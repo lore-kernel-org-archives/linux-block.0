@@ -2,96 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A3BC6FD1F
-	for <linux-block@archiver.kernel.org>; Sun, 12 Mar 2023 08:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E0BC6FD1F
+	for <linux-block@archiver.kernel.org>; Sun, 12 Mar 2023 12:36:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229499AbjCLIbR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Mar 2023 04:31:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44034 "EHLO
+        id S229776AbjCLMgW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Mar 2023 08:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229650AbjCLIbQ (ORCPT
+        with ESMTP id S229493AbjCLMgV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Mar 2023 04:31:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AF74FF1F
-        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 00:30:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678609827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cTJUAFMiKw9YXPlS9lywYBNgOfv1YiKLGXLNoVp00UQ=;
-        b=Mh6Fm5lDZQUofBj/lQiRykJBl4+ANTG7lh8RPA/D55tCoN4zY2dUvDpWvJ0peoUWNaJFdp
-        Q4ia/IGDLmD9fRM/xXX3zPQL1U4H1W+r90TYRGHrQqu6dw4uI/Q9goKNZXyMJHCFsaA72f
-        siqO+EnT+0V1KcCEvANU2dm7bmzgbEU=
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
- [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-270-nA7d5DTFP0O9B7yiG4QnSA-1; Sun, 12 Mar 2023 04:30:19 -0400
-X-MC-Unique: nA7d5DTFP0O9B7yiG4QnSA-1
-Received: by mail-ua1-f69.google.com with SMTP id b19-20020ab04813000000b0068fbb418f63so4616765uad.2
-        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 00:30:18 -0800 (PST)
+        Sun, 12 Mar 2023 08:36:21 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1269130187
+        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 05:36:20 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id k2so2260737pll.8
+        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 05:36:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678624579;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BZ/oZ2UTxPe8mkUt3Li/iZ+QGKCA6pqiISA8N20XQF4=;
+        b=p4GaONQsmqJw7GUBPHDi1KEIY4A+gItWyBYrqM6F6VVCGOAvqFc8xSnRf41UZZly/Z
+         K0mubuH8vJB2Oponfi7ltJGjg5BuLO5ypCI/BXW1D+bWzbXhY/yaAobFm7t6UIgkEkg1
+         PUuQgWYTJAfxrm2mG2mcAc7PXB/fRDWsnp4fk3dcbJCZiwNt6/Gr3krMRWfwjxLy8xkh
+         yWP3fa9sd8RxOzxzk9KXM0+AsxjJWaSl5S+Jkmzh2ZZQ4joozf1KlmttxZ1UddLyqsA5
+         Iz1Qmm1KO8sMc+Z671aYrBJCPNU7tbNsXc47RsM17BYqOUt2nnul+hlImyVYkmv1MC8V
+         G4jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678609818;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cTJUAFMiKw9YXPlS9lywYBNgOfv1YiKLGXLNoVp00UQ=;
-        b=OrdTIsvdkDAl5L7Wewi4OfHSuHm47RDf8KZT+pQmXeWuB3JttCSmktCHayOLbAKOaD
-         Wcu+bynJ+UiMKlE6g1pplAirSj+ZckAgtjjZNRegM9EEiGTIzS9TfXvn6+ys+56kT4HW
-         +ikpukapmBY0zDENIp068nPEmzf82hfKxBZSpwTOYU6THk1uQJ7aC0EDi9EBlo+uc2Hd
-         e2Y8aH8q9VMm1/nOAdRCY30GGwqHWW544hwd2t+pC7naqWkRBC6/4JkXFTh8V8T3/B7m
-         rZFxTxoCZnWyLC8pwCqxxlZShfFyYgjNolO/c5sm9nZfj44pznRfKtLX/aS1OpfiYlYY
-         ziow==
-X-Gm-Message-State: AO0yUKWEUKq9eokMyv8AI2ZymoGuLIrHrhdw1aBHlA2mv6CayimAryhV
-        OVUrXqXarUzHkoYgbN+/zW2eJd0A7uiD+L/6IDTO6b8wCJzbq86r/SPo4SmQTwv1jlda76rlr3e
-        S7Kbsj1Ep1m7O8tQMM2aKsioz132VaUsTpudpLr6CDzEicjo=
-X-Received: by 2002:a1f:5081:0:b0:418:4529:a308 with SMTP id e123-20020a1f5081000000b004184529a308mr18819944vkb.3.1678609818165;
-        Sun, 12 Mar 2023 00:30:18 -0800 (PST)
-X-Google-Smtp-Source: AK7set/XxiUHqj7uZm7+uQmpQQmAFDztF4XwTwbAWzfBXxoaAKYWNuNGHKx1WneKNKQ2hYsmxYfu0s630gn5HA+5VLg=
-X-Received: by 2002:a1f:5081:0:b0:418:4529:a308 with SMTP id
- e123-20020a1f5081000000b004184529a308mr18819935vkb.3.1678609817771; Sun, 12
- Mar 2023 00:30:17 -0800 (PST)
+        d=1e100.net; s=20210112; t=1678624579;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BZ/oZ2UTxPe8mkUt3Li/iZ+QGKCA6pqiISA8N20XQF4=;
+        b=ZRlsGlxpwVHQsJNnsFTeo+Ju6fehj9pXaA6h+8Mdv+apAVh9XxqeTL/vslsgoHn7PB
+         Wq8fUrwsOL0pSpIAKtf5hEIa6y8LduIHJvza+BC1QI66rQHe+PAzKEd8lT2Y+sQylByT
+         KSN7Wh1JNNdlS7jNi5H2rzWFCVnrhbfPo4TWks6aHtoT+VwuyoJsh5kVuLXztX7RFEuf
+         ENU4+P+z1YGPyJmhL+zGdg6+j0sBspSojaDsFvADFYHBGQhX/x/qUV1ixZJhdBTQyAoc
+         km5mY6kLmKLVchgGAloIsiDG8GxkdP24TQcFqGF89hDt8KlbYMpt/1GxomUmThfIV47F
+         F5XQ==
+X-Gm-Message-State: AO0yUKUrXWarczRed9VkEYLxPrw0Y0kvjT7e8JAuJo9RlkDkc7u3jpqQ
+        OL4+PBoZ9Wwe8vDGEa1lxCKasti5MFI=
+X-Google-Smtp-Source: AK7set9hdcAeOcx8F/u9qV4UYr1hkUkgeiLGp1L21JGEKIxH910Fp4ECqY8ka/AF3nYBo+oRFum3TA==
+X-Received: by 2002:a17:902:c948:b0:19a:a4f3:6d4c with SMTP id i8-20020a170902c94800b0019aa4f36d4cmr37100476pla.67.1678624578638;
+        Sun, 12 Mar 2023 05:36:18 -0700 (PDT)
+Received: from localhost.localdomain ([240f:34:212d:1:f857:74a:5290:8183])
+        by smtp.gmail.com with ESMTPSA id kb8-20020a170903338800b001990028c0c9sm2828879plb.68.2023.03.12.05.36.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Mar 2023 05:36:17 -0700 (PDT)
+From:   Akinobu Mita <akinobu.mita@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     Akinobu Mita <akinobu.mita@gmail.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] null_blk: execute complete callback for fake timeout request
+Date:   Sun, 12 Mar 2023 21:35:56 +0900
+Message-Id: <20230312123556.12298-1-akinobu.mita@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <Y8lSYBU9q5fjs7jS@T590> <ZAyAdwWdw0I034IZ@pc220518.home.grep.be>
-In-Reply-To: <ZAyAdwWdw0I034IZ@pc220518.home.grep.be>
-From:   Ming Lei <ming.lei@redhat.com>
-Date:   Sun, 12 Mar 2023 16:30:06 +0800
-Message-ID: <CAFj5m9KM1xbwPobvEYBmgotrU8s2jBQGcSQafJVJM+iQMS0pjA@mail.gmail.com>
-Subject: Re: ublk-nbd: ublk-nbd is avaialbe
-To:     Wouter Verhelst <w@uter.be>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 11, 2023 at 9:58=E2=80=AFPM Wouter Verhelst <w@uter.be> wrote:
->
-> Hi,
->
-> On Thu, Jan 19, 2023 at 10:23:28PM +0800, Ming Lei wrote:
-> > The handshake implementation is borrowed from nbd project[2], so
-> > basically ublk-nbd just adds new code for implementing transmission
-> > phase, and it can be thought as moving linux block nbd driver into
-> > userspace.
-> [...]
-> > Any comments are welcome!
->
-> I see you copied nbd-client.c and modified it, but removed all the
-> author information from it (including mine).
->
-> Please don't do that. nbd-client is not public domain, it is GPLv2,
-> which means you need to keep copyright statements around somewhere. You
-> can move them into an AUTHORS file or some such if you prefer, but you
-> can't just remove them blindly.
+When injecting a fake timeout into the null_blk driver by fail_io_timeout,
+the request timeout handler doen't execute blk_mq_complete_request(), so
+the complete callback will never be executed for that timed out request.
 
-Thanks for finding it, and it must be one accident, and I will add the
-author info
-back soon.
+The null_blk driver also has a driver-specific fake timeout mechanism and
+does not have the problem that occur when using the generic one.
+Fix the problem by doing similar to what the driver-specific one does.
 
-thanks,
+Fixes: de3510e52b0a ("null_blk: fix command timeout completion handling")
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+---
+ drivers/block/null_blk/main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 4c601ca9552a..69250b3cfecd 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1413,7 +1413,9 @@ static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
+ 	case NULL_IRQ_SOFTIRQ:
+ 		switch (cmd->nq->dev->queue_mode) {
+ 		case NULL_Q_MQ:
+-			if (likely(!blk_should_fake_timeout(cmd->rq->q)))
++			if (unlikely(blk_should_fake_timeout(cmd->rq->q)))
++				cmd->fake_timeout = true;
++			else
+ 				blk_mq_complete_request(cmd->rq);
+ 			break;
+ 		case NULL_Q_BIO:
+-- 
+2.34.1
 
