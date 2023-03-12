@@ -2,99 +2,188 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E0BC6FD1F
-	for <linux-block@archiver.kernel.org>; Sun, 12 Mar 2023 12:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58991C6FA99
+	for <linux-block@archiver.kernel.org>; Sun, 12 Mar 2023 19:11:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbjCLMgW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Mar 2023 08:36:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50516 "EHLO
+        id S229829AbjCLTLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Mar 2023 15:11:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjCLMgV (ORCPT
+        with ESMTP id S229925AbjCLTK7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Mar 2023 08:36:21 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1269130187
-        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 05:36:20 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id k2so2260737pll.8
-        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 05:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678624579;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZ/oZ2UTxPe8mkUt3Li/iZ+QGKCA6pqiISA8N20XQF4=;
-        b=p4GaONQsmqJw7GUBPHDi1KEIY4A+gItWyBYrqM6F6VVCGOAvqFc8xSnRf41UZZly/Z
-         K0mubuH8vJB2Oponfi7ltJGjg5BuLO5ypCI/BXW1D+bWzbXhY/yaAobFm7t6UIgkEkg1
-         PUuQgWYTJAfxrm2mG2mcAc7PXB/fRDWsnp4fk3dcbJCZiwNt6/Gr3krMRWfwjxLy8xkh
-         yWP3fa9sd8RxOzxzk9KXM0+AsxjJWaSl5S+Jkmzh2ZZQ4joozf1KlmttxZ1UddLyqsA5
-         Iz1Qmm1KO8sMc+Z671aYrBJCPNU7tbNsXc47RsM17BYqOUt2nnul+hlImyVYkmv1MC8V
-         G4jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678624579;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BZ/oZ2UTxPe8mkUt3Li/iZ+QGKCA6pqiISA8N20XQF4=;
-        b=ZRlsGlxpwVHQsJNnsFTeo+Ju6fehj9pXaA6h+8Mdv+apAVh9XxqeTL/vslsgoHn7PB
-         Wq8fUrwsOL0pSpIAKtf5hEIa6y8LduIHJvza+BC1QI66rQHe+PAzKEd8lT2Y+sQylByT
-         KSN7Wh1JNNdlS7jNi5H2rzWFCVnrhbfPo4TWks6aHtoT+VwuyoJsh5kVuLXztX7RFEuf
-         ENU4+P+z1YGPyJmhL+zGdg6+j0sBspSojaDsFvADFYHBGQhX/x/qUV1ixZJhdBTQyAoc
-         km5mY6kLmKLVchgGAloIsiDG8GxkdP24TQcFqGF89hDt8KlbYMpt/1GxomUmThfIV47F
-         F5XQ==
-X-Gm-Message-State: AO0yUKUrXWarczRed9VkEYLxPrw0Y0kvjT7e8JAuJo9RlkDkc7u3jpqQ
-        OL4+PBoZ9Wwe8vDGEa1lxCKasti5MFI=
-X-Google-Smtp-Source: AK7set9hdcAeOcx8F/u9qV4UYr1hkUkgeiLGp1L21JGEKIxH910Fp4ECqY8ka/AF3nYBo+oRFum3TA==
-X-Received: by 2002:a17:902:c948:b0:19a:a4f3:6d4c with SMTP id i8-20020a170902c94800b0019aa4f36d4cmr37100476pla.67.1678624578638;
-        Sun, 12 Mar 2023 05:36:18 -0700 (PDT)
-Received: from localhost.localdomain ([240f:34:212d:1:f857:74a:5290:8183])
-        by smtp.gmail.com with ESMTPSA id kb8-20020a170903338800b001990028c0c9sm2828879plb.68.2023.03.12.05.36.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Mar 2023 05:36:17 -0700 (PDT)
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Akinobu Mita <akinobu.mita@gmail.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] null_blk: execute complete callback for fake timeout request
-Date:   Sun, 12 Mar 2023 21:35:56 +0900
-Message-Id: <20230312123556.12298-1-akinobu.mita@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 12 Mar 2023 15:10:59 -0400
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBB5303DB;
+        Sun, 12 Mar 2023 12:10:49 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.west.internal (Postfix) with ESMTP id 9E524320046E;
+        Sun, 12 Mar 2023 15:10:47 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Sun, 12 Mar 2023 15:10:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
+        :cc:content-transfer-encoding:content-type:content-type:date
+        :date:from:from:in-reply-to:message-id:mime-version:reply-to
+        :sender:subject:subject:to:to; s=fm1; t=1678648247; x=
+        1678734647; bh=Cvh4ZiacG5VE6kcR8Gk7s5+fYYDWMIvbwr/3VYeaQZ4=; b=k
+        X+AnLqLq4MLdXHy+t+2is0PlLlD7ud3YWETgaLWAP5nQ5kVuhBCdwSpTx/S62NbI
+        7+HRx3jRkN8Y9B20bCvyDPtTtw90qRFZN/yYrGoOqmHJAFBf/vH98xKQ67lmAw/u
+        KjxdDaVXs/16cCRKyOo2k2YsI8uaS7OIHVHl07X+RFw5ioITxeDzYHDI1qPpC3OX
+        y+s/fD+64p6BgPXxh8an5lGc1fxOQnah4SCsxpkZ1qR9o/NYnBsN6eMnXFPQmZWv
+        1fE9DzScWIgzbgLGEzid6asztQno2ltg5GchMSRfbOR1tDKe+1if8zHxsC1WMBZg
+        0KFocWKYPbS3ghXDRGTHA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:date:feedback-id:feedback-id
+        :from:from:in-reply-to:message-id:mime-version:reply-to:sender
+        :subject:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender
+        :x-me-sender:x-sasl-enc; s=fm2; t=1678648247; x=1678734647; bh=C
+        vh4ZiacG5VE6kcR8Gk7s5+fYYDWMIvbwr/3VYeaQZ4=; b=vRA11/tAGCHarmsIR
+        s2nKwyc0GCeCAKvbfF/ZhBJjEU9Ip+gCnurM6Q6qsHCjpfzv4P3zgeNGgrymWjP3
+        zdZhqeAQ74Nw7uYu/YDthOvq5OU4T7MZnOo6aqLgXNQbxGWX6RWQcoyR9Ph+dZ55
+        ikt7jS71lk2v99aigtZJPV5SBDKrM7USbnWnd/30jyiAOiqDoGMuPErUiANvXYWg
+        z4Yhn5qlMQsqxSb1pFpivhpZrpSdptpfTINywVNShyBf/uf72k+8T49MyBPVNmlJ
+        vO/2m892Am6rNSeqbV/5f5uNLXAbSoitMz88bjl870TnV0M1WHokeBraj1EnO8ep
+        FFl2g==
+X-ME-Sender: <xms:tiMOZLZNPbBlvpD6EebseWHHRnEqRjmlf5aiOIBqu63oPF5vzTQmOQ>
+    <xme:tiMOZKa2qd2vmYwvG563FWj-7y6bbJLguiPcVQWrDxfgPApc4DNXkUf3Z1Of2hbl8
+    EyWwfpGfK82CBnWig>
+X-ME-Received: <xmr:tiMOZN9AxCea0RtN7VS-V5g9W_lhgHtqZ4Z7MASgGYYz32B6Anonfxs_mZBL_t0PR3bV6SdyaN1NP50c_GJhgGz1wO4YZpuRNQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvddvvddguddvtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvfevufffkffogggtgfesthekredtredtjeenucfhrhhomheptehlhihs
+    shgrucftohhsshcuoehhihesrghlhihsshgrrdhisheqnecuggftrfgrthhtvghrnhepve
+    evgfehledtieelffegvdegveeukeevhfdtteeggeejvdduveegvefftefgueffnecuffho
+    mhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpehhihesrghlhihsshgrrdhish
+X-ME-Proxy: <xmx:tiMOZBplT7Ushm42rQUl_PyR8nzY1xxCu5d4WQoxjE2P6scdIaPo2A>
+    <xmx:tiMOZGos34MSyNMXe1A5gz_SZ37XCx9Oiwvn2QIp7qW4qclqABcjuQ>
+    <xmx:tiMOZHTBiwYW4eJunuRWqjo6hKX36y0tBYRLz3aB2sR8olTWfbUc1g>
+    <xmx:tyMOZN2cd5oNEs6W7sGqAtYnM0uOJhcwEfv26X93_i8j8BFExTswrw>
+Feedback-ID: i12284293:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 12 Mar 2023 15:10:46 -0400 (EDT)
+Received: by x220.qyliss.net (Postfix, from userid 1000)
+        id 3B3C423881; Sun, 12 Mar 2023 19:10:39 +0000 (UTC)
+From:   Alyssa Ross <hi@alyssa.is>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, Alyssa Ross <hi@alyssa.is>,
+        Martijn Coenen <maco@android.com>, linux-block@vger.kernel.org
+Subject: [PATCH v2] loop: LOOP_CONFIGURE: send uevents for partitions
+Date:   Sun, 12 Mar 2023 19:10:31 +0000
+Message-Id: <20230312191031.551204-1-hi@alyssa.is>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When injecting a fake timeout into the null_blk driver by fail_io_timeout,
-the request timeout handler doen't execute blk_mq_complete_request(), so
-the complete callback will never be executed for that timed out request.
+LOOP_CONFIGURE is, as far as I understand it, supposed to be a way to
+combine LOOP_SET_FD and LOOP_SET_STATUS64 into a single syscall.  When
+using LOOP_SET_FD+LOOP_SET_STATUS64, a single uevent would be sent for
+each partition found on the loop device after the second ioctl(), but
+when using LOOP_CONFIGURE, no such uevent was being sent.
 
-The null_blk driver also has a driver-specific fake timeout mechanism and
-does not have the problem that occur when using the generic one.
-Fix the problem by doing similar to what the driver-specific one does.
+In the old setup, uevents are disabled for LOOP_SET_FD, but not for
+LOOP_SET_STATUS64.  This makes sense, as it prevents uevents being
+sent for a partially configured device during LOOP_SET_FD — they're
+only sent at the end of LOOP_SET_STATUS64.  But for LOOP_CONFIGURE,
+uevents were disabled for the entire operation, so that final
+notification was never issued.  To fix this, I've moved the
+loop_reread_partitions() call, which causes the uevents to be issued,
+to after uevents are re-enabled, matching the behaviour of the
+LOOP_SET_FD+LOOP_SET_STATUS64 combination.
 
-Fixes: de3510e52b0a ("null_blk: fix command timeout completion handling")
-Cc: Damien Le Moal <damien.lemoal@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+I noticed this because Busybox's losetup program recently changed from
+using LOOP_SET_FD+LOOP_SET_STATUS64 to LOOP_CONFIGURE, and this broke
+my setup, for which I want a notification from the kernel any time a
+new partition becomes available.
+
+Signed-off-by: Alyssa Ross <hi@alyssa.is>
+Fixes: 3448914e8cc5 ("loop: Add LOOP_CONFIGURE ioctl")
 ---
- drivers/block/null_blk/main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 4c601ca9552a..69250b3cfecd 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1413,7 +1413,9 @@ static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
- 	case NULL_IRQ_SOFTIRQ:
- 		switch (cmd->nq->dev->queue_mode) {
- 		case NULL_Q_MQ:
--			if (likely(!blk_should_fake_timeout(cmd->rq->q)))
-+			if (unlikely(blk_should_fake_timeout(cmd->rq->q)))
-+				cmd->fake_timeout = true;
-+			else
- 				blk_mq_complete_request(cmd->rq);
- 			break;
- 		case NULL_Q_BIO:
+v1: https://lore.kernel.org/linux-block/20230221222847.607096-1-hi@alyssa.is/
+
+v1 was an RFC, because I was looking for advice on how to handle
+distinguishing between LOOP_SET_FD with non-zero max_part (in which
+case partscan will be true, but a uevent should not be emitted), and
+LOOP_CONFIGURE (where a uevent should be emitted).  I didn't hear
+anything, but I did some experimentation of my own, and adding a
+partscan_uevent parameter to distinguish between LOOP_SET_FD and
+LOOP_CONFIGURE feels like the least bad solution to me.
+
+ drivers/block/loop.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 839373451c2b..f00a0209b522 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -992,7 +992,8 @@ loop_set_status_from_info(struct loop_device *lo,
+ 
+ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 			  struct block_device *bdev,
+-			  const struct loop_config *config)
++			  const struct loop_config *config,
++			  bool partscan_uevent)
+ {
+ 	struct file *file = fget(config->fd);
+ 	struct inode *inode;
+@@ -1110,15 +1111,21 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+ 
+ 	loop_global_unlock(lo, is_loop);
+-	if (partscan)
+-		loop_reread_partitions(lo);
+ 	if (!(mode & FMODE_EXCL))
+ 		bd_abort_claiming(bdev, loop_configure);
+ 
++	/*
++	 * Now that we are done, reread the partitions with uevent
++	 * re-enabled if appropriate to let userspace know about the
++	 * changes.
++	 */
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), !partscan_uevent);
++	if (partscan)
++		loop_reread_partitions(lo);
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
++
+ 	error = 0;
+ done:
+-	/* enable and uncork uevent now that we are done */
+-	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+ 	return error;
+ 
+ out_unlock:
+@@ -1130,6 +1136,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	fput(file);
+ 	/* This is safe: open() is still holding a reference. */
+ 	module_put(THIS_MODULE);
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
+ 	goto done;
+ }
+ 
+@@ -1547,7 +1554,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		memset(&config, 0, sizeof(config));
+ 		config.fd = arg;
+ 
+-		return loop_configure(lo, mode, bdev, &config);
++		return loop_configure(lo, mode, bdev, &config, false);
+ 	}
+ 	case LOOP_CONFIGURE: {
+ 		struct loop_config config;
+@@ -1555,7 +1562,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ 		if (copy_from_user(&config, argp, sizeof(config)))
+ 			return -EFAULT;
+ 
+-		return loop_configure(lo, mode, bdev, &config);
++		return loop_configure(lo, mode, bdev, &config, true);
+ 	}
+ 	case LOOP_CHANGE_FD:
+ 		return loop_change_fd(lo, bdev, arg);
 -- 
-2.34.1
+2.37.1
 
