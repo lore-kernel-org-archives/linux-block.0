@@ -2,159 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C947C6FD19
-	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 01:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 927BBC6FD1F
+	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 03:05:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbjCMBAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 12 Mar 2023 21:00:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58694 "EHLO
+        id S229685AbjCMDFb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 12 Mar 2023 23:05:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjCMBAi (ORCPT
+        with ESMTP id S229977AbjCMDFR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 12 Mar 2023 21:00:38 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7093629429
-        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 18:00:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1678669234; x=1710205234;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TZ9hmTug9/+SbaIJsNlFxN8Yz88RN4hP0DPgXCVIw7w=;
-  b=PZVbWhN1FP0t0egwN/wBisaIXjH3X5+vXcDZu+fGaAn2g1NAyaOmNTg8
-   GjtpZi0U5OPTqsSi3R67Hj5WRn9+uQ/kaEKfd4SoiNkkUDwipfme65AGC
-   /1gDa74xQnbbRsQvzli+bm2Oqg8jLbuzceYD8WCmYkde4jW91rZqy2PNb
-   Ar4JPNUlILDWfIxWEDM4TYJSfuaPVi4nV0lRkaCl2tDnAZOgKeWT1mdNI
-   PGd6zBJCM65mQ7hJuYqG2mSOm5Xz+IIgxZ0j0IbBwaLtufyEqwkmy0LcW
-   pzPd8IVpyobcNefFeHamiExZ3kMg3ZvESJbj8tQa59K9RzTjh11hMDHE7
-   g==;
-X-IronPort-AV: E=Sophos;i="5.98,254,1673884800"; 
-   d="scan'208";a="223744819"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Mar 2023 09:00:32 +0800
-IronPort-SDR: lkmElhdSFoOuWKe5wRszNrg1x4WY2i9ALJ25J5wbM5EO51G0XYcqmJA9YHbJdbj0pOasyi02z0
- gDtPGmY8Lyp6aS7QDvQqElGeNuoxmmTp+DcoMsGYeyFGRlRHD0OAAxg9IYWG9JwDEigshC+wXF
- SOY6Kia0rvAmH9gs1LezMoFOD3MvZq9llaY5UMYrU+NHeFKdEMZRm4G81ts20HlAxNNlG3BJ1/
- qZxgzVjEYIKcaq39zjBDZEiyr4lERZAPR5oGuZps1Uw/ZNyk0hqu4hYZnad41xu8JO11MtyT91
- 9EI=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Mar 2023 17:17:02 -0700
-IronPort-SDR: O+kodt8+oAEyci5OjD/oL3qOOUqhJB99TlA8hbRDnBphSgJj2VN7X7WjwPwdtRT/ZrIidgUo9w
- 2SFNQiSQytv0/as7NecFveY11SWSNLYRcltonC6gnL7ta+QIsAO4FzIG3WMhxGp5QiToPiVtm5
- VoLN7vGKa3eZk2N0vfoMj83FdG9EmHQosl4zgSO8YDVqiIw184m0r1f2sawiSdtmMFndxwrEW2
- Me6FRob+XDYxjNml73RN0AKdm5dgtPNTz0kXM6CELrPDHYLCvVTNEov25tHbU9VFCPJX8N8ZpC
- UjI=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Mar 2023 18:00:34 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PZdcc4H3Gz1RwqL
-        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 18:00:32 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1678669232; x=1681261233; bh=TZ9hmTug9/+SbaIJsNlFxN8Yz88RN4hP0DP
-        gXCVIw7w=; b=pdQUYpLzB30eRLiN5MDgqVMqq3C4uzPf6coqezhqoUXImnL5BvR
-        O3eWuwAUKWOV/AcjoCQx9yo9eLdX0u4oKHIgJ1zkSSfTlgPJcwB/Ie0pNY9CQvPO
-        4mwufoKR+93gNpU7JMcDOTUWoAVHJe0UTz1ejtWRUCprWj9M4mmE5tIxEAt8Sy5w
-        h+bEUGmbzPq9cBH1WnIYTsRiB6F6AQ6qMTZTSJ2dNOGdaoVgydXKhwt1OUR4DTNd
-        gt1RKs1kGPZ8MWRi7h9umKuZyDq+H4izm1iYw2vYF5F909KAGErHFr8ARgcHpYvS
-        bxG2XJd1k7im0qhMRnKsU617M+7mPyiA76g==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id LepTz4BpBDdh for <linux-block@vger.kernel.org>;
-        Sun, 12 Mar 2023 18:00:32 -0700 (PDT)
-Received: from [10.225.163.79] (unknown [10.225.163.79])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PZdcb4gGzz1RvLy;
-        Sun, 12 Mar 2023 18:00:31 -0700 (PDT)
-Message-ID: <49cfce8b-042e-7248-928f-4a5c5f7d0e31@opensource.wdc.com>
-Date:   Mon, 13 Mar 2023 10:00:30 +0900
+        Sun, 12 Mar 2023 23:05:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E65B222122
+        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 20:04:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678676673;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AQANVrvaj9/B2WSrHSzaItV2LmCoP7qwGr+9zKi06ow=;
+        b=Ss/jhcn3qWPpcxYmqzgzaoYjnbq8HhXtlLbI9G7K3oV2uzv4qKVZwiLwip6+W9jO/0bryx
+        SSRUK9qB9Hdt49/b+Iwn31haN3jFLZy751aycCZPP//eNMRVLtRSkRP+NL8kuIJI1YonKy
+        JZpdKWxtncu6DTtjHzR7MQnskZuRbo0=
+Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
+ [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-613-QlqfF10dPz6DlhSpfy-zYQ-1; Sun, 12 Mar 2023 23:04:31 -0400
+X-MC-Unique: QlqfF10dPz6DlhSpfy-zYQ-1
+Received: by mail-ua1-f72.google.com with SMTP id g34-20020ab059a5000000b0068fb77b4fccso5628517uad.3
+        for <linux-block@vger.kernel.org>; Sun, 12 Mar 2023 20:04:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678676671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AQANVrvaj9/B2WSrHSzaItV2LmCoP7qwGr+9zKi06ow=;
+        b=SC9JCEQC/7n0UZegoo1Njz7uK5b6bh0AErYsfnF8ma/vmrhkn84dywe2/1CE3b9iXO
+         qcLezIn7q8dnJJizO31PZndPdrpsQwaHRzZ0kqfS6/Dcbg9ZJQHxqgMkH+JYWpE7hI+V
+         dAvcqPU2djG5xq9jmRTBAnC7+vhL7CTrJzw3d2DjtS+eeZSnr+WkscbgT38QuoB5+u4n
+         p5OcqJ3x7GxnNnntHHX5kMHU2/3WyfM/V0/ahTGixN29PfvYQE4DVycYtNPqHjUv8Jtm
+         i2p9ADm202A0L1Nvf//H2/AIEOep4PnQ4hSBYUjoVJ4gOAhz0D/yUqC1Un1wn1Zvzrxg
+         J+mw==
+X-Gm-Message-State: AO0yUKWJchCxCxIqQ8iTiRaQxSp8XRrdfnhQf46mNM1nCv0DtU14pm3y
+        OLVVbr8g2lONUUJKgAt3x/pHBaRovEEPm07q6Tpstlc0iKVx+LBK5ZEqAn1lozG7xpcaLps5L+w
+        e1v1/VNlZcd+m3D++uHg2Xs0oJZHKL5w8sUuEDm5uJqNZD3qhCQ==
+X-Received: by 2002:a1f:4b01:0:b0:401:8898:ea44 with SMTP id y1-20020a1f4b01000000b004018898ea44mr18555378vka.3.1678676671146;
+        Sun, 12 Mar 2023 20:04:31 -0700 (PDT)
+X-Google-Smtp-Source: AK7set83d8dKkzLeJ9M1ow+hnonqiyLfMHFAS+UySCvJj8sJK2fNKWzzVwX2uSVj8vcnI9W5BAG2+1uG1juFgoNFqic=
+X-Received: by 2002:a1f:4b01:0:b0:401:8898:ea44 with SMTP id
+ y1-20020a1f4b01000000b004018898ea44mr18555374vka.3.1678676670837; Sun, 12 Mar
+ 2023 20:04:30 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH] null_blk: execute complete callback for fake timeout
- request
-Content-Language: en-US
-To:     Akinobu Mita <akinobu.mita@gmail.com>, linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-References: <20230312123556.12298-1-akinobu.mita@gmail.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230312123556.12298-1-akinobu.mita@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230310201525.2615385-1-eblake@redhat.com> <20230310201525.2615385-2-eblake@redhat.com>
+In-Reply-To: <20230310201525.2615385-2-eblake@redhat.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Mon, 13 Mar 2023 11:04:19 +0800
+Message-ID: <CAFj5m9JmwYn9BTYEWWFykC_20rDVXfENKRbD2A=G=DmM4ni1-g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] uapi nbd: improve doc links to userspace spec
+To:     Eric Blake <eblake@redhat.com>
+Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+        corbet@lwn.net, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/12/23 21:35, Akinobu Mita wrote:
-> When injecting a fake timeout into the null_blk driver by fail_io_timeout,
-> the request timeout handler doen't execute blk_mq_complete_request(), so
-> the complete callback will never be executed for that timed out request.
-> 
-> The null_blk driver also has a driver-specific fake timeout mechanism and
-> does not have the problem that occur when using the generic one.
-> Fix the problem by doing similar to what the driver-specific one does.
-> 
-> Fixes: de3510e52b0a ("null_blk: fix command timeout completion handling")
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
-> ---
->  drivers/block/null_blk/main.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 4c601ca9552a..69250b3cfecd 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1413,7 +1413,9 @@ static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
->  	case NULL_IRQ_SOFTIRQ:
->  		switch (cmd->nq->dev->queue_mode) {
->  		case NULL_Q_MQ:
-> -			if (likely(!blk_should_fake_timeout(cmd->rq->q)))
-> +			if (unlikely(blk_should_fake_timeout(cmd->rq->q)))
-> +				cmd->fake_timeout = true;
-> +			else
->  				blk_mq_complete_request(cmd->rq);
->  			break;
->  		case NULL_Q_BIO:
+On Sat, Mar 11, 2023 at 4:17=E2=80=AFAM Eric Blake <eblake@redhat.com> wrot=
+e:
+>
+> The uapi <linux/nbd.h> header intentionally documents only the NBD
+> server features that the kernel module will utilize as a client.  But
+> while it already had one mention of skipped bits due to userspace
+> extensions, it did not actually direct the reader to the canonical
+> source to learn about those extensions.
+>
+> While touching comments, fix an outdated reference that listed only
+> READ and WRITE as commands.
+>
+> The documentation file also had a stale link to sourceforge; nbd
+> ditched that several years ago in favor of github.
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-I have not checked, but does this work ?
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 4c601ca9552a..52d689aa3171 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1413,7 +1413,7 @@ static inline void nullb_complete_cmd(struct nullb_cmd *cmd)
-        case NULL_IRQ_SOFTIRQ:
-                switch (cmd->nq->dev->queue_mode) {
-                case NULL_Q_MQ:
--                       if (likely(!blk_should_fake_timeout(cmd->rq->q)))
-+                       if (!cmd->fake_timeout)
-                                blk_mq_complete_request(cmd->rq);
-                        break;
-                case NULL_Q_BIO:
-@@ -1675,7 +1675,8 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
-        cmd->rq = bd->rq;
-        cmd->error = BLK_STS_OK;
-        cmd->nq = nq;
--       cmd->fake_timeout = should_timeout_request(bd->rq);
-+       cmd->fake_timeout = should_timeout_request(bd->rq) ||
-+               blk_should_fake_timeout(bd->rq->q);
-
-        blk_mq_start_request(bd->rq);
-
-
-It is I think cleaner as it unifies the internal fake timeout and
-blk_should_fake_timeout().
-
--- 
-Damien Le Moal
-Western Digital Research
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
