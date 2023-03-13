@@ -2,76 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AAA7C7618B
-	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 22:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B8DC6FD1C
+	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 22:30:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbjCMWaB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Mar 2023 18:30:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46470 "EHLO
+        id S229456AbjCMWaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Mar 2023 18:30:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbjCMW37 (ORCPT
+        with ESMTP id S229842AbjCMWaB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Mar 2023 18:29:59 -0400
+        Mon, 13 Mar 2023 18:30:01 -0400
 Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 948A57B9B2
-        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 15:29:57 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id p20so14576968plw.13
-        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 15:29:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE8E69CCB
+        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 15:29:59 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id a2so14618733plm.4
+        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 15:29:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1678746597;
+        d=chromium.org; s=google; t=1678746599;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xa07PDDOnj/X6NHN+d/QgDm/+DQki57Tyzb3ho/cDuY=;
-        b=bylvb4fxugyVDyToLt5KgTYX0EeU8moTM+EGxcxevMVmFAAwBd/b8qm1kmZvfBvdqg
-         xrvhBGF1I/rw0V2kUxdFKH8/ATrtXkDfLxsHhbAcMfTUdZ8YL91kykyDgtDPC5rPCAtw
-         G7yuXDGBulWFqWPG85pX3lZvecfT3ebaG7yRY=
+        bh=XPLn+orVfSK+z4tupCE3vvaGTo6pOxRCWsTN9XiJPXw=;
+        b=jwVQFnAZvTbL1m3KsEL+nj7y4CkOYqkthOJJZum4ez+s9ehzdY/jhGB0JirvrTvSCM
+         7SR9W1NWfEuWwA6QbUBpgU0GPxwrjZmm2fE5jYhi23JHRYR5Q3ZCDyPrpG03hgw3sark
+         ZA4S2l4uR/NYjZU1VXsKl+FSisRWndkN9o27U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678746597;
+        d=1e100.net; s=20210112; t=1678746599;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xa07PDDOnj/X6NHN+d/QgDm/+DQki57Tyzb3ho/cDuY=;
-        b=N+Pk6OcXldRZ19LXphK8TI+pJPzVwH205DxHnZ8CU8vXkQEcCav3R7KhZW7BoGc8q4
-         +ZJ4sCr3PtlfEzukUfPix0oejpVSQTODxYinSjkDdjaxZt8mfDdtVBqkSVAdOCise6yr
-         xirRqivWzd1nbYlvB7fmcn1c2OVP6nz0ghQTMlEVrEbljbPGctikycFmsy3AtpwGxJLo
-         vbEg0pMA1gkewztus1Iik+0+6vtYGlXDEg8YqQLIyQzhLgZ3vkctvsQDeSMft0C3HrUs
-         07QkBorLrTTkuIOp1vPRMZpXgEb2dKJe91FvXI3V19WuurBOJnuyQYa1OMTyLFdnDiJn
-         cFdg==
-X-Gm-Message-State: AO0yUKXleUcc8Pc4mtvDLMntsCc/EavkzGB/+17hLpn6rxosmsEDJrp6
-        XSN1tzyNGN14gUe0D9epIjT5xA==
-X-Google-Smtp-Source: AK7set8ijmeCDZTeQ5anQRrCdK+T4bnN0nNP0w7J4l9Ofm1NnmHTTqjHYMYqUtegpiLW2JeXvfPgEw==
-X-Received: by 2002:a17:902:d4c8:b0:19e:7bce:cc65 with SMTP id o8-20020a170902d4c800b0019e7bcecc65mr39459482plg.66.1678746596837;
-        Mon, 13 Mar 2023 15:29:56 -0700 (PDT)
+        bh=XPLn+orVfSK+z4tupCE3vvaGTo6pOxRCWsTN9XiJPXw=;
+        b=Jxg6Zs/7J05KC5Qb7qxERPAfaChWN+OaNwV8ygq9FDmIOhXE+efku2SWhxUK2b0NJs
+         TMnzaGRKm0WBPzKQtc3/JOGwvUNekYadciu7Kal72xfEjEnrUshssbUcWqx1dUioZH6b
+         GZ1va1sB5VOyeHD0euEj6xhhJhnPss3YuTCITsP1hDkaA6b+Fi/a9ggRExgkcItvMIuk
+         pv6X+RYSJbOd8/8kzr8lRiqnffzab2pMkwqB6HOrVtCwIOjK+W8Xy5HKLNLfcTOKGMte
+         MaWr88mk3Sw3PVGqNTX1THokCbRcyhRpSj5k3bw2gun9xPE1/6Jl0k5rZmRm6qXQt2Dg
+         U6OA==
+X-Gm-Message-State: AO0yUKUwmNtpIoTXvQU2HwaS7cLJsUF8nKt1ZKwi5om742H6BA+ooPRX
+        Rb175N1asNYD6m9VyQThofwigw==
+X-Google-Smtp-Source: AK7set+bwCXPeXXJYiHoIs21LWog9BcgfWy0JQjslrBQOlmossB4jqnklmjuEP81ZHtlr8WCPOmtjQ==
+X-Received: by 2002:a17:903:446:b0:1a0:48ff:53a0 with SMTP id iw6-20020a170903044600b001a048ff53a0mr3867362plb.35.1678746599155;
+        Mon, 13 Mar 2023 15:29:59 -0700 (PDT)
 Received: from khazhy-linux.svl.corp.google.com ([2620:15c:2d4:203:157:b07d:930a:fb24])
-        by smtp.gmail.com with ESMTPSA id km8-20020a17090327c800b0019aa8149cb9sm352440plb.79.2023.03.13.15.29.55
+        by smtp.gmail.com with ESMTPSA id km8-20020a17090327c800b0019aa8149cb9sm352440plb.79.2023.03.13.15.29.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 15:29:56 -0700 (PDT)
+        Mon, 13 Mar 2023 15:29:58 -0700 (PDT)
 From:   Khazhismel Kumykov <khazhy@chromium.org>
 X-Google-Original-From: Khazhismel Kumykov <khazhy@google.com>
 To:     stable@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, NeilBrown <neilb@suse.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Anna Schumaker <Anna.Schumaker@Netapp.com>,
-        Chao Yu <chao@kernel.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Wu Fengguang <fengguang.wu@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+Cc:     linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>,
         Khazhismel Kumykov <khazhy@google.com>
-Subject: [PATCH v5.10 3/5] block/bfq-iosched.c: use "false" rather than "BLK_RW_ASYNC"
-Date:   Mon, 13 Mar 2023 15:27:55 -0700
-Message-Id: <20230313222757.1103179-4-khazhy@google.com>
+Subject: [PATCH v5.10 5/5] block, bfq: fix uaf for bfqq in bic_set_bfqq()
+Date:   Mon, 13 Mar 2023 15:27:57 -0700
+Message-Id: <20230313222757.1103179-6-khazhy@google.com>
 X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
 In-Reply-To: <20230313222757.1103179-1-khazhy@google.com>
 References: <20230313222757.1103179-1-khazhy@google.com>
@@ -81,52 +67,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: NeilBrown <neilb@suse.de>
+From: Yu Kuai <yukuai3@huawei.com>
 
-[ Upstream commit f6bad159f5d5e5b33531aba3d9b860ad8618afe0 ]
+[ Upstream commit b600de2d7d3a16f9007fad1bdae82a3951a26af2 ]
 
-bfq_get_queue() expects a "bool" for the third arg, so pass "false"
-rather than "BLK_RW_ASYNC" which will soon be removed.
+After commit 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'"),
+bic->bfqq will be accessed in bic_set_bfqq(), however, in some context
+bic->bfqq will be freed, and bic_set_bfqq() is called with the freed
+bic->bfqq.
 
-Link: https://lkml.kernel.org/r/164549983746.9187.7949730109246767909.stgit@noble.brown
-Signed-off-by: NeilBrown <neilb@suse.de>
-Acked-by: Jens Axboe <axboe@kernel.dk>
-Cc: Anna Schumaker <Anna.Schumaker@Netapp.com>
-Cc: Chao Yu <chao@kernel.org>
-Cc: Darrick J. Wong <djwong@kernel.org>
-Cc: Ilya Dryomov <idryomov@gmail.com>
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Jeff Layton <jlayton@kernel.org>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-Cc: Miklos Szeredi <miklos@szeredi.hu>
-Cc: Paolo Valente <paolo.valente@linaro.org>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-Cc: Wu Fengguang <fengguang.wu@intel.com>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
-Stable-dep-of: b600de2d7d3a ("block, bfq: fix uaf for bfqq in bic_set_bfqq()")
+Fix the problem by always freeing bfqq after bic_set_bfqq().
+
+Fixes: 64dc8c732f5c ("block, bfq: fix possible uaf for 'bfqq->bic'")
+Reported-and-tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Link: https://lore.kernel.org/r/20230130014136.591038-1-yukuai1@huaweicloud.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
 ---
- block/bfq-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bfq-cgroup.c  | 2 +-
+ block/bfq-iosched.c | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 2f440b79183d..1f9ccc661d57 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -748,8 +748,8 @@ static void *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
+ 				 * request from the old cgroup.
+ 				 */
+ 				bfq_put_cooperator(sync_bfqq);
+-				bfq_release_process_ref(bfqd, sync_bfqq);
+ 				bic_set_bfqq(bic, NULL, true);
++				bfq_release_process_ref(bfqd, sync_bfqq);
+ 			}
+ 		}
+ 	}
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0a53b653a7e2..35b240cba092 100644
+index 016d7f32af9f..6687b805bab3 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -5071,7 +5071,7 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
+@@ -5070,9 +5070,11 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
+ 
  	bfqq = bic_to_bfqq(bic, false);
  	if (bfqq) {
- 		bfq_release_process_ref(bfqd, bfqq);
--		bfqq = bfq_get_queue(bfqd, bio, BLK_RW_ASYNC, bic);
-+		bfqq = bfq_get_queue(bfqd, bio, false, bic);
+-		bfq_release_process_ref(bfqd, bfqq);
++		struct bfq_queue *old_bfqq = bfqq;
++
+ 		bfqq = bfq_get_queue(bfqd, bio, false, bic);
  		bic_set_bfqq(bic, bfqq, false);
++		bfq_release_process_ref(bfqd, old_bfqq);
  	}
  
+ 	bfqq = bic_to_bfqq(bic, true);
 -- 
 2.40.0.rc1.284.g88254d51c5-goog
 
