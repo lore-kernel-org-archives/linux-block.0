@@ -2,288 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EE8C74A4B
-	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 21:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BDEC61DA4
+	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 22:29:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229666AbjCMV0v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Mar 2023 17:26:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
+        id S229789AbjCMW3z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Mar 2023 18:29:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjCMV0u (ORCPT
+        with ESMTP id S229551AbjCMW3y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Mar 2023 17:26:50 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050C784F66
-        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 14:26:48 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id f11so12590612wrv.8
-        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 14:26:47 -0700 (PDT)
+        Mon, 13 Mar 2023 18:29:54 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3259869CCB
+        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 15:29:53 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id p13-20020a17090a284d00b0023d2e945aebso50466pjf.0
+        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 15:29:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678742806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s15Olw145Z4FO4sJQbn04iS8rc4A9F0RRMP8zoY3AG4=;
-        b=Dj+OadbgSZ40SGxBNfv3esbcqm0c7MMatXy7VjnNjwla00odXbiumbSrs+aAAyTLid
-         WQ8eT233AHca0GqfwA7VzjwO9OfbYwlg9inefEs6o1UUCSo6teYv4MNAP9bG/pSFrIEl
-         YGk5GsWAxAZoVndetTEYpJ5FEwHyDnKEk5Fv29ZZjFmBTkqK6hNEbnQz6iIafN4ZhRux
-         Vba7RxFSTbUMXflwcLP5SwcWSxNZKJAU+jFnq41xzNz99UXOoHGFf90hh8pj+FYe1dJs
-         3Vwc2aZKZ3wWTX0u3SHq8jyth/QfIbK475V3MBYeZaEgKZU+3i8rMQl4jTLixMQCVz/E
-         uDuA==
+        d=chromium.org; s=google; t=1678746592;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+cDZBFg4+sLfTVl0lHEWTrnMA1SY40Bzt4Pz1p3665s=;
+        b=hq6kVxFAtkrq3Ewqqt9Kyb8JDJsB71QkLXq4YRWCUfPc8nsiGX+ehY+uW2sa7X0woQ
+         4Cy+nxh2aVIdRJhlOjSHjMbsOEHj9E4J0batJcyf8gs34jpFaEmF+N258+vCKhdo24Ry
+         JfTqLXkp+Sar+jjWV3g7F4BnuxWCO610LFmoE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678742806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s15Olw145Z4FO4sJQbn04iS8rc4A9F0RRMP8zoY3AG4=;
-        b=2vIcg9cR4MBtcg9lpc+4m7xj7G5LlE7O5BbS+uj5L4yjw7WMPp/WHFOTfjaYaIdmpj
-         ID9CA3zNiSDhGiUUc1mxFMfhMCZ72qQRMTsiaL/Np6ifJvjVLTWYIWMZbqX2MoNZMgLU
-         RlXoCTLZnYB0viAtzf/VjQCfgMJoDv7bGbZfxP9ygp9aYUk1+KTznUjtKpkzmw4UpGQc
-         Y3FlxAAPEv8MR5B1+YcCgj0WynyR7iOGEv8POGWgoWk0ru+yolmNi87wBBFalDm3QpXN
-         gv+EnqDh5e03n+b7NuBM759v2Ft0nZNS8mmUztetZQehNDQ51m7VA5vHKBPoKTOOcc6p
-         DuMg==
-X-Gm-Message-State: AO0yUKWoOAxZfL6Iv+3KrXroM3Nl36aCsoJyzaTctQ3joD9tfpVVVI37
-        RHrRzoWm3+Czvy8a1nMk6353jbqpsi0+ZXUTQ31WHw==
-X-Google-Smtp-Source: AK7set/zbCALuj05w9+p7BPnzm7X9DKsWzxMFIYzWjEQQWyYvQWX2aEOk7lpqzYSSNiGefNnjwV2SKycoVrOsz53+qQ=
-X-Received: by 2002:a5d:62d0:0:b0:2ce:a8d6:570f with SMTP id
- o16-20020a5d62d0000000b002cea8d6570fmr1418584wrv.4.1678742806297; Mon, 13 Mar
- 2023 14:26:46 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1678746592;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+cDZBFg4+sLfTVl0lHEWTrnMA1SY40Bzt4Pz1p3665s=;
+        b=hH6msDxbnYvwxPQEPCMV7xGkJZhTsWH34UPAPjNvtuevW2ffMoXC4SEjPV5KFSp/ap
+         ZUK2IWs6x+GPgLiWOPT9y+YOQTHqo97CtEbRnVr2kcnWEre7PYnncnH44cPejNuoiPt/
+         SoiFJuApnAPKh9y4BxcY93pfYyNW//D3rGzQUgURsPEpC0oTO9ylBgybjxOMZ0T0+eRo
+         +a+7qHWWgkhANET8TobCOinl0AdWhDPIO7YeDk0Vhsn4mxE3/L6RxPXMx947RMc1wusu
+         gzZFzWE7n1UEVn148p96wj5g4k79QRvpplUafFaNjlFbn8YslCT6YrH5+NhLqj10HCEu
+         PsCg==
+X-Gm-Message-State: AO0yUKXK3+J5vOwMkd5DNENw9Ldb6vgl8KXFzlnEOTw/qlkNyERtT63G
+        VnRrcRw8EnKLQfyhQYjcVEHMyA==
+X-Google-Smtp-Source: AK7set+tsI6mjf1YmgDV7GcGW+bHf/BJP7/foLKzNYnTq8RcMGiGu3XY7oAgJ00CozH69W6A9oLLtQ==
+X-Received: by 2002:a17:902:b716:b0:19f:3b86:4715 with SMTP id d22-20020a170902b71600b0019f3b864715mr5590127pls.8.1678746592674;
+        Mon, 13 Mar 2023 15:29:52 -0700 (PDT)
+Received: from khazhy-linux.svl.corp.google.com ([2620:15c:2d4:203:157:b07d:930a:fb24])
+        by smtp.gmail.com with ESMTPSA id km8-20020a17090327c800b0019aa8149cb9sm352440plb.79.2023.03.13.15.29.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 15:29:52 -0700 (PDT)
+From:   Khazhismel Kumykov <khazhy@chromium.org>
+X-Google-Original-From: Khazhismel Kumykov <khazhy@google.com>
+To:     stable@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Khazhismel Kumykov <khazhy@google.com>
+Subject: [PATCH v5.10 0/5] bfq bic/cgroup interaction uaf fixes
+Date:   Mon, 13 Mar 2023 15:27:52 -0700
+Message-Id: <20230313222757.1103179-1-khazhy@google.com>
+X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
 MIME-Version: 1.0
-References: <20230308193645.114069-1-ebiggers@kernel.org> <20230308193645.114069-2-ebiggers@kernel.org>
-In-Reply-To: <20230308193645.114069-2-ebiggers@kernel.org>
-From:   Nathan Huckleberry <nhuck@google.com>
-Date:   Mon, 13 Mar 2023 14:26:00 -0700
-Message-ID: <CAJkfWY76-fUf92YZid3bOPrufXwCzM-q9L1ezqkLZ+WJiWL3jQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] blk-mq: release crypto keyslot before reporting
- I/O complete
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-fscrypt@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 8, 2023 at 11:39=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> Once all I/O using a blk_crypto_key has completed, filesystems can call
-> blk_crypto_evict_key().  However, the block layer currently doesn't call
-> blk_crypto_put_keyslot() until the request is being freed, which happens
-> after upper layers have been told (via bio_endio()) the I/O has
-> completed.  This causes a race condition where blk_crypto_evict_key()
-> can see 'slot_refs !=3D 0' without there being an actual bug.
->
-> This makes __blk_crypto_evict_key() hit the
-> 'WARN_ON_ONCE(atomic_read(&slot->slot_refs) !=3D 0)' and return without
-> doing anything, eventually causing a use-after-free in
-> blk_crypto_reprogram_all_keys().  (This is a very rare bug and has only
-> been seen when per-file keys are being used with fscrypt.)
->
-> There are two options to fix this: either release the keyslot before
-> bio_endio() is called on the request's last bio, or make
-> __blk_crypto_evict_key() ignore slot_refs.  Let's go with the first
-> solution, since it preserves the ability to report bugs (via
-> WARN_ON_ONCE) where a key is evicted while still in-use.
->
-> Fixes: a892c8d52c02 ("block: Inline encryption support for blk-mq")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  block/blk-crypto-internal.h | 25 +++++++++++++++++++++----
->  block/blk-crypto.c          | 24 ++++++++++++------------
->  block/blk-merge.c           |  2 ++
->  block/blk-mq.c              | 15 ++++++++++++++-
->  4 files changed, 49 insertions(+), 17 deletions(-)
->
-> diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
-> index a8cdaf26851e..4f1de2495f0c 100644
-> --- a/block/blk-crypto-internal.h
-> +++ b/block/blk-crypto-internal.h
-> @@ -65,6 +65,11 @@ static inline bool blk_crypto_rq_is_encrypted(struct r=
-equest *rq)
->         return rq->crypt_ctx;
->  }
->
-> +static inline bool blk_crypto_rq_has_keyslot(struct request *rq)
-> +{
-> +       return rq->crypt_keyslot;
-> +}
-> +
->  blk_status_t blk_crypto_get_keyslot(struct blk_crypto_profile *profile,
->                                     const struct blk_crypto_key *key,
->                                     struct blk_crypto_keyslot **slot_ptr)=
-;
-> @@ -119,6 +124,11 @@ static inline bool blk_crypto_rq_is_encrypted(struct=
- request *rq)
->         return false;
->  }
->
-> +static inline bool blk_crypto_rq_has_keyslot(struct request *rq)
-> +{
-> +       return false;
-> +}
-> +
->  #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
->
->  void __bio_crypt_advance(struct bio *bio, unsigned int bytes);
-> @@ -153,14 +163,21 @@ static inline bool blk_crypto_bio_prep(struct bio *=
-*bio_ptr)
->         return true;
->  }
->
-> -blk_status_t __blk_crypto_init_request(struct request *rq);
-> -static inline blk_status_t blk_crypto_init_request(struct request *rq)
-> +blk_status_t __blk_crypto_rq_get_keyslot(struct request *rq);
-> +static inline blk_status_t blk_crypto_rq_get_keyslot(struct request *rq)
->  {
->         if (blk_crypto_rq_is_encrypted(rq))
-> -               return __blk_crypto_init_request(rq);
-> +               return __blk_crypto_rq_get_keyslot(rq);
->         return BLK_STS_OK;
->  }
->
-> +void __blk_crypto_rq_put_keyslot(struct request *rq);
-> +static inline void blk_crypto_rq_put_keyslot(struct request *rq)
-> +{
-> +       if (blk_crypto_rq_has_keyslot(rq))
-> +               __blk_crypto_rq_put_keyslot(rq);
-> +}
-> +
->  void __blk_crypto_free_request(struct request *rq);
->  static inline void blk_crypto_free_request(struct request *rq)
->  {
-> @@ -199,7 +216,7 @@ static inline blk_status_t blk_crypto_insert_cloned_r=
-equest(struct request *rq)
->  {
->
->         if (blk_crypto_rq_is_encrypted(rq))
-> -               return blk_crypto_init_request(rq);
-> +               return blk_crypto_rq_get_keyslot(rq);
->         return BLK_STS_OK;
->  }
->
-> diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-> index 45378586151f..d0c7feb447e9 100644
-> --- a/block/blk-crypto.c
-> +++ b/block/blk-crypto.c
-> @@ -224,27 +224,27 @@ static bool bio_crypt_check_alignment(struct bio *b=
-io)
->         return true;
->  }
->
-> -blk_status_t __blk_crypto_init_request(struct request *rq)
-> +blk_status_t __blk_crypto_rq_get_keyslot(struct request *rq)
->  {
->         return blk_crypto_get_keyslot(rq->q->crypto_profile,
->                                       rq->crypt_ctx->bc_key,
->                                       &rq->crypt_keyslot);
->  }
->
-> -/**
-> - * __blk_crypto_free_request - Uninitialize the crypto fields of a reque=
-st.
-> - *
-> - * @rq: The request whose crypto fields to uninitialize.
-> - *
-> - * Completely uninitializes the crypto fields of a request. If a keyslot=
- has
-> - * been programmed into some inline encryption hardware, that keyslot is
-> - * released. The rq->crypt_ctx is also freed.
-> - */
-> -void __blk_crypto_free_request(struct request *rq)
-> +void __blk_crypto_rq_put_keyslot(struct request *rq)
->  {
->         blk_crypto_put_keyslot(rq->crypt_keyslot);
-> +       rq->crypt_keyslot =3D NULL;
-> +}
-> +
-> +void __blk_crypto_free_request(struct request *rq)
-> +{
-> +       /* The keyslot, if one was needed, should have been released earl=
-ier. */
-> +       if (WARN_ON_ONCE(rq->crypt_keyslot))
-> +               __blk_crypto_rq_put_keyslot(rq);
-> +
->         mempool_free(rq->crypt_ctx, bio_crypt_ctx_pool);
-> -       blk_crypto_rq_set_defaults(rq);
-> +       rq->crypt_ctx =3D NULL;
->  }
->
->  /**
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 6460abdb2426..65e75efa9bd3 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -867,6 +867,8 @@ static struct request *attempt_merge(struct request_q=
-ueue *q,
->         if (!blk_discard_mergable(req))
->                 elv_merge_requests(q, req, next);
->
-> +       blk_crypto_rq_put_keyslot(next);
-> +
+Pulls in uaf fix for bfqq->bic along with fixups. I pulled in the
+backport dependencies that were also present in 5.15-lts.
 
-This looks good to me, but it looks like there was a pre-existing bug
-in the blk-merge code. The elv_merged_request function is only called
-when the request does not merge. Does anyone know if that behavior is
-correct?
+NeilBrown (1):
+  block/bfq-iosched.c: use "false" rather than "BLK_RW_ASYNC"
 
->         /*
->          * 'next' is going away, so update stats accordingly
->          */
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d0cb2ef18fe2..49825538d932 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -840,6 +840,12 @@ static void blk_complete_request(struct request *req=
-)
->                 req->q->integrity.profile->complete_fn(req, total_bytes);
->  #endif
->
-> +       /*
-> +        * Upper layers may call blk_crypto_evict_key() anytime after the=
- last
-> +        * bio_endio().  Therefore, the keyslot must be released before t=
-hat.
-> +        */
-> +       blk_crypto_rq_put_keyslot(req);
-> +
->         blk_account_io_completion(req, total_bytes);
->
->         do {
-> @@ -905,6 +911,13 @@ bool blk_update_request(struct request *req, blk_sta=
-tus_t error,
->                 req->q->integrity.profile->complete_fn(req, nr_bytes);
->  #endif
->
-> +       /*
-> +        * Upper layers may call blk_crypto_evict_key() anytime after the=
- last
-> +        * bio_endio().  Therefore, the keyslot must be released before t=
-hat.
-> +        */
-> +       if (blk_crypto_rq_has_keyslot(req) && nr_bytes >=3D blk_rq_bytes(=
-req))
-> +               __blk_crypto_rq_put_keyslot(req);
-> +
->         if (unlikely(error && !blk_rq_is_passthrough(req) &&
->                      !(req->rq_flags & RQF_QUIET)) &&
->                      !test_bit(GD_DEAD, &req->q->disk->state)) {
-> @@ -2967,7 +2980,7 @@ void blk_mq_submit_bio(struct bio *bio)
->
->         blk_mq_bio_to_request(rq, bio, nr_segs);
->
-> -       ret =3D blk_crypto_init_request(rq);
-> +       ret =3D blk_crypto_rq_get_keyslot(rq);
->         if (ret !=3D BLK_STS_OK) {
->                 bio->bi_status =3D ret;
->                 bio_endio(bio);
-> --
-> 2.39.2
->
+Yu Kuai (4):
+  block, bfq: fix possible uaf for 'bfqq->bic'
+  block, bfq: fix uaf for bfqq in bfq_exit_icq_bfqq
+  block, bfq: replace 0/1 with false/true in bic apis
+  block, bfq: fix uaf for bfqq in bic_set_bfqq()
 
-This patch itself looks good to me.
+ block/bfq-cgroup.c  |  8 ++++----
+ block/bfq-iosched.c | 19 +++++++++++++------
+ 2 files changed, 17 insertions(+), 10 deletions(-)
 
-Reviewed-by: Nathan Huckleberry <nhuck@google.com>
+-- 
+2.40.0.rc1.284.g88254d51c5-goog
+
