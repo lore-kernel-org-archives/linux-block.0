@@ -2,263 +2,288 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE9C2C6FD19
-	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 16:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EE8C74A4B
+	for <linux-block@archiver.kernel.org>; Mon, 13 Mar 2023 21:26:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbjCMQ4Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Mar 2023 12:56:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50404 "EHLO
+        id S229666AbjCMV0v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Mar 2023 17:26:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbjCMQ4P (ORCPT
+        with ESMTP id S229642AbjCMV0u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Mar 2023 12:56:15 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23A420541;
-        Mon, 13 Mar 2023 09:56:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678726573; x=1710262573;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=35jKFnRN3WFewle4kyuMtbuyLqVRQ727HOwYCxRN3Zc=;
-  b=AFPxQ0FTfewebpblIPaWR9MRzO9iVtLh5DHX90KHYLE+sMHAlFPHRrnA
-   jGf6noBg4sTRElCJ4+C8wuILTmxa6WGcin4KfG1RNad7W3IUScLez/S01
-   F2o+flkGi5BDgfAfrTiKriny5/KuOi4rD5Yo/FtCBTrmtfqR3+Oh6jjCD
-   D9MA6lTaF5XAm9JxQy5SLaIZb0OWslCmg+gMNWp2aNdmbbbcxleNG/WCr
-   G3ifPEbsnmQv6jATMrLyyMMsmse0uMbaVKpOqEKDDKUuPlTc+svVtYhio
-   gbMxftmxaPbX+5kTBqkI9ziGwLOMDjie2z5LauQZ+o0hnU+0LN6FvEKTo
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="325564349"
-X-IronPort-AV: E=Sophos;i="5.98,257,1673942400"; 
-   d="scan'208";a="325564349"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 09:56:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10648"; a="678772058"
-X-IronPort-AV: E=Sophos;i="5.98,257,1673942400"; 
-   d="scan'208";a="678772058"
-Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.33.115])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 09:56:10 -0700
-Message-ID: <3effa855-1668-db9f-7d38-2c3352ea6ef1@intel.com>
-Date:   Mon, 13 Mar 2023 18:56:07 +0200
+        Mon, 13 Mar 2023 17:26:50 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050C784F66
+        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 14:26:48 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id f11so12590612wrv.8
+        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 14:26:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1678742806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s15Olw145Z4FO4sJQbn04iS8rc4A9F0RRMP8zoY3AG4=;
+        b=Dj+OadbgSZ40SGxBNfv3esbcqm0c7MMatXy7VjnNjwla00odXbiumbSrs+aAAyTLid
+         WQ8eT233AHca0GqfwA7VzjwO9OfbYwlg9inefEs6o1UUCSo6teYv4MNAP9bG/pSFrIEl
+         YGk5GsWAxAZoVndetTEYpJ5FEwHyDnKEk5Fv29ZZjFmBTkqK6hNEbnQz6iIafN4ZhRux
+         Vba7RxFSTbUMXflwcLP5SwcWSxNZKJAU+jFnq41xzNz99UXOoHGFf90hh8pj+FYe1dJs
+         3Vwc2aZKZ3wWTX0u3SHq8jyth/QfIbK475V3MBYeZaEgKZU+3i8rMQl4jTLixMQCVz/E
+         uDuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678742806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s15Olw145Z4FO4sJQbn04iS8rc4A9F0RRMP8zoY3AG4=;
+        b=2vIcg9cR4MBtcg9lpc+4m7xj7G5LlE7O5BbS+uj5L4yjw7WMPp/WHFOTfjaYaIdmpj
+         ID9CA3zNiSDhGiUUc1mxFMfhMCZ72qQRMTsiaL/Np6ifJvjVLTWYIWMZbqX2MoNZMgLU
+         RlXoCTLZnYB0viAtzf/VjQCfgMJoDv7bGbZfxP9ygp9aYUk1+KTznUjtKpkzmw4UpGQc
+         Y3FlxAAPEv8MR5B1+YcCgj0WynyR7iOGEv8POGWgoWk0ru+yolmNi87wBBFalDm3QpXN
+         gv+EnqDh5e03n+b7NuBM759v2Ft0nZNS8mmUztetZQehNDQ51m7VA5vHKBPoKTOOcc6p
+         DuMg==
+X-Gm-Message-State: AO0yUKWoOAxZfL6Iv+3KrXroM3Nl36aCsoJyzaTctQ3joD9tfpVVVI37
+        RHrRzoWm3+Czvy8a1nMk6353jbqpsi0+ZXUTQ31WHw==
+X-Google-Smtp-Source: AK7set/zbCALuj05w9+p7BPnzm7X9DKsWzxMFIYzWjEQQWyYvQWX2aEOk7lpqzYSSNiGefNnjwV2SKycoVrOsz53+qQ=
+X-Received: by 2002:a5d:62d0:0:b0:2ce:a8d6:570f with SMTP id
+ o16-20020a5d62d0000000b002cea8d6570fmr1418584wrv.4.1678742806297; Mon, 13 Mar
+ 2023 14:26:46 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.8.0
-Subject: Re: [RFC PATCH] mmc: core: Disable REQ_FUA if the eMMC supports an
- internal cache
-Content-Language: en-US
-To:     =?UTF-8?Q?Christian_L=c3=b6hle?= <CLoehle@hyperstone.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Wenchao Chen <wenchao.chen666@gmail.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20230302144330.274947-1-ulf.hansson@linaro.org>
- <54cee7de4ab7479db74b21e64e5f53cf@hyperstone.com>
- <CAPDyKFq-qToEX+qiuHirNbcuedii_f0KKuHiPAv7+tydrUTpqQ@mail.gmail.com>
- <4a2c5b752968496ca72966f80e148d47@hyperstone.com>
-From:   Adrian Hunter <adrian.hunter@intel.com>
-Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
- Business Identity Code: 0357606 - 4, Domiciled in Helsinki
-In-Reply-To: <4a2c5b752968496ca72966f80e148d47@hyperstone.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20230308193645.114069-1-ebiggers@kernel.org> <20230308193645.114069-2-ebiggers@kernel.org>
+In-Reply-To: <20230308193645.114069-2-ebiggers@kernel.org>
+From:   Nathan Huckleberry <nhuck@google.com>
+Date:   Mon, 13 Mar 2023 14:26:00 -0700
+Message-ID: <CAJkfWY76-fUf92YZid3bOPrufXwCzM-q9L1ezqkLZ+WJiWL3jQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] blk-mq: release crypto keyslot before reporting
+ I/O complete
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-fscrypt@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/03/23 19:06, Christian Löhle wrote:
-> 
->>>
->>> I have benchmarked the FUA/Cache behavior a bit.
->>> I don't have an actual filesystem benchmark that does what I wanted and is easy to port to the target so I used:
->>>
->>> # call with
->>> # for loop in {1..3}; do sudo dd if=/dev/urandom bs=1M 
->>> of=/dev/mmcblk2; done; for loop in {1..5}; do time 
->>> ./filesystembenchmark.sh; umount /mnt; done
->>> mkfs.ext4 -F /dev/mmcblk2
->>> mount /dev/mmcblk2 /mnt
->>> for i in {1..3}
->>> do
->>> cp -r linux-6.2.2 /mnt/$i
->>> done
->>> for i in {1..3}
->>> do
->>> rm -r /mnt/$i
->>> done
->>> for i in {1..3}
->>> do
->>> cp -r linux-6.2.2 /mnt/$i
->>> done
->>>
->>>
->>> I found a couple of DUTs that I can link, I also tested one industrial card.
->>>
->>> DUT1: blue PCB Foresee eMMC
->>> https://pine64.com/product/32gb-emmc-module/
->>> DUT2: green PCB SiliconGo eMMC
->>> Couldn't find that one online anymore unfortunately
->>> DUT3: orange hardkernel PCB 8GB
->>> https://www.hardkernel.com/shop/8gb-emmc-module-c2-android/
->>> DUT4: orange hardkernel PCB white dot
->>> https://rlx.sk/en/odroid/3198-16gb-emmc-50-module-xu3-android-for-odro
->>> id-xu3.html
->>> DUT5: Industrial card
->>
->> Thanks a lot for helping out with testing! Much appreciated!
-> 
-> No problem, glad to be of help.
-> 
->>
->>>
->>>
->>> The test issued 461 DO_REL_WR during one of the iterations for DUT5
->>>
->>> DUT1:
->>> Cache, no FUA:
->>> 13:04.49
->>> 13:13.82
->>> 13:30.59
->>> 13:28:13
->>> 13:20:64
->>> FUA:
->>> 13:30.32
->>> 13:36.26
->>> 13:10.86
->>> 13:32.52
->>> 13:48.59
->>>
->>> DUT2:
->>> FUA:
->>> 8:11.24
->>> 7:47.73
->>> 7:48.00
->>> 7:48.18
->>> 7:47.38
->>> Cache, no FUA:
->>> 8:10.30
->>> 7:48.97
->>> 7:48.47
->>> 7:47.93
->>> 7:44.18
->>>
->>> DUT3:
->>> Cache, no FUA:
->>> 7:02.82
->>> 6:58.94
->>> 7:03.20
->>> 7:00.27
->>> 7:00.88
->>> FUA:
->>> 7:05.43
->>> 7:03.44
->>> 7:04.82
->>> 7:03.26
->>> 7:04.74
->>>
->>> DUT4:
->>> FUA:
->>> 7:23.92
->>> 7:20.15
->>> 7:20.52
->>> 7:19.10
->>> 7:20.71
->>> Cache, no FUA:
->>> 7:20.23
->>> 7:20.48
->>> 7:19.94
->>> 7:18.90
->>> 7:19.88
->>
->> Without going into the details of the above, it seems like for DUT1, DUT2, DUT3 and DUT4 there a good reasons to why we should move forward with $subject patch.
->>
->> Do you agree?
-> 
-> That is a good question, that's why I just posted the data without further comment from my side.
-> I was honestly expecting the difference to be much higher, given the original patch.
-> If this is representative for most cards, you would require quite an unusual workload to actually notice the difference IMO.
-> If there are cards where the difference is much more significant then of course a quirk would be nicer.
-> On the other side I don't see why not and any improvement is a good one?
-> 
->>
->>>
->>> Cache, no FUA:
->>> 7:19.36
->>> 7:02.11
->>> 7:01.53
->>> 7:01.35
->>> 7:00.37
->>> Cache, no FUA CQE:
->>> 7:17.55
->>> 7:00.73
->>> 6:59.25
->>> 6:58.44
->>> 6:58.60
->>> FUA:
->>> 7:15.10
->>> 6:58.99
->>> 6:58.94
->>> 6:59.17
->>> 6:60.00
->>> FUA CQE:
->>> 7:11.03
->>> 6:58.04
->>> 6:56.89
->>> 6:56.43
->>> 6:56:28
->>>
->>> If anyone has any comments or disagrees with the benchmark, or has a specific eMMC to test, let me know.
->>
->> If I understand correctly, for DUT5, it seems like using FUA may be slightly better than just cache-flushing, right?
-> 
-> That is correct, I specifically tested with this card as under the assumption that reliable write is without much additional cost, the DCMD would be slightly worse for performance and SYNC a bit worse.
-> 
->>
->> For CQE, it seems like FUA could be slightly even better, at least for DUT5.  Do you know if REQ_OP_FLUSH translates into MMC_ISSUE_DCMD or MMC_ISSUE_SYNC for your case? See mmc_cqe_issue_type().
-> It is SYNC (this is sdhci-of-arasan on rk3399, no DCMD), but even SYNC is not too bad here it seems, could of course be worse if the workload was less sequential.
-> 
->>
->> When it comes to CQE, maybe Adrian have some additional thoughts around this? Perhaps we should keep using REQ_FUA, if we have CQE?
-> Sure, I'm also interested in Adrian's take on this.
+On Wed, Mar 8, 2023 at 11:39=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Once all I/O using a blk_crypto_key has completed, filesystems can call
+> blk_crypto_evict_key().  However, the block layer currently doesn't call
+> blk_crypto_put_keyslot() until the request is being freed, which happens
+> after upper layers have been told (via bio_endio()) the I/O has
+> completed.  This causes a race condition where blk_crypto_evict_key()
+> can see 'slot_refs !=3D 0' without there being an actual bug.
+>
+> This makes __blk_crypto_evict_key() hit the
+> 'WARN_ON_ONCE(atomic_read(&slot->slot_refs) !=3D 0)' and return without
+> doing anything, eventually causing a use-after-free in
+> blk_crypto_reprogram_all_keys().  (This is a very rare bug and has only
+> been seen when per-file keys are being used with fscrypt.)
+>
+> There are two options to fix this: either release the keyslot before
+> bio_endio() is called on the request's last bio, or make
+> __blk_crypto_evict_key() ignore slot_refs.  Let's go with the first
+> solution, since it preserves the ability to report bugs (via
+> WARN_ON_ONCE) where a key is evicted while still in-use.
+>
+> Fixes: a892c8d52c02 ("block: Inline encryption support for blk-mq")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  block/blk-crypto-internal.h | 25 +++++++++++++++++++++----
+>  block/blk-crypto.c          | 24 ++++++++++++------------
+>  block/blk-merge.c           |  2 ++
+>  block/blk-mq.c              | 15 ++++++++++++++-
+>  4 files changed, 49 insertions(+), 17 deletions(-)
+>
+> diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+> index a8cdaf26851e..4f1de2495f0c 100644
+> --- a/block/blk-crypto-internal.h
+> +++ b/block/blk-crypto-internal.h
+> @@ -65,6 +65,11 @@ static inline bool blk_crypto_rq_is_encrypted(struct r=
+equest *rq)
+>         return rq->crypt_ctx;
+>  }
+>
+> +static inline bool blk_crypto_rq_has_keyslot(struct request *rq)
+> +{
+> +       return rq->crypt_keyslot;
+> +}
+> +
+>  blk_status_t blk_crypto_get_keyslot(struct blk_crypto_profile *profile,
+>                                     const struct blk_crypto_key *key,
+>                                     struct blk_crypto_keyslot **slot_ptr)=
+;
+> @@ -119,6 +124,11 @@ static inline bool blk_crypto_rq_is_encrypted(struct=
+ request *rq)
+>         return false;
+>  }
+>
+> +static inline bool blk_crypto_rq_has_keyslot(struct request *rq)
+> +{
+> +       return false;
+> +}
+> +
+>  #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
+>
+>  void __bio_crypt_advance(struct bio *bio, unsigned int bytes);
+> @@ -153,14 +163,21 @@ static inline bool blk_crypto_bio_prep(struct bio *=
+*bio_ptr)
+>         return true;
+>  }
+>
+> -blk_status_t __blk_crypto_init_request(struct request *rq);
+> -static inline blk_status_t blk_crypto_init_request(struct request *rq)
+> +blk_status_t __blk_crypto_rq_get_keyslot(struct request *rq);
+> +static inline blk_status_t blk_crypto_rq_get_keyslot(struct request *rq)
+>  {
+>         if (blk_crypto_rq_is_encrypted(rq))
+> -               return __blk_crypto_init_request(rq);
+> +               return __blk_crypto_rq_get_keyslot(rq);
+>         return BLK_STS_OK;
+>  }
+>
+> +void __blk_crypto_rq_put_keyslot(struct request *rq);
+> +static inline void blk_crypto_rq_put_keyslot(struct request *rq)
+> +{
+> +       if (blk_crypto_rq_has_keyslot(rq))
+> +               __blk_crypto_rq_put_keyslot(rq);
+> +}
+> +
+>  void __blk_crypto_free_request(struct request *rq);
+>  static inline void blk_crypto_free_request(struct request *rq)
+>  {
+> @@ -199,7 +216,7 @@ static inline blk_status_t blk_crypto_insert_cloned_r=
+equest(struct request *rq)
+>  {
+>
+>         if (blk_crypto_rq_is_encrypted(rq))
+> -               return blk_crypto_init_request(rq);
+> +               return blk_crypto_rq_get_keyslot(rq);
+>         return BLK_STS_OK;
+>  }
+>
+> diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+> index 45378586151f..d0c7feb447e9 100644
+> --- a/block/blk-crypto.c
+> +++ b/block/blk-crypto.c
+> @@ -224,27 +224,27 @@ static bool bio_crypt_check_alignment(struct bio *b=
+io)
+>         return true;
+>  }
+>
+> -blk_status_t __blk_crypto_init_request(struct request *rq)
+> +blk_status_t __blk_crypto_rq_get_keyslot(struct request *rq)
+>  {
+>         return blk_crypto_get_keyslot(rq->q->crypto_profile,
+>                                       rq->crypt_ctx->bc_key,
+>                                       &rq->crypt_keyslot);
+>  }
+>
+> -/**
+> - * __blk_crypto_free_request - Uninitialize the crypto fields of a reque=
+st.
+> - *
+> - * @rq: The request whose crypto fields to uninitialize.
+> - *
+> - * Completely uninitializes the crypto fields of a request. If a keyslot=
+ has
+> - * been programmed into some inline encryption hardware, that keyslot is
+> - * released. The rq->crypt_ctx is also freed.
+> - */
+> -void __blk_crypto_free_request(struct request *rq)
+> +void __blk_crypto_rq_put_keyslot(struct request *rq)
+>  {
+>         blk_crypto_put_keyslot(rq->crypt_keyslot);
+> +       rq->crypt_keyslot =3D NULL;
+> +}
+> +
+> +void __blk_crypto_free_request(struct request *rq)
+> +{
+> +       /* The keyslot, if one was needed, should have been released earl=
+ier. */
+> +       if (WARN_ON_ONCE(rq->crypt_keyslot))
+> +               __blk_crypto_rq_put_keyslot(rq);
+> +
+>         mempool_free(rq->crypt_ctx, bio_crypt_ctx_pool);
+> -       blk_crypto_rq_set_defaults(rq);
+> +       rq->crypt_ctx =3D NULL;
+>  }
+>
+>  /**
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 6460abdb2426..65e75efa9bd3 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -867,6 +867,8 @@ static struct request *attempt_merge(struct request_q=
+ueue *q,
+>         if (!blk_discard_mergable(req))
+>                 elv_merge_requests(q, req, next);
+>
+> +       blk_crypto_rq_put_keyslot(next);
+> +
 
-Testing an arbitrary system and looking only at individual I/Os,
-which may not be representative of any use-case, resulted in
-FUA always winning, see below.
+This looks good to me, but it looks like there was a pre-existing bug
+in the blk-merge code. The elv_merged_request function is only called
+when the request does not merge. Does anyone know if that behavior is
+correct?
 
-All values are approximate and in microseconds.
+>         /*
+>          * 'next' is going away, so update stats accordingly
+>          */
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d0cb2ef18fe2..49825538d932 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -840,6 +840,12 @@ static void blk_complete_request(struct request *req=
+)
+>                 req->q->integrity.profile->complete_fn(req, total_bytes);
+>  #endif
+>
+> +       /*
+> +        * Upper layers may call blk_crypto_evict_key() anytime after the=
+ last
+> +        * bio_endio().  Therefore, the keyslot must be released before t=
+hat.
+> +        */
+> +       blk_crypto_rq_put_keyslot(req);
+> +
+>         blk_account_io_completion(req, total_bytes);
+>
+>         do {
+> @@ -905,6 +911,13 @@ bool blk_update_request(struct request *req, blk_sta=
+tus_t error,
+>                 req->q->integrity.profile->complete_fn(req, nr_bytes);
+>  #endif
+>
+> +       /*
+> +        * Upper layers may call blk_crypto_evict_key() anytime after the=
+ last
+> +        * bio_endio().  Therefore, the keyslot must be released before t=
+hat.
+> +        */
+> +       if (blk_crypto_rq_has_keyslot(req) && nr_bytes >=3D blk_rq_bytes(=
+req))
+> +               __blk_crypto_rq_put_keyslot(req);
+> +
+>         if (unlikely(error && !blk_rq_is_passthrough(req) &&
+>                      !(req->rq_flags & RQF_QUIET)) &&
+>                      !test_bit(GD_DEAD, &req->q->disk->state)) {
+> @@ -2967,7 +2980,7 @@ void blk_mq_submit_bio(struct bio *bio)
+>
+>         blk_mq_bio_to_request(rq, bio, nr_segs);
+>
+> -       ret =3D blk_crypto_init_request(rq);
+> +       ret =3D blk_crypto_rq_get_keyslot(rq);
+>         if (ret !=3D BLK_STS_OK) {
+>                 bio->bi_status =3D ret;
+>                 bio_endio(bio);
+> --
+> 2.39.2
+>
 
-		With FUA		Without FUA
+This patch itself looks good to me.
 
-With CQE	Reliable Write	350	Write	125
-					Flush	300
-		Total		350		425
-
-Without CQE	Reliable Write	350	Write	125
-		CMD13		100	CMD13	100
-					Flush	300
-					CMD13	100
-		Total		450		625
-
-FYI the test I was doing was:
-
-  # cat test.sh
-	#!/bin/sh
-
-	echo "hi" > /mnt/mmc/hi.txt
-
-	sync
-
-
-  # perf record --no-bpf-event -e mmc:* -a -- ./test.sh
-  # perf script --ns --deltatime
-
-
-The conclusion in this case would seem to be that CQE
-makes the case for removing FUA less bad.
-
-Perhaps CQE is more common in newer eMMCs which in turn
-have better FUA implementations.
-
+Reviewed-by: Nathan Huckleberry <nhuck@google.com>
