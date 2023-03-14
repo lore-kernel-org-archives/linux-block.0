@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AA9C7618B
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 22:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC78C6FD1F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 22:09:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231225AbjCNWJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 18:09:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37556 "EHLO
+        id S230190AbjCNWJz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 18:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbjCNWJP (ORCPT
+        with ESMTP id S231286AbjCNWJX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 18:09:15 -0400
+        Tue, 14 Mar 2023 18:09:23 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E6E1F913
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 15:08:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 866D4574FB
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 15:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678831703;
+        s=mimecast20190719; t=1678831711;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=74aMisHJvcrsbS5g8R7662ZNEA+1A6hMiypJVvVd5yo=;
-        b=eG6ejL6MxEJrZU/a70OVDPXbUjEFK0vJK9NbZmX1dG7gtMEcIhPUDANpZ7FQCLkfWWzkui
-        6n5IDXXywLzyD58+t18fY5dwNtsH/hKaDIkXiHeV/FqoRT78qC0Dx6ot0OJKlP6ct2J+O2
-        GyrKFfvnIeC6JoJ6yNmgmwXli5UPNwg=
+        bh=WFhWed43Sc7081L0WA9mMaa7Q22YwjW6QNRxMcW8x9U=;
+        b=Z3oClPdYZyCfwgyXTW8oGyWN+OIz7+cvl4hisq/RzXRrvufGPVCFMr16D3Im9GYZXlnOn5
+        Xp+vP8yyu7SO3uURPY9jFiHrqJI4Gm9uRpKznVAEqZcMjqqOPp2LUCmpi++y0qhoJwHFHN
+        zrox/+awrYwJmR3o3XiwxQ1ANRvvD6o=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-482-OmsvrtS9MnWFP7mBkgbzgQ-1; Tue, 14 Mar 2023 18:08:20 -0400
-X-MC-Unique: OmsvrtS9MnWFP7mBkgbzgQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-664-YVi37OcXM4WmpK94EDl53A-1; Tue, 14 Mar 2023 18:08:26 -0400
+X-MC-Unique: YVi37OcXM4WmpK94EDl53A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 15FA9811E6E;
-        Tue, 14 Mar 2023 22:08:19 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78AEC802D2A;
+        Tue, 14 Mar 2023 22:08:25 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B11D347507A;
-        Tue, 14 Mar 2023 22:08:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 144332166B26;
+        Tue, 14 Mar 2023 22:08:22 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,27 +52,30 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>,
         Miklos Szeredi <miklos@szeredi.hu>,
-        linux-unionfs@vger.kernel.org
-Subject: [PATCH v18 04/15] overlayfs: Implement splice-read
-Date:   Tue, 14 Mar 2023 22:07:46 +0000
-Message-Id: <20230314220757.3827941-5-dhowells@redhat.com>
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v18 06/15] tty, proc, kernfs, random: Use direct_splice_read()
+Date:   Tue, 14 Mar 2023 22:07:48 +0000
+Message-Id: <20230314220757.3827941-7-dhowells@redhat.com>
 In-Reply-To: <20230314220757.3827941-1-dhowells@redhat.com>
 References: <20230314220757.3827941-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implement splice-read for overlayfs by passing the request down a layer
-rather than going through generic_file_splice_read() which is going to be
-changed to assume that ->read_folio() is present on buffered files.
+Use direct_splice_read() for tty, procfs, kernfs and random files rather
+than going through generic_file_splice_read() as they just copy the file
+into the output buffer and don't splice pages.  This avoids the need for
+them to have a ->read_folio() to satisfy filemap_splice_read().
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Al Viro <viro@zeniv.linux.org.uk>
@@ -80,63 +83,140 @@ cc: John Hubbard <jhubbard@nvidia.com>
 cc: David Hildenbrand <david@redhat.com>
 cc: Matthew Wilcox <willy@infradead.org>
 cc: Miklos Szeredi <miklos@szeredi.hu>
-cc: linux-unionfs@vger.kernel.org
+cc: Arnd Bergmann <arnd@arndb.de>
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
+ drivers/char/random.c | 4 ++--
+ drivers/tty/tty_io.c  | 4 ++--
+ fs/kernfs/file.c      | 2 +-
+ fs/proc/inode.c       | 4 ++--
+ fs/proc/proc_sysctl.c | 2 +-
+ fs/proc_namespace.c   | 6 +++---
+ 6 files changed, 11 insertions(+), 11 deletions(-)
 
-Notes:
-    ver #17)
-     - Use vfs_splice_read() helper rather than open-coding checks.
-    
-    ver #15)
-     - Remove redundant FMODE_CAN_ODIRECT check on real file.
-     - Do rw_verify_area() on the real file, not the overlay file.
-     - Fix a file leak.
-
- fs/overlayfs/file.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/fs/overlayfs/file.c b/fs/overlayfs/file.c
-index 7c04f033aadd..86197882ff35 100644
---- a/fs/overlayfs/file.c
-+++ b/fs/overlayfs/file.c
-@@ -419,6 +419,27 @@ static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
- 	return ret;
- }
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index ce3ccd172cc8..792713616ba8 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1546,7 +1546,7 @@ const struct file_operations random_fops = {
+ 	.compat_ioctl = compat_ptr_ioctl,
+ 	.fasync = random_fasync,
+ 	.llseek = noop_llseek,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = direct_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ };
  
-+static ssize_t ovl_splice_read(struct file *in, loff_t *ppos,
-+			       struct pipe_inode_info *pipe, size_t len,
-+			       unsigned int flags)
-+{
-+	const struct cred *old_cred;
-+	struct fd real;
-+	ssize_t ret;
-+
-+	ret = ovl_real_fdget(in, &real);
-+	if (ret)
-+		return ret;
-+
-+	old_cred = ovl_override_creds(file_inode(in)->i_sb);
-+	ret = vfs_splice_read(real.file, ppos, pipe, len, flags);
-+	revert_creds(old_cred);
-+	ovl_file_accessed(in);
-+
-+	fdput(real);
-+	return ret;
-+}
-+
- /*
-  * Calling iter_file_splice_write() directly from overlay's f_op may deadlock
-  * due to lock order inversion between pipe->mutex in iter_file_splice_write()
-@@ -695,7 +716,7 @@ const struct file_operations ovl_file_operations = {
- 	.fallocate	= ovl_fallocate,
- 	.fadvise	= ovl_fadvise,
- 	.flush		= ovl_flush,
--	.splice_read    = generic_file_splice_read,
-+	.splice_read    = ovl_splice_read,
- 	.splice_write   = ovl_splice_write,
+@@ -1557,7 +1557,7 @@ const struct file_operations urandom_fops = {
+ 	.compat_ioctl = compat_ptr_ioctl,
+ 	.fasync = random_fasync,
+ 	.llseek = noop_llseek,
+-	.splice_read = generic_file_splice_read,
++	.splice_read = direct_splice_read,
+ 	.splice_write = iter_file_splice_write,
+ };
  
- 	.copy_file_range	= ovl_copy_file_range,
+diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
+index 36fb945fdad4..9d117e579dfb 100644
+--- a/drivers/tty/tty_io.c
++++ b/drivers/tty/tty_io.c
+@@ -466,7 +466,7 @@ static const struct file_operations tty_fops = {
+ 	.llseek		= no_llseek,
+ 	.read_iter	= tty_read,
+ 	.write_iter	= tty_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.poll		= tty_poll,
+ 	.unlocked_ioctl	= tty_ioctl,
+@@ -481,7 +481,7 @@ static const struct file_operations console_fops = {
+ 	.llseek		= no_llseek,
+ 	.read_iter	= tty_read,
+ 	.write_iter	= redirected_tty_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.poll		= tty_poll,
+ 	.unlocked_ioctl	= tty_ioctl,
+diff --git a/fs/kernfs/file.c b/fs/kernfs/file.c
+index e4a50e4ff0d2..9d23b8141db7 100644
+--- a/fs/kernfs/file.c
++++ b/fs/kernfs/file.c
+@@ -1011,7 +1011,7 @@ const struct file_operations kernfs_file_fops = {
+ 	.release	= kernfs_fop_release,
+ 	.poll		= kernfs_fop_poll,
+ 	.fsync		= noop_fsync,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ };
+ 
+diff --git a/fs/proc/inode.c b/fs/proc/inode.c
+index f495fdb39151..711f12706469 100644
+--- a/fs/proc/inode.c
++++ b/fs/proc/inode.c
+@@ -591,7 +591,7 @@ static const struct file_operations proc_iter_file_ops = {
+ 	.llseek		= proc_reg_llseek,
+ 	.read_iter	= proc_reg_read_iter,
+ 	.write		= proc_reg_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.poll		= proc_reg_poll,
+ 	.unlocked_ioctl	= proc_reg_unlocked_ioctl,
+ 	.mmap		= proc_reg_mmap,
+@@ -617,7 +617,7 @@ static const struct file_operations proc_reg_file_ops_compat = {
+ static const struct file_operations proc_iter_file_ops_compat = {
+ 	.llseek		= proc_reg_llseek,
+ 	.read_iter	= proc_reg_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.write		= proc_reg_write,
+ 	.poll		= proc_reg_poll,
+ 	.unlocked_ioctl	= proc_reg_unlocked_ioctl,
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index 5851eb5bc726..e49f99657d1c 100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -869,7 +869,7 @@ static const struct file_operations proc_sys_file_operations = {
+ 	.poll		= proc_sys_poll,
+ 	.read_iter	= proc_sys_read,
+ 	.write_iter	= proc_sys_write,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.llseek		= default_llseek,
+ };
+diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
+index 846f9455ae22..492abbbeff5e 100644
+--- a/fs/proc_namespace.c
++++ b/fs/proc_namespace.c
+@@ -324,7 +324,7 @@ static int mountstats_open(struct inode *inode, struct file *file)
+ const struct file_operations proc_mounts_operations = {
+ 	.open		= mounts_open,
+ 	.read_iter	= seq_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.llseek		= seq_lseek,
+ 	.release	= mounts_release,
+ 	.poll		= mounts_poll,
+@@ -333,7 +333,7 @@ const struct file_operations proc_mounts_operations = {
+ const struct file_operations proc_mountinfo_operations = {
+ 	.open		= mountinfo_open,
+ 	.read_iter	= seq_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.llseek		= seq_lseek,
+ 	.release	= mounts_release,
+ 	.poll		= mounts_poll,
+@@ -342,7 +342,7 @@ const struct file_operations proc_mountinfo_operations = {
+ const struct file_operations proc_mountstats_operations = {
+ 	.open		= mountstats_open,
+ 	.read_iter	= seq_read_iter,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= direct_splice_read,
+ 	.llseek		= seq_lseek,
+ 	.release	= mounts_release,
+ };
 
