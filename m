@@ -2,143 +2,184 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9813AC6FD1F
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 19:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42979C7618B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 20:09:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbjCNT5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 15:57:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55904 "EHLO
+        id S230252AbjCNUJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 16:09:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229872AbjCNT5x (ORCPT
+        with ESMTP id S230346AbjCNUJV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 15:57:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C3146161
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 12:57:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678823826;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cwJKLbbt+tCbh3r4moNy9ZfrdrBTTmr8w1YMLV/pQG0=;
-        b=P5QtS0zvuUOUU8xoAHtE+pWdbDc3qj2KDIfuTVtep1lQ/wMKdvFNdaTBYalwJ9jRSITI5y
-        ldQKpzj4bKTc69cNXj5XNCIXWweNwP/1aVxI1lufmlgf17gOTEuCY9DSSOGm0mg4r5gC3v
-        c84Ac1siRX5j9PIG0bQ1OrpM32XhHfc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-240-kJiNRgUXP2iY_DBKqxDP7A-1; Tue, 14 Mar 2023 15:57:00 -0400
-X-MC-Unique: kJiNRgUXP2iY_DBKqxDP7A-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D402F802C18;
-        Tue, 14 Mar 2023 19:56:59 +0000 (UTC)
-Received: from redhat.com (unknown [10.2.16.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0655A400F52;
-        Tue, 14 Mar 2023 19:56:58 +0000 (UTC)
-Date:   Tue, 14 Mar 2023 14:56:57 -0500
-From:   Eric Blake <eblake@redhat.com>
-To:     Nir Soffer <nsoffer@redhat.com>
-Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-        corbet@lwn.net, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] block nbd: use req.cookie instead of req.handle
-Message-ID: <20230314195657.vpazxest7rvm5frp@redhat.com>
-References: <20230310201525.2615385-1-eblake@redhat.com>
- <20230310201525.2615385-4-eblake@redhat.com>
- <CAMRbyyv59L9GiLr5tJvnNdwnBNdNGw+xveG7S63WC9ycOuJYrA@mail.gmail.com>
+        Tue, 14 Mar 2023 16:09:21 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF83D22013;
+        Tue, 14 Mar 2023 13:09:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=IaZ/Ro/ijOLAt3RzYQfBauDHIMb1QN04KckKloToQhQ=; b=H/OzrV4ZZOdQ766rINvqXhx3Uz
+        DE5Ya4WI3WaejSgHW4GSEdlGfwC0K4ktwYnNkBk4L+TDz5TruL3iXen7Xmt1UDAFY7rF0xZ418wzN
+        cql632ZS1KbI0zaDvhisw6wF200LC2ayvUqscm3z8DxN6yRCRSz4iuMeoBctga4b74Dg2+NrhMnSJ
+        s7zZdegBZ6tpHLq6CKItzi9PlmTsIzltgYbuE0vzrn2PAm0Urtp7bkugiePcGDG0XOfSDbT3BlKDY
+        ghLxTQg2eVkNAQYj9wF5Lbl7X3Fs3Iu7AtMARyxsIlkJswSTnVSoc1/tbtEZvBO+dt/Qk4EfaBvS6
+        4x5cqx7Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pcAwy-00DCLc-6R; Tue, 14 Mar 2023 20:08:48 +0000
+Date:   Tue, 14 Mar 2023 20:08:48 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Daniel Golle <daniel@makrotopia.org>,
+        Guenter Roeck <groeck7@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Hugh Dickins <hughd@google.com>
+Subject: Re: [PATCH v17 03/14] shmem: Implement splice-read
+Message-ID: <ZBDUUAGO9HbZG8EW@casper.infradead.org>
+References: <20230308165251.2078898-1-dhowells@redhat.com>
+ <20230308165251.2078898-4-dhowells@redhat.com>
+ <CAHk-=wjYR3h5Q-_i3Q2Et=P8WsrjwNA20fYpEQf9nafHwBNALA@mail.gmail.com>
+ <ZBCkDvveAIJENA0G@casper.infradead.org>
+ <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRbyyv59L9GiLr5tJvnNdwnBNdNGw+xveG7S63WC9ycOuJYrA@mail.gmail.com>
-User-Agent: NeoMutt/20220429
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+In-Reply-To: <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 11, 2023 at 02:22:51PM +0200, Nir Soffer wrote:
-> On Fri, Mar 10, 2023 at 10:16 PM Eric Blake <eblake@redhat.com> wrote:
+On Tue, Mar 14, 2023 at 11:02:40AM -0700, Linus Torvalds wrote:
+> On Tue, Mar 14, 2023 at 9:43 AM Matthew Wilcox <willy@infradead.org> wrote:
 > >
-> > A good compiler should not compile this any differently, but it seems
-> > nicer to avoid memcpy() when integer assignment will work.
-> >
-> > Signed-off-by: Eric Blake <eblake@redhat.com>
-> > ---
-> >  drivers/block/nbd.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > index 592cfa8b765a..672fb8d1ce67 100644
-> > --- a/drivers/block/nbd.c
-> > +++ b/drivers/block/nbd.c
-> > @@ -606,7 +606,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-> >                 request.len = htonl(size);
-> >         }
-> >         handle = nbd_cmd_handle(cmd);
+> > The problem is that we might have swapped out the shmem folio.  So we
+> > don't want to clear the page, but ask swap to fill the page.
 > 
-> This returns native u64 (likely little endian) but the new interface
-> specifies __be64. Should we swap the bytes if needed?
+> Doesn't shmem_swapin_folio() already basically do all that work?
+> 
+> The real oddity with shmem - compared to other filesystems - is that
+> the xarray has a value entry instead of being a real folio. And yes,
+> the current filemap code will then just ignore such entries as
+> "doesn't exist", and so the regular read iterators will all fail on
+> it.
+> 
+> But while filemap_get_read_batch() will stop at a value-folio, I feel
+> like filemap_create_folio() should be able to turn a value page into a
+> "real" page. Right now it already allocates said page, but then I
+> think filemap_add_folio() will return -EEXIST when said entry exists
+> as a value.
+> 
+> But *if* instead of -EEXIST we could just replace the value with the
+> (already locked) page, and have some sane way to pass that value
+> (which is the swap entry data) to readpage(), I think that should just
+> do it all.
 
-Or document the field as u64 in the .h file.  I'm not sure which is
-better, but the mismatch here is definitely why the test robot
-complained about new warnings with my v1 patch.  I'm new enough to
-kernel development that I will welcome a hint about which way I should
-lean in writing v2.
+This was basically what I had in mind:
 
-> 
-> This will help tools like the wireshark plugin to display the right value
-> when checking traces from machines with different endianness. Or help
-> the nbd server to show the same *cooike* value in the logs. The value
-> is opaque but reasonable code can assume that __be64 can be safely
-> parsed as an integer.
+I don't think this will handle a case like:
 
-The fact that the old code was memcpy()ing a u64 into char[8] over the
-wire means that wireshark was already seeing endian-dependant values
-in that portion of the struct (a big-endian and little-endian client
-that happen to use the same cookie/handle will show up differently).
-I don't mind adding byteswapping and using __be64 (instead of direct
-assignment and u64) if that's what we want, but I don't think anyone
-should be relying on wireshark to have stable output for those bytes,
-since they are opaque to the server regardless of endianness.
+Alloc order-0 folio at index 4
+Alloc order-0 folio at index 7
+Swap out both folios
+Alloc order-9 folio at indices 0-511
 
-> 
-> Also the same file has references to *handle* like:
-> 
-> static u64 nbd_cmd_handle(struct nbd_cmd *cmd)
-> {
->     struct request *req = blk_mq_rq_from_pdu(cmd);
->     u32 tag = blk_mq_unique_tag(req);
->     u64 cookie = cmd->cmd_cookie;
-> 
->     return (cookie << NBD_COOKIE_BITS) | tag;
-> }
-> 
-> static u32 nbd_handle_to_tag(u64 handle)
-> {
->     return (u32)handle;
-> }
-> 
-> static u32 nbd_handle_to_cookie(u64 handle)
-> {
->     return (u32)(handle >> NBD_COOKIE_BITS);
-> }
-> 
-> So this change is a little bit confusing.
-> 
-> I think we need to use a term like *nbd_cookie* instead of
-> *handle* to make this more clear.
+But I don't see where shmem currently handles that either.  Maybe it
+falls back to order-0 folios instead of the crude BUG_ON I put in.
+Hugh?
 
-I can additionally rename these helper functions in v2 if that would
-be helpful.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
+diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
+index 82c1262f396f..30f2502314de 100644
+--- a/include/linux/shmem_fs.h
++++ b/include/linux/shmem_fs.h
+@@ -114,12 +114,6 @@ int shmem_get_folio(struct inode *inode, pgoff_t index, struct folio **foliop,
+ struct folio *shmem_read_folio_gfp(struct address_space *mapping,
+ 		pgoff_t index, gfp_t gfp);
+ 
+-static inline struct folio *shmem_read_folio(struct address_space *mapping,
+-		pgoff_t index)
+-{
+-	return shmem_read_folio_gfp(mapping, index, mapping_gfp_mask(mapping));
+-}
+-
+ static inline struct page *shmem_read_mapping_page(
+ 				struct address_space *mapping, pgoff_t index)
+ {
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 57c1b154fb5a..8e4f95c5b65a 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -877,6 +877,8 @@ noinline int __filemap_add_folio(struct address_space *mapping,
+ 					order, gfp);
+ 		xas_lock_irq(&xas);
+ 		xas_for_each_conflict(&xas, entry) {
++			if (old)
++				BUG_ON(shmem_mapping(mapping));
+ 			old = entry;
+ 			if (!xa_is_value(entry)) {
+ 				xas_set_err(&xas, -EEXIST);
+@@ -885,7 +887,12 @@ noinline int __filemap_add_folio(struct address_space *mapping,
+ 		}
+ 
+ 		if (old) {
+-			if (shadowp)
++			if (shmem_mapping(mapping)) {
++				folio_set_swap_entry(folio,
++						radix_to_swp_entry(old));
++				folio_set_swapcache(folio);
++				folio_set_swapbacked(folio);
++			} else if (shadowp)
+ 				*shadowp = old;
+ 			/* entry may have been split before we acquired lock */
+ 			order = xa_get_order(xas.xa, xas.xa_index);
+diff --git a/mm/shmem.c b/mm/shmem.c
+index 8e60826e4246..ea75c7dcf5ec 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -2059,6 +2059,18 @@ int shmem_get_folio(struct inode *inode, pgoff_t index, struct folio **foliop,
+ 			mapping_gfp_mask(inode->i_mapping), NULL, NULL, NULL);
+ }
+ 
++static int shmem_read_folio(struct file *file, struct folio *folio)
++{
++	if (folio_test_swapcache(folio)) {
++		swap_readpage(&folio->page, true, NULL);
++	} else {
++		folio_zero_segment(folio, 0, folio_size(folio));
++		folio_mark_uptodate(folio);
++		folio_unlock(folio);
++	}
++	return 0;
++}
++
+ /*
+  * This is like autoremove_wake_function, but it removes the wait queue
+  * entry unconditionally - even if something else had already woken the
+@@ -2396,7 +2408,8 @@ static int shmem_fadvise_willneed(struct address_space *mapping,
+ 	xa_for_each_range(&mapping->i_pages, index, folio, start, end) {
+ 		if (!xa_is_value(folio))
+ 			continue;
+-		folio = shmem_read_folio(mapping, index);
++		folio = shmem_read_folio_gfp(mapping, index,
++						mapping_gfp_mask(mapping));
+ 		if (!IS_ERR(folio))
+ 			folio_put(folio);
+ 	}
+@@ -4037,6 +4050,7 @@ static int shmem_error_remove_page(struct address_space *mapping,
+ }
+ 
+ const struct address_space_operations shmem_aops = {
++	.read_folio	= shmem_read_folio,
+ 	.writepage	= shmem_writepage,
+ 	.dirty_folio	= noop_dirty_folio,
+ #ifdef CONFIG_TMPFS
