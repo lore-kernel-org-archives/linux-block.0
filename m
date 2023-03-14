@@ -2,51 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB53AC74A44
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 18:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 857A2C74A44
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 19:08:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230260AbjCNS1j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 14:27:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59496 "EHLO
+        id S231322AbjCNTH7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 15:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbjCNS1e (ORCPT
+        with ESMTP id S230098AbjCNTH7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 14:27:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FA938E86
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 11:26:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678818414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fTfsBvYbBxdRy/TFGETnYr2wutSLBUazSKwuZl5QCkE=;
-        b=OUGEVZi1oWDpV3XIp7D3sVxdSRmD5BVqkGaeuPXW5CoXKgeXfx3n0R20njTqV848rD+aFC
-        KldkQNu/3L7kQcMUgcGwdXqG95vAMeEG2G/x1YFUpV7QcnjPGHEK4lwEeEIkQzByBq/mEY
-        1/LfYIJtqZgyxLtyft0ZHbOa8DU4vNU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-644-OSAmWMqFMO6H_2rey2MskA-1; Tue, 14 Mar 2023 14:26:49 -0400
-X-MC-Unique: OSAmWMqFMO6H_2rey2MskA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1BD4E280A328;
-        Tue, 14 Mar 2023 18:26:48 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A90B1121318;
-        Tue, 14 Mar 2023 18:26:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com>
-References: <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com> <20230308165251.2078898-1-dhowells@redhat.com> <20230308165251.2078898-4-dhowells@redhat.com> <CAHk-=wjYR3h5Q-_i3Q2Et=P8WsrjwNA20fYpEQf9nafHwBNALA@mail.gmail.com> <ZBCkDvveAIJENA0G@casper.infradead.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
+        Tue, 14 Mar 2023 15:07:59 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9123EFE
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 12:07:57 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id fd5so32353955edb.7
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 12:07:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1678820875;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5XXQN4LaizH2j4eXVSdO1xOJU1STk3wgvGGHOknlOD8=;
+        b=a6WyRdFfi0DT7KYrcVh8KTBoERDVjfv/XJ6l0uILwYMBAPnA/UBOlqSBYK5E8mAA5E
+         gyMsC6wKiXOOl13zzf6+ip5YEB6dQ1oXi+QLJ8Z5sLuxArOr0GPojIVKAlN0eNCjCQTJ
+         oTKawdKO94eDLMqkex9c7ds01Gql5IOB48HKs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678820875;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5XXQN4LaizH2j4eXVSdO1xOJU1STk3wgvGGHOknlOD8=;
+        b=7yUsAt/wyjm82qKQMF4oWceW5Pc4UWu3ERuT8cOWdYc9NzKi6Gpp2swa+s0C+XeFFO
+         DiH2fj7pxA8O9VCzLoAw/Wk+HOYc0bxA4mtthR0a0Krqw/3oJPwxjxuL36J2yjePEJy/
+         hjIWmgtGzbVjpqgK6LQymUZtWz1aaUt90cDtsU+xIML75AeEt3pA1Y6ztE4m/14Xxxvh
+         DER4H0tjOe8uQs1hE+Q72hBGnd1MrwXvOCjTS62tkP07KtwmTeYw7Jwd3KrpTJ+KsVBI
+         L5O+2G2DeJQwyZqOz8a5HiYJKL5rWOvS7+QcF80RghkgKF/1kPW7Yx6khZccLZnJl7Ic
+         +HQw==
+X-Gm-Message-State: AO0yUKXYVbvoiacIt7YkuXgt0a3MQ1Zt4hIOtVxyPbP4eVx+Enzdarrd
+        4+I94lt0U+rMM7guTIjnWuTdM81BJ4HA1Upfy5VSew==
+X-Google-Smtp-Source: AK7set9QkKQ6cE4hpWidMatx6R3+QqBmS9MpI7VoELicTPaPnAsgBSOiwp7gb07f4Yts0Igd/qZBXQ==
+X-Received: by 2002:a17:906:d8a5:b0:8b1:7aaa:4c25 with SMTP id qc5-20020a170906d8a500b008b17aaa4c25mr3349252ejb.29.1678820875561;
+        Tue, 14 Mar 2023 12:07:55 -0700 (PDT)
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
+        by smtp.gmail.com with ESMTPSA id hp2-20020a1709073e0200b008b175c46867sm1483936ejc.116.2023.03.14.12.07.54
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Mar 2023 12:07:54 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id cy23so66119889edb.12
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 12:07:54 -0700 (PDT)
+X-Received: by 2002:a50:d506:0:b0:4fb:482b:f93d with SMTP id
+ u6-20020a50d506000000b004fb482bf93dmr106272edi.2.1678820874229; Tue, 14 Mar
+ 2023 12:07:54 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230308165251.2078898-1-dhowells@redhat.com> <20230308165251.2078898-4-dhowells@redhat.com>
+ <CAHk-=wjYR3h5Q-_i3Q2Et=P8WsrjwNA20fYpEQf9nafHwBNALA@mail.gmail.com>
+ <ZBCkDvveAIJENA0G@casper.infradead.org> <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com>
+ <3761465.1678818404@warthog.procyon.org.uk>
+In-Reply-To: <3761465.1678818404@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 14 Mar 2023 12:07:36 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wh-OKQdK2AE+CD_Y5bimnoSH=_4+F5EOZoGUf3SGJdxGA@mail.gmail.com>
+Message-ID: <CAHk-=wh-OKQdK2AE+CD_Y5bimnoSH=_4+F5EOZoGUf3SGJdxGA@mail.gmail.com>
+Subject: Re: [PATCH v17 03/14] shmem: Implement splice-read
+To:     David Howells <dhowells@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
@@ -60,20 +79,27 @@ Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
         Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>,
         Hugh Dickins <hughd@google.com>
-Subject: Re: [PATCH v17 03/14] shmem: Implement splice-read
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3761464.1678818404.1@warthog.procyon.org.uk>
-Date:   Tue, 14 Mar 2023 18:26:44 +0000
-Message-ID: <3761465.1678818404@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Tue, Mar 14, 2023 at 11:26=E2=80=AFAM David Howells <dhowells@redhat.com=
+> wrote:
+>
+> Are you okay if we go with my current patch for the moment?
 
-Are you okay if we go with my current patch for the moment?
+I  guess.
 
-David
+But please at least stop doing the
 
+     get_page(buf->page);
+
+on the zero-page (which includes using no-op .get and .put functions
+in  zero_pipe_buf_ops().
+
+Maybe we can do /dev/null some day and actually have a common case for thos=
+e.
+
+             Linus
