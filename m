@@ -2,99 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC559C6FD1C
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 13:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA23C6FD1D
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 13:26:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232296AbjCNNYo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 09:24:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33824 "EHLO
+        id S232334AbjCNN0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 09:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232008AbjCNNY0 (ORCPT
+        with ESMTP id S232376AbjCNNZr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 09:24:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202966484F
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 06:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678799967;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5yLNYQmV+u2VRfFCW1SdaEMv1D/RkRV8OgRAz/vRVGU=;
-        b=OG+j3DpIfibZO1xf6q+vJRi5O9gs+PoQxBJapOR3sAPvxOL6ai53RHHU6XlLlvesIusGts
-        LgpIQPMVpwd/NRnONJOJoPbFtZ/uA+kk2Rc68AY9Yp40D3nIfNus/0h2n+sTBapyS+Hdpx
-        ABj5Oh2l3eCA8yVskjb8HkKq7dvcf3o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-279-D_Y9vy0pOfq-jxN1Aq3LdQ-1; Tue, 14 Mar 2023 08:57:53 -0400
-X-MC-Unique: D_Y9vy0pOfq-jxN1Aq3LdQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36158803513;
-        Tue, 14 Mar 2023 12:57:53 +0000 (UTC)
-Received: from localhost (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A1D42166B26;
-        Tue, 14 Mar 2023 12:57:52 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 05/16] block: ublk_drv: mark device as LIVE before adding disk
-Date:   Tue, 14 Mar 2023 20:57:16 +0800
-Message-Id: <20230314125727.1731233-6-ming.lei@redhat.com>
-In-Reply-To: <20230314125727.1731233-1-ming.lei@redhat.com>
-References: <20230314125727.1731233-1-ming.lei@redhat.com>
+        Tue, 14 Mar 2023 09:25:47 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF90996616;
+        Tue, 14 Mar 2023 06:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=CyA6aX3LWF3S0LPq2B7KDIy9+tGtAg2Aqm4KsZBo8Hk=; b=IjN16Nr/j4WtYjF4MKbc6hAh/E
+        r1bkPgb4/YGLPSO+ZHwaIHrCj6AYOllQjfgCiURKiKyBq/kCQXyJstxnIGpP0Vp2YeHco2JAHOzMx
+        fSXXBplsiWXjS1M9T8XQcAljcKIllA2fXBIzNlruoPlmC8WzJ+VS9zhbX79ayTGui8Q4CwDm0kTmu
+        Jhcre75eo3MY1gtiyS20cX/f7Sdv32876LgD2fKZ45TJf/GjH/ZYl4xy5PxXk9sg9M46M1hQWZq7B
+        X+GRLXQN4L6C2qX9h4igSgw7kW9G0VopqYa1C22FUfitHAIXtVRczeFUkUdA8DPHR+A9X2P7rg78c
+        pS15A3pw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pc4MQ-00CvDN-HJ; Tue, 14 Mar 2023 13:06:38 +0000
+Date:   Tue, 14 Mar 2023 13:06:38 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Vlastimil Babka <vbabka@suse.cz>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        bpf@vger.kernel.org, linux-xfs@vger.kernel.org,
+        David Rientjes <rientjes@google.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+        Roman Gushchin <roman.gushchin@linux.dev>
+Subject: Re: [LSF/MM/BPF TOPIC] SLOB+SLAB allocators removal and future SLUB
+ improvements
+Message-ID: <ZBBxXhvL/oS3uu5/@casper.infradead.org>
+References: <4b9fc9c6-b48c-198f-5f80-811a44737e5f@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b9fc9c6-b48c-198f-5f80-811a44737e5f@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-IO can be started before add_disk() returns, such as reading parititon table,
-then the monitor work should work for making forward progress.
+On Tue, Mar 14, 2023 at 09:05:13AM +0100, Vlastimil Babka wrote:
+> The immediate benefit of that is that we can allow kfree() (and kfree_rcu())
+> to free objects from kmem_cache_alloc() - something that IIRC at least xfs
+> people wanted in the past, and SLOB was incompatible with that.
+> 
+> For SLAB removal I haven't yet heard any objections (but also didn't
+> deprecate it yet) but if there are any users due to particular workloads
+> doing better with SLAB than SLUB, we can discuss why those would regress and
+> what can be done about that in SLUB.
+> 
+> Once we have just one slab allocator in the kernel, we can take a closer
+> look at what the users are missing from it that forces them to create own
+> allocators (e.g. BPF), and could be considered to be added as a generic
+> implementation to SLUB.
 
-So mark device as LIVE before adding disk, meantime change to
-DEAD if add_disk() fails.
+With kfree() now working on kmem_cache_alloc(), I'd like to re-propose
+the introduction of a generic free() function which can free any
+allocated object.  It starts out looking a lot like kvfree(), but
+can be enhanced to cover other things ... here's a version I did from
+2018 before giving up on it when I realised slob made it impossible:
 
-Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
++/**
++ * free() - Free memory
++ * @ptr: Pointer to memory
++ *
++ * This function can free almost any type of memory.  It can safely be
++ * called on:
++ * * NULL pointers.
++ * * Pointers to read-only data (will do nothing).
++ * * Pointers to memory allocated from kmalloc().
++ * * Pointers to memory allocated from kmem_cache_alloc().
++ * * Pointers to memory allocated from vmalloc().
++ * * Pointers to memory allocated from alloc_percpu().
++ * * Pointers to memory allocated from __get_free_pages().
++ * * Pointers to memory allocated from page_frag_alloc().
++ *
++ * It cannot free memory allocated by dma_pool_alloc() or dma_alloc_coherent().
++ */
++void free(const void *ptr)
++{
++       struct page *page;
++
++       if (unlikely(ZERO_OR_NULL_PTR(ptr)))
++               return;
++       if (is_kernel_rodata((unsigned long)ptr))
++               return;
++
++       page = virt_to_head_page(ptr);
++       if (likely(PageSlab(page)))
++               return kmem_cache_free(page->slab_cache, (void *)ptr);
++
++       if (is_vmalloc_addr(ptr))
++               return vfree(ptr);
++       if (is_kernel_percpu_address((unsigned long)ptr))
++               free_percpu((void __percpu *)ptr);
++       if (put_page_testzero(page))
++               __put_page(page);
++}
++EXPORT_SYMBOL(free);
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index d1d1c8d606c8..fb5a557afde8 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1602,17 +1602,18 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
- 		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
- 
- 	get_device(&ub->cdev_dev);
-+	ub->dev_info.state = UBLK_S_DEV_LIVE;
- 	ret = add_disk(disk);
- 	if (ret) {
- 		/*
- 		 * Has to drop the reference since ->free_disk won't be
- 		 * called in case of add_disk failure.
- 		 */
-+		ub->dev_info.state = UBLK_S_DEV_DEAD;
- 		ublk_put_device(ub);
- 		goto out_put_disk;
- 	}
- 	set_bit(UB_STATE_USED, &ub->state);
--	ub->dev_info.state = UBLK_S_DEV_LIVE;
- out_put_disk:
- 	if (ret)
- 		put_disk(disk);
--- 
-2.39.2
+Looking at it now, I'd also include a test for stack memory (and do
+nothing if it is)
 
+There are some prep patches that I'm not including here to clear out
+the use of 'free' as a function name (some conflicting identifiers named
+'free') and a fun one to set a SLAB_PAGE_DTOR on compound pages.
