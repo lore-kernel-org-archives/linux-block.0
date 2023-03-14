@@ -2,109 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 754C3C7618B
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 23:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1662CC6FD1F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 23:21:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbjCNXC3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 19:02:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36174 "EHLO
+        id S229675AbjCNXVU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 19:21:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjCNXC2 (ORCPT
+        with ESMTP id S230122AbjCNXVT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 19:02:28 -0400
-X-Greylist: delayed 568 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 14 Mar 2023 16:02:26 PDT
-Received: from mx.manguebit.com (mx.manguebit.com [IPv6:2a01:4f8:1c1e:a2ae::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2118CDEA;
-        Tue, 14 Mar 2023 16:02:26 -0700 (PDT)
-Message-Id: <8621e53ca50226823b1ee6c1ec9d40ce.pc.crab@mail.manguebit.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1678834375;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OfTmHuG7/JVkukj6i9UvqcVneAXUFxJc9BrAXcIEPfA=;
-        b=tEVGR4CpZY6tuUOTQ+3sKHsqALva5ESHJluPSSoqSsI0dXFvQZro05N1h/xvBmw2W71ipD
-        n/bt4/sGwgCgve2usmycJaqjlobl5cnG9qnK+jumdZoginAwg6GcwMmd1tEST6UU/FdpAT
-        V0z0CZAOmzJv+T9HuAcs+9FvBCVLOhJlDCZxA+NIfb0xXFTdVEyXSMRJSk8zu5GFeusn9w
-        /pPZnDRX780vT1JMZBaz0DyzJxVy1kvlES6NnnI/9hvoGSLSVuut53xCd4KHlIpqZU99RG
-        yYD9JV8ey82aMiUkNfWjg70xKGtSmSlZb9MQWh4/fWmHuUdEWx8bwcOmt/fMtQ==
-ARC-Seal: i=1; s=dkim; d=manguebit.com; t=1678834375; a=rsa-sha256;
-        cv=none;
-        b=irWPiCIKBmyUp/1SgHmr27JoNn+cRe6BWTFWBeaWgKShG3kcum929GJ1JWT9yhB1qh1LC9
-        QYTdtvQoHWMiFUhlwfOT8tfzESQ9ixVy/pTpfkFJtaHkE3o+A8+fZcIptLJaAXml/nnAev
-        cHOiqAiBwxbx0Fgaz+N0JH+6W/rsFzns6hqlnHUoK7yKtXB9eM+3yf0rtRU3TU/epNhCNB
-        7B6iPfE4z45/+Q0gm2fvPsW2u8cWbDStCHl89r8Jit56F2EVXXqDpYArEHNRnlwnM2ksQ4
-        uRR1VBNdP84FBbPeTlXDOTY8J8PDTUDgDarTALGpMok7HdvMvDYa/MQFsTvPmw==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pc@manguebit.com smtp.mailfrom=pc@manguebit.com
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=manguebit.com;
-        s=dkim; t=1678834375;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OfTmHuG7/JVkukj6i9UvqcVneAXUFxJc9BrAXcIEPfA=;
-        b=HHNOdTIrWMStj6EtyFNq+tmH8Uc/RD1UGUqPD0NTxnJ8fVPAuTlhouw26AfWasZAGshT5C
-        INLA7884qP/NYT2whmwTIH+gvLz+uIPEUFkvxsczbw0AhSspkiLUY98GirkY70BUtRnrdt
-        PsSegNawVvpUNuBnTNWsv7bkK9lAo8Fdk9KYzLp5uaX2tEDo72TTzzzc7hIBivoKorlBJL
-        6QUS4+7Bsq3VEQl2s6+ZVsJVet21x57JzBOnqApPi7+wJPLdLW8HAtsEC1fBr56A3Lg74h
-        bB3YBIgWLoan8BmWoeUnOCnnV0cdff3t0sc1vst9D9pu9/2H5FiOZYjzchJJFQ==
-From:   Paulo Alcantara <pc@manguebit.com>
-To:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        Steve French <smfrench@gmail.com>,
-        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v18 08/15] cifs: Use generic_file_splice_read()
-In-Reply-To: <20230314220757.3827941-9-dhowells@redhat.com>
-References: <20230314220757.3827941-1-dhowells@redhat.com>
- <20230314220757.3827941-9-dhowells@redhat.com>
-Date:   Tue, 14 Mar 2023 19:52:49 -0300
+        Tue, 14 Mar 2023 19:21:19 -0400
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0E6305C4;
+        Tue, 14 Mar 2023 16:21:18 -0700 (PDT)
+Received: by mail-pj1-f44.google.com with SMTP id rj10so6401825pjb.4;
+        Tue, 14 Mar 2023 16:21:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678836078;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CTQ7I6gEq/wz6ZhaT13oVoyn1XK6+uvwTMIlBtJLUPo=;
+        b=TNQM40Eq5LDLQsFobyir8r9fPYbTzSLh9tQmE0sDHghRvm3g6I0K5iFlXQUVcMQr4X
+         6+8XJ94SAlF7dxHXf3jfAUyn9i7JASHdlxqNBNcdTBYmdebS3XWsjTQay0o6CVAtnpvm
+         HWifiAbHe770VswhMiQgeY8mgRiepArgOV4WqgmPUISvov8phlQd5FGOxE3RFCXAJ5a+
+         hlTrrdNwPLkqhgv9GwR343yA6mTMVEvofKL7N1CyArcdQ42XYJ57I5wZohrQiSpsTS5m
+         A1GxkEugRjiDCcb9WhEMxihQnt+xWp13p2FjWqHc726tiqe2lWRLM1TvB6RYqzNj+WDs
+         +rJg==
+X-Gm-Message-State: AO0yUKV6FFy744LbqfT7LB1izASMW50clOb2d1sTlF53OmzZq0JAT/Vx
+        MuFkd6L89pKu7xbpmNVXfAA=
+X-Google-Smtp-Source: AK7set/NyLqv5k2p0JDFsAd2z1ShpVSrNW3r+zoLi8Lj2uvXgRFdLpqo2Yl7oH6prG4ifjoXU1JLgg==
+X-Received: by 2002:a05:6a20:63a1:b0:c7:4bf5:fa0a with SMTP id m33-20020a056a2063a100b000c74bf5fa0amr32385885pzg.48.1678836077941;
+        Tue, 14 Mar 2023 16:21:17 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id k17-20020aa78211000000b005cdbd9c8825sm2116947pfi.195.2023.03.14.16.21.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Mar 2023 16:21:17 -0700 (PDT)
+Message-ID: <c98a3741-273b-8a69-016d-5f3e79f8a71e@acm.org>
+Date:   Tue, 14 Mar 2023 16:21:15 -0700
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
+ and slow-stuck reboots
+Content-Language: en-US
+To:     Alexey Klimov <alexey.klimov@linaro.org>, peterz@infradead.org
+Cc:     draszik@google.com, peter.griffin@linaro.org,
+        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
+        tony@atomide.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        alim.akhtar@samsung.com, regressions@lists.linux.dev,
+        avri.altman@wdc.com, klimova@google.com
+References: <20230314230004.961993-1-alexey.klimov@linaro.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230314230004.961993-1-alexey.klimov@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Howells <dhowells@redhat.com> writes:
+On 3/14/23 16:00, Alexey Klimov wrote:
+> The delay is found to be in device's ->shutdown() methods called from kernel_restart():
+> void kernel_restart_prepare(char *cmd)
+> {
+> 	blocking_notifier_call_chain(&reboot_notifier_list, SYS_RESTART, cmd);
+> 	system_state = SYSTEM_RESTART;
+> 	usermodehelper_disable();
+> 	device_shutdown();	<---- here
+> }
+> 
+> The driver in question is ufshcd and its ufshcd_wl_shutdown() shutdown method. It often blocks on scsi_device_quiesce() and upon manual checking it seems that it sleeps on blk_mq_freeze_queue_wait()/wait_event() in blk_freeze_queue():
+> 
+> scsi_device_quiesce(struct scsi_device *sdev)
+> {
+> 	...
+> 	blk_mq_freeze_queue(q);
+> 	...
+> }
+> 	||
+> 	V
+> void blk_freeze_queue(struct request_queue *q)
+> {
+> 	/*
+> 	 * In the !blk_mq case we are only calling this to kill the
+> 	 * q_usage_counter, otherwise this increases the freeze depth
+> 	 * and waits for it to return to zero.  For this reason there is
+> 	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
+> 	 * exported to drivers as the only user for unfreeze is blk_mq.
+> 	 */
+> 	blk_freeze_queue_start(q);
+> 	blk_mq_freeze_queue_wait(q);	<--- sleeps on wait_event() here
+> }
 
-> Make cifs use generic_file_splice_read() rather than doing it for itself.
->
-> As a consequence, filemap_splice_read() no longer needs to be exported.
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Steve French <smfrench@gmail.com>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: David Hildenbrand <david@redhat.com>
-> cc: John Hubbard <jhubbard@nvidia.com>
-> cc: linux-mm@kvack.org
-> cc: linux-block@vger.kernel.org
-> cc: linux-cifs@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->
-> Notes:
->     ver #18)
->      - Split out from change to generic_file_splice_read().
->
->  fs/cifs/cifsfs.c |  8 ++++----
->  fs/cifs/cifsfs.h |  3 ---
->  fs/cifs/file.c   | 16 ----------------
->  mm/filemap.c     |  1 -
->  4 files changed, 4 insertions(+), 24 deletions(-)
+Please let me know if you want me to resubmit patch "scsi: ufs: Remove 
+the LUN quiescing code from ufshcd_wl_shutdown()" 
+(https://lore.kernel.org/linux-scsi/20220331223424.1054715-14-bvanassche@acm.org/).
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@manguebit.com>
+Thanks,
+
+Bart.
+
