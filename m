@@ -2,71 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A6AC05027
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 17:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69788C6FD1F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 17:31:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230201AbjCNRbM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 13:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46576 "EHLO
+        id S230282AbjCNRbq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 13:31:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230164AbjCNRbL (ORCPT
+        with ESMTP id S230280AbjCNRbo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 13:31:11 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844EE9F059;
-        Tue, 14 Mar 2023 10:31:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 808E8B81AA1;
-        Tue, 14 Mar 2023 17:31:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BF9C4339B;
-        Tue, 14 Mar 2023 17:31:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678815062;
-        bh=TCw/AN/Un6bpx1N00J+z/9cj1Si2ZLC5bXYvaaXHbJo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RT336Dqro1Vvp6z3vHVDTOzldVLFQhP9GHbt6GCR9ohPrJ/T171dOczOyvFvLBU8P
-         QSR9sZcYLdEaaLnQVT0UTtAd3coc7EaaBd11pXeq2jTqQFZPLHQa2iKE8VlBW0lSgw
-         Nb53Rx/qZoqcFAO7rkFy8zoDogPkI1i9CgHCZPVIuzaUaMu7myIk6TzPMj83EW4AUd
-         tYI3vMBp30Yl106WwXWZ/kIaj8DbyOajqUNwCyzDXhjjRQoElRjWqje5bUpAWQuwqg
-         zrORMZ1564WqDhbrrZidfw9s5xpsDXQqhDKvHncDPKfYyICvrkZKE6QaPEHiNUDEqD
-         oW4FX4kd2HW4A==
-Date:   Tue, 14 Mar 2023 11:30:59 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Mike Christie <michael.christie@oracle.com>, bvanassche@acm.org,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        target-devel@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v4 09/18] nvme: Move pr code to it's own file
-Message-ID: <ZBCvU0ldBvvTqz+y@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230224174502.321490-1-michael.christie@oracle.com>
- <20230224174502.321490-10-michael.christie@oracle.com>
- <20230314171322.GE6780@lst.de>
+        Tue, 14 Mar 2023 13:31:44 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAABEACB86;
+        Tue, 14 Mar 2023 10:31:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hrjqNDyAxanW6Co1Z6mFKhPGQa8P4t5dCZ7joNbFdBE=; b=Uzb0eoUXwE1MCiBG8y/Yd2LmbS
+        10U6878KSXCi+r53vZ/MsWmXAHA6cqZ58eA8y6i/1rL9ZD7ZXyz9/bHMKqT4nW1hSojmG/xUalFdb
+        w1bqloAOrptDtSsWc0NpHL8CMYnM57qw82GtEs5b17l+VFh2dX2+SxC/VqGUJVxYgWMIzO32zkeNP
+        xHdizoj+vjVm/wQvZrxsj7H5oManfqiqhsk0Jihs3lDf06GHisha6OiQ1mHPgb7db+trGTHUdmOkx
+        K0m17FVRBtF40lPOemVEhLvT/bkmYKX8yjSCMyGenvCZQU+vOguUgcygyTVsFCRW/Nn0cVVR1RG+p
+        /ANrQYyA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pc8Um-00B1OQ-1v;
+        Tue, 14 Mar 2023 17:31:32 +0000
+Date:   Tue, 14 Mar 2023 10:31:32 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>,
+        linux-unionfs@vger.kernel.org
+Subject: Re: [PATCH v17 02/14] splice: Make do_splice_to() generic and export
+ it
+Message-ID: <ZBCvdKQskS46qyV3@infradead.org>
+References: <20230308165251.2078898-1-dhowells@redhat.com>
+ <20230308165251.2078898-3-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230314171322.GE6780@lst.de>
+In-Reply-To: <20230308165251.2078898-3-dhowells@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 06:13:22PM +0100, Christoph Hellwig wrote:
-> > +++ b/drivers/nvme/host/pr.c
-> > @@ -0,0 +1,155 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> 
-> I'd feel much more comfortable if we had a copyright notice code
-> here.  This code was written by Keith, maybe he can help to fill
-> in what the proper notice should be?
+> -static long do_splice_to(struct file *in, loff_t *ppos,
+> -			 struct pipe_inode_info *pipe, size_t len,
+> -			 unsigned int flags)
+> +long vfs_splice_read(struct file *in, loff_t *ppos,
 
-Okay, this was initially introduced with 1d277a637a711a while employed with
-Intel, so let's add for the history:
+The (pre-existing) long here is odd given that ->splice_read
+returns a ssize_t.  This might be a good time to fix that up.
 
-/*
- * Copyright (c) 2015 Intel Corporation 
- *	Keith Busch <kbusch@kernel.org>
- */
+Otherwise looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
