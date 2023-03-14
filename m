@@ -2,143 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C042C6FD1F
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 18:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB53AC74A44
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 18:27:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjCNSWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 14:22:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50318 "EHLO
+        id S230260AbjCNS1j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 14:27:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbjCNSWD (ORCPT
+        with ESMTP id S230182AbjCNS1e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 14:22:03 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 653BFAB094
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 11:22:01 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id k18-20020a17090a591200b0023d36e30cb5so3169001pji.1
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 11:22:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678818121;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z/dUDno2FJnXaQAIB8DGKZ56WFRROVuSaX+BWuSmFyc=;
-        b=FGCuUPKhSE0jtMxM8KoIvC5V4HkuUyauXq4YMJmgpqXOC+CGhpAksQoPVtEJE8e9AC
-         yRWOa45NkHFEpeSrw9oVJV8swQayoF/mCbDYjlZjkMKFi2DTvNi295+n8opeABCLeEjK
-         Zh5d5aXXogA/4KFnUR84bTQBIbo8uQLwHG/ZfCXkRKLeDuItdVqh0qRb/IzI8derhpIp
-         4LdxS1rEXoyFF9mscRd5jEGukq6mbHPgAe13nQyRYgAIuTSIEruMAtHEQb1p70Hnc8ap
-         QdV4kxmhG0HU4q6sBA+epcwlh8Uk9+w9vszaasVul4J/FTthjLpudBRDHrieAFz+itbO
-         eRWA==
-X-Gm-Message-State: AO0yUKX4FBBzXzERf99svsQSdvPYk832/l8HBvF7VHtHxpGjEhIl8UWV
-        3b50e7zx4cbkGZrryuIGgP0=
-X-Google-Smtp-Source: AK7set88E3+jjuZkCk36UvjxD4AMhqk8dGYOG3+x+m4eNQIwwpz2P3RQhhV4ZrvUcSy+F9jvzBy0GA==
-X-Received: by 2002:a17:903:485:b0:1a0:7425:4b73 with SMTP id jj5-20020a170903048500b001a074254b73mr1068551plb.4.1678818120684;
-        Tue, 14 Mar 2023 11:22:00 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9cdb:df66:226e:e52a])
-        by smtp.gmail.com with ESMTPSA id kx5-20020a170902f94500b0019a837be977sm2051087plb.271.2023.03.14.11.21.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Mar 2023 11:22:00 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Jan Kara <jack@suse.cz>, Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ming Lei <ming.lei@canonical.com>
-Subject: [PATCH] loop: Fix use-after-free issues
-Date:   Tue, 14 Mar 2023 11:21:54 -0700
-Message-Id: <20230314182155.80625-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
+        Tue, 14 Mar 2023 14:27:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8FA938E86
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 11:26:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678818414;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fTfsBvYbBxdRy/TFGETnYr2wutSLBUazSKwuZl5QCkE=;
+        b=OUGEVZi1oWDpV3XIp7D3sVxdSRmD5BVqkGaeuPXW5CoXKgeXfx3n0R20njTqV848rD+aFC
+        KldkQNu/3L7kQcMUgcGwdXqG95vAMeEG2G/x1YFUpV7QcnjPGHEK4lwEeEIkQzByBq/mEY
+        1/LfYIJtqZgyxLtyft0ZHbOa8DU4vNU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-644-OSAmWMqFMO6H_2rey2MskA-1; Tue, 14 Mar 2023 14:26:49 -0400
+X-MC-Unique: OSAmWMqFMO6H_2rey2MskA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1BD4E280A328;
+        Tue, 14 Mar 2023 18:26:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A90B1121318;
+        Tue, 14 Mar 2023 18:26:44 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com>
+References: <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com> <20230308165251.2078898-1-dhowells@redhat.com> <20230308165251.2078898-4-dhowells@redhat.com> <CAHk-=wjYR3h5Q-_i3Q2Et=P8WsrjwNA20fYpEQf9nafHwBNALA@mail.gmail.com> <ZBCkDvveAIJENA0G@casper.infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Daniel Golle <daniel@makrotopia.org>,
+        Guenter Roeck <groeck7@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Hugh Dickins <hughd@google.com>
+Subject: Re: [PATCH v17 03/14] shmem: Implement splice-read
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3761464.1678818404.1@warthog.procyon.org.uk>
+Date:   Tue, 14 Mar 2023 18:26:44 +0000
+Message-ID: <3761465.1678818404@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-do_req_filebacked() calls blk_mq_complete_request() synchronously or
-asynchronously when using asynchronous I/O unless memory allocation fails.
-Hence, modify loop_handle_cmd() such that it does not dereference 'cmd' nor
-'rq' after do_req_filebacked() finished unless we are sure that the request
-has not yet been completed. This patch fixes the following kernel crash:
+Hi Linus,
 
-Unable to handle kernel NULL pointer dereference at virtual address 0000000000000054
-Call trace:
- css_put.42938+0x1c/0x1ac
- loop_process_work+0xc8c/0xfd4
- loop_rootcg_workfn+0x24/0x34
- process_one_work+0x244/0x558
- worker_thread+0x400/0x8fc
- kthread+0x16c/0x1e0
- ret_from_fork+0x10/0x20
+Are you okay if we go with my current patch for the moment?
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Johannes Weiner <hannes@cmpxchg.org>
-Cc: Dan Schatzberg <schatzberg.dan@gmail.com>
-Fixes: c74d40e8b5e2 ("loop: charge i/o to mem and blk cg")
-Fixes: bc07c10a3603 ("block: loop: support DIO & AIO")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/loop.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+David
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 839373451c2b..28eb59fd71ca 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1859,35 +1859,44 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- static void loop_handle_cmd(struct loop_cmd *cmd)
- {
-+	struct cgroup_subsys_state *cmd_blkcg_css = cmd->blkcg_css;
-+	struct cgroup_subsys_state *cmd_memcg_css = cmd->memcg_css;
- 	struct request *rq = blk_mq_rq_from_pdu(cmd);
- 	const bool write = op_is_write(req_op(rq));
- 	struct loop_device *lo = rq->q->queuedata;
- 	int ret = 0;
- 	struct mem_cgroup *old_memcg = NULL;
-+	const bool use_aio = cmd->use_aio;
- 
- 	if (write && (lo->lo_flags & LO_FLAGS_READ_ONLY)) {
- 		ret = -EIO;
- 		goto failed;
- 	}
- 
--	if (cmd->blkcg_css)
--		kthread_associate_blkcg(cmd->blkcg_css);
--	if (cmd->memcg_css)
-+	if (cmd_blkcg_css)
-+		kthread_associate_blkcg(cmd_blkcg_css);
-+	if (cmd_memcg_css)
- 		old_memcg = set_active_memcg(
--			mem_cgroup_from_css(cmd->memcg_css));
-+			mem_cgroup_from_css(cmd_memcg_css));
- 
-+	/*
-+	 * do_req_filebacked() may call blk_mq_complete_request() synchronously
-+	 * or asynchronously if using aio. Hence, do not touch 'cmd' after
-+	 * do_req_filebacked() has returned unless we are sure that 'cmd' has
-+	 * not yet been completed.
-+	 */
- 	ret = do_req_filebacked(lo, rq);
- 
--	if (cmd->blkcg_css)
-+	if (cmd_blkcg_css)
- 		kthread_associate_blkcg(NULL);
- 
--	if (cmd->memcg_css) {
-+	if (cmd_memcg_css) {
- 		set_active_memcg(old_memcg);
--		css_put(cmd->memcg_css);
-+		css_put(cmd_memcg_css);
- 	}
-  failed:
- 	/* complete non-aio request */
--	if (!cmd->use_aio || ret) {
-+	if (!use_aio || ret) {
- 		if (ret == -EOPNOTSUPP)
- 			cmd->ret = ret;
- 		else
