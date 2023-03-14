@@ -2,118 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE05EC05027
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 18:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86934C7618B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 18:20:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbjCNSDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 14:03:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44302 "EHLO
+        id S229949AbjCNSUa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 14:20:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbjCNSDD (ORCPT
+        with ESMTP id S229616AbjCNSU3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 14:03:03 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D59038E3CB
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 11:03:01 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id cy23so65394382edb.12
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 11:03:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1678816980;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BaNrWV0j7xcmGChzOfmkTnIc3tuBbFeTK4GfA059lX0=;
-        b=A355oSfcS4IPkDnWgCLNYE3gtKpKx8SSzUdqkM4uAX5YXMXLzLtZSXfYmX1DKdWWsf
-         baCik0PqYXtSj6qxvChNsn7kFuSEL4gSpsLgVh0midQaUV0TPrAM785rJfl1WY1M3cug
-         hufMQEu+RmMfWQw5pnxLWJ1o5MvYPwQTbNlV4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678816980;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BaNrWV0j7xcmGChzOfmkTnIc3tuBbFeTK4GfA059lX0=;
-        b=1fNg2GToXo6jS7ce/FMD5p+qyR/Lc16AGHlrzTTdmk7de2psF6hhrwdMduZvwgYkDq
-         lDf3TRxtu51oxvUJJ3PMlW6r+6IoK56aGNlKOIQodYawan8iz7glmwCikPFnZOCJY0G6
-         Eo1TB9ofT51N2gqFVxxAwDigvl5oIdFJEy7rNJWDwPKmd9YTCQJuafEssBzoKdxHhD1G
-         ljDHjQFwzQ+lBZIQNth2SKLSpAloyQpYVsF/qwWmwO4vY6uV1KHAFiJr8C9zBdlFN8Gc
-         WTfrXgMHTq9MreqqK7z7sK7FcTUdEx/YPl5xhhK1AVewN8rwbJ1s7pXSZ8zv+Pyzowsm
-         8yDQ==
-X-Gm-Message-State: AO0yUKV0c4rFrdC53MfvtoUzFh1wJ+WAhxVnUOFKMk2G5Ivw7AOHuHBC
-        wHxpskxBARehMky3nB/GCkGtChJ5E7yjO5ss+Z+s9g==
-X-Google-Smtp-Source: AK7set9E3lBf+xCDs4Am+d68qeqcWDqg/5xKhEK1HCniY8clbcDWp2WJb8nibu5kFo2SlZPtVa57hw==
-X-Received: by 2002:a17:907:a2ce:b0:8a9:e031:c4b7 with SMTP id re14-20020a170907a2ce00b008a9e031c4b7mr3161739ejc.4.1678816979920;
-        Tue, 14 Mar 2023 11:02:59 -0700 (PDT)
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com. [209.85.208.54])
-        by smtp.gmail.com with ESMTPSA id l1-20020a170906644100b0091f5e98abd5sm1425571ejn.133.2023.03.14.11.02.58
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Mar 2023 11:02:58 -0700 (PDT)
-Received: by mail-ed1-f54.google.com with SMTP id z21so208777edb.4
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 11:02:58 -0700 (PDT)
-X-Received: by 2002:a17:906:c30e:b0:8ad:d366:54c4 with SMTP id
- s14-20020a170906c30e00b008add36654c4mr1933623ejz.4.1678816977991; Tue, 14 Mar
- 2023 11:02:57 -0700 (PDT)
+        Tue, 14 Mar 2023 14:20:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DCC8F517;
+        Tue, 14 Mar 2023 11:20:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E5A061865;
+        Tue, 14 Mar 2023 18:20:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A942C433D2;
+        Tue, 14 Mar 2023 18:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678818016;
+        bh=JlqsKonhMEf6gDtyf8JSKNHgwCqX/wnttVAxy2Tn+Fo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WDGz1vGDDgF4rzmWdJv5wdNXKUfoYvGsIfWgPilF1aP8uHXhl25g5lWh2gJuHW9P+
+         Ikb/Dn/0laagNxWb+Lq1ySsMSicg67leVjXhSfjUDbtQ3hpr4OIwRTOjWL7A48PhZk
+         p/0fDukzp6M1GGwexjV9gZFm62s5slHmCMFkUqItrw9ToxyxWoLD1cA8ApWyWFzCYi
+         CMpLL8Fc+TzgBWDJaO1l8sl+kDjictSYNhhkOrxfvR6T3OqzeUjxuekvjSvkhdocXU
+         thg/dtTy46k6YHye2NC16GaXKV4CfIuYJlt1McaMl3Q0/gPNszUCjpRec6ogDljpx7
+         K/HengPnYYtyA==
+Date:   Tue, 14 Mar 2023 11:20:14 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-fscrypt@vger.kernel.org, stable@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 1/4] blk-mq: release crypto keyslot before reporting
+ I/O complete
+Message-ID: <ZBC63ry7EFMr+Xzk@sol.localdomain>
+References: <20230308193645.114069-1-ebiggers@kernel.org>
+ <20230308193645.114069-2-ebiggers@kernel.org>
+ <CAJkfWY76-fUf92YZid3bOPrufXwCzM-q9L1ezqkLZ+WJiWL3jQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20230308165251.2078898-1-dhowells@redhat.com> <20230308165251.2078898-4-dhowells@redhat.com>
- <CAHk-=wjYR3h5Q-_i3Q2Et=P8WsrjwNA20fYpEQf9nafHwBNALA@mail.gmail.com> <ZBCkDvveAIJENA0G@casper.infradead.org>
-In-Reply-To: <ZBCkDvveAIJENA0G@casper.infradead.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 14 Mar 2023 11:02:40 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com>
-Message-ID: <CAHk-=wiO-Z7QdKnA+yeLCROiVVE6dBK=TaE7wz4hMc0gE2SPRw@mail.gmail.com>
-Subject: Re: [PATCH v17 03/14] shmem: Implement splice-read
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Daniel Golle <daniel@makrotopia.org>,
-        Guenter Roeck <groeck7@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Hugh Dickins <hughd@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJkfWY76-fUf92YZid3bOPrufXwCzM-q9L1ezqkLZ+WJiWL3jQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 9:43=E2=80=AFAM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> The problem is that we might have swapped out the shmem folio.  So we
-> don't want to clear the page, but ask swap to fill the page.
+On Mon, Mar 13, 2023 at 02:26:00PM -0700, Nathan Huckleberry wrote:
+> > diff --git a/block/blk-merge.c b/block/blk-merge.c
+> > index 6460abdb2426..65e75efa9bd3 100644
+> > --- a/block/blk-merge.c
+> > +++ b/block/blk-merge.c
+> > @@ -867,6 +867,8 @@ static struct request *attempt_merge(struct request_queue *q,
+> >         if (!blk_discard_mergable(req))
+> >                 elv_merge_requests(q, req, next);
+> >
+> > +       blk_crypto_rq_put_keyslot(next);
+> > +
+> 
+> This looks good to me, but it looks like there was a pre-existing bug
+> in the blk-merge code. The elv_merged_request function is only called
+> when the request does not merge. Does anyone know if that behavior is
+> correct?
 
-Doesn't shmem_swapin_folio() already basically do all that work?
+That's very confusing to me too!
 
-The real oddity with shmem - compared to other filesystems - is that
-the xarray has a value entry instead of being a real folio. And yes,
-the current filemap code will then just ignore such entries as
-"doesn't exist", and so the regular read iterators will all fail on
-it.
+I did notice that attempt_merge() calls elv_merge_requests() (not to be confused
+with elv_merged_request()) if it merges the requests.
 
-But while filemap_get_read_batch() will stop at a value-folio, I feel
-like filemap_create_folio() should be able to turn a value page into a
-"real" page. Right now it already allocates said page, but then I
-think filemap_add_folio() will return -EEXIST when said entry exists
-as a value.
+So it seems there is elv_merge_requests() which means the request was merged,
+and elv_merged_request() which means the request was *not* merged...  I have no
+idea what is going on there :-(
+	
+> This patch itself looks good to me.
+> 
+> Reviewed-by: Nathan Huckleberry <nhuck@google.com>
 
-But *if* instead of -EEXIST we could just replace the value with the
-(already locked) page, and have some sane way to pass that value
-(which is the swap entry data) to readpage(), I think that should just
-do it all.
+Thanks.
 
-Admittedly I really don't know this area very well, so I may be
-*entirely* out to lunch.
+Jens, Christoph, etc., anyone else want to take a look too?
 
-But the whole "teach the filemap code to actually react to XA value
-entries" would be how I'd solve the hole issue too. So I think there
-are commonalities here.
-
-             Linus
-               Linus
+- Eric
