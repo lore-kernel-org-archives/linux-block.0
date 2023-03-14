@@ -2,174 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C16C74A44
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 04:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC930C6FD1C
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 07:10:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229757AbjCNELP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 00:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47372 "EHLO
+        id S229903AbjCNHKW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 03:10:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229765AbjCNELM (ORCPT
+        with ESMTP id S229735AbjCNHKV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 00:11:12 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C10178FBC5
-        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 21:11:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1678767071; x=1710303071;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Oo6LRSZ/MwpJ6ztvXZ9FoKMpk6/TPO+x4HbUUuvBG9A=;
-  b=gDmGQp6kErosyAmzhrWrjUmlVMNUML/eZSXA58/55XxxVPX0FXs6G1Ab
-   nXxcFFxyUSw5NvD06Wxqn5Wj1BfEDY9BGxfL8+gTydexyWwjrHUHiKb24
-   GiVtEJdo1fIe130y9WpozHs01qIyOatsIszkW9oPn7DBkli/DpvUKdSWv
-   BulLn8ytNQwF0EVn4US/1/04tLoNCDQ1RTqgby6gfVocFPp3YkTiQyGn3
-   fEAYuRwiIF7aYpHhv/RiCP4KQNIA6utBcnTjulXtJ3DXECTbmy2umvnno
-   RL62i2MXZQOYazXbOlPm3b6m15yWw2HB6kt4NFNWKvPxPAE5ltz9Pot1u
-   w==;
-X-IronPort-AV: E=Sophos;i="5.98,258,1673884800"; 
-   d="scan'208";a="225349845"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Mar 2023 12:11:11 +0800
-IronPort-SDR: 7geGWFc4Sr5gFsbtIeQB34Wmux0YZL6tro8y3u1AKS1Gzxae10B29+yzswjuz4f00OcepxCZPy
- Tfte6vCi2YbbiPEQFeND5hZpYdGRhv0rStRDhwy8vFoiBumwXXA60T5N/5R4pj2kOQxkaOu4xO
- gS8cDH5e6N1/eK8AjRY50yZGrYHrqY/qi8sEplGy/Tr8OBWRZk848Y9p4V6sgBp2u3lWH911xu
- BVK7dQIjPUCc88YQpkOntYAOo7b4D1ocarxez+9Fqz6Dm+FLEgTZLAyziE3Y7Byt0Seyj0YyEg
- Yxg=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Mar 2023 20:27:39 -0700
-IronPort-SDR: pnleP11yQn9oNPeHeTSH4K0hHZ12GK8pvK3XQQ2KQZhA0YQ2TFG5DT/I83eqGvYp2ljIqPoLBW
- UaFidaNc9y03DrZbb5FPYdW5WUH6K2mvOB7NuYPMNwItzZxt6obBmXfwAAXYFcsxFQxtS2/Vhn
- sB+LtsDPsAB2g8sABSGVJD1C5gx9gcqlWy233pVCRmB/c8AS3sxeyKcmtMeAgrAjo7dpGdMveU
- 7KZZFBuMRv/HmMeeZN4yFU8uMsoXt33WeiU23fhVc7OtNs5UWegIQAwphmybVHLrgVymc+wwDt
- MfA=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Mar 2023 21:11:11 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PbKp72GRMz1RtVq
-        for <linux-block@vger.kernel.org>; Mon, 13 Mar 2023 21:11:11 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:mime-version
-        :references:in-reply-to:x-mailer:message-id:date:subject:to
-        :from; s=dkim; t=1678767070; x=1681359071; bh=Oo6LRSZ/MwpJ6ztvXZ
-        9FoKMpk6/TPO+x4HbUUuvBG9A=; b=k7QhX3ROvk+hg9avf7GIDFMdmWsFE2rSn5
-        1EyIpeeEBM58xl5L0xourE4/AfdDosvd6vbBN8OCxJcb375mU1+/Uw/OHJzMVQs7
-        /l9NMjRHSTF24WRioADbdFL5lS8CjFs6Y3ddvK9jFWlJ8RBuY8jAOyPcvHPJftJQ
-        UxXiBW5ZX9dXPqsMdhH2ZnMPuMLk/4JoRjp04gbRoKVoF17gYKQZSy5+gSQGR/gz
-        gnJd1nZ1Fx1QQXOe4/HXeANcbT4U71WqEcFZroAwj01qODVzW7COAOACnDFDAs0M
-        7nxLJeMVqCg2jDEaq0a96lBn7+BYPtRtsOk4WDSbKdBFlECPMOAg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id W3ckqLmyKLIt for <linux-block@vger.kernel.org>;
-        Mon, 13 Mar 2023 21:11:10 -0700 (PDT)
-Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PbKp62Hqkz1RtVm;
-        Mon, 13 Mar 2023 21:11:10 -0700 (PDT)
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Akinobu Mita <akinobu.mita@gmail.com>
-Subject: [PATCH 2/2] block: null_blk: cleanup null_queue_rq()
-Date:   Tue, 14 Mar 2023 13:11:06 +0900
-Message-Id: <20230314041106.19173-3-damien.lemoal@opensource.wdc.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230314041106.19173-1-damien.lemoal@opensource.wdc.com>
-References: <20230314041106.19173-1-damien.lemoal@opensource.wdc.com>
+        Tue, 14 Mar 2023 03:10:21 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77FF498AD;
+        Tue, 14 Mar 2023 00:10:19 -0700 (PDT)
+Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4PbPjP2tr6z17Kmy;
+        Tue, 14 Mar 2023 15:07:21 +0800 (CST)
+Received: from [10.174.178.159] (10.174.178.159) by
+ kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Tue, 14 Mar 2023 15:10:16 +0800
+Message-ID: <b191b5b0-1dd8-e36a-75b3-d47f0195ca48@huawei.com>
+Date:   Tue, 14 Mar 2023 15:10:15 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH-next] nbd: fix incomplete validation of ioctl arg
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
+        <yukuai3@huawei.com>, <houtao1@huawei.com>, <yangerkun@huawei.com>,
+        Zhong Jinghua <zhongjinghua@huaweicloud.com>
+References: <20230206145805.2645671-1-zhongjinghua@huawei.com>
+From:   zhongjinghua <zhongjinghua@huawei.com>
+In-Reply-To: <20230206145805.2645671-1-zhongjinghua@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.178.159]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600002.china.huawei.com (7.193.23.29)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use a local struct request pointer variable to avoid having to
-dereference struct blk_mq_queue_data multiple times. While at it, also
-fix the function argument indentation and remove a useless "else" after
-a return.
+ping...
 
-Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
----
- drivers/block/null_blk/main.c | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+Hello
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
-c
-index 7d95ad203c97..9e6b032c8ecc 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1657,12 +1657,13 @@ static enum blk_eh_timer_return null_timeout_rq(s=
-truct request *rq)
- }
-=20
- static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
--			 const struct blk_mq_queue_data *bd)
-+				  const struct blk_mq_queue_data *bd)
- {
--	struct nullb_cmd *cmd =3D blk_mq_rq_to_pdu(bd->rq);
-+	struct request *rq =3D bd->rq;
-+	struct nullb_cmd *cmd =3D blk_mq_rq_to_pdu(rq);
- 	struct nullb_queue *nq =3D hctx->driver_data;
--	sector_t nr_sectors =3D blk_rq_sectors(bd->rq);
--	sector_t sector =3D blk_rq_pos(bd->rq);
-+	sector_t nr_sectors =3D blk_rq_sectors(rq);
-+	sector_t sector =3D blk_rq_pos(rq);
- 	const bool is_poll =3D hctx->type =3D=3D HCTX_TYPE_POLL;
-=20
- 	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
-@@ -1671,15 +1672,15 @@ static blk_status_t null_queue_rq(struct blk_mq_h=
-w_ctx *hctx,
- 		hrtimer_init(&cmd->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
- 		cmd->timer.function =3D null_cmd_timer_expired;
- 	}
--	cmd->rq =3D bd->rq;
-+	cmd->rq =3D rq;
- 	cmd->error =3D BLK_STS_OK;
- 	cmd->nq =3D nq;
--	cmd->fake_timeout =3D should_timeout_request(bd->rq) ||
--		blk_should_fake_timeout(bd->rq->q);
-+	cmd->fake_timeout =3D should_timeout_request(rq) ||
-+		blk_should_fake_timeout(rq->q);
-=20
--	blk_mq_start_request(bd->rq);
-+	blk_mq_start_request(rq);
-=20
--	if (should_requeue_request(bd->rq)) {
-+	if (should_requeue_request(rq)) {
- 		/*
- 		 * Alternate between hitting the core BUSY path, and the
- 		 * driver driven requeue path
-@@ -1687,22 +1688,20 @@ static blk_status_t null_queue_rq(struct blk_mq_h=
-w_ctx *hctx,
- 		nq->requeue_selection++;
- 		if (nq->requeue_selection & 1)
- 			return BLK_STS_RESOURCE;
--		else {
--			blk_mq_requeue_request(bd->rq, true);
--			return BLK_STS_OK;
--		}
-+		blk_mq_requeue_request(rq, true);
-+		return BLK_STS_OK;
- 	}
-=20
- 	if (is_poll) {
- 		spin_lock(&nq->poll_lock);
--		list_add_tail(&bd->rq->queuelist, &nq->poll_list);
-+		list_add_tail(&rq->queuelist, &nq->poll_list);
- 		spin_unlock(&nq->poll_lock);
- 		return BLK_STS_OK;
- 	}
- 	if (cmd->fake_timeout)
- 		return BLK_STS_OK;
-=20
--	return null_handle_cmd(cmd, sector, nr_sectors, req_op(bd->rq));
-+	return null_handle_cmd(cmd, sector, nr_sectors, req_op(rq));
- }
-=20
- static void cleanup_queue(struct nullb_queue *nq)
---=20
-2.39.2
+Anyone looking this？
 
+在 2023/2/6 22:58, Zhong Jinghua 写道:
+> We tested and found an alarm caused by nbd_ioctl arg without verification.
+> The UBSAN warning calltrace like below:
+>
+> UBSAN: Undefined behaviour in fs/buffer.c:1709:35
+> signed integer overflow:
+> -9223372036854775808 - 1 cannot be represented in type 'long long int'
+> CPU: 3 PID: 2523 Comm: syz-executor.0 Not tainted 4.19.90 #1
+> Hardware name: linux,dummy-virt (DT)
+> Call trace:
+>   dump_backtrace+0x0/0x3f0 arch/arm64/kernel/time.c:78
+>   show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
+>   __dump_stack lib/dump_stack.c:77 [inline]
+>   dump_stack+0x170/0x1dc lib/dump_stack.c:118
+>   ubsan_epilogue+0x18/0xb4 lib/ubsan.c:161
+>   handle_overflow+0x188/0x1dc lib/ubsan.c:192
+>   __ubsan_handle_sub_overflow+0x34/0x44 lib/ubsan.c:206
+>   __block_write_full_page+0x94c/0xa20 fs/buffer.c:1709
+>   block_write_full_page+0x1f0/0x280 fs/buffer.c:2934
+>   blkdev_writepage+0x34/0x40 fs/block_dev.c:607
+>   __writepage+0x68/0xe8 mm/page-writeback.c:2305
+>   write_cache_pages+0x44c/0xc70 mm/page-writeback.c:2240
+>   generic_writepages+0xdc/0x148 mm/page-writeback.c:2329
+>   blkdev_writepages+0x2c/0x38 fs/block_dev.c:2114
+>   do_writepages+0xd4/0x250 mm/page-writeback.c:2344
+>
+> The reason for triggering this warning is __block_write_full_page()
+> -> i_size_read(inode) - 1 overflow.
+> inode->i_size is assigned in __nbd_ioctl() -> nbd_set_size() -> bytesize.
+> We think it is necessary to limit the size of arg to prevent errors.
+>
+> Moreover, __nbd_ioctl() -> nbd_add_socket(), arg will be cast to int.
+> Assuming the value of arg is 0x80000000000000001) (on a 64-bit machine),
+> it will become 1 after the coercion, which will return unexpected results.
+>
+> Fix it by adding checks to prevent passing in too large numbers.
+>
+> Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+> ---
+>   drivers/block/nbd.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+>
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 592cfa8b765a..e1c954094b6c 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -325,6 +325,9 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
+>   	if (blk_validate_block_size(blksize))
+>   		return -EINVAL;
+>   
+> +	if (bytesize < 0)
+> +		return -EINVAL;
+> +
+>   	nbd->config->bytesize = bytesize;
+>   	nbd->config->blksize_bits = __ffs(blksize);
+>   
+> @@ -1111,6 +1114,9 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
+>   	struct nbd_sock *nsock;
+>   	int err;
+>   
+> +	/* Arg will be cast to int, check it to avoid overflow */
+> +	if (arg > INT_MAX)
+> +		return -EINVAL;
+>   	sock = nbd_get_socket(nbd, arg, &err);
+>   	if (!sock)
+>   		return err;
