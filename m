@@ -2,48 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C32EC6FD1F
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 07:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F87C6FD1F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 08:05:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230320AbjCNH6A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 03:58:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52782 "EHLO
+        id S230373AbjCNIFq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 04:05:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230253AbjCNH5y (ORCPT
+        with ESMTP id S230421AbjCNIF0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 03:57:54 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4715D4D601
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 00:57:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=tFZwyRwnxbU4hWyKlO7/ivdWjj
-        u/cLYGn6xLzBPfAksR8VDfnVBk3b5SkVIZs5SyHBkSJeBXDVa5nPLzcOFEsNISTOUDzk3IpOSaMI7
-        QHSlxZUyP2QIRjsX8CyTlWhwSIIKzUpnoakT1Q99T5D6SZOjX0sfI0JAlbZD7Vg17Qu9/NOW13FKJ
-        dh2PilRLVCc5FE3vsryrSuplJxDqUCCJWzO35YSNb7K2aBMEcCCvEJimzN4bGvMyd/2gumvofj7d9
-        nAx8x+6LxArMgVsItHy5BBModm49BTdmI3g+OK2nwP1KplcNcdFtGKKxFqEAfXWuMDwLXqCTD3Rwr
-        s1m88GLA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pbzXa-009Px4-F0; Tue, 14 Mar 2023 07:57:50 +0000
-Date:   Tue, 14 Mar 2023 00:57:50 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: do not reverse request order when flushing plug
- list
-Message-ID: <ZBAo/ujrRXgsCrI6@infradead.org>
-References: <20230313093002.11756-1-jack@suse.cz>
+        Tue, 14 Mar 2023 04:05:26 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91CEE80936;
+        Tue, 14 Mar 2023 01:05:15 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 269001FE20;
+        Tue, 14 Mar 2023 08:05:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1678781114; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=TqIJDRVcUYmUlbVn0Al2s2TH5Ea7U61xcXfPnxRC8bk=;
+        b=JuuPkRge9DaAsKPAnSsr3J3o2B1c45g4WDsJTAypBCaOTG/+k2YtwugJotj+5umoepDq5L
+        TuUVPHm4eFg+d2esuhVpCZd6V3STHgLDJx9hJDyNjPYs0q2y13F3+6WIXihGzreIdcwUbu
+        lO+u7taEJcnju7keWQH7NrYiQQWglyE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1678781114;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=TqIJDRVcUYmUlbVn0Al2s2TH5Ea7U61xcXfPnxRC8bk=;
+        b=lFATKKuMWsr+cewxUEmgvU2RGt38Txqkod0y1aDc5gwWv25hEcpjSi72g6lfcJ97SCxl5W
+        v+xphcCSgLf76gAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E80C113A26;
+        Tue, 14 Mar 2023 08:05:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id PMfcN7kqEGSmNQAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Tue, 14 Mar 2023 08:05:13 +0000
+Message-ID: <4b9fc9c6-b48c-198f-5f80-811a44737e5f@suse.cz>
+Date:   Tue, 14 Mar 2023 09:05:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230313093002.11756-1-jack@suse.cz>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+From:   Vlastimil Babka <vbabka@suse.cz>
+Subject: [LSF/MM/BPF TOPIC] SLOB+SLAB allocators removal and future SLUB
+ improvements
+To:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        bpf@vger.kernel.org, linux-xfs@vger.kernel.org
+Content-Language: en-US
+Cc:     David Rientjes <rientjes@google.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+        Roman Gushchin <roman.gushchin@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+As you're probably aware, my plan is to get rid of SLOB and SLAB, leaving
+only SLUB going forward. The removal of SLOB seems to be going well, there
+were no objections to the deprecation and I've posted v1 of the removal
+itself [1] so it could be in -next soon.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The immediate benefit of that is that we can allow kfree() (and kfree_rcu())
+to free objects from kmem_cache_alloc() - something that IIRC at least xfs
+people wanted in the past, and SLOB was incompatible with that.
+
+For SLAB removal I haven't yet heard any objections (but also didn't
+deprecate it yet) but if there are any users due to particular workloads
+doing better with SLAB than SLUB, we can discuss why those would regress and
+what can be done about that in SLUB.
+
+Once we have just one slab allocator in the kernel, we can take a closer
+look at what the users are missing from it that forces them to create own
+allocators (e.g. BPF), and could be considered to be added as a generic
+implementation to SLUB.
+
+Thanks,
+Vlastimil
+
+[1] https://lore.kernel.org/all/20230310103210.22372-1-vbabka@suse.cz/
