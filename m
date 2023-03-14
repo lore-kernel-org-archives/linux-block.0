@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B052C7618B
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 22:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D7DC7618B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 22:10:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231315AbjCNWKL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 18:10:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39080 "EHLO
+        id S231232AbjCNWKQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 18:10:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229960AbjCNWJj (ORCPT
+        with ESMTP id S229904AbjCNWJm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 18:09:39 -0400
+        Tue, 14 Mar 2023 18:09:42 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B98C828865
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 15:08:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E18212A8
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 15:08:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678831723;
+        s=mimecast20190719; t=1678831722;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0+QymJ+GCZW28tJ8JK9HTXv9GxubpscA9882LeMgv9w=;
-        b=R4DPIoMMJdtHq3Fq8tqDH20Nn4KnyRQMeqSTDr+drXH2CYu6mvzFmuNSrG0VCHbedwPZz6
-        tSXQtxlsRxQlPQFuX1koYBsVnu03X/kpoKKW55iJ1AK5m4tbbvBs9xwk31bL1PetC0IOTN
-        3/CQRBa3VTlAPmXb88qFxY3eWzs6JUQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=w0CyxxuCfKyDxUhqZI8uZNDs4yTA+LT97JFfaSxmf5E=;
+        b=CtyCMb7aBJ8fWcpExxmq1/s+SIYJ+ukszw/icB+LCoM2iQLzL9k/dn9W6MUzcltnI2M9Qz
+        /wUcCtEZ9lET1bFpjTQe3gURxp/O65CRoxCVitu+/OOq5VaxJvL3TTbqjdLCTHlTU8fI6R
+        7OtZuQ1zzHc9Pp+d5L4UlY2I6HKQRqI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-102-n0ZfiDmHMfGhrz83iRoe6A-1; Tue, 14 Mar 2023 18:08:40 -0400
-X-MC-Unique: n0ZfiDmHMfGhrz83iRoe6A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-240-WXoXZ4YbN7yQ7YG_W8vEZA-1; Tue, 14 Mar 2023 18:08:38 -0400
+X-MC-Unique: WXoXZ4YbN7yQ7YG_W8vEZA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E35971C08798;
-        Tue, 14 Mar 2023 22:08:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CADA6C164E7;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 34E3B85D062;
         Tue, 14 Mar 2023 22:08:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 042542166B26;
+        Tue, 14 Mar 2023 22:08:34 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,78 +52,45 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v18 11/15] block: Fix bio_flagged() so that gcc can better optimise it
-Date:   Tue, 14 Mar 2023 22:07:53 +0000
-Message-Id: <20230314220757.3827941-12-dhowells@redhat.com>
+        John Hubbard <jhubbard@nvidia.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v18 10/15] iomap: Don't get an reference on ZERO_PAGE for direct I/O block zeroing
+Date:   Tue, 14 Mar 2023 22:07:52 +0000
+Message-Id: <20230314220757.3827941-11-dhowells@redhat.com>
 In-Reply-To: <20230314220757.3827941-1-dhowells@redhat.com>
 References: <20230314220757.3827941-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix bio_flagged() so that multiple instances of it, such as:
-
-	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
-	    bio_flagged(bio, BIO_PAGE_PINNED))
-
-can be combined by the gcc optimiser into a single test in assembly
-(arguably, this is a compiler optimisation issue[1]).
-
-The missed optimisation stems from bio_flagged() comparing the result of
-the bitwise-AND to zero.  This results in an out-of-line bio_release_page()
-being compiled to something like:
-
-   <+0>:     mov    0x14(%rdi),%eax
-   <+3>:     test   $0x1,%al
-   <+5>:     jne    0xffffffff816dac53 <bio_release_pages+11>
-   <+7>:     test   $0x2,%al
-   <+9>:     je     0xffffffff816dac5c <bio_release_pages+20>
-   <+11>:    movzbl %sil,%esi
-   <+15>:    jmp    0xffffffff816daba1 <__bio_release_pages>
-   <+20>:    jmp    0xffffffff81d0b800 <__x86_return_thunk>
-
-However, the test is superfluous as the return type is bool.  Removing it
-results in:
-
-   <+0>:     testb  $0x3,0x14(%rdi)
-   <+4>:     je     0xffffffff816e4af4 <bio_release_pages+15>
-   <+6>:     movzbl %sil,%esi
-   <+10>:    jmp    0xffffffff816dab7c <__bio_release_pages>
-   <+15>:    jmp    0xffffffff81d0b7c0 <__x86_return_thunk>
-
-instead.
-
-Also, the MOVZBL instruction looks unnecessary[2] - I think it's just
-'re-booling' the mark_dirty parameter.
+ZERO_PAGE can't go away, no need to hold an extra reference.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: linux-block@vger.kernel.org
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108370 [1]
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108371 [2]
-Link: https://lore.kernel.org/r/167391056756.2311931.356007731815807265.stgit@warthog.procyon.org.uk/ # v6
+Reviewed-by: Dave Chinner <dchinner@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: linux-fsdevel@vger.kernel.org
 ---
- include/linux/bio.h | 2 +-
+ fs/iomap/direct-io.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d766be7152e1..d9d6df62ea57 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -229,7 +229,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index f771001574d0..850fb9870c2f 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -202,7 +202,7 @@ static void iomap_dio_zero(const struct iomap_iter *iter, struct iomap_dio *dio,
+ 	bio->bi_private = dio;
+ 	bio->bi_end_io = iomap_dio_bio_end_io;
  
- static inline bool bio_flagged(struct bio *bio, unsigned int bit)
- {
--	return (bio->bi_flags & (1U << bit)) != 0;
-+	return bio->bi_flags & (1U << bit);
+-	get_page(page);
++	bio_set_flag(bio, BIO_NO_PAGE_REF);
+ 	__bio_add_page(bio, page, len, 0);
+ 	iomap_dio_submit_bio(iter, dio, bio, pos);
  }
- 
- static inline void bio_set_flag(struct bio *bio, unsigned int bit)
 
