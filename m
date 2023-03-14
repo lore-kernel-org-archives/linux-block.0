@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A25ABC05027
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 19:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9813AC6FD1F
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 19:57:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229813AbjCNTv0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 15:51:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46202 "EHLO
+        id S230104AbjCNT5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 15:57:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229760AbjCNTvZ (ORCPT
+        with ESMTP id S229872AbjCNT5x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 15:51:25 -0400
+        Tue, 14 Mar 2023 15:57:53 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF282CFC5
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 12:50:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C3146161
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 12:57:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678823432;
+        s=mimecast20190719; t=1678823826;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3M5M7uIlC8hyhww3unkjtp+hcWjh4Vt7Gzo5dt9yCXk=;
-        b=PlIDzNitNYULMVGa06UyDFNQ3ffzuSNqXlVUxzivD2gJlNfbm/uhkN9jkO0EqgLbO5Pdmm
-        bQxgOyyavaFWj9Og5oIt2qRg2/y60ZNiPG0AA5K5qrb4CuEwheWwkpEMJmVUMg+252Z/hT
-        95fit1b2GIywqZtOLFsz1VzrUsNzpWo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=cwJKLbbt+tCbh3r4moNy9ZfrdrBTTmr8w1YMLV/pQG0=;
+        b=P5QtS0zvuUOUU8xoAHtE+pWdbDc3qj2KDIfuTVtep1lQ/wMKdvFNdaTBYalwJ9jRSITI5y
+        ldQKpzj4bKTc69cNXj5XNCIXWweNwP/1aVxI1lufmlgf17gOTEuCY9DSSOGm0mg4r5gC3v
+        c84Ac1siRX5j9PIG0bQ1OrpM32XhHfc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-404-3pv0nfEjMBCC45D0Ch-0fA-1; Tue, 14 Mar 2023 15:50:26 -0400
-X-MC-Unique: 3pv0nfEjMBCC45D0Ch-0fA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-240-kJiNRgUXP2iY_DBKqxDP7A-1; Tue, 14 Mar 2023 15:57:00 -0400
+X-MC-Unique: kJiNRgUXP2iY_DBKqxDP7A-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CAB8938123A8;
-        Tue, 14 Mar 2023 19:50:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D402F802C18;
+        Tue, 14 Mar 2023 19:56:59 +0000 (UTC)
 Received: from redhat.com (unknown [10.2.16.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E4AB540C6E67;
-        Tue, 14 Mar 2023 19:50:24 +0000 (UTC)
-Date:   Tue, 14 Mar 2023 14:50:23 -0500
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0655A400F52;
+        Tue, 14 Mar 2023 19:56:58 +0000 (UTC)
+Date:   Tue, 14 Mar 2023 14:56:57 -0500
 From:   Eric Blake <eblake@redhat.com>
 To:     Nir Soffer <nsoffer@redhat.com>
 Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
@@ -46,88 +46,96 @@ Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
         lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
         corbet@lwn.net, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] uapi nbd: add cookie alias to handle
-Message-ID: <20230314195023.bsey5bfq2atz7d66@redhat.com>
+Subject: Re: [PATCH 3/3] block nbd: use req.cookie instead of req.handle
+Message-ID: <20230314195657.vpazxest7rvm5frp@redhat.com>
 References: <20230310201525.2615385-1-eblake@redhat.com>
- <20230310201525.2615385-3-eblake@redhat.com>
- <CAMRbyysDE+v_D6Q3tCf_+86T0V57UE4Emw6zc_4vnUu0Yau23A@mail.gmail.com>
+ <20230310201525.2615385-4-eblake@redhat.com>
+ <CAMRbyyv59L9GiLr5tJvnNdwnBNdNGw+xveG7S63WC9ycOuJYrA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRbyysDE+v_D6Q3tCf_+86T0V57UE4Emw6zc_4vnUu0Yau23A@mail.gmail.com>
+In-Reply-To: <CAMRbyyv59L9GiLr5tJvnNdwnBNdNGw+xveG7S63WC9ycOuJYrA@mail.gmail.com>
 User-Agent: NeoMutt/20220429
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 11, 2023 at 02:30:39PM +0200, Nir Soffer wrote:
+On Sat, Mar 11, 2023 at 02:22:51PM +0200, Nir Soffer wrote:
 > On Fri, Mar 10, 2023 at 10:16 PM Eric Blake <eblake@redhat.com> wrote:
 > >
-> > The uapi <linux/nbd.h> header declares a 'char handle[8]' per request;
-> > which is overloaded in English (are you referring to "handle" the
-> > verb, such as handling a signal or writing a callback handler, or
-> > "handle" the noun, the value used in a lookup table to correlate a
-> > response back to the request).  Many client-side NBD implementations
-> > (both servers and clients) have instead used 'u64 cookie' or similar,
-> > as it is easier to directly assign an integer than to futz around with
-> > memcpy.  In fact, upstream documentation is now encouraging this shift
-> > in terminology: https://lists.debian.org/nbd/2023/03/msg00031.html
-> >
-> > Accomplish this by use of an anonymous union to provide the alias for
-> > anyone getting the definition from the uapi; this does not break
-> > existing clients, while exposing the nicer name for those who prefer
-> > it.  Note that block/nbd.c still uses the term handle (in fact, it
-> > actually combines a 32-bit cookie and a 32-bit tag into the 64-bit
-> > handle), but that internal usage is not changed the public uapi, since
-> > no compliant NBD server has any reason to inspect or alter the 64
-> > bits sent over the socket.
+> > A good compiler should not compile this any differently, but it seems
+> > nicer to avoid memcpy() when integer assignment will work.
 > >
 > > Signed-off-by: Eric Blake <eblake@redhat.com>
 > > ---
-> >  include/uapi/linux/nbd.h | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
+> >  drivers/block/nbd.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
 > >
-> > diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-> > index 8797387caaf7..f58f2043f62e 100644
-> > --- a/include/uapi/linux/nbd.h
-> > +++ b/include/uapi/linux/nbd.h
-> > @@ -81,7 +81,10 @@ enum {
-> >  struct nbd_request {
-> >         __be32 magic;   /* NBD_REQUEST_MAGIC    */
-> >         __be32 type;    /* See NBD_CMD_*        */
-> > -       char handle[8];
-> > +       union {
-> > +               char handle[8];
-> > +               __be64 cookie;
-> > +       };
-> >         __be64 from;
-> >         __be32 len;
-> >  } __attribute__((packed));
-> > @@ -93,6 +96,9 @@ struct nbd_request {
-> >  struct nbd_reply {
-> >         __be32 magic;           /* NBD_REPLY_MAGIC      */
-> >         __be32 error;           /* 0 = ok, else error   */
-> > -       char handle[8];         /* handle you got from request  */
-> > +       union {
-> > +               char handle[8]; /* handle you got from request  */
-> > +               __be64 cookie;
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index 592cfa8b765a..672fb8d1ce67 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -606,7 +606,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+> >                 request.len = htonl(size);
+> >         }
+> >         handle = nbd_cmd_handle(cmd);
 > 
-> Should we document like this?
-> 
->     union {
->         __be64 cookie; /* cookie you got from request */
->         char handle[8]; /* older name */
-> 
-> I think we want future code to use the new term.
+> This returns native u64 (likely little endian) but the new interface
+> specifies __be64. Should we swap the bytes if needed?
 
-Sure, swapping the order to favor the preferred name first makes sense.
+Or document the field as u64 in the .h file.  I'm not sure which is
+better, but the mismatch here is definitely why the test robot
+complained about new warnings with my v1 patch.  I'm new enough to
+kernel development that I will welcome a hint about which way I should
+lean in writing v2.
 
-I'm still not sure on whether cookie should be u64 or __be64 (it's
-opaque, so endianness over the wire doesn't matter; and previous code
-was using memcpy() onto char[8] which may behave differently depending
-on machine endianness).
+> 
+> This will help tools like the wireshark plugin to display the right value
+> when checking traces from machines with different endianness. Or help
+> the nbd server to show the same *cooike* value in the logs. The value
+> is opaque but reasonable code can assume that __be64 can be safely
+> parsed as an integer.
+
+The fact that the old code was memcpy()ing a u64 into char[8] over the
+wire means that wireshark was already seeing endian-dependant values
+in that portion of the struct (a big-endian and little-endian client
+that happen to use the same cookie/handle will show up differently).
+I don't mind adding byteswapping and using __be64 (instead of direct
+assignment and u64) if that's what we want, but I don't think anyone
+should be relying on wireshark to have stable output for those bytes,
+since they are opaque to the server regardless of endianness.
+
+> 
+> Also the same file has references to *handle* like:
+> 
+> static u64 nbd_cmd_handle(struct nbd_cmd *cmd)
+> {
+>     struct request *req = blk_mq_rq_from_pdu(cmd);
+>     u32 tag = blk_mq_unique_tag(req);
+>     u64 cookie = cmd->cmd_cookie;
+> 
+>     return (cookie << NBD_COOKIE_BITS) | tag;
+> }
+> 
+> static u32 nbd_handle_to_tag(u64 handle)
+> {
+>     return (u32)handle;
+> }
+> 
+> static u32 nbd_handle_to_cookie(u64 handle)
+> {
+>     return (u32)(handle >> NBD_COOKIE_BITS);
+> }
+> 
+> So this change is a little bit confusing.
+> 
+> I think we need to use a term like *nbd_cookie* instead of
+> *handle* to make this more clear.
+
+I can additionally rename these helper functions in v2 if that would
+be helpful.
 
 -- 
 Eric Blake, Principal Software Engineer
