@@ -2,140 +2,174 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A881C6FD1C
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 12:28:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C279C6FD1D
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 12:44:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbjCNM2D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 08:28:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50902 "EHLO
+        id S231881AbjCNMon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 08:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230201AbjCNM1k (ORCPT
+        with ESMTP id S231710AbjCNMoF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 08:27:40 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A10D7685
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 05:25:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1678796716; x=1710332716;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=eXqhOA59lR2OsemLai44IJ7M3W9geVIWrz3XdU1LItk=;
-  b=Bswd0xPd+kbo+eKzFrATv26JESkTmH/y7GD2e6LzovCNC0jL0+D/yaCM
-   HEsOcfGDvnp63OA1WbwPcjbzciuNcCrWLLGhwZ2FGh/AtHiR3OiASGlGE
-   gsEZpWEsGH9AQrE7RBT/kPIsOKuj5iCRNfcdSRLgta5IvIVikbYfnxhFw
-   VzTA+AAHCfoHKR9+VstPKhBTwVT6N5yTvYih7v9dy59VXfGaSEVOtKV77
-   k2ia8oFj/aTc5vI5PkZ3odpGB7d2F0HDRco8FnLsTSj+egbxG2MffrpV5
-   RLXW7PRK8WUuGTfAfjMSVBnVAbJD7uJ4ztDOlapaDRyDE4UzvBjYtfpEJ
-   A==;
-X-IronPort-AV: E=Sophos;i="5.98,259,1673884800"; 
-   d="scan'208";a="337613283"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Mar 2023 20:22:09 +0800
-IronPort-SDR: +pAhj4wU7oOxVsZsYlrOEh3dwQxp+zBVM4DLp9B2xqWD85Yv8ZMd1g5O/mACYqDWzJhwKt8XQ/
- iq0x1dbNaAD1xszbPMIwXyN2QkWqs1rWwABxtHt3wbFxKmBMQHAYJmCrXyjtoAEmQGHTYklOyL
- qoAVcGWof3iSbahrfnzWMHpUTmVGBA9lFJ8u9IrZjfVYpku0FCaWrRxTWYw72dmtIsjuxJjBel
- bgYQl0o96mXJmySfqcycABoixhMnjt7QCcWybQQdybru175IsUFEOqijDWFQ7Piy16BfmL3GVq
- PLU=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Mar 2023 04:32:58 -0700
-IronPort-SDR: 48L+Vjz0ErgHp+UAUH248OuzHjIn5M4YQa1TPwxpdVqfhxyQfl3Vgg9mtPHcw8G2NYuw5OYo3t
- qAscVKFpi7LWUeghCodcyjoDnPIVtZP1E4j1bahyJHLLhb938jfoDoIYFlytDqHFl/5qp5++GI
- YHHoSmxeFWDJNxaegC3XHFN0VnMHxAEJD5UQhIUA4+Nr6nY6UCtrhr7FhHN/4MdwwZbTLQ2i8b
- KTPPHnwyFZwkxnInS4tWbQlhQM5jdQphoEDP2tAA7OaotLeIBFIPPVroNgnk+9ehRb5E8yN1HW
- JLo=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Mar 2023 05:22:11 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PbXhf6Z98z1RtVt
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 05:22:10 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1678796530; x=1681388531; bh=eXqhOA59lR2OsemLai44IJ7M3W9geVIWrz3
-        XdU1LItk=; b=SS2wEdvy0eYrn/X/kFi1p337PKmpGRxSIJdp5mc00u4jm1lIyru
-        TC9Y4dwO7bwg1//wMY0iUmWQLOpzC26fn8FHgJMtogRkgPA5i+a01JeSpB4qm5TI
-        nHSueYA+5zTNDdX1ru9YkucoP2pTxVvjBQzarrk5qZFp9NVZ9cFk233l/L/HAJrd
-        0Xumv4eEB9IStkxichCzME39OzhLMVV+hw5RFFy0LJJFzMlVlxBfxuz4lhsiek6t
-        fLoyNZJIK3upGPEA8dRiQR9+x6ZOwy2eX7KxQgZHiPCiSPHofKv0Org4eGOVLV+A
-        2sz1YIxQwErSRuEgDIjEnSzTD77hZFdM7zw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 41UQwcZDebsQ for <linux-block@vger.kernel.org>;
-        Tue, 14 Mar 2023 05:22:10 -0700 (PDT)
-Received: from [10.225.163.84] (unknown [10.225.163.84])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PbXhd5Gmrz1RtVm;
-        Tue, 14 Mar 2023 05:22:09 -0700 (PDT)
-Message-ID: <24e54d52-e7d8-312f-8872-388d8e4c70b4@opensource.wdc.com>
-Date:   Tue, 14 Mar 2023 21:22:08 +0900
+        Tue, 14 Mar 2023 08:44:05 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 223BC64267;
+        Tue, 14 Mar 2023 05:43:32 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id A2B3821B12;
+        Tue, 14 Mar 2023 12:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1678796320; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HDY7jcwI9dHCgL/OW2lTTFRBkD5jd0F5io+HlohS21I=;
+        b=W2o/Sx0IV9q9sHrwyeQ8vvaSFabluCcDYybZfvzR5LNnbeEA9UG/HLEVe/BbgQgqqnoAF9
+        93QxWvHDkEi5JqUSnxzXMkK8fm2161uJKCjU+8Y4S1cCWqRlHq/knnbSUbKmrfswMnv8uL
+        f7UIybVZYr3JMNFcXrgBQAA1Ir2I2Bc=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 76D4E13A26;
+        Tue, 14 Mar 2023 12:18:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 1xCEGyBmEGQRUQAAMHmgww
+        (envelope-from <jgross@suse.com>); Tue, 14 Mar 2023 12:18:40 +0000
+Message-ID: <38816e91-3ed9-68d8-1c26-1830505a13f8@suse.com>
+Date:   Tue, 14 Mar 2023 13:18:40 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [PATCH] block: do not reverse request order when flushing plug
- list
+Subject: Re: [PATCH 0/4] xen/blkback: some cleanups
 Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>, Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20230313093002.11756-1-jack@suse.cz>
- <ZBBJ7CLOurvOO3OQ@ovpn-8-18.pek2.redhat.com>
- <20230314120900.u67czr5v4kd3my3r@quack3>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230314120900.u67czr5v4kd3my3r@quack3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From:   Juergen Gross <jgross@suse.com>
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org
+References: <20221216145816.27374-1-jgross@suse.com>
+ <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
+In-Reply-To: <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------yDupyS31ATbX9dfN5PReB1O4"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/14/23 21:09, Jan Kara wrote:
-> On Tue 14-03-23 18:18:20, Ming Lei wrote:
->> On Mon, Mar 13, 2023 at 10:30:02AM +0100, Jan Kara wrote:
->>> Commit 26fed4ac4eab ("block: flush plug based on hardware and software
->>> queue order") changed flushing of plug list to submit requests one
->>> device at a time. However while doing that it also started using
->>> list_add_tail() instead of list_add() used previously thus effectively
->>> submitting requests in reverse order. Also when forming a rq_list with
->>> remaining requests (in case two or more devices are used), we
->>> effectively reverse the ordering of the plug list for each device we
->>> process. Submitting requests in reverse order has negative impact on
->>> performance for rotational disks (when BFQ is not in use). We observe
->>> 10-25% regression in random 4k write throughput, as well as ~20%
->>> regression in MariaDB OLTP benchmark on rotational storage on btrfs
->>> filesystem.
->>>
->>> Fix the problem by preserving ordering of the plug list when inserting
->>> requests into the queuelist as well as by appending to requeue_list
->>> instead of prepending to it.
->>
->> Also in case of !plug->multiple_queues && !plug->has_elevator, requests
->> are still sent to device in reverse order, do we need to cover that case?
-> 
-> That's an interesting question. I suppose reversing the order in this case
-> could be suprising e.g. for shingled storage. I don't think it matters that
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------yDupyS31ATbX9dfN5PReB1O4
+Content-Type: multipart/mixed; boundary="------------59oIaAQLnuN0lZWZuus8u7md";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Cc: =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org
+Message-ID: <38816e91-3ed9-68d8-1c26-1830505a13f8@suse.com>
+Subject: Re: [PATCH 0/4] xen/blkback: some cleanups
+References: <20221216145816.27374-1-jgross@suse.com>
+ <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
+In-Reply-To: <055adce8-ceba-983a-19cc-b09ec30bb3c3@suse.com>
 
-We do not allow plugging writes to sequential zones on zoned block devices. The
-reason is that write commands in the plug may end up being reordered with write
-commands issued later but without plugging. We hit that issue while doing btrfs
-work and the only easy solution we could think of was to not plug any write
-command so that the write ordering is preserved down to the scheduler insertion.
-For the dispatching order, it is the scheduler (mq-deadline) responsibility.
+--------------59oIaAQLnuN0lZWZuus8u7md
+Content-Type: multipart/mixed; boundary="------------gqUsVOBYzACHLsDfqUPvTAIK"
 
-> much for normal rotational storage as there you presumably run with at
-> least some IO scheduler (we were using mq-deadline in our testing).>
-> Avoiding the reversal will require small changes to plug handling (so that
-> we append the plug list) but it shouldn't be too bad. Still I'd do it in a
-> separate patch.
-> 
-> 								Honza
+--------------gqUsVOBYzACHLsDfqUPvTAIK
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
--- 
-Damien Le Moal
-Western Digital Research
+T24gMDkuMDEuMjMgMTY6MDUsIEp1ZXJnZW4gR3Jvc3Mgd3JvdGU6DQo+IE9uIDE2LjEyLjIy
+IDE1OjU4LCBKdWVyZ2VuIEdyb3NzIHdyb3RlOg0KPj4gU29tZSBzbWFsbCBjbGVhbnVwIHBh
+dGNoZXMgSSBoYWQgbHlpbmcgYXJvdW5kIGZvciBzb21lIHRpbWUgbm93Lg0KPj4NCj4+IEp1
+ZXJnZW4gR3Jvc3MgKDQpOg0KPj4gwqDCoCB4ZW4vYmxrYmFjazogZml4IHdoaXRlIHNwYWNl
+IGNvZGUgc3R5bGUgaXNzdWVzDQo+PiDCoMKgIHhlbi9ibGtiYWNrOiByZW1vdmUgc3RhbGUg
+cHJvdG90eXBlDQo+PiDCoMKgIHhlbi9ibGtiYWNrOiBzaW1wbGlmeSBmcmVlX3BlcnNpc3Rl
+bnRfZ250cygpIGludGVyZmFjZQ0KPj4gwqDCoCB4ZW4vYmxrYmFjazogbW92ZSBibGtpZl9n
+ZXRfeDg2XypfcmVxKCkgaW50byBibGtiYWNrLmMNCj4+DQo+PiDCoCBkcml2ZXJzL2Jsb2Nr
+L3hlbi1ibGtiYWNrL2Jsa2JhY2suYyB8IDEyNiArKysrKysrKysrKysrKysrKysrKysrKysr
+LS0tDQo+PiDCoCBkcml2ZXJzL2Jsb2NrL3hlbi1ibGtiYWNrL2NvbW1vbi5owqAgfCAxMDMg
+Ky0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+IMKgIDIgZmlsZXMgY2hhbmdlZCwgMTE4IGlu
+c2VydGlvbnMoKyksIDExMSBkZWxldGlvbnMoLSkNCj4+DQo+IA0KPiBQaW5nPw0KDQpQaW5n
+wrIgPw0KDQoNCkp1ZXJnZW4NCg0K
+--------------gqUsVOBYzACHLsDfqUPvTAIK
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+jR/i1DG86lem3iBDXzXsZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------gqUsVOBYzACHLsDfqUPvTAIK--
+
+--------------59oIaAQLnuN0lZWZuus8u7md--
+
+--------------yDupyS31ATbX9dfN5PReB1O4
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmQQZiAFAwAAAAAACgkQsN6d1ii/Ey9K
+NQf+JuxFSCUrGSXCueW3Ymoi+0baxwYJVlrAvTYJ3cOwbEDDcuVNmPpwtnnAgLLKusA6P8DrF9SG
+2WvQCaVti0olXsZ/CGyuRKEx/Gcy9RrnD+dhbVpP0S2oRyY5RQJY59c87hPaGcibwkASLJzFXmBj
+MHXz16eUo4ocHQvs1Z6PoObxuwLVlKDY4NdDlzWNoktitGdqtLeFS2ylg+ulRhJRiyj9zS1iyifz
+Bp12tEJnr6dZb4uh8YvdZuT+pe8qN2pHBwTOhDJRWKWd/xbzIQdS7d9K1yq0j54MpMxRsVTyCyRw
+iZuQN0b/kgraIaiCxy/kMsJtOst3LVPH9p1tNGCqPw==
+=TlAT
+-----END PGP SIGNATURE-----
+
+--------------yDupyS31ATbX9dfN5PReB1O4--
