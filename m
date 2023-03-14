@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F01C8C6FD1F
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 22:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B052C7618B
+	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 22:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbjCNWKC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 18:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38650 "EHLO
+        id S231315AbjCNWKL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 18:10:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbjCNWJc (ORCPT
+        with ESMTP id S229960AbjCNWJj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 18:09:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492D22CFF7
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 15:08:35 -0700 (PDT)
+        Tue, 14 Mar 2023 18:09:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B98C828865
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 15:08:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678831714;
+        s=mimecast20190719; t=1678831723;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tPHDzTeiqkehQq1hzvPvPGknkMXTxgyXWdFbtANbawg=;
-        b=iAWWcarjZGORj1XpTrs7WLkU66Wn02dGKlo5PTlXGVjAdzAsofefD1xWo2OBQtOQC7bBX6
-        X6Uil+99G8eTLlui2H6BmTKJm1oIki8ZNdChyFbLpLwzJr972u1O6CmmSmbsNdvcEprXtB
-        KtyG0/7t2phJ4M8jObdASNgJy//9M9E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0+QymJ+GCZW28tJ8JK9HTXv9GxubpscA9882LeMgv9w=;
+        b=R4DPIoMMJdtHq3Fq8tqDH20Nn4KnyRQMeqSTDr+drXH2CYu6mvzFmuNSrG0VCHbedwPZz6
+        tSXQtxlsRxQlPQFuX1koYBsVnu03X/kpoKKW55iJ1AK5m4tbbvBs9xwk31bL1PetC0IOTN
+        3/CQRBa3VTlAPmXb88qFxY3eWzs6JUQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-yinWqeU4PtWbq9L6irR4zQ-1; Tue, 14 Mar 2023 18:08:29 -0400
-X-MC-Unique: yinWqeU4PtWbq9L6irR4zQ-1
+ us-mta-102-n0ZfiDmHMfGhrz83iRoe6A-1; Tue, 14 Mar 2023 18:08:40 -0400
+X-MC-Unique: n0ZfiDmHMfGhrz83iRoe6A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6700D85A5A3;
-        Tue, 14 Mar 2023 22:08:28 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E35971C08798;
+        Tue, 14 Mar 2023 22:08:39 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B9EAC164E7;
-        Tue, 14 Mar 2023 22:08:26 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CADA6C164E7;
+        Tue, 14 Mar 2023 22:08:37 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,11 +53,10 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Steve French <smfrench@gmail.com>,
-        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
-Subject: [PATCH v18 07/15] splice: Do splice read from a file without using ITER_PIPE
-Date:   Tue, 14 Mar 2023 22:07:49 +0000
-Message-Id: <20230314220757.3827941-8-dhowells@redhat.com>
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v18 11/15] block: Fix bio_flagged() so that gcc can better optimise it
+Date:   Tue, 14 Mar 2023 22:07:53 +0000
+Message-Id: <20230314220757.3827941-12-dhowells@redhat.com>
 In-Reply-To: <20230314220757.3827941-1-dhowells@redhat.com>
 References: <20230314220757.3827941-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -67,71 +66,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make generic_file_splice_read() use filemap_splice_read() and
-direct_splice_read() rather than using an ITER_PIPE and call_read_iter().
+Fix bio_flagged() so that multiple instances of it, such as:
 
-With this, ITER_PIPE is no longer used.
+	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
+	    bio_flagged(bio, BIO_PAGE_PINNED))
+
+can be combined by the gcc optimiser into a single test in assembly
+(arguably, this is a compiler optimisation issue[1]).
+
+The missed optimisation stems from bio_flagged() comparing the result of
+the bitwise-AND to zero.  This results in an out-of-line bio_release_page()
+being compiled to something like:
+
+   <+0>:     mov    0x14(%rdi),%eax
+   <+3>:     test   $0x1,%al
+   <+5>:     jne    0xffffffff816dac53 <bio_release_pages+11>
+   <+7>:     test   $0x2,%al
+   <+9>:     je     0xffffffff816dac5c <bio_release_pages+20>
+   <+11>:    movzbl %sil,%esi
+   <+15>:    jmp    0xffffffff816daba1 <__bio_release_pages>
+   <+20>:    jmp    0xffffffff81d0b800 <__x86_return_thunk>
+
+However, the test is superfluous as the return type is bool.  Removing it
+results in:
+
+   <+0>:     testb  $0x3,0x14(%rdi)
+   <+4>:     je     0xffffffff816e4af4 <bio_release_pages+15>
+   <+6>:     movzbl %sil,%esi
+   <+10>:    jmp    0xffffffff816dab7c <__bio_release_pages>
+   <+15>:    jmp    0xffffffff81d0b7c0 <__x86_return_thunk>
+
+instead.
+
+Also, the MOVZBL instruction looks unnecessary[2] - I think it's just
+'re-booling' the mark_dirty parameter.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Steve French <smfrench@gmail.com>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108370 [1]
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108371 [2]
+Link: https://lore.kernel.org/r/167391056756.2311931.356007731815807265.stgit@warthog.procyon.org.uk/ # v6
 ---
+ include/linux/bio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Notes:
-    ver #18)
-     - Split out the change to cifs to make it use generic_file_splice_read().
-     - Split out the unexport of filemap_splice_read() (still needed by cifs).
-
- fs/splice.c | 30 +++++++-----------------------
- 1 file changed, 7 insertions(+), 23 deletions(-)
-
-diff --git a/fs/splice.c b/fs/splice.c
-index 90ccd3666dca..f46dd1fb367b 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -387,29 +387,13 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
- 				 struct pipe_inode_info *pipe, size_t len,
- 				 unsigned int flags)
- {
--	struct iov_iter to;
--	struct kiocb kiocb;
--	int ret;
--
--	iov_iter_pipe(&to, ITER_DEST, pipe, len);
--	init_sync_kiocb(&kiocb, in);
--	kiocb.ki_pos = *ppos;
--	ret = call_read_iter(in, &kiocb, &to);
--	if (ret > 0) {
--		*ppos = kiocb.ki_pos;
--		file_accessed(in);
--	} else if (ret < 0) {
--		/* free what was emitted */
--		pipe_discard_from(pipe, to.start_head);
--		/*
--		 * callers of ->splice_read() expect -EAGAIN on
--		 * "can't put anything in there", rather than -EFAULT.
--		 */
--		if (ret == -EFAULT)
--			ret = -EAGAIN;
--	}
--
--	return ret;
-+	if (unlikely(*ppos >= file_inode(in)->i_sb->s_maxbytes))
-+		return 0;
-+	if (unlikely(!len))
-+		return 0;
-+	if (in->f_flags & O_DIRECT)
-+		return direct_splice_read(in, ppos, pipe, len, flags);
-+	return filemap_splice_read(in, ppos, pipe, len, flags);
- }
- EXPORT_SYMBOL(generic_file_splice_read);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d766be7152e1..d9d6df62ea57 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -229,7 +229,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
  
+ static inline bool bio_flagged(struct bio *bio, unsigned int bit)
+ {
+-	return (bio->bi_flags & (1U << bit)) != 0;
++	return bio->bi_flags & (1U << bit);
+ }
+ 
+ static inline void bio_set_flag(struct bio *bio, unsigned int bit)
 
