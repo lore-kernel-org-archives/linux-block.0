@@ -2,69 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB24AC76195
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 14:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C01C7C6FD1D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 15:01:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233093AbjCOO54 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 10:57:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44596 "EHLO
+        id S232853AbjCOPBk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 11:01:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232784AbjCOO5j (ORCPT
+        with ESMTP id S232850AbjCOPBV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 10:57:39 -0400
+        Wed, 15 Mar 2023 11:01:21 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECE5425948;
-        Wed, 15 Mar 2023 07:57:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE3C968D3;
+        Wed, 15 Mar 2023 08:00:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=NtGVTT0RE5iHf8BDlNnJJTmqknLyFuFovkq+NsrgLe4=; b=PiUZ5d9s1025RuKr4ecGq9sArC
-        v2VR2D3pHXH/amZGn6D1lD6vqM5Q6MKJ+O0jzI3lm5p4zSfr+CaXeZEWzGkwhdH5oL2f3vQ+1PRKr
-        XWE3xORmmUTQzRCIe/Ld9xRWfOKkgPiPn76MIdw3IPtqfMg8w6RLpMDGCc3SwI0U4fS0yOCLGAoKJ
-        UH1IbfqoDsFCA3AelyRBAXKTzhCoZPNWjKSMOjvxJS1hts1kazbIti2grOrPssBOPJAUk410i1pyd
-        A9B/Gw8gGSqj4qSh+zmFT5AK2yUl6d2Ge/M0xXZlezoUqkwhBH8NX2IAew9BWt+V7S8o7Bwh5szem
-        c21/Ugbg==;
+        bh=l59wLLAdYkWPRXL2DR8xpU5dwlDJ3Y0fL5Qut2OPdh0=; b=H9TdPAnkNRPy6L5nWfp8dRCPQY
+        3hbLEBY2TaPEDwRnp6mB945iHEGkTfcawPYlQHyBDdYFTN3kW3fIQbDebeC1V/JPrET+gE/FxwTSZ
+        hDJB1MwPXEwBcPMj/lC0NfavlBi0C3k3FKrgxDHww8WEDWsxAzbEZVdUMXm3V2lKHg/4VbWfoPwos
+        FMyOTVVb5Qa8uN4tLCGM7WDQUPAhw179iObEAXtvCu81yYS8n90q0ZAzig2Z+fML/7bJ/SGlsvdHp
+        NGahIHzVOuNQuccJmQnyOZaOmwHC3LPrDVrUabqjdfrvvh1JIA/t9rLAWC0n6NcG2W8+C+xmKOdpi
+        YA2JWcMw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pcSYB-00Dhrz-0d;
-        Wed, 15 Mar 2023 14:56:23 +0000
-Date:   Wed, 15 Mar 2023 07:56:23 -0700
+        id 1pcSc6-00Dj3s-2Y;
+        Wed, 15 Mar 2023 15:00:26 +0000
+Date:   Wed, 15 Mar 2023 08:00:26 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     hubcap@omnibond.com, senozhatsky@chromium.org, martin@omnibond.com,
-        willy@infradead.org, minchan@kernel.org, viro@zeniv.linux.org.uk,
-        brauner@kernel.org, axboe@kernel.dk, akpm@linux-foundation.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        gost.dev@samsung.com, mcgrof@kernel.org, devel@lists.orangefs.org
-Subject: Re: [RFC PATCH 1/3] filemap: convert page_endio to folio_endio
-Message-ID: <ZBHcl8Pz2ULb4RGD@infradead.org>
-References: <20230315123233.121593-1-p.raghav@samsung.com>
- <CGME20230315123234eucas1p2503d83ad0180cecde02e924d7b143535@eucas1p2.samsung.com>
- <20230315123233.121593-2-p.raghav@samsung.com>
+To:     Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2 1/4] blk-integrity: use sysfs_emit
+Message-ID: <ZBHditvgrS3jKvNr@infradead.org>
+References: <20230309-kobj_release-gendisk_integrity-v2-0-761a50d71900@weissschuh.net>
+ <20230309-kobj_release-gendisk_integrity-v2-1-761a50d71900@weissschuh.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230315123233.121593-2-p.raghav@samsung.com>
+In-Reply-To: <20230309-kobj_release-gendisk_integrity-v2-1-761a50d71900@weissschuh.net>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Can we take a step back and figure out if page_endio is a good
-idea to start with?
+>  	if (bi->profile && bi->profile->name)
+> -		return sprintf(page, "%s\n", bi->profile->name);
+> +		return sysfs_emit(page, "%s\n", bi->profile->name);
+>  	else
 
-The zram usage seems clearly wrong to me.  zram is a block driver
-and does not own the pages, so it shouldn't touch any of the page
-state.  It seems like this mostly operates on it's own
-pages allocated using alloc_page so the harm might not be horrible
-at least.
+Might be worth to drop the else here if you touch the function.
 
-orangefs uses it on readahead pages, with ret known for the whole
-iteration.  So one quick loop for the success and one for the
-failure case would look simpler an more obvious.
+>
+> +	return sysfs_emit(page, "%d\n", (bi->flags & BLK_INTEGRITY_VERIFY) != 0);
 
-mpage really should use separate end_io handler for read vs write
-as well like most other aops do.
+Please shorten these != 0 to !! expressions, i.e.
 
-So overall I'd be happier to just kill the helper.
+	return sysfs_emit(page, "%d\n", !!(bi->flags & BLK_INTEGRITY_VERIFY));
+
