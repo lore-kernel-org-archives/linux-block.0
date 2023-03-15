@@ -2,89 +2,131 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B9FC61DA4
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 17:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB897C7618D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 17:48:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232399AbjCORBL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 13:01:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54228 "EHLO
+        id S232543AbjCORsY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 13:48:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232369AbjCORBK (ORCPT
+        with ESMTP id S232659AbjCORr5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:01:10 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 091D15D257
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 10:00:47 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id w9so7368048edc.3
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 10:00:47 -0700 (PDT)
+        Wed, 15 Mar 2023 13:47:57 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29ED895E1C
+        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 10:47:42 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id h83so446743iof.8
+        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 10:47:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1678899645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1678902435; x=1681494435;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RNcufV/o6gXGVvEybdJYpsgEKHaP677A9vzHvZRO1S4=;
-        b=hmklnvS8zFNaTwg4I6AQ8EgxC3rDC55Fy1yfRRBp55jWHPiflyBzeHx2PDt50zg8GT
-         D8dve4rM25zjPPSNbTl+uptvWB3CXXHZbGRLv00MJOeGP99iz9VvwSrP1tZCPGdmqxt5
-         UYJQJr2DMflIuMNL31dLUytSBT/8YJpsXrhPs=
+        bh=+lxfpdXXZwd5ObmwIUKYTvInLkSnJ3rTmk1dwfXuWn8=;
+        b=j9zqC407ORD8JyCqubo5WPcomiRwRsgSCSSitJearydehrdb9JmZmX1rrAPvBarmDI
+         APa7Mmkn0oYxgQl+hDgaAbnSf1Gfotr9lsBCqg8+KunkhVpQTNRE9c+Uc3o2y6Ki54zD
+         9yMtnupZGdSKcH0Dh42IsgTI+f7K+gAsNZDJKHxvwoc1mgNszsufVoss9y9Kb4Yl/flK
+         D4iOTC3S3GCxDs7oxdJdi9FhFA4/jU9D4EQfXvzEw8R69jZgFe/xYPMY61r9C9vHLDXf
+         1+2m2A4MHtceKufCfJX4QnOXmFmWiTHIUgAOGbWOZZ7UtXPxRIvFDXRRYFhktW4goBQ8
+         8Isg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678899645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1678902435; x=1681494435;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RNcufV/o6gXGVvEybdJYpsgEKHaP677A9vzHvZRO1S4=;
-        b=xqdOdC3/2nM7zfFLHBFzVq+zjvxyxeWxxLnsESzNH0vHKCaGAD7+UF8CI6sQf2YbrA
-         AhZftvp3oMYgEsF3DG5zIAtqoS/QkvdNGcrMdfDgwwY1T0nRSzWD8btgMmnqynxid1rz
-         wGJSRrHzCNMmTrqvSwv1zyUyUcbFc5GJMHIcqZKDeEKfqeCy0AGmq3f5SqOxHjEMLWL5
-         FyttPoK5D/0OfaidxvTUsW1R1bHDPZZ7J2OMieSz45wJcH7ahfUPQDO4jCobSWOVJ3tk
-         MjtVKqlVSf7U/y4jsmrBTwFjib9pmh5zo9ZuZCw2NonLHNH1z5f+tF93UeYnFzlBrPvU
-         hNDQ==
-X-Gm-Message-State: AO0yUKUmiEErQrii1FspyCe6Amal++Lfwk4EUyshiPnJH9DPTxFJCVOz
-        rOllKY4buJ2O1XRUp/tdoYkUXoCsSlDyzuP7/DPiYQ==
-X-Google-Smtp-Source: AK7set/O9zq7/xJroAbpvtop5DWoqIy/Yu4l166uX/w9jy2ussAQ0pOvW1lnpLraQDCFqUHwLUEeOA==
-X-Received: by 2002:a17:906:7d52:b0:92e:e9c2:7b9c with SMTP id l18-20020a1709067d5200b0092ee9c27b9cmr2565875ejp.77.1678899645246;
-        Wed, 15 Mar 2023 10:00:45 -0700 (PDT)
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
-        by smtp.gmail.com with ESMTPSA id qq11-20020a17090720cb00b008c6c47f59c1sm2786679ejb.48.2023.03.15.10.00.44
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Mar 2023 10:00:44 -0700 (PDT)
-Received: by mail-ed1-f50.google.com with SMTP id h8so34374311ede.8
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 10:00:44 -0700 (PDT)
-X-Received: by 2002:a17:907:72c1:b0:8e5:1a7b:8ab2 with SMTP id
- du1-20020a17090772c100b008e51a7b8ab2mr4223971ejc.4.1678899643988; Wed, 15 Mar
- 2023 10:00:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230315163549.295454-1-dhowells@redhat.com>
-In-Reply-To: <20230315163549.295454-1-dhowells@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 15 Mar 2023 10:00:26 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiSfbFAVvXpbRJ0NkNJbpo93d5ObdoHcNMvX4CYGrafAQ@mail.gmail.com>
-Message-ID: <CAHk-=wiSfbFAVvXpbRJ0NkNJbpo93d5ObdoHcNMvX4CYGrafAQ@mail.gmail.com>
-Subject: Re: [PATCH v19 00/15] splice, block: Use page pinning and kill ITER_PIPE
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        bh=+lxfpdXXZwd5ObmwIUKYTvInLkSnJ3rTmk1dwfXuWn8=;
+        b=oDjDLAEWUiuVLA2xtvNTfu0RjjxBlRdutWFO2NlfkkwslSq1+iGVUYTjByzD4l6DfE
+         EDNbIVCv4b79RwyLRjcARAU7EstJmYVOaDp/nI7OLXy8MSXNO+mhhIAmdkpwIALuJ3i7
+         mMZlNm/52Cyk+G1xqL33dSqjhlbYPO99X4KexoCNTaHidJZrpB2m+Wp3HAQbfm6hYiNM
+         zcznpR46/5jAMYcyA2FDnoinR8NkIqHtO1pl6JHN5BwqQyVefdc1xmvkyVWzhQaXqUnS
+         U3goOMX7vLgiwl2hDfpAqP8NsyIOHHtq+Kmi46sQxFf6Mxj2rJs4AiZrOnfQN2Bjz3xD
+         5Cnw==
+X-Gm-Message-State: AO0yUKXxsWuWau02uWFUvcVlxHYvdcASiYSCsyfHvAzJXl+/q5vuHJjb
+        kVfL5zSJyxxi0WRE/Am9z3306A==
+X-Google-Smtp-Source: AK7set8NaGAjOIa8kTwZzEhvCzFYesiBzdjCmPGndPULiKBjmur+M8FpGX8hzACaLs458oHc/KbObQ==
+X-Received: by 2002:a6b:3c0a:0:b0:719:6a2:99d8 with SMTP id k10-20020a6b3c0a000000b0071906a299d8mr1919987iob.0.1678902435147;
+        Wed, 15 Mar 2023 10:47:15 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id r14-20020a6b440e000000b00740710c0a65sm1811816ioa.47.2023.03.15.10.47.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 10:47:14 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        David Howells <dhowells@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         Hillf Danton <hdanton@sina.com>,
         Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+In-Reply-To: <20230315163549.295454-1-dhowells@redhat.com>
+References: <20230315163549.295454-1-dhowells@redhat.com>
+Subject: Re: [PATCH v19 00/15] splice, block: Use page pinning and kill
+ ITER_PIPE
+Message-Id: <167890243414.54517.7660243890362126266.b4-ty@kernel.dk>
+Date:   Wed, 15 Mar 2023 11:47:14 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-2eb1a
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 9:35=E2=80=AFAM David Howells <dhowells@redhat.com>=
- wrote:
->
-> ver #19)
->  - Remove a missed get_page() on the zeropage in shmem_splice_read().
 
-Ack. I see nothing alarming in this series.
+On Wed, 15 Mar 2023 16:35:34 +0000, David Howells wrote:
+> The first half of this patchset kills off ITER_PIPE to avoid a race between
+> truncate, iov_iter_revert() on the pipe and an as-yet incomplete DMA to a
+> bio with unpinned/unref'ed pages from an O_DIRECT splice read.  This causes
+> memory corruption[2].  Instead, we use filemap_splice_read(), which invokes
+> the buffered file reading code and splices from the pagecache into the
+> pipe; direct_splice_read(), which bulk-allocates a buffer, reads into it
+> and then pushes the filled pages into the pipe; or handle it in
+> filesystem-specific code.
+> 
+> [...]
 
-              Linus
+Applied, thanks!
+
+[01/15] splice: Clean up direct_splice_read() a bit
+        commit: d187b44bc9404581bad8d006d80937d1b3a2b0c0
+[02/15] splice: Make do_splice_to() generic and export it
+        commit: 6dc39c2949ee71ee9996d6190d374512ecf44982
+[03/15] shmem: Implement splice-read
+        commit: b81d7b89beccbeebe347c21c004665ffe07e36bb
+[04/15] overlayfs: Implement splice-read
+        commit: f39de7bd1b5088241f0580b5fe5d76cc5569711f
+[05/15] coda: Implement splice-read
+        commit: f0daac2d4dcd286168d7c70d0495328c096d4d96
+[06/15] tty, proc, kernfs, random: Use direct_splice_read()
+        commit: 82ab8404c910d4aba33f55257c2bbc8ea9cfad3c
+[07/15] splice: Do splice read from a file without using ITER_PIPE
+        commit: 3eb3c59b128509a5e8a8349dafced64b9769438e
+[08/15] cifs: Use generic_file_splice_read()
+        commit: fa9a848ded4984a8c64d0d20c3a5b0aab97c7754
+[09/15] iov_iter: Kill ITER_PIPE
+        commit: a53f5dee3448a51e6602a7f98952abaf19049641
+[10/15] iomap: Don't get an reference on ZERO_PAGE for direct I/O block zeroing
+        commit: 2102c4e41418fb5c2cdf26bf2b97922190e38ba2
+[11/15] block: Fix bio_flagged() so that gcc can better optimise it
+        commit: caf8aae59a7b1f668a32f91115ed8be3aebaaa41
+[12/15] block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted logic
+        commit: e812d15adde4363c95f1743b7dd4946f1a550c5c
+[13/15] block: Add BIO_PAGE_PINNED and associated infrastructure
+        commit: b5596bf292996a5cd62f1fbc00c2c35f1a3faa12
+[14/15] block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
+        commit: 648627d7077d4de810e5f4c09490cb993514a53f
+[15/15] block: convert bio_map_user_iov to use iov_iter_extract_pages
+        commit: d187b44bc9404581bad8d006d80937d1b3a2b0c0
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
