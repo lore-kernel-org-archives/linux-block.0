@@ -2,131 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB897C7618D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 17:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A71C6FD1D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 18:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232543AbjCORsY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 13:48:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59202 "EHLO
+        id S232277AbjCOST2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 14:19:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232659AbjCORr5 (ORCPT
+        with ESMTP id S231748AbjCOST1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:47:57 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29ED895E1C
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 10:47:42 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id h83so446743iof.8
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 10:47:42 -0700 (PDT)
+        Wed, 15 Mar 2023 14:19:27 -0400
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C47B5A6D7
+        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 11:19:26 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id d7so17151946qtr.12
+        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 11:19:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1678902435; x=1681494435;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+lxfpdXXZwd5ObmwIUKYTvInLkSnJ3rTmk1dwfXuWn8=;
-        b=j9zqC407ORD8JyCqubo5WPcomiRwRsgSCSSitJearydehrdb9JmZmX1rrAPvBarmDI
-         APa7Mmkn0oYxgQl+hDgaAbnSf1Gfotr9lsBCqg8+KunkhVpQTNRE9c+Uc3o2y6Ki54zD
-         9yMtnupZGdSKcH0Dh42IsgTI+f7K+gAsNZDJKHxvwoc1mgNszsufVoss9y9Kb4Yl/flK
-         D4iOTC3S3GCxDs7oxdJdi9FhFA4/jU9D4EQfXvzEw8R69jZgFe/xYPMY61r9C9vHLDXf
-         1+2m2A4MHtceKufCfJX4QnOXmFmWiTHIUgAOGbWOZZ7UtXPxRIvFDXRRYFhktW4goBQ8
-         8Isg==
+        d=joelfernandes.org; s=google; t=1678904365;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GgzilRrDZzjZzGZPzVxtA7dkKR8Cud+QjJJNSSQFpD0=;
+        b=aeF1GaiTWV2z10A11VbsrsakE7qKYNyoR2nVgFLI3d6N8gJEjje/zzswtN2TGFln6U
+         SlbpWOL++D9xe66W2i+I7sjdmACU7jeLTJNedgxGtjL2iQs0D2V2ErxDWeH77FfhlQ7S
+         B9eXRQAjYlyuksBs4ic13nFMImugk9I19BUXI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678902435; x=1681494435;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+lxfpdXXZwd5ObmwIUKYTvInLkSnJ3rTmk1dwfXuWn8=;
-        b=oDjDLAEWUiuVLA2xtvNTfu0RjjxBlRdutWFO2NlfkkwslSq1+iGVUYTjByzD4l6DfE
-         EDNbIVCv4b79RwyLRjcARAU7EstJmYVOaDp/nI7OLXy8MSXNO+mhhIAmdkpwIALuJ3i7
-         mMZlNm/52Cyk+G1xqL33dSqjhlbYPO99X4KexoCNTaHidJZrpB2m+Wp3HAQbfm6hYiNM
-         zcznpR46/5jAMYcyA2FDnoinR8NkIqHtO1pl6JHN5BwqQyVefdc1xmvkyVWzhQaXqUnS
-         U3goOMX7vLgiwl2hDfpAqP8NsyIOHHtq+Kmi46sQxFf6Mxj2rJs4AiZrOnfQN2Bjz3xD
-         5Cnw==
-X-Gm-Message-State: AO0yUKXxsWuWau02uWFUvcVlxHYvdcASiYSCsyfHvAzJXl+/q5vuHJjb
-        kVfL5zSJyxxi0WRE/Am9z3306A==
-X-Google-Smtp-Source: AK7set8NaGAjOIa8kTwZzEhvCzFYesiBzdjCmPGndPULiKBjmur+M8FpGX8hzACaLs458oHc/KbObQ==
-X-Received: by 2002:a6b:3c0a:0:b0:719:6a2:99d8 with SMTP id k10-20020a6b3c0a000000b0071906a299d8mr1919987iob.0.1678902435147;
-        Wed, 15 Mar 2023 10:47:15 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id r14-20020a6b440e000000b00740710c0a65sm1811816ioa.47.2023.03.15.10.47.14
+        d=1e100.net; s=20210112; t=1678904365;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GgzilRrDZzjZzGZPzVxtA7dkKR8Cud+QjJJNSSQFpD0=;
+        b=ag+aYroNANTzbX7JHtudKNRRgSXTICHOXLC81RPUGJtTd93hDwFVxNU7EuwwCmKsLa
+         xUKQW2GwjKqyTbYuB7dn7BWduFKyegX+VsWMj/tz7ASQFnQBWRxN/6MUndO0q6qnFzcW
+         SaeMWr9GRPPH6/uNTJLP10zK/hUSCeiQf/a3i9DnFuIzJrxAPGUnrGaRPQSUpHv5emL2
+         xDVkDA9BobPHMoydEaA7HlRybx5Nm3asTJ9jw1ABnssaMNHsQOtmlWtjZU0spuNfMFXc
+         KUBrFrILlEl1K/Vie7BDlE+hodxhhrlKm64gg6KqzODHMumts4HXRR0WtEbC5zDuqVMW
+         AKlg==
+X-Gm-Message-State: AO0yUKVcNPaNGC9es7es3SR+XQHUU8b+wzIQBGe1xzRnlAzg7OKqt4np
+        UBg5ldMRLc9fe3rulRPdKdjH9Q==
+X-Google-Smtp-Source: AK7set8VcYEA2FNHiNt71e1UCyy1BH+LnV/QaaYc7e1fsnQTQLTwiKalxIxHMNkF25qJEH4XWQKcdQ==
+X-Received: by 2002:ac8:5cce:0:b0:3bf:c266:fa6f with SMTP id s14-20020ac85cce000000b003bfc266fa6fmr1378818qta.46.1678904365367;
+        Wed, 15 Mar 2023 11:19:25 -0700 (PDT)
+Received: from joelboxx.c.googlers.com.com (129.239.188.35.bc.googleusercontent.com. [35.188.239.129])
+        by smtp.gmail.com with ESMTPSA id v125-20020a379383000000b007458ae32290sm4113974qkd.128.2023.03.15.11.19.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:47:14 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        David Howells <dhowells@redhat.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Jason Gunthorpe <jgg@ziepe.ca>
-In-Reply-To: <20230315163549.295454-1-dhowells@redhat.com>
-References: <20230315163549.295454-1-dhowells@redhat.com>
-Subject: Re: [PATCH v19 00/15] splice, block: Use page pinning and kill
- ITER_PIPE
-Message-Id: <167890243414.54517.7660243890362126266.b4-ty@kernel.dk>
-Date:   Wed, 15 Mar 2023 11:47:14 -0600
+        Wed, 15 Mar 2023 11:19:24 -0700 (PDT)
+From:   "Joel Fernandes (Google)" <joel@joelfernandes.org>
+To:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     "Uladzislau Rezki (Sony)" <urezki@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Joel Fernandes <joel@joelfernandes.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 01/14] drbd: Rename kvfree_rcu() to kvfree_rcu_mightsleep()
+Date:   Wed, 15 Mar 2023 18:18:48 +0000
+Message-Id: <20230315181902.4177819-1-joel@joelfernandes.org>
+X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-2eb1a
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
 
-On Wed, 15 Mar 2023 16:35:34 +0000, David Howells wrote:
-> The first half of this patchset kills off ITER_PIPE to avoid a race between
-> truncate, iov_iter_revert() on the pipe and an as-yet incomplete DMA to a
-> bio with unpinned/unref'ed pages from an O_DIRECT splice read.  This causes
-> memory corruption[2].  Instead, we use filemap_splice_read(), which invokes
-> the buffered file reading code and splices from the pagecache into the
-> pipe; direct_splice_read(), which bulk-allocates a buffer, reads into it
-> and then pushes the filled pages into the pipe; or handle it in
-> filesystem-specific code.
-> 
-> [...]
+The kvfree_rcu() macro's single-argument form is deprecated.  Therefore
+switch to the new kvfree_rcu_mightsleep() variant. The goal is to
+avoid accidental use of the single-argument forms, which can introduce
+functionality bugs in atomic contexts and latency bugs in non-atomic
+contexts.
 
-Applied, thanks!
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
+Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+---
+ drivers/block/drbd/drbd_nl.c       | 6 +++---
+ drivers/block/drbd/drbd_receiver.c | 4 ++--
+ drivers/block/drbd/drbd_state.c    | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-[01/15] splice: Clean up direct_splice_read() a bit
-        commit: d187b44bc9404581bad8d006d80937d1b3a2b0c0
-[02/15] splice: Make do_splice_to() generic and export it
-        commit: 6dc39c2949ee71ee9996d6190d374512ecf44982
-[03/15] shmem: Implement splice-read
-        commit: b81d7b89beccbeebe347c21c004665ffe07e36bb
-[04/15] overlayfs: Implement splice-read
-        commit: f39de7bd1b5088241f0580b5fe5d76cc5569711f
-[05/15] coda: Implement splice-read
-        commit: f0daac2d4dcd286168d7c70d0495328c096d4d96
-[06/15] tty, proc, kernfs, random: Use direct_splice_read()
-        commit: 82ab8404c910d4aba33f55257c2bbc8ea9cfad3c
-[07/15] splice: Do splice read from a file without using ITER_PIPE
-        commit: 3eb3c59b128509a5e8a8349dafced64b9769438e
-[08/15] cifs: Use generic_file_splice_read()
-        commit: fa9a848ded4984a8c64d0d20c3a5b0aab97c7754
-[09/15] iov_iter: Kill ITER_PIPE
-        commit: a53f5dee3448a51e6602a7f98952abaf19049641
-[10/15] iomap: Don't get an reference on ZERO_PAGE for direct I/O block zeroing
-        commit: 2102c4e41418fb5c2cdf26bf2b97922190e38ba2
-[11/15] block: Fix bio_flagged() so that gcc can better optimise it
-        commit: caf8aae59a7b1f668a32f91115ed8be3aebaaa41
-[12/15] block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted logic
-        commit: e812d15adde4363c95f1743b7dd4946f1a550c5c
-[13/15] block: Add BIO_PAGE_PINNED and associated infrastructure
-        commit: b5596bf292996a5cd62f1fbc00c2c35f1a3faa12
-[14/15] block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
-        commit: 648627d7077d4de810e5f4c09490cb993514a53f
-[15/15] block: convert bio_map_user_iov to use iov_iter_extract_pages
-        commit: d187b44bc9404581bad8d006d80937d1b3a2b0c0
-
-Best regards,
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index 60757ac31701..f49f2a5282e1 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -1615,7 +1615,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
+ 			drbd_send_sync_param(peer_device);
+ 	}
+ 
+-	kvfree_rcu(old_disk_conf);
++	kvfree_rcu_mightsleep(old_disk_conf);
+ 	kfree(old_plan);
+ 	mod_timer(&device->request_timer, jiffies + HZ);
+ 	goto success;
+@@ -2446,7 +2446,7 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	mutex_unlock(&connection->resource->conf_update);
+ 	mutex_unlock(&connection->data.mutex);
+-	kvfree_rcu(old_net_conf);
++	kvfree_rcu_mightsleep(old_net_conf);
+ 
+ 	if (connection->cstate >= C_WF_REPORT_PARAMS) {
+ 		struct drbd_peer_device *peer_device;
+@@ -2860,7 +2860,7 @@ int drbd_adm_resize(struct sk_buff *skb, struct genl_info *info)
+ 		new_disk_conf->disk_size = (sector_t)rs.resize_size;
+ 		rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
+ 		mutex_unlock(&device->resource->conf_update);
+-		kvfree_rcu(old_disk_conf);
++		kvfree_rcu_mightsleep(old_disk_conf);
+ 		new_disk_conf = NULL;
+ 	}
+ 
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 757f4692b5bd..e197b2a465d2 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -3759,7 +3759,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
+ 		drbd_info(connection, "peer data-integrity-alg: %s\n",
+ 			  integrity_alg[0] ? integrity_alg : "(none)");
+ 
+-	kvfree_rcu(old_net_conf);
++	kvfree_rcu_mightsleep(old_net_conf);
+ 	return 0;
+ 
+ disconnect_rcu_unlock:
+@@ -4127,7 +4127,7 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
+ 
+ 			rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
+ 			mutex_unlock(&connection->resource->conf_update);
+-			kvfree_rcu(old_disk_conf);
++			kvfree_rcu_mightsleep(old_disk_conf);
+ 
+ 			drbd_info(device, "Peer sets u_size to %lu sectors (old: %lu)\n",
+ 				 (unsigned long)p_usize, (unsigned long)my_usize);
+diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
+index 75d13ea0024f..2aeea295fa28 100644
+--- a/drivers/block/drbd/drbd_state.c
++++ b/drivers/block/drbd/drbd_state.c
+@@ -2071,7 +2071,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
+ 		conn_free_crypto(connection);
+ 		mutex_unlock(&connection->resource->conf_update);
+ 
+-		kvfree_rcu(old_conf);
++		kvfree_rcu_mightsleep(old_conf);
+ 	}
+ 
+ 	if (ns_max.susp_fen) {
 -- 
-Jens Axboe
-
-
+2.40.0.rc1.284.g88254d51c5-goog
 
