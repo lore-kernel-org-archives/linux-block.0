@@ -2,126 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5994C74A5B
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 10:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBD5C7618A
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 11:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232220AbjCOKGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 06:06:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36562 "EHLO
+        id S231879AbjCOLS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 07:18:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231936AbjCOKFk (ORCPT
+        with ESMTP id S231895AbjCOLSH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 06:05:40 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7C259E47;
-        Wed, 15 Mar 2023 03:04:56 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32F9Cefn029844;
-        Wed, 15 Mar 2023 10:04:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=wm6XrG90RA3+jZ6n23uggt2rMBObnN4VNBwJHfOpGTE=;
- b=M44Xqnl31paXV/L6fzU/kv1+TckR4GM33EjTNJwlLwfFKkPYY+mhuqwHgWlcvE+sPOyR
- uMcz05rEHIjqfgFlf5oE0i1hM48skicjimHl4MGGS+wNx66Dildwo7lOEewbdDJ20ttN
- XoSsGW5VGFgizJ4uFYswHwPQc8PVAprz4Z/uHtc98zecjF28B8l2pNkHYXbt8o0uG5qi
- b1wEWmjLRIdFeIM6cCksZSrjuMht4XcNfuv40NZDNZSeMBupQu7POG3bd8lilsuACAfC
- cjuI3CEyqRc2REIdtJzpVKTCzdeApEFpUJKBD3aAaGk4wKSczmcCZxbCpRPcKEadlO99 Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbb67hbx8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 10:04:29 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32F9VHqX017522;
-        Wed, 15 Mar 2023 10:04:28 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbb67hbw0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 10:04:28 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32F3UQXO008910;
-        Wed, 15 Mar 2023 10:04:26 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3pb29t0gh0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 Mar 2023 10:04:25 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32FA4Nsf46596788
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 Mar 2023 10:04:23 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 845BF2006B;
-        Wed, 15 Mar 2023 10:04:23 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 24C1220063;
-        Wed, 15 Mar 2023 10:04:23 +0000 (GMT)
-Received: from [9.152.212.230] (unknown [9.152.212.230])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 15 Mar 2023 10:04:23 +0000 (GMT)
-Message-ID: <33ed9615-b570-03c7-9a7a-d07f020d3222@linux.ibm.com>
-Date:   Wed, 15 Mar 2023 11:04:22 +0100
+        Wed, 15 Mar 2023 07:18:07 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4582F4489;
+        Wed, 15 Mar 2023 04:17:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=fLp/3lhmGZhhr6T35BEOzQ7BwCL8lH8JN5yPMH5YQqA=; b=fkBu5WFzLh5l28dnaby02Efvus
+        9kFvQpTolF5xxKpH5rjq4/xTE8Bn4Z0Jqxl0BsbtaRhl6WyfYGsdf4/x/8GDVQx6/xGpba/kzd0Rm
+        Fm+u0KpufOzhUK/oMlrlMt19uIS4yPmndYnwlLbdGqyiNHjv2kVykldjkEnArTBsHgl9C3WeR/kM5
+        o4FkQkjT1K25hmReMEyHmR9KTRSUHT5Qiu8Zx0fLzjr5+XjLZlwQea00S/W6xVocHoN/XYVTA6p4W
+        4Ych9bWQ6vyzbeMpeWlUYV0Gie1ywZZNPGdrCgeleMDxmKGukAunjxbezWWoQjCkEpRUZdxpd2jjU
+        84C02fuQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pcP73-0025TW-0p;
+        Wed, 15 Mar 2023 11:16:10 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AA5E13001F7;
+        Wed, 15 Mar 2023 12:16:06 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 680F2212F1AE1; Wed, 15 Mar 2023 12:16:06 +0100 (CET)
+Date:   Wed, 15 Mar 2023 12:16:06 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Alexey Klimov <alexey.klimov@linaro.org>
+Cc:     draszik@google.com, peter.griffin@linaro.org,
+        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
+        tony@atomide.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        alim.akhtar@samsung.com, regressions@lists.linux.dev,
+        avri.altman@wdc.com, bvanassche@acm.org, klimova@google.com
+Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
+ and slow-stuck reboots
+Message-ID: <20230315111606.GB2006103@hirez.programming.kicks-ass.net>
+References: <20230314230004.961993-1-alexey.klimov@linaro.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-To:     Christoph Hellwig <hch@lst.de>,
-        Mike Christie <michael.christie@oracle.com>
-Cc:     bvanassche@acm.org, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, james.bottomley@hansenpartnership.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        kbusch@kernel.org, target-devel@vger.kernel.org,
-        Jan Hoeppner <hoeppner@linux.ibm.com>
-References: <20230224174502.321490-1-michael.christie@oracle.com>
- <20230224174502.321490-3-michael.christie@oracle.com>
- <20230314171119.GB6780@lst.de>
-Content-Language: en-US
-From:   Stefan Haberland <sth@linux.ibm.com>
-Subject: Re: [PATCH v4 02/18] block: Rename BLK_STS_NEXUS to
- BLK_STS_RESV_CONFLICT
-In-Reply-To: <20230314171119.GB6780@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Gm8knda4ABLDpRDHcHrrp25yIqxkZsPd
-X-Proofpoint-GUID: mK6UREPnREctSNluacMB5DE7veYDb5Ae
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-15_04,2023-03-15_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- priorityscore=1501 mlxscore=0 adultscore=0 spamscore=0 impostorscore=0
- mlxlogscore=999 phishscore=0 lowpriorityscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2302240000 definitions=main-2303150086
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230314230004.961993-1-alexey.klimov@linaro.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Am 14.03.23 um 18:11 schrieb Christoph Hellwig:
-> On Fri, Feb 24, 2023 at 11:44:46AM -0600, Mike Christie wrote:
->> BLK_STS_NEXUS is used for NVMe/SCSI reservation conflicts or in dasd's
->> case something similar. This renames BLK_STS_NEXUS so it better reflects
->> this.
-> I like this rename a lot.
->
->> diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
->> index a9c2a8d76c45..a2899d9690d4 100644
->> --- a/drivers/s390/block/dasd.c
->> +++ b/drivers/s390/block/dasd.c
->> @@ -2723,7 +2723,7 @@ static void __dasd_cleanup_cqr(struct dasd_ccw_req *cqr)
->>   	else if (status == 0) {
->>   		switch (cqr->intrc) {
->>   		case -EPERM:
->> -			error = BLK_STS_NEXUS;
->> +			error = BLK_STS_RESV_CONFLICT;
->>   			break;
-> But is this really a reservation conflict?  Or should the DASD code
-> maybe use a different error code here?
->
 
-This also fits for the DASD case. We use this error code for a
-reservation/locking conflict of the DASD device when the lock we
-previously held was stolen.
+(could you wrap your email please)
 
-Acked-by: Stefan Haberland <sth@linux.ibm.com>
+On Tue, Mar 14, 2023 at 11:00:04PM +0000, Alexey Klimov wrote:
+> #regzbot introduced: 0c5ffc3d7b15 #regzbot title:
+> CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait() and slow-stuck
+> reboots
+> 
+> The upstream changes are being merged into android-mainline repo and
+> at some point we started to observe kernel panics on reboot or long
+> reboot times.
 
+On what hardware? I find it somewhat hard to follow this DT code :/
+
+> Looks like adding CPUIDLE_FLAG_RCU_IDLE flag to idle driver caused
+> this behaviour.  The minimal change that is required for this system
+> to avoid the regression would be one liner that removes the flag
+> (below).
+> 
+> But if it is a real regression, then other idle drivers if used will
+> likely cause this regression too withe same ufshcd driver. There is
+> also a suspicion that CPUIDLE_FLAG_RCU_IDLE just revealed or uncovered
+> some other problem.
+> 
+> Any thoughts on this? 
+
+So ARM has a weird 'rule' in that idle state 0 (wfi) should not have
+RCU_IDLE set, while others should have.
+
+Of the dt_init_idle_driver() users:
+
+ - cpuidle-arm: arm_enter_idle_state()
+ - cpuidle-big_little: bl_enter_powerdown() does ct_cpuidle_{enter,exit}()
+ - cpuidle-psci: psci_enter_idle_state() uses CPU_PM_CPU_IDLE_ENTER_PARAM_RCU()
+ - cpuidle-qcom-spm: spm_enter_idle_state() uses CPU_PM_CPU_IDLE_ENTER_PARAM()
+ - cpuidle-riscv-sbi: sbi_cpuidle_enter_state() uses CPU_PM_CPU_IDLE_ENTER_*_PARAM()
+
+All of them start on index 1 and hence should have RCU_IDLE set, but at
+least the arm, qcom-spm and riscv-sbi don't actually appear to abide by
+the rules.
+
+Fixing that gives me the below; does that help?
+
+---
+
+diff --git a/drivers/cpuidle/cpuidle-arm.c b/drivers/cpuidle/cpuidle-arm.c
+index 7cfb980a357d..58fa81f0fa7d 100644
+--- a/drivers/cpuidle/cpuidle-arm.c
++++ b/drivers/cpuidle/cpuidle-arm.c
+@@ -39,7 +39,7 @@ static __cpuidle int arm_enter_idle_state(struct cpuidle_device *dev,
+ 	 * will call the CPU ops suspend protocol with idle index as a
+ 	 * parameter.
+ 	 */
+-	return CPU_PM_CPU_IDLE_ENTER(arm_cpuidle_suspend, idx);
++	return CPU_PM_CPU_IDLE_ENTER_RCU(arm_cpuidle_suspend, idx);
+ }
+ 
+ static struct cpuidle_driver arm_idle_driver __initdata = {
+diff --git a/drivers/cpuidle/cpuidle-qcom-spm.c b/drivers/cpuidle/cpuidle-qcom-spm.c
+index c6e2e91bb4c3..429db2d40114 100644
+--- a/drivers/cpuidle/cpuidle-qcom-spm.c
++++ b/drivers/cpuidle/cpuidle-qcom-spm.c
+@@ -64,7 +64,7 @@ static __cpuidle int spm_enter_idle_state(struct cpuidle_device *dev,
+ 	struct cpuidle_qcom_spm_data *data = container_of(drv, struct cpuidle_qcom_spm_data,
+ 							  cpuidle_driver);
+ 
+-	return CPU_PM_CPU_IDLE_ENTER_PARAM(qcom_cpu_spc, idx, data->spm);
++	return CPU_PM_CPU_IDLE_ENTER_PARAM_RCU(qcom_cpu_spc, idx, data->spm);
+ }
+ 
+ static struct cpuidle_driver qcom_spm_idle_driver = {
+diff --git a/drivers/cpuidle/cpuidle-riscv-sbi.c b/drivers/cpuidle/cpuidle-riscv-sbi.c
+index be383f4b6855..04a601cda06b 100644
+--- a/drivers/cpuidle/cpuidle-riscv-sbi.c
++++ b/drivers/cpuidle/cpuidle-riscv-sbi.c
+@@ -100,10 +100,9 @@ static __cpuidle int sbi_cpuidle_enter_state(struct cpuidle_device *dev,
+ 	u32 state = states[idx];
+ 
+ 	if (state & SBI_HSM_SUSP_NON_RET_BIT)
+-		return CPU_PM_CPU_IDLE_ENTER_PARAM(sbi_suspend, idx, state);
+-	else
+-		return CPU_PM_CPU_IDLE_ENTER_RETENTION_PARAM(sbi_suspend,
+-							     idx, state);
++		return CPU_PM_CPU_IDLE_ENTER_PARAM_RCU(sbi_suspend, idx, state);
++
++	return CPU_PM_CPU_IDLE_ENTER_RETENTION_PARAM_RCU(sbi_suspend, idx, state);
+ }
+ 
+ static __cpuidle int __sbi_enter_domain_idle_state(struct cpuidle_device *dev,
+diff --git a/include/linux/cpuidle.h b/include/linux/cpuidle.h
+index 3183aeb7f5b4..dd92bdafe2d3 100644
+--- a/include/linux/cpuidle.h
++++ b/include/linux/cpuidle.h
+@@ -334,6 +334,9 @@ extern s64 cpuidle_governor_latency_req(unsigned int cpu);
+ #define CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx)	\
+ 	__CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx, idx, 0, 0)
+ 
++#define CPU_PM_CPU_IDLE_ENTER_RCU(low_level_idle_enter, idx)	\
++	__CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx, idx, 0, 1)
++
+ #define CPU_PM_CPU_IDLE_ENTER_RETENTION(low_level_idle_enter, idx)	\
+ 	__CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx, idx, 1, 0)
+ 
