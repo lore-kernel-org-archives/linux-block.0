@@ -2,162 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBD5C7618A
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 11:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5863DC6FD1D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 12:34:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231879AbjCOLS0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 07:18:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36552 "EHLO
+        id S232745AbjCOMeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 08:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231895AbjCOLSH (ORCPT
+        with ESMTP id S232655AbjCOMeB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 07:18:07 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4582F4489;
-        Wed, 15 Mar 2023 04:17:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=fLp/3lhmGZhhr6T35BEOzQ7BwCL8lH8JN5yPMH5YQqA=; b=fkBu5WFzLh5l28dnaby02Efvus
-        9kFvQpTolF5xxKpH5rjq4/xTE8Bn4Z0Jqxl0BsbtaRhl6WyfYGsdf4/x/8GDVQx6/xGpba/kzd0Rm
-        Fm+u0KpufOzhUK/oMlrlMt19uIS4yPmndYnwlLbdGqyiNHjv2kVykldjkEnArTBsHgl9C3WeR/kM5
-        o4FkQkjT1K25hmReMEyHmR9KTRSUHT5Qiu8Zx0fLzjr5+XjLZlwQea00S/W6xVocHoN/XYVTA6p4W
-        4Ych9bWQ6vyzbeMpeWlUYV0Gie1ywZZNPGdrCgeleMDxmKGukAunjxbezWWoQjCkEpRUZdxpd2jjU
-        84C02fuQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pcP73-0025TW-0p;
-        Wed, 15 Mar 2023 11:16:10 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id AA5E13001F7;
-        Wed, 15 Mar 2023 12:16:06 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 680F2212F1AE1; Wed, 15 Mar 2023 12:16:06 +0100 (CET)
-Date:   Wed, 15 Mar 2023 12:16:06 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Alexey Klimov <alexey.klimov@linaro.org>
-Cc:     draszik@google.com, peter.griffin@linaro.org,
-        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
-        tony@atomide.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        alim.akhtar@samsung.com, regressions@lists.linux.dev,
-        avri.altman@wdc.com, bvanassche@acm.org, klimova@google.com
-Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
- and slow-stuck reboots
-Message-ID: <20230315111606.GB2006103@hirez.programming.kicks-ass.net>
-References: <20230314230004.961993-1-alexey.klimov@linaro.org>
+        Wed, 15 Mar 2023 08:34:01 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD0869FBE9
+        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 05:32:44 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230315123236euoutp013b1447f1ab7f02cc2945ca559e3ebc8b~Ml7MUifDC2675726757euoutp01D
+        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 12:32:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230315123236euoutp013b1447f1ab7f02cc2945ca559e3ebc8b~Ml7MUifDC2675726757euoutp01D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1678883556;
+        bh=ykKPRIypeSKVaDre01XbjaH9/YVIiqKYL9EWvo/S2nY=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=VoKw1Tcp4cjWDG2KDq6FYtdu1ywDgF0UiIGe0sZKPUTD3Z7RguFTgEOJIdf3Fj6Lp
+         HMmUj54qlqQBWU/zytXodhQK/PpDSc+qFIfODc+NV3WPsWot5VVZ4tKtGpuVu6xCdr
+         yrLSUnxbq0K38hgRS+XL/Gxkiaaoj542Yaza3DDg=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230315123234eucas1p2b5b92251f39ab613d887dd832d91d5e7~Ml7Ky7IgR1509115091eucas1p2r;
+        Wed, 15 Mar 2023 12:32:34 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 0C.70.09503.2EAB1146; Wed, 15
+        Mar 2023 12:32:34 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230315123234eucas1p179bf8c0583a71d91bef7e909d7ec6504~Ml7KWawqf2754127541eucas1p1-;
+        Wed, 15 Mar 2023 12:32:34 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230315123234eusmtrp13d1335c93e077877fca4327b447c8295~Ml7KVrG131056310563eusmtrp1t;
+        Wed, 15 Mar 2023 12:32:34 +0000 (GMT)
+X-AuditID: cbfec7f2-e8fff7000000251f-15-6411bae22586
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id EC.AF.09583.2EAB1146; Wed, 15
+        Mar 2023 12:32:34 +0000 (GMT)
+Received: from localhost (unknown [106.210.248.172]) by eusmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230315123234eusmtip1ee33ed5ffeb24bba0305d7a1d80dec28~Ml7KEHbZD0648506485eusmtip1z;
+        Wed, 15 Mar 2023 12:32:34 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     hubcap@omnibond.com, senozhatsky@chromium.org, martin@omnibond.com,
+        willy@infradead.org, minchan@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, axboe@kernel.dk, akpm@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        gost.dev@samsung.com, mcgrof@kernel.org, devel@lists.orangefs.org,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: [RFC PATCH 0/3] convert page_endio to folio_endio
+Date:   Wed, 15 Mar 2023 13:32:30 +0100
+Message-Id: <20230315123233.121593-1-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230314230004.961993-1-alexey.klimov@linaro.org>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHKsWRmVeSWpSXmKPExsWy7djPc7qPdgmmGEydq28xZ/0aNovVd/vZ
+        LF4f/sRosX/zFCaLmwd2Mlm03+1jsth7S9tiz96TLBaXd81hs7i35j+rxcn1/5ktbkx4ymix
+        7Ot7dovPS1vYLXZvXMRmcf7vcVaL3z/msDkIesxuuMjisXmFlsfls6Uem1Z1snls+jSJ3ePE
+        jN8sHg1Tb7F5/Lp9h9Wjb8sqRo/Pm+Q8Nj15yxTAHcVlk5Kak1mWWqRvl8CV8X7FZ/aCuewV
+        7Z82szQw7mHtYuTkkBAwkdi+dgVbFyMXh5DACkaJzX8/MUI4Xxglvs6ZxQThfGaUaD+0jL2L
+        kQOs5dsGZ4j4ckaJu1NWsUI4Lxkldv9exwhSxCagJdHYyQ4SFxE4wyjxpGUi2A5mgfuMEteb
+        frODLBcWsJKY+Xg/E4jNIqAq0f1oOSOIzQsUn3NnKTvEgfIS+w+eZYaIC0qcnPmEBcRmBoo3
+        b53NDDJUQmAxp8SKh1uhPnKRWH1vM1SzsMSr41ugbBmJ05N7WCDsaomnN35DNbcwSvTvXM8G
+        8Zu1RN+ZHBCTWUBTYv0ufYhyR4kLuzuYICr4JG68FYQ4gU9i0rbpzBBhXomONiGIaiWJnT+f
+        QC2VkLjcNAdqqYfE8YeLwD4UEoiVmPZ8BvsERoVZSB6bheSxWQg3LGBkXsUonlpanJueWmyY
+        l1quV5yYW1yal66XnJ+7iRGYBE//O/5pB+PcVx/1DjEycTAeYpTgYFYS4Q1nEUgR4k1JrKxK
+        LcqPLyrNSS0+xCjNwaIkzqttezJZSCA9sSQ1OzW1ILUIJsvEwSnVwBSxkj3lhkroci775Zdf
+        bzkzMX/5+yKu2RK8R3bWe09zv2yzQF8znaWpkyMtZfL2zEPqQncDBY5Uf1WadrW6nI1VrPdT
+        V5SXnGRw4fwL5gtedd/nmfT728ZlMWG5m0TNg87lb9hxpDr5501LnpikCZwL354QMv7UmJkv
+        kimuobLj1crlhSx3fqa5ldyKm27Y+E6qsvHWijWcHg+m5xW4lKw8f01DuYF1GcfRvg0i/o2C
+        Muoz9wjyXWk/r/frFsemNQzz1j9ua9+hOVW1vbxO8oRI14+Hq5MvarQWnRQJz6tf2LROhIl9
+        SZdAesbFJWeubNqsk6TF0nhZS5jp0bsLqvWnt/109Khe7KMtt0b2rRJLcUaioRZzUXEiAJyp
+        NpLxAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNIsWRmVeSWpSXmKPExsVy+t/xu7qPdgmmGLSdErSYs34Nm8Xqu/1s
+        Fq8Pf2K02L95CpPFzQM7mSza7/YxWey9pW2xZ+9JFovLu+awWdxb85/V4uT6/8wWNyY8ZbRY
+        9vU9u8XnpS3sFrs3LmKzOP/3OKvF7x9z2BwEPWY3XGTx2LxCy+Py2VKPTas62Tw2fZrE7nFi
+        xm8Wj4apt9g8ft2+w+rRt2UVo8fnTXIem568ZQrgjtKzKcovLUlVyMgvLrFVija0MNIztLTQ
+        MzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DLeL/iM3vBXPaK9k+bWRoY97B2MXJwSAiYSHzb
+        4NzFyMUhJLCUUeLT+qPMXYycQHEJidsLmxghbGGJP9e62CCKnjNK3NsxixGkmU1AS6Kxkx0k
+        LiJwg1Fi6qVfjCAOM0jRs5t3WEG6hQWsJGY+3s8EYrMIqEp0P1oONpUXKD7nzlJ2iA3yEvsP
+        nmUGGcosoCmxfpc+RImgxMmZT1hAbGagkuats5knMPLPQqiahaRqFpKqBYzMqxhFUkuLc9Nz
+        i430ihNzi0vz0vWS83M3MQJjdduxn1t2MK589VHvECMTB+MhRgkOZiUR3nAWgRQh3pTEyqrU
+        ovz4otKc1OJDjKZAV09klhJNzgcmi7ySeEMzA1NDEzNLA1NLM2MlcV7Pgo5EIYH0xJLU7NTU
+        gtQimD4mDk6pBqYFdr/1JpWtC6/lbCuys/l178+W3CULf51bZjKjsl42ML7PsDHyjd/n61oJ
+        YjYqagJPmlZEnS2LcX7tbrFrdw/P+TK7G965lu3yvz/N0bCcxVqhwVGeIVXI4LVN9kSSruQW
+        e/XzvjxfL/TenBWa+VTZJFVZWHVm7rGsFp7Urt47krlqSsFil5XnPxcTtGSPPXvJraPD+fY3
+        y/p5QurPrJW3uW3UWK5a35l6gPPKe5tVuQf4MjgMem9p3JxsuyBl6dHg5d2TUrnzTetbDey1
+        HnzSMngyf83ikFv8EV75n29PTgl/aNIbYiET8lH+SpFd1W62Ly4NHPrSKa1FXl4PxZJc7RNk
+        AkNc4xQS5iuxFGckGmoxFxUnAgDOtCM3XgMAAA==
+X-CMS-MailID: 20230315123234eucas1p179bf8c0583a71d91bef7e909d7ec6504
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20230315123234eucas1p179bf8c0583a71d91bef7e909d7ec6504
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230315123234eucas1p179bf8c0583a71d91bef7e909d7ec6504
+References: <CGME20230315123234eucas1p179bf8c0583a71d91bef7e909d7ec6504@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+page_endio() already works on folios by converting a page in to a folio as
+the first step. This small series converts page_endio() to take a folio as
+the first parameter instead of a page, and use native folio API at the
+callee site to simplify the call to the converted folio_endio()
+function.
 
-(could you wrap your email please)
+mpage changes were tested with a simple boot testing. zram and orangefs is
+only build tested. No functional changes were introduced as a part of
+this AFAIK.
 
-On Tue, Mar 14, 2023 at 11:00:04PM +0000, Alexey Klimov wrote:
-> #regzbot introduced: 0c5ffc3d7b15 #regzbot title:
-> CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait() and slow-stuck
-> reboots
-> 
-> The upstream changes are being merged into android-mainline repo and
-> at some point we started to observe kernel panics on reboot or long
-> reboot times.
+Pankaj Raghav (3):
+  filemap: convert page_endio to folio_endio
+  mpage: use bio_for_each_folio_all in mpage_end_io()
+  orangefs: use folio in orangefs_readahead()
 
-On what hardware? I find it somewhat hard to follow this DT code :/
+ drivers/block/zram/zram_drv.c |  2 +-
+ fs/mpage.c                    | 11 ++++-------
+ fs/orangefs/inode.c           |  8 ++++----
+ include/linux/pagemap.h       |  2 +-
+ mm/filemap.c                  |  8 +++-----
+ 5 files changed, 13 insertions(+), 18 deletions(-)
 
-> Looks like adding CPUIDLE_FLAG_RCU_IDLE flag to idle driver caused
-> this behaviour.  The minimal change that is required for this system
-> to avoid the regression would be one liner that removes the flag
-> (below).
-> 
-> But if it is a real regression, then other idle drivers if used will
-> likely cause this regression too withe same ufshcd driver. There is
-> also a suspicion that CPUIDLE_FLAG_RCU_IDLE just revealed or uncovered
-> some other problem.
-> 
-> Any thoughts on this? 
+-- 
+2.34.1
 
-So ARM has a weird 'rule' in that idle state 0 (wfi) should not have
-RCU_IDLE set, while others should have.
-
-Of the dt_init_idle_driver() users:
-
- - cpuidle-arm: arm_enter_idle_state()
- - cpuidle-big_little: bl_enter_powerdown() does ct_cpuidle_{enter,exit}()
- - cpuidle-psci: psci_enter_idle_state() uses CPU_PM_CPU_IDLE_ENTER_PARAM_RCU()
- - cpuidle-qcom-spm: spm_enter_idle_state() uses CPU_PM_CPU_IDLE_ENTER_PARAM()
- - cpuidle-riscv-sbi: sbi_cpuidle_enter_state() uses CPU_PM_CPU_IDLE_ENTER_*_PARAM()
-
-All of them start on index 1 and hence should have RCU_IDLE set, but at
-least the arm, qcom-spm and riscv-sbi don't actually appear to abide by
-the rules.
-
-Fixing that gives me the below; does that help?
-
----
-
-diff --git a/drivers/cpuidle/cpuidle-arm.c b/drivers/cpuidle/cpuidle-arm.c
-index 7cfb980a357d..58fa81f0fa7d 100644
---- a/drivers/cpuidle/cpuidle-arm.c
-+++ b/drivers/cpuidle/cpuidle-arm.c
-@@ -39,7 +39,7 @@ static __cpuidle int arm_enter_idle_state(struct cpuidle_device *dev,
- 	 * will call the CPU ops suspend protocol with idle index as a
- 	 * parameter.
- 	 */
--	return CPU_PM_CPU_IDLE_ENTER(arm_cpuidle_suspend, idx);
-+	return CPU_PM_CPU_IDLE_ENTER_RCU(arm_cpuidle_suspend, idx);
- }
- 
- static struct cpuidle_driver arm_idle_driver __initdata = {
-diff --git a/drivers/cpuidle/cpuidle-qcom-spm.c b/drivers/cpuidle/cpuidle-qcom-spm.c
-index c6e2e91bb4c3..429db2d40114 100644
---- a/drivers/cpuidle/cpuidle-qcom-spm.c
-+++ b/drivers/cpuidle/cpuidle-qcom-spm.c
-@@ -64,7 +64,7 @@ static __cpuidle int spm_enter_idle_state(struct cpuidle_device *dev,
- 	struct cpuidle_qcom_spm_data *data = container_of(drv, struct cpuidle_qcom_spm_data,
- 							  cpuidle_driver);
- 
--	return CPU_PM_CPU_IDLE_ENTER_PARAM(qcom_cpu_spc, idx, data->spm);
-+	return CPU_PM_CPU_IDLE_ENTER_PARAM_RCU(qcom_cpu_spc, idx, data->spm);
- }
- 
- static struct cpuidle_driver qcom_spm_idle_driver = {
-diff --git a/drivers/cpuidle/cpuidle-riscv-sbi.c b/drivers/cpuidle/cpuidle-riscv-sbi.c
-index be383f4b6855..04a601cda06b 100644
---- a/drivers/cpuidle/cpuidle-riscv-sbi.c
-+++ b/drivers/cpuidle/cpuidle-riscv-sbi.c
-@@ -100,10 +100,9 @@ static __cpuidle int sbi_cpuidle_enter_state(struct cpuidle_device *dev,
- 	u32 state = states[idx];
- 
- 	if (state & SBI_HSM_SUSP_NON_RET_BIT)
--		return CPU_PM_CPU_IDLE_ENTER_PARAM(sbi_suspend, idx, state);
--	else
--		return CPU_PM_CPU_IDLE_ENTER_RETENTION_PARAM(sbi_suspend,
--							     idx, state);
-+		return CPU_PM_CPU_IDLE_ENTER_PARAM_RCU(sbi_suspend, idx, state);
-+
-+	return CPU_PM_CPU_IDLE_ENTER_RETENTION_PARAM_RCU(sbi_suspend, idx, state);
- }
- 
- static __cpuidle int __sbi_enter_domain_idle_state(struct cpuidle_device *dev,
-diff --git a/include/linux/cpuidle.h b/include/linux/cpuidle.h
-index 3183aeb7f5b4..dd92bdafe2d3 100644
---- a/include/linux/cpuidle.h
-+++ b/include/linux/cpuidle.h
-@@ -334,6 +334,9 @@ extern s64 cpuidle_governor_latency_req(unsigned int cpu);
- #define CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx)	\
- 	__CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx, idx, 0, 0)
- 
-+#define CPU_PM_CPU_IDLE_ENTER_RCU(low_level_idle_enter, idx)	\
-+	__CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx, idx, 0, 1)
-+
- #define CPU_PM_CPU_IDLE_ENTER_RETENTION(low_level_idle_enter, idx)	\
- 	__CPU_PM_CPU_IDLE_ENTER(low_level_idle_enter, idx, idx, 1, 0)
- 
