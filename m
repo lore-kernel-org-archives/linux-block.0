@@ -2,85 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEC2DC6FD1D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 14:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5683CC61DA4
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 14:51:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231976AbjCOOu3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 10:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59708 "EHLO
+        id S232707AbjCOOvp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 10:51:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232490AbjCOOu1 (ORCPT
+        with ESMTP id S232710AbjCOOvm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 10:50:27 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE17A19105
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 07:50:25 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id a13so4084365ilr.9
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 07:50:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1678891825;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=urXmFSAIqf9cS2Q7Ffm5vzZ5mhS0kxXVV0tqFPT2Av4=;
-        b=5af9DsZG3gLmtc4J04ljgHUvZkX42GJGypgA/wbIfXI7i8e2f57gALNgN4aDUId3hD
-         JGKSvb3tDvcfJKePSqk6+Q0/dPuVKxfzDLX9JDl+2Vcr1LBzoWjvbNek2Rka2E8NCaSA
-         YCUUlkXkApkadJh2KiirsgKfv86VfmlGkQgbsprQ1Stxs25JtGEQXAQoK0fV4WWWfwRI
-         fJ/4tkx9/V6J+FLb5En1NXB7lBRxOnlbAUdw7ZhdA8DFf+IBit30bWSq6Rg4WVLvh3Ik
-         5RBeboHAinH1IsTgOtmuOdex64xzr56SAvZoh9Z9wSuuJvV3d5V3IFW5isK7G+WfGH6q
-         HECA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678891825;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=urXmFSAIqf9cS2Q7Ffm5vzZ5mhS0kxXVV0tqFPT2Av4=;
-        b=AeK8LpyiQ7rj00ypdaC6D4kBgWQOrzE+Mu/94R9bQ/EbGU2D+sHzB/Ac3Qf8ry354m
-         qsoR+evB3OmlKJ4KKR4ImHREUcD++rQbiJZfhGf0vsgBivY+QPgD37avcVhNT7FrIXzD
-         RgPX01oihoaHaML7NoK749MR21xncjBNj9X1SApxe5FFgOlcFrHPPy/qyRn8InTMQmJB
-         hgpBPdFWRjI/nH9vl/uQ4pbz1AHM3oLPwphY1Cbzvn0+NzrGLqNlbtRdg6F99B+9XaFv
-         ay2hDSiVaglqaqEbyMFaOTW/ctmRdua+dZjAzK+9Cak5zKmpa4mDQz+k223g+SAQf7Tw
-         un2w==
-X-Gm-Message-State: AO0yUKU2PAegFZdPyjWiEw0O81d6Rngmx4QIEPvRCFgCWk7Algfl1FcH
-        PvZ37vlRv4/VB2Fcq5gUnYj5irbdq973TQ7o009b9g==
-X-Google-Smtp-Source: AK7set/6/dLlRlJxLEVfGwJ5YXSxzZCp1HL91wY/z22IQmFtcz+ZhO0jmLsZzsKMSNgO63CrwAI7AQ==
-X-Received: by 2002:a92:b10d:0:b0:319:9153:3750 with SMTP id t13-20020a92b10d000000b0031991533750mr11925734ilh.1.1678891825021;
-        Wed, 15 Mar 2023 07:50:25 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id g7-20020a92dd87000000b00310f9a0f8a7sm1662460iln.76.2023.03.15.07.50.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 07:50:24 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, Liang He <windhl@126.com>
-In-Reply-To: <20230315062032.1741692-1-windhl@126.com>
-References: <20230315062032.1741692-1-windhl@126.com>
-Subject: Re: [PATCH] block: sunvdc: add check for mdesc_grab()
-Message-Id: <167889182429.39055.10570504254967369328.b4-ty@kernel.dk>
-Date:   Wed, 15 Mar 2023 08:50:24 -0600
+        Wed, 15 Mar 2023 10:51:42 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8154C61885;
+        Wed, 15 Mar 2023 07:51:40 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3FED4219B2;
+        Wed, 15 Mar 2023 14:51:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1678891899; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7zN92RATXHClyStOM+d5V8uZWcn/TnTw/Njd/6C4epA=;
+        b=hhtriCNraBCnTfLEs3tdlL0KY8e9/UGeNlNxe/Rzcn3Y2wQmJl9Zhfw5kwz764TkjVZIW2
+        KBz3ViihppZ1vOiOUmS5GlzcZenc7ZpupP8OI+HTM18Nl7XfjBx56GNBl6xwuBsEqznvbA
+        VHxg/JEM6yX5nHOsXcypLNLjzgNRrQA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1678891899;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7zN92RATXHClyStOM+d5V8uZWcn/TnTw/Njd/6C4epA=;
+        b=3KraaO6gycZxDWk83e+AXp9e/HO+t+93D+tFnY0MOiGFNcA9jaDsWN//mFB/SY6YL1PVTy
+        p4ffaRKzuVcYxbAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 682FD13A00;
+        Wed, 15 Mar 2023 14:51:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id cp2tFXrbEWTpVQAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 15 Mar 2023 14:51:38 +0000
+Message-ID: <a0984167-76bd-ec7c-08a7-93b29f364843@suse.de>
+Date:   Wed, 15 Mar 2023 15:51:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [RFC PATCH 1/3] filemap: convert page_endio to folio_endio
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>, hubcap@omnibond.com,
+        senozhatsky@chromium.org, martin@omnibond.com, willy@infradead.org,
+        minchan@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+        axboe@kernel.dk, akpm@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        gost.dev@samsung.com, mcgrof@kernel.org, devel@lists.orangefs.org
+References: <20230315123233.121593-1-p.raghav@samsung.com>
+ <CGME20230315123234eucas1p2503d83ad0180cecde02e924d7b143535@eucas1p2.samsung.com>
+ <20230315123233.121593-2-p.raghav@samsung.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230315123233.121593-2-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-2eb1a
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Wed, 15 Mar 2023 14:20:32 +0800, Liang He wrote:
-> In vdc_port_probe(), we should check the return value
-> of mdesc_grab() as it may return NULL, which can cause
-> potential NPD bug.
+On 3/15/23 13:32, Pankaj Raghav wrote:
+> page_endio() already works on folios by converting a page in to a folio as
+> the first step. Convert page_endio to folio_endio by taking a folio as the
+> first parameter.
 > 
+> Instead of doing a page to folio conversion in the page_endio()
+> function, the consumers of this API do this conversion and call the
+> folio_endio() function in this patch.
+> The following patches will convert the consumers of this API to use native
+> folio functions to pass to folio_endio().
 > 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> ---
+>   drivers/block/zram/zram_drv.c | 2 +-
+>   fs/mpage.c                    | 2 +-
+>   fs/orangefs/inode.c           | 2 +-
+>   include/linux/pagemap.h       | 2 +-
+>   mm/filemap.c                  | 8 +++-----
+>   5 files changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index aa490da3cef2..f441251c9138 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -610,7 +610,7 @@ static void zram_page_end_io(struct bio *bio)
+>   {
+>   	struct page *page = bio_first_page_all(bio);
+>   
+> -	page_endio(page, op_is_write(bio_op(bio)),
+> +	folio_endio(page_folio(page), op_is_write(bio_op(bio)),
+>   			blk_status_to_errno(bio->bi_status));
+>   	bio_put(bio);
+>   }
+> diff --git a/fs/mpage.c b/fs/mpage.c
+> index 22b9de5ddd68..40e86e839e77 100644
+> --- a/fs/mpage.c
+> +++ b/fs/mpage.c
+> @@ -50,7 +50,7 @@ static void mpage_end_io(struct bio *bio)
+>   
+>   	bio_for_each_segment_all(bv, bio, iter_all) {
+>   		struct page *page = bv->bv_page;
+> -		page_endio(page, bio_op(bio),
+> +		folio_endio(page_folio(page), bio_op(bio),
+>   			   blk_status_to_errno(bio->bi_status));
+>   	}
+>   
+Can't this be converted to use 'bio_for_each_folio_all()' instead of
+bio_for_each_segment_all()?
 
-Applied, thanks!
+Cheers,
 
-[1/1] block: sunvdc: add check for mdesc_grab()
-      commit: 6030363199e3a6341afb467ddddbed56640cbf6a
-
-Best regards,
--- 
-Jens Axboe
-
-
+Hannes
 
