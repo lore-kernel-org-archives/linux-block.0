@@ -2,143 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51AFBC61DA4
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 03:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0644C61DA4
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 03:34:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbjCODQv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 23:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56138 "EHLO
+        id S230348AbjCODes (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 23:34:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjCODQu (ORCPT
+        with ESMTP id S229673AbjCODeh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 23:16:50 -0400
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D43457D0
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 20:16:48 -0700 (PDT)
-Received: by mail-il1-f198.google.com with SMTP id d6-20020a92d786000000b00316f1737173so9401523iln.16
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 20:16:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678850207;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vGBVKQOu//U9MZYEieyhjs1JmosA1wF9zZa3sb+J/0w=;
-        b=ijeDBaA2YOMmqCZi6nT9qIjB4HtQsuM23gHsk5IGnpGcX3SMQkAj+Isl+xWz3KkeTu
-         h0IlAzhdSZynP8lvFadPSs4G7I7fPMiL9M+HH76Us76+JHhAIISDgHK9yDGa8te3+/ZA
-         CwXG2srX3qnXGammXe0xjWwAs5AXS2nZ3MC/b89Kt3WK6pRnhj0fhljrZAVSraNxdpiN
-         yIlB89C6Ah+ScnNMBGHuZSEs+dwqXB8ZeyLMNw2OVW9p3/75DCsgc1cPZpCW7g2gRzgU
-         WiCdNGV74/Us7psw/YgNlQi3BPVZhubcfMO1L5Ed6r2f6ziZ0Wid3+I1RDiDDanxW15O
-         IXHg==
-X-Gm-Message-State: AO0yUKWRyrkEl+W1k+LxhIaTQ4bc4uHUwfOkitBye7h8Jr8jK7L4Mh6F
-        6qwlcmcqWSoZ2Ev1d09UsICOLPC5TpG47dDBMzL20/iDPKGj
-X-Google-Smtp-Source: AK7set/GAqdOFmxcV2MmuG0PXBuF4cINuIPZG+o9uUcOG/MPMfL6gi+8XaWlhl77JLjbUkmLCXIZouRhhiQFP3qYrJBgz9fMtBCf
+        Tue, 14 Mar 2023 23:34:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79AF15A6FB
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 20:33:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678851230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P8AT5dPnPUO+JypixZa88t/Pmtrax3iyp7vcDArwYms=;
+        b=AWzriW/dvDNz0t4GiM4C+TfczO8oY4pNVVIqFFl9VNaGjrk6ElS9Qzx2CyNlVJrgelJjfG
+        BjMmxCE3MozC8E6GasqIhKbhdjgtTcPvhpYVUIyGpG1OgewdLmWnqEBvxOvzIzSrAVSroc
+        e0CeVdSd12GZmFKO6vq0CLZgrQpx26o=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-638-XmQ9F8K2Pk-Z_PtwFA-QGw-1; Tue, 14 Mar 2023 23:33:45 -0400
+X-MC-Unique: XmQ9F8K2Pk-Z_PtwFA-QGw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 99C1D1C0418B;
+        Wed, 15 Mar 2023 03:33:44 +0000 (UTC)
+Received: from ovpn-8-22.pek2.redhat.com (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B22940B3ED6;
+        Wed, 15 Mar 2023 03:33:37 +0000 (UTC)
+Date:   Wed, 15 Mar 2023 11:33:32 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Eric Blake <eblake@redhat.com>
+Cc:     Nir Soffer <nsoffer@redhat.com>, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, nbd@other.debian.org,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, corbet@lwn.net,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: [PATCH 2/3] uapi nbd: add cookie alias to handle
+Message-ID: <ZBE8jPO5RomMUTmG@ovpn-8-22.pek2.redhat.com>
+References: <20230310201525.2615385-1-eblake@redhat.com>
+ <20230310201525.2615385-3-eblake@redhat.com>
+ <CAMRbyysDE+v_D6Q3tCf_+86T0V57UE4Emw6zc_4vnUu0Yau23A@mail.gmail.com>
+ <20230314195023.bsey5bfq2atz7d66@redhat.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:d0c:b0:313:c399:73c8 with SMTP id
- g12-20020a056e020d0c00b00313c39973c8mr2516315ilj.4.1678850207484; Tue, 14 Mar
- 2023 20:16:47 -0700 (PDT)
-Date:   Tue, 14 Mar 2023 20:16:47 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003faaa105f6e7c658@google.com>
-Subject: [syzbot] [block?] WARNING in copy_page_from_iter
-From:   syzbot <syzbot+63dec323ac56c28e644f@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230314195023.bsey5bfq2atz7d66@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Tue, Mar 14, 2023 at 02:50:23PM -0500, Eric Blake wrote:
+> On Sat, Mar 11, 2023 at 02:30:39PM +0200, Nir Soffer wrote:
+> > On Fri, Mar 10, 2023 at 10:16 PM Eric Blake <eblake@redhat.com> wrote:
+> > >
+> > > The uapi <linux/nbd.h> header declares a 'char handle[8]' per request;
+> > > which is overloaded in English (are you referring to "handle" the
+> > > verb, such as handling a signal or writing a callback handler, or
+> > > "handle" the noun, the value used in a lookup table to correlate a
+> > > response back to the request).  Many client-side NBD implementations
+> > > (both servers and clients) have instead used 'u64 cookie' or similar,
+> > > as it is easier to directly assign an integer than to futz around with
+> > > memcpy.  In fact, upstream documentation is now encouraging this shift
+> > > in terminology: https://lists.debian.org/nbd/2023/03/msg00031.html
+> > >
+> > > Accomplish this by use of an anonymous union to provide the alias for
+> > > anyone getting the definition from the uapi; this does not break
+> > > existing clients, while exposing the nicer name for those who prefer
+> > > it.  Note that block/nbd.c still uses the term handle (in fact, it
+> > > actually combines a 32-bit cookie and a 32-bit tag into the 64-bit
+> > > handle), but that internal usage is not changed the public uapi, since
+> > > no compliant NBD server has any reason to inspect or alter the 64
+> > > bits sent over the socket.
+> > >
+> > > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > > ---
+> > >  include/uapi/linux/nbd.h | 10 ++++++++--
+> > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
+> > > index 8797387caaf7..f58f2043f62e 100644
+> > > --- a/include/uapi/linux/nbd.h
+> > > +++ b/include/uapi/linux/nbd.h
+> > > @@ -81,7 +81,10 @@ enum {
+> > >  struct nbd_request {
+> > >         __be32 magic;   /* NBD_REQUEST_MAGIC    */
+> > >         __be32 type;    /* See NBD_CMD_*        */
+> > > -       char handle[8];
+> > > +       union {
+> > > +               char handle[8];
+> > > +               __be64 cookie;
+> > > +       };
+> > >         __be64 from;
+> > >         __be32 len;
+> > >  } __attribute__((packed));
+> > > @@ -93,6 +96,9 @@ struct nbd_request {
+> > >  struct nbd_reply {
+> > >         __be32 magic;           /* NBD_REPLY_MAGIC      */
+> > >         __be32 error;           /* 0 = ok, else error   */
+> > > -       char handle[8];         /* handle you got from request  */
+> > > +       union {
+> > > +               char handle[8]; /* handle you got from request  */
+> > > +               __be64 cookie;
+> > 
+> > Should we document like this?
+> > 
+> >     union {
+> >         __be64 cookie; /* cookie you got from request */
+> >         char handle[8]; /* older name */
+> > 
+> > I think we want future code to use the new term.
+> 
+> Sure, swapping the order to favor the preferred name first makes sense.
+> 
+> I'm still not sure on whether cookie should be u64 or __be64 (it's
+> opaque, so endianness over the wire doesn't matter;
 
-syzbot found the following issue on:
+I guess it is 'u64', given ->handle is always copied to nbd_reply from
+nbd_request in nbd server side, so native endian is always applied for
+building and parsing ->handle in nbd client side.
 
-HEAD commit:    fc89d7fb499b Merge tag 'for_linus' of git://git.kernel.org..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=13ec6e84c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=253e7e1012aef938
-dashboard link: https://syzkaller.appspot.com/bug?extid=63dec323ac56c28e644f
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103eae42c80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a81156c80000
+But it looks odd to mark it as u64.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a6a7b232754b/disk-fc89d7fb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bdf765cb166a/vmlinux-fc89d7fb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ba2677f81efa/bzImage-fc89d7fb.xz
-
-The issue was bisected to:
-
-commit a41dad905e5a388f88435a517de102e9b2c8e43d
-Author: Al Viro <viro@zeniv.linux.org.uk>
-Date:   Fri Sep 16 00:11:15 2022 +0000
-
-    iov_iter: saner checks for attempt to copy to/from iterator
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14bda788c80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16bda788c80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12bda788c80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+63dec323ac56c28e644f@syzkaller.appspotmail.com
-Fixes: a41dad905e5a ("iov_iter: saner checks for attempt to copy to/from iterator")
-
-WARNING: CPU: 1 PID: 5070 at lib/iov_iter.c:623 _copy_from_iter+0x2ad/0x1060 lib/iov_iter.c:623
-Modules linked in:
-CPU: 1 PID: 5070 Comm: syz-executor363 Not tainted 6.3.0-rc2-syzkaller-00006-gfc89d7fb499b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/02/2023
-RIP: 0010:_copy_from_iter+0x2ad/0x1060 lib/iov_iter.c:623
-Code: 5d 41 5c 41 5d 41 5e 41 5f c3 e8 4e 1a 6e fd be 73 02 00 00 48 c7 c7 40 ab a6 8a e8 1d ec a9 fd e9 56 fe ff ff e8 33 1a 6e fd <0f> 0b 45 31 ff eb 8b e8 27 1a 6e fd 31 ff 89 ee e8 2e 16 6e fd 40
-RSP: 0018:ffffc9000348f688 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88802ab34100 RSI: ffffffff8414dc0d RDI: 0000000000000001
-RBP: 0000000000000021 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: ffffea0001c9fc00 R14: ffffc9000348f8c0 R15: 0000000000000021
-FS:  000055555576d300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000004561a0 CR3: 000000007980a000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- copy_page_from_iter lib/iov_iter.c:748 [inline]
- copy_page_from_iter+0x233/0x3f0 lib/iov_iter.c:737
- bio_copy_from_iter block/blk-map.c:55 [inline]
- bio_copy_user_iov block/blk-map.c:210 [inline]
- blk_rq_map_user_iov+0xb5d/0x16e0 block/blk-map.c:661
- blk_rq_map_user block/blk-map.c:690 [inline]
- blk_rq_map_user_io+0x1cd/0x200 block/blk-map.c:723
- sg_start_req drivers/scsi/sg.c:1807 [inline]
- sg_common_write.constprop.0+0xdcd/0x1e00 drivers/scsi/sg.c:803
- sg_new_write.isra.0+0x522/0xa90 drivers/scsi/sg.c:770
- sg_ioctl_common drivers/scsi/sg.c:935 [inline]
- sg_ioctl+0x9a8/0x2700 drivers/scsi/sg.c:1159
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f47aad046c9
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcbf523d68 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f47aad046c9
-RDX: 0000000020000180 RSI: 0000000000002285 RDI: 0000000000000003
-RBP: 00007f47aacc41d0 R08: 0000000000000000 R09: 0000000000000000
-R10: 000000000000ffff R11: 0000000000000246 R12: 00007f47aacc4260
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+> and previous code
+> was using memcpy() onto char[8] which may behave differently depending
+> on machine endianness).
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+
+Thanks,
+Ming
+
