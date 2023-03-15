@@ -2,156 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A71C6FD1D
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 18:19:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E05C74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 18:27:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232277AbjCOST2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 14:19:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52868 "EHLO
+        id S230099AbjCOS1L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 14:27:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231748AbjCOST1 (ORCPT
+        with ESMTP id S230078AbjCOS1J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 14:19:27 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C47B5A6D7
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 11:19:26 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d7so17151946qtr.12
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 11:19:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1678904365;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GgzilRrDZzjZzGZPzVxtA7dkKR8Cud+QjJJNSSQFpD0=;
-        b=aeF1GaiTWV2z10A11VbsrsakE7qKYNyoR2nVgFLI3d6N8gJEjje/zzswtN2TGFln6U
-         SlbpWOL++D9xe66W2i+I7sjdmACU7jeLTJNedgxGtjL2iQs0D2V2ErxDWeH77FfhlQ7S
-         B9eXRQAjYlyuksBs4ic13nFMImugk9I19BUXI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678904365;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GgzilRrDZzjZzGZPzVxtA7dkKR8Cud+QjJJNSSQFpD0=;
-        b=ag+aYroNANTzbX7JHtudKNRRgSXTICHOXLC81RPUGJtTd93hDwFVxNU7EuwwCmKsLa
-         xUKQW2GwjKqyTbYuB7dn7BWduFKyegX+VsWMj/tz7ASQFnQBWRxN/6MUndO0q6qnFzcW
-         SaeMWr9GRPPH6/uNTJLP10zK/hUSCeiQf/a3i9DnFuIzJrxAPGUnrGaRPQSUpHv5emL2
-         xDVkDA9BobPHMoydEaA7HlRybx5Nm3asTJ9jw1ABnssaMNHsQOtmlWtjZU0spuNfMFXc
-         KUBrFrILlEl1K/Vie7BDlE+hodxhhrlKm64gg6KqzODHMumts4HXRR0WtEbC5zDuqVMW
-         AKlg==
-X-Gm-Message-State: AO0yUKVcNPaNGC9es7es3SR+XQHUU8b+wzIQBGe1xzRnlAzg7OKqt4np
-        UBg5ldMRLc9fe3rulRPdKdjH9Q==
-X-Google-Smtp-Source: AK7set8VcYEA2FNHiNt71e1UCyy1BH+LnV/QaaYc7e1fsnQTQLTwiKalxIxHMNkF25qJEH4XWQKcdQ==
-X-Received: by 2002:ac8:5cce:0:b0:3bf:c266:fa6f with SMTP id s14-20020ac85cce000000b003bfc266fa6fmr1378818qta.46.1678904365367;
-        Wed, 15 Mar 2023 11:19:25 -0700 (PDT)
-Received: from joelboxx.c.googlers.com.com (129.239.188.35.bc.googleusercontent.com. [35.188.239.129])
-        by smtp.gmail.com with ESMTPSA id v125-20020a379383000000b007458ae32290sm4113974qkd.128.2023.03.15.11.19.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 11:19:24 -0700 (PDT)
-From:   "Joel Fernandes (Google)" <joel@joelfernandes.org>
-To:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Uladzislau Rezki (Sony)" <urezki@gmail.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Joel Fernandes <joel@joelfernandes.org>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 01/14] drbd: Rename kvfree_rcu() to kvfree_rcu_mightsleep()
-Date:   Wed, 15 Mar 2023 18:18:48 +0000
-Message-Id: <20230315181902.4177819-1-joel@joelfernandes.org>
-X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
+        Wed, 15 Mar 2023 14:27:09 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC2542B9DE;
+        Wed, 15 Mar 2023 11:27:03 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 45002B81ECC;
+        Wed, 15 Mar 2023 18:27:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD1C2C4339B;
+        Wed, 15 Mar 2023 18:27:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678904820;
+        bh=qRA32Ck8SnanqXkULNiubOSomcNgiM+++fkxIPwPbEo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JbQV7smNIvX3vE2a1G5RMRov2APzjmvL0pTykVR1NTmVDfr1f8nSVYhr9dHznGcuB
+         HWFf8JALw0ca8GQL8L9DEz3D/Unrh6VuvhCXHEciUEBUkOhsMWZenz4A9gX1z8DoeW
+         a4m03BjFXpfPb3peRRvNyG386knQohGxSCh7Rd2bbg7RirJs/47HMqsmUKpNTfwh4I
+         Dz2npTb+cQSTFtG0w6tgheW499MI87cXAS1MuSOXiZhRxi63mHqIpCulDmxdaTxvT+
+         MLMK9umJl14Q56k68TVZ1WOL5UjYm+gtPDSpmI9rPbCanY2Gp09YibKQydo7yVAfpu
+         IRTnmMuv+kojg==
+Date:   Wed, 15 Mar 2023 11:26:58 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-fscrypt@vger.kernel.org,
+        Nathan Huckleberry <nhuck@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] blk-crypto: make blk_crypto_evict_key() more
+ robust
+Message-ID: <20230315182658.GB975@sol.localdomain>
+References: <20230308193645.114069-1-ebiggers@kernel.org>
+ <20230308193645.114069-3-ebiggers@kernel.org>
+ <ZBHw8DteTQq6p97i@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZBHw8DteTQq6p97i@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
+On Wed, Mar 15, 2023 at 09:23:12AM -0700, Christoph Hellwig wrote:
+> On Wed, Mar 08, 2023 at 11:36:43AM -0800, Eric Biggers wrote:
+> >  			   const struct blk_crypto_key *key)
+> > @@ -389,22 +377,22 @@ int __blk_crypto_evict_key(struct blk_crypto_profile *profile,
+> >  
+> >  	blk_crypto_hw_enter(profile);
+> >  	slot = blk_crypto_find_keyslot(profile, key);
+> > +	if (slot) {
+> 
+> Isn't !slot also an error condition that we should warn on?
 
-The kvfree_rcu() macro's single-argument form is deprecated.  Therefore
-switch to the new kvfree_rcu_mightsleep() variant. The goal is to
-avoid accidental use of the single-argument forms, which can introduce
-functionality bugs in atomic contexts and latency bugs in non-atomic
-contexts.
+No, definitely not.  Keys are not guaranteed to be in a keyslot.  I'll add a
+comment here.
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
-Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
-Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
----
- drivers/block/drbd/drbd_nl.c       | 6 +++---
- drivers/block/drbd/drbd_receiver.c | 4 ++--
- drivers/block/drbd/drbd_state.c    | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> > +		if (WARN_ON_ONCE(atomic_read(&slot->slot_refs) != 0)) {
+> > +			/* BUG: key is still in use by I/O */
+> > +			err = -EBUSY;
+> 
+> Either way two gotos to jump forward for the error case would improve
+> the readability of the code a fair bit I think.
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index 60757ac31701..f49f2a5282e1 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1615,7 +1615,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct genl_info *info)
- 			drbd_send_sync_param(peer_device);
- 	}
- 
--	kvfree_rcu(old_disk_conf);
-+	kvfree_rcu_mightsleep(old_disk_conf);
- 	kfree(old_plan);
- 	mod_timer(&device->request_timer, jiffies + HZ);
- 	goto success;
-@@ -2446,7 +2446,7 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
- 
- 	mutex_unlock(&connection->resource->conf_update);
- 	mutex_unlock(&connection->data.mutex);
--	kvfree_rcu(old_net_conf);
-+	kvfree_rcu_mightsleep(old_net_conf);
- 
- 	if (connection->cstate >= C_WF_REPORT_PARAMS) {
- 		struct drbd_peer_device *peer_device;
-@@ -2860,7 +2860,7 @@ int drbd_adm_resize(struct sk_buff *skb, struct genl_info *info)
- 		new_disk_conf->disk_size = (sector_t)rs.resize_size;
- 		rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
- 		mutex_unlock(&device->resource->conf_update);
--		kvfree_rcu(old_disk_conf);
-+		kvfree_rcu_mightsleep(old_disk_conf);
- 		new_disk_conf = NULL;
- 	}
- 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 757f4692b5bd..e197b2a465d2 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -3759,7 +3759,7 @@ static int receive_protocol(struct drbd_connection *connection, struct packet_in
- 		drbd_info(connection, "peer data-integrity-alg: %s\n",
- 			  integrity_alg[0] ? integrity_alg : "(none)");
- 
--	kvfree_rcu(old_net_conf);
-+	kvfree_rcu_mightsleep(old_net_conf);
- 	return 0;
- 
- disconnect_rcu_unlock:
-@@ -4127,7 +4127,7 @@ static int receive_sizes(struct drbd_connection *connection, struct packet_info
- 
- 			rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf);
- 			mutex_unlock(&connection->resource->conf_update);
--			kvfree_rcu(old_disk_conf);
-+			kvfree_rcu_mightsleep(old_disk_conf);
- 
- 			drbd_info(device, "Peer sets u_size to %lu sectors (old: %lu)\n",
- 				 (unsigned long)p_usize, (unsigned long)my_usize);
-diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
-index 75d13ea0024f..2aeea295fa28 100644
---- a/drivers/block/drbd/drbd_state.c
-+++ b/drivers/block/drbd/drbd_state.c
-@@ -2071,7 +2071,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
- 		conn_free_crypto(connection);
- 		mutex_unlock(&connection->resource->conf_update);
- 
--		kvfree_rcu(old_conf);
-+		kvfree_rcu_mightsleep(old_conf);
- 	}
- 
- 	if (ns_max.susp_fen) {
--- 
-2.40.0.rc1.284.g88254d51c5-goog
+I slightly prefer it without the gotos, but sure I'll do it that way.
 
+> > +		} else {
+> > +			err = profile->ll_ops.keyslot_evict(
+> > +					profile, key,
+> > +					blk_crypto_keyslot_index(slot));
+> > +		}
+> > +		/*
+> > +		 * Callers may free the key even on error, so unlink the key
+> > +		 * from the hash table and clear slot->key even on error.
+> > +		 */
+> > +		hlist_del(&slot->hash_node);
+> > +		slot->key = NULL;
+> >  	}
+> >  	blk_crypto_hw_exit(profile);
+> >  	return err;
+> 
+> Also given your above accurate description of the calling context,
+> what is the point of even returning an error here vs just logging
+> an error message?
+
+Yes, I was thinking about that too.  I'll add a patch that makes
+blk_crypto_evict_key() log errors and return void.
+
+- Eric
