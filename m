@@ -2,53 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D267FC61DA4
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 13:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52707C6FD1D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 14:46:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232420AbjCONbY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 09:31:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34758 "EHLO
+        id S231127AbjCOOqQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 10:46:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232318AbjCONbO (ORCPT
+        with ESMTP id S230205AbjCOOqP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 09:31:14 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABECB1A955;
-        Wed, 15 Mar 2023 06:30:47 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 65B0768B05; Wed, 15 Mar 2023 14:30:40 +0100 (CET)
-Date:   Wed, 15 Mar 2023 14:30:39 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Stefan Haberland <sth@linux.ibm.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Mike Christie <michael.christie@oracle.com>,
-        bvanassche@acm.org, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, james.bottomley@hansenpartnership.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        kbusch@kernel.org, target-devel@vger.kernel.org,
-        Jan Hoeppner <hoeppner@linux.ibm.com>
-Subject: Re: [PATCH v4 02/18] block: Rename BLK_STS_NEXUS to
- BLK_STS_RESV_CONFLICT
-Message-ID: <20230315133039.GA24533@lst.de>
-References: <20230224174502.321490-1-michael.christie@oracle.com> <20230224174502.321490-3-michael.christie@oracle.com> <20230314171119.GB6780@lst.de> <33ed9615-b570-03c7-9a7a-d07f020d3222@linux.ibm.com>
+        Wed, 15 Mar 2023 10:46:15 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C186B8F73B;
+        Wed, 15 Mar 2023 07:46:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4S3XVxpATHJONpTD39rYznbyHkN4BWTWM3r05Ibro0k=; b=ZWHEtZ16w2+detW7cVl81jaxFC
+        fs+chfLFoFcwTb49WuJNlAGUFz/m2YWyc5ZlPLwyWY8t74pMkdDBdQOiPvyCywKFAcTvWvzl6F2hT
+        cPPzmSsDbgKavXOjcX1SnqkiUhPh5hpNZPHsAjeSk7JqONWGhjClRkFavct2WQxYdPozEZCUuvWex
+        hvd8tK+HCxmfabDn/OKIzi4tqE8UqlHDmgjbbRJpJL45SDoRTED3m4fiLQKLGF+fh1InGw1vmu8Vg
+        ew/DmNYm8NaVpWJ7/0S2ifbrZ1LTSanmcTVS1sbuVIayXvzaT9/BHSrmLXXzop1bJwhflgitEHkSt
+        xCK7cimQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pcSOF-00DeFR-1q;
+        Wed, 15 Mar 2023 14:46:07 +0000
+Date:   Wed, 15 Mar 2023 07:46:07 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     hubcap@omnibond.com, senozhatsky@chromium.org, martin@omnibond.com,
+        willy@infradead.org, minchan@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, axboe@kernel.dk, akpm@linux-foundation.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        gost.dev@samsung.com, devel@lists.orangefs.org
+Subject: Re: [RFC PATCH 1/3] filemap: convert page_endio to folio_endio
+Message-ID: <ZBHaL0eS95H0CIJQ@bombadil.infradead.org>
+References: <20230315123233.121593-1-p.raghav@samsung.com>
+ <CGME20230315123234eucas1p2503d83ad0180cecde02e924d7b143535@eucas1p2.samsung.com>
+ <20230315123233.121593-2-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <33ed9615-b570-03c7-9a7a-d07f020d3222@linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20230315123233.121593-2-p.raghav@samsung.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 11:04:22AM +0100, Stefan Haberland wrote:
-> This also fits for the DASD case. We use this error code for a
-> reservation/locking conflict of the DASD device when the lock we
-> previously held was stolen.
+On Wed, Mar 15, 2023 at 01:32:31PM +0100, Pankaj Raghav wrote:
+> page_endio() already works on folios by converting a page in to a folio as
+> the first step. Convert page_endio to folio_endio by taking a folio as the
+> first parameter.
+> 
+> Instead of doing a page to folio conversion in the page_endio()
+> function, the consumers of this API do this conversion and call the
+> folio_endio() function in this patch.
+> The following patches will convert the consumers of this API to use native
+> folio functions to pass to folio_endio().
+> 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 
-But that's not really a reservation conflict in the sense
-of the reservation API.  Given that DASD doesn't support it it
-might not matter.  Do you have applications that checks for
-the translated errno value?  We'll probably at least want
-a comment documenting this status code.
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+
+Perhaps the hard thing is what tree would this go through?
+
+  Luis
