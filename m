@@ -2,80 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAC0C61DA4
-	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 16:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A02F7C76195
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 16:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231508AbjCOQKQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 12:10:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48976 "EHLO
+        id S231917AbjCOQT3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 12:19:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232190AbjCOQJg (ORCPT
+        with ESMTP id S232358AbjCOQTL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 12:09:36 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4D3A27F;
-        Wed, 15 Mar 2023 09:08:54 -0700 (PDT)
+        Wed, 15 Mar 2023 12:19:11 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2483D97FE3;
+        Wed, 15 Mar 2023 09:18:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=narI0Kzzf814XY8EFz2CHLlHOwVpJgEJht5/vy7eNPg=; b=QPZrdM9w8rQ7+F0DIyWNH69HBa
-        WqivpYrlq9+bf1aQAZoGwRpPki/msVvMlC4cxTdD1gfLpnjd5mZdjVLDT8K92whqduduTJqUQgQ9X
-        M824RtUrRn6WaRvqVtJApcVFhdluWsjwQ6hedSKpBzGqDwzol58496pVh0GaYlatw5hHJN8k/APLJ
-        TFgOp2+UlsQyp0qsU+3pso9VgwhHaqt8EDBNe3cpPlHlNyRGk8Zlg332G3lXfZXG2Pc/uTCpLkcCT
-        7wYPygjWvJ7DtE/qMescqFHNE8cNf70qCP4nu6PltvUWhE1CPrd2muYclIdjQo1LCx+D+pcUPVGFl
-        6vDnlirQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pcTgE-00DyRp-IK; Wed, 15 Mar 2023 16:08:46 +0000
-Date:   Wed, 15 Mar 2023 16:08:46 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Pankaj Raghav <p.raghav@samsung.com>, hubcap@omnibond.com,
-        senozhatsky@chromium.org, martin@omnibond.com, minchan@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org, axboe@kernel.dk,
-        akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, gost.dev@samsung.com, mcgrof@kernel.org,
-        devel@lists.orangefs.org
-Subject: Re: [RFC PATCH 2/3] mpage: use bio_for_each_folio_all in
- mpage_end_io()
-Message-ID: <ZBHtjrk52/TTPU/F@casper.infradead.org>
-References: <20230315123233.121593-1-p.raghav@samsung.com>
- <CGME20230315123235eucas1p1bd62cb2aab435727880769f2e57624fd@eucas1p1.samsung.com>
- <20230315123233.121593-3-p.raghav@samsung.com>
- <64a5e85e-4018-ed7d-29d4-db12af290899@suse.de>
+        bh=yDBiOEkvjDgg4IR0j4lnPMTMvoAfiMmq7CSmPPL80Uk=; b=IIpyHbVyrtlWCaQlCN4lfFWNuz
+        UqJgfh7tj0P0sBr3qwA4Ko1Fz0kAO7EyECokBSkcnp3QNmD4yUaPwvAtCDzoqhWtIiAnhfASaja9h
+        5SCYc2r6iuIvp6r13Dhrw0Ujx3zyYbZuFiifYV51ntCNNGOrS3ppHq1upkj+CzB584Y1FytiivBOT
+        7IQQ4iMjOmwj0s8aKlwVh3HxjJrXbC+OM28/0+/Rem8qiEAvop90YjvHZgpgLWObu5JeYCyZhVSwV
+        GgOO0zmZZrwHn6KMkphje33MlfCHgVF3BBfAJbgIl4u0xQzgr1W45evOcqnKY/S1qO+113vt7LjTH
+        LLM9KCUQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pcTpm-00E2cF-29;
+        Wed, 15 Mar 2023 16:18:38 +0000
+Date:   Wed, 15 Mar 2023 09:18:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Nathan Huckleberry <nhuck@google.com>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, linux-fscrypt@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] blk-mq: release crypto keyslot before reporting
+ I/O complete
+Message-ID: <ZBHv3m0c9Fzs9DHA@infradead.org>
+References: <20230308193645.114069-1-ebiggers@kernel.org>
+ <20230308193645.114069-2-ebiggers@kernel.org>
+ <CAJkfWY76-fUf92YZid3bOPrufXwCzM-q9L1ezqkLZ+WJiWL3jQ@mail.gmail.com>
+ <ZBC63ry7EFMr+Xzk@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <64a5e85e-4018-ed7d-29d4-db12af290899@suse.de>
+In-Reply-To: <ZBC63ry7EFMr+Xzk@sol.localdomain>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 03:52:15PM +0100, Hannes Reinecke wrote:
-> On 3/15/23 13:32, Pankaj Raghav wrote:
-> > Use bio_for_each_folio_all to iterate through folios in a bio so that
-> > the folios can be directly passed to the folio_endio() function.
-> > +	bio_for_each_folio_all(fi, bio)
-> > +		folio_endio(fi.folio, bio_op(bio),
-> > +			    blk_status_to_errno(bio->bi_status));
-> >   	bio_put(bio);
-> >   }
+On Tue, Mar 14, 2023 at 11:20:14AM -0700, Eric Biggers wrote:
+> I did notice that attempt_merge() calls elv_merge_requests() (not to be confused
+> with elv_merged_request()) if it merges the requests.
 > 
-> Ah. Here it is.
-> 
-> I would suggest merge these two patches.
+> So it seems there is elv_merge_requests() which means the request was merged,
+> and elv_merged_request() which means the request was *not* merged...  I have no
+> idea what is going on there :-(
 
-The right way to have handled this patch series was:
-
-1. Introduce a new folio_endio() [but see Christoph's mail on why we
-shouldn't do that]
-2-n convert callers to use folios directly
-n+1 remove page_endio() entirely.
-
-Note that patch n+1 might not be part of this patch series; sometimes
-it takes a while to convert all callers to use folios.
-
-I very much dislike the way this was done by pushing the page_folio()
-call into each of the callers because it makes the entire series hard to
-review.
+The naming looks very confusing, but that is indeed what the code
+does.  The elevator code is in massive need of a cleanup, as it often
+is that confusing.
