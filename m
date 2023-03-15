@@ -2,106 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DCCC6FD1D
-	for <linux-block@archiver.kernel.org>; Tue, 14 Mar 2023 23:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B0FC6FD1D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Mar 2023 01:12:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbjCNXkS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Mar 2023 19:40:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54954 "EHLO
+        id S229816AbjCOBMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Mar 2023 21:12:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjCNXkS (ORCPT
+        with ESMTP id S229778AbjCOBMn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Mar 2023 19:40:18 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B9637B45
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 16:40:16 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id r11so17178333edd.5
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 16:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1678837215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uNuC5vuLHUrjsLAEtJntp1DYmMh0ryjDseFJIAEyVKE=;
-        b=SWqsjXNtJB90zrndCdVwNbsgqtdhu21jKTQCRGI+yGN8eaKZJdg+Ia/4z6CNA17e25
-         +YbzCjCwIJrc7wvpays0t0a4NTBUNih9VnP0oyTKL7nPZ/+d2WBNWGYNhQ4STTZShx2W
-         uU8qXwm4+fPS4iWPXCcND8/UwnyPMdHQUuyoc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678837215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uNuC5vuLHUrjsLAEtJntp1DYmMh0ryjDseFJIAEyVKE=;
-        b=yhHktUMjmtFPLuebuurIEeIAnMzfCHdNOJo2Sa3D2hqPAAzqn5BYnGjKzTaunSpU96
-         z1tVsxZtXtE0cc6pv/M1WFtPpxXjFr3f5N9vszxG7ZMqjkNwZPBPiqLGnTeor2/TYwYo
-         uhTC3+ek/EC9aNKVK+tII9VwObyPncY7FzUhIiIB5Nl0BPHEANvyWB3BdoFssaeWEhbl
-         G9rV0j7mLnU6hFktgy3M6Br7xWRGIXaWMLWCVTtYzSlnmYWKvrF+b6jJ0oqjYvTIoxjG
-         bpn+u46ZPGToULh244Xj0IeWLnsCT2Td2yrTN2vlsX6V1SBiL6q/fc19ExY4arjI+lx6
-         igkg==
-X-Gm-Message-State: AO0yUKUBdnCaUMKkbl/zz4B/JswAReEMolMqpJHnH3czS6epsm7eKrkR
-        rkLojq6NSv5lRQuFxEw3FUt4VCX/OW8hWi++XXCsNA==
-X-Google-Smtp-Source: AK7set+Kjd9Ebikst6thxYf/Ew9u8feYiojxm8LYXGuS6ilrXdaMr+0f3rrGW45iSsB/Ip3TBKv7vg==
-X-Received: by 2002:a17:907:608c:b0:92e:d6e6:f3ad with SMTP id ht12-20020a170907608c00b0092ed6e6f3admr372129ejc.6.1678837214961;
-        Tue, 14 Mar 2023 16:40:14 -0700 (PDT)
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
-        by smtp.gmail.com with ESMTPSA id ga31-20020a1709070c1f00b008b904cb2bcdsm1750618ejc.11.2023.03.14.16.40.12
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Mar 2023 16:40:13 -0700 (PDT)
-Received: by mail-ed1-f50.google.com with SMTP id o12so68798298edb.9
-        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 16:40:12 -0700 (PDT)
-X-Received: by 2002:a50:d506:0:b0:4fb:482b:f93d with SMTP id
- u6-20020a50d506000000b004fb482bf93dmr435862edi.2.1678837212326; Tue, 14 Mar
- 2023 16:40:12 -0700 (PDT)
+        Tue, 14 Mar 2023 21:12:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C453423C44
+        for <linux-block@vger.kernel.org>; Tue, 14 Mar 2023 18:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678842720;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RrLaAbaQQ8liS3JpotmCZivvj1yZqkGMm60GRC9/iZI=;
+        b=Y5IP8uthSPt7lS3Gs7oxZ0m3jgiT3uBaiFyZKBnK8lqwvIWlcrjOxQp+sYy5hJaGV6CxdH
+        nNksl/XjKYvguBJZIlX3v1lW3zqZS3D0aiCLelyh7J5KJhoqW5STroWsjriiiTPuDebPJw
+        vJ6op+zHeHSOFV/P371PJLpq7gjf36E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-140-B7sg6ndEPLmTZYTOZXas8w-1; Tue, 14 Mar 2023 21:11:56 -0400
+X-MC-Unique: B7sg6ndEPLmTZYTOZXas8w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D2760800B23;
+        Wed, 15 Mar 2023 01:11:55 +0000 (UTC)
+Received: from ovpn-8-22.pek2.redhat.com (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 266FB2166B26;
+        Wed, 15 Mar 2023 01:11:49 +0000 (UTC)
+Date:   Wed, 15 Mar 2023 09:11:45 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ming Lei <ming.lei@canonical.com>
+Subject: Re: [PATCH] loop: Fix use-after-free issues
+Message-ID: <ZBEbUQ/mDIbunpeR@ovpn-8-22.pek2.redhat.com>
+References: <20230314182155.80625-1-bvanassche@acm.org>
 MIME-Version: 1.0
-References: <20230314220757.3827941-1-dhowells@redhat.com> <20230314220757.3827941-4-dhowells@redhat.com>
-In-Reply-To: <20230314220757.3827941-4-dhowells@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 14 Mar 2023 16:39:55 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whKPK=Bn_je2A19rSptpDo589DWxBJi8UQYS7sPjDPurw@mail.gmail.com>
-Message-ID: <CAHk-=whKPK=Bn_je2A19rSptpDo589DWxBJi8UQYS7sPjDPurw@mail.gmail.com>
-Subject: Re: [PATCH v18 03/15] shmem: Implement splice-read
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Daniel Golle <daniel@makrotopia.org>,
-        Guenter Roeck <groeck7@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Hugh Dickins <hughd@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230314182155.80625-1-bvanassche@acm.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 3:08=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-\> +static size_t splice_zeropage_into_pipe(...
->   ...
-> +               *buf =3D (struct pipe_buffer) {
-> +                       .ops    =3D &zero_pipe_buf_ops,
-> +                       .page   =3D ZERO_PAGE(0),
-> +                       .offset =3D offset,
-> +                       .len    =3D size,
-> +               };
-> +               get_page(buf->page);
+On Tue, Mar 14, 2023 at 11:21:54AM -0700, Bart Van Assche wrote:
+> do_req_filebacked() calls blk_mq_complete_request() synchronously or
+> asynchronously when using asynchronous I/O unless memory allocation fails.
+> Hence, modify loop_handle_cmd() such that it does not dereference 'cmd' nor
+> 'rq' after do_req_filebacked() finished unless we are sure that the request
+> has not yet been completed. This patch fixes the following kernel crash:
+> 
+> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000054
+> Call trace:
+>  css_put.42938+0x1c/0x1ac
+>  loop_process_work+0xc8c/0xfd4
+>  loop_rootcg_workfn+0x24/0x34
+>  process_one_work+0x244/0x558
+>  worker_thread+0x400/0x8fc
+>  kthread+0x16c/0x1e0
+>  ret_from_fork+0x10/0x20
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Johannes Weiner <hannes@cmpxchg.org>
+> Cc: Dan Schatzberg <schatzberg.dan@gmail.com>
+> Fixes: c74d40e8b5e2 ("loop: charge i/o to mem and blk cg")
+> Fixes: bc07c10a3603 ("block: loop: support DIO & AIO")
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-That
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-+               get_page(buf->page);
+Thanks,
+Ming
 
-is still there, and now it's doubly wrong because it's never dropped
-and will eventually overflow that count that shouldn't even be there.
-
-             Linus
