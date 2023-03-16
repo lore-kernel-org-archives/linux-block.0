@@ -2,50 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE458C6FD19
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 15:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C548C6FD1F
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 15:24:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231311AbjCPPPx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 11:15:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41906 "EHLO
+        id S231246AbjCPPYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 11:24:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230147AbjCPPPx (ORCPT
+        with ESMTP id S231400AbjCPPYW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 11:15:53 -0400
+        Thu, 16 Mar 2023 11:24:22 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A54D588B;
-        Thu, 16 Mar 2023 08:15:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E4359E309;
+        Thu, 16 Mar 2023 08:24:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=mto+OkRK5WeboSrId9/5NQZ9Y9
-        ga90UklI6l6yhd6GaQwiuyjLdzztgjmiyHk/aLw/UTkX0KU5rA9fCaxlrO4UV+QAoZXzBGrMn23wC
-        Y7zrmeaiRlOEp3FDky4lHCFFVCcnkeNbCyV1VNB/HK5oGtXQxYtGYVGy0itckiYzQpipmOqWnVJ4g
-        M/7PhqLynXVdVmOt6P7g8cQV4g00mdwFGvn0PU/Q93YhcBJJVhS6LfR2yWb9K3P53ONDK8XyllzCS
-        3CmrOgxO2Bdq5xnm4/F9z5BONBNoet1FwiXSpK5IbVk9GyO1uUlNeybTUns6q25xpCKgdwpA6nrv2
-        vJrZDhaw==;
+        bh=Jbs95Gjo7Q//j6ilu4KDrnygFvpFxedZLKTPScHD73o=; b=0REXzHjdr3ri4fT8gvfHhc1YE+
+        CzFmb3IfjPqEVtLc1hEeKsHoeslo1BrVqyrSvvD6iQ1WKABF792Y2KK6Nh7Qn5I2vZl9kDc7LLt3T
+        9aUYhgNnDW8A4+Qo9nAt4e4s9sCq6nUnN2Em41FVx5tUawAAN+Zh3sgRpI9AcqR8y1BJ613rpSfqZ
+        kiVkZUmktBBZMU7XEIB9zErbzECUCup5LesKj8eenY3JrKQDHarPokKUw9z9UG5oip1vyw1co0470
+        v85Mz316j22qeqbbxrlwcOuhs6kE1J61YoNNW5W4NPLOE4uAbtSElJR7WOqXoqHGtOpQ5zFWoOGte
+        b9F5fWzQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pcpKN-00Gn30-2g;
-        Thu, 16 Mar 2023 15:15:39 +0000
-Date:   Thu, 16 Mar 2023 08:15:39 -0700
+        id 1pcpSW-00Goph-19;
+        Thu, 16 Mar 2023 15:24:04 +0000
+Date:   Thu, 16 Mar 2023 08:24:04 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
-        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: remove obsolete config BLOCK_COMPAT
-Message-ID: <ZBMym7zMgego1fC6@infradead.org>
-References: <20230316111630.4897-1-lukas.bulwahn@gmail.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, hubcap@omnibond.com,
+        senozhatsky@chromium.org, martin@omnibond.com, willy@infradead.org,
+        minchan@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
+        axboe@kernel.dk, akpm@linux-foundation.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        gost.dev@samsung.com, mcgrof@kernel.org, devel@lists.orangefs.org
+Subject: Re: [RFC PATCH 1/3] filemap: convert page_endio to folio_endio
+Message-ID: <ZBM0lPycYm2X0Tfp@infradead.org>
+References: <20230315123233.121593-1-p.raghav@samsung.com>
+ <CGME20230315123234eucas1p2503d83ad0180cecde02e924d7b143535@eucas1p2.samsung.com>
+ <20230315123233.121593-2-p.raghav@samsung.com>
+ <ZBHcl8Pz2ULb4RGD@infradead.org>
+ <d6cde35e-359a-e837-d2e0-f2bd362f2c3e@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230316111630.4897-1-lukas.bulwahn@gmail.com>
+In-Reply-To: <d6cde35e-359a-e837-d2e0-f2bd362f2c3e@samsung.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Thu, Mar 16, 2023 at 11:04:54AM +0100, Pankaj Raghav wrote:
+> It looks like this endio function is called when alloc_page is used (for
+> partial IO) to trigger writeback from the user space `echo "idle" >
+> /sys/block/zram0/writeback`.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+Yes.
+
+> I don't understand when you say the harm might not be horrible if we don't
+> call folio_endio here. Do you think it is just safe to remove the call to
+> folio_endio function?
+
+I suspect so.  It doesn't seem like the involved pages are ever locked
+or have the writeback set, so it should be fine.
+
+> +               while ((folio = readahead_folio(rac))) {
+> +                       folio_clear_uptodate(folio);
+> +                       folio_set_error(folio);
+> +                       folio_unlock(folio);
+> +               }
+> +               return;
+> +       }
+> +
+> +       while ((folio = readahead_folio(rac))) {
+> +               folio_mark_uptodate(folio);
+> +               folio_unlock(folio);
+>         }
+>  }
+
+Looks good.
+
+> @@ -59,7 +59,8 @@ static void mpage_end_io(struct bio *bio)
+> static struct bio *mpage_bio_submit(struct bio *bio)
+>  {
+> -       bio->bi_end_io = mpage_end_io;
+> +       bio->bi_end_io = (op_is_write(bio_op(bio))) ? mpage_write_end_io :
+> +                                                     mpage_read_end_io;
+>         guard_bio_eod(bio);
+>         submit_bio(bio);
+>         return NULL;
+> And mpage_{write,read}_end_io will iterate over the folio and call the
+> respective functions.
+
+Yes, although I'd do it with a good old if/else and with less braces.
+It might make sense to split mpage_bio_submit as well, though.
