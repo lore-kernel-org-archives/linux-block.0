@@ -2,81 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6340C7618E
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 18:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A8D1C6FD1F
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 19:12:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbjCPSlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 14:41:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44696 "EHLO
+        id S230031AbjCPTMq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 15:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjCPSl1 (ORCPT
+        with ESMTP id S229620AbjCPTMo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 14:41:27 -0400
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6956BBD4C8;
-        Thu, 16 Mar 2023 11:41:26 -0700 (PDT)
-Received: by mail-pj1-f50.google.com with SMTP id y2so2564690pjg.3;
-        Thu, 16 Mar 2023 11:41:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678992086;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aAO8ipnGlaW7Dsdpbu2ZfEHDL1dEpEJ1pzRe9Xj45k0=;
-        b=ln0XI09uQYWjrapTiNHLCbUGmeDNZ5cs7gnwYyDufiUfXiYP1OOXpbnRlw09f5G+gG
-         Z2AV9WEQYshpp2i9TGXPdatlCbuJtwM/oE2uBFsNswByIKG1qDVHsQtaUqWDqBqGmBMK
-         3q6JiBoOGbAROLAt1Qr8tX1+mTluchJwWfL7BV5KsT6E+pb6GWmmW6Jlr69SVLsuOrZt
-         XdaHt6XiLi7BSeIfeZ5ALzNFd9zDNVJlS8EC/WMAKh/JJMy1eIvKmb15/RKZ+1+jR3+W
-         x7LYriC5rgYCwTolv1+9DWc526LlR8pVHnRWrsKKE0vGQ5x9u3Wz/dwVUJDPBmpNEOmE
-         7dmQ==
-X-Gm-Message-State: AO0yUKUbpmeWpeQ69Lp5dIPxE/UBeQNgR9u5J+7ddxaqjM+DG5jHjfLT
-        rxBzx84S8we8WeDOEHSP5D4=
-X-Google-Smtp-Source: AK7set8CHdRUEDH1kXpv7Ln9kRiMK77wVthfB0Yo62w5ZO6f2T4CZZigqQzLsymhio37ow9nEn+X2Q==
-X-Received: by 2002:a05:6a20:65a2:b0:d6:a2f9:ca9a with SMTP id p34-20020a056a2065a200b000d6a2f9ca9amr3901085pzh.42.1678992085744;
-        Thu, 16 Mar 2023 11:41:25 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:ad26:bef0:6406:d659? ([2620:15c:211:201:ad26:bef0:6406:d659])
-        by smtp.gmail.com with ESMTPSA id c25-20020aa78c19000000b00623f72df4e2sm9088pfd.203.2023.03.16.11.41.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Mar 2023 11:41:24 -0700 (PDT)
-Message-ID: <70b757f9-cc0c-ebd9-a597-f6ea14acbedb@acm.org>
-Date:   Thu, 16 Mar 2023 11:41:21 -0700
+        Thu, 16 Mar 2023 15:12:44 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88321F5FD;
+        Thu, 16 Mar 2023 12:12:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678993963; x=1710529963;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=isSa6T4VpH1WCIHZYBJ+SROq9MEvWMv6WPoU3Z3MMMg=;
+  b=Q4npJxBxVkXRhXANBm+BqXtnii8eKmJiWPgVGX9hXvypHzpw33TnMT0p
+   B0Xc2SaMhR+blPPg2mz4d47Ls+8I72uM/EywIJJpACt6XsHSSyN6KcbVl
+   kc1LtlahasZ5GUklOwxG32nwU0dLxU4jP/YBsvyFetLDEdjPw7oY4aaZ4
+   HQWvuSRFElylM82qjnMtnJnXwOgspOnjWmXCj1S6aN2O+fouEm65edUhQ
+   LHEjFk8bP4ZB7Ay9/wLgnCfy6Mdeu7e2+j0DMGuKjIs5R2wJTd5Sgjv9J
+   AusdB3DilG7K39SFSKkvw/UsbM9IAhkhkOG7Dt8/6LiMiKERSKusBru+L
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="317743429"
+X-IronPort-AV: E=Sophos;i="5.98,265,1673942400"; 
+   d="scan'208";a="317743429"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 12:12:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="769073124"
+X-IronPort-AV: E=Sophos;i="5.98,265,1673942400"; 
+   d="scan'208";a="769073124"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.251.221.172])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 12:12:40 -0700
+Message-ID: <522a5d01-e939-278a-3354-1bbfb1bd6557@intel.com>
+Date:   Thu, 16 Mar 2023 21:12:35 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v4 02/19] block: introduce ioprio hints
+ Firefox/102.0 Thunderbird/102.9.0
+Subject: Re: [PATCH] mmc: core: Allow to avoid REQ_FUA if the eMMC supports an
+ internal cache
 Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230309215516.3800571-1-niklas.cassel@wdc.com>
- <20230309215516.3800571-3-niklas.cassel@wdc.com>
- <c91be70e-14a9-7ad6-ba7c-975a640a34d3@opensource.wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <c91be70e-14a9-7ad6-ba7c-975a640a34d3@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Christoph Hellwig <hch@infradead.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     linux-mmc@vger.kernel.org,
+        Wenchao Chen <wenchao.chen666@gmail.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Christian Lohle <cloehle@hyperstone.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bean Huo <beanhuo@micron.com>
+References: <20230316164514.1615169-1-ulf.hansson@linaro.org>
+ <ZBNIg8+rOdFKcsS8@infradead.org>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <ZBNIg8+rOdFKcsS8@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/15/23 19:00, Damien Le Moal wrote:
-> Bart,
+On 16/03/23 18:49, Christoph Hellwig wrote:
+> On Thu, Mar 16, 2023 at 05:45:14PM +0100, Ulf Hansson wrote:
+>> File systems typically uses REQ_FUA for writing their meta-data and other
+>> important information. Ideally it should provide an increased protection
+>> against data-corruption, during sudden power-failures. This said, file
+>> systems have other ways to handle sudden power-failures too, like using
+>> checksums to detect partly-written data, for example.
 > 
-> I would like to hear your opinion as well.
+> Sorry, but this is completely wrong and dangerous, if not intentionally
+> misleading bullshit.
 
-Isn't sending a ping after only three days a bit soon for such a large 
-patch?
+There is some context missing.
 
-Regarding your question: I like the block/ioprio.c changes in this 
-version of this patch series much better than the changes in the 
-previous version of this patch series.
+Historically file systems have assumed that sectors are updated
+atomically i.e. there is never a sector with a mixture of
+old and new data. The eMMC spec does not guarantee that,
+except for the eMMC "reliable write" operation. So the paragraph
+above is informing the potential benefit of reliable write instead
+of cache flush.
 
-No objections from my side about the changes in this patch (02/19).
+Note, it is not that eMMC cannot avoid torn sectors, it is that
+the specification does not mandate that they do.
 
-Thanks,
+However, the issue has been raised that reliable write is not
+needed to provide sufficient assurance of data integrity, and that
+in fact, cache flush can be used instead and perform better.
 
-Bart.
+This patch adds a card quirk MMC_QUIRK_AVOID_REL_WRITE
+that can be set for cards where cache flush outperforms
+reliable write.  We would expect acks from someone in the
+manufacturer's organization on patches setting the quirk, effectively
+assuring fitness-for-purpose, and implying that torn sectors are
+not especially more likely than any other sort of data integrity
+failure.
+
+> 
+> The only way to provide data integrity is to ensure data is written to
+> the media and not a cache.  That can be done by a full blown cache
+> flush, or with a FUA-like optimization.
+
+The patch is just reporting (via blk_queue_write_cache())
+that FUA is not supported, so a flush will be done instead.
 
