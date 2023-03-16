@@ -2,158 +2,136 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B2F7C6FD1F
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 10:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F345C7618A
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 10:17:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbjCPKIW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 06:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56854 "EHLO
+        id S229617AbjCPKRh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 06:17:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230080AbjCPKIU (ORCPT
+        with ESMTP id S229608AbjCPKRg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 06:08:20 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 878B47D9F
-        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 03:07:45 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230316100744euoutp0220fb31884c04406c20193b9703c63445~M3l-cJqWI1463914639euoutp02D
-        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 10:07:44 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230316100744euoutp0220fb31884c04406c20193b9703c63445~M3l-cJqWI1463914639euoutp02D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1678961264;
-        bh=/5KVLbY5EbFI+IEYeOG53hyhtyXgaXrgX9fqrbvA2kY=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=JUQuVLfWUqLd6aIm6j9/zDDnvQ0O1SoTxe/hf0KO8t6DZqznCIT/LBHc/D/ceuCBN
-         4/e1kTHpq/vMsn+XFC0rGgcix9fGawMKYWPJZYt0FjqPspKhXzgqYvGf1BfGBAF8sM
-         uKgM0WAUwybd5MN8RB0zUOLgeURGWLd49sLgE824=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20230316100744eucas1p2091c328f81b5c7d3530f9b9a8e2cabec~M3l-M20OT0459504595eucas1p2X;
-        Thu, 16 Mar 2023 10:07:44 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 68.36.09503.07AE2146; Thu, 16
-        Mar 2023 10:07:44 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230316100743eucas1p2c47958a35d977b3cdc8f2624a25e7bfe~M3l_02bb_0456104561eucas1p26;
-        Thu, 16 Mar 2023 10:07:43 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230316100743eusmtrp179409928ca5693e6acda839d27d15524~M3l_zqiuW1198011980eusmtrp1P;
-        Thu, 16 Mar 2023 10:07:43 +0000 (GMT)
-X-AuditID: cbfec7f2-e8fff7000000251f-92-6412ea70950b
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 5C.36.09583.F6AE2146; Thu, 16
-        Mar 2023 10:07:43 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230316100743eusmtip2c14a68e7c74e1e30e25a0f1511fa316f~M3l_oOcme0556805568eusmtip2x;
-        Thu, 16 Mar 2023 10:07:43 +0000 (GMT)
-Received: from [192.168.8.107] (106.210.248.172) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Thu, 16 Mar 2023 10:07:23 +0000
-Message-ID: <7121c937-adea-a495-eb15-8e0d7fe0838c@samsung.com>
-Date:   Thu, 16 Mar 2023 11:07:22 +0100
+        Thu, 16 Mar 2023 06:17:36 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62EE5B5FDC;
+        Thu, 16 Mar 2023 03:17:34 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32GA3MOu036254;
+        Thu, 16 Mar 2023 10:17:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ZACa85eTwIwEbxbh2jnmGok+PA4RgqK2zsPjWVAbaO0=;
+ b=VQBVVa0hVeaAMk/VLdWbaFLmkZr79x2Qaj5JxbSj2bsBMF9E47wbJYb+QgX0DYA8IQke
+ kAnRYwBqVrdDsGZt/TDhcyIFTAp4eHS7mCljB+RhKUi3WtkmPKfSWaHpdmzk6rA+N8Ln
+ KJp6Ia2PDBMv646TzkudQeAM2i12YE/67nGslrFbqG78+hD+xBSNy/AWeR4MdmU2WfJ0
+ yyICMCVsQeA7RYNnNkd86Sqxy42lusaGUAUqumCohL6zzJCWNb3TkbjV6E0ZUBGf6evo
+ XxpLlSY5TyUVEf+S7noPXRc08Ch7mVBXNm9NSw0nciTpoOhRNu7agdbyT/uUrKzy1SeL rw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbpx4x9bq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Mar 2023 10:17:12 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32G9uM4w036034;
+        Thu, 16 Mar 2023 10:17:12 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3pbpx4x9b6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Mar 2023 10:17:11 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 32G230aA028037;
+        Thu, 16 Mar 2023 10:17:10 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3pbsyxrd8s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 16 Mar 2023 10:17:09 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 32GAH7cl21561864
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Mar 2023 10:17:07 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8422F20040;
+        Thu, 16 Mar 2023 10:17:07 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 224D820065;
+        Thu, 16 Mar 2023 10:17:07 +0000 (GMT)
+Received: from [9.152.212.230] (unknown [9.152.212.230])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 16 Mar 2023 10:17:07 +0000 (GMT)
+Message-ID: <4484f553-84c1-5402-4f52-c2972ad3e496@linux.ibm.com>
+Date:   Thu, 16 Mar 2023 11:17:06 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
-        Thunderbird/102.8.0
-Subject: Re: [RFC PATCH 2/3] mpage: use bio_for_each_folio_all in
- mpage_end_io()
+ Thunderbird/102.8.0
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Mike Christie <michael.christie@oracle.com>, bvanassche@acm.org,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
+        kbusch@kernel.org, target-devel@vger.kernel.org,
+        Jan Hoeppner <hoeppner@linux.ibm.com>
+References: <20230224174502.321490-1-michael.christie@oracle.com>
+ <20230224174502.321490-3-michael.christie@oracle.com>
+ <20230314171119.GB6780@lst.de>
+ <33ed9615-b570-03c7-9a7a-d07f020d3222@linux.ibm.com>
+ <20230315133039.GA24533@lst.de>
 Content-Language: en-US
-To:     Matthew Wilcox <willy@infradead.org>,
-        Hannes Reinecke <hare@suse.de>
-CC:     <hubcap@omnibond.com>, <senozhatsky@chromium.org>,
-        <martin@omnibond.com>, <minchan@kernel.org>,
-        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <axboe@kernel.dk>,
-        <akpm@linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-mm@kvack.org>, <gost.dev@samsung.com>, <mcgrof@kernel.org>,
-        <devel@lists.orangefs.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <ZBHtjrk52/TTPU/F@casper.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   Stefan Haberland <sth@linux.ibm.com>
+Subject: Re: [PATCH v4 02/18] block: Rename BLK_STS_NEXUS to
+ BLK_STS_RESV_CONFLICT
+In-Reply-To: <20230315133039.GA24533@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.172]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMKsWRmVeSWpSXmKPExsWy7djPc7oFr4RSDH5eY7GYs34Nm8Xqu/1s
-        Fq8Pf2K02L95CpPFnkWTmCza7/YxWey9pW2xZ+9JFovLu+awWdxb85/V4uT6/8wWNyY8ZbRY
-        9vU9u8XujYvYLM7/Pc5q8fvHHDYHAY/ZDRdZPDav0PK4fLbUY9OqTjaPTZ8msXucmPGbxaNh
-        6i02j1+377B6bD5d7fF5k5zHpidvmQK4o7hsUlJzMstSi/TtErgytvS2sxW0cVasWivQwDiF
-        vYuRk0NCwETi0LxGVhBbSGAFo8TytzJdjFxA9hdGic/rZrBBOJ8ZJX7/es4I09G37TALRMdy
-        Rom7t4Xgip6+nMQO4exmlFjSeQpsLq+AnUTDrFlg3SwCqhLLzr5ghogLSpyc+QRoEgeHqECU
-        xIvXZSBhYYEgiXsbHrOB2MwC4hK3nsxnArFFBDwk/l9azgIyn1mgh1li7t3TjCC9bAJaEo2d
-        YO9wAh3Xun8nK0SvpkTr9t/sELa8xPa3c5ghHlCWmPN6B5RdK3Fqyy0mCPsZp0TXFBsI20Xi
-        xZ//UDXCEq+Ob4EGl4zE6ck9LBB2tcTTG7+ZQe6REGhhlOjfuZ4N5B4JAWuJvjM5EDWOEpsW
-        TWGFCPNJ3HgrCHEOn8SkbdOZJzCqzkIKiFlIPp6F5INZSD5YwMiyilE8tbQ4Nz212DAvtVyv
-        ODG3uDQvXS85P3cTIzAdnv53/NMOxrmvPuodYmTiYDzEKMHBrCTCG84ikCLEm5JYWZValB9f
-        VJqTWnyIUZqDRUmcV9v2ZLKQQHpiSWp2ampBahFMlomDU6qBKUrZakG/X6yxrdB8TxbT2+n3
-        JQtuct0NvGO3o61u8ekD57vtGK39l2/bcmPtn3UWnI6RNp1rn2059S2g7Jvp1JZdcf1eOpc2
-        SXfOC7316PiPcz9u8345tvhMr/4y/nUiyxfuXH/j0nyh3/nCZ87/nHjQM3WC3ncOW+PJW8P/
-        9Pyoq5E2Mvj49VVHQ6CqgNfF+11td1+/XVh1PGPij0+XloZcve5ZsWhHVZbxzPo/3yPS/u/W
-        s3J9v6gpwstT/PJc9acenFbb55629ZnG0LFxb09O4rclBTtW1d+cz3h1Udei6SUL5Zjn8l5w
-        vzLnXUCAdrlm5Ozn/4uNZXw9M42OsocfFKiwYxJQSUj36RfbulGJpTgj0VCLuag4EQAdOwYz
-        9gMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFKsWRmVeSWpSXmKPExsVy+t/xe7r5r4RSDC7MU7eYs34Nm8Xqu/1s
-        Fq8Pf2K02L95CpPFnkWTmCza7/YxWey9pW2xZ+9JFovLu+awWdxb85/V4uT6/8wWNyY8ZbRY
-        9vU9u8XujYvYLM7/Pc5q8fvHHDYHAY/ZDRdZPDav0PK4fLbUY9OqTjaPTZ8msXucmPGbxaNh
-        6i02j1+377B6bD5d7fF5k5zHpidvmQK4o/RsivJLS1IVMvKLS2yVog0tjPQMLS30jEws9QyN
-        zWOtjEyV9O1sUlJzMstSi/TtEvQytvS2sxW0cVasWivQwDiFvYuRk0NCwESib9thFhBbSGAp
-        o8S1PX4QcRmJT1c+QtUIS/y51sXWxcgFVPORUeJH51omCGc3o8SJ+1dZQap4BewkGmbNYgSx
-        WQRUJZadfcEMEReUODnzCdgGUYEoiad3DoHFhQWCJO5teMwGYjMLiEvcejKfCcQWEfCQ+H9p
-        OQtEvIdZ4lNbDcSyWUwSq6a/AEpwcLAJaEk0doJdxwn0Qev+nawQ9ZoSrdt/s0PY8hLb385h
-        hvhAWWLO6x1Qdq3E57/PGCcwis5Cct4sJGfMQjJqFpJRCxhZVjGKpJYW56bnFhvpFSfmFpfm
-        pesl5+duYgQmkm3Hfm7Zwbjy1Ue9Q4xMHIyHGCU4mJVEeMNZBFKEeFMSK6tSi/Lji0pzUosP
-        MZoCw2gis5Rocj4wleWVxBuaGZgamphZGphamhkrifN6FnQkCgmkJ5akZqemFqQWwfQxcXBK
-        NTBprS2/MfPhyn23GttEVmpOt7Pd9f3wh5wvOX93P/h26wyzm5Gh+omF4i458lP+tGhEPBVJ
-        zdfYNEExYd6am3Hv89exTalwu33xy5GeijdytUmJDWqaUa+vx7BLv/GX3DYx+t1/seMfm6IL
-        JgjInmv0qc06KbWN79Ur44xZXDrbje23JW0JeSI4/ckft/OPv048Fhm5f0ZCRO4q9oNvn8Yn
-        lPSnd9yKcb+ozlT5rbTpaImd6/yMY1HvuPoELmQk/b8V3/Z3laavTNX1c/P59nfO4/67jWXp
-        I59jW3YtdGe1nvRhrUPAkhePrl44LLWrwVNx5Tzvi7ycmwvL/Sb+MF3RvKjhvax91x2lf5zT
-        +pOtlFiKMxINtZiLihMBweWkw60DAAA=
-X-CMS-MailID: 20230316100743eucas1p2c47958a35d977b3cdc8f2624a25e7bfe
-X-Msg-Generator: CA
-X-RootMTR: 20230315123235eucas1p1bd62cb2aab435727880769f2e57624fd
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230315123235eucas1p1bd62cb2aab435727880769f2e57624fd
-References: <20230315123233.121593-1-p.raghav@samsung.com>
-        <CGME20230315123235eucas1p1bd62cb2aab435727880769f2e57624fd@eucas1p1.samsung.com>
-        <20230315123233.121593-3-p.raghav@samsung.com>
-        <64a5e85e-4018-ed7d-29d4-db12af290899@suse.de>
-        <ZBHtjrk52/TTPU/F@casper.infradead.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7Lu1Tb2Scs24OFho49SszeZQEQtjCy3_
+X-Proofpoint-ORIG-GUID: e5UmNwL8IYAtm8F-8DT0dsS5_CITZfXA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-16_06,2023-03-15_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ spamscore=0 adultscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0
+ phishscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303150002
+ definitions=main-2303160081
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-03-15 17:08, Matthew Wilcox wrote:
-> On Wed, Mar 15, 2023 at 03:52:15PM +0100, Hannes Reinecke wrote:
->> On 3/15/23 13:32, Pankaj Raghav wrote:
->>> Use bio_for_each_folio_all to iterate through folios in a bio so that
->>> the folios can be directly passed to the folio_endio() function.
->>> +	bio_for_each_folio_all(fi, bio)
->>> +		folio_endio(fi.folio, bio_op(bio),
->>> +			    blk_status_to_errno(bio->bi_status));
->>>   	bio_put(bio);
->>>   }
->>
->> Ah. Here it is.
->>
->> I would suggest merge these two patches.
-> 
-> The right way to have handled this patch series was:
-> 
-> 1. Introduce a new folio_endio() [but see Christoph's mail on why we
-> shouldn't do that]
-> 2-n convert callers to use folios directly
-> n+1 remove page_endio() entirely.
-> 
-> Note that patch n+1 might not be part of this patch series; sometimes
-> it takes a while to convert all callers to use folios.
-> 
+Am 15.03.23 um 14:30 schrieb Christoph Hellwig:
+> On Wed, Mar 15, 2023 at 11:04:22AM +0100, Stefan Haberland wrote:
+>> This also fits for the DASD case. We use this error code for a
+>> reservation/locking conflict of the DASD device when the lock we
+>> previously held was stolen.
+> But that's not really a reservation conflict in the sense
+> of the reservation API.  Given that DASD doesn't support it it
+> might not matter.  Do you have applications that checks for
+> the translated errno value?  We'll probably at least want
+> a comment documenting this status code.
 
-This is definitely a much better way to handle these changes. Thanks willy.
+Well, I might completely misunderstand the use case for this error code.
+Sorry if that is the case.
 
-> I very much dislike the way this was done by pushing the page_folio()
-> call into each of the callers because it makes the entire series hard to
-> review.
+Beside that I thought that the return codes are generic blocklayer 
+return codes
+and not bound to a specific API. I am not familiar with the reservation 
+API you
+are talking about.
+
+What I understood from the reservation in NVMe context is that a namespace
+might be reserved to a host. If there is a conflict with this reservation
+this error code is provided for the IO request.
+
+For DASDs we have the possibility to reserve a disk for a host. If there 
+is a
+conflict with this platform specific reservation we would present this 
+error
+for an IO request.
+
+This sounded quite similar for me.
+
+I am completely open to using another return code and I am not aware of an
+application checking for this specific return code.
+
+Is there any that would fit better from your point of view?
+
