@@ -2,213 +2,191 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD892C6FD1D
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 02:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BA6C74A5B
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 03:13:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbjCPCAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 22:00:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51252 "EHLO
+        id S229512AbjCPDNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Mar 2023 23:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbjCPCAi (ORCPT
+        with ESMTP id S229464AbjCPDNr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 22:00:38 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 973F1AF2B8
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 19:00:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1678932037; x=1710468037;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=frvO2agJBLyaiESLPLi6KEXOHNLtpqWj0D7l6//gTck=;
-  b=iz87SVw6rK3M3drbNCVMC36JurLMYrRwCyUAO9/g/YU1/Nl0HH+O8JpW
-   CgEG8GwlUdXNwRx8+c2FGjajwAKV6HdIvx5cVgIBKb/P3z+Pn1BNfn1Cz
-   6AMBC4E91ewbwFwKXc+WZWNtsscXWfxj+lKkHfxSg9ccV3cYqmvNtsMCp
-   tNTAXup6eWsPiAP878LQofpC88Ja/ca5e6xZHkNSffoY/e9Rv0wyo8wlk
-   hqLDKiDC3NF5C+My4B0IjxiZYmTSDOIiX6F3xpmuQXz5e/F7pv1NG2Yrk
-   5ORdwrTfWCyz7IM1bx121yzt64Gvpr5DucsjnknG1bAIB1dlZBkvZyd1N
-   A==;
-X-IronPort-AV: E=Sophos;i="5.98,264,1673884800"; 
-   d="scan'208";a="224020858"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Mar 2023 10:00:34 +0800
-IronPort-SDR: kAETL9C0SmOQNClDqfMp7SnJ9vp5kG65C6AG6PNU98rALybfY5wZYNAO51mjFM2PzVJuu+wZj2
- +kgea3XMK7rpdvP/d+hNLKbLnrgsX/RUZhrsxEpWVy3r9wiJBPblr97MPDldnCubTz89kmJ8pE
- djYlJCqbfxnc3sfNzn/C2V79a4fn1uZJ5cLi1GXkHoziWeSE0PM7Js9+hQfB2v/2a9thEqrlCJ
- GLvigLy4HuDsiQTLqO4kQPm2/jGxNeHKqvNyWG5f1+uwpAtS2iJ+jmxn+zn0y7ZNhHt0Xcu4v/
- Myg=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Mar 2023 18:17:00 -0700
-IronPort-SDR: cIWg8WYOIKbqV63Dg1QBegmn6E2Fl7B4wN8ZY0vHGNmZ3pAwWsT8m6D2X34MpWmtU2lUFGbohY
- NbNSRH1JMdED+ScKKAmLIx10WtpeKk7OaFdeH7Emci9kYGHUdt0MObaWJLXyXJTOB4V7KGbC0G
- 03HVKE2unSvSl668binUdawbHm4uD03c/kG0QikvLzhXH/4kEsH3D4ZIcKqXG/mlKC++i8qSJY
- d1EpaqkSEAx4UJbG4VvWwfn72PWZ43Oye9ghSQ1ubrEF3RqWhRb+BUU8bwMWcnACnXkzG1Ko6I
- qJw=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Mar 2023 19:00:35 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PcVpV0XrWz1RtVx
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 19:00:34 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1678932032; x=1681524033; bh=frvO2agJBLyaiESLPLi6KEXOHNLtpqWj0D7
-        l6//gTck=; b=O5NEhEOYDYzRLeeVx579qgOZqzEvmwyli7naBjmovIziFs+apeo
-        ftJqf5TZ6kye6zPJs7GtC5sED71/KDXOw+cIkKJbd2gVQ4mJCc4Odo1cYYziH8Vk
-        Mv0ezm2WHyWGlxEbUtcuURlLpKMWpWg4xssr4Ceo1xTZEuOURT4JZOV20S6ra+IC
-        Wb2E15lA7rG+5425HA4Jf3ViTxUGhf2YBjqcE+8pKajcW6PnVObFUmlwpnIySuDx
-        lGbv3xUlG7YiX+BJnqA7Om7wrC6XK0nQtnaT27/q+YagS3M0z6dRA2TmYYQP9tgW
-        F8SIKp90Ai1q0akUNr1jsz77CMB+0Yi7Sow==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 3YxxIMAwwFxP for <linux-block@vger.kernel.org>;
-        Wed, 15 Mar 2023 19:00:32 -0700 (PDT)
-Received: from [10.89.80.69] (c02drav6md6t.dhcp.fujisawa.hgst.com [10.89.80.69])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PcVpR4Bd2z1RtVm;
-        Wed, 15 Mar 2023 19:00:31 -0700 (PDT)
-Message-ID: <c91be70e-14a9-7ad6-ba7c-975a640a34d3@opensource.wdc.com>
-Date:   Thu, 16 Mar 2023 11:00:30 +0900
+        Wed, 15 Mar 2023 23:13:47 -0400
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CD432D173;
+        Wed, 15 Mar 2023 20:13:44 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VdyJZbd_1678936419;
+Received: from 30.221.146.182(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VdyJZbd_1678936419)
+          by smtp.aliyun-inc.com;
+          Thu, 16 Mar 2023 11:13:40 +0800
+Message-ID: <fd30b561-86dd-5061-714f-e46058f7079f@linux.alibaba.com>
+Date:   Thu, 16 Mar 2023 11:13:39 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.8.0
-Subject: Re: [PATCH v4 02/19] block: introduce ioprio hints
+Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>
+References: <20230314125727.1731233-1-ming.lei@redhat.com>
 Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230309215516.3800571-1-niklas.cassel@wdc.com>
- <20230309215516.3800571-3-niklas.cassel@wdc.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230309215516.3800571-3-niklas.cassel@wdc.com>
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+In-Reply-To: <20230314125727.1731233-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/03/10 6:54, Niklas Cassel wrote:
-> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> 
-> IO priorities currently only use 6-bits of the 16-bits ioprio value: the
-> 3-upper bits are used to define up to 8 priority classes (4 of which are
-> valid) and the 3 lower bits of the value are used to define a priority
-> level for the real-time and best-effort class.
-> 
-> The remaining 10-bits between the IO priority class and level are
-> unused, and in fact, cannot be used by the user as doing so would
-> either result in the value being completely ignored, or in an error
-> returned by ioprio_check_cap().
-> 
-> Use these 10-bits of an ioprio value to allow a user to specify IO
-> hints. An IO hint is defined as a 10-bits value, allowing up to 1023
-> different hints to be specified, with the value 0 being reserved as the
-> "no hint" case. An IO hint can apply to any IO that specifies a valid
-> priority class other than NONE, regardless of the IO priority level
-> specified.
-> 
-> To do so, the macros IOPRIO_PRIO_HINT() and IOPRIO_PRIO_VALUE_HINT() are
-> introduced in include/uapi/linux/ioprio.h to respectively allow a user
-> to get and set a hint in an ioprio value.
-> 
-> To support the ATA and SCSI command duration limits feature, 7 hints
-> are defined: IOPRIO_HINT_DEV_DURATION_LIMIT_1 to
-> IOPRIO_HINT_DEV_DURATION_LIMIT_7, allowing a user to specify which
-> command duration limit descriptor should be applied to the commands
-> serving an IO. Specifying these hints has for now no effect whatsoever
-> if the target block devices do not support the command duration limits
-> feature. However, in the future, block IO schedulers can be modified to
-> optimize IO issuing order based on these hints, even for devices that
-> do not support the command duration limits feature.
-> 
-> Given that the 7 duration limits hints defined have no effect on any
-> block layer component, the actual definition of the duration limits
-> implied by these hints remains at the device level.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+hi,
 
-Jens, Martin,
+> Hello,
+>
+> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+> and its ->issue() can retrieve/import buffer from master request's
+> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+> submits slave OP just like normal OP issued from userspace, that said,
+> SQE order is kept, and batching handling is done too.
+Thanks for this great work, seems that we're now in the right direction
+to support ublk zero copy, I believe this feature will improve io throughput
+greatly and reduce ublk's cpu resource usage.
 
-Any thoughts on this new interface ?
+I have gone through your 2th patch, and have some little concerns here:
+Say we have one ublk loop target device, but it has 4 backend files,
+every file will carry 25% of device capacity and it's implemented in stripped
+way, then for every io request, current implementation will need issed 4
+fused_cmd, right? 4 slave sqes are necessary, but it would be better to
+have just one master sqe, so I wonder whether we can have another
+method. The key point is to let io_uring support register various kernel
+memory objects, which come from kernel, such as ITER_BVEC or
+ITER_KVEC. so how about below actions:
+1. add a new infrastructure in io_uring, which will support to register
+various kernel memory objects in it, this new infrastructure could be
+maintained in a xarray structure, every memory objects in it will have
+a unique id. This registration could be done in a ublk uring cmd, io_uring
+offers registration interface.
+2. then any sqe can use these memory objects freely, so long as it
+passes above unique id in sqe properly.
+Above are just rough ideas, just for your reference.
 
-Bart,
+And current zero-copy method only supports raw data redirection, if
+ublk targets need to crc, compress, encrypt raw io requests' pages,
+then we'll still need to copy block layer's io data to userspace daemon.
+In that way, ebpf may give a help :) we directly operate block layer's
+io data in ebpf prog, doing crc or compress, encrypt, still does not need
+to copy to userspace daemon. But as you said before, ebpf may not
+support complicated user io logic, a much long way to go...
 
-I would like to hear your opinion as well.
+Regards,
+Xiaoguang Wang
 
-
-> ---
->  include/uapi/linux/ioprio.h | 49 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 49 insertions(+)
-> 
-> diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-> index 4444b4e4fdad..607c7617b9d2 100644
-> --- a/include/uapi/linux/ioprio.h
-> +++ b/include/uapi/linux/ioprio.h
-> @@ -58,4 +58,53 @@ enum {
->  #define IOPRIO_NORM	4
->  #define IOPRIO_BE_NORM	IOPRIO_NORM
->  
-> +/*
-> + * The 10-bits between the priority class and the priority level are used to
-> + * optionally define IO hints for any combination of IO priority class and
-> + * level. Depending on the kernel configuration, IO scheduler being used and
-> + * the target IO device being used, hints can influence how IOs are processed
-> + * without affecting the IO scheduling ordering defined by the IO priority
-> + * class and level.
-> + */
-> +#define IOPRIO_HINT_SHIFT		IOPRIO_LEVEL_NR_BITS
-> +#define IOPRIO_HINT_NR_BITS		10
-> +#define IOPRIO_NR_HINTS			(1 << IOPRIO_HINT_NR_BITS)
-> +#define IOPRIO_HINT_MASK		(IOPRIO_NR_HINTS - 1)
-> +#define IOPRIO_PRIO_HINT(ioprio)	\
-> +	(((ioprio) >> IOPRIO_HINT_SHIFT) & IOPRIO_HINT_MASK)
-> +
-> +/*
-> + * Alternate macro for IOPRIO_PRIO_VALUE() to define an IO priority with
-> + * a class, level and hint.
-> + */
-> +#define IOPRIO_PRIO_VALUE_HINT(class, level, hint)		 \
-> +	((((class) & IOPRIO_CLASS_MASK) << IOPRIO_CLASS_SHIFT) | \
-> +	 (((hint) & IOPRIO_HINT_MASK) << IOPRIO_HINT_SHIFT) |	 \
-> +	 ((level) & IOPRIO_LEVEL_MASK))
-> +
-> +/*
-> + * IO hints.
-> + */
-> +enum {
-> +	/* No hint */
-> +	IOPRIO_HINT_NONE = 0,
-> +
-> +	/*
-> +	 * Device command duration limits: indicate to the device a desired
-> +	 * duration limit for the commands that will be used to process an IO.
-> +	 * These will currently only be effective for SCSI and ATA devices that
-> +	 * support the command duration limits feature. If this feature is
-> +	 * enabled, then the commands issued to the device to process an IO with
-> +	 * one of these hints set will have the duration limit index (dld field)
-> +	 * set to the value of the hint.
-> +	 */
-> +	IOPRIO_HINT_DEV_DURATION_LIMIT_1 = 1,
-> +	IOPRIO_HINT_DEV_DURATION_LIMIT_2 = 2,
-> +	IOPRIO_HINT_DEV_DURATION_LIMIT_3 = 3,
-> +	IOPRIO_HINT_DEV_DURATION_LIMIT_4 = 4,
-> +	IOPRIO_HINT_DEV_DURATION_LIMIT_5 = 5,
-> +	IOPRIO_HINT_DEV_DURATION_LIMIT_6 = 6,
-> +	IOPRIO_HINT_DEV_DURATION_LIMIT_7 = 7,
-> +};
-> +
->  #endif /* _UAPI_LINUX_IOPRIO_H */
-
--- 
-Damien Le Moal
-Western Digital Research
+>
+> Please see detailed design in commit log of the 2th patch, and one big
+> point is how to handle buffer ownership.
+>
+> With this way, it is easy to support zero copy for ublk/fuse device.
+>
+> Basically userspace can specify any sub-buffer of the ublk block request
+> buffer from the fused command just by setting 'offset/len'
+> in the slave SQE for running slave OP. This way is flexible to implement
+> io mapping: mirror, stripped, ...
+>
+> The 3th & 4th patches enable fused slave support for the following OPs:
+>
+> 	OP_READ/OP_WRITE
+> 	OP_SEND/OP_RECV/OP_SEND_ZC
+>
+> The other ublk patches cleans ublk driver and implement fused command
+> for supporting zero copy.
+>
+> Follows userspace code:
+>
+> https://github.com/ming1/ubdsrv/tree/fused-cmd-zc-v2
+>
+> All three(loop, nbd and qcow2) ublk targets have supported zero copy by passing:
+>
+> 	ublk add -t [loop|nbd|qcow2] -z .... 
+>
+> Basic fs mount/kernel building and builtin test are done, and also not
+> observe regression on xfstest test over ublk-loop with zero copy.
+>
+> Also add liburing test case for covering fused command based on miniublk
+> of blktest:
+>
+> https://github.com/ming1/liburing/commits/fused_cmd_miniublk
+>
+> Performance improvement is obvious on memory bandwidth
+> related workloads, such as, 1~2X improvement on 64K/512K BS
+> IO test on loop with ramfs backing file.
+>
+> Any comments are welcome!
+>
+> V3:
+> 	- fix build warning reported by kernel test robot
+> 	- drop patch for checking fused flags on existed drivers with
+> 	  ->uring_command(), which isn't necessary, since we do not do that
+>       when adding new ioctl or uring command
+>     - inline io_init_rq() for core code, so just export io_init_slave_req
+> 	- return result of failed slave request unconditionally since REQ_F_CQE_SKIP
+> 	will be cleared
+> 	- pass xfstest over ublk-loop
+>
+> V2:
+> 	- don't resue io_mapped_ubuf (io_uring)
+> 	- remove REQ_F_FUSED_MASTER_BIT (io_uring)
+> 	- fix compile warning (io_uring)
+> 	- rebase on v6.3-rc1 (io_uring)
+> 	- grabbing io request reference when handling fused command 
+> 	- simplify ublk_copy_user_pages() by iov iterator
+> 	- add read()/write() for userspace to read/write ublk io buffer, so
+> 	that some corner cases(read zero, passthrough request(report zones)) can
+> 	be handled easily in case of zero copy; this way also helps to switch to
+> 	zero copy completely
+> 	- misc cleanup
+>
+>
+> Ming Lei (16):
+>   io_uring: increase io_kiocb->flags into 64bit
+>   io_uring: add IORING_OP_FUSED_CMD
+>   io_uring: support OP_READ/OP_WRITE for fused slave request
+>   io_uring: support OP_SEND_ZC/OP_RECV for fused slave request
+>   block: ublk_drv: mark device as LIVE before adding disk
+>   block: ublk_drv: add common exit handling
+>   block: ublk_drv: don't consider flush request in map/unmap io
+>   block: ublk_drv: add two helpers to clean up map/unmap request
+>   block: ublk_drv: clean up several helpers
+>   block: ublk_drv: cleanup 'struct ublk_map_data'
+>   block: ublk_drv: cleanup ublk_copy_user_pages
+>   block: ublk_drv: grab request reference when the request is handled by
+>     userspace
+>   block: ublk_drv: support to copy any part of request pages
+>   block: ublk_drv: add read()/write() support for ublk char device
+>   block: ublk_drv: don't check buffer in case of zero copy
+>   block: ublk_drv: apply io_uring FUSED_CMD for supporting zero copy
+>
+>  drivers/block/ublk_drv.c       | 602 ++++++++++++++++++++++++++-------
+>  include/linux/io_uring.h       |  49 ++-
+>  include/linux/io_uring_types.h |  80 +++--
+>  include/uapi/linux/io_uring.h  |   1 +
+>  include/uapi/linux/ublk_cmd.h  |  37 +-
+>  io_uring/Makefile              |   2 +-
+>  io_uring/fused_cmd.c           | 245 ++++++++++++++
+>  io_uring/fused_cmd.h           |  11 +
+>  io_uring/io_uring.c            |  28 +-
+>  io_uring/io_uring.h            |   3 +
+>  io_uring/net.c                 |  30 +-
+>  io_uring/opdef.c               |  17 +
+>  io_uring/opdef.h               |   2 +
+>  io_uring/rw.c                  |  20 ++
+>  14 files changed, 967 insertions(+), 160 deletions(-)
+>  create mode 100644 io_uring/fused_cmd.c
+>  create mode 100644 io_uring/fused_cmd.h
+>
 
