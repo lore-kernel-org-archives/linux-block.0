@@ -2,80 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A464C6FD1F
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 10:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C39D5C6FD1F
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 11:16:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229473AbjCPKvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 06:51:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43040 "EHLO
+        id S229638AbjCPLQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 07:16:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjCPKvR (ORCPT
+        with ESMTP id S229786AbjCPLQg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 06:51:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E507199CC;
-        Thu, 16 Mar 2023 03:51:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 11377B820D1;
-        Thu, 16 Mar 2023 10:51:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D23C433EF;
-        Thu, 16 Mar 2023 10:51:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678963873;
-        bh=o5wa1JMj2zzuoLzQAkHij/fz/01C48xRb+au5j5qJNM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Z6m+LgZxyPxAv9EF0QM2ILFfjSGfBIs2q0m7UE/ox2P47WZ0IVDQkg3dTSnGKjT+S
-         df3mIO7yB5DdnIXxeKDRagCzRKy4eAceaSzGVP82Dj6INOgp1E9vUpeHCCyWwCp0Ek
-         CsP1C15KG2u79hUs+oj5wp3XpOoFIfZfagjTdNjLpRbpo7w5RPTcKjanjqpw7YTIAZ
-         m9c4vzCjjwPiSzdOjh4uog3ibSebCMwFEARA/HHuui3y81y0E/Vt4+58VS65hjPgPK
-         VTy4dj5G35wcUcdjocnS6mYptUQP/m3CTeMatassVYe+scqaZ4yt6M80ZrXWJW9b83
-         OoUzAKY/vg3Mw==
-Date:   Thu, 16 Mar 2023 11:51:06 +0100
-From:   Christian Brauner <brauner@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v19 09/15] iov_iter: Kill ITER_PIPE
-Message-ID: <20230316105106.cqo7equqxzw342rr@wittgenstein>
-References: <20230315163549.295454-1-dhowells@redhat.com>
- <20230315163549.295454-10-dhowells@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230315163549.295454-10-dhowells@redhat.com>
+        Thu, 16 Mar 2023 07:16:36 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50D22BBB15;
+        Thu, 16 Mar 2023 04:16:35 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id eg48so5966695edb.13;
+        Thu, 16 Mar 2023 04:16:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678965394;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NfjSPidc5pyhIjhycYrYynfFm6hlfBhZw9y/nZ4/67Y=;
+        b=WxdArsdAYr4fk0dWLGtqTHtrj6klABluPaNoEoRS+hnaZcm1OoFRtNNMvGPxQvMjXx
+         cNVUR8DgmDTpELX0ZyUkQopcSbTfcWDg+rhMHdp2YvnsNFRw0Fpl5H3D8oEfAKcZtnV3
+         si+whSMJ3ZxTJ868ssF76X17ZSC9I8+YgoN4RoJ5rjIZpEg0JdG99Gut9V2jgEvF9vKE
+         xmgxEgel3MKcHFPMGS+QsEXMD7R6voxnvwf+Z3/MRVG8WFsmGvd11OZyJnZSv5CZeCU8
+         xXPv5G91hbFnpVyjK/71C5pQRQGTyp/3xu/JsZZZo/GN01QObZdv6NjnjUTttoIV/zzG
+         FstQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678965394;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NfjSPidc5pyhIjhycYrYynfFm6hlfBhZw9y/nZ4/67Y=;
+        b=6dminVI27YqZgJCB7rlch2ZjOV2a1YOKbprCIEhQpwz3KdOIRZ7+lM+skVSC6jWuFv
+         VFKjusjpAq5O7n7ml/EDTKe84nQM+XVq02gXs+4UrGLu1DGyclopAAtZ7PbXSMUqgH+k
+         HsZmJ9zSZQMiOIGVNMftUWntCogu0qzI5IdG6XxoxAGNQE5bmIQf4zmLx362ighTgVly
+         rRbOrzeWyT4B9wxZs0UWTDgCbXXFQT3zJGX1yb+OFVsmsD7W3s9UXKVqtHI2qiKAJ8s8
+         RbyraJzgYjAludCLtUqUkt7G2HuEmqobT5IUj11XoKBrYi6o3nOW/xOBAUaZtmEJRTid
+         CYPw==
+X-Gm-Message-State: AO0yUKU8WFmgzZAuwbbUje4kdDfm/pgF8sBlpNg3UYPceU2SpWk06bTv
+        foJjNpJu9dyJHQJg1btyfwo=
+X-Google-Smtp-Source: AK7set86pLM7AMgzdBVkzaZKIiaXpyIOBZ/aEXxSow8ZQjQPCY3mEBF3kqIJjz3w8nY9ds6lKLYaDQ==
+X-Received: by 2002:a17:906:c244:b0:86a:316:d107 with SMTP id bl4-20020a170906c24400b0086a0316d107mr9706530ejb.72.1678965393665;
+        Thu, 16 Mar 2023 04:16:33 -0700 (PDT)
+Received: from felia.fritz.box ([2a02:810d:2a40:1104:a05c:be0f:b1e7:779e])
+        by smtp.gmail.com with ESMTPSA id qa14-20020a170907868e00b008f702684c51sm3704245ejc.161.2023.03.16.04.16.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Mar 2023 04:16:33 -0700 (PDT)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] block: remove obsolete config BLOCK_COMPAT
+Date:   Thu, 16 Mar 2023 12:16:30 +0100
+Message-Id: <20230316111630.4897-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 04:35:43PM +0000, David Howells wrote:
-> The ITER_PIPE-type iterator was only used for generic_file_splice_read(),
-> but that has now been switched to either pull pages directly from the
-> pagecache for buffered file splice-reads or to use ITER_BVEC instead for
-> O_DIRECT file splice-reads.  This leaves ITER_PIPE unused - so remove it.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: David Hildenbrand <david@redhat.com>
-> cc: John Hubbard <jhubbard@nvidia.com>
-> cc: linux-mm@kvack.org
-> cc: linux-block@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> ---
+Before commit bdc1ddad3e5f ("compat_ioctl: block: move
+blkdev_compat_ioctl() into ioctl.c"), the config BLOCK_COMPAT was used to
+include compat_ioctl.c into the kernel build. With this commit, the code
+is moved into ioctl.c and included with the config COMPAT. So, since then,
+the config BLOCK_COMPAT has no effect and any further purpose.
 
-That is a good simplification,
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+Remove this obsolete config BLOCK_COMPAT.
+
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+ block/Kconfig | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/block/Kconfig b/block/Kconfig
+index 5d9d9c84d516..941b2dca70db 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -204,9 +204,6 @@ config BLK_INLINE_ENCRYPTION_FALLBACK
+ 
+ source "block/partitions/Kconfig"
+ 
+-config BLOCK_COMPAT
+-	def_bool COMPAT
+-
+ config BLK_MQ_PCI
+ 	def_bool PCI
+ 
+-- 
+2.17.1
+
