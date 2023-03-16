@@ -2,152 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 837E9C6FD19
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 03:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF971C6FD1F
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 07:59:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjCPD5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Mar 2023 23:57:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52160 "EHLO
+        id S229698AbjCPH7I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 03:59:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjCPD5C (ORCPT
+        with ESMTP id S229982AbjCPH7H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Mar 2023 23:57:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AC5C6A2F1
-        for <linux-block@vger.kernel.org>; Wed, 15 Mar 2023 20:56:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678938977;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QNiK2VEGVrc54NDmjJpog4oYcRrtFTUQS5YRNkrDJd8=;
-        b=cmA30X1sXN0HZcMZje4DVPi/2HhUHPDJ72mHxKmEnCAtiDmuJzNhtKyNZ62daZxhPfdLYi
-        yLRs/sHU5Jtw3vrGixcgK/bX/H1HMjhZoQ9tZS3xe2tfS7qa+Cg6klEllCe4byWP5Eo064
-        qDwy9dGWbNUGqNkAG10uUMlG9IktMpg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-530-rSkoSpS4NJSu5bAAU3FQfw-1; Wed, 15 Mar 2023 23:56:13 -0400
-X-MC-Unique: rSkoSpS4NJSu5bAAU3FQfw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 752A187A9E1;
-        Thu, 16 Mar 2023 03:56:13 +0000 (UTC)
-Received: from ovpn-8-22.pek2.redhat.com (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CB782492B00;
-        Thu, 16 Mar 2023 03:56:07 +0000 (UTC)
-Date:   Thu, 16 Mar 2023 11:56:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
-Message-ID: <ZBKTUtWTVdcTeUHD@ovpn-8-22.pek2.redhat.com>
-References: <20230314125727.1731233-1-ming.lei@redhat.com>
- <fd30b561-86dd-5061-714f-e46058f7079f@linux.alibaba.com>
+        Thu, 16 Mar 2023 03:59:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B1C32CC71
+        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 00:58:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=XTBXPgJaAS/Rk+rOJ2daFp/gw2en9Iwyy0SadIzG7Oo=; b=b8ZdSEa8hvhtb7D0gEjRpezPsx
+        7V3umsxINJnwDpF/KFmrDtt9GjhZ8WC/ChWqNylgUfElMZP9CrNg+IYXzsdLjfDX0hXRdm1RKkZlE
+        +/QpeoiBEZhRoAAxKMmOy5DhLDvfK8U+564xcLtyA0k5n/ctRyk6DS7xzHhM55VRuwAuC/PL8iCfL
+        PfphBeVLU3hqUWS5warRGZ/zd8fqteE0jAdVPFp2cvjEIBUMEK+zgxgaltPNcbF6RHzNB3g59kKXw
+        8e9hDgpb/XqO6aMBNEMKIh/81qiJwWaXpVPAj5iDUnWB3uL4/4yebn31Y5QunjBc8fCf3/UCDvXT1
+        G3Gfu2Tg==;
+Received: from 213-225-12-242.nat.highway.a1.net ([213.225.12.242] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pciVZ-00FZUS-1r;
+        Thu, 16 Mar 2023 07:58:45 +0000
+Date:   Thu, 16 Mar 2023 08:58:41 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.3
+Message-ID: <ZBLMMaLFyRsgOvGp@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fd30b561-86dd-5061-714f-e46058f7079f@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 11:13:39AM +0800, Xiaoguang Wang wrote:
-> hi,
-> 
-> > Hello,
-> >
-> > Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
-> > be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
-> > 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
-> > to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
-> > and its ->issue() can retrieve/import buffer from master request's
-> > fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
-> > this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
-> > submits slave OP just like normal OP issued from userspace, that said,
-> > SQE order is kept, and batching handling is done too.
-> Thanks for this great work, seems that we're now in the right direction
-> to support ublk zero copy, I believe this feature will improve io throughput
-> greatly and reduce ublk's cpu resource usage.
-> 
-> I have gone through your 2th patch, and have some little concerns here:
-> Say we have one ublk loop target device, but it has 4 backend files,
-> every file will carry 25% of device capacity and it's implemented in stripped
-> way, then for every io request, current implementation will need issed 4
-> fused_cmd, right? 4 slave sqes are necessary, but it would be better to
-> have just one master sqe, so I wonder whether we can have another
+The following changes since commit b6402014cab0481bdfd1ffff3e1dad714e8e1205:
 
-Yeah, the current approach needs 4 fused command with 4 slave request,
-but from user viewpoint it is just 4 128byte SQEs.
+  block: null_blk: cleanup null_queue_rq() (2023-03-15 06:50:24 -0600)
 
-It is pretty lightweight to handle master command, just calling io_fused_cmd_provide_kbuf()
-for providing the buffer, so IMO it is fine to submit 4 fused command to handle
-single stripped IO.
+are available in the Git repository at:
 
-> method. The key point is to let io_uring support register various kernel
-> memory objects, which come from kernel, such as ITER_BVEC or
-> ITER_KVEC. so how about below actions:
-> 1. add a new infrastructure in io_uring, which will support to register
-> various kernel memory objects in it, this new infrastructure could be
-> maintained in a xarray structure, every memory objects in it will have
-> a unique id. This registration could be done in a ublk uring cmd, io_uring
-> offers registration interface.
-> 2. then any sqe can use these memory objects freely, so long as it
-> passes above unique id in sqe properly.
-> Above are just rough ideas, just for your reference.
+  git://git.infradead.org/nvme.git tags/nvme-6.3-2022-03-16
 
-I'd rather not add more complexity from the beginning, and IMO probably it
-could be the most simple & generic way to handle it by single fused command,
-at least the buffer lifetime/ownership won't cross multiple OPs.
+for you to fetch changes up to 6173a77b7e9d3e202bdb9897b23f2a8afe7bf286:
 
-Registering per-io buffer isn't free, Pavel actually mentioned the
-idea, basically:
+  nvmet: avoid potential UAF in nvmet_req_complete() (2023-03-15 14:58:53 +0100)
 
-1) one OP is for registering buffer
-2) another OP is for un-registering buffer
+----------------------------------------------------------------
+nvme fixes for Linux 6.3
 
-Then we still need 3+ OPs(SQEs) for handling single IO, not mention the buffer
-has to be stored in global(per-ctx) data structure, and you have to pay
-cost to read/write global data structure in IO fast path. In the case of
-4 stripped underlying device, you still need 6 64byte SQEs for handling single io.
+ - avoid potential UAF in nvmet_req_complete (Damien Le Moal)
+ - more quirks (Elmer Miroslav Mosher Golovin, Philipp Geulen)
+ - fix a memory leak in the nvme-pci probe teardown path (Irvin Cote)
+ - repair the MAINTAINERS entry (Lukas Bulwahn)
+ - fix handling single range discard request (Ming Lei)
+ - show more opcode names in trace events (Minwoo Im)
+ - fix nvme-tcp timeout reporting (Sagi Grimberg)
 
-But in future if we don't have other better candidates and fused command can't
-scale well, we can extend it or add new OPs for improving the multiple underlying
-devices, but so far, not see the problem.
+----------------------------------------------------------------
+Damien Le Moal (1):
+      nvmet: avoid potential UAF in nvmet_req_complete()
 
-> 
-> And current zero-copy method only supports raw data redirection, if
+Elmer Miroslav Mosher Golovin (1):
+      nvme-pci: add NVME_QUIRK_BOGUS_NID for Netac NV3000
 
-Yeah.
+Irvin Cote (1):
+      nvme-pci: fixing memory leak in probe teardown path
 
-> ublk targets need to crc, compress, encrypt raw io requests' pages,
-> then we'll still need to copy block layer's io data to userspace daemon.
+Lukas Bulwahn (1):
+      MAINTAINERS: repair malformed T: entries in NVM EXPRESS DRIVERS
 
-Yes, zero copy can't cover all cases, that is why I add read/write
-interface to support other cases, see patch 14, then userspace can
-do whatwever they like.
+Ming Lei (1):
+      nvme: fix handling single range discard request
 
-Actually once zero copy is accepted, I'd suggest to mark the non-zc code path
-as legacy, since the copy can be done explicitly in userspace by the added
-read()/write(). And ublk driver can get simplified & cleaned, same with
-userspace implementation.
+Minwoo Im (1):
+      nvme-trace: show more opcode names
 
-> In that way, ebpf may give a help :) we directly operate block layer's
-> io data in ebpf prog, doing crc or compress, encrypt, still does not need
-> to copy to userspace daemon. But as you said before, ebpf may not
-> support complicated user io logic, a much long way to go...
+Philipp Geulen (1):
+      nvme-pci: add NVME_QUIRK_BOGUS_NID for Lexar NM620
 
-Of course, there can be lots of work for future improvement, and ebpf is
-really one great weapon, but let's start effectively with something
-reliable & simple.
+Sagi Grimberg (2):
+      nvme-tcp: fix opcode reporting in the timeout handler
+      nvme-tcp: add nvme-tcp pdu size build protection
 
-
-thanks,
-Ming
-
+ MAINTAINERS                |  8 ++++----
+ drivers/nvme/host/core.c   | 28 +++++++++++++++++++---------
+ drivers/nvme/host/pci.c    |  5 +++++
+ drivers/nvme/host/tcp.c    | 33 +++++++++++++++++++++++++++------
+ drivers/nvme/target/core.c |  4 +++-
+ include/linux/nvme.h       |  5 +++++
+ 6 files changed, 63 insertions(+), 20 deletions(-)
