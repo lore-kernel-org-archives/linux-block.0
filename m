@@ -2,318 +2,639 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E43C6FD1F
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 14:25:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB618C6FD19
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 14:55:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230495AbjCPOZi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 10:25:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56322 "EHLO
+        id S230171AbjCPOzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 10:55:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230241AbjCPOZh (ORCPT
+        with ESMTP id S230129AbjCPOzt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 10:25:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56333B53CF
-        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 07:24:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1678976692;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tlU0VIZTxbUnw6ta2XILXCFOUxMiwfJQmlzuOkfTnno=;
-        b=Rl3zPq5QNxT5aiFP7R48eGrlOKJ5KjoEL9AC45qKfB2xlBEp4r8j2EMft6IPVFhQ0AM58m
-        gx/CPDGAipm6SEoddwt2ZPw/Dre3hGFMSqDUV+I+Y17Q21YCaa9Tg8VDIOk7o+BdEmc3bg
-        XivYcESqO40eNw9gDyvYaDWcAIntQqk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-605-YmrcPXGjP9a2UlLzljs92g-1; Thu, 16 Mar 2023 10:24:49 -0400
-X-MC-Unique: YmrcPXGjP9a2UlLzljs92g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6E6C3185A790;
-        Thu, 16 Mar 2023 14:24:48 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.49])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 81F0840C6E67;
-        Thu, 16 Mar 2023 14:24:47 +0000 (UTC)
-Date:   Thu, 16 Mar 2023 10:24:46 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Andreas Hindborg <nmi@metaspace.dk>, linux-block@vger.kernel.org,
-        lsf-pc@lists.linux-foundation.org,
-        Liu Xiaodong <xiaodong.liu@intel.com>,
-        Jim Harris <james.r.harris@intel.com>,
+        Thu, 16 Mar 2023 10:55:49 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD423C082C
+        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 07:55:46 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id fd5so8745747edb.7
+        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 07:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20210112.gappssmtp.com; s=20210112; t=1678978545;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E8vZoXbqek/3Iu5KJTr0xORJ990KMNEeK5gBRiw2Dns=;
+        b=1LIXEiDpvlruioKn549DZmluoetlzwpvWiPzMqdX7Lu+35spzUrbehTkx/XZTRBcfD
+         VyJRnA56Kxr4WPe2v1zS//YTPZBcvBlb5aJ77adPwHfDhSH6LHQ1SJkm09TpSVskonn6
+         A6jXF/UrAi1fDANZLUFUvGvTgBmhlNMJG0bF2vytRMB40x6ddW0BqlHBG3YkUJYudt2T
+         pNsnY6nO14A5r0hDqcbxIQXZ5A6YA+MBsX0BPLq/Zn1ghKjdVySw1cxmv/5duoUAsotV
+         s/aXSRTHdMDaGTSZIDGlm7wStUWXVjVlcQVISj2ZFBhK0jNAnFEyFMUYI8x2nr6Qety1
+         YQ3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678978545;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E8vZoXbqek/3Iu5KJTr0xORJ990KMNEeK5gBRiw2Dns=;
+        b=QlJ6lvmfHkdyYkXDanpxSWm5EUsrB7LWlcZWYsRB+W2Tdmo76VuHgrJCjsBhXHlZZf
+         dY8PejzHxrOpxxWK5CU7iaCgmQtmPIdyn6rikkoSvZIvr0xlPY8slHQ6Q7E9z1+IMwep
+         r6cysQs4zKaEe17MvMYTxhIPOpg2SXmqHGji3Dx4QjK2hZG+jvwViI0jJBAAW6QdGkrs
+         rBNvcAYcPKGvWe4OFOPlAi9MKKWyfsdQm97ZsweJN8q5MuZ8/BZSoX4WPfjFilLsOk9E
+         Ine9rJdrA8wHiwN87qjm77K9jZdbHpCtpcm/wKd71aUPfUe3tiW6zMjBwsWwdLiHd0Ik
+         JNbg==
+X-Gm-Message-State: AO0yUKVuI4kD9asmMd0RBjBATbCsFcVdkcc4ta0IkUvT+x32bGulg7NJ
+        SOrIUW4QIDCgS4yKQQRSU7M5I2l0XWasb0v0E9U=
+X-Google-Smtp-Source: AK7set9hpr2t2sZ0vgvCTecqzsiQpWPQ5WYUZzKI7aOC3KtS6Zmp8DiGc41J2lh+3lhbm419s/vM1g==
+X-Received: by 2002:a05:6402:b35:b0:4ac:bbaa:867a with SMTP id bo21-20020a0564020b3500b004acbbaa867amr6344946edb.24.1678978545122;
+        Thu, 16 Mar 2023 07:55:45 -0700 (PDT)
+Received: from localhost ([194.62.217.1])
+        by smtp.gmail.com with ESMTPSA id b27-20020a50ccdb000000b004ad601533a3sm4011035edj.55.2023.03.16.07.55.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Mar 2023 07:55:44 -0700 (PDT)
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     linux-block@vger.kernel.org
+Cc:     Andreas Hindborg <a.hindborg@samsung.com>,
+        Andreas Hindborg <nmi@metaspace.dk>,
         Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        "hch@lst.de" <hch@lst.de>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: Re: [LSF/MM/BPF BoF]: extend UBLK to cover real storage hardware
-Message-ID: <20230316142446.GC42060@fedora>
-References: <87bkltrj9x.fsf@metaspace.dk>
- <Y+4JVgd338R0x1m4@T590>
- <877cwhrgul.fsf@metaspace.dk>
- <Y+7kfZnWsmnA0V84@T590>
- <Y++t3kYTSNo9Sbb5@fedora>
- <Y/C1CVFceZ+X0ECa@T590>
- <Y/EbEGV2Ege51RQZ@fedora>
- <Y/aijeTJ2HuITMc1@T590>
- <Y/fKC7/cTM2mpz3H@fedora>
- <ZAAWj8Bs8JujXsbX@T590>
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH v3] block: ublk: enable zoned storage support
+Date:   Thu, 16 Mar 2023 15:55:38 +0100
+Message-Id: <20230316145539.300523-1-nmi@metaspace.dk>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="u+2iSFscRkUssHp2"
-Content-Disposition: inline
-In-Reply-To: <ZAAWj8Bs8JujXsbX@T590>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Andreas Hindborg <a.hindborg@samsung.com>
 
---u+2iSFscRkUssHp2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Add zoned storage support to ublk: report_zones and operations:
+ - REQ_OP_ZONE_OPEN
+ - REQ_OP_ZONE_CLOSE
+ - REQ_OP_ZONE_FINISH
+ - REQ_OP_ZONE_RESET
 
-On Thu, Mar 02, 2023 at 11:22:55AM +0800, Ming Lei wrote:
-> On Thu, Feb 23, 2023 at 03:18:19PM -0500, Stefan Hajnoczi wrote:
-> > On Thu, Feb 23, 2023 at 07:17:33AM +0800, Ming Lei wrote:
-> > > On Sat, Feb 18, 2023 at 01:38:08PM -0500, Stefan Hajnoczi wrote:
-> > > > On Sat, Feb 18, 2023 at 07:22:49PM +0800, Ming Lei wrote:
-> > > > > On Fri, Feb 17, 2023 at 11:39:58AM -0500, Stefan Hajnoczi wrote:
-> > > > > > On Fri, Feb 17, 2023 at 10:20:45AM +0800, Ming Lei wrote:
-> > > > > > > On Thu, Feb 16, 2023 at 12:21:32PM +0100, Andreas Hindborg wr=
-ote:
-> > > > > > > >=20
-> > > > > > > > Ming Lei <ming.lei@redhat.com> writes:
-> > > > > > > >=20
-> > > > > > > > > On Thu, Feb 16, 2023 at 10:44:02AM +0100, Andreas Hindbor=
-g wrote:
-> > > > > > > > >>=20
-> > > > > > > > >> Hi Ming,
-> > > > > > > > >>=20
-> > > > > > > > >> Ming Lei <ming.lei@redhat.com> writes:
-> > > > > > > > >>=20
-> > > > > > > > >> > On Mon, Feb 13, 2023 at 02:13:59PM -0500, Stefan Hajno=
-czi wrote:
-> > > > > > > > >> >> On Mon, Feb 13, 2023 at 11:47:31AM +0800, Ming Lei wr=
-ote:
-> > > > > > > > >> >> > On Wed, Feb 08, 2023 at 07:17:10AM -0500, Stefan Ha=
-jnoczi wrote:
-> > > > > > > > >> >> > > On Wed, Feb 08, 2023 at 10:12:19AM +0800, Ming Le=
-i wrote:
-> > > > > > > > >> >> > > > On Mon, Feb 06, 2023 at 03:27:09PM -0500, Stefa=
-n Hajnoczi wrote:
-> > > > > > > > >> >> > > > > On Mon, Feb 06, 2023 at 11:00:27PM +0800, Min=
-g Lei wrote:
-> > > > > > > > >> >> > > > > > Hello,
-> > > > > > > > >> >> > > > > >=20
-> > > > > > > > >> >> > > > > > So far UBLK is only used for implementing v=
-irtual block device from
-> > > > > > > > >> >> > > > > > userspace, such as loop, nbd, qcow2, ...[1].
-> > > > > > > > >> >> > > > >=20
-> > > > > > > > >> >> > > > > I won't be at LSF/MM so here are my thoughts:
-> > > > > > > > >> >> > > >=20
-> > > > > > > > >> >> > > > Thanks for the thoughts, :-)
-> > > > > > > > >> >> > > >=20
-> > > > > > > > >> >> > > > >=20
-> > > > > > > > >> >> > > > > >=20
-> > > > > > > > >> >> > > > > > It could be useful for UBLK to cover real s=
-torage hardware too:
-> > > > > > > > >> >> > > > > >=20
-> > > > > > > > >> >> > > > > > - for fast prototype or performance evaluat=
-ion
-> > > > > > > > >> >> > > > > >=20
-> > > > > > > > >> >> > > > > > - some network storages are attached to hos=
-t, such as iscsi and nvme-tcp,
-> > > > > > > > >> >> > > > > > the current UBLK interface doesn't support =
-such devices, since it needs
-> > > > > > > > >> >> > > > > > all LUNs/Namespaces to share host resources=
-(such as tag)
-> > > > > > > > >> >> > > > >=20
-> > > > > > > > >> >> > > > > Can you explain this in more detail? It seems=
- like an iSCSI or
-> > > > > > > > >> >> > > > > NVMe-over-TCP initiator could be implemented =
-as a ublk server today.
-> > > > > > > > >> >> > > > > What am I missing?
-> > > > > > > > >> >> > > >=20
-> > > > > > > > >> >> > > > The current ublk can't do that yet, because the=
- interface doesn't
-> > > > > > > > >> >> > > > support multiple ublk disks sharing single host=
-, which is exactly
-> > > > > > > > >> >> > > > the case of scsi and nvme.
-> > > > > > > > >> >> > >=20
-> > > > > > > > >> >> > > Can you give an example that shows exactly where =
-a problem is hit?
-> > > > > > > > >> >> > >=20
-> > > > > > > > >> >> > > I took a quick look at the ublk source code and d=
-idn't spot a place
-> > > > > > > > >> >> > > where it prevents a single ublk server process fr=
-om handling multiple
-> > > > > > > > >> >> > > devices.
-> > > > > > > > >> >> > >=20
-> > > > > > > > >> >> > > Regarding "host resources(such as tag)", can the =
-ublk server deal with
-> > > > > > > > >> >> > > that in userspace? The Linux block layer doesn't =
-have the concept of a
-> > > > > > > > >> >> > > "host", that would come in at the SCSI/NVMe level=
- that's implemented in
-> > > > > > > > >> >> > > userspace.
-> > > > > > > > >> >> > >=20
-> > > > > > > > >> >> > > I don't understand yet...
-> > > > > > > > >> >> >=20
-> > > > > > > > >> >> > blk_mq_tag_set is embedded into driver host structu=
-re, and referred by queue
-> > > > > > > > >> >> > via q->tag_set, both scsi and nvme allocates tag in=
- host/queue wide,
-> > > > > > > > >> >> > that said all LUNs/NSs share host/queue tags, curre=
-nt every ublk
-> > > > > > > > >> >> > device is independent, and can't shard tags.
-> > > > > > > > >> >>=20
-> > > > > > > > >> >> Does this actually prevent ublk servers with multiple=
- ublk devices or is
-> > > > > > > > >> >> it just sub-optimal?
-> > > > > > > > >> >
-> > > > > > > > >> > It is former, ublk can't support multiple devices whic=
-h share single host
-> > > > > > > > >> > because duplicated tag can be seen in host side, then =
-io is failed.
-> > > > > > > > >> >
-> > > > > > > > >>=20
-> > > > > > > > >> I have trouble following this discussion. Why can we not=
- handle multiple
-> > > > > > > > >> block devices in a single ublk user space process?
-> > > > > > > > >>=20
-> > > > > > > > >> From this conversation it seems that the limiting factor=
- is allocation
-> > > > > > > > >> of the tag set of the virtual device in the kernel? But =
-as far as I can
-> > > > > > > > >> tell, the tag sets are allocated per virtual block devic=
-e in
-> > > > > > > > >> `ublk_ctrl_add_dev()`?
-> > > > > > > > >>=20
-> > > > > > > > >> It seems to me that a single ublk user space process shu=
-ld be able to
-> > > > > > > > >> connect to multiple storage devices (for instance nvme-o=
-f) and then
-> > > > > > > > >> create a ublk device for each namespace, all from a sing=
-le ublk process.
-> > > > > > > > >>=20
-> > > > > > > > >> Could you elaborate on why this is not possible?
-> > > > > > > > >
-> > > > > > > > > If the multiple storages devices are independent, the cur=
-rent ublk can
-> > > > > > > > > handle them just fine.
-> > > > > > > > >
-> > > > > > > > > But if these storage devices(such as luns in iscsi, or NS=
-s in nvme-tcp)
-> > > > > > > > > share single host, and use host-wide tagset, the current =
-interface can't
-> > > > > > > > > work as expected, because tags is shared among all these =
-devices. The
-> > > > > > > > > current ublk interface needs to be extended for covering =
-this case.
-> > > > > > > >=20
-> > > > > > > > Thanks for clarifying, that is very helpful.
-> > > > > > > >=20
-> > > > > > > > Follow up question: What would the implications be if one t=
-ried to
-> > > > > > > > expose (through ublk) each nvme namespace of an nvme-of con=
-troller with
-> > > > > > > > an independent tag set?
-> > > > > > >=20
-> > > > > > > https://lore.kernel.org/linux-block/877cwhrgul.fsf@metaspace.=
-dk/T/#m57158db9f0108e529d8d62d1d56652c52e9e3e67
-> > > > > > >=20
-> > > > > > > > What are the benefits of sharing a tagset across
-> > > > > > > > all namespaces of a controller?
-> > > > > > >=20
-> > > > > > > The userspace implementation can be simplified a lot since ge=
-neric
-> > > > > > > shared tag allocation isn't needed, meantime with good perfor=
-mance
-> > > > > > > (shared tags allocation in SMP is one hard problem)
-> > > > > >=20
-> > > > > > In NVMe, tags are per Submission Queue. AFAIK there's no such t=
-hing as
-> > > > > > shared tags across multiple SQs in NVMe. So userspace doesn't n=
-eed an
-> > > > >=20
-> > > > > In reality the max supported nr_queues of nvme is often much less=
- than
-> > > > > nr_cpu_ids, for example, lots of nvme-pci devices just support at=
- most
-> > > > > 32 queues, I remembered that Azure nvme supports less(just 8 queu=
-es).
-> > > > > That is because queue isn't free in both software and hardware, w=
-hich
-> > > > > implementation is often tradeoff between performance and cost.
-> > > >=20
-> > > > I didn't say that the ublk server should have nr_cpu_ids threads. I
-> > > > thought the idea was the ublk server creates as many threads as it =
-needs
-> > > > (e.g. max 8 if the Azure NVMe device only has 8 queues).
-> > > >=20
-> > > > Do you expect ublk servers to have nr_cpu_ids threads in all/most c=
-ases?
-> > >=20
-> > > No.
-> > >=20
-> > > In ublksrv project, each pthread maps to one unique hardware queue, s=
-o total
-> > > number of pthread is equal to nr_hw_queues.
-> >=20
-> > Good, I think we agree on that part.
-> >=20
-> > Here is a summary of the ublk server model I've been describing:
-> > 1. Each pthread has a separate io_uring context.
-> > 2. Each pthread has its own hardware submission queue (NVMe SQ, SCSI
-> >    command queue, etc).
-> > 3. Each pthread has a distinct subrange of the tag space if the tag
-> >    space is shared across hardware submission queues.
-> > 4. Each pthread allocates tags from its subrange without coordinating
-> >    with other threads. This is cheap and simple.
->=20
-> That is also not doable.
->=20
-> The tag space can be pretty small, such as, usb-storage queue depth
-> is just 1, and usb card reader can support multi lun too.
->=20
-> That is just one extreme example, but there can be more low queue depth
-> scsi devices(sata : 32, ...), typical nvme/pci queue depth is 1023, but
-> there could be some implementation with less.
->=20
-> More importantly subrange could waste lots of tags for idle LUNs/NSs, and
-> active LUNs/NSs will have to suffer from the small subrange tags. And ava=
-ilable
-> tags depth represents the max allowed in-flight block IOs, so performance
-> is affected a lot by subrange.
->=20
-> If you look at block layer tag allocation change history, we never take
-> such way.
+This allows implementation of zoned storage devices in user space. An
+example user space implementation based on ubdsrv is available [1].
 
-Hi Ming,
-Any thoughts on my last reply? If my mental model is incorrect I'd like
-to learn why.
+[1] https://github.com/metaspace/ubdsrv/commit/2c60b9ffdfb7cb44c5cce0272bb52229ea6c95d4
 
-Thanks,
-Stefan
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+---
 
---u+2iSFscRkUssHp2
-Content-Type: application/pgp-signature; name="signature.asc"
+Changes since v2:
+ - Allow reporting of multiple zones in a single request
+ - Move zoned functions to separate translation unit
+ - Do not overload REQ_OP_DRV_IN for zone report
+ - Reserve space in ublk_param_zoned for future parameters
+ - Do not overload (struct request).__sector and .__data_len
+ - Remove unnecessary conditional compilation 
+ - Remove goto statements in ublk_report_zones
 
------BEGIN PGP SIGNATURE-----
+v1: https://lore.kernel.org/linux-block/20230224125950.214779-1-nmi@metaspace.dk/
+v2: https://lore.kernel.org/all/20230224200502.391570-1-nmi@metaspace.dk/
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmQTJq4ACgkQnKSrs4Gr
-c8hekAf/c8G79SDctp/xyOnnah8xhlD/bUiXgExZXWU+aBC+x4dftHU6mcNtErKf
-7df8voe9BdXDQjVBnjqsPRpMRnxRvf467avxv+TDEXdsCuua0hM4XlBUAnPNTZJC
-WyWr20VFDQFarI7I9x2UBht6Xl2tXTS8ayWOqYUEFf81MrcSUkmHb04t1rCke+a6
-c3MoXmPQheFVK9Ik+haypqbvGbNMUuC/E0kHFjSx1wODH3bgs+ub46dreJsiB2uq
-8O3x2PouOhrd8mGghjl5nkGFWFBz/a1ye33Q6gtIaGYfAMjwa+7Dq6NFAfo4BtH4
-XoqTJpF/6mbeU+e31nN3VM6mfPHsFA==
-=avAC
------END PGP SIGNATURE-----
+ drivers/block/Kconfig          |   4 +
+ drivers/block/Makefile         |   1 +
+ drivers/block/ublk_drv-zoned.c | 142 +++++++++++++++++++++++++++++++++
+ drivers/block/ublk_drv.c       | 113 ++++++++++++++------------
+ drivers/block/ublk_drv.h       |  69 ++++++++++++++++
+ include/uapi/linux/ublk_cmd.h  |  37 +++++++--
+ 6 files changed, 308 insertions(+), 58 deletions(-)
+ create mode 100644 drivers/block/ublk_drv-zoned.c
+ create mode 100644 drivers/block/ublk_drv.h
 
---u+2iSFscRkUssHp2--
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index f79f20430ef7..311e401eece5 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -385,6 +385,10 @@ config BLK_DEV_UBLK
+ 	  can handle batch more effectively, but task_work_add() isn't exported
+ 	  for module, so ublk has to be built to kernel.
+ 
++config BLK_DEV_UBLK_ZONED
++	def_bool y
++	depends on BLK_DEV_UBLK && BLK_DEV_ZONED
++
+ source "drivers/block/rnbd/Kconfig"
+ 
+ endif # BLK_DEV
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index 101612cba303..0de9379ba9df 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -38,5 +38,6 @@ obj-$(CONFIG_BLK_DEV_RNBD)	+= rnbd/
+ obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
+ 
+ obj-$(CONFIG_BLK_DEV_UBLK)			+= ublk_drv.o
++obj-$(CONFIG_BLK_DEV_UBLK_ZONED)		+= ublk_drv-zoned.o
+ 
+ swim_mod-y	:= swim.o swim_asm.o
+diff --git a/drivers/block/ublk_drv-zoned.c b/drivers/block/ublk_drv-zoned.c
+new file mode 100644
+index 000000000000..fbcbe1bbf653
+--- /dev/null
++++ b/drivers/block/ublk_drv-zoned.c
+@@ -0,0 +1,142 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright 2023 Andreas Hindborg <a.hindborg@samsung.com>
++ */
++#include <linux/blkzoned.h>
++#include <linux/ublk_cmd.h>
++#include "ublk_drv.h"
++
++void ublk_set_nr_zones(struct ublk_device *ub)
++{
++	const struct ublk_param_basic *p = &ub->params.basic;
++
++	if (ub->dev_info.flags & UBLK_F_ZONED && p->chunk_sectors)
++		ub->ub_disk->nr_zones = p->dev_sectors / p->chunk_sectors;
++}
++
++void ublk_dev_param_zoned_apply(struct ublk_device *ub)
++{
++	const struct ublk_param_zoned *p = &ub->params.zoned;
++
++	if (ub->dev_info.flags & UBLK_F_ZONED) {
++		disk_set_max_active_zones(ub->ub_disk, p->max_active_zones);
++		disk_set_max_open_zones(ub->ub_disk, p->max_open_zones);
++	}
++}
++
++int ublk_revalidate_disk_zones(struct gendisk *disk)
++{
++	return blk_revalidate_disk_zones(disk, NULL);
++}
++
++// Based on virtblk_alloc_report_buffer
++static void *ublk_alloc_report_buffer(struct ublk_device *ublk,
++				      unsigned int nr_zones,
++				      unsigned int zone_sectors, size_t *buflen)
++{
++	struct request_queue *q = ublk->ub_disk->queue;
++	size_t bufsize;
++	void *buf;
++
++	nr_zones = min_t(unsigned int, nr_zones,
++			 get_capacity(ublk->ub_disk) >> ilog2(zone_sectors));
++
++	bufsize = nr_zones * sizeof(struct blk_zone);
++	bufsize =
++		min_t(size_t, bufsize, queue_max_hw_sectors(q) << SECTOR_SHIFT);
++	bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
++
++	while (bufsize >= sizeof(struct blk_zone)) {
++		buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
++		if (buf) {
++			*buflen = bufsize;
++			return buf;
++		}
++		bufsize >>= 1;
++	}
++
++	bufsize = 0;
++	return NULL;
++}
++
++int ublk_report_zones(struct gendisk *disk, sector_t sector,
++		      unsigned int nr_zones, report_zones_cb cb, void *data)
++{
++	unsigned int done_zones = 0;
++	struct ublk_device *ub = disk->private_data;
++	unsigned int zone_size_sectors = disk->queue->limits.chunk_sectors;
++	unsigned int first_zone = sector >> ilog2(zone_size_sectors);
++	struct blk_zone *buffer;
++	size_t buffer_length;
++	unsigned int max_zones_per_request;
++
++	if (!(ub->dev_info.flags & UBLK_F_ZONED))
++		return -EOPNOTSUPP;
++
++	nr_zones = min_t(unsigned int, ub->ub_disk->nr_zones - first_zone,
++			 nr_zones);
++
++	buffer = ublk_alloc_report_buffer(ub, nr_zones, zone_size_sectors,
++					  &buffer_length);
++	if (!buffer)
++		return -ENOMEM;
++
++	max_zones_per_request = buffer_length / sizeof(struct blk_zone);
++
++	while (done_zones < nr_zones) {
++		unsigned int remaining_zones = nr_zones - done_zones;
++		unsigned int zones_in_request = min_t(
++			unsigned int, remaining_zones, max_zones_per_request);
++		int err = 0;
++		struct request *req;
++		struct ublk_rq_data *pdu;
++		blk_status_t status;
++
++		memset(buffer, 0, buffer_length);
++
++		req = blk_mq_alloc_request(disk->queue, REQ_OP_DRV_IN, 0);
++		if (IS_ERR(req))
++			return PTR_ERR(req);
++
++		pdu = blk_mq_rq_to_pdu(req);
++		pdu->operation = UBLK_IO_OP_REPORT_ZONES;
++		pdu->sector = sector;
++		pdu->nr_sectors = remaining_zones * zone_size_sectors;
++
++		err = blk_rq_map_kern(disk->queue, req, buffer, buffer_length,
++					GFP_KERNEL);
++		if (err) {
++			blk_mq_free_request(req);
++			kvfree(buffer);
++			return err;
++		}
++
++		status = blk_execute_rq(req, 0);
++		err = blk_status_to_errno(status);
++		blk_mq_free_request(req);
++		if (err) {
++			kvfree(buffer);
++			return err;
++		}
++
++		for (unsigned int i = 0; i < zones_in_request; i++) {
++			struct blk_zone *zone = buffer + i;
++
++			err = cb(zone, i, data);
++			if (err)
++				return err;
++
++			done_zones++;
++			sector += zone_size_sectors;
++
++			/* A zero length zone means don't ask for more zones */
++			if (!zone->len) {
++				kvfree(buffer);
++				return done_zones;
++			}
++		}
++	}
++
++	kvfree(buffer);
++	return done_zones;
++}
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index d1d1c8d606c8..69a3e7dedfc0 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -44,6 +44,7 @@
+ #include <linux/task_work.h>
+ #include <linux/namei.h>
+ #include <uapi/linux/ublk_cmd.h>
++#include "ublk_drv.h"
+ 
+ #define UBLK_MINORS		(1U << MINORBITS)
+ 
+@@ -53,16 +54,13 @@
+ 		| UBLK_F_NEED_GET_DATA \
+ 		| UBLK_F_USER_RECOVERY \
+ 		| UBLK_F_USER_RECOVERY_REISSUE \
+-		| UBLK_F_UNPRIVILEGED_DEV)
++		| UBLK_F_UNPRIVILEGED_DEV \
++		| UBLK_F_ZONED)
+ 
+ /* All UBLK_PARAM_TYPE_* should be included here */
+-#define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
+-		UBLK_PARAM_TYPE_DISCARD | UBLK_PARAM_TYPE_DEVT)
+-
+-struct ublk_rq_data {
+-	struct llist_node node;
+-	struct callback_head work;
+-};
++#define UBLK_PARAM_TYPE_ALL                                \
++	(UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
++	 UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED)
+ 
+ struct ublk_uring_cmd_pdu {
+ 	struct ublk_queue *ubq;
+@@ -135,45 +133,6 @@ struct ublk_queue {
+ 
+ #define UBLK_DAEMON_MONITOR_PERIOD	(5 * HZ)
+ 
+-struct ublk_device {
+-	struct gendisk		*ub_disk;
+-
+-	char	*__queues;
+-
+-	unsigned int	queue_size;
+-	struct ublksrv_ctrl_dev_info	dev_info;
+-
+-	struct blk_mq_tag_set	tag_set;
+-
+-	struct cdev		cdev;
+-	struct device		cdev_dev;
+-
+-#define UB_STATE_OPEN		0
+-#define UB_STATE_USED		1
+-#define UB_STATE_DELETED	2
+-	unsigned long		state;
+-	int			ub_number;
+-
+-	struct mutex		mutex;
+-
+-	spinlock_t		mm_lock;
+-	struct mm_struct	*mm;
+-
+-	struct ublk_params	params;
+-
+-	struct completion	completion;
+-	unsigned int		nr_queues_ready;
+-	unsigned int		nr_privileged_daemon;
+-
+-	/*
+-	 * Our ubq->daemon may be killed without any notification, so
+-	 * monitor each queue's daemon periodically
+-	 */
+-	struct delayed_work	monitor_work;
+-	struct work_struct	quiesce_work;
+-	struct work_struct	stop_work;
+-};
+-
+ /* header of ublk_params */
+ struct ublk_params_header {
+ 	__u32	len;
+@@ -225,6 +184,9 @@ static void ublk_dev_param_basic_apply(struct ublk_device *ub)
+ 		set_disk_ro(ub->ub_disk, true);
+ 
+ 	set_capacity(ub->ub_disk, p->dev_sectors);
++
++	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED))
++		ublk_set_nr_zones(ub);
+ }
+ 
+ static void ublk_dev_param_discard_apply(struct ublk_device *ub)
+@@ -285,6 +247,9 @@ static int ublk_apply_params(struct ublk_device *ub)
+ 	if (ub->params.types & UBLK_PARAM_TYPE_DISCARD)
+ 		ublk_dev_param_discard_apply(ub);
+ 
++	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) && (ub->params.types & UBLK_PARAM_TYPE_ZONED))
++		ublk_dev_param_zoned_apply(ub);
++
+ 	return 0;
+ }
+ 
+@@ -420,9 +385,10 @@ static int ublk_open(struct block_device *bdev, fmode_t mode)
+ }
+ 
+ static const struct block_device_operations ub_fops = {
+-	.owner =	THIS_MODULE,
+-	.open =		ublk_open,
+-	.free_disk =	ublk_free_disk,
++	.owner = THIS_MODULE,
++	.open = ublk_open,
++	.free_disk = ublk_free_disk,
++	.report_zones = ublk_report_zones,
+ };
+ 
+ #define UBLK_MAX_PIN_PAGES	32
+@@ -558,7 +524,7 @@ static int ublk_unmap_io(const struct ublk_queue *ubq,
+ {
+ 	const unsigned int rq_bytes = blk_rq_bytes(req);
+ 
+-	if (req_op(req) == REQ_OP_READ && ublk_rq_has_data(req)) {
++	if ((req_op(req) == REQ_OP_READ || req_op(req) == REQ_OP_DRV_IN) && ublk_rq_has_data(req)) {
+ 		struct ublk_map_data data = {
+ 			.ubq	=	ubq,
+ 			.rq	=	req,
+@@ -607,6 +573,7 @@ static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
+ {
+ 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
+ 	struct ublk_io *io = &ubq->ios[req->tag];
++	struct ublk_rq_data *pdu = blk_mq_rq_to_pdu(req);
+ 	u32 ublk_op;
+ 
+ 	switch (req_op(req)) {
+@@ -625,6 +592,35 @@ static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
+ 	case REQ_OP_WRITE_ZEROES:
+ 		ublk_op = UBLK_IO_OP_WRITE_ZEROES;
+ 		break;
++	case REQ_OP_ZONE_OPEN:
++		ublk_op = UBLK_IO_OP_ZONE_OPEN;
++		break;
++	case REQ_OP_ZONE_CLOSE:
++		ublk_op = UBLK_IO_OP_ZONE_CLOSE;
++		break;
++	case REQ_OP_ZONE_FINISH:
++		ublk_op = UBLK_IO_OP_ZONE_FINISH;
++		break;
++	case REQ_OP_ZONE_RESET:
++		ublk_op = UBLK_IO_OP_ZONE_RESET;
++		break;
++	case REQ_OP_DRV_IN:
++	case REQ_OP_DRV_OUT:
++		ublk_op = pdu->operation;
++		switch (ublk_op) {
++		case UBLK_IO_OP_REPORT_ZONES:
++			iod->op_flags = ublk_op | ublk_req_build_flags(req);
++			iod->nr_sectors = pdu->nr_sectors;
++			iod->start_sector = pdu->sector;
++			iod->addr = io->addr;
++			return BLK_STS_OK;
++		default:
++			return BLK_STS_IOERR;
++		}
++	case REQ_OP_ZONE_APPEND:
++	case REQ_OP_ZONE_RESET_ALL:
++		/* We do not support zone append or reset_all yet */
++		fallthrough;
+ 	default:
+ 		return BLK_STS_IOERR;
+ 	}
+@@ -671,7 +667,8 @@ static void ublk_complete_rq(struct request *req)
+ 	 *
+ 	 * Both the two needn't unmap.
+ 	 */
+-	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE) {
++	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE &&
++	    req_op(req) != REQ_OP_DRV_IN) {
+ 		blk_mq_end_request(req, BLK_STS_OK);
+ 		return;
+ 	}
+@@ -1601,6 +1598,15 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
+ 	if (ub->nr_privileged_daemon != ub->nr_queues_ready)
+ 		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+ 
++	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
++	    ub->dev_info.flags & UBLK_F_ZONED) {
++		disk_set_zoned(disk, BLK_ZONED_HM);
++		blk_queue_required_elevator_features(disk->queue, ELEVATOR_F_ZBD_SEQ_WRITE);
++		ret = ublk_revalidate_disk_zones(disk);
++		if (ret)
++			goto out_put_disk;
++	}
++
+ 	get_device(&ub->cdev_dev);
+ 	ret = add_disk(disk);
+ 	if (ret) {
+@@ -1746,6 +1752,9 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+ 	if (!IS_BUILTIN(CONFIG_BLK_DEV_UBLK))
+ 		ub->dev_info.flags |= UBLK_F_URING_CMD_COMP_IN_TASK;
+ 
++	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED))
++		ub->dev_info.flags &= ~UBLK_F_ZONED;
++
+ 	/* We are not ready to support zero copy */
+ 	ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
+ 
+diff --git a/drivers/block/ublk_drv.h b/drivers/block/ublk_drv.h
+new file mode 100644
+index 000000000000..7b21235d7673
+--- /dev/null
++++ b/drivers/block/ublk_drv.h
+@@ -0,0 +1,69 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef _UBLK_DRV_H
++#define _UBLK_DRV_H
++
++#include <uapi/linux/ublk_cmd.h>
++#include <linux/blk-mq.h>
++#include <linux/cdev.h>
++
++struct ublk_device {
++	struct gendisk *ub_disk;
++
++	char *__queues;
++
++	unsigned int queue_size;
++	struct ublksrv_ctrl_dev_info dev_info;
++
++	struct blk_mq_tag_set tag_set;
++
++	struct cdev cdev;
++	struct device cdev_dev;
++
++#define UB_STATE_OPEN 0
++#define UB_STATE_USED 1
++#define UB_STATE_DELETED 2
++	unsigned long state;
++	int ub_number;
++
++	struct mutex mutex;
++
++	spinlock_t mm_lock;
++	struct mm_struct *mm;
++
++	struct ublk_params params;
++
++	struct completion completion;
++	unsigned int nr_queues_ready;
++	unsigned int nr_privileged_daemon;
++
++	/*
++	 * Our ubq->daemon may be killed without any notification, so
++	 * monitor each queue's daemon periodically
++	 */
++	struct delayed_work monitor_work;
++	struct work_struct quiesce_work;
++	struct work_struct stop_work;
++};
++
++struct ublk_rq_data {
++	struct llist_node node;
++	struct callback_head work;
++	enum ublk_op operation;
++	__u64 sector;
++	__u32 nr_sectors;
++};
++
++void ublk_set_nr_zones(struct ublk_device *ub);
++void ublk_dev_param_zoned_apply(struct ublk_device *ub);
++int ublk_revalidate_disk_zones(struct gendisk *disk);
++
++#ifdef CONFIG_BLK_DEV_UBLK_ZONED
++int ublk_report_zones(struct gendisk *disk, sector_t sector,
++		      unsigned int nr_zones, report_zones_cb cb,
++		      void *data);
++#else
++#define ublk_report_zones NULL
++#endif
++
++#endif
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index f6238ccc7800..a9c3e71b0756 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -102,6 +102,11 @@
+  */
+ #define UBLK_F_UNPRIVILEGED_DEV	(1UL << 5)
+ 
++/*
++ * Enable zoned device support
++ */
++#define UBLK_F_ZONED (1ULL << 6)
++
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
+ #define UBLK_S_DEV_LIVE	1
+@@ -155,12 +160,24 @@ struct ublksrv_ctrl_dev_info {
+ 	__u64   reserved2;
+ };
+ 
+-#define		UBLK_IO_OP_READ		0
+-#define		UBLK_IO_OP_WRITE		1
+-#define		UBLK_IO_OP_FLUSH		2
+-#define		UBLK_IO_OP_DISCARD	3
+-#define		UBLK_IO_OP_WRITE_SAME	4
+-#define		UBLK_IO_OP_WRITE_ZEROES	5
++enum ublk_op {
++	UBLK_IO_OP_READ = 0,
++	UBLK_IO_OP_WRITE = 1,
++	UBLK_IO_OP_FLUSH = 2,
++	UBLK_IO_OP_DISCARD = 3,
++	UBLK_IO_OP_WRITE_SAME = 4,
++	UBLK_IO_OP_WRITE_ZEROES = 5,
++	UBLK_IO_OP_ZONE_OPEN = 10,
++	UBLK_IO_OP_ZONE_CLOSE = 11,
++	UBLK_IO_OP_ZONE_FINISH = 12,
++	UBLK_IO_OP_ZONE_APPEND = 13,
++	UBLK_IO_OP_ZONE_RESET = 15,
++	__UBLK_IO_OP_DRV_IN_START = 32,
++	UBLK_IO_OP_REPORT_ZONES = __UBLK_IO_OP_DRV_IN_START,
++	__UBLK_IO_OP_DRV_IN_END = 96,
++	__UBLK_IO_OP_DRV_OUT_START = __UBLK_IO_OP_DRV_IN_END,
++	__UBLK_IO_OP_DRV_OUT_END = 160,
++};
+ 
+ #define		UBLK_IO_F_FAILFAST_DEV		(1U << 8)
+ #define		UBLK_IO_F_FAILFAST_TRANSPORT	(1U << 9)
+@@ -257,6 +274,12 @@ struct ublk_param_devt {
+ 	__u32   disk_minor;
+ };
+ 
++struct ublk_param_zoned {
++	__u32	max_open_zones;
++	__u32	max_active_zones;
++	__u8	reserved[24];
++};
++
+ struct ublk_params {
+ 	/*
+ 	 * Total length of parameters, userspace has to set 'len' for both
+@@ -268,11 +291,13 @@ struct ublk_params {
+ #define UBLK_PARAM_TYPE_BASIC           (1 << 0)
+ #define UBLK_PARAM_TYPE_DISCARD         (1 << 1)
+ #define UBLK_PARAM_TYPE_DEVT            (1 << 2)
++#define UBLK_PARAM_TYPE_ZONED           (1 << 3)
+ 	__u32	types;			/* types of parameter included */
+ 
+ 	struct ublk_param_basic		basic;
+ 	struct ublk_param_discard	discard;
+ 	struct ublk_param_devt		devt;
++	struct ublk_param_zoned	zoned;
+ };
+ 
+ #endif
+
+base-commit: eeac8ede17557680855031c6f305ece2378af326
+-- 
+2.39.2
 
