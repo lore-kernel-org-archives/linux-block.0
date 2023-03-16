@@ -2,91 +2,195 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D8FC76195
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 15:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED25C6FD19
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 15:48:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231710AbjCPPjB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 11:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54042 "EHLO
+        id S230199AbjCPPsV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 11:48:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231699AbjCPPil (ORCPT
+        with ESMTP id S230193AbjCPPsU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 11:38:41 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D3F23104
-        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 08:36:56 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id j6so1201693ilr.7
-        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 08:36:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1678980957; x=1681572957;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sYar2ybeVJqnai5t6j9VGmRtR2ovUMfBI/dkWezXyWc=;
-        b=sVk1JuZmFUhd1tlBehU7iFt3sVXohrn+jnAzxsEhXyW1rV3rTUKOwK9OK1Sh1mDfzd
-         Kdv9QjNsZcBRnPUFaxFo+MZqaO/wdpiUCKcD0WaWhPqnh8kAVh2LV8rzxLXlt/nl0ZkI
-         zmuuw653yy4/0bfN11ybpCc2F1GxYJUez5q3lorEpqZmPHRWANi9M5ZirtBDnQaQV313
-         h3yoZbRmcM/85ydvtqPw4hElb0MKrZBkT5NK+SHPVpIXcq/POirSUbuXiM63Nt1VDxJQ
-         tmJwN2tMboNaBqDwf6Ag8Rl5xWxtCDFYcmMQQgdpU8duQc+zZpHZfsl8DtrjYmguNLfo
-         5SFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678980957; x=1681572957;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sYar2ybeVJqnai5t6j9VGmRtR2ovUMfBI/dkWezXyWc=;
-        b=GpTVcR6bjWOnjQEXwR+ayvjVOfgoyGjpy80z2TLZ/Uk57PBbaIqowQ5cCysb/MiBUj
-         Rewtfx5pQGuV1xs7dGw+EU7yCaptrcCL/qppjxIbu/+q2QMgKP1ayMy3h0qPEVlvD/1y
-         sX9f7fFTMIE6cdbhEPhR62mwG4yc2XPDl4Mc4QpkcxEY+at+IZwoxWK+OnZpu41Yr3++
-         OxBWW7Yy6KUB0stiZEsmA199ZZWUtXF6ByggBzCdrLNNNWkuSno5PwkqUY2nlA/W6Ahj
-         aGhz4hcxmw+gsIT1/27X0RAnYME70lUU5SrGmLupZbrpay6qiE2zce0FjnEWuHkFZISj
-         AGKw==
-X-Gm-Message-State: AO0yUKUocXUHeuWAzn7Dr3j7XVganass7O1PPyWctUDe9va5kOA/R2XP
-        ebIPv76bvyYiEWCNOiv8hkWtEDSm5vHDHI+EWNUiQw==
-X-Google-Smtp-Source: AK7set/W9ggxEyvzAzMZ4ShGBmfvBVdryiJ14kkiBwYaN78df/A1Lz33twWv8A/A/Ldki12xG+KOpg==
-X-Received: by 2002:a92:d64f:0:b0:323:10c5:899e with SMTP id x15-20020a92d64f000000b0032310c5899emr4228071ilp.1.1678980957025;
-        Thu, 16 Mar 2023 08:35:57 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id t8-20020a056638204800b004050d92f6d4sm726970jaj.50.2023.03.16.08.35.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 08:35:56 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Arnd Bergmann <arnd@arndb.de>, linux-block@vger.kernel.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20230316111630.4897-1-lukas.bulwahn@gmail.com>
-References: <20230316111630.4897-1-lukas.bulwahn@gmail.com>
-Subject: Re: [PATCH] block: remove obsolete config BLOCK_COMPAT
-Message-Id: <167898095613.31557.5292857532580529637.b4-ty@kernel.dk>
-Date:   Thu, 16 Mar 2023 09:35:56 -0600
+        Thu, 16 Mar 2023 11:48:20 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2152193F6
+        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 08:47:55 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230316153017euoutp014844a4adfc9e1a8024dee36773fe1214~M7-nAmUGq1532915329euoutp01j
+        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 15:30:17 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230316153017euoutp014844a4adfc9e1a8024dee36773fe1214~M7-nAmUGq1532915329euoutp01j
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1678980617;
+        bh=dw6ZM8dVL/gkZJVPvpAuxqdfmjR01x+CAelnHMcCROY=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=VMat0wlgvbVPtM46pax/06d6MC/I6P0R9qAbbaCazV/cUWpT8go7K1hVGE98p/b0p
+         FJjZHM3LqZZPv+l6qTMkIcgCcVloY/S/1IGYNcd+QGxTmuEM2TSofoFuo1dPmT5dfk
+         WGn8a76STu1JimcU5w98ho5k1b21H4qKrebfphcA=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230316153016eucas1p1061bfe038e8dfcb4a43ab5bd7e65ef3d~M7-mt0_oK2016020160eucas1p1Y;
+        Thu, 16 Mar 2023 15:30:16 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 4F.D2.09503.80633146; Thu, 16
+        Mar 2023 15:30:16 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230316153016eucas1p14c300fe22d12c46881b889a7a4786cad~M7-mMfLhD1723017230eucas1p1W;
+        Thu, 16 Mar 2023 15:30:16 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230316153016eusmtrp262884fa26715c616db40201755be7daf~M7-mL4aBv1290912909eusmtrp2q;
+        Thu, 16 Mar 2023 15:30:16 +0000 (GMT)
+X-AuditID: cbfec7f2-ea5ff7000000251f-95-641336088113
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id B1.BD.08862.80633146; Thu, 16
+        Mar 2023 15:30:16 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230316153015eusmtip19802e01efff92dc1fbb3b14a98748063~M7-mBRrTc0360603606eusmtip1h;
+        Thu, 16 Mar 2023 15:30:15 +0000 (GMT)
+Received: from [192.168.8.107] (106.210.248.172) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Thu, 16 Mar 2023 15:29:57 +0000
+Message-ID: <367c04f8-f5f6-a628-c4a9-7534fa83eb88@samsung.com>
+Date:   Thu, 16 Mar 2023 16:29:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+        Thunderbird/102.8.0
+Subject: Re: [LSF/MM/BPF TOPIC] Cloud storage optimizations
+Content-Language: en-US
+To:     Keith Busch <kbusch@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+CC:     Matthew Wilcox <willy@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        <lsf-pc@lists.linux-foundation.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-block@vger.kernel.org>, Dave Chinner <david@fromorbit.com>,
+        "Christoph Hellwig" <hch@lst.de>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <ZAJ1aLWsir73bA1p@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-2eb1a
+X-Originating-IP: [106.210.248.172]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0hTcRj1d+92d11oN7X2pZKlaTVpaQ+70cOkkCUWZVRkQa28mKhTdp3a
+        C7QXuULnLMqb+ax8VdaSstSK1ZSZaQXpkrKnmK0Hapmy0rxeA/873znn+3HOx4/EXWrE7mSM
+        OonRqFVx3oRUdLthqHU+GeQaFVDV5EtXN3QiurzSjNEGUxui6zv86bp6i4juvDoipu/b6nHa
+        qu9C9PHTQxLaPphHrJYqm4pBeatMrjRWZBBKY59BosyxliJl7as0Qnmk2Ywr+40zNpKR0hVR
+        TFxMMqNZsGq3dJ+l/Yok0TopNXO4jUhDH0gdciSBWgwnDZcxHZKSLlQZgmzD8PjwE0FWWh0u
+        DP0ICm6cl/xfaW/uEQtCKYKBjmyMF8ZcbypSBaEWgfXIMTEvOFGr4ELtTZzHIsoX9LoaXOCn
+        gCX3k0iHSHIqFQmfbck87UotByNXh3iMUzLo+FSA8RY3ah2MNPryz+NUPwbfOfMYT1BySM+Q
+        8NCRCobuHJmwOQ+O37FLBOwFd77l4UJ8H8iz1Yzjw9BU3TFWGKhSR8h+MEAIwlqoPPseE7Ar
+        fGmsHu/uCSN3C8b5g9BltePC8rHRa92tIvgQMJo/szlO8ITA/fZMTKCdwfptipDHGQy3z+F6
+        5MtNuAM3oTA3oQI3oUIhElUgGaNl46MZNlDNpChYVTyrVUcr9ibEG9Ho53oy3NhXgy5+6VWY
+        EEYiEwIS93Zz2iaiolycolT7DzCahF0abRzDmpAHKfKWOfmvtOx1oaJVSUwswyQymv8qRjq6
+        p2Ezg9dw2pJQbUpL77XFR12XQO5WImvHC5vuj59kzqlQhQeXv0D6zuf6xpYe+6liu4MhaPKi
+        wl2pD/4+fHxmFm0yz2EnbfhTvkhfMjtzelKJoii9Z4anXyz9dbk+dunQmpSXHq+fwll/qXxa
+        GNWZTwQ8kngdOrGFzSrEZANv65xbxW4Lz9GDQT93dn+PSIjxDIxM100OCP4Y5hcy6yBxozfP
+        nDQ3N6K1T128aXubLXzZ1fVdtoxL63+0zGazxU/OR6zeEe7s8EybNdjd4J68sGxmYaPtoT9j
+        eUeGYIe3RH/9de9WaEb4oXmfV1YFJD5/Jd+sOaoq4nbHeHi19qh+OzCpe0hvEbtPFSjHNazq
+        H+mAVbXLAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrPIsWRmVeSWpSXmKPExsVy+t/xu7ocZsIpBhc+sFlsOXaP0WLl6qNM
+        FpMOXWO02HtL22LP3pMsFvfW/Ge12Pd6L7PFjQlPGS1ae36yW/z+MYfNgcvj1CIJj80rtDw2
+        repk89j0aRK7x+Qbyxk9dt9sYPNoOnOU2ePzJrkAjig9m6L80pJUhYz84hJbpWhDCyM9Q0sL
+        PSMTSz1DY/NYKyNTJX07m5TUnMyy1CJ9uwS9jJPXl7EX3OCu6Pt3ja2B8RFHFyMnh4SAicT1
+        My9Zuxi5OIQEljJK7Nn5hRkiISPx6cpHdghbWOLPtS42iKKPjBK3ms8xQTi7GSU2POhnBKni
+        FbCTmL17I1g3i4CqxISuHcwQcUGJkzOfsIDYogJREk/vHAKLCwtYS2yatQesl1lAXOLWk/lA
+        Qzk4RAQ8Jf4fVwWZzyzwmUmib+9UZohls5kl7l06yQJSxCagJdHYyQ5icgrYSzyfLA4xRlOi
+        dftvdghbXmL72zlQzyhLzHm9A8qulfj89xnjBEbRWUium4XkillIRs1CMmoBI8sqRpHU0uLc
+        9NxiQ73ixNzi0rx0veT83E2MwJjfduzn5h2M81591DvEyMTBeIhRgoNZSYQ3nEUgRYg3JbGy
+        KrUoP76oNCe1+BCjKTCIJjJLiSbnA5NOXkm8oZmBqaGJmaWBqaWZsZI4r2dBR6KQQHpiSWp2
+        ampBahFMHxMHp1QDE0sqB+/R5sCWnwGfgu20Mi+6XbbjtV7mti+/prHzLGOo2pQfb1dunfrM
+        XMt0nnRi66Y7opn/yhfuNUlcV1FcaP719M4lc35k2j64+eHYxuzNmo6F6be7vE5FR4Sqp6+o
+        5FiauINbXsCOc3L6srsuLX+Fom1mnd9xxH3DcyXeT5O1tXNmC2x+Wn1+8+Oj55j2n/i+m+/C
+        1mWn2jyyrmXpO2imL4t9L8j5u/EFC5fYKt+53rZ/713669EgZbqwjOfNz7TmbU4RTIk2szZG
+        zm63e8oTmHM3iC164kKT8nOrRQwzLOIP7fSfO19v7pbUluY9wQ1msaHPkqfUquob5Ntc31Le
+        sdVgktmpRad2T44RUGIpzkg01GIuKk4EAAl4REqCAwAA
+X-CMS-MailID: 20230316153016eucas1p14c300fe22d12c46881b889a7a4786cad
+X-Msg-Generator: CA
+X-RootMTR: 20230303223216eucas1p2517850ab1c4f98dc4e09d83673525983
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230303223216eucas1p2517850ab1c4f98dc4e09d83673525983
+References: <Y/7L74P6jSWwOvWt@mit.edu>
+        <ZAFUYqAcPmRPLjET@kbusch-mbp.dhcp.thefacebook.com>
+        <ZAFuSSZ5vZN7/UAa@casper.infradead.org>
+        <ZAJqjM6qLrraFrrn@bombadil.infradead.org>
+        <ZAJvu2hZrHu816gj@kbusch-mbp.dhcp.thefacebook.com>
+        <ZAJxX2u4CbgVpNNN@bombadil.infradead.org>
+        <CGME20230303223216eucas1p2517850ab1c4f98dc4e09d83673525983@eucas1p2.samsung.com>
+        <ZAJ1aLWsir73bA1p@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Keith,
 
-On Thu, 16 Mar 2023 12:16:30 +0100, Lukas Bulwahn wrote:
-> Before commit bdc1ddad3e5f ("compat_ioctl: block: move
-> blkdev_compat_ioctl() into ioctl.c"), the config BLOCK_COMPAT was used to
-> include compat_ioctl.c into the kernel build. With this commit, the code
-> is moved into ioctl.c and included with the config COMPAT. So, since then,
-> the config BLOCK_COMPAT has no effect and any further purpose.
+On 2023-03-03 23:32, Keith Busch wrote:
+>> Yes, clearly it says *yet* so that begs the question what would be
+>> required?
 > 
-> Remove this obsolete config BLOCK_COMPAT.
-> 
-> [...]
+> Oh, gotcha. I'll work on a list of places it currently crashes.
+>  
+I started looking into this to see why it crashes when we increase the LBA
+size of a block device greater than the page size. These are my primary
+findings:
 
-Applied, thanks!
+- Block device aops (address_space_operations) are all based on buffer
+head, which limits us to work on only PAGE_SIZE chunks.
 
-[1/1] block: remove obsolete config BLOCK_COMPAT
-      commit: 8f0d196e4dc137470bbd5de98278d941c8002fcb
+For a 8k LBA size, the stack trace you posted ultimately fails inside
+alloc_page_buffers as the size will be > PAGE_SIZE.
 
-Best regards,
--- 
-Jens Axboe
-
+struct buffer_head *alloc_page_buffers(struct page *page, unsigned long
+size, bool retry)
 
 
+
+{
+
+
+
+        struct buffer_head *bh, *head;
+
+
+
+....
+
+
+
+
+
+
+
+        head = NULL;
+
+
+
+        offset = PAGE_SIZE;
+
+
+
+        while ((offset -= size) >= 0) {
+	// we will not go into this loop as offset will be negative
+...
+...
+	}
+	return head;
+}
+
+- As Dave chinner pointed out later in the thread, we allocate pages in the
+page cache with order 0, instead of BS of the device or the filesystem.
+Letting filemap_get_folio(FGP_CREAT) allocate folios in LBA size for a
+block device should solve that problem, I guess.
+
+Is it a crazy idea to convert block device aops (block/fops.c) to use iomap
+which supports higher order folios instead of mpage and other functions
+that use buffer head?
+
+Let me know your thoughts.
+--
+Pankaj
