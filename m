@@ -2,96 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCF3C7618E
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 20:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC46C76196
+	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 22:11:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbjCPUau (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 16:30:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35352 "EHLO
+        id S229830AbjCPWL0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 18:11:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229770AbjCPUau (ORCPT
+        with ESMTP id S229800AbjCPWLU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 16:30:50 -0400
-X-Greylist: delayed 592 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 16 Mar 2023 13:30:48 PDT
-Received: from out-40.mta0.migadu.com (out-40.mta0.migadu.com [IPv6:2001:41d0:1004:224b::28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED19FB0B9E
-        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 13:30:48 -0700 (PDT)
-Date:   Thu, 16 Mar 2023 13:20:34 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1678998054;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tp+E+qKzkiPQ9TteUgVP64dlXuOyGgf7R5+zJuVjYSM=;
-        b=d6nBC/+ODd1bTK9Q0IPFjyCGN1iQ02clc+m2RmLBYjreQBYklevSuN12MY7zhDZjQX/XWM
-        VH0dJshY6vsOTIgSNvH2twCYoS966PkaQTYkn8xGjN7yqVdR8+ou9+ZfNhW5XLkVjv14Yd
-        nEqedL4bgTd8PmyOyZoYuY5h+zdPyFY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Roman Gushchin <roman.gushchin@linux.dev>
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        bpf@vger.kernel.org, linux-xfs@vger.kernel.org,
-        David Rientjes <rientjes@google.com>,
-        Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] SLOB+SLAB allocators removal and future SLUB
- improvements
-Message-ID: <ZBN6Eus03wRSbqwf@P9FQF9L96D.corp.robot.car>
-References: <4b9fc9c6-b48c-198f-5f80-811a44737e5f@suse.cz>
- <ZBEzUN35gOK5igmT@P9FQF9L96D>
- <c87d4f6c-e947-70b2-f74f-2e5145572123@suse.cz>
+        Thu, 16 Mar 2023 18:11:20 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 197DA18B3B;
+        Thu, 16 Mar 2023 15:10:57 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 49B962057034; Thu, 16 Mar 2023 15:10:36 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 49B962057034
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1679004636;
+        bh=91dVpHPjN0I18MHMEPytTYoAIcj3tyyfhEHK1iqzMPQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HqM5s8Lv4cdYH4FTxM8ECxW+qlq9xYC5uyrjWzmUgAox9VPD8YUiKBlVI33RA3C4V
+         Fldv/wo+3U0Z71kycUAZ9D1j/mCkqhwZbRpTf8J90aOuMRBDyDQ/3lf1roICQ0vkut
+         tuKKCPaYpChsjgoYGO1HOGIC8r40sD49SxPTvRaA=
+Date:   Thu, 16 Mar 2023 15:10:36 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v9 11/16] ipe: add support for dm-verity as a trust
+ provider
+Message-ID: <20230316221036.GA22567@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-12-git-send-email-wufan@linux.microsoft.com>
+ <CAHC9VhRdm_xpXNQvSVO2hkx2js=_zzo2DiQ6PvEjAEet4OjxNw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c87d4f6c-e947-70b2-f74f-2e5145572123@suse.cz>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CAHC9VhRdm_xpXNQvSVO2hkx2js=_zzo2DiQ6PvEjAEet4OjxNw@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Thu, Mar 16, 2023 at 09:18:11AM +0100, Vlastimil Babka wrote:
-> On 3/15/23 03:54, Roman Gushchin wrote:
-> > On Tue, Mar 14, 2023 at 09:05:13AM +0100, Vlastimil Babka wrote:
-> >> As you're probably aware, my plan is to get rid of SLOB and SLAB, leaving
-> >> only SLUB going forward. The removal of SLOB seems to be going well, there
-> >> were no objections to the deprecation and I've posted v1 of the removal
-> >> itself [1] so it could be in -next soon.
-> >> 
-> >> The immediate benefit of that is that we can allow kfree() (and kfree_rcu())
-> >> to free objects from kmem_cache_alloc() - something that IIRC at least xfs
-> >> people wanted in the past, and SLOB was incompatible with that.
-> >> 
-> >> For SLAB removal I haven't yet heard any objections (but also didn't
-> >> deprecate it yet) but if there are any users due to particular workloads
-> >> doing better with SLAB than SLUB, we can discuss why those would regress and
-> >> what can be done about that in SLUB.
-> >> 
-> >> Once we have just one slab allocator in the kernel, we can take a closer
-> >> look at what the users are missing from it that forces them to create own
-> >> allocators (e.g. BPF), and could be considered to be added as a generic
-> >> implementation to SLUB.
-> > 
-> > I guess eventually we want to merge the percpu allocator too.
+On Thu, Mar 02, 2023 at 02:08:04PM -0500, Paul Moore wrote:
 > 
-> What exactly do you mean here, probably not mm/percpu.c
+> If you had both IPE and dm-verity enabled in your kernel build, is
+> there ever a case where you wouldn't want IPE_PROP_DM_VERITY?  I
+> suspect you can just have IPE and dm-verity select IPE_PROP_DM_VERITY
+> and not bother the user/admin with the additional Kconfig knob.
+> 
+Sorry for the late reply, I was relocating to a new country and it
+took me some time to settle down.
 
-Actually, I mean mm/percpu.c
+I have read your comments and I will try to answer some questions
+that I can answer right now. For the remaining questions, I need more
+time to get more context and information. I will get back to you
+as soon as possible.
 
-> which is too different from slab
+For this one I agree just have IPE and dm-verity select IPE_PROP_DM_VERITY
+is better, I will update this in the next version.
 
-It is currently, but mostly for historical reasons, I guess.
-
-In fact, all is needed (I drastically simplify here) is to replicate
-an allocation for each cpu, which can be done by having special slab_caches
-with a set of pages per cpu. I believe that in the long run the percpu allocator
-can greatly benefit from it. The need for the performance and fragmentation avoidance
-improvements grows with the increased number of percpu applications.
-
-But it's not a small project by any means and to my knowledge nobody is actively
-working on it, so my comment can be ignored now.
-
-Thanks!
+> 
+> --
+> paul-moore.com
