@@ -2,167 +2,131 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2147CC7618B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCCCC6FD1D
+	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:32:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbjCQUbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Mar 2023 16:31:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38338 "EHLO
+        id S230202AbjCQUcK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Mar 2023 16:32:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230190AbjCQUbb (ORCPT
+        with ESMTP id S230181AbjCQUcH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Mar 2023 16:31:31 -0400
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E861EFFC
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:11 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id er8so13230847edb.0
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:11 -0700 (PDT)
+        Fri, 17 Mar 2023 16:32:07 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0A01B31F
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:40 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id e194so7080022ybf.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1679085065;
+        d=gmail.com; s=20210112; t=1679085095;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tdwPzVsmob+Q/2o5AaDTACeQ8LqTFlcH3duKRoFq2iQ=;
-        b=NRRDvzKrpe8pYBzozs6ge7vqHuUviWfY6zC02S2Qz2ecCTbPpe9T4e6uBCNFzMqCd8
-         seWjFsr2PePAi1T70JZzGYiFm0pUqoCfKAHToYFYfQSlppds1cRifzvCzqnfy5Hh7nnz
-         wA/Xac9eMopHZS+YhuCw941avlp3Q9/QDL2QY=
+        bh=LAOavDnRCoSnVP+J06YC2/4u8vunh0Z+T3beJB56tGs=;
+        b=k+EG32PX1ks8+ifXvbd81Om1X7/ouU/fclSmvOJQ6z8d4A6BhoFcR2hmyn0VZcZpvN
+         4BcY253DsV872KX7/Kl0FOFevZo708obZXDpwJa9PTfrgTD9Sd6OhYi2T9HUPcQqpn5L
+         gcStPAaLdZ3v4xIb1toioU5nnc/lrFSRDu7Gk0x6OJYBniOascUkYHSALyL88KBT6K0V
+         gDQCqjTxDfVppLvIAQjw+x5qkPmA9cwvr62NCfwFDGb3m87FE9OoioXhs3DBARJbBeE4
+         t6uMnQEILgooKqjurhy58mcUi/pFqOlG/OocDFsjtsVFodAq60elK4rbquPFR3C8TFr1
+         8ryA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679085065;
+        d=1e100.net; s=20210112; t=1679085095;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tdwPzVsmob+Q/2o5AaDTACeQ8LqTFlcH3duKRoFq2iQ=;
-        b=aDUbuOBYB2oMuRjmFwbC7MOcqVnMHAeJrPV4+gO8vKS7PUSu2eJbWQCmxImKiUS3Ph
-         43hDoo9idxGjGPElsqdkna2u6OuHN9GngE0cUPXfn4YX1pTwRB5YwJb6UdCpkMLs4Ndy
-         UzRKTWdXEwUtm7t74c6PEjMzp8EatvBBUnezhwsG+v8xEY1nC/pi0QNVJNnknFB+rxDd
-         rKvACCDI0A79mu6S/3RYRS9ctbc59Io6fwVxeYrDDPHxW9n2IJ4ixYri8J5HYfBsKCY0
-         +z1iBR5GS811yjQxRvOcpra3hQ7heCqarNqrLB02O523Ose+LPCskSgsVrJRsa1c0KMu
-         n0mQ==
-X-Gm-Message-State: AO0yUKVIT41yIFVsNyin7PiFWynqWqLjWQWxN3flhoe4VrmnDl4XRz0A
-        j4554ZbKqb57n3oqtYtVYUtjhU3K1AjpxoM/IIY98g==
-X-Google-Smtp-Source: AK7set8h78LvymKbKbmP0A/4oW3LQ2glut7rUolcOdQRLgFmz11ue/+K85Ksa3eL4A5fnyS7Z5879g==
-X-Received: by 2002:a17:906:8496:b0:909:4a93:d9d2 with SMTP id m22-20020a170906849600b009094a93d9d2mr593563ejx.2.1679085064717;
-        Fri, 17 Mar 2023 13:31:04 -0700 (PDT)
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
-        by smtp.gmail.com with ESMTPSA id b24-20020a170906491800b008e82cb55195sm1340777ejq.203.2023.03.17.13.31.03
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Mar 2023 13:31:04 -0700 (PDT)
-Received: by mail-ed1-f47.google.com with SMTP id x13so25003987edd.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:03 -0700 (PDT)
-X-Received: by 2002:a50:ce54:0:b0:4fa:794a:c0cc with SMTP id
- k20-20020a50ce54000000b004fa794ac0ccmr2477649edj.2.1679085063365; Fri, 17 Mar
- 2023 13:31:03 -0700 (PDT)
+        bh=LAOavDnRCoSnVP+J06YC2/4u8vunh0Z+T3beJB56tGs=;
+        b=nyBVHcLI69U/DZlwmtFP8rMiCfjmvkWkzpcHKqN6x2ezUVRqaRy5xNhA60E6zZ1H9j
+         FSlbt4VstI5LYRgPwiYFCffwON6ZnKuSH7rzkJGYoDByTSn26+83U1EH4wD16X0Xhbck
+         M/Ivq9tEzBE7mVp3/xb+2O2Es1A8fY7HtfR+NrUW2KbfiBuoqsZMTuFNiRWYjA1gBXvx
+         US3+W1ROMtvgz8t+lYXegJgF6J2dMUQtPyKaqHHnguz23mA04iakkOo42yzXJEW04o/J
+         1KZqW/YC005CzH1+nyKv+16dE4FjNwGYg6wwrIj56e5NKiB51AUYvkCzi5i2c8QKD3D0
+         q09A==
+X-Gm-Message-State: AO0yUKWxx186o5vlPIGqjvExYOwd8VjXoUgaxa0b1yGanrBpVdrloW0z
+        A/AaUe5xLNVr1APxlF1UWGOw9+QVsusM5A1PMqg=
+X-Google-Smtp-Source: AK7set8lugLqGHowHkdXeIrEFyz+BTJvhQtaUcRiKKfFq6PTMzogHg2zvMvP7eBqclL95hiTyI6xGRcA0qPJTZRMXEg=
+X-Received: by 2002:a25:e90b:0:b0:b21:5fb4:c6e6 with SMTP id
+ n11-20020a25e90b000000b00b215fb4c6e6mr465188ybd.11.1679085095448; Fri, 17 Mar
+ 2023 13:31:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <9d0ef355-f430-e8e2-c844-b34cfcf60d88@kernel.dk>
- <CAHk-=wgcYvgJ5YWJPy6PA-B_yRtPfpw01fmCqtvqGN9jouc_8w@mail.gmail.com>
- <CAKwvOdmJkQUe6bhvQXHo0XOncdso0Kk26n8vdJZufm4Ku72tng@mail.gmail.com> <6414c470.a70a0220.6b62f.3f02@mx.google.com>
-In-Reply-To: <6414c470.a70a0220.6b62f.3f02@mx.google.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 17 Mar 2023 13:30:46 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi5yk0+NeqB34fRC-Zvt+8QZVPTiny9MvCxxjg+ZqDhKg@mail.gmail.com>
-Message-ID: <CAHk-=wi5yk0+NeqB34fRC-Zvt+8QZVPTiny9MvCxxjg+ZqDhKg@mail.gmail.com>
+ <CAHk-=wgcYvgJ5YWJPy6PA-B_yRtPfpw01fmCqtvqGN9jouc_8w@mail.gmail.com> <CAHk-=wj1wYh_2d8Y1Vm6YjPTh4yMqWc++aWVY2LpX7n_atc2hA@mail.gmail.com>
+In-Reply-To: <CAHk-=wj1wYh_2d8Y1Vm6YjPTh4yMqWc++aWVY2LpX7n_atc2hA@mail.gmail.com>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Fri, 17 Mar 2023 21:31:24 +0100
+Message-ID: <CANiq72kjd+NES2mSthLKZduFm_KrwLShngs6jLqhoQPSb+1d-g@mail.gmail.com>
 Subject: Re: [GIT PULL] Block fixes for 6.3-rc3
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Jens Axboe <axboe@kernel.dk>,
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
         Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Kees Cook <keescook@chromium.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        clang-built-linux <llvm@lists.linux.dev>,
-        linux-hardening@vger.kernel.org
+        clang-built-linux <llvm@lists.linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 17, 2023 at 12:50=E2=80=AFPM Kees Cook <keescook@chromium.org> =
-wrote:
+On Fri, Mar 17, 2023 at 7:50=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> I've hit these cases a few times too. The __ubsan_handle_* stuff
-> is designed to be recoverable. I think there are some cases where
-> we're tripping over Clang bugs, though. Some of the past issues
-> have been with Clang thinking some UBSAN feature was trap-only
-> (e.g. -fsanitizer=3Dlocal-bounds), but here it actually generated the cal=
-l,
-> but decided it was no-return. *sigh*
+> Debug support *MUST* have an option to just continue. Sure, make "this
+> is fatal" be an option *too*, because if you are a developer, maybe
+> you really want the "fail hard, fail quickly" behavior.
 
-Hmm. The problem here is that we only get an objdump warning by pure luck.
+At least for userspace it has different modes -- the default is to
+report and continue:
 
-This isn't a "objdump will always catch it", it's more like "objdump
-will only catch it if the code happens to be moved to the end of the
-function".
+    -fsanitize=3D...: print a verbose error report and continue
+execution (default);
+    -fno-sanitize-recover=3D...: print a verbose error report and exit
+the program;
+    -fsanitize-trap=3D...: execute a trap instruction (doesn=E2=80=99t requ=
+ire
+UBSan run-time support).
+    -fno-sanitize=3D...: disable any check, e.g., -fno-sanitize=3Dalignment=
+.
 
-So I'm very happy to hear that it's not by design, and that's very good.
+    (https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html#usage)
 
-But the whole "this is a compiler bug" doesn't exactly give me the
-warm and fuzzies either.
+For the kernel I assume it is meant to work due to `UBSAN_TRAP`, but
+the optimizer may be getting in the way.
 
-The code generation looks *really* odd to me. This is, as far as I can
-tell, the code sequence that this code has:
+From a quick look, it seems that `__find_restype` (which gets inlined
+into `m5mols_set_fmt` via `__find_resolution`) has a small loop:
 
-m5mols_set_fmt:
-  ..
-        movq    %rdx, %rbp
-  ..
-        movl    16(%rbp), %ebx
-        movq    %rbx, %rdi
-  ..
-        cmpq    $16385, %rbx                    # imm =3D 0x4001
-        jne     .LBB24_1
-  ..
-.LBB24_1:
-        cmpl    $8199, %ebx                     # imm =3D 0x2007
-        jne     .LBB24_3
-  ..
-.LBB24_3:
-        callq   __sanitizer_cov_trace_pc@PLT
-        movl    $2, %esi
-        movq    $.L__unnamed_3, %rdi
-        callq   __ubsan_handle_out_of_bounds
+    do {
+        if (code =3D=3D m5mols_default_ffmt[type].code)
+            return type;
+    } while (type++ !=3D SIZE_DEFAULT_FFMT);
 
-and as far as I can tell, that "movl 16(%rbp), %ebx" is
+that I guess gets simplified into something like:
 
-        enum m5mols_restype stype =3D __find_restype(mf->code);
+    if (code =3D=3D first code)
+        yield 0;
+    if (code =3D=3D second code)
+        yield 1;
+    out of bounds;
 
-in __find_resolution(). But I don't understand those odd constants
-it's comparing against at all.
+When UBSAN is disabled, it may be assuming:
 
-'enum m5mols_restype' should be in the range 0..2, but it seems to use
-a 64-bit compare against '16385' (and then a 32-bit compare against
-'8199') to decide it's out-of-bounds.
+    if (code =3D=3D first code)
+        yield 0;
+    yield 1;
 
-I must be *completely* mis-reading this, because none of that makes a
-whit of sense to me.
+Thus no issue.
 
-It's possible that clang is just *so* terminally confused that it just
-generates random code, but it's more likely that I'm mis-reading
-things.
+Though even with UBSAN disabled, if I add a dummy opaque call inside
+the loop, it goes back to something like before, except the jump goes
+nowhere and then `objtool` complains again:
 
-The above is my interpretation of what I see with the current F37
-clang version for a "allmodconfig" build of that file.
+    .LBB24_20:
+        callq    dummydummydummy
+    .Lfunc_end24:
 
-My 'clang -v' says
+So it is reproducible even without UBSAN getting involved:
+https://godbolt.org/z/hTe91b3eG
 
-    clang version 15.0.7 (Fedora 15.0.7-1.fc37)
-
-in case some clang person wants to try to recreate this.
-
-> I'm not opposed to disabling UBSAN for all*config builds if we need to,
-> but I want to get these Clang bugs found and fixed so I'd be sad to lose
-> the coverage.
-
-I wonder how many people actually end up having UBSAN actually
-enabled. I get the feeling that most of the coverage it gets is
-exactly just the compile-only coverage by "allmodconfig" and friends.
-
-Otherwise it would be really easy to just say
-
-        depends on !COMPILE_TEST
-
-for all these run-time debug things. But exactly *because* they have
-caused endless amounts of build-time pain - *and* because I doubt how
-much real run-time testing they get - limiting it to non-build tests
-sounds a bit counter-productive.
-
-              Linus
+Cheers,
+Miguel
