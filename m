@@ -2,125 +2,167 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CFCC7618B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2147CC7618B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:31:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbjCQU3M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Mar 2023 16:29:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59204 "EHLO
+        id S229562AbjCQUbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Mar 2023 16:31:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230181AbjCQU3D (ORCPT
+        with ESMTP id S230190AbjCQUbb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Mar 2023 16:29:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFCEC562B
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:28:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679084882;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GsYNbSh5zaQpqPToVrw2INmBUKfltsbn27ZhrwN66l0=;
-        b=Dv+0NvLd89FjIG1XC4/Cgw3uuIIMJi5K3Ks+IJj3rzn3DNvOQYyACtDmUHLa1j8t9gXyhU
-        hWsV2PuI0DjGMHGbtT0UON693bpaUpKmLIGwkjUmkeF4V3VZKBLQQj+j6UkmrWZ8hDPCKr
-        HbA2ON+VtGmRf6gngrDEiD/qvAN0Fl0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-508-BMu_1d4VN-CdyMOrQPqmSw-1; Fri, 17 Mar 2023 16:27:57 -0400
-X-MC-Unique: BMu_1d4VN-CdyMOrQPqmSw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C41153806737;
-        Fri, 17 Mar 2023 20:27:56 +0000 (UTC)
-Received: from green.redhat.com (unknown [10.2.16.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 12E05492B00;
-        Fri, 17 Mar 2023 20:27:56 +0000 (UTC)
-From:   Eric Blake <eblake@redhat.com>
-To:     josef@toxicpanda.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, corbet@lwn.net,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/5] uapi nbd: add cookie alias to handle
-Date:   Fri, 17 Mar 2023 15:27:47 -0500
-Message-Id: <20230317202749.419094-4-eblake@redhat.com>
-In-Reply-To: <20230317202749.419094-1-eblake@redhat.com>
-References: <20230317202749.419094-1-eblake@redhat.com>
+        Fri, 17 Mar 2023 16:31:31 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E861EFFC
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:11 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id er8so13230847edb.0
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1679085065;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tdwPzVsmob+Q/2o5AaDTACeQ8LqTFlcH3duKRoFq2iQ=;
+        b=NRRDvzKrpe8pYBzozs6ge7vqHuUviWfY6zC02S2Qz2ecCTbPpe9T4e6uBCNFzMqCd8
+         seWjFsr2PePAi1T70JZzGYiFm0pUqoCfKAHToYFYfQSlppds1cRifzvCzqnfy5Hh7nnz
+         wA/Xac9eMopHZS+YhuCw941avlp3Q9/QDL2QY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679085065;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tdwPzVsmob+Q/2o5AaDTACeQ8LqTFlcH3duKRoFq2iQ=;
+        b=aDUbuOBYB2oMuRjmFwbC7MOcqVnMHAeJrPV4+gO8vKS7PUSu2eJbWQCmxImKiUS3Ph
+         43hDoo9idxGjGPElsqdkna2u6OuHN9GngE0cUPXfn4YX1pTwRB5YwJb6UdCpkMLs4Ndy
+         UzRKTWdXEwUtm7t74c6PEjMzp8EatvBBUnezhwsG+v8xEY1nC/pi0QNVJNnknFB+rxDd
+         rKvACCDI0A79mu6S/3RYRS9ctbc59Io6fwVxeYrDDPHxW9n2IJ4ixYri8J5HYfBsKCY0
+         +z1iBR5GS811yjQxRvOcpra3hQ7heCqarNqrLB02O523Ose+LPCskSgsVrJRsa1c0KMu
+         n0mQ==
+X-Gm-Message-State: AO0yUKVIT41yIFVsNyin7PiFWynqWqLjWQWxN3flhoe4VrmnDl4XRz0A
+        j4554ZbKqb57n3oqtYtVYUtjhU3K1AjpxoM/IIY98g==
+X-Google-Smtp-Source: AK7set8h78LvymKbKbmP0A/4oW3LQ2glut7rUolcOdQRLgFmz11ue/+K85Ksa3eL4A5fnyS7Z5879g==
+X-Received: by 2002:a17:906:8496:b0:909:4a93:d9d2 with SMTP id m22-20020a170906849600b009094a93d9d2mr593563ejx.2.1679085064717;
+        Fri, 17 Mar 2023 13:31:04 -0700 (PDT)
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
+        by smtp.gmail.com with ESMTPSA id b24-20020a170906491800b008e82cb55195sm1340777ejq.203.2023.03.17.13.31.03
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Mar 2023 13:31:04 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id x13so25003987edd.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:31:03 -0700 (PDT)
+X-Received: by 2002:a50:ce54:0:b0:4fa:794a:c0cc with SMTP id
+ k20-20020a50ce54000000b004fa794ac0ccmr2477649edj.2.1679085063365; Fri, 17 Mar
+ 2023 13:31:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+References: <9d0ef355-f430-e8e2-c844-b34cfcf60d88@kernel.dk>
+ <CAHk-=wgcYvgJ5YWJPy6PA-B_yRtPfpw01fmCqtvqGN9jouc_8w@mail.gmail.com>
+ <CAKwvOdmJkQUe6bhvQXHo0XOncdso0Kk26n8vdJZufm4Ku72tng@mail.gmail.com> <6414c470.a70a0220.6b62f.3f02@mx.google.com>
+In-Reply-To: <6414c470.a70a0220.6b62f.3f02@mx.google.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 17 Mar 2023 13:30:46 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wi5yk0+NeqB34fRC-Zvt+8QZVPTiny9MvCxxjg+ZqDhKg@mail.gmail.com>
+Message-ID: <CAHk-=wi5yk0+NeqB34fRC-Zvt+8QZVPTiny9MvCxxjg+ZqDhKg@mail.gmail.com>
+Subject: Re: [GIT PULL] Block fixes for 6.3-rc3
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        clang-built-linux <llvm@lists.linux.dev>,
+        linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The uapi <linux/nbd.h> header declares a 'char handle[8]' per request;
-which is overloaded in English (are you referring to "handle" the
-verb, such as handling a signal or writing a callback handler, or
-"handle" the noun, the value used in a lookup table to correlate a
-response back to the request).  Many client-side NBD implementations
-(both servers and clients) have instead used 'uint64_t cookie' or
-similar, as it is easier to directly assign an integer than to futz
-around with memcpy.  In fact, upstream documentation is now
-encouraging this shift in terminology:
-https://lists.debian.org/nbd/2023/03/msg00031.html
+On Fri, Mar 17, 2023 at 12:50=E2=80=AFPM Kees Cook <keescook@chromium.org> =
+wrote:
+>
+> I've hit these cases a few times too. The __ubsan_handle_* stuff
+> is designed to be recoverable. I think there are some cases where
+> we're tripping over Clang bugs, though. Some of the past issues
+> have been with Clang thinking some UBSAN feature was trap-only
+> (e.g. -fsanitizer=3Dlocal-bounds), but here it actually generated the cal=
+l,
+> but decided it was no-return. *sigh*
 
-Accomplish this by use of an anonymous union to provide the alias for
-anyone getting the definition from the uapi; this does not break
-existing clients, while exposing the nicer name for those who prefer
-it.  Note that block/nbd.c still uses the term handle (in fact, it
-actually combines a 32-bit cookie and a 32-bit tag into the 64-bit
-handle), but that internal usage is not changed the public uapi, since
-no compliant NBD server has any reason to inspect or alter the 64
-bits sent over the socket.
+Hmm. The problem here is that we only get an objdump warning by pure luck.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+This isn't a "objdump will always catch it", it's more like "objdump
+will only catch it if the code happens to be moved to the end of the
+function".
 
----
-v2: swap order of anonymous union and add comments to list favored name
----
- include/uapi/linux/nbd.h | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+So I'm very happy to hear that it's not by design, and that's very good.
 
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index 8797387caaf7..80ce0ef43afd 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -12,7 +12,7 @@
-  * 2004/02/19 Paul Clements
-  *            Removed PARANOIA, plus various cleanup and comments
-  * 2023 Copyright Red Hat
-- *            Link to userspace extensions.
-+ *            Link to userspace extensions, favor cookie over handle.
-  */
+But the whole "this is a compiler bug" doesn't exactly give me the
+warm and fuzzies either.
 
- #ifndef _UAPILINUX_NBD_H
-@@ -81,7 +81,10 @@ enum {
- struct nbd_request {
- 	__be32 magic;	/* NBD_REQUEST_MAGIC	*/
- 	__be32 type;	/* See NBD_CMD_*	*/
--	char handle[8];
-+	union {
-+		__be64 cookie;	/* Opaque identifier for request	*/
-+		char handle[8];	/* older spelling of cookie		*/
-+	};
- 	__be64 from;
- 	__be32 len;
- } __attribute__((packed));
-@@ -93,6 +96,9 @@ struct nbd_request {
- struct nbd_reply {
- 	__be32 magic;		/* NBD_REPLY_MAGIC	*/
- 	__be32 error;		/* 0 = ok, else error	*/
--	char handle[8];		/* handle you got from request	*/
-+	union {
-+		__be64 cookie;	/* Opaque identifier from request	*/
-+		char handle[8];	/* older spelling of cookie		*/
-+	};
- };
- #endif /* _UAPILINUX_NBD_H */
--- 
-2.39.2
+The code generation looks *really* odd to me. This is, as far as I can
+tell, the code sequence that this code has:
 
+m5mols_set_fmt:
+  ..
+        movq    %rdx, %rbp
+  ..
+        movl    16(%rbp), %ebx
+        movq    %rbx, %rdi
+  ..
+        cmpq    $16385, %rbx                    # imm =3D 0x4001
+        jne     .LBB24_1
+  ..
+.LBB24_1:
+        cmpl    $8199, %ebx                     # imm =3D 0x2007
+        jne     .LBB24_3
+  ..
+.LBB24_3:
+        callq   __sanitizer_cov_trace_pc@PLT
+        movl    $2, %esi
+        movq    $.L__unnamed_3, %rdi
+        callq   __ubsan_handle_out_of_bounds
+
+and as far as I can tell, that "movl 16(%rbp), %ebx" is
+
+        enum m5mols_restype stype =3D __find_restype(mf->code);
+
+in __find_resolution(). But I don't understand those odd constants
+it's comparing against at all.
+
+'enum m5mols_restype' should be in the range 0..2, but it seems to use
+a 64-bit compare against '16385' (and then a 32-bit compare against
+'8199') to decide it's out-of-bounds.
+
+I must be *completely* mis-reading this, because none of that makes a
+whit of sense to me.
+
+It's possible that clang is just *so* terminally confused that it just
+generates random code, but it's more likely that I'm mis-reading
+things.
+
+The above is my interpretation of what I see with the current F37
+clang version for a "allmodconfig" build of that file.
+
+My 'clang -v' says
+
+    clang version 15.0.7 (Fedora 15.0.7-1.fc37)
+
+in case some clang person wants to try to recreate this.
+
+> I'm not opposed to disabling UBSAN for all*config builds if we need to,
+> but I want to get these Clang bugs found and fixed so I'd be sad to lose
+> the coverage.
+
+I wonder how many people actually end up having UBSAN actually
+enabled. I get the feeling that most of the coverage it gets is
+exactly just the compile-only coverage by "allmodconfig" and friends.
+
+Otherwise it would be really easy to just say
+
+        depends on !COMPILE_TEST
+
+for all these run-time debug things. But exactly *because* they have
+caused endless amounts of build-time pain - *and* because I doubt how
+much real run-time testing they get - limiting it to non-build tests
+sounds a bit counter-productive.
+
+              Linus
