@@ -2,111 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EB3C6FD1F
-	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 00:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D62C74A5B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 01:38:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbjCQAv4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 20:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43738 "EHLO
+        id S229608AbjCQBio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 21:38:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbjCQAvz (ORCPT
+        with ESMTP id S229674AbjCQBin (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 20:51:55 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23ECBAFBA1;
-        Thu, 16 Mar 2023 17:51:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679014314; x=1710550314;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=F0aL+5pXfubO4Fep3HxXNB4087FElE558NDpmhmpgXc=;
-  b=QNDc95xSV5PldKzEfC3aWG1lJcAVmP+xqYjVuvii2E7Y40l4B+Y7OTii
-   5C6zJlsk3ejRcQVrCcs1bNyJ33jsIaCpVWIDVp+nEJ4akn95sTSB5GYSY
-   cyIem3GLP2Q119rJYy9nC08hRexqAoyYnE8FnixjYYagZbB2QiJIQXhTW
-   cbBCne2GKBiV+mCS6jrMvld8dyll4BD62h5lE6eZKTlg8NelgixARJ4X2
-   C1J/RGqbmOgAkTfRSl53ClI4PphOiDEGy9G4rCEYZ3wEuikIicjXq4Afp
-   zX4BE6AaB72lie4ajRFcgYKzMH5hDbdCX8CB1c0D9HFVthtES8OUhgvSP
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="317804627"
-X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
-   d="scan'208";a="317804627"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 17:51:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="712560052"
-X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
-   d="scan'208";a="712560052"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 16 Mar 2023 17:51:50 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pcyJx-0008wA-0r;
-        Fri, 17 Mar 2023 00:51:49 +0000
-Date:   Fri, 17 Mar 2023 08:51:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andreas Hindborg <nmi@metaspace.dk>, linux-block@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Andreas Hindborg <a.hindborg@samsung.com>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>,
-        Minwoo Im <minwoo.im.dev@gmail.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] block: ublk: enable zoned storage support
-Message-ID: <202303170851.rY3VPud2-lkp@intel.com>
-References: <20230316145539.300523-1-nmi@metaspace.dk>
+        Thu, 16 Mar 2023 21:38:43 -0400
+Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B8ACDE7
+        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 18:38:39 -0700 (PDT)
+Received: by mail-ua1-x930.google.com with SMTP id p2so2437232uap.1
+        for <linux-block@vger.kernel.org>; Thu, 16 Mar 2023 18:38:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1679017119;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gZiMCDMIqB6OVa8oI0SbxOaqsvPFfiDjO4dIGyuTuIg=;
+        b=ypwhZFcEyECXNJLrPmBrQBRxwV+y3VDSUZRidDldPrMlkddN8UY8Sd09RHpaiqdiJL
+         T7ZnlEx7oQHOvemcAeJimox6CqBwQt5mA6I5dl4zxVDLl84vlluYmnsW3XrJAq59rLmm
+         WEPR9GDZf3CMjIEeQ1ImdBuXtn3KtyXxGhGeEnmEZS0j2sqwdmlAlzOwUzK6i/XefAY5
+         7Y1tBOyhxN8wEoGSg6Y+f7V7aOput026rhrRVSliNNxcqNUPXZI8t7s/BGDZ4fpJznF2
+         a4wY+SXlfzZfwhEPy83h/v6w/SWGnfBLCXxitQ0B/IYAlEUQxW78axaN7PPFkDGCimfx
+         W+qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679017119;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gZiMCDMIqB6OVa8oI0SbxOaqsvPFfiDjO4dIGyuTuIg=;
+        b=XFWLE9voEP5uB3C+BIgTF4ysVBGtLZDRBDqK/qe4dHJrTtYKV0/4mDKWHFBhk/CNeX
+         gkucqKd4K6ErgETJhbiZhJ1mu8oeMugW1fTkeXp7wjiJ3P9vZVGs66pdrBNj9swIqPp6
+         v0Jy/azy7BYUvrdC4gLGltQID+zVMoXojh+v/C+iNtY1mOvhu+xEGMuRai2NWNPKS9Ct
+         OypkKfHU0L2CFxJSC3A/JaXPIdlJh/m0UN7ybsDibKSDISqvkPPmPDoFUPjQ7q8VLYy0
+         VHtUglwmHhbJyW44UsV9PAXLL97hupWqDwiKIArE+orMzGZ6RRNXyZAdFQOKFE5RFqUi
+         adjQ==
+X-Gm-Message-State: AO0yUKU4qJnUuFFPNbLF81JCbTDFrFmdhu6qH+JbtsymrTsIjzYazFNs
+        4TynhD0+puFa/32OJdVFMjKkB+1oYBSZuLF20TpIlA==
+X-Google-Smtp-Source: AK7set+/q/KOu9X2oqklAu82mx0ZTERuPycsI3lxx4LB0u576R4uCrwSrRzaoqbLzoyXIBsLOflo4MZ1GqF/8zksvhU=
+X-Received: by 2002:a1f:b292:0:b0:42d:18f9:d0b6 with SMTP id
+ b140-20020a1fb292000000b0042d18f9d0b6mr18388753vkf.2.1679017118886; Thu, 16
+ Mar 2023 18:38:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230316145539.300523-1-nmi@metaspace.dk>
+References: <20230314230004.961993-1-alexey.klimov@linaro.org> <c98a3741-273b-8a69-016d-5f3e79f8a71e@acm.org>
+In-Reply-To: <c98a3741-273b-8a69-016d-5f3e79f8a71e@acm.org>
+From:   Alexey Klimov <alexey.klimov@linaro.org>
+Date:   Fri, 17 Mar 2023 01:38:27 +0000
+Message-ID: <CANgGJDqhimVZ7Pfes0sT8S2VHo_gTLBYkGFNcfbT5CV5VJz51Q@mail.gmail.com>
+Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
+ and slow-stuck reboots
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     peterz@infradead.org, draszik@google.com, peter.griffin@linaro.org,
+        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
+        tony@atomide.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        alim.akhtar@samsung.com, regressions@lists.linux.dev,
+        avri.altman@wdc.com, klimova@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Andreas,
+On Tue, 14 Mar 2023 at 23:21, Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 3/14/23 16:00, Alexey Klimov wrote:
+> > The delay is found to be in device's ->shutdown() methods called from kernel_restart():
+> > void kernel_restart_prepare(char *cmd)
+> > {
+> >       blocking_notifier_call_chain(&reboot_notifier_list, SYS_RESTART, cmd);
+> >       system_state = SYSTEM_RESTART;
+> >       usermodehelper_disable();
+> >       device_shutdown();      <---- here
 
-Thank you for the patch! Yet something to improve:
+[..]
 
-[auto build test ERROR on eeac8ede17557680855031c6f305ece2378af326]
+>
+> Please let me know if you want me to resubmit patch "scsi: ufs: Remove
+> the LUN quiescing code from ufshcd_wl_shutdown()"
+> (https://lore.kernel.org/linux-scsi/20220331223424.1054715-14-bvanassche@acm.org/).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230316-225725
-base:   eeac8ede17557680855031c6f305ece2378af326
-patch link:    https://lore.kernel.org/r/20230316145539.300523-1-nmi%40metaspace.dk
-patch subject: [PATCH v3] block: ublk: enable zoned storage support
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20230317/202303170851.rY3VPud2-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/723d5c2508e09f127226d38c698d3e4e6cff83f1
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230316-225725
-        git checkout 723d5c2508e09f127226d38c698d3e4e6cff83f1
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=s390 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash
+This indeed works and helps to reduce reboot time. Thanks!
+If you decide to resubmit, feel free to ping me to test it.
+However I have no knowledge how comments from Adrian can be addressed.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202303170851.rY3VPud2-lkp@intel.com/
+With that patch the reboot time decreases from 60-100 seconds to
+~10-20 seconds. The next
+"slow" thing is wlan driver which callback is called from
+blocking_notifier_call_chain(&reboot_notifier_list, ...) but obviously
+it is not a part of ufs code.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
-ERROR: modpost: "devm_ioremap_resource" [drivers/dma/qcom/hdma.ko] undefined!
-ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
-ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
-ERROR: modpost: "iounmap" [drivers/tty/ipwireless/ipwireless.ko] undefined!
-ERROR: modpost: "ioremap" [drivers/tty/ipwireless/ipwireless.ko] undefined!
-ERROR: modpost: "devm_platform_ioremap_resource" [drivers/char/xillybus/xillybus_of.ko] undefined!
->> ERROR: modpost: "ublk_set_nr_zones" [drivers/block/ublk_drv.ko] undefined!
->> ERROR: modpost: "ublk_dev_param_zoned_apply" [drivers/block/ublk_drv.ko] undefined!
->> ERROR: modpost: "ublk_revalidate_disk_zones" [drivers/block/ublk_drv.ko] undefined!
->> ERROR: modpost: "ublk_report_zones" [drivers/block/ublk_drv.ko] undefined!
-WARNING: modpost: suppressed 19 unresolved symbol warnings because there were too many)
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Best regards,
+Alexey
