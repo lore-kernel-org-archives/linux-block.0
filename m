@@ -2,145 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9078C6FD1D
-	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 22:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 450BEC74A5B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 22:39:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229886AbjCQW2R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Mar 2023 18:28:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48110 "EHLO
+        id S230242AbjCQWj0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Mar 2023 18:39:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229814AbjCQW2Q (ORCPT
+        with ESMTP id S229560AbjCQWjZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Mar 2023 18:28:16 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BFD94C6FD
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 15:28:15 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E65E31FE34;
-        Fri, 17 Mar 2023 22:28:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1679092093; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Nq97KjuKrJoKusuMAN0Ul4Ghjteo9qeitM20sZqhuws=;
-        b=ceKCTaWB5u/afkoxzo2SEj/0V7GZQRGutgFWKMHqkTAnhgYrhkAYHzODzjNkJ+iIwYHBZk
-        ZzjGjjq3vIPwEL0SBGoA6nR4/r6VEkVB5pi6jht+eFCT3zvSMbkW63QVeDEcCpwbo+3XaT
-        yOvNsu0gjBxMM31+fBj41W6cjBBqHbE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1679092093;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Nq97KjuKrJoKusuMAN0Ul4Ghjteo9qeitM20sZqhuws=;
-        b=vfXCoiCwk+zhBV2jT8XO2B3DhZVmY2h00LMO2RCVm3QLc/oyOSs/v1yrVbL8SF56MLBuj6
-        jr8SI0pS9L7J1+BQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D8CE313428;
-        Fri, 17 Mar 2023 22:28:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id CKvnNH3pFGTYTwAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 17 Mar 2023 22:28:13 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 63585A06FD; Fri, 17 Mar 2023 23:28:13 +0100 (CET)
-Date:   Fri, 17 Mar 2023 23:28:13 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
-Message-ID: <20230317222813.xkjia2cottjwzls7@quack3>
-References: <20230317195938.1745318-1-bvanassche@acm.org>
- <20230317195938.1745318-3-bvanassche@acm.org>
+        Fri, 17 Mar 2023 18:39:25 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE7226B32B
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 15:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1679092763; x=1710628763;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=QqCVcd1o9+X40P1EwMH7YX1nBg8rtjGpkstT/tarGGs=;
+  b=RyFG7Im0/3TzXduJbqmNJ3d89d6jLIUbsBLuE2ixDwJbQuISq+xiQEff
+   RmFA/guOxPh2K58Mg8e+vEWOxDKsautnwMArerHmuKwBcainrfBGjLnZ6
+   UcIf9ub7XkNWi5hT+zoLyiFrLZI/ts3Iw7u1ZndRCl21qMImucT/TzXqN
+   6712NcZgNg+rZpXmueLyVLNRgX0bA+HmxzzQxHKZ+Pv6O3hL+gBDalJaK
+   MU0uWqwsDo9AFT3xXisd8ncZKr6BQHJxA9oKajzXX1g81Lrd8Liy0uZK/
+   CBjbPEqSUYwail9wcd7jDh6g4BrqiS1nomQptpDZOq+QF8rVcArmHrarj
+   g==;
+X-IronPort-AV: E=Sophos;i="5.98,270,1673884800"; 
+   d="scan'208";a="224182116"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Mar 2023 06:39:22 +0800
+IronPort-SDR: kebgIj+G5ZF/QvZWERtH5lXgG3rNApvhG2PCLZyc141j7a2CBVf8c0msHMNZ16/tEAd6ueE2JO
+ Hy+y7qgQcTw0JIX7hdPP0c97v1580kZlJFo/D/X7r80yuygCvreN1+F/KoXjPJM6qFv7kDO5TG
+ HSZASqyJZZsNBqyuzkSFMD0+lyEKSFBkhHlal115sXr3kSY2irqNwKXJi4ZfqcncXl6nxGZFCa
+ qrYAFSXClqt2W2DLmu0cfTKuV2TNYhd7bZaM5letY96Dcno3BGRA8DPYs+2K0iaVkq5v3MNAVA
+ Nwg=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Mar 2023 14:50:05 -0700
+IronPort-SDR: YvNvMnudN4fM0eaa4rQK8fyvMoHzaivWQzi1mbh/OgFrSwSp+EyLrHoXRUJ0ev/98wfFuE3IxX
+ LsHE9Q23G4bPo60V/uwYwi0DPR+jmgQy1BTLaZbBEcs3tfO9c9V1+MpGDzy3HyO7Urm8v6AhPf
+ KektRIfQMu1hlBwioP/DU2VamFXrsXA5qvs9kVCMru80MoXUEkU6OAPo7UzdYIDHd435hQ5xkY
+ nx9aGCMFI0wzrgQogFdefwcNRPJEhqEooBZNZATlYcWo46hkq7OvRcpp3VvOosDgGR+ht/tYjn
+ PxQ=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Mar 2023 15:39:23 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PdfFQ4TnVz1RtVy
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 15:39:22 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1679092762; x=1681684763; bh=QqCVcd1o9+X40P1EwMH7YX1nBg8rtjGpkst
+        T/tarGGs=; b=fgMU4ucD76nNXDM8aY+kSGjuqk8smKU77r3xAVGWSRPMXwjX1q7
+        OIRLVXTmCt4H9AgszEdNlF9wWKaGzcDbNopXS7gzYl39o46+ovJOhcWZ7ucinxB7
+        Bl3ZfhWGRy6VYXitHlToWE/mlX9o9ia6EUKyHNBH6lq0nQRX5SYKPaHU2BvF00rI
+        lBndH9PMC4Xn2P59X7mQf3714hE+hoZ0FvCN2WogGcbSdAtidBpzguCUFeTH3Ghi
+        ndDeAhhSEp2bE1U9tTeh8rm1gwsbkuBrLWsPDwyfWeW9aT1POlMWEmtlg/DTcN+d
+        yj7o1DcVQzLlfROeT9/8M2xbfPpabpQMTHg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id KdjP7KZ4lg1e for <linux-block@vger.kernel.org>;
+        Fri, 17 Mar 2023 15:39:22 -0700 (PDT)
+Received: from [10.225.163.88] (unknown [10.225.163.88])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PdfFN55Q3z1RtVm;
+        Fri, 17 Mar 2023 15:39:20 -0700 (PDT)
+Message-ID: <9987139a-f423-3d2e-5abd-877b3d147134@opensource.wdc.com>
+Date:   Sat, 18 Mar 2023 07:39:19 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230317195938.1745318-3-bvanassche@acm.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH] block: Support splitting REQ_OP_ZONE_APPEND bios
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        David Sterba <dsterba@suse.com>
+References: <20230317195036.1743712-1-bvanassche@acm.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20230317195036.1743712-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 17-03-23 12:59:38, Bart Van Assche wrote:
-> Instead of submitting the bio fragment with the highest LBA first,
-> submit the bio fragment with the lowest LBA first. If plugging is
-> active, append requests at the end of the list with plugged requests
-> instead of at the start. This approach prevents write errors when
-> submitting large bios to host-managed zoned block devices.
+On 3/18/23 04:50, Bart Van Assche wrote:
+> Make it easier for filesystems to submit zone append bios that exceed
+> the block device limits by adding support for REQ_OP_ZONE_APPEND in
+> bio_split(). See also commit 0512a75b98f8 ("block: Introduce
+> REQ_OP_ZONE_APPEND").
+> 
+> This patch is a bug fix for commit d5e4377d5051 because that commit
+> introduces a call to bio_split() for zone append bios without adding
+> support for splitting REQ_OP_ZONE_APPEND bios in bio_split().
+> 
+> Untested.
 > 
 > Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Keith Busch <kbusch@kernel.org>
 > Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Cc: Josef Bacik <josef@toxicpanda.com>
 > Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Fixes: d5e4377d5051 ("btrfs: split zone append bios in btrfs_submit_bio")
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-...
+Nack. This will break zonefs.
+zonefs uses zone append commands for sync writes. If zonefs does not have
+guarantees that a single write is processed with a single command, the user data
+can get corrupted because of the possible reordering of zone append commands.
 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index cc32ad0cd548..9b0f9f3fdba0 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1300,7 +1300,7 @@ static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
->  
->  static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
->  {
-> -	struct request *last = rq_list_peek(&plug->mq_list);
-> +	struct request *last = rq_list_peek(&plug->mq_list), **last_p;
->  
->  	if (!plug->rq_count) {
->  		trace_block_plug(rq->q);
-> @@ -1317,7 +1317,10 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
->  	if (!plug->has_elevator && (rq->rq_flags & RQF_ELV))
->  		plug->has_elevator = true;
->  	rq->rq_next = NULL;
-> -	rq_list_add(&plug->mq_list, rq);
-> +	last_p = &plug->mq_list;
-> +	while (*last_p)
-> +		last_p = &(*last_p)->rq_next;
-> +	rq_list_add_tail(&last_p, rq);
->  	plug->rq_count++;
->  }
 
-Uh, I don't think we want to traverse the whole plug list each time we are
-adding a request to it. We have just recently managed to avoid that at
-least for single-device cases and apparently it was a win for fast devices
-(see commit d38a9c04c0d5 ("block: only check previous entry for plug merge
-attempt")).
-
-If anything, I'd rather modify blk_mq_dispatch_plug_list() to add requests
-to the queuelist in reverse order in this case, like I did it in
-34e0a279a993 ("block: do not reverse request order when flushing plug
-list") which is now in Jens' tree.
-
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index dd5ce1137f04..5e01791967c0 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -228,6 +228,12 @@ static inline unsigned short req_get_ioprio(struct request *req)
->  	*(listptr) = rq;				\
->  } while (0)
->  
-> +#define rq_list_add_tail(lastpptr, rq) do {		\
-> +	(rq)->rq_next = NULL;				\
-> +	**(lastpptr) = rq;				\
-> +	*(lastpptr) = &rq->rq_next;			\
-> +} while (0)
-> +
-
-And this function should be already in Jens's tree as part of commit
-34e0a279a993 ("block: do not reverse request order when flushing plug
-list").
-
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Damien Le Moal
+Western Digital Research
+
