@@ -2,118 +2,144 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7457C7618E
-	for <linux-block@archiver.kernel.org>; Thu, 16 Mar 2023 22:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D06CAC74A5B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 00:22:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbjCPWxn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Mar 2023 18:53:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57018 "EHLO
+        id S229669AbjCQAWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Mar 2023 20:22:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjCPWxm (ORCPT
+        with ESMTP id S229659AbjCQAWD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Mar 2023 18:53:42 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9BC3B2F7BB;
-        Thu, 16 Mar 2023 15:53:41 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id EC6622057035; Thu, 16 Mar 2023 15:53:40 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EC6622057035
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1679007220;
-        bh=ozAKii3/G+nF0B4iMSAidkpr8EKBtFwptQ71Sgukeww=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KkZPlvrZkwVJk9N6tCVcfEWVijYklxICoHBlfmIBUdyC9L+DFQd4o9FIlLtaz5zo9
-         LlqgvLme5WmK8AGXZvR43afaNUceUwk8wqOJUB8SBwuHtIGBuXChLJM+Ctaq1+q6w0
-         SjFFKl2n5uJm/6kczK6TR5zqAcTMDJ2OG5M9TlUA=
-Date:   Thu, 16 Mar 2023 15:53:40 -0700
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     Steve Grubb <sgrubb@redhat.com>, corbet@lwn.net,
-        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
-        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
-        agk@redhat.com, snitzer@kernel.org, eparis@redhat.com,
-        linux-audit@redhat.com, dm-devel@redhat.com,
-        linux-doc@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>,
-        roberto.sassu@huawei.com, linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [RFC PATCH v9 07/16] uapi|audit|ipe: add ipe auditing support
-Message-ID: <20230316225340.GB22567@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <1675119451-23180-8-git-send-email-wufan@linux.microsoft.com>
- <3723852.kQq0lBPeGt@x2>
- <CAHC9VhRqMrTuvVtwzJoK2U=6O1QuaQ8ceA6+qm=6ib0TOUEeSw@mail.gmail.com>
+        Thu, 16 Mar 2023 20:22:03 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B18E502B;
+        Thu, 16 Mar 2023 17:22:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679012521; x=1710548521;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OE8Dqyqz+vpOyK5wB/P3TD5L08Vj6aPhYlgE8XqlfJI=;
+  b=D5lMRBNJVmG8jSFxRMED4zH+ywUG0834AQVXEc3vN0/NC+8CHjaPD36x
+   dw2pQk476TOzfyfB1T3sNNrHJNajOjfm7Wt3/QA82TLJMGXktPBOroET+
+   hA8/hjNX3BCkzaMCqqxQ5nLL4giWZroKwJv14sTFXa6iT40d01KDqvhPO
+   0wzK9FAMYWeODs2laz4HjKr7I7alZJrwSpXUvWQIHy1oAr94HW6Rmh0hv
+   K99OjhoIQeraeK0zbOp3+f8KopnEG15Dj7AZHY6ebIMn+KGp4Usp5Gc/k
+   g2kZohF2tA4NQdgO5pq+BfVtCZNKBB1ulF3YwIP8Ug/Vl8vaAuxbuCbgP
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="400727680"
+X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
+   d="scan'208";a="400727680"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Mar 2023 17:21:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10651"; a="630095879"
+X-IronPort-AV: E=Sophos;i="5.98,267,1673942400"; 
+   d="scan'208";a="630095879"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 16 Mar 2023 17:21:48 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pcxqt-0008ua-2B;
+        Fri, 17 Mar 2023 00:21:47 +0000
+Date:   Fri, 17 Mar 2023 08:20:49 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andreas Hindborg <nmi@metaspace.dk>, linux-block@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Andreas Hindborg <a.hindborg@samsung.com>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Matias Bjorling <Matias.Bjorling@wdc.com>,
+        Minwoo Im <minwoo.im.dev@gmail.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] block: ublk: enable zoned storage support
+Message-ID: <202303170805.9OMzCcn7-lkp@intel.com>
+References: <20230316145539.300523-1-nmi@metaspace.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHC9VhRqMrTuvVtwzJoK2U=6O1QuaQ8ceA6+qm=6ib0TOUEeSw@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20230316145539.300523-1-nmi@metaspace.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 02, 2023 at 02:05:33PM -0500, Paul Moore wrote:
-> On Tue, Jan 31, 2023 at 12:11???PM Steve Grubb <sgrubb@redhat.com> wrote:
-> >
-> > Hello,
-> >
-> > On Monday, January 30, 2023 5:57:22 PM EST Fan Wu wrote:
-> > > From: Deven Bowers <deven.desai@linux.microsoft.com>
-> > >
-> > > Users of IPE require a way to identify when and why an operation fails,
-> > > allowing them to both respond to violations of policy and be notified
-> > > of potentially malicious actions on their systens with respect to IPE
-> > > itself.
-> > >
-> > > The new 1420 audit, AUDIT_IPE_ACCESS indicates the result of a policy
-> > > evaulation of a resource. The other two events, AUDIT_MAC_POLICY_LOAD,
-> > > and AUDIT_MAC_CONFIG_CHANGE represent a new policy was loaded into the
-> > > kernel and the currently active policy changed, respectively.
-> >
-> > Typically when you reuse an existing record type, it is expected to maintain
-> > the same fields in the same order. Also, it is expect that fields that are
-> > common across diferent records have the same meaning. To aid in this, we have
-> > a field dictionary here:
-> >
-> > https://github.com/linux-audit/audit-documentation/blob/main/specs/fields/
-> > field-dictionary.csv
-> >
-> > For example, dev is expected to be 2 hex numbers separated by a colon which
-> > are the device major and minor numbers. But down a couple lines from here, we
-> > find dev="tmpfs". But isn't that a filesystem type?
-> 
-> What Steve said.
-> 
-> I'll also add an administrative note, we just moved upstream Linux
-> audit development to a new mailing list, audit@vger.kernel.org, please
-> use that in future patch submissions.  As a positive, it's a fully
-> open list so you won't run into moderation delays/notifications/etc.
-> 
-Thanks for the info, I will update the address.
+Hi Andreas,
 
-> > > This patch also adds support for success auditing, allowing users to
-> > > identify how a resource passed policy. It is recommended to use this
-> > > option with caution, as it is quite noisy.
-> > >
-> > > This patch adds the following audit records:
-> > >
-> > >   audit: AUDIT1420 path="/tmp/tmpwxmam366/deny/bin/hello" dev="tmpfs"
-> > >     ino=72 rule="DEFAULT op=EXECUTE action=DENY"
-> >
-> > Do we really need to log the whole rule?
-> 
-> Fan, would it be reasonable to list the properties which caused the
-> access denial?  That seems like it might be more helpful than the
-> specific rule, or am I missing something?
-> 
-Audit the whole rule can let the user find the reason of a policy decision.
-We need the whole rule because an allow/block is not caused by a specific
-property, but the combination of all property conditions in a rule.
+Thank you for the patch! Yet something to improve:
 
-We could also add a verbose switch such that we only audit
-the whole rule when a user turned the verbose switch on. 
+[auto build test ERROR on eeac8ede17557680855031c6f305ece2378af326]
 
--Fan
+url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230316-225725
+base:   eeac8ede17557680855031c6f305ece2378af326
+patch link:    https://lore.kernel.org/r/20230316145539.300523-1-nmi%40metaspace.dk
+patch subject: [PATCH v3] block: ublk: enable zoned storage support
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20230317/202303170805.9OMzCcn7-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/723d5c2508e09f127226d38c698d3e4e6cff83f1
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Andreas-Hindborg/block-ublk-enable-zoned-storage-support/20230316-225725
+        git checkout 723d5c2508e09f127226d38c698d3e4e6cff83f1
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sh olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=sh SHELL=/bin/bash drivers/block/
 
-> paul-moore.com
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303170805.9OMzCcn7-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   drivers/block/ublk_drv-zoned.c: In function 'ublk_alloc_report_buffer':
+>> drivers/block/ublk_drv-zoned.c:50:23: error: implicit declaration of function '__vmalloc'; did you mean '__kmalloc'? [-Werror=implicit-function-declaration]
+      50 |                 buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
+         |                       ^~~~~~~~~
+         |                       __kmalloc
+>> drivers/block/ublk_drv-zoned.c:50:21: warning: assignment to 'void *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+      50 |                 buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
+         |                     ^
+   cc1: some warnings being treated as errors
+
+
+vim +50 drivers/block/ublk_drv-zoned.c
+
+    31	
+    32	// Based on virtblk_alloc_report_buffer
+    33	static void *ublk_alloc_report_buffer(struct ublk_device *ublk,
+    34					      unsigned int nr_zones,
+    35					      unsigned int zone_sectors, size_t *buflen)
+    36	{
+    37		struct request_queue *q = ublk->ub_disk->queue;
+    38		size_t bufsize;
+    39		void *buf;
+    40	
+    41		nr_zones = min_t(unsigned int, nr_zones,
+    42				 get_capacity(ublk->ub_disk) >> ilog2(zone_sectors));
+    43	
+    44		bufsize = nr_zones * sizeof(struct blk_zone);
+    45		bufsize =
+    46			min_t(size_t, bufsize, queue_max_hw_sectors(q) << SECTOR_SHIFT);
+    47		bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
+    48	
+    49		while (bufsize >= sizeof(struct blk_zone)) {
+  > 50			buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
+    51			if (buf) {
+    52				*buflen = bufsize;
+    53				return buf;
+    54			}
+    55			bufsize >>= 1;
+    56		}
+    57	
+    58		bufsize = 0;
+    59		return NULL;
+    60	}
+    61	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
