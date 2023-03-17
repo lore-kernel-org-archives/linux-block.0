@@ -2,52 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFB4C7618B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EC4C7618B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:29:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbjCQU2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Mar 2023 16:28:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58770 "EHLO
+        id S230103AbjCQU3K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Mar 2023 16:29:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbjCQU2u (ORCPT
+        with ESMTP id S230169AbjCQU25 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Mar 2023 16:28:50 -0400
+        Fri, 17 Mar 2023 16:28:57 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D51FA5699
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:28:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F4023AF291
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:28:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1679084881;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0R5I27ov4lNPeGd1XvXpj2Wrky39OKo2yJm6P6Bnges=;
-        b=WIgxzbMP5NtZO46Fgux60QACmtocFP5TH3XFHl9uMzsvB6nzVeWpHzSWaRO98zEMWoPpgR
-        NXCr10E0CkgCJhLi7nylw1CYQ/+aKsZ8mchW4XXx8OjEFm0VTA550yTKi+K1FMUZ+/2gu8
-        AnKrvqjf/qm5JGUTKiEQ9m0I+hqBTZk=
+        bh=LMNmNTOdx390ioTe9XNiCAi1NYjBrn3x8X89rBxIitg=;
+        b=fKaktX6BEYi2d1WqbMA4G+oCwmqlZsoZg/ugQvXUUye0APtXpbd4JSchdngYpQDLZU2ibp
+        li+xPjA0J7OVht3ZK4tXv2Kl8jUxZc+HGy/ByiuR3ROglpDquksi+WOm/T6ei2e4dj3T/7
+        nqMqQB3osV3rXBni+1HUTnS5XL+GA8g=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-392-zpc23gJ5NoWr0lHdeCqhig-1; Fri, 17 Mar 2023 16:27:55 -0400
-X-MC-Unique: zpc23gJ5NoWr0lHdeCqhig-1
+ us-mta-294-Mxwocp_hMcOEN5qt7QZfpw-1; Fri, 17 Mar 2023 16:27:58 -0400
+X-MC-Unique: Mxwocp_hMcOEN5qt7QZfpw-1
 Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1865C3C025C0;
-        Fri, 17 Mar 2023 20:27:55 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D7602999B21;
+        Fri, 17 Mar 2023 20:27:57 +0000 (UTC)
 Received: from green.redhat.com (unknown [10.2.16.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 218CD492B00;
-        Fri, 17 Mar 2023 20:27:54 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E243B492B00;
+        Fri, 17 Mar 2023 20:27:56 +0000 (UTC)
 From:   Eric Blake <eblake@redhat.com>
 To:     josef@toxicpanda.com, linux-block@vger.kernel.org,
         nbd@other.debian.org
 Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
         christoph.boehmwalder@linbit.com, corbet@lwn.net,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 1/5] uapi nbd: improve doc links to userspace spec
-Date:   Fri, 17 Mar 2023 15:27:45 -0500
-Message-Id: <20230317202749.419094-2-eblake@redhat.com>
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 4/5] block nbd: use req.cookie instead of req.handle
+Date:   Fri, 17 Mar 2023 15:27:48 -0500
+Message-Id: <20230317202749.419094-5-eblake@redhat.com>
 In-Reply-To: <20230317202749.419094-1-eblake@redhat.com>
 References: <20230317202749.419094-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -58,83 +57,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The uapi <linux/nbd.h> header intentionally documents only the NBD
-server features that the kernel module will utilize as a client.  But
-while it already had one mention of skipped bits due to userspace
-extensions, it did not actually direct the reader to the canonical
-source to learn about those extensions.
-
-While touching comments, fix an outdated reference that listed only
-READ and WRITE as commands.
+A good optimizing compiler should not compile this any differently,
+but it is nicer to work directly with integers instead of memcpy().
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 ---
-v2: Split change to sourceforge link to separate patch
+v2: Fix kernel test robot complaint about wrong endianness on loongarch:
+https://lore.kernel.org/oe-kbuild-all/202303121323.Jd35Q1Au-lkp@intel.com/
 ---
- include/uapi/linux/nbd.h | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ drivers/block/nbd.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/include/uapi/linux/nbd.h b/include/uapi/linux/nbd.h
-index 20d6cc91435d..8797387caaf7 100644
---- a/include/uapi/linux/nbd.h
-+++ b/include/uapi/linux/nbd.h
-@@ -11,6 +11,8 @@
-  *            Cleanup PARANOIA usage & code.
-  * 2004/02/19 Paul Clements
-  *            Removed PARANOIA, plus various cleanup and comments
-+ * 2023 Copyright Red Hat
-+ *            Link to userspace extensions.
-  */
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 8a9487e79f1c..94ae85400b46 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -560,7 +560,6 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 	unsigned long size = blk_rq_bytes(req);
+ 	struct bio *bio;
+ 	u64 handle;
+-	__be64 tmp;
+ 	u32 type;
+ 	u32 nbd_cmd_flags = 0;
+ 	int sent = nsock->sent, skip = 0;
+@@ -607,8 +606,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		request.len = htonl(size);
+ 	}
+ 	handle = nbd_cmd_handle(cmd);
+-	tmp = cpu_to_be64(handle);
+-	memcpy(request.handle, &tmp, sizeof(tmp));
++	request.cookie = cpu_to_be64(handle);
 
- #ifndef _UAPILINUX_NBD_H
-@@ -30,12 +32,18 @@
- #define NBD_SET_TIMEOUT _IO( 0xab, 9 )
- #define NBD_SET_FLAGS   _IO( 0xab, 10)
+ 	trace_nbd_send_request(&request, nbd->index, blk_mq_rq_from_pdu(cmd));
 
-+/*
-+ * See also https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
-+ * for additional userspace extensions not yet utilized in the kernel module.
-+ */
-+
- enum {
- 	NBD_CMD_READ = 0,
- 	NBD_CMD_WRITE = 1,
- 	NBD_CMD_DISC = 2,
- 	NBD_CMD_FLUSH = 3,
- 	NBD_CMD_TRIM = 4
-+	/* userspace defines additional extension commands */
- };
+@@ -729,14 +727,12 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
+ 	int result;
+ 	struct nbd_cmd *cmd;
+ 	struct request *req = NULL;
+-	__be64 tmp;
+ 	u64 handle;
+ 	u16 hwq;
+ 	u32 tag;
+ 	int ret = 0;
 
- /* values for flags field, these are server interaction specific. */
-@@ -64,14 +72,15 @@ enum {
- #define NBD_REQUEST_MAGIC 0x25609513
- #define NBD_REPLY_MAGIC 0x67446698
- /* Do *not* use magics: 0x12560953 0x96744668. */
-+/* magic 0x668e33ef for structured reply not supported by kernel yet */
-
- /*
-  * This is the packet used for communication between client and
-  * server. All data are in network byte order.
-  */
- struct nbd_request {
--	__be32 magic;
--	__be32 type;	/* == READ || == WRITE 	*/
-+	__be32 magic;	/* NBD_REQUEST_MAGIC	*/
-+	__be32 type;	/* See NBD_CMD_*	*/
- 	char handle[8];
- 	__be64 from;
- 	__be32 len;
-@@ -82,7 +91,7 @@ struct nbd_request {
-  * it has completed an I/O request (or an error occurs).
-  */
- struct nbd_reply {
--	__be32 magic;
-+	__be32 magic;		/* NBD_REPLY_MAGIC	*/
- 	__be32 error;		/* 0 = ok, else error	*/
- 	char handle[8];		/* handle you got from request	*/
- };
+-	memcpy(&tmp, reply->handle, sizeof(tmp));
+-	handle = be64_to_cpu(tmp);
++	handle = be64_to_cpu(reply->cookie);
+ 	tag = nbd_handle_to_tag(handle);
+ 	hwq = blk_mq_unique_tag_to_hwq(tag);
+ 	if (hwq < nbd->tag_set.nr_hw_queues)
 -- 
 2.39.2
 
