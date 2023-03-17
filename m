@@ -2,121 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9863BC74A5B
-	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265D6C7618B
+	for <linux-block@archiver.kernel.org>; Fri, 17 Mar 2023 20:51:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230260AbjCQUpa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Mar 2023 16:45:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34308 "EHLO
+        id S230001AbjCQUvk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Mar 2023 16:51:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230296AbjCQUp3 (ORCPT
+        with ESMTP id S229783AbjCQUvj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Mar 2023 16:45:29 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CEAC1A657
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:45:27 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id er8so13348189edb.0
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:45:27 -0700 (PDT)
+        Fri, 17 Mar 2023 16:51:39 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ADF53E1D7
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:51:37 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id er8so13397937edb.0
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:51:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1679085925;
+        d=linux-foundation.org; s=google; t=1679086295;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gss4H1ZQ+0ilRx2yopl9iBc9rNAe4OOqCmcGOGIMEWs=;
-        b=Hr5oAwRMlaXswLvnugh2M3B3g/p43gsdtsOhUCr6hgmhINOc1j074sVKUrfWxhsV6A
-         Ji9+MSUk3lUIXEDcaWubxFGCzudpHRcwv6FYrJn1ybq8R+zlcdYMEMnK7h1Y3lI3A4Da
-         0lwzVNQ4Exx/4xTIgozQrAadSU4FDy++qhOKs=
+        bh=HGPinKOg8Q94FTw3RW1XhRjZJIhdvmuXH/yX2ELyuDQ=;
+        b=d+ZPrGN7mH+n06n73UyCuuGRKEzvOIcp0CnERIXzSKexwWJXV8UGn8lyuhffqPfRge
+         RTyCIpYh2JhNm6rmsEIkCp1eaacgKpnTxHswMQzZbV9/5GvKhIR8gaL4IeU2GLpf4XOO
+         ZbcYBBPCXyWtan3iA+0A71ES1364NVP+weSAA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679085925;
+        d=1e100.net; s=20210112; t=1679086295;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gss4H1ZQ+0ilRx2yopl9iBc9rNAe4OOqCmcGOGIMEWs=;
-        b=DQvH5ng3An9uwaRg5VAWFFU2IdoGqGTBfFmwwM+e8phv+/dFa6lH9kzJLY/x4PsAwg
-         mrjMx+g05KVdhcIV9yOJ4fFj0sQiDsCnBYoATTUOJAM7mySJFwFuY92ImMg8We3GCZru
-         rAazZN/B7ZqiB0/n8IgAlsgQTucmBI2RRwUIfBkrKzMmNaRbaYhLul19oq6MweLQI7xI
-         uQ4tN2WszZp9WQn5PGEx6yJKEHUT90P6hMKDoo4sTC1nNCjMYg5inYwqUvFwYih/k0xy
-         JPIw7c0JDQI5zUSnrwAMTEuci/+ybiUj4W0DBU0Nu7MEv6lGgHg906taQogTH1udiIM0
-         CGNw==
-X-Gm-Message-State: AO0yUKXNedQkitN8VrZOR+J2ecQ8VHLcgMo4D92jqiG5NQCM/Ch3gUQW
-        z48ZlVFAUlSrMVfsf79uDfgTy/8DwKNVBYulnjjVwA==
-X-Google-Smtp-Source: AK7set8IaUsOthDHy2I10ww5j9AsqLWaCG5hLpFrHZlTtcJ8h+JTjyx5wFGyxA8JEnWtURATSz4yiQ==
-X-Received: by 2002:a17:907:774c:b0:932:3d1b:b67a with SMTP id kx12-20020a170907774c00b009323d1bb67amr767498ejc.41.1679085925683;
-        Fri, 17 Mar 2023 13:45:25 -0700 (PDT)
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com. [209.85.208.48])
-        by smtp.gmail.com with ESMTPSA id 11-20020a170906300b00b0093137b1f23fsm1362473ejz.37.2023.03.17.13.45.24
+        bh=HGPinKOg8Q94FTw3RW1XhRjZJIhdvmuXH/yX2ELyuDQ=;
+        b=WjUsIkXiRcEBzqw5gjhdwrDxJaem5Gq+IquZqbLpqM8+Z9Fa9grYuU1cCWfuI2LTwk
+         M1JMYbVcBW25OtzYxADMr78RttC07c1B2eKIRVYjmWIvT2NVHgLWe4+yTiRwsTBZGZb2
+         CeHNsH94PKrOFvX1D67/QUkeRjsOQmEEHDqL84wBxkaEIfI2lU4cXD6LpIDa25HHhyvc
+         svQE0OccE/0ht3q1ZhdBwhIJBlEwMB/vd48vzDR1jsucPrj043QuQuIDMWw2mtKqJejJ
+         Z6red/jX15qW6JLLNDJpjJQELwA9ImqyEvxkqn17JooAtquWBFWFK3kkVlwJhwZnpj4j
+         Vxew==
+X-Gm-Message-State: AO0yUKU2AUq0yddV5aDZ6HcgHSSc4ceQZvDonWy1JDl6TogyI8AjatO3
+        b7YpdNuYkEvGsA9rM+KvhT5srBWsouvjcufKDLPSEw==
+X-Google-Smtp-Source: AK7set/1zbJBlps9Jl2jWmyH1+ZgoKmRrU7Ky6zK/HLRQsg4cZqNGq98l/b3lGRShuyqRiiivmhs7A==
+X-Received: by 2002:a17:906:bc58:b0:91d:a049:17a9 with SMTP id s24-20020a170906bc5800b0091da04917a9mr713053ejv.36.1679086295559;
+        Fri, 17 Mar 2023 13:51:35 -0700 (PDT)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id q30-20020a50aa9e000000b004fadc041e13sm1541935edc.42.2023.03.17.13.51.34
         for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Mar 2023 13:45:24 -0700 (PDT)
-Received: by mail-ed1-f48.google.com with SMTP id er8so13347886edb.0
-        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:45:24 -0700 (PDT)
-X-Received: by 2002:a50:d54a:0:b0:4fc:a484:c6ed with SMTP id
- f10-20020a50d54a000000b004fca484c6edmr2431609edj.2.1679085923690; Fri, 17 Mar
- 2023 13:45:23 -0700 (PDT)
+        Fri, 17 Mar 2023 13:51:34 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id er8so13397722edb.0
+        for <linux-block@vger.kernel.org>; Fri, 17 Mar 2023 13:51:34 -0700 (PDT)
+X-Received: by 2002:a17:906:2695:b0:931:99b5:67a4 with SMTP id
+ t21-20020a170906269500b0093199b567a4mr291317ejc.15.1679086294427; Fri, 17 Mar
+ 2023 13:51:34 -0700 (PDT)
 MIME-Version: 1.0
 References: <9d0ef355-f430-e8e2-c844-b34cfcf60d88@kernel.dk>
  <CAHk-=wgcYvgJ5YWJPy6PA-B_yRtPfpw01fmCqtvqGN9jouc_8w@mail.gmail.com>
- <CAHk-=wj1wYh_2d8Y1Vm6YjPTh4yMqWc++aWVY2LpX7n_atc2hA@mail.gmail.com> <CANiq72kjd+NES2mSthLKZduFm_KrwLShngs6jLqhoQPSb+1d-g@mail.gmail.com>
-In-Reply-To: <CANiq72kjd+NES2mSthLKZduFm_KrwLShngs6jLqhoQPSb+1d-g@mail.gmail.com>
+ <CAKwvOdmJkQUe6bhvQXHo0XOncdso0Kk26n8vdJZufm4Ku72tng@mail.gmail.com>
+ <6414c470.a70a0220.6b62f.3f02@mx.google.com> <CAHk-=wi5yk0+NeqB34fRC-Zvt+8QZVPTiny9MvCxxjg+ZqDhKg@mail.gmail.com>
+ <CANiq72m46OzQPtZbS_VaQGgGknFV-hKvhBw8sVZx9ef=AzupTQ@mail.gmail.com>
+In-Reply-To: <CANiq72m46OzQPtZbS_VaQGgGknFV-hKvhBw8sVZx9ef=AzupTQ@mail.gmail.com>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 17 Mar 2023 13:45:07 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj3c3Y9fWJjOwvQ0fN6hciWoh8xV69tcRqDm=tpQP14Ew@mail.gmail.com>
-Message-ID: <CAHk-=wj3c3Y9fWJjOwvQ0fN6hciWoh8xV69tcRqDm=tpQP14Ew@mail.gmail.com>
+Date:   Fri, 17 Mar 2023 13:51:17 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgTSdKYbmB1JYM5vmHMcD9J9UZr0mn7BOYM_LudrP+Xvw@mail.gmail.com>
+Message-ID: <CAHk-=wgTSdKYbmB1JYM5vmHMcD9J9UZr0mn7BOYM_LudrP+Xvw@mail.gmail.com>
 Subject: Re: [GIT PULL] Block fixes for 6.3-rc3
 To:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Nathan Chancellor <nathan@kernel.org>,
+Cc:     Kees Cook <keescook@chromium.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
-        Kees Cook <keescook@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        clang-built-linux <llvm@lists.linux.dev>
+        clang-built-linux <llvm@lists.linux.dev>,
+        linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 17, 2023 at 1:31=E2=80=AFPM Miguel Ojeda
+On Fri, Mar 17, 2023 at 1:42=E2=80=AFPM Miguel Ojeda
 <miguel.ojeda.sandonis@gmail.com> wrote:
 >
-> From a quick look, it seems that `__find_restype` (which gets inlined
-> into `m5mols_set_fmt` via `__find_resolution`) has a small loop:
->
->     do {
->         if (code =3D=3D m5mols_default_ffmt[type].code)
->             return type;
->     } while (type++ !=3D SIZE_DEFAULT_FFMT);
->
-> that I guess gets simplified into something like:
->
->     if (code =3D=3D first code)
->         yield 0;
->     if (code =3D=3D second code)
->         yield 1;
->     out of bounds;
+> It is comparing against just the `.code` in the `m5mols_default_ffmt`
+> table, i.e. the `MEDIA_BUS_FMT_VYUY8_2X8` (8199 =3D 0x2007) and
+> `MEDIA_BUS_FMT_JPEG_1X8` (16385 =3D 0x4001), see
 
-Ahh. That explains the odd constants I saw. I did figure out it had
-something to do with loading 'mf->code', but then it went off the
-rails.
+Yeah, I see what it's doing.
 
-> Though even with UBSAN disabled, if I add a dummy opaque call inside
-> the loop, it goes back to something like before, except the jump goes
-> nowhere and then `objtool` complains again:
->
->     .LBB24_20:
->         callq    dummydummydummy
->     .Lfunc_end24:
->
-> So it is reproducible even without UBSAN getting involved:
-> https://godbolt.org/z/hTe91b3eG
+But:
 
-That code generation is some crazy stuff.
+> If the condition had `++type` instead, it would not be a problem,
+> because the loop stops before we go into the out of bounds access thus
+> no UB.
 
-Yeah, that's not acceptable, and the bug is clearly not UBSAN, but
-some generic bogus clang thing.
+Yeah, but clang really should have generated a proper third iteration,
+which calls that "out of bounds" case, and then returns, instead fo
+falling off the end.
 
-Much nicer to try to debug this as a "objtool complains about the
-generated code" rather than as some insane runtine problem with code
-falling off the end of the function.
+I do think that on the kernel side, the fix is to just change
 
-                Linus
+        } while (type++ !=3D SIZE_DEFAULT_FFMT);
+
+to
+
+        } while (++type !=3D SIZE_DEFAULT_FFMT);
+
+but I would *really* like clang to be fixed to not silently generate
+code that does insane things and would be basically impossible to
+debug if it ever triggers.
+
+We would have spent a *lot* of time wondering how the heck we Oopsed
+in m5mols_get_frame_desc().
+
+             Linus
