@@ -2,75 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 698A4C61DA4
-	for <linux-block@archiver.kernel.org>; Sat, 18 Mar 2023 16:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78DE1C61DA4
+	for <linux-block@archiver.kernel.org>; Sat, 18 Mar 2023 16:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229737AbjCRQyc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Mar 2023 12:54:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52820 "EHLO
+        id S229660AbjCRQ4I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Mar 2023 12:56:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbjCRQyb (ORCPT
+        with ESMTP id S229478AbjCRQ4H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Mar 2023 12:54:31 -0400
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7831C32508;
-        Sat, 18 Mar 2023 09:54:30 -0700 (PDT)
-Date:   Sat, 18 Mar 2023 16:54:26 +0000
+        Sat, 18 Mar 2023 12:56:07 -0400
+Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A3C32503;
+        Sat, 18 Mar 2023 09:56:06 -0700 (PDT)
+Date:   Sat, 18 Mar 2023 16:56:02 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-        s=mail; t=1679158468;
-        bh=AqJcrdJC5gEX3q4CJrxx1vAdswTTanoGDAbiA2uJP7o=;
+        s=mail; t=1679158564;
+        bh=qSw6t5TafsNcSL7zpnL1WRQ/KMi1c9c0NquGbXd2Apw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=oaW7+TC1Uv9UQ70oJQMd7xnaWeZ2SO6fQrkxCRN3CoadTLUQvfjuOVyiZEn0bNgyl
-         Apvo/TW7v8DxLxJB37uYf7R0SVVGJSfMEPh3NFF2TCTH3/fzIhj6CtcTVxrrc9X0PP
-         Bwt46NULoejIuNtS1W/INN3cUF/yRJ/VOP8H6UpY=
+        b=OJHFcqtBs2KXgGlc4Fc/IDuT5eb+PiEXI2ZIOKkHeMbOoPPlG3FfCdN72LstG828K
+         job5PGWaopoaH6D1PSkVrA9Va9358nOhxjefH5vSb1CvKR8z19tocGCzem2/7vC5vx
+         3TdIVW1LdPYMT6BlevxbVOLiuxZgohqLjnKGjluc=
 From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v2 2/4] blk-integrity: convert to struct device_attribute
-Message-ID: <7dbc76cf-132f-4381-92d8-980c49f13ae3@t-8ch.de>
+Subject: Re: [PATCH v2 3/4] blk-integrity: register sysfs attributes on
+ struct device
+Message-ID: <0e7d7df8-f14e-4925-9c11-d08cb52dd4e6@t-8ch.de>
 References: <20230309-kobj_release-gendisk_integrity-v2-0-761a50d71900@weissschuh.net>
- <20230309-kobj_release-gendisk_integrity-v2-2-761a50d71900@weissschuh.net>
- <ZBHeJOlwKD4v41kC@infradead.org>
+ <20230309-kobj_release-gendisk_integrity-v2-3-761a50d71900@weissschuh.net>
+ <ZBHfCwnqUtBpqdTW@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZBHeJOlwKD4v41kC@infradead.org>
+In-Reply-To: <ZBHfCwnqUtBpqdTW@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 08:03:00AM -0700, Christoph Hellwig wrote:
-> > +		container_of(attr, struct device_attribute, attr);
-> >  	ssize_t ret = 0;
+On Wed, Mar 15, 2023 at 08:06:51AM -0700, Christoph Hellwig wrote:
+> > +static const struct attribute_group integrity_group  = {
+> 
+> Double whitespace before the =
+
+Ack.
+
+> > +	.name = "integrity", .attrs = integrity_attrs,
+> >  };
+> 
+> We generally put each field member on separate lines for readability.
+
+Ack.
+
+> >  int blk_integrity_add(struct gendisk *disk)
+> >  {
+> > +	return device_add_groups(disk_to_dev(disk), integrity_groups);
+> >  }
 > >  
-> > +	if (dev_attr->store)
-> > +		ret = dev_attr->store(dev, dev_attr, page, count);
-> >  
-> >  	return ret;
+> >  void blk_integrity_del(struct gendisk *disk)
+> >  {
+> > +	device_remove_groups(disk_to_dev(disk), integrity_groups);
 > 
-> This can be simplified to:
-> 
-> 	if (!rev_attr->store)
-> 		return 0;
-> 	return dev_attr->store(dev, dev_attr, page, count);
-> 
-> (I'm still confused why 0 is the right return value here, but that's not
->  new in your patch, so better don't rock that boat).
+> Can't we just add integrity_group to disk_attr_groups and remove these
+> calls entirely?
 
-This indeed looks weird.
-
-Please note that this case will become -EIO in the next patch switching
-over to the standard dev_sysfs_ops.
-
-It shouldn't matter though as all writable attributes all have the
-store() handler defined.
-
-> > +static ssize_t format_show(struct device *dev, struct device_attribute *attr, char *page)
-> 
-> Please avoid the overly long line here. an in the other methods.
-
-This was following the "new" 100-characters per line limit.
-The new revision will follow the limit with 80.
+Thanks for the pointer. This works and is indeed nicer.
