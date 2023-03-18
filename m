@@ -2,91 +2,219 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52166C61DA4
-	for <linux-block@archiver.kernel.org>; Sat, 18 Mar 2023 14:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E61C7618A
+	for <linux-block@archiver.kernel.org>; Sat, 18 Mar 2023 14:36:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbjCROdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Mar 2023 10:33:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39984 "EHLO
+        id S229576AbjCROgm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Mar 2023 10:36:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbjCROdC (ORCPT
+        with ESMTP id S229517AbjCROgl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Mar 2023 10:33:02 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0312B28F
-        for <linux-block@vger.kernel.org>; Sat, 18 Mar 2023 07:33:00 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id a16so3699143pjs.4
-        for <linux-block@vger.kernel.org>; Sat, 18 Mar 2023 07:33:00 -0700 (PDT)
+        Sat, 18 Mar 2023 10:36:41 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38EAEE1B3
+        for <linux-block@vger.kernel.org>; Sat, 18 Mar 2023 07:36:39 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id gp15-20020a17090adf0f00b0023d1bbd9f9eso12053463pjb.0
+        for <linux-block@vger.kernel.org>; Sat, 18 Mar 2023 07:36:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1679149980; x=1681741980;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=euFgKuZiJAI8fjRtYSJs4nwMqmIYbqq3bnMsbjrWIPk=;
-        b=X1m92A6oZ1iyVGFj0cHLEXa14ewYEKakkdsqxyqO20WlGluUGMjuuwTDt86UG5qqMI
-         4551mSymrN/GBfFFVstC+lHHDBPvVIbVtgRbO6Cyhc1zopJdenC0L3gRNRP6QawFbipc
-         jPxQxJdd0DZp+aUlfQdV6YsA6YH48BTIbyP+Ug4RzRqGI+Ci+QqY7gpX9P7KIflny3WE
-         lzxf1+tydA7VZkFoWbt86ydGsDeuYL7d1t5pdDju5HOMmMx3hLGXgjqK/hpx7hMKrGcX
-         NqJmt6JwVEH2hzuHIIbR1qCeQ80c2Bf97cYwTj/cWwuahQJqVpiM7Ra1jsJY0xkTLcOZ
-         86BA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1679150198;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=evWK/j+Fz+6ogk6UJoi+Ed7wwA7w6Ptpe3Rj5dE7lmE=;
+        b=Q1qJNzpPUwB90SCS2RyedUmgtcNJB7dPK1o1hezIGyD+DdCaMf+iWVyUzE0m5rGlBR
+         g8NeIyhiAkOZulLYpRsuPjBjB/PtlM1epmCUGaKeHR1THVhPKslY4Iaw5ps0RRnGerRe
+         4keXHIL6mvbhotVvGRtfp2H+Ab24rcoIGnpx11NjhFgB/NGzhOUb2gBi0iUzpaYif2c2
+         UFU1ntQ6F+J0kLM7Uk9Wc3qksN/YRpue5lU6eFUEssTUINtKvdrfsha/bFOoF1vIhvh6
+         rR/ZNx86dV6Do2XH+ev5nom/pNDthe9OeYnqbQkzC/XVGjggdvjgqaR2WMq/P773f3ut
+         rt/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679149980; x=1681741980;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=euFgKuZiJAI8fjRtYSJs4nwMqmIYbqq3bnMsbjrWIPk=;
-        b=XMDS7UqSrSKpj+ipZyqdHPC6EasuU7DC4ObNUngrBw2Ima45gxq+D+JX7kXFZcWbeQ
-         wq9GpbGAuhwVXNGDgdW2MmCqAMZKlC1rRePwBqO/ztJfOnWv6jXGA2kDSnUYNtL2MKKY
-         w1CH5yxyltzqXFxv4IFFBpHbizkC/NJHYXcbIYrUHU9IERdZP4Z3kRk75RDLRnI9VcQl
-         UZjBKp+D4pP5RWMvCyIO29P2wvTdMYiR+sY+YfHDH1GXragvuvCTXsd1lothfslBRKkT
-         ltBcgov5rYU26NGUXF3T2q16FuVofVHPzMgLSPkLptIZR7eEVr18XFIw7Bl1ig74PsUq
-         YX7g==
-X-Gm-Message-State: AO0yUKXlamDpjF/qmOnsdwIC0BF7OlB9lhdjfvQXonsyH2LrJBv2W6Gu
-        bLB2xnaW74Bej7vM/d9OUhNQ7A==
-X-Google-Smtp-Source: AK7set8w3ie7UJSnp32YjRolxIwl+Q8t6Hb2wbHvTQCq9zqJWJRVlvEGcIlAK2PvFQGjbYmkpMpeRA==
-X-Received: by 2002:a17:902:c94f:b0:19a:9269:7d1 with SMTP id i15-20020a170902c94f00b0019a926907d1mr10798905pla.4.1679149979898;
-        Sat, 18 Mar 2023 07:32:59 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id y9-20020a1709029b8900b0019e6f3112b6sm3356794plp.91.2023.03.18.07.32.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Mar 2023 07:32:59 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20230318141231.55562-1-ming.lei@redhat.com>
-References: <20230318141231.55562-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] block: ublk_drv: mark device as LIVE before adding
- disk
-Message-Id: <167914997920.312664.10763418802006125999.b4-ty@kernel.dk>
-Date:   Sat, 18 Mar 2023 08:32:59 -0600
+        d=1e100.net; s=20210112; t=1679150198;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=evWK/j+Fz+6ogk6UJoi+Ed7wwA7w6Ptpe3Rj5dE7lmE=;
+        b=WU+hf5y4ygyKX9yYN6HXJ6yQ7oTxtEQTwNG7PdiZvw3PBSc8KKMgRRYUVKAe0Afn9c
+         /8bjmZzlWTfEuOUAaQtekCDZwsZpTmcC3ZiZdwViLqevS8A+gKk1/B2WBnj7rlfbZCnQ
+         k6+3SC77cdiEB4Bp7+2xCmV3iLOzhODmD61kyisRIlXLLp9waWoTiFfxph0r7hW0mxeN
+         slA3Ha9fiwZr9RVkBP6AnRVjaUXh1e8TBfArd5tp2l7FloUkRb49vuN4QYl41z+6gf9g
+         3N508k+GqlgFGU8NEy9JQitkJa5EWBrtMgAes4lk63qEH0tw3kpfSCxkNkl2uRS/ouq4
+         KVMg==
+X-Gm-Message-State: AO0yUKUmsLeTdkIkVDFrVVmmL7Fron2chG4N3G3rSpwYtkdsvRhw0awg
+        /TPI09ICY7+iiwm24jHfa0JyHQ==
+X-Google-Smtp-Source: AK7set9UjdzbIOtx2yyMAip//VawiucCW88QlObBpnitUPZWAxtjQ1YzELnm5Zhv6fcAlGTiP0FhhA==
+X-Received: by 2002:a17:902:c40c:b0:19c:f005:92de with SMTP id k12-20020a170902c40c00b0019cf00592demr10234682plk.4.1679150198602;
+        Sat, 18 Mar 2023 07:36:38 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id v9-20020a1709028d8900b001964c8164aasm3370367plo.129.2023.03.18.07.36.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 Mar 2023 07:36:38 -0700 (PDT)
+Message-ID: <bb2a0c27-afc9-5683-9346-005b55a7240c@kernel.dk>
+Date:   Sat, 18 Mar 2023 08:36:37 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>
+References: <20230314125727.1731233-1-ming.lei@redhat.com>
+ <ZBQhSzIhvZL+83nM@ovpn-8-18.pek2.redhat.com>
+ <3971d43f-601f-635f-5a30-df7e647f6659@kernel.dk>
+ <ZBW+PCaeNmCR/k0M@ovpn-8-18.pek2.redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZBW+PCaeNmCR/k0M@ovpn-8-18.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-2eb1a
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Sat, 18 Mar 2023 22:12:31 +0800, Ming Lei wrote:
-> IO can be started before add_disk() returns, such as reading parititon table,
-> then the monitor work should work for making forward progress.
+On 3/18/23 7:35?AM, Ming Lei wrote:
+> Hi Jens,
 > 
-> So mark device as LIVE before adding disk, meantime change to
-> DEAD if add_disk() fails.
+> Thanks for the response!
+> 
+> On Sat, Mar 18, 2023 at 06:59:41AM -0600, Jens Axboe wrote:
+>> On 3/17/23 2:14?AM, Ming Lei wrote:
+>>> On Tue, Mar 14, 2023 at 08:57:11PM +0800, Ming Lei wrote:
+>>>> Hello,
+>>>>
+>>>> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+>>>> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+>>>> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+>>>> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+>>>> and its ->issue() can retrieve/import buffer from master request's
+>>>> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+>>>> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+>>>> submits slave OP just like normal OP issued from userspace, that said,
+>>>> SQE order is kept, and batching handling is done too.
+>>>>
+>>>> Please see detailed design in commit log of the 2th patch, and one big
+>>>> point is how to handle buffer ownership.
+>>>>
+>>>> With this way, it is easy to support zero copy for ublk/fuse device.
+>>>>
+>>>> Basically userspace can specify any sub-buffer of the ublk block request
+>>>> buffer from the fused command just by setting 'offset/len'
+>>>> in the slave SQE for running slave OP. This way is flexible to implement
+>>>> io mapping: mirror, stripped, ...
+>>>>
+>>>> The 3th & 4th patches enable fused slave support for the following OPs:
+>>>>
+>>>> 	OP_READ/OP_WRITE
+>>>> 	OP_SEND/OP_RECV/OP_SEND_ZC
+>>>>
+>>>> The other ublk patches cleans ublk driver and implement fused command
+>>>> for supporting zero copy.
+>>>>
+>>>> Follows userspace code:
+>>>>
+>>>> https://github.com/ming1/ubdsrv/tree/fused-cmd-zc-v2
+>>>>
+>>>> All three(loop, nbd and qcow2) ublk targets have supported zero copy by passing:
+>>>>
+>>>> 	ublk add -t [loop|nbd|qcow2] -z .... 
+>>>>
+>>>> Basic fs mount/kernel building and builtin test are done, and also not
+>>>> observe regression on xfstest test over ublk-loop with zero copy.
+>>>>
+>>>> Also add liburing test case for covering fused command based on miniublk
+>>>> of blktest:
+>>>>
+>>>> https://github.com/ming1/liburing/commits/fused_cmd_miniublk
+>>>>
+>>>> Performance improvement is obvious on memory bandwidth
+>>>> related workloads, such as, 1~2X improvement on 64K/512K BS
+>>>> IO test on loop with ramfs backing file.
+>>>>
+>>>> Any comments are welcome!
+>>>>
+>>>> V3:
+>>>> 	- fix build warning reported by kernel test robot
+>>>> 	- drop patch for checking fused flags on existed drivers with
+>>>> 	  ->uring_command(), which isn't necessary, since we do not do that
+>>>>       when adding new ioctl or uring command
+>>>>     - inline io_init_rq() for core code, so just export io_init_slave_req
+>>>> 	- return result of failed slave request unconditionally since REQ_F_CQE_SKIP
+>>>> 	will be cleared
+>>>> 	- pass xfstest over ublk-loop
+>>>
+>>> Hello Jens and Guys,
+>>>
+>>> I have been working on io_uring zero copy support for ublk/fuse for a while, and
+>>> I appreciate you may share any thoughts on this patchset or approach?
+>>
+>> I'm a bit split on this one, as I really like (and want) the feature.
+>> ublk has become popular pretty quickly, and it makes a LOT of sense to
+>> support zero copy for it. At the same time, I'm not really a huge fan of
+>> the fused commands... They seem too specialized to be useful for other
+>> things, and it'd be a shame to do something like that only for it later
+>> to be replaced by a generic solution. And then we're stuck with
+>> supporting fused commands forever, not sure I like that prospect.
+>>
+>> Both Pavel and Xiaoguang voiced similar concerns, and I think it may be
+>> worth spending a bit more time on figuring out if splice can help us
+>> here. David Howells currently has a lot going on in that area too.
+> 
+> IMO, splice(->splice_read()) can help much less in this use case, and
+> I can't see improvement David Howells has done in this area:
+> 
+> 1) we need to pass reference of the whole buffer from driver to io_uring,
+> which is missed in splice, which just deals with page reference; for
+> passing whole buffer reference, we have to apply per buffer pipe to
+> solve the problem, and this way is expensive since the pipe can't
+> be freed until all buffers are consumed.
+> 
+> 2) reference can't outlive the whole buffer, and splice still misses
+> mechanism to provide such guarantee; splice can just make sure that
+> page won't be gone if page reference is grabbed, but here we care
+> more the whole buffer & its (shared)references lifetime
+> 
+> 3) current ->splice_read() misses capability to provide writeable
+> reference to spliced page[2]; either we have to pass new flags
+> to ->splice_read() or passing back new pipe buf flags, unfortunately
+> Linus thought it isn't good to extend pipe/splice for such purpose,
+> and now I agree with Linus now.
+> 
+> I believe that Pavel has realized this point[3] too, and here the only
+> of value of using pipe is to reuse ->splice_read(), however, the above
+> points show that ->splice_read() isn't good at this purpose.
 > 
 > 
-> [...]
+> [1] https://lore.kernel.org/linux-block/ZAk5%2FHfwc+NBwlbI@ovpn-8-17.pek2.redhat.com/
+> [2] https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
+> [3] https://lore.kernel.org/linux-block/7cdea685-98d3-e24d-8282-87cb44ae6174@gmail.com/
 
-Applied, thanks!
+splice is just one idea, but I do wonder if there's a way to express
+this relationship (and buffer handovers) that doesn't involve needing
+these odd kind of fused commands where they must be submitted as one big
+sqe, but really are two normal ones. BPF is obviously one way, and maybe
+we'll do BPF with io_uring at some point, but it makes things rather
+more complicated to use and I'd prefer to avoid it if we can.
 
-[1/1] block: ublk_drv: mark device as LIVE before adding disk
-      commit: 4985e7b2c002eb4c5c794a1d3acd91b82c89a0fd
+I'll take a closer look at the patches.
 
-Best regards,
+>> So while I'd love to see this feature get queued up right now, I also
+>> don't want to prematurely do so. Can we split out the fixes from this
+>> series into a separate series that we can queue up now? That would also
+>> help shrink the patchset, which is always a win for review.
+> 
+> There is only one fix(patch 5), and the real part is actually the 1st 4
+> patches.
+> 
+> I will separate patch 5 from the whole patchset and send out soon, and will
+> post out this patchset v4 by improving document for explaining how fused
+> command solves this problem in one safe & efficient way.
+
+Thanks, did get that one now and applied it.
+
 -- 
 Jens Axboe
-
-
 
