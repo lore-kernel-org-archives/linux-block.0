@@ -2,571 +2,208 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E3C6FD1D
-	for <linux-block@archiver.kernel.org>; Mon, 20 Mar 2023 16:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CCCC7619A
+	for <linux-block@archiver.kernel.org>; Mon, 20 Mar 2023 16:45:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231993AbjCTQVD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Mar 2023 12:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
+        id S232065AbjCTQpg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Mar 2023 12:45:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232008AbjCTQUi (ORCPT
+        with ESMTP id S233368AbjCTQpR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Mar 2023 12:20:38 -0400
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B941CC0F
-        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 09:12:17 -0700 (PDT)
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32K97VxA004745
-        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 09:12:17 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=s2048-2021-q4;
- bh=hP2ugGUfXZWB7bKpwBhxX4WMaPOtLeBAzvbfIhFoCrs=;
- b=DexflX2SavfCjvFTytG4J7fS6jt/ilzeP5NXKX7m68mRaijocRuWyyHwQLJLXc4Db70O
- EQvLtVAuRfdpkCn5ft7d9LTa4/3vQvhMSaWh9e2gLKYH5xm9KNKnwSn30gYFQ1IWSRfK
- rF4Gptj6j0xi7MyuMThOq54rcPxs62WhmIIgAtwHtwM0z6SLLuFB5mYqrLf410upsL8v
- ezmL4qC2fDgbwkjCbye7qO5R4Na4mnwEeZw8A0BQNvv+CQ1/NS/5Ya6Ty7fWiQ4wl1tn
- wWhm9Ahf6GCHyIajDUXQmUSJRaHts4jhpG3loDXV+TE8zsZcDfL/rPKoSVg8GYa+1pBb bg== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3pd8mrtenu-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 09:12:16 -0700
-Received: from twshared4419.04.ash8.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:82::e) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Mon, 20 Mar 2023 09:12:13 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 439AF13FD65A1; Mon, 20 Mar 2023 09:12:06 -0700 (PDT)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        <io-uring@vger.kernel.org>
-CC:     Pavel Begunkov <asml.silence@gmail.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] blk-mq: remove hybrid polling
-Date:   Mon, 20 Mar 2023 09:12:05 -0700
-Message-ID: <20230320161205.1714865-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 20 Mar 2023 12:45:17 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E3DCF6;
+        Mon, 20 Mar 2023 09:40:04 -0700 (PDT)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32KFxEx2018351;
+        Mon, 20 Mar 2023 16:39:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2022-7-12;
+ bh=xmJHnKwVqfoKJFz+P23n1CIzOMefjT0he7Sj6kvP4CI=;
+ b=VHBlQ4A0D3gofMt19tWoiFUPSU5NnWDUlyjsKi94h9Sjk6pIi33bp0HkmvVgYvYM+IiR
+ 6T91PLdf7QFB2XcAyv8Kc6JpSlkVWXY8EMJxlg5Exwc2GnwyNH7Zsn/5ZxESWV3OFc6h
+ Xd2VjtDBxOhH1oSxQQHzIhpNobSt01PRFT5ZC8+PgcbYUPU3203RoYVgmK7qfgsvC6JM
+ D1s6LXS7RaHljqPtVlIJfgWccTQKH7d/0x/HlMdwSyA79kpWsBIxiXk1gxSJchVspNtC
+ ELLOq/XBeXYSxK+sKcfN/cwapjeZP5BJHHgslKeqrVORI3QDLrUkFtLopeG7VBxfbDYU JQ== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pd56auv30-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Mar 2023 16:39:20 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32KFDnQH037002;
+        Mon, 20 Mar 2023 16:39:19 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2174.outbound.protection.outlook.com [104.47.55.174])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3peg5njdk0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 Mar 2023 16:39:19 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kSjwIFxXMOkIwYeg2413rfUn7Mki9WwyXnDPzQ0ws3JIPcbuqEM+oA/QQIfSsOVoZhPoJyhRrGDGRnJ6qzX9O+jbsuAVOhZx+UpkDfccHt6r4Mv1Nc2NPT+Ouq5K4lSO9woacwaF+Jqj8Mv7hmmrlXzPeJ+1ONNlsmqt+YqEYqbUajiebhGzgKtr2qjdV0JGwyZy6DdA1Z+whBz07D7jBKiWyvSmR571Tpkxj/W8Ho6ah4C2zUleP17NIr6xvtvYsr34K3CfDvgbuvuWbCir0iYHjg887g7mJlUtsfXdLKWJT/X/NRRXnj3vtUo/MvVWWXmQdv9RRD3NyT/+igTzOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xmJHnKwVqfoKJFz+P23n1CIzOMefjT0he7Sj6kvP4CI=;
+ b=gZSjWafG7x7fpTJffLmgF0RP3RxJSuPer8YGC7yEV/43U2k79VWqgO792tpXkr8JoZo5LHAQBXttiXScuUTDUyRdZEaACA6I/lr8K4UbpbA6BlGbl7ZcKjravkdQNMDgpIWrVXU8BgHxPlJT/Er3ImvT/UOvpu8vsYCH1MtkNmaM1jiLfbzAA5wuMV8vzGW74yGE5Ef5EZmdJTAQUBWJSnfoGnf8TMsv3Ig710pXOPHLvOJ6vh60nz/vQzReR2sEd8IZkooNsP6P/tDXbbRwcadwsFmTC+BmkaBJ4d0B3RGlHcA5JvpSOGW9QMZA3Hx+Eep/VGtb+v0CGdGeqE56XQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xmJHnKwVqfoKJFz+P23n1CIzOMefjT0he7Sj6kvP4CI=;
+ b=x1j3zp5zDKm3acn5jezttXYoyIAHgKeKQ0vXu3Mdtp3+bfRCX99bBj10k51Wv45sC5dTH9LsLEConQZVGSyY5r9gFI0KlZxT15S/voc4fyHIDo1H/0eYThG9la7B0amybhbKW8q6Wyw5ZsNvj0sVnzEY5ui5AQDO/bRg9A6P50E=
+Received: from DM5PR10MB1466.namprd10.prod.outlook.com (2603:10b6:3:b::7) by
+ PH0PR10MB4662.namprd10.prod.outlook.com (2603:10b6:510:38::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6178.37; Mon, 20 Mar 2023 16:39:16 +0000
+Received: from DM5PR10MB1466.namprd10.prod.outlook.com
+ ([fe80::7dd7:8d22:104:8d64]) by DM5PR10MB1466.namprd10.prod.outlook.com
+ ([fe80::7dd7:8d22:104:8d64%7]) with mapi id 15.20.6178.037; Mon, 20 Mar 2023
+ 16:39:15 +0000
+Message-ID: <ed8afac2-af41-dd0e-16d0-b0253d1a5528@oracle.com>
+Date:   Mon, 20 Mar 2023 11:39:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v4 02/18] block: Rename BLK_STS_NEXUS to
+ BLK_STS_RESV_CONFLICT
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Stefan Haberland <sth@linux.ibm.com>, bvanassche@acm.org,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
+        kbusch@kernel.org, target-devel@vger.kernel.org,
+        Jan Hoeppner <hoeppner@linux.ibm.com>
+References: <20230224174502.321490-1-michael.christie@oracle.com>
+ <20230224174502.321490-3-michael.christie@oracle.com>
+ <20230314171119.GB6780@lst.de>
+ <33ed9615-b570-03c7-9a7a-d07f020d3222@linux.ibm.com>
+ <20230315133039.GA24533@lst.de>
+ <4484f553-84c1-5402-4f52-c2972ad3e496@linux.ibm.com>
+ <6da0ec0a-d465-fec4-0ca5-96b2ffb7be7a@oracle.com>
+ <20230320130625.GA11908@lst.de>
+From:   Mike Christie <michael.christie@oracle.com>
+In-Reply-To: <20230320130625.GA11908@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR02CA0166.namprd02.prod.outlook.com
+ (2603:10b6:5:332::33) To DM5PR10MB1466.namprd10.prod.outlook.com
+ (2603:10b6:3:b::7)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: O-hr7CFhrsaCjMPRWDEhtSTWU5apRbTf
-X-Proofpoint-ORIG-GUID: O-hr7CFhrsaCjMPRWDEhtSTWU5apRbTf
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM5PR10MB1466:EE_|PH0PR10MB4662:EE_
+X-MS-Office365-Filtering-Correlation-Id: 20a8e5a2-5af8-4aa5-9df4-08db2961a4d1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /YixQ9am8jG7ueubP8Ej2fJrbf/eywD/eAQaxsSy6BV10WjTRmXAHxe5mFDG0qk1qcuYt2uEZBrmhIbPCJa/eACo8x+DmmnTcwFtTKM/oybdLIz493/l8gRtHEuvgJkuT88reMAZj8dLncG4A2R8o5M7ykNvoiMdMPirUTK2T+uBnw3Awbw61KngvHdKzdLBVSSouet4uQc+n3kr9w4bQA6EgrJJeDzp/CWEvA5UEa0btPuKHKdzHctmG0x/mq/6Gt9YWDMBxRAlNZJiGmA7p9OxFybTIit0qk1TSMFaOA4vYxBcV0FS3ZzUXGSDCUpn8FeMuK6TdBUku8s7O9LThKtG7VUhEuzQbQuTSXO5MvhaS4Fv1q0wgWuVMLMhxK27XrdiNOi7/WkrNbIsoTSkXOsRt1blkQyT9clNDb1M7KwctvmaxzjCb4loan5DQrld1oY12z8WrnCMKH8NyuNQiRCJv9zxmkqFw5703OzSoFIUctrJVhPAdaK26UFMWMLAxfgtYIAf9Rl+FK/vuGVz2zAhkO9oY8697+bnPPxExJn6+m9+9RYVuonCRC99Wlq6vZ1X1It6tlB6l9DV3OHaePTs/EfrndiFvr8vnFq+FKsPyZ2fBhuIVVwOHCnelZTkrZ/0bEv+qL8EsO1UniB7lll+vgiprWbpROh9s6rP4Lv6H0xhsOpDdLW1DwuAzo3uTIK+FwJBOtk+HwxLT5dhyGL0RlNFxw4W0Z9VfOQ5yY4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR10MB1466.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(366004)(396003)(346002)(136003)(376002)(39860400002)(451199018)(54906003)(316002)(31696002)(86362001)(6486002)(83380400001)(2616005)(38100700002)(478600001)(36756003)(53546011)(26005)(186003)(6506007)(6512007)(4744005)(2906002)(8936002)(31686004)(41300700001)(5660300002)(7416002)(8676002)(66476007)(4326008)(66556008)(66946007)(6916009)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?REtCbWhyQUtDUnVIeHB0cUdXT0NIeDlhc0VZZW5GS3MyK3NFcGxsdXRtNy9J?=
+ =?utf-8?B?OW05cXcwb3RYMkdmSldaSXE2TUxmeXNxTGVLWVNLYWNscnBBcUxwdk5BWU5k?=
+ =?utf-8?B?ZmZqQXV4aG1KY0lmWnVuSUw4dTlVWDYySWVkckNoNkR5bnN5TVBUUnp2eW54?=
+ =?utf-8?B?YTNuSzBJdytiVHMyUHpoYUsreURhM3VETG0xTTFsQkUzb1JWVHl5dE05TmR2?=
+ =?utf-8?B?dkdLb1hoeWQ3THEwWXZKWThhT051aHlJYW1WZEFyMGNaZ0hNMTF0VFBMeEtl?=
+ =?utf-8?B?VlFGUnoyVjhMLzlDSk0wNzJPWUNSMnRmS1BWM2ltYXFaaTA5SWJ2SkNhNWo2?=
+ =?utf-8?B?ZEVLa0N5dVZUK2NZK2o2ZERadXp0cTYyMkpBNG5YQTBzMmFaZ1VMdFhqbUNy?=
+ =?utf-8?B?aTJiNGFnam1hbkVVRENzTTRmdlVBdC9heXVYbm5uU1JMRmNzWGRUVG5SVkF0?=
+ =?utf-8?B?Zm1xeENnVitHWG44UXk3L3ZGcmxuOE1NeG9vZVc3RFdFcmZBZ1FRTHZlMkhE?=
+ =?utf-8?B?YXltSzNLZ3NFeWtFTCtyTXFvNDR4dnJZQTdSRHdYRXQ4bFc5WkZTajNpd0pH?=
+ =?utf-8?B?RXdJa0lNcmhIdmlORmFUZStzdzluN1BkRk5wZ3d2N1didDFJT1JrUWlNbE5y?=
+ =?utf-8?B?TmJuY1lKVjN5R3NPcmh2WmlRTkIxQXlWTWltN3dNWlNITUNYRE01aWs4bXZ5?=
+ =?utf-8?B?dm5HS0R4V29XcEMrZWFIa3JlaXFpNUlQbXdiZm1Yay9BaHFuQXh4cnA4bzRr?=
+ =?utf-8?B?Q1BwSEpPQXpabi9LcUx6Zm5aSVNqaTBYcjc5WTJZbkQ3eEtkdHFlaFpBR0Jy?=
+ =?utf-8?B?Z3krdFh0M2RMaU4yMjJscmJYV3A0Y1RZYTdsdmpoQ1haMUpCcGpMQkQvVVln?=
+ =?utf-8?B?Ty94VGhOR0g4NGJZODJCaXVlZW8rSU5DY09qcGxCbzR5d0k4eEtWVkE2OUpT?=
+ =?utf-8?B?UzJHQjMxMGFWc01iQjArblV5WEg1Yks4NDVPSmFYSE9ET092MWtyWW9XcGhW?=
+ =?utf-8?B?cnRFbDQ1TWF5ZTRQV2JjdHlVMXQ0RGs0M0FLWFlCOHU0VnlOWEMyT3hZTEFT?=
+ =?utf-8?B?YWVmdWxTNEllMHJ2cytUTWFILy9odXI3VlRiaWxBbmJhVkZSajlGU2tJb1pS?=
+ =?utf-8?B?UE94ZXJFWjZ2OXIxVjVMQnB0aHNJbUtaSmlNbUJUVFZDaGZIQ2hDdGNCVjRT?=
+ =?utf-8?B?UlRxTjU1TFhYU1pVYVIwUzkrVWhYenZ5NmVmUi9La2t0bytlMUpDRmJnMlQ4?=
+ =?utf-8?B?bW9rTExjVUhlaXBFS2hURzhaUEwrTC94R2I4RGVSeGFtbXVCZE9Rd2MvelNP?=
+ =?utf-8?B?TXdlZFlTUmJHWnFneW5uaU0welVGZ0xGaGUva3hmS21halJCMFlDZjlndXpS?=
+ =?utf-8?B?eUw1bTBSQ2lnVThrbExkQVNpSmhqemtaeVJIR3BQLy9CSFMyMWpTa0RGaDM5?=
+ =?utf-8?B?MzhwUmZuWVdtKy8xR2lUanJiNEdnWkwrRDdrbnNpTDMwUFV3d2NwZGloUTFP?=
+ =?utf-8?B?YXErMXE2SEtkUWtyQ3pvVXF4NUxyQUE2My8zeHdnRDhDQ0VRUzdoc1ltVlVF?=
+ =?utf-8?B?dnJTT3ZXM1phUHhGVjFRZXFXVGhubFVudDc3a2taWk90TENLY3VUMXZ2OFUv?=
+ =?utf-8?B?dk9pT2lCSDVjS2FZZm5zSmxoa0tIdExsK3NVMHlvdTR5OVVNNzBURTQwZmw4?=
+ =?utf-8?B?Umt5dHNmRmRJSjEwcWVaTGI0anlCNkx5NjVpdXgrS3pqM09oSWVybHRKcHlO?=
+ =?utf-8?B?V292K1VVZ3NEODkzYUttcVdpMmpZVi9QNkEvbExrWlQ0M2tScTBYZVAwUFVP?=
+ =?utf-8?B?RkRzN0RWeE9QS3NJZWcrNFlYWmsyS1QvbWdVQjJOeng2dlg4dEVBamtkakJ0?=
+ =?utf-8?B?ZWFqeEFCRHMxeWpBZFV2d1FjVVQyZ0MxVVM0MjhhZC9Qa2NUZlhLaksrd0ll?=
+ =?utf-8?B?OEpBeXo2Y3libmNlUjRMQS9Gdys0QmRwVXIwby9ienJ1VjByU0Fsalh0cC9o?=
+ =?utf-8?B?d2xqOWg0UEt3RmxyV3JLZk1Bb1VMblZ2ZytLL3QvWlRDQzJWbjVmbFhFTkxk?=
+ =?utf-8?B?MnZoYTBKd1ViLzlJQWNrWm9mRmRRUU1Hb2pVSDkxWlRzdzBsNVd5ZlRXUzVz?=
+ =?utf-8?B?ZXV3OG5yL094dTNjWWtqL1huNDhjc2d0Z2tLWHJWdEgxNzdqOUJ6T0dXQXdO?=
+ =?utf-8?B?Y3c9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?ZWdTMWZBVm42bzg4T21QenhFQ2MzVUJkNTgzMW1RZHN3OXljZzgzNzI2WjlC?=
+ =?utf-8?B?Q3BqTW85NEV1ZENJREQxclVsNjZuZVUvaTNBVU10SWQzbk5UQURJaW1DQjdp?=
+ =?utf-8?B?V0tYU2NMNlJMcGVJbUhQTDNET3hreXZTakY5aWI3UklwNVNvOG9OeTQxL2dG?=
+ =?utf-8?B?RzZxOTl1YkMzM0dmU1Z3RDcxb2xSZDZrWGZ0V0JRR2RWUHdIbXpwQ0hseUZ5?=
+ =?utf-8?B?ZmhUcFZNK0VYMHg4eG8zZytLQi9pNjFQK0lwYzJQMkxCWU9KMGhuUWJueThq?=
+ =?utf-8?B?TUZNYWJFRXNqbVZOQk9CTEZIMlhxUUdQcEpnczNUNE5YRW9XZGxtSlh2YTlF?=
+ =?utf-8?B?WEVaN205anJLTGEyUXFiRk94M3ZGaUF4akQ5TXdCQUY1RlduN0RwQ3M1eEYw?=
+ =?utf-8?B?M0R1Mjl1dXpvYjFtVkVUQXYycytydVJ2QXFraERlTFRyUHgzWkV2anZsVHIx?=
+ =?utf-8?B?c05tb0lFVXBvVkJBdlRZL3p2WjVwWWFoZW84bXgwOVBhdFE1SUV2YmhHT1Qr?=
+ =?utf-8?B?MktZM3JNR3phWDRvNWRWSzFWdVY1ZVQ1SlVVNTBXS21pekl6ZHJhMTlDSll0?=
+ =?utf-8?B?U3RNRTc4ME1iUU9SS01tMmJUV0RRaEJ5cE5QdXVGRWs1d2VYMGd4ZEQzdGdX?=
+ =?utf-8?B?QU85Zm9rQ1grd2F2bXBOZ0lJTFZWMHV4dlhDcGVYWnR4dmF5c0NNajhrLzJp?=
+ =?utf-8?B?SUR2U3gyVXVuV2JINmZLNlpuMTFwZ3JISTJYNEdVNnlnbEc1Q2p1RUI2RlBq?=
+ =?utf-8?B?S1o0R3lua3U3Q2pRTFBEWURuTGtlVVhqaGhKVTVaM0R5M2JCWUh2d09mN1c3?=
+ =?utf-8?B?bFdrNjJlN2twVFBaRjZNQUJaWnhxUnRwWHNLdGNJMXp6MWVpZ3hyRXBYalg4?=
+ =?utf-8?B?R2ZIK0pPaEFBazdQZXl1YTNPRmM3cFNsejJ0UllMdW9xRkxEdkhvbE1mU1JG?=
+ =?utf-8?B?eDViU3g0UXhNYVdFZ0lZNTRidHFYbktSb2djeDJaMFhWQXRIVVNJQm05ZkFo?=
+ =?utf-8?B?VzU1K1RWV2RCVEdtb1A4bitCZkc4UUNCaFJQMmpZYTliZjFqUjE2OXJzK3lM?=
+ =?utf-8?B?eTV2Q1ZJdHVlZlhKMzAxek95YnJNcy8zOG14UHg3SjhpOFo2RXhEOWVkZkZz?=
+ =?utf-8?B?RUdvRVdyYVljZEJOanp2dkxXMkJTK0ZJRUZKc0U1MGZVRTNtKzJLc002bWIw?=
+ =?utf-8?B?THFaNjdZbWs3OFBiN2pZZXNGK1YxbjhJMUVPN2d6TmkrbnBYbFpwVUlYYlJp?=
+ =?utf-8?B?Z2dzbzNicmphMVVIRjk3YXFuc0c1c3hieFN3cTZxcGxpMWZzcHloTExOSFJY?=
+ =?utf-8?B?RUpTc1JGOTRUQnBKdGUwaGlPTlc4NTdwWlZKajZUcGJBRkZ3SmtGZXBMMGU3?=
+ =?utf-8?B?cldjam84ZjF4a1hlU1RUZzBEMmp5Mjg1Umo5TkIzVWJBRTVTN0tqN3VqY0I5?=
+ =?utf-8?Q?YZiHYZI7?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20a8e5a2-5af8-4aa5-9df4-08db2961a4d1
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR10MB1466.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 16:39:15.8699
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uMC3cVlQ8j9rzQmMuF2Ug1VitYUDIdDp5QOQBfqHn83eifQn4veUXE6P0f+gpuuKxBNvenegCB3Cifc2/69cBlFtoWDRtATgE2g0ASliLus=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4662
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-20_13,2023-03-20_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303150002
+ definitions=main-2303200141
+X-Proofpoint-ORIG-GUID: DNz4M7Pbmc4-v4LyZ9dY2mGoQsAs9vsA
+X-Proofpoint-GUID: DNz4M7Pbmc4-v4LyZ9dY2mGoQsAs9vsA
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On 3/20/23 8:06 AM, Christoph Hellwig wrote:
+> On Thu, Mar 16, 2023 at 11:36:12AM -0500, Mike Christie wrote:
+>> I think we are ok for dasd using BLK_STS_RESV_CONFLICT.
+>>
+>> It thought it sounded similar to SCSI/NVMe and userspace will still
+>> see -EBADE because the blk_status_to_errno/errno_to_blk_status will
+>> handle this.
+>>
+>> There was no internal dasd code checking for BLK_STS_NEXUS.
+>>
+>> There is a pr_ops API, but dasd is not hooked into it so we don't
+>> have to worry about behavior changes.
+> 
+> Yes, we don't have to worry about it.  I just find a bit confusing
+> to have a PR-related error in a driver that doesn't use PRs.
+> > Maybe add a little comment that it is used for some s390 or DASD
+> specific locking instead.
 
-io_uring provides the only way user space can poll completions, and that
-always sets BLK_POLL_NOSLEEP. This effectively makes hybrid polling dead
-code, so remove it and everything supporting it.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-core.c       |   6 --
- block/blk-mq-debugfs.c |  26 ------
- block/blk-mq.c         | 205 ++---------------------------------------
- block/blk-stat.c       |  18 ----
- block/blk-sysfs.c      |  33 +------
- include/linux/blk-mq.h |   2 -
- include/linux/blkdev.h |  12 ---
- io_uring/rw.c          |   2 +-
- 8 files changed, 9 insertions(+), 295 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9e5e0277a4d95..269765d16cfd9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -263,13 +263,7 @@ static void blk_free_queue_rcu(struct rcu_head *rcu_=
-head)
-=20
- static void blk_free_queue(struct request_queue *q)
- {
--	if (q->poll_stat)
--		blk_stat_remove_callback(q, q->poll_cb);
--	blk_stat_free_callback(q->poll_cb);
--
- 	blk_free_queue_stats(q->stats);
--	kfree(q->poll_stat);
--
- 	if (queue_is_mq(q))
- 		blk_mq_release(q);
-=20
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index b01818f8e216e..212a7f301e730 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -15,33 +15,8 @@
- #include "blk-mq-tag.h"
- #include "blk-rq-qos.h"
-=20
--static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
--{
--	if (stat->nr_samples) {
--		seq_printf(m, "samples=3D%d, mean=3D%llu, min=3D%llu, max=3D%llu",
--			   stat->nr_samples, stat->mean, stat->min, stat->max);
--	} else {
--		seq_puts(m, "samples=3D0");
--	}
--}
--
- static int queue_poll_stat_show(void *data, struct seq_file *m)
- {
--	struct request_queue *q =3D data;
--	int bucket;
--
--	if (!q->poll_stat)
--		return 0;
--
--	for (bucket =3D 0; bucket < (BLK_MQ_POLL_STATS_BKTS / 2); bucket++) {
--		seq_printf(m, "read  (%d Bytes): ", 1 << (9 + bucket));
--		print_stat(m, &q->poll_stat[2 * bucket]);
--		seq_puts(m, "\n");
--
--		seq_printf(m, "write (%d Bytes): ",  1 << (9 + bucket));
--		print_stat(m, &q->poll_stat[2 * bucket + 1]);
--		seq_puts(m, "\n");
--	}
- 	return 0;
- }
-=20
-@@ -282,7 +257,6 @@ static const char *const rqf_name[] =3D {
- 	RQF_NAME(STATS),
- 	RQF_NAME(SPECIAL_PAYLOAD),
- 	RQF_NAME(ZONE_WRITE_LOCKED),
--	RQF_NAME(MQ_POLL_SLEPT),
- 	RQF_NAME(TIMED_OUT),
- 	RQF_NAME(ELV),
- 	RQF_NAME(RESV),
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a875b1cdff9b5..4e30459df8151 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -46,51 +46,15 @@
-=20
- static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
-=20
--static void blk_mq_poll_stats_start(struct request_queue *q);
--static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
--
--static int blk_mq_poll_stats_bkt(const struct request *rq)
--{
--	int ddir, sectors, bucket;
--
--	ddir =3D rq_data_dir(rq);
--	sectors =3D blk_rq_stats_sectors(rq);
--
--	bucket =3D ddir + 2 * ilog2(sectors);
--
--	if (bucket < 0)
--		return -1;
--	else if (bucket >=3D BLK_MQ_POLL_STATS_BKTS)
--		return ddir + BLK_MQ_POLL_STATS_BKTS - 2;
--
--	return bucket;
--}
--
--#define BLK_QC_T_SHIFT		16
--#define BLK_QC_T_INTERNAL	(1U << 31)
--
- static inline struct blk_mq_hw_ctx *blk_qc_to_hctx(struct request_queue =
-*q,
- 		blk_qc_t qc)
- {
--	return xa_load(&q->hctx_table,
--			(qc & ~BLK_QC_T_INTERNAL) >> BLK_QC_T_SHIFT);
--}
--
--static inline struct request *blk_qc_to_rq(struct blk_mq_hw_ctx *hctx,
--		blk_qc_t qc)
--{
--	unsigned int tag =3D qc & ((1U << BLK_QC_T_SHIFT) - 1);
--
--	if (qc & BLK_QC_T_INTERNAL)
--		return blk_mq_tag_to_rq(hctx->sched_tags, tag);
--	return blk_mq_tag_to_rq(hctx->tags, tag);
-+	return xa_load(&q->hctx_table, qc);
- }
-=20
- static inline blk_qc_t blk_rq_to_qc(struct request *rq)
- {
--	return (rq->mq_hctx->queue_num << BLK_QC_T_SHIFT) |
--		(rq->tag !=3D -1 ?
--		 rq->tag : (rq->internal_tag | BLK_QC_T_INTERNAL));
-+	return rq->mq_hctx->queue_num;
- }
-=20
- /*
-@@ -1038,10 +1002,8 @@ static inline void blk_account_io_start(struct req=
-uest *req)
-=20
- static inline void __blk_mq_end_request_acct(struct request *rq, u64 now=
-)
- {
--	if (rq->rq_flags & RQF_STATS) {
--		blk_mq_poll_stats_start(rq->q);
-+	if (rq->rq_flags & RQF_STATS)
- 		blk_stat_add(rq, now);
--	}
-=20
- 	blk_mq_sched_completed_request(rq, now);
- 	blk_account_io_done(rq, now);
-@@ -4222,14 +4184,8 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_=
-set *set,
- 	/* mark the queue as mq asap */
- 	q->mq_ops =3D set->ops;
-=20
--	q->poll_cb =3D blk_stat_alloc_callback(blk_mq_poll_stats_fn,
--					     blk_mq_poll_stats_bkt,
--					     BLK_MQ_POLL_STATS_BKTS, q);
--	if (!q->poll_cb)
--		goto err_exit;
--
- 	if (blk_mq_alloc_ctxs(q))
--		goto err_poll;
-+		goto err_exit;
-=20
- 	/* init q->mq_kobj and sw queues' kobjects */
- 	blk_mq_sysfs_init(q);
-@@ -4257,11 +4213,6 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_=
-set *set,
-=20
- 	q->nr_requests =3D set->queue_depth;
-=20
--	/*
--	 * Default to classic polling
--	 */
--	q->poll_nsec =3D BLK_MQ_POLL_CLASSIC;
--
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
- 	blk_mq_add_queue_tag_set(set, q);
- 	blk_mq_map_swqueue(q);
-@@ -4269,9 +4220,6 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_s=
-et *set,
-=20
- err_hctxs:
- 	blk_mq_release(q);
--err_poll:
--	blk_stat_free_callback(q->poll_cb);
--	q->poll_cb =3D NULL;
- err_exit:
- 	q->mq_ops =3D NULL;
- 	return -ENOMEM;
-@@ -4768,138 +4716,8 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag=
-_set *set, int nr_hw_queues)
- }
- EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
-=20
--/* Enable polling stats and return whether they were already enabled. */
--static bool blk_poll_stats_enable(struct request_queue *q)
--{
--	if (q->poll_stat)
--		return true;
--
--	return blk_stats_alloc_enable(q);
--}
--
--static void blk_mq_poll_stats_start(struct request_queue *q)
--{
--	/*
--	 * We don't arm the callback if polling stats are not enabled or the
--	 * callback is already active.
--	 */
--	if (!q->poll_stat || blk_stat_is_active(q->poll_cb))
--		return;
--
--	blk_stat_activate_msecs(q->poll_cb, 100);
--}
--
--static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
--{
--	struct request_queue *q =3D cb->data;
--	int bucket;
--
--	for (bucket =3D 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
--		if (cb->stat[bucket].nr_samples)
--			q->poll_stat[bucket] =3D cb->stat[bucket];
--	}
--}
--
--static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
--				       struct request *rq)
--{
--	unsigned long ret =3D 0;
--	int bucket;
--
--	/*
--	 * If stats collection isn't on, don't sleep but turn it on for
--	 * future users
--	 */
--	if (!blk_poll_stats_enable(q))
--		return 0;
--
--	/*
--	 * As an optimistic guess, use half of the mean service time
--	 * for this type of request. We can (and should) make this smarter.
--	 * For instance, if the completion latencies are tight, we can
--	 * get closer than just half the mean. This is especially
--	 * important on devices where the completion latencies are longer
--	 * than ~10 usec. We do use the stats for the relevant IO size
--	 * if available which does lead to better estimates.
--	 */
--	bucket =3D blk_mq_poll_stats_bkt(rq);
--	if (bucket < 0)
--		return ret;
--
--	if (q->poll_stat[bucket].nr_samples)
--		ret =3D (q->poll_stat[bucket].mean + 1) / 2;
--
--	return ret;
--}
--
--static bool blk_mq_poll_hybrid(struct request_queue *q, blk_qc_t qc)
--{
--	struct blk_mq_hw_ctx *hctx =3D blk_qc_to_hctx(q, qc);
--	struct request *rq =3D blk_qc_to_rq(hctx, qc);
--	struct hrtimer_sleeper hs;
--	enum hrtimer_mode mode;
--	unsigned int nsecs;
--	ktime_t kt;
--
--	/*
--	 * If a request has completed on queue that uses an I/O scheduler, we
--	 * won't get back a request from blk_qc_to_rq.
--	 */
--	if (!rq || (rq->rq_flags & RQF_MQ_POLL_SLEPT))
--		return false;
--
--	/*
--	 * If we get here, hybrid polling is enabled. Hence poll_nsec can be:
--	 *
--	 *  0:	use half of prev avg
--	 * >0:	use this specific value
--	 */
--	if (q->poll_nsec > 0)
--		nsecs =3D q->poll_nsec;
--	else
--		nsecs =3D blk_mq_poll_nsecs(q, rq);
--
--	if (!nsecs)
--		return false;
--
--	rq->rq_flags |=3D RQF_MQ_POLL_SLEPT;
--
--	/*
--	 * This will be replaced with the stats tracking code, using
--	 * 'avg_completion_time / 2' as the pre-sleep target.
--	 */
--	kt =3D nsecs;
--
--	mode =3D HRTIMER_MODE_REL;
--	hrtimer_init_sleeper_on_stack(&hs, CLOCK_MONOTONIC, mode);
--	hrtimer_set_expires(&hs.timer, kt);
--
--	do {
--		if (blk_mq_rq_state(rq) =3D=3D MQ_RQ_COMPLETE)
--			break;
--		set_current_state(TASK_UNINTERRUPTIBLE);
--		hrtimer_sleeper_start_expires(&hs, mode);
--		if (hs.task)
--			io_schedule();
--		hrtimer_cancel(&hs.timer);
--		mode =3D HRTIMER_MODE_ABS;
--	} while (hs.task && !signal_pending(current));
--
--	__set_current_state(TASK_RUNNING);
--	destroy_hrtimer_on_stack(&hs.timer);
--
--	/*
--	 * If we sleep, have the caller restart the poll loop to reset the
--	 * state.  Like for the other success return cases, the caller is
--	 * responsible for checking if the IO completed.  If the IO isn't
--	 * complete, we'll get called again and will go straight to the busy
--	 * poll loop.
--	 */
--	return true;
--}
--
--static int blk_mq_poll_classic(struct request_queue *q, blk_qc_t cookie,
--			       struct io_comp_batch *iob, unsigned int flags)
-+int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
-_batch *iob,
-+		unsigned int flags)
- {
- 	struct blk_mq_hw_ctx *hctx =3D blk_qc_to_hctx(q, cookie);
- 	long state =3D get_current_state();
-@@ -4926,17 +4744,6 @@ static int blk_mq_poll_classic(struct request_queu=
-e *q, blk_qc_t cookie,
- 	return 0;
- }
-=20
--int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
-_batch *iob,
--		unsigned int flags)
--{
--	if (!(flags & BLK_POLL_NOSLEEP) &&
--	    q->poll_nsec !=3D BLK_MQ_POLL_CLASSIC) {
--		if (blk_mq_poll_hybrid(q, cookie))
--			return 1;
--	}
--	return blk_mq_poll_classic(q, cookie, iob, flags);
--}
--
- unsigned int blk_mq_rq_cpu(struct request *rq)
- {
- 	return rq->mq_ctx->cpu;
-diff --git a/block/blk-stat.c b/block/blk-stat.c
-index c6ca16abf911e..74a1a8c32d86f 100644
---- a/block/blk-stat.c
-+++ b/block/blk-stat.c
-@@ -231,21 +231,3 @@ void blk_free_queue_stats(struct blk_queue_stats *st=
-ats)
-=20
- 	kfree(stats);
- }
--
--bool blk_stats_alloc_enable(struct request_queue *q)
--{
--	struct blk_rq_stat *poll_stat;
--
--	poll_stat =3D kcalloc(BLK_MQ_POLL_STATS_BKTS, sizeof(*poll_stat),
--				GFP_ATOMIC);
--	if (!poll_stat)
--		return false;
--
--	if (cmpxchg(&q->poll_stat, NULL, poll_stat) !=3D NULL) {
--		kfree(poll_stat);
--		return true;
--	}
--
--	blk_stat_add_callback(q, q->poll_cb);
--	return false;
--}
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f1fce1c7fa44b..c6c231f3d0f10 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -408,36 +408,7 @@ queue_rq_affinity_store(struct request_queue *q, con=
-st char *page, size_t count)
-=20
- static ssize_t queue_poll_delay_show(struct request_queue *q, char *page=
-)
- {
--	int val;
--
--	if (q->poll_nsec =3D=3D BLK_MQ_POLL_CLASSIC)
--		val =3D BLK_MQ_POLL_CLASSIC;
--	else
--		val =3D q->poll_nsec / 1000;
--
--	return sprintf(page, "%d\n", val);
--}
--
--static ssize_t queue_poll_delay_store(struct request_queue *q, const cha=
-r *page,
--				size_t count)
--{
--	int err, val;
--
--	if (!q->mq_ops || !q->mq_ops->poll)
--		return -EINVAL;
--
--	err =3D kstrtoint(page, 10, &val);
--	if (err < 0)
--		return err;
--
--	if (val =3D=3D BLK_MQ_POLL_CLASSIC)
--		q->poll_nsec =3D BLK_MQ_POLL_CLASSIC;
--	else if (val >=3D 0)
--		q->poll_nsec =3D val * 1000;
--	else
--		return -EINVAL;
--
--	return count;
-+	return sprintf(page, "%d\n", -1);
- }
-=20
- static ssize_t queue_poll_show(struct request_queue *q, char *page)
-@@ -617,7 +588,7 @@ QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zo=
-nes");
- QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
- QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
- QUEUE_RW_ENTRY(queue_poll, "io_poll");
--QUEUE_RW_ENTRY(queue_poll_delay, "io_poll_delay");
-+QUEUE_RO_ENTRY(queue_poll_delay, "io_poll_delay");
- QUEUE_RW_ENTRY(queue_wc, "write_cache");
- QUEUE_RO_ENTRY(queue_fua, "fua");
- QUEUE_RO_ENTRY(queue_dax, "dax");
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index dd5ce1137f04a..1dacb2c81fdda 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -57,8 +57,6 @@ typedef __u32 __bitwise req_flags_t;
- #define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
- /* The per-zone write lock is held for this request */
- #define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
--/* already slept for hybrid poll */
--#define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
- /* ->timeout has been called, don't expire again */
- #define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
- /* queue has elevator attached */
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d1aee08f8c181..6ede578dfbc64 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -44,12 +44,6 @@ extern const struct device_type disk_type;
- extern struct device_type part_type;
- extern struct class block_class;
-=20
--/* Must be consistent with blk_mq_poll_stats_bkt() */
--#define BLK_MQ_POLL_STATS_BKTS 16
--
--/* Doing classic polling */
--#define BLK_MQ_POLL_CLASSIC -1
--
- /*
-  * Maximum number of blkcg policies allowed to be registered concurrentl=
-y.
-  * Defined here to simplify include dependency.
-@@ -468,10 +462,6 @@ struct request_queue {
- #endif
-=20
- 	unsigned int		rq_timeout;
--	int			poll_nsec;
--
--	struct blk_stat_callback	*poll_cb;
--	struct blk_rq_stat	*poll_stat;
-=20
- 	struct timer_list	timeout;
- 	struct work_struct	timeout_work;
-@@ -870,8 +860,6 @@ blk_status_t errno_to_blk_status(int errno);
-=20
- /* only poll the hardware once, don't continue until a completion was fo=
-und */
- #define BLK_POLL_ONESHOT		(1 << 0)
--/* do not sleep to wait for the expected completion time */
--#define BLK_POLL_NOSLEEP		(1 << 1)
- int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int fl=
-ags);
- int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
- 			unsigned int flags);
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index 4c233910e2009..a099dc0543d95 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -1002,7 +1002,7 @@ void io_rw_fail(struct io_kiocb *req)
- int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
- {
- 	struct io_wq_work_node *pos, *start, *prev;
--	unsigned int poll_flags =3D BLK_POLL_NOSLEEP;
-+	unsigned int poll_flags =3D 0;
- 	DEFINE_IO_COMP_BATCH(iob);
- 	int nr_events =3D 0;
-=20
---=20
-2.34.1
-
+Ok. 
