@@ -2,59 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9CFC6FD1D
-	for <linux-block@archiver.kernel.org>; Mon, 20 Mar 2023 13:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18446C6FD1D
+	for <linux-block@archiver.kernel.org>; Mon, 20 Mar 2023 13:11:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230495AbjCTNGc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Mar 2023 09:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55850 "EHLO
+        id S231535AbjCTNLQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Mar 2023 09:11:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231429AbjCTNGb (ORCPT
+        with ESMTP id S229684AbjCTNLO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Mar 2023 09:06:31 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CBAD1C7D9;
-        Mon, 20 Mar 2023 06:06:30 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BA35E68AFE; Mon, 20 Mar 2023 14:06:25 +0100 (CET)
-Date:   Mon, 20 Mar 2023 14:06:25 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Mike Christie <michael.christie@oracle.com>
-Cc:     Stefan Haberland <sth@linux.ibm.com>,
-        Christoph Hellwig <hch@lst.de>, bvanassche@acm.org,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        kbusch@kernel.org, target-devel@vger.kernel.org,
-        Jan Hoeppner <hoeppner@linux.ibm.com>
-Subject: Re: [PATCH v4 02/18] block: Rename BLK_STS_NEXUS to
- BLK_STS_RESV_CONFLICT
-Message-ID: <20230320130625.GA11908@lst.de>
-References: <20230224174502.321490-1-michael.christie@oracle.com> <20230224174502.321490-3-michael.christie@oracle.com> <20230314171119.GB6780@lst.de> <33ed9615-b570-03c7-9a7a-d07f020d3222@linux.ibm.com> <20230315133039.GA24533@lst.de> <4484f553-84c1-5402-4f52-c2972ad3e496@linux.ibm.com> <6da0ec0a-d465-fec4-0ca5-96b2ffb7be7a@oracle.com>
+        Mon, 20 Mar 2023 09:11:14 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914FFB76A;
+        Mon, 20 Mar 2023 06:11:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+/9FCDUcz/9yyumayNm7HvxGQ4k/d4p/8qwiRrkpHdI=; b=X4GyKsIv0QTVIz6ae3YmM33lHX
+        VBU9O+UrtEDNpJX70qptJmPQKFA3abRRe+j9f5PYJLaMjfBHzf6YU1XTRsWEF2tcqoWJ60HZw/ZY9
+        t6HL2p0DIxaFiiV5kemuIZVAGq682ctS2u/pInLxhO5QbmB+g835D/22Pb3Vgv1KhfDDzSDsbZy9i
+        lmpR3y1YYr6inC257Kit2JShOphUvvLieE79DRyIJFZX2I/WTKHZJQWoWcATKxDcwaJ51gtOSvX8F
+        8ycRRX0udJsYRVCLiqXafKmJKeqAWwW6QvJgu8P321g8h6kVt1ESX9K9Y+0haeuwZSWlPWykgOLCa
+        oLesLzCg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1peFHu-0093xe-1V;
+        Mon, 20 Mar 2023 13:10:58 +0000
+Date:   Mon, 20 Mar 2023 06:10:58 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v19 00/15] splice, block: Use page pinning and kill
+ ITER_PIPE
+Message-ID: <ZBhbYkTonYVY1xa4@infradead.org>
+References: <20230315163549.295454-1-dhowells@redhat.com>
+ <167890243414.54517.7660243890362126266.b4-ty@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6da0ec0a-d465-fec4-0ca5-96b2ffb7be7a@oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <167890243414.54517.7660243890362126266.b4-ty@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 16, 2023 at 11:36:12AM -0500, Mike Christie wrote:
-> I think we are ok for dasd using BLK_STS_RESV_CONFLICT.
+On Wed, Mar 15, 2023 at 11:47:14AM -0600, Jens Axboe wrote:
+> > [...]
 > 
-> It thought it sounded similar to SCSI/NVMe and userspace will still
-> see -EBADE because the blk_status_to_errno/errno_to_blk_status will
-> handle this.
-> 
-> There was no internal dasd code checking for BLK_STS_NEXUS.
-> 
-> There is a pr_ops API, but dasd is not hooked into it so we don't
-> have to worry about behavior changes.
+> Applied, thanks!
 
-Yes, we don't have to worry about it.  I just find a bit confusing
-to have a PR-related error in a driver that doesn't use PRs.
-
-Maybe add a little comment that it is used for some s390 or DASD
-specific locking instead.
+Dave, now that the basic patchset is in, can you resurrect the
+patch to conver the legacy direct-io code?  That would allow
+us to instantly the PAGE_REF version of the bio_release_pages,
+and also be a giant step toward never modifying page contents
+from a regular get_user_pages, and thus fix the file system
+problems around that.
