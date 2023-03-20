@@ -2,173 +2,571 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C5DC6FD1D
-	for <linux-block@archiver.kernel.org>; Mon, 20 Mar 2023 16:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E3C6FD1D
+	for <linux-block@archiver.kernel.org>; Mon, 20 Mar 2023 16:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232165AbjCTQQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Mar 2023 12:16:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46942 "EHLO
+        id S231993AbjCTQVD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Mar 2023 12:21:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232178AbjCTQPi (ORCPT
+        with ESMTP id S232008AbjCTQUi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Mar 2023 12:15:38 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 38B0CE3A3;
-        Mon, 20 Mar 2023 09:05:07 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4C054AD7;
-        Mon, 20 Mar 2023 09:05:51 -0700 (PDT)
-Received: from FVFF77S0Q05N.cambridge.arm.com (FVFF77S0Q05N.cambridge.arm.com [10.1.35.35])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E0A93F67D;
-        Mon, 20 Mar 2023 09:05:05 -0700 (PDT)
-Date:   Mon, 20 Mar 2023 16:04:55 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Alexey Klimov <alexey.klimov@linaro.org>
-Cc:     peterz@infradead.org, draszik@google.com, peter.griffin@linaro.org,
-        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
-        tony@atomide.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        alim.akhtar@samsung.com, regressions@lists.linux.dev,
-        avri.altman@wdc.com, bvanassche@acm.org, klimova@google.com
-Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
- and slow-stuck reboots
-Message-ID: <ZBiEEyDaxq9oSXJk@FVFF77S0Q05N.cambridge.arm.com>
-References: <20230314230004.961993-1-alexey.klimov@linaro.org>
- <ZBhlL4tqSUi/c3qk@FVFF77S0Q05N.cambridge.arm.com>
+        Mon, 20 Mar 2023 12:20:38 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B941CC0F
+        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 09:12:17 -0700 (PDT)
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32K97VxA004745
+        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 09:12:17 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=hP2ugGUfXZWB7bKpwBhxX4WMaPOtLeBAzvbfIhFoCrs=;
+ b=DexflX2SavfCjvFTytG4J7fS6jt/ilzeP5NXKX7m68mRaijocRuWyyHwQLJLXc4Db70O
+ EQvLtVAuRfdpkCn5ft7d9LTa4/3vQvhMSaWh9e2gLKYH5xm9KNKnwSn30gYFQ1IWSRfK
+ rF4Gptj6j0xi7MyuMThOq54rcPxs62WhmIIgAtwHtwM0z6SLLuFB5mYqrLf410upsL8v
+ ezmL4qC2fDgbwkjCbye7qO5R4Na4mnwEeZw8A0BQNvv+CQ1/NS/5Ya6Ty7fWiQ4wl1tn
+ wWhm9Ahf6GCHyIajDUXQmUSJRaHts4jhpG3loDXV+TE8zsZcDfL/rPKoSVg8GYa+1pBb bg== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3pd8mrtenu-3
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 09:12:16 -0700
+Received: from twshared4419.04.ash8.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:82::e) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Mon, 20 Mar 2023 09:12:13 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 439AF13FD65A1; Mon, 20 Mar 2023 09:12:06 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        <io-uring@vger.kernel.org>
+CC:     Pavel Begunkov <asml.silence@gmail.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] blk-mq: remove hybrid polling
+Date:   Mon, 20 Mar 2023 09:12:05 -0700
+Message-ID: <20230320161205.1714865-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZBhlL4tqSUi/c3qk@FVFF77S0Q05N.cambridge.arm.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: O-hr7CFhrsaCjMPRWDEhtSTWU5apRbTf
+X-Proofpoint-ORIG-GUID: O-hr7CFhrsaCjMPRWDEhtSTWU5apRbTf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-20_13,2023-03-20_02,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 20, 2023 at 01:52:47PM +0000, Mark Rutland wrote:
-> On Tue, Mar 14, 2023 at 11:00:04PM +0000, Alexey Klimov wrote:
-> > #regzbot introduced: 0c5ffc3d7b15
-> > #regzbot title: CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait() and slow-stuck reboots
-> > 
-> > The upstream changes are being merged into android-mainline repo and at some
-> > point we started to observe kernel panics on reboot or long reboot times.
-> 
-> Where can I find the android-mainline repo, and which specific branch/commit
-> from that repo is being merged in?
+From: Keith Busch <kbusch@kernel.org>
 
-I assume that was the android-mainline branch in:
+io_uring provides the only way user space can poll completions, and that
+always sets BLK_POLL_NOSLEEP. This effectively makes hybrid polling dead
+code, so remove it and everything supporting it.
 
-  https://android.googlesource.com/kernel/common/
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-core.c       |   6 --
+ block/blk-mq-debugfs.c |  26 ------
+ block/blk-mq.c         | 205 ++---------------------------------------
+ block/blk-stat.c       |  18 ----
+ block/blk-sysfs.c      |  33 +------
+ include/linux/blk-mq.h |   2 -
+ include/linux/blkdev.h |  12 ---
+ io_uring/rw.c          |   2 +-
+ 8 files changed, 9 insertions(+), 295 deletions(-)
 
-... and I had a go with commit:
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 9e5e0277a4d95..269765d16cfd9 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -263,13 +263,7 @@ static void blk_free_queue_rcu(struct rcu_head *rcu_=
+head)
+=20
+ static void blk_free_queue(struct request_queue *q)
+ {
+-	if (q->poll_stat)
+-		blk_stat_remove_callback(q, q->poll_cb);
+-	blk_stat_free_callback(q->poll_cb);
+-
+ 	blk_free_queue_stats(q->stats);
+-	kfree(q->poll_stat);
+-
+ 	if (queue_is_mq(q))
+ 		blk_mq_release(q);
+=20
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index b01818f8e216e..212a7f301e730 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -15,33 +15,8 @@
+ #include "blk-mq-tag.h"
+ #include "blk-rq-qos.h"
+=20
+-static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
+-{
+-	if (stat->nr_samples) {
+-		seq_printf(m, "samples=3D%d, mean=3D%llu, min=3D%llu, max=3D%llu",
+-			   stat->nr_samples, stat->mean, stat->min, stat->max);
+-	} else {
+-		seq_puts(m, "samples=3D0");
+-	}
+-}
+-
+ static int queue_poll_stat_show(void *data, struct seq_file *m)
+ {
+-	struct request_queue *q =3D data;
+-	int bucket;
+-
+-	if (!q->poll_stat)
+-		return 0;
+-
+-	for (bucket =3D 0; bucket < (BLK_MQ_POLL_STATS_BKTS / 2); bucket++) {
+-		seq_printf(m, "read  (%d Bytes): ", 1 << (9 + bucket));
+-		print_stat(m, &q->poll_stat[2 * bucket]);
+-		seq_puts(m, "\n");
+-
+-		seq_printf(m, "write (%d Bytes): ",  1 << (9 + bucket));
+-		print_stat(m, &q->poll_stat[2 * bucket + 1]);
+-		seq_puts(m, "\n");
+-	}
+ 	return 0;
+ }
+=20
+@@ -282,7 +257,6 @@ static const char *const rqf_name[] =3D {
+ 	RQF_NAME(STATS),
+ 	RQF_NAME(SPECIAL_PAYLOAD),
+ 	RQF_NAME(ZONE_WRITE_LOCKED),
+-	RQF_NAME(MQ_POLL_SLEPT),
+ 	RQF_NAME(TIMED_OUT),
+ 	RQF_NAME(ELV),
+ 	RQF_NAME(RESV),
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a875b1cdff9b5..4e30459df8151 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -46,51 +46,15 @@
+=20
+ static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
+=20
+-static void blk_mq_poll_stats_start(struct request_queue *q);
+-static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+-
+-static int blk_mq_poll_stats_bkt(const struct request *rq)
+-{
+-	int ddir, sectors, bucket;
+-
+-	ddir =3D rq_data_dir(rq);
+-	sectors =3D blk_rq_stats_sectors(rq);
+-
+-	bucket =3D ddir + 2 * ilog2(sectors);
+-
+-	if (bucket < 0)
+-		return -1;
+-	else if (bucket >=3D BLK_MQ_POLL_STATS_BKTS)
+-		return ddir + BLK_MQ_POLL_STATS_BKTS - 2;
+-
+-	return bucket;
+-}
+-
+-#define BLK_QC_T_SHIFT		16
+-#define BLK_QC_T_INTERNAL	(1U << 31)
+-
+ static inline struct blk_mq_hw_ctx *blk_qc_to_hctx(struct request_queue =
+*q,
+ 		blk_qc_t qc)
+ {
+-	return xa_load(&q->hctx_table,
+-			(qc & ~BLK_QC_T_INTERNAL) >> BLK_QC_T_SHIFT);
+-}
+-
+-static inline struct request *blk_qc_to_rq(struct blk_mq_hw_ctx *hctx,
+-		blk_qc_t qc)
+-{
+-	unsigned int tag =3D qc & ((1U << BLK_QC_T_SHIFT) - 1);
+-
+-	if (qc & BLK_QC_T_INTERNAL)
+-		return blk_mq_tag_to_rq(hctx->sched_tags, tag);
+-	return blk_mq_tag_to_rq(hctx->tags, tag);
++	return xa_load(&q->hctx_table, qc);
+ }
+=20
+ static inline blk_qc_t blk_rq_to_qc(struct request *rq)
+ {
+-	return (rq->mq_hctx->queue_num << BLK_QC_T_SHIFT) |
+-		(rq->tag !=3D -1 ?
+-		 rq->tag : (rq->internal_tag | BLK_QC_T_INTERNAL));
++	return rq->mq_hctx->queue_num;
+ }
+=20
+ /*
+@@ -1038,10 +1002,8 @@ static inline void blk_account_io_start(struct req=
+uest *req)
+=20
+ static inline void __blk_mq_end_request_acct(struct request *rq, u64 now=
+)
+ {
+-	if (rq->rq_flags & RQF_STATS) {
+-		blk_mq_poll_stats_start(rq->q);
++	if (rq->rq_flags & RQF_STATS)
+ 		blk_stat_add(rq, now);
+-	}
+=20
+ 	blk_mq_sched_completed_request(rq, now);
+ 	blk_account_io_done(rq, now);
+@@ -4222,14 +4184,8 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_=
+set *set,
+ 	/* mark the queue as mq asap */
+ 	q->mq_ops =3D set->ops;
+=20
+-	q->poll_cb =3D blk_stat_alloc_callback(blk_mq_poll_stats_fn,
+-					     blk_mq_poll_stats_bkt,
+-					     BLK_MQ_POLL_STATS_BKTS, q);
+-	if (!q->poll_cb)
+-		goto err_exit;
+-
+ 	if (blk_mq_alloc_ctxs(q))
+-		goto err_poll;
++		goto err_exit;
+=20
+ 	/* init q->mq_kobj and sw queues' kobjects */
+ 	blk_mq_sysfs_init(q);
+@@ -4257,11 +4213,6 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_=
+set *set,
+=20
+ 	q->nr_requests =3D set->queue_depth;
+=20
+-	/*
+-	 * Default to classic polling
+-	 */
+-	q->poll_nsec =3D BLK_MQ_POLL_CLASSIC;
+-
+ 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
+ 	blk_mq_add_queue_tag_set(set, q);
+ 	blk_mq_map_swqueue(q);
+@@ -4269,9 +4220,6 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_s=
+et *set,
+=20
+ err_hctxs:
+ 	blk_mq_release(q);
+-err_poll:
+-	blk_stat_free_callback(q->poll_cb);
+-	q->poll_cb =3D NULL;
+ err_exit:
+ 	q->mq_ops =3D NULL;
+ 	return -ENOMEM;
+@@ -4768,138 +4716,8 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag=
+_set *set, int nr_hw_queues)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
+=20
+-/* Enable polling stats and return whether they were already enabled. */
+-static bool blk_poll_stats_enable(struct request_queue *q)
+-{
+-	if (q->poll_stat)
+-		return true;
+-
+-	return blk_stats_alloc_enable(q);
+-}
+-
+-static void blk_mq_poll_stats_start(struct request_queue *q)
+-{
+-	/*
+-	 * We don't arm the callback if polling stats are not enabled or the
+-	 * callback is already active.
+-	 */
+-	if (!q->poll_stat || blk_stat_is_active(q->poll_cb))
+-		return;
+-
+-	blk_stat_activate_msecs(q->poll_cb, 100);
+-}
+-
+-static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
+-{
+-	struct request_queue *q =3D cb->data;
+-	int bucket;
+-
+-	for (bucket =3D 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
+-		if (cb->stat[bucket].nr_samples)
+-			q->poll_stat[bucket] =3D cb->stat[bucket];
+-	}
+-}
+-
+-static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+-				       struct request *rq)
+-{
+-	unsigned long ret =3D 0;
+-	int bucket;
+-
+-	/*
+-	 * If stats collection isn't on, don't sleep but turn it on for
+-	 * future users
+-	 */
+-	if (!blk_poll_stats_enable(q))
+-		return 0;
+-
+-	/*
+-	 * As an optimistic guess, use half of the mean service time
+-	 * for this type of request. We can (and should) make this smarter.
+-	 * For instance, if the completion latencies are tight, we can
+-	 * get closer than just half the mean. This is especially
+-	 * important on devices where the completion latencies are longer
+-	 * than ~10 usec. We do use the stats for the relevant IO size
+-	 * if available which does lead to better estimates.
+-	 */
+-	bucket =3D blk_mq_poll_stats_bkt(rq);
+-	if (bucket < 0)
+-		return ret;
+-
+-	if (q->poll_stat[bucket].nr_samples)
+-		ret =3D (q->poll_stat[bucket].mean + 1) / 2;
+-
+-	return ret;
+-}
+-
+-static bool blk_mq_poll_hybrid(struct request_queue *q, blk_qc_t qc)
+-{
+-	struct blk_mq_hw_ctx *hctx =3D blk_qc_to_hctx(q, qc);
+-	struct request *rq =3D blk_qc_to_rq(hctx, qc);
+-	struct hrtimer_sleeper hs;
+-	enum hrtimer_mode mode;
+-	unsigned int nsecs;
+-	ktime_t kt;
+-
+-	/*
+-	 * If a request has completed on queue that uses an I/O scheduler, we
+-	 * won't get back a request from blk_qc_to_rq.
+-	 */
+-	if (!rq || (rq->rq_flags & RQF_MQ_POLL_SLEPT))
+-		return false;
+-
+-	/*
+-	 * If we get here, hybrid polling is enabled. Hence poll_nsec can be:
+-	 *
+-	 *  0:	use half of prev avg
+-	 * >0:	use this specific value
+-	 */
+-	if (q->poll_nsec > 0)
+-		nsecs =3D q->poll_nsec;
+-	else
+-		nsecs =3D blk_mq_poll_nsecs(q, rq);
+-
+-	if (!nsecs)
+-		return false;
+-
+-	rq->rq_flags |=3D RQF_MQ_POLL_SLEPT;
+-
+-	/*
+-	 * This will be replaced with the stats tracking code, using
+-	 * 'avg_completion_time / 2' as the pre-sleep target.
+-	 */
+-	kt =3D nsecs;
+-
+-	mode =3D HRTIMER_MODE_REL;
+-	hrtimer_init_sleeper_on_stack(&hs, CLOCK_MONOTONIC, mode);
+-	hrtimer_set_expires(&hs.timer, kt);
+-
+-	do {
+-		if (blk_mq_rq_state(rq) =3D=3D MQ_RQ_COMPLETE)
+-			break;
+-		set_current_state(TASK_UNINTERRUPTIBLE);
+-		hrtimer_sleeper_start_expires(&hs, mode);
+-		if (hs.task)
+-			io_schedule();
+-		hrtimer_cancel(&hs.timer);
+-		mode =3D HRTIMER_MODE_ABS;
+-	} while (hs.task && !signal_pending(current));
+-
+-	__set_current_state(TASK_RUNNING);
+-	destroy_hrtimer_on_stack(&hs.timer);
+-
+-	/*
+-	 * If we sleep, have the caller restart the poll loop to reset the
+-	 * state.  Like for the other success return cases, the caller is
+-	 * responsible for checking if the IO completed.  If the IO isn't
+-	 * complete, we'll get called again and will go straight to the busy
+-	 * poll loop.
+-	 */
+-	return true;
+-}
+-
+-static int blk_mq_poll_classic(struct request_queue *q, blk_qc_t cookie,
+-			       struct io_comp_batch *iob, unsigned int flags)
++int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
+_batch *iob,
++		unsigned int flags)
+ {
+ 	struct blk_mq_hw_ctx *hctx =3D blk_qc_to_hctx(q, cookie);
+ 	long state =3D get_current_state();
+@@ -4926,17 +4744,6 @@ static int blk_mq_poll_classic(struct request_queu=
+e *q, blk_qc_t cookie,
+ 	return 0;
+ }
+=20
+-int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
+_batch *iob,
+-		unsigned int flags)
+-{
+-	if (!(flags & BLK_POLL_NOSLEEP) &&
+-	    q->poll_nsec !=3D BLK_MQ_POLL_CLASSIC) {
+-		if (blk_mq_poll_hybrid(q, cookie))
+-			return 1;
+-	}
+-	return blk_mq_poll_classic(q, cookie, iob, flags);
+-}
+-
+ unsigned int blk_mq_rq_cpu(struct request *rq)
+ {
+ 	return rq->mq_ctx->cpu;
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index c6ca16abf911e..74a1a8c32d86f 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -231,21 +231,3 @@ void blk_free_queue_stats(struct blk_queue_stats *st=
+ats)
+=20
+ 	kfree(stats);
+ }
+-
+-bool blk_stats_alloc_enable(struct request_queue *q)
+-{
+-	struct blk_rq_stat *poll_stat;
+-
+-	poll_stat =3D kcalloc(BLK_MQ_POLL_STATS_BKTS, sizeof(*poll_stat),
+-				GFP_ATOMIC);
+-	if (!poll_stat)
+-		return false;
+-
+-	if (cmpxchg(&q->poll_stat, NULL, poll_stat) !=3D NULL) {
+-		kfree(poll_stat);
+-		return true;
+-	}
+-
+-	blk_stat_add_callback(q, q->poll_cb);
+-	return false;
+-}
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index f1fce1c7fa44b..c6c231f3d0f10 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -408,36 +408,7 @@ queue_rq_affinity_store(struct request_queue *q, con=
+st char *page, size_t count)
+=20
+ static ssize_t queue_poll_delay_show(struct request_queue *q, char *page=
+)
+ {
+-	int val;
+-
+-	if (q->poll_nsec =3D=3D BLK_MQ_POLL_CLASSIC)
+-		val =3D BLK_MQ_POLL_CLASSIC;
+-	else
+-		val =3D q->poll_nsec / 1000;
+-
+-	return sprintf(page, "%d\n", val);
+-}
+-
+-static ssize_t queue_poll_delay_store(struct request_queue *q, const cha=
+r *page,
+-				size_t count)
+-{
+-	int err, val;
+-
+-	if (!q->mq_ops || !q->mq_ops->poll)
+-		return -EINVAL;
+-
+-	err =3D kstrtoint(page, 10, &val);
+-	if (err < 0)
+-		return err;
+-
+-	if (val =3D=3D BLK_MQ_POLL_CLASSIC)
+-		q->poll_nsec =3D BLK_MQ_POLL_CLASSIC;
+-	else if (val >=3D 0)
+-		q->poll_nsec =3D val * 1000;
+-	else
+-		return -EINVAL;
+-
+-	return count;
++	return sprintf(page, "%d\n", -1);
+ }
+=20
+ static ssize_t queue_poll_show(struct request_queue *q, char *page)
+@@ -617,7 +588,7 @@ QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zo=
+nes");
+ QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
+ QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
+ QUEUE_RW_ENTRY(queue_poll, "io_poll");
+-QUEUE_RW_ENTRY(queue_poll_delay, "io_poll_delay");
++QUEUE_RO_ENTRY(queue_poll_delay, "io_poll_delay");
+ QUEUE_RW_ENTRY(queue_wc, "write_cache");
+ QUEUE_RO_ENTRY(queue_fua, "fua");
+ QUEUE_RO_ENTRY(queue_dax, "dax");
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index dd5ce1137f04a..1dacb2c81fdda 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -57,8 +57,6 @@ typedef __u32 __bitwise req_flags_t;
+ #define RQF_SPECIAL_PAYLOAD	((__force req_flags_t)(1 << 18))
+ /* The per-zone write lock is held for this request */
+ #define RQF_ZONE_WRITE_LOCKED	((__force req_flags_t)(1 << 19))
+-/* already slept for hybrid poll */
+-#define RQF_MQ_POLL_SLEPT	((__force req_flags_t)(1 << 20))
+ /* ->timeout has been called, don't expire again */
+ #define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
+ /* queue has elevator attached */
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d1aee08f8c181..6ede578dfbc64 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -44,12 +44,6 @@ extern const struct device_type disk_type;
+ extern struct device_type part_type;
+ extern struct class block_class;
+=20
+-/* Must be consistent with blk_mq_poll_stats_bkt() */
+-#define BLK_MQ_POLL_STATS_BKTS 16
+-
+-/* Doing classic polling */
+-#define BLK_MQ_POLL_CLASSIC -1
+-
+ /*
+  * Maximum number of blkcg policies allowed to be registered concurrentl=
+y.
+  * Defined here to simplify include dependency.
+@@ -468,10 +462,6 @@ struct request_queue {
+ #endif
+=20
+ 	unsigned int		rq_timeout;
+-	int			poll_nsec;
+-
+-	struct blk_stat_callback	*poll_cb;
+-	struct blk_rq_stat	*poll_stat;
+=20
+ 	struct timer_list	timeout;
+ 	struct work_struct	timeout_work;
+@@ -870,8 +860,6 @@ blk_status_t errno_to_blk_status(int errno);
+=20
+ /* only poll the hardware once, don't continue until a completion was fo=
+und */
+ #define BLK_POLL_ONESHOT		(1 << 0)
+-/* do not sleep to wait for the expected completion time */
+-#define BLK_POLL_NOSLEEP		(1 << 1)
+ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int fl=
+ags);
+ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+ 			unsigned int flags);
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index 4c233910e2009..a099dc0543d95 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -1002,7 +1002,7 @@ void io_rw_fail(struct io_kiocb *req)
+ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
+ {
+ 	struct io_wq_work_node *pos, *start, *prev;
+-	unsigned int poll_flags =3D BLK_POLL_NOSLEEP;
++	unsigned int poll_flags =3D 0;
+ 	DEFINE_IO_COMP_BATCH(iob);
+ 	int nr_events =3D 0;
+=20
+--=20
+2.34.1
 
-  8338670fd5bdf8d7 ("Merge "Merge 36289a03bcd3 ("Merge tag 'v6.3-p1' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6") into android-mainline" into android-mainline")
-
-... as that was the commit immediately before your local revert:
-
-  a32cec8e3f2253bc ("ANDROID: Revert "cpuidle, dt: Push RCU-idle into driver")
-
-Testing on Juno R2 with defconfig + PROVE_LOCKING=y + DEBUG_LOCKDEP=y, I cannot
-reproduce the reboot issue; everything seems to work just fine.
-
-Can you say which config you're using?
-
-Just to check: are you using a pristine version of that tree, or do you have
-any vendor hooks present? I note that there are special hooks added to the
-cpuidle and PSCI code, and I can imagine those might expect the old behaviour
-w.r.t. RCU and idle, so ruling those out would help.
-
-Thanks,
-Mark.
-
-> 
-> > The merge commit is 1f2d9ffc7a5f Merge tag 'sched-core-2023-02-20' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.
-> > Before, the reboot usually took significantly less than 15 seconds and after merge the reboot time fall in the range of 60-100 seconds.
-> > At some point watchdog-like functionality or softdog start to worry about the system stuck somewhere nd panic the system.
-> > 
-> > The delay is found to be in device's ->shutdown() methods called from kernel_restart():
-> > void kernel_restart_prepare(char *cmd)
-> > {
-> > 	blocking_notifier_call_chain(&reboot_notifier_list, SYS_RESTART, cmd);
-> > 	system_state = SYSTEM_RESTART;
-> > 	usermodehelper_disable();
-> > 	device_shutdown();	<---- here
-> > }
-> > 
-> > The driver in question is ufshcd and its ufshcd_wl_shutdown() shutdown method. It often blocks on scsi_device_quiesce() and upon manual checking it seems that it sleeps on blk_mq_freeze_queue_wait()/wait_event() in blk_freeze_queue():
-> > 
-> > scsi_device_quiesce(struct scsi_device *sdev)
-> > {
-> > 	...
-> > 	blk_mq_freeze_queue(q);
-> > 	...
-> > }
-> > 	||
-> > 	V
-> > void blk_freeze_queue(struct request_queue *q)
-> > {
-> > 	/*
-> > 	 * In the !blk_mq case we are only calling this to kill the
-> > 	 * q_usage_counter, otherwise this increases the freeze depth
-> > 	 * and waits for it to return to zero.  For this reason there is
-> > 	 * no blk_unfreeze_queue(), and blk_freeze_queue() is not
-> > 	 * exported to drivers as the only user for unfreeze is blk_mq.
-> > 	 */
-> > 	blk_freeze_queue_start(q);
-> > 	blk_mq_freeze_queue_wait(q);	<--- sleeps on wait_event() here
-> > }
-> > 
-> > Or in other words:
-> > 
-> > [   34.785050][    C4] sysrq: Show Blocked State
-> > [   34.785132][    C4] task:init            state:D stack:9680  pid:1     ppid:0      flags:0x04000008
-> > [   34.785301][    C4] Call trace:
-> > [   34.785360][    C4]  __switch_to+0x180/0x308
-> > [   34.785452][    C4]  __schedule+0x61c/0x9f0
-> > [   34.785530][    C4]  schedule+0x84/0xf4
-> > [   34.785602][    C4]  blk_mq_freeze_queue_wait+0x78/0xbc
-> > [   34.785707][    C4]  blk_freeze_queue+0x74/0x8c
-> > [   34.785850][    C4]  blk_mq_freeze_queue+0x18/0x2c
-> > [   34.786033][    C4]  scsi_device_quiesce+0x54/0xec
-> > [   34.786216][    C4]  ufshcd_wl_shutdown+0x98/0xc0
-> > [   34.786396][    C4]  device_shutdown+0x1a8/0x264
-> > [   34.786572][    C4]  kernel_restart+0x48/0x11c
-> > [   34.786742][    C4]  __arm64_sys_reboot+0x1a8/0x27c
-> > [   34.786927][    C4]  invoke_syscall+0x60/0x130
-> > [   34.787096][    C4]  el0_svc_common+0xbc/0x100
-> > [   34.787266][    C4]  do_el0_svc+0x38/0xc4
-> > [   34.787420][    C4]  el0_svc+0x34/0xc4
-> > [   34.787563][    C4]  el0t_64_sync_handler+0x8c/0xfc
-> > [   34.787749][    C4]  el0t_64_sync+0x1a4/0x1a8
-> > 
-> > 
-> > However, bisect pointed to 0c5ffc3d7b15 cpuidle, dt: Push RCU-idle into driver
-> > 
-> > ->BAD 924aed1646bf cpuidle, cpu_pm: Remove RCU fiddling from cpu_pm_{enter,exit}()
-> > ->BAD a01353cf1896 cpuidle: Fix ct_idle_*() usage
-> > ->BAD (doesn't compile, needs one missing header file) 0c5ffc3d7b15 cpuidle, dt: Push RCU-idle into driver
-> > ->good c3d42418dca5 cpuidle, OMAP4: Push RCU-idle into driver
-> > 
-> > Looks like adding CPUIDLE_FLAG_RCU_IDLE flag to idle driver caused this behaviour.
-> > The minimal change that is required for this system to avoid the regression
-> > would be one liner that removes the flag (below).
-> > 
-> > But if it is a real regression, then other idle drivers if used will likely
-> > cause this regression too withe same ufshcd driver. There is also a suspicion
-> > that CPUIDLE_FLAG_RCU_IDLE just revealed or uncovered some other problem.
-> > 
-> > Any thoughts on this? Some missing __cpuidle or noinstr annotations?
-> 
-> As Peter has suggested in another reply, this might not be an *upstream*
-> regression, but rather an interaction with those out-of-tree patches. If you
-> can provide a pointer to the branch above that, it'll make it much easier to
-> figure out what's going on.
-> 
-> The code in mainline is unfortunately convoluted, but it doesn't look to be
-> obviously wrong.
-> 
-> FWIW, I've just tried v6.3-rc3 on Juno R2 in a few configurations (ACPI, DT,
-> with PROVE_LOCKING=y and DEBUG_LOCKDEP=y, with PSCI_CHECKER=y) and I'm not
-> seeing similar issues. So either I'm not tickling the same code path, or
-> something else is involved.
-> 
-> Thanks,
-> Mark.
