@@ -2,78 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E27C6FD20
-	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 18:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC319C6FD20
+	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 21:50:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230319AbjCUSpD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Mar 2023 14:45:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59970 "EHLO
+        id S229692AbjCUVuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Mar 2023 17:50:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbjCUSpD (ORCPT
+        with ESMTP id S229550AbjCUVue (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2023 14:45:03 -0400
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904B353DBD
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 11:45:02 -0700 (PDT)
-Received: by mail-pf1-f170.google.com with SMTP id fd25so9658399pfb.1
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 11:45:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679424302;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ERTv2GYmi0sNtPH4wp3GqmBDbXjned4PNdpvTVS2A8=;
-        b=g6JmZCK+VXOLfRWYivrbTXM+3FNsX4yvMGfi0GdgfaJUuSsdy+j0m6K3K9YDpQxGzU
-         13JA5vnDGUq08+JbYvcZ0GdxIM0hx3QgHluoWQ/1P//e4wCkxcoISFoLGxC1QRtEi789
-         yyaD4nJXlK7E3yq2KolMzbpuGaB4/sDcT8rOXp2jaPJURzVTxNOVvIWxq8aEkgN+pjlb
-         N3XB3d//Ucd9Cd8nJLuRGDbJSDusgUUQPt6SR58cpcGpw+vivIWX0i+Ou3QpflWsJEE8
-         QwPe/9/3z3ehLUvMaNWSWQrmuZTIHw/bgkY+L89wxk+UM/HTFWgJtC4R9mMrYc8Ftgyq
-         ePJQ==
-X-Gm-Message-State: AO0yUKVf5ws3hTzJ7bHLpBLAHbaxQpwFoE7LbbMJtVlgmWuHFGjnetbB
-        DjTJWz8RmF7ax0alJAB4x5U=
-X-Google-Smtp-Source: AK7set85or01B8FINuyEoZenoYGQw+bhREreKffa1/91/vXp4EcqdiLFLszU2ETqT+FcbQRiF9M3gA==
-X-Received: by 2002:a62:cf04:0:b0:628:635:1ade with SMTP id b4-20020a62cf04000000b0062806351ademr637774pfg.21.1679424301943;
-        Tue, 21 Mar 2023 11:45:01 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:ad26:bef0:6406:d659? ([2620:15c:211:201:ad26:bef0:6406:d659])
-        by smtp.gmail.com with ESMTPSA id b21-20020aa78115000000b005a7f8a326a3sm8594776pfi.50.2023.03.21.11.45.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Mar 2023 11:45:01 -0700 (PDT)
-Message-ID: <6596c17f-62cc-2f2b-1a25-0ec2b6ae230c@acm.org>
-Date:   Tue, 21 Mar 2023 11:44:59 -0700
+        Tue, 21 Mar 2023 17:50:34 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C323E32E54
+        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 14:50:33 -0700 (PDT)
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32LIOFLU005652
+        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 14:50:33 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=mjZsaOpwR1GRuAdQwudtlE6kfNLVwybwZDHdfenMzgQ=;
+ b=Xhstcz/ABMZzSnG5usdqCTZQ1Cno1yyZzWab4ENBgQ94IhOo8q773Pm2XHHoaApp3mtW
+ bf99xOevnFCloIY6H0RchFwmW3+PNsf4zXZVZhZDp+E5Au3ceka+c9QFI5Vn2sCn0kG/
+ LGa9jog7UMNJHF3AxysZoeWhMQprymjdp1oTSHUMb6hRDYtV+6/svY8ObbqHx2Mls3KE
+ Q8Bu7Quc+vsT+9FKxUK5b9WewT+oOdh1esK37CRmpRCap+e9oKeL/vRiAMyKqLuONmID
+ kS0ewr2rh2i56qEovRIW1Emm4q578/DEyMAavXakty+uRlndIWxB+tjXurRClZCoeIG0 zw== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3pfdx9uba4-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 14:50:33 -0700
+Received: from twshared7147.05.ash9.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:82::c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Tue, 21 Mar 2023 14:50:08 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 9C2DC141735C0; Tue, 21 Mar 2023 14:50:02 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+CC:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH] blk-mq: fix forward declaration for rdma mapping
+Date:   Tue, 21 Mar 2023 14:50:01 -0700
+Message-ID: <20230321215001.2655451-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v2 2/3] block: Split and submit bios in LBA order
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20230320234905.3832131-1-bvanassche@acm.org>
- <20230320234905.3832131-3-bvanassche@acm.org> <20230321060307.GB18078@lst.de>
- <20230321060530.GC18078@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230321060530.GC18078@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: 3_Wzra8ujGOm0pEn5ZO96RWrjnmc-L0W
+X-Proofpoint-ORIG-GUID: 3_Wzra8ujGOm0pEn5ZO96RWrjnmc-L0W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-21_11,2023-03-21_01,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/20/23 23:05, Christoph Hellwig wrote:
-> In fact I wonder how you managed to get into __bio_split_to_limits
-> wtih a NULL current->bio_list at all.
+From: Keith Busch <kbusch@kernel.org>
 
-Hi Christoph,
+blk_mq_rdma_map_queues() used to take a 'blk_mq_tag_set *' parameter,
+but was changed to 'blk_mq_queue_map *'. The forward declaration needs
+to be updated so .c files won't have to include headers in a specific
+order.
 
-This patch series is what I came up with after having observed an 
-UNALIGNED WRITE COMMAND response with a 5.15 kernel. In that kernel 
-version (but probably not in the latest upstream kernel) the device 
-mapper core submits split bios in the wrong order. I will check again 
-whether this patch is really necessary.
+Fixes: e42b3867de4bd5e ("blk-mq-rdma: pass in queue map to blk_mq_rdma_ma=
+p_queues")
+Cc: Sagi Grimberg <sagi@grimberg.me>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ include/linux/blk-mq-rdma.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
+diff --git a/include/linux/blk-mq-rdma.h b/include/linux/blk-mq-rdma.h
+index 53b58c610e767..d7ead42f1c6ad 100644
+--- a/include/linux/blk-mq-rdma.h
++++ b/include/linux/blk-mq-rdma.h
+@@ -2,7 +2,7 @@
+ #ifndef _LINUX_BLK_MQ_RDMA_H
+ #define _LINUX_BLK_MQ_RDMA_H
+=20
+-struct blk_mq_tag_set;
++struct blk_mq_queue_map;
+ struct ib_device;
+=20
+ void blk_mq_rdma_map_queues(struct blk_mq_queue_map *map,
+--=20
+2.34.1
 
-Bart.
