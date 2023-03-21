@@ -2,80 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 802CAC6FD1D
-	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 14:46:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6480CC74A5B
+	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 15:00:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229788AbjCUOq5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Mar 2023 10:46:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49920 "EHLO
+        id S231536AbjCUPAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Mar 2023 11:00:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229687AbjCUOq4 (ORCPT
+        with ESMTP id S231529AbjCUPAH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2023 10:46:56 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4B75FE6
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 07:46:55 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id c18so16244175ple.11
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 07:46:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679410014;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RQflYYDOt8iG2bWEoAisev99TFiRBpWXZ6Fp/SV5wo0=;
-        b=yXZrIexe5fYfEx4LG9glNcsO+7NajPQXf8qadK1smtmewsDWuLYLo9dvKbI9OPH/My
-         PfUXJx0Io/hoxS1dnq7/FKL1ZrJ1Eh/wbYxVlzesOFfH1owbosaBmUFOf3XNLk+h7L7x
-         dbHqKW+44RFfIOkJ+ofEY7ZO4D9ofh/j3Tyd3YD+T95ncB6gwp9zBug/4i7N1H+eVFbN
-         w4KWxNxAkcfRWnFOIUoQWtOtiwswhhgxGHS6Gv/L81HkmLcDNa6j8lIbMKxO/X8zTO3q
-         bqLs4TM3oGeSDClR2E9rfWWrNEXXXoQCKHTkTqEKYqM1rGHisXWY0izIPeVpL4hSF437
-         24YQ==
-X-Gm-Message-State: AO0yUKWHXiWLmJ/2GNgaygVnGfRDWVKY77fQk5aMDwy7QuMCMncWST+N
-        UqFnM0TrgCnAqmtXdlpSj4BI1mFXLpo=
-X-Google-Smtp-Source: AK7set/XZ7J7p9qsyUYQRv/c5BtpcT9E8owmQLNIxBLtADYygHDu2c+F+0tEDnKtT/9S6DzyyBplDg==
-X-Received: by 2002:a17:903:138e:b0:1a0:549d:39a1 with SMTP id jx14-20020a170903138e00b001a0549d39a1mr2553631plb.32.1679410014303;
-        Tue, 21 Mar 2023 07:46:54 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id ju10-20020a170903428a00b0019a83f2c99bsm8857065plb.28.2023.03.21.07.46.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Mar 2023 07:46:53 -0700 (PDT)
-Message-ID: <6325fba6-3dac-9391-28ef-177fcae9ad0a@acm.org>
-Date:   Tue, 21 Mar 2023 07:46:51 -0700
+        Tue, 21 Mar 2023 11:00:07 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F88D328;
+        Tue, 21 Mar 2023 08:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=m9bL0KOnysBAibLI8w6lm45Z5wnCZBOkn23yAA0iJvc=; b=dAQYw4k5ZrZRxlzfG+MNeaXDVQ
+        zgoyf0lkO9E+CSiKf9dSSdFYTL7H9n2ksIeg5/FSGnADOyiohhjCzoUv1C0s5SQEO3o6agYtof6iX
+        4xi4gcJdHzzPa4IT9cTQ67Ygn4/1UY0b1N9jxcdjbV7g9Dq3EtZxdiWUmhCQh/RMMN67tXLVFsSyk
+        EXjs2C0WOg9D5VImqqgGX46azDo7z1RYhPKZa+F1iSprF4ZAjvdQnpSwc8ilnojYZ3dOyyrdyxd9T
+        VW/s67Qi9X3YDKsVxUfQ8R32Dgh/SrUtiQT/KmSbTKXq5sNpoRfYvd5GaMWET66BArKMuDQ/HqWN5
+        bPKjmhQQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pedT1-00288y-DT; Tue, 21 Mar 2023 15:00:03 +0000
+Date:   Tue, 21 Mar 2023 15:00:03 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 1/5] brd: convert to folios
+Message-ID: <ZBnGc4WbBOlnRUgd@casper.infradead.org>
+References: <20230306120127.21375-1-hare@suse.de>
+ <20230306120127.21375-2-hare@suse.de>
+ <ZAYk5wOUaXAIouQ5@casper.infradead.org>
+ <76613838-fa4c-7f3e-3417-7a803fafc6c2@suse.de>
+ <ZAboHUp/YUkEs/D1@casper.infradead.org>
+ <a4489f7b-912c-e68f-4a4c-c14d96026bd6@suse.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v2 3/3] block: Preserve LBA order when requeuing
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20230320234905.3832131-1-bvanassche@acm.org>
- <20230320234905.3832131-4-bvanassche@acm.org> <20230321055802.GA18078@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230321055802.GA18078@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4489f7b-912c-e68f-4a4c-c14d96026bd6@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/20/23 22:58, Christoph Hellwig wrote:
-> On Mon, Mar 20, 2023 at 04:49:05PM -0700, Bart Van Assche wrote:
->> When requeuing a request to a zoned block device, preserve the LBA order
->> per zone.
+On Tue, Mar 07, 2023 at 09:14:27AM +0100, Hannes Reinecke wrote:
+> On 3/7/23 08:30, Matthew Wilcox wrote:
+> > On Tue, Mar 07, 2023 at 07:55:32AM +0100, Hannes Reinecke wrote:
+> > > On 3/6/23 18:37, Matthew Wilcox wrote:
+> > > > On Mon, Mar 06, 2023 at 01:01:23PM +0100, Hannes Reinecke wrote:
+> > > > > -	page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
+> > > > > -	if (!page)
+> > > > > +	folio = folio_alloc(gfp | __GFP_ZERO, 0);
+> > > > > +	if (!folio)
+> > > > 
+> > > > Did you drop HIGHMEM support on purpose?
+> > > 
+> > > No; I thought that folios would be doing that implicitely.
+> > > Will be re-adding.
+> > 
+> > We can't ... not all filesystems want to allocate every folio from
+> > HIGHMEM.  eg for superblocks, it often makes more sense to allocate the
+> > folio from lowmem than allocate it from highmem and keep it kmapped.
+> > The only GFP flag that folios force-set is __GFP_COMP because folios by
+> > definition are compound pages.
 > 
-> What causes this requeue?
+> Oh well.
+> 
+> However, when playing with the modified brd and setting the logical&physical
+> blocksize to 16k the whole thing crashes
+> (not unexpectedly).
+> It does crash, however, in block_read_full_folio(), which rather
+> surprisingly (at least for me) is using create_page_buffers();
+> I would have expected something like create_folio_buffers().
+> Is this work in progress or what is the plan here?
 
-Hi Christoph,
+Supporting folios > PAGE_SIZE in blockdev is definitely still WIP.
+I know of at least one bug, which is:
 
-Two examples of why the SCSI core can decide to requeue a command are a 
-retryable unit attention or ufshcd_queuecommand() returning 
-SCSI_MLQUEUE_HOST_BUSY. For example, ufshcd_queuecommand() returns 
-SCSI_MLQUEUE_HOST_BUSY while clock scaling is in progress (changing the 
-frequency of the link between host controller and UFS device).
+#define bh_offset(bh)           ((unsigned long)(bh)->b_data & ~PAGE_MASK)
 
-Thanks,
+That needs to be something like
 
-Bart.
+static size_t bh_offset(const struct buffer_head *bh)
+{
+	return (unsigned long)bh->b_data & (folio_size(bh->b_folio) - 1);
+}
+
+I haven't done a thorough scan for folio-size problems in the block
+layer; I've just been fixing up things as I notice them.
+
+Yes, create_page_buffers() should now be create_folio_buffers().  Just
+didn't get round to it yet.
