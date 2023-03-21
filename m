@@ -2,148 +2,335 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51632C6FD1D
-	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 01:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B99A1C6FD1C
+	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 02:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229927AbjCUBqm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Mar 2023 21:46:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58270 "EHLO
+        id S229627AbjCUCGV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Mar 2023 22:06:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjCUBql (ORCPT
+        with ESMTP id S229458AbjCUCGU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Mar 2023 21:46:41 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA0D2B292
-        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 18:46:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1679363199; x=1710899199;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=67MPh4PA74oDyONsWMMXlZyds267ChMqJ/afy8bb1jM=;
-  b=caEPwasZ2kUC2PESHsCwYKjP0tHAVrDfBA8DitVRj9G8FsJotFivk2qv
-   cpp+leQGyAXxEV9CUmhonkOmz86BL/EH83L2kV+UmMIoKutrsI/Ps0pmT
-   5arlaCH3YZi8GAZFwlGL9kqdyP3rucx2MKZurpB09BAqfAd9gTtihwZ7D
-   pYUIUYvTc+TcqaiVfa/9cfT48SQZK5hKpda7cFUIvC5/ubrq9XXf0/+dq
-   dNhGQly+6+RqU3Kj+Wc6njwQoyes2fwEE7uSD7kEQZ6zSkALE3E5zSlp4
-   WrOtzX7hp7tnRbe+S7hGPKPojWXuksfckXg6wfRNJLm2+C+N4cnXgUR/2
-   A==;
-X-IronPort-AV: E=Sophos;i="5.98,277,1673884800"; 
-   d="scan'208";a="231061581"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Mar 2023 09:46:34 +0800
-IronPort-SDR: qPihxVUvDK0DOv4NdqHxTWOFPq1JQz9nyncqCYTvS7xz/P6xlZOjaPNrl6EnOpMr09uR7cFFG/
- XoZCrhSAUNysjmwfRevb/ja2Zzspn1e83MRpAeiqhrnIW/ImtqkAzUEZnxRFXckKd7lY/RT2Fb
- CnZt8DC7veooiMkc5Wh66VMYaXK5qYg1OpLX/V1I3FEaz78z/0Y0OvUXLrAPH+jPcUfcUtSgH1
- W0T4ssoKEFX2POXJytoM/CWgcQmUflRjS7GWXCd9r39ciPruAqmnWhh21bWEeptmPVy3uY7/5F
- mVU=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Mar 2023 18:02:53 -0700
-IronPort-SDR: cHVUo//hhQkVkK7EyRKQ2lUVXHBuKpLVp0Y/wOS1j/XJ2Q801O8Frl9vadOLzzox58f4WX7OMX
- l4ihAaln19qQg1cWqFfCV8pQ2PcxQK51pE5luIREecUbPxQfWOCoUajxy/MMgx4mXnXCYzZV8I
- YVIAPMdGRgkXwO9IP1J9EDe62s6z/5Nmc0ki2Ilg8RYt8Fo0fiZsZKxOWOMPB1bOhFXNx0uoz6
- YhP6GwXkKmTvZsjy+wz7iF+/VBNKb1ReY3H8JulUi+rCsTh8pkFsCRDQ/WPY0XehmnKI6+f649
- z1Y=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Mar 2023 18:46:34 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PgZG15nWZz1RtVq
-        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 18:46:33 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1679363193; x=1681955194; bh=67MPh4PA74oDyONsWMMXlZyds267ChMqJ/a
-        fy8bb1jM=; b=oO7Eqj4JV2obV/9gu/uiVMupIKYmzq0oztiSf/6qkqcKDLkU1Ak
-        qULGa/9UelQDqtFklUheoZt5daw2itILgX0OVwRHaoYe1CH1NhWmRcz2oQHyNa2E
-        8PDHL/aPYZ/e3ESuRfaCu3cOxcYHogAaNr1yyxxWsqn/KIpfZ/xmu3k5hqUDuv7u
-        kx1EwVrlhpEQxJjtV3KFt/wI1ylBLwJhvb8u3ZUPxFBSyAe3POsi0SrCdEopFuue
-        kzsstw6PJm/OQwtepLzQ+fQJL3ROkWzQrIaSmIvKgpYpRjxjta06lmAmqJx0Bxam
-        6vH4t5IDJiQSBX6bdkcnsyOTJBC8WDvLZLw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 8DEt3qFgFPVm for <linux-block@vger.kernel.org>;
-        Mon, 20 Mar 2023 18:46:33 -0700 (PDT)
-Received: from [10.225.163.91] (unknown [10.225.163.91])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PgZFz5zXdz1RtVm;
-        Mon, 20 Mar 2023 18:46:31 -0700 (PDT)
-Message-ID: <a9347617-70b3-3cc1-ea5e-c6bd78c29acd@opensource.wdc.com>
-Date:   Tue, 21 Mar 2023 10:46:30 +0900
+        Mon, 20 Mar 2023 22:06:20 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B5D2ED5B
+        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 19:06:18 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id k2so14527920pll.8
+        for <linux-block@vger.kernel.org>; Mon, 20 Mar 2023 19:06:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1679364378; x=1681956378;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9tjN4opgTz6XoF+JL1uegrK/9eRhyvfFnPa8psKIoKo=;
+        b=DkBBXu0evQibHsMsKoAHV2L6dv1OAmyXMfyg9ww808USIEZdhgVoxxw7S35Cl3k+7M
+         +zWlOO6Ip2GMI+T7O3EwjXKvQ3YhF1ZQhLHGZ6KhP64/0d7Psg93Mbk5/Xz1t2FBMvXX
+         +pVOZawrqIp1BzhH3Hx3RE6dEBmFot7zdEyDSyI4MyvF3kRESeYdpbG/1JyknJND8+Fa
+         OwevDcaE2py1J5CfN3JDZOrZVIcCERL1jlWVfSroC8U2pJvD8EX+QH93ebZR1F49vhUO
+         Lx7fSE7JApJXPhQOIq0VA4iDiU4aD2qOE9jMinaBPKG8e+R9B0ETm93UYxpVWEbimoJl
+         bsMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679364378; x=1681956378;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9tjN4opgTz6XoF+JL1uegrK/9eRhyvfFnPa8psKIoKo=;
+        b=4IUw1Hgsvfu4PN7XxwMz1rBlfSRJN8ajeEq2u3XTJ7J61XQrFRxMnmb+oCnfhbaXvB
+         MROMok2gufmJCNt3txyhkpxS35EnucQ7lnqj9y44BgvyXEftCQTIb3NnR7SHyUgrBukm
+         haaLpKhLpc5Bp9QcFBqxxUwL2FeBSb4cj42vdhaD1yC0NwUg22yxfvZx1FVlh88ZPZO3
+         yt+/LRWlajvVmktlagMXC3cBhitnOtOt0UC7tviwrj+gedyDuljctbY4y7ww804oPgtl
+         SdIfcHMMB15wI1Sk737Nl/NE1KUCmLB7dhtvBuCFUh4IldQz7Tfjvm2VdL/e8ViG1ZZS
+         WSsQ==
+X-Gm-Message-State: AO0yUKXuKq8AE5cFdeiPaMtAErL5dqVWHaZZ8Q41uRwc97gL2EfJIVUq
+        xOr3OzDyEFOXR/5kBv5QgfJhbSrligrsaUjazV+htQ==
+X-Google-Smtp-Source: AK7set8rVnrTbdzwQpN9KZruPpbq2k73mFdK+7t61gkEE9OmZxeppFIJDesv/8Kj4HYHOJIbAHrciQ==
+X-Received: by 2002:a05:6a20:6914:b0:cd:2c0a:6ec0 with SMTP id q20-20020a056a20691400b000cd2c0a6ec0mr522783pzj.3.1679364378062;
+        Mon, 20 Mar 2023 19:06:18 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 3-20020aa79143000000b0059261bd5bacsm6904365pfi.202.2023.03.20.19.06.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Mar 2023 19:06:17 -0700 (PDT)
+Message-ID: <c56fc63e-7e6b-480e-dfdc-417b00802f11@kernel.dk>
+Date:   Mon, 20 Mar 2023 20:06:16 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20230317195938.1745318-1-bvanassche@acm.org>
- <20230317195938.1745318-3-bvanassche@acm.org>
- <ZBT6EmhEfJmgRXU1@ovpn-8-18.pek2.redhat.com>
- <580e712c-5e43-e1a5-277b-c4e8c50485f0@acm.org>
- <ZBjsDy2pfPk9t6qB@ovpn-8-29.pek2.redhat.com>
- <50dfa89c-19fa-b655-f6b8-b8853b066c75@acm.org>
- <ZBj99Oy5FPDI+Gdn@ovpn-8-18.pek2.redhat.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <ZBj99Oy5FPDI+Gdn@ovpn-8-18.pek2.redhat.com>
+To:     io-uring <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block/io_uring: pass in issue_flags for uring_cmd task_work
+ handling
+Cc:     Ming Lei <ming.lei@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/21/23 09:44, Ming Lei wrote:
-> On Mon, Mar 20, 2023 at 04:32:57PM -0700, Bart Van Assche wrote:
->> On 3/20/23 16:28, Ming Lei wrote:
->>> On Fri, Mar 17, 2023 at 04:45:46PM -0700, Bart Van Assche wrote:
->>>> Thanks for having taken a look. This patch series is intended for
->>>> REQ_OP_WRITE requests and not for REQ_OP_ZONE_APPEND requests.
->>>
->>> But you are talking about host-managed zoned device, and the write
->>> should have to be zone append, right?
->>
->> Hi Ming,
->>
->> The use case I'm looking at is Android devices with UFS storage. UFS is
->> based on SCSI and hence only REQ_OP_WRITE is supported natively. There is a
->> REQ_OP_ZONE_APPEND emulation in drivers/scsi/sd_zbc.c but it restricts the
->> queue depth to one.
-> 
-> But is this UFS one host-managed zoned device? If yes, this "REQ_OP_WRITE"
-> still should have been handled as REQ_OP_ZONE_APPEND? Otherwise, I don't
-> think it is host-managed, and your patch isn't needed too.
+io_uring_cmd_done() currently assumes that the uring_lock is held
+when invoked, and while it generally is, this is not guaranteed.
+Pass in the issue_flags associated with it, so that we have
+IO_URING_F_UNLOCKED available to be able to lock the CQ ring
+appropriately when completing events.
 
-Ming,
+Cc: stable@vger.kernel.org
+Fixes: ee692a21e9bf ("fs,io_uring: add infrastructure for uring-cmd")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Both regular writes and zone append writes are supported by host managed
-devices. For ZNS, zone append write is natively supported as a different
-command. For SCSI & ATA (and UFS) devices, zone append write is emulated in the
-sd driver using the regular write command because the SCSI and ATA standards do
-not define a zone append write command.
+---
 
-For BIO splitting, splitting a regular write is fine as the resulting fragments
-are sequential writes, so all fine. But zone append splitting is not allowed as
-the actual written sector is returned by the device (or the sd emulation) to the
-block layer through the bio iter sector. So if a zone append is split and its
-fragments reordered, we can end up with a the wrong written sector and mangled
-data when considering the original large bio that was split.
-
-> 
-> 
-> Thanks,
-> Ming
-> 
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index fb5a557afde8..c73cc57ec547 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -715,7 +715,8 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
+ 	}
+ }
+ 
+-static void ubq_complete_io_cmd(struct ublk_io *io, int res)
++static void ubq_complete_io_cmd(struct ublk_io *io, int res,
++				unsigned issue_flags)
+ {
+ 	/* mark this cmd owned by ublksrv */
+ 	io->flags |= UBLK_IO_FLAG_OWNED_BY_SRV;
+@@ -727,7 +728,7 @@ static void ubq_complete_io_cmd(struct ublk_io *io, int res)
+ 	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
+ 
+ 	/* tell ublksrv one io request is coming */
+-	io_uring_cmd_done(io->cmd, res, 0);
++	io_uring_cmd_done(io->cmd, res, 0, issue_flags);
+ }
+ 
+ #define UBLK_REQUEUE_DELAY_MS	3
+@@ -744,7 +745,8 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+ 	mod_delayed_work(system_wq, &ubq->dev->monitor_work, 0);
+ }
+ 
+-static inline void __ublk_rq_task_work(struct request *req)
++static inline void __ublk_rq_task_work(struct request *req,
++				       unsigned issue_flags)
+ {
+ 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
+ 	int tag = req->tag;
+@@ -782,7 +784,7 @@ static inline void __ublk_rq_task_work(struct request *req)
+ 			pr_devel("%s: need get data. op %d, qid %d tag %d io_flags %x\n",
+ 					__func__, io->cmd->cmd_op, ubq->q_id,
+ 					req->tag, io->flags);
+-			ubq_complete_io_cmd(io, UBLK_IO_RES_NEED_GET_DATA);
++			ubq_complete_io_cmd(io, UBLK_IO_RES_NEED_GET_DATA, issue_flags);
+ 			return;
+ 		}
+ 		/*
+@@ -820,17 +822,18 @@ static inline void __ublk_rq_task_work(struct request *req)
+ 			mapped_bytes >> 9;
+ 	}
+ 
+-	ubq_complete_io_cmd(io, UBLK_IO_RES_OK);
++	ubq_complete_io_cmd(io, UBLK_IO_RES_OK, issue_flags);
+ }
+ 
+-static inline void ublk_forward_io_cmds(struct ublk_queue *ubq)
++static inline void ublk_forward_io_cmds(struct ublk_queue *ubq,
++					unsigned issue_flags)
+ {
+ 	struct llist_node *io_cmds = llist_del_all(&ubq->io_cmds);
+ 	struct ublk_rq_data *data, *tmp;
+ 
+ 	io_cmds = llist_reverse_order(io_cmds);
+ 	llist_for_each_entry_safe(data, tmp, io_cmds, node)
+-		__ublk_rq_task_work(blk_mq_rq_from_pdu(data));
++		__ublk_rq_task_work(blk_mq_rq_from_pdu(data), issue_flags);
+ }
+ 
+ static inline void ublk_abort_io_cmds(struct ublk_queue *ubq)
+@@ -842,12 +845,12 @@ static inline void ublk_abort_io_cmds(struct ublk_queue *ubq)
+ 		__ublk_abort_rq(ubq, blk_mq_rq_from_pdu(data));
+ }
+ 
+-static void ublk_rq_task_work_cb(struct io_uring_cmd *cmd)
++static void ublk_rq_task_work_cb(struct io_uring_cmd *cmd, unsigned issue_flags)
+ {
+ 	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
+ 	struct ublk_queue *ubq = pdu->ubq;
+ 
+-	ublk_forward_io_cmds(ubq);
++	ublk_forward_io_cmds(ubq, issue_flags);
+ }
+ 
+ static void ublk_rq_task_work_fn(struct callback_head *work)
+@@ -856,8 +859,9 @@ static void ublk_rq_task_work_fn(struct callback_head *work)
+ 			struct ublk_rq_data, work);
+ 	struct request *req = blk_mq_rq_from_pdu(data);
+ 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
++	unsigned issue_flags = IO_URING_F_UNLOCKED;
+ 
+-	ublk_forward_io_cmds(ubq);
++	ublk_forward_io_cmds(ubq, issue_flags);
+ }
+ 
+ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
+@@ -1111,7 +1115,8 @@ static void ublk_cancel_queue(struct ublk_queue *ubq)
+ 		struct ublk_io *io = &ubq->ios[i];
+ 
+ 		if (io->flags & UBLK_IO_FLAG_ACTIVE)
+-			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0);
++			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0,
++						IO_URING_F_UNLOCKED);
+ 	}
+ 
+ 	/* all io commands are canceled */
+@@ -1351,7 +1356,7 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 	return -EIOCBQUEUED;
+ 
+  out:
+-	io_uring_cmd_done(cmd, ret, 0);
++	io_uring_cmd_done(cmd, ret, 0, issue_flags);
+ 	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
+ 			__func__, cmd_op, tag, ret, io->flags);
+ 	return -EIOCBQUEUED;
+@@ -2234,7 +2239,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 	if (ub)
+ 		ublk_put_device(ub);
+  out:
+-	io_uring_cmd_done(cmd, ret, 0);
++	io_uring_cmd_done(cmd, ret, 0, issue_flags);
+ 	pr_devel("%s: cmd done ret %d cmd_op %x, dev id %d qid %d\n",
+ 			__func__, ret, cmd->cmd_op, header->dev_id, header->queue_id);
+ 	return -EIOCBQUEUED;
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index 723e7d5b778f..d24ea2e05156 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -464,7 +464,8 @@ static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
+ 	return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
+ }
+ 
+-static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd)
++static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd,
++				    unsigned issue_flags)
+ {
+ 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+ 	struct request *req = pdu->req;
+@@ -485,17 +486,18 @@ static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd)
+ 		blk_rq_unmap_user(req->bio);
+ 	blk_mq_free_request(req);
+ 
+-	io_uring_cmd_done(ioucmd, status, result);
++	io_uring_cmd_done(ioucmd, status, result, issue_flags);
+ }
+ 
+-static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
++static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd,
++			       unsigned issue_flags)
+ {
+ 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+ 
+ 	if (pdu->bio)
+ 		blk_rq_unmap_user(pdu->bio);
+ 
+-	io_uring_cmd_done(ioucmd, pdu->nvme_status, pdu->u.result);
++	io_uring_cmd_done(ioucmd, pdu->nvme_status, pdu->u.result, issue_flags);
+ }
+ 
+ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+@@ -517,7 +519,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+ 	 * Otherwise, move the completion to task work.
+ 	 */
+ 	if (cookie != NULL && blk_rq_is_poll(req))
+-		nvme_uring_task_cb(ioucmd);
++		nvme_uring_task_cb(ioucmd, IO_URING_F_UNLOCKED);
+ 	else
+ 		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
+ 
+@@ -539,7 +541,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
+ 	 * Otherwise, move the completion to task work.
+ 	 */
+ 	if (cookie != NULL && blk_rq_is_poll(req))
+-		nvme_uring_task_meta_cb(ioucmd);
++		nvme_uring_task_meta_cb(ioucmd, IO_URING_F_UNLOCKED);
+ 	else
+ 		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
+ 
+diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+index 934e5dd4ccc0..35b9328ca335 100644
+--- a/include/linux/io_uring.h
++++ b/include/linux/io_uring.h
+@@ -27,7 +27,7 @@ struct io_uring_cmd {
+ 	const void	*cmd;
+ 	union {
+ 		/* callback to defer completions to task context */
+-		void (*task_work_cb)(struct io_uring_cmd *cmd);
++		void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
+ 		/* used for polled completion */
+ 		void *cookie;
+ 	};
+@@ -39,9 +39,10 @@ struct io_uring_cmd {
+ #if defined(CONFIG_IO_URING)
+ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+ 			      struct iov_iter *iter, void *ioucmd);
+-void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2);
++void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2,
++			unsigned issue_flags);
+ void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *));
++			void (*task_work_cb)(struct io_uring_cmd *, unsigned));
+ struct sock *io_uring_get_socket(struct file *file);
+ void __io_uring_cancel(bool cancel_all);
+ void __io_uring_free(struct task_struct *tsk);
+@@ -72,11 +73,11 @@ static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+ 	return -EOPNOTSUPP;
+ }
+ static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+-		ssize_t ret2)
++		ssize_t ret2, unsigned issue_flags)
+ {
+ }
+ static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *))
++			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+ {
+ }
+ static inline struct sock *io_uring_get_socket(struct file *file)
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index 446a189b78b0..e535e8db01e3 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -15,12 +15,13 @@
+ static void io_uring_cmd_work(struct io_kiocb *req, bool *locked)
+ {
+ 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
++	unsigned issue_flags = *locked ? 0 : IO_URING_F_UNLOCKED;
+ 
+-	ioucmd->task_work_cb(ioucmd);
++	ioucmd->task_work_cb(ioucmd, issue_flags);
+ }
+ 
+ void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+-			void (*task_work_cb)(struct io_uring_cmd *))
++			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+ {
+ 	struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
+ 
+@@ -42,7 +43,8 @@ static inline void io_req_set_cqe32_extra(struct io_kiocb *req,
+  * Called by consumers of io_uring_cmd, if they originally returned
+  * -EIOCBQUEUED upon receiving the command.
+  */
+-void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2)
++void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2,
++		       unsigned issue_flags)
+ {
+ 	struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
+ 
+@@ -56,7 +58,7 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2)
+ 		/* order with io_iopoll_req_issued() checking ->iopoll_complete */
+ 		smp_store_release(&req->iopoll_completed, 1);
+ 	else
+-		io_req_complete_post(req, 0);
++		io_req_complete_post(req, issue_flags);
+ }
+ EXPORT_SYMBOL_GPL(io_uring_cmd_done);
+ 
 -- 
-Damien Le Moal
-Western Digital Research
+Jens Axboe
 
