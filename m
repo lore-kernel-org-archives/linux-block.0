@@ -2,141 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04564C74A5B
-	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 15:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE07C74A5B
+	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 15:58:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231472AbjCUP0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Mar 2023 11:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53060 "EHLO
+        id S229635AbjCUP6N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Mar 2023 11:58:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231350AbjCUP0g (ORCPT
+        with ESMTP id S230380AbjCUP6M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2023 11:26:36 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E9624FCC1;
-        Tue, 21 Mar 2023 08:26:29 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 06D9A201A2;
-        Tue, 21 Mar 2023 15:26:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1679412387; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Tue, 21 Mar 2023 11:58:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5DBA4E5D0
+        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 08:57:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679414230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fHCbxvEjKOCYot1TTU/89XdN70pMiGLRyCU4Q3dVZWM=;
-        b=BqM2UZjmV8ztE6hEHNUxaqezY8+lLRir4PU85eB4qM5Y/TUYY2Yqir8fVHhaUCmOEEEy9W
-        CKpCu6RRvUknfCahvnkNJlKbnWxZhYBpgaCuOkEMV++tgnfWPPMVSqyqFHBoeK59P1z71L
-        6jJ0t/citRikS93ERyilEzC4AYqwjOU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1679412387;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fHCbxvEjKOCYot1TTU/89XdN70pMiGLRyCU4Q3dVZWM=;
-        b=kh4QJnPp6A9z1s/gk+Je+Xxosy5KRUVMUm0VW6U7uzbHD+HZeeMv0Ob6U4C/5Mc5XletR+
-        PG+uzlQE9zmvrcAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=DN59pp+C6hDNz15tX2qpijzkgX68iyvX6ziKjshgX7I=;
+        b=HWCs8mNYo6wuiiWezwED/1dWN383GMVTWHBBvTK2R/ttYnVq+XyC8QdCM2yd7b4lhPbtNJ
+        z4JDnfp1BpPNe7a7fw53zWi/0t3Ta94p3oNU3F8kYvDWfC/l1B+M/wZ2bjzP0U3QxbWH5T
+        8dpps+quFjNSWYo7hUQFa96UD8vBTtQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-224-hQEJgpWcPOyn5NJcx6wZzA-1; Tue, 21 Mar 2023 11:57:05 -0400
+X-MC-Unique: hQEJgpWcPOyn5NJcx6wZzA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E4A9113440;
-        Tue, 21 Mar 2023 15:26:26 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id DQ0UN6LMGWRrWAAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 21 Mar 2023 15:26:26 +0000
-Message-ID: <0e54cc51-e667-b343-74b0-4989e28d8982@suse.de>
-Date:   Tue, 21 Mar 2023 16:26:26 +0100
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4E305857FB5;
+        Tue, 21 Mar 2023 15:57:04 +0000 (UTC)
+Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A617E140E960;
+        Tue, 21 Mar 2023 15:56:50 +0000 (UTC)
+Date:   Tue, 21 Mar 2023 23:56:41 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
+Message-ID: <ZBnTuX+5D8QeLPuQ@ovpn-8-18.pek2.redhat.com>
+References: <20230314125727.1731233-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH 1/5] brd: convert to folios
-Content-Language: en-US
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-References: <20230306120127.21375-1-hare@suse.de>
- <20230306120127.21375-2-hare@suse.de> <ZAYk5wOUaXAIouQ5@casper.infradead.org>
- <76613838-fa4c-7f3e-3417-7a803fafc6c2@suse.de>
- <ZAboHUp/YUkEs/D1@casper.infradead.org>
- <a4489f7b-912c-e68f-4a4c-c14d96026bd6@suse.de>
- <ZBnGc4WbBOlnRUgd@casper.infradead.org>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ZBnGc4WbBOlnRUgd@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230314125727.1731233-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/21/23 16:00, Matthew Wilcox wrote:
-> On Tue, Mar 07, 2023 at 09:14:27AM +0100, Hannes Reinecke wrote:
->> On 3/7/23 08:30, Matthew Wilcox wrote:
->>> On Tue, Mar 07, 2023 at 07:55:32AM +0100, Hannes Reinecke wrote:
->>>> On 3/6/23 18:37, Matthew Wilcox wrote:
->>>>> On Mon, Mar 06, 2023 at 01:01:23PM +0100, Hannes Reinecke wrote:
->>>>>> -	page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
->>>>>> -	if (!page)
->>>>>> +	folio = folio_alloc(gfp | __GFP_ZERO, 0);
->>>>>> +	if (!folio)
->>>>>
->>>>> Did you drop HIGHMEM support on purpose?
->>>>
->>>> No; I thought that folios would be doing that implicitely.
->>>> Will be re-adding.
->>>
->>> We can't ... not all filesystems want to allocate every folio from
->>> HIGHMEM.  eg for superblocks, it often makes more sense to allocate the
->>> folio from lowmem than allocate it from highmem and keep it kmapped.
->>> The only GFP flag that folios force-set is __GFP_COMP because folios by
->>> definition are compound pages.
->>
->> Oh well.
->>
->> However, when playing with the modified brd and setting the logical&physical
->> blocksize to 16k the whole thing crashes
->> (not unexpectedly).
->> It does crash, however, in block_read_full_folio(), which rather
->> surprisingly (at least for me) is using create_page_buffers();
->> I would have expected something like create_folio_buffers().
->> Is this work in progress or what is the plan here?
+On Tue, Mar 14, 2023 at 08:57:11PM +0800, Ming Lei wrote:
+> Hello,
 > 
-> Supporting folios > PAGE_SIZE in blockdev is definitely still WIP.
-> I know of at least one bug, which is:
+> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+> and its ->issue() can retrieve/import buffer from master request's
+> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+> submits slave OP just like normal OP issued from userspace, that said,
+> SQE order is kept, and batching handling is done too.
 > 
-> #define bh_offset(bh)           ((unsigned long)(bh)->b_data & ~PAGE_MASK)
+> Please see detailed design in commit log of the 2th patch, and one big
+> point is how to handle buffer ownership.
 > 
-> That needs to be something like
+> With this way, it is easy to support zero copy for ublk/fuse device.
 > 
-> static size_t bh_offset(const struct buffer_head *bh)
-> {
-> 	return (unsigned long)bh->b_data & (folio_size(bh->b_folio) - 1);
-> }
+> Basically userspace can specify any sub-buffer of the ublk block request
+> buffer from the fused command just by setting 'offset/len'
+> in the slave SQE for running slave OP. This way is flexible to implement
+> io mapping: mirror, stripped, ...
 > 
-> I haven't done a thorough scan for folio-size problems in the block
-> layer; I've just been fixing up things as I notice them.
+> The 3th & 4th patches enable fused slave support for the following OPs:
 > 
-And not to mention the various instances of (PAGE_SHIFT - blkbits)
-which will get happily into negative numbers for large block sizes,
-resulting in interesting effects for a shift left operation ...
+> 	OP_READ/OP_WRITE
+> 	OP_SEND/OP_RECV/OP_SEND_ZC
+> 
+> The other ublk patches cleans ublk driver and implement fused command
+> for supporting zero copy.
+> 
+> Follows userspace code:
+> 
+> https://github.com/ming1/ubdsrv/tree/fused-cmd-zc-v2
+> 
+> All three(loop, nbd and qcow2) ublk targets have supported zero copy by passing:
+> 
+> 	ublk add -t [loop|nbd|qcow2] -z .... 
+> 
+> Basic fs mount/kernel building and builtin test are done, and also not
+> observe regression on xfstest test over ublk-loop with zero copy.
+> 
+> Also add liburing test case for covering fused command based on miniublk
+> of blktest:
+> 
+> https://github.com/ming1/liburing/commits/fused_cmd_miniublk
+> 
+> Performance improvement is obvious on memory bandwidth
+> related workloads, such as, 1~2X improvement on 64K/512K BS
+> IO test on loop with ramfs backing file.
+> 
+> Any comments are welcome!
+> 
+> V3:
+> 	- fix build warning reported by kernel test robot
+> 	- drop patch for checking fused flags on existed drivers with
+> 	  ->uring_command(), which isn't necessary, since we do not do that
+>       when adding new ioctl or uring command
+>     - inline io_init_rq() for core code, so just export io_init_slave_req
+> 	- return result of failed slave request unconditionally since REQ_F_CQE_SKIP
+> 	will be cleared
+> 	- pass xfstest over ublk-loop
 
-> Yes, create_page_buffers() should now be create_folio_buffers().  Just
-> didn't get round to it yet.
+BTW, I just wrote one ublk zero copy document, which describes technical requirement
+for this feature, and explains why splice isn't good and how fused command solves it,
+feel free to refer to it when working on candidate approach.
 
-Ah, so I was on the right track after all.
+https://github.com/ming1/linux/blob/my_v6.3-io_uring_fuse_cmd_v4/Documentation/block/ublk.rst#zero-copy
 
-But I was wondering ... couldn't we use the physical block size as a 
-hint on how many pages to allocate?
-With that we can work on updating the stack even with existing hardware, 
-and we wouldn't crash immediately if we miss the odd conversion ...
+Which will be included in V4.
 
-Hmm?
 
-Cheers,
-
-Hannes
+Thanks, 
+Ming
 
