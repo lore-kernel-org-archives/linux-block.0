@@ -2,79 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F2ABC6FD1D
-	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 13:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA735C74A5B
+	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 14:00:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231305AbjCUNxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Mar 2023 09:53:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51398 "EHLO
+        id S230446AbjCUOAP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Mar 2023 10:00:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231322AbjCUNxk (ORCPT
+        with ESMTP id S231221AbjCUOAO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2023 09:53:40 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3AB4FA94;
-        Tue, 21 Mar 2023 06:53:18 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id r11so59980843edd.5;
-        Tue, 21 Mar 2023 06:53:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679406796;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8W6ejF7gmj1PXpTdZI2xA9f/8wOpeSmMndaGTr9oNFw=;
-        b=hUoV97dpkPfmUSFYW4vwoWzUklDsHrRtC38eT2rA4UxLiATRCd9kZdBJfSJ0lvrqio
-         hWtKOo3saKK9qyyGKbUJftte/nNlb0bdYnjc51Osghwez7Y4vkGQojC5nlV2pGMhqt+2
-         Ghj29IM7cx22VrkFksNf1zyDVVgPEY/EpK59lfqko2VsKkQhXNyNlwL/i0LKXtYaxvfe
-         I1OexL8I7Vuv7G8u9YNkZ2TSv1kfEnOVFqJbNNBuGvnfSBJ01JaXjGNSmEu+6i0vbufI
-         8wvVYRv4n3R1DuRtGudFKpS4BXygCifbi1j/DTr2YGK5hXKs3dWjtyBq6jpyJvVc86kJ
-         1dpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679406796;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8W6ejF7gmj1PXpTdZI2xA9f/8wOpeSmMndaGTr9oNFw=;
-        b=a9Hcb0YFLg/QWQzVcYvSgBNK6rrWNQTvwrnk3MRHKpzLFZCrevYNIbj4hVyMY3Z5kA
-         sndFNc7wzMvQ6XPgkkYuDJWQIZ8p2E3VaHrG1pAbfiw/FjeKPyy/DlciNZ2lmtSyGUdk
-         itrhLdoyY6tRehhRMVBE4u8tD+h+ZYKaAw4pYOXrxWBLoZU9rBJLxDRxFV7aNZOlMPRR
-         X3zjUBGHgkmbv5vRGej9tUz798EiwLi2ic54PMVbVqRsZS50OKjYlXZV374QQKoOG57X
-         m9/Jjl+dvDcW4nK/OiG9Uhlm9ltzJKS7s2VagU7ACBJy0eNpX0JKNPUsgMx4jRUFi74c
-         KMDA==
-X-Gm-Message-State: AO0yUKXSS1Q0CalB2N4jr7PlsY+M/B29PmrcjXGCc/kGfRUyCZ/32i9v
-        6Y082FMjaH3t1Xai7h6w/GkV5fp1aqCijBVnh9Pfmn9X9U3KOg==
-X-Google-Smtp-Source: AK7set/s5RxMFyLJ3g71CZ2H3wSgUc+1I0vaYBez5Vxx/7wCI9wP3s5ElkFf/xSD0ekVeCy826N1b1k+nOXGwbH0HWE=
-X-Received: by 2002:a50:ce45:0:b0:4fb:80cf:898b with SMTP id
- k5-20020a50ce45000000b004fb80cf898bmr1595691edj.7.1679406796401; Tue, 21 Mar
- 2023 06:53:16 -0700 (PDT)
+        Tue, 21 Mar 2023 10:00:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D534FB442
+        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 06:59:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679407149;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=g424voK5fQvBZkp82ZC/xQcTlf9Zd9Qmzk9MdruItK8=;
+        b=OnhIZU3UNgIQ9vBUDc4HRr8eRqt27BDibLO05SM9EAaBFUYGyp42DVDQK6IXleUhXCt08m
+        VD44PGLj6JqT2oJwxVFBQqDa4eAWyfpBSYJlGOJgMxXeLOgm4AiFIAUsozMEcGSIobkYQb
+        QSJ+b1yXBpghIQxxJc/jYgyTaY0D7ss=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-8-mhkTREkhMBaZkgUqgtF8kw-1; Tue, 21 Mar 2023 09:59:03 -0400
+X-MC-Unique: mhkTREkhMBaZkgUqgtF8kw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF41B100DEB6;
+        Tue, 21 Mar 2023 13:59:02 +0000 (UTC)
+Received: from redhat.com (unknown [10.2.16.148])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E2D5C40C83A9;
+        Tue, 21 Mar 2023 13:59:01 +0000 (UTC)
+Date:   Tue, 21 Mar 2023 08:59:00 -0500
+From:   Eric Blake <eblake@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+        corbet@lwn.net, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] block nbd: send handle in network order
+Message-ID: <20230321135900.ni4w5ichvjba7s4u@redhat.com>
+References: <20230317202749.419094-1-eblake@redhat.com>
+ <20230317202749.419094-3-eblake@redhat.com>
+ <ZBjqQckL7d5EJPlh@ovpn-8-29.pek2.redhat.com>
 MIME-Version: 1.0
-From:   lacsaP Patatetom <patatetom@gmail.com>
-Date:   Tue, 21 Mar 2023 14:52:54 +0100
-Message-ID: <CAGhAadc4tfjpB1UJ2WkUVLSkvbsShi+Ek6XUGL=0NbTU9tsGAQ@mail.gmail.com>
-Subject: RO device/partition "tampered" by LVM
-To:     linux-block@vger.kernel.org
-Cc:     linux-raid@vger.kernel.org, dm-devel@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZBjqQckL7d5EJPlh@ovpn-8-29.pek2.redhat.com>
+User-Agent: NeoMutt/20220429
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hello developers,
+On Tue, Mar 21, 2023 at 07:20:33AM +0800, Ming Lei wrote:
+> On Fri, Mar 17, 2023 at 03:27:46PM -0500, Eric Blake wrote:
+> > The NBD spec says the client handle (or cookie) is opaque on the
+> > server, and therefore it really doesn't matter what endianness we use;
+> > to date, the use of memcpy() between u64 and a char[8] has exposed
+> > native endianness when treating the handle as a 64-bit number.
+> 
+> No, memcpy() works fine for char[8], which doesn't break endianness.
 
-until recently, I used to modify the `bio_check_ro` function of the
-`block/blk-core.c` file to prevent LVM from altering read-only
-partitions.
+I didn't say memcpy() breaks endianness, I said it preserves it.  By
+using memcpy(), you are exposing native endianness over the wire.
+Thus, even though a server should not be making any decisions based on
+the content of the handle (it is an opaque value handed back to the
+client unchanged), the current kernel client code DOES leak through
+information about whether the client is big- or little-endian; in
+contrast to the NBD protocol saying that ALL data is
+network-byte-order.
 
-is it possible to get this behavior back after the many changes
-applied to the `block/blk-core.c` file and especially to the
-`bio_check_ro` function ?
-if yes, can you tell me how to do it ?
-otherwise, would retrograde only the `block/blk-core.c` file in a
-previous version work ?
+> 
+> > However, since NBD protocol documents that everything else is in
+> > network order, and tools like Wireshark will dump even the contents of
+> > the handle as seen over the network, it's worth using a consistent
+> > ordering regardless of the native endianness.
+> > 
+> > Plus, using a consistent endianness now allows an upcoming patch to
+> > simplify this to directly use integer assignment instead of memcpy().
+> 
+> It isn't necessary, given ->handle is actually u64, which is handled by
+> nbd client only.
 
-here is a GitHub page that details what I said :
-https://github.com/patatetom/lvm-on-readonly-block-device .
+No, re-read the whole series.  ->handle is actually char[8].  Later in
+the series adds ->cookie as __be64 as an alias to ->handle, precisely
+so that we are converting the u64 'handle' in kernel code into a
+big-endian value on the wire, regardless of the host type, and making
+it impossible for a server to inspect the wire data and learn the
+kernel's endianness.
 
-on this subject, do you know of any other technologies such as LVM
-that would alter a disk or partition marked as read-only, which would
-ignore the administrator's wish ?
+> 
+> > 
+> > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > 
+> > ---
+> > v2: new patch
+> > ---
+> >  drivers/block/nbd.c | 10 +++++++---
+> >  1 file changed, 7 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index 592cfa8b765a..8a9487e79f1c 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -560,6 +560,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+> >  	unsigned long size = blk_rq_bytes(req);
+> >  	struct bio *bio;
+> >  	u64 handle;
+> > +	__be64 tmp;
+> >  	u32 type;
+> >  	u32 nbd_cmd_flags = 0;
+> >  	int sent = nsock->sent, skip = 0;
+> > @@ -606,7 +607,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+> >  		request.len = htonl(size);
+> >  	}
+> >  	handle = nbd_cmd_handle(cmd);
+> > -	memcpy(request.handle, &handle, sizeof(handle));
+> > +	tmp = cpu_to_be64(handle);
+> > +	memcpy(request.handle, &tmp, sizeof(tmp));
+> 
+> This way copies handle two times, really not fun.
 
-regards, lacsaP.
+Indeed.  And as mentioned in the commit message, it is temporary; the
+second copy goes away later in the series once we can use direct
+integer assignment.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
