@@ -2,102 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC023C74A5B
-	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 11:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD101C76195
+	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 12:37:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbjCULoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Mar 2023 07:44:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44530 "EHLO
+        id S230523AbjCUMhi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Mar 2023 08:37:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbjCULop (ORCPT
+        with ESMTP id S229473AbjCUMhe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2023 07:44:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 171973802F
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 04:44:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679399041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ip0ypPWj0y6T3kRIH9Tya2rrM/dKmttRsWWLGVarwIU=;
-        b=TLJLimf1KXPkh81bTaQltMx2kUo60lPvXbj+WVhjqFFaFmUMUA51gYWpRXli3vyJfcS1Ps
-        Q9uNyCLbP8fFMQEjCI6BLzs/9zts/ZTpACJ8YM+mGkMrLfg2aRC/oSle4NebNtzAv5egvP
-        fTlb7kBKy9LPkxRDRLu9f2W0cb7yXwA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-106-zDzNZeAJNaCSu7nOK5F_fQ-1; Tue, 21 Mar 2023 07:43:59 -0400
-X-MC-Unique: zDzNZeAJNaCSu7nOK5F_fQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 156C529AB3EA;
-        Tue, 21 Mar 2023 11:43:59 +0000 (UTC)
-Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ACA531121314;
-        Tue, 21 Mar 2023 11:43:51 +0000 (UTC)
-Date:   Tue, 21 Mar 2023 19:43:46 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     jack@suse.cz, hare@suse.de, hch@infradead.org, axboe@kernel.dk,
+        Tue, 21 Mar 2023 08:37:34 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C46FB4346F;
+        Tue, 21 Mar 2023 05:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=EKPzzBQ3FvBycDuqBFuN9h8/3as7Wm8d7ysB+f2krm4=; b=nvjbX0z/nmnuQ6KwN3CNm8WoLu
+        oyEVoMHPWDfIbLBsKuQBad4rZOOiRoj5uThoiY3ks5tCiIvftymvBulFkhxEeNft/MYn6IUmgQzTX
+        xlWmqmGKYRdKZlKb/eP5Qupv1MBzXbv2T3mStJjk2S8lbDPiTtF5XVVPyLSxVGxUBHBsc+AeiNFyh
+        pkrDNXbSNnzs4NeGGEdoBYxtdFWKiW9vRbGijsMbUyoNFz+Mw0BaTLocTU7JlVRj+1NbTg/zTSIRm
+        Ts2x53hXcC+N11eHg7QYP8n945U6vZPrlZgqMjPrGyIJQj6eLTRMTWadfHu3OlFLvzqu45sIMa1Y9
+        qKQ4zYKw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pebF1-00CLpY-1d;
+        Tue, 21 Mar 2023 12:37:27 +0000
+Date:   Tue, 21 Mar 2023 05:37:27 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        linux-mmc@vger.kernel.org,
+        Wenchao Chen <wenchao.chen666@gmail.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Christian Lohle <cloehle@hyperstone.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        ming.lei@redhat.com
-Subject: Re: [PATCH -next 0/2] block: fix scan partition for exclusively open
- device again
-Message-ID: <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
-References: <20230217022200.3092987-1-yukuai1@huaweicloud.com>
+        Bean Huo <beanhuo@micron.com>
+Subject: Re: [PATCH] mmc: core: Allow to avoid REQ_FUA if the eMMC supports
+ an internal cache
+Message-ID: <ZBmlB2K3KMt7Apv5@infradead.org>
+References: <20230316164514.1615169-1-ulf.hansson@linaro.org>
+ <ZBNIg8+rOdFKcsS8@infradead.org>
+ <522a5d01-e939-278a-3354-1bbfb1bd6557@intel.com>
+ <ZBf8dZm1FZIusMls@infradead.org>
+ <CAPDyKFogTyf30X+3JGeqf+yER_OLQ8JwXy6oEF3Rn78KzLSDxw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230217022200.3092987-1-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+In-Reply-To: <CAPDyKFogTyf30X+3JGeqf+yER_OLQ8JwXy6oEF3Rn78KzLSDxw@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 17, 2023 at 10:21:58AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Mon, Mar 20, 2023 at 04:24:36PM +0100, Ulf Hansson wrote:
+> > Neither to ATA or SCSI, but applications and file systems always very
+> > much expected it, so withou it storage devices would be considered
+> > fault.  Only NVMe actually finally made it part of the standard.
 > 
-> Changes from RFC:
->  - remove the patch to factor out GD_NEED_PART_SCAN
+> Even if the standard doesn't say, it's perfectly possible that the
+> storage device implements it.
+
+That's exactly what I'm saying above.
+
+> > But these are completely separate issue.  Torn writes are completely
+> > unrelated to cache flushes.  You can indeed work around torn writes
+> > by checksums, but not the lack of cache flushes or vice versa.
 > 
-> Yu Kuai (2):
->   block: Revert "block: Do not reread partition table on exclusively
->     open device"
->   block: fix scan partition for exclusively open device again
+> It's not a separate issue for eMMC. Please read the complete commit
+> message for further clarifications in this regard.
 
-Hi Yu kuai,
+The commit message claims that checksums replace cache flushes.  Which
+is dangerously wrong.  So please don't refer me to it again - this
+dangerously incorrect commit message is wht alerted me to reply to the
+patch.
 
-Looks the original issue starts to re-appear now with the two patches:
+> > > However, the issue has been raised that reliable write is not
+> > > needed to provide sufficient assurance of data integrity, and that
+> > > in fact, cache flush can be used instead and perform better.
+> >
+> > It does not.
+> 
+> Can you please elaborate on this?
 
-https://lore.kernel.org/linux-block/20221130135344.2ul4cyfstfs3znxg@quack3/
-
-And underlying disk partition and raid partition can be observed at the
-same time.
-
-Can you take a look?
-
-Follows the script, which isn't 100% triggered, but still easy.
-
-#create level 1 with 2 devices, meta 1.0
-mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
-
-#create partition 0, start from 0 sector, size 100MiB
-sgdisk -n 0:0:+100MiB /dev/md0
-
-#observe partitions
-cat /proc/partitions
-
-#stop the array
-mdadm -S /dev/md0
-
-#re-assemble 
-mdadm -A /dev/md0 /dev/sda /dev/sdb
-cat /proc/partitions
-
-
-Thanks,
-Ming
-
+Flushing caches does not replace the invariant of not tearing subsector
+writes.  And if you need to use reliable writes for (some) devices to
+not tear sectors, no amount of cache flushing is going to paper over
+the problem.
