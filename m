@@ -2,122 +2,190 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC3FC6FD1D
-	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 09:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB439C74A5B
+	for <linux-block@archiver.kernel.org>; Tue, 21 Mar 2023 10:37:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230047AbjCUJvE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Mar 2023 05:51:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33284 "EHLO
+        id S230250AbjCUKhP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Mar 2023 06:37:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbjCUJvB (ORCPT
+        with ESMTP id S230260AbjCUKhN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Mar 2023 05:51:01 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E3A42B623
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 02:50:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1679392254; x=1710928254;
+        Tue, 21 Mar 2023 06:37:13 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB0D67D9E;
+        Tue, 21 Mar 2023 03:36:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679395008; x=1710931008;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=vTmk5TuFUMS/dLmfmudGcz7s69aNfPh6jndBre9n4nc=;
-  b=Ij8npUW6aiSt+5MzlzvQMo/FeL/sOkezNsQ6m7/yPHONDf5j7EcrhX8H
-   dAS5fAKaWyccwy4bSjNeChWNk/H8Z0pRBSEwdBJWmxS2nZfW8PJzaP7WR
-   A2m9Z/9orfNO4k/3D1pwY24RxeyAyXyycFVrpuAJIlPJ0bQrskNgw/9XT
-   vyWSx3Y9s54GnGc7bfXvIrU6uSKBsIU6p7encBzN55QlNoUsmhO5BipLG
-   bkZc34Q/qJIWXNQ2Jfa/NeEOvqOsMjs6/TqlG9/ZcVQ4IQHd3dtl4+IZK
-   S6QNXsFEEVGoiVoKtsjy3ItPjrlGcVA6VHqLwl5RWDF/i54VHwahDlw4x
-   w==;
-X-IronPort-AV: E=Sophos;i="5.98,278,1673884800"; 
-   d="scan'208";a="225928746"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Mar 2023 17:50:53 +0800
-IronPort-SDR: HrMh9dX46Fcej4VWsjY5CGZioZLm0rpMcjUJxao+FTQEqBIQI/u5msyrmUhcqZseQH50G4JCEu
- Zge9lYWFWj2o8Ro8JaZO1QpmV/uOClbAGMUTzbAVc174RNk6X3knbc2p5G4II+ZGCXSPO9uPrr
- Pf3zhH7/HfGJtym1L6l04G+8iTNpbT+/VzLZ46RtzmErSjPaZ8AITcdgci0wBOWTGjAFFjDLv5
- ueAjro+XnV2J1DlAe8GeueHI2Iu/l+zSnUkP5eV/xebBKr/qIDS/ey4zHO4R2FyFIDtIqgCF6w
- eV4=
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Mar 2023 02:07:12 -0700
-IronPort-SDR: wudMj6tQ2cU+I1vGMpEIFHbWjiQXvnIRVRywDldFhCuT5wjf+xNXGyJuun8gfrcNZulnfm//DV
- qqOr1l9W2f5ELMSIMb+nNf5viDAT/VUNvA/dU66/eoXE/J5agxf3jb3bJ+qbnACxm2ShisLrhU
- IjMP9BaEVTdkjfwSI89YOBPGeV5gVMtxCgU1xgaK+A+MT1TTNh/C3+uUnPF2aECWHOmxwSWFrw
- c4Dd5wVL1gp0XgO0bUjJ4LPMSLwnAmnPL5wwt/zbz+HYo4yudI3J1491wgVC+eBDiGa/bEfYJy
- ab8=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Mar 2023 02:50:54 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Pgn0s2Hsrz1RtVp
-        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 02:50:53 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1679392252; x=1681984253; bh=vTmk5TuFUMS/dLmfmudGcz7s69aNfPh6jnd
-        Bre9n4nc=; b=nQT2+9OssKrVx8dHfIkItzg8I2CvQPmvQYsKtZRu5dA83DjaOpR
-        BXyaUThD4T4zez3iLTo2dMTBPACfGQQFi6NjYH4QzaVL+CstwBlnlCHQhR9Z8Guf
-        rPsmglHcVMjVhMsTJIHbVCItqDT97kovLmoVuTAuu8MHSYKeRvr7PGFIutW2gN2g
-        8LV6tY0fPE9b2cp7GwNVD/2D826oHAcxS2Y3Ab0goM594VndpDTAOGmBZ8XRhwjI
-        JIx/BZ9sqG0TarWmI6z/usswFnSPmlVu6Ju58sJ0Zt7kCIPDLN/Kvlt7mqp8cCr7
-        mleE0M7OxeQASkiEqJeog2/jb7Unt0CPVuA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id IFVNxU_9waRE for <linux-block@vger.kernel.org>;
-        Tue, 21 Mar 2023 02:50:52 -0700 (PDT)
-Received: from [10.225.163.91] (unknown [10.225.163.91])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Pgn0q1y17z1RtVm;
-        Tue, 21 Mar 2023 02:50:51 -0700 (PDT)
-Message-ID: <07a40b66-6785-ecb9-90ba-fb502e78639e@opensource.wdc.com>
-Date:   Tue, 21 Mar 2023 18:50:49 +0900
+  bh=02a4bSS1l3THSC25dR3CqSQi5ey23+yWCWwus1hx1S8=;
+  b=A9dxe6wk30QOTsfr9q6ywD+q1qkQj9LivVFhzs3kH8IV3qDwequH05zf
+   fRuvssExYN6hgscdDZJkp63yEzpK3d9xnfWZCunLkZ2rbn9zjd+hjjeZh
+   umP46KF43ECY1WjdQ9/EyOczCadtg3I93/ITpbjDDGWeAAs0pDvwpcwJt
+   VrOHYmq75lpEKHTDyXhLWZmA7xukvtzpi9CM/0s5HTACYKbBOOw8fJqRX
+   Ctwf9e9tUltCmQ/qcYGnKVcaKZtbiAAqcXm3LS3O7jaoN9Z9r8UkIzlF3
+   5DFWXKIJTNpsG8xfcmdSM3ASiGhJUwdNtrIMU7C0KfaSj3uon/Ig5dUxq
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10655"; a="322747494"
+X-IronPort-AV: E=Sophos;i="5.98,278,1673942400"; 
+   d="scan'208";a="322747494"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2023 03:36:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10655"; a="631520210"
+X-IronPort-AV: E=Sophos;i="5.98,278,1673942400"; 
+   d="scan'208";a="631520210"
+Received: from ahunter6-mobl1.ger.corp.intel.com (HELO [10.0.2.15]) ([10.252.61.109])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2023 03:36:45 -0700
+Message-ID: <8d6d12b5-39d4-ac07-f725-18ae9df9765b@intel.com>
+Date:   Tue, 21 Mar 2023 12:36:41 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
+ Firefox/102.0 Thunderbird/102.9.0
+Subject: Re: [PATCH] mmc: core: Allow to avoid REQ_FUA if the eMMC supports an
+ internal cache
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <ZBT6EmhEfJmgRXU1@ovpn-8-18.pek2.redhat.com>
- <580e712c-5e43-e1a5-277b-c4e8c50485f0@acm.org>
- <ZBjsDy2pfPk9t6qB@ovpn-8-29.pek2.redhat.com>
- <50dfa89c-19fa-b655-f6b8-b8853b066c75@acm.org>
- <ZBj99Oy5FPDI+Gdn@ovpn-8-18.pek2.redhat.com>
- <a9347617-70b3-3cc1-ea5e-c6bd78c29acd@opensource.wdc.com>
- <ZBkTwV7UC5QDtRyj@ovpn-8-18.pek2.redhat.com>
- <9c74df25-aa99-afc2-4f40-3201dd67368e@opensource.wdc.com>
- <ZBlkF7zjQyahk5gv@ovpn-8-18.pek2.redhat.com>
- <cbf73fed-265f-b244-608c-bfcf5c1b6d4d@opensource.wdc.com>
- <20230321090908.GA27216@lst.de>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230321090908.GA27216@lst.de>
+To:     Ulf Hansson <ulf.hansson@linaro.org>, linux-mmc@vger.kernel.org
+Cc:     Wenchao Chen <wenchao.chen666@gmail.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Christian Lohle <cloehle@hyperstone.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bean Huo <beanhuo@micron.com>
+References: <20230316164514.1615169-1-ulf.hansson@linaro.org>
+From:   Adrian Hunter <adrian.hunter@intel.com>
+Organization: Intel Finland Oy, Registered Address: PL 281, 00181 Helsinki,
+ Business Identity Code: 0357606 - 4, Domiciled in Helsinki
+In-Reply-To: <20230316164514.1615169-1-ulf.hansson@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/21/23 18:09, Christoph Hellwig wrote:
-> On Tue, Mar 21, 2023 at 05:51:29PM +0900, Damien Le Moal wrote:
->> Interesting. We have never seen such issue in practice with the device mappers
->> that support zoned devices. But it seems interesting to try to find a use case
->> that could trigger this. Will look into it, and if everything is fixed, it would
->> still be a good regression test for blocktest.
+On 16/03/23 18:45, Ulf Hansson wrote:
+> REQ_FUA translates into so called "reliable writes" (atomic writes) for
+> eMMC cards, which is generally supported as it was introduced as a
+> mandatory feature already in the v4.3 (2007) of the eMMC spec. To fully
+> support the reliable writes (thus REQ_FUA), the mmc host driver needs to
+> support the CMD23 (MMC_CAP_CMD23) too, which is rather common nowadays.
 > 
-> I think it requires a non-zoneappend bio that is large enough to
-> require splitting and which goes through a remapper.
+> File systems typically uses REQ_FUA for writing their meta-data and other
+> important information. Ideally it should provide an increased protection
+> against data-corruption, during sudden power-failures. This said, file
+> systems have other ways to handle sudden power-failures too, like using
+> checksums to detect partly-written data, for example.
+> 
+> It has been reported that the reliable writes are costly for some eMMCs,
+> leading to performance degradations. Exactly why, is in the implementation
+> details of the internals of the eMMC.
+> 
+> Moreover, in the v4.5 (2011) of the eMMC spec, the cache-control was
+> introduced as an optional feature. It allows the host to trigger a flush of
+> the eMMC's internal write-cache. In the past, before the cache-control
+> feature was added, the reliable write acted as trigger for the eMMC, to
+> also flush its internal write-cache, even if that too remains as an
+> implementation detail of the eMMC.
+> 
+> In a way to try to improve the situation with costly reliable writes and
+> REQ_FUA, let's add a new card quirk MMC_QUIRK_AVOID_REL_WRITE, which may be
+> set to avoid announcing the support for it. However, as mentioned above,
+> due to the specific relationship with the cache-control feature, we must
+> keep REQ_FUA unless that is supported too.
+> 
+> Reported-by: Wenchao Chen <wenchao.chen666@gmail.com>
+> Acked-by: Bean Huo <beanhuo@micron.com>
+> Acked-by: Avri Altman <avri.altman@wdc.com>
+> Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-dm-crypt and dm-linear could be targets potentially affected. Will have a try.
+Minor cosmetic suggestion below, but nevertheless:
 
--- 
-Damien Le Moal
-Western Digital Research
+Acked-by: Adrian Hunter <adrian.hunter@intel.com>
+
+> ---
+> 
+> Updated since the RFC:
+> 	Added a card quirk to maintain the current behaviour. The quirk isn't
+> 	set for any cards yet, which is needed (a patch on top) to move forward
+> 	with this.
+> 
+> ---
+>  drivers/mmc/core/block.c | 16 ++++++++++++----
+>  drivers/mmc/core/card.h  |  5 +++++
+>  include/linux/mmc/card.h |  1 +
+>  3 files changed, 18 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index 672ab90c4b2d..35292e36a1fb 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -2409,8 +2409,7 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+>  	struct mmc_blk_data *md;
+>  	int devidx, ret;
+>  	char cap_str[10];
+> -	bool cache_enabled = false;
+> -	bool fua_enabled = false;
+> +	bool cache_enabled, avoid_fua, fua_enabled = false;
+>  
+>  	devidx = ida_simple_get(&mmc_blk_ida, 0, max_devices, GFP_KERNEL);
+>  	if (devidx < 0) {
+> @@ -2494,11 +2493,20 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+>  	    ((card->ext_csd.rel_param & EXT_CSD_WR_REL_PARAM_EN) ||
+>  	     card->ext_csd.rel_sectors)) {
+>  		md->flags |= MMC_BLK_REL_WR;
+> +	}
+> +
+> +	/*
+> +	 * REQ_FUA is supported through eMMC reliable writes, which has been
+> +	 * reported to be a bit costly for some eMMCs. In these cases, let's
+> +	 * rely on the flush requests (REQ_OP_FLUSH) instead, if we can use the
+> +	 * cache-control feature too.
+> +	 */
+> +	cache_enabled = mmc_cache_enabled(card->host);
+> +	avoid_fua = cache_enabled && mmc_card_avoid_rel_write(card);
+> +	if (md->flags & MMC_BLK_REL_WR && !avoid_fua) {
+>  		fua_enabled = true;
+>  		cache_enabled = true;
+>  	}
+
+looks like this could be just:
+
+	fua_enabled = (md->flags & MMC_BLK_REL_WR) && !avoid_fua;
+
+with fua_enabled no longer needing initialization
+
+> -	if (mmc_cache_enabled(card->host))
+> -		cache_enabled  = true;
+>  
+>  	blk_queue_write_cache(md->queue.queue, cache_enabled, fua_enabled);
+>  
+> diff --git a/drivers/mmc/core/card.h b/drivers/mmc/core/card.h
+> index cfdd1ff40b86..2ab448fa2841 100644
+> --- a/drivers/mmc/core/card.h
+> +++ b/drivers/mmc/core/card.h
+> @@ -229,6 +229,11 @@ static inline int mmc_blksz_for_byte_mode(const struct mmc_card *c)
+>  	return c->quirks & MMC_QUIRK_BLKSZ_FOR_BYTE_MODE;
+>  }
+>  
+> +static inline int mmc_card_avoid_rel_write(const struct mmc_card *c)
+> +{
+> +	return c->quirks & MMC_QUIRK_AVOID_REL_WRITE;
+> +}
+> +
+>  static inline int mmc_card_disable_cd(const struct mmc_card *c)
+>  {
+>  	return c->quirks & MMC_QUIRK_DISABLE_CD;
+> diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
+> index c726ea781255..4d297d565c83 100644
+> --- a/include/linux/mmc/card.h
+> +++ b/include/linux/mmc/card.h
+> @@ -282,6 +282,7 @@ struct mmc_card {
+>  						/* for byte mode */
+>  #define MMC_QUIRK_NONSTD_SDIO	(1<<2)		/* non-standard SDIO card attached */
+>  						/* (missing CIA registers) */
+> +#define MMC_QUIRK_AVOID_REL_WRITE (1<<3)	/* Avoid rel-write (REQ_FUA) */
+>  #define MMC_QUIRK_NONSTD_FUNC_IF (1<<4)		/* SDIO card has nonstd function interfaces */
+>  #define MMC_QUIRK_DISABLE_CD	(1<<5)		/* disconnect CD/DAT[3] resistor */
+>  #define MMC_QUIRK_INAND_CMD38	(1<<6)		/* iNAND devices have broken CMD38 */
 
