@@ -2,195 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5B4C6FD1F
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 12:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70589C6FD1F
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 12:54:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbjCVMhP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 08:37:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45742 "EHLO
+        id S230415AbjCVMyo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 08:54:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230297AbjCVMhO (ORCPT
+        with ESMTP id S230031AbjCVMyn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 08:37:14 -0400
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1E45AB68;
-        Wed, 22 Mar 2023 05:37:07 -0700 (PDT)
-Received: by mail-wm1-f51.google.com with SMTP id i5-20020a05600c354500b003edd24054e0so6169130wmq.4;
-        Wed, 22 Mar 2023 05:37:07 -0700 (PDT)
+        Wed, 22 Mar 2023 08:54:43 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162E22202D
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 05:54:42 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id c18so22387695qte.5
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 05:54:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1679489681;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F9v4u5dsmD7IdPDedAw7yl5GKCx002rE2DFuzXEhabA=;
+        b=oseP/IlFp1j6s51mg5FR8BiD6pOuhlK2sA/PlZwS/47aFuK75h2plqVR7N7hDpcFa9
+         RNPKysEMUcAGmfNzJFQjff8MPwtzdEDzgXasGPPvcWoLZRxVPcs0do46FVyGzpIx9O9f
+         FgsKFh5qQ8h7ho1bSmqDMyyTzD9X+IKIEneS507MEDL3prFqV3lx0yiRMRFF8RpcWnLD
+         y2HeeLXMMjA65EWEnQpwhRbYW5wkS0WxrYqbmrXRxpcXw54Ksy4fYNzuP6ahgYd10Qw0
+         Qy4dGtMucvoCfJFJYxp/OlFfph19hl6TG3+gX53Gm423poeYD12x9UMuxq7X9L/RkxaM
+         KD+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679488625; x=1682080625;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LRwZsANB3r2C91lXFiZnI3O1RAzjRFSQIWS7Bmxs4kw=;
-        b=kEVyKmxHCDtHquzkXbz3/iIgF5Yq7f9kaDX+E58sD64JWj98XaQQ52H1emgtGXbteZ
-         8spBx50fxTnTYsWdroIIj5jviLqKrkGf1d4ewbKm/Up3lF90yM87akrE0Ed9GcjtTStz
-         HEtuRAYDMF/Ct1uXJp+UzPXhDWagFRtti1B7D/Lzrj7yM/dU0LTE91TW6vHDoF3QsGID
-         c0TrNXf1I9cmlvs4AnjXlTAU2yrZwE60NNVcEOOWPa5R5bEjUUFzEx5ni2chkcovX9vT
-         LgUscpMeKg8LPHDKyeITQ09J5N0tvz/P4hTISJa57g54DU88Bu9gpJg1RT7wGUtteI+S
-         O2MA==
-X-Gm-Message-State: AO0yUKVIUPkSdN+32k3tSYEqzKP8UBJW5P+1fOD6ahTet4Vvmd62WHJg
-        563geg8giipOzrI/iulkR82g0eRhO1E=
-X-Google-Smtp-Source: AK7set+DFNuOfo4tAskyhOm3T819ZfypjR/C+2jy8A+mbjjVnZsIAC+xiBgMVqvhh7gVF1jqcDGADQ==
-X-Received: by 2002:a05:600c:4504:b0:3ed:d119:df27 with SMTP id t4-20020a05600c450400b003edd119df27mr6060190wmo.3.1679488625440;
-        Wed, 22 Mar 2023 05:37:05 -0700 (PDT)
-Received: from localhost.localdomain (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id u4-20020a5d4344000000b002c5526234d2sm13939285wrr.8.2023.03.22.05.37.04
+        d=1e100.net; s=20210112; t=1679489681;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F9v4u5dsmD7IdPDedAw7yl5GKCx002rE2DFuzXEhabA=;
+        b=0cGhbnhNEvsV8gVrIlL18gM2dZ5pyMaydHx2hslTDHwOIu9dtcb21Cnv19iIXq+LZb
+         RiqSnoJ2qxywislo4N+GcIrg2RPAuzw+Vpd8esXiy+F2wiADsPvWHMB7Nf1PQ11w34W+
+         vLUVoew4QHL6QvrnJ4ve9FB+cByYQqxnNdD9uN9dTnQz8RNHfKgNqXtfDkScyHMIU0hb
+         KM/0wzuly8i126NDTxFGGycz0jCYDy9Kl5usqIw2t5e35nxPo7k6PhB+xAh0h6UmVGRf
+         P0+UjXsaKhR8isrAPW/WoaMrUhD/R9kpKiIxRtG56EHPYocOn2SyJIOD2ET4OtBKOcGm
+         gONQ==
+X-Gm-Message-State: AO0yUKWLsURqfduzruXA8S2dkk1lUUjclOvHra+978RgnMFBBCIPfnD2
+        AlBNdKWBk6NWUISOapdCZJihRQ==
+X-Google-Smtp-Source: AK7set84B/dAzc/qRKnsrbryejsxkR+kgL8Ft54Ca1aeV7djrv80URDlXYzzFfBac/AL/7y8+qjk8Q==
+X-Received: by 2002:ac8:5c93:0:b0:3e0:3187:faf3 with SMTP id r19-20020ac85c93000000b003e03187faf3mr6264695qta.13.1679489681268;
+        Wed, 22 Mar 2023 05:54:41 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-25-194.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.25.194])
+        by smtp.gmail.com with ESMTPSA id k10-20020ac8604a000000b003d3a34d2eb2sm10168725qtm.41.2023.03.22.05.54.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 05:37:04 -0700 (PDT)
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        Wed, 22 Mar 2023 05:54:40 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1pexzE-000msK-9E;
+        Wed, 22 Mar 2023 09:54:40 -0300
+Date:   Wed, 22 Mar 2023 09:54:40 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         linux-rdma@vger.kernel.org
-Subject: [PATCH] blk-mq-rdma: remove queue mapping helper for rdma devices
-Date:   Wed, 22 Mar 2023 14:37:03 +0200
-Message-Id: <20230322123703.485544-1-sagi@grimberg.me>
-X-Mailer: git-send-email 2.34.1
+Subject: Re: [PATCH] blk-mq-rdma: remove queue mapping helper for rdma devices
+Message-ID: <ZBr6kNVoa5RbNzSa@ziepe.ca>
+References: <20230322123703.485544-1-sagi@grimberg.me>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230322123703.485544-1-sagi@grimberg.me>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-No rdma device exposes its irq vectors affinity today. So the only
-mapping that we have left, is the default blk_mq_map_queues, which
-we fallback to anyways. Also fixup the only consumer of this helper
-(nvme-rdma).
+On Wed, Mar 22, 2023 at 02:37:03PM +0200, Sagi Grimberg wrote:
+> No rdma device exposes its irq vectors affinity today. So the only
+> mapping that we have left, is the default blk_mq_map_queues, which
+> we fallback to anyways. Also fixup the only consumer of this helper
+> (nvme-rdma).
 
-Remove this now dead code.
+This was the only caller of ib_get_vector_affinity() so please delete 
+op get_vector_affinity and ib_get_vector_affinity() from verbs as well
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- block/Kconfig               |  5 -----
- block/Makefile              |  1 -
- block/blk-mq-rdma.c         | 44 -------------------------------------
- drivers/nvme/host/rdma.c    |  7 ++----
- include/linux/blk-mq-rdma.h | 11 ----------
- 5 files changed, 2 insertions(+), 66 deletions(-)
- delete mode 100644 block/blk-mq-rdma.c
- delete mode 100644 include/linux/blk-mq-rdma.h
-
-diff --git a/block/Kconfig b/block/Kconfig
-index 5d9d9c84d516..0b7c13f9a089 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -215,11 +215,6 @@ config BLK_MQ_VIRTIO
- 	depends on VIRTIO
- 	default y
- 
--config BLK_MQ_RDMA
--	bool
--	depends on INFINIBAND
--	default y
--
- config BLK_PM
- 	def_bool PM
- 
-diff --git a/block/Makefile b/block/Makefile
-index 4e01bb71ad6e..b31b05390749 100644
---- a/block/Makefile
-+++ b/block/Makefile
-@@ -30,7 +30,6 @@ obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o
- obj-$(CONFIG_BLK_DEV_INTEGRITY_T10)	+= t10-pi.o
- obj-$(CONFIG_BLK_MQ_PCI)	+= blk-mq-pci.o
- obj-$(CONFIG_BLK_MQ_VIRTIO)	+= blk-mq-virtio.o
--obj-$(CONFIG_BLK_MQ_RDMA)	+= blk-mq-rdma.o
- obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
- obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
- obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
-diff --git a/block/blk-mq-rdma.c b/block/blk-mq-rdma.c
-deleted file mode 100644
-index 29c1f4d6eb04..000000000000
---- a/block/blk-mq-rdma.c
-+++ /dev/null
-@@ -1,44 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/*
-- * Copyright (c) 2017 Sagi Grimberg.
-- */
--#include <linux/blk-mq.h>
--#include <linux/blk-mq-rdma.h>
--#include <rdma/ib_verbs.h>
--
--/**
-- * blk_mq_rdma_map_queues - provide a default queue mapping for rdma device
-- * @map:	CPU to hardware queue map.
-- * @dev:	rdma device to provide a mapping for.
-- * @first_vec:	first interrupt vectors to use for queues (usually 0)
-- *
-- * This function assumes the rdma device @dev has at least as many available
-- * interrupt vetors as @set has queues.  It will then query it's affinity mask
-- * and built queue mapping that maps a queue to the CPUs that have irq affinity
-- * for the corresponding vector.
-- *
-- * In case either the driver passed a @dev with less vectors than
-- * @set->nr_hw_queues, or @dev does not provide an affinity mask for a
-- * vector, we fallback to the naive mapping.
-- */
--void blk_mq_rdma_map_queues(struct blk_mq_queue_map *map,
--		struct ib_device *dev, int first_vec)
--{
--	const struct cpumask *mask;
--	unsigned int queue, cpu;
--
--	for (queue = 0; queue < map->nr_queues; queue++) {
--		mask = ib_get_vector_affinity(dev, first_vec + queue);
--		if (!mask)
--			goto fallback;
--
--		for_each_cpu(cpu, mask)
--			map->mq_map[cpu] = map->queue_offset + queue;
--	}
--
--	return;
--
--fallback:
--	blk_mq_map_queues(map);
--}
--EXPORT_SYMBOL_GPL(blk_mq_rdma_map_queues);
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index bbad26b82b56..3a62867b6cab 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -12,7 +12,6 @@
- #include <linux/string.h>
- #include <linux/atomic.h>
- #include <linux/blk-mq.h>
--#include <linux/blk-mq-rdma.h>
- #include <linux/blk-integrity.h>
- #include <linux/types.h>
- #include <linux/list.h>
-@@ -2163,10 +2162,8 @@ static void nvme_rdma_map_queues(struct blk_mq_tag_set *set)
- 			ctrl->io_queues[HCTX_TYPE_DEFAULT];
- 		set->map[HCTX_TYPE_READ].queue_offset = 0;
- 	}
--	blk_mq_rdma_map_queues(&set->map[HCTX_TYPE_DEFAULT],
--			ctrl->device->dev, 0);
--	blk_mq_rdma_map_queues(&set->map[HCTX_TYPE_READ],
--			ctrl->device->dev, 0);
-+	blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
-+	blk_mq_map_queues(&set->map[HCTX_TYPE_READ]);
- 
- 	if (opts->nr_poll_queues && ctrl->io_queues[HCTX_TYPE_POLL]) {
- 		/* map dedicated poll queues only if we have queues left */
-diff --git a/include/linux/blk-mq-rdma.h b/include/linux/blk-mq-rdma.h
-deleted file mode 100644
-index 53b58c610e76..000000000000
---- a/include/linux/blk-mq-rdma.h
-+++ /dev/null
-@@ -1,11 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef _LINUX_BLK_MQ_RDMA_H
--#define _LINUX_BLK_MQ_RDMA_H
--
--struct blk_mq_tag_set;
--struct ib_device;
--
--void blk_mq_rdma_map_queues(struct blk_mq_queue_map *map,
--		struct ib_device *dev, int first_vec);
--
--#endif /* _LINUX_BLK_MQ_RDMA_H */
--- 
-2.34.1
-
+Jason
