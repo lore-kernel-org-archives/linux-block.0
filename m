@@ -2,75 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB743C6FD1F
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 14:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F98DC6FD1C
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 14:16:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231318AbjCVOGt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 10:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55658 "EHLO
+        id S231387AbjCVOQD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 10:16:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231362AbjCVOGc (ORCPT
+        with ESMTP id S231361AbjCVOP7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 10:06:32 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 686D16424E
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 07:06:21 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 12C2733BA6;
-        Wed, 22 Mar 2023 14:06:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1679493980; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CZc0Qj4tZ4zTkmzE1ji+h6aLVP7ArKKuE6NKqyNX8Ms=;
-        b=jq8ibrVdnjgWoiHkuYTGpLBdgrAUEpiIZxVYbZr7nBs5CKgbLQF5IOoAD2jWoxlFdTbtAI
-        t35kjRmeXHl/5BVLg6S0uVGTkDhWP2OlD/sgDqDHEyuek6H0uOABk1EtMPr8vWkGNsK47k
-        3ovwAsK325TrQjDjNJVtQOaIBy7z7bI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1679493980;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CZc0Qj4tZ4zTkmzE1ji+h6aLVP7ArKKuE6NKqyNX8Ms=;
-        b=kzC+o+meSy0BCfmHz3IjoqPjmj78VDc2SPNV32nysLHEL1uiiFvucEZJ6COdAsphz+MLbe
-        OUrfz0ieohwpfjCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 03CC613416;
-        Wed, 22 Mar 2023 14:06:20 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id K2DfAFwLG2ToGAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 22 Mar 2023 14:06:20 +0000
-Date:   Wed, 22 Mar 2023 15:06:19 +0100
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, linux-nvme@lists.infradead.org, sagi@grimberg.me,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 2/3] nvme: add polling options for loop target
-Message-ID: <20230322140619.zy2msly7mcuwgo6a@carbon.lan>
-References: <20230322002350.4038048-1-kbusch@meta.com>
- <20230322002350.4038048-3-kbusch@meta.com>
- <20230322082310.GA22782@lst.de>
- <20230322084651.xmnup2ag3ve6jr3a@carbon.lan>
- <20230322135200.GA16587@lst.de>
+        Wed, 22 Mar 2023 10:15:59 -0400
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E5264861
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 07:15:57 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5445009c26bso340727967b3.8
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 07:15:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112; t=1679494557;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Whislchss/sFlCFTwP31713E4FxIStQL6qfZ4WUEnIc=;
+        b=tzVmChHwG5UdzVVOpXkf2rTQATcV+/+zaZ4pw3uDOzqEhkRt5Ve9ob8pgqEPs/Y1fe
+         UTg2YOvzk6LqHz80jJegh3QK/C6Nw5mUFmQRuYQdxN/g06L4n2D8VqGTpKrEwVLXCMyg
+         bcLY5fticeZdjLAS82sbu5TBTjdYbbZWwVewaUa46wFZTPzT8Iaeq+jOe9TXtX5fDQhM
+         bH0UkD0Bze72U3h9g4fm9xhtBi74DWE9y5/g7HVJ77mStLDJNqI5IlGO35ZFBslvbkdt
+         0tnWP6LHWVGlPLgYq0+b9Iy7dVlw0jYqZHf1nX5ZUpvjRTg0T1AmjYqWQfawOzmxCgxb
+         Ollg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679494557;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Whislchss/sFlCFTwP31713E4FxIStQL6qfZ4WUEnIc=;
+        b=HVPNwRCxx4Y2XL+8DdG7WOYtpaCMGuzVnWraOUpB9h7Tw2Uk6cyXcGlmKKPnBUwu8r
+         ad3XXHhvwc30RJsv3JJjyJZUqDuFMp5BpUTfBYQ7hQ/nvxAwHF744d/fN1/ZgBImQihQ
+         +gvYAFpsM0sfu5g1d2RCHbwnLCEoJbhacimhgzyJRQ0jbcgyONup12VgMDexwIXdCt7w
+         wYz3FHzKCqfujA8vK3nc+0LAF5AHPWCwQtwS1/lL6btvWDaHSSMgLcXPMbCI1Bc5sHX+
+         9tFlBJsWn5C5fk5dYYLsal2ZG4sfK5BEZJUcfTISQnxK8yNo1atUO5B235mFucnbrRYg
+         5oRw==
+X-Gm-Message-State: AO0yUKUChuwGyGGErQcpfMutuohYHl1JVmzrvHkeTJD0m4vidJH4zuJ9
+        TXYtez4JTtV991weYNzVa95VDw==
+X-Google-Smtp-Source: AK7set867nYOJLPUXEWSXWMJFE/YmBaPwP8V/3k5TMR93AJK29UptcHHOv2RuPaUN5WddwnxgNj1hw==
+X-Received: by 2002:a05:7500:5bc3:b0:fb:d3c:28fe with SMTP id ed3-20020a0575005bc300b000fb0d3c28femr62914gab.29.1679494556330;
+        Wed, 22 Mar 2023 07:15:56 -0700 (PDT)
+Received: from localhost (cpe-174-109-170-245.nc.res.rr.com. [174.109.170.245])
+        by smtp.gmail.com with ESMTPSA id f66-20020a37d245000000b00745f3200f54sm11293540qkj.112.2023.03.22.07.15.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Mar 2023 07:15:55 -0700 (PDT)
+Date:   Wed, 22 Mar 2023 10:15:53 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Eric Blake <eblake@redhat.com>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, corbet@lwn.net,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] nbd: s/handle/cookie/
+Message-ID: <20230321235250.GA1426669@localhost.localdomain>
+References: <20230317202749.419094-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230322135200.GA16587@lst.de>
+In-Reply-To: <20230317202749.419094-1-eblake@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 02:52:00PM +0100, Christoph Hellwig wrote:
-> Who says that we could support polling on all current and future
-> fabrics transports?
+On Fri, Mar 17, 2023 at 03:27:44PM -0500, Eric Blake wrote:
+> v1 was here: https://lkml.org/lkml/2023/3/10/1162
+> since then:
+> - split original 1/3 into 1/5 and 5/5
+> - new patch 2/5
+> - reorder members of anon union
+> - always send cookie in network order
+> 
+> Eric Blake (5):
+>   uapi nbd: improve doc links to userspace spec
+>   block nbd: send handle in network order
+>   uapi nbd: add cookie alias to handle
+>   block nbd: use req.cookie instead of req.handle
+>   docs nbd: userspace NBD now favors github over sourceforge
+> 
+>  Documentation/admin-guide/blockdev/nbd.rst |  2 +-
+>  drivers/block/nbd.c                        |  6 +++---
+>  include/uapi/linux/nbd.h                   | 25 +++++++++++++++++-----
+>  3 files changed, 24 insertions(+), 9 deletions(-)
+> 
+> 
+> base-commit: 8d3c682a5e3d9dfc2448ecbb22f4cd48359b9e21
 
-I just assumed this is a generic feature supposed to present in all transports.
-I'll update my new blktest test to run only tcp or rdma.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+
+Thanks,
+
+Josef
