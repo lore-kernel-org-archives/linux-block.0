@@ -2,130 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF146C6FD1F
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 04:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABDBFC6FD1F
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 04:39:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbjCVECS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 00:02:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49232 "EHLO
+        id S229511AbjCVEjW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 00:39:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230414AbjCVEBt (ORCPT
+        with ESMTP id S229676AbjCVEjV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 00:01:49 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99864DE0E;
-        Tue, 21 Mar 2023 21:00:52 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PhFBN2cr1z4f3mKt;
-        Wed, 22 Mar 2023 12:00:44 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDHcyFqfRpki+pjFQ--.44895S3;
-        Wed, 22 Mar 2023 12:00:43 +0800 (CST)
-Subject: Re: [PATCH -next 0/2] block: fix scan partition for exclusively open
- device again
-To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     jack@suse.cz, hare@suse.de, hch@infradead.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        Changhui Zhong <czhong@redhat.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230217022200.3092987-1-yukuai1@huaweicloud.com>
- <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
- <dc7d28bf-35ca-7cde-ffdf-9490177dfdb9@huaweicloud.com>
- <ZBpbGKxPQcs9NYst@ovpn-8-18.pek2.redhat.com>
- <5facd7c1-fa90-99ff-bd08-cdf67fe6c1ab@huaweicloud.com>
- <a8505ded-dadd-9096-4b13-31512a2c703e@huaweicloud.com>
- <ZBp4Ql08g5YvTDAA@ovpn-8-17.pek2.redhat.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <28ee8ba9-fa42-d3bb-d3c4-44d7e77c64be@huaweicloud.com>
-Date:   Wed, 22 Mar 2023 12:00:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 22 Mar 2023 00:39:21 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D8AB761
+        for <linux-block@vger.kernel.org>; Tue, 21 Mar 2023 21:39:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679459960; x=1710995960;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EUtBxfQNkr4Y9oF+6OQUVDoIGsoEayRjCUVAXz8EPbk=;
+  b=iYZXLvlpw7H21+n1IwQsr31LlBuYZEPmihSXi+d0yLCGgmUp9o1/9Kmy
+   tNE357fAF6Mn3RSAAbmbYQ/gVuFfIY7gOnQeQBZPDBMETQCN0Rep1iz6N
+   y9CopyXoDTu/l596OYojBEtJwiD5AMeZzHG342yivLe4C2dL9inWCUL+l
+   xtaAkF3L5E/B6HN7yxwWr+rQdIwkIXY7Qa5zeL03RgjpGVS4pfvPYatZj
+   0+fl4o7NRgGtUjLxknPywkdbi9uLq/gq/Wsq1wA3DaUHPGdz1IT7XzXTb
+   62nG9rS64/8N11U+2+16L1uuhDNGPL6Q353pyQqqZK9tTpCRiqGzdvP4A
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10656"; a="404009690"
+X-IronPort-AV: E=Sophos;i="5.98,280,1673942400"; 
+   d="scan'208";a="404009690"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2023 21:39:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10656"; a="714280809"
+X-IronPort-AV: E=Sophos;i="5.98,280,1673942400"; 
+   d="scan'208";a="714280809"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 21 Mar 2023 21:39:17 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1peqFo-000Csc-2X;
+        Wed, 22 Mar 2023 04:39:16 +0000
+Date:   Wed, 22 Mar 2023 12:38:29 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        axboe@kernel.dk, linux-nvme@lists.infradead.org, hch@lst.de,
+        sagi@grimberg.me
+Cc:     oe-kbuild-all@lists.linux.dev, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 1/3] nvme-fabrics: add queue setup helpers
+Message-ID: <202303221244.KMWQNHnu-lkp@intel.com>
+References: <20230322002350.4038048-2-kbusch@meta.com>
 MIME-Version: 1.0
-In-Reply-To: <ZBp4Ql08g5YvTDAA@ovpn-8-17.pek2.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDHcyFqfRpki+pjFQ--.44895S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF47WryfZF15tFykZw4Utwb_yoW8Cr1fpF
-        WxGa13JF4DJryYkw1Iqw17GFW5Kw4xZry5WFyUGr10k3s0vr98trZ7t3yq9r9Fqr1UGw1Y
-        9F15JFn3Xa4jyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r4j6FyU
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230322002350.4038048-2-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi Keith,
 
-在 2023/03/22 11:38, Ming Lei 写道:
->>>>>> Hi Yu kuai,
->>>>>>
->>>>>> Looks the original issue starts to re-appear now with the two patches:
->>>>>>
->>>>>> https://lore.kernel.org/linux-block/20221130135344.2ul4cyfstfs3znxg@quack3/
->>>>>>
->>>>>>
->>>>>> And underlying disk partition and raid partition can be observed at the
->>>>>> same time.
->>>>>>
->>>>>> Can you take a look?
->>>>> Yes, thanks for the report. I realize that sda1 adn sdb1 is created
->>>>> while raid open sda and sdb excl, and I think this problem should exist
->>>>> before this patchset.
->>>>
->>>> Looks not reproduced before applying your two patches, that is
->>>> exactly what Jan
->>>> tried to fix with 36369f46e917 ("block: Do not reread partition
->>>> table on exclusively open device").
->>>
->>> Hi, Ming
->>>
->>> I just tried your test with this patchset reverted, and I can still
->>> reporduce the problem myself.
->>
->> Oops, I forgot to revert the first patch. It's right the problem can't
->> be reporduced.
->>>
->>> raid only open this device excl, and disk_scan_partitions is not called:
->>>
->>> md_import_device
->>>    blkdev_get_by_devo
->>>
->>> I need to add some debuginfo to figure out how GD_NEED_PART_SCAN is set
->>> for sda after raid is stopped. And this should explain why sda1 is
->>> created.
->>
->> I found how GD_NEED_PART_SCAN is set now, in patch 2, this is set before
->> bd_prepare_to_claim, so preciously faild part scan will still set this
->> bit, and following patch shold fix this problem:
-> 
-> Just run quick test, the issue won't be reproduced with your patch, and
-> the change looks rational too,
-> 
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> 
+I love your patch! Perhaps something to improve:
 
-Thanks for the test and review, I just do some additional change to
-clear GD_NEED_PART_SCAN, I will send a patch, can you take a look?
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.3-rc3 next-20230322]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Kuai
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
+url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/nvme-fabrics-add-queue-setup-helpers/20230322-082537
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230322002350.4038048-2-kbusch%40meta.com
+patch subject: [PATCH 1/3] nvme-fabrics: add queue setup helpers
+config: arm-randconfig-r046-20230321 (https://download.01.org/0day-ci/archive/20230322/202303221244.KMWQNHnu-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/0acb3964621b925db18ebec1a6c57bc3c3446859
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Keith-Busch/nvme-fabrics-add-queue-setup-helpers/20230322-082537
+        git checkout 0acb3964621b925db18ebec1a6c57bc3c3446859
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash drivers/nvme/
 
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303221244.KMWQNHnu-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/nvme/host/core.c:26:
+>> drivers/nvme/host/fabrics.h:222:29: warning: 'struct ib_device' declared inside parameter list will not be visible outside of this definition or declaration
+     222 |                      struct ib_device *dev, u32 io_queues[HCTX_MAX_TYPES]);
+         |                             ^~~~~~~~~
+--
+   In file included from drivers/nvme/host/core.c:26:
+>> drivers/nvme/host/fabrics.h:222:29: warning: 'struct ib_device' declared inside parameter list will not be visible outside of this definition or declaration
+     222 |                      struct ib_device *dev, u32 io_queues[HCTX_MAX_TYPES]);
+         |                             ^~~~~~~~~
+   In file included from drivers/nvme/host/trace.h:175,
+                    from drivers/nvme/host/core.c:30:
+   include/trace/define_trace.h:95:42: fatal error: ./trace.h: No such file or directory
+      95 | #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
+         |                                          ^
+   compilation terminated.
+
+
+vim +222 drivers/nvme/host/fabrics.h
+
+   205	
+   206	int nvmf_reg_read32(struct nvme_ctrl *ctrl, u32 off, u32 *val);
+   207	int nvmf_reg_read64(struct nvme_ctrl *ctrl, u32 off, u64 *val);
+   208	int nvmf_reg_write32(struct nvme_ctrl *ctrl, u32 off, u32 val);
+   209	int nvmf_connect_admin_queue(struct nvme_ctrl *ctrl);
+   210	int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid);
+   211	int nvmf_register_transport(struct nvmf_transport_ops *ops);
+   212	void nvmf_unregister_transport(struct nvmf_transport_ops *ops);
+   213	void nvmf_free_options(struct nvmf_ctrl_options *opts);
+   214	int nvmf_get_address(struct nvme_ctrl *ctrl, char *buf, int size);
+   215	bool nvmf_should_reconnect(struct nvme_ctrl *ctrl);
+   216	bool nvmf_ip_options_match(struct nvme_ctrl *ctrl,
+   217			struct nvmf_ctrl_options *opts);
+   218	void nvme_set_io_queues(struct nvmf_ctrl_options *opts, u32 nr_io_queues,
+   219				u32 io_queues[HCTX_MAX_TYPES]);
+   220	unsigned int nvme_nr_io_queues(struct nvmf_ctrl_options *opts);
+   221	void nvme_map_queues(struct blk_mq_tag_set *set, struct nvme_ctrl *ctrl,
+ > 222			     struct ib_device *dev, u32 io_queues[HCTX_MAX_TYPES]);
+   223	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
