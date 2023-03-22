@@ -2,154 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F758C7619A
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 13:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F026EC74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 13:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230452AbjCVNas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 09:30:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43072 "EHLO
+        id S230395AbjCVNux (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 09:50:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjCVNar (ORCPT
+        with ESMTP id S230428AbjCVNup (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 09:30:47 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A049D10D1
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 06:30:45 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id p203so20937147ybb.13
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 06:30:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679491845;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fj1ZEndN827h6H99ZndY6ISgjudYJ+QA+1NK7dJ1MKY=;
-        b=dAp2Sm7P7M3MQaKNyWk6eEx7+O4qGXWX0+DMyeBe3i97co13uziImImpyMJGF4jLLb
-         xA77N70wHknYdtIkxdMcbPBi2dV8fgnGDSaeaFCa1mFqNyi2hAATsozRzSBv/TnqPMkF
-         p09JSU9UaWA35VbyplGqVFuvokTma7h74NFHl8ZLBKedG+qa8hQwxqEo3Q/saaytLRUt
-         ofrdVXGmJBE5HUYGnmLV2DdhSwXE4W2Ugc8LdfDSnlBxpyp7jCxvYpN09mVgXGfV4ziy
-         GFKhfQ4GzQyhKr+1Ky1+Ok7ncgb4g4cPb8nGHR4kSsvg1DAbYXUUWTkSj/BZF9mwKCf5
-         lJ3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679491845;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Fj1ZEndN827h6H99ZndY6ISgjudYJ+QA+1NK7dJ1MKY=;
-        b=kw406/sneLCgyMWSo1IyNmeopErhHpGzSiXmM6hwISPg+qDdEg6koEqk/SS4lxmNyC
-         ZTzxaWR5957kQAtvpD096QROURKQH0tYoOVUgiDe2rE/llggka03ILAtR2FsL6M2PYcb
-         tiNqe/myGykNZn3eDhIbsl/fAsD/siO6OxUONSSgNl9w/tkc3c9JIEUcFrRWLK1TxPez
-         fbDzHVcgFeYEGSyhsmJegcI2XKS+JF5ChcBiZu+5JXNI0Fn7hr0qSMDtT/JBlVszgcOr
-         G5lX91JdMjl7Xda1Lp+jStrvxbebn8X+7bRy8PSP9PG+gaj0fpRETMO4c3GgNuOmmcjt
-         V64g==
-X-Gm-Message-State: AAQBX9f0AD17EwU3yFB4RIhYK3uNb5JqEcTs0P5sn7shLLfNIbuHRozT
-        wY8tMtlmwa3aMcoM40YFd1WEh/DIdOgNHcSJ1avdVg==
-X-Google-Smtp-Source: AKy350bWFZJIkHw1dTAPTwr1WPguwRn3chvLp7222Dwm6xMXDK8TwrXNFJdroXPfKjAnjFCm6fSEeVSjJIIxXsUW6gM=
-X-Received: by 2002:a25:5456:0:b0:b69:eb08:8f3b with SMTP id
- i83-20020a255456000000b00b69eb088f3bmr5910216ybb.4.1679491844680; Wed, 22 Mar
- 2023 06:30:44 -0700 (PDT)
+        Wed, 22 Mar 2023 09:50:45 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DA32117
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 06:50:22 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230322135018euoutp021b480a64f8d78cb4c55989c2a537c901~OwgCO9EAu1887418874euoutp02S
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 13:50:18 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230322135018euoutp021b480a64f8d78cb4c55989c2a537c901~OwgCO9EAu1887418874euoutp02S
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1679493018;
+        bh=B7mV7FXyoTd1l8VtYDL/Y6/ww7FK/3anjYTB9ana5Ew=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=B3kZYXG7gxRoA/syaoUAWSE3836oL/3vMQg6n4Pog4cc/CWBbpD883LaemojNNVtc
+         HmB4uByLwCiVHTVmDNnRliYXqdTAhhy9SSZqwHHar9pHcz+/9/8GsXkR9fZImR9tr2
+         tOXl7dYx20ooyXimmvn5pEuCWtK4gC8pPRWcawkc=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230322135016eucas1p249e0287ce2648121944ff9859e7ca930~OwgAmbtE_0614806148eucas1p2s;
+        Wed, 22 Mar 2023 13:50:16 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id CF.84.09503.8970B146; Wed, 22
+        Mar 2023 13:50:16 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230322135016eucas1p2ee1b64175f621ee425f7f48cb908dc20~OwgAQ7_-H2731127311eucas1p2h;
+        Wed, 22 Mar 2023 13:50:16 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230322135016eusmtrp2b58b16b46a6e5ebd71064b4e97c60834~OwgAQS0ON0726007260eusmtrp2H;
+        Wed, 22 Mar 2023 13:50:16 +0000 (GMT)
+X-AuditID: cbfec7f2-e8fff7000000251f-e2-641b07981cc7
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 0D.52.08862.8970B146; Wed, 22
+        Mar 2023 13:50:16 +0000 (GMT)
+Received: from localhost (unknown [106.210.248.108]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230322135016eusmtip2fb1d581c86b27c823127c62671bcf838~OwgACUjVU2536025360eusmtip2t;
+        Wed, 22 Mar 2023 13:50:16 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     senozhatsky@chromium.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        willy@infradead.org, brauner@kernel.org, akpm@linux-foundation.org,
+        minchan@kernel.org, hubcap@omnibond.com, martin@omnibond.com
+Cc:     mcgrof@kernel.org, devel@lists.orangefs.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: [RFC v2 2/5] orangefs: use folios in orangefs_readahead
+Date:   Wed, 22 Mar 2023 14:50:10 +0100
+Message-Id: <20230322135013.197076-3-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230322135013.197076-1-p.raghav@samsung.com>
 MIME-Version: 1.0
-References: <4b9fc9c6-b48c-198f-5f80-811a44737e5f@suse.cz> <CAANmLtzajny8ZK_QKVYOxLc8L9gyWG6Uu7YyL-CR-qfwphVTzg@mail.gmail.com>
- <ZBr8Gf53CbJc0b5E@hyeyoo>
-In-Reply-To: <ZBr8Gf53CbJc0b5E@hyeyoo>
-From:   Binder Makin <merimus@google.com>
-Date:   Wed, 22 Mar 2023 09:30:32 -0400
-Message-ID: <CAANmLtzQRsRHVRdMGccNK_+Ov1H_30ntWdhBJaHDBpYLzmVR6w@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] SLOB+SLAB allocators removal and future SLUB improvements
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     Vlastimil Babka <vbabka@suse.cz>,
-        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        bpf@vger.kernel.org, linux-xfs@vger.kernel.org,
-        David Rientjes <rientjes@google.com>,
-        Christoph Lameter <cl@linux.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Roman Gushchin <roman.gushchin@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01SfUwTZxjfe3e9HnUlxynpgyXqGl0iIgy3jINNxzKml21uc9k/28iwsTc+
+        bIG01M8sqQVhMlddA44B4uKAIX40FEHrIAjM1aZFsoEWKehGyjJ1xNljG59l3K5m/ve8v+f3
+        9SQvhTMB2Uoqr6CYNxZo9RpSQXT8OHNjY7VcrXvOLrzI1jnOkezZsWMk+6AvhNjutkqMvX3V
+        hbHlYzaM7RrZwHZ2eQh28Eodyd45tyhjPY5FnB0+PoHYpr8eylmhsVTOft96mmQHFtwydm66
+        jsyI4WotPxFcW3MCN9hv5pwtR0jOGbLLuevVcwRnqRohudnAqIyzXWxBnOBcxTmDk9i7yz5U
+        vKzj9Xl7eGPylp2K3HmLV14UpvZN+KZxCzojr0BRFNAvgO2SF6tACoqhmxEErNeR9JhC0C4c
+        JkQWQwsIbn+7/bHizC1BJuHfIShvXyMJ7iE4WnV1yYqiSDoBDh2Ri/gK2oeg0lqNRAFO30Xg
+        7frPdDmdAYsNdpnIJ+h1MHIqXoSVdDr0+JsIKWs1dPf04+IcRb8E46dPkBInBjxfBwnJcjWU
+        tNfiYhbQZ6PAHj6PJHEmBM57IkbL4b77YuTkeFh0ncKk+SBMDM9FxKUIjrkcpFgIltJsPr04
+        4vR6cFxJluivwu/NLiQxomF4MkaqEA32jq9wCVbCZ2WMxNaAayYYCQUYtNZFynAQulxCHEfP
+        1DxxTM0Tx9T8n/sNwluQijebDDm8KaWA35tk0hpM5oKcpF2FBida+n/esDt0GZ28/yipF2EU
+        6kVA4ZoVyq046BilTrv/AG8szDaa9bypF6kpQqNSbtjs2cXQOdpifjfPF/HGx1uMilppwaoa
+        aqvfvEHqR/kdo8NvpK8dchzsN2b5SpPTb1E2vKfSuz+/uOVa56Z7W7dc+CGjXqGv/3hqWcev
+        mYfmJ7Ev6ROdif4d3UmzZZ8M5Lw/L5+qT3vv2VUXFi69o6oFf9M24Wb5DPNWSYojRP8z0Kha
+        wxuZOHdrOFr4/M/+hdTJdeON3n0fZMVuU28e6BP+ZtxlwY7nY+yqweRZX/603/bwpiE2YU/e
+        AVncUP6n17jo1Fd+znXEPira/XTsU368QdNz2PpRUyuuft276UHe9jEt9cdvbeq0obTwHLFz
+        /dHCePPditTOhvE42dsGa/adoGdvdt/GRE27MTHrl9RiXVngi9fsmRrClKtNScCNJu2//oZi
+        vu4DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrDIsWRmVeSWpSXmKPExsVy+t/xe7oz2KVTDL5vk7OYs34Nm8Xqu/1s
+        Fq8Pf2K02L95CpPFzQM7mSza7/YxWey9pW2xZ+9JFovLu+awWdxb85/V4uT6/8wWNyY8ZbRY
+        9vU9u8XnpS3sFrs3LmKzOP/3OKvF7x9z2BwEPWY3XGTx2LxCy+Py2VKPTas62Tw2fZrE7nFi
+        xm8Wj4apt9g8ft2+w+rRt2UVo8fnTXIem568ZQrgjtKzKcovLUlVyMgvLrFVija0MNIztLTQ
+        MzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DL+NNwmr3gH0fF0zM/mBsYV7J3MXJySAiYSKy8
+        9pm1i5GLQ0hgKaNE29d7bBAJCYnbC5sYIWxhiT/Xutggip4zSuw/sxSom4ODTUBLorETbJCI
+        wA1GifZVeiA1zCA1l5/OZgZJCAs4SPxfMokVpJ5FQFXi1nwZkDCvgJXEwevLWCDmy0vsP3gW
+        rJxTwFri0aJpYDcIAdVc3g/SClIvKHFy5hOwemag+uats5knMArMQpKahSS1gJFpFaNIamlx
+        bnpusaFecWJucWleul5yfu4mRmC0bjv2c/MOxnmvPuodYmTiYDzEKMHBrCTC68YskSLEm5JY
+        WZValB9fVJqTWnyI0RTo7InMUqLJ+cB0kVcSb2hmYGpoYmZpYGppZqwkzutZ0JEoJJCeWJKa
+        nZpakFoE08fEwSnVwKQYde9M9jO1DWsZWzs/Ws3uWfpi1/0DW0LWaG5ruswxtWSi3GTXw3lP
+        jIwFmpd8Lm9Z3CSzf8Et5Yp3fpuWdsaUtL/g07z/fe/yMHnhWq2/4ofK1eu+bv6dwx9f3Xri
+        s/zN5slG7ZeW3/vOyqPzoudbS4LrZY9efb4Yt8i/64ykZ/p32EXJd5c+tfl/Y8oB/y6ulqWn
+        n9fnWUZ+Krios3bDxW8lVUvdHWr3ns6+GBf9ufaA7cMZZRrWW+b+qGV8/me+5S6lb2J9xhqR
+        f46Eny0488F+ZuP6ILmyzHnrdKwKrc3drCPW8yzp2ZAuobnfTvKxa1rOY68zFsvWvF+1kuvv
+        on8f5+98uGRvs6bYZ1YlluKMREMt5qLiRAAQHpt+XwMAAA==
+X-CMS-MailID: 20230322135016eucas1p2ee1b64175f621ee425f7f48cb908dc20
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20230322135016eucas1p2ee1b64175f621ee425f7f48cb908dc20
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230322135016eucas1p2ee1b64175f621ee425f7f48cb908dc20
+References: <20230322135013.197076-1-p.raghav@samsung.com>
+        <CGME20230322135016eucas1p2ee1b64175f621ee425f7f48cb908dc20@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Blah, sorry, lets try this.
-https://docs.google.com/spreadsheets/d/e/2PACX-1vS1uiw85AIpzgcVlvNlDCD9PuCI=
-ubiaJvBrKIC5OyAQURZHogOuCtpFNsC-zGHZ4-XNKJVcGgkpL-KH/pubhtml
+Convert orangefs_readahead() from using struct page to struct folio.
+This conversion removes the call to page_endio() which is soon to be
+removed, and simplifies the final page handling.
 
-On Wed, Mar 22, 2023 at 9:02=E2=80=AFAM Hyeonggon Yoo <42.hyeyoo@gmail.com>=
- wrote:
->
-> On Wed, Mar 22, 2023 at 08:15:28AM -0400, Binder Makin wrote:
-> > Was looking at SLAB removal and started by running A/B tests of SLAB vs
-> > SLUB.  Please note these are only preliminary results.
-> >
-> > These were run using 6.1.13 configured for SLAB/SLUB.
-> > Machines were standard datacenter servers.
-> >
-> > Hackbench shows completion time, so smaller is better.
-> > On all others larger is better.
-> > https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47Mekl8BOp3ekCefwL6wL=
-8SQiv6Qvp5avkU2ssQSh41gntjivE-aKM4PkwzkC4N_s_MxUdcsokhhz/pubhtml
-> >
-> > Some notes:
-> > SUnreclaim and SReclaimable shows unreclaimable and reclaimable memory.
-> > Substantially higher with SLUB, but I believe that is to be expected.
-> >
-> > Various results showing a 5-10% degradation with SLUB.  That feels
-> > concerning to me, but I'm not sure what others' tolerance would be.
->
-> Hello Binder,
->
-> Thank you for sharing the data on which workloads
-> SLUB performs worse than SLAB. This information is critical for
-> improving SLUB and deprecating SLAB.
->
-> By the way, it appears that the spreadsheet is currently set to private.
-> Could you make it public for me to access?
->
-> I am really interested in performing similar experiments on my machines
-> to obtain comparable data that can be utilized to enhance SLUB.
->
-> Thanks,
-> Hyeonggon
->
-> > redis results on AMD show some pretty bad degredations.  10-20% range
-> > netpipe on Intel also has issues.. 10-17%
-> >
-> > On Tue, Mar 14, 2023 at 4:05=E2=80=AFAM Vlastimil Babka <vbabka@suse.cz=
-> wrote:
-> >
-> > > As you're probably aware, my plan is to get rid of SLOB and SLAB, lea=
-ving
-> > > only SLUB going forward. The removal of SLOB seems to be going well, =
-there
-> > > were no objections to the deprecation and I've posted v1 of the remov=
-al
-> > > itself [1] so it could be in -next soon.
-> > >
-> > > The immediate benefit of that is that we can allow kfree() (and
-> > > kfree_rcu())
-> > > to free objects from kmem_cache_alloc() - something that IIRC at leas=
-t xfs
-> > > people wanted in the past, and SLOB was incompatible with that.
-> > >
-> > > For SLAB removal I haven't yet heard any objections (but also didn't
-> > > deprecate it yet) but if there are any users due to particular worklo=
-ads
-> > > doing better with SLAB than SLUB, we can discuss why those would regr=
-ess
-> > > and
-> > > what can be done about that in SLUB.
-> > >
-> > > Once we have just one slab allocator in the kernel, we can take a clo=
-ser
-> > > look at what the users are missing from it that forces them to create=
- own
-> > > allocators (e.g. BPF), and could be considered to be added as a gener=
-ic
-> > > implementation to SLUB.
-> > >
-> > > Thanks,
-> > > Vlastimil
-> > >
-> > > [1] https://lore.kernel.org/all/20230310103210.22372-1-vbabka@suse.cz=
-/
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+ fs/orangefs/inode.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
+index aefdf1d3be7c..9014bbcc8031 100644
+--- a/fs/orangefs/inode.c
++++ b/fs/orangefs/inode.c
+@@ -244,7 +244,7 @@ static void orangefs_readahead(struct readahead_control *rac)
+ 	struct iov_iter iter;
+ 	struct inode *inode = rac->mapping->host;
+ 	struct xarray *i_pages;
+-	struct page *page;
++	struct folio *folio;
+ 	loff_t new_start = readahead_pos(rac);
+ 	int ret;
+ 	size_t new_len = 0;
+@@ -275,9 +275,10 @@ static void orangefs_readahead(struct readahead_control *rac)
+ 		ret = 0;
+ 
+ 	/* clean up. */
+-	while ((page = readahead_page(rac))) {
+-		page_endio(page, false, ret);
+-		put_page(page);
++	while ((folio = readahead_folio(rac))) {
++		if (!ret)
++			folio_mark_uptodate(folio);
++		folio_unlock(folio);
+ 	}
+ }
+ 
+-- 
+2.34.1
+
