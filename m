@@ -2,116 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AE0C6FD1F
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 09:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CBC6C6FD1F
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 09:55:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231236AbjCVJr7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 05:47:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55214 "EHLO
+        id S229719AbjCVJy7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 05:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbjCVJrj (ORCPT
+        with ESMTP id S229820AbjCVJy0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 05:47:39 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC2BC5DCB3;
-        Wed, 22 Mar 2023 02:47:11 -0700 (PDT)
+        Wed, 22 Mar 2023 05:54:26 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F9110CD;
+        Wed, 22 Mar 2023 02:52:55 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 1802B20BFE;
-        Wed, 22 Mar 2023 09:47:08 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7D7253397C;
+        Wed, 22 Mar 2023 09:52:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1679478428; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1679478774; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oUSPKszOsprQzpNqGZ3Sw62husTIX6UrodrjQqn4C/w=;
-        b=UK2V9GCKM6sQbANP9S15oaNnvIm+M4kfXbyYwi9WF2JuggGNBZ9e6bNM/DUyNT2cX7HqMQ
-        IgirpNBphhwzofGF1i9WUnpYX9RKi8iHT7HUA7P608ElgE03nuEqN//DCX/F4avJeTOrsm
-        c9vFTgJmEpzVWF3xFFuKYSBY7pdh+0A=
+        bh=YzMHyOdi3M1oFdxmInUs087qpDgl9pNZ0oaO0+rMEPk=;
+        b=B3dWGc6HiwwJQ4iCU+EMaTIyhtYPcbwEXoQDeJeccjWWWW1kbrQfctel2hnDQTQ4bSK6M2
+        Pq4WdIZ9YWd5HntYhoOPyXdAGb3U+CCkAce31bEMxHUZm5RjdCkKoPAAuXNDNNPOvuqW4h
+        VbAx+flptB2w0V5Bc8hxk/nsJgNoepw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1679478428;
+        s=susede2_ed25519; t=1679478774;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oUSPKszOsprQzpNqGZ3Sw62husTIX6UrodrjQqn4C/w=;
-        b=RwWV54C6LMEW9rNi2aql+3gsLNEkvYGDzf9N/BzyEjIav5pR14gHW/KQ5tchzulGyLbx5s
-        4589hry4URAO+GAA==
+        bh=YzMHyOdi3M1oFdxmInUs087qpDgl9pNZ0oaO0+rMEPk=;
+        b=bVlKWQlg6j26d7aS7zpSTttD9JVtk7JrnEexCZsgnB90+ErOjWgqkkEtCvqsNg5N1Fredc
+        9uGZ0Pyqp6ovD5DA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 08B2813416;
-        Wed, 22 Mar 2023 09:47:08 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6CD7113416;
+        Wed, 22 Mar 2023 09:52:54 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id PPgWApzOGmS8eAAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 22 Mar 2023 09:47:08 +0000
+        id pqKQGvbPGmRifAAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 22 Mar 2023 09:52:54 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 8C002A071C; Wed, 22 Mar 2023 10:47:07 +0100 (CET)
-Date:   Wed, 22 Mar 2023 10:47:07 +0100
+        id EA136A071C; Wed, 22 Mar 2023 10:52:53 +0100 (CET)
+Date:   Wed, 22 Mar 2023 10:52:53 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@infradead.org,
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     ming.lei@redhat.com, jack@suse.cz, hch@infradead.org,
         axboe@kernel.dk, yukuai3@huawei.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
         yangerkun@huawei.com
 Subject: Re: [PATCH] block: don't set GD_NEED_PART_SCAN if scan partition
  failed
-Message-ID: <20230322094707.7xsexupiijmxxlom@quack3>
+Message-ID: <20230322095253.gznm43rees5vpkmh@quack3>
 References: <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
  <20230322035926.1791317-1-yukuai1@huaweicloud.com>
- <ZBq1K90+9ASVbdTu@ovpn-8-17.pek2.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZBq1K90+9ASVbdTu@ovpn-8-17.pek2.redhat.com>
+In-Reply-To: <20230322035926.1791317-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 22-03-23 15:58:35, Ming Lei wrote:
-> On Wed, Mar 22, 2023 at 11:59:26AM +0800, Yu Kuai wrote:
-> > From: Yu Kuai <yukuai3@huawei.com>
-> > 
-> > Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
-> > set, and partition scan will be proceed again when blkdev_get_by_dev()
-> > is called. However, this will cause a problem that re-assemble partitioned
-> > raid device will creat partition for underlying disk.
-> > 
-> > Test procedure:
-> > 
-> > mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
-> > sgdisk -n 0:0:+100MiB /dev/md0
-> > blockdev --rereadpt /dev/sda
-> > blockdev --rereadpt /dev/sdb
-> > mdadm -S /dev/md0
-> > mdadm -A /dev/md0 /dev/sda /dev/sdb
-> > 
-> > Test result: underlying disk partition and raid partition can be
-> > observed at the same time
-> > 
-> > Note that this can still happen in come corner cases that
-> > GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
-> > device.
-> > 
-> > Fixes: e5cfefa97bcc ("block: fix scan partition for exclusively open device again")
-> > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+On Wed 22-03-23 11:59:26, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> The issue still can't be avoided completely, such as, after rebooting,
-> /dev/sda1 & /dev/md0p1 can be observed at the same time. And this one
-> should be underlying partitions scanned before re-assembling raid, I
-> guess it may not be easy to avoid.
+> Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
+> set, and partition scan will be proceed again when blkdev_get_by_dev()
+> is called. However, this will cause a problem that re-assemble partitioned
+> raid device will creat partition for underlying disk.
+> 
+> Test procedure:
+> 
+> mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
+> sgdisk -n 0:0:+100MiB /dev/md0
+> blockdev --rereadpt /dev/sda
+> blockdev --rereadpt /dev/sdb
+> mdadm -S /dev/md0
+> mdadm -A /dev/md0 /dev/sda /dev/sdb
+> 
+> Test result: underlying disk partition and raid partition can be
+> observed at the same time
+> 
+> Note that this can still happen in come corner cases that
+> GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
+> device.
+> 
+> Fixes: e5cfefa97bcc ("block: fix scan partition for exclusively open device again")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-So this was always happening (before my patches, after my patches, and now
-after Yu's patches) and kernel does not have enough information to know
-that sda will become part of md0 device in the future. But mdadm actually
-deals with this as far as I remember and deletes partitions for all devices
-it is assembling the array from (and quick tracing experiment I did
-supports this).
+This looks good to me. I've actually noticed this problem already when
+looking at the patch resulting in commit e5cfefa97bcc but Jens merged it
+before I got to checking it and then I've convinced myself it's not serious
+enough to redo the patch. Anyway, feel free to add:
 
-								Honza
+Reviewed-by: Jan Kara <jack@suse.cz>
 
+								Honza 
+
+> ---
+>  block/genhd.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 08bb1a9ec22c..a72e27d6779d 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -368,7 +368,6 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>  	if (disk->open_partitions)
+>  		return -EBUSY;
+>  
+> -	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>  	/*
+>  	 * If the device is opened exclusively by current thread already, it's
+>  	 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
+> @@ -381,12 +380,19 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>  			return ret;
+>  	}
+>  
+> +	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>  	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL);
+>  	if (IS_ERR(bdev))
+>  		ret =  PTR_ERR(bdev);
+>  	else
+>  		blkdev_put(bdev, mode & ~FMODE_EXCL);
+>  
+> +	/*
+> +	 * If blkdev_get_by_dev() failed early, GD_NEED_PART_SCAN is still set,
+> +	 * and this will cause that re-assemble partitioned raid device will
+> +	 * creat partition for underlying disk.
+> +	 */
+> +	clear_bit(GD_NEED_PART_SCAN, &disk->state);
+>  	if (!(mode & FMODE_EXCL))
+>  		bd_abort_claiming(disk->part0, disk_scan_partitions);
+>  	return ret;
+> -- 
+> 2.31.1
+> 
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
