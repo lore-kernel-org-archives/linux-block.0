@@ -2,140 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54228C6FD1C
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 07:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F94BC6FD1C
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 07:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbjCVHpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 03:45:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51376 "EHLO
+        id S229642AbjCVH7b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 03:59:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjCVHo7 (ORCPT
+        with ESMTP id S229522AbjCVH7b (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 03:44:59 -0400
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4FF13C79B
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 00:44:57 -0700 (PDT)
-Received: by mail-wm1-f44.google.com with SMTP id m35so10897471wms.4
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 00:44:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679471096;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6UXyATeKHlv1Op6ZKzcQ0JQ9/Q6dOVj9ORhczgbtwQc=;
-        b=rcZDdddwFPMj7HRiWNQcD0kLI5qUA1M9M+n/D4edDXc/wO/5zH9/UTJmMLvcliacmG
-         BUo5I7tkn+Mm3Zs3GbB8M5ZCuzf66nKJhHi99JwFmBLMC2gQ9Lj3NIfiY6OdnwhYiUb4
-         WFF+ZSlRxUXuJfbUv4dzHZDqCmZKxgK6WL4y68adIurNpe+Gs9+ZwawA1KSywbktvUuP
-         pj6B6jYiiIGwj4aUTSNrdzCkNwEG2kM5yLZsld0JV1BvHRQ+TvZwz65fC+kezUs4L7Bz
-         /NTSSVvnu3+viTvn4MAZ3T3f5UKIXl+7tOprs9lsIhExZxBHKHwDNcSwku/iXHzmdVG5
-         A43Q==
-X-Gm-Message-State: AO0yUKWJ07jYRVV65RQYFh3a+CvNGDRqxxIyyVGLN35x/dGZdDbHR3w0
-        yuiglZgXZzBxaBi+o7SFEFo=
-X-Google-Smtp-Source: AK7set+NaVAzrB6RElN6Q2zygls9pNPDiQGzAKQLmX0v+8Xvml2M3E+0eisgfBmflQXHoVFvCtJ62g==
-X-Received: by 2002:a05:600c:3110:b0:3ed:2702:fed8 with SMTP id g16-20020a05600c311000b003ed2702fed8mr4983293wmo.4.1679471096027;
-        Wed, 22 Mar 2023 00:44:56 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id j22-20020a05600c1c1600b003e9ded91c27sm22484092wms.4.2023.03.22.00.44.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Mar 2023 00:44:55 -0700 (PDT)
-Message-ID: <6c5bddde-7a9e-c7be-4302-ce0334708914@grimberg.me>
-Date:   Wed, 22 Mar 2023 09:44:54 +0200
+        Wed, 22 Mar 2023 03:59:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09171E1F7
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 00:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679471932;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L8Ne1p2uicICYZ7xBH6jyVNfKiAf/Oat/UHSOLhhvvU=;
+        b=SERR3/lw+aYWBUdUyizbQaquJM+zd+PBknOSU6SvsYngbgrUN9VDYORE8rt2cqdrGrwtMH
+        i3ZQfsz6Gtd/hkIrsI1lfDfffecszbwgEJ3qYYH7Ofp0kFjQYJjwPuxxLpT7qzQwjZTmhP
+        Z5jcEngjQfL+yNtBqOj0tHsVW9Wt5nw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-423-ew3BiCPcNQGT8dgmsdGtbw-1; Wed, 22 Mar 2023 03:58:46 -0400
+X-MC-Unique: ew3BiCPcNQGT8dgmsdGtbw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E198385C075;
+        Wed, 22 Mar 2023 07:58:45 +0000 (UTC)
+Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 730B940C20FA;
+        Wed, 22 Mar 2023 07:58:39 +0000 (UTC)
+Date:   Wed, 22 Mar 2023 15:58:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     jack@suse.cz, hch@infradead.org, axboe@kernel.dk,
+        yukuai3@huawei.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yangerkun@huawei.com, ming.lei@redhat.com
+Subject: Re: [PATCH] block: don't set GD_NEED_PART_SCAN if scan partition
+ failed
+Message-ID: <ZBq1K90+9ASVbdTu@ovpn-8-17.pek2.redhat.com>
+References: <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
+ <20230322035926.1791317-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH 2/3] nvme: add polling options for loop target
-Content-Language: en-US
-To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, linux-nvme@lists.infradead.org, hch@lst.de
-Cc:     Keith Busch <kbusch@kernel.org>
-References: <20230322002350.4038048-1-kbusch@meta.com>
- <20230322002350.4038048-3-kbusch@meta.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230322002350.4038048-3-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230322035926.1791317-1-yukuai1@huaweicloud.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 3/22/23 02:23, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+On Wed, Mar 22, 2023 at 11:59:26AM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> This is for mostly for testing purposes.
+> Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
+> set, and partition scan will be proceed again when blkdev_get_by_dev()
+> is called. However, this will cause a problem that re-assemble partitioned
+> raid device will creat partition for underlying disk.
 > 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> Test procedure:
+> 
+> mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
+> sgdisk -n 0:0:+100MiB /dev/md0
+> blockdev --rereadpt /dev/sda
+> blockdev --rereadpt /dev/sdb
+> mdadm -S /dev/md0
+> mdadm -A /dev/md0 /dev/sda /dev/sdb
+> 
+> Test result: underlying disk partition and raid partition can be
+> observed at the same time
+> 
+> Note that this can still happen in come corner cases that
+> GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
+> device.
+> 
+> Fixes: e5cfefa97bcc ("block: fix scan partition for exclusively open device again")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+
+The issue still can't be avoided completely, such as, after rebooting,
+/dev/sda1 & /dev/md0p1 can be observed at the same time. And this one
+should be underlying partitions scanned before re-assembling raid, I
+guess it may not be easy to avoid.
+
+Also seems the following change added in e5cfefa97bcc isn't necessary:
+
+                /* Make sure the first partition scan will be proceed */
+                if (get_capacity(disk) && !(disk->flags & GENHD_FL_NO_PART) &&
+                    !test_bit(GD_SUPPRESS_PART_SCAN, &disk->state))
+                        set_bit(GD_NEED_PART_SCAN, &disk->state);
+
+since the following disk_scan_partitions() in device_add_disk() should cover
+partitions scan.
+
 > ---
->   drivers/nvme/target/loop.c | 63 +++++++++++++++++++++++++++++++++++---
->   1 file changed, 58 insertions(+), 5 deletions(-)
+>  block/genhd.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-> index f2d24b2d992f8..0587ead60b09e 100644
-> --- a/drivers/nvme/target/loop.c
-> +++ b/drivers/nvme/target/loop.c
-> @@ -22,6 +22,7 @@ struct nvme_loop_iod {
->   	struct nvmet_req	req;
->   	struct nvme_loop_queue	*queue;
->   	struct work_struct	work;
-> +	struct work_struct	poll;
->   	struct sg_table		sg_table;
->   	struct scatterlist	first_sgl[];
->   };
-> @@ -37,6 +38,7 @@ struct nvme_loop_ctrl {
->   	struct nvme_ctrl	ctrl;
->   
->   	struct nvmet_port	*port;
-> +	u32			io_queues[HCTX_MAX_TYPES];
->   };
->   
->   static inline struct nvme_loop_ctrl *to_loop_ctrl(struct nvme_ctrl *ctrl)
-> @@ -76,7 +78,11 @@ static void nvme_loop_complete_rq(struct request *req)
->   	struct nvme_loop_iod *iod = blk_mq_rq_to_pdu(req);
->   
->   	sg_free_table_chained(&iod->sg_table, NVME_INLINE_SG_CNT);
-> -	nvme_complete_rq(req);
-> +
-> +	if (req->mq_hctx->type != HCTX_TYPE_POLL || !in_interrupt())
-> +		nvme_complete_rq(req);
-> +	else
-> +		queue_work(nvmet_wq, &iod->poll);
->   }
->   
->   static struct blk_mq_tags *nvme_loop_tagset(struct nvme_loop_queue *queue)
-> @@ -120,6 +126,15 @@ static void nvme_loop_queue_response(struct nvmet_req *req)
->   	}
->   }
->   
-> +static void nvme_loop_poll_work(struct work_struct *work)
-> +{
-> +	struct nvme_loop_iod *iod =
-> +		container_of(work, struct nvme_loop_iod, poll);
-> +	struct request *req = blk_mq_rq_from_pdu(iod);
-> +
-> +	nvme_complete_rq(req);
-> +}
-> +
->   static void nvme_loop_execute_work(struct work_struct *work)
->   {
->   	struct nvme_loop_iod *iod =
-> @@ -170,6 +185,30 @@ static blk_status_t nvme_loop_queue_rq(struct blk_mq_hw_ctx *hctx,
->   	return BLK_STS_OK;
->   }
->   
-> +static bool nvme_loop_poll_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> +{
-> +	struct blk_mq_hw_ctx *hctx = data;
-> +	struct nvme_loop_iod *iod;
-> +	struct request *rq;
-> +
-> +	rq = blk_mq_tag_to_rq(hctx->tags, bitnr);
-> +	if (!rq)
-> +		return true;
-> +
-> +	iod = blk_mq_rq_to_pdu(rq);
-> +	flush_work(&iod->poll);
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 08bb1a9ec22c..a72e27d6779d 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -368,7 +368,6 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>  	if (disk->open_partitions)
+>  		return -EBUSY;
+>  
+> -	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>  	/*
+>  	 * If the device is opened exclusively by current thread already, it's
+>  	 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
+> @@ -381,12 +380,19 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>  			return ret;
+>  	}
+>  
+> +	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>  	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL);
+>  	if (IS_ERR(bdev))
+>  		ret =  PTR_ERR(bdev);
+>  	else
+>  		blkdev_put(bdev, mode & ~FMODE_EXCL);
+>  
+> +	/*
+> +	 * If blkdev_get_by_dev() failed early, GD_NEED_PART_SCAN is still set,
+> +	 * and this will cause that re-assemble partitioned raid device will
+> +	 * creat partition for underlying disk.
+> +	 */
+> +	clear_bit(GD_NEED_PART_SCAN, &disk->state);
 
-If we want to go down this route, I would think that maybe
-it'd be better to add .poll to nvmet_req like .execute, that can
-actually be wired to bio_poll ? for file it can be wired to fop.iopoll
+I feel GD_NEED_PART_SCAN becomes a bit hard to follow.
+
+So far, it is only consumed by blkdev_get_whole(), and cleared in
+bdev_disk_changed(). That means partition scan can be retried
+if bdev_disk_changed() fails.
+
+Another mess is that more drivers start to touch this flag, such as
+nbd/sd, probably it is better to change them into one API of
+blk_disk_need_partition_scan(), and hide implementation detail
+to drivers.
+
+
+thanks,
+Ming
+
