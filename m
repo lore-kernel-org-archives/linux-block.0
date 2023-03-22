@@ -2,149 +2,136 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D00C6FD1F
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 16:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 838E0C76195
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 18:14:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbjCVQKQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 12:10:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52798 "EHLO
+        id S230219AbjCVSOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 14:14:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbjCVQKF (ORCPT
+        with ESMTP id S229513AbjCVSOU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 12:10:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 494455982B
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 09:09:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679501349;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1bX4swPuNAE8QO6vwyly7Hj41GaBwCiM8/ocxk1BKj4=;
-        b=bhZRxNTE5zKfTGiSXyOud5qqUZckc8u+UI3Xpq3mX3tsx93CbTirLiHMllK5VDUBTRcNV0
-        wlT8npDLQeg51CN0aauUYlpb6BsB7PRkBRuvbJIHWMrWv4gk2OWHnh1vaXkv9ZoWu0p/Dg
-        V6Cz0tQwVT+L5JnzMulivpRplH5hHh8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-240-ZxPoGhpZNJi8CF_LsICsCw-1; Wed, 22 Mar 2023 12:09:05 -0400
-X-MC-Unique: ZxPoGhpZNJi8CF_LsICsCw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F5C68030D6;
-        Wed, 22 Mar 2023 16:09:04 +0000 (UTC)
-Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A89D41410F1E;
-        Wed, 22 Mar 2023 16:08:57 +0000 (UTC)
-Date:   Thu, 23 Mar 2023 00:08:51 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, hch@infradead.org,
-        axboe@kernel.dk, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, Xiao Ni <xni@redhat.com>,
-        linux-raid@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH] block: don't set GD_NEED_PART_SCAN if scan partition
- failed
-Message-ID: <ZBsoE677zEuAm23E@ovpn-8-17.pek2.redhat.com>
-References: <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
- <20230322035926.1791317-1-yukuai1@huaweicloud.com>
- <ZBq1K90+9ASVbdTu@ovpn-8-17.pek2.redhat.com>
- <20230322094707.7xsexupiijmxxlom@quack3>
- <ZBrnxrQ8csN/xkRG@ovpn-8-17.pek2.redhat.com>
- <20230322130709.7zp7spmhcmjbfjvm@quack3>
+        Wed, 22 Mar 2023 14:14:20 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2065.outbound.protection.outlook.com [40.107.244.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4ADB61897;
+        Wed, 22 Mar 2023 11:14:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gEdfnGwJhAGjIABpaC2Mk5IOA0MriJbOatJ/5Lg921F6TBBsX0pnaSFcCdCJS0RKd9kQ/frKeeuIydc016sqAu/obBFXL9glsKXo3N8jymZ5gyZ4fmXq68wpmgmgw5a0GiIRMnOGUZH4wVgnAHI8bzOONQfvP0Y9G2YeKQyV6YbQiMNJyqDwOT+p7pzwp5waOK38OCZI/tzzrEm03ZmhdBD6Y80iJcWTsGgxARlZmtuOeZbIzg/XkLi67vVl4JtpaaDcbFwdp/4nvbIXnxuEi6L3XOmB5RcsDy3jMlKobHRIphp3C9OrvuK8BYSEgP8CrLRi/fkkjKGZ+/AB0x0qHQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JsU6zMgugdbSwrhZSqil6LLbB66MRDHg1WYgVomhVQE=;
+ b=E2X2IUUMcZtJeE2ogkvz/30N1Z2GpTLv5TO4q7y5SwwM3zqKwkUqTGj+R7WKK9jU1xqVlEp3yXOBig6aMZSOQLqWATwaFsiNhkBX6QiUDekhvl6crbp/22dhbAZfUBryfF6JmEWvU+ONvb844QWQ1DAI5coGifw3F37SGny6KSEBqXeQxlGBaDt3WqnsKzS/Kiw6BxQjXm9lanz309YW0BIgNJ0ML7OSGkHqwBGWlpZPsZPB50wT9LCFfXS3S/YPXWyH3ULSCTQi5z31fZESPX859v0eMQXNDCM9zyA63VVyTUi5NoSnG4PeYZKWx+iGoKca0eewcQQZRNVe/mBKpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JsU6zMgugdbSwrhZSqil6LLbB66MRDHg1WYgVomhVQE=;
+ b=JDMklHB3s8/PG85rPT1AapXpSIYs2yuJD6Y6/AXtdwsvvm2wpmiWWDxgDrR06IT9z9u7LCXb/4n6CaD/gIdTbE7CbEJWGQFZIJ1FB34pKM6JUB7X2POWlSR7r2yAyUxuT31GZS9BmC2sNRNcChjhPDMZE/rD2Cjo3YxMWiYH44fKNQgobTGpsHmDZkTb9nvnasWj/+Eu4/XKRPWv5Smt98cBqD4vekjEXfwxviM4PA8Vd47ZWlYL8uyeSWDygQTIEyYiadxumA/bllB1jUnLX7p+hLz0g/xHs2jjfZGmMRY5Vh+TNS/GfyoQaOu7ogpxb7sLIvKtR1nYHwD9UsgDFg==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by CH0PR12MB5298.namprd12.prod.outlook.com (2603:10b6:610:d5::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Wed, 22 Mar
+ 2023 18:14:17 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::9f90:cf3d:d640:a90b]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::9f90:cf3d:d640:a90b%4]) with mapi id 15.20.6178.037; Wed, 22 Mar 2023
+ 18:14:17 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Sagi Grimberg <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+CC:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH] blk-mq-rdma: remove queue mapping helper for rdma devices
+Thread-Topic: [PATCH] blk-mq-rdma: remove queue mapping helper for rdma
+ devices
+Thread-Index: AQHZXLsKHjYMnEpKYkmjsZYFemgSBK8HGsSA
+Date:   Wed, 22 Mar 2023 18:14:17 +0000
+Message-ID: <28cee6ea-3802-aaf9-755f-3cdedd12d2b4@nvidia.com>
+References: <20230322123703.485544-1-sagi@grimberg.me>
+In-Reply-To: <20230322123703.485544-1-sagi@grimberg.me>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|CH0PR12MB5298:EE_
+x-ms-office365-filtering-correlation-id: bb6f5f7e-712f-468b-977b-08db2b014023
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: BNHC3oilGUL2LYRQbJpQUDxQykpCZ2Y4mywbN7J8JNvickL1tQtrLZ0NA0aTgZ+NBQVjrgGneyfIaxQbVHsX5GgllTbq0vUm/pW/GUsYgl/z+o/HwIqofYYBiq7vTi8OyjcjJehHM8tzVDDtE+UjoYeigFHphg3ss3U20xjlzeyirrZfPhfGIS2kYhpgIlqm4durZX4aquv9bZyMSiwd9FwIlLHHRY3ERTeuiJkkcIy8FygHZdX0dK0Kiy3ywdJ0wlzKnluorh0QjEIi9C0fAMt4kFWTJ2ULnEKpqmHGr/D/KKI1VzDxh2iLHiO13ZQFAMVABCu5nc+pOXzJqc5+IQG5vkklmbDFBYL3i47Ue2rhY9q2MzNy5GR19ZGoERyIhpyk+FYwdA3AMYUSznFxs0F/behtlzFRlksWhJOvvxcVyGwSGL7goDwLTNBWRb+7e1sXe0l793f2qMP96UvqfAAhtMhD26+OlFDss85lHSn/5NdQ06o/MJn87CYlxD2ZFlq/KVbW2gx5wedYnQEs7wtjRive1irUg2QcV9LL/khP/kTgD9EV2xmA4KlrY4xlQ74jJ0WeDbCmTtNtfuUWv4C/KfjC22l/E6nUFWqou/Zz1mjlt4Axx5o7lJ32L6AewED6qVCe7+FWT0eTxZ0tZa8cSkGw5c8BXQRB+iMdIqDcdh8HqFjNN2yd9CUIjwFOhSZkaz4ViZk3IiF6dX3sJ3HYBJJ/FlfMHB9UpYZE597uP59cTFNT6JQ9l9sUyVgkl+xb4pD6sK5kqRwZG3rC5A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(396003)(346002)(376002)(366004)(39860400002)(451199018)(86362001)(31686004)(2616005)(6486002)(38070700005)(26005)(6506007)(6512007)(53546011)(186003)(71200400001)(31696002)(38100700002)(478600001)(122000001)(2906002)(4326008)(91956017)(66476007)(4744005)(54906003)(66946007)(8676002)(110136005)(64756008)(316002)(5660300002)(66446008)(8936002)(41300700001)(66556008)(76116006)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZlJCQTF3UWdiZG53QXk4L0FIY2lFYWNJMFZUb1dRZER0TVpqeVcyOEJoZys1?=
+ =?utf-8?B?ck9US2g2TUZVaWdqYUVGK1dsa3hQL0JwbS9zUkQySnJXd1poTWV4WThSOHZa?=
+ =?utf-8?B?dkIxZ2ZyVXVSdTJhT0RSazhwTUNqRFYxQ2lWN00rVUltUDg0TzUwU2U3WVpz?=
+ =?utf-8?B?dS9hczZqYkdSdXdGRHplQnZTZXd2MnA5N0NyckFoVzlBbXpYWUtkODh4VEFP?=
+ =?utf-8?B?MTFRR2x2d1pDTGNSTmdONS9xUmt4NVlFVVA0clJYSlo0aFFxTlRZOTIzRGth?=
+ =?utf-8?B?Q1ppdnRsd0o3TzJiWUFLTGg5WU9NTUtMbkxLbk1xdG9uMFVBZ3NNTTJWTjRW?=
+ =?utf-8?B?VEFveUdsampVUzJFNHFMWEZWNDB2Zyt2dDhQTFZVTU5aYnIwbnhyYVpXa2t1?=
+ =?utf-8?B?bE1IYmtzN3ZBMmR2aURZMjBQc2FUakw2ZlczVjJMQ25DUEtUSklhUG8zM0Rt?=
+ =?utf-8?B?V1M5L01MOHpHTHJydTRpcWc2UHdieGpCSnY2Q3Brc0ZRWkJCUWZreVlOZmZq?=
+ =?utf-8?B?dVVaQVYzQm84VFVvYldCazNVdlN0UkxtWlZHTEszaEVSc0FoVHVhZWxMZ0tz?=
+ =?utf-8?B?dGpDMnZjVGhXRys0QVZCamVqeGROcWcraDRaMEltbitPN1RpNDBSbk1xd3dq?=
+ =?utf-8?B?S0NyendDQy9TVXQ3bTJiMFJwZ3RNdS83WXdtSkRzN3grMEg2WDR5aFBxOVIy?=
+ =?utf-8?B?YUY3OFdiYXhQV3FrZXZCSHJmL1ZRam5aQWxBVmtnUUV6cFFMbkhrcUU0d1lB?=
+ =?utf-8?B?VGhpNkpCWEh0UjRaTjFGMDZJeFNPZk5CZ3BnQUhBdXRDYzZyVTdTSVZneExY?=
+ =?utf-8?B?NXlpb0hPY3RMZjFEdTV1dmV0ckF2Z0pwUmRnRTFiYk5FaU9vOW5XNkw0TTM2?=
+ =?utf-8?B?YkZGNS80SEJWZmdWVlpwUUxWZmw5VXVJRlZtU04zU3J6ZFo3ampRcW5qekxl?=
+ =?utf-8?B?UVYrcjlYdHBOdDRldmwySktQYzYwTk1FbjRWS0hoenVJM3AxcG5PaU9vdXB2?=
+ =?utf-8?B?dm56dis2Y1R6aTd1cDMyUnFSZFhLampnbUhHOURHbFhidFdlQ0ZRaXh5SThn?=
+ =?utf-8?B?WFNEN0ZnNmVFb1ZaUzMxb1QyS1pvWmYwTmwyd0lBNThBRlJTVkFRa2JtY3hM?=
+ =?utf-8?B?ZkdPQk5hTDVSTm5McjI0ZWNIV2ZMU0V1SURzZTZLb1NJRFZQQ0p1K3d5cGdQ?=
+ =?utf-8?B?MXN3L2NJbXlaUWRnaC9MMlRLTzJqb3hoTDNtc0haNldBajhyNkZ2UndmUGpH?=
+ =?utf-8?B?WFhHUHdpWG9qRkFOMTVDU09vNGlDWHV1cVBlQVhtRmEwVCtjNlBocEVGL0NE?=
+ =?utf-8?B?aWRUMURhZHNnY3QwSXBLS0xHVkd3ZGExWnpnYlFMam52a3hDaGRNenpQUHpl?=
+ =?utf-8?B?MGVwd2szTmpyYm9jdjZQNUc1M1BrQjJrUFJtQ1FpTmwyb01MSnkveGduNXRk?=
+ =?utf-8?B?T2NTWDZhMVh1Q0Vxb0RpYjZoOThxclUralNTbzBDWkFTb3RFc0VoLzFnbkZj?=
+ =?utf-8?B?TktiQjVNRXFZd2lmQjFkNm9ZVGFaQUxwQ1BpNDdmWHdiRTkrU0tnL29RNzRT?=
+ =?utf-8?B?RzdoSjJ3U3cycU1EV2FiaFNlNHJsT0Fta3BhSExVdkNobHRQWlovZ3VBa016?=
+ =?utf-8?B?bkF6TnhmT3JCYmU4bTUvUnBIOUl1Zmw4WjBmWHlvL0w4a3lSKzIzVjlpY1Jz?=
+ =?utf-8?B?aGZWMmU4bVZlTm95VC9lM0VIaW93bWRLeWZQb041RTQ1T0orek1Qdi9peHpI?=
+ =?utf-8?B?Z2V3bUZ3bklNZUtpR2IwSkdVVFQ2ZjI2Ly9DTm1TNytHTFRaRHA3WGcxVUNo?=
+ =?utf-8?B?cFFZVTlkTE1pamFiVFVtQ0p4eXdkcGtpWU1QYisxM3p4VTl4RWkwNXdnUDJQ?=
+ =?utf-8?B?QWdwT3cxcWx0bjVDSjdOWW85OFVlNVZFWHRTSkRGRVhjaEFNQjBub1poNW9R?=
+ =?utf-8?B?aE0rMmpqZFFuOEZ3RXFBUVljWEZwZTVXOGNDV3ZSWWFJUVl0dkZRQ2VDcm9z?=
+ =?utf-8?B?WjhyUzkvbnl5bENNank3TFBhMndPbTlnV0JkdHFtUW9QcUFLYzZnSk9CQVFI?=
+ =?utf-8?B?YlBKaGMxc2NPc0xMbmZEdTUzd3ZNcS9RSWlCV2ltWTRhWE95RHlXbUVRbGhP?=
+ =?utf-8?Q?M9KkYAOcGN59Z2d0+Xti2f6AG?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <07CD4E70615934468B626F4B8D65F667@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230322130709.7zp7spmhcmjbfjvm@quack3>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb6f5f7e-712f-468b-977b-08db2b014023
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Mar 2023 18:14:17.3936
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DQZ6EoKGxxZltg4MWoRNRQw/d/lcQV7rLJlPtTb6AQ86c5x0wg3L8oObOtpKahLk+9e+Sg1CItikBRAM3YrOOw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5298
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 02:07:09PM +0100, Jan Kara wrote:
-> On Wed 22-03-23 19:34:30, Ming Lei wrote:
-> > On Wed, Mar 22, 2023 at 10:47:07AM +0100, Jan Kara wrote:
-> > > On Wed 22-03-23 15:58:35, Ming Lei wrote:
-> > > > On Wed, Mar 22, 2023 at 11:59:26AM +0800, Yu Kuai wrote:
-> > > > > From: Yu Kuai <yukuai3@huawei.com>
-> > > > > 
-> > > > > Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
-> > > > > set, and partition scan will be proceed again when blkdev_get_by_dev()
-> > > > > is called. However, this will cause a problem that re-assemble partitioned
-> > > > > raid device will creat partition for underlying disk.
-> > > > > 
-> > > > > Test procedure:
-> > > > > 
-> > > > > mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
-> > > > > sgdisk -n 0:0:+100MiB /dev/md0
-> > > > > blockdev --rereadpt /dev/sda
-> > > > > blockdev --rereadpt /dev/sdb
-> > > > > mdadm -S /dev/md0
-> > > > > mdadm -A /dev/md0 /dev/sda /dev/sdb
-> > > > > 
-> > > > > Test result: underlying disk partition and raid partition can be
-> > > > > observed at the same time
-> > > > > 
-> > > > > Note that this can still happen in come corner cases that
-> > > > > GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
-> > > > > device.
-> > > > > 
-> > > > > Fixes: e5cfefa97bcc ("block: fix scan partition for exclusively open device again")
-> > > > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> > > > 
-> > > > The issue still can't be avoided completely, such as, after rebooting,
-> > > > /dev/sda1 & /dev/md0p1 can be observed at the same time. And this one
-> > > > should be underlying partitions scanned before re-assembling raid, I
-> > > > guess it may not be easy to avoid.
-> > > 
-> > > So this was always happening (before my patches, after my patches, and now
-> > > after Yu's patches) and kernel does not have enough information to know
-> > > that sda will become part of md0 device in the future. But mdadm actually
-> > > deals with this as far as I remember and deletes partitions for all devices
-> > > it is assembling the array from (and quick tracing experiment I did
-> > > supports this).
-> > 
-> > I am testing on Fedora 37, so mdadm v4.2 doesn't delete underlying
-> > partitions before re-assemble.
-> 
-> Strange, I'm on openSUSE Leap 15.4 and mdadm v4.1 deletes these partitions
-> (at least I can see mdadm do BLKPG_DEL_PARTITION ioctls). And checking
-> mdadm sources I can see calls to remove_partitions() from start_array()
-> function in Assemble.c so I'm not sure why this is not working for you...
-
-I added dump_stack() in delete_partition() for partition 1, not observe
-stack trace during booting.
-
-> 
-> > Also given mdadm or related userspace has to change for avoiding
-> > to scan underlying partitions, just wondering why not let userspace
-> > to tell kernel not do it explicitly?
-> 
-> Well, those userspace changes are long deployed, now you would introduce
-> new API that needs to proliferate again. Not very nice. Also how would that
-> exactly work? I mean once mdadm has underlying device open, the current
-> logic makes sure we do not create partitions anymore. But there's no way
-> how mdadm could possibly prevent creation of partitions for devices it
-> doesn't know about yet so it still has to delete existing partitions...
-
-I meant if mdadm has to change to delete existed partitions, why not add
-one ioctl to disable partition scan for this disk when deleting
-partitions/re-assemble, and re-enable scan after stopping array.
-
-But looks it isn't so, since you mentioned that remove_partitions is
-supposed to be called before starting array, however I didn't observe this
-behavior.
-
-I am worrying if the current approach may cause regression, one concern is
-that ioctl(BLKRRPART) needs exclusive open now, such as:
-
-1) mount /dev/vdb1 /mnt
-
-2) ioctl(BLKRRPART) may fail after removing /dev/vdb3
-
-
-thanks,
-Ming
-
+T24gMy8yMi8yMyAwNTozNywgU2FnaSBHcmltYmVyZyB3cm90ZToNCj4gTm8gcmRtYSBkZXZpY2Ug
+ZXhwb3NlcyBpdHMgaXJxIHZlY3RvcnMgYWZmaW5pdHkgdG9kYXkuIFNvIHRoZSBvbmx5DQo+IG1h
+cHBpbmcgdGhhdCB3ZSBoYXZlIGxlZnQsIGlzIHRoZSBkZWZhdWx0IGJsa19tcV9tYXBfcXVldWVz
+LCB3aGljaA0KPiB3ZSBmYWxsYmFjayB0byBhbnl3YXlzLiBBbHNvIGZpeHVwIHRoZSBvbmx5IGNv
+bnN1bWVyIG9mIHRoaXMgaGVscGVyDQo+IChudm1lLXJkbWEpLg0KPg0KPiBSZW1vdmUgdGhpcyBu
+b3cgZGVhZCBjb2RlLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBTYWdpIEdyaW1iZXJnIDxzYWdpQGdy
+aW1iZXJnLm1lPg0KPiAtLS0NCj4NCg0KQmFzZWQgb24gdGhlIGRpc2N1c3Npb24gb24gdGhlIG90
+aGVyIHRocmVhZCBvbiB0aGUgS2VpdGgncyBwYXRjaA0KdGhpcyBsb29rcyBnb29kLg0KDQpSZXZp
+ZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNrDQoNCg0K
