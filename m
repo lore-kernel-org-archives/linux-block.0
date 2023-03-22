@@ -2,189 +2,124 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA378C6FD1C
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 12:30:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFF4C7619A
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 12:30:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbjCVMaP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 08:30:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34184 "EHLO
+        id S230371AbjCVMav (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 08:30:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230046AbjCVMaO (ORCPT
+        with ESMTP id S230298AbjCVMan (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 08:30:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 807BA303E7
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 05:29:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679488165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DDZ81cwjjCLDnbq2gzVynfA+CfCd2gVU17eXqtriDsI=;
-        b=f+rO3wkPFP9g5Gr7JmC+PCl9wHYmqIIGykifAipsxo84WbdfE0lLj+7hirNQy1qNM72Yxv
-        j6doGNWLQEL37W1Zyt3rSFhONchBmimuGHkhStiIhr+v+tYEuVy0lmccavq+9ZOmMNAlfW
-        MsPtImmi+V3HVrWl4FhKnW1W/K77Ous=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-389-b_yorsKQMHavVIILlI1VxA-1; Wed, 22 Mar 2023 08:29:24 -0400
-X-MC-Unique: b_yorsKQMHavVIILlI1VxA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E11C93C54277;
-        Wed, 22 Mar 2023 12:29:23 +0000 (UTC)
-Received: from redhat.com (unknown [10.2.16.148])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E3A4B1731B;
-        Wed, 22 Mar 2023 12:29:22 +0000 (UTC)
-Date:   Wed, 22 Mar 2023 07:29:21 -0500
-From:   Eric Blake <eblake@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-        corbet@lwn.net, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/5] block nbd: send handle in network order
-Message-ID: <20230322122921.ac47tbbkddrb72gq@redhat.com>
-References: <20230317202749.419094-1-eblake@redhat.com>
- <20230317202749.419094-3-eblake@redhat.com>
- <ZBjqQckL7d5EJPlh@ovpn-8-29.pek2.redhat.com>
- <20230321135900.ni4w5ichvjba7s4u@redhat.com>
- <ZBpQLQtZP3Gj8MdS@ovpn-8-18.pek2.redhat.com>
+        Wed, 22 Mar 2023 08:30:43 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A688B59E7B
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 05:30:40 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id y5so20770733ybu.3
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 05:30:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679488240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hIDnRaN9sxd0xnZDEDrl7FwoOB+6T8A94tkf+oMcNsM=;
+        b=hwEVw8FNtToCOmLQzJtRNJ/OkEWC4Dguci+blmJcuw5u2JD4IBIE2+21El8yJXYoS4
+         xuyDJwhGLwfaZi4e9bgZZGHhFGtOICW8hbt23BhzniyCEPVGOXnYg5c3h5ZbYmsCAqzr
+         Ul3z2M8L2Z/jcy8nHggkc/OqzRO00lMvkcrhcmAvsTir82DbqXUWHEi1I0pl9naV+vso
+         //rUba+Z/gTIow6PImoH69N7wZehEHDn3oDGDLUfWuVliKEdajCUSZwA9E/tNQddm/fB
+         YJA2gkwEYdZDmOzm1TMbsjMExHS//8LA6sjV4vQxVz+tjTXv/wXuRWBAxV6D3ze4hQfa
+         7+rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679488240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hIDnRaN9sxd0xnZDEDrl7FwoOB+6T8A94tkf+oMcNsM=;
+        b=l36aAiB3IB0QNyWubCrFL8KyPyWp3RC0e0ovOJY/pcjgFcNoGnvUPdr2v9DBtlM8lU
+         8IcygAp3PhzZdSNHqrXre4fJ6EbVtS3Tb41FgceN7hgL3rGzLgWP/s0ABlXQf2oTOE09
+         szFfDkRA4tn4eYdZhb+aeYcAAhb/R0KsgzHcQnOzGxi88vnPaRCiWsPlGURALBqGvF87
+         IxfD/90ND7pYMxC6X66yBgC4O0SkkDnXdeiQmunDaqukCSyXtww/41uggiRKhu9ZsfoM
+         j7/aye/gIL+SNF8s3w4v2LB/dLwQd9YRggeMDPLKYdO+TPfVFnrmFAD9qFwUbZduIwro
+         rgig==
+X-Gm-Message-State: AAQBX9cDoLxRgrk+u7a3C81a9UmBJRxbJNA2AwRAhSbmtZTB2X5kxXEO
+        7w3TpdfD9S7FrgN9KjrfwhJ/QkB4VNoAF+JID8HDsQ==
+X-Google-Smtp-Source: AKy350brVrs9DIoKaxSl5+ZQ+gEXyG50JHgNzUqBm/HoXTIpFkpBjkTYSzxIQd9ZikPcfWRmDPMlyrDfrlfnAJgtd8I=
+X-Received: by 2002:a25:d256:0:b0:a3f:191f:dfb4 with SMTP id
+ j83-20020a25d256000000b00a3f191fdfb4mr5148818ybg.58.1679488239630; Wed, 22
+ Mar 2023 05:30:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZBpQLQtZP3Gj8MdS@ovpn-8-18.pek2.redhat.com>
-User-Agent: NeoMutt/20220429
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+References: <4b9fc9c6-b48c-198f-5f80-811a44737e5f@suse.cz>
+In-Reply-To: <4b9fc9c6-b48c-198f-5f80-811a44737e5f@suse.cz>
+From:   Binder Makin <merimus@google.com>
+Date:   Wed, 22 Mar 2023 08:30:27 -0400
+Message-ID: <CAANmLtwGS75WJ9AXfmqZv73pNdHJn6zfrrCCWjKK_6jPk9pWRg@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] SLOB+SLAB allocators removal and future SLUB improvements
+To:     Vlastimil Babka <vbabka@suse.cz>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-block@vger.kernel.org,
+        bpf@vger.kernel.org, linux-xfs@vger.kernel.org,
+        David Rientjes <rientjes@google.com>,
+        Christoph Lameter <cl@linux.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+        Roman Gushchin <roman.gushchin@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 08:47:41AM +0800, Ming Lei wrote:
-> On Tue, Mar 21, 2023 at 08:59:00AM -0500, Eric Blake wrote:
-> > On Tue, Mar 21, 2023 at 07:20:33AM +0800, Ming Lei wrote:
-> > > On Fri, Mar 17, 2023 at 03:27:46PM -0500, Eric Blake wrote:
-> > > > The NBD spec says the client handle (or cookie) is opaque on the
-> > > > server, and therefore it really doesn't matter what endianness we use;
-> > > > to date, the use of memcpy() between u64 and a char[8] has exposed
-> > > > native endianness when treating the handle as a 64-bit number.
-> > > 
-> > > No, memcpy() works fine for char[8], which doesn't break endianness.
-> > 
-> > I didn't say memcpy() breaks endianness, I said it preserves it.  By
-> > using memcpy(), you are exposing native endianness over the wire.
-> > Thus, even though a server should not be making any decisions based on
-> > the content of the handle (it is an opaque value handed back to the
-> > client unchanged), the current kernel client code DOES leak through
-> > information about whether the client is big- or little-endian;
-> 
-> How is the client cpu endianness leaked with handle defined as char[8]?
-> 
-> Suppose it is leaked, is it really one issue? Cause most of CPUs in
-> the world is little-endian.
-> 
-> > contrast to the NBD protocol saying that ALL data is
-> > network-byte-order.
-> 
-> That doesn't make sense for any data defined as char[] or byte which
-> needn't to be little or big endian.
+Was looking at SLAB removal and started by running A/B tests of SLAB
+vs SLUB.  Please note these are only preliminary results.
 
-The NBD spec defines it as a 64-bit opaque quantity - that does not
-indicate whether it is a single integer or 8 characters, but because
-it is opaque, we don't have to care.  However, if we DO treat it as an
-integer (and the kernel client code DOES do that: internally, it is
-building up a u64 integer), it is wise to consider network endianness.
+These were run using 6.1.13 configured for SLAB/SLUB.
+Machines were standard datacenter servers.
 
-> 
-> > 
-> > > 
-> > > > However, since NBD protocol documents that everything else is in
-> > > > network order, and tools like Wireshark will dump even the contents of
-> > > > the handle as seen over the network, it's worth using a consistent
-> > > > ordering regardless of the native endianness.
-> > > > 
-> > > > Plus, using a consistent endianness now allows an upcoming patch to
-> > > > simplify this to directly use integer assignment instead of memcpy().
-> > > 
-> > > It isn't necessary, given ->handle is actually u64, which is handled by
-> > > nbd client only.
-> > 
-> > No, re-read the whole series.  ->handle is actually char[8].  Later in
-> > the series adds ->cookie as __be64 as an alias to ->handle, precisely
-> > so that we are converting the u64 'handle' in kernel code into a
-> > big-endian value on the wire, regardless of the host type, and making
-> > it impossible for a server to inspect the wire data and learn the
-> > kernel's endianness.
-> 
-> How does server learn the client cpu endianness in this way? Is it really
-> one issue?
+Hackbench shows completion time, so smaller is better.
+On all others larger is better.
+https://docs.google.com/spreadsheets/d/e/2PACX-1vQ47Mekl8BOp3ekCefwL6wL8SQi=
+v6Qvp5avkU2ssQSh41gntjivE-aKM4PkwzkC4N_s_MxUdcsokhhz/pubhtml
 
-Not a security issue, merely a consistency one.  A server that
-inspects the handles being sent by the client, and checks whether they
-are sequential when treated as a big- or little-endian number, can
-infer whether the client is little-endian.  But there is nothing
-useful it can do with that knowledge.  Rather, the consistency factor
-is that if you have a wireshark plugin reading network traffic, and
-are trying to correlate it back to kernel traces, it is NICE if the
-wireshark plugin can display the SAME u64 number as the kernel was
-sticking into the field - and the way to do that is to have a fixed
-endianness of the u64 value over the wire.
+Some notes:
+SUnreclaim and SReclaimable shows unreclaimable and reclaimable memory.
+Substantially higher with SLUB, but I believe that is to be expected.
 
-> 
-> > 
-> > > 
-> > > > 
-> > > > Signed-off-by: Eric Blake <eblake@redhat.com>
-> > > > 
-> > > > ---
-> > > > v2: new patch
-> > > > ---
-> > > >  drivers/block/nbd.c | 10 +++++++---
-> > > >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > > > index 592cfa8b765a..8a9487e79f1c 100644
-> > > > --- a/drivers/block/nbd.c
-> > > > +++ b/drivers/block/nbd.c
-> > > > @@ -560,6 +560,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-> > > >  	unsigned long size = blk_rq_bytes(req);
-> > > >  	struct bio *bio;
-> > > >  	u64 handle;
-> > > > +	__be64 tmp;
-> > > >  	u32 type;
-> > > >  	u32 nbd_cmd_flags = 0;
-> > > >  	int sent = nsock->sent, skip = 0;
-> > > > @@ -606,7 +607,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
-> > > >  		request.len = htonl(size);
-> > > >  	}
-> > > >  	handle = nbd_cmd_handle(cmd);
-> > > > -	memcpy(request.handle, &handle, sizeof(handle));
-> > > > +	tmp = cpu_to_be64(handle);
-> > > > +	memcpy(request.handle, &tmp, sizeof(tmp));
-> > > 
-> > > This way copies handle two times, really not fun.
-> > 
-> > Indeed.  And as mentioned in the commit message, it is temporary; the
-> > second copy goes away later in the series once we can use direct
-> > integer assignment.
-> 
-> Then please merge with following patch, given it is hard to review
-> temporary change.
+Various results showing a 5-10% degradation with SLUB.  That feels
+concerning to me, but I'm not sure what others' tolerance would be.
 
-The underlying reason I split this patch out is that in v1 I got
-complaints that I was not taking endianness into account.  The patch
-series DOES cause an observable change (namely, a little-endian client
-now sends a value in big-endian order that it used to send in
-little-endian order) - but the change is harmless.  But if you want me
-to squash this patch back with 4/5 in v3, I'm happy to do that.
+redis results on AMD show some pretty bad degredations.  10-20% range
+netpipe on Intel also has issues.. 10-17%
 
-Are there any other comments on this series that I should consider
-before spending time putting out a v3?
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
+On Tue, Mar 14, 2023 at 4:05=E2=80=AFAM Vlastimil Babka <vbabka@suse.cz> wr=
+ote:
+>
+> As you're probably aware, my plan is to get rid of SLOB and SLAB, leaving
+> only SLUB going forward. The removal of SLOB seems to be going well, ther=
+e
+> were no objections to the deprecation and I've posted v1 of the removal
+> itself [1] so it could be in -next soon.
+>
+> The immediate benefit of that is that we can allow kfree() (and kfree_rcu=
+())
+> to free objects from kmem_cache_alloc() - something that IIRC at least xf=
+s
+> people wanted in the past, and SLOB was incompatible with that.
+>
+> For SLAB removal I haven't yet heard any objections (but also didn't
+> deprecate it yet) but if there are any users due to particular workloads
+> doing better with SLAB than SLUB, we can discuss why those would regress =
+and
+> what can be done about that in SLUB.
+>
+> Once we have just one slab allocator in the kernel, we can take a closer
+> look at what the users are missing from it that forces them to create own
+> allocators (e.g. BPF), and could be considered to be added as a generic
+> implementation to SLUB.
+>
+> Thanks,
+> Vlastimil
+>
+> [1] https://lore.kernel.org/all/20230310103210.22372-1-vbabka@suse.cz/
+>
