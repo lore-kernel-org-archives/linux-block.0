@@ -2,278 +2,200 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95042C6FD1C
-	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 13:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB4CC7619A
+	for <linux-block@archiver.kernel.org>; Wed, 22 Mar 2023 13:24:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbjCVNY1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Mar 2023 09:24:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35686 "EHLO
+        id S230242AbjCVNYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Mar 2023 09:24:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbjCVNY0 (ORCPT
+        with ESMTP id S230127AbjCVNYd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Mar 2023 09:24:26 -0400
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C069B136C5
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 06:24:24 -0700 (PDT)
-Received: by mail-wm1-f46.google.com with SMTP id fm20-20020a05600c0c1400b003ead37e6588so13014523wmb.5
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 06:24:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679491463;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fmnrNNIihsL2m7bJ09oCMNw0+jKVUUERpsFM6QsRyz8=;
-        b=oSxdHhB0Oyw1rVDiH+yxpjaI02yNjofCk6zoH1jEWXLJs7EITk2FL9PFhyfM0h/tJ3
-         WbdJTzzINyF4R1MW0oB4JLZByyj7B5cD4ICJxMHkYSEjZ7X/MJuNBSLgypK8ROjz3mrV
-         uK/occ0eyRK6Lp130N+dmmxP+DKokwUwHWsLawCjgcdajLjpiyaJxEfBVdtEHJxLc8Wd
-         vmmbcl0LMHv/ogGWroSSUxITV8p1r5sNn8JWKNhGDTRfWj8kZZGeGn750nsdNS6V3VsB
-         wpu/tsdOmATmF3gpUwR9FM8+8rkKgi+lpb1i6+6AL05up6vRRGi2DpTpvBbnk593PlBO
-         uuAA==
-X-Gm-Message-State: AO0yUKUo1SVy6n23WPcCgdm49pA0Ci2BipUCcC4LZFHUkoE+7pHCrRm5
-        cxydkJqNScf0a+ege9G0xWo=
-X-Google-Smtp-Source: AK7set/KqmgrooUP+AxwhcG1nHCnmIjZjzY1SJG+2jkjfok7J8DmpBrKW/n/3WnjQAbejAgnfG8mrA==
-X-Received: by 2002:a05:600c:4ec7:b0:3ed:d119:df36 with SMTP id g7-20020a05600c4ec700b003edd119df36mr6553475wmq.0.1679491463123;
-        Wed, 22 Mar 2023 06:24:23 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id s20-20020a7bc394000000b003ee3e075d1csm4485742wmj.22.2023.03.22.06.24.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Mar 2023 06:24:22 -0700 (PDT)
-Message-ID: <d6e49031-5f61-c96d-ad26-5c591a21ac54@grimberg.me>
-Date:   Wed, 22 Mar 2023 15:24:20 +0200
+        Wed, 22 Mar 2023 09:24:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1251637B58
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 06:23:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679491421;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vr/nw/QBGgbu6vHLXLGuyUHyWfBfiDPuxGzOQXoK3+8=;
+        b=Pt83fleS0CpTinUj70+S+SDozEM0y5w+L6j43UFNGTMcDMGnaXj1lPm2WViDILHvCi/ZoP
+        FGg0kh/d8n6PBpvijl/fITpUoG3Co4DlLiKSzV7zLKhibaMnzYw2t31ZFDTNcjzWoMUBtu
+        ayRs2E6CTkvB5bukIlOnZ2AAbekHQPc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-452-1DUppYg_MCimdX7OH_7Hbw-1; Wed, 22 Mar 2023 09:23:39 -0400
+X-MC-Unique: 1DUppYg_MCimdX7OH_7Hbw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DC0D51C087AC;
+        Wed, 22 Mar 2023 13:23:38 +0000 (UTC)
+Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AD886C15BAD;
+        Wed, 22 Mar 2023 13:23:32 +0000 (UTC)
+Date:   Wed, 22 Mar 2023 21:23:27 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Eric Blake <eblake@redhat.com>
+Cc:     josef@toxicpanda.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+        corbet@lwn.net, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH v2 2/5] block nbd: send handle in network order
+Message-ID: <ZBsBT0nvK06MZZjF@ovpn-8-17.pek2.redhat.com>
+References: <20230317202749.419094-1-eblake@redhat.com>
+ <20230317202749.419094-3-eblake@redhat.com>
+ <ZBjqQckL7d5EJPlh@ovpn-8-29.pek2.redhat.com>
+ <20230321135900.ni4w5ichvjba7s4u@redhat.com>
+ <ZBpQLQtZP3Gj8MdS@ovpn-8-18.pek2.redhat.com>
+ <20230322122921.ac47tbbkddrb72gq@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH 0/3] nvme fabrics polling fixes
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>, Keith Busch <kbusch@meta.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, hch@lst.de,
-        Keith Busch <kbusch@kernel.org>
-References: <20230322002350.4038048-1-kbusch@meta.com>
- <20230322084831.qwdarhmrs3uv5y43@carbon.lan>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230322084831.qwdarhmrs3uv5y43@carbon.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230322122921.ac47tbbkddrb72gq@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> From: Keith Busch <kbusch@kernel.org>
->>
->> I couldn't test the existing tcp or rdma options, so I had to make a
->> loop poll option. The last patch fixes the polling queues when used with
->> fabrics.
->>
->> Note, this depends on patch I sent earlier today that I should have just
->> included in this series:
->>
->>    https://lore.kernel.org/linux-block/20230321215001.2655451-1-kbusch@meta.com/T/#u
+On Wed, Mar 22, 2023 at 07:29:21AM -0500, Eric Blake wrote:
+> On Wed, Mar 22, 2023 at 08:47:41AM +0800, Ming Lei wrote:
+> > On Tue, Mar 21, 2023 at 08:59:00AM -0500, Eric Blake wrote:
+> > > On Tue, Mar 21, 2023 at 07:20:33AM +0800, Ming Lei wrote:
+> > > > On Fri, Mar 17, 2023 at 03:27:46PM -0500, Eric Blake wrote:
+> > > > > The NBD spec says the client handle (or cookie) is opaque on the
+> > > > > server, and therefore it really doesn't matter what endianness we use;
+> > > > > to date, the use of memcpy() between u64 and a char[8] has exposed
+> > > > > native endianness when treating the handle as a 64-bit number.
+> > > > 
+> > > > No, memcpy() works fine for char[8], which doesn't break endianness.
+> > > 
+> > > I didn't say memcpy() breaks endianness, I said it preserves it.  By
+> > > using memcpy(), you are exposing native endianness over the wire.
+> > > Thus, even though a server should not be making any decisions based on
+> > > the content of the handle (it is an opaque value handed back to the
+> > > client unchanged), the current kernel client code DOES leak through
+> > > information about whether the client is big- or little-endian;
+> > 
+> > How is the client cpu endianness leaked with handle defined as char[8]?
+> > 
+> > Suppose it is leaked, is it really one issue? Cause most of CPUs in
+> > the world is little-endian.
+> > 
+> > > contrast to the NBD protocol saying that ALL data is
+> > > network-byte-order.
+> > 
+> > That doesn't make sense for any data defined as char[] or byte which
+> > needn't to be little or big endian.
 > 
-> I've tested this series with
-> 
->    https://github.com/igaw/blktests/tree/queue-counts
-> 
-> and while for rdma all is good I got a lockdep warning for tcp:
-> 
-> 
->   ======================================================
->   WARNING: possible circular locking dependency detected
->   6.3.0-rc1+ #15 Tainted: G        W
->   ------------------------------------------------------
->   kworker/6:0/54 is trying to acquire lock:
->   ffff888121d88030 ((work_completion)(&queue->io_work)){+.+.}-{0:0}, at: __flush_work+0xb9/0x170
-> 
->   but task is already holding lock:
->   ffff888100b0fd20 ((work_completion)(&queue->release_work)){+.+.}-{0:0}, at: process_one_work+0x707/0xbc0
-> 
->   which lock already depends on the new lock.
-> 
-> 
->   the existing dependency chain (in reverse order) is:
-> 
->   -> #2 ((work_completion)(&queue->release_work)){+.+.}-{0:0}:
->          lock_acquire+0x13a/0x310
->          process_one_work+0x728/0xbc0
->          worker_thread+0x97a/0x1480
->          kthread+0x228/0x2b0
->          ret_from_fork+0x1f/0x30
-> 
->   -> #1 ((wq_completion)nvmet-wq){+.+.}-{0:0}:
->          lock_acquire+0x13a/0x310
->          __flush_workqueue+0x185/0x14e0
->          nvmet_tcp_install_queue+0x63/0x270 [nvmet_tcp]
->          nvmet_install_queue+0x2b1/0x6a0 [nvmet]
->          nvmet_execute_admin_connect+0x381/0x880 [nvmet]
->          nvmet_tcp_io_work+0x15e8/0x8f60 [nvmet_tcp]
->          process_one_work+0x756/0xbc0
->          worker_thread+0x97a/0x1480
->          kthread+0x228/0x2b0
->          ret_from_fork+0x1f/0x30
-> 
->   -> #0 ((work_completion)(&queue->io_work)){+.+.}-{0:0}:
->          validate_chain+0x19f1/0x6d50
->          __lock_acquire+0x122d/0x1e90
->          lock_acquire+0x13a/0x310
->          __flush_work+0xd5/0x170
->          __cancel_work_timer+0x36b/0x470
->          nvmet_tcp_release_queue_work+0x25c/0x1000 [nvmet_tcp]
->          process_one_work+0x756/0xbc0
->          worker_thread+0x97a/0x1480
->          kthread+0x228/0x2b0
->          ret_from_fork+0x1f/0x30
-> 
->   other info that might help us debug this:
-> 
->   Chain exists of:
->     (work_completion)(&queue->io_work) --> (wq_completion)nvmet-wq --> (work_completion)(&queue->release_work)
+> The NBD spec defines it as a 64-bit opaque quantity - that does not
+> indicate whether it is a single integer or 8 characters, but because
+> it is opaque, we don't have to care.  However, if we DO treat it as an
+> integer (and the kernel client code DOES do that: internally, it is
+> building up a u64 integer), it is wise to consider network endianness.
 
-This came up before.
-
-Its because in nvmet_tcp_install_queue we flush the nvmet_wq, to let
-queue releases flush before accepting new queues. Without it, there is
-no back-pressure and a host can simply reconnect in a loop and exhaust
-nvmet system memory...
-
-I don't think its a deadlock, because the queue that flushes the
-nvmet_wq cannot be in release, this is only possible that other queues
-would be releasing. So I can't see how it would deadlock. But I don't
-know how to teach lockdep.
-
-I'll try to see if there is a different way to do this, without annoying
-lockdep.
+That depends on if it is reasonable to convert to int.
 
 > 
->    Possible unsafe locking scenario:
+> > 
+> > > 
+> > > > 
+> > > > > However, since NBD protocol documents that everything else is in
+> > > > > network order, and tools like Wireshark will dump even the contents of
+> > > > > the handle as seen over the network, it's worth using a consistent
+> > > > > ordering regardless of the native endianness.
+> > > > > 
+> > > > > Plus, using a consistent endianness now allows an upcoming patch to
+> > > > > simplify this to directly use integer assignment instead of memcpy().
+> > > > 
+> > > > It isn't necessary, given ->handle is actually u64, which is handled by
+> > > > nbd client only.
+> > > 
+> > > No, re-read the whole series.  ->handle is actually char[8].  Later in
+> > > the series adds ->cookie as __be64 as an alias to ->handle, precisely
+> > > so that we are converting the u64 'handle' in kernel code into a
+> > > big-endian value on the wire, regardless of the host type, and making
+> > > it impossible for a server to inspect the wire data and learn the
+> > > kernel's endianness.
+> > 
+> > How does server learn the client cpu endianness in this way? Is it really
+> > one issue?
 > 
->          CPU0                    CPU1
->          ----                    ----
->     lock((work_completion)(&queue->release_work));
->                                  lock((wq_completion)nvmet-wq);
->                                  lock((work_completion)(&queue->release_work));
->     lock((work_completion)(&queue->io_work));
+> Not a security issue, merely a consistency one.  A server that
+> inspects the handles being sent by the client, and checks whether they
+> are sequential when treated as a big- or little-endian number, can
+> infer whether the client is little-endian.  But there is nothing
+> useful it can do with that knowledge.  Rather, the consistency factor
+> is that if you have a wireshark plugin reading network traffic, and
+> are trying to correlate it back to kernel traces, it is NICE if the
+> wireshark plugin can display the SAME u64 number as the kernel was
+> sticking into the field - and the way to do that is to have a fixed
+> endianness of the u64 value over the wire.
+
+OK, so the real motivation is only for aligning wireshark output with nbd
+trace event. If yes, please add it in comment log.
+
+BTW, the nbd trace event can be converted to any format by bcc or bpftrace
+script, then you still can associate one with another.
+
 > 
->    *** DEADLOCK ***
+> > 
+> > > 
+> > > > 
+> > > > > 
+> > > > > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > > > > 
+> > > > > ---
+> > > > > v2: new patch
+> > > > > ---
+> > > > >  drivers/block/nbd.c | 10 +++++++---
+> > > > >  1 file changed, 7 insertions(+), 3 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > > > > index 592cfa8b765a..8a9487e79f1c 100644
+> > > > > --- a/drivers/block/nbd.c
+> > > > > +++ b/drivers/block/nbd.c
+> > > > > @@ -560,6 +560,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+> > > > >  	unsigned long size = blk_rq_bytes(req);
+> > > > >  	struct bio *bio;
+> > > > >  	u64 handle;
+> > > > > +	__be64 tmp;
+> > > > >  	u32 type;
+> > > > >  	u32 nbd_cmd_flags = 0;
+> > > > >  	int sent = nsock->sent, skip = 0;
+> > > > > @@ -606,7 +607,8 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+> > > > >  		request.len = htonl(size);
+> > > > >  	}
+> > > > >  	handle = nbd_cmd_handle(cmd);
+> > > > > -	memcpy(request.handle, &handle, sizeof(handle));
+> > > > > +	tmp = cpu_to_be64(handle);
+> > > > > +	memcpy(request.handle, &tmp, sizeof(tmp));
+> > > > 
+> > > > This way copies handle two times, really not fun.
+> > > 
+> > > Indeed.  And as mentioned in the commit message, it is temporary; the
+> > > second copy goes away later in the series once we can use direct
+> > > integer assignment.
+> > 
+> > Then please merge with following patch, given it is hard to review
+> > temporary change.
 > 
->   2 locks held by kworker/6:0/54:
->    #0: ffff888109ff6d48 ((wq_completion)nvmet-wq){+.+.}-{0:0}, at: process_one_work+0x6c8/0xbc0
->    #1: ffff888100b0fd20 ((work_completion)(&queue->release_work)){+.+.}-{0:0}, at: process_one_work+0x707/0xbc0
+> The underlying reason I split this patch out is that in v1 I got
+> complaints that I was not taking endianness into account.  The patch
+> series DOES cause an observable change (namely, a little-endian client
+> now sends a value in big-endian order that it used to send in
+> little-endian order) - but the change is harmless.  But if you want me
+> to squash this patch back with 4/5 in v3, I'm happy to do that.
 > 
->   stack backtrace:
->   CPU: 6 PID: 54 Comm: kworker/6:0 Tainted: G        W          6.3.0-rc1+ #15 f4d05de834b07d62567d33b70ec70fb0fa06f103
->   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->   Workqueue: nvmet-wq nvmet_tcp_release_queue_work [nvmet_tcp]
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x5a/0x80
->    check_noncircular+0x2c8/0x390
->    ? add_chain_block+0x5e0/0x5e0
->    ? ret_from_fork+0x1f/0x30
->    ? lockdep_lock+0xd3/0x260
->    ? stack_trace_save+0x10a/0x1e0
->    ? stack_trace_snprint+0x100/0x100
->    ? check_noncircular+0x1a6/0x390
->    validate_chain+0x19f1/0x6d50
->    ? lockdep_unlock+0x9e/0x1f0
->    ? validate_chain+0x15b2/0x6d50
->    ? reacquire_held_locks+0x510/0x510
->    ? reacquire_held_locks+0x510/0x510
->    ? reacquire_held_locks+0x510/0x510
->    ? add_lock_to_list+0xbf/0x2c0
->    ? lockdep_unlock+0x9e/0x1f0
->    ? validate_chain+0x15b2/0x6d50
->    ? reacquire_held_locks+0x510/0x510
->    ? reacquire_held_locks+0x510/0x510
->    ? xfs_buf_find_lock+0xb0/0x430 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? reacquire_held_locks+0x510/0x510
->    ? validate_chain+0x176/0x6d50
->    ? trace_lock_acquired+0x7b/0x180
->    ? lock_is_held_type+0x8b/0x110
->    ? lock_is_held_type+0x8b/0x110
->    ? rcu_read_lock_sched_held+0x34/0x70
->    ? reacquire_held_locks+0x510/0x510
->    ? xfs_buf_get_map+0xd72/0x11a0 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? lock_is_held_type+0x8b/0x110
->    ? rcu_read_lock_sched_held+0x34/0x70
->    ? trace_xfs_buf_read+0x7c/0x180 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_buf_read_map+0x111/0x700 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? lock_is_held_type+0x8b/0x110
->    ? lock_is_held_type+0x8b/0x110
->    ? xfs_btree_read_buf_block+0x205/0x300 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? rcu_read_lock_sched_held+0x34/0x70
->    ? trace_xfs_trans_read_buf+0x79/0x170 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_btree_read_buf_block+0x205/0x300 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_trans_read_buf_map+0x303/0x4f0 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? trace_xfs_trans_getsb+0x170/0x170 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_verify_fsbno+0x74/0x130 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_btree_ptr_to_daddr+0x19b/0x660 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_buf_set_ref+0x1d/0x50 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_btree_read_buf_block+0x233/0x300 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? mark_lock+0x8f/0x320
->    ? xfs_btree_readahead+0x250/0x250 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_verify_fsbno+0x74/0x130 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_btree_ptr_to_daddr+0x19b/0x660 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_dio_write_end_io+0x32f/0x3f0 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_dio_write_end_io+0x32f/0x3f0 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_dio_write_end_io+0x32f/0x3f0 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_dio_write_end_io+0x32f/0x3f0 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? __module_address+0x86/0x1e0
->    ? ret_from_fork+0x1f/0x30
->    ? deref_stack_reg+0x17f/0x210
->    ? ret_from_fork+0x1f/0x30
->    ? unwind_next_frame+0x16b/0x2240
->    ? ret_from_fork+0x1f/0x30
->    ? stack_trace_save+0x1e0/0x1e0
->    ? arch_stack_walk+0xb7/0xf0
->    ? lock_is_held_type+0x8b/0x110
->    ? find_busiest_group+0x104e/0x2480
->    ? load_balance+0x2540/0x2540
->    ? stack_trace_save+0x10a/0x1e0
->    ? mark_lock+0x8f/0x320
->    ? __lock_acquire+0x122d/0x1e90
->    ? lock_is_held_type+0x8b/0x110
->    ? rcu_lock_acquire+0x30/0x30
->    ? xfs_buf_ioend+0x248/0x450 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? xfs_buf_ioend+0x248/0x450 [xfs e56ce85f3b18232dbd061be3c73dc29bed4ad37b]
->    ? __module_address+0x86/0x1e0
->    ? ret_from_fork+0x1f/0x30
->    ? deref_stack_reg+0x17f/0x210
->    ? ret_from_fork+0x1f/0x30
->    ? unwind_next_frame+0x16b/0x2240
->    ? stack_trace_save+0x10a/0x1e0
->    ? deref_stack_reg+0x17f/0x210
->    ? look_up_lock_class+0x65/0x130
->    ? register_lock_class+0x5d/0x860
->    ? mark_lock+0x8f/0x320
->    __lock_acquire+0x122d/0x1e90
->    lock_acquire+0x13a/0x310
->    ? __flush_work+0xb9/0x170
->    ? read_lock_is_recursive+0x10/0x10
->    ? lock_is_held_type+0x8b/0x110
->    ? rcu_lock_acquire+0x30/0x30
->    __flush_work+0xd5/0x170
->    ? __flush_work+0xb9/0x170
->    ? flush_work+0x10/0x10
->    ? lock_is_held_type+0x8b/0x110
->    ? __lock_acquire+0x1e90/0x1e90
->    ? do_raw_spin_unlock+0x112/0x890
->    ? mark_lock+0x8f/0x320
->    ? lockdep_hardirqs_on_prepare+0x2d5/0x610
->    __cancel_work_timer+0x36b/0x470
->    ? cancel_work_sync+0x10/0x10
->    ? mark_lock+0x8f/0x320
->    ? lockdep_hardirqs_on_prepare+0x2d5/0x610
->    ? nvmet_tcp_release_queue_work+0x24d/0x1000 [nvmet_tcp f61749ac066e0812c28869697bc2623872f02bd4]
->    ? datagram_poll+0x380/0x380
->    nvmet_tcp_release_queue_work+0x25c/0x1000 [nvmet_tcp f61749ac066e0812c28869697bc2623872f02bd4]
->    process_one_work+0x756/0xbc0
->    ? rescuer_thread+0x13f0/0x13f0
->    ? lock_acquired+0x2f2/0x930
->    ? worker_thread+0xf55/0x1480
->    worker_thread+0x97a/0x1480
->    ? rcu_lock_release+0x20/0x20
->    kthread+0x228/0x2b0
->    ? rcu_lock_release+0x20/0x20
->    ? kthread_blkcg+0xa0/0xa0
->    ret_from_fork+0x1f/0x30
->    </TASK>
+> Are there any other comments on this series that I should consider
+> before spending time putting out a v3?
+
+I think 2~4 should be merged to single patch.
+
+Thanks,
+Ming
+
