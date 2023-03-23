@@ -2,120 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA50C76195
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 14:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E65FC76196
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:01:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231265AbjCWOat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 10:30:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52610 "EHLO
+        id S231979AbjCWPBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 11:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231362AbjCWOas (ORCPT
+        with ESMTP id S231908AbjCWPAw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 10:30:48 -0400
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F2B9756
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 07:30:47 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id jl13so14179940qvb.10
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 07:30:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=omnibond-com.20210112.gappssmtp.com; s=20210112; t=1679581846;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DW5cWuSORuMPl9h4M/OMu4zN6Ab689Cgd2Jmn907uzA=;
-        b=uga6xPblyjNwQ0nys0O9OMOnWPlxzoqUx0tub1g4jl3Ds7H0qu2WTey6xF5KYLxKjC
-         SCNdX/4AXYIE5IhDdtecko+9IOBtUIc3U2CM4hPqaHHiSjJXBWP+o6JLCwKslIKRmAED
-         TXE8V7Fa5Vj5MdO1Sgso1Toii0RePFj640IY5JVqwEa1uZwDrQZ5LDzFX93GFGZY9IjQ
-         hb8Z808MK7gqHrpq+J6Wxii0pqN6Kedc0VTbCmzHxDcz5RluBsBf5YY47foQKVJ8WL5w
-         Hhs7tyAu+HDhks/IkXKF2t4EX3GViwlbB8pSikG3+R69thN52bWR4mIjSGgorkjzAiC0
-         GC9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679581846;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DW5cWuSORuMPl9h4M/OMu4zN6Ab689Cgd2Jmn907uzA=;
-        b=tJL5zspFFEqy703NLtY15HYhKJCxxUGM0m3Cpo5MRXJubrbQMTqK2afjondnoclYu4
-         iyIIstA3C7KmocPRcbwodwt0mFOOX2whkbacwOCBl8SizYPqAAxAN9BAOhYwiZnS7Eub
-         F9sm92tFPOYpZt74IScrmEXlBpovM8cyzNoMpJvEoYeMod2va6HxNPDwRXSOp5Vy48ll
-         K+8waWa5vaAej14FLG2JtVLqhFMNL/GhEEd/bN1G1iU5SEyBTy6n3TwHJgDdl7YFgQtT
-         HQpY+vftcyYkaWdq9+ttrzVPR83uMjzQZ/lIra4KfghB2xsC0NFHcJnoc+qDZA43virE
-         zJYA==
-X-Gm-Message-State: AO0yUKVsD9FCNemmAgoCN4Ml3zlD62uwd1PJvuwEFyc1XwMqi/xizU2y
-        epK14NH1/lktoKzEwCXGL6i3heCAFnHwV5Fy6/Jqwg==
-X-Google-Smtp-Source: AK7set/trVllkfcEi+yg3oqpS8DY+A/uEckTTWNRYDqUdJd5erFFIJB2DTR1p2z4pS/Mo+VlMX55/q/gvrdpE0I/XKA=
-X-Received: by 2002:a05:6214:8c7:b0:537:7476:41f7 with SMTP id
- da7-20020a05621408c700b00537747641f7mr1552535qvb.3.1679581846154; Thu, 23 Mar
- 2023 07:30:46 -0700 (PDT)
+        Thu, 23 Mar 2023 11:00:52 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D47E31BEE
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:00:42 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230323150039euoutp028aaaea954cc9cae7dafca96504afea5b~PFGv4W-xr1980519805euoutp02F
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 15:00:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230323150039euoutp028aaaea954cc9cae7dafca96504afea5b~PFGv4W-xr1980519805euoutp02F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1679583640;
+        bh=Icol1NVQVqXWLETTQ6qBuGxVjyUvKpu5FRVxPfMJI5w=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=a0wEK/WILT2l2yTo7hODi6knqNCGLVGsWm1o9nnVOFmazylpeSUowNYKpW9hbmAdx
+         8MhSHQbumCLTtm3Gs9WPa0wNGb01fXT7Mcczv+AaVg7lusT0RJwGXhJk1wBUP3Dwa3
+         tpo78MbYZkTmwvgVEYiKrAgK892rDgTohFlCd9qc=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230323150039eucas1p2c7b2e1906656e2f9285fe5c95907c5c9~PFGvm1TmA2995529955eucas1p2N;
+        Thu, 23 Mar 2023 15:00:39 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 28.11.09503.7996C146; Thu, 23
+        Mar 2023 15:00:39 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230323150039eucas1p26720ff35cb61c319cf3689f2f692f720~PFGvHi8AG2042820428eucas1p2e;
+        Thu, 23 Mar 2023 15:00:39 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230323150039eusmtrp27e05b1483f2166f1785c5879c94b1e57~PFGvG7Gmy2667426674eusmtrp2p;
+        Thu, 23 Mar 2023 15:00:39 +0000 (GMT)
+X-AuditID: cbfec7f2-ea5ff7000000251f-bc-641c6997ca0e
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 1A.39.09583.6996C146; Thu, 23
+        Mar 2023 15:00:39 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20230323150038eusmtip1bb56ea103192735c274ede4a1e924d2e~PFGu3--cZ1265912659eusmtip1b;
+        Thu, 23 Mar 2023 15:00:38 +0000 (GMT)
+Received: from [106.110.32.65] (106.110.32.65) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Thu, 23 Mar 2023 15:00:37 +0000
+Message-ID: <fbf5bc8a-6c82-a43e-dd96-8a9d2b7d3bf4@samsung.com>
+Date:   Thu, 23 Mar 2023 16:00:37 +0100
 MIME-Version: 1.0
-References: <CGME20230322135015eucas1p2ff980e76159f0ceef7bf66934580bd6c@eucas1p2.samsung.com>
- <20230322135013.197076-1-p.raghav@samsung.com>
-In-Reply-To: <20230322135013.197076-1-p.raghav@samsung.com>
-From:   Mike Marshall <hubcap@omnibond.com>
-Date:   Thu, 23 Mar 2023 10:30:35 -0400
-Message-ID: <CAOg9mSRvPDysNF-GV_ZGf8bu1-50wA5y7L=LuZwGp+vEVzsu1Q@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+        Thunderbird/102.8.0
 Subject: Re: [RFC v2 0/5] remove page_endio()
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     senozhatsky@chromium.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        willy@infradead.org, brauner@kernel.org, akpm@linux-foundation.org,
-        minchan@kernel.org, martin@omnibond.com, mcgrof@kernel.org,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>
+CC:     <senozhatsky@chromium.org>, <viro@zeniv.linux.org.uk>,
+        <axboe@kernel.dk>, <brauner@kernel.org>,
+        <akpm@linux-foundation.org>, <minchan@kernel.org>,
+        <hubcap@omnibond.com>, <martin@omnibond.com>, <mcgrof@kernel.org>,
+        <devel@lists.orangefs.org>, <linux-mm@kvack.org>,
+        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <gost.dev@samsung.com>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <ZBtSevjWLybE6S07@casper.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.110.32.65]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrNKsWRmVeSWpSXmKPExsWy7djPc7rTM2VSDPaeUrOYs34Nm8Xqu/1s
+        Fq8Pf2K02L95CpNF+90+Jou9t7Qt9uw9yWJxedccNot7a/6zWpxc/5/Z4saEp4wWy76+Z7fY
+        vXERm8X5v8dZLX7/mMPmwO8xu+Eii8fmFVoel8+Wemxa1cnmsenTJHaPEzN+s3g0TL3F5vHr
+        9h1Wj8+b5Dw2PXnLFMAVxWWTkpqTWZZapG+XwJXRfeQHY8FVnoqVy44zNjC2c3UxcnJICJhI
+        zN3zirGLkYtDSGAFo8SDDwfZIZwvjBInzm5kBKkSEvjMKDH9qhFMx54jd9kgipYzSrxbep8V
+        rqh7tjREYiejxKu2xywgCV4BO4mDf6aygdgsAqoSLS3vmCHighInZz4BquHgEBWIknjxugwk
+        LCygK3FxTydYK7OAuMStJ/OZQEpEBDQk3mwxAhnPLNDDLLFo7S6wVjYBLYnGTnaQck6g2yY9
+        WMUO0aop0br9N5QtL7H97RxmiPsVJSbdfM8KYddKnNpyiwlkpoTAPU6Jb+cPskAkXCSWNt+H
+        KhKWeHV8CzuELSPxfyfIPSB2tcTTG7+ZIZpbGCX6d65nAzlIQsBaou9MDkSNo8SezedZIcJ8
+        EjfeCkLcwycxadt05gmMqrOQAmIWko9nIXlhFpIXFjCyrGIUTy0tzk1PLTbMSy3XK07MLS7N
+        S9dLzs/dxAhMf6f/Hf+0g3Huq496hxiZOBgPMUpwMCuJ8LoxS6QI8aYkVlalFuXHF5XmpBYf
+        YpTmYFES59W2PZksJJCeWJKanZpakFoEk2Xi4JRqYFK5Munvw7ke7WpXNDg1G5si1rrXhJ3l
+        kvw0Revb9oVuDFz7RW+UJL8x3b/sSuzCFN6U53MbE8y8zl5dNCHmq4rC6gP8ov1PpDu443n2
+        l12/3trGvMHctir5Y7iJ06kd32YuWDingqH1rqvfj4afS6WfNiwSNdyQVu26LN7xek2IWbag
+        h6D896mTJPZ22LBvnLRj8osvFbxPH66S9lyVMfNges/8GI81T47Ha+4wEV7Q+Emut0rmzKGP
+        7/SPtTT+YAmIkavcF6je26i07QpzWqWI0EnBpWGZgcFbGg/fVzkauWB2gu1FSYdHuWft2h94
+        H1hgev3+09QzrX+Dp3SrBCUqBQfz7zny/znnnQnMr5RYijMSDbWYi4oTAde99cruAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprMKsWRmVeSWpSXmKPExsVy+t/xu7rTM2VSDKbsYbSYs34Nm8Xqu/1s
+        Fq8Pf2K02L95CpNF+90+Jou9t7Qt9uw9yWJxedccNot7a/6zWpxc/5/Z4saEp4wWy76+Z7fY
+        vXERm8X5v8dZLX7/mMPmwO8xu+Eii8fmFVoel8+Wemxa1cnmsenTJHaPEzN+s3g0TL3F5vHr
+        9h1Wj8+b5Dw2PXnLFMAVpWdTlF9akqqQkV9cYqsUbWhhpGdoaaFnZGKpZ2hsHmtlZKqkb2eT
+        kpqTWZZapG+XoJfRfeQHY8FVnoqVy44zNjC2c3UxcnJICJhI7Dlyl62LkYtDSGApo8Tsc19Y
+        IRIyEp+ufGSHsIUl/lzrgir6yCjRMv0EM4Szk1FizYJDbCBVvAJ2Egf/TAWzWQRUJVpa3jFD
+        xAUlTs58wgJiiwpESTy9cwgsLiygK3FxTydYnFlAXOLWk/lMXYwcHCICGhJvthiBzGcW6GGW
+        mD9rKiPEsh2MEq17r7CAFLEJaEk0doJdxwn0wqQHq9gh5mhKtG7/DWXLS2x/O4cZ4gNFiUk3
+        30N9Vivx+e8zxgmMorOQnDcLyRmzkIyahWTUAkaWVYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmb
+        GIGpY9uxn1t2MK589VHvECMTB+MhRgkOZiURXjdmiRQh3pTEyqrUovz4otKc1OJDjKbAMJrI
+        LCWanA9MXnkl8YZmBqaGJmaWBqaWZsZK4ryeBR2JQgLpiSWp2ampBalFMH1MHJxSDUwMymwC
+        TpNn7j6sZ8lplHKrTqX15ur7P77v+rnkrcqXpR/fXJPkOXIyfEPPRYuz979NtKlLeF9591cG
+        44pOPYG2dXGeZjLHv8zdEKZ47PrZctNFK0tT5r2yefBm/c2TKUlnH00VnnHLnU1JM9VxnhCP
+        s0RTcBf3motOn53W7xEurPnRd2bWdNm6Rw6HFnZkvNrgNee2WnpOVcmhfwomqr07Ln+awhMu
+        zrz8mo7pgqspWY2H1k5ZmNx4t/4af1bMSsVlbrs39Tq///Tm1nPZBbtCusTsvI/kJRpXVkrf
+        a3VjsZrwQjf8xEN9Jw+t3vn84k4++s/dnktzsote1jPrY2uotWj5lPNXpE7YLih68hslluKM
+        REMt5qLiRACWM9NJpgMAAA==
+X-CMS-MailID: 20230323150039eucas1p26720ff35cb61c319cf3689f2f692f720
+X-Msg-Generator: CA
+X-RootMTR: 20230322135015eucas1p2ff980e76159f0ceef7bf66934580bd6c
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230322135015eucas1p2ff980e76159f0ceef7bf66934580bd6c
+References: <CGME20230322135015eucas1p2ff980e76159f0ceef7bf66934580bd6c@eucas1p2.samsung.com>
+        <20230322135013.197076-1-p.raghav@samsung.com>
+        <ZBtSevjWLybE6S07@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I have tested this patch on orangefs on top of 6.3.0-rc3, no
-regressions.
+>> Open questions:
+>> - Willy pointed out that the calls to folio_set_error() and
+>>   folio_clear_uptodate() are not needed anymore in the read path when an
+>>   error happens[2]. I still don't understand 100% why they aren't needed
+>>   anymore as I see those functions are still called in iomap. It will be
+>>   good to put that rationale as a part of the commit message.
+> 
+> page_endio() was generic.  It needed to handle a lot of cases.  When it's
+> being inlined into various completion routines, we know which cases we
+> need to handle and can omit all the cases which we don't.
+> 
+> We know the uptodate flag is clear.  If the uptodate flag is set,
+> we don't call the filesystem's read path.  Since we know it's clear,
+> we don't need to clear it.
+> 
+Got it.
 
-It is very easy to build a single host orangefs test system on
-a vm. There are instructions in orangefs.rst, and also I'd
-be glad to help make them better...
+> We don't need to set the error flag.  Only some filesystems still use
+> the error flag, and orangefs isn't one of them.  I'd like to get rid
+> of the error flag altogether, and I've sent patches in the past which
+> get us a lot closer to that desired outcome.  Not sure we're there yet.
+> Regardless, generic code doesn't check the error flag.
 
--Mike
+Thanks for the explanation. I think found the series you are referring here.
 
-On Wed, Mar 22, 2023 at 9:50=E2=80=AFAM Pankaj Raghav <p.raghav@samsung.com=
-> wrote:
->
-> It was decided to remove the page_endio() as per the previous RFC
-> discussion[1] of this series and move that functionality into the caller
-> itself. One of the side benefit of doing that is the callers have been
-> modified to directly work on folios as page_endio() already worked on
-> folios.
->
-> mpage changes were tested with a simple boot testing. zram and orangefs i=
-s
-> only build tested. No functional changes were introduced as a part of
-> this AFAIK.
->
-> Open questions:
-> - Willy pointed out that the calls to folio_set_error() and
->   folio_clear_uptodate() are not needed anymore in the read path when an
->   error happens[2]. I still don't understand 100% why they aren't needed
->   anymore as I see those functions are still called in iomap. It will be
->   good to put that rationale as a part of the commit message.
->
-> [1] https://lore.kernel.org/linux-mm/ZBHcl8Pz2ULb4RGD@infradead.org/
-> [2] https://lore.kernel.org/linux-mm/ZBSH6Uq6IIXON%2Frh@casper.infradead.=
-org/
->
-> Pankaj Raghav (5):
->   zram: remove zram_page_end_io function
->   orangefs: use folios in orangefs_readahead
->   mpage: split bi_end_io callback for reads and writes
->   mpage: use folios in bio end_io handler
->   filemap: remove page_endio()
->
->  drivers/block/zram/zram_drv.c | 13 +----------
->  fs/mpage.c                    | 44 ++++++++++++++++++++++++++++-------
->  fs/orangefs/inode.c           |  9 +++----
->  include/linux/pagemap.h       |  2 --
->  mm/filemap.c                  | 30 ------------------------
->  5 files changed, 42 insertions(+), 56 deletions(-)
->
-> --
-> 2.34.1
->
+https://lore.kernel.org/linux-mm/20220527155036.524743-1-willy@infradead.org/#t
+
+I see orangefs is still setting the error flag in orangefs_read_folio(), so
+it should be removed at some point?
+
+I also changed mpage to **not set** the error flag in the read path. It does beg
+the question whether block_read_full_folio() and iomap_finish_folio_read() should
+also follow the suit.
+
+--
+Pankaj
