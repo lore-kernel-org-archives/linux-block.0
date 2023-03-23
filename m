@@ -2,209 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 375A9C761AF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 19:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67324C6FD1C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 22:51:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231504AbjCWTfg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 15:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36444 "EHLO
+        id S230372AbjCWWve (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 18:51:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231194AbjCWTff (ORCPT
+        with ESMTP id S231418AbjCWWvX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 15:35:35 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A519219F15
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 12:35:33 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5447d217bc6so411952787b3.7
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 12:35:33 -0700 (PDT)
+        Thu, 23 Mar 2023 18:51:23 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FDFA2CC5B
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 15:51:20 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id j3-20020a17090adc8300b0023d09aea4a6so3387963pjv.5
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 15:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679600133;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7VcmchQqt9DaMxSLZ78hVIFyFO9YofibofDFlcn/C/A=;
-        b=qcmPuY4UNpBr+P2ZKeYHu1R051ec4TvA2Clkq4ip2880X7aXBn2kafw99H0CzcQE8Y
-         55btBqMovU8tiALDLxofgtxE/bZ0HgUAqQ7/uL9ivj3gfCrk6Yuh0oGKI0h3hhLcEY7P
-         dflHLX+NDoqrZpncNEKvk51KUcHVmknk2JEAaqvkhAXJHpK54fIOZMMCA7hah18AZ/bd
-         JkZhELoYu+zcuogS32m/qQmFm811rpAtxS23YU+81bGhLBg7rvz3YmoDRQyp8dCCDNhb
-         lUPfwH5qF/cf+E5RouEWAGBRgF9zRDRmzCb9ikWcAdK0VJGHDe0vWwWNlwRMGXpXzXAs
-         LaXw==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1679611880; x=1682203880;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E0OX40ehjV5gIkQr/Q9nraxMiJdzGjqFLifP7n6ggXk=;
+        b=TTqPzThDGMupB/gagrp+rTbV3eHSKSSrLjeATpLujyP3BjQhyLVdJPW0nFqfh7lx4X
+         /tL5/prrRpFJnHz7NO9yWbSZYuEIbhgoUu+hIfGI0YCk0HO1n6FyPw4xLxD9b87pvVSL
+         CK4W5AVwxkz0p8kq6QRhUEa31VKANW6YLLR5YwZwnuwvYDUbDeFzkaD1tIbclly1k12L
+         ahS0F94a0rnpiFBIxQyHIiS7ylZ5k+o/htcVsn/9Ucp/a9U4M5NJTvX5L1BCfVR3S3RX
+         8wl5iIN2tmHyYrx+Vw8BnXwd2RfKOSW3OFEYaEwQz3LNenf0o4ch+tpXJBuJgtXi4Taf
+         1V+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679600133;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7VcmchQqt9DaMxSLZ78hVIFyFO9YofibofDFlcn/C/A=;
-        b=yd3BHLitQEUgk9u/jctTxrD4H1DtAr1C6LSW2ZpFsdD4+nvsX2tXIG2gaKoCcvPp3e
-         lyX8czcW/y12BPLFRlgH9W/JIX8aEf7+sS/YvZ80nHilUVjYKpYphU71LGOTthx7POiW
-         52XGFiHboWSKiJ78UguvhMS6XvcUcAHYklGkjSqPNcyRZloMk1W1TdcZukONHykt9Gdo
-         AhNPwrvAHvrjylRr2+DkY4zI7fGpFlpB01CSgOiDnn7RSy7CfS3H+Zvq9vyo415QSwS/
-         z4grEOuC4tvDblGf6+bJMvRWmDYKJJGg7mJEfcPS4o6rearRZZ2QEL4zAs8VnAV1UAfR
-         paCg==
-X-Gm-Message-State: AAQBX9e+dXFiQcYc+7WKM9vcjBOm+ODXnNh1NgZc8Q4WxpIFQ8UK/4KI
-        AKJO3fBgaYF1wdFkHu8Gf27yQOLGwTt9SlPofFRhtg==
-X-Google-Smtp-Source: AKy350ZXwVmW+8wxag0P4Y079RwZrC59m2sOfutsdJVuOG7wMxgYoQ6G9rfVZpnKi1K8J8jngBYLKTgqhGctfMls/iw=
-X-Received: by 2002:a81:ef08:0:b0:545:883a:542c with SMTP id
- o8-20020a81ef08000000b00545883a542cmr1610295ywm.0.1679600131909; Thu, 23 Mar
- 2023 12:35:31 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679611880; x=1682203880;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E0OX40ehjV5gIkQr/Q9nraxMiJdzGjqFLifP7n6ggXk=;
+        b=fpjvacWnBZwdhlggMOlNrI4V9wcfbbzslLzPebQVi70NSogP1UpHitPbCJE8fKhTAt
+         bs30lXz3jNrCdJEQUjAj4cYk7uqiIbEbF6qYGfVoiT8jgzbfS8IpOrAb6RBUSAwcjpju
+         Duja9R/eV7SXMwMjWi/9lgBSNbjtcIlBSlGQHeOCl9ZjAwS0DzpyCRSO3/S0zuP5X0Y8
+         6GUClfcnDm5WDGh4f4joEO0/gX4uftRXvzm/+FwF4AUJivo622kKGw6cLQwmlMdMWyhX
+         4asBuN3IX5X4d0S0rtYBtIkZBM3OLUr8odol9YFjPiu9jgEnagTl3Clg0VUwA90+Z7im
+         YsAA==
+X-Gm-Message-State: AAQBX9fnlisAFmwl8JKrKGnJc+wsBotZkVnMtgpromelIgt6z/yzGKMv
+        15Uuvg9qZhaa3gPsN+QyGS4p8g==
+X-Google-Smtp-Source: AKy350YwB4kYOrekaxdEpI+hPuVho+rJnXECPnSPxRKXmlcV0fNHAsS4nvedwv84jZJ4QD01oSfi+Q==
+X-Received: by 2002:a17:903:788:b0:1a1:bf37:7c2e with SMTP id kn8-20020a170903078800b001a1bf377c2emr225398plb.4.1679611879706;
+        Thu, 23 Mar 2023 15:51:19 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id x21-20020a170902ea9500b0019b9a075f1fsm12871828plb.80.2023.03.23.15.51.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Mar 2023 15:51:19 -0700 (PDT)
+Message-ID: <6c507b78-35fb-fe23-51f0-e5bb754679d0@kernel.dk>
+Date:   Thu, 23 Mar 2023 16:51:17 -0600
 MIME-Version: 1.0
-References: <20230323040037.2389095-1-yosryahmed@google.com>
- <20230323040037.2389095-5-yosryahmed@google.com> <20230323155613.GC739026@cmpxchg.org>
- <CAJD7tkZ7Dz9myftc9bg7jhiaOYcn7qJ+V4sxZ_2kfnb+k=zhJQ@mail.gmail.com>
- <20230323172732.GE739026@cmpxchg.org> <CAJD7tkbtHhzOytu3hfN8tjdAyNq0BZXYN8TEipS4NTApUzkL7w@mail.gmail.com>
-In-Reply-To: <CAJD7tkbtHhzOytu3hfN8tjdAyNq0BZXYN8TEipS4NTApUzkL7w@mail.gmail.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Thu, 23 Mar 2023 12:35:20 -0700
-Message-ID: <CALvZod4z6F2Rr3prKdLqBuWUjippOBoLFw3QFFY7Bk=czm5iHg@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/7] memcg: sleep during flushing stats in safe contexts
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH RESEND v3] nbd_genl_status: null check for nla_nest_start
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org,
+        Navid Emamdoost <navid.emamdoost@gmail.com>,
+        Michal Kubecek <mkubecek@suse.cz>
+References: <20230323193032.28483-1-mkoutny@suse.com>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230323193032.28483-1-mkoutny@suse.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 11:08=E2=80=AFAM Yosry Ahmed <yosryahmed@google.com=
-> wrote:
->
-> On Thu, Mar 23, 2023 at 10:27=E2=80=AFAM Johannes Weiner <hannes@cmpxchg.=
-org> wrote:
-> >
-> > On Thu, Mar 23, 2023 at 09:01:12AM -0700, Yosry Ahmed wrote:
-> > > On Thu, Mar 23, 2023 at 8:56=E2=80=AFAM Johannes Weiner <hannes@cmpxc=
-hg.org> wrote:
-> > > >
-> > > > On Thu, Mar 23, 2023 at 04:00:34AM +0000, Yosry Ahmed wrote:
-> > > > > @@ -644,26 +644,26 @@ static void __mem_cgroup_flush_stats(void)
-> > > > >               return;
-> > > > >
-> > > > >       flush_next_time =3D jiffies_64 + 2*FLUSH_TIME;
-> > > > > -     cgroup_rstat_flush(root_mem_cgroup->css.cgroup, false);
-> > > > > +     cgroup_rstat_flush(root_mem_cgroup->css.cgroup, may_sleep);
-> > > >
-> > > > How is it safe to call this with may_sleep=3Dtrue when it's holding=
- the
-> > > > stats_flush_lock?
-> > >
-> > > stats_flush_lock is always called with trylock, it is only used today
-> > > so that we can skip flushing if another cpu is already doing a flush
-> > > (which is not 100% correct as they may have not finished flushing yet=
-,
-> > > but that's orthogonal here). So I think it should be safe to sleep as
-> > > no one can be blocked waiting for this spinlock.
-> >
-> > I see. It still cannot sleep while the lock is held, though, because
-> > preemption is disabled. Make sure you have all lock debugging on while
-> > testing this.
->
-> Thanks for pointing this out, will do.
->
-> >
-> > > Perhaps it would be better semantically to replace the spinlock with
-> > > an atomic test and set, instead of having a lock that can only be use=
-d
-> > > with trylock?
-> >
-> > It could be helpful to clarify what stats_flush_lock is protecting
-> > first. Keep in mind that locks should protect data, not code paths.
-> >
-> > Right now it's doing multiple things:
-> >
-> > 1. It protects updates to stats_flush_threshold
-> > 2. It protects updates to flush_next_time
-> > 3. It serializes calls to cgroup_rstat_flush() based on those ratelimit=
-s
-> >
-> > However,
-> >
-> > 1. stats_flush_threshold is already an atomic
-> >
-> > 2. flush_next_time is not atomic. The writer is locked, but the reader
-> >    is lockless. If the reader races with a flush, you could see this:
-> >
-> >                                         if (time_after(jiffies, flush_n=
-ext_time))
-> >         spin_trylock()
-> >         flush_next_time =3D now + delay
-> >         flush()
-> >         spin_unlock()
-> >                                         spin_trylock()
-> >                                         flush_next_time =3D now + delay
-> >                                         flush()
-> >                                         spin_unlock()
-> >
-> >    which means we already can get flushes at a higher frequency than
-> >    FLUSH_TIME during races. But it isn't really a problem.
-> >
-> >    The reader could also see garbled partial updates, so it needs at
-> >    least READ_ONCE and WRITE_ONCE protection.
-> >
-> > 3. Serializing cgroup_rstat_flush() calls against the ratelimit
-> >    factors is currently broken because of the race in 2. But the race
-> >    is actually harmless, all we might get is the occasional earlier
-> >    flush. If there is no delta, the flush won't do much. And if there
-> >    is, the flush is justified.
-> >
-> > In summary, it seems to me the lock can be ditched altogether. All the
-> > code needs is READ_ONCE/WRITE_ONCE around flush_next_time.
->
-> Thanks a lot for this analysis. I agree that the lock can be removed
-> with proper READ_ONCE/WRITE_ONCE, but I think there is another purpose
-> of the lock that we are missing here.
->
-> I think one other purpose of the lock is avoiding a thundering herd
-> problem on cgroup_rstat_lock, particularly from reclaim context, as
-> mentioned by the log of  commit aa48e47e3906 ("memcg: infrastructure
-> to flush memcg stats").
->
-> While testing, I did notice that removing this lock indeed causes a
-> thundering herd problem if we have a lot of concurrent reclaimers. The
-> trylock makes sure we abort immediately if someone else is flushing --
-> which is not ideal because that flusher might have just started, and
-> we may end up reading stale data anyway.
->
-> This is why I suggested replacing the lock by an atomic, and do
-> something like this if we want to maintain the current behavior:
->
-> static void __mem_cgroup_flush_stats(void)
-> {
->     ...
->     if (atomic_xchg(&ongoing_flush, 1))
->         return;
->     ...
->     atomic_set(&ongoing_flush, 0)
-> }
->
-> Alternatively, if we want to change the behavior and wait for the
-> concurrent flusher to finish flushing, we can maybe spin until
-> ongoing_flush goes back to 0 and then return:
->
-> static void __mem_cgroup_flush_stats(void)
-> {
->     ...
->     if (atomic_xchg(&ongoing_flush, 1)) {
->         /* wait until the ongoing flusher finishes to get updated stats *=
-/
->         while (atomic_read(&ongoing_flush) {};
->         return;
->     }
->     /* flush the stats ourselves */
->     ...
->     atomic_set(&ongoing_flush, 0)
-> }
->
-> WDYT?
+On 3/23/23 1:30 PM, Michal Koutný wrote:
+> From: Navid Emamdoost <navid.emamdoost@gmail.com>
+> 
+> nla_nest_start may fail and return NULL. The check is inserted, and
+> errno is selected based on other call sites within the same source code.
+> Update: removed extra new line.
+> v3 Update: added release reply, thanks to Michal Kubecek for pointing
+> out.
 
-I would go with your first approach i.e. no spinning.
+Josef? Looks straight forward to me, though it's not clear (to me) how
+this can be triggered and hence how important it is.
+
+> Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
+> Reviewed-by: Michal Kubecek <mkubecek@suse.cz>
+> Link: https://lore.kernel.org/r/20190911164013.27364-1-navid.emamdoost@gmail.com/
+> ---
+> 
+> I'm resending the patch because there was apparent consensus of its
+> inclusion and it seems it was only overlooked. Some people may care
+> about this because of CVE-2019-16089.
+
+Anyone can file a CVE, and in fact they are often filed as some kind
+of silly trophy. Whether a CVE exists or not has ZERO bearing on
+whether a bug is worth fixing.
+
+So please don't mix CVEs into any of this, they don't matter one bit.
+Never have, and never will. What's important is how the bug can be
+triggered.
+
+-- 
+Jens Axboe
+
+
