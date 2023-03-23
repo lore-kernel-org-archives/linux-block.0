@@ -2,22 +2,22 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C52C6FD1D
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 08:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2497DC6FD1D
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 08:22:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230463AbjCWITI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 04:19:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45366 "EHLO
+        id S229991AbjCWIWq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 04:22:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230482AbjCWITG (ORCPT
+        with ESMTP id S229933AbjCWIWp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 04:19:06 -0400
+        Thu, 23 Mar 2023 04:22:45 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 443722FCDA
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 01:19:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C755C2FCDD
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 01:22:44 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 95D2868AA6; Thu, 23 Mar 2023 09:19:01 +0100 (CET)
-Date:   Thu, 23 Mar 2023 09:19:01 +0100
+        id 313B468AA6; Thu, 23 Mar 2023 09:22:41 +0100 (CET)
+Date:   Thu, 23 Mar 2023 09:22:40 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
@@ -25,33 +25,38 @@ Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Ming Lei <ming.lei@redhat.com>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH v2 3/3] block: Preserve LBA order when requeuing
-Message-ID: <20230323081901.GA21977@lst.de>
-References: <20230320234905.3832131-1-bvanassche@acm.org> <20230320234905.3832131-4-bvanassche@acm.org> <20230321055802.GA18078@lst.de> <6325fba6-3dac-9391-28ef-177fcae9ad0a@acm.org>
+Subject: Re: [PATCH v2 2/3] block: Split and submit bios in LBA order
+Message-ID: <20230323082240.GB21977@lst.de>
+References: <20230320234905.3832131-1-bvanassche@acm.org> <20230320234905.3832131-3-bvanassche@acm.org> <20230321060307.GB18078@lst.de> <20230321060530.GC18078@lst.de> <6596c17f-62cc-2f2b-1a25-0ec2b6ae230c@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6325fba6-3dac-9391-28ef-177fcae9ad0a@acm.org>
+In-Reply-To: <6596c17f-62cc-2f2b-1a25-0ec2b6ae230c@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 07:46:51AM -0700, Bart Van Assche wrote:
-> On 3/20/23 22:58, Christoph Hellwig wrote:
->> On Mon, Mar 20, 2023 at 04:49:05PM -0700, Bart Van Assche wrote:
->>> When requeuing a request to a zoned block device, preserve the LBA order
->>> per zone.
->>
->> What causes this requeue?
+On Tue, Mar 21, 2023 at 11:44:59AM -0700, Bart Van Assche wrote:
+> On 3/20/23 23:05, Christoph Hellwig wrote:
+>> In fact I wonder how you managed to get into __bio_split_to_limits
+>> wtih a NULL current->bio_list at all.
 >
 > Hi Christoph,
 >
-> Two examples of why the SCSI core can decide to requeue a command are a 
-> retryable unit attention or ufshcd_queuecommand() returning 
-> SCSI_MLQUEUE_HOST_BUSY. For example, ufshcd_queuecommand() returns 
-> SCSI_MLQUEUE_HOST_BUSY while clock scaling is in progress (changing the 
-> frequency of the link between host controller and UFS device).
+> This patch series is what I came up with after having observed an UNALIGNED 
+> WRITE COMMAND response with a 5.15 kernel. In that kernel version (but 
+> probably not in the latest upstream kernel) the device mapper core submits 
+> split bios in the wrong order. I will check again whether this patch is 
+> really necessary.
 
-None of these should happen as the upper layers enforce a per-zone
-queue depth of 1.
+How did that escape the upper layer serialization of zoned writes?
+
+But my point is that all ->submit_bio instances as well as
+blk_mq_submit_bio are only called with a non-NULL current->bio_list.
+So I don't think you can reach the NULL current->bio_list case in this
+patch.
+
+Note that even without any specific zone device isss, submitting bios
+in LBA oders works best for both spinning and solid state media,
+but all of the arguments here don't add up.
