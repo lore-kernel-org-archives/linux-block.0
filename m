@@ -2,61 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2497DC6FD1D
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 08:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814CCC6FD1C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 08:26:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229991AbjCWIWq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 04:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49372 "EHLO
+        id S231367AbjCWI0Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 04:26:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbjCWIWp (ORCPT
+        with ESMTP id S231387AbjCWI0S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 04:22:45 -0400
+        Thu, 23 Mar 2023 04:26:18 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C755C2FCDD
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 01:22:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC53305F1
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 01:26:08 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 313B468AA6; Thu, 23 Mar 2023 09:22:41 +0100 (CET)
-Date:   Thu, 23 Mar 2023 09:22:40 +0100
+        id 08EEC68AA6; Thu, 23 Mar 2023 09:26:05 +0100 (CET)
+Date:   Thu, 23 Mar 2023 09:26:04 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
+Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Jan Kara <jack@suse.cz>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH v2 2/3] block: Split and submit bios in LBA order
-Message-ID: <20230323082240.GB21977@lst.de>
-References: <20230320234905.3832131-1-bvanassche@acm.org> <20230320234905.3832131-3-bvanassche@acm.org> <20230321060307.GB18078@lst.de> <20230321060530.GC18078@lst.de> <6596c17f-62cc-2f2b-1a25-0ec2b6ae230c@acm.org>
+Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
+Message-ID: <20230323082604.GC21977@lst.de>
+References: <20230317195938.1745318-1-bvanassche@acm.org> <20230317195938.1745318-3-bvanassche@acm.org> <ZBT6EmhEfJmgRXU1@ovpn-8-18.pek2.redhat.com> <580e712c-5e43-e1a5-277b-c4e8c50485f0@acm.org> <ZBjsDy2pfPk9t6qB@ovpn-8-29.pek2.redhat.com> <50dfa89c-19fa-b655-f6b8-b8853b066c75@acm.org> <20230321055537.GA18035@lst.de> <100dfc73-d8f3-f08f-e091-3c08707e95f5@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6596c17f-62cc-2f2b-1a25-0ec2b6ae230c@acm.org>
+In-Reply-To: <100dfc73-d8f3-f08f-e091-3c08707e95f5@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 11:44:59AM -0700, Bart Van Assche wrote:
-> On 3/20/23 23:05, Christoph Hellwig wrote:
->> In fact I wonder how you managed to get into __bio_split_to_limits
->> wtih a NULL current->bio_list at all.
+On Tue, Mar 21, 2023 at 07:36:12AM -0700, Bart Van Assche wrote:
+> The UFSHCI specification is very clear about the requirement that UFS host 
+> controllers must process SCSI commands in order if host software sets one 
+> bit at a time in the UFSHCI 3.0 doorbell register: "For Task Management 
+> Requests and Transfer Requests, software may issue multiple commands at a 
+> time, and may issue new commands before previous commands have completed. 
+> When software sets the corresponding doorbell register, the Task Management 
+> Requests and Transfer Requests automatically get a time stamp with their 
+> issue time. The commands within a command list (Task Management List or 
+> Transfer Request List) shall be processed in
+> the order of their time stamps, starting from the oldest time stamp. In the 
+> case multiple commands from the same list have the same time stamp, they 
+> shall be processed in the order of their command list index,
+> starting from the lowest index."
+
+But we can't write Linux software just for UFS.  We have no sensible
+ordering guarantee anywhere else.
+
+> Damien and Jens agree about introducing an additional hardware queue for 
+> preserving the order of zoned writes as one can see here: 
+> https://lore.kernel.org/linux-block/ed255a4a-a0da-a962-2da4-13321d0a75c5@kernel.dk/
 >
-> Hi Christoph,
->
-> This patch series is what I came up with after having observed an UNALIGNED 
-> WRITE COMMAND response with a 5.15 kernel. In that kernel version (but 
-> probably not in the latest upstream kernel) the device mapper core submits 
-> split bios in the wrong order. I will check again whether this patch is 
-> really necessary.
+> In our tests pipelining zoned writes (REQ_OP_WRITE) works fine as long as 
+> the UFS error handler is not activated. After the UFS error handler has 
+> been scheduled and before the SCSI host state is changed into 
+> SHOST_RECOVERY, the UFS host controller driver responds with 
+> SCSI_MLQUEUE_HOST_BUSY. I'm still working on a solution for the reordering 
+> caused by this mechanism.
 
-How did that escape the upper layer serialization of zoned writes?
-
-But my point is that all ->submit_bio instances as well as
-blk_mq_submit_bio are only called with a non-NULL current->bio_list.
-So I don't think you can reach the NULL current->bio_list case in this
-patch.
-
-Note that even without any specific zone device isss, submitting bios
-in LBA oders works best for both spinning and solid state media,
-but all of the arguments here don't add up.
+We'll still need REQ_OP_ZONE_APPEND as the actual file system fast path
+interface.  For a low-end device like UFS the sd.c emulation might be
+able to take advantage of the above separate queue as an implementation
+detail.
