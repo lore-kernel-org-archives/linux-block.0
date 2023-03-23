@@ -2,113 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9302C6FD1C
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E92BC6FD1C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:43:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbjCWPko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 11:40:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48180 "EHLO
+        id S231684AbjCWPnJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 11:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231658AbjCWPkn (ORCPT
+        with ESMTP id S229600AbjCWPnI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 11:40:43 -0400
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EDD920579
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:40:42 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id p204so14231988ybc.12
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:40:42 -0700 (PDT)
+        Thu, 23 Mar 2023 11:43:08 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B291E181
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:43:06 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id a5so5401769qto.6
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:43:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679586041;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aXqZ3IJA77cnf/fukJT6xyyWj+RxTe/4tMZOB+1mbkQ=;
-        b=pZto6I+vvxaphKg4Ca9NDWCYEUNhj7BJYmHfaAG8M51g5rBMERT2pTxw32czJVRwqf
-         EXpqwyXIM77qAJ204++TM8DrNrSWXsJyryfpkiZaymGsJv+mhNCo+v4QMcuWklOwQ1zb
-         14XunBWOhtBzzFTiU3Gj8RFDbfEQ4MSASypSDfsLzNrh14XAxfBwpnKQD7EnPJaTeklc
-         QpjEu0BIrsjS593Tol8303VAwfsZeO1qSu7wHKzhAJW4G9NFMuqTCi3YV8xqFEcXgHrN
-         7FMdZFQg1MqDPNCzODUn974BlGYh8gXmdMD2HE3tXqWplxkq95RhThaIWYkoMKBBBJ0Y
-         EGwA==
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112; t=1679586185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KS4mI5dSZp2boSr3gZdSRyxPkDeWYs2g1qOZH+GPmsA=;
+        b=bp0VhDf9ovL1bSdfzbiIO0gMq8zKiy5UCvl56pjEv3yZC2e6XJiTzXreyCquV4fR7j
+         CHbolL2DDZVqDX1QGbzh4DqoneGgloHixlkykX+mwgOhTScpZ0RN3cjWIl8ZnIRo4osu
+         3vpBiSm7GHsppP3u3BSs0VM9W+ODBBpYeV1d15NTXPA2/ZeKakTDoSKAHSbIWSlDbKrz
+         oxXVdmDMn15JnWqyPCzF7NvgKA4T9gLpEJ+o6JIdPbX+6YAuye9EmaLBGM7Mve+ZMF8s
+         rtDdUu6CG1rlItGycvCEP+Rz+ZDaXImPAx1sAoc8NrTSJasuUcHon2E4DhyrGrKKmGse
+         +0tQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679586041;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aXqZ3IJA77cnf/fukJT6xyyWj+RxTe/4tMZOB+1mbkQ=;
-        b=We2e0ZB7bx7VwLZUN8ScQ/nSxaVA8EHZaJKiL21PThlpy1vt1IX8CTCRpAjj3L62Nm
-         N8W2mg5UasTMp3m7vfaZEXiTn/y48JBUdxu6JywHhU1T2k2yFsYvsAgbomGvZIQBOz5L
-         ZGAbp6UL/TDjfa6ZFidBV5MI1l7KxNVXfQShQ5iNNOMJ42w1ZpT6PzQFuEXV6ewZVPpD
-         M9azZpeU2sURf+VSPnWZTzObh0tCLpdVHOiLButC7yPClIjbmcKxDN6tGQD1G//YxFNH
-         XoOs5ksgfAOokXKcYb652KtWu1JN61PyEWpCkiS53danXHtZVdnLPPistF7mBCHegmKZ
-         De5w==
-X-Gm-Message-State: AAQBX9d8O5z73o56b/AzSTnba1/4xngaFhHJFZjfhpar1Fo4XUaU3ay3
-        Dp81qf2R+tnoViNWJgd2AYrxEDEn7uqEzxN6v5cmbQ==
-X-Google-Smtp-Source: AKy350a50T0eMMPyL8hbiqxSf8FqZlw1dWta2IKhAFk++fAM4XiuwKP9tfvhLOJ/p8i1fAwcvy/Zde16et8l9oC4gKw=
-X-Received: by 2002:a05:6902:1083:b0:b67:d295:d614 with SMTP id
- v3-20020a056902108300b00b67d295d614mr2101971ybu.12.1679586041114; Thu, 23 Mar
- 2023 08:40:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230323040037.2389095-1-yosryahmed@google.com>
- <20230323040037.2389095-2-yosryahmed@google.com> <CALvZod7e7dMmkhKtXPAxmXjXQoTyeBf3Bht8HJC8AtWW93As3g@mail.gmail.com>
- <CAJD7tkbziGh+6hnMysHkoNr_HGBKU+s1rSGj=gZLki0ALT-jLg@mail.gmail.com>
- <CALvZod5GT=bZsLXsG500pNkEJpMB1o2KJau4=r0eHB-c8US53A@mail.gmail.com> <CAJD7tkY6Wf2OWja+f-JeFM5DdMCyLzbXxZ8KF0MjcYOKri-vtA@mail.gmail.com>
-In-Reply-To: <CAJD7tkY6Wf2OWja+f-JeFM5DdMCyLzbXxZ8KF0MjcYOKri-vtA@mail.gmail.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Thu, 23 Mar 2023 08:40:29 -0700
-Message-ID: <CALvZod5mJBAQ5adym7UNEruL-tOOOi+Y_ZiKsfOYqXPmGVPUEA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
- percpu lock
+        d=1e100.net; s=20210112; t=1679586185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KS4mI5dSZp2boSr3gZdSRyxPkDeWYs2g1qOZH+GPmsA=;
+        b=7Q5n7cxkhyG5Y7BzqG0ZrMO37U3JpIk/MJlEXwUJpYuS0bY/7XDnS2AW88JjpG1IG+
+         +GTZZmM/auoBmu2FsHXYaRIvBVGmsDN4y0e0IwP5apoH5xAa2issJYetlh1PqzCW0peI
+         +LXJho87URN6JFk7Mb6oCSxASspkIURDvgphVmkBQR3S0tzTKDDAwDhOsua359DHyXdG
+         8pjuEg5ZSY4oPWdRxzR8NqUV/F/a+pfMA4hnu0zNttNHOq48kLxAFdV4SElKQJEfxX1V
+         Nf+9ljBgrZSrr/pEvb4XjU7WE/K1WC/83BHaFaZtVz1JxKG7o3AyADn0DaN0ZBNH6ggG
+         6Itw==
+X-Gm-Message-State: AO0yUKWrbZm2EffrPZbLEu0L/xQsdi1Q4BqdtN9WxES+UzjsIkVPJOuR
+        VKzLXlb4oyYSoKZxzmDFDuqupQ==
+X-Google-Smtp-Source: AK7set9m68HsM4zsbLTLo8lzq2cUjnnMSSCWIrS35xYc1xlQGS6uWQoye655J6lJtXD51iJlGF9bUA==
+X-Received: by 2002:a05:622a:38b:b0:3e3:8a0b:8c80 with SMTP id j11-20020a05622a038b00b003e38a0b8c80mr9206917qtx.41.1679586185631;
+        Thu, 23 Mar 2023 08:43:05 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:400::5:62db])
+        by smtp.gmail.com with ESMTPSA id 6-20020ac85646000000b003e3897d8505sm3329544qtt.54.2023.03.23.08.43.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 08:43:05 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 11:43:04 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
 To:     Yosry Ahmed <yosryahmed@google.com>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>,
         Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
         Michal Hocko <mhocko@kernel.org>,
         Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
         Muchun Song <muchun.song@linux.dev>,
         Andrew Morton <akpm@linux-foundation.org>,
         Vasily Averin <vasily.averin@linux.dev>,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [RFC PATCH 3/7] cgroup: rstat: remove
+ cgroup_rstat_flush_irqsafe()
+Message-ID: <20230323154304.GA739026@cmpxchg.org>
+References: <20230323040037.2389095-1-yosryahmed@google.com>
+ <20230323040037.2389095-4-yosryahmed@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230323040037.2389095-4-yosryahmed@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 6:36=E2=80=AFAM Yosry Ahmed <yosryahmed@google.com>=
- wrote:
->
-[...]
-> > >
-> > > > 2. Are we really calling rstat flush in irq context?
-> > >
-> > > I think it is possible through the charge/uncharge path:
-> > > memcg_check_events()->mem_cgroup_threshold()->mem_cgroup_usage(). I
-> > > added the protection against flushing in an interrupt context for
-> > > future callers as well, as it may cause a deadlock if we don't disabl=
-e
-> > > interrupts when acquiring cgroup_rstat_lock.
-> > >
-> > > > 3. The mem_cgroup_flush_stats() call in mem_cgroup_usage() is only
-> > > > done for root memcg. Why is mem_cgroup_threshold() interested in ro=
-ot
-> > > > memcg usage? Why not ignore root memcg in mem_cgroup_threshold() ?
-> > >
-> > > I am not sure, but the code looks like event notifications may be set
-> > > up on root memcg, which is why we need to check thresholds.
-> >
-> > This is something we should deprecate as root memcg's usage is ill defi=
-ned.
->
-> Right, but I think this would be orthogonal to this patch series.
->
+On Thu, Mar 23, 2023 at 04:00:33AM +0000, Yosry Ahmed wrote:
+> The naming of cgroup_rstat_flush_irqsafe() can be confusing.
+> It can read like "irqsave", which means that it disables
+> interrupts throughout, but it actually doesn't. It is just "safe" to
+> call from contexts with interrupts disabled.
+> 
+> Furthermore, this is only used today by mem_cgroup_flush_stats(), which
+> will be changed by a later patch to optionally allow sleeping. Simplify
+> the code and make it easier to reason about by instead passing in an
+> explicit @may_sleep argument to cgroup_rstat_flush(), which gets passed
+> directly to cgroup_rstat_flush_locked().
+> 
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> ---
+>  block/blk-cgroup.c     |  2 +-
+>  include/linux/cgroup.h |  3 +--
+>  kernel/cgroup/cgroup.c |  4 ++--
+>  kernel/cgroup/rstat.c  | 24 +++++-------------------
+>  mm/memcontrol.c        |  6 +++---
+>  5 files changed, 12 insertions(+), 27 deletions(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index bd50b55bdb61..3fe313ce5e6b 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1043,7 +1043,7 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+>  	if (!seq_css(sf)->parent)
+>  		blkcg_fill_root_iostats();
+>  	else
+> -		cgroup_rstat_flush(blkcg->css.cgroup);
+> +		cgroup_rstat_flush(blkcg->css.cgroup, true);
+>  
+>  	rcu_read_lock();
+>  	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
+> diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+> index 3410aecffdb4..743c345b6a3f 100644
+> --- a/include/linux/cgroup.h
+> +++ b/include/linux/cgroup.h
+> @@ -691,8 +691,7 @@ static inline void cgroup_path_from_kernfs_id(u64 id, char *buf, size_t buflen)
+>   * cgroup scalable recursive statistics.
+>   */
+>  void cgroup_rstat_updated(struct cgroup *cgrp, int cpu);
+> -void cgroup_rstat_flush(struct cgroup *cgrp);
+> -void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp);
+> +void cgroup_rstat_flush(struct cgroup *cgrp, bool may_sleep);
+>  void cgroup_rstat_flush_hold(struct cgroup *cgrp);
+>  void cgroup_rstat_flush_release(void);
+>  
+> diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+> index 935e8121b21e..58df0fc379f6 100644
+> --- a/kernel/cgroup/cgroup.c
+> +++ b/kernel/cgroup/cgroup.c
+> @@ -5393,7 +5393,7 @@ static void css_release_work_fn(struct work_struct *work)
+>  	if (ss) {
+>  		/* css release path */
+>  		if (!list_empty(&css->rstat_css_node)) {
+> -			cgroup_rstat_flush(cgrp);
+> +			cgroup_rstat_flush(cgrp, true);
+>  			list_del_rcu(&css->rstat_css_node);
+>  		}
+>  
+> @@ -5406,7 +5406,7 @@ static void css_release_work_fn(struct work_struct *work)
+>  		/* cgroup release path */
+>  		TRACE_CGROUP_PATH(release, cgrp);
+>  
+> -		cgroup_rstat_flush(cgrp);
+> +		cgroup_rstat_flush(cgrp, true);
 
-I don't think we can make cgroup_rstat_lock a non-irq-disabling lock
-without either breaking a link between mem_cgroup_threshold and
-cgroup_rstat_lock or make mem_cgroup_threshold work without disabling
-irqs.
+This is an anti-pattern, please don't do this. Naked bool arguments
+are a pain to comprehend at the callsite and an easy vector for bugs.
 
-So, this patch can not be applied before either of those two tasks are
-done (and we may find more such scenarios).
+cgroup_rstat_flush_atomic() would be a better name for, well, atomic
+callsites.
+
+> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+> index af11e28bd055..fe8690bb1e1c 100644
+> --- a/kernel/cgroup/rstat.c
+> +++ b/kernel/cgroup/rstat.c
+> @@ -243,30 +243,16 @@ static bool should_skip_flush(void)
+>   * This function is safe to call from contexts that disable interrupts, but
+>   * @may_sleep must be set to false, otherwise the function may block.
+>   */
+> -__bpf_kfunc void cgroup_rstat_flush(struct cgroup *cgrp)
+> +__bpf_kfunc void cgroup_rstat_flush(struct cgroup *cgrp, bool may_sleep)
+>  {
+>  	if (should_skip_flush())
+>  		return;
+>  
+> -	might_sleep();
+> -	spin_lock(&cgroup_rstat_lock);
+> -	cgroup_rstat_flush_locked(cgrp, true);
+> -	spin_unlock(&cgroup_rstat_lock);
+> -}
+> -
+> -/**
+> - * cgroup_rstat_flush_irqsafe - irqsafe version of cgroup_rstat_flush()
+> - * @cgrp: target cgroup
+> - *
+> - * This function can be called from any context.
+> - */
+> -void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp)
+> -{
+> -	if (should_skip_flush())
+> -		return;
+> +	if (may_sleep)
+> +		might_sleep();
+
+might_sleep_if()
