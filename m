@@ -2,102 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC397C76196
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 04:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA744C6FD1D
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 04:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230331AbjCWEBG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 00:01:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37764 "EHLO
+        id S229781AbjCWEHX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 00:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbjCWEA5 (ORCPT
+        with ESMTP id S229485AbjCWEHW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 00:00:57 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABB561F919
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 21:00:54 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 204-20020a250fd5000000b00b6d6655dc35so10076289ybp.6
-        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 21:00:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679544054;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GbeROioJTSRzpGZIx65CHc5YHmhlz1VRWOdmKxovUco=;
-        b=Hsck6MLI0adIPASRaTY3d/eUkBNtZFq5fHTozHNB8yOtl2ZkHkJQQ4GNrxQh4iSoWz
-         JkY9CbdFxu+ujh+Pyx1oKlS53Vj0EANz1HJ/mNRwoFFcZsbYiHuLCMd4Lx5axIZ0gB5l
-         yaad/tHsVvn1tHU57blkHy/+dS8g9HHclDAV/QT3pdal8fCNCqCcJD9lMmCv5J074fQc
-         TEWaFK69tR0mz3hWUAlm/mUgTwQep/HE638zK7huhLNEr0Yv6vPjLeQWwk4UQCFbwI31
-         KRefecpL1tiBaS/Y5Rnpmz8ntCNmT0BogLXtNGk9m7i1zmm8BH4noVNiIwwFJbgEqIWE
-         ZH9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679544054;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GbeROioJTSRzpGZIx65CHc5YHmhlz1VRWOdmKxovUco=;
-        b=qvIdspQU3g7YJv+iFa/9T2/7yifbglw7cYvllIoSnOTdHJwA3JDIVmbvUX4mKdh5Oe
-         ZYAqHg+EYOiFmcuMDL2mJ+8UDaqTPKeLptEW57xwHCBhrNKygTG7YnG1UR287BSnlZFz
-         v3PoNf6NUugZznfhkA/VeoZHJPb9CHGJu2w1yTakFf3lnI2hXrKA0LGfzOJfBe/qiYK4
-         xAWGHwEKHBwpBUfR7emcvy22vmaIr1rQO3jjWNwQ4BlB5MEXeFA5SM9svaAC+j9CnFFy
-         XoUvnjzrvJwqXzcVoIyP3owFWOwbpnM3vOKmKzw2cIYj5HAXOHVu1sQZlQccJxPrHptS
-         q5vw==
-X-Gm-Message-State: AAQBX9fhBtrDzo45odZLRDrIkk6xzFQlFyNoe8/PyCspZ8CT7SWMGwV8
-        JOS4Ahe3aTskTX03NVfGaUxea+9LLINNOCHB
-X-Google-Smtp-Source: AKy350aHC0fJxZVNDyOM4vrsmksnjt2c5UEEiO2IoOQY1+2DycjUjKQKdK6RunG6Yd33ZztPbzyijCwEZgPQmgPG
-X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
- (user=yosryahmed job=sendgmr) by 2002:a05:6902:1549:b0:b73:4a25:fd36 with
- SMTP id r9-20020a056902154900b00b734a25fd36mr1286158ybu.2.1679544053971; Wed,
- 22 Mar 2023 21:00:53 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 04:00:37 +0000
-In-Reply-To: <20230323040037.2389095-1-yosryahmed@google.com>
-Mime-Version: 1.0
-References: <20230323040037.2389095-1-yosryahmed@google.com>
-X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230323040037.2389095-8-yosryahmed@google.com>
-Subject: [RFC PATCH 7/7] memcg: do not modify rstat tree for zero updates
-From:   Yosry Ahmed <yosryahmed@google.com>
-To:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Vasily Averin <vasily.averin@linux.dev>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, bpf@vger.kernel.org,
-        Yosry Ahmed <yosryahmed@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 23 Mar 2023 00:07:22 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0143D19101
+        for <linux-block@vger.kernel.org>; Wed, 22 Mar 2023 21:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=bF/Wd72ByyxSY9ZX1MicBMeY/tPgYwqU9VpxIRfAbu8=; b=QdX9nXOI2pvqa+Ee05SgVNQ/Sa
+        0yHwkdpTzpvx84lkZgGbNPlcHV12OertSEC+GHGRPlok4xuY74waBVTM8dUHoMu1mb1to7J+Kqqca
+        FE9k8f2aHeDWV4ItdYc1ViTBJdZ3lbcjFKrzUYTNX9cyw3UkjHJNhNJJIZ+Zc0EWkP1DsWbmzj14M
+        a2lVZef7nup6U3KuR+55F0BEYj1fMzHWqn4Spgk0Hr2G/hefFw5KAXYywxO3lYPl/o/MyHJj/kFqF
+        BlgJM/+m4gn0JeGkQoDpK9w7Dg2OSgLT4ZmExODGhlszCGDb6hrlOcJrYSYy+/tdbnnjn9S8QCoE0
+        vG7HqQEQ==;
+Received: from 213-147-166-156.nat.highway.webapn.at ([213.147.166.156] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pfCEJ-000iMH-2q;
+        Thu, 23 Mar 2023 04:07:12 +0000
+Date:   Thu, 23 Mar 2023 05:07:08 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.3
+Message-ID: <ZBvQbMungfXYQaL8@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In some situations, we may end up calling memcg_rstat_updated() with a
-value of 0, which means the stat was not actually updated. An example is
-if we fail to reclaim any pages in shrink_folio_list().
+The following changes since commit 9d2789ac9d60c049d26ef6d3005d9c94c5a559e9:
 
-Do not add the cgroup to the rstat updated tree in this case, to avoid
-unnecessarily flushing it.
+  block/io_uring: pass in issue_flags for uring_cmd task_work handling (2023-03-20 20:01:25 -0600)
 
-Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
----
- mm/memcontrol.c | 3 +++
- 1 file changed, 3 insertions(+)
+are available in the Git repository at:
 
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 39a9c7a978ae..7afd29399409 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -618,6 +618,9 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
- {
- 	unsigned int x;
- 
-+	if (!val)
-+		return;
-+
- 	cgroup_rstat_updated(memcg->css.cgroup, smp_processor_id());
- 
- 	x = __this_cpu_add_return(stats_updates, abs(val));
--- 
-2.40.0.rc1.284.g88254d51c5-goog
+  git://git.infradead.org/nvme.git tags/nvme-6.3-2023-03-23
 
+for you to fetch changes up to aa01c67de5926fdb276793180564f172c55fb0d7:
+
+  nvme-tcp: fix nvme_tcp_term_pdu to match spec (2023-03-22 09:19:56 +0100)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.3
+
+ - send Identify with CNS 06h only to I/O controllers (Martin George)
+ - fix nvme_tcp_term_pdu to match spec (Caleb Sander)
+
+----------------------------------------------------------------
+Caleb Sander (1):
+      nvme-tcp: fix nvme_tcp_term_pdu to match spec
+
+Martin George (1):
+      nvme: send Identify with CNS 06h only to I/O controllers
+
+ drivers/nvme/host/core.c | 3 ++-
+ include/linux/nvme-tcp.h | 5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
