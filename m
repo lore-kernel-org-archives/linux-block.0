@@ -2,153 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB72C6FD1C
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 13:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA50C76195
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 14:30:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231127AbjCWNg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 09:36:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49008 "EHLO
+        id S231265AbjCWOat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 10:30:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231552AbjCWNgZ (ORCPT
+        with ESMTP id S231362AbjCWOas (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 09:36:25 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363512915F
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 06:36:22 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id i5so39744539eda.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 06:36:22 -0700 (PDT)
+        Thu, 23 Mar 2023 10:30:48 -0400
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F2B9756
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 07:30:47 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id jl13so14179940qvb.10
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 07:30:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679578580;
+        d=omnibond-com.20210112.gappssmtp.com; s=20210112; t=1679581846;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EuE0cJjbmK+/BhJwvJMFWgBmHM9057+RC8AkvA4HkKU=;
-        b=DcDiKscPNUA4W1/GbdqN5BhxUIYoz9Wmqq3Xmd1C+DUMMpURN79kep/XyUMFs7O6WW
-         MdqSEoZEpJh6K1uDYGXqCYwtqPCRXnq1QLfTpNV4Eo1IgdgOLTpM3R2PdOsbI+hV2kfK
-         QVD9wZK3LA17mTvY76ITqoPHiau96K56j+TNrZ6a3QUQ5L79xAReQuBw7n00P8VHIWWm
-         neNib3URA3K2d5FtCKba9hlgjdkmZkjza+ySCPA7jYZFPPJYNEHu2p+u2TV4VmmjgEJS
-         llW6op2xvHlxZkcr/ECLM2jHofYIAEetci4tarDdc6n3marMfQcOD5Xx5wNyNvIJNjGD
-         lz0Q==
+        bh=DW5cWuSORuMPl9h4M/OMu4zN6Ab689Cgd2Jmn907uzA=;
+        b=uga6xPblyjNwQ0nys0O9OMOnWPlxzoqUx0tub1g4jl3Ds7H0qu2WTey6xF5KYLxKjC
+         SCNdX/4AXYIE5IhDdtecko+9IOBtUIc3U2CM4hPqaHHiSjJXBWP+o6JLCwKslIKRmAED
+         TXE8V7Fa5Vj5MdO1Sgso1Toii0RePFj640IY5JVqwEa1uZwDrQZ5LDzFX93GFGZY9IjQ
+         hb8Z808MK7gqHrpq+J6Wxii0pqN6Kedc0VTbCmzHxDcz5RluBsBf5YY47foQKVJ8WL5w
+         Hhs7tyAu+HDhks/IkXKF2t4EX3GViwlbB8pSikG3+R69thN52bWR4mIjSGgorkjzAiC0
+         GC9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679578580;
+        d=1e100.net; s=20210112; t=1679581846;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EuE0cJjbmK+/BhJwvJMFWgBmHM9057+RC8AkvA4HkKU=;
-        b=cnqF9AM+1KqxSEPJVqhSc6LJrD9nfNGk4DAN/jcuLSSkX18BE3rINFfcZ8HL9q6Iza
-         +zSCvoUA90HlQ69LdXuAz1fg7CM3IQueNRkU1vAwBgjYBYRvZ8afTBfiZAGIUJjgYuRV
-         nY1Env9vW0WoeBUzatUddEXc7BFnVqK8vinjyYefjo+EyIWKsYjKMCVh/T0V+PymH2qu
-         YTnQaTIV5HvR/DmcC6QJevNdw9ILsozwMB53ng/T8GJUBqfdMv/rIQEohdrhnIQYn2N6
-         hNUzqS+/rTAqZqxJ8T8rUv/Vcp2KjjP3UjYRSpvskaYQ67si0jOTCIlhVKepAsuXy3Qi
-         qP3g==
-X-Gm-Message-State: AO0yUKWWpQSrbSP6JA865TLR4vPGZ+s7vK+r++KS0j/xglZCIbLiZwmQ
-        ToI7QaeGlsn+AL2reef5aaAihaWON/SXtRJPMisZ4g==
-X-Google-Smtp-Source: AK7set/b903mZdRoPNoYVhLFO+mUgHONws3mpu+Ax6aYZzzVndV1mWTWBDnS8VjbuXo0x7feM2DBl3f475JvT0qkzkM=
-X-Received: by 2002:a50:d4c5:0:b0:500:5463:35de with SMTP id
- e5-20020a50d4c5000000b00500546335demr5382302edj.8.1679578580439; Thu, 23 Mar
- 2023 06:36:20 -0700 (PDT)
+        bh=DW5cWuSORuMPl9h4M/OMu4zN6Ab689Cgd2Jmn907uzA=;
+        b=tJL5zspFFEqy703NLtY15HYhKJCxxUGM0m3Cpo5MRXJubrbQMTqK2afjondnoclYu4
+         iyIIstA3C7KmocPRcbwodwt0mFOOX2whkbacwOCBl8SizYPqAAxAN9BAOhYwiZnS7Eub
+         F9sm92tFPOYpZt74IScrmEXlBpovM8cyzNoMpJvEoYeMod2va6HxNPDwRXSOp5Vy48ll
+         K+8waWa5vaAej14FLG2JtVLqhFMNL/GhEEd/bN1G1iU5SEyBTy6n3TwHJgDdl7YFgQtT
+         HQpY+vftcyYkaWdq9+ttrzVPR83uMjzQZ/lIra4KfghB2xsC0NFHcJnoc+qDZA43virE
+         zJYA==
+X-Gm-Message-State: AO0yUKVsD9FCNemmAgoCN4Ml3zlD62uwd1PJvuwEFyc1XwMqi/xizU2y
+        epK14NH1/lktoKzEwCXGL6i3heCAFnHwV5Fy6/Jqwg==
+X-Google-Smtp-Source: AK7set/trVllkfcEi+yg3oqpS8DY+A/uEckTTWNRYDqUdJd5erFFIJB2DTR1p2z4pS/Mo+VlMX55/q/gvrdpE0I/XKA=
+X-Received: by 2002:a05:6214:8c7:b0:537:7476:41f7 with SMTP id
+ da7-20020a05621408c700b00537747641f7mr1552535qvb.3.1679581846154; Thu, 23 Mar
+ 2023 07:30:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230323040037.2389095-1-yosryahmed@google.com>
- <20230323040037.2389095-2-yosryahmed@google.com> <CALvZod7e7dMmkhKtXPAxmXjXQoTyeBf3Bht8HJC8AtWW93As3g@mail.gmail.com>
- <CAJD7tkbziGh+6hnMysHkoNr_HGBKU+s1rSGj=gZLki0ALT-jLg@mail.gmail.com> <CALvZod5GT=bZsLXsG500pNkEJpMB1o2KJau4=r0eHB-c8US53A@mail.gmail.com>
-In-Reply-To: <CALvZod5GT=bZsLXsG500pNkEJpMB1o2KJau4=r0eHB-c8US53A@mail.gmail.com>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Thu, 23 Mar 2023 06:35:44 -0700
-Message-ID: <CAJD7tkY6Wf2OWja+f-JeFM5DdMCyLzbXxZ8KF0MjcYOKri-vtA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
- percpu lock
-To:     Shakeel Butt <shakeelb@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
+References: <CGME20230322135015eucas1p2ff980e76159f0ceef7bf66934580bd6c@eucas1p2.samsung.com>
+ <20230322135013.197076-1-p.raghav@samsung.com>
+In-Reply-To: <20230322135013.197076-1-p.raghav@samsung.com>
+From:   Mike Marshall <hubcap@omnibond.com>
+Date:   Thu, 23 Mar 2023 10:30:35 -0400
+Message-ID: <CAOg9mSRvPDysNF-GV_ZGf8bu1-50wA5y7L=LuZwGp+vEVzsu1Q@mail.gmail.com>
+Subject: Re: [RFC v2 0/5] remove page_endio()
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     senozhatsky@chromium.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        willy@infradead.org, brauner@kernel.org, akpm@linux-foundation.org,
+        minchan@kernel.org, martin@omnibond.com, mcgrof@kernel.org,
+        devel@lists.orangefs.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 11:33=E2=80=AFPM Shakeel Butt <shakeelb@google.com>=
- wrote:
+I have tested this patch on orangefs on top of 6.3.0-rc3, no
+regressions.
+
+It is very easy to build a single host orangefs test system on
+a vm. There are instructions in orangefs.rst, and also I'd
+be glad to help make them better...
+
+-Mike
+
+On Wed, Mar 22, 2023 at 9:50=E2=80=AFAM Pankaj Raghav <p.raghav@samsung.com=
+> wrote:
 >
-> On Wed, Mar 22, 2023 at 10:15=E2=80=AFPM Yosry Ahmed <yosryahmed@google.c=
-om> wrote:
-> >
-> [...]
-> > > Couple of questions:
-> > >
-> > > 1. What exactly is cgroup_rstat_lock protecting? Can we just remove i=
-t
-> > > altogether?
-> >
-> > I believe it protects the global state variables that we flush into.
-> > For example, for memcg, it protects mem_cgroup->vmstats.
-> >
-> > I tried removing the lock and allowing concurrent flushing on
-> > different cpus, by changing mem_cgroup->vmstats to use atomics
-> > instead, but that turned out to be a little expensive. Also,
-> > cgroup_rstat_lock is already contended by different flushers
-> > (mitigated by stats_flush_lock on the memcg side). If we remove it,
-> > concurrent flushers contend on every single percpu lock instead, which
-> > also seems to be expensive.
+> It was decided to remove the page_endio() as per the previous RFC
+> discussion[1] of this series and move that functionality into the caller
+> itself. One of the side benefit of doing that is the callers have been
+> modified to directly work on folios as page_endio() already worked on
+> folios.
 >
-> We should add a comment on what it is protecting. I think block rstat
-> are fine but memcg and bpf would need this.
-
-I think it also protects the cpu base stats flushed by cgroup_base_stat_flu=
-sh().
-
-I will add a comment in the next version.
-
+> mpage changes were tested with a simple boot testing. zram and orangefs i=
+s
+> only build tested. No functional changes were introduced as a part of
+> this AFAIK.
 >
-> >
-> > > 2. Are we really calling rstat flush in irq context?
-> >
-> > I think it is possible through the charge/uncharge path:
-> > memcg_check_events()->mem_cgroup_threshold()->mem_cgroup_usage(). I
-> > added the protection against flushing in an interrupt context for
-> > future callers as well, as it may cause a deadlock if we don't disable
-> > interrupts when acquiring cgroup_rstat_lock.
-> >
-> > > 3. The mem_cgroup_flush_stats() call in mem_cgroup_usage() is only
-> > > done for root memcg. Why is mem_cgroup_threshold() interested in root
-> > > memcg usage? Why not ignore root memcg in mem_cgroup_threshold() ?
-> >
-> > I am not sure, but the code looks like event notifications may be set
-> > up on root memcg, which is why we need to check thresholds.
+> Open questions:
+> - Willy pointed out that the calls to folio_set_error() and
+>   folio_clear_uptodate() are not needed anymore in the read path when an
+>   error happens[2]. I still don't understand 100% why they aren't needed
+>   anymore as I see those functions are still called in iomap. It will be
+>   good to put that rationale as a part of the commit message.
 >
-> This is something we should deprecate as root memcg's usage is ill define=
-d.
-
-Right, but I think this would be orthogonal to this patch series.
-
+> [1] https://lore.kernel.org/linux-mm/ZBHcl8Pz2ULb4RGD@infradead.org/
+> [2] https://lore.kernel.org/linux-mm/ZBSH6Uq6IIXON%2Frh@casper.infradead.=
+org/
 >
-> >
-> > Even if mem_cgroup_threshold() does not flush memcg stats, the purpose
-> > of this patch is to make sure the rstat flushing code itself is not
-> > disabling interrupts; which it currently does for any unsleepable
-> > context, even if it is interruptible.
+> Pankaj Raghav (5):
+>   zram: remove zram_page_end_io function
+>   orangefs: use folios in orangefs_readahead
+>   mpage: split bi_end_io callback for reads and writes
+>   mpage: use folios in bio end_io handler
+>   filemap: remove page_endio()
 >
-> Basically I am saying we should aim for VM_BUG_ON(!in_task()) in the
-> flush function rather than adding should_skip_flush() which does not
-> stop potential new irq flushers.
-
-I wanted to start with VM_BUG_ON(!in_task()) but I wasn't sure that
-all contexts that call rstat flushing are not in irq contexts. I added
-should_skip_flush() so that if there are existing flushers in irq
-context, or new flushers are added, we are protected against a
-deadlock.
-
-We can change should_skip_flush() to have a WARN_ON_ONCE(!in_task())
-to alert in this case. If you prefer removing should_skip_flush() and
-just adding VM_BUG_ON(!in_task()) we can do that, but personally I was
-not confident enough that we have no code paths today that may attempt
-flushing from irq context.
+>  drivers/block/zram/zram_drv.c | 13 +----------
+>  fs/mpage.c                    | 44 ++++++++++++++++++++++++++++-------
+>  fs/orangefs/inode.c           |  9 +++----
+>  include/linux/pagemap.h       |  2 --
+>  mm/filemap.c                  | 30 ------------------------
+>  5 files changed, 42 insertions(+), 56 deletions(-)
+>
+> --
+> 2.34.1
+>
