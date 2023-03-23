@@ -2,111 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3689BC6FD1C
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 13:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB72C6FD1C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 13:36:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231681AbjCWNDg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 09:03:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52134 "EHLO
+        id S231127AbjCWNg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 09:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231676AbjCWNDf (ORCPT
+        with ESMTP id S231552AbjCWNgZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 09:03:35 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67DB24CB1
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 06:03:27 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id t9so26346129qtx.8
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 06:03:27 -0700 (PDT)
+        Thu, 23 Mar 2023 09:36:25 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363512915F
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 06:36:22 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id i5so39744539eda.0
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 06:36:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1679576607;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JT5kxqVOLNs1cddye30QvhqujBIE6P8vkXfghBDUxrs=;
-        b=fsnlSj1wYC+oyegO1q1yDBhN8AGGfS4B+/UJULqMDG1jdL9i5Fbq8O1r0UzJVbgZ5N
-         CurbRDFSblDK9jc415qglfplweQjxGgBmqJhkAyt51A78hYTvBHd5fNCjBUuHTPn12EM
-         Y1zKMRG6J4vTDaSNZyUJtcdDE+Bc4WCdEGj2SxETTQC9dX65jzYjndPxJagfadtzcHCH
-         KucPqK8M85ho9lf87J55E+JMepmXIqa3pD+e1u9JzACYKTlMkED7tsKMjIDWBNd1fGTF
-         U3Y7TJ6KcgnjkwfOD17f24lPxk4X4kA8SUtwmE3gF+qqh2vrzBTq+F7nq338bAMfL5EK
-         qakw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679576607;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20210112; t=1679578580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JT5kxqVOLNs1cddye30QvhqujBIE6P8vkXfghBDUxrs=;
-        b=DOadJPBadGVDuJ/I5Djzma/2B+bQJ/IZz6tTHjMQQD7eQ3mBV/nBTdLE3keu6UoR71
-         FjsA2NQ6AASo2ZsyJOMRv4tw26BslqlSCy8d/i8Qylon3BsbWQ/NQ3UsvtbpaHf9FAv1
-         2yuntMVNqAA+ifTAE4qQz6BeJCQesyCPawNWSxJ0I5XqboR5jET9MEsqgvCR5PdB1Jk+
-         t/+d0V9H+Y4IYli9ycUwKt+lANXSIvjk4HZn3c/ytkVVDJyCWeYgWm8MsJYnRXNEqK0U
-         F77UozcHwUN2m++BXIicRUFlnC6/qdJjqpU5WZSi/2pNQ/TQJwtKaGsW9pBBL5ckRWPm
-         3thA==
-X-Gm-Message-State: AO0yUKXYl0Rjl72mj6Soj87ZqA47vCRYUa8WhqF146nP3MEJklCSTuWz
-        awssQZtAL2nUkNpPS/AkKqnciA==
-X-Google-Smtp-Source: AK7set9Nd0IROYibAsNWzp2/wBVMkNxgJf3eiBJQdDWBUctTuOee3WY/j00WoSi5pcTukOCIoBjA4w==
-X-Received: by 2002:ac8:7dd1:0:b0:3e2:7a9e:a04e with SMTP id c17-20020ac87dd1000000b003e27a9ea04emr9731248qte.18.1679576606971;
-        Thu, 23 Mar 2023 06:03:26 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id c9-20020ac80549000000b003d8d1ec2672sm11612362qth.89.2023.03.23.06.03.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 06:03:26 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1pfKbF-001D0h-LK;
-        Thu, 23 Mar 2023 10:03:25 -0300
-Date:   Thu, 23 Mar 2023 10:03:25 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH] blk-mq-rdma: remove queue mapping helper for rdma devices
-Message-ID: <ZBxOHZwre3x8DkWN@ziepe.ca>
-References: <20230322123703.485544-1-sagi@grimberg.me>
- <ZBr6kNVoa5RbNzSa@ziepe.ca>
- <c51d3d99-5bc9-cb47-6efa-5371ef3cc0f4@grimberg.me>
- <ZBsHnq6FlpO0p10A@ziepe.ca>
- <20230323120515.GE36557@unreal>
+        bh=EuE0cJjbmK+/BhJwvJMFWgBmHM9057+RC8AkvA4HkKU=;
+        b=DcDiKscPNUA4W1/GbdqN5BhxUIYoz9Wmqq3Xmd1C+DUMMpURN79kep/XyUMFs7O6WW
+         MdqSEoZEpJh6K1uDYGXqCYwtqPCRXnq1QLfTpNV4Eo1IgdgOLTpM3R2PdOsbI+hV2kfK
+         QVD9wZK3LA17mTvY76ITqoPHiau96K56j+TNrZ6a3QUQ5L79xAReQuBw7n00P8VHIWWm
+         neNib3URA3K2d5FtCKba9hlgjdkmZkjza+ySCPA7jYZFPPJYNEHu2p+u2TV4VmmjgEJS
+         llW6op2xvHlxZkcr/ECLM2jHofYIAEetci4tarDdc6n3marMfQcOD5Xx5wNyNvIJNjGD
+         lz0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679578580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EuE0cJjbmK+/BhJwvJMFWgBmHM9057+RC8AkvA4HkKU=;
+        b=cnqF9AM+1KqxSEPJVqhSc6LJrD9nfNGk4DAN/jcuLSSkX18BE3rINFfcZ8HL9q6Iza
+         +zSCvoUA90HlQ69LdXuAz1fg7CM3IQueNRkU1vAwBgjYBYRvZ8afTBfiZAGIUJjgYuRV
+         nY1Env9vW0WoeBUzatUddEXc7BFnVqK8vinjyYefjo+EyIWKsYjKMCVh/T0V+PymH2qu
+         YTnQaTIV5HvR/DmcC6QJevNdw9ILsozwMB53ng/T8GJUBqfdMv/rIQEohdrhnIQYn2N6
+         hNUzqS+/rTAqZqxJ8T8rUv/Vcp2KjjP3UjYRSpvskaYQ67si0jOTCIlhVKepAsuXy3Qi
+         qP3g==
+X-Gm-Message-State: AO0yUKWWpQSrbSP6JA865TLR4vPGZ+s7vK+r++KS0j/xglZCIbLiZwmQ
+        ToI7QaeGlsn+AL2reef5aaAihaWON/SXtRJPMisZ4g==
+X-Google-Smtp-Source: AK7set/b903mZdRoPNoYVhLFO+mUgHONws3mpu+Ax6aYZzzVndV1mWTWBDnS8VjbuXo0x7feM2DBl3f475JvT0qkzkM=
+X-Received: by 2002:a50:d4c5:0:b0:500:5463:35de with SMTP id
+ e5-20020a50d4c5000000b00500546335demr5382302edj.8.1679578580439; Thu, 23 Mar
+ 2023 06:36:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230323120515.GE36557@unreal>
+References: <20230323040037.2389095-1-yosryahmed@google.com>
+ <20230323040037.2389095-2-yosryahmed@google.com> <CALvZod7e7dMmkhKtXPAxmXjXQoTyeBf3Bht8HJC8AtWW93As3g@mail.gmail.com>
+ <CAJD7tkbziGh+6hnMysHkoNr_HGBKU+s1rSGj=gZLki0ALT-jLg@mail.gmail.com> <CALvZod5GT=bZsLXsG500pNkEJpMB1o2KJau4=r0eHB-c8US53A@mail.gmail.com>
+In-Reply-To: <CALvZod5GT=bZsLXsG500pNkEJpMB1o2KJau4=r0eHB-c8US53A@mail.gmail.com>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Thu, 23 Mar 2023 06:35:44 -0700
+Message-ID: <CAJD7tkY6Wf2OWja+f-JeFM5DdMCyLzbXxZ8KF0MjcYOKri-vtA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
+ percpu lock
+To:     Shakeel Butt <shakeelb@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 02:05:15PM +0200, Leon Romanovsky wrote:
-> On Wed, Mar 22, 2023 at 10:50:22AM -0300, Jason Gunthorpe wrote:
-> > On Wed, Mar 22, 2023 at 03:00:08PM +0200, Sagi Grimberg wrote:
-> > > 
-> > > > > No rdma device exposes its irq vectors affinity today. So the only
-> > > > > mapping that we have left, is the default blk_mq_map_queues, which
-> > > > > we fallback to anyways. Also fixup the only consumer of this helper
-> > > > > (nvme-rdma).
-> > > > 
-> > > > This was the only caller of ib_get_vector_affinity() so please delete
-> > > > op get_vector_affinity and ib_get_vector_affinity() from verbs as well
-> > > 
-> > > Yep, no problem.
-> > > 
-> > > Given that nvme-rdma was the only consumer, do you prefer this goes from
-> > > the nvme tree?
-> > 
-> > Sure, it is probably fine
-> 
-> I tried to do it two+ years ago:
-> https://lore.kernel.org/all/20200929091358.421086-1-leon@kernel.org
+On Wed, Mar 22, 2023 at 11:33=E2=80=AFPM Shakeel Butt <shakeelb@google.com>=
+ wrote:
+>
+> On Wed, Mar 22, 2023 at 10:15=E2=80=AFPM Yosry Ahmed <yosryahmed@google.c=
+om> wrote:
+> >
+> [...]
+> > > Couple of questions:
+> > >
+> > > 1. What exactly is cgroup_rstat_lock protecting? Can we just remove i=
+t
+> > > altogether?
+> >
+> > I believe it protects the global state variables that we flush into.
+> > For example, for memcg, it protects mem_cgroup->vmstats.
+> >
+> > I tried removing the lock and allowing concurrent flushing on
+> > different cpus, by changing mem_cgroup->vmstats to use atomics
+> > instead, but that turned out to be a little expensive. Also,
+> > cgroup_rstat_lock is already contended by different flushers
+> > (mitigated by stats_flush_lock on the memcg side). If we remove it,
+> > concurrent flushers contend on every single percpu lock instead, which
+> > also seems to be expensive.
+>
+> We should add a comment on what it is protecting. I think block rstat
+> are fine but memcg and bpf would need this.
 
-Christoph's points make sense, but I think we should still purge this
-code.
+I think it also protects the cpu base stats flushed by cgroup_base_stat_flu=
+sh().
 
-If we want to do proper managed affinity the right RDMA API is to
-directly ask for the desired CPU binding when creating the CQ, and
-optionally a way to change the CPU binding of the CQ at runtime.
+I will add a comment in the next version.
 
-This obfuscated 'comp vector number' thing is nonsensical for a kAPI -
-creating a CQ on a random CPU then trying to backwards figure out what
-CPU it was created on is silly.
+>
+> >
+> > > 2. Are we really calling rstat flush in irq context?
+> >
+> > I think it is possible through the charge/uncharge path:
+> > memcg_check_events()->mem_cgroup_threshold()->mem_cgroup_usage(). I
+> > added the protection against flushing in an interrupt context for
+> > future callers as well, as it may cause a deadlock if we don't disable
+> > interrupts when acquiring cgroup_rstat_lock.
+> >
+> > > 3. The mem_cgroup_flush_stats() call in mem_cgroup_usage() is only
+> > > done for root memcg. Why is mem_cgroup_threshold() interested in root
+> > > memcg usage? Why not ignore root memcg in mem_cgroup_threshold() ?
+> >
+> > I am not sure, but the code looks like event notifications may be set
+> > up on root memcg, which is why we need to check thresholds.
+>
+> This is something we should deprecate as root memcg's usage is ill define=
+d.
 
-Jason
+Right, but I think this would be orthogonal to this patch series.
+
+>
+> >
+> > Even if mem_cgroup_threshold() does not flush memcg stats, the purpose
+> > of this patch is to make sure the rstat flushing code itself is not
+> > disabling interrupts; which it currently does for any unsleepable
+> > context, even if it is interruptible.
+>
+> Basically I am saying we should aim for VM_BUG_ON(!in_task()) in the
+> flush function rather than adding should_skip_flush() which does not
+> stop potential new irq flushers.
+
+I wanted to start with VM_BUG_ON(!in_task()) but I wasn't sure that
+all contexts that call rstat flushing are not in irq contexts. I added
+should_skip_flush() so that if there are existing flushers in irq
+context, or new flushers are added, we are protected against a
+deadlock.
+
+We can change should_skip_flush() to have a WARN_ON_ONCE(!in_task())
+to alert in this case. If you prefer removing should_skip_flush() and
+just adding VM_BUG_ON(!in_task()) we can do that, but personally I was
+not confident enough that we have no code paths today that may attempt
+flushing from irq context.
