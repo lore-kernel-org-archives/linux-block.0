@@ -2,86 +2,191 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07267C74A5B
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 16:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7124C77B60
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 16:30:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230154AbjCWQ17 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 12:27:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38442 "EHLO
+        id S232165AbjCWQaT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 12:30:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjCWQ16 (ORCPT
+        with ESMTP id S231224AbjCWQ3z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 12:27:58 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C961702
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:27:55 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id n20so9002738pfa.3
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:27:55 -0700 (PDT)
+        Thu, 23 Mar 2023 12:29:55 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD4E024BE7
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:29:48 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id z83so25534140ybb.2
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679588988;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Re7Ul0ocDttfAu2MIei1cNhSsXPUW8eyd1Dmg4NOWNY=;
+        b=ta8VBHiRyoygVRQCyQdLSUWlxj/b6S8E/YOXEjvQvBe+KnMbrmIzc8Q5T/2Db4c1fC
+         POV8HV4H5T1K63dxkgXi76qwKMFVbmhC3hacNk/nBSEksUMJvjMclFKx/lyBuATImAeN
+         t0jIOpB7aVfUPX9uuC+89PXHxfqs9Rlh6eGrUGdRduuyJM2hunicNCOFkMsNdRNsIeBX
+         kUBCxLSaYyc/lkmVfJQ2KnM/BZn4rW5AYN+5TWngULmqNlS57bA2WWMwgy45bh9ZMLDJ
+         bs/OzYmIvgTWjQbeZrl2GwvvIHs4BJaPX3DoANTZtPPHl/zJZxVOARVxA1wMMpj6hcm0
+         EzaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679588875;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I+1ibTVsDSFKipf8XY5Mo50yKdNF+Xl7RBmXD0Gu8g8=;
-        b=BzoHUx+Lgo4Z3PPjAIV6YgTfNT67cHwyG/oKI2pBmng0dACKaMM0Z4ooXatIKZJ1hk
-         QaJxKutkD+MXtif4MTZW1d1fE9tG4btkdrGNUPDoruFpNv1orx91UpET4x3+VuqYq44X
-         4NsMqCa3/W8JDS2TQ9uwQ/tZ/tzLTEBw7I3M+eAPafedsnFnCpQ+9W2fBfy1pc5T4JFW
-         tkKsxSXl/c8qgdMIqb4uyGSI5pEbHDWwtLOzcBP33F6p3pV+mAErnbKoQkgRMcCeq1xf
-         UmBnKSldygQZ4iEmdPlcXhtNqYCfzot5gI7nm8pDwelyc09vsEjVzLuOEFdBWsmb0pgP
-         Kfmw==
-X-Gm-Message-State: AO0yUKUzHZ7vD0NI9tEyh7j3phJE1nS/FBdYbdjlbXrhas3aAFE6yy3n
-        +9Ip64pOwAhrr4pMKv9mjFQ=
-X-Google-Smtp-Source: AK7set/MuGxB3zSWpqnkDcPFgEdRJKcp+xuy84OOhis6mylZoEggcffZDjB/S0wef0SjcnuhTYDUTw==
-X-Received: by 2002:aa7:95bd:0:b0:62a:1267:2036 with SMTP id a29-20020aa795bd000000b0062a12672036mr4710408pfk.34.1679588875078;
-        Thu, 23 Mar 2023 09:27:55 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:ad4e:d902:f46f:5b50? ([2620:15c:211:201:ad4e:d902:f46f:5b50])
-        by smtp.gmail.com with ESMTPSA id s10-20020a62e70a000000b00593e4e6516csm10654914pfh.124.2023.03.23.09.27.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Mar 2023 09:27:54 -0700 (PDT)
-Message-ID: <122cdca2-b0ae-ce74-664d-e268fe0699a8@acm.org>
-Date:   Thu, 23 Mar 2023 09:27:51 -0700
+        d=1e100.net; s=20210112; t=1679588988;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Re7Ul0ocDttfAu2MIei1cNhSsXPUW8eyd1Dmg4NOWNY=;
+        b=J68vqC8tnjEycqgdi5UR9cYH2tDMwZstlZWTjrP6rCt13AW1UesxmUSDG0bEI5LzZW
+         NxJcng5+Eyr/YWGhyoYNJGyhW+wV8nqsMwgWEgQtJvYDTmz2n4Dy0a/aayd/pNDcbPRI
+         IkTmOhQ1t1pEh7mJ09rgVihT1WJ0XNwdRgH1BEAY+oyDFZJEyuCKZAxPHU8HMLUQZQQ7
+         WG/xP2ycQ7/Uz3+v4rskxu6+kwNZlp+9DNazbquPIt5U+CBpG7GAvaR0wwQztlN2owvl
+         /FcwhMUyTleZMKsxAM2ZeqeV5yDzbx2gTIozBGizRqTXwBXH8Ng+Jw8b/20/jNOg2Ewe
+         lPPA==
+X-Gm-Message-State: AAQBX9dYwjv7AEgsFmg13dLJ0ZTg6zHPiHcx49CQ0R2EJZ9YLy2BUGIA
+        AARZiEHoXYEMVwrmJFCY2/SofJdytUt4nOaW20lfLw==
+X-Google-Smtp-Source: AKy350ZdWs3TZBA4oon5b+/w5rRAVLTmxdsHO7iy2dwgHNTSj5X9cjOcrVIt+5KAEnBAd5bvLAFGZPp1srAbne4eJYw=
+X-Received: by 2002:a05:6902:100d:b0:b6d:fc53:c5c0 with SMTP id
+ w13-20020a056902100d00b00b6dfc53c5c0mr2573188ybt.1.1679588988014; Thu, 23 Mar
+ 2023 09:29:48 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20230317195938.1745318-1-bvanassche@acm.org>
- <20230317195938.1745318-3-bvanassche@acm.org>
- <ZBT6EmhEfJmgRXU1@ovpn-8-18.pek2.redhat.com>
- <580e712c-5e43-e1a5-277b-c4e8c50485f0@acm.org>
- <ZBjsDy2pfPk9t6qB@ovpn-8-29.pek2.redhat.com>
- <50dfa89c-19fa-b655-f6b8-b8853b066c75@acm.org>
- <20230321055537.GA18035@lst.de>
- <100dfc73-d8f3-f08f-e091-3c08707e95f5@acm.org>
- <20230323082604.GC21977@lst.de>
- <acd13f8c-6cbe-a14d-e3b4-645d62811cec@opensource.wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <acd13f8c-6cbe-a14d-e3b4-645d62811cec@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230323040037.2389095-1-yosryahmed@google.com>
+ <20230323040037.2389095-2-yosryahmed@google.com> <CALvZod7e7dMmkhKtXPAxmXjXQoTyeBf3Bht8HJC8AtWW93As3g@mail.gmail.com>
+ <CAJD7tkbziGh+6hnMysHkoNr_HGBKU+s1rSGj=gZLki0ALT-jLg@mail.gmail.com>
+ <CALvZod5GT=bZsLXsG500pNkEJpMB1o2KJau4=r0eHB-c8US53A@mail.gmail.com>
+ <CAJD7tkY6Wf2OWja+f-JeFM5DdMCyLzbXxZ8KF0MjcYOKri-vtA@mail.gmail.com>
+ <CALvZod5mJBAQ5adym7UNEruL-tOOOi+Y_ZiKsfOYqXPmGVPUEA@mail.gmail.com>
+ <CAJD7tkYWo_aB7a4SHXNQDHwcaTELonOk_Vd8q0=x8vwGy2VkYg@mail.gmail.com>
+ <CALvZod7f9Rejb_WrZ+Ajegz-NsQ7iPQegRDMdk5Ya0a0w=40kg@mail.gmail.com>
+ <CALvZod7-6F84POkNetA2XJB-24wms=5q_s495NEthO8b63rL4A@mail.gmail.com> <CAJD7tkbGCgk9VkGdec0=AdHErds4XQs1LzJMhqVryXdjY5PVAg@mail.gmail.com>
+In-Reply-To: <CAJD7tkbGCgk9VkGdec0=AdHErds4XQs1LzJMhqVryXdjY5PVAg@mail.gmail.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Thu, 23 Mar 2023 09:29:36 -0700
+Message-ID: <CALvZod7saq910u4JxnuY4C7EwiK5vgNF=-Bv+236RprUOQdkjw@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
+ percpu lock
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/23/23 03:28, Damien Le Moal wrote:
-> For the zone append emulation, the write locking is done by sd.c and the upper
-> layer does not restrict to one append per zone. So we actually could envision a
-> UFS version of the sd write locking calls that is optimized for the device
-> capabilities and we can keep a common upper layer (which is preferable in my
-> opinion).
+On Thu, Mar 23, 2023 at 9:18=E2=80=AFAM Yosry Ahmed <yosryahmed@google.com>=
+ wrote:
+>
+> On Thu, Mar 23, 2023 at 9:10=E2=80=AFAM Shakeel Butt <shakeelb@google.com=
+> wrote:
+> >
+> > On Thu, Mar 23, 2023 at 8:46=E2=80=AFAM Shakeel Butt <shakeelb@google.c=
+om> wrote:
+> > >
+> > > On Thu, Mar 23, 2023 at 8:43=E2=80=AFAM Yosry Ahmed <yosryahmed@googl=
+e.com> wrote:
+> > > >
+> > > > On Thu, Mar 23, 2023 at 8:40=E2=80=AFAM Shakeel Butt <shakeelb@goog=
+le.com> wrote:
+> > > > >
+> > > > > On Thu, Mar 23, 2023 at 6:36=E2=80=AFAM Yosry Ahmed <yosryahmed@g=
+oogle.com> wrote:
+> > > > > >
+> > > > > [...]
+> > > > > > > >
+> > > > > > > > > 2. Are we really calling rstat flush in irq context?
+> > > > > > > >
+> > > > > > > > I think it is possible through the charge/uncharge path:
+> > > > > > > > memcg_check_events()->mem_cgroup_threshold()->mem_cgroup_us=
+age(). I
+> > > > > > > > added the protection against flushing in an interrupt conte=
+xt for
+> > > > > > > > future callers as well, as it may cause a deadlock if we do=
+n't disable
+> > > > > > > > interrupts when acquiring cgroup_rstat_lock.
+> > > > > > > >
+> > > > > > > > > 3. The mem_cgroup_flush_stats() call in mem_cgroup_usage(=
+) is only
+> > > > > > > > > done for root memcg. Why is mem_cgroup_threshold() intere=
+sted in root
+> > > > > > > > > memcg usage? Why not ignore root memcg in mem_cgroup_thre=
+shold() ?
+> > > > > > > >
+> > > > > > > > I am not sure, but the code looks like event notifications =
+may be set
+> > > > > > > > up on root memcg, which is why we need to check thresholds.
+> > > > > > >
+> > > > > > > This is something we should deprecate as root memcg's usage i=
+s ill defined.
+> > > > > >
+> > > > > > Right, but I think this would be orthogonal to this patch serie=
+s.
+> > > > > >
+> > > > >
+> > > > > I don't think we can make cgroup_rstat_lock a non-irq-disabling l=
+ock
+> > > > > without either breaking a link between mem_cgroup_threshold and
+> > > > > cgroup_rstat_lock or make mem_cgroup_threshold work without disab=
+ling
+> > > > > irqs.
+> > > > >
+> > > > > So, this patch can not be applied before either of those two task=
+s are
+> > > > > done (and we may find more such scenarios).
+> > > >
+> > > >
+> > > > Could you elaborate why?
+> > > >
+> > > > My understanding is that with an in_task() check to make sure we on=
+ly
+> > > > acquire cgroup_rstat_lock from non-irq context it should be fine to
+> > > > acquire cgroup_rstat_lock without disabling interrupts.
+> > >
+> > > From mem_cgroup_threshold() code path, cgroup_rstat_lock will be take=
+n
+> > > with irq disabled while other code paths will take cgroup_rstat_lock
+> > > with irq enabled. This is a potential deadlock hazard unless
+> > > cgroup_rstat_lock is always taken with irq disabled.
+> >
+> > Oh you are making sure it is not taken in the irq context through
+> > should_skip_flush(). Hmm seems like a hack. Normally it is recommended
+> > to actually remove all such users instead of silently
+> > ignoring/bypassing the functionality.
+>
+> It is a workaround, we simply accept to read stale stats in irq
+> context instead of the expensive flush operation.
+>
+> >
+> > So, how about removing mem_cgroup_flush_stats() from
+> > mem_cgroup_usage(). It will break the known chain which is taking
+> > cgroup_rstat_lock with irq disabled and you can add
+> > WARN_ON_ONCE(!in_task()).
+>
+> This changes the behavior in a more obvious way because:
+> 1. The memcg_check_events()->mem_cgroup_threshold()->mem_cgroup_usage()
+> path is also exercised in a lot of paths outside irq context, this
+> will change the behavior for any event thresholds on the root memcg.
+> With proposed skipped flushing in irq context we only change the
+> behavior in a small subset of cases.
+>
+> I think we can skip flushing in irq context for now, and separately
+> deprecate threshold events for the root memcg. When that is done we
+> can come back and remove should_skip_flush() and add a VM_BUG_ON or
+> WARN_ON_ONCE instead. WDYT?
+>
+> 2. mem_cgroup_usage() is also used when reading usage from userspace.
+> This should be an easy workaround though.
 
-I see a blk_req_zone_write_trylock() call in 
-sd_zbc_prepare_zone_append() and a blk_req_zone_write_unlock() call in 
-sd_zbc_complete() for REQ_OP_ZONE_APPEND operations. Does this mean that 
-the sd_zbc.c code restricts the queue depth to one per zone for 
-REQ_OP_ZONE_APPEND operations?
-
-Thanks,
-
-Bart.
+This is a cgroup v1 behavior and to me it is totally reasonable to get
+the 2 second stale root's usage. Even if you want to skip flushing in
+irq, do that in the memcg code and keep VM_BUG_ON/WARN_ON_ONCE in the
+rstat core code. This way we will know if other subsystems are doing
+the same or not.
