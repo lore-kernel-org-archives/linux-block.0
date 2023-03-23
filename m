@@ -2,125 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98065C76196
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BA9C6FD1C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 16:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231825AbjCWP56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 11:57:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43490 "EHLO
+        id S230494AbjCWQAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 12:00:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231718AbjCWP55 (ORCPT
+        with ESMTP id S232260AbjCWQAg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 11:57:57 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71E8241CB
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:57:54 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id r5so27098883qtp.4
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:57:54 -0700 (PDT)
+        Thu, 23 Mar 2023 12:00:36 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9647625290
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:00:32 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id hf2so22939755qtb.3
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:00:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1679587074;
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112; t=1679587231;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gGyjbK25A5fLzkX+hIsW9kQZpkrTVOcdb2FDSKVkFPQ=;
-        b=E0rgqX50pLyXP+81+1VFu1+NvLWajW6EaC3lQOvlQNz/J96UCIafgWL1SnIW6Z3a6b
-         nX+J4CA4xizxiSkXAXeSTQRXfD6uANpHRDaDuMJN95SzmcBLSE3pZo0fGsFzTjFlrRDu
-         5xaxx0qu0JhEPzo6krnUO7av0rJslRwPNXE+c9dOKobwZhqu4d7arwob0WlS2MiPrHzN
-         LiQNBbizMO9hdSZLEJyCjyyfq/99Byf9WYTWxHP4Wgvjq4Dm73jKUR590EKwZZKl3u1S
-         3oNI0bP5sc6q01/oh46moJXIW/BeQcwlyp0vJWZx4PTw7H+UDl51LHzn8FSZIxYFWmwU
-         3UxQ==
+        bh=xQQYR3tgoTZGjn44UlqD2Q/Bi/7ZZ0L1D2F+tNyu+vY=;
+        b=JUSYGg90JZTT6Yd13pjG6DLnrb2PDfmyEiLktcz2+MNdTX1qhs8SEmuA54OaIlpPJb
+         DxtqFpASEbLE1v0MWbPxSyp5iJvz/cWT8oHdtMYHkFXPLcVCi5GYkPZurEN1bWPwQDzC
+         weuJE2NJS7RteJovT2yARUM6DjWrj4KVVFVUPsqLMqvDhc6sSQI6Mvr+an7mCsZje+Ma
+         HzcrGuLfySAPmUsyXVd3Jh0ih8mkd/t0KaiLpkyblfIp5tKl5BXeCDVIuYG91jK7wKEU
+         fOndc7BtP6DmMZ+/1A5temMFZBDYv1b7xByaHD0exVuhFbacP6Sn5JBtcOlh09PvP/Ah
+         bUrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679587074;
+        d=1e100.net; s=20210112; t=1679587231;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gGyjbK25A5fLzkX+hIsW9kQZpkrTVOcdb2FDSKVkFPQ=;
-        b=eoQcxfK+gPjNAKBM+C5mJVhedS2IbFl8mRFcdFSGVTKj/qvjFj9sz0YJej7HMcGr70
-         qnAvqi/Wd3+ECUIpfXDLcIbT/UzTLUr2CEZoZL517hmHEtIQTKOJyxes1dmrUnoIiLDP
-         b+UTwif3pFUhDpQkcxOKptwR+sonW8GD5ppaO7e3UAqjYZ+wXd2IKj+EzydlGl0d0edB
-         PzjP1GIri57aPEbY47Oqtiq1gKTeOPbylaFOAhSbGfAiz/1YGdwKF5yGkKVdDCnUl/EM
-         f4Dks4NwCduHSmXJNsv2dyNn+s3dPZwlXaSKNsVH87lrQ7nLh1KloMnK+IJIUVlUP5xA
-         tITg==
-X-Gm-Message-State: AO0yUKU3LlGl8mXSdU50TZiZlAgarG0gpa0tuEfrIzeX99fuBG7dRAux
-        8qmKeM28EE721C46hwefnL6ZGA==
-X-Google-Smtp-Source: AK7set+C0r03cEybZ+1MOP3W3s0zXKghh6HbhSu+aoQAuNc5b+ZpVQmRxxUfyLjMcNbp/TYds5SVyw==
-X-Received: by 2002:a05:622a:18f:b0:3bf:e13e:438f with SMTP id s15-20020a05622a018f00b003bfe13e438fmr9905893qtw.36.1679587074059;
-        Thu, 23 Mar 2023 08:57:54 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26])
-        by smtp.gmail.com with ESMTPSA id n69-20020a374048000000b00743a0096e8csm13480280qka.39.2023.03.23.08.57.53
+        bh=xQQYR3tgoTZGjn44UlqD2Q/Bi/7ZZ0L1D2F+tNyu+vY=;
+        b=t9tMv0PUj0u62I/QK+UzqbCpZahXUB1z6ruD+YuJRE1mEUz7/tioXLdSS+s+WS+BC4
+         2yF0Q9Q/VW9ZEy4axjQsDYERJSPz6SmnachEku6gk72AQrT1s3HmPx1b2Ey1XVnYujqi
+         cUQcJsSA8GpeH+ptpNw5FcMtF74v4aHoiAD4xAjAR28eSliIdLHoSx/8ipXnz5g1LW7Z
+         HDlWkiWADrZNva1vJnVi3FMAp2Wrw8YQZCkpcPwOWHBkPrmdUPVpSnoeTRkQ890qg4XJ
+         m11MEj9lBrIVwH+esAzT7xc1mEj9y3PdubW5WQlS3aBy2qs5R7wbUrYcEFiHd26H8MQn
+         hLJQ==
+X-Gm-Message-State: AO0yUKXGZoayGU9SQY10B/VpcURh2FWrQGTpfrGpYKiVBH/2R6pXTeeu
+        H/hjjVE1a847mJxQN8V/CRXfHg==
+X-Google-Smtp-Source: AK7set87oFRPV+RhpgHybpu64glNPVjvktx8AzjXw+O057W6zUiIN3FRPNknFZPhV+tY70AZT6E7jg==
+X-Received: by 2002:a05:622a:182a:b0:3e3:90fa:c5d9 with SMTP id t42-20020a05622a182a00b003e390fac5d9mr5230973qtc.40.1679587231698;
+        Thu, 23 Mar 2023 09:00:31 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:400::5:62db])
+        by smtp.gmail.com with ESMTPSA id j23-20020ac86657000000b003e0c29112b6sm7802610qtp.7.2023.03.23.09.00.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 08:57:53 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1pfNK4-001UO9-Ei;
-        Thu, 23 Mar 2023 12:57:52 -0300
-Date:   Thu, 23 Mar 2023 12:57:52 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Leon Romanovsky <leon@kernel.org>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH] blk-mq-rdma: remove queue mapping helper for rdma devices
-Message-ID: <ZBx3AI5pothCuvTx@ziepe.ca>
-References: <20230322123703.485544-1-sagi@grimberg.me>
- <ZBr6kNVoa5RbNzSa@ziepe.ca>
- <c51d3d99-5bc9-cb47-6efa-5371ef3cc0f4@grimberg.me>
- <ZBsHnq6FlpO0p10A@ziepe.ca>
- <20230323120515.GE36557@unreal>
- <ZBxOHZwre3x8DkWN@ziepe.ca>
- <e1b00740-3c75-8b90-4d68-76a5f341a117@grimberg.me>
+        Thu, 23 Mar 2023 09:00:31 -0700 (PDT)
+Date:   Thu, 23 Mar 2023 12:00:30 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Subject: Re: [RFC PATCH 6/7] workingset: memcg: sleep when flushing stats in
+ workingset_refault()
+Message-ID: <20230323160030.GD739026@cmpxchg.org>
+References: <20230323040037.2389095-1-yosryahmed@google.com>
+ <20230323040037.2389095-7-yosryahmed@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e1b00740-3c75-8b90-4d68-76a5f341a117@grimberg.me>
+In-Reply-To: <20230323040037.2389095-7-yosryahmed@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 05:07:24PM +0200, Sagi Grimberg wrote:
+On Thu, Mar 23, 2023 at 04:00:36AM +0000, Yosry Ahmed wrote:
+> In workingset_refault(), we call mem_cgroup_flush_stats_delayed() to
+> flush stats within an RCU read section and with sleeping disallowed.
+> Move the call to mem_cgroup_flush_stats_delayed() above the RCU read
+> section and allow sleeping to avoid unnecessarily performing a lot of
+> work without sleeping.
 > 
-> > > > > > > No rdma device exposes its irq vectors affinity today. So the only
-> > > > > > > mapping that we have left, is the default blk_mq_map_queues, which
-> > > > > > > we fallback to anyways. Also fixup the only consumer of this helper
-> > > > > > > (nvme-rdma).
-> > > > > > 
-> > > > > > This was the only caller of ib_get_vector_affinity() so please delete
-> > > > > > op get_vector_affinity and ib_get_vector_affinity() from verbs as well
-> > > > > 
-> > > > > Yep, no problem.
-> > > > > 
-> > > > > Given that nvme-rdma was the only consumer, do you prefer this goes from
-> > > > > the nvme tree?
-> > > > 
-> > > > Sure, it is probably fine
-> > > 
-> > > I tried to do it two+ years ago:
-> > > https://lore.kernel.org/all/20200929091358.421086-1-leon@kernel.org
-> > 
-> > Christoph's points make sense, but I think we should still purge this
-> > code.
-> > 
-> > If we want to do proper managed affinity the right RDMA API is to
-> > directly ask for the desired CPU binding when creating the CQ, and
-> > optionally a way to change the CPU binding of the CQ at runtime.
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> ---
 > 
-> I think the affinity management is referring to IRQD_AFFINITY_MANAGED
-> which IIRC is the case when the device passes `struct irq_affinity` to
-> pci_alloc_irq_vectors_affinity.
+> A lot of code paths call into workingset_refault(), so I am not
+> generally sure at all whether it's okay to sleep in all contexts or not.
+> Feedback here would be very helpful.
 > 
-> Not sure what that has to do with passing a cpu to create_cq.
+> ---
+>  mm/workingset.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/mm/workingset.c b/mm/workingset.c
+> index 042eabbb43f6..410bc6684ea7 100644
+> --- a/mm/workingset.c
+> +++ b/mm/workingset.c
+> @@ -406,6 +406,8 @@ void workingset_refault(struct folio *folio, void *shadow)
+>  	unpack_shadow(shadow, &memcgid, &pgdat, &eviction, &workingset);
+>  	eviction <<= bucket_order;
+>  
+> +	/* Flush stats (and potentially sleep) before holding RCU read lock */
+> +	mem_cgroup_flush_stats_delayed(true);
 
-I took Christoph's remarks to be that the system should auto configure
-interrupts sensibly and not rely on userspace messing around in proc.
+Btw, it might be a good time to rename this while you're in the
+area. delayed suggests this is using a delayed_work, but this is
+actually sometimes flushing directly from the callsite.
 
-For instance, I would expect that the NVMe driver work the same way on
-RDMA and PCI. For PCI it calls pci_alloc_irq_vectors_affinity(), RDMA
-should call some ib_alloc_cq_affinity() and generate the affinity in
-exactly the same way.
+What it's doing is ratelimited calls. A better name would be:
 
-So, I have no problem to delete these things as the
-get_vector_affinity API is not part of solving the affinity problem,
-and it seems NVMe PCI doesn't need blk_mq_rdma_map_queues() either.
-
-Jason
+	mem_cgroup_flush_stats_ratelimited()
