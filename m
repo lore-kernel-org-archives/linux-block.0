@@ -2,108 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A455C6FD1C
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C208C76196
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:33:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231883AbjCWPJj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 11:09:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50996 "EHLO
+        id S232163AbjCWPdr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 11:33:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229976AbjCWPJi (ORCPT
+        with ESMTP id S232167AbjCWPdi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 11:09:38 -0400
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD6E1F919;
-        Thu, 23 Mar 2023 08:08:27 -0700 (PDT)
-Received: by mail-wr1-f47.google.com with SMTP id r29so20848312wra.13;
-        Thu, 23 Mar 2023 08:08:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679584046; x=1682176046;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W5eaU9UI5gNRoVJmBelB0AByjFrGD8ImlIIGOOSTiYM=;
-        b=CQCmQg7mNgSHFDgqBLVxv2em2v5cHz8aeXWTZvhJWJzVyRpGRBTfTpHr3o0yhBD02i
-         cAZ0cuj+ufd0cyAAs4Xs/aPE7cHZ8o01GCGHhzgR5sCR9nn5WM6Ha5KL3y7jGl7Pbumw
-         OHSlxQh+Ubc+CGiADsMRoE4bQt9is0LgyfdbN8Bal//sOhOSPDAyFRuIqQPGeR/54Mla
-         1gtiDwp+TXrfetk3IBDpRerHEJ0EdaEOmPV212iGgax9vaZNDm/s0KJ2neUbVzMK5xPf
-         8FaGxmABzNLJuhtGgU7pCdYGSculHlFcZ5pTjPpFTWFv75QPKSqZ8mEtYKeIFr3VucZd
-         Ynxw==
-X-Gm-Message-State: AO0yUKU9ddFcX8zapRfkuBPqLj7k7jkmX1u4f9Bz9WH6x4QlLKRtNyqp
-        le5UyQtrsjmJxmFgvCT9C9SARNtFhmU=
-X-Google-Smtp-Source: AK7set+e4miZKSYP825PLpvWVYToMLQ9zWrZumdjz4czNzXkEklOqiRp4QzdYZS+q2IQIUtyJryFSA==
-X-Received: by 2002:adf:f681:0:b0:2ca:ab68:eff9 with SMTP id v1-20020adff681000000b002caab68eff9mr6178292wrp.7.1679584046480;
-        Thu, 23 Mar 2023 08:07:26 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id y16-20020a056000109000b002c56013c07fsm16215088wrw.109.2023.03.23.08.07.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Mar 2023 08:07:26 -0700 (PDT)
-Message-ID: <e1b00740-3c75-8b90-4d68-76a5f341a117@grimberg.me>
-Date:   Thu, 23 Mar 2023 17:07:24 +0200
+        Thu, 23 Mar 2023 11:33:38 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42AB776B2;
+        Thu, 23 Mar 2023 08:33:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hi678RG+egR/ohgFkrrnz97rFnnIU7oN844J5N2rULQ=; b=YmTajRSERctVdDqthoUzk8V1y5
+        JcXUqGfOrW0uvT2auwRy+Z2MmEoW0In7FSEHQRJgt0bvf7Q3tCok1ZKq2pDmq2U97c/0tltJaxwbC
+        2aGLHCuAGuY3SPkVcxxp9bnm26fMEdA2JRXCE+lyumGZfi5ycDfcHj+wi+a4CbLYuWjJrLd2piPyy
+        VBj0caG5Ainp0pOxP8pKeTJLVQpzm8DRD2cLbALRn+mEiuYDMIJUr7VcsdxbbazF9Rwh+hIZ2QwCv
+        BF3B32nf5/UtTpuotoi1dQ5nFpqTcinuGimhxlVY5TQ0MuwXj8rtoOpZHe7GZ9FpM6PoQf4gk46Tc
+        OxEUTDXg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pfMwJ-0042qM-6r; Thu, 23 Mar 2023 15:33:19 +0000
+Date:   Thu, 23 Mar 2023 15:33:19 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     senozhatsky@chromium.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        brauner@kernel.org, akpm@linux-foundation.org, minchan@kernel.org,
+        hubcap@omnibond.com, martin@omnibond.com, mcgrof@kernel.org,
+        devel@lists.orangefs.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [RFC v2 0/5] remove page_endio()
+Message-ID: <ZBxxPw9BTdkE4KF0@casper.infradead.org>
+References: <CGME20230322135015eucas1p2ff980e76159f0ceef7bf66934580bd6c@eucas1p2.samsung.com>
+ <20230322135013.197076-1-p.raghav@samsung.com>
+ <ZBtSevjWLybE6S07@casper.infradead.org>
+ <fbf5bc8a-6c82-a43e-dd96-8a9d2b7d3bf4@samsung.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH] blk-mq-rdma: remove queue mapping helper for rdma devices
-To:     Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        linux-rdma@vger.kernel.org
-References: <20230322123703.485544-1-sagi@grimberg.me>
- <ZBr6kNVoa5RbNzSa@ziepe.ca>
- <c51d3d99-5bc9-cb47-6efa-5371ef3cc0f4@grimberg.me>
- <ZBsHnq6FlpO0p10A@ziepe.ca> <20230323120515.GE36557@unreal>
- <ZBxOHZwre3x8DkWN@ziepe.ca>
-Content-Language: en-US
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <ZBxOHZwre3x8DkWN@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fbf5bc8a-6c82-a43e-dd96-8a9d2b7d3bf4@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->>>>>> No rdma device exposes its irq vectors affinity today. So the only
->>>>>> mapping that we have left, is the default blk_mq_map_queues, which
->>>>>> we fallback to anyways. Also fixup the only consumer of this helper
->>>>>> (nvme-rdma).
->>>>>
->>>>> This was the only caller of ib_get_vector_affinity() so please delete
->>>>> op get_vector_affinity and ib_get_vector_affinity() from verbs as well
->>>>
->>>> Yep, no problem.
->>>>
->>>> Given that nvme-rdma was the only consumer, do you prefer this goes from
->>>> the nvme tree?
->>>
->>> Sure, it is probably fine
->>
->> I tried to do it two+ years ago:
->> https://lore.kernel.org/all/20200929091358.421086-1-leon@kernel.org
+On Thu, Mar 23, 2023 at 04:00:37PM +0100, Pankaj Raghav wrote:
+> > We don't need to set the error flag.  Only some filesystems still use
+> > the error flag, and orangefs isn't one of them.  I'd like to get rid
+> > of the error flag altogether, and I've sent patches in the past which
+> > get us a lot closer to that desired outcome.  Not sure we're there yet.
+> > Regardless, generic code doesn't check the error flag.
 > 
-> Christoph's points make sense, but I think we should still purge this
-> code.
+> Thanks for the explanation. I think found the series you are referring here.
 > 
-> If we want to do proper managed affinity the right RDMA API is to
-> directly ask for the desired CPU binding when creating the CQ, and
-> optionally a way to change the CPU binding of the CQ at runtime.
+> https://lore.kernel.org/linux-mm/20220527155036.524743-1-willy@infradead.org/#t
+> 
+> I see orangefs is still setting the error flag in orangefs_read_folio(), so
+> it should be removed at some point?
 
-I think the affinity management is referring to IRQD_AFFINITY_MANAGED
-which IIRC is the case when the device passes `struct irq_affinity` to
-pci_alloc_irq_vectors_affinity.
+Yes, OrangeFS only sets the error flag, it never checks it, so it never
+needs to set it.
 
-Not sure what that has to do with passing a cpu to create_cq.
+> I also changed mpage to **not set** the error flag in the read path. It does beg
+> the question whether block_read_full_folio() and iomap_finish_folio_read() should
+> also follow the suit.
 
-> This obfuscated 'comp vector number' thing is nonsensical for a kAPI -
-> creating a CQ on a random CPU then trying to backwards figure out what
-> CPU it was created on is silly.
-
-I don't remember if the comp_vector maps 1x1 to an irq vector, and if it
-isn't then it is indeed obfuscated. But a similar model is heavily used
-by the network stack with cpu_rmap, where this was derived from.
-
-But regardless, its been two years, it is effectively dead code, and not
-a single user complained about missing it. So we can safely purge them
-and if someone cares about it, we can debate adding it back.
+Wrong.  mpage is used by filesystems which *DO* check the error flag.
+You can't remove it being set until they're fixed to not check it.
