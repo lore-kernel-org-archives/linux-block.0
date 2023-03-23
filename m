@@ -2,74 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C208C76196
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9302C6FD1C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 15:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232163AbjCWPdr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 11:33:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60254 "EHLO
+        id S231806AbjCWPko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 11:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232167AbjCWPdi (ORCPT
+        with ESMTP id S231658AbjCWPkn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 11:33:38 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42AB776B2;
-        Thu, 23 Mar 2023 08:33:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hi678RG+egR/ohgFkrrnz97rFnnIU7oN844J5N2rULQ=; b=YmTajRSERctVdDqthoUzk8V1y5
-        JcXUqGfOrW0uvT2auwRy+Z2MmEoW0In7FSEHQRJgt0bvf7Q3tCok1ZKq2pDmq2U97c/0tltJaxwbC
-        2aGLHCuAGuY3SPkVcxxp9bnm26fMEdA2JRXCE+lyumGZfi5ycDfcHj+wi+a4CbLYuWjJrLd2piPyy
-        VBj0caG5Ainp0pOxP8pKeTJLVQpzm8DRD2cLbALRn+mEiuYDMIJUr7VcsdxbbazF9Rwh+hIZ2QwCv
-        BF3B32nf5/UtTpuotoi1dQ5nFpqTcinuGimhxlVY5TQ0MuwXj8rtoOpZHe7GZ9FpM6PoQf4gk46Tc
-        OxEUTDXg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pfMwJ-0042qM-6r; Thu, 23 Mar 2023 15:33:19 +0000
-Date:   Thu, 23 Mar 2023 15:33:19 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     senozhatsky@chromium.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        brauner@kernel.org, akpm@linux-foundation.org, minchan@kernel.org,
-        hubcap@omnibond.com, martin@omnibond.com, mcgrof@kernel.org,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [RFC v2 0/5] remove page_endio()
-Message-ID: <ZBxxPw9BTdkE4KF0@casper.infradead.org>
-References: <CGME20230322135015eucas1p2ff980e76159f0ceef7bf66934580bd6c@eucas1p2.samsung.com>
- <20230322135013.197076-1-p.raghav@samsung.com>
- <ZBtSevjWLybE6S07@casper.infradead.org>
- <fbf5bc8a-6c82-a43e-dd96-8a9d2b7d3bf4@samsung.com>
+        Thu, 23 Mar 2023 11:40:43 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EDD920579
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:40:42 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id p204so14231988ybc.12
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 08:40:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679586041;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aXqZ3IJA77cnf/fukJT6xyyWj+RxTe/4tMZOB+1mbkQ=;
+        b=pZto6I+vvxaphKg4Ca9NDWCYEUNhj7BJYmHfaAG8M51g5rBMERT2pTxw32czJVRwqf
+         EXpqwyXIM77qAJ204++TM8DrNrSWXsJyryfpkiZaymGsJv+mhNCo+v4QMcuWklOwQ1zb
+         14XunBWOhtBzzFTiU3Gj8RFDbfEQ4MSASypSDfsLzNrh14XAxfBwpnKQD7EnPJaTeklc
+         QpjEu0BIrsjS593Tol8303VAwfsZeO1qSu7wHKzhAJW4G9NFMuqTCi3YV8xqFEcXgHrN
+         7FMdZFQg1MqDPNCzODUn974BlGYh8gXmdMD2HE3tXqWplxkq95RhThaIWYkoMKBBBJ0Y
+         EGwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679586041;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aXqZ3IJA77cnf/fukJT6xyyWj+RxTe/4tMZOB+1mbkQ=;
+        b=We2e0ZB7bx7VwLZUN8ScQ/nSxaVA8EHZaJKiL21PThlpy1vt1IX8CTCRpAjj3L62Nm
+         N8W2mg5UasTMp3m7vfaZEXiTn/y48JBUdxu6JywHhU1T2k2yFsYvsAgbomGvZIQBOz5L
+         ZGAbp6UL/TDjfa6ZFidBV5MI1l7KxNVXfQShQ5iNNOMJ42w1ZpT6PzQFuEXV6ewZVPpD
+         M9azZpeU2sURf+VSPnWZTzObh0tCLpdVHOiLButC7yPClIjbmcKxDN6tGQD1G//YxFNH
+         XoOs5ksgfAOokXKcYb652KtWu1JN61PyEWpCkiS53danXHtZVdnLPPistF7mBCHegmKZ
+         De5w==
+X-Gm-Message-State: AAQBX9d8O5z73o56b/AzSTnba1/4xngaFhHJFZjfhpar1Fo4XUaU3ay3
+        Dp81qf2R+tnoViNWJgd2AYrxEDEn7uqEzxN6v5cmbQ==
+X-Google-Smtp-Source: AKy350a50T0eMMPyL8hbiqxSf8FqZlw1dWta2IKhAFk++fAM4XiuwKP9tfvhLOJ/p8i1fAwcvy/Zde16et8l9oC4gKw=
+X-Received: by 2002:a05:6902:1083:b0:b67:d295:d614 with SMTP id
+ v3-20020a056902108300b00b67d295d614mr2101971ybu.12.1679586041114; Thu, 23 Mar
+ 2023 08:40:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fbf5bc8a-6c82-a43e-dd96-8a9d2b7d3bf4@samsung.com>
+References: <20230323040037.2389095-1-yosryahmed@google.com>
+ <20230323040037.2389095-2-yosryahmed@google.com> <CALvZod7e7dMmkhKtXPAxmXjXQoTyeBf3Bht8HJC8AtWW93As3g@mail.gmail.com>
+ <CAJD7tkbziGh+6hnMysHkoNr_HGBKU+s1rSGj=gZLki0ALT-jLg@mail.gmail.com>
+ <CALvZod5GT=bZsLXsG500pNkEJpMB1o2KJau4=r0eHB-c8US53A@mail.gmail.com> <CAJD7tkY6Wf2OWja+f-JeFM5DdMCyLzbXxZ8KF0MjcYOKri-vtA@mail.gmail.com>
+In-Reply-To: <CAJD7tkY6Wf2OWja+f-JeFM5DdMCyLzbXxZ8KF0MjcYOKri-vtA@mail.gmail.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Thu, 23 Mar 2023 08:40:29 -0700
+Message-ID: <CALvZod5mJBAQ5adym7UNEruL-tOOOi+Y_ZiKsfOYqXPmGVPUEA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
+ percpu lock
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 04:00:37PM +0100, Pankaj Raghav wrote:
-> > We don't need to set the error flag.  Only some filesystems still use
-> > the error flag, and orangefs isn't one of them.  I'd like to get rid
-> > of the error flag altogether, and I've sent patches in the past which
-> > get us a lot closer to that desired outcome.  Not sure we're there yet.
-> > Regardless, generic code doesn't check the error flag.
-> 
-> Thanks for the explanation. I think found the series you are referring here.
-> 
-> https://lore.kernel.org/linux-mm/20220527155036.524743-1-willy@infradead.org/#t
-> 
-> I see orangefs is still setting the error flag in orangefs_read_folio(), so
-> it should be removed at some point?
+On Thu, Mar 23, 2023 at 6:36=E2=80=AFAM Yosry Ahmed <yosryahmed@google.com>=
+ wrote:
+>
+[...]
+> > >
+> > > > 2. Are we really calling rstat flush in irq context?
+> > >
+> > > I think it is possible through the charge/uncharge path:
+> > > memcg_check_events()->mem_cgroup_threshold()->mem_cgroup_usage(). I
+> > > added the protection against flushing in an interrupt context for
+> > > future callers as well, as it may cause a deadlock if we don't disabl=
+e
+> > > interrupts when acquiring cgroup_rstat_lock.
+> > >
+> > > > 3. The mem_cgroup_flush_stats() call in mem_cgroup_usage() is only
+> > > > done for root memcg. Why is mem_cgroup_threshold() interested in ro=
+ot
+> > > > memcg usage? Why not ignore root memcg in mem_cgroup_threshold() ?
+> > >
+> > > I am not sure, but the code looks like event notifications may be set
+> > > up on root memcg, which is why we need to check thresholds.
+> >
+> > This is something we should deprecate as root memcg's usage is ill defi=
+ned.
+>
+> Right, but I think this would be orthogonal to this patch series.
+>
 
-Yes, OrangeFS only sets the error flag, it never checks it, so it never
-needs to set it.
+I don't think we can make cgroup_rstat_lock a non-irq-disabling lock
+without either breaking a link between mem_cgroup_threshold and
+cgroup_rstat_lock or make mem_cgroup_threshold work without disabling
+irqs.
 
-> I also changed mpage to **not set** the error flag in the read path. It does beg
-> the question whether block_read_full_folio() and iomap_finish_folio_read() should
-> also follow the suit.
-
-Wrong.  mpage is used by filesystems which *DO* check the error flag.
-You can't remove it being set until they're fixed to not check it.
+So, this patch can not be applied before either of those two tasks are
+done (and we may find more such scenarios).
