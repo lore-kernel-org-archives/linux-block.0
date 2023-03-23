@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA805C74A5B
-	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 16:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A19B6C6FD1C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Mar 2023 16:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230487AbjCWQCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 12:02:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51274 "EHLO
+        id S231473AbjCWQDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Mar 2023 12:03:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229796AbjCWQCs (ORCPT
+        with ESMTP id S231229AbjCWQDL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 12:02:48 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B322E0FB
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:02:47 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id ek18so88887587edb.6
-        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:02:47 -0700 (PDT)
+        Thu, 23 Mar 2023 12:03:11 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053664C0D
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:03:02 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id b20so55904047edd.1
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 09:03:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679587366;
+        d=google.com; s=20210112; t=1679587382;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jdxCtHk5BHFsSI7nCxtLNI5LUnK63CNxiy4dYgR/sK4=;
-        b=QlTme/lFyoVDGKhtIAPxITQZffC97/l2oat44BkhKOQXnc7z5W55mV5A44zPZ8OGX6
-         ieCQS9QJJe04JPyGxmvKoxYcb/6gQvd8J2I8xk4kzIExvTBSFeUJ3fpgJT80yPCg0j3n
-         KVOa+0j43EavuVRfPpI2YeoOpHD2sYJ8JORlybIjrlpmdZq0xNZpet1HPVPAsNx1EyNw
-         imyiMcCNDyrct+tw5WnnPBMwbfXgBSsHluGWQ9dzfC5g79d1pB3qvkF5UzSptGRUNLx2
-         RqDfaKK3gyCo40qWY0d2X7soZJSq46RP/P8uVQRQH4A39erkept9iI80vCztx4p5iEEi
-         K1yg==
+        bh=0qq4eAJlExkTdfdM7Y2EFZtPczMJ0l3cf4DT7uOI7JI=;
+        b=b2L3krFnhws7f+p6hNHEuWxd6zHS4DqTuXhpP/rStBHvPGchFK0OAE51Mv5Gggdeva
+         0g+X1gb+kxTGwE7MuENLR+hBwy5CJCvKIeflwI8gTeX7juPYoXVi6mToYkQu2jsd6VVK
+         XkpNk/cz5nwC5XHfmfjMuww1FYcjHs0qPmGVGUo4z9Ghsk7Eb1tXZJTLTmpPar+FodLP
+         ufTGqdkDyfaPIyftUYuOdlRHEhAF00xxGUsvAS7AFhZdslbx6UQqkV+Zc9Xvt9lR/pVo
+         p0D8+Hc5PEtyv37lvNruiMQD1DsZALHgLLaWg+NZbdFcsLcZ3CNgbGpSXxz9y6+ZVaJt
+         NXIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679587366;
+        d=1e100.net; s=20210112; t=1679587382;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jdxCtHk5BHFsSI7nCxtLNI5LUnK63CNxiy4dYgR/sK4=;
-        b=qqnSGYHl6uRd0EdT8GZ6OFm2ykU47uHEKZe0q61LqmgSI7vjkLdKS0nPh4qD9itRLF
-         pYtGtV2r6mtL5MLZyfWuderdzcqL6TV8Z2xqgdSuIa9NMOv6zcv3iogZEacRc4i+JUcd
-         XUrM2gK1NFTxa0BuI+y12SCP4zb89/hbrNoU0yUZGb6fuUMsBtfFO9LbHsKC+9W8AYUy
-         VoFAzAYqvMhLD6V0Y7RFhRfkcVCXP4Qw42mKPznEej44FRuzpFhuL7Azw1ofOV21opyL
-         NBEE6beKvsUfG7DbFuES7ObbopUFNz9LazqsPPXtuNb8hTNErpdPfqwYzkiqh8T57Dcv
-         laCg==
-X-Gm-Message-State: AO0yUKX0T64XclVi0pdgOqDG3n244ReF3/CWfpllreiuQ6552mr0BX2t
-        fNcXa6d/MS+hkgb6snYzLnYQbCKUaoB6mQYpLd2B8w==
-X-Google-Smtp-Source: AK7set990Oll8W/SXU/i0j17c5vuX4anYSeMLFlhYksbJJFOfM6VZxj2yzvlsoVTIsqgNYyJr8BxTWFke55LyxTw83E=
+        bh=0qq4eAJlExkTdfdM7Y2EFZtPczMJ0l3cf4DT7uOI7JI=;
+        b=JOw3Ccu5+9PJ9bVINBgwBV/PP48Q6Rw/qBUOH6BCfBaaYfLCAsAQdzHt+NsNxs6U0V
+         9odNOytrARJzvmKMmWErKRPYTSVrS8FilI50u1x9VA/FQpLsXlEW/Bg5oJXZlChlmo6F
+         yYI6bpuMODVY7BkUG6Xzn87XGjSMqN5kXlqxStFtsWZgp4ulmBTCv9m4U6+UR/E1jO41
+         x8e0SNfvKWGAcztaunNiHPtBklV8hy+egby0oGHa74ZJA9om9RBS8/CfkTpc1dOXaF1Z
+         P0LRwcRnO8sLi4me03MGuvL0Q/v/bo5a8kpqa9ITrDvesmwaJhLqzKa6OK5dMQN83HRJ
+         nxTQ==
+X-Gm-Message-State: AO0yUKVzmw6rZ6kGjTQt2Vb0ZPiHtzv6FIxlEd3wogT9N+gNzyHLS6XO
+        VqmadxrvJGS1XJ8vkm2KoLSnLNguJY49to1qvprVhg==
+X-Google-Smtp-Source: AK7set/CTEwM+vAIIaFjtAYd2scGR7MdjQ8kvYZ6kSB1SLo+YTrn50F185ArhVjN2rVBhkCYuegGR8kNlO2/oWLc7XU=
 X-Received: by 2002:a17:906:34cd:b0:8e5:411d:4d09 with SMTP id
- h13-20020a17090634cd00b008e5411d4d09mr5207317ejb.15.1679587365591; Thu, 23
- Mar 2023 09:02:45 -0700 (PDT)
+ h13-20020a17090634cd00b008e5411d4d09mr5207827ejb.15.1679587382152; Thu, 23
+ Mar 2023 09:03:02 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230323040037.2389095-1-yosryahmed@google.com>
- <20230323040037.2389095-7-yosryahmed@google.com> <20230323155040.GB739026@cmpxchg.org>
-In-Reply-To: <20230323155040.GB739026@cmpxchg.org>
+ <20230323040037.2389095-7-yosryahmed@google.com> <20230323160030.GD739026@cmpxchg.org>
+In-Reply-To: <20230323160030.GD739026@cmpxchg.org>
 From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Thu, 23 Mar 2023 09:02:09 -0700
-Message-ID: <CAJD7tkZ7d_ZFdcfOdZGSeL9i46cyEV+p2rPm0gotvRT8u8atpw@mail.gmail.com>
+Date:   Thu, 23 Mar 2023 09:02:25 -0700
+Message-ID: <CAJD7tkZ2cOQ8fVRewxznYin6VgeRHiJAQMZbhhi6cT64xfRvqg@mail.gmail.com>
 Subject: Re: [RFC PATCH 6/7] workingset: memcg: sleep when flushing stats in workingset_refault()
 To:     Johannes Weiner <hannes@cmpxchg.org>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -74,7 +74,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 23, 2023 at 8:50=E2=80=AFAM Johannes Weiner <hannes@cmpxchg.org=
+On Thu, Mar 23, 2023 at 9:00=E2=80=AFAM Johannes Weiner <hannes@cmpxchg.org=
 > wrote:
 >
 > On Thu, Mar 23, 2023 at 04:00:36AM +0000, Yosry Ahmed wrote:
@@ -91,7 +91,30 @@ On Thu, Mar 23, 2023 at 8:50=E2=80=AFAM Johannes Weiner <hannes@cmpxchg.org=
 > > generally sure at all whether it's okay to sleep in all contexts or not=
 .
 > > Feedback here would be very helpful.
+> >
+> > ---
+> >  mm/workingset.c | 5 ++---
+> >  1 file changed, 2 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/mm/workingset.c b/mm/workingset.c
+> > index 042eabbb43f6..410bc6684ea7 100644
+> > --- a/mm/workingset.c
+> > +++ b/mm/workingset.c
+> > @@ -406,6 +406,8 @@ void workingset_refault(struct folio *folio, void *=
+shadow)
+> >       unpack_shadow(shadow, &memcgid, &pgdat, &eviction, &workingset);
+> >       eviction <<=3D bucket_order;
+> >
+> > +     /* Flush stats (and potentially sleep) before holding RCU read lo=
+ck */
+> > +     mem_cgroup_flush_stats_delayed(true);
 >
-> Yes, it's safe.
+> Btw, it might be a good time to rename this while you're in the
+> area. delayed suggests this is using a delayed_work, but this is
+> actually sometimes flushing directly from the callsite.
+>
+> What it's doing is ratelimited calls. A better name would be:
+>
+>         mem_cgroup_flush_stats_ratelimited()
 
-Thanks! That's very helpful!
+Agreed. Will do in the next version.
