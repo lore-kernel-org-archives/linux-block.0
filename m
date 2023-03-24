@@ -2,131 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8B2C76196
-	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 14:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF5CC6FD1C
+	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 16:28:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231433AbjCXONf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Mar 2023 10:13:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48120 "EHLO
+        id S230157AbjCXQ2x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Mar 2023 12:28:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231928AbjCXONd (ORCPT
+        with ESMTP id S230021AbjCXQ2w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Mar 2023 10:13:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA0941B56D
-        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 07:12:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679667173;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ADiIDdAPnjqVAbV/udpxZCAiMLd8rfZn004mVe2ENYg=;
-        b=WFFg3feX/HlfMONRuSAmeE9CSLg7gecerOBt/1jmh9700U3+xhd1ysjZEfqVUjMRwKyxcY
-        ULbUUt471qTMTzSECOotFmCTAH3b/Mnkm4h3xfithL6O85MaMH1nD7t16eTRtY0tAvRJNg
-        Cazj+Q2gM0uHYyMbHcGXRxBGe9mPSqQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-638-1m-g8VaUM1S0ZM79i3uKWA-1; Fri, 24 Mar 2023 10:12:45 -0400
-X-MC-Unique: 1m-g8VaUM1S0ZM79i3uKWA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7BAE29AA3B5;
-        Fri, 24 Mar 2023 14:12:43 +0000 (UTC)
-Received: from [10.22.33.184] (unknown [10.22.33.184])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E174D140EBF4;
-        Fri, 24 Mar 2023 14:12:42 +0000 (UTC)
-Message-ID: <53582a07-81c6-35eb-10bf-7920b27483be@redhat.com>
-Date:   Fri, 24 Mar 2023 10:12:42 -0400
+        Fri, 24 Mar 2023 12:28:52 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D32DBD6
+        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 09:28:50 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id lr16-20020a17090b4b9000b0023f187954acso2118421pjb.2
+        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 09:28:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1679675330;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mfSeDmyLNk5kEL58erzze+WgOQ8324zTXVhInnnT7io=;
+        b=VXg+M3cnQDzoVGBaf6LhfNyY3MjUTBLodRbCD2TpI5xsr8YdGdBtUdhCkyHJm290sD
+         q9v0dhM5gw96KugbZO+0ooyxPCAcVEdJjzyCW1LaokkA7pmo1FrNWrcFumff8RhB1AMZ
+         mCasWKpWmFM2m8X9OSCFd5R6uholIW8FBJJgjul7FYYELmx0TFQO+Xa5Sm6WTEc4abVn
+         g2zWNI1So28CzmAa2WikoLw+Fh2Gf62Zioy1jw7HWDr0qpN5Ljtp3vuwTE5Lo8Y9lFkP
+         00ty7rfhQ/1/N/rX/fhC3r4r4oixFenVHLCmn4D/joX68ATzTBuWwzVEfXTFjVxzATjc
+         tfow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679675330;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mfSeDmyLNk5kEL58erzze+WgOQ8324zTXVhInnnT7io=;
+        b=5Cr0ZbAv6zrab0FiGHwcx9bUOl5oQJkJUgqzTEdzrkOmgjLyxwb8SYwinnA6kdFNj+
+         Oh0+qxt+mrRcStMVTtm9f6TwQyne3uGW2irvfHzDOKQEF46hx9GkoUtLpmNp0fS/107K
+         reyi2aFiqF7GbgbE0mV7lE8w9+d9I31Xou3C0vvq3xz+2PJkZNP36wMKthdA27Kt7nYu
+         NxdeBL+E+XtuigoxVddZuCVg6rBHeMQ3J3YvkgNUTz1deJdaTsfU7HJ6cPcsxDU2pHZa
+         Haf16AJ6cLLxHSh1Oo0ahW+9lr1Fo4jvE5ru6huulktDtSVaGvdhCVIzkJPT55rvGBOd
+         +gcA==
+X-Gm-Message-State: AO0yUKXy83sASH2vi9DhLSs3PODMqlGG2iiijSxGnHlycV1T0B7+hrA2
+        gMMV/45MiYiN8dfvPorE2NVi3whOv0Ni3MuQyuXtzg==
+X-Google-Smtp-Source: AK7set+nm7M7ab2U9WdKadJe4nq2Ec5m5kYNn4PnyLrecvU3WtDlTaWCygsNY0K1phbDg4ckwXm9kQ==
+X-Received: by 2002:a05:6a20:4408:b0:da:c070:c466 with SMTP id ce8-20020a056a20440800b000dac070c466mr3750797pzb.6.1679675330179;
+        Fri, 24 Mar 2023 09:28:50 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c085:21c1::1239? ([2620:10d:c090:400::5:56f0])
+        by smtp.gmail.com with ESMTPSA id h24-20020a63f918000000b004fb8732a2f9sm13563633pgi.88.2023.03.24.09.28.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Mar 2023 09:28:49 -0700 (PDT)
+Message-ID: <a3e790c2-e454-f49e-b2c0-2353ceb9752c@kernel.dk>
+Date:   Fri, 24 Mar 2023 10:28:48 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
- percpu lock
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
 Content-Language: en-US
-To:     Yosry Ahmed <yosryahmed@google.com>, Tejun Heo <tj@kernel.org>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-References: <20230323040037.2389095-1-yosryahmed@google.com>
- <20230323040037.2389095-2-yosryahmed@google.com>
- <ZBz/V5a7/6PZeM7S@slm.duckdns.org>
- <CAJD7tkYNZeEytm_Px9_73Y-AYJfHAxaoTmmnO71HW5hd1B5tPg@mail.gmail.com>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <CAJD7tkYNZeEytm_Px9_73Y-AYJfHAxaoTmmnO71HW5hd1B5tPg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.3-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/24/23 03:22, Yosry Ahmed wrote:
-> On Thu, Mar 23, 2023 at 6:39 PM Tejun Heo <tj@kernel.org> wrote:
->> Hello,
->>
->> On Thu, Mar 23, 2023 at 04:00:31AM +0000, Yosry Ahmed wrote:
->>> Currently, when sleeping is not allowed during rstat flushing, we hold
->>> the global rstat lock with interrupts disabled throughout the entire
->>> flush operation. Flushing in an O(# cgroups * # cpus) operation, and
->>> having interrupts disabled throughout is dangerous.
->>>
->>> For some contexts, we may not want to sleep, but can be interrupted
->>> (e.g. while holding a spinlock or RCU read lock). As such, do not
->>> disable interrupts throughout rstat flushing, only when holding the
->>> percpu lock. This breaks down the O(# cgroups * # cpus) duration with
->>> interrupts disabled to a series of O(# cgroups) durations.
->>>
->>> Furthermore, if a cpu spinning waiting for the global rstat lock, it
->>> doesn't need to spin with interrupts disabled anymore.
->> I'm generally not a fan of big spin locks w/o irq protection. They too often
->> become a source of unpredictable latency spikes. As you said, the global
->> rstat lock can be held for quite a while. Removing _irq makes irq latency
->> better on the CPU but on the other hand it makes a lot more likely that the
->> lock is gonna be held even longer, possibly significantly so depending on
->> the configuration and workload which will in turn stall other CPUs waiting
->> for the lock. Sure, irqs are being serviced quicker but if the cost is more
->> and longer !irq context multi-cpu stalls, what's the point?
->>
->> I don't think there's anything which requires the global lock to be held
->> throughout the entire flushing sequence and irq needs to be disabled when
->> grabbing the percpu lock anyway, so why not just release the global lock on
->> CPU boundaries instead? We don't really lose anything significant that way.
->> The durations of irq disabled sections are still about the same as in the
->> currently proposed solution at O(# cgroups) and we avoid the risk of holding
->> the global lock for too long unexpectedly from getting hit repeatedly by
->> irqs while holding the global lock.
-> Thanks for taking a look!
->
-> I think a problem with this approach is that we risk having to contend
-> for the global lock at every CPU boundary in atomic contexts. Right
-Isn't it the plan to just do a trylock in atomic contexts so that it 
-won't get stuck spinning for the lock for an indeterminate amount of time?
-> now we contend for the global lock once, and once we have it we go
-> through all CPUs to flush, only having to contend with updates taking
-> the percpu locks at this point. If we unconditionally release &
-> reacquire the global lock at every CPU boundary then we may contend
-> for it much more frequently with concurrent flushers.
+Hi Linus,
 
-Note that with the use of qspinlock in all the major arches, the impact 
-of thundering herds of lockers are much less serious than before. There 
-are certainly some overhead in doing multiple lock acquires and 
-releases, but that shouldn't been too excessive.
+A few fixes on the storage front that should go into the 6.3 release:
 
-I am all in for reducing lock hold time as much as possible as it will 
-improve the response time.
+- NVMe pull request via Christoph:
+	- Send Identify with CNS 06h only to I/O controllers
+	  (Martin George)
+	- Fix nvme_tcp_term_pdu to match spec (Caleb Sander)
 
-Cheers,
-Longman
+- Pass in issue_flags for uring_cmd, so the end_io handlers don't need
+  to assume what the right context is (me)
+
+- Fix for ublk, marking it as LIVE before adding it to avoid races on
+  the initial IO (Ming)
+
+Please pull!
+
+
+The following changes since commit 8f0d196e4dc137470bbd5de98278d941c8002fcb:
+
+  block: remove obsolete config BLOCK_COMPAT (2023-03-16 09:35:44 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.3-2023-03-24
+
+for you to fetch changes up to f915da0f0dfb69ffea53f62101b38073e0b81f73:
+
+  Merge tag 'nvme-6.3-2023-03-23' of git://git.infradead.org/nvme into block-6.3 (2023-03-23 13:02:20 -0600)
+
+----------------------------------------------------------------
+block-6.3-2023-03-24
+
+----------------------------------------------------------------
+Caleb Sander (1):
+      nvme-tcp: fix nvme_tcp_term_pdu to match spec
+
+Jens Axboe (2):
+      block/io_uring: pass in issue_flags for uring_cmd task_work handling
+      Merge tag 'nvme-6.3-2023-03-23' of git://git.infradead.org/nvme into block-6.3
+
+Martin George (1):
+      nvme: send Identify with CNS 06h only to I/O controllers
+
+Ming Lei (1):
+      block: ublk_drv: mark device as LIVE before adding disk
+
+ drivers/block/ublk_drv.c  | 34 ++++++++++++++++++++--------------
+ drivers/nvme/host/core.c  |  3 ++-
+ drivers/nvme/host/ioctl.c | 14 ++++++++------
+ include/linux/io_uring.h  | 11 ++++++-----
+ include/linux/nvme-tcp.h  |  5 +++--
+ io_uring/uring_cmd.c      | 10 ++++++----
+ 6 files changed, 45 insertions(+), 32 deletions(-)
+
+-- 
+Jens Axboe
 
