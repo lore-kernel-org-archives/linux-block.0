@@ -2,119 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F23EC74A5B
-	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 01:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18593C6FD20
+	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 04:08:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229847AbjCXBjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Mar 2023 21:39:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56054 "EHLO
+        id S229945AbjCXEH7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Mar 2023 00:07:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjCXBjj (ORCPT
+        with ESMTP id S231359AbjCXEH5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Mar 2023 21:39:39 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5220040C0;
-        Thu, 23 Mar 2023 18:39:38 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id kc4so516512plb.10;
-        Thu, 23 Mar 2023 18:39:38 -0700 (PDT)
+        Fri, 24 Mar 2023 00:07:57 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DABBB
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 21:07:55 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id d10so384110pgt.12
+        for <linux-block@vger.kernel.org>; Thu, 23 Mar 2023 21:07:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679621977;
+        d=chromium.org; s=google; t=1679630875;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=diknpbDhmJOoggKEsWIo361E1xjQ+rSUkFKYJZdkY28=;
-        b=gnLz9UYgts87Q3W2eAEqb/mHOi71mt9PGOMXo3NEdCjx7le5V/SdRfNH8QY4DX91PR
-         mCvDShHmWN+U7wlmjHd9cNHfFqLwHTUB+uMCgGW9/AhNY0yULgXlcZ4Yr6gh/o4Q76pD
-         cpevHL0IWLcIVZwFvShEgeRYVAOmSQ439XwAhpgltMNrVpWg6AP/2rmWh2ioK5uFVZu+
-         5o1qQYTV+9U6tf8A347nKJPhMMsepQ9SGZRRmNplq7DNiyWcq7TmfeLRBH8sG0ZbzbPv
-         0nPC1d127qZAyd2STxenO3kLgZbv3SE2IDCsan4ukhVtSm1eAZoY1dhs1c1XqtCOMOe9
-         nA2Q==
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2LfQ4bUGZWvA0RhGgJPkL2wWDD5iJCeigY4j8HTk/bI=;
+        b=aaHGmkeM2buhuAyL59PFubTTRpNOm1eOr6ux6+8muJ71E4GdLMqxN/ANXRS2Ff2iqT
+         puytLloUQm/NIr3fW/m4egfG9EAzyZI0SVKcGavWJAQBHL+kju0K9cQxrovSDlaS6PR/
+         EpyuHT9jOB/RAxUTzC09aziuazUj4QdQCE8jg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679621977;
+        d=1e100.net; s=20210112; t=1679630875;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=diknpbDhmJOoggKEsWIo361E1xjQ+rSUkFKYJZdkY28=;
-        b=erxmBPiCJRFwCG0Q87PgsIXkIPgTPUF+xEEKYBFlQjNz2RCG4ciOONux3B9bjtLleh
-         xpWbORQ1cRwIaKc8/Yzx334kkh0U5xY8iXt5sKCxT+1FeHAvA2m5YHQ6eGAt9KLqhJFq
-         /di/G5Xus09mWMMN3nfKsVa/HQitCIQChzTyvm80pqgjukphpV9fc+OY0gcwlsJ02jKE
-         3eRfRgAo1eJN4ZgTsudmx0I7Ofy6tYOYjVGJ/P4ouBUc9ydltY/eHfNl9qwy0fsdXZE1
-         /2FRb6xjwkYWXqOOetwEKxhFpcD0it+qDe/xVl2TFI9w2VttH9IJq0NTaQ/yBNtzmy75
-         wqTg==
-X-Gm-Message-State: AAQBX9eI4IIWZo8g03iTA/9vErNnsEDI1lGGsQxOA+oqt5rf+WA+Qt60
-        rojynH84IrteAIGXJV+WZkQ=
-X-Google-Smtp-Source: AKy350Z2/Lmf5xqmVragfODC9cX5JhU/nXhgivLUccuwhKWSqvt3QF7E94kIlv5aol/eYR0rE7fg+w==
-X-Received: by 2002:a17:902:f546:b0:19c:be57:9c82 with SMTP id h6-20020a170902f54600b0019cbe579c82mr999628plf.65.1679621977225;
-        Thu, 23 Mar 2023 18:39:37 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id d13-20020a170902728d00b001994fc55998sm12884105pll.217.2023.03.23.18.39.36
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2LfQ4bUGZWvA0RhGgJPkL2wWDD5iJCeigY4j8HTk/bI=;
+        b=5d16XaT7SbPZiB7GiZ8rdNdYse49dXOJ0raRdYOLMTIDSRRuo/kM1P7mNj+TcV3QT4
+         52/vEelAcuRW1xmyfHwHDrXKmim0dhGU6DJS0ZNKg2CPCDhIf8dhowZ86HgXVO0LBwL7
+         bSopsAfwv6CXzD0xeicMp3nOsI2LXiJGbVct9UYzMBgBiywyIDG/VTmjSyrwxoYliT49
+         WSaKnr1zX7tbXn3OMEDtVfOifgM/xAi4CF8zJjhDR8AXXXgHJVtYmh0Jp64E0HF+TeKE
+         +G7FQH3ICuwwnwU5G+nHR332E+brY6IBddmOPXoooqJZMekFfJiGSOowsTKLDkF+TcBS
+         to6A==
+X-Gm-Message-State: AO0yUKUbMsY5d814wgl+7lIvcZpbYMaGnVKUWJGRKiDTbzHYWcDzNLZy
+        VHL5NaN6vVq7POOklddwiYiv1A==
+X-Google-Smtp-Source: AK7set/p6NEs60N0pJLkWHg1ERai59XDLTc6q2wAVfQjBCptyxS1eAAboGBNMuT6+4vwwc9JM6nMnQ==
+X-Received: by 2002:a05:6a00:80d0:b0:627:e677:bc70 with SMTP id ei16-20020a056a0080d000b00627e677bc70mr7152042pfb.14.1679630875169;
+        Thu, 23 Mar 2023 21:07:55 -0700 (PDT)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id t19-20020a62ea13000000b005a8de0f4c64sm12678235pfh.82.2023.03.23.21.07.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 18:39:36 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 23 Mar 2023 15:39:35 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
- percpu lock
-Message-ID: <ZBz/V5a7/6PZeM7S@slm.duckdns.org>
-References: <20230323040037.2389095-1-yosryahmed@google.com>
- <20230323040037.2389095-2-yosryahmed@google.com>
+        Thu, 23 Mar 2023 21:07:54 -0700 (PDT)
+Date:   Fri, 24 Mar 2023 13:07:50 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Mike Galbraith <umgwanakikbuti@gmail.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] zram: Replace bit spinlocks with spinlock_t for
+ PREEMPT_RT.
+Message-ID: <20230324040750.GE3271889@google.com>
+References: <20230323161830.jFbWCosd@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230323040037.2389095-2-yosryahmed@google.com>
+In-Reply-To: <20230323161830.jFbWCosd@linutronix.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Thu, Mar 23, 2023 at 04:00:31AM +0000, Yosry Ahmed wrote:
-> Currently, when sleeping is not allowed during rstat flushing, we hold
-> the global rstat lock with interrupts disabled throughout the entire
-> flush operation. Flushing in an O(# cgroups * # cpus) operation, and
-> having interrupts disabled throughout is dangerous.
+On (23/03/23 17:18), Sebastian Andrzej Siewior wrote:
+> From: Mike Galbraith <umgwanakikbuti@gmail.com>
 > 
-> For some contexts, we may not want to sleep, but can be interrupted
-> (e.g. while holding a spinlock or RCU read lock). As such, do not
-> disable interrupts throughout rstat flushing, only when holding the
-> percpu lock. This breaks down the O(# cgroups * # cpus) duration with
-> interrupts disabled to a series of O(# cgroups) durations.
+> The bit spinlock disables preemption. The spinlock_t lock becomes a sleeping
+> lock on PREEMPT_RT and it can not be acquired in this context. In this locked
+> section, zs_free() acquires a zs_pool::lock, and there is access to
+> zram::wb_limit_lock.
 > 
-> Furthermore, if a cpu spinning waiting for the global rstat lock, it
-> doesn't need to spin with interrupts disabled anymore.
+> Use a spinlock_t on PREEMPT_RT for locking and set/ clear ZRAM_LOCK bit after
+> the lock has been acquired/ dropped.
+> 
+> Signed-off-by: Mike Galbraith <umgwanakikbuti@gmail.com>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Link: https://lkml.kernel.org/r/YqIbMuHCPiQk+Ac2@linutronix.de
+> ---
+> 
+> I'm simply forwarding Mike's patch here. The other alternative is to let
+> the driver depend on !PREEMPT_RT. I can't tell likely it is that this
+> driver is used. Mike most likely stumbled upon it while running LTP.
 
-I'm generally not a fan of big spin locks w/o irq protection. They too often
-become a source of unpredictable latency spikes. As you said, the global
-rstat lock can be held for quite a while. Removing _irq makes irq latency
-better on the CPU but on the other hand it makes a lot more likely that the
-lock is gonna be held even longer, possibly significantly so depending on
-the configuration and workload which will in turn stall other CPUs waiting
-for the lock. Sure, irqs are being serviced quicker but if the cost is more
-and longer !irq context multi-cpu stalls, what's the point?
-
-I don't think there's anything which requires the global lock to be held
-throughout the entire flushing sequence and irq needs to be disabled when
-grabbing the percpu lock anyway, so why not just release the global lock on
-CPU boundaries instead? We don't really lose anything significant that way.
-The durations of irq disabled sections are still about the same as in the
-currently proposed solution at O(# cgroups) and we avoid the risk of holding
-the global lock for too long unexpectedly from getting hit repeatedly by
-irqs while holding the global lock.
-
-Thanks.
-
--- 
-tejun
+Yeah, I'm curious if anyone uses zram in preempt-rt systems. I don't
+mind this patch but would be nice to add new code when it solves some
+real problems. Maybe `depend on !PREEMPT_RT` can be a better option.
