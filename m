@@ -2,140 +2,212 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D8DC6FD1C
-	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 21:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FD33C6FD1C
+	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 22:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231794AbjCXV2T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Mar 2023 17:28:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36672 "EHLO
+        id S232196AbjCXWuv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Mar 2023 18:50:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231841AbjCXV2R (ORCPT
+        with ESMTP id S231889AbjCXWuu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Mar 2023 17:28:17 -0400
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 799DD19C52
-        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 14:28:16 -0700 (PDT)
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32OGXCrX000538
-        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 14:28:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=s2048-2021-q4;
- bh=2umER3Yy5QQjdTn23cuNP0N+AWlhdN1P40sj7bMbuKM=;
- b=bFWV+bjxAj5EIPYMUdyM1kPmJQtwm0DgaqDj33k2/1UgKqtOLZat4pma2qJ8R0NQeaWI
- O4P2h5Rs9Go4f3+vV+r0JbfHNty0WgDWdNOLUNQEDS7giDKMrEdNQWtcs5SC5eqmQ2CO
- HQgMpUoGtL/AzRsZrjG9Zyh5c3cdD/oK9tvPLsbXb7pW5I4HnPdtYGID5+FARJ/WIw62
- HUrLqGDLKm+8H/+0UKPw9Y4zd319XYjw+bGIhu0GmikO4JgQXOsDV/1J8VhkQ+H6aaWQ
- P6ZRAPCbiZf7V4LOvj5H0g3yOufwvzNUPCvt6NELGmusSn4YMKwBvVdBBB7FQwry5k07 Gg== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3pgxmqxp31-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 14:28:16 -0700
-Received: from twshared52565.14.frc2.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Fri, 24 Mar 2023 14:28:14 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id C5CA31456476F; Fri, 24 Mar 2023 14:28:04 -0700 (PDT)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <axboe@kernel.dk>, <hch@lst.de>
-CC:     Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 1/2] blk-mq: export request polling helpers
-Date:   Fri, 24 Mar 2023 14:28:02 -0700
-Message-ID: <20230324212803.1837554-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 24 Mar 2023 18:50:50 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D68A10279
+        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 15:50:48 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id t10so13441093edd.12
+        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 15:50:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679698247;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k4C4+ig9qii8cFMiMH7UB83VKoFh5dhcH5qAN4vMsyQ=;
+        b=PNZilH1Gjf6oog3t5h9HCkdzcH1etVK5NHRvqEGz0tzMA6UkvV8oibBMlnELMdCsTx
+         ESv3g4RuIOXbzQrTC6JLpovuuTr2leIRJnt5pu6Ur8taswzMfoVb3b76ogYPK9rIUKoz
+         ZroJcsC87UZfJJ2+P4nODPSm6IGXHRapFkl2XStb5f6xPFrqB4NCxRgBRY328FFsfaDb
+         t6M4EYsSyH+txGLv4+tb4mRYPL29/PWW8y0ndgEQEPnNflpkS9g0D0g6ILZ3+M7P/deo
+         ZMVQpgzWN70olFlt/oeGeYGAsjRYrdlraZNnRwlFQ+LQ65cNhoGA3o8yS9sSslR5pm/L
+         5tjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679698247;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k4C4+ig9qii8cFMiMH7UB83VKoFh5dhcH5qAN4vMsyQ=;
+        b=NWnl6guzojEHfPDFs/M8IiEuvdODN9j4lrxF+5H7b6Z62Qq/5/vk11YkJqcd1tSA3/
+         K1fgIyO9YYeDLXCyPhlpEnAZJ166GDHODH46jI3W4sVX1CJME7aPkiOH8880LSzKymUJ
+         55Nm+mNotgC+iDqa7kUCEDL/ViuZ1DxlzcgY1TDBFeQKTmrADkNG/rwGuQQz0kiTb5Ih
+         YQQ3nZL5hPAjAyCzYslWsah5YLxvrsNqBcS0G4+/t5j6Ey+YJFuATwuSI+4b7xnaksco
+         5+r01QVjtC8GU7RB/Im1Cm0scxe71+OwngbjeUcS5cC5yTTTHxqyX4XB7Av140iAnkWs
+         x5sw==
+X-Gm-Message-State: AAQBX9fqAqRX9Hi3YT4P+C7b9A9cgrfRlI8wq6j69w9+ZM8wGw78U3ke
+        zmpYny6QFz/i3xNJWLzhC6lPPnaxzc/Dp5tkTOBkDg==
+X-Google-Smtp-Source: AKy350as1fjLqRzEXcj4LkTEmL/GZJV50WUfZRkDVfUJxjhMe3gHdgiiXSgPCONXQe0PAnrHWJ2DjRG+gGSUM+zjV0U=
+X-Received: by 2002:a50:a6d7:0:b0:4fa:71a2:982b with SMTP id
+ f23-20020a50a6d7000000b004fa71a2982bmr2076902edc.0.1679698246555; Fri, 24 Mar
+ 2023 15:50:46 -0700 (PDT)
 MIME-Version: 1.0
+References: <20230323040037.2389095-1-yosryahmed@google.com>
+ <20230323040037.2389095-2-yosryahmed@google.com> <ZBz/V5a7/6PZeM7S@slm.duckdns.org>
+ <CAJD7tkYNZeEytm_Px9_73Y-AYJfHAxaoTmmnO71HW5hd1B5tPg@mail.gmail.com> <53582a07-81c6-35eb-10bf-7920b27483be@redhat.com>
+In-Reply-To: <53582a07-81c6-35eb-10bf-7920b27483be@redhat.com>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Fri, 24 Mar 2023 15:50:10 -0700
+Message-ID: <CAJD7tkZA-LxAVA5SWRzMeQ17T26qGBApPqErqT_SpCbrtCJQkA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
+ percpu lock
+To:     Waiman Long <longman@redhat.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: FF-IjiPyCh3OVGk5KM7IMuXgjM5Ovodj
-X-Proofpoint-ORIG-GUID: FF-IjiPyCh3OVGk5KM7IMuXgjM5Ovodj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-24_11,2023-03-24_01,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On Fri, Mar 24, 2023 at 7:12=E2=80=AFAM Waiman Long <longman@redhat.com> wr=
+ote:
+>
+> On 3/24/23 03:22, Yosry Ahmed wrote:
+> > On Thu, Mar 23, 2023 at 6:39=E2=80=AFPM Tejun Heo <tj@kernel.org> wrote=
+:
+> >> Hello,
+> >>
+> >> On Thu, Mar 23, 2023 at 04:00:31AM +0000, Yosry Ahmed wrote:
+> >>> Currently, when sleeping is not allowed during rstat flushing, we hol=
+d
+> >>> the global rstat lock with interrupts disabled throughout the entire
+> >>> flush operation. Flushing in an O(# cgroups * # cpus) operation, and
+> >>> having interrupts disabled throughout is dangerous.
+> >>>
+> >>> For some contexts, we may not want to sleep, but can be interrupted
+> >>> (e.g. while holding a spinlock or RCU read lock). As such, do not
+> >>> disable interrupts throughout rstat flushing, only when holding the
+> >>> percpu lock. This breaks down the O(# cgroups * # cpus) duration with
+> >>> interrupts disabled to a series of O(# cgroups) durations.
+> >>>
+> >>> Furthermore, if a cpu spinning waiting for the global rstat lock, it
+> >>> doesn't need to spin with interrupts disabled anymore.
+> >> I'm generally not a fan of big spin locks w/o irq protection. They too=
+ often
+> >> become a source of unpredictable latency spikes. As you said, the glob=
+al
+> >> rstat lock can be held for quite a while. Removing _irq makes irq late=
+ncy
+> >> better on the CPU but on the other hand it makes a lot more likely tha=
+t the
+> >> lock is gonna be held even longer, possibly significantly so depending=
+ on
+> >> the configuration and workload which will in turn stall other CPUs wai=
+ting
+> >> for the lock. Sure, irqs are being serviced quicker but if the cost is=
+ more
+> >> and longer !irq context multi-cpu stalls, what's the point?
+> >>
+> >> I don't think there's anything which requires the global lock to be he=
+ld
+> >> throughout the entire flushing sequence and irq needs to be disabled w=
+hen
+> >> grabbing the percpu lock anyway, so why not just release the global lo=
+ck on
+> >> CPU boundaries instead? We don't really lose anything significant that=
+ way.
+> >> The durations of irq disabled sections are still about the same as in =
+the
+> >> currently proposed solution at O(# cgroups) and we avoid the risk of h=
+olding
+> >> the global lock for too long unexpectedly from getting hit repeatedly =
+by
+> >> irqs while holding the global lock.
+> > Thanks for taking a look!
+> >
+> > I think a problem with this approach is that we risk having to contend
+> > for the global lock at every CPU boundary in atomic contexts. Right
+> Isn't it the plan to just do a trylock in atomic contexts so that it
+> won't get stuck spinning for the lock for an indeterminate amount of time=
+?
 
-These will be used by drivers later.
+Not exactly. On the memory controller side, we currently only allow
+one flusher at a time and force all flushers to flush the full
+hierarchy, such that concurrent flushers can skip. This is done for
+both atomic and non-atomic contexts.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-mq.c         | 6 +-----
- block/blk-mq.h         | 2 --
- include/linux/blk-mq.h | 7 +++++++
- 3 files changed, 8 insertions(+), 7 deletions(-)
+For flushers outside the memory controller, they can still contend the
+lock among themselves or with flushers in the memory controller. In
+this case, instead of contending the lock once, they contend it at
+each CPU boundary.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 37d8a2f4d5da8..34ac95fc43a66 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -52,11 +52,6 @@ static inline struct blk_mq_hw_ctx *blk_qc_to_hctx(str=
-uct request_queue *q,
- 	return xa_load(&q->hctx_table, qc);
- }
-=20
--static inline blk_qc_t blk_rq_to_qc(struct request *rq)
--{
--	return rq->mq_hctx->queue_num;
--}
--
- /*
-  * Check if any of the ctx, dispatch list or elevator
-  * have pending work in this hardware queue.
-@@ -4744,6 +4739,7 @@ int blk_mq_poll(struct request_queue *q, blk_qc_t c=
-ookie, struct io_comp_batch *
- 	__set_current_state(TASK_RUNNING);
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(blk_mq_poll);
-=20
- unsigned int blk_mq_rq_cpu(struct request *rq)
- {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index ef59fee62780d..92bc058fba3e5 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -31,8 +31,6 @@ struct blk_mq_ctx {
- } ____cacheline_aligned_in_smp;
-=20
- void blk_mq_submit_bio(struct bio *bio);
--int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
-_batch *iob,
--		unsigned int flags);
- void blk_mq_exit_queue(struct request_queue *q);
- int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr);
- void blk_mq_wake_waiters(struct request_queue *q);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 1dacb2c81fdda..ed10b5e380103 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -438,6 +438,11 @@ struct blk_mq_hw_ctx {
- 	struct list_head	hctx_list;
- };
-=20
-+static inline blk_qc_t blk_rq_to_qc(struct request *rq)
-+{
-+	return rq->mq_hctx->queue_num;
-+}
-+
- /**
-  * struct blk_mq_queue_map - Map software queues to hardware queues
-  * @mq_map:       CPU ID to hardware queue index map. This is an array
-@@ -716,6 +721,8 @@ int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set *se=
-t,
- void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
-=20
- void blk_mq_free_request(struct request *rq);
-+int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
-_batch *iob,
-+		unsigned int flags);
-=20
- bool blk_mq_queue_inflight(struct request_queue *q);
-=20
---=20
-2.34.1
+> > now we contend for the global lock once, and once we have it we go
+> > through all CPUs to flush, only having to contend with updates taking
+> > the percpu locks at this point. If we unconditionally release &
+> > reacquire the global lock at every CPU boundary then we may contend
+> > for it much more frequently with concurrent flushers.
+>
+> Note that with the use of qspinlock in all the major arches, the impact
+> of thundering herds of lockers are much less serious than before. There
+> are certainly some overhead in doing multiple lock acquires and
+> releases, but that shouldn't been too excessive.
 
+I ran some tests to measure this. Since I am using a cgroup v1
+hierarchy, I cannot reproduce contention between memory controller
+flushers and non-memory controller flushers, so I removed the "one
+memory flusher only" restriction to have concurrent memory flushers
+compete for the global rstat lock to measure the impact:
+
+Before (only one flusher allowed to compete for the global rstat lock):
+            ---cgroup_rstat_flush
+               |
+                --1.27%--cgroup_rstat_flush_locked
+                          |
+                           --0.94%--mem_cgroup_css_rstat_flush
+
+After (concurrent flushers allowed to compete for the global rstat lock):
+            ---cgroup_rstat_flush
+               |
+               |--4.94%--_raw_spin_lock
+               |          |
+               |           --4.94%--queued_spin_lock_slowpath
+               |
+                --0.92%--cgroup_rstat_flush_locked
+                          |
+                           --0.56%--mem_cgroup_css_rstat_flush
+
+This was run with 20 processes trying to flush concurrently, so it may
+be excessive, but it seems like in this case lock contention makes a
+significant difference.
+
+Again, this is not a regression for non-atomic flushers, as they
+already compete for the lock at every CPU boundary, but for atomic
+flushers that don't give up the lock at all today, it would be a
+regression to start competing for the lock at every CPU boundary. This
+patch series aims to minimize the number of atomic flushers (brings
+them down to two, one of which is not common), so this may be fine.
+
+My main concern is that for some flushers that this series converts
+from atomic to non-atomic, we may notice a regression later and revert
+it (e.g. refault path), which is why I have them in separate patches.
+If we regress the atomic flushing path, it would be a larger surgery
+to restore the performance for these paths -- which is why I would
+rather keep the atomic path without excessive lock contention.
+
+Thoughts?
+
+>
+> I am all in for reducing lock hold time as much as possible as it will
+> improve the response time.
+>
+> Cheers,
+> Longman
+>
