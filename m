@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D20B2C6FD20
-	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 18:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BAEC7619A
+	for <linux-block@archiver.kernel.org>; Fri, 24 Mar 2023 18:20:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231402AbjCXSUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Mar 2023 14:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49552 "EHLO
+        id S232037AbjCXSU5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Mar 2023 14:20:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231966AbjCXSUh (ORCPT
+        with ESMTP id S232060AbjCXSUv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Mar 2023 14:20:37 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14E92007C;
-        Fri, 24 Mar 2023 11:20:30 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32OI5CAc002432;
-        Fri, 24 Mar 2023 18:18:15 GMT
+        Fri, 24 Mar 2023 14:20:51 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CAE21F92C;
+        Fri, 24 Mar 2023 11:20:38 -0700 (PDT)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32OHorg2021424;
+        Fri, 24 Mar 2023 18:18:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2022-7-12;
- bh=5R47IUH5V0bCRYNW6W9PBkUNA79uHRpMXhrvr1HPRu0=;
- b=gUNjSdXINEwgb5rhCLlrDuHDJeU0wJtMGfKiS9G5arekL+5avlxSZaRa/rk362LjBdSZ
- rJxleuoQGfyNPRCLhOh8nLJhh5TDXnI90NOSM90PjcKjM1Q2nWvlPau8TOpNVxw7otLy
- pTAORFZXU32xUSXVTZQVqdhBkFjYVA6hvdBwrW/eFjrsg53sMPOWS1OQ6lqQEoPNmk9a
- M3VSU8AMsHd4xcL3tVogLAKULi7RA7yepxBAsHsYfbmaEr/RQNjR014wNtIefh19XBD5
- s+ZVw9EqO2wYA/Y+WTfWStBccYbsjGsQfT/03uXSAfJ8v3H56bbDNZUMqIEHLkttdfIO mw== 
+ bh=P9Lzi/ZtfXnWhqP/2lFsblJTFnvLSerrPfLluzUW4fw=;
+ b=fDvYn+3S0XpnHAr4lkWK/1/HuyquwnJUgPlJ7mex6X0o9Wss2gJqERaFa7GJGwCIqZAq
+ 9MXE/KEF3mpiUKCRr+uAWnbVbgZ5yRRZCwIOtpxmR9Sqf8Ggf6O8h2WNqEwue3L/X4Lo
+ ngPUlEEsPdxZuGlpO/e2s44zk0TCaAqcjzNFoj+uj/6lBit2j0TbTpGSj/cMwEpSUlxb
+ xIJ+YT49MVDo5dWMU0MaIS09fPO3HJQvLVnlQabcrZzwkZd9rTIjN3mZgiHSYH2hSCsZ
+ SzY+vyQ+vpbBWv/jzULpUJVie8NoVZJRcxwvDFX6KLrd7+cFmd2XjLBZ+3vV4kvMTli1 TA== 
 Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3phgtr80xx-1
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3phgku039w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Mar 2023 18:18:15 +0000
+        Fri, 24 Mar 2023 18:18:24 +0000
 Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32OGHS91001364;
-        Fri, 24 Mar 2023 18:18:14 GMT
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 32OGZV3K001643;
+        Fri, 24 Mar 2023 18:18:23 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3pgxk4bxk6-1
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3pgxk4bxrd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 Mar 2023 18:18:14 +0000
+        Fri, 24 Mar 2023 18:18:23 +0000
 Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32OIHiEh021017;
-        Fri, 24 Mar 2023 18:18:13 GMT
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 32OIHiEp021017;
+        Fri, 24 Mar 2023 18:18:22 GMT
 Received: from mnchrist-mac.us.oracle.com (dhcp-10-154-153-54.vpn.oracle.com [10.154.153.54])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3pgxk4bx19-13;
-        Fri, 24 Mar 2023 18:18:13 +0000
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3pgxk4bx19-17;
+        Fri, 24 Mar 2023 18:18:22 +0000
 From:   Mike Christie <michael.christie@oracle.com>
 To:     bvanassche@acm.org, hch@lst.de, martin.petersen@oracle.com,
         linux-scsi@vger.kernel.org, james.bottomley@hansenpartnership.com,
@@ -51,11 +51,10 @@ To:     bvanassche@acm.org, hch@lst.de, martin.petersen@oracle.com,
         snitzer@kernel.org, axboe@kernel.dk,
         linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
         kbusch@kernel.org, target-devel@vger.kernel.org
-Cc:     Mike Christie <michael.christie@oracle.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v5 12/18] nvme: Add a nvme_pr_type enum
-Date:   Fri, 24 Mar 2023 13:17:35 -0500
-Message-Id: <20230324181741.13908-13-michael.christie@oracle.com>
+Cc:     Mike Christie <michael.christie@oracle.com>
+Subject: [PATCH v5 16/18] scsi: target: Pass struct target_opcode_descriptor to enabled
+Date:   Fri, 24 Mar 2023 13:17:39 -0500
+Message-Id: <20230324181741.13908-17-michael.christie@oracle.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230324181741.13908-1-michael.christie@oracle.com>
 References: <20230324181741.13908-1-michael.christie@oracle.com>
@@ -65,114 +64,184 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-03-24_11,2023-03-24_01,2023-02-09_01
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- mlxlogscore=829 spamscore=0 adultscore=0 bulkscore=0 mlxscore=0
+ mlxlogscore=999 spamscore=0 adultscore=0 bulkscore=0 mlxscore=0
  phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2303200000 definitions=main-2303240143
-X-Proofpoint-ORIG-GUID: dnKdv8ClMWGHI_2KslURdpQT0zGwRIb8
-X-Proofpoint-GUID: dnKdv8ClMWGHI_2KslURdpQT0zGwRIb8
+X-Proofpoint-ORIG-GUID: A46DEWlW5mWXniqlTvt6kz-DGpIeqHPI
+X-Proofpoint-GUID: A46DEWlW5mWXniqlTvt6kz-DGpIeqHPI
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The next patch adds support to report the reservation type, so we need to
-be able to convert from the NVMe PR value we get from the device to the
-linux block layer PR value that will be returned to callers. To prepare
-for that, this patch adds a nvme_pr_type enum and renames the nvme_pr_type
-function.
+The iblock pr_ops support does not support commands that require port or
+I_T Nexus info. This adds a struct target_opcode_descriptor as an argument
+to the enabled callout so we can still have the common tcm_is_pr_enabled
+and tcm_is_scsi2_reservations_enabled functions and also determine if the
+command is supported based on the command and service action and device
+settings.
 
 Signed-off-by: Mike Christie <michael.christie@oracle.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pr.c | 24 ++++++++++++------------
- include/linux/nvme.h   |  9 +++++++++
- 2 files changed, 21 insertions(+), 12 deletions(-)
+ drivers/target/target_core_spc.c  | 40 +++++++++++++++++++------------
+ include/target/target_core_base.h |  3 ++-
+ 2 files changed, 27 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/nvme/host/pr.c b/drivers/nvme/host/pr.c
-index 6aadcc25f3e2..c550c172ff0d 100644
---- a/drivers/nvme/host/pr.c
-+++ b/drivers/nvme/host/pr.c
-@@ -9,24 +9,24 @@
+diff --git a/drivers/target/target_core_spc.c b/drivers/target/target_core_spc.c
+index 00d34616df5d..caf8d1325007 100644
+--- a/drivers/target/target_core_spc.c
++++ b/drivers/target/target_core_spc.c
+@@ -1429,7 +1429,8 @@ static struct target_opcode_descriptor tcm_opcode_write_verify16 = {
+ 	.update_usage_bits = set_dpofua_usage_bits,
+ };
  
- #include "nvme.h"
- 
--static char nvme_pr_type(enum pr_type type)
-+static enum nvme_pr_type nvme_pr_type_from_blk(enum pr_type type)
+-static bool tcm_is_ws_enabled(struct se_cmd *cmd)
++static bool tcm_is_ws_enabled(struct target_opcode_descriptor *descr,
++			      struct se_cmd *cmd)
  {
- 	switch (type) {
- 	case PR_WRITE_EXCLUSIVE:
--		return 1;
-+		return NVME_PR_WRITE_EXCLUSIVE;
- 	case PR_EXCLUSIVE_ACCESS:
--		return 2;
-+		return NVME_PR_EXCLUSIVE_ACCESS;
- 	case PR_WRITE_EXCLUSIVE_REG_ONLY:
--		return 3;
-+		return NVME_PR_WRITE_EXCLUSIVE_REG_ONLY;
- 	case PR_EXCLUSIVE_ACCESS_REG_ONLY:
--		return 4;
-+		return NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY;
- 	case PR_WRITE_EXCLUSIVE_ALL_REGS:
--		return 5;
-+		return NVME_PR_WRITE_EXCLUSIVE_ALL_REGS;
- 	case PR_EXCLUSIVE_ACCESS_ALL_REGS:
--		return 6;
--	default:
--		return 0;
-+		return NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS;
+ 	struct exec_cmd_ops *ops = cmd->protocol_data;
+ 	struct se_device *dev = cmd->se_dev;
+@@ -1456,7 +1457,8 @@ static struct target_opcode_descriptor tcm_opcode_write_same32 = {
+ 	.update_usage_bits = set_dpofua_usage_bits32,
+ };
+ 
+-static bool tcm_is_caw_enabled(struct se_cmd *cmd)
++static bool tcm_is_caw_enabled(struct target_opcode_descriptor *descr,
++			       struct se_cmd *cmd)
+ {
+ 	struct se_device *dev = cmd->se_dev;
+ 
+@@ -1496,7 +1498,8 @@ static struct target_opcode_descriptor tcm_opcode_read_capacity16 = {
+ 		       0xff, 0xff, 0x00, SCSI_CONTROL_MASK},
+ };
+ 
+-static bool tcm_is_rep_ref_enabled(struct se_cmd *cmd)
++static bool tcm_is_rep_ref_enabled(struct target_opcode_descriptor *descr,
++				   struct se_cmd *cmd)
+ {
+ 	struct se_device *dev = cmd->se_dev;
+ 
+@@ -1507,7 +1510,6 @@ static bool tcm_is_rep_ref_enabled(struct se_cmd *cmd)
  	}
-+
-+	return 0;
+ 	spin_unlock(&dev->t10_alua.lba_map_lock);
+ 	return true;
+-
  }
  
- static int nvme_send_ns_head_pr_command(struct block_device *bdev,
-@@ -127,7 +127,7 @@ static int nvme_pr_reserve(struct block_device *bdev, u64 key,
- 	if (flags & ~PR_FL_IGNORE_KEY)
- 		return -EOPNOTSUPP;
- 
--	cdw10 = nvme_pr_type(type) << 8;
-+	cdw10 = nvme_pr_type_from_blk(type) << 8;
- 	cdw10 |= ((flags & PR_FL_IGNORE_KEY) ? 1 << 3 : 0);
- 	return nvme_pr_command(bdev, cdw10, key, 0, nvme_cmd_resv_acquire);
- }
-@@ -135,7 +135,7 @@ static int nvme_pr_reserve(struct block_device *bdev, u64 key,
- static int nvme_pr_preempt(struct block_device *bdev, u64 old, u64 new,
- 		enum pr_type type, bool abort)
- {
--	u32 cdw10 = nvme_pr_type(type) << 8 | (abort ? 2 : 1);
-+	u32 cdw10 = nvme_pr_type_from_blk(type) << 8 | (abort ? 2 : 1);
- 
- 	return nvme_pr_command(bdev, cdw10, old, new, nvme_cmd_resv_acquire);
- }
-@@ -149,7 +149,7 @@ static int nvme_pr_clear(struct block_device *bdev, u64 key)
- 
- static int nvme_pr_release(struct block_device *bdev, u64 key, enum pr_type type)
- {
--	u32 cdw10 = nvme_pr_type(type) << 8 | (key ? 0 : 1 << 3);
-+	u32 cdw10 = nvme_pr_type_from_blk(type) << 8 | (key ? 0 : 1 << 3);
- 
- 	return nvme_pr_command(bdev, cdw10, key, 0, nvme_cmd_resv_release);
- }
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index c18bd55a4ead..182b6d614eb1 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -759,6 +759,15 @@ enum {
- 	NVME_LBART_ATTRIB_HIDE	= 1 << 1,
+ static struct target_opcode_descriptor tcm_opcode_read_report_refferals = {
+@@ -1542,7 +1544,8 @@ static struct target_opcode_descriptor tcm_opcode_sync_cache16 = {
+ 		       0xff, 0xff, SCSI_GROUP_NUMBER_MASK, SCSI_CONTROL_MASK},
  };
  
-+enum nvme_pr_type {
-+	NVME_PR_WRITE_EXCLUSIVE			= 1,
-+	NVME_PR_EXCLUSIVE_ACCESS		= 2,
-+	NVME_PR_WRITE_EXCLUSIVE_REG_ONLY	= 3,
-+	NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY	= 4,
-+	NVME_PR_WRITE_EXCLUSIVE_ALL_REGS	= 5,
-+	NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS	= 6,
-+};
-+
- enum nvme_eds {
- 	NVME_EXTENDED_DATA_STRUCT	= 0x1,
+-static bool tcm_is_unmap_enabled(struct se_cmd *cmd)
++static bool tcm_is_unmap_enabled(struct target_opcode_descriptor *descr,
++				 struct se_cmd *cmd)
+ {
+ 	struct exec_cmd_ops *ops = cmd->protocol_data;
+ 	struct se_device *dev = cmd->se_dev;
+@@ -1664,7 +1667,8 @@ static struct target_opcode_descriptor tcm_opcode_pri_read_resrv = {
+ 		       0xff, SCSI_CONTROL_MASK},
  };
+ 
+-static bool tcm_is_pr_enabled(struct se_cmd *cmd)
++static bool tcm_is_pr_enabled(struct target_opcode_descriptor *descr,
++			      struct se_cmd *cmd)
+ {
+ 	struct se_device *dev = cmd->se_dev;
+ 
+@@ -1793,7 +1797,9 @@ static struct target_opcode_descriptor tcm_opcode_pro_register_move = {
+ 	.enabled = tcm_is_pr_enabled,
+ };
+ 
+-static bool tcm_is_scsi2_reservations_enabled(struct se_cmd *cmd)
++static bool
++tcm_is_scsi2_reservations_enabled(struct target_opcode_descriptor *descr,
++				  struct se_cmd *cmd)
+ {
+ 	struct se_device *dev = cmd->se_dev;
+ 
+@@ -1854,7 +1860,8 @@ static struct target_opcode_descriptor tcm_opcode_inquiry = {
+ 		       0xff, SCSI_CONTROL_MASK},
+ };
+ 
+-static bool tcm_is_3pc_enabled(struct se_cmd *cmd)
++static bool tcm_is_3pc_enabled(struct target_opcode_descriptor *descr,
++			       struct se_cmd *cmd)
+ {
+ 	struct se_device *dev = cmd->se_dev;
+ 
+@@ -1915,8 +1922,8 @@ static struct target_opcode_descriptor tcm_opcode_report_target_pgs = {
+ 		       0xff, 0xff, 0x00, SCSI_CONTROL_MASK},
+ };
+ 
+-
+-static bool spc_rsoc_enabled(struct se_cmd *cmd)
++static bool spc_rsoc_enabled(struct target_opcode_descriptor *descr,
++			     struct se_cmd *cmd)
+ {
+ 	struct se_device *dev = cmd->se_dev;
+ 
+@@ -1936,7 +1943,8 @@ static struct target_opcode_descriptor tcm_opcode_report_supp_opcodes = {
+ 	.enabled = spc_rsoc_enabled,
+ };
+ 
+-static bool tcm_is_set_tpg_enabled(struct se_cmd *cmd)
++static bool tcm_is_set_tpg_enabled(struct target_opcode_descriptor *descr,
++				   struct se_cmd *cmd)
+ {
+ 	struct t10_alua_tg_pt_gp *l_tg_pt_gp;
+ 	struct se_lun *l_lun = cmd->se_lun;
+@@ -2123,7 +2131,7 @@ spc_rsoc_get_descr(struct se_cmd *cmd, struct target_opcode_descriptor **opcode)
+ 			if (descr->serv_action_valid)
+ 				return TCM_INVALID_CDB_FIELD;
+ 
+-			if (!descr->enabled || descr->enabled(cmd))
++			if (!descr->enabled || descr->enabled(descr, cmd))
+ 				*opcode = descr;
+ 			break;
+ 		case 0x2:
+@@ -2137,7 +2145,8 @@ spc_rsoc_get_descr(struct se_cmd *cmd, struct target_opcode_descriptor **opcode)
+ 			 */
+ 			if (descr->serv_action_valid &&
+ 			    descr->service_action == requested_sa) {
+-				if (!descr->enabled || descr->enabled(cmd))
++				if (!descr->enabled || descr->enabled(descr,
++								      cmd))
+ 					*opcode = descr;
+ 			} else if (!descr->serv_action_valid)
+ 				return TCM_INVALID_CDB_FIELD;
+@@ -2150,7 +2159,8 @@ spc_rsoc_get_descr(struct se_cmd *cmd, struct target_opcode_descriptor **opcode)
+ 			 * be returned in the one_command parameter data format.
+ 			 */
+ 			if (descr->service_action == requested_sa)
+-				if (!descr->enabled || descr->enabled(cmd))
++				if (!descr->enabled || descr->enabled(descr,
++								      cmd))
+ 					*opcode = descr;
+ 			break;
+ 		}
+@@ -2207,7 +2217,7 @@ spc_emulate_report_supp_op_codes(struct se_cmd *cmd)
+ 
+ 		for (i = 0; i < ARRAY_SIZE(tcm_supported_opcodes); i++) {
+ 			descr = tcm_supported_opcodes[i];
+-			if (descr->enabled && !descr->enabled(cmd))
++			if (descr->enabled && !descr->enabled(descr, cmd))
+ 				continue;
+ 
+ 			response_length += spc_rsoc_encode_command_descriptor(
+diff --git a/include/target/target_core_base.h b/include/target/target_core_base.h
+index 12c9ba16217e..04646b3dbf75 100644
+--- a/include/target/target_core_base.h
++++ b/include/target/target_core_base.h
+@@ -878,7 +878,8 @@ struct target_opcode_descriptor {
+ 	u8			specific_timeout;
+ 	u16			nominal_timeout;
+ 	u16			recommended_timeout;
+-	bool			(*enabled)(struct se_cmd *cmd);
++	bool			(*enabled)(struct target_opcode_descriptor *descr,
++					   struct se_cmd *cmd);
+ 	void			(*update_usage_bits)(u8 *usage_bits,
+ 						     struct se_device *dev);
+ 	u8			usage_bits[];
 -- 
 2.25.1
 
