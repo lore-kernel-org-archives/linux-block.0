@@ -2,158 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB1FFC76196
-	for <linux-block@archiver.kernel.org>; Sat, 25 Mar 2023 14:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01FA6C6FD1F
+	for <linux-block@archiver.kernel.org>; Sat, 25 Mar 2023 16:31:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230007AbjCYOQR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Mar 2023 10:16:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34238 "EHLO
+        id S229446AbjCYQbN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Mar 2023 12:31:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbjCYOQQ (ORCPT
+        with ESMTP id S230399AbjCYQbM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Mar 2023 10:16:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E286583
-        for <linux-block@vger.kernel.org>; Sat, 25 Mar 2023 07:15:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679753727;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EJskXx//8dz1rUMxGQMccM+rIb22Wd8SqK5F/LVmoVM=;
-        b=FeI+3NlXJuPVWEvi3pJMe3uxl7xpNfhG0IfjLnlYMy/YM0ERso0x8YP9qFs9czxtddtPc6
-        RXD27KG8skEI3zfeoMo8oMxAl5i+IQHNyrGS/J0Wpz+uADeNr5UDdiss8XJnRSlv3hemob
-        HWXYxNk9HuFgxSOLAhx/pkMumAmdn34=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-133-3RB24tOHMhOwj5tywzySTQ-1; Sat, 25 Mar 2023 10:15:25 -0400
-X-MC-Unique: 3RB24tOHMhOwj5tywzySTQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F40B13C0DDA3;
-        Sat, 25 Mar 2023 14:15:24 +0000 (UTC)
-Received: from ovpn-8-21.pek2.redhat.com (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A516202701E;
-        Sat, 25 Mar 2023 14:15:18 +0000 (UTC)
-Date:   Sat, 25 Mar 2023 22:15:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
-Message-ID: <ZB8B8cr1/qIcPdRM@ovpn-8-21.pek2.redhat.com>
-References: <20230314125727.1731233-1-ming.lei@redhat.com>
- <fd30b561-86dd-5061-714f-e46058f7079f@linux.alibaba.com>
- <845ff5cb-b0ff-8ea0-e2ff-a5b216966dfb@gmail.com>
+        Sat, 25 Mar 2023 12:31:12 -0400
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E1CA1040D
+        for <linux-block@vger.kernel.org>; Sat, 25 Mar 2023 09:31:09 -0700 (PDT)
+Received: by mail-pj1-f44.google.com with SMTP id r7-20020a17090b050700b002404be7920aso3774737pjz.5
+        for <linux-block@vger.kernel.org>; Sat, 25 Mar 2023 09:31:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679761869;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+bI22aDTE0EkyKzjY2GnUSfGRlBjHkkpYNcu06n1Jk=;
+        b=x8iTMmuqo37cYf96cmXwUVtHgyEsdAfivIZbMJkaWUSxa3h/d4pdSQst0hZ2DEWY45
+         DAbVKaTxmvfnbrSwVSV0nUNx/PvEoWUzX9Jy3/chG2YUAEq2JkIMfsndKbJDz+3mHi8D
+         oLo5vIVlNLdl9uKdCD7ZJu2bfpgjrHGhRhOYOQuMjitjM1I/y7lu6IjPutEDfb9CQkY/
+         9XQBoWGYS5sn9w4YmtZfuoB7VWwrvZWfWIc/+kMtoW8i70YkzdHj7O/DoL805auSfeeB
+         rDQyGi1uF+UfRFfDyVQ68Lv3qt6KIZXMv8Dab/QT+RHU18LS2NpBXV0XeV6kTOT1Qru4
+         Ec2Q==
+X-Gm-Message-State: AAQBX9elTTjF1kEaSLzFnVMByKhdeStEJ4kJjHAxuutuKF0tx5dN1r3M
+        8uhL3MhOuqj7fSVHBVa/kps=
+X-Google-Smtp-Source: AKy350bNTQPjMRlfFTmi0UAzCZFnD81+N+Y2gpBdVOCYbojy6uZiJfu8twOr6+uP/ykU4/grtRZoBg==
+X-Received: by 2002:a17:90a:780e:b0:23f:d7ea:6212 with SMTP id w14-20020a17090a780e00b0023fd7ea6212mr6257782pjk.38.1679761868613;
+        Sat, 25 Mar 2023 09:31:08 -0700 (PDT)
+Received: from ?IPV6:2601:642:4c02:3681:3ba2:71db:559e:27be? ([2601:642:4c02:3681:3ba2:71db:559e:27be])
+        by smtp.gmail.com with ESMTPSA id mv21-20020a17090b199500b0023d16f05dd8sm4854732pjb.36.2023.03.25.09.31.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 25 Mar 2023 09:31:07 -0700 (PDT)
+Message-ID: <7f4463c1-fd02-8ac5-16d7-61ffe6279e07@acm.org>
+Date:   Sat, 25 Mar 2023 09:31:01 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <845ff5cb-b0ff-8ea0-e2ff-a5b216966dfb@gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+References: <20230317195938.1745318-1-bvanassche@acm.org>
+ <20230317195938.1745318-3-bvanassche@acm.org>
+ <ZBT6EmhEfJmgRXU1@ovpn-8-18.pek2.redhat.com>
+ <580e712c-5e43-e1a5-277b-c4e8c50485f0@acm.org>
+ <ZBjsDy2pfPk9t6qB@ovpn-8-29.pek2.redhat.com>
+ <50dfa89c-19fa-b655-f6b8-b8853b066c75@acm.org>
+ <20230321055537.GA18035@lst.de>
+ <100dfc73-d8f3-f08f-e091-3c08707e95f5@acm.org>
+ <20230323082604.GC21977@lst.de>
+ <acd13f8c-6cbe-a14d-e3b4-645d62811cec@opensource.wdc.com>
+ <122cdca2-b0ae-ce74-664d-e268fe0699a8@acm.org>
+ <7a795b9b-51dc-9166-1cf0-6c51db77b195@opensource.wdc.com>
+ <1e65e542-e8e9-bd3f-6ff1-1bbd4716a8c3@acm.org>
+ <e83d1111-1841-7b2a-973b-16bea2e789c6@opensource.wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <e83d1111-1841-7b2a-973b-16bea2e789c6@opensource.wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 18, 2023 at 04:23:35PM +0000, Pavel Begunkov wrote:
-> On 3/16/23 03:13, Xiaoguang Wang wrote:
-> > > Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
-> > > be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
-> > > 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
-> > > to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
-> > > and its ->issue() can retrieve/import buffer from master request's
-> > > fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
-> > > this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
-> > > submits slave OP just like normal OP issued from userspace, that said,
-> > > SQE order is kept, and batching handling is done too.
-> > Thanks for this great work, seems that we're now in the right direction
-> > to support ublk zero copy, I believe this feature will improve io throughput
-> > greatly and reduce ublk's cpu resource usage.
-> > 
-> > I have gone through your 2th patch, and have some little concerns here:
-> > Say we have one ublk loop target device, but it has 4 backend files,
-> > every file will carry 25% of device capacity and it's implemented in stripped
-> > way, then for every io request, current implementation will need issed 4
-> > fused_cmd, right? 4 slave sqes are necessary, but it would be better to
-> > have just one master sqe, so I wonder whether we can have another
-> > method. The key point is to let io_uring support register various kernel
-> > memory objects, which come from kernel, such as ITER_BVEC or
-> > ITER_KVEC. so how about below actions:
-> > 1. add a new infrastructure in io_uring, which will support to register
-> > various kernel memory objects in it, this new infrastructure could be
-> > maintained in a xarray structure, every memory objects in it will have
-> > a unique id. This registration could be done in a ublk uring cmd, io_uring
-> > offers registration interface.
-> > 2. then any sqe can use these memory objects freely, so long as it
-> > passes above unique id in sqe properly.
-> > Above are just rough ideas, just for your reference.
-> 
-> It precisely hints on what I proposed a bit earlier, that makes
-> me not alone thinking that it's a good idea to have a design allowing
-> 1) multiple ops using a buffer and 2) to limiting it to one single
-> submission because the userspace might want to preprocess a part
-> of the data, multiplex it or on the opposite divide. I was mostly
-> coming from non ublk cases, and one example would be such zc recv,
-> parsing the app level headers and redirecting the rest of the data
-> somewhere.
+On 3/24/23 19:00, Damien Le Moal wrote:
+> The trick here could be to have the UFS LLD to unlock the target zone of a write
+> when the command is sent to the device, instead of when the command completes.
+> This way, the zone is still locked when there is a requeue and there is no
+> reordering. That could allow for write qd > 1 in the case of UFS. And this
+> method could actually work for regular writes too.
 
-Just get some time to think about zc recv.
+Hi Damien,
 
-Firstly I understand the buffer shouldn't be provided from userspace unlike
-storage, given network recv can happen any time, and NIC driver has to put
-received data into kernel socket recv buffer first. But if yes for some special recv
-case, the use case is totally different with ublk, and impossible to share
-any code with ublk.
-
-So here suppose the zc recv means to export socket recv buffer to userspace
-just like the implementation in lwn doc [1].
-
-[1] https://lwn.net/Articles/752188/
-
-But how does userspace pre-process this kernel buffer? mmap is expensive,
-and copy won't be one option. Or the data is just simply forwarded to
-somewhere(special case)?
-
-If yes, it can become a bit similar with ublk's case in which
-the device io buffer needn't to be modified and just simply forwarded to
-FS or socket in most of cases. Then it could be possible to extend fused
-for supporting it given the buffer lifetime model is useful for generic zero
-copy, such as:
-
-- send fused command(A) to just register buffer(socket recv buffer) with one
-empty buffer index, then return the buffer index to userspace via CQE(
-IORING_CQE_F_MORE), but not complete this fused command(A); but it
-requires socket FS to implement ->uring_command() for providing recv
-buffer.
-
-- after getting recv SQE, userspace can use the registered buffer to
-do whatever, but direct access on buffer is one problem, since it is
-simply pages which have to be mapped for handling from userspace
-
-- after userspace handles everything(includes net send over this buffer) on
-the recv buffer, send another fused command or new OP to ask kernel to
-release buffer by completing fused command(A). However, one corner case
-is that this fuse command needs to be completed automatically when
-io_uring exits since app is dead at that time.
-
-It should be easy to extend fused command in above way(slave less)
-since V4 starts to support normal 64byte SQE, and we have enough uring
-command flags.
-
-But not sure if that is what you need. If not, please explain a bit
-your exact requirement.
-
-> 
-> I haven't got a chance to work on it but will return to it in
-> a week. The discussion was here:
-> 
-> https://lore.kernel.org/all/ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com/
-
+Although the above sounds interesting to me, I think the following two 
+scenarios are not handled by the above approach and can lead to reordering:
+* The SCSI device reporting a unit attention.
+* The SCSI device responding with the SCSI status "BUSY". The UFS 
+standard explicitly allows this. From the UFS standard: "If the unit is 
+not ready to accept a new command (e.g., still processing previous 
+command) a STATUS response of BUSY will be returned."
 
 Thanks,
-Ming
+
+Bart.
+
 
