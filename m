@@ -2,133 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D67C76195
-	for <linux-block@archiver.kernel.org>; Sat, 25 Mar 2023 01:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91078C6FD1C
+	for <linux-block@archiver.kernel.org>; Sat, 25 Mar 2023 02:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231966AbjCYByy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Mar 2023 21:54:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40944 "EHLO
+        id S231843AbjCYCAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Mar 2023 22:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjCYByx (ORCPT
+        with ESMTP id S229505AbjCYCAU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Mar 2023 21:54:53 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CC52128;
-        Fri, 24 Mar 2023 18:54:52 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id o2so3466925plg.4;
-        Fri, 24 Mar 2023 18:54:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679709292;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rZD4yeAZYRZA0h6Sa2287K8z27FVJ3yK8JKUr0lQOXE=;
-        b=mC2DwxizegktL3ml5ZkgW4iCveIfhyJtMgfrimZIa1j1Y8YW2I4IZ0tdvhZc1A2gBf
-         bPpL453iMfkKE7Q2iWa4l856pfAiURxN5/VWU5iRKWYdb8bkZ3t7oIn4Ot9AMCUHitJ1
-         fCBSfv9sMBPT7l1ZZx+O8DWyTvwkVSxYlGe9lG/wtPJtTqKF+eHZphHY8fK58NNu/2RP
-         gJ6z0onrbm2DECMNfgl9WtEt3NFf22+/uIlkkjpNvmM6Bun+RuVdmYM0bG3VPR8NAMhS
-         fy/MyqxnmIPai73OJB0s480cJGQXc7QfJTxlb9Gf6+IA3XpIVl5ws2XDBcGAJ5Rj3nhv
-         6k6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679709292;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rZD4yeAZYRZA0h6Sa2287K8z27FVJ3yK8JKUr0lQOXE=;
-        b=foSxrAun58eoPwjaqBixSDbsStCoQLq6LTSbK4yZbWBlOMuJBxA07qQMZX3EDQnytC
-         dG9s4XvOjpYvguULEi35Z/1L/3WH5WZj+K5S6uDRpU0XXM6mx/gKzkUvfjBjOK54y6yc
-         5aBw7Clal18anfOvuH001VO1z9+Jp1/EW0Z5hFi32ymWtA6Tg+TQaHe2ZaPQysZu3HgG
-         qNw88JT/jnI3NNLxXYc34olOY61Ueeg7YAR59JVb9rmCwXJ6+e4b79gVKElfJ2fwIYQu
-         RzFvneax9q+ItSPKE9BgUbU5+Nzy4/DMU/pETUahbf7ns11bOwKPuC1oLPsmPVr/ylPU
-         yDpQ==
-X-Gm-Message-State: AAQBX9cr3p/Pv+2c7dmdDYpMzRUIzagRzy0KTrRbUeR7MOD7x5ByMK/F
-        G6Cdc8TH4qU7p81uRcV5Vfc=
-X-Google-Smtp-Source: AKy350ayeAKBbmYB88nMPmyXyjU6HNDMbK6lhYJvfZOmCtey/uCIZ7/8QwM1J7mRvwtCkk9eMFLdBg==
-X-Received: by 2002:a17:902:d4c7:b0:19e:6760:305b with SMTP id o7-20020a170902d4c700b0019e6760305bmr4705364plg.47.1679709292101;
-        Fri, 24 Mar 2023 18:54:52 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id bf11-20020a170902b90b00b00194caf3e975sm2019425plb.208.2023.03.24.18.54.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Mar 2023 18:54:51 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 24 Mar 2023 15:54:50 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
- percpu lock
-Message-ID: <ZB5UalkjGngcBDEJ@slm.duckdns.org>
-References: <20230323040037.2389095-1-yosryahmed@google.com>
- <20230323040037.2389095-2-yosryahmed@google.com>
- <ZBz/V5a7/6PZeM7S@slm.duckdns.org>
- <CAJD7tkYNZeEytm_Px9_73Y-AYJfHAxaoTmmnO71HW5hd1B5tPg@mail.gmail.com>
+        Fri, 24 Mar 2023 22:00:20 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69F551043F
+        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 19:00:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1679709616; x=1711245616;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=EO7h67tmYCEDXvXWmg+pG3kWFn9vJA7iFMTngdvUJJE=;
+  b=mXZoQBUYBQCqZWL6Qf0mGg8hCIr3t8LLsDi9kyy8D8Ebk4Nf6sJPlwID
+   0iYLcBlsOXBr4J7qz5pwO6Y3LPPLgT5g9ztW5LJb44ZxO4vECwNZPdbuv
+   Oosato5GhjTptHeLMRQKpLwFc8m+pqfksgw8oF2Tnkaa28uWhIy2RJNqt
+   H5BsvYiMF0ZHbW5qGXMIxynbJ/f0tSjbMdXWzFmGhDCrbmAe6A6O4qcYR
+   P5tRo4wews7gmmH7LGut+15Jx6N8eLp6ZH3zwBg4PKetYpc4I1xNO7d4G
+   vGkOC8OX1Mwo8Yv9+irqTbZqplarVTgIR7MXwPfXKSrS6FgM+/BiDK8gU
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.98,289,1673884800"; 
+   d="scan'208";a="330888038"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2023 10:00:13 +0800
+IronPort-SDR: TsowbVcBqNM+yVztWAaMGn12wlpvBN7zOzZPOlN+o3MyXfG3r54YKUsQZF8KnJ7mBEjF45HjRQ
+ eMt/dMxYNMrSDacy4/f/mi6nUc/9fLVq4gwqlqfTfQU5F1Co0XUj+F1UmGwEGxYGF7ASSiukrD
+ Z9YX6pFyz06JudtWs8m5iI0gfjjcLKIMS1u2NMYp6NvSQFJ0NXQjI5Z98DgPiS+vci/OS6Kd0t
+ 8+lf6bKTFnHOf2tqbMlV6ct99dhCrUgFoxJMH0hswoPTLvf/DTlnBtt+vJoTsR407LhCvcqmST
+ QWs=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Mar 2023 18:16:27 -0700
+IronPort-SDR: fr9SqAIFth4XZFN60hwc30MTVOzERP1IWUG5Yo5Q6YJJ4rBuhmDNBRfX8UCczyZ6WRyIYfxZhm
+ av8heQ3vyu8GlpDkiWRQQoZ4NyB0pZeSg+5F51I3F7oQ/YUmMtpUt+yV8JDNM5eYBkaDa9w2VV
+ NjItgCtvySN/KQnRUPUbzmNhHzK5wQPDteWpeX3lOw7hJM8JUexJMFUiRzjRFg9/H3TeFrwKuy
+ rVUsSDNJmbSgUsvD2gJKlDJGrL6r03TqQHcg5Ele70tEroq86mypADuZ3Z9B5+hxab4REEYOVf
+ OFc=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Mar 2023 19:00:13 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Pk2Mw0kYlz1RtVy
+        for <linux-block@vger.kernel.org>; Fri, 24 Mar 2023 19:00:12 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1679709611; x=1682301612; bh=EO7h67tmYCEDXvXWmg+pG3kWFn9vJA7iFMT
+        ngdvUJJE=; b=XA//j1PJpKiCgUBjAPcCR9MQMaWiS+urTEw2u9wXmByLwcVKNIa
+        XVIO+PGqRjDa0caz8wWe8dvStymijP9h+J8guwbWMDEYXgn02T20czJNrNo5ohq3
+        iB+5ehvBhugvnAc0t798wZImNSWkPWf2c4jbr9gjU25cWONgEcEhv2Ra1E+RTpTA
+        nG6qjYtQ1esMm/KmFhFeplZt/1A/ADDIGDmzQchVtVlsDu/5M5mlOyejJSV4d8AT
+        2hy6vXPmEYq0UbANXHzUCk4fvyfG0ShkiGodlFzUvkU+lgnNfg/uVENuc97X67D0
+        8bgybtIJbXS051TVEvTu2WMJnm9Cs5M5mlA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 3NouF0McxGW1 for <linux-block@vger.kernel.org>;
+        Fri, 24 Mar 2023 19:00:11 -0700 (PDT)
+Received: from [10.225.163.103] (unknown [10.225.163.103])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Pk2Ms6zTjz1RtVm;
+        Fri, 24 Mar 2023 19:00:09 -0700 (PDT)
+Message-ID: <e83d1111-1841-7b2a-973b-16bea2e789c6@opensource.wdc.com>
+Date:   Sat, 25 Mar 2023 11:00:08 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJD7tkYNZeEytm_Px9_73Y-AYJfHAxaoTmmnO71HW5hd1B5tPg@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+References: <20230317195938.1745318-1-bvanassche@acm.org>
+ <20230317195938.1745318-3-bvanassche@acm.org>
+ <ZBT6EmhEfJmgRXU1@ovpn-8-18.pek2.redhat.com>
+ <580e712c-5e43-e1a5-277b-c4e8c50485f0@acm.org>
+ <ZBjsDy2pfPk9t6qB@ovpn-8-29.pek2.redhat.com>
+ <50dfa89c-19fa-b655-f6b8-b8853b066c75@acm.org>
+ <20230321055537.GA18035@lst.de>
+ <100dfc73-d8f3-f08f-e091-3c08707e95f5@acm.org>
+ <20230323082604.GC21977@lst.de>
+ <acd13f8c-6cbe-a14d-e3b4-645d62811cec@opensource.wdc.com>
+ <122cdca2-b0ae-ce74-664d-e268fe0699a8@acm.org>
+ <7a795b9b-51dc-9166-1cf0-6c51db77b195@opensource.wdc.com>
+ <1e65e542-e8e9-bd3f-6ff1-1bbd4716a8c3@acm.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <1e65e542-e8e9-bd3f-6ff1-1bbd4716a8c3@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Fri, Mar 24, 2023 at 12:22:09AM -0700, Yosry Ahmed wrote:
-> I think a problem with this approach is that we risk having to contend
-> for the global lock at every CPU boundary in atomic contexts. Right
-> now we contend for the global lock once, and once we have it we go
-> through all CPUs to flush, only having to contend with updates taking
-> the percpu locks at this point. If we unconditionally release &
-> reacquire the global lock at every CPU boundary then we may contend
-> for it much more frequently with concurrent flushers.
+On 3/25/23 01:55, Bart Van Assche wrote:
+> On 3/23/23 15:53, Damien Le Moal wrote:
+>> On 3/24/23 01:27, Bart Van Assche wrote:
+>>> On 3/23/23 03:28, Damien Le Moal wrote:
+>>>> For the zone append emulation, the write locking is done by sd.c and the upper
+>>>> layer does not restrict to one append per zone. So we actually could envision a
+>>>> UFS version of the sd write locking calls that is optimized for the device
+>>>> capabilities and we can keep a common upper layer (which is preferable in my
+>>>> opinion).
+>>>
+>>> I see a blk_req_zone_write_trylock() call in
+>>> sd_zbc_prepare_zone_append() and a blk_req_zone_write_unlock() call in
+>>> sd_zbc_complete() for REQ_OP_ZONE_APPEND operations. Does this mean that
+>>> the sd_zbc.c code restricts the queue depth to one per zone for
+>>> REQ_OP_ZONE_APPEND operations?
+>>
+>> Yes, since the append becomes a regular write and HBAs are often happy to
+>> reorder these commands, even for SMR, we need the locking.
+>>
+>> But if I understand your use case correctly, given that UFS gives guarantees on
+>> the command dispatching order, you could probably relax this locking for zone
+>> append requests. But you cannot for regular writes as the locking is up in the
+>> block layer and needed to avoid block layer level reordering.
 > 
-> On the memory controller side, concurrent flushers are already held
-> back to avoid a thundering herd problem on the global rstat lock, but
-> flushers from outside the memory controller can still compete together
-> or with a flusher from the memory controller. In this case, we risk
-> contending the global lock more and concurrent flushers taking a
-> longer period of time, which may end up causing multi-CPU stalls
-> anyway, right? Also, if we keep _irq when spinning for the lock, then
-> concurrent flushers still need to spin with irq disabled -- another
-> problem that this series tries to fix.
+> Hi Damien,
 > 
-> This is particularly a problem for flushers in atomic contexts. There
-> is a flusher in mem_cgroup_wb_stats() that flushes while holding
-> another spinlock, and a flusher in mem_cgroup_usage() that flushes
-> with irqs disabled. If flushing takes a longer period of time due to
-> repeated lock contention, it affects such atomic context negatively.
-> 
-> I am not sure how all of this matters in practice, it depends heavily
-> on the workloads and the configuration like you mentioned. I am just
-> pointing out the potential disadvantages of reacquiring the lock at
-> every CPU boundary in atomic contexts.
+> I don't think that we can achieve QD > 1 even if we would switch to
+> REQ_OP_ZONE_APPEND. A SCSI LLD is allowed to respond with 
+> SCSI_MLQUEUE_HOST_BUSY if the SCSI core asks it to queue a command. This 
+> may lead to reordering and hence may cause UNALIGNED WRITE COMMAND 
+> errors. We want to avoid these errors.
 
-So, I'm not too convinced by the arguments for a couple reasons:
-
-* It's not very difficult to create conditions where a contented non-irq
-  protected spinlock is held unnecessarily long due to heavy IRQ irq load on
-  the holding CPU. This can easily extend the amount of time the lock is
-  held by multiple times if not orders of magnitude. That is likely a
-  significantly worse problem than the contention on the lock cacheline
-  which will lead to a lot more gradual degradation.
-
-* If concurrent flushing is an actual problem, we need and can implement a
-  better solution. There's quite a bit of maneuvering room here given that
-  the flushing operations are mostly idempotent in close time proximity and
-  there's no real atomicity requirement across different segments of
-  flushing operations.
-
-Thanks.
+The trick here could be to have the UFS LLD to unlock the target zone of a write
+when the command is sent to the device, instead of when the command completes.
+This way, the zone is still locked when there is a requeue and there is no
+reordering. That could allow for write qd > 1 in the case of UFS. And this
+method could actually work for regular writes too.
 
 -- 
-tejun
+Damien Le Moal
+Western Digital Research
+
