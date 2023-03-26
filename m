@@ -2,175 +2,155 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA547C6FD1C
-	for <linux-block@archiver.kernel.org>; Sun, 26 Mar 2023 12:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F240C6FD1C
+	for <linux-block@archiver.kernel.org>; Sun, 26 Mar 2023 13:01:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231211AbjCZM1X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Mar 2023 08:27:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
+        id S231904AbjCZNBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Mar 2023 09:01:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjCZM1X (ORCPT
+        with ESMTP id S231834AbjCZNBw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Mar 2023 08:27:23 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F1B4C39
-        for <linux-block@vger.kernel.org>; Sun, 26 Mar 2023 05:27:22 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id cf7so7268015ybb.5
-        for <linux-block@vger.kernel.org>; Sun, 26 Mar 2023 05:27:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1679833641;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WuEsxrDbF/inLpKrbuVfZ5izqyJJinZBdUjdf7O5LUM=;
-        b=V2gHZHslEdu3xrIj9mtxPLaMLoocSdj5ImvyU4v+44pm9nVKNP/zYL1Dg2eieY2dxp
-         onkNUDhH4aQXyS5ed0T6dBP1v4bMpWcxzSnhyhvzCY/L15JMWN/KJCqFpN/dfiykJfAB
-         9cWNgbjm86N+e4qqv1IeChEjzj55EXToH5TPQ=
+        Sun, 26 Mar 2023 09:01:52 -0400
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F087AA3
+        for <linux-block@vger.kernel.org>; Sun, 26 Mar 2023 06:01:50 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id cn12so25325010edb.4
+        for <linux-block@vger.kernel.org>; Sun, 26 Mar 2023 06:01:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679833641;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WuEsxrDbF/inLpKrbuVfZ5izqyJJinZBdUjdf7O5LUM=;
-        b=WZI8fTXUtpokL06sZ6TvsUwLqICetgrYbFUBZT6eRM66+3Y4CxG8deFOfvIJxMiocI
-         suy8kwuy3gXgK3Gia50S+JE3JO3MhNTXhxCkj7ysKfXCmUkMlc+zLPXfevKwEMrZJnDz
-         fyLHT8Flw5nfhjYWxb/uO7OBHYFMb/zbnHPiDZiZGjipa9DZy+YlmpfgnH2l3G0tPh8x
-         spNShiuzChv6NC+uo25AWUYX77BGF20/U90iBNmnjh/DOLoch+6RQ4O6yM1IEZPABb5x
-         VxAsU5yR8GdEVznlpE242ChAVk4+V/J3M7IWsmglTlu0cs6gGch/Z0c8cd5kOB07JuYX
-         PAzw==
-X-Gm-Message-State: AAQBX9c3ccB+wEWyAfo2qZAkYyr+uCYWbRlDLnYTfHLnoMCILhFu4cyU
-        Jmh685MPfTOZzGYfuAnHeCFMqx6P7KnqNx2bvqUPSQ==
-X-Google-Smtp-Source: AKy350Z7FAUAxqILc0KDv/Q2NcQmwgP5WIczo/cB3lR7Oy5nlhBvDO4RBmlXSkSRRW9Lr0SX2xoh8S28f15LfRwm9Xk=
-X-Received: by 2002:a05:6902:1108:b0:b6d:fc53:c5c0 with SMTP id
- o8-20020a056902110800b00b6dfc53c5c0mr6998960ybu.1.1679833641143; Sun, 26 Mar
- 2023 05:27:21 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679835709; x=1682427709;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qgkJ2We0qcp9j3CcyyYU8CKDu2OA7+3QPtzRZPu3z4s=;
+        b=uSW9dTfVPtg2BxGEsAIJJ/4kYqTWVGfMQ/9KZ0YfcfJ+CznMz4PT2YZHhVHwCTJ1lX
+         WTSI8nfQwwmfKuZzuSJz5GlRHgCuSAo79CH97FMyfDFZiLeWnuR50ZlxX1jLoC0G4H6H
+         hQEQAPA5Q2e0jL9seVwFWMMp6DuzoRPw2CSXlshuTPfyjRD+2XXSeY5DZCQ5DZ72qzAV
+         yOU4xbBkXev7ar84XaY9iPn4PdlLBbwAyRnWLrcdJ9iZN1hMrzH3N2NHzCQ/XOgtd0xW
+         Q9093fxrGjlKhfQDycm/ptwwH4i2UNmYTznST7SF9dLAtPAWuvWX4Qe5tGVJj2zjYi59
+         TYng==
+X-Gm-Message-State: AAQBX9fY4dPMNodCJW4NuJc+y7AVghdrmGOYQKHK7+qzxaYAw+gBzQ8m
+        KkKr4zfM/idpUA3b1ru2a6E=
+X-Google-Smtp-Source: AKy350ZJgIoqcJ0eFVlmxWEG1NpqNPfkqKKWnnoXk/aMzm+3X/FwO7GMiZpore4c3APCYqyQLJmR5Q==
+X-Received: by 2002:a17:906:1001:b0:93f:e5e4:8c13 with SMTP id 1-20020a170906100100b0093fe5e48c13mr3175368ejm.5.1679835708840;
+        Sun, 26 Mar 2023 06:01:48 -0700 (PDT)
+Received: from [10.100.102.14] (85.65.206.11.dynamic.barak-online.net. [85.65.206.11])
+        by smtp.gmail.com with ESMTPSA id 22-20020a170906309600b0092f289b6fdbsm12891737ejv.181.2023.03.26.06.01.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 26 Mar 2023 06:01:48 -0700 (PDT)
+Message-ID: <55f9c095-32c2-648d-7ac9-84c1d9224abb@grimberg.me>
+Date:   Sun, 26 Mar 2023 16:01:46 +0300
 MIME-Version: 1.0
-References: <20230315181902.4177819-1-joel@joelfernandes.org>
-In-Reply-To: <20230315181902.4177819-1-joel@joelfernandes.org>
-From:   Joel Fernandes <joel@joelfernandes.org>
-Date:   Sun, 26 Mar 2023 08:27:10 -0400
-Message-ID: <CAEXW_YQehT7Zj0G4nBj-0b+Ndq_FTxFzxQ-WYnBGJ=87wPBHYw@mail.gmail.com>
-Subject: Re: [PATCH v2 01/14] drbd: Rename kvfree_rcu() to kvfree_rcu_mightsleep()
-To:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Uladzislau Rezki (Sony)" <urezki@gmail.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH 2/2] nvme: use blk-mq polling for uring commands
+Content-Language: en-US
+To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, axboe@kernel.dk, hch@lst.de
+Cc:     Keith Busch <kbusch@kernel.org>
+References: <20230324212803.1837554-1-kbusch@meta.com>
+ <20230324212803.1837554-2-kbusch@meta.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230324212803.1837554-2-kbusch@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 2:19=E2=80=AFPM Joel Fernandes (Google)
-<joel@joelfernandes.org> wrote:
->
-> From: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
->
-> The kvfree_rcu() macro's single-argument form is deprecated.  Therefore
-> switch to the new kvfree_rcu_mightsleep() variant. The goal is to
-> avoid accidental use of the single-argument forms, which can introduce
-> functionality bugs in atomic contexts and latency bugs in non-atomic
-> contexts.
->
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Philipp Reisner <philipp.reisner@linbit.com>
-> Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-Jens/Others, any chance for an Ack here?
 
- - Joel
-
-> Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
-> Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
-> Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+On 3/25/23 00:28, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> The first advantage is that unshared and multipath namespaces can use
+> the same polling callback.
+> 
+> The other advantage is that we don't need a bio payload in order to
+> poll, allowing commands like 'flush' and 'write zeroes' to be submitted
+> on the same high priority queue as read and write commands.
+> 
+> This can also allow for a future optimization for the driver since we no
+> longer need to create special hidden block devices to back nvme-generic
+> char dev's with unsupported command sets.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
->  drivers/block/drbd/drbd_nl.c       | 6 +++---
->  drivers/block/drbd/drbd_receiver.c | 4 ++--
->  drivers/block/drbd/drbd_state.c    | 2 +-
->  3 files changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-> index 60757ac31701..f49f2a5282e1 100644
-> --- a/drivers/block/drbd/drbd_nl.c
-> +++ b/drivers/block/drbd/drbd_nl.c
-> @@ -1615,7 +1615,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct =
-genl_info *info)
->                         drbd_send_sync_param(peer_device);
->         }
->
-> -       kvfree_rcu(old_disk_conf);
-> +       kvfree_rcu_mightsleep(old_disk_conf);
->         kfree(old_plan);
->         mod_timer(&device->request_timer, jiffies + HZ);
->         goto success;
-> @@ -2446,7 +2446,7 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct g=
-enl_info *info)
->
->         mutex_unlock(&connection->resource->conf_update);
->         mutex_unlock(&connection->data.mutex);
-> -       kvfree_rcu(old_net_conf);
-> +       kvfree_rcu_mightsleep(old_net_conf);
->
->         if (connection->cstate >=3D C_WF_REPORT_PARAMS) {
->                 struct drbd_peer_device *peer_device;
-> @@ -2860,7 +2860,7 @@ int drbd_adm_resize(struct sk_buff *skb, struct gen=
-l_info *info)
->                 new_disk_conf->disk_size =3D (sector_t)rs.resize_size;
->                 rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf=
-);
->                 mutex_unlock(&device->resource->conf_update);
-> -               kvfree_rcu(old_disk_conf);
-> +               kvfree_rcu_mightsleep(old_disk_conf);
->                 new_disk_conf =3D NULL;
->         }
->
-> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd=
-_receiver.c
-> index 757f4692b5bd..e197b2a465d2 100644
-> --- a/drivers/block/drbd/drbd_receiver.c
-> +++ b/drivers/block/drbd/drbd_receiver.c
-> @@ -3759,7 +3759,7 @@ static int receive_protocol(struct drbd_connection =
-*connection, struct packet_in
->                 drbd_info(connection, "peer data-integrity-alg: %s\n",
->                           integrity_alg[0] ? integrity_alg : "(none)");
->
-> -       kvfree_rcu(old_net_conf);
-> +       kvfree_rcu_mightsleep(old_net_conf);
->         return 0;
->
->  disconnect_rcu_unlock:
-> @@ -4127,7 +4127,7 @@ static int receive_sizes(struct drbd_connection *co=
-nnection, struct packet_info
->
->                         rcu_assign_pointer(device->ldev->disk_conf, new_d=
-isk_conf);
->                         mutex_unlock(&connection->resource->conf_update);
-> -                       kvfree_rcu(old_disk_conf);
-> +                       kvfree_rcu_mightsleep(old_disk_conf);
->
->                         drbd_info(device, "Peer sets u_size to %lu sector=
-s (old: %lu)\n",
->                                  (unsigned long)p_usize, (unsigned long)m=
-y_usize);
-> diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_st=
-ate.c
-> index 75d13ea0024f..2aeea295fa28 100644
-> --- a/drivers/block/drbd/drbd_state.c
-> +++ b/drivers/block/drbd/drbd_state.c
-> @@ -2071,7 +2071,7 @@ static int w_after_conn_state_ch(struct drbd_work *=
-w, int unused)
->                 conn_free_crypto(connection);
->                 mutex_unlock(&connection->resource->conf_update);
->
-> -               kvfree_rcu(old_conf);
-> +               kvfree_rcu_mightsleep(old_conf);
->         }
->
->         if (ns_max.susp_fen) {
-> --
-> 2.40.0.rc1.284.g88254d51c5-goog
->
+>   drivers/nvme/host/ioctl.c     | 79 ++++++++++++-----------------------
+>   drivers/nvme/host/multipath.c |  2 +-
+>   drivers/nvme/host/nvme.h      |  2 -
+>   3 files changed, 28 insertions(+), 55 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+> index 723e7d5b778f2..369e8519b87a2 100644
+> --- a/drivers/nvme/host/ioctl.c
+> +++ b/drivers/nvme/host/ioctl.c
+> @@ -503,7 +503,6 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+>   {
+>   	struct io_uring_cmd *ioucmd = req->end_io_data;
+>   	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+> -	void *cookie = READ_ONCE(ioucmd->cookie);
+>   
+>   	req->bio = pdu->bio;
+>   	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
+> @@ -516,9 +515,10 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+>   	 * For iopoll, complete it directly.
+>   	 * Otherwise, move the completion to task work.
+>   	 */
+> -	if (cookie != NULL && blk_rq_is_poll(req))
+> +	if (blk_rq_is_poll(req)) {
+> +		WRITE_ONCE(ioucmd->cookie, NULL);
+>   		nvme_uring_task_cb(ioucmd);
+> -	else
+> +	} else
+>   		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
+>   
+>   	return RQ_END_IO_FREE;
+> @@ -529,7 +529,6 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
+>   {
+>   	struct io_uring_cmd *ioucmd = req->end_io_data;
+>   	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+> -	void *cookie = READ_ONCE(ioucmd->cookie);
+>   
+>   	req->bio = pdu->bio;
+>   	pdu->req = req;
+> @@ -538,9 +537,10 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
+>   	 * For iopoll, complete it directly.
+>   	 * Otherwise, move the completion to task work.
+>   	 */
+> -	if (cookie != NULL && blk_rq_is_poll(req))
+> +	if (blk_rq_is_poll(req)) {
+> +		WRITE_ONCE(ioucmd->cookie, NULL);
+>   		nvme_uring_task_meta_cb(ioucmd);
+> -	else
+> +	} else
+>   		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
+>   
+>   	return RQ_END_IO_NONE;
+> @@ -597,7 +597,6 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+>   	if (issue_flags & IO_URING_F_IOPOLL)
+>   		rq_flags |= REQ_POLLED;
+>   
+> -retry:
+>   	req = nvme_alloc_user_request(q, &c, rq_flags, blk_flags);
+>   	if (IS_ERR(req))
+>   		return PTR_ERR(req);
+> @@ -611,17 +610,9 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+>   			return ret;
+>   	}
+>   
+> -	if (issue_flags & IO_URING_F_IOPOLL && rq_flags & REQ_POLLED) {
+> -		if (unlikely(!req->bio)) {
+> -			/* we can't poll this, so alloc regular req instead */
+> -			blk_mq_free_request(req);
+> -			rq_flags &= ~REQ_POLLED;
+> -			goto retry;
+> -		} else {
+> -			WRITE_ONCE(ioucmd->cookie, req->bio);
+> -			req->bio->bi_opf |= REQ_POLLED;
+> -		}
+> -	}
+> +	if (blk_rq_is_poll(req))
+> +		WRITE_ONCE(ioucmd->cookie, req);
+
+Why aren't we always setting the cookie to point at the req?
