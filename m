@@ -2,110 +2,175 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0058C6FD1C
-	for <linux-block@archiver.kernel.org>; Sun, 26 Mar 2023 09:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA547C6FD1C
+	for <linux-block@archiver.kernel.org>; Sun, 26 Mar 2023 12:27:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229763AbjCZJJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Mar 2023 05:09:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36044 "EHLO
+        id S231211AbjCZM1X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Mar 2023 08:27:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjCZJJ0 (ORCPT
+        with ESMTP id S229483AbjCZM1X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Mar 2023 05:09:26 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A949032;
-        Sun, 26 Mar 2023 02:09:24 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id t10so24117544edd.12;
-        Sun, 26 Mar 2023 02:09:24 -0700 (PDT)
+        Sun, 26 Mar 2023 08:27:23 -0400
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F1B4C39
+        for <linux-block@vger.kernel.org>; Sun, 26 Mar 2023 05:27:22 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id cf7so7268015ybb.5
+        for <linux-block@vger.kernel.org>; Sun, 26 Mar 2023 05:27:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679821763;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CWz+kM84jjmBibW+1U4/kJJyzwolvMd6Soxllt73RkQ=;
-        b=TezzMXLQPDFEMNmCPeVOOce+gMuzyTStYHZN3wFEC+H1b1dSc+orudckLqx/Rrlyr3
-         DB33/sl9ZKdeUPlwgWB3IQBuZg3r8H4nis4C5LpnwT5fFqo9LmJGukEpW4p0dNafy8R2
-         W5VpGKgRgkuw5qeWA4Mf8sBzDwAHxZCWfmlVgQWc3J76yeP/wyhehtCMilfia9Ril5Uy
-         qIpxSa6lLcFW8N5WqPtu/T5aHs/nwuACRLf159bmcZQAWSXQczuAzk3JkW53wtpsSndR
-         fM0oupziVdJ/4F8VEoXemYQuFmMxMau/GBIXnNXrz+uwGnWVWlG3E37JT5f6qn29f+Ui
-         x9Ng==
+        d=joelfernandes.org; s=google; t=1679833641;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WuEsxrDbF/inLpKrbuVfZ5izqyJJinZBdUjdf7O5LUM=;
+        b=V2gHZHslEdu3xrIj9mtxPLaMLoocSdj5ImvyU4v+44pm9nVKNP/zYL1Dg2eieY2dxp
+         onkNUDhH4aQXyS5ed0T6dBP1v4bMpWcxzSnhyhvzCY/L15JMWN/KJCqFpN/dfiykJfAB
+         9cWNgbjm86N+e4qqv1IeChEjzj55EXToH5TPQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679821763;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CWz+kM84jjmBibW+1U4/kJJyzwolvMd6Soxllt73RkQ=;
-        b=BrgZzZfvZiN7J0YCMxazOeJr3d1bBufjNazguk2sGiLBb//B1/apPNKztI3M1kP1tN
-         KZJD1tEBId3zorVdKPLkoj4pUoowIrLw1ZMLvfmY0jgO8tq6LF39XLY3DdMhI0Sbe4Zt
-         UH5pvR7xCJ1rMkRc3xmmGIrWJsLzAKKDpYgQJabLglpTtobHTdpIGkoxHS2KcFoDYc2i
-         K8qpKfKrZEbhhpgOZdw0e+Az3+GEMCq2DbeHWP3ga3USkGoa/p3c7d80dXH3zDI4C/Kk
-         x7bdGUA1FZf9DUVaGapQ0yn/mtIqa5Q+E5A4cGlncHVVcLn4zhq8dcduSBLSYqcdCtiB
-         bUug==
-X-Gm-Message-State: AAQBX9fT9ZKFHBfs7LReF7YE5o1GjTnZcAWuWsInE9bPciul1JTMFO09
-        1sPyMilvLOgLICu3jeKw4+4mfncsJWCvk+9hbVA=
-X-Google-Smtp-Source: AKy350ZutC1LFLhZ+pc81GNrJON1TxYnwf9GxzFCzarL3co8kVdNkLqvXn/fWnnmVzf5lZ8GhqqbcQz3W9Fa12CHllQ=
-X-Received: by 2002:a50:f692:0:b0:4fc:fc86:5f76 with SMTP id
- d18-20020a50f692000000b004fcfc865f76mr4126134edn.6.1679821763185; Sun, 26 Mar
- 2023 02:09:23 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679833641;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WuEsxrDbF/inLpKrbuVfZ5izqyJJinZBdUjdf7O5LUM=;
+        b=WZI8fTXUtpokL06sZ6TvsUwLqICetgrYbFUBZT6eRM66+3Y4CxG8deFOfvIJxMiocI
+         suy8kwuy3gXgK3Gia50S+JE3JO3MhNTXhxCkj7ysKfXCmUkMlc+zLPXfevKwEMrZJnDz
+         fyLHT8Flw5nfhjYWxb/uO7OBHYFMb/zbnHPiDZiZGjipa9DZy+YlmpfgnH2l3G0tPh8x
+         spNShiuzChv6NC+uo25AWUYX77BGF20/U90iBNmnjh/DOLoch+6RQ4O6yM1IEZPABb5x
+         VxAsU5yR8GdEVznlpE242ChAVk4+V/J3M7IWsmglTlu0cs6gGch/Z0c8cd5kOB07JuYX
+         PAzw==
+X-Gm-Message-State: AAQBX9c3ccB+wEWyAfo2qZAkYyr+uCYWbRlDLnYTfHLnoMCILhFu4cyU
+        Jmh685MPfTOZzGYfuAnHeCFMqx6P7KnqNx2bvqUPSQ==
+X-Google-Smtp-Source: AKy350Z7FAUAxqILc0KDv/Q2NcQmwgP5WIczo/cB3lR7Oy5nlhBvDO4RBmlXSkSRRW9Lr0SX2xoh8S28f15LfRwm9Xk=
+X-Received: by 2002:a05:6902:1108:b0:b6d:fc53:c5c0 with SMTP id
+ o8-20020a056902110800b00b6dfc53c5c0mr6998960ybu.1.1679833641143; Sun, 26 Mar
+ 2023 05:27:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230307224627.28011-1-linux@zary.sk> <202303181955.41922.linux@zary.sk>
- <d16b4b27-f1d3-bf05-e062-516e7c708fa2@omp.ru> <202303221310.44235.linux@zary.sk>
-In-Reply-To: <202303221310.44235.linux@zary.sk>
-From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Date:   Sun, 26 Mar 2023 10:08:47 +0100
-Message-ID: <CADVatmORsN4ZdOZ+u0AfUy320UV77PuNn7UiV0Kx1nRX03YJTQ@mail.gmail.com>
-Subject: Re: [PATCH 00/32] pata_parport-bpck6: rework bpck6 protocol driver
-To:     Ondrej Zary <linux@zary.sk>
-Cc:     Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
-        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+References: <20230315181902.4177819-1-joel@joelfernandes.org>
+In-Reply-To: <20230315181902.4177819-1-joel@joelfernandes.org>
+From:   Joel Fernandes <joel@joelfernandes.org>
+Date:   Sun, 26 Mar 2023 08:27:10 -0400
+Message-ID: <CAEXW_YQehT7Zj0G4nBj-0b+Ndq_FTxFzxQ-WYnBGJ=87wPBHYw@mail.gmail.com>
+Subject: Re: [PATCH v2 01/14] drbd: Rename kvfree_rcu() to kvfree_rcu_mightsleep()
+To:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     "Uladzislau Rezki (Sony)" <urezki@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 22 Mar 2023 at 12:11, Ondrej Zary <linux@zary.sk> wrote:
+On Wed, Mar 15, 2023 at 2:19=E2=80=AFPM Joel Fernandes (Google)
+<joel@joelfernandes.org> wrote:
 >
-> On Sunday 19 March 2023 21:02:43 Sergey Shtylyov wrote:
-> > On 3/18/23 9:55 PM, Ondrej Zary wrote:
-> >
-> > >>> This patch series simplifies bpck6 code, removing ppc6lnx.c file to match
-> > >>> the simplicity of other protocol drivers. It also converts the direct
-> > >>> port I/O access to paraport access functions. This conversion revealed that
-> > >>> there's no 8-bit and 16-bit EPP support in parport_pc so patch 11 implements
-> > >>> that.
-> > >>>
-> > >>> Tested with Backpack CD-RW 222011 and CD-RW 19350.
-> > >>>
-> > >>> Signed-off-by: Ondrej Zary <linux@zary.sk>
-> > >>> ---
-> > >>>  drivers/ata/pata_parport/bpck6.c   | 452 +++++++++++++++++++++++++++--------
-> > >>>  drivers/ata/pata_parport/ppc6lnx.c | 726 ---------------------------------------------------------
-> > >>>  drivers/parport/parport_pc.c       |  20 +-
-> > >>>  include/uapi/linux/parport.h       |   3 +
-> > >>>  4 files changed, 370 insertions(+), 831 deletions(-)
-> > >>
-> > >>    OK, it's finally clear I can't keep up with reviewing 32 patches posted
-> > >> at once...  Luckily, all those patches seem to be dealing with parallel port
-> > >> control), not the PATA control! Of course, when I volunteered to review the
-> > >> PATA driver patches, I didn't expect such patch volumes -- I mostly expected
-> > >> some odd fixes, not a massive driver rework... :-/
-> > >
-> > > So you're going to review the (P)ATA parts (if any) only.
-> >
-> >    I saw no PATA parts in this patcheset...
-> >
-> > > Maybe Sudip (as parport maintainer) could review the parallel port parts?
-> >
-> >    I have no objections! :-)
+> From: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
 >
-> Looks like Sudip does not care. What needs to be done so this can be merged?
+> The kvfree_rcu() macro's single-argument form is deprecated.  Therefore
+> switch to the new kvfree_rcu_mightsleep() variant. The goal is to
+> avoid accidental use of the single-argument forms, which can introduce
+> functionality bugs in atomic contexts and latency bugs in non-atomic
+> contexts.
+>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: Philipp Reisner <philipp.reisner@linbit.com>
+> Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-oops.. sorry. I missed it.
+Jens/Others, any chance for an Ack here?
 
+ - Joel
 
--- 
-Regards
-Sudip
+> Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
+> Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+> Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+> ---
+>  drivers/block/drbd/drbd_nl.c       | 6 +++---
+>  drivers/block/drbd/drbd_receiver.c | 4 ++--
+>  drivers/block/drbd/drbd_state.c    | 2 +-
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+> index 60757ac31701..f49f2a5282e1 100644
+> --- a/drivers/block/drbd/drbd_nl.c
+> +++ b/drivers/block/drbd/drbd_nl.c
+> @@ -1615,7 +1615,7 @@ int drbd_adm_disk_opts(struct sk_buff *skb, struct =
+genl_info *info)
+>                         drbd_send_sync_param(peer_device);
+>         }
+>
+> -       kvfree_rcu(old_disk_conf);
+> +       kvfree_rcu_mightsleep(old_disk_conf);
+>         kfree(old_plan);
+>         mod_timer(&device->request_timer, jiffies + HZ);
+>         goto success;
+> @@ -2446,7 +2446,7 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct g=
+enl_info *info)
+>
+>         mutex_unlock(&connection->resource->conf_update);
+>         mutex_unlock(&connection->data.mutex);
+> -       kvfree_rcu(old_net_conf);
+> +       kvfree_rcu_mightsleep(old_net_conf);
+>
+>         if (connection->cstate >=3D C_WF_REPORT_PARAMS) {
+>                 struct drbd_peer_device *peer_device;
+> @@ -2860,7 +2860,7 @@ int drbd_adm_resize(struct sk_buff *skb, struct gen=
+l_info *info)
+>                 new_disk_conf->disk_size =3D (sector_t)rs.resize_size;
+>                 rcu_assign_pointer(device->ldev->disk_conf, new_disk_conf=
+);
+>                 mutex_unlock(&device->resource->conf_update);
+> -               kvfree_rcu(old_disk_conf);
+> +               kvfree_rcu_mightsleep(old_disk_conf);
+>                 new_disk_conf =3D NULL;
+>         }
+>
+> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd=
+_receiver.c
+> index 757f4692b5bd..e197b2a465d2 100644
+> --- a/drivers/block/drbd/drbd_receiver.c
+> +++ b/drivers/block/drbd/drbd_receiver.c
+> @@ -3759,7 +3759,7 @@ static int receive_protocol(struct drbd_connection =
+*connection, struct packet_in
+>                 drbd_info(connection, "peer data-integrity-alg: %s\n",
+>                           integrity_alg[0] ? integrity_alg : "(none)");
+>
+> -       kvfree_rcu(old_net_conf);
+> +       kvfree_rcu_mightsleep(old_net_conf);
+>         return 0;
+>
+>  disconnect_rcu_unlock:
+> @@ -4127,7 +4127,7 @@ static int receive_sizes(struct drbd_connection *co=
+nnection, struct packet_info
+>
+>                         rcu_assign_pointer(device->ldev->disk_conf, new_d=
+isk_conf);
+>                         mutex_unlock(&connection->resource->conf_update);
+> -                       kvfree_rcu(old_disk_conf);
+> +                       kvfree_rcu_mightsleep(old_disk_conf);
+>
+>                         drbd_info(device, "Peer sets u_size to %lu sector=
+s (old: %lu)\n",
+>                                  (unsigned long)p_usize, (unsigned long)m=
+y_usize);
+> diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_st=
+ate.c
+> index 75d13ea0024f..2aeea295fa28 100644
+> --- a/drivers/block/drbd/drbd_state.c
+> +++ b/drivers/block/drbd/drbd_state.c
+> @@ -2071,7 +2071,7 @@ static int w_after_conn_state_ch(struct drbd_work *=
+w, int unused)
+>                 conn_free_crypto(connection);
+>                 mutex_unlock(&connection->resource->conf_update);
+>
+> -               kvfree_rcu(old_conf);
+> +               kvfree_rcu_mightsleep(old_conf);
+>         }
+>
+>         if (ns_max.susp_fen) {
+> --
+> 2.40.0.rc1.284.g88254d51c5-goog
+>
