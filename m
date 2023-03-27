@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED78C76195
-	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 23:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D49CC6FD1D
+	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 23:09:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbjC0XCE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Mar 2023 19:02:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49284 "EHLO
+        id S230224AbjC0XJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Mar 2023 19:09:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbjC0XCE (ORCPT
+        with ESMTP id S229940AbjC0XJB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2023 19:02:04 -0400
+        Mon, 27 Mar 2023 19:09:01 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5608D1FF3;
-        Mon, 27 Mar 2023 16:02:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 712D3213B;
+        Mon, 27 Mar 2023 16:08:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=pX5mbDI4mPib0i+fafxYiU/1Pb3MyNg+wGAHRkR1vfY=; b=wrZBwDV5pKDLzuuoVkC1O+gwaQ
-        OLlh83Ze53CQKJNqbfyLOXpUfro7/eBuk691x6bbcqd5C2J9xgBavy7Zr8HanfT8uM3W5ikJp/x5q
-        UxCnNFBTeixwr4CXYFaySZnaD0wVoR7OltZ6Plt1AINHfkoqsMf2nr/owaY+XfivpYFZHhucnua8U
-        aSnoIh9IL79691Bsgxw3wO/Q0ufduFssfD0OVtSMInWwrpAfd4E9HCvrENz7j+3lsPs9TIcNPG0I+
-        DU2KNEq82Ebf787KS8m/kwXtJjsMiISV2JUWomfQfrSIDxBNZYIh0gv5ywUeSwxzE0pD20B1CyPdA
-        ySJR2QQQ==;
+        bh=oMDBWqWOlIU0sHD7bRFINkPbOz4tKP/jx+uoy8N2eAk=; b=jq9AhNHYbXWbeJb64OED8KLPrC
+        CH3w8f30Va2EwWmHyytVUhjFeQwtwxGhO2OTQCWhnKTB5oYVu9fnp3+shk0u/Xxc5kyYcYIdgq/fI
+        OcwtxGs7LV71vbhmZVqEaNOhnFlUVRZqCCJUG82hKMmVjrsExdV4z3IWMOnpcqDCtPOdTAmdYSg3H
+        NdH6CaS6dIpKihvKhO2n8uZecFGV93QVFqXRcpWjSkQ6ci/Qhnml2b9ZXmhxKOMTXVxugedYVJy+a
+        tfo4pi7gWtvbpkhJDEiP3htz1hltRoGMj220K07jyxRftTU+B6i+CvnEsD0Rnqc28qaYaGPVpCBXe
+        Kc+iJ3cg==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pgvqk-00Ccn0-0U;
-        Mon, 27 Mar 2023 23:02:02 +0000
-Date:   Mon, 27 Mar 2023 16:02:02 -0700
+        id 1pgvxM-00CdF7-2N;
+        Mon, 27 Mar 2023 23:08:52 +0000
+Date:   Mon, 27 Mar 2023 16:08:52 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     axboe@kernel.dk, sth@linux.ibm.com, hoeppner@linux.ibm.com,
@@ -37,42 +37,32 @@ Cc:     axboe@kernel.dk, sth@linux.ibm.com, hoeppner@linux.ibm.com,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] block: annotate bdev_disk_changed() deprecation with a
  symbol namespace
-Message-ID: <ZCIgavqUnw0Z3A3t@bombadil.infradead.org>
+Message-ID: <ZCIiBHyrzDoTJPXT@bombadil.infradead.org>
 References: <20230327184410.2881786-1-mcgrof@kernel.org>
  <ZCIVx2UNN8VAWYAH@infradead.org>
+ <ZCIgavqUnw0Z3A3t@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZCIVx2UNN8VAWYAH@infradead.org>
+In-Reply-To: <ZCIgavqUnw0Z3A3t@bombadil.infradead.org>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 03:16:39PM -0700, Christoph Hellwig wrote:
-> On Mon, Mar 27, 2023 at 11:44:10AM -0700, Luis Chamberlain wrote:
-> > Instead of relying on fragile documentation which can easily let us
-> > slip, use a symbol namespace to annotate which symbols should not be
-> > used by others.
+On Mon, Mar 27, 2023 at 04:02:02PM -0700, Luis Chamberlain wrote:
+> On Mon, Mar 27, 2023 at 03:16:39PM -0700, Christoph Hellwig wrote:
+> > What I'd really want is something like an
 > > 
-> > This ensures no other users pop up by mistake easily and provides
-> > us a with an easy vehicle to do the same with other routines should
-> > we need it later.
+> > EXPORT_SYMBOL_FOR(bdev_disk_changed, loop, CONFIG_BLK_DEV_LOOP);
+> > EXPORT_SYMBOL_FOR(bdev_disk_changed, dasd_kmod, CONFIG_DASD);
+> > 
+> > Which ensures that the symbol lookup only succeeds for loop.ko and
+> > dasd_kmod.ko, and that the export only happens if the relevant
+> > symbols are set.
 > 
-> I don't think deprecated really cuts it.  For these two drivers we
-> can't really get rid of the calls as it is part of their ABI.
+> I think that could be done, sure.
 
-Ah yes.
-
-> What I'd really want is something like an
-> 
-> EXPORT_SYMBOL_FOR(bdev_disk_changed, loop, CONFIG_BLK_DEV_LOOP);
-> EXPORT_SYMBOL_FOR(bdev_disk_changed, dasd_kmod, CONFIG_DASD);
-> 
-> Which ensures that the symbol lookup only succeeds for loop.ko and
-> dasd_kmod.ko, and that the export only happens if the relevant
-> symbols are set.
-
-I think that could be done, sure.
+BTW is anyone aware of similar exports which are stuck in this way?
 
   Luis
