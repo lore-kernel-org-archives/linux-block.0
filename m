@@ -2,155 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3571C761A6
-	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 16:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 556A5C6FD1D
+	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 17:21:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbjC0QFF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Mar 2023 12:05:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39560 "EHLO
+        id S231960AbjC0RVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Mar 2023 13:21:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjC0QFE (ORCPT
+        with ESMTP id S230289AbjC0RVX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2023 12:05:04 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B18BF;
-        Mon, 27 Mar 2023 09:05:03 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id b20so38382337edd.1;
-        Mon, 27 Mar 2023 09:05:03 -0700 (PDT)
+        Mon, 27 Mar 2023 13:21:23 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2FC735A9
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 10:21:12 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id l12so9560470wrm.10
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 10:21:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679933102;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j2eNrnZLsC/sH8bLS1Gd4Au+GF568VY/ybvODVTAJAA=;
-        b=bDoL5S1ZgFx4UpAC0ek0FAoxVtZEPzhrh9PAhynArKTRR6vDQVnkINfV2+MWQeQ9Gq
-         ci3iV7xP9ysML9c7L08N+7jAEq8pkG1YvKcjk7EtW+F31wQhXJMFgSwbNZzQxv7/+6/k
-         qvJRM+7gTJuceDvUun+X9PT0Ta66mziFW1fwCEw1Lub4iImHgBHyseR7We0U2MX7iVr7
-         1jgnjfdW1ld72hlYsQGcIvS7I9BrDN6LIYhZ+Pyh3KMY4843giUVKvUGsEyMKxKPpp0d
-         bMoSGXi7s1cgWCBq7cDHeQrwIm4TbgOx8qvsQ+NJSJTJzsXGaVneuPoNc4cdxE+/UplJ
-         boWA==
+        d=gmail.com; s=20210112; t=1679937671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kW0nhN+MJjduSbj2eCKtTmFxk2OT8HS0PznhYbGtPTM=;
+        b=jMycVUhHVftLtI83DVEutydlCn4Rnjy9Zw94fQ3pLh9v4gAJGWCoGi4SGiGmIwFKXk
+         AILHsKgI4wZpR6OhN0kyNPL0nOGjZbIDSNFS8OIeHC/aB7fX4HelVmX9mhMnQOUr1ZoH
+         3fgKsevg5QltWFRp2UeUU/YJpQxPVoNigZM66A4gNYoAMkspuiM+txRy/CqBOxe/MXVl
+         BqbQ04AFVWwnKWnlqAbGme2wjb5oJbZyH6BgJgCqgVosWWM/G+/xEY32T4NUfeYW6eSC
+         NRUcwrq+s1euMyOcgH4sdLjptVFLZxrhIWJEd9o/UvHTuVO+cAjN5qsK/1il92lFeHLl
+         gmJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679933102;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j2eNrnZLsC/sH8bLS1Gd4Au+GF568VY/ybvODVTAJAA=;
-        b=57xqBpYllIdmYPFQXr7xH4y8Ezw+pvrVuTRdQ1iDC2VDRpBYmEmP6Ntby9pSOoznOE
-         ogRjuQPwVIdy5wTkicOw55Gf1uUwz6WwFa79HpMk2XJ4eFi4jAorl2CZUVlGVWLaRSeX
-         d5y558jYf3IRKQGdqcg8/SNZtIdrRl9dLttlkFwAnUOlM3nbJy+99/XLa5L2KfZAwpEF
-         NCE/R+PJ4hslp1kWJ4oaOHGoN1vD0piG33UmqRubntGUrFR69oxRQ7Mj1PWgZuAJFLYI
-         4AvPVdHB68WghqBNwNOiTEAC3NKoNYNqLs1sbhG3eMJhNFaEgYFYT6bJ6kVJnNg+GXPc
-         vlNQ==
-X-Gm-Message-State: AAQBX9eGADd4VgmwUjX/VnrEtCO/T4FXayXAiC+Coo//ZdCUon1g+yWc
-        cDvvHn0aq0pyJPN/yh263DQ=
-X-Google-Smtp-Source: AKy350YE+6n8JJYVVf7QDhetMimnyyNnluuj62XuXTw+L0IqYQc7JwnMPdfi72GokouzyrhMvVzfyQ==
-X-Received: by 2002:a05:6402:184f:b0:4fc:494a:98f5 with SMTP id v15-20020a056402184f00b004fc494a98f5mr14382724edy.29.1679933101942;
-        Mon, 27 Mar 2023 09:05:01 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:310::2eef? ([2620:10d:c092:600::2:e437])
-        by smtp.gmail.com with ESMTPSA id a25-20020a50c319000000b004bc15a440f1sm14945021edb.78.2023.03.27.09.05.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Mar 2023 09:05:01 -0700 (PDT)
-Message-ID: <5160ca98-af64-5916-53f6-b8ed39c9a1a6@gmail.com>
-Date:   Mon, 27 Mar 2023 17:04:01 +0100
+        d=1e100.net; s=20210112; t=1679937671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kW0nhN+MJjduSbj2eCKtTmFxk2OT8HS0PznhYbGtPTM=;
+        b=sf6t8dBV8+/JmaQ04ePIItyyI2A8VmTS2lF7IfiiXAPwVtv2zZKJOscI+S0/ZJCpc9
+         whhm+tp/XHJFe7U2+jgGUZGKDCugRoOtnSRlDKcbpr7DlVSezFUyRr5t4gto88rEOuGQ
+         MCOPDgWrbYPhFZ6vEcD4/jWE1Br++s13wNLYyOiJ+o1U14W+dk5Ww/RFbZ1P+6TlyDaS
+         ///eOWs1cMZ2DQL7tu2V5ovdGPhSdaJU8JsN3aGRl2vm0vEbiuWRIdAzAocMc4NJKmP3
+         3wsgClntHluZtQR6ouOHuMsfWHTXhaJEfCP5IKOAGsgTloB0l9ExN5NNJSSdZW0IKjHY
+         tQgw==
+X-Gm-Message-State: AAQBX9chZZ9Nf0elMv8S3zBbiQo1EZxktEl8JoSGg3bJn3ZlxKxW48On
+        GTEvmP7KcW0NbxA5hf4TU1Da1sfgvFct6YrpkWQ=
+X-Google-Smtp-Source: AKy350a4utJV1mHAd+//ciS/7jPRA+GMjsq8cxwf+CqIVJ08XiMWLibsFdiv8E24YJJYOsY0uLVUfAu06bJvj7678E4=
+X-Received: by 2002:a5d:5691:0:b0:2cf:efad:9c23 with SMTP id
+ f17-20020a5d5691000000b002cfefad9c23mr2029558wrv.14.1679937671209; Mon, 27
+ Mar 2023 10:21:11 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230314125727.1731233-1-ming.lei@redhat.com>
- <fd30b561-86dd-5061-714f-e46058f7079f@linux.alibaba.com>
- <845ff5cb-b0ff-8ea0-e2ff-a5b216966dfb@gmail.com>
- <ded5b188-0bcd-3003-353e-b31608e58be4@linux.alibaba.com>
-Content-Language: en-US
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ded5b188-0bcd-3003-353e-b31608e58be4@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230324212803.1837554-1-kbusch@meta.com> <CGME20230324213124epcas5p331ea3c2e2a05ec6a6825e719e47d2427@epcas5p3.samsung.com>
+ <20230324212803.1837554-2-kbusch@meta.com> <20230327135810.GA8405@green5> <ZCG0O6RdlA/sUd7C@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <ZCG0O6RdlA/sUd7C@kbusch-mbp.dhcp.thefacebook.com>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Mon, 27 Mar 2023 22:50:47 +0530
+Message-ID: <CA+1E3rK2h9gyy26v1NmwTFtUsCwMkc1DgkDsCFME+HjZJPn5Hg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] nvme: use blk-mq polling for uring commands
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Keith Busch <kbusch@meta.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        axboe@kernel.dk, hch@lst.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/21/23 09:17, Ziyang Zhang wrote:
-> On 2023/3/19 00:23, Pavel Begunkov wrote:
->> On 3/16/23 03:13, Xiaoguang Wang wrote:
->>>> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
->>>> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
->>>> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
->>>> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
->>>> and its ->issue() can retrieve/import buffer from master request's
->>>> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
->>>> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
->>>> submits slave OP just like normal OP issued from userspace, that said,
->>>> SQE order is kept, and batching handling is done too.
->>> Thanks for this great work, seems that we're now in the right direction
->>> to support ublk zero copy, I believe this feature will improve io throughput
->>> greatly and reduce ublk's cpu resource usage.
->>>
->>> I have gone through your 2th patch, and have some little concerns here:
->>> Say we have one ublk loop target device, but it has 4 backend files,
->>> every file will carry 25% of device capacity and it's implemented in stripped
->>> way, then for every io request, current implementation will need issed 4
->>> fused_cmd, right? 4 slave sqes are necessary, but it would be better to
->>> have just one master sqe, so I wonder whether we can have another
->>> method. The key point is to let io_uring support register various kernel
->>> memory objects, which come from kernel, such as ITER_BVEC or
->>> ITER_KVEC. so how about below actions:
->>> 1. add a new infrastructure in io_uring, which will support to register
->>> various kernel memory objects in it, this new infrastructure could be
->>> maintained in a xarray structure, every memory objects in it will have
->>> a unique id. This registration could be done in a ublk uring cmd, io_uring
->>> offers registration interface.
->>> 2. then any sqe can use these memory objects freely, so long as it
->>> passes above unique id in sqe properly.
->>> Above are just rough ideas, just for your reference.
->>
->> It precisely hints on what I proposed a bit earlier, that makes
->> me not alone thinking that it's a good idea to have a design allowing
->> 1) multiple ops using a buffer and 2) to limiting it to one single
->> submission because the userspace might want to preprocess a part
->> of the data, multiplex it or on the opposite divide. I was mostly
->> coming from non ublk cases, and one example would be such zc recv,
->> parsing the app level headers and redirecting the rest of the data
->> somewhere.
->>
->> I haven't got a chance to work on it but will return to it in
->> a week. The discussion was here:
->>
->> https://lore.kernel.org/all/ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com/
->>
-> 
-> Hi Pavel and all,
-> 
-> I think it is a good idea to register some kernel objects(such as bvec)
-> in io_uring and return a cookie(such as buf_idx) for READ/WRITE/SEND/RECV sqes.
-> There are some ways to register user's buffer such as IORING_OP_PROVIDE_BUFFERS
-> and IORING_REGISTER_PBUF_RING but there is not a way to register kernel buffer(bvec).
-> 
-> I do not think reusing splice is a good idea because splice should run in io-wq.
+On Mon, Mar 27, 2023 at 8:59=E2=80=AFPM Keith Busch <kbusch@kernel.org> wro=
+te:
+>
+> On Mon, Mar 27, 2023 at 07:28:10PM +0530, Kanchan Joshi wrote:
+> > > -   }
+> > > +   if (blk_rq_is_poll(req))
+> > > +           WRITE_ONCE(ioucmd->cookie, req);
+> >
+> > blk_rq_is_poll(req) warns for null "req->bio" and returns false if that
+> > is the case. That defeats one of the purpose of the series i.e. poll on
+> > no-payload commands such as flush/write-zeroes.
+>
+> Sorry, I'm sending out various patches piecemeal. This patch here depends=
+ on
+> this one sent out earlier:
+>
+>   https://lore.kernel.org/linux-block/3f670ca7-908d-db55-3da1-4090f116005=
+d@nvidia.com/T/#mbc6174ce3f9dbae38ae2ca646518be4bf105f6e4
 
-The reason why I disabled inline splice execution is because do_splice()
-and below the stack doesn't support nowait well enough, which is not a
-problem when we hook directly under the ->splice_read() callback and
-operate only with one file at a time at the io_uring level.
+That clears it up, thanks.
 
+> > >     rcu_read_lock();
+> > > -   bio =3D READ_ONCE(ioucmd->cookie);
+> > > -   ns =3D container_of(file_inode(ioucmd->file)->i_cdev,
+> > > -                   struct nvme_ns, cdev);
+> > > -   q =3D ns->queue;
+> > > -   if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio && bio->bi_=
+bdev)
+> > > -           ret =3D bio_poll(bio, iob, poll_flags);
+> > > +   req =3D READ_ONCE(ioucmd->cookie);
+> > > +   if (req) {
+> >
+> > This is risky. We are not sure if the cookie is actually "req" at this
+> > moment.
+>
+> What else could it be? It's either a real request from a polled hctx tag,=
+ or
+> NULL at this point.
 
-> If we have a big sq depth there may be lots of io-wqs. Then lots of context switch
-> may lower the IO performance especially for small IO size.
-> 
-> Here are some rough ideas:
-> (1) design a new OPCODE such as IORING_REGISTER_KOBJ to register kernel objects in
->      io_uring or
-> (2) reuse uring-cmd. We can send uring-cmd to drivers(opcode may be CMD_REGISTER_KBUF)
->      and let drivers call io_uring_provide_kbuf() to register kbuf. io_uring_provide_kbuf()
->      is a new function provided by io_uring for drivers.
-> (3) let the driver call io_uring_provide_kbuf() directly. For ublk, this function is called
->      before io_uring_cmd_done().
+It can also be a function pointer that gets assigned on irq-driven completi=
+on.
+See the "struct io_uring_cmd" - we are tight on cacheline, so cookie
+and task_work_cb share the storage.
 
--- 
-Pavel Begunkov
+> It's safe to check the cookie like this and rely on its contents.
+Hence not safe. Please try running this without poll-queues (at nvme
+level), you'll see failures.
