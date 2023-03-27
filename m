@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E11DC76195
-	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 20:14:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7FEC76195
+	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 20:14:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232329AbjC0UOZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Mar 2023 16:14:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39210 "EHLO
+        id S232479AbjC0UO2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Mar 2023 16:14:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232300AbjC0UOZ (ORCPT
+        with ESMTP id S232244AbjC0UO0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2023 16:14:25 -0400
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B77562100
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 13:13:37 -0700 (PDT)
-Received: by mail-qt1-f179.google.com with SMTP id cn12so6457696qtb.8
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 13:13:37 -0700 (PDT)
+        Mon, 27 Mar 2023 16:14:26 -0400
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47E32D44
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 13:13:38 -0700 (PDT)
+Received: by mail-qt1-f175.google.com with SMTP id h16so3008089qtn.7
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 13:13:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679948017;
+        d=1e100.net; s=20210112; t=1679948018;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PwFipSc82OIEFDU8Id4luDtLttcFOJWrHTnvxSKayKA=;
-        b=mLYedgBLA5EDUqW7ZZnumufDDDQ2VubdDrhvPw5q6Bn2tQIbOgdzq3TkAaWUT6Fl3o
-         ykM7PgetnBwq69g9AeWkSgX/OTJhk402C7d/nUYOL0q3CFjIFYwELk9nYALHbNkXJwU0
-         dLSjrBpzn7lUaonMHTUwLlYCD8I+cwmf14URDVJsHkYGYgPG0khEHZyy1daGlgoLAbYU
-         eLqrwiZ7Dzp5Z5Y33AbT9A4tt5z+jhuTvgx9Sa/9oaeYr2EsWrtXnH6LsSiGbJ3E4PyJ
-         4dq5gn54iAzYpSfPOcv0L3iwRHLjq1w0dQ63tgxABttY858AeE/f9fbXSaj7LVuBJI9p
-         lmtg==
-X-Gm-Message-State: AO0yUKUjB17E4jmHYZe5ZdMg4ajbpWgtaLaN4ZTQCF0tf/w3WS/0AIer
-        SWO/MHDfxMkaDFRMseXqvjYw
-X-Google-Smtp-Source: AK7set/FmDxDs4w1j0e5PA+jX3MwJRj6+AOGAADIBIksQBRZljk9BW4Q1CQMIOVrgNxvcG4up41zZQ==
-X-Received: by 2002:a05:622a:c6:b0:3b6:2c3b:8c00 with SMTP id p6-20020a05622a00c600b003b62c3b8c00mr23270455qtw.66.1679948016921;
-        Mon, 27 Mar 2023 13:13:36 -0700 (PDT)
+        bh=RS/kygwvcLIIpB3MPZf9iFXCT5/ZQtXgTxSpDCvveGI=;
+        b=Eby2HfXlEZwdm1i4OAzfhOSjeJt7Y0jx0gYckqKKZmG5/B3xVphRqxPGzhlUmrj4oG
+         gZZLEm6gsK17W2sVUavdzXvebu6J2kauNB6x122vg+PwCljKNnxVayEiDQAL5AFF5HOn
+         7sFDm8Rs8gYdchOuxTLTQELIJIODN6BNqYLVm9fzxWxaHxKjqwM06/BCdGXCFXe4rlyp
+         Ax+c21clg9rSrxK543Cypf5t2+BFF/601AgiT42NjQXAf21ixlaLX2ftb+ytefTLhMUz
+         KWxi6/2eT/OFo299gj7VrKhe0SVjJnD53Fo4qhf/eEmmAlLUsqFd6UwuO6acE2VX9oHa
+         tBAg==
+X-Gm-Message-State: AO0yUKUYpIrrHu+1Mwv/WlSQVdwZQmFv6tgCuH4VF89UY7BhIIm7oAfa
+        88VjrsZkh5uZpk5tRon3GuWT
+X-Google-Smtp-Source: AK7set9gY+NOfaP2EPxXeQTEmFaMokIIbBlTZWwiEUt/LmRMwCYwgGOWnXBndmFgQ57KlO5UkZnONg==
+X-Received: by 2002:a05:622a:1d3:b0:3e3:87a2:e7f5 with SMTP id t19-20020a05622a01d300b003e387a2e7f5mr20519135qtw.11.1679948018387;
+        Mon, 27 Mar 2023 13:13:38 -0700 (PDT)
 Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id f8-20020a05620a280800b0074269db4699sm10226828qkp.46.2023.03.27.13.13.36
+        by smtp.gmail.com with ESMTPSA id 207-20020a3703d8000000b007468ec2e5dcsm10816449qkd.87.2023.03.27.13.13.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 13:13:36 -0700 (PDT)
+        Mon, 27 Mar 2023 13:13:38 -0700 (PDT)
 From:   Mike Snitzer <snitzer@kernel.org>
 To:     dm-devel@redhat.com
 Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, ejt@redhat.com,
         mpatocka@redhat.com, heinzm@redhat.com, nhuck@google.com,
         ebiggers@kernel.org, keescook@chromium.org, luomeng12@huawei.com,
         Mike Snitzer <snitzer@kernel.org>
-Subject: [dm-6.4 PATCH v3 18/20] dm bufio: intelligently size dm_buffer_cache's buffer_trees
-Date:   Mon, 27 Mar 2023 16:11:41 -0400
-Message-Id: <20230327201143.51026-19-snitzer@kernel.org>
+Subject: [dm-6.4 PATCH v3 19/20] dm bio prison v1: prepare to intelligently size dm_bio_prison's prison_regions
+Date:   Mon, 27 Mar 2023 16:11:42 -0400
+Message-Id: <20230327201143.51026-20-snitzer@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230327201143.51026-1-snitzer@kernel.org>
 References: <20230327201143.51026-1-snitzer@kernel.org>
@@ -56,78 +56,108 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Size the dm_buffer_cache's number of buffer_tree structs using
+Add num_locks member to dm_bio_prison struct and use it rather than
+the NR_LOCKS magic value (64).
+
+Next commit will size the dm_bio_prison's prison_regions according to
 dm_num_sharded_locks().
 
 Signed-off-by: Mike Snitzer <snitzer@kernel.org>
 ---
- drivers/md/dm-bufio.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ drivers/md/dm-bio-prison-v1.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
-index 2250799a70e4..7dc53f3d0739 100644
---- a/drivers/md/dm-bufio.c
-+++ b/drivers/md/dm-bufio.c
-@@ -21,6 +21,8 @@
- #include <linux/stacktrace.h>
- #include <linux/jump_label.h>
+diff --git a/drivers/md/dm-bio-prison-v1.c b/drivers/md/dm-bio-prison-v1.c
+index 78bb559b521c..a7930ad1878b 100644
+--- a/drivers/md/dm-bio-prison-v1.c
++++ b/drivers/md/dm-bio-prison-v1.c
+@@ -17,7 +17,6 @@
+ /*----------------------------------------------------------------*/
  
-+#include "dm.h"
-+
- #define DM_MSG_PREFIX "bufio"
+ #define NR_LOCKS 64
+-#define LOCK_MASK (NR_LOCKS - 1)
+ #define MIN_CELLS 1024
  
- /*
-@@ -379,8 +381,6 @@ struct dm_buffer {
-  * only enough to ensure get/put are threadsafe.
-  */
+ struct prison_region {
+@@ -26,8 +25,9 @@ struct prison_region {
+ } ____cacheline_aligned_in_smp;
  
--#define NR_LOCKS 64
--
- struct buffer_tree {
- 	struct rw_semaphore lock;
- 	struct rb_root root;
-@@ -393,7 +393,7 @@ struct dm_buffer_cache {
- 	 * on the locks.
- 	 */
- 	unsigned int num_locks;
--	struct buffer_tree trees[NR_LOCKS];
-+	struct buffer_tree trees[];
+ struct dm_bio_prison {
+-	struct prison_region regions[NR_LOCKS];
+ 	mempool_t cell_pool;
++	unsigned int num_locks;
++	struct prison_region regions[NR_LOCKS];
  };
  
- static inline unsigned int cache_index(sector_t block, unsigned int num_locks)
-@@ -976,7 +976,7 @@ struct dm_bufio_client {
- 	 */
- 	unsigned long oldest_buffer;
+ static struct kmem_cache *_cell_cache;
+@@ -46,8 +46,9 @@ struct dm_bio_prison *dm_bio_prison_create(void)
  
--	struct dm_buffer_cache cache;
-+	struct dm_buffer_cache cache; /* must be last member */
- };
+ 	if (!prison)
+ 		return NULL;
++	prison->num_locks = NR_LOCKS;
  
- static DEFINE_STATIC_KEY_FALSE(no_sleep_enabled);
-@@ -2422,6 +2422,7 @@ struct dm_bufio_client *dm_bufio_client_create(struct block_device *bdev, unsign
- 					       unsigned int flags)
+-	for (i = 0; i < NR_LOCKS; i++) {
++	for (i = 0; i < prison->num_locks; i++) {
+ 		spin_lock_init(&prison->regions[i].lock);
+ 		prison->regions[i].cell = RB_ROOT;
+ 	}
+@@ -115,9 +116,9 @@ static int cmp_keys(struct dm_cell_key *lhs,
+ 	return 0;
+ }
+ 
+-static unsigned lock_nr(struct dm_cell_key *key)
++static unsigned lock_nr(struct dm_cell_key *key, unsigned int num_locks)
+ {
+-	return (key->block_begin >> BIO_PRISON_MAX_RANGE_SHIFT) & LOCK_MASK;
++	return (key->block_begin >> BIO_PRISON_MAX_RANGE_SHIFT) & (num_locks - 1);
+ }
+ 
+ bool dm_cell_key_has_valid_range(struct dm_cell_key *key)
+@@ -176,7 +177,7 @@ static int bio_detain(struct dm_bio_prison *prison,
+ 		      struct dm_bio_prison_cell **cell_result)
  {
  	int r;
-+	unsigned int num_locks;
- 	struct dm_bufio_client *c;
- 	char slab_name[27];
+-	unsigned l = lock_nr(key);
++	unsigned l = lock_nr(key, prison->num_locks);
  
-@@ -2431,12 +2432,13 @@ struct dm_bufio_client *dm_bufio_client_create(struct block_device *bdev, unsign
- 		goto bad_client;
- 	}
+ 	spin_lock_irq(&prison->regions[l].lock);
+ 	r = __bio_detain(&prison->regions[l].cell, key, inmate, cell_prealloc, cell_result);
+@@ -224,7 +225,7 @@ void dm_cell_release(struct dm_bio_prison *prison,
+ 		     struct dm_bio_prison_cell *cell,
+ 		     struct bio_list *bios)
+ {
+-	unsigned l = lock_nr(&cell->key);
++	unsigned l = lock_nr(&cell->key, prison->num_locks);
  
--	c = kzalloc(sizeof(*c), GFP_KERNEL);
-+	num_locks = dm_num_sharded_locks();
-+	c = kzalloc(sizeof(*c) + (num_locks * sizeof(struct buffer_tree)), GFP_KERNEL);
- 	if (!c) {
- 		r = -ENOMEM;
- 		goto bad_client;
- 	}
--	cache_init(&c->cache, NR_LOCKS);
-+	cache_init(&c->cache, num_locks);
+ 	spin_lock_irq(&prison->regions[l].lock);
+ 	__cell_release(&prison->regions[l].cell, cell, bios);
+@@ -247,7 +248,7 @@ void dm_cell_release_no_holder(struct dm_bio_prison *prison,
+ 			       struct dm_bio_prison_cell *cell,
+ 			       struct bio_list *inmates)
+ {
+-	unsigned l = lock_nr(&cell->key);
++	unsigned l = lock_nr(&cell->key, prison->num_locks);
+ 	unsigned long flags;
  
- 	c->bdev = bdev;
- 	c->block_size = block_size;
+ 	spin_lock_irqsave(&prison->regions[l].lock, flags);
+@@ -277,7 +278,7 @@ void dm_cell_visit_release(struct dm_bio_prison *prison,
+ 			   void *context,
+ 			   struct dm_bio_prison_cell *cell)
+ {
+-	unsigned l = lock_nr(&cell->key);
++	unsigned l = lock_nr(&cell->key, prison->num_locks);
+ 	spin_lock_irq(&prison->regions[l].lock);
+ 	visit_fn(context, cell);
+ 	rb_erase(&cell->node, &prison->regions[l].cell);
+@@ -301,7 +302,7 @@ int dm_cell_promote_or_release(struct dm_bio_prison *prison,
+ 			       struct dm_bio_prison_cell *cell)
+ {
+ 	int r;
+-	unsigned l = lock_nr(&cell->key);
++	unsigned l = lock_nr(&cell->key, prison->num_locks);
+ 
+ 	spin_lock_irq(&prison->regions[l].lock);
+ 	r = __promote_or_release(&prison->regions[l].cell, cell);
 -- 
 2.40.0
 
