@@ -2,152 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91303C76195
-	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 07:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F393C761AF
+	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 12:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232132AbjC0HgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Mar 2023 03:36:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40420 "EHLO
+        id S232671AbjC0M2r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Mar 2023 08:28:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232574AbjC0HgL (ORCPT
+        with ESMTP id S232473AbjC0M2n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2023 03:36:11 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2053.outbound.protection.outlook.com [40.107.94.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6713640E3
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 00:35:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gnk4KyVvPvEJYOnabel8wWbx7A0VXOfIZN8FfLr+aJyc+qls14cGgOsBSBSLxggg4073KAQhb21nJ7Inqwqpq2UyjW6L6LGai5Dg0Xz4tZO/dF0y9hkW87SZ/kz0e05r2IimbyMf/4cUiK5vthjwZtF1DGYH1L6yw5k7mToNxROtMWK+V+7QgKgXgGwJcRA4RpBBfE0RCW3OHK5Lb28y0kpPniiQa5OpmcoSBDJIt+lmUhyg5cG9ZKfTvbEjH8cYfo/BQI5db6pf1FgmxQgUicuifIF+Ggr8ZOuCqWzhmnwzlkH60fPU7H6mGebvvEwppnhH4y9XAQZUMkwK7ZYD4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8RzIQL+w0ng/PFbNguEE4WF5LM7zr2O4ky6fPLVA9Sw=;
- b=NfVNwSYnfwXHIU2Im36HnkZB5ceArFXRhZllasCcMOVXOqfMf0aToj2Lu0SnxmKsy3DXWUyufj+3Sd4R9UBmJtVJDMpagIMqp5ChNL0f6/gCnun1AVcOVfRav/svPErLq3nrfFSSq+lBwetFcWvUXZZrFgeFKPT+oEvK+Cnadw52YhpOH2kGxb8OlN/vwtrzbvqNDl6Q/ygWTSHp9B6GXRK8ACnNP9t9DbbVVYZ8ppQk4QPf8uvXcaFO5pgaQb4gEcJuIvoS4KbX1PAYXqvbQ6KFR81QF8xV7eqr5eD3F67cG1TPCOTDAI0ymWnmDNOZWVvJEz0eRvtGYJyJxdb0og==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8RzIQL+w0ng/PFbNguEE4WF5LM7zr2O4ky6fPLVA9Sw=;
- b=gSL3Z8xKA5m4DA6T6EniVBOSEdq3j1AK6gTOPATnhlL1d3GblMAJMGCQI4fneHsRyie+fW71o4MkWp41bco8XFNE3aj0gvFH5/vrpNGBwc/QFN3xHxnaGKwyvHBcUqXqC5fU6ldo0fJzFUOc9ubfzGaWIoi0SBC4FC99tlz6niXByuwntqErnvVDMKf0kLcxReMKKt8w0qQ5yKtaaA3o3f/XwiVnWRrzqcy9MYGeslanP/UfQTG0nl/DAxw8H/rjGd0XRv7vKPm4b8e7Oypzh91h4IkjKySJ0MooLnR5x5tUQi3DUl1HvegRofjiaUnem62oeDFny/GOm3K0WP7V9g==
-Received: from DM6PR05CA0047.namprd05.prod.outlook.com (2603:10b6:5:335::16)
- by CH3PR12MB8236.namprd12.prod.outlook.com (2603:10b6:610:121::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.41; Mon, 27 Mar
- 2023 07:35:10 +0000
-Received: from DS1PEPF0000E640.namprd02.prod.outlook.com
- (2603:10b6:5:335:cafe::96) by DM6PR05CA0047.outlook.office365.com
- (2603:10b6:5:335::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.16 via Frontend
- Transport; Mon, 27 Mar 2023 07:35:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS1PEPF0000E640.mail.protection.outlook.com (10.167.17.202) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6178.30 via Frontend Transport; Mon, 27 Mar 2023 07:35:09 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 27 Mar 2023
- 00:34:57 -0700
-Received: from dev.nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 27 Mar
- 2023 00:34:56 -0700
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>
-CC:     <axboe@kernel.dk>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH 2/2] block: open code __blk_account_io_done()
-Date:   Mon, 27 Mar 2023 00:34:27 -0700
-Message-ID: <20230327073427.4403-3-kch@nvidia.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <20230327073427.4403-1-kch@nvidia.com>
-References: <20230327073427.4403-1-kch@nvidia.com>
+        Mon, 27 Mar 2023 08:28:43 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E85C3AA8
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 05:28:41 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id r11so8587350wrr.12
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 05:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112; t=1679920120;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7JE7QdvKaZYNiC+EHD6Zp12m/upgFyEAxrLdJhc4mQQ=;
+        b=2L0cR5VE2NFhVPykwsr4iw3GlHlZuOz/yTvn7XLSW0BbgbuceoOqdTYO3ba2irsviG
+         tqODrs0635EEPHYkxxMW6IP5tFr+qNcFFuZsCaEN5jSFRvtzh4aodQEruC0iH7w8RGPf
+         w4v4HSAzC4/lTVdvhrdGUAHvQLybaEoXo0jQSluLK4+n8sBIGulmpBtWxlhiETyPS6+9
+         FDxT8anFyaMOG+pEsCtl34lHodYnMqdtqWKoNYT4DA+1PTHED3jOL4KcEavojhBrKQDM
+         3RkwnlBekLln7xj7/MPlqU+ZeUa//7ckmCFfRFueD1q8Opy3xng9vUWcSqI/5Jq09eFX
+         xBYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679920120;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7JE7QdvKaZYNiC+EHD6Zp12m/upgFyEAxrLdJhc4mQQ=;
+        b=cPcBSPTPT5VTFSUiInzM1PXDylKNziZOBE/XbBVhNc75w/k/fyywknfeXebQerJDP9
+         4DXjRw/lPT4WZwiim/Bx5iw7xLYBH8NKPB7d3+O+uBq1pktLsklLzeGU5oEr+PMW6C02
+         xQR28424yRMzRggC/mLdo2By5jImFmn6mq/0iIqoT4UWioERdj32DOVLRorbKN2SimQd
+         DGPmyFa/IDVP04OikE1LXv/KtwcLjspsdOiDGHXc/hmJVJMfLFXJ9Kb9dpdjw8VHvpEq
+         bDxdM3Z8+Y1EgCz8Oh69ftUMRX8a/Fh6EYAj/LLDZ0swwbBGZBqlMyXVb+/IXGWnlSaa
+         Xz+A==
+X-Gm-Message-State: AAQBX9cLSNIXq76KwYFhvqvHtStOYAauc+id1VvGEb7VnZ3bXKd6TH1l
+        foLJEoUzblZadTKtgglhny63yg==
+X-Google-Smtp-Source: AKy350aYLU0BuXDE6SXKbUGRw51RJogCMJNwzIn8Anvk+Et3prniahCnvNWUrpjPpBnsQ7XeEp0+nQ==
+X-Received: by 2002:a5d:6a87:0:b0:2d0:c73d:ef2a with SMTP id s7-20020a5d6a87000000b002d0c73def2amr9184389wru.24.1679920119730;
+        Mon, 27 Mar 2023 05:28:39 -0700 (PDT)
+Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id t13-20020adfe10d000000b002db1b66ea8fsm11525226wrz.57.2023.03.27.05.28.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Mar 2023 05:28:38 -0700 (PDT)
+Message-ID: <a989f01e-79a9-44a4-3603-ba4eeeb86dea@linbit.com>
+Date:   Mon, 27 Mar 2023 14:28:37 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH resent] drbd: Fix exception handling in
+ nla_put_drbd_cfg_context()
+To:     Markus Elfring <Markus.Elfring@web.de>
+Cc:     cocci@inria.fr, LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>
+References: <f9303bdc-b1a7-be5e-56c6-dfa8232b8b55@web.de>
+ <8d193937-532f-959f-9b84-d911984508aa@web.de>
+ <941709b5-d940-42c9-5f31-7ed56e3e6151@web.de>
+Content-Language: en-US
+From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+In-Reply-To: <941709b5-d940-42c9-5f31-7ed56e3e6151@web.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E640:EE_|CH3PR12MB8236:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65e0596f-ed6f-4c83-7901-08db2e95cb5f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1hYUCh5oXMx1HJe6MNhQzjxrHe1o2C7bezwFQXkTzSxSWm3Hp3XlP7tB3jtz6baVLPeHFWWCPHo/rCUttKHguNbYnfPNCJ+TjIxzZIL0pGyShZKakMAiGCwgomxPM8FUYSQT8+Kaw3hQ8DGFxR7ZeGsUTkHFO+FLXn27ZxBXNICjPDR50dmyx10i5yEtnBTQ1/Y9hckNehmcxWorhnJ6mdiPcnrFL5pXATZrEnFZw8xALAbvMHqSNNEvmjJd6twWeYWznz+d2QqQGDJ47OVuiDWGy4Rm2cGuHFA7dUHPZ5aGHHgcVq9NO4DhAy1SLOXB9nj6DWVR96vOizlEgY+tpVXzFa9k7of4Qx0uyIKWN48mAem62vKc3M2NmHsfO4QZwx2Fw20aT3aEOUKwem2LT2IIMgjroE3akc+7r96+ZN5M/awvVpv+aNt7fmQyFHmj7hfULx9cO+ta4VikVudnH8eOrvT+bwLnDBLnUnuVlyhQXXxz1MT/n/sDeQPF9mhsWWtotc27HlU4Cj9X/62DQv6Ljg1q2fzU+oURCB06TWyh7qt1+qGELkRIepU0Wzth/hbl3zuWVSlcQFUqrb0Pzk3UpvhWPOe6yrvPlU/KQPee1QlGTWjMgELB5RObDPoTDnMbSLeBf8/0gEsQYmTJtb12095t9ggJKkwywV7buPQriqzIn5aF4pSD5Ge4T7pghzkRmV8LNUUeMwM1/t8AHYTFbOsJ7datf4evbMUYhR6eXltE8k3FtvvO8X/X+HuB
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(136003)(346002)(376002)(451199021)(46966006)(40470700004)(36840700001)(107886003)(6666004)(356005)(2616005)(7696005)(40460700003)(40480700001)(426003)(47076005)(70586007)(70206006)(4326008)(8676002)(82310400005)(82740400003)(41300700001)(316002)(54906003)(186003)(36756003)(16526019)(478600001)(36860700001)(336012)(83380400001)(26005)(6916009)(2906002)(8936002)(7636003)(5660300002)(1076003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2023 07:35:09.8374
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65e0596f-ed6f-4c83-7901-08db2e95cb5f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E640.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8236
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is only one caller for __blk_account_io_done(), the function
-is small enough to fit in its caller blk_account_io_done().
+Am 25.03.23 um 15:07 schrieb Markus Elfring:
+> Date: Fri, 17 Mar 2023 18:32:05 +0100
+> 
+> The label “nla_put_failure” was used to jump to another pointer check
+> despite of the detail in the implementation of the function
+> “nla_put_drbd_cfg_context” that it was determined already that
+> the corresponding variable contained a null pointer.
+> 
+> * Thus return directly after a call of the function
+>   “nla_nest_start_noflag” failed.
+> 
+> * Delete an extra pointer check which became unnecessary
+>   with this refactoring.
+> 
+> 
+> This issue was detected by using the Coccinelle software.
+> 
+> Fixes: 543cc10b4cc5c60aa9fcc62705ccfb9998bf4697 ("drbd: drbd_adm_get_status needs to show some more detail")
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  drivers/block/drbd/drbd_nl.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+> index f49f2a5282e1..9cb947127472 100644
+> --- a/drivers/block/drbd/drbd_nl.c
+> +++ b/drivers/block/drbd/drbd_nl.c
+> @@ -3187,7 +3187,7 @@ static int nla_put_drbd_cfg_context(struct sk_buff *skb,
+>  	struct nlattr *nla;
+>  	nla = nla_nest_start_noflag(skb, DRBD_NLA_CFG_CONTEXT);
+>  	if (!nla)
+> -		goto nla_put_failure;
+> +		return -EMSGSIZE;
+>  	if (device &&
+>  	    nla_put_u32(skb, T_ctx_volume, device->vnr))
+>  		goto nla_put_failure;
+> @@ -3205,8 +3205,7 @@ static int nla_put_drbd_cfg_context(struct sk_buff *skb,
+>  	return 0;
+> 
+>  nla_put_failure:
+> -	if (nla)
+> -		nla_nest_cancel(skb, nla);
+> +	nla_nest_cancel(skb, nla);
+>  	return -EMSGSIZE;
+>  }
+> 
+> --
+> 2.40.0
+> 
 
-Remove the function and opencode in the its caller
-blk_account_io_done().
+Sorry, I fail to see how this is an improvement over the status quo,
+much less a "fix".
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- block/blk-mq.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+Can you identify the issue with the current code and can you explain how
+your patch makes it better?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f514128f7dad..c782d556488c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -953,17 +953,6 @@ bool blk_update_request(struct request *req, blk_status_t error,
- }
- EXPORT_SYMBOL_GPL(blk_update_request);
- 
--static void __blk_account_io_done(struct request *req, u64 now)
--{
--	const int sgrp = op_stat_group(req_op(req));
--
--	part_stat_lock();
--	update_io_ticks(req->part, jiffies, true);
--	part_stat_inc(req->part, ios[sgrp]);
--	part_stat_add(req->part, nsecs[sgrp], now - req->start_time_ns);
--	part_stat_unlock();
--}
--
- static inline void blk_account_io_done(struct request *req, u64 now)
- {
- 	/*
-@@ -972,8 +961,15 @@ static inline void blk_account_io_done(struct request *req, u64 now)
- 	 * containing request is enough.
- 	 */
- 	if (blk_do_io_stat(req) && req->part &&
--	    !(req->rq_flags & RQF_FLUSH_SEQ))
--		__blk_account_io_done(req, now);
-+	    !(req->rq_flags & RQF_FLUSH_SEQ)) {
-+		const int sgrp = op_stat_group(req_op(req));
-+
-+		part_stat_lock();
-+		update_io_ticks(req->part, jiffies, true);
-+		part_stat_inc(req->part, ios[sgrp]);
-+		part_stat_add(req->part, nsecs[sgrp], now - req->start_time_ns);
-+		part_stat_unlock();
-+	}
- }
- 
- static inline void blk_account_io_start(struct request *req)
 -- 
-2.29.0
-
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
