@@ -2,53 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9BCC74A5B
-	for <linux-block@archiver.kernel.org>; Sun, 26 Mar 2023 23:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08860C74A5B
+	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 00:49:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231196AbjCZXp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Mar 2023 19:45:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36840 "EHLO
+        id S229892AbjC0Atx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Mar 2023 20:49:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjCZXp5 (ORCPT
+        with ESMTP id S229479AbjC0Atw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Mar 2023 19:45:57 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D3B949C1
-        for <linux-block@vger.kernel.org>; Sun, 26 Mar 2023 16:45:56 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1C60968BEB; Mon, 27 Mar 2023 01:45:53 +0200 (CEST)
-Date:   Mon, 27 Mar 2023 01:45:52 +0200
+        Sun, 26 Mar 2023 20:49:52 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB83132;
+        Sun, 26 Mar 2023 17:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=J34aMK6n+O5EOaIOD1zXvzTxUfNPfAeP9gPFHmYCaGA=; b=4M3uK7D06M5LGjDiFkWczeT12G
+        Pr/zv02t1WWrUSI1ZtKKyr4dSQBLuK86287W6gGZfpKr49g/XufKv582wRFvV84PxJS/CZ2IbAL32
+        5mCxz4UXT6WQArvCuCArUftBki8/SVAx/KAi3kaGC+GAh0lEOvyTEVaSraNm2S5zaV29s/9QlpU2J
+        FzCW7xq/xIRFxXbxUvdR0YHhdVsF8MtMFdAEdQSEWYvt7tCvs5qrc5ZAueo2MJAM6D/9PWl8SsrdY
+        mL9PnLJs3vWh7Hl/gIwdSoBVonA7tYt1FU1XPWkCVgBFjvkZ4vussqUzn/iKmd/lFGI26P8pzmsl7
+        i13m7J7Q==;
+Received: from i114-182-241-148.s41.a014.ap.plala.or.jp ([114.182.241.148] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pgb3S-009Qrq-0K;
+        Mon, 27 Mar 2023 00:49:46 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
-Message-ID: <20230326234552.GC20017@lst.de>
-References: <20230321055537.GA18035@lst.de> <100dfc73-d8f3-f08f-e091-3c08707e95f5@acm.org> <20230323082604.GC21977@lst.de> <acd13f8c-6cbe-a14d-e3b4-645d62811cec@opensource.wdc.com> <122cdca2-b0ae-ce74-664d-e268fe0699a8@acm.org> <7a795b9b-51dc-9166-1cf0-6c51db77b195@opensource.wdc.com> <1e65e542-e8e9-bd3f-6ff1-1bbd4716a8c3@acm.org> <e83d1111-1841-7b2a-973b-16bea2e789c6@opensource.wdc.com> <7f4463c1-fd02-8ac5-16d7-61ffe6279e07@acm.org> <5b450fee-714b-224e-69ae-497633e005ed@opensource.wdc.com>
+To:     Josef Bacik <josef@toxicpanda.com>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+Subject: move bio cgroup punting into btrfs
+Date:   Mon, 27 Mar 2023 09:49:46 +0900
+Message-Id: <20230327004954.728797-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b450fee-714b-224e-69ae-497633e005ed@opensource.wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 26, 2023 at 10:45:08AM +0900, Damien Le Moal wrote:
-> > Although the above sounds interesting to me, I think the following two 
-> > scenarios are not handled by the above approach and can lead to reordering:
-> > * The SCSI device reporting a unit attention.
-> > * The SCSI device responding with the SCSI status "BUSY". The UFS 
-> > standard explicitly allows this. From the UFS standard: "If the unit is 
-> > not ready to accept a new command (e.g., still processing previous 
-> > command) a STATUS response of BUSY will be returned."
-> 
-> Yes, that likely would be an issue for regular writes, but likely not for zone
-> append emulation using regular writes though, since a "busy" return for a ZA
-> emulated regular write can be resent later with a different aligned write location.
+Hi all,
 
-Exactly.  That's why ZONE_APPEND is the only really viable high-level
-interface.
+the current code to offload bio submission into a cgroup-specific helper
+thread when sent from the btrfs internal helper threads is a bit ugly.
+
+This series moves it into btrfs with minimal interference in the core
+code.
+
+I also wonder if the better way to handle this in the long would be to
+to allow multiple writeback threads per device and cgroup, which should
+remove the need for both the btrfs submission helper workqueue and the
+per-cgroup threads.
+
+Diffstat:
+ block/Kconfig             |    3 +
+ block/blk-cgroup.c        |   78 +++++++++++++++++++++++++---------------------
+ block/blk-cgroup.h        |   15 +-------
+ block/blk-core.c          |    3 -
+ fs/btrfs/Kconfig          |    1 
+ fs/btrfs/bio.c            |   12 ++++---
+ fs/btrfs/bio.h            |    3 +
+ fs/btrfs/compression.c    |    8 ----
+ fs/btrfs/compression.h    |    1 
+ fs/btrfs/extent_io.c      |    6 +--
+ fs/btrfs/inode.c          |   37 +++++++++++----------
+ include/linux/bio.h       |    5 ++
+ include/linux/blk_types.h |   18 ++--------
+ include/linux/writeback.h |    5 --
+ 14 files changed, 94 insertions(+), 101 deletions(-)
