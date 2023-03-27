@@ -2,56 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B2EC6FD1D
-	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 21:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85817C76195
+	for <linux-block@archiver.kernel.org>; Mon, 27 Mar 2023 21:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230085AbjC0VGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Mar 2023 17:06:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60086 "EHLO
+        id S229733AbjC0VUp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Mar 2023 17:20:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjC0VGN (ORCPT
+        with ESMTP id S229632AbjC0VUo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2023 17:06:13 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 951D2C4
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 14:06:12 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id fy10-20020a17090b020a00b0023b4bcf0727so10399524pjb.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 14:06:12 -0700 (PDT)
+        Mon, 27 Mar 2023 17:20:44 -0400
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A46DC173A
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 14:20:39 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id y19so6008910pgk.5
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 14:20:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679951172;
+        d=1e100.net; s=20210112; t=1679952039;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wp4i1bljYVAIAYrdKsrqkK0En6mhe6ajoIRnr70mTfI=;
-        b=mQHSLY6+twjQ9X6qA1FhCZmPS3CB/xOTqhF4+ZT8gv02HhzG4Mrjs1a3jVitKU8G9y
-         rwl79F6MPxZEGOILUVLZZ6dje+i3VD41jw/FQ6U3cI9pK7hRWJl2X4GbtlnaKdLmBVUQ
-         DfcKXObSd2WXVq9n9ZcJq/FsdaaY8WN5EyV3usD+wV7w1dqtewDtwO7+otJWd5N8lZlV
-         zuMPWpoUdTWsThhtpqQz13nHWWDjcLIYLnnV9QMw1ShtdgbEccqnZg9Dd5/Lr/B7dc9J
-         n8tXErYQJbGKhyYkqZNGgdnAjRqmlYWVbqjaG60RUBMFoUsVgEJD2qnAi0AGNVTlQVIu
-         CNQA==
-X-Gm-Message-State: AAQBX9ciRVsu1VneBw9884fPNLRItO0R5BfVJ+EHNkNwBSBCVK8bRJWR
-        XU8gmNnJ0hmb0P7N8bMZ08M=
-X-Google-Smtp-Source: AKy350bZbc8ADH3Z4Mf+O4B2OmRcw2VEviFCVCHddsj8VJCLRtJw0LO13JNs78VVBPzgcv9EZJtbFw==
-X-Received: by 2002:a17:902:c404:b0:19d:611:2815 with SMTP id k4-20020a170902c40400b0019d06112815mr16382558plk.42.1679951171960;
-        Mon, 27 Mar 2023 14:06:11 -0700 (PDT)
+        bh=wtKtvF7i9MVGscb1YlpGSXffk/VCGeWlwHYgp9dF3I8=;
+        b=zzaKYnmStrEdCrhQFZSZtoZs87y27ehCuNedGDdtq0RROBZtBH+XUSGth3vhCbDPn+
+         SY8V5mh8o9Ddzgq5LwMVYbNTRlmGmTv4UM0TMEMK/Rbi6ewN+Uunydkumqe4Le71Rsiy
+         XcLt5N8aycnz2ajO1SfwfJWfMzxH4ZM4aTw/8pxkmfY1P8YsbMFf71P+d0L6k10onuBP
+         FZI7YQjj9JIOmo7RZE5Tyh/8ESjufJgLpWWu6sg4q8qFC950WmRe7ov4NeJJAoH30Kka
+         quFP0CJLu6QJY79kvpyxSjlZ2i3/RlviMuAowViS+zUWfTskWuMMnW6dQVlfChQhb+Iv
+         pglw==
+X-Gm-Message-State: AAQBX9c/Qkpfb+DNiVp1XCrRDul2JuDcLQYB1BLpMCYvCRWKbdo22mLx
+        /aZNyX0QjR0/NChlHjyL8h8=
+X-Google-Smtp-Source: AKy350Y2dSr6+Gu66gKohfowypj9BO77ZnmbjzJuIdPRmqOw0FybXB93gxEBsLn1IhLXXcEmlX51XA==
+X-Received: by 2002:aa7:9728:0:b0:626:17b8:8586 with SMTP id k8-20020aa79728000000b0062617b88586mr13362592pfg.30.1679952038963;
+        Mon, 27 Mar 2023 14:20:38 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:798e:a3a0:ddc2:c946? ([2620:15c:211:201:798e:a3a0:ddc2:c946])
-        by smtp.gmail.com with ESMTPSA id c11-20020a170902aa4b00b001a1fe42a141sm8867195plr.115.2023.03.27.14.06.10
+        by smtp.gmail.com with ESMTPSA id v5-20020aa78085000000b006254794d5b2sm7876989pff.94.2023.03.27.14.20.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Mar 2023 14:06:11 -0700 (PDT)
-Message-ID: <7b668546-addb-9a47-b6f0-4f2422617ead@acm.org>
-Date:   Mon, 27 Mar 2023 14:06:09 -0700
+        Mon, 27 Mar 2023 14:20:38 -0700 (PDT)
+Message-ID: <2a5e0494-faae-bdb3-379b-582df5777cfb@acm.org>
+Date:   Mon, 27 Mar 2023 14:20:36 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
 Subject: Re: [PATCH 2/2] block: Split and submit bios in LBA order
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Christoph Hellwig <hch@lst.de>
 Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
         Jan Kara <jack@suse.cz>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20230321055537.GA18035@lst.de>
+References: <20230317195938.1745318-1-bvanassche@acm.org>
+ <20230317195938.1745318-3-bvanassche@acm.org>
+ <ZBT6EmhEfJmgRXU1@ovpn-8-18.pek2.redhat.com>
+ <580e712c-5e43-e1a5-277b-c4e8c50485f0@acm.org>
+ <ZBjsDy2pfPk9t6qB@ovpn-8-29.pek2.redhat.com>
+ <50dfa89c-19fa-b655-f6b8-b8853b066c75@acm.org>
+ <20230321055537.GA18035@lst.de>
  <100dfc73-d8f3-f08f-e091-3c08707e95f5@acm.org>
  <20230323082604.GC21977@lst.de>
  <acd13f8c-6cbe-a14d-e3b4-645d62811cec@opensource.wdc.com>
@@ -61,28 +67,51 @@ References: <20230321055537.GA18035@lst.de>
  <e83d1111-1841-7b2a-973b-16bea2e789c6@opensource.wdc.com>
  <7f4463c1-fd02-8ac5-16d7-61ffe6279e07@acm.org>
  <5b450fee-714b-224e-69ae-497633e005ed@opensource.wdc.com>
- <20230326234552.GC20017@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230326234552.GC20017@lst.de>
+In-Reply-To: <5b450fee-714b-224e-69ae-497633e005ed@opensource.wdc.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/26/23 16:45, Christoph Hellwig wrote:
-> Exactly.  That's why ZONE_APPEND is the only really viable high-level
-> interface.
+On 3/25/23 18:45, Damien Le Moal wrote:
+> On 3/26/23 01:31, Bart Van Assche wrote:
+>> Although the above sounds interesting to me, I think the following two
+>> scenarios are not handled by the above approach and can lead to reordering:
+>> * The SCSI device reporting a unit attention.
+>> * The SCSI device responding with the SCSI status "BUSY". The UFS
+>> standard explicitly allows this. From the UFS standard: "If the unit is
+>> not ready to accept a new command (e.g., still processing previous
+>> command) a STATUS response of BUSY will be returned."
+> 
+> Yes, that likely would be an issue for regular writes, but likely not for zone
+> append emulation using regular writes though, since a "busy" return for a ZA
+> emulated regular write can be resent later with a different aligned write location.
 
-Using REQ_OP_ZONE_APPEND may lead to reordering - data being written on 
-the storage medium in another order than the order in which the 
-REQ_OP_ZONE_APPEND commands were submitted. Hence, the number of extents 
-for large files increases and performance when reading large files 
-reduces. To me comparing the performance of these two approaches sounds 
-like a good topic for a research paper. I'm not sure that 
-REQ_OP_ZONE_APPEND is better for all zoned storage workloads than 
-REQ_OP_WRITE.
+Hi Damien,
+
+If a SCSI device responds with status "BUSY" or a unit attention for a 
+zone append operation, all pending REQ_OP_ZONE_APPEND operations that 
+have already been translated into WRITE commands will fail because of a 
+write pointer mismatch. I'm wondering whether the following would be 
+sufficient to support multiple pending REQ_OP_ZONE_APPEND operations 
+when translating these into SCSI WRITE commands:
+* If a zoned write operation is not executed (SAM_STAT_BUSY,
+   SAM_STAT_CHECK_CONDITION, ...), change the host state to
+   SHOST_RECOVERY to prevent that pending zone append operations fail
+   because of a write pointer mismatch.
+* After all pending SCSI commands have failed, completed or timed out,
+   resubmit these commands. For REQ_OP_ZONE_APPEND, this may result in a
+   new LBA being selected when translating these into WRITE commands.
+* Retry commands that fail with UNALIGNED WRITE COMMAND until the retry
+   count is exhausted.
+* Increase the retry count for REQ_OP_ZONE_APPEND operations such that
+   the above retry mechanism neither causes an infinite loop nor failures
+   because the device responds with SAM_STAT_BUSY or a unit attention.
 
 Thanks,
 
 Bart.
+
+
