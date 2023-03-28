@@ -2,97 +2,256 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D84E9C76196
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B47AFC76196
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:14:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232576AbjC1PMf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 11:12:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53538 "EHLO
+        id S231203AbjC1POK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 11:14:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232398AbjC1PM1 (ORCPT
+        with ESMTP id S233106AbjC1PNj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:12:27 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456D3E3AC
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:12:05 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id p15so15447154ybl.9
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:12:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680016194;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g+YmdZ2KifzhfvJEdg7p7f3TJNPgCoNZqPs2Cx2ndxo=;
-        b=QxwODGEreqDxcIBzupdiBDMaDhVMLLzdv5CfZ77spG0lhFRud2y5nLrWzzAe/C6t7j
-         ZOeI1MwZhgbHKufRmNFroSj3WemqRteMnB4I3zgWlrAqlMt2LkDL2uFa+Q4rzDU1486c
-         dNNfXBmijmlYD705lBNf01BTyrCyDOrSF9RzPetnYAB3AYPpNLJYWV3MaUX8PnUEt/zX
-         ZWmL0MYGGLpvauhUzo75H6kPcjwi3fp70mN3e4rJpmVhTv/25ZngEpNST6bZiJzZmjXl
-         eT2y5J/uzC+53+JC7JZ5kq/eruzL0a+NXlhHEm6lqmXJr8zdho9ORG1Eq0Et9AmoG2T8
-         Vnpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680016194;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g+YmdZ2KifzhfvJEdg7p7f3TJNPgCoNZqPs2Cx2ndxo=;
-        b=bZHWquspYruV3Vjluxh4dNIwLw1LXW4PetCRuol9XzRMZk2F8AAfE48Vm3wV3MxF1+
-         LkT+24glIt4lbz84jVWKK+7AwodW2HcW+HVpQT+KJJtHjNxfrV62MPKyfA64q8ETOrhA
-         JI1akq8f4lIDCApfhKdzmhhRlmAhTNAje6eJzJrwNWJhSmNRfIfxtTW9j2lQyZV2xYlc
-         AtKCu6M8LaVQE5uynDMslw8CXTejoVhAaoeCM3lmMCYlo7V50nXwsRE12HykYO65m6b+
-         qd/NLGCUvCaSBN6r2ADgs7Cv9b7ewUoY/2yn1SEnAQiQqyyw40DTNC93JS33vB9R+7o4
-         6t9A==
-X-Gm-Message-State: AAQBX9csWIUKpRrf9hCbobp5S00YdltdozcCKxh78I6Heq4IMd6pTE0i
-        pgM3hKIN1SZzMTh9KWY+TN9z10XHsLQEFOkdqmcdTQ==
-X-Google-Smtp-Source: AKy350Zye7Uz+A9wXvm0bc/VbyhY+/GQhhowJbGOvGnmquTK5nbpQG/LFKJZLvFUfYERcKgtllJiz9XGHkAhkgNpcPs=
-X-Received: by 2002:a25:2749:0:b0:a99:de9d:d504 with SMTP id
- n70-20020a252749000000b00a99de9dd504mr10160590ybn.12.1680016193782; Tue, 28
- Mar 2023 08:09:53 -0700 (PDT)
+        Tue, 28 Mar 2023 11:13:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65B810247
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:12:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680016263;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=siKKh0x5p/UqrBQe9QYa+cxMAYrLZPJZiVZtx1DzXec=;
+        b=XBKX1t86ccQCIsYA5W263BL5JGuPMf85PdmfE/q1te2cMgEkMvphJ+yszf+1l8sIuNXQin
+        ZrXdwr4z7S7Lx2Oq1sveziBhmJD3C5OkpItI8+4qVfvxVbqAT4jGvGbxCw6L99EfJzmxjO
+        r57kbIustICTnZBAr+jpYjheVa8F5eg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-381-TbRalWqROt-cqgLg3YGivw-1; Tue, 28 Mar 2023 11:11:00 -0400
+X-MC-Unique: TbRalWqROt-cqgLg3YGivw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E82993C17124;
+        Tue, 28 Mar 2023 15:10:58 +0000 (UTC)
+Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0416C1121330;
+        Tue, 28 Mar 2023 15:10:57 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 03/16] io_uring: support normal SQE for fused command
+Date:   Tue, 28 Mar 2023 23:09:45 +0800
+Message-Id: <20230328150958.1253547-4-ming.lei@redhat.com>
+In-Reply-To: <20230328150958.1253547-1-ming.lei@redhat.com>
+References: <20230328150958.1253547-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-7-yosryahmed@google.com>
-In-Reply-To: <20230328061638.203420-7-yosryahmed@google.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Tue, 28 Mar 2023 08:09:43 -0700
-Message-ID: <CALvZod7ekQD-ygrv2M-QZzDFVTj7O-v7iCYOHKp3iqG6c-Rt1g@mail.gmail.com>
-Subject: Re: [PATCH v1 6/9] memcg: sleep during flushing stats in safe contexts
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 11:16=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
-> wrote:
->
-> Currently, all contexts that flush memcg stats do so with sleeping not
-> allowed. Some of these contexts are perfectly safe to sleep in, such as
-> reading cgroup files from userspace or the background periodic flusher.
->
-> Refactor the code to make mem_cgroup_flush_stats() non-atomic (aka
-> sleepable), and provide a separate atomic version. The atomic version is
-> used in reclaim, refault, writeback, and in mem_cgroup_usage(). All
-> other code paths are left to use the non-atomic version. This includes
-> callbacks for userspace reads and the periodic flusher.
->
-> Since refault is the only caller of mem_cgroup_flush_stats_ratelimited(),
-> this function is changed to call the atomic version of
-> mem_cgroup_flush_stats(). Reclaim and refault code paths are modified
-> to do non-atomic flushing in separate later patches -- so
-> mem_cgroup_flush_stats_ratelimited() will eventually become non-atomic.
->
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+So far, the secondary sqe is saved in the 2nd 64 byte of primary sqe, which
+requires that SQE128 has to be enabled. Relax this limit by allowing to
+fetch secondary SQE from SQ directly.
 
-Acked-by: Shakeel Butt <shakeelb@google.com>
+IORING_URING_CMD_FUSED_SPLIT_SQE has to be set for this usage, and
+userspace has to put secondary SQE following the primary sqe.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/uapi/linux/io_uring.h |  8 ++++++-
+ io_uring/fused_cmd.c          | 42 ++++++++++++++++++++++++++++-------
+ io_uring/io_uring.c           | 23 +++++++++++++------
+ io_uring/io_uring.h           |  2 ++
+ 4 files changed, 59 insertions(+), 16 deletions(-)
+
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 98b7f21623f9..b379677dff9d 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -235,9 +235,15 @@ enum io_uring_op {
+  * sqe->uring_cmd_flags
+  * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
+  *				along with setting sqe->buf_index.
++ *
++ * IORING_URING_CMD_FUSED_SPLIT_SQE fused command only, secondary sqe is
++ * 				    provided from another new sqe; without
++ * 				    setting the flag, secondary sqe is from
++ * 				    2nd 64byte of this sqe, so SQE128 has
++ * 				    to be enabled
+  */
+ #define IORING_URING_CMD_FIXED	(1U << 0)
+-
++#define IORING_URING_CMD_FUSED_SPLIT_SQE	(1U << 1)
+ 
+ /*
+  * sqe->fsync_flags
+diff --git a/io_uring/fused_cmd.c b/io_uring/fused_cmd.c
+index 7af3ddb182c1..25577cbb0e9c 100644
+--- a/io_uring/fused_cmd.c
++++ b/io_uring/fused_cmd.c
+@@ -43,18 +43,34 @@ static inline void io_fused_cmd_update_link_flags(struct io_kiocb *req,
+ 		req->flags |= REQ_F_LINK;
+ }
+ 
++static const struct io_uring_sqe *fused_cmd_get_secondary_sqe(
++		struct io_ring_ctx *ctx, const struct io_uring_sqe *primary,
++		bool split_sqe)
++{
++	if (unlikely(!(ctx->flags & IORING_SETUP_SQE128) && !split_sqe))
++		return NULL;
++
++	if (split_sqe) {
++		const struct io_uring_sqe *sqe;
++
++		if (unlikely(!io_get_secondary_sqe(ctx, &sqe)))
++			return NULL;
++		return sqe;
++	}
++
++	return primary + 1;
++}
++
+ int io_fused_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	__must_hold(&req->ctx->uring_lock)
+ {
+ 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+-	const struct io_uring_sqe *secondary_sqe = sqe + 1;
++	const struct io_uring_sqe *secondary_sqe;
+ 	struct io_ring_ctx *ctx = req->ctx;
+ 	struct io_kiocb *secondary;
+ 	u8 secondary_op;
+ 	int ret;
+-
+-	if (unlikely(!(ctx->flags & IORING_SETUP_SQE128)))
+-		return -EINVAL;
++	bool split_sqe;
+ 
+ 	if (unlikely(sqe->__pad1))
+ 		return -EINVAL;
+@@ -67,7 +83,12 @@ int io_fused_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 		return -EINVAL;
+ 
+ 	ioucmd->flags = READ_ONCE(sqe->uring_cmd_flags);
+-	if (unlikely(ioucmd->flags))
++	if (unlikely(ioucmd->flags & ~IORING_URING_CMD_FUSED_SPLIT_SQE))
++		return -EINVAL;
++
++	split_sqe = ioucmd->flags & IORING_URING_CMD_FUSED_SPLIT_SQE;
++	secondary_sqe = fused_cmd_get_secondary_sqe(ctx, sqe, split_sqe);
++	if (unlikely(!secondary_sqe))
+ 		return -EINVAL;
+ 
+ 	secondary_op = READ_ONCE(secondary_sqe->opcode);
+@@ -78,8 +99,12 @@ int io_fused_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	ioucmd->cmd_op = READ_ONCE(sqe->cmd_op);
+ 	req->fused_cmd_kbuf = NULL;
+ 
+-	/* take one extra reference for the secondary request */
+-	io_get_task_refs(1);
++	/*
++	 * Take one extra reference for the secondary request built from
++	 * builtin SQE since io_uring core code doesn't grab it for us
++	 */
++	if (!split_sqe)
++		io_get_task_refs(1);
+ 
+ 	ret = -ENOMEM;
+ 	if (unlikely(!io_alloc_req(ctx, &secondary)))
+@@ -103,7 +128,8 @@ int io_fused_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ fail_free_req:
+ 	io_free_req(secondary);
+ fail:
+-	current->io_uring->cached_refs += 1;
++	if (!split_sqe)
++		current->io_uring->cached_refs += 1;
+ 	return ret;
+ }
+ 
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index ddbc9b9e51d3..9d9bc5b06ca2 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -2414,7 +2414,8 @@ static void io_commit_sqring(struct io_ring_ctx *ctx)
+  * used, it's important that those reads are done through READ_ONCE() to
+  * prevent a re-load down the line.
+  */
+-static bool io_get_sqe(struct io_ring_ctx *ctx, const struct io_uring_sqe **sqe)
++static inline bool io_get_sqe(struct io_ring_ctx *ctx,
++		const struct io_uring_sqe **sqe)
+ {
+ 	unsigned head, mask = ctx->sq_entries - 1;
+ 	unsigned sq_idx = ctx->cached_sq_head++ & mask;
+@@ -2443,19 +2444,26 @@ static bool io_get_sqe(struct io_ring_ctx *ctx, const struct io_uring_sqe **sqe)
+ 	return false;
+ }
+ 
++bool io_get_secondary_sqe(struct io_ring_ctx *ctx,
++		const struct io_uring_sqe **sqe)
++{
++	return io_get_sqe(ctx, sqe);
++}
++
+ int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr)
+ 	__must_hold(&ctx->uring_lock)
+ {
+ 	unsigned int entries = io_sqring_entries(ctx);
+-	unsigned int left;
++	unsigned old_head = ctx->cached_sq_head;
++	unsigned int left = 0;
+ 	int ret;
+ 
+ 	if (unlikely(!entries))
+ 		return 0;
+ 	/* make sure SQ entry isn't read before tail */
+-	ret = left = min3(nr, ctx->sq_entries, entries);
+-	io_get_task_refs(left);
+-	io_submit_state_start(&ctx->submit_state, left);
++	ret = min3(nr, ctx->sq_entries, entries);
++	io_get_task_refs(ret);
++	io_submit_state_start(&ctx->submit_state, ret);
+ 
+ 	do {
+ 		const struct io_uring_sqe *sqe;
+@@ -2474,11 +2482,12 @@ int io_submit_sqes(struct io_ring_ctx *ctx, unsigned int nr)
+ 		 */
+ 		if (unlikely(io_submit_sqe(ctx, req, sqe)) &&
+ 		    !(ctx->flags & IORING_SETUP_SUBMIT_ALL)) {
+-			left--;
++			left = 1;
+ 			break;
+ 		}
+-	} while (--left);
++	} while ((ctx->cached_sq_head - old_head) < ret);
+ 
++	left = ret - (ctx->cached_sq_head - old_head) - left;
+ 	if (unlikely(left)) {
+ 		ret -= left;
+ 		/* try again if it submitted nothing and can't allocate a req */
+diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
+index dd193c612348..8ede804b3caf 100644
+--- a/io_uring/io_uring.h
++++ b/io_uring/io_uring.h
+@@ -78,6 +78,8 @@ bool __io_alloc_req_refill(struct io_ring_ctx *ctx);
+ bool io_match_task_safe(struct io_kiocb *head, struct task_struct *task,
+ 			bool cancel_all);
+ 
++bool io_get_secondary_sqe(struct io_ring_ctx *ctx,
++		const struct io_uring_sqe **sqe);
+ int io_init_secondary_req(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 		const struct io_uring_sqe *sqe);
+ 
+-- 
+2.39.2
+
