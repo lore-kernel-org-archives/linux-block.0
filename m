@@ -2,88 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6368AC6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 661E9C6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:24:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233362AbjC1PWq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 11:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40578 "EHLO
+        id S233339AbjC1PYL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 11:24:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233193AbjC1PW3 (ORCPT
+        with ESMTP id S233106AbjC1PX6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:22:29 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2866FF1F
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:20:52 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id z83so15542514ybb.2
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680016826;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ONZYLiGDk21RMFgMpaXH7s4UWxHkNsJ+wUGHRFEkuCc=;
-        b=c8ynwXPsqcK1BZ6E1vrYfDJcqWTKC225pVcmZQQIcGa+4WzKkC/FwoXCPTIZP0uqNW
-         jalQxGai5+TUgtreV4lGVmixYr6hAEF97bJP6udFm1yicUDr3KPFXDmLE2aJHchJhqAj
-         7J4XebvBwK691HXXFYm5J21xAY8msOd5k/OOZSjNYpGC2QnLfu+09Jc4Pbhux+Hpz5l/
-         35fyjYPGGFQ/WwDLWWO9LuBpYSShrGA9j+zLmlaXc44UkvAaGsRQX8zqrH4aOojgeFnH
-         DBkes4tXkEWXNeFd/n9ARofjF5njrlz0PZjoz9j8BGF67LqPGhfa7EH16H69NZfFsNx5
-         Xcaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680016826;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ONZYLiGDk21RMFgMpaXH7s4UWxHkNsJ+wUGHRFEkuCc=;
-        b=01feMrNkOACbNRQ6FbNq8dXbMyzytIauA8EbENltpMrW6vaxFk72K2kTfj02J3zwEh
-         lsn9QkffYfWOpchKzdIBrbqIJzuuuub99S1dMRTIIGVV+moQVOMpjt+A4bEvYZ3yoKBs
-         atg127ZRHwTD9NjtsBXG96FkbOCqADIsyTO9sYYZcBRSRM3EOl6IXELC7ySEsOd567jT
-         DN+VPV6cTcNX1KW/9DKiQnK3agK26WTKm69wr0grbc3k64d67XOxAKboFcU+V0UIkZ1H
-         TG65AwsBxvAX+Ii1tB18LDZawd4lIA/h2auwI7v0ipx4ou2kucJmpaoGHdzskJflakZt
-         v0hw==
-X-Gm-Message-State: AAQBX9eh5W+y0XI5qJSMCYe8NBpAQLr6dAdBpBAPWTzxjuEFqcKPGFar
-        QNBy/vSLRnVgXC1tMMMaunFvcyn9iOmRHh4j8zit7g==
-X-Google-Smtp-Source: AKy350Z1lvsH1c3O1jHKo+DM2HBpLRhmt4Hwp7gRiZRJb5+27sNfylAL7/FK3qaRf4mMZ9UmJB/3uw0wBUSKxNqtrno=
-X-Received: by 2002:a05:6902:154e:b0:b77:d2db:5f8f with SMTP id
- r14-20020a056902154e00b00b77d2db5f8fmr9838517ybu.12.1680016826025; Tue, 28
- Mar 2023 08:20:26 -0700 (PDT)
+        Tue, 28 Mar 2023 11:23:58 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21204A5F7;
+        Tue, 28 Mar 2023 08:22:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=OSlnzCNxt0KdotKHUVgrriB1TzoU+1B8CYF5yyGE4wY=; b=T3UwVlxbjnBe0qWhtVGyVsRai+
+        ftMAaz0Kaey7nxYegHsY3Cb8ufJgIxLbwpIY8HzfdZ8ITqwItXQIo8aUziRO+hNeImCwCNXL9kmG9
+        FE+JAZd9HPWwfFTcGZ4GAWWxbIi6BOYyQSfFjd2zXnH28i0EDQZibREpMI0RUQtbK30utgObbkDdO
+        FjlNQZFB71JrwQW+b1nbus2B+ubac07Bw71ynwQTiRYW8pD1QkVCqpn52wkEMEk8aLdE0WhyQre1X
+        eXMc+IRdQi8sP5NE6Ms9L9ObTbtNDbv097G4UbO1uiRlQ/J/C+BtNzjY2isjYDiI8gIUSeOJjvt3m
+        zEiq5KZw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1phB8b-008XGU-KA; Tue, 28 Mar 2023 15:21:29 +0000
+Date:   Tue, 28 Mar 2023 16:21:29 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     martin@omnibond.com, axboe@kernel.dk, minchan@kernel.org,
+        akpm@linux-foundation.org, hubcap@omnibond.com,
+        viro@zeniv.linux.org.uk, senozhatsky@chromium.org,
+        brauner@kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, mcgrof@kernel.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        linux-mm@kvack.org, devel@lists.orangefs.org
+Subject: Re: [PATCH 2/5] orangefs: use folios in orangefs_readahead
+Message-ID: <ZCMF+QjynkdSHbn0@casper.infradead.org>
+References: <20230328112716.50120-1-p.raghav@samsung.com>
+ <CGME20230328112718eucas1p263dacecb2a59f5fce510f81685f9d497@eucas1p2.samsung.com>
+ <20230328112716.50120-3-p.raghav@samsung.com>
 MIME-Version: 1.0
-References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-10-yosryahmed@google.com>
-In-Reply-To: <20230328061638.203420-10-yosryahmed@google.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Tue, 28 Mar 2023 08:20:15 -0700
-Message-ID: <CALvZod4boccrKxrCm9aDBCupror1zC0J3spHeidSiAZgei_r9Q@mail.gmail.com>
-Subject: Re: [PATCH v1 9/9] memcg: do not modify rstat tree for zero updates
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230328112716.50120-3-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 11:17=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
-> wrote:
->
-> In some situations, we may end up calling memcg_rstat_updated() with a
-> value of 0, which means the stat was not actually updated. An example is
-> if we fail to reclaim any pages in shrink_folio_list().
->
-> Do not add the cgroup to the rstat updated tree in this case, to avoid
-> unnecessarily flushing it.
->
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+On Tue, Mar 28, 2023 at 01:27:13PM +0200, Pankaj Raghav wrote:
+> Convert orangefs_readahead() from using struct page to struct folio.
+> This conversion removes the call to page_endio() which is soon to be
+> removed, and simplifies the final page handling.
+> 
+> The page error flags is not required to be set in the error case as
+> orangefs doesn't depend on them.
+> 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 
-Acked-by: Shakeel Butt <shakeelb@google.com>
+Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+
+Shouldn't Mike's tested-by be in here?
