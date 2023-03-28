@@ -2,107 +2,284 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44175C761AF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42808C76196
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:22:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233252AbjC1PWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 11:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39272 "EHLO
+        id S233141AbjC1PWi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 11:22:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232525AbjC1PV5 (ORCPT
+        with ESMTP id S233916AbjC1PWR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:21:57 -0400
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00FA4EF9B
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:20:18 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-545e907790fso120226847b3.3
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680016784;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZcS8n/4+59b+VXd6eXMn877oxhRuuiSj8mRyLdeW/tM=;
-        b=Ar4Zra7am34XuPMhOvIUcA5xD0kVon3c99ACx4qVdYKc7PvMpeZbPc7LV4yiktxx93
-         ugQcjwZKj3vROoqeRauJSOBpb/R7U0idQKpJU7syI6uOUqxt1iBIF8l4r9F7EviaUoDi
-         5eGZKwhRwKRZxVY+kApK4O0HT7InuJX8mw3M0HfrCXDYjBj5bNd8FOTKy3yI06ZWgwjO
-         HPR0Gz42df+GFqUpBoW8UGumfJGgpC4TxJYcxJ2J6DfmavIUYu4J0xle/MsU2yYWX7OR
-         ESI5YObo7wWB9KiZs8NeKzMtj5Q2PHwXIhtBG2Qb1iBMLwwQvMGYO3D8HHRZ3Q70iOfB
-         d1KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680016784;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZcS8n/4+59b+VXd6eXMn877oxhRuuiSj8mRyLdeW/tM=;
-        b=bZp7NCoudUBGM/W00fXsngm+8n8xHEB7xZFq1K/2om2W6F8biUc8ridqGvnUAFLXpJ
-         4vWGYv6WoMyzOIQp8l9pBAE6qIatyujVFZ6qDvhE0dZk2x9cD5UOUE5YkfV5whdmN1MX
-         yJdev2s/26qCedKtF4KSSZjR+pOTqbxMdbOrXf5mD6aXA2atHDqlx+ntxjV9QEFfHSrR
-         s/FeIG8zRhA6CsfpLqKrh6D4KWvk7wFRYRVjtwIUYXNSMsERySkJlJgIoONwtSwZ6OYd
-         Eh6y5AGyKGe6hFVl+XEdQvKAQ9LU3d3iDzBUiuQlsvJX2FyGkWWm+8Is62YpO7SOzBzY
-         0TOQ==
-X-Gm-Message-State: AAQBX9eGs2v4kfDrVFO9x6v/MO/cpewHdJIb979wAGcynRMBbhGmpVV8
-        ogEW/FHB/EblxwjTXzrHD3X45DmSfaI513iKjlrhFw==
-X-Google-Smtp-Source: AKy350Z9cmGM4H/7sFJEBekvmzlUQ1sUU694LWzJhS2SSks5o5zMh8yAhNT3YmusP5qBVLKJW5eonGGOovifhFPxfcU=
-X-Received: by 2002:a81:4406:0:b0:546:63a:6e23 with SMTP id
- r6-20020a814406000000b00546063a6e23mr2281889ywa.0.1680016784433; Tue, 28 Mar
- 2023 08:19:44 -0700 (PDT)
+        Tue, 28 Mar 2023 11:22:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A65910A8E
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:19:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680016695;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=epgMYPHiL/drcoyXP4r134WY88eox9+1YtvoGLQRluU=;
+        b=QxtG67xB34SgvqCx0m/NyjDNlqE9g5wDq98CjhlfiKaO+Bb62irCWZs4l8LN5sHMPywh+j
+        MlVVBqHVmgtPHyULdGYl7xbpbCX/TUnoZgM24d5eQza71g1ZLfdX/yOy/UK+Rw89qqzWrS
+        GOtPLYOJQSHCOdu00G9chpyO8CKScmQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-35-NUuhNtO5O_SR8Ng9fEVPbQ-1; Tue, 28 Mar 2023 11:11:54 -0400
+X-MC-Unique: NUuhNtO5O_SR8Ng9fEVPbQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6211B887403;
+        Tue, 28 Mar 2023 15:11:53 +0000 (UTC)
+Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 57D7E4020C82;
+        Tue, 28 Mar 2023 15:11:51 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 14/16] block: ublk_drv: add read()/write() support for ublk char device
+Date:   Tue, 28 Mar 2023 23:09:56 +0800
+Message-Id: <20230328150958.1253547-15-ming.lei@redhat.com>
+In-Reply-To: <20230328150958.1253547-1-ming.lei@redhat.com>
+References: <20230328150958.1253547-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-9-yosryahmed@google.com>
-In-Reply-To: <20230328061638.203420-9-yosryahmed@google.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Tue, 28 Mar 2023 08:19:33 -0700
-Message-ID: <CALvZod7wJ-e-dHEhMynquiqQWFU2j+05wUyUe_yv_rBqJLu2rw@mail.gmail.com>
-Subject: Re: [PATCH v1 8/9] vmscan: memcg: sleep when flushing stats during reclaim
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 11:16=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
-> wrote:
->
-> Memory reclaim is a sleepable context. Allow sleeping when flushing
-> memcg stats to avoid unnecessarily performing a lot of work without
-> sleeping. This can slow down reclaim code if flushing stats is taking
-> too long, but there is already multiple cond_resched()'s in reclaim
-> code.
->
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+We are going to support zero copy by fused uring command, the userspace
+can't read from or write to the io buffer any more, it becomes not
+flexible for applications:
 
-Acked-by: Shakeel Butt <shakeelb@google.com>
+1) some targets need to zero buffer explicitly, such as when reading
+unmapped qcow2 cluster
 
-> ---
->  mm/vmscan.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/mm/vmscan.c b/mm/vmscan.c
-> index a9511ccb936f..9c1c5e8b24b8 100644
-> --- a/mm/vmscan.c
-> +++ b/mm/vmscan.c
-> @@ -2845,7 +2845,7 @@ static void prepare_scan_count(pg_data_t *pgdat, st=
-ruct scan_control *sc)
->          * Flush the memory cgroup stats, so that we read accurate per-me=
-mcg
->          * lruvec stats for heuristics.
->          */
-> -       mem_cgroup_flush_stats_atomic();
-> +       mem_cgroup_flush_stats();
+2) some targets need to support passthrough command, such as zoned
+report zones, and still need to read/write the io buffer
 
-I wonder if we should just replace this with
-mem_cgroup_flush_stats_ratelimited().
+Support pread()/pwrite() on ublk char device for reading/writing request
+io buffer, so ublk server can handle the above cases easily.
+
+This also can help to make zero copy becoming the primary option, and
+non-zero-copy will become legacy code path since the added read()/write()
+can cover non-zero-copy feature.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c      | 131 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/ublk_cmd.h |  31 +++++++-
+ 2 files changed, 161 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 32304942ab87..03ad33686808 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1322,6 +1322,36 @@ static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
+ 	ublk_queue_cmd(ubq, req);
+ }
+ 
++static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
++		struct ublk_queue *ubq, int tag, size_t offset)
++{
++	struct request *req;
++
++	if (!ublk_support_zc(ubq))
++		return NULL;
++
++	req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
++	if (!req)
++		return NULL;
++
++	if (!ublk_get_req_ref(ubq, req))
++		return NULL;
++
++	if (unlikely(!blk_mq_request_started(req) || req->tag != tag))
++		goto fail_put;
++
++	if (!ublk_rq_has_data(req))
++		goto fail_put;
++
++	if (offset > blk_rq_bytes(req))
++		goto fail_put;
++
++	return req;
++fail_put:
++	ublk_put_req_ref(ubq, req);
++	return NULL;
++}
++
+ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ {
+ 	struct ublksrv_io_cmd *ub_cmd = (struct ublksrv_io_cmd *)cmd->cmd;
+@@ -1423,11 +1453,112 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 	return -EIOCBQUEUED;
+ }
+ 
++static inline bool ublk_check_ubuf_dir(const struct request *req,
++		int ubuf_dir)
++{
++	/* copy ubuf to request pages */
++	if (req_op(req) == REQ_OP_READ && ubuf_dir == ITER_SOURCE)
++		return true;
++
++	/* copy request pages to ubuf */
++	if (req_op(req) == REQ_OP_WRITE && ubuf_dir == ITER_DEST)
++		return true;
++
++	return false;
++}
++
++static struct request *ublk_check_and_get_req(struct kiocb *iocb,
++		struct iov_iter *iter, size_t *off, int dir)
++{
++	struct ublk_device *ub = iocb->ki_filp->private_data;
++	struct ublk_queue *ubq;
++	struct request *req;
++	size_t buf_off;
++	u16 tag, q_id;
++
++	if (!ub)
++		return ERR_PTR(-EACCES);
++
++	if (!user_backed_iter(iter))
++		return ERR_PTR(-EACCES);
++
++	if (ub->dev_info.state == UBLK_S_DEV_DEAD)
++		return ERR_PTR(-EACCES);
++
++	tag = ublk_pos_to_tag(iocb->ki_pos);
++	q_id = ublk_pos_to_hwq(iocb->ki_pos);
++	buf_off = ublk_pos_to_buf_offset(iocb->ki_pos);
++
++	if (q_id >= ub->dev_info.nr_hw_queues)
++		return ERR_PTR(-EINVAL);
++
++	ubq = ublk_get_queue(ub, q_id);
++	if (!ubq)
++		return ERR_PTR(-EINVAL);
++
++	if (tag >= ubq->q_depth)
++		return ERR_PTR(-EINVAL);
++
++	req = __ublk_check_and_get_req(ub, ubq, tag, buf_off);
++	if (!req)
++		return ERR_PTR(-EINVAL);
++
++	if (!req->mq_hctx || !req->mq_hctx->driver_data)
++		goto fail;
++
++	if (!ublk_check_ubuf_dir(req, dir))
++		goto fail;
++
++	*off = buf_off;
++	return req;
++fail:
++	ublk_put_req_ref(ubq, req);
++	return ERR_PTR(-EACCES);
++}
++
++static ssize_t ublk_ch_read_iter(struct kiocb *iocb, struct iov_iter *to)
++{
++	struct ublk_queue *ubq;
++	struct request *req;
++	size_t buf_off;
++	size_t ret;
++
++	req = ublk_check_and_get_req(iocb, to, &buf_off, ITER_DEST);
++	if (unlikely(IS_ERR(req)))
++		return PTR_ERR(req);
++
++	ret = ublk_copy_user_pages(req, buf_off, to, ITER_DEST);
++	ubq = req->mq_hctx->driver_data;
++	ublk_put_req_ref(ubq, req);
++
++	return ret;
++}
++
++static ssize_t ublk_ch_write_iter(struct kiocb *iocb, struct iov_iter *from)
++{
++	struct ublk_queue *ubq;
++	struct request *req;
++	size_t buf_off;
++	size_t ret;
++
++	req = ublk_check_and_get_req(iocb, from, &buf_off, ITER_SOURCE);
++	if (unlikely(IS_ERR(req)))
++		return PTR_ERR(req);
++
++	ret = ublk_copy_user_pages(req, buf_off, from, ITER_SOURCE);
++	ubq = req->mq_hctx->driver_data;
++	ublk_put_req_ref(ubq, req);
++
++	return ret;
++}
++
+ static const struct file_operations ublk_ch_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open = ublk_ch_open,
+ 	.release = ublk_ch_release,
+ 	.llseek = no_llseek,
++	.read_iter = ublk_ch_read_iter,
++	.write_iter = ublk_ch_write_iter,
+ 	.uring_cmd = ublk_ch_uring_cmd,
+ 	.mmap = ublk_ch_mmap,
+ };
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index f6238ccc7800..d1a6b3dc0327 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -54,7 +54,36 @@
+ #define UBLKSRV_IO_BUF_OFFSET	0x80000000
+ 
+ /* tag bit is 12bit, so at most 4096 IOs for each queue */
+-#define UBLK_MAX_QUEUE_DEPTH	4096
++#define UBLK_TAG_BITS		12
++#define UBLK_MAX_QUEUE_DEPTH	(1U << UBLK_TAG_BITS)
++
++/* used for locating each io buffer for pread()/pwrite() on char device */
++#define UBLK_BUFS_SIZE_BITS	42
++#define UBLK_BUFS_SIZE_MASK    ((1ULL << UBLK_BUFS_SIZE_BITS) - 1)
++#define UBLK_BUF_SIZE_BITS     (UBLK_BUFS_SIZE_BITS - UBLK_TAG_BITS)
++#define UBLK_BUF_MAX_SIZE      (1ULL << UBLK_BUF_SIZE_BITS)
++
++static inline __u16 ublk_pos_to_hwq(__u64 pos)
++{
++	return pos >> UBLK_BUFS_SIZE_BITS;
++}
++
++static inline __u32 ublk_pos_to_buf_offset(__u64 pos)
++{
++	return (pos & UBLK_BUFS_SIZE_MASK) & (UBLK_BUF_MAX_SIZE - 1);
++}
++
++static inline __u16 ublk_pos_to_tag(__u64 pos)
++{
++	return (pos & UBLK_BUFS_SIZE_MASK) >> UBLK_BUF_SIZE_BITS;
++}
++
++/* offset of single buffer, which has to be < UBLK_BUX_MAX_SIZE */
++static inline __u64 ublk_pos(__u16 q_id, __u16 tag, __u32 offset)
++{
++	return (((__u64)q_id) << UBLK_BUFS_SIZE_BITS) |
++		((((__u64)tag) << UBLK_BUF_SIZE_BITS) + offset);
++}
+ 
+ /*
+  * zero copy requires 4k block size, and can remap ublk driver's io
+-- 
+2.39.2
+
