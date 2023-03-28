@@ -2,88 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 815EAC6FD1D
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 01:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2A4C6FD1D
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 01:17:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230380AbjC1BPR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Mar 2023 21:15:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51908 "EHLO
+        id S229677AbjC1BRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Mar 2023 21:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbjC1BPQ (ORCPT
+        with ESMTP id S229575AbjC1BRu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Mar 2023 21:15:16 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E69719A0
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 18:15:13 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id w4so10141744plg.9
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 18:15:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1679966113; x=1682558113;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zwq4wydL9I093v9hDO3zVwxnC9J0ZcC370MjIqWsDT8=;
-        b=4aXydidiJ0gc7rsxJ/Twmo6oHXpvj6XODqgY7UDHkJeLJRsq6y40W37/ZcDksGwZAc
-         A7BXYYZww/WmIS5JeLSNicb1HYtNX5E4BjRm8ACtByEhkjCJ9ARbgOcD4/af01hfRL/X
-         73P7ZjcuNrHhhdcOJJlOKzxG+9YhoRF2UdL3R+Ol6CJprWIaOhDgSwvj9P9ViC2LIXzB
-         vGuC6V//sYYzegzWxHCY0qpLo/W2jl78LaiE3g6VvgIwFElz9WM4eBphtyqshPwZjzT2
-         RrI3SIIpLjqG0o0f3Ur2haKngtLQRPgHhAN8u1QzsxyTmcSsuagZ/WXUKES9HL2OZZg9
-         YvEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679966113; x=1682558113;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zwq4wydL9I093v9hDO3zVwxnC9J0ZcC370MjIqWsDT8=;
-        b=U79yskJzGKuf6cTcGSTP6lAMGS1TIC+mTABwaqyo18ujDa6QQA9A8/d4Tb6+K9vb7u
-         y9PdW8Bbj0LdIu4UAuNzHWSEv6acMGMAF+9c5YrT6FDsSPvrsIVjbkkaUlAZ5OUUx/nu
-         w7wjmLOar69+G5KlX2fNP27h/HaDQvm0yaarAt/k546uY8Jsf5o8BL4TjbJ9kDw21/ul
-         Y/BnCZ5KEsFtaWY9QmeGeHTwb8gTj4HINQ2OpeCL1Ww0zMRvBSTBj5ie9WhMSh+JlCuk
-         JD4/cADbfmdKBbvbD8yEOAvOAz/jU+zTIoBIbje9vXHfE8qGVcSczLVOD+B681f9Q30H
-         EOGQ==
-X-Gm-Message-State: AAQBX9e2jNXHWoJwz5tcQTQ+abtfY8NloOmI11HJnHXk1x5PjFyf20lN
-        7v/Zvtw516Uwbib2O6lldXmJXg==
-X-Google-Smtp-Source: AKy350ZYJ4GZvfbOmXmRspn+6HYJw0ztOtB6wwoqRwXMmL0StVUaM++KMQ2fSjcxhpwdlKSJBi5Bqg==
-X-Received: by 2002:a17:90a:d58b:b0:23b:4d09:c166 with SMTP id v11-20020a17090ad58b00b0023b4d09c166mr10919116pju.4.1679966112751;
-        Mon, 27 Mar 2023 18:15:12 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id l21-20020a656815000000b004eecc3080f8sm18782941pgt.29.2023.03.27.18.15.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Mar 2023 18:15:12 -0700 (PDT)
-Message-ID: <f1b3f0c2-f08a-a432-f0c5-6223a59e671a@kernel.dk>
-Date:   Mon, 27 Mar 2023 19:15:11 -0600
+        Mon, 27 Mar 2023 21:17:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A443199E
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 18:17:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1679966231;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IwxeZGW5YVnlucvXX3uaJlGZ00LAxfwDci1nwLOV/ps=;
+        b=GHArcW8RDr5B8U4x/nm1MgPeS4uD2HLnCfalTELil+Q0HjmyIY3N5Gb5VakqizYj1F8RoS
+        lxE0tY2MjkOuyGheJohzsC8lfbQgW92UaY7PLHOn0iTXwcdo96a0xrAmDgy2KftX3i47Mm
+        V512GLEctUnvDSP9q5egd3IHVj90/ls=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-209-yezJs16sNfeifGoeJt7QAg-1; Mon, 27 Mar 2023 21:17:07 -0400
+X-MC-Unique: yezJs16sNfeifGoeJt7QAg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0EFC285A588;
+        Tue, 28 Mar 2023 01:17:07 +0000 (UTC)
+Received: from ovpn-8-20.pek2.redhat.com (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B5C9F492B01;
+        Tue, 28 Mar 2023 01:16:59 +0000 (UTC)
+Date:   Tue, 28 Mar 2023 09:16:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V4 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
+Message-ID: <ZCJABlFshb0UmTMv@ovpn-8-20.pek2.redhat.com>
+References: <20230324135808.855245-1-ming.lei@redhat.com>
+ <642236912a229_29cc2942c@dwillia2-xfh.jf.intel.com.notmuch>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH 5/7] btrfs, block: move REQ_CGROUP_PUNT to btrfs
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
-        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>
-Cc:     Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-References: <20230327004954.728797-1-hch@lst.de>
- <20230327004954.728797-6-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230327004954.728797-6-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <642236912a229_29cc2942c@dwillia2-xfh.jf.intel.com.notmuch>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/26/23 6:49?PM, Christoph Hellwig wrote:
-> REQ_CGROUP_PUNT is a bit annoying as it is hard to follow and adds
-> a branch to the bio submission hot path.  To fix this, export
-> blkcg_punt_bio_submit and let btrfs call it directly.  Add a new
-> REQ_FS_PRIVATE flag for btrfs to indicate to it's own low-level
-> bio submission code that a punt to the cgroup submission helper
-> is required.
+Hi Dan,
 
-Looks good, and nice to remove more cruft from the generic
-submission path:
+On Mon, Mar 27, 2023 at 05:36:33PM -0700, Dan Williams wrote:
+> Ming Lei wrote:
+> > Hello Jens,
+> > 
+> > Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+> > be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+> > 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+> > to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+> > and its ->issue() can retrieve/import buffer from master request's
+> > fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+> > this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+> > submits slave OP just like normal OP issued from userspace, that said,
+> > SQE order is kept, and batching handling is done too.
+> 
+> Hi Ming,
+> 
+> io_uring and ublk are starting to be more on my radar these days. I
+> wanted to take a look at this series, but could not get past the
+> distracting "master"/"slave" terminology in this lead-in paragraph let
+> alone start looking at patches.
+> 
+> Frankly, the description sounds more like "head"/"tail", or even
+> "fuse0"/"fuse1" because, for example, who is to say you might not have
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+The term "master/slave" is from patches.
 
--- 
-Jens Axboe
+The master command not only provides buffer for slave request, but also requires
+slave request for serving master command, and master command is always completed
+after all slave request are done.
+
+That is why it is named as master/slave. Actually Jens raised the similar concern
+and I hate the name too, but it is always hard to figure out perfect name, or
+any other name for reflecting the relation? (head/tail, fuse0/1 can't
+do that, IMO)
+
+> larger fused ops in the future and need terminology to address
+> "fuse{0,1,2,3}"?
+
+Yeah, definitely, the interface can be extended in future to support
+multiple "slave" requests.
+
+Thanks,
+Ming
 
