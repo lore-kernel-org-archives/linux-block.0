@@ -2,115 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 794B2C77B61
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 14:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8100C761AF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 14:58:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233677AbjC1O6b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 10:58:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34026 "EHLO
+        id S233734AbjC1O6k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 10:58:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233699AbjC1O6Y (ORCPT
+        with ESMTP id S233657AbjC1O6a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 10:58:24 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9E859D4
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:57:57 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id o11so11947690ple.1
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:57:57 -0700 (PDT)
+        Tue, 28 Mar 2023 10:58:30 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5BBDBF9
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:58:03 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id kc4so11903239plb.10
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:58:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1680015477;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JKgdRUirgIZoU7+JyVOh+FcbHYUvKjPRVe7MS66oIFw=;
-        b=U64rvy0fPv5B3bl2GVSa2WjftX+lfIuzgkjwaxrNFtIrB+XsboRO7PFXTQbk1mwVsV
-         FN6Pzz6qfjLHk9sbxl5SSLhjBVRJeg409SHrQXfxHdvwEiPn/EEBtMtQSkTVhJrXX42v
-         zjU4KHit5sr8z2482ceOgCcDuI79Gupf681GcQ14KPG4ueLDcRAusKZ97ntmP8YS2uA4
-         JvUfvKJk3+5iZsFxJVlL2WY/wtvmN4Q4LYfc3qAyAGDTViRjQgOtVSLAwaHGgty/KUQO
-         Zi+ohbIa49gVpGmlp7KYceNekMRIH31UNYsivdlNODxViXDeplMjIoqMXtx8YEK+2WYA
-         WIEQ==
+        d=bytedance.com; s=google; t=1680015483;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mm/+XJd0CmSVOsRZU0I051KkHVVy+39u+QNn8QsY058=;
+        b=fqsNROW7MlA7x+v0YHDdg4JhU7jwlfO1TCakjmUK3J9KKV0mFXMNSTE9zJpQj1xSdd
+         A82TwPEgdicnTzo9CRmvXR0r8qWY1M/uWXSX9dxQoILcXAJStZ+h3JSF4VUtwCr86Hyi
+         BDSiAKBx8hSmU15k3IbAGLOkYIJnK7R+Sa0BlyNaCBmQcsE9RDjA+GGzDES9fnbjmA7g
+         /ejsEIC9/29W9I5ko239PgsYUwJzvwvKN0PnCx+3LfB6DRRWUmxNE4SwkNgIKk/BMH3S
+         5wsNnNwDJBZ5iV/UfhSToIVdR9g6Ii9Rq/wp4yCwlG/Hmx4peGubSueZTgBzzNdbrONG
+         STtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680015477;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JKgdRUirgIZoU7+JyVOh+FcbHYUvKjPRVe7MS66oIFw=;
-        b=igdOTdKtPHgT8wYWVSU0hdeQJytCeiyAmbKZzGCr1htyrerHXx0bQHv6VdPKB9dw0Q
-         2PnLxh0+vPDrRYrR2TSMgaYzGvByxtQJ+D6yLZdITa9kAf4tNbpriW7hvkPdRLmwyk2B
-         U8KTPYtv8//vdLn9RLM6rFa1QMYZyEnmqIsFbirgthcdyHPugfYHknZYENvXa3/OZoa5
-         6y7lJlPqui1bac7AdfXa53OV4dpKBrwi3L9yzGUZV3ew4TDkRYrrRKA+vVeTK1dymnvO
-         3LAoQtY9khCRkJuxomuFArE95HYwv+BJUEQpgR+DPgtT18oBcupT9n0JAQqBgVq5zcbV
-         6/Ww==
-X-Gm-Message-State: AAQBX9fDlqzerZT+lcAj2ztgoOyB7gVMp8Sg/Av9Udan2FigNjCAOYUY
-        po1xzJMEjr/Rv5UN73JEvVtPkg==
-X-Google-Smtp-Source: AKy350Z0gk1JmhHV2YqkSNfo28WpGsA4+RBZHbcWp07wiKZE7+TZEdXt7UeGnkNFOSnlhbvip4WaPw==
-X-Received: by 2002:a17:90b:1e4f:b0:23f:4dfd:4fc1 with SMTP id pi15-20020a17090b1e4f00b0023f4dfd4fc1mr18014809pjb.43.1680015476833;
-        Tue, 28 Mar 2023 07:57:56 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680015483;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mm/+XJd0CmSVOsRZU0I051KkHVVy+39u+QNn8QsY058=;
+        b=OppIYq9c+NoMW1bRsZRa6dwF8RUkraKhaYWiPy7GPwi85BosTIRCLm7+jOyeZKy80X
+         7OEVm7AMlG+0P2tvq2As1BP6ok90F7+oKLDdpjHCgemdk2a+O/qUQc5AMcSMl+L/k4AI
+         JgxBnCzW+XPbHMM6Hza4WgSUqy/hv/YaBYi76u03swVPifA3LJ5Nbs3r5bUM+0lBe7I0
+         ju0m+bN3isV8GvwV9Zv1/BZlIZvEBn66GTL/kMcu+zj8D3k55oqHzMP6hKXxUy7HNdtk
+         1SaCogwoxiDH32tb8Y3YnSRjhijTdj4Pkx6VbcXsPzxjy0jWY9J0+GlUDlQM6FgQyeFh
+         h8jg==
+X-Gm-Message-State: AAQBX9ewXig4OsldvsVIUpe+wgp9JZewRODCNQdnao+tpfbSEhOPpMHu
+        ssSmiqECKbs3CegCYX/eraNa7w==
+X-Google-Smtp-Source: AKy350ZuJPDxtXtKE6oMQqs5ky5bfJ06RHzbK7tcmAL+zIUW5FRRKJ1pOA1hOYo27HuitaPHRZdfdQ==
+X-Received: by 2002:a17:90b:1d05:b0:23f:2d2c:abd0 with SMTP id on5-20020a17090b1d0500b0023f2d2cabd0mr14551757pjb.4.1680015482930;
+        Tue, 28 Mar 2023 07:58:02 -0700 (PDT)
 Received: from localhost.localdomain ([2409:8a28:e6d:5da0:f469:aa9c:494f:b32f])
-        by smtp.gmail.com with ESMTPSA id nk13-20020a17090b194d00b0023b3179f0fcsm6382250pjb.6.2023.03.28.07.57.54
+        by smtp.gmail.com with ESMTPSA id nk13-20020a17090b194d00b0023b3179f0fcsm6382250pjb.6.2023.03.28.07.58.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 07:57:56 -0700 (PDT)
+        Tue, 28 Mar 2023 07:58:02 -0700 (PDT)
 From:   Chengming Zhou <zhouchengming@bytedance.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org,
         josef@toxicpanda.com
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH 1/4] block, bfq: remove BFQ_WEIGHT_LEGACY_DFL
-Date:   Tue, 28 Mar 2023 22:56:58 +0800
-Message-Id: <20230328145701.33699-1-zhouchengming@bytedance.com>
+Subject: [PATCH 3/4] blk-cgroup: delete cpd_init_fn of blkcg_policy
+Date:   Tue, 28 Mar 2023 22:57:00 +0800
+Message-Id: <20230328145701.33699-3-zhouchengming@bytedance.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20230328145701.33699-1-zhouchengming@bytedance.com>
+References: <20230328145701.33699-1-zhouchengming@bytedance.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BFQ_WEIGHT_LEGACY_DFL is the same as CGROUP_WEIGHT_DFL, which means
-we don't need cpd_bind_fn() callback to update default weight when
-attached to a hierarchy.
+blkcg_policy cpd_init_fn() is used to just initialize some default
+fields of policy data, which is enough to do in cpd_alloc_fn().
 
-This patch remove BFQ_WEIGHT_LEGACY_DFL and cpd_bind_fn().
+This patch delete the only user bfq_cpd_init(), and remove cpd_init_fn
+from blkcg_policy.
 
 Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
 ---
- block/bfq-cgroup.c  | 4 +---
- block/bfq-iosched.h | 1 -
- 2 files changed, 1 insertion(+), 4 deletions(-)
+ block/bfq-cgroup.c | 10 ++--------
+ block/blk-cgroup.c |  4 ----
+ block/blk-cgroup.h |  1 -
+ 3 files changed, 2 insertions(+), 13 deletions(-)
 
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 89ffb3aa992c..a2ab5dd58068 100644
+index a2ab5dd58068..74f7d051665b 100644
 --- a/block/bfq-cgroup.c
 +++ b/block/bfq-cgroup.c
-@@ -504,8 +504,7 @@ static void bfq_cpd_init(struct blkcg_policy_data *cpd)
- {
- 	struct bfq_group_data *d = cpd_to_bfqgd(cpd);
+@@ -497,14 +497,9 @@ static struct blkcg_policy_data *bfq_cpd_alloc(gfp_t gfp)
+ 	bgd = kzalloc(sizeof(*bgd), gfp);
+ 	if (!bgd)
+ 		return NULL;
+-	return &bgd->pd;
+-}
  
--	d->weight = cgroup_subsys_on_dfl(io_cgrp_subsys) ?
--		CGROUP_WEIGHT_DFL : BFQ_WEIGHT_LEGACY_DFL;
-+	d->weight = CGROUP_WEIGHT_DFL;
+-static void bfq_cpd_init(struct blkcg_policy_data *cpd)
+-{
+-	struct bfq_group_data *d = cpd_to_bfqgd(cpd);
+-
+-	d->weight = CGROUP_WEIGHT_DFL;
++	bgd->weight = CGROUP_WEIGHT_DFL;
++	return &bgd->pd;
  }
  
  static void bfq_cpd_free(struct blkcg_policy_data *cpd)
-@@ -1302,7 +1301,6 @@ struct blkcg_policy blkcg_policy_bfq = {
+@@ -1300,7 +1295,6 @@ struct blkcg_policy blkcg_policy_bfq = {
+ 	.legacy_cftypes		= bfq_blkcg_legacy_files,
  
  	.cpd_alloc_fn		= bfq_cpd_alloc,
- 	.cpd_init_fn		= bfq_cpd_init,
--	.cpd_bind_fn	        = bfq_cpd_init,
+-	.cpd_init_fn		= bfq_cpd_init,
  	.cpd_free_fn		= bfq_cpd_free,
  
  	.pd_alloc_fn		= bfq_pd_alloc,
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 69aaee52285a..467e8cfc41a2 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -20,7 +20,6 @@
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 68b797b3f114..18331cb92914 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1249,8 +1249,6 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
+ 		blkcg->cpd[i] = cpd;
+ 		cpd->blkcg = blkcg;
+ 		cpd->plid = i;
+-		if (pol->cpd_init_fn)
+-			pol->cpd_init_fn(cpd);
+ 	}
  
- #define BFQ_DEFAULT_QUEUE_IOPRIO	4
+ 	spin_lock_init(&blkcg->lock);
+@@ -1605,8 +1603,6 @@ int blkcg_policy_register(struct blkcg_policy *pol)
+ 			blkcg->cpd[pol->plid] = cpd;
+ 			cpd->blkcg = blkcg;
+ 			cpd->plid = pol->plid;
+-			if (pol->cpd_init_fn)
+-				pol->cpd_init_fn(cpd);
+ 		}
+ 	}
  
--#define BFQ_WEIGHT_LEGACY_DFL	100
- #define BFQ_DEFAULT_GRP_IOPRIO	0
- #define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index 26ce62663e27..2c6788658544 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -173,7 +173,6 @@ struct blkcg_policy {
  
+ 	/* operations */
+ 	blkcg_pol_alloc_cpd_fn		*cpd_alloc_fn;
+-	blkcg_pol_init_cpd_fn		*cpd_init_fn;
+ 	blkcg_pol_free_cpd_fn		*cpd_free_fn;
+ 
+ 	blkcg_pol_alloc_pd_fn		*pd_alloc_fn;
 -- 
 2.39.2
 
