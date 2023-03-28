@@ -2,64 +2,230 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 661E9C6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE6EC76196
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:28:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233339AbjC1PYL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 11:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
+        id S233431AbjC1P23 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 11:28:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233106AbjC1PX6 (ORCPT
+        with ESMTP id S233380AbjC1P2M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:23:58 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21204A5F7;
-        Tue, 28 Mar 2023 08:22:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=OSlnzCNxt0KdotKHUVgrriB1TzoU+1B8CYF5yyGE4wY=; b=T3UwVlxbjnBe0qWhtVGyVsRai+
-        ftMAaz0Kaey7nxYegHsY3Cb8ufJgIxLbwpIY8HzfdZ8ITqwItXQIo8aUziRO+hNeImCwCNXL9kmG9
-        FE+JAZd9HPWwfFTcGZ4GAWWxbIi6BOYyQSfFjd2zXnH28i0EDQZibREpMI0RUQtbK30utgObbkDdO
-        FjlNQZFB71JrwQW+b1nbus2B+ubac07Bw71ynwQTiRYW8pD1QkVCqpn52wkEMEk8aLdE0WhyQre1X
-        eXMc+IRdQi8sP5NE6Ms9L9ObTbtNDbv097G4UbO1uiRlQ/J/C+BtNzjY2isjYDiI8gIUSeOJjvt3m
-        zEiq5KZw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1phB8b-008XGU-KA; Tue, 28 Mar 2023 15:21:29 +0000
-Date:   Tue, 28 Mar 2023 16:21:29 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     martin@omnibond.com, axboe@kernel.dk, minchan@kernel.org,
-        akpm@linux-foundation.org, hubcap@omnibond.com,
-        viro@zeniv.linux.org.uk, senozhatsky@chromium.org,
-        brauner@kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, mcgrof@kernel.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        linux-mm@kvack.org, devel@lists.orangefs.org
-Subject: Re: [PATCH 2/5] orangefs: use folios in orangefs_readahead
-Message-ID: <ZCMF+QjynkdSHbn0@casper.infradead.org>
-References: <20230328112716.50120-1-p.raghav@samsung.com>
- <CGME20230328112718eucas1p263dacecb2a59f5fce510f81685f9d497@eucas1p2.samsung.com>
- <20230328112716.50120-3-p.raghav@samsung.com>
+        Tue, 28 Mar 2023 11:28:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6481167E
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:26:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680017133;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F7F6vbrS0gh77HT5XSUWKXsVAOVZJQ/PeMG00WEkJhQ=;
+        b=JRG9uDvEBEgjnYF+qNIUJwd/QJm7sJLKVDyKlUSPiUIBpEhNs/62bQf4xuniBFrpFREdrS
+        QK1v1jlMmSb75OOVoSBvD6COnFz8Kmp9J4YvesfgHUS0AMlSCAanvkTfxQvUDTyjCNQAAg
+        QXvHrfgzXScmQ8l8nV7B3LOaREULwqA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-491-4CUDDjSVM8ih_EohNIseDw-1; Tue, 28 Mar 2023 11:11:46 -0400
+X-MC-Unique: 4CUDDjSVM8ih_EohNIseDw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 76BAD887405;
+        Tue, 28 Mar 2023 15:11:45 +0000 (UTC)
+Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 66A462166B26;
+        Tue, 28 Mar 2023 15:11:44 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 12/16] block: ublk_drv: grab request reference when the request is handled by userspace
+Date:   Tue, 28 Mar 2023 23:09:54 +0800
+Message-Id: <20230328150958.1253547-13-ming.lei@redhat.com>
+In-Reply-To: <20230328150958.1253547-1-ming.lei@redhat.com>
+References: <20230328150958.1253547-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230328112716.50120-3-p.raghav@samsung.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 01:27:13PM +0200, Pankaj Raghav wrote:
-> Convert orangefs_readahead() from using struct page to struct folio.
-> This conversion removes the call to page_endio() which is soon to be
-> removed, and simplifies the final page handling.
-> 
-> The page error flags is not required to be set in the error case as
-> orangefs doesn't depend on them.
-> 
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Add one reference counter into request pdu data, and hold this reference
+in the request's lifetime. This way is always safe. In theory, the ublk
+request won't be completed until fused commands are done. However, it
+is userspace, and application can submit fused command at will.
 
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Prepare for supporting zero copy, which needs to retrieve request buffer
+by fused command, so we have to guarantee:
 
-Shouldn't Mike's tested-by be in here?
+- the fused command can't succeed unless the request isn't queued
+
+- when any fused command is successful, this request can't be freed
+until all fused commands on this request are done.
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 67 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index cca0e95a89d8..0dc8eb04b9a5 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -43,6 +43,7 @@
+ #include <asm/page.h>
+ #include <linux/task_work.h>
+ #include <linux/namei.h>
++#include <linux/kref.h>
+ #include <uapi/linux/ublk_cmd.h>
+ 
+ #define UBLK_MINORS		(1U << MINORBITS)
+@@ -62,6 +63,17 @@
+ struct ublk_rq_data {
+ 	struct llist_node node;
+ 	struct callback_head work;
++
++	/*
++	 * Only for applying fused command to support zero copy:
++	 *
++	 * - if there is any fused command aiming at this request, not complete
++	 *   request until all fused commands are done
++	 *
++	 * - fused command has to fail unless this reference is grabbed
++	 *   successfully
++	 */
++	struct kref ref;
+ };
+ 
+ struct ublk_uring_cmd_pdu {
+@@ -180,6 +192,9 @@ struct ublk_params_header {
+ 	__u32	types;
+ };
+ 
++static inline void __ublk_complete_rq(struct request *req);
++static void ublk_complete_rq(struct kref *ref);
++
+ static dev_t ublk_chr_devt;
+ static struct class *ublk_chr_class;
+ 
+@@ -288,6 +303,35 @@ static int ublk_apply_params(struct ublk_device *ub)
+ 	return 0;
+ }
+ 
++static inline bool ublk_support_zc(const struct ublk_queue *ubq)
++{
++	return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
++}
++
++static inline bool ublk_get_req_ref(const struct ublk_queue *ubq,
++		struct request *req)
++{
++	if (ublk_support_zc(ubq)) {
++		struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
++
++		return kref_get_unless_zero(&data->ref);
++	}
++
++	return true;
++}
++
++static inline void ublk_put_req_ref(const struct ublk_queue *ubq,
++		struct request *req)
++{
++	if (ublk_support_zc(ubq)) {
++		struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
++
++		kref_put(&data->ref, ublk_complete_rq);
++	} else {
++		__ublk_complete_rq(req);
++	}
++}
++
+ static inline bool ublk_can_use_task_work(const struct ublk_queue *ubq)
+ {
+ 	if (IS_BUILTIN(CONFIG_BLK_DEV_UBLK) &&
+@@ -632,13 +676,19 @@ static inline bool ubq_daemon_is_dying(struct ublk_queue *ubq)
+ }
+ 
+ /* todo: handle partial completion */
+-static void ublk_complete_rq(struct request *req)
++static inline void __ublk_complete_rq(struct request *req)
+ {
+ 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
+ 	struct ublk_io *io = &ubq->ios[req->tag];
+ 	unsigned int unmapped_bytes;
+ 	blk_status_t res = BLK_STS_OK;
+ 
++	/* called from ublk_abort_queue() code path */
++	if (io->flags & UBLK_IO_FLAG_ABORTED) {
++		res = BLK_STS_IOERR;
++		goto exit;
++	}
++
+ 	/* failed read IO if nothing is read */
+ 	if (!io->res && req_op(req) == REQ_OP_READ)
+ 		io->res = -EIO;
+@@ -678,6 +728,15 @@ static void ublk_complete_rq(struct request *req)
+ 	blk_mq_end_request(req, res);
+ }
+ 
++static void ublk_complete_rq(struct kref *ref)
++{
++	struct ublk_rq_data *data = container_of(ref, struct ublk_rq_data,
++			ref);
++	struct request *req = blk_mq_rq_from_pdu(data);
++
++	__ublk_complete_rq(req);
++}
++
+ /*
+  * Since __ublk_rq_task_work always fails requests immediately during
+  * exiting, __ublk_fail_req() is only called from abort context during
+@@ -696,7 +755,7 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
+ 		if (ublk_queue_can_use_recovery_reissue(ubq))
+ 			blk_mq_requeue_request(req, false);
+ 		else
+-			blk_mq_end_request(req, BLK_STS_IOERR);
++			ublk_put_req_ref(ubq, req);
+ 	}
+ }
+ 
+@@ -734,6 +793,7 @@ static inline void __ublk_rq_task_work(struct request *req,
+ 				       unsigned issue_flags)
+ {
+ 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
++	struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
+ 	int tag = req->tag;
+ 	struct ublk_io *io = &ubq->ios[tag];
+ 	unsigned int mapped_bytes;
+@@ -805,6 +865,7 @@ static inline void __ublk_rq_task_work(struct request *req,
+ 			mapped_bytes >> 9;
+ 	}
+ 
++	kref_init(&data->ref);
+ 	ubq_complete_io_cmd(io, UBLK_IO_RES_OK, issue_flags);
+ }
+ 
+@@ -1017,7 +1078,7 @@ static void ublk_commit_completion(struct ublk_device *ub,
+ 	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
+ 
+ 	if (req && likely(!blk_should_fake_timeout(req->q)))
+-		ublk_complete_rq(req);
++		ublk_put_req_ref(ubq, req);
+ }
+ 
+ /*
+-- 
+2.39.2
+
