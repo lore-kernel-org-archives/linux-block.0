@@ -2,66 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF331C76196
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 18:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D50FC6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 19:00:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229869AbjC1Sxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 14:53:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55244 "EHLO
+        id S229631AbjC1TAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 15:00:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbjC1Sx3 (ORCPT
+        with ESMTP id S229479AbjC1TAi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 14:53:29 -0400
+        Tue, 28 Mar 2023 15:00:38 -0400
 Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D294B2139
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 11:53:27 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id r11so53737690edd.5
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 11:53:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8493A272B
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:00:37 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id x3so53711218edb.10
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680029606;
+        d=google.com; s=20210112; t=1680030036;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Knz0ICKyVQWqTN98QRlsl94SOUBbAgJSfpknOWcWIz8=;
-        b=eBFPS5upevzYowGb39P08hDPA5ByzP8CKwYQMFgOKj+6IYq2Vkfhm5oL5cVrbZhHzf
-         eQHkB8C313lW8nsV9BpZNUZGGFqiswJwY5FMsPU6z/cd/O9XwAIDMFqeGPfx35miDyrF
-         +bGkozLip971EeAk9h6UC0HOXtdfFwRiZJkEUoXuLJ3fBqgLl1/lbS6hfhsmfL9XRhH+
-         KR9XbqwM57zERf5JS531f6qDu8XI49Nmmt2jHNhErVh4imKzomY5+lfULAhHKaJb3jM2
-         Rye/OtfKqLqEEIMO08YuFZgxXxl9NZRbCLkFj6dKWKMGFVVM0dFa3ui8jA4/djrvfILk
-         dA1w==
+        bh=VaFE8MJ/rJnWu49G6qaf7Zeu9SjJjHyr+HaKIIGZlo8=;
+        b=hGNPwQWTEYe3CZmGYHi60X2aSfRWtVK8WiJ7nu3mjdJk4YmjuiqYe9pQ+CDJlPYyxd
+         /pi9trbtJtSOm7MifwcGnSBImrwX+6Z42snV0nbBlJ7UXJ/eKh48Yn/EV7NYVDSmmbPt
+         Rb0l9k4E3FCIRsq0+yQqNxV2ey483qI2f6DnbBWaNsDKB3buuC+B9cupFif5N8kLGalN
+         EqIH5K8IIPJWWoiCFHfQlnBM7LhKzgagHTbCa9LC7C/ObuzCHw9amKjqLxPdo/JKx3RO
+         c+XsEE64L2GpM8WO4QZD+clco6JbOEINCGSlyDLrWKVTxZp91kvGAVcL2J04SbpNs5mz
+         w6JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680029606;
+        d=1e100.net; s=20210112; t=1680030036;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Knz0ICKyVQWqTN98QRlsl94SOUBbAgJSfpknOWcWIz8=;
-        b=3fhqALiNHB6RuFvY9GvPUhpE7pQiTWo7fGgykfnrUjcyAgCSc5nxuopVrP/Dn2xEkZ
-         kImBwXCALCjjaVIWc6bz13BVLzZ+XMscKbI/bZNFQTnP6omqkbLk++Ob2PKSMKq3oFCw
-         H1/xW4PAergbdkpE71E4Z+bQ+EvhluemjMbJpZ2S6EHE20+uVw2J/I/M7tFjuts27kyY
-         kGPs5iFPAOVEhr5qRc34briJ6nTH+cus5o02BRFsiecEbu0yiPkn8xBrNKXSGRAzMIyR
-         f6uicOtTRAMqbIybxkEeSl/9L9A7xyk4Wr8rdJ20I2lNXeB/mc+7SH1qiWzQmT4XJBrS
-         PiFw==
-X-Gm-Message-State: AAQBX9fBLQS8jCsY5/rBBbNHVDF6eslXLz8DBm5RZqe7BmIEqVQhQ8B5
-        HIC4fie2Y7YOmf3YiM+o367cz7ZzFlIhN0+XSdmW8A==
-X-Google-Smtp-Source: AKy350Z3M7QR34ahCbawZrKpU+fclV+7eeIoXTqQ34bVv12otunyd4ooJvbGExuWfU2TzFjs2F14JyzAfPoOyuqb8SA=
-X-Received: by 2002:a17:907:9870:b0:8b1:28f6:8ab3 with SMTP id
- ko16-20020a170907987000b008b128f68ab3mr8771567ejc.15.1680029606204; Tue, 28
- Mar 2023 11:53:26 -0700 (PDT)
+        bh=VaFE8MJ/rJnWu49G6qaf7Zeu9SjJjHyr+HaKIIGZlo8=;
+        b=K0NWU0UJqXfil6WFqVvENOrzcXTJaAKFburjDD6A5kqCM6W2nsQVC6rU5rJUsiJJ4U
+         u9Oi1eMpPFMK9SRgoBX52u5dhzI0DvQHva7oH5NgZp2egVDzg0qvaqgy9l8t51Gr3jot
+         sN4wEFVJRA1xBT49b+2vbWJywCXxFq9WXyfH5yvtHqsNjT00RnhoGf+62X6IKaOMmUzU
+         meESZH6uRa7//0Vyl2uJoUmWVWRlopKV+nOCqUDk431FhmVoZAsiCXdNVsdJDPq5VJNM
+         3mPJNtKKEgDr8sgIPukS6ZukA0VbTAFX5HaAROhr45pAJYxEnRBsoHVvoG6Cx0H2Vwjv
+         x7dg==
+X-Gm-Message-State: AAQBX9eCGW4M7FAAv74aOusyqStMgVruEbIPcVmQvJHmtRC0HYbTkoYu
+        zXr0KxcDm5TBgt0lBW15J+5KVQG8smPnathFSuDlkA==
+X-Google-Smtp-Source: AKy350Yhk/i0+JPviKO6ga1I/DH2EtAh9hdlzqBienFUiCmmezrhPlteMpnkr+v35C7I9/6s8VzBjh8YFxr470tp00Q=
+X-Received: by 2002:a50:d756:0:b0:4fc:e5c:902 with SMTP id i22-20020a50d756000000b004fc0e5c0902mr8274473edj.8.1680030035893;
+ Tue, 28 Mar 2023 12:00:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230328061638.203420-1-yosryahmed@google.com>
- <20230328061638.203420-6-yosryahmed@google.com> <20230328141523.txyhl7wt7wtvssea@google.com>
-In-Reply-To: <20230328141523.txyhl7wt7wtvssea@google.com>
+ <20230328061638.203420-5-yosryahmed@google.com> <ZCMojk50vjiK6mBe@cmpxchg.org>
+In-Reply-To: <ZCMojk50vjiK6mBe@cmpxchg.org>
 From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Tue, 28 Mar 2023 11:52:50 -0700
-Message-ID: <CAJD7tkYo=CeXJPUi_KxjzC0QCxC2qd_J2_FQi_aXh7svD8u60A@mail.gmail.com>
-Subject: Re: [PATCH v1 5/9] memcg: replace stats_flush_lock with an atomic
-To:     Shakeel Butt <shakeelb@google.com>
+Date:   Tue, 28 Mar 2023 11:59:59 -0700
+Message-ID: <CAJD7tkYA=0rKSmtQzYQpZ2DuUoJq0bQcVqPgSpVEs0M4zAktnw@mail.gmail.com>
+Subject: Re: [PATCH v1 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
+ outside task context
+To:     Johannes Weiner <hannes@cmpxchg.org>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>,
         Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
         Michal Hocko <mhocko@kernel.org>,
         Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
         Muchun Song <muchun.song@linux.dev>,
         Andrew Morton <akpm@linux-foundation.org>,
         =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
@@ -75,65 +75,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 7:15=E2=80=AFAM Shakeel Butt <shakeelb@google.com> =
-wrote:
+On Tue, Mar 28, 2023 at 10:49=E2=80=AFAM Johannes Weiner <hannes@cmpxchg.or=
+g> wrote:
 >
-> On Tue, Mar 28, 2023 at 06:16:34AM +0000, Yosry Ahmed wrote:
-> [...]
-> > @@ -585,8 +585,8 @@ mem_cgroup_largest_soft_limit_node(struct mem_cgrou=
-p_tree_per_node *mctz)
-> >   */
-> >  static void flush_memcg_stats_dwork(struct work_struct *w);
-> >  static DECLARE_DEFERRABLE_WORK(stats_flush_dwork, flush_memcg_stats_dw=
-ork);
-> > -static DEFINE_SPINLOCK(stats_flush_lock);
-> >  static DEFINE_PER_CPU(unsigned int, stats_updates);
-> > +static atomic_t stats_flush_ongoing =3D ATOMIC_INIT(0);
-> >  static atomic_t stats_flush_threshold =3D ATOMIC_INIT(0);
-> >  static u64 flush_next_time;
+> On Tue, Mar 28, 2023 at 06:16:33AM +0000, Yosry Ahmed wrote:
+> > rstat flushing is too expensive to perform in irq context.
+> > The previous patch removed the only context that may invoke an rstat
+> > flush from irq context, add a WARN_ON_ONCE() to detect future
+> > violations, or those that we are not aware of.
 > >
-> > @@ -636,15 +636,18 @@ static inline void memcg_rstat_updated(struct mem=
-_cgroup *memcg, int val)
+> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> > ---
+> >  kernel/cgroup/rstat.c | 2 ++
+> >  1 file changed, 2 insertions(+)
 > >
-> >  static void __mem_cgroup_flush_stats(void)
+> > diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+> > index d3252b0416b6..c2571939139f 100644
+> > --- a/kernel/cgroup/rstat.c
+> > +++ b/kernel/cgroup/rstat.c
+> > @@ -176,6 +176,8 @@ static void cgroup_rstat_flush_locked(struct cgroup=
+ *cgrp, bool may_sleep)
 > >  {
-> > -     unsigned long flag;
-> > -
-> > -     if (!spin_trylock_irqsave(&stats_flush_lock, flag))
-> > +     /*
-> > +      * We always flush the entire tree, so concurrent flushers can ju=
-st
-> > +      * skip. This avoids a thundering herd problem on the rstat globa=
-l lock
-> > +      * from memcg flushers (e.g. reclaim, refault, etc).
-> > +      */
-> > +     if (atomic_xchg(&stats_flush_ongoing, 1))
+> >       int cpu;
+> >
+> > +     /* rstat flushing is too expensive for irq context */
+> > +     WARN_ON_ONCE(!in_task());
+> >       lockdep_assert_held(&cgroup_rstat_lock);
 >
-> Have you profiled this? I wonder if we should replace the above with
->
->         if (atomic_read(&stats_flush_ongoing) || atomic_xchg(&stats_flush=
-_ongoing, 1))
+> This seems a bit arbitrary. Why is an irq caller forbidden, but an
+> irq-disabled, non-preemptible section caller is allowed? The latency
+> impact on the system would be the same, right?
 
-I profiled the entire series with perf and I haven't noticed a notable
-difference between before and after the patch series -- but maybe some
-specific access patterns cause a regression, not sure.
+Thanks for taking a look.
 
-Does an atomic_cmpxchg() satisfy the same purpose? it's easier to read
-/ more concise I guess.
+So in the first patch series the initial purpose was to make sure
+cgroup_rstat_lock was never acquired in an irq context, so that we can
+stop disabling irqs while holding it. Tejun disagreed with this
+approach though.
 
-Something like
-
-    if (atomic_cmpxchg(&stats_flush_ongoing, 0, 1))
+We currently have one caller that calls flushing with irqs disabled
+(mem_cgroup_usage()) -- so we cannot forbid such callers (yet), but I
+thought we can at least forbid callers from irq context now (or catch
+those that we are not aware of), and then maybe forbid irqs_disabled()
+contexts as well we can get rid of that callsite.
 
 WDYT?
-
-
-
-
->
-> to not always dirty the cacheline. This would not be an issue if there
-> is no cacheline sharing but I suspect percpu stats_updates is sharing
-> the cacheline with it and may cause false sharing with the parallel stat
-> updaters (updaters only need to read the base percpu pointer).
->
-> Other than that the patch looks good.
