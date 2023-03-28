@@ -2,59 +2,60 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 282B1C6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 19:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA05BC76196
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 19:43:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbjC1Te6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 15:34:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48828 "EHLO
+        id S229648AbjC1TnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 15:43:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbjC1Tez (ORCPT
+        with ESMTP id S229436AbjC1TnJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 15:34:55 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A0B2E9
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:34:53 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id r11so54168293edd.5
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:34:53 -0700 (PDT)
+        Tue, 28 Mar 2023 15:43:09 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 141DA18B
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:43:08 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id ek18so54246271edb.6
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:43:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680032092;
+        d=google.com; s=20210112; t=1680032586;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PCcvIywQQCX7FP21Q6hk+wcOp0VhtxDKF+8JhJGEAfQ=;
-        b=dHoOF8rNOSkdjd1rnnf8XC6IGb6FKwmM7Ivdvjk2GQi/EbVyThzjBYyHQXopuJULIg
-         3p1bzuC4gKKNl6Fqhda2du3Rr+s6FdBcg4aXKrD1ycu2zktIM3FTOAoGmv4pZHnjujsT
-         rvqc9SbA4NjhcACriIJnLeYfMpWyuhW0j5mUqMiEJuGYX3I6Vm1bge9vyTRqSfTQ+kFD
-         hcNKe+61X/fdB+69ZT/PWtpn27JcWOnhGjSUdRlOVudULYhr4IE9KPo4WrZdFpVOufcb
-         x3G5vlvhcJZuXWJ1jNnDtE5NmkzFKju+dq8flQe22Sd56znLfGyB2CeL5tXa6i93FNYi
-         J7Xg==
+        bh=nqIPDr+ZqfoCi8eQc3DTNr+ThF98a/RBvzrvNFqWYDM=;
+        b=TIEXaRQDBAZ6mBWE2R4TELhNaijNMDedZH3kg6n0ljtndAxJLXXqyFQwcErH6B46Lz
+         U9BN+2qoq3bDs+Ypbo1k5NzI/RQIygK7ia03C7cfrRO0ByWfBXsdRCT0alHvfQTfmvRe
+         qv9IocyC7Cjb3idOoIKKeNX5YVur0irro0khGXutbTnhV67ua5rmPZ8USHumeZuOnxd8
+         bw+LUtnZMfNIRTh+++D2tITNO4f5XHgKLCv401nXpXS49KzLZKP/0ycEI4wvThEYgq34
+         SdVY6fUmkfV2iCF/Uacl+jKfcVLSr1puNKsWanMsSlWfcXyo+ZpeNqbzs0La62nvhfVM
+         xa2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680032092;
+        d=1e100.net; s=20210112; t=1680032586;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PCcvIywQQCX7FP21Q6hk+wcOp0VhtxDKF+8JhJGEAfQ=;
-        b=xui2FcFIT2crD6GA8g+Ur5A5f4iiV/KnRnECrkW4/IGlP6aSmXtUFbLgZsVwbWnmL4
-         rLDgRDrszJMZtv5dv2sVSb5jv9RgZvNDz3noTmYgzBiDEbAjp5BkKIefUitmx+YryBaV
-         YzD99x5PTsqz5t2gAMkMnqQSeqDakSEfzQP1J8hUtk3rjheR+gujV/gfjBpjx7nyTInf
-         iMH3da2PmDGheAwwiCEAYNvACKoXlmKo7dJFHOaOod5H5mH8oR5xoDLVYz787fU8TJqR
-         VgQr307BZu0EcdViRy90hfS0svitn3NUGun3HvFSbZQeK0JKbMseGAgRKhbPXQJWsv3q
-         E4pw==
-X-Gm-Message-State: AAQBX9dW/9j8bYJ+4jW/nHFWr6/NQXERM1XPrzP5b5+M/yfLMcYhYRRZ
-        QgyJbU8zJxGORYSSPB/6mE8STZwgfDXuFIPOIIupvQ==
-X-Google-Smtp-Source: AKy350YOd+MIycwAtui+juLEs+/XeA1BayeLMmg6/SLyZm36OoLT9BnRDKlngVlZ55Qf5nONmzBspfNUTrbsKzLJWs4=
-X-Received: by 2002:a50:d581:0:b0:502:1d1c:7d37 with SMTP id
- v1-20020a50d581000000b005021d1c7d37mr8497378edi.8.1680032091630; Tue, 28 Mar
- 2023 12:34:51 -0700 (PDT)
+        bh=nqIPDr+ZqfoCi8eQc3DTNr+ThF98a/RBvzrvNFqWYDM=;
+        b=omXyb4Za99RUvpZpLxzRE4xIwde8HFlku0l8wRmU0Exjo9eJhoqLBzYIaO/q+EUFGv
+         SNfipqabW3JcivD1tUnIXdAzRpczOKAFv4MGqLP3cbWt9hnOgeWtRe7f2CXmPIMXcCGI
+         3/y4Jl0iNJQkut9+mrkchfSqxArXys8oeB6AEcYxnyY9T+LaSNzwkV3shC11UqCZ1kJ1
+         dlxU46ALSCiCqAZDh5hjYNN+zKHQeFpmZfAkc3yzGmg79O4iX7lNO8AIBAIQfRtfieJc
+         LUXb6tKnTkha8GKx5qcZMFdrlWdz+wIcEIFPLVhsIhNPbJ9GegvhwhahHNYau66IuEt7
+         HOIQ==
+X-Gm-Message-State: AAQBX9eGtNEnSXrBxGuZPe+H0j55BkkMWi5OLlZ3UzZX9mhDuIYhun4P
+        ZWv/kBdaY479KgBzj27ZhnUObFkddPnE3IIdrqtZSQ==
+X-Google-Smtp-Source: AKy350Y+r8YQubYTs8R7PJEitaPs1q0OlTz1iemnZQ7KI+3/VnM/MXrQyknZBxEGhPVmnt+/5hUtEtoV/kv4VWDou8E=
+X-Received: by 2002:a50:a444:0:b0:500:5463:35de with SMTP id
+ v4-20020a50a444000000b00500546335demr8511392edb.8.1680032586465; Tue, 28 Mar
+ 2023 12:43:06 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230328061638.203420-1-yosryahmed@google.com>
  <20230328061638.203420-6-yosryahmed@google.com> <20230328141523.txyhl7wt7wtvssea@google.com>
- <CAJD7tkYo=CeXJPUi_KxjzC0QCxC2qd_J2_FQi_aXh7svD8u60A@mail.gmail.com> <CALvZod4Gsngc6MjXdk4s5+ePVjsgcVppdRmsQovN6gSrxzdbfA@mail.gmail.com>
-In-Reply-To: <CALvZod4Gsngc6MjXdk4s5+ePVjsgcVppdRmsQovN6gSrxzdbfA@mail.gmail.com>
+ <CAJD7tkYo=CeXJPUi_KxjzC0QCxC2qd_J2_FQi_aXh7svD8u60A@mail.gmail.com>
+ <CALvZod4Gsngc6MjXdk4s5+ePVjsgcVppdRmsQovN6gSrxzdbfA@mail.gmail.com> <CAJD7tkb_YA3fvo3LgCzR+X-b-r-AmAR68hNR=xT7B6TJfBa54A@mail.gmail.com>
+In-Reply-To: <CAJD7tkb_YA3fvo3LgCzR+X-b-r-AmAR68hNR=xT7B6TJfBa54A@mail.gmail.com>
 From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Tue, 28 Mar 2023 12:34:15 -0700
-Message-ID: <CAJD7tkb_YA3fvo3LgCzR+X-b-r-AmAR68hNR=xT7B6TJfBa54A@mail.gmail.com>
+Date:   Tue, 28 Mar 2023 12:42:30 -0700
+Message-ID: <CAJD7tkYbZKikn8VEzuuCL9pPiD_PX1gXdK7r9v8q-skKPBYf2w@mail.gmail.com>
 Subject: Re: [PATCH v1 5/9] memcg: replace stats_flush_lock with an atomic
 To:     Shakeel Butt <shakeelb@google.com>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -76,44 +77,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 12:28=E2=80=AFPM Shakeel Butt <shakeelb@google.com>=
- wrote:
+On Tue, Mar 28, 2023 at 12:34=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
+> wrote:
 >
-> On Tue, Mar 28, 2023 at 11:53=E2=80=AFAM Yosry Ahmed <yosryahmed@google.c=
-om> wrote:
+> On Tue, Mar 28, 2023 at 12:28=E2=80=AFPM Shakeel Butt <shakeelb@google.co=
+m> wrote:
 > >
-> [...]
-> > > > +     if (atomic_xchg(&stats_flush_ongoing, 1))
+> > On Tue, Mar 28, 2023 at 11:53=E2=80=AFAM Yosry Ahmed <yosryahmed@google=
+.com> wrote:
 > > >
-> > > Have you profiled this? I wonder if we should replace the above with
+> > [...]
+> > > > > +     if (atomic_xchg(&stats_flush_ongoing, 1))
+> > > >
+> > > > Have you profiled this? I wonder if we should replace the above wit=
+h
+> > > >
+> > > >         if (atomic_read(&stats_flush_ongoing) || atomic_xchg(&stats=
+_flush_ongoing, 1))
 > > >
-> > >         if (atomic_read(&stats_flush_ongoing) || atomic_xchg(&stats_f=
-lush_ongoing, 1))
+> > > I profiled the entire series with perf and I haven't noticed a notabl=
+e
+> > > difference between before and after the patch series -- but maybe som=
+e
+> > > specific access patterns cause a regression, not sure.
+> > >
+> > > Does an atomic_cmpxchg() satisfy the same purpose? it's easier to rea=
+d
+> > > / more concise I guess.
+> > >
+> > > Something like
+> > >
+> > >     if (atomic_cmpxchg(&stats_flush_ongoing, 0, 1))
+> > >
+> > > WDYT?
+> > >
 > >
-> > I profiled the entire series with perf and I haven't noticed a notable
-> > difference between before and after the patch series -- but maybe some
-> > specific access patterns cause a regression, not sure.
+> > No, I don't think cmpxchg will be any different from xchg(). On x86,
+> > the cmpxchg will always write to stats_flush_ongoing and depending on
+> > the comparison result, it will either be 0 or 1 here.
 > >
-> > Does an atomic_cmpxchg() satisfy the same purpose? it's easier to read
-> > / more concise I guess.
-> >
-> > Something like
-> >
-> >     if (atomic_cmpxchg(&stats_flush_ongoing, 0, 1))
-> >
-> > WDYT?
-> >
+> > If you see the implementation of queued_spin_trylock(), it does the
+> > same as well.
 >
-> No, I don't think cmpxchg will be any different from xchg(). On x86,
-> the cmpxchg will always write to stats_flush_ongoing and depending on
-> the comparison result, it will either be 0 or 1 here.
+> Interesting. I thought cmpxchg by definition will compare first and
+> only do the write if stats_flush_ongoing =3D=3D 0 in this case.
 >
-> If you see the implementation of queued_spin_trylock(), it does the
-> same as well.
+> I thought queued_spin_trylock() was doing an atomic_read() first to
+> avoid the LOCK instruction unnecessarily the lock is held by someone
+> else.
 
-Interesting. I thought cmpxchg by definition will compare first and
-only do the write if stats_flush_ongoing =3D=3D 0 in this case.
+Anyway, perhaps it's better to follow what queued_spin_trylock() is
+doing, even if only to avoid locking the cache line unnecessarily.
 
-I thought queued_spin_trylock() was doing an atomic_read() first to
-avoid the LOCK instruction unnecessarily the lock is held by someone
-else.
+(Although now that I think about it, I wonder why atomic_cmpxchg
+doesn't do this by default, food for thought)
