@@ -2,92 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD9C8C761AF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 13:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8AAC761AF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 13:42:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229718AbjC1N02 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 09:26:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46630 "EHLO
+        id S233127AbjC1Nm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 09:42:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230014AbjC1N01 (ORCPT
+        with ESMTP id S232484AbjC1Nmt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 09:26:27 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17EC71BFF
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 06:26:26 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id z83so15017824ybb.2
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 06:26:26 -0700 (PDT)
+        Tue, 28 Mar 2023 09:42:49 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1119778;
+        Tue, 28 Mar 2023 06:42:39 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id d10so7205741pgt.12;
+        Tue, 28 Mar 2023 06:42:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680009985;
+        d=gmail.com; s=20210112; t=1680010959;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8bJymL0yBKvMYTD1Xc/qu3GglkLI9FvB8Lv/yuqvRQc=;
-        b=eZy1jM+Kd53ZIzWNbOqgWbWL45Dr+Nw9ANo2PWtQbmVaWtrjCdrDAwPWv3yK9p7pwn
-         NdX2H4aYwg5QRk1CBz5Q+PDjxvTvxqOymyHBX8fhYiwV1krbMVJo3/thEa0eeD2ncqtr
-         11MW+NX2xIo4RJWivNGz5B/TSrAzZmnzZLla0MAE4rR5mfGrSLcqNM08TimNues3s+u/
-         7Y5UuSgD0RzJHWmkNAiahoW2q/TpdkuXvww90IJ4ZT0HDPDLUtzwosiL6k1Ay9MagttR
-         Xll6pq0j7ma1HAlACEp1cDHFcxilfs9tVtLUSpSaT3tswN2NAz96yvtBv6Q2jzszETWW
-         11rA==
+        bh=zhuOF8Ho5g7rK8i7Gjjphp+Xz2ush8RYPAJ3+nO8+hU=;
+        b=ohv1R6BsJ0apfHnfIaYD0x+ssyU4aWoNEXnATWn2rcvn29C/EsJGK7p6IDnuM9fJMo
+         UOtC34kKxAZjwY84umK4/vicnSdHCBd6qgMiRWHpE7h/hgRFM82W+dJglled/echbUQ1
+         E1K0v84j+vnl7V5Zy5Fn5uaLHHhFKkCsjRx3vtPfrC9FHjGApF/xGMzc2CigYWS919Dr
+         jaxtUJy1iRunvTtsHeYhd3a8LnyWhjQV0DNnURVouXTAG0jex6sTV43umwktvLXRVyIb
+         j7iKNpcsPY13un2CQi4of8BswcmImAdR6XvOD/CnYM47BUz/tzStpE44TF+MzCXZn3gG
+         iB+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680009985;
+        d=1e100.net; s=20210112; t=1680010959;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8bJymL0yBKvMYTD1Xc/qu3GglkLI9FvB8Lv/yuqvRQc=;
-        b=MVcsOPYdHDdI7D+A9NO4K3ku/MyweMBn+NJyA23NNXRcSQvmMnO39ZKI/sauMwRHtZ
-         92p2MT7rJHtjiboYsaRstGTpVK01QSq+Ei5EwUX+cVSCajOjxYq3CmflifzYTB8RiPt9
-         85/cBeJV0cIv/qWI90hDJ5RBGlAFkdFrMpAeMI7MQOEFuPZqweMl3mduOCWluXIsrOr/
-         Qt9cCNTaEvVgCo44jD7b7gkBEwnHI7vJYWBBVknynPDshrsydAZl+b9lbvJu4f14Ub/F
-         eUjOgvzGtaLwaUCSTq9hrtZHR1coFMcjJ3kHHCEWehJ24h3mHjCQ2F6P9ph5jT7vR6Ak
-         k3Kw==
-X-Gm-Message-State: AAQBX9fhkiIsBd6dEgtKIlXCRxZGV89jJ2qR/6nu4GMNkERJh52HmtD3
-        FRsLJOgc2+qU92gmGc6tvZXsy290Ezr2Se5vnfG1QA==
-X-Google-Smtp-Source: AKy350Zja1hP9WxwT3nbR4kgm/32+esIcZm0ttA35DlxybRpCP5Bjc/9FU70PICjQ5T/32D5BoknkSe4x+2lmAwB5IY=
-X-Received: by 2002:a25:e054:0:b0:b6b:d3f3:45af with SMTP id
- x81-20020a25e054000000b00b6bd3f345afmr9852686ybg.1.1680009985214; Tue, 28 Mar
- 2023 06:26:25 -0700 (PDT)
+        bh=zhuOF8Ho5g7rK8i7Gjjphp+Xz2ush8RYPAJ3+nO8+hU=;
+        b=28KtK3M+11nHcfYTmCM8YCs3Wpw9m0puVpAIXttkbwzYBq6HPOfxC59viamiE6Yvlv
+         BPn8cjPSGsqxcyiSA8OfrvEfZfgUitsrtR7meyVkiNQR+1xSs/bVp8yTpKB62nBIrt/+
+         ONumljC+ZrQekRguepbUsf6LkpFLzL/NC11xTQvVOOm8bUEDq1poJrSd98Z95VQJi3zS
+         Dwj+qJCmfDUOqN2joGqWkdzI7Pnxyj7eO13QT39xOzlKiNYP8o9Xk6k81/YS3Q0mOhjL
+         cyuTNBD/KoKuH+Ef4bqTIHWXJcLV7suA6kdu1jHy6N8a452AFkio11j3Lf8Ch07Dcz8z
+         eVOw==
+X-Gm-Message-State: AAQBX9del6dtMsjzJc6qTP+ZqBXYuO+1JtCMe4umlGBKghEVyWd5Jx49
+        DJJ1chOmd5j8MrnHPkkz3JO+r0Cobnc+8mAyPuqC766n
+X-Google-Smtp-Source: AKy350bVKJbK4HdlOq50XmTjRNX5ftQ2y602rndF1NQGJZJwBaI0ysvg4ceiDozOC6jOtPOZm9kKgj2yO8M4S5/4mqU=
+X-Received: by 2002:a63:ef0c:0:b0:50f:aafa:6bc9 with SMTP id
+ u12-20020a63ef0c000000b0050faafa6bc9mr4067379pgh.6.1680010958857; Tue, 28 Mar
+ 2023 06:42:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-4-yosryahmed@google.com>
-In-Reply-To: <20230328061638.203420-4-yosryahmed@google.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Tue, 28 Mar 2023 06:26:14 -0700
-Message-ID: <CALvZod6n64b80+ZPX13bBiJWagcMJBstAcLauQoiT=UMdx0QGw@mail.gmail.com>
-Subject: Re: [PATCH v1 3/9] memcg: do not flush stats in irq context
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
+References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
+In-Reply-To: <20230327174402.1655365-1-kent.overstreet@linux.dev>
+From:   Phillip Lougher <phillip.lougher@gmail.com>
+Date:   Tue, 28 Mar 2023 14:42:28 +0100
+Message-ID: <CAB3woddAP_6uOUJ4Yjj_PATme-CQao3p2JErBBtjtpzYxQejng@mail.gmail.com>
+Subject: Re: [PATCH 0/2] bio iter improvements
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        willy@infradead.org, axboe@kernel.dk,
+        Phillip Lougher <phillip@squashfs.org.uk>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 11:16=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
-> wrote:
+On Mon, Mar 27, 2023 at 7:02=E2=80=AFPM Kent Overstreet
+<kent.overstreet@linux.dev> wrote:
 >
-> Currently, the only context in which we can invoke an rstat flush from
-> irq context is through mem_cgroup_usage() on the root memcg when called
-> from memcg_check_events(). An rstat flush is an expensive operation that
-> should not be done in irq context, so do not flush stats and use the
-> stale stats in this case.
+> Small patch series cleaning up/standardizing bio_for_each_segment_all(),
+> which means we can use the same guts for bio_for_each_folio_all(),
+> considerably simplifying that code.
 >
-> Arguably, usage threshold events are not reliable on the root memcg
-> anyway since its usage is ill-defined.
->
-> Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
-> Suggested-by: Shakeel Butt <shakeelb@google.com>
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> The squashfs maintainer will want to look at and test those changes,
+> that code was doing some slightly tricky things. The rest was a pretty
+> mechanical conversion.
 
-Acked-by: Shakeel Butt <shakeelb@google.com>
+An eyeball of the changes doesn't bring up anything obviously wrong.
+
+I'll apply and do some tests.
+
+Phillip
+
+BTW please CC me on the cover letter as well as patch [1/2].
+
+
+>
+> Kent Overstreet (2):
+>   block: Rework bio_for_each_segment_all()
+>   block: Rework bio_for_each_folio_all()
+>
+>  block/bio.c               |  38 ++++++------
+>  block/blk-map.c           |  38 ++++++------
+>  block/bounce.c            |  12 ++--
+>  drivers/md/bcache/btree.c |   8 +--
+>  drivers/md/dm-crypt.c     |  10 ++--
+>  drivers/md/raid1.c        |   4 +-
+>  fs/btrfs/disk-io.c        |  10 ++--
+>  fs/btrfs/extent_io.c      |  52 ++++++++--------
+>  fs/btrfs/inode.c          |   8 +--
+>  fs/btrfs/raid56.c         |  18 +++---
+>  fs/crypto/bio.c           |   8 +--
+>  fs/erofs/zdata.c          |   4 +-
+>  fs/ext4/page-io.c         |   8 +--
+>  fs/ext4/readpage.c        |   4 +-
+>  fs/f2fs/data.c            |  20 +++----
+>  fs/gfs2/lops.c            |  10 ++--
+>  fs/gfs2/meta_io.c         |   8 +--
+>  fs/iomap/buffered-io.c    |  14 +++--
+>  fs/mpage.c                |   4 +-
+>  fs/squashfs/block.c       |  48 ++++++++-------
+>  fs/squashfs/lz4_wrapper.c |  17 +++---
+>  fs/squashfs/lzo_wrapper.c |  17 +++---
+>  fs/verity/verify.c        |   4 +-
+>  include/linux/bio.h       | 123 +++++++++++++++++++++-----------------
+>  include/linux/bvec.h      |  70 ++++++++++++++--------
+>  25 files changed, 302 insertions(+), 255 deletions(-)
+>
+> --
+> 2.39.2
+>
