@@ -2,178 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD2DC77B61
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 17:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D35C761AF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 17:42:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229664AbjC1ReW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 13:34:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43356 "EHLO
+        id S229637AbjC1Rmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 13:42:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjC1ReV (ORCPT
+        with ESMTP id S229548AbjC1Rmi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 13:34:21 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33386BBA8;
-        Tue, 28 Mar 2023 10:34:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680024860; x=1711560860;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WTNJQqR6j0Fv4yewPZZeEkwpR+jxknlg6+8TkBHSQ54=;
-  b=Y9gvdJXg1IKOTv7EqWiOjWp3U6JuuVIPGxQNuwRvC+2n2VEenfxxrBQ0
-   Rp6M3XJo7wMvIXfSW+eIkuYNVevE9bf88bcd22KleknmVK5de+yTfe7Ip
-   BbrSj49YNDktmp9KKDGGEaUkPszsYSUwjVetbQRRS+N6LcN/lBmLgTMXO
-   c4qGPpV44J9vxnDTh32+OnUQKVttYt4MPTSe2K9ayovHFU81UYXauSQrz
-   j3AdJTwXHdjNvAEmuCsDFaGBs9VYbMDXvoOTfkc24ZGqmh5n6ZuRxC46C
-   fOCy+dTPp3AQFay//2jrndvUJrGZWQh4OBIAIDbMG1ZBi/lpZxVhYqteq
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="342228785"
-X-IronPort-AV: E=Sophos;i="5.98,297,1673942400"; 
-   d="scan'208";a="342228785"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2023 10:34:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10663"; a="677452177"
-X-IronPort-AV: E=Sophos;i="5.98,297,1673942400"; 
-   d="scan'208";a="677452177"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 28 Mar 2023 10:34:15 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1phDD4-000IlR-1M;
-        Tue, 28 Mar 2023 17:34:14 +0000
-Date:   Wed, 29 Mar 2023 01:33:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH V5 02/16] io_uring: add IORING_OP_FUSED_CMD
-Message-ID: <202303290112.oiF4LrMI-lkp@intel.com>
-References: <20230328150958.1253547-3-ming.lei@redhat.com>
+        Tue, 28 Mar 2023 13:42:38 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F44C65F
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 10:42:36 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id x3so52865959edb.10
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 10:42:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112; t=1680025355;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OdjXZM63BnqFRkAjlfnPpinEdD7TpZ20uen1Kc76yzY=;
+        b=XkSSaVRhEu8Jkiy0akM6wNvHj81vWyDUX4zDbELthR0W7IKpQL5VFjzfb4O7oRJJzx
+         /+V55i/y66oIT17EyRgliReH0SzCaNchzN37b7i9Qy0JtGZpxpt7TDCkTv3Y8TJq8/cS
+         XOcgYZMVWjFB/pGadqgIUEGENaTNPM9ivJBqqcUY22+PWsjwhB34WKDjosN59L+2zHzd
+         9UCNcEUVm8EhuOlILx44UWRGvgqsn/bty2TQm7+eBdaRlAsjqc6dHNsL4cpUS9UT+j5B
+         6OQYzm4H9GReeF59X9O43IdgySJFfL9l+9J/dVpP2YlhzNOLrcjJfVgUfcaZE7yZ/JXP
+         mKvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680025355;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OdjXZM63BnqFRkAjlfnPpinEdD7TpZ20uen1Kc76yzY=;
+        b=THtVvcrk4admhL0eBU4emVPtJ5Kd9HZCKSwhPuf610D+q51lWdre18f9o3kCNh409q
+         0tuYeOc2kDgE04LGlPSLn7qvQXDYQI+BgFcLOKlDwkY+Dt5607axvHVaTf/h2W6vEFVU
+         CRmSxHQCwBy6H24ceMzP0mmuOO0GnkD0PYyWUQcTIcJ125/i/g4J1wJP9sTB0Z2Qq7Pb
+         rdHi5ZfLs42D16AGkr/qjPIdzT9GEwO1LI12ZOU9UIfB0eOfpbi1x2bdrG1DuZfktQtA
+         /9qSsecnkYxs4f4zabESUZBOpHT0nYlVyVRPFiQwadE/jkG3Ts7Mi5y1vkwteYlcHLHN
+         fdfA==
+X-Gm-Message-State: AAQBX9fRrTOTABzdX3p31l7xioyxwuVn497dO9wpgNhfG2E3zSSlWwfh
+        0XfzMxmJ8THYmg1IZ8+qu63l1g==
+X-Google-Smtp-Source: AKy350amP79GzP8XYvyQlTbyF7h5Y94HZ31RR7yRjEski8rNi0DQR5LhSQYAPBPO0k/xCK9hXfVXbA==
+X-Received: by 2002:aa7:d658:0:b0:4bc:f925:5dbe with SMTP id v24-20020aa7d658000000b004bcf9255dbemr16254610edr.42.1680025355066;
+        Tue, 28 Mar 2023 10:42:35 -0700 (PDT)
+Received: from localhost ([2a02:8070:6387:ab20:5139:4abd:1194:8f0e])
+        by smtp.gmail.com with ESMTPSA id c5-20020a170906924500b0092be625d981sm15559189ejx.91.2023.03.28.10.42.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 10:42:34 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 13:42:33 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH v1 1/9] cgroup: rename cgroup_rstat_flush_"irqsafe" to
+ "atomic"
+Message-ID: <ZCMnCVe4UZx5E8KM@cmpxchg.org>
+References: <20230328061638.203420-1-yosryahmed@google.com>
+ <20230328061638.203420-2-yosryahmed@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230328150958.1253547-3-ming.lei@redhat.com>
+In-Reply-To: <20230328061638.203420-2-yosryahmed@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Tue, Mar 28, 2023 at 06:16:30AM +0000, Yosry Ahmed wrote:
+> cgroup_rstat_flush_irqsafe() can be a confusing name. It may read as
+> "irqs are disabled throughout", which is what the current implementation
+> does (currently under discussion [1]), but is not the intention. The
+> intention is that this function is safe to call from atomic contexts.
+> Name it as such.
+> 
+> Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
 
-I love your patch! Perhaps something to improve:
-
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on linus/master v6.3-rc4 next-20230328]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/io_uring-increase-io_kiocb-flags-into-64bit/20230328-232554
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20230328150958.1253547-3-ming.lei%40redhat.com
-patch subject: [PATCH V5 02/16] io_uring: add IORING_OP_FUSED_CMD
-config: x86_64-randconfig-a011-20230327 (https://download.01.org/0day-ci/archive/20230329/202303290112.oiF4LrMI-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/1cdd7d77287ea8d97834b37825e63a727e860f6c
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Ming-Lei/io_uring-increase-io_kiocb-flags-into-64bit/20230328-232554
-        git checkout 1cdd7d77287ea8d97834b37825e63a727e860f6c
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/nvme/host/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202303290112.oiF4LrMI-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/nvme/host/ioctl.c:8:
->> include/linux/io_uring.h:112:74: warning: omitting the parameter name in a function definition is a C2x extension [-Wc2x-extensions]
-   static inline void io_fused_cmd_start_secondary_req(struct io_uring_cmd *,
-                                                                            ^
-   include/linux/io_uring.h:113:57: warning: omitting the parameter name in a function definition is a C2x extension [-Wc2x-extensions]
-                   unsigned issue_flags, const struct io_uring_bvec_buf *,
-                                                                         ^
-   include/linux/io_uring.h:114:15: warning: omitting the parameter name in a function definition is a C2x extension [-Wc2x-extensions]
-                   unsigned int,
-                               ^
-   3 warnings generated.
-
-
-vim +112 include/linux/io_uring.h
-
-    93	
-    94	static inline void io_uring_files_cancel(void)
-    95	{
-    96		if (current->io_uring) {
-    97			io_uring_unreg_ringfd();
-    98			__io_uring_cancel(false);
-    99		}
-   100	}
-   101	static inline void io_uring_task_cancel(void)
-   102	{
-   103		if (current->io_uring)
-   104			__io_uring_cancel(true);
-   105	}
-   106	static inline void io_uring_free(struct task_struct *tsk)
-   107	{
-   108		if (tsk->io_uring)
-   109			__io_uring_free(tsk);
-   110	}
-   111	#else
- > 112	static inline void io_fused_cmd_start_secondary_req(struct io_uring_cmd *,
-   113			unsigned issue_flags, const struct io_uring_bvec_buf *,
-   114			unsigned int,
-   115			void (*complete_tw_cb)(struct io_uring_cmd *, unsigned))
-   116	{
-   117	}
-   118	static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
-   119				      struct iov_iter *iter, void *ioucmd)
-   120	{
-   121		return -EOPNOTSUPP;
-   122	}
-   123	static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
-   124			ssize_t ret2, unsigned issue_flags)
-   125	{
-   126	}
-   127	static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
-   128				void (*task_work_cb)(struct io_uring_cmd *, unsigned))
-   129	{
-   130	}
-   131	static inline struct sock *io_uring_get_socket(struct file *file)
-   132	{
-   133		return NULL;
-   134	}
-   135	static inline void io_uring_task_cancel(void)
-   136	{
-   137	}
-   138	static inline void io_uring_files_cancel(void)
-   139	{
-   140	}
-   141	static inline void io_uring_free(struct task_struct *tsk)
-   142	{
-   143	}
-   144	static inline const char *io_uring_get_opcode(u8 opcode)
-   145	{
-   146		return "";
-   147	}
-   148	#endif
-   149	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
