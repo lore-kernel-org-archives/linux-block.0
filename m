@@ -2,186 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E2BC77B61
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B45BC77B61
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:22:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233345AbjC1PVd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 11:21:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40134 "EHLO
+        id S233451AbjC1PWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 11:22:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233952AbjC1PVV (ORCPT
+        with ESMTP id S233455AbjC1PVq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:21:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4DCFF27
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:18:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680016681;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B4h73f5q+9OJB7ocdpIjrrTEZsKx6E5zs0QXKOnNU3Q=;
-        b=gJeWJSCrF3AZ/Q/jWP4bcJTBSnYZFk2i84MIOqFZsY6IF6SpCkR5PrHYp4FWt+BgACf1La
-        9WypnWT2777449hBjNWf+6QACoJo09+JbvWVIZiJiwwp6/J09mx5uN3Wi94k05wGsfUDTj
-        MK0EHsuij5EPuso2mYB2rDsZwZb+rG0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-299-IE_ZslxBPuyv2EpFbWcMkQ-1; Tue, 28 Mar 2023 11:11:21 -0400
-X-MC-Unique: IE_ZslxBPuyv2EpFbWcMkQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C6981875045;
-        Tue, 28 Mar 2023 15:11:13 +0000 (UTC)
-Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 33C89C15BB8;
-        Tue, 28 Mar 2023 15:11:11 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 05/16] io_uring: support OP_SEND_ZC/OP_RECV for fused secondary request
-Date:   Tue, 28 Mar 2023 23:09:47 +0800
-Message-Id: <20230328150958.1253547-6-ming.lei@redhat.com>
-In-Reply-To: <20230328150958.1253547-1-ming.lei@redhat.com>
-References: <20230328150958.1253547-1-ming.lei@redhat.com>
+        Tue, 28 Mar 2023 11:21:46 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268CE18F;
+        Tue, 28 Mar 2023 08:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=wX0gmGH9IveBATxHqfl2f3+O0L57UTWE20X3bYSnO1g=; b=pr1joZerHeKsBlyHogQ7a2PLlI
+        OnKh0jl/7d0I5iiAMB3X7PawFs8SxWFO5NOBIiE/eGbmzg3mKFkP+FwRa5Ny5sshyl1sTJhGnrPxM
+        i0MpOhosQtQBiby8hQFQO7A547F7BZHII2Gq3lLxvo2wHCUyCNlUkBH2lWpFKhivqkwK73X1FvCJ1
+        xLdu2PshCd8JBCdj8YknFzz0zElmgXh2/EyRWj8nrbt2FtuH5VKto89AE5WltWejQQIgwhOsB109K
+        5E0AzOvrQIsWkVletsJB/nREkTB9gE00L06B+oQy1+yUivc+7vioonZ2bMQDnHKEDOstKf2D+vqu9
+        lfiylSRA==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1phB6P-008XAW-Sn; Tue, 28 Mar 2023 15:19:13 +0000
+Date:   Tue, 28 Mar 2023 16:19:13 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     martin@omnibond.com, axboe@kernel.dk, minchan@kernel.org,
+        akpm@linux-foundation.org, hubcap@omnibond.com,
+        viro@zeniv.linux.org.uk, senozhatsky@chromium.org,
+        brauner@kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, mcgrof@kernel.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        linux-mm@kvack.org, devel@lists.orangefs.org
+Subject: Re: [PATCH 1/5] zram: remove the call to page_endio in the bio
+ end_io handler
+Message-ID: <ZCMFcTHkTe/1WapL@casper.infradead.org>
+References: <20230328112716.50120-1-p.raghav@samsung.com>
+ <CGME20230328112718eucas1p214a859cfb3d7b45523356bcc16c373b1@eucas1p2.samsung.com>
+ <20230328112716.50120-2-p.raghav@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230328112716.50120-2-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Start to allow fused secondary request to support OP_SEND_ZC/OP_RECV, and
-the buffer can be retrieved from primary request.
+On Tue, Mar 28, 2023 at 01:27:12PM +0200, Pankaj Raghav wrote:
+> -static void zram_page_end_io(struct bio *bio)
+> +static void zram_read_end_io(struct bio *bio)
+>  {
+> -	struct page *page = bio_first_page_all(bio);
+> -
+> -	page_endio(page, op_is_write(bio_op(bio)),
+> -			blk_status_to_errno(bio->bi_status));
+>  	bio_put(bio);
+>  }
+>  
+> @@ -635,7 +631,7 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
+>  	}
+>  
+>  	if (!parent)
+> -		bio->bi_end_io = zram_page_end_io;
+> +		bio->bi_end_io = zram_read_end_io;
 
-Once the secondary request is completed, the primary buffer will be returned
-back.
+Can we just do:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- io_uring/net.c   | 30 ++++++++++++++++++++++++++++--
- io_uring/opdef.c |  6 ++++++
- 2 files changed, 34 insertions(+), 2 deletions(-)
+	if (!parent)
+		bio->bi_end_io = bio_put;
 
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 4040cf093318..e1c807a6e503 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -16,6 +16,7 @@
- #include "net.h"
- #include "notif.h"
- #include "rsrc.h"
-+#include "fused_cmd.h"
- 
- #if defined(CONFIG_NET)
- struct io_shutdown {
-@@ -69,6 +70,13 @@ struct io_sr_msg {
- 	struct io_kiocb 		*notif;
- };
- 
-+#define user_ptr_to_u64(x) (		\
-+{					\
-+	typecheck(void __user *, (x));		\
-+	(u64)(unsigned long)(x);	\
-+}					\
-+)
-+
- static inline bool io_check_multishot(struct io_kiocb *req,
- 				      unsigned int issue_flags)
- {
-@@ -379,7 +387,11 @@ int io_send(struct io_kiocb *req, unsigned int issue_flags)
- 	if (unlikely(!sock))
- 		return -ENOTSOCK;
- 
--	ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
-+	if (!(req->flags & REQ_F_FUSED_SECONDARY))
-+		ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
-+	else
-+		ret = io_import_buf_for_secondary(user_ptr_to_u64(sr->buf),
-+				sr->len, ITER_SOURCE, &msg.msg_iter, req);
- 	if (unlikely(ret))
- 		return ret;
- 
-@@ -870,7 +882,11 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
- 		sr->buf = buf;
- 	}
- 
--	ret = import_ubuf(ITER_DEST, sr->buf, len, &msg.msg_iter);
-+	if (!(req->flags & REQ_F_FUSED_SECONDARY))
-+		ret = import_ubuf(ITER_DEST, sr->buf, len, &msg.msg_iter);
-+	else
-+		ret = io_import_buf_for_secondary(user_ptr_to_u64(sr->buf),
-+				sr->len, ITER_DEST, &msg.msg_iter, req);
- 	if (unlikely(ret))
- 		goto out_free;
- 
-@@ -984,6 +1000,9 @@ int io_send_zc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	if (zc->flags & IORING_RECVSEND_FIXED_BUF) {
- 		unsigned idx = READ_ONCE(sqe->buf_index);
- 
-+		if (req->flags & REQ_F_FUSED_SECONDARY)
-+			return -EINVAL;
-+
- 		if (unlikely(idx >= ctx->nr_user_bufs))
- 			return -EFAULT;
- 		idx = array_index_nospec(idx, ctx->nr_user_bufs);
-@@ -1120,8 +1139,15 @@ int io_send_zc(struct io_kiocb *req, unsigned int issue_flags)
- 		if (unlikely(ret))
- 			return ret;
- 		msg.sg_from_iter = io_sg_from_iter;
-+	} else if (req->flags & REQ_F_FUSED_SECONDARY) {
-+		ret = io_import_buf_for_secondary(user_ptr_to_u64(zc->buf),
-+				zc->len, ITER_SOURCE, &msg.msg_iter, req);
-+		if (unlikely(ret))
-+			return ret;
-+		msg.sg_from_iter = io_sg_from_iter;
- 	} else {
- 		io_notif_set_extended(zc->notif);
-+
- 		ret = import_ubuf(ITER_SOURCE, zc->buf, zc->len, &msg.msg_iter);
- 		if (unlikely(ret))
- 			return ret;
-diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index d81c9afd65ed..c31badf4fe45 100644
---- a/io_uring/opdef.c
-+++ b/io_uring/opdef.c
-@@ -273,6 +273,8 @@ const struct io_issue_def io_issue_defs[] = {
- 		.audit_skip		= 1,
- 		.ioprio			= 1,
- 		.manual_alloc		= 1,
-+		.fused_secondary	= 1,
-+		.buf_dir		= READ,
- #if defined(CONFIG_NET)
- 		.prep			= io_sendmsg_prep,
- 		.issue			= io_send,
-@@ -287,6 +289,8 @@ const struct io_issue_def io_issue_defs[] = {
- 		.buffer_select		= 1,
- 		.audit_skip		= 1,
- 		.ioprio			= 1,
-+		.fused_secondary	= 1,
-+		.buf_dir		= WRITE,
- #if defined(CONFIG_NET)
- 		.prep			= io_recvmsg_prep,
- 		.issue			= io_recv,
-@@ -413,6 +417,8 @@ const struct io_issue_def io_issue_defs[] = {
- 		.audit_skip		= 1,
- 		.ioprio			= 1,
- 		.manual_alloc		= 1,
-+		.fused_secondary	= 1,
-+		.buf_dir		= READ,
- #if defined(CONFIG_NET)
- 		.prep			= io_send_zc_prep,
- 		.issue			= io_send_zc,
--- 
-2.39.2
-
+drivers/nvme/target/passthru.c does this, so it wouldn't be the first.
