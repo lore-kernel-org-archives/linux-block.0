@@ -2,126 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93468C76196
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 14:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E620FC77B61
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 14:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233357AbjC1OxG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 10:53:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43088 "EHLO
+        id S233258AbjC1OxQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 10:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233490AbjC1Owu (ORCPT
+        with ESMTP id S233416AbjC1OxD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 10:52:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C791DBDE
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:51:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680015112;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0cR29LyY11JQFvMX2a2zTEiw5p1+i0O8ayeeXYSH/LE=;
-        b=jDOMVVCUfPwxRPibzQ319qhI+8/YENW0pXbgmDcyhBiO5sCilpru32b0CsQlvboBo0Z1ZF
-        5WkPo2+sbm+i/q/l2V48NYOBQ7l3wuc9AFkoW77ViMv0g75rrKHiDAd3T9Y0++CD4GSk9c
-        lo5IuGkkQkUrPeG9IkziSPpXbdSzZUo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-9-RPfPPF6wPLmSOhF3zAx9_w-1; Tue, 28 Mar 2023 10:51:48 -0400
-X-MC-Unique: RPfPPF6wPLmSOhF3zAx9_w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 28 Mar 2023 10:53:03 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE60FD520
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:52:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 64D4685A5B1;
-        Tue, 28 Mar 2023 14:51:47 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D51B51121330;
-        Tue, 28 Mar 2023 14:51:46 +0000 (UTC)
-Date:   Tue, 28 Mar 2023 10:51:45 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Stefan Hajnoczi <stefanha@gmail.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sam Li <faithilikerun@gmail.com>,
-        virtio-dev@lists.oasis-open.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [virtio-dev] [PATCH 1/2] virtio-blk: migrate to the latest
- patchset version
-Message-ID: <20230328145145.GB1623159@fedora>
-References: <20230328022928.1003996-1-dmitry.fomichev@wdc.com>
- <20230328022928.1003996-2-dmitry.fomichev@wdc.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7C300B81D73
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 14:52:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81706C4339B;
+        Tue, 28 Mar 2023 14:52:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680015177;
+        bh=WoO6PtuXAgnsaZpuL2RMkjnPmQYDohpfLo07J0iy+ak=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=EIfP4LEInyloxi8XloSlWkjhcXAOjSK4wIGxLuKSTu88V6vS5egyeO/L19c0CFQv6
+         liK7kjOPvyxV+fn6I6/Q3JdywxBVVSjXcRDmO0hsMCYIxOv95k4CO3oULGKeQ2pGQ1
+         NfVTMP3WqnIb0ONg1TvDFJKB0bOgn+VgkbCo0vcM5qyPETFAv1jn4wPFc9QKUJ9OrF
+         KBgJEX6UdoSeX2RjH8SL8Cd7NIyOnlsULmwUdMPAN855rrSvbyQ3NqwLLOpGsCLhJx
+         qndmXmpskXXO2dDMcAWo2a/O/txp0g1LOzZ8fSfk3BP6yHqk4RRwOddgq27wHkL1kg
+         EM5vvcE4M/gsA==
+Date:   Tue, 28 Mar 2023 08:52:53 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Kanchan Joshi <joshiiitr@gmail.com>, Keith Busch <kbusch@meta.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        axboe@kernel.dk, hch@lst.de
+Subject: Re: [PATCH 2/2] nvme: use blk-mq polling for uring commands
+Message-ID: <ZCL/RTHoflUVCMyw@kbusch-mbp.dhcp.thefacebook.com>
+References: <20230324212803.1837554-1-kbusch@meta.com>
+ <CGME20230324213124epcas5p331ea3c2e2a05ec6a6825e719e47d2427@epcas5p3.samsung.com>
+ <20230324212803.1837554-2-kbusch@meta.com>
+ <20230327135810.GA8405@green5>
+ <ZCG0O6RdlA/sUd7C@kbusch-mbp.dhcp.thefacebook.com>
+ <CA+1E3rK2h9gyy26v1NmwTFtUsCwMkc1DgkDsCFME+HjZJPn5Hg@mail.gmail.com>
+ <ZCI5XopTr7nJvVF1@kbusch-mbp.dhcp.thefacebook.com>
+ <20230328074939.GA2800@green5>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="W+f9eOPTmKJwgc15"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230328022928.1003996-2-dmitry.fomichev@wdc.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230328074939.GA2800@green5>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Mar 28, 2023 at 01:19:39PM +0530, Kanchan Joshi wrote:
+> On Mon, Mar 27, 2023 at 06:48:30PM -0600, Keith Busch wrote:
+> > On Mon, Mar 27, 2023 at 10:50:47PM +0530, Kanchan Joshi wrote:
+> > > On Mon, Mar 27, 2023 at 8:59 PM Keith Busch <kbusch@kernel.org> wrote:
+> > > > > >     rcu_read_lock();
+> > > > > > -   bio = READ_ONCE(ioucmd->cookie);
+> > > > > > -   ns = container_of(file_inode(ioucmd->file)->i_cdev,
+> > > > > > -                   struct nvme_ns, cdev);
+> > > > > > -   q = ns->queue;
+> > > > > > -   if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio && bio->bi_bdev)
+> > > > > > -           ret = bio_poll(bio, iob, poll_flags);
+> > > > > > +   req = READ_ONCE(ioucmd->cookie);
+> > > > > > +   if (req) {
+> > > > >
+> > > > > This is risky. We are not sure if the cookie is actually "req" at this
+> > > > > moment.
+> > > >
+> > > > What else could it be? It's either a real request from a polled hctx tag, or
+> > > > NULL at this point.
+> > > 
+> > > It can also be a function pointer that gets assigned on irq-driven completion.
+> > > See the "struct io_uring_cmd" - we are tight on cacheline, so cookie
+> > > and task_work_cb share the storage.
+> > > 
+> > > > It's safe to check the cookie like this and rely on its contents.
+> > > Hence not safe. Please try running this without poll-queues (at nvme
+> > > level), you'll see failures.
+> > 
+> > Okay, you have a iouring polling instance used with a file that has poll
+> > capabilities, but doesn't have any polling hctx's. It would be nice to exclude
+> > these from io_uring's polling since they're wasting CPU time, but that doesn't
+> > look easily done.
+> 
+> Do you mean having the ring with IOPOLL set, and yet skip the attempt of
+> actively reaping the completion for certain IOs?
 
---W+f9eOPTmKJwgc15
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, exactly. It'd be great if non-polled requests don't get added to the
+ctx->iopoll_list in the first place.
+ 
+> > This simple patch atop should work though.
+> > 
+> > ---
+> > diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+> > index 369e8519b87a2..e3ff019404816 100644
+> > --- a/drivers/nvme/host/ioctl.c
+> > +++ b/drivers/nvme/host/ioctl.c
+> > @@ -612,6 +612,8 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+> > 
+> > 	if (blk_rq_is_poll(req))
+> > 		WRITE_ONCE(ioucmd->cookie, req);
+> > +	else if (issue_flags & IO_URING_F_IOPOLL)
+> > +		ioucmd->flags |= IORING_URING_CMD_NOPOLL;
+> 
+> If IO_URING_F_IOPOLL would have come here as part of "ioucmd->flags", we
+> could have just cleared that here. That would avoid the need of NOPOLL flag.
+> That said, I don't feel strongly about new flag too. You decide.
 
-On Mon, Mar 27, 2023 at 10:29:27PM -0400, Dmitry Fomichev wrote:
-> The merged patch series to support zoned block devices in virtio-blk
-> is not the most up to date version. The merged patch can be found at
->=20
-> https://lore.kernel.org/linux-block/20221016034127.330942-3-dmitry.fomich=
-ev@wdc.com/
->=20
-> , but the latest and reviewed version is
->=20
-> https://lore.kernel.org/linux-block/20221110053952.3378990-3-dmitry.fomic=
-hev@wdc.com/
->=20
-> The differences between the two are mostly cleanups, but there is one
-> change that is very important in terms of compatibility with the
-> approved virtio-zbd specification.
->=20
-> Before it was approved, the OASIS virtio spec had a change in
-> VIRTIO_BLK_T_ZONE_APPEND request layout that is not reflected in the
-> current virtio-blk driver code. In the running code, the status is
-> the first byte of the in-header that is followed by some pad bytes
-> and the u64 that carries the sector at which the data has been written
-> to the zone back to the driver, aka the append sector.
->=20
-> This layout turned out to be problematic for implementing in QEMU and
-> the request status byte has been eventually made the last byte of the
-> in-header. The current code doesn't expect that and this causes the
-> append sector value always come as zero to the block layer. This needs
-> to be fixed ASAP.
->=20
-> Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-> ---
->  drivers/block/virtio_blk.c      | 238 +++++++++++++++++++++-----------
->  include/uapi/linux/virtio_blk.h |  18 +--
->  2 files changed, 165 insertions(+), 91 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---W+f9eOPTmKJwgc15
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmQi/wEACgkQnKSrs4Gr
-c8imZggAhJA5G85LLc28etjnXDmkF7WtvrUc4MoHpgxVUys1SEaxhlmAsh+EIrd5
-oSIHcBTkAv6xkMA44ogTyq+Ewl0J4e8Ma46s+HE9Pn0XXuHpOZKeVxJxLvyYUkkS
-9RbxlExUCi68vdHy4JKqS8u+iisGRILKXCu06B5Ce3wD1o07kuvYlkZcOKyaJMUs
-1Z1ifmiTphIsUT7KHMJ13GsR1QhgBr0+1LH2uCTJu8faD3UGGTJHtH9r+wmFVKbt
-AKQ7DsQuhIUfreukTh4AOK1LOAjTgtNyf9mhkQl4js1KkKKoiedxmGqVV9RlHbZw
-WFTFCtcjbgVhBQi4SvLAlAgy0yC++g==
-=KqDZ
------END PGP SIGNATURE-----
-
---W+f9eOPTmKJwgc15--
-
+IO_URING_F_IOPOLL, while named in an enum that sounds suspiciouly like it is
+part of ioucmd->flags, is actually ctx flags, so a little confusing. And we
+need to be a litle careful here: the existing ioucmd->flags is used with uapi
+flags.
