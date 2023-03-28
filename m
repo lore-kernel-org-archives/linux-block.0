@@ -2,152 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C00C76195
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 05:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 535E8C77B60
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 06:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229580AbjC1FLb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 01:11:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44768 "EHLO
+        id S232140AbjC1GRC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 02:17:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbjC1FLa (ORCPT
+        with ESMTP id S232401AbjC1GRA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 01:11:30 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E121C19A9
-        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 22:11:27 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230328051123epoutp0158072e3c189ece834d794336da64f5a2~QfSrQTDPy0518905189epoutp01Y
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 05:11:23 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230328051123epoutp0158072e3c189ece834d794336da64f5a2~QfSrQTDPy0518905189epoutp01Y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1679980283;
-        bh=9Avr+yTfa9LLK9saCK49G1DKCcPcrY/twlH1AMLYC+Y=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=CdqapUn+yKWgSQBQ604LYFowne4Z+4wvN0Cd6hAcVtcqiiXqH+9J+Y/c1ydGMOGuT
-         o24dxLoTlj9Gb1eSGLpHWD/McWJ7T954pXRhJWoDrD0rM5D+YhYev71cP0jfuJR7uM
-         iCKN29JLrifFJ8Rw18M0B0L69KFeYSJBXvYi9qfc=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20230328051123epcas5p35abba1121e835d343c49beaaa5ded462~QfSq7Hdhn0185101851epcas5p3U;
-        Tue, 28 Mar 2023 05:11:23 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4PlyT53s7vz4x9QK; Tue, 28 Mar
-        2023 05:11:21 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A7.E9.55678.8F672246; Tue, 28 Mar 2023 14:11:20 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230328051120epcas5p23b4a173dadbd6f125c881d3809202d85~QfSnsiGbd1367713677epcas5p2m;
-        Tue, 28 Mar 2023 05:11:20 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230328051120epsmtrp2790b231483430685416c7b3c303e01a2~QfSnrlTFx0876108761epsmtrp2K;
-        Tue, 28 Mar 2023 05:11:20 +0000 (GMT)
-X-AuditID: b6c32a4a-6a3ff7000000d97e-be-642276f89e8a
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        39.F9.18071.7F672246; Tue, 28 Mar 2023 14:11:19 +0900 (KST)
-Received: from green5 (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230328051117epsmtip1945862bfadb3271bf9b732bc79c0b27f~QfSluiTd_2317323173epsmtip1w;
-        Tue, 28 Mar 2023 05:11:17 +0000 (GMT)
-Date:   Tue, 28 Mar 2023 10:40:37 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        Tue, 28 Mar 2023 02:17:00 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B90C830DC
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 23:16:42 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id e23-20020a25e717000000b00b66ab374ba1so11157064ybh.22
+        for <linux-block@vger.kernel.org>; Mon, 27 Mar 2023 23:16:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1679984202;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sp9O7DL9obBb0muMtifinlg/m6vcys5sIiJC9lNDWi4=;
+        b=NeuDT5i+IX7EsYuGxrlQHGfM/O44K/q8azh0N01/JWHajTpr/8bCoJ2QTmweAtvhfe
+         gYoeDE3hEA/7en26XdMklOvz+naw4YK/G+YhpbjekM9lK1gn62mOub1rqZqAuOD3Va4S
+         1QIsws0AsakJv6xmZVg2tR6CGN3YqUveLDQmgizdGWo93cuUB1v+gh6AulTa+cAtsQ1E
+         KKArWRQY0GrdStBwfUXdbR6yPsdQlbb61EZd9PCwqGtcxA7k1j294s/M/nt3EKFywNtt
+         l3OyHVKVYr6ScGHLswWLNtnzcPUbA+BqIwaG4p3phWhy3WEkn1PyyK7m1rhPq1yMmAEF
+         q2mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679984202;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sp9O7DL9obBb0muMtifinlg/m6vcys5sIiJC9lNDWi4=;
+        b=gxNBIF7axt4wdf6LAzZV/Njn3gp2b4upgVSkwz+XpLA+4zhrpOzgfeijgSaxpvMlUL
+         4ulue6pu8d3WaeGWY5m5p6ZgjGGzF2dBpGtecKMnMNk/yJVKkVo3vq3FwpxtWUXsvpiD
+         8tfKPWuZloXslpYvOGNUqhzuw+AZvwerOSaLeAqqN1WorZ6K34TP6ZLISVnWQ/jckTxZ
+         zysVKIWNqJHSFHH/MUBSJ9owRRvCRRL4ZbEvgW9L7RS3tgGLYY3M6fqhcVgCLFygA68C
+         xqw2arBePkDc6guTg5kxEcgoTOaRonEBOC5eu2GSt7HGI6JxUFoAbqJ9kd7/zdTCBMD/
+         YbVw==
+X-Gm-Message-State: AAQBX9dAaqlrL1jzYQB3+Hq9BKyO6LwQghKBnuL4u7Scpg4vMKXAUhMv
+        b8t1ZpebnK2bU+NOYXXkFN5SVuSz7YwDsPhV
+X-Google-Smtp-Source: AKy350bZY7FA4NsJ0fqBTDQ1vhS8yI9N8IskrUxgaH2uFCVGGGkuCT76RaKDFHndt2HqiHyVKmyLU1Kd/HHTyvK/
+X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
+ (user=yosryahmed job=sendgmr) by 2002:a25:2749:0:b0:b4a:e062:3576 with SMTP
+ id n70-20020a252749000000b00b4ae0623576mr6830636ybn.13.1679984201935; Mon, 27
+ Mar 2023 23:16:41 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 06:16:29 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
+Message-ID: <20230328061638.203420-1-yosryahmed@google.com>
+Subject: [PATCH v1 0/9] memcg: make rstat flushing irq and sleep friendly
+From:   Yosry Ahmed <yosryahmed@google.com>
+To:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "=?UTF-8?q?Michal=20Koutn=C3=BD?=" <mkoutny@suse.com>
+Cc:     Vasily Averin <vasily.averin@linux.dev>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH V4 00/17] io_uring/ublk: add IORING_OP_FUSED_CMD
-Message-ID: <20230328051037.GB8405@green5>
-MIME-Version: 1.0
-In-Reply-To: <20230324135808.855245-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKJsWRmVeSWpSXmKPExsWy7bCmhu6PMqUUgxX9AhZzVm1jtFh9t5/N
-        4uH7J2wW71rPsVjsvaVtcXnXHDaLQ5ObmSxm9p1hsng96T+rxaa/J5ks2p9OYnTg9pjytI/d
-        Y+esu+wel8+Weux8aOnxft9VNo/Pm+QC2KKybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwM
-        dQ0tLcyVFPISc1NtlVx8AnTdMnOAjlNSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTk
-        FJgU6BUn5haX5qXr5aWWWBkaGBiZAhUmZGe0v3/OVLCTp6Lz7X7GBsZNXF2MnBwSAiYSZ04f
-        ZOti5OIQEtjNKNF/bDEThPOJUWL58q/sEM43RonZS/6ywrR8ffSCGSKxF6jq11Yo5wmjxNM9
-        jSxdjBwcLAKqEn+WFYKYbAKaEhcml4L0iggoSdy9uxpsKLPATyaJE5+mMoMkhAVcJI7dbACz
-        eQW0JNZt74SyBSVOznzCAmJzClhJzDnUyQRiiwooSxzYdhzsVAmBuRwS9651MENc5yJx/dhC
-        KFtY4tXxLewQtpTE53d72SDsZIlLM88xQdglEo/3HISy7SVaT/WD9TILZEo8OTGNHcLmk+j9
-        /YQJ5BkJAV6JjjYhiHJFiXuTnkIDRVzi4YwlULaHxKpPj6Eh18socez/T7YJjHKzkPwzC8kK
-        CNtKovNDE+ssoBXMAtISy/9xQJiaEut36S9gZF3FKJlaUJybnlpsWmCUl1oOj+Tk/NxNjOD0
-        quW1g/Hhgw96hxiZOBgPMUpwMCuJ8G72VkwR4k1JrKxKLcqPLyrNSS0+xGgKjJ6JzFKiyfnA
-        BJ9XEm9oYmlgYmZmZmJpbGaoJM6rbnsyWUggPbEkNTs1tSC1CKaPiYNTqoEpg9Ei/GHRnzlF
-        D8/2KZrbLD9wcHXU32Xmz06I3Jr54/xc5g7LUtPNRbzfbHyTlvCeyGs+l//JWSP2e11WNjvT
-        0nnrJCs/HFugtvrYwkTTBIMFP21KrZxjDcOEub7vcP2dEct/4+S6X4Z+i1fvNt8euMToZ8GH
-        Bhv1yasenLlq9rut9kKifGd8kv7lT912IQ+jHrXKfV/2+p6zTfy+c9UdMvs//zTjvTjr3r5t
-        JxsvTt55fK+AvFKc4PY9db9Xsz7hmiS2math38ciM9n17o9bNucf9Lp8/fii/qCSbRXSH9Z/
-        /PiVV3D1sVWsqfeePY0/l77xtFqsrvTGrar/H190dmZwtHl5d8L1dQySyv1zmJVYijMSDbWY
-        i4oTATiZqWc4BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMLMWRmVeSWpSXmKPExsWy7bCSnO73MqUUgyVtFhZzVm1jtFh9t5/N
-        4uH7J2wW71rPsVjsvaVtcXnXHDaLQ5ObmSxm9p1hsng96T+rxaa/J5ks2p9OYnTg9pjytI/d
-        Y+esu+wel8+Weux8aOnxft9VNo/Pm+QC2KK4bFJSczLLUov07RK4Mp6f/s9U8IKz4vDb52wN
-        jL/Zuxg5OSQETCS+PnrB3MXIxSEksJtR4lT3V6iEuETztR9QtrDEyn/P2SGKHjFKfF+6m7GL
-        kYODRUBV4s+yQhCTTUBT4sLkUpByEQElibt3V4OVMwv8ZZJ4fOcNK0hCWMBF4tjNBmYQm1dA
-        S2Ld9k6oxb2MEnMuPWSFSAhKnJz5hAXEZhYwk5i3+SEzyAJmAWmJ5f84QMKcAlYScw51MoHY
-        ogLKEge2HWeawCg4C0n3LCTdsxC6FzAyr2KUTC0ozk3PLTYsMMxLLdcrTswtLs1L10vOz93E
-        CI4XLc0djNtXfdA7xMjEwXiIUYKDWUmEd7O3YooQb0piZVVqUX58UWlOavEhRmkOFiVx3gtd
-        J+OFBNITS1KzU1MLUotgskwcnFINTH6n2CYf8zp2sOgn+7mPVSpCkhcPadod5ZQ4/73Vv26p
-        u/P2L3lsXYU5N6wb787avGt35o1VThVdpxM+xfRcbk836KrqyHurzpqwOGB7bOWHyZs+POAr
-        rTwY9ptXlilcZp3ZVN1ladu5d+xl7Tm0qGufXKinWuKZmfc4nfa8qMp5deCme9CxGT58G/0v
-        837acG9bEbvkGiYe/SmfpQx3bedqmP/vtjbHRaMjYi4z7c7on3p9aVfTlp9WNid6q7eH1vNZ
-        iRueqX/Ql/R8X+PqZUL5u1kkPEpTD76WEfGwb5lzTV1FJPXrIY1igUeR9bq8C/wXGTJe5kle
-        VhqyqKJnTZ2jg4fiz7RvoVtEXA4dUmIpzkg01GIuKk4EANNV18YGAwAA
-X-CMS-MailID: 20230328051120epcas5p23b4a173dadbd6f125c881d3809202d85
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_11136e_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230324135916epcas5p37aad4c49c76c05567a484377d8909092
-References: <CGME20230324135916epcas5p37aad4c49c76c05567a484377d8909092@epcas5p3.samsung.com>
-        <20230324135808.855245-1-ming.lei@redhat.com>
+        linux-mm@kvack.org, bpf@vger.kernel.org,
+        Yosry Ahmed <yosryahmed@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_11136e_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+Currently, all calls to flush memcg stats use the atomic variant for
+rstat flushing, cgroup_rstat_flush_irqsafe(), which keeps interrupts
+disabled throughout flushing and does not sleep. Flushing stats is an
+expensive operation, and we should avoid doing it atomically where
+possible. Otherwise, we may end up doing a lot of work without
+rescheduling and with interrupts disabled unnecessarily.
 
-On Fri, Mar 24, 2023 at 09:57:51PM +0800, Ming Lei wrote:
->Hello Jens,
->
->Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
->be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
->64byte SQE(slave) is another normal 64byte OP. For any OP which needs
->to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
->and its ->issue() can retrieve/import buffer from master request's
->fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
->this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
->submits slave OP just like normal OP issued from userspace, that said,
->SQE order is kept, and batching handling is done too.
->
->Please see detailed design in commit log of the 2th patch, and one big
->point is how to handle buffer ownership.
->
->With this way, it is easy to support zero copy for ublk/fuse device.
->
->Basically userspace can specify any sub-buffer of the ublk block request
->buffer from the fused command just by setting 'offset/len'
->in the slave SQE for running slave OP. 
+Patches 1 and 2 are cleanups requested during reviews of prior versions
+of this series.
 
-Wondering if this new OP can also be used to do larger IO (than
-device limit) on nvme-passthrough?
-For example, 1MB IO on NVMe than has 512k or 256K maximum transfer
-size.
+Patch 3 makes sure we never try to flush from within an irq context, and
+patch 4 adds a WARN_ON_ONCE() to make sure we catch any violations.
 
-------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_11136e_
-Content-Type: text/plain; charset="utf-8"
+Patches 5 to 8 introduce separate variants of mem_cgroup_flush_stats()
+for atomic and non-atomic flushing, and make sure we only flush the
+stats atomically when necessary.
 
+Patch 9 is a slightly tangential optimization that limits the work done
+by rstat flushing in some scenarios.
 
-------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_11136e_--
+RFC -> v1:
+- Dropped patch 1 that attempted to make the global rstat lock a non-irq
+  lock, will follow up on that separetly (Shakeel).
+- Dropped stats_flush_lock entirely, replaced by an atomic (Johannes).
+- Renamed cgroup_rstat_flush_irqsafe() to cgroup_rstat_flush_atomic()
+  instead of removing it (Johannes).
+- Added a patch to rename mem_cgroup_flush_stats_delayed() to
+  mem_cgroup_flush_stats_ratelimited() (Johannes).
+- Separate APIs for flushing memcg stats in atomic and non-atomic
+  contexts instead of a boolean argument (Johannes).
+- Added patches 3 & 4 to make sure we never flush from irq context
+  (Shakeel & Johannes).
+
+Yosry Ahmed (9):
+  cgroup: rename cgroup_rstat_flush_"irqsafe" to "atomic"
+  memcg: rename mem_cgroup_flush_stats_"delayed" to "ratelimited"
+  memcg: do not flush stats in irq context
+  cgroup: rstat: add WARN_ON_ONCE() if flushing outside task context
+  memcg: replace stats_flush_lock with an atomic
+  memcg: sleep during flushing stats in safe contexts
+  workingset: memcg: sleep when flushing stats in workingset_refault()
+  vmscan: memcg: sleep when flushing stats during reclaim
+  memcg: do not modify rstat tree for zero updates
+
+ include/linux/cgroup.h     |  2 +-
+ include/linux/memcontrol.h |  9 +++-
+ kernel/cgroup/rstat.c      |  6 ++-
+ mm/memcontrol.c            | 86 ++++++++++++++++++++++++++++++++------
+ mm/workingset.c            |  4 +-
+ 5 files changed, 87 insertions(+), 20 deletions(-)
+
+-- 
+2.40.0.348.gf938b09366-goog
+
