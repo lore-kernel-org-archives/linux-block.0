@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F20C761A6
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 19:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E93C6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 19:57:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbjC1T5u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 15:57:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41790 "EHLO
+        id S229522AbjC1T5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 15:57:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjC1T5s (ORCPT
+        with ESMTP id S229487AbjC1T5t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 15:57:48 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2042.outbound.protection.outlook.com [40.107.244.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04293C19
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:57:20 -0700 (PDT)
+        Tue, 28 Mar 2023 15:57:49 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C1DB3C0A
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 12:57:23 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jgQC/2l8OsB7M3PP1Z4VOCelGGVyxwytdBCcaLB+Zoa9v7GmAMFK2YSwl7l4FsF1eNo0mZvlw9ogCZutzv5w7Qwe6UWIQ02ZuLgwzK1e7Qe3EntlBmYB8ezF7EAi0F7y7LPStHw/lNiJqjPGuwcRaA3FcGsmiXA+oGwKXkmeqHBYzdmeeno7YBwiFr/rW+k5ogbK5UjuCYvqPpqkePqbztysBnDD6h1zpc2stjOt96xBmR+Mp9oUeydG04hKJWA12VJNXO2+jXTvwhr1wiKgmMI6kF0fhH2fOAhZwOaAFVh1MUUrQS4o367D00wHs3zeqrcwlDFVKjOdAGuM3qEm5Q==
+ b=BCWDl0lfGhAEKAPpXVoWQnaR7aQFIRXMSRKiZhyIWMIv+FeXJ0SpbJuAaTiRjfFqehSe7ySNAx7dNUlRMN1NcXW0BRDEFtqZ9ibsUtQHqKAG5W1yXdOJsXYQeUkUs0RphmHM7521mMQx+bB1FF5b74vbBpJ6ARI8SDcdshfuFMkyUgq7HuLIguTqz0MRAuek8r5votR2+LpGhe+UtOpfz7P5EYkASDwYTOwCBA754kD6FkhwwVgWb7zdHdyO789HwzGjtQt7uc58p5gvAbWAD5ZL3LbALqekOaSRV71Y7+bB/Gk16hd2YZSwSxvR2uayrq7XHaczcB2zJWV22NoXIg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t+cwlHTRv9D4ufe0iHxJrDbSkY+ZrLC+H+KcMvP4m1Q=;
- b=W6sa6Hnt56eNQQVd09tMa3nH01NCNMXfjoZzhhp3LDpK1GojtsORVqz9Si728V4FS9GMlISDeWsobIeROLoN0TS/5OfYWjUSI5ScraeFJivJDrn/chSDcZaMB4Fmtnb7xwIJ/U/kC9TjN+OuR0O9IfT3gBlqOln0Wg/dv5hHJgDtN0xeopxTsaFLDqA2cGWh1hJXusAdAcS5ijXKho8LikynAAiGfqv5NqRXBHjH/29sEtvnJvCJ/R2DE5NkJRNkz1a2PVJ7CRoblBrBONgU3A4UfNXS4NkkAmk0sEOSUgPOqoPxwJ6F7pAC/07u4mynpWW+210+27v1El8Ax259lQ==
+ bh=RdbymjXlHcqVEtPrvrOB18iTp+mF1nybaePS+vKz4Uw=;
+ b=h/1UHDMKpcXMBLxha1V8E6JYrINu7HwWuhu7k2Dbso+8/S8RZs+kc9kTyw4586i00ggc2hsFB5dJZaINYrUK1CrPlP5KQV/ZDATuZo2Ll7rzzP5cAAxi93xOyfhFJTScQsZ+zDIne6/45K7kzpVoksgxZV7NcNcGGpYj5hHQdwLhHH7Yqt8hGiOMnZgHmzR7dlet8UNdPjnMo5kU0rNgIP1DNleBkmTYfbxJlNhmv1UZpEF2FZ6O69L4mWRzZTJLokELxs7vI5MbYj7nWt1uj+M2s1eog2+LzKWkc/DBE7xkqBt9/oAhP+9mi3rzlvGQDajFuXWzzJc/izwr3EHmKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -29,18 +29,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t+cwlHTRv9D4ufe0iHxJrDbSkY+ZrLC+H+KcMvP4m1Q=;
- b=W2ujo0gTMkj6XXYx4kMqfqlVOfakUUVh+pLozuKWq/lGAWmZt/HzjCTnd8iKA8Zkc/eHSjJsH9QhnZY0cmMddwWXqaJecU+hc2dDI3WxU1t4kottJt/RddOmRSiSFEPvgjEtaC6gPGRXVQfNi9xRF+ubENjjzum89p+nTYOOiL7mB46OGnR6dlaeyUOUmU9i1KfC8kxSLvl5aU3ta6AvPkwq9Xv9u901EsZ1RZdqoZcEsOwnm7wrR2TTLmS4+tqaheE+FSDcu6ki7R6JEfqrwNjNPk5B9IivWRsdJbT5tJhUdM8HDpkIOMIQtxfUbEeBn51higSMW2VTfA07RVSuaw==
-Received: from MW4P220CA0026.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::31)
- by BL3PR12MB6428.namprd12.prod.outlook.com (2603:10b6:208:3b7::19) with
+ bh=RdbymjXlHcqVEtPrvrOB18iTp+mF1nybaePS+vKz4Uw=;
+ b=okuEd82Lyj7T0o/VWr/825Z4hD56knsnhkP7MZvTuowBlGwpMg4FNJkk5MQNGwvW0xKoxom7SoBwwt+ESifCI5FWQLaHpCbWny2hv2AtrP08Adkw8cKWFdntnouNIpuNTPCHFWYrBQyNtF95yDIf9byOduBRgg5Er8inlSBjwRLC0e4pxHRvI++gvfT7pFnUd3sHz347qxqz6pKuH0cWZSitnO2S3GJzWO1f/j0vPsEfja/68fduwzOwOqQGMUGV3xEyo6i/23sigdRSSC9LaLefXR17bsGc8Mrq4C3Y4wByGOCdoGHIStCZeQG0a5gTHyMJ3y9phZueyBV8SiuxgA==
+Received: from MW4PR03CA0359.namprd03.prod.outlook.com (2603:10b6:303:dc::34)
+ by DM6PR12MB4220.namprd12.prod.outlook.com (2603:10b6:5:21d::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.41; Tue, 28 Mar
- 2023 19:57:08 +0000
-Received: from CO1NAM11FT093.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:115:cafe::8b) by MW4P220CA0026.outlook.office365.com
- (2603:10b6:303:115::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.30; Tue, 28 Mar
+ 2023 19:57:19 +0000
+Received: from CO1NAM11FT113.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:dc:cafe::3f) by MW4PR03CA0359.outlook.office365.com
+ (2603:10b6:303:dc::34) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.43 via Frontend
- Transport; Tue, 28 Mar 2023 19:57:07 +0000
+ Transport; Tue, 28 Mar 2023 19:57:19 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -48,97 +48,90 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CO1NAM11FT093.mail.protection.outlook.com (10.13.175.59) with Microsoft SMTP
+ CO1NAM11FT113.mail.protection.outlook.com (10.13.174.180) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6222.21 via Frontend Transport; Tue, 28 Mar 2023 19:57:07 +0000
+ 15.20.6199.32 via Frontend Transport; Tue, 28 Mar 2023 19:57:19 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 28 Mar 2023
- 12:56:55 -0700
-Received: from dev.nvidia.com (10.126.230.37) by rnnvmail201.nvidia.com
+ 12:57:06 -0700
+Received: from dev.nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 28 Mar
- 2023 12:56:55 -0700
+ 2023 12:57:06 -0700
 From:   Chaitanya Kulkarni <kch@nvidia.com>
 To:     <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH 2/4] brd: use memcpy_to_page() in copy_to_brd()
-Date:   Tue, 28 Mar 2023 12:56:24 -0700
-Message-ID: <20230328195626.12075-3-kch@nvidia.com>
+Subject: [PATCH 3/4] brd: use memcpy_from_page() in copy_from_brd()
+Date:   Tue, 28 Mar 2023 12:56:25 -0700
+Message-ID: <20230328195626.12075-4-kch@nvidia.com>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20230328195626.12075-1-kch@nvidia.com>
 References: <20230328195626.12075-1-kch@nvidia.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.126.230.37]
+X-Originating-IP: [10.126.231.37]
 X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT093:EE_|BL3PR12MB6428:EE_
-X-MS-Office365-Filtering-Correlation-Id: d5bf8e3a-cfd1-43dd-3292-08db2fc69c36
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT113:EE_|DM6PR12MB4220:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0523d7fb-a656-40eb-1557-08db2fc6a377
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Bwdv99iwboL+mFVywBWrDO0LgXG+gvjM5Xyrt+rLBay94zj2WDdOWfrLgHGjM5yvVW3CeGge9X47V5h+gVChwhM+go6n3L9bfdx6int9SQMYXtIHQMlGJBP3qG7RH9nxK0vedY0M94VjsySPHtRRcZkZZkCHypxKtS7sJdEDjFSK0K+aZ4fzSEEx2o6RSwbWOL3HTI1+AMjxvzdp3kL6VmRsorttSHibjPy3cZkZRS/8RtWdzm1iVxA13TXJ0yuEwYgExq2zEl7jiyOzZLRQSKWrCP4vadUd9BjEJLfiTup1k/6cr+nu/XopNZqmg1L/uVTyWhJgxRsGL2s5D0Jq7oYo9MeGKzjHRvzl+VWucqYPap2sdJU+rWGNcQxtk2tObOx3fvETVCzfdlhPC7qsCCTDv2QO3IXkSBitw/K3bjjazQi291yVPllVIiHfx62npxKK3NKAijb5g8Qot3dqjsPau0yUEDkbqrU/VXiadeVpDzjncXuj7FX0wzn2sL8kZ79JHfF3KwvE6NQ04G0icK3e0f4FqVfCNR458QsedG0H2TrKZbtmYKgALLEDVhB4ZxgLRcqr1Aj97Ln8G2SbPouQ190Zl4cdjPlA0ZfyD56A3SlX2oR/M4595Beo2T792UGUOwDkM/EC8gGzJZQjtKBcJ5EVig1uHbbW9hP86aqyUv+R/woohpU40gg3yZXwekyz+22ztPhqAzowob92E8CVd3l9/E4KCmHUO1xb6gILUcK3mcLfgnnFI8trjjG6AqYCETaDuohSM18TlWkkhD0Dfm95CkMmPyS/zClRxKY=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(396003)(376002)(346002)(451199021)(36840700001)(46966006)(40470700004)(82310400005)(83380400001)(2906002)(426003)(47076005)(2616005)(4326008)(336012)(356005)(70586007)(40480700001)(186003)(40460700003)(6916009)(16526019)(34020700004)(7636003)(82740400003)(41300700001)(36756003)(36860700001)(8936002)(8676002)(70206006)(26005)(5660300002)(1076003)(107886003)(6666004)(316002)(54906003)(7696005)(478600001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 26Gt1MHhVpu2INYrseh6wsG6+v25qKuXKvviPmBRq85Toif+u8khBCHea48AlUkKZebVHSh6y3cTaBvcyRRsenUwJQtCSzW5/uC4IcAWZFwYetrF7e6PMoUW8pAgST9+Nx4Biel8Pvq7IRFwfopjalgpFKbPsP80EfcUIKHqxOxC9q9NyUYBBF9a/oOnqq4FjNM5bP5MyYm9ioT0bapOjz7gd3JEj77NZK73vaATy6MI1Wcn3p+5/16LbMu2X2SSm07cLRT5KlUPmJHw/aiD99MWDfB3n9AZiTa+Xxa+9ldhxrbMELmdzP07gmGw/NMWZpRDIjsUkR69t/i5ZEPbvaPPK1/freh3ZdReVNdI52CjUcZcrrOibTBL3evILqg3+bK+xpGLvsm5JiSXiNlgiV4EdpmirIiw9gHXzq397+Sdx8lQNtCeN0oBHzfDLs7YYtkDIzt7UVTHWdiH2yOsJwgGsDifFJVxg7nVu9wQ6O/zTMnOjFuqXTKfzQVmNXSU8rYw1qjYdX7ki8/pM/Zh/CxvS3Ikso3iJVjgoNR7Xy2opvrgvOyCrRqR/rgNuySmWiyQ5YFRdmC8leXry9ulDsRRiOwvOlj8rWIrqxl7TS5LIA/TanIJGNhKNBcnvGsWN6jqEG9kbuJ+SWbNpDCWDefEDlgd6lka3MPoaX2AVF6axr5UmN+G7pnvzdVbuKVbdd/a14pYloIQLlKOy796t+/Mu63FqTCpq5O4jh0LeqREZx+0/pb1fkE9ZkTMApUWQSXQFAtwb4wxMdSScSCqFP5Rc5HE9ubF5n9kYEnfSR0=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(39860400002)(136003)(346002)(451199021)(36840700001)(46966006)(40470700004)(7696005)(2616005)(426003)(336012)(47076005)(16526019)(186003)(107886003)(6666004)(478600001)(34020700004)(316002)(36860700001)(54906003)(70206006)(1076003)(26005)(83380400001)(8676002)(70586007)(4326008)(8936002)(41300700001)(6916009)(356005)(7636003)(5660300002)(2906002)(82740400003)(40460700003)(40480700001)(36756003)(82310400005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2023 19:57:07.2947
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2023 19:57:19.4640
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5bf8e3a-cfd1-43dd-3292-08db2fc69c36
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0523d7fb-a656-40eb-1557-08db2fc6a377
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT093.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT113.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6428
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4220
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In copy_to_brd() it uses kmap_atomic() call on the page in question to
-create destination page mapping on buffer (dst), then it uses memcpy()
-call to copy the data from source pointer onto mapped buffer (dst) with
-added offset and size equals to number of bytes stored in copy variable.
+In copy_from_brd() it uses kmap_atomic() call on the page in question to
+create source page mapping on buffer (src), then it uses memcpy() call
+to copy the data from mapped buffer (src) with added offset and size
+equals to number of bytes stored in copy variable.
 Then it uses the kunmap_atomic(), also from :include/linux/highmem.h:
 
 "kmap_atomic - Atomically map a page for temporary usage - Deprecated!"
 
-Use memcpy_from_page() does the same job of mapping and copying except
-it uses non deprecated kmap_local_page() and kunmap_local().
-
-Use memcpy_from_page() does the same job of mapping and copying except
-it uses non deprecated kmap_local_page() and kunmap_local().
+Use memcpy_from_page() helper does the same job of mapping and copying
+except it uses non deprecated kmap_local_page() and kunmap_local().
 
 Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- drivers/block/brd.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/block/brd.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 91ab0a76a39f..4948cfdd83ac 100644
+index 4948cfdd83ac..3df4b45eded3 100644
 --- a/drivers/block/brd.c
 +++ b/drivers/block/brd.c
-@@ -189,7 +189,6 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 			sector_t sector, size_t n)
- {
- 	struct page *page;
--	void *dst;
- 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
- 	size_t copy;
+@@ -222,11 +222,9 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
  
-@@ -206,9 +205,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 		page = brd_lookup_page(brd, sector);
- 		BUG_ON(!page);
+ 	copy = min_t(size_t, n, PAGE_SIZE - offset);
+ 	page = brd_lookup_page(brd, sector);
+-	if (page) {
+-		src = kmap_atomic(page);
+-		memcpy(dst, src + offset, copy);
+-		kunmap_atomic(src);
+-	} else
++	if (page)
++		memcpy_from_page(dst, page, offset, copy);
++	else
+ 		memset(dst, 0, copy);
  
--		dst = kmap_atomic(page);
--		memcpy(dst, src, copy);
--		kunmap_atomic(dst);
-+		memcpy_to_page(page, 0, src, copy);
- 	}
- }
- 
+ 	if (copy < n) {
 -- 
 2.29.0
 
