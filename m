@@ -2,123 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0504DC77B61
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E55BEC6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:20:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232949AbjC1PSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 11:18:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53938 "EHLO
+        id S233936AbjC1PUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 11:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233959AbjC1PRk (ORCPT
+        with ESMTP id S233986AbjC1PUV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:17:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2C211646
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:16:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680016500;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Plah9oxK2vEYgPKSe8zMQk868IGL1eXPxQld6RUGB/s=;
-        b=aFe5grvNnlHnopoQloN5mHTBKZryNG+4I15mAezHN8C6K/NVcRNsdjzBCR9kESQ3D3k6RT
-        7yiH/Ipj2tF71S51z5PpDqMDdt2GegafLv/90InrRkMCArI/B1VTuTZuXhkbjZqDqbOrTG
-        gma6Y2NcxZn2pg1MxfTbp50eTD9umEo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-552-eIOBpHoaMdCVHdDeJnE0HA-1; Tue, 28 Mar 2023 11:11:34 -0400
-X-MC-Unique: eIOBpHoaMdCVHdDeJnE0HA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4E2A3100DEBF;
-        Tue, 28 Mar 2023 15:11:33 +0000 (UTC)
-Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7072214171C3;
-        Tue, 28 Mar 2023 15:11:32 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 09/16] block: ublk_drv: clean up several helpers
-Date:   Tue, 28 Mar 2023 23:09:51 +0800
-Message-Id: <20230328150958.1253547-10-ming.lei@redhat.com>
-In-Reply-To: <20230328150958.1253547-1-ming.lei@redhat.com>
-References: <20230328150958.1253547-1-ming.lei@redhat.com>
+        Tue, 28 Mar 2023 11:20:21 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3405AA5F8
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:18:29 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id p204so15484933ybc.12
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:18:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680016702;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+Oo7t3uH5L5XgCZ1uKSglRiPDhZouQp2W4do7dpcvfk=;
+        b=sloJNSy6jcyr8V+bl2KDVZrUIx+CgEgGJSFJ4w5WaC8TdDbJCtG+r3mp7IA616+rDp
+         vp5xon0cmgSmMxTl22bo4RSzS9zf/7Kn97mBl99ky4OeP2XRyg6onKPOdON3LsP3G/5l
+         XANyH+1QqjNiVr6oKoANqKgz1Ajr/GLOPr3j2cYawyyWbFlBNgScTCm22rzxJwSb9p82
+         VRIEQDNvWgAhrcsWYx4ovZiheIKaE6I+lr3iNOLgZUWrzZB/z7jbm0dfyF5GYULBzeUy
+         sOr3fI0aibAi2tvxQGwIW5wXdwecj11oK32tp95GWC1wSYzzlaWZF+3LUtQI/ppp1xXc
+         o8Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680016702;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+Oo7t3uH5L5XgCZ1uKSglRiPDhZouQp2W4do7dpcvfk=;
+        b=t2G/CGLvHVvQYNxYhLua0nvnCqKAcneDjspF94n8zMGvqaU+gYpjf+qjlsx9pT9vpY
+         BcblufiYFJ+/7Qb3dR9MGBFZTjLfMw5+M5oNYjd8J3CNg0VAUM1jrPjhnqQU9tkhYDh5
+         mYWDexq3hGpznyb4Jah1jbwvwn/0NigLLsE0rp0Rr7LVgdehNLy5BUyrepvjq5P7uUQm
+         FzU1eazqTbVcoiZkxT6Kw2yeqLJneDmtEjqOwsHXCsDaO2TbBbskn9vjwEMR/KMLOr7i
+         LHkLsoKXZnMp2Ga6OrIY6hDk9LlyfTKrm76vq82d/0aGITebmkmiLGwsAm149Bfh/M/Q
+         76Gg==
+X-Gm-Message-State: AAQBX9dERR4VZ2m1u9qmofr8USJv23jlGWnuOijzAGEfEUSAnA9IOG2l
+        PEN1s+ejo7iUzMb888H8OBYRGS8vYI5hvtOKHotYx9i8dMDGTq3iATUVpg==
+X-Google-Smtp-Source: AKy350bj5Nyxts8ciOXLw5EWFV9sPrHyhrga3LXQMYyQcc2/rYEnNjc1hc6y50eir7QoYRZz6dOHo8zvJLKF9E3OnwA=
+X-Received: by 2002:a25:2749:0:b0:a99:de9d:d504 with SMTP id
+ n70-20020a252749000000b00a99de9dd504mr10180174ybn.12.1680016702030; Tue, 28
+ Mar 2023 08:18:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-8-yosryahmed@google.com>
+In-Reply-To: <20230328061638.203420-8-yosryahmed@google.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Tue, 28 Mar 2023 08:18:11 -0700
+Message-ID: <CALvZod5_NVTrYUhLjc3Me=CC6y3R4bhA71mCt-jXo0rX+2zUxw@mail.gmail.com>
+Subject: Re: [PATCH v1 7/9] workingset: memcg: sleep when flushing stats in workingset_refault()
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert the following pattern in several helpers
-	if (Z)
-		return true
-	return false
-into:
-	return Z;
+On Mon, Mar 27, 2023 at 11:16=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
+> wrote:
+>
+> In workingset_refault(), we call mem_cgroup_flush_stats_ratelimited()
+> to flush stats within an RCU read section and with sleeping disallowed.
+> Move the call to mem_cgroup_flush_stats_ratelimited() above the RCU read
+> section and allow sleeping to avoid unnecessarily performing a lot of
+> work without sleeping.
+>
+> Since workingset_refault() is the only caller of
+> mem_cgroup_flush_stats_ratelimited(), just make it call the non-atomic
+> mem_cgroup_flush_stats().
+>
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
 
-Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+A nit below:
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index f87597a7d679..1c057003a40a 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -298,9 +298,7 @@ static inline bool ublk_can_use_task_work(const struct ublk_queue *ubq)
- 
- static inline bool ublk_need_get_data(const struct ublk_queue *ubq)
- {
--	if (ubq->flags & UBLK_F_NEED_GET_DATA)
--		return true;
--	return false;
-+	return ubq->flags & UBLK_F_NEED_GET_DATA;
- }
- 
- static struct ublk_device *ublk_get_device(struct ublk_device *ub)
-@@ -349,25 +347,19 @@ static inline int ublk_queue_cmd_buf_size(struct ublk_device *ub, int q_id)
- static inline bool ublk_queue_can_use_recovery_reissue(
- 		struct ublk_queue *ubq)
- {
--	if ((ubq->flags & UBLK_F_USER_RECOVERY) &&
--			(ubq->flags & UBLK_F_USER_RECOVERY_REISSUE))
--		return true;
--	return false;
-+	return (ubq->flags & UBLK_F_USER_RECOVERY) &&
-+			(ubq->flags & UBLK_F_USER_RECOVERY_REISSUE);
- }
- 
- static inline bool ublk_queue_can_use_recovery(
- 		struct ublk_queue *ubq)
- {
--	if (ubq->flags & UBLK_F_USER_RECOVERY)
--		return true;
--	return false;
-+	return ubq->flags & UBLK_F_USER_RECOVERY;
- }
- 
- static inline bool ublk_can_use_recovery(struct ublk_device *ub)
- {
--	if (ub->dev_info.flags & UBLK_F_USER_RECOVERY)
--		return true;
--	return false;
-+	return ub->dev_info.flags & UBLK_F_USER_RECOVERY;
- }
- 
- static void ublk_free_disk(struct gendisk *disk)
--- 
-2.39.2
+Acked-by: Shakeel Butt <shakeelb@google.com>
 
+> ---
+>  mm/memcontrol.c | 12 ++++++------
+>  mm/workingset.c |  4 ++--
+>  2 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 57e8cbf701f3..0c0e74188e90 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -674,12 +674,6 @@ void mem_cgroup_flush_stats_atomic(void)
+>                 __mem_cgroup_flush_stats_atomic();
+>  }
+>
+> -void mem_cgroup_flush_stats_ratelimited(void)
+> -{
+> -       if (time_after64(jiffies_64, READ_ONCE(flush_next_time)))
+> -               mem_cgroup_flush_stats_atomic();
+> -}
+> -
+>  /* non-atomic functions, only safe from sleepable contexts */
+>  static void __mem_cgroup_flush_stats(void)
+>  {
+> @@ -695,6 +689,12 @@ void mem_cgroup_flush_stats(void)
+>                 __mem_cgroup_flush_stats();
+>  }
+>
+> +void mem_cgroup_flush_stats_ratelimited(void)
+> +{
+> +       if (time_after64(jiffies_64, READ_ONCE(flush_next_time)))
+> +               mem_cgroup_flush_stats();
+> +}
+> +
+>  static void flush_memcg_stats_dwork(struct work_struct *w)
+>  {
+>         __mem_cgroup_flush_stats();
+> diff --git a/mm/workingset.c b/mm/workingset.c
+> index af862c6738c3..7d7ecc46521c 100644
+> --- a/mm/workingset.c
+> +++ b/mm/workingset.c
+> @@ -406,6 +406,8 @@ void workingset_refault(struct folio *folio, void *sh=
+adow)
+>         unpack_shadow(shadow, &memcgid, &pgdat, &eviction, &workingset);
+>         eviction <<=3D bucket_order;
+>
+> +       /* Flush stats (and potentially sleep) before holding RCU read lo=
+ck */
+
+I think the only reason we use rcu lock is due to
+mem_cgroup_from_id(). Maybe we should add mem_cgroup_tryget_from_id().
+The other caller of mem_cgroup_from_id() in vmscan is already doing
+the same and could use mem_cgroup_tryget_from_id().
+
+Though this can be done separately to this series (if we decide to do
+it at all).
