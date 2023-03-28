@@ -2,62 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7E7C6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 18:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ACD7C761A6
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 18:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbjC1SgX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 14:36:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40022 "EHLO
+        id S229765AbjC1Snl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 14:43:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjC1SgX (ORCPT
+        with ESMTP id S229511AbjC1Snk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 14:36:23 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B2431FDB
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 11:36:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3FB27B81E33
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 18:36:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E5D9C433D2;
-        Tue, 28 Mar 2023 18:36:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680028561;
-        bh=kc5R6nXTzPfvlU6LuPQ145KHQ64nhKzvpe4FksK4B/g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=epsmqNnLEaujUCalH3zBcrtfn6n+EgCpaox+2i0zCM1W/bzqKGUZ2ta041G1Jnff0
-         YVw4pvHnj1sA4eqhKRN3IHTZax6aOK7baDsoCgG4L0o3bmY/Czj+w/35zUDIIKqAqi
-         x96ogSCggPATRJa5RH8/UEST/O9UJ+NZsZhmOXc2VyJF2AK41Kx5+J5j8MdTKP/Dbn
-         6oZ9tKTRM3kcuBoZRT0Ms226kTzDPfIfmgCAqa5Ilnkr/gWXzmTMMVSrmPc0JA7bgG
-         BCJBtQjPR4DiZbqexkGZ4u4WQd0T0ckmr6PBpXPBAR4IRRlzE6QTa4eu5Zuy/+6pWm
-         8HTr2LpUpWneQ==
-Date:   Tue, 28 Mar 2023 12:35:57 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Subject: Re: [PATCH blktests v2 0/3] Test different queue counts
-Message-ID: <ZCMzjVs26imnywgo@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230322101648.31514-1-dwagner@suse.de>
+        Tue, 28 Mar 2023 14:43:40 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D8C2110
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 11:43:24 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id t10so53484395edd.12
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 11:43:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112; t=1680029002;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rj2RQnjDsXwaVL7ntpieUXva4Ffe8kxZx/xthWWU0bA=;
+        b=gsJgxRHD3bOgSTLtfz5lc8JsyfjCFq9/1NiJAHhPimNN7eSlnuIqbiYFd01bZKnjkP
+         vevcfEYFS4Wi1X3PMT55jO0hLoanb2YDgLQB0gSA0WRGTU7cKXBQ7FdqWZXGIUTi0z/D
+         uwwS34T9zxFwD124x/eKhqE+Q3wUyFb+2h4s1O+zEfRZmy/OhHw2EFVJgNUkqIBI9O3W
+         P1W537yWyPHsem/Dbp1zlCM6bVIkxo4eis/m7QM9I4yKYCM8l+XkutscKtdNCdql72dA
+         78QHdu1hsBdcel8kv8irSlL4e6NqUJGVkREQTZ4WoslS1aU7O0XplLGhNFJ9T9qXSA5z
+         Fklw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680029002;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rj2RQnjDsXwaVL7ntpieUXva4Ffe8kxZx/xthWWU0bA=;
+        b=IYBz5HAMB7u8/CtU2h7OCo1ww/A0PZ0hfrln16/HbUOWJ9Sx503znTmrBZl4ACgwYA
+         TtAEst4m/bTprtcyTTOLszorlbHztm/ZIjS5JSjFUA7jsnnacBhJaYBwXDA6c/FPmTx/
+         ZC1EXpl9n6G1YyIFmFYkvyeRNkoJTlln7CBn7BVNzD0k7qdyc41pBFHGuZwa09nBFmU1
+         FzrcetiEl2GKSm57co1XQ3lfJfNfaDTDDpScuP+Fhxp4DDXLzU5C7I0BriV/Eg9K5CLg
+         vetgpgK+TQK12/b3Lq3+OsohiHN3YzOGujrShDTClbB8XLkQ4DHF5aIQp/xKfXh7uAAT
+         i3dw==
+X-Gm-Message-State: AAQBX9cwFVdeVx3OyZOfpvJibp3+kLWhIcjXJZL50a0iShg48Sa3gKh3
+        RCxShBbsInVTFUjeg5KVrAe7cg==
+X-Google-Smtp-Source: AKy350ZBgNqTLZmGafKvz39W/GT1Mit2dRqnjGmdrRbaKi3drMY5VIC19T1z7xf7oIKC0pmnW1Faqw==
+X-Received: by 2002:a17:906:5849:b0:931:4b0b:73e3 with SMTP id h9-20020a170906584900b009314b0b73e3mr16287762ejs.65.1680029002767;
+        Tue, 28 Mar 2023 11:43:22 -0700 (PDT)
+Received: from localhost ([2a02:8070:6387:ab20:5139:4abd:1194:8f0e])
+        by smtp.gmail.com with ESMTPSA id b1-20020a1709065e4100b008ca52f7fbcbsm15499474eju.1.2023.03.28.11.43.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Mar 2023 11:43:22 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 14:43:21 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH v1 7/9] workingset: memcg: sleep when flushing stats in
+ workingset_refault()
+Message-ID: <ZCM1Sayt3nYZ9LL9@cmpxchg.org>
+References: <20230328061638.203420-1-yosryahmed@google.com>
+ <20230328061638.203420-8-yosryahmed@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230322101648.31514-1-dwagner@suse.de>
+In-Reply-To: <20230328061638.203420-8-yosryahmed@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 11:16:45AM +0100, Daniel Wagner wrote:
-> Setup different queues, e.g. read and poll queues.
+On Tue, Mar 28, 2023 at 06:16:36AM +0000, Yosry Ahmed wrote:
+> @@ -406,6 +406,8 @@ void workingset_refault(struct folio *folio, void *shadow)
+>  	unpack_shadow(shadow, &memcgid, &pgdat, &eviction, &workingset);
+>  	eviction <<= bucket_order;
+>  
+> +	/* Flush stats (and potentially sleep) before holding RCU read lock */
+> +	mem_cgroup_flush_stats_ratelimited();
+>  	rcu_read_lock();
 
-If you wanted to add a similar test for pci, you do it by echo'ing the desired
-options to:
+Minor nit, but please keep the lock section visually separated by an
+empty line between the flush and the rcu lock.
 
-  /sys/modules/nvme/parameters/{poll_queues,write_queues}
+Other than that,
 
-Then do an 'nvme reset' on the target nvme pci device.
-
-I'll just note that such a test will currently fail, and fixing that doesn't
-look like fun. :)
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
