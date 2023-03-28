@@ -2,148 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E55BEC6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:20:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E2BC77B61
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 15:21:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233936AbjC1PUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 11:20:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40602 "EHLO
+        id S233345AbjC1PVd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 11:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233986AbjC1PUV (ORCPT
+        with ESMTP id S233952AbjC1PVV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 11:20:21 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3405AA5F8
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:18:29 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id p204so15484933ybc.12
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:18:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680016702;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+Oo7t3uH5L5XgCZ1uKSglRiPDhZouQp2W4do7dpcvfk=;
-        b=sloJNSy6jcyr8V+bl2KDVZrUIx+CgEgGJSFJ4w5WaC8TdDbJCtG+r3mp7IA616+rDp
-         vp5xon0cmgSmMxTl22bo4RSzS9zf/7Kn97mBl99ky4OeP2XRyg6onKPOdON3LsP3G/5l
-         XANyH+1QqjNiVr6oKoANqKgz1Ajr/GLOPr3j2cYawyyWbFlBNgScTCm22rzxJwSb9p82
-         VRIEQDNvWgAhrcsWYx4ovZiheIKaE6I+lr3iNOLgZUWrzZB/z7jbm0dfyF5GYULBzeUy
-         sOr3fI0aibAi2tvxQGwIW5wXdwecj11oK32tp95GWC1wSYzzlaWZF+3LUtQI/ppp1xXc
-         o8Fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680016702;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+Oo7t3uH5L5XgCZ1uKSglRiPDhZouQp2W4do7dpcvfk=;
-        b=t2G/CGLvHVvQYNxYhLua0nvnCqKAcneDjspF94n8zMGvqaU+gYpjf+qjlsx9pT9vpY
-         BcblufiYFJ+/7Qb3dR9MGBFZTjLfMw5+M5oNYjd8J3CNg0VAUM1jrPjhnqQU9tkhYDh5
-         mYWDexq3hGpznyb4Jah1jbwvwn/0NigLLsE0rp0Rr7LVgdehNLy5BUyrepvjq5P7uUQm
-         FzU1eazqTbVcoiZkxT6Kw2yeqLJneDmtEjqOwsHXCsDaO2TbBbskn9vjwEMR/KMLOr7i
-         LHkLsoKXZnMp2Ga6OrIY6hDk9LlyfTKrm76vq82d/0aGITebmkmiLGwsAm149Bfh/M/Q
-         76Gg==
-X-Gm-Message-State: AAQBX9dERR4VZ2m1u9qmofr8USJv23jlGWnuOijzAGEfEUSAnA9IOG2l
-        PEN1s+ejo7iUzMb888H8OBYRGS8vYI5hvtOKHotYx9i8dMDGTq3iATUVpg==
-X-Google-Smtp-Source: AKy350bj5Nyxts8ciOXLw5EWFV9sPrHyhrga3LXQMYyQcc2/rYEnNjc1hc6y50eir7QoYRZz6dOHo8zvJLKF9E3OnwA=
-X-Received: by 2002:a25:2749:0:b0:a99:de9d:d504 with SMTP id
- n70-20020a252749000000b00a99de9dd504mr10180174ybn.12.1680016702030; Tue, 28
- Mar 2023 08:18:22 -0700 (PDT)
+        Tue, 28 Mar 2023 11:21:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4DCFF27
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 08:18:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680016681;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=B4h73f5q+9OJB7ocdpIjrrTEZsKx6E5zs0QXKOnNU3Q=;
+        b=gJeWJSCrF3AZ/Q/jWP4bcJTBSnYZFk2i84MIOqFZsY6IF6SpCkR5PrHYp4FWt+BgACf1La
+        9WypnWT2777449hBjNWf+6QACoJo09+JbvWVIZiJiwwp6/J09mx5uN3Wi94k05wGsfUDTj
+        MK0EHsuij5EPuso2mYB2rDsZwZb+rG0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-299-IE_ZslxBPuyv2EpFbWcMkQ-1; Tue, 28 Mar 2023 11:11:21 -0400
+X-MC-Unique: IE_ZslxBPuyv2EpFbWcMkQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C6981875045;
+        Tue, 28 Mar 2023 15:11:13 +0000 (UTC)
+Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 33C89C15BB8;
+        Tue, 28 Mar 2023 15:11:11 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 05/16] io_uring: support OP_SEND_ZC/OP_RECV for fused secondary request
+Date:   Tue, 28 Mar 2023 23:09:47 +0800
+Message-Id: <20230328150958.1253547-6-ming.lei@redhat.com>
+In-Reply-To: <20230328150958.1253547-1-ming.lei@redhat.com>
+References: <20230328150958.1253547-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-8-yosryahmed@google.com>
-In-Reply-To: <20230328061638.203420-8-yosryahmed@google.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Tue, 28 Mar 2023 08:18:11 -0700
-Message-ID: <CALvZod5_NVTrYUhLjc3Me=CC6y3R4bhA71mCt-jXo0rX+2zUxw@mail.gmail.com>
-Subject: Re: [PATCH v1 7/9] workingset: memcg: sleep when flushing stats in workingset_refault()
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 11:16=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
-> wrote:
->
-> In workingset_refault(), we call mem_cgroup_flush_stats_ratelimited()
-> to flush stats within an RCU read section and with sleeping disallowed.
-> Move the call to mem_cgroup_flush_stats_ratelimited() above the RCU read
-> section and allow sleeping to avoid unnecessarily performing a lot of
-> work without sleeping.
->
-> Since workingset_refault() is the only caller of
-> mem_cgroup_flush_stats_ratelimited(), just make it call the non-atomic
-> mem_cgroup_flush_stats().
->
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+Start to allow fused secondary request to support OP_SEND_ZC/OP_RECV, and
+the buffer can be retrieved from primary request.
 
-A nit below:
+Once the secondary request is completed, the primary buffer will be returned
+back.
 
-Acked-by: Shakeel Butt <shakeelb@google.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ io_uring/net.c   | 30 ++++++++++++++++++++++++++++--
+ io_uring/opdef.c |  6 ++++++
+ 2 files changed, 34 insertions(+), 2 deletions(-)
 
-> ---
->  mm/memcontrol.c | 12 ++++++------
->  mm/workingset.c |  4 ++--
->  2 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index 57e8cbf701f3..0c0e74188e90 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -674,12 +674,6 @@ void mem_cgroup_flush_stats_atomic(void)
->                 __mem_cgroup_flush_stats_atomic();
->  }
->
-> -void mem_cgroup_flush_stats_ratelimited(void)
-> -{
-> -       if (time_after64(jiffies_64, READ_ONCE(flush_next_time)))
-> -               mem_cgroup_flush_stats_atomic();
-> -}
-> -
->  /* non-atomic functions, only safe from sleepable contexts */
->  static void __mem_cgroup_flush_stats(void)
->  {
-> @@ -695,6 +689,12 @@ void mem_cgroup_flush_stats(void)
->                 __mem_cgroup_flush_stats();
->  }
->
-> +void mem_cgroup_flush_stats_ratelimited(void)
-> +{
-> +       if (time_after64(jiffies_64, READ_ONCE(flush_next_time)))
-> +               mem_cgroup_flush_stats();
-> +}
-> +
->  static void flush_memcg_stats_dwork(struct work_struct *w)
->  {
->         __mem_cgroup_flush_stats();
-> diff --git a/mm/workingset.c b/mm/workingset.c
-> index af862c6738c3..7d7ecc46521c 100644
-> --- a/mm/workingset.c
-> +++ b/mm/workingset.c
-> @@ -406,6 +406,8 @@ void workingset_refault(struct folio *folio, void *sh=
-adow)
->         unpack_shadow(shadow, &memcgid, &pgdat, &eviction, &workingset);
->         eviction <<=3D bucket_order;
->
-> +       /* Flush stats (and potentially sleep) before holding RCU read lo=
-ck */
+diff --git a/io_uring/net.c b/io_uring/net.c
+index 4040cf093318..e1c807a6e503 100644
+--- a/io_uring/net.c
++++ b/io_uring/net.c
+@@ -16,6 +16,7 @@
+ #include "net.h"
+ #include "notif.h"
+ #include "rsrc.h"
++#include "fused_cmd.h"
+ 
+ #if defined(CONFIG_NET)
+ struct io_shutdown {
+@@ -69,6 +70,13 @@ struct io_sr_msg {
+ 	struct io_kiocb 		*notif;
+ };
+ 
++#define user_ptr_to_u64(x) (		\
++{					\
++	typecheck(void __user *, (x));		\
++	(u64)(unsigned long)(x);	\
++}					\
++)
++
+ static inline bool io_check_multishot(struct io_kiocb *req,
+ 				      unsigned int issue_flags)
+ {
+@@ -379,7 +387,11 @@ int io_send(struct io_kiocb *req, unsigned int issue_flags)
+ 	if (unlikely(!sock))
+ 		return -ENOTSOCK;
+ 
+-	ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
++	if (!(req->flags & REQ_F_FUSED_SECONDARY))
++		ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
++	else
++		ret = io_import_buf_for_secondary(user_ptr_to_u64(sr->buf),
++				sr->len, ITER_SOURCE, &msg.msg_iter, req);
+ 	if (unlikely(ret))
+ 		return ret;
+ 
+@@ -870,7 +882,11 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
+ 		sr->buf = buf;
+ 	}
+ 
+-	ret = import_ubuf(ITER_DEST, sr->buf, len, &msg.msg_iter);
++	if (!(req->flags & REQ_F_FUSED_SECONDARY))
++		ret = import_ubuf(ITER_DEST, sr->buf, len, &msg.msg_iter);
++	else
++		ret = io_import_buf_for_secondary(user_ptr_to_u64(sr->buf),
++				sr->len, ITER_DEST, &msg.msg_iter, req);
+ 	if (unlikely(ret))
+ 		goto out_free;
+ 
+@@ -984,6 +1000,9 @@ int io_send_zc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	if (zc->flags & IORING_RECVSEND_FIXED_BUF) {
+ 		unsigned idx = READ_ONCE(sqe->buf_index);
+ 
++		if (req->flags & REQ_F_FUSED_SECONDARY)
++			return -EINVAL;
++
+ 		if (unlikely(idx >= ctx->nr_user_bufs))
+ 			return -EFAULT;
+ 		idx = array_index_nospec(idx, ctx->nr_user_bufs);
+@@ -1120,8 +1139,15 @@ int io_send_zc(struct io_kiocb *req, unsigned int issue_flags)
+ 		if (unlikely(ret))
+ 			return ret;
+ 		msg.sg_from_iter = io_sg_from_iter;
++	} else if (req->flags & REQ_F_FUSED_SECONDARY) {
++		ret = io_import_buf_for_secondary(user_ptr_to_u64(zc->buf),
++				zc->len, ITER_SOURCE, &msg.msg_iter, req);
++		if (unlikely(ret))
++			return ret;
++		msg.sg_from_iter = io_sg_from_iter;
+ 	} else {
+ 		io_notif_set_extended(zc->notif);
++
+ 		ret = import_ubuf(ITER_SOURCE, zc->buf, zc->len, &msg.msg_iter);
+ 		if (unlikely(ret))
+ 			return ret;
+diff --git a/io_uring/opdef.c b/io_uring/opdef.c
+index d81c9afd65ed..c31badf4fe45 100644
+--- a/io_uring/opdef.c
++++ b/io_uring/opdef.c
+@@ -273,6 +273,8 @@ const struct io_issue_def io_issue_defs[] = {
+ 		.audit_skip		= 1,
+ 		.ioprio			= 1,
+ 		.manual_alloc		= 1,
++		.fused_secondary	= 1,
++		.buf_dir		= READ,
+ #if defined(CONFIG_NET)
+ 		.prep			= io_sendmsg_prep,
+ 		.issue			= io_send,
+@@ -287,6 +289,8 @@ const struct io_issue_def io_issue_defs[] = {
+ 		.buffer_select		= 1,
+ 		.audit_skip		= 1,
+ 		.ioprio			= 1,
++		.fused_secondary	= 1,
++		.buf_dir		= WRITE,
+ #if defined(CONFIG_NET)
+ 		.prep			= io_recvmsg_prep,
+ 		.issue			= io_recv,
+@@ -413,6 +417,8 @@ const struct io_issue_def io_issue_defs[] = {
+ 		.audit_skip		= 1,
+ 		.ioprio			= 1,
+ 		.manual_alloc		= 1,
++		.fused_secondary	= 1,
++		.buf_dir		= READ,
+ #if defined(CONFIG_NET)
+ 		.prep			= io_send_zc_prep,
+ 		.issue			= io_send_zc,
+-- 
+2.39.2
 
-I think the only reason we use rcu lock is due to
-mem_cgroup_from_id(). Maybe we should add mem_cgroup_tryget_from_id().
-The other caller of mem_cgroup_from_id() in vmscan is already doing
-the same and could use mem_cgroup_tryget_from_id().
-
-Though this can be done separately to this series (if we decide to do
-it at all).
