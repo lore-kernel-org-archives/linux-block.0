@@ -2,178 +2,290 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF1EC77B61
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 11:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBF2C76196
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 13:02:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232548AbjC1L1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 07:27:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42514 "EHLO
+        id S229968AbjC1NCk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 09:02:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232700AbjC1L1a (ORCPT
+        with ESMTP id S230425AbjC1NCj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 07:27:30 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4ACAB
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 04:27:28 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230328112722euoutp02bcc171994103c23afa1731972d9d8e85~Qka8_Iyc33057130571euoutp02e
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 11:27:22 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230328112722euoutp02bcc171994103c23afa1731972d9d8e85~Qka8_Iyc33057130571euoutp02e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1680002842;
-        bh=Qd/EHq/hNi9U0eDQzSkYHva3vzVuhQ3/uVr2IhrtsQQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=drjE9jpUzOwvKJrVY1iPOEPDBI27vBqwRWG6il8vuZYyNEyvF6xBLiF4Bd4xSnZkc
-         khY2nUF+KDemqhNUQEnNdRD902LjMfSzeHSnDrTvdNr8Q8xVYscrY9hnWflP+iFEkz
-         Afy6ntAMmTCyit7LuLu7bVEafMfaYQvM4EaRrdX4=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20230328112721eucas1p29c3e5a9281c3f21042a2ffafdd0866eb~Qka7TOoBk2371323713eucas1p2a;
-        Tue, 28 Mar 2023 11:27:21 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 38.51.09503.81FC2246; Tue, 28
-        Mar 2023 12:27:20 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230328112720eucas1p2bbb42b49da00b4f2299049bf6bafce48~Qka65Z-hg0535105351eucas1p2X;
-        Tue, 28 Mar 2023 11:27:20 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230328112720eusmtrp2ce3dc34f33115a65d99589fcad9b4c0a~Qka63UKs50134701347eusmtrp2U;
-        Tue, 28 Mar 2023 11:27:20 +0000 (GMT)
-X-AuditID: cbfec7f2-e8fff7000000251f-80-6422cf18967a
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id A0.81.09583.81FC2246; Tue, 28
-        Mar 2023 12:27:20 +0100 (BST)
-Received: from localhost (unknown [106.210.248.108]) by eusmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230328112720eusmtip2188f4b42b34ffb070ff5ffc1e476b9e4~Qka6sYigr0132101321eusmtip28;
-        Tue, 28 Mar 2023 11:27:20 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     martin@omnibond.com, axboe@kernel.dk, minchan@kernel.org,
-        akpm@linux-foundation.org, hubcap@omnibond.com,
-        willy@infradead.org, viro@zeniv.linux.org.uk,
-        senozhatsky@chromium.org, brauner@kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        mcgrof@kernel.org, linux-block@vger.kernel.org,
-        gost.dev@samsung.com, linux-mm@kvack.org, devel@lists.orangefs.org,
-        Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH 5/5] filemap: remove page_endio()
-Date:   Tue, 28 Mar 2023 13:27:16 +0200
-Message-Id: <20230328112716.50120-6-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230328112716.50120-1-p.raghav@samsung.com>
+        Tue, 28 Mar 2023 09:02:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BBE2A5FE
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 06:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680008496;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QHrIT10U/HwbnbHfh15/xIUm76PzhuMWdcPTjn7QUWY=;
+        b=PQrAYtROE7BPEE7YlV8vAwUyBaAfYb1ycrPPkzqlIcCJsCS7WuZfA4F/gitjolRfveOz3q
+        bp8jP3w8qnm7xNUTNGH5ubcIlx1oS9DyuBtUpoKwGjPkbHmobkCWMRbgR20aiAAnc2Vuql
+        3Ls4h1Yzk0a/5E5DGp0AenTKm/wdjTU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-383-_lVvkgUCNxe2LerOMgA4dw-1; Tue, 28 Mar 2023 09:01:33 -0400
+X-MC-Unique: _lVvkgUCNxe2LerOMgA4dw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 76FBE884ECA;
+        Tue, 28 Mar 2023 13:01:32 +0000 (UTC)
+Received: from ovpn-8-20.pek2.redhat.com (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A81D1121330;
+        Tue, 28 Mar 2023 13:01:25 +0000 (UTC)
+Date:   Tue, 28 Mar 2023 21:01:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
+Message-ID: <ZCLlIAnBWOm59rIM@ovpn-8-20.pek2.redhat.com>
+References: <20230314125727.1731233-1-ming.lei@redhat.com>
+ <ZBQhSzIhvZL+83nM@ovpn-8-18.pek2.redhat.com>
+ <3971d43f-601f-635f-5a30-df7e647f6659@kernel.dk>
+ <ZBW+PCaeNmCR/k0M@ovpn-8-18.pek2.redhat.com>
+ <4f8161e7-5229-45c4-1bb2-b86d87e22a16@gmail.com>
+ <ZBZJXb6vQ7z4CYk/@ovpn-8-18.pek2.redhat.com>
+ <8b227cf3-6ad1-59ad-e13b-a46381958a4c@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLKsWRmVeSWpSXmKPExsWy7djPc7oS55VSDN5ftLaYs34Nm8Xqu/1s
-        Fq8Pf2K02L95CpPFzQM7mSza7/YxWey9pW2xZ+9JFovLu+awWdxb85/V4uT6/8wWNyY8ZbRY
-        9vU9u8XnpS3sFrs3LmKzOP/3OKvF7x9z2BwEPWY3XGTx2LxCy+Py2VKPTas62Tw2fZrE7nFi
-        xm8Wj4apt9g8ft2+w+rRt2UVo8fnTXIem568ZQrgjuKySUnNySxLLdK3S+DKeNs9i7VgHl/F
-        +vsfGBsYz3J3MXJySAiYSPzddpipi5GLQ0hgBaPEqZNXGUESQgJfGCUuX7CCSHxmlFi37gYj
-        TMeOt//ZIRLLGSVWt79hhHBeMkqsfTOPuYuRg4NNQEuisROsSETgDKPE4uWNbCAOs8B9Rolv
-        L88zgYwSFjCUWDH3CZjNIqAqsXzuOzYQm1fAUmLD9IssEOvkJfYfPAs2lFPASmLabyuIEkGJ
-        kzOfgJUwA5U0b53NDDJfQmA1p8S8C49ZIXpdJG5828AEYQtLvDq+hR3ClpH4v3M+VLxa4umN
-        31DNLYwS/TvXs4EskxCwlug7kwNiMgtoSqzfpQ9R7ijRd2MlI0QFn8SNt4IQJ/BJTNo2nRki
-        zCvR0SYEUa0ksfPnE6ilEhKXm+ZAPeUhcWz3JfYJjIqzkDwzC8kzsxD2LmBkXsUonlpanJue
-        WmyYl1quV5yYW1yal66XnJ+7iRGYAk//O/5pB+PcVx/1DjEycTAeYpTgYFYS4d3srZgixJuS
-        WFmVWpQfX1Sak1p8iFGag0VJnFfb9mSykEB6YklqdmpqQWoRTJaJg1OqgWnhq0ct997f5QqV
-        ebnEf/WulTx8M0NPeZvyVFit3O7yK/yj8Z8v01cHffgxg9Psn62CsmHS6z6t+mk6qecuaF+r
-        WxLlGjxpo7HWscVPw9M22CmcEr6VeLaDR/dr/Oaol+I9/+t+S/12XvB9Bn/nZpsvpjUFDRa8
-        p5afeL9raeVKnQVXl1X19jVdM7WsfHH1w4dfKYLNGvtv5jtXdyafjCrz/fbrJVfaD0XhD7d6
-        XsqJOP55tKLXOeWIQtWDJOXjVw0NnR3+9BzdXRx+2uvo08aYls0/hBv6tgb9MmvY9Wza2eAc
-        1VP22oYVB6f43m696b6hsf22g0ye63vfh8tlTSbd3FS4VOyKXi1z9MYjV3KUWIozEg21mIuK
-        EwHKEU1A8AMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrLIsWRmVeSWpSXmKPExsVy+t/xe7oS55VSDKY+VLSYs34Nm8Xqu/1s
-        Fq8Pf2K02L95CpPFzQM7mSza7/YxWey9pW2xZ+9JFovLu+awWdxb85/V4uT6/8wWNyY8ZbRY
-        9vU9u8XnpS3sFrs3LmKzOP/3OKvF7x9z2BwEPWY3XGTx2LxCy+Py2VKPTas62Tw2fZrE7nFi
-        xm8Wj4apt9g8ft2+w+rRt2UVo8fnTXIem568ZQrgjtKzKcovLUlVyMgvLrFVija0MNIztLTQ
-        MzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DLeNs9i7VgHl/F+vsfGBsYz3J3MXJySAiYSOx4
-        +5+9i5GLQ0hgKaPEsekrGSESEhK3FzZB2cISf651sUEUPWeUWDGvC6iDg4NNQEuisROsWUTg
-        BqPE2qe/WEEcZpCiu/tes4J0CwsYSqyY+4QJxGYRUJVYPvcdG4jNK2ApsWH6RRaIDfIS+w+e
-        ZQYZyilgJTHttxVIWAio5OqZ94wQ5YISJ2c+AStnBipv3jqbeQKjwCwkqVlIUgsYmVYxiqSW
-        Fuem5xYb6RUn5haX5qXrJefnbmIExuu2Yz+37GBc+eqj3iFGJg7GQ4wSHMxKIrybvRVThHhT
-        EiurUovy44tKc1KLDzGaAp09kVlKNDkfmDDySuINzQxMDU3MLA1MLc2MlcR5PQs6EoUE0hNL
-        UrNTUwtSi2D6mDg4pRqYNJN2fz/6QVTltN8ZF97WlRk3LhiW3Gc8ad27onHbTaaClaem7VN7
-        7lAqpSIsl116c96/MOvOhUt3ph+ds/2soKH+l3uvF9q9YpXl5FVp0lv5+zsPy6cX+ctZ7ghn
-        PDLSjRL3Mpzx+F/biQX9fZb1fJOWicQKnVx2Zp7StQBd3Rm+Rco73+mGHr7OL2Mr87HVXNym
-        8saWVzU/Hk18ULqxwEm2SZ1nelPnFP2V/fynJmsYnefq/Zox61Ak85/w9MVuh0IL9/xKE534
-        5cDE8vAnqo+XBObzHa0+/fCj1INph7ZkXOlVZA5+Gn9ONL51BssFI/0Gsdvn4yXm2Ga0MQvP
-        2xTsycD/VbS//bH6rMJ0JZbijERDLeai4kQAvVarymADAAA=
-X-CMS-MailID: 20230328112720eucas1p2bbb42b49da00b4f2299049bf6bafce48
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20230328112720eucas1p2bbb42b49da00b4f2299049bf6bafce48
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230328112720eucas1p2bbb42b49da00b4f2299049bf6bafce48
-References: <20230328112716.50120-1-p.raghav@samsung.com>
-        <CGME20230328112720eucas1p2bbb42b49da00b4f2299049bf6bafce48@eucas1p2.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b227cf3-6ad1-59ad-e13b-a46381958a4c@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-page_endio() is not used anymore. Remove it.
+On Tue, Mar 28, 2023 at 11:55:38AM +0100, Pavel Begunkov wrote:
+> On 3/18/23 23:42, Ming Lei wrote:
+> > On Sat, Mar 18, 2023 at 04:51:14PM +0000, Pavel Begunkov wrote:
+> > > On 3/18/23 13:35, Ming Lei wrote:
+> > > > On Sat, Mar 18, 2023 at 06:59:41AM -0600, Jens Axboe wrote:
+> > > > > On 3/17/23 2:14?AM, Ming Lei wrote:
+> > > > > > On Tue, Mar 14, 2023 at 08:57:11PM +0800, Ming Lei wrote:
+> [...]
+> > > > IMO, splice(->splice_read()) can help much less in this use case, and
+> > > > I can't see improvement David Howells has done in this area:
+> > > 
+> > > Let me correct a misunderstanding I've seen a couple of times
+> > > from people. Apart from the general idea of providing buffers, it's
+> > > not that bound to splice. Yes, I reused splicing guts for that
+> > > half-made POC, but we can add a new callback that would do it a
+> > > bit nicer, i.e. better consolidating returned buffers. Would
+> > 
+> > ->release() is for releasing pipe-buffer(page), instead of the whole buffer(reference).
+> > > probably be even better to have both of them falling back to
+> > > splice so it can cover more cases. The core of it is mediating
+> > > buffers through io_uring's registered buffer table, which
+> > > decouples all the components from each other.
+> > 
+> > For using pipe buffer's ->release() to release the whole buffer's
+> > reference, you have to allocate one pipe for each fixed buffer, and add
+> > pipe buffer to it, and keep each pipe buffer into the pipe
+> > until it is consumed, since ->release() needs to be called when
+> > unregistering buffer(all IOs are completed)
+> 
+> What I'm saying is that I'm more concerned about the uapi,
+> whether internally it's ->splice_read(). I think ->splice_read()
+> has its merit in a hybrid approach, but simplicity let's say for
+> we don't use it and there is a new f_op callback or it's
+> it's returned with by cmd requests.
 
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- include/linux/pagemap.h |  2 --
- mm/filemap.c            | 30 ------------------------------
- 2 files changed, 32 deletions(-)
+OK, then forget splice if you add new callback, isn't that what this
+patchset(just reuse ->uring_cmd()) is doing? 
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index fdcd595d2294..73ee6ead90dd 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -1076,8 +1076,6 @@ int filemap_migrate_folio(struct address_space *mapping, struct folio *dst,
- #else
- #define filemap_migrate_folio NULL
- #endif
--void page_endio(struct page *page, bool is_write, int err);
--
- void folio_end_private_2(struct folio *folio);
- void folio_wait_private_2(struct folio *folio);
- int folio_wait_private_2_killable(struct folio *folio);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 6f3a7e53fccf..a770a207825d 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1625,36 +1625,6 @@ void folio_end_writeback(struct folio *folio)
- }
- EXPORT_SYMBOL(folio_end_writeback);
- 
--/*
-- * After completing I/O on a page, call this routine to update the page
-- * flags appropriately
-- */
--void page_endio(struct page *page, bool is_write, int err)
--{
--	struct folio *folio = page_folio(page);
--
--	if (!is_write) {
--		if (!err) {
--			folio_mark_uptodate(folio);
--		} else {
--			folio_clear_uptodate(folio);
--			folio_set_error(folio);
--		}
--		folio_unlock(folio);
--	} else {
--		if (err) {
--			struct address_space *mapping;
--
--			folio_set_error(folio);
--			mapping = folio_mapping(folio);
--			if (mapping)
--				mapping_set_error(mapping, err);
--		}
--		folio_end_writeback(folio);
--	}
--}
--EXPORT_SYMBOL_GPL(page_endio);
--
- /**
-  * __folio_lock - Get a lock on the folio, assuming we need to sleep to get it.
-  * @folio: The folio to lock
--- 
-2.34.1
+> 
+> > It(allocating/free pipe node, and populating it with each page) is
+> > really inefficient for handling one single IO.
+> 
+> It doesn't need pipe node allocation. We'd need to allocate
+> space for pages, but again, there is a good io_uring infra
+> for it without any single additional lock taken in most cases.
+
+Then it is same with this patchset.
+
+> 
+> 
+> > So re-using splice for this purpose is still bad not mention splice
+> > can't support writeable spliced page.
+> > 
+> > Wiring device io buffer with context registered buffer table looks like
+> > another approach, however:
+> > 
+> > 1) two uring command OPs for registering/unregistering this buffer in io fast
+> > path has to be added since only userspace can know when buffer(reference)
+> > isn't needed
+> 
+> Yes, that's a good point. Registration replaces fuse master cmd, so it's
+> one extra request for unregister, which might be fine.
+
+Unfortunately I don't think this way is good, the problem is that buffer
+only has physical pages, and doesn't have userspace mapping, so why bother
+to export it to userspace?
+
+As I replied to Ziyang, the current fused command can be extended to
+this way easily, but I don't know why we need to use the buffer registration,
+given userspace can't read/write the buffer, and fused command can cover
+it just fine.
+
+> 
+> > 2) userspace becomes more complicated, 3+ OPs are required for handling one
+> > single device IO
+> > 
+> > 3) buffer reference crosses multiple OPs, for cleanup the registered buffer,
+> > we have to store the device file & "buffer key" in each buffer(such as io_uring_bvec_buf)
+> > for unregistering buffer
+> 
+> It should not necessarily be a file.
+
+At least in ublk's case, from io_uring viewpoint, the buffer is owned by
+ublk device, so we need the device node or file for releasing the
+buffer.
+
+> 
+> > 4) here the case is totally different with io_mapped_ubuf which isn't
+> > related to any specific file, and just belong to io_uring context; however,
+> > the device io buffer belongs to device(file) actually, so in theory it is wrong
+> > to put it into context's registered buffer table, and supposed to put into
+> 
+> Not at all, it doesn't belong to io_uring but rather to the user space,
+> without a file, right, but io_uring still only borrowing it.
+
+How can one such buffer be owned by userspace? What if the userspace is
+killed? If you think userspace can grab the buffer reference, that still
+needs userspace to release the buffer, but that is unreliable, and
+io_uring has to cover the buffer cleanup in case of userspace exit abnormally.
+
+Because buffer lifetime is crossing multiple OPs if you implement buffer
+register/unregister OPs. And there isn't such issue for fused command
+which has same lifetime with the buffer.
+
+> 
+> As for keeping files, I predict that it'll be there anyway in some time,
+> some p2pdma experiments, dma preregistration, all required having a file
+> attached to the buffer.
+> 
+> > per-file buffer table which isn't supported by io_uring, or it becomes hard to
+> > implement multiple-device io buffer in single context since 'file + buffer key'
+> > has to be used to retrieve this buffer, probably xarray has to be
+> > relied, but
+> 
+> I was proposing to give slot selection to the userspace, perhaps with
+> optional auto index allocation as it's done with registered files.
+
+As I mentioned above, it doesn't make sense to export buffer to
+userspace which can't touch any data of the buffer at all.
+
+> 
+> > 	- here the index is (file, buffer key) if the table is per-context, current
+> > 	xarray only supports index with type of 'unsigned long', so looks not doable
+> > 	- or per-file xarray has to be used, then the implementation becomes more complicated
+> > 	- write to xarray has to be done two times in fast io path, so another factor which
+> > 	hurts performance.
+> > 
+> > > 
+> > > > 1) we need to pass reference of the whole buffer from driver to io_uring,
+> > > > which is missed in splice, which just deals with page reference; for
+> > > > passing whole buffer reference, we have to apply per buffer pipe to
+> > > > solve the problem, and this way is expensive since the pipe can't
+> > > > be freed until all buffers are consumed.
+> > > > 
+> > > > 2) reference can't outlive the whole buffer, and splice still misses
+> > > > mechanism to provide such guarantee; splice can just make sure that
+> > > > page won't be gone if page reference is grabbed, but here we care
+> > > > more the whole buffer & its (shared)references lifetime
+> > > > 
+> > > > 3) current ->splice_read() misses capability to provide writeable
+> > > > reference to spliced page[2]; either we have to pass new flags
+> > > > to ->splice_read() or passing back new pipe buf flags, unfortunately
+> > > > Linus thought it isn't good to extend pipe/splice for such purpose,
+> > > > and now I agree with Linus now.
+> > > 
+> > > It might be a non-workable option if we're thinking about splice(2)
+> > > and pipes, but pipes and ->splice_read() are just internal details,
+> > > an execution mechanism, and it's hidden from the userspace.
+> > 
+> > both pipe and ->splice_read() are really exposed to userspace, and are
+> > used in other non-io_uring situations, so any change can not break
+> > existed splice/pipe usage, maybe I misunderstand your point?
+> 
+> Oh, I meant reusing some of splice bits but not changing splice(2).
+> E.g. a kernel internal flag which is not allowed to be passed into
+> splice(2).
+> 
+> 
+> > > I guess someone might make a point that we don't want any changes
+> > > to the splice code even if it doesn't affect splice(2) userspace
+> > > users, but that's rather a part of development process.
+> > > > I believe that Pavel has realized this point[3] too, and here the only
+> > > > of value of using pipe is to reuse ->splice_read(), however, the above
+> > > > points show that ->splice_read() isn't good at this purpose.
+> > > 
+> > > But agree that, ->splice_read() doesn't support the revers
+> > > direction, i.e. a file (e.g. ublk) provides buffers for
+> > > someone to write into it, that would need to be extended
+> > > in some way.
+> > 
+> > Linus has objected[1] explicitly to extend it in this way:
+> > 
+> > 	There's no point trying to deal with "if unexpectedly doing crazy
+> > 	things". If a sink writes the data, the sinkm is so unbelievably buggy
+> > 	that it's not even funny.
+> 
+> As far as I can see, Linus doesn't like there that the semantics
+> is not clear. "sink writes data" and writing to pages provided
+> by ->splice_read() don't sound right indeed.
+> 
+> I might be wrong but it appears that the semantics was ublk
+> lending an "empty" buffer to another file, which will fill it
+> in and return back the data by calling some sort of ->release
+> callback, then ublk consumes the data.
+
+Yes, that is exactly what fused command is doing.
+
+> 
+> 
+> > [1] https://lore.kernel.org/linux-block/CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com/
+> > 
+> > That is also the reason why fuse can only support write zero copy via splice
+> > for 10+ years.
+> > 
+> > > 
+> > > > [1] https://lore.kernel.org/linux-block/ZAk5%2FHfwc+NBwlbI@ovpn-8-17.pek2.redhat.com/
+> > > 
+> > > Oops, missed this one
+> > > 
+> > > > [2] https://lore.kernel.org/linux-block/CAJfpeguQ3xn2-6svkkVXJ88tiVfcDd-eKi1evzzfvu305fMoyw@mail.gmail.com/
+> > > 
+> > > Miklos said that it's better to signal the owner of buffer about
+> > > completion, IIUC the way I was proposing, i.e. calling ->release
+> > > when io_uring removes the buffer and all io_uring requests using
+> > > it complete, should do exactly that.
+> > 
+> > ->release() just for acking the page consumption, what the ublk needs is
+> > to drop the whole buffer(represented by bvec) reference when the buffer isn't
+> > used by normal OPs, actually similar with fuse's case, because buffer
+> > reference can't outlive the buffer itself(repesented by bvec).
+> > 
+> > Yeah, probably releasing whole buffer reference can be done by ->release() in
+> > very complicated way, but the whole pipe & pipe buffer has to be kept in
+> > the whole IO lifetime for calling each pipe buffer's ->release(), so you have to
+> > allocate one pipe when registering this buffer, and release it when un-registering
+> > it. Much less efficient.
+> 
+> As per noted above, We don't necessarily have to stick with splice_read()
+> and pipe callbacks.
+
+As I mentioned, it is basically what fused command is doing.
+
+
+Thanks,
+Ming
 
