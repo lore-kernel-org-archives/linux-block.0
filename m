@@ -2,120 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8AAC761AF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 13:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66393C6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 14:15:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233127AbjC1Nm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 09:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
+        id S233060AbjC1OPk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 10:15:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232484AbjC1Nmt (ORCPT
+        with ESMTP id S233108AbjC1OP3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 09:42:49 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1119778;
-        Tue, 28 Mar 2023 06:42:39 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id d10so7205741pgt.12;
-        Tue, 28 Mar 2023 06:42:39 -0700 (PDT)
+        Tue, 28 Mar 2023 10:15:29 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A238CA06
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:15:26 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id b8-20020aa78708000000b005eaa50faa35so6035032pfo.20
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:15:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680010959;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zhuOF8Ho5g7rK8i7Gjjphp+Xz2ush8RYPAJ3+nO8+hU=;
-        b=ohv1R6BsJ0apfHnfIaYD0x+ssyU4aWoNEXnATWn2rcvn29C/EsJGK7p6IDnuM9fJMo
-         UOtC34kKxAZjwY84umK4/vicnSdHCBd6qgMiRWHpE7h/hgRFM82W+dJglled/echbUQ1
-         E1K0v84j+vnl7V5Zy5Fn5uaLHHhFKkCsjRx3vtPfrC9FHjGApF/xGMzc2CigYWS919Dr
-         jaxtUJy1iRunvTtsHeYhd3a8LnyWhjQV0DNnURVouXTAG0jex6sTV43umwktvLXRVyIb
-         j7iKNpcsPY13un2CQi4of8BswcmImAdR6XvOD/CnYM47BUz/tzStpE44TF+MzCXZn3gG
-         iB+w==
+        d=google.com; s=20210112; t=1680012925;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qjzC1AXnpW8l0xPrPEZPgxXh3c0otg2X0grqn38oTAU=;
+        b=Z21Fhu3pxXs+t1qejKjoB06mqPadXXUaJj6uhGgpRk+3gLqlDes+wtSSSWE2knRI8/
+         qiF1U6JTQdX1HxRtou/7QeC7ME871T4I2lhXvmsiB9LqWDQkJ4A+0KJwwrxD+tJ4Zz1U
+         eS8+YEXBsJWpRHPbqfmOGMvVMX3kHO1M02ByL8p7FWqBJtGrwNge2GxAveCUIe2ZNQ6v
+         dvl7/FGZwG59zro3vm/oD7ttk1pXq3InfcSBeQsKHb9wmWZOyOVM20v0sF2M0rosq1uZ
+         BvtS7Z8Fw8zE99KoUjs5+fCH5VuwRsaKfmGjaYi/I6cgKnvsxM9ic7CzcXo5qhkkLbxE
+         V9bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680010959;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zhuOF8Ho5g7rK8i7Gjjphp+Xz2ush8RYPAJ3+nO8+hU=;
-        b=28KtK3M+11nHcfYTmCM8YCs3Wpw9m0puVpAIXttkbwzYBq6HPOfxC59viamiE6Yvlv
-         BPn8cjPSGsqxcyiSA8OfrvEfZfgUitsrtR7meyVkiNQR+1xSs/bVp8yTpKB62nBIrt/+
-         ONumljC+ZrQekRguepbUsf6LkpFLzL/NC11xTQvVOOm8bUEDq1poJrSd98Z95VQJi3zS
-         Dwj+qJCmfDUOqN2joGqWkdzI7Pnxyj7eO13QT39xOzlKiNYP8o9Xk6k81/YS3Q0mOhjL
-         cyuTNBD/KoKuH+Ef4bqTIHWXJcLV7suA6kdu1jHy6N8a452AFkio11j3Lf8Ch07Dcz8z
-         eVOw==
-X-Gm-Message-State: AAQBX9del6dtMsjzJc6qTP+ZqBXYuO+1JtCMe4umlGBKghEVyWd5Jx49
-        DJJ1chOmd5j8MrnHPkkz3JO+r0Cobnc+8mAyPuqC766n
-X-Google-Smtp-Source: AKy350bVKJbK4HdlOq50XmTjRNX5ftQ2y602rndF1NQGJZJwBaI0ysvg4ceiDozOC6jOtPOZm9kKgj2yO8M4S5/4mqU=
-X-Received: by 2002:a63:ef0c:0:b0:50f:aafa:6bc9 with SMTP id
- u12-20020a63ef0c000000b0050faafa6bc9mr4067379pgh.6.1680010958857; Tue, 28 Mar
- 2023 06:42:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
-In-Reply-To: <20230327174402.1655365-1-kent.overstreet@linux.dev>
-From:   Phillip Lougher <phillip.lougher@gmail.com>
-Date:   Tue, 28 Mar 2023 14:42:28 +0100
-Message-ID: <CAB3woddAP_6uOUJ4Yjj_PATme-CQao3p2JErBBtjtpzYxQejng@mail.gmail.com>
-Subject: Re: [PATCH 0/2] bio iter improvements
-To:     Kent Overstreet <kent.overstreet@linux.dev>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        willy@infradead.org, axboe@kernel.dk,
-        Phillip Lougher <phillip@squashfs.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        d=1e100.net; s=20210112; t=1680012925;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qjzC1AXnpW8l0xPrPEZPgxXh3c0otg2X0grqn38oTAU=;
+        b=go5rz5UxGlPPiNDDGZbJafnCh15Xxrnu+YjKjFhr0R6h+uS51LFPA/kvqD9M9iJ3ZY
+         dQtP2PG4V7ub+LCdZbK0lwe3Yuhf2Ca2R8JYgm5aFgTdXMA3vHMDrPZBoxp8nzpcJPsH
+         mcLOSgRI41ZvcVl2fpkFexudU6TEm1G5zVgxzL+o74n9r7Xv5Ezx9wWArkT8ulsdL59X
+         Yo4BaTodVeaWSvXPoHQhPHfgvWPiGyQllfPmz9HVZL/2A2+BcuKofpjWbr1Ro2CumSNx
+         6F4iSL+W7O505ULssaiQXBYzDS9lBmOLb70xdwkvHnyixVWWjkOZpJVX4HSl94Qrj68Z
+         q7DA==
+X-Gm-Message-State: AAQBX9cPcUFkNcZFusOmTuS6nMYk3vkT6b+tv6hFMXdBZ3L5ICCDA+e/
+        wwcfjiQqD88X6aIPVAjw5wT4N1mVasM8Kg==
+X-Google-Smtp-Source: AKy350YS7K4/XlK9G5uXTQxuk1NaV9HRM+JxBayP8kn09bcoJ8C7tEj08nHpJbsB9L4uvhkNT4kYeDqSgTfetg==
+X-Received: from shakeelb.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:262e])
+ (user=shakeelb job=sendgmr) by 2002:a63:5a43:0:b0:50a:c176:385b with SMTP id
+ k3-20020a635a43000000b0050ac176385bmr4084662pgm.0.1680012925672; Tue, 28 Mar
+ 2023 07:15:25 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 14:15:23 +0000
+In-Reply-To: <20230328061638.203420-6-yosryahmed@google.com>
+Mime-Version: 1.0
+References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-6-yosryahmed@google.com>
+Message-ID: <20230328141523.txyhl7wt7wtvssea@google.com>
+Subject: Re: [PATCH v1 5/9] memcg: replace stats_flush_lock with an atomic
+From:   Shakeel Butt <shakeelb@google.com>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Michal =?utf-8?Q?Koutn=C3=BD?=" <mkoutny@suse.com>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 27, 2023 at 7:02=E2=80=AFPM Kent Overstreet
-<kent.overstreet@linux.dev> wrote:
->
-> Small patch series cleaning up/standardizing bio_for_each_segment_all(),
-> which means we can use the same guts for bio_for_each_folio_all(),
-> considerably simplifying that code.
->
-> The squashfs maintainer will want to look at and test those changes,
-> that code was doing some slightly tricky things. The rest was a pretty
-> mechanical conversion.
+On Tue, Mar 28, 2023 at 06:16:34AM +0000, Yosry Ahmed wrote:
+[...]
+> @@ -585,8 +585,8 @@ mem_cgroup_largest_soft_limit_node(struct mem_cgroup_tree_per_node *mctz)
+>   */
+>  static void flush_memcg_stats_dwork(struct work_struct *w);
+>  static DECLARE_DEFERRABLE_WORK(stats_flush_dwork, flush_memcg_stats_dwork);
+> -static DEFINE_SPINLOCK(stats_flush_lock);
+>  static DEFINE_PER_CPU(unsigned int, stats_updates);
+> +static atomic_t stats_flush_ongoing = ATOMIC_INIT(0);
+>  static atomic_t stats_flush_threshold = ATOMIC_INIT(0);
+>  static u64 flush_next_time;
+>  
+> @@ -636,15 +636,18 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
+>  
+>  static void __mem_cgroup_flush_stats(void)
+>  {
+> -	unsigned long flag;
+> -
+> -	if (!spin_trylock_irqsave(&stats_flush_lock, flag))
+> +	/*
+> +	 * We always flush the entire tree, so concurrent flushers can just
+> +	 * skip. This avoids a thundering herd problem on the rstat global lock
+> +	 * from memcg flushers (e.g. reclaim, refault, etc).
+> +	 */
+> +	if (atomic_xchg(&stats_flush_ongoing, 1))
 
-An eyeball of the changes doesn't bring up anything obviously wrong.
+Have you profiled this? I wonder if we should replace the above with
+	
+	if (atomic_read(&stats_flush_ongoing) || atomic_xchg(&stats_flush_ongoing, 1))
 
-I'll apply and do some tests.
+to not always dirty the cacheline. This would not be an issue if there
+is no cacheline sharing but I suspect percpu stats_updates is sharing
+the cacheline with it and may cause false sharing with the parallel stat
+updaters (updaters only need to read the base percpu pointer).
 
-Phillip
-
-BTW please CC me on the cover letter as well as patch [1/2].
-
-
->
-> Kent Overstreet (2):
->   block: Rework bio_for_each_segment_all()
->   block: Rework bio_for_each_folio_all()
->
->  block/bio.c               |  38 ++++++------
->  block/blk-map.c           |  38 ++++++------
->  block/bounce.c            |  12 ++--
->  drivers/md/bcache/btree.c |   8 +--
->  drivers/md/dm-crypt.c     |  10 ++--
->  drivers/md/raid1.c        |   4 +-
->  fs/btrfs/disk-io.c        |  10 ++--
->  fs/btrfs/extent_io.c      |  52 ++++++++--------
->  fs/btrfs/inode.c          |   8 +--
->  fs/btrfs/raid56.c         |  18 +++---
->  fs/crypto/bio.c           |   8 +--
->  fs/erofs/zdata.c          |   4 +-
->  fs/ext4/page-io.c         |   8 +--
->  fs/ext4/readpage.c        |   4 +-
->  fs/f2fs/data.c            |  20 +++----
->  fs/gfs2/lops.c            |  10 ++--
->  fs/gfs2/meta_io.c         |   8 +--
->  fs/iomap/buffered-io.c    |  14 +++--
->  fs/mpage.c                |   4 +-
->  fs/squashfs/block.c       |  48 ++++++++-------
->  fs/squashfs/lz4_wrapper.c |  17 +++---
->  fs/squashfs/lzo_wrapper.c |  17 +++---
->  fs/verity/verify.c        |   4 +-
->  include/linux/bio.h       | 123 +++++++++++++++++++++-----------------
->  include/linux/bvec.h      |  70 ++++++++++++++--------
->  25 files changed, 302 insertions(+), 255 deletions(-)
->
-> --
-> 2.39.2
->
+Other than that the patch looks good.
