@@ -2,94 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B88DC76196
-	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 14:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B21CC77B61
+	for <linux-block@archiver.kernel.org>; Tue, 28 Mar 2023 14:59:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233650AbjC1O6l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 10:58:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34524 "EHLO
+        id S233767AbjC1O7l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Mar 2023 10:59:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233663AbjC1O6a (ORCPT
+        with ESMTP id S233743AbjC1O7d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 10:58:30 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F601E1A1
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:58:06 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id kq3so11893928plb.13
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:58:06 -0700 (PDT)
+        Tue, 28 Mar 2023 10:59:33 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09A8E397
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:59:19 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id p15so15394658ybl.9
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 07:59:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1680015486;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20210112; t=1680015555;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bq/FNHJyM6VL3GySeYH7whuNpSDOXfegBXORfrv0Wd0=;
-        b=gjeUX9N/SZSVreSCgBBOw1Qw3SvaO9BulRKZFa9FyzIBnTyw04c02sekVQEgIM9rIX
-         GBYeifm4ppvE4m2nrikaPAj3YSUKwne5xcZwXa1x08/SUo8pKH0jL/9uaE0YzjjJKWH5
-         +IQ6UpCaQ0skcosDMsJ6DB9E/8AOPxqejhYko3LGCE/xwRl9jjGZFBWSzf7CHMnJW7Sn
-         5ZvdrLMWzlSBrb1U6z1yXAtrL6G20+j5YfRsafiry3WpHRYLRKQnP/LZ1oBdlo9O0Xhm
-         +eJLgX+JpPVZA045FloYbVpJecxawrYj1IP83C+8SMNjRfLs8X67VdNeK+gbWJkd6eu3
-         qngQ==
+        bh=n/Tr76xWiRdPhCzh2iAIz1ngMVJemqmUsrV57MPqNeE=;
+        b=Tt1MpwBCckGfBRJPyJn7mnYIufUfVxu0osm9Xuq8gDBzp9Zl5SijHD6x4KQjbrMWEh
+         cR4itExVYXUY8HTQuYCWuV5Rg6H125SdaHSCPAvUlKamplxStCH4rjE2/WcnHTjKhjrt
+         038rfwwfndQ2ou7fJtK3qBflN/A1iDRlkq81JX+Z7insN5nb1uTL0Uo01n0XraIao7M2
+         Fdp9ucU3Ljn6qpuDyKhjPEtSctWImYf+1VP6nPOE2U4SSXgKWYIn4QDlVxtNK1zY5mgr
+         bLTFWCgmCGlE6IuJslMe1IS18hr0AuFjkuVwxblk3dP0+AkaQl8W95dVHmZXdHKaN7fx
+         PZeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680015486;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680015555;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Bq/FNHJyM6VL3GySeYH7whuNpSDOXfegBXORfrv0Wd0=;
-        b=E3Gn/wXdTGoHjX+Zhs6JwGZ0rwsEi8mXaOZHWTafkEBNxw5D2j20m76EN5mWBiXyOD
-         rFzlrHcV4MAr765aU+TqoKyls2wiMC3GR9elfE/BQwLI63EEK88xWS6mWW2RFT6xZWdH
-         N48b6KrUb3OKir9Y3u2scD4HmASq36isghYBK6tgna+E2HYhmB2slgQcknEOp0FDb05y
-         ZXTWK131SVs7UVhOucUwZdHeJaTWpeMVJXntBvbvMVA4Ed3HjfunNnnwQbz1dSbK6Qeb
-         ceERoO26vAi1B4a4QF/74EfVLhfE/YGjkAh6kJP9g952pGGOPbU40ckD1IxyjhYrcJNW
-         BlEQ==
-X-Gm-Message-State: AAQBX9eOVtuW1e3/0Tn+Rrjua5due8AoeylmXiydiuywGQRMu0nQc1s3
-        I5i3948fmqcdiDBPMPi4eP7ovA==
-X-Google-Smtp-Source: AKy350bsOMKykidZMTfGdRua7QdjJGu0JUcqyIYnK51VJ3/7o6PSqWLvzcEq7eErON9tTEHI22gg3Q==
-X-Received: by 2002:a17:90a:10d7:b0:234:f77:d6d2 with SMTP id b23-20020a17090a10d700b002340f77d6d2mr17046206pje.45.1680015485946;
-        Tue, 28 Mar 2023 07:58:05 -0700 (PDT)
-Received: from localhost.localdomain ([2409:8a28:e6d:5da0:f469:aa9c:494f:b32f])
-        by smtp.gmail.com with ESMTPSA id nk13-20020a17090b194d00b0023b3179f0fcsm6382250pjb.6.2023.03.28.07.58.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 07:58:05 -0700 (PDT)
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org,
-        josef@toxicpanda.com
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH 4/4] blk-cgroup: change BLKCG_MAX_POLS back to 5
-Date:   Tue, 28 Mar 2023 22:57:01 +0800
-Message-Id: <20230328145701.33699-4-zhouchengming@bytedance.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20230328145701.33699-1-zhouchengming@bytedance.com>
-References: <20230328145701.33699-1-zhouchengming@bytedance.com>
+        bh=n/Tr76xWiRdPhCzh2iAIz1ngMVJemqmUsrV57MPqNeE=;
+        b=TZ/Q4zu+MlL7owQE39BkaO9xU2fhV8XzrGQFILi6sTl0pl27xfOgNHa23/T979+olB
+         nuc9D3tGXrUUtiRBX9MrTChvvnLdwKRqhTtbKEmJ8lAHwL/Hhnrpe0PR6ubVDvjoGY82
+         3n37337YaEIPMvdKi/m3egF6UAy52O97AAQ4dN+eCNNwsmoazz4Jt+K3q3SaGKBRxP70
+         IjONKVtoAVjYXkzX7tvl+IEe0djWUoZ6WXK0QAQT2zIZmbeo4HfDwvIPEd6QoWQuDhAf
+         aaTLDlojNOdNh9PWYYEpm6fFIlo38PuqLQGl0NysVy9rENnWJjNDRWZ8goh/SR8Qzv+L
+         xg9Q==
+X-Gm-Message-State: AAQBX9eF3IfT+Udrh8zhYrl2uXcyFw2QB/gHbEEPIz7RLVxtBoe1x9fl
+        eUVgikjblatOj0QJhy/T6eUaTKTOCzDeDfVD+ScvcA==
+X-Google-Smtp-Source: AKy350aNQtresOYs68OKsUS0vcF2N6XmOyJ60HmYb6YXhXcoQU+dKlCLTm68Gcz+3vaqlOs4fNhYSgxXyk+d8mzAE3I=
+X-Received: by 2002:a05:6902:1108:b0:b6d:fc53:c5c0 with SMTP id
+ o8-20020a056902110800b00b6dfc53c5c0mr13259448ybu.1.1680015555044; Tue, 28 Mar
+ 2023 07:59:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230328061638.203420-1-yosryahmed@google.com> <20230328061638.203420-5-yosryahmed@google.com>
+In-Reply-To: <20230328061638.203420-5-yosryahmed@google.com>
+From:   Shakeel Butt <shakeelb@google.com>
+Date:   Tue, 28 Mar 2023 07:59:04 -0700
+Message-ID: <CALvZod4zLhgjd3Tr5Qauz+OwF7Gj-NwDZPMpYAsxaMSUvu3F4g@mail.gmail.com>
+Subject: Re: [PATCH v1 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
+ outside task context
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BLKCG_MAX_POLS is changed from 5 to 6 when mq-deadline-cgroup introduced,
-then commit 0f7839955114 ("Revert "block/mq-deadline: Add cgroup support"")
-reverted it. So change BLKCG_MAX_POLS back to 5.
+On Mon, Mar 27, 2023 at 11:16=E2=80=AFPM Yosry Ahmed <yosryahmed@google.com=
+> wrote:
+>
+> rstat flushing is too expensive to perform in irq context.
+> The previous patch removed the only context that may invoke an rstat
+> flush from irq context, add a WARN_ON_ONCE() to detect future
+> violations, or those that we are not aware of.
+>
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- include/linux/blkdev.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 941304f17492..398f288bcf30 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -54,7 +54,7 @@ extern struct class block_class;
-  * Maximum number of blkcg policies allowed to be registered concurrently.
-  * Defined here to simplify include dependency.
-  */
--#define BLKCG_MAX_POLS		6
-+#define BLKCG_MAX_POLS		5
- 
- #define DISK_MAX_PARTS			256
- #define DISK_NAME_LEN			32
--- 
-2.39.2
-
+Reviewed-by: Shakeel Butt <shakeelb@google.com>
