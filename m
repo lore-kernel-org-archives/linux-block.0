@@ -2,86 +2,50 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B40CC77B60
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 12:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C95C761A6
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 13:58:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbjC2MY0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 08:24:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
+        id S230362AbjC2N6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 09:58:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230046AbjC2MYV (ORCPT
+        with ESMTP id S230360AbjC2N6S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 08:24:21 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F150C3C29
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 05:24:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1680092660; x=1711628660;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2dcvqV87tiaXbc2Uo11d6o/I39/nMjI+zlAAi+6Vbgk=;
-  b=cTX0GS2IKZnCMfsKm8zQNlEEbV9p/LdDu3BpumtG/rnrgh6Ne7jUTXuE
-   VH1oNuMboBV97WVy9+qORKJw4m+KEhJUsblv035y/+VNJm7BbUHKsVEF6
-   kZ0EQMJ/ljwlnn8HzgZgNjK64saSGC4u6fPSOV79R1YkKUJehEa/61gr5
-   eQAGti/+oWsReJeUMksj7I7g22XCVKwqQ9wZDQYYlz1SjzmRKhzDX20Tr
-   JbSniU+9YwcHKLgh6GJJtKIbwuNzvUxkZl1K8rYrewY5VILxNpwr6yXvF
-   i1Tkem7eS/U9HqkxMs4SPgJ37DnvqcWFJNUYaN7FriYywDMO+c5iRa5F/
+        Wed, 29 Mar 2023 09:58:18 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 548B84697;
+        Wed, 29 Mar 2023 06:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680098297; x=1711634297;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ck3URVmLgHrVhcVJ5gg7rR62G4o0wwV83BuwrsZ3cYk=;
+  b=lWDRmXA3XdUj9Q5/tN1xDVTjIXA6UfL1R/apwlZIg4V6cZeicPZANeII
+   KkWp2Q1Cin8PXYTnRxfKjENdMGiMjgWkMw0sYFbf4neUTS/nkerNGHTqc
+   +YpdYytIcNBywX1tDyXBxZ7nmDovNQYiZDaNpr1pdhgd/BWcsjQKAR7/B
+   yHbfuxEby32cOtElwlFJrYPtLuXtmOvLFqUFZbi6FEaoptL5hTNDd9UQh
+   B2rEet2b2vtMiJFkVUwLYx+jjloumydvlOBz3UIJqvGsvQVGsdmreT6Wv
+   5uyilJS7NiOL10TnJ1rhCFfNHH0HeePPwHXgHpGvk39xvgzxlhmWl+xnW
    w==;
-X-IronPort-AV: E=Sophos;i="5.98,300,1673884800"; 
-   d="scan'208";a="231763319"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Mar 2023 20:24:19 +0800
-IronPort-SDR: hZczaHf9SxYxSfTaoHTy/+qVxy9Kw2lYrCrQP9Y3C/ctavbg1HEuVLpfUBLU6rgK+OKTd0TMdm
- +rzMw4xc0ZCFNH2dqTg1Gm7zwlSLQbHmM9xa/81RPwfr1fG7lC/pjAx0Pbexjiu5oY1W1mni4Z
- US60ngH32mILDY9fm98m8UOOGkYAw6lHoiAZAWlnEWlSaluXSI9iqEZeN/ob6JihjdwLtQgU++
- cB0VQdwSIE6Ra4w2QJ73j56ooTK8AdbTeM+Xxb+CuXpJB+b3hufoE7Iu6ai8K+WlGzbf1QbOM/
- K20=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 04:40:28 -0700
-IronPort-SDR: /X+spp0hbG6/P1QriZOOey6SZ1gLyxI7l8sdWWPbhS1VY0lnh46Z0botx1TPWSbIGxKeobCXI0
- PuLG2VDGqJr9c7Ya+u28HT0jCM3D6VdNFmAQ37ycO2ypTRFXj6dTPYQ5Inwx/M0MtppCb+FiKj
- 2Latr2i1KMfTWY4iAZOZdPA+qrxhptbKSmBl9u1bqCFcZH8pvTELLXSiITbf2zpM8zbTDOUjZH
- fRxYBWkuT5IrUznAe5Q/Vk2CbmO6DBKIUg27MaOuU2Y6nuWOeDbR/bKOWaCwtsGR26SOuBuAsC
- ZfE=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 05:24:19 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Pmm2B63wgz1RtW6
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 05:24:18 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1680092657; x=1682684658; bh=2dcvqV87tiaXbc2Uo11d6o/I39/nMjI+zlA
-        Ai+6Vbgk=; b=aYJDL/Wv2IOTx8UdzJQy6vhK6Cwx6WbFawjWCYauh4DMUjt8PUN
-        9x0lBBLgBT/IjyJZGV1IULqpb87tc8FlfO62FSSzocE5VAR0WX6HRUoEfOG+mAEG
-        rS94t5CfBpzIdV/6jIaxzIRNmFgSzvpryU3Z3Hgv220Wql3f6LJqko6ekzg49x+7
-        qeUNMP4r4fsY+rjt2ddmQ5DpVwco7it1Uwnyd0bFSBOYjcGo49ZkFsBrbmu/9pYw
-        AfMs3umVUAn9mMkkU82WMd1B4ReuDbvk0vLFAQHC/dPMQD3ZYGm0zN4Yjco6S7g1
-        yw6PpaghAYhqlgVGMdPjU7T3BSfmuLdDP4g==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id HAWycJ6HL42X for <linux-block@vger.kernel.org>;
-        Wed, 29 Mar 2023 05:24:17 -0700 (PDT)
-Received: from [10.225.163.116] (unknown [10.225.163.116])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Pmm253ydnz1RtVm;
-        Wed, 29 Mar 2023 05:24:13 -0700 (PDT)
-Message-ID: <03c647ff-3c4f-a810-12c4-06a9dc62c90e@opensource.wdc.com>
-Date:   Wed, 29 Mar 2023 21:24:11 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v8 1/9] block: Introduce queue limits for copy-offload
- support
-Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-Cc:     Anuj Gupta <anuj20.g@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="329348375"
+X-IronPort-AV: E=Sophos;i="5.98,301,1673942400"; 
+   d="scan'208";a="329348375"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2023 06:58:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10664"; a="716892985"
+X-IronPort-AV: E=Sophos;i="5.98,301,1673942400"; 
+   d="scan'208";a="716892985"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 29 Mar 2023 06:57:54 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1phWJF-000Jb6-0H;
+        Wed, 29 Mar 2023 13:57:53 +0000
+Date:   Wed, 29 Mar 2023 21:56:55 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Anuj Gupta <anuj20.g@samsung.com>, Jens Axboe <axboe@kernel.dk>,
         Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
         Keith Busch <kbusch@kernel.org>,
@@ -90,81 +54,132 @@ Cc:     Anuj Gupta <anuj20.g@samsung.com>, Jens Axboe <axboe@kernel.dk>,
         James Smart <james.smart@broadcom.com>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, bvanassche@acm.org,
-        hare@suse.de, ming.lei@redhat.com, joshi.k@samsung.com,
-        nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Christian Brauner <brauner@kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev, bvanassche@acm.org, hare@suse.de,
+        ming.lei@redhat.com, damien.lemoal@opensource.wdc.com,
+        anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
+        gost.dev@samsung.com, Nitesh Shetty <nj.shetty@samsung.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-References: <20230327084103.21601-1-anuj20.g@samsung.com>
- <CGME20230327084216epcas5p3945507ecd94688c40c29195127ddc54d@epcas5p3.samsung.com>
- <20230327084103.21601-2-anuj20.g@samsung.com>
- <e725768d-19f5-a78a-2b05-c0b189624fea@opensource.wdc.com>
- <20230329104142.GA11932@green5>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20230329104142.GA11932@green5>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v8 6/9] nvmet: add copy command support for bdev and file
+ ns
+Message-ID: <202303292148.Pbx4mDpS-lkp@intel.com>
+References: <20230327084103.21601-7-anuj20.g@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230327084103.21601-7-anuj20.g@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/29/23 19:41, Nitesh Shetty wrote:
->>> +What:		/sys/block/<disk>/queue/copy_max_bytes
->>> +Date:		November 2022
->>> +Contact:	linux-block@vger.kernel.org
->>> +Description:
->>> +		[RW] While 'copy_max_bytes_hw' is the hardware limit for the
->>> +		device, 'copy_max_bytes' setting is the software limit.
->>> +		Setting this value lower will make Linux issue smaller size
->>> +		copies from block layer.
->>
->> 		This is the maximum number of bytes that the block
->>                 layer will allow for a copy request. Must be smaller than
->>                 or equal to the maximum size allowed by the hardware indicated
-> 
-> Looks good.  Will update in next version. We took reference from discard. 
-> 
->> 		by copy_max_bytes_hw. Write 0 to use the default kernel
->> 		settings.
->>
-> 
-> Nack, writing 0 will not set it to default value. (default value is
-> copy_max_bytes = copy_max_bytes_hw)
+Hi Anuj,
 
-It is trivial to make it work that way, which would match how max_sectors_kb
-works. Write 0 to return copy_max_bytes being equal to the default
-copy_max_bytes_hw.
+Thank you for the patch! Perhaps something to improve:
 
-The other possibility that is also interesting is "write 0 to disable copy
-offload and use emulation". This one may actually be more useful.
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.3-rc4 next-20230329]
+[cannot apply to device-mapper-dm/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> 
->>> +
->>> +
->>> +What:		/sys/block/<disk>/queue/copy_max_bytes_hw
->>> +Date:		November 2022
->>> +Contact:	linux-block@vger.kernel.org
->>> +Description:
->>> +		[RO] Devices that support offloading copy functionality may have
->>> +		internal limits on the number of bytes that can be offloaded
->>> +		in a single operation. The `copy_max_bytes_hw`
->>> +		parameter is set by the device driver to the maximum number of
->>> +		bytes that can be copied in a single operation. Copy
->>> +		requests issued to the device must not exceed this limit.
->>> +		A value of 0 means that the device does not
->>> +		support copy offload.
->>
->> 		[RO] This is the maximum number of kilobytes supported in a
->>                 single data copy offload operation. A value of 0 means that the
->> 		device does not support copy offload.
->>
-> 
-> Nack, value is in bytes. Same as discard.
+url:    https://github.com/intel-lab-lkp/linux/commits/Anuj-Gupta/block-Add-copy-offload-support-infrastructure/20230329-162018
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230327084103.21601-7-anuj20.g%40samsung.com
+patch subject: [PATCH v8 6/9] nvmet: add copy command support for bdev and file ns
+config: arm64-randconfig-s041-20230329 (https://download.01.org/0day-ci/archive/20230329/202303292148.Pbx4mDpS-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 12.1.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/f846a8ac40882d9d42532e9e2b43560650ef8510
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Anuj-Gupta/block-Add-copy-offload-support-infrastructure/20230329-162018
+        git checkout f846a8ac40882d9d42532e9e2b43560650ef8510
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arm64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arm64 SHELL=/bin/bash drivers/nvme/target/
 
-Typo. I meant Bytes. Your text is too long an too convoluted, so unclear.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303292148.Pbx4mDpS-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/nvme/target/io-cmd-bdev.c:55:27: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int [usertype] val @@     got restricted __le16 [usertype] mssrl @@
+   drivers/nvme/target/io-cmd-bdev.c:55:27: sparse:     expected unsigned int [usertype] val
+   drivers/nvme/target/io-cmd-bdev.c:55:27: sparse:     got restricted __le16 [usertype] mssrl
+>> drivers/nvme/target/io-cmd-bdev.c:55:27: sparse: sparse: cast from restricted __le16
+>> drivers/nvme/target/io-cmd-bdev.c:55:27: sparse: sparse: cast from restricted __le16
+>> drivers/nvme/target/io-cmd-bdev.c:55:27: sparse: sparse: cast from restricted __le16
+>> drivers/nvme/target/io-cmd-bdev.c:55:27: sparse: sparse: cast from restricted __le16
+   drivers/nvme/target/io-cmd-bdev.c:57:29: sparse: sparse: cast from restricted __le16
+   drivers/nvme/target/io-cmd-bdev.c:60:27: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int [usertype] val @@     got restricted __le16 [usertype] mssrl @@
+   drivers/nvme/target/io-cmd-bdev.c:60:27: sparse:     expected unsigned int [usertype] val
+   drivers/nvme/target/io-cmd-bdev.c:60:27: sparse:     got restricted __le16 [usertype] mssrl
+   drivers/nvme/target/io-cmd-bdev.c:60:27: sparse: sparse: cast from restricted __le16
+   drivers/nvme/target/io-cmd-bdev.c:60:27: sparse: sparse: cast from restricted __le16
+   drivers/nvme/target/io-cmd-bdev.c:60:27: sparse: sparse: cast from restricted __le16
+   drivers/nvme/target/io-cmd-bdev.c:60:27: sparse: sparse: cast from restricted __le16
+
+vim +55 drivers/nvme/target/io-cmd-bdev.c
+
+    12	
+    13	void nvmet_bdev_set_limits(struct block_device *bdev, struct nvme_id_ns *id)
+    14	{
+    15		/* Logical blocks per physical block, 0's based. */
+    16		const __le16 lpp0b = to0based(bdev_physical_block_size(bdev) /
+    17					      bdev_logical_block_size(bdev));
+    18	
+    19		/*
+    20		 * For NVMe 1.2 and later, bit 1 indicates that the fields NAWUN,
+    21		 * NAWUPF, and NACWU are defined for this namespace and should be
+    22		 * used by the host for this namespace instead of the AWUN, AWUPF,
+    23		 * and ACWU fields in the Identify Controller data structure. If
+    24		 * any of these fields are zero that means that the corresponding
+    25		 * field from the identify controller data structure should be used.
+    26		 */
+    27		id->nsfeat |= 1 << 1;
+    28		id->nawun = lpp0b;
+    29		id->nawupf = lpp0b;
+    30		id->nacwu = lpp0b;
+    31	
+    32		/*
+    33		 * Bit 4 indicates that the fields NPWG, NPWA, NPDG, NPDA, and
+    34		 * NOWS are defined for this namespace and should be used by
+    35		 * the host for I/O optimization.
+    36		 */
+    37		id->nsfeat |= 1 << 4;
+    38		/* NPWG = Namespace Preferred Write Granularity. 0's based */
+    39		id->npwg = lpp0b;
+    40		/* NPWA = Namespace Preferred Write Alignment. 0's based */
+    41		id->npwa = id->npwg;
+    42		/* NPDG = Namespace Preferred Deallocate Granularity. 0's based */
+    43		id->npdg = to0based(bdev_discard_granularity(bdev) /
+    44				    bdev_logical_block_size(bdev));
+    45		/* NPDG = Namespace Preferred Deallocate Alignment */
+    46		id->npda = id->npdg;
+    47		/* NOWS = Namespace Optimal Write Size */
+    48		id->nows = to0based(bdev_io_opt(bdev) / bdev_logical_block_size(bdev));
+    49	
+    50		/*Copy limits*/
+    51		if (bdev_max_copy_sectors(bdev)) {
+    52			id->msrc = id->msrc;
+    53			id->mssrl = cpu_to_le16((bdev_max_copy_sectors(bdev) <<
+    54					SECTOR_SHIFT) / bdev_logical_block_size(bdev));
+  > 55			id->mcl = cpu_to_le32(id->mssrl);
+    56		} else {
+    57			id->msrc = (u8)to0based(BIO_MAX_VECS - 1);
+    58			id->mssrl = cpu_to_le16((BIO_MAX_VECS << PAGE_SHIFT) /
+    59					bdev_logical_block_size(bdev));
+    60			id->mcl = cpu_to_le32(id->mssrl);
+    61		}
+    62	}
+    63	
 
 -- 
-Damien Le Moal
-Western Digital Research
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
