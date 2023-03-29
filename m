@@ -2,138 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C368C74A5B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 03:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E6EC74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 06:01:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230086AbjC2DbG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Mar 2023 23:31:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
+        id S229845AbjC2GBe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 02:01:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230140AbjC2Dal (ORCPT
+        with ESMTP id S229646AbjC2GBc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Mar 2023 23:30:41 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2077.outbound.protection.outlook.com [40.107.94.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED72D40F0
-        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 20:30:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YY1bfSSbd/Lzg1OK5exbCQUoFAMmKzzrHpaemH8c+Md0eup2HfrQoCj5Ad4ij7gmtasQphPZtLXnB11Rj29fLl1Tfp0R7JzJgH22RSeFbLdZPM5YjPPHyC3i7J/qUJ3sCJOLKPJwFtd/HK0u2smU5j1zhMVCC9i1492+c1mbNU6FiDbBxE1E99wsxv4feT5cMEeRJ+2p6eluFkmIq8bfQ1Ggru/XCW3ySS5GyuhVTJIBb43jAsCf5cq9Kgmje4gH4a6EhGQtmeIvwXjaxf9Z/5AJOtHv2oYBV34QIjqK/UKNGoouRSAKy1d+NE4r1/3YsYn9BoNVvH4GbogLmu0zAg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pA3jUqBb3WRuyFKtrmeydOPtBZgAUZDwfgf+QkYX8gY=;
- b=fjqQQK1KaBeAW/xtnIkwjzbmPumnLT8RafXf5UKhJ7Ql8pv6osQNrLFCcGX4yZzB0EVq9kwg5yrceajLCJCIYLcLPr2+P9jk+TqVp/j/+ubFhvWHA43CUTRkIl+uzlJL5EgMgjef2E2XpxyU1uSFzZFsrufXRxjXaIqFgjdVccLVDxOvrX3IA7UDPCYJhjbF13AvIRSj5X4Ij3d6Sh/OXu/EZKHJWYUKaE56aCnAO/HA4BdzueQ360RDzAprUaA/SoRyXjYW8+qTwJOCN8aac+F3yG+4FJjJOCboFKuzktV9wQoo/1JtZPYNEKmn6eGo2kMVbYGQnPZK1cslkvE2mA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pA3jUqBb3WRuyFKtrmeydOPtBZgAUZDwfgf+QkYX8gY=;
- b=E0zYmihMZkf5oJKEwH3FzMaBeIJDGlUq7OefYVdAJl+rLYO4J/p7oNAsum3baKbaaSMMnNEfsOfMGAXtllsQJBFksUcHcbt25R2o3B+VifBKWwjVgA2dY+3LXge6jgs35+QHwy4O62rrXe3hIdwyFNOzNmtucf6ij1PR0+YDsUQlhkLHR1VkhLqLElpvQ1o1AY7dmnvs9LLD/sfRM6bhrukQYEJtxLdu7PI5WFmx2pVM33rFfglXHtCWcDwELwuD5/B0DmiZfK5ZOr7nz5ijeLBGr/ZsxgTkX1Cx69TK5T+Ah7x2qE+45DSsPnZRq78WGMtkoGB1iLaZ68g925YSDg==
-Received: from BL0PR12MB4659.namprd12.prod.outlook.com (2603:10b6:207:1d::33)
- by MW3PR12MB4537.namprd12.prod.outlook.com (2603:10b6:303:5b::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.35; Wed, 29 Mar
- 2023 03:30:17 +0000
-Received: from BL0PR12MB4659.namprd12.prod.outlook.com
- ([fe80::c447:32e5:4322:403a]) by BL0PR12MB4659.namprd12.prod.outlook.com
- ([fe80::c447:32e5:4322:403a%5]) with mapi id 15.20.6222.033; Wed, 29 Mar 2023
- 03:30:17 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Keith Busch <kbusch@kernel.org>, Daniel Wagner <dwagner@suse.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH blktests v2 0/3] Test different queue counts
-Thread-Topic: [PATCH blktests v2 0/3] Test different queue counts
-Thread-Index: AQHZXKdvRAUG9bQ5KUS8NHUM8XKpWq8QjvaAgACVS4A=
-Date:   Wed, 29 Mar 2023 03:30:17 +0000
-Message-ID: <6dcf501f-8863-b448-01fa-1252e73a87f5@nvidia.com>
-References: <20230322101648.31514-1-dwagner@suse.de>
- <ZCMzjVs26imnywgo@kbusch-mbp.dhcp.thefacebook.com>
-In-Reply-To: <ZCMzjVs26imnywgo@kbusch-mbp.dhcp.thefacebook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR12MB4659:EE_|MW3PR12MB4537:EE_
-x-ms-office365-filtering-correlation-id: 1117e7c0-5e11-43a4-312d-08db3005eab9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rGRJe8BzDKwHzT4LyRmp01pQToczHq+s4DzpvgrCViR3IR++HPRkfOeHM7ifMfxE9YYipDUrEFDfKQ65T8Bb5C+JVOSB9tlpTOiKj/VuMOavh/zM4iJtaosMCPvBLn07m1KI2uaNZSqJ8tFVxGFz/wVMWiry7UZLTM5dkV4zzORKdQ9foo/mqBvf0iiAfFtgI8jil1jgmctHxkUVuVKYNMy13tmamJHTPRXjoe+esYbfebPJS9/hkprP0xYeTR2ozY+v4efC5b6VFaUpRlaq31M8Xgp3Ufx/1Rj3GFraotRktZslKotERyPJ0gFUDhUOtnHn2m8aovn6CfLGMwdj72kUyb+94Pp2mdf/rxwaPjWbEYnaTuohUpNhJkDKC6sDVmyFL9cautI2z0sGJIFnbENfYfRojv1TjAUXirdpII8haSUZ3rjvsbrRth+MWnB0MFMl9WO7kBd6AXnNXxZlnsTQcxcHCu6nxpO+/TK/59hOYQMn3++oFFG4crmfWxf1YUrvSOKUskTIG+kBKJBsB9CjYJS5cJ9LGf/PN9O9IrK7FssgE6Ug9mBiz7ZublI5PhvFEyL7KoT6ogswAiW+Y60PVJzHnVC6/50vVqMs09/WiNxpQqTiy7Leur7WapWFRIPEgmHCvqDgjgkUjvpFB/9VFZmluWf30GOnan9CtmNPRZOMDfARU/a0oxOWkRYV
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB4659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(366004)(346002)(39860400002)(396003)(451199021)(4744005)(2906002)(5660300002)(41300700001)(122000001)(8936002)(38100700002)(86362001)(31696002)(36756003)(38070700005)(6486002)(71200400001)(6512007)(6506007)(53546011)(478600001)(2616005)(31686004)(186003)(26005)(8676002)(4326008)(91956017)(66556008)(66476007)(66946007)(66446008)(64756008)(76116006)(316002)(110136005)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VU1FY3ZaY01LNDdhSlBRRjc5TkpzRG1CQS9xd0hFRkNYMFNYOHNiQzB4WWNt?=
- =?utf-8?B?T0xqZWZGNk1qRVp3cEtqVisrbGNnZ3ZkMGJzSEtCMFRVakUyZEJJaWYvRXNy?=
- =?utf-8?B?eVBDQ0xzdmsrR0xxdDBvSlBHeUR6WlY3YWZQRkNRYmdRQTk5bVBTRWNBOVE3?=
- =?utf-8?B?RjhNUVU0YzIzNDArNkUrRG1NM0tYQzcvVzVlRGRuZFN6b1NwVG1qUHMva25y?=
- =?utf-8?B?d0ZmTjkveDM5U3FpajVxY3RsaXpXYW9vZlRhandHaGF3anZrS2dpRlNVMitj?=
- =?utf-8?B?U1A2NW94QWFtck9jemlIY2hyaTYrN0xPWjdRMi9wMG5RV2ZJWXdrTzlmaEpj?=
- =?utf-8?B?OXc0c0xQV2VuWE1MbEUwVHNGM0pYYmY3c0U4RkQ5NXI1RFVyS3JmbDkyWVZu?=
- =?utf-8?B?VkFyOXRua28wMDhuRU9IUWloRXE5MzRRODJuMnI5UEdHS1djdWpJMVpnZlho?=
- =?utf-8?B?Nm9oMElWL2dzd2drNFRNR242dTd0VG16NEJ6Q2tJdjN4a1BkMzZNWHJMU3pz?=
- =?utf-8?B?elVDanN3eVZDZXhRQlZaR1JYN2MvQy9jWEZDRTdlQU5CcWZlUEdTMng3eTF3?=
- =?utf-8?B?M0VCRzBJdUFveXV4NVc4UldwUVc0THdJTHZZR3BSemYzbW9XVlZxdlB4U3ov?=
- =?utf-8?B?eW5JbHJRd1dSM1FWdkdkWXJmVHRTYmI5OHhjbnp4N3RaenkrSlZjemUwM1RO?=
- =?utf-8?B?TFNpbFhhTG1iZStvYjdzQlhjYlBiNDhEdHZFdHJVU0gwY0dXT2dJb1J3N1Jx?=
- =?utf-8?B?c2Q1NVFyWi9WOTNBRXhXQXh6aGlzMjBlZE04VkRNbkM3ZFlIZjJVWTBNTHBj?=
- =?utf-8?B?TjBITVpBVDh4UnA4cWJCZXZsR0Q1aUo1bjJ4Tk9MejA2aitCRTM3VXd1ZGpH?=
- =?utf-8?B?WVgyeml2TFIxTGdONDM3bFVNdDhWMFZVL01XWXJoREtXaVh4RDg5dElENXNQ?=
- =?utf-8?B?Ly9YYW04a1VTOXNreURHa3VtOXNjZzNoRW9UcmViL2FpQVIyZ2Q5blFMWUxm?=
- =?utf-8?B?TlRjWitGcHo3OHhta0FIM1I2OHV4eVE1d01DUmh0VHBGQTMrWXA3NVlwbXp4?=
- =?utf-8?B?bGwvTXVBNW5VTnRVU2ZpYkJDdHZtSDIrWVBqeG44LytNcUtSbkh2bmlQbjQv?=
- =?utf-8?B?TldNZEFtSThNcXRaTGx4ZGJLaWNPSGFGZHlVWnF6ZlNXaHk4bUJDYmNmQ3dD?=
- =?utf-8?B?cy9KamloQmFHRVV5UG1wQ1VPRGs5MkpvRFBQTjB3NC9ZNTMwSnZFUnBhb3h0?=
- =?utf-8?B?TzF0M2xjVFpsQVd0OUFRYnJQVURObThKMVVZR0lhMzR4Sk01eVFBZzNWZGxi?=
- =?utf-8?B?cnFLTzZOeER2aWNaQ0Q1WmFTNEVzSlpYL0RSK0VmTGFKVmZRSUlZOUFxendn?=
- =?utf-8?B?UVNna3MxdjVyeGhpZGZYVDRuQ3hndVNjcWN0eUtUM2o4ZkVlUGZDRzRDQTJw?=
- =?utf-8?B?aXVNNTV5Zk1zM3NTQVhsWm90SXhwdmpTc01WNldwaW5oQmQ4S1V6Y2M2ODlO?=
- =?utf-8?B?Z1UxU2FHRytJQTd2LzlnMHhzSGhhVHd3YSt0RjNwK2EwWFY1c3VkN0xkeXI3?=
- =?utf-8?B?OHV6MVF3OC9jb3dCK0VGTEhwNXhjaGZUY0M1c0dwM05OeXBiZWxjdVJTcXZR?=
- =?utf-8?B?RStrdzVsM2F6VE9NdXEzRnVhaFpnSEUxZW5pSUp5TmVWWGxpRzltUW01cC9z?=
- =?utf-8?B?Vy9jNGhmWTlEQnFORVE4eHlxUXVsT2FoSk82MzhUbWI0Wjd4am1FNklqSVRo?=
- =?utf-8?B?V0haVVBDcUJUOVBjcDhveFFBYkhUSktra2o4dE1iUU5CcUZ3Ky9BQWF5U2Nn?=
- =?utf-8?B?eWkvT2Zjdk03VW1TYldCZlA2M01uY2ovUTdZUDRXK0QzN0hvZDMvVFVsSm9Y?=
- =?utf-8?B?eTRLNDYxZTgwZjlFbi9xbmE3MzllZlpFcjVSb2VFUlZSUVdIcE11QWhxaE15?=
- =?utf-8?B?eGR4NDNlMmxsVksybGVNTnRZMDIva1dlREkxbDJod1JpbWFnaWFFOUsySGo4?=
- =?utf-8?B?TFM5bTcvYWkvMTEwOW1KajcyQ1BHY2tEL0srS2Z2TWVGUzAwYlFoZjF4VFV3?=
- =?utf-8?B?d2I1Q0wxNFM3SHl4dTU1aTl1aG5RWlRZa3UrZ2JydnkvbUZJTi84VDFwL3ZR?=
- =?utf-8?Q?wOEjUuH2i11Wm2yoqXblC0jui?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4A8EE5BCB6DB8744A3F6F6768DB6BBBB@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 29 Mar 2023 02:01:32 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927C3358B;
+        Tue, 28 Mar 2023 23:01:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F2B40B8200F;
+        Wed, 29 Mar 2023 06:01:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B197C433D2;
+        Wed, 29 Mar 2023 06:01:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1680069685;
+        bh=VmpSqDmABCdiRrhZPUIC9g9iH1F5K/OB3bj4hj2T7/o=;
+        h=From:To:Cc:Subject:Date:From;
+        b=N74FlaxeHd/XcyD7wDsFfAHp0QgMR2u7iZIxzF23eyiHhxGjhPQWvYV1DaLXxy7h4
+         7AVj7yPVkaGJJBmCEdl9Y56TUUSnvEnU0EbpO5uiBkElFdwNxfdMRXCrisPUX57uZQ
+         Ef8m9Yol6pZMQI2tW2kE2gTREaSGYa5NeFO+J0mY=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] pktcdvd: simplify the class_pktcdvd logic
+Date:   Wed, 29 Mar 2023 08:01:21 +0200
+Message-Id: <20230329060121.2688338-1-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB4659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1117e7c0-5e11-43a4-312d-08db3005eab9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Mar 2023 03:30:17.3987
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3BVWGPy7Gg9yJVUsd8DjoToRDQynhkjj30sTFb4u+QhXY0VAiXYf2HHO+7XFFNaXePaxtPSCJaW67o3wBPhuWQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4537
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3437; i=gregkh@linuxfoundation.org; h=from:subject; bh=VmpSqDmABCdiRrhZPUIC9g9iH1F5K/OB3bj4hj2T7/o=; b=owGbwMvMwCRo6H6F97bub03G02pJDCnKV/RezPS67rU91M9H6m9HdO636N1HBSzZtt3fYXo29 exzq+ezO2JZGASZGGTFFFm+bOM5ur/ikKKXoe1pmDmsTCBDGLg4BWAid6UY5uf4uO7a4XXz8Lv8 CvmU9GbJ+f9l8hnmyi1a8rn2kv+8l3IVDsqTZkQ/2bXMDwA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMy8yOC8yMyAxMTozNSwgS2VpdGggQnVzY2ggd3JvdGU6DQo+IE9uIFdlZCwgTWFyIDIyLCAy
-MDIzIGF0IDExOjE2OjQ1QU0gKzAxMDAsIERhbmllbCBXYWduZXIgd3JvdGU6DQo+PiBTZXR1cCBk
-aWZmZXJlbnQgcXVldWVzLCBlLmcuIHJlYWQgYW5kIHBvbGwgcXVldWVzLg0KPiBJZiB5b3Ugd2Fu
-dGVkIHRvIGFkZCBhIHNpbWlsYXIgdGVzdCBmb3IgcGNpLCB5b3UgZG8gaXQgYnkgZWNobydpbmcg
-dGhlIGRlc2lyZWQNCj4gb3B0aW9ucyB0bzoNCj4NCj4gICAgL3N5cy9tb2R1bGVzL252bWUvcGFy
-YW1ldGVycy97cG9sbF9xdWV1ZXMsd3JpdGVfcXVldWVzfQ0KPg0KPiBUaGVuIGRvIGFuICdudm1l
-IHJlc2V0JyBvbiB0aGUgdGFyZ2V0IG52bWUgcGNpIGRldmljZS4NCj4NCj4gSSdsbCBqdXN0IG5v
-dGUgdGhhdCBzdWNoIGEgdGVzdCB3aWxsIGN1cnJlbnRseSBmYWlsLCBhbmQgZml4aW5nIHRoYXQg
-ZG9lc24ndA0KPiBsb29rIGxpa2UgZnVuLiA6KQ0KDQp0aGVuIHdlIHNob3VsZCBkZWZpbml0ZWx5
-IGFkZCBpdCA7KSBoYSBoYS4NCg0KSSB3YXMgYWN0dWFsbHkgd29uZGVyaW5nIGFib3V0IHBjaSBi
-YXNlZCBvbiB0aGUgZGlzY3Vzc2lvbiBvbiB0aGlzIHRocmVhZA0Kd2FzIG1haW5seSBmb2N1c2Vk
-IG9uIHRjcCBhbmQgcmRhbSwgdGhhbmtzIGZvciB0aGUgc3VnZ2VzdGlvbiBLZWl0aC4NCg0KLWNr
-DQoNCg0K
+There is no need to dynamically create and destory the class_pktcdvd
+structure, just make it static and remove the memory allocation logic
+which simplifies and cleans up the logic a lot.
+
+Cc: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+Note: I would like to take this through the driver-core tree as I have
+later struct class cleanups that depend on this change being made to the
+tree if that's ok with the maintainer of this file.
+
+ drivers/block/pktcdvd.c | 40 ++++++++++++----------------------------
+ 1 file changed, 12 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index ba9bbdef9ef5..79af8a59142e 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -100,7 +100,8 @@ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
+ static mempool_t psd_pool;
+ static struct bio_set pkt_bio_set;
+ 
+-static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
++/* /sys/class/pktcdvd */
++static struct class	class_pktcdvd;
+ static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
+ 
+ /* forward declaration */
+@@ -315,8 +316,8 @@ static const struct attribute_group *pkt_groups[] = {
+ 
+ static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
+ {
+-	if (class_pktcdvd) {
+-		pd->dev = device_create_with_groups(class_pktcdvd, NULL,
++	if (class_is_registered(&class_pktcdvd)) {
++		pd->dev = device_create_with_groups(&class_pktcdvd, NULL,
+ 						    MKDEV(0, 0), pd, pkt_groups,
+ 						    "%s", pd->name);
+ 		if (IS_ERR(pd->dev))
+@@ -326,7 +327,7 @@ static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
+ 
+ static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
+ {
+-	if (class_pktcdvd)
++	if (class_is_registered(&class_pktcdvd))
+ 		device_unregister(pd->dev);
+ }
+ 
+@@ -338,11 +339,6 @@ static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
+                      device_map     show mappings
+  *******************************************************************/
+ 
+-static void class_pktcdvd_release(struct class *cls)
+-{
+-	kfree(cls);
+-}
+-
+ static ssize_t device_map_show(const struct class *c, const struct class_attribute *attr,
+ 			       char *data)
+ {
+@@ -405,35 +401,23 @@ static struct attribute *class_pktcdvd_attrs[] = {
+ };
+ ATTRIBUTE_GROUPS(class_pktcdvd);
+ 
++static struct class class_pktcdvd = {
++	.name		= DRIVER_NAME,
++	.class_groups	= class_pktcdvd_groups,
++};
++
+ static int pkt_sysfs_init(void)
+ {
+-	int ret = 0;
+-
+ 	/*
+ 	 * create control files in sysfs
+ 	 * /sys/class/pktcdvd/...
+ 	 */
+-	class_pktcdvd = kzalloc(sizeof(*class_pktcdvd), GFP_KERNEL);
+-	if (!class_pktcdvd)
+-		return -ENOMEM;
+-	class_pktcdvd->name = DRIVER_NAME;
+-	class_pktcdvd->class_release = class_pktcdvd_release;
+-	class_pktcdvd->class_groups = class_pktcdvd_groups;
+-	ret = class_register(class_pktcdvd);
+-	if (ret) {
+-		kfree(class_pktcdvd);
+-		class_pktcdvd = NULL;
+-		pr_err("failed to create class pktcdvd\n");
+-		return ret;
+-	}
+-	return 0;
++	return class_register(&class_pktcdvd);
+ }
+ 
+ static void pkt_sysfs_cleanup(void)
+ {
+-	if (class_pktcdvd)
+-		class_destroy(class_pktcdvd);
+-	class_pktcdvd = NULL;
++	class_unregister(&class_pktcdvd);
+ }
+ 
+ /********************************************************************
+-- 
+2.40.0
+
