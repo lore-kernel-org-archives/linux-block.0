@@ -2,123 +2,149 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF42C77B60
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 11:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC62C74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 12:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbjC2L6v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 07:58:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35852 "EHLO
+        id S229875AbjC2MO6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 08:14:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbjC2L6u (ORCPT
+        with ESMTP id S230050AbjC2MOz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 07:58:50 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7ADEA;
-        Wed, 29 Mar 2023 04:58:44 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 29 Mar 2023 08:14:55 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91864449A;
+        Wed, 29 Mar 2023 05:14:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 89907219D6;
-        Wed, 29 Mar 2023 11:58:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1680091123; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yUxNSXHNGER+MCVZDyDV8l5ua3h1BaSz76WjsL0+L3s=;
-        b=Y9IuGtiVAXDxMAHsM6cj7w2mYq2eAbOAWUcGbhruEFj1/tTjy0ED7NrMdnGwksKxLWnPdS
-        2XErqMm71eFEKSjeeww8JCt/gvAo3MxStIDeQ1v26jeQkUL5w58Wj50wWGD35gsly/pJ7o
-        eNf2oLyQeU11xKNm9lcEWC8qojyK8Qs=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6F463138FF;
-        Wed, 29 Mar 2023 11:58:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id ecknG/MnJGRBXwAAMHmgww
-        (envelope-from <mhocko@suse.com>); Wed, 29 Mar 2023 11:58:43 +0000
-Date:   Wed, 29 Mar 2023 13:58:43 +0200
-From:   Michal Hocko <mhocko@suse.com>
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Subject: Re: [PATCH v2 3/9] memcg: do not flush stats in irq context
-Message-ID: <ZCQn86f7sxBt6tyN@dhcp22.suse.cz>
-References: <20230328221644.803272-1-yosryahmed@google.com>
- <20230328221644.803272-4-yosryahmed@google.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 51BA6B820CA;
+        Wed, 29 Mar 2023 12:14:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA1B7C433D2;
+        Wed, 29 Mar 2023 12:14:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680092089;
+        bh=Cq96Ecr1uXjVoaJWJyUxPHu037nrWz83m8M9Gjo4M0w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KGfQ19JB/t5T8xfel5ekL7rIPIqjuGdUbpHu2TvFVfDJqzFnbriKg5iK3wfxALI59
+         5LyiLESlpTzJHFW/8lt+018tzaD7vZPajHSzbIU/DEnaaeuEg4k4RCEEfRugFAgOYR
+         m4DqhUtYK/1puiYULG8SOL55Wo0xxlZ0S513YrqIOLShG+zrSOD7j4MR7Fy5CLAsOW
+         nn4Qqp5Qeh+Rgu7KnCNo6kX6DX82G9OqAuv4aGfxbXXRpuHiefLuICveefVRrgufMz
+         KWcn2gniTr4BpCa5KHKzopGOqsKdRWruD0kdqIg9k6ZIVu2LqL7myHVVmrQ8JoGoPD
+         zDQW2N2v6MA6A==
+Date:   Wed, 29 Mar 2023 14:14:40 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Anuj Gupta <anuj20.g@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, bvanassche@acm.org,
+        hare@suse.de, ming.lei@redhat.com,
+        damien.lemoal@opensource.wdc.com, joshi.k@samsung.com,
+        nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v8 4/9] fs, block: copy_file_range for def_blk_ops for
+ direct block device.
+Message-ID: <20230329-glitter-drainpipe-bdf9d3876ac4@brauner>
+References: <20230327084103.21601-1-anuj20.g@samsung.com>
+ <CGME20230327084244epcas5p1b0ede867e558ff6faf258de3656a8aa4@epcas5p1.samsung.com>
+ <20230327084103.21601-5-anuj20.g@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230328221644.803272-4-yosryahmed@google.com>
+In-Reply-To: <20230327084103.21601-5-anuj20.g@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 28-03-23 22:16:38, Yosry Ahmed wrote:
-> Currently, the only context in which we can invoke an rstat flush from
-> irq context is through mem_cgroup_usage() on the root memcg when called
-> from memcg_check_events(). An rstat flush is an expensive operation that
-> should not be done in irq context, so do not flush stats and use the
-> stale stats in this case.
+On Mon, Mar 27, 2023 at 02:10:52PM +0530, Anuj Gupta wrote:
+> From: Nitesh Shetty <nj.shetty@samsung.com>
 > 
-> Arguably, usage threshold events are not reliable on the root memcg
-> anyway since its usage is ill-defined.
+> For direct block device opened with O_DIRECT, use copy_file_range to
+> issue device copy offload, and fallback to generic_copy_file_range incase
+> device copy offload capability is absent.
+> Modify checks to allow bdevs to use copy_file_range.
 > 
-> Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
-> Suggested-by: Shakeel Butt <shakeelb@google.com>
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> Acked-by: Shakeel Butt <shakeelb@google.com>
-> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-
-Acked-by: Michal Hocko <mhocko@suse.com>
-
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
 > ---
->  mm/memcontrol.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+>  block/blk-lib.c        | 22 ++++++++++++++++++++++
+>  block/fops.c           | 20 ++++++++++++++++++++
+>  fs/read_write.c        | 11 +++++++++--
+>  include/linux/blkdev.h |  3 +++
+>  4 files changed, 54 insertions(+), 2 deletions(-)
 > 
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index c3b6aae78901..ff39f78f962e 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -3669,7 +3669,21 @@ static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap)
->  	unsigned long val;
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index a21819e59b29..c288573c7e77 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -475,6 +475,28 @@ static inline bool blk_check_copy_offload(struct request_queue *q_in,
+>  	return blk_queue_copy(q_in) && blk_queue_copy(q_out);
+>  }
 >  
->  	if (mem_cgroup_is_root(memcg)) {
-> -		mem_cgroup_flush_stats();
-> +		/*
-> +		 * We can reach here from irq context through:
-> +		 * uncharge_batch()
-> +		 * |--memcg_check_events()
-> +		 *    |--mem_cgroup_threshold()
-> +		 *       |--__mem_cgroup_threshold()
-> +		 *          |--mem_cgroup_usage
-> +		 *
-> +		 * rstat flushing is an expensive operation that should not be
-> +		 * done from irq context; use stale stats in this case.
-> +		 * Arguably, usage threshold events are not reliable on the root
-> +		 * memcg anyway since its usage is ill-defined.
-> +		 */
-> +		if (in_task())
-> +			mem_cgroup_flush_stats();
->  		val = memcg_page_state(memcg, NR_FILE_PAGES) +
->  			memcg_page_state(memcg, NR_ANON_MAPPED);
->  		if (swap)
-> -- 
-> 2.40.0.348.gf938b09366-goog
+> +int blkdev_copy_offload(struct block_device *bdev_in, loff_t pos_in,
+> +		      struct block_device *bdev_out, loff_t pos_out, size_t len,
+> +		      cio_iodone_t end_io, void *private, gfp_t gfp_mask)
+> +{
+> +	struct request_queue *in_q = bdev_get_queue(bdev_in);
+> +	struct request_queue *out_q = bdev_get_queue(bdev_out);
+> +	int ret = -EINVAL;
 
--- 
-Michal Hocko
-SUSE Labs
+Why initialize to -EINVAL if blk_copy_sanity_check() initializes it
+right away anyway?
+
+> +	bool offload = false;
+
+Same thing with initializing offload.
+
+> +
+> +	ret = blk_copy_sanity_check(bdev_in, pos_in, bdev_out, pos_out, len);
+> +	if (ret)
+> +		return ret;
+> +
+> +	offload = blk_check_copy_offload(in_q, out_q);
+> +	if (offload)
+> +		ret = __blk_copy_offload(bdev_in, pos_in, bdev_out, pos_out,
+> +				len, end_io, private, gfp_mask);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(blkdev_copy_offload);
+> +
+>  /*
+>   * @bdev_in:	source block device
+>   * @pos_in:	source offset
+> diff --git a/block/fops.c b/block/fops.c
+> index d2e6be4e3d1c..3b7c05831d5c 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -611,6 +611,25 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+>  	return ret;
+>  }
+>  
+> +static ssize_t blkdev_copy_file_range(struct file *file_in, loff_t pos_in,
+> +				struct file *file_out, loff_t pos_out,
+> +				size_t len, unsigned int flags)
+> +{
+> +	struct block_device *in_bdev = I_BDEV(bdev_file_inode(file_in));
+> +	struct block_device *out_bdev = I_BDEV(bdev_file_inode(file_out));
+> +	int comp_len = 0;
+> +
+> +	if ((file_in->f_iocb_flags & IOCB_DIRECT) &&
+> +		(file_out->f_iocb_flags & IOCB_DIRECT))
+> +		comp_len = blkdev_copy_offload(in_bdev, pos_in, out_bdev,
+> +				 pos_out, len, NULL, NULL, GFP_KERNEL);
+> +	if (comp_len != len)
+> +		comp_len = generic_copy_file_range(file_in, pos_in + comp_len,
+> +			file_out, pos_out + comp_len, len - comp_len, flags);
+
+I'm not deeply familiar with this code but this looks odd. It at least
+seems possible that comp_len could be -EINVAL and len 20 at which point
+you'd be doing len - comp_len aka 20 - 22 = -2 in generic_copy_file_range().
