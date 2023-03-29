@@ -2,291 +2,503 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91898C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 08:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4225BC74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 08:59:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbjC2Ixo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 04:53:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41704 "EHLO
+        id S229971AbjC2I7B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 04:59:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231351AbjC2Ixg (ORCPT
+        with ESMTP id S229677AbjC2I6r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 04:53:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7184A3A85
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:52:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680079951;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GaNT2Og1QOD5grKCAXED7/s8sdTatYwvipTFRccPuKo=;
-        b=EcOOM9LcgijufdW13Z5zxpNHMYBnLPx7SudcRN/IehN8DAX3UwlxEiI8GZ/iWAJIFpVWnw
-        lBOU3FoyW5KDr6hVO6oLINn7MIhDkCLinmj4T877WYYW+HSssIAqc334MTLROoYw3yv732
-        Y03jGafoCB6nEJCrbc1I+eARUMFx4cQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-652-_YcrxN-_MXmPumzneapgwQ-1; Wed, 29 Mar 2023 04:52:29 -0400
-X-MC-Unique: _YcrxN-_MXmPumzneapgwQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F03DA101A550;
-        Wed, 29 Mar 2023 08:52:28 +0000 (UTC)
-Received: from ovpn-8-26.pek2.redhat.com (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F043918EC2;
-        Wed, 29 Mar 2023 08:52:22 +0000 (UTC)
-Date:   Wed, 29 Mar 2023 16:52:16 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        ming.lei@redhat.com
-Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
-Message-ID: <ZCP8QEBC8cL5CKa8@ovpn-8-26.pek2.redhat.com>
-References: <20230314125727.1731233-1-ming.lei@redhat.com>
- <fd30b561-86dd-5061-714f-e46058f7079f@linux.alibaba.com>
- <845ff5cb-b0ff-8ea0-e2ff-a5b216966dfb@gmail.com>
- <ded5b188-0bcd-3003-353e-b31608e58be4@linux.alibaba.com>
- <ZCI6ifwZwwaM6TFw@ovpn-8-20.pek2.redhat.com>
- <1004bd4d-d74e-f1de-0e60-6532fc526c85@linux.alibaba.com>
+        Wed, 29 Mar 2023 04:58:47 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCBBD40F6
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:57:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1680080276; x=1711616276;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=dpYCJqxHzH41LLeY9P40KlHhDXgqF8BIDqP+hRLMETk=;
+  b=eZ7XLOyljllUKEsnKTXv62O+IOqdZyuNsyL7e3335izt2NlJQm8mjqW3
+   Gqy3YipLUBG3i2Srje6eaD92qTKzQImRlxteaDfIT35dViH/8m9KnMnuK
+   M76eazAARUNPtXD3IFXKqUqomoxj/Y/VyiIAFxboLffBz8yOdsLfIUX7f
+   eVGYc471T8Q46e/1pnLcc0JVT7BsulmVnl0BpziCuiOoRNhcpV9+z6kLY
+   5nWeWu32ltUS6mSdArtfGu+192wx3nUGVzJYHOTpBKTTNB5WQtmZcBm8k
+   jATxOndCDKn5ZFZWsSGnMmn++QGfZyawHW9szSNIHWEE/FrTHFrbZwYB2
+   w==;
+X-IronPort-AV: E=Sophos;i="5.98,300,1673884800"; 
+   d="scan'208";a="226590414"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Mar 2023 16:56:21 +0800
+IronPort-SDR: Skxvzg4NouGUdMXgnunA3heUDC0/Fk8Vcve8hwRbE6yZu1wYxb7/8SUBFipLvuFubLYFSfpv/H
+ cXV4FKGgKwIi8zpEQwtM5+fO0cKZdh18Ns2PllM1PH3sImdJkVUQlDKytM4ZdmFzYoUfEtJRFt
+ cQ82E3Y/rNJi/k2xeKBpzss3p3LccmpGGX6Q4h2rhkVeHAviftQ1U5NfDZtB6+hFEoMOPI+icx
+ Q3YXCjFOE+6nBJCbG4By96xKOA2EhVjAT2uXr3CNcYkqRKqZRx4atRBT2Wd7UqUmeO2QAQ0w3n
+ vIk=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 01:06:50 -0700
+IronPort-SDR: lkm4/wy3NtmO5jcThj9WDNdo934+Tsa141RX37msarcmC5xpMX7TSlLQdocBVy793lL0XrWtL2
+ NJnuqNbTAAyt3B9p8DmByQQUvsUFx9BEyRt1LlGAiDpIGseFvYhoCGEDwCHBZnc/5UARxBHPLO
+ RcIaEMqM6H+bFI8ZC9zCHgTAOvn51AGl2hPKakpMoIq4i9Chdo0EFrqFLCvT6jxnHAjZ4JGxL0
+ +uxj5kZiHK7WzyGkn9sSK3cdUb9Aa0qKdN9J+IvAuULWsPxPtsydVIdRwflDOBbI0sT6Gjl+Qr
+ BP4=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 01:56:22 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PmgQD2VNBz1RtW3
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:56:20 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1680080176; x=1682672177; bh=dpYCJqxHzH41LLeY9P40KlHhDXgqF8BIDqP
+        +hRLMETk=; b=g4qPU26E9KIV28rNP5GyB8fWbWEwCW8uklz6V4LxmO1tBcwbfwS
+        ID1h6odT+p4zx3ZLvsb27SWybStLwYEj/TH95+/z39Dx4GYFaQbLMQYHWkUZqvh1
+        1Dq4NtLlVdZwNLBTcqSi7dKkKjzdUrfGmL3x0+f+Mxgz0DAXGbXp84hqBmM/cLbr
+        rOR6MYJKjrd8TUwt96y291XiOwwCBSlFnTT8nN7nA1XSIC5p9se/f9KFAXhoCBCQ
+        22FSV3RXhNAG2d1l+nsY77pVn5OU677E+fVVo9euI5vbdRUXPL0v7smP5+wvwzwB
+        KQqRMZVgVP/OXZuX4VZvz+z17gfEB7QSDhw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id AS4qDl23XWZB for <linux-block@vger.kernel.org>;
+        Wed, 29 Mar 2023 01:56:16 -0700 (PDT)
+Received: from [10.225.163.116] (unknown [10.225.163.116])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PmgQ50xR5z1RtVm;
+        Wed, 29 Mar 2023 01:56:12 -0700 (PDT)
+Message-ID: <6fd95345-ff8d-d18e-5dcf-1f34dae31770@opensource.wdc.com>
+Date:   Wed, 29 Mar 2023 17:56:11 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1004bd4d-d74e-f1de-0e60-6532fc526c85@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v8 2/9] block: Add copy offload support infrastructure
+Content-Language: en-US
+To:     Anuj Gupta <anuj20.g@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>
+Cc:     bvanassche@acm.org, hare@suse.de, ming.lei@redhat.com,
+        joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+References: <20230327084103.21601-1-anuj20.g@samsung.com>
+ <CGME20230327084226epcas5p28e667b25cbb5e4b0e884aa2ca89cbfff@epcas5p2.samsung.com>
+ <20230327084103.21601-3-anuj20.g@samsung.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20230327084103.21601-3-anuj20.g@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 29, 2023 at 02:57:38PM +0800, Ziyang Zhang wrote:
-> On 2023/3/28 08:53, Ming Lei wrote:
-> > Hi Ziyang,
-> > 
-> > On Tue, Mar 21, 2023 at 05:17:56PM +0800, Ziyang Zhang wrote:
-> >> On 2023/3/19 00:23, Pavel Begunkov wrote:
-> >>> On 3/16/23 03:13, Xiaoguang Wang wrote:
-> >>>>> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
-> >>>>> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
-> >>>>> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
-> >>>>> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
-> >>>>> and its ->issue() can retrieve/import buffer from master request's
-> >>>>> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
-> >>>>> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
-> >>>>> submits slave OP just like normal OP issued from userspace, that said,
-> >>>>> SQE order is kept, and batching handling is done too.
-> >>>> Thanks for this great work, seems that we're now in the right direction
-> >>>> to support ublk zero copy, I believe this feature will improve io throughput
-> >>>> greatly and reduce ublk's cpu resource usage.
-> >>>>
-> >>>> I have gone through your 2th patch, and have some little concerns here:
-> >>>> Say we have one ublk loop target device, but it has 4 backend files,
-> >>>> every file will carry 25% of device capacity and it's implemented in stripped
-> >>>> way, then for every io request, current implementation will need issed 4
-> >>>> fused_cmd, right? 4 slave sqes are necessary, but it would be better to
-> >>>> have just one master sqe, so I wonder whether we can have another
-> >>>> method. The key point is to let io_uring support register various kernel
-> >>>> memory objects, which come from kernel, such as ITER_BVEC or
-> >>>> ITER_KVEC. so how about below actions:
-> >>>> 1. add a new infrastructure in io_uring, which will support to register
-> >>>> various kernel memory objects in it, this new infrastructure could be
-> >>>> maintained in a xarray structure, every memory objects in it will have
-> >>>> a unique id. This registration could be done in a ublk uring cmd, io_uring
-> >>>> offers registration interface.
-> >>>> 2. then any sqe can use these memory objects freely, so long as it
-> >>>> passes above unique id in sqe properly.
-> >>>> Above are just rough ideas, just for your reference.
-> >>>
-> >>> It precisely hints on what I proposed a bit earlier, that makes
-> >>> me not alone thinking that it's a good idea to have a design allowing
-> >>> 1) multiple ops using a buffer and 2) to limiting it to one single
-> >>> submission because the userspace might want to preprocess a part
-> >>> of the data, multiplex it or on the opposite divide. I was mostly
-> >>> coming from non ublk cases, and one example would be such zc recv,
-> >>> parsing the app level headers and redirecting the rest of the data
-> >>> somewhere.
-> >>>
-> >>> I haven't got a chance to work on it but will return to it in
-> >>> a week. The discussion was here:
-> >>>
-> >>> https://lore.kernel.org/all/ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com/
-> >>>
-> >>
-> >> Hi Pavel and all,
-> >>
-> >> I think it is a good idea to register some kernel objects(such as bvec)
-> >> in io_uring and return a cookie(such as buf_idx) for READ/WRITE/SEND/RECV sqes.
-> >> There are some ways to register user's buffer such as IORING_OP_PROVIDE_BUFFERS
-> >> and IORING_REGISTER_PBUF_RING but there is not a way to register kernel buffer(bvec).
-> >>
-> >> I do not think reusing splice is a good idea because splice should run in io-wq.
-> >> If we have a big sq depth there may be lots of io-wqs. Then lots of context switch
-> >> may lower the IO performance especially for small IO size.
-> > 
-> > Agree, not only it is hard for splice to guarantee correctness of buffer lifetime,
-> > but also it is much less efficient to support the feature in one very ugly way, not
-> > mention Linus objects to extend splice wrt. buffer direction issue, see the reasoning
-> > in my document:
-> > 
-> > https://github.com/ming1/linux/blob/my_v6.3-io_uring_fuse_cmd_v4/Documentation/block/ublk.rst#zero-copy
-> > 
-> >>
-> >> Here are some rough ideas:
-> >> (1) design a new OPCODE such as IORING_REGISTER_KOBJ to register kernel objects in
-> >>     io_uring or
-> >> (2) reuse uring-cmd. We can send uring-cmd to drivers(opcode may be CMD_REGISTER_KBUF)
-> >>     and let drivers call io_uring_provide_kbuf() to register kbuf. io_uring_provide_kbuf()
-> >>     is a new function provided by io_uring for drivers.
-> >> (3) let the driver call io_uring_provide_kbuf() directly. For ublk, this function is called
-> >>     before io_uring_cmd_done().
-> > 
-> > Can you explain a bit which use cases you are trying to address by
-> > registering kernel io buffer unmapped to userspace?
+On 3/27/23 17:40, Anuj Gupta wrote:
+> From: Nitesh Shetty <nj.shetty@samsung.com>
 > 
-> Hi Ming,
+> Introduce blkdev_issue_copy which takes similar arguments as
+> copy_file_range and performs copy offload between two bdevs.
+> Introduce REQ_COPY copy offload operation flag. Create a read-write
+> bio pair with a token as payload and submitted to the device in order.
+> Read request populates token with source specific information which
+> is then passed with write request.
+> This design is courtesy Mikulas Patocka's token based copy
 > 
-> Sorry there is no specific use case. In our product, we have to calculate cksum
-> or compress data before sending IO to remote backend. So Xiaoguang's EBPF might
-> be the final solution... :) But I'd rather to start here...
-
-If chsum calculation and compression are done in userspace, the current zero
-copy can't help you because the fused command is for sharing ublk client
-io buffer to io_uring OPs only. And userspace has to reply on data copy
-for checksum & compression.
-
-ebpf could help you, but that is still one big project, not sure if
-current prog is allowed to get kernel mapping of pages and read/write
-via the kernel mapping.
-
+> Larger copy will be divided, based on max_copy_sectors limit.
 > 
-> I think you, Pavel and I all have the same basic idea: register the kernel object
-> (bvec) first then incoming sqes can use it. But I think fused-cmd is too specific
-> (hack) to ublk so other users of io_uring may not benefit from it.
-
-fused command is actually one generic interface:
-
-1) create relationship between primary command and secondary requests,
-the current interface does support to setup 1:N relationship, and just
-needs multiple secondary reqs following the primary command. If you
-think following SQEs isn't flexible, you still can send multiple fused
-requests with same primary cmd to relax the usage of following SQEs.
-
-2) based on the above relationship, lots of thing can be done, sharing
-buffer is just one function, it could be other kind of resource sharing.
-The 'sharing' can be implemented as plugin way, such as passing
-uring_command flags for specifying which kind of plugin is used.
-
-I have re-organized code in my local repo in the above way.
-
-
-> What if we design a general way which allows io_uring to register kernel objects
-> (such as bvec) just like IORING_OP_PROVIDE_BUFFERS or IORING_REGISTER_PBUF_RING?
-> Pavel said that registration replaces fuse master cmd. And I think so too.
-
-The buffer belongs to device, not io_uring context. And the registration
-isn't necessary, and not sure it is doable:
-
-1) userspace hasn't buffer mapping, so can't use the buffer, you can't
-calculate checksum and compress data by this registration
-
-2) you just want to use the register id to build the relationship between
-primary command and secondary OPs, but fused command can do it(see above)
-because we want to solve buffer lifetime easily, fused command has same
-lifetime with the buffer reference
-
-3) not sure if the buffer registration is doable:
-
-- only 1 sqe flags is left, how to distinguish normal fixed buffer
-  with this kind of registration?
-
-- the buffer belongs to device, if you register it in userspace, you
-  have to unregister it in userspace since only userspace knows
-  when the buffer isn't needed. Then this buffer lifetime will cross
-  multiple OPs, what if the userspace is killed before unregistration.
-
-So what is your real requirement for the buffer registration? I believe
-fused command can solve requests relationship building(primary cmd vs.
-secondary requests), which seems your only concern about buffer
-registration.
-
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> ---
+>  block/blk-lib.c           | 236 ++++++++++++++++++++++++++++++++++++++
+>  block/blk.h               |   2 +
+>  include/linux/blk_types.h |  25 ++++
+>  include/linux/blkdev.h    |   3 +
+>  4 files changed, 266 insertions(+)
 > 
-> > 
-> > The buffer(request buffer, represented by bvec) are just bvecs, basically only
-> > physical pages available, and the userspace does not have mapping(virtual address)
-> > on this buffer and can't read/write the buffer, so I don't think it makes sense
-> > to register the buffer somewhere for userspace, does it?
-> 
-> The userspace does not touch these registered kernel bvecs, but reference it id.
-> For example, we can set "sqe->kobj_id" so this sqe can import this bvec as its
-> RW buffer just like IORING_OP_PROVIDE_BUFFERS.
-> 
-> There is limitation on fused-cmd: secondary sqe has to be primary+1 or be linked.
-> But with registration way we allow multiple OPs reference the kernel bvecs.
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index e59c3069e835..cbc6882d1e7a 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -115,6 +115,242 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  }
+>  EXPORT_SYMBOL(blkdev_issue_discard);
+>  
+> +/*
+> + * For synchronous copy offload/emulation, wait and process all in-flight BIOs.
+> + * This must only be called once all bios have been issued so that the refcount
+> + * can only decrease. This just waits for all bios to make it through
+> + * bio_copy_*_write_end_io. IO errors are propagated through cio->io_error.
+> + */
+> +static int cio_await_completion(struct cio *cio)
 
-The interface in V5 actually starts to supports to 1:N relation between primary cmd
-and secondary requests, but just implements 1:1 so far. It isn't hard to do 1:N.
+Why not simply cio_wait_completion() ?
 
-Actually you can reach same purpose by sending multiple fused requests with same
-primary req, and there shouldn't be performance effect since the primary command
-handling is pretty thin(passing buffer reference).
+> +{
+> +	int ret = 0;
 
-> However
-> we have to deal with buffer ownership/lifetime carefully.
+No need for the initialization.
 
-That is one fundamental problem. If buffer is allowed to cross multiple
-OPs, it can be hard to solve the lifetime issue. Not mention it is less efficient
-to add one extra buffer un-registraion in fast io path.
+> +
+> +	if (cio->endio)
+> +		return 0;
+> +
+> +	if (atomic_read(&cio->refcount)) {
+> +		__set_current_state(TASK_UNINTERRUPTIBLE);
+> +		blk_io_schedule();
+> +	}
+> +
+> +	ret = cio->comp_len;
 
-> 
-> > 
-> > That said the buffer should only be used by kernel, such as io_uring normal OPs.
-> > It is basically invisible for userspace, 
-> > 
-> > However, Xiaoguang's BPF might be one perfect supplement here[1], such as:
-> > 
-> > - add one generic io_uring BPF OP, which can run one specified registered BPF
-> > program by passing bpf_prog_id
-> > 
-> > - link this BPF OP as slave request of fused command, then the ebpf prog can do
-> > whatever on the kernel pages if kernel mapping & buffer read/write is allowed
-> > for ebpf prog, and results can be returned into user via any bpf mapping(s)
-> 
-> In Xiaoguang's ublk-EBPF design, we almost avoid userspace code/logic while
-> handling ublk io. So mix fused-cmd with ublk-EBPF may be a bad idea.
+What about cio->io_error as the top comment mentions ? Looking at struct cio,
+there is no io_error field.
 
-What I meant is to add io_uring generic ebpf OP, that isn't ublk dedicated ebpf.
+> +	kfree(cio);
+> +
+> +	return ret;
+> +}
+> +
+> +static void blk_copy_offload_write_end_io(struct bio *bio)
+> +{
+> +	struct copy_ctx *ctx = bio->bi_private;
+> +	struct cio *cio = ctx->cio;
+> +	sector_t clen;
+> +
+> +	if (bio->bi_status) {
+> +		clen = (bio->bi_iter.bi_sector << SECTOR_SHIFT) - cio->pos_out;
+> +		cio->comp_len = min_t(sector_t, clen, cio->comp_len);
 
-The generic io_uring ebpf OP is for supporting encryption, checksum, or
-simple packet parsing,  sort of thing, because the bvec buffer doesn't
-have userspace mapping, and we want to avoid to copy data to userspace for
-calculating checksum, encryption, ...
+I do not understand. You set the length only if there was an error ? What about
+the OK case ? Is this to handle partial completions ? If yes, then please add a
+comment.
 
-> 
-> > 
-> > - then userspace can decide how to handle the result from bpf mapping(s), such as,
-> > submit another fused command to handle IO with part of the kernel buffer.
-> > 
-> > Also the buffer is io buffer, and its lifetime is pretty short, and register/
-> > unregister introduces unnecessary cost in fast io path for any approach.
-> 
-> I'm not sure the io buffer has short lifetime in our product. :P In our product
-> we can first issue a very big request with a big io buffer. Then the backend
-> can parse&split it into pieces and distribute each piece to a specific socket_fd
-> representing a storage node. This big io buffer may have long lifetime.
+> +	}
+> +	__free_page(bio->bi_io_vec[0].bv_page);
+> +	bio_put(bio);
+> +
+> +	kfree(ctx);
+> +	if (atomic_dec_and_test(&cio->refcount)) {
 
-The short just means it is in fast io path, not like io_uring fixed buffer which
-needs to register just once. IO handling is really fast, otherwise it isn't necessary
-to consider zero copy at all.
+Reverse this condition and return early.
 
-So we do care performance effect from any unneccessary operation(such
-as, buffer unregistration).
+> +		if (cio->endio) {
+> +			cio->endio(cio->private, cio->comp_len);
+> +			kfree(cio);
+> +		} else
+> +			blk_wake_io_task(cio->waiter);
 
+Missing curly braces for the else.
 
-Thanks,
-Ming
+> +	}
+> +}
+> +
+> +static void blk_copy_offload_read_end_io(struct bio *read_bio)
+> +{
+> +	struct copy_ctx *ctx = read_bio->bi_private;
+> +	struct cio *cio = ctx->cio;
+> +	sector_t clen;
+> +
+> +	if (read_bio->bi_status) {
+> +		clen = (read_bio->bi_iter.bi_sector << SECTOR_SHIFT)
+> +				- cio->pos_in;
+> +		cio->comp_len = min_t(sector_t, clen, cio->comp_len);
+> +		__free_page(read_bio->bi_io_vec[0].bv_page);
+> +		bio_put(ctx->write_bio);
+> +		bio_put(read_bio);
+> +		kfree(ctx);
+> +		if (atomic_dec_and_test(&cio->refcount)) {
+> +			if (cio->endio) {
+> +				cio->endio(cio->private, cio->comp_len);
+> +				kfree(cio);
+> +			} else
+> +				blk_wake_io_task(cio->waiter);
+
+Missing curly braces for the else.
+
+> +		}
+> +		return;
+
+So you do all this only if there was an error ? What about an OK bio completion
+(bi_status == BLK_STS_OK) ?
+
+> +	}
+> +
+> +	schedule_work(&ctx->dispatch_work);
+> +	bio_put(read_bio);
+> +}
+> +
+> +static void blk_copy_dispatch_work_fn(struct work_struct *work)
+> +{
+> +	struct copy_ctx *ctx = container_of(work, struct copy_ctx,
+> +			dispatch_work);
+> +
+> +	submit_bio(ctx->write_bio);
+> +}
+> +
+> +/*
+> + * __blk_copy_offload	- Use device's native copy offload feature.
+> + * we perform copy operation by sending 2 bio.
+> + * 1. First we send a read bio with REQ_COPY flag along with a token and source
+> + * and length. Once read bio reaches driver layer, device driver adds all the
+> + * source info to token and does a fake completion.
+> + * 2. Once read operation completes, we issue write with REQ_COPY flag with same
+> + * token. In driver layer, token info is used to form a copy offload command.
+> + *
+> + * returns the length of bytes copied or negative error value
+> + */
+> +static int __blk_copy_offload(struct block_device *bdev_in, loff_t pos_in,
+> +		struct block_device *bdev_out, loff_t pos_out, size_t len,
+> +		cio_iodone_t end_io, void *private, gfp_t gfp_mask)
+> +{
+> +	struct cio *cio;
+> +	struct copy_ctx *ctx;
+> +	struct bio *read_bio, *write_bio;
+> +	struct page *token;
+> +	sector_t copy_len;
+> +	sector_t rem, max_copy_len;
+> +
+> +	cio = kzalloc(sizeof(struct cio), GFP_KERNEL);
+> +	if (!cio)
+> +		return -ENOMEM;
+> +	atomic_set(&cio->refcount, 0);
+> +	cio->waiter = current;
+> +	cio->endio = end_io;
+> +	cio->private = private;
+> +
+> +	max_copy_len = min(bdev_max_copy_sectors(bdev_in),
+> +			bdev_max_copy_sectors(bdev_out)) << SECTOR_SHIFT;
+> +
+> +	cio->pos_in = pos_in;
+> +	cio->pos_out = pos_out;
+> +	cio->comp_len = len;
+> +	for (rem = len; rem > 0; rem -= copy_len) {
+> +		copy_len = min(rem, max_copy_len);
+> +
+> +		token = alloc_page(gfp_mask);
+> +		if (unlikely(!token))
+> +			goto err_token;
+> +
+> +		ctx = kzalloc(sizeof(struct copy_ctx), gfp_mask);
+> +		if (!ctx)
+> +			goto err_ctx;
+> +		read_bio = bio_alloc(bdev_in, 1, REQ_OP_READ | REQ_COPY
+> +			| REQ_SYNC | REQ_NOMERGE, gfp_mask);
+> +		if (!read_bio)
+> +			goto err_read_bio;
+> +		write_bio = bio_alloc(bdev_out, 1, REQ_OP_WRITE
+> +			| REQ_COPY | REQ_SYNC | REQ_NOMERGE, gfp_mask);
+> +		if (!write_bio)
+> +			goto err_write_bio;
+> +
+> +		ctx->cio = cio;
+> +		ctx->write_bio = write_bio;
+> +		INIT_WORK(&ctx->dispatch_work, blk_copy_dispatch_work_fn);
+> +
+> +		__bio_add_page(read_bio, token, PAGE_SIZE, 0);
+> +		read_bio->bi_iter.bi_size = copy_len;
+> +		read_bio->bi_iter.bi_sector = pos_in >> SECTOR_SHIFT;
+> +		read_bio->bi_end_io = blk_copy_offload_read_end_io;
+> +		read_bio->bi_private = ctx;
+> +
+> +		__bio_add_page(write_bio, token, PAGE_SIZE, 0);
+> +		write_bio->bi_iter.bi_size = copy_len;
+> +		write_bio->bi_end_io = blk_copy_offload_write_end_io;
+> +		write_bio->bi_iter.bi_sector = pos_out >> SECTOR_SHIFT;
+> +		write_bio->bi_private = ctx;
+> +
+> +		atomic_inc(&cio->refcount);
+> +		submit_bio(read_bio);
+> +		pos_in += copy_len;
+> +		pos_out += copy_len;
+> +	}
+> +
+> +	/* Wait for completion of all IO's*/
+> +	return cio_await_completion(cio);
+> +
+> +err_write_bio:
+> +	bio_put(read_bio);
+> +err_read_bio:
+> +	kfree(ctx);
+> +err_ctx:
+> +	__free_page(token);
+> +err_token:
+> +	cio->comp_len = min_t(sector_t, cio->comp_len, (len - rem));
+
+Why ? cio_wait_completion() return that, no ?
+
+> +	return cio_await_completion(cio);
+> +}
+> +
+> +static inline int blk_copy_sanity_check(struct block_device *bdev_in,
+> +	loff_t pos_in, struct block_device *bdev_out, loff_t pos_out,
+> +	size_t len)
+> +{
+> +	unsigned int align = max(bdev_logical_block_size(bdev_out),
+> +					bdev_logical_block_size(bdev_in)) - 1;
+> +
+> +	if (bdev_read_only(bdev_out))
+> +		return -EPERM;
+> +
+> +	if ((pos_in & align) || (pos_out & align) || (len & align) || !len ||
+> +		len >= MAX_COPY_TOTAL_LENGTH)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static inline bool blk_check_copy_offload(struct request_queue *q_in,
+> +		struct request_queue *q_out)
+> +{
+> +	return blk_queue_copy(q_in) && blk_queue_copy(q_out);
+> +}
+
+Not a very useful helper.
+
+> +
+> +/*
+> + * @bdev_in:	source block device
+> + * @pos_in:	source offset
+> + * @bdev_out:	destination block device
+> + * @pos_out:	destination offset
+> + * @len:	length in bytes to be copied
+> + * @end_io:	end_io function to be called on completion of copy operation,
+> + *		for synchronous operation this should be NULL
+> + * @private:	end_io function will be called with this private data, should be
+> + *		NULL, if operation is synchronous in nature
+> + * @gfp_mask:   memory allocation flags (for bio_alloc)
+> + *
+> + * Returns the length of bytes copied or a negative error value
+> + *
+> + * Description:
+> + *	Copy source offset from source block device to destination block
+> + *	device. length of a source range cannot be zero. Max total length of
+> + *	copy is limited to MAX_COPY_TOTAL_LENGTH
+> + */
+> +int blkdev_issue_copy(struct block_device *bdev_in, loff_t pos_in,
+> +		      struct block_device *bdev_out, loff_t pos_out, size_t len,
+> +		      cio_iodone_t end_io, void *private, gfp_t gfp_mask)
+> +{
+> +	struct request_queue *q_in = bdev_get_queue(bdev_in);
+> +	struct request_queue *q_out = bdev_get_queue(bdev_out);
+> +	int ret = -EINVAL;
+> +
+> +	ret = blk_copy_sanity_check(bdev_in, pos_in, bdev_out, pos_out, len);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (blk_check_copy_offload(q_in, q_out))
+> +		ret = __blk_copy_offload(bdev_in, pos_in, bdev_out, pos_out,
+> +			   len, end_io, private, gfp_mask);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(blkdev_issue_copy);
+> +
+>  static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>  		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+>  		struct bio **biop, unsigned flags)
+> diff --git a/block/blk.h b/block/blk.h
+> index d65d96994a94..684b8fa121db 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -311,6 +311,8 @@ static inline bool bio_may_exceed_limits(struct bio *bio,
+>  		break;
+>  	}
+>  
+> +	if (unlikely(op_is_copy(bio->bi_opf)))
+> +		return false;
+>  	/*
+>  	 * All drivers must accept single-segments bios that are <= PAGE_SIZE.
+>  	 * This is a quick and dirty check that relies on the fact that
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index a0e339ff3d09..7f586c4b9954 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -423,6 +423,7 @@ enum req_flag_bits {
+>  	 */
+>  	/* for REQ_OP_WRITE_ZEROES: */
+>  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+> +	__REQ_COPY,		/* copy request */
+>  
+>  	__REQ_NR_BITS,		/* stops here */
+>  };
+> @@ -452,6 +453,7 @@ enum req_flag_bits {
+>  
+>  #define REQ_DRV		(__force blk_opf_t)(1ULL << __REQ_DRV)
+>  #define REQ_SWAP	(__force blk_opf_t)(1ULL << __REQ_SWAP)
+> +#define REQ_COPY	((__force blk_opf_t)(1ULL << __REQ_COPY))
+>  
+>  #define REQ_FAILFAST_MASK \
+>  	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+> @@ -478,6 +480,11 @@ static inline bool op_is_write(blk_opf_t op)
+>  	return !!(op & (__force blk_opf_t)1);
+>  }
+>  
+> +static inline bool op_is_copy(blk_opf_t op)
+> +{
+> +	return (op & REQ_COPY);
+
+No need for the parenthesis.
+
+> +}
+> +
+>  /*
+>   * Check if the bio or request is one that needs special treatment in the
+>   * flush state machine.
+> @@ -537,4 +544,22 @@ struct blk_rq_stat {
+>  	u64 batch;
+>  };
+>  
+> +typedef void (cio_iodone_t)(void *private, int comp_len);
+
+Not really needed I think.
+
+> +
+> +struct cio {
+> +	struct task_struct *waiter;     /* waiting task (NULL if none) */
+> +	atomic_t refcount;
+> +	loff_t pos_in;
+> +	loff_t pos_out;
+> +	size_t comp_len;
+> +	cio_iodone_t *endio;		/* applicable for async operation */
+> +	void *private;			/* applicable for async operation */
+> +};
+> +
+> +struct copy_ctx {
+> +	struct cio *cio;
+> +	struct work_struct dispatch_work;
+> +	struct bio *write_bio;
+> +};
+> +
+>  #endif /* __LINUX_BLK_TYPES_H */
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 200338f2ec2e..1bb43697d43d 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1054,6 +1054,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop);
+>  int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
+>  		sector_t nr_sects, gfp_t gfp);
+> +int blkdev_issue_copy(struct block_device *bdev_in, loff_t pos_in,
+> +		      struct block_device *bdev_out, loff_t pos_out, size_t len,
+> +		      cio_iodone_t end_io, void *private, gfp_t gfp_mask);
+>  
+>  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
+>  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
+
+-- 
+Damien Le Moal
+Western Digital Research
 
