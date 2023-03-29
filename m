@@ -2,87 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E9AC77B61
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 14:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAB9C6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 14:23:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230332AbjC2OQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 10:16:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53234 "EHLO
+        id S231234AbjC2OXc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 10:23:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230412AbjC2OQl (ORCPT
+        with ESMTP id S231238AbjC2OVp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 10:16:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D5359DD
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 07:15:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 29 Mar 2023 10:21:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5242F6592
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 07:16:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680099381;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZJvfcCj7beM2l3aL2q8ZqMjrzC72DifYH9bqCAjpsUU=;
+        b=RYyVFfzJCAUQ+JS2lsDClZWDzmOl8wnGfISjdNNA9QMqZZsVBp69tGp6rS2z9x6QBt6tNp
+        c3pXX7zIgKIHU+5lfLTZjx/NI3YLp48TPvxK43Y3hyjjTERhTl4PfidPAoZqGDmfHKQeb8
+        IT6+fxaqWivawkmhZYVKoFzbYL6Sv0s=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-478-i-sNnR3eM--eeVz7bh3LKA-1; Wed, 29 Mar 2023 10:16:17 -0400
+X-MC-Unique: i-sNnR3eM--eeVz7bh3LKA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AD57C61D4F
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 14:15:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E43FC4339C;
-        Wed, 29 Mar 2023 14:15:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680099344;
-        bh=rEWEhDShqg7d5LUQrwZW5nc+7s7+ICat6EtlrOjs+lY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vP033oWrjHp+YR2pxJd7vVcE+g2YikCzJ9eA+oWtEzptWZuT3M9b8+XxCupWQG4lZ
-         pCc/cnvxye2InXK26YkOXNgT2zL2evU14kfzexRbRncERAUFxO/qEsEYmHdN9JDGde
-         6HT3r1w4bXiXSWEi+s8vp0VCPETsTm7vLbVnh36qzHRW3t1v8DIjPzLpL4qmvv4oaR
-         /f4NQVYU3t96B4ztnhRnLNY9KzuFG69z8dPhWCs+eyAaBHHHnb+MJ//QLNLmnTdPcF
-         hF6xDLHu3ClMs8A4maapCy3LhB6rQ2lbB2xB7PswYTjLInr47W8c7dr7UJQ+d5K9mp
-         frfSnBus1GRPQ==
-Date:   Wed, 29 Mar 2023 16:15:35 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Ondrej Kozina <okozina@redhat.com>
-Cc:     linux-block@vger.kernel.org, bluca@debian.org, gmazyland@gmail.com,
-        axboe@kernel.dk, hch@infradead.org, rafael.antognolli@intel.com
-Subject: Re: [PATCH 1/5] sed-opal: do not add user authority twice in boolean
- ace.
-Message-ID: <20230329-amendment-trodden-75a619120b5e@brauner>
-References: <20230322151604.401680-1-okozina@redhat.com>
- <20230322151604.401680-2-okozina@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 241CE185A790;
+        Wed, 29 Mar 2023 14:16:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A585114171BC;
+        Wed, 29 Mar 2023 14:16:05 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Matthew Wilcox <willy@infradead.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
+        Christian Brauner <brauner@kernel.org>,
+        Chuck Lever III <chuck.lever@oracle.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org
+Subject: [RFC PATCH v2 46/48] drbd: Use sendmsg(MSG_SPLICE_PAGES) rather than sendmsg()
+Date:   Wed, 29 Mar 2023 15:13:52 +0100
+Message-Id: <20230329141354.516864-47-dhowells@redhat.com>
+In-Reply-To: <20230329141354.516864-1-dhowells@redhat.com>
+References: <20230329141354.516864-1-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230322151604.401680-2-okozina@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 22, 2023 at 04:16:00PM +0100, Ondrej Kozina wrote:
-> While adding user authority in boolean ace value
-> of uid OPAL_LOCKINGRANGE_ACE_WRLOCKED or
-> OPAL_LOCKINGRANGE_ACE_RDLOCKED, it was added twice.
-> 
-> Signed-off-by: Ondrej Kozina <okozina@redhat.com>
-> Tested-by: Luca Boccassi <bluca@debian.org>
-> Tested-by: Milan Broz <gmazyland@gmail.com>
-> ---
->  block/sed-opal.c | 16 ----------------
->  1 file changed, 16 deletions(-)
-> 
-> diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index c320093c14f1..d86d3e5f5a44 100644
-> --- a/block/sed-opal.c
-> +++ b/block/sed-opal.c
-> @@ -1798,22 +1798,6 @@ static int add_user_to_lr(struct opal_dev *dev, void *data)
->  	add_token_bytestring(&err, dev, user_uid, OPAL_UID_LENGTH);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
->  
-> -
-> -	add_token_u8(&err, dev, OPAL_STARTNAME);
-> -	add_token_bytestring(&err, dev,
-> -			     opaluid[OPAL_HALF_UID_AUTHORITY_OBJ_REF],
-> -			     OPAL_UID_LENGTH/2);
-> -	add_token_bytestring(&err, dev, user_uid, OPAL_UID_LENGTH);
-> -	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -
-> -
-> -	add_token_u8(&err, dev, OPAL_STARTNAME);
-> -	add_token_bytestring(&err, dev, opaluid[OPAL_HALF_UID_BOOLEAN_ACE],
+Use sendmsg() conditionally with MSG_SPLICE_PAGES in _drbd_send_page()
+rather than calling sendpage() or _drbd_no_send_page().
 
-This index only appears one time in the code. IOW, you're completely
-removing OPAL_HALF_UID_BOOLEAN_ACE leavig only
-OPAL_HALF_UID_AUTHORITY_OBJ_REF. Is that intended and if so why is
-OPAL_HALF_UID_BOOLEAN_ACE not needed anymore?
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Philipp Reisner <philipp.reisner@linbit.com>
+cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: drbd-dev@lists.linbit.com
+cc: linux-block@vger.kernel.org
+cc: netdev@vger.kernel.org
+---
+ drivers/block/drbd/drbd_main.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 2c764f7ee4a7..e5f90abd29b6 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -1532,7 +1532,8 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
+ 		    int offset, size_t size, unsigned msg_flags)
+ {
+ 	struct socket *socket = peer_device->connection->data.socket;
+-	int len = size;
++	struct bio_vec bvec;
++	struct msghdr msg = { .msg_flags = msg_flags, };
+ 	int err = -EIO;
+ 
+ 	/* e.g. XFS meta- & log-data is in slab pages, which have a
+@@ -1541,33 +1542,33 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
+ 	 * put_page(); and would cause either a VM_BUG directly, or
+ 	 * __page_cache_release a page that would actually still be referenced
+ 	 * by someone, leading to some obscure delayed Oops somewhere else. */
+-	if (drbd_disable_sendpage || !sendpage_ok(page))
+-		return _drbd_no_send_page(peer_device, page, offset, size, msg_flags);
++	if (!drbd_disable_sendpage && sendpage_ok(page))
++		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
++
++	bvec_set_page(&bvec, page, offset, size);
++	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
+ 
+-	msg_flags |= MSG_NOSIGNAL;
+ 	drbd_update_congested(peer_device->connection);
+ 	do {
+ 		int sent;
+ 
+-		sent = socket->ops->sendpage(socket, page, offset, len, msg_flags);
++		sent = sock_sendmsg(socket, &msg);
+ 		if (sent <= 0) {
+ 			if (sent == -EAGAIN) {
+ 				if (we_should_drop_the_connection(peer_device->connection, socket))
+ 					break;
+ 				continue;
+ 			}
+-			drbd_warn(peer_device->device, "%s: size=%d len=%d sent=%d\n",
+-			     __func__, (int)size, len, sent);
++			drbd_warn(peer_device->device, "%s: size=%d len=%zu sent=%d\n",
++				  __func__, (int)size, msg_data_left(&msg), sent);
+ 			if (sent < 0)
+ 				err = sent;
+ 			break;
+ 		}
+-		len    -= sent;
+-		offset += sent;
+-	} while (len > 0 /* THINK && device->cstate >= C_CONNECTED*/);
++	} while (msg_data_left(&msg) /* THINK && device->cstate >= C_CONNECTED*/);
+ 	clear_bit(NET_CONGESTED, &peer_device->connection->flags);
+ 
+-	if (len == 0) {
++	if (!msg_data_left(&msg)) {
+ 		err = 0;
+ 		peer_device->device->send_cnt += size >> 9;
+ 	}
+
