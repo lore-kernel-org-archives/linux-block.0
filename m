@@ -2,193 +2,291 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C29C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 08:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91898C6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 08:53:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230107AbjC2IrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 04:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34768 "EHLO
+        id S231310AbjC2Ixo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 04:53:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230489AbjC2IrG (ORCPT
+        with ESMTP id S231351AbjC2Ixg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 04:47:06 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68DC170F
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:47:03 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230329084702epoutp04fc16fe52868b5e310dfd35d4bc678702~Q14PP2qnY1706317063epoutp04l
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 08:47:02 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230329084702epoutp04fc16fe52868b5e310dfd35d4bc678702~Q14PP2qnY1706317063epoutp04l
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1680079622;
-        bh=9eo0FIiSOetMqwE+9U2Ie9WW1i1bTo1eRTvTmsbECTY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JUn0vJgg1NnZJbIqC8Tw41t+c1Gu80dx3ny/JAZQpN6ca961H1EODhSbAZGdGKGet
-         B4TV9EeL2y9DuoxtBjzjdeEkKmSoYdV1SPnvHlsrubtNNjoJYP9oqLgqq+dBQ1VLbf
-         w8WN0YNORoBRHEPZCY+5PvM3pSMtTc87PdqNVHhg=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20230329084701epcas5p474b0aacf4f28606d1d70f5ae48dd8fa7~Q14O2Rm4_2290122901epcas5p44;
-        Wed, 29 Mar 2023 08:47:01 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.180]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4PmgCS3b5Nz4x9Q2; Wed, 29 Mar
-        2023 08:47:00 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        04.50.55678.40BF3246; Wed, 29 Mar 2023 17:47:00 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20230329084659epcas5p3bfde5f30962dd3f30f4e401967c0cd76~Q14NA-W431743817438epcas5p33;
-        Wed, 29 Mar 2023 08:46:59 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230329084659epsmtrp2bffb7b40d540a4d51a862b3de0f12a3c~Q14NAVkbB1583215832epsmtrp2j;
-        Wed, 29 Mar 2023 08:46:59 +0000 (GMT)
-X-AuditID: b6c32a4a-909fc7000000d97e-b7-6423fb04c4a3
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        CC.BC.31821.30BF3246; Wed, 29 Mar 2023 17:46:59 +0900 (KST)
-Received: from green5 (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230329084658epsmtip2b470edcbb08adcfa49d1c260c51b11e8~Q14L3FdDS1143311433epsmtip2g;
-        Wed, 29 Mar 2023 08:46:58 +0000 (GMT)
-Date:   Wed, 29 Mar 2023 14:16:18 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Kanchan Joshi <joshiiitr@gmail.com>, Keith Busch <kbusch@meta.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        axboe@kernel.dk, hch@lst.de
-Subject: Re: [PATCH 2/2] nvme: use blk-mq polling for uring commands
-Message-ID: <20230329084618.GB2800@green5>
+        Wed, 29 Mar 2023 04:53:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7184A3A85
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:52:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680079951;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GaNT2Og1QOD5grKCAXED7/s8sdTatYwvipTFRccPuKo=;
+        b=EcOOM9LcgijufdW13Z5zxpNHMYBnLPx7SudcRN/IehN8DAX3UwlxEiI8GZ/iWAJIFpVWnw
+        lBOU3FoyW5KDr6hVO6oLINn7MIhDkCLinmj4T877WYYW+HSssIAqc334MTLROoYw3yv732
+        Y03jGafoCB6nEJCrbc1I+eARUMFx4cQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-652-_YcrxN-_MXmPumzneapgwQ-1; Wed, 29 Mar 2023 04:52:29 -0400
+X-MC-Unique: _YcrxN-_MXmPumzneapgwQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F03DA101A550;
+        Wed, 29 Mar 2023 08:52:28 +0000 (UTC)
+Received: from ovpn-8-26.pek2.redhat.com (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F043918EC2;
+        Wed, 29 Mar 2023 08:52:22 +0000 (UTC)
+Date:   Wed, 29 Mar 2023 16:52:16 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: [PATCH V3 00/16] io_uring/ublk: add IORING_OP_FUSED_CMD
+Message-ID: <ZCP8QEBC8cL5CKa8@ovpn-8-26.pek2.redhat.com>
+References: <20230314125727.1731233-1-ming.lei@redhat.com>
+ <fd30b561-86dd-5061-714f-e46058f7079f@linux.alibaba.com>
+ <845ff5cb-b0ff-8ea0-e2ff-a5b216966dfb@gmail.com>
+ <ded5b188-0bcd-3003-353e-b31608e58be4@linux.alibaba.com>
+ <ZCI6ifwZwwaM6TFw@ovpn-8-20.pek2.redhat.com>
+ <1004bd4d-d74e-f1de-0e60-6532fc526c85@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <ZCL/RTHoflUVCMyw@kbusch-mbp.dhcp.thefacebook.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrAJsWRmVeSWpSXmKPExsWy7bCmhi7Lb+UUgyePpC1W3+1ns1i5+iiT
-        xfm3h5ksJh26xmhx5upCFou9t7Qt5i97yu7A7rFz1l12j8tnSz02repk89i8pN5j980GNo9z
-        Fys8Pm+SC2CPyrbJSE1MSS1SSM1Lzk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQ
-        dcvMATpGSaEsMacUKBSQWFyspG9nU5RfWpKqkJFfXGKrlFqQklNgUqBXnJhbXJqXrpeXWmJl
-        aGBgZApUmJCd8XzFb6aCS9IV91d+Ymxg7BDrYuTkkBAwkdi0bB1TFyMXh5DAbkaJCXv72SGc
-        T4wSjz+8ZQWpEhL4zCgx8UsxTMfOzq+sEEW7GCW+72iEcp4wSrQ+nsgCUsUioCrR+XYpWxcj
-        BwebgKbEhcmlIGERAWWJu/Nngg1lFljCKDFnTiqILSzgIrHuyAawOK+AlsSiwxcZIWxBiZMz
-        n4CN5BSwl1j24ABYXBRozoFtx8HOlhCYyiExffpJFojrXCQu3e1igrCFJV4d38IOYUtJfH63
-        lw3CTpa4NPMcVE2JxOM9B6Fse4nWU/3MEMdlSnTffcsCYfNJ9P5+wgTyi4QAr0RHmxBEuaLE
-        vUlPWSFscYmHM5ZA2R4Ss1/sYYaEyV1midZVh1kmMMrNQvLPLCQrIGwric4PTawQtrxE89bZ
-        zLOA1jELSEss/8cBYWpKrN+lv4CRbRWjZGpBcW56arFpgVFeajk8vpPzczcxgpOqltcOxocP
-        PugdYmTiYDzEKMHBrCTC+/uaUooQb0piZVVqUX58UWlOavEhRlNgVE1klhJNzgem9bySeEMT
-        SwMTMzMzE0tjM0MlcV5125PJQgLpiSWp2ampBalFMH1MHJxSDUxRmonXNzfyTdV2i663NVz/
-        /1Zhdvndj3mPJ+xZ73Lq0oFUqbhH3qk2JpeNk79FiwlJrsluMN41b9luZWangnXqOu+2MfiL
-        z63pCamZ5R//Wm/7Rwuz/1ofF38/zqzW6Md2S27Gd5/4x54MWkf3s66YxvXulNjMlAXbMmyr
-        PlhJHprgnL/ZMcHrafPO1l7+jff9VEWOWFXfW5YIVO7KIS3XZnlLke+i2id3Z7nlk+Ta25vK
-        +p5LvVLR2zQlWvFW9P65fV+3/52Y3SE7QXPJl4P7jaQNqqyObTZguKxivuuj1tRtMofELPfX
-        fGq8L/3rwVuNcr6SIz+3/ZG7WppQt3Na3bYpJ58znwoOO2+lpsRSnJFoqMVcVJwIAJ4pmB4z
-        BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNLMWRmVeSWpSXmKPExsWy7bCSvC7zb+UUg9sT1SxW3+1ns1i5+iiT
-        xfm3h5ksJh26xmhx5upCFou9t7Qt5i97yu7A7rFz1l12j8tnSz02repk89i8pN5j980GNo9z
-        Fys8Pm+SC2CP4rJJSc3JLEst0rdL4Mpo3/KcueCBRMXWt9/YGhg3C3cxcnJICJhI7Oz8ytrF
-        yMUhJLCDUaLt2mImiIS4RPO1H+wQtrDEyn/P2SGKHjFK7Dm/lBkkwSKgKtH5dilbFyMHB5uA
-        psSFyaUgYREBZYm782eygtjMAksYJebMSQWxhQVcJNYd2QAW5xXQklh0+CIjxMz7zBInWv4z
-        QiQEJU7OfMIC0WwmMW/zQ2aQ+cwC0hLL/3FAhOUlmrfOBjuBU8BeYtmDA2CtokB7D2w7zjSB
-        UWgWkkmzkEyahTBpFpJJCxhZVjFKphYU56bnFhsWGOWllusVJ+YWl+al6yXn525iBMePltYO
-        xj2rPugdYmTiYDzEKMHBrCTC+/uaUooQb0piZVVqUX58UWlOavEhRmkOFiVx3gtdJ+OFBNIT
-        S1KzU1MLUotgskwcnFINTAzcH3hKtyt4uH5fI2Q8q+XZPTsvjenqMg+jg0wuHnD8y2Th+559
-        0b6klb6Lvkd4r5xmIFNruOrygtjimlk+56xaHube4A7z3Okx8+2iGZU+fTJsoasfHPHSmuFg
-        sVr9NBe7y44FE2Wz5saGsKcumFF34fbZyN1yrTmu0vwOEpNVyyo0pOYpStXHn9Jw7XZ+tc1w
-        exBjYnH59hY+y+Mzbtybuf1p1+KFFod5I1utZ3Un1Ztdlpnzrn1a753q7Df5Ih6Z6pybtm0V
-        eip4vPWNmsrqfRvm8FzdWXJ3i3blU1Ex7o6CiO3/Nlr88OxwcQ3bkz0h+Muv7Vv6rPTu1W8T
-        tHQ4JHMt5/X3j4Iq1QE7lViKMxINtZiLihMBqIAl0Q4DAAA=
-X-CMS-MailID: 20230329084659epcas5p3bfde5f30962dd3f30f4e401967c0cd76
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----KShBqqPo14.eBT3ESqKA1JUVW8Pp5OSRF8p2BdrChsSVkVya=_117d1b_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230324213124epcas5p331ea3c2e2a05ec6a6825e719e47d2427
-References: <20230324212803.1837554-1-kbusch@meta.com>
-        <CGME20230324213124epcas5p331ea3c2e2a05ec6a6825e719e47d2427@epcas5p3.samsung.com>
-        <20230324212803.1837554-2-kbusch@meta.com> <20230327135810.GA8405@green5>
-        <ZCG0O6RdlA/sUd7C@kbusch-mbp.dhcp.thefacebook.com>
-        <CA+1E3rK2h9gyy26v1NmwTFtUsCwMkc1DgkDsCFME+HjZJPn5Hg@mail.gmail.com>
-        <ZCI5XopTr7nJvVF1@kbusch-mbp.dhcp.thefacebook.com>
-        <20230328074939.GA2800@green5>
-        <ZCL/RTHoflUVCMyw@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1004bd4d-d74e-f1de-0e60-6532fc526c85@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------KShBqqPo14.eBT3ESqKA1JUVW8Pp5OSRF8p2BdrChsSVkVya=_117d1b_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
+On Wed, Mar 29, 2023 at 02:57:38PM +0800, Ziyang Zhang wrote:
+> On 2023/3/28 08:53, Ming Lei wrote:
+> > Hi Ziyang,
+> > 
+> > On Tue, Mar 21, 2023 at 05:17:56PM +0800, Ziyang Zhang wrote:
+> >> On 2023/3/19 00:23, Pavel Begunkov wrote:
+> >>> On 3/16/23 03:13, Xiaoguang Wang wrote:
+> >>>>> Add IORING_OP_FUSED_CMD, it is one special URING_CMD, which has to
+> >>>>> be SQE128. The 1st SQE(master) is one 64byte URING_CMD, and the 2nd
+> >>>>> 64byte SQE(slave) is another normal 64byte OP. For any OP which needs
+> >>>>> to support slave OP, io_issue_defs[op].fused_slave needs to be set as 1,
+> >>>>> and its ->issue() can retrieve/import buffer from master request's
+> >>>>> fused_cmd_kbuf. The slave OP is actually submitted from kernel, part of
+> >>>>> this idea is from Xiaoguang's ublk ebpf patchset, but this patchset
+> >>>>> submits slave OP just like normal OP issued from userspace, that said,
+> >>>>> SQE order is kept, and batching handling is done too.
+> >>>> Thanks for this great work, seems that we're now in the right direction
+> >>>> to support ublk zero copy, I believe this feature will improve io throughput
+> >>>> greatly and reduce ublk's cpu resource usage.
+> >>>>
+> >>>> I have gone through your 2th patch, and have some little concerns here:
+> >>>> Say we have one ublk loop target device, but it has 4 backend files,
+> >>>> every file will carry 25% of device capacity and it's implemented in stripped
+> >>>> way, then for every io request, current implementation will need issed 4
+> >>>> fused_cmd, right? 4 slave sqes are necessary, but it would be better to
+> >>>> have just one master sqe, so I wonder whether we can have another
+> >>>> method. The key point is to let io_uring support register various kernel
+> >>>> memory objects, which come from kernel, such as ITER_BVEC or
+> >>>> ITER_KVEC. so how about below actions:
+> >>>> 1. add a new infrastructure in io_uring, which will support to register
+> >>>> various kernel memory objects in it, this new infrastructure could be
+> >>>> maintained in a xarray structure, every memory objects in it will have
+> >>>> a unique id. This registration could be done in a ublk uring cmd, io_uring
+> >>>> offers registration interface.
+> >>>> 2. then any sqe can use these memory objects freely, so long as it
+> >>>> passes above unique id in sqe properly.
+> >>>> Above are just rough ideas, just for your reference.
+> >>>
+> >>> It precisely hints on what I proposed a bit earlier, that makes
+> >>> me not alone thinking that it's a good idea to have a design allowing
+> >>> 1) multiple ops using a buffer and 2) to limiting it to one single
+> >>> submission because the userspace might want to preprocess a part
+> >>> of the data, multiplex it or on the opposite divide. I was mostly
+> >>> coming from non ublk cases, and one example would be such zc recv,
+> >>> parsing the app level headers and redirecting the rest of the data
+> >>> somewhere.
+> >>>
+> >>> I haven't got a chance to work on it but will return to it in
+> >>> a week. The discussion was here:
+> >>>
+> >>> https://lore.kernel.org/all/ce96f7e7-1315-7154-f540-1a3ff0215674@gmail.com/
+> >>>
+> >>
+> >> Hi Pavel and all,
+> >>
+> >> I think it is a good idea to register some kernel objects(such as bvec)
+> >> in io_uring and return a cookie(such as buf_idx) for READ/WRITE/SEND/RECV sqes.
+> >> There are some ways to register user's buffer such as IORING_OP_PROVIDE_BUFFERS
+> >> and IORING_REGISTER_PBUF_RING but there is not a way to register kernel buffer(bvec).
+> >>
+> >> I do not think reusing splice is a good idea because splice should run in io-wq.
+> >> If we have a big sq depth there may be lots of io-wqs. Then lots of context switch
+> >> may lower the IO performance especially for small IO size.
+> > 
+> > Agree, not only it is hard for splice to guarantee correctness of buffer lifetime,
+> > but also it is much less efficient to support the feature in one very ugly way, not
+> > mention Linus objects to extend splice wrt. buffer direction issue, see the reasoning
+> > in my document:
+> > 
+> > https://github.com/ming1/linux/blob/my_v6.3-io_uring_fuse_cmd_v4/Documentation/block/ublk.rst#zero-copy
+> > 
+> >>
+> >> Here are some rough ideas:
+> >> (1) design a new OPCODE such as IORING_REGISTER_KOBJ to register kernel objects in
+> >>     io_uring or
+> >> (2) reuse uring-cmd. We can send uring-cmd to drivers(opcode may be CMD_REGISTER_KBUF)
+> >>     and let drivers call io_uring_provide_kbuf() to register kbuf. io_uring_provide_kbuf()
+> >>     is a new function provided by io_uring for drivers.
+> >> (3) let the driver call io_uring_provide_kbuf() directly. For ublk, this function is called
+> >>     before io_uring_cmd_done().
+> > 
+> > Can you explain a bit which use cases you are trying to address by
+> > registering kernel io buffer unmapped to userspace?
+> 
+> Hi Ming,
+> 
+> Sorry there is no specific use case. In our product, we have to calculate cksum
+> or compress data before sending IO to remote backend. So Xiaoguang's EBPF might
+> be the final solution... :) But I'd rather to start here...
 
-On Tue, Mar 28, 2023 at 08:52:53AM -0600, Keith Busch wrote:
->On Tue, Mar 28, 2023 at 01:19:39PM +0530, Kanchan Joshi wrote:
->> On Mon, Mar 27, 2023 at 06:48:30PM -0600, Keith Busch wrote:
->> > On Mon, Mar 27, 2023 at 10:50:47PM +0530, Kanchan Joshi wrote:
->> > > On Mon, Mar 27, 2023 at 8:59 PM Keith Busch <kbusch@kernel.org> wrote:
->> > > > > >     rcu_read_lock();
->> > > > > > -   bio = READ_ONCE(ioucmd->cookie);
->> > > > > > -   ns = container_of(file_inode(ioucmd->file)->i_cdev,
->> > > > > > -                   struct nvme_ns, cdev);
->> > > > > > -   q = ns->queue;
->> > > > > > -   if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio && bio->bi_bdev)
->> > > > > > -           ret = bio_poll(bio, iob, poll_flags);
->> > > > > > +   req = READ_ONCE(ioucmd->cookie);
->> > > > > > +   if (req) {
->> > > > >
->> > > > > This is risky. We are not sure if the cookie is actually "req" at this
->> > > > > moment.
->> > > >
->> > > > What else could it be? It's either a real request from a polled hctx tag, or
->> > > > NULL at this point.
->> > >
->> > > It can also be a function pointer that gets assigned on irq-driven completion.
->> > > See the "struct io_uring_cmd" - we are tight on cacheline, so cookie
->> > > and task_work_cb share the storage.
->> > >
->> > > > It's safe to check the cookie like this and rely on its contents.
->> > > Hence not safe. Please try running this without poll-queues (at nvme
->> > > level), you'll see failures.
->> >
->> > Okay, you have a iouring polling instance used with a file that has poll
->> > capabilities, but doesn't have any polling hctx's. It would be nice to exclude
->> > these from io_uring's polling since they're wasting CPU time, but that doesn't
->> > look easily done.
->>
->> Do you mean having the ring with IOPOLL set, and yet skip the attempt of
->> actively reaping the completion for certain IOs?
->
->Yes, exactly. It'd be great if non-polled requests don't get added to the
->ctx->iopoll_list in the first place.
->
->> > This simple patch atop should work though.
->> >
->> > ---
->> > diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
->> > index 369e8519b87a2..e3ff019404816 100644
->> > --- a/drivers/nvme/host/ioctl.c
->> > +++ b/drivers/nvme/host/ioctl.c
->> > @@ -612,6 +612,8 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
->> >
->> > 	if (blk_rq_is_poll(req))
->> > 		WRITE_ONCE(ioucmd->cookie, req);
->> > +	else if (issue_flags & IO_URING_F_IOPOLL)
->> > +		ioucmd->flags |= IORING_URING_CMD_NOPOLL;
->>
->> If IO_URING_F_IOPOLL would have come here as part of "ioucmd->flags", we
->> could have just cleared that here. That would avoid the need of NOPOLL flag.
->> That said, I don't feel strongly about new flag too. You decide.
->
->IO_URING_F_IOPOLL, while named in an enum that sounds suspiciouly like it is
->part of ioucmd->flags, is actually ctx flags, so a little confusing. And we
->need to be a litle careful here: the existing ioucmd->flags is used with uapi
->flags.
+If chsum calculation and compression are done in userspace, the current zero
+copy can't help you because the fused command is for sharing ublk client
+io buffer to io_uring OPs only. And userspace has to reply on data copy
+for checksum & compression.
 
-Indeed. If this is getting crufty, series can just enable polling on
-no-payload requests. Reducing nvme handlers - for another day.
+ebpf could help you, but that is still one big project, not sure if
+current prog is allowed to get kernel mapping of pages and read/write
+via the kernel mapping.
 
-------KShBqqPo14.eBT3ESqKA1JUVW8Pp5OSRF8p2BdrChsSVkVya=_117d1b_
-Content-Type: text/plain; charset="utf-8"
+> 
+> I think you, Pavel and I all have the same basic idea: register the kernel object
+> (bvec) first then incoming sqes can use it. But I think fused-cmd is too specific
+> (hack) to ublk so other users of io_uring may not benefit from it.
+
+fused command is actually one generic interface:
+
+1) create relationship between primary command and secondary requests,
+the current interface does support to setup 1:N relationship, and just
+needs multiple secondary reqs following the primary command. If you
+think following SQEs isn't flexible, you still can send multiple fused
+requests with same primary cmd to relax the usage of following SQEs.
+
+2) based on the above relationship, lots of thing can be done, sharing
+buffer is just one function, it could be other kind of resource sharing.
+The 'sharing' can be implemented as plugin way, such as passing
+uring_command flags for specifying which kind of plugin is used.
+
+I have re-organized code in my local repo in the above way.
 
 
-------KShBqqPo14.eBT3ESqKA1JUVW8Pp5OSRF8p2BdrChsSVkVya=_117d1b_--
+> What if we design a general way which allows io_uring to register kernel objects
+> (such as bvec) just like IORING_OP_PROVIDE_BUFFERS or IORING_REGISTER_PBUF_RING?
+> Pavel said that registration replaces fuse master cmd. And I think so too.
+
+The buffer belongs to device, not io_uring context. And the registration
+isn't necessary, and not sure it is doable:
+
+1) userspace hasn't buffer mapping, so can't use the buffer, you can't
+calculate checksum and compress data by this registration
+
+2) you just want to use the register id to build the relationship between
+primary command and secondary OPs, but fused command can do it(see above)
+because we want to solve buffer lifetime easily, fused command has same
+lifetime with the buffer reference
+
+3) not sure if the buffer registration is doable:
+
+- only 1 sqe flags is left, how to distinguish normal fixed buffer
+  with this kind of registration?
+
+- the buffer belongs to device, if you register it in userspace, you
+  have to unregister it in userspace since only userspace knows
+  when the buffer isn't needed. Then this buffer lifetime will cross
+  multiple OPs, what if the userspace is killed before unregistration.
+
+So what is your real requirement for the buffer registration? I believe
+fused command can solve requests relationship building(primary cmd vs.
+secondary requests), which seems your only concern about buffer
+registration.
+
+> 
+> > 
+> > The buffer(request buffer, represented by bvec) are just bvecs, basically only
+> > physical pages available, and the userspace does not have mapping(virtual address)
+> > on this buffer and can't read/write the buffer, so I don't think it makes sense
+> > to register the buffer somewhere for userspace, does it?
+> 
+> The userspace does not touch these registered kernel bvecs, but reference it id.
+> For example, we can set "sqe->kobj_id" so this sqe can import this bvec as its
+> RW buffer just like IORING_OP_PROVIDE_BUFFERS.
+> 
+> There is limitation on fused-cmd: secondary sqe has to be primary+1 or be linked.
+> But with registration way we allow multiple OPs reference the kernel bvecs.
+
+The interface in V5 actually starts to supports to 1:N relation between primary cmd
+and secondary requests, but just implements 1:1 so far. It isn't hard to do 1:N.
+
+Actually you can reach same purpose by sending multiple fused requests with same
+primary req, and there shouldn't be performance effect since the primary command
+handling is pretty thin(passing buffer reference).
+
+> However
+> we have to deal with buffer ownership/lifetime carefully.
+
+That is one fundamental problem. If buffer is allowed to cross multiple
+OPs, it can be hard to solve the lifetime issue. Not mention it is less efficient
+to add one extra buffer un-registraion in fast io path.
+
+> 
+> > 
+> > That said the buffer should only be used by kernel, such as io_uring normal OPs.
+> > It is basically invisible for userspace, 
+> > 
+> > However, Xiaoguang's BPF might be one perfect supplement here[1], such as:
+> > 
+> > - add one generic io_uring BPF OP, which can run one specified registered BPF
+> > program by passing bpf_prog_id
+> > 
+> > - link this BPF OP as slave request of fused command, then the ebpf prog can do
+> > whatever on the kernel pages if kernel mapping & buffer read/write is allowed
+> > for ebpf prog, and results can be returned into user via any bpf mapping(s)
+> 
+> In Xiaoguang's ublk-EBPF design, we almost avoid userspace code/logic while
+> handling ublk io. So mix fused-cmd with ublk-EBPF may be a bad idea.
+
+What I meant is to add io_uring generic ebpf OP, that isn't ublk dedicated ebpf.
+
+The generic io_uring ebpf OP is for supporting encryption, checksum, or
+simple packet parsing,  sort of thing, because the bvec buffer doesn't
+have userspace mapping, and we want to avoid to copy data to userspace for
+calculating checksum, encryption, ...
+
+> 
+> > 
+> > - then userspace can decide how to handle the result from bpf mapping(s), such as,
+> > submit another fused command to handle IO with part of the kernel buffer.
+> > 
+> > Also the buffer is io buffer, and its lifetime is pretty short, and register/
+> > unregister introduces unnecessary cost in fast io path for any approach.
+> 
+> I'm not sure the io buffer has short lifetime in our product. :P In our product
+> we can first issue a very big request with a big io buffer. Then the backend
+> can parse&split it into pieces and distribute each piece to a specific socket_fd
+> representing a storage node. This big io buffer may have long lifetime.
+
+The short just means it is in fast io path, not like io_uring fixed buffer which
+needs to register just once. IO handling is really fast, otherwise it isn't necessary
+to consider zero copy at all.
+
+So we do care performance effect from any unneccessary operation(such
+as, buffer unregistration).
+
+
+Thanks,
+Ming
+
