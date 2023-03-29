@@ -2,88 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 006F5C74A5B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 22:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA89C74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 23:29:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229618AbjC2WsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 18:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37404 "EHLO
+        id S230434AbjC2X3W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 19:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbjC2WsH (ORCPT
+        with ESMTP id S229996AbjC2X3V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 18:48:07 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D319A10C3
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 15:48:05 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-3230125dde5so603715ab.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 15:48:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680130085;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m3RsGkHtbe7hFCgfTwPiyz/Yz3UUNeLQpkcu2PeDaIc=;
-        b=OcFymZYw8554gudOlcUcidK5mTOI73Lum6c707vuwJiiltkjqRUVeBzdoIFd7Cs/L+
-         xdSElHbtOaZefWXv8U3nkWWmbnt3oJ1YxyUmca8cgw0AR6Tj4qG97SLCrxu5ZV8/KNJk
-         mfuPr0hJ+jXzpZd4sfDLRD1ZOSd4NrnG32x5oAMKsnWnYseqVvdgB5Rqa9ULM2TT5g/B
-         5c50lq0mifRPZERAr8o6FyqdGZRvQqoLvwx0VR1Sc1qzpiGvCnsbtA/tIE7aVTh2BK3r
-         7hZVnn8u1LGD5wCOxCjLTpdnSW/bbHuRfWh2FHCOMeW11LK+9sQFifkPr68TvZJC1A/u
-         3uPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680130085;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m3RsGkHtbe7hFCgfTwPiyz/Yz3UUNeLQpkcu2PeDaIc=;
-        b=HEvQNqQfxGbHCsWU6ZUbPMprcl5RY7Oq1ppOyPSrjE/IieJfX1cXg4osOgHU8wwoPb
-         OSJ0EEhqZuJlTlmvdXsryxVGFwfQo1HYhnf5Kskf3DzzVkUVIIYLVewHoHtdcdw02bdH
-         0LTcvbyMVGNcEwgLVr7gcK/flI0a0cT7UHxv2lGrpoiW5O0mgieGI2rC0PpwSQIKG0US
-         7HTr9LVPCF/km2t55e3I4o/3XUxj53IQ/uElr1Azvty1PM89ileuWdZJsP9CbNFNu++1
-         4A4Kw47kVJITy7fqobavctqJmNpuMWvo1NnSRRPDIElQP8eBIzpGZiCDLx4qOjhJBaDT
-         oCVQ==
-X-Gm-Message-State: AAQBX9dGZO/GC/SVXvfHj5+VMQj5wBg8qg8UMeMFBMbj7vfoNgHVciKR
-        WMBuFUqNifyURYBunszubgmTzKneRVheYx+FSKC3Dw==
-X-Google-Smtp-Source: AKy350av2KaUAve2ibQJ37NNFZGFR7vVhttextyH6kwC3LF0IurgIhIw4E0jHLx0WHUtj/eIbEGr1g==
-X-Received: by 2002:a05:6e02:48a:b0:325:e065:8bf8 with SMTP id b10-20020a056e02048a00b00325e0658bf8mr187599ils.0.1680130084835;
-        Wed, 29 Mar 2023 15:48:04 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id b89-20020a0295e2000000b003c5157c8b2csm11047798jai.47.2023.03.29.15.48.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Mar 2023 15:48:04 -0700 (PDT)
-Message-ID: <8f759010-cd5e-3ace-9b6e-ea4f896ee789@kernel.dk>
-Date:   Wed, 29 Mar 2023 16:48:03 -0600
+        Wed, 29 Mar 2023 19:29:21 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF9611BCD
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 16:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1680132560; x=1711668560;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=a+NVpLO2XQBp6iZs+ex8RERrDcsLfBZuQOxHVIXweuE=;
+  b=jgnC4uynYAdv5p8bHG8BimpLBrnLpMQpMbKLtHxpP9jwiUBh5wXCLSQ+
+   KOJmKYRithKlQ0ndoBDzv5wVNeENaqhyFS9T1cw6gbBUQn0KdExZnmUu2
+   AVnEsvUb2UL0kyvi0BTvy5ZZXlbBOB7Hc8gpRszjMCJ7GCaTAGvzLQmtp
+   porO3OjtCUzvHIvkzkSzVFeXf40k3VwUBmnLtKm5nv1x51IufII3tUKsY
+   zCkRp84NZfsNeVvuJ9f6NN93Ru3YYrkVwR9SQ6PRkdIsqyTh9IqLd/AuX
+   jcxtIwxApDuQt1lUg6g9Zuh3zBErQH/CksVqsOX+WVNRCnVRkR2FKw1om
+   w==;
+X-IronPort-AV: E=Sophos;i="5.98,301,1673884800"; 
+   d="scan'208";a="226647942"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2023 07:29:20 +0800
+IronPort-SDR: jjlgAviPAEeeIT5pOKNGT/YaaL9SLEaalVxdGk7LQAiiJmJCu5bQxstNH9L4eFeQudpcLXq5Lm
+ FMlWjsosOYliZKZmLaZigoXPVr3oxjxKSE5j45X5JURKTMirOVJIxQNzDSox+P8X9t+FGaCE9Y
+ KL5Nd49r80LgZ+F/9gYJqoi4MmUv6WCRPnLD5NpYVzVkmbPUphuTQJCF1AFbVcQuzytxM+9YpL
+ 9q882KdbFy/yFhmoCjCZ5rKlar68WFryuwpzQ/T2s0brUK3E6+8hV0ZOVAf3GUYe/Pk4EK6WQy
+ 7ZY=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 15:39:49 -0700
+IronPort-SDR: ofxHlFFgkSxG0xgD0UG5TTbqpau76MuOi4W7VjyO85lgitdmgp9DnyMZhf9po+H8je4qclG+bN
+ /THb9jim3wXZVJBCzZ4Q2+0SiqE++CQmsIT0Wro+86qWOIWrramTRFCWHrVFV4HNWzh07CMWED
+ nwZwqOjiDTy89F3WdglPccTDHzuI5qMdzewFZZ3tc3hgRPhfVZp8wGWt1S+cYL4EQ8fAxjyz5X
+ jUw1t8W63KpfTrtrH7tmhFH70eZImgZ1GEWso7E/fqyzoSi9xisXBUWfO+BW3dYmA28x2WZ/Fi
+ 9Lk=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 16:29:20 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Pn2nX173Cz1RtVv
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 16:29:20 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1680132559; x=1682724560; bh=a+NVpLO2XQBp6iZs+ex8RERrDcsLfBZuQOx
+        HVIXweuE=; b=ey2f3kk11MiZ8fW2lBsVE6iqLCNprO9dciEEFxTXxN+atK95JFm
+        GeL4fdna7sGh5OA3GyhTl6dDgM1awPXCw/oh0ur/h+S4H1cvx8Kq82Mw1Vc30qtY
+        Nl4miDGl6PutBI7w7Ra2ULynQ0KRR2jk5wsVgu1BGOTa2pU2ZCzd8135B1HLnAHe
+        bwtsBUtPmdPVK5BZusnYQ0LO/k1J1+NHVVOZRXZOFswL4vtTAlv9VzJwO/o1EGqz
+        GHmTvBtmOh6QS/VJ7nCVRUApfB8c0Gn/ArE3TTpQ9cCBP794K0T3HJ8VeF0pNwdv
+        NXyennxT++lsXIsW0TYKGI/+C0BsoiTHPVQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id RoIAvrV3jqWQ for <linux-block@vger.kernel.org>;
+        Wed, 29 Mar 2023 16:29:19 -0700 (PDT)
+Received: from [10.225.163.116] (unknown [10.225.163.116])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Pn2nR75BJz1RtVm;
+        Wed, 29 Mar 2023 16:29:15 -0700 (PDT)
+Message-ID: <a3e8f1cb-4d76-dcb0-41a7-43b015d25dd4@opensource.wdc.com>
+Date:   Thu, 30 Mar 2023 08:29:14 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
-Subject: Re: [PATCH 0/4] null_blk: usr memcpy_[to|from]_page()
+Subject: Re: [PATCH 01/19] swap: use __bio_add_page to add page to bio
 Content-Language: en-US
-To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org
-Cc:     damien.lemoal@opensource.wdc.com, johannes.thumshirn@wdc.com,
-        bvanassche@acm.org, kbusch@kernel.org, vincent.fu@samsung.com,
-        shinichiro.kawasaki@wdc.com, error27@gmail.com
-References: <20230329204652.52785-1-kch@nvidia.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230329204652.52785-1-kch@nvidia.com>
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, Song Liu <song@kernel.org>,
+        linux-raid@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org
+References: <cover.1680108414.git.johannes.thumshirn@wdc.com>
+ <7849b142e073b20f033e5124a39080f59e5f19d2.1680108414.git.johannes.thumshirn@wdc.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <7849b142e073b20f033e5124a39080f59e5f19d2.1680108414.git.johannes.thumshirn@wdc.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/29/23 2:46 PM, Chaitanya Kulkarni wrote:
-> Hi,
+On 3/30/23 02:05, Johannes Thumshirn wrote:
+> The swap code only adds a single page to a newly created bio. So use
+> __bio_add_page() to add the page which is guaranteed to succeed in this
+> case.
 > 
-> From :include/linux/highmem.h:
-> "kmap_atomic - Atomically map a page for temporary usage - Deprecated!"
+> This brings us closer to marking bio_add_page() as __must_check.
 > 
-> Use memcpy_from_page() since does the same job of mapping, copying, and
-> unmaping except it uses non deprecated kmap_local_page() and
-> kunmap_local(). Following are the differences between kmal_local_page()
-> and kmap_atomic() :-
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-Looks fine to me, but I'd fold patches 1-3 rather than split them up.
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
 -- 
-Jens Axboe
-
+Damien Le Moal
+Western Digital Research
 
