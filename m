@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DE6C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 23:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE52C74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 23:45:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230301AbjC2Xiz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 19:38:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46490 "EHLO
+        id S229910AbjC2Xo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 19:44:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbjC2Xin (ORCPT
+        with ESMTP id S230427AbjC2Xoz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 19:38:43 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E524C13
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 16:38:42 -0700 (PDT)
+        Wed, 29 Mar 2023 19:44:55 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8575B59EA
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 16:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1680133121; x=1711669121;
+  t=1680133494; x=1711669494;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=aODFcqxqHz5iuZ9R2+Bd+E8Nkx+iNXfbVHgy68x60n0=;
-  b=gwZqchh0bB1gXkom4w9s4I/gVYw3ayfa4/18plUNfDEdfe2VnuH+N7pB
-   IKz1qnkyjcal4x/JWMQ/7Kq9S4Kigb7sGcV84qilifQ8ulLVHeiyesWom
-   6mOkkruYTwbgGcr7X1g0cvtKQl96QUbYuCizmYjfy2vmJrXnjT7p6ZKfh
-   Pe/dIquZfUdJ08RztMb2JhgbiSFcs6sh4GYXG/7zbKu4J8QX1+laoWk3a
-   rRQXaekpQ2DgDcuCXlBP2nibvzVU/GrObND9zhR61AAc/iUQZQvCPvHsn
-   Awv/vMQkajW8yZWYXpb6cjI/rWzGDf/MZOSHOtj58dugCKsWZsU9HOmT9
+  bh=u0GDcNaX/W8JMXWCJKoDWEVkmUM3b9b6zaDxlqDnkVw=;
+  b=Pekv38xSgMi6wm3lJUxFUeEHy7eG3LyLvmTMlo3rFxg7s4NUMWJ6kUzF
+   Cz332sf7OIEuG4/mGy/H1q0ViRs+Nr9yhzWE6gz8MmRvGUp27Q+Z9uPs+
+   fsqhWX3sk+JF0qQl0PxhgtdhxlBB1w2FlJ5sEb9pRessTK8aodbGjtmWo
+   bHnTOMHgI7283MnxwaZqzrO98GifiepVMfij54d6qLn3kTvYBy+/gc9yu
+   I7Df7UnVHKMEEkjbz1zVf/ccaQOuIrAWq9I+Ro27yE+RfnjKJYaRSTv1L
+   H3DRs/xMhxfbukUddWT60xlJMNElLzXdVofMta2ek4ewmzN5g2ed1x1wZ
    w==;
 X-IronPort-AV: E=Sophos;i="5.98,301,1673884800"; 
-   d="scan'208";a="226828805"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2023 07:38:40 +0800
-IronPort-SDR: Jht62uHN+LVNXDRjhsRwaCwyECraXxZpvOLMZAmE1Aqe1yJfMvh8A5I1j2zSTVpxBkzAqOAXW+
- LtEBjr7ZjhvFXsjLQ6Nyi/QpkgHcVXCLT1ov3byahvav6WL3pZ9DO5H45wcDHYGH4+psiDRxlX
- xkGtgr2Xunpyt9WFQWI/vdkYscdgjbRGVQryKum254D2eEnVBLcQ2NUJKghBYZmwJcwz9rjbfV
- rxmHC9/oaCXCiwqCP7k+CqqFWn77GLy+C9ScPxCFWXzBJpbSKfW1FLoXedmUtmACAFlJFSkezt
- uK8=
+   d="scan'208";a="231809206"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2023 07:44:54 +0800
+IronPort-SDR: 1+eii8OG0P+J01DfnnQBSI3lKcMlk9RnaslTZLWcBYtqNLUQvBrNBTNG5rS4xuIvKrUCmiNoVi
+ OYLz78JBnxJdMBhv2a0Bpws5O8vx2SlKq+NOOs1AltoraS67BoUZ057vinTpiOLQuBVgGEA2K5
+ +HuS7B11M7cECKSDhClauCydN8WhxUEbLR6M+1/bz8bLBQvqyTTQJbuOJ9RvVaZfNfqIvhtrI4
+ GNpEOXSqfSxsiDjcdCQKabserwkTOfmiKhL0lwHrCP8mpRIRkL0lBL1WiV1ydVWyKpzM5gwE90
+ Kww=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 15:54:49 -0700
-IronPort-SDR: 1S+k3OSLQOhcFiG7wPsspjm9fstA2a3FszOpneDxYAq3yJQXB6jZc7cRAPOEmsZryj7pPxkW04
- Up0Nhjh5iHovtIorvJupyys3n5tmaQKSoHGbJ0vOsD15h0edoS4abTkG+hPpAVudjLUFLNj6CV
- Zk/JjAihH8jv5hjx9965DNsHNb6EKw6alhK8Jzs14WSvzt8orek7Jzp498qiX26tSxtMhbusR3
- JFaZLDhUUngU1rS4IU4wwHPM5g4ac/U5iHhX4kfE9gz4lDLZdvIC9HWmcsH+2MzaRVHoEQtgT7
- KvY=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 15:55:22 -0700
+IronPort-SDR: tKQkmnMI2rndvDvWkE+2dsuMQbcfJMlue9RKBDyWzfuUMDR8tdLrgvpfKCij0gTihF5eyEX5w+
+ YvQojOemMTUUhoHXdfX9XtquhXDEp9koS8oVdbXtdzoPrYNsm2dR1gBIXiME7lbVLkDzbNcDQc
+ 7Xt65eTlc7bmYysDj4QwV3SEl+1LQJ8+lehZHOeOYkKqOc95OwbH7jf3s8cAbShFz0pi8RGDwC
+ 4mPYTqZ2uR95gC++wYLQMYSp6V9jzir8HHA+Uf2ax9RkyUhlwtDzIbpQm0i6ijpXZEsDiFxagw
+ bu8=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 16:38:41 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 16:44:54 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Pn30J47bPz1RtW5
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 16:38:40 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Pn37T3klQz1RtW2
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 16:44:53 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,28 +57,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1680133119; x=1682725120; bh=aODFcqxqHz5iuZ9R2+Bd+E8Nkx+iNXfbVHg
-        y68x60n0=; b=KBjlQKVFv+faQXsHdbboX8Xx9NxcmIm9AdBgDadiYuEI6iU44Gp
-        jIKLTOiXkry8UpjbdYwauGh77NnsPrQSFZpCT7/P7YDoBzDw9zAFX+sbYXbItBD4
-        Awy5kRAsBzpAxGEQt6/iFRAhFRIvGXb6QP2BKhHdWdA6t/8jyHKIjGtg0XDfA0ep
-        9/S+K4tRXJIRFwdQ+UasHvlXj7W7pXISUVz/O/kQ1s0icT+btM6C83LvSU896SWN
-        zX3mTR/5AXoqxmQ7Cm4R0QRAsxtuKFEiZ8wGyy7Y6iwGwfe3kKGL98CIKdDi6AJd
-        jzR0sEF+xRcPBDw1yJoRYinpIPNolkCqMHw==
+        1680133492; x=1682725493; bh=u0GDcNaX/W8JMXWCJKoDWEVkmUM3b9b6zaD
+        xlqDnkVw=; b=sWgVImUIxq+wWv1IY/OzgZBxlMgwl6baNfK+TqDv/z9uGO4/lCt
+        F80WbSTE4+zUj8V0KSvVsrvpDkaRwb4xUc4WvzxbBWL84Hn8V4HQomFckjQyxrY1
+        X0XkISOSqW9QYHF6QugDBdkke58q7tb92oKEEHYiT6JSunUei+AHzcz8Sr8d1rgM
+        XQE7xIDgFbTnJY20sa1jEv3CUu36WQYI/MhUDV8/3hBMQEryT+U76F6ZujWyaxcY
+        Laa1jGoGfx5a4Yhez4KqWdpv/xoDLd+woYRyn3dDBSFt37g9Zj2KS3TC+gfCG56r
+        o+X+Ideih0iowjTzWAbWUDYhNczPHD7idUA==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id i79Ji72-O03V for <linux-block@vger.kernel.org>;
-        Wed, 29 Mar 2023 16:38:39 -0700 (PDT)
+        with ESMTP id X0IBp9hLmISC for <linux-block@vger.kernel.org>;
+        Wed, 29 Mar 2023 16:44:52 -0700 (PDT)
 Received: from [10.225.163.116] (unknown [10.225.163.116])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Pn30D5vG4z1RtVn;
-        Wed, 29 Mar 2023 16:38:36 -0700 (PDT)
-Message-ID: <84d3057f-58b3-b3da-a473-082806c4b5f2@opensource.wdc.com>
-Date:   Thu, 30 Mar 2023 08:38:35 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Pn37P0nXXz1RtVm;
+        Wed, 29 Mar 2023 16:44:48 -0700 (PDT)
+Message-ID: <7441afa8-3e60-79cf-66c7-4ddb692c1bcd@opensource.wdc.com>
+Date:   Thu, 30 Mar 2023 08:44:47 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
-Subject: Re: [PATCH 16/19] md: raid1: use __bio_add_page for adding single
- page to bio
+Subject: Re: [PATCH 17/19] md: raid1: check if adding pages to resync bio
+ fails
 Content-Language: en-US
 To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Jens Axboe <axboe@kernel.dk>
@@ -95,10 +95,10 @@ Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
         Andreas Gruenbacher <agruenba@redhat.com>,
         David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org
 References: <cover.1680108414.git.johannes.thumshirn@wdc.com>
- <8758569c543389604d8a6a9460de086246fabe89.1680108414.git.johannes.thumshirn@wdc.com>
+ <e2f96e539befa4f9d57f19ff1fc26cfc0d109435.1680108414.git.johannes.thumshirn@wdc.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <8758569c543389604d8a6a9460de086246fabe89.1680108414.git.johannes.thumshirn@wdc.com>
+In-Reply-To: <e2f96e539befa4f9d57f19ff1fc26cfc0d109435.1680108414.git.johannes.thumshirn@wdc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -106,17 +106,74 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 3/30/23 02:06, Johannes Thumshirn wrote:
-> The sync request code uses bio_add_page() to add a page to a newly created bio.
-> bio_add_page() can fail, but the return value is never checked.
+> Check if adding pages to resync bio fails and if bail out.
 > 
-> Use __bio_add_page() as adding a single page to a newly created bio is
-> guaranteed to succeed.
+> As the comment above suggests this cannot happen, WARN if it actually
+> happens.
 > 
-> This brings us a step closer to marking bio_add_page() as __must_check.
+> This way we can mark bio_add_pages as __must_check.
 > 
 > Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
+>  drivers/md/raid1-10.c |  7 ++++++-
+>  drivers/md/raid10.c   | 12 ++++++++++--
+>  2 files changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
+> index e61f6cad4e08..c21b6c168751 100644
+> --- a/drivers/md/raid1-10.c
+> +++ b/drivers/md/raid1-10.c
+> @@ -105,7 +105,12 @@ static void md_bio_reset_resync_pages(struct bio *bio, struct resync_pages *rp,
+>  		 * won't fail because the vec table is big
+>  		 * enough to hold all these pages
+>  		 */
+> -		bio_add_page(bio, page, len, 0);
+> +		if (WARN_ON(!bio_add_page(bio, page, len, 0))) {
+
+Not sure we really need the WARN_ON here...
+Nevertheless,
 
 Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+
+
+> +			bio->bi_status = BLK_STS_RESOURCE;
+> +			bio_endio(bio);
+> +			return;
+> +		}
+> +
+>  		size -= len;
+>  	} while (idx++ < RESYNC_PAGES && size > 0);
+>  }
+> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+> index 6c66357f92f5..5682dba52fd3 100644
+> --- a/drivers/md/raid10.c
+> +++ b/drivers/md/raid10.c
+> @@ -3808,7 +3808,11 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
+>  			 * won't fail because the vec table is big enough
+>  			 * to hold all these pages
+>  			 */
+> -			bio_add_page(bio, page, len, 0);
+> +			if (WARN_ON(!bio_add_page(bio, page, len, 0))) {
+> +				bio->bi_status = BLK_STS_RESOURCE;
+> +				bio_endio(bio);
+> +				goto giveup;
+> +			}
+>  		}
+>  		nr_sectors += len>>9;
+>  		sector_nr += len>>9;
+> @@ -4989,7 +4993,11 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
+>  			 * won't fail because the vec table is big enough
+>  			 * to hold all these pages
+>  			 */
+> -			bio_add_page(bio, page, len, 0);
+> +			if (WARN_ON(!bio_add_page(bio, page, len, 0))) {
+> +				bio->bi_status = BLK_STS_RESOURCE;
+> +				bio_endio(bio);
+> +				return sectors_done; /* XXX: is this correct? */
+> +			}
+>  		}
+>  		sector_nr += len >> 9;
+>  		nr_sectors += len >> 9;
 
 -- 
 Damien Le Moal
