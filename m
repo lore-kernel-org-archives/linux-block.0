@@ -2,153 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E6EC74A5B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 06:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A92CC6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 06:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbjC2GBe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 02:01:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49262 "EHLO
+        id S229632AbjC2G0J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 02:26:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjC2GBc (ORCPT
+        with ESMTP id S229463AbjC2G0I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 02:01:32 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927C3358B;
-        Tue, 28 Mar 2023 23:01:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 29 Mar 2023 02:26:08 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7C235B7
+        for <linux-block@vger.kernel.org>; Tue, 28 Mar 2023 23:26:02 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F2B40B8200F;
-        Wed, 29 Mar 2023 06:01:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B197C433D2;
-        Wed, 29 Mar 2023 06:01:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1680069685;
-        bh=VmpSqDmABCdiRrhZPUIC9g9iH1F5K/OB3bj4hj2T7/o=;
-        h=From:To:Cc:Subject:Date:From;
-        b=N74FlaxeHd/XcyD7wDsFfAHp0QgMR2u7iZIxzF23eyiHhxGjhPQWvYV1DaLXxy7h4
-         7AVj7yPVkaGJJBmCEdl9Y56TUUSnvEnU0EbpO5uiBkElFdwNxfdMRXCrisPUX57uZQ
-         Ef8m9Yol6pZMQI2tW2kE2gTREaSGYa5NeFO+J0mY=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] pktcdvd: simplify the class_pktcdvd logic
-Date:   Wed, 29 Mar 2023 08:01:21 +0200
-Message-Id: <20230329060121.2688338-1-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.40.0
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 868091FE31;
+        Wed, 29 Mar 2023 06:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1680071160; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Gg20VuxotjIBrApcqYsHTz75BAKs5arxadou0gRz/c4=;
+        b=SrbO0Tz9m0noLJPnRR10xf0Fq5bDbC8bq7OrKWb9CLoy/Mm8m4NBQuy37rf3G9VdB86C3c
+        HV/m5+H4KxuGAO2o0x25RX3wrDsHqYO7kETddYADnE3vwTLEifA74Jhay746h0p5HLjdVc
+        RzNxKSB6rn87/R/kLvloMJeIgY2aP5M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1680071160;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Gg20VuxotjIBrApcqYsHTz75BAKs5arxadou0gRz/c4=;
+        b=KlfZjoClu3k1HvaT9iLgT0TlbdxDOhwaywF2a3mzObtwau3ZWd2S0TB6xjElsbmN9U0fxO
+        C3Rztw45+Ym5fRBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 63C70139D3;
+        Wed, 29 Mar 2023 06:26:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id WE9NGPjZI2SRHgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 29 Mar 2023 06:26:00 +0000
+Date:   Wed, 29 Mar 2023 08:25:59 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH blktests v2 0/3] Test different queue counts
+Message-ID: <20230329062559.k4qltulx4oldx3pa@carbon.lan>
+References: <20230322101648.31514-1-dwagner@suse.de>
+ <ZCMzjVs26imnywgo@kbusch-mbp.dhcp.thefacebook.com>
+ <6dcf501f-8863-b448-01fa-1252e73a87f5@nvidia.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3437; i=gregkh@linuxfoundation.org; h=from:subject; bh=VmpSqDmABCdiRrhZPUIC9g9iH1F5K/OB3bj4hj2T7/o=; b=owGbwMvMwCRo6H6F97bub03G02pJDCnKV/RezPS67rU91M9H6m9HdO636N1HBSzZtt3fYXo29 exzq+ezO2JZGASZGGTFFFm+bOM5ur/ikKKXoe1pmDmsTCBDGLg4BWAid6UY5uf4uO7a4XXz8Lv8 CvmU9GbJ+f9l8hnmyi1a8rn2kv+8l3IVDsqTZkQ/2bXMDwA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6dcf501f-8863-b448-01fa-1252e73a87f5@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to dynamically create and destory the class_pktcdvd
-structure, just make it static and remove the memory allocation logic
-which simplifies and cleans up the logic a lot.
+On Wed, Mar 29, 2023 at 03:30:17AM +0000, Chaitanya Kulkarni wrote:
+> On 3/28/23 11:35, Keith Busch wrote:
+> > On Wed, Mar 22, 2023 at 11:16:45AM +0100, Daniel Wagner wrote:
+> >> Setup different queues, e.g. read and poll queues.
+> > If you wanted to add a similar test for pci, you do it by echo'ing the desired
+> > options to:
+> >
+> >    /sys/modules/nvme/parameters/{poll_queues,write_queues}
+> >
+> > Then do an 'nvme reset' on the target nvme pci device.
+> >
+> > I'll just note that such a test will currently fail, and fixing that doesn't
+> > look like fun. :)
+> 
+> then we should definitely add it ;) ha ha.
+> 
+> I was actually wondering about pci based on the discussion on this thread
+> was mainly focused on tcp and rdam, thanks for the suggestion Keith.
 
-Cc: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-Note: I would like to take this through the driver-core tree as I have
-later struct class cleanups that depend on this change being made to the
-tree if that's ok with the maintainer of this file.
-
- drivers/block/pktcdvd.c | 40 ++++++++++++----------------------------
- 1 file changed, 12 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index ba9bbdef9ef5..79af8a59142e 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -100,7 +100,8 @@ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
- static mempool_t psd_pool;
- static struct bio_set pkt_bio_set;
- 
--static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
-+/* /sys/class/pktcdvd */
-+static struct class	class_pktcdvd;
- static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
- 
- /* forward declaration */
-@@ -315,8 +316,8 @@ static const struct attribute_group *pkt_groups[] = {
- 
- static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
- {
--	if (class_pktcdvd) {
--		pd->dev = device_create_with_groups(class_pktcdvd, NULL,
-+	if (class_is_registered(&class_pktcdvd)) {
-+		pd->dev = device_create_with_groups(&class_pktcdvd, NULL,
- 						    MKDEV(0, 0), pd, pkt_groups,
- 						    "%s", pd->name);
- 		if (IS_ERR(pd->dev))
-@@ -326,7 +327,7 @@ static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
- 
- static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
- {
--	if (class_pktcdvd)
-+	if (class_is_registered(&class_pktcdvd))
- 		device_unregister(pd->dev);
- }
- 
-@@ -338,11 +339,6 @@ static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
-                      device_map     show mappings
-  *******************************************************************/
- 
--static void class_pktcdvd_release(struct class *cls)
--{
--	kfree(cls);
--}
--
- static ssize_t device_map_show(const struct class *c, const struct class_attribute *attr,
- 			       char *data)
- {
-@@ -405,35 +401,23 @@ static struct attribute *class_pktcdvd_attrs[] = {
- };
- ATTRIBUTE_GROUPS(class_pktcdvd);
- 
-+static struct class class_pktcdvd = {
-+	.name		= DRIVER_NAME,
-+	.class_groups	= class_pktcdvd_groups,
-+};
-+
- static int pkt_sysfs_init(void)
- {
--	int ret = 0;
--
- 	/*
- 	 * create control files in sysfs
- 	 * /sys/class/pktcdvd/...
- 	 */
--	class_pktcdvd = kzalloc(sizeof(*class_pktcdvd), GFP_KERNEL);
--	if (!class_pktcdvd)
--		return -ENOMEM;
--	class_pktcdvd->name = DRIVER_NAME;
--	class_pktcdvd->class_release = class_pktcdvd_release;
--	class_pktcdvd->class_groups = class_pktcdvd_groups;
--	ret = class_register(class_pktcdvd);
--	if (ret) {
--		kfree(class_pktcdvd);
--		class_pktcdvd = NULL;
--		pr_err("failed to create class pktcdvd\n");
--		return ret;
--	}
--	return 0;
-+	return class_register(&class_pktcdvd);
- }
- 
- static void pkt_sysfs_cleanup(void)
- {
--	if (class_pktcdvd)
--		class_destroy(class_pktcdvd);
--	class_pktcdvd = NULL;
-+	class_unregister(&class_pktcdvd);
- }
- 
- /********************************************************************
--- 
-2.40.0
-
+The test is fabric centric because we configure the queues via the 'nvme
+connect' call, something we can't do for PCI. It look likes it needs another
+new test for PCI. Let me get this one sorted out first though.
