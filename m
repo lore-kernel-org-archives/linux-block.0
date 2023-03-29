@@ -2,177 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C883FC6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 16:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE9DC6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 16:11:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbjC2QAK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 12:00:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55842 "EHLO
+        id S229452AbjC2QLm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 12:11:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230001AbjC2P7b (ORCPT
+        with ESMTP id S229555AbjC2QLk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 11:59:31 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D066585;
-        Wed, 29 Mar 2023 08:58:58 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 29 Mar 2023 12:11:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 300B45B86
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 09:11:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 2CBDA219FB;
-        Wed, 29 Mar 2023 15:58:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1680105537; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=laCTMVv10tir+5LCK7bZIg6RxS0xYCgupvb50S/b4XY=;
-        b=Vl2TDvex2fX+V/qOfl0Xk9vDM3ikifOzUk6sEr0WIzpohvYYkvFLW+6qBu+RlI035Az2QO
-        Bg4vs8RqNGMdJ7g7ivHKAcgIhtsY1zKezQDQyUbKkOeL8fq/lKChGvk9VCPFR40TGr8YMU
-        k0NaJphuGjbyfnmWQTPsdyb4/FmBbbU=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 00BBA138FF;
-        Wed, 29 Mar 2023 15:58:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id qZMgAEFgJGQEaAAAMHmgww
-        (envelope-from <mhocko@suse.com>); Wed, 29 Mar 2023 15:58:56 +0000
-Date:   Wed, 29 Mar 2023 17:58:56 +0200
-From:   Michal Hocko <mhocko@suse.com>
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Subject: Re: [PATCH v2 5/9] memcg: replace stats_flush_lock with an atomic
-Message-ID: <ZCRgQHtDuWN6xp7z@dhcp22.suse.cz>
-References: <20230328221644.803272-1-yosryahmed@google.com>
- <20230328221644.803272-6-yosryahmed@google.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 614EA61D9A
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 16:11:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08632C433EF;
+        Wed, 29 Mar 2023 16:11:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680106269;
+        bh=9DcUxntLnab5cJ/+8zw/KFyM3GJUThn6mt1RVFym3OI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BtX1GYrz6I3x76GBwPYUCSl7Yy75ev4djW4jtGV4pHaxqr3LLYGR3bbSAqz807zVr
+         CwpfFioDelLfPz2SMrHlcoDzGEiTfZ3kv3NusnwkudId1FTIXZEsDNOhiZqmILEUdz
+         /a3EwveV9Ukq9wPy9eUKQnlamQv9jNs7wqT8hLmQ6YHehZLeAo8oz098VGQoJiay8+
+         vl5KYtZAVeR7SY/trbx3XTrdiu21/jb3v/Cgk5mo+5tE2CJFWX0k+8UexkoNAVFN5P
+         WtZCtQjnnahO6OtSOVA7+HxVORaESzwZhsVOxNSXvXNBNp5Z+jFZJhAR3pVsC3/8AL
+         RoV0XHd91IuWQ==
+Date:   Wed, 29 Mar 2023 10:11:06 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Kanchan Joshi <joshiiitr@gmail.com>, Keith Busch <kbusch@meta.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        axboe@kernel.dk, hch@lst.de
+Subject: Re: [PATCH 2/2] nvme: use blk-mq polling for uring commands
+Message-ID: <ZCRjGmPCeLvi2m39@kbusch-mbp.dhcp.thefacebook.com>
+References: <20230324212803.1837554-1-kbusch@meta.com>
+ <CGME20230324213124epcas5p331ea3c2e2a05ec6a6825e719e47d2427@epcas5p3.samsung.com>
+ <20230324212803.1837554-2-kbusch@meta.com>
+ <20230327135810.GA8405@green5>
+ <ZCG0O6RdlA/sUd7C@kbusch-mbp.dhcp.thefacebook.com>
+ <CA+1E3rK2h9gyy26v1NmwTFtUsCwMkc1DgkDsCFME+HjZJPn5Hg@mail.gmail.com>
+ <ZCI5XopTr7nJvVF1@kbusch-mbp.dhcp.thefacebook.com>
+ <20230328074939.GA2800@green5>
+ <ZCL/RTHoflUVCMyw@kbusch-mbp.dhcp.thefacebook.com>
+ <20230329084618.GB2800@green5>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230328221644.803272-6-yosryahmed@google.com>
+In-Reply-To: <20230329084618.GB2800@green5>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 28-03-23 22:16:40, Yosry Ahmed wrote:
-> As Johannes notes in [1], stats_flush_lock is currently used to:
-> (a) Protect updated to stats_flush_threshold.
-> (b) Protect updates to flush_next_time.
-> (c) Serializes calls to cgroup_rstat_flush() based on those ratelimits.
+On Wed, Mar 29, 2023 at 02:16:18PM +0530, Kanchan Joshi wrote:
+> On Tue, Mar 28, 2023 at 08:52:53AM -0600, Keith Busch wrote:
+> > > > +	else if (issue_flags & IO_URING_F_IOPOLL)
+> > > > +		ioucmd->flags |= IORING_URING_CMD_NOPOLL;
+> > > 
+> > > If IO_URING_F_IOPOLL would have come here as part of "ioucmd->flags", we
+> > > could have just cleared that here. That would avoid the need of NOPOLL flag.
+> > > That said, I don't feel strongly about new flag too. You decide.
+> > 
+> > IO_URING_F_IOPOLL, while named in an enum that sounds suspiciouly like it is
+> > part of ioucmd->flags, is actually ctx flags, so a little confusing. And we
+> > need to be a litle careful here: the existing ioucmd->flags is used with uapi
+> > flags.
 > 
-> However:
-> 
-> 1. stats_flush_threshold is already an atomic
-> 
-> 2. flush_next_time is not atomic. The writer is locked, but the reader
->    is lockless. If the reader races with a flush, you could see this:
-> 
->                                         if (time_after(jiffies, flush_next_time))
->         spin_trylock()
->         flush_next_time = now + delay
->         flush()
->         spin_unlock()
->                                         spin_trylock()
->                                         flush_next_time = now + delay
->                                         flush()
->                                         spin_unlock()
-> 
->    which means we already can get flushes at a higher frequency than
->    FLUSH_TIME during races. But it isn't really a problem.
-> 
->    The reader could also see garbled partial updates, so it needs at
->    least READ_ONCE and WRITE_ONCE protection.
+> Indeed. If this is getting crufty, series can just enable polling on
+> no-payload requests. Reducing nvme handlers - for another day.
 
-Just a nit. Sounds more serious than it is actually. This would only
-happen if compiler decides to split the write.
-
-> 3. Serializing cgroup_rstat_flush() calls against the ratelimit
->    factors is currently broken because of the race in 2. But the race
->    is actually harmless, all we might get is the occasional earlier
->    flush. If there is no delta, the flush won't do much. And if there
->    is, the flush is justified.
-> 
-> So the lock can be removed all together. However, the lock also served
-> the purpose of preventing a thundering herd problem for concurrent
-> flushers, see [2]. Use an atomic instead to serve the purpose of
-> unifying concurrent flushers.
-> 
-> [1]https://lore.kernel.org/lkml/20230323172732.GE739026@cmpxchg.org/
-> [2]https://lore.kernel.org/lkml/20210716212137.1391164-2-shakeelb@google.com/
-> 
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-
-Acked-by: Michal Hocko <mhocko@suse.com>
-
-> ---
->  mm/memcontrol.c | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
-> 
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index ff39f78f962e..65750f8b8259 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -585,8 +585,8 @@ mem_cgroup_largest_soft_limit_node(struct mem_cgroup_tree_per_node *mctz)
->   */
->  static void flush_memcg_stats_dwork(struct work_struct *w);
->  static DECLARE_DEFERRABLE_WORK(stats_flush_dwork, flush_memcg_stats_dwork);
-> -static DEFINE_SPINLOCK(stats_flush_lock);
->  static DEFINE_PER_CPU(unsigned int, stats_updates);
-> +static atomic_t stats_flush_ongoing = ATOMIC_INIT(0);
->  static atomic_t stats_flush_threshold = ATOMIC_INIT(0);
->  static u64 flush_next_time;
->  
-> @@ -636,15 +636,19 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
->  
->  static void __mem_cgroup_flush_stats(void)
->  {
-> -	unsigned long flag;
-> -
-> -	if (!spin_trylock_irqsave(&stats_flush_lock, flag))
-> +	/*
-> +	 * We always flush the entire tree, so concurrent flushers can just
-> +	 * skip. This avoids a thundering herd problem on the rstat global lock
-> +	 * from memcg flushers (e.g. reclaim, refault, etc).
-> +	 */
-> +	if (atomic_read(&stats_flush_ongoing) ||
-> +	    atomic_xchg(&stats_flush_ongoing, 1))
->  		return;
->  
-> -	flush_next_time = jiffies_64 + 2*FLUSH_TIME;
-> +	WRITE_ONCE(flush_next_time, jiffies_64 + 2*FLUSH_TIME);
->  	cgroup_rstat_flush_atomic(root_mem_cgroup->css.cgroup);
->  	atomic_set(&stats_flush_threshold, 0);
-> -	spin_unlock_irqrestore(&stats_flush_lock, flag);
-> +	atomic_set(&stats_flush_ongoing, 0);
->  }
->  
->  void mem_cgroup_flush_stats(void)
-> @@ -655,7 +659,7 @@ void mem_cgroup_flush_stats(void)
->  
->  void mem_cgroup_flush_stats_ratelimited(void)
->  {
-> -	if (time_after64(jiffies_64, flush_next_time))
-> +	if (time_after64(jiffies_64, READ_ONCE(flush_next_time)))
->  		mem_cgroup_flush_stats();
->  }
->  
-> -- 
-> 2.40.0.348.gf938b09366-goog
-
--- 
-Michal Hocko
-SUSE Labs
+Well something needs to be done about multipath since it's broken today: if the
+path changes between submission and poll, we'll consult the wrong queue for
+polling enabled. This could cause a missed polling opprotunity, polling a
+pointer that isn't a bio, or poll an irq enabled cq. All are bad.
