@@ -2,214 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D8A4C74A5B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 14:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0C6C74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 15:21:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231453AbjC2OXk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 10:23:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55612 "EHLO
+        id S229694AbjC2PV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 11:21:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230308AbjC2OWI (ORCPT
+        with ESMTP id S229501AbjC2PV1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 10:22:08 -0400
+        Wed, 29 Mar 2023 11:21:27 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69C016599
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 07:16:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837119E
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 08:20:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680099384;
+        s=mimecast20190719; t=1680103241;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Q/kAjj+4zLWTXkqKqP2B/MWL9umh9MFmha+7vx/dBng=;
-        b=TkRM1Llexh4aq/1IDCS0Gjz30Rp7oJPAVTT3UlVqNRUSn+dnloUC3F3UlYdW73rEGPrcxQ
-        GTRuaDYshpL522A6mQmvLK7zTW1fZTzDv+SCAqLqZcOzRh5CcJw0bzjcEe1/Ooa03Lg5So
-        Fmr+m2260HKE9RjY1t+Rd0yJYbm11kQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-270-JSybz5aLMb2BtboAW1enxw-1; Wed, 29 Mar 2023 10:16:18 -0400
-X-MC-Unique: JSybz5aLMb2BtboAW1enxw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4406F3C0ED5A;
-        Wed, 29 Mar 2023 14:16:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DC138202701E;
-        Wed, 29 Mar 2023 14:16:08 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Chuck Lever III <chuck.lever@oracle.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org
-Subject: [RFC PATCH v2 47/48] drdb: Send an entire bio in a single sendmsg
-Date:   Wed, 29 Mar 2023 15:13:53 +0100
-Message-Id: <20230329141354.516864-48-dhowells@redhat.com>
-In-Reply-To: <20230329141354.516864-1-dhowells@redhat.com>
-References: <20230329141354.516864-1-dhowells@redhat.com>
+        bh=8QfBEWZaETqXKkNIZWe2Rgfoz5A0Mz2yy7ZiCrKeUrk=;
+        b=cYk8FeP5rFo2BuKC0+lN4n356AJyMydQTwE/1xE8VcJR00QcS1/FErsz2o9Oczd/yJMofZ
+        3lkzTKtJ8y+ZzXak5mNV6QiFwJHJJSuGC6kXSs+Bis3uPH3E2Bl2vDVU4IojARvCOD4iKY
+        fKjdxNbdusVsNuDv3NPMDtcyH4Dru3M=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-658-xtRa4GCUNUyO3ghhxR7IJA-1; Wed, 29 Mar 2023 11:20:32 -0400
+X-MC-Unique: xtRa4GCUNUyO3ghhxR7IJA-1
+Received: by mail-ed1-f71.google.com with SMTP id i42-20020a0564020f2a00b004fd23c238beso22847268eda.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 08:20:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680103231;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8QfBEWZaETqXKkNIZWe2Rgfoz5A0Mz2yy7ZiCrKeUrk=;
+        b=UnnqqXMc1Fp9oIADb4tVK8pexvZxi7iYvUoHZOf/VqmK04YAxc7EwMgzWwTL9GZKXX
+         hrWhKa7cELeFuIf4oQK8EZm1WWIkptm3EwYpNmUT6SkqXFAM2ELHcG4Chdo6No/KNirR
+         nyfIWLKv4EJTgt8LqG7l3Rvc2ceWxf5lvhgIR3A4RLL5NBua11/rd2szBxmhFoQhAcVQ
+         3gJdPrBJH/dOrYndEBlWpEMFXlek3UXBRU+FrF2GgZgJ26oh76U1nklfJ3RUSwB/ZrcF
+         /DmZhFWnUl2DcH//qCjFTLUD9J9A0vt/bp794tMkzihWRE9EYmR7PGZX8z7Q4spg7IHv
+         XJWw==
+X-Gm-Message-State: AAQBX9fvfgiJZopTofgvGdXiHs4xC0RSIgvROWbbCtJInl3OYxNt7Sj7
+        yS/Hqx9ky0PeYeesVk6oXt9vwMp9OHtFdLz6O10VUZa3OtvSKICnmsTiC7VlKEEvBuc7fi68Xr/
+        1BstE88W9IjGhj7y0WwbLYQ==
+X-Received: by 2002:a05:6402:70a:b0:4fb:9b54:ccb8 with SMTP id w10-20020a056402070a00b004fb9b54ccb8mr19963098edx.21.1680103231325;
+        Wed, 29 Mar 2023 08:20:31 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZIDq5cbD4oxWGT+bxHeC8eCeDrmTmHS2bporzQleFYwRv0FroOOgbBgNfZL6B5UYLBTBOzQQ==
+X-Received: by 2002:a05:6402:70a:b0:4fb:9b54:ccb8 with SMTP id w10-20020a056402070a00b004fb9b54ccb8mr19963077edx.21.1680103231077;
+        Wed, 29 Mar 2023 08:20:31 -0700 (PDT)
+Received: from [10.43.17.42] (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id y94-20020a50bb67000000b004be11e97ca2sm17165261ede.90.2023.03.29.08.20.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Mar 2023 08:20:30 -0700 (PDT)
+Message-ID: <a2ce079f-f3de-9bf1-5cd0-ec3045a25168@redhat.com>
+Date:   Wed, 29 Mar 2023 17:20:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Content-Language: en-US
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     linux-block@vger.kernel.org, bluca@debian.org, gmazyland@gmail.com,
+        axboe@kernel.dk, hch@infradead.org, jonathan.derrick@linux.dev
+References: <20230322151604.401680-1-okozina@redhat.com>
+ <20230322151604.401680-2-okozina@redhat.com>
+ <20230329-amendment-trodden-75a619120b5e@brauner>
+From:   Ondrej Kozina <okozina@redhat.com>
+Subject: Re: [PATCH 1/5] sed-opal: do not add user authority twice in boolean
+ ace.
+In-Reply-To: <20230329-amendment-trodden-75a619120b5e@brauner>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since _drdb_sendpage() is now using sendmsg to send the pages rather
-sendpage, pass the entire bio in one go using a bvec iterator instead of
-doing it piecemeal.
+On 29. 03. 23 16:15, Christian Brauner wrote:
+> On Wed, Mar 22, 2023 at 04:16:00PM +0100, Ondrej Kozina wrote:
+> 
+> This index only appears one time in the code. IOW, you're completely
+> removing OPAL_HALF_UID_BOOLEAN_ACE leavig only
+> OPAL_HALF_UID_AUTHORITY_OBJ_REF. Is that intended and if so why is
+> OPAL_HALF_UID_BOOLEAN_ACE not needed anymore?
+> 
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Philipp Reisner <philipp.reisner@linbit.com>
-cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: drbd-dev@lists.linbit.com
-cc: linux-block@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- drivers/block/drbd/drbd_main.c | 77 +++++++++++-----------------------
- 1 file changed, 25 insertions(+), 52 deletions(-)
+It seemed redundant when only single authority is added in the set 
+method aka { authority1, authority1, OR }:
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index e5f90abd29b6..ab63d6138407 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -1512,28 +1512,15 @@ static void drbd_update_congested(struct drbd_connection *connection)
-  * As a workaround, we disable sendpage on pages
-  * with page_count == 0 or PageSlab.
-  */
--static int _drbd_no_send_page(struct drbd_peer_device *peer_device, struct page *page,
--			      int offset, size_t size, unsigned msg_flags)
--{
--	struct socket *socket;
--	void *addr;
--	int err;
--
--	socket = peer_device->connection->data.socket;
--	addr = kmap(page) + offset;
--	err = drbd_send_all(peer_device->connection, socket, addr, size, msg_flags);
--	kunmap(page);
--	if (!err)
--		peer_device->device->send_cnt += size >> 9;
--	return err;
--}
--
--static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *page,
--		    int offset, size_t size, unsigned msg_flags)
-+static int _drbd_send_pages(struct drbd_peer_device *peer_device,
-+			    struct iov_iter *iter, unsigned msg_flags)
- {
- 	struct socket *socket = peer_device->connection->data.socket;
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = msg_flags, };
-+	struct msghdr msg = {
-+		.msg_flags	= msg_flags | MSG_NOSIGNAL,
-+		.msg_iter	= *iter,
-+	};
-+	size_t size = iov_iter_count(iter);
- 	int err = -EIO;
- 
- 	/* e.g. XFS meta- & log-data is in slab pages, which have a
-@@ -1542,11 +1529,8 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 	 * put_page(); and would cause either a VM_BUG directly, or
- 	 * __page_cache_release a page that would actually still be referenced
- 	 * by someone, leading to some obscure delayed Oops somewhere else. */
--	if (!drbd_disable_sendpage && sendpage_ok(page))
--		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
--
--	bvec_set_page(&bvec, page, offset, size);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
-+	if (drbd_disable_sendpage)
-+		msg.msg_flags &= ~(MSG_NOSIGNAL | MSG_SPLICE_PAGES);
- 
- 	drbd_update_congested(peer_device->connection);
- 	do {
-@@ -1577,39 +1561,22 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 
- static int _drbd_send_bio(struct drbd_peer_device *peer_device, struct bio *bio)
- {
--	struct bio_vec bvec;
--	struct bvec_iter iter;
-+	struct iov_iter iter;
- 
--	/* hint all but last page with MSG_MORE */
--	bio_for_each_segment(bvec, bio, iter) {
--		int err;
-+	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
-+		      bio->bi_iter.bi_size);
- 
--		err = _drbd_no_send_page(peer_device, bvec.bv_page,
--					 bvec.bv_offset, bvec.bv_len,
--					 bio_iter_last(bvec, iter)
--					 ? 0 : MSG_MORE);
--		if (err)
--			return err;
--	}
--	return 0;
-+	return _drbd_send_pages(peer_device, &iter, 0);
- }
- 
- static int _drbd_send_zc_bio(struct drbd_peer_device *peer_device, struct bio *bio)
- {
--	struct bio_vec bvec;
--	struct bvec_iter iter;
-+	struct iov_iter iter;
- 
--	/* hint all but last page with MSG_MORE */
--	bio_for_each_segment(bvec, bio, iter) {
--		int err;
-+	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
-+		      bio->bi_iter.bi_size);
- 
--		err = _drbd_send_page(peer_device, bvec.bv_page,
--				      bvec.bv_offset, bvec.bv_len,
--				      bio_iter_last(bvec, iter) ? 0 : MSG_MORE);
--		if (err)
--			return err;
--	}
--	return 0;
-+	return _drbd_send_pages(peer_device, &iter, MSG_SPLICE_PAGES);
- }
- 
- static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
-@@ -1621,10 +1588,16 @@ static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
- 
- 	/* hint all but last page with MSG_MORE */
- 	page_chain_for_each(page) {
-+		struct iov_iter iter;
-+		struct bio_vec bvec;
- 		unsigned l = min_t(unsigned, len, PAGE_SIZE);
- 
--		err = _drbd_send_page(peer_device, page, 0, l,
--				      page_chain_next(page) ? MSG_MORE : 0);
-+		bvec_set_page(&bvec, page, 0, l);
-+		iov_iter_bvec(&iter, ITER_SOURCE, &bvec, 1, l);
-+
-+		err = _drbd_send_pages(peer_device, &iter,
-+				       MSG_SPLICE_PAGES |
-+				       (page_chain_next(page) ? MSG_MORE : 0));
- 		if (err)
- 			return err;
- 		len -= l;
+TCG Storage Architecture Core Specification, 5.1.3.3 ACE_expression
+
+"This is an alternative type where the options are either a uidref to an 
+Authority object or one of the boolean_ACE (AND = 0 and OR = 1) options. 
+This type is used within the AC_element list to form a postfix Boolean 
+expression of Authorities."
+
+I add OPAL_HALF_UID_BOOLEAN_ACE when there's more than single authority 
+added in any ACE_expression in later code.
 
