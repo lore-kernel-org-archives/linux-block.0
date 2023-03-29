@@ -2,404 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B18C761AF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 16:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1DBC74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 17:06:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbjC2Qul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 12:50:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60120 "EHLO
+        id S231244AbjC2RGf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 13:06:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230379AbjC2Quj (ORCPT
+        with ESMTP id S231233AbjC2RGd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 12:50:39 -0400
-Received: from p3plwbeout15-02.prod.phx3.secureserver.net (p3plsmtp15-02-2.prod.phx3.secureserver.net [173.201.193.36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17CF75FC2
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 09:50:33 -0700 (PDT)
-Received: from mailex.mailcore.me ([94.136.40.143])
-        by :WBEOUT: with ESMTP
-        id hZ0KpAI7dnisThZ0LpzlJg; Wed, 29 Mar 2023 09:50:33 -0700
-X-CMAE-Analysis: v=2.4 cv=Yet4Wydf c=1 sm=1 tr=0 ts=64246c59
- a=EhJYbXVJKsomWlz4CTV+qA==:117 a=84ok6UeoqCVsigPHarzEiQ==:17
- a=ggZhUymU-5wA:10 a=IkcTkHD0fZMA:10 a=k__wU0fu6RkA:10 a=VwQbUJbxAAAA:8
- a=20KFwNOVAAAA:8 a=FXvPX3liAAAA:8 a=gjMtakkyLEDTN96sYTAA:9 a=QEXdDO2ut3YA:10
- a=AjGcO6oz07-iQ99wixmX:22 a=UObqyxdv-6Yh2QiB9mM_:22
-X-SECURESERVER-ACCT: phillip@squashfs.org.uk  
-X-SID:  hZ0KpAI7dnisT
-Received: from 82-69-79-175.dsl.in-addr.zen.co.uk ([82.69.79.175] helo=[192.168.178.33])
-        by smtp01.mailcore.me with esmtpa (Exim 4.94.2)
-        (envelope-from <phillip@squashfs.org.uk>)
-        id 1phZ0H-0001bO-K1; Wed, 29 Mar 2023 17:50:30 +0100
-Message-ID: <52a5bd5c-d3a1-71d7-e1e5-7965501818bd@squashfs.org.uk>
-Date:   Wed, 29 Mar 2023 17:50:27 +0100
+        Wed, 29 Mar 2023 13:06:33 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A50B44B8;
+        Wed, 29 Mar 2023 10:06:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1680109581; x=1711645581;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+NnexQOsAOUbE/augeQOa8oyAzkSCsYrdZjdeoHBcjs=;
+  b=eegj7RVxqxvbatq8B2uigrOeBNSe47E0Vr4CJ8Q5pb5LijBYIm2SIfFD
+   LmEpn7ZqRZu8K7NlRYIXfxRgKuoXzpgL+S+kdiGPf4S63OWbc00evtNDX
+   u0RqjBgp1ahJavAYLCQrJbym3ZF/KYloSVIcUo5/Up+eIuseu3XHDhwMA
+   u6XaWsGMkW2SzgXHlOeRKRRkMyQjz7vzNeTCYURvHDR6bR0Nb8CX2GpC9
+   uDuDyx1CrojNNEygT6rnLH7F45mwKe4qwVqoJotcbRzfduHllM+Mhm4+i
+   kx9cbNPJcKVJT9FA4pKEPEUuaBQ3wlVwXkfoJnszNCJyYKEaZApIa6pQM
+   w==;
+X-IronPort-AV: E=Sophos;i="5.98,301,1673884800"; 
+   d="scan'208";a="225092813"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Mar 2023 01:06:20 +0800
+IronPort-SDR: 4Czs/V3uRtbM6T8bvTpWTqKbjnAK/1BA1wnwQ618CHNP6O3qWFFXQgMtwW381tq8vRP7vmUzco
+ 5OdSPUve1Wg3TyLP439ObjlmQAT5IqMRIOCF+m8PxMJQQJ7zq2k9vckW0MjO5b1jZK742Wybhg
+ roJ3UQGbmRyori1AlsQhFqctlQhwnYfTIKjSFz+DTepWukNpOnhnURkj3FK1aTZgWYb0xWjfGg
+ A9TUYIpxbMaFxD73OaXs4XgaoPlP8/+dHnvKiZKQEYFM0G90aZPc+/cuKWAOCk5pVE+D2L0DJa
+ IYM=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 09:22:30 -0700
+IronPort-SDR: 5o43zE44ApvlLKedTs27i6ZN/lELa7pMrmIJQK40gUpdn2C4UtQdcwlIfjiKh1n/bPpGX2YXq8
+ YJJVJzgPqspxZi96lPe0WBzcRw9V0Z9BQK2DV4YAFsTQkHP1VrCBf6vXbgxIZ7J5vpxE0lTn/0
+ xSGPZVtghIG7ljFrff33/jPHtv9RuCOmJLd+y2rtbDipZfTukm+09qiddbRkAF472QN1YGPAI9
+ JwRocCI6ASGu/e1WbcS3qvfbyDLv4KkKB37h7xOPvZEpnFh7bqGxuER/H3ZfH5Gd/fUWjoHgjr
+ ZXs=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.72])
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Mar 2023 10:06:20 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, Song Liu <song@kernel.org>,
+        linux-raid@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 00/19] bio: check return values of bio_add_page
+Date:   Wed, 29 Mar 2023 10:05:46 -0700
+Message-Id: <cover.1680108414.git.johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH 1/2] block: Rework bio_for_each_segment_all()
-To:     Kent Overstreet <kent.overstreet@linux.dev>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     willy@infradead.org, axboe@kernel.dk,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
- <20230327174402.1655365-2-kent.overstreet@linux.dev>
-From:   Phillip Lougher <phillip@squashfs.org.uk>
-In-Reply-To: <20230327174402.1655365-2-kent.overstreet@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Mailcore-Auth: 439999529
-X-Mailcore-Domain: 1394945
-X-123-reg-Authenticated:  phillip@squashfs.org.uk  
-X-Originating-IP: 82.69.79.175
-X-CMAE-Envelope: MS4xfP1G+7d1l1ags5pssdPy3lZpIgQmAnMZy4qUiTY3edwL+VL+E7oPcpTiBuuUxJaI8X1vUYXZMhhLZldrMBK/DYw5WOS+84GVDjfeT5S4x1lXvbJ2BUH7
- NnrNRXrpDbcv5ub8XOaF6pylXSb7hz+1SR57tbdU7u41QOdzwUOS+N/K9wjVhJZ8Zj2eETuVnMWQfyAp6x0UbPqsVtTzAeuwqD6acZGYmUB8Dy9CAZPYXO5L
- Z63ua9F+71w6k+JMBlFLOg==
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/03/2023 18:44, Kent Overstreet wrote:
-> This patch reworks bio_for_each_segment_all() to be more inline with how
-> the other bio iterators work:
-> 
->   - bio_iter_all_peek() now returns a synthesized bio_vec; we don't stash
->     one in the iterator and pass a pointer to it - bad. This way makes it
->     clearer what's a constructed value vs. a reference to something
->     pre-existing, and it also will help with cleaning up and
->     consolidating code with bio_for_each_folio_all().
-> 
->   - We now provide bio_for_each_segment_all_continue(), for squashfs:
->     this makes their code clearer.
-> 
-> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: linux-block@vger.kernel.org
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Phillip Lougher <phillip@squashfs.org.uk>
+We have two functions for adding a page to a bio, __bio_add_page() which is
+used to add a single page to a freshly created bio and bio_add_page() which is
+used to add a page to an existing bio.
 
-> --- a/fs/squashfs/block.c
-> +++ b/fs/squashfs/block.c
+While __bio_add_page() is expected to succeed, bio_add_page() can fail.
 
-> @@ -170,21 +172,25 @@ int squashfs_read_data(struct super_block *sb, u64 index, int length,
->   		if (res)
->   			goto out;
->   
-> -		if (WARN_ON_ONCE(!bio_next_segment(bio, &iter_all))) {
-> +		bvec = bio_iter_all_peek(bio, &iter);
-> +
-> +		if (WARN_ON_ONCE(!bvec.bv_len)) {
->   			res = -EIO;
->   			goto out_free_bio;
->   		}
->   		/* Extract the length of the metadata block */
-> -		data = bvec_virt(bvec);
-> +		data = bvec_virt(&bvec);
->   		length = data[offset];
-> -		if (offset < bvec->bv_len - 1) {
-> +		if (offset < bvec.bv_len - 1) {
->   			length |= data[offset + 1] << 8;
->   		} else {
-> -			if (WARN_ON_ONCE(!bio_next_segment(bio, &iter_all))) {
-> +			bio_iter_all_advance(bio, &iter, bvec.bv_len);
-> +
-> +			if (WARN_ON_ONCE(!bvec.bv_len)) {
->   				res = -EIO;
->   				goto out_free_bio;
->   			}
-> -			data = bvec_virt(bvec);
-> +			data = bvec_virt(&bvec);
->   			length |= data[0] << 8;
->   		}
+This series converts the callers of bio_add_page() which can easily use
+__bio_add_page() to using it and checks the return of bio_add_page() for
+callers that don't work on a freshly created bio.
 
-There is a problem with the above code, on testing I get the following
-results:
+Lastly it marks bio_add_page() as __must_check so we don't have to go again
+and audit all callers.
 
-Index 78018785329, offset 49, bvec.bv_len 1024: In same bio, metadata 
-length 32780
-Index 77867356495, offset 335, bvec.bv_len 1024: In same bio, metadata 
-length 3214
-Index 78012985028, offset 708, bvec.bv_len 1024: In same bio, metadata 
-length 3161
-Index 77738921515, offset 555, bvec.bv_len 1024: In same bio, metadata 
-length 2647
-Index 78012988191, offset 799, bvec.bv_len 1024: In same bio, metadata 
-length 3157
-Index 77738926684, offset 604, bvec.bv_len 1024: In same bio, metadata 
-length 2291
-Index 77738933889, offset 641, bvec.bv_len 1024: In same bio, metadata 
-length 2549
-Index 77738936440, offset 120, bvec.bv_len 1024: In same bio, metadata 
-length 2375
-Index 77738938817, offset 449, bvec.bv_len 1024: In same bio, metadata 
-length 2686
-Index 78018785329, offset 49, bvec.bv_len 1024: In same bio, metadata 
-length 32780
-Index 77867356495, offset 335, bvec.bv_len 1024: In same bio, metadata 
-length 3214
-Index 78012985028, offset 708, bvec.bv_len 1024: In same bio, metadata 
-length 3161
-Index 77738941505, offset 65, bvec.bv_len 1024: In same bio, metadata 
-length 2730
-Index 78012988191, offset 799, bvec.bv_len 1024: In same bio, metadata 
-length 3157
-Index 77738946766, offset 206, bvec.bv_len 1024: In same bio, metadata 
-length 2651
-Index 77738949419, offset 811, bvec.bv_len 1024: In same bio, metadata 
-length 2616
-Index 77738952037, offset 357, bvec.bv_len 1024: In same bio, metadata 
-length 2712
-Index 77738954751, offset 1023, bvec.bv_len 1024: Overlapping bios, 
-metadata length 41205, low-byte 245 high-byte 160
-SQUASHFS error: Failed to read block 0x12199a5001: -5
-Kernel panic - not syncing: squashfs read failed
+Johannes Thumshirn (19):
+  swap: use __bio_add_page to add page to bio
+  drbd: use __bio_add_page to add page to bio
+  dm: dm-zoned: use __bio_add_page for adding single metadata page
+  fs: buffer: use __bio_add_page to add single page to bio
+  md: use __bio_add_page to add single page
+  md: raid5-log: use __bio_add_page to add single page
+  md: raid5: use __bio_add_page to add single page to new bio
+  btrfs: repair: use __bio_add_page for adding single page
+  btrfs: raid56: use __bio_add_page to add single page
+  jfs: logmgr: use __bio_add_page to add single page to bio
+  gfs: use __bio_add_page for adding single page to bio
+  zonefs: use __bio_add_page for adding single page to bio
+  zram: use __bio_add_page for adding single page to bio
+  floppy: use __bio_add_page for adding single page to bio
+  md: check for failure when adding pages in alloc_behind_master_bio
+  md: raid1: use __bio_add_page for adding single page to bio
+  md: raid1: check if adding pages to resync bio fails
+  dm-crypt: check if adding pages to clone bio fails
+  block: mark bio_add_page as __must_check
 
-The output should be fairly explanatory.
+ drivers/block/drbd/drbd_bitmap.c |  8 +++++---
+ drivers/block/floppy.c           |  2 +-
+ drivers/block/zram/zram_drv.c    |  2 +-
+ drivers/md/dm-crypt.c            |  9 ++++++++-
+ drivers/md/dm-zoned-metadata.c   |  6 +++---
+ drivers/md/md.c                  |  4 ++--
+ drivers/md/raid1-10.c            |  7 ++++++-
+ drivers/md/raid1.c               |  5 +++--
+ drivers/md/raid10.c              | 12 ++++++++++--
+ drivers/md/raid5-cache.c         |  2 +-
+ drivers/md/raid5-ppl.c           |  4 ++--
+ fs/btrfs/bio.c                   |  2 +-
+ fs/btrfs/raid56.c                |  2 +-
+ fs/buffer.c                      |  2 +-
+ fs/gfs2/ops_fstype.c             |  2 +-
+ fs/jfs/jfs_logmgr.c              |  4 ++--
+ fs/zonefs/super.c                |  2 +-
+ include/linux/bio.h              |  2 +-
+ mm/page_io.c                     |  8 ++++----
+ 19 files changed, 54 insertions(+), 31 deletions(-)
 
-When the two-byte length field is in the same bio, it is correctly read.
-
-When it overlaps two bios, the first (low-byte) is read correctly, but
-the high byte read from the second bio is wrong.  It is being read as
-160 when it should be 10.
-
-So the code that reads the second bio isn't working as it should do.
-
-Phillip
-
-
->   		bio_free_pages(bio);
-> diff --git a/fs/squashfs/lz4_wrapper.c b/fs/squashfs/lz4_wrapper.c
-> index 49797729f1..bd0dd787d2 100644
-> --- a/fs/squashfs/lz4_wrapper.c
-> +++ b/fs/squashfs/lz4_wrapper.c
-> @@ -92,20 +92,23 @@ static int lz4_uncompress(struct squashfs_sb_info *msblk, void *strm,
->   	struct bio *bio, int offset, int length,
->   	struct squashfs_page_actor *output)
->   {
-> -	struct bvec_iter_all iter_all = {};
-> -	struct bio_vec *bvec = bvec_init_iter_all(&iter_all);
-> +	struct bvec_iter_all iter;
-> +	struct bio_vec bvec;
->   	struct squashfs_lz4 *stream = strm;
->   	void *buff = stream->input, *data;
->   	int bytes = length, res;
->   
-> -	while (bio_next_segment(bio, &iter_all)) {
-> -		int avail = min(bytes, ((int)bvec->bv_len) - offset);
-> +	bvec_iter_all_init(&iter);
-> +	bio_iter_all_advance(bio, &iter, offset);
->   
-> -		data = bvec_virt(bvec);
-> -		memcpy(buff, data + offset, avail);
-> +	bio_for_each_segment_all_continue(bvec, bio, iter) {
-> +		unsigned avail = min_t(unsigned, bytes, bvec.bv_len);
-> +
-> +		memcpy(buff, bvec_virt(&bvec), avail);
->   		buff += avail;
->   		bytes -= avail;
-> -		offset = 0;
-> +		if (!bytes)
-> +			break;
->   	}
->   
->   	res = LZ4_decompress_safe(stream->input, stream->output,
-> diff --git a/fs/squashfs/lzo_wrapper.c b/fs/squashfs/lzo_wrapper.c
-> index d216aeefa8..bccfcfa12e 100644
-> --- a/fs/squashfs/lzo_wrapper.c
-> +++ b/fs/squashfs/lzo_wrapper.c
-> @@ -66,21 +66,24 @@ static int lzo_uncompress(struct squashfs_sb_info *msblk, void *strm,
->   	struct bio *bio, int offset, int length,
->   	struct squashfs_page_actor *output)
->   {
-> -	struct bvec_iter_all iter_all = {};
-> -	struct bio_vec *bvec = bvec_init_iter_all(&iter_all);
-> +	struct bvec_iter_all iter;
-> +	struct bio_vec bvec;
->   	struct squashfs_lzo *stream = strm;
->   	void *buff = stream->input, *data;
->   	int bytes = length, res;
->   	size_t out_len = output->length;
->   
-> -	while (bio_next_segment(bio, &iter_all)) {
-> -		int avail = min(bytes, ((int)bvec->bv_len) - offset);
-> +	bvec_iter_all_init(&iter);
-> +	bio_iter_all_advance(bio, &iter, offset);
->   
-> -		data = bvec_virt(bvec);
-> -		memcpy(buff, data + offset, avail);
-> +	bio_for_each_segment_all_continue(bvec, bio, iter) {
-> +		unsigned avail = min_t(unsigned, bytes, bvec.bv_len);
-> +
-> +		memcpy(buff, bvec_virt(&bvec), avail);
->   		buff += avail;
->   		bytes -= avail;
-> -		offset = 0;
-> +		if (!bytes)
-> +			break;
->   	}
->   
->   	res = lzo1x_decompress_safe(stream->input, (size_t)length,
-> diff --git a/fs/verity/verify.c b/fs/verity/verify.c
-> index 961ba24802..c08ff3b406 100644
-> --- a/fs/verity/verify.c
-> +++ b/fs/verity/verify.c
-> @@ -215,7 +215,7 @@ void fsverity_verify_bio(struct bio *bio)
->   	const struct fsverity_info *vi = inode->i_verity_info;
->   	const struct merkle_tree_params *params = &vi->tree_params;
->   	struct ahash_request *req;
-> -	struct bio_vec *bv;
-> +	struct bio_vec bv;
->   	struct bvec_iter_all iter_all;
->   	unsigned long max_ra_pages = 0;
->   
-> @@ -238,7 +238,7 @@ void fsverity_verify_bio(struct bio *bio)
->   	}
->   
->   	bio_for_each_segment_all(bv, bio, iter_all) {
-> -		struct page *page = bv->bv_page;
-> +		struct page *page = bv.bv_page;
->   		unsigned long level0_index = page->index >> params->log_arity;
->   		unsigned long level0_ra_pages =
->   			min(max_ra_pages, params->level0_blocks - level0_index);
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index c1da63f6c8..554eebd6a9 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -76,22 +76,37 @@ static inline void *bio_data(struct bio *bio)
->   	return NULL;
->   }
->   
-> -static inline bool bio_next_segment(const struct bio *bio,
-> -				    struct bvec_iter_all *iter)
-> +static inline struct bio_vec bio_iter_all_peek(const struct bio *bio,
-> +					       struct bvec_iter_all *iter)
->   {
-> -	if (iter->idx >= bio->bi_vcnt)
-> -		return false;
-> +	BUG_ON(iter->idx >= bio->bi_vcnt);
-> +	return bvec_iter_all_peek(bio->bi_io_vec, iter);
-> +}
->   
-> -	bvec_advance(&bio->bi_io_vec[iter->idx], iter);
-> -	return true;
-> +static inline void bio_iter_all_advance(const struct bio *bio,
-> +					struct bvec_iter_all *iter,
-> +					unsigned bytes)
-> +{
-> +	bvec_iter_all_advance(bio->bi_io_vec, iter, bytes);
-> +
-> +	BUG_ON(iter->idx > bio->bi_vcnt || (iter->idx == bio->bi_vcnt && iter->done));
->   }
->   
-> +#define bio_for_each_segment_all_continue(bvl, bio, iter)		\
-> +	for (;								\
-> +	     iter.idx < bio->bi_vcnt &&					\
-> +		((bvl = bio_iter_all_peek(bio, &iter)), true);		\
-> +	     bio_iter_all_advance((bio), &iter, bvl.bv_len))
-> +
->   /*
->    * drivers should _never_ use the all version - the bio may have been split
->    * before it got to the driver and the driver won't own all of it
->    */
-> -#define bio_for_each_segment_all(bvl, bio, iter) \
-> -	for (bvl = bvec_init_iter_all(&iter); bio_next_segment((bio), &iter); )
-> +#define bio_for_each_segment_all(bvl, bio, iter)			\
-> +	for (bvec_iter_all_init(&iter);					\
-> +	     iter.idx < bio->bi_vcnt &&					\
-> +		((bvl = bio_iter_all_peek(bio, &iter)), true);		\
-> +	     bio_iter_all_advance((bio), &iter, bvl.bv_len))
->   
->   static inline void bio_advance_iter(const struct bio *bio,
->   				    struct bvec_iter *iter, unsigned int bytes)
-> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-> index 35c25dff65..12f0e073c0 100644
-> --- a/include/linux/bvec.h
-> +++ b/include/linux/bvec.h
-> @@ -46,12 +46,6 @@ struct bvec_iter {
->   						   current bvec */
->   } __packed;
->   
-> -struct bvec_iter_all {
-> -	struct bio_vec	bv;
-> -	int		idx;
-> -	unsigned	done;
-> -};
-> -
->   /*
->    * various member access, note that bio_data should of course not be used
->    * on highmem page vectors
-> @@ -145,7 +139,10 @@ static inline void bvec_iter_advance_single(const struct bio_vec *bv,
->   		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
->   	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
->   
-> -/* for iterating one bio from start to end */
-> +/*
-> + * bvec_iter_all: for advancing over a bio as it was originally created, but
-> + * with the usual bio_for_each_segment interface - nonstandard, do not use:
-> + */
->   #define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
->   {									\
->   	.bi_sector	= 0,						\
-> @@ -154,33 +151,45 @@ static inline void bvec_iter_advance_single(const struct bio_vec *bv,
->   	.bi_bvec_done	= 0,						\
->   }
->   
-> -static inline struct bio_vec *bvec_init_iter_all(struct bvec_iter_all *iter_all)
-> +/*
-> + * bvec_iter_all: for advancing over individual pages in a bio, as it was when
-> + * it was first created:
-> + */
-> +struct bvec_iter_all {
-> +	int		idx;
-> +	unsigned	done;
-> +};
-> +
-> +static inline void bvec_iter_all_init(struct bvec_iter_all *iter_all)
->   {
->   	iter_all->done = 0;
->   	iter_all->idx = 0;
-> +}
->   
-> -	return &iter_all->bv;
-> +static inline struct bio_vec bvec_iter_all_peek(const struct bio_vec *bvec,
-> +						struct bvec_iter_all *iter)
-> +{
-> +	struct bio_vec bv = bvec[iter->idx];
-> +
-> +	bv.bv_offset	+= iter->done;
-> +	bv.bv_len	-= iter->done;
-> +
-> +	bv.bv_page	+= bv.bv_offset >> PAGE_SHIFT;
-> +	bv.bv_offset	&= ~PAGE_MASK;
-> +	bv.bv_len	= min_t(unsigned, PAGE_SIZE - bv.bv_offset, bv.bv_len);
-> +
-> +	return bv;
->   }
->   
-> -static inline void bvec_advance(const struct bio_vec *bvec,
-> -				struct bvec_iter_all *iter_all)
-> +static inline void bvec_iter_all_advance(const struct bio_vec *bvec,
-> +					 struct bvec_iter_all *iter,
-> +					 unsigned bytes)
->   {
-> -	struct bio_vec *bv = &iter_all->bv;
-> -
-> -	if (iter_all->done) {
-> -		bv->bv_page++;
-> -		bv->bv_offset = 0;
-> -	} else {
-> -		bv->bv_page = bvec->bv_page + (bvec->bv_offset >> PAGE_SHIFT);
-> -		bv->bv_offset = bvec->bv_offset & ~PAGE_MASK;
-> -	}
-> -	bv->bv_len = min_t(unsigned int, PAGE_SIZE - bv->bv_offset,
-> -			   bvec->bv_len - iter_all->done);
-> -	iter_all->done += bv->bv_len;
-> +	iter->done += bytes;
->   
-> -	if (iter_all->done == bvec->bv_len) {
-> -		iter_all->idx++;
-> -		iter_all->done = 0;
-> +	while (iter->done && iter->done >= bvec[iter->idx].bv_len) {
-> +		iter->done -= bvec[iter->idx].bv_len;
-> +		iter->idx++;
->   	}
->   }
->   
+-- 
+2.39.2
 
