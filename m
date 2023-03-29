@@ -2,303 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAA2C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 11:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D5EEC74A5B
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 11:22:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjC2LKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 07:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41284 "EHLO
+        id S229772AbjC2LWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 07:22:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbjC2LKi (ORCPT
+        with ESMTP id S229477AbjC2LWQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 07:10:38 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0107A19A1
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 04:10:34 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230329111033epoutp03e702564406a3c7b0f2d1f7ef57ee8a63~Q31ivVaW33163931639epoutp03a
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 11:10:32 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230329111033epoutp03e702564406a3c7b0f2d1f7ef57ee8a63~Q31ivVaW33163931639epoutp03a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1680088233;
-        bh=Xk+nH/TKHZ2otMFv1dPDB9/vDYwI4owFqXLVfiYqr5I=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=g35lzFk+iQunlTGitO0HvRTJl27P6Md5l9mLwEqXLuLft2hFy6C45P9A+flSaXfZi
-         aP8SJv4tXAPTqt0WxXJ3IwT4HRG8xfpHzMX5OnczXxW6aLeMzByq3o8nuQ/A8miQmQ
-         f/eHP8DcJzJ32BeRJU3pGzdxJaz6lIHXrbpgdjv0=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20230329111032epcas5p4d136e23b1114a6a012bd1dcdce095e8d~Q31iEcnFw1699116991epcas5p4P;
-        Wed, 29 Mar 2023 11:10:32 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.182]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4PmkP23Ghsz4x9Q1; Wed, 29 Mar
-        2023 11:10:30 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        30.74.55678.6AC14246; Wed, 29 Mar 2023 20:10:30 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230329104226epcas5p1a6c8373304372ec2c02573ac59a7e8d8~Q3dAAFZeX0051700517epcas5p1L;
-        Wed, 29 Mar 2023 10:42:26 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230329104226epsmtrp142b1ba35c822a3a46a762710d3a53155~Q3c--A1i30671106711epsmtrp1c;
-        Wed, 29 Mar 2023 10:42:26 +0000 (GMT)
-X-AuditID: b6c32a4a-6a3ff7000000d97e-f4-64241ca6b704
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        B4.0B.31821.21614246; Wed, 29 Mar 2023 19:42:26 +0900 (KST)
-Received: from green5 (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230329104223epsmtip1c86cdb99c232682a50f105b430b65e80~Q3c80kGNQ2021320213epsmtip1R;
-        Wed, 29 Mar 2023 10:42:22 +0000 (GMT)
-Date:   Wed, 29 Mar 2023 16:11:42 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Anuj Gupta <anuj20.g@samsung.com>, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>, bvanassche@acm.org,
-        hare@suse.de, ming.lei@redhat.com, joshi.k@samsung.com,
-        nitheshshetty@gmail.com, gost.dev@samsung.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v8 1/9] block: Introduce queue limits for copy-offload
- support
-Message-ID: <20230329104142.GA11932@green5>
+        Wed, 29 Mar 2023 07:22:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9718133;
+        Wed, 29 Mar 2023 04:22:14 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8D56F1F7AB;
+        Wed, 29 Mar 2023 11:22:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1680088933; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gebdMLUhhGELLLVSbQbSg6v4/rJOoLd9eRIXmlgXsio=;
+        b=vXmcD7WVZBRtIF0QTHnyV0Rs4Utot99+8SQdPpEeQgdw9Nt9PPFDXEaDiGG07RKvkX9o4l
+        lGXnaYncs8HwoSJ4MiI1vkPA5f/VJ3GJlKnBIUWk10zdR5ivx8u3vsRJi+RTJsPs0Xg3tS
+        /x3S3AGVNCHDf2wdcfpAeE+BafyyrcY=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6EBF7138FF;
+        Wed, 29 Mar 2023 11:22:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id QbCbGWUfJGSgSQAAMHmgww
+        (envelope-from <mhocko@suse.com>); Wed, 29 Mar 2023 11:22:13 +0000
+Date:   Wed, 29 Mar 2023 13:22:12 +0200
+From:   Michal Hocko <mhocko@suse.com>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
+Subject: Re: [PATCH v2 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
+ outside task context
+Message-ID: <ZCQfZJFufkJ10o01@dhcp22.suse.cz>
+References: <20230328221644.803272-1-yosryahmed@google.com>
+ <20230328221644.803272-5-yosryahmed@google.com>
 MIME-Version: 1.0
-In-Reply-To: <e725768d-19f5-a78a-2b05-c0b189624fea@opensource.wdc.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xbdRTH87u3vS2Y6l0B91sZyMpDB8Ja1sLtAkIcwxsekcU5gwtCR69A
-        gLbpw6FmjofoYOMxxCnVbMCAOVCYsCFQykiRUQqMRR4GtgFzJVPeA2WZBLBwi9l/n3PO9+S8
-        ctgo91sWj50i11AquTSNj9kzmrv2e/vW7PWQCWqvvEw0mG+jRHbxOkrUPSjCiNmuZUBcXHqG
-        EmsDgyhhWPiOSYx1tiJEe2UJQlyr60YIfcUThOjenMeIEuMoIKZHdAhhGPch2g29DGKo7XuM
-        uFwzzSKMX+UgRIslCxD1s4sMwjTuTAyu9zBDd5NDw5GkbnIAI1t1D1jk4MTPDHJoQEs21uZh
-        ZFPVGVI/lomRBTkLVkHuJJNc7BjByMIbtYBs6vuUXGl0JRst80jMS++nBiVTUhmlcqPkiQpZ
-        ijwpmB/5TvzheHGAQOgrlBCBfDe5NJ0K5odFxfiGp6RZV8B3+0iaprW6YqRqNf/AG0EqhVZD
-        uSUr1JpgPqWUpSlFSj+1NF2tlSf5ySnNIaFA4C+2ChNSkztyN1BlvjDj5sgVViYweeUDOzbE
-        RXDueh6SD+zZXFwP4D+3h23GMoB3+6uZtLEC4NXrE8ydlDv9fbZAG4Bf3rrJog0LgH+PFm+r
-        GLgnXDpXZWU2G8N9YN8me8vtiIvh/PlcxhajeA0TLt7fljvgx+DF4SnWFnOs8j9ulTFp3gV7
-        yyzbejs8HP7Zt4BssRPuDjubexC6oQY7WN95nOYw+M05HUqzA5zpucGimQf/KvrCxqfgtdIf
-        sK2eIf45gLrfdYAOhMBccxFKN5cCTUsbtgQX+LW5HqH9L8KCNYutMAe2XNphd/hjQzlG8x44
-        +jTLxiQsXq+yLegZgJUPH4Ni8IruueF0z9Wj+XVYrl/GdNbdobgzvLrBpnE/bGg7UA6YtWAP
-        pVSnJ1FqsdJfTp36/+KJivRGsP0i3hEt4OHUkp8RIGxgBJCN8h05a6N8GZcjk378CaVSxKu0
-        aZTaCMTWW11AeU6JCuuPyTXxQpFEIAoICBBJDgYI+bs5rwb3JnLxJKmGSqUoJaXayUPYdrxM
-        RDkoXo9KzZKYKo891herFQ4zH+TO3nUpFzafDq2Ouhfpqhh8z3ApPDb18MmGI8mqHO67C40V
-        Gd4eVZxdKsOAZ8dy19m5gezQ0dDYJ79W+zadYMq0GZ5xhpCTjLWgOxGfOS5k/+vtuhl7hrs6
-        L2EJIscTwjgtphOFb+/Lf1PgIivQT9+LDfQIv0DJSgrOjtknHA3sdz/qVejk8trIkcUa57hO
-        jiI6rFnKdfY3dq/Ulf7GWY07dL+itqXt+Gr/o72rm2lPzTPc6DyvCVGHS4TxhcvRB0/zfPJK
-        ois+nFvPlsSXDbeGTpkNvMn21kecEIeY0o5+zpSjGUnPMlne2vjlPPMnPkOdLBV6oyq19D/z
-        ynCPqwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrJIsWRmVeSWpSXmKPExsWy7bCSnK6QmEqKwauvvBbrTx1jtmia8JfZ
-        YvXdfjaL14c/MVpM+/CT2eL32fPMFnvfzWa1uHlgJ5PFnkWTmCxWrj7KZLF74Ucmi6P/37JZ
-        TDp0jdHi6dVZTBZ7b2lb7Nl7ksXi8q45bBbzlz1ltzg0uZnJYseTRkaLda/fs1icuCVtcf7v
-        cVYHcY/LV7w9Zt0/y+axc9Zddo/z9zayeFw+W+qxaVUnm8fmJfUeu282sHn0Nr8DKmi9z+rx
-        ft9VNo++LasYPTafrvb4vEnOY9OTt0wB/FFcNimpOZllqUX6dglcGd1rTrAVHNer2PJ/GXsD
-        4zyVLkZODgkBE4lzZ06zdjFycQgJ7GCU2PvsLCtEQlJi2d8jzBC2sMTKf8/ZIYoeMUrcfXQX
-        rIhFQFXiQ/cSIJuDg01AW+L0fw6QsIiAqcTbnlYWEJtZYBWrxL1duiC2sECIxLQrD9hBbF6g
-        8kf7Z0It/sko0TblHitEQlDi5MwnUM1aEjf+vWQCmc8sIC2x/B/YfE4BN4kXp98xgdiiAsoS
-        B7YdZ5rAKDgLSfcsJN2zELoXMDKvYpRMLSjOTc8tNiwwykst1ytOzC0uzUvXS87P3cQIjn0t
-        rR2Me1Z90DvEyMTBeIhRgoNZSYT39zWlFCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8F7pOxgsJ
-        pCeWpGanphakFsFkmTg4pRqY1s3Qi+PIut/wauYp/2ftceuSPxhM/3RMgNvFySb3mYFUfvs+
-        FjG+lmQOeWnn5+dlDy9Yzvj3aVvYgkcB28ReyDyXqwxmiuoXfZZfIOm0V0HuW69y+ler/W2H
-        F9lm75515uT/BZuyrmtevBvF2V94MkrViTerPmjba86PmzN8Hy2Ya/1hA1vvj5K2eX5hX94v
-        PGJx2POlyFPnicen2HwIa1njHnZe+4XAKqPupu3z2SsOLb1tdyCl+pSZxBFt7Zatx+V+501v
-        kGjpuOh74HrNho4d5wvuZhb88fy5p0BI9OeGn2XH9jUlcFi9ZLulkBemqu/inLn16yPhgE6W
-        udcLw51n3TrzPmi/aYjSBnVPJZbijERDLeai4kQARjFdhmwDAAA=
-X-CMS-MailID: 20230329104226epcas5p1a6c8373304372ec2c02573ac59a7e8d8
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_118142_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230327084216epcas5p3945507ecd94688c40c29195127ddc54d
-References: <20230327084103.21601-1-anuj20.g@samsung.com>
-        <CGME20230327084216epcas5p3945507ecd94688c40c29195127ddc54d@epcas5p3.samsung.com>
-        <20230327084103.21601-2-anuj20.g@samsung.com>
-        <e725768d-19f5-a78a-2b05-c0b189624fea@opensource.wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230328221644.803272-5-yosryahmed@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_118142_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+On Tue 28-03-23 22:16:39, Yosry Ahmed wrote:
+> rstat flushing is too expensive to perform in irq context.
+> The previous patch removed the only context that may invoke an rstat
+> flush from irq context, add a WARN_ON_ONCE() to detect future
+> violations, or those that we are not aware of.
+> 
+> Ideally, we wouldn't flush with irqs disabled either, but we have one
+> context today that does so in mem_cgroup_usage(). Forbid callers from
+> irq context for now, and hopefully we can also forbid callers with irqs
+> disabled in the future when we can get rid of this callsite.
 
-On Wed, Mar 29, 2023 at 05:40:09PM +0900, Damien Le Moal wrote:
-> On 3/27/23 17:40, Anuj Gupta wrote:
-> > From: Nitesh Shetty <nj.shetty@samsung.com>
-> > 
-> > Add device limits as sysfs entries,
-> >         - copy_offload (RW)
-> >         - copy_max_bytes (RW)
-> >         - copy_max_bytes_hw (RO)
-> > 
-> > Above limits help to split the copy payload in block layer.
-> > copy_offload: used for setting copy offload(1) or emulation(0).
-> > copy_max_bytes: maximum total length of copy in single payload.
-> > copy_max_bytes_hw: Reflects the device supported maximum limit.
-> > 
-> > Reviewed-by: Hannes Reinecke <hare@suse.de>
-> > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> > Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> > ---
-> >  Documentation/ABI/stable/sysfs-block | 36 ++++++++++++++++
-> >  block/blk-settings.c                 | 24 +++++++++++
-> >  block/blk-sysfs.c                    | 64 ++++++++++++++++++++++++++++
-> >  include/linux/blkdev.h               | 12 ++++++
-> >  include/uapi/linux/fs.h              |  3 ++
-> >  5 files changed, 139 insertions(+)
-> > 
-> > diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-> > index c57e5b7cb532..f5c56ad91ad6 100644
-> > --- a/Documentation/ABI/stable/sysfs-block
-> > +++ b/Documentation/ABI/stable/sysfs-block
-> > @@ -155,6 +155,42 @@ Description:
-> >  		last zone of the device which may be smaller.
-> >  
-> >  
-> > +What:		/sys/block/<disk>/queue/copy_offload
-> > +Date:		November 2022
-> > +Contact:	linux-block@vger.kernel.org
-> > +Description:
-> > +		[RW] When read, this file shows whether offloading copy to
-> > +		device is enabled (1) or disabled (0). Writing '0' to this
-> 
-> ...to a device...
-> 
-acked
+I am sorry to be late to the discussion. I wanted to follow up on
+Johannes reply in the previous version but you are too fast ;)
 
-> > +		file will disable offloading copies for this device.
-> > +		Writing any '1' value will enable this feature. If device
-> 
-> If the device does...
-> 
-acked
+I do agree that this looks rather arbitrary. You do not explain how the
+warning actually helps. Is the intention to be really verbose to the
+kernel log when somebody uses this interface from the IRQ context and
+get bug reports? What about configurations with panic on warn? Do we
+really want to crash their systems for something like that?
 
-> > +		does not support offloading, then writing 1, will result in
-> > +		error.
-> > +
-> > +
-> > +What:		/sys/block/<disk>/queue/copy_max_bytes
-> > +Date:		November 2022
-> > +Contact:	linux-block@vger.kernel.org
-> > +Description:
-> > +		[RW] While 'copy_max_bytes_hw' is the hardware limit for the
-> > +		device, 'copy_max_bytes' setting is the software limit.
-> > +		Setting this value lower will make Linux issue smaller size
-> > +		copies from block layer.
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> Reviewed-by: Shakeel Butt <shakeelb@google.com>
+> ---
+>  kernel/cgroup/rstat.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> 		This is the maximum number of bytes that the block
->                 layer will allow for a copy request. Must be smaller than
->                 or equal to the maximum size allowed by the hardware indicated
-
-Looks good.  Will update in next version. We took reference from discard. 
-
-> 		by copy_max_bytes_hw. Write 0 to use the default kernel
-> 		settings.
-> 
-
-Nack, writing 0 will not set it to default value. (default value is
-copy_max_bytes = copy_max_bytes_hw)
-
-> > +
-> > +
-> > +What:		/sys/block/<disk>/queue/copy_max_bytes_hw
-> > +Date:		November 2022
-> > +Contact:	linux-block@vger.kernel.org
-> > +Description:
-> > +		[RO] Devices that support offloading copy functionality may have
-> > +		internal limits on the number of bytes that can be offloaded
-> > +		in a single operation. The `copy_max_bytes_hw`
-> > +		parameter is set by the device driver to the maximum number of
-> > +		bytes that can be copied in a single operation. Copy
-> > +		requests issued to the device must not exceed this limit.
-> > +		A value of 0 means that the device does not
-> > +		support copy offload.
-> 
-> 		[RO] This is the maximum number of kilobytes supported in a
->                 single data copy offload operation. A value of 0 means that the
-> 		device does not support copy offload.
-> 
-
-Nack, value is in bytes. Same as discard.
-
-> > +
-> > +
-> >  What:		/sys/block/<disk>/queue/crypto/
-> >  Date:		February 2022
-> >  Contact:	linux-block@vger.kernel.org
-> > diff --git a/block/blk-settings.c b/block/blk-settings.c
-> > index 896b4654ab00..350f3584f691 100644
-> > --- a/block/blk-settings.c
-> > +++ b/block/blk-settings.c
-> > @@ -59,6 +59,8 @@ void blk_set_default_limits(struct queue_limits *lim)
-> >  	lim->zoned = BLK_ZONED_NONE;
-> >  	lim->zone_write_granularity = 0;
-> >  	lim->dma_alignment = 511;
-> > +	lim->max_copy_sectors_hw = 0;
-> > +	lim->max_copy_sectors = 0;
-> >  }
-> >  
-> >  /**
-> > @@ -82,6 +84,8 @@ void blk_set_stacking_limits(struct queue_limits *lim)
-> >  	lim->max_dev_sectors = UINT_MAX;
-> >  	lim->max_write_zeroes_sectors = UINT_MAX;
-> >  	lim->max_zone_append_sectors = UINT_MAX;
-> > +	lim->max_copy_sectors_hw = ULONG_MAX;
-> > +	lim->max_copy_sectors = ULONG_MAX;
-> >  }
-> >  EXPORT_SYMBOL(blk_set_stacking_limits);
-> >  
-> > @@ -183,6 +187,22 @@ void blk_queue_max_discard_sectors(struct request_queue *q,
-> >  }
-> >  EXPORT_SYMBOL(blk_queue_max_discard_sectors);
-> >  
-> > +/**
-> > + * blk_queue_max_copy_sectors_hw - set max sectors for a single copy payload
-> > + * @q:  the request queue for the device
-> > + * @max_copy_sectors: maximum number of sectors to copy
-> > + **/
-> > +void blk_queue_max_copy_sectors_hw(struct request_queue *q,
-> > +		unsigned int max_copy_sectors)
-> > +{
-> > +	if (max_copy_sectors >= MAX_COPY_TOTAL_LENGTH)
-> 
-> Confusing name as LENGTH may be interpreted as bytes. MAX_COPY_SECTORS would be
-> better.
-> 
-
-Agreed, we will make MAX_COPY_TOTAL_LENGTH explicit to bytes.
-We also check this limit against user payload length which is in bytes(patch 2).
-So there is a inconsistency from our end (patch 1 and 2). We will fix this
-in next version.
-
-> > +		max_copy_sectors = MAX_COPY_TOTAL_LENGTH;
-> > +
-> > +	q->limits.max_copy_sectors_hw = max_copy_sectors;
-> > +	q->limits.max_copy_sectors = max_copy_sectors;
-> > +}
-> > +EXPORT_SYMBOL_GPL(blk_queue_max_copy_sectors_hw);
-> 
-> 
+> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+> index d3252b0416b6..c2571939139f 100644
+> --- a/kernel/cgroup/rstat.c
+> +++ b/kernel/cgroup/rstat.c
+> @@ -176,6 +176,8 @@ static void cgroup_rstat_flush_locked(struct cgroup *cgrp, bool may_sleep)
+>  {
+>  	int cpu;
+>  
+> +	/* rstat flushing is too expensive for irq context */
+> +	WARN_ON_ONCE(!in_task());
+>  	lockdep_assert_held(&cgroup_rstat_lock);
+>  
+>  	for_each_possible_cpu(cpu) {
 > -- 
-> Damien Le Moal
-> Western Digital Research
-> 
-> 
+> 2.40.0.348.gf938b09366-goog
 
-------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_118142_
-Content-Type: text/plain; charset="utf-8"
-
-
-------KU2CxbTk4.ftA7vvsvzLW4bt.-m_7jRTbTuK1k18jgDVn8pS=_118142_--
+-- 
+Michal Hocko
+SUSE Labs
