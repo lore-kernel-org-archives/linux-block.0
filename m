@@ -2,205 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96366C74A5B
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 16:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC3F8C6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 16:44:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229487AbjC2QWJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 12:22:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43872 "EHLO
+        id S230206AbjC2Qo2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 12:44:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjC2QWI (ORCPT
+        with ESMTP id S229750AbjC2Qo1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 12:22:08 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D9B091;
-        Wed, 29 Mar 2023 09:22:04 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id u10so15434260plz.7;
-        Wed, 29 Mar 2023 09:22:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680106924;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eL805LanJCOtJR13Sv0bSKaadQ6dj4kBVLoTB3pCMlY=;
-        b=bw1OMPbv63jCW6z5zwcrjh7m+55uhBfSqng2W/HmczxHL3TcG5RIbu/Ae1+drJPfkj
-         r3FiuKCqsa6TMlHoLyJs9h1CDElGHjgfeh+udceyadCu0VCItBIS1/7FqEy7u09pQy2w
-         WjNGWpkhG2ioEFry8C9vgmtvEvk7ZvrkDKBVk/7QRH3nMmXyl4+FERCpPcd86fRBfSN7
-         E3GXpz0u3jMddlrT2dxqgjxQ8dkc5KyYWDsr+ey4XAc8oUv06iPQHVp+R41zFNEMnL8o
-         F5dy1rggrE8Rq1mtkBN7xogBwYqLjtA0o+DiMTgD4M5wlwI0+2OPP8xcktbQ98DAmlfU
-         EE6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680106924;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eL805LanJCOtJR13Sv0bSKaadQ6dj4kBVLoTB3pCMlY=;
-        b=aSPVANK2wDu91Uup0pytMPEAcTf6Bmzf4zvK0Rp3qyu5jywqEv8BOTOZJGEVyfmARS
-         h/8V4Kke5lZcHFR9FcsREFG+mbkybd3IAgFrJRi10eFAR3SDhQ9/q8zhgKWd80Pxo4lS
-         SJO//2CgxYpbJdlD1usQmHeOgcg92mxAsOfpVbxTKjhb+59SgtyEVprlLmdR30Z2faLp
-         og0PkX//2oyv6ykN8AhIleeNcIOY1C2ThpDywC9OCbTM0hTN4GoHChMjoIzyia1zCfYn
-         02gRaOmUtqepQT9KMgZWDuqBhHwWz3YM9HRkPihgJhAGR+TQ6C90Bgxi2iTV2WOTr9z5
-         Jivg==
-X-Gm-Message-State: AAQBX9clQNQDH+YHvzrhiM6keWpWB8tPUCf1agCVaKL0jwgGOcB0ZOx9
-        468wFjeoFtaUk282PmGzW0s=
-X-Google-Smtp-Source: AKy350bkl3Js0CxHq/OfLJhRqkWjrD3+HMYyX6ssnyqmd4SG8heNYygswD09G0AIgTVAbuK1C4rA1A==
-X-Received: by 2002:a17:902:dacf:b0:19c:d7a9:8bf0 with SMTP id q15-20020a170902dacf00b0019cd7a98bf0mr3003399plx.10.1680106923636;
-        Wed, 29 Mar 2023 09:22:03 -0700 (PDT)
-Received: from localhost.localdomain ([240f:34:212d:1:cf16:fc3d:6c49:2909])
-        by smtp.gmail.com with ESMTPSA id a10-20020a170902b58a00b00198b01b412csm23176845pls.303.2023.03.29.09.22.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Mar 2023 09:22:02 -0700 (PDT)
-From:   Akinobu Mita <akinobu.mita@gmail.com>
-To:     chaitanyak@nvidia.com
-Cc:     akinobu.mita@gmail.com, akpm@linux-foundation.org, axboe@kernel.dk,
-        hch@infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, shinichiro.kawasaki@wdc.com
-Subject: [PATCH blktests] don't require modular null_blk for fault-injection
-Date:   Thu, 30 Mar 2023 01:21:45 +0900
-Message-Id: <20230329162145.147395-1-akinobu.mita@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <7c00f4f8-5bdf-4fa6-d9f0-141cf88c9ec9@nvidia.com>
-References: <7c00f4f8-5bdf-4fa6-d9f0-141cf88c9ec9@nvidia.com>
+        Wed, 29 Mar 2023 12:44:27 -0400
+X-Greylist: delayed 165 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 29 Mar 2023 09:44:26 PDT
+Received: from p3plwbeout17-01.prod.phx3.secureserver.net (p3plsmtp17-01-2.prod.phx3.secureserver.net [173.201.193.162])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8902D55
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 09:44:26 -0700 (PDT)
+Received: from mailex.mailcore.me ([94.136.40.144])
+        by :WBEOUT: with ESMTP
+        id hYrkp77KGWrMGhYrkpobIF; Wed, 29 Mar 2023 09:41:41 -0700
+X-CMAE-Analysis: v=2.4 cv=AqsrYMxP c=1 sm=1 tr=0 ts=64246a45
+ a=wXHyRMViKMYRd//SnbHIqA==:117 a=84ok6UeoqCVsigPHarzEiQ==:17
+ a=ggZhUymU-5wA:10 a=IkcTkHD0fZMA:10 a=k__wU0fu6RkA:10 a=4ao_m9BdAAAA:8
+ a=A5gmrugz_5UGpGwqIrwA:9 a=QEXdDO2ut3YA:10 a=MsgbvsnFcLE8lbaOJhbn:22
+X-SECURESERVER-ACCT: phillip@squashfs.org.uk  
+X-SID:  hYrkp77KGWrMG
+Received: from 82-69-79-175.dsl.in-addr.zen.co.uk ([82.69.79.175] helo=[192.168.178.33])
+        by smtp07.mailcore.me with esmtpa (Exim 4.94.2)
+        (envelope-from <phillip@squashfs.org.uk>)
+        id 1phYrm-0002Rj-6u; Wed, 29 Mar 2023 17:41:42 +0100
+Message-ID: <e1df6748-d923-6ff5-9012-359cbfd8a718@squashfs.org.uk>
+Date:   Wed, 29 Mar 2023 17:41:34 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH 0/2] bio iter improvements
+To:     Kent Overstreet <kent.overstreet@linux.dev>,
+        Phillip Lougher <phillip.lougher@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        willy@infradead.org, axboe@kernel.dk
+References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
+ <CAB3woddAP_6uOUJ4Yjj_PATme-CQao3p2JErBBtjtpzYxQejng@mail.gmail.com>
+ <ZCMcbnlZchi3kWIL@moria.home.lan>
+From:   Phillip Lougher <phillip@squashfs.org.uk>
+In-Reply-To: <ZCMcbnlZchi3kWIL@moria.home.lan>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Mailcore-Auth: 439999529
+X-Mailcore-Domain: 1394945
+X-123-reg-Authenticated:  phillip@squashfs.org.uk  
+X-Originating-IP: 82.69.79.175
+X-CMAE-Envelope: MS4xfM+s2+e1DosdiwrYUVgGPgnCp1D5xyNuRbLTGuWth5A1cSnTuGkDlxbH5I8b3s1Bxs2f1YpQQNIsHqd0Oo9foMqf6Ag8CKAxRMKxIEO6TJZdEuERQp69
+ H7SmJYL/j3ZzsF7CsoZcMsXtBqOizcYvFFqdCY1zUHXptizEuYaYzs+ERap1CDqP8AbR4WOo1kO3KwCBtjiBIY45AXkcZZEq05w4/V3et8cAoUO0IQwO9hHJ
+ 8rWAxEIkZD+lLK1QBILVMA==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I'm trying to allow configuration of null_blk fault-injection via configfs.
+On 28/03/2023 17:57, Kent Overstreet wrote:
+> On Tue, Mar 28, 2023 at 02:42:28PM +0100, Phillip Lougher wrote:
+>> On Mon, Mar 27, 2023 at 7:02 PM Kent Overstreet
+>> <kent.overstreet@linux.dev> wrote:
+>>>
+>>> Small patch series cleaning up/standardizing bio_for_each_segment_all(),
+>>> which means we can use the same guts for bio_for_each_folio_all(),
+>>> considerably simplifying that code.
+>>>
+>>> The squashfs maintainer will want to look at and test those changes,
+>>> that code was doing some slightly tricky things. The rest was a pretty
+>>> mechanical conversion.
+>>
+>> An eyeball of the changes doesn't bring up anything obviously wrong.
+>>
+>> I'll apply and do some tests.
+>>
+>> Phillip
+>>
+>> BTW please CC me on the cover letter as well as patch [1/2].
+> 
+> Will do.
+> 
+> There were some squashfs files that got missed, there's a fixup patch
+> you'll want in this branch:
+> 
+> https://evilpiepirate.org/git/bcachefs.git/log/?h=bio_folio_iter
 
-This blktests change changes null_blk fault-injection settings to be
-configured via configfs instead of module parameters.
-This allows null_blk fault-injection tests to run even if the null_blk is
-built-in the kernel and not built as a module.
+Patches applied, and I do see some issues in testing.
 
-However, to keep the scripts simple, we will skip testing if the null_blk
-does not yet support configuring fault-injection via configfs.
+I'll reply on patch [1/2] because that's where the code is.
 
-Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
----
- tests/block/014 | 18 ++++++++++++------
- tests/block/015 | 18 ++++++++++++------
- tests/block/030 | 26 +++++++++++++++-----------
- 3 files changed, 39 insertions(+), 23 deletions(-)
-
-diff --git a/tests/block/014 b/tests/block/014
-index facd4bc..65913e5 100755
---- a/tests/block/014
-+++ b/tests/block/014
-@@ -16,20 +16,26 @@ requires() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
--	# The format is "<interval>,<probability>,<space>,<times>". Here, we
--	# fail 50% of I/Os.
--	if ! _init_null_blk timeout='1,50,0,-1'; then
-+	# Here, we fail 50% of I/Os.
-+	if ! _configure_null_blk faultb0 timeout_inject/probability=50 \
-+	     timeout_inject/times=-1 timeout_inject/verbose=0 power=1; then
-+		if [[ -d /sys/kernel/config/nullb/faultb0/timeout_inject ]]; then
-+			echo "Configuring null_blk failed"
-+		else
-+			SKIP_REASONS+=("requires fault injection via configfs")
-+		fi
-+		rmdir /sys/kernel/config/nullb/faultb0
- 		return 1
- 	fi
- 
--	for sched in $(_io_schedulers nullb0); do
-+	for sched in $(_io_schedulers faultb0); do
- 		echo "Testing $sched" >> "$FULL"
--		echo "$sched" > /sys/block/nullb0/queue/scheduler
-+		echo "$sched" > /sys/block/faultb0/queue/scheduler
- 		# Do a bunch of I/Os which will timeout and then complete. The
- 		# only thing we're really testing here is that this doesn't
- 		# crash or hang.
- 		for ((i = 0; i < 100; i++)); do
--			dd if=/dev/nullb0 of=/dev/null bs=4K count=4 \
-+			dd if=/dev/faultb0 of=/dev/null bs=4K count=4 \
- 				iflag=direct status=none > /dev/null 2>&1 &
- 		done
- 		wait
-diff --git a/tests/block/015 b/tests/block/015
-index 389c67f..5257d33 100755
---- a/tests/block/015
-+++ b/tests/block/015
-@@ -18,16 +18,22 @@ requires() {
- test() {
- 	echo "Running ${TEST_NAME}"
- 
--	# The format is "<interval>,<probability>,<space>,<times>". Here, we
--	# requeue 10% of the time.
--	if ! _init_null_blk requeue='1,10,0,-1'; then
-+	# Here, we requeue 10% of the time.
-+	if ! _configure_null_blk faultb0 requeue_inject/probability=10 \
-+	     requeue_inject/times=-1 requeue_inject/verbose=0 power=1; then
-+		if [[ -d /sys/kernel/config/nullb/faultb0/requeue_inject ]]; then
-+			echo "Configuring null_blk failed"
-+		else
-+			SKIP_REASONS+=("requires fault injection via configfs")
-+		fi
-+		rmdir /sys/kernel/config/nullb/faultb0
- 		return 1
- 	fi
- 
--	for sched in $(_io_schedulers nullb0); do
-+	for sched in $(_io_schedulers faultb0); do
- 		echo "Testing $sched" >> "$FULL"
--		echo "$sched" > /sys/block/nullb0/queue/scheduler
--		dd if=/dev/nullb0 of=/dev/null bs=4K count=$((512 * 1024)) \
-+		echo "$sched" > /sys/block/faultb0/queue/scheduler
-+		dd if=/dev/faultb0 of=/dev/null bs=4K count=$((512 * 1024)) \
- 			iflag=direct status=none
- 	done
- 
-diff --git a/tests/block/030 b/tests/block/030
-index 7a0712b..f3cc337 100755
---- a/tests/block/030
-+++ b/tests/block/030
-@@ -17,19 +17,23 @@ requires() {
- }
- 
- test() {
--	local i sq=/sys/kernel/config/nullb/nullb0/submit_queues
-+	local i sq=/sys/kernel/config/nullb/faultb0/submit_queues
- 
- 	: "${TIMEOUT:=30}"
--	# Legend: init_hctx=<interval>,<probability>,<space>,<times>
- 	# Set <space> to $(nproc) + 1 to make loading of null_blk succeed.
--	if ! _init_null_blk nr_devices=0 \
--	     "init_hctx=$(nproc),100,$(($(nproc) + 1)),-1"; then
--		echo "Loading null_blk failed"
--		return 1
--	fi
--	if ! _configure_null_blk nullb0 completion_nsec=0 blocksize=512 size=16\
--	     submit_queues="$(nproc)" memory_backed=1 power=1; then
--		echo "Configuring null_blk failed"
-+	if ! _configure_null_blk faultb0 completion_nsec=0 blocksize=512 size=16\
-+	     submit_queues="$(nproc)" memory_backed=1 \
-+	     init_hctx_fault_inject/interval="$(nproc)" \
-+	     init_hctx_fault_inject/probability=100 \
-+	     init_hctx_fault_inject/space="$(($(nproc) + 1))" \
-+	     init_hctx_fault_inject/times=-1 \
-+	     init_hctx_fault_inject/verbose=0 power=1; then
-+		if [[ -d /sys/kernel/config/nullb/faultb0/init_hctx_fault_inject ]]; then
-+			echo "Configuring null_blk failed"
-+		else
-+			SKIP_REASONS+=("requires fault injection via configfs")
-+		fi
-+		rmdir /sys/kernel/config/nullb/faultb0
- 		return 1
- 	fi
- 	# Since older null_blk versions do not allow "submit_queues" to be
-@@ -47,7 +51,7 @@ test() {
- 	else
- 		SKIP_REASONS+=("Skipping test because $sq cannot be modified")
- 	fi
--	rmdir /sys/kernel/config/nullb/nullb0
-+	rmdir /sys/kernel/config/nullb/faultb0
- 	_exit_null_blk
- 	echo Passed
- }
--- 
-2.34.1
+Phillip
 
