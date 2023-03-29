@@ -2,288 +2,185 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E55C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 08:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC59AC6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 29 Mar 2023 08:18:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230527AbjC2ISB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Mar 2023 04:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47368 "EHLO
+        id S230417AbjC2ISb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Mar 2023 04:18:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230491AbjC2IRP (ORCPT
+        with ESMTP id S230521AbjC2IR7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Mar 2023 04:17:15 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 882784ED3
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:16:36 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230329081634epoutp018557f22fe43de337d8e1729e5ec76c06~Q1dpZjFwv1483214832epoutp01E
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 08:16:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230329081634epoutp018557f22fe43de337d8e1729e5ec76c06~Q1dpZjFwv1483214832epoutp01E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1680077794;
-        bh=lm0WP6O4CL5/qIdjNGTZX/T8lPRCo7+74BXwP7Ula+E=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=apw/ZAAvoyBAzNqib27S9mMdwX1Dtba9K5LYX2p7RI5fFUVB0Lg1jkJ525/0FnSMn
-         LSatC9SgJoTfkkewhjj3vAXF5z8sRhbXnjkhXFHq3MT6yQLms9qVXUtjIr/tAAM8Jo
-         M5p4/VmXWv88oW6BR9vMqsLmDefQ8HgwEPKtM3Xs=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20230329081634epcas5p384a60fc6e935d5677d4fd6fdae0febc5~Q1do1vqoW1882518825epcas5p3E;
-        Wed, 29 Mar 2023 08:16:34 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.174]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4PmfXJ2dzfz4x9Q9; Wed, 29 Mar
-        2023 08:16:32 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C1.20.06765.0E3F3246; Wed, 29 Mar 2023 17:16:32 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230327084331epcas5p2510ed79d04fe3432c2ec84ce528745c6~QOimo1dPU0968909689epcas5p21;
-        Mon, 27 Mar 2023 08:43:31 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230327084331epsmtrp2fb8c9870f1fe27704e0328bf8f28bf73~QOimnxreA2690426904epsmtrp2Q;
-        Mon, 27 Mar 2023 08:43:31 +0000 (GMT)
-X-AuditID: b6c32a4b-46dfa70000011a6d-23-6423f3e00c8b
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A9.4C.18071.33751246; Mon, 27 Mar 2023 17:43:31 +0900 (KST)
-Received: from green5.sa.corp.samsungelectronics.net (unknown
-        [107.110.206.5]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230327084327epsmtip160db9f1d1db73f5d72d3f78f49ac1595~QOijROTfK3005130051epsmtip15;
-        Mon, 27 Mar 2023 08:43:27 +0000 (GMT)
-From:   Anuj Gupta <anuj20.g@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     bvanassche@acm.org, hare@suse.de, ming.lei@redhat.com,
-        damien.lemoal@opensource.wdc.com, anuj20.g@samsung.com,
-        joshi.k@samsung.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH v8 9/9] null_blk: add support for copy offload
-Date:   Mon, 27 Mar 2023 14:10:57 +0530
-Message-Id: <20230327084103.21601-10-anuj20.g@samsung.com>
-X-Mailer: git-send-email 2.35.1.500.gb896f729e2
-In-Reply-To: <20230327084103.21601-1-anuj20.g@samsung.com>
+        Wed, 29 Mar 2023 04:17:59 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24944229
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:16:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1680077813; x=1711613813;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=i1Av5v0IANfijJy7313HLD9w+ZztkoJqJ2yCebnr7tA=;
+  b=e15y/E5MfqFfgR3NixsJgYL3Y6/HymV7iOPMGdgXjuqTlPMHRaGcElUI
+   DrDT6H7DgXjqREn6R8iBBLTIPqec/gIAMi4Sd1yibsBhG4uDhd1yC/UOp
+   REDegfvLMFoT7oZiwRrB4AT3uSdCIAfoVZpoQEv346FjAebx18a+5dEqk
+   PPUgL6XgtXB2OaT0hdqCX3ziRzO2b58ieBVHYHkgzGN7eOzA75EWNhTr2
+   hO7jvg9w8ZgKCIL+jjSl+DWXYiFGXF7xiNMYB4A74+OwGTDp/ZZwyb2Vn
+   Orj0bbJSaAIRfpqJlHwVj7uRj5v+ph7IwAz+6kZlQoJe64WwqjKY5On1T
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.98,300,1673884800"; 
+   d="scan'208";a="338843293"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Mar 2023 16:16:53 +0800
+IronPort-SDR: kfuNJrQWTUJlqy1c1EkO3xDrrnedBCaYJSFCC/HkcneiX8QwMsfcR4MOVwsB6fMX11o+T/DbT5
+ Ahv+2SfgNGfjRjTPOlAMP9KFZVsC5eT7fFA24TRTEd31jnMNEAWGAyI5uu1mo+skZ2p4PsdKu2
+ q46F9DoVjy1foj+ndxWmH2SIBNO+7eH7GnDN4wG38pOPnf+54fGYRuV29n+HN3AgWoazF35f1P
+ MBegQb0cHVqdZsdMp70gfYoH5/LZTJOKPCKTYJjVJDDDXfa8D+GLda8wCJes//FNv+2wDNmuYM
+ Lvs=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 00:33:02 -0700
+IronPort-SDR: w1AyZx+W1a4ZBAnGdqrKdS1/WeqBAilT9OFY6XA9v+UE5zFA6/y1Ze5hUtcyexmAjl3ruw18K/
+ G+rwkyFRbuUaCZkUsEnjIFDgtpIqY2n1fKCk46c4wcW/RBk/Pg6ZGQ8uBFFT6u8FuMOrd8FepS
+ sPObs3f3B6UpnwqHnztM+a37XS/05hmSsB+V5EBhhjx00DODiKd1Y/7jMxBe6LJ+wsAmEbS6TH
+ y/mbECrWYUjHZZZCCewC+XKNu8gqNL9u1jQJnhogfHezumxTHPCO8HTgkXqCAnA0u+mGiK5A0b
+ Fxo=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Mar 2023 01:16:54 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4PmfXj0tKrz1RtVn
+        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 01:16:53 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1680077811; x=1682669812; bh=i1Av5v0IANfijJy7313HLD9w+ZztkoJqJ2y
+        Cebnr7tA=; b=gWqsCRnserwXaDL8ml5qgKO7pSyI1iw0bNbFdYwWZ1zYMaWzIRz
+        jSOvxO8sT2yfl+tNydRUPiUDPAVyjelMrRyJ5NwEH4TQl8CmFDCceMaOu7sLM+4+
+        aYR0Oa0xxMoNoPW1YgZDcySL2Hw4r1JaZBPEjCIlsrQuKcg2SdPb6w58TQIT2aCt
+        wEh8j2USfrIphoM/UERtqnyrypwjoppPg8YWoML1nbLANCnSmGUJkjrFVIbeKJRC
+        yRMxEXk/ltSkZyIPyZJF4+Dpp984AepsWgemgNUHZgyvaP5fbezWllWaZXF7MulS
+        nbEtKKWId4kxhABlY5owjQE2GrGILg2jzgA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 8e_b_AGT7KVE for <linux-block@vger.kernel.org>;
+        Wed, 29 Mar 2023 01:16:51 -0700 (PDT)
+Received: from [10.225.163.116] (unknown [10.225.163.116])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4PmfXf49tHz1RtVm;
+        Wed, 29 Mar 2023 01:16:50 -0700 (PDT)
+Message-ID: <0517910b-5acf-be28-24de-d7616de8a7fc@opensource.wdc.com>
+Date:   Wed, 29 Mar 2023 17:16:49 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTdxTH87u3vRRI3eVh9pNlrrkbYTh5KZQfaHUPt90EXRqXSOJmSkdv
-        CoM+1tuObbJZxlAeARSQuIIylZGAmUBhrDxqWBFYOx6aCgiZwrSIHfIQzESYspbC5n+fc873
-        5Jzz/eXHw/3PeAXxUpVaRqOUplOED6elKzQ0bGLxVVnk0qIvqrf14Ojbk09xdOlWMYGmuxYA
-        Kp9/gqOV/kEcmWcruGi0sxVDHRdKMFR7qRtD7ecfYqh7dYZAJZZhgCaHDBgyj72BOsxWDrK3
-        VRKoqmbSC1lKszFkcmQB1LJShaPL03Mc9NvYS+huQS5Ag097uW9uoe03EmjDeD9BtxpuedGD
-        txs5tL1fRxvr8gi6qfoY3T6qJ+jC7FmXIGecS89dGSLoouY6QDf9fpReNG6ljY4ZTPzC4bTd
-        KYxUxmgEjDJZJUtVykVUwoeSdyQxwsiosKg4FEsJlFIFI6L27ReHvZea7jKDEnwuTde5UmIp
-        y1IRe3ZrVDotI0hRsVoRxahl6epodTgrVbA6pTxcyWjjoyIjd8S4hElpKTd7sgh1VvAXlpZO
-        oAc3t+YDbx4ko6EpX++VD3x4/mQ7gI+WywhPsACg80wx7gn+BvBGcy53o2X0bCvHUzAD2FLk
-        XA+yMVjzpBe4VQQZAq9O5QB3IZA8jsOHk3lrKpzMwaGj0+TlVgWQe+C9yuK1Dg4ZDB8s5HLc
-        zCfj4Yy92qXhueZFwOJxP3fa25WuNNm4HokftH7vWJPj5Csw++eKtV0hWe8Ns8obOZ5d98Hl
-        Cifu4QD4V2+zl4eD4OKsmfCwHC7ZJzEPq2F2zxXg4b0wx+Y2gOcaEArr2yI86ZfhadtlzDN3
-        Eyxccay38qHp3AZT8ERt5TpDaB7QrzMNa0uG1g0uBPBi6SpxEggMz91jeO4ew/+jfwB4HdjC
-        qFmFnGFj1DuVTMZ/75ysUhjB2hfZlmACdybmwy0A4wELgDycCuSvDFMyf75M+uVXjEYl0ejS
-        GdYCYlx+n8KDNierXH9MqZVERcdFRguFwui4ncIo6kV+iMia7E/KpVomjWHUjGajD+N5B+kx
-        MpXutB/elbHaydrbdlivNpKiB9gH1WXL796BpyXbq0JNzpkfhwt+3XV8WmG1HvLdzt178TMM
-        tzYcva6IOzD3S9LrbWevOQcO+Y4smI0ZIwESWH9BCrKLngXmKaR9iY63BhwnQpfePhCXlsn/
-        mq2YbeqoKDvvVNret7ApMzF+xoa6ubGPk3jlR1qmM5uonxqmDROncq6F8CLvHxxZnkr+VCSA
-        /lN5jzfdTqqfbPVXPy44do9rDG40xOYNqkvrz3X/08XVfhKf2KfiBXFe436XKH7EyJdtfqN4
-        7p99YtGR+Tbhviy8SVyz3+dZpk2XFrt6v/EjPX4w/Y+7Dd9cZzeHUhw2RRq1Ddew0n8BLZKS
-        8asEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02RXUhTcRjG+59zPDtKq9NM+qtlOVyR0aYk9q+p1YV1TBCjiyAJPbTDFOca
-        W2bZhZpFaphiaDQtrURwluY0dX5kbM38QK1Mc5UOvyl11srIrMwpgXfP+/ye93kvXgoX9BAe
-        VJzyPKdWsgoh6ULUmYRee/ed8pb5WeY8UVVnG46u5P7BUcVQDommTXaACr4s4GixuxdHLbZC
-        J2R5bsBQ84M8DJVXmDHUdP8rhsxLsyTKMw4ANNGvxVDL+z2ouaWDQH2NRSQqLpvgIeOtdAw1
-        jKcBVLdYjKPK6TkCtb/3RGM3MgDq/fPS6bA70/c2nNFau0nGoB3iMb3D1QTT153I6HWZJFNT
-        msI0WVJJJjvdthy4ZnVi5p71k8zNWh1garouM9/0Xox+fBaL3HjaJUjGKeIucGpJSIxL7GBb
-        GqlKE1001j0HqWDQKws4U5AOgJa7BiILuFACugnAYesgbxVA2PmpDKxqV1j+d4q3GkrD4HD9
-        B9IBSHoXfDF1DTjAZjoXh2+sqaRjwOl8HM43zaykXOkQOFmUs1JF0CI4Y88gHJpPH4SzfaXL
-        tdTyCQnMsW5y2M7LdlFDp5NDC+gDMOd6I7Ya3wQ77oyvrOL0dpj+tBDPBbR2DdKuQSUA0wF3
-        TqVJkCdo/FX+Si5JrGETNIlKufjsuQQ9WHm57+4GUK/7IjYCjAJGAClcuJlfE+4tE/Bl7KVk
-        Tn0uWp2o4DRG4EkRwi38V1kd0QJazp7n4jlOxan/U4xy9kjFfN1c3UoOKddlB2dazPkege1s
-        qymmIyoyv2ubfGS96d1o9IawHb9TQntCjmbunxjpnFL4iVKyg1UvfJZih47n9e+sPKHXLurm
-        I+JLXonrJFXxrDnF0h7m7i7de+90cfXV2xHeW1WJvTLFR1FrHvXWZrvbKOVL9/+OSBaN5i6x
-        twbehc5vYUft/d+NlqSBRw/fFMRUdr3OL7vsE1JwhCf80Rr0aPikMPSMZN5kLRz5Fbh0TDnX
-        fHAGuXlMTk9Mnj159adVabQ9wb3k5YZZXpv08RCK66GlmF4XXiEB3+szx0oDxFFhBrvZ78T1
-        NkXSgn477RwVGfvZPr4QXR9VKyQ0say/L67WsP8A07UlKmEDAAA=
-X-CMS-MailID: 20230327084331epcas5p2510ed79d04fe3432c2ec84ce528745c6
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230327084331epcas5p2510ed79d04fe3432c2ec84ce528745c6
-References: <20230327084103.21601-1-anuj20.g@samsung.com>
-        <CGME20230327084331epcas5p2510ed79d04fe3432c2ec84ce528745c6@epcas5p2.samsung.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH 1/2] virtio-blk: migrate to the latest patchset version
+Content-Language: en-US
+To:     Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sam Li <faithilikerun@gmail.com>
+Cc:     virtio-dev@lists.oasis-open.org,
+        virtualization@lists.linux-foundation.org
+References: <20230328022928.1003996-1-dmitry.fomichev@wdc.com>
+ <20230328022928.1003996-2-dmitry.fomichev@wdc.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20230328022928.1003996-2-dmitry.fomichev@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Nitesh Shetty <nj.shetty@samsung.com>
+On 3/28/23 11:29, Dmitry Fomichev wrote:
+> The merged patch series to support zoned block devices in virtio-blk
+> is not the most up to date version. The merged patch can be found at
+> 
+> https://lore.kernel.org/linux-block/20221016034127.330942-3-dmitry.fomichev@wdc.com/
+> 
+> , but the latest and reviewed version is
+> 
+> https://lore.kernel.org/linux-block/20221110053952.3378990-3-dmitry.fomichev@wdc.com/
+> 
+> The differences between the two are mostly cleanups, but there is one
+> change that is very important in terms of compatibility with the
+> approved virtio-zbd specification.
+> 
+> Before it was approved, the OASIS virtio spec had a change in
+> VIRTIO_BLK_T_ZONE_APPEND request layout that is not reflected in the
+> current virtio-blk driver code. In the running code, the status is
+> the first byte of the in-header that is followed by some pad bytes
+> and the u64 that carries the sector at which the data has been written
+> to the zone back to the driver, aka the append sector.
+> 
+> This layout turned out to be problematic for implementing in QEMU and
+> the request status byte has been eventually made the last byte of the
+> in-header. The current code doesn't expect that and this causes the
+> append sector value always come as zero to the block layer. This needs
+> to be fixed ASAP.
+> 
+> Fixes: 95bfec41bd3d ("virtio-blk: add support for zoned block devices")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 
-Implementaion is based on existing read and write infrastructure.
+A couple of nits below, but otherwise looks good to me.
 
-Suggested-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
----
- drivers/block/null_blk/main.c     | 94 +++++++++++++++++++++++++++++++
- drivers/block/null_blk/null_blk.h |  7 +++
- 2 files changed, 101 insertions(+)
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 9e6b032c8ecc..84c5fbcd67a5 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1257,6 +1257,81 @@ static int null_transfer(struct nullb *nullb, struct page *page,
- 	return err;
- }
- 
-+static inline int nullb_setup_copy_read(struct nullb *nullb,
-+		struct bio *bio)
-+{
-+	struct nullb_copy_token *token = bvec_kmap_local(&bio->bi_io_vec[0]);
-+
-+	memcpy(token->subsys, "nullb", 5);
-+	token->sector_in = bio->bi_iter.bi_sector;
-+	token->nullb = nullb;
-+	token->sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-+
-+	return 0;
-+}
-+
-+static inline int nullb_setup_copy_write(struct nullb *nullb,
-+		struct bio *bio, bool is_fua)
-+{
-+	struct nullb_copy_token *token = bvec_kmap_local(&bio->bi_io_vec[0]);
-+	sector_t sector_in, sector_out;
-+	void *in, *out;
-+	size_t rem, temp;
-+	unsigned long offset_in, offset_out;
-+	struct nullb_page *t_page_in, *t_page_out;
-+	int ret = -EIO;
-+
-+	if (unlikely(memcmp(token->subsys, "nullb", 5)))
-+		return -EOPNOTSUPP;
-+	if (unlikely(token->nullb != nullb))
-+		return -EOPNOTSUPP;
-+	if (WARN_ON(token->sectors != bio->bi_iter.bi_size >> SECTOR_SHIFT))
-+		return -EOPNOTSUPP;
-+
-+	sector_in = token->sector_in;
-+	sector_out = bio->bi_iter.bi_sector;
-+	rem = token->sectors << SECTOR_SHIFT;
-+
-+	spin_lock_irq(&nullb->lock);
-+	while (rem > 0) {
-+		temp = min_t(size_t, nullb->dev->blocksize, rem);
-+		offset_in = (sector_in & SECTOR_MASK) << SECTOR_SHIFT;
-+		offset_out = (sector_out & SECTOR_MASK) << SECTOR_SHIFT;
-+
-+		if (null_cache_active(nullb) && !is_fua)
-+			null_make_cache_space(nullb, PAGE_SIZE);
-+
-+		t_page_in = null_lookup_page(nullb, sector_in, false,
-+			!null_cache_active(nullb));
-+		if (!t_page_in)
-+			goto err;
-+		t_page_out = null_insert_page(nullb, sector_out,
-+			!null_cache_active(nullb) || is_fua);
-+		if (!t_page_out)
-+			goto err;
-+
-+		in = kmap_local_page(t_page_in->page);
-+		out = kmap_local_page(t_page_out->page);
-+
-+		memcpy(out + offset_out, in + offset_in, temp);
-+		kunmap_local(out);
-+		kunmap_local(in);
-+		__set_bit(sector_out & SECTOR_MASK, t_page_out->bitmap);
-+
-+		if (is_fua)
-+			null_free_sector(nullb, sector_out, true);
-+
-+		rem -= temp;
-+		sector_in += temp >> SECTOR_SHIFT;
-+		sector_out += temp >> SECTOR_SHIFT;
-+	}
-+
-+	ret = 0;
-+err:
-+	spin_unlock_irq(&nullb->lock);
-+	return ret;
-+}
-+
- static int null_handle_rq(struct nullb_cmd *cmd)
- {
- 	struct request *rq = cmd->rq;
-@@ -1267,6 +1342,14 @@ static int null_handle_rq(struct nullb_cmd *cmd)
- 	struct req_iterator iter;
- 	struct bio_vec bvec;
- 
-+	if (rq->cmd_flags & REQ_COPY) {
-+		if (op_is_write(req_op(rq)))
-+			return nullb_setup_copy_write(nullb, rq->bio,
-+						rq->cmd_flags & REQ_FUA);
-+		else
-+			return nullb_setup_copy_read(nullb, rq->bio);
-+	}
-+
- 	spin_lock_irq(&nullb->lock);
- 	rq_for_each_segment(bvec, rq, iter) {
- 		len = bvec.bv_len;
-@@ -1294,6 +1377,14 @@ static int null_handle_bio(struct nullb_cmd *cmd)
- 	struct bio_vec bvec;
- 	struct bvec_iter iter;
- 
-+	if (bio->bi_opf & REQ_COPY) {
-+		if (op_is_write(bio_op(bio)))
-+			return nullb_setup_copy_write(nullb, bio,
-+							bio->bi_opf & REQ_FUA);
-+		else
-+			return nullb_setup_copy_read(nullb, bio);
-+	}
-+
- 	spin_lock_irq(&nullb->lock);
- 	bio_for_each_segment(bvec, bio, iter) {
- 		len = bvec.bv_len;
-@@ -2146,6 +2237,9 @@ static int null_add_dev(struct nullb_device *dev)
- 	list_add_tail(&nullb->list, &nullb_list);
- 	mutex_unlock(&lock);
- 
-+	blk_queue_max_copy_sectors_hw(nullb->disk->queue, 1024);
-+	blk_queue_flag_set(QUEUE_FLAG_COPY, nullb->disk->queue);
-+
- 	pr_info("disk %s created\n", nullb->disk_name);
- 
- 	return 0;
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index eb5972c50be8..94e524e7306a 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -67,6 +67,13 @@ enum {
- 	NULL_Q_MQ	= 2,
- };
- 
-+struct nullb_copy_token {
-+	char subsys[5];
-+	struct nullb *nullb;
-+	u64 sector_in;
-+	u64 sectors;
-+};
-+
- struct nullb_device {
- 	struct nullb *nullb;
- 	struct config_item item;
+[...]
+
+> @@ -242,11 +240,15 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
+>  				      struct request *req,
+>  				      struct virtblk_req *vbr)
+>  {
+> -	size_t in_hdr_len = sizeof(vbr->status);
+> +	size_t in_hdr_len = sizeof(vbr->in_hdr.status);
+>  	bool unmap = false;
+>  	u32 type;
+>  	u64 sector = 0;
+>  
+> +	if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+> +		op_is_zone_mgmt(req_op(req)))
+
+Weird indentation here. Make this a single line, or align op_is_zone_mgmt() call
+to "!".
+
+> +		return BLK_STS_NOTSUPP;
+> +
+>  	/* Set fields for all request types */
+>  	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
+>  
+
+[...]
+
+> @@ -794,6 +871,7 @@ static inline bool virtblk_has_zoned_feature(struct virtio_device *vdev)
+>  {
+>  	return virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED);
+>  }
+> +
+>  #else
+>  
+>  /*
+> @@ -809,7 +887,6 @@ static inline int virtblk_probe_zoned_device(struct virtio_device *vdev,
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+> -
+
+Keeping the whiteline between the function definitions would be nicer.
+
+>  static inline bool virtblk_has_zoned_feature(struct virtio_device *vdev)
+>  {
+>  	return false;
+
+
 -- 
-2.35.1.500.gb896f729e2
+Damien Le Moal
+Western Digital Research
 
