@@ -2,119 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 562BEC6FD1D
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 11:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C93C761A6
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 11:50:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231833AbjC3Llr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 07:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48648 "EHLO
+        id S231592AbjC3LuX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 07:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231835AbjC3Llc (ORCPT
+        with ESMTP id S231159AbjC3LuS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 07:41:32 -0400
+        Thu, 30 Mar 2023 07:50:18 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA164B75F
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:39:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF3C8C4
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680176379;
+        s=mimecast20190719; t=1680176980;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=2HaaAMVXBOU9npIKRCm63G2Jnf2K0Y8PRLMtIL+XBWM=;
-        b=MjFbtW/QqLHQfLAV9OScLju9IhFOO4Gw8pVmnhbysGrLzYjJglnVk0b5NIXDRrhJQMAOAz
-        xfzHMn4d+qOgXxKF91PZgQUYC6RdGItXK+XzZ8RBGEDIYdnDh7Y+q2E5S7hIAnQy+jDgXh
-        q/V7dkk1hfSqc/vTVWHQo5+Ah9XpdX0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=MgT8q2jy++WQMRLIsrm1uJ/zXUAPqptvzJtFdyenaOc=;
+        b=aTkMEqhvZ1BJgc6BenqdMRw8UQeICKD9+fTT0bPrgPkPO2l+jQz5sIHamsWK/hsPdNJgrn
+        p26aAMxkTaaHDF6KmhIsz2UJNshM3HbM1doKK94m37UT5bb1pO0efath3KdEggIP8BBBON
+        rZSmqbnhDiginLlHes9F0CacBQYdpIw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-281-Rhj8dw_eM82Bc3Cpkq4GXA-1; Thu, 30 Mar 2023 07:37:14 -0400
-X-MC-Unique: Rhj8dw_eM82Bc3Cpkq4GXA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-557-XelzLDmsP4WGt43mfZhqJw-1; Thu, 30 Mar 2023 07:49:35 -0400
+X-MC-Unique: XelzLDmsP4WGt43mfZhqJw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CD54888B7A2;
-        Thu, 30 Mar 2023 11:37:13 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E4F83202701F;
-        Thu, 30 Mar 2023 11:37:12 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E1A543C025C4;
+        Thu, 30 Mar 2023 11:49:34 +0000 (UTC)
+Received: from ovpn-8-19.pek2.redhat.com (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CAB0B2166B33;
+        Thu, 30 Mar 2023 11:49:29 +0000 (UTC)
+Date:   Thu, 30 Mar 2023 19:49:23 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 07/17] block: ublk_drv: add common exit handling
-Date:   Thu, 30 Mar 2023 19:36:20 +0800
-Message-Id: <20230330113630.1388860-8-ming.lei@redhat.com>
-In-Reply-To: <20230330113630.1388860-1-ming.lei@redhat.com>
-References: <20230330113630.1388860-1-ming.lei@redhat.com>
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        willy@infradead.org, axboe@kernel.dk,
+        Phillip Lougher <phillip@squashfs.org.uk>, ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] block: Rework bio_for_each_segment_all()
+Message-ID: <ZCV3Q+TUMvTZZ/Tl@ovpn-8-19.pek2.redhat.com>
+References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
+ <20230327174402.1655365-2-kent.overstreet@linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230327174402.1655365-2-kent.overstreet@linux.dev>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Simplify exit handling a bit, and prepare for supporting fused command.
+On Mon, Mar 27, 2023 at 01:44:01PM -0400, Kent Overstreet wrote:
+> This patch reworks bio_for_each_segment_all() to be more inline with how
+> the other bio iterators work:
+> 
+>  - bio_iter_all_peek() now returns a synthesized bio_vec; we don't stash
+>    one in the iterator and pass a pointer to it - bad. This way makes it
+>    clearer what's a constructed value vs. a reference to something
+>    pre-existing, and it also will help with cleaning up and
+>    consolidating code with bio_for_each_folio_all().
+> 
+>  - We now provide bio_for_each_segment_all_continue(), for squashfs:
+>    this makes their code clearer.
+> 
+> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Phillip Lougher <phillip@squashfs.org.uk>
+> ---
+>  block/bio.c               | 38 ++++++++++++------------
+>  block/blk-map.c           | 38 ++++++++++++------------
+>  block/bounce.c            | 12 ++++----
+>  drivers/md/bcache/btree.c |  8 ++---
+>  drivers/md/dm-crypt.c     | 10 +++----
+>  drivers/md/raid1.c        |  4 +--
+>  fs/btrfs/disk-io.c        | 10 +++----
+>  fs/btrfs/extent_io.c      | 52 ++++++++++++++++-----------------
+>  fs/btrfs/inode.c          |  8 ++---
+>  fs/btrfs/raid56.c         | 18 ++++++------
+>  fs/crypto/bio.c           |  8 ++---
+>  fs/erofs/zdata.c          |  4 +--
+>  fs/ext4/page-io.c         |  8 ++---
+>  fs/ext4/readpage.c        |  4 +--
+>  fs/f2fs/data.c            | 20 ++++++-------
+>  fs/gfs2/lops.c            | 10 +++----
+>  fs/gfs2/meta_io.c         |  8 ++---
+>  fs/mpage.c                |  4 +--
+>  fs/squashfs/block.c       | 48 ++++++++++++++++--------------
+>  fs/squashfs/lz4_wrapper.c | 17 ++++++-----
+>  fs/squashfs/lzo_wrapper.c | 17 ++++++-----
+>  fs/verity/verify.c        |  4 +--
+>  include/linux/bio.h       | 31 +++++++++++++++-----
+>  include/linux/bvec.h      | 61 ++++++++++++++++++++++-----------------
+>  24 files changed, 239 insertions(+), 203 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index ab59a491a8..8d3abe249e 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1170,13 +1170,13 @@ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+>  
+>  void __bio_release_pages(struct bio *bio, bool mark_dirty)
+>  {
+> -	struct bvec_iter_all iter_all;
+> -	struct bio_vec *bvec;
+> +	struct bvec_iter_all iter;
+> +	struct bio_vec bvec;
+>  
+> -	bio_for_each_segment_all(bvec, bio, iter_all) {
+> -		if (mark_dirty && !PageCompound(bvec->bv_page))
+> -			set_page_dirty_lock(bvec->bv_page);
+> -		put_page(bvec->bv_page);
+> +	bio_for_each_segment_all(bvec, bio, iter) {
+> +		if (mark_dirty && !PageCompound(bvec.bv_page))
+> +			set_page_dirty_lock(bvec.bv_page);
+> +		put_page(bvec.bv_page);
+>  	}
 
-Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+bio_for_each_segment_all is supposed to be used by bio which owns the
+bvec table, so it is just fine to return bvec pointer by bio_for_each_segment_all
+to save extra bvec copy.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c73cc57ec547..bc46616710d4 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -655,14 +655,15 @@ static void ublk_complete_rq(struct request *req)
- 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
- 	struct ublk_io *io = &ubq->ios[req->tag];
- 	unsigned int unmapped_bytes;
-+	blk_status_t res = BLK_STS_OK;
- 
- 	/* failed read IO if nothing is read */
- 	if (!io->res && req_op(req) == REQ_OP_READ)
- 		io->res = -EIO;
- 
- 	if (io->res < 0) {
--		blk_mq_end_request(req, errno_to_blk_status(io->res));
--		return;
-+		res = errno_to_blk_status(io->res);
-+		goto exit;
- 	}
- 
- 	/*
-@@ -671,10 +672,8 @@ static void ublk_complete_rq(struct request *req)
- 	 *
- 	 * Both the two needn't unmap.
- 	 */
--	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE) {
--		blk_mq_end_request(req, BLK_STS_OK);
--		return;
--	}
-+	if (req_op(req) != REQ_OP_READ && req_op(req) != REQ_OP_WRITE)
-+		goto exit;
- 
- 	/* for READ request, writing data in iod->addr to rq buffers */
- 	unmapped_bytes = ublk_unmap_io(ubq, req, io);
-@@ -691,6 +690,10 @@ static void ublk_complete_rq(struct request *req)
- 		blk_mq_requeue_request(req, true);
- 	else
- 		__blk_mq_end_request(req, BLK_STS_OK);
-+
-+	return;
-+exit:
-+	blk_mq_end_request(req, res);
- }
- 
- /*
--- 
-2.39.2
+And the change becomes not efficient any more.
+
+
+Thanks,
+Ming
 
