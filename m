@@ -2,224 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF10C761AF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 04:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE4DC6FD1D
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 05:48:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbjC3E1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 00:27:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55636 "EHLO
+        id S229525AbjC3Fsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 01:48:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbjC3E1F (ORCPT
+        with ESMTP id S229500AbjC3Fss (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 00:27:05 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE731BB
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 21:27:03 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id b20so71596195edd.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Mar 2023 21:27:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680150421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mPxXZwrGY9EQBVrz+rM6XeJQecrNiNwMGKoahuxks9c=;
-        b=UB9ilX9x0DFClvH2MBsafXYctyfQiMtqneVbDgIn8dlkb7SeJEzllIUHniTmROr9zA
-         QNEcN1WFlEJGxgMboHiWeAft9d3KIZB6LTea9dtS1hOwT9F0hILhYXmS0E6kIWINYTZy
-         vBEL04m8KhM3aacYuUlP7egfig+eopFO62We1ZE3+r978w7tMG7VVUF5nAvktNbztfWy
-         DPIUhgo3yBtBMUXACd+J8qLZYHzhxPnNgyVg366YOY7pdoxSIli5kTx+TEp3cf9hhDzv
-         kmAe2yK9UIVG5k/8muUa7zOO6grvclhgaCpWWvyR2kWnYuNTZ48TJfXwnL+iNuR2zeoS
-         O3lA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680150421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mPxXZwrGY9EQBVrz+rM6XeJQecrNiNwMGKoahuxks9c=;
-        b=4wLn9KaWPsDUshm5+cRMOut5I5PYL/Hx7Hz54pWhsPJy0lNYH0GuE9JxNxDibmlaEh
-         PXV5fyC+ESQ6VRxBsEI1z7EnwgcDU2iUhO1zLq1uqXdouIO3p7GojYdNCQCdGpJKF0EG
-         ix4FQdvJVXhy72TP6A4zGCyPWQGGiGxUQgmCduBnrU9mKTl0iazTSusxMulayrhNjW/+
-         6GR+jWbyLdHsmi7Wi1o4ez8hnJG2N4O4H7L6Xfwk0Nb1DUChV0i7wZg5Na4wLwOP3rQy
-         xbq2IX0q7Ir2xWQiUIh/OvxZhukRjEWiboZd4hlwG/4CORrZe4gOnUpQkTynDCUX2s6W
-         JEzg==
-X-Gm-Message-State: AAQBX9e7Ey/cgG9p86PCN0GA/j7or6LuCk/Sq7LhG91LBpgVJ52U4fK3
-        yiQI4lljZ9ysFbx1OtyektsQ9jk8LO3s6O05UzW48A==
-X-Google-Smtp-Source: AKy350Y3jW8mXAik9Znw5lXXT0a3LkoBTafwWbTIHw4pWyMN7nAmXuXsz/YasuYog2yKCeL23uzXcExl0Qv0CZmiwXM=
-X-Received: by 2002:a50:d756:0:b0:4fc:e5c:902 with SMTP id i22-20020a50d756000000b004fc0e5c0902mr10775755edj.8.1680150421386;
- Wed, 29 Mar 2023 21:27:01 -0700 (PDT)
+        Thu, 30 Mar 2023 01:48:48 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C1082139;
+        Wed, 29 Mar 2023 22:48:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 20BDEB825D8;
+        Thu, 30 Mar 2023 05:48:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6990DC433D2;
+        Thu, 30 Mar 2023 05:48:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680155323;
+        bh=lQIWkG96HEOigO4uxjKwseyUJFpfgWSVR2DNobYfCEk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=S1y5ebevSlJFzuLM5GzkEyt/CYemxPmct+Tz3wAEbvbGVWEAXsQTkg1fmRCEliSsl
+         LEdSb/Gl1dECvicoc6sJKNqlIVR8GONQ0rgtvlFJ5c3H6Z6sDmYypmKZ75MxFAr9B5
+         GgHX5jGLB8a5N5l8MPXcfkN4W21aGIiqZ0rlLl9QdEWkKDHyXn7suBHLJGk1UEUpEB
+         MN7hrqBJmCCdC/nkPxaexkfrDkTCuQlHDWiZSSOWAr8DwpibCISqDB1MBgQjWpPF4D
+         Tq5KlHh4/a4K2BJ4iqn5ohJOkYqItOrroYvLlO9xbruZlXLhNPVQzUdK0ppON3P1H7
+         WlJYooCLwgEgQ==
+Date:   Thu, 30 Mar 2023 07:48:35 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     Anuj Gupta <anuj20.g@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, bvanassche@acm.org,
+        hare@suse.de, ming.lei@redhat.com,
+        damien.lemoal@opensource.wdc.com, joshi.k@samsung.com,
+        nitheshshetty@gmail.com, gost.dev@samsung.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v8 4/9] fs, block: copy_file_range for def_blk_ops for
+ direct block device.
+Message-ID: <20230330-strode-deforest-b65424417062@brauner>
+References: <20230327084103.21601-1-anuj20.g@samsung.com>
+ <CGME20230327084244epcas5p1b0ede867e558ff6faf258de3656a8aa4@epcas5p1.samsung.com>
+ <20230327084103.21601-5-anuj20.g@samsung.com>
+ <20230329-glitter-drainpipe-bdf9d3876ac4@brauner>
+ <20230329124236.GB3895@green5>
 MIME-Version: 1.0
-References: <ZBz/V5a7/6PZeM7S@slm.duckdns.org> <CAJD7tkYNZeEytm_Px9_73Y-AYJfHAxaoTmmnO71HW5hd1B5tPg@mail.gmail.com>
- <ZB5UalkjGngcBDEJ@slm.duckdns.org> <CAJD7tkYhyMkD8SFf8b8L1W9QUrLOdw-HJ2NUbENjw5dgFnH3Aw@mail.gmail.com>
- <CALvZod6rF0D21hcV7xnqD+oRkn=x5NLi5GOkPpyaPa859uDH+Q@mail.gmail.com>
- <CAJD7tkY_ESpMYMw72bsATpp6tPphv8qS6VbfEUjpKZW6vUqQSQ@mail.gmail.com>
- <CALvZod41ecuCKmuFBNtAjoKJjQgWYzoe4_B8zRK37HYk-rYDkA@mail.gmail.com>
- <CAJD7tkZrp=4zWvjE9_010TAG1T_crCbf9P64UzJABspgcrGPKg@mail.gmail.com>
- <ZCSJDpPPOVvBYfOy@slm.duckdns.org> <f9b6410-ee17-635f-a35d-559fa0191dc3@google.com>
- <ZCSY8l/jVwszF6iA@slm.duckdns.org> <98cb3ce-7ed9-3d17-9015-ef7193d6627@google.com>
-In-Reply-To: <98cb3ce-7ed9-3d17-9015-ef7193d6627@google.com>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Wed, 29 Mar 2023 21:26:24 -0700
-Message-ID: <CAJD7tkaFhG39LHUNuKmxj2LEvojavOnpnREXz2vvuLrbBAHyEA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/7] cgroup: rstat: only disable interrupts for the
- percpu lock
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Shakeel Butt <shakeelb@google.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230329124236.GB3895@green5>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for a great discussion, Tejun and Hugh.
+On Wed, Mar 29, 2023 at 06:12:36PM +0530, Nitesh Shetty wrote:
+> On Wed, Mar 29, 2023 at 02:14:40PM +0200, Christian Brauner wrote:
+> > On Mon, Mar 27, 2023 at 02:10:52PM +0530, Anuj Gupta wrote:
+> > > From: Nitesh Shetty <nj.shetty@samsung.com>
+> > > 
+> > > For direct block device opened with O_DIRECT, use copy_file_range to
+> > > issue device copy offload, and fallback to generic_copy_file_range incase
+> > > device copy offload capability is absent.
+> > > Modify checks to allow bdevs to use copy_file_range.
+> > > 
+> > > Suggested-by: Ming Lei <ming.lei@redhat.com>
+> > > Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> > > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> > > ---
+> > >  block/blk-lib.c        | 22 ++++++++++++++++++++++
+> > >  block/fops.c           | 20 ++++++++++++++++++++
+> > >  fs/read_write.c        | 11 +++++++++--
+> > >  include/linux/blkdev.h |  3 +++
+> > >  4 files changed, 54 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/block/blk-lib.c b/block/blk-lib.c
+> > > index a21819e59b29..c288573c7e77 100644
+> > > --- a/block/blk-lib.c
+> > > +++ b/block/blk-lib.c
+> > > @@ -475,6 +475,28 @@ static inline bool blk_check_copy_offload(struct request_queue *q_in,
+> > >  	return blk_queue_copy(q_in) && blk_queue_copy(q_out);
+> > >  }
+> > >  
+> > > +int blkdev_copy_offload(struct block_device *bdev_in, loff_t pos_in,
+> > > +		      struct block_device *bdev_out, loff_t pos_out, size_t len,
+> > > +		      cio_iodone_t end_io, void *private, gfp_t gfp_mask)
+> > > +{
+> > > +	struct request_queue *in_q = bdev_get_queue(bdev_in);
+> > > +	struct request_queue *out_q = bdev_get_queue(bdev_out);
+> > > +	int ret = -EINVAL;
+> > 
+> > Why initialize to -EINVAL if blk_copy_sanity_check() initializes it
+> > right away anyway?
+> > 
+> 
+> acked.
+> 
+> > > +	bool offload = false;
+> > 
+> > Same thing with initializing offload.
+> > 
+> acked
+> 
+> > > +
+> > > +	ret = blk_copy_sanity_check(bdev_in, pos_in, bdev_out, pos_out, len);
+> > > +	if (ret)
+> > > +		return ret;
+> > > +
+> > > +	offload = blk_check_copy_offload(in_q, out_q);
+> > > +	if (offload)
+> > > +		ret = __blk_copy_offload(bdev_in, pos_in, bdev_out, pos_out,
+> > > +				len, end_io, private, gfp_mask);
+> > > +
+> > > +	return ret;
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(blkdev_copy_offload);
+> > > +
+> > >  /*
+> > >   * @bdev_in:	source block device
+> > >   * @pos_in:	source offset
+> > > diff --git a/block/fops.c b/block/fops.c
+> > > index d2e6be4e3d1c..3b7c05831d5c 100644
+> > > --- a/block/fops.c
+> > > +++ b/block/fops.c
+> > > @@ -611,6 +611,25 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+> > >  	return ret;
+> > >  }
+> > >  
+> > > +static ssize_t blkdev_copy_file_range(struct file *file_in, loff_t pos_in,
+> > > +				struct file *file_out, loff_t pos_out,
+> > > +				size_t len, unsigned int flags)
+> > > +{
+> > > +	struct block_device *in_bdev = I_BDEV(bdev_file_inode(file_in));
+> > > +	struct block_device *out_bdev = I_BDEV(bdev_file_inode(file_out));
+> > > +	int comp_len = 0;
+> > > +
+> > > +	if ((file_in->f_iocb_flags & IOCB_DIRECT) &&
+> > > +		(file_out->f_iocb_flags & IOCB_DIRECT))
+> > > +		comp_len = blkdev_copy_offload(in_bdev, pos_in, out_bdev,
+> > > +				 pos_out, len, NULL, NULL, GFP_KERNEL);
+> > > +	if (comp_len != len)
+> > > +		comp_len = generic_copy_file_range(file_in, pos_in + comp_len,
+> > > +			file_out, pos_out + comp_len, len - comp_len, flags);
+> > 
+> > I'm not deeply familiar with this code but this looks odd. It at least
+> > seems possible that comp_len could be -EINVAL and len 20 at which point
+> > you'd be doing len - comp_len aka 20 - 22 = -2 in generic_copy_file_range().
 
-On Wed, Mar 29, 2023 at 1:38=E2=80=AFPM Hugh Dickins <hughd@google.com> wro=
-te:
->
-> On Wed, 29 Mar 2023, Tejun Heo wrote:
->
-> > Hello, Hugh. How have you been?
-> >
-> > On Wed, Mar 29, 2023 at 12:22:24PM -0700, Hugh Dickins wrote:
-> > > Hi Tejun,
-> > > Butting in here, I'm fascinated.  This is certainly not my area, I kn=
-ow
-> > > nothing about rstat, but this is the first time I ever heard someone
-> > > arguing for more disabling of interrupts rather than less.
-> > >
-> > > An interrupt coming in while holding a contended resource can certain=
-ly
-> > > add to latencies, that I accept of course.  But until now, I thought =
-it
-> > > was agreed best practice to disable irqs only regretfully, when stric=
-tly
-> > > necessary.
-> > >
-> > > If that has changed, I for one want to know about it.  How should we
-> > > now judge which spinlocks should disable interrupts and which should =
-not?
-> > > Page table locks are currently my main interest - should those be cha=
-nged?
-> >
-> > For rstat, it's a simple case because the global lock here wraps around
-> > per-cpu locks which have to be irq-safe, so the only difference we get
-> > between making the global irq-unsafe and keeping it so but releasing
-> > inbetween is:
-> >
-> >  Global lock held: G
-> >  IRQ disabled: I
-> >  Percpu lock held: P
-> >
-> > 1. IRQ unsafe
-> >
-> >  GGGGGGGGGGGGGGG~~GGGGG
-> >  IIII IIII IIII ~~ IIII
-> >  PPPP PPPP PPPP ~~ PPPP
-> >
-> > 2. IRQ safe released inbetween cpus
-> >
-> >  GGGG GGGG GGGG ~~ GGGG
-> >  IIII IIII IIII ~~ IIII
-> >  PPPP PPPP PPPP ~~ PPPP
-> >
-> > #2 seems like the obvious thing to do here given how the lock is used a=
-nd
-> > each P section may take a bit of time.
->
-> Many thanks for the detailed response.  I'll leave it to the rstat folks,
-> to agree or disagree with your analysis there.
+20 - -22 = 44 ofc
 
-Thanks for the analysis, Tejun, it does indeed make sense. I perf'd
-releasing and reacquiring the lock at each CPU boundary and the
-overhead seems to be minimal. It would be higher with contention, but
-all memcg flushers should be held back by the memcg code, and flushers
-outside memcg are not frequent (reading blkcg and cpu base stats from
-user space, and when a cgroup is being removed).
+> 
+> comp_len should be 0 incase of error. We do agree, some function
 
-I realized that after v2 of this patch series [1], we would only end
-up with two atomic flushing contexts, mem_cgroup_wb_stats() and
-mem_cgroup_usage(). The latter is already disabling irqs for other
-reasons, so anything we do within the rstat core code doesn't really
-help, it needs to be addressed separately. So only the call site in
-mem_cgroup_wb_stats() would benefit from not having irqs disabled
-throughout the flush.
-
-I will hold off on sending a patch until I observe that this call site
-is causing us pain and/or other atomic call sites emerge (or we have
-to revert one of the ones we made non-atomic), so that we don't hurt
-other flushers unnecessarily. Does this make sense to you?
-
-[1] https://lore.kernel.org/linux-mm/20230328221644.803272-1-yosryahmed@goo=
-gle.com/
-
->
-> >
-> > So, in the rstat case, the choice is, at least to me, obvious, but even=
- for
-> > more generic cases where the bulk of actual work isn't done w/ irq disa=
-bled,
-> > I don't think the picture is as simple as "use the least protected vari=
-ant
-> > possible" anymore because the underlying hardware changed.
-> >
-> > For an SMP kernel running on an UP system, "the least protected variant=
-" is
-> > the obvious choice to make because you don't lose anything by holding a
-> > spinlock longer than necessary. However, as you increase the number of =
-CPUs,
-> > there rises a tradeoff between local irq servicing latency and global l=
-ock
-> > contention.
-> >
-> > Imagine a, say, 128 cpu system with a few cores servicing relatively hi=
-gh
-> > frequency interrupts. Let's say there's a mildly hot lock. Usually, it =
-shows
-> > up in the system profile but only just. Let's say something happens and=
- the
-> > irq rate on those cores went up for some reason to the point where it
-> > becomes a rather common occurrence when the lock is held on one of thos=
-e
-> > cpus, irqs are likely to intervene lengthening how long the lock is hel=
-d,
-> > sometimes, signficantly. Now because the lock is on average held for mu=
-ch
-> > longer, it become a lot hotter as more CPUs would stall on it and depen=
-ding
-> > on luck or lack thereof these stalls can span many CPUs on the system f=
-or
-> > quite a while. This is actually something we saw in production.
-> >
-> > So, in general, there's a trade off between local irq service latency a=
-nd
-> > inducing global lock contention when using unprotected locks. With more=
- and
-> > more CPUs, the balance keeps shifting. The balance still very much depe=
-nds
-> > on the specifics of a given lock but yeah I think it's something we nee=
-d to
-> > be a lot more careful about now.
->
-> And this looks a very plausible argument to me: I'll let it sink in.
->
-> But I hadn't heard that the RT folks were clamouring for more irq disabli=
-ng:
-> perhaps they partition their machines with more care, and are not devotee=
-s
-> of high CPU counts.
->
-> What I hope is that others will chime in one way or the other -
-> it does sound as if a reappraisal of the balances is overdue.
->
-> Thanks,
-> Hugh (disabling interrupts for as long as he can)
+I mean, not to hammer on this point too much but just to be clear
+blk_copy_sanity_check(), which is introduced in the second patch, can
+return both -EPERM and -EINVAL and is first called in
+blkdev_copy_offload() so it's definitely possible for comp_len to be
+negative.
