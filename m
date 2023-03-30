@@ -2,178 +2,250 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AA0C6FD1D
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 07:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B31C77B62
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 07:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231140AbjC3HOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 03:14:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46008 "EHLO
+        id S229874AbjC3HgB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 03:36:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231124AbjC3HOW (ORCPT
+        with ESMTP id S229552AbjC3HgA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 03:14:22 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC6672A5
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 00:13:55 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id b20so72739504edd.1
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 00:13:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680160433;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rIO+xjpPvxFE7p3Fg529YdgqYE0es+Za65fM8K1qjgQ=;
-        b=UvXOXvaKg5W3pOiKg4eDH9lHl4Zdbajrfr9yCdPGB59p3EbanzUW5AbZ60M0Fo1jLj
-         xgrtU13pG+2HRUXSZV1YHQUF6aAPx8bmMFTsyT+tMN4I6uSd3iTp4e0p5o0dlpChmR1N
-         kgpM/rCb2oFLWV87Mo4Q+i3t95OakU3lMRj4YQ1nysYmA+Tpl5yBca0fvDqMPohFxbDB
-         Y7+D8BKyWgRNceAUWpnfWnDi7HIUgkBAG3eDp8W+4bCHX6Cc8wGgEGVLJTMMQ7fZWTfd
-         8/Oa9xlswq0vuQl+sJims+8vhoieSnu1v+Z91iZH9bXW/MlL8LF9mWWEI22UEcU5KFZ+
-         xqbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680160433;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rIO+xjpPvxFE7p3Fg529YdgqYE0es+Za65fM8K1qjgQ=;
-        b=zT5sqT6iR0uDVHy3d3WkoXA+HTU0GYlTjmXjAnnl6z0NpgxjAg/fyqj+8IIqrDa56t
-         MhvHSJ6Bf7fNd/1E2oU6KDJh+zdWdHKxMwITLAjWR8nDuZHXST4v5mkou9zd2OX6s68I
-         sJs03l+pyXskxPwbc0N3KtTVeVyWoir9pA1ZIS1xOnf582CfDI+MCwvrkyF5/hhlhFNO
-         LC1d/84Tx/bHp5kcCLCFB2oA8rnkt/1uoXoDhk/cL0EkjIXPkHuPOmoZFiSxUtgdJIZ1
-         dXUO9YVZ5bPyYPpGz940CX2b+DCnMwM50A/8I0CfFRqpjKBuVq42owKhmUkLiPH+9lgd
-         zHcQ==
-X-Gm-Message-State: AAQBX9cXqxveXA0ARh4f1dADt7Mr44Jm6yUdh3G4M3TQVNq7FLF2xK6K
-        QbhkTh5Vd/9flc9xrtjJ0/l+6a8kK+jeovPslyl6Cg==
-X-Google-Smtp-Source: AKy350YivWZ/HKPgZxm5eZxF7+2qcjmArqrs51gN4d7jnY/jgrQdpgyHe6R7cHRBBvkOSSb0g8UX51iLn7ZYwWx1eHQ=
-X-Received: by 2002:a17:906:7846:b0:933:1967:a984 with SMTP id
- p6-20020a170906784600b009331967a984mr10847576ejm.15.1680160433435; Thu, 30
- Mar 2023 00:13:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230328221644.803272-1-yosryahmed@google.com>
- <20230328221644.803272-5-yosryahmed@google.com> <ZCQfZJFufkJ10o01@dhcp22.suse.cz>
- <CAJD7tkb-UpKm2QbjYzB=B=oGk6Hyj9cbUviZUPC+7VsvBecH7g@mail.gmail.com>
- <20230329192059.2nlme5ubshzdbpg6@google.com> <ZCU1Bp+5bKNJzWIu@dhcp22.suse.cz>
-In-Reply-To: <ZCU1Bp+5bKNJzWIu@dhcp22.suse.cz>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Thu, 30 Mar 2023 00:13:16 -0700
-Message-ID: <CAJD7tka0CmRvcvB0k8DZuid1vC9OK_mFriHHbXNTUkVE7OjaTA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
- outside task context
-To:     Michal Hocko <mhocko@suse.com>
-Cc:     Shakeel Butt <shakeelb@google.com>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
+        Thu, 30 Mar 2023 03:36:00 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2232BE3;
+        Thu, 30 Mar 2023 00:35:59 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D36811FE91;
+        Thu, 30 Mar 2023 07:35:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1680161757; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fU7z0yHw4Ry/tQw4NzU0o63bQ+V0Qd8kX2CYBZv5RXc=;
+        b=uykLa5wl1jleLVQ6elC+H2skYegC2uaQgOrhniRTyo0oiHO0cLN1xo67HvgCsAMt2/5tYw
+        y0woZkDkwHmuuvVJteGxd8GCR06LvcbfoPMX3TYaH3/LEK6zekWk9zhX9MHemGQoYyeukU
+        rG7ABcMf7DqojiNhm1Q+5nikcDzGNNg=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B1BBA1348E;
+        Thu, 30 Mar 2023 07:35:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id UFEnKd07JWTFegAAMHmgww
+        (envelope-from <mhocko@suse.com>); Thu, 30 Mar 2023 07:35:57 +0000
+Date:   Thu, 30 Mar 2023 09:35:56 +0200
+From:   Michal Hocko <mhocko@suse.com>
+To:     Yosry Ahmed <yosryahmed@google.com>
+Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>,
         Zefan Li <lizefan.x@bytedance.com>,
         Johannes Weiner <hannes@cmpxchg.org>,
         Roman Gushchin <roman.gushchin@linux.dev>,
+        Shakeel Butt <shakeelb@google.com>,
         Muchun Song <muchun.song@linux.dev>,
         Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
         Vasily Averin <vasily.averin@linux.dev>,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 6/9] memcg: sleep during flushing stats in safe
+ contexts
+Message-ID: <ZCU73Ghje96Q0X7A@dhcp22.suse.cz>
+References: <20230328221644.803272-1-yosryahmed@google.com>
+ <20230328221644.803272-7-yosryahmed@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230328221644.803272-7-yosryahmed@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 30, 2023 at 12:06=E2=80=AFAM Michal Hocko <mhocko@suse.com> wro=
-te:
->
-> On Wed 29-03-23 19:20:59, Shakeel Butt wrote:
-> > On Wed, Mar 29, 2023 at 11:41:39AM -0700, Yosry Ahmed wrote:
-> > > On Wed, Mar 29, 2023 at 4:22=E2=80=AFAM Michal Hocko <mhocko@suse.com=
-> wrote:
-> > > >
-> > > > On Tue 28-03-23 22:16:39, Yosry Ahmed wrote:
-> > > > > rstat flushing is too expensive to perform in irq context.
-> > > > > The previous patch removed the only context that may invoke an rs=
-tat
-> > > > > flush from irq context, add a WARN_ON_ONCE() to detect future
-> > > > > violations, or those that we are not aware of.
-> > > > >
-> > > > > Ideally, we wouldn't flush with irqs disabled either, but we have=
- one
-> > > > > context today that does so in mem_cgroup_usage(). Forbid callers =
-from
-> > > > > irq context for now, and hopefully we can also forbid callers wit=
-h irqs
-> > > > > disabled in the future when we can get rid of this callsite.
-> > > >
-> > > > I am sorry to be late to the discussion. I wanted to follow up on
-> > > > Johannes reply in the previous version but you are too fast ;)
-> > > >
-> > > > I do agree that this looks rather arbitrary. You do not explain how=
- the
-> > > > warning actually helps. Is the intention to be really verbose to th=
-e
-> > > > kernel log when somebody uses this interface from the IRQ context a=
-nd
-> > > > get bug reports? What about configurations with panic on warn? Do w=
-e
-> > > > really want to crash their systems for something like that?
-> > >
-> > > Thanks for taking a look, Michal!
-> > >
-> > > The ultimate goal is not to flush in irq context or with irqs
-> > > disabled, as in some cases it causes irqs to be disabled for a long
-> > > time, as flushing is an expensive operation. The previous patch in th=
-e
-> > > series should have removed the only context that flushes in irq
-> > > context, and the purpose of the WARN_ON_ONCE() is to catch future use=
-s
-> > > or uses that we might have missed.
-> > >
-> > > There is still one code path that flushes with irqs disabled (also
-> > > mem_cgroup_usage()), and we cannot remove this just yet; we need to
-> > > deprecate usage threshold events for root to do that. So we cannot
-> > > enforce not flushing with irqs disabled yet.
-> > >
-> > > So basically the patch is trying to enforce what we have now, not
-> > > flushing in irq context, and hopefully at some point we will also be
-> > > able to enforce not flushing with irqs disabled.
-> > >
-> > > If WARN_ON_ONCE() is the wrong tool for this, please let me know.
-> > >
-> >
-> > If I understand Michal's concern, the question is should be start with
-> > pr_warn_once() instead of WARN_ON_ONCE() and I think yes we should star=
-t
-> > with pr_warn_once().
->
-> Yes, I do not really like the WARN_ON here. It is an overkill. pr_warn
-> would much less intrusive but potentially incomplete because you won't
-> know who that offender is. So if you really care about those then you
-> would need to call dump_stack as well.
->
-> So the real question is. Do we really care so deeply? After all somebody
-> might be calling this from within a spin lock or irq disabled section
-> resulting in a similar situation without noticing.
+On Tue 28-03-23 22:16:41, Yosry Ahmed wrote:
+> Currently, all contexts that flush memcg stats do so with sleeping not
+> allowed. Some of these contexts are perfectly safe to sleep in, such as
+> reading cgroup files from userspace or the background periodic flusher.
+> 
+> Refactor the code to make mem_cgroup_flush_stats() non-atomic (aka
+> sleepable), and provide a separate atomic version. The atomic version is
+> used in reclaim, refault, writeback, and in mem_cgroup_usage(). All
+> other code paths are left to use the non-atomic version. This includes
+> callbacks for userspace reads and the periodic flusher.
+> 
+> Since refault is the only caller of mem_cgroup_flush_stats_ratelimited(),
+> change it to mem_cgroup_flush_stats_atomic_ratelimited(). Reclaim and
+> refault code paths are modified to do non-atomic flushing in separate
+> later patches -- so it will eventually be changed back to
+> mem_cgroup_flush_stats_ratelimited().
+> 
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> Acked-by: Shakeel Butt <shakeelb@google.com>
 
-There are discussions in [1] about making atomic rstat flush not
-disable irqs throughout the process, so in that case it would only
-result in a similar situation if the caller has irq disabled. The only
-caller that might have irq disabled is the same caller that might be
-in irq context before this series: mem_cgroup_usage().
+Acked-by: Michal Hocko <mhocko@suse.com>
 
-On that note, and while I have your attention, I was wondering if we
-can eliminate the flush call completely from mem_cgroup_usage(), and
-read the global stats counters for root memcg instead of the root
-counters. There might be subtle differences, but the root memcg usage
-isn't super accurate now anyway (e.g. it doesn't include kernel
-memory).
+> ---
+>  include/linux/memcontrol.h |  9 ++++++--
+>  mm/memcontrol.c            | 45 ++++++++++++++++++++++++++++++--------
+>  mm/vmscan.c                |  2 +-
+>  mm/workingset.c            |  2 +-
+>  4 files changed, 45 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+> index ac3f3b3a45e2..b424ba3ebd09 100644
+> --- a/include/linux/memcontrol.h
+> +++ b/include/linux/memcontrol.h
+> @@ -1037,7 +1037,8 @@ static inline unsigned long lruvec_page_state_local(struct lruvec *lruvec,
+>  }
+>  
+>  void mem_cgroup_flush_stats(void);
+> -void mem_cgroup_flush_stats_ratelimited(void);
+> +void mem_cgroup_flush_stats_atomic(void);
+> +void mem_cgroup_flush_stats_atomic_ratelimited(void);
+>  
+>  void __mod_memcg_lruvec_state(struct lruvec *lruvec, enum node_stat_item idx,
+>  			      int val);
+> @@ -1535,7 +1536,11 @@ static inline void mem_cgroup_flush_stats(void)
+>  {
+>  }
+>  
+> -static inline void mem_cgroup_flush_stats_ratelimited(void)
+> +static inline void mem_cgroup_flush_stats_atomic(void)
+> +{
+> +}
+> +
+> +static inline void mem_cgroup_flush_stats_atomic_ratelimited(void)
+>  {
+>  }
+>  
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 65750f8b8259..a2ce3aa10d94 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -634,7 +634,7 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
+>  	}
+>  }
+>  
+> -static void __mem_cgroup_flush_stats(void)
+> +static void do_flush_stats(bool atomic)
+>  {
+>  	/*
+>  	 * We always flush the entire tree, so concurrent flushers can just
+> @@ -646,26 +646,46 @@ static void __mem_cgroup_flush_stats(void)
+>  		return;
+>  
+>  	WRITE_ONCE(flush_next_time, jiffies_64 + 2*FLUSH_TIME);
+> -	cgroup_rstat_flush_atomic(root_mem_cgroup->css.cgroup);
+> +
+> +	if (atomic)
+> +		cgroup_rstat_flush_atomic(root_mem_cgroup->css.cgroup);
+> +	else
+> +		cgroup_rstat_flush(root_mem_cgroup->css.cgroup);
+> +
+>  	atomic_set(&stats_flush_threshold, 0);
+>  	atomic_set(&stats_flush_ongoing, 0);
+>  }
+>  
+> +static bool should_flush_stats(void)
+> +{
+> +	return atomic_read(&stats_flush_threshold) > num_online_cpus();
+> +}
+> +
+>  void mem_cgroup_flush_stats(void)
+>  {
+> -	if (atomic_read(&stats_flush_threshold) > num_online_cpus())
+> -		__mem_cgroup_flush_stats();
+> +	if (should_flush_stats())
+> +		do_flush_stats(false);
+>  }
+>  
+> -void mem_cgroup_flush_stats_ratelimited(void)
+> +void mem_cgroup_flush_stats_atomic(void)
+> +{
+> +	if (should_flush_stats())
+> +		do_flush_stats(true);
+> +}
+> +
+> +void mem_cgroup_flush_stats_atomic_ratelimited(void)
+>  {
+>  	if (time_after64(jiffies_64, READ_ONCE(flush_next_time)))
+> -		mem_cgroup_flush_stats();
+> +		mem_cgroup_flush_stats_atomic();
+>  }
+>  
+>  static void flush_memcg_stats_dwork(struct work_struct *w)
+>  {
+> -	__mem_cgroup_flush_stats();
+> +	/*
+> +	 * Always flush here so that flushing in latency-sensitive paths is
+> +	 * as cheap as possible.
+> +	 */
+> +	do_flush_stats(false);
+>  	queue_delayed_work(system_unbound_wq, &stats_flush_dwork, FLUSH_TIME);
+>  }
+>  
+> @@ -3685,9 +3705,12 @@ static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap)
+>  		 * done from irq context; use stale stats in this case.
+>  		 * Arguably, usage threshold events are not reliable on the root
+>  		 * memcg anyway since its usage is ill-defined.
+> +		 *
+> +		 * Additionally, other call paths through memcg_check_events()
+> +		 * disable irqs, so make sure we are flushing stats atomically.
+>  		 */
+>  		if (in_task())
+> -			mem_cgroup_flush_stats();
+> +			mem_cgroup_flush_stats_atomic();
+>  		val = memcg_page_state(memcg, NR_FILE_PAGES) +
+>  			memcg_page_state(memcg, NR_ANON_MAPPED);
+>  		if (swap)
+> @@ -4610,7 +4633,11 @@ void mem_cgroup_wb_stats(struct bdi_writeback *wb, unsigned long *pfilepages,
+>  	struct mem_cgroup *memcg = mem_cgroup_from_css(wb->memcg_css);
+>  	struct mem_cgroup *parent;
+>  
+> -	mem_cgroup_flush_stats();
+> +	/*
+> +	 * wb_writeback() takes a spinlock and calls
+> +	 * wb_over_bg_thresh()->mem_cgroup_wb_stats(). Do not sleep.
+> +	 */
+> +	mem_cgroup_flush_stats_atomic();
+>  
+>  	*pdirty = memcg_page_state(memcg, NR_FILE_DIRTY);
+>  	*pwriteback = memcg_page_state(memcg, NR_WRITEBACK);
+> diff --git a/mm/vmscan.c b/mm/vmscan.c
+> index 9c1c5e8b24b8..a9511ccb936f 100644
+> --- a/mm/vmscan.c
+> +++ b/mm/vmscan.c
+> @@ -2845,7 +2845,7 @@ static void prepare_scan_count(pg_data_t *pgdat, struct scan_control *sc)
+>  	 * Flush the memory cgroup stats, so that we read accurate per-memcg
+>  	 * lruvec stats for heuristics.
+>  	 */
+> -	mem_cgroup_flush_stats();
+> +	mem_cgroup_flush_stats_atomic();
+>  
+>  	/*
+>  	 * Determine the scan balance between anon and file LRUs.
+> diff --git a/mm/workingset.c b/mm/workingset.c
+> index af862c6738c3..dab0c362b9e3 100644
+> --- a/mm/workingset.c
+> +++ b/mm/workingset.c
+> @@ -462,7 +462,7 @@ void workingset_refault(struct folio *folio, void *shadow)
+>  
+>  	mod_lruvec_state(lruvec, WORKINGSET_REFAULT_BASE + file, nr);
+>  
+> -	mem_cgroup_flush_stats_ratelimited();
+> +	mem_cgroup_flush_stats_atomic_ratelimited();
+>  	/*
+>  	 * Compare the distance to the existing workingset size. We
+>  	 * don't activate pages that couldn't stay resident even if
+> -- 
+> 2.40.0.348.gf938b09366-goog
 
-With that removed, no callers to rstat flushing would be from irq
-context or have irqs disabled. There will only be one atomic flusher
-(mem_cgroup_wb_stats()), and we can proceed with [1] if it causes a
-problem.
-
-What do you think?
-
-[1] https://lore.kernel.org/lkml/CAJD7tkZrp=3D4zWvjE9_010TAG1T_crCbf9P64UzJ=
-ABspgcrGPKg@mail.gmail.com/
-
-> --
-> Michal Hocko
-> SUSE Labs
+-- 
+Michal Hocko
+SUSE Labs
