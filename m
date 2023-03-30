@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF0AC6FD1D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 799F5C761AF
 	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 11:38:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231727AbjC3Lie (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 07:38:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47022 "EHLO
+        id S231713AbjC3Lid (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 07:38:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231698AbjC3Lia (ORCPT
+        with ESMTP id S231699AbjC3Lib (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 07:38:30 -0400
+        Thu, 30 Mar 2023 07:38:31 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15AB89EE0
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:37:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369D59EDE
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:37:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680176233;
+        s=mimecast20190719; t=1680176232;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=VFZ4HTDXQ9j9mvF7AZrrlFzXBT77MGX93ZTMUgSaoQU=;
-        b=Y9MmOayt4lfl4+DsXkULVdax4eD9f6jlW7P88fILpekMSX1kG5lrART7lfCK2rO5N5dJXk
-        aA0ENEyJYUOQxvO3SPlOkBOun+VL5MWd2eo0GzzB6QbRE069t0COXa3UxzOyo0JFMi7ynk
-        XDzDKbThREYjP7T5U+lW+MECcD0BGxM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=P0DTv4gl8fMLayIUkvMe05PQQKcmNOxgRlRQJo/UHTk=;
+        b=itSk1tpl5WVESwFMcfyAF0O5ISiZR1z39agW6uWruQ4y3MA+3fPMVgdW5OP1Ll/yqJJYNE
+        pxWS4tpy/xu+pzku7MECEv0S0z9fkavjQV9odYsJZy94q/6qAp1J+8mjr2y1bbQpzQKS0X
+        qkZfy7La2L18mpSLfyos++1AlIxf9UY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-137-5dSRH69cN2WxjCzoc7DlOA-1; Thu, 30 Mar 2023 07:37:11 -0400
-X-MC-Unique: 5dSRH69cN2WxjCzoc7DlOA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-449-0F5Xh6MCNryUTMXNPDqzxw-1; Thu, 30 Mar 2023 07:37:06 -0400
+X-MC-Unique: 0F5Xh6MCNryUTMXNPDqzxw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 532C3101A552;
-        Thu, 30 Mar 2023 11:37:10 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D6A21C0754C;
+        Thu, 30 Mar 2023 11:37:06 +0000 (UTC)
 Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5BB562166B33;
-        Thu, 30 Mar 2023 11:37:08 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 55D9DC15BA0;
+        Thu, 30 Mar 2023 11:37:04 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
         linux-block@vger.kernel.org
@@ -49,139 +49,103 @@ Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Dan Williams <dan.j.williams@intel.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 06/17] io_uring: support OP_SEND_ZC/OP_RECV for fused secondary request
-Date:   Thu, 30 Mar 2023 19:36:19 +0800
-Message-Id: <20230330113630.1388860-7-ming.lei@redhat.com>
+Subject: [PATCH V6 05/17] io_uring: support OP_READ/OP_WRITE for fused secondary request
+Date:   Thu, 30 Mar 2023 19:36:18 +0800
+Message-Id: <20230330113630.1388860-6-ming.lei@redhat.com>
 In-Reply-To: <20230330113630.1388860-1-ming.lei@redhat.com>
 References: <20230330113630.1388860-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Start to allow fused secondary request to support OP_SEND_ZC/OP_RECV, and
-the buffer can be retrieved from primary request.
+Start to allow fused secondary request to support OP_READ/OP_WRITE, and
+the buffer can be retrieved from the primary request.
 
-Once secondary request is completed, the primary command will be done and
-the associated buffer is returned back.
+Once the secondary request is completed, the primary request buffer will
+be returned back.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- io_uring/net.c   | 30 ++++++++++++++++++++++++++++--
- io_uring/opdef.c |  6 ++++++
- 2 files changed, 34 insertions(+), 2 deletions(-)
+ io_uring/opdef.c |  4 ++++
+ io_uring/rw.c    | 21 +++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 4040cf093318..f0fce1db7596 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -16,6 +16,7 @@
- #include "net.h"
- #include "notif.h"
- #include "rsrc.h"
-+#include "fused_cmd.h"
- 
- #if defined(CONFIG_NET)
- struct io_shutdown {
-@@ -69,6 +70,13 @@ struct io_sr_msg {
- 	struct io_kiocb 		*notif;
- };
- 
-+#define user_ptr_to_u64(x) (		\
-+{					\
-+	typecheck(void __user *, (x));		\
-+	(u64)(unsigned long)(x);	\
-+}					\
-+)
-+
- static inline bool io_check_multishot(struct io_kiocb *req,
- 				      unsigned int issue_flags)
- {
-@@ -379,7 +387,11 @@ int io_send(struct io_kiocb *req, unsigned int issue_flags)
- 	if (unlikely(!sock))
- 		return -ENOTSOCK;
- 
--	ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
-+	if (!io_req_use_fused_buf(req))
-+		ret = import_ubuf(ITER_SOURCE, sr->buf, sr->len, &msg.msg_iter);
-+	else
-+		ret = io_import_buf_from_fused(user_ptr_to_u64(sr->buf),
-+				sr->len, ITER_SOURCE, &msg.msg_iter, req);
- 	if (unlikely(ret))
- 		return ret;
- 
-@@ -870,7 +882,11 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
- 		sr->buf = buf;
- 	}
- 
--	ret = import_ubuf(ITER_DEST, sr->buf, len, &msg.msg_iter);
-+	if (!io_req_use_fused_buf(req))
-+		ret = import_ubuf(ITER_DEST, sr->buf, len, &msg.msg_iter);
-+	else
-+		ret = io_import_buf_from_fused(user_ptr_to_u64(sr->buf),
-+				sr->len, ITER_DEST, &msg.msg_iter, req);
- 	if (unlikely(ret))
- 		goto out_free;
- 
-@@ -984,6 +1000,9 @@ int io_send_zc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	if (zc->flags & IORING_RECVSEND_FIXED_BUF) {
- 		unsigned idx = READ_ONCE(sqe->buf_index);
- 
-+		if (io_req_use_fused_buf(req))
-+			return -EINVAL;
-+
- 		if (unlikely(idx >= ctx->nr_user_bufs))
- 			return -EFAULT;
- 		idx = array_index_nospec(idx, ctx->nr_user_bufs);
-@@ -1120,8 +1139,15 @@ int io_send_zc(struct io_kiocb *req, unsigned int issue_flags)
- 		if (unlikely(ret))
- 			return ret;
- 		msg.sg_from_iter = io_sg_from_iter;
-+	} else if (io_req_use_fused_buf(req)) {
-+		ret = io_import_buf_from_fused(user_ptr_to_u64(zc->buf),
-+				zc->len, ITER_SOURCE, &msg.msg_iter, req);
-+		if (unlikely(ret))
-+			return ret;
-+		msg.sg_from_iter = io_sg_from_iter;
- 	} else {
- 		io_notif_set_extended(zc->notif);
-+
- 		ret = import_ubuf(ITER_SOURCE, zc->buf, zc->len, &msg.msg_iter);
- 		if (unlikely(ret))
- 			return ret;
 diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index d81c9afd65ed..c31badf4fe45 100644
+index 63b90e8e65f8..d81c9afd65ed 100644
 --- a/io_uring/opdef.c
 +++ b/io_uring/opdef.c
-@@ -273,6 +273,8 @@ const struct io_issue_def io_issue_defs[] = {
- 		.audit_skip		= 1,
+@@ -235,6 +235,8 @@ const struct io_issue_def io_issue_defs[] = {
  		.ioprio			= 1,
- 		.manual_alloc		= 1,
-+		.fused_secondary	= 1,
-+		.buf_dir		= READ,
- #if defined(CONFIG_NET)
- 		.prep			= io_sendmsg_prep,
- 		.issue			= io_send,
-@@ -287,6 +289,8 @@ const struct io_issue_def io_issue_defs[] = {
- 		.buffer_select		= 1,
- 		.audit_skip		= 1,
- 		.ioprio			= 1,
+ 		.iopoll			= 1,
+ 		.iopoll_queue		= 1,
 +		.fused_secondary	= 1,
 +		.buf_dir		= WRITE,
- #if defined(CONFIG_NET)
- 		.prep			= io_recvmsg_prep,
- 		.issue			= io_recv,
-@@ -413,6 +417,8 @@ const struct io_issue_def io_issue_defs[] = {
- 		.audit_skip		= 1,
+ 		.prep			= io_prep_rw,
+ 		.issue			= io_read,
+ 	},
+@@ -248,6 +250,8 @@ const struct io_issue_def io_issue_defs[] = {
  		.ioprio			= 1,
- 		.manual_alloc		= 1,
+ 		.iopoll			= 1,
+ 		.iopoll_queue		= 1,
 +		.fused_secondary	= 1,
 +		.buf_dir		= READ,
- #if defined(CONFIG_NET)
- 		.prep			= io_send_zc_prep,
- 		.issue			= io_send_zc,
+ 		.prep			= io_prep_rw,
+ 		.issue			= io_write,
+ 	},
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index 5431caf1e331..5ce7c8a2f74d 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -19,6 +19,7 @@
+ #include "kbuf.h"
+ #include "rsrc.h"
+ #include "rw.h"
++#include "fused_cmd.h"
+ 
+ struct io_rw {
+ 	/* NOTE: kiocb has the file as the first member, so don't do it here */
+@@ -371,6 +372,18 @@ static struct iovec *__io_import_iovec(int ddir, struct io_kiocb *req,
+ 	size_t sqe_len;
+ 	ssize_t ret;
+ 
++	/*
++	 * fused_secondary OP passes buffer offset from sqe->addr actually, since
++	 * the fused cmd buf's mapped start address is zero.
++	 */
++	if (io_req_use_fused_buf(req)) {
++		ret = io_import_buf_from_fused(rw->addr, rw->len, ddir,
++				iter, req);
++		if (ret)
++			return ERR_PTR(ret);
++		return NULL;
++	}
++
+ 	if (opcode == IORING_OP_READ_FIXED || opcode == IORING_OP_WRITE_FIXED) {
+ 		ret = io_import_fixed(ddir, iter, req->imu, rw->addr, rw->len);
+ 		if (ret)
+@@ -443,11 +456,19 @@ static inline loff_t *io_kiocb_ppos(struct kiocb *kiocb)
+  */
+ static ssize_t loop_rw_iter(int ddir, struct io_rw *rw, struct iov_iter *iter)
+ {
++	struct io_kiocb *req = cmd_to_io_kiocb(rw);
+ 	struct kiocb *kiocb = &rw->kiocb;
+ 	struct file *file = kiocb->ki_filp;
+ 	ssize_t ret = 0;
+ 	loff_t *ppos;
+ 
++	/*
++	 * Fused secondary req hasn't user buffer, so ->read/->write can't
++	 * be supported
++	 */
++	if (io_req_use_fused_buf(req))
++		return -EOPNOTSUPP;
++
+ 	/*
+ 	 * Don't support polled IO through this interface, and we can't
+ 	 * support non-blocking either. For the latter, this just causes
 -- 
 2.39.2
 
