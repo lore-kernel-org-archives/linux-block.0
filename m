@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E63CC77B70
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 19:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC22C6FD1D
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 19:18:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232022AbjC3TSK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 15:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47756 "EHLO
+        id S232101AbjC3TSU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 15:18:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232046AbjC3TSJ (ORCPT
+        with ESMTP id S232064AbjC3TSN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 15:18:09 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3B00EB5A
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:18:07 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id a9-20020a170902b58900b0019e2eafafddso11569404pls.7
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:18:07 -0700 (PDT)
+        Thu, 30 Mar 2023 15:18:13 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1529EF77D
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:18:10 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54196bfcd5fso194620127b3.4
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680203887;
+        d=google.com; s=20210112; t=1680203889;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LXlZsArwPDY7OuU2BxzeoXG1UXSoglEAfUQ5EzzMXG4=;
-        b=QmYQM+j13cdbjBiZy3Y+dzkJUgGOVHTdr9lvDbSE859fYaJtq+8zmH02RDaKbdpvap
-         CqejHKuoW/4IBz5mIHOf6Y8AHa6GMb/hCZ7zMABh1AePaLkgpcjAyzU7xGg8rQCDHyuT
-         xd/GhSCAHuv9H/zwirCUR2wyGX+B6mkWwB9WVRwD19bK9qyHzg7+GCXy42vkNiRXXZdr
-         kN4hOyhVE2VLeXDBEBRHB8fSA0RE0BkgU+jq32E4Jq+3xIhGwrpX/kGZ92PdxYBPFxyB
-         8OgXFYA1yB1rgGnRYxUqB9CL2/ZWFsevIT5f1UxupCOTzAHu4BNZEW/BqlkhNKD16qxi
-         CoQQ==
+        bh=aVus0GFA9nzxOZ5lNIH1Nx8kHcLEa/aLkX98gl9HKOI=;
+        b=Rb2fsB8aWLuAh/6UfhLacuvSldBOfVahXww4db+vgAZH6d8hHK5iS/Pb3yBuHu8zXu
+         8OHs3K+JgNd5BWKL8HmUqSNmeBMWOUfM93BgScQIJGiFyUTuS/OhqqsgB8B/zESgECWW
+         id0La031n/vRfUHiqMH5ptV4ZUHLtuC1awDopegwUjfP8gYPSzkD9GboR6Sv+BT5F0il
+         4cP0p/kpaTUv9ECKBi7X6nDyHboM9b8Z+lLZ6iyDmkLsMIt+cWstg1DQo4e/ZnrIN56I
+         iRBi8QgWvfbGxJTMXxv2zZuY7CwzGwzqEOEYe4XvyV9MRzo4MibTgBPKLkzWKa272DY9
+         IgGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680203887;
+        d=1e100.net; s=20210112; t=1680203889;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LXlZsArwPDY7OuU2BxzeoXG1UXSoglEAfUQ5EzzMXG4=;
-        b=IZDmQ4N/IhD4XYIAQSXOSMg9zwj9E9G3P3PEF8FZWwUevzREoG7KeGcYyXFyJk7k7y
-         RcsNQRtTHftsumb5XkouT/UZVlrpyZE3RTooW6mxLxUOgrFx7o1Lc+PONc1iRXgiAdb3
-         8mP+J2qZapEAV4LQlr5q2msDxtyIZZqWuohHVwav1H3+3SHX+TIazr6gC/cWyHOvxMtA
-         4BU+voEgEUdBss7OlbQjlvmVAyPD/3AVOQ2iaEskfe+SvoQ2NxjykvX047x1IKIHbWNk
-         nSkltJm5IyPYUGU3e2f6G/EqFziGYkPau7JYcTMumR6mtUtCbS3xBIyZs5Ek0DTwFARU
-         ooCg==
-X-Gm-Message-State: AAQBX9chbyFoS189M1GHGXf6PvcOCyE5t/OJpF2AOQb1yh52zUWCc4v6
-        yFQOZvXHpXBL0cWfOwwHjySwihZ57RkBhXcM
-X-Google-Smtp-Source: AKy350acDpkb2oKWRJtDPrvhJr6G7w3aWGLRFehCl/mgbnA6nqxhni7pGTt+2Eb5S7HVMulqi96jSmdvt00VgGJt
+        bh=aVus0GFA9nzxOZ5lNIH1Nx8kHcLEa/aLkX98gl9HKOI=;
+        b=XJ6UzuSXHuxpSmr0+tCe7KDFe0ib5If8t8nO0APJ6VCepO+EmVIrEPWusCRzCnOKqF
+         sI32XXCkHbnf+LOwtTudpPo/SaZLC4dSn+UXWww3PJ6eKX2YzsSnYVuqgmcisZ4c1lLp
+         aY80inbe2i8/IZ+Tf7+tcqluPIp56+rHBzKmYMjUpP0SYi7WHT6mIC1Lx8Uavyw1iYq1
+         F0I8LPmzSj7iMUVw9jrXu/dFppffAtNys5XZOspdhBg6iG7NxQTV/wC3mk94a29rYmRA
+         nFVUYUY+FKK/4ib+E8VD3kNkz0MKifeHXaWcFS6C1M6YhOmL7Mnvr7c+IoU+83f+ZWYA
+         k9ZQ==
+X-Gm-Message-State: AAQBX9dvttPOJTMbS+CXK3aKblqEPeV6Ky7pC2fgw/NHyR+MeP+62x5I
+        VlM+0txO08uPpJS6aocjLR+OYzrMt2E4fbA/
+X-Google-Smtp-Source: AKy350az4CClmAfjDaxG6/AcT2u/aalMEwRTuNYj9qh25Mudi/3feszrufxHB4k9is1ESXC81UQXzGZVI+EC5ExV
 X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
- (user=yosryahmed job=sendgmr) by 2002:a17:90a:ec11:b0:237:9cbe:22ad with SMTP
- id l17-20020a17090aec1100b002379cbe22admr7641616pjy.5.1680203887352; Thu, 30
- Mar 2023 12:18:07 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 19:17:55 +0000
+ (user=yosryahmed job=sendgmr) by 2002:a05:6902:10c3:b0:b79:4826:e8e3 with
+ SMTP id w3-20020a05690210c300b00b794826e8e3mr10930499ybu.1.1680203889210;
+ Thu, 30 Mar 2023 12:18:09 -0700 (PDT)
+Date:   Thu, 30 Mar 2023 19:17:56 +0000
 In-Reply-To: <20230330191801.1967435-1-yosryahmed@google.com>
 Mime-Version: 1.0
 References: <20230330191801.1967435-1-yosryahmed@google.com>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230330191801.1967435-3-yosryahmed@google.com>
-Subject: [PATCH v3 2/8] memcg: rename mem_cgroup_flush_stats_"delayed" to "ratelimited"
+Message-ID: <20230330191801.1967435-4-yosryahmed@google.com>
+Subject: [PATCH v3 3/8] memcg: do not flush stats in irq context
 From:   Yosry Ahmed <yosryahmed@google.com>
 To:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>,
@@ -74,71 +74,52 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-mem_cgroup_flush_stats_delayed() suggests his is using a delayed_work,
-but this is actually sometimes flushing directly from the callsite.
+Currently, the only context in which we can invoke an rstat flush from
+irq context is through mem_cgroup_usage() on the root memcg when called
+from memcg_check_events(). An rstat flush is an expensive operation that
+should not be done in irq context, so do not flush stats and use the
+stale stats in this case.
 
-What it's doing is ratelimited calls. A better name would be
-mem_cgroup_flush_stats_ratelimited().
+Arguably, usage threshold events are not reliable on the root memcg
+anyway since its usage is ill-defined.
 
 Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
+Suggested-by: Shakeel Butt <shakeelb@google.com>
 Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
 Acked-by: Shakeel Butt <shakeelb@google.com>
 Acked-by: Johannes Weiner <hannes@cmpxchg.org>
 Acked-by: Michal Hocko <mhocko@suse.com>
 ---
- include/linux/memcontrol.h | 4 ++--
- mm/memcontrol.c            | 2 +-
- mm/workingset.c            | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ mm/memcontrol.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index b6eda2ab205d..ac3f3b3a45e2 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -1037,7 +1037,7 @@ static inline unsigned long lruvec_page_state_local(struct lruvec *lruvec,
- }
- 
- void mem_cgroup_flush_stats(void);
--void mem_cgroup_flush_stats_delayed(void);
-+void mem_cgroup_flush_stats_ratelimited(void);
- 
- void __mod_memcg_lruvec_state(struct lruvec *lruvec, enum node_stat_item idx,
- 			      int val);
-@@ -1535,7 +1535,7 @@ static inline void mem_cgroup_flush_stats(void)
- {
- }
- 
--static inline void mem_cgroup_flush_stats_delayed(void)
-+static inline void mem_cgroup_flush_stats_ratelimited(void)
- {
- }
- 
 diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 0205e58ea430..c3b6aae78901 100644
+index c3b6aae78901..ff39f78f962e 100644
 --- a/mm/memcontrol.c
 +++ b/mm/memcontrol.c
-@@ -653,7 +653,7 @@ void mem_cgroup_flush_stats(void)
- 		__mem_cgroup_flush_stats();
- }
+@@ -3669,7 +3669,21 @@ static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap)
+ 	unsigned long val;
  
--void mem_cgroup_flush_stats_delayed(void)
-+void mem_cgroup_flush_stats_ratelimited(void)
- {
- 	if (time_after64(jiffies_64, flush_next_time))
- 		mem_cgroup_flush_stats();
-diff --git a/mm/workingset.c b/mm/workingset.c
-index 00c6f4d9d9be..af862c6738c3 100644
---- a/mm/workingset.c
-+++ b/mm/workingset.c
-@@ -462,7 +462,7 @@ void workingset_refault(struct folio *folio, void *shadow)
- 
- 	mod_lruvec_state(lruvec, WORKINGSET_REFAULT_BASE + file, nr);
- 
--	mem_cgroup_flush_stats_delayed();
-+	mem_cgroup_flush_stats_ratelimited();
- 	/*
- 	 * Compare the distance to the existing workingset size. We
- 	 * don't activate pages that couldn't stay resident even if
+ 	if (mem_cgroup_is_root(memcg)) {
+-		mem_cgroup_flush_stats();
++		/*
++		 * We can reach here from irq context through:
++		 * uncharge_batch()
++		 * |--memcg_check_events()
++		 *    |--mem_cgroup_threshold()
++		 *       |--__mem_cgroup_threshold()
++		 *          |--mem_cgroup_usage
++		 *
++		 * rstat flushing is an expensive operation that should not be
++		 * done from irq context; use stale stats in this case.
++		 * Arguably, usage threshold events are not reliable on the root
++		 * memcg anyway since its usage is ill-defined.
++		 */
++		if (in_task())
++			mem_cgroup_flush_stats();
+ 		val = memcg_page_state(memcg, NR_FILE_PAGES) +
+ 			memcg_page_state(memcg, NR_ANON_MAPPED);
+ 		if (swap)
 -- 
 2.40.0.348.gf938b09366-goog
 
