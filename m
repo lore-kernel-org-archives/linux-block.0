@@ -2,133 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D73CC761AF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 22:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D8BC7619A
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 22:37:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbjC3WaA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 18:30:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55004 "EHLO
+        id S230372AbjC3WhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 18:37:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230339AbjC3W37 (ORCPT
+        with ESMTP id S230146AbjC3WhS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:29:59 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8468E1BE1;
-        Thu, 30 Mar 2023 15:29:58 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id j13so18658666pjd.1;
-        Thu, 30 Mar 2023 15:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680215398;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x7V03//xrMoj2maIfgC2qsiNLnzTtZRlKFOvF+x+bJg=;
-        b=mlMMJ39hyYXqt+JHj1LUKtCdNF3jPgcvR5YIbnZgjG2qBiSoA+kwmOTqtkW+KgUjT+
-         f3e/T8MSaieLqfYE0dDEdexsiqrRYKBvODsqM2N1upFbF1vKGKnEQRNu6sm836+CwA5C
-         ck0fVumW1XKGVaDTiJc1oZcOOCIV226dBsy+ORXRDdb3DqX9xOqXNxevXkMcMjtEUDFn
-         3DS5IHtGgjR5BAJQeAORmm+Co3dYw4PAzJtKWdjXOIijVMdHsC+Mv7hna+osVcIUucg/
-         sMDusNSOtuWu7xAgNPPArSDS5AjN3qPzyekWsD7Mi/qHO9lJ1NdSDNgcsKtE2ONpmI68
-         vTqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680215398;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x7V03//xrMoj2maIfgC2qsiNLnzTtZRlKFOvF+x+bJg=;
-        b=6o7qy2ghE+jk/5ofPwYNeI4QpWdVyjYfDNSM0TQHZNE7sscvLiiPuD2c+UMvxkhkuh
-         SmkJEdBWFmp2OWCIZjHJNgZscC4O+I5OQRswSS0rS1B3zscTxhSWSONNDTtsyyUpvSge
-         PS8JqHSRRKX8AG1AUSdgDhOHcQ87lHS9kRRRPCcZjSKgJwKp7syX9Fr/1qvo3Xia6iCo
-         hCnibPPIySq1TGdvhrIaz8WPVIjuCpmIdqpO3cHi6VEKue5t2CncB00p5BwgzHeN8r5T
-         ErqeoaYXPlbH6Ygmw5NKp/OnqRuG+yLPzx4P+34hrX1MRyvNr4voKq7Au2VJ4Z4rTYvt
-         8spg==
-X-Gm-Message-State: AAQBX9e/4dn5WZ7tKJuxFTCb0GlGltJtdYyPCN6VZ/qUjfFSxUBc/9PY
-        crpfzNTVJ37SwhiHZdhiwclp1V22H2mStOwqYWw=
-X-Google-Smtp-Source: AKy350ZrPyR1hRVTBuZnQUpMEn54ihWHCa7XbNjYLmiSy4XxnRAJ80dimqjvvbOmN9ocOuC+cire+hzLe0DMBMrzkWw=
-X-Received: by 2002:a17:90a:fb57:b0:23d:30c2:c5b7 with SMTP id
- iq23-20020a17090afb5700b0023d30c2c5b7mr2603971pjb.3.1680215397861; Thu, 30
- Mar 2023 15:29:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1680108414.git.johannes.thumshirn@wdc.com>
- <beea645603eccbb045ad9bb777e05a085b91808a.1680108414.git.johannes.thumshirn@wdc.com>
- <3a0f0c92-63cb-3624-c2fe-049a76d1a64a@opensource.wdc.com> <CAHbLzkoRdTTbnfz3RyLQAeNJBOEVNGL2WLgRSE2eQ4nR8sRe2g@mail.gmail.com>
- <b19696d3-54bb-d997-5e56-aa5fd58b469f@opensource.wdc.com>
-In-Reply-To: <b19696d3-54bb-d997-5e56-aa5fd58b469f@opensource.wdc.com>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Thu, 30 Mar 2023 15:29:46 -0700
-Message-ID: <CAHbLzkrEXVDf4TYLw_MPrFNybWQHWXKX=zP5GhxHQFdpVPWhEg@mail.gmail.com>
-Subject: Re: [PATCH 18/19] dm-crypt: check if adding pages to clone bio fails
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>,
+        Thu, 30 Mar 2023 18:37:18 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6618ECC36
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 15:37:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=NJllDt/tGBBHR8YkJulvsU7yOqGtD9huZUiRyzH8+0k=; b=IjFEZOWRKZF9n6Ohm4mRbeHhpw
+        rYDcQUZRK2aYit5WTlAp+C5SPj6hINEeUZiflr/05++xB3onMCX/MF8bGWs/3ln6cQVovW1uxLDmM
+        6GWpWu8cZWnNzXHnmg4wGzmrUmQIW8Pyl1qHkBCpUUmmPrxfg5PkQtmjr8XH62ZwRx8h9tjRok0CQ
+        8hwA60S8CcceNwZPyec6JLsjm7kSxtQv+5nUelrvem2k/5zsbJvV8bjgcNfYt93qOUDXMya/5KdqE
+        I4D73avsRW/E+HmYY6Lw0KO6t8BYUAxaC0V3IcdD9x2yACITOftCQBFR5ZVhG55xPMTFFGjOgvg8K
+        Tr1VXq2Q==;
+Received: from [182.171.77.115] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pi0tK-005EfC-35;
+        Thu, 30 Mar 2023 22:37:11 +0000
+Date:   Fri, 31 Mar 2023 07:37:06 +0900
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
         Chaitanya Kulkarni <kch@nvidia.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        dm-devel@redhat.com, Song Liu <song@kernel.org>,
-        linux-raid@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.3
+Message-ID: <ZCYPEl0cfKtOlkU8@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 29, 2023 at 5:24=E2=80=AFPM Damien Le Moal
-<damien.lemoal@opensource.wdc.com> wrote:
->
-> On 3/30/23 09:17, Yang Shi wrote:
-> > On Wed, Mar 29, 2023 at 4:49=E2=80=AFPM Damien Le Moal
-> > <damien.lemoal@opensource.wdc.com> wrote:
-> >>
-> >> On 3/30/23 02:06, Johannes Thumshirn wrote:
-> >>> Check if adding pages to clone bio fails and if bail out.
-> >>
-> >> Nope. The code retries with direct reclaim until it succeeds. Which is=
- very
-> >> suspicious...
-> >
-> > It is not related to bio_add_page() failure. It is used to avoid a
-> > race condition when two processes are depleting the mempool
-> > simultaneously.
-> >
-> > IIUC I don't think page merge may happen for dm-crypt, so is
-> > __bio_add_page() good enough? I'm working on this code too, using
-> > __bio_add_page() would make my patch easier.
->
-> If the BIO was allocated with enough bvecs, we could use that function. B=
-ut page
-> merging reduces overhead, so if it can happen, let's use it.
+The following changes since commit bb430b69422640891b0b8db762885730579a4145:
 
-It does allocate BIO with enough bvecs. IIUC it will merge the
-adjacent pages? If so page merging may happen. Since dm-crypt does
-allocate BIO with enough bvces, so it can't fail if I read the code
-correctly. I'm wondering whether we could have a never fail variant.
+  loop: LOOP_CONFIGURE: send uevents for partitions (2023-03-27 13:27:06 -0600)
 
->
-> >
-> >>
-> >>>
-> >>> This way we can mark bio_add_pages as __must_check.
-> >>>
-> >>> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> >>
-> >> With the commit message fixed,
-> >>
-> >> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> >>
-> >>
-> >> --
-> >> Damien Le Moal
-> >> Western Digital Research
-> >>
-> >>
->
-> --
-> Damien Le Moal
-> Western Digital Research
->
+are available in the Git repository at:
+
+  git://git.infradead.org/nvme.git tags/nvme-6.3-2023-03-31
+
+for you to fetch changes up to 88eaba80328b31ef81813a1207b4056efd7006a6:
+
+  nvme-tcp: fix a possible UAF when failing to allocate an io queue (2023-03-30 11:24:33 +0900)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.3
+
+ - mark Lexar NM760 as IGNORE_DEV_SUBNQN (Juraj Pecigos)
+ - fix a possible UAF when failing to allocate an TCP io queue
+   (Sagi Grimberg)
+
+----------------------------------------------------------------
+Juraj Pecigos (1):
+      nvme-pci: mark Lexar NM760 as IGNORE_DEV_SUBNQN
+
+Sagi Grimberg (1):
+      nvme-tcp: fix a possible UAF when failing to allocate an io queue
+
+ drivers/nvme/host/pci.c |  3 ++-
+ drivers/nvme/host/tcp.c | 46 ++++++++++++++++++++++++++--------------------
+ 2 files changed, 28 insertions(+), 21 deletions(-)
