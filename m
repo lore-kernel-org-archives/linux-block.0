@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D55CEC77B6F
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 11:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AFDC77B71
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 11:39:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231715AbjC3Ljc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S231719AbjC3Ljc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 30 Mar 2023 07:39:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48508 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231811AbjC3LjQ (ORCPT
+        with ESMTP id S231733AbjC3LjH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 07:39:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C289B658B
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:37:43 -0700 (PDT)
+        Thu, 30 Mar 2023 07:39:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56FE1A244
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:37:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680176263;
+        s=mimecast20190719; t=1680176243;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=F7F6vbrS0gh77HT5XSUWKXsVAOVZJQ/PeMG00WEkJhQ=;
-        b=J9khDAL+Wwl9maF6aNc4g+XrA8LqS4dRiRz5MF4aOnIrgq1OmInEeFkUM0tgoGVGw5ppG9
-        SMWeNudETGuofgIlBsqF4Y5IoaPGR2QaT2jYz2+QpGhUf5fz5uNwviErR2thoZR5NLE4oT
-        uoxr+AiXk/AZH/6AYw3SHBvY7/6L93g=
+        bh=s89n5MVHIm/yrA8YFK9Xcfzas4VQ/6rU7DsLdSVa7Sk=;
+        b=Ry/csCRQgFlR8d2yw/fPeTOJxckRAG8UjyVr2ooxGGS6ZPIP9Vn0GDeG6AXF7evDm7Xzjq
+        Cl6jeX/fPwVgKrRMY7JX3aV8M+NxhjM8+qNhGfIHM1HkFuyPyV1f+eIBGX0W+dbvUbZPzN
+        cwMDiScNVd/mD5bgxZ/RuRStrxqLgAE=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-353-qJ6wA3vFNyqWH4EHtEt7Yw-1; Thu, 30 Mar 2023 07:37:38 -0400
-X-MC-Unique: qJ6wA3vFNyqWH4EHtEt7Yw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-604-YrZfWq1oOt6aE3h8QRqdYA-1; Thu, 30 Mar 2023 07:37:18 -0400
+X-MC-Unique: YrZfWq1oOt6aE3h8QRqdYA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 677B83815EF1;
-        Thu, 30 Mar 2023 11:37:37 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D51DF3815EF4;
+        Thu, 30 Mar 2023 11:37:17 +0000 (UTC)
 Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F54B202701E;
-        Thu, 30 Mar 2023 11:37:35 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F3EED14171BB;
+        Thu, 30 Mar 2023 11:37:16 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
         linux-block@vger.kernel.org
@@ -49,183 +49,60 @@ Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Dan Williams <dan.j.williams@intel.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 13/17] block: ublk_drv: grab request reference when the request is handled by userspace
-Date:   Thu, 30 Mar 2023 19:36:26 +0800
-Message-Id: <20230330113630.1388860-14-ming.lei@redhat.com>
+Subject: [PATCH V6 08/17] block: ublk_drv: don't consider flush request in map/unmap io
+Date:   Thu, 30 Mar 2023 19:36:21 +0800
+Message-Id: <20230330113630.1388860-9-ming.lei@redhat.com>
 In-Reply-To: <20230330113630.1388860-1-ming.lei@redhat.com>
 References: <20230330113630.1388860-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add one reference counter into request pdu data, and hold this reference
-in the request's lifetime. This way is always safe. In theory, the ublk
-request won't be completed until fused commands are done. However, it
-is userspace, and application can submit fused command at will.
+There isn't data in request of REQ_OP_FLUSH always, so don't consider
+it in both ublk_map_io() and ublk_unmap_io().
 
-Prepare for supporting zero copy, which needs to retrieve request buffer
-by fused command, so we have to guarantee:
-
-- the fused command can't succeed unless the request isn't queued
-
-- when any fused command is successful, this request can't be freed
-until all fused commands on this request are done.
-
+Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 67 ++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 64 insertions(+), 3 deletions(-)
+ drivers/block/ublk_drv.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index cca0e95a89d8..0dc8eb04b9a5 100644
+index bc46616710d4..c73b2dba25ce 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -43,6 +43,7 @@
- #include <asm/page.h>
- #include <linux/task_work.h>
- #include <linux/namei.h>
-+#include <linux/kref.h>
- #include <uapi/linux/ublk_cmd.h>
- 
- #define UBLK_MINORS		(1U << MINORBITS)
-@@ -62,6 +63,17 @@
- struct ublk_rq_data {
- 	struct llist_node node;
- 	struct callback_head work;
-+
-+	/*
-+	 * Only for applying fused command to support zero copy:
-+	 *
-+	 * - if there is any fused command aiming at this request, not complete
-+	 *   request until all fused commands are done
-+	 *
-+	 * - fused command has to fail unless this reference is grabbed
-+	 *   successfully
-+	 */
-+	struct kref ref;
- };
- 
- struct ublk_uring_cmd_pdu {
-@@ -180,6 +192,9 @@ struct ublk_params_header {
- 	__u32	types;
- };
- 
-+static inline void __ublk_complete_rq(struct request *req);
-+static void ublk_complete_rq(struct kref *ref);
-+
- static dev_t ublk_chr_devt;
- static struct class *ublk_chr_class;
- 
-@@ -288,6 +303,35 @@ static int ublk_apply_params(struct ublk_device *ub)
- 	return 0;
- }
- 
-+static inline bool ublk_support_zc(const struct ublk_queue *ubq)
-+{
-+	return ubq->flags & UBLK_F_SUPPORT_ZERO_COPY;
-+}
-+
-+static inline bool ublk_get_req_ref(const struct ublk_queue *ubq,
-+		struct request *req)
-+{
-+	if (ublk_support_zc(ubq)) {
-+		struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
-+
-+		return kref_get_unless_zero(&data->ref);
-+	}
-+
-+	return true;
-+}
-+
-+static inline void ublk_put_req_ref(const struct ublk_queue *ubq,
-+		struct request *req)
-+{
-+	if (ublk_support_zc(ubq)) {
-+		struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
-+
-+		kref_put(&data->ref, ublk_complete_rq);
-+	} else {
-+		__ublk_complete_rq(req);
-+	}
-+}
-+
- static inline bool ublk_can_use_task_work(const struct ublk_queue *ubq)
+@@ -529,15 +529,13 @@ static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
+ 		struct ublk_io *io)
  {
- 	if (IS_BUILTIN(CONFIG_BLK_DEV_UBLK) &&
-@@ -632,13 +676,19 @@ static inline bool ubq_daemon_is_dying(struct ublk_queue *ubq)
- }
- 
- /* todo: handle partial completion */
--static void ublk_complete_rq(struct request *req)
-+static inline void __ublk_complete_rq(struct request *req)
- {
- 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
- 	struct ublk_io *io = &ubq->ios[req->tag];
- 	unsigned int unmapped_bytes;
- 	blk_status_t res = BLK_STS_OK;
- 
-+	/* called from ublk_abort_queue() code path */
-+	if (io->flags & UBLK_IO_FLAG_ABORTED) {
-+		res = BLK_STS_IOERR;
-+		goto exit;
-+	}
+ 	const unsigned int rq_bytes = blk_rq_bytes(req);
 +
- 	/* failed read IO if nothing is read */
- 	if (!io->res && req_op(req) == REQ_OP_READ)
- 		io->res = -EIO;
-@@ -678,6 +728,15 @@ static void ublk_complete_rq(struct request *req)
- 	blk_mq_end_request(req, res);
- }
- 
-+static void ublk_complete_rq(struct kref *ref)
-+{
-+	struct ublk_rq_data *data = container_of(ref, struct ublk_rq_data,
-+			ref);
-+	struct request *req = blk_mq_rq_from_pdu(data);
-+
-+	__ublk_complete_rq(req);
-+}
-+
- /*
-  * Since __ublk_rq_task_work always fails requests immediately during
-  * exiting, __ublk_fail_req() is only called from abort context during
-@@ -696,7 +755,7 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
- 		if (ublk_queue_can_use_recovery_reissue(ubq))
- 			blk_mq_requeue_request(req, false);
- 		else
--			blk_mq_end_request(req, BLK_STS_IOERR);
-+			ublk_put_req_ref(ubq, req);
- 	}
- }
- 
-@@ -734,6 +793,7 @@ static inline void __ublk_rq_task_work(struct request *req,
- 				       unsigned issue_flags)
- {
- 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
-+	struct ublk_rq_data *data = blk_mq_rq_to_pdu(req);
- 	int tag = req->tag;
- 	struct ublk_io *io = &ubq->ios[tag];
- 	unsigned int mapped_bytes;
-@@ -805,6 +865,7 @@ static inline void __ublk_rq_task_work(struct request *req,
- 			mapped_bytes >> 9;
+ 	/*
+ 	 * no zero copy, we delay copy WRITE request data into ublksrv
+ 	 * context and the big benefit is that pinning pages in current
+ 	 * context is pretty fast, see ublk_pin_user_pages
+ 	 */
+-	if (req_op(req) != REQ_OP_WRITE && req_op(req) != REQ_OP_FLUSH)
+-		return rq_bytes;
+-
+-	if (ublk_rq_has_data(req)) {
++	if (ublk_rq_has_data(req) && req_op(req) == REQ_OP_WRITE) {
+ 		struct ublk_map_data data = {
+ 			.ubq	=	ubq,
+ 			.rq	=	req,
+@@ -774,9 +772,7 @@ static inline void __ublk_rq_task_work(struct request *req,
+ 		return;
  	}
  
-+	kref_init(&data->ref);
- 	ubq_complete_io_cmd(io, UBLK_IO_RES_OK, issue_flags);
- }
- 
-@@ -1017,7 +1078,7 @@ static void ublk_commit_completion(struct ublk_device *ub,
- 	req = blk_mq_tag_to_rq(ub->tag_set.tags[qid], tag);
- 
- 	if (req && likely(!blk_should_fake_timeout(req->q)))
--		ublk_complete_rq(req);
-+		ublk_put_req_ref(ubq, req);
- }
- 
- /*
+-	if (ublk_need_get_data(ubq) &&
+-			(req_op(req) == REQ_OP_WRITE ||
+-			req_op(req) == REQ_OP_FLUSH)) {
++	if (ublk_need_get_data(ubq) && (req_op(req) == REQ_OP_WRITE)) {
+ 		/*
+ 		 * We have not handled UBLK_IO_NEED_GET_DATA command yet,
+ 		 * so immepdately pass UBLK_IO_RES_NEED_GET_DATA to ublksrv
 -- 
 2.39.2
 
