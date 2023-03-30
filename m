@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5266BC77B6D
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 11:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C876C761A6
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 11:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231750AbjC3Lje (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 07:39:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46942 "EHLO
+        id S231751AbjC3Ljf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 07:39:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231774AbjC3LjM (ORCPT
+        with ESMTP id S231823AbjC3LjS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 07:39:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2968BA251
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:37:28 -0700 (PDT)
+        Thu, 30 Mar 2023 07:39:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24E4893D8
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 04:37:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680176247;
+        s=mimecast20190719; t=1680176265;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Plah9oxK2vEYgPKSe8zMQk868IGL1eXPxQld6RUGB/s=;
-        b=J+T8ekRfizD6eKHILhemUq4/dx+nuXBjxcV9D5R8PwWlQGvsMDtPNTe8n07cufX/i1M7eI
-        crjpGspV4P1OaFOtveAYW7pN8WxG6PWH4eg0q5r5nta994aLSfvWIqA6t6XKA4/AmYAPSz
-        DYGlN60PPTIZQGPlutFQs7o/kY+aqSI=
+        bh=cTxPpka+LhrPaNriA70AKnPyZgOXWneoLBopgtDoZwU=;
+        b=eCOZhpzfv2r7l2HGXajEHU+68gpywdRpN+tRR3giXPPpsIujen9hO0OVpOQeFeojczByK/
+        LaqXFaCLb20EsbbludfIw/adK7IbT2wG3+SEZ3ji0Fmg3LuLoy8v9C5d8OFl1OujUvxHwK
+        hbjtI88/GJmIXF2Oru/dwkqp3cXe25Q=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-274-OlcWq4k8Nrismr90--zAhw-1; Thu, 30 Mar 2023 07:37:26 -0400
-X-MC-Unique: OlcWq4k8Nrismr90--zAhw-1
+ us-mta-451-VPwHtt-QMliJ16sPFx-2aQ-1; Thu, 30 Mar 2023 07:37:42 -0400
+X-MC-Unique: VPwHtt-QMliJ16sPFx-2aQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9FD2B884EC6;
-        Thu, 30 Mar 2023 11:37:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 74C34101A54F;
+        Thu, 30 Mar 2023 11:37:41 +0000 (UTC)
 Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B3CC018EC7;
-        Thu, 30 Mar 2023 11:37:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E96918EC6;
+        Thu, 30 Mar 2023 11:37:40 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
         linux-block@vger.kernel.org
@@ -49,9 +49,9 @@ Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Dan Williams <dan.j.williams@intel.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 10/17] block: ublk_drv: clean up several helpers
-Date:   Thu, 30 Mar 2023 19:36:23 +0800
-Message-Id: <20230330113630.1388860-11-ming.lei@redhat.com>
+Subject: [PATCH V6 14/17] block: ublk_drv: support to copy any part of request pages
+Date:   Thu, 30 Mar 2023 19:36:27 +0800
+Message-Id: <20230330113630.1388860-15-ming.lei@redhat.com>
 In-Reply-To: <20230330113630.1388860-1-ming.lei@redhat.com>
 References: <20230330113630.1388860-1-ming.lei@redhat.com>
 MIME-Version: 1.0
@@ -61,64 +61,78 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert the following pattern in several helpers
-	if (Z)
-		return true
-	return false
-into:
-	return Z;
+Add 'offset' to 'struct ublk_map_data', so that ublk_copy_user_pages()
+can be used to copy any sub-buffer(linear mapped) of the request.
 
-Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+ drivers/block/ublk_drv.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index f87597a7d679..1c057003a40a 100644
+index 0dc8eb04b9a5..32304942ab87 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -298,9 +298,7 @@ static inline bool ublk_can_use_task_work(const struct ublk_queue *ubq)
- 
- static inline bool ublk_need_get_data(const struct ublk_queue *ubq)
- {
--	if (ubq->flags & UBLK_F_NEED_GET_DATA)
--		return true;
--	return false;
-+	return ubq->flags & UBLK_F_NEED_GET_DATA;
+@@ -511,19 +511,36 @@ static void ublk_copy_io_pages(struct ublk_io_iter *data,
+ 	}
  }
  
- static struct ublk_device *ublk_get_device(struct ublk_device *ub)
-@@ -349,25 +347,19 @@ static inline int ublk_queue_cmd_buf_size(struct ublk_device *ub, int q_id)
- static inline bool ublk_queue_can_use_recovery_reissue(
- 		struct ublk_queue *ubq)
++static bool ublk_advance_io_iter(const struct request *req,
++		struct ublk_io_iter *iter, unsigned int offset)
++{
++	struct bio *bio = req->bio;
++
++	for_each_bio(bio) {
++		if (bio->bi_iter.bi_size > offset) {
++			iter->bio = bio;
++			iter->iter = bio->bi_iter;
++			bio_advance_iter(iter->bio, &iter->iter, offset);
++			return true;
++		}
++		offset -= bio->bi_iter.bi_size;
++	}
++	return false;
++}
++
+ /*
+  * Copy data between request pages and io_iter, and 'offset'
+  * is the start point of linear offset of request.
+  */
+ static size_t ublk_copy_user_pages(const struct request *req,
+-		struct iov_iter *uiter, int dir)
++		unsigned offset, struct iov_iter *uiter, int dir)
  {
--	if ((ubq->flags & UBLK_F_USER_RECOVERY) &&
--			(ubq->flags & UBLK_F_USER_RECOVERY_REISSUE))
--		return true;
--	return false;
-+	return (ubq->flags & UBLK_F_USER_RECOVERY) &&
-+			(ubq->flags & UBLK_F_USER_RECOVERY_REISSUE);
- }
+-	struct ublk_io_iter iter = {
+-		.bio	= req->bio,
+-		.iter	= req->bio->bi_iter,
+-	};
++	struct ublk_io_iter iter;
+ 	size_t done = 0;
  
- static inline bool ublk_queue_can_use_recovery(
- 		struct ublk_queue *ubq)
- {
--	if (ubq->flags & UBLK_F_USER_RECOVERY)
--		return true;
--	return false;
-+	return ubq->flags & UBLK_F_USER_RECOVERY;
- }
++	if (!ublk_advance_io_iter(req, &iter, offset))
++		return 0;
++
+ 	while (iov_iter_count(uiter) && iter.bio) {
+ 		unsigned nr_pages;
+ 		size_t len, off;
+@@ -576,7 +593,7 @@ static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
+ 		import_single_range(dir, u64_to_user_ptr(io->addr), rq_bytes,
+ 				&iov, &iter);
  
- static inline bool ublk_can_use_recovery(struct ublk_device *ub)
- {
--	if (ub->dev_info.flags & UBLK_F_USER_RECOVERY)
--		return true;
--	return false;
-+	return ub->dev_info.flags & UBLK_F_USER_RECOVERY;
+-		return ublk_copy_user_pages(req, &iter, dir);
++		return ublk_copy_user_pages(req, 0, &iter, dir);
+ 	}
+ 	return rq_bytes;
  }
+@@ -596,7 +613,7 @@ static int ublk_unmap_io(const struct ublk_queue *ubq,
  
- static void ublk_free_disk(struct gendisk *disk)
+ 		import_single_range(dir, u64_to_user_ptr(io->addr), io->res,
+ 				&iov, &iter);
+-		return ublk_copy_user_pages(req, &iter, dir);
++		return ublk_copy_user_pages(req, 0, &iter, dir);
+ 	}
+ 	return rq_bytes;
+ }
 -- 
 2.39.2
 
