@@ -2,107 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9437EC77B6E
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 19:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E654C761A6
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 19:23:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230392AbjC3TTH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 15:19:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48674 "EHLO
+        id S230088AbjC3TXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 15:23:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232213AbjC3TSj (ORCPT
+        with ESMTP id S231558AbjC3TXK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 15:18:39 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD4510A97
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:18:18 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54574d6204aso197368167b3.15
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:18:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680203898;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WbNC07VGnJucfMQdaVru/HWxeCTMcNM6hFkgQ/MCeFU=;
-        b=PUv9MA0n+Z8fm7ErrGvHySjECm+JmVMmb7yIewlfjR/61XxilLPkk2HWdbFMTfUOaL
-         VEd5S3Db2lj6fZaM1EVkiIBt/SsoMNdbAydQDGkFf9C+290T1e1uwhZ4tZ9DFf8Phq0h
-         P4OVDvENTCX+3IndK3Cvs6OkRD4foG1c4Yew7PAGOLNrfjOHkmrszhM9+d8Istzt+wK/
-         krUK3yorRZOqS1BM/g9ye1FRB5jRNaXtQwUxDYcXcRNeFj0C93RhkVtRFak+8MvkC/U9
-         MW/LMGQgSZbJ8G2s7XbIxfyCgArJtDyQ9vNCBWNE1utNTCLeMAHTcanEcYFbU2EbD5hm
-         feog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680203898;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WbNC07VGnJucfMQdaVru/HWxeCTMcNM6hFkgQ/MCeFU=;
-        b=r2FZY38tQchfcZbu1Zto7vGCPjKLZ79bXYzPv6r6JLMpMa83CHWU+K1rIUG+UMhG8R
-         okB8/vRCOhGNfra4HTpKNBhzBjA5FdZWtmuX1ZGkYrRaqaLTIdxGCqvFC3uw5YN8VvcG
-         gSla5WJD2o0/tLFMW4CTR2ziRUNGST92V1rWenmBagvAJzn3Gw5TOHrWJuwNM3/8Xs75
-         osIi0WrD11mAabsrDaTnGNPJzrU9+fAnQM/u8vAVAnlTJITe3BXntvW4QcTz29oVmLGo
-         NqF3PClvpL1ot8NAdGEzCvhLzHDaxebtqZDIF2/EHwb8xeBVDZsXJMfBvkgT9Rggv/k/
-         eCEw==
-X-Gm-Message-State: AAQBX9e5hbLSzgBsr5fgJ2zaXqYWqnJ0ZYA7tUuaz8HXXho0YKYm0IAj
-        FFgiAAwCf/bJ7bfAxum8PvIuRpu0R8xAArH1
-X-Google-Smtp-Source: AKy350Z/bGsj2O9Q2OanxyiTVpU0KIn4cOhMHnfEJjh1llR4Xo1YrB6Sk31TDPAteoghtoX9TuixuaLotnLFVi3d
-X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
- (user=yosryahmed job=sendgmr) by 2002:a25:12d4:0:b0:b6e:d788:eba4 with SMTP
- id 203-20020a2512d4000000b00b6ed788eba4mr12664999ybs.6.1680203898630; Thu, 30
- Mar 2023 12:18:18 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 19:18:01 +0000
-In-Reply-To: <20230330191801.1967435-1-yosryahmed@google.com>
-Mime-Version: 1.0
-References: <20230330191801.1967435-1-yosryahmed@google.com>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230330191801.1967435-9-yosryahmed@google.com>
-Subject: [PATCH v3 8/8] memcg: do not modify rstat tree for zero updates
-From:   Yosry Ahmed <yosryahmed@google.com>
-To:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "=?UTF-8?q?Michal=20Koutn=C3=BD?=" <mkoutny@suse.com>
-Cc:     Vasily Averin <vasily.averin@linux.dev>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, bpf@vger.kernel.org,
-        Yosry Ahmed <yosryahmed@google.com>,
-        Michal Hocko <mhocko@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 30 Mar 2023 15:23:10 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C33CA1C
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:23:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680204189; x=1711740189;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6+En+FPxNTvoULOGa+u0T1QqJO9VImC93u8e+kPzfxo=;
+  b=PkE61N6SipJPPInNDM8Q54s0rtlaLBtMltHZ6O8qbCyH7AmDEYXvuoB7
+   UJdHR0AmPKTPzen/jBW22VhuGQWO5S6G3SuQeygxTqR+kB5Sq3KLoWrcH
+   wl6Bv/KPr8iIzK4j1GSE2Z/ubmI+jdZ4v4aB/V4qn11xDHu9PT3OpfRtz
+   a+uCZ8wVkpeP2CmlM66pT26gj/UfQm/5wO3uIvYHGnhvEVeZgAMtzX45G
+   nJ8IUqg2fFSy9C3gc+fwM5q8OT/O+hAAfGqtxG/nWNZnKrBxH8cq5qQbZ
+   28cBG/mq2ifMGIEKd7tAkdkFBtk6blmKe2SaJWA6jo3FzCQ7Jay+pyHos
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10665"; a="329788630"
+X-IronPort-AV: E=Sophos;i="5.98,305,1673942400"; 
+   d="scan'208";a="329788630"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2023 12:23:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10665"; a="687376956"
+X-IronPort-AV: E=Sophos;i="5.98,305,1673942400"; 
+   d="scan'208";a="687376956"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 30 Mar 2023 12:23:07 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1phxrW-000L8k-1n;
+        Thu, 30 Mar 2023 19:23:06 +0000
+Date:   Fri, 31 Mar 2023 03:22:28 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Alyssa Ross <hi@alyssa.is>, chaitanyak@nvidia.com,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     oe-kbuild-all@lists.linux.dev, axboe@kernel.dk, hch@lst.de,
+        hi@alyssa.is, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] loop/009: add test for loop partition uvents
+Message-ID: <202303310316.QS2vADHM-lkp@intel.com>
+References: <20230330160247.16030-1-hi@alyssa.is>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230330160247.16030-1-hi@alyssa.is>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In some situations, we may end up calling memcg_rstat_updated() with a
-value of 0, which means the stat was not actually updated. An example is
-if we fail to reclaim any pages in shrink_folio_list().
+Hi Alyssa,
 
-Do not add the cgroup to the rstat updated tree in this case, to avoid
-unnecessarily flushing it.
+Thank you for the patch! Perhaps something to improve:
 
-Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-Acked-by: Shakeel Butt <shakeelb@google.com>
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-Acked-by: Michal Hocko <mhocko@suse.com>
----
- mm/memcontrol.c | 3 +++
- 1 file changed, 3 insertions(+)
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.3-rc4 next-20230330]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 361c0bbf7283..a63ee2efa780 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -618,6 +618,9 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
- {
- 	unsigned int x;
- 
-+	if (!val)
-+		return;
-+
- 	cgroup_rstat_updated(memcg->css.cgroup, smp_processor_id());
- 
- 	x = __this_cpu_add_return(stats_updates, abs(val));
+url:    https://github.com/intel-lab-lkp/linux/commits/Alyssa-Ross/loop-009-add-test-for-loop-partition-uvents/20230331-001157
+patch link:    https://lore.kernel.org/r/20230330160247.16030-1-hi%40alyssa.is
+patch subject: [PATCH blktests] loop/009: add test for loop partition uvents
+reproduce:
+        scripts/spdxcheck.py
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303310316.QS2vADHM-lkp@intel.com/
+
+spdxcheck warnings: (new ones prefixed by >>)
+>> tests/loop/009: 2:27 Invalid License ID: GPL-3.0+
+
 -- 
-2.40.0.348.gf938b09366-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
