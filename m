@@ -2,104 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B34A8C77B60
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 19:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB52CC6FD1D
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 19:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230386AbjC3TaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 15:30:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35606 "EHLO
+        id S232152AbjC3TbW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 15:31:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231796AbjC3TaU (ORCPT
+        with ESMTP id S232110AbjC3TbU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 15:30:20 -0400
-Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4FE210B
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:30:18 -0700 (PDT)
-Received: by mail-oo1-xc33.google.com with SMTP id g21-20020a4ad855000000b0053e563c2f72so1942595oov.6
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 12:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112; t=1680204618;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Khpw7ou3XcOkEyyu20b7pCpZUxpOS3o1zWL8rB8cIWg=;
-        b=EBZ5RSwu7qAxwJOxXP+VV5tCHAvd597imHWQHEOpyHjV99Yma2yYj2+GVrBE3CvEYu
-         j8GOYLIo/8V6p01dDFwWDz0SuE7pJ9ps3e/uuV/vrp+Efny6FMlE8BM6+lrA9yui5XXy
-         BP6sOtWFiXcCali8wq+wJ3ZeGb16MFGin5/zucLqAsEfB6IkgmUZYUNLVZS0o4LTsQYV
-         p4WDiyCZ5dD1Xl6y5Lz0GhJWbb1bQHZ85QIJV0Hj8hcm7nUsFbYsfBttw01lkBWhwMDp
-         adaoaJrHF1Tqpn0MyPd0QZKQohCtbf0gRnsrAsPTFufImEuTtaA7mENwlPt7Do/NeuEl
-         4V8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680204618;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Khpw7ou3XcOkEyyu20b7pCpZUxpOS3o1zWL8rB8cIWg=;
-        b=qoCVq/GfNGQWtI1KLtYk2dflAAr5wuc19POcgFN69ErUKYmvQH6rw1445ncnLgrezW
-         vwIxIW2KYxNZScEDAXitdN/dx26oB6sTidUAQyBoWeKyGH4MDHK+D443igIZ2vEYGBpe
-         JaSiXA/GIDCNWwB3+7bg0CeL52AUhFbWtgatUIZiRkh8WSZn4w7ZEFBbOTVuGyepqsDT
-         w87wnrMuwnA+tZwxTYLc7qN2jtshsq6dFHbHz7cOmUV+s4uTL5jWMPWdSkAn8/PL/9rH
-         DxV4z5aey3urzggoLC3xprG1UKLPFruk1c0zeLyYz+gOZH1ja/2xVeqE1XHAM4kSDzpj
-         jYmA==
-X-Gm-Message-State: AO0yUKX4qiZC0aOiyvVE0Uk2LE+6ra4ag3IW1o1Byf5V6O5CbtLK8Nre
-        3odNG4gXTvOIWKE5BVp1nGKGJA==
-X-Google-Smtp-Source: AK7set8ZpEUnr0vsSLvX76E+UiWGEN8KrfPFawZyGwI6bQmQYsusk8/LecZTtUIeYJN+T8sl467z8w==
-X-Received: by 2002:a4a:558f:0:b0:534:c237:eb00 with SMTP id e137-20020a4a558f000000b00534c237eb00mr11810755oob.3.1680204618144;
-        Thu, 30 Mar 2023 12:30:18 -0700 (PDT)
-Received: from localhost ([107.116.82.97])
-        by smtp.gmail.com with ESMTPSA id 2-20020a4a0302000000b005251f71250dsm13103ooi.37.2023.03.30.12.30.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Mar 2023 12:30:17 -0700 (PDT)
-Date:   Thu, 30 Mar 2023 15:30:13 -0400
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Yosry Ahmed <yosryahmed@google.com>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Michal Hocko <mhocko@kernel.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Shakeel Butt <shakeelb@google.com>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, Michal Hocko <mhocko@suse.com>
-Subject: Re: [PATCH v3 5/8] memcg: sleep during flushing stats in safe
- contexts
-Message-ID: <ZCXjRYASA+Cjomlx@cmpxchg.org>
-References: <20230330191801.1967435-1-yosryahmed@google.com>
- <20230330191801.1967435-6-yosryahmed@google.com>
+        Thu, 30 Mar 2023 15:31:20 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA24213C;
+        Thu, 30 Mar 2023 12:31:19 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 96F501FE07;
+        Thu, 30 Mar 2023 19:31:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1680204678;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Etjp+xE3FIW3A1xPIHa1sQtyQ4/Nn9crT5hD184o2SA=;
+        b=aHv++cdpXPaXb26/G1LMYwclQgZ4Qx/cyWFa0fjo70P5nNjzjoHIeWQSajl20M1XZZkoz2
+        ZwgPzABCzOE8C4i0glI8NLuVt6p2eWDvwk3FK3zK7SXAeXYSpz3JpQIfG2AbcvOChVT7+9
+        1qTNvdPzYgEM+d96UTjl0NgotnSkQr4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1680204678;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Etjp+xE3FIW3A1xPIHa1sQtyQ4/Nn9crT5hD184o2SA=;
+        b=wYPbuyHqUYLobbGSEtgz4W8ycI8q3CtaKnbPUQGE+5MzS+bueBw/fljFzrPU/2rA5fyNzR
+        A2+wNxH4qiVKtHBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 200FE133E0;
+        Thu, 30 Mar 2023 19:31:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 77P7BobjJWQBRQAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Thu, 30 Mar 2023 19:31:18 +0000
+Date:   Thu, 30 Mar 2023 21:25:03 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     "dsterba@suse.cz" <dsterba@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Song Liu <song@kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        "jfs-discussion@lists.sourceforge.net" 
+        <jfs-discussion@lists.sourceforge.net>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        David Sterba <dsterba@suse.com>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
+Subject: Re: [PATCH v2 00/19] bio: check return values of bio_add_page
+Message-ID: <20230330192503.GT10580@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <cover.1680172791.git.johannes.thumshirn@wdc.com>
+ <20230330154529.GS10580@twin.jikos.cz>
+ <9835fc72-18b4-517d-0861-b5b413252eb9@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230330191801.1967435-6-yosryahmed@google.com>
+In-Reply-To: <9835fc72-18b4-517d-0861-b5b413252eb9@wdc.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 30, 2023 at 07:17:58PM +0000, Yosry Ahmed wrote:
-> Currently, all contexts that flush memcg stats do so with sleeping not
-> allowed. Some of these contexts are perfectly safe to sleep in, such as
-> reading cgroup files from userspace or the background periodic flusher.
-> Flushing is an expensive operation that scales with the number of cpus
-> and the number of cgroups in the system, so avoid doing it atomically
-> where possible.
+On Thu, Mar 30, 2023 at 04:41:58PM +0000, Johannes Thumshirn wrote:
+> On 30.03.23 17:52, David Sterba wrote:
+> > On Thu, Mar 30, 2023 at 03:43:42AM -0700, Johannes Thumshirn wrote:
+> >> We have two functions for adding a page to a bio, __bio_add_page() which is
+> >> used to add a single page to a freshly created bio and bio_add_page() which is
+> >> used to add a page to an existing bio.
+> >>
+> >> While __bio_add_page() is expected to succeed, bio_add_page() can fail.
+> >>
+> >> This series converts the callers of bio_add_page() which can easily use
+> >> __bio_add_page() to using it and checks the return of bio_add_page() for
+> >> callers that don't work on a freshly created bio.
+> >>
+> >> Lastly it marks bio_add_page() as __must_check so we don't have to go again
+> >> and audit all callers.
+> >>
+> >> Changes to v1:
+> >> - Removed pointless comment pointed out by Willy
+> >> - Changed commit messages pointed out by Damien
+> >> - Colledted Damien's Reviews and Acks
+> >>
+> >> Johannes Thumshirn (19):
+> > 
+> >>   btrfs: repair: use __bio_add_page for adding single page
+> >>   btrfs: raid56: use __bio_add_page to add single page
+> > 
+> > The btrfs patches added to misc-next, thanks.
+> > 
 > 
-> Refactor the code to make mem_cgroup_flush_stats() non-atomic (aka
-> sleepable), and provide a separate atomic version. The atomic version is
-> used in reclaim, refault, writeback, and in mem_cgroup_usage(). All
-> other code paths are left to use the non-atomic version. This includes
-> callbacks for userspace reads and the periodic flusher.
-> 
-> Since refault is the only caller of mem_cgroup_flush_stats_ratelimited(),
-> change it to mem_cgroup_flush_stats_atomic_ratelimited(). Reclaim and
-> refault code paths are modified to do non-atomic flushing in separate
-> later patches -- so it will eventually be changed back to
-> mem_cgroup_flush_stats_ratelimited().
-> 
-> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> Acked-by: Shakeel Butt <shakeelb@google.com>
-> Acked-by: Michal Hocko <mhocko@suse.com>
+> Thanks but wouldn't it make more sense for Jens to pick up all of them?
+> The last patch in the series flips bio_add_pages() over to
+> __must_check and so it'll create an interdependency between the
+> btrfs and the block tree.
 
-Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+I'd rather take it via btrfs tree, this avoids future merge conflicts.
