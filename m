@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B31DAC7619A
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 21:33:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40B2C761AF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 21:33:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbjC3VdQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 17:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56854 "EHLO
+        id S229595AbjC3Vd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 17:33:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjC3VdP (ORCPT
+        with ESMTP id S229659AbjC3Vd2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 17:33:15 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2070.outbound.protection.outlook.com [40.107.93.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0287835B5
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 14:33:14 -0700 (PDT)
+        Thu, 30 Mar 2023 17:33:28 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F37EFAD
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 14:33:27 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QRBLccT7F43ud1cDs9lI24DES2+Teymn2hm6Mwo1UUFjM8aycE49yRBF6IjKgS/7QhMOWFG/H9C1q8tFbDecOVSY0HvyJV141yCEb2szvjzlTxZXUr2HNh7YHmmrAWU1mA3nl8/hgQtmD0c3ux2B4FqphFNSZpNv57PMtJflirzAdlV9Tw+TUo5qUE3MPysmxP6rf4sa2Ea0lw93Eh8aZPC8SWJHaaPS/yokW55EybgOe4hCqJ5WOHNRhPpCBAKxvg1Tey4Yn/b86Dm9w/SfaLKd2qDh4mE+g4NK508WlGVWRDA+vOpWUPVVa4hDkVwYXUFQoVJVe2npOUvkPpchgw==
+ b=cT/7s2P59Y/GK/dux3ybpIzQECGzovezmRjxHuvWRlklKg0pnARyegt8Txt6/8vzGQbVdeoMG2fA0zMsnc+DVtAto7L3WJkwa5FUZ/X4uNxzWt0Mt8bahdU0D6s3CDxf1noRlDhOC4hu3/75AqvrUQtwY8b/j57idwDu74H/PkxJlHQpIBGUrqDksagCPnfp5rGPmjfVLl+FYPPMb3S1YMpFG8t+IahUhE19eAS0/Rc+J5Nm0rSUx283H+qqxoZWAPWsGDYkpzFADXNENF8oj6AoaP/F+dFmqmE3qOB8qXxXfKt3aHDOqRfKqAiG3d2w/2V6v9lUBiaL1prcqcOMDA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ay5Z0N6oBRZ4/K2Or1meAgFWdvIhSKpu/PSEKaryELc=;
- b=WK8H+y+r/LUKjKbWyAFl5UaTGcSC6fZreu6d4sUU3m933XeMK/s2INqdYtCCrjgf8TwIXH00rOvURmTmLU9GlvMvuV7hsZ9ZQzo5RAvxCQQAwrPZqfXiMZK+TwxuYeNNauH/gli0hOESmF243MDsPPQdBB7fqlAr55xKpBg9hjxLQ6ZL+n125ihQqlyizmmEM3B6dhAwyElcZiJdjuMV1K9+uUgFf6gNVny/8bsGF/7vEZjS/+1CJ47JAuA2MihHpngZCqX5sJZVdsanYWy1guC4CfnNL7v3BvfqtFF8d9v8m6wBE8QOi1kPXbM2f9RYof2PDQ4wiX7XFojLzuWnjQ==
+ bh=MadCxwS9c+RauycmyBdgmNdtCtt4D6xzoC+/leRBIMc=;
+ b=X8zb45O1j4dv0fNcTAskDRwUHH2/TPO9Kvz6YqSgnQKH5q12HsEgdgDbH7BkkjzKVTnssBFWwl3PasQqruMCd9XcVDlnSNSqgfQColxI+t31qwSQZBn94SL4dptVBsBpa7yVDkgmEdCpJkezj14XWAOjzGij/BxnJP2aIEUMsTVyXYqjrOD4fRbLD9UB0IVHlwO6bIrXGgllYxks1M+Ot03hVv+E5YmaF394T7pZi8jc2jUYnD3+1hULH7P9JSTqaOjwa2KZwrWqj75jEDWTK39sL8/5CvzDXJO/GnfhR8NGfOsIre1Eb2EvT/1bjL1cqUpvsiLmNsgzilH4U4euWw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -29,18 +29,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ay5Z0N6oBRZ4/K2Or1meAgFWdvIhSKpu/PSEKaryELc=;
- b=tJqpdejCL5F+ty01Bor6pNb9Efc1U/hgNAt4+JWCiX/3KOI4dVJCkTRANzGMvbuz6220rS9E8GIUIXmzdfLgfu+oNeMeyezOlXEVRt3GROdmZ3JR8nJl4rGpD1tYf7UV4KvmrEtMFuNgpVG2AyhQXLzEmA06wy6YnuGnBuEvKM9Q7kqlM7adS2FO9suRdsxt+HII5DkThftN9pJbS8jlrbQSajJ469qz4vKRBq5tn6Fx1Tdeq+vt1/EgtcrrJWpb0B7p+DgSqERuFn+KXfD0iaKf6pFUVawJqEbmp1kef93PGcGTGKR9Vv1BHeoKKajhD6ysHkeHr2B25fJbbKppAQ==
-Received: from MW4P220CA0012.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::17)
- by SJ1PR12MB6337.namprd12.prod.outlook.com (2603:10b6:a03:456::20) with
+ bh=MadCxwS9c+RauycmyBdgmNdtCtt4D6xzoC+/leRBIMc=;
+ b=Ixu22Lx0kZSQYMNvmx47DpFaIjQxFzgRxFA2m8yNet8o/WfAvSKxO65apV0iHmA3nH7F/nUapnMH8Bnrj/aUSq2MYc2B6wXXJR561S2uv4wzSBRvgz16pO+gLYwdQf8k+X/54tgteyrNpe98PgBWKE/9HmxROoswvc8ooWMExabr8jG0uqYCjmkzaPGFCxIHrWGta92GvYeScb6QBnEK/N8xgxyUeMIMiCOPqGJUiAZhlJZncV3cZql2hMn5LFu2qH+Yz+xRhg9yK5epIllfth4zDJFnLTitZ5WNe/M0F7TsogeFHvSWkaytOQ0tG9Z5irkADw5KYw/W5sI1KIbFew==
+Received: from MW4PR03CA0349.namprd03.prod.outlook.com (2603:10b6:303:dc::24)
+ by SA1PR12MB8700.namprd12.prod.outlook.com (2603:10b6:806:388::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.32; Thu, 30 Mar
- 2023 21:33:11 +0000
-Received: from CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:115:cafe::fa) by MW4P220CA0012.outlook.office365.com
- (2603:10b6:303:115::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.22 via Frontend
- Transport; Thu, 30 Mar 2023 21:33:11 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6222.33; Thu, 30 Mar
+ 2023 21:33:25 +0000
+Received: from CO1NAM11FT114.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:dc:cafe::ac) by MW4PR03CA0349.outlook.office365.com
+ (2603:10b6:303:dc::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.20 via Frontend
+ Transport; Thu, 30 Mar 2023 21:33:25 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -48,98 +48,114 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- CO1NAM11FT005.mail.protection.outlook.com (10.13.174.147) with Microsoft SMTP
+ CO1NAM11FT114.mail.protection.outlook.com (10.13.174.103) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6254.21 via Frontend Transport; Thu, 30 Mar 2023 21:33:10 +0000
+ 15.20.6277.14 via Frontend Transport; Thu, 30 Mar 2023 21:33:24 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 30 Mar 2023
- 14:33:03 -0700
-Received: from dev.nvidia.com (10.126.230.37) by rnnvmail201.nvidia.com
+ 14:33:15 -0700
+Received: from dev.nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 30 Mar
- 2023 14:33:03 -0700
+ 2023 14:33:14 -0700
 From:   Chaitanya Kulkarni <kch@nvidia.com>
 To:     <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, <kch@nvidia.com>,
         <damien.lemoal@opensource.wdc.com>, <johannes.thumshirn@wdc.com>,
         <ming.lei@redhat.com>, <bvanassche@acm.org>,
         <shinichiro.kawasaki@wdc.com>, <vincent.fu@samsung.com>
-Subject: [PATCH V2 7/9] null_blk: check for valid queue depth value
-Date:   Thu, 30 Mar 2023 14:31:32 -0700
-Message-ID: <20230330213134.131298-8-kch@nvidia.com>
+Subject: [PATCH V2 8/9] null_blk: avoid use global modparam g_queue_mode
+Date:   Thu, 30 Mar 2023 14:31:33 -0700
+Message-ID: <20230330213134.131298-9-kch@nvidia.com>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20230330213134.131298-1-kch@nvidia.com>
 References: <20230330213134.131298-1-kch@nvidia.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.126.230.37]
+X-Originating-IP: [10.126.231.37]
 X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT005:EE_|SJ1PR12MB6337:EE_
-X-MS-Office365-Filtering-Correlation-Id: 791ace4c-cc38-450a-c54d-08db31665c76
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT114:EE_|SA1PR12MB8700:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b9fa025-c266-4323-cf89-08db316664c5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: usPD2AvvedW7IQqeaj3k1SXCjZmVdE5H4l/zajC3wT9AxrdIXhoMU2K7HPSbyj7O91OG4NIbSBK1ay0xBkq611owkRBWUmAmirPqMcrVva+idBdkiIWuuwMYWozM8vgJ+qmOWckEWRnY8AFOzauLYH5jRIu+dKQLZn31vIT7PYY9gpjyubVOfQhXlQj/ZoRNTzWtJa+eL0s0tQHOCfbA0QTFUGnuy7cSEA4WeJ38UHFGVJ/6SPbXIihpggUppZ26F4zMvFVPVozSUgCcBLahzILGf0ztpAa/T7aQeWTFrisc0SbhTo9Rnkp0OlwGrTslSrmdEqZH3JRVszBr52awf9HqpU8GJN+rTUYmWO7LvAu5kIBqJ1Y7JZvF+hC1OD6a8J+j2l/mtGayVPsYsFuZDUUa7eqjzP8oQA3mS0uCyCjSFxZIycFALx02sbG6qymgVMaEcxonmMmkXsKjqfI9BOcm6HNYsOg/aX6rYEvc8i50QeLrKMwuPSNsMF2iSPq9R2ZryMf1f2v4UZ2kxO8nBAa1JXB2wR15zoHSiYQa03ZiFRPigitYCihX9zU9PoCyiwYChqN82WUITMBNVgCnGQqAGFYeeVIhFfCf5u4N87D2/QdLXXvC0Ed2jxlHrc8J1QSeb71goRu/MGkR6vACfPtkEqN2pSkbit2R1NcKnN+UHzGpol4wpS7f/Fp7zMc7rP5A6R56QJigQ3TL3QwTYW7Nff95kKT+2Q/34X2tmJ4hxq+IP1b0M55yEI35VThBxBdzGYwBY1Pt/bQtto8/U1VQnLYs8zkz2/MLz4OFekI=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(396003)(39860400002)(136003)(451199021)(46966006)(40470700004)(36840700001)(6666004)(70206006)(4326008)(40460700003)(1076003)(316002)(6916009)(8936002)(47076005)(26005)(54906003)(34020700004)(82740400003)(41300700001)(356005)(7636003)(70586007)(186003)(83380400001)(5660300002)(2616005)(478600001)(8676002)(336012)(36860700001)(7696005)(426003)(16526019)(82310400005)(2906002)(36756003)(40480700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: r0AZ72JWZqfM4K3UtoD4y+ZmFN/Ufd0nPo9vygJS0JS27ptVKgqAEODHIUvltt7TKP+rTIxWyTYHERuAwtZUAyosKMgTCxGmt2lQTNbsSvgDi2x9cG/O6pIWlQBwhzy0ptlBqeYgJmg5LT8zrJX22Jp2a/q2nSDNg/84yAdCliCQumFZgS62KwDJE37VOA/AOVuI6QZaFU713DQfdrnQw0/J5BDrGqBohDKcojEB5gDhgIxjewzDY0gApKlVUFOG659P4udEPUYxe+khi31pZ3ruDT9dXiw+b9jfoGACjN16pHQKZ+cYS42FgYxb598JRUQnKX2WL7ULiBV3W0+UrTz8RP7BO19SN2307QeXn2X/0vsl/R1SF23VgDhta9k/n7SOaa6cbwKvt9JQKIMqzrzjsjrLDifD2UhvodtEl1ChFRVQX+enC3qI4KfZIwlx50aX4xDDLvftUYEpDs5l6Zz4StpkKt8bVCmcOi2bsHL0B0TZgLEwCEG7wuLLuwos16lsfntGIwVKtHUxkABxfKIRNyaMaHum7ZHkQMJixMub6Cd8JNZw6XEGIACgyEtZrRn7Q+E3+k/WD+MqZOvItLaXJyUjmQTaFxGQj8MeD99v1QhV17jyp7lwtWV6RSsqZOOUlAc0ButJT1GtsCTuKao1mbmeslRGcqPVBKmWH8aQrpLYsABPUdj6AQyC8coSlrNUaaevakFl/BNBehkp08JmzMQ/5O5Hcay4NU37wpkB8bJoF39RCwOsKzdtUo6aOswtP3V+7wa/3tjjGENnOyMtTPUayAHbk4Y+XBFQKqI=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(376002)(396003)(346002)(136003)(451199021)(46966006)(40470700004)(36840700001)(8936002)(4326008)(2906002)(41300700001)(5660300002)(356005)(426003)(40480700001)(7636003)(36756003)(82310400005)(40460700003)(82740400003)(478600001)(6916009)(1076003)(54906003)(316002)(7696005)(6666004)(26005)(2616005)(70206006)(8676002)(83380400001)(336012)(186003)(70586007)(34020700004)(16526019)(47076005)(36860700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 21:33:10.9676
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2023 21:33:24.9074
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 791ace4c-cc38-450a-c54d-08db31665c76
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b9fa025-c266-4323-cf89-08db316664c5
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT114.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6337
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8700
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Right now we don't check for valid module parameter value for
-queue depth, that allows user to set negative values.
+The reference to module parameter is already present in the
+struct kernel_param dp->arg include/linux/moduleparam.h :-
 
-Add a callback to error out when queue depth value is set < 1 before
-module is loaded.
+device_param_cb(name, ops, arg, perm)
+ level_param_cb(name, ops, arg, perm, level)
+   __module_param_call(prefix, name, ops, arg, perm, level, flags)
+288         /* Default value instead of permissions? */                     \
+289         static const char __param_str_##name[] = prefix #name;          \
+290         static struct kernel_param __moduleparam_const __param_##name   \
+291         __used __section("__param")                                     \
+292         __aligned(__alignof__(struct kernel_param))                     \
+293         = { __param_str_##name, THIS_MODULE, ops,                       \
+294             VERIFY_OCTAL_PERMISSIONS(perm), level, flags, { arg } }
+
+Replace global reference to the g_queue_mode in null_set_queue_mode()
+with the function parameter kp-arg and rearrage code that matches
+nicely with this patch series.
+
+Also, use this opportunity to print the error message with valid range.
 
 Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- drivers/block/null_blk/main.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ drivers/block/null_blk/main.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index c13f0f2b8d86..96ced0485e35 100644
+index 96ced0485e35..5325ec57287d 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -264,8 +264,23 @@ static unsigned long g_completion_nsec = 10000;
- module_param_named(completion_nsec, g_completion_nsec, ulong, 0444);
- MODULE_PARM_DESC(completion_nsec, "Time in ns to complete a request in hardware. Default: 10,000ns");
+@@ -156,11 +156,15 @@ module_param_string(init_hctx, g_init_hctx_str, sizeof(g_init_hctx_str), 0444);
+ MODULE_PARM_DESC(init_hctx, "Fault injection to fail hctx init. init_hctx=<interval>,<probability>,<space>,<times>");
+ #endif
  
-+static int null_set_hw_queue_depth(const char *s, const struct kernel_param *kp)
-+{
+-static int g_queue_mode = NULL_Q_MQ;
+-
+ static int null_set_queue_mode(const char *str, const struct kernel_param *kp)
+ {
+-	return null_param_store_int(str, &g_queue_mode, NULL_Q_BIO, NULL_Q_MQ);
 +	int ret;
 +
-+	ret = null_param_store_int(s, kp->arg, 1, INT_MAX);
++	ret = null_param_store_int(str, kp->arg, NULL_Q_BIO, NULL_Q_MQ);
 +	if (ret)
-+		pr_err("only positive values are allowed for queue_depth\n");
++		pr_err("queue_mode valid values BIO: %u, MQ: %u\n",
++		       NULL_Q_BIO, NULL_Q_MQ);
 +	return ret;
-+}
-+
-+static const struct kernel_param_ops null_hw_qdepth_param_ops = {
-+	.set	= null_set_hw_queue_depth,
-+	.get	= param_get_int,
-+};
-+
- static int g_hw_queue_depth = 64;
--module_param_named(hw_queue_depth, g_hw_queue_depth, int, 0444);
-+device_param_cb(hw_queue_depth, &null_hw_qdepth_param_ops, &g_hw_queue_depth, 0444);
- MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 64");
+ }
  
- static bool g_use_per_node_hctx;
+ static const struct kernel_param_ops null_queue_mode_param_ops = {
+@@ -168,6 +172,7 @@ static const struct kernel_param_ops null_queue_mode_param_ops = {
+ 	.get	= param_get_int,
+ };
+ 
++static int g_queue_mode = NULL_Q_MQ;
+ device_param_cb(queue_mode, &null_queue_mode_param_ops, &g_queue_mode, 0444);
+ MODULE_PARM_DESC(queue_mode, "Block interface to use (0=bio,1=rq,2=multiqueue)");
+ 
 -- 
 2.29.0
 
