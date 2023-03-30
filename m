@@ -2,66 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9417C6FD1D
-	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 08:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E142FC6FD1D
+	for <linux-block@archiver.kernel.org>; Thu, 30 Mar 2023 08:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230284AbjC3IUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 04:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35024 "EHLO
+        id S229581AbjC3IjM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 04:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230356AbjC3IUM (ORCPT
+        with ESMTP id S229680AbjC3IjI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 04:20:12 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7BD7698
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 01:20:07 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id ek18so73325343edb.6
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 01:20:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680164406;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rE+Nd7UYDrEpMLZdSjUiKej18eXol1/TN8rz8IxWo74=;
-        b=GyiWHmVq+FRfL2cjm01ZTknwA6vfgE0p1ya77Ct3yJ2fB3E9yTJDYO2DG1GztDRNr1
-         mgqcDehwuGMzQozTkhWOck0f+hbdMLCW22Oz0H2Hw6ub0AxgTKvO7NZZd8kar0iXPa0I
-         w1fR0oirsZVe2itG6Xr3UFIcRF4dGKzDyt2lNU2VwbqP6oVlYOxkUSoEnJivS8rNs64x
-         VZVdjxryxpTbjqXXWbrRaMthVoEUjQbg6RENFAeilc95gCV/uc5zz8ndmctFE1QXVkv2
-         tyHZExil1HMZFY3eIbGsSr2E+zht6bWEo8TR5K8rxCHL18BXfX+/+YVs+jZNksasf9f2
-         oklg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680164406;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rE+Nd7UYDrEpMLZdSjUiKej18eXol1/TN8rz8IxWo74=;
-        b=pHmtBjI7LFpEX7sL1znb8wxIAFNwEDX9WdznuSSoUsOTJufHqLfFGCpNt8jWXOH63G
-         IpwUccqgjTDaLf5AKq9cVdA19gN1lSn9HqNKHFSDkRh4CW7pD7SDUF3f95oukzFP8cwI
-         TCFCKkhSbjF+i7IyDI6bHdnbvd5TzfG5X/NYNbD/ir9pR1/i5rPVzfsyjIHzsm0DONz1
-         93EryIlGuvbj7G0VwvnKc6Wbt2KjGbuAeVUBo+B1G7pLmO+/9ieLwipi9mYVM+JWjGpF
-         VSeiqPEiWBZDgpXw/cCZdB19Eh9XiejINggSnsqQiU0PQ2dvw2yrbvKAyorDuaiw3lKN
-         9Wtg==
-X-Gm-Message-State: AAQBX9f/WmgMQ09aRCICrt8shthzlCbPeQp9niZ4pmeWoqnDDChr4TPr
-        l6GGagQUXWYdVPtkYtqztmrMF5ZhfPS0yxeZNtbcaw==
-X-Google-Smtp-Source: AKy350bAhrh9NHy4UYkmG2jHp+l/1C2NvOUI9U59l2Zu/qbpFVbWrn1FsDF2AI+0/W7DKu39i6IFvDYFuiBiBzY6SzU=
-X-Received: by 2002:a50:8e0d:0:b0:4fc:473d:3308 with SMTP id
- 13-20020a508e0d000000b004fc473d3308mr11186298edw.8.1680164405731; Thu, 30 Mar
- 2023 01:20:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230328221644.803272-1-yosryahmed@google.com>
- <20230328221644.803272-5-yosryahmed@google.com> <ZCQfZJFufkJ10o01@dhcp22.suse.cz>
- <CAJD7tkb-UpKm2QbjYzB=B=oGk6Hyj9cbUviZUPC+7VsvBecH7g@mail.gmail.com>
- <20230329192059.2nlme5ubshzdbpg6@google.com> <ZCU1Bp+5bKNJzWIu@dhcp22.suse.cz>
- <CAJD7tka0CmRvcvB0k8DZuid1vC9OK_mFriHHbXNTUkVE7OjaTA@mail.gmail.com>
- <ZCU+8lSi+e4WgT3F@dhcp22.suse.cz> <CAJD7tkaKd9Bcb2-e83Q-kzF7G+crr1U+7uqUPBARXWq-LpyKvw@mail.gmail.com>
- <ZCVFA78lDj2/Uy0C@dhcp22.suse.cz>
-In-Reply-To: <ZCVFA78lDj2/Uy0C@dhcp22.suse.cz>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Thu, 30 Mar 2023 01:19:29 -0700
-Message-ID: <CAJD7tkbjmBaXghQ+14Hy28r2LoWSim+LEjOPxaamYeA_kr2uVw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
- outside task context
-To:     Michal Hocko <mhocko@suse.com>
+        Thu, 30 Mar 2023 04:39:08 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1746582;
+        Thu, 30 Mar 2023 01:39:07 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1AB851FE3F;
+        Thu, 30 Mar 2023 08:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1680165546; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=l77j8HdtGUHY1DMGytaSmxCL2KwdNyQtcXi/v8k1LPw=;
+        b=ZgNg5GontEAiDlgn92dJ6MtfZud/Zqf+VjcX9eEi4gTi2tHmEQ33ugODl7Ly+X0ZWtEsA+
+        p3AZ19J4aHB5KoT4BR/c1glf2Ls0e6ZF0/gGE1sQoKTvQeCB+cmYH2J59mXyjUNEtHGGaB
+        aZDvQcyHUI3flpOOeXADbKoneVeUCeA=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EC0D1138FF;
+        Thu, 30 Mar 2023 08:39:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 6e0lN6lKJWRCHQAAMHmgww
+        (envelope-from <mhocko@suse.com>); Thu, 30 Mar 2023 08:39:05 +0000
+Date:   Thu, 30 Mar 2023 10:39:04 +0200
+From:   Michal Hocko <mhocko@suse.com>
+To:     Yosry Ahmed <yosryahmed@google.com>
 Cc:     Johannes Weiner <hannes@cmpxchg.org>,
         Shakeel Butt <shakeelb@google.com>, Tejun Heo <tj@kernel.org>,
         Josef Bacik <josef@toxicpanda.com>,
@@ -70,42 +51,64 @@ Cc:     Johannes Weiner <hannes@cmpxchg.org>,
         Roman Gushchin <roman.gushchin@linux.dev>,
         Muchun Song <muchun.song@linux.dev>,
         Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
         Vasily Averin <vasily.averin@linux.dev>,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
+ outside task context
+Message-ID: <ZCVKqN2nDkkQFvO0@dhcp22.suse.cz>
+References: <20230328221644.803272-5-yosryahmed@google.com>
+ <ZCQfZJFufkJ10o01@dhcp22.suse.cz>
+ <CAJD7tkb-UpKm2QbjYzB=B=oGk6Hyj9cbUviZUPC+7VsvBecH7g@mail.gmail.com>
+ <20230329192059.2nlme5ubshzdbpg6@google.com>
+ <ZCU1Bp+5bKNJzWIu@dhcp22.suse.cz>
+ <CAJD7tka0CmRvcvB0k8DZuid1vC9OK_mFriHHbXNTUkVE7OjaTA@mail.gmail.com>
+ <ZCU+8lSi+e4WgT3F@dhcp22.suse.cz>
+ <CAJD7tkaKd9Bcb2-e83Q-kzF7G+crr1U+7uqUPBARXWq-LpyKvw@mail.gmail.com>
+ <ZCVFA78lDj2/Uy0C@dhcp22.suse.cz>
+ <CAJD7tkbjmBaXghQ+14Hy28r2LoWSim+LEjOPxaamYeA_kr2uVw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJD7tkbjmBaXghQ+14Hy28r2LoWSim+LEjOPxaamYeA_kr2uVw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 30, 2023 at 1:15=E2=80=AFAM Michal Hocko <mhocko@suse.com> wrot=
-e:
->
-> On Thu 30-03-23 01:06:26, Yosry Ahmed wrote:
-> [...]
-> > If we achieve that, do you think it makes sense to add
-> > WARN_ON_ONCE(irqs_disabled()) instead to prevent future users from
-> > flushing while disabling irqs or in irq context?
->
-> WARN_ON (similar to BUG_ON) will not prevent anybody from doing bad
-> things. We already have means to shout about sleepable code being
-> invoked from an atomic context and there is no reason to duplicate that.
-> As I've said earlier WARN_ON might panic the system in some
-> configurations (and yes they are used also in production systems - do
-> not ask me why...). So please be careful about that and use that only
-> when something really bad (yet recoverable) is going on.
+On Thu 30-03-23 01:19:29, Yosry Ahmed wrote:
+> On Thu, Mar 30, 2023 at 1:15 AM Michal Hocko <mhocko@suse.com> wrote:
+> >
+> > On Thu 30-03-23 01:06:26, Yosry Ahmed wrote:
+> > [...]
+> > > If we achieve that, do you think it makes sense to add
+> > > WARN_ON_ONCE(irqs_disabled()) instead to prevent future users from
+> > > flushing while disabling irqs or in irq context?
+> >
+> > WARN_ON (similar to BUG_ON) will not prevent anybody from doing bad
+> > things. We already have means to shout about sleepable code being
+> > invoked from an atomic context and there is no reason to duplicate that.
+> > As I've said earlier WARN_ON might panic the system in some
+> > configurations (and yes they are used also in production systems - do
+> > not ask me why...). So please be careful about that and use that only
+> > when something really bad (yet recoverable) is going on.
+> 
+> Thanks for the information (I was about to ask why about production
+> systems, but okay..). I will avoid WARN_ON completely. For the
+> purposes of this series I will drop this patch anyway.
 
-Thanks for the information (I was about to ask why about production
-systems, but okay..). I will avoid WARN_ON completely. For the
-purposes of this series I will drop this patch anyway.
+Thanks! People do strange things sometimes...
 
-Any idea how to shout about "hey this may take too long, why are you
-doing it with irqs disabled?!"?
+> Any idea how to shout about "hey this may take too long, why are you
+> doing it with irqs disabled?!"?
 
->
-> --
-> Michal Hocko
-> SUSE Labs
+Well we have a hard lockup detector. It hits at a much higher stall by
+default but if you care about IRQ latencies in general then you likely
+want to lower. Another thing would be IRQ tracing. In any case this code
+path shouldn't be any special. Sure it can take long on large systems
+but I bet there are more of those.
+-- 
+Michal Hocko
+SUSE Labs
