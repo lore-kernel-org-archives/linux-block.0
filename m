@@ -2,102 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 800E8C6FD1D
-	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 01:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D16C77B6C
+	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 01:42:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229462AbjCaBNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 21:13:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60890 "EHLO
+        id S229470AbjCaBmn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 21:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjCaBNE (ORCPT
+        with ESMTP id S229458AbjCaBmn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 21:13:04 -0400
-X-Greylist: delayed 165 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Mar 2023 18:13:03 PDT
-Received: from p3plwbeout25-03.prod.phx3.secureserver.net (p3plsmtp25-03-2.prod.phx3.secureserver.net [216.69.139.16])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568CACDC6
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 18:13:03 -0700 (PDT)
-Received: from mailex.mailcore.me ([94.136.40.141])
-        by :WBEOUT: with ESMTP
-        id i3HUpUgzYhXpBi3HWpZnnm; Thu, 30 Mar 2023 18:10:18 -0700
-X-CMAE-Analysis: v=2.4 cv=Z88poFdA c=1 sm=1 tr=0 ts=642632fa
- a=bheWAUFm1xGnSTQFbH9Kqg==:117 a=84ok6UeoqCVsigPHarzEiQ==:17
- a=ggZhUymU-5wA:10 a=IkcTkHD0fZMA:10 a=k__wU0fu6RkA:10 a=v52JICOvAAAA:20
- a=OzmVjPQ5Tx5mEpMD0PMA:9 a=QEXdDO2ut3YA:10
-X-SECURESERVER-ACCT: phillip@squashfs.org.uk  
-X-SID:  i3HUpUgzYhXpB
-Received: from 82-69-79-175.dsl.in-addr.zen.co.uk ([82.69.79.175] helo=[192.168.178.33])
-        by smtp02.mailcore.me with esmtpa (Exim 4.94.2)
-        (envelope-from <phillip@squashfs.org.uk>)
-        id 1pi3HU-000BSU-JI; Fri, 31 Mar 2023 02:10:16 +0100
-Message-ID: <5ab59623-4317-5aff-5173-d7285b5b224c@squashfs.org.uk>
-Date:   Fri, 31 Mar 2023 02:10:15 +0100
+        Thu, 30 Mar 2023 21:42:43 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7CDEB72;
+        Thu, 30 Mar 2023 18:42:42 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id iw3so19865885plb.6;
+        Thu, 30 Mar 2023 18:42:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680226962;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Tfm+hbs/jl6LALmLyvo0+JGmZiFpCrqmfVmO3EjPG/U=;
+        b=TrpXzdzRu5jUI7LHqyu7stpCOlAN1ukTs0SqCkuDb7kbwhuIxqEh99BpwSYfmOtpcO
+         SS5Tz4Aycr0UvccPQmjXBZlZRxxQps7hY11C90XxQPmDUaEAxcTa//PbYqRi6BH24jmz
+         ap4WFQ+oxxdcNAkU8BuS8lj1iiIBB+dXRUxWYdYi1vawR89cMTYj7dQuROR9lfMskADY
+         srkspqNZBuFQM6TZt4QIVTAGAfzhRmejGbwZfLF2PpkvxQxwDM0++PButpMJW5GorX6D
+         gq6gPUhURDbB7jlw0jFwvblAxzjAdEFxNRe5L8ox/WEJruXEcOWqM/l6N4mfjbhQ7TVq
+         4g/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680226962;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tfm+hbs/jl6LALmLyvo0+JGmZiFpCrqmfVmO3EjPG/U=;
+        b=myFxY0tT8Ju05TOWSiHLjBLbhv5eIlEsqnJDbe3wEgxDHf0jXrNoR2jOsgdGb68HRm
+         O0MarRwQ9KVMMZAkS87cFmDYR5nBFJxp7y++pB2dPHUbE7NGGVQ54fkJSGftpVASA1qo
+         gjd0pQFsj7+XAG69GBn5tr5hSndbzZC4do26QhzwHYEOviIPdnCbjrMnX0o9M2KcFYjk
+         9//Sn7HB+P+b9PhhHsPMITr+VZfXdodcEGUHRZBNnwO5VPHzaOYoxk2im4iCIR4UMMNP
+         S42+yAOTZSj8De2k+gdlDqA7LGUJpQXKJDKRh757LjK8BwYtkjQcZNXjkRw0fAkCy5rj
+         raAQ==
+X-Gm-Message-State: AAQBX9cy7+gg9iwyJeZYIhHcLtuIiACOZ7TuQgvVIxfH+dXy2jSNFqQs
+        y16cHXiQJAZ0yCc0Y9QOYPo=
+X-Google-Smtp-Source: AKy350buo2Zzy4xjvCuquW12XdoWy6na2heI1Y3+soPRp1dbwTzaLnv9aqUFtI85XkcfPJ1kEr73fA==
+X-Received: by 2002:a17:902:d48f:b0:1a1:af64:380c with SMTP id c15-20020a170902d48f00b001a1af64380cmr29599940plg.27.1680226961690;
+        Thu, 30 Mar 2023 18:42:41 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:93aa:8e39:c08b:8c2c])
+        by smtp.gmail.com with ESMTPSA id bf5-20020a170902b90500b001a2574813b8sm307862plb.278.2023.03.30.18.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Mar 2023 18:42:40 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Thu, 30 Mar 2023 18:42:38 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Pankaj Raghav <p.raghav@samsung.com>, martin@omnibond.com,
+        axboe@kernel.dk, akpm@linux-foundation.org, hubcap@omnibond.com,
+        willy@infradead.org, viro@zeniv.linux.org.uk,
+        senozhatsky@chromium.org, brauner@kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        mcgrof@kernel.org, linux-block@vger.kernel.org,
+        gost.dev@samsung.com, linux-mm@kvack.org, devel@lists.orangefs.org
+Subject: Re: [PATCH 1/5] zram: remove the call to page_endio in the bio
+ end_io handler
+Message-ID: <ZCY6jsKdhOXGkYYT@google.com>
+References: <20230328112716.50120-1-p.raghav@samsung.com>
+ <CGME20230328112718eucas1p214a859cfb3d7b45523356bcc16c373b1@eucas1p2.samsung.com>
+ <20230328112716.50120-2-p.raghav@samsung.com>
+ <ZCYSincU0FlULyWJ@google.com>
+ <ZCYYSdpmWRJynC6d@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 1/2] block: Rework bio_for_each_segment_all()
-From:   Phillip Lougher <phillip@squashfs.org.uk>
-To:     Kent Overstreet <kent.overstreet@linux.dev>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        willy@infradead.org, axboe@kernel.dk,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
- <20230327174402.1655365-2-kent.overstreet@linux.dev>
- <52a5bd5c-d3a1-71d7-e1e5-7965501818bd@squashfs.org.uk>
- <ZCXNDQ6Eslhj+9g5@moria.home.lan>
- <4753802a-685f-ab56-fed2-22d6eb4cfccd@squashfs.org.uk>
-In-Reply-To: <4753802a-685f-ab56-fed2-22d6eb4cfccd@squashfs.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Mailcore-Auth: 439999529
-X-Mailcore-Domain: 1394945
-X-123-reg-Authenticated:  phillip@squashfs.org.uk  
-X-Originating-IP: 82.69.79.175
-X-CMAE-Envelope: MS4xfEmkHjiJMxqjqDT1bqM25V1sruMQxYj6fcWMOKDoQi8zNMk8RqSiqDeDYB5ezroMyvMJRimKmQzWFK3gZtfshyMTDAlcgQaX59hebdoa1OFapn3uLLN8
- prnz06TA3Tk3E2nuuyQye5jgGLmd662uaKW4PUNQLUDWyeLyx8TPBKvY1UC43b2NchvzLGjDJ9qcyAXL679qXKIEh7uIHno3HjRDTIPWQe+Nks1CkbmkPvOS
- zzzNnmsBoQ8HdCsDZ3kbbw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZCYYSdpmWRJynC6d@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/03/2023 19:59, Phillip Lougher wrote:
-> On 30/03/2023 18:55, Kent Overstreet wrote:
->> On Wed, Mar 29, 2023 at 05:50:27PM +0100, Phillip Lougher wrote:
->>> There is a problem with the above code, on testing I get the following
->>> results:
->>>
->>> Index 78018785329, offset 49, bvec.bv_len 1024: In same bio, metadata 
->>> length
->>> 32780
->>
->> Could you share how you're doing your testing? I set up a basic test
->> (created images using every compression type, tested reading them) and
->> so far I'm not able to reproduce this.
+On Thu, Mar 30, 2023 at 04:16:25PM -0700, Christoph Hellwig wrote:
+> On Thu, Mar 30, 2023 at 03:51:54PM -0700, Minchan Kim wrote:
+> > > to remove the call to page_endio() function that unlocks or marks
+> > > writeback end on the page.
+> > > 
+> > > Rename the endio handler from zram_page_end_io to zram_read_end_io as
+> > > the call to page_endio() is removed and to associate the callback to the
+> > > operation it is used in.
+> > 
+> > Since zram removed the rw_page and IO comes with bio from now on,
+> > IIUC, we are fine since every IO will go with chained-IO. Right?
 > 
-> I use a very large Squashfs file that triggers the edge case.
-> 
-> That is too big to post, and so I'll see if I can artifically generate
-> a small Squashfs filesystem that triggers the edge case.
-> 
-> Phillip
-> 
-> 
+> writeback_store callszram_bvec_read with a NULL bio, that is it just
+> fires off an async read without any synchronization.
 
-Hi,
-
-This is a Google drive link to a file that triggers the issue.
-
-https://drive.google.com/file/d/1-3-a1BKq62hZGQ6ynioreMSWFMuCV9B4/view?usp=sharing
-
-To reproduce the issue
-
-% mount -t squashfs <the file> /mnt -o errors=panic
-
-then either one of the following will produce a panic
-
-% ls /mnt
-% find /mnt -type f | xargs wc > /dev/null
-
-
-Phillip
-
-
+It should go under zram_read_from_zspool, not zram_bvec_read_from_bdev.
+The ZRAM_UNDER_WB and ZRAM_WB under zram_slot_lock should synchronize.
