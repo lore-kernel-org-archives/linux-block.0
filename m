@@ -2,154 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0E7C761A6
-	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 16:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27391C77B60
+	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 17:31:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233089AbjCaQuh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Mar 2023 12:50:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49776 "EHLO
+        id S230284AbjCaRb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Mar 2023 13:31:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233134AbjCaQuP (ORCPT
+        with ESMTP id S230126AbjCaRby (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Mar 2023 12:50:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F032CA29;
-        Fri, 31 Mar 2023 09:47:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 31 Mar 2023 13:31:54 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72AA3AB9;
+        Fri, 31 Mar 2023 10:31:52 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4BE826229F;
-        Fri, 31 Mar 2023 16:47:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54092C433D2;
-        Fri, 31 Mar 2023 16:47:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1680281248;
-        bh=/lkIh5Nz3go+vQYNCoQXglwXXZHR6bz3tdiI3tn+/LE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=uAUI4tf4c0+iTL6VZpA452QzH6rdPXK2D1+tb4vwwT/OCVlIWYk71lbZJF6RRrGWV
-         LYsPAv/3q2kfIQIF6xRFhs1/+9r4W6MSzzvfcu/DOw5ddPOo2e27YJz00wzn+PgD+B
-         3eLOeqaGIYYJq3/QuqmuAkaNlfXlOBfepGFnP+DQ=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     axboe@kernel.dk
-Cc:     linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] pktcdvd: simplify the class_pktcdvd logic
-Date:   Fri, 31 Mar 2023 18:47:24 +0200
-Message-Id: <20230331164724.319703-1-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.40.0
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5CCFF21AC0;
+        Fri, 31 Mar 2023 17:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1680283911;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8HVcYQ1lSsLr0GGFaE6/gSgA/f1Cg/CbSrd2aXGyFRA=;
+        b=Ow3RWOlzRUBW8wpoNPTzbrksZDXeObeFutiyKa61eSyCNTORcP19dQ5lrR2RihL5DMkd74
+        dAMq0btppv6NADshsmtDxHlMX+OvtghonwIMIRKf392Vc5WT9a9bc2BBCLerwazmIBCW8j
+        hwPqGF2X6m+F85ySt16qtmkhVhJK0jM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1680283911;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8HVcYQ1lSsLr0GGFaE6/gSgA/f1Cg/CbSrd2aXGyFRA=;
+        b=82hiKoK+DdfxxJKLniClLSsiWpAoAys8G8yDDzVcJ2WorrPaC1AIl3h3Xl0YsV0ez53bEn
+        2RTkg7CB4mvF8yBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 175C0133B6;
+        Fri, 31 Mar 2023 17:31:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id scuNBAcZJ2RRQwAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Fri, 31 Mar 2023 17:31:51 +0000
+Date:   Fri, 31 Mar 2023 19:25:35 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     David Sterba <dsterba@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Josef Bacik <josef@toxicpanda.com>,
+        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+Subject: Re: move bio cgroup punting into btrfs
+Message-ID: <20230331172535.GX10580@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20230327004954.728797-1-hch@lst.de>
+ <20230327231837.GK10580@twin.jikos.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3396; i=gregkh@linuxfoundation.org; h=from:subject; bh=/lkIh5Nz3go+vQYNCoQXglwXXZHR6bz3tdiI3tn+/LE=; b=owGbwMvMwCRo6H6F97bub03G02pJDCnqfLM2ZljVbzQ8OFcgf5P80eJV6glVGl5Fx83nrXt4Y uePc78YO2JZGASZGGTFFFm+bOM5ur/ikKKXoe1pmDmsTCBDGLg4BWAidv8ZFszbIx716uosyzke z/UrVUNeKbab6zAsuFQbVZT3TohFYmNs7IYzjZb5JzcUAwA=
-X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230327231837.GK10580@twin.jikos.cz>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to dynamically create and destroy the class_pktcdvd
-structure, just make it static and remove the memory allocation logic
-which simplifies and cleans up the logic a lot.
+On Tue, Mar 28, 2023 at 01:18:37AM +0200, David Sterba wrote:
+> On Mon, Mar 27, 2023 at 09:49:46AM +0900, Christoph Hellwig wrote:
+> > Hi all,
+> > 
+> > the current code to offload bio submission into a cgroup-specific helper
+> > thread when sent from the btrfs internal helper threads is a bit ugly.
+> > 
+> > This series moves it into btrfs with minimal interference in the core
+> > code.
+> 
+> I can't speak for the cgroup side, but as btrfs is the only user of the
+> REQ_CGROUP_PUNT flag pushing it down to the IO submission path makes
+> sense. Code looks ok, it's a direct conversion.
+> 
+> When the mm/block changes get an Ack I can put it to btrfs for-next.
 
-Cc: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-Note, I would like to take this through my driver-core tree as it is
-needed for other struct class cleanup work I have done and am continuing
-to do there.
-
- drivers/block/pktcdvd.c | 40 ++++++++++++----------------------------
- 1 file changed, 12 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index ba9bbdef9ef5..79af8a59142e 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -100,7 +100,8 @@ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
- static mempool_t psd_pool;
- static struct bio_set pkt_bio_set;
- 
--static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
-+/* /sys/class/pktcdvd */
-+static struct class	class_pktcdvd;
- static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
- 
- /* forward declaration */
-@@ -315,8 +316,8 @@ static const struct attribute_group *pkt_groups[] = {
- 
- static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
- {
--	if (class_pktcdvd) {
--		pd->dev = device_create_with_groups(class_pktcdvd, NULL,
-+	if (class_is_registered(&class_pktcdvd)) {
-+		pd->dev = device_create_with_groups(&class_pktcdvd, NULL,
- 						    MKDEV(0, 0), pd, pkt_groups,
- 						    "%s", pd->name);
- 		if (IS_ERR(pd->dev))
-@@ -326,7 +327,7 @@ static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
- 
- static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
- {
--	if (class_pktcdvd)
-+	if (class_is_registered(&class_pktcdvd))
- 		device_unregister(pd->dev);
- }
- 
-@@ -338,11 +339,6 @@ static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
-                      device_map     show mappings
-  *******************************************************************/
- 
--static void class_pktcdvd_release(struct class *cls)
--{
--	kfree(cls);
--}
--
- static ssize_t device_map_show(const struct class *c, const struct class_attribute *attr,
- 			       char *data)
- {
-@@ -405,35 +401,23 @@ static struct attribute *class_pktcdvd_attrs[] = {
- };
- ATTRIBUTE_GROUPS(class_pktcdvd);
- 
-+static struct class class_pktcdvd = {
-+	.name		= DRIVER_NAME,
-+	.class_groups	= class_pktcdvd_groups,
-+};
-+
- static int pkt_sysfs_init(void)
- {
--	int ret = 0;
--
- 	/*
- 	 * create control files in sysfs
- 	 * /sys/class/pktcdvd/...
- 	 */
--	class_pktcdvd = kzalloc(sizeof(*class_pktcdvd), GFP_KERNEL);
--	if (!class_pktcdvd)
--		return -ENOMEM;
--	class_pktcdvd->name = DRIVER_NAME;
--	class_pktcdvd->class_release = class_pktcdvd_release;
--	class_pktcdvd->class_groups = class_pktcdvd_groups;
--	ret = class_register(class_pktcdvd);
--	if (ret) {
--		kfree(class_pktcdvd);
--		class_pktcdvd = NULL;
--		pr_err("failed to create class pktcdvd\n");
--		return ret;
--	}
--	return 0;
-+	return class_register(&class_pktcdvd);
- }
- 
- static void pkt_sysfs_cleanup(void)
- {
--	if (class_pktcdvd)
--		class_destroy(class_pktcdvd);
--	class_pktcdvd = NULL;
-+	class_unregister(&class_pktcdvd);
- }
- 
- /********************************************************************
--- 
-2.40.0
-
+Patchset added to for-next.
