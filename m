@@ -2,217 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA00C76196
-	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 11:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B72C6FD18
+	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 12:22:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231476AbjCaLT5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Mar 2023 07:19:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34048 "EHLO
+        id S232326AbjCaMWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Mar 2023 08:22:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230386AbjCaLT4 (ORCPT
+        with ESMTP id S232321AbjCaMVm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Mar 2023 07:19:56 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66DD31BF7C
-        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 04:19:54 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230331111951euoutp02c334416d66d6af0085a7dbc96af63169~RfQPSE-A52590925909euoutp02J
-        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 11:19:51 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230331111951euoutp02c334416d66d6af0085a7dbc96af63169~RfQPSE-A52590925909euoutp02J
+        Fri, 31 Mar 2023 08:21:42 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B3F1F7BF
+        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 05:21:12 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230331122047euoutp0121dfbc4b97e48ce28c75f8a7841c52b2~RgFcN-DXb3220632206euoutp01d
+        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 12:20:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230331122047euoutp0121dfbc4b97e48ce28c75f8a7841c52b2~RgFcN-DXb3220632206euoutp01d
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1680261591;
-        bh=rotXHmLJ+3RmVvig7nNDjJgCDFpn3JfHaBhmEOHV1xU=;
-        h=Date:From:Subject:To:CC:In-Reply-To:References:From;
-        b=AvRRY729uZ3p9BOnTZjG0mklUGgK5XB+IKF3dmfyY5XDjb39MYGjmQOAm49/+82gB
-         9WtlEF7EpqRA9qgU2pF6dWQF93zQvcLCbuFwBoDFqYd3eX5bN5/GYzkEOO8iLXdURn
-         yEWKU+bOWK1EdwpOm6GTukN/krDcvk/xbqvSwrFM=
+        s=mail20170921; t=1680265247;
+        bh=RG0AskesBGxejlTr4JHEhK02MF/IWOxvFzpfN3R7npc=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=sEWO2dKySJf9bqBkoq2fkNFxwAwamiqJ5bOxce1NxpZX61XpF66PidxaF84lkquev
+         ++ETNPtaWZbvBoFM+W6uSokTPuVsDNzpbcAsQREz9177zRQ6KDcSJVKD666vQWplV9
+         jUBvS2BYT6A/G1RW/hKzXwYnSiqMy+MammGcX9dw=
 Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
         eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20230331111950eucas1p20fd7a4a982cb8f666bb7d574d0950f24~RfQO6FUKT0705007050eucas1p2y;
-        Fri, 31 Mar 2023 11:19:50 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 3A.5A.09503.6D1C6246; Fri, 31
-        Mar 2023 12:19:50 +0100 (BST)
+        20230331122046eucas1p2dd047848b60f9ddc31dd7b266bd86d77~RgFbxwOsi1098310983eucas1p24;
+        Fri, 31 Mar 2023 12:20:46 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 14.78.09503.E10D6246; Fri, 31
+        Mar 2023 13:20:46 +0100 (BST)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
         eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230331111950eucas1p24613fe162e4c64b427fc13182914c84e~RfQOVp2I91172711727eucas1p2t;
-        Fri, 31 Mar 2023 11:19:50 +0000 (GMT)
+        20230331122046eucas1p247e0cd2d06229a6b7cae9cb26ea43d5b~RgFbZahPc1098310983eucas1p23;
+        Fri, 31 Mar 2023 12:20:46 +0000 (GMT)
 Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
         eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230331111950eusmtrp289d12c6234d5114b90c0f2c48cde8703~RfQOU7ns72314123141eusmtrp2a;
-        Fri, 31 Mar 2023 11:19:50 +0000 (GMT)
-X-AuditID: cbfec7f2-ea5ff7000000251f-d9-6426c1d6a538
+        20230331122046eusmtrp238c8959c39aa187032906ac97e80131b~RgFbYiwNm2670526705eusmtrp2U;
+        Fri, 31 Mar 2023 12:20:46 +0000 (GMT)
+X-AuditID: cbfec7f2-ea5ff7000000251f-bf-6426d01eee9e
 Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id FF.85.09583.6D1C6246; Fri, 31
-        Mar 2023 12:19:50 +0100 (BST)
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id F3.4E.09583.E10D6246; Fri, 31
+        Mar 2023 13:20:46 +0100 (BST)
 Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
         eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230331111950eusmtip22bed4ddfdecd2e651183996406d37c70~RfQOHI4Uw2857728577eusmtip2N;
-        Fri, 31 Mar 2023 11:19:50 +0000 (GMT)
-Received: from [106.110.32.65] (106.110.32.65) by CAMSVWEXC02.scsc.local
+        20230331122046eusmtip2b8baf2b87eb1e2370ba007aa92d0a40b~RgFbLcVLU2523725237eusmtip2g;
+        Fri, 31 Mar 2023 12:20:46 +0000 (GMT)
+Received: from localhost (106.110.32.140) by CAMSVWEXC02.scsc.local
         (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Fri, 31 Mar 2023 12:19:48 +0100
-Message-ID: <3b116359-d346-a63c-1a78-f95ad1912dfe@samsung.com>
-Date:   Fri, 31 Mar 2023 13:19:49 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
-        Thunderbird/102.9.0
+        Fri, 31 Mar 2023 13:20:45 +0100
+Date:   Fri, 31 Mar 2023 14:12:29 +0200
 From:   Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCH 1/5] zram: remove the call to page_endio in the bio
- end_io handler
-To:     Minchan Kim <minchan@kernel.org>
-CC:     <martin@omnibond.com>, <axboe@kernel.dk>,
-        <akpm@linux-foundation.org>, <hubcap@omnibond.com>,
-        <willy@infradead.org>, <viro@zeniv.linux.org.uk>,
-        <senozhatsky@chromium.org>, <brauner@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <mcgrof@kernel.org>, <linux-block@vger.kernel.org>,
-        <gost.dev@samsung.com>, <linux-mm@kvack.org>,
-        <devel@lists.orangefs.org>, Christoph Hellwig <hch@lst.de>
-Content-Language: en-US
-In-Reply-To: <ZCYSincU0FlULyWJ@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.110.32.65]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+CC:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "Hannes Reinecke" <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, <linux-block@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <dm-devel@redhat.com>, Song Liu <song@kernel.org>,
+        <linux-raid@vger.kernel.org>, Mike Snitzer <snitzer@kernel.org>,
+        "Matthew Wilcox" <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        <jfs-discussion@lists.sourceforge.net>, <cluster-devel@redhat.com>,
+        "Bob Peterson" <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        David Sterba <dsterba@suse.com>, <linux-btrfs@vger.kernel.org>
+Subject: Re: [PATCH 01/19] swap: use __bio_add_page to add page to bio
+Message-ID: <20230331121156.7c7nbxfhagdufpzo@blixen>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <7849b142e073b20f033e5124a39080f59e5f19d2.1680108414.git.johannes.thumshirn@wdc.com>
+X-Originating-IP: [106.110.32.140]
+X-ClientProxiedBy: CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) To
         CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBKsWRmVeSWpSXmKPExsWy7djP87rXDqqlGPT2mVjMWb+GzWL13X42
-        i9eHPzFa7N88hcli5eqjTBbtd/uYLPbe0rbYs/cki8XlXXPYLO6t+c9qcXL9f2aLGxOeMlos
-        +/qe3WL3xkVsFuf/Hme1+P1jDpuDgMfshossHptXaHlcPlvqsWlVJ5vHpk+T2D1OzPjN4tEw
-        9Rabx+6bDWwev27fYfX4vEnOY9OTt0wB3FFcNimpOZllqUX6dglcGct7jrIVzJCo+HLwGGsD
-        4wuhLkYODgkBE4lDbRpdjFwcQgIrGCX+9K9nhXC+MEpcW3OQGcL5zCgx9dxMoAwnWMeZlhPs
-        EInljBLP3y9AqFp7ZT5U/05GiW8t/9hAWngF7CRurHnACGKzCKhKXP45GyouKHFy5hMWEFtU
-        IEqi7/YmVpCj2AS0JBo72UHCwgIREofebgdrFRFQkfjz9B8jyHxmgfXMEq/mdzOBJJgFxCVu
-        PZkPZnMC9f5vWwsV15Ro3f6bHcKWl9j+dg4zxAuKEpNuvod6p1bi1JZbTCBDJQQ+cUrsPnOT
-        BSLhItH8+hcjhC0s8er4FnYIW0bi/06IZRIC1RJPb/xmhmhuYZTo37meDRKs1hJ9Z3Igahwl
-        Hm/fyQoR5pO48VYQ4h4+iUnbpjNPYFSdhRQUs5C8MwvJC7OQvLCAkWUVo3hqaXFuemqxYV5q
-        uV5xYm5xaV66XnJ+7iZGYGI8/e/4px2Mc1991DvEyMTBeIhRgoNZSYS30Fg1RYg3JbGyKrUo
-        P76oNCe1+BCjNAeLkjivtu3JZCGB9MSS1OzU1ILUIpgsEwenVAOTxfLryhr3K3vmX5eX0o50
-        NpV9fvHmfal3IbflHoQ82Xq0uzVL1HKxovWLfWphIekP57zckqotdvOPZv1+u/wrx0wu65e9
-        uxW9/NZW2/5vTzbHHtV7x/jXPVW+MrQ+X3Mdx/mnvu57JTKXzFz56f992TNBYTl5DMlbP2oY
-        rnzDWLM/eGdlzIec7tp3jinBh86qquYeFFDINbn7bFprFMdzOZ2fje/MhJUSqr3V93Jxhs3P
-        mns8b8NVC8ud1+MTmiq8laNaruYEr/k9JfhISfTpkjeLlj22er1o0qJE3cL5JzntM3cUPFZf
-        uOWx3Q2TLTN9FXv+cydJ6B3ZXKPX+OFSY4GEos/c/U9jo9782PNOiaU4I9FQi7moOBEAQgNM
-        2PsDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprLKsWRmVeSWpSXmKPExsVy+t/xe7rXDqqlGNxdymsxZ/0aNovVd/vZ
-        LF4f/sRosX/zFCaLlauPMlm03+1jsth7S9tiz96TLBaXd81hs7i35j+rxcn1/5ktbkx4ymix
-        7Ot7dovdGxexWZz/e5zV4vePOWwOAh6zGy6yeGxeoeVx+Wypx6ZVnWwemz5NYvc4MeM3i0fD
-        1FtsHrtvNrB5/Lp9h9Xj8yY5j01P3jIFcEfp2RTll5akKmTkF5fYKkUbWhjpGVpa6BmZWOoZ
-        GpvHWhmZKunb2aSk5mSWpRbp2yXoZSzvOcpWMEOi4svBY6wNjC+Euhg5OSQETCTOtJxgB7GF
-        BJYyStz+ZwwRl5H4dOUjO4QtLPHnWhdbFyMXUM1HRokVWyawQDg7GSW61m5iBKniFbCTuLHm
-        AZjNIqAqcfnnbDaIuKDEyZlPWEBsUYEoic8HWoCmcnCwCWhJNHaCLRAWiJBYOmEqM4gtIqAi
-        8efpP0aQ+cwC65klXs3vZoJYdptR4vW2K2BDmQXEJW49mc8EYnMCDfrftpYJIq4p0br9NzuE
-        LS+x/e0cZogXFCUm3XzPCmHXSnz++4xxAqPoLCT3zUIydhaSUbOQjFrAyLKKUSS1tDg3PbfY
-        SK84Mbe4NC9dLzk/dxMjMJ1sO/Zzyw7Gla8+6h1iZOJgPMQowcGsJMJbaKyaIsSbklhZlVqU
-        H19UmpNafIjRFBhIE5mlRJPzgQktryTe0MzA1NDEzNLA1NLMWEmc17OgI1FIID2xJDU7NbUg
-        tQimj4mDU6qBSSpjwktRzxjNpadr/3tNfdRfs3X6a56jcR0LWBdnnplclO3S3fT/3am+pnOb
-        RXcumTYp9QjTwsdPX8gvahDUqbi2SbWV1Ux8PXPmfskJ7NZfAze3z29MPOUySbevff+K9TOb
-        l0/fJ787OobxyhzX5QvZYicrhWet+3p8mfU8Fdfawo1feLzt583zDivWSX87j//ccr88mUTl
-        lwG6k82mPJdau/LRL7V1U4oPSU7NnyDUGH+OV4Nz/rv5a5WLFPZe/bF68X/GtmsFs7ec2Xau
-        esczi87QyTNOfov50RgdzXew5JfJQd+Vs/Tlb89wurzpgdn3/dr+Cd2xBXLHfv/+WZ4UfPqS
-        YMW/kumNB2qm6XUpsRRnJBpqMRcVJwIApiMYd7ADAAA=
-X-CMS-MailID: 20230331111950eucas1p24613fe162e4c64b427fc13182914c84e
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrBKsWRmVeSWpSXmKPExsWy7djPc7pyF9RSDBZPM7TYtm43u8Xqu/1s
+        FidXP2azaG3/xmSx991sVosLPxqZLPYsmsRksXL1USaLix9bmSz+dt1jsnh6dRZQyS1ti0uP
+        V7Bb7Nl7ksXi3pr/rBbt83cxWhya3Mxk0TW7lc3i9p0fzBYnbklbHF/+l83i9485bA5iHptX
+        aHlcPlvqsWlVJ5vHpk+T2D12L/jM5LH7ZgObR2/zOzaP9/uusnms33KVxWPz6WqPz5vkPNoP
+        dDMF8ERx2aSk5mSWpRbp2yVwZcz/doOtYCNzxfprsQ2Mj5i6GDk5JARMJI5NaGHsYuTiEBJY
+        wSixunsRG4TzhVFi1+QXrBDOZ0aJ7a+uw7WceLyHBSKxnFFiX9M2Rriq46eeQjlbGCUuntsE
+        1sIioCqx4etl9i5GDg42AS2Jxk52kLCIgLHEle8LwSYxC5xmlVh4/QsrSEJYwE2ibepCsCJe
+        oHVH7ixnhLAFJU7OfMICYjML6Egs2P2JDWQms4C0xPJ/HCBhToFEiZt7FkBdqiTRsPkMC4Rd
+        K7G3+QA7hP2NU+LUCiEI20Vix+rNUPXCEq+Ob4GqkZH4v3M+VLxa4umN38wgd0oItDBK9O9c
+        D7ZXQsBaou9MDoTpKLFrii2EySdx460gxJF8EpO2TWeGCPNKdLRBLVWT2NG0lXECo/IsJG/N
+        QvLWLIS3FjAyr2IUTy0tzk1PLTbMSy3XK07MLS7NS9dLzs/dxAhMnKf/Hf+0g3Huq496hxiZ
+        OBgPMUpwMCuJ8BYaq6YI8aYkVlalFuXHF5XmpBYfYpTmYFES59W2PZksJJCeWJKanZpakFoE
+        k2Xi4JRqYGJ/Mq99ttHmVS9fhk9x2O7O7HvTf+/R+lhRfRXOv75H4oX0PF9zSC0zsTrB2Hsi
+        eKO1iPxXL+MvIfrzNi9OcG46+ol153PN+JnpYbKbTDaqOVs9D1OquC2Qvc6bJZbv0SouaanZ
+        J+X3chn66V2wn3wx+Nano/cD+ev+KYgXdvDKXHV6X3w0czGPM8dGn7d1vwrNFazUsroWMtkd
+        +Ls72vL37s3Kn4871TzKdpGfZlo61e5ruFDCKqVOfjP5pt+WNy4fDn79+XDsAe7Oo6avAv35
+        39y5bHdLp1fXyF+qKOcGH9MF62viPsXSs85vcJbSfPmjgyG4/s+0ABtmk9XT80s+SRrPL0wQ
+        ULNpnrtUiaU4I9FQi7moOBEAP8WwqwsEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGKsWRmVeSWpSXmKPExsVy+t/xe7pyF9RSDK5cErfYtm43u8Xqu/1s
+        FidXP2azaG3/xmSx991sVosLPxqZLPYsmsRksXL1USaLix9bmSz+dt1jsnh6dRZQyS1ti0uP
+        V7Bb7Nl7ksXi3pr/rBbt83cxWhya3Mxk0TW7lc3i9p0fzBYnbklbHF/+l83i9485bA5iHptX
+        aHlcPlvqsWlVJ5vHpk+T2D12L/jM5LH7ZgObR2/zOzaP9/uusnms33KVxWPz6WqPz5vkPNoP
+        dDMF8ETp2RTll5akKmTkF5fYKkUbWhjpGVpa6BmZWOoZGpvHWhmZKunb2aSk5mSWpRbp2yXo
+        Zcz/doOtYCNzxfprsQ2Mj5i6GDk5JARMJE483sMCYgsJLGWUeLRWCiIuI/Hpykd2CFtY4s+1
+        LrYuRi6gmo+MEptubYFytjBKfJz6G6yKRUBVYsPXy0A2BwebgJZEYydYWETAWOLK94UsIPXM
+        AqdZJT7PfskIkhAWcJNom7oQrIgX6Iojd5YzQlwxhVFi8msViLigxMmZT8CuYxbQkViw+xMb
+        yHxmAWmJ5f84QMKcAokSN/csgHpGSaJh8xkWCLtWovPVabYJjMKzkEyahWTSLIRJCxiZVzGK
+        pJYW56bnFhvpFSfmFpfmpesl5+duYgQmkG3Hfm7Zwbjy1Ue9Q4xMHIyHGCU4mJVEeAuNVVOE
+        eFMSK6tSi/Lji0pzUosPMZoCQ2Iis5Rocj4wheWVxBuaGZgamphZGphamhkrifN6FnQkCgmk
+        J5akZqemFqQWwfQxcXBKNTDFVzyrFHN98C7HflXCTe5DketvM5byVt4rXXFnmnXppfPP/gtl
+        BZ5b8vLrudR/D3Iz/Fasl/4UvMc041N88wNOBgf+xBThdu+rZRy24sznqrl8jSra+Ll+/Yzt
+        3xBydFb+naTaadW32p4G3VITy/E2PH3Ft25+7jOHcJGd0efa9vScOnT3UZHSofkuTbK2e6aF
+        OpbGm31dtmbVN/uOqc+ubDQIvfkv/5/Jt4LA442q4pY3XU00w07n5CmwnVj63Te1aaPR/7fN
+        6xx/JofOXyfrWGzyV7Sgq/yyyfkbxVGrbKvEPRfzpB0tL9sqLRthkNB5f0FPx8pVbt/eSXo8
+        /JRkIvyyfrYM914byRPTBJRYijMSDbWYi4oTAXZ/WI2pAwAA
+X-CMS-MailID: 20230331122046eucas1p247e0cd2d06229a6b7cae9cb26ea43d5b
 X-Msg-Generator: CA
-X-RootMTR: 20230328112718eucas1p214a859cfb3d7b45523356bcc16c373b1
+X-RootMTR: 20230331122046eucas1p247e0cd2d06229a6b7cae9cb26ea43d5b
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20230328112718eucas1p214a859cfb3d7b45523356bcc16c373b1
-References: <20230328112716.50120-1-p.raghav@samsung.com>
-        <CGME20230328112718eucas1p214a859cfb3d7b45523356bcc16c373b1@eucas1p2.samsung.com>
-        <20230328112716.50120-2-p.raghav@samsung.com> <ZCYSincU0FlULyWJ@google.com>
+X-CMS-RootMailID: 20230331122046eucas1p247e0cd2d06229a6b7cae9cb26ea43d5b
+References: <cover.1680108414.git.johannes.thumshirn@wdc.com>
+        <7849b142e073b20f033e5124a39080f59e5f19d2.1680108414.git.johannes.thumshirn@wdc.com>
+        <CGME20230331122046eucas1p247e0cd2d06229a6b7cae9cb26ea43d5b@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-03-31 00:51, Minchan Kim wrote:
-> On Tue, Mar 28, 2023 at 01:27:12PM +0200, Pankaj Raghav wrote:
->> zram_page_end_io function is called when alloc_page is used (for
->> partial IO) to trigger writeback from the user space. The pages used for
+On Wed, Mar 29, 2023 at 10:05:47AM -0700, Johannes Thumshirn wrote:
+> The swap code only adds a single page to a newly created bio. So use
+> __bio_add_page() to add the page which is guaranteed to succeed in this
+> case.
 > 
-> No, it was used with zram_rw_page since rw_page didn't carry the bio.
+> This brings us closer to marking bio_add_page() as __must_check.
 > 
->> this operation is never locked or have the writeback set. So, it is safe
-> 
-> VM had the page lock and wait to unlock.
-> 
->> to remove the call to page_endio() function that unlocks or marks
->> writeback end on the page.
->>
->> Rename the endio handler from zram_page_end_io to zram_read_end_io as
->> the call to page_endio() is removed and to associate the callback to the
->> operation it is used in.
-> 
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-I revisited the code again. Let me know if I got it right.
-
-When we trigger writeback, we will always call zram_bvec_read() only if
-ZRAM_WB is not set. That means we will only call zram_read_from_zspool() in
-__zram_bvec_read when parent bio set to NULL.
-
-static ssize_t writeback_store(struct device *dev, ...
-{
-if (zram_test_flag(zram, index, ZRAM_WB) ||
-                   zram_test_flag(zram, index, ZRAM_SAME) ||
-                   zram_test_flag(zram, index, ZRAM_UNDER_WB))
-           goto next;
-...
-if (zram_bvec_read(zram, &bvec, index, 0, NULL)) {
-...
-}
-
-static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
-			    struct bio *bio, bool partial_io)
-{
-....
-if (!zram_test_flag(zram, index, ZRAM_WB)) {
-        /* Slot should be locked through out the function call */
-        ret = zram_read_from_zspool(zram, page, index);
-        zram_slot_unlock(zram, index);
-} else {
-        /* Slot should be unlocked before the function call */
-        zram_slot_unlock(zram, index);
-
-        ret = zram_bvec_read_from_bdev(zram, page, index, bio,
-                                       partial_io);
-}
-....
-}
-
-> Since zram removed the rw_page and IO comes with bio from now on,
-> IIUC, we are fine since every IO will go with chained-IO. Right?
->
-
-We will never call zram_bvec_read_from_bdev() with parent bio set to NULL. IOW, we will always
-only hit the bio_chain case in read_from_bdev_async. So we could do the following?:
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index b7bb52f8dfbd..2341f4009b0f 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -606,15 +606,6 @@ static void free_block_bdev(struct zram *zram, unsigned long blk_idx)
- 	atomic64_dec(&zram->stats.bd_count);
- }
-
--static void zram_page_end_io(struct bio *bio)
--{
--	struct page *page = bio_first_page_all(bio);
--
--	page_endio(page, op_is_write(bio_op(bio)),
--			blk_status_to_errno(bio->bi_status));
--	bio_put(bio);
--}
--
- /*
-  * Returns 1 if the submission is successful.
-  */
-@@ -634,9 +625,7 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
- 		return -EIO;
- 	}
-
--	if (!parent)
--		bio->bi_end_io = zram_page_end_io;
--	else
-+	if (parent)
- 		bio_chain(bio, parent);
-
- 	submit_bio(bio);
+Looks good,
+Reviewed-by: Pankaj Raghav <p.raghav@samsung.com>
