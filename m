@@ -2,214 +2,154 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9627BC77B6D
-	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 16:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0E7C761A6
+	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 16:50:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbjCaQmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Mar 2023 12:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58492 "EHLO
+        id S233089AbjCaQuh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Mar 2023 12:50:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231983AbjCaQmA (ORCPT
+        with ESMTP id S233134AbjCaQuP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Mar 2023 12:42:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE4B236B5
-        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 09:37:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680280621;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q/kAjj+4zLWTXkqKqP2B/MWL9umh9MFmha+7vx/dBng=;
-        b=GsGMfwBC5sTqoMv61DUaHrPWWrnPAfUa2oJkahTm6TE70yLDjlIKdtiXN2+019BUa+vEOj
-        5sNS1a5o/8V7xveUjxm7KmSUcRrhmVOoy17jYXAqYA/BXR7z2eolre2uaXo7cym1Z2dDED
-        B9yrJ8iufx8slBApd6MCDlnWCiOgsnc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-54-NrSaPjGbPqK-bssP12GZRQ-1; Fri, 31 Mar 2023 12:11:53 -0400
-X-MC-Unique: NrSaPjGbPqK-bssP12GZRQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 31 Mar 2023 12:50:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F032CA29;
+        Fri, 31 Mar 2023 09:47:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 48C5E29AA2CF;
-        Fri, 31 Mar 2023 16:11:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E198914171B8;
-        Fri, 31 Mar 2023 16:11:49 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Chuck Lever III <chuck.lever@oracle.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, drbd-dev@lists.linbit.com,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4BE826229F;
+        Fri, 31 Mar 2023 16:47:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54092C433D2;
+        Fri, 31 Mar 2023 16:47:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1680281248;
+        bh=/lkIh5Nz3go+vQYNCoQXglwXXZHR6bz3tdiI3tn+/LE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=uAUI4tf4c0+iTL6VZpA452QzH6rdPXK2D1+tb4vwwT/OCVlIWYk71lbZJF6RRrGWV
+         LYsPAv/3q2kfIQIF6xRFhs1/+9r4W6MSzzvfcu/DOw5ddPOo2e27YJz00wzn+PgD+B
+         3eLOeqaGIYYJq3/QuqmuAkaNlfXlOBfepGFnP+DQ=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH v3 54/55] drdb: Send an entire bio in a single sendmsg
-Date:   Fri, 31 Mar 2023 17:09:13 +0100
-Message-Id: <20230331160914.1608208-55-dhowells@redhat.com>
-In-Reply-To: <20230331160914.1608208-1-dhowells@redhat.com>
-References: <20230331160914.1608208-1-dhowells@redhat.com>
+Subject: [PATCH] pktcdvd: simplify the class_pktcdvd logic
+Date:   Fri, 31 Mar 2023 18:47:24 +0200
+Message-Id: <20230331164724.319703-1-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3396; i=gregkh@linuxfoundation.org; h=from:subject; bh=/lkIh5Nz3go+vQYNCoQXglwXXZHR6bz3tdiI3tn+/LE=; b=owGbwMvMwCRo6H6F97bub03G02pJDCnqfLM2ZljVbzQ8OFcgf5P80eJV6glVGl5Fx83nrXt4Y uePc78YO2JZGASZGGTFFFm+bOM5ur/ikKKXoe1pmDmsTCBDGLg4BWAidv8ZFszbIx716uosyzke z/UrVUNeKbab6zAsuFQbVZT3TohFYmNs7IYzjZb5JzcUAwA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since _drdb_sendpage() is now using sendmsg to send the pages rather
-sendpage, pass the entire bio in one go using a bvec iterator instead of
-doing it piecemeal.
+There is no need to dynamically create and destroy the class_pktcdvd
+structure, just make it static and remove the memory allocation logic
+which simplifies and cleans up the logic a lot.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Philipp Reisner <philipp.reisner@linbit.com>
-cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: drbd-dev@lists.linbit.com
-cc: linux-block@vger.kernel.org
-cc: netdev@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/block/drbd/drbd_main.c | 77 +++++++++++-----------------------
- 1 file changed, 25 insertions(+), 52 deletions(-)
+Note, I would like to take this through my driver-core tree as it is
+needed for other struct class cleanup work I have done and am continuing
+to do there.
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index e5f90abd29b6..ab63d6138407 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -1512,28 +1512,15 @@ static void drbd_update_congested(struct drbd_connection *connection)
-  * As a workaround, we disable sendpage on pages
-  * with page_count == 0 or PageSlab.
-  */
--static int _drbd_no_send_page(struct drbd_peer_device *peer_device, struct page *page,
--			      int offset, size_t size, unsigned msg_flags)
+ drivers/block/pktcdvd.c | 40 ++++++++++++----------------------------
+ 1 file changed, 12 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index ba9bbdef9ef5..79af8a59142e 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -100,7 +100,8 @@ static struct mutex ctl_mutex;	/* Serialize open/close/setup/teardown */
+ static mempool_t psd_pool;
+ static struct bio_set pkt_bio_set;
+ 
+-static struct class	*class_pktcdvd = NULL;    /* /sys/class/pktcdvd */
++/* /sys/class/pktcdvd */
++static struct class	class_pktcdvd;
+ static struct dentry	*pkt_debugfs_root = NULL; /* /sys/kernel/debug/pktcdvd */
+ 
+ /* forward declaration */
+@@ -315,8 +316,8 @@ static const struct attribute_group *pkt_groups[] = {
+ 
+ static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
+ {
+-	if (class_pktcdvd) {
+-		pd->dev = device_create_with_groups(class_pktcdvd, NULL,
++	if (class_is_registered(&class_pktcdvd)) {
++		pd->dev = device_create_with_groups(&class_pktcdvd, NULL,
+ 						    MKDEV(0, 0), pd, pkt_groups,
+ 						    "%s", pd->name);
+ 		if (IS_ERR(pd->dev))
+@@ -326,7 +327,7 @@ static void pkt_sysfs_dev_new(struct pktcdvd_device *pd)
+ 
+ static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
+ {
+-	if (class_pktcdvd)
++	if (class_is_registered(&class_pktcdvd))
+ 		device_unregister(pd->dev);
+ }
+ 
+@@ -338,11 +339,6 @@ static void pkt_sysfs_dev_remove(struct pktcdvd_device *pd)
+                      device_map     show mappings
+  *******************************************************************/
+ 
+-static void class_pktcdvd_release(struct class *cls)
 -{
--	struct socket *socket;
--	void *addr;
--	int err;
--
--	socket = peer_device->connection->data.socket;
--	addr = kmap(page) + offset;
--	err = drbd_send_all(peer_device->connection, socket, addr, size, msg_flags);
--	kunmap(page);
--	if (!err)
--		peer_device->device->send_cnt += size >> 9;
--	return err;
+-	kfree(cls);
 -}
 -
--static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *page,
--		    int offset, size_t size, unsigned msg_flags)
-+static int _drbd_send_pages(struct drbd_peer_device *peer_device,
-+			    struct iov_iter *iter, unsigned msg_flags)
+ static ssize_t device_map_show(const struct class *c, const struct class_attribute *attr,
+ 			       char *data)
  {
- 	struct socket *socket = peer_device->connection->data.socket;
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = msg_flags, };
-+	struct msghdr msg = {
-+		.msg_flags	= msg_flags | MSG_NOSIGNAL,
-+		.msg_iter	= *iter,
-+	};
-+	size_t size = iov_iter_count(iter);
- 	int err = -EIO;
+@@ -405,35 +401,23 @@ static struct attribute *class_pktcdvd_attrs[] = {
+ };
+ ATTRIBUTE_GROUPS(class_pktcdvd);
  
- 	/* e.g. XFS meta- & log-data is in slab pages, which have a
-@@ -1542,11 +1529,8 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 	 * put_page(); and would cause either a VM_BUG directly, or
- 	 * __page_cache_release a page that would actually still be referenced
- 	 * by someone, leading to some obscure delayed Oops somewhere else. */
--	if (!drbd_disable_sendpage && sendpage_ok(page))
--		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
--
--	bvec_set_page(&bvec, page, offset, size);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
-+	if (drbd_disable_sendpage)
-+		msg.msg_flags &= ~(MSG_NOSIGNAL | MSG_SPLICE_PAGES);
- 
- 	drbd_update_congested(peer_device->connection);
- 	do {
-@@ -1577,39 +1561,22 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 
- static int _drbd_send_bio(struct drbd_peer_device *peer_device, struct bio *bio)
- {
--	struct bio_vec bvec;
--	struct bvec_iter iter;
-+	struct iov_iter iter;
- 
--	/* hint all but last page with MSG_MORE */
--	bio_for_each_segment(bvec, bio, iter) {
--		int err;
-+	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
-+		      bio->bi_iter.bi_size);
- 
--		err = _drbd_no_send_page(peer_device, bvec.bv_page,
--					 bvec.bv_offset, bvec.bv_len,
--					 bio_iter_last(bvec, iter)
--					 ? 0 : MSG_MORE);
--		if (err)
--			return err;
--	}
--	return 0;
-+	return _drbd_send_pages(peer_device, &iter, 0);
- }
- 
- static int _drbd_send_zc_bio(struct drbd_peer_device *peer_device, struct bio *bio)
- {
--	struct bio_vec bvec;
--	struct bvec_iter iter;
-+	struct iov_iter iter;
- 
--	/* hint all but last page with MSG_MORE */
--	bio_for_each_segment(bvec, bio, iter) {
--		int err;
-+	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
-+		      bio->bi_iter.bi_size);
- 
--		err = _drbd_send_page(peer_device, bvec.bv_page,
--				      bvec.bv_offset, bvec.bv_len,
--				      bio_iter_last(bvec, iter) ? 0 : MSG_MORE);
--		if (err)
--			return err;
--	}
--	return 0;
-+	return _drbd_send_pages(peer_device, &iter, MSG_SPLICE_PAGES);
- }
- 
- static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
-@@ -1621,10 +1588,16 @@ static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
- 
- 	/* hint all but last page with MSG_MORE */
- 	page_chain_for_each(page) {
-+		struct iov_iter iter;
-+		struct bio_vec bvec;
- 		unsigned l = min_t(unsigned, len, PAGE_SIZE);
- 
--		err = _drbd_send_page(peer_device, page, 0, l,
--				      page_chain_next(page) ? MSG_MORE : 0);
-+		bvec_set_page(&bvec, page, 0, l);
-+		iov_iter_bvec(&iter, ITER_SOURCE, &bvec, 1, l);
++static struct class class_pktcdvd = {
++	.name		= DRIVER_NAME,
++	.class_groups	= class_pktcdvd_groups,
++};
 +
-+		err = _drbd_send_pages(peer_device, &iter,
-+				       MSG_SPLICE_PAGES |
-+				       (page_chain_next(page) ? MSG_MORE : 0));
- 		if (err)
- 			return err;
- 		len -= l;
+ static int pkt_sysfs_init(void)
+ {
+-	int ret = 0;
+-
+ 	/*
+ 	 * create control files in sysfs
+ 	 * /sys/class/pktcdvd/...
+ 	 */
+-	class_pktcdvd = kzalloc(sizeof(*class_pktcdvd), GFP_KERNEL);
+-	if (!class_pktcdvd)
+-		return -ENOMEM;
+-	class_pktcdvd->name = DRIVER_NAME;
+-	class_pktcdvd->class_release = class_pktcdvd_release;
+-	class_pktcdvd->class_groups = class_pktcdvd_groups;
+-	ret = class_register(class_pktcdvd);
+-	if (ret) {
+-		kfree(class_pktcdvd);
+-		class_pktcdvd = NULL;
+-		pr_err("failed to create class pktcdvd\n");
+-		return ret;
+-	}
+-	return 0;
++	return class_register(&class_pktcdvd);
+ }
+ 
+ static void pkt_sysfs_cleanup(void)
+ {
+-	if (class_pktcdvd)
+-		class_destroy(class_pktcdvd);
+-	class_pktcdvd = NULL;
++	class_unregister(&class_pktcdvd);
+ }
+ 
+ /********************************************************************
+-- 
+2.40.0
 
