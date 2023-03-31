@@ -2,90 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89304C77B60
-	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 18:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9ECC76196
+	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 18:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233056AbjCaSBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Mar 2023 14:01:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36456 "EHLO
+        id S232893AbjCaSCO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Mar 2023 14:02:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232607AbjCaSAi (ORCPT
+        with ESMTP id S229998AbjCaSB5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Mar 2023 14:00:38 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3492023B67;
-        Fri, 31 Mar 2023 11:00:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C21BB62B01;
-        Fri, 31 Mar 2023 18:00:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C3E2C4339B;
-        Fri, 31 Mar 2023 18:00:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680285611;
-        bh=9tXVcu579pVEe31v3uq18Kz/aIIJc6OZT76XuWimyYY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=YgNZHmOLXZ1VOoy/QrY5pCHfzk02sSFrQTFY8GMr48v+dR8Qt80AuSqjMT9CMiyQP
-         ysZNr5rNQY3tgaZGR4Y4E1KmqnncUybRBlI9djM6dnMAKa0tGiX2HdStla1bqU8Rui
-         SX81lbv3qxEedlQfzWSfKo2BQGXsCELkmxicunMqhmL9LK/7cwUaFfqONAQAgbsMka
-         lq0p/rO2GGulMBtdSYkbfCG6qYULmX+4wfIogx/OKsjD4vMqSwXtkoGVEEvklS8Xlc
-         lwmpE8dJGYL0g76IAqUKiRhYvDAfDoXONYgDuBSUCv3CEfs4DoVFQS7aOkePgsQ0J5
-         lFU05B2XGayvg==
-Received: by mail-lj1-f173.google.com with SMTP id h9so23934671ljq.2;
-        Fri, 31 Mar 2023 11:00:11 -0700 (PDT)
-X-Gm-Message-State: AAQBX9ez3i9uLcd7FRlo1TlPyn0LkWVnPKum46Tb6ws1Aq1n0WckI5nw
-        3GQEOHRE5nw+ipDHLEB++sVkHtQPbu2onHm9Ij8=
-X-Google-Smtp-Source: AKy350ZgbNojOjOEEz2nHphY2xJCW9wwsXYrrgwE3PRrjnKQvmDG5MKMnwlOL72DBVmaW0fPmBMmrb5gTNKFPGLQqzY=
-X-Received: by 2002:a2e:a556:0:b0:29b:d43f:f68f with SMTP id
- e22-20020a2ea556000000b0029bd43ff68fmr5465915ljn.5.1680285609272; Fri, 31 Mar
- 2023 11:00:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1680172791.git.johannes.thumshirn@wdc.com> <4c9eaedd34f80d3477a5049f49610a8da8859744.1680172791.git.johannes.thumshirn@wdc.com>
-In-Reply-To: <4c9eaedd34f80d3477a5049f49610a8da8859744.1680172791.git.johannes.thumshirn@wdc.com>
-From:   Song Liu <song@kernel.org>
-Date:   Fri, 31 Mar 2023 10:59:57 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW7AAKXuPtvfjR-UBq=QCbHOkqCQQk=GTAWZH0ysVxhECQ@mail.gmail.com>
-Message-ID: <CAPhsuW7AAKXuPtvfjR-UBq=QCbHOkqCQQk=GTAWZH0ysVxhECQ@mail.gmail.com>
-Subject: Re: [PATCH v2 16/19] md: raid1: use __bio_add_page for adding single
- page to bio
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>,
+        Fri, 31 Mar 2023 14:01:57 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF5722E91
+        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 11:01:37 -0700 (PDT)
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 32VHFNSN009444
+        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 11:01:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=7N7+T3oAc0Z3pa3pgBoPp9XPY+QAKDM3jfNkpleR/Uo=;
+ b=AmTdlLU7KvuccEo32J31Q7Fjgc6IJ9C2L8+rS3XnST5/q7SyR4vP6ZUX8lDoWlOgdbR1
+ 5AAlMF36e/6KgaeeTwDgEQV4qH3q+4NIiCQHqKvowqAN0y2E9RbaPZksVsIr6ptJksvx
+ PiGF1Efwk2uOcXMTBIozR29SADWYDy6674+ru8qAYjQFTZDGloUHyzpk4Cv8FqWkAxyJ
+ r9E6bcweiYFsKLQ9+ITVkaV4hrRaJYr6nyBzvOr7DFTs5hfJKD0R84iraDh/nUoqK+Fx
+ jgX1EclHEsv7nAW6MK31YzJgd2oD/zOJYQ6NQQKe5D+BnXd7/JUtHlJQod8/yO3DfXcl og== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3pnr3fvew8-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 11:01:36 -0700
+Received: from twshared21760.39.frc1.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c085:11d::4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Fri, 31 Mar 2023 11:01:35 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id CFA3314E89F23; Fri, 31 Mar 2023 11:01:27 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+CC:     Keith Busch <kbusch@kernel.org>, <stable@kernel.org>,
+        Martin Belanger <Martin.Belanger@dell.com>,
+        Daniel Wagner <dwagner@suse.de>,
         Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        dm-devel@redhat.com, linux-raid@vger.kernel.org,
-        Mike Snitzer <snitzer@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+        Sagi Grimberg <sagi@grimberg.me>,
+        Christoph Hellwig <hch@lst.de>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCHv2] blk-mq: directly poll requests
+Date:   Fri, 31 Mar 2023 11:00:56 -0700
+Message-ID: <20230331180056.1155862-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: nZFjkhHLLn7UjqjLDgl_vKCtXoxFyo4N
+X-Proofpoint-ORIG-GUID: nZFjkhHLLn7UjqjLDgl_vKCtXoxFyo4N
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-03-31_07,2023-03-31_01,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 30, 2023 at 3:44=E2=80=AFAM Johannes Thumshirn
-<johannes.thumshirn@wdc.com> wrote:
->
-> The sync request code uses bio_add_page() to add a page to a newly create=
-d bio.
-> bio_add_page() can fail, but the return value is never checked.
->
-> Use __bio_add_page() as adding a single page to a newly created bio is
-> guaranteed to succeed.
->
-> This brings us a step closer to marking bio_add_page() as __must_check.
->
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+From: Keith Busch <kbusch@kernel.org>
 
-Acked-by: Song Liu <song@kernel.org>
+Polling needs a bio with a valid bi_bdev, but neither of those are
+guaranteed for polled driver requests. Make request based polling
+directly use blk-mq's polling function instead.
 
-Thanks!
+When executing a request from a polled hctx, we know the request's
+cookie, and that it's from a live blk-mq queue that supports polling, so
+we can safely skip everything that bio_poll provides.
+
+Cc: stable@kernel.org
+Reported-by: Martin Belanger <Martin.Belanger@dell.com>
+Reported-by: Daniel Wagner <dwagner@suse.de>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+Tested-by: Daniel Wagner <dwagner@suse.de>
+Revieded-by: Daniel Wagner <dwagner@suse.de>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+v1->v2:
+
+  Split from the unnecessary nvme fabrics polling cleanup patches since
+  there's no dependency with them, and will be posted separately.
+
+  Added received reviews, tests, and cc stable
+
+ block/blk-mq.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1b304f66f4e8e..3b75de43293c3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1326,8 +1326,6 @@ bool blk_rq_is_poll(struct request *rq)
+ 		return false;
+ 	if (rq->mq_hctx->type !=3D HCTX_TYPE_POLL)
+ 		return false;
+-	if (WARN_ON_ONCE(!rq->bio))
+-		return false;
+ 	return true;
+ }
+ EXPORT_SYMBOL_GPL(blk_rq_is_poll);
+@@ -1335,7 +1333,7 @@ EXPORT_SYMBOL_GPL(blk_rq_is_poll);
+ static void blk_rq_poll_completion(struct request *rq, struct completion=
+ *wait)
+ {
+ 	do {
+-		bio_poll(rq->bio, NULL, 0);
++		blk_mq_poll(rq->q, blk_rq_to_qc(rq), NULL, 0);
+ 		cond_resched();
+ 	} while (!completion_done(wait));
+ }
+--=20
+2.34.1
+
