@@ -2,323 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D773DC77B6C
-	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 00:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 800E8C6FD1D
+	for <linux-block@archiver.kernel.org>; Fri, 31 Mar 2023 01:13:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbjCaAaq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Mar 2023 20:30:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48478 "EHLO
+        id S229462AbjCaBNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Mar 2023 21:13:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbjCaAao (ORCPT
+        with ESMTP id S229453AbjCaBNE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Mar 2023 20:30:44 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269971025B
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 17:30:35 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id ek18so83485536edb.6
-        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 17:30:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1680222633;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s3r5eQncDU04l860YNWqLD6wbbCGIfGDlp9mbjOhdOU=;
-        b=dQ93Wk+Ks0MpqcGc+XVhyiMMrBUMuOTlnyUdvZTqVp0bN0Nmlc332OAwEYAAl4bdOb
-         rMvMFpmV/ShWfjSwJCQQlIG8eLhnJAG6GIFRRac4zR3uNqv31lS4gB+893Ba8gr7luBu
-         NYPe2fAf2Jbhe561F22ak4DIq2XkXoPQMnFZA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680222633;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s3r5eQncDU04l860YNWqLD6wbbCGIfGDlp9mbjOhdOU=;
-        b=P6euncxgN6ytprP3+mtxdCiYUaqeZm3kiuzBp84S4DAyxgOVz01qCm4J5XeU4qYbAZ
-         07u17cF+4frYpG6dtM9dzCZBoB/sanzPQh6TePetXom+Ydaq4zelLV2jVFMQRCRq1Cf8
-         hWndyZt5XA3XeJZuhaYgoF5uJ3LXKEPLgQ3E1gain2X+qvDVLX48iOt6ENSGGFIj6aWk
-         6V05X+mkax3x319/OvpTaRdlu9umbxYFLxH2q1LwjTK8oTLzFa9qtxHp089qzng/CI3n
-         TcHM6wYpKRG7AIbCDWyOA28C5tfyXDRWQzvKi1AP9QJpcQSk7CeGvIE5vzOAV8AaJPMk
-         bCQg==
-X-Gm-Message-State: AAQBX9dkSbw6lTd4tPYIOFeQrGG1n9R7neUOc+sw1n1e3gyiT0mJ1tar
-        6CL949U41YpSH847eSlkOUpnGSsN/wnY5/p2iB4nCw==
-X-Google-Smtp-Source: AKy350bUrFjid7TXbTeqMBKOpuNLpzymdFUzXKXUsWM99Dh5ebCTsP5lJJEB9dpSdwE6OtCHBeIdQ5BHXLCCKNvPA98=
-X-Received: by 2002:a17:907:d687:b0:93d:a14f:c9b4 with SMTP id
- wf7-20020a170907d68700b0093da14fc9b4mr12727665ejc.2.1680222633437; Thu, 30
- Mar 2023 17:30:33 -0700 (PDT)
+        Thu, 30 Mar 2023 21:13:04 -0400
+X-Greylist: delayed 165 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Mar 2023 18:13:03 PDT
+Received: from p3plwbeout25-03.prod.phx3.secureserver.net (p3plsmtp25-03-2.prod.phx3.secureserver.net [216.69.139.16])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568CACDC6
+        for <linux-block@vger.kernel.org>; Thu, 30 Mar 2023 18:13:03 -0700 (PDT)
+Received: from mailex.mailcore.me ([94.136.40.141])
+        by :WBEOUT: with ESMTP
+        id i3HUpUgzYhXpBi3HWpZnnm; Thu, 30 Mar 2023 18:10:18 -0700
+X-CMAE-Analysis: v=2.4 cv=Z88poFdA c=1 sm=1 tr=0 ts=642632fa
+ a=bheWAUFm1xGnSTQFbH9Kqg==:117 a=84ok6UeoqCVsigPHarzEiQ==:17
+ a=ggZhUymU-5wA:10 a=IkcTkHD0fZMA:10 a=k__wU0fu6RkA:10 a=v52JICOvAAAA:20
+ a=OzmVjPQ5Tx5mEpMD0PMA:9 a=QEXdDO2ut3YA:10
+X-SECURESERVER-ACCT: phillip@squashfs.org.uk  
+X-SID:  i3HUpUgzYhXpB
+Received: from 82-69-79-175.dsl.in-addr.zen.co.uk ([82.69.79.175] helo=[192.168.178.33])
+        by smtp02.mailcore.me with esmtpa (Exim 4.94.2)
+        (envelope-from <phillip@squashfs.org.uk>)
+        id 1pi3HU-000BSU-JI; Fri, 31 Mar 2023 02:10:16 +0100
+Message-ID: <5ab59623-4317-5aff-5173-d7285b5b224c@squashfs.org.uk>
+Date:   Fri, 31 Mar 2023 02:10:15 +0100
 MIME-Version: 1.0
-References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
- <20221229081252.452240-3-sarthakkukreti@chromium.org> <Y7biAQyLKJDjsAlz@bfoster>
-In-Reply-To: <Y7biAQyLKJDjsAlz@bfoster>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Thu, 30 Mar 2023 17:30:22 -0700
-Message-ID: <CAG9=OMNLAL8M2AqzSWzecXJzR7jfC_3Ckc_L24MzNBgz_+u-wQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] dm: Add support for block provisioning
-To:     Brian Foster <bfoster@redhat.com>
-Cc:     sarthakkukreti@google.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH 1/2] block: Rework bio_for_each_segment_all()
+From:   Phillip Lougher <phillip@squashfs.org.uk>
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        willy@infradead.org, axboe@kernel.dk,
+        Ming Lei <ming.lei@redhat.com>
+References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
+ <20230327174402.1655365-2-kent.overstreet@linux.dev>
+ <52a5bd5c-d3a1-71d7-e1e5-7965501818bd@squashfs.org.uk>
+ <ZCXNDQ6Eslhj+9g5@moria.home.lan>
+ <4753802a-685f-ab56-fed2-22d6eb4cfccd@squashfs.org.uk>
+In-Reply-To: <4753802a-685f-ab56-fed2-22d6eb4cfccd@squashfs.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Mailcore-Auth: 439999529
+X-Mailcore-Domain: 1394945
+X-123-reg-Authenticated:  phillip@squashfs.org.uk  
+X-Originating-IP: 82.69.79.175
+X-CMAE-Envelope: MS4xfEmkHjiJMxqjqDT1bqM25V1sruMQxYj6fcWMOKDoQi8zNMk8RqSiqDeDYB5ezroMyvMJRimKmQzWFK3gZtfshyMTDAlcgQaX59hebdoa1OFapn3uLLN8
+ prnz06TA3Tk3E2nuuyQye5jgGLmd662uaKW4PUNQLUDWyeLyx8TPBKvY1UC43b2NchvzLGjDJ9qcyAXL679qXKIEh7uIHno3HjRDTIPWQe+Nks1CkbmkPvOS
+ zzzNnmsBoQ8HdCsDZ3kbbw==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 5, 2023 at 6:42=E2=80=AFAM Brian Foster <bfoster@redhat.com> wr=
-ote:
->
-> On Thu, Dec 29, 2022 at 12:12:47AM -0800, Sarthak Kukreti wrote:
-> > Add support to dm devices for REQ_OP_PROVISION. The default mode
-> > is to pass through the request and dm-thin will utilize it to provision
-> > blocks.
-> >
-> > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > ---
-> >  drivers/md/dm-crypt.c         |  4 +-
-> >  drivers/md/dm-linear.c        |  1 +
-> >  drivers/md/dm-snap.c          |  7 +++
-> >  drivers/md/dm-table.c         | 25 ++++++++++
-> >  drivers/md/dm-thin.c          | 90 ++++++++++++++++++++++++++++++++++-
-> >  drivers/md/dm.c               |  4 ++
-> >  include/linux/device-mapper.h | 11 +++++
-> >  7 files changed, 139 insertions(+), 3 deletions(-)
-> >
-> ...
-> > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-> > index 64cfcf46881d..ab3f1abfabaf 100644
-> > --- a/drivers/md/dm-thin.c
-> > +++ b/drivers/md/dm-thin.c
-> ...
-> > @@ -1980,6 +1992,70 @@ static void process_cell(struct thin_c *tc, stru=
-ct dm_bio_prison_cell *cell)
-> >       }
-> >  }
-> >
-> > +static void process_provision_cell(struct thin_c *tc, struct dm_bio_pr=
-ison_cell *cell)
-> > +{
-> > +     int r;
-> > +     struct pool *pool =3D tc->pool;
-> > +     struct bio *bio =3D cell->holder;
-> > +     dm_block_t begin, end;
-> > +     struct dm_thin_lookup_result lookup_result;
-> > +
-> > +     if (tc->requeue_mode) {
-> > +             cell_requeue(pool, cell);
-> > +             return;
-> > +     }
-> > +
-> > +     get_bio_block_range(tc, bio, &begin, &end);
-> > +
-> > +     while (begin !=3D end) {
-> > +             r =3D ensure_next_mapping(pool);
-> > +             if (r)
-> > +                     /* we did our best */
-> > +                     return;
-> > +
-> > +             r =3D dm_thin_find_block(tc->td, begin, 1, &lookup_result=
-);
->
-> Hi Sarthak,
->
-> I think we discussed this before.. but remind me if/how we wanted to
-> handle the case if the thin blocks are shared..? Would a provision op
-> carry enough information to distinguish an FALLOC_FL_UNSHARE_RANGE
-> request from upper layers to conditionally provision in that case?
->
-I think that should depend on how the filesystem implements unsharing:
-assuming that we use provision on first allocation, unsharing on xfs
-should result in xfs calling REQ_OP_PROVISION on the newly allocated
-blocks first. But for ext4, we'd fail UNSHARE_RANGE unless provision
-(instead of noprovision, provision_on_alloc), in which case, we'd send
-REQ_OP_PROVISION.
+On 30/03/2023 19:59, Phillip Lougher wrote:
+> On 30/03/2023 18:55, Kent Overstreet wrote:
+>> On Wed, Mar 29, 2023 at 05:50:27PM +0100, Phillip Lougher wrote:
+>>> There is a problem with the above code, on testing I get the following
+>>> results:
+>>>
+>>> Index 78018785329, offset 49, bvec.bv_len 1024: In same bio, metadata 
+>>> length
+>>> 32780
+>>
+>> Could you share how you're doing your testing? I set up a basic test
+>> (created images using every compression type, tested reading them) and
+>> so far I'm not able to reproduce this.
+> 
+> I use a very large Squashfs file that triggers the edge case.
+> 
+> That is too big to post, and so I'll see if I can artifically generate
+> a small Squashfs filesystem that triggers the edge case.
+> 
+> Phillip
+> 
+> 
 
-Best
-Sarthak
+Hi,
+
+This is a Google drive link to a file that triggers the issue.
+
+https://drive.google.com/file/d/1-3-a1BKq62hZGQ6ynioreMSWFMuCV9B4/view?usp=sharing
+
+To reproduce the issue
+
+% mount -t squashfs <the file> /mnt -o errors=panic
+
+then either one of the following will produce a panic
+
+% ls /mnt
+% find /mnt -type f | xargs wc > /dev/null
 
 
-Sarthak
+Phillip
 
-> Brian
->
-> > +             switch (r) {
-> > +             case 0:
-> > +                     begin++;
-> > +                     break;
-> > +             case -ENODATA:
-> > +                     bio_inc_remaining(bio);
-> > +                     provision_block(tc, bio, begin, cell);
-> > +                     begin++;
-> > +                     break;
-> > +             default:
-> > +                     DMERR_LIMIT(
-> > +                             "%s: dm_thin_find_block() failed: error =
-=3D %d",
-> > +                             __func__, r);
-> > +                     cell_defer_no_holder(tc, cell);
-> > +                     bio_io_error(bio);
-> > +                     begin++;
-> > +                     break;
-> > +             }
-> > +     }
-> > +     bio_endio(bio);
-> > +     cell_defer_no_holder(tc, cell);
-> > +}
-> > +
-> > +static void process_provision_bio(struct thin_c *tc, struct bio *bio)
-> > +{
-> > +     dm_block_t begin, end;
-> > +     struct dm_cell_key virt_key;
-> > +     struct dm_bio_prison_cell *virt_cell;
-> > +
-> > +     get_bio_block_range(tc, bio, &begin, &end);
-> > +     if (begin =3D=3D end) {
-> > +             bio_endio(bio);
-> > +             return;
-> > +     }
-> > +
-> > +     build_key(tc->td, VIRTUAL, begin, end, &virt_key);
-> > +     if (bio_detain(tc->pool, &virt_key, bio, &virt_cell))
-> > +             return;
-> > +
-> > +     process_provision_cell(tc, virt_cell);
-> > +}
-> > +
-> >  static void process_bio(struct thin_c *tc, struct bio *bio)
-> >  {
-> >       struct pool *pool =3D tc->pool;
-> > @@ -2200,6 +2276,8 @@ static void process_thin_deferred_bios(struct thi=
-n_c *tc)
-> >
-> >               if (bio_op(bio) =3D=3D REQ_OP_DISCARD)
-> >                       pool->process_discard(tc, bio);
-> > +             else if (bio_op(bio) =3D=3D REQ_OP_PROVISION)
-> > +                     process_provision_bio(tc, bio);
-> >               else
-> >                       pool->process_bio(tc, bio);
-> >
-> > @@ -2716,7 +2794,8 @@ static int thin_bio_map(struct dm_target *ti, str=
-uct bio *bio)
-> >               return DM_MAPIO_SUBMITTED;
-> >       }
-> >
-> > -     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DISCARD=
-) {
-> > +     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DISCARD=
- ||
-> > +         bio_op(bio) =3D=3D REQ_OP_PROVISION) {
-> >               thin_defer_bio_with_throttle(tc, bio);
-> >               return DM_MAPIO_SUBMITTED;
-> >       }
-> > @@ -3355,6 +3434,8 @@ static int pool_ctr(struct dm_target *ti, unsigne=
-d argc, char **argv)
-> >       pt->low_water_blocks =3D low_water_blocks;
-> >       pt->adjusted_pf =3D pt->requested_pf =3D pf;
-> >       ti->num_flush_bios =3D 1;
-> > +     ti->num_provision_bios =3D 1;
-> > +     ti->provision_supported =3D true;
-> >
-> >       /*
-> >        * Only need to enable discards if the pool should pass
-> > @@ -4053,6 +4134,7 @@ static void pool_io_hints(struct dm_target *ti, s=
-truct queue_limits *limits)
-> >               blk_limits_io_opt(limits, pool->sectors_per_block << SECT=
-OR_SHIFT);
-> >       }
-> >
-> > +
-> >       /*
-> >        * pt->adjusted_pf is a staging area for the actual features to u=
-se.
-> >        * They get transferred to the live pool in bind_control_target()
-> > @@ -4243,6 +4325,9 @@ static int thin_ctr(struct dm_target *ti, unsigne=
-d argc, char **argv)
-> >               ti->num_discard_bios =3D 1;
-> >       }
-> >
-> > +     ti->num_provision_bios =3D 1;
-> > +     ti->provision_supported =3D true;
-> > +
-> >       mutex_unlock(&dm_thin_pool_table.mutex);
-> >
-> >       spin_lock_irq(&tc->pool->lock);
-> > @@ -4457,6 +4542,7 @@ static void thin_io_hints(struct dm_target *ti, s=
-truct queue_limits *limits)
-> >
-> >       limits->discard_granularity =3D pool->sectors_per_block << SECTOR=
-_SHIFT;
-> >       limits->max_discard_sectors =3D 2048 * 1024 * 16; /* 16G */
-> > +     limits->max_provision_sectors =3D 2048 * 1024 * 16; /* 16G */
-> >  }
-> >
-> >  static struct target_type thin_target =3D {
-> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > index e1ea3a7bd9d9..4d19bae9da4a 100644
-> > --- a/drivers/md/dm.c
-> > +++ b/drivers/md/dm.c
-> > @@ -1587,6 +1587,7 @@ static bool is_abnormal_io(struct bio *bio)
-> >               case REQ_OP_DISCARD:
-> >               case REQ_OP_SECURE_ERASE:
-> >               case REQ_OP_WRITE_ZEROES:
-> > +             case REQ_OP_PROVISION:
-> >                       return true;
-> >               default:
-> >                       break;
-> > @@ -1611,6 +1612,9 @@ static blk_status_t __process_abnormal_io(struct =
-clone_info *ci,
-> >       case REQ_OP_WRITE_ZEROES:
-> >               num_bios =3D ti->num_write_zeroes_bios;
-> >               break;
-> > +     case REQ_OP_PROVISION:
-> > +             num_bios =3D ti->num_provision_bios;
-> > +             break;
-> >       default:
-> >               break;
-> >       }
-> > diff --git a/include/linux/device-mapper.h b/include/linux/device-mappe=
-r.h
-> > index 04c6acf7faaa..b4d97d5d75b8 100644
-> > --- a/include/linux/device-mapper.h
-> > +++ b/include/linux/device-mapper.h
-> > @@ -333,6 +333,12 @@ struct dm_target {
-> >        */
-> >       unsigned num_write_zeroes_bios;
-> >
-> > +     /*
-> > +      * The number of PROVISION bios that will be submitted to the tar=
-get.
-> > +      * The bio number can be accessed with dm_bio_get_target_bio_nr.
-> > +      */
-> > +     unsigned num_provision_bios;
-> > +
-> >       /*
-> >        * The minimum number of extra bytes allocated in each io for the
-> >        * target to use.
-> > @@ -357,6 +363,11 @@ struct dm_target {
-> >        */
-> >       bool discards_supported:1;
-> >
-> > +     /* Set if this target needs to receive provision requests regardl=
-ess of
-> > +      * whether or not its underlying devices have support.
-> > +      */
-> > +     bool provision_supported:1;
-> > +
-> >       /*
-> >        * Set if we need to limit the number of in-flight bios when swap=
-ping.
-> >        */
-> > --
-> > 2.37.3
-> >
->
+
