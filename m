@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034AFC76196
-	for <linux-block@archiver.kernel.org>; Sat,  1 Apr 2023 01:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6128CC76196
+	for <linux-block@archiver.kernel.org>; Sat,  1 Apr 2023 01:43:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233516AbjDABmO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Mar 2023 21:42:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45684 "EHLO
+        id S233676AbjDABnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Mar 2023 21:43:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233440AbjDABmL (ORCPT
+        with ESMTP id S233677AbjDABnd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Mar 2023 21:42:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF65A20DA6;
-        Fri, 31 Mar 2023 18:41:51 -0700 (PDT)
+        Fri, 31 Mar 2023 21:43:33 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB1F20D94;
+        Fri, 31 Mar 2023 18:43:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D03F062CE1;
-        Sat,  1 Apr 2023 01:41:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E6D4C433D2;
-        Sat,  1 Apr 2023 01:41:47 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C106CB83313;
+        Sat,  1 Apr 2023 01:43:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA835C4339E;
+        Sat,  1 Apr 2023 01:42:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680313308;
-        bh=XirnIgZ9S0tSEoZVOZ9ZU/c4xaqjAjSCS8VJZDEoJk8=;
+        s=k20201202; t=1680313380;
+        bh=tPP5Uymkg5+cO2zQqihgwwc+sGOlG0PfkqjeCtfYDb4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VdQj5SwsPaU2qEvTy+KS6TOUAwj7B4+cl1J/bpgyeBp4Lfpt6y0RcgV5EwUVoSN8Z
-         1nYFrxLM5LyUiHYQkhLSHowMShFaeXWTLCPU0r4uo1ZKAVltgudX2e/JtmXV3l+aIS
-         Tin3LnA8W/4A48G7J9uXfEMHsnI3g9trFbh0wlTYtIONeaP5ShM1m1mEezV1sCmh66
-         fekQwDqxRn7U+LDKFv2Zi/7lU5JLgTqdGhSZgEI03ms7Jx8l3INeZKzF8qY5oQG8Vk
-         OqT2j7OLRrE9WsCfpPGz374G3fBrYznPyhLqa20r4vcL7vJcbWL1Nmr9eCF1rKZm+I
-         HENkahlAyZJEw==
+        b=hltvDFu/zpTdWOizyNIc6+n6SJ1ivvzX2LTljlBttJv8YIizNEqg/+fnrGDKrgg6k
+         Vh8Yw03A40ldSTsY9zyG65f9D9t+J5ZaVSDRdB2roX+n7xPS5cYPC7GqaQmBC2I8Q/
+         m9clMof7JJ0P82V/rnGdn55baOe8LsWlkSlKDGiv/IUmTGD99WlYbpknNSaB9V7dJD
+         UVc3kDOhEh3wF9mfZJbnTDYsQjmPb2qKj80BGwm2/mOmyxe+ceuWmATPgU6pSxMcC0
+         0F7rvPa9KpJCwHu/AvoGliAnw0lOIDeU596U4+nTZq9LKSl7dvfKyf/f6DxhrT4oD6
+         sFngORNF8Y1jQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ming Lei <ming.lei@redhat.com>,
         Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.2 12/25] block: ublk_drv: mark device as LIVE before adding disk
-Date:   Fri, 31 Mar 2023 21:41:10 -0400
-Message-Id: <20230401014126.3356410-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 11/24] block: ublk_drv: mark device as LIVE before adding disk
+Date:   Fri, 31 Mar 2023 21:42:27 -0400
+Message-Id: <20230401014242.3356780-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230401014126.3356410-1-sashal@kernel.org>
-References: <20230401014126.3356410-1-sashal@kernel.org>
+In-Reply-To: <20230401014242.3356780-1-sashal@kernel.org>
+References: <20230401014242.3356780-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -73,10 +73,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 22a790d512842..f24d47d349256 100644
+index 4aec9be0ab77e..5a5bf0e2738b2 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -1553,17 +1553,18 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
+@@ -1548,17 +1548,18 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
  		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
  
  	get_device(&ub->cdev_dev);
