@@ -2,92 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC08C761A6
-	for <linux-block@archiver.kernel.org>; Sat,  1 Apr 2023 02:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4EA6C76196
+	for <linux-block@archiver.kernel.org>; Sat,  1 Apr 2023 09:47:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232973AbjDAC3F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Mar 2023 22:29:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50702 "EHLO
+        id S229887AbjDAJrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Apr 2023 05:47:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233272AbjDAC3E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Mar 2023 22:29:04 -0400
-Received: from out-48.mta1.migadu.com (out-48.mta1.migadu.com [95.215.58.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D93CDBC6
-        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 19:29:04 -0700 (PDT)
-Date:   Fri, 31 Mar 2023 22:28:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1680316142;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nk3BO9ozKnNgHpSZ+K/XAgwZZGpDKyN1TJC8W4PiYMA=;
-        b=bFZFMdRc23zZazbLH0H7CmHlemGuo1HoqhVyo8DLD3kUfbRL8eKREH+Hw+KMKfNkp0F6p6
-        2GSK/citNW0eQCpkjgUoN/rOlKW9MXgDhSNKZJE2zXCbryBqzXJHz7svtlopAeeToW9FA/
-        yiE0cJuT0ZiG3oidJyx9UG7LHjm12UU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Phillip Lougher <phillip@squashfs.org.uk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        willy@infradead.org, axboe@kernel.dk,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 1/2] block: Rework bio_for_each_segment_all()
-Message-ID: <ZCeW6j44aHGI/v5Q@moria.home.lan>
-References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
- <20230327174402.1655365-2-kent.overstreet@linux.dev>
- <52a5bd5c-d3a1-71d7-e1e5-7965501818bd@squashfs.org.uk>
- <ZCXNDQ6Eslhj+9g5@moria.home.lan>
- <4753802a-685f-ab56-fed2-22d6eb4cfccd@squashfs.org.uk>
- <5ab59623-4317-5aff-5173-d7285b5b224c@squashfs.org.uk>
+        with ESMTP id S229853AbjDAJrg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Apr 2023 05:47:36 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FB01042C
+        for <linux-block@vger.kernel.org>; Sat,  1 Apr 2023 02:47:23 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id lr16-20020a17090b4b9000b0023f187954acso26023286pjb.2
+        for <linux-block@vger.kernel.org>; Sat, 01 Apr 2023 02:47:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1680342442;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hiK4KO4kZbl8xYSoAWQs5Xyf4Snj7jNQFcEtAQejez8=;
+        b=V+zhxA472E3zjzApz3J/B0H+TF2UZuO9A3fqlLhaAsX+s8ZPpc6Y5xCXMt+ODvpYia
+         prVRA6DUvQ0U8QdnsdMSDgxnevfp/Htz8mOqyOLtb/ctA/aKl7nZX5U1yZOEb8m1jhIS
+         h2XiY2mp3+D5wLLfJJ9IWb9ftDxnGzA9PjwjTDB58mMn4WjQlAP9ATXwjr0EZF6KVmMo
+         CseN0wvqz9Cb3qySGD9rkACfMDQ7Lmknsc0B9/T5z24lpA8DEXa9OyJu1KaNRtkaErtR
+         WU2DKk+Q55OX8+3ozYk2myGGhObt9Vsrf3CqSyvenh4P2tCxjdTR8vfI+su5veg4D4Ys
+         1rwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680342442;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hiK4KO4kZbl8xYSoAWQs5Xyf4Snj7jNQFcEtAQejez8=;
+        b=qH4wwbgP+mABaND+YSOSY/ALDFtz79vw03iam6/DnmrTXKmOJjajQGTA+87grj70YE
+         4EqbQMOnafdisDRRj3B7eW90h/19EcyjQ27LwLfouZWsdV7ppldPnxqWTj7VWw2WNQgi
+         mjHuem3Kkbx5yAj4I8WQ9UqfALaE8L6atNT7NOzYvIQTy5IalcGAutYEx7vOK4XFHYV9
+         76xOmfKI5HDJ5phOe9WcSU5/3Eu7Xq8hAw4x26PyuCaW5uzRmc72lwYVoIuGEIq3RL0X
+         4VbQTc4utgFRMEO2a2AlP3KjuDixtbOp0CC0ki7J0rAC+4On1wkaBQ6IJu1ET73lYj0n
+         Z6Eg==
+X-Gm-Message-State: AAQBX9cpLgI+TqDtnhnCzDq/H4434Z3cpRyxL9J7Onbq3gIwuHFRGKDf
+        sW7gSplGo4ZS0b9qxSmJbWpSNw==
+X-Google-Smtp-Source: AKy350a5Qyn30MXPsqFDtaona2Q3ahaJBygNo5/JecPGW8Mz2FslX1mFe6llG8NPGyJowvc0Ntl7+A==
+X-Received: by 2002:a05:6a20:cd5a:b0:e4:d395:5ce6 with SMTP id hn26-20020a056a20cd5a00b000e4d3955ce6mr3118164pzb.25.1680342442606;
+        Sat, 01 Apr 2023 02:47:22 -0700 (PDT)
+Received: from C02GD5ZHMD6R.bytedance.net ([139.177.225.240])
+        by smtp.gmail.com with ESMTPSA id w26-20020aa7859a000000b0062d90f36d16sm3233919pfn.88.2023.04.01.02.47.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Apr 2023 02:47:22 -0700 (PDT)
+From:   Jinke Han <hanjinke.666@bytedance.com>
+X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
+To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jinke Han <hanjinke.666@bytedance.com>
+Subject: [PATCH v2] blk-throttle: Fix io statistics for cgroup v1
+Date:   Sat,  1 Apr 2023 17:47:08 +0800
+Message-Id: <20230401094708.77631-1-hanjinke.666@bytedance.com>
+X-Mailer: git-send-email 2.32.0 (Apple Git-132)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5ab59623-4317-5aff-5173-d7285b5b224c@squashfs.org.uk>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 31, 2023 at 02:10:15AM +0100, Phillip Lougher wrote:
-> On 30/03/2023 19:59, Phillip Lougher wrote:
-> > On 30/03/2023 18:55, Kent Overstreet wrote:
-> > > On Wed, Mar 29, 2023 at 05:50:27PM +0100, Phillip Lougher wrote:
-> > > > There is a problem with the above code, on testing I get the following
-> > > > results:
-> > > > 
-> > > > Index 78018785329, offset 49, bvec.bv_len 1024: In same bio,
-> > > > metadata length
-> > > > 32780
-> > > 
-> > > Could you share how you're doing your testing? I set up a basic test
-> > > (created images using every compression type, tested reading them) and
-> > > so far I'm not able to reproduce this.
-> > 
-> > I use a very large Squashfs file that triggers the edge case.
-> > 
-> > That is too big to post, and so I'll see if I can artifically generate
-> > a small Squashfs filesystem that triggers the edge case.
-> > 
-> > Phillip
-> > 
-> > 
-> 
-> Hi,
-> 
-> This is a Google drive link to a file that triggers the issue.
-> 
-> https://drive.google.com/file/d/1-3-a1BKq62hZGQ6ynioreMSWFMuCV9B4/view?usp=sharing
-> 
-> To reproduce the issue
-> 
-> % mount -t squashfs <the file> /mnt -o errors=panic
-> 
-> then either one of the following will produce a panic
-> 
-> % ls /mnt
-> % find /mnt -type f | xargs wc > /dev/null
+From: Jinke Han <hanjinke.666@bytedance.com>
 
-Appears to be fixed now - updated version of the patchset is at
-https://evilpiepirate.org/git/bcachefs.git bio_folio_iter
+After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
+blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
+the only stable io stats interface of cgroup v1, and these statistics
+are done in the blk-throttle code. But the current code only counts the
+bios that are actually throttled. When the user does not add the throttle
+limit, the io stats for cgroup v1 has nothing. I fix it according to the
+statistical method of v2, and made it count all ios accurately.
 
-Can you confirm, then I'll mail out the updated series?
+Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
+Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
+---
+ block/blk-cgroup.c   | 6 ++++--
+ block/blk-throttle.c | 6 ------
+ block/blk-throttle.h | 9 +++++++++
+ 3 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index bd50b55bdb61..33263d0d0e0f 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -2033,6 +2033,9 @@ void blk_cgroup_bio_start(struct bio *bio)
+ 	struct blkg_iostat_set *bis;
+ 	unsigned long flags;
+ 
++	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
++		return;
++
+ 	/* Root-level stats are sourced from system-wide IO stats */
+ 	if (!cgroup_parent(blkcg->css.cgroup))
+ 		return;
+@@ -2064,8 +2067,7 @@ void blk_cgroup_bio_start(struct bio *bio)
+ 	}
+ 
+ 	u64_stats_update_end_irqrestore(&bis->sync, flags);
+-	if (cgroup_subsys_on_dfl(io_cgrp_subsys))
+-		cgroup_rstat_updated(blkcg->css.cgroup, cpu);
++	cgroup_rstat_updated(blkcg->css.cgroup, cpu);
+ 	put_cpu();
+ }
+ 
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 47e9d8be68f3..2be66e9430f7 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2174,12 +2174,6 @@ bool __blk_throtl_bio(struct bio *bio)
+ 
+ 	rcu_read_lock();
+ 
+-	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+-		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
+-				bio->bi_iter.bi_size);
+-		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
+-	}
+-
+ 	spin_lock_irq(&q->queue_lock);
+ 
+ 	throtl_update_latency_buckets(td);
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index ef4b7a4de987..d1ccbfe9f797 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -185,6 +185,15 @@ static inline bool blk_should_throtl(struct bio *bio)
+ 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
+ 	int rw = bio_data_dir(bio);
+ 
++	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
++		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
++			bio_set_flag(bio, BIO_CGROUP_ACCT);
++			blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
++					bio->bi_iter.bi_size);
++		}
++		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
++	}
++
+ 	/* iops limit is always counted */
+ 	if (tg->has_rules_iops[rw])
+ 		return true;
+-- 
+2.20.1
+
