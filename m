@@ -2,100 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6128CC76196
-	for <linux-block@archiver.kernel.org>; Sat,  1 Apr 2023 01:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC08C761A6
+	for <linux-block@archiver.kernel.org>; Sat,  1 Apr 2023 02:29:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233676AbjDABnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 31 Mar 2023 21:43:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46500 "EHLO
+        id S232973AbjDAC3F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 31 Mar 2023 22:29:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233677AbjDABnd (ORCPT
+        with ESMTP id S233272AbjDAC3E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 31 Mar 2023 21:43:33 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB1F20D94;
-        Fri, 31 Mar 2023 18:43:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C106CB83313;
-        Sat,  1 Apr 2023 01:43:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA835C4339E;
-        Sat,  1 Apr 2023 01:42:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680313380;
-        bh=tPP5Uymkg5+cO2zQqihgwwc+sGOlG0PfkqjeCtfYDb4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hltvDFu/zpTdWOizyNIc6+n6SJ1ivvzX2LTljlBttJv8YIizNEqg/+fnrGDKrgg6k
-         Vh8Yw03A40ldSTsY9zyG65f9D9t+J5ZaVSDRdB2roX+n7xPS5cYPC7GqaQmBC2I8Q/
-         m9clMof7JJ0P82V/rnGdn55baOe8LsWlkSlKDGiv/IUmTGD99WlYbpknNSaB9V7dJD
-         UVc3kDOhEh3wF9mfZJbnTDYsQjmPb2qKj80BGwm2/mOmyxe+ceuWmATPgU6pSxMcC0
-         0F7rvPa9KpJCwHu/AvoGliAnw0lOIDeU596U4+nTZq9LKSl7dvfKyf/f6DxhrT4oD6
-         sFngORNF8Y1jQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 11/24] block: ublk_drv: mark device as LIVE before adding disk
-Date:   Fri, 31 Mar 2023 21:42:27 -0400
-Message-Id: <20230401014242.3356780-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230401014242.3356780-1-sashal@kernel.org>
-References: <20230401014242.3356780-1-sashal@kernel.org>
+        Fri, 31 Mar 2023 22:29:04 -0400
+Received: from out-48.mta1.migadu.com (out-48.mta1.migadu.com [95.215.58.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D93CDBC6
+        for <linux-block@vger.kernel.org>; Fri, 31 Mar 2023 19:29:04 -0700 (PDT)
+Date:   Fri, 31 Mar 2023 22:28:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1680316142;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nk3BO9ozKnNgHpSZ+K/XAgwZZGpDKyN1TJC8W4PiYMA=;
+        b=bFZFMdRc23zZazbLH0H7CmHlemGuo1HoqhVyo8DLD3kUfbRL8eKREH+Hw+KMKfNkp0F6p6
+        2GSK/citNW0eQCpkjgUoN/rOlKW9MXgDhSNKZJE2zXCbryBqzXJHz7svtlopAeeToW9FA/
+        yiE0cJuT0ZiG3oidJyx9UG7LHjm12UU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Phillip Lougher <phillip@squashfs.org.uk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        willy@infradead.org, axboe@kernel.dk,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 1/2] block: Rework bio_for_each_segment_all()
+Message-ID: <ZCeW6j44aHGI/v5Q@moria.home.lan>
+References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
+ <20230327174402.1655365-2-kent.overstreet@linux.dev>
+ <52a5bd5c-d3a1-71d7-e1e5-7965501818bd@squashfs.org.uk>
+ <ZCXNDQ6Eslhj+9g5@moria.home.lan>
+ <4753802a-685f-ab56-fed2-22d6eb4cfccd@squashfs.org.uk>
+ <5ab59623-4317-5aff-5173-d7285b5b224c@squashfs.org.uk>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ab59623-4317-5aff-5173-d7285b5b224c@squashfs.org.uk>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+On Fri, Mar 31, 2023 at 02:10:15AM +0100, Phillip Lougher wrote:
+> On 30/03/2023 19:59, Phillip Lougher wrote:
+> > On 30/03/2023 18:55, Kent Overstreet wrote:
+> > > On Wed, Mar 29, 2023 at 05:50:27PM +0100, Phillip Lougher wrote:
+> > > > There is a problem with the above code, on testing I get the following
+> > > > results:
+> > > > 
+> > > > Index 78018785329, offset 49, bvec.bv_len 1024: In same bio,
+> > > > metadata length
+> > > > 32780
+> > > 
+> > > Could you share how you're doing your testing? I set up a basic test
+> > > (created images using every compression type, tested reading them) and
+> > > so far I'm not able to reproduce this.
+> > 
+> > I use a very large Squashfs file that triggers the edge case.
+> > 
+> > That is too big to post, and so I'll see if I can artifically generate
+> > a small Squashfs filesystem that triggers the edge case.
+> > 
+> > Phillip
+> > 
+> > 
+> 
+> Hi,
+> 
+> This is a Google drive link to a file that triggers the issue.
+> 
+> https://drive.google.com/file/d/1-3-a1BKq62hZGQ6ynioreMSWFMuCV9B4/view?usp=sharing
+> 
+> To reproduce the issue
+> 
+> % mount -t squashfs <the file> /mnt -o errors=panic
+> 
+> then either one of the following will produce a panic
+> 
+> % ls /mnt
+> % find /mnt -type f | xargs wc > /dev/null
 
-[ Upstream commit 4985e7b2c002eb4c5c794a1d3acd91b82c89a0fd ]
+Appears to be fixed now - updated version of the patchset is at
+https://evilpiepirate.org/git/bcachefs.git bio_folio_iter
 
-IO can be started before add_disk() returns, such as reading parititon table,
-then the monitor work should work for making forward progress.
-
-So mark device as LIVE before adding disk, meantime change to
-DEAD if add_disk() fails.
-
-Fixed: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
-Reviewed-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20230318141231.55562-1-ming.lei@redhat.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/ublk_drv.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 4aec9be0ab77e..5a5bf0e2738b2 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1548,17 +1548,18 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
- 		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
- 
- 	get_device(&ub->cdev_dev);
-+	ub->dev_info.state = UBLK_S_DEV_LIVE;
- 	ret = add_disk(disk);
- 	if (ret) {
- 		/*
- 		 * Has to drop the reference since ->free_disk won't be
- 		 * called in case of add_disk failure.
- 		 */
-+		ub->dev_info.state = UBLK_S_DEV_DEAD;
- 		ublk_put_device(ub);
- 		goto out_put_disk;
- 	}
- 	set_bit(UB_STATE_USED, &ub->state);
--	ub->dev_info.state = UBLK_S_DEV_LIVE;
- out_put_disk:
- 	if (ret)
- 		put_disk(disk);
--- 
-2.39.2
-
+Can you confirm, then I'll mail out the updated series?
