@@ -2,98 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641B4C76196
-	for <linux-block@archiver.kernel.org>; Sun,  2 Apr 2023 12:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7ECBC7619A
+	for <linux-block@archiver.kernel.org>; Sun,  2 Apr 2023 14:50:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229503AbjDBMkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Apr 2023 08:40:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56422 "EHLO
+        id S230141AbjDBOuK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Apr 2023 10:50:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbjDBMkv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2023 08:40:51 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10EF2E1B6;
-        Sun,  2 Apr 2023 05:40:48 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1pix0b-0005dt-9D; Sun, 02 Apr 2023 14:40:33 +0200
-Message-ID: <3a2ca263-7f60-63d3-7f9a-208ab8197c07@leemhuis.info>
-Date:   Sun, 2 Apr 2023 14:40:32 +0200
+        with ESMTP id S229459AbjDBOuJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2023 10:50:09 -0400
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E234686
+        for <linux-block@vger.kernel.org>; Sun,  2 Apr 2023 07:50:05 -0700 (PDT)
+Received: by mail-yb1-f171.google.com with SMTP id f188so13612906ybb.3
+        for <linux-block@vger.kernel.org>; Sun, 02 Apr 2023 07:50:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680447004; x=1683039004;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fSJkeczsRCJsz2ttU8oQJ8eXqzZE348TERtH4FIpWw4=;
+        b=yw4uYmYD8WH74wmJIB+gwT/m7zOP7RyfMSPKPBt552l1pO+VhYou2JmjBX8Z44dyXv
+         9YKYkpaUIrim5hWpeAnUbfY0HckQNTa3TKJItwCYPgYaGyi2LHSX10vlPt7qT/bvFU8d
+         KOqfYK0Ai85+Xn8ZspL5RIQm1ECu4uBgudBrXhgqtJdUMKnSMs0LzJ8In8pJ3wEeYC3e
+         dvHwVyrcRLQn7X81tPR18naC/S9ss4u6n64HFNpMoHh64lvqMWFKCiEBMMxgY2nA+r8I
+         3w9ZzT+uVFYalCboiM1Qq6HyDlN6Oa4ML6r4fgfHTIje60Eqc7sSVDv+DgvzuUSmEhif
+         Vgpg==
+X-Gm-Message-State: AAQBX9ejF5A2h1hKOX8f24Sgd/SoiGs7JS69gryyjObtRY3ljBXNLjAU
+        FkhfHAS0E0fwrFIZ1HjvNnPI73B4ZEfjdQ==
+X-Google-Smtp-Source: AKy350YDC51pfRC1iE5hbO2R/dHHTWgGrh1cFEEXdbYEEml+tcLvqcgdZ4Xs91aEMi2nJAoJIZcbNg==
+X-Received: by 2002:a25:e68b:0:b0:b72:ec3d:c670 with SMTP id d133-20020a25e68b000000b00b72ec3dc670mr27717767ybh.10.1680447004014;
+        Sun, 02 Apr 2023 07:50:04 -0700 (PDT)
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com. [209.85.219.171])
+        by smtp.gmail.com with ESMTPSA id g16-20020a25ef10000000b00b7d2204cd4bsm1927019ybd.21.2023.04.02.07.50.01
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 02 Apr 2023 07:50:02 -0700 (PDT)
+Received: by mail-yb1-f171.google.com with SMTP id i6so32097389ybu.8
+        for <linux-block@vger.kernel.org>; Sun, 02 Apr 2023 07:50:01 -0700 (PDT)
+X-Received: by 2002:a05:6902:1586:b0:b76:ceb2:661b with SMTP id
+ k6-20020a056902158600b00b76ceb2661bmr21171344ybu.3.1680447001548; Sun, 02 Apr
+ 2023 07:50:01 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
- and slow-stuck reboots
-Content-Language: en-US, de-DE
-To:     Mark Rutland <mark.rutland@arm.com>,
-        Alexey Klimov <alexey.klimov@linaro.org>
-Cc:     peterz@infradead.org, draszik@google.com, peter.griffin@linaro.org,
-        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
-        tony@atomide.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        alim.akhtar@samsung.com, regressions@lists.linux.dev,
-        avri.altman@wdc.com, bvanassche@acm.org, klimova@google.com
-References: <20230314230004.961993-1-alexey.klimov@linaro.org>
- <ZBhlL4tqSUi/c3qk@FVFF77S0Q05N.cambridge.arm.com>
- <ZBiEEyDaxq9oSXJk@FVFF77S0Q05N.cambridge.arm.com>
-From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <ZBiEEyDaxq9oSXJk@FVFF77S0Q05N.cambridge.arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1680439249;6dba8e56;
-X-HE-SMSGID: 1pix0b-0005dt-9D
+References: <20230322151604.401680-1-okozina@redhat.com>
+In-Reply-To: <20230322151604.401680-1-okozina@redhat.com>
+From:   Luca Boccassi <bluca@debian.org>
+Date:   Sun, 2 Apr 2023 15:49:50 +0100
+X-Gmail-Original-Message-ID: <CAMw=ZnRHomfw33tnnMNAz+WyhH8bWjiZ1-2qQm3tqevNtkOOVA@mail.gmail.com>
+Message-ID: <CAMw=ZnRHomfw33tnnMNAz+WyhH8bWjiZ1-2qQm3tqevNtkOOVA@mail.gmail.com>
+Subject: Re: [PATCH 0/5] sed-opal: add command to read locking range attributes
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, gmazyland@gmail.com,
+        hch@infradead.org, brauner@kernel.org, rafael.antognolli@intel.com,
+        Ondrej Kozina <okozina@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[TLDR: This mail in primarily relevant for Linux kernel regression
-tracking. See link in footer if these mails annoy you.]
+On Wed, 22 Mar 2023 at 15:16, Ondrej Kozina <okozina@redhat.com> wrote:
+>
+> This patch set aims to add ability to user authorities to read locking
+> range attributes.
+>
+> It's achieved in two steps (except SUM enabled drives):
+>
+> 1) Patch IOC_OPAL_ADD_USR_TO_LR command so that user authority (together with
+> OPAL_ADMIN1) is added in ACE that allows getting locking range attributes.
+>
+> 2) Add new ioctl command IOC_OPAL_GET_LR_STATUS to get locking range
+> attributes to user authority assigned to specific locking range.
+>
+> libcryptsetup plans to support OPAL2 drives and needs to verify locking
+> range parameters before device activation (LR unlock) takes place since
+> it's considered undesirable to have (for example) partition mapped beyond
+> locking range boundaries.
+>
+> Ondrej Kozina (5):
+>   sed-opal: do not add user authority twice in boolean ace.
+>   sed-opal: add helper for adding user authorities in ACE.
+>   sed-opal: allow user authority to get locking range attributes.
+>   sed-opal: add helper to get multiple columns at once.
+>   sed-opal: Add command to read locking range parameters.
+>
+>  block/opal_proto.h            |   1 +
+>  block/sed-opal.c              | 263 ++++++++++++++++++++++++++++------
+>  include/linux/sed-opal.h      |   1 +
+>  include/uapi/linux/sed-opal.h |  11 ++
+>  4 files changed, 233 insertions(+), 43 deletions(-)
 
-On 20.03.23 17:04, Mark Rutland wrote:
-> On Mon, Mar 20, 2023 at 01:52:47PM +0000, Mark Rutland wrote:
->> On Tue, Mar 14, 2023 at 11:00:04PM +0000, Alexey Klimov wrote:
->>> #regzbot introduced: 0c5ffc3d7b15
->>> #regzbot title: CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait() and slow-stuck reboots
->>>
->>> The upstream changes are being merged into android-mainline repo and at some
->>> point we started to observe kernel panics on reboot or long reboot times.
->>
->> Where can I find the android-mainline repo, and which specific branch/commit
->> from that repo is being merged in?
-> 
-> I assume that was the android-mainline branch in:
-> 
->   https://android.googlesource.com/kernel/common/
-> 
-> ... and I had a go with commit:
-> 
->   8338670fd5bdf8d7 ("Merge "Merge 36289a03bcd3 ("Merge tag 'v6.3-p1' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6") into android-mainline" into android-mainline")
-> 
-> ... as that was the commit immediately before your local revert:
-> 
->   a32cec8e3f2253bc ("ANDROID: Revert "cpuidle, dt: Push RCU-idle into driver")
-> 
-> Testing on Juno R2 with defconfig + PROVE_LOCKING=y + DEBUG_LOCKDEP=y, I cannot
-> reproduce the reboot issue; everything seems to work just fine.
-> 
-> Can you say which config you're using?
-> 
-> Just to check: are you using a pristine version of that tree, or do you have
-> any vendor hooks present? I note that there are special hooks added to the
-> cpuidle and PSCI code, and I can imagine those might expect the old behaviour
-> w.r.t. RCU and idle, so ruling those out would help.
+Hi Jens,
 
-No reply to this since more than 10 days afaics, hence for now assuming
-that this is not really a regression.
+Any chance we could get this series looked at, please? It's the last
+thing we need to get userspace support going:
+https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/461
 
-#regzbot inconclusive: another dev could not reproduce issue; reporter
-MIA and might have used a patched tree
-#regzbot ignore-activity
+Thanks!
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+Kind regards,
+Luca Boccassi
