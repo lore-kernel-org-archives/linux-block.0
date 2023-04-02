@@ -2,88 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F841C761AF
-	for <linux-block@archiver.kernel.org>; Sun,  2 Apr 2023 02:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1246CC6FD1D
+	for <linux-block@archiver.kernel.org>; Sun,  2 Apr 2023 02:28:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230191AbjDBCZO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Apr 2023 22:25:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49252 "EHLO
+        id S229849AbjDBC2p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Apr 2023 22:28:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbjDBCZN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Apr 2023 22:25:13 -0400
+        with ESMTP id S229498AbjDBC2o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Apr 2023 22:28:44 -0400
 Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659F41CB8F
-        for <linux-block@vger.kernel.org>; Sat,  1 Apr 2023 19:25:12 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-62810466cccso1439938b3a.1
-        for <linux-block@vger.kernel.org>; Sat, 01 Apr 2023 19:25:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98FBCFF03
+        for <linux-block@vger.kernel.org>; Sat,  1 Apr 2023 19:28:43 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id u38so17057438pfg.10
+        for <linux-block@vger.kernel.org>; Sat, 01 Apr 2023 19:28:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680402312;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fNJn7rJ9mfi+8BFFswpknbpijn0YYNUZ+eri+Zl6WMI=;
-        b=KeSs8TLuUJ9k46im3nNlZft8qdRNFcPvl/dsXf01zYGR4qNwLMZGaC8JjwmwKhdSWo
-         h+bvguldTAPmOdwC3Ox5IAUJa1/FRehs3Wb3sszcFYjIRBkZ6RBXl+EAdpOHH3RhhrnR
-         NYV1yBLMPyVV565lYNviJPnzYwBCS1NQgOS7JoqEL9+vm0ZVf7vxXuik3CM0j0SHPlRg
-         XR464QAuAMYt8WMySF1bHOMdgTSVZ9X/n1z13nbyqjTZT8XEucF7+sA27OSst+JnlWIy
-         IkO5kW/ZomqVw1PVfMuwLnXuvo6rkQJ+1z50Dp0oXGFd6fIC6tDFHJQulFqp9PEA150Y
-         51gg==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680402523; x=1682994523;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mbBXik6s13zjuB8lqR/mXcNtwljV23YmiF9AVCc5Tqg=;
+        b=fs4EEMdJIsWQKkCDUlFJconzAAa10y3z9h/ND5chxiuUY/0NLR3/Wy+JZpITiLte7y
+         5NhX9P7DGIV9h6gGz4XBQjCcPBRB1LCvM5pjUTBa8CoCkDlAeBCxQU0RIGUvafb0Xzqo
+         a0FY8ySc/B8VW9/Bz1/ravjf6gXF3fCj3QoNF2dOUX1sndYgHAeP30nPh5Vy4K+Syy+/
+         4n8kYCvaoCdPXQeUfa0Vw8EZorA3NkK740WubnjeTZaQRlSfVz2V+duS1VUFTCCjIbqQ
+         hfs0y3Jik8HAKPzvs3YdULuDtzAXAWi82pXbWRsGSxjG7wIDCAf7tAmLKHef4zUjU6Zx
+         kLLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680402312;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fNJn7rJ9mfi+8BFFswpknbpijn0YYNUZ+eri+Zl6WMI=;
-        b=ddN1lXYz268a9z0lkiYsLf7e1nEY3g377cTcL6DUyKH3hyMsSVXGAW6vFeluuEmWKE
-         pvHR5mvAgqKSI3/SpnrDGXBfseKvpbHxmdCbzzPeCPuMDy8k+QddoPCEA8Qgcyeb44em
-         flIsj9p9wR8MrML2e1m4WIJy5N9gOhZhuu3o5GCsk8vOYwMHlnmuJW+yETcSfBegOFrP
-         Txc3vP3/Tvyqp/FTiCjdqya2OpCgSpP9Jo0Tz9K2ANhV5M/wPFkRC21NLWXBCndMORa2
-         NmLa6xnfjVjgyUwa0Lr53UUfzYqCJGbjc9RcOJZG/FoTpTyELtmtWheJoslhVVSPDyCv
-         OXXA==
-X-Gm-Message-State: AAQBX9cVDiYszoEhj4nylbxey1+Ps5P9hcVhAelV4l2cIZ1NlFnrPWBK
-        XmUhckbVdztQ0U1PiXtWnPVg1PEnzBkaHejfKip76Q==
-X-Google-Smtp-Source: AKy350ZnNIOuLbxw5ULmCgiQnJPVCvCEZyhLzu6XGUcIgGsjYDWtlYY54TXYdTiKrMyiMA/evkBk/g==
-X-Received: by 2002:a17:903:41cb:b0:1a2:9940:1f75 with SMTP id u11-20020a17090341cb00b001a299401f75mr8712478ple.0.1680402311736;
-        Sat, 01 Apr 2023 19:25:11 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ji21-20020a170903325500b0019956488546sm3934150plb.277.2023.04.01.19.25.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Apr 2023 19:25:11 -0700 (PDT)
-Message-ID: <87e110f9-a57d-520b-6fae-f75d16a71108@kernel.dk>
-Date:   Sat, 1 Apr 2023 20:25:10 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH] pktcdvd: simplify the class_pktcdvd logic
-Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230331164724.319703-1-gregkh@linuxfoundation.org>
+        d=1e100.net; s=20210112; t=1680402523; x=1682994523;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mbBXik6s13zjuB8lqR/mXcNtwljV23YmiF9AVCc5Tqg=;
+        b=BB9FD0BxzMwn8ZRTUZxzOPDLAV+V3jniIC8KGH6fCfn1gE1h0D/HkZ4XUpZqFHbrGF
+         F5/RUzZLdt46OM05lcqZMnHSyY94VixBU6OGpF+J94pDZSivpbRB1LE7rdbEf/rKefOb
+         qm8NepDLhsyIxx+D2+3+VL+Lh7kkuuRzYh1vbPfoY1ciZxgP7p4jfrCvK8L3qOp+G4kW
+         heZFWhKJMeg1scR1Jl8Dsp6wX/xYcIMgHW2YfRGbxpF8qCf9NjbArseyiYE1ax6x1L5f
+         /Dwr4Yr9xqW6DqjGPUg+e8JpYNkIOVC7D50BTGeFV9TgwYa6hvRy4Q6p/TVm1NIZ1cVg
+         fhVA==
+X-Gm-Message-State: AAQBX9caB3nm0Gyuhy+LRF8CzSU66rMn7G4QiegM9FTd4raXcEpGXUSc
+        lpvlqx3kOabBT+TT+fXYU5JTfw==
+X-Google-Smtp-Source: AKy350bAJbY260sAkhMhd0XbnK7IGHPfxtA8wVX6GOSyICoiV+ctVlXv6Fj7G84Y7FbOqRYmHeMsTA==
+X-Received: by 2002:a05:6a00:22cb:b0:627:ff64:85cc with SMTP id f11-20020a056a0022cb00b00627ff6485ccmr11929945pfj.0.1680402522990;
+        Sat, 01 Apr 2023 19:28:42 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id n23-20020a62e517000000b0061ddff8c53dsm4184006pff.151.2023.04.01.19.28.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Apr 2023 19:28:42 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230331164724.319703-1-gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     damien.lemoal@opensource.wdc.com, johannes.thumshirn@wdc.com,
+        bvanassche@acm.org, kbusch@kernel.org, vincent.fu@samsung.com,
+        shinichiro.kawasaki@wdc.com, error27@gmail.com
+In-Reply-To: <20230330184926.64209-1-kch@nvidia.com>
+References: <20230330184926.64209-1-kch@nvidia.com>
+Subject: Re: [PATCH V2 0/2] null_blk: usr memcpy_[to|from]_page()
+Message-Id: <168040252203.200172.2016544685299966439.b4-ty@kernel.dk>
+Date:   Sat, 01 Apr 2023 20:28:42 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-20972
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/23 10:47 AM, Greg Kroah-Hartman wrote:
-> There is no need to dynamically create and destroy the class_pktcdvd
-> structure, just make it static and remove the memory allocation logic
-> which simplifies and cleans up the logic a lot.
+
+On Thu, 30 Mar 2023 11:49:24 -0700, Chaitanya Kulkarni wrote:
+> From :include/linux/highmem.h:
+> "kmap_atomic - Atomically map a page for temporary usage - Deprecated!"
 > 
-> Cc: linux-block@vger.kernel.org
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> ---
-> Note, I would like to take this through my driver-core tree as it is
-> needed for other struct class cleanup work I have done and am continuing
-> to do there.
+> Use memcpy_from_page() since does the same job of mapping, copying, and
+> unmaping except it uses non deprecated kmap_local_page() and
+> kunmap_local(). Following are the differences between kmal_local_page()
+> and kmap_atomic() :-
+> 
+> [...]
 
-I'm going to defer to you on this kind of stuff, so if you think it's
-fine, then go for it.
+Applied, thanks!
 
+[1/2] null_blk: use non-deprecated lib functions
+      commit: acc3c8799b9723d0b6a8cd67f8036dfdaa280825
+[2/2] null_blk: use kmap_local_page() and kunmap_local()
+      commit: acc3c8799b9723d0b6a8cd67f8036dfdaa280825
+
+Best regards,
 -- 
 Jens Axboe
+
 
 
