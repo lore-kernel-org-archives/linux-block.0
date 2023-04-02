@@ -2,67 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58426C7619A
-	for <linux-block@archiver.kernel.org>; Sun,  2 Apr 2023 08:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 641B4C76196
+	for <linux-block@archiver.kernel.org>; Sun,  2 Apr 2023 12:40:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbjDBI5o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Apr 2023 04:57:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60908 "EHLO
+        id S229503AbjDBMkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Apr 2023 08:40:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjDBI5n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2023 04:57:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9FEAD1B;
-        Sun,  2 Apr 2023 01:57:42 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 782BC60F7D;
-        Sun,  2 Apr 2023 08:57:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8466FC433D2;
-        Sun,  2 Apr 2023 08:57:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1680425861;
-        bh=2Sp/WGMz3fqu0IaXp63wNcBNSGfhlqXDZ2bdpCKy3QE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aRXTcZE3mYfA7PFSOhgoQRvNu2hl66627nKgFVoEkrtOXff0lKGsaPS2a9VguB77m
-         ZyRjfqO1xodz/u05Do9gX9pyJ/kbag6WxBBe6sUQlDTcjl6qVG3mzPyX8bWDo9DxRm
-         AjNiDSm/ogxaogNW5RevI3uddevvVX3DKBXhie8c=
-Date:   Sun, 2 Apr 2023 10:57:39 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] pktcdvd: simplify the class_pktcdvd logic
-Message-ID: <2023040213-plop-krypton-b853@gregkh>
-References: <20230331164724.319703-1-gregkh@linuxfoundation.org>
- <87e110f9-a57d-520b-6fae-f75d16a71108@kernel.dk>
+        with ESMTP id S229719AbjDBMkv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2023 08:40:51 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10EF2E1B6;
+        Sun,  2 Apr 2023 05:40:48 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1pix0b-0005dt-9D; Sun, 02 Apr 2023 14:40:33 +0200
+Message-ID: <3a2ca263-7f60-63d3-7f9a-208ab8197c07@leemhuis.info>
+Date:   Sun, 2 Apr 2023 14:40:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87e110f9-a57d-520b-6fae-f75d16a71108@kernel.dk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
+ and slow-stuck reboots
+Content-Language: en-US, de-DE
+To:     Mark Rutland <mark.rutland@arm.com>,
+        Alexey Klimov <alexey.klimov@linaro.org>
+Cc:     peterz@infradead.org, draszik@google.com, peter.griffin@linaro.org,
+        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
+        tony@atomide.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        alim.akhtar@samsung.com, regressions@lists.linux.dev,
+        avri.altman@wdc.com, bvanassche@acm.org, klimova@google.com
+References: <20230314230004.961993-1-alexey.klimov@linaro.org>
+ <ZBhlL4tqSUi/c3qk@FVFF77S0Q05N.cambridge.arm.com>
+ <ZBiEEyDaxq9oSXJk@FVFF77S0Q05N.cambridge.arm.com>
+From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <ZBiEEyDaxq9oSXJk@FVFF77S0Q05N.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1680439249;6dba8e56;
+X-HE-SMSGID: 1pix0b-0005dt-9D
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 01, 2023 at 08:25:10PM -0600, Jens Axboe wrote:
-> On 3/31/23 10:47 AM, Greg Kroah-Hartman wrote:
-> > There is no need to dynamically create and destroy the class_pktcdvd
-> > structure, just make it static and remove the memory allocation logic
-> > which simplifies and cleans up the logic a lot.
-> > 
-> > Cc: linux-block@vger.kernel.org
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> > Note, I would like to take this through my driver-core tree as it is
-> > needed for other struct class cleanup work I have done and am continuing
-> > to do there.
+[TLDR: This mail in primarily relevant for Linux kernel regression
+tracking. See link in footer if these mails annoy you.]
+
+On 20.03.23 17:04, Mark Rutland wrote:
+> On Mon, Mar 20, 2023 at 01:52:47PM +0000, Mark Rutland wrote:
+>> On Tue, Mar 14, 2023 at 11:00:04PM +0000, Alexey Klimov wrote:
+>>> #regzbot introduced: 0c5ffc3d7b15
+>>> #regzbot title: CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait() and slow-stuck reboots
+>>>
+>>> The upstream changes are being merged into android-mainline repo and at some
+>>> point we started to observe kernel panics on reboot or long reboot times.
+>>
+>> Where can I find the android-mainline repo, and which specific branch/commit
+>> from that repo is being merged in?
 > 
-> I'm going to defer to you on this kind of stuff, so if you think it's
-> fine, then go for it.
+> I assume that was the android-mainline branch in:
+> 
+>   https://android.googlesource.com/kernel/common/
+> 
+> ... and I had a go with commit:
+> 
+>   8338670fd5bdf8d7 ("Merge "Merge 36289a03bcd3 ("Merge tag 'v6.3-p1' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6") into android-mainline" into android-mainline")
+> 
+> ... as that was the commit immediately before your local revert:
+> 
+>   a32cec8e3f2253bc ("ANDROID: Revert "cpuidle, dt: Push RCU-idle into driver")
+> 
+> Testing on Juno R2 with defconfig + PROVE_LOCKING=y + DEBUG_LOCKDEP=y, I cannot
+> reproduce the reboot issue; everything seems to work just fine.
+> 
+> Can you say which config you're using?
+> 
+> Just to check: are you using a pristine version of that tree, or do you have
+> any vendor hooks present? I note that there are special hooks added to the
+> cpuidle and PSCI code, and I can imagine those might expect the old behaviour
+> w.r.t. RCU and idle, so ruling those out would help.
 
-Thanks!  And sorry for sending this twice, I forgot I had previously
-sent this a few days prior.  Too many patches to juggle over here...
+No reply to this since more than 10 days afaics, hence for now assuming
+that this is not really a regression.
 
-greg k-h
+#regzbot inconclusive: another dev could not reproduce issue; reporter
+MIA and might have used a patched tree
+#regzbot ignore-activity
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
