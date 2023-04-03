@@ -2,62 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B76C76188
-	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 15:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFEAC76196
+	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 16:01:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232930AbjDCPwW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Apr 2023 11:52:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33378 "EHLO
+        id S232960AbjDCQBO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Apr 2023 12:01:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232952AbjDCPwH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 11:52:07 -0400
-Received: from out-14.mta0.migadu.com (out-14.mta0.migadu.com [IPv6:2001:41d0:1004:224b::e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6900C3ABA
-        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 08:51:40 -0700 (PDT)
-Date:   Mon, 3 Apr 2023 11:51:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1680537095;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=g2gJhk2EudPdDf1rhN0+Yqo19FdGtI3AE5kQt4njseU=;
-        b=xvC3EoZpCjRIKJSK/hMwRQRQLoIWADFK/Lxj5KYc3TL23GHTWhquFpjxEiiIy/Ch8MjEuw
-        MwwFvPIR7ofTcOYm5vwb8vNmt1FJzlw8x3sfWJD8pdQaZ9Y6G6yDyGciA0PezYCox2paBw
-        EflYNGdHo2WjJQYRlkhAE5h/kg318tU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        willy@infradead.org, axboe@kernel.dk
-Subject: Re: [PATCH 2/2] block: Rework bio_for_each_folio_all()
-Message-ID: <ZCr1/K03uGF3neCY@moria.home.lan>
-References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
- <20230327174402.1655365-3-kent.overstreet@linux.dev>
- <ZCrtEWEYGdGN++wX@infradead.org>
+        with ESMTP id S233155AbjDCQBG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 12:01:06 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5F6199A
+        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 09:00:56 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id a21-20020a5d9595000000b0074c9dc19e16so17960192ioo.15
+        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2023 09:00:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680537655; x=1683129655;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XENesBsTsU74N3xfCyWfV4bNRGTQ6uvKt1Bti6poCrs=;
+        b=ct2VwBhE40pkU1yWeLdqvoyY1YO8xiRGQ7PO3iG4CtrsdwjSIm3SM8IF0hh96+5zCV
+         U1iC4YvRFgXypRVOROZYyF1y7oEZimnY6z2g+3X3BqUo8kX5DFWts6kcOfG7aQ8hUMds
+         btUrmMKR9haPScx7Sp8H1378EsM5aOrEj7VlnEXyBxHoadwukaNZrQNR9GNsM4j6+q/U
+         WKtWLgmg6UnCtVK5yCjoYchfu6ZI754NBLnAzzXdz2DTWrMu+oHwFy+D647UF+2s9WJH
+         rLUqET9fUOt+OlB9uMDXvAjWyI1gr+NapqS5Q5+I6esDiCSK+T9M5aiCjPnCK4sVgdjC
+         PIZQ==
+X-Gm-Message-State: AAQBX9f6xA4A8hkduIfnh5T+UKqHm6MgUh5kGENUxtQd9b2Nisskstli
+        PVeE8VYxc1hZ2bP9BW/ytORKifwXhBlZI8bPNGxTRZoeFcj5Rzw=
+X-Google-Smtp-Source: AKy350YzWVQ79GIVWccMGTckSG2bbsFhrcm3U+O/3yjbJNXWNn3jvmXa8/vmak2qK0hmIOz5IYV6xs5EvvS5us8MCSc3rkWofFT1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZCrtEWEYGdGN++wX@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:ecc:b0:325:f785:6a6 with SMTP id
+ i12-20020a056e020ecc00b00325f78506a6mr15270093ilk.6.1680537655756; Mon, 03
+ Apr 2023 09:00:55 -0700 (PDT)
+Date:   Mon, 03 Apr 2023 09:00:55 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000000d1d705f870aaee@google.com>
+Subject: [syzbot] Monthly block report
+From:   syzbot <syzbot+list7f409556e0cf60fa6f76@syzkaller.appspotmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 03, 2023 at 08:13:21AM -0700, Christoph Hellwig wrote:
-> On Mon, Mar 27, 2023 at 01:44:02PM -0400, Kent Overstreet wrote:
-> > +	bio_for_each_folio_all(fv, bio, iter)
-> > +		iomap_finish_folio_read(fv.fv_folio, fv.fv_offset, fv.fv_len, error);
-> 
-> Please avoid the overly long lines.  Also if we pass all arguments
-> of the folio_vec we might as ell just pass that folio_vec anyway.
-> 
-> > -	BUG_ON(iter->idx > bio->bi_vcnt || (iter->idx == bio->bi_vcnt && iter->done));
-> > +	BUG_ON(iter->idx > bio->bi_vcnt ||
-> > +	       (iter->idx == bio->bi_vcnt && iter->done));
-> 
-> Seems like this should be folded into the previous patch.  Also I
-> generally prefer to avoid top-level || in asserts and just do multiple
-> asserts, as that shows which condition triggered.
+Hello block maintainers/developers,
 
-It should be folded in, but it's logically the same assert (advance
-past the end of the iter) so not worth the increased code size.
+This is a 30-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
+
+During the period, 2 new issues were detected and 1 were fixed.
+In total, 24 issues are still open and 73 have been fixed so far.
+
+Some of the still happening issues:
+
+Crashes Repro Title
+343     Yes   INFO: task hung in blkdev_put (4)
+              https://syzkaller.appspot.com/bug?extid=9a29d5e745bd7523c851
+173     Yes   WARNING in copy_page_from_iter
+              https://syzkaller.appspot.com/bug?extid=63dec323ac56c28e644f
+71      Yes   INFO: task hung in blkdev_fallocate
+              https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+21      Yes   WARNING in blk_register_tracepoints
+              https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
+14      Yes   INFO: task hung in blkdev_get_by_dev (5)
+              https://syzkaller.appspot.com/bug?extid=6229476844294775319e
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
