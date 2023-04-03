@@ -2,110 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33AC1C761A6
-	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 13:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C66C761A6
+	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 14:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232681AbjDCN50 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Apr 2023 09:57:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34850 "EHLO
+        id S233295AbjDCOZw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Apr 2023 10:25:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232755AbjDCN5X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 09:57:23 -0400
-Received: from p3plwbeout26-04.prod.phx3.secureserver.net (p3plsmtp26-04-2.prod.phx3.secureserver.net [216.69.139.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D2A4486
-        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 06:57:18 -0700 (PDT)
-Received: from mailex.mailcore.me ([94.136.40.143])
-        by :WBEOUT: with ESMTP
-        id jKgOpwxkjJzPrjKgPpDhO5; Mon, 03 Apr 2023 06:57:17 -0700
-X-CMAE-Analysis: v=2.4 cv=OJjiYQWB c=1 sm=1 tr=0 ts=642adb3d
- a=EhJYbXVJKsomWlz4CTV+qA==:117 a=84ok6UeoqCVsigPHarzEiQ==:17
- a=ggZhUymU-5wA:10 a=IkcTkHD0fZMA:10 a=dKHAf1wccvYA:10 a=v52JICOvAAAA:20
- a=4ao_m9BdAAAA:8 a=WCF8PDb0v4YLkHPhQUUA:9 a=QEXdDO2ut3YA:10
- a=MsgbvsnFcLE8lbaOJhbn:22
-X-SECURESERVER-ACCT: phillip@squashfs.org.uk  
-X-SID:  jKgOpwxkjJzPr
-Received: from 82-69-79-175.dsl.in-addr.zen.co.uk ([82.69.79.175] helo=[192.168.178.33])
-        by smtp03.mailcore.me with esmtpa (Exim 4.94.2)
-        (envelope-from <phillip@squashfs.org.uk>)
-        id 1pjKgA-00005A-Od; Mon, 03 Apr 2023 14:57:05 +0100
-Message-ID: <ab1c2512-7dd6-5246-7213-077022a85c2f@squashfs.org.uk>
-Date:   Mon, 3 Apr 2023 14:57:02 +0100
+        with ESMTP id S233291AbjDCOZv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 10:25:51 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB9CB2B0D6;
+        Mon,  3 Apr 2023 07:25:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=tPLcLIMQuTkpwt1uxM6/NR9e+5ws7a0VS6jnQRtPH08=; b=Mh/k+rFpGlTmouG9aSBAmjU9Dl
+        CkQCmtpT0He99s6WHpRflV9v8qXpw9cU6/fi9W8EdXcHATsJ4Lj/5eLNXcOaxjDRvRFd7S1gtaimN
+        oa5dtbsdhKrUDr1+ngB8HqdhtLj4TLDAZAWIq8Hxere6rv6/jH2IFrK7S96vI7rDZJz4a1pu6gsYS
+        LfrvuyfyToaiPkU2iRBbQO/2k6XG3rHEb6RnzQtL6WyPcPwtxCOKzKAGdRvY/7qkSN84UI22S3YEx
+        Ia2lIOiQNVQZ9mRW4yatYeRXaIBaxM48cXMT6CBcxUFuUhBAoOHCWWsiYAqJTRqFRdQotzLFWzSHr
+        iF0dk39g==;
+Received: from [2001:4bb8:191:a744:529d:286f:e3d8:fddb] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pjL7z-00Fdkt-2n;
+        Mon, 03 Apr 2023 14:25:48 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     dhowells@redhat.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: two little cleanups for the for-6.4/splice branch
+Date:   Mon,  3 Apr 2023 16:25:40 +0200
+Message-Id: <20230403142543.1913749-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 1/2] block: Rework bio_for_each_segment_all()
-To:     Kent Overstreet <kent.overstreet@linux.dev>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        willy@infradead.org, axboe@kernel.dk,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
- <20230327174402.1655365-2-kent.overstreet@linux.dev>
- <52a5bd5c-d3a1-71d7-e1e5-7965501818bd@squashfs.org.uk>
- <ZCXNDQ6Eslhj+9g5@moria.home.lan>
- <4753802a-685f-ab56-fed2-22d6eb4cfccd@squashfs.org.uk>
- <5ab59623-4317-5aff-5173-d7285b5b224c@squashfs.org.uk>
- <ZCeW6j44aHGI/v5Q@moria.home.lan>
-From:   Phillip Lougher <phillip@squashfs.org.uk>
-In-Reply-To: <ZCeW6j44aHGI/v5Q@moria.home.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Mailcore-Auth: 439999529
-X-Mailcore-Domain: 1394945
-X-123-reg-Authenticated:  phillip@squashfs.org.uk  
-X-Originating-IP: 82.69.79.175
-X-CMAE-Envelope: MS4xfK3f+MDVXoFRtin485DFFzlIRVdxg0qVA+GWjA05vGW2VyzcJIPoCK0uGIhCXDqApniUXrj2Tdan4gdcgZiw474qLG22fi4KZGfdS91yTNjLwLY6d3wY
- rWvKpfFFzFcsYMhfQj/g4rBr52mOMNpMCDxNC2o45p0loZV5pZAmxC8+JGkj/1ENDO45wb1Yark8w2DfGVgkV34ggESOTjglpFQPEgKkFUHsAvoT7DvFFoow
- SiM+O2gImWKVlb/yvHJkjQ==
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01/04/2023 03:28, Kent Overstreet wrote:
-> On Fri, Mar 31, 2023 at 02:10:15AM +0100, Phillip Lougher wrote:
->> On 30/03/2023 19:59, Phillip Lougher wrote:
->>> On 30/03/2023 18:55, Kent Overstreet wrote:
->>>> On Wed, Mar 29, 2023 at 05:50:27PM +0100, Phillip Lougher wrote:
->>>>> There is a problem with the above code, on testing I get the following
->>>>> results:
->>>>>
->>>>> Index 78018785329, offset 49, bvec.bv_len 1024: In same bio,
->>>>> metadata length
->>>>> 32780
->>>>
->>>> Could you share how you're doing your testing? I set up a basic test
->>>> (created images using every compression type, tested reading them) and
->>>> so far I'm not able to reproduce this.
->>>
->>> I use a very large Squashfs file that triggers the edge case.
->>>
->>> That is too big to post, and so I'll see if I can artifically generate
->>> a small Squashfs filesystem that triggers the edge case.
->>>
->>> Phillip
->>>
->>>
->>
->> Hi,
->>
->> This is a Google drive link to a file that triggers the issue.
->>
->> https://drive.google.com/file/d/1-3-a1BKq62hZGQ6ynioreMSWFMuCV9B4/view?usp=sharing
->>
->> To reproduce the issue
->>
->> % mount -t squashfs <the file> /mnt -o errors=panic
->>
->> then either one of the following will produce a panic
->>
->> % ls /mnt
->> % find /mnt -type f | xargs wc > /dev/null
-> 
-> Appears to be fixed now - updated version of the patchset is at
-> https://evilpiepirate.org/git/bcachefs.git bio_folio_iter
-> 
-> Can you confirm, then I'll mail out the updated series?
+Hi Jens,
 
-Thw updated patch-set fixes the issues seen.
-
-Phillip
-
+this series removes two now unused functions.
