@@ -2,102 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7ECBC7619A
-	for <linux-block@archiver.kernel.org>; Sun,  2 Apr 2023 14:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AACE8C76196
+	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 01:12:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230141AbjDBOuK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Apr 2023 10:50:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51832 "EHLO
+        id S230204AbjDCBMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Apr 2023 21:12:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjDBOuJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2023 10:50:09 -0400
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E234686
-        for <linux-block@vger.kernel.org>; Sun,  2 Apr 2023 07:50:05 -0700 (PDT)
-Received: by mail-yb1-f171.google.com with SMTP id f188so13612906ybb.3
-        for <linux-block@vger.kernel.org>; Sun, 02 Apr 2023 07:50:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680447004; x=1683039004;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fSJkeczsRCJsz2ttU8oQJ8eXqzZE348TERtH4FIpWw4=;
-        b=yw4uYmYD8WH74wmJIB+gwT/m7zOP7RyfMSPKPBt552l1pO+VhYou2JmjBX8Z44dyXv
-         9YKYkpaUIrim5hWpeAnUbfY0HckQNTa3TKJItwCYPgYaGyi2LHSX10vlPt7qT/bvFU8d
-         KOqfYK0Ai85+Xn8ZspL5RIQm1ECu4uBgudBrXhgqtJdUMKnSMs0LzJ8In8pJ3wEeYC3e
-         dvHwVyrcRLQn7X81tPR18naC/S9ss4u6n64HFNpMoHh64lvqMWFKCiEBMMxgY2nA+r8I
-         3w9ZzT+uVFYalCboiM1Qq6HyDlN6Oa4ML6r4fgfHTIje60Eqc7sSVDv+DgvzuUSmEhif
-         Vgpg==
-X-Gm-Message-State: AAQBX9ejF5A2h1hKOX8f24Sgd/SoiGs7JS69gryyjObtRY3ljBXNLjAU
-        FkhfHAS0E0fwrFIZ1HjvNnPI73B4ZEfjdQ==
-X-Google-Smtp-Source: AKy350YDC51pfRC1iE5hbO2R/dHHTWgGrh1cFEEXdbYEEml+tcLvqcgdZ4Xs91aEMi2nJAoJIZcbNg==
-X-Received: by 2002:a25:e68b:0:b0:b72:ec3d:c670 with SMTP id d133-20020a25e68b000000b00b72ec3dc670mr27717767ybh.10.1680447004014;
-        Sun, 02 Apr 2023 07:50:04 -0700 (PDT)
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com. [209.85.219.171])
-        by smtp.gmail.com with ESMTPSA id g16-20020a25ef10000000b00b7d2204cd4bsm1927019ybd.21.2023.04.02.07.50.01
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Apr 2023 07:50:02 -0700 (PDT)
-Received: by mail-yb1-f171.google.com with SMTP id i6so32097389ybu.8
-        for <linux-block@vger.kernel.org>; Sun, 02 Apr 2023 07:50:01 -0700 (PDT)
-X-Received: by 2002:a05:6902:1586:b0:b76:ceb2:661b with SMTP id
- k6-20020a056902158600b00b76ceb2661bmr21171344ybu.3.1680447001548; Sun, 02 Apr
- 2023 07:50:01 -0700 (PDT)
+        with ESMTP id S230200AbjDCBMQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Apr 2023 21:12:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1BD6A5F7
+        for <linux-block@vger.kernel.org>; Sun,  2 Apr 2023 18:11:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680484288;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AQE8Zgt4vs0BP5OpIWmWFH54NBQOZeUZ1VG+31AaATI=;
+        b=V0zlXHU48dHE0HZ66hFaVwP0cRSS8395Q6BdWMx61na54IRTwjGtEIuUrleryVolIleZ9X
+        Von13numZUOTe9mUcDuvGPjzV3gsxheiQ+nMof7+X4KW+szIajZ/2z9LveIwv2b6et2zXm
+        gQ25ramO2YOYjOz4m1b0ea0P5HcRPHI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-58-uKq9kBVwPJGFRqjSzmVk-w-1; Sun, 02 Apr 2023 21:11:25 -0400
+X-MC-Unique: uKq9kBVwPJGFRqjSzmVk-w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 903203804507;
+        Mon,  3 Apr 2023 01:11:24 +0000 (UTC)
+Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 28F762166B3F;
+        Mon,  3 Apr 2023 01:11:16 +0000 (UTC)
+Date:   Mon, 3 Apr 2023 09:11:11 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V6 00/17] io_uring/ublk: add generic IORING_OP_FUSED_CMD
+Message-ID: <ZConr0f8e/mEL0Cl@ovpn-8-18.pek2.redhat.com>
+References: <20230330113630.1388860-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20230322151604.401680-1-okozina@redhat.com>
-In-Reply-To: <20230322151604.401680-1-okozina@redhat.com>
-From:   Luca Boccassi <bluca@debian.org>
-Date:   Sun, 2 Apr 2023 15:49:50 +0100
-X-Gmail-Original-Message-ID: <CAMw=ZnRHomfw33tnnMNAz+WyhH8bWjiZ1-2qQm3tqevNtkOOVA@mail.gmail.com>
-Message-ID: <CAMw=ZnRHomfw33tnnMNAz+WyhH8bWjiZ1-2qQm3tqevNtkOOVA@mail.gmail.com>
-Subject: Re: [PATCH 0/5] sed-opal: add command to read locking range attributes
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, gmazyland@gmail.com,
-        hch@infradead.org, brauner@kernel.org, rafael.antognolli@intel.com,
-        Ondrej Kozina <okozina@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230330113630.1388860-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 22 Mar 2023 at 15:16, Ondrej Kozina <okozina@redhat.com> wrote:
->
-> This patch set aims to add ability to user authorities to read locking
-> range attributes.
->
-> It's achieved in two steps (except SUM enabled drives):
->
-> 1) Patch IOC_OPAL_ADD_USR_TO_LR command so that user authority (together with
-> OPAL_ADMIN1) is added in ACE that allows getting locking range attributes.
->
-> 2) Add new ioctl command IOC_OPAL_GET_LR_STATUS to get locking range
-> attributes to user authority assigned to specific locking range.
->
-> libcryptsetup plans to support OPAL2 drives and needs to verify locking
-> range parameters before device activation (LR unlock) takes place since
-> it's considered undesirable to have (for example) partition mapped beyond
-> locking range boundaries.
->
-> Ondrej Kozina (5):
->   sed-opal: do not add user authority twice in boolean ace.
->   sed-opal: add helper for adding user authorities in ACE.
->   sed-opal: allow user authority to get locking range attributes.
->   sed-opal: add helper to get multiple columns at once.
->   sed-opal: Add command to read locking range parameters.
->
->  block/opal_proto.h            |   1 +
->  block/sed-opal.c              | 263 ++++++++++++++++++++++++++++------
->  include/linux/sed-opal.h      |   1 +
->  include/uapi/linux/sed-opal.h |  11 ++
->  4 files changed, 233 insertions(+), 43 deletions(-)
+On Thu, Mar 30, 2023 at 07:36:13PM +0800, Ming Lei wrote:
+> Hello Jens and Guys,
+> 
+> Add generic fused command, which can include one primary command and multiple
+> secondary requests. This command provides one safe way to share resource between
+> primary command and secondary requests, and primary command is always
+> completed after all secondary requests are done, and resource lifetime
+> is bound with primary command.
+> 
+> With this way, it is easy to support zero copy for ublk/fuse device, and
+> there could be more potential use cases, such as offloading complicated logic
+> into userspace, or decouple kernel subsystems.
+> 
+> Follows ublksrv code, which implements zero copy for loop, nbd and
+> qcow2 targets with fused command:
+> 
+> https://github.com/ming1/ubdsrv/tree/fused-cmd-zc-for-v6
+> 
+> All three(loop, nbd and qcow2) ublk targets have supported zero copy by passing:
+> 
+> 	ublk add -t [loop|nbd|qcow2] -z .... 
+> 
+> Also add liburing test case for covering fused command based on miniublk
+> of blktest.
+> 
+> https://github.com/ming1/liburing/tree/fused_cmd_miniublk_for_v6
+> 
+> Performance improvement is obvious on memory bandwidth related workloads,
+> such as, 1~2X improvement on 64K/512K BS IO test on loop with ramfs backing file.
+> ublk-null shows 5X IOPS improvement on big BS test when the copy is avoided.
+> 
+> Please review and consider for v6.4.
+> 
+> V6:
+> 	- re-design fused command, and make it more generic, moving sharing buffer
+> 	as one plugin of fused command, so in future we can implement more plugins
+> 	- document potential other use cases of fused command
+> 	- drop support for builtin secondary sqe in SQE128, so all secondary
+> 	  requests has standalone SQE
+> 	- make fused command as one feature
+> 	- cleanup & improve naming
 
 Hi Jens,
 
-Any chance we could get this series looked at, please? It's the last
-thing we need to get userspace support going:
-https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/461
+Can you apply ublk cleanup patches 7~11 on for-6.4? For others, we may
+delay to 6.5, and I am looking at other approach too.
 
-Thanks!
 
-Kind regards,
-Luca Boccassi
+Thanks,
+Ming
+
