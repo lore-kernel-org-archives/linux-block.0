@@ -2,63 +2,60 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE03C76196
-	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 15:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF77AC76188
+	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 15:13:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231450AbjDCPKm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Apr 2023 11:10:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44818 "EHLO
+        id S231899AbjDCPNY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Apr 2023 11:13:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230044AbjDCPKl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 11:10:41 -0400
+        with ESMTP id S229780AbjDCPNY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 11:13:24 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEAF6197;
-        Mon,  3 Apr 2023 08:10:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E409D;
+        Mon,  3 Apr 2023 08:13:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZoXFx8oNL/N+tUpgQ9R5nRcJHiW5eJ11y0V+QBJtJbE=; b=JtMGl/T1h3Tk0EB9kqoDklN/1D
-        vjpkewGSjYKCtkYwxAWFfCJqGdz2D4VE+0UDW8kLyvNHtkKi80O74EHK9KRsfQC0kTPlqp3Of78Wi
-        oaDoWR0W6adOx2tA/Gyov+yKLgKsd+zHQ4uomWio0xAnlGrvOR3VeRugIZDiTveSJ8COwJLn1jV2u
-        9WM0+/+wnsmTAkUhMC+Vi/2ifOoYmc0d459vRfx5KPv2me5HB9xovqCbHkGwFsJNdh98ZLeWgH11R
-        Qteon8LpKeuBCIAbWEeQt+SkgNcmhwlguFM/qRQ28kclUvSnvjP9lMjBC8RUrcwWbg3JDI1Vj51ys
-        Ol+vdD9g==;
+        bh=B7kXOVNKKiYGm55LmYo0xLWWOBNIP+Mr/6zTfTQhP4Y=; b=Gt8/CIKy93b4Mx86hSubZHEeFl
+        +7LgmPyqg45dIbDO94knccQIb8oGwFp2IWCL16yWJnKaOxe3cqzf9iS5VK4btn1wDSB/SfPB4vyaa
+        cw+hRDSbkXTftd4AQus1hdriDCjc9labIJEbRzJQrYmDZrHo+ZKMu7e1zhrUpd+MIGaTR10Js2Skw
+        7NSdOgAKWyZ4NaXWDsciHiAQktdcPsBEX+fGlyqQiTH8uXySChIVHrsPkxpjK6t5MmyLdK/0SUk9c
+        BL0gY3XnNJOFPzGe2hCYr5E1NEkDH7VlDUeGS8Qsiuj5YjQxAu1KHuetUeEs9nlsNY8gkfIe+rMdU
+        OlmPBKpg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pjLpO-00FkAA-1h;
-        Mon, 03 Apr 2023 15:10:38 +0000
-Date:   Mon, 3 Apr 2023 08:10:38 -0700
+        id 1pjLs1-00FkUU-2f;
+        Mon, 03 Apr 2023 15:13:21 +0000
+Date:   Mon, 3 Apr 2023 08:13:21 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Kent Overstreet <kent.overstreet@linux.dev>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         willy@infradead.org, axboe@kernel.dk
-Subject: Re: [PATCH 0/2] bio iter improvements
-Message-ID: <ZCrsbv+zKGf4jvUm@infradead.org>
+Subject: Re: [PATCH 2/2] block: Rework bio_for_each_folio_all()
+Message-ID: <ZCrtEWEYGdGN++wX@infradead.org>
 References: <20230327174402.1655365-1-kent.overstreet@linux.dev>
- <ZCIVLQ6Klrps6k1g@infradead.org>
- <ZCNN2GE3WBjMkLkH@moria.home.lan>
+ <20230327174402.1655365-3-kent.overstreet@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZCNN2GE3WBjMkLkH@moria.home.lan>
+In-Reply-To: <20230327174402.1655365-3-kent.overstreet@linux.dev>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 28, 2023 at 04:28:08PM -0400, Kent Overstreet wrote:
-> > Can you post a code size comparism for the before and after cases?
-> 
-> 6.2:
-> kent@moria:~/linux$ size ktest-out/kernel_build.x86_64/vmlinux
->    text    data     bss     dec     hex filename
-> 13234215        5355074  872448 19461737        128f669 ktest-out/kernel_build.x86_64/vmlinux
-> 
-> With patches:
-> kent@moria:~/linux$ size ktest-out/kernel_build.x86_64/vmlinux
->    text    data     bss     dec     hex filename
-> 13234215        5355578  872448 19462241        128f861 ktest-out/kernel_build.x86_64/vmlinux
+On Mon, Mar 27, 2023 at 01:44:02PM -0400, Kent Overstreet wrote:
+> +	bio_for_each_folio_all(fv, bio, iter)
+> +		iomap_finish_folio_read(fv.fv_folio, fv.fv_offset, fv.fv_len, error);
 
-So we have a slightly larger binary size, and a slighly larger source
-code size.  What is the overall benefit of this conversion?
+Please avoid the overly long lines.  Also if we pass all arguments
+of the folio_vec we might as ell just pass that folio_vec anyway.
+
+> -	BUG_ON(iter->idx > bio->bi_vcnt || (iter->idx == bio->bi_vcnt && iter->done));
+> +	BUG_ON(iter->idx > bio->bi_vcnt ||
+> +	       (iter->idx == bio->bi_vcnt && iter->done));
+
+Seems like this should be folded into the previous patch.  Also I
+generally prefer to avoid top-level || in asserts and just do multiple
+asserts, as that shows which condition triggered.
