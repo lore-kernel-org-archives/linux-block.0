@@ -2,212 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBEE3C76188
-	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 18:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80253C76188
+	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 20:40:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231653AbjDCSlz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Apr 2023 14:41:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48054 "EHLO
+        id S233463AbjDCUkL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Apr 2023 16:40:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232493AbjDCSlu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 14:41:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB8E8BC
-        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 11:41:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680547259;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pnUfxiNzIDCXaSEDlUou/KQ85PIVBXyvNqN5IYn9Rr0=;
-        b=i4UyChUS93gfMcmzoiqhx4swBrEd6BB5raZHM/i8h2T1SH5jU4JfUdo3DtUb8w87xsouk5
-        6XuZREK6/VT4sc2QOXM3In6jc7k9LUwgvyHG5qZ1O3YoOU2Q95OUwPVIv6ea5dODDMdT2a
-        GcXowV6olRkl5eAtiHx29cBKAxBY+qE=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-512-kGNpSXRBMK61uIHSej3Nbg-1; Mon, 03 Apr 2023 14:40:58 -0400
-X-MC-Unique: kGNpSXRBMK61uIHSej3Nbg-1
-Received: by mail-ot1-f72.google.com with SMTP id x20-20020a9d7054000000b006a149b4ad1cso7977365otj.23
-        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2023 11:40:58 -0700 (PDT)
+        with ESMTP id S232357AbjDCUkK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 16:40:10 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0FD1270C
+        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 13:40:07 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id er13so81346294edb.9
+        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2023 13:40:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112; t=1680554406;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=98lpmjVP03rasH0aUw5Or4NqpKX/eDyfmYvak2z+XQY=;
+        b=aOrySHi+L5aBtQhD9CMl2wIUewhWyIyQQXGmhw67rG4aYB/0VxtLJJdx4JKcjr4/Su
+         CKHv3ZrfEko2du/9DiJPnmJgfyM9NzFrN9wGLJLRnVWtCv6yd58ea0gAc1LIGcNps8aF
+         iQTbr3AocnQwqVN0vRpZPBqysYDShbz/ZYTddqaS5BtXq0sVascssl+jkJwncPNANTjk
+         LRdvan3ZAUekClGuJ3S02i2YGWuAiDNHkJMii0Y/083m5jLXpgQg8MobYoyssOoaX1B9
+         uxV+Z9IvmlmsJ8Y4QsY7pkdlMNW7ukQiPmVap2uSl7WIEp0ptj20puF/FpeYyuTT9zI9
+         0ZgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680547258;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pnUfxiNzIDCXaSEDlUou/KQ85PIVBXyvNqN5IYn9Rr0=;
-        b=hwMQRwd2YVAGEfBrFKJ8LhGtxyov29SAI0sJEf8psZ+jWTMxdtmENFqI6taopqEobV
-         mymdUHI7oS3g+CZwiWvzsYBxIDZ6kGe9txJXQPeb9hD67t1ksqsK0B9bCy+TVOLI7189
-         9zrQrlMn95sT8LurhZONFBBLDidY+jV7NHWtnvpywA9GVDjf7+AK5g0Lm6I9kVuzqd+S
-         oA0l73Ct3hEQf8k6Vo1Ayq6VdAldwJhCs+YMDh3wjK7r4KGEmTRjPxm8EjoUhrRTKqJ+
-         cBep3IhpHpqgntWVuU73jrtzcpvhYhWhR7T35M7uUh1fFTYE1hZJrHEvZJh8OOm1SO+K
-         X94g==
-X-Gm-Message-State: AAQBX9ebScFAnXxe/BywPQeuZ6Ga90MI7Xo8U1ju9YHxm4nEDX8i64HL
-        r9Onpb2kUvfisby8S00hW4DvcuskJlNHGDhGQ08lqcbQIL2y5Gnw6N7XUkHHTNZ5pr7MZifTZ0x
-        eTzbALkYDMK/VJOYVrI7goVc=
-X-Received: by 2002:a4a:1187:0:b0:541:521:b527 with SMTP id 129-20020a4a1187000000b005410521b527mr198579ooc.7.1680547258078;
-        Mon, 03 Apr 2023 11:40:58 -0700 (PDT)
-X-Google-Smtp-Source: AKy350Yjw6SX+mZhSvcqaOrhUXUnvCZA88w50+qKtKQMN6F8MzrhjcbntFSEGSL5GlXqrbUxSoQBeA==
-X-Received: by 2002:a4a:1187:0:b0:541:521:b527 with SMTP id 129-20020a4a1187000000b005410521b527mr198576ooc.7.1680547257803;
-        Mon, 03 Apr 2023 11:40:57 -0700 (PDT)
-Received: from ?IPv6:2600:6c64:4e7f:603b:45:ae91:c478:3bf0? ([2600:6c64:4e7f:603b:45:ae91:c478:3bf0])
-        by smtp.gmail.com with ESMTPSA id q40-20020a4a962b000000b0053b543b027bsm4255367ooi.42.2023.04.03.11.40.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Apr 2023 11:40:57 -0700 (PDT)
-Message-ID: <02ba658226be85a2b5ea678116fdc4c3059b82a7.camel@redhat.com>
-Subject: Re: Issue with discard with NVME and Infinibox Storage
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     minlei@redhat.com, jmeneghi@redhat.com,
-        "Hellwig, Christoph" <hch@infradead.org>, axboe@fb.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Date:   Mon, 03 Apr 2023 14:40:55 -0400
-In-Reply-To: <89d2cd0379c848f145eed7daf1931d7b4c81b230.camel@redhat.com>
-References: <d1dbb7c5eca51993e9988849ab2e43e800ecb067.camel@redhat.com>
-         <ZCsUMR3uLx+vPoOp@kbusch-mbp.dhcp.thefacebook.com>
-         <89d2cd0379c848f145eed7daf1931d7b4c81b230.camel@redhat.com>
+        d=1e100.net; s=20210112; t=1680554406;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=98lpmjVP03rasH0aUw5Or4NqpKX/eDyfmYvak2z+XQY=;
+        b=TuRMtPFULSTtq3E2O1ZEy/+EgYFkPjk+Dd4+xkTd+PmPWxdOIk7vnYrzIUsWcPEZ3J
+         hUYFReXdtYI1nr67h4u6MGBlSj/AAG1TTKS/UmvnUji8nY/lRM+IDH6/elWzog2fRaOi
+         i6ovYbAiGVfvfuBY7cqFKGNTvCucvOIBYYqp4YSqSRea3mgl+JElvHtGJcAiP4dp2qSt
+         0CDCUqYPwdDBFR5Ha0ur3LKZpOwvW/euD2iTd0/tHqosRDFp/qBiIQh2qdtEBsMVEQPo
+         TNDiaoWIMvMNCZjq6Xt5MxLTDbU/u/1s2UC2t/BJvvT3UuOQj36ptgNROEgGOY4qDqsa
+         ZpYA==
+X-Gm-Message-State: AAQBX9fGfMjqz1dk2+87l7jbk5c3SXedLtywpzdQdx+7dD0cHkmYr6gR
+        c/dWTGPREo7xnHE7mYUEquQY0wM3TZUNlgXBNMcaow==
+X-Google-Smtp-Source: AKy350Zgaw5pQ0oWUtuZqoGHW8zTg36m0ZFKQebBTrdHG4AMl+dpXooPrkU+eTMNeuZDA0kcJZZ9arc1xcfhu4d3GZg=
+X-Received: by 2002:a50:bac2:0:b0:502:1d1c:7d37 with SMTP id
+ x60-20020a50bac2000000b005021d1c7d37mr259671ede.8.1680554406118; Mon, 03 Apr
+ 2023 13:40:06 -0700 (PDT)
+MIME-Version: 1.0
+References: <ZCU1Bp+5bKNJzWIu@dhcp22.suse.cz> <CAJD7tka0CmRvcvB0k8DZuid1vC9OK_mFriHHbXNTUkVE7OjaTA@mail.gmail.com>
+ <ZCU+8lSi+e4WgT3F@dhcp22.suse.cz> <CAJD7tkaKd9Bcb2-e83Q-kzF7G+crr1U+7uqUPBARXWq-LpyKvw@mail.gmail.com>
+ <ZCVFA78lDj2/Uy0C@dhcp22.suse.cz> <CAJD7tkbjmBaXghQ+14Hy28r2LoWSim+LEjOPxaamYeA_kr2uVw@mail.gmail.com>
+ <ZCVKqN2nDkkQFvO0@dhcp22.suse.cz> <CAJD7tkYEOVRcXs-Ag3mWn69EwE4rjFt9j5MAcTGCNE8BuhTd+A@mail.gmail.com>
+ <ZCa9sixp3GJcjf8Y@dhcp22.suse.cz> <CAJD7tka-2vNn25=NdrKQoMf4ntdbWtojY0k4eAa-c9D+v7J=HQ@mail.gmail.com>
+ <ZCqQfuprGreGYwFA@dhcp22.suse.cz>
+In-Reply-To: <ZCqQfuprGreGYwFA@dhcp22.suse.cz>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Mon, 3 Apr 2023 13:39:29 -0700
+Message-ID: <CAJD7tkZF+rCNW4pctjOfAetoAQRq7-exV-j-nRc_xYMkMBGY_A@mail.gmail.com>
+Subject: Re: [PATCH v2 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
+ outside task context
+To:     Michal Hocko <mhocko@suse.com>
+Cc:     Johannes Weiner <hannes@cmpxchg.org>,
+        Shakeel Butt <shakeelb@google.com>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+        Vasily Averin <vasily.averin@linux.dev>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2023-04-03 at 14:18 -0400, Laurence Oberman wrote:
-> On Mon, 2023-04-03 at 12:00 -0600, Keith Busch wrote:
-> > On Mon, Apr 03, 2023 at 01:35:22PM -0400, Laurence Oberman wrote:
-> > > Hello Ming and Christoph
-> > >=20
-> > > Issue with Infinibox storage
-> > > ----------------------------
-> > > Really discovered 2 issues here=20
-> > >=20
-> > > Issue 1
-> > > Kernels 5.15 to 5.18 inclusive recognize the discard support on
-> > > the
-> > > Infinibox device but they fail in the nvme_setup_discard function
-> > > call
-> >=20
-> > This first i ssue should be fixed with this commit:
-> >=20
-> > =C2=A0
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it?id=3D37f0dc2ec78af0c3f35dd05578763de059f6fe77
-> >=20
-> > > Issue 2
-> > > Trying to narrow this down.
-> > > 5.19 and higher (6.3 included), no longer support discard on the
-> > > Infinibox device and log this message so I cannot run the test
-> > > for
-> > > the
-> > > discard issue
-> > >=20
-> > > [=C2=A0=C2=A0 35.989809] nvme nvme1: new ctrl: NQN "nqn.2020-
-> > > 01.com.infinidat:36000-subsystem-696", addr 192.168.1.2:4420
-> > > [=C2=A0=C2=A0 64.810437] XFS (nvme1n1): mounting with "discard" optio=
-n, but
-> > > the
-> > > device does not support discard
-> > > [=C2=A0=C2=A0 64.812298] XFS (nvme1n1): Mounting V5 Filesystem 6763a3=
-3f-
-> > > 18cc-
-> > > 4a26-894b-8b0f8d79a98a
-> > >=20
-> > > I then bisected between 5.18 and 5.19 to this commit
-> > >=20
-> > > 1a86924e4f464757546d7f7bdc469be237918395 is the first bad commit
-> >=20
-> >=20
-> > > commit 1a86924e4f464757546d7f7bdc469be237918395
-> > > Author: Tom Yan <tom.ty89@gmail.com>
-> > > Date:=C2=A0=C2=A0 Fri Apr 29 12:52:43 2022 +0800
-> > >=20
-> > > =C2=A0=C2=A0=C2=A0 nvme: fix interpretation of DMRSL
-> > > =C2=A0=C2=A0=C2=A0=20
-> > > =C2=A0=C2=A0=C2=A0 DMRSLl is in the unit of logical blocks, while
-> > > max_discard_sectors
-> > > is
-> > > =C2=A0=C2=A0=C2=A0 in the unit of "linux sector".
-> > > =C2=A0=C2=A0=C2=A0=20
-> > > =C2=A0=C2=A0=C2=A0 Signed-off-by: Tom Yan <tom.ty89@gmail.com>
-> > > =C2=A0=C2=A0=C2=A0 Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > >=20
-> > > =C2=A0drivers/nvme/host/core.c | 6 ++++--
-> > > =C2=A0drivers/nvme/host/nvme.h | 1 +
-> > > =C2=A02 files changed, 5 insertions(+), 2 deletions(-)
-> > >=20
-> > >=20
-> > > Note that Infindat mentioned this in our case they logged with us
-> > > They say they fully adhere to TP4040 MDTS.
-> > > Towards NVMe-oF 2.0 specification, TP4040=C2=A0 - Max Data Transfer
-> > > for
-> > > non-
-> > > IO Commands (MDTS) was released with additional fields to control
-> > > these
-> > > parameters.
-> > > These parameters are supported in kernel versions 5.15 and
-> > > above.=C2=A0
-> > > ****
-> > >=20
-> > > Our storage target will reply with 0 for bit 2 of the ONCS,
-> > > indicating
-> > > UNMAP is supported based on the DMRL, DMRSL, and DMSL values.=20
-> > > (older kernels will interpret these values as UNMAP NOT
-> > > SUPPORTED)
-> > >=20
-> > >=20
-> > > Let me know your thoughts please. for both issues
-> >=20
-> > The commit you found unconditionally sets the discard queue limit
-> > to
-> > the
-> > reported DMRSL, so it sounds like your target is reporting DMRSL as
-> > '0'. Prior
-> > to that commit, we'd use that value only if it was non-zero. I hope
-> > that helps.
-> >=20
->=20
->=20
->=20
-> Hello Keith,
-> Many Thanks as always
-> I will inform Infinidat and have them figure this out.
->=20
-> Regards
-> Laurence
+On Mon, Apr 3, 2023 at 1:38=E2=80=AFAM Michal Hocko <mhocko@suse.com> wrote=
+:
+>
+> On Fri 31-03-23 12:03:47, Yosry Ahmed wrote:
+> > On Fri, Mar 31, 2023 at 4:02=E2=80=AFAM Michal Hocko <mhocko@suse.com> =
+wrote:
+> > >
+> > > On Thu 30-03-23 01:53:38, Yosry Ahmed wrote:
+> > > [...]
+> > > > Maybe we can add a primitive like might_sleep() for this, just food=
+ for thought.
+> > >
+> > > I do not think it is the correct to abuse might_sleep if the function
+> > > itself doesn't sleep. If it does might_sleep is already involved.
+> >
+> > Oh, sorry if I wasn't clear, I did not mean to reuse might_sleep() --
+> > I meant introducing a new similar debug primitive that shouts if irqs
+> > are disabled.
+>
+> This is circling back to original concerns about arbitrary decision to
+> care about IRQs. Is this really any different from spin locks or preempt
+> disabled critical sections preventing any scheduling and potentially
+> triggereing soft lockups?
 
+Not really, I am sure there are other code paths that may cause
+similar problems. At least we can start annotating them so that we
+don't regress them (e.g. by introducing a caller that disables irqs --
+converting them into hard lockups).
 
-Hi Keith=C2=A0
-Closing the loop
-
-The challenge was the other issue was masking me testing the fix.
-
-I reverted that commit (1a86924e4f464757546d7f7bdc469be237918395) and
-now the original test passes so we are good here.
-
-Linux localhost.localdomain 6.3.0-rc4+ #13 SMP PREEMPT_DYNAMIC Mon Apr
-3 13:40:21 EDT 2023 x86_64 x86_64 x86_64 GNU/Linux
-
-[   57.090328] nvme nvme1: new ctrl: NQN "nqn.2020-
-01.com.infinidat:36000-subsystem-696", addr 192.168.1.2:4420
-[   61.441213] XFS (nvme1n1): Mounting V5 Filesystem 6763a33f-18cc-
-4a26-894b-8b0f8d79a98a
-[   64.627670] XFS (nvme1n1): Ending clean mount
-[   64.665657] xfs filesystem being mounted at /data supports
-timestamps until 2038 (0x7fffffff)
-
-Then running the fio test passes with no issues so confirming the fix
-you called out (Ming had mentioned this too) resolves the original
-issue.
-
-
-Infinidat will have to fix their DMRSL issue
-
-Thanks folks
-
-Regards as always
-Laurence Oberman
-
-
+> --
+> Michal Hocko
+> SUSE Labs
