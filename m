@@ -2,112 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80253C76188
-	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 20:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCB41C76188
+	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 21:20:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233463AbjDCUkL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Apr 2023 16:40:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59690 "EHLO
+        id S232656AbjDCVUD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Apr 2023 17:20:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232357AbjDCUkK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 16:40:10 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0FD1270C
-        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 13:40:07 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id er13so81346294edb.9
-        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2023 13:40:07 -0700 (PDT)
+        with ESMTP id S231552AbjDCVUA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 17:20:00 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E9E46B4;
+        Mon,  3 Apr 2023 14:19:35 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id le6so29337176plb.12;
+        Mon, 03 Apr 2023 14:19:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680554406;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=98lpmjVP03rasH0aUw5Or4NqpKX/eDyfmYvak2z+XQY=;
-        b=aOrySHi+L5aBtQhD9CMl2wIUewhWyIyQQXGmhw67rG4aYB/0VxtLJJdx4JKcjr4/Su
-         CKHv3ZrfEko2du/9DiJPnmJgfyM9NzFrN9wGLJLRnVWtCv6yd58ea0gAc1LIGcNps8aF
-         iQTbr3AocnQwqVN0vRpZPBqysYDShbz/ZYTddqaS5BtXq0sVascssl+jkJwncPNANTjk
-         LRdvan3ZAUekClGuJ3S02i2YGWuAiDNHkJMii0Y/083m5jLXpgQg8MobYoyssOoaX1B9
-         uxV+Z9IvmlmsJ8Y4QsY7pkdlMNW7ukQiPmVap2uSl7WIEp0ptj20puF/FpeYyuTT9zI9
-         0ZgQ==
+        d=gmail.com; s=20210112; t=1680556775;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9MIwuslKOv23RmObbF1opEGXBO5SntQiEEpUaiQ2xkw=;
+        b=VCcYybWY8EXxG2djVLd2aJwEv3cQfYWsN6xic8+5BBdab6G7SK99uEilDzr2s5ecNm
+         EUSnIt/fmVyLhdQ/v+j+mZH7wWt29jvd9IjTBPvaLo8Kp3I4XtcysEn8SChIyz+VOdiT
+         fKK8ywgiCVhVQBHjW/qt5N4h1oQevA4ZhSw4Q6AI38O12K2HrGD702U57RLP/i6nlG/e
+         KWe+Frfzxz1hsWj3xuiZMwARooukrDJNwK1NdHQcR3lrWQkWLLbfKXsKqinoM8iP8FtD
+         WxUIintHLTELgXMfeWZqO/KwVems6bBzZ3EiqryVfucKxRFlHXBmeTwzQbcwjkbZYTuf
+         4F8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680554406;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680556775;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=98lpmjVP03rasH0aUw5Or4NqpKX/eDyfmYvak2z+XQY=;
-        b=TuRMtPFULSTtq3E2O1ZEy/+EgYFkPjk+Dd4+xkTd+PmPWxdOIk7vnYrzIUsWcPEZ3J
-         hUYFReXdtYI1nr67h4u6MGBlSj/AAG1TTKS/UmvnUji8nY/lRM+IDH6/elWzog2fRaOi
-         i6ovYbAiGVfvfuBY7cqFKGNTvCucvOIBYYqp4YSqSRea3mgl+JElvHtGJcAiP4dp2qSt
-         0CDCUqYPwdDBFR5Ha0ur3LKZpOwvW/euD2iTd0/tHqosRDFp/qBiIQh2qdtEBsMVEQPo
-         TNDiaoWIMvMNCZjq6Xt5MxLTDbU/u/1s2UC2t/BJvvT3UuOQj36ptgNROEgGOY4qDqsa
-         ZpYA==
-X-Gm-Message-State: AAQBX9fGfMjqz1dk2+87l7jbk5c3SXedLtywpzdQdx+7dD0cHkmYr6gR
-        c/dWTGPREo7xnHE7mYUEquQY0wM3TZUNlgXBNMcaow==
-X-Google-Smtp-Source: AKy350Zgaw5pQ0oWUtuZqoGHW8zTg36m0ZFKQebBTrdHG4AMl+dpXooPrkU+eTMNeuZDA0kcJZZ9arc1xcfhu4d3GZg=
-X-Received: by 2002:a50:bac2:0:b0:502:1d1c:7d37 with SMTP id
- x60-20020a50bac2000000b005021d1c7d37mr259671ede.8.1680554406118; Mon, 03 Apr
- 2023 13:40:06 -0700 (PDT)
+        bh=9MIwuslKOv23RmObbF1opEGXBO5SntQiEEpUaiQ2xkw=;
+        b=z9V5AdhgLUHYN2Wx9ZRc/lVHXfX7juOslEd22idAl+iXdrgRW9QQuVP5Wjc5zVRexj
+         TQh15RIj2iZuL1s5fQsegwR5xqm2DIUXuojdvp+tnObHZgpl5E9DkbPrDTP8Mdzi+dbH
+         QQ+LTNgldj1AVgld1qEQcI8UYZXUz1eehqvOxDqa7fCZpDSCKVWy4hUyvJvxsz9pR9Ba
+         USBkZDo/j8wS5R/PhuMkdz+GQJzC4Br6lN2ksmCewQIGuYmlEF8E443VKiBfeo+lVgFo
+         q3a5l+k3dlqCIVDzpqN7sdRwn9y98FpQx8AY6TGPlplom5TNLPoB1xvTHfJEF1ZcRzVt
+         9SKw==
+X-Gm-Message-State: AAQBX9douPvFNM3brl3hreLWk+fHayfFvs0ERzo0A4EAK7C/6DJCAuTx
+        acV0GPAQxjWrdw8Nb1Fdu1fPr2Cd+oM=
+X-Google-Smtp-Source: AKy350as6sEsccwjl6/R0AjaknzzuuYQpBo6CpKe/V5UwkgYSell9ckH3bWSIgb0ayPm7SwKy77zWA==
+X-Received: by 2002:a17:90b:3b4f:b0:237:161e:33bc with SMTP id ot15-20020a17090b3b4f00b00237161e33bcmr316502pjb.16.1680556775321;
+        Mon, 03 Apr 2023 14:19:35 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:da37:a7fa:157d:2446])
+        by smtp.gmail.com with ESMTPSA id mr17-20020a17090b239100b002369a14d6b1sm10083835pjb.31.2023.04.03.14.19.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 14:19:34 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Mon, 3 Apr 2023 14:19:31 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     axboe@kernel.dk, martin@omnibond.com, hubcap@omnibond.com,
+        brauner@kernel.org, viro@zeniv.linux.org.uk,
+        senozhatsky@chromium.org, akpm@linux-foundation.org,
+        willy@infradead.org, hch@lst.de, devel@lists.orangefs.org,
+        mcgrof@kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, gost.dev@samsung.com,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] zram: always chain bio to the parent in
+ read_from_bdev_async
+Message-ID: <ZCtC4yhM5lZP7mEg@google.com>
+References: <20230403132221.94921-1-p.raghav@samsung.com>
+ <CGME20230403132223eucas1p2a27e8239b8bda4fc16b675a9473fd61f@eucas1p2.samsung.com>
+ <20230403132221.94921-2-p.raghav@samsung.com>
 MIME-Version: 1.0
-References: <ZCU1Bp+5bKNJzWIu@dhcp22.suse.cz> <CAJD7tka0CmRvcvB0k8DZuid1vC9OK_mFriHHbXNTUkVE7OjaTA@mail.gmail.com>
- <ZCU+8lSi+e4WgT3F@dhcp22.suse.cz> <CAJD7tkaKd9Bcb2-e83Q-kzF7G+crr1U+7uqUPBARXWq-LpyKvw@mail.gmail.com>
- <ZCVFA78lDj2/Uy0C@dhcp22.suse.cz> <CAJD7tkbjmBaXghQ+14Hy28r2LoWSim+LEjOPxaamYeA_kr2uVw@mail.gmail.com>
- <ZCVKqN2nDkkQFvO0@dhcp22.suse.cz> <CAJD7tkYEOVRcXs-Ag3mWn69EwE4rjFt9j5MAcTGCNE8BuhTd+A@mail.gmail.com>
- <ZCa9sixp3GJcjf8Y@dhcp22.suse.cz> <CAJD7tka-2vNn25=NdrKQoMf4ntdbWtojY0k4eAa-c9D+v7J=HQ@mail.gmail.com>
- <ZCqQfuprGreGYwFA@dhcp22.suse.cz>
-In-Reply-To: <ZCqQfuprGreGYwFA@dhcp22.suse.cz>
-From:   Yosry Ahmed <yosryahmed@google.com>
-Date:   Mon, 3 Apr 2023 13:39:29 -0700
-Message-ID: <CAJD7tkZF+rCNW4pctjOfAetoAQRq7-exV-j-nRc_xYMkMBGY_A@mail.gmail.com>
-Subject: Re: [PATCH v2 4/9] cgroup: rstat: add WARN_ON_ONCE() if flushing
- outside task context
-To:     Michal Hocko <mhocko@suse.com>
-Cc:     Johannes Weiner <hannes@cmpxchg.org>,
-        Shakeel Butt <shakeelb@google.com>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
-        Vasily Averin <vasily.averin@linux.dev>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230403132221.94921-2-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 3, 2023 at 1:38=E2=80=AFAM Michal Hocko <mhocko@suse.com> wrote=
-:
->
-> On Fri 31-03-23 12:03:47, Yosry Ahmed wrote:
-> > On Fri, Mar 31, 2023 at 4:02=E2=80=AFAM Michal Hocko <mhocko@suse.com> =
-wrote:
-> > >
-> > > On Thu 30-03-23 01:53:38, Yosry Ahmed wrote:
-> > > [...]
-> > > > Maybe we can add a primitive like might_sleep() for this, just food=
- for thought.
-> > >
-> > > I do not think it is the correct to abuse might_sleep if the function
-> > > itself doesn't sleep. If it does might_sleep is already involved.
-> >
-> > Oh, sorry if I wasn't clear, I did not mean to reuse might_sleep() --
-> > I meant introducing a new similar debug primitive that shouts if irqs
-> > are disabled.
->
-> This is circling back to original concerns about arbitrary decision to
-> care about IRQs. Is this really any different from spin locks or preempt
-> disabled critical sections preventing any scheduling and potentially
-> triggereing soft lockups?
+On Mon, Apr 03, 2023 at 03:22:17PM +0200, Pankaj Raghav wrote:
+> zram_bvec_read() is called with the bio set to NULL only in
+> writeback_store() function. When a writeback is triggered,
+> zram_bvec_read() is called only if ZRAM_WB flag is not set. That will
+> result only calling zram_read_from_zspool() in __zram_bvec_read().
+> 
+> rw_page callback used to call read_from_bdev_async with a NULL parent
+> bio but that has been removed since commit 3222d8c2a7f8
+> ("block: remove ->rw_page").
+> 
+> We can now safely always call bio_chain() as read_from_bdev_async() will
+> be called with a parent bio set. A WARN_ON_ONCE is added if this function
+> is called with parent set to NULL.
+> 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Acked-by: Minchan Kim <minchan@kernel.org>
 
-Not really, I am sure there are other code paths that may cause
-similar problems. At least we can start annotating them so that we
-don't regress them (e.g. by introducing a caller that disables irqs --
-converting them into hard lockups).
-
-> --
-> Michal Hocko
-> SUSE Labs
+Thanks.
