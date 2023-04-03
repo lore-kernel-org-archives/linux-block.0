@@ -2,133 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 357E7C76196
-	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 17:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D5FC76188
+	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 18:00:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232892AbjDCR5r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Apr 2023 13:57:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45560 "EHLO
+        id S232978AbjDCSAv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Apr 2023 14:00:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232726AbjDCR51 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 13:57:27 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B4D212F
-        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 10:56:57 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id c18so28825133ple.11
-        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2023 10:56:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1680544617;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zvbXO2zEiAAtifGVfeUKcNOUgXd8fePbZNqY6UemQus=;
-        b=NeE9Wk2utSK19PXZCOaD49MN9bJsYQQCqJkMm5dFlVhQ4vvtd39tS83Ayte5UqNH/E
-         hQkOpBGdzyonrza8zrN6BS+EBfh4tDDmQtDTvheNR37l0XGyERQg2SZKou3blg+q+vcY
-         tIadtzWN0DsbYZ8vj716opgE5Ajw9eL2oXL5tJJCei7uAhysaZE4CZl/Nsrw3ykGoQya
-         9EsCld/FHm1EPhsBWCFAjQRGc0NuV3z7k97Jj1l/TipicMXFBzU72JXBXv5uGzIm7GB5
-         Fkr5tmml+hyc8WL47nSRDq4+7FNjAiiTAqenK0YtEagBNuL2pcirKdcqTqU4XSxq417Y
-         lOnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680544617;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zvbXO2zEiAAtifGVfeUKcNOUgXd8fePbZNqY6UemQus=;
-        b=N8t/bmLlcT92ccT+deOybT+Anxs8uXVwWaaUPJ0kkJzcbC9y2qqR3mNGq1nkz5XXW+
-         hJyaNP4Db4Qxt/DrivxbssYXzVwkydUnie5NMinvPAzoN0/9s8nv0NWtaZzV0vDDHJ/a
-         iSlIURXhDKCa8DP9/n7McODxplIZRFcJsWtklA5tsM8uSJsEnUo7WKfy/gUsygyWjQnh
-         JcRZ/Jcuxqp0CA5PbTAJrp7NZNQ6k9GAZlErU1kHjHfQKIbdTXuaTWNpXEuquB2NBjND
-         egyE0yg3zgoKApEj7bwWac7a7aQi/fppLK/BAhrpNVg3quroqUkrahCMhZ6UfhInzl7B
-         Tleg==
-X-Gm-Message-State: AAQBX9cVF6yGZhy8cMIUqZdrVGqfRi3GLyERxFwZsK0HpNIQsL0eiT1t
-        W8KJjwhoRLnASP3lLoPZuZ39JA==
-X-Google-Smtp-Source: AKy350Y/o4NlisuKM4QeBSHzVv110kGyt89sAVitu14JA8M02u9XVH+wqGBtQUeplDG2G3rdtxV/Fg==
-X-Received: by 2002:a17:90b:4c10:b0:22c:816e:d67d with SMTP id na16-20020a17090b4c1000b0022c816ed67dmr42609674pjb.24.1680544616942;
-        Mon, 03 Apr 2023 10:56:56 -0700 (PDT)
-Received: from [10.4.252.188] ([139.177.225.226])
-        by smtp.gmail.com with ESMTPSA id bk4-20020a17090b080400b0023d0c2f39f2sm9999175pjb.19.2023.04.03.10.56.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Apr 2023 10:56:56 -0700 (PDT)
-Message-ID: <cb69bf15-6288-e5d9-08c9-cf64187ddd03@bytedance.com>
-Date:   Tue, 4 Apr 2023 01:56:51 +0800
+        with ESMTP id S233035AbjDCSAl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 14:00:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00E635A5
+        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 11:00:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 17D066145D
+        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 18:00:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9698C433D2;
+        Mon,  3 Apr 2023 18:00:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680544820;
+        bh=OAdREJ98WBCtXKCCtZaL+kKO7LD1uHZwB9WFPjq8K74=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Qa7GrQ2bKTddu1wlPxosCMS6U1ezmYu2wgF9fqT2JSfSUaXd+ujyy3IO8G3+B1Xyu
+         vck0maujpj4QLaZth7kAqF/bPqsJ9pDvN9jXP82GwqloKRK2pbZK2la8TbY0UslP5X
+         LdIQiut22SY+zZhi/0/D3M0bjy4ov7VVwMKO8p58iBN0g0BOASCm7vAWptWMTyFirc
+         fwUxZ3+SP1tdq2lsrJsouBc7O2AeJ0yPlDZodnpivc/5rlmG5WkihwVo+tHey5EWMd
+         zhoc+hImWUQB5w5dREWr7CgEGjS+JdyV1Hlp7C97mZxHcxhFFTyOMm8wyFzcywnTDa
+         V1X9tM19Fl+lw==
+Date:   Mon, 3 Apr 2023 12:00:17 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Laurence Oberman <loberman@redhat.com>
+Cc:     minlei@redhat.com, jmeneghi@redhat.com,
+        "Hellwig, Christoph" <hch@infradead.org>, axboe@fb.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: Issue with discard with NVME and Infinibox Storage
+Message-ID: <ZCsUMR3uLx+vPoOp@kbusch-mbp.dhcp.thefacebook.com>
+References: <d1dbb7c5eca51993e9988849ab2e43e800ecb067.camel@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.0
-Subject: Re: [External] Re: [PATCH v2] blk-throttle: Fix io statistics for
- cgroup v1
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230401094708.77631-1-hanjinke.666@bytedance.com>
- <20230403153021.z4smxxnxbgdcgcey@blackpad>
-From:   hanjinke <hanjinke.666@bytedance.com>
-In-Reply-To: <20230403153021.z4smxxnxbgdcgcey@blackpad>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d1dbb7c5eca51993e9988849ab2e43e800ecb067.camel@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Apr 03, 2023 at 01:35:22PM -0400, Laurence Oberman wrote:
+> Hello Ming and Christoph
+> 
+> Issue with Infinibox storage
+> ----------------------------
+> Really discovered 2 issues here 
+> 
+> Issue 1
+> Kernels 5.15 to 5.18 inclusive recognize the discard support on the
+> Infinibox device but they fail in the nvme_setup_discard function call
+
+This first i ssue should be fixed with this commit:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=37f0dc2ec78af0c3f35dd05578763de059f6fe77
+
+> Issue 2
+> Trying to narrow this down.
+> 5.19 and higher (6.3 included), no longer support discard on the
+> Infinibox device and log this message so I cannot run the test for the
+> discard issue
+> 
+> [   35.989809] nvme nvme1: new ctrl: NQN "nqn.2020-
+> 01.com.infinidat:36000-subsystem-696", addr 192.168.1.2:4420
+> [   64.810437] XFS (nvme1n1): mounting with "discard" option, but the
+> device does not support discard
+> [   64.812298] XFS (nvme1n1): Mounting V5 Filesystem 6763a33f-18cc-
+> 4a26-894b-8b0f8d79a98a
+> 
+> I then bisected between 5.18 and 5.19 to this commit
+> 
+> 1a86924e4f464757546d7f7bdc469be237918395 is the first bad commit
 
 
-在 2023/4/3 下午11:30, Michal Koutný 写道:
-> On Sat, Apr 01, 2023 at 05:47:08PM +0800, Jinke Han <hanjinke.666@bytedance.com> wrote:
->> From: Jinke Han <hanjinke.666@bytedance.com>
->>
->> After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
->> blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
->> the only stable io stats interface of cgroup v1,
+> commit 1a86924e4f464757546d7f7bdc469be237918395
+> Author: Tom Yan <tom.ty89@gmail.com>
+> Date:   Fri Apr 29 12:52:43 2022 +0800
 > 
-> There is also blkio.bfq.{io_serviced,io_service_bytes} couple, so it's
-> not the only. Or do you mean stable in terms of used IO scheduler?
+>     nvme: fix interpretation of DMRSL
+>     
+>     DMRSLl is in the unit of logical blocks, while max_discard_sectors
+> is
+>     in the unit of "linux sector".
+>     
+>     Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+>     Signed-off-by: Christoph Hellwig <hch@lst.de>
 > 
+>  drivers/nvme/host/core.c | 6 ++++--
+>  drivers/nvme/host/nvme.h | 1 +
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> 
+> Note that Infindat mentioned this in our case they logged with us
+> They say they fully adhere to TP4040 MDTS.
+> Towards NVMe-oF 2.0 specification, TP4040  - Max Data Transfer for non-
+> IO Commands (MDTS) was released with additional fields to control these
+> parameters.
+> These parameters are supported in kernel versions 5.15 and above.  ****
+> 
+> Our storage target will reply with 0 for bit 2 of the ONCS, indicating
+> UNMAP is supported based on the DMRL, DMRSL, and DMSL values. 
+> (older kernels will interpret these values as UNMAP NOT SUPPORTED)
+> 
+> 
+> Let me know your thoughts please. for both issues
 
-Oh, the stable here means that it always exists, and when the bfq 
-scheduler is not used, the bfq interface may not exist.
-
->> and these statistics are done in the blk-throttle code. But the
->> current code only counts the bios that are actually throttled. When
->> the user does not add the throttle limit,
-> 
-> ... "or the limit doesn't kick in"
-> 
-
-Agree.
-
->> the io stats for cgroup v1 has nothing.
-> 
-> 
->> I fix it according to the statistical method of v2, and made it count
->> all ios accurately.
-> 
-> s/all ios/all bios and split ios/
-> 
-> (IIUC you fix two things)
-> 
->> Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
-> 
-> Good catch.
-> 
-> Does it also undo the performance gain from that commit? (Or rather,
-> have you observed effect of your patch on v2-only performance?)
-> 
-
-Under v1, this statistical overhead is unavoidable. Under v2, the static 
-key is friendly to judging branches, so I think the performance 
-difference before and after the patch is negligible.
-
->> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
->> ---
->>   block/blk-cgroup.c   | 6 ++++--
->>   block/blk-throttle.c | 6 ------
->>   block/blk-throttle.h | 9 +++++++++
->>   3 files changed, 13 insertions(+), 8 deletions(-)
-> 
-> The code looks correct.
-> 
-> Thanks,
-> Michal
-
-Thanks.
-
+The commit you found unconditionally sets the discard queue limit to the
+reported DMRSL, so it sounds like your target is reporting DMRSL as '0'. Prior
+to that commit, we'd use that value only if it was non-zero. I hope that helps.
