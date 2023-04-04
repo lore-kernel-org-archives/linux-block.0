@@ -2,371 +2,280 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D22C76188
-	for <linux-block@archiver.kernel.org>; Mon,  3 Apr 2023 22:57:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 844A3C7618D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 05:30:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233752AbjDCW51 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Apr 2023 18:57:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36112 "EHLO
+        id S233181AbjDDFaf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 01:30:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233072AbjDCW50 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Apr 2023 18:57:26 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361D144A6
-        for <linux-block@vger.kernel.org>; Mon,  3 Apr 2023 15:57:24 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id h8so123471231ede.8
-        for <linux-block@vger.kernel.org>; Mon, 03 Apr 2023 15:57:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1680562642;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pNQNHEmyxWKm570ezYESleHypk8TjPfYsCf01llgY1E=;
-        b=YZMXl6HZpBFkK69HxALQ7LA0GcIzQxO+oxSrRlChPUnularuOQlzYizTdFKd8zbW/8
-         4CVmgjvUboiGywJcL7luFa82xvVPYnz9Sn0I9fMLtpcE6UKa+WDCIp3PFn6kJGTf4E4C
-         92u1WER03J780X/cN8/5CkoYeSKdYCx7tEzsE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680562642;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pNQNHEmyxWKm570ezYESleHypk8TjPfYsCf01llgY1E=;
-        b=e2dfw69G4IGQIgXq4omCQtV0Pa8uGkuExIkVXOiKvt80k0V0rt2fm5sDGJzYv26qzx
-         kFeuo6uUXcYy7z+sXfR2vWgSIZwQ/nQwdtoib6Y6bK3ueqlqitjTwo3YnFEuVJpFDgAg
-         xmmVDKmusaq9sFoh/G3yeK6QemUqOKRPNeAWhOFKU+aPmQqFT+PhrQA4VQyrixGrPZAP
-         K7LV4uFQUjF2MDVHRk10wXtO3ndRQvwz/+w4EkJlQPP8o/rS0K1tiOJRkYGbk8Ir+92Y
-         bOiqskTxc6MDrndB6ReWFLJCXAdSa/vIW7+KaWPXbRRbHlqZXo/pNq+BvZ07qUujsSnj
-         EW7Q==
-X-Gm-Message-State: AAQBX9cn/vJgiR8VaWUECeEqCUFXvHzcFyhbUZZ5qCg/N8uuXhvUusPh
-        fxFnqs/Byju4AOe8VWNtLjNYnKsXLlg2ca0Mgt7/GQ==
-X-Google-Smtp-Source: AKy350ao2Y0z8CpV79IpYns3sYFnAYql88bE6K8ADZnpZfXRr8sA9XZZYmJgi9xahsU6f2Xyn8JJh7ATYaoK/WVvgJY=
-X-Received: by 2002:a17:906:9f28:b0:934:b5d6:14d0 with SMTP id
- fy40-20020a1709069f2800b00934b5d614d0mr194797ejc.2.1680562642663; Mon, 03 Apr
- 2023 15:57:22 -0700 (PDT)
+        with ESMTP id S233369AbjDDFab (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 01:30:31 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F021FEF;
+        Mon,  3 Apr 2023 22:30:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1680586228; x=1712122228;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RdDpxGvgQ2tbcB1Q1fxF2Lua+npmQ3o86qaGHUvpBgc=;
+  b=jc3PYuEnvwiBb1scsIhzmgKId0CZJCtf6Yp0WSYaF0Wm5jFehnWIB0yl
+   jmHy7CuSPCmYwKZkEe3VDWWunyoI5m2DGirYTRcj1xgt+0VjCElxA6jFA
+   pjR8IWpFSiX+gcRyJXUTVgpbCsbXE+xzBm7jPEp8PL0GcDRK/v39vlaSQ
+   VMr4HHzdu9CMr84p3hFbxtXKi8YebayKdFvnhk7gDyB8VR4Rqep0YYgQB
+   RFAqqUX6BUufTX9DolcvPa35KwkjkvCQPTGtjtyiwi+yqI9sJWb3BrdaA
+   kVdl4OVSqCA+3Pn2usLAKe4RjNW/MJVFFriPW1SpV90Or5POiQcyqKyDK
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="428377409"
+X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
+   d="scan'208";a="428377409"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 22:30:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="686242063"
+X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
+   d="scan'208";a="686242063"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 03 Apr 2023 22:30:08 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pjZF8-000PEe-10;
+        Tue, 04 Apr 2023 05:30:06 +0000
+Date:   Tue, 4 Apr 2023 13:29:42 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Mike Christie <michael.christie@oracle.com>, bvanassche@acm.org,
+        hch@lst.de, martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
+        kbusch@kernel.org, target-devel@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Mike Christie <michael.christie@oracle.com>
+Subject: Re: [PATCH v5 18/18] scsi: target: Add block PR support to iblock
+Message-ID: <202304041322.SEFV29Co-lkp@intel.com>
+References: <20230324181741.13908-19-michael.christie@oracle.com>
 MIME-Version: 1.0
-References: <20221229081252.452240-1-sarthakkukreti@chromium.org>
- <20221229081252.452240-3-sarthakkukreti@chromium.org> <Y7biAQyLKJDjsAlz@bfoster>
- <CAG9=OMNLAL8M2AqzSWzecXJzR7jfC_3Ckc_L24MzNBgz_+u-wQ@mail.gmail.com> <ZCbR4euMpUauJ0iI@bfoster>
-In-Reply-To: <ZCbR4euMpUauJ0iI@bfoster>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Mon, 3 Apr 2023 15:57:11 -0700
-Message-ID: <CAG9=OMNT8c=Pkzd-Nw99R32i5VjYtyQsscY0huJFg3EbtRJ5BQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] dm: Add support for block provisioning
-To:     Brian Foster <bfoster@redhat.com>
-Cc:     sarthakkukreti@google.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230324181741.13908-19-michael.christie@oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 31, 2023 at 5:26=E2=80=AFAM Brian Foster <bfoster@redhat.com> w=
-rote:
->
-> On Thu, Mar 30, 2023 at 05:30:22PM -0700, Sarthak Kukreti wrote:
-> > On Thu, Jan 5, 2023 at 6:42=E2=80=AFAM Brian Foster <bfoster@redhat.com=
-> wrote:
-> > >
-> > > On Thu, Dec 29, 2022 at 12:12:47AM -0800, Sarthak Kukreti wrote:
-> > > > Add support to dm devices for REQ_OP_PROVISION. The default mode
-> > > > is to pass through the request and dm-thin will utilize it to provi=
-sion
-> > > > blocks.
-> > > >
-> > > > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > > > ---
-> > > >  drivers/md/dm-crypt.c         |  4 +-
-> > > >  drivers/md/dm-linear.c        |  1 +
-> > > >  drivers/md/dm-snap.c          |  7 +++
-> > > >  drivers/md/dm-table.c         | 25 ++++++++++
-> > > >  drivers/md/dm-thin.c          | 90 +++++++++++++++++++++++++++++++=
-+++-
-> > > >  drivers/md/dm.c               |  4 ++
-> > > >  include/linux/device-mapper.h | 11 +++++
-> > > >  7 files changed, 139 insertions(+), 3 deletions(-)
-> > > >
-> > > ...
-> > > > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-> > > > index 64cfcf46881d..ab3f1abfabaf 100644
-> > > > --- a/drivers/md/dm-thin.c
-> > > > +++ b/drivers/md/dm-thin.c
-> > > ...
-> > > > @@ -1980,6 +1992,70 @@ static void process_cell(struct thin_c *tc, =
-struct dm_bio_prison_cell *cell)
-> > > >       }
-> > > >  }
-> > > >
-> > > > +static void process_provision_cell(struct thin_c *tc, struct dm_bi=
-o_prison_cell *cell)
-> > > > +{
-> > > > +     int r;
-> > > > +     struct pool *pool =3D tc->pool;
-> > > > +     struct bio *bio =3D cell->holder;
-> > > > +     dm_block_t begin, end;
-> > > > +     struct dm_thin_lookup_result lookup_result;
-> > > > +
-> > > > +     if (tc->requeue_mode) {
-> > > > +             cell_requeue(pool, cell);
-> > > > +             return;
-> > > > +     }
-> > > > +
-> > > > +     get_bio_block_range(tc, bio, &begin, &end);
-> > > > +
-> > > > +     while (begin !=3D end) {
-> > > > +             r =3D ensure_next_mapping(pool);
-> > > > +             if (r)
-> > > > +                     /* we did our best */
-> > > > +                     return;
-> > > > +
-> > > > +             r =3D dm_thin_find_block(tc->td, begin, 1, &lookup_re=
-sult);
-> > >
-> > > Hi Sarthak,
-> > >
-> > > I think we discussed this before.. but remind me if/how we wanted to
-> > > handle the case if the thin blocks are shared..? Would a provision op
-> > > carry enough information to distinguish an FALLOC_FL_UNSHARE_RANGE
-> > > request from upper layers to conditionally provision in that case?
-> > >
-> > I think that should depend on how the filesystem implements unsharing:
-> > assuming that we use provision on first allocation, unsharing on xfs
-> > should result in xfs calling REQ_OP_PROVISION on the newly allocated
-> > blocks first. But for ext4, we'd fail UNSHARE_RANGE unless provision
-> > (instead of noprovision, provision_on_alloc), in which case, we'd send
-> > REQ_OP_PROVISION.
-> >
->
-> I think my question was unclear... It doesn't necessarily have much to
-> do with the filesystem or associated provision policy. Since dm-thin can
-> share blocks internally via snapshots, do you intend to support
-> FL_UNSHARE_RANGE via blkdev_fallocate() and REQ_OP_PROVISION?
->
-> If so, then presumably this wants an UNSHARE request flag to pair with
-> REQ_OP_PROVISION. Also, the dm-thin code above needs to check whether an
-> existing block it finds is shared and basically do whatever COW breaking
-> is necessary during the PROVISION request.
->
-> If not, why? And what is expected behavior if blkdev_fallocate() is
-> called with FL_UNSHARE_RANGE?
->
-I think the handling of REQ_OP_PROVISION by each snapshot target is
-kind-of implicit:
+Hi Mike,
 
-- snapshot-origin: do nothing
-- snapshot: send REQ_OP_PROVISION to the COW device
-- snapshot-merge: send REQ_OP_PROVISION to the origin.
+kernel test robot noticed the following build warnings:
 
-From the thinpool's perspective, REQ_OP_PROVISION reuses the
-provision_block() primitive to break sharing (there's a bug in the
-below code, as you pointed out: case 0 should also call
-provision_block() if the lookup result shows that this is a shared
-block).
+[auto build test WARNING on mkp-scsi/for-next]
+[also build test WARNING on jejb-scsi/for-next axboe-block/for-next linus/master v6.3-rc5 next-20230403]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-So, I think the provision op would carry enough information to
-conditionally provision and copy the block. Are there other cases
-where UNSHARE_RANGE would be useful?
+url:    https://github.com/intel-lab-lkp/linux/commits/Mike-Christie/block-Add-PR-callouts-for-read-keys-and-reservation/20230325-022314
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git for-next
+patch link:    https://lore.kernel.org/r/20230324181741.13908-19-michael.christie%40oracle.com
+patch subject: [PATCH v5 18/18] scsi: target: Add block PR support to iblock
+config: ia64-randconfig-s043-20230403 (https://download.01.org/0day-ci/archive/20230404/202304041322.SEFV29Co-lkp@intel.com/config)
+compiler: ia64-linux-gcc (GCC) 12.1.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/f3fe3a0cab8498044d99362b81e01f5c48da5f63
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Mike-Christie/block-Add-PR-callouts-for-read-keys-and-reservation/20230325-022314
+        git checkout f3fe3a0cab8498044d99362b81e01f5c48da5f63
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=ia64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=ia64 SHELL=/bin/bash drivers/target/
 
-Best
-Sarthak
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304041322.SEFV29Co-lkp@intel.com/
 
-> Brian
->
-> > Best
-> > Sarthak
-> >
-> >
-> > Sarthak
-> >
-> > > Brian
-> > >
-> > > > +             switch (r) {
-> > > > +             case 0:
-> > > > +                     begin++;
-> > > > +                     break;
-> > > > +             case -ENODATA:
-> > > > +                     bio_inc_remaining(bio);
-> > > > +                     provision_block(tc, bio, begin, cell);
-> > > > +                     begin++;
-> > > > +                     break;
-> > > > +             default:
-> > > > +                     DMERR_LIMIT(
-> > > > +                             "%s: dm_thin_find_block() failed: err=
-or =3D %d",
-> > > > +                             __func__, r);
-> > > > +                     cell_defer_no_holder(tc, cell);
-> > > > +                     bio_io_error(bio);
-> > > > +                     begin++;
-> > > > +                     break;
-> > > > +             }
-> > > > +     }
-> > > > +     bio_endio(bio);
-> > > > +     cell_defer_no_holder(tc, cell);
-> > > > +}
-> > > > +
-> > > > +static void process_provision_bio(struct thin_c *tc, struct bio *b=
-io)
-> > > > +{
-> > > > +     dm_block_t begin, end;
-> > > > +     struct dm_cell_key virt_key;
-> > > > +     struct dm_bio_prison_cell *virt_cell;
-> > > > +
-> > > > +     get_bio_block_range(tc, bio, &begin, &end);
-> > > > +     if (begin =3D=3D end) {
-> > > > +             bio_endio(bio);
-> > > > +             return;
-> > > > +     }
-> > > > +
-> > > > +     build_key(tc->td, VIRTUAL, begin, end, &virt_key);
-> > > > +     if (bio_detain(tc->pool, &virt_key, bio, &virt_cell))
-> > > > +             return;
-> > > > +
-> > > > +     process_provision_cell(tc, virt_cell);
-> > > > +}
-> > > > +
-> > > >  static void process_bio(struct thin_c *tc, struct bio *bio)
-> > > >  {
-> > > >       struct pool *pool =3D tc->pool;
-> > > > @@ -2200,6 +2276,8 @@ static void process_thin_deferred_bios(struct=
- thin_c *tc)
-> > > >
-> > > >               if (bio_op(bio) =3D=3D REQ_OP_DISCARD)
-> > > >                       pool->process_discard(tc, bio);
-> > > > +             else if (bio_op(bio) =3D=3D REQ_OP_PROVISION)
-> > > > +                     process_provision_bio(tc, bio);
-> > > >               else
-> > > >                       pool->process_bio(tc, bio);
-> > > >
-> > > > @@ -2716,7 +2794,8 @@ static int thin_bio_map(struct dm_target *ti,=
- struct bio *bio)
-> > > >               return DM_MAPIO_SUBMITTED;
-> > > >       }
-> > > >
-> > > > -     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DIS=
-CARD) {
-> > > > +     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DIS=
-CARD ||
-> > > > +         bio_op(bio) =3D=3D REQ_OP_PROVISION) {
-> > > >               thin_defer_bio_with_throttle(tc, bio);
-> > > >               return DM_MAPIO_SUBMITTED;
-> > > >       }
-> > > > @@ -3355,6 +3434,8 @@ static int pool_ctr(struct dm_target *ti, uns=
-igned argc, char **argv)
-> > > >       pt->low_water_blocks =3D low_water_blocks;
-> > > >       pt->adjusted_pf =3D pt->requested_pf =3D pf;
-> > > >       ti->num_flush_bios =3D 1;
-> > > > +     ti->num_provision_bios =3D 1;
-> > > > +     ti->provision_supported =3D true;
-> > > >
-> > > >       /*
-> > > >        * Only need to enable discards if the pool should pass
-> > > > @@ -4053,6 +4134,7 @@ static void pool_io_hints(struct dm_target *t=
-i, struct queue_limits *limits)
-> > > >               blk_limits_io_opt(limits, pool->sectors_per_block << =
-SECTOR_SHIFT);
-> > > >       }
-> > > >
-> > > > +
-> > > >       /*
-> > > >        * pt->adjusted_pf is a staging area for the actual features =
-to use.
-> > > >        * They get transferred to the live pool in bind_control_targ=
-et()
-> > > > @@ -4243,6 +4325,9 @@ static int thin_ctr(struct dm_target *ti, uns=
-igned argc, char **argv)
-> > > >               ti->num_discard_bios =3D 1;
-> > > >       }
-> > > >
-> > > > +     ti->num_provision_bios =3D 1;
-> > > > +     ti->provision_supported =3D true;
-> > > > +
-> > > >       mutex_unlock(&dm_thin_pool_table.mutex);
-> > > >
-> > > >       spin_lock_irq(&tc->pool->lock);
-> > > > @@ -4457,6 +4542,7 @@ static void thin_io_hints(struct dm_target *t=
-i, struct queue_limits *limits)
-> > > >
-> > > >       limits->discard_granularity =3D pool->sectors_per_block << SE=
-CTOR_SHIFT;
-> > > >       limits->max_discard_sectors =3D 2048 * 1024 * 16; /* 16G */
-> > > > +     limits->max_provision_sectors =3D 2048 * 1024 * 16; /* 16G */
-> > > >  }
-> > > >
-> > > >  static struct target_type thin_target =3D {
-> > > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > > index e1ea3a7bd9d9..4d19bae9da4a 100644
-> > > > --- a/drivers/md/dm.c
-> > > > +++ b/drivers/md/dm.c
-> > > > @@ -1587,6 +1587,7 @@ static bool is_abnormal_io(struct bio *bio)
-> > > >               case REQ_OP_DISCARD:
-> > > >               case REQ_OP_SECURE_ERASE:
-> > > >               case REQ_OP_WRITE_ZEROES:
-> > > > +             case REQ_OP_PROVISION:
-> > > >                       return true;
-> > > >               default:
-> > > >                       break;
-> > > > @@ -1611,6 +1612,9 @@ static blk_status_t __process_abnormal_io(str=
-uct clone_info *ci,
-> > > >       case REQ_OP_WRITE_ZEROES:
-> > > >               num_bios =3D ti->num_write_zeroes_bios;
-> > > >               break;
-> > > > +     case REQ_OP_PROVISION:
-> > > > +             num_bios =3D ti->num_provision_bios;
-> > > > +             break;
-> > > >       default:
-> > > >               break;
-> > > >       }
-> > > > diff --git a/include/linux/device-mapper.h b/include/linux/device-m=
-apper.h
-> > > > index 04c6acf7faaa..b4d97d5d75b8 100644
-> > > > --- a/include/linux/device-mapper.h
-> > > > +++ b/include/linux/device-mapper.h
-> > > > @@ -333,6 +333,12 @@ struct dm_target {
-> > > >        */
-> > > >       unsigned num_write_zeroes_bios;
-> > > >
-> > > > +     /*
-> > > > +      * The number of PROVISION bios that will be submitted to the=
- target.
-> > > > +      * The bio number can be accessed with dm_bio_get_target_bio_=
-nr.
-> > > > +      */
-> > > > +     unsigned num_provision_bios;
-> > > > +
-> > > >       /*
-> > > >        * The minimum number of extra bytes allocated in each io for=
- the
-> > > >        * target to use.
-> > > > @@ -357,6 +363,11 @@ struct dm_target {
-> > > >        */
-> > > >       bool discards_supported:1;
-> > > >
-> > > > +     /* Set if this target needs to receive provision requests reg=
-ardless of
-> > > > +      * whether or not its underlying devices have support.
-> > > > +      */
-> > > > +     bool provision_supported:1;
-> > > > +
-> > > >       /*
-> > > >        * Set if we need to limit the number of in-flight bios when =
-swapping.
-> > > >        */
-> > > > --
-> > > > 2.37.3
-> > > >
-> > >
-> >
->
+sparse warnings: (new ones prefixed by >>)
+>> drivers/target/target_core_iblock.c:968:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:968:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:968:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:973:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:973:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:973:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:985:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:985:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:985:24: sparse:     got restricted sense_reason_t
+>> drivers/target/target_core_iblock.c:996:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected int [assigned] ret @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:996:21: sparse:     expected int [assigned] ret
+   drivers/target/target_core_iblock.c:996:21: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1000:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected int [assigned] ret @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1000:13: sparse:     expected int [assigned] ret
+   drivers/target/target_core_iblock.c:1000:13: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1035:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1035:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:1035:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1040:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1040:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:1040:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1044:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1044:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:1044:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1049:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1049:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:1049:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1055:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1055:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:1055:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1059:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1059:24: sparse:     expected int
+   drivers/target/target_core_iblock.c:1059:24: sparse:     got restricted sense_reason_t
+   drivers/target/target_core_iblock.c:1062:16: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
+   drivers/target/target_core_iblock.c:1062:16: sparse:     expected int
+   drivers/target/target_core_iblock.c:1062:16: sparse:     got restricted sense_reason_t
+>> drivers/target/target_core_iblock.c:1075:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted sense_reason_t [usertype] ret @@     got int @@
+   drivers/target/target_core_iblock.c:1075:21: sparse:     expected restricted sense_reason_t [usertype] ret
+   drivers/target/target_core_iblock.c:1075:21: sparse:     got int
+   drivers/target/target_core_iblock.c:1078:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted sense_reason_t [usertype] ret @@     got int @@
+   drivers/target/target_core_iblock.c:1078:21: sparse:     expected restricted sense_reason_t [usertype] ret
+   drivers/target/target_core_iblock.c:1078:21: sparse:     got int
+
+vim +968 drivers/target/target_core_iblock.c
+
+   956	
+   957	static int iblock_pr_read_keys(struct se_cmd *cmd, unsigned char *param_data)
+   958	{
+   959		struct se_device *dev = cmd->se_dev;
+   960		struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
+   961		struct block_device *bdev = ib_dev->ibd_bd;
+   962		const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+   963		int i, ret, len, paths, data_offset;
+   964		struct pr_keys *keys;
+   965	
+   966		if (!ops) {
+   967			pr_err("Block device does not support pr_ops but iblock device has been configured for PR passthrough.\n");
+ > 968			return TCM_UNSUPPORTED_SCSI_OPCODE;
+   969		}
+   970	
+   971		if (!ops->pr_read_keys) {
+   972			pr_err("Block device does not support read_keys.\n");
+   973			return TCM_UNSUPPORTED_SCSI_OPCODE;
+   974		}
+   975	
+   976		/*
+   977		 * We don't know what's under us, but dm-multipath will register every
+   978		 * path with the same key, so start off with enough space for 16 paths.
+   979		 */
+   980		paths = 16;
+   981	retry:
+   982		len = 8 * paths;
+   983		keys = kzalloc(sizeof(*keys) + len, GFP_KERNEL);
+   984		if (!keys)
+   985			return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+   986	
+   987		keys->num_keys = paths;
+   988		ret = ops->pr_read_keys(bdev, keys);
+   989		if (!ret) {
+   990			if (keys->num_keys > paths) {
+   991				kfree(keys);
+   992				paths *= 2;
+   993				goto retry;
+   994			}
+   995		} else if (ret) {
+ > 996			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+   997			goto free_keys;
+   998		}
+   999	
+  1000		ret = TCM_NO_SENSE;
+  1001	
+  1002		put_unaligned_be32(keys->generation, &param_data[0]);
+  1003		if (!keys->num_keys) {
+  1004			put_unaligned_be32(0, &param_data[4]);
+  1005			goto free_keys;
+  1006		}
+  1007	
+  1008		put_unaligned_be32(8 * keys->num_keys, &param_data[4]);
+  1009	
+  1010		data_offset = 8;
+  1011		for (i = 0; i < keys->num_keys; i++) {
+  1012			if (data_offset + 8 > cmd->data_length)
+  1013				break;
+  1014	
+  1015			put_unaligned_be64(keys->keys[i], &param_data[data_offset]);
+  1016			data_offset += 8;
+  1017		}
+  1018	
+  1019	free_keys:
+  1020		kfree(keys);
+  1021		return ret;
+  1022	}
+  1023	
+  1024	static int iblock_pr_read_reservation(struct se_cmd *cmd,
+  1025					      unsigned char *param_data)
+  1026	{
+  1027		struct se_device *dev = cmd->se_dev;
+  1028		struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
+  1029		struct block_device *bdev = ib_dev->ibd_bd;
+  1030		const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+  1031		struct pr_held_reservation rsv = { };
+  1032	
+  1033		if (!ops) {
+  1034			pr_err("Block device does not support pr_ops but iblock device has been configured for PR passthrough.\n");
+  1035			return TCM_UNSUPPORTED_SCSI_OPCODE;
+  1036		}
+  1037	
+  1038		if (!ops->pr_read_reservation) {
+  1039			pr_err("Block device does not support read_keys.\n");
+  1040			return TCM_UNSUPPORTED_SCSI_OPCODE;
+  1041		}
+  1042	
+  1043		if (ops->pr_read_reservation(bdev, &rsv))
+  1044			return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
+  1045	
+  1046		put_unaligned_be32(rsv.generation, &param_data[0]);
+  1047		if (!block_pr_type_to_scsi(rsv.type)) {
+  1048			put_unaligned_be32(0, &param_data[4]);
+  1049			return TCM_NO_SENSE;
+  1050		}
+  1051	
+  1052		put_unaligned_be32(16, &param_data[4]);
+  1053	
+  1054		if (cmd->data_length < 16)
+> 1055			return TCM_NO_SENSE;
+  1056		put_unaligned_be64(rsv.key, &param_data[8]);
+  1057	
+  1058		if (cmd->data_length < 22)
+  1059			return TCM_NO_SENSE;
+  1060		param_data[21] = block_pr_type_to_scsi(rsv.type);
+  1061	
+  1062		return TCM_NO_SENSE;
+  1063	}
+  1064	
+  1065	static sense_reason_t iblock_execute_pr_in(struct se_cmd *cmd, u8 sa,
+  1066						   unsigned char *param_data)
+  1067	{
+  1068		sense_reason_t ret = TCM_NO_SENSE;
+  1069	
+  1070		switch (sa) {
+  1071		case PRI_REPORT_CAPABILITIES:
+  1072			iblock_pr_report_caps(param_data);
+  1073			break;
+  1074		case PRI_READ_KEYS:
+> 1075			ret = iblock_pr_read_keys(cmd, param_data);
+  1076			break;
+  1077		case PRI_READ_RESERVATION:
+  1078			ret = iblock_pr_read_reservation(cmd, param_data);
+  1079			break;
+  1080		default:
+  1081			pr_err("Unknown PERSISTENT_RESERVE_IN SA: 0x%02x\n", sa);
+  1082			return TCM_UNSUPPORTED_SCSI_OPCODE;
+  1083		}
+  1084	
+  1085		return ret;
+  1086	}
+  1087	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
