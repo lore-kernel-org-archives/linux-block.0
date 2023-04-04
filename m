@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71550C6FD1D
-	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 16:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4B8C6FD1D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 16:53:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235555AbjDDQxd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Apr 2023 12:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34654 "EHLO
+        id S235667AbjDDQxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 12:53:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234777AbjDDQxY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 12:53:24 -0400
+        with ESMTP id S235411AbjDDQxb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 12:53:31 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5AE4EC5;
-        Tue,  4 Apr 2023 09:53:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E91A319AA;
+        Tue,  4 Apr 2023 09:53:16 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 9A75E20689;
-        Tue,  4 Apr 2023 16:53:06 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9F0872068B;
+        Tue,  4 Apr 2023 16:53:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1680627186; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1680627195; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Ll6vzEKQtu1d/iiPFBcw95nX9gIYgOaKMZRWVNUtfkM=;
-        b=OnTsPuWsvR8SUopMCtCWMTgT2XxI3U2ix4/z/djlxuJpDe5rTy1vlqUc7rIQ79SwyWU+Ba
-        aNQWpCYDuFeaj6SA/BU2bvIIYzm8uWKKX3KtU5qWEj3+h5Nzr/fpy+by5cNlp77YPmMqCo
-        FWnVjkGyLQXqBJ8fQCYb63lUO4hLKBw=
+        bh=HsMVP1Gx6bqzvFmi3XkM83yTiX2CMmFn0tLAqTXnpkI=;
+        b=btRPMMcl2b2uFZz5YK+tZE32E88Ja+m/EkIvXmlf/VcbcyPt8UXBCI+1HfaQcy83X/zun0
+        q8RT3lcBoIJDjqhQN0pXO17r2yZOR2oRKUkxYGi1adL3BezoX5ydpiXRqzkCA18uWnHeQF
+        XP2lmbvyGFA9b3jQoIJi4gEXoZ7IQ7M=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4C4161391A;
-        Tue,  4 Apr 2023 16:53:06 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5A9781391A;
+        Tue,  4 Apr 2023 16:53:15 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id +w65EfJVLGTSMAAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Tue, 04 Apr 2023 16:53:06 +0000
-Date:   Tue, 4 Apr 2023 18:53:05 +0200
+        id dYFtFftVLGTlMAAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Tue, 04 Apr 2023 16:53:15 +0000
+Date:   Tue, 4 Apr 2023 18:53:14 +0200
 From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
 To:     Yosry Ahmed <yosryahmed@google.com>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -54,58 +54,41 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         bpf@vger.kernel.org, Michal Hocko <mhocko@suse.com>
-Subject: Re: [PATCH v3 6/8] workingset: memcg: sleep when flushing stats in
- workingset_refault()
-Message-ID: <20230404165305.ffs7uscqpndnfytn@blackpad>
+Subject: Re: [PATCH v3 8/8] memcg: do not modify rstat tree for zero updates
+Message-ID: <20230404165314.swb7bide2mkjap3p@blackpad>
 References: <20230330191801.1967435-1-yosryahmed@google.com>
- <20230330191801.1967435-7-yosryahmed@google.com>
+ <20230330191801.1967435-9-yosryahmed@google.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="qfkseaqkxxqkcz24"
+        protocol="application/pgp-signature"; boundary="v5h2bvm4dmip3h3q"
 Content-Disposition: inline
-In-Reply-To: <20230330191801.1967435-7-yosryahmed@google.com>
+In-Reply-To: <20230330191801.1967435-9-yosryahmed@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---qfkseaqkxxqkcz24
-Content-Type: text/plain; charset=us-ascii
+--v5h2bvm4dmip3h3q
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 30, 2023 at 07:17:59PM +0000, Yosry Ahmed <yosryahmed@google.co=
+On Thu, Mar 30, 2023 at 07:18:01PM +0000, Yosry Ahmed <yosryahmed@google.co=
 m> wrote:
-> In workingset_refault(), we call
-> mem_cgroup_flush_stats_atomic_ratelimited() to read accurate stats
-> within an RCU read section and with sleeping disallowed. Move the
-> call above the RCU read section to make it non-atomic.
->=20
-> Flushing is an expensive operation that scales with the number of cpus
-> and the number of cgroups in the system, so avoid doing it atomically
-> where possible.
+>  mm/memcontrol.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-I understand why one does not process the whole flushing load in one go
-in general.
-However, I remember there were reports of workingset_refault() being
-sensitive to latencies (hence the ratelimited call was created).
+Reviewed-by: Michal Koutn=FD <mkoutny@suse.com>
 
-Is there any consideration on impact of this here?
-(Or are there other cond_resched() precendents on this path? Should it
-be mentioned like in the vmscan (7/8) commit?)
-
-Thanks,
-Michal
-
---qfkseaqkxxqkcz24
+--v5h2bvm4dmip3h3q
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCZCxV7gAKCRAkDQmsBEOq
-uUD+AQD8wXXi9jmmMAZsQDelWPQkkod/PwIlrMWJ7mxxhDrGEwEAqpLPmU1ZnE0x
-eJvubQemadydJAWDGZe8mox2qJ3iLAY=
-=AwCK
+iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCZCxV9QAKCRAkDQmsBEOq
+uYK9AP0WJYtFSeSrHica60KBnkpC0zuL6ZB9oq/HdqUH8N7N9gEAxT/BKJqjFEX1
+f8Ij/Sc8okkrXt+NvEbGkgBVVJnCNAA=
+=86rE
 -----END PGP SIGNATURE-----
 
---qfkseaqkxxqkcz24--
+--v5h2bvm4dmip3h3q--
