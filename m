@@ -2,107 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC16C7619A
-	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 14:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB61C761A6
+	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 14:45:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238237AbjDEOl7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 10:41:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53394 "EHLO
+        id S238477AbjDEOpS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 10:45:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237398AbjDEOl4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 10:41:56 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C8D40C4;
-        Wed,  5 Apr 2023 07:41:43 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 335Dv4r9027460;
-        Wed, 5 Apr 2023 14:20:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=pc7qniAN4vjGcrauIAuGswZmbQTkPmHflKHcwYCNj3Q=;
- b=kO4Ux52eW+aYU6U0g769uBkPy/5Sr6XfA0LKdGYuMork0/NVULoNnFB0ima18l7iCool
- 7S/2sbss0DA3yCLlj5Eylv231R3E7QPr4C604sSvPKJP8zF375/4oRO8T29zfoLg5d1H
- VAdlGRxMht/xmyBugN8Sk0UH6QQ6lutiM/EYtxd08wBSg4HrFtcrfLQEJHJAmGqLhKDP
- PwMjsaPXvWO187rRQKxtxhO/Qo3KpgGwhf2LLKx5zAuo5esknVkycNOQeu4IBc4UiM9N
- q1n8Bq1W1bSimY+F6wUKZpafqNHSfYhTpdneqL+FD029m4ZEaZTLpo+ZbwCahe59QT09 mQ== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3psaamrrg5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Apr 2023 14:20:25 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 334NupWA003364;
-        Wed, 5 Apr 2023 14:20:21 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ppc873cnp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Apr 2023 14:20:21 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 335EKIjo50135678
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Apr 2023 14:20:18 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2139F2004D;
-        Wed,  5 Apr 2023 14:20:18 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0DAF12004B;
-        Wed,  5 Apr 2023 14:20:18 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed,  5 Apr 2023 14:20:18 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
-        id 8C160E13E2; Wed,  5 Apr 2023 16:20:17 +0200 (CEST)
-From:   Stefan Haberland <sth@linux.ibm.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 6/7] s390/dasd: add autoquiesce event for start IO error
-Date:   Wed,  5 Apr 2023 16:20:16 +0200
-Message-Id: <20230405142017.2446986-7-sth@linux.ibm.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20230405142017.2446986-1-sth@linux.ibm.com>
-References: <20230405142017.2446986-1-sth@linux.ibm.com>
+        with ESMTP id S238532AbjDEOpR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 10:45:17 -0400
+Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D345658A;
+        Wed,  5 Apr 2023 07:45:07 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id 03AB6417B5;
+        Tue,  4 Apr 2023 10:09:22 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx2-2022; t=1680617362;
+        bh=11GGAKNFFOnfpIak6NFTdMWk1LHfY/KVoSOPzye48Ng=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=NwRiJb+gjJQznZhakZ0C7bUEf34GSJBKlvcPoWpcMHZ9QHbtkNs01RsrHFl+bFyLj
+         Q42amjZbjhbrBDYerYo0B0V/43066nm4UD1ODEPGmQ+jFrBqIaud7ynUGT+NYTiLm6
+         lhpA5/OFGwQSDHUHSNU/7C7iYTQinGpOcc8OhuJ9SJ/hvTgGUwqOQUh/GW2cK9eLqw
+         a3Oxnkro3HJH3xTE8NW+yI/Z8W5Ml762h3I4Pskr9d9+AZ0AjKhNLzr0kaqeQogy3a
+         HfHkkveZLo92DtUSuPrL4+VwU66eP9Htg09Wb0OayTzKHhyoqeIsoGuWDWgrMIqPHJ
+         +OWAy0x3s+kuw==
+Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
+ prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 4 Apr 2023 16:09:15 +0200
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <axboe@kernel.dk>, <hch@infradead.org>, <corbet@lwn.net>,
+        <snitzer@kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <willy@infradead.org>, <kch@nvidia.com>,
+        <martin.petersen@oracle.com>, <vkoul@kernel.org>,
+        <ming.lei@redhat.com>, <gregkh@linuxfoundation.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <sergei.shtepa@veeam.com>
+Subject: [PATCH v3 11/11] blksnap: Kconfig and Makefile
+Date:   Tue, 4 Apr 2023 16:08:35 +0200
+Message-ID: <20230404140835.25166-12-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20230404140835.25166-1-sergei.shtepa@veeam.com>
+References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: MvuuerSaPPWWQWMozTbs8LvFbVXtpKL-
-X-Proofpoint-ORIG-GUID: MvuuerSaPPWWQWMozTbs8LvFbVXtpKL-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-05_09,2023-04-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- adultscore=0 priorityscore=1501 malwarescore=0 bulkscore=0 clxscore=1015
- spamscore=0 suspectscore=0 phishscore=0 mlxlogscore=999 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
- definitions=main-2304050127
+Content-Type: text/plain
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2924031554657367
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a check for errors in the start_io function that signal a not
-working device. Trigger an autoquiesce event in that case.
+Allows to build a module and add the blksnap to the kernel tree.
 
-Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
-Reviewed-by: Jan Hoeppner <hoeppner@linux.ibm.com>
+Co-developed-by: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Christoph Hellwig <hch@infradead.org>
+Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- drivers/s390/block/dasd.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/block/Kconfig          |  2 ++
+ drivers/block/Makefile         |  2 ++
+ drivers/block/blksnap/Kconfig  | 12 ++++++++++++
+ drivers/block/blksnap/Makefile | 15 +++++++++++++++
+ 4 files changed, 31 insertions(+)
+ create mode 100644 drivers/block/blksnap/Kconfig
+ create mode 100644 drivers/block/blksnap/Makefile
 
-diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
-index 1bfd0e17a4dc..3696931f8015 100644
---- a/drivers/s390/block/dasd.c
-+++ b/drivers/s390/block/dasd.c
-@@ -1452,6 +1452,8 @@ int dasd_start_IO(struct dasd_ccw_req *cqr)
- 	case -ENODEV:
- 		DBF_DEV_EVENT(DBF_WARNING, device, "%s",
- 			      "start_IO: -ENODEV device gone, retry");
-+		/* this is equivalent to CC=3 for SSCH report this to EER */
-+		dasd_handle_autoquiesce(device, cqr, DASD_EER_STARTIO);
- 		break;
- 	case -EIO:
- 		DBF_DEV_EVENT(DBF_WARNING, device, "%s",
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index f79f20430ef7..5fc38a7ed822 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -387,4 +387,6 @@ config BLK_DEV_UBLK
+ 
+ source "drivers/block/rnbd/Kconfig"
+ 
++source "drivers/block/blksnap/Kconfig"
++
+ endif # BLK_DEV
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index 101612cba303..9a2a9a56a247 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -40,3 +40,5 @@ obj-$(CONFIG_BLK_DEV_NULL_BLK)	+= null_blk/
+ obj-$(CONFIG_BLK_DEV_UBLK)			+= ublk_drv.o
+ 
+ swim_mod-y	:= swim.o swim_asm.o
++
++obj-$(CONFIG_BLKSNAP) += blksnap/
+diff --git a/drivers/block/blksnap/Kconfig b/drivers/block/blksnap/Kconfig
+new file mode 100644
+index 000000000000..14081359847b
+--- /dev/null
++++ b/drivers/block/blksnap/Kconfig
+@@ -0,0 +1,12 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Block device snapshot module configuration
++#
++
++config BLKSNAP
++	tristate "Block Devices Snapshots Module (blksnap)"
++	help
++	  Allow to create snapshots and track block changes for block devices.
++	  Designed for creating backups for simple block devices. Snapshots are
++	  temporary and are released then backup is completed. Change block
++	  tracking allows to create incremental or differential backups.
+diff --git a/drivers/block/blksnap/Makefile b/drivers/block/blksnap/Makefile
+new file mode 100644
+index 000000000000..8d528b95579a
+--- /dev/null
++++ b/drivers/block/blksnap/Makefile
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: GPL-2.0
++
++blksnap-y := 		\
++	cbt_map.o	\
++	chunk.o		\
++	diff_area.o	\
++	diff_buffer.o	\
++	diff_storage.o	\
++	event_queue.o	\
++	main.o		\
++	snapimage.o	\
++	snapshot.o	\
++	tracker.o
++
++obj-$(CONFIG_BLKSNAP)	 += blksnap.o
 -- 
-2.37.2
+2.20.1
 
