@@ -2,134 +2,146 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C84C761A6
-	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 18:32:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCCFFC761A6
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 18:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236386AbjDDScU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Apr 2023 14:32:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51184 "EHLO
+        id S236112AbjDDScx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 14:32:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236396AbjDDScG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 14:32:06 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2077.outbound.protection.outlook.com [40.107.101.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF52583E2
-        for <linux-block@vger.kernel.org>; Tue,  4 Apr 2023 11:29:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KOQYcpoeVNHjCiuHISTYb5ld4ZlcPQ2DroZEjrwSWeB6oGJ2byjgbbBLvwuBsGr108PkJ/3BKRBh2yh2Q8A8eBZLVtmKJ+WDWsoGU6+YRXEIYacfyIAOssu7wTVqvDVkFZ86g5/Z56+6kSHQHrFEWXeJaS3GY17xN72Ci6HI7zgfd7RVtj2El/V+UNXAk0NR9T9FkE2vJBK63MMMfevNgsesHPM2a+KNTaGEawNK5QnlQOOMjdPyUyYHeV/jHLhShFp4Zc9ddbVsGGRFhRZImgVSVwKBk+oZcrVEHJneo+W5hleQGrm+9GKasoVqrAt1/3AsNwFUP24wjdtx766xHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yGP2dVwAyq/cbNZ0owGygvyHc6wRDGNqLjcmeDjvVC0=;
- b=BEUhSkhDdcJlFEsOojdjoseXi8bGiLt9Jg3vF7/7RXUjpc8Q7Fp6iU35tmLDCL2i5RDhibFdkFIa08prxhegbNTnQhv9b+5MGgGuQ/k854L9dRgnqwv3/94MGBGFUCHsC2HoG2HivqHj0NTNTleELkgW5F94VHVSQEZL/tgUIm16OXiGHs0ravkfEnqFOEkVoZOrpCOlKUNemxK3Bz6SlGtJkZhVs/u+/ojoJmzP6/12E4dg5qd5KeK3R7KxJILwBlP8s+jzQx/iuQjoG7XrXUgGHKhioLvki2SBDqdRzS6J/0euExFX0Mhwc1dexeTKZGgCCuTUDkR61QgId8jGjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yGP2dVwAyq/cbNZ0owGygvyHc6wRDGNqLjcmeDjvVC0=;
- b=WQjsp57PGPg4QxgSzQ2KY8/NKJO9p+/hpYETBYXEOL1He/kOEAGeNUYW11US0zQGSN+GFIYUSbYDxCGbZdKEtEpHXWwIMzqlhUCmxEyX6IT/E3MbzYDzW1qUzsTovxapyQBUF6DGmcg9zo4bgf+m3na1mFpN4bv2BovT+n2kz2dUWF61vAtZisf8JJcFfblMnFgysgYupoNzCrbSzh0qt0fVcuXbhU9M8Yt3lbkaX/0BO2/Po8JrwMc7GdCZ/dZXwY0qb557Smivigh279a3KIX2aIBYvqFl6XMOh/+MtxRl11448jFflnCm9FaJDWnU+OnUQYAqQjHo+HVxJ1oyoA==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by PH7PR12MB5926.namprd12.prod.outlook.com (2603:10b6:510:1d9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Tue, 4 Apr
- 2023 18:29:01 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::9f90:cf3d:d640:a90b]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::9f90:cf3d:d640:a90b%4]) with mapi id 15.20.6254.035; Tue, 4 Apr 2023
- 18:29:00 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Alyssa Ross <hi@alyssa.is>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] loop/009: add test for loop partition uvents
-Thread-Topic: [PATCH blktests] loop/009: add test for loop partition uvents
-Thread-Index: AQHZYyGPFP4Za0bZWkK9bgonlouwP68bgGMA
-Date:   Tue, 4 Apr 2023 18:29:00 +0000
-Message-ID: <517f4449-ffef-f1e8-78cf-bae8c2cdf665@nvidia.com>
-References: <21c2861f-9b7d-636e-74e1-27bd7bbb1a4f@nvidia.com>
- <20230330160247.16030-1-hi@alyssa.is>
-In-Reply-To: <20230330160247.16030-1-hi@alyssa.is>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|PH7PR12MB5926:EE_
-x-ms-office365-filtering-correlation-id: aeb63254-06b8-4c8a-5a55-08db353a7617
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: AbQDXK2v/xMKKKcOWMgC2qWpu7EaQUOeVDlTUljfo0TBKdcwb831pn+L+AzSmdDyIRXMvCYDmUsCLUritr0Qm+nK+jz9ttyeaLIsEcv6iAlioK24WlDSyd5n+6DlpJkETXCxNtCS7nFpDCDRd/ISldpbvOvyu9/QlIuFovfOVHvRiOHf9Boky+EMeOmLN8YsW7wc6XJioMnspOiOyzJ9fjd+9HE4gnYirgE++efZ62XGIGG6efd3Dle36+V++AFUS/JVNZIT4V0UkFqKtOjs3hRHWHCYdv3tCNXc/2Dtve/VK0eoPslAyaqwiZH5gRpPFB8YTcATWKnDKGwzG0iAmMpQW4TuwtbJOlCAxZQcCsGd4WjBJBU5Xd5oGWbuWNe8XDKc04Py3LcDXwoKQiRB4ss2++74yjjEQ70jcU/8xTciktG5+E6AHyfVd0sbfb6iaXvfXpIiMnX8K0HSrPK6pxoXAKkcM76tow8JcCUG2HGlQTroVfpZeVb4NGwIVTAGAz/fGJu8OGItHrvx6PzC0PzTojwG3kGI1byAFqwm+B7/qJWNteqcQgyJEhpNtXQUjpe5WUFu+zgCpFGWUGf6omnpqBCYDxsppq1PfmQoRL01GXfN0K5nR1Z1/Q+brZNhyo0LQy8eUCHuP7qpoHtyPtmeCWqvqgf3hG1cHhWU6kKvwSJY00/MpMl6hsDS/MIbEemdFPP8h7M3lLVl9kBGoA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(346002)(366004)(39860400002)(451199021)(122000001)(4326008)(66946007)(316002)(8676002)(76116006)(66556008)(91956017)(66446008)(66476007)(64756008)(54906003)(478600001)(4744005)(110136005)(8936002)(38100700002)(5660300002)(41300700001)(53546011)(186003)(966005)(6486002)(71200400001)(2616005)(6512007)(6506007)(86362001)(31696002)(2906002)(36756003)(38070700005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?b3ZXN3JVLzJHMlJUMnZldG85VWRzSzBGbmYzZHkyLzhFQ2xzanJLNFZRdlJ6?=
- =?utf-8?B?ZUtEWjhkRERYUnZnZ0NTKzdEY0UyTHpnUWJRcEo2Zm9HOVBrTjhyWkhLOWcz?=
- =?utf-8?B?eUFlb20vTEFUS3BiWUNnTmlXbEg5ZVN1bHRUSlVITitISE9DNVliUjQvV0Nr?=
- =?utf-8?B?N1ZnK1VzcGxDZnBhUHNEQWZKa25laFFXcUVjOGxQSW9LNzFRVll6ZXhzMG5K?=
- =?utf-8?B?Y3NtekxQNkRad2x6UVNEd056cDJONHVCN3hzSUZYYkdvYlVhSkRJNUlEdGxo?=
- =?utf-8?B?YzJXYjg5eEJiWU91ZUVoaDNCSzRHeXhkMXFaRzVacVJTRzl1UWVvU3djYnYx?=
- =?utf-8?B?bFhvQWZUeTE3YUM5TVF1WFpCNlVRTzBQcURmMHlnMDBQa1pQbXhOQTFRS0NP?=
- =?utf-8?B?VGE2U0wrdWN2Q3pRRFNJQVU5OXJoKzVZMXBTcHpqaDFKWGlxTlFlQjlNelUw?=
- =?utf-8?B?Uithc2xDd0VBMFhjZWpaMWwwc1ovUDhSR25OdTBLRkxzSjZ4WXloT3Jmdm41?=
- =?utf-8?B?bGVRS1ZJOFA0T2RhY21LVHJGcFA2WUhjSmgvRGZCQVpCOGhSczI3Nk5FVTlW?=
- =?utf-8?B?K2d6aHIyYTRURElHRlZ0cjF2N01PdTFrT05ycVJsQmpKeGZ3YW4yS3lDTFV2?=
- =?utf-8?B?VitnM0xOM28wT0NxZkdpRTZ0T0JFdDRzWnAvOGdValpiTDdqYUY4bXB4K3Z2?=
- =?utf-8?B?WDZ4Y3lBOUYzZytXZ1p3elNuSWg3NzVrQm1GWWpMbHRQMHFlNzEvTDJxYnpq?=
- =?utf-8?B?VmJ1NzVrQkdCZmlWeG5XbFg2RlJrSmhJYi84WmE0SnVkbnlweEY2czZaMlRS?=
- =?utf-8?B?WmRCQS8xVUdzd0M5ejVacFc5SDh3cmYvbjVwL2JuaTR3OS9xek8vUzlNV002?=
- =?utf-8?B?djc5Z0VDU0thOGJha1E4aVpva2RaUlRwWnN6Vk1memEyeFZrb0pRVWN5QTZF?=
- =?utf-8?B?QkZ2RlcrYVpQQVh2V1gyUnNYSnZUR21tbmhuY2JET3hBZXpta3Vnc2E0Sjd0?=
- =?utf-8?B?eVZkRTRkUTB6VzVKOUpkY2V2SEJaWFFTU3FVV2NwSGhlMXRWYS9xcmhNU2Qr?=
- =?utf-8?B?a2k2cW9wMlUxN1FDNnFqMXkxNGFHdjdvNkh3REtYK0hCY0FKU01OT0xzZGJC?=
- =?utf-8?B?c2JQakloWTFtK1lhZUducWxmUDRVd0t5TkFPandHVS9DZFd4R01xSERSeEZG?=
- =?utf-8?B?V0puSlNOM1N2SG5wVzVmdG82TG9reE1PcDhzNGZKZW0zUVlMc2VnYWdDdzF5?=
- =?utf-8?B?WHRiMXJkcVFKZ0x2dUxURytja1BGaStmbWVMK05PYVYzUnF0b2tEbWI0MFBG?=
- =?utf-8?B?ckEwTGZxbXh5R1pPa0h0T1N4UzZJNm91dVZuTjhJQVBDeXpmMTVDWXpUZUVh?=
- =?utf-8?B?MjJ6OFhYT0VDNjZDQldlaUNrZlp3Y01xVFdKNU5TNy8rOFNwOWlMb0RnSFJk?=
- =?utf-8?B?c3J2VEY2UUtHeFdRZzFxYzVIZXdLbVMrY3AyV0NrdlJKTEM1VXplb1paRW9p?=
- =?utf-8?B?R29YWnRQRGRmZ0RrbjlPY204a05qM0hkTWFaTk40bDdWVnlqTnJhOWRYT0ZJ?=
- =?utf-8?B?bnh3NTVnaUZNb3hiQ2RlVHUyZHFaWXNPT1pUc1ZXRFJDWXBVU1daemhodjBy?=
- =?utf-8?B?TExrd0NoZEM3YlNZTGJwUGpabm0rU3FKODgwVXpudXBtZmkzaWUveVg3MUJa?=
- =?utf-8?B?YmdUOWZ1akhySHZSZzE3QVpvQ0s3WUd3Y0lPTW5xaUE2d1E0ajIrWWgzVW4x?=
- =?utf-8?B?dVZPYWxJUnkzLzY5OVk0cUoyL3JXbUM4UHRZQXljWlNKeGdHZUpxdFhiOEdk?=
- =?utf-8?B?ZGlQUjZvZEgzWERPeEJISHh3aG1idjZibTdjU2hLVHRsRU15c1d3REF0RXFQ?=
- =?utf-8?B?cUkvbUsvRFV2UlV6RTFhdE1vL3lPNUdnVVpGN1RML1RHaEd4bWFGbmMrb2Jq?=
- =?utf-8?B?eStyU2Y0TEhRSTNCVXQ0cWtXVjkyWWVWUTllZmpBRkNRWGszekMvS0s0Rnp3?=
- =?utf-8?B?MXl4U1pabllmMVloeDgyUU4wMXVwSWUycEQ5UUoxMDhLL250cHFYV2JQWGdN?=
- =?utf-8?B?VG8vdzYxcFdZSk9FQjFnNlRZUUYzencrdFRVajJCOTZEeTRPRGpMOWYxTTJx?=
- =?utf-8?B?Tko5MVN6aVhaZlEveDlOT2s3RXdxaEltbjNPRDY4cFUzUExRa1IwdXZIM1ll?=
- =?utf-8?Q?2cuM74TGxLew18bTyStZ9/qs5sNA97OYo4ry+KQGLmzQ?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F71E8FD752F1A84B9D0FBD8065845388@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S236403AbjDDSch (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 14:32:37 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C07E7299;
+        Tue,  4 Apr 2023 11:29:57 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id g19so30395002lfr.9;
+        Tue, 04 Apr 2023 11:29:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680632996;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:dkim-signature
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iyOtHBCn/uWNrq/R7ZU6Qv+JF796mVDB+Rf4s24M8k8=;
+        b=ib9mbykm3+8hKIYWnHITKJCz17TUtGdUTKk3v2uwnImQG0J82GrUq7qgQzTPkd6HrE
+         NhUZnvOEsVdDd5WEBFutKoE1kma+7g+QUz70yaiTiO3qcT191MzskWZQp2v9FFFetYZS
+         RAimbJ+Zcyg6HtPr620V/qQXvzId/t9IOiCP70bP8Eq4KR/dczuw3doaQGADSRLmr7Jb
+         wlSvh8/DIk+QRn0Kx6P9fUli/q00rSqWwsFxTd8C4sT1ZV+7Lf5FcxUM+vEFvU+6+wpV
+         1VOv3423fRJRwEetZEFoKm6sfj6XxVmnhfwORe+C1Gv4hOBfnUfABVd/+wR9JZ+GXNaZ
+         W+NQ==
+X-Gm-Message-State: AAQBX9db/+JF0xRPwwwaooBom1RyOfVkXH5WFlk6XKWSZkz19+5QNyMY
+        kSOa8ec461BPIVyhG85bPxsI0tEnHEY2jw==
+X-Google-Smtp-Source: AKy350Zuu6oRwoWxK7jFyzhkUcbAGbkBFA6XrYXRGF/ep7kWeA/x99mPQ7eqCAXA4HSUMpmEEdphTg==
+X-Received: by 2002:ac2:495c:0:b0:4eb:f6d:64f with SMTP id o28-20020ac2495c000000b004eb0f6d064fmr875381lfi.42.1680632995622;
+        Tue, 04 Apr 2023 11:29:55 -0700 (PDT)
+Received: from flawful.org (c-a3f5e255.011-101-6d6c6d3.bbcust.telenor.se. [85.226.245.163])
+        by smtp.gmail.com with ESMTPSA id q17-20020a19a411000000b004d3d43c7569sm2434994lfc.3.2023.04.04.11.29.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 11:29:55 -0700 (PDT)
+Received: by flawful.org (Postfix, from userid 112)
+        id 58508895; Tue,  4 Apr 2023 20:29:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
+        t=1680632993; bh=rbfvsr3tquiM93ijFijrjR0bS0TPBVeknlwL0sNNs3w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=a3DxNnZoYVoyfOR9GBn/fKDA+kCpFRiV4COlGHiFOmiGGYiHRvsH7YO3hhH7tmRY9
+         UbcueSw/PFYgvmiPrJAy4lNHlfj7ZoIt/+YVeISDOfL0qIrl/AvpdzlHIWgZIvY/v7
+         +BIuO6uKJfXuIGGHZ5P+en4vLcnwgB8pZ8VFyStA=
+Received: from x1-carbon.lan (OpenWrt.lan [192.168.1.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by flawful.org (Postfix) with ESMTPSA id 47F2CA55;
+        Tue,  4 Apr 2023 20:25:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
+        t=1680632737; bh=rbfvsr3tquiM93ijFijrjR0bS0TPBVeknlwL0sNNs3w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=JWi/ewFA6jmNPVTTeqjpc+8T/swngda6y6f4QJuGJxv7ruzgZDA0vqDUbWGIfLCVK
+         bUicPZep8s+7Ys3YYoA66fwda9r7qzoDHHIR3H4aah70tAVh0o5lfquU1b5NEqVl63
+         KMJXYpIayHlUHNqO2boKhvQXS7AfxtnemS5FKxGQ=
+From:   Niklas Cassel <nks@flawful.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>,
+        Mike Christie <michael.christie@oracle.com>
+Subject: [PATCH v5 05/19] scsi: rename and move get_scsi_ml_byte()
+Date:   Tue,  4 Apr 2023 20:24:10 +0200
+Message-Id: <20230404182428.715140-6-nks@flawful.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230404182428.715140-1-nks@flawful.org>
+References: <20230404182428.715140-1-nks@flawful.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aeb63254-06b8-4c8a-5a55-08db353a7617
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Apr 2023 18:29:00.8424
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KuWAHBDDQS0DoLsvrH16mZMde5iKdtBWeVeM6U+9wl4nahv4wC4cc1jNNan69BWCy/AEe98OD2xN6n65a/136g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5926
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMy8zMC8yMDIzIDk6MDIgQU0sIEFseXNzYSBSb3NzIHdyb3RlOg0KPiBMaW5rOiBodHRwczov
-L2xvcmUua2VybmVsLm9yZy9yLzIwMjMwMzIwMTI1NDMwLjU1MzY3LTEtaGNoQGxzdC5kZS8NCj4g
-U3VnZ2VzdGVkLWJ5OiBDaGFpdGFueWEgS3Vsa2FybmkgPGNoYWl0YW55YWtAbnZpZGlhLmNvbT4N
-Cj4gU2lnbmVkLW9mZi1ieTogQWx5c3NhIFJvc3MgPGhpQGFseXNzYS5pcz4NCg0KVGhhbmtzIGEg
-bG90IGZvciB0aGlzLCBvdmVyYWxsIHRoaXMgbG9va3MgZ29vZCB0byBtZS4NCg0KVGhpcyBkb2Vz
-IGV4YWN0bHkgdGhlIHRlc3RpbmcgZm9yIGxvb3AgY29uZmlndXJlIHRoYXQgeW91ciBwYXRjaA0K
-aXMgZm9yLCBsZXQncyBqdXN0IG1ha2Ugc3VyZSB0byBhcHBseSB0aGlzIHBhdGNoIG9uY2UgeW91
-ciBrZXJuZWwNCnBhdGNoIGlzIG1lcmdlZC4NCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBLdWxr
-YXJuaSA8a2NoQG52aWRpYS5jb20+DQoNCi1jaw0KDQoNCg==
+From: Niklas Cassel <niklas.cassel@wdc.com>
+
+SCSI has two different getters:
+- get_XXX_byte() (in scsi_cmnd.h) which takes a struct scsi_cmnd *, and
+- XXX_byte() (in scsi.h) which takes a scmd->result.
+The proper name for get_scsi_ml_byte() should thus be without the get_
+prefix, as it takes a scmd->result. Rename the function to rectify this.
+(This change was suggested by Mike Christie.)
+
+Additionally, move get_scsi_ml_byte() to scsi_priv.h since both scsi_lib.c
+and scsi_error.c will need to use this helper in a follow-up patch.
+
+Cc: Mike Christie <michael.christie@oracle.com>
+Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/scsi/scsi_lib.c  | 7 +------
+ drivers/scsi/scsi_priv.h | 5 +++++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index b7c569a42aa4..fac9c31161d2 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -578,11 +578,6 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+ 	return false;
+ }
+ 
+-static inline u8 get_scsi_ml_byte(int result)
+-{
+-	return (result >> 8) & 0xff;
+-}
+-
+ /**
+  * scsi_result_to_blk_status - translate a SCSI result code into blk_status_t
+  * @result:	scsi error code
+@@ -595,7 +590,7 @@ static blk_status_t scsi_result_to_blk_status(int result)
+ 	 * Check the scsi-ml byte first in case we converted a host or status
+ 	 * byte.
+ 	 */
+-	switch (get_scsi_ml_byte(result)) {
++	switch (scsi_ml_byte(result)) {
+ 	case SCSIML_STAT_OK:
+ 		break;
+ 	case SCSIML_STAT_RESV_CONFLICT:
+diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
+index 96284a0e13fe..74324fba4281 100644
+--- a/drivers/scsi/scsi_priv.h
++++ b/drivers/scsi/scsi_priv.h
+@@ -29,6 +29,11 @@ enum scsi_ml_status {
+ 	SCSIML_STAT_TGT_FAILURE		= 0x04,	/* Permanent target failure */
+ };
+ 
++static inline u8 scsi_ml_byte(int result)
++{
++	return (result >> 8) & 0xff;
++}
++
+ /*
+  * Scsi Error Handler Flags
+  */
+-- 
+2.39.2
+
