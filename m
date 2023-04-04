@@ -2,280 +2,208 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 844A3C7618D
-	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 05:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC291C6FD1D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 07:49:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233181AbjDDFaf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Apr 2023 01:30:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57428 "EHLO
+        id S233652AbjDDHt6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 03:49:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233369AbjDDFab (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 01:30:31 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F021FEF;
-        Mon,  3 Apr 2023 22:30:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1680586228; x=1712122228;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RdDpxGvgQ2tbcB1Q1fxF2Lua+npmQ3o86qaGHUvpBgc=;
-  b=jc3PYuEnvwiBb1scsIhzmgKId0CZJCtf6Yp0WSYaF0Wm5jFehnWIB0yl
-   jmHy7CuSPCmYwKZkEe3VDWWunyoI5m2DGirYTRcj1xgt+0VjCElxA6jFA
-   pjR8IWpFSiX+gcRyJXUTVgpbCsbXE+xzBm7jPEp8PL0GcDRK/v39vlaSQ
-   VMr4HHzdu9CMr84p3hFbxtXKi8YebayKdFvnhk7gDyB8VR4Rqep0YYgQB
-   RFAqqUX6BUufTX9DolcvPa35KwkjkvCQPTGtjtyiwi+yqI9sJWb3BrdaA
-   kVdl4OVSqCA+3Pn2usLAKe4RjNW/MJVFFriPW1SpV90Or5POiQcyqKyDK
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="428377409"
-X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="428377409"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2023 22:30:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10669"; a="686242063"
-X-IronPort-AV: E=Sophos;i="5.98,316,1673942400"; 
-   d="scan'208";a="686242063"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 03 Apr 2023 22:30:08 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pjZF8-000PEe-10;
-        Tue, 04 Apr 2023 05:30:06 +0000
-Date:   Tue, 4 Apr 2023 13:29:42 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Mike Christie <michael.christie@oracle.com>, bvanassche@acm.org,
-        hch@lst.de, martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        james.bottomley@hansenpartnership.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        kbusch@kernel.org, target-devel@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Mike Christie <michael.christie@oracle.com>
-Subject: Re: [PATCH v5 18/18] scsi: target: Add block PR support to iblock
-Message-ID: <202304041322.SEFV29Co-lkp@intel.com>
-References: <20230324181741.13908-19-michael.christie@oracle.com>
+        with ESMTP id S233567AbjDDHtx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 03:49:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91849120
+        for <linux-block@vger.kernel.org>; Tue,  4 Apr 2023 00:49:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680594546;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Im5L/NmV1DuxZwE4hnbXnlwO/3Ionh4NNqvKa/4qFqc=;
+        b=ekmWt4HAsKnGU5fQv2glL6t/LKcSTn7n8YGxTZ6Z+gFobGUxuByarVbUV9U/IyIzEpy26H
+        mls2JQJ/kKiuaq4TxNUdF85Ujl0sAP49TPclU0eVk8b4C2WiAauOadw2ZBrCW6t83RbsPd
+        6eyhNlMNlPDzlXq2p6k2jUmrx4NkftE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-517-jwH89YmNPK-iUr1YjTs6Bg-1; Tue, 04 Apr 2023 03:49:03 -0400
+X-MC-Unique: jwH89YmNPK-iUr1YjTs6Bg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F2431C0A59B;
+        Tue,  4 Apr 2023 07:49:03 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 432FA440BC;
+        Tue,  4 Apr 2023 07:48:55 +0000 (UTC)
+Date:   Tue, 4 Apr 2023 15:48:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>, ming.lei@redhat.com
+Subject: Re: [PATCH V6 00/17] io_uring/ublk: add generic IORING_OP_FUSED_CMD
+Message-ID: <ZCvWYoDk0dnJbHhW@ovpn-8-16.pek2.redhat.com>
+References: <20230330113630.1388860-1-ming.lei@redhat.com>
+ <ZConr0f8e/mEL0Cl@ovpn-8-18.pek2.redhat.com>
+ <d696eb70-9dac-9334-7aec-1b5af62442e3@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230324181741.13908-19-michael.christie@oracle.com>
+In-Reply-To: <d696eb70-9dac-9334-7aec-1b5af62442e3@kernel.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Mike,
+Hello Jens and Everyone,
 
-kernel test robot noticed the following build warnings:
+On Sun, Apr 02, 2023 at 07:24:17PM -0600, Jens Axboe wrote:
+> On 4/2/23 7:11?PM, Ming Lei wrote:
+> > On Thu, Mar 30, 2023 at 07:36:13PM +0800, Ming Lei wrote:
+> >> Hello Jens and Guys,
+> >>
+> >> Add generic fused command, which can include one primary command and multiple
+> >> secondary requests. This command provides one safe way to share resource between
+> >> primary command and secondary requests, and primary command is always
+> >> completed after all secondary requests are done, and resource lifetime
+> >> is bound with primary command.
+> >>
+> >> With this way, it is easy to support zero copy for ublk/fuse device, and
+> >> there could be more potential use cases, such as offloading complicated logic
+> >> into userspace, or decouple kernel subsystems.
+> >>
+> >> Follows ublksrv code, which implements zero copy for loop, nbd and
+> >> qcow2 targets with fused command:
+> >>
+> >> https://github.com/ming1/ubdsrv/tree/fused-cmd-zc-for-v6
+> >>
+> >> All three(loop, nbd and qcow2) ublk targets have supported zero copy by passing:
+> >>
+> >> 	ublk add -t [loop|nbd|qcow2] -z .... 
+> >>
+> >> Also add liburing test case for covering fused command based on miniublk
+> >> of blktest.
+> >>
+> >> https://github.com/ming1/liburing/tree/fused_cmd_miniublk_for_v6
+> >>
+> >> Performance improvement is obvious on memory bandwidth related workloads,
+> >> such as, 1~2X improvement on 64K/512K BS IO test on loop with ramfs backing file.
+> >> ublk-null shows 5X IOPS improvement on big BS test when the copy is avoided.
+> >>
+> >> Please review and consider for v6.4.
+> >>
+> >> V6:
+> >> 	- re-design fused command, and make it more generic, moving sharing buffer
+> >> 	as one plugin of fused command, so in future we can implement more plugins
+> >> 	- document potential other use cases of fused command
+> >> 	- drop support for builtin secondary sqe in SQE128, so all secondary
+> >> 	  requests has standalone SQE
+> >> 	- make fused command as one feature
+> >> 	- cleanup & improve naming
+> > 
+> > Hi Jens,
+> > 
+> > Can you apply ublk cleanup patches 7~11 on for-6.4? For others, we may
+> > delay to 6.5, and I am looking at other approach too.
+> 
+> Done - and yes, we're probably looking at 6.5 for the rest. But that's
 
-[auto build test WARNING on mkp-scsi/for-next]
-[also build test WARNING on jejb-scsi/for-next axboe-block/for-next linus/master v6.3-rc5 next-20230403]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Thanks!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mike-Christie/block-Add-PR-callouts-for-read-keys-and-reservation/20230325-022314
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git for-next
-patch link:    https://lore.kernel.org/r/20230324181741.13908-19-michael.christie%40oracle.com
-patch subject: [PATCH v5 18/18] scsi: target: Add block PR support to iblock
-config: ia64-randconfig-s043-20230403 (https://download.01.org/0day-ci/archive/20230404/202304041322.SEFV29Co-lkp@intel.com/config)
-compiler: ia64-linux-gcc (GCC) 12.1.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/f3fe3a0cab8498044d99362b81e01f5c48da5f63
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Mike-Christie/block-Add-PR-callouts-for-read-keys-and-reservation/20230325-022314
-        git checkout f3fe3a0cab8498044d99362b81e01f5c48da5f63
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=ia64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=ia64 SHELL=/bin/bash drivers/target/
+> fine, I'd rather end up with the right interface than try and rush one.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304041322.SEFV29Co-lkp@intel.com/
+Also I'd provide one summery about this work here so that it may help
+for anyone interested in this work, follows three approaches we have
+tried or proposed:
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/target/target_core_iblock.c:968:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:968:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:968:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:973:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:973:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:973:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:985:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:985:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:985:24: sparse:     got restricted sense_reason_t
->> drivers/target/target_core_iblock.c:996:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected int [assigned] ret @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:996:21: sparse:     expected int [assigned] ret
-   drivers/target/target_core_iblock.c:996:21: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1000:13: sparse: sparse: incorrect type in assignment (different base types) @@     expected int [assigned] ret @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1000:13: sparse:     expected int [assigned] ret
-   drivers/target/target_core_iblock.c:1000:13: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1035:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1035:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:1035:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1040:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1040:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:1040:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1044:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1044:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:1044:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1049:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1049:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:1049:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1055:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1055:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:1055:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1059:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1059:24: sparse:     expected int
-   drivers/target/target_core_iblock.c:1059:24: sparse:     got restricted sense_reason_t
-   drivers/target/target_core_iblock.c:1062:16: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted sense_reason_t @@
-   drivers/target/target_core_iblock.c:1062:16: sparse:     expected int
-   drivers/target/target_core_iblock.c:1062:16: sparse:     got restricted sense_reason_t
->> drivers/target/target_core_iblock.c:1075:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted sense_reason_t [usertype] ret @@     got int @@
-   drivers/target/target_core_iblock.c:1075:21: sparse:     expected restricted sense_reason_t [usertype] ret
-   drivers/target/target_core_iblock.c:1075:21: sparse:     got int
-   drivers/target/target_core_iblock.c:1078:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted sense_reason_t [usertype] ret @@     got int @@
-   drivers/target/target_core_iblock.c:1078:21: sparse:     expected restricted sense_reason_t [usertype] ret
-   drivers/target/target_core_iblock.c:1078:21: sparse:     got int
+1) splice can't do this job[1][2]
 
-vim +968 drivers/target/target_core_iblock.c
+2) fused command in this patchset
+- it is more like sendfile() or copy_file_range(), because the internal
+  buffer isn't exposed outside
 
-   956	
-   957	static int iblock_pr_read_keys(struct se_cmd *cmd, unsigned char *param_data)
-   958	{
-   959		struct se_device *dev = cmd->se_dev;
-   960		struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
-   961		struct block_device *bdev = ib_dev->ibd_bd;
-   962		const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
-   963		int i, ret, len, paths, data_offset;
-   964		struct pr_keys *keys;
-   965	
-   966		if (!ops) {
-   967			pr_err("Block device does not support pr_ops but iblock device has been configured for PR passthrough.\n");
- > 968			return TCM_UNSUPPORTED_SCSI_OPCODE;
-   969		}
-   970	
-   971		if (!ops->pr_read_keys) {
-   972			pr_err("Block device does not support read_keys.\n");
-   973			return TCM_UNSUPPORTED_SCSI_OPCODE;
-   974		}
-   975	
-   976		/*
-   977		 * We don't know what's under us, but dm-multipath will register every
-   978		 * path with the same key, so start off with enough space for 16 paths.
-   979		 */
-   980		paths = 16;
-   981	retry:
-   982		len = 8 * paths;
-   983		keys = kzalloc(sizeof(*keys) + len, GFP_KERNEL);
-   984		if (!keys)
-   985			return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-   986	
-   987		keys->num_keys = paths;
-   988		ret = ops->pr_read_keys(bdev, keys);
-   989		if (!ret) {
-   990			if (keys->num_keys > paths) {
-   991				kfree(keys);
-   992				paths *= 2;
-   993				goto retry;
-   994			}
-   995		} else if (ret) {
- > 996			ret = TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-   997			goto free_keys;
-   998		}
-   999	
-  1000		ret = TCM_NO_SENSE;
-  1001	
-  1002		put_unaligned_be32(keys->generation, &param_data[0]);
-  1003		if (!keys->num_keys) {
-  1004			put_unaligned_be32(0, &param_data[4]);
-  1005			goto free_keys;
-  1006		}
-  1007	
-  1008		put_unaligned_be32(8 * keys->num_keys, &param_data[4]);
-  1009	
-  1010		data_offset = 8;
-  1011		for (i = 0; i < keys->num_keys; i++) {
-  1012			if (data_offset + 8 > cmd->data_length)
-  1013				break;
-  1014	
-  1015			put_unaligned_be64(keys->keys[i], &param_data[data_offset]);
-  1016			data_offset += 8;
-  1017		}
-  1018	
-  1019	free_keys:
-  1020		kfree(keys);
-  1021		return ret;
-  1022	}
-  1023	
-  1024	static int iblock_pr_read_reservation(struct se_cmd *cmd,
-  1025					      unsigned char *param_data)
-  1026	{
-  1027		struct se_device *dev = cmd->se_dev;
-  1028		struct iblock_dev *ib_dev = IBLOCK_DEV(dev);
-  1029		struct block_device *bdev = ib_dev->ibd_bd;
-  1030		const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
-  1031		struct pr_held_reservation rsv = { };
-  1032	
-  1033		if (!ops) {
-  1034			pr_err("Block device does not support pr_ops but iblock device has been configured for PR passthrough.\n");
-  1035			return TCM_UNSUPPORTED_SCSI_OPCODE;
-  1036		}
-  1037	
-  1038		if (!ops->pr_read_reservation) {
-  1039			pr_err("Block device does not support read_keys.\n");
-  1040			return TCM_UNSUPPORTED_SCSI_OPCODE;
-  1041		}
-  1042	
-  1043		if (ops->pr_read_reservation(bdev, &rsv))
-  1044			return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
-  1045	
-  1046		put_unaligned_be32(rsv.generation, &param_data[0]);
-  1047		if (!block_pr_type_to_scsi(rsv.type)) {
-  1048			put_unaligned_be32(0, &param_data[4]);
-  1049			return TCM_NO_SENSE;
-  1050		}
-  1051	
-  1052		put_unaligned_be32(16, &param_data[4]);
-  1053	
-  1054		if (cmd->data_length < 16)
-> 1055			return TCM_NO_SENSE;
-  1056		put_unaligned_be64(rsv.key, &param_data[8]);
-  1057	
-  1058		if (cmd->data_length < 22)
-  1059			return TCM_NO_SENSE;
-  1060		param_data[21] = block_pr_type_to_scsi(rsv.type);
-  1061	
-  1062		return TCM_NO_SENSE;
-  1063	}
-  1064	
-  1065	static sense_reason_t iblock_execute_pr_in(struct se_cmd *cmd, u8 sa,
-  1066						   unsigned char *param_data)
-  1067	{
-  1068		sense_reason_t ret = TCM_NO_SENSE;
-  1069	
-  1070		switch (sa) {
-  1071		case PRI_REPORT_CAPABILITIES:
-  1072			iblock_pr_report_caps(param_data);
-  1073			break;
-  1074		case PRI_READ_KEYS:
-> 1075			ret = iblock_pr_read_keys(cmd, param_data);
-  1076			break;
-  1077		case PRI_READ_RESERVATION:
-  1078			ret = iblock_pr_read_reservation(cmd, param_data);
-  1079			break;
-  1080		default:
-  1081			pr_err("Unknown PERSISTENT_RESERVE_IN SA: 0x%02x\n", sa);
-  1082			return TCM_UNSUPPORTED_SCSI_OPCODE;
-  1083		}
-  1084	
-  1085		return ret;
-  1086	}
-  1087	
+- v6 becomes a bit more generic, the theory is that one SQE list is submitted
+as a whole request logically; the 1st sqe is the primary command, which
+provides buffer for others, and is responsible for submitting other SQEs
+(secondary)in this list; the primary command isn't completed until all secondary
+requests are done
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+- this approach solves two problems efficiently in one simple way:
+
+	a) buffer lifetime issue, and buffer lifetime is same with primary command, so
+	all secondary OPs can be submitted & completely safely
+
+	b) request dependency issue, all secondary requests depend on primary command,
+	and secondary request itself could be independent, we start to allow to submit
+	secondary request in non-async style, and all secondary requests can be issued
+	concurrently
+
+- this approach is simple, because we don't expose buffer outside, and
+  buffer is just shared among these secondary requests; meantime
+  internal buffer saves us complicated OPs' dependency issue, avoid
+  contention by registering buffer anywhere between submission and
+  completion code path
+
+- the drawback is that we add one new SQE usage/model of primary SQE and
+  secondary SQEs, and the whole logical request in concept, which is
+  like sendfile() or copy_file_range()
+
+3) register transient buffers for OPs[3]
+- it is more like splice(), which is flexible and could be more generic, but
+internal pipe buffer is added to pipe which is visible outside, so the
+implementation becomes complicated; and it should be more than splice(),
+because the io buffer needs to be shared among multiple OPs
+
+- inefficiently & complicated
+
+	a) buffer has to be added to one global container(suppose it is
+	io_uring context pipe) by ADD_BUF OP, and either buffer needs to be removed after
+	consumer OPs are completed, or DEL_OP is run for removing buffer explicitly, so
+	either contention on the io_uring pipe is added, or another new dependency is
+	added(DEL_OP depends on all normal OPs)
+
+	b) ADD_BUF OP is needed, and normal OPs have to depend on this new
+	OP by IOSQE_IO_LINK, then all normal OPs will be submitted in async way,
+	even worse, each normal OP has to be issued one by one, because io_uring
+	isn't capable of handling 1:N dependency issue[5]
+
+    c) if DEL_BUF OP is needed, then it is basically not possible
+	to solve 1:N dependency any more, given DEL_BUF starts to depends on the previous
+	N OPs; otherwise, contention on pipe is inevitable.
+
+	d) solving 1:N dependency issue generically
+
+- advantage
+
+Follows current io_uring SQE usage, and looks more generic/flexible,
+like splice().
+
+4) others approaches or suggestions?
+
+Any idea is welcome as usual.
+
+
+Finally from problem viewpoint, if the problem domain is just ublk/fuse zero copy
+or other similar problems[6], fused command might be the simpler & more efficient
+approach, compared with approach 3). However, are there any other problems we
+want to cover by one more generic/flexible interface? If not, would we
+like to pay the complexity & inefficiency for one kind of less generic
+problem?
+
+
+[1] https://lore.kernel.org/linux-block/ZCQnHwrXvSOQHfAC@ovpn-8-26.pek2.redhat.com/T/#m1bfa358524b6af94731bcd5be28056f9f4408ecf
+[2] https://github.com/ming1/linux/blob/my_v6.3-io_uring_fuse_cmd_v6/Documentation/block/ublk.rst#zero-copy
+[3] https://lore.kernel.org/linux-block/ZCQnHwrXvSOQHfAC@ovpn-8-26.pek2.redhat.com/T/#mbe428dfeb0417487cd1db7e6dabca7399a3c265b
+[4] https://lore.kernel.org/linux-block/ZCQnHwrXvSOQHfAC@ovpn-8-26.pek2.redhat.com/T/#md035ffa4c6b69e85de2ab145418a9849a3b33741
+[5] https://lore.kernel.org/linux-block/20230330113630.1388860-5-ming.lei@redhat.com/T/#m5e0c282ad26d9f3d8e519645168aeb3a19b5740b
+[6] https://lore.kernel.org/linux-block/20230330113630.1388860-5-ming.lei@redhat.com/T/#me5cca4db606541fae452d625780635fcedcd5c6c
+
+Thanks,
+Ming
+
