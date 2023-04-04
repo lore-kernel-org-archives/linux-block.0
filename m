@@ -2,208 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC291C6FD1D
-	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 07:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A18C6FD1D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 08:28:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233652AbjDDHt6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Apr 2023 03:49:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
+        id S234289AbjDDI21 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 04:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233567AbjDDHtx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 03:49:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91849120
-        for <linux-block@vger.kernel.org>; Tue,  4 Apr 2023 00:49:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680594546;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Im5L/NmV1DuxZwE4hnbXnlwO/3Ionh4NNqvKa/4qFqc=;
-        b=ekmWt4HAsKnGU5fQv2glL6t/LKcSTn7n8YGxTZ6Z+gFobGUxuByarVbUV9U/IyIzEpy26H
-        mls2JQJ/kKiuaq4TxNUdF85Ujl0sAP49TPclU0eVk8b4C2WiAauOadw2ZBrCW6t83RbsPd
-        6eyhNlMNlPDzlXq2p6k2jUmrx4NkftE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-517-jwH89YmNPK-iUr1YjTs6Bg-1; Tue, 04 Apr 2023 03:49:03 -0400
-X-MC-Unique: jwH89YmNPK-iUr1YjTs6Bg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F2431C0A59B;
-        Tue,  4 Apr 2023 07:49:03 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 432FA440BC;
-        Tue,  4 Apr 2023 07:48:55 +0000 (UTC)
-Date:   Tue, 4 Apr 2023 15:48:50 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V6 00/17] io_uring/ublk: add generic IORING_OP_FUSED_CMD
-Message-ID: <ZCvWYoDk0dnJbHhW@ovpn-8-16.pek2.redhat.com>
-References: <20230330113630.1388860-1-ming.lei@redhat.com>
- <ZConr0f8e/mEL0Cl@ovpn-8-18.pek2.redhat.com>
- <d696eb70-9dac-9334-7aec-1b5af62442e3@kernel.dk>
+        with ESMTP id S234229AbjDDI2N (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 04:28:13 -0400
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF3C2D44;
+        Tue,  4 Apr 2023 01:27:41 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id r29so31836849wra.13;
+        Tue, 04 Apr 2023 01:27:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680596793;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P+IA0sfS8Hko6hpK1HZztJ6kiawc/hgiN78OoxbJlkE=;
+        b=qPbXFAu3NFSUuePdXIGCFg7snbxm8fYqQcWtbEZPAtTwXRFsHR5/nTt+RGkYWnX7KI
+         oexHfndDEqnQKxbeSDpaq4leGLariWGtraVXa13jQD4G/d8uyO6JX09NJ4B9SevsFoub
+         NPTALWgkbG0Rx1jI0JZaLHT440ZD3sK/i2fDCwJDXAQo+xJYzXSZcmUK52nMxOZOk4aV
+         5cX+ROXbMfTrFWytmTcVMOZ1K1fZYy9yIcrVJDEj0F3hFX0qhwAoR5qy2J8f44bSBbZW
+         SGUhaENXwL02Y2bMsBBOeVU0eM+Ty94kSLr14hNrkJMD01GRBnppAnI4sc2xVElAy4AW
+         d2HQ==
+X-Gm-Message-State: AAQBX9cnktGdSw29EYqJZAvJFG//Bzppu87rjW/goEp3puGTrpPgjGQX
+        BWxRFkQSQdkrmklGnithvv4=
+X-Google-Smtp-Source: AKy350YRAl3M0jE5+UynIwckjiW+CsHm28SGM1LHNiMQ7J8tXe8xmw1F2qmXD/R4sfgmgOX6wBeBhg==
+X-Received: by 2002:adf:e0c3:0:b0:2cf:e747:b0d4 with SMTP id m3-20020adfe0c3000000b002cfe747b0d4mr940685wri.40.1680596793398;
+        Tue, 04 Apr 2023 01:26:33 -0700 (PDT)
+Received: from [192.168.32.129] (aftr-82-135-86-174.dynamic.mnet-online.de. [82.135.86.174])
+        by smtp.gmail.com with ESMTPSA id t6-20020a7bc3c6000000b003ee1b2ab9a0sm14294575wmj.11.2023.04.04.01.26.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Apr 2023 01:26:32 -0700 (PDT)
+Message-ID: <bbc98aa3-24f0-8ee6-9d74-483564a14f0f@kernel.org>
+Date:   Tue, 4 Apr 2023 10:26:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d696eb70-9dac-9334-7aec-1b5af62442e3@kernel.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH v2 17/19] md: raid1: check if adding pages to resync bio
+ fails
+To:     Song Liu <song@kernel.org>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <cover.1680172791.git.johannes.thumshirn@wdc.com>
+ <8b8a3bb2db8c5183ef36c1810f2ac776ac526327.1680172791.git.johannes.thumshirn@wdc.com>
+ <CAPhsuW7a+mpn+VprfA2mC5Fc+M9BFq8i6d-y+-o5G1u5dOsk2Q@mail.gmail.com>
+Content-Language: en-US
+From:   Johannes Thumshirn <jth@kernel.org>
+In-Reply-To: <CAPhsuW7a+mpn+VprfA2mC5Fc+M9BFq8i6d-y+-o5G1u5dOsk2Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Jens and Everyone,
-
-On Sun, Apr 02, 2023 at 07:24:17PM -0600, Jens Axboe wrote:
-> On 4/2/23 7:11?PM, Ming Lei wrote:
-> > On Thu, Mar 30, 2023 at 07:36:13PM +0800, Ming Lei wrote:
-> >> Hello Jens and Guys,
-> >>
-> >> Add generic fused command, which can include one primary command and multiple
-> >> secondary requests. This command provides one safe way to share resource between
-> >> primary command and secondary requests, and primary command is always
-> >> completed after all secondary requests are done, and resource lifetime
-> >> is bound with primary command.
-> >>
-> >> With this way, it is easy to support zero copy for ublk/fuse device, and
-> >> there could be more potential use cases, such as offloading complicated logic
-> >> into userspace, or decouple kernel subsystems.
-> >>
-> >> Follows ublksrv code, which implements zero copy for loop, nbd and
-> >> qcow2 targets with fused command:
-> >>
-> >> https://github.com/ming1/ubdsrv/tree/fused-cmd-zc-for-v6
-> >>
-> >> All three(loop, nbd and qcow2) ublk targets have supported zero copy by passing:
-> >>
-> >> 	ublk add -t [loop|nbd|qcow2] -z .... 
-> >>
-> >> Also add liburing test case for covering fused command based on miniublk
-> >> of blktest.
-> >>
-> >> https://github.com/ming1/liburing/tree/fused_cmd_miniublk_for_v6
-> >>
-> >> Performance improvement is obvious on memory bandwidth related workloads,
-> >> such as, 1~2X improvement on 64K/512K BS IO test on loop with ramfs backing file.
-> >> ublk-null shows 5X IOPS improvement on big BS test when the copy is avoided.
-> >>
-> >> Please review and consider for v6.4.
-> >>
-> >> V6:
-> >> 	- re-design fused command, and make it more generic, moving sharing buffer
-> >> 	as one plugin of fused command, so in future we can implement more plugins
-> >> 	- document potential other use cases of fused command
-> >> 	- drop support for builtin secondary sqe in SQE128, so all secondary
-> >> 	  requests has standalone SQE
-> >> 	- make fused command as one feature
-> >> 	- cleanup & improve naming
-> > 
-> > Hi Jens,
-> > 
-> > Can you apply ublk cleanup patches 7~11 on for-6.4? For others, we may
-> > delay to 6.5, and I am looking at other approach too.
+On 31/03/2023 20:13, Song Liu wrote:
+> On Thu, Mar 30, 2023 at 3:44 AM Johannes Thumshirn
+> <johannes.thumshirn@wdc.com> wrote:
+>>
+>> Check if adding pages to resync bio fails and if bail out.
+>>
+>> As the comment above suggests this cannot happen, WARN if it actually
+>> happens.
+>>
+>> This way we can mark bio_add_pages as __must_check.
+>>
+>> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+>> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+>> ---
+>>   drivers/md/raid1-10.c |  7 ++++++-
+>>   drivers/md/raid10.c   | 12 ++++++++++--
+>>   2 files changed, 16 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
+>> index e61f6cad4e08..c21b6c168751 100644
+>> --- a/drivers/md/raid1-10.c
+>> +++ b/drivers/md/raid1-10.c
+>> @@ -105,7 +105,12 @@ static void md_bio_reset_resync_pages(struct bio *bio, struct resync_pages *rp,
+>>                   * won't fail because the vec table is big
+>>                   * enough to hold all these pages
+>>                   */
 > 
-> Done - and yes, we're probably looking at 6.5 for the rest. But that's
+> We know these won't fail. Shall we just use __bio_add_page?
 
-Thanks!
+We could yes, but I kind of like the assert() style warning.
+But of cause ultimately your call.
 
-> fine, I'd rather end up with the right interface than try and rush one.
-
-Also I'd provide one summery about this work here so that it may help
-for anyone interested in this work, follows three approaches we have
-tried or proposed:
-
-1) splice can't do this job[1][2]
-
-2) fused command in this patchset
-- it is more like sendfile() or copy_file_range(), because the internal
-  buffer isn't exposed outside
-
-- v6 becomes a bit more generic, the theory is that one SQE list is submitted
-as a whole request logically; the 1st sqe is the primary command, which
-provides buffer for others, and is responsible for submitting other SQEs
-(secondary)in this list; the primary command isn't completed until all secondary
-requests are done
-
-- this approach solves two problems efficiently in one simple way:
-
-	a) buffer lifetime issue, and buffer lifetime is same with primary command, so
-	all secondary OPs can be submitted & completely safely
-
-	b) request dependency issue, all secondary requests depend on primary command,
-	and secondary request itself could be independent, we start to allow to submit
-	secondary request in non-async style, and all secondary requests can be issued
-	concurrently
-
-- this approach is simple, because we don't expose buffer outside, and
-  buffer is just shared among these secondary requests; meantime
-  internal buffer saves us complicated OPs' dependency issue, avoid
-  contention by registering buffer anywhere between submission and
-  completion code path
-
-- the drawback is that we add one new SQE usage/model of primary SQE and
-  secondary SQEs, and the whole logical request in concept, which is
-  like sendfile() or copy_file_range()
-
-3) register transient buffers for OPs[3]
-- it is more like splice(), which is flexible and could be more generic, but
-internal pipe buffer is added to pipe which is visible outside, so the
-implementation becomes complicated; and it should be more than splice(),
-because the io buffer needs to be shared among multiple OPs
-
-- inefficiently & complicated
-
-	a) buffer has to be added to one global container(suppose it is
-	io_uring context pipe) by ADD_BUF OP, and either buffer needs to be removed after
-	consumer OPs are completed, or DEL_OP is run for removing buffer explicitly, so
-	either contention on the io_uring pipe is added, or another new dependency is
-	added(DEL_OP depends on all normal OPs)
-
-	b) ADD_BUF OP is needed, and normal OPs have to depend on this new
-	OP by IOSQE_IO_LINK, then all normal OPs will be submitted in async way,
-	even worse, each normal OP has to be issued one by one, because io_uring
-	isn't capable of handling 1:N dependency issue[5]
-
-    c) if DEL_BUF OP is needed, then it is basically not possible
-	to solve 1:N dependency any more, given DEL_BUF starts to depends on the previous
-	N OPs; otherwise, contention on pipe is inevitable.
-
-	d) solving 1:N dependency issue generically
-
-- advantage
-
-Follows current io_uring SQE usage, and looks more generic/flexible,
-like splice().
-
-4) others approaches or suggestions?
-
-Any idea is welcome as usual.
-
-
-Finally from problem viewpoint, if the problem domain is just ublk/fuse zero copy
-or other similar problems[6], fused command might be the simpler & more efficient
-approach, compared with approach 3). However, are there any other problems we
-want to cover by one more generic/flexible interface? If not, would we
-like to pay the complexity & inefficiency for one kind of less generic
-problem?
-
-
-[1] https://lore.kernel.org/linux-block/ZCQnHwrXvSOQHfAC@ovpn-8-26.pek2.redhat.com/T/#m1bfa358524b6af94731bcd5be28056f9f4408ecf
-[2] https://github.com/ming1/linux/blob/my_v6.3-io_uring_fuse_cmd_v6/Documentation/block/ublk.rst#zero-copy
-[3] https://lore.kernel.org/linux-block/ZCQnHwrXvSOQHfAC@ovpn-8-26.pek2.redhat.com/T/#mbe428dfeb0417487cd1db7e6dabca7399a3c265b
-[4] https://lore.kernel.org/linux-block/ZCQnHwrXvSOQHfAC@ovpn-8-26.pek2.redhat.com/T/#md035ffa4c6b69e85de2ab145418a9849a3b33741
-[5] https://lore.kernel.org/linux-block/20230330113630.1388860-5-ming.lei@redhat.com/T/#m5e0c282ad26d9f3d8e519645168aeb3a19b5740b
-[6] https://lore.kernel.org/linux-block/20230330113630.1388860-5-ming.lei@redhat.com/T/#me5cca4db606541fae452d625780635fcedcd5c6c
-
-Thanks,
-Ming
-
+Byte,
+	Johannes
