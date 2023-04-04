@@ -2,126 +2,281 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57312C6FD1D
-	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 18:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14EFAC77B60
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 18:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235364AbjDDSpr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Apr 2023 14:45:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49188 "EHLO
+        id S233701AbjDDStC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 14:49:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235705AbjDDSpl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 14:45:41 -0400
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6D64448F
-        for <linux-block@vger.kernel.org>; Tue,  4 Apr 2023 11:45:38 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 3E6015C0218;
-        Tue,  4 Apr 2023 14:45:38 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Tue, 04 Apr 2023 14:45:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
-        :cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1680633938; x=1680720338; bh=kr
-        FeNNOsYObGFmIS85mJvh+EIehXxf+JYgAjScxHhkI=; b=RhZUC5frKQFi+Wk2Kg
-        8FeuZS8UiCOGtImvwYlvDbz0TssptcInxN46bTDj0m+EC+QpG3J4sGDk8qKsx+0U
-        Vif8Mw4uNIYrZZCLL0OXGrUJHv2bsmNLHzC6RVTEVjaYyH7mNeSzLyuaWOf4EY75
-        hY9ZxFcuR18WoGtmQWDR1mRBumhtAKVnV25qmrfCZuV0cMowdLnfBeX7cycg+Mpq
-        Ekf3K0mi2McTIhHdhIS8IS7myULynIAFbe05FgZgfC8PExAOHlFJdfA9zyRyyNWS
-        zvP1HMteFq8dl6gvCflBG1eLIgaufEDoiRHn+TEqdBLHUwmY0c8q8fxIrxlDq5wx
-        Zp8w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm2; t=1680633938; x=1680720338; bh=krFeNNOsYObGF
-        mIS85mJvh+EIehXxf+JYgAjScxHhkI=; b=L+bdivR+tMKlaaIMqF6koqZrTlKtW
-        8cvQ8OOqbbP+EIPMPjsGvALI1WlDlkdezNQaZpwQ2tzmlPI8K8AplgjTgW85zy8J
-        bmkamaC4av5WkJxNQWfPVjwPq1j+ZWRi5/aWTZBVHMb5jkD8tXVBbZcM5tNkyWRg
-        kw3qID9lFz00RUi/+nFXUSDRJcn0Qeju5agq8LiiEB2KKRnafKMTYavvb/kyqMyb
-        +h4NU8tNnxqH4rZjD8r0jnt6p0S0aNN/dsxsXbuneGoWU/lT2o5OKCq8+UuFNDzg
-        HoRmP7J/pAamYSRym0avGEfewEX1DZUp5yDvJ4LV7DBSEqEp89izAUKDg==
-X-ME-Sender: <xms:UXAsZC9r-z2Ib-a7b4q6tfaOh5l8DIAePZ48NhuL5V4Ged3xuvArZA>
-    <xme:UXAsZCv5oh-IORQfmavuyg3HL-OlyezcsRcnn7VDzYBQWzMYczY6LycFlfa9cJHq2
-    9AQjaHksJgFKgS-Rw>
-X-ME-Received: <xmr:UXAsZIARRdnOIjeSjmjWXIK-HzpLKgXMFLm0YghCLsScJuUNR4VaK9RG1INPR-jjR9lccg6hGCtfhorH_0-LXZGio7o1lTrDRg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdeiledguddvlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehgtderredttddvnecuhfhrohhmpeetlhih
-    shhsrgcutfhoshhsuceohhhisegrlhihshhsrgdrihhsqeenucggtffrrghtthgvrhhnpe
-    dvjeefueehuddtgfelheekudfghffggeektdfhhfdvteeltdeuieevjedukeduieenucff
-    ohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhephhhisegrlhihshhsrgdrihhs
-X-ME-Proxy: <xmx:UXAsZKffBPfMLQIzCEH7zotPQxcqZ2qvwLXW_lwwGiIwdosXokeIbg>
-    <xmx:UXAsZHMIO8rtihWOyqIHg91jNziKhg_2XHepKScAezFzxG7H-tq4RA>
-    <xmx:UXAsZEmHpCl7VINYWk7u9pkftqMqfZFoeRWe5FBkGfMhS6aH3ycv8A>
-    <xmx:UnAsZAotcVgsz86zu_WcW79xxjFnQVNeOchw-PF5xAeL--xrj6MJwA>
-Feedback-ID: i12284293:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 4 Apr 2023 14:45:36 -0400 (EDT)
-Received: by x220.qyliss.net (Postfix, from userid 1000)
-        id BCB1426AE; Tue,  4 Apr 2023 18:45:34 +0000 (UTC)
-Date:   Tue, 4 Apr 2023 18:45:34 +0000
-From:   Alyssa Ross <hi@alyssa.is>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] loop/009: add test for loop partition uvents
-Message-ID: <20230404184534.t22goewekxb5yds6@x220>
-References: <21c2861f-9b7d-636e-74e1-27bd7bbb1a4f@nvidia.com>
- <20230330160247.16030-1-hi@alyssa.is>
- <517f4449-ffef-f1e8-78cf-bae8c2cdf665@nvidia.com>
+        with ESMTP id S229881AbjDDStC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 14:49:02 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C503359D;
+        Tue,  4 Apr 2023 11:49:00 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 069611FDCA;
+        Tue,  4 Apr 2023 18:48:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1680634139; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8peVY1P/REvyDSmPjBd6Uq7SBRI3/UQNQvcvUPnaQJU=;
+        b=iZthqA6CHjREsUmc6oxWDUZ5HWOrrM+2wukMgWQcyrOEbBfTwPNASKsVHTkvb0VPHu9iep
+        t0FU83aCGpvVY+leNSOA4An8/grcjuhcxOB3zKRzvFf7gRbbO7DfICU2eHrD8eJsunlHhs
+        r5GRoHZlGCO7TUSTAkD1Biw2qeT+t10=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1680634139;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8peVY1P/REvyDSmPjBd6Uq7SBRI3/UQNQvcvUPnaQJU=;
+        b=KxX9AGx3AIC2QLDfZI5MC/Qn45WfVRNSzepHx7y4Kku0WEyY0VbT6nnCoKzvgM0ARrQZ57
+        IstXMOjHPH2Z2XDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AF5271391A;
+        Tue,  4 Apr 2023 18:48:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id miCkKRpxLGS7ZQAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 04 Apr 2023 18:48:58 +0000
+Message-ID: <d55ac074-73df-eab3-f0b8-c70d8efb4b72@suse.de>
+Date:   Tue, 4 Apr 2023 20:48:58 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="64s75twqblaffulm"
-Content-Disposition: inline
-In-Reply-To: <517f4449-ffef-f1e8-78cf-bae8c2cdf665@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v5 08/19] scsi: detect support for command duration limits
+Content-Language: en-US
+To:     Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
+References: <20230404182428.715140-1-nks@flawful.org>
+ <20230404182428.715140-9-nks@flawful.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230404182428.715140-9-nks@flawful.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 4/4/23 20:24, Niklas Cassel wrote:
+> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> 
+> Introduce the function scsi_cdl_check() to detect if a device supports
+> command duration limits (CDL). Support for the READ 16, WRITE 16,
+> READ 32 and WRITE 32 commands are checked using the function
+> scsi_report_opcode() to probe the rwcdlp and cdlp bits as they indicate
+> the mode page defining the command duration limits descriptors that
+> apply to the command being tested.
+> 
+> If any of these commands support CDL, the field cdl_supported of
+> struct scsi_device is set to 1 to indicate that the device supports CDL.
+> 
+> Support for CDL for a device is advertizes through sysfs using the new
+> cdl_supported device attribute. This attribute value is 1 for a device
+> supporting CDL and 0 otherwise.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> ---
+>   Documentation/ABI/testing/sysfs-block-device |  9 +++
+>   drivers/scsi/scsi.c                          | 81 ++++++++++++++++++++
+>   drivers/scsi/scsi_scan.c                     |  3 +
+>   drivers/scsi/scsi_sysfs.c                    |  2 +
+>   include/scsi/scsi_device.h                   |  3 +
+>   5 files changed, 98 insertions(+)
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-block-device b/Documentation/ABI/testing/sysfs-block-device
+> index 7ac7b19b2f72..ee3610a25845 100644
+> --- a/Documentation/ABI/testing/sysfs-block-device
+> +++ b/Documentation/ABI/testing/sysfs-block-device
+> @@ -95,3 +95,12 @@ Description:
+>   		This file does not exist if the HBA driver does not implement
+>   		support for the SATA NCQ priority feature, regardless of the
+>   		device support for this feature.
+> +
+> +
+> +What:		/sys/block/*/device/cdl_supported
+> +Date:		Mar, 2023
+> +KernelVersion:	v6.4
+> +Contact:	linux-scsi@vger.kernel.org
+> +Description:
+> +		(RO) Indicates if the device supports the command duration
+> +		limits feature found in some ATA and SCSI devices.
+> diff --git a/drivers/scsi/scsi.c b/drivers/scsi/scsi.c
+> index 62d9472e08e9..c03814ce23ca 100644
+> --- a/drivers/scsi/scsi.c
+> +++ b/drivers/scsi/scsi.c
+> @@ -570,6 +570,87 @@ int scsi_report_opcode(struct scsi_device *sdev, unsigned char *buffer,
+>   }
+>   EXPORT_SYMBOL(scsi_report_opcode);
+>   
+> +#define SCSI_CDL_CHECK_BUF_LEN	64
+> +
+> +static bool scsi_cdl_check_cmd(struct scsi_device *sdev, u8 opcode, u16 sa,
+> +			       unsigned char *buf)
+> +{
+> +	int ret;
+> +	u8 cdlp;
+> +
+> +	/* Check operation code */
+> +	ret = scsi_report_opcode(sdev, buf, SCSI_CDL_CHECK_BUF_LEN, opcode, sa);
+> +	if (ret <= 0)
+> +		return false;
+> +
+> +	if ((buf[1] & 0x03) != 0x03)
+> +		return false;
+> +
+> +	/* See SPC-6, one command format of REPORT SUPPORTED OPERATION CODES */
+> +	cdlp = (buf[1] & 0x18) >> 3;
+> +	if (buf[0] & 0x01) {
+> +		/* rwcdlp == 1 */
+> +		switch (cdlp) {
+> +		case 0x01:
+> +			/* T2A page */
+> +			return true;
+> +		case 0x02:
+> +			/* T2B page */
+> +			return true;
+> +		}
+> +	} else {
+> +		/* rwcdlp == 0 */
+> +		switch (cdlp) {
+> +		case 0x01:
+> +			/* A page */
+> +			return true;
+> +		case 0x02:
+> +			/* B page */
+> +			return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+Why do we need to check this when writing to sysfs? Shouldn't we detect 
+this during startup / revalidate?
 
---64s75twqblaffulm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> +/**
+> + * scsi_cdl_check - Check if a SCSI device supports Command Duration Limits
+> + * @sdev: The device to check
+> + */
+> +void scsi_cdl_check(struct scsi_device *sdev)
+> +{
+> +	bool cdl_supported;
+> +	unsigned char *buf;
+> +
+> +	buf = kmalloc(SCSI_CDL_CHECK_BUF_LEN, GFP_KERNEL);
+> +	if (!buf) {
+> +		sdev->cdl_supported = 0;
+> +		return;
+> +	}
+> +
+> +	/* Check support for READ_16, WRITE_16, READ_32 and WRITE_32 commands */
+> +	cdl_supported =
+> +		scsi_cdl_check_cmd(sdev, READ_16, 0, buf) ||
+> +		scsi_cdl_check_cmd(sdev, WRITE_16, 0, buf) ||
+> +		scsi_cdl_check_cmd(sdev, VARIABLE_LENGTH_CMD, READ_32, buf) ||
+> +		scsi_cdl_check_cmd(sdev, VARIABLE_LENGTH_CMD, WRITE_32, buf);
+> +	if (cdl_supported) {
+> +		/*
+> +		 * We have CDL support: force the use of READ16/WRITE16.
+> +		 * READ32 and WRITE32 will be used for devices that support
+> +		 * the T10_PI_TYPE2_PROTECTION protection type.
+> +		 */
+> +		sdev->use_16_for_rw = 1;
+> +		sdev->use_10_for_rw = 0;
+> +
+> +		sdev->cdl_supported = 1;
+> +	} else {
+> +		sdev->cdl_supported = 0;
+> +	}
+> +
+> +	kfree(buf);
+> +}
+> +
+>   /**
+>    * scsi_device_get  -  get an additional reference to a scsi_device
+>    * @sdev:	device to get a reference to
+> diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
+> index d217be323cc6..aa13feb17c62 100644
+> --- a/drivers/scsi/scsi_scan.c
+> +++ b/drivers/scsi/scsi_scan.c
+> @@ -1087,6 +1087,8 @@ static int scsi_add_lun(struct scsi_device *sdev, unsigned char *inq_result,
+>   	if (sdev->scsi_level >= SCSI_3)
+>   		scsi_attach_vpd(sdev);
+>   
+> +	scsi_cdl_check(sdev);
+> +
+>   	sdev->max_queue_depth = sdev->queue_depth;
+>   	WARN_ON_ONCE(sdev->max_queue_depth > sdev->budget_map.depth);
+>   	sdev->sdev_bflags = *bflags;
+> @@ -1624,6 +1626,7 @@ void scsi_rescan_device(struct device *dev)
+>   	device_lock(dev);
+>   
+>   	scsi_attach_vpd(sdev);
+> +	scsi_cdl_check(sdev);
+>   
+>   	if (sdev->handler && sdev->handler->rescan)
+>   		sdev->handler->rescan(sdev);
+> diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
+> index ee28f73af4d4..4994148e685b 100644
+> --- a/drivers/scsi/scsi_sysfs.c
+> +++ b/drivers/scsi/scsi_sysfs.c
+> @@ -670,6 +670,7 @@ sdev_rd_attr (scsi_level, "%d\n");
+>   sdev_rd_attr (vendor, "%.8s\n");
+>   sdev_rd_attr (model, "%.16s\n");
+>   sdev_rd_attr (rev, "%.4s\n");
+> +sdev_rd_attr (cdl_supported, "%d\n");
+>   
+>   static ssize_t
+>   sdev_show_device_busy(struct device *dev, struct device_attribute *attr,
+> @@ -1300,6 +1301,7 @@ static struct attribute *scsi_sdev_attrs[] = {
+>   	&dev_attr_preferred_path.attr,
+>   #endif
+>   	&dev_attr_queue_ramp_up_period.attr,
+> +	&dev_attr_cdl_supported.attr,
+>   	REF_EVT(media_change),
+>   	REF_EVT(inquiry_change_reported),
+>   	REF_EVT(capacity_change_reported),
+> diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+> index c93c5aaf637e..6b8df9e253a0 100644
+> --- a/include/scsi/scsi_device.h
+> +++ b/include/scsi/scsi_device.h
+> @@ -218,6 +218,8 @@ struct scsi_device {
+>   	unsigned silence_suspend:1;	/* Do not print runtime PM related messages */
+>   	unsigned no_vpd_size:1;		/* No VPD size reported in header */
+>   
+> +	unsigned cdl_supported:1;	/* Command duration limits supported */
+> +
+>   	unsigned int queue_stopped;	/* request queue is quiesced */
+>   	bool offline_already;		/* Device offline message logged */
+>   
+> @@ -364,6 +366,7 @@ extern int scsi_register_device_handler(struct scsi_device_handler *scsi_dh);
+>   extern void scsi_remove_device(struct scsi_device *);
+>   extern int scsi_unregister_device_handler(struct scsi_device_handler *scsi_dh);
+>   void scsi_attach_vpd(struct scsi_device *sdev);
+> +void scsi_cdl_check(struct scsi_device *sdev);
+>   
+>   extern struct scsi_device *scsi_device_from_queue(struct request_queue *q);
+>   extern int __must_check scsi_device_get(struct scsi_device *);
 
-On Tue, Apr 04, 2023 at 06:29:00PM +0000, Chaitanya Kulkarni wrote:
-> On 3/30/2023 9:02 AM, Alyssa Ross wrote:
-> > Link: https://lore.kernel.org/r/20230320125430.55367-1-hch@lst.de/
-> > Suggested-by: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-> > Signed-off-by: Alyssa Ross <hi@alyssa.is>
->
-> Thanks a lot for this, overall this looks good to me.
->
-> This does exactly the testing for loop configure that your patch
-> is for, let's just make sure to apply this patch once your kernel
-> patch is merged.
+Cheers,
 
-The kernel patch was included in v6.3-rc5. :)
+Hannes
 
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-
---64s75twqblaffulm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEH9wgcxqlHM/ARR3h+dvtSFmyccAFAmQscD4ACgkQ+dvtSFmy
-ccDLbBAAl0hQSPzAliQE0VWqZXaXSBRzaO7rIfd5rABBr2RBSL01NteHGOMpHb9A
-7daNKIlbiMaakMPcIpG3i9vYjgT7ZRrT7YvXpt4VSj1HN7JdfxoINOcgkm7AHrev
-B/UN3IAOllI+YT4/dR1OWhSoj8DQq91KcddTEberazrYB2vzT9nf0CWJLcmvk+hN
-10AjCRjVUJbbhKRO/JWuEUmXGL2rGqtH2rm7TRCTJOSW6jVZsNBUC+Bhj9NZVSGf
-A8HyWN47OHwBYLWpYOJ6uOLAbh81VrDpZUMXKl3umv9lW4LdaxCeo3yz938B8h/0
-nlefCxOcYzIuvqYp9EW7IBoEXg9avb5VcAvHke/378CAVCzsHKhKBOLr+2m9zpNB
-usSqC/VjstEssLcFSgg4mQ23xUKzVW5U6xX+y/eFIK+uyFOY31eL7IlSKdoCvrpx
-WvVpwCC3YRPB14JC7dfQdrx+3tzZWtXNQ8u2xp0l99/5hX2uMtHmSXeEZFOYN0l0
-/MhCZuzWfISCJbEdyTuISew2vlPv9TIE6c+1JLoQ5tuuoPsyTL860fMM1cMf8e1K
-SKGOXVLTAuyW06N6/8Bkb4uanFDodYeG5RUY4etHu5RNxnx5sjTWPlGYk4AQVTi8
-etzDhxVkPudHDPfjyBluHrWjP/9LR3FCe7wTya6+ZKfyrGU9iBk=
-=sHRb
------END PGP SIGNATURE-----
-
---64s75twqblaffulm--
