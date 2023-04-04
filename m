@@ -2,97 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6855EC77B60
-	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 15:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED1EC6FD1D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 15:07:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235241AbjDDPG3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Apr 2023 11:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48352 "EHLO
+        id S234826AbjDDPHN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 11:07:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232206AbjDDPG2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 11:06:28 -0400
+        with ESMTP id S235042AbjDDPHM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 11:07:12 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 184024208
-        for <linux-block@vger.kernel.org>; Tue,  4 Apr 2023 08:06:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4DB94208;
+        Tue,  4 Apr 2023 08:07:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Z31TaxcmBcQbY5YTlosn00gPAt+82xXlAsoIcw5In2M=; b=uQ9UTzJVgXvGcIfJtsQA8bK/hc
-        Ik4zIFgliSiyNq035wr81VbaIGiwmPYye+JoeN9kS1mms+IWJp3b09Lz1baLKLykkApRx/gCRnd8S
-        519ZbpInoYEx+qREpiRAS3EUtb+hs66/6g27debBn5UQJyON+VTEnhdCFEle4g8E/PO1e3YFeFRym
-        0mCKM5+TZqMBEZon0xoy1FCkKC0cIeLm29oelyGNcxklQGpVJz+5GPvZD2PxcGL2fjIYKjRH84ics
-        ZLJl9Ym1nTjTY2b9Sf4ffAHX8MbLYmQmLLxpVQagIA1UVtKRlcsnwksLDKzfeUPV28tvmZhiX+TfP
-        HqyJP5WQ==;
-Received: from [2001:4bb8:191:a744:23e5:e88f:5622:7c79] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pjiEm-001vvr-1T;
-        Tue, 04 Apr 2023 15:06:20 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH 16/16] zram: return errors from read_from_bdev_sync
-Date:   Tue,  4 Apr 2023 17:05:36 +0200
-Message-Id: <20230404150536.2142108-17-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230404150536.2142108-1-hch@lst.de>
-References: <20230404150536.2142108-1-hch@lst.de>
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=+xJx4n5fddFyIFFs3SdXnORgMAqZS8Ci75rQNLy446k=; b=rFcI21jKpPc9azebBgljlpKjUt
+        qaU36x2REP/7febP8y1I/U1MUjGKukxFvQ9jkDUnP6nlav/TCkhFNIr66m+bWJvPJIUV4fHUlOWQs
+        2kv99JKeyqasNjykpcqoZTauDxW+prYc5FahlOpfz0/qqW7zY3a6M4G4gu7zUcLEG4LCxdtAiQmR9
+        1HaHdqQjE1cktt8L8Os43sQIP7K3kn5jV9l4zFSUPH8MHZ/U4n60J9x8aFRXClPra0ASxHQRWigDf
+        bgG2ZTNYVKwirYWvL5gbcAHseIy9nwp0QDt62ahuGCVAecGEXhJTqzQLHbknDf64gaDXyQ0hKRWw0
+        Cf/fBj6Q==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pjiFL-001vy7-2q;
+        Tue, 04 Apr 2023 15:06:55 +0000
+Date:   Tue, 4 Apr 2023 08:06:55 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     axboe@kernel.dk, minchan@kernel.org, martin@omnibond.com,
+        hubcap@omnibond.com, brauner@kernel.org, viro@zeniv.linux.org.uk,
+        senozhatsky@chromium.org, akpm@linux-foundation.org,
+        willy@infradead.org, hch@lst.de, devel@lists.orangefs.org,
+        mcgrof@kernel.org, linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, gost.dev@samsung.com,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] zram: always chain bio to the parent in
+ read_from_bdev_async
+Message-ID: <ZCw9Dxdd0C95EUza@infradead.org>
+References: <20230403132221.94921-1-p.raghav@samsung.com>
+ <CGME20230403132223eucas1p2a27e8239b8bda4fc16b675a9473fd61f@eucas1p2.samsung.com>
+ <20230403132221.94921-2-p.raghav@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230403132221.94921-2-p.raghav@samsung.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Propagate read errors to the caller instead of dropping them on
-the floor, and stop returning the somewhat dangerous 1 on success
-from read_from_bdev*.
+On Mon, Apr 03, 2023 at 03:22:17PM +0200, Pankaj Raghav wrote:
+> zram_bvec_read() is called with the bio set to NULL only in
+> writeback_store() function. When a writeback is triggered,
+> zram_bvec_read() is called only if ZRAM_WB flag is not set. That will
+> result only calling zram_read_from_zspool() in __zram_bvec_read().
+> 
+> rw_page callback used to call read_from_bdev_async with a NULL parent
+> bio but that has been removed since commit 3222d8c2a7f8
+> ("block: remove ->rw_page").
+> 
+> We can now safely always call bio_chain() as read_from_bdev_async() will
+> be called with a parent bio set. A WARN_ON_ONCE is added if this function
+> is called with parent set to NULL.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/zram/zram_drv.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+I'm pretty sure this is wrong.  I've now sent a series to untangle
+and fix up the zram I/O path, which should address the underlying
+issue here.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 0a98a0ba14607a..0be1633b0f4e94 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -770,6 +770,7 @@ struct zram_work {
- 	struct zram *zram;
- 	unsigned long entry;
- 	struct page *page;
-+	int error;
- };
- 
- static void zram_sync_read(struct work_struct *work)
-@@ -781,7 +782,7 @@ static void zram_sync_read(struct work_struct *work)
- 	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
- 	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
--	submit_bio_wait(&bio);
-+	zw->error = submit_bio_wait(&bio);
- }
- 
- /*
-@@ -803,7 +804,7 @@ static int read_from_bdev_sync(struct zram *zram, struct page *page,
- 	flush_work(&work.work);
- 	destroy_work_on_stack(&work.work);
- 
--	return 1;
-+	return work.error;
- }
- #else
- static int read_from_bdev_sync(struct zram *zram, struct page *page,
-@@ -821,7 +822,7 @@ static int read_from_bdev(struct zram *zram, struct page *page,
- 	if (!parent)
- 		return read_from_bdev_sync(zram, page, entry);
- 	read_from_bdev_async(zram, page, entry, parent);
--	return 1;
-+	return 0;
- }
- #else
- static inline void reset_bdev(struct zram *zram) {};
--- 
-2.39.2
-
+It will obviously conflict with this patch, so maybe the best thing is
+to get the other page_endio removals into their respective maintainer
+trees, and then just do the final removal of the unused function after
+-rc1.
