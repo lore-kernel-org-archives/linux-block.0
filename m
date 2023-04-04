@@ -2,86 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE65C6FD1D
-	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 19:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0935AC6FD1D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Apr 2023 22:12:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235858AbjDDTbf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Apr 2023 15:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59230 "EHLO
+        id S231657AbjDDWL7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Apr 2023 18:11:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235844AbjDDTbe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 15:31:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3933A2111;
-        Tue,  4 Apr 2023 12:31:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C6820630C3;
-        Tue,  4 Apr 2023 19:31:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0787C433EF;
-        Tue,  4 Apr 2023 19:31:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1680636692;
-        bh=iZeD7ZRu9tfSGLuTP62t6auaUEfXlLmcKZ7Z2/qHEMQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NKpoyy+Yq6eqQbNYmjxqL2awnOyyHtD9l6JPyLyvHjgVoziqxs+++3YxXj1ILg3s7
-         fThj6+7nxfFmT1cgl4T8Z52FbVv3E1+An1mGocVyxA8KAphD8aJqEfobzBt3Jhc7l5
-         zcR20po358bnNrXE8ln3SnUEFC/KX/yu2Asz1XdU=
-Date:   Tue, 4 Apr 2023 12:31:31 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
-        minchan@kernel.org, martin@omnibond.com, hubcap@omnibond.com,
-        brauner@kernel.org, viro@zeniv.linux.org.uk,
-        senozhatsky@chromium.org, willy@infradead.org, hch@lst.de,
-        devel@lists.orangefs.org, mcgrof@kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, gost.dev@samsung.com,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] zram: always chain bio to the parent in
- read_from_bdev_async
-Message-Id: <20230404123131.6e8fca22b0a484c8c152492a@linux-foundation.org>
-In-Reply-To: <ZCw9Dxdd0C95EUza@infradead.org>
-References: <20230403132221.94921-1-p.raghav@samsung.com>
-        <CGME20230403132223eucas1p2a27e8239b8bda4fc16b675a9473fd61f@eucas1p2.samsung.com>
-        <20230403132221.94921-2-p.raghav@samsung.com>
-        <ZCw9Dxdd0C95EUza@infradead.org>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        with ESMTP id S236122AbjDDWL7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Apr 2023 18:11:59 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2EFBEE
+        for <linux-block@vger.kernel.org>; Tue,  4 Apr 2023 15:11:56 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id qe8-20020a17090b4f8800b0023f07253a2cso35383989pjb.3
+        for <linux-block@vger.kernel.org>; Tue, 04 Apr 2023 15:11:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680646316;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FbWVsPRbHIBbR9kLT5KB4TeQj8+SBqxBKles1oDkc8g=;
+        b=uLaj7C8i2eFHo6crqyq/FCi7oeK2GfLWiYV/YHPQJr78WD73Ud28Bh1ykW0SYkLHKI
+         MyrVvUxXkCTnjjXkiWguvTt3jcVcS/FU1WBeDxg22fnh6eQH8+SJgi8X0XtfsHIR5PGN
+         injOE93KEfB+JpEf5tf9oT3+gWRVrY2u/IadEdfbS7E6m1/JxwRZBmC6hPmm0T01b2HD
+         eb7UAMp9kEGSL6IKhkiTyQ1sIel/JKaQSq9W/LQYdtNy3c/PY7JGRqiLZ3+4rIUU+U9V
+         PXIIPTCw8O8d/4yazEHYJGGDnzmkqZAjQ/wRrpacszqc9vi/2VFH17BbdKW8SiNwUNWP
+         G1Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680646316;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FbWVsPRbHIBbR9kLT5KB4TeQj8+SBqxBKles1oDkc8g=;
+        b=JLu/lXNRVgXXg30d0cS8a83INjh8fbpnfsWDVcqCd23DDbiRdIVfvfSC+LvvZ/jIYN
+         Ucg3Z0S313U3PMeKh5ilVfOYvIWwpkmxNzDeEDZwMlvGjDmjsruO9rdQIfB5Bkmw+d0s
+         B6UDd6FSFyECfv5am1CIP/xvO03LkuZMZuUQHi8X/o6l6z7NFptrqJb/h9ckM731cDjq
+         mNEuUT5249AW9w71nWFt9iSQPs3tMGlDaESNRmtmfLRbxFBOH/n5b4hP+9EeT27JAI6K
+         8NAlh88FgVHluFV/32ZpRl/UDZwBMcK4titceEhcrVXKBZk5gH4cOsnCPnJJE3OsPxrE
+         uFlQ==
+X-Gm-Message-State: AAQBX9euAB2dIWc5ywNLw5ZITdGtgcDrv6q40Vl0F7+AAoVT5xiV58o2
+        OmWplOIP1Sm1TGtfFiKmhfBOfng87n89m9S9kpZc3w==
+X-Google-Smtp-Source: AKy350aP/w7A+A+vnnvzdmbiQSqefdgL7bgYMkWOxu1R/yhPR7Ph+KKypm4ZiAYLhbsuNl4m2oIzdg==
+X-Received: by 2002:a05:6a20:9383:b0:da:4b41:8606 with SMTP id x3-20020a056a20938300b000da4b418606mr4514868pzh.5.1680646316056;
+        Tue, 04 Apr 2023 15:11:56 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 9-20020aa79149000000b0062dd28aaca6sm9157370pfi.212.2023.04.04.15.11.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 15:11:55 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, Keith Busch <kbusch@meta.com>
+Cc:     Keith Busch <kbusch@kernel.org>, stable@kernel.org,
+        Martin Belanger <Martin.Belanger@dell.com>,
+        Daniel Wagner <dwagner@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Christoph Hellwig <hch@lst.de>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20230331180056.1155862-1-kbusch@meta.com>
+References: <20230331180056.1155862-1-kbusch@meta.com>
+Subject: Re: [PATCHv2] blk-mq: directly poll requests
+Message-Id: <168064631491.88378.6153219751322337145.b4-ty@kernel.dk>
+Date:   Tue, 04 Apr 2023 16:11:54 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 4 Apr 2023 08:06:55 -0700 Christoph Hellwig <hch@infradead.org> wrote:
 
-> On Mon, Apr 03, 2023 at 03:22:17PM +0200, Pankaj Raghav wrote:
-> > zram_bvec_read() is called with the bio set to NULL only in
-> > writeback_store() function. When a writeback is triggered,
-> > zram_bvec_read() is called only if ZRAM_WB flag is not set. That will
-> > result only calling zram_read_from_zspool() in __zram_bvec_read().
-> > 
-> > rw_page callback used to call read_from_bdev_async with a NULL parent
-> > bio but that has been removed since commit 3222d8c2a7f8
-> > ("block: remove ->rw_page").
-> > 
-> > We can now safely always call bio_chain() as read_from_bdev_async() will
-> > be called with a parent bio set. A WARN_ON_ONCE is added if this function
-> > is called with parent set to NULL.
+On Fri, 31 Mar 2023 11:00:56 -0700, Keith Busch wrote:
+> Polling needs a bio with a valid bi_bdev, but neither of those are
+> guaranteed for polled driver requests. Make request based polling
+> directly use blk-mq's polling function instead.
 > 
-> I'm pretty sure this is wrong.
+> When executing a request from a polled hctx, we know the request's
+> cookie, and that it's from a live blk-mq queue that supports polling, so
+> we can safely skip everything that bio_poll provides.
+> 
+> [...]
 
-Thanks, I'll drop this v2 series.
+Applied, thanks!
 
->  I've now sent a series to untangle
-> and fix up the zram I/O path, which should address the underlying
-> issue here.
+[1/1] blk-mq: directly poll requests
+      commit: 38a8c4d1d45006841f0643f4cb29b5e50758837c
 
-I can't find that series.
+Best regards,
+-- 
+Jens Axboe
 
-> It will obviously conflict with this patch, so maybe the best thing is
-> to get the other page_endio removals into their respective maintainer
-> trees, and then just do the final removal of the unused function after
-> -rc1.
+
+
