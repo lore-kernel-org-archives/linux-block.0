@@ -2,92 +2,247 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8709CC7619A
-	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 16:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C42C77B62
+	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 18:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233232AbjDEQqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 12:46:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52034 "EHLO
+        id S234116AbjDES0q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 14:26:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232000AbjDEQqg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 12:46:36 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B34440C9
-        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 09:46:33 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-75d1e0ff8ecso1103939f.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 09:46:33 -0700 (PDT)
+        with ESMTP id S232680AbjDES0p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 14:26:45 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295F03ABC
+        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 11:26:43 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id u10so35225634plz.7
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 11:26:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680713193; x=1683305193;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XzDRh3J+8SvEaXn0A+6OwXdLsL1cECKaJ2d44EZkMv8=;
-        b=cvI9QcotuV/WktpPWLiG9q4P4hb+fv6+L6fSPKWafHE+/Rha1cywCFPBTcxcs7VOfF
-         N2ouY2O52fIxorXrYcHLYhkSGr5sQ1qOJw8wE+22T7X5px1V2h0oDQtykbM00fv+er7Y
-         ciNCEt6vEUY3Ost7gBNPDhWIpDUWZrJ2f7UQ7gmXcxcDWUzSvUWcTaAn4zEZf7xmmHQ5
-         JuyZih1ualPwJ4GOudcl4LRQ/+nICcjsA1Ne1W9BLHY1ePAq4HJQMeWlv1hV5wlFfj9j
-         9HONukPaW9BEyzUlrOr7RjHnP0crt4tssSxH+GSgSZEv3keTR95daTnBl1Zq72l143Gf
-         cA+A==
+        d=google.com; s=20210112; t=1680719202;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=40L1KpnbNaApfY6Jqegb/JgWk30KiDpmnuAJ36ODgMc=;
+        b=X4ZvWGkD0WKJyXoOzxHZtn4O3VcrPjAam71maWBunTX5/ybnKIG8rxx6MZUgglLMUq
+         vDxIZDd3Gx13g1dfbl7BrHzKNci09SQ66uOnCSuzKGPr5NNtUvO37xMDMAinGA6g1sQ7
+         ZWPXTumoAbVccGDATi26uXH2M94gbdcETow2dy8+llMBW/d6xbiN4fvb641V6IAefhKw
+         XNn5wJcBHpoYBR967a0FDTrgwZa4vNNOJ0jc3KpOfyGnq1f175QEJgAahhIy1EI+qCc3
+         L7+1jhpPgixLQx9bo94bWhr7uuw5jHw2VBjK+NCOdtE94yOvnQQIUZHZdLTZOaPYAnhZ
+         kqMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680713193; x=1683305193;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XzDRh3J+8SvEaXn0A+6OwXdLsL1cECKaJ2d44EZkMv8=;
-        b=KZ7e+3BO7TAlSK7b33F6VMuWhIHHro/L3GUXoGj0GlTaKtMU0NIMdYnPqXHMS8xxW0
-         ppBettiSSgbq6Gt42XWHC234vPL3ZdtXbqkXb6XXiPN+Bfk1YYOBF1r6LzdwJ25WGkOM
-         lRJ+t+BZohY5vq48UsgaBN1fP7h2Pa2Qz6+096IDeKUlmB4lxScvep/kKZdynD7I7ZTk
-         pS4UwEvc3g7ilookh6uDc/GAfcD60anjy0V1GbkLfc/0V1e28bCOBQKaV+Ef9ijxLLXY
-         PNgJv5qBPA2kH7zLBlHUVsWKsbwvRVNeJuZDpSqm/NogT+BLQZ41RExMFeZmBmlIY6CK
-         rjaQ==
-X-Gm-Message-State: AAQBX9eaI9hYLHCIfHi+OZuZAWvyIavvnd6ErPb03XEDdWJ25N/4DbaC
-        SYj3FFFqey/7EpOYLMx6sTosdw==
-X-Google-Smtp-Source: AKy350Zpwf9mFVQTQK0zdVakkitvp5e+RlJjveBB+ifhwqXu+VbfbTE1RvfDJdPOPfDc5Uo0oYEAHQ==
-X-Received: by 2002:a92:7d04:0:b0:313:fb1b:2f86 with SMTP id y4-20020a927d04000000b00313fb1b2f86mr1403917ilc.0.1680713192956;
-        Wed, 05 Apr 2023 09:46:32 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 19-20020a921813000000b00326ca02f30dsm800189ily.65.2023.04.05.09.46.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Apr 2023 09:46:32 -0700 (PDT)
-Message-ID: <aae10acf-7567-48e9-37b5-12db6a69719e@kernel.dk>
-Date:   Wed, 5 Apr 2023 10:46:31 -0600
+        d=1e100.net; s=20210112; t=1680719202;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=40L1KpnbNaApfY6Jqegb/JgWk30KiDpmnuAJ36ODgMc=;
+        b=tUe4OuSD0RzTKAw704sb+QHLp5JeMB20bWhR1vcax9ifZnuOzQgE58ko1OcNNnVFW3
+         rmSAQLvYGb/SxG7TlSFwfQtnjgMicSXBF7c4gW34RS0zdG0Y0We4lYg65w6bmru4sPi6
+         jc921E6WLHUXlLyLqdIBR21dlgb5VU3LIplYr2JCdHIat4WJABeL900Tfp0maBBmKiAw
+         07FHR5sshN5JBC2DW6RIYxWSiQugTHNFz/kjeWHErKI6xHjRtRB0ebsF6sypWuhkrdde
+         dRwxS7gr1INUi3DEyVFmmo0q6OU7kLrenOCLG3JxWaHpRfgLGAeGKrT30LYYenBexDAY
+         Uugw==
+X-Gm-Message-State: AAQBX9dVk9I3vnVJ9cZ4ZBPmigs0cMNnnlA74rPjJDBQT34f5Pr0VHkY
+        y8XJ4tiRu5OFHz4cxKRkjOff3A==
+X-Google-Smtp-Source: AKy350bbj5GuqBtzvQ6G3HkhXB3/jYYiubbbGojcGeVN4YdUw5kM1Rmy2aquWmt+oDofrV6cSOUwaw==
+X-Received: by 2002:a05:6a20:1207:b0:d9:957f:612a with SMTP id v7-20020a056a20120700b000d9957f612amr116198pzf.29.1680719202318;
+        Wed, 05 Apr 2023 11:26:42 -0700 (PDT)
+Received: from google.com ([2620:15c:2c5:13:873a:a865:8e8:d6b3])
+        by smtp.gmail.com with ESMTPSA id 197-20020a6307ce000000b0051322ab5ccdsm9668423pgh.28.2023.04.05.11.26.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Apr 2023 11:26:41 -0700 (PDT)
+Date:   Wed, 5 Apr 2023 11:26:36 -0700
+From:   Igor Pylypiv <ipylypiv@google.com>
+To:     Niklas Cassel <nks@flawful.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
+Subject: Re: [PATCH v5 18/19] ata: libata: set read/write commands CDL index
+Message-ID: <ZC29XNMS9CnQZn74@google.com>
+References: <20230404182428.715140-1-nks@flawful.org>
+ <20230404182428.715140-19-nks@flawful.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: kernel BUG in find_lock_entries
-Content-Language: en-US
-To:     "Dae R. Jeong" <threeearcat@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <ZC1S_f9nworAQpm_@dragonet>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZC1S_f9nworAQpm_@dragonet>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230404182428.715140-19-nks@flawful.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/5/23 4:52 AM, Dae R. Jeong wrote:
-> Hi,
+On Tue, Apr 04, 2023 at 08:24:23PM +0200, Niklas Cassel wrote:
+> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 > 
-> We observed an issue "kernel BUG in find_lock_entries". This was
-> observed a few months ago.
+> For devices supporting the command duration limits feature, translate
+> the dld field of read and write operation to set the command duration
+> limit index field of the command task file when the duration limit
+> feature is enabled.
 > 
-> Unfortunately, we have not found a reproducer for the crash yet. We
-> will inform you if we have any update on this crash.
-> 
-> Detailed crash information is attached below.
-> 
-> Best regards,
-> Dae R. Jeong
-> 
-> -----
-> - Kernel version:
-> 6.0-rc7
+> The function ata_set_tf_cdl() is introduced to do this. For unqueued
+> (non NCQ) read and write operations, this function sets the command
+> duration limit index set as the lower 2 bits of the feature field.
+> For queued NCQ read/write commands, the index is set as the lower
+> 2 bits of the auxiliary field.
 
-This is pretty old. Does it trigger on a current kernel?
+CDL index is lower 3 bits, not 2 bits.
 
--- 
-Jens Axboe
+> 
+> The flag ATA_QCFLAG_HAS_CDL is introduced to indicate that a command
+> taskfile has a non zero cdl field.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
+> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+> ---
+>  drivers/ata/libata-core.c | 32 +++++++++++++++++++++++++++++---
+>  drivers/ata/libata-scsi.c | 16 +++++++++++++++-
+>  drivers/ata/libata.h      |  2 +-
+>  include/linux/libata.h    |  1 +
+>  4 files changed, 46 insertions(+), 5 deletions(-)
+Reviewed-by: Igor Pylypiv <ipylypiv@google.com>
 
-
+Thanks,
+Igor
+> 
+> diff --git a/drivers/ata/libata-core.c b/drivers/ata/libata-core.c
+> index 62e100fa90e2..c68e7b684a87 100644
+> --- a/drivers/ata/libata-core.c
+> +++ b/drivers/ata/libata-core.c
+> @@ -665,12 +665,29 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
+>  	return block;
+>  }
+>  
+> +/*
+> + * Set a taskfile command duration limit index.
+> + */
+> +static inline void ata_set_tf_cdl(struct ata_queued_cmd *qc, int cdl)
+> +{
+> +	struct ata_taskfile *tf = &qc->tf;
+> +
+> +	if (tf->protocol == ATA_PROT_NCQ)
+> +		tf->auxiliary |= cdl;
+> +	else
+> +		tf->feature |= cdl;
+> +
+> +	/* Mark this command as having a CDL */
+> +	qc->flags |= ATA_QCFLAG_HAS_CDL;
+> +}
+> +
+>  /**
+>   *	ata_build_rw_tf - Build ATA taskfile for given read/write request
+>   *	@qc: Metadata associated with the taskfile to build
+>   *	@block: Block address
+>   *	@n_block: Number of blocks
+>   *	@tf_flags: RW/FUA etc...
+> + *	@cdl: Command duration limit index
+>   *	@class: IO priority class
+>   *
+>   *	LOCKING:
+> @@ -685,7 +702,7 @@ u64 ata_tf_read_block(const struct ata_taskfile *tf, struct ata_device *dev)
+>   *	-EINVAL if the request is invalid.
+>   */
+>  int ata_build_rw_tf(struct ata_queued_cmd *qc, u64 block, u32 n_block,
+> -		    unsigned int tf_flags, int class)
+> +		    unsigned int tf_flags, int cdl, int class)
+>  {
+>  	struct ata_taskfile *tf = &qc->tf;
+>  	struct ata_device *dev = qc->dev;
+> @@ -724,11 +741,20 @@ int ata_build_rw_tf(struct ata_queued_cmd *qc, u64 block, u32 n_block,
+>  		if (dev->flags & ATA_DFLAG_NCQ_PRIO_ENABLED &&
+>  		    class == IOPRIO_CLASS_RT)
+>  			tf->hob_nsect |= ATA_PRIO_HIGH << ATA_SHIFT_PRIO;
+> +
+> +		if ((dev->flags & ATA_DFLAG_CDL_ENABLED) && cdl)
+> +			ata_set_tf_cdl(qc, cdl);
+> +
+>  	} else if (dev->flags & ATA_DFLAG_LBA) {
+>  		tf->flags |= ATA_TFLAG_LBA;
+>  
+> -		/* We need LBA48 for FUA writes */
+> -		if (!(tf->flags & ATA_TFLAG_FUA) && lba_28_ok(block, n_block)) {
+> +		if ((dev->flags & ATA_DFLAG_CDL_ENABLED) && cdl)
+> +			ata_set_tf_cdl(qc, cdl);
+> +
+> +		/* Both FUA writes and a CDL index require 48-bit commands */
+> +		if (!(tf->flags & ATA_TFLAG_FUA) &&
+> +		    !(qc->flags & ATA_QCFLAG_HAS_CDL) &&
+> +		    lba_28_ok(block, n_block)) {
+>  			/* use LBA28 */
+>  			tf->device |= (block >> 24) & 0xf;
+>  		} else if (lba_48_ok(block, n_block)) {
+> diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+> index 8dde1cede5ca..05bde27947a2 100644
+> --- a/drivers/ata/libata-scsi.c
+> +++ b/drivers/ata/libata-scsi.c
+> @@ -1380,6 +1380,18 @@ static inline void scsi_16_lba_len(const u8 *cdb, u64 *plba, u32 *plen)
+>  	*plen = get_unaligned_be32(&cdb[10]);
+>  }
+>  
+> +/**
+> + *	scsi_dld - Get duration limit descriptor index
+> + *	@cdb: SCSI command to translate
+> + *
+> + *	Returns the dld bits indicating the index of a command duration limit
+> + *	descriptor.
+> + */
+> +static inline int scsi_dld(const u8 *cdb)
+> +{
+> +	return ((cdb[1] & 0x01) << 2) | ((cdb[14] >> 6) & 0x03);
+> +}
+> +
+>  /**
+>   *	ata_scsi_verify_xlat - Translate SCSI VERIFY command into an ATA one
+>   *	@qc: Storage for translated ATA taskfile
+> @@ -1548,6 +1560,7 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
+>  	struct request *rq = scsi_cmd_to_rq(scmd);
+>  	int class = IOPRIO_PRIO_CLASS(req_get_ioprio(rq));
+>  	unsigned int tf_flags = 0;
+> +	int dld = 0;
+>  	u64 block;
+>  	u32 n_block;
+>  	int rc;
+> @@ -1598,6 +1611,7 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
+>  			goto invalid_fld;
+>  		}
+>  		scsi_16_lba_len(cdb, &block, &n_block);
+> +		dld = scsi_dld(cdb);
+>  		if (cdb[1] & (1 << 3))
+>  			tf_flags |= ATA_TFLAG_FUA;
+>  		if (!ata_check_nblocks(scmd, n_block))
+> @@ -1622,7 +1636,7 @@ static unsigned int ata_scsi_rw_xlat(struct ata_queued_cmd *qc)
+>  	qc->flags |= ATA_QCFLAG_IO;
+>  	qc->nbytes = n_block * scmd->device->sector_size;
+>  
+> -	rc = ata_build_rw_tf(qc, block, n_block, tf_flags, class);
+> +	rc = ata_build_rw_tf(qc, block, n_block, tf_flags, dld, class);
+>  	if (likely(rc == 0))
+>  		return 0;
+>  
+> diff --git a/drivers/ata/libata.h b/drivers/ata/libata.h
+> index 2cd6124a01e8..73dd2ebc277c 100644
+> --- a/drivers/ata/libata.h
+> +++ b/drivers/ata/libata.h
+> @@ -45,7 +45,7 @@ static inline void ata_force_cbl(struct ata_port *ap) { }
+>  extern u64 ata_tf_to_lba(const struct ata_taskfile *tf);
+>  extern u64 ata_tf_to_lba48(const struct ata_taskfile *tf);
+>  extern int ata_build_rw_tf(struct ata_queued_cmd *qc, u64 block, u32 n_block,
+> -			   unsigned int tf_flags, int class);
+> +			   unsigned int tf_flags, int dld, int class);
+>  extern u64 ata_tf_read_block(const struct ata_taskfile *tf,
+>  			     struct ata_device *dev);
+>  extern unsigned ata_exec_internal(struct ata_device *dev,
+> diff --git a/include/linux/libata.h b/include/linux/libata.h
+> index d7fe735e6322..ab8b62036c12 100644
+> --- a/include/linux/libata.h
+> +++ b/include/linux/libata.h
+> @@ -209,6 +209,7 @@ enum {
+>  	ATA_QCFLAG_CLEAR_EXCL	= (1 << 5), /* clear excl_link on completion */
+>  	ATA_QCFLAG_QUIET	= (1 << 6), /* don't report device error */
+>  	ATA_QCFLAG_RETRY	= (1 << 7), /* retry after failure */
+> +	ATA_QCFLAG_HAS_CDL	= (1 << 8), /* qc has CDL a descriptor set */
+>  
+>  	ATA_QCFLAG_EH		= (1 << 16), /* cmd aborted and owned by EH */
+>  	ATA_QCFLAG_SENSE_VALID	= (1 << 17), /* sense data valid */
+> -- 
+> 2.39.2
+> 
