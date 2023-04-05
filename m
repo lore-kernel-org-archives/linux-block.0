@@ -2,95 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AF2C7619A
-	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 22:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C00E3C77B6C
+	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 22:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbjDEWZr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 18:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55124 "EHLO
+        id S230385AbjDEW3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 18:29:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbjDEWZq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 18:25:46 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38AAD59FC;
-        Wed,  5 Apr 2023 15:25:41 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-93071f06a94so90749566b.3;
-        Wed, 05 Apr 2023 15:25:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680733539;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l+SuiRQr1y49yLSoZiwgChN2owpYFtgpGjmGmx4+yfM=;
-        b=FqSyrYZVbGTZDSwPy3MTlAwISli1dlrjSuat2laMptqutKrSxukPjFKlP+zwDVwHo+
-         RFgQIrW5ZDaKqV9pg+VbUXq2lyIz6tD9CMFfTmjI3wcmcvyXK/HmrU51O4hMkx7qfTSQ
-         wIuXvCpjzkDL75//VGU3zR0zf5+ko8kzGqT17Eus/Rzv3CelBiWz2m9euBsHXqnw+vHA
-         ZFizIyOky1vdNiCngngPSZEUk0pTgQrjXsyTrkgtDClBrkofPaQAzHtPouJrDJmpSyA8
-         THVK/Af1gnyPYSuWcnvfXOK+iJL+YXMHNsymRoRg4fn1quStLjt+SNX6OksgebX77jky
-         UINQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680733539;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l+SuiRQr1y49yLSoZiwgChN2owpYFtgpGjmGmx4+yfM=;
-        b=PXEik/S7gzccQujVw73m9cQcacSrWBldRdpR8FqVbbEFVZEvTGlbOzc5Lx7QBOTBvo
-         70MDPpQjZjLuWfeJlHHrStN6rYmJypF7whEp712QEf5glKscq5xwlVYDSemVGOC/e/hW
-         yF3j7VIxX4Q8+/A5TEJFGaPdXB4uR/0z19lrAlT6DvHPHDa+lhVaFH4qOWpBgvWIewqY
-         UJom7YtDlYoF00OTvqqZ/E72Eo2nHu3Ui7N/2k/TPsi7dVjcouVxFlepNwOy1hB22ZVn
-         nRSM9cvzrIx0h8uJ6zH6oXcBqfbRducC7aabw7Hht20K38/lhZB6E0mIYGhEbA4yuh/4
-         j+ug==
-X-Gm-Message-State: AAQBX9dz0AQrhsDzXXRpcNXsOg5is32Bye/aTYQKyBC56sOcsjjAbSc6
-        OTEaJbCo+8PH0xoAO20xCfY4vrhfdd9PdjrEIsNRLREYrG2qIg==
-X-Google-Smtp-Source: AKy350ZBmygqiJIg5PdHv0Gzqj69rb1PkWDxi/MUrEmncPyRs22hMTulXR+IpwXFs7U7klpEi+IRvR1GOZoGSSAChxs=
-X-Received: by 2002:a50:ff05:0:b0:500:58cb:3b05 with SMTP id
- a5-20020a50ff05000000b0050058cb3b05mr3303754edu.27.1680733538997; Wed, 05 Apr
- 2023 15:25:38 -0700 (PDT)
+        with ESMTP id S229520AbjDEW3j (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 18:29:39 -0400
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4334310C8;
+        Wed,  5 Apr 2023 15:29:38 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailnew.nyi.internal (Postfix) with ESMTP id D8E47582237;
+        Wed,  5 Apr 2023 18:29:34 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Wed, 05 Apr 2023 18:29:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-transfer-encoding:content-type:content-type:date
+        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to; s=fm2; t=
+        1680733774; x=1680737374; bh=0hvdTrqnIesfwKwVq3biOhVWklyP7PuBB8v
+        wBclqcXE=; b=IPp+MnqRTTn2N3vo6dlles7qSJybzgJBtGedU7ArVmfm98PRps1
+        ysXZ3RJjjMsXtT+cIAhg5aSMTY+WXe+fIt616o4yicnIRSI/9Ld4wdlt5QUnfOlj
+        LsRrcbIeun2wHjykL/2UDc2MYH6v1u1pxWFH7cSdT8okDz9CmTKTeV5e6mf4yRd3
+        /x7nDB3n3DU0CQfnrQIkY5imJeUTj4lkuq6SrySmX70DyZGy6VBv5ocqBAfRMgEl
+        /rl4RRPX88V2Q6ZvvPIczhADDw5RaBe6yJFb3dhFEbRmwcwkJITlOgXbp3wwhexn
+        FndoTzGqo3NjiVRPgPxwY4wdKHL1yRtL5ig==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:date:feedback-id:feedback-id
+        :from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=i3db14652.fm2;
+         t=1680733774; x=1680737374; bh=0hvdTrqnIesfwKwVq3biOhVWklyP7PuB
+        B8vwBclqcXE=; b=JcCcM8Seu/Bh6214t3XI5cK0zyL7dg39sz8nnX1B1UPlCXoL
+        gdzUZNAJmpbmsdUvHmOTs99SqfIn4gjPjIPVkWu8ouLGnwGjiho1tXob7mpAE4rv
+        4F6sa53NCV4KDpWeXG0Ws0JBcRtFX0DaxiRNkxOL+wjeJg0mFe2k/22pZCD0o1XU
+        WpC0JOtcItxF8K7TX6x6pq9MNeK6Vg1w3yR/JCUbKhKIgCLoO8Ipm41eS+so6g1Z
+        p03R2uurm2OVJ6mfWa7WaZno9gsndIqfZid73nQmUlbtXhKXTieEJRLTCKoTzp2q
+        46spHIN0zCdtNag5s4LwFoKJ9fQHAX0UHN+QZg==
+X-ME-Sender: <xms:TfYtZHLAdghiXg-PzztIWq6FvuRpVXQ44Khif8DBv__firBZcOw-Zw>
+    <xme:TfYtZLJ4hNjC0q5fjPHb2Ocbr3F_qwbs1L0b5d4U7alWybB1pJb6yJkeD7uGYssX-
+    9NrKNPuVfNuOZ5jPjU>
+X-ME-Received: <xmr:TfYtZPunT8yMHXDDLF6TAQLFmVq2wVlcwhb_hX5tSuSpStl5D5h7_lRZ0bT3PBmva1hiFJfu-Os7wCpPe3sdqelLOaRkcrYQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdejvddgudduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtfeejnecuhfhrohhmpeffrghm
+    ihgvnhcunfgvucfoohgrlhcuoegulhgvmhhorghlsehfrghsthhmrghilhdrtghomheqne
+    cuggftrfgrthhtvghrnhepteefiefhieetgfevhfegfeehffetteduieetudfgleetvdff
+    udelveejfefhfeejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepughlvghmohgrlhesfhgrshhtmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:TfYtZAZ0HVncHW_8sn3-0_lMi9HLVzug-mragr37Q2RPjbB3xijvAw>
+    <xmx:TfYtZOaOk80OEjjPzUCCR3NG2LfrCWftqEDoCQSHzWEHwhhBXRxDeQ>
+    <xmx:TfYtZEAYJct45crcqaVI-X01Xp6JqTh_AQXeVMpOKbAXX2cjhlFPyw>
+    <xmx:TvYtZLSmM-oHr3AxtvQe2FtoYRhW_2BBEL4vq8Im_0ucS4dwEHTF6w>
+Feedback-ID: i3db14652:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Apr 2023 18:29:30 -0400 (EDT)
+Message-ID: <e61cd958-2cea-a03e-2581-a8cea1940028@fastmail.com>
+Date:   Thu, 6 Apr 2023 07:29:28 +0900
 MIME-Version: 1.0
-References: <ZC1S_f9nworAQpm_@dragonet> <aae10acf-7567-48e9-37b5-12db6a69719e@kernel.dk>
-In-Reply-To: <aae10acf-7567-48e9-37b5-12db6a69719e@kernel.dk>
-From:   "Dae R. Jeong" <threeearcat@gmail.com>
-Date:   Thu, 6 Apr 2023 07:25:25 +0900
-Message-ID: <CACsK=jcyHA4vWoR1tB3RQyXgtJ55LpwbGa+jCmGUDe1Ng7EiXQ@mail.gmail.com>
-Subject: Re: kernel BUG in find_lock_entries
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v5 18/19] ata: libata: set read/write commands CDL index
+To:     Igor Pylypiv <ipylypiv@google.com>, Niklas Cassel <nks@flawful.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
+References: <20230404182428.715140-1-nks@flawful.org>
+ <20230404182428.715140-19-nks@flawful.org> <ZC29XNMS9CnQZn74@google.com>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@fastmail.com>
+In-Reply-To: <ZC29XNMS9CnQZn74@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 6, 2023 at 1:46=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 4/5/23 4:52=E2=80=AFAM, Dae R. Jeong wrote:
-> > Hi,
-> >
-> > We observed an issue "kernel BUG in find_lock_entries". This was
-> > observed a few months ago.
-> >
-> > Unfortunately, we have not found a reproducer for the crash yet. We
-> > will inform you if we have any update on this crash.
-> >
-> > Detailed crash information is attached below.
-> >
-> > Best regards,
-> > Dae R. Jeong
-> >
-> > -----
-> > - Kernel version:
-> > 6.0-rc7
->
-> This is pretty old. Does it trigger on a current kernel?
+On 4/6/23 03:26, Igor Pylypiv wrote:
+> On Tue, Apr 04, 2023 at 08:24:23PM +0200, Niklas Cassel wrote:
+>> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+>>
+>> For devices supporting the command duration limits feature, translate
+>> the dld field of read and write operation to set the command duration
+>> limit index field of the command task file when the duration limit
+>> feature is enabled.
+>>
+>> The function ata_set_tf_cdl() is introduced to do this. For unqueued
+>> (non NCQ) read and write operations, this function sets the command
+>> duration limit index set as the lower 2 bits of the feature field.
+>> For queued NCQ read/write commands, the index is set as the lower
+>> 2 bits of the auxiliary field.
+> 
+> CDL index is lower 3 bits, not 2 bits.
 
-I'm not sure, but I don't think I've seen it recently.
-I will let you know if I observe it again.
-I'm sorry for wasting your time.
+Yes, typo. We will correct that.
 
-> --
-> Jens Axboe
->
->
+> 
+>>
+>> The flag ATA_QCFLAG_HAS_CDL is introduced to indicate that a command
+>> taskfile has a non zero cdl field.
+>>
+>> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+>> Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
+>> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+>> ---
+>>  drivers/ata/libata-core.c | 32 +++++++++++++++++++++++++++++---
+>>  drivers/ata/libata-scsi.c | 16 +++++++++++++++-
+>>  drivers/ata/libata.h      |  2 +-
+>>  include/linux/libata.h    |  1 +
+>>  4 files changed, 46 insertions(+), 5 deletions(-)
+> Reviewed-by: Igor Pylypiv <ipylypiv@google.com>
 
-Best regards,
-Dae R. Jeong.
+Thanks.
+
