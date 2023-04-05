@@ -2,52 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E93EC76188
-	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 15:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5863BC76188
+	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 15:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238935AbjDEPrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 11:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57952 "EHLO
+        id S239047AbjDEPrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 11:47:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238972AbjDEPrM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 11:47:12 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D695FC0
-        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 08:46:43 -0700 (PDT)
+        with ESMTP id S239059AbjDEPrb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 11:47:31 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE2B5FFC
+        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 08:47:07 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A47EA1FD64;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0E89A22314;
         Wed,  5 Apr 2023 15:46:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1680709595; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KQWWvyVOMNwg10qqrGRlHZ3xI6T1/nnXbHNP0F4OczA=;
-        b=he8paOLy12grTI42eoR4LxgQ4eciguZHWMo+4M+xpoV2HRqjd1rz80539nibOfw09JsjmS
-        JhV7QLcYqU23WW9l751NrmfqhgJLguIi99Q5NCdYfxSYyxaUXuhbQf8bfl6dy/S7i6DGd0
-        tPzn0/Ktyq/CKyFNlWso5s/7wAe6SNY=
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=icT/mqr4pMZQJFZc1I7CnseD2mZL4uOS9LIN9x1wVVg=;
+        b=WYiSiLOelii2EKxYp+E8jBPI6OOFrs8/pWG0zAHMpo+mD4K1mCOhYaG4x5EybJ556xz5cL
+        M6NEpY3IrWtdS7re65XCu6gAVDzOLh9Co3K+rgsoaMt7vZd1JanjTZrgHcKc1ifOMJMrb6
+        TER+3p/h8J5QUIHFa6RR4Ko1BDnooQc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1680709595;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KQWWvyVOMNwg10qqrGRlHZ3xI6T1/nnXbHNP0F4OczA=;
-        b=dypq+NkheZxu3UIuQaAWUJoE1BcJzHM0SFkJO3Y5nKLUIMoS2Txw5N0hjtMSNbZgXnHlHT
-        /fUdeAluOJwn++Aw==
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=icT/mqr4pMZQJFZc1I7CnseD2mZL4uOS9LIN9x1wVVg=;
+        b=ZUaaFqCYUULstj9anNQ9j7381Jqao9SCxDRznlYfKCjJHoyTauCr5BfyPw5vEI9lDA4KJ5
+        Mecgv6rwQ2QtEKCQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9510913A10;
-        Wed,  5 Apr 2023 15:46:35 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F3CBC13A10;
+        Wed,  5 Apr 2023 15:46:34 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 5E9jJNuXLWTaNgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 05 Apr 2023 15:46:35 +0000
+        id O7aAO9qXLWTTNgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 05 Apr 2023 15:46:34 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-block@vger.kernel.org
 Cc:     linux-nvme@lists.infradead.org,
@@ -56,44 +52,61 @@ Cc:     linux-nvme@lists.infradead.org,
         Hannes Reinecke <hare@suse.de>,
         James Smart <jsmart2021@gmail.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v5 1/4] nvme/rc: Add setter for attr_qid_max
-Date:   Wed,  5 Apr 2023 17:46:27 +0200
-Message-Id: <20230405154630.16298-2-dwagner@suse.de>
+Subject: [PATCH blktests v5 0/4] test queue count changes on reconnect
+Date:   Wed,  5 Apr 2023 17:46:26 +0200
+Message-Id: <20230405154630.16298-1-dwagner@suse.de>
 X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230405154630.16298-1-dwagner@suse.de>
-References: <20230405154630.16298-1-dwagner@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- tests/nvme/rc | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+The target is allowed to change the number of i/o queues. test if the
+host is able to reconnect in this scenario.
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index a3c9b42d91e6..ec7678dbe09e 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -617,6 +617,16 @@ _set_nvmet_dhgroup() {
- 	     "${cfs_path}/dhchap_dhgroup"
- }
- 
-+_set_nvmet_attr_qid_max() {
-+	local nvmet_subsystem="$1"
-+	local qid_max="$2"
-+	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
-+
-+	if [[ -f "${cfs_path}/attr_qid_max" ]]; then
-+		echo $qid_max > "${cfs_path}/attr_qid_max"
-+	fi
-+}
-+
- _find_nvme_dev() {
- 	local subsys=$1
- 	local subsysnqn
+I was able to test this successfully with tcp and rdma. fc still fails due to
+the race condition in the target code.
+
+Next attempt to get this series upstream :)
+
+This version is based on my previous posted nvme/047 patches [1]
+
+[1] https://lore.kernel.org/linux-nvme/20230329090202.8351-1-dwagner@suse.de/
+
+v5:
+ - moved generic parts to nvme/rc
+ - renamed test to 048
+ - rebased ontop of nvme/047
+v4:
+ - do not remove ports instead depend on host removing
+   controllers, see
+   https://lore.kernel.org/linux-nvme/20220927143157.3659-1-dwagner@suse.de/
+ - https://lore.kernel.org/linux-nvme/20220927143719.4214-1-dwagner@suse.de/
+v3:
+ - Added comment why at least 2 CPUs are needed for the test
+ - Fixed shell quoting in _set_nvmet_attr_qid_max
+ - https://lore.kernel.org/linux-nvme/20220913065758.134668-1-dwagner@suse.de/
+v2:
+ - detect if attr_qid_max is available
+ - https://lore.kernel.org/linux-block/20220831153506.28234-1-dwagner@suse.de/
+v1:
+ - https://lore.kernel.org/linux-block/20220831120900.13129-1-dwagner@suse.de/
+
+
+Daniel Wagner (4):
+  nvme/rc: Add setter for attr_qid_max
+  nvme/rc: Add nvmet attribute feature detection function
+  nvme/rc: Add helper to wait for nvme ctrl state
+  nvme/048: test queue count changes on reconnect
+
+ tests/nvme/048     | 81 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/nvme/048.out |  3 ++
+ tests/nvme/rc      | 58 +++++++++++++++++++++++++++++++++
+ 3 files changed, 142 insertions(+)
+ create mode 100755 tests/nvme/048
+ create mode 100644 tests/nvme/048.out
+
 -- 
 2.40.0
 
