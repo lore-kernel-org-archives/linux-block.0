@@ -2,102 +2,211 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FAB5C76188
-	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 10:53:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F36C76188
+	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 11:13:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237575AbjDEKxd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 06:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34876 "EHLO
+        id S229874AbjDELNs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 07:13:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237597AbjDEKx2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 06:53:28 -0400
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B073E559F
-        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 03:53:25 -0700 (PDT)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-54601d90118so513627067b3.12
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 03:53:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680692004; x=1683284004;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BF8S57zklCF7SEsUQ/f/6fRKqS2VWXlKEiFk3IkRkRs=;
-        b=YN1D6LOtOFRSeouKb6cK3VN6jjVIlEMke0wFGzXTwKgvRRcLB5OfG8b0/gV4obNhpo
-         9+S+aZrMGtdNH6hj10BKAj+XRr5GU4W/Y9a9BrgZERiquN+MIgRoQ/TV/q5cYuYFn4OA
-         ODsCGShNoizOXXKgKSk7JIXAxaba6pguNHBo1jg6uX+M412FAnCF3RYcMMaMum7k3JyV
-         iS+QPhm6UPhiGss0C6Z2n6Q9yYLmXkM2b1FT+cuoNFcjAj/aykM7u0ami4XIsmFGslQV
-         uNkCltgQHeaDsNeOHP149IFzk51+dlDDSgRqJ3V7Ky71u1PQea8BlKvdV/DZvjQZpppR
-         sqGg==
-X-Gm-Message-State: AAQBX9fta4Qd7omwwvfxVU9G+3rS1tvFc3kKAsJGnQ2vgn+QOFE6TdW7
-        NlK0GYqI6DaYsFpmzJvfFnJh/ZpVyAavlA==
-X-Google-Smtp-Source: AKy350Zk7+yjHpjdCGvhfHuEJ5RNwN95bnjdVP7WQkhK5lDxglSvnm4fUZoE2xHB6ohAiMImd4fFqA==
-X-Received: by 2002:a81:490b:0:b0:541:66d8:ef7 with SMTP id w11-20020a81490b000000b0054166d80ef7mr5361326ywa.4.1680692004453;
-        Wed, 05 Apr 2023 03:53:24 -0700 (PDT)
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com. [209.85.219.181])
-        by smtp.gmail.com with ESMTPSA id bz2-20020a05690c084200b00545a08184b3sm3787604ywb.67.2023.04.05.03.53.23
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Apr 2023 03:53:23 -0700 (PDT)
-Received: by mail-yb1-f181.google.com with SMTP id j7so41987501ybg.4
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 03:53:23 -0700 (PDT)
-X-Received: by 2002:a25:8487:0:b0:b26:884:c35e with SMTP id
- v7-20020a258487000000b00b260884c35emr1625689ybk.4.1680692003275; Wed, 05 Apr
- 2023 03:53:23 -0700 (PDT)
+        with ESMTP id S237210AbjDELNr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 07:13:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF4C7194
+        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 04:13:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680693184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ttYZmLJKXr76OL+dZ2wrCyBN7cFB9DM+SJg2wEjWKes=;
+        b=Krb4laPQ7YRJYL5Lag5lVfpyPU0Ydv5We8t7iNXdFWOOjjD+HC/ZsNrEulydBSQ1wbW7B0
+        idRo2cjQ86fEd4fQ3G2Z4G87CoVpnyCj5zvvjbIpbca7j3Lrp1HzwTj2CSHprVJH0Ik6FD
+        2jzvvmxmoyngpw01Ho3lYJzTyAUSdbQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-180-_13QKQwbOe6186Lhlq9a_g-1; Wed, 05 Apr 2023 07:13:03 -0400
+X-MC-Unique: _13QKQwbOe6186Lhlq9a_g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 74F8B85C6E3;
+        Wed,  5 Apr 2023 11:13:02 +0000 (UTC)
+Received: from mrjust8.localdomain (unknown [10.43.17.42])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5246040C6EC4;
+        Wed,  5 Apr 2023 11:13:01 +0000 (UTC)
+From:   Ondrej Kozina <okozina@redhat.com>
+To:     linux-block@vger.kernel.org
+Cc:     bluca@debian.org, gmazyland@gmail.com, axboe@kernel.dk,
+        hch@infradead.org, brauner@kernel.org, jonathan.derrick@linux.dev,
+        Ondrej Kozina <okozina@redhat.com>
+Subject: [PATCH v2 2/5] sed-opal: add helper for adding user authorities in ACE.
+Date:   Wed,  5 Apr 2023 13:12:20 +0200
+Message-Id: <20230405111223.272816-3-okozina@redhat.com>
+In-Reply-To: <20230405111223.272816-1-okozina@redhat.com>
+References: <20230322151604.401680-1-okozina@redhat.com>
+ <20230405111223.272816-1-okozina@redhat.com>
 MIME-Version: 1.0
-References: <20230322151604.401680-1-okozina@redhat.com> <20230322151604.401680-6-okozina@redhat.com>
- <20230405-komitee-treten-36f2c0a823b6@brauner> <36d11bf6-a0c9-b02f-020c-df25d06c7aee@redhat.com>
-In-Reply-To: <36d11bf6-a0c9-b02f-020c-df25d06c7aee@redhat.com>
-From:   Luca Boccassi <bluca@debian.org>
-Date:   Wed, 5 Apr 2023 11:53:12 +0100
-X-Gmail-Original-Message-ID: <CAMw=ZnSw5xhEr_vEcOgk0WVhvQ1jFd3W5TJPx5erXpHkzzxpLQ@mail.gmail.com>
-Message-ID: <CAMw=ZnSw5xhEr_vEcOgk0WVhvQ1jFd3W5TJPx5erXpHkzzxpLQ@mail.gmail.com>
-Subject: Re: [PATCH 5/5] sed-opal: Add command to read locking range parameters.
-To:     Ondrej Kozina <okozina@redhat.com>
-Cc:     Christian Brauner <brauner@kernel.org>,
-        linux-block@vger.kernel.org, gmazyland@gmail.com, axboe@kernel.dk,
-        hch@infradead.org, jonathan.derrick@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 5 Apr 2023 at 10:39, Ondrej Kozina <okozina@redhat.com> wrote:
->
-> On 05. 04. 23 10:27, Christian Brauner wrote:
-> > On Wed, Mar 22, 2023 at 04:16:04PM +0100, Ondrej Kozina wrote:
-> >> diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-> >> index d7a1524023db..3905c8ffedbf 100644
-> >> --- a/include/uapi/linux/sed-opal.h
-> >> +++ b/include/uapi/linux/sed-opal.h
-> >> @@ -78,6 +78,16 @@ struct opal_user_lr_setup {
-> >>      struct opal_session_info session;
-> >>   };
-> >>
-> >> +struct opal_lr_status {
-> >> +    struct opal_session_info session;
-> >> +    __u64 range_start;
-> >> +    __u64 range_length;
-> >> +    __u32 RLE; /* Read Lock enabled */
-> >> +    __u32 WLE; /* Write Lock Enabled */
-> >
-> > Why is that in capital letters if I may ask? That seems strange uapi for
-> > Linux. And why not just "read_lock_enabled" and "write_lock_enabled"
-> > given that we also have "range_start" and "range_length". Let's not
-> > CREAT one of those weird uapis if we don't have to.
->
-> See 'opal_user_lr_setup' struct above. Since the new command is supposed
-> to return those parameters I did not want to add confusion by naming it
-> differently.
->
-> >
-> >> +    __u32 l_state;
-> >
-> > "locking_state"?
->
-> Same as above, see 'opal_lock_unlock' struct. It's even spicier
-> considering it's impossible to set WRITE_ONLY state (lock only read I/O)
-> with sed-opal iface.
+Move ACE construction away from add_user_to_lr routine
+and refactor it to be used also in later code.
 
-Yeah we really want to keep the parameters names the same across the
-various ioctl, otherwise it's going to get very confusing very
-quickly.
+Also adds boolean operators defines from TCG Core
+specification.
+
+Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+Tested-by: Luca Boccassi <bluca@debian.org>
+Tested-by: Milan Broz <gmazyland@gmail.com>
+---
+ block/opal_proto.h |  9 +++++
+ block/sed-opal.c   | 88 +++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 77 insertions(+), 20 deletions(-)
+
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index 7152aa1f1a49..b045cbb9d76e 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -86,6 +86,15 @@ enum opal_response_token {
+ #define OPAL_MSID_KEYLEN 15
+ #define OPAL_UID_LENGTH_HALF 4
+ 
++/*
++ * Boolean operators from TCG Core spec 2.01 Section:
++ * 5.1.3.11
++ * Table 61
++ */
++#define OPAL_BOOLEAN_AND 0
++#define OPAL_BOOLEAN_OR  1
++#define OPAL_BOOLEAN_NOT 2
++
+ /* Enum to index OPALUID array */
+ enum opal_uid {
+ 	/* users */
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index d86d3e5f5a44..4d0253bc2bfd 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -1759,25 +1759,43 @@ static int set_sid_cpin_pin(struct opal_dev *dev, void *data)
+ 	return finalize_and_send(dev, parse_and_check_status);
+ }
+ 
+-static int add_user_to_lr(struct opal_dev *dev, void *data)
++static void add_authority_object_ref(int *err,
++				     struct opal_dev *dev,
++				     const u8 *uid,
++				     size_t uid_len)
++{
++	add_token_u8(err, dev, OPAL_STARTNAME);
++	add_token_bytestring(err, dev,
++			     opaluid[OPAL_HALF_UID_AUTHORITY_OBJ_REF],
++			     OPAL_UID_LENGTH/2);
++	add_token_bytestring(err, dev, uid, uid_len);
++	add_token_u8(err, dev, OPAL_ENDNAME);
++}
++
++static void add_boolean_object_ref(int *err,
++				   struct opal_dev *dev,
++				   u8 boolean_op)
++{
++	add_token_u8(err, dev, OPAL_STARTNAME);
++	add_token_bytestring(err, dev, opaluid[OPAL_HALF_UID_BOOLEAN_ACE],
++			     OPAL_UID_LENGTH/2);
++	add_token_u8(err, dev, boolean_op);
++	add_token_u8(err, dev, OPAL_ENDNAME);
++}
++
++static int set_lr_boolean_ace(struct opal_dev *dev,
++			      unsigned int opal_uid,
++			      u8 lr,
++			      const u8 *users,
++			      size_t users_len)
+ {
+ 	u8 lr_buffer[OPAL_UID_LENGTH];
+ 	u8 user_uid[OPAL_UID_LENGTH];
+-	struct opal_lock_unlock *lkul = data;
++	u8 u;
+ 	int err;
+ 
+-	memcpy(lr_buffer, opaluid[OPAL_LOCKINGRANGE_ACE_RDLOCKED],
+-	       OPAL_UID_LENGTH);
+-
+-	if (lkul->l_state == OPAL_RW)
+-		memcpy(lr_buffer, opaluid[OPAL_LOCKINGRANGE_ACE_WRLOCKED],
+-		       OPAL_UID_LENGTH);
+-
+-	lr_buffer[7] = lkul->session.opal_key.lr;
+-
+-	memcpy(user_uid, opaluid[OPAL_USER1_UID], OPAL_UID_LENGTH);
+-
+-	user_uid[7] = lkul->session.who;
++	memcpy(lr_buffer, opaluid[opal_uid], OPAL_UID_LENGTH);
++	lr_buffer[7] = lr;
+ 
+ 	err = cmd_start(dev, lr_buffer, opalmethod[OPAL_SET]);
+ 
+@@ -1790,19 +1808,49 @@ static int add_user_to_lr(struct opal_dev *dev, void *data)
+ 
+ 	add_token_u8(&err, dev, OPAL_STARTLIST);
+ 
++	for (u = 0; u < users_len; u++) {
++		if (users[u] == OPAL_ADMIN1)
++			memcpy(user_uid, opaluid[OPAL_ADMIN1_UID],
++			       OPAL_UID_LENGTH);
++		else {
++			memcpy(user_uid, opaluid[OPAL_USER1_UID],
++			       OPAL_UID_LENGTH);
++			user_uid[7] = users[u];
++		}
++
++		add_authority_object_ref(&err, dev, user_uid, sizeof(user_uid));
+ 
+-	add_token_u8(&err, dev, OPAL_STARTNAME);
+-	add_token_bytestring(&err, dev,
+-			     opaluid[OPAL_HALF_UID_AUTHORITY_OBJ_REF],
+-			     OPAL_UID_LENGTH/2);
+-	add_token_bytestring(&err, dev, user_uid, OPAL_UID_LENGTH);
+-	add_token_u8(&err, dev, OPAL_ENDNAME);
++		/*
++		 * Add boolean operator in postfix only with
++		 * two or more authorities being added in ACE
++		 * expresion.
++		 * */
++		if (u > 0)
++			add_boolean_object_ref(&err, dev, OPAL_BOOLEAN_OR);
++	}
+ 
+ 	add_token_u8(&err, dev, OPAL_ENDLIST);
+ 	add_token_u8(&err, dev, OPAL_ENDNAME);
+ 	add_token_u8(&err, dev, OPAL_ENDLIST);
+ 	add_token_u8(&err, dev, OPAL_ENDNAME);
+ 
++	return err;
++}
++
++static int add_user_to_lr(struct opal_dev *dev, void *data)
++{
++	int err;
++	struct opal_lock_unlock *lkul = data;
++	const u8 users[] = {
++		lkul->session.who
++	};
++
++	err = set_lr_boolean_ace(dev,
++				 lkul->l_state == OPAL_RW ?
++					OPAL_LOCKINGRANGE_ACE_WRLOCKED :
++					OPAL_LOCKINGRANGE_ACE_RDLOCKED,
++				 lkul->session.opal_key.lr, users,
++				 ARRAY_SIZE(users));
+ 	if (err) {
+ 		pr_debug("Error building add user to locking range command.\n");
+ 		return err;
+-- 
+2.31.1
+
