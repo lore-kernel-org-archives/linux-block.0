@@ -2,255 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11B5C77B70
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 14:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34801C7618D
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 14:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239246AbjDFOnV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 10:43:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42718 "EHLO
+        id S239435AbjDFOwV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 10:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239238AbjDFOmz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 10:42:55 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15264B745
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 07:41:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=/s4HmdzqY/SIQsjeFgn1lkiQFP+kj3yZfHQB3ZWsd7g=; b=N3hFCTIWRZM2cTjpttNhd52OUZ
-        PaAsWSHSgMwDDEKbR+SQMZ8RYAD5sT2gq0TTZv8GATklWOocKh1DB1qNKtkciFAEVOm0D8zYjLAJy
-        f1wEA9WdQcLTt6hhgsDElMblhZTWPLcDoR1jrPagZsgLkUfWJVbjE9KQhVzzD7ex+0PIz3Gys1C6D
-        cws5rw3U5BISHAFvNOOhoGPfjfEHpAyrNbvT1vfSjGDg6nVP7D9MGSnM2ahGJFQA/02RHpdqDsMzP
-        AnTVbjtpSsk5ojOdeOUmEguAxXlUtozI2/VAtjYqsmFcrnrz1gfA63LNpeeBnbvH++htJqIA6iXr5
-        XL/9onAQ==;
-Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pkQo0-007fol-2a;
-        Thu, 06 Apr 2023 14:41:41 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH 15/16] zram: fix synchronous reads
-Date:   Thu,  6 Apr 2023 16:41:01 +0200
-Message-Id: <20230406144102.149231-16-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230406144102.149231-1-hch@lst.de>
-References: <20230406144102.149231-1-hch@lst.de>
+        with ESMTP id S237762AbjDFOwF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 10:52:05 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9927A170C
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 07:51:07 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id nh20-20020a17090b365400b0024496d637e1so1809895pjb.5
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 07:51:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1680792666;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hvxogFZ7tzo2z7dxF0J9Y3jJgkG796IBeY87z8Qv1kQ=;
+        b=PxWqmBRUj4WBnZSfVzpRfLqostqKXR8X10+oF706WENnUQNTAeGyug62X2dsa4tpYN
+         TmZJqensASXgsRSvYlajRgHSMIgj2iFr/xVKZh8tJZGDsoodlod6SdH5oK9lq7q+7ePl
+         eaWtyww8e1C07Wfpb5nER82j3g66y0RauEyorkQixXonVxmvCfIDmD6SHJ6PzTQihsqe
+         I2AQUXe4NtRjpaxWSZwm/sykWFD+1zLra0dC+oUYexpzGyYlq9uYv7vXgtDPypULn3GD
+         qClosOFu9bbC+DXhM1sMN06zbLRpwPyZr8aDAP28l2d16iq49K4A3UQfJINl2MstFl0K
+         VtEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680792666;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hvxogFZ7tzo2z7dxF0J9Y3jJgkG796IBeY87z8Qv1kQ=;
+        b=Bsq9ON0oEaGd7Bsk2MqrEERC8LDoyEx49GUf4G4NwsHJVV0PG4qRFbdJmV8IiO70wW
+         7herVp2l0E271CTwZhb4Oho95g7uPC4/rO1tIO7JtM2EqMTQv1Wa3KIdHs8tNMm///ai
+         99vRFmBvB6/Lt4Dyk0/4ZZOy5icBNa/Hvgf9uHN2OF9gy6np4vy8UmpvwLdqZbg3gAdz
+         N7RKtekAAfduLnQyDByJYdJABrueLGASgiZSsmudy5+R/cdOcoiN0tWj7ROuYutKc71W
+         8yx9JhVPFe02Mwoyw+A/Vk9aHPavb6jC1wqQZmyzFh5N6aZeQ/4KCeBhWSa+6EOg8Okb
+         aX4w==
+X-Gm-Message-State: AAQBX9dtJlu4F8Z22LpPrhTYYJ4XWN4TbTry+IugmP/692tI86dVNqAz
+        LpIRXz5lyCLAG9/duMCW9hXiKg==
+X-Google-Smtp-Source: AKy350YMOAAXOd9Wtpy7569VRlFO8zc9dgQrOSpbdZ975Faxy8Ltu9r0KG6OuX3tcNR0EjtuUJaFTA==
+X-Received: by 2002:a17:903:22cd:b0:1a2:8924:224d with SMTP id y13-20020a17090322cd00b001a28924224dmr12472230plg.59.1680792665876;
+        Thu, 06 Apr 2023 07:51:05 -0700 (PDT)
+Received: from localhost.localdomain ([2409:8a28:e63:f500:18d3:10f7:2e64:a1a7])
+        by smtp.gmail.com with ESMTPSA id i4-20020a170902eb4400b0019ca68ef7c3sm1487398pli.74.2023.04.06.07.51.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 07:51:05 -0700 (PDT)
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+To:     axboe@kernel.dk, tj@kernel.org
+Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH v2 1/3] block, bfq: remove BFQ_WEIGHT_LEGACY_DFL
+Date:   Thu,  6 Apr 2023 22:50:48 +0800
+Message-Id: <20230406145050.49914-2-zhouchengming@bytedance.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20230406145050.49914-1-zhouchengming@bytedance.com>
+References: <20230406145050.49914-1-zhouchengming@bytedance.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently nothing waits for the synchronous reads before accessing
-the data.  Switch them to an on-stack bio and submit_bio_wait to
-make sure the I/O has actually completed when the work item has been
-flushed.  This also removes the call to page_endio that would unlock
-a page that has never been locked.
+BFQ_WEIGHT_LEGACY_DFL is the same as CGROUP_WEIGHT_DFL, which means
+we don't need cpd_bind_fn() callback to update default weight when
+attached to a hierarchy.
 
-Drop the partial_io/sync flag, as chaining only makes sense for the
-asynchronous reads of the entire page.
+This patch remove BFQ_WEIGHT_LEGACY_DFL and cpd_bind_fn().
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/block/zram/zram_drv.c | 64 +++++++++++++----------------------
- 1 file changed, 24 insertions(+), 40 deletions(-)
+ block/bfq-cgroup.c  | 4 +---
+ block/bfq-iosched.h | 1 -
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index ec6df834189b7a..5259b647010afe 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -55,7 +55,7 @@ static const struct block_device_operations zram_devops;
- 
- static void zram_free_page(struct zram *zram, size_t index);
- static int zram_read_page(struct zram *zram, struct page *page, u32 index,
--			  struct bio *bio, bool partial_io);
-+			  struct bio *parent);
- 
- static int zram_slot_trylock(struct zram *zram, u32 index)
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 89ffb3aa992c..a2ab5dd58068 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -504,8 +504,7 @@ static void bfq_cpd_init(struct blkcg_policy_data *cpd)
  {
-@@ -575,31 +575,15 @@ static void free_block_bdev(struct zram *zram, unsigned long blk_idx)
- 	atomic64_dec(&zram->stats.bd_count);
+ 	struct bfq_group_data *d = cpd_to_bfqgd(cpd);
+ 
+-	d->weight = cgroup_subsys_on_dfl(io_cgrp_subsys) ?
+-		CGROUP_WEIGHT_DFL : BFQ_WEIGHT_LEGACY_DFL;
++	d->weight = CGROUP_WEIGHT_DFL;
  }
  
--static void zram_page_end_io(struct bio *bio)
--{
--	struct page *page = bio_first_page_all(bio);
--
--	page_endio(page, op_is_write(bio_op(bio)),
--			blk_status_to_errno(bio->bi_status));
--	bio_put(bio);
--}
--
- static void read_from_bdev_async(struct zram *zram, struct page *page,
- 			unsigned long entry, struct bio *parent)
- {
- 	struct bio *bio;
+ static void bfq_cpd_free(struct blkcg_policy_data *cpd)
+@@ -1302,7 +1301,6 @@ struct blkcg_policy blkcg_policy_bfq = {
  
--	bio = bio_alloc(zram->bdev, 1, parent ? parent->bi_opf : REQ_OP_READ,
--			GFP_NOIO);
--
-+	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
- 	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
- 	__bio_add_page(bio, page, PAGE_SIZE, 0);
--
--	if (!parent)
--		bio->bi_end_io = zram_page_end_io;
--	else
--		bio_chain(bio, parent);
--
-+	bio_chain(bio, parent);
- 	submit_bio(bio);
- }
+ 	.cpd_alloc_fn		= bfq_cpd_alloc,
+ 	.cpd_init_fn		= bfq_cpd_init,
+-	.cpd_bind_fn	        = bfq_cpd_init,
+ 	.cpd_free_fn		= bfq_cpd_free,
  
-@@ -704,7 +688,7 @@ static ssize_t writeback_store(struct device *dev,
- 		/* Need for hugepage writeback racing */
- 		zram_set_flag(zram, index, ZRAM_IDLE);
- 		zram_slot_unlock(zram, index);
--		if (zram_read_page(zram, page, index, NULL, false)) {
-+		if (zram_read_page(zram, page, index, NULL)) {
- 			zram_slot_lock(zram, index);
- 			zram_clear_flag(zram, index, ZRAM_UNDER_WB);
- 			zram_clear_flag(zram, index, ZRAM_IDLE);
-@@ -780,23 +764,24 @@ static ssize_t writeback_store(struct device *dev,
- 	return ret;
- }
+ 	.pd_alloc_fn		= bfq_pd_alloc,
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 69aaee52285a..467e8cfc41a2 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -20,7 +20,6 @@
  
-+#if PAGE_SIZE != 4096
- struct zram_work {
- 	struct work_struct work;
- 	struct zram *zram;
- 	unsigned long entry;
--	struct bio *bio;
- 	struct page *page;
- };
+ #define BFQ_DEFAULT_QUEUE_IOPRIO	4
  
--#if PAGE_SIZE != 4096
- static void zram_sync_read(struct work_struct *work)
- {
- 	struct zram_work *zw = container_of(work, struct zram_work, work);
--	struct zram *zram = zw->zram;
--	unsigned long entry = zw->entry;
--	struct bio *bio = zw->bio;
-+	struct bio_bvec bv;
-+	struct bio bio;
+-#define BFQ_WEIGHT_LEGACY_DFL	100
+ #define BFQ_DEFAULT_GRP_IOPRIO	0
+ #define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
  
--	read_from_bdev_async(zram, zw->page, entry, bio);
-+	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
-+	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
-+	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
-+	submit_bio_wait(&bio);
- }
- 
- /*
-@@ -805,14 +790,13 @@ static void zram_sync_read(struct work_struct *work)
-  * use a worker thread context.
-  */
- static int read_from_bdev_sync(struct zram *zram, struct page *page,
--				unsigned long entry, struct bio *bio)
-+				unsigned long entry)
- {
- 	struct zram_work work;
- 
- 	work.page = page;
- 	work.zram = zram;
- 	work.entry = entry;
--	work.bio = bio;
- 
- 	INIT_WORK_ONSTACK(&work.work, zram_sync_read);
- 	queue_work(system_unbound_wq, &work.work);
-@@ -823,7 +807,7 @@ static int read_from_bdev_sync(struct zram *zram, struct page *page,
- }
- #else
- static int read_from_bdev_sync(struct zram *zram, struct page *page,
--				unsigned long entry, struct bio *bio)
-+				unsigned long entry)
- {
- 	WARN_ON(1);
- 	return -EIO;
-@@ -831,18 +815,18 @@ static int read_from_bdev_sync(struct zram *zram, struct page *page,
- #endif
- 
- static int read_from_bdev(struct zram *zram, struct page *page,
--			unsigned long entry, struct bio *parent, bool sync)
-+			unsigned long entry, struct bio *parent)
- {
- 	atomic64_inc(&zram->stats.bd_reads);
--	if (sync)
--		return read_from_bdev_sync(zram, page, entry, parent);
-+	if (!parent)
-+		return read_from_bdev_sync(zram, page, entry);
- 	read_from_bdev_async(zram, page, entry, parent);
- 	return 1;
- }
- #else
- static inline void reset_bdev(struct zram *zram) {};
- static int read_from_bdev(struct zram *zram, struct page *page,
--			unsigned long entry, struct bio *parent, bool sync)
-+			unsigned long entry, struct bio *parent)
- {
- 	return -EIO;
- }
-@@ -1375,7 +1359,7 @@ static int zram_read_from_zspool(struct zram *zram, struct page *page,
- }
- 
- static int zram_read_page(struct zram *zram, struct page *page, u32 index,
--			  struct bio *bio, bool partial_io)
-+			  struct bio *parent)
- {
- 	int ret;
- 
-@@ -1392,7 +1376,7 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
- 		zram_slot_unlock(zram, index);
- 
- 		ret = read_from_bdev(zram, page, zram_get_element(zram, index),
--				     bio, partial_io);
-+				     parent);
- 	}
- 
- 	/* Should NEVER happen. Return bio error if it does. */
-@@ -1407,14 +1391,14 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
-  * always expects a full page for the output.
-  */
- static int zram_bvec_read_partial(struct zram *zram, struct bio_vec *bvec,
--				  u32 index, int offset, struct bio *bio)
-+				  u32 index, int offset)
- {
- 	struct page *page = alloc_page(GFP_NOIO);
- 	int ret;
- 
- 	if (!page)
- 		return -ENOMEM;
--	ret = zram_read_page(zram, page, index, bio, true);
-+	ret = zram_read_page(zram, page, index, NULL);
- 	if (likely(!ret))
- 		memcpy_to_bvec(bvec, page_address(page) + offset);
- 	__free_page(page);
-@@ -1425,8 +1409,8 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
- 			  u32 index, int offset, struct bio *bio)
- {
- 	if (is_partial_io(bvec))
--		return zram_bvec_read_partial(zram, bvec, index, offset, bio);
--	return zram_read_page(zram, bvec->bv_page, index, bio, false);
-+		return zram_bvec_read_partial(zram, bvec, index, offset);
-+	return zram_read_page(zram, bvec->bv_page, index, bio);
- }
- 
- static int zram_write_page(struct zram *zram, struct page *page, u32 index)
-@@ -1566,7 +1550,7 @@ static int zram_bvec_write_partial(struct zram *zram, struct bio_vec *bvec,
- 	if (!page)
- 		return -ENOMEM;
- 
--	ret = zram_read_page(zram, page, index, bio, true);
-+	ret = zram_read_page(zram, page, index, bio);
- 	if (!ret) {
- 		memcpy_from_bvec(page_address(page) + offset, bvec);
- 		ret = zram_write_page(zram, page, index);
 -- 
 2.39.2
 
