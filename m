@@ -2,214 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C13EDC7618D
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 13:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A73F9C76196
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 13:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238096AbjDFNU4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 09:20:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47764 "EHLO
+        id S235962AbjDFNcf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 09:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238099AbjDFNUt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 09:20:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C00A240
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 06:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680787184;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=frVsBhffPn3PwOoewmeaK0CjpqOTk7ubCOsW6eOaIb0=;
-        b=hXUIpC5yFi3Og2jtKt04jUrjg9biV5nOFHcqkzCq4IxxAMOoxu+gg0xFFegAo4QhzbKl0i
-        4qq6P0qchOrsxaIwwcwCKRGi4qgZYJQLOTdwXu7NCaTsqsL6kPX/1ut2G+bQtr+ZolNL3l
-        n/z1gISLI+2q5zeHYacrSxPs2jB4ZWs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-448-r6ZiRPQ-MrmMuPLd03v7NA-1; Thu, 06 Apr 2023 09:19:40 -0400
-X-MC-Unique: r6ZiRPQ-MrmMuPLd03v7NA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4821E884EC0;
-        Thu,  6 Apr 2023 13:19:40 +0000 (UTC)
-Received: from mrjust8.localdomain (unknown [10.43.17.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 23AF02027063;
-        Thu,  6 Apr 2023 13:19:39 +0000 (UTC)
-From:   Ondrej Kozina <okozina@redhat.com>
-To:     linux-block@vger.kernel.org
-Cc:     bluca@debian.org, gmazyland@gmail.com, axboe@kernel.dk,
-        hch@infradead.org, brauner@kernel.org, jonathan.derrick@linux.dev,
-        Ondrej Kozina <okozina@redhat.com>
-Subject: [PATCH 1/1] sed-opal: geometry feature reporting command
-Date:   Thu,  6 Apr 2023 15:19:34 +0200
-Message-Id: <20230406131934.340155-2-okozina@redhat.com>
-In-Reply-To: <20230406131934.340155-1-okozina@redhat.com>
-References: <20230406131934.340155-1-okozina@redhat.com>
+        with ESMTP id S237053AbjDFNce (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 09:32:34 -0400
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B87C15FCE
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 06:32:32 -0700 (PDT)
+Received: by mail-il1-x12a.google.com with SMTP id e9e14a558f8ab-325ac3266a1so256845ab.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 06:32:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680787952;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RTqi1Ajv67oHRc5tROIKfGkaqOKRz7sRDcwDqPC9v1o=;
+        b=wrYh3BkKHG6FRKoBC/mXYvD58hzSb9ye3+XaLVLgJSfU49kpt2BOYOXzvi5/WIZs2j
+         qcx5efTRjgo0NjdgUWhxTQND2+sGROHWOTjiMQZA7JZjbFy2iGmy27JF+Sz3Q1bS/SCy
+         6fe17hYGzJDZCgWZXqvmZMqgTyIG50K4iddqfnnnSG0Btzer6WvQ+PD2f11FxtonF7HU
+         ATvfIifpAe4XeL5jvdlVPh+zUVyQovXezrjFOK+gc170m/cwNEk9NTVxa1XjwPkGCJ2v
+         3Ahet13BCJB90TDL+kuT0Gj9I8McOK68jZMv/9v8isihQRt4WKwQTDJjpjzc8i6xw+92
+         otBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680787952;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RTqi1Ajv67oHRc5tROIKfGkaqOKRz7sRDcwDqPC9v1o=;
+        b=3hK6I+t27Vo3eovHYbmxo2yH18pgh/eCQbQqgo5zLl+CStfjgXbiENkvgZ5bC4JN7v
+         QjdzS5tgAbA74fD6aYR9ChDOdG4OGTWGIIBHfRj+aCqiDX25p9IM4ft9xmxBgtfB8XZv
+         Ix8SpqcI0e9IyxQwXJjQcJrMszGr32sCOpLHLLLtw986OuygzeCix3ljkj5wk+jkmzoL
+         i8bvlFwSrAcoW7pHYbYh2uAQJegNeIuo1GJUiZnlfAVp9S85yB5NHCyl2KRVHG+t3U7k
+         gLxmYWbhCJeH+9FFd02I3+NRJAyEotxTW49MenSSeggYUFgpI6lxyClZmHJBMjBddNSl
+         P3pw==
+X-Gm-Message-State: AAQBX9fAlpAkYrgD4ByWz/ytpkpO408l0z6U3qqE5LMPu8FAX2u195Jd
+        /+MDW0nVNsCDt7GduCPYcKCP98S8sbVGF66+YUVkJw==
+X-Google-Smtp-Source: AKy350aF6SAwbPdndWPPnppug7AmRG98ip4sIdPVteltqZpMQOxCmgNuasGzfKKj6MH148+IfZtazg==
+X-Received: by 2002:a05:6602:2d11:b0:75c:f48c:2075 with SMTP id c17-20020a0566022d1100b0075cf48c2075mr4116486iow.2.1680787951945;
+        Thu, 06 Apr 2023 06:32:31 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id v8-20020a056602014800b007046e9e138esm381425iot.22.2023.04.06.06.32.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Apr 2023 06:32:31 -0700 (PDT)
+Message-ID: <f3dd02c3-4113-d1d1-58d6-1d3877590b32@kernel.dk>
+Date:   Thu, 6 Apr 2023 07:32:30 -0600
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH] block: ublk: make sure that block size is set correctly
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+References: <20230406124059.2035969-1-ming.lei@redhat.com>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230406124059.2035969-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Locking range start and locking range length
-attributes may be require to satisfy restrictions
-exposed by OPAL2 geometry feature reporting.
+On 4/6/23 6:40 AM, Ming Lei wrote:
+> block size is one very key setting for block layer, and bad block size
+> could panic kernel easily.
+> 
+> Make sure that block size is set correctly.
+> 
+> Meantime if ublk_validate_params() fails, clear ub->params so that disk
+> is prevented from being added.
 
-Geometry reporting feature is described in TCG OPAL SSC,
-section 3.1.1.4 (ALIGN, LogicalBlockSize, AlignmentGranularity
-and LowestAlignedLBA).
+Applied, and I added Breno's reported-by to the tags.
 
-4.3.5.2.1.1 RangeStart Behavior:
-
-[ StartAlignment = (RangeStart modulo AlignmentGranularity) - LowestAlignedLBA ]
-
-When processing a Set method or CreateRow method on the Locking
-table for a non-Global Range row, if:
-
-a) the AlignmentRequired (ALIGN above) column in the LockingInfo
-   table is TRUE;
-b) RangeStart is non-zero; and
-c) StartAlignment is non-zero, then the method SHALL fail and
-   return an error status code INVALID_PARAMETER.
-
-4.3.5.2.1.2 RangeLength Behavior:
-
-If RangeStart is zero, then
-	[ LengthAlignment = (RangeLength modulo AlignmentGranularity) - LowestAlignedLBA ]
-
-If RangeStart is non-zero, then
-	[ LengthAlignment = (RangeLength modulo AlignmentGranularity) ]
-
-When processing a Set method or CreateRow method on the Locking
-table for a non-Global Range row, if:
-
-a) the AlignmentRequired (ALIGN above) column in the LockingInfo
-   table is TRUE;
-b) RangeLength is non-zero; and
-c) LengthAlignment is non-zero, then the method SHALL fail and
-   return an error status code INVALID_PARAMETER
-
-In userspace we stuck to logical block size reported by general
-block device (via sysfs or ioctl), but we can not read
-'AlignmentGranularity' or 'LowestAlignedLBA' anywhere else and
-we need to get those values from sed-opal interface otherwise
-we will not be able to report or avoid locking range setup
-INVALID_PARAMETER errors above.
-
-Signed-off-by: Ondrej Kozina <okozina@redhat.com>
----
- block/sed-opal.c              | 29 ++++++++++++++++++++++++++++-
- include/linux/sed-opal.h      |  1 +
- include/uapi/linux/sed-opal.h | 13 +++++++++++++
- 3 files changed, 42 insertions(+), 1 deletion(-)
-
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 3fc4e65db111..137d47a5e674 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -83,8 +83,10 @@ struct opal_dev {
- 	u16 comid;
- 	u32 hsn;
- 	u32 tsn;
--	u64 align;
-+	u64 align; /* alignment granularity */
- 	u64 lowest_lba;
-+	u32 logical_block_size;
-+	u8  align_required; /* ALIGN: 0 or 1 */
- 
- 	size_t pos;
- 	u8 *cmd;
-@@ -409,6 +411,8 @@ static void check_geometry(struct opal_dev *dev, const void *data)
- 
- 	dev->align = be64_to_cpu(geo->alignment_granularity);
- 	dev->lowest_lba = be64_to_cpu(geo->lowest_aligned_lba);
-+	dev->logical_block_size = be32_to_cpu(geo->logical_block_size);
-+	dev->align_required = (geo->reserved01 & 0b10000000) ? 1 : 0;
- }
- 
- static int execute_step(struct opal_dev *dev,
-@@ -2956,6 +2960,26 @@ static int opal_get_status(struct opal_dev *dev, void __user *data)
- 	return 0;
- }
- 
-+static int opal_get_geometry(struct opal_dev *dev, void __user *data)
-+{
-+	struct opal_geometry geo = {0};
-+
-+	if (check_opal_support(dev))
-+		return -EINVAL;
-+
-+	geo.align = dev->align_required;
-+	geo.logical_block_size = dev->logical_block_size;
-+	geo.alignment_granularity =  dev->align;
-+	geo.lowest_aligned_lba = dev->lowest_lba;
-+
-+	if (copy_to_user(data, &geo, sizeof(geo))) {
-+		pr_debug("Error copying geometry data to userspace\n");
-+		return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
- int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- {
- 	void *p;
-@@ -3029,6 +3053,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 	case IOC_OPAL_GET_LR_STATUS:
- 		ret = opal_locking_range_status(dev, p, arg);
- 		break;
-+	case IOC_OPAL_GET_GEOMETRY:
-+		ret = opal_get_geometry(dev, arg);
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 042c1e2cb0ce..bbae1e52ab4f 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -46,6 +46,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	case IOC_OPAL_GENERIC_TABLE_RW:
- 	case IOC_OPAL_GET_STATUS:
- 	case IOC_OPAL_GET_LR_STATUS:
-+	case IOC_OPAL_GET_GEOMETRY:
- 		return true;
- 	}
- 	return false;
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 3905c8ffedbf..dc2efd345133 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -161,6 +161,18 @@ struct opal_status {
- 	__u32 reserved;
- };
- 
-+/*
-+ * Geometry Reporting per TCG Storage OPAL SSC
-+ * section 3.1.1.4
-+ */
-+struct opal_geometry {
-+	__u8 align;
-+	__u32 logical_block_size;
-+	__u64 alignment_granularity;
-+	__u64 lowest_aligned_lba;
-+	__u8  __align[3];
-+};
-+
- #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
- #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
- #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
-@@ -179,5 +191,6 @@ struct opal_status {
- #define IOC_OPAL_GENERIC_TABLE_RW   _IOW('p', 235, struct opal_read_write_table)
- #define IOC_OPAL_GET_STATUS         _IOR('p', 236, struct opal_status)
- #define IOC_OPAL_GET_LR_STATUS      _IOW('p', 237, struct opal_lr_status)
-+#define IOC_OPAL_GET_GEOMETRY       _IOR('p', 238, struct opal_geometry)
- 
- #endif /* _UAPI_SED_OPAL_H */
 -- 
-2.31.1
+Jens Axboe
+
 
