@@ -2,41 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30802C77B6F
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 14:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56218C77B70
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 14:43:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239084AbjDFOnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 10:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42204 "EHLO
+        id S239354AbjDFOnL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 10:43:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239386AbjDFOmf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 10:42:35 -0400
+        with ESMTP id S239173AbjDFOmk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 10:42:40 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BBA6AF0D
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 07:41:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC10CA5F4
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 07:41:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=hQanMhh8zwbKAF2OwSHuBoBEWxA4OX9V6+kl+QBB/zo=; b=UsAVwqT6emqgOj//VZVXrBC+Sv
-        aMmrYsqdsAJ9G8qaSFMRh8tyn9ovrv/tW9Dm09tHHA6BsbappAItSY1vxn2fUlJUqwD3fBF35fsMf
-        JUZHWvfHwQa3TWOqbq39ZroJzj2NPttsb6I4ggeozWNo/4u+eynAWOPGl1H7g17Cc4m2utTMBopvP
-        YqKmi1F4Ws4FQkZoIKHP4N4QDO1R3RJrCubnjPCbnxbb3J2UCyGAJLDyH4nhvW2KBfoN/vTACBVYC
-        j30Ql7WbvhnrXF1DCLGyvPgFn5iT4SOTHjnYyTNmsULE6jOPocLKoTagsAKgthmOTnJeDLAirihfY
-        My+OqBGA==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=GgKSvWRVz3BmtqqsjylV4+F/lWQhAgOcjW+7+ZBPo2I=; b=qke4VTQ/gRDC6VlWjRAzNY3xa4
+        PQDkORLNFm33eZ4euJUXpxBdZ2gf6tu6y4ILmQeImilcscTMQsZNWm4AqRXanSOoTcOawOfIB3Mgm
+        cKW8VgYdBzVx4YV/x2//YjPVARTT8krHuq58D3KPGe0iuDS/yhM4qksEMwtokL++M/tcsKNMkHeIp
+        Ox6Cx6fgSc8NmJGRS7ZsfZInPt5ImMvWMoBTLYfMzyMDqjE7bP77sfarwH45XdylzhCZuhLg5bZuW
+        PgNj7Rx3wkHkbcTw5tDiKUFZg0CSmk7j4s1olpuI/4tnQOTYI7ewnDm6Ll6HkqUlFqJHkfBfSwmy/
+        tr+JUogA==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pkQnS-007fei-2z;
-        Thu, 06 Apr 2023 14:41:07 +0000
+        id 1pkQnZ-007fgj-28;
+        Thu, 06 Apr 2023 14:41:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: zram I/O path cleanups and fixups v2
-Date:   Thu,  6 Apr 2023 16:40:46 +0200
-Message-Id: <20230406144102.149231-1-hch@lst.de>
+Subject: [PATCH 03/16] zram: simplify bvec iteration in __zram_make_request
+Date:   Thu,  6 Apr 2023 16:40:49 +0200
+Message-Id: <20230406144102.149231-4-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230406144102.149231-1-hch@lst.de>
+References: <20230406144102.149231-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -44,25 +46,85 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+bio_for_each_segment synthetize bvecs that never cross page boundaries,
+so don't duplicate that work in an inner loop.
 
-this series cleans up the zram I/O path, and fixes the handling of
-synchronous I/O to the underlying device in the writeback_store
-function or for > 4K PAGE_SIZE systems.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ drivers/block/zram/zram_drv.c | 42 +++++++++--------------------------
+ 1 file changed, 11 insertions(+), 31 deletions(-)
 
-The fixes are at the end, as I could not fully reason about them being
-safe before untangling the callchain.
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 3d8e2a1db7c7d3..5f1e4fd23ade32 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -174,12 +174,6 @@ static inline u32 zram_get_priority(struct zram *zram, u32 index)
+ 	return prio & ZRAM_COMP_PRIORITY_MASK;
+ }
+ 
+-static void update_position(u32 *index, int *offset, struct bio_vec *bvec)
+-{
+-	*index  += (*offset + bvec->bv_len) / PAGE_SIZE;
+-	*offset = (*offset + bvec->bv_len) % PAGE_SIZE;
+-}
+-
+ static inline void update_used_max(struct zram *zram,
+ 					const unsigned long pages)
+ {
+@@ -1966,16 +1960,10 @@ static int zram_bvec_rw(struct zram *zram, struct bio_vec *bvec, u32 index,
+ 
+ static void __zram_make_request(struct zram *zram, struct bio *bio)
+ {
+-	int offset;
+-	u32 index;
+-	struct bio_vec bvec;
+ 	struct bvec_iter iter;
++	struct bio_vec bv;
+ 	unsigned long start_time;
+ 
+-	index = bio->bi_iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
+-	offset = (bio->bi_iter.bi_sector &
+-		  (SECTORS_PER_PAGE - 1)) << SECTOR_SHIFT;
+-
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_DISCARD:
+ 	case REQ_OP_WRITE_ZEROES:
+@@ -1986,24 +1974,16 @@ static void __zram_make_request(struct zram *zram, struct bio *bio)
+ 	}
+ 
+ 	start_time = bio_start_io_acct(bio);
+-	bio_for_each_segment(bvec, bio, iter) {
+-		struct bio_vec bv = bvec;
+-		unsigned int unwritten = bvec.bv_len;
+-
+-		do {
+-			bv.bv_len = min_t(unsigned int, PAGE_SIZE - offset,
+-							unwritten);
+-			if (zram_bvec_rw(zram, &bv, index, offset,
+-					 bio_op(bio), bio) < 0) {
+-				bio->bi_status = BLK_STS_IOERR;
+-				break;
+-			}
+-
+-			bv.bv_offset += bv.bv_len;
+-			unwritten -= bv.bv_len;
+-
+-			update_position(&index, &offset, &bv);
+-		} while (unwritten);
++	bio_for_each_segment(bv, bio, iter) {
++		u32 index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
++		u32 offset = (iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
++				SECTOR_SHIFT;
++
++		if (zram_bvec_rw(zram, &bv, index, offset, bio_op(bio),
++				bio) < 0) {
++			bio->bi_status = BLK_STS_IOERR;
++			break;
++		}
+ 	}
+ 	bio_end_io_acct(bio, start_time);
+ 	bio_endio(bio);
+-- 
+2.39.2
 
-This survives xfstests on two zram devices on x86, but I don't actually
-have a large PAGE_SIZE system to test that path on.
-
-Changes since v1:
- - fix failed read vs write accounting
- - minor commit log and comment improvements
- - cosmetic change to use a break instead of a return in the main switch
-   in zram_submit_bio
-
-Diffstat:
- zram_drv.c |  377 ++++++++++++++++++++++---------------------------------------
- zram_drv.h |    1 
- 2 files changed, 137 insertions(+), 241 deletions(-)
