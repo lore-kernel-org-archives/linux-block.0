@@ -2,84 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D1FC76196
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 14:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F24EC76196
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 16:51:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239377AbjDFOwg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 10:52:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32864 "EHLO
+        id S239437AbjDFQvo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 12:51:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238925AbjDFOwT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 10:52:19 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEE5B769
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 07:51:03 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id o11so37733970ple.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 07:51:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1680792663;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jsN7tdxypihrla/GoL2oV2FbQRrK9CjsAVFPGAuvGMk=;
-        b=hNPXzmSIy/mxvyggQ3ydVzZKSJmXyokWxnfuXMrXOwox3waYSO9HkrwG/OUveIPAvb
-         0K5NAGLjHQD+lM5P1nRRJVprnOaQL4Yhfr7DAOL0LM57bac3qiLBE+nZ9nlINlUQfvAl
-         nd+qBy402VJeQOrbVrqxNZsJkIAV84N4iRmTdQI9H5+1HvIx8HAxnCon4Ba7mIVD947S
-         Echo6XtpjPCS2sx+NwqR0Mr5flBYxeMj9uAbB2Jig4vvOEz2N6OUEuHaEZxxtThXRWG5
-         WYNKwgpvc4oRkks7blCcpPDF6gXXQes14x/fCEhLVsH8qMuEejRxJuVeDKB+LyGPZMj0
-         x1Sw==
+        with ESMTP id S229868AbjDFQvn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 12:51:43 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF0290
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 09:51:42 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id b12-20020a6bb20c000000b007585c93862aso24702279iof.4
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 09:51:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680792663;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jsN7tdxypihrla/GoL2oV2FbQRrK9CjsAVFPGAuvGMk=;
-        b=yQQrCTpNgjLfD4afHhm4qmvciiW1HWD2EuRLFbJXnsBud458uR4cXJlUSf9G1SXQ1V
-         LNFDZAukK0qda6Xe7fdeGYb95AnB5JddVskWn2rgHqbJij0Vf15aocxoJF+ymuHhX4sF
-         bbxEy8tLeVEaN5WlXL8FLGeOWn6KrvhvW31pc16ylzVL9DxQr8gFi17OgAlXjdwB2UYJ
-         3fy11bmiOai4p11b7HSvnekS5mU0Q8vHB4938q8hZJCGAm5bDwMK6KvMsP1JOpwMfp7y
-         XEC3+NHEWeP0exqv0YmYOQnnJiU6oYWo4AGoArtQf05JS6N+rdjV6riHNG8wCS/4n6bt
-         1rxQ==
-X-Gm-Message-State: AAQBX9c+tWOXsbM9KHvacqB3lZOEkBIB/kh8h/T+b6q+FYTXXEI+uquc
-        BEw3CEdvSTKo1d9PwWY3s8hNSQ==
-X-Google-Smtp-Source: AKy350bG80qA6UgZFZIQWG7FVa/XWqHC70y/fiV8BLBfS2SIDCo6c3bZAJd6N7wRrR8QcqITiwzauQ==
-X-Received: by 2002:a17:902:ced0:b0:19e:7a2c:78a7 with SMTP id d16-20020a170902ced000b0019e7a2c78a7mr12747837plg.57.1680792662798;
-        Thu, 06 Apr 2023 07:51:02 -0700 (PDT)
-Received: from localhost.localdomain ([2409:8a28:e63:f500:18d3:10f7:2e64:a1a7])
-        by smtp.gmail.com with ESMTPSA id i4-20020a170902eb4400b0019ca68ef7c3sm1487398pli.74.2023.04.06.07.51.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 07:51:02 -0700 (PDT)
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH v2 0/3] blk-cgroup: some cleanup
-Date:   Thu,  6 Apr 2023 22:50:47 +0800
-Message-Id: <20230406145050.49914-1-zhouchengming@bytedance.com>
-X-Mailer: git-send-email 2.35.1
+        d=1e100.net; s=20210112; t=1680799901; x=1683391901;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HPNvMqwq7Vl/Pla7kHnqRsp93LF7NUEp/EVbRLBG6mk=;
+        b=ETtx9LN8ffdoqMReqKuPlPf4qVIbVXBbBhYacQdVBt0r9h0uQh4jtBtpmwxELe3E6k
+         Px4pFgN3Rl95sdnG7FoGq2zvGBdVMdTL7p/gLwRx//DgFgeW96+U8TWcANgD9G3ecaqD
+         VvtsbELq4KT5Jz63bEY58d6CD9vzcW+0PocmgYkukAXQ0XUgJ4HdflR7Q767UDOTJ5kD
+         njpMZl92xdT16xc8hU5Qt1gLLjlu8BtO1zbEHzh36Av+CpPmuNBe0x1uS/LluQ5mO20J
+         zCVF8fId0s07iPNousGOmtq6EC+7nWtCXsD+kd4GuPkGXDM519RFaVBGesXtgxh/pB9s
+         u7Og==
+X-Gm-Message-State: AAQBX9cJ1JrkrLlPPy6UzKj4J0UklQjBumTnee8l+rn7xzFwvxoPA7oV
+        kinRXmgqYtUMhmRW9wNG/cVML9QtdfWWjrgUUhiq/NkDOdaN
+X-Google-Smtp-Source: AKy350aB1kMwD47CTvFnGsBxN2BJukVoF5k7sg0VGqdBKEMNx7tpT5RRsDuCg8B6QiIdCc9xw5bQNvd3KLAqt4dizZMGHxGjCkyP
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a6b:ed18:0:b0:745:68ef:e410 with SMTP id
+ n24-20020a6bed18000000b0074568efe410mr100730iog.0.1680799901753; Thu, 06 Apr
+ 2023 09:51:41 -0700 (PDT)
+Date:   Thu, 06 Apr 2023 09:51:41 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000152bee05f8adb94c@google.com>
+Subject: [syzbot] [block?] WARNING in wait_til_done (2)
+From:   syzbot <syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These are some cleanup patches of blk-cgroup. Thanks for review.
+Hello,
 
-v2:
- - Add Acked tags from Tejun.
+syzbot found the following issue on:
 
-Chengming Zhou (3):
-  block, bfq: remove BFQ_WEIGHT_LEGACY_DFL
-  blk-cgroup: delete cpd_bind_fn of blkcg_policy
-  blk-cgroup: delete cpd_init_fn of blkcg_policy
+HEAD commit:    148341f0a2f5 Merge tag 'vfs.misc.fixes.v6.3-rc6' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12a10d3ec80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=adfc55aec6afccdd
+dashboard link: https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
- block/bfq-cgroup.c  | 12 ++----------
- block/bfq-iosched.h |  1 -
- block/blk-cgroup.c  | 25 -------------------------
- block/blk-cgroup.h  |  2 --
- 4 files changed, 2 insertions(+), 38 deletions(-)
+Unfortunately, I don't have any reproducer for this issue yet.
 
--- 
-2.39.2
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com
 
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 793 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 0 PID: 793 at drivers/block/floppy.c:999 wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
+Modules linked in:
+CPU: 0 PID: 793 Comm: syz-executor.1 Not tainted 6.3.0-rc5-syzkaller-00005-g148341f0a2f5 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
+Code: fc 41 83 fd 01 7e ac e8 4e 7f 66 fc 4c 89 e6 48 c7 c7 e0 d4 44 8d e8 3f 7b 44 fc e8 3a 7f 66 fc e9 c3 fd ff ff e8 30 7f 66 fc <0f> 0b e9 4b fd ff ff e8 64 9f b6 fc e9 0f fe ff ff e8 1a 7f 66 fc
+RSP: 0018:ffffc90004d4f738 EFLAGS: 00010216
+RAX: 0000000000000b2f RBX: 1ffff920009a9ee7 RCX: ffffc900027ca000
+RDX: 0000000000040000 RSI: ffffffff851b7940 RDI: 0000000000000001
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
+R13: ffffffff851b35c0 R14: 0000000000000000 R15: 0000000000000003
+FS:  00007fed1de7c700(0000) GS:ffff88802ca00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc84fd52d38 CR3: 000000006e24b000 CR4: 0000000000150ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_check_events+0x35e/0x680 drivers/block/floppy.c:4098
+ disk_check_events+0xc2/0x420 block/disk-events.c:193
+ disk_clear_events block/disk-events.c:248 [inline]
+ bdev_check_media_change+0x130/0x360 block/disk-events.c:279
+ floppy_open+0x879/0xe90 drivers/block/floppy.c:4057
+ blkdev_get_whole+0x99/0x2d0 block/bdev.c:594
+ blkdev_get_by_dev.part.0+0x5e0/0xb80 block/bdev.c:744
+ blkdev_get_by_dev+0x6f/0x90 block/bdev.c:778
+ blkdev_open+0x140/0x2c0 block/fops.c:493
+ do_dentry_open+0x6cc/0x13f0 fs/open.c:920
+ do_open fs/namei.c:3560 [inline]
+ path_openat+0x1baa/0x2750 fs/namei.c:3715
+ do_filp_open+0x1ba/0x410 fs/namei.c:3742
+ do_sys_openat2+0x16d/0x4c0 fs/open.c:1348
+ do_sys_open fs/open.c:1364 [inline]
+ __do_sys_openat fs/open.c:1380 [inline]
+ __se_sys_openat fs/open.c:1375 [inline]
+ __x64_sys_openat+0x143/0x1f0 fs/open.c:1375
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fed1d03e2f4
+Code: Unable to access opcode bytes at 0x7fed1d03e2ca.
+RSP: 002b:00007fed1de7bca0 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 6666666666666667 RCX: 00007fed1d03e2f4
+RDX: 0000000000000000 RSI: 00007fed1de7bd40 RDI: 00000000ffffff9c
+RBP: 00007fed1de7bd40 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
+R13: 00007ffe2ee6a22f R14: 00007fed1de7c300 R15: 0000000000022000
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
