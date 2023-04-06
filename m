@@ -2,125 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F24EC76196
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 16:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AD4C76196
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 17:06:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239437AbjDFQvo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 12:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37338 "EHLO
+        id S239799AbjDFRGy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 13:06:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbjDFQvn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 12:51:43 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF0290
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 09:51:42 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id b12-20020a6bb20c000000b007585c93862aso24702279iof.4
-        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 09:51:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680799901; x=1683391901;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HPNvMqwq7Vl/Pla7kHnqRsp93LF7NUEp/EVbRLBG6mk=;
-        b=ETtx9LN8ffdoqMReqKuPlPf4qVIbVXBbBhYacQdVBt0r9h0uQh4jtBtpmwxELe3E6k
-         Px4pFgN3Rl95sdnG7FoGq2zvGBdVMdTL7p/gLwRx//DgFgeW96+U8TWcANgD9G3ecaqD
-         VvtsbELq4KT5Jz63bEY58d6CD9vzcW+0PocmgYkukAXQ0XUgJ4HdflR7Q767UDOTJ5kD
-         njpMZl92xdT16xc8hU5Qt1gLLjlu8BtO1zbEHzh36Av+CpPmuNBe0x1uS/LluQ5mO20J
-         zCVF8fId0s07iPNousGOmtq6EC+7nWtCXsD+kd4GuPkGXDM519RFaVBGesXtgxh/pB9s
-         u7Og==
-X-Gm-Message-State: AAQBX9cJ1JrkrLlPPy6UzKj4J0UklQjBumTnee8l+rn7xzFwvxoPA7oV
-        kinRXmgqYtUMhmRW9wNG/cVML9QtdfWWjrgUUhiq/NkDOdaN
-X-Google-Smtp-Source: AKy350aB1kMwD47CTvFnGsBxN2BJukVoF5k7sg0VGqdBKEMNx7tpT5RRsDuCg8B6QiIdCc9xw5bQNvd3KLAqt4dizZMGHxGjCkyP
+        with ESMTP id S229977AbjDFRGx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 13:06:53 -0400
+X-Greylist: delayed 437 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 06 Apr 2023 10:06:52 PDT
+Received: from phd-imap.ethz.ch (phd-imap.ethz.ch [129.132.80.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6756183F2
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 10:06:52 -0700 (PDT)
+Received: from localhost (192-168-127-49.net4.ethz.ch [192.168.127.49])
+        by phd-imap.ethz.ch (Postfix) with ESMTP id 4Psnm55w08z33
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 18:59:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=phys.ethz.ch;
+        s=2023; t=1680800373;
+        bh=nXGbb7hv01ZmxnY2hs860tFHyNVV12CQts9yOHXUbnA=;
+        h=Date:From:To:Subject:Reply-To:From;
+        b=YlAr2W6NXDVDuujIMDlTheiFAxMI3i081R45npN5SO/Fq/PiNagppt60EkSwM1MZy
+         uGCBP1yXCFLM1lRNRfS9ELi8Oj5lRvTjYBHM3skYDdfXuWg5zwKcJWJ6PnVwsESQaF
+         mTz/IaRTm9a5dJLSPiutd/rh04DSSyKEHJAJKTRnQLZYV2/pTeDowdH8qzdb5ImNjt
+         MEPdVqtxocAW7wFgcxpQXJJRFGa76smpRjsWB7G2RA4cWUxymjRPHARx9R+ye+E/lu
+         OTtw3vMDiAk1iiXdvEWY4ZaYERikCYdg5ZE0HHwsf6KV2oRF4zMevl+33F0sr27awA
+         sFMMu+LcY0OMg==
+X-Virus-Scanned: Debian amavisd-new at phys.ethz.ch
+Received: from phd-mxin.ethz.ch ([192.168.127.53])
+        by localhost (phd-mailscan.ethz.ch [192.168.127.49]) (amavisd-new, port 10024)
+        with LMTP id yPmV3_Al3fDF for <linux-block@vger.kernel.org>;
+        Thu,  6 Apr 2023 18:59:33 +0200 (CEST)
+Received: from phys.ethz.ch (mothership.ethz.ch [192.33.96.20])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: daduke@phd-mxin.ethz.ch)
+        by phd-mxin.ethz.ch (Postfix) with ESMTPSA id 4Psnm558FGz9r
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 18:59:33 +0200 (CEST)
+Date:   Thu, 6 Apr 2023 18:59:32 +0200
+From:   Christian Herzog <herzog@phys.ethz.ch>
+To:     linux-block@vger.kernel.org
+Subject: file server freezes with all nfsds stuck in D state after upgrade to
+ Debian bookworm
+Message-ID: <ZC76dIshWvaWlki4@phys.ethz.ch>
+Reply-To: Christian Herzog <herzog@phys.ethz.ch>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:ed18:0:b0:745:68ef:e410 with SMTP id
- n24-20020a6bed18000000b0074568efe410mr100730iog.0.1680799901753; Thu, 06 Apr
- 2023 09:51:41 -0700 (PDT)
-Date:   Thu, 06 Apr 2023 09:51:41 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000152bee05f8adb94c@google.com>
-Subject: [syzbot] [block?] WARNING in wait_til_done (2)
-From:   syzbot <syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Dear all,
 
-syzbot found the following issue on:
+disclaimer: this email was originally posted to linux-nfs since we believed
+the problem to be nfsd, but Chuck Lever suggested that rq_qos_wait hinted at a
+problem further down in the storage stack and referred to you guys, so here we
+are:
 
-HEAD commit:    148341f0a2f5 Merge tag 'vfs.misc.fixes.v6.3-rc6' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a10d3ec80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=adfc55aec6afccdd
-dashboard link: https://syzkaller.appspot.com/bug?extid=9bc4da690ee5334f5d15
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+for our researchers we are running file servers in the hundreds-of-TiB to
+low-PiB range that export via NFS and SMB. Storage is iSCSI-over-Infiniband
+LUNs LVM'ed into individual XFS file systems. With Ubuntu 18.04 nearing EOL,
+we prepared an upgrade to Debian bookworm and tests went well. About a week
+after one of the upgrades, we ran into the first occurence of our problem: all
+of a sudden, all nfsds enter the D state and are not recoverable. However, the
+underlying file systems seem fine and can be read and written to. The only way
+out appears to be to reboot the server. The only clues are the frozen nfsds
+and strack traces like
 
-Unfortunately, I don't have any reproducer for this issue yet.
+[<0>] rq_qos_wait+0xbc/0x130
+[<0>] wbt_wait+0xa2/0x110
+[<0>] __rq_qos_throttle+0x20/0x40
+[<0>] blk_mq_submit_bio+0x2d3/0x580
+[<0>] submit_bio_noacct_nocheck+0xf7/0x2c0
+[<0>] iomap_submit_ioend+0x4b/0x80
+[<0>] iomap_do_writepage+0x4b4/0x820
+[<0>] write_cache_pages+0x180/0x4c0
+[<0>] iomap_writepages+0x1c/0x40
+[<0>] xfs_vm_writepages+0x79/0xb0 [xfs]
+[<0>] do_writepages+0xbd/0x1c0
+[<0>] filemap_fdatawrite_wbc+0x5f/0x80
+[<0>] __filemap_fdatawrite_range+0x58/0x80
+[<0>] file_write_and_wait_range+0x41/0x90
+[<0>] xfs_file_fsync+0x5a/0x2a0 [xfs]
+[<0>] nfsd_commit+0x93/0x190 [nfsd]
+[<0>] nfsd4_commit+0x5e/0x90 [nfsd]
+[<0>] nfsd4_proc_compound+0x352/0x660 [nfsd]
+[<0>] nfsd_dispatch+0x167/0x280 [nfsd]
+[<0>] svc_process_common+0x286/0x5e0 [sunrpc]
+[<0>] svc_process+0xad/0x100 [sunrpc]
+[<0>] nfsd+0xd5/0x190 [nfsd]
+[<0>] kthread+0xe6/0x110
+[<0>] ret_from_fork+0x1f/0x30
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9bc4da690ee5334f5d15@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 793 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 0 PID: 793 at drivers/block/floppy.c:999 wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
-Modules linked in:
-CPU: 0 PID: 793 Comm: syz-executor.1 Not tainted 6.3.0-rc5-syzkaller-00005-g148341f0a2f5 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
-Code: fc 41 83 fd 01 7e ac e8 4e 7f 66 fc 4c 89 e6 48 c7 c7 e0 d4 44 8d e8 3f 7b 44 fc e8 3a 7f 66 fc e9 c3 fd ff ff e8 30 7f 66 fc <0f> 0b e9 4b fd ff ff e8 64 9f b6 fc e9 0f fe ff ff e8 1a 7f 66 fc
-RSP: 0018:ffffc90004d4f738 EFLAGS: 00010216
-RAX: 0000000000000b2f RBX: 1ffff920009a9ee7 RCX: ffffc900027ca000
-RDX: 0000000000040000 RSI: ffffffff851b7940 RDI: 0000000000000001
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
-R13: ffffffff851b35c0 R14: 0000000000000000 R15: 0000000000000003
-FS:  00007fed1de7c700(0000) GS:ffff88802ca00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fc84fd52d38 CR3: 000000006e24b000 CR4: 0000000000150ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- floppy_check_events+0x35e/0x680 drivers/block/floppy.c:4098
- disk_check_events+0xc2/0x420 block/disk-events.c:193
- disk_clear_events block/disk-events.c:248 [inline]
- bdev_check_media_change+0x130/0x360 block/disk-events.c:279
- floppy_open+0x879/0xe90 drivers/block/floppy.c:4057
- blkdev_get_whole+0x99/0x2d0 block/bdev.c:594
- blkdev_get_by_dev.part.0+0x5e0/0xb80 block/bdev.c:744
- blkdev_get_by_dev+0x6f/0x90 block/bdev.c:778
- blkdev_open+0x140/0x2c0 block/fops.c:493
- do_dentry_open+0x6cc/0x13f0 fs/open.c:920
- do_open fs/namei.c:3560 [inline]
- path_openat+0x1baa/0x2750 fs/namei.c:3715
- do_filp_open+0x1ba/0x410 fs/namei.c:3742
- do_sys_openat2+0x16d/0x4c0 fs/open.c:1348
- do_sys_open fs/open.c:1364 [inline]
- __do_sys_openat fs/open.c:1380 [inline]
- __se_sys_openat fs/open.c:1375 [inline]
- __x64_sys_openat+0x143/0x1f0 fs/open.c:1375
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fed1d03e2f4
-Code: Unable to access opcode bytes at 0x7fed1d03e2ca.
-RSP: 002b:00007fed1de7bca0 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 6666666666666667 RCX: 00007fed1d03e2f4
-RDX: 0000000000000000 RSI: 00007fed1de7bd40 RDI: 00000000ffffff9c
-RBP: 00007fed1de7bd40 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
-R13: 00007ffe2ee6a22f R14: 00007fed1de7c300 R15: 0000000000022000
- </TASK>
+(we've also seen nfsd3). It's very sporadic, we have no idea what's triggering
+it and it has now happened 4 times on one server and once on a second.
+Needless to say, these are production systems, so we have a window of a few
+minutes for debugging before people start yelling. We've thrown everything we
+could at our test setup but so far haven't been able to trigger it.
+Any pointers would be highly appreciated.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+thanks and best regards,
+-Christian
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+
+cat /etc/os-release 
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+
+uname -vr
+6.1.0-7-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.20-1 (2023-03-19)
+
+apt list --installed '*nfs*'
+libnfsidmap1/testing,now 1:2.6.2-4 amd64 [installed,automatic]
+nfs-common/testing,now 1:2.6.2-4 amd64 [installed]
+nfs-kernel-server/testing,now 1:2.6.2-4 amd64 [installed]
+
+nfsconf -d
+[exportd]
+ debug = all
+[exportfs]
+ debug = all
+[general]
+ pipefs-directory = /run/rpc_pipefs
+[lockd]
+ port = 32769
+ udp-port = 32769
+[mountd]
+ debug = all
+ manage-gids = True
+ port = 892
+[nfsd]
+ debug = all
+ port = 2049
+ threads = 48
+[nfsdcld]
+ debug = all
+[nfsdcltrack]
+ debug = all
+[sm-notify]
+ debug = all
+ outgoing-port = 846
+[statd]
+ debug = all
+ outgoing-port = 2020
+ port = 662
+
+
+
+-- 
+Dr. Christian Herzog <herzog@phys.ethz.ch>  support: +41 44 633 26 68
+Head, IT Services Group, HPT H 8              voice: +41 44 633 39 50
+Department of Physics, ETH Zurich           
+8093 Zurich, Switzerland                     http://isg.phys.ethz.ch/
+
+----- End forwarded message -----
+
+-- 
+Dr. Christian Herzog <herzog@phys.ethz.ch>  support: +41 44 633 26 68
+Head, IT Services Group, HPT H 8              voice: +41 44 633 39 50
+Department of Physics, ETH Zurich           
+8093 Zurich, Switzerland                     http://isg.phys.ethz.ch/
