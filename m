@@ -2,75 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C22A0C7618D
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 21:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC46AC77B6C
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 21:19:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237482AbjDFVRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 17:17:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47806 "EHLO
+        id S240190AbjDFVTy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 17:19:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbjDFVRL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 17:17:11 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34AC74C3A
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 14:17:11 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso6829479pjc.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 14:17:11 -0700 (PDT)
+        with ESMTP id S240066AbjDFVTw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 17:19:52 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C687A26C
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 14:19:51 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id q2so2538019pll.7
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 14:19:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680815830;
+        d=gmail.com; s=20210112; t=1680815990;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jDzKLZgQ4DLrPhYF71Ntb0jFiXzvjtbNYxt5vTB4n70=;
-        b=pTxSLFOMoFUNlzaCLgr17hpiZiOqn4Us9gaTBSL58dL6EX3ngcmNecAu9fIhQ2F3Ka
-         Ec8VcfXewqQrFPGTskIdm4U6HAXUP4eQF2FGTH1DxsRjY3vBKIHZF3t/48/KHszGw5EP
-         +fYQjJYa6+tEtWDkeec7ZJXVbGYTj4Vz9NUGq5JsoLJW+Txni1n8n29wxHVH8szMaUwt
-         Xyu5X68EPnP34Z+HHpFbS62CFjs0RMmRIr3jqMZc2+36CSPHqZRxy+/vXhjGNKqS59Po
-         bZi5mIaaSUrStfPQZGCKqNeTnUsRWV+wrho3zEMfoRZ4uIAyfXbhgdydI2NskQIQ26UZ
-         lgVw==
+        bh=Y4q2yZUDY9+DAqNExO05l5NIqw4IFLcHgMroHz7eXEg=;
+        b=o5uyserpBqBSAFKxCKAOHHmqzLxUc0PoeQXJCpUH8laSCAKK7ojCYMjBkzcLPWt8Md
+         Li0IA0NYVD0gh21szZUW+NQB41lKaEQD/Pkzl9uQDRTyU1Q/vUheLLs+dWvUriVjuHug
+         7ZtuZupyY2jK10/bw5SBG71Iz5AgVqsK45PkOQPT2VuGjD1LFpL6yX7Gge/++mnXITTG
+         TCcKPgMYm1OCzPv3kzmJvRDAhFY4Kli2mthve67Y15YbMhdGMl+Cgv7LH5fgw93kwmRM
+         vx2JHhu21oEyUqJO4N1cLHLRJOxZQC9tdpVjYMTRXYWIXyYLm+EuohJarmBkPpoS7GVu
+         kSsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680815830;
+        d=1e100.net; s=20210112; t=1680815990;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jDzKLZgQ4DLrPhYF71Ntb0jFiXzvjtbNYxt5vTB4n70=;
-        b=p40S8D7BQR2gYxzKnHjxO1Zt7XnX39Z9hiTXLv6wDL3Pw61scfMAkN4vTODgosXgUG
-         XDfPsAfb0a5n1LVRcXAUBwJ8Pztj17PIA+xYCV0wJhKniNMJ1Q7//gbM2pXOc8B+HC4t
-         Tf4N4hb4DIVqH+W4U2SGyMyCQU6Al3Yr2VNkiZKm7M7XCjeyUKBqPsB93sm81k5FZzLO
-         qVF9GPeYX575TGsPYEqqk+IvoQEdlTPL8ZfNR7Tq3yZ5g8ez0C1jjZSl6ZJ+TypuNNTA
-         KT+AmoDTwicqQa/2c6B3iUreP9kJDoV39Vg0t+bVgDR6GYtKiQ9/oEpK1998Agsz6Rww
-         WgRQ==
-X-Gm-Message-State: AAQBX9fhg3UNa39qBXd07ny2h9ITgDkRUEgFzOcNJ9yijOdK7F6AjmPF
-        sYtcc0yFiKvlPGnLEzy4iBw=
-X-Google-Smtp-Source: AKy350ZHHEaGcGPZx6VMI5/WGaom6lhcziOtBxvgNyHiug9BNrI3AP3t+/APzlxdc1RncbL8LPhg1g==
-X-Received: by 2002:a17:902:f291:b0:1a1:cc8b:7b0b with SMTP id k17-20020a170902f29100b001a1cc8b7b0bmr330066plc.66.1680815830600;
-        Thu, 06 Apr 2023 14:17:10 -0700 (PDT)
+        bh=Y4q2yZUDY9+DAqNExO05l5NIqw4IFLcHgMroHz7eXEg=;
+        b=3IERKsqQnyZHYAH2FQGhNi8C+zcQcBZi8X6YAou6dO/lparVmCGfAkq2m6nxS+d91q
+         sewVRmgJmNVE63hr+Oy0CsAzHerEZsoTDdZ9brtV9QeEGHUDlwp4rOLowFHy/zcVYuEr
+         c6B/xcjBkf6dTUX7tkHJTRh9u4NsYfuPTrqFNt1Reqk7++d9BrdpwmFiI5XYf7ap7Yf+
+         t9ZFIQPtePQobOfKqJv8df9JKkGG7kVznAgsbKxc6ujKgCFvtGMLGxuXXk+x8H4wurrp
+         xlxqDH/sr7SLlEYxYEUmA5oOOjqp/ViB8Bl8ER5ZyntnsCeFlHphQg6hpGm2LDCKjd00
+         tyuA==
+X-Gm-Message-State: AAQBX9fxvUUWfY/OEP+d4jEHUOeQikqhZix1n3+FiKwPvADGwfAuEJzb
+        b1pLhTHBQSMfPgY8DxTZjFqHvQgEP6k=
+X-Google-Smtp-Source: AKy350apEokeNKx0NPatu6pOjfWuXr7TfyeghA0U7LjK+GzUliBGULp8FE1InhM2YRkw1I8+D0a2gA==
+X-Received: by 2002:a17:90b:33c8:b0:23f:35c8:895 with SMTP id lk8-20020a17090b33c800b0023f35c80895mr12806068pjb.32.1680815990723;
+        Thu, 06 Apr 2023 14:19:50 -0700 (PDT)
 Received: from google.com ([2620:15c:211:201:6a8d:6a82:8d0e:6dc8])
-        by smtp.gmail.com with ESMTPSA id f16-20020a170902ab9000b001a1d4a985eesm1761478plr.228.2023.04.06.14.17.09
+        by smtp.gmail.com with ESMTPSA id s12-20020a170902a50c00b0019aaab3f9d7sm1781844plq.113.2023.04.06.14.19.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 14:17:09 -0700 (PDT)
+        Thu, 06 Apr 2023 14:19:50 -0700 (PDT)
 Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Thu, 6 Apr 2023 14:17:08 -0700
+Date:   Thu, 6 Apr 2023 14:19:48 -0700
 From:   Minchan Kim <minchan@kernel.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 08/16] zram: rename __zram_bvec_read to zram_read_page
-Message-ID: <ZC821Cgn+aG4Q0cQ@google.com>
+Subject: Re: [PATCH 09/16] zram: directly call zram_read_page in
+ writeback_store
+Message-ID: <ZC83dNGzQm2oHiql@google.com>
 References: <20230406144102.149231-1-hch@lst.de>
- <20230406144102.149231-9-hch@lst.de>
+ <20230406144102.149231-10-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230406144102.149231-9-hch@lst.de>
+In-Reply-To: <20230406144102.149231-10-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 06, 2023 at 04:40:54PM +0200, Christoph Hellwig wrote:
-> __zram_bvec_read doesn't get passed a bvec, but always read a whole
-> page.  Rename it to make the usage more clear.
+On Thu, Apr 06, 2023 at 04:40:55PM +0200, Christoph Hellwig wrote:
+> writeback_store always reads a full page, so just call zram_read_page
+> directly and bypass the boune buffer handling.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
