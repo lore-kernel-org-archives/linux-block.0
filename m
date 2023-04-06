@@ -2,51 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F475C76196
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 06:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759CBC76196
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 06:17:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234678AbjDFGMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 02:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51540 "EHLO
+        id S232252AbjDFGRl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 02:17:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjDFGMU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 02:12:20 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D64427AA6
-        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 23:12:16 -0700 (PDT)
+        with ESMTP id S235092AbjDFGRj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 02:17:39 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D02F78A51
+        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 23:17:37 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7F7EC22591;
-        Thu,  6 Apr 2023 06:12:15 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 684711FF43;
+        Thu,  6 Apr 2023 06:17:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1680761535; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1680761856; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HEuH/YkOBOinF1cO2uWYOkFM8PNnCrP0rdn4xwT5/74=;
-        b=CkW+mlZZ57yZ9Qn4hRM+IE6aTUShGtpL1Der3Bv5pM0cdh1+nuj9OHJbeMGQgBkzMLFEhd
-        RemidBnMjk9xrepeLsoaNUa0Ko4I26DH3SsjUpqYbY5OWv9OziQEFEdIwd0YOf9+45EPD0
-        6z/UitWKp7FbVUPeQBQ3PsWCy0EKmWA=
+        bh=PI0V3VGiW12lvl/2LJ14W4Dt1wz1QsN+t9i8GNG9b84=;
+        b=mHn2Y6jdhOl3r2V5EnJqaugIdklM87zj7QmmOudwP958oVxhuAQWmnHo0JdO+Ww18McXfi
+        O9chc8UV+RtuPPQKmnr6+7SJuER0hwG/A0fRqbb9bV9b9Vf9v92re/0UAn+woZCZM8HMPP
+        oQb5Hyd8Q/DxehtsMyH8wEdHI8Xv83E=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1680761535;
+        s=susede2_ed25519; t=1680761856;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HEuH/YkOBOinF1cO2uWYOkFM8PNnCrP0rdn4xwT5/74=;
-        b=WUenku246MDvCLBqqQ0P5JzbF1T+196qFpqZhf2VW6OuCU9Zzc8ARLJRZe1sCDrxhWRvWM
-        b7Mg0Buus+gN+ABQ==
+        bh=PI0V3VGiW12lvl/2LJ14W4Dt1wz1QsN+t9i8GNG9b84=;
+        b=n8s/HeoJQZk2Y5KuICNyOIqYozsUridAb4wV1ecEvz8ssLyNR9QDFNtOFjNVCLEIINHKQS
+        wWN5PZ/GJ8/HmwCA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7053F133E5;
-        Thu,  6 Apr 2023 06:12:15 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 581D8133E5;
+        Thu,  6 Apr 2023 06:17:36 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id P3BkG79iLmS+IAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Thu, 06 Apr 2023 06:12:15 +0000
-Date:   Thu, 6 Apr 2023 08:12:14 +0200
+        id QmUKFQBkLmQSIwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Thu, 06 Apr 2023 06:17:36 +0000
+Date:   Thu, 6 Apr 2023 08:17:35 +0200
 From:   Daniel Wagner <dwagner@suse.de>
 To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -55,32 +57,53 @@ Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Sagi Grimberg <sagi@grimberg.me>,
         Hannes Reinecke <hare@suse.de>,
         James Smart <jsmart2021@gmail.com>
-Subject: Re: [PATCH blktests v5 1/4] nvme/rc: Add setter for attr_qid_max
-Message-ID: <2w3ki4ntl5m2farwokvepbgtcvd5piywv3cmdyzp4s6su6fngc@55wsvekrge3c>
+Subject: Re: [PATCH blktests v5 4/4] nvme/048: test queue count changes on
+ reconnect
+Message-ID: <lgqrsky6qbdiyhnzunc453mpbgxvr4fi5fumpi6xrhvd3lfgvf@vakvam7bkerx>
 References: <20230405154630.16298-1-dwagner@suse.de>
- <20230405154630.16298-2-dwagner@suse.de>
- <9bde6907-20b8-1e19-8b5c-e26f62f2f9e4@nvidia.com>
+ <20230405154630.16298-5-dwagner@suse.de>
+ <b469de5e-0005-b123-8473-6b95661e78d7@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <9bde6907-20b8-1e19-8b5c-e26f62f2f9e4@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b469de5e-0005-b123-8473-6b95661e78d7@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 05, 2023 at 06:39:43PM +0000, Chaitanya Kulkarni wrote:
-> this is only used in the testcase patch #4, until we get a second
-> user move it to patch #4 ?
+On Wed, Apr 05, 2023 at 06:57:49PM +0000, Chaitanya Kulkarni wrote:
 > 
-> in case this was already discussed and decision made to keep it
-> in rc, please ignore this comment.
+> > +	if ! _detect_nvmet_subsys_attr "attr_qid_max"; then
+> > +		SKIP_REASONS+=("missing attr_qid_max feature")
+> > +		return 1
+> > +	fi
+> > +
+> > +	truncate -s 512M "${file_path}"
+> > +
+> > +	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+> > +		"b92842df-a394-44b1-84a4-92ae7d112861"
+> 
+> by checking following after create subsystem in testcase itself
+> we avoid whole process of creating and deleting subsystem and
+> additional function in the rc file, because we are already creating
+> subsystem as a part of the testcase :-
+> 
+> local attr="${NVMET_CFS}/subsystems/${subsys_name}/attr_qid_max"
+> 
+> #above tow vars go top of this function
+> 
+> if [ -f "${attr}" ];then
+>      SKIP_REASONS+=("missing attr_qid_max feature")
+>      #do appropriate error handling and jump to unwind code
+> fi
+> 
+> again please ignore this comment if decision has been made to
+> keep it this way for some reason...
 
-There wasn't any decision on this topic. I was not sure if I should put it in rc
-but I saw there are already _set_nvmet_*() functions. Thus I came to the
-conclusion it makes maintaining these helper function simpler in future because
-they are all in one file. If someone touches all _set_nvmet_*() function this
-one is not forgotten.
+Again, no decision here. I think I overengineered this part slightly. Indeed if
+we are goint to setup a controller anyway we should try to avoid double work.
+This should also speed up the test slightly.
 
-The same goes for the other rc helpers (patch 1-3).
-
-That said, I really do not insit in putiting in rc.
+Talking about execution time, I was thinking on reducing the timeout value
+to reduce the overall runtime.
