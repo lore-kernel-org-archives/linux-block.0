@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7899DC76196
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 14:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AAADC77B71
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 14:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239363AbjDFOnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S239364AbjDFOnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 6 Apr 2023 10:43:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42248 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239122AbjDFOmn (ORCPT
+        with ESMTP id S239403AbjDFOmn (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 10:42:43 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAE70AF3A
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 07:41:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D01B6A5ED
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 07:41:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=al8zLM9Ic7CC0VUR/uH9Jjzv8yEWaSLP1IoPzglULr4=; b=Vl6DV0vgPerIIsI3H3er4jjF7t
-        4kzOyOu94rgJU0kn2Yplb/3786autjpYwXW4P5Db00FIpfWohU3ZC5XCj+oQnosdwmXG/qS7lHeLp
-        8rAs2OvhQy/B0wXZ/6Hqwc0aFlfViVnNoagiha5EOxpCjWYNFAmwFILwcOJavhFl1RFZN5uaRA43c
-        BE3dCI0BQu4OWszwJXmhBDSMLALgoc+dUtyRkIqKvar3mWCtKDM+a4QiEUxNqV0jMtBRobYjw6+md
-        rS+ZvwK9UIr+qScZsfUyDyOVopJ2eGgooBuJDqgiJ6C8MRusle//fcZUXkrCPb9oBAk+bx2+Th8GX
-        6QsqqQWw==;
+        bh=znXlGEBXgXgz2qYhouwBNtotSqrR5Y8dSYtNL29Q9/w=; b=fs7ZwD6ONspDcZdKCykO2dNMOk
+        i12XfwTB5Rqg8bTBo5mYIElNv6kC3FUAXgX2dBkqMLIUjEaLpKKjcRePoNBXd0lCebf2iGx+rkbpg
+        RhASX413vMWS1BdA+H72OFCSbX9sOOb+FRj9pb/RVA3XuCDAUAf3eIh4giQ8gRUKSo8BLx0B4fOyN
+        9XmaMyR3I6bGEOrZm9QrJlwTdOjteMn3KRo/dcr1J09TEHpPGT90ZznWW+pX5kWqQizYR3S8QjE/K
+        d0flkvJ9ooiF6lmGNLMsY4LyVlT+hIvt/NsWADXNjJZtEtdUrW1kfUNTyY4L4yaLtSCYoULeNTzrH
+        lXezJthQ==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pkQne-007fhe-0Z;
-        Thu, 06 Apr 2023 14:41:18 +0000
+        id 1pkQni-007fir-2K;
+        Thu, 06 Apr 2023 14:41:23 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH 05/16] zram: return early on error in zram_bvec_rw
-Date:   Thu,  6 Apr 2023 16:40:51 +0200
-Message-Id: <20230406144102.149231-6-hch@lst.de>
+Subject: [PATCH 07/16] zram: don't use highmem for the bounce buffer in zram_bvec_{read,write}
+Date:   Thu,  6 Apr 2023 16:40:53 +0200
+Message-Id: <20230406144102.149231-8-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230406144102.149231-1-hch@lst.de>
 References: <20230406144102.149231-1-hch@lst.de>
@@ -46,51 +46,68 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the low-level access fails, don't clear the idle flag or clear
-the caches, and just return.
+There is no point in allocation a highmem page when we instantly need
+to copy from it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/zram_drv.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ drivers/block/zram/zram_drv.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 7adc6b02b531d6..0b8e49aa3be24b 100644
+index 5e823dcd1975c0..86d20011680f52 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -1939,23 +1939,23 @@ static int zram_bvec_rw(struct zram *zram, struct bio_vec *bvec, u32 index,
- 
- 	if (!op_is_write(op)) {
- 		ret = zram_bvec_read(zram, bvec, index, offset, bio);
-+		if (unlikely(ret < 0)) {
-+			atomic64_inc(&zram->stats.failed_reads);
-+			return ret;
-+		}
- 		flush_dcache_page(bvec->bv_page);
- 	} else {
- 		ret = zram_bvec_write(zram, bvec, index, offset, bio);
-+		if (unlikely(ret < 0)) {
-+			atomic64_inc(&zram->stats.failed_writes);
-+			return ret;
-+		}
+@@ -1437,7 +1437,7 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+ 	page = bvec->bv_page;
+ 	if (is_partial_io(bvec)) {
+ 		/* Use a temporary buffer to decompress the page */
+-		page = alloc_page(GFP_NOIO|__GFP_HIGHMEM);
++		page = alloc_page(GFP_NOIO);
+ 		if (!page)
+ 			return -ENOMEM;
  	}
+@@ -1446,12 +1446,8 @@ static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+ 	if (unlikely(ret))
+ 		goto out;
  
- 	zram_slot_lock(zram, index);
- 	zram_accessed(zram, index);
- 	zram_slot_unlock(zram, index);
+-	if (is_partial_io(bvec)) {
+-		void *src = kmap_atomic(page);
 -
--	if (unlikely(ret < 0)) {
--		if (!op_is_write(op))
--			atomic64_inc(&zram->stats.failed_reads);
--		else
--			atomic64_inc(&zram->stats.failed_writes);
+-		memcpy_to_bvec(bvec, src + offset);
+-		kunmap_atomic(src);
 -	}
--
--	return ret;
-+	return 0;
- }
++	if (is_partial_io(bvec))
++		memcpy_to_bvec(bvec, page_address(page) + offset);
+ out:
+ 	if (is_partial_io(bvec))
+ 		__free_page(page);
+@@ -1595,12 +1591,11 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
  
- static void __zram_make_request(struct zram *zram, struct bio *bio)
+ 	vec = *bvec;
+ 	if (is_partial_io(bvec)) {
+-		void *dst;
+ 		/*
+ 		 * This is a partial IO. We need to read the full page
+ 		 * before to write the changes.
+ 		 */
+-		page = alloc_page(GFP_NOIO|__GFP_HIGHMEM);
++		page = alloc_page(GFP_NOIO);
+ 		if (!page)
+ 			return -ENOMEM;
+ 
+@@ -1608,9 +1603,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+ 		if (ret)
+ 			goto out;
+ 
+-		dst = kmap_atomic(page);
+-		memcpy_from_bvec(dst + offset, bvec);
+-		kunmap_atomic(dst);
++		memcpy_from_bvec(page_address(page) + offset, bvec);
+ 
+ 		bvec_set_page(&vec, page, PAGE_SIZE, 0);
+ 	}
 -- 
 2.39.2
 
