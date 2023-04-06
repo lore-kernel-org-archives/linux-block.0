@@ -2,71 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C5AC7619A
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 02:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 478F4C76196
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 03:42:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234400AbjDFC6Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 22:58:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53944 "EHLO
+        id S234712AbjDFDm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 23:42:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234216AbjDFC6Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 22:58:24 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50D4B5B97
-        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 19:58:23 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id iw3so36290296plb.6
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 19:58:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1680749903; x=1683341903;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PBxCnTWWioaHhsFkPOzVSJK72utSvq4IDlTrjAZpCn4=;
-        b=NlDwbj41aGxAqSkRgwqh/UXS9WUjd38GHJvtbQdCGaHZZ40TwRphhM/ROLe54uuwzI
-         4SQbG7d8Dp2R89oaeLxUnkabwoii25y8KRAVFCj9L7u5tHw/drxK3Jr0r+FhBbs9+dKr
-         rxX5FCVh59GvOaSPsXgfk6LaXY32SQ1UAExSo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680749903; x=1683341903;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PBxCnTWWioaHhsFkPOzVSJK72utSvq4IDlTrjAZpCn4=;
-        b=l6AuXFDA+vN+e04bMfISJTkUM+PCvK2E1n7WPHwfn4iSwijRMp+/2nnRGUTRom5IJ1
-         +TCCEhyFswHK1DhVBifrfaT1xVA1aTCL8Doy5lv1Eq096BYZlDvjwCP1FvS4XJcmNe2s
-         6xiyrsK31kvcePvxG1+juaP0GTk3Cf4BY6218rKxWa5vlggT+G/7DN4LqKe+srBnzmwa
-         pNKv3MGibAUQl9i8dJnsmFfquwPWqSw16z91oTCQzhvy/mK0jNCap3YM0aEyt6JmBxfa
-         nILaLRAndwGZnATM6aaOuP11ajMcVL2EkwvCYtYSdVfiYUcV7DMrQhrUjMISwgjKCDA3
-         hUKw==
-X-Gm-Message-State: AAQBX9devK8BpF1+mCk99/IRjdissFpR7Xe1ouOa8qXE/C0sDhx4+O8l
-        rSUfnb+ZWiFu1zxJzNrIIsBb7mXawyV4r9CQVfg=
-X-Google-Smtp-Source: AKy350ZMtyKjdat01iVxX218E7nVDK4VSITYdbSaHkBW9agpKoBS6IBvka4ZKZbcWdb3j+Js8pc8XA==
-X-Received: by 2002:a17:90a:190f:b0:23f:990d:b5b1 with SMTP id 15-20020a17090a190f00b0023f990db5b1mr9266766pjg.46.1680749902759;
-        Wed, 05 Apr 2023 19:58:22 -0700 (PDT)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id l2-20020a17090aec0200b0023fda235bb5sm85019pjy.33.2023.04.05.19.58.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 19:58:22 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 11:58:18 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 10/16] zram: refactor zram_bdev_read
-Message-ID: <20230406025818.GV12892@google.com>
-References: <20230404150536.2142108-1-hch@lst.de>
- <20230404150536.2142108-11-hch@lst.de>
+        with ESMTP id S230324AbjDFDm4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 23:42:56 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1584F7AAD;
+        Wed,  5 Apr 2023 20:42:53 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4PsS4m1SYCz4f3ppn;
+        Thu,  6 Apr 2023 11:42:48 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgBH9CG4Py5kOHX_GA--.19144S3;
+        Thu, 06 Apr 2023 11:42:49 +0800 (CST)
+Subject: Re: [PATCH] block: don't set GD_NEED_PART_SCAN if scan partition
+ failed
+To:     Yu Kuai <yukuai1@huaweicloud.com>, ming.lei@redhat.com,
+        jack@suse.cz, hch@infradead.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
+ <20230322035926.1791317-1-yukuai1@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <42cfedca-f233-4d7e-f43b-4b5dd0c97e9e@huaweicloud.com>
+Date:   Thu, 6 Apr 2023 11:42:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230404150536.2142108-11-hch@lst.de>
+In-Reply-To: <20230322035926.1791317-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgBH9CG4Py5kOHX_GA--.19144S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF45ZFy5CF4fWw17uw4rZrb_yoW8tw18pF
+        sxJF45tr9Fgr17ua4UZ3WxXa15Ja9rZryfGrW3G34Iywn8X3ZFkF92k3yDWF10grZ3KrWD
+        WF15WayruF1fCrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
+        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (23/04/04 17:05), Christoph Hellwig wrote:
-> 
-> Split the partial read into a separate helper.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Hi, Jens!
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+ÔÚ 2023/03/22 11:59, Yu Kuai Ð´µÀ:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
+> set, and partition scan will be proceed again when blkdev_get_by_dev()
+> is called. However, this will cause a problem that re-assemble partitioned
+> raid device will creat partition for underlying disk.
+> 
+> Test procedure:
+> 
+> mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
+> sgdisk -n 0:0:+100MiB /dev/md0
+> blockdev --rereadpt /dev/sda
+> blockdev --rereadpt /dev/sdb
+> mdadm -S /dev/md0
+> mdadm -A /dev/md0 /dev/sda /dev/sdb
+> 
+> Test result: underlying disk partition and raid partition can be
+> observed at the same time
+> 
+> Note that this can still happen in come corner cases that
+> GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
+> device.
+> 
+
+Can you apply this patch?
+
+Thanks,
+Kuai
+> Fixes: e5cfefa97bcc ("block: fix scan partition for exclusively open device again")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/genhd.c | 8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 08bb1a9ec22c..a72e27d6779d 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -368,7 +368,6 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>   	if (disk->open_partitions)
+>   		return -EBUSY;
+>   
+> -	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>   	/*
+>   	 * If the device is opened exclusively by current thread already, it's
+>   	 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
+> @@ -381,12 +380,19 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>   			return ret;
+>   	}
+>   
+> +	set_bit(GD_NEED_PART_SCAN, &disk->state);
+>   	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL);
+>   	if (IS_ERR(bdev))
+>   		ret =  PTR_ERR(bdev);
+>   	else
+>   		blkdev_put(bdev, mode & ~FMODE_EXCL);
+>   
+> +	/*
+> +	 * If blkdev_get_by_dev() failed early, GD_NEED_PART_SCAN is still set,
+> +	 * and this will cause that re-assemble partitioned raid device will
+> +	 * creat partition for underlying disk.
+> +	 */
+> +	clear_bit(GD_NEED_PART_SCAN, &disk->state);
+>   	if (!(mode & FMODE_EXCL))
+>   		bd_abort_claiming(disk->part0, disk_scan_partitions);
+>   	return ret;
+> 
+
