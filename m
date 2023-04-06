@@ -2,72 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BBDC7619A
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 01:45:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7271AC7619A
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 01:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234636AbjDFBpO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 21:45:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46734 "EHLO
+        id S234678AbjDFBpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 21:45:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234678AbjDFBpN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 21:45:13 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C39D76BD
-        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 18:44:55 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id q2so58660pll.7
-        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 18:44:55 -0700 (PDT)
+        with ESMTP id S233828AbjDFBpm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 21:45:42 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B41769E
+        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 18:45:41 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id h12-20020a17090aea8c00b0023d1311fab3so39163792pjz.1
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 18:45:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1680745494; x=1683337494;
+        d=chromium.org; s=google; t=1680745541; x=1683337541;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=r0PiB0tAf7EnUQK50jROY9tFKPhzxKKBfwhOcqZeQM8=;
-        b=i9OYFl4pWn5xcxgzFxmIitPIzpwW+v9g0OYpD+y0bp6Vd+9PYz7urK5e8tMB69JBCU
-         pK6Vdm/nuHrf3bRRJnu/O+NAnxsHOMNcHsPbB+G0qePMiVu+m8n6xo/M+rOkelowQr/O
-         3mIyw5ZOVQjqOSC06UZK30q745tqmbwHbYJwY=
+        bh=RVX/ObsoB1YMIpbJBvrf7XALXwTbbsVzCIqppDHHgC4=;
+        b=Qy31wX2c1cCuVEpX3wOT9p7xc2B/D+buJTXIhyXlnvPC16JCnjaafSHZnFlxTtLAER
+         6OAqZBhfiQ2DexHyjBhONymF3NZTqoLEieKKkGe3ias9iPjH1StF0DKGEU/tuu+Jm2lY
+         URmGMXuRgJq66C8gqGmzJnZSF6SAQqk++W944=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680745494; x=1683337494;
+        d=1e100.net; s=20210112; t=1680745541; x=1683337541;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r0PiB0tAf7EnUQK50jROY9tFKPhzxKKBfwhOcqZeQM8=;
-        b=eVmP9Qw/0LF8AzcKSl/jkWLXpWwQoXwMg02ExLfHtu45MuoI7tCYRnU6SiLg/SGss1
-         JgySaVi0Gd8EoFPp0NiT8qKft8GXzpaRO2J0CmhDNwjYT50AfGADuo2F5fyZO7UABOQU
-         P/XhxklrJ8iRu1TRGWyOLh5t9hOz9PqRHkMIwdsHcl1rpJgdDJ9EYz8vT/seW7LRV63e
-         YrYz5fROsHtjmJgUAxOueUj+J/x8ub0EiAoXq25MMs+D+bCWv52fpS0SE6JYemBaEQMF
-         caJvGaIyNbR25k/qmJLZ89Gz9lDS/pFv/GVSWBBmaLtt8pA9c9iNmX6NIdsA3Owm+0Dt
-         oX8w==
-X-Gm-Message-State: AAQBX9cZYwvaxUlaJcCtyDmEAOpJ12B0poE4iPgdxnLak6yMsoivlwoN
-        HqZ/t4YHEK4uwXdTRZfda5JvEw==
-X-Google-Smtp-Source: AKy350bO/7JV+NOlLw6ctcf/3tbwYZJGd52feDLIHriRADZpq8jurTmSkVpAKCPUOIqRupN/U/4Oig==
-X-Received: by 2002:a17:90b:314a:b0:23d:4ffc:43e with SMTP id ip10-20020a17090b314a00b0023d4ffc043emr8968148pjb.38.1680745494628;
-        Wed, 05 Apr 2023 18:44:54 -0700 (PDT)
+        bh=RVX/ObsoB1YMIpbJBvrf7XALXwTbbsVzCIqppDHHgC4=;
+        b=YEWwBSBaOzD3YirR2e+d90O5twfBSCbKB1/qFF1mId6pisWhWe2hM2yIyZGXen6Os9
+         PEHtNkyHfBaLyYFPGzk2fvHmg+sxMHuY+vI+dwrsCFvrdpWJD5OhXKfPEoRiSqHm9JIE
+         J1TGybbQrz2uLb1EQq7ehVgbKn4C54j24G5r3OKfyV/5Sxdzbkj5Z2HRVd1d7Mke7yhb
+         PLoyJXREToDpuNXsrpek0dKkbJN6Z87Na3wzBTsoceVP1ZF/mehS6y3Z1EHhnrg4zmDN
+         hOK/GVR6sRqBeeQFGh8vVBkFznPB+twqSznKJ55T/HPbiq0Q3DJHegIij4/5B+7WYiY6
+         2gWA==
+X-Gm-Message-State: AAQBX9dOKdHi6ePWhtghonq5JMkk35483EFx7Dfi+McAQbecksGk3qp3
+        1ZPdrF1wzCsfyJONcpZ6UdfyrA==
+X-Google-Smtp-Source: AKy350ZQkA7zjhkAnJbVuyAjVZHwuAHsAIYssQU6OX6TzftJVqk+aaGChlvgduKek/OV+6t5wWFldw==
+X-Received: by 2002:a17:902:e353:b0:1a0:428b:d8c5 with SMTP id p19-20020a170902e35300b001a0428bd8c5mr6905777plc.45.1680745540956;
+        Wed, 05 Apr 2023 18:45:40 -0700 (PDT)
 Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id gp19-20020a17090adf1300b0023c8a23005asm10974pjb.49.2023.04.05.18.44.52
+        by smtp.gmail.com with ESMTPSA id 144-20020a630696000000b0051303d3e3c5sm14579pgg.42.2023.04.05.18.45.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 18:44:53 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 10:44:49 +0900
+        Wed, 05 Apr 2023 18:45:40 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 10:45:36 +0900
 From:   Sergey Senozhatsky <senozhatsky@chromium.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 01/16] zram: remove valid_io_request
-Message-ID: <20230406014449.GM12892@google.com>
+Subject: Re: [PATCH 02/16] zram: make zram_bio_discard more self-contained
+Message-ID: <20230406014536.GN12892@google.com>
 References: <20230404150536.2142108-1-hch@lst.de>
- <20230404150536.2142108-2-hch@lst.de>
+ <20230404150536.2142108-3-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230404150536.2142108-2-hch@lst.de>
+In-Reply-To: <20230404150536.2142108-3-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On (23/04/04 17:05), Christoph Hellwig wrote:
-> All bios hande to drivers from the block layer are checked against the
-> device size and for logical block alignment already, so don't duplicate
-> those checks.
+> 
+> Derive the index and offset variables inside the function, and complete
+> the bio directly in preparation for cleaning up the I/O path.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Has this changed "recently"? I can trace that valid_io() function back
-to initial zram commit 306b0c957f3f0e7 (Staging: virtual block device
-driver (ramzswap)). Was that check always redundant?
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
