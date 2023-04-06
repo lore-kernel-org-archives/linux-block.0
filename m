@@ -2,77 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFC9C7618D
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 21:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 683CDC76196
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 21:24:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236739AbjDFVX3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 17:23:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50710 "EHLO
+        id S229561AbjDFVYu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 17:24:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230139AbjDFVX2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 17:23:28 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB2EE69
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 14:23:27 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-627fe5dea6dso41313b3a.2
-        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 14:23:27 -0700 (PDT)
+        with ESMTP id S238773AbjDFVY0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 17:24:26 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7FA8A4A
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 14:24:22 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id w4so38618569plg.9
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 14:24:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680816207;
+        d=gmail.com; s=20210112; t=1680816262;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oKAYGOdfmeNfpOOil34EKQMJPRMN3JpiYxhBbAs9PCw=;
-        b=V+KiMmKLMlL557ZA8iYvsCDpzJGkLgb/8lKNEDxnQIhvd7VhhdyUS+qMSIKDJzvJYP
-         7tfK8nXyYifXaez6JFtR+DJB9X/xlU1JbYZT/l9Kfj009UlHBQ2R9b4IGqb1pFrD56fC
-         NI+qk6eALFSdRtLd3DQuSbO8LB8iIwqPH6JMPrDYLc4L2Lrd7fbXA73/tseB2u8KiyJ1
-         cXKSH/2UTZThXpxtspbIwCGbrWQMAOQvgWYr9R7vLRNAsI9u8/dsQ+iz2PCVVbKgnv6G
-         mfHhaRUg1yMtCn3p7XuzEAC++OCHFZRtXcn1zeqL0ZWVag0OM/DatIOZJn+0X6n7iVqB
-         jTlg==
+        bh=cQnx6CWs97HABdSj1WBg7W+dmeDj7oBw6VUesCl2p88=;
+        b=XwdZiGmhfkUNDigtf54MZ1xCsBHO5KBrZ5YoW67vuqmK8M6Weu9gp0+OMa3+9vXHjU
+         ikuIJ5uaReY8kBIcBweZNoUBfzAov/KzkwHKZGmBXnnRxvAsYgsuFXI4yND5cCbxXfL3
+         oLmR4hr+Irm7PH9gaSrMANE6g3YA/HTSJYsVsBTryI8x7H0iDYJxzuMyRRjdKxhT6cvo
+         1CBQIFJeM6v4y2kMrOMKe6DWR64cTF0gVenA2rWJn9H8OW41W8avHTqhablVKDsI6+vg
+         sPZzMQI6dd3ittnwZZDkPAqEDo6t5l6EjNeuSK3DaqDQ/R5jQrZEK4lDBNVBUeZgRsKZ
+         ez2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680816207;
+        d=1e100.net; s=20210112; t=1680816262;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oKAYGOdfmeNfpOOil34EKQMJPRMN3JpiYxhBbAs9PCw=;
-        b=xzZ55Yy7lEWoS+JJFS9ir8Q7I0HEfkP2m9dDz/FsxPrzVy600rmCquSAEURU5fDgS+
-         1O11HLEV8S7hU7t45zEwRuOFhY7M13nXJQpAbB6wuF6OdL9LJJyLNB3cOV96PG7MuU/6
-         tUDg0F7H7s+cdBrZMJU38o31yKi2CRdBeQ71ybnG8nC3a+gCWiXT9zPDc5vTZ9rs8XAQ
-         vmbrRp1+WNGK494RszUy2O7bjubJgCm3tFxBssf+ASnPgSwYhLD3Hh/rvRCMuWcICqQ7
-         llisQoqFp9lJYzAUBSecD+YSJARNqjCOadvVqLbRc5k0dTLB46i1Ls+e6Ast8MTLXzXI
-         HeCA==
-X-Gm-Message-State: AAQBX9edOb9rEUbQUlcwAHPAI0oayC+b8WVtNj+TtWW37f4wrRUOwwnA
-        booQiY0xZlx7t6P8raYmi+o=
-X-Google-Smtp-Source: AKy350YHKvSG+5P0PT/8kB42nmvZaUTUfWMjP+44tjJQdisYXD6NCpjTQ9bjRk7TB63VzRoaTa4Yxw==
-X-Received: by 2002:aa7:980a:0:b0:627:fc3b:4cb4 with SMTP id e10-20020aa7980a000000b00627fc3b4cb4mr239877pfl.19.1680816207258;
-        Thu, 06 Apr 2023 14:23:27 -0700 (PDT)
+        bh=cQnx6CWs97HABdSj1WBg7W+dmeDj7oBw6VUesCl2p88=;
+        b=rLCEjc8mdY40yZF/MqoSyFolr+Db/JuWhHnv4d5kfZNN+T1PP65f90j/PXb/8nCybD
+         bHhjdwVijlIN9iDuIVxNzNh8SnHkKd+2V5PZ7sH8+q2t3rrgs3rUeV8QHpHYAyjfwg8/
+         j7Q5hYTc/cKIG3rY14/NwkmyK3Ab8Xfw9qT0ji8IUEolopU7uZykvCm2+1K6ukVJMeY7
+         BotBuUlZz9JLh8JosDyUSbwMeqFeV9+Q7pJJk55sRkeMtrFtWnftcXO15LIVftdtTAHR
+         +R92P+3C/tSbP++EU+rzI8pgnCYKnsR8urUXougBPuCQBqQJU7ehoX7bXsx2vOhNK9OY
+         C69g==
+X-Gm-Message-State: AAQBX9dIZqeOhRBvec5iyn2ojJhY3nWVYu9AnhcaA6O5d9PsFur1lmvc
+        btbyqPS3/Hx1VRtak/qMZsg=
+X-Google-Smtp-Source: AKy350betnGVNR1zoPuMBa8Mvcs0STHAj3iDjSWBHDv2sXVxg9RIVmDNA+IVw2CvxAmBiUUd78JtdA==
+X-Received: by 2002:a17:902:d512:b0:1a5:918:df40 with SMTP id b18-20020a170902d51200b001a50918df40mr588617plg.13.1680816262171;
+        Thu, 06 Apr 2023 14:24:22 -0700 (PDT)
 Received: from google.com ([2620:15c:211:201:6a8d:6a82:8d0e:6dc8])
-        by smtp.gmail.com with ESMTPSA id s21-20020aa78295000000b00627ed4e23e0sm1786024pfm.101.2023.04.06.14.23.26
+        by smtp.gmail.com with ESMTPSA id s18-20020a170902b19200b001a2806ae2f7sm1797939plr.83.2023.04.06.14.24.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 14:23:26 -0700 (PDT)
+        Thu, 06 Apr 2023 14:24:21 -0700 (PDT)
 Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Thu, 6 Apr 2023 14:23:24 -0700
+Date:   Thu, 6 Apr 2023 14:24:19 -0700
 From:   Minchan Kim <minchan@kernel.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 13/16] zram: pass a page to read_from_bdev
-Message-ID: <ZC84TI10OycFuFHK@google.com>
+Subject: Re: [PATCH 14/16] zram: don't return errors from read_from_bdev_async
+Message-ID: <ZC84g1Pm0vaQNEnp@google.com>
 References: <20230406144102.149231-1-hch@lst.de>
- <20230406144102.149231-14-hch@lst.de>
+ <20230406144102.149231-15-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230406144102.149231-14-hch@lst.de>
+In-Reply-To: <20230406144102.149231-15-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 06, 2023 at 04:40:59PM +0200, Christoph Hellwig wrote:
-> read_from_bdev always reads a whole page, so pass a page to it instead
-> of the bvec and remove the now pointless zram_bvec_read_from_bdev
-> wrapper.
+On Thu, Apr 06, 2023 at 04:41:00PM +0200, Christoph Hellwig wrote:
+> bio_alloc will never return a NULL bio when it is allowed to sleep,
+> and adding a single page to bio with a single vector also can't
+> fail, so switch to the asserting __bio_add_page variant and drop the
+
+Oh,,,, didn't know it.
+Great!
+
+> error returns.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+
 Acked-by: Minchan Kim <minchan@kernel.org>
