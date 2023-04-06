@@ -2,197 +2,225 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB84C76196
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 10:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8A1C761A6
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 11:40:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237216AbjDFKaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 06:30:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57914 "EHLO
+        id S238212AbjDFLkm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 07:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237265AbjDFKag (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 06:30:36 -0400
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AD249000
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 03:30:12 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 9AFE8582147;
-        Thu,  6 Apr 2023 06:30:10 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Thu, 06 Apr 2023 06:30:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1680777010; x=1680777610; bh=v3
-        adLEUkmHzpa/+31E15ky0ON9PbkYEHPpncYGjhfwo=; b=ed34SO1+wavF2+UMC6
-        ym0J1OI1ROZudag894CirtjX2uzU2CAiuSeunItfKtSZmkpXtcDO2+aISbQGpPXK
-        BDLmS8ZO2LPd48WACRAAbYjVb4C6XeBsm7QrGgoyizgbMv23r6lSoiQ8bUAXqadb
-        tjXY0CxGejF+wcuMIwt+BwNjcfiSdmx38OjUK/uN28mgsqjgwU/XroAYv1BiSev/
-        l/P/tWGYE0bfcJ0EnWD5TrPy0UDtJDX2FEQjiM4j2MZBqcQWKebm/6kICcwwfFHQ
-        NzMG/396xy/J02WIL5GTGgpceHqZjFjsqi0JhTe6lyaKI0mc0Cum4wWUGMhK4kNW
-        1gHA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=ie1e949a3.fm2; t=1680777010; x=1680777610; bh=v3a
-        dLEUkmHzpa/+31E15ky0ON9PbkYEHPpncYGjhfwo=; b=EldqOZoIUebrWOEdrPB
-        Hj7el7e3m8K7MW6jC3SPWW3RMUo/oAnxJgPAtgR1QMvheKkG/nYixgjpNTApQ3S1
-        Nbx/uvEuzUZ3OIkkgCAUNw0lFqRN9eeyUBAzaOD4gzYPhnolR3e/hquVfNWN7Mzl
-        DrkTXnMRey6cXWaTrslVibcFzNNZZl2prnnP6NMiuVSyK8f7J7JIAv6Dkv0atqkU
-        /ZzMt9LFLyY/CMr29mpsU3O9MidkqSr/LVV62oKog6GeSc9KPgorfD/RY6SCbwTr
-        v+IvAGIT1mhTF3R/s+7LXHCUBp69il2rDSiNA4AcYdzqOJ9jv0l8OAIj/l3lMSHN
-        A0g==
-X-ME-Sender: <xms:MZ8uZEVp1fTYW8otM3RwoVcyF1aTgryFQV-t1xsyWvsmPCXdZUF3TQ>
-    <xme:MZ8uZInsAyU-kQbz3C84L2uGojQW-VoT_z7YZKXoCSJmPAlwKAkS9_Ihxoxi0acgJ
-    LTHWGlp2JAIpSU10C8>
-X-ME-Received: <xmr:MZ8uZIYk2xxtEAQ0t5GnfxXuNOaSfjGQY8gLmfwlQTNI6YiQ04S7NrV7cVtPR8Ph6NdfULZkSHHSnQUvDNf65A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdejfedgvdeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttd
-    ertddttddvnecuhfhrohhmpefuhhhinhdkihgthhhirhhoucfmrgifrghsrghkihcuoehs
-    hhhinhhitghhihhrohesfhgrshhtmhgrihhlrdgtohhmqeenucggtffrrghtthgvrhhnpe
-    ekteelteevveejtdfhieevjeffgfduveehheegtdelieelleehueelueeutdelvdenucff
-    ohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
-    mh
-X-ME-Proxy: <xmx:MZ8uZDVdilBftex-EXfCOBbIRcfj578u9De6J3mDfn0v3PeE6EHyFw>
-    <xmx:MZ8uZOkRx7mh_iWXCLnVE5EU3XSTnAqGl_Fk4OzQD46R07ZUTWgn5Q>
-    <xmx:MZ8uZIeSjAUPvXph2vmH4JisGv-3LvBKNSjFhjY6Nj99NS9bd69hbA>
-    <xmx:Mp8uZPBM8bilWHpYzTooghhWQ_YblbihMmnfPOxzp_hGvn1GSwkNLNUNWuo>
-Feedback-ID: ie1e949a3:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 6 Apr 2023 06:30:07 -0400 (EDT)
-Date:   Thu, 6 Apr 2023 19:30:03 +0900
-From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     Alyssa Ross <hi@alyssa.is>
-Cc:     chaitanyak@nvidia.com,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests] loop/009: add test for loop partition uvents
-Message-ID: <20230406103003.u5j7m6xqflcli7y2@shinhome>
-References: <21c2861f-9b7d-636e-74e1-27bd7bbb1a4f@nvidia.com>
- <20230330160247.16030-1-hi@alyssa.is>
+        with ESMTP id S238480AbjDFLj2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 07:39:28 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637CEAF3F;
+        Thu,  6 Apr 2023 04:35:51 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id x17so50462517lfu.5;
+        Thu, 06 Apr 2023 04:35:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680780894;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:dkim-signature
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uxkPXt/BJV64yINVeMw3iyNk+2W+/NvxrZXmnm6vVkc=;
+        b=Fna9eKEFVG5CgPZJTrPyTQExtoGgxXxEfpBtIKWptOFzXMo4eRiMi+PgRAB+HzVJfd
+         UQEjhDuoTz8fMKNyEGvXCYJ40Sco0huj0im51F0S5C0pEKGfv7UuIjsNrLjto81h/ipu
+         X9QIFg/7+EviRjoNOEV3/jabCU0xWvpnJj81MYI0QUvy7kQ5BFyk6fSFyoqjRwIcamAM
+         uPgMAWdIEEUzvI3BMv5f/vzj1ZZBds4H3tl9+BAVTJEoWMv1AbIwUwH2bTQO5HYMiHWf
+         Y3n+yPNMUmfH2zUTVprSbo5R8RtvPjsK0Uc42KRc4h7dNmoQllA+sfYmhU+bKFoDSOZA
+         JHpw==
+X-Gm-Message-State: AAQBX9cDPzGclma2SNGzbQvOgwGbkswgmLYRYLTsheTe6qd+zqzmXnhI
+        fFxc5mWCMzkt1eYJoZKJ4OrhFhlOOnXhRA==
+X-Google-Smtp-Source: AKy350YPd8nACD/MEGbXapD2saTg0hTxTInGN/v9jhod6gupmdZq4bWennaNJ8no1YQkE3pFl8RH9g==
+X-Received: by 2002:a19:c209:0:b0:4eb:4552:61aa with SMTP id l9-20020a19c209000000b004eb455261aamr2658961lfc.12.1680780893656;
+        Thu, 06 Apr 2023 04:34:53 -0700 (PDT)
+Received: from flawful.org (c-fcf6e255.011-101-6d6c6d3.bbcust.telenor.se. [85.226.246.252])
+        by smtp.gmail.com with ESMTPSA id l2-20020ac25542000000b004a0589786ddsm225755lfk.69.2023.04.06.04.34.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 04:34:53 -0700 (PDT)
+Received: by flawful.org (Postfix, from userid 112)
+        id 6921412A1; Thu,  6 Apr 2023 13:34:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
+        t=1680780892; bh=ebpTNycMZn1flsaux/oqOg/RKm/7dkblNsrcl9srxNc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=O69y/dbUnEdofy+NxftR1kH3K1G8XmSEaAzoJBx91r6RGSbHRepQt0cWse1XlfXLM
+         V82Ye+R6dUXaI4MOGS8mvh/HBGkgSOgFUTj3XTvOY33V04M38VyRtJx0tgtesgtV7d
+         tRWtld6BQ7sU0uwLKAH3STLX+d4n0nSK/j9YBUoI=
+Received: from x1-carbon.lan (OpenWrt.lan [192.168.1.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by flawful.org (Postfix) with ESMTPSA id 77327666;
+        Thu,  6 Apr 2023 13:33:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
+        t=1680780786; bh=ebpTNycMZn1flsaux/oqOg/RKm/7dkblNsrcl9srxNc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ULytm6a3uQPd+Bs/l0rmW98i4Vhxj+mhP+AgQ3VYIzrxePLTbo9zmzWbQm40odzXn
+         usw5YcIDuAEJGiQwTwwzaC0dfszIRets/JaLKUieNIH05D6fuVHUV8P/qcqU3U6s9l
+         knHlLhY4LELDGjShLCa32gHqz+fm1IKC8Ga6Bd/I=
+From:   Niklas Cassel <nks@flawful.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Damien Le Moal <dlemoal@fastmail.com>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
+Subject: [PATCH v6 01/19] ioprio: cleanup interface definition
+Date:   Thu,  6 Apr 2023 13:32:30 +0200
+Message-Id: <20230406113252.41211-2-nks@flawful.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230406113252.41211-1-nks@flawful.org>
+References: <20230406113252.41211-1-nks@flawful.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230330160247.16030-1-hi@alyssa.is>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Alyssa, thanks for the patch and sorry for this late response.
+From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-Please find one comment in line. Other than that, this patch looks good to me.
-I also ran the test case in my environment and confirmed that it passes with
-the kernel fix. Good.
+The IO priority user interface defines the 16-bits ioprio values as
+the combination of the upper 3-bits for an IO priority class and the
+lower 13-bits as priority data. However, the kernel only uses the
+lower 3-bits of the priority data to define priority levels for the RT
+and BE priority classes. The data part of an ioprio value is completely
+ignored for the IDLE and NONE classes. This is enforced by checks done
+in ioprio_check_cap(), which is called for all paths that allow defining
+an IO priority for IOs: the per-context ioprio_set() system call, aio
+interface and io-uring interface.
 
-On Mar 30, 2023 / 16:02, Alyssa Ross wrote:
-> Link: https://lore.kernel.org/r/20230320125430.55367-1-hch@lst.de/
-> Suggested-by: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-> Signed-off-by: Alyssa Ross <hi@alyssa.is>
-> ---
->  tests/loop/009     | 62 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/loop/009.out |  3 +++
->  2 files changed, 65 insertions(+)
->  create mode 100755 tests/loop/009
->  create mode 100644 tests/loop/009.out
-> 
-> diff --git a/tests/loop/009 b/tests/loop/009
-> new file mode 100755
-> index 0000000..dfa9de3
-> --- /dev/null
-> +++ b/tests/loop/009
-> @@ -0,0 +1,62 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright 2023 Alyssa Ross
-> +#
-> +# Regression test for patch "loop: LOOP_CONFIGURE: send uevents for partitions".
-> +
-> +. tests/loop/rc
-> +
-> +DESCRIPTION="check that LOOP_CONFIGURE sends uevents for partitions"
-> +
-> +QUICK=1
-> +
-> +test() {
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	# Make a disk image with a partition.
-> +	truncate -s 3MiB "$TMPDIR/img"
-> +	sfdisk "$TMPDIR/img" >"$FULL" <<EOF
-> +label: gpt
-> +size=1MiB
-> +EOF
-> +
-> +	mkfifo "$TMPDIR/mon"
-> +	timeout 5 udevadm monitor -ks block/partition >"$TMPDIR/mon" &
-> +
-> +	# Open the fifo for reading, and wait for udevadm monitor to start.
-> +	exec 3< "$TMPDIR/mon"
-> +	read -r _ <&3
-> +	read -r _ <&3
-> +	read -r _ <&3
-> +
-> +	dev="$(losetup -f)"
-> +
-> +	# The default udev behavior is to watch loop devices, which means that
-> +	# udevd will explicitly prompt the kernel to rescan the partitions with
-> +	# ioctl(BLKRRPART).  We want to make sure we're getting uevents from
-> +	# ioctl(LOOP_CONFIGURE), so disable this udev behavior for our device to
-> +	# avoid false positives.
-> +	echo "ACTION!=\"remove\", KERNEL==\"${dev#/dev/}\", OPTIONS+=\"nowatch\"" \
-> +		>/run/udev/rules.d/99-blktests-$$.rules
+Clarify this fact in the uapi ioprio.h header file and introduce the
+IOPRIO_PRIO_LEVEL_MASK and IOPRIO_PRIO_LEVEL() macros for users to
+define and get priority levels in an ioprio value. The coarser macro
+IOPRIO_PRIO_DATA() is retained for backward compatibility with old
+applications already using it. There is no functional change introduced
+with this.
 
-On Fedora Server 37, the line above prints a failure message because the
-directory /run/udev/rules.d/ does not exist. To avoid it, I needed the change
-below. I suggest to apply this change.
+In-kernel users of the IOPRIO_PRIO_DATA() macro which are explicitly
+handling IO priority data as a priority level are modified to use the
+new IOPRIO_PRIO_LEVEL() macro without any functional change. Since f2fs
+is the only user of this macro not explicitly using that value as a
+priority level, it is left unchanged.
 
-diff --git a/tests/loop/009 b/tests/loop/009
-index dfa9de3..2b7a042 100755
---- a/tests/loop/009
-+++ b/tests/loop/009
-@@ -36,6 +36,7 @@ EOF
-        # ioctl(BLKRRPART).  We want to make sure we're getting uevents from
-        # ioctl(LOOP_CONFIGURE), so disable this udev behavior for our device to
-        # avoid false positives.
-+       [[ ! -d /run/udev/rules.d ]] && mkdir -p /run/udev/rules.d
-        echo "ACTION!=\"remove\", KERNEL==\"${dev#/dev/}\", OPTIONS+=\"nowatch\"" \
-                >/run/udev/rules.d/99-blktests-$$.rules
-        udevadm control -R
+Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ block/bfq-iosched.c         |  8 ++++----
+ block/ioprio.c              |  6 +++---
+ include/uapi/linux/ioprio.h | 19 ++++++++++++++-----
+ 3 files changed, 21 insertions(+), 12 deletions(-)
 
-> +	udevadm control -R
-> +
-> +	# Open and close the loop device for writing, to trigger the inotify
-> +	# event udevd had already started listening for.
-> +	: > "$dev"
-> +
-> +	# Wait for udev to have processed the inotify event.
-> +	udevadm control --ping
-> +
-> +	losetup -P "$dev" "$TMPDIR/img"
-> +
-> +	# Wait for at most 1 add event so we don't need to wait for timeout if
-> +	# we get what we're looking for.
-> +	<&3 grep -m 1 '^KERNEL\[.*\] add' |
-> +		sed -e 's/\[.*\]//' -e 's/loop[0-9]\+/loop_/g'
-> +
-> +	rm /run/udev/rules.d/99-blktests-$$.rules
-> +	udevadm control -R
-> +	losetup -d "$dev"
-> +
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/loop/009.out b/tests/loop/009.out
-> new file mode 100644
-> index 0000000..658dcff
-> --- /dev/null
-> +++ b/tests/loop/009.out
-> @@ -0,0 +1,3 @@
-> +Running loop/009
-> +KERNEL add      /devices/virtual/block/loop_/loop_p1 (block)
-> +Test complete
-> -- 
-> 2.37.1
-> 
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index d9ed3108c17a..a4d2879096a5 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5523,16 +5523,16 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
+ 		bfqq->new_ioprio_class = task_nice_ioclass(tsk);
+ 		break;
+ 	case IOPRIO_CLASS_RT:
+-		bfqq->new_ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++		bfqq->new_ioprio = IOPRIO_PRIO_LEVEL(bic->ioprio);
+ 		bfqq->new_ioprio_class = IOPRIO_CLASS_RT;
+ 		break;
+ 	case IOPRIO_CLASS_BE:
+-		bfqq->new_ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++		bfqq->new_ioprio = IOPRIO_PRIO_LEVEL(bic->ioprio);
+ 		bfqq->new_ioprio_class = IOPRIO_CLASS_BE;
+ 		break;
+ 	case IOPRIO_CLASS_IDLE:
+ 		bfqq->new_ioprio_class = IOPRIO_CLASS_IDLE;
+-		bfqq->new_ioprio = 7;
++		bfqq->new_ioprio = IOPRIO_NR_LEVELS - 1;
+ 		break;
+ 	}
+ 
+@@ -5829,7 +5829,7 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
+ 				       struct bfq_io_cq *bic,
+ 				       bool respawn)
+ {
+-	const int ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
++	const int ioprio = IOPRIO_PRIO_LEVEL(bic->ioprio);
+ 	const int ioprio_class = IOPRIO_PRIO_CLASS(bic->ioprio);
+ 	struct bfq_queue **async_bfqq = NULL;
+ 	struct bfq_queue *bfqq;
+diff --git a/block/ioprio.c b/block/ioprio.c
+index 32a456b45804..f0d9e818abc5 100644
+--- a/block/ioprio.c
++++ b/block/ioprio.c
+@@ -33,7 +33,7 @@
+ int ioprio_check_cap(int ioprio)
+ {
+ 	int class = IOPRIO_PRIO_CLASS(ioprio);
+-	int data = IOPRIO_PRIO_DATA(ioprio);
++	int level = IOPRIO_PRIO_LEVEL(ioprio);
+ 
+ 	switch (class) {
+ 		case IOPRIO_CLASS_RT:
+@@ -49,13 +49,13 @@ int ioprio_check_cap(int ioprio)
+ 			fallthrough;
+ 			/* rt has prio field too */
+ 		case IOPRIO_CLASS_BE:
+-			if (data >= IOPRIO_NR_LEVELS || data < 0)
++			if (level >= IOPRIO_NR_LEVELS)
+ 				return -EINVAL;
+ 			break;
+ 		case IOPRIO_CLASS_IDLE:
+ 			break;
+ 		case IOPRIO_CLASS_NONE:
+-			if (data)
++			if (level)
+ 				return -EINVAL;
+ 			break;
+ 		default:
+diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
+index f70f2596a6bf..4444b4e4fdad 100644
+--- a/include/uapi/linux/ioprio.h
++++ b/include/uapi/linux/ioprio.h
+@@ -17,7 +17,7 @@
+ 	 ((data) & IOPRIO_PRIO_MASK))
+ 
+ /*
+- * These are the io priority groups as implemented by the BFQ and mq-deadline
++ * These are the io priority classes as implemented by the BFQ and mq-deadline
+  * schedulers. RT is the realtime class, it always gets premium service. For
+  * ATA disks supporting NCQ IO priority, RT class IOs will be processed using
+  * high priority NCQ commands. BE is the best-effort scheduling class, the
+@@ -32,11 +32,20 @@ enum {
+ };
+ 
+ /*
+- * The RT and BE priority classes both support up to 8 priority levels.
++ * The RT and BE priority classes both support up to 8 priority levels that
++ * can be specified using the lower 3-bits of the priority data.
+  */
+-#define IOPRIO_NR_LEVELS	8
+-#define IOPRIO_BE_NR		IOPRIO_NR_LEVELS
++#define IOPRIO_LEVEL_NR_BITS		3
++#define IOPRIO_NR_LEVELS		(1 << IOPRIO_LEVEL_NR_BITS)
++#define IOPRIO_LEVEL_MASK		(IOPRIO_NR_LEVELS - 1)
++#define IOPRIO_PRIO_LEVEL(ioprio)	((ioprio) & IOPRIO_LEVEL_MASK)
+ 
++#define IOPRIO_BE_NR			IOPRIO_NR_LEVELS
++
++/*
++ * Possible values for the "which" argument of the ioprio_get() and
++ * ioprio_set() system calls (see "man ioprio_set").
++ */
+ enum {
+ 	IOPRIO_WHO_PROCESS = 1,
+ 	IOPRIO_WHO_PGRP,
+@@ -44,7 +53,7 @@ enum {
+ };
+ 
+ /*
+- * Fallback BE priority level.
++ * Fallback BE class priority level.
+  */
+ #define IOPRIO_NORM	4
+ #define IOPRIO_BE_NORM	IOPRIO_NORM
+-- 
+2.39.2
+
