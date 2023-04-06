@@ -2,125 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C00E3C77B6C
-	for <linux-block@archiver.kernel.org>; Wed,  5 Apr 2023 22:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BBDC7619A
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 01:45:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230385AbjDEW3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Apr 2023 18:29:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57832 "EHLO
+        id S234636AbjDFBpO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Apr 2023 21:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjDEW3j (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 18:29:39 -0400
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4334310C8;
-        Wed,  5 Apr 2023 15:29:38 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id D8E47582237;
-        Wed,  5 Apr 2023 18:29:34 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 05 Apr 2023 18:29:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-transfer-encoding:content-type:content-type:date
-        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to; s=fm2; t=
-        1680733774; x=1680737374; bh=0hvdTrqnIesfwKwVq3biOhVWklyP7PuBB8v
-        wBclqcXE=; b=IPp+MnqRTTn2N3vo6dlles7qSJybzgJBtGedU7ArVmfm98PRps1
-        ysXZ3RJjjMsXtT+cIAhg5aSMTY+WXe+fIt616o4yicnIRSI/9Ld4wdlt5QUnfOlj
-        LsRrcbIeun2wHjykL/2UDc2MYH6v1u1pxWFH7cSdT8okDz9CmTKTeV5e6mf4yRd3
-        /x7nDB3n3DU0CQfnrQIkY5imJeUTj4lkuq6SrySmX70DyZGy6VBv5ocqBAfRMgEl
-        /rl4RRPX88V2Q6ZvvPIczhADDw5RaBe6yJFb3dhFEbRmwcwkJITlOgXbp3wwhexn
-        FndoTzGqo3NjiVRPgPxwY4wdKHL1yRtL5ig==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:content-type:date:date:feedback-id:feedback-id
-        :from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=i3db14652.fm2;
-         t=1680733774; x=1680737374; bh=0hvdTrqnIesfwKwVq3biOhVWklyP7PuB
-        B8vwBclqcXE=; b=JcCcM8Seu/Bh6214t3XI5cK0zyL7dg39sz8nnX1B1UPlCXoL
-        gdzUZNAJmpbmsdUvHmOTs99SqfIn4gjPjIPVkWu8ouLGnwGjiho1tXob7mpAE4rv
-        4F6sa53NCV4KDpWeXG0Ws0JBcRtFX0DaxiRNkxOL+wjeJg0mFe2k/22pZCD0o1XU
-        WpC0JOtcItxF8K7TX6x6pq9MNeK6Vg1w3yR/JCUbKhKIgCLoO8Ipm41eS+so6g1Z
-        p03R2uurm2OVJ6mfWa7WaZno9gsndIqfZid73nQmUlbtXhKXTieEJRLTCKoTzp2q
-        46spHIN0zCdtNag5s4LwFoKJ9fQHAX0UHN+QZg==
-X-ME-Sender: <xms:TfYtZHLAdghiXg-PzztIWq6FvuRpVXQ44Khif8DBv__firBZcOw-Zw>
-    <xme:TfYtZLJ4hNjC0q5fjPHb2Ocbr3F_qwbs1L0b5d4U7alWybB1pJb6yJkeD7uGYssX-
-    9NrKNPuVfNuOZ5jPjU>
-X-ME-Received: <xmr:TfYtZPunT8yMHXDDLF6TAQLFmVq2wVlcwhb_hX5tSuSpStl5D5h7_lRZ0bT3PBmva1hiFJfu-Os7wCpPe3sdqelLOaRkcrYQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdejvddgudduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtfeejnecuhfhrohhmpeffrghm
-    ihgvnhcunfgvucfoohgrlhcuoegulhgvmhhorghlsehfrghsthhmrghilhdrtghomheqne
-    cuggftrfgrthhtvghrnhepteefiefhieetgfevhfegfeehffetteduieetudfgleetvdff
-    udelveejfefhfeejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
-    hfrhhomhepughlvghmohgrlhesfhgrshhtmhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:TfYtZAZ0HVncHW_8sn3-0_lMi9HLVzug-mragr37Q2RPjbB3xijvAw>
-    <xmx:TfYtZOaOk80OEjjPzUCCR3NG2LfrCWftqEDoCQSHzWEHwhhBXRxDeQ>
-    <xmx:TfYtZEAYJct45crcqaVI-X01Xp6JqTh_AQXeVMpOKbAXX2cjhlFPyw>
-    <xmx:TvYtZLSmM-oHr3AxtvQe2FtoYRhW_2BBEL4vq8Im_0ucS4dwEHTF6w>
-Feedback-ID: i3db14652:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 5 Apr 2023 18:29:30 -0400 (EDT)
-Message-ID: <e61cd958-2cea-a03e-2581-a8cea1940028@fastmail.com>
-Date:   Thu, 6 Apr 2023 07:29:28 +0900
+        with ESMTP id S234678AbjDFBpN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Apr 2023 21:45:13 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C39D76BD
+        for <linux-block@vger.kernel.org>; Wed,  5 Apr 2023 18:44:55 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id q2so58660pll.7
+        for <linux-block@vger.kernel.org>; Wed, 05 Apr 2023 18:44:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1680745494; x=1683337494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=r0PiB0tAf7EnUQK50jROY9tFKPhzxKKBfwhOcqZeQM8=;
+        b=i9OYFl4pWn5xcxgzFxmIitPIzpwW+v9g0OYpD+y0bp6Vd+9PYz7urK5e8tMB69JBCU
+         pK6Vdm/nuHrf3bRRJnu/O+NAnxsHOMNcHsPbB+G0qePMiVu+m8n6xo/M+rOkelowQr/O
+         3mIyw5ZOVQjqOSC06UZK30q745tqmbwHbYJwY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680745494; x=1683337494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r0PiB0tAf7EnUQK50jROY9tFKPhzxKKBfwhOcqZeQM8=;
+        b=eVmP9Qw/0LF8AzcKSl/jkWLXpWwQoXwMg02ExLfHtu45MuoI7tCYRnU6SiLg/SGss1
+         JgySaVi0Gd8EoFPp0NiT8qKft8GXzpaRO2J0CmhDNwjYT50AfGADuo2F5fyZO7UABOQU
+         P/XhxklrJ8iRu1TRGWyOLh5t9hOz9PqRHkMIwdsHcl1rpJgdDJ9EYz8vT/seW7LRV63e
+         YrYz5fROsHtjmJgUAxOueUj+J/x8ub0EiAoXq25MMs+D+bCWv52fpS0SE6JYemBaEQMF
+         caJvGaIyNbR25k/qmJLZ89Gz9lDS/pFv/GVSWBBmaLtt8pA9c9iNmX6NIdsA3Owm+0Dt
+         oX8w==
+X-Gm-Message-State: AAQBX9cZYwvaxUlaJcCtyDmEAOpJ12B0poE4iPgdxnLak6yMsoivlwoN
+        HqZ/t4YHEK4uwXdTRZfda5JvEw==
+X-Google-Smtp-Source: AKy350bO/7JV+NOlLw6ctcf/3tbwYZJGd52feDLIHriRADZpq8jurTmSkVpAKCPUOIqRupN/U/4Oig==
+X-Received: by 2002:a17:90b:314a:b0:23d:4ffc:43e with SMTP id ip10-20020a17090b314a00b0023d4ffc043emr8968148pjb.38.1680745494628;
+        Wed, 05 Apr 2023 18:44:54 -0700 (PDT)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id gp19-20020a17090adf1300b0023c8a23005asm10974pjb.49.2023.04.05.18.44.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Apr 2023 18:44:53 -0700 (PDT)
+Date:   Thu, 6 Apr 2023 10:44:49 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 01/16] zram: remove valid_io_request
+Message-ID: <20230406014449.GM12892@google.com>
+References: <20230404150536.2142108-1-hch@lst.de>
+ <20230404150536.2142108-2-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v5 18/19] ata: libata: set read/write commands CDL index
-To:     Igor Pylypiv <ipylypiv@google.com>, Niklas Cassel <nks@flawful.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230404182428.715140-1-nks@flawful.org>
- <20230404182428.715140-19-nks@flawful.org> <ZC29XNMS9CnQZn74@google.com>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@fastmail.com>
-In-Reply-To: <ZC29XNMS9CnQZn74@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230404150536.2142108-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/23 03:26, Igor Pylypiv wrote:
-> On Tue, Apr 04, 2023 at 08:24:23PM +0200, Niklas Cassel wrote:
->> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->>
->> For devices supporting the command duration limits feature, translate
->> the dld field of read and write operation to set the command duration
->> limit index field of the command task file when the duration limit
->> feature is enabled.
->>
->> The function ata_set_tf_cdl() is introduced to do this. For unqueued
->> (non NCQ) read and write operations, this function sets the command
->> duration limit index set as the lower 2 bits of the feature field.
->> For queued NCQ read/write commands, the index is set as the lower
->> 2 bits of the auxiliary field.
-> 
-> CDL index is lower 3 bits, not 2 bits.
+On (23/04/04 17:05), Christoph Hellwig wrote:
+> All bios hande to drivers from the block layer are checked against the
+> device size and for logical block alignment already, so don't duplicate
+> those checks.
 
-Yes, typo. We will correct that.
-
-> 
->>
->> The flag ATA_QCFLAG_HAS_CDL is introduced to indicate that a command
->> taskfile has a non zero cdl field.
->>
->> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->> Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
->> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
->> ---
->>  drivers/ata/libata-core.c | 32 +++++++++++++++++++++++++++++---
->>  drivers/ata/libata-scsi.c | 16 +++++++++++++++-
->>  drivers/ata/libata.h      |  2 +-
->>  include/linux/libata.h    |  1 +
->>  4 files changed, 46 insertions(+), 5 deletions(-)
-> Reviewed-by: Igor Pylypiv <ipylypiv@google.com>
-
-Thanks.
-
+Has this changed "recently"? I can trace that valid_io() function back
+to initial zram commit 306b0c957f3f0e7 (Staging: virtual block device
+driver (ramzswap)). Was that check always redundant?
