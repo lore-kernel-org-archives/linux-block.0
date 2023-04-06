@@ -2,136 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE6CC761A6
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 12:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BE6C76196
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 12:42:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237873AbjDFMBS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 08:01:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32774 "EHLO
+        id S237410AbjDFMmA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 08:42:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238192AbjDFMAz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 08:00:55 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D07230D4;
-        Thu,  6 Apr 2023 04:58:13 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id h17so39234767wrt.8;
-        Thu, 06 Apr 2023 04:58:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680782291;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w7uewdVPDtWlBmd0txwJX02g5PYGjBmA/8tf1xq7PQc=;
-        b=JpaAwBSjB1qEaPPlW1EO6tqmKSRez8Dq1m56wP/aN3/lR0POfZOIgbTZlKnC6T8A9u
-         8NUpMCMfUwojPD8BbTSh1mtYe9/NYMY3S2Hnx6sVnqiKg+N6mEJWTJ+LNXHsLkS+zj5m
-         oT/JK93HmF2fMv7FeZnX9ituxlrM2aHbxJueAIAfCtPg4uzL6SqiVsUqGuHJYMvXieqK
-         iEm4pDfjVpuXCciyKUechdY4HLwgiEHilPAMSjw2Rg0n7DkbT+glsNg3cDNMKEMg4CEA
-         BfT6mUr4BSEBkgZ6+MsRMOoT1qOPBzDK6LEoRGV9oohFAS3TJGmNqd2OCw5vSZBUrZtK
-         ThXg==
-X-Gm-Message-State: AAQBX9cC700kECV/rC7H3tkoH0uWKeNWfzsPiHm263v9S3zV5wuW4IuK
-        ZxLjc6afQJRdNOPVWPSnNc7dUPXaznuPzw==
-X-Google-Smtp-Source: AKy350Z52mlf+miam/OjAYF64Wbw1zHimhNWm50Qh9NuMESgECFP0wvqY5JQOILWFUQjsgs9wW9iYg==
-X-Received: by 2002:a05:6512:21e:b0:4ea:129c:528 with SMTP id a30-20020a056512021e00b004ea129c0528mr2580828lfo.56.1680781258240;
-        Thu, 06 Apr 2023 04:40:58 -0700 (PDT)
-Received: from flawful.org (c-fcf6e255.011-101-6d6c6d3.bbcust.telenor.se. [85.226.246.252])
-        by smtp.gmail.com with ESMTPSA id t12-20020ac24c0c000000b004eb3bb581ccsm229247lfq.53.2023.04.06.04.40.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 04:40:58 -0700 (PDT)
-Received: by flawful.org (Postfix, from userid 112)
-        id 2FB8067E; Thu,  6 Apr 2023 13:40:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1680781257; bh=OuulYDiO5r4YnHxGZH5etX0gMKwwO40hqAMiklCCvpQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vGjxtfR0uA6BHzXH0p6vJOfXLUigo5InyUtXK9WCQpAmy5ObAS3HYqCGo3mjrG5sj
-         ms1ztoYEljQSWbOhm0BlYWbiWv9urvpYZtXNLxsATuT2zZSfnSiKoFfm3lXpM82Rx6
-         2jPuXaVPljjZco3u33LmadL+NI7+7ILqbF7JKwfE=
-Received: from x1-carbon.lan (OpenWrt.lan [192.168.1.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        with ESMTP id S230032AbjDFMl7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 08:41:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BBFB76A9
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 05:41:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680784874;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=9tkmzm/hquNGLWmsXzJCaOliFwRI9+JTQF9rbBxcXE4=;
+        b=URKM1FFqLQQSfR8OX10XkQeFwciqycjNkM0uAqFRQ1RW52arBUsoTXvxPOifMaDnH3T6vL
+        Od0x9VEAODv4AhwPc2RT2xeYhGVzWj03aEjLTDSDwSbeze1eVAdwOQ4UW9V2K7BbS0MXYz
+        JgKwTKnj+oDZMKgaqCV96D9/B4pjztI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-78-oUk7kfGWO6Gz2WYL8_S7xA-1; Thu, 06 Apr 2023 08:41:13 -0400
+X-MC-Unique: oUk7kfGWO6Gz2WYL8_S7xA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by flawful.org (Postfix) with ESMTPSA id 810D9D18;
-        Thu,  6 Apr 2023 13:33:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1680780795; bh=OuulYDiO5r4YnHxGZH5etX0gMKwwO40hqAMiklCCvpQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rz8PfjZ19ppe1jRbLu2pcCzOREJ3OkaGYEmWwy4DiZ/lTR9lWwZhEw2Tc36tzoS6l
-         zzdCXcAZcEnGER9Ej3sr3HbtRYQZV4LXCfOWQQ9bH7vEpIoGANw6S//qbY9L66UcdN
-         1VzU8EWxwWF8CYQ9l+yTDQTNsNC9mgedn/gjsAVY=
-From:   Niklas Cassel <nks@flawful.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <dlemoal@fastmail.com>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-Subject: [PATCH v6 12/19] ata: libata-scsi: remove unnecessary !cmd checks
-Date:   Thu,  6 Apr 2023 13:32:41 +0200
-Message-Id: <20230406113252.41211-13-nks@flawful.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230406113252.41211-1-nks@flawful.org>
-References: <20230406113252.41211-1-nks@flawful.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C0BF101A531;
+        Thu,  6 Apr 2023 12:41:13 +0000 (UTC)
+Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 325684020C80;
+        Thu,  6 Apr 2023 12:41:11 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: ublk: make sure that block size is set correctly
+Date:   Thu,  6 Apr 2023 20:40:59 +0800
+Message-Id: <20230406124059.2035969-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Niklas Cassel <niklas.cassel@wdc.com>
+block size is one very key setting for block layer, and bad block size
+could panic kernel easily.
 
-There is no need to check if !cmd as this can only happen for
-ATA internal commands which uses the ATA internal tag (32).
+Make sure that block size is set correctly.
 
-Most users of ata_scsi_set_sense() are from _xlat functions that
-translate a scsicmd to an ATA command. These obviously have a qc->scsicmd.
+Meantime if ublk_validate_params() fails, clear ub->params so that disk
+is prevented from being added.
 
-ata_scsi_qc_complete() can also call ata_scsi_set_sense() via
-ata_gen_passthru_sense() / ata_gen_ata_sense(), called via
-ata_scsi_qc_complete(). This callback is only called for translated
-commands, so it also has a qc->scsicmd.
-
-ata_eh_analyze_ncq_error(): the NCQ error log can only contain a 0-31
-value, so it will never be able to get the ATA internal tag (32).
-
-ata_eh_request_sense(): only called by ata_eh_analyze_tf(), which
-is only called when iteratating the QCs using ata_qc_for_each_raw(),
-which does not include the internal tag.
-
-Since there is no existing call site where cmd can be NULL, remove the
-!cmd check from ata_scsi_set_sense() and ata_scsi_set_sense_information().
-
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/ata/libata-scsi.c | 6 ------
- 1 file changed, 6 deletions(-)
+ drivers/block/ublk_drv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-index e093c7a7deeb..26746609bf76 100644
---- a/drivers/ata/libata-scsi.c
-+++ b/drivers/ata/libata-scsi.c
-@@ -209,9 +209,6 @@ void ata_scsi_set_sense(struct ata_device *dev, struct scsi_cmnd *cmd,
- {
- 	bool d_sense = (dev->flags & ATA_DFLAG_D_SENSE);
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index f48d213fb65e..2899efa07fad 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -246,7 +246,7 @@ static int ublk_validate_params(const struct ublk_device *ub)
+ 	if (ub->params.types & UBLK_PARAM_TYPE_BASIC) {
+ 		const struct ublk_param_basic *p = &ub->params.basic;
  
--	if (!cmd)
--		return;
--
- 	scsi_build_sense(cmd, d_sense, sk, asc, ascq);
- }
+-		if (p->logical_bs_shift > PAGE_SHIFT)
++		if (p->logical_bs_shift > PAGE_SHIFT || p->logical_bs_shift < 9)
+ 			return -EINVAL;
  
-@@ -221,9 +218,6 @@ void ata_scsi_set_sense_information(struct ata_device *dev,
- {
- 	u64 information;
+ 		if (p->logical_bs_shift > p->physical_bs_shift)
+@@ -1949,6 +1949,8 @@ static int ublk_ctrl_set_params(struct ublk_device *ub,
+ 		/* clear all we don't support yet */
+ 		ub->params.types &= UBLK_PARAM_TYPE_ALL;
+ 		ret = ublk_validate_params(ub);
++		if (ret)
++			ub->params.types = 0;
+ 	}
+ 	mutex_unlock(&ub->mutex);
  
--	if (!cmd)
--		return;
--
- 	information = ata_tf_read_block(tf, dev);
- 	if (information == U64_MAX)
- 		return;
 -- 
-2.39.2
+2.38.1
 
