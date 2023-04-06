@@ -2,74 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E492C77B73
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 11:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE8BC761A6
+	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 11:41:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbjDFLkn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 07:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46588 "EHLO
+        id S238634AbjDFLlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 07:41:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238996AbjDFLkQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 07:40:16 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD0CB47A;
-        Thu,  6 Apr 2023 04:36:32 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id g29so532751lfj.4;
-        Thu, 06 Apr 2023 04:36:32 -0700 (PDT)
+        with ESMTP id S238447AbjDFLlE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 07:41:04 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF45186A7;
+        Thu,  6 Apr 2023 04:37:06 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id g29so533921lfj.4;
+        Thu, 06 Apr 2023 04:37:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680780934;
+        d=1e100.net; s=20210112; t=1680780957;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:dkim-signature
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hLe2BDpqjmup0y1LPiABk+LzHgKkTNIBWp76zDCcB+4=;
-        b=GIcASHLvXk58zNoEndxSyPxeJSduISNiRK7lWnyq86ivFMxH/4PAdrQOyVXnK3unfq
-         8tpWmJODQuW1eBuHeAF8JSlQXYfYI3LgIESyKi+U/lWEmv4RYoinzZKR5sdLoZoLzTCj
-         GNxuiTQr6Ly+nldPAK6lVvA4ZVHx39c7+3I63uwU8A7mwyTfLlXTj2bv/lRjo7yDfadh
-         P2Ki9a1ztaZyuPQIIPExrlHI5qLIbU5H5bdknMsMBmdEgxRYr6iFyNRK3ffKeYJbXR98
-         sU3eJLUo4SqYB8A88j1iC87kKWEGbtZ+Ej3ceYTa/NqpWBXzqi5C3oHgodLUSCY65kZ6
-         YR0w==
-X-Gm-Message-State: AAQBX9eIj5BOwlWUwXzhvVANVB94xqYmqYBsUg39LO9iKGOMIRbspEMH
-        5/3PJUgQKa451/SMmDVJewFDx/W2UbbVWw==
-X-Google-Smtp-Source: AKy350ZsR7wQELdu0Yp2Ev9AYrRg0/aCfTlocFrwPkX/J8DrIIB5UP0w8paVzkWrOdzVODIGeX3vqQ==
-X-Received: by 2002:ac2:48a1:0:b0:4eb:452d:5bbf with SMTP id u1-20020ac248a1000000b004eb452d5bbfmr2597917lfg.54.1680780934104;
-        Thu, 06 Apr 2023 04:35:34 -0700 (PDT)
+        bh=dr2Hww8UkSMsbtWPl+uiEpvBEwJnNqlS9FIB4hVpH0g=;
+        b=KQ2/qZnNAGnBOyOS934Ob7aJpWH7Pz23j5Mqv+boLPIe94pB/JoDWooDsxJtso+0b6
+         FeflB6DlV30us/xPUOhm5aNvbJKPRDP0IP1IDlF6V0zOIRCgIg7O9sobC4Sq63mKTz1C
+         4Ab2ZCKxAZmV0HxzUPpt7ATCd8K6h5vyr+vyK3mqvD1Qzzoy2OKps0ju++i2+lXlOqzR
+         ehpGIxO1YEWyyxZG3i4lNUfbsIdDi3FycTJFQLk4Jq10QYhh3/cfJ4a5M9p7Z6tzkzZC
+         ovpnHhod465rPevhr45+Hu942Sgbx8RKYPr6j9BXGSG68VZVKvysgcbHRuAy8YgZ6Z9r
+         ZkoQ==
+X-Gm-Message-State: AAQBX9dFbOiNVcX0y74rAnZoV5EaxQ/Qxa+LkTzG+jcgaO52NeRb5sOf
+        5iCc9ex6VqCU9l5VIYpcGRHjIlhG7iI2zg==
+X-Google-Smtp-Source: AKy350ZctK27GN5EalBhlORsrxLbdDBl/BiheiEdoP9KfkEepVgZ11mXi/EEu7Vfnzet/kjYS3rr8w==
+X-Received: by 2002:ac2:46f6:0:b0:4e9:c6bc:601b with SMTP id q22-20020ac246f6000000b004e9c6bc601bmr2395097lfo.64.1680780957129;
+        Thu, 06 Apr 2023 04:35:57 -0700 (PDT)
 Received: from flawful.org (c-fcf6e255.011-101-6d6c6d3.bbcust.telenor.se. [85.226.246.252])
-        by smtp.gmail.com with ESMTPSA id g13-20020ac2538d000000b004eb41d26d49sm229529lfh.28.2023.04.06.04.35.33
+        by smtp.gmail.com with ESMTPSA id q12-20020ac2528c000000b004db39e80733sm226552lfm.155.2023.04.06.04.35.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 04:35:33 -0700 (PDT)
+        Thu, 06 Apr 2023 04:35:56 -0700 (PDT)
 Received: by flawful.org (Postfix, from userid 112)
-        id C2B7312A1; Thu,  6 Apr 2023 13:35:32 +0200 (CEST)
+        id EA13369A; Thu,  6 Apr 2023 13:35:55 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1680780933; bh=preqedR2QZNTaOgvRKfmyWCCDHRysOKE6G/n/oQl2tk=;
+        t=1680780956; bh=Ml7y/jf7AIB69js3iH/Wxe2UpbdPAiIMGTLWNNw4CTk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QXZONJlZ0GfO6y8sPyaChIJtM6fJDKJskV+SLPl/UexUPKvDrpbjOZ/jqyelNv28s
-         aAGIS5HV3hKHKkAmcQv/CKNvP2/24akemK/zi6nFBrKEvAFqv+MAnctGOgs7mbOWPL
-         jzcm8vGGgCXy3//izsq53tmSyW8qDOTRJSepm55E=
+        b=LyvsX3M5Zoe3QR9zfczY4NwgS27ZqdVPV+NdvFxCtr3b+akOM+t+omOt/biLkPlCH
+         1PwBgaIPx0Y1qjkYJ/klXnmxnmHMh5pKTvZNG2/ZxpCKtoghpugYegVN3vPG+R897q
+         Gg1aPDZALapd78wo2L4vucRyOlgDP5MEOOhaTeCw=
 Received: from x1-carbon.lan (OpenWrt.lan [192.168.1.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by flawful.org (Postfix) with ESMTPSA id 1EA9E69A;
+        by flawful.org (Postfix) with ESMTPSA id CDC256D4;
         Thu,  6 Apr 2023 13:33:07 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1680780787; bh=preqedR2QZNTaOgvRKfmyWCCDHRysOKE6G/n/oQl2tk=;
+        t=1680780788; bh=Ml7y/jf7AIB69js3iH/Wxe2UpbdPAiIMGTLWNNw4CTk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YEsZ+/Af/WlbT+HSw0N1YcUN7htnpOH4BXhKpCf8EcuZ/lLc0NbhnVOt+ckzdFEzs
-         6fY/gmaJfXrSiWMI9IfmIqrkmU9aUUtjiUncXShAn11iuqnC0vR0CeqHvfsLXW1jQI
-         o/HTg47o4TdishwfA7oGwd0g98YzBEEiM1A/F5qE=
+        b=iokZ8Ff14pXTPl9z/wTIeaMPtkBCylmJ2YQCeGlr51TT9hDoFtZTNGKh/M10Hb1Tw
+         PdHardtCiG7D/XLzUnm+v6X2Ph/T98Ua5VU4WHOhVaiug4EE47Md65rJVgObg16ARE
+         wOWwqCXja/eJ8FsRjOSODhGLqHaFLrSKgF8lBkgw=
 From:   Niklas Cassel <nks@flawful.org>
 To:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-kernel@vger.kernel.org
+        "Martin K. Petersen" <martin.petersen@oracle.com>
 Cc:     Bart Van Assche <bvanassche@acm.org>,
         Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Damien Le Moal <dlemoal@fastmail.com>,
         linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-Subject: [PATCH v6 02/19] block: introduce ioprio hints
-Date:   Thu,  6 Apr 2023 13:32:31 +0200
-Message-Id: <20230406113252.41211-3-nks@flawful.org>
+Subject: [PATCH v6 03/19] block: introduce BLK_STS_DURATION_LIMIT
+Date:   Thu,  6 Apr 2023 13:32:32 +0200
+Message-Id: <20230406113252.41211-4-nks@flawful.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230406113252.41211-1-nks@flawful.org>
 References: <20230406113252.41211-1-nks@flawful.org>
@@ -81,106 +80,61 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-IO priorities currently only use 6-bits of the 16-bits ioprio value: the
-3-upper bits are used to define up to 8 priority classes (4 of which are
-valid) and the 3 lower bits of the value are used to define a priority
-level for the real-time and best-effort class.
+Introduce the new block IO status BLK_STS_DURATION_LIMIT for LLDDs to
+report command that failed due to a command duration limit being
+exceeded. This new status is mapped to the ETIME error code to allow
+users to differentiate "soft" duration limit failures from other more
+serious hardware related errors.
 
-The remaining 10-bits between the IO priority class and level are
-unused, and in fact, cannot be used by the user as doing so would
-either result in the value being completely ignored, or in an error
-returned by ioprio_check_cap().
+If we compare BLK_STS_DURATION_LIMIT with BLK_STS_TIMEOUT:
+-BLK_STS_DURATION_LIMIT means that the drive gave a reply indicating that
+the command duration limit was exceeded before the command could be
+completed. This IO status is mapped to ETIME for user space.
 
-Use these 10-bits of an ioprio value to allow a user to specify IO
-hints. An IO hint is defined as a 10-bits value, allowing up to 1023
-different hints to be specified, with the value 0 being reserved as the
-"no hint" case. An IO hint can apply to any IO that specifies a valid
-priority class other than NONE, regardless of the IO priority level
-specified.
-
-To do so, the macros IOPRIO_PRIO_HINT() and IOPRIO_PRIO_VALUE_HINT() are
-introduced in include/uapi/linux/ioprio.h to respectively allow a user
-to get and set a hint in an ioprio value.
-
-To support the ATA and SCSI command duration limits feature, 7 hints
-are defined: IOPRIO_HINT_DEV_DURATION_LIMIT_1 to
-IOPRIO_HINT_DEV_DURATION_LIMIT_7, allowing a user to specify which
-command duration limit descriptor should be applied to the commands
-serving an IO. Specifying these hints has for now no effect whatsoever
-if the target block devices do not support the command duration limits
-feature. However, in the future, block IO schedulers can be modified to
-optimize IO issuing order based on these hints, even for devices that
-do not support the command duration limits feature.
-
-Given that the 7 duration limits hints defined have no effect on any
-block layer component, the actual definition of the duration limits
-implied by these hints remains at the device level.
+-BLK_STS_TIMEOUT means that the drive never gave a reply at all.
+This IO status is mapped to ETIMEDOUT for user space.
 
 Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
 Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- include/uapi/linux/ioprio.h | 49 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ block/blk-core.c          | 3 +++
+ include/linux/blk_types.h | 6 ++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
-index 4444b4e4fdad..607c7617b9d2 100644
---- a/include/uapi/linux/ioprio.h
-+++ b/include/uapi/linux/ioprio.h
-@@ -58,4 +58,53 @@ enum {
- #define IOPRIO_NORM	4
- #define IOPRIO_BE_NORM	IOPRIO_NORM
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 42926e6cb83c..be7facaa11a6 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -170,6 +170,9 @@ static const struct {
+ 	[BLK_STS_ZONE_OPEN_RESOURCE]	= { -ETOOMANYREFS, "open zones exceeded" },
+ 	[BLK_STS_ZONE_ACTIVE_RESOURCE]	= { -EOVERFLOW, "active zones exceeded" },
+ 
++	/* Command duration limit device-side timeout */
++	[BLK_STS_DURATION_LIMIT]	= { -ETIME, "duration limit exceeded" },
++
+ 	/* everything else not covered above: */
+ 	[BLK_STS_IOERR]		= { -EIO,	"I/O" },
+ };
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 99be590f952f..cde997590765 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -166,6 +166,12 @@ typedef u16 blk_short_t;
+  */
+ #define BLK_STS_OFFLINE		((__force blk_status_t)17)
  
 +/*
-+ * The 10-bits between the priority class and the priority level are used to
-+ * optionally define IO hints for any combination of IO priority class and
-+ * level. Depending on the kernel configuration, IO scheduler being used and
-+ * the target IO device being used, hints can influence how IOs are processed
-+ * without affecting the IO scheduling ordering defined by the IO priority
-+ * class and level.
++ * BLK_STS_DURATION_LIMIT is returned from the driver when the target device
++ * aborted the command because it exceeded one of its Command Duration Limits.
 + */
-+#define IOPRIO_HINT_SHIFT		IOPRIO_LEVEL_NR_BITS
-+#define IOPRIO_HINT_NR_BITS		10
-+#define IOPRIO_NR_HINTS			(1 << IOPRIO_HINT_NR_BITS)
-+#define IOPRIO_HINT_MASK		(IOPRIO_NR_HINTS - 1)
-+#define IOPRIO_PRIO_HINT(ioprio)	\
-+	(((ioprio) >> IOPRIO_HINT_SHIFT) & IOPRIO_HINT_MASK)
++#define BLK_STS_DURATION_LIMIT	((__force blk_status_t)18)
 +
-+/*
-+ * Alternate macro for IOPRIO_PRIO_VALUE() to define an IO priority with
-+ * a class, level and hint.
-+ */
-+#define IOPRIO_PRIO_VALUE_HINT(class, level, hint)		 \
-+	((((class) & IOPRIO_CLASS_MASK) << IOPRIO_CLASS_SHIFT) | \
-+	 (((hint) & IOPRIO_HINT_MASK) << IOPRIO_HINT_SHIFT) |	 \
-+	 ((level) & IOPRIO_LEVEL_MASK))
-+
-+/*
-+ * IO hints.
-+ */
-+enum {
-+	/* No hint */
-+	IOPRIO_HINT_NONE = 0,
-+
-+	/*
-+	 * Device command duration limits: indicate to the device a desired
-+	 * duration limit for the commands that will be used to process an IO.
-+	 * These will currently only be effective for SCSI and ATA devices that
-+	 * support the command duration limits feature. If this feature is
-+	 * enabled, then the commands issued to the device to process an IO with
-+	 * one of these hints set will have the duration limit index (dld field)
-+	 * set to the value of the hint.
-+	 */
-+	IOPRIO_HINT_DEV_DURATION_LIMIT_1 = 1,
-+	IOPRIO_HINT_DEV_DURATION_LIMIT_2 = 2,
-+	IOPRIO_HINT_DEV_DURATION_LIMIT_3 = 3,
-+	IOPRIO_HINT_DEV_DURATION_LIMIT_4 = 4,
-+	IOPRIO_HINT_DEV_DURATION_LIMIT_5 = 5,
-+	IOPRIO_HINT_DEV_DURATION_LIMIT_6 = 6,
-+	IOPRIO_HINT_DEV_DURATION_LIMIT_7 = 7,
-+};
-+
- #endif /* _UAPI_LINUX_IOPRIO_H */
+ /**
+  * blk_path_error - returns true if error may be path related
+  * @error: status the request was completed with
 -- 
 2.39.2
 
