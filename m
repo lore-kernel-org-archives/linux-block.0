@@ -2,123 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7829EC77B6C
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 16:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C70C6FD1D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 18:41:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbjDGQup (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Apr 2023 12:50:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59672 "EHLO
+        id S229768AbjDGSlp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Apr 2023 14:41:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbjDGQun (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 12:50:43 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC25C15A
-        for <linux-block@vger.kernel.org>; Fri,  7 Apr 2023 09:50:41 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-3230125dde5so1802035ab.1
-        for <linux-block@vger.kernel.org>; Fri, 07 Apr 2023 09:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680886241;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F2wEWCBXZz4FvlQWLtEGWe0fF/78tqvkEK7ameOAIKE=;
-        b=3MQaHtBcX2OD4ZgPoX8PO8nKKfdo4FVxy7iAK4dHV7CAiXmdY99EjYcDot169H8VW3
-         NyuUpwxk67ZRBf/P0xf38myjPUn3zU8rn9K+AnCNEET8dgHVAtZa4aa78tZdD0Lb6ILU
-         J0auCNFGQsNIg1wxSXuwZIWxnI3Y6y9Mru7tYgxfNVZoCBZUXukiJdvtIaxrQj6l+HW2
-         PqIDXMfWv7Y0+G7BtLwS1fe6MoR1GBHFJQartS6VkwvNMs3uc4r9rtGkNN7gFH/VoHTg
-         klPMrN1u8MqG96iCOk1sN3p7SZfRZZBECVorhSj92D/g4dqa0puGJ1NV7vyO/E44rmXU
-         oRLQ==
+        with ESMTP id S229523AbjDGSlo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 14:41:44 -0400
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04E0A27B;
+        Fri,  7 Apr 2023 11:41:43 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id q2so4553093pll.7;
+        Fri, 07 Apr 2023 11:41:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680886241;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=F2wEWCBXZz4FvlQWLtEGWe0fF/78tqvkEK7ameOAIKE=;
-        b=goZogaEa6Rb/afUBoKhOMCngGswpyd2bXAWU0Nc1TuofjULmDCWcVpSiBTwcoOl7LH
-         T/n+zS7LILS3HJSRW2ADBv8/+uzTvzU/bcxdg0KOGl6o6g5o/fXk6ewjTunEcvpHUt2z
-         aMVGZ/QmIEEcI+qLwXhJDHS1fgzlBS/uLL+PrGGatqtxNbIkRQ0MFyUlyX6y0M3Amg5M
-         nPYO2OVj0oRhtH8r2+nKJnivTaDEW6xYz0tpHvdcRRvG7TPy5LrMKac3tBIbuzoBWAbv
-         95/BCk6Wr/f5Sb0ufqWc237oXQJeS6gwwokseU7Dh77RMKLg+CiS2wfm+MqzdKzxTPW0
-         XSXw==
-X-Gm-Message-State: AAQBX9egP57MEYxkmKIyUs635+mdwNHQEvFklsdQi2OePC+s4mPkybQp
-        Ta4LU6eo/NQqetRvwVy7zoCC6dihBqN0h3ET8i0T5g==
-X-Google-Smtp-Source: AKy350ZhJ8SRYSrEcSjO9F7XMHc8yVs5t5l9tCyxWxjn753rDSIK+3GHSOMVXpCtPdwLvdn+QkGNWg==
-X-Received: by 2002:a05:6602:2a48:b0:759:485:41d with SMTP id k8-20020a0566022a4800b007590485041dmr83519iov.0.1680886241222;
-        Fri, 07 Apr 2023 09:50:41 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id c62-20020a029644000000b00406431d0fb5sm1177037jai.72.2023.04.07.09.50.40
+        d=1e100.net; s=20210112; t=1680892903; x=1683484903;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3oRwt6N4ADa78EEH+o6Pc1K4R7YlHGK3pUj1aovOcq4=;
+        b=BYlLjGct7FTDQdPy7SYv8wL32dfvMWGrWukpge0DOHBK7o4Es5RbFKEUTTHWK1uIxw
+         0ZBDghJA97ZyCiTgoXmG302oyuR87ALdt2KW2rCUB5xle/Ijfjn7bb2WFExyWH8WOiL6
+         kUJGDlhb5MAMJ9luI9EN5BssivioSwzFkc5w4OpJGeP5GIniPaYlMfMYceA+KvlhtW1S
+         sN5vsQdrnh8yBBPRXryL68wfa8IHLg4SKi89MF4dfZ60cko8Mvwwq1onn6CEsYwH0WuI
+         W6CWR9ibxbeKqwRbpPdYYKW45dYg44/IFYkp/jBRGeGTVV5KMMbwT1L29CyDcEsgTHM1
+         cPzw==
+X-Gm-Message-State: AAQBX9djcmeYiU/57zv5SZOYddRVEzfbnDf3tXuFPwXIJmzPYNndE5JG
+        UWfa7aeZHRR1+s90GOAh2kI=
+X-Google-Smtp-Source: AKy350avvsGl4zVwBPa4ui2T1sZ4b1Ps6ohOFXIaaoS82O6uuIVf9A7ZONzjgA2v9hGpemFWz7IBig==
+X-Received: by 2002:a05:6a20:4f27:b0:dd:ee39:5e90 with SMTP id gi39-20020a056a204f2700b000ddee395e90mr2655675pzb.23.1680892903272;
+        Fri, 07 Apr 2023 11:41:43 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:f2c:4ac2:6000:5900? ([2620:15c:211:201:f2c:4ac2:6000:5900])
+        by smtp.gmail.com with ESMTPSA id u16-20020aa78490000000b00628e9871c24sm3342377pfn.183.2023.04.07.11.41.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Apr 2023 09:50:40 -0700 (PDT)
-Message-ID: <52f2b320-dbcf-f276-bd86-ec6dd21b88dc@kernel.dk>
-Date:   Fri, 7 Apr 2023 10:50:40 -0600
+        Fri, 07 Apr 2023 11:41:42 -0700 (PDT)
+Message-ID: <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
+Date:   Fri, 7 Apr 2023 11:41:41 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v2 0/3] blk-cgroup: some cleanup
 Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.3-rc6
-Content-Type: text/plain; charset=UTF-8
+To:     Chengming Zhou <zhouchengming@bytedance.com>, axboe@kernel.dk,
+        tj@kernel.org
+Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230406145050.49914-1-zhouchengming@bytedance.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230406145050.49914-1-zhouchengming@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 4/6/23 07:50, Chengming Zhou wrote:
+> These are some cleanup patches of blk-cgroup. Thanks for review.
 
-A few block fixes that should go into the 6.3 release:
+With these patches applied, my kernel test VM crashes during boot. The 
+following crash disappears if I revert these patches:
 
-- Ensure that ublk always reads the whole sqe upfront (me)
+BUG: KASAN: null-ptr-deref in bio_associate_blkg_from_css+0x83/0x240
+Read of size 8 at addr 0000000000000518 by task blkid/5885
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
+1.16.0-debian-1.16.0-5 04/01/2014
+Call Trace:
+  dump_stack_lvl+0x4a/0x80
+  print_report+0x21e/0x260
+  kasan_report+0xc2/0xf0
+  __asan_load8+0x69/0x90
+  bio_associate_blkg_from_css+0x83/0x240
+  bfq_bio_bfqg+0xce/0x120 [bfq]
+  bfq_bic_update_cgroup+0x2f/0x3c0 [bfq]
+  bfq_init_rq+0x1e8/0xb10 [bfq]
+  bfq_insert_request.isra.0+0xa3/0x420 [bfq]
+  bfq_insert_requests+0xca/0xf0 [bfq]
+  blk_mq_dispatch_rq_list+0x4c0/0xb00
+  __blk_mq_sched_dispatch_requests+0x15e/0x200
+  blk_mq_sched_dispatch_requests+0x8b/0xc0
+  __blk_mq_run_hw_queue+0x3ff/0x500
+  __blk_mq_delay_run_hw_queue+0x23a/0x300
+  blk_mq_run_hw_queue+0x14e/0x350
+  blk_mq_sched_insert_request+0x181/0x1f0
+  blk_execute_rq+0xf4/0x300
+  scsi_execute_cmd+0x23e/0x350
+  sr_do_ioctl+0x173/0x3d0 [sr_mod]
+  sr_packet+0x60/0x90 [sr_mod]
+  cdrom_get_track_info.constprop.0+0x125/0x170 [cdrom]
+  cdrom_get_last_written+0x1d4/0x2d0 [cdrom]
+  mmc_ioctl_cdrom_last_written+0x85/0x120 [cdrom]
+  mmc_ioctl+0x10b/0x1d0 [cdrom]
+  cdrom_ioctl+0xa66/0x1270 [cdrom]
+  sr_block_ioctl+0xee/0x130 [sr_mod]
+  blkdev_ioctl+0x1bb/0x3f0
+  __x64_sys_ioctl+0xc7/0xe0
+  do_syscall_64+0x34/0x80
+  entry_SYSCALL_64_after_hwframe+0x46/0xb0
 
-- Fix for a block size probing issue with ublk (Ming)
-
-- Fix for the bio based polling (Keith)
-
-- NVMe pull request via Christoph
-	- fix discard support without oncs (Keith Busch)
-
-- Partition scan error handling regression fix (Yu)
-
-Please pull!
-
-
-The following changes since commit 24ab70d83784a807c9ddff939ea762ef19bd4ffd:
-
-  Merge tag 'md-fixes-2023-03-29' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.3 (2023-03-30 20:29:47 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.3-2023-04-06
-
-for you to fetch changes up to 3723091ea1884d599cc8b8bf719d6f42e8d4d8b1:
-
-  block: don't set GD_NEED_PART_SCAN if scan partition failed (2023-04-06 20:41:53 -0600)
-
-----------------------------------------------------------------
-block-6.3-2023-04-06
-
-----------------------------------------------------------------
-Jens Axboe (2):
-      ublk: read any SQE values upfront
-      Merge tag 'nvme-6.3-2023-04-06' of git://git.infradead.org/nvme into block-6.3
-
-Keith Busch (2):
-      blk-mq: directly poll requests
-      nvme: fix discard support without oncs
-
-Ming Lei (1):
-      block: ublk: make sure that block size is set correctly
-
-Yu Kuai (1):
-      block: don't set GD_NEED_PART_SCAN if scan partition failed
-
- block/blk-mq.c           |  4 +---
- block/genhd.c            |  8 +++++++-
- drivers/block/ublk_drv.c | 26 +++++++++++++++++++++++---
- drivers/nvme/host/core.c |  6 +++---
- 4 files changed, 34 insertions(+), 10 deletions(-)
-
--- 
-Jens Axboe
-
+Bart.
