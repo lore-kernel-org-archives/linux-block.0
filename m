@@ -2,89 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB1AC761A6
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 00:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A35BBC76196
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 01:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232622AbjDGAhy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 20:37:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43756 "EHLO
+        id S230264AbjDGBBh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 21:01:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231171AbjDGAhy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 20:37:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE19A76AB
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 17:37:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8463E623F5
-        for <linux-block@vger.kernel.org>; Fri,  7 Apr 2023 00:37:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3CDFC433EF;
-        Fri,  7 Apr 2023 00:37:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1680827871;
-        bh=4Zt39+nffm2iZkHEjZsxZDriJikDO7SUrcfYvnGFZo8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=rALOiWovKbxOq6OZNbFJo8HkpIsnE322HFcy1wNT+FxGcq7wXtdExrqVaJMBJUlqJ
-         oSfaTSxC5G0E34LwkttZOslPsMSkShE2DpPiuP5sUozmVFKhGYq4/1CYC4NUzP7CkX
-         80dikFk/smlxVCqSbqEG8I7rElXNb4mgCD5veQeI=
-Date:   Thu, 6 Apr 2023 17:37:51 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
+        with ESMTP id S230151AbjDGBBf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 21:01:35 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7941E49CA
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 18:01:33 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6262956578bso69711b3a.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 18:01:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1680829293; x=1683421293;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xc1elUC0A6VPs2hEGtcnom0Oa7mWG0FGy+xTjiBZ0Uc=;
+        b=HVsqCunVHwnGJ4IGSm0JmCFnfkIvqzCFEehBxpfDrnCJBGZlvSFLHFcL4rg1qdg9NQ
+         sd6YbkeQnacdCw6BGDiGU1pABYtc4YtGvOy15TSdQ42XXyJhhNrTunBDIH1F0qy0YIyN
+         jX4rhj7joL2Tx6zWc4eOK/KBSIF7NL9YDFe9A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680829293; x=1683421293;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xc1elUC0A6VPs2hEGtcnom0Oa7mWG0FGy+xTjiBZ0Uc=;
+        b=ObgtWEZluaT9yQupilYC8oK5UIq6ueT1jHABFwE4Ciq4bwm5BtGIlPLpunJa+aTclz
+         TaD/9yoqodbkookkaMjhZ9kyZb7qP3uyoM+TxkphOFKqg9foyBsTiJnd4e08dLaDGhoR
+         gAn9zR+bLmUFzpRB39u0Fm3HZQKHy3/vtxuv1wba/1pyPrzodEA6RPVCD+lK3LIQQ5Lx
+         kW5OtGteqNX67XKD/nR5/w/SBpvbXUMhT2t/gbl/ec7Vn8AMNgPoI8raLnJ2Y+hyTQum
+         hh+Rn9TsXlfbv/7b/z2+r6hFQWszLhpI3YgozHnqUD2FR+5hsHazjSNrsMC3NEUj8ay0
+         OeQQ==
+X-Gm-Message-State: AAQBX9cUqImIfUwGr9TPwe5L4RCxLnmDtHuBjkbYvvpVznRNy/hzeq4S
+        cnLg0a6CsVfZxYMi9HuYckJHrcRA3hKagx7xcU8=
+X-Google-Smtp-Source: AKy350YqUMYxLWmNR1hIG4mQS/jRIh8BW3K6uwgHy85Qpb0J26ixIai43YiZUZ08K9cs4N01EWF4ww==
+X-Received: by 2002:a62:1911:0:b0:625:1487:f06c with SMTP id 17-20020a621911000000b006251487f06cmr665754pfz.29.1680829292905;
+        Thu, 06 Apr 2023 18:01:32 -0700 (PDT)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id k3-20020aa78203000000b00625c96db7desm1895131pfi.198.2023.04.06.18.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 18:01:32 -0700 (PDT)
+Date:   Fri, 7 Apr 2023 10:01:28 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 15/16] zram: fix synchronous reads
-Message-Id: <20230406173751.b96145c698e382ff2f1b1e08@linux-foundation.org>
-In-Reply-To: <ZC9il6lWSKEZxDUr@google.com>
+Subject: Re: [PATCH 05/16] zram: return early on error in zram_bvec_rw
+Message-ID: <20230407010128.GW12892@google.com>
 References: <20230406144102.149231-1-hch@lst.de>
-        <20230406144102.149231-16-hch@lst.de>
-        <ZC9CIsMcwCjYvbXX@google.com>
-        <20230406155810.abc9a2b5c72f43f03a5d5800@linux-foundation.org>
-        <ZC9il6lWSKEZxDUr@google.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ <20230406144102.149231-6-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230406144102.149231-6-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 6 Apr 2023 17:23:51 -0700 Minchan Kim <minchan@kernel.org> wrote:
+On (23/04/06 16:40), Christoph Hellwig wrote:
+> 
+> When the low-level access fails, don't clear the idle flag or clear
+> the caches, and just return.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-> > Someone may develop such a use case in the future.  And backporting
-> > this fix will be difficult, unless people backport all the other
-> > patches, which is also difficult.
-> 
-> I think the simple fix is just bail out for partial IO case from
-> rw_page path so that bio comes next to serve the rw_page failure.
-> In the case, zram will always do chained bio so we are fine with
-> asynchronous IO.
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index b8549c61ff2c..23fa0e03cdc1 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1264,6 +1264,8 @@ static int __zram_bvec_read(struct zram *zram, struct page *page, u32 index,
->                 struct bio_vec bvec;
-> 
->                 zram_slot_unlock(zram, index);
-> +               if (partial_io)
-> +                       return -EAGAIN;
-> 
->                 bvec.bv_page = page;
->                 bvec.bv_len = PAGE_SIZE;
-> 
-> > 
-> > What are the user-visible effects of this bug?  It sounds like it will
-> > give userspace access to unintialized kernel memory, which isn't good.
-> 
-> It's true.
-> 
-> Without better suggestion or objections, I could cook the stable patch.
-
-Sounds good to me.  Please don't forget to describe the user-visible
-effects and the situation under which they will be observed, etc.
-
-Then I can redo Chritoph's patches on top, so we end up with this
-series as-is going forward.
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
