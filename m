@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F18C6FD1D
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 19:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0466CC6FD1D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 19:18:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230269AbjDGTRP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Apr 2023 15:17:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44478 "EHLO
+        id S230336AbjDGTSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Apr 2023 15:18:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbjDGTRO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 15:17:14 -0400
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268CDC15D
-        for <linux-block@vger.kernel.org>; Fri,  7 Apr 2023 12:17:07 -0700 (PDT)
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 337Gh7M0013448
-        for <linux-block@vger.kernel.org>; Fri, 7 Apr 2023 12:17:06 -0700
+        with ESMTP id S229586AbjDGTSF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 15:18:05 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F0A93E3
+        for <linux-block@vger.kernel.org>; Fri,  7 Apr 2023 12:18:04 -0700 (PDT)
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+        by m0089730.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 337GiLuu028093
+        for <linux-block@vger.kernel.org>; Fri, 7 Apr 2023 12:18:03 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=jnhpZENk/xcLV2g88wDxXsdXF0VZ73uIc8pUlWQlfgk=;
- b=FipN7gqaWccdnx0Ru8b6j0swgGQA6exOU3PegXSroFE5AIzPrh3BiteE1OneqUGGZs3R
- C0/LdfVHOJ6RAUUayQDWreJCdxULESHP4zAqdLPlj5WTfD2Kaj9NvAcj3i/lQ6pvoZIV
- o1IIQWpP3KpOpG57gF5F2E7pEScY0pDFYZfgowrDraG9zdMaVDU4jG76SI2XSOlZCDtl
- sxKXZjeKXFvq7TxcFmwW/DGgh4OlgHvnoMweMuUeSxBnbnJWF76X+k96O/Im/+Vxuf/H
- 9/i0hLT+sp5C5EOY//GYLtn2yu0YnPLG6CvOiAFVc4uVnPq0ArTTZ+njm60ZitcdrVjS jw== 
+ bh=OUahnU2vQF7v2u8mdfu+tv4js0n8ogHNDJ3QjG1WFzs=;
+ b=M09D4pjBtkENGGsAcvpvv5MsN+ic1NkADHSeasf5TJsmgU64TGEq10veYT5dnaIOWddh
+ sxTrhwYhr3icf3iGxRecM6j/xfIy+htS/zIIGurWplAvqMtobpyAQ0EHTohX7kdXnmUn
+ VtJl0IAi+Bnd7cjKuGEyURoAFibYz3oG3bBdGCG5a7uAZpzHFsyYUHq/QRCKWXdaMad4
+ s9r3gvg+cKTXGE3pGIi2mOWfwt/S+IFPqDtkoKaLGF2M35acRdskWJ9lE0XZPbR0UV/L
+ ZmvbbgQ3FaLj8VikP+IY6C+cxhCBYpbGaY6xHAPrG8fGjwedxPaN84wQH2GspF3Dk+C2 pA== 
 Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ptg0a3d87-11
+        by m0089730.ppops.net (PPS) with ESMTPS id 3pt9yhn2jf-3
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 07 Apr 2023 12:17:06 -0700
-Received: from twshared0333.05.ash8.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c085:21d::6) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Fri, 07 Apr 2023 12:18:03 -0700
+Received: from twshared15216.17.frc2.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:11d::7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Fri, 7 Apr 2023 12:17:00 -0700
+ 15.1.2507.17; Fri, 7 Apr 2023 12:17:02 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 2FEA8157B5F85; Fri,  7 Apr 2023 12:16:47 -0700 (PDT)
+        id CC8D1157B5F8C; Fri,  7 Apr 2023 12:16:48 -0700 (PDT)
 From:   Keith Busch <kbusch@meta.com>
 To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
         <io-uring@vger.kernel.org>, <axboe@kernel.dk>, <hch@lst.de>
 CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
         Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 3/5] nvme: unify nvme request end_io
-Date:   Fri, 7 Apr 2023 12:16:34 -0700
-Message-ID: <20230407191636.2631046-4-kbusch@meta.com>
+Subject: [PATCHv2 5/5] io_uring: remove uring_cmd cookie
+Date:   Fri, 7 Apr 2023 12:16:36 -0700
+Message-ID: <20230407191636.2631046-6-kbusch@meta.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230407191636.2631046-1-kbusch@meta.com>
 References: <20230407191636.2631046-1-kbusch@meta.com>
@@ -51,8 +51,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: oiYhHrjHBxQybv88V6sJDLiR2EdyLKz6
-X-Proofpoint-ORIG-GUID: oiYhHrjHBxQybv88V6sJDLiR2EdyLKz6
+X-Proofpoint-GUID: M05Tv07pzD3XKl1E7dBtKeUBw_f8RVeQ
+X-Proofpoint-ORIG-GUID: M05Tv07pzD3XKl1E7dBtKeUBw_f8RVeQ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
  definitions=2023-04-07_12,2023-04-06_03,2023-02-09_01
@@ -62,114 +62,46 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-We can finish the metadata copy inline with the completion. After that,
-there's really nothing else different between the meta and non-meta data
-end_io callbacks, so unify them.
+No users of this field anymore, so remove it.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/nvme/host/ioctl.c | 57 +++++++--------------------------------
- 1 file changed, 9 insertions(+), 48 deletions(-)
+ include/linux/io_uring.h | 8 ++------
+ io_uring/uring_cmd.c     | 1 -
+ 2 files changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index 278c57ee0db91..a1e0a14dadedc 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -465,29 +465,6 @@ static inline struct nvme_uring_cmd_pdu *nvme_uring_=
-cmd_pdu(
- 	return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
- }
-=20
--static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd,
--				    unsigned issue_flags)
--{
--	struct nvme_uring_cmd_pdu *pdu =3D nvme_uring_cmd_pdu(ioucmd);
--	struct request *req =3D pdu->req;
--	int status;
--	u64 result;
--
--	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
--		status =3D -EINTR;
--	else
--		status =3D nvme_req(req)->status;
--
--	result =3D le64_to_cpu(nvme_req(req)->result.u64);
--
--	if (pdu->meta_len)
--		status =3D nvme_finish_user_metadata(req, pdu->u.meta_buffer,
--					pdu->u.meta, pdu->meta_len, status);
--	blk_mq_free_request(req);
--
--	io_uring_cmd_done(ioucmd, status, result, issue_flags);
--}
--
- static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd,
- 			       unsigned issue_flags)
- {
-@@ -502,11 +479,16 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(str=
-uct request *req,
- 	struct io_uring_cmd *ioucmd =3D req->end_io_data;
- 	struct nvme_uring_cmd_pdu *pdu =3D nvme_uring_cmd_pdu(ioucmd);
- 	void *cookie =3D READ_ONCE(ioucmd->cookie);
-+	int status =3D nvme_req(req)->status;
-=20
- 	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
--		pdu->nvme_status =3D -EINTR;
--	else
--		pdu->nvme_status =3D nvme_req(req)->status;
-+		status =3D -EINTR;
-+
-+	if (pdu->meta_len)
-+		status =3D nvme_finish_user_metadata(req, pdu->u.meta_buffer,
-+					pdu->u.meta, pdu->meta_len, status);
-+
-+	pdu->nvme_status =3D status;
- 	pdu->u.result =3D le64_to_cpu(nvme_req(req)->result.u64);
-=20
- 	/*
-@@ -521,25 +503,6 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(stru=
-ct request *req,
- 	return RQ_END_IO_FREE;
- }
-=20
--static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req=
-,
--						     blk_status_t err)
--{
--	struct io_uring_cmd *ioucmd =3D req->end_io_data;
--	struct nvme_uring_cmd_pdu *pdu =3D nvme_uring_cmd_pdu(ioucmd);
--	void *cookie =3D READ_ONCE(ioucmd->cookie);
--
--	/*
--	 * For iopoll, complete it directly.
--	 * Otherwise, move the completion to task work.
--	 */
--	if (cookie !=3D NULL && blk_rq_is_poll(req))
--		nvme_uring_task_meta_cb(ioucmd, IO_URING_F_UNLOCKED);
--	else
--		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
--
--	return RQ_END_IO_NONE;
--}
--
- static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 		struct io_uring_cmd *ioucmd, unsigned int issue_flags, bool vec)
- {
-@@ -620,12 +583,10 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl=
-, struct nvme_ns *ns,
- 	pdu->req =3D req;
- 	pdu->meta_len =3D d.metadata_len;
- 	req->end_io_data =3D ioucmd;
-+	req->end_io =3D nvme_uring_cmd_end_io;
- 	if (pdu->meta_len) {
- 		pdu->u.meta =3D meta;
- 		pdu->u.meta_buffer =3D nvme_to_user_ptr(d.metadata);
--		req->end_io =3D nvme_uring_cmd_end_io_meta;
--	} else {
--		req->end_io =3D nvme_uring_cmd_end_io;
+diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+index 35b9328ca3352..235307bf6a072 100644
+--- a/include/linux/io_uring.h
++++ b/include/linux/io_uring.h
+@@ -25,12 +25,8 @@ enum io_uring_cmd_flags {
+ struct io_uring_cmd {
+ 	struct file	*file;
+ 	const void	*cmd;
+-	union {
+-		/* callback to defer completions to task context */
+-		void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
+-		/* used for polled completion */
+-		void *cookie;
+-	};
++	/* callback to defer completions to task context */
++	void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
+ 	u32		cmd_op;
+ 	u32		flags;
+ 	u8		pdu[32]; /* available inline for free use */
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index f7a96bc76ea13..94586f691984c 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -127,7 +127,6 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int i=
+ssue_flags)
+ 			return -EOPNOTSUPP;
+ 		issue_flags |=3D IO_URING_F_IOPOLL;
+ 		req->iopoll_completed =3D 0;
+-		WRITE_ONCE(ioucmd->cookie, NULL);
  	}
- 	blk_execute_rq_nowait(req, false);
- 	return -EIOCBQUEUED;
+=20
+ 	ret =3D file->f_op->uring_cmd(ioucmd, issue_flags);
 --=20
 2.34.1
 
