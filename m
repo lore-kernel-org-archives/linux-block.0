@@ -2,87 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE132C76196
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 18:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1413C6FD1D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 19:17:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbjDGSo5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Apr 2023 14:44:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55320 "EHLO
+        id S230285AbjDGTRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Apr 2023 15:17:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230048AbjDGSo4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 14:44:56 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53BE1B75B
-        for <linux-block@vger.kernel.org>; Fri,  7 Apr 2023 11:44:55 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id 98e67ed59e1d1-2465835cf6fso28634a91.1
-        for <linux-block@vger.kernel.org>; Fri, 07 Apr 2023 11:44:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680893095; x=1683485095;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Kzuwp9uE5sEsN7zJHJeiz67QAe8Oc4s0UD0YCNSdM5U=;
-        b=O3+MoV6cDmmkPk7W8AJ/froinsO6LnGDj+Z5hsCYMGsWXJkNFNjt/nsjhnZg8+4tI0
-         QIrEe1yOg43xQeckg1TGUnwXZa1/PnaY1t00UhDiWa2jXuLWvjMXFEgXly1N1Yt7aE6V
-         jf8xC6fLILmQ374PFSo9Kn02mz10UvYv67tQrJMg+nXNykneGweIkXs6t3v7qLeY3kjX
-         ILL22YyeQZft7KFN/VKBwR+h326O/A3Pr5c3Fjb0XJVRtQXMKvlvS5/2PBKuhFNg/RsT
-         wi1sm10f2dlsbhbFwvZYnDisSUWfifJO1EY/WMx7nLmjkthQbgK1MmDA6byqNJB7BhcA
-         YZVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680893095; x=1683485095;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kzuwp9uE5sEsN7zJHJeiz67QAe8Oc4s0UD0YCNSdM5U=;
-        b=xyoLx7QquoZ1H9Et2SX0Hwgi1v+NnTUtCQrbENLsE7251rAbrVxhHc2aVyMAg/1qfv
-         ceer+MLa2JdA8RfDVtpEfXo70R9+j0Nef1GejpfFm7cvWxVIPPm31RyS442IF17bt/dY
-         vHxOY5bNgPqx3qS3KL+4M9hvCz2JLBZsFSzH5+cKEX17HJspJd35rxRz7d7X2EIKI8DI
-         KhxTDrkIxN6CdiTkPyuRzouJv4Ct2LAmLjGVJWDS/Ryw7sSB56gGuMQo9GtQel836Uxe
-         qknouTYt0stkgb3UN4Xr01LBWQobg9RuuQ/Z5jLCtXYFc1FjBfmod13rWjsqnFui7syz
-         VwMA==
-X-Gm-Message-State: AAQBX9eqri97icGp2yck1khIA62LPSOJMNinuiszTefNz4pr2RJVnGDn
-        6D/z+C+yOa6hzZGm1j3+htEYImwXjO5yBjM1yRs=
-X-Google-Smtp-Source: AKy350bwH8Ljb3Bjuavft3K3wZtMIN9MYDZhfXWWkH7inyw2OO+U4jkptlydYjV02OqHE2017JEwIA==
-X-Received: by 2002:a05:6a00:414a:b0:627:fe88:a2e with SMTP id bv10-20020a056a00414a00b00627fe880a2emr3687157pfb.0.1680893094614;
-        Fri, 07 Apr 2023 11:44:54 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id r20-20020a62e414000000b0058d92d6e4ddsm3381979pfh.5.2023.04.07.11.44.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Apr 2023 11:44:54 -0700 (PDT)
-Message-ID: <1416b648-188f-873a-08b3-c8e8494ab1a7@kernel.dk>
-Date:   Fri, 7 Apr 2023 12:44:52 -0600
+        with ESMTP id S230241AbjDGTRE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 15:17:04 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF65BDD5
+        for <linux-block@vger.kernel.org>; Fri,  7 Apr 2023 12:16:58 -0700 (PDT)
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+        by m0089730.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 337GiLtg028095
+        for <linux-block@vger.kernel.org>; Fri, 7 Apr 2023 12:16:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=nWvxQ8Ox9CeKkhvc5Inedpz7NyvfDoB9E9p0Y0nxkTc=;
+ b=OMxWj1dCoTMrTXODRy05JY3uVMH1f8FGOsGMWChfKTeP674FLF3qMplOvrrVRf/YG5dD
+ 6jBrN/oJ5cQbWNI5XRvWDhWnwN2zk8jxOuWjsBbBwwpS20Bg21Hj0Ra+OYT9a1sHlVqo
+ lmJ6jePSfIMh4SP6VGO3AUfO2ZXEH7ydjadfz6ILE6kYdFS1R5noL1pWuq6+3ibHZfAf
+ vtjNtNyDvBEgcoLjD2HrbMevlVmY/nRTbEAQ8dFCMXzZuz72DzR/siQQXR8PdCNU1Ajw
+ sw2nTsWiIirzB5mNe4DGkvthMnP9te+hX+TuUnGQsSF0Air7wkTa99/f8SP+3ajj+1tu aQ== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by m0089730.ppops.net (PPS) with ESMTPS id 3pt9yhn2aj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Fri, 07 Apr 2023 12:16:57 -0700
+Received: from twshared21760.39.frc1.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c085:21d::4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Fri, 7 Apr 2023 12:16:56 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 66855157B5F7D; Fri,  7 Apr 2023 12:16:47 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <io-uring@vger.kernel.org>, <axboe@kernel.dk>, <hch@lst.de>
+CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 0/5] nvme io_uring_cmd polling enhancements
+Date:   Fri, 7 Apr 2023 12:16:31 -0700
+Message-ID: <20230407191636.2631046-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v2 0/3] blk-cgroup: some cleanup
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Chengming Zhou <zhouchengming@bytedance.com>, tj@kernel.org
-Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230406145050.49914-1-zhouchengming@bytedance.com>
- <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: k5Xz2lroDg-hM621AlWrXfhHvfxKk6QU
+X-Proofpoint-ORIG-GUID: k5Xz2lroDg-hM621AlWrXfhHvfxKk6QU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-07_12,2023-04-06_03,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/7/23 12:41 PM, Bart Van Assche wrote:
-> On 4/6/23 07:50, Chengming Zhou wrote:
->> These are some cleanup patches of blk-cgroup. Thanks for review.
-> 
-> With these patches applied, my kernel test VM crashes during boot. The following crash disappears if I revert these patches:
-> 
-> BUG: KASAN: null-ptr-deref in bio_associate_blkg_from_css+0x83/0x240
+From: Keith Busch <kbusch@kernel.org>
 
-Would be useful in the report to know where that is, as it doesn't include
-the code output.
+Similar idea as the original v1, but even better.
 
--- 
-Jens Axboe
+This series originally aimed at improve polling without payloads, and
+fix a potential bug when polling multipath. This ended up significantly
+simplifying the nvme uring_cmd handling in the process.
 
+In order to ensure we're polling the correct thing, we need the original
+request, but we can't depend on the "cookie" since the field has
+multi-purpose. But we have a free spot for the request in the driver's
+"pdu", so the driver just needs to detangle the "bio" occupying the same
+spot.
+
+Keith Busch (5):
+  block: add request polling helper
+  nvme: simplify passthrough bio cleanup
+  nvme: unify nvme request end_io
+  nvme: use blk-mq polling for uring commands
+  io_uring: remove uring_cmd cookie
+
+ block/blk-mq.c                |  18 +++++
+ drivers/nvme/host/ioctl.c     | 137 ++++++----------------------------
+ drivers/nvme/host/multipath.c |   2 +-
+ drivers/nvme/host/nvme.h      |   2 -
+ include/linux/blk-mq.h        |   2 +
+ include/linux/io_uring.h      |   8 +-
+ io_uring/uring_cmd.c          |   1 -
+ 7 files changed, 47 insertions(+), 123 deletions(-)
+
+--=20
+2.34.1
 
