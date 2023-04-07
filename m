@@ -2,94 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A3FC6FD1D
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 19:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50122C77B74
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 20:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229842AbjDGTpx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Apr 2023 15:45:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41132 "EHLO
+        id S229720AbjDGUGU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Apr 2023 16:06:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjDGTpw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 15:45:52 -0400
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875079028;
-        Fri,  7 Apr 2023 12:45:50 -0700 (PDT)
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1a51d304648so498825ad.3;
-        Fri, 07 Apr 2023 12:45:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680896750; x=1683488750;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CWghzBfKuQahtLumYRFLf1CL+ff9yd1SjNGPejMxZk8=;
-        b=rkYhPdfx26R6YooQeIUmRf+PnwngkGGje8A2PlgFRnFYtlT8QHJ9SW0bgiaj1wcsCw
-         fRCxCkKkJ1WbmfyibzsUX4DpcrWHwT4SIUlkEfVtOZYTCRbtG9RmIkelN2C+rCHSG5zd
-         qMUhjClmIWzSAslaS8qBR3k8mEw8/m2uX4i6+kLX0z2nWQ7VH3v3l2YEhh5YOJNtY5Cy
-         mUasTz1GLrOvLl83lUpIEZQG7jfuW0KNvKK/i8zDBWqSY9q3J9OlgFaI87tR+7Tc3D4W
-         C0rA/kGZWxEv/pJCZEIvO+hkjQsPGwJqUMV1LkBtS4bpBNmClIfrT6M16N75hv5wvIJM
-         vpOA==
-X-Gm-Message-State: AAQBX9eD9B6IBKsv/sws+/VM2+xsgtO8hUiLAqwiHNyHVcDhgGrVi41+
-        7rPGx3mAZvo1KDFaDKglSL0YjOEvXoQ=
-X-Google-Smtp-Source: AKy350Zvf+ZYs9X20b1qMpn53sbWEJeeG8LMZ6lU+gEvqgWHqGO3zOmD3Xp5o3DiTs1Lha5jhvsRAg==
-X-Received: by 2002:aa7:8bd1:0:b0:62a:9d6f:98dc with SMTP id s17-20020aa78bd1000000b0062a9d6f98dcmr3444446pfd.11.1680896749761;
-        Fri, 07 Apr 2023 12:45:49 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:f2c:4ac2:6000:5900? ([2620:15c:211:201:f2c:4ac2:6000:5900])
-        by smtp.gmail.com with ESMTPSA id f27-20020a631f1b000000b0051322ab5ccdsm3001289pgf.28.2023.04.07.12.45.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Apr 2023 12:45:49 -0700 (PDT)
-Message-ID: <63cf4e4f-764b-8634-b29f-30d45bed1ca5@acm.org>
-Date:   Fri, 7 Apr 2023 12:45:47 -0700
+        with ESMTP id S229436AbjDGUGT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 16:06:19 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD76155AA;
+        Fri,  7 Apr 2023 13:06:18 -0700 (PDT)
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 337FwobR017328;
+        Fri, 7 Apr 2023 20:05:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : subject :
+ date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2022-7-12; bh=SJkqXoQLLyTNQe4VizlrD0rXpuK5h0M4gUBGLc5iBhc=;
+ b=q1NpzSyicelZz/EJcjAv9KLV9wPgT9RciIMrqB5hUursj4cRgyB5AtNzBQQIGMOjw0qD
+ g+xIhPGqsrssM5xjtvtCnG20DxXdmClEO4MASIDmPieBxPyluHV037zmNxGBukqLDbOU
+ SflEujEYMJleRTTCR8VWL2S4mXnH9pjrF56+0Mj0yLewUoSRJ42Qq+gipmqoWQYrnHnu
+ PqDSEPWluknceZGqv5Nr/+h5X97VJjtRmUdqArcwd123oGOnZ3MS7ifKcOaOUfR0Ae1G
+ ZizVT8h6tzzvy6Bh5PaTGfCbyR6WmwSkzrvQvPSuCDWO2tda7JvS+9O1an1XYvRrif4C Bw== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ppcnd5wu4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 Apr 2023 20:05:56 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 337J0UK9034219;
+        Fri, 7 Apr 2023 20:05:55 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3pptjxeec5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 Apr 2023 20:05:55 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 337K5tqq010228;
+        Fri, 7 Apr 2023 20:05:55 GMT
+Received: from mnchrist-mac.us.oracle.com (dhcp-10-154-128-1.vpn.oracle.com [10.154.128.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3pptjxeeam-1;
+        Fri, 07 Apr 2023 20:05:54 +0000
+From:   Mike Christie <michael.christie@oracle.com>
+To:     bvanassche@acm.org, hch@lst.de, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, james.bottomley@hansenpartnership.com,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        snitzer@kernel.org, axboe@kernel.dk,
+        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
+        kbusch@kernel.org, target-devel@vger.kernel.org
+Subject: [PATCH v6 00/18] Use block pr_ops in LIO
+Date:   Fri,  7 Apr 2023 15:05:33 -0500
+Message-Id: <20230407200551.12660-1-michael.christie@oracle.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v2 0/3] blk-cgroup: some cleanup
-To:     Jens Axboe <axboe@kernel.dk>,
-        Chengming Zhou <zhouchengming@bytedance.com>, tj@kernel.org
-Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230406145050.49914-1-zhouchengming@bytedance.com>
- <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
- <1416b648-188f-873a-08b3-c8e8494ab1a7@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <1416b648-188f-873a-08b3-c8e8494ab1a7@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-07_12,2023-04-06_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
+ phishscore=0 bulkscore=0 mlxscore=0 suspectscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304070180
+X-Proofpoint-GUID: iHg0PBtxfmh4W4-XsTYDZ3rbexyC2Cq0
+X-Proofpoint-ORIG-GUID: iHg0PBtxfmh4W4-XsTYDZ3rbexyC2Cq0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/7/23 11:44, Jens Axboe wrote:
-> On 4/7/23 12:41 PM, Bart Van Assche wrote:
->> On 4/6/23 07:50, Chengming Zhou wrote:
->>> These are some cleanup patches of blk-cgroup. Thanks for review.
->>
->> With these patches applied, my kernel test VM crashes during boot. The following crash disappears if I revert these patches:
->>
->> BUG: KASAN: null-ptr-deref in bio_associate_blkg_from_css+0x83/0x240
-> 
-> Would be useful in the report to know where that is, as it doesn't include
-> the code output.
+The patches in this thread allow us to use the block pr_ops with LIO's
+target_core_iblock module to support cluster applications in VMs. They
+were built over Linus's tree. They also apply over linux-next and
+Martin's tree and Jens's trees.
 
-Hi Jens,
+Currently, to use windows clustering or linux clustering (pacemaker +
+cluster labs scsi fence agents) in VMs with LIO and vhost-scsi, you have
+to use tcmu or pscsi or use a cluster aware FS/framework for the LIO pr
+file. Setting up a cluster FS/framework is pain and waste when your real
+backend device is already a distributed device, and pscsi and tcmu are
+nice for specific use cases, but iblock gives you the best performance and
+allows you to use stacked devices like dm-multipath. So these patches
+allow iblock to work like pscsi/tcmu where they can pass a PR command to
+the backend module. And then iblock will use the pr_ops to pass the PR
+command to the real devices similar to what we do for unmap today.
 
-This is what gdb tells me about the crash address:
+The patches are separated in the following groups:
+Patch 1 - 2:
+- Add block layer callouts for reading reservations and rename reservation
+  error code.
+Patch 3 - 5:
+- SCSI support for new callouts.
+Patch 6:
+- DM support for new callouts.
+Patch 7 - 13:
+- NVMe support for new callouts.
+Patch 14 - 18:
+- LIO support for new callouts.
 
-$ gdb vmlinux
-(gdb) list *(bio_associate_blkg_from_css+0x83)
-0xffffffff81856923 is in bio_associate_blkg_from_css (./include/linux/blkdev.h:865).
-860     int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
-861                             unsigned int flags);
-862
-863     static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
-864     {
-865             return bdev->bd_queue;  /* this is never NULL */
-866     }
-867
-868     /* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */
-869     const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);
+This patchset has been tested with the libiscsi PGR ops and with window's
+failover cluster verification test. Note that for scsi backend devices we
+need this patchset:
 
-Thanks,
+https://lore.kernel.org/linux-scsi/20230123221046.125483-1-michael.christie@oracle.com/T/#m4834a643ffb5bac2529d65d40906d3cfbdd9b1b7
 
-Bart.
+to handle UAs. To reduce the size of this patchset that's being done
+separately to make reviewing easier. And to make merging easier this
+patchset and the one above do not have any conflicts so can be merged
+in different trees.
+
+v6:
+- Drop dm use comment.
+- Move scsi pr type conversion code to scsi_common.c/.h.
+- Fix le NVME_EXTENDED_DATA_STRUCT use.
+- Fix sparse warnings like sense_reason_t use.
+
+v5:
+- Use []/struct_size with nvme reservation structs
+- Add Keith's copywrite to pr.c
+- Drop else in nvme_send_pr_command
+- Fix PR_EXCLUSIVE_ACCESS_ALL_REGS use in block_pr_type_from_nvme
+
+v4:
+- Pass read_keys number of keys instead of array len
+- Keep the switch use when converting between block and scsi/nvme PR
+types. Drop default case so compiler spits out warning if in the future
+a new value is added.
+- Add helper for handling
+nvme_send_ns_head_pr_command/nvme_send_ns_pr_command
+- Use void * instead of u8* for passing data buffer.
+- Rename status variable to rs.
+- Have caller init buffer/structs instead of nvme/scsi callouts.
+- Drop blk_status to err code.
+
+v3:
+- Fix patch subject formatting.
+- Fix coding style.
+- Rearrange patches so helpers are added with users to avoid compilation
+errors.
+- Move pr type conversion to array and add nvme_pr_type.
+- Add Extended Data Structure control flag enum and use in code for checks.
+- Move nvme pr code to new file.
+- Add more info to patch subjects about why we need to add blk_status
+to pr_ops.
+- Use generic SCSI passthrough error handling interface.
+- Fix checkpatch --strict errors. Note that I kept the existing coding
+style that it complained about because it looked like it was the preferred
+style for the code and I didn't want a mix and match.
+
+v2:
+- Drop BLK_STS_NEXUS rename changes. Will do separately.
+- Add NVMe support.
+- Fixed bug in target_core_iblock where a variable was not initialized
+mentioned by Christoph.
+- Fixed sd pr_ops UA handling issue found when running libiscsi PGR tests.
+- Added patches to allow pr_ops to pass up a BLK_STS so we could return
+a RESERVATION_CONFLICT status when a pr_ops callout fails.
+
+
