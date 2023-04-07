@@ -2,106 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0466CC6FD1D
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 19:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A3FC6FD1D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 19:45:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230336AbjDGTSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Apr 2023 15:18:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45584 "EHLO
+        id S229842AbjDGTpx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Apr 2023 15:45:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbjDGTSF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 15:18:05 -0400
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F0A93E3
-        for <linux-block@vger.kernel.org>; Fri,  7 Apr 2023 12:18:04 -0700 (PDT)
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-        by m0089730.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 337GiLuu028093
-        for <linux-block@vger.kernel.org>; Fri, 7 Apr 2023 12:18:03 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=OUahnU2vQF7v2u8mdfu+tv4js0n8ogHNDJ3QjG1WFzs=;
- b=M09D4pjBtkENGGsAcvpvv5MsN+ic1NkADHSeasf5TJsmgU64TGEq10veYT5dnaIOWddh
- sxTrhwYhr3icf3iGxRecM6j/xfIy+htS/zIIGurWplAvqMtobpyAQ0EHTohX7kdXnmUn
- VtJl0IAi+Bnd7cjKuGEyURoAFibYz3oG3bBdGCG5a7uAZpzHFsyYUHq/QRCKWXdaMad4
- s9r3gvg+cKTXGE3pGIi2mOWfwt/S+IFPqDtkoKaLGF2M35acRdskWJ9lE0XZPbR0UV/L
- ZmvbbgQ3FaLj8VikP+IY6C+cxhCBYpbGaY6xHAPrG8fGjwedxPaN84wQH2GspF3Dk+C2 pA== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by m0089730.ppops.net (PPS) with ESMTPS id 3pt9yhn2jf-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 07 Apr 2023 12:18:03 -0700
-Received: from twshared15216.17.frc2.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c085:11d::7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Fri, 7 Apr 2023 12:17:02 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id CC8D1157B5F8C; Fri,  7 Apr 2023 12:16:48 -0700 (PDT)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <io-uring@vger.kernel.org>, <axboe@kernel.dk>, <hch@lst.de>
-CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 5/5] io_uring: remove uring_cmd cookie
-Date:   Fri, 7 Apr 2023 12:16:36 -0700
-Message-ID: <20230407191636.2631046-6-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230407191636.2631046-1-kbusch@meta.com>
-References: <20230407191636.2631046-1-kbusch@meta.com>
+        with ESMTP id S229523AbjDGTpw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Apr 2023 15:45:52 -0400
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875079028;
+        Fri,  7 Apr 2023 12:45:50 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1a51d304648so498825ad.3;
+        Fri, 07 Apr 2023 12:45:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680896750; x=1683488750;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CWghzBfKuQahtLumYRFLf1CL+ff9yd1SjNGPejMxZk8=;
+        b=rkYhPdfx26R6YooQeIUmRf+PnwngkGGje8A2PlgFRnFYtlT8QHJ9SW0bgiaj1wcsCw
+         fRCxCkKkJ1WbmfyibzsUX4DpcrWHwT4SIUlkEfVtOZYTCRbtG9RmIkelN2C+rCHSG5zd
+         qMUhjClmIWzSAslaS8qBR3k8mEw8/m2uX4i6+kLX0z2nWQ7VH3v3l2YEhh5YOJNtY5Cy
+         mUasTz1GLrOvLl83lUpIEZQG7jfuW0KNvKK/i8zDBWqSY9q3J9OlgFaI87tR+7Tc3D4W
+         C0rA/kGZWxEv/pJCZEIvO+hkjQsPGwJqUMV1LkBtS4bpBNmClIfrT6M16N75hv5wvIJM
+         vpOA==
+X-Gm-Message-State: AAQBX9eD9B6IBKsv/sws+/VM2+xsgtO8hUiLAqwiHNyHVcDhgGrVi41+
+        7rPGx3mAZvo1KDFaDKglSL0YjOEvXoQ=
+X-Google-Smtp-Source: AKy350Zvf+ZYs9X20b1qMpn53sbWEJeeG8LMZ6lU+gEvqgWHqGO3zOmD3Xp5o3DiTs1Lha5jhvsRAg==
+X-Received: by 2002:aa7:8bd1:0:b0:62a:9d6f:98dc with SMTP id s17-20020aa78bd1000000b0062a9d6f98dcmr3444446pfd.11.1680896749761;
+        Fri, 07 Apr 2023 12:45:49 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:f2c:4ac2:6000:5900? ([2620:15c:211:201:f2c:4ac2:6000:5900])
+        by smtp.gmail.com with ESMTPSA id f27-20020a631f1b000000b0051322ab5ccdsm3001289pgf.28.2023.04.07.12.45.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Apr 2023 12:45:49 -0700 (PDT)
+Message-ID: <63cf4e4f-764b-8634-b29f-30d45bed1ca5@acm.org>
+Date:   Fri, 7 Apr 2023 12:45:47 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: M05Tv07pzD3XKl1E7dBtKeUBw_f8RVeQ
-X-Proofpoint-ORIG-GUID: M05Tv07pzD3XKl1E7dBtKeUBw_f8RVeQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-07_12,2023-04-06_03,2023-02-09_01
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v2 0/3] blk-cgroup: some cleanup
+To:     Jens Axboe <axboe@kernel.dk>,
+        Chengming Zhou <zhouchengming@bytedance.com>, tj@kernel.org
+Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230406145050.49914-1-zhouchengming@bytedance.com>
+ <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
+ <1416b648-188f-873a-08b3-c8e8494ab1a7@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <1416b648-188f-873a-08b3-c8e8494ab1a7@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On 4/7/23 11:44, Jens Axboe wrote:
+> On 4/7/23 12:41 PM, Bart Van Assche wrote:
+>> On 4/6/23 07:50, Chengming Zhou wrote:
+>>> These are some cleanup patches of blk-cgroup. Thanks for review.
+>>
+>> With these patches applied, my kernel test VM crashes during boot. The following crash disappears if I revert these patches:
+>>
+>> BUG: KASAN: null-ptr-deref in bio_associate_blkg_from_css+0x83/0x240
+> 
+> Would be useful in the report to know where that is, as it doesn't include
+> the code output.
 
-No users of this field anymore, so remove it.
+Hi Jens,
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- include/linux/io_uring.h | 8 ++------
- io_uring/uring_cmd.c     | 1 -
- 2 files changed, 2 insertions(+), 7 deletions(-)
+This is what gdb tells me about the crash address:
 
-diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-index 35b9328ca3352..235307bf6a072 100644
---- a/include/linux/io_uring.h
-+++ b/include/linux/io_uring.h
-@@ -25,12 +25,8 @@ enum io_uring_cmd_flags {
- struct io_uring_cmd {
- 	struct file	*file;
- 	const void	*cmd;
--	union {
--		/* callback to defer completions to task context */
--		void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
--		/* used for polled completion */
--		void *cookie;
--	};
-+	/* callback to defer completions to task context */
-+	void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
- 	u32		cmd_op;
- 	u32		flags;
- 	u8		pdu[32]; /* available inline for free use */
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index f7a96bc76ea13..94586f691984c 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -127,7 +127,6 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int i=
-ssue_flags)
- 			return -EOPNOTSUPP;
- 		issue_flags |=3D IO_URING_F_IOPOLL;
- 		req->iopoll_completed =3D 0;
--		WRITE_ONCE(ioucmd->cookie, NULL);
- 	}
-=20
- 	ret =3D file->f_op->uring_cmd(ioucmd, issue_flags);
---=20
-2.34.1
+$ gdb vmlinux
+(gdb) list *(bio_associate_blkg_from_css+0x83)
+0xffffffff81856923 is in bio_associate_blkg_from_css (./include/linux/blkdev.h:865).
+860     int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+861                             unsigned int flags);
+862
+863     static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+864     {
+865             return bdev->bd_queue;  /* this is never NULL */
+866     }
+867
+868     /* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */
+869     const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);
 
+Thanks,
+
+Bart.
