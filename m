@@ -2,77 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F0BC77B6C
-	for <linux-block@archiver.kernel.org>; Thu,  6 Apr 2023 22:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB8BEC76196
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 00:17:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239368AbjDFW6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 18:58:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59246 "EHLO
+        id S230397AbjDGART (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 20:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239384AbjDFW6N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 18:58:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6E765FE1
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 15:58:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5601760F32
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 22:58:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9968DC433EF;
-        Thu,  6 Apr 2023 22:58:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1680821891;
-        bh=Yki3EO9+2qofkXWW1c2yr5dHn1MZvddDU65K/Lquusw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=IWefx2cJ3OBpD07GUQobWw0RjajKL39lRyjpiaGrASSMBWMpx7p11M1ReOfo/gCSI
-         sAByx7DP5T+ON47uF8ZWpv+AWi+84pP0JB7MN8Ykc7RQK+NrECb+vm7R4IBL8Z4HX+
-         necQWCd8PMEK8wzOJPHsOp37exEZCOzjttSdZi3Q=
-Date:   Thu, 6 Apr 2023 15:58:10 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 15/16] zram: fix synchronous reads
-Message-Id: <20230406155810.abc9a2b5c72f43f03a5d5800@linux-foundation.org>
-In-Reply-To: <ZC9CIsMcwCjYvbXX@google.com>
-References: <20230406144102.149231-1-hch@lst.de>
-        <20230406144102.149231-16-hch@lst.de>
-        <ZC9CIsMcwCjYvbXX@google.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S229892AbjDGARS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 20:17:18 -0400
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 199038A55
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 17:17:17 -0700 (PDT)
+Received: by mail-pj1-f45.google.com with SMTP id q102so38611076pjq.3
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 17:17:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680826636; x=1683418636;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=owO9GwTpufMJvZtom8FocWQVruY8gA12/ruhEXHOesg=;
+        b=7xvptHnmtYZcMmPVRNuTymubQzUb30rdxgEPnd4Aa8DxjdndmtaCJ7aWIYhUp7h+0y
+         8xjbRtWoqnBpFE5rqappjmXYU3MKwpc9P2BbMjjICafsUW7+HnM0zIQmI02qIQx8XpyN
+         IHoNjUsLS1fcYgdWZKfqZ01MppA7nPQqJDaBmiyGbiyEWK35h6MTXAkgeYGQLwGy7Nsc
+         qZVt99uIqc52oDsObikEOkBaBPi5MkbtJJNSQ/g30uh3rK5iTKEMdON3TRHPrgA6tLZt
+         iWgBYuC6DPga5HPIqN04NhwqqyNh8euJSEI7HaaqrBkjnNVypnruxup4r2FJbMR1u836
+         QeDQ==
+X-Gm-Message-State: AAQBX9cx1gmHGqXgCSJXi//FxY5/HH9naKMQaWntoVL9vrQlI41D3NE2
+        ZxilnbHTyzt9Y4yz3kOSdVo=
+X-Google-Smtp-Source: AKy350YYs1WArtI+5Yzh7ybA9VzScUlLBPoWSCU9WtK/2b2UAm0vi1Y0aeW85/YF0yPNRvwlclX22A==
+X-Received: by 2002:a17:903:280b:b0:1a2:8fa7:7b9f with SMTP id kp11-20020a170903280b00b001a28fa77b9fmr798381plb.22.1680826636032;
+        Thu, 06 Apr 2023 17:17:16 -0700 (PDT)
+Received: from bvanassche-glaptop2.roam.corp.google.com ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id x9-20020a1709028ec900b0019a773419a6sm1873676plo.170.2023.04.06.17.17.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Apr 2023 17:17:15 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 00/12] Submit zoned writes in order
+Date:   Thu,  6 Apr 2023 17:16:58 -0700
+Message-Id: <20230407001710.104169-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.40.0.577.gac1e443424-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 6 Apr 2023 15:05:22 -0700 Minchan Kim <minchan@kernel.org> wrote:
+Hi Jens,
 
-> On Thu, Apr 06, 2023 at 04:41:01PM +0200, Christoph Hellwig wrote:
-> > Currently nothing waits for the synchronous reads before accessing
-> > the data.  Switch them to an on-stack bio and submit_bio_wait to
-> > make sure the I/O has actually completed when the work item has been
-> > flushed.  This also removes the call to page_endio that would unlock
-> > a page that has never been locked.
-> > 
-> > Drop the partial_io/sync flag, as chaining only makes sense for the
-> > asynchronous reads of the entire page.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Acked-by: Minchan Kim <minchan@kernel.org>
-> 
-> So this fixes zram_rw_page + CONFIG_ZRAM_WRITEBACK feature on
-> ppc some arch where PAGE_SIZE is not 4K.
-> 
-> IIRC, we didn't have any report since the writeback feature was
-> introduced. Then, we may skip having the fix into stable?
+Tests with a zoned UFS prototype have shown that there are plenty of
+opportunities for reordering in the block layer for zoned writes (REQ_OP_WRITE).
+The UFS driver is more likely to trigger reordering than other SCSI drivers
+because it reports BLK_STS_DEV_RESOURCE more often, e.g. during clock scaling.
+This patch series makes sure that zoned writes are submitted in order without
+affecting other workloads significantly.
 
-Someone may develop such a use case in the future.  And backporting
-this fix will be difficult, unless people backport all the other
-patches, which is also difficult.
+Please consider this patch series for the next merge window.
 
-What are the user-visible effects of this bug?  It sounds like it will
-give userspace access to unintialized kernel memory, which isn't good.
+Thanks,
+
+Bart.
+
+Bart Van Assche (12):
+  block: Send zoned writes to the I/O scheduler
+  block: Send flush requests to the I/O scheduler
+  block: Send requeued requests to the I/O scheduler
+  block: Requeue requests if a CPU is unplugged
+  block: One requeue list per hctx
+  block: Preserve the order of requeued requests
+  block: Make it easier to debug zoned write reordering
+  block: mq-deadline: Simplify deadline_skip_seq_writes()
+  block: mq-deadline: Disable head insertion for zoned writes
+  block: mq-deadline: Introduce a local variable
+  block: mq-deadline: Fix a race condition related to zoned writes
+  block: mq-deadline: Handle requeued requests correctly
+
+ block/blk-flush.c      |   3 +-
+ block/blk-mq-debugfs.c |  66 +++++++++++------------
+ block/blk-mq.c         | 115 +++++++++++++++++++++++------------------
+ block/blk.h            |  19 +++++++
+ block/mq-deadline.c    |  67 +++++++++++++++++++-----
+ include/linux/blk-mq.h |  35 ++++++-------
+ include/linux/blkdev.h |   4 --
+ 7 files changed, 192 insertions(+), 117 deletions(-)
+
