@@ -2,73 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A35BBC76196
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 01:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34010C76196
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 01:04:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230264AbjDGBBh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 21:01:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53654 "EHLO
+        id S230139AbjDGBE0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 21:04:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbjDGBBf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 21:01:35 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7941E49CA
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 18:01:33 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6262956578bso69711b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 18:01:33 -0700 (PDT)
+        with ESMTP id S231773AbjDGBEZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 21:04:25 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F42F83FA
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 18:04:24 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-5140926a867so71664a12.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 18:04:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1680829293; x=1683421293;
+        d=chromium.org; s=google; t=1680829464; x=1683421464;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xc1elUC0A6VPs2hEGtcnom0Oa7mWG0FGy+xTjiBZ0Uc=;
-        b=HVsqCunVHwnGJ4IGSm0JmCFnfkIvqzCFEehBxpfDrnCJBGZlvSFLHFcL4rg1qdg9NQ
-         sd6YbkeQnacdCw6BGDiGU1pABYtc4YtGvOy15TSdQ42XXyJhhNrTunBDIH1F0qy0YIyN
-         jX4rhj7joL2Tx6zWc4eOK/KBSIF7NL9YDFe9A=
+        bh=rQ2/2/alrOrOJ5NOzVGNABqYDTMJskB7TwTd50pEcz0=;
+        b=BfCSUEy+HeB2hDmdbALRZfAZ9q9UC1xpmnPORfn5Ms1lxP6Py0ZuTqPVzjh30b2cAt
+         7DlQaYRy5ouqNy9IGbDKFYlG//7Hsi65ToB+nb5CIPQCdKgGdw+dalKUi3dRULJ2hD5+
+         XpRA+oqW0/bcb+GM2WUvGLIY+szudPtgZSgx4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680829293; x=1683421293;
+        d=1e100.net; s=20210112; t=1680829464; x=1683421464;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xc1elUC0A6VPs2hEGtcnom0Oa7mWG0FGy+xTjiBZ0Uc=;
-        b=ObgtWEZluaT9yQupilYC8oK5UIq6ueT1jHABFwE4Ciq4bwm5BtGIlPLpunJa+aTclz
-         TaD/9yoqodbkookkaMjhZ9kyZb7qP3uyoM+TxkphOFKqg9foyBsTiJnd4e08dLaDGhoR
-         gAn9zR+bLmUFzpRB39u0Fm3HZQKHy3/vtxuv1wba/1pyPrzodEA6RPVCD+lK3LIQQ5Lx
-         kW5OtGteqNX67XKD/nR5/w/SBpvbXUMhT2t/gbl/ec7Vn8AMNgPoI8raLnJ2Y+hyTQum
-         hh+Rn9TsXlfbv/7b/z2+r6hFQWszLhpI3YgozHnqUD2FR+5hsHazjSNrsMC3NEUj8ay0
-         OeQQ==
-X-Gm-Message-State: AAQBX9cUqImIfUwGr9TPwe5L4RCxLnmDtHuBjkbYvvpVznRNy/hzeq4S
-        cnLg0a6CsVfZxYMi9HuYckJHrcRA3hKagx7xcU8=
-X-Google-Smtp-Source: AKy350YqUMYxLWmNR1hIG4mQS/jRIh8BW3K6uwgHy85Qpb0J26ixIai43YiZUZ08K9cs4N01EWF4ww==
-X-Received: by 2002:a62:1911:0:b0:625:1487:f06c with SMTP id 17-20020a621911000000b006251487f06cmr665754pfz.29.1680829292905;
-        Thu, 06 Apr 2023 18:01:32 -0700 (PDT)
+        bh=rQ2/2/alrOrOJ5NOzVGNABqYDTMJskB7TwTd50pEcz0=;
+        b=IDiQtUzU60ndZgQtLqi2zFccWeakN2ApcDC7FrZbqvN3aXVnVGrVs7mx+c4ASR7TOz
+         5MAk69cQNpRFAQCSszS9655pC9KcTHvMCDH4ORJqHOrRPmzRihKUAEWVH4t6Kyudi4GT
+         F+Zp2zoYi890/+llzS22qHLQmJ8qVzOZRSpdPeKbY7qQ6/ufbZun6Ruz2DJKXBfOEHfz
+         oXGohUAKRP2hvcm7JSe4ff4+JMhavCeOYFfNfmQ6cZtbmLlUFABhw5hKmaZJM/7pwqIK
+         9M6OE9XDTwpaSQYctwi8iEQfLq4xltkEPo3UWvF4zBVwI8YDwXSK5uk6QgwOJz/U1gDP
+         yzug==
+X-Gm-Message-State: AAQBX9e8ojA3xNAm3ckTHwNQxxQ+ieOf6cvkaY82atmxz3Nd+XDh04K1
+        KNGBxN51OafCz+EU/Edx5rfVow==
+X-Google-Smtp-Source: AKy350bwM5NdXQQWn+TgCbamuFti8Svkf7VhrB870slr8vlvZzQ449k9kX8/IKbdWLaonOHcPN7J5w==
+X-Received: by 2002:a62:19c2:0:b0:624:7c9a:c832 with SMTP id 185-20020a6219c2000000b006247c9ac832mr694560pfz.8.1680829464066;
+        Thu, 06 Apr 2023 18:04:24 -0700 (PDT)
 Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id k3-20020aa78203000000b00625c96db7desm1895131pfi.198.2023.04.06.18.01.30
+        by smtp.gmail.com with ESMTPSA id x5-20020aa79185000000b0062ddcad2cbesm1969815pfa.145.2023.04.06.18.04.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 18:01:32 -0700 (PDT)
-Date:   Fri, 7 Apr 2023 10:01:28 +0900
+        Thu, 06 Apr 2023 18:04:23 -0700 (PDT)
+Date:   Fri, 7 Apr 2023 10:04:19 +0900
 From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Minchan Kim <minchan@kernel.org>,
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 05/16] zram: return early on error in zram_bvec_rw
-Message-ID: <20230407010128.GW12892@google.com>
+Subject: Re: [PATCH 01/16] zram: remove valid_io_request
+Message-ID: <20230407010419.GX12892@google.com>
 References: <20230406144102.149231-1-hch@lst.de>
- <20230406144102.149231-6-hch@lst.de>
+ <20230406144102.149231-2-hch@lst.de>
+ <ZC81LyKt+QS18LzT@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230406144102.149231-6-hch@lst.de>
+In-Reply-To: <ZC81LyKt+QS18LzT@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (23/04/06 16:40), Christoph Hellwig wrote:
+On (23/04/06 14:10), Minchan Kim wrote:
+> >  static void update_position(u32 *index, int *offset, struct bio_vec *bvec)
+> >  {
+> >  	*index  += (*offset + bvec->bv_len) / PAGE_SIZE;
+> > @@ -1190,10 +1166,9 @@ static ssize_t io_stat_show(struct device *dev,
+> >  
+> >  	down_read(&zram->init_lock);
+> >  	ret = scnprintf(buf, PAGE_SIZE,
+> > -			"%8llu %8llu %8llu %8llu\n",
+> > +			"%8llu %8llu 0 %8llu\n",
 > 
-> When the low-level access fails, don't clear the idle flag or clear
-> the caches, and just return.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Since it's sysfs, I don't think we could remove it at this moment.
+> Instead, just return always 0?
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+I think this is what the patch does, it replaces %8llu placeholder with 0.
