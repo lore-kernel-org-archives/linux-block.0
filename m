@@ -2,100 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B0AC761A6
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 02:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89133C76196
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 02:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240419AbjDGCLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 22:11:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34936 "EHLO
+        id S229500AbjDGCmn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 22:42:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240326AbjDGCLd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 22:11:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0757BCC23
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 19:09:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680833358;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q9mDbmCDWIZufpdSQOQtCy1IYkjHuQ55FDYgdUqKYCs=;
-        b=Mo1TeuyxDPghiy8cyjQ7XxocvzI3bEJoFcNPJDqZ6VEpzJe7RK/4UDoqOrlkqdXNTIXfac
-        9tUTuMIZLc2cFlnHwx7ZNXMJKnKyS6cK70UVi/HXf8V/i3LssPCR04YLxshVJvMDOMghns
-        HsZ05AbBvaI9WrxpQSWZt3RChd/Ssoo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-195-MnPaK8BFPJW-M_AVEpvykg-1; Thu, 06 Apr 2023 22:02:09 -0400
-X-MC-Unique: MnPaK8BFPJW-M_AVEpvykg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD8973C20EEC;
-        Fri,  7 Apr 2023 02:02:08 +0000 (UTC)
-Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF41640C6EC4;
-        Fri,  7 Apr 2023 02:02:01 +0000 (UTC)
-Date:   Fri, 7 Apr 2023 10:01:55 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        with ESMTP id S237444AbjDGCmm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 22:42:42 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E5783D0
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 19:42:41 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5144427bad7so268589a12.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 19:42:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1680835361;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=X8X/ofNJxOyXBKtu6E6tFhvwKT4AgBrWgfgReTBYBmo=;
+        b=rho/IPf5hqzPDcmZdhV1K7zLDdw33k6FbSbSB5xn0zILh6XsXvisZTDlSj2FlKPjBh
+         4OzQKMAF6WBjsbimCTiXST58KxhQXaTd2OS4JdDEdas4MvZVPxm6J7xZIfYrjA9WK6TK
+         Ct4XvZBpJHudMPE+XP9bZkPHjJ1gebV8Ia/Swb+cgFopMjGaEbKbDm8mTcBRvBYaDhhd
+         HKWUzIl7eeUfa+wGP5h+q4/3pR2qQ1aeQKEoBAF/AEkqlFrbZiXquqJK5vberByqwNKV
+         dJeeLQNyxhaTMSAithk/l/OyiPpVIL2tgSNm73AgqBCN31Z4RQdBT+Tusv84cQX4ZiAu
+         4lqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680835361;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X8X/ofNJxOyXBKtu6E6tFhvwKT4AgBrWgfgReTBYBmo=;
+        b=U30w3fpdyixIRt+bXFSZ5Pdnc6fW14j3IboC58Y8aJfh3xmih8cwpn2HW1rtACK4ly
+         m5a5Tu1ztCGMRxtS+YU/a2kIFvWQhX4VUIMzDFQ+J/JS9ctj2dlpRc1ysdgzkLYDc6Pa
+         9RpebZETwE/ewR8r9fYAKFSBXcjxbCSLBXemn+r4Zvi8ROPWOy1OUv1N+SZm0VFsYSGW
+         HPniLA0D4kINRkNfi1D+3qZ5DSk0TZhtI+O1S2Or/9nNRHL1Y55tPPFO68ejl5vOLakc
+         gQuohKjm0ixKtE+oGu0XYAb8WFVVzg+yewnLuprwtkOofT+eB7waJEdMnvqz+g7tXso/
+         /zAg==
+X-Gm-Message-State: AAQBX9eTKVV/LNA8mGkiQfqIORGgfwWfGEnFbG3MUB1DqbFM+0+vIhL7
+        kvYghQMKF0lovrvCYwSEI5McmQ==
+X-Google-Smtp-Source: AKy350Ym3MrcHI3b7iLaVIx9TXp2e+6vuJ1zWNUYE3bufQbkuJ7KmcRxvXvMwwWClIsImjvU3eX1NQ==
+X-Received: by 2002:aa7:8194:0:b0:627:e180:ac04 with SMTP id g20-20020aa78194000000b00627e180ac04mr1222717pfi.0.1680835360677;
+        Thu, 06 Apr 2023 19:42:40 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e20-20020aa78c54000000b0062607d604b2sm1986897pfd.53.2023.04.06.19.42.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Apr 2023 19:42:40 -0700 (PDT)
+Message-ID: <32e9b9e0-0748-4e03-624d-a31c1df6b045@kernel.dk>
+Date:   Thu, 6 Apr 2023 20:42:38 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: [PATCH] block: don't set GD_NEED_PART_SCAN if scan partition
+ failed
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@infradead.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>, ming.lei@redhat.com
-Subject: Re: [PATCH] block: don't set GD_NEED_PART_SCAN if scan partition
- failed
-Message-ID: <ZC95kzpiZnD9m7GY@ovpn-8-24.pek2.redhat.com>
+        "yukuai (C)" <yukuai3@huawei.com>
 References: <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
  <20230322035926.1791317-1-yukuai1@huaweicloud.com>
  <42cfedca-f233-4d7e-f43b-4b5dd0c97e9e@huaweicloud.com>
  <b3817e92-80ca-8eea-ebdd-f2172f3390c8@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+ <ZC95kzpiZnD9m7GY@ovpn-8-24.pek2.redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZC95kzpiZnD9m7GY@ovpn-8-24.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b3817e92-80ca-8eea-ebdd-f2172f3390c8@kernel.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 06, 2023 at 04:29:43PM -0600, Jens Axboe wrote:
-> On 4/5/23 9:42 PM, Yu Kuai wrote:
-> > Hi, Jens!
-> > 
-> > 在 2023/03/22 11:59, Yu Kuai 写道:
-> >> From: Yu Kuai <yukuai3@huawei.com>
-> >>
-> >> Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
-> >> set, and partition scan will be proceed again when blkdev_get_by_dev()
-> >> is called. However, this will cause a problem that re-assemble partitioned
-> >> raid device will creat partition for underlying disk.
-> >>
-> >> Test procedure:
-> >>
-> >> mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
-> >> sgdisk -n 0:0:+100MiB /dev/md0
-> >> blockdev --rereadpt /dev/sda
-> >> blockdev --rereadpt /dev/sdb
-> >> mdadm -S /dev/md0
-> >> mdadm -A /dev/md0 /dev/sda /dev/sdb
-> >>
-> >> Test result: underlying disk partition and raid partition can be
-> >> observed at the same time
-> >>
-> >> Note that this can still happen in come corner cases that
-> >> GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
-> >> device.
-> >>
-> > 
-> > Can you apply this patch?
+On 4/6/23 8:01 PM, Ming Lei wrote:
+> On Thu, Apr 06, 2023 at 04:29:43PM -0600, Jens Axboe wrote:
+>> On 4/5/23 9:42 PM, Yu Kuai wrote:
+>>> Hi, Jens!
+>>>
+>>> 在 2023/03/22 11:59, Yu Kuai 写道:
+>>>> From: Yu Kuai <yukuai3@huawei.com>
+>>>>
+>>>> Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
+>>>> set, and partition scan will be proceed again when blkdev_get_by_dev()
+>>>> is called. However, this will cause a problem that re-assemble partitioned
+>>>> raid device will creat partition for underlying disk.
+>>>>
+>>>> Test procedure:
+>>>>
+>>>> mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
+>>>> sgdisk -n 0:0:+100MiB /dev/md0
+>>>> blockdev --rereadpt /dev/sda
+>>>> blockdev --rereadpt /dev/sdb
+>>>> mdadm -S /dev/md0
+>>>> mdadm -A /dev/md0 /dev/sda /dev/sdb
+>>>>
+>>>> Test result: underlying disk partition and raid partition can be
+>>>> observed at the same time
+>>>>
+>>>> Note that this can still happen in come corner cases that
+>>>> GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
+>>>> device.
+>>>>
+>>>
+>>> Can you apply this patch?
+>>
+>> None of them apply to my for-6.4/block branch...
 > 
-> None of them apply to my for-6.4/block branch...
+> This patch is bug fix, and probably should aim at 6.3.
 
-This patch is bug fix, and probably should aim at 6.3.
+Yeah I see now, but it's a bit of a mashup of 2 patches, and
+then a separate one. I've applied the single fixup for 6.3.
 
-Thanks,
-Ming
+-- 
+Jens Axboe
+
 
