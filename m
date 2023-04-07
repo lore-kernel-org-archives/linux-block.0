@@ -2,91 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E2DC76196
-	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 01:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B0AC761A6
+	for <linux-block@archiver.kernel.org>; Fri,  7 Apr 2023 02:11:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231458AbjDGBOd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Apr 2023 21:14:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56900 "EHLO
+        id S240419AbjDGCLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Apr 2023 22:11:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbjDGBOc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 21:14:32 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B62D5B9A
-        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 18:14:32 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-50fa02be315so69897a12.2
-        for <linux-block@vger.kernel.org>; Thu, 06 Apr 2023 18:14:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680830072;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zFePiC80drSv997a5PrYVJZ8i/yBVUDW4g7ppp5ypnI=;
-        b=dBWdh9mlTu0c6aYZ0y05BjeGVF+3roDIdeUjper8yYZnEjDqW4lbJ5Yf4Kz1zUa9TM
-         wjxhKyFV+NBXzqUO53RWY/cUvRL/NIiBSFoHDXhtaMDH0mUfgSLAcpy77N315ktZ0XO/
-         xpI/KxDfBlqAPoOm27mJflTvzghn/EY3Oj0eArvc8pTX3ioHeOfzMbwTA94mF0kGqWr8
-         IKZVz73KJouOOQ8GLOP3PFrxp4R3VAlWUAG+6Y3ExoKA/cDpHYDBttfpcwj7452p2hr2
-         dPlg9efv2pQ2Jj3PTRGs/RurXHwjlEs6c47Z7dLW6Zh0srUe21OVk05p+E+eULxM6odq
-         e+qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680830072;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zFePiC80drSv997a5PrYVJZ8i/yBVUDW4g7ppp5ypnI=;
-        b=aNX5c5Xy+5lCVu7k5b1TqyXukYHWX6ntTUGcj3QcFk3DPB+ZE8SqfSXwA7JCkkws8c
-         IkF7evniDAMF5uP/xe7NAgFXNTAbiGY1IzJxaHaJHs8K3idb9AgNaybe4HZrTGEGq8gW
-         vMe8OooEKyu9nExvLiCleE1rT1jOElgGJ6zlob4INjTRMp8kSaOMXkdA1YjPwz8cKO2K
-         M3iK4o3L451zXSgoS6OgMkBN+5U6yMHL13Q2BcHgFu8e8mv/yO5cUCHsTXQJ4VzNXDOt
-         jhpJ7XTMqKxR4vLF75tiiykUyAGVz5mqMMRncZ+ZxCR5zQIHCDQnbwhdhEVFbmFp3/X7
-         DdtA==
-X-Gm-Message-State: AAQBX9e0mL2xubDdzoOnDtTIYS+yEP7xatIUrKg+V2BhdQcj29ErAcxp
-        IAHFHFawqUpfcKUU2XumKpj4Ls5fXZM=
-X-Google-Smtp-Source: AKy350b3vqunKUehhRorfzlvAQEyTRfwjvobRW0StJEeRMMgnewk224N8zCjN7a/RMVPegY5LuKCFQ==
-X-Received: by 2002:aa7:9601:0:b0:625:e77b:93b2 with SMTP id q1-20020aa79601000000b00625e77b93b2mr841277pfg.5.1680830071641;
-        Thu, 06 Apr 2023 18:14:31 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:6a8d:6a82:8d0e:6dc8])
-        by smtp.gmail.com with ESMTPSA id c17-20020a62e811000000b0062d9ced3db3sm1921473pfi.23.2023.04.06.18.14.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 18:14:31 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Thu, 6 Apr 2023 18:14:29 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 01/16] zram: remove valid_io_request
-Message-ID: <ZC9udSVxt9M4k9SO@google.com>
-References: <20230406144102.149231-1-hch@lst.de>
- <20230406144102.149231-2-hch@lst.de>
- <ZC81LyKt+QS18LzT@google.com>
- <20230407010419.GX12892@google.com>
+        with ESMTP id S240326AbjDGCLd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Apr 2023 22:11:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0757BCC23
+        for <linux-block@vger.kernel.org>; Thu,  6 Apr 2023 19:09:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1680833358;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q9mDbmCDWIZufpdSQOQtCy1IYkjHuQ55FDYgdUqKYCs=;
+        b=Mo1TeuyxDPghiy8cyjQ7XxocvzI3bEJoFcNPJDqZ6VEpzJe7RK/4UDoqOrlkqdXNTIXfac
+        9tUTuMIZLc2cFlnHwx7ZNXMJKnKyS6cK70UVi/HXf8V/i3LssPCR04YLxshVJvMDOMghns
+        HsZ05AbBvaI9WrxpQSWZt3RChd/Ssoo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-195-MnPaK8BFPJW-M_AVEpvykg-1; Thu, 06 Apr 2023 22:02:09 -0400
+X-MC-Unique: MnPaK8BFPJW-M_AVEpvykg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD8973C20EEC;
+        Fri,  7 Apr 2023 02:02:08 +0000 (UTC)
+Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF41640C6EC4;
+        Fri,  7 Apr 2023 02:02:01 +0000 (UTC)
+Date:   Fri, 7 Apr 2023 10:01:55 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>, ming.lei@redhat.com
+Subject: Re: [PATCH] block: don't set GD_NEED_PART_SCAN if scan partition
+ failed
+Message-ID: <ZC95kzpiZnD9m7GY@ovpn-8-24.pek2.redhat.com>
+References: <ZBmYcuVzpDDTiaP+@ovpn-8-18.pek2.redhat.com>
+ <20230322035926.1791317-1-yukuai1@huaweicloud.com>
+ <42cfedca-f233-4d7e-f43b-4b5dd0c97e9e@huaweicloud.com>
+ <b3817e92-80ca-8eea-ebdd-f2172f3390c8@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230407010419.GX12892@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b3817e92-80ca-8eea-ebdd-f2172f3390c8@kernel.dk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 07, 2023 at 10:04:19AM +0900, Sergey Senozhatsky wrote:
-> On (23/04/06 14:10), Minchan Kim wrote:
-> > >  static void update_position(u32 *index, int *offset, struct bio_vec *bvec)
-> > >  {
-> > >  	*index  += (*offset + bvec->bv_len) / PAGE_SIZE;
-> > > @@ -1190,10 +1166,9 @@ static ssize_t io_stat_show(struct device *dev,
-> > >  
-> > >  	down_read(&zram->init_lock);
-> > >  	ret = scnprintf(buf, PAGE_SIZE,
-> > > -			"%8llu %8llu %8llu %8llu\n",
-> > > +			"%8llu %8llu 0 %8llu\n",
+On Thu, Apr 06, 2023 at 04:29:43PM -0600, Jens Axboe wrote:
+> On 4/5/23 9:42 PM, Yu Kuai wrote:
+> > Hi, Jens!
 > > 
-> > Since it's sysfs, I don't think we could remove it at this moment.
-> > Instead, just return always 0?
+> > 在 2023/03/22 11:59, Yu Kuai 写道:
+> >> From: Yu Kuai <yukuai3@huawei.com>
+> >>
+> >> Currently if disk_scan_partitions() failed, GD_NEED_PART_SCAN will still
+> >> set, and partition scan will be proceed again when blkdev_get_by_dev()
+> >> is called. However, this will cause a problem that re-assemble partitioned
+> >> raid device will creat partition for underlying disk.
+> >>
+> >> Test procedure:
+> >>
+> >> mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
+> >> sgdisk -n 0:0:+100MiB /dev/md0
+> >> blockdev --rereadpt /dev/sda
+> >> blockdev --rereadpt /dev/sdb
+> >> mdadm -S /dev/md0
+> >> mdadm -A /dev/md0 /dev/sda /dev/sdb
+> >>
+> >> Test result: underlying disk partition and raid partition can be
+> >> observed at the same time
+> >>
+> >> Note that this can still happen in come corner cases that
+> >> GD_NEED_PART_SCAN can be set for underlying disk while re-assemble raid
+> >> device.
+> >>
+> > 
+> > Can you apply this patch?
 > 
-> I think this is what the patch does, it replaces %8llu placeholder with 0.
+> None of them apply to my for-6.4/block branch...
 
-/me slaps self. 
+This patch is bug fix, and probably should aim at 6.3.
 
-Acked-by: Minchan Kim <minchan@kernel.org>
+Thanks,
+Ming
+
