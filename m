@@ -2,105 +2,548 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A137C77B61
-	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 18:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5762EC77B6F
+	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 18:53:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbjDJSr5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Apr 2023 14:47:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
+        id S229671AbjDJSxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Apr 2023 14:53:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230023AbjDJSrw (ORCPT
+        with ESMTP id S229574AbjDJSxj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2023 14:47:52 -0400
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96B8C2681;
-        Mon, 10 Apr 2023 11:47:36 -0700 (PDT)
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1a516fb6523so6046405ad.3;
-        Mon, 10 Apr 2023 11:47:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681152456; x=1683744456;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6/wrJEyb3+a5lpb9UjwwVTGaTVjn/LL/vtD2/dCiZU4=;
-        b=DE343F7BngaV9MvL6eAOZkUZvoN5WJAumbJNHV6VZr/HKqsFJdRUwtYGYDTWqXLpfm
-         E3Pd2t4ahKDKGdLgdJNxt/vThcaF9znQ7LcqgTGjNN2F3tTNceVjNIfT6riVw8nJE6it
-         +XqJhAwdMhHkVjHIRaplVGCgiVJ/MZAHu9CX5Zdc7fn+VbhZ3EiVtDywszqLf6F2gFxW
-         Yrftcgl+JyM8NqqcdgmPmfwF4KPBIDeH+NjukTj10rPk41k0pUjTiiYat9xGbNqraIOy
-         WsT6mJyjF/yPSFuFcCGEfpP7gzBOoVau+KGQWNsm52BAfCz9oFqPtW7Te6pNdz+30pF8
-         20Kg==
-X-Gm-Message-State: AAQBX9fPRL51Gf1+15niiWLqdMsh2m84nFzf5Y76WK9dwPF7uLyL7PMa
-        lwwW0oIFXCduRQOLTu5fev57wByLP/E=
-X-Google-Smtp-Source: AKy350a4CGttKjH82H1GT39L5QH6vMdJ13DyQS6yhURvvr3pOQ2/1rMO+0PW0lVNC+4IOkAFdlWP0g==
-X-Received: by 2002:aa7:98c2:0:b0:639:9089:798e with SMTP id e2-20020aa798c2000000b006399089798emr2854426pfm.19.1681152455834;
-        Mon, 10 Apr 2023 11:47:35 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:11fd:f446:f156:c8? ([2620:15c:211:201:11fd:f446:f156:c8])
-        by smtp.gmail.com with ESMTPSA id h10-20020aa786ca000000b006334699ee51sm4563579pfo.47.2023.04.10.11.47.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Apr 2023 11:47:35 -0700 (PDT)
-Message-ID: <8651fa1f-7f50-03c6-cd85-e61aa44d4927@acm.org>
-Date:   Mon, 10 Apr 2023 11:47:34 -0700
+        Mon, 10 Apr 2023 14:53:39 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39980E4;
+        Mon, 10 Apr 2023 11:53:35 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 99EB92174E2A; Mon, 10 Apr 2023 11:53:34 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 99EB92174E2A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1681152814;
+        bh=6k4RqFSClh1JCnvAAxRswlmchYa0DJUjXyAdfc2QE8w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KHDLnhB8SnkcU0ENyT4L8IqUsgr7Nl9Dy7xsbX5ee2cKmrHXRLo1D3b+au7r6WT9d
+         FnSyoMEwf4y2vM/6gHR1e/R20YqVwo4bbJefzizzKS1bgHLMaBMzT0f3GWYTEqKfmx
+         GaTfDWdahgG3vccJbhUB48ivfSr/HzjtOVn9Nmso=
+Date:   Mon, 10 Apr 2023 11:53:34 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v9 03/16] ipe: add evaluation loop and introduce
+ 'boot_verified' as a trust provider
+Message-ID: <20230410185334.GA18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-4-git-send-email-wufan@linux.microsoft.com>
+ <CAHC9VhS_EbT7ze4oSHwHfus91VWQfdgGagf=5O7_h+XJ2o79PA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v2 0/3] blk-cgroup: some cleanup
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Chengming Zhou <zhouchengming@bytedance.com>, axboe@kernel.dk,
-        tj@kernel.org
-Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230406145050.49914-1-zhouchengming@bytedance.com>
- <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
- <d23a6891-96f0-2ee0-70c7-869123d85362@huaweicloud.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <d23a6891-96f0-2ee0-70c7-869123d85362@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHC9VhS_EbT7ze4oSHwHfus91VWQfdgGagf=5O7_h+XJ2o79PA@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/9/23 18:57, Yu Kuai wrote:
-> Hi, Bart
+On Thu, Mar 02, 2023 at 02:03:11PM -0500, Paul Moore wrote:
+> On Mon, Jan 30, 2023 at 5:58???PM Fan Wu <wufan@linux.microsoft.com> wrote:
+> >
+> > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> >
+> > IPE must have a centralized function to evaluate incoming callers
+> > against IPE's policy. This iteration of the policy against the rules
+> > for that specific caller is known as the evaluation loop.
+> >
+> > In addition, IPE is designed to provide system level trust guarantees,
+> > this usually implies that trust starts from bootup with a hardware root
+> > of trust, which validates the bootloader. After this, the bootloader
+> > verifies the kernel and the initramfs.
+> >
+> > As there's no currently supported integrity method for initramfs, and
+> > it's typically already verified by the bootloader, introduce a property
+> > that causes the first superblock to have an execution to be "pinned",
+> > which is typically initramfs.
+> >
+> > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
 > 
-> 在 2023/04/08 2:41, Bart Van Assche 写道:
->> On 4/6/23 07:50, Chengming Zhou wrote:
->>> These are some cleanup patches of blk-cgroup. Thanks for review.
->>
->> With these patches applied, my kernel test VM crashes during boot. The 
->> following crash disappears if I revert these patches:
->>
->> BUG: KASAN: null-ptr-deref in bio_associate_blkg_from_css+0x83/0x240
->> Read of size 8 at addr 0000000000000518 by task blkid/5885
->> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
->> 1.16.0-debian-1.16.0-5 04/01/2014
->> Call Trace:
->>   dump_stack_lvl+0x4a/0x80
->>   print_report+0x21e/0x260
->>   kasan_report+0xc2/0xf0
->>   __asan_load8+0x69/0x90
->>   bio_associate_blkg_from_css+0x83/0x240
->>   bfq_bio_bfqg+0xce/0x120 [bfq]
->>   bfq_bic_update_cgroup+0x2f/0x3c0 [bfq]
->>   bfq_init_rq+0x1e8/0xb10 [bfq]
->>   bfq_insert_request.isra.0+0xa3/0x420 [bfq]
->>   bfq_insert_requests+0xca/0xf0 [bfq]
->>   blk_mq_dispatch_rq_list+0x4c0/0xb00
+> ...
 > 
-> I found this call trace quite weird, I can't figure out how
-> bfq_insert_requests can be called from blk_mq_dispatch_rq_list,
-> can you show the add2line result?
+> > ---
+> >  security/ipe/Makefile        |   1 +
+> >  security/ipe/eval.c          | 180 +++++++++++++++++++++++++++++++++++
+> >  security/ipe/eval.h          |  28 ++++++
+> >  security/ipe/hooks.c         |  25 +++++
+> >  security/ipe/hooks.h         |  14 +++
+> >  security/ipe/ipe.c           |   1 +
+> >  security/ipe/policy.c        |  20 ++++
+> >  security/ipe/policy.h        |   3 +
+> >  security/ipe/policy_parser.c |   8 +-
+> >  9 files changed, 279 insertions(+), 1 deletion(-)
+> >  create mode 100644 security/ipe/eval.c
+> >  create mode 100644 security/ipe/eval.h
+> >  create mode 100644 security/ipe/hooks.c
+> >  create mode 100644 security/ipe/hooks.h
+> >
+> > diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+> > index 16bbe80991f1..d7f2870d7c09 100644
+> > --- a/security/ipe/Makefile
+> > +++ b/security/ipe/Makefile
+> > @@ -6,6 +6,7 @@
+> >  #
+> >
+> >  obj-$(CONFIG_SECURITY_IPE) += \
+> > +       eval.o \
+> >         hooks.o \
+> >         ipe.o \
+> >         policy.o \
+> > diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+> > new file mode 100644
+> > index 000000000000..48b5104a3463
+> > --- /dev/null
+> > +++ b/security/ipe/eval.c
+> > @@ -0,0 +1,180 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (C) Microsoft Corporation. All rights reserved.
+> > + */
+> > +
+> > +#include "ipe.h"
+> > +#include "eval.h"
+> > +#include "hooks.h"
+> > +#include "policy.h"
+> > +
+> > +#include <linux/fs.h>
+> > +#include <linux/types.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/file.h>
+> > +#include <linux/sched.h>
+> > +#include <linux/rcupdate.h>
+> > +#include <linux/spinlock.h>
+> > +
+> > +struct ipe_policy __rcu *ipe_active_policy;
+> > +
+> > +static struct super_block *pinned_sb;
+> > +static DEFINE_SPINLOCK(pin_lock);
+> > +#define FILE_SUPERBLOCK(f) ((f)->f_path.mnt->mnt_sb)
+> > +
+> > +/**
+> > + * pin_sb - Pin the underlying superblock of @f, marking it as trusted.
+> > + * @f: Supplies a file structure to source the super_block from.
+> > + */
+> > +static void pin_sb(const struct file *f)
+> > +{
+> > +       if (!f)
+> > +               return;
+> > +       spin_lock(&pin_lock);
+> > +       if (pinned_sb)
+> > +               goto out;
+> > +       pinned_sb = FILE_SUPERBLOCK(f);
+> > +out:
+> > +       spin_unlock(&pin_lock);
+> > +}
+> 
+> Since you don't actually use @f, just the super_block, you might
+> consider passing the super_block as the parameter and not the
+> associated file.
+> 
+> I'd probably also flip the if-then to avoid the 'goto', for example:
+> 
+>   static void pin_sb(const struct super_block *sb)
+>   {
+>     if (!sb)
+>       return;
+>     spin_lock(&pin_lock);
+>     if (!pinned_sb)
+>       pinned_sb = sb;
+>     spin_unlock(&pin_lock);
+>   }
+> 
 
-Hi Kuai,
+Sure, I can change the code accordingly. 
 
-Thanks for having taken a look. I ran my tests with this patch series on 
-top of Jens' for-next branch: "[PATCH v2 00/12] Submit zoned writes in 
-order" 
-(https://lore.kernel.org/linux-block/20230407235822.1672286-1-bvanassche@acm.org/T/#m4c8c7ca5a5627510dc1709847b11589e8791b6b6). 
-I will take a closer look and see which of these two patch series needs 
-to be adjusted.
+> Also, do we need to worry about the initramfs' being unmounted and the
+> super_block going away?
+> 
 
-Bart.
+If initramfs is being unmounted, the boot_verified property will never be TRUE,
+which is an expected behavior. In an actual use case, we can leverage this
+property to only enable files in initramfs during the booting stage, and later switch
+to another policy without the boot_verified property after unmounting the initramfs.
+This approach helps keep the allowed set of files minimum at each stage.
 
+> > +/**
+> > + * from_pinned - Determine whether @f is source from the pinned super_block.
+> > + * @f: Supplies a file structure to check against the pinned super_block.
+> > + *
+> > + * Return:
+> > + * * true      - @f is sourced from the pinned super_block
+> > + * * false     - @f is not sourced from the pinned super_block
+> > + */
+> > +static bool from_pinned(const struct file *f)
+> > +{
+> > +       bool rv;
+> > +
+> > +       if (!f)
+> > +               return false;
+> > +       spin_lock(&pin_lock);
+> > +       rv = !IS_ERR_OR_NULL(pinned_sb) && pinned_sb == FILE_SUPERBLOCK(f);
+> > +       spin_unlock(&pin_lock);
+> > +       return rv;
+> > +}
+> > +
+> > +/**
+> > + * build_eval_ctx - Build an evaluation context.
+> > + * @ctx: Supplies a pointer to the context to be populdated.
+> > + * @file: Supplies a pointer to the file to associated with the evaluation.
+> > + * @op: Supplies the IPE policy operation associated with the evaluation.
+> > + */
+> > +void build_eval_ctx(struct ipe_eval_ctx *ctx,
+> > +                   const struct file *file,
+> > +                   enum ipe_op_type op)
+> > +{
+> > +       ctx->file = file;
+> > +       ctx->op = op;
+> > +       ctx->from_init_sb = from_pinned(file);
+> > +}
+> 
+> I was a little concerned about the spinlock around the pinned
+> superblock being a potential issue so I was checking the callers of
+> `build_eval_ctx()` and realized there are no callers in this patch ...
+> ?  Maybe it makes sense for `build_eval_ctx()` to be in this patch but
+> it seems a little odd.
+> 
+
+I can try to move this function to a later patch.
+
+> > +/**
+> > + * evaluate_property - Analyze @ctx against a property.
+> > + * @ctx: Supplies a pointer to the context to be evaluated.
+> > + * @p: Supplies a pointer to the property to be evaluated.
+> > + *
+> > + * Return:
+> > + * * true      - The current @ctx match the @p
+> > + * * false     - The current @ctx doesn't match the @p
+> > + */
+> > +static bool evaluate_property(const struct ipe_eval_ctx *const ctx,
+> > +                             struct ipe_prop *p)
+> > +{
+> > +       bool eval = false;
+> > +
+> > +       switch (p->type) {
+> > +       case ipe_prop_boot_verified_false:
+> > +               eval = !ctx->from_init_sb;
+> > +               break;
+> > +       case ipe_prop_boot_verified_true:
+> > +               eval = ctx->from_init_sb;
+> > +               break;
+> > +       default:
+> > +               eval = false;
+> 
+> You don't need to set @eval to false both when it is declared or in
+> the 'default' case.
+> 
+> Honestly, you don't need @eval at all, you can simply replace all of
+> the @eval assignment statements with return statements.
+> 
+
+Yep, this makes sense to me, I will replace them with returns.
+
+> > +       }
+> > +
+> > +       return eval;
+> > +}
+> > +
+> > +/**
+> > + * ipe_evaluate_event - Analyze @ctx against the current active policy.
+> > + * @ctx: Supplies a pointer to the context to be evaluated.
+> > + *
+> > + * This is the loop where all policy evaluation happens against IPE policy.
+> > + *
+> > + * Return:
+> > + * * 0         - OK
+> > + * * -EACCES   - @ctx did not pass evaluation.
+> > + * * !0                - Error
+> > + */
+> > +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx)
+> > +{
+> > +       int rc = 0;
+> > +       bool match = false;
+> > +       enum ipe_action_type action;
+> > +       struct ipe_policy *pol = NULL;
+> > +       const struct ipe_rule *rule = NULL;
+> > +       const struct ipe_op_table *rules = NULL;
+> > +       struct ipe_prop *prop = NULL;
+> > +
+> > +       if (ctx->op == ipe_op_exec)
+> > +               pin_sb(ctx->file);
+> 
+> If I understand things correctly, the initramfs is determined by the
+> first process to be executed?  I think that's reasonable, but I'm
+> beginning to wonder if that pinned super_block spinlock is going to be
+> a problem, especially for something that is written once (twice if you
+> consider the ERR_PTR(-EIO) on umount), yet read for each IPE policy
+> evaluation.
+> 
+> I'm okay if you want to keep this as a spinlock for now, but this
+> seems like a good candidate for RCU, and the change would be trivial
+> since it is a single pointer.
+> 
+
+I agree switching to RCU will be better, I will change this part.
+
+> > +       pol = ipe_get_policy_rcu(ipe_active_policy);
+> 
+> I don't think you can safely drop the RCU lock and leave the RCU
+> critical section while you are still using @ipe_active_policy.  I
+> think the right thing to do is to get rid of `ipe_get_policy_rcu()`
+> and simply place from here on down in `ipe_evaluate_event()` in a RCU
+> critical section.  Doing so would ensure that @ipe_active_policy could
+> not be free'd/replaced from underneath you while evaluating an event.
+> 
+
+Yes After reading the RCU documentation, I realized that we were mistaken.
+I will place the entire eval function into the critical section instead.
+
+> > +       if (!pol)
+> > +               goto out;
+> > +
+> > +       if (ctx->op == ipe_op_max) {
+> > +               action = pol->parsed->global_default_action;
+> > +               goto eval;
+> > +       }
+> > +
+> > +       rules = &pol->parsed->rules[ctx->op];
+> > +
+> > +       list_for_each_entry(rule, &rules->rules, next) {
+> > +               match = true;
+> > +
+> > +               list_for_each_entry(prop, &rule->props, next)
+> > +                       match = match && evaluate_property(ctx, prop);
+> > +
+> > +               if (match)
+> > +                       break;
+> > +       }
+> > +
+> > +       if (match)
+> > +               action = rule->action;
+> > +       else if (rules->default_action != ipe_action_max)
+> > +               action = rules->default_action;
+> > +       else
+> > +               action = pol->parsed->global_default_action;
+> > +
+> > +eval:
+> > +       if (action == ipe_action_deny)
+> > +               rc = -EACCES;
+> > +
+> > +out:
+> > +       return rc;
+> > +}
+> > +
+> > +/**
+> > + * ipe_invalidate_pinned_sb - invalidte the ipe pinned super_block.
+> > + * @mnt_sb: super_block to check against the pinned super_block.
+> > + *
+> > + * This function is called a super_block like the initramfs's is freed,
+> > + * if the super_block is currently pinned by ipe it will be invalided,
+> > + * so ipe won't consider the block device is boot verified afterward.
+> > + */
+> > +void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb)
+> > +{
+> > +       spin_lock(&pin_lock);
+> > +
+> > +       if (!IS_ERR_OR_NULL(pinned_sb) && mnt_sb == pinned_sb)
+> > +               pinned_sb = ERR_PTR(-EIO);
+> 
+> I think you only need to check if @pinned_sb is equal to @mnt_sb,
+> that's all that really matters here.
+> 
+
+Agree, will remove the unnecessary part.
+
+> > +       spin_unlock(&pin_lock);
+> > +}
+> > diff --git a/security/ipe/eval.h b/security/ipe/eval.h
+> > new file mode 100644
+> > index 000000000000..887797438b9b
+> > --- /dev/null
+> > +++ b/security/ipe/eval.h
+> > @@ -0,0 +1,28 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * Copyright (C) Microsoft Corporation. All rights reserved.
+> > + */
+> > +
+> > +#ifndef IPE_EVAL_H
+> > +#define IPE_EVAL_H
+> > +
+> > +#include <linux/file.h>
+> > +#include <linux/types.h>
+> > +
+> > +#include "hooks.h"
+> > +#include "policy.h"
+> > +
+> > +extern struct ipe_policy __rcu *ipe_active_policy;
+> > +
+> > +struct ipe_eval_ctx {
+> > +       enum ipe_op_type op;
+> > +
+> > +       const struct file *file;
+> > +       bool from_init_sb;
+> > +};
+> > +
+> > +void build_eval_ctx(struct ipe_eval_ctx *ctx, const struct file *file, enum ipe_op_type op);
+> > +int ipe_evaluate_event(const struct ipe_eval_ctx *const ctx);
+> > +void ipe_invalidate_pinned_sb(const struct super_block *mnt_sb);
+> > +
+> > +#endif /* IPE_EVAL_H */
+> > diff --git a/security/ipe/hooks.c b/security/ipe/hooks.c
+> > new file mode 100644
+> > index 000000000000..335b773c7ae1
+> > --- /dev/null
+> > +++ b/security/ipe/hooks.c
+> > @@ -0,0 +1,25 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (C) Microsoft Corporation. All rights reserved.
+> > + */
+> > +
+> > +#include "ipe.h"
+> > +#include "hooks.h"
+> > +#include "eval.h"
+> > +
+> > +#include <linux/fs.h>
+> > +#include <linux/types.h>
+> > +#include <linux/binfmts.h>
+> > +#include <linux/mman.h>
+> > +
+> > +/**
+> > + * ipe_sb_free_security - ipe security hook function for super_block.
+> > + * @mnt_sb: Supplies a pointer to a super_block is about to be freed.
+> > + *
+> > + * IPE does not have any structures with mnt_sb, but uses this hook to
+> > + * invalidate a pinned super_block.
+> > + */
+> > +void ipe_sb_free_security(struct super_block *mnt_sb)
+> > +{
+> > +       ipe_invalidate_pinned_sb(mnt_sb);
+> > +}
+> > diff --git a/security/ipe/hooks.h b/security/ipe/hooks.h
+> > new file mode 100644
+> > index 000000000000..30fe455389bf
+> > --- /dev/null
+> > +++ b/security/ipe/hooks.h
+> > @@ -0,0 +1,14 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * Copyright (C) Microsoft Corporation. All rights reserved.
+> > + */
+> > +#ifndef IPE_HOOKS_H
+> > +#define IPE_HOOKS_H
+> > +
+> > +#include <linux/fs.h>
+> > +#include <linux/binfmts.h>
+> > +#include <linux/security.h>
+> > +
+> > +void ipe_sb_free_security(struct super_block *mnt_sb);
+> > +
+> > +#endif /* IPE_HOOKS_H */
+> > diff --git a/security/ipe/ipe.c b/security/ipe/ipe.c
+> > index 9ed3bf4dcc04..551c6d90ac11 100644
+> > --- a/security/ipe/ipe.c
+> > +++ b/security/ipe/ipe.c
+> > @@ -9,6 +9,7 @@ static struct lsm_blob_sizes ipe_blobs __lsm_ro_after_init = {
+> >  };
+> >
+> >  static struct security_hook_list ipe_hooks[] __lsm_ro_after_init = {
+> > +       LSM_HOOK_INIT(sb_free_security, ipe_sb_free_security),
+> >  };
+> >
+> >  /**
+> > diff --git a/security/ipe/policy.c b/security/ipe/policy.c
+> > index e446f4b84152..772d876b1087 100644
+> > --- a/security/ipe/policy.c
+> > +++ b/security/ipe/policy.c
+> > @@ -97,3 +97,23 @@ struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
+> >  err:
+> >         return ERR_PTR(rc);
+> >  }
+> > +
+> > +/**
+> > + * ipe_get_policy_rcu - Dereference a rcu-protected policy pointer.
+> > + *
+> > + * @p: rcu-protected pointer to a policy.
+> > + *
+> > + * Not safe to call on IS_ERR.
+> > + *
+> > + * Return: the value of @p
+> > + */
+> > +struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p)
+> > +{
+> > +       struct ipe_policy *rv = NULL;
+> > +
+> > +       rcu_read_lock();
+> > +       rv = rcu_dereference(p);
+> > +       rcu_read_unlock();
+> > +
+> > +       return rv;
+> > +}
+> > diff --git a/security/ipe/policy.h b/security/ipe/policy.h
+> > index 6af2d9a811ec..967d816cd5cd 100644
+> > --- a/security/ipe/policy.h
+> > +++ b/security/ipe/policy.h
+> > @@ -26,6 +26,8 @@ enum ipe_action_type {
+> >  };
+> >
+> >  enum ipe_prop_type {
+> > +       ipe_prop_boot_verified_false,
+> > +       ipe_prop_boot_verified_true,
+> >         ipe_prop_max
+> >  };
+> >
+> > @@ -73,5 +75,6 @@ struct ipe_policy {
+> >  struct ipe_policy *ipe_new_policy(const char *text, size_t textlen,
+> >                                   const char *pkcs7, size_t pkcs7len);
+> >  void ipe_free_policy(struct ipe_policy *pol);
+> > +struct ipe_policy *ipe_get_policy_rcu(struct ipe_policy __rcu *p);
+> >
+> >  #endif /* IPE_POLICY_H */
+> > diff --git a/security/ipe/policy_parser.c b/security/ipe/policy_parser.c
+> > index c7ba0e865366..7efafc482e46 100644
+> > --- a/security/ipe/policy_parser.c
+> > +++ b/security/ipe/policy_parser.c
+> > @@ -265,7 +265,9 @@ static enum ipe_action_type parse_action(char *t)
+> >  }
+> >
+> >  static const match_table_t property_tokens = {
+> > -       {ipe_prop_max,                                  NULL}
+> > +       {ipe_prop_boot_verified_false,  "boot_verified=FALSE"},
+> > +       {ipe_prop_boot_verified_true,   "boot_verified=TRUE"},
+> > +       {ipe_prop_max,                  NULL}
+> >  };
+> >
+> >  /**
+> > @@ -295,6 +297,10 @@ int parse_property(char *t, struct ipe_rule *r)
+> >         token = match_token(t, property_tokens, args);
+> >
+> >         switch (token) {
+> > +       case ipe_prop_boot_verified_false:
+> > +       case ipe_prop_boot_verified_true:
+> > +               p->type = token;
+> > +               break;
+> >         case ipe_prop_max:
+> >         default:
+> >                 rc = -EBADMSG;
+> > --
+> > 2.39.0
+> 
+> --
+> paul-moore.com
