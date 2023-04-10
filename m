@@ -2,178 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2832BC77B61
-	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 12:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7F4C77B73
+	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 16:06:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbjDJMoh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Apr 2023 08:44:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
+        id S230226AbjDJQGX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Apr 2023 12:06:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbjDJMo2 (ORCPT
+        with ESMTP id S230220AbjDJQGW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2023 08:44:28 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B36D61AC
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 05:44:24 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230410124420epoutp03c3e27af736f71ded3ae7d0207a3cff96~Uk22qhlS82195321953epoutp03Q
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 12:44:20 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230410124420epoutp03c3e27af736f71ded3ae7d0207a3cff96~Uk22qhlS82195321953epoutp03Q
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1681130660;
-        bh=Oz6PkpanDJafi5z9bEJgTzlzMkL/dsMLOw2pkUzLNck=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=oYb4ZbxaoOkZRgUK+KhvWnThmYNizrh1pEfeKcedot3J+WWtnriUqJj6XU+1KehT9
-         W98G43/CWvYU6evexXYRUI7hDCzEbNDx/kW3PCr28VFYODH2fB3u8XFjrdM6uL29OM
-         zOY58n+7erir9UPmqOPk8liSt2qqCOQ0FK9IzVkA=
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230410124419epcas5p1f6311642816695e03607cec38de37ac0~Uk22Y1vUm1912219122epcas5p1o;
-        Mon, 10 Apr 2023 12:44:19 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230410124419epsmtrp2f6eea08908ab1f081bb9165a27cd511d~Uk22YSc6i1301713017epsmtrp24;
-        Mon, 10 Apr 2023 12:44:19 +0000 (GMT)
-Received: from green5 (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230410124417epsmtip1ea7bd4a86c4aca55e5d920eb8723f83d~Uk20e5nHr2932429324epsmtip1b;
-        Mon, 10 Apr 2023 12:44:17 +0000 (GMT)
-Date:   Mon, 10 Apr 2023 18:13:33 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-Cc:     shinichiro.kawasaki@wdc.com, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, mcgrof@kernel.org
-Subject: Re: [PATCH blktests 2/2] nvme/047: add test for uring-passthrough
-Message-ID: <20230410124333.GC16047@green5>
+        Mon, 10 Apr 2023 12:06:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA193E8;
+        Mon, 10 Apr 2023 09:06:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3C95E614F3;
+        Mon, 10 Apr 2023 16:06:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A04AC433EF;
+        Mon, 10 Apr 2023 16:06:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681142780;
+        bh=mwSxhzCg15RXyTCgR9LDyFgq4h2rR53nA455oB13C/U=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=uy9ZpuY0vy2vryhepr3pFQGMr8grlBUWulmlwmxtAdUIeGqBZT78A1zNPM7ZM7Pbg
+         80BlDSor2Q+NUbN+Em6MmVaioJUZUyf2LJAD9cZ+T2g6nhq70CYWjg4DeSKfM2PJin
+         /yuIKz9GE3XW7WgHPpfoCGqc87it9FAk84og7eiHrYZR0nUcmeXUdYrcGpIz4A+5ID
+         7cVAEXwb0z7wdLObf180ptGHtrhmTtMJOYLSOjva3fYYT5jQZM0vZYSGo8dQq2ovp5
+         4G0gsxRWgyHIREk2+mwCWjD0hmYsYFutawlh5pd7JCr/rKeTfdXyrsI34BbeUW0wkr
+         wbbmJTsRjleyA==
+Received: by mail-lj1-f178.google.com with SMTP id n22so3923469ljq.8;
+        Mon, 10 Apr 2023 09:06:20 -0700 (PDT)
+X-Gm-Message-State: AAQBX9f5g2ZVXNPpeUtF6UM/67NGFKNHxx7nMqf3hDry6+f+97kT/XMT
+        AN5HIyazqwSvu2xTfehztDrApsfBXwJ1P7AUfkc=
+X-Google-Smtp-Source: AKy350ZYTf5+tNtIInJ56xYELpkw807n6pcDQqxLzwYNn5kC/wsk/lyy0ZRj6GpVdiG1eSqStA2SCDFU3pUWbh96/vU=
+X-Received: by 2002:a2e:b0e2:0:b0:2a5:fe8f:b314 with SMTP id
+ h2-20020a2eb0e2000000b002a5fe8fb314mr2152243ljl.5.1681142778696; Mon, 10 Apr
+ 2023 09:06:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20230407080746.tx4sgperc6pvjsbu@shinhome>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-CMS-MailID: 20230410124419epcas5p1f6311642816695e03607cec38de37ac0
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b83_"
-CMS-TYPE: 105P
-X-CMS-RootMailID: 20230331034533epcas5p2834dad2bc54ad1a6348895f522400e8c
-References: <20230331034414.42024-1-joshi.k@samsung.com>
-        <CGME20230331034533epcas5p2834dad2bc54ad1a6348895f522400e8c@epcas5p2.samsung.com>
-        <20230331034414.42024-3-joshi.k@samsung.com>
-        <20230407080746.tx4sgperc6pvjsbu@shinhome>
+References: <cover.1680172791.git.johannes.thumshirn@wdc.com>
+ <8b8a3bb2db8c5183ef36c1810f2ac776ac526327.1680172791.git.johannes.thumshirn@wdc.com>
+ <CAPhsuW7a+mpn+VprfA2mC5Fc+M9BFq8i6d-y+-o5G1u5dOsk2Q@mail.gmail.com> <bbc98aa3-24f0-8ee6-9d74-483564a14f0f@kernel.org>
+In-Reply-To: <bbc98aa3-24f0-8ee6-9d74-483564a14f0f@kernel.org>
+From:   Song Liu <song@kernel.org>
+Date:   Mon, 10 Apr 2023 09:06:06 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW4yQjNgHZpw4UzkhC+GkY+aAFSjC-PDQFFoL-Wg-u2r1Q@mail.gmail.com>
+Message-ID: <CAPhsuW4yQjNgHZpw4UzkhC+GkY+aAFSjC-PDQFFoL-Wg-u2r1Q@mail.gmail.com>
+Subject: Re: [PATCH v2 17/19] md: raid1: check if adding pages to resync bio fails
+To:     Johannes Thumshirn <jth@kernel.org>
+Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b83_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
-
-On Fri, Apr 07, 2023 at 05:07:46PM +0900, Shin'ichiro Kawasaki wrote:
->Thanks for the patch. I think it's good to have this test case to cover the
->uring-passthrough codes in the nvme driver code. Please find my comments in
->line.
+On Tue, Apr 4, 2023 at 1:26=E2=80=AFAM Johannes Thumshirn <jth@kernel.org> =
+wrote:
 >
->Also, I ran the new test case on my Fedora system using QEMU NVME device and
->found the test case fails with errors like,
+> On 31/03/2023 20:13, Song Liu wrote:
+> > On Thu, Mar 30, 2023 at 3:44=E2=80=AFAM Johannes Thumshirn
+> > <johannes.thumshirn@wdc.com> wrote:
+> >>
+> >> Check if adding pages to resync bio fails and if bail out.
+> >>
+> >> As the comment above suggests this cannot happen, WARN if it actually
+> >> happens.
+> >>
+> >> This way we can mark bio_add_pages as __must_check.
+> >>
+> >> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> >> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> >> ---
+> >>   drivers/md/raid1-10.c |  7 ++++++-
+> >>   drivers/md/raid10.c   | 12 ++++++++++--
+> >>   2 files changed, 16 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
+> >> index e61f6cad4e08..c21b6c168751 100644
+> >> --- a/drivers/md/raid1-10.c
+> >> +++ b/drivers/md/raid1-10.c
+> >> @@ -105,7 +105,12 @@ static void md_bio_reset_resync_pages(struct bio =
+*bio, struct resync_pages *rp,
+> >>                   * won't fail because the vec table is big
+> >>                   * enough to hold all these pages
+> >>                   */
+> >
+> > We know these won't fail. Shall we just use __bio_add_page?
 >
->    fio: io_u error on file /dev/ng0n1: Permission denied: read offset=266240, buflen=4096
->
->I took a look in this and learned that SELinux on my system does not allow
->IORING_OP_URING_CMD by default. I needed to do "setenforce 0" or add a local
->policy to allow IORING_OP_URING_CMD so that the test case passes.
->
->I think this test case should check this security requirement. I'm not sure what
->is the best way to do it. One idea is to just run fio with io_uring_cmd engine
->and check its error message. I created a patch below, and it looks working on my
->system. I suggest to add it, unless anyone knows other better way.
+> We could yes, but I kind of like the assert() style warning.
+> But of cause ultimately your call.
 
-I will use the latest one you posted. Thanks for taking care of it.
+The assert() style warning is fine. In this case, please remove the
+"won't fail ..." comments.
 
->diff --git a/tests/nvme/047 b/tests/nvme/047
->index a0cc8b2..30961ff 100755
->--- a/tests/nvme/047
->+++ b/tests/nvme/047
->@@ -14,6 +14,22 @@ requires() {
-> 	_have_fio_ver 3 33
-> }
->
->+device_requires() {
->+	local ngdev=${TEST_DEV/nvme/ng}
->+	local fio_output
->+
->+	if fio_output=$(fio --name=check --size=4k --filename="$ngdev" \
->+			    --rw=read --ioengine=io_uring_cmd 2>&1); then
->+		return 0
->+	fi
->+	if grep -qe "Permission denied" <<< "$fio_output"; then
->+		SKIP_REASONS+=("IORING_OP_URING_CMD is not allowed for $ngdev")
->+	else
->+		SKIP_REASONS+=("IORING_OP_URING_CMD check for $ngdev failed")
->+	fi
->+	return 1
->+}
->+
-> test_device() {
-> 	echo "Running ${TEST_NAME}"
-> 	local ngdev=${TEST_DEV/nvme/ng}
->
->
->On Mar 31, 2023 / 09:14, Kanchan Joshi wrote:
->> User can communicate to NVMe char device (/dev/ngXnY) using the
->> uring-passthrough interface. This test exercises some of these
->> communication pathways, using the 'io_uring_cmd' ioengine of fio.
->>
->> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->> ---
->>  tests/nvme/047     | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->>  tests/nvme/047.out |  2 ++
->>  2 files changed, 48 insertions(+)
->>  create mode 100755 tests/nvme/047
->>  create mode 100644 tests/nvme/047.out
->>
->> diff --git a/tests/nvme/047 b/tests/nvme/047
->> new file mode 100755
->> index 0000000..a0cc8b2
->> --- /dev/null
->> +++ b/tests/nvme/047
->> @@ -0,0 +1,46 @@
->> +#!/bin/bash
->> +# SPDX-License-Identifier: GPL-3.0+
->> +# Copyright (C) 2023 Kanchan Joshi, Samsung Electronics
->> +# Test exercising uring passthrough IO on nvme char device
->> +
->> +. tests/nvme/rc
->> +
->> +DESCRIPTION="basic test for uring-passthrough io on /dev/ngX"
->> +QUICK=1
->> +
->> +requires() {
->> +	_nvme_requires
->> +	_have_kver 6 1
->
->In general, it's the better not to depend on version number to check dependency.
->Is kernel version the only way to check the kernel dependency?
-
-The tests checks for iopoll and fixed-buffer paths which are present
-from 6.1 onwards, therefore this check. Hope that is ok?
-
->Also, I think this test case assumes that the kernel is built with
->CONFIG_IO_URING. I suggest to add "_have_kernel_option IO_URING" to ensure it.
-
-Sure, will add.
-
->> +	_have_fio_ver 3 33
->
->Is io_uring_cmd engine the reason to check this fio version? If so, I suggest to
->check "fio --enghelp" output. We can add a new helper function with name like
->_have_fio_io_uring_cmd_engine. _have_fio_zbd_zonemode in common/fio can be a
->reference.
-
-fixed-buffer support[1] went into this fio relese, therefore check for
-the specific version.
-
-[1]https://lore.kernel.org/fio/20221003033152.314763-1-anuj20.g@samsung.com/
-
-------PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b83_
-Content-Type: text/plain; charset="utf-8"
-
-
-------PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b83_--
+Thanks,
+Song
