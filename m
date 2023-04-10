@@ -2,163 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE2EC77B6E
-	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 00:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86979C77B6E
+	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 01:58:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbjDJAoK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Apr 2023 20:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34292 "EHLO
+        id S229480AbjDJB56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Apr 2023 21:57:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjDJAoJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Apr 2023 20:44:09 -0400
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 758E33596
-        for <linux-block@vger.kernel.org>; Sun,  9 Apr 2023 17:44:08 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.west.internal (Postfix) with ESMTP id EC06D2B0671A;
-        Sun,  9 Apr 2023 20:44:04 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Sun, 09 Apr 2023 20:44:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1681087444; x=1681088044; bh=Z6
-        icuaoDHHIsO5d4VfRrQbPiDw7J9fTP2H0bgGwHcnU=; b=R4hEEA6eoBFqpNR20p
-        fL8F4Q7f8azzkWcnqc7RMdvWDBpbZJXuJW2ma9XENfVL40Cz+Qe1sAkdPFAUtAIp
-        rJbLdr1HQ5Zld+ldeP9AdBgAdxpPWcXIu1gxw4rGWGNqiQoQPHLs4K6b3v1VAd4t
-        FiCAdQz+f+VH2fXffebZcKoxOXyyH/fZ5hYI9iYa0sZVGiQeTc7J5P3+3Yeh2hu5
-        2ZUPY5ypE9P7WmpLSVRRvGE80eKxO/BIm8NaKrnIczy5aLDX9frWAC3d3jeJ+87c
-        JNpdSUKA+9CyTEhs+GNb3TpRk1q32lSEc6hupa8dm0n9Al32vrxPzTBkVKncpuMX
-        EMYQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=ie1e949a3.fm2; t=1681087444; x=1681088044; bh=Z6i
-        cuaoDHHIsO5d4VfRrQbPiDw7J9fTP2H0bgGwHcnU=; b=BIUtOI/bxs78GTs7w8G
-        YztdY4DfFJq4kv4v0nQEFy64xOf+E1Ra4+I/Ok5+q87eVEOAbH96btokgCSpCU9k
-        gqVhzKIXMbCQ6TrbaD0+vDpadxzj7oK7wjiodRwUtLOl0pJNOklH6gsxKqgm/him
-        5bEIuchJksm8dULBYajj3cwCmvDjS6U7WJ4amWWpr+oNTgjFz2wEd2kvHW6CKt6/
-        2k9W5vz2v73CGNJn1NkK6wpq4brMKUPAtVBDE9coaPV+SrnGVslWT8ux2Oin2fSr
-        s1iPVkzcYu4wTLjRmt5Pz/VrTQl4Zcdi7Wj4x4XliSqAmJKbnS7YaAMLo52mcdbV
-        chQ==
-X-ME-Sender: <xms:01szZAQh1QcSfgVrnv7o8b5msLFk46ADQHAGvRtXacr3fmkkZBXGzQ>
-    <xme:01szZNzCDgGhvguXY2qSAGiSRNh-8YOefYAsQOLcTtOMlWvTq5liyMek-BUsYKSDe
-    fUAxAJxfDhaKxflvjg>
-X-ME-Received: <xmr:01szZN33ihhVfny2VsVKBcrmr7ODkSlenOO2r87iQdW8MUi4B22frYRL8wbCF3fF1nbGVk4V-5BVbC7Mghzs_Q>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekuddggedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
-    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepvdegtdfgvdfhgfekvdektdfgfeeljeel
-    gefgkedujeeiteehgefhgeethffgheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
-    mh
-X-ME-Proxy: <xmx:01szZECDe7jZVGm2Du1AZdYwzl_MSDzjtapZgRFjMPZX20jOhDDDnw>
-    <xmx:01szZJgmxj_YGpFc_FCkPYm6CrVBewOjGZvg0KyPab9Sv7fpIs0KQw>
-    <xmx:01szZAqbEROpcXZydHq1C8t5ckVQVgvtEuPT-lg5lV_pSUUF_VS8QA>
-    <xmx:1FszZOuXquiD4L68G6T3Pe_OEjLbALahLJXOwssrrhknq64nH7Yfcu7H5VddhlLn>
-Feedback-ID: ie1e949a3:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 9 Apr 2023 20:44:02 -0400 (EDT)
-Date:   Mon, 10 Apr 2023 09:43:58 +0900
-From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     shinichiro.kawasaki@wdc.com, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, mcgrof@kernel.org
-Subject: Re: [PATCH blktests 2/2] nvme/047: add test for uring-passthrough
-Message-ID: <p7rz7dz6t2vdihusunblbw6tm4cqrq4vcfaupttjwqqj7jiwgc@6emzgswzmmeq>
-References: <20230331034414.42024-1-joshi.k@samsung.com>
- <CGME20230331034533epcas5p2834dad2bc54ad1a6348895f522400e8c@epcas5p2.samsung.com>
- <20230331034414.42024-3-joshi.k@samsung.com>
- <20230407080746.tx4sgperc6pvjsbu@shinhome>
+        with ESMTP id S229455AbjDJB56 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Apr 2023 21:57:58 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5C9358D;
+        Sun,  9 Apr 2023 18:57:52 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PvsYm20NLz4f4Nt5;
+        Mon, 10 Apr 2023 09:57:48 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgDHcyEbbTNkJq3_GQ--.14009S3;
+        Mon, 10 Apr 2023 09:57:49 +0800 (CST)
+Subject: Re: [PATCH v2 0/3] blk-cgroup: some cleanup
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Chengming Zhou <zhouchengming@bytedance.com>, axboe@kernel.dk,
+        tj@kernel.org
+Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230406145050.49914-1-zhouchengming@bytedance.com>
+ <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <d23a6891-96f0-2ee0-70c7-869123d85362@huaweicloud.com>
+Date:   Mon, 10 Apr 2023 09:57:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230407080746.tx4sgperc6pvjsbu@shinhome>
+In-Reply-To: <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDHcyEbbTNkJq3_GQ--.14009S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Aw4fCr4xAr1kXw43AF1DJrb_yoW8ur4rpa
+        15KFZxCr48Gryqqa1rZanrWF18Ga9IkasrAr93Kr43Zas8uw48JF1kJF9FvryUGFWkZFyx
+        WFyDGFZ5XF4jq37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+        kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa
+        7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 07, 2023 / 17:07, Shin'ichiro Kawasaki wrote:
-> Thanks for the patch. I think it's good to have this test case to cover the
-> uring-passthrough codes in the nvme driver code. Please find my comments in
-> line.
-> 
-> Also, I ran the new test case on my Fedora system using QEMU NVME device and
-> found the test case fails with errors like,
-> 
->     fio: io_u error on file /dev/ng0n1: Permission denied: read offset=266240, buflen=4096
-> 
-> I took a look in this and learned that SELinux on my system does not allow
-> IORING_OP_URING_CMD by default. I needed to do "setenforce 0" or add a local
-> policy to allow IORING_OP_URING_CMD so that the test case passes.
-> 
-> I think this test case should check this security requirement. I'm not sure what
-> is the best way to do it. One idea is to just run fio with io_uring_cmd engine
-> and check its error message. I created a patch below, and it looks working on my
-> system. I suggest to add it, unless anyone knows other better way.
-> 
-> diff --git a/tests/nvme/047 b/tests/nvme/047
-> index a0cc8b2..30961ff 100755
-> --- a/tests/nvme/047
-> +++ b/tests/nvme/047
-> @@ -14,6 +14,22 @@ requires() {
->  	_have_fio_ver 3 33
->  }
->  
-> +device_requires() {
-> +	local ngdev=${TEST_DEV/nvme/ng}
-> +	local fio_output
-> +
-> +	if fio_output=$(fio --name=check --size=4k --filename="$ngdev" \
-> +			    --rw=read --ioengine=io_uring_cmd 2>&1); then
-> +		return 0
-> +	fi
-> +	if grep -qe "Permission denied" <<< "$fio_output"; then
-> +		SKIP_REASONS+=("IORING_OP_URING_CMD is not allowed for $ngdev")
-> +	else
-> +		SKIP_REASONS+=("IORING_OP_URING_CMD check for $ngdev failed")
+Hi, Bart
 
-I revisited the code I suggested and noticed this part is not good. The failures
-other than "Permission denied" are the failures that this test case intended to
-catch. It is not good to skip them.
+在 2023/04/08 2:41, Bart Van Assche 写道:
+> On 4/6/23 07:50, Chengming Zhou wrote:
+>> These are some cleanup patches of blk-cgroup. Thanks for review.
+> 
+> With these patches applied, my kernel test VM crashes during boot. The 
+> following crash disappears if I revert these patches:
+> 
+> BUG: KASAN: null-ptr-deref in bio_associate_blkg_from_css+0x83/0x240
+> Read of size 8 at addr 0000000000000518 by task blkid/5885
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
+> 1.16.0-debian-1.16.0-5 04/01/2014
+> Call Trace:
+>   dump_stack_lvl+0x4a/0x80
+>   print_report+0x21e/0x260
+>   kasan_report+0xc2/0xf0
+>   __asan_load8+0x69/0x90
+>   bio_associate_blkg_from_css+0x83/0x240
+>   bfq_bio_bfqg+0xce/0x120 [bfq]
+>   bfq_bic_update_cgroup+0x2f/0x3c0 [bfq]
+>   bfq_init_rq+0x1e8/0xb10 [bfq]
+>   bfq_insert_request.isra.0+0xa3/0x420 [bfq]
+>   bfq_insert_requests+0xca/0xf0 [bfq]
+>   blk_mq_dispatch_rq_list+0x4c0/0xb00
 
-> +	fi
-> +	return 1
-> +}
-> +
->  test_device() {
->  	echo "Running ${TEST_NAME}"
->  	local ngdev=${TEST_DEV/nvme/ng}
+I found this call trace quite weird, I can't figure out how
+bfq_insert_requests can be called from blk_mq_dispatch_rq_list,
+can you show the add2line result?
 
-As far as I read the kernel code related to security_uring_cmd(), calling uring
-command is the only way to check its security permission. It means that we can
-not separate the check for the security permission and the uring command test
-itself. So it's the better to check the security permission not in
-device_requires() but in test_device(), as follows:
-
-diff --git a/tests/nvme/047 b/tests/nvme/047
-index a0cc8b2..741ccd9 100755
---- a/tests/nvme/047
-+++ b/tests/nvme/047
-@@ -30,6 +30,16 @@ test_device() {
- 		--time_based
- 		--runtime=2
- 	)
-+	local fio_output
-+
-+	# check security permission
-+	if ! fio_output=$(fio --name=check --size=4k --filename="$ngdev" \
-+			    --rw=read --ioengine=io_uring_cmd 2>&1) &&
-+			grep -qe "Permission denied" <<< "$fio_output"; then
-+		SKIP_REASONS+=("IORING_OP_URING_CMD is not allowed for $ngdev")
-+		return
-+	fi
-+
- 	#plain read test
- 	_run_fio "${common_args[@]}"
- 
+Thanks,
+Kuai
+>   __blk_mq_sched_dispatch_requests+0x15e/0x200
+>   blk_mq_sched_dispatch_requests+0x8b/0xc0
+>   __blk_mq_run_hw_queue+0x3ff/0x500
+>   __blk_mq_delay_run_hw_queue+0x23a/0x300
+>   blk_mq_run_hw_queue+0x14e/0x350
+>   blk_mq_sched_insert_request+0x181/0x1f0
+>   blk_execute_rq+0xf4/0x300
+>   scsi_execute_cmd+0x23e/0x350
+>   sr_do_ioctl+0x173/0x3d0 [sr_mod]
+>   sr_packet+0x60/0x90 [sr_mod]
+>   cdrom_get_track_info.constprop.0+0x125/0x170 [cdrom]
+>   cdrom_get_last_written+0x1d4/0x2d0 [cdrom]
+>   mmc_ioctl_cdrom_last_written+0x85/0x120 [cdrom]
+>   mmc_ioctl+0x10b/0x1d0 [cdrom]
+>   cdrom_ioctl+0xa66/0x1270 [cdrom]
+>   sr_block_ioctl+0xee/0x130 [sr_mod]
+>   blkdev_ioctl+0x1bb/0x3f0
+>   __x64_sys_ioctl+0xc7/0xe0
+>   do_syscall_64+0x34/0x80
+>   entry_SYSCALL_64_after_hwframe+0x46/0xb0
+> 
+> Bart.
+> 
+> .
+> 
 
