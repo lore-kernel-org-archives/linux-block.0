@@ -2,135 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E81F8C76196
-	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 08:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 295E5C77B70
+	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 11:26:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbjDJIcG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Apr 2023 04:32:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46952 "EHLO
+        id S229694AbjDJL0F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Apr 2023 07:26:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbjDJIcF (ORCPT
+        with ESMTP id S229645AbjDJL0E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2023 04:32:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA0963590
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 01:32:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 582EB60C79
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 08:32:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EC78C433EF;
-        Mon, 10 Apr 2023 08:32:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681115523;
-        bh=xBtT4/1xl+qKxf8uW/CUqlnGlEx4FJ7gvtU7C0AOYD0=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=NTzL09n3T6X4/7sZ01n9QXonuhOXlMBn1+3F0H5aZMVow837vV4Ll9i3mBK2szv/4
-         9D1oFNENQUR9JGzHavyrzZ35ueQeDKcUc7/istFn3ANrmoc/kmLBHFZQkOzJ2Ap5ys
-         qrMjIHq8gHHdmLjh1TCxNWjW/9U+uDixR0sAptDa2QfI6+eCpxV9+cOx6GCvxHTxn+
-         T3LFVCRVkFvQRd3BByKazHuYwZ2T+I1IrTBO93HM2jxJmcQB9L9Gebpa5d2V/Zp8L2
-         lueh/tNRoNFTD3YNajVJTaQPt0DbK3bMvAHibil6KRMfACgWIP3+JOmU2mzIAGx7XN
-         0g98d3il1zY+Q==
-Message-ID: <c9b29094-50f9-3dac-647e-b7b5b7cc729d@kernel.org>
-Date:   Mon, 10 Apr 2023 17:32:00 +0900
+        Mon, 10 Apr 2023 07:26:04 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE3303AB5
+        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 04:26:01 -0700 (PDT)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230410112558epoutp013f23cedc11775f121ae1177014d049e6~Ujyb_-vgq2329223292epoutp01x
+        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 11:25:58 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230410112558epoutp013f23cedc11775f121ae1177014d049e6~Ujyb_-vgq2329223292epoutp01x
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1681125958;
+        bh=UHIxLy9rr2FhoG6rYbGSve7hP2xwzs8NruR/TyQFIMM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Vvozc/AX+2UFkrE+m2OcNf4q65qf2xw32IL3ehSFZp5VeUxoFGaKZo3Wj7G7gkL0i
+         X8sapoO/2iHGZ+1eiV5iLmfCnCnD57XWYTE4zC4Wn+SLbotCV/IKVKPdHB5f6emif3
+         NCMO0tlBX/KwiFBi08bov4U294zx5byClF4smXf8=
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230410112558epcas5p1a0b28653aae0af8be020cd6dff0fd2ef~Ujybe8Jay0835008350epcas5p1k;
+        Mon, 10 Apr 2023 11:25:58 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230410112558epsmtrp20642811a51e760e70ba63e118986d2ff~Ujybebwfu3173131731epsmtrp2Y;
+        Mon, 10 Apr 2023 11:25:58 +0000 (GMT)
+Received: from green5 (unknown [107.110.206.5]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230410112556epsmtip1c29299c2d6bd2368d392525783eafae0~UjyaK_cPT2849828498epsmtip1N;
+        Mon, 10 Apr 2023 11:25:56 +0000 (GMT)
+Date:   Mon, 10 Apr 2023 16:55:03 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Keith Busch <kbusch@meta.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        sagi@grimberg.me, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv2 2/5] nvme: simplify passthrough bio cleanup
+Message-ID: <20230410112503.GA16047@green5>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v2 12/12] block: mq-deadline: Handle requeued requests
- correctly
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>
-References: <20230407235822.1672286-1-bvanassche@acm.org>
- <20230407235822.1672286-13-bvanassche@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230407235822.1672286-13-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20230407191636.2631046-3-kbusch@meta.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-CMS-MailID: 20230410112558epcas5p1a0b28653aae0af8be020cd6dff0fd2ef
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_5835_"
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20230407191711epcas5p3b9b27aa2477b12ec116b85ea3c7d54b7
+References: <20230407191636.2631046-1-kbusch@meta.com>
+        <CGME20230407191711epcas5p3b9b27aa2477b12ec116b85ea3c7d54b7@epcas5p3.samsung.com>
+        <20230407191636.2631046-3-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/8/23 08:58, Bart Van Assche wrote:
-> If a zoned write is requeued with an LBA that is lower than already
-> inserted zoned writes, make sure that it is submitted first.
-> 
-> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Mike Snitzer <snitzer@kernel.org>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/mq-deadline.c | 26 +++++++++++++++++++++++++-
->  1 file changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index d49e20d3011d..c536b499a60f 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -162,8 +162,19 @@ static void
->  deadline_add_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
->  {
->  	struct rb_root *root = deadline_rb_root(per_prio, rq);
-> +	struct request **next_rq = &per_prio->next_rq[rq_data_dir(rq)];
->  
->  	elv_rb_add(root, rq);
-> +	if (*next_rq == NULL || !blk_queue_is_zoned(rq->q))
-> +		return;
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_5835_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-A blank line here would be nice.
+On Fri, Apr 07, 2023 at 12:16:33PM -0700, Keith Busch wrote:
+>From: Keith Busch <kbusch@kernel.org>
+>
+>Set the bio's bi_end_io to handle the cleanup so that uring_cmd doesn't
+>need this complex pdu->{bio,req} switchero and restore.
+>
+>Signed-off-by: Keith Busch <kbusch@kernel.org>
+>---
+> drivers/nvme/host/ioctl.c | 26 +++++++++-----------------
+> 1 file changed, 9 insertions(+), 17 deletions(-)
+>
+>diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+>index d24ea2e051564..278c57ee0db91 100644
+>--- a/drivers/nvme/host/ioctl.c
+>+++ b/drivers/nvme/host/ioctl.c
+>@@ -159,6 +159,11 @@ static struct request *nvme_alloc_user_request(struct request_queue *q,
+> 	return req;
+> }
+>
+>+static void nvme_uring_bio_end_io(struct bio *bio)
+>+{
+>+	blk_rq_unmap_user(bio);
+>+}
+>+
+> static int nvme_map_user_request(struct request *req, u64 ubuffer,
+> 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
+> 		u32 meta_seed, void **metap, struct io_uring_cmd *ioucmd,
+>@@ -204,6 +209,7 @@ static int nvme_map_user_request(struct request *req, u64 ubuffer,
+> 		*metap = meta;
+> 	}
+>
+>+	bio->bi_end_io = nvme_uring_bio_end_io;
+> 	return ret;
+>
+> out_unmap:
+>@@ -249,8 +255,6 @@ static int nvme_submit_user_cmd(struct request_queue *q,
+> 	if (meta)
+> 		ret = nvme_finish_user_metadata(req, meta_buffer, meta,
+> 						meta_len, ret);
+>-	if (bio)
+>-		blk_rq_unmap_user(bio);
 
-> +	/*
-> +	 * If a request got requeued or requests have been submitted out of
-> +	 * order, make sure that per zone the request with the lowest LBA is
+Is it safe to call blk_rq_unamp_user in irq context?
+Agree that current code does some complex stuff, but that's to ensure
+what the code-comment [1] says.
 
-Requests being submitted out of order would be a bug in the issuer code. So I
-would not even mention this here and focus on explaining that requeue may cause
-seeing inserts outs of order.
+Also for polled-io, new-code will hit this warn-on [2] on calling
+bio_put_percpu_cache.
 
-> +	 * submitted first.
-> +	 */
-> +	if (blk_rq_pos(rq) < blk_rq_pos(*next_rq) &&
-> +	    blk_rq_zone_no(rq) == blk_rq_zone_no(*next_rq))
-> +		*next_rq = rq;
->  }
->  
->  static inline void
-> @@ -822,6 +833,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  		list_add(&rq->queuelist, &per_prio->dispatch);
->  		rq->fifo_time = jiffies;
->  	} else {
-> +		struct list_head *insert_before;
-> +
->  		deadline_add_rq_rb(per_prio, rq);
->  
->  		if (rq_mergeable(rq)) {
-> @@ -834,7 +847,18 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  		 * set expire time and add to fifo list
->  		 */
->  		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
-> -		list_add_tail(&rq->queuelist, &per_prio->fifo_list[data_dir]);
-> +		insert_before = &per_prio->fifo_list[data_dir];
-> +		if (blk_rq_is_seq_zoned_write(rq)) {
-> +			const unsigned int zno = blk_rq_zone_no(rq);
-> +			struct request *rq2 = rq;
-> +
-> +			while ((rq2 = deadline_earlier_request(rq2)) &&
-> +			       blk_rq_zone_no(rq2) == zno &&
-> +			       blk_rq_pos(rq2) > blk_rq_pos(rq)) {
-> +				insert_before = &rq2->queuelist;
-> +			}
-> +		}
-> +		list_add_tail(&rq->queuelist, insert_before);
+[1] 
+623  *    A matching blk_rq_unmap_user() must be issued at the end of I/O, while
+624  *    still in process context.
+625  */
+626 int blk_rq_map_user_iov(struct request_queue *q, struct request *rq,
+627                         struct rq_map_data *map_data,
 
-This seems incorrect: the fifo list is ordered in arrival time, so always
-queuing at the tail is the right thing to do. What I think you want to do here
-is when we choose the next request to be the oldest (to implement aging), you
-want to get the first request for the target zone of that oldest request. But
-why do that on insert ? This should be in the dispatch code, coded in
-deadline_fifo_request(), no ?
 
+[2]
+773         if ((bio->bi_opf & REQ_POLLED) && !WARN_ON_ONCE(in_interrupt())) {
+774                 bio->bi_next = cache->free_list;
+
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_5835_
+Content-Type: text/plain; charset="utf-8"
+
+
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_5835_--
