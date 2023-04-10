@@ -2,120 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86979C77B6E
-	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 01:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF2DC76196
+	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 05:01:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbjDJB56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Apr 2023 21:57:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54440 "EHLO
+        id S229577AbjDJFBM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Apr 2023 01:01:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbjDJB56 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Apr 2023 21:57:58 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5C9358D;
-        Sun,  9 Apr 2023 18:57:52 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PvsYm20NLz4f4Nt5;
-        Mon, 10 Apr 2023 09:57:48 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDHcyEbbTNkJq3_GQ--.14009S3;
-        Mon, 10 Apr 2023 09:57:49 +0800 (CST)
-Subject: Re: [PATCH v2 0/3] blk-cgroup: some cleanup
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Chengming Zhou <zhouchengming@bytedance.com>, axboe@kernel.dk,
-        tj@kernel.org
-Cc:     paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230406145050.49914-1-zhouchengming@bytedance.com>
- <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <d23a6891-96f0-2ee0-70c7-869123d85362@huaweicloud.com>
-Date:   Mon, 10 Apr 2023 09:57:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229485AbjDJFBL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Apr 2023 01:01:11 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E2F93C14;
+        Sun,  9 Apr 2023 22:01:09 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-2467761d1f4so163374a91.2;
+        Sun, 09 Apr 2023 22:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1681102869;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zsSfEZyj+6Q8d8N54pdQLmL7plXalSHeWulTtzchzEU=;
+        b=UNggAa+REmV/mVKgHZrHAhMKAXCg62u4RtbQyigD2xDLlxxzc+mLUZaZ2LSOhO18wH
+         ZCb2LWqCgMZF6YIC5uh6ycS5HclDDolef1sLQ67RkOfHhT/xy8LENTizW9auqEWDClzV
+         M95euQYdqsKZcvtHSQcLO/3s3izKkHsRNCbBoDYoVOpp7rCGy86gXgRHGnlXy6st/aY4
+         pqON9DeYoSqYdQZ0WuRRtgyqxh+5bOWFTNUGTZz00BS09v3QLovne9UAWlh0VE6XKn89
+         v0E1Z9sxgysK/59rH7oOddVKtqBrN8Ts/6D4TI2mOxXO1PhHvYMsewRmEW6spGq0VUeC
+         MBqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681102869;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zsSfEZyj+6Q8d8N54pdQLmL7plXalSHeWulTtzchzEU=;
+        b=AVvvE/QEXcXD7NzJI1u4T7SqrG2mb1VHx+U0zHPFxY7h1webW76GPudVBWhGKuKOsA
+         2PRlgfCcl44t3TrxqI+rCR3/HF+20upEGjJHpRGEaFdCh+chAl5URbOgoaLCFAc0Z47a
+         2rGnHRk3wNtkMDwZ9dnIzs0UELD6XoQbC6/ZVDCgZZ6Ge1Yx7WFQsRFleJnn8+XviQaZ
+         LZ4HcqFa44xvuOe9xeHdyRRphMId/9HNg56fTqv+PFkyucqrs2D9Br2aPXwTrguKkwDa
+         8yGmRf1ScozbuBtAjrXGBSnKC1rdyqoJFSIZwI6K8ZAL6xxnD8yW2+2WEg3xiMVC3QEJ
+         iURQ==
+X-Gm-Message-State: AAQBX9dV95Nbtgrwer2anRJj3IPcmjqErLkWX0pz6gL59STkcZpMEKfK
+        CwqeHhyPKQLMHpXuFsvsYmU=
+X-Google-Smtp-Source: AKy350Y1RaWC/2Sf5V2Te3MVI4yRXS+LLPRO3v85S9xjoGMlEJgqiYjq7FsgLcnvrdGOY6A1wC0XAw==
+X-Received: by 2002:a62:1bd4:0:b0:625:efa4:4c01 with SMTP id b203-20020a621bd4000000b00625efa44c01mr9899878pfb.3.1681102868660;
+        Sun, 09 Apr 2023 22:01:08 -0700 (PDT)
+Received: from debian.me (subs32-116-206-28-34.three.co.id. [116.206.28.34])
+        by smtp.gmail.com with ESMTPSA id s5-20020aa78d45000000b00625037cf695sm3391162pfe.86.2023.04.09.22.01.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Apr 2023 22:01:08 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 16D161067EC; Mon, 10 Apr 2023 12:01:03 +0700 (WIB)
+Date:   Mon, 10 Apr 2023 12:01:03 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+        kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org,
+        ming.lei@redhat.com, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
+Message-ID: <ZDOYD9eehrz9wQBZ@debian.me>
+References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
+ <20230404140835.25166-4-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
-In-Reply-To: <cab869b1-1cba-5698-55eb-a93d0596c869@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDHcyEbbTNkJq3_GQ--.14009S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw4fCr4xAr1kXw43AF1DJrb_yoW8ur4rpa
-        15KFZxCr48Gryqqa1rZanrWF18Ga9IkasrAr93Kr43Zas8uw48JF1kJF9FvryUGFWkZFyx
-        WFyDGFZ5XF4jq37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-        kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
-        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa
-        7IU1zuWJUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="3sJxY84NpHVtSyPq"
+Content-Disposition: inline
+In-Reply-To: <20230404140835.25166-4-sergei.shtepa@veeam.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Bart
 
-在 2023/04/08 2:41, Bart Van Assche 写道:
-> On 4/6/23 07:50, Chengming Zhou wrote:
->> These are some cleanup patches of blk-cgroup. Thanks for review.
-> 
-> With these patches applied, my kernel test VM crashes during boot. The 
-> following crash disappears if I revert these patches:
-> 
-> BUG: KASAN: null-ptr-deref in bio_associate_blkg_from_css+0x83/0x240
-> Read of size 8 at addr 0000000000000518 by task blkid/5885
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
-> 1.16.0-debian-1.16.0-5 04/01/2014
-> Call Trace:
->   dump_stack_lvl+0x4a/0x80
->   print_report+0x21e/0x260
->   kasan_report+0xc2/0xf0
->   __asan_load8+0x69/0x90
->   bio_associate_blkg_from_css+0x83/0x240
->   bfq_bio_bfqg+0xce/0x120 [bfq]
->   bfq_bic_update_cgroup+0x2f/0x3c0 [bfq]
->   bfq_init_rq+0x1e8/0xb10 [bfq]
->   bfq_insert_request.isra.0+0xa3/0x420 [bfq]
->   bfq_insert_requests+0xca/0xf0 [bfq]
->   blk_mq_dispatch_rq_list+0x4c0/0xb00
+--3sJxY84NpHVtSyPq
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I found this call trace quite weird, I can't figure out how
-bfq_insert_requests can be called from blk_mq_dispatch_rq_list,
-can you show the add2line result?
+On Tue, Apr 04, 2023 at 04:08:27PM +0200, Sergei Shtepa wrote:
+> +The main properties that a backup tool should have are:
+> +
+> +- Simplicity and versatility of use
+> +- Reliability
+> +- Minimal consumption of system resources during backup
+> +- Minimal time required for recovery or replication of the entire system
+> +
+> +Therefore, the features of the blksnap module are:
+"Taking above properties into account, blksnap module features:"
 
-Thanks,
-Kuai
->   __blk_mq_sched_dispatch_requests+0x15e/0x200
->   blk_mq_sched_dispatch_requests+0x8b/0xc0
->   __blk_mq_run_hw_queue+0x3ff/0x500
->   __blk_mq_delay_run_hw_queue+0x23a/0x300
->   blk_mq_run_hw_queue+0x14e/0x350
->   blk_mq_sched_insert_request+0x181/0x1f0
->   blk_execute_rq+0xf4/0x300
->   scsi_execute_cmd+0x23e/0x350
->   sr_do_ioctl+0x173/0x3d0 [sr_mod]
->   sr_packet+0x60/0x90 [sr_mod]
->   cdrom_get_track_info.constprop.0+0x125/0x170 [cdrom]
->   cdrom_get_last_written+0x1d4/0x2d0 [cdrom]
->   mmc_ioctl_cdrom_last_written+0x85/0x120 [cdrom]
->   mmc_ioctl+0x10b/0x1d0 [cdrom]
->   cdrom_ioctl+0xa66/0x1270 [cdrom]
->   sr_block_ioctl+0xee/0x130 [sr_mod]
->   blkdev_ioctl+0x1bb/0x3f0
->   __x64_sys_ioctl+0xc7/0xe0
->   do_syscall_64+0x34/0x80
->   entry_SYSCALL_64_after_hwframe+0x46/0xb0
-> 
-> Bart.
-> 
-> .
-> 
+> +The change tracker allows to determine which blocks were changed during =
+the
+> +time between the last snapshot created and any of the previous snapshots.
+> +Having a map of changes, it is enough to copy only the changed blocks, a=
+nd
+"With a map of changes, ..."
 
+> +3. ``blkfilter_ctl_blksnap_cbtdirty`` mark blocks as changed in the chan=
+ge
+                                         marks
+
+> +The blksnap [#userspace_tools]_ console tool allows to control the module
+> +from the command line. The tool contains detailed built-in help. To get
+> +the list of commands, enter the ``blksnap --help`` command. The ``blksnap
+> +<command name> --help`` command allows to get detailed information about=
+ the
+"To get list of commands with usage description, see ``blksnap --help``."
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--3sJxY84NpHVtSyPq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZDOYCwAKCRD2uYlJVVFO
+owIAAQCShKPGI3iVP2p11Jwxc8bI7plcI7SwlEpil85rz3HhEQD/fQEb1kgmjR1S
+yYd0nwhnho3eR9QaNG8wgBxpYwu3jQ0=
+=PoLi
+-----END PGP SIGNATURE-----
+
+--3sJxY84NpHVtSyPq--
