@@ -2,186 +2,131 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0133C76196
-	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 20:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1282C76196
+	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 21:02:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229523AbjDJUUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Apr 2023 16:20:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47742 "EHLO
+        id S229922AbjDJVCo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Apr 2023 17:02:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbjDJUUN (ORCPT
+        with ESMTP id S229703AbjDJVCo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2023 16:20:13 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2053.outbound.protection.outlook.com [40.107.92.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 652631FF3
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 13:20:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yb4HmWqRrrWRxmx69HJrpLgWTXb/i+dUJaVzP7CeHk3UU/woJquxW4wEKHSyNgfydRgFqFtJvn+WIHa9PDXufp2wSOfxNw/tHj0VyR6vpThm7uoXtbTgjGxB7O/fqPegkfSYqYNZ3sS5pYUUvbFBZefxvm92XiifZQAViVRQ9vpL/DkJ0qiHa38o6JES3zdEpIxzHpisoYx8zCZzPjOVGx0heYqwKPtUdqwe9q7sKCtn8AACZT3/ZHLMXsdfyZGLyt7gNXrAU2Eczz3ccWR+5jmTnViYEWnvtNO8kLgKYnCr8Cte44fynfe79Ynmn82MuUMnu1i3cebos9OHsLCNxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dkjbMHrAnoS1LUOyAciamDb6/yZ7245CwxAcTnFSdJ4=;
- b=LJj4CwAPknIOSSo4T/qTn6CO5UoK2GRp9dzaMvZoHh96eQ+nWnkieSTJ+GpURmnGSTe+40zVFLwfZzfcGRzCcvIQHgYJcbni2wgBUmj9PodwEL6nAUq7HvTt7DVX32eb5UmNlw7HPubzM9yQKBAEB/AXCxbtw9wRWFhK02+EtIRV5aYCWSry311TRozpFd/ADSNAaD1hhrl4Y18wrVM8wI6HYazCu8EKwgT3VKridJu0DDq5peIuiEblZ8sCzliC0IsL1jJyVm9xn/2bpT/SjzSOJkYUW50XcFKQXGRSzb/zTNPlO1uOf8IMwL1wqqlF1XZCeDTaK0Oph0nFLrTq4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.dk smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dkjbMHrAnoS1LUOyAciamDb6/yZ7245CwxAcTnFSdJ4=;
- b=iJoSrKwhwLJ4Fd5u4Mhzb5mYpzudrbJKo2gZr6eF2RYhTxWqG1GXkxo4Wv1h4SRIdPyOk3QYmAcR2mgXTLwd2qFN7mlA9p900pGph83CStIwVjCaN1Hs/BSw85/w2WG+YpoL4vEFVOQ5la57jmgurS5o4LPNZspSCQ+5ADdp6AVWKb9sdkZX/NElwu7hFXrpyqVrX/WPqLt+qfd5yLveBuNMxbIU5zG37lH+wI49QQM5PaDnXhG/goDroaLrSB5QbPr+P07bblZWhGT6lAf883IPBR2tkTqDEOOUdwNmqYSRIjxhqD5rIkfxPlLec9l5soym+PwM4QEv9VM62f50Bw==
-Received: from DS7PR03CA0137.namprd03.prod.outlook.com (2603:10b6:5:3b4::22)
- by PH7PR12MB6836.namprd12.prod.outlook.com (2603:10b6:510:1b6::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Mon, 10 Apr
- 2023 20:20:09 +0000
-Received: from DM6NAM11FT077.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b4:cafe::1e) by DS7PR03CA0137.outlook.office365.com
- (2603:10b6:5:3b4::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.39 via Frontend
- Transport; Mon, 10 Apr 2023 20:20:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DM6NAM11FT077.mail.protection.outlook.com (10.13.173.147) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6298.27 via Frontend Transport; Mon, 10 Apr 2023 20:20:08 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 10 Apr 2023
- 13:20:01 -0700
-Received: from dev.nvidia.com (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 10 Apr
- 2023 13:20:01 -0700
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH V2 1/1] brd: use memcpy_to|from_page() in copy_to|from_brd()
-Date:   Mon, 10 Apr 2023 13:19:38 -0700
-Message-ID: <20230410201938.59122-2-kch@nvidia.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <20230410201938.59122-1-kch@nvidia.com>
-References: <20230410201938.59122-1-kch@nvidia.com>
+        Mon, 10 Apr 2023 17:02:44 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17ED010F6;
+        Mon, 10 Apr 2023 14:02:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681160563; x=1712696563;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/iFIhWoDac+UT40gLNkBeOwuDo3E6+5ZVwgNZZpo0ak=;
+  b=cJsUjj8mqUXhTBnWzlhw91jfHbqpp/FJSKE4eikEDWUJwCTqAAE8XP+C
+   qmYuFGss5Fpy58qBxRMG2E+7FmyhXkMJDuYBbB/9LdfWABm/Rs4EIJeQU
+   tosjdc/8adimk/ekX8or8tHohC+kmSAVn+ktMfzIv+coyQ0vdqLwrU9XR
+   QdOHZNb6EBJEXT0FmJ+4COz0uvibCKWbSvrHldQ5/vZwKVwIVQuIfIyX/
+   N6mVNsMpKXPCyi2MVOQcfT4UrfHXtE+lN3NxAC9hOhAURhS4imnAsvCL0
+   GY3bOW1jeu+VwJCeoJ5m7MaGXy3oynvo5D82O9dVF1FoGZcz8GjEpnq5d
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="345240686"
+X-IronPort-AV: E=Sophos;i="5.98,333,1673942400"; 
+   d="scan'208";a="345240686"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2023 14:02:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10676"; a="832096656"
+X-IronPort-AV: E=Sophos;i="5.98,333,1673942400"; 
+   d="scan'208";a="832096656"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 10 Apr 2023 14:02:39 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1plyes-000VfZ-2X;
+        Mon, 10 Apr 2023 21:02:38 +0000
+Date:   Tue, 11 Apr 2023 05:02:22 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Keith Busch <kbusch@meta.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de
+Cc:     oe-kbuild-all@lists.linux.dev, sagi@grimberg.me,
+        joshi.k@samsung.com, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv2 2/5] nvme: simplify passthrough bio cleanup
+Message-ID: <202304110443.e026C3nq-lkp@intel.com>
+References: <20230407191636.2631046-3-kbusch@meta.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.37]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT077:EE_|PH7PR12MB6836:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7615391-3092-4896-9b6a-08db3a00fb17
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ueRCZx89jYF7wdpf9SfXRQhNTqIvs7R/dQXcGV8Sv+HiIGBE0rSbku6PZzhnRv/HnD+xy7RdrAAxWwkC/ULa4ng8K0d6UN4+A66LcDHDdXClFG8HZS4NiUDahMyFTFdaEvOd2Jbzp1KdtVzvW5ferRoFpyCwIlZxSCFqJkaqxhGIN5Pd+f2l/lDJ/jjmp0vN7NPKZpQHkm0K9TGegtcALDZw0GGqBoJVy36yLohNGy6/0kExvEleTDlY74/wU3lD2WNRoWIZdFZx21EKmoOlFy0Xcl1nejoGtqi44/JpTpqN16JfjhN9SUrJOs5TyxEBKjyWz7mi62jxLulHRilUFrIAWN3HSyJBBci66AZ83WsDw8LpnKRjfnFvT6tIOLbxmdgiIVPJ+EErNW8xI9SWexu+P+JBGZm5BPrapsWrUvlUXqcnLEpZ0wQFfIzKRYQxtl2ezGcxpj9jStSuvYbUcV/zSA7V8kzdjLK3W6qLozmt8RD28clKbImg/HjlDVwxurhAs02vYUl4dkFJmAA6HCAmycGP/tX3GblM7PZtIBfKX+8KEoh0Cf53vD+Z+om8gF16UgZiLs8h7smhrBp9NBuooSZWpa890GtZiBkHMk2Z+/UBhNYxnbx78VbD8k/78lg7sBdafJmKJDQ35srr8P8s+rlNL1sD17FHtzuvjmYEiTM1Iz3NohwXW2EQkazgE4zLOOIPklgDu79CMg+ymLr9T4H54NrWLvsE8rdATq1/HF0UriNfY6+ewaZwUQ1B
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(39860400002)(346002)(376002)(451199021)(46966006)(40470700004)(36840700001)(16526019)(186003)(26005)(1076003)(107886003)(40480700001)(6666004)(40460700003)(426003)(36756003)(8676002)(7696005)(82310400005)(36860700001)(54906003)(478600001)(70206006)(316002)(82740400003)(4326008)(83380400001)(6916009)(356005)(70586007)(41300700001)(47076005)(7636003)(2906002)(336012)(5660300002)(8936002)(2616005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2023 20:20:08.8690
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7615391-3092-4896-9b6a-08db3a00fb17
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT077.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6836
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230407191636.2631046-3-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-"kmap_atomic - Atomically map a page for temporary usage - Deprecated!"
+Hi Keith,
 
-Use memcpy_from_page() helper does the same job of mapping and copying
-except it uses non deprecated kmap_local_page() and kunmap_local()
-in copy_from_brd().
+kernel test robot noticed the following build warnings:
 
-Use memcpy_to_page() helper does the same job of mapping and copying
-except it uses non deprecated kmap_local_page() and kunmap_local()
-in copy_to_brd().
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on next-20230406]
+[cannot apply to linus/master v6.3-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- drivers/block/brd.c | 26 ++++++++------------------
- 1 file changed, 8 insertions(+), 18 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Keith-Busch/block-add-request-polling-helper/20230408-031926
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230407191636.2631046-3-kbusch%40meta.com
+patch subject: [PATCHv2 2/5] nvme: simplify passthrough bio cleanup
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20230411/202304110443.e026C3nq-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/9a32e7ca02dd8cff559b273fe161b5347b5b5c97
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Keith-Busch/block-add-request-polling-helper/20230408-031926
+        git checkout 9a32e7ca02dd8cff559b273fe161b5347b5b5c97
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=x86_64 olddefconfig
+        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/nvme/host/
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 34177f1bd97d..c1251159bd13 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -189,7 +189,6 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 			sector_t sector, size_t n)
- {
- 	struct page *page;
--	void *dst;
- 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
- 	size_t copy;
- 
-@@ -197,9 +196,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 	page = brd_lookup_page(brd, sector);
- 	BUG_ON(!page);
- 
--	dst = kmap_atomic(page);
--	memcpy(dst + offset, src, copy);
--	kunmap_atomic(dst);
-+	memcpy_to_page(page, offset, src, copy);
- 
- 	if (copy < n) {
- 		src += copy;
-@@ -208,9 +205,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- 		page = brd_lookup_page(brd, sector);
- 		BUG_ON(!page);
- 
--		dst = kmap_atomic(page);
--		memcpy(dst, src, copy);
--		kunmap_atomic(dst);
-+		memcpy_to_page(page, 0, src, copy);
- 	}
- }
- 
-@@ -221,17 +216,14 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 			sector_t sector, size_t n)
- {
- 	struct page *page;
--	void *src;
- 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
- 	size_t copy;
- 
- 	copy = min_t(size_t, n, PAGE_SIZE - offset);
- 	page = brd_lookup_page(brd, sector);
--	if (page) {
--		src = kmap_atomic(page);
--		memcpy(dst, src + offset, copy);
--		kunmap_atomic(src);
--	} else
-+	if (page)
-+		memcpy_from_page(dst, page, offset, copy);
-+	else
- 		memset(dst, 0, copy);
- 
- 	if (copy < n) {
-@@ -239,11 +231,9 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- 		sector += copy >> SECTOR_SHIFT;
- 		copy = n - copy;
- 		page = brd_lookup_page(brd, sector);
--		if (page) {
--			src = kmap_atomic(page);
--			memcpy(dst, src, copy);
--			kunmap_atomic(src);
--		} else
-+		if (page)
-+			memcpy_from_page(dst, page, 0, copy);
-+		else
- 			memset(dst, 0, copy);
- 	}
- }
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304110443.e026C3nq-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/nvme/host/ioctl.c: In function 'nvme_submit_user_cmd':
+   drivers/nvme/host/ioctl.c:232:21: warning: variable 'bio' set but not used [-Wunused-but-set-variable]
+     232 |         struct bio *bio;
+         |                     ^~~
+   drivers/nvme/host/ioctl.c: In function 'nvme_uring_cmd_end_io_meta':
+>> drivers/nvme/host/ioctl.c:528:36: warning: unused variable 'pdu' [-Wunused-variable]
+     528 |         struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+         |                                    ^~~
+
+
+vim +/pdu +528 drivers/nvme/host/ioctl.c
+
+c0a7ba77e81b84 Jens Axboe    2022-09-21  523  
+c0a7ba77e81b84 Jens Axboe    2022-09-21  524  static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
+c0a7ba77e81b84 Jens Axboe    2022-09-21  525  						     blk_status_t err)
+c0a7ba77e81b84 Jens Axboe    2022-09-21  526  {
+c0a7ba77e81b84 Jens Axboe    2022-09-21  527  	struct io_uring_cmd *ioucmd = req->end_io_data;
+c0a7ba77e81b84 Jens Axboe    2022-09-21 @528  	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+c0a7ba77e81b84 Jens Axboe    2022-09-21  529  	void *cookie = READ_ONCE(ioucmd->cookie);
+c0a7ba77e81b84 Jens Axboe    2022-09-21  530  
+c0a7ba77e81b84 Jens Axboe    2022-09-21  531  	/*
+c0a7ba77e81b84 Jens Axboe    2022-09-21  532  	 * For iopoll, complete it directly.
+c0a7ba77e81b84 Jens Axboe    2022-09-21  533  	 * Otherwise, move the completion to task work.
+c0a7ba77e81b84 Jens Axboe    2022-09-21  534  	 */
+c0a7ba77e81b84 Jens Axboe    2022-09-21  535  	if (cookie != NULL && blk_rq_is_poll(req))
+9d2789ac9d60c0 Jens Axboe    2023-03-20  536  		nvme_uring_task_meta_cb(ioucmd, IO_URING_F_UNLOCKED);
+c0a7ba77e81b84 Jens Axboe    2022-09-21  537  	else
+c0a7ba77e81b84 Jens Axboe    2022-09-21  538  		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
+c0a7ba77e81b84 Jens Axboe    2022-09-21  539  
+de671d6116b521 Jens Axboe    2022-09-21  540  	return RQ_END_IO_NONE;
+456cba386e94f2 Kanchan Joshi 2022-05-11  541  }
+456cba386e94f2 Kanchan Joshi 2022-05-11  542  
+
 -- 
-2.29.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
