@@ -2,100 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D14C8C77B61
-	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 05:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B998C76196
+	for <linux-block@archiver.kernel.org>; Mon, 10 Apr 2023 06:06:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229485AbjDJF6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Apr 2023 01:58:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33848 "EHLO
+        id S229535AbjDJGGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Apr 2023 02:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjDJF6H (ORCPT
+        with ESMTP id S229482AbjDJGGN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2023 01:58:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9621E3AA4
-        for <linux-block@vger.kernel.org>; Sun,  9 Apr 2023 22:58:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 29B99614C0
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 05:58:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39EA7C433D2;
-        Mon, 10 Apr 2023 05:58:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681106285;
-        bh=T4Xwu+1M4nUqOSg+R/cs1Eo68WpYM8P7XHB9pmWkj9Y=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=tXNDjcA7xjrufQF8nOTph0rEep0j0LNDHB6AjEh5BmZ0eQ85jpdFouTiSo8n5LlJ9
-         OfP80i/RsZw5BVI11+5tKdt9r/+obyw8ta83eTuE+XXg0gGx1a9NSIJ5dSFl0e1Jmx
-         5P6ujM96ln5pF4zD77u+6yS7LcFXWbC2bWVeQNyF0jvVGLV0Xow7jBCZ9WUl5nxRih
-         yK8JRrvQ3Jso/YUZ1XDLoELRgeDfyBUfzL7Ja95eO59QF0hGnc+stRpHw5sMpemuRL
-         cjOarRlxEaZsVIv2vP6cnuO98p9MsRkU0+e1gti+u8DAvDeYnmnmqpIb/73vQzEnBW
-         is1fav+ztGa9g==
-Message-ID: <5ac02fed-1669-9b3c-a1f6-07b08290bbee@kernel.org>
-Date:   Mon, 10 Apr 2023 14:58:02 +0900
+        Mon, 10 Apr 2023 02:06:13 -0400
+Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EE673C35
+        for <linux-block@vger.kernel.org>; Sun,  9 Apr 2023 23:06:11 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.west.internal (Postfix) with ESMTP id BEEAB2B06712;
+        Mon, 10 Apr 2023 02:06:10 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Mon, 10 Apr 2023 02:06:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1681106770; x=1681107370; bh=+J
+        iAbLrbAJgHcDzgRpzma7BrumZozZYXSiVdGgFxTPA=; b=qxsuj/m258kY/8g2JF
+        hbc0h2/oqib296rMYxvESCICdfEx0hU1eTuBVAYplz3roSHPgigayrFjB32L0DDb
+        afK9ZA0al8/hye74l9eermwV35BS5GVc+053psxK8XsNDqA3797KXBrwHwgLRpdg
+        8j0LxlW2W5TZIISh72TALIctRUm9EPuIXQQfli11cH1rEZ7sz+8oNcj/IHA+58m+
+        tmM6ZiC4xcj2bfY1acDHXlPO2vFafH8DPua6JXcF1aq/7AgeKGHYY950hZmvVS02
+        /owDmXGJKgBN+hcTAgqVQAsdembd+Iiod1QDBQEIR6RPnFzM6KjniBtblCOxHsgd
+        Qo6g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=ie1e949a3.fm2; t=1681106770; x=1681107370; bh=+Ji
+        AbLrbAJgHcDzgRpzma7BrumZozZYXSiVdGgFxTPA=; b=jaSD2lBqT4APe0KBzNg
+        qcHDOT9pE78Pd2yXfbW3bq5cpoVk2Y7sPT6I0D3it3NHYqz5CQdFCZQ4lWcPlHGV
+        Y9Htz/KoRQWyWRsuvs1SjiSuD6Lbujm1FQLyUwBMP3rFTQ4F4MP1cdT/2E6gdb2C
+        Nl6qb/0uVhhLy99ZqvN+SbQRzKuL3PFABIXApV44XjmwjJRVo2a+9yZPDjVQ6kM3
+        FJMhD4pP2Ea2hSxrrWFGpuyr484mBfNdB7Wx2WPtFMHE8sBKjBZCBWOf/vaAy8In
+        LWVKk8YP6VSrnAcU6tTAc3bSK2RnBT8JtTl3D2VhSn6+77/TW1JULcH5A4ccjDLm
+        u+A==
+X-ME-Sender: <xms:UaczZA4mbnp5UH90vOiIAMcZokmX_wENW3XtpdUEeyreAV95v2aECQ>
+    <xme:UaczZB7k9JcFMlbBpUPkg4cGLNe5JwCJJHuWENEKYxSlA0i4QQ8fEJW9_uPH921hL
+    F6hiE01hTzuAkwddI4>
+X-ME-Received: <xmr:UaczZPdsQP831zElw4Dh5eyp0bBrIH2Qcq7q3oqUkjFbI0ffU3OkWlr6O56Ly8mjew5UW0_EvQ0nYp_zOU3GDg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekuddguddtiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddttddvnecuhfhrohhmpefuhhhi
+    nhdkihgthhhirhhoucfmrgifrghsrghkihcuoehshhhinhhitghhihhrohesfhgrshhtmh
+    grihhlrdgtohhmqeenucggtffrrghtthgvrhhnpedvgedtgfdvhffgkedvkedtgfefleej
+    leeggfekudejieetheeghfegtefhgfehheenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehshhhinhhitghhihhrohesfhgrshhtmhgrihhlrdgt
+    ohhm
+X-ME-Proxy: <xmx:UqczZFK763oUAg3BbDdZtoNIliUIPdQk_FyLG2DW6yWAe3U9uRXsoA>
+    <xmx:UqczZEIyhig2DFz3nCueXjNo5wDZWI3VCSB-XY5klz97weNNRUmx2Q>
+    <xmx:UqczZGxOCeSrdojQe_CV7dqbokvI5AHI9-VDK647L0GzOtJUiQzE7w>
+    <xmx:UqczZM8qCRxNfmNc7MuXa5HQq0I48ULEqZ52XMJgJ0dxHF3uVztAcHYECjycWoOS>
+Feedback-ID: ie1e949a3:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 10 Apr 2023 02:06:07 -0400 (EDT)
+Date:   Mon, 10 Apr 2023 15:06:05 +0900
+From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Subject: Re: [PATCH blktests v6 0/2] test queue count changes on reconnect
+Message-ID: <enbhdajylbbzykqyey5d35hmqbmsqca6entvdhpwifg53lx3ue@pe4dpridsdxg>
+References: <20230406083050.19246-1-dwagner@suse.de>
+ <ftljvb4alzxssqjzr5ik7pvatiwh25i4ftktvgvxzqxk76afew@brp7ch4v7wik>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH V2 1/1] null_blk: add moddule parameter check
-Content-Language: en-US
-To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        johannes.thumshirn@wdc.com, ming.lei@redhat.com,
-        bvanassche@acm.org, shinichiro.kawasaki@wdc.com,
-        vincent.fu@samsung.com
-References: <20230410051352.36856-1-kch@nvidia.com>
- <20230410051352.36856-2-kch@nvidia.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230410051352.36856-2-kch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ftljvb4alzxssqjzr5ik7pvatiwh25i4ftktvgvxzqxk76afew@brp7ch4v7wik>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/10/23 14:13, Chaitanya Kulkarni wrote:
->  static bool g_virt_boundary = false;
->  module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
->  MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
-> @@ -86,11 +113,13 @@ module_param_named(no_sched, g_no_sched, int, 0444);
->  MODULE_PARM_DESC(no_sched, "No io scheduler");
->  
->  static int g_submit_queues = 1;
-> -module_param_named(submit_queues, g_submit_queues, int, 0444);
-> +NULL_PARAM(submit_queues, 1, INT_MAX);
+On Apr 06, 2023 / 11:10, Daniel Wagner wrote:
+> On Thu, Apr 06, 2023 at 10:30:48AM +0200, Daniel Wagner wrote:
+> > good and the bad case (rdma started to fail today, something to fix).
+> 
+> After adding the missing _nvmet_setup() call, tcp and rdma works fine.
 
-INT_MAX ? That is a little large... Why not using CONFIG_NR_CPUS ? Or
-CONFIG_NR_CPUS * 2 to leave some room for experiments.
+I also confirmed this. I observed test pass with tcp and rdma. Good. Still
+lockdep warning is observed and fc transport causes system hang, but I think
+those issues should be fixed after applying the patches to blktests master.
 
-> +device_param_cb(submit_queues, &null_submit_queues_param_ops, &g_submit_queues, 0444);
->  MODULE_PARM_DESC(submit_queues, "Number of submission queues");
-
-[...]
-
->  static int g_bs = 512;
-> -module_param_named(bs, g_bs, int, 0444);
-> +NULL_PARAM(bs, 1, PAGE_SIZE);
-
-Allowing min=1 here does not make sense. This should be 512. And you could add a
-"bool is_power_of_2" argument to null_param_store_int() to check that the value
-is a power of 2.
-
-> +device_param_cb(bs, &null_bs_param_ops, &g_bs, 0444);
->  MODULE_PARM_DESC(bs, "Block size (in bytes)");
-
-[...]
-
->  static int g_hw_queue_depth = 64;
-> -module_param_named(hw_queue_depth, g_hw_queue_depth, int, 0444);
-> +NULL_PARAM(hw_qdepth, 1, INT_MAX);
-
-INT_MAX here is a little silly. Way too large to make any sense in my opinion.
-NVMe allows up to 65536, why not use the same value here ?
-
-> +device_param_cb(hw_queue_depth, &null_hw_qdepth_param_ops, &g_hw_queue_depth, 0444);
->  MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 64");
->  
->  static bool g_use_per_node_hctx;
-
+I walked through the patches and they look good enough to apply for me. I will
+wait a few more days in case anyone has more comments. If there is no more
+comments, no need to post v7. I will add the missing _setup_nvmet() and replace
+the spaces in the 2nd patch.
