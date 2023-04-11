@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB93C77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 17:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E433DC77B70
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 17:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230017AbjDKRPR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 13:15:17 -0400
+        id S230035AbjDKRPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 13:15:19 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229944AbjDKRPN (ORCPT
+        with ESMTP id S230008AbjDKRPQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 13:15:13 -0400
+        Tue, 11 Apr 2023 13:15:16 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A28E05FC2
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 10:15:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E9ED5254
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 10:15:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=NaGh447c3Z5O8Q1bwlc/CmWQq2CtUmxa/8UXLYlOKnY=; b=AWyPUXA1ggJqNE7/uiKSf00eSE
-        4XKDeG9aX5oFbo9YAcckIE99yPuDDxKmHsdQZeYnuDEssBQnaodnR52gzJvqdPojfayHViXG3Y9yD
-        xcuI9Qd2xGw9PozQQuEz7AdtgWEtrHkqEbXpT61+MAjaPGnBViWLTdkn1Raze2xG9echvc1uohALa
-        8JuaM//HVrSDN0Q4ovHZgwrJdE+YkzdB2wcKO1Q3tA9TMV2ytEXkMTQ5yaaknzWsiPFx1rIzwyzv+
-        CKkwC0E/lpgy4wNt3K3QhdHBkwf2WWkdpwUpNReCxCQKkht9/q5tWKQsdlUOTZqy9ZnQVSQ12UXPY
-        KvhGi2VA==;
+        bh=dO45kGEIie6VyRArhz/6iUERYlM0TSvNoxjSwEcK9VY=; b=BBHZPgr/u4htd9PMGNqzp4g8yC
+        3E/7BtP0WRP2nvhXs2expL4gvGH3mSG4rOSWpHtLZFg/JXArMXAtt/yhALQ4bT79iOWVQzLhG87My
+        VKwyErUY3U2nf5syXcnJruZLwUUIrjxFhoa0hkPao9gewwcvjrRnTbhV7iMHAfwaKIFpqvjF9JMNq
+        bdtehQLczuqZ/8alfglNbnIAaghjzC5AGZfjzJ87U4LlwMwi2s1ncTqVN5UwL3//JO07Nz8cMv3Qq
+        sFLEdMB6ZjwmsAbrxi7pXG2VzZosV/yFZrQjXiMqP2kd8kitCpa6xPJOk/7Iv/sFw14SVt+FaS7bq
+        NW4X1iBA==;
 Received: from [2001:4bb8:192:2d6c:e384:cbad:b189:57c6] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pmHaB-000gk2-1M;
-        Tue, 11 Apr 2023 17:15:03 +0000
+        id 1pmHaE-000gkS-0K;
+        Tue, 11 Apr 2023 17:15:06 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Minchan Kim <minchan@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH 01/17] zram: always compile read_from_bdev_sync
-Date:   Tue, 11 Apr 2023 19:14:43 +0200
-Message-Id: <20230411171459.567614-2-hch@lst.de>
+Subject: [PATCH 02/17] zram: remove valid_io_request
+Date:   Tue, 11 Apr 2023 19:14:44 +0200
+Message-Id: <20230411171459.567614-3-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230411171459.567614-1-hch@lst.de>
 References: <20230411171459.567614-1-hch@lst.de>
@@ -47,71 +47,91 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-read_from_bdev_sync is currently only compiled for non-4k PAGE_SIZE,
-which means it won't be built with the most common configurations.
-
-Replace the ifdef with a check for the PAGE_SIZE in an if instead.
-The check uses an extra symbol and IS_ENABLED to allow the compiler
-to eliminate the dead code, leading to the same generated code size:
-
-   text	   data	    bss	    dec	    hex	filename
-  16709	   1428	     12	  18149	   46e5	drivers/block/zram/zram_drv.o.old
-  16709	   1428	     12	  18149	   46e5	drivers/block/zram/zram_drv.o.new
+All bios hande to drivers from the block layer are checked against the
+device size and for logical block alignment already (and have been since
+long before zram was merged), so don't duplicate those checks.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Acked-by: Minchan Kim <minchan@kernel.org>
 ---
- drivers/block/zram/zram_drv.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ drivers/block/zram/zram_drv.c | 34 +---------------------------------
+ drivers/block/zram/zram_drv.h |  1 -
+ 2 files changed, 1 insertion(+), 34 deletions(-)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index aa490da3cef233..57787cbdf1f728 100644
+index 57787cbdf1f728..f4466ad1fd4aef 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -148,6 +148,7 @@ static inline bool is_partial_io(struct bio_vec *bvec)
- {
- 	return bvec->bv_len != PAGE_SIZE;
+@@ -175,30 +175,6 @@ static inline u32 zram_get_priority(struct zram *zram, u32 index)
+ 	return prio & ZRAM_COMP_PRIORITY_MASK;
  }
-+#define ZRAM_PARTIAL_IO		1
- #else
- static inline bool is_partial_io(struct bio_vec *bvec)
- {
-@@ -833,7 +834,6 @@ struct zram_work {
- 	struct bio_vec bvec;
- };
  
--#if PAGE_SIZE != 4096
- static void zram_sync_read(struct work_struct *work)
- {
- 	struct zram_work *zw = container_of(work, struct zram_work, work);
-@@ -866,23 +866,17 @@ static int read_from_bdev_sync(struct zram *zram, struct bio_vec *bvec,
- 
- 	return 1;
- }
--#else
--static int read_from_bdev_sync(struct zram *zram, struct bio_vec *bvec,
--				unsigned long entry, struct bio *bio)
+-/*
+- * Check if request is within bounds and aligned on zram logical blocks.
+- */
+-static inline bool valid_io_request(struct zram *zram,
+-		sector_t start, unsigned int size)
 -{
--	WARN_ON(1);
--	return -EIO;
+-	u64 end, bound;
+-
+-	/* unaligned request */
+-	if (unlikely(start & (ZRAM_SECTOR_PER_LOGICAL_BLOCK - 1)))
+-		return false;
+-	if (unlikely(size & (ZRAM_LOGICAL_BLOCK_SIZE - 1)))
+-		return false;
+-
+-	end = start + (size >> SECTOR_SHIFT);
+-	bound = zram->disksize >> SECTOR_SHIFT;
+-	/* out of range */
+-	if (unlikely(start >= bound || end > bound || start > end))
+-		return false;
+-
+-	/* I/O request is valid */
+-	return true;
 -}
--#endif
- 
- static int read_from_bdev(struct zram *zram, struct bio_vec *bvec,
- 			unsigned long entry, struct bio *parent, bool sync)
+-
+ static void update_position(u32 *index, int *offset, struct bio_vec *bvec)
  {
- 	atomic64_inc(&zram->stats.bd_reads);
--	if (sync)
-+	if (sync) {
-+		if (WARN_ON_ONCE(!IS_ENABLED(ZRAM_PARTIAL_IO)))
-+			return -EIO;
- 		return read_from_bdev_sync(zram, bvec, entry, parent);
--	else
--		return read_from_bdev_async(zram, bvec, entry, parent);
-+	}
-+	return read_from_bdev_async(zram, bvec, entry, parent);
+ 	*index  += (*offset + bvec->bv_len) / PAGE_SIZE;
+@@ -1184,10 +1160,9 @@ static ssize_t io_stat_show(struct device *dev,
+ 
+ 	down_read(&zram->init_lock);
+ 	ret = scnprintf(buf, PAGE_SIZE,
+-			"%8llu %8llu %8llu %8llu\n",
++			"%8llu %8llu 0 %8llu\n",
+ 			(u64)atomic64_read(&zram->stats.failed_reads),
+ 			(u64)atomic64_read(&zram->stats.failed_writes),
+-			(u64)atomic64_read(&zram->stats.invalid_io),
+ 			(u64)atomic64_read(&zram->stats.notify_free));
+ 	up_read(&zram->init_lock);
+ 
+@@ -2037,13 +2012,6 @@ static void zram_submit_bio(struct bio *bio)
+ {
+ 	struct zram *zram = bio->bi_bdev->bd_disk->private_data;
+ 
+-	if (!valid_io_request(zram, bio->bi_iter.bi_sector,
+-					bio->bi_iter.bi_size)) {
+-		atomic64_inc(&zram->stats.invalid_io);
+-		bio_io_error(bio);
+-		return;
+-	}
+-
+ 	__zram_make_request(zram, bio);
  }
- #else
- static inline void reset_bdev(struct zram *zram) {};
+ 
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index c5254626f051fa..ca7a15bd48456a 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -78,7 +78,6 @@ struct zram_stats {
+ 	atomic64_t compr_data_size;	/* compressed size of pages stored */
+ 	atomic64_t failed_reads;	/* can happen when memory is too low */
+ 	atomic64_t failed_writes;	/* can happen when memory is too low */
+-	atomic64_t invalid_io;	/* non-page-aligned I/O requests */
+ 	atomic64_t notify_free;	/* no. of swap slot free notifications */
+ 	atomic64_t same_pages;		/* no. of same element filled pages */
+ 	atomic64_t huge_pages;		/* no. of huge pages */
 -- 
 2.39.2
 
