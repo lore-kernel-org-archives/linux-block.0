@@ -2,46 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E795C77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 06:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80444C77B6F
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 06:24:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbjDKGVg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 02:21:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35800 "EHLO
+        id S229975AbjDKGYV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 02:24:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230213AbjDKGVc (ORCPT
+        with ESMTP id S229688AbjDKGYV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 02:21:32 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A004B19A7;
-        Mon, 10 Apr 2023 23:21:30 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id D6D4768BFE; Tue, 11 Apr 2023 08:21:27 +0200 (CEST)
-Date:   Tue, 11 Apr 2023 08:21:27 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Niklas Cassel <nks@flawful.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Damien Le Moal <dlemoal@fastmail.com>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-Subject: Re: [PATCH v6 06/19] scsi: support retrieving sub-pages of mode
- pages
-Message-ID: <20230411062127.GA19329@lst.de>
-References: <20230406113252.41211-1-nks@flawful.org> <20230406113252.41211-7-nks@flawful.org>
+        Tue, 11 Apr 2023 02:24:21 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A05201722;
+        Mon, 10 Apr 2023 23:24:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=vvvoVTo6uRRuAg1HUjBDI7dU65PXUKEZopfNrSUkhqg=; b=M41HlpoCT9nDSlGvPd3jf1Y3K6
+        3v4Qtki/KgoPE59M8XiUAoqAtQfmwoQI3I+7u4kt28lRteSbVrSyrXmnerX5cTOkcX2+rDEx6yHE+
+        i6B4SKBCYeWr/706bXwYwznLJYTUBRprmtiiJRyCUFGpROymaxZ2OMtD9hJl0NvLS5FfZWk+djfcV
+        N4n2b6y8GRzx1aHKn89+DlNeCz/b73dyKmkImyXJFGAZGyOApbrmsYX+r8Ov2PjV4JM1Wl0qqb3Zo
+        lNx7c/P7DyK0jzi/Yxqc8qn+bPqbTCD0GL/CdNYMM1Ahky2IC9WfO4CIeh4K0R39jwMdyxTOJznQ0
+        qQw2JGDw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pm7Pm-00GZYc-05;
+        Tue, 11 Apr 2023 06:23:38 +0000
+Date:   Mon, 10 Apr 2023 23:23:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Donald Buczek <buczek@molgen.mpg.de>
+Cc:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org,
+        viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+        kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org,
+        ming.lei@redhat.com, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
+Message-ID: <ZDT86vCXcszoBh4e@infradead.org>
+References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
+ <20230404140835.25166-3-sergei.shtepa@veeam.com>
+ <be98bee0-4ddc-194f-82be-767e0bb9f60f@molgen.mpg.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230406113252.41211-7-nks@flawful.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <be98bee0-4ddc-194f-82be-767e0bb9f60f@molgen.mpg.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Sat, Apr 08, 2023 at 05:16:42PM +0200, Donald Buczek wrote:
+> Hi, Sergei,
+> 
+> On 4/4/23 16:08, Sergei Shtepa wrote:
+> > The block device filtering mechanism is an API that allows to attach
+> > block device filters. Block device filters allow perform additional
+> > processing for I/O units.
+> > [...]
+> > diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+> > index b7b56871029c..1848d62979a4 100644
+> > --- a/include/uapi/linux/fs.h
+> > +++ b/include/uapi/linux/fs.h
+> > @@ -185,6 +185,11 @@ struct fsxattr {
+> >   #define BLKROTATIONAL _IO(0x12,126)
+> >   #define BLKZEROOUT _IO(0x12,127)
+> >   #define BLKGETDISKSEQ _IOR(0x12,128,__u64)
+> > +/* 13* is defined in linux/blkzoned.h */
+> 
+> nit: This is already explained in the comment below your insert.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+My faul.  But indeed, no need to duplicate that, instead the new
+ioctl opcodes should move below that existing comment.
