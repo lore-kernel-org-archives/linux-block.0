@@ -2,115 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5EEC77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 06:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 181BCC7619A
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 07:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbjDKGqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 02:46:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57276 "EHLO
+        id S230250AbjDKHCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 03:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjDKGqf (ORCPT
+        with ESMTP id S230197AbjDKHCK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 02:46:35 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB99FE5F;
-        Mon, 10 Apr 2023 23:46:34 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Tue, 11 Apr 2023 03:02:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5372722
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 00:02:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 5B70F21A49;
-        Tue, 11 Apr 2023 06:46:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1681195593; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LnZLJFAzvf0Pk6IYk3KGyS4mlZTYvqDJlzNUrXNBYHU=;
-        b=dxoW0t1uqK2YJxwofc1glGDRucLqwWuSEIWQF+71FbqH8TurGdzFZjUspLjw4hzKVkZG67
-        +ac1X+V69GQ75tuMMOpwRknh10Ug/cci79TKzFRuM76DzVZbSbYb9FAFbSEyTMgx4Hhv7r
-        GCsZBJw8x9Qnb1OVTI5XGPMU6GevZbI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1681195593;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LnZLJFAzvf0Pk6IYk3KGyS4mlZTYvqDJlzNUrXNBYHU=;
-        b=ioLDuBdCGicuy/BaDBz6AhUaGQJJamJx+T4wxcv7CmV6IiRKjjUt89O/Gp9/r5GK7DynJY
-        DOk+BpV4JOvC/rBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EF89D13519;
-        Tue, 11 Apr 2023 06:46:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 66JAOUgCNWSBUQAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 11 Apr 2023 06:46:32 +0000
-Message-ID: <74553eaa-c06c-69a4-aa1c-2664f7e85561@suse.de>
-Date:   Tue, 11 Apr 2023 08:46:32 +0200
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 35A28621F3
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 07:02:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8958EC433EF;
+        Tue, 11 Apr 2023 07:02:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681196528;
+        bh=CFGPd2XqhK2A0Cl0ukmyxvea/BtvuwKr69c69crn2PA=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=jq1nJFunYcRKMLwBUm5zhc/kC+0YbEW8VBbxvN64g3jmz26Jk/wWZgFOvbapM3Bph
+         zPe7bqcNanGC2StZEJs5e4UDswBQ2fiyj2X6gySqyW5MG0s/tjF2LMBDa4kJPKMmkU
+         NOly6Lrqcz+RZikkfaqoj4L+EPTZgk76Hm9CEiq2prRcYSMFzl8beenweo5IK32X9B
+         pgBjD/g5kTd8S+hYFxp6TCB4AcKHgq9bD8p8wxLq1xgppQr1Sfa/OFIQFbzKDldekD
+         9dTo6kzXFWSYeeYiZa/rp6TmMnsEEp/4b84PlsHL9V3uDYgdfmLSPdp3+rx7rU07qD
+         nJwrOzrGuqhkg==
+Message-ID: <1b23f539-1528-cd73-3575-f73c196cb661@kernel.org>
+Date:   Tue, 11 Apr 2023 16:02:05 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.1
-Subject: Re: [PATCH v6 18/19] ata: libata: set read/write commands CDL index
+Subject: Re: [PATCH V2 1/1] null_blk: add moddule parameter check
 Content-Language: en-US
-To:     Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <dlemoal@fastmail.com>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>,
-        Igor Pylypiv <ipylypiv@google.com>
-References: <20230406113252.41211-1-nks@flawful.org>
- <20230406113252.41211-19-nks@flawful.org>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230406113252.41211-19-nks@flawful.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "vincent.fu@samsung.com" <vincent.fu@samsung.com>
+References: <20230410051352.36856-1-kch@nvidia.com>
+ <20230410051352.36856-2-kch@nvidia.com>
+ <CGME20230410174800epcas5p3177f199ec973ba5e8e44a0a688a072e8@epcas5p3.samsung.com>
+ <20230410174708.pv6xm4pwaszyabte@green5>
+ <92bce410-8a0f-5580-94d9-8952ebbab2d7@kernel.org>
+ <03029381-bd62-d26b-3520-862185c4570a@nvidia.com>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <03029381-bd62-d26b-3520-862185c4570a@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/23 13:32, Niklas Cassel wrote:
-> From: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+On 4/11/23 15:40, Chaitanya Kulkarni wrote:
+> On 4/10/23 22:29, Damien Le Moal wrote:
+>> On 4/11/23 02:47, Nitesh Shetty wrote:
+>>>> static int g_gb = 250;
+>>>> -module_param_named(gb, g_gb, int, 0444);
+>>>> +NULL_PARAM(gb, 1, INT_MAX);
+>>> This value gets converted to mb, for dev->size calculation in
+>>> null_alloc_dev. I think either there should be a type conversion or
+>>> this module parameter max value can be reduced to smaller value.
+>> Yeah, good catch. it is multiplied by 1024, and assigned to dev->size which is
+>> an unsigned long. So that could overflow on 32-bits arch. So this needs some fixing.
+>>
+>> I would still allow a very large value as possible though, to allow testing for
+>> overflows.
 > 
-> For devices supporting the command duration limits feature, translate
-> the dld field of read and write operation to set the command duration
-> limit index field of the command task file when the duration limit
-> feature is enabled.
+> will change the type in next version, but still keep the large value
+> possible for that type.
 > 
-> The function ata_set_tf_cdl() is introduced to do this. For unqueued
-> (non NCQ) read and write operations, this function sets the command
-> duration limit index set as the lower 3 bits of the feature field.
-> For queued NCQ read/write commands, the index is set as the lower
-> 3 bits of the auxiliary field.
+>>>> +device_param_cb(gb, &null_gb_param_ops, &g_gb, 0444);
+>>>> MODULE_PARM_DESC(gb, "Size in GB");
+>> Chaitanya,
+>>
+>> Another thing: did you check if setting all these arguments through configfs
+>> also gets the same min/max value treatment ? Ideally, we want both configuration
+>> interfaces (module args and configfs) to be equivalent.
 > 
-> The flag ATA_QCFLAG_HAS_CDL is introduced to indicate that a command
-> taskfile has a non zero cdl field.
-> 
-> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Co-developed-by: Niklas Cassel <niklas.cassel@wdc.com>
-> Signed-off-by: Niklas Cassel <niklas.cassel@wdc.com>
-> Reviewed-by: Igor Pylypiv <ipylypiv@google.com>
-> ---
->   drivers/ata/libata-core.c | 32 +++++++++++++++++++++++++++++---
->   drivers/ata/libata-scsi.c | 16 +++++++++++++++-
->   drivers/ata/libata.h      |  2 +-
->   include/linux/libata.h    |  1 +
->   4 files changed, 46 insertions(+), 5 deletions(-)
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> I'm trying to avoid that in the same patch,
+> are you okay to add that in the same patch or a separate one ?
 
-Cheers,
+Separate patch is fine.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+> 
+>> (Note: please use dlemoal@kernel.org. wdc.com addresses do not work right now)
+> 
+> noticed that from bounced mails from hgst server, will fix it next 
+> git-send...
+> 
+> -ck
+> 
+> 
 
