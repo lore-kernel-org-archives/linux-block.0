@@ -2,22 +2,22 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A02C7619A
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 06:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B61C7619A
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 06:17:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbjDKGR0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 02:17:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59552 "EHLO
+        id S230218AbjDKGRx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 02:17:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbjDKGRZ (ORCPT
+        with ESMTP id S230225AbjDKGRp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 02:17:25 -0400
+        Tue, 11 Apr 2023 02:17:45 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF881986;
-        Mon, 10 Apr 2023 23:17:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD2819A6;
+        Mon, 10 Apr 2023 23:17:41 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 2DBEF68C7B; Tue, 11 Apr 2023 08:17:22 +0200 (CEST)
-Date:   Tue, 11 Apr 2023 08:17:21 +0200
+        id 3F93268BFE; Tue, 11 Apr 2023 08:17:39 +0200 (CEST)
+Date:   Tue, 11 Apr 2023 08:17:38 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Niklas Cassel <nks@flawful.org>
 Cc:     Jens Axboe <axboe@kernel.dk>,
@@ -28,14 +28,14 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         Damien Le Moal <dlemoal@fastmail.com>,
         linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-Subject: Re: [PATCH v6 12/19] ata: libata-scsi: remove unnecessary !cmd
- checks
-Message-ID: <20230411061721.GF18719@lst.de>
-References: <20230406113252.41211-1-nks@flawful.org> <20230406113252.41211-13-nks@flawful.org>
+Subject: Re: [PATCH v6 14/19] ata: libata: detect support for command
+ duration limits
+Message-ID: <20230411061738.GG18719@lst.de>
+References: <20230406113252.41211-1-nks@flawful.org> <20230406113252.41211-15-nks@flawful.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230406113252.41211-13-nks@flawful.org>
+In-Reply-To: <20230406113252.41211-15-nks@flawful.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
