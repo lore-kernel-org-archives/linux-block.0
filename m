@@ -2,82 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 827DCC77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 17:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC46C77B70
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 17:47:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230254AbjDKRqp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 13:46:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52990 "EHLO
+        id S230040AbjDKRrW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 13:47:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230292AbjDKRqc (ORCPT
+        with ESMTP id S230231AbjDKRrV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 13:46:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADA756A7F;
-        Tue, 11 Apr 2023 10:46:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 333F362A31;
-        Tue, 11 Apr 2023 17:46:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5719CC433EF;
-        Tue, 11 Apr 2023 17:46:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681235176;
-        bh=+KwAX5jvhr8OZFxH2Ho3mZVxPLvKchdh8zwtFvTu3bI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hIA74WpO3nlSIHGYDKgAvn00Y7DrZF18Ee7jLN1maDVdy55Ra+zKLSV0tcPyYD/iS
-         3BnE923JR7q9lN+K9q1sAM+PkseTcTGGsmmQ/Jglw5We4I5yO1L2GQPCCmwrmEHip5
-         z8yYINC4Bp6PQcwc5Y7AudEpq16NQZ/RCWTn7/g+7vHd9T8Md6a/zmQSzLL0r5+FmE
-         F8OuCbkaogR+ageptS1irNh5atdKzEnhbOLBU8QLX3kdfpuA1maPCFucviw1shMqYO
-         7qN9Tk3qBaUh/nmc1ZHa++bvktaXNuksJUhbpC0ttZlQzYY5IqlYC8HZMIuzYJx/4S
-         0Fefvg41+aQxw==
-Date:   Tue, 11 Apr 2023 10:46:14 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     Keith Busch <kbusch@meta.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        axboe@kernel.dk, hch@lst.de, sagi@grimberg.me
-Subject: Re: [PATCHv2 2/5] nvme: simplify passthrough bio cleanup
-Message-ID: <ZDWc5iavegZADUyY@kbusch-mbp>
-References: <20230407191636.2631046-1-kbusch@meta.com>
- <CGME20230407191711epcas5p3b9b27aa2477b12ec116b85ea3c7d54b7@epcas5p3.samsung.com>
- <20230407191636.2631046-3-kbusch@meta.com>
- <20230410112503.GA16047@green5>
+        Tue, 11 Apr 2023 13:47:21 -0400
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 849207689
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 10:46:58 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id la3so8433085plb.11
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 10:46:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681235218; x=1683827218;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iiItn63537QUWZ/MaNaDoa1PgQEeZ3A+ttY2ChWcM2U=;
+        b=x7x/blBtsnvUNpO89bmvZFBnEkuf50vV8UtSQRdcHG5z+VHkW411X+Uk3pSLSZsH/f
+         WYC06vE8jaCdyR71Mx2PsAvFzFJKYumtZXrNgsKSHAMTGqO3w/PoUHv7KLG4o4VV2BRt
+         A5EEhxUMs29YdZEKB2FzaQxQfxoXdbj789cnvz/qCAvbptLOZ0nIFaLuuwbGhgm4aDSy
+         dUe9fbWI/3zG+SmsGopDlVHkPY2Iti2pGe2xALw/BpBvIuNd0vIWRaiB4O3EPh3QlE1g
+         t48WMbd4DaLZiZjdyrVeIKJ0nPCMUiTy4Bwq3BV268xwh4BKhhVDDJeBZQIqeSvFNaTe
+         AE+w==
+X-Gm-Message-State: AAQBX9eqndlPo47FSZxpbq2FNTfEFLd5Cb9nFoSRLYtw52AuYlry2X36
+        CrHSIzwz4oQtMmWlVRzFb5s=
+X-Google-Smtp-Source: AKy350ZyzMifROha9i3JYx1g7W/E0qyxdA5hJqn68jTKuK/d9+y16BkQ0NBGTlNwUrbysL1itH8sSQ==
+X-Received: by 2002:a17:90b:3ec2:b0:246:82f9:9b0a with SMTP id rm2-20020a17090b3ec200b0024682f99b0amr5063829pjb.3.1681235217869;
+        Tue, 11 Apr 2023 10:46:57 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:646f:c9f7:828a:8b03? ([2620:15c:211:201:646f:c9f7:828a:8b03])
+        by smtp.gmail.com with ESMTPSA id jh3-20020a170903328300b001963a178dfcsm8074892plb.244.2023.04.11.10.46.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Apr 2023 10:46:57 -0700 (PDT)
+Message-ID: <c46e5d7f-4b22-1c38-7835-9013e39ece89@acm.org>
+Date:   Tue, 11 Apr 2023 10:46:56 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230410112503.GA16047@green5>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH 04/16] blk-mq: move blk_mq_sched_insert_request to
+ blk-mq.c
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+References: <20230411133329.554624-1-hch@lst.de>
+ <20230411133329.554624-5-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230411133329.554624-5-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 10, 2023 at 04:55:03PM +0530, Kanchan Joshi wrote:
-> On Fri, Apr 07, 2023 at 12:16:33PM -0700, Keith Busch wrote:
-> > +static void nvme_uring_bio_end_io(struct bio *bio)
-> > +{
-> > +	blk_rq_unmap_user(bio);
-> > +}
-> > +
-> > static int nvme_map_user_request(struct request *req, u64 ubuffer,
-> > 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
-> > 		u32 meta_seed, void **metap, struct io_uring_cmd *ioucmd,
-> > @@ -204,6 +209,7 @@ static int nvme_map_user_request(struct request *req, u64 ubuffer,
-> > 		*metap = meta;
-> > 	}
-> > 
-> > +	bio->bi_end_io = nvme_uring_bio_end_io;
-> > 	return ret;
-> > 
-> > out_unmap:
-> > @@ -249,8 +255,6 @@ static int nvme_submit_user_cmd(struct request_queue *q,
-> > 	if (meta)
-> > 		ret = nvme_finish_user_metadata(req, meta_buffer, meta,
-> > 						meta_len, ret);
-> > -	if (bio)
-> > -		blk_rq_unmap_user(bio);
-> 
-> Is it safe to call blk_rq_unamp_user in irq context?
+On 4/11/23 06:33, Christoph Hellwig wrote:
+> blk_mq_sched_insert_request is the main request insert helper and not
+> directly I/O scheduler related.  Move blk_mq_sched_insert_request to
+> blk-mq.c, rename it to blk_mq_insert_request and mark it static.
 
-Doh! I boxed my thinking into the polling mode that completely neglected the
-more common use case. Thanks, now back to the drawing board for me...
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
