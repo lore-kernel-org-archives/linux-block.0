@@ -2,145 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C35C77B74
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 12:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E62C77B70
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 12:29:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbjDKMWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 08:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
+        id S229980AbjDKM3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 08:29:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbjDKMWH (ORCPT
+        with ESMTP id S229490AbjDKM3a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 08:22:07 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C429940C6;
-        Tue, 11 Apr 2023 05:22:05 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id o1so10171282lfc.2;
-        Tue, 11 Apr 2023 05:22:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681215724;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:dkim-signature:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P0CfEwwxRtpT41g8a6YsRRGMNfYTxceqIiIsFCToW5o=;
-        b=Qlm39oo1uwN2R1XrnH6TujBBGRSvw8Usk4/CKvF2HqgylgMCZsYoebFcm2L/94I6dj
-         q6VLaY81ZZteQKy+IrrSxgrsB1hAFXyYgL2p4Pi/HBFR1KBl5A2t9U1qt6f8ieTcur3w
-         N1A2IJ0SPAvsYsh0dfw2710Ql/q3572B+IVjaHURrdYaDlKebeohHZt21aILQT8N0tJC
-         0lzljxfWSli/nkxrmuOKPObWX+66bAKRdNW0jqaq2dZhlzyoMFCAOSN9ZSXmEuNj+Ssk
-         UkFiTaALvteVcijXgr9h7aJyog0KON0edIDtz5SO0Hd1q6vY6ChkR6Bo2i+IavoMT7Ni
-         tlJg==
-X-Gm-Message-State: AAQBX9eA0A1i6H4kKV23JwGO4QwYsWMGqPkV/Dn+4sASpyMtvKeP/eQ2
-        2GhM3vPwu5psE2jKoW/HkcLmnJbJdyhPmzH/
-X-Google-Smtp-Source: AKy350YcsRFNTafYFBVxlq7IsxWLdwjZmewy5xDiKmI45ffHR99wywc33ew9+03mdnSDkYfhIFcdJQ==
-X-Received: by 2002:ac2:5307:0:b0:4eb:3b4c:50a3 with SMTP id c7-20020ac25307000000b004eb3b4c50a3mr2615918lfh.29.1681215724128;
-        Tue, 11 Apr 2023 05:22:04 -0700 (PDT)
-Received: from flawful.org (c-fcf6e255.011-101-6d6c6d3.bbcust.telenor.se. [85.226.246.252])
-        by smtp.gmail.com with ESMTPSA id r6-20020a056512102600b004e843d6244csm2540278lfr.99.2023.04.11.05.22.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Apr 2023 05:22:03 -0700 (PDT)
-Received: by flawful.org (Postfix, from userid 112)
-        id 24541458; Tue, 11 Apr 2023 14:22:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1681215723; bh=/LguqkW2Bx5Nx7Nq830RqXMFmLCkG4fHgOSjgc/o8hk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=phJQywzKolyrZmvjPFQHlKnTkNKjK6N9V5T/BxzvhN0fNxLi7gRiR9NVr8kcLnKak
-         dG2vI+aXuo67idi9p9b+F1E+IS/9nuOyvMgFoUxZJz/SUoHGa87Dx29nxcJGnU/7bm
-         ECMENityREAkt4ABxj3hZkgMrh5Sb+aGQPCqaPfs=
-Received: from x1-carbon (unknown [87.116.37.42])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by flawful.org (Postfix) with ESMTPSA id F40CE458;
-        Tue, 11 Apr 2023 14:21:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1681215696; bh=/LguqkW2Bx5Nx7Nq830RqXMFmLCkG4fHgOSjgc/o8hk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mW7y5YiX6yqgycGI4V5C3rc93lrUvbbVuOGxTetRdzZ0rNEVnjr1lNXuLCPu1qL21
-         Yv8KIw29kxjbr6Ii8q4NSjSdXK/pU82tEZl3g0kjsp/WPG8R6rVLkKn6l57k37n5uA
-         Ui1jKrfwJg4z3s9+rDT2fGyBqgVQ60mfFAyvBwms=
-Date:   Tue, 11 Apr 2023 14:20:41 +0200
-From:   Niklas Cassel <nks@flawful.org>
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v6 09/19] scsi: allow enabling and disabling command
- duration limits
-Message-ID: <ZDVQmX2bYoRBYR1Y@x1-carbon>
-References: <20230406113252.41211-1-nks@flawful.org>
- <20230406113252.41211-10-nks@flawful.org>
- <20230411061648.GD18719@lst.de>
- <e9cf65ce-e1f0-4d99-31e7-75b8e88e2a89@kernel.org>
- <20230411072317.GA22683@lst.de>
- <15ad7cf9-e385-9cea-964a-4a2eac35385c@kernel.org>
- <ZDVLsIi/OhkxNcGb@x1-carbon>
+        Tue, 11 Apr 2023 08:29:30 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B0A1BE8
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 05:29:26 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230411122925euoutp0166592db218433964ee1f02197a02bc58~U4THx9iap0721707217euoutp01h
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 12:29:25 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230411122925euoutp0166592db218433964ee1f02197a02bc58~U4THx9iap0721707217euoutp01h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1681216165;
+        bh=PIVtaWRdXFvvGvca/utIz/lLXjHseGY076GdVp9CofQ=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=s+NcSqyqbq11RtsrC+miaqtF9/zatU92pOylTRwd7fqlJapAX0PouHP1PgEAx/uXx
+         DyeEETwwsyKbo+sFwMBF1sju9QKbpPx1/GJyuzdssfrueHqz7EcEhAZP0KLactXS2B
+         wP3ZGLEpiAXdItnsQ4DEPTcKYoI50y18gs5kxSuc=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20230411122923eucas1p2f756a287f9f45b8c76bdbd7f81d949db~U4TF8Df2y3228532285eucas1p2t;
+        Tue, 11 Apr 2023 12:29:23 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id B8.9A.10014.3A255346; Tue, 11
+        Apr 2023 13:29:23 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230411122923eucas1p27e097fa66db8e166d14658bc7c6f180b~U4TFlFxcc3003730037eucas1p27;
+        Tue, 11 Apr 2023 12:29:23 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230411122923eusmtrp1f4a4812316778b3dcb34ac05a45a01dd~U4TFkUivq0646206462eusmtrp1S;
+        Tue, 11 Apr 2023 12:29:23 +0000 (GMT)
+X-AuditID: cbfec7f5-b8bff7000000271e-03-643552a3acbc
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id B7.FB.34412.2A255346; Tue, 11
+        Apr 2023 13:29:23 +0100 (BST)
+Received: from localhost (unknown [106.210.248.243]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230411122922eusmtip22c05afaf469dd0ad10bc0ac238306b53~U4TFSq8M32761927619eusmtip2k;
+        Tue, 11 Apr 2023 12:29:22 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     hubcap@omnibond.com, brauner@kernel.org, martin@omnibond.com,
+        willy@infradead.org, hch@lst.de, minchan@kernel.org,
+        viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        akpm@linux-foundation.org, senozhatsky@chromium.org
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        devel@lists.orangefs.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        mcgrof@kernel.org, Pankaj Raghav <p.raghav@samsung.com>
+Subject: [PATCH v3 1/3] orangefs: use folios in orangefs_readahead
+Date:   Tue, 11 Apr 2023 14:29:18 +0200
+Message-Id: <20230411122920.30134-2-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230411122920.30134-1-p.raghav@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZDVLsIi/OhkxNcGb@x1-carbon>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrGKsWRmVeSWpSXmKPExsWy7djP87qLg0xTDJqvyVnMWb+GzWL13X42
+        i9eHPzFa7N88hcni5oGdTBYrVx9lsmi/28dksfeWtsWevSdZLC7vmsNmcW/Nf1aLk+v/M1vc
+        mPCU0WLZ1/fsFp+XtrBb7N64iM3i/N/jrBa/f8xhcxDymN1wkcVj8wotj8tnSz02repk89j0
+        aRK7x4kZv1k8GqbeYvPYfbOBzePX7TusHn1bVjF6fN4k57HpyVumAJ4oLpuU1JzMstQifbsE
+        roxzS26zFjRwV9x9e5+pgbGZs4uRg0NCwERic593FyMXh5DACkaJnS93sEA4Xxglbm+7ygTh
+        fGaUeHFlKWMXIydYx97Pe9lBbCGB5YwS7Yf8IYpeMkpM2rCLCWQsm4CWRGMnO0hcROAWo8SC
+        z1cYQRxmgfuMEg9vnQLrFhZwkliyeQYriM0ioCrxbv1fZpBmXgFLifbFTBDL5CX2HzzLDGJz
+        ClhJrF71AewIXgFBiZMzn7CA2MxANc1bZzODzJcQ2M0p0X15KRtEs4vE5glHWCFsYYlXx7ew
+        Q9gyEqcn97BA2NUST2/8hmpuYZTo37meDRIw1hJ9Z3JATGYBTYn1u/Qhyh0l9n7bxwhRwSdx
+        460gxAl8EpO2TWeGCPNKdLQJQVQrSez8+QRqqYTE5aY5UEs9JH71HWefwKg4C8kzs5A8Mwth
+        7wJG5lWM4qmlxbnpqcXGeanlesWJucWleel6yfm5mxiBSfH0v+NfdzCuePVR7xAjEwfjIUYJ
+        DmYlEd4fLqYpQrwpiZVVqUX58UWlOanFhxilOViUxHm1bU8mCwmkJ5akZqemFqQWwWSZODil
+        GphqHNS0w+S2T33e+sH0yKvojbIasw2dJDimru7lqnjlPI+zvK2fd2WoG8cu7iMT21e0ud5w
+        vNP461p/f631ZjFFiaMJMz71rDgWIOqy4P3nFTwPapimFmS+4m6NO5Woz7L1ksTTZb2LRHb6
+        bVl3/FT4057jG9Z3B9a3xHDd/GbHetz4wPYU9ZNOj0pfHjP9/jDHfq9zwaklGxavmJLBvHpR
+        e2fCag+Hz9+bpNinsTsIv3hkmtT4pb8i/ynPnD3qUwvurTg2N9nrm+8Tp97ST1s6V2z//SFB
+        6bBS7JPLbhci+VZfnXyH7y3XzRX227o/SKyfZH0+b2FcYfv6b7enmlTZyyonf5OedzNDR+DZ
+        df4dSizFGYmGWsxFxYkAYICW5vkDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKIsWRmVeSWpSXmKPExsVy+t/xe7qLg0xTDF58YLSYs34Nm8Xqu/1s
+        Fq8Pf2K02L95CpPFzQM7mSxWrj7KZNF+t4/JYu8tbYs9e0+yWFzeNYfN4t6a/6wWJ9f/Z7a4
+        MeEpo8Wyr+/ZLT4vbWG32L1xEZvF+b/HWS1+/5jD5iDkMbvhIovH5hVaHpfPlnpsWtXJ5rHp
+        0yR2jxMzfrN4NEy9xeax+2YDm8ev23dYPfq2rGL0+LxJzmPTk7dMATxRejZF+aUlqQoZ+cUl
+        tkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehnnltxmLWjgrrj79j5TA2Mz
+        ZxcjJ4eEgInE3s972bsYuTiEBJYySty8ep4NIiEhcXthEyOELSzx51oXWFxI4DmjxJQPrF2M
+        HBxsAloSjZ1gvSICzxglZm/YwgpSwwxS8+sRL4gtLOAksWTzDLA4i4CqxLv1f5lBenkFLCXa
+        FzNBjJeX2H/wLDOIzSlgJbF61QdGiFWWEhfa54G18goISpyc+YQFYry8RPPW2cwTGAVmIUnN
+        QpJawMi0ilEktbQ4Nz232EivODG3uDQvXS85P3cTIzB+tx37uWUH48pXH/UOMTJxMB5ilOBg
+        VhLh/eFimiLEm5JYWZValB9fVJqTWnyI0RTo7InMUqLJ+cAEklcSb2hmYGpoYmZpYGppZqwk
+        zutZ0JEoJJCeWJKanZpakFoE08fEwSnVwLQ93KVDxE3m+9vDar+Mz0p8/1bln2KS8P2w0b97
+        3lMzqht59tmv+yM8sbzajeF+3MY9BwWrzrM8z8wt3XzhRsdn4+o4l7e6cufMz0W+512x//iT
+        I2dm7cqqZbuo4FT3uoZl8ZkGkX3+nA+Xne74dXSPaV3jWcFdpS8KPx+b++CB992C3Us/Zs91
+        /RFmfCb/ucYU9i/8obeMYo/6zThy03ZXQLj86b663BOLyn6V+K1j33Fv95t/ndcSv9nruDOo
+        3rnC929L3s7/Fuxpnkn8TKJFD2oyXnkFbD8h2CWzUX+6mOq1Vfe+Bl0o9evQuBo62aXz56Wy
+        pD2TXpp0qV9fffT1PlZHs9opi+X0GpnYZq9UYinOSDTUYi4qTgQAQYdjlmgDAAA=
+X-CMS-MailID: 20230411122923eucas1p27e097fa66db8e166d14658bc7c6f180b
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20230411122923eucas1p27e097fa66db8e166d14658bc7c6f180b
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230411122923eucas1p27e097fa66db8e166d14658bc7c6f180b
+References: <20230411122920.30134-1-p.raghav@samsung.com>
+        <CGME20230411122923eucas1p27e097fa66db8e166d14658bc7c6f180b@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 01:59:44PM +0200, Niklas Cassel wrote:
-> On Tue, Apr 11, 2023 at 04:38:48PM +0900, Damien Le Moal wrote:
-> > On 4/11/23 16:23, Christoph Hellwig wrote:
-> > > On Tue, Apr 11, 2023 at 04:09:34PM +0900, Damien Le Moal wrote:
-> > >> But yes, I guess we could just unconditionally enable CDL for ATA on device scan
-> > >> to be on par with scsi, which has CDL always enabled.
-> > > 
-> > > I'd prefer that.  With a module option to not enable it just to be
-> > > safe.
-> > 
-> > Then it may be better to move the cdl_enable attribute store definition for ATA
-> > devices to libata. That would be less messy that way. Let me see if that can be
-> > done cleanly.
-> 
-> I don't think that the SCSI mode select can just be replaced with simple
-> SET FEATURES in libata.
-> 
-> If we move the SET FEATURES call to a function in libata, and then use a
-> function pointer in the scsi_host_template, and let only libata set this
-> function pointer (similar to e.g. how the queue_depth sysfs attribute works),
-> then the code will no longer work for SATA devices connected to a SAS HBA.
-> 
-> 
-> 
-> The current code simply checks if VPD page89 (the ATA Information VPD
-> page - which is defined in the SCSI to ATA Translation (SAT) standard)
-> exists. This page (and thus the sdev->vpd_pg89 pointer) will only exist
-> if either:
-> 1) An ATA device is connected to a SATA controller. This page will then
-> be implemented by libata.
-> 2) An ATA device is connected to a SAS HBA. The SAS HB will then provide
-> this page. (The page will not exist for SCSI devices connected to the
-> same SAS HBA.)
-> 
-> For case 1) with the current code, scsi.c will call scsi_mode_select()
-> which will be translated by libata before being sent down to the device.
-> 
-> For case 2) with the current code, scsi.c will send down a SCSI mode
-> select to the SAS HBA, and the SAS HBA will be responsible for translating
-> the command before sending it to the device.
-> 
-> So I actually think that the current way to check if vpd page89 exists
-> is probably the "cleanest" solution that I can think of.
-> 
-> If you have a better suggestion that will work for both case 1) and
-> case 2), I will be happy to change the code accordingly.
+Convert orangefs_readahead() from using struct page to struct folio.
+This conversion removes the call to page_endio() which is soon to be
+removed, and simplifies the final page handling.
 
+The page error flags is not required to be set in the error case as
+orangefs doesn't depend on them.
 
-In addition to:
-https://github.com/torvalds/linux/blame/v6.3-rc6/drivers/scsi/sd.c#L3066-L3074
+Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: Mike Marshall <hubcap@omnibond.com>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+ fs/orangefs/inode.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-checking for the existence of VPD page89 is also currently done by e.g.:
-https://github.com/torvalds/linux/blob/v6.3-rc6/drivers/scsi/mpt3sas/mpt3sas_scsih.c#L12607
-and
-https://github.com/torvalds/linux/blob/v6.3-rc6/drivers/hwmon/drivetemp.c#L340
+diff --git a/fs/orangefs/inode.c b/fs/orangefs/inode.c
+index aefdf1d3be7c..9014bbcc8031 100644
+--- a/fs/orangefs/inode.c
++++ b/fs/orangefs/inode.c
+@@ -244,7 +244,7 @@ static void orangefs_readahead(struct readahead_control *rac)
+ 	struct iov_iter iter;
+ 	struct inode *inode = rac->mapping->host;
+ 	struct xarray *i_pages;
+-	struct page *page;
++	struct folio *folio;
+ 	loff_t new_start = readahead_pos(rac);
+ 	int ret;
+ 	size_t new_len = 0;
+@@ -275,9 +275,10 @@ static void orangefs_readahead(struct readahead_control *rac)
+ 		ret = 0;
+ 
+ 	/* clean up. */
+-	while ((page = readahead_page(rac))) {
+-		page_endio(page, false, ret);
+-		put_page(page);
++	while ((folio = readahead_folio(rac))) {
++		if (!ret)
++			folio_mark_uptodate(folio);
++		folio_unlock(folio);
+ 	}
+ }
+ 
+-- 
+2.34.1
 
-
-Kind regards,
-Niklas
