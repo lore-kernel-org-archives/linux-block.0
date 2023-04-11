@@ -2,85 +2,256 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 431D8C77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 14:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD0EC77B6F
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 16:18:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbjDKOqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 10:46:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37790 "EHLO
+        id S229654AbjDKQSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 12:18:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjDKOqg (ORCPT
+        with ESMTP id S229604AbjDKQRs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 10:46:36 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7774DE
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 07:46:35 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id kt17so8832321ejb.11
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 07:46:35 -0700 (PDT)
+        Tue, 11 Apr 2023 12:17:48 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8DE6193
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 09:16:26 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id gw11-20020a05600c850b00b003f07d305b32so5719822wmb.4
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 09:16:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1681224394; x=1683816394;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xw/mxUKXpWj97EyrOhCIY5GQVAW/IVTixbTM7woSH08=;
-        b=cf26QppW6hc6LUjqyHMEpZPG9vb23OlmrSSkPmSBv1WGwBvT8juUi3hqVsziAu1wWZ
-         9UpurxajGrHC+xcSEVlodokdnj9hH008ozIAWC5F8PeFU/DNOERRG3WMZWYbY3/E3AkG
-         n4ShuYEKYGDAMNqhyLwoPucpuyA8+iMZLKpAgrcmt6D81SRfijshYQrbsJ83kgh6eR5Q
-         utZZSG33dIx1BqPyAWdrX6wZda7KzdbDPhbLg6PwpOLRJQ9fKo6iRViX13WJux0XmpJt
-         Hpo6g6fmn/AEQq624M3+UzIu+H9+sCKJ8ww++EhU5bhXR79teDAftVprSXs/c8Q1qmT1
-         Zvgg==
+        d=linaro.org; s=google; t=1681229785; x=1683821785;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rQOU2NxcA3yCNJObcmxy+gfhS7V/5K9QCr7rxWQRSCc=;
+        b=w4nLujlkK2kPUHBbGgWURVjMNtN7wv3feP7uzPldzYCs/EZ0GmNCQhhHFGLTAY+Gi5
+         +Lp8L9G1hkQsoR4T/dP2rnFkQKkZXj7JVGKt2lrBdp2Y9cUjeunzhGlijbiFiuE09YMq
+         8oYD9lZ/+fe3Tmd7PwYMP9Neo0olfAjzmJV4bg+3wvDDwtBoIp95WGcK3lzcKDyPBQbo
+         xr5gW0S3s9YIrEBW+lx4H009CWTnN7QSRWYImt3lc7oi4UOHjQVAn+FI7WBpxxNs7mMA
+         oYTwb7x0T2CieNCJ+JHcPAG+ZgWjhkKlYOaEY5U39P11b+wlJGKSllAt7arcPFJdCxn+
+         S4Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681224394; x=1683816394;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xw/mxUKXpWj97EyrOhCIY5GQVAW/IVTixbTM7woSH08=;
-        b=BOEoj02A1l+s1X9pstu1uVmhHVaaAYDUFdfEjzyxZfnMXtm/8vdof2zC24QAwUKc1a
-         4tcZAVBFdjV4Dtdo3Aa5g2ifm7JOH8ljbg/RdG7qC76W710w6cqEOpUSWdx50Ox3pPf2
-         E5EN03P6x8gLxBXaiHyMtXI5LlCgmgeO2QvWUgcfBDeNov+0fxRcHqdI20LGlFvSMUfF
-         KiZkyFxT4n1IeFiCt2mgivmMLPcD5TH0t0rAtJ/Q5iv7/IRCxOaBdfTNjc8Mj83BAvgl
-         YiJZekxAPkhd9C+wXoLjsk2KYP1QCTQBmGuPtaLa2Vm6RO5XtJrlz6uYs4XrQ4HrQZp1
-         UOwA==
-X-Gm-Message-State: AAQBX9em6zVIMkPHwx99nlNQebG84Jhr22GVVdIgJd27Yr5ucTmb9p2S
-        dcgusmuwcGGDJpRgMf9hQuw=
-X-Google-Smtp-Source: AKy350a2ciFTg2uyVhlEf+IsdVsD7K4dbSIz6c3orKkFI2vUVbvfpeHZPHZt7nzqIndJ9Jmop6d9Og==
-X-Received: by 2002:a17:906:aec4:b0:94a:93f4:711d with SMTP id me4-20020a170906aec400b0094a93f4711dmr2690400ejb.4.1681224394117;
-        Tue, 11 Apr 2023 07:46:34 -0700 (PDT)
-Received: from [192.168.2.30] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id r25-20020a1709067fd900b0094a73c2c5c6sm2554143ejs.184.2023.04.11.07.46.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Apr 2023 07:46:32 -0700 (PDT)
-Message-ID: <07619cf4-f487-a5ee-01ac-4d6d7dd3e32a@gmail.com>
-Date:   Tue, 11 Apr 2023 16:46:31 +0200
+        d=1e100.net; s=20210112; t=1681229785; x=1683821785;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rQOU2NxcA3yCNJObcmxy+gfhS7V/5K9QCr7rxWQRSCc=;
+        b=KcS5uY8ZOoYdgod0crL2Dkn2y/a9w/wd85a+9xdF2JH26bR8aj8YPhH08dgwxcYDaj
+         dl26UKzeIEbgH+Vx4HVVQdHVFi2UpLLUU0H+cvtRnye19n/CSh8jM5cHeGBpZd5A77sH
+         FhGoBgosrBzgS91h+Z1NJmVmk9MT1U/iyGFJ3PMoMhvxnPzEeNwJP3N+K8JwenzYrBim
+         WfBXBTPT58IVdD8Yleje5DbizdNCmNgNMhpVcjqi1oY++kPsA05egiDHP+zso+MFRKGb
+         GYS9igoXjL9GIjQgfh0IFPlT14sno3awj0prIVzDcfoDxXj5JKjrW3AjuKWAy9AwCVlo
+         Kcxg==
+X-Gm-Message-State: AAQBX9flfX8PM7g9Msx0yYhOPowNQ/EISfv9s+fom5XlyffntMtMKN6h
+        wxiElhB4HEO+rpRlvlf5dqJIsQ==
+X-Google-Smtp-Source: AKy350ZI3OMMZN8klF1UVUUig8s+iGaTms+boTblI8oKaQxUKj3bSCRKrhXp0lQDjqs/Ax6/me7yQA==
+X-Received: by 2002:a05:600c:4da5:b0:3f0:4275:395f with SMTP id v37-20020a05600c4da500b003f04275395fmr9211597wmp.13.1681229785055;
+        Tue, 11 Apr 2023 09:16:25 -0700 (PDT)
+Received: from klimova1.roam.corp.google.com ([194.75.181.122])
+        by smtp.gmail.com with ESMTPSA id n37-20020a05600c3ba500b003f0652084b8sm21282192wms.20.2023.04.11.09.16.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Apr 2023 09:16:24 -0700 (PDT)
+Date:   Tue, 11 Apr 2023 17:16:21 +0100
+From:   Alexey Klimov <alexey.klimov@linaro.org>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     draszik@google.com, peter.griffin@linaro.org,
+        willmcvicker@google.com, mingo@kernel.org, ulf.hansson@linaro.org,
+        tony@atomide.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        alim.akhtar@samsung.com, regressions@lists.linux.dev,
+        avri.altman@wdc.com, bvanassche@acm.org, klimova@google.com,
+        Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [REGRESSION] CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait()
+ and slow-stuck reboots
+Message-ID: <20230411171621.0544249a.alexey.klimov@linaro.org>
+In-Reply-To: <20230320093614.GB2196776@hirez.programming.kicks-ass.net>
+References: <20230314230004.961993-1-alexey.klimov@linaro.org>
+        <20230315111606.GB2006103@hirez.programming.kicks-ass.net>
+        <CANgGJDpd4Gm5HhQW__oMAv1yUqSPZ7FSGoQLYTmug=TUk4cn4g@mail.gmail.com>
+        <20230320090558.GF2194297@hirez.programming.kicks-ass.net>
+        <20230320093614.GB2196776@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.9.1
-Subject: Re: [PATCH v2 1/1] sed-opal: geometry feature reporting command
-Content-Language: en-US
-To:     Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
-Cc:     bluca@debian.org, axboe@kernel.dk, hch@infradead.org,
-        brauner@kernel.org, jonathan.derrick@linux.dev
-References: <20230406131934.340155-1-okozina@redhat.com>
- <20230411090931.9193-1-okozina@redhat.com>
- <20230411090931.9193-2-okozina@redhat.com>
-From:   Milan Broz <gmazyland@gmail.com>
-In-Reply-To: <20230411090931.9193-2-okozina@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/11/23 11:09, Ondrej Kozina wrote:
-> Locking range start and locking range length
-> attributes may be require to satisfy restrictions
-> exposed by OPAL2 geometry feature reporting.
+On Mon, 20 Mar 2023 10:36:14 +0100
+Peter Zijlstra <peterz@infradead.org> wrote:
 
-...
-> Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+Sorry for the delay.
+(adding Mark in c/c)
 
-v2 works on all of my SATA/NVMe OPAL drives, so
+> On Mon, Mar 20, 2023 at 10:05:58AM +0100, Peter Zijlstra wrote:
+> > On Fri, Mar 17, 2023 at 02:11:25AM +0000, Alexey Klimov wrote:  
+> > > On Wed, 15 Mar 2023 at 11:16, Peter Zijlstra
+> > > <peterz@infradead.org> wrote:  
+> > > >
+> > > >
+> > > > (could you wrap your email please)  
+> > > 
+> > > Ouch. Sorry.
+> > >   
+> > > > On Tue, Mar 14, 2023 at 11:00:04PM +0000, Alexey Klimov wrote:  
+> > > > > #regzbot introduced: 0c5ffc3d7b15 #regzbot title:
+> > > > > CPUIDLE_FLAG_RCU_IDLE, blk_mq_freeze_queue_wait() and
+> > > > > slow-stuck reboots
+> > > > >
+> > > > > The upstream changes are being merged into android-mainline
+> > > > > repo and at some point we started to observe kernel panics on
+> > > > > reboot or long reboot times.  
+> > > >
+> > > > On what hardware? I find it somewhat hard to follow this DT
+> > > > code :/  
+> > > 
+> > > Pixel 6.  
+> > 
+> > What actual cpuidle driver is that thing using? Is there any
+> > out-of-tree code involved? Mark tells me anything arm64 should be
+> > using PSCI, so let me to stare hard at that again.
 
-Tested-by: Milan Broz <gmazyland@gmail.com>
+Yep, it uses PSCI (psci_idle). But there is some out-of-tree code
+involved.
 
-m.
+> So specifically, your problem sounds like rcu_synchronize() is taking
+> very much longer than it used to. Specifically combined with the patch
+> that makes it 'go-away' this seems to indicate you lost a
+> ct_cpuidle_enter() call, which is what ends up telling RCU the cpu is
+> idle and no longer partakes in the whole grace period machinery. Not
+> telling RCU this results in RCU waiting for an idle cpu to report back
+> on it's RCU progress, but it being idle means it's not going to be
+> doing that and things sorta wait around until RCU gets fed up and
+> starts spraying IPIs to try and get things moving.
+ 
+rcu_barrier().
+
+Eventually managed to make sysrq work and blocked tasks point to
+rcu_barrier():
+
+[  454.626264][    C4] task:init state:D stack:9728 pid:1 ppid:0
+flags:0x04000008
+[  454.626463][    C4] Call trace:
+[  454.626570][    C4]  __switch_to+0x180/0x308
+[  454.626733][    C4]  __schedule+0x620/0x9e4
+[  454.626892][    C4]  schedule+0x84/0xf4
+[  454.627039][    C4]  schedule_timeout+0x48/0x1d8
+[  454.627215][    C4]  wait_for_common+0xe0/0x1a8
+[  454.627388][    C4]  wait_for_completion+0x20/0x30
+[  454.627571][    C4]  rcu_barrier+0x3f8/0x674
+[  454.627734][    C4]  netdev_run_todo+0x74/0x5d8
+[  454.627907][    C4]  rtnl_unlock+0x18/0x2c
+[  454.628063][    C4]  dhd_unregister_net+0x30/0x54 [bcmdhd4389]
+[  454.629084][    C4]  wl_cfg80211_unregister_static_if+0x98/0x18c
+[bcmdhd4389]
+[  454.630101][    C4]  wl_cfg80211_detach+0xcc/0x344
+[bcmdhd4389]
+[  454.631091][    C4]  dhd_detach+0x4d0/0xc78 [bcmdhd4389]
+[  454.632064][    C4]  dhdpcie_bus_release+0x28c/0x6bc [bcmdhd4389]
+[  454.633052][    C4]  dhdpcie_pci_remove+0xb4/0x1a4 [bcmdhd4389]
+[  454.634036][    C4]  pci_device_remove+0x60/0x118
+[  454.634152][    C4]  device_release_driver_internal+0x19c/0x2f0
+[  454.634291][    C4]  driver_detach+0x98/0xe0
+[  454.634395][    C4]  bus_remove_driver+0x80/0xbc
+[  454.634504][    C4]  driver_unregister+0x38/0x64
+[  454.634616][    C4]  pci_unregister_driver+0x2c/0xb8
+[  454.634735][    C4]  dhdpcie_bus_unregister+0xd8/0x1b0 [bcmdhd4389]
+[  454.635739][    C4]  dhd_bus_unregister+0x24/0x50 [bcmdhd4389]
+[  454.636722][    C4]  dhd_reboot_callback+0x19c/0x1d8 [bcmdhd4389]
+[  454.637709][    C4]  blocking_notifier_call_chain+0x78/0xc8
+[  454.637836][    C4]  kernel_power_off+0x2c/0xfc
+[  454.637946][    C4]  __arm64_sys_reboot+0x270/0x27c
+[  454.638060][    C4]  invoke_syscall+0x60/0x130
+[  454.638169][    C4]  el0_svc_common+0xbc/0x100
+[  454.638278][    C4]  do_el0_svc+0x38/0xb0
+[  454.638377][    C4]  el0_svc+0x34/0xc4
+[  454.638464][    C4]  el0t_64_sync_handler+0x8c/0xfc
+[  454.638573][    C4]  el0t_64_sync+0x1a8/0x1ac
+
+and
+
+[   13.799675][    C2] task:kworker/1:1     state:D stack:12784 pid:97
+  ppid:2      flags:0x00000008
+[   13.799879][    C2] Workqueue: events
+slab_caches_to_rcu_destroy_workfn
+[   13.800112][    C2] Call trace:
+[   13.800231][    C2]  __switch_to+0x180/0x308
+[   13.800394][    C2]  __schedule+0x620/0x9e4
+[   13.800553][    C2]  schedule+0x84/0xf4
+[   13.800700][    C2]  schedule_timeout+0x48/0x1d8
+[   13.800876][    C2]  wait_for_common+0xe0/0x1a8
+[   13.801049][    C2]  wait_for_completion+0x20/0x30
+[   13.801232][    C2]  rcu_barrier+0x3f8/0x674
+[   13.801394][    C2]  slab_caches_to_rcu_destroy_workfn+0x90/0x108
+[   13.801627][    C2]  process_one_work+0x1f0/0x454
+[   13.801807][    C2]  worker_thread+0x330/0x43c
+[   13.801977][    C2]  kthread+0x10c/0x1b8
+[   13.802127][    C2]  ret_from_fork+0x10/0x20
+
+ 
+> Now...  if a driver sets CPUIDLE_FLAG_RCU_IDLE it promises to call
+> ct_cpuidle_{enter,exit}() itself. Hence for any driver that does *NOT*
+> set that flag, cpuidle_enter_state() calls these functions.
+> 
+> Now, fo PSCI, the DT handler is psci_enter_idle_state(), which uses
+> CPU_PM_CPU_IDLE_ENTER_PARAM_RCU(), which per the other email, means
+> that it's low_level_idle_enter := psci_cpu_suspend_enter(), *will*
+> call ct_cpuidle_{enter,exit}().
+> 
+> Then if we look at psci_cpu_suspend_enter(), it has two cases
+> depending on psci_power_state_loses_context(). If it doesn't lose
+> context it does ct_cpuidle_enter() right there and proceeds to call
+> psci_ops.cpu_suspend() -- whatever that does.
+> 
+> If it does lose state, then it depends on CONFIG_ARM64, on arm64 we do
+> not call ct_cpuidle_{enter,exit}() but proceed into cpu_suspend().
+> 
+> We can find that function in arch/arm64/kernel/suspend.c, and if you
+> look at it, you'll note it does in fact call ct_cpuidle_{enter,exit}()
+> as per promises made.
+> 
+> So AFAICT every path into idle will pass through ct_cpuidle_enter().
+ 
+I tried to understand where ct_cpuidle_{enter,exit}() is missing and
+narrow it down until found out that the problem is cpu pm notifier
+returning NOTIFY_BAD during reboot and calls to ct_cpuidle_{enter,exit}
+are correct. Thanks for checking.
+
+In __CPU_PM_CPU_IDLE_ENTER() macro we have:
+
+	if (!is_retention)
+		__ret =  cpu_pm_enter();
+	if (!__ret) {
+		if (!is_rcu)
+			ct_cpuidle_enter();
+		__ret = low_level_idle_enter(state);
+		if (!is_rcu)
+			ct_cpuidle_exit();
+		if (!is_retention)
+			cpu_pm_exit();
+	}
+
+While rebooting cpu_pm_enter() returns an error since one of the
+notifiers starts to return NOTIFY_BAD. Looks like kernel starts to
+"spin" trying to put CPUs in idle state and always gets an error from
+cpu_pm_enter() never reaching the section covered by
+ct_cpuidle_{enter,exit}. Before the mentioned commit all of this were
+under ct_cpuidle_{enter,exit}. Hence, yes, in some sense we lost a
+ct_cpuidle_enter+exit() call. As long as I manually cover this small
+piece with ct_cpuidle_{enter,exit} for testing, the reboot times return
+back to as it was before the commit. Currently I removed returning
+NOTIFY_BAD from notifier when rebooting.
+
+It seems RCU waits for these CPUs to attend RCU machinery.
+Also it probably does not count as an upstream regression since it
+involves out of tree code but in theory this could happen with any
+other notifier. Probably WARN_ONCE() will be too bad too.
+
+The cpu pm notifier is this one, line 972,
+exynos_cpu_pm_notify_callback():
+https://android.googlesource.com/kernel/gs/+/refs/tags/android-t-qpr3-beta-2_r0.5/drivers/soc/google/exynos-cpupm.c#972
+
+Thank you for checking all this!
+
+Best regards,
+Alexey
+
