@@ -2,190 +2,182 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C29BC7619A
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 20:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F001C76196
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 21:46:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229766AbjDKUzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 16:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57598 "EHLO
+        id S229562AbjDKVqA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 17:46:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjDKUzS (ORCPT
+        with ESMTP id S229742AbjDKVp4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 16:55:18 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB81E18E
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 13:55:16 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33BEx69Y005453;
-        Tue, 11 Apr 2023 20:55:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=1TjZkMlphF8xodysitIGajCufJb1p9OwIiQYcK1F3pM=;
- b=DTwoeo+4VAahP2Puqs7DJJVEfEKoMLQbutjM5b4CtoFuiWsci/4eTLDaGAL4Js9N+lH+
- 0EmztcS4fPAdHy9QnwYVt4wSJCL1Q6Mc5zptwWWqagKEAWf8wgCRZO1X35N5bnLGTZiv
- Q3Lh1m0je8BfQBUgRy1gBeBM/H7pRfYGGkENxf9vp/aTHibckV4JhiH86DJpMFl0XFf+
- skopH8jQsrdpQlEv+LD0pLRDaMgmiAVYYcmFHJkSjcFVy9nHevCrWx+QSJntkeYPhIDw
- gtP0KJObL3jadAv9RhKrIXJOoLVNErglq80J1qEV7iTzJDSNOlI6gI/NsvpE9FaRTxyC jw== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pu0e7eh1g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Apr 2023 20:55:09 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33BJKXF6008056;
-        Tue, 11 Apr 2023 20:55:08 GMT
-Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2040.outbound.protection.outlook.com [104.47.51.40])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3puwc4s974-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Apr 2023 20:55:08 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aOAicWapAYZiKLBxNIjRGSZjN/J2+cL3srRO2VCiBHKTFsUaDVDsaCQGuHl7G/5H8r8LH4qhC2XyJXhHnei6cLEerd9rXkpiJb3R2DT/qrwn9TKqluSOTf2EHtzgH+EGiNzcAuViMhWzZVYlhjOU4EdEnB0B+7FjVyHeuSEpMT5aU7gbjy93Nf8+q/bD0U2supmL2+VsNzLatEOcl9y9gPwWeR3denElwl3As67GV19DcfiTbn7iLrL+iLZY1NYeEsR/fND0RsSpicU8ANiKZlxMAo0w4i1UUyMyVUv9PrWdpdgyvrMdY1P57PbaN2QPbFCcHeYoOlIui3Z9V4iQiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1TjZkMlphF8xodysitIGajCufJb1p9OwIiQYcK1F3pM=;
- b=B5SNql2P5x9m1OVceSpgFw6RXTnGYAArYgfZEKepvIocybabg30tkfv2dKVp+1ZUvjOkSl6g2dtFVgEML4GYQHYJ0Qx472jAm361NScRcsKRmFMB6QPJBpHpT66KU0PHJL/d/vI08AUBFNd3JlahechvxNS3NQM0HGcCECQKtBmbHezotaWX0uoowj+lYa3Cqipb0XD3I2QkW0l0QrXcXCk6YNa4YDoYZsPOHOYwmTqyGwip17ZuWXOvf5eqlkHaEu/FsAXlfpyqtz6Pw/MgAbP9bPNpSkdkWCDB33D5PHypJjjUPnYSu1M7ns4BGJaqxMfaHb4Kf37f158XFrFVAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Tue, 11 Apr 2023 17:45:56 -0400
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA2D49ED
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 14:45:53 -0700 (PDT)
+Received: by mail-yb1-xb2b.google.com with SMTP id v7so8290233ybi.0
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 14:45:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1TjZkMlphF8xodysitIGajCufJb1p9OwIiQYcK1F3pM=;
- b=s1b1bFf81bRqtN0nQzvWlQecAkaDMJPvV+F0956TXo0mcd+K1bNB6C5bFMmRnIBwmoH/SlHdkq6NbD24l0DmtG49ALnHkiwPxwUKYhPHMGKlo63pXIxur/huWh53S9GKdbigX1OTnGnoBJHGjjcjRhiMVGnmdWTX8RzWzfoIA58=
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com (2603:10b6:a03:3d3::5)
- by CO1PR10MB4482.namprd10.prod.outlook.com (2603:10b6:303:99::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.38; Tue, 11 Apr
- 2023 20:55:07 +0000
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::e206:6854:c7ed:225c]) by SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::e206:6854:c7ed:225c%6]) with mapi id 15.20.6277.038; Tue, 11 Apr 2023
- 20:55:07 +0000
-Message-ID: <c7e8f14a-6c1f-4e65-f72e-6fb92244f09c@oracle.com>
-Date:   Tue, 11 Apr 2023 13:55:03 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.1
-Subject: Re: blktests nvme/039 failure
-Content-Language: en-US
-To:     Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <5vnpdeocos6k4nmh6ewh7ltqz7b6wuemzcmqflfkybejssewkh@edtqm3t4w3zv>
- <76983b72-b954-5865-1b34-c88161a7dec9@oracle.com>
- <acu2ak5fwyjnsino5i4ilaeh3xawlkygbxwjjm5tu3ntzxmgbh@zawuclpnlwiu>
-From:   alan.adamson@oracle.com
-In-Reply-To: <acu2ak5fwyjnsino5i4ilaeh3xawlkygbxwjjm5tu3ntzxmgbh@zawuclpnlwiu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DM6PR06CA0050.namprd06.prod.outlook.com
- (2603:10b6:5:54::27) To SJ0PR10MB5550.namprd10.prod.outlook.com
- (2603:10b6:a03:3d3::5)
+        d=paul-moore.com; s=google; t=1681249552; x=1683841552;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QJHIYVc0csC12SHK/J/mtXalsO4pjHKd97C3GIyBGPs=;
+        b=DBlz2vm4moCxBbqcz1weaSasKWcg+Y71F5kVhWN7HJXD/ZN7d3htDBV70rbXGYWU3t
+         CXxT9fxqT9/QnzXL5Nd4wWfo4F0S9G27/nnohdAdRRK+4bONsmM4BvVBIzpOCbcwAeha
+         Xy/3h3dUEkfQn6vXeo0795aMl3/fNibaNdnltb95zNJoMMc7l+XJgqL5yZzvzIEqaHpF
+         HuYAWlfZWOnEM+Wye80CUORh4piSFA7w5AQbxTd97rqexAdvf8c6ZT1rwMrsR9PEU/VP
+         HGzyfkBtzRsmynNQmymKhDcCzgTJ+xjIpLPiLBbn6PV++RgHBtfpqB4xyg2F/X6/HjlC
+         QQ/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681249552; x=1683841552;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QJHIYVc0csC12SHK/J/mtXalsO4pjHKd97C3GIyBGPs=;
+        b=dQaV8OX8uj0ZZjLmw5rXC50QTp6zQIbg+x0i1H75rDFlA+tKBUTjkSS2jpokpKSruo
+         IH/tP4xv73639Ab2MveWI7RiGdxquJjoBns6PWXB5X7FWoKIUPL9FU1zCnP4wdusFnoP
+         kavoLssFgQoz+GZmFNRuwMyrtVl9XO1zJoXzrTHzhgwmOzb4KnPN73LpyyDD+U7vKwiz
+         e7JKx7yJxDKnR/hlyduzUP1RdKZVBv6uuyxlrY4nh2yAZW5AxAEmCyQ2EDaNi7D4fl9E
+         Psb+AqA+20yObF/6ux27LDd9NbMxtpUjVt5niltZvrp/i7JfktAc1DzAQlXP+c1U0l1J
+         jc2A==
+X-Gm-Message-State: AAQBX9cwhfyOv6hrpksFqyoNN7175WBZVHKUmv7TiX3SJKETIsRS3ZN6
+        rMtrQv9m74xnWnkEeQzjCSMhv7/Ul7rc0DR/Q5EP
+X-Google-Smtp-Source: AKy350Yy44JQPhqwIxfCYnzm9J8mBAXlzIsXMzsUvsaWbKpTAmHS32TjoXQQ8RK1Y2npGScPRJOP30cnOuG8gOZrT1A=
+X-Received: by 2002:a25:e0c5:0:b0:b8b:fd23:5028 with SMTP id
+ x188-20020a25e0c5000000b00b8bfd235028mr2609635ybg.3.1681249552097; Tue, 11
+ Apr 2023 14:45:52 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB5550:EE_|CO1PR10MB4482:EE_
-X-MS-Office365-Filtering-Correlation-Id: bbabbb81-aecb-48ec-5d59-08db3acf07ea
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: i769QyFViBPiuA56uw4Jq+fhm8QjsuWGa6lAqzpl4fBDMoNUyAWFfTy1CBiVl049zei9qRafKX2ir6ojKP6Urd+6XCACIsS2+eg/qTFS1iutbdW7s4SXIb+G3+u5N07f/PEzwBtgqn+KEp8fZ6gNiYYBbkMW8F5lWnLJq9QYC/uDt8MDd4MJVOZOfMacuzCU2SJA0mVB20c/5kv33j6IsUn8hJXPH6IDijVls9V6qtYZbS9xkYMUouWpiaIS6VF4jGZ2igy8JALgvIT6BSA4IQFOuJTpm/UDh2OQnM3fiPM7Sx3l0LjL2MsxISC0A83k5xNfdDkaafM3g6IRIOtyasdyw+HW0SwWTXd2lAxnlhe6cS9UuycVc411xJX7x/Kb7N9c2pYi4I7JuZ4SGjeEf4MFADFZYRC3OyoLE+qFR7eGxLTI0l8QReEImVW1KvmDG5g4DZkY4Dxexru+Qn7/ra6i4QVk2btyDZWUErv4lm7AxOwcvvQ1axUaHLEi8oNGY4iNRNNW4xUHXF/BIqBuyhbGNFQUeDriPtMuQZBeut4lLmV5h8FdNdooD7hz6Kdo72KgBsEaZfpU8DJtV5X0s8gC8qwqySyEvE/Tf2PpfPCkP6APMbhdKquGBJd+l6uT
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB5550.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(346002)(136003)(39860400002)(376002)(366004)(451199021)(478600001)(53546011)(26005)(316002)(9686003)(6506007)(186003)(2906002)(5660300002)(4326008)(66946007)(8676002)(6916009)(6666004)(66476007)(6486002)(41300700001)(8936002)(66556008)(31696002)(83380400001)(86362001)(36756003)(6512007)(2616005)(38100700002)(31686004)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bXhyTzVxdEdPaFI3OTJNRDJtNkRLMGVMSVVJNUxHZTl5YlNhOEwzeGNSc3ov?=
- =?utf-8?B?YU9qMitQOVZ1am40NXBGUFlHbndhdFV3V242MVd5RE04Z09KRmJqWnNkMXF0?=
- =?utf-8?B?dDk1QlJ2Rjc0aTlUY2FTbnZFQVkyYzFQajRETjZwMU1QeGpZdllUT3czQThH?=
- =?utf-8?B?Zy9GMG9LRmd4ZENqa05Qd3lvbTJ3NW1zY2NIcWdFMlpVREJjTjFyeW96MThW?=
- =?utf-8?B?c1c0SEV0YWxXWjkzdEVYSXdTcDZpVzlCZC9ndmkwRlhMdTRZMTd6R0lkWlBm?=
- =?utf-8?B?R2lLSk52d1RKTlgzbDZYWGpFMDJwQ0tqem5lV3NRN1lkeU5UTUFTTEFwaHFx?=
- =?utf-8?B?Q0wwKzR2OWF0N0p3VHVYWE9IU09zUGF2MDJrV203Y1BvUWM5bnROc0lnWWMy?=
- =?utf-8?B?dW1PMEpWOElXNjk4MVlyQTNlTlpkYjlRYzRNZDllOGRxQ0x3UzV5c2FIWnFo?=
- =?utf-8?B?MWhreVFITVlqTlZLbVAwQUZUNlg0MVM3SEVmditsMkVQaWJRQngyYXV0aklE?=
- =?utf-8?B?cVBXQ01xSEQ2a0Z5TGJnQ0pHOGJQV1k0akpsVWN3MDlWRzhFSGFpTzhiNzJw?=
- =?utf-8?B?OGlTV3NBQXJDbzVGbHNaemRDeVNPd0ppN2pEdk1jUjlXSDdHc0pqTDRzZjlF?=
- =?utf-8?B?T0ZlRzdqL3JMQUVYVGg1MkJCU0twd3R1bERZMGFNSVVQMkFvS0RNbFU2Y0Vq?=
- =?utf-8?B?QjhhQXdQUG1NcTJzVWJZRFVEVGFDZUc0akFhTTJDMmJBRlQ4U2FrMDRNRzRr?=
- =?utf-8?B?YytGYWV3YlRKMHcvVlgybGp6USt2V1hhTXJSK3NKc0t1TEJmNkFtK1ZEVURC?=
- =?utf-8?B?VklkeGU5YW9yTm9NVVNhazUwdXY4cGtDWEhnN0ViK0ZNbDAwSGZpdU9aajl5?=
- =?utf-8?B?Qk1xYmVRUnpIUzRqWG43K1oxZEVKU0FBSzNsVDBWSTVZU2JOUjNObkpVTTd5?=
- =?utf-8?B?ZkdDYkxmcGtWaDFNZ2FIYlJTTkJjOGRoaWUrSW8vM2FMRys3RzFFcmxnRlIy?=
- =?utf-8?B?TkR1MURqQXFvQ2pnb09IbFlNWDF3TWsxUGxEUGtXRW9YZ242Wm50Q3g3d2d5?=
- =?utf-8?B?c2NwRGluU0FsbzZOdzhkSTN3amNiV2ZDby9IRTNFY0RYbFY4Z0RkRFl5d0VZ?=
- =?utf-8?B?ZnRRUDA3OXhOc1RjcVpObWlEZ29raFJxOVpqaWVsb3o0dTM3M0svT1A0WmNS?=
- =?utf-8?B?eVB5bUlVVTkvMUFxMmcrTzgvVnRHYnFvdURGUi9XZVVvUkpNbVUvSGNVRnIv?=
- =?utf-8?B?cUUvVlg3alJuVUl0TFNOaHhZMTFuRzhqMFdOZnJ2WWIzczdEQ0dCdXdQNStO?=
- =?utf-8?B?dmM2aUhySmUzemlzTjNyMXRFbkdqSThIR3IxKzNJWk5WeHRRRDB3YWpQVkNr?=
- =?utf-8?B?MUJKai9TRklkS05VcWtlamQ0T2ZzWnd6V0tPOFpIZ1lDKzVxeFJ6dm4vTDFo?=
- =?utf-8?B?Vjk1YjQ4bmk2RThlSFlYQ2kvb0N5RmErc21RNXVSaDVuckZvTzdEYmFOZ0FS?=
- =?utf-8?B?cmpOTUxXMUV1WDdzV3VHRG41Mk9INWM3OXorck5MQ1JvSEcvVjdiaWtKM3FD?=
- =?utf-8?B?WFVmbVFxd3dKWk5vSk5GaEMrQVBSTzV2aVV0Y2xXZTA0dTFFOEdVbUFKZm41?=
- =?utf-8?B?cmJHN3VHM284S3l1SEJFSGVYdmcxdm9YWXF3V2pwTmM2UWFmWW9xUC9rRHR3?=
- =?utf-8?B?UHhyYld3WFpWRlBqQWJHRlFmZkh4TGI5TGtiNXoyZ3ZKWndncmhDYlZIUWtl?=
- =?utf-8?B?QnpINVJXRUd4emZYOE90NkpHM21uUTdVZ2RNajJJVXYyZTNmaDdoK1hzaGdB?=
- =?utf-8?B?YjJqUkpLM0V2T2VqaG82RnRtWDBNY2w4Wm9FR2cyUmQrZUwzMDY0WkpMYXFx?=
- =?utf-8?B?R3hyL2ZuNmVpMXppb0piZnRJRzlWa0lVZlYxWW8xUDljc1JEQ0pvMG1NSkVD?=
- =?utf-8?B?QUhyN3VBLzErV0VYR3BZNkFPTFBtZDVJMndYWUZLeVh0WTFlYUFLeEdmeWdY?=
- =?utf-8?B?QUNnZGRFTjhoek40TXh1QUN6eVcvN3JiZjB2MlBkWGE2UkJwSjZJQjduQ2ls?=
- =?utf-8?B?SXR2S3o5bmdUNzBLWUpkN2c0OUFTOHBRWEp3ZmhoOTlZcHhjb1FFOTBDZUIr?=
- =?utf-8?Q?fup7iTXN4AJIEPC1ITmPgIhuR?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: Qk73mzgIkBYSHiexmfKac21tVWmva8+gnvalGdryy46UU358deG/x7WCgq30/NqRSZCA9q3tqSOz+SMEjxjZkrjyZxtojMN3fFBnifoP1LFaZz/eS4E5UmuBjVd0N5yeyGLbeiyBS7XrLwr25+cyc4oqz9Oh04OqijPTPk8pUnEiT2naVbuHB/ApABa7cKB0wtbydaTkInFrHFB8FGxz0NK0GMonL2mjDtbrRlb54pFWzmhh+DsziHHZJ2DlappYxHBNe+Au1jIaCiSafuG1WXdGj9VyAlpbSdTlNH4f+hii758xM+Cut3uSE7hT1bn0VIwcFgxqWW3i6sgI5xc9ZLj+iY+isfTCZJwWsxgPGug1oY5g7Zku1xKWhvr8rCBe4T299Zd+3Q7w69pbKcSfmkuOoOHux+dj9GsZmeQYku7yrL8WH+IAKLnJnwQUQoXjpfYpO5JZ9iNC6TDnLwzpCiSLRwUG1fnx7lXF8b66Tksh1YZQbDwpkQhwcO4cr4t9azcGyigeZdGOp9MexPj1Jm4wdE+NqNVW0RREylKRO/T5G7yFqoP/Ha2XLNGfYIyIc5l2KfJ8p5Ypl0Fb76xaZ4hjSUxLdD0dg9ZbvtOh15TiXCfR+YgKW+jQaz9lRkb1xTMLaLwEms1Mv4AAAfBJgNwyCK7Qz2jAab4eBXM7NmWkQE9sO0nQfeR4snfqL8no6wae6SLYqgUvJiipQx+RkhQAQbKEoLjjpa5DEIdguA7ShHb/z/LSCrAeXoBby8vikEfh+fLswHhSPNrkIba4da5l/p5BCaO3TReULQFUaZ8TgQ+amt18VHxZkCDOmirsE6jczGdPQgurzTfgXrzqKT07y8ve9uBfLq2z2XD0kUU=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbabbb81-aecb-48ec-5d59-08db3acf07ea
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB5550.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2023 20:55:07.0618
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5oqDH8yOJ0HxMPLnloRKbxEW0OGxMtiOGqjns/KUqHXh8G0olGNpsXt3P/sLZObNaq6cSJmFLZZpVtx8/6KONA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4482
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-11_14,2023-04-11_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 adultscore=0
- suspectscore=0 phishscore=0 mlxlogscore=999 mlxscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
- definitions=main-2304110188
-X-Proofpoint-ORIG-GUID: IKL1DDgFap3DAZlR0oVHBn53Hk75FTeX
-X-Proofpoint-GUID: IKL1DDgFap3DAZlR0oVHBn53Hk75FTeX
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-6-git-send-email-wufan@linux.microsoft.com>
+ <CAHC9VhRa+NwKzLfQBmHfMgUp6_d5soQG7JBq-Vn=MUeUAt4tuQ@mail.gmail.com> <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Tue, 11 Apr 2023 17:45:41 -0400
+Message-ID: <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
+Subject: Re: [RFC PATCH v9 05/16] ipe: add userspace interface
+To:     Fan Wu <wufan@linux.microsoft.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Apr 10, 2023 at 3:10=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
+wrote:
+> On Thu, Mar 02, 2023 at 02:04:42PM -0500, Paul Moore wrote:
+> > On Mon, Jan 30, 2023 at 5:58???PM Fan Wu <wufan@linux.microsoft.com> wr=
+ote:
+> > >
+> > > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> > >
+> > > As is typical with LSMs, IPE uses securityfs as its interface with
+> > > userspace. for a complete list of the interfaces and the respective
+> > > inputs/outputs, please see the documentation under
+> > > admin-guide/LSM/ipe.rst
+> > >
+> > > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> >
+> > ...
+> >
+> > > ---
+> > >  security/ipe/Makefile    |   2 +
+> > >  security/ipe/fs.c        | 101 +++++++++
+> > >  security/ipe/fs.h        |  17 ++
+> > >  security/ipe/ipe.c       |   3 +
+> > >  security/ipe/ipe.h       |   2 +
+> > >  security/ipe/policy.c    | 135 ++++++++++++
+> > >  security/ipe/policy.h    |   7 +
+> > >  security/ipe/policy_fs.c | 459 +++++++++++++++++++++++++++++++++++++=
+++
+> > >  8 files changed, 726 insertions(+)
+> > >  create mode 100644 security/ipe/fs.c
+> > >  create mode 100644 security/ipe/fs.h
+> > >  create mode 100644 security/ipe/policy_fs.c
 
-On 4/10/23 6:27 PM, Shin'ichiro Kawasaki wrote:
-> On Apr 10, 2023 / 16:06, alan.adamson@oracle.com wrote:
-> [...]
->> I've been able to reproduce it.  The sleep .1 helps but doesn't eliminate
->> the issue.  I did notice whenever there was a failure, there was also a
->> "blk_print_req_error: 2 callbacks suppressed" in the log which would break
->> the parsing the test needs to do.
-> Ah, I see. The error messages were no printed because pr_err_ratelimited()
-> suppressed them. AFAIK, there is no way to disable or relax the rate limit from
-> userland. I think sleep for 5 = DEFAULT_RATE_LIMIT seconds at the beginning of
-> the test will ensure the error message printed. It will also avoid the "x
-> callbacks suppressed" messages.
->
-> With the change below, I observe no failure on my system.
->
-> diff --git a/tests/nvme/039 b/tests/nvme/039
-> index 11d6d24..5d76297 100755
-> --- a/tests/nvme/039
-> +++ b/tests/nvme/039
-> @@ -139,6 +139,9 @@ test_device() {
->   
->   	_nvme_err_inject_setup "${ns_dev}" "${ctrl_dev}"
->   
-> +	# wait DEFAULT_RATELIMIT_INTERVAL=5 seconds to ensure errors are printed
-> +	sleep 5
-> +
->   	inject_unrec_read_on_read "${ns_dev}"
->   	inject_invalid_status_on_read "${ns_dev}"
->   	inject_write_fault_on_write "${ns_dev}"
->
-Looks good.  I tested it with my environment.  When we get the passthru 
-logging in,  I'll be adding more tests here, but I'll have to do another 
-sleep 5.
+...
 
-Alan
+> > > +/**
+> > > + * ipe_update_policy - parse a new policy and replace @old with it.
+> > > + * @addr: Supplies a pointer to the i_private for saving policy.
+> > > + * @text: Supplies a pointer to the plain text policy.
+> > > + * @textlen: Supplies the length of @text.
+> > > + * @pkcs7: Supplies a pointer to a buffer containing a pkcs7 message=
+.
+> > > + * @pkcs7len: Supplies the length of @pkcs7len.
+> > > + *
+> > > + * @text/@textlen is mutually exclusive with @pkcs7/@pkcs7len - see
+> > > + * ipe_new_policy.
+> > > + *
+> > > + * Return:
+> > > + * * !IS_ERR   - OK
+> > > + * * -ENOENT   - Policy doesn't exist
+> > > + * * -EINVAL   - New policy is invalid
+> > > + */
+> > > +struct ipe_policy *ipe_update_policy(struct ipe_policy __rcu **addr,
+> > > +                                    const char *text, size_t textlen=
+,
+> > > +                                    const char *pkcs7, size_t pkcs7l=
+en)
+> > > +{
+> > > +       int rc =3D 0;
+> > > +       struct ipe_policy *old, *new;
+> > > +
+> > > +       old =3D ipe_get_policy_rcu(*addr);
+> > > +       if (!old) {
+> > > +               rc =3D -ENOENT;
+> > > +               goto err;
+> > > +       }
+> > > +
+> > > +       new =3D ipe_new_policy(text, textlen, pkcs7, pkcs7len);
+> > > +       if (IS_ERR(new)) {
+> > > +               rc =3D PTR_ERR(new);
+> > > +               goto err;
+> > > +       }
+> > > +
+> > > +       if (strcmp(new->parsed->name, old->parsed->name)) {
+> > > +               rc =3D -EINVAL;
+> > > +               goto err;
+> > > +       }
+> > > +
+> > > +       if (ver_to_u64(old) > ver_to_u64(new)) {
+> > > +               rc =3D -EINVAL;
+> > > +               goto err;
+> > > +       }
+> > > +
+> > > +       if (ipe_is_policy_active(old)) {
+> >
+> > I don't understand the is-active check, you want to make @new the new
+> > active policy regardless, right?  Could this is-active check ever be
+> > false?
+>
+> Actually this is needed. Policy updates can be applied to any deployed
+> policy, which may be saved in two places: the securityfs file node
+> and the ipe_active_policy pointer. To update a policy, this function firs=
+t
+> checks if the policy saved in the securityfs file node is currently activ=
+e.
+> If so, it updates the ipe_active_policy pointer to point to the new polic=
+y,
+> and finally updates the policy pointer in the securityfs to the new polic=
+y.
 
+Ah, okay.  I must have forgotten, or not realized, that multiple
+policies could be loaded and not active.
+
+I guess this does make me wonder about keeping a non-active policy
+loaded in the kernel, what purpose does that serve?
+
+--=20
+paul-moore.com
