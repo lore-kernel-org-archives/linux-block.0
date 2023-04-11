@@ -2,182 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F001C76196
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 21:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E6CC76196
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 22:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbjDKVqA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 17:46:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55776 "EHLO
+        id S229587AbjDKWsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 18:48:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbjDKVp4 (ORCPT
+        with ESMTP id S229504AbjDKWso (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 17:45:56 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA2D49ED
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 14:45:53 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id v7so8290233ybi.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 14:45:53 -0700 (PDT)
+        Tue, 11 Apr 2023 18:48:44 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F80210C;
+        Tue, 11 Apr 2023 15:48:43 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id l18so9008327wrb.9;
+        Tue, 11 Apr 2023 15:48:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1681249552; x=1683841552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QJHIYVc0csC12SHK/J/mtXalsO4pjHKd97C3GIyBGPs=;
-        b=DBlz2vm4moCxBbqcz1weaSasKWcg+Y71F5kVhWN7HJXD/ZN7d3htDBV70rbXGYWU3t
-         CXxT9fxqT9/QnzXL5Nd4wWfo4F0S9G27/nnohdAdRRK+4bONsmM4BvVBIzpOCbcwAeha
-         Xy/3h3dUEkfQn6vXeo0795aMl3/fNibaNdnltb95zNJoMMc7l+XJgqL5yZzvzIEqaHpF
-         HuYAWlfZWOnEM+Wye80CUORh4piSFA7w5AQbxTd97rqexAdvf8c6ZT1rwMrsR9PEU/VP
-         HGzyfkBtzRsmynNQmymKhDcCzgTJ+xjIpLPiLBbn6PV++RgHBtfpqB4xyg2F/X6/HjlC
-         QQ/A==
+        d=gmail.com; s=20221208; t=1681253321; x=1683845321;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=J8z4ld9M7fftUfGlVauhoYGNSHVLLFw30U9QnPZZQ0Q=;
+        b=WBSt0uIWmzOcToKeWQxxdMApFSn0OOldxgDCfvBJZx439ZuHjAjl7STB4wvunzSCfJ
+         G6RUXJWdWqBr0oFqcYNS7oE/cjx9KIqAbF9IKvqjv+hXQPE+fKxKCs3pVWTz377VIBmT
+         ZZnz42ge0iJN9NPXjE459lPWPobVpXzc1vRFn9XqVfxtgRWzWpJpckw1C/1Uqk8dr3jr
+         RLeIr8jCRByAjdlESGggC3jQJzwUA3o3BYEHDjBcQcaZh8ywo7FyyMdEGQNlpO+uUeuw
+         ZhefFtWIqAStgA4PHeGrUztkjvUmscroMon9eulPSIn4lImiTpYJaddZsRHdZbwWZIX4
+         K/zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681249552; x=1683841552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QJHIYVc0csC12SHK/J/mtXalsO4pjHKd97C3GIyBGPs=;
-        b=dQaV8OX8uj0ZZjLmw5rXC50QTp6zQIbg+x0i1H75rDFlA+tKBUTjkSS2jpokpKSruo
-         IH/tP4xv73639Ab2MveWI7RiGdxquJjoBns6PWXB5X7FWoKIUPL9FU1zCnP4wdusFnoP
-         kavoLssFgQoz+GZmFNRuwMyrtVl9XO1zJoXzrTHzhgwmOzb4KnPN73LpyyDD+U7vKwiz
-         e7JKx7yJxDKnR/hlyduzUP1RdKZVBv6uuyxlrY4nh2yAZW5AxAEmCyQ2EDaNi7D4fl9E
-         Psb+AqA+20yObF/6ux27LDd9NbMxtpUjVt5niltZvrp/i7JfktAc1DzAQlXP+c1U0l1J
-         jc2A==
-X-Gm-Message-State: AAQBX9cwhfyOv6hrpksFqyoNN7175WBZVHKUmv7TiX3SJKETIsRS3ZN6
-        rMtrQv9m74xnWnkEeQzjCSMhv7/Ul7rc0DR/Q5EP
-X-Google-Smtp-Source: AKy350Yy44JQPhqwIxfCYnzm9J8mBAXlzIsXMzsUvsaWbKpTAmHS32TjoXQQ8RK1Y2npGScPRJOP30cnOuG8gOZrT1A=
-X-Received: by 2002:a25:e0c5:0:b0:b8b:fd23:5028 with SMTP id
- x188-20020a25e0c5000000b00b8bfd235028mr2609635ybg.3.1681249552097; Tue, 11
- Apr 2023 14:45:52 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1681253321; x=1683845321;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J8z4ld9M7fftUfGlVauhoYGNSHVLLFw30U9QnPZZQ0Q=;
+        b=DXjqnXzQ/k/rz2JNfFeRkx+hFjr4fdSLdFhCKF3b3WG6xUg/ENLtX2uRITuYJfVFIT
+         GuohFcmftZbMOa6cRhnt9DsgVCAhRghj8sLda/Dr0WHR+QRDEJl/Uw3Ks/8TEuYvPGpK
+         N/HdcCLk1oZD1IE5FP3OUq5bQVHwSUlYoiEMdB0lXo7bxlEEiMroahmg7tfUaKXTB57N
+         KP/lFv3oshcXr86FP9WWJdSccd29i3brG+2LshWUtYwrq+RnOHjljHwI768uml0Ys0Ha
+         BDNFgdZLclrU+uk9cTeweyBmUx6y6f0Twh/tfaorq5E6G5yHyQCs27uOVWcHJReacUwN
+         xGXw==
+X-Gm-Message-State: AAQBX9fBQpBgOPh2DeEgavFBgO3a8ezC42UORTM79Hyiokp16bjUWsJx
+        KOaAlZA4rcR3OF0IfkN4b/+34UCOmx7lReHoEVw=
+X-Google-Smtp-Source: AKy350bm9/hkzTmDMITQuK1I1lLskq3ilk2A747iayl3f0ls6saSW3UKC/7hJzvOXLGaj1dw8xncoyujhc8923PdMRY=
+X-Received: by 2002:a5d:6803:0:b0:2ef:bb9f:f5bc with SMTP id
+ w3-20020a5d6803000000b002efbb9ff5bcmr960994wru.14.1681253321374; Tue, 11 Apr
+ 2023 15:48:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <1675119451-23180-6-git-send-email-wufan@linux.microsoft.com>
- <CAHC9VhRa+NwKzLfQBmHfMgUp6_d5soQG7JBq-Vn=MUeUAt4tuQ@mail.gmail.com> <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To: <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-From:   Paul Moore <paul@paul-moore.com>
-Date:   Tue, 11 Apr 2023 17:45:41 -0400
-Message-ID: <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
-Subject: Re: [RFC PATCH v9 05/16] ipe: add userspace interface
-To:     Fan Wu <wufan@linux.microsoft.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
+References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
+ <20230210180033.321377-1-joshi.k@samsung.com> <39a543d7-658c-0309-7a68-f07ffe850d0e@kernel.dk>
+In-Reply-To: <39a543d7-658c-0309-7a68-f07ffe850d0e@kernel.dk>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Wed, 12 Apr 2023 04:18:16 +0530
+Message-ID: <CA+1E3rLLu2ZzBHp30gwXBWzkCvOA4KD7PS70mLuGE8tYFpNEmA@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>,
+        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
+        hch@lst.de, kbusch@kernel.org, ming.lei@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 10, 2023 at 3:10=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
-wrote:
-> On Thu, Mar 02, 2023 at 02:04:42PM -0500, Paul Moore wrote:
-> > On Mon, Jan 30, 2023 at 5:58???PM Fan Wu <wufan@linux.microsoft.com> wr=
-ote:
-> > >
-> > > From: Deven Bowers <deven.desai@linux.microsoft.com>
-> > >
-> > > As is typical with LSMs, IPE uses securityfs as its interface with
-> > > userspace. for a complete list of the interfaces and the respective
-> > > inputs/outputs, please see the documentation under
-> > > admin-guide/LSM/ipe.rst
-> > >
-> > > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> > > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> >
-> > ...
-> >
-> > > ---
-> > >  security/ipe/Makefile    |   2 +
-> > >  security/ipe/fs.c        | 101 +++++++++
-> > >  security/ipe/fs.h        |  17 ++
-> > >  security/ipe/ipe.c       |   3 +
-> > >  security/ipe/ipe.h       |   2 +
-> > >  security/ipe/policy.c    | 135 ++++++++++++
-> > >  security/ipe/policy.h    |   7 +
-> > >  security/ipe/policy_fs.c | 459 +++++++++++++++++++++++++++++++++++++=
-++
-> > >  8 files changed, 726 insertions(+)
-> > >  create mode 100644 security/ipe/fs.c
-> > >  create mode 100644 security/ipe/fs.h
-> > >  create mode 100644 security/ipe/policy_fs.c
-
-...
-
-> > > +/**
-> > > + * ipe_update_policy - parse a new policy and replace @old with it.
-> > > + * @addr: Supplies a pointer to the i_private for saving policy.
-> > > + * @text: Supplies a pointer to the plain text policy.
-> > > + * @textlen: Supplies the length of @text.
-> > > + * @pkcs7: Supplies a pointer to a buffer containing a pkcs7 message=
-.
-> > > + * @pkcs7len: Supplies the length of @pkcs7len.
-> > > + *
-> > > + * @text/@textlen is mutually exclusive with @pkcs7/@pkcs7len - see
-> > > + * ipe_new_policy.
-> > > + *
-> > > + * Return:
-> > > + * * !IS_ERR   - OK
-> > > + * * -ENOENT   - Policy doesn't exist
-> > > + * * -EINVAL   - New policy is invalid
-> > > + */
-> > > +struct ipe_policy *ipe_update_policy(struct ipe_policy __rcu **addr,
-> > > +                                    const char *text, size_t textlen=
-,
-> > > +                                    const char *pkcs7, size_t pkcs7l=
-en)
-> > > +{
-> > > +       int rc =3D 0;
-> > > +       struct ipe_policy *old, *new;
-> > > +
-> > > +       old =3D ipe_get_policy_rcu(*addr);
-> > > +       if (!old) {
-> > > +               rc =3D -ENOENT;
-> > > +               goto err;
-> > > +       }
-> > > +
-> > > +       new =3D ipe_new_policy(text, textlen, pkcs7, pkcs7len);
-> > > +       if (IS_ERR(new)) {
-> > > +               rc =3D PTR_ERR(new);
-> > > +               goto err;
-> > > +       }
-> > > +
-> > > +       if (strcmp(new->parsed->name, old->parsed->name)) {
-> > > +               rc =3D -EINVAL;
-> > > +               goto err;
-> > > +       }
-> > > +
-> > > +       if (ver_to_u64(old) > ver_to_u64(new)) {
-> > > +               rc =3D -EINVAL;
-> > > +               goto err;
-> > > +       }
-> > > +
-> > > +       if (ipe_is_policy_active(old)) {
-> >
-> > I don't understand the is-active check, you want to make @new the new
-> > active policy regardless, right?  Could this is-active check ever be
-> > false?
+> > 4. Direct NVMe queues - will there be interest in having io_uring
+> > managed NVMe queues?  Sort of a new ring, for which I/O is destaged from
+> > io_uring SQE to NVMe SQE without having to go through intermediate
+> > constructs (i.e., bio/request). Hopefully,that can further amp up the
+> > efficiency of IO.
 >
-> Actually this is needed. Policy updates can be applied to any deployed
-> policy, which may be saved in two places: the securityfs file node
-> and the ipe_active_policy pointer. To update a policy, this function firs=
-t
-> checks if the policy saved in the securityfs file node is currently activ=
-e.
-> If so, it updates the ipe_active_policy pointer to point to the new polic=
-y,
-> and finally updates the policy pointer in the securityfs to the new polic=
-y.
+> This is interesting, and I've pondered something like that before too. I
+> think it's worth investigating and hacking up a prototype. I recently
+> had one user of IOPOLL assume that setting up a ring with IOPOLL would
+> automatically create a polled queue on the driver side and that is what
+> would be used for IO. And while that's not how it currently works, it
+> definitely does make sense and we could make some things faster like
+> that. It would also potentially easier enable cancelation referenced in
+> #1 above, if it's restricted to the queue(s) that the ring "owns".
 
-Ah, okay.  I must have forgotten, or not realized, that multiple
-policies could be loaded and not active.
+So I am looking at prototyping it, exclusively for the polled-io case.
+And for that, is there already a way to ensure that there are no
+concurrent submissions to this ring (set with IORING_SETUP_IOPOLL
+flag)?
+That will be the case generally (and submissions happen under
+uring_lock mutex), but submission may still get punted to io-wq
+worker(s) which do not take that mutex.
+So the original task and worker may get into doing concurrent submissions.
 
-I guess this does make me wonder about keeping a non-active policy
-loaded in the kernel, what purpose does that serve?
-
---=20
-paul-moore.com
+The flag IORING_SETUP_SINGLE_ISSUER - is not for this case, or is it?
