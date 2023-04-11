@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C79FC77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 13:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49235C77B6F
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 13:34:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229721AbjDKNeY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 09:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44114 "EHLO
+        id S229992AbjDKNe3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 09:34:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbjDKNeX (ORCPT
+        with ESMTP id S230083AbjDKNe1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 09:34:23 -0400
+        Tue, 11 Apr 2023 09:34:27 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEFCF3C39
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 06:34:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A99448A
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 06:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=9NLpAaiklui+4Sdl05N+0y4tAEqsohXA/XYQgZ+iFGk=; b=MEKzJoDPgJhs/tmp2uOxXpgFV4
-        LNHQL2VMdJj3v0Qy/VNc3akmezIuwx/hsecWCZ5p3TEuFHo6+O6FI3ieR+SXQ33LpMqEzVGHuO0bI
-        tnmkcAMOq8QzYMrhM83pPVc6JIbY78G7AineFfWgClFA9uQDhbbf/PQyI2WvvxjXeO1jLmgwGwvAS
-        N6n4kQ0TKiy/f81viHpzu9ZcShDMIfpXrmCRh+tHAXtI8xJXs9WRzf0VDQ9jP3xLga9UnQzSV0UYw
-        lO/LS5VtXzMBrR06Ohtb37tCc5DZH08RJO+sfq8Km0+j+JvvHz08LQ4mrKI3VEF+Y8s/FZ8VNinvq
-        NGRSvXow==;
+        bh=KTawvqXz96DdhMpQ+29CGiITy5ZE8d7Oaw5EwWo/FMk=; b=DAMsivqLUQdXgI0rATBlt1WXHt
+        hDXOfsfKyrc27KiOyx85fV7Xl5ks61ZlzVhY8EGnCjnITgsiQ4P/r6rlixpcnNjV3XJjP2jSTj2Mp
+        AMOoVG6Xiyh1YM1LY5E3AF8uSFHCLAFVaHeniMlb6dEXh34Y1oj0Psi5Ac6KeAxpW37yfJnxZ/X/9
+        dOu2IbJDeB8hLE6Ks8Z2MCaw2dlSHw9ALXjD3i3cCh61F8TY3J5qQ0Aj7kgFF/r/wrjvWo3Yp2/xw
+        wd/lNDx1FexJ1V99/TSGITiUtiVPqctb/Ww8jvS/ETFVQKlDprRbmv5/iu+Mf+TD3x+jKm5xVVH6g
+        RJASeZnQ==;
 Received: from [2001:4bb8:192:2d6c:a9b7:88a0:9fdd:81ca] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pmE8W-0007xk-0y;
-        Tue, 11 Apr 2023 13:34:17 +0000
+        id 1pmE8b-0007yb-2S;
+        Tue, 11 Apr 2023 13:34:22 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-Subject: [PATCH 09/16] blk-mq: refactor the DONTPREP/SOFTBARRIER andling in blk_mq_requeue_work
-Date:   Tue, 11 Apr 2023 15:33:22 +0200
-Message-Id: <20230411133329.554624-10-hch@lst.de>
+Subject: [PATCH 10/16] blk-mq: factor out a blk_mq_get_budget_and_tag helper
+Date:   Tue, 11 Apr 2023 15:33:23 +0200
+Message-Id: <20230411133329.554624-11-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230411133329.554624-1-hch@lst.de>
 References: <20230411133329.554624-1-hch@lst.de>
@@ -45,46 +45,65 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split the RQF_DONTPREP and RQF_SOFTBARRIER in separate branches to make
-the code more readable.
+Factor out a helper from __blk_mq_try_issue_directly in preparation
+of folding that function into its two callers.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-mq.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ block/blk-mq.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4bd7736c173bc8..a4fc6e68c3a66b 100644
+index a4fc6e68c3a66b..2995863c1680eb 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1429,20 +1429,20 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 	spin_unlock_irq(&q->requeue_lock);
+@@ -2625,13 +2625,27 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	return ret;
+ }
  
- 	list_for_each_entry_safe(rq, next, &rq_list, queuelist) {
--		if (!(rq->rq_flags & (RQF_SOFTBARRIER | RQF_DONTPREP)))
--			continue;
++static bool blk_mq_get_budget_and_tag(struct request *rq)
++{
++	int budget_token;
++
++	budget_token = blk_mq_get_dispatch_budget(rq->q);
++	if (budget_token < 0)
++		return false;
++	blk_mq_set_rq_budget_token(rq, budget_token);
++	if (!blk_mq_get_driver_tag(rq)) {
++		blk_mq_put_dispatch_budget(rq->q, budget_token);
++		return false;
++	}
++	return true;
++}
++
+ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 						struct request *rq,
+ 						bool bypass_insert, bool last)
+ {
+ 	struct request_queue *q = rq->q;
+ 	bool run_queue = true;
+-	int budget_token;
+ 
+ 	/*
+ 	 * RCU or SRCU read lock is needed before checking quiesced flag.
+@@ -2649,16 +2663,8 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if ((rq->rq_flags & RQF_ELV) && !bypass_insert)
+ 		goto insert;
+ 
+-	budget_token = blk_mq_get_dispatch_budget(q);
+-	if (budget_token < 0)
+-		goto insert;
 -
--		rq->rq_flags &= ~RQF_SOFTBARRIER;
--		list_del_init(&rq->queuelist);
- 		/*
- 		 * If RQF_DONTPREP, rq has contained some driver specific
- 		 * data, so insert it to hctx dispatch list to avoid any
- 		 * merge.
- 		 */
--		if (rq->rq_flags & RQF_DONTPREP)
-+		if (rq->rq_flags & RQF_DONTPREP) {
-+			rq->rq_flags &= ~RQF_SOFTBARRIER;
-+			list_del_init(&rq->queuelist);
- 			blk_mq_request_bypass_insert(rq, false, false);
--		else
-+		} else if (rq->rq_flags & RQF_SOFTBARRIER) {
-+			rq->rq_flags &= ~RQF_SOFTBARRIER;
-+			list_del_init(&rq->queuelist);
- 			blk_mq_insert_request(rq, true, false, false);
-+		}
- 	}
+-	blk_mq_set_rq_budget_token(rq, budget_token);
+-
+-	if (!blk_mq_get_driver_tag(rq)) {
+-		blk_mq_put_dispatch_budget(q, budget_token);
++	if (!blk_mq_get_budget_and_tag(rq))
+ 		goto insert;
+-	}
  
- 	while (!list_empty(&rq_list)) {
+ 	return __blk_mq_issue_directly(hctx, rq, last);
+ insert:
 -- 
 2.39.2
 
