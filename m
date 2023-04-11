@@ -2,111 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FFFC76196
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 01:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 586C8C77B61
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 01:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbjDKB1q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Apr 2023 21:27:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34790 "EHLO
+        id S229749AbjDKBgC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Apr 2023 21:36:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjDKB1p (ORCPT
+        with ESMTP id S229851AbjDKBgB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Apr 2023 21:27:45 -0400
+        Mon, 10 Apr 2023 21:36:01 -0400
 Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FAA4F9
-        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 18:27:44 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.west.internal (Postfix) with ESMTP id 0628C2B066FC;
-        Mon, 10 Apr 2023 21:27:41 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Mon, 10 Apr 2023 21:27:42 -0400
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27112D50
+        for <linux-block@vger.kernel.org>; Mon, 10 Apr 2023 18:35:48 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailnew.west.internal (Postfix) with ESMTP id 142CF2B066BB;
+        Mon, 10 Apr 2023 21:35:48 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Mon, 10 Apr 2023 21:35:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-transfer-encoding:content-type:content-type:date
-        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to; s=fm2; t=
-        1681176461; x=1681177061; bh=+djj8E2EfQ1BdgmqIQjeoDHOm1x7gpXZl9v
-        OkKv3HaA=; b=onwl2IiDr2QHgPAoZS8WPDPzj60b+GcxtmhqTHhVtIYFIqTD5/p
-        CPIMcalX5SOO0ble3ugNPWE2jNE5tCR+z0G6ALTm6ZOs3ACv/3gxbtZqWGt8qBRk
-        djdKZoLFr9BXWjTuXglvMt3nvQlx8Je5EVTM6irpQ23Lwy27v2FZex8FRk/Bu5uH
-        KaEazKPc5TuQJ/tz2anEmOMYAs6HGDgv1jKCJ8LJOR2ino4oVkX/sbsQAVu1DLIu
-        3A0EeXHmcldAq9PNQMpw6zTmqhArnHsZyHx1g+Z3pdw8T/vCYeNGs2KOP2FwG2DG
-        Yg7x1gN+CEUCk6wIqeq9l3aCAhjpUxVuivg==
+        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1681176947; x=1681177547; bh=N3
+        vWz+VeN1lE7R+NrNAweI4FiV73pPcdRXaUR4ZBTtU=; b=eWPSrv+0bn8vduSHX4
+        dPTTLNsosfR/mpmxII94OSOz+ZCABuYZRZ/8MYzOIGJJg2rKzE+vXx7MhSnGIIIn
+        dXwsyE8YWExRqWDiJi+j/jGA8Bjqe4GHYUlPl9wASN4GRxl0ZB/+hag9cyqsvxVV
+        pAZZXSNta1dvL86XVSring7liDx8dFUsR6H19yks0lBToP1vAg2AR1RTa75mAYGy
+        chkOzU1MHFxSyxg3f4IW6Pl1lGVbjqpq4Hf+Bs2AfYUMVrqMtv0oIvl4aP11QfSU
+        bSaYxNRRooFQinR0QBR9jLNFiVFBkyy/TPR13cRY7+PyJcpHo9GRCa88MecFTN58
+        3eSg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:content-type:date:date:feedback-id:feedback-id
-        :from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=ie1e949a3.fm2;
-         t=1681176461; x=1681177061; bh=+djj8E2EfQ1BdgmqIQjeoDHOm1x7gpXZ
-        l9vOkKv3HaA=; b=Oqazz89E9PuvNgsMWX6ORBRvEAUwIXSvr8qyEEKF9f1scb9T
-        9x49jXw7JeRO0lv+RqL9bTEOoczQjglklSiTNJjum29ZCUWdZSTlLzSAOUmqawNl
-        4G/XMxpr6ru0Uc6r6FBvPWEeg+EVYb+esvecYbMhVuhz2ls4RcxD+WtxXlLgJ9aB
-        Umv1AX5kHjxt4gORNXrsnhAL0flzRHEQpERaiuEZ9utsC/Tn88P3zJ7KjRax90pG
-        6vQVKwHwrGM+5B/Gba0FQ8Y8lQjmYHP9olMIGbByL1uqdGI1D+o2Re7M8M64TZYa
-        a+BF/rRhxyA3CUnFCHQAXlS/nPu9NepYkzFeZA==
-X-ME-Sender: <xms:jbc0ZNHFZncHYXzatA4qkgI3vFvrGpvU_IZ4rQJKaQtlS1-qAxTtDw>
-    <xme:jbc0ZCUcHg_4zqM-MrpYp2FAhgKdkanlt7CC8HZt0CDbQoEiK8L5hbjWLmaUL3jEb
-    humMhpgeXUcMrDqihM>
-X-ME-Received: <xmr:jbc0ZPKRl3xKds0ye68C8Ul0juUHGVhfK7fY1Sly7Kzhg7b9ACWvnRw9755fgeWvtMZRyRnD-dZ2KcJGjohbJQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekfedggeekucetufdoteggodetrfdotf
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=ie1e949a3.fm2; t=1681176947; x=1681177547; bh=N3v
+        Wz+VeN1lE7R+NrNAweI4FiV73pPcdRXaUR4ZBTtU=; b=Q9wUJugRyew3RQpXs7q
+        bcMfbW5g3w3mVIYPjoK0bwLgNPfCa+2NcY4kWqkGxPDm5cEt8anloJza2Tg/P69a
+        FAx6E8FFztb/syMULmTlkbx+CJohF1nBUGSSrWaIxeWVkBy28ZTqe22Dre7Xvzxd
+        wYHBrpnSNuf11F/SUfSJwzVnfXzkqmoffGPaTfPcWJc5Y19lVFpkKGJ5TOuoeoXu
+        1iX/1pGjBktmWk9F+nlrNUVrKRc4jgphPUYtGeBz7dceGZsj+wF/yX5DAcg0IalT
+        ZAvTp7yNV+KK2Sl1zkKfLDsy0WZPGsGEMZvEZJ62ok9MIoRmbbMZSeayQ8QfuZ5F
+        22Q==
+X-ME-Sender: <xms:c7k0ZNAsFww3s9oelJ_AkJI7TDoITjqo9EE8pJQHT6BGY346gFQwog>
+    <xme:c7k0ZLgQ1-_qQdGREGurVD-ntcmDd3NbN2V7Bv-MXp0M92nbU6nVMweod01CHUbZT
+    UidYbuMeD2XmQKyuis>
+X-ME-Received: <xmr:c7k0ZInGl0j6R33iQYm385ptnAAEDjW779ea6sEqo4ui-3UBJIgreL7JLxfHavQITENEds8K7HwJ6N-Ekz9AWw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekfedghedtucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtugfgjgesth
-    eksfdttddtudenucfhrhhomhepufhhihhnkdhitghhihhrohcumfgrfigrshgrkhhiuceo
-    shhhihhnihgthhhirhhosehfrghsthhmrghilhdrtghomheqnecuggftrfgrthhtvghrnh
-    ephfekkeeuueekfeeiueegtdehheegfeektdegtdfgudffvdeuvdeljeekteetgeelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshhhihhnih
-    gthhhirhhosehfrghsthhmrghilhdrtghomh
-X-ME-Proxy: <xmx:jbc0ZDH8o-Wsj8pd0aVJB7F9zuuxLu1e8Q8dJ9e-23SOQYqnqnwmIQ>
-    <xmx:jbc0ZDUr1lImSNt4TZYw_SRMJwD1pfeG3Bi6AJjPncE2gMY4Mz4XPQ>
-    <xmx:jbc0ZOOfxPvaGsZiQuXNUdyJ2DKz0DdnlgQAGDcVSInAmjB1J4ZKdg>
-    <xmx:jbc0ZKf8MXHjmFeHb5MHCYMiKEclbfpqeHGpwqmjX3n1GkriwHSi3aR61zSjVI00>
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
+    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
+    hilhdrtghomheqnecuggftrfgrthhtvghrnhepffehffetgfdugeffffelvdfgjefgkedv
+    hfehgeefveffgfffvedtueekgeevvefhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrgh
+    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehshhhi
+    nhhitghhihhrohesfhgrshhtmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:c7k0ZHwKLl5Q7xLchCSwGkPSg3dXF-iYm5McaxSHrqqkGSzoXOVBog>
+    <xmx:c7k0ZCSjmeV2nMITxbVBhrkGB16G92U_6-c0gq6cFcxSX-WcdRab5Q>
+    <xmx:c7k0ZKZqE-newFORneeCIqbgMbNlJej50WeE7D0Jf8hgZSCpJs-sqw>
+    <xmx:c7k0ZAc_ZITgQPeciOE3LyDwXRsmKVOQWEj7X1pkvIomPELr8NF98XO-AeXs9Geo>
 Feedback-ID: ie1e949a3:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 10 Apr 2023 21:27:40 -0400 (EDT)
-Date:   Tue, 11 Apr 2023 10:27:36 +0900
+ 10 Apr 2023 21:35:45 -0400 (EDT)
+Date:   Tue, 11 Apr 2023 10:35:43 +0900
 From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     alan.adamson@oracle.com
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: blktests nvme/039 failure
-Message-ID: <acu2ak5fwyjnsino5i4ilaeh3xawlkygbxwjjm5tu3ntzxmgbh@zawuclpnlwiu>
-References: <5vnpdeocos6k4nmh6ewh7ltqz7b6wuemzcmqflfkybejssewkh@edtqm3t4w3zv>
- <76983b72-b954-5865-1b34-c88161a7dec9@oracle.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     shinichiro.kawasaki@wdc.com, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, mcgrof@kernel.org
+Subject: Re: [PATCH blktests 2/2] nvme/047: add test for uring-passthrough
+Message-ID: <dopldttgovohurv7fovj4sxoux7aelkhd6zzrmxvxevoue6e54@wopt7tlh3dzg>
+References: <20230331034414.42024-1-joshi.k@samsung.com>
+ <CGME20230331034533epcas5p2834dad2bc54ad1a6348895f522400e8c@epcas5p2.samsung.com>
+ <20230331034414.42024-3-joshi.k@samsung.com>
+ <20230407080746.tx4sgperc6pvjsbu@shinhome>
+ <20230410124333.GC16047@green5>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <76983b72-b954-5865-1b34-c88161a7dec9@oracle.com>
+In-Reply-To: <20230410124333.GC16047@green5>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 10, 2023 / 16:06, alan.adamson@oracle.com wrote:
+On Apr 10, 2023 / 18:13, Kanchan Joshi wrote:
+> On Fri, Apr 07, 2023 at 05:07:46PM +0900, Shin'ichiro Kawasaki wrote:
 [...]
-> I've been able to reproduce it.  The sleep .1 helps but doesn't eliminate
-> the issue.  I did notice whenever there was a failure, there was also a
-> "blk_print_req_error: 2 callbacks suppressed" in the log which would break
-> the parsing the test needs to do.
+> > > +requires() {
+> > > +	_nvme_requires
+> > > +	_have_kver 6 1
+> > 
+> > In general, it's the better not to depend on version number to check dependency.
+> > Is kernel version the only way to check the kernel dependency?
+> 
+> The tests checks for iopoll and fixed-buffer paths which are present
+> from 6.1 onwards, therefore this check. Hope that is ok?
 
-Ah, I see. The error messages were no printed because pr_err_ratelimited()
-suppressed them. AFAIK, there is no way to disable or relax the rate limit from
-userland. I think sleep for 5 = DEFAULT_RATE_LIMIT seconds at the beginning of
-the test will ensure the error message printed. It will also avoid the "x
-callbacks suppressed" messages.
+Okay, thanks for the clarification. The changes are not visible from userland,
+then we need the kernel version check.
 
-With the change below, I observe no failure on my system.
+> 
+> > Also, I think this test case assumes that the kernel is built with
+> > CONFIG_IO_URING. I suggest to add "_have_kernel_option IO_URING" to ensure it.
+> 
+> Sure, will add.
+> 
+> > > +	_have_fio_ver 3 33
+> > 
+> > Is io_uring_cmd engine the reason to check this fio version? If so, I suggest to
+> > check "fio --enghelp" output. We can add a new helper function with name like
+> > _have_fio_io_uring_cmd_engine. _have_fio_zbd_zonemode in common/fio can be a
+> > reference.
+> 
+> fixed-buffer support[1] went into this fio relese, therefore check for
+> the specific version.
+> 
+> [1]https://lore.kernel.org/fio/20221003033152.314763-1-anuj20.g@samsung.com/
 
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index 11d6d24..5d76297 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -139,6 +139,9 @@ test_device() {
- 
- 	_nvme_err_inject_setup "${ns_dev}" "${ctrl_dev}"
- 
-+	# wait DEFAULT_RATELIMIT_INTERVAL=5 seconds to ensure errors are printed
-+	sleep 5
-+
- 	inject_unrec_read_on_read "${ns_dev}"
- 	inject_invalid_status_on_read "${ns_dev}"
- 	inject_write_fault_on_write "${ns_dev}"
+Thanks again. This can not be checked with fio commands. Let's do with
+_have_fio_ver as you suggested.
+
+On top of this, could you renumber the test case to nvme/049? Other new test
+cases will consume nvme/047 and nvme/048 soon.
 
