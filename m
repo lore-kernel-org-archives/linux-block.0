@@ -2,117 +2,167 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B48AC77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 22:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C4BC77B6F
+	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 23:08:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjDKWxs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 18:53:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46640 "EHLO
+        id S229521AbjDKXIS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 19:08:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbjDKWxr (ORCPT
+        with ESMTP id S229485AbjDKXIN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 18:53:47 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C913C3B
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 15:53:46 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-63240bdd5e8so388837b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 15:53:46 -0700 (PDT)
+        Tue, 11 Apr 2023 19:08:13 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC591FE0
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 16:08:09 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id a13so9990490ybl.11
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 16:08:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112; t=1681253625; x=1683845625;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZwN+vpcrp8JnaBxSFxnp66UorlPenXdR7YcSEsS9PJA=;
-        b=Blve6j3beEvr4MGx4o2cQAOsiz/oa5sDRIeSd5bwP7EgKVWwCZh6W5Zcuoirh445V9
-         gN+WnNp8ssR0FmDjROQtj7GjRFg8VK9cnovPOOH0Uh7yWoqhhvr6rkNOR+e98zZx3j/y
-         cnZ+Z0tpLq69T/G+KSgss+94ZnlknhZ9/W10wjS7vW1hns3/8jz6zgkJvuzgpj7cjThk
-         aUMvLlPvD7ldCMAaqo2+dEDSmckpizuCbu/BTE1j7aLBYdBzoRi2+N6LK/Y/Ks96CGW3
-         ctCdcWgV43LXZEADK/532mTy38Z+Z6uUys0yphSbWMI4wCdkc5VLiA1iLpbxfreIReFe
-         fOEA==
+        d=paul-moore.com; s=google; t=1681254489; x=1683846489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eIyxfCRdtVW6DZEqESNyM82Zcjpw6q1yxE2SLi7Q/10=;
+        b=XXnbf3ZXHmVyyAWosjbgtLtVe0obVxWMHT6ER5WKVjE2//n1kQT1vqGfH+itDlXM2k
+         2fneTH+5x2uocctQ6SccdU559tW16dOAzYZt4SUNr3SQZoWWsatyRHmcKNDLHGZiFZX1
+         ngNGr73HAG/JBY+0W9DmkWkoC+3V3vgClv7PS81c7UdnCx+3aMFz1Ishp4aKe2GcG+9q
+         +3SRRyJSTGsRHSMejxxYLambtKEVZffeY9ZCgEkqByHxjKnrI4D7N/WlEOpBuqUt0lI4
+         YOvKnY4/lPDxTBJnhmllQ0VSpmZ1AJLwV7aGqPZH7Infu2EyjgWnt0Qsp4/uyydvAv+I
+         TYrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681253625; x=1683845625;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZwN+vpcrp8JnaBxSFxnp66UorlPenXdR7YcSEsS9PJA=;
-        b=j2uc4AQDNqKHMJWYCg7H4p8OO/dpTdSYTcbvhhe8iPhTAmT+Q1Kn+caRsYIQs4wpSR
-         FfZvcxcaBjBRiutSE+ZTqTfbEb7BRCc7iEe/mDUsvSzMkC7TBQt/xhjeQJ0J4MIA25g4
-         Zsh3GXhayj8poIA4PlhTBYDjR1OpYvNBBqiGneh85KVJpsa9Rv1v7hKbqIVfQKTFvwgb
-         UY5GYDR4SAFWMaa37RaF4okRUQBpv2hDTveHlrRQgp0HiHDmgaA4mRrv+nuIhq/pzsrS
-         mON8QQ7dNcqK6bF4Dcgm/A+PnEK+tcnlVezZ1b2Pej8/4Hqlf2uVBVUetCNlbb1rdbKZ
-         U1gA==
-X-Gm-Message-State: AAQBX9c2YgIx7ef9g+NW4lsk9imByu7PCacCbemIFEqmY2bTcT4m2w2O
-        MqA/IikvhinpfnuKE39frHRs/J1R3uGov1Dgrz4=
-X-Google-Smtp-Source: AKy350ZwLjFGBs1C1IQ6bdjW6D/KSdMpqjWdP4TOPIhdiCaVGn6kZjqQL2EZSc7OlV2XdyUxmiJ5vQ==
-X-Received: by 2002:a05:6a00:2353:b0:633:4c01:58b4 with SMTP id j19-20020a056a00235300b006334c0158b4mr574228pfj.2.1681253625543;
-        Tue, 11 Apr 2023 15:53:45 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j18-20020aa79292000000b005ccbe5346ebsm10283023pfa.163.2023.04.11.15.53.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Apr 2023 15:53:45 -0700 (PDT)
-Message-ID: <09a546bd-ec30-f2db-f63f-b7708e6d63a1@kernel.dk>
-Date:   Tue, 11 Apr 2023 16:53:43 -0600
+        d=1e100.net; s=20210112; t=1681254489; x=1683846489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eIyxfCRdtVW6DZEqESNyM82Zcjpw6q1yxE2SLi7Q/10=;
+        b=EDlrGCcGScax5huuKxg2XNrY0g0brEDZZAD12mo6Ao6/yJvjl1RXBwmGDfwS8UlvOu
+         Jw6nkyK4d2RsdtWrY0ST79p//0M9aDM0d1/W1vX1yvQLqb/Ti76enmEUaUfrhJymouFD
+         K+oGuqOM6RdOs584A1yWwygTKlul3v6P1/L7Pjvkb+AmGX+qdm6TB2YbdGJljXKvhT6K
+         nLrDkHPmua/Lis+b8DLbzkFkTT8sFIu5itsnL4Ao0Nk1okCwm76k+jASer8y6hLVXz2J
+         OQcySX5JDBHb3D5Djq/zteoixdtx6r8qsIiGsuKmSOL1Yvj7wroM0lY6Y6UZXhSDBWuv
+         cM2g==
+X-Gm-Message-State: AAQBX9f0Vk8lAQ7lgb4uJ2Id27G2AP5Dt+JCDS3ZjNXrHnNl4vSDAPUj
+        J1JCz3kjSUR2VcVuRO3r9GgcTYojw3n8kB8EsYeb
+X-Google-Smtp-Source: AKy350YGpKFShus1wXg4P7JDpOEQwCA2ZUIAFxOOzluNG03DhrMlLa19ZC7t5ZHiN0J6rZ9Xc6wbx1W+NEq2mwRq1zY=
+X-Received: by 2002:a25:d702:0:b0:b68:7a4a:5258 with SMTP id
+ o2-20020a25d702000000b00b687a4a5258mr377571ybg.3.1681254488697; Tue, 11 Apr
+ 2023 16:08:08 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
-Content-Language: en-US
-To:     Kanchan Joshi <joshiiitr@gmail.com>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
-        hch@lst.de, kbusch@kernel.org, ming.lei@redhat.com
-References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
- <20230210180033.321377-1-joshi.k@samsung.com>
- <39a543d7-658c-0309-7a68-f07ffe850d0e@kernel.dk>
- <CA+1E3rLLu2ZzBHp30gwXBWzkCvOA4KD7PS70mLuGE8tYFpNEmA@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CA+1E3rLLu2ZzBHp30gwXBWzkCvOA4KD7PS70mLuGE8tYFpNEmA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-8-git-send-email-wufan@linux.microsoft.com>
+ <3723852.kQq0lBPeGt@x2> <CAHC9VhRqMrTuvVtwzJoK2U=6O1QuaQ8ceA6+qm=6ib0TOUEeSw@mail.gmail.com>
+ <20230316225340.GB22567@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: <20230316225340.GB22567@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Tue, 11 Apr 2023 19:07:57 -0400
+Message-ID: <CAHC9VhQxxrDnzJmUitMid3fk-VwNRU3NWoqjpj1=rhrtpoE=7w@mail.gmail.com>
+Subject: Re: [RFC PATCH v9 07/16] uapi|audit|ipe: add ipe auditing support
+To:     Fan Wu <wufan@linux.microsoft.com>
+Cc:     Steve Grubb <sgrubb@redhat.com>, corbet@lwn.net,
+        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        tytso@mit.edu, ebiggers@kernel.org, axboe@kernel.dk,
+        agk@redhat.com, snitzer@kernel.org, eparis@redhat.com,
+        linux-audit@redhat.com, dm-devel@redhat.com,
+        linux-doc@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>,
+        roberto.sassu@huawei.com, linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-integrity@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/11/23 4:48 PM, Kanchan Joshi wrote:
->>> 4. Direct NVMe queues - will there be interest in having io_uring
->>> managed NVMe queues?  Sort of a new ring, for which I/O is destaged from
->>> io_uring SQE to NVMe SQE without having to go through intermediate
->>> constructs (i.e., bio/request). Hopefully,that can further amp up the
->>> efficiency of IO.
->>
->> This is interesting, and I've pondered something like that before too. I
->> think it's worth investigating and hacking up a prototype. I recently
->> had one user of IOPOLL assume that setting up a ring with IOPOLL would
->> automatically create a polled queue on the driver side and that is what
->> would be used for IO. And while that's not how it currently works, it
->> definitely does make sense and we could make some things faster like
->> that. It would also potentially easier enable cancelation referenced in
->> #1 above, if it's restricted to the queue(s) that the ring "owns".
-> 
-> So I am looking at prototyping it, exclusively for the polled-io case.
-> And for that, is there already a way to ensure that there are no
-> concurrent submissions to this ring (set with IORING_SETUP_IOPOLL
-> flag)?
-> That will be the case generally (and submissions happen under
-> uring_lock mutex), but submission may still get punted to io-wq
-> worker(s) which do not take that mutex.
-> So the original task and worker may get into doing concurrent submissions.
+On Thu, Mar 16, 2023 at 6:53=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
+wrote:
+> On Thu, Mar 02, 2023 at 02:05:33PM -0500, Paul Moore wrote:
+> > On Tue, Jan 31, 2023 at 12:11???PM Steve Grubb <sgrubb@redhat.com> wrot=
+e:
+> > >
+> > > Hello,
+> > >
+> > > On Monday, January 30, 2023 5:57:22 PM EST Fan Wu wrote:
+> > > > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> > > >
+> > > > Users of IPE require a way to identify when and why an operation fa=
+ils,
+> > > > allowing them to both respond to violations of policy and be notifi=
+ed
+> > > > of potentially malicious actions on their systens with respect to I=
+PE
+> > > > itself.
+> > > >
+> > > > The new 1420 audit, AUDIT_IPE_ACCESS indicates the result of a poli=
+cy
+> > > > evaulation of a resource. The other two events, AUDIT_MAC_POLICY_LO=
+AD,
+> > > > and AUDIT_MAC_CONFIG_CHANGE represent a new policy was loaded into =
+the
+> > > > kernel and the currently active policy changed, respectively.
+> > >
+> > > Typically when you reuse an existing record type, it is expected to m=
+aintain
+> > > the same fields in the same order. Also, it is expect that fields tha=
+t are
+> > > common across diferent records have the same meaning. To aid in this,=
+ we have
+> > > a field dictionary here:
+> > >
+> > > https://github.com/linux-audit/audit-documentation/blob/main/specs/fi=
+elds/
+> > > field-dictionary.csv
+> > >
+> > > For example, dev is expected to be 2 hex numbers separated by a colon=
+ which
+> > > are the device major and minor numbers. But down a couple lines from =
+here, we
+> > > find dev=3D"tmpfs". But isn't that a filesystem type?
+> >
+> > What Steve said.
+> >
+> > I'll also add an administrative note, we just moved upstream Linux
+> > audit development to a new mailing list, audit@vger.kernel.org, please
+> > use that in future patch submissions.  As a positive, it's a fully
+> > open list so you won't run into moderation delays/notifications/etc.
+> >
+> Thanks for the info, I will update the address.
+>
+> > > > This patch also adds support for success auditing, allowing users t=
+o
+> > > > identify how a resource passed policy. It is recommended to use thi=
+s
+> > > > option with caution, as it is quite noisy.
+> > > >
+> > > > This patch adds the following audit records:
+> > > >
+> > > >   audit: AUDIT1420 path=3D"/tmp/tmpwxmam366/deny/bin/hello" dev=3D"=
+tmpfs"
+> > > >     ino=3D72 rule=3D"DEFAULT op=3DEXECUTE action=3DDENY"
+> > >
+> > > Do we really need to log the whole rule?
+> >
+> > Fan, would it be reasonable to list the properties which caused the
+> > access denial?  That seems like it might be more helpful than the
+> > specific rule, or am I missing something?
+>
+> Audit the whole rule can let the user find the reason of a policy decisio=
+n.
+> We need the whole rule because an allow/block is not caused by a specific
+> property, but the combination of all property conditions in a rule.
 
-io-wq may indeed get in your way. But I think for something like this,
-you'd never want to punt to io-wq to begin with. If userspace is managing
-the queue, then by definition you cannot run out of tags. If there are
-other conditions for this kind of request that may run into out-of-memory
-conditions, then the error just needs to be returned.
+Okay, that's a reasonable argument for logging the rule along with the
+decision.  I think it helps that the IPE policy rules are not
+particularly long.
 
-With that, you have exclusive submits on that ring and lower down.
+> We could also add a verbose switch such that we only audit
+> the whole rule when a user turned the verbose switch on.
 
-> The flag IORING_SETUP_SINGLE_ISSUER - is not for this case, or is it?
+I'm not sure that's necessary, and honestly it might be annoying as we
+would still need to output a 'rule=3D"?"' field in the audit record as
+it is considered good practice to not have fields magically appear and
+disappear from the record format.  However, if there are concerns
+about record sizes, that could be a potential mitigation.
 
-It's not, it enables optimizations around the ring creator saying that
-only one userspace task is submitting requests on this ring.
-
--- 
-Jens Axboe
-
-
+--=20
+paul-moore.com
