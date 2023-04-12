@@ -2,104 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2107C7619A
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 12:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9AAC7619A
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 12:28:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbjDLMY7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 08:24:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35144 "EHLO
+        id S229656AbjDLM2n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 08:28:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231618AbjDLMYw (ORCPT
+        with ESMTP id S229482AbjDLM2M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 08:24:52 -0400
-Received: from wnew4-smtp.messagingengine.com (wnew4-smtp.messagingengine.com [64.147.123.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F1A6195
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 05:24:38 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.west.internal (Postfix) with ESMTP id F0A5D2B06D22;
-        Wed, 12 Apr 2023 08:24:36 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Wed, 12 Apr 2023 08:24:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1681302276; x=1681302876; bh=rJ
-        IhgBsBw/NJzAOWuM05Xblw+tLr4BH3K0I+r2a8DRw=; b=n6yJ16aPNKNgV2uJ2P
-        jP/fKuqY4ukTnUbUU9caqzYMZECRW8KwHRaUXkIc2iaAlSrgzZ0IMFKBh51m7Bj5
-        8pf+OMAfkFUoJ6TLWItWTyY/fxWx6cOTwE77uMQlTkV+/yU9bKtMrbjkA9UYoB9k
-        D1IKyph6IlG6yoXSqmKFqko0gclk7c9DOTFBfEwwulauCn4aWBhbg2bitTxzuRdg
-        3Kl801CfB54xPPq0rKrW4RnMFc94kn7AKh/CoNyJiTcrp60bZK3CQtRivAcFelW7
-        Xy4T+auuiyf/c/10h+o49g4uOHHS7Ud70EVjBGdJiGVaGEoAf9YTrVhWuRee7Dea
-        pBLQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=ie1e949a3.fm3; t=1681302276; x=1681302876; bh=rJI
-        hgBsBw/NJzAOWuM05Xblw+tLr4BH3K0I+r2a8DRw=; b=M/Z+jV/FELvTqZP6KZJ
-        MYwdylntqWygSZxNStJNhDer60LAUXGjAVHH/1IXivVaTx5XUo0saF2vaHoFObWK
-        uQXEJ07oCcNvyiiNAIT8wWQpxDKrxYaqCmcZOyg+zC4YFsYDVxwa1FCstVOlzANg
-        PaW7FMj+5maTktuCaWArx0+N+o5J5ulGG1/Uk4kJHR1KLMH/BDIeO26BymDIqXcq
-        3rxve5SU/EvXmSaempUwbBWHDRDXBs8lTeTY+mjvHuzutj63NRuUamscsbsDJnzl
-        g5HXdw2+PWZB38/EWMEU9473QMOHGyaKsV1JwkQpCODkMgTNg3ZgOw+DpUuEkLBG
-        tqw==
-X-ME-Sender: <xms:BKM2ZM-TJP6i9H9Mdrq75lMqLaOBpLpEqT61J4iHs4_W2lDrzrjGSg>
-    <xme:BKM2ZEsFKR_WWL4fFzZ2WF2FTAXoUC2ovgeqi_KZExEA2mKSfoQt3c16OQhIjzw5S
-    3-EJMp7SvVJbKY4Ioc>
-X-ME-Received: <xmr:BKM2ZCD7vAHpyFvbkzWTSA-bweLneoClaTH5_s0UPBD3DU_K42do3pNQ4fK3unrJRHhkrcxQuaqUWI8RafFwWw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekiedghedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
-    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepvdegtdfgvdfhgfekvdektdfgfeeljeel
-    gefgkedujeeiteehgefhgeethffgheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
-    mh
-X-ME-Proxy: <xmx:BKM2ZMcYeQ1AXr07B3yNXQc6A2b0GTClMsQgD06QQmnxvEh7trADwQ>
-    <xmx:BKM2ZBMbii5Bz22-NjPTivMz1O65n7lG4Ms8xE7BoTXLW-Z-BYKYLA>
-    <xmx:BKM2ZGk1i9Vm8Wn5xzLrOBjwpaxskxazQTVyc9HKzb66UM41ylWN4A>
-    <xmx:BKM2ZNCKqhUjVt36vQFyIkCfP-2Kmg0GamypH7NbPGUOMp_VVj5bkZddqCmkODKB>
-Feedback-ID: ie1e949a3:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 12 Apr 2023 08:24:33 -0400 (EDT)
-Date:   Wed, 12 Apr 2023 21:24:31 +0900
-From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        James Smart <jsmart2021@gmail.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Subject: Re: [PATCH blktests v6 0/2] test queue count changes on reconnect
-Message-ID: <oazlhd7d6lblsozvaymwiz3kug4grwyyukzmptya7kdybxhpid@q7ofosisefcr>
-References: <20230406083050.19246-1-dwagner@suse.de>
- <ftljvb4alzxssqjzr5ik7pvatiwh25i4ftktvgvxzqxk76afew@brp7ch4v7wik>
- <enbhdajylbbzykqyey5d35hmqbmsqca6entvdhpwifg53lx3ue@pe4dpridsdxg>
+        Wed, 12 Apr 2023 08:28:12 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D98DD527E
+        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 05:27:59 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id c3so12243166pjg.1
+        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 05:27:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1681302479; x=1683894479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OHwgQCls7OE6cS2UfNvW73dQ95kWKhGiDSKnfNbHZ/Y=;
+        b=HofAAUHXgpsogYvO2rbKmkX0Io7XVwrCueShJ7XbLiv+wF9nyDV62NxINyrjH0C1Wp
+         zAZG2NtXKhi7VyhuOePrHHb4r6uFvKNi6BkpHy2x2mF4+qN6FNl9RrZ4EQrpcPVoCokv
+         YO//0XbbodnIEy/rKxHnagB5PkMvJ7ApohRWw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681302479; x=1683894479;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OHwgQCls7OE6cS2UfNvW73dQ95kWKhGiDSKnfNbHZ/Y=;
+        b=wwmXNs18ynEv9mB8VT691dx0sDi2oJxTrYywRdKzxr1V2ZVmKWVCGyvJTDCpPR8kAL
+         7DLCRLKejowzl1e8jAPzBjrhA1pMR+p9XUj7hjBxALDEyhX6x9oVx03SG3CGAvQQ6zOC
+         wVZ8QjES4ps8RqwNh7/iR2BQHWaJwYf9yOm9siZTadgIg/oi8lzyzuRuxrjhclYa7Y1M
+         f3t+Uoss79R+8xndMPa6LuRDULb/uS/E2RF4PLtvycgF6YLyg/ncIijxcnWLyzNhCRfY
+         h9jAUnS8qgu8CwdMKPUjkThAYTITVPTgPOqrpY2qG6P55it0hs+gorIpmMokCFtO1ORe
+         3hcg==
+X-Gm-Message-State: AAQBX9dCOF2AWD3LElR9bPk5QGJ1lguGCht73+X4S5DxJ4oD2Mztl7xP
+        yQ7XrZmUn93GoO49VaLHLWk8uQ==
+X-Google-Smtp-Source: AKy350b8YGmFD1GUj9zj5kbbs6UzM4ROLQpBOv1iOU8bB3Ptgu8Bz2sPQWEpMNBAqWVy3jbPaRjRgA==
+X-Received: by 2002:a17:90a:d583:b0:23b:569d:fe41 with SMTP id v3-20020a17090ad58300b0023b569dfe41mr18682475pju.7.1681302479290;
+        Wed, 12 Apr 2023 05:27:59 -0700 (PDT)
+Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
+        by smtp.gmail.com with ESMTPSA id me18-20020a17090b17d200b00244991b3f7asm4554883pjb.1.2023.04.12.05.27.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Apr 2023 05:27:58 -0700 (PDT)
+Date:   Wed, 12 Apr 2023 21:27:54 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 01/17] zram: always compile read_from_bdev_sync
+Message-ID: <20230412122754.GE25053@google.com>
+References: <20230411171459.567614-1-hch@lst.de>
+ <20230411171459.567614-2-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <enbhdajylbbzykqyey5d35hmqbmsqca6entvdhpwifg53lx3ue@pe4dpridsdxg>
+In-Reply-To: <20230411171459.567614-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 10, 2023 / 15:06, Shin'ichiro Kawasaki wrote:
-> On Apr 06, 2023 / 11:10, Daniel Wagner wrote:
-> > On Thu, Apr 06, 2023 at 10:30:48AM +0200, Daniel Wagner wrote:
-> > > good and the bad case (rdma started to fail today, something to fix).
-> > 
-> > After adding the missing _nvmet_setup() call, tcp and rdma works fine.
+On (23/04/11 19:14), Christoph Hellwig wrote:
+> read_from_bdev_sync is currently only compiled for non-4k PAGE_SIZE,
+> which means it won't be built with the most common configurations.
 > 
-> I also confirmed this. I observed test pass with tcp and rdma. Good. Still
-> lockdep warning is observed and fc transport causes system hang, but I think
-> those issues should be fixed after applying the patches to blktests master.
+> Replace the ifdef with a check for the PAGE_SIZE in an if instead.
+> The check uses an extra symbol and IS_ENABLED to allow the compiler
+> to eliminate the dead code, leading to the same generated code size:
 > 
-> I walked through the patches and they look good enough to apply for me. I will
-> wait a few more days in case anyone has more comments. If there is no more
-> comments, no need to post v7. I will add the missing _setup_nvmet() and replace
-> the spaces in the 2nd patch.
+>    text	   data	    bss	    dec	    hex	filename
+>   16709	   1428	     12	  18149	   46e5	drivers/block/zram/zram_drv.o.old
+>   16709	   1428	     12	  18149	   46e5	drivers/block/zram/zram_drv.o.new
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I've applied this series with the edits. Thanks!
+Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
