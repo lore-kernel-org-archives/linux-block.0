@@ -2,73 +2,70 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A71E7C77B71
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 12:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E860EC7619A
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 12:40:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbjDLMbU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 08:31:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43322 "EHLO
+        id S230334AbjDLMkj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 08:40:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231152AbjDLMbQ (ORCPT
+        with ESMTP id S231625AbjDLMki (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 08:31:16 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6389E7DB9
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 05:31:10 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-635a81be246so891792b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 05:31:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1681302669; x=1683894669;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BemMrKsiVPWhr8KgAgF7wba8eC0bKPhdDgywL32/aPQ=;
-        b=MQSoIK94eEv7ri0juw4qDUOsohp3s2KhBIjA4xCWvnipHaqI3D7PrBaQdehxKBDO2e
-         NxpNAdcFXwzhvNTTF1QoH4pDvnFE7b6FRZ55WozVUGs3K2AAkjGtrhqwWuJQzu3/eTzM
-         HKyzj0rPrPxoX6IvID5PuMbap39VOGiTGv62c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681302669; x=1683894669;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BemMrKsiVPWhr8KgAgF7wba8eC0bKPhdDgywL32/aPQ=;
-        b=pN4AoPxR68JqyNkZx0PrFn+X7w5+QsKvImZcHt1xOA1CAxa4gASHd2TIcdtxbwVeuC
-         s2HkjbSo9rubCkxqZv5JNvwU+w1dNcL8T3sHOUBrMJF2mtZ+9Bwi4BVuAFFLbbYt8K4w
-         S3UQvOERQm/GOER5tzVadE9wVV8ptDLBWQ4zipgJNCeXFt89DqK8zk+3wEu6Ct+w9hoz
-         9y6or02p3SgTA2OuZtz0hri1v+QT48BPixFdJFr1Q09IKjVboylKn92MMz2b1IJBnyfA
-         F0JU676TASuMHpf9RqU7dkzV05V4tq81er1CU6rNdkhmHaHoFkK0lFeGzl8YuGwTphWp
-         M2LQ==
-X-Gm-Message-State: AAQBX9dJyLhJmvv32oSk/PadWz1k/9Tfz/gQ2R16j0NnklosBjR4fi8E
-        m28MzFSKIZMay40XuXMYncuBeQ==
-X-Google-Smtp-Source: AKy350bOyOtuVOJEtrrk2ja0trJm+5u/EBXSosOBCnA7UGyMLsrhRvxG57vP3JYy3QDDrJCZWOAusQ==
-X-Received: by 2002:aa7:8f25:0:b0:638:7c22:6fd with SMTP id y5-20020aa78f25000000b006387c2206fdmr7591835pfr.1.1681302669604;
-        Wed, 12 Apr 2023 05:31:09 -0700 (PDT)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id c11-20020aa78c0b000000b0063afb08afeesm1884037pfd.67.2023.04.12.05.31.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Apr 2023 05:31:09 -0700 (PDT)
-Date:   Wed, 12 Apr 2023 21:31:05 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 13/17] zram: refactor zram_bdev_write
-Message-ID: <20230412123105.GH25053@google.com>
-References: <20230411171459.567614-1-hch@lst.de>
- <20230411171459.567614-14-hch@lst.de>
+        Wed, 12 Apr 2023 08:40:38 -0400
+Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9EE17EC6;
+        Wed, 12 Apr 2023 05:40:10 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id 6DA9D406BD;
+        Wed, 12 Apr 2023 08:39:53 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx2-2022; t=1681303193;
+        bh=ZsREK7Jdmk5/bS3HMVbcUFFY2ynvc5y6DHn+evYJiIo=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=SF1B2Nsiq0/ZYmAlZBDyu/yXVj4ytwYuY9AoNhXvBgiaH8IE40FJ4JlV48QH9GdDv
+         pUjp74EqI4D+JZ0wS4FEdluiM7kmxAE4QJk6ZhqpzlyPh/bP8zC7r+0aSNLtEXSd+o
+         x4B/tQxvhhSUPdD0O8zmgyBc4FOBTwEqzyurcj+uW9Dx2aRLX0Tu/BRAa17m3gXvc/
+         J94mZl/i0GdKZxPlxoevDUQWnSmNkOGTlTziVuVI6YJW8h4eYq+DdfFWYbB5ZnmhdG
+         E2Er8Q6vWJmYxHdn8ePQrmQwtUzesurwtRqsWW1oXZ1Eev70c7Bs23amGor+1ACAqp
+         LDmrV+4zVNOAg==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Wed, 12 Apr
+ 2023 14:39:50 +0200
+Message-ID: <62b90944-724d-093a-2e83-c7665d5dbd54@veeam.com>
+Date:   Wed, 12 Apr 2023 14:39:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230411171459.567614-14-hch@lst.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v3 01/11] documentation: Block Device Filtering Mechanism
+Content-Language: en-US
+To:     Bagas Sanjaya <bagasdotme@gmail.com>, <axboe@kernel.dk>,
+        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <willy@infradead.org>, <kch@nvidia.com>,
+        <martin.petersen@oracle.com>, <vkoul@kernel.org>,
+        <ming.lei@redhat.com>, <gregkh@linuxfoundation.org>,
+        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
+ <20230404140835.25166-2-sergei.shtepa@veeam.com> <ZDOY4tWY9wjPDb/c@debian.me>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <ZDOY4tWY9wjPDb/c@debian.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2924031554647062
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (23/04/11 19:14), Christoph Hellwig wrote:
-> Split the read/modify/write case into a separate helper.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Minchan Kim <minchan@kernel.org>
+Thanks, Bagas!
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+I have made changes in my repository.
+Link: https://github.com/SergeiShtepa/linux/commit/d3309add0f355ef09483238868636c5db1258135
