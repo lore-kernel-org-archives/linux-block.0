@@ -2,288 +2,443 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CD6C7619A
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 08:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 934E9C77B6E
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 08:54:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbjDLIwn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 04:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40472 "EHLO
+        id S231472AbjDLIyO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 04:54:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231415AbjDLIwe (ORCPT
+        with ESMTP id S231480AbjDLIyL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 04:52:34 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061c.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::61c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7CD77283
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 01:52:16 -0700 (PDT)
+        Wed, 12 Apr 2023 04:54:11 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on20621.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::621])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D9606E8A
+        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 01:53:55 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XRogoqlGCwGzjaSk+d9ftnIfMVTUsuyelxqnBEOIkt3LIoSkUranyzBF8wtlS87BUpwCxMIlvzLZVK3RQNHGBwl6eSL9j7+xIJlmA2zEPS0IUYsLCePhiTbZ1VKObb7fsTRI/1VAkaxZD5s4i8XXzTUaLBEm0EaUUFQMTLS6jSZTjmXrddUBv1s/Am1ZaFKOEF05/akamCnJXqpEP5ByLKeXrII/Ps+CrJch1twm8Mwnkls75KyBvzsT97/l2mU7C6UeXlBtdhNPEL6OOsYRn9VmbnCNQ4s2Mc6fWdBob6+gzjNpcLgI4aSaRWlpTyNVSVBuebo/S6q4gOP7y5sYxw==
+ b=b+ssddzcSW/KBM6hWpWQq3AspcAriG1tFr2PX6DgOyVX0+hMAhiP6wNNMi5T2iPL0mXf+RTAfVoGZPujaavoTnJJ1rC9VRraGiHBDJ3zJcaBGN5djThPtLPFoIFVWeHuVdbl7vgiz+Z9AAPvfQjTV6HLMXlVcF5MAa04uU02u8hjcp6gNNrPm9TuzKV7BWxgLDKenLMOLB3ySrMoh09rnvFRqQQwWE5dp8A90/bvjhOve7jQywpFn/tVfLE3CZCMSpYQkc3tVH0nuNTKgX4LCl8wYJ291Rts2PF63BUDuFWiN+zOArqdd46aikuTE3sm9Vpy5brSDu0CMoquXxKVyQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=olUtVGaegvdLCTumTsnONb1PMKfxrbaPMMVeKiHX37k=;
- b=ZGiiVdHGRMNXMSkgwMFmtkG79+cIhOE0/40B1GQmsnrCZykEZy/u/b7HnbiSpPCSBD2uoPTJ10CR5e8RG3FOtrBmZiDruAbHNm1bH2VhaqXM/Cqc/K5GclMulPRH6ZHdNLz9UDKiti8UT85bve9vf/+PI/Lf00oUyaV2fYnUVdiCPaZgTFenfB5mbMXNIVEYcyvxts7CbErOxLVnFXil7YbgX0yOAakJ8AmS6jPDr57jTIPLCHQsHT/+SVlWRRxwb+ovPPv4lWVJmCOtWrc7zJ37o0WJ897YbNH/1Ub85fv4IcSmGcNGidnnjFjJJyRTrmd5AlczYPlw9SN3rO4P5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
+ bh=HKl+e/rslSDUERNgHTchvKvTYGi5NH31pNQyopNtU2w=;
+ b=KJP9TQGafFdEi89HoWUhY0/rRrh+p8bA6/99CeZ/lcX5cKZSXolf6CnBZRGhJ3eau3LOfkoe+1Ox452u2CXpii1V4HUuEYdOqzfmQjeq+97lC/ewXRBX3uMpHV8LM2ccrgKyRK2hS67dJG1NN24jAGlNZNMVb/eRmD6rm3HCzzRfx6V1lWokaohyAP1ECPG6C/TSL2+C4QBOSczXdWfcSR+sxcKoiC41USXX6RDDcWYLAhgUnOWtFG2Vyy5Jp7wsNTe8AsoA6St3R1e2KqKjTl5Qf2NuYZwlsriMy9JUvCvV0MYGA/GMNcVaW2/swiLSkYlfB4btjy5CYFa7KNU8ZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=olUtVGaegvdLCTumTsnONb1PMKfxrbaPMMVeKiHX37k=;
- b=mwsFyVY1zLoPiuQRy6GRnPYHj+FUfaZUsgOJLkVmwYBt3dr2PCUCDW4KjOqqMAi69IyQecAgR2rdC+ufUjbX72n0kltfRvUGZZFbuSovz4P+KEHaYLMkaIyK8s2Mo9RCQHvCVmTSZmhE0orvgGcEkNMqe1F+kLZ0OohXyud/vup9/fgXEp/avNDMQPQjeGMgQK/W1RmAzsBW6exRmmb5gzfBbi4QUE9cfEjYLOAUIgxFfLQ1rUf+gLu1zAUQ2xFCCqho1zZajTvwTFFMQ84hIL9X5yPD8rmvfiZUWsN/ECwBF+oanJZ4UPWJrIOLXNsxDa4GkZGxoZfoIFYo12/4hg==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by LV2PR12MB5749.namprd12.prod.outlook.com (2603:10b6:408:17f::20) with
+ bh=HKl+e/rslSDUERNgHTchvKvTYGi5NH31pNQyopNtU2w=;
+ b=DNYge29mtXdMSmoP0VAMKDwulw1i5XrZPAvwerJXNZs3oB9n4/t9mxCAVZ9v7u+aczkxOxQq6UvgdcDSYlrjqLKI3dlX9Grl3xjCQLjRpOoXr/juwv8U2XiZMzeHGKWJPx5KIRZeqXB9ottnt55Niw9jiWRID46bYNehxJMBariciG9+w+uR2FIZsbbnmobF1K/xEqhFLY6PUf0mCjVUeC3f6vlfkxCqm0QlArx9ayWvOjuAUnxsKCBNNYXMKRR0/unpvvbDxuriztev/Q0zjXFwvK7ipBhJlMq3pmdM/2vN7aJ2eK1LLQgwaQ8uLtkT2ZQqA9r1cTZSN07tBOX7GA==
+Received: from DM6PR14CA0067.namprd14.prod.outlook.com (2603:10b6:5:18f::44)
+ by IA0PR12MB7776.namprd12.prod.outlook.com (2603:10b6:208:430::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.33; Wed, 12 Apr
- 2023 08:50:47 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::6b01:9498:e881:8fb3]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::6b01:9498:e881:8fb3%4]) with mapi id 15.20.6298.030; Wed, 12 Apr 2023
- 08:50:46 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "damien.lemoal@opensource.wdc.com" <damien.lemoal@opensource.wdc.com>,
-        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "vincent.fu@samsung.com" <vincent.fu@samsung.com>,
-        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
-        "yukuai3@huawei.com" <yukuai3@huawei.com>,
-        "dlemoal@kenrel.org" <dlemoal@kenrel.org>
-Subject: Re: [PATCH 1/1] null_blk: allow user to set QUEUE_FLAG_NOWAIT
-Thread-Topic: [PATCH 1/1] null_blk: allow user to set QUEUE_FLAG_NOWAIT
-Thread-Index: AQHZbRuBGnDoA0PLrUmq3zDXdDqS5K8nXYcA
-Date:   Wed, 12 Apr 2023 08:50:46 +0000
-Message-ID: <ae7f79da-50dd-e2fd-349b-20f324c6a06a@nvidia.com>
-References: <20230412084730.51694-1-kch@nvidia.com>
- <20230412084730.51694-2-kch@nvidia.com>
-In-Reply-To: <20230412084730.51694-2-kch@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|LV2PR12MB5749:EE_
-x-ms-office365-filtering-correlation-id: 409158d1-a60e-401b-149e-08db3b33022c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: FI/oxmmdYV6Isp7BmVDHWG6s9TYkGERJvZoe2pFeQLviOhdjqHkWQNsLyCC2JTKPClwoih4+IUbMw1nkds6vn0GanU5FfZFzidnOfFORSLugfZAxdMz6g0q0vWGoxIlVKC0We3uTDYN1Il7BAhZKu9G+8C2kvGtv5AyAmn9dm6CaCNLb14AZKt4lr032eGp0pe3UHZ0RPp1t9zk9i1/9LV6TpRBQze8qZ2iKI95F4Sf4yvK5SYHNoUvjgw8VaB16DoNwT+ubyNQjk4Zud36slqA4pSd8EZyA1TjUTkH6j/AaztZnjTPaBBCanqkmcTp3FE8y+Vquv/0KzBJ46+22mUEdwYyJDsPYrhWyDft0dPdWZjeQac+vjAiFamOkVhhs5VEWsVfyybHzfguMZT6soEH/Sr47VgWS8vYLEb2oeS4iwo9ismEjZ4ySfWtc+jEtjTwx2Wak1i50lZP+R9r/HuOFDtdsqXYngZCUIp4+AOwxZWi2k47cPn2BWL+lcpzK3MOruH+wCuaz8xJYQxm7qfo8vkH+wZ4Wz3CHf9xeTaf28V5T8XDrxeLOTr7HM0HqL2zpcRueX+n8EncEy+DYKFNZideShLIxQEb/vFu65jIy07myh54nYH0IHDEzgnyQUqxx/sWEfSPhAqX0v5PCiQoBEqClj2ZvOa2ub17Q2PPGNukMgjkkSvRnSHLhufP4
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(136003)(39860400002)(346002)(366004)(451199021)(186003)(31686004)(66899021)(53546011)(38100700002)(6486002)(31696002)(38070700005)(83380400001)(4326008)(5660300002)(36756003)(86362001)(8936002)(478600001)(6506007)(2906002)(316002)(54906003)(110136005)(2616005)(66446008)(64756008)(66476007)(91956017)(6512007)(122000001)(66946007)(76116006)(66556008)(41300700001)(8676002)(71200400001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?azZEaytFZ2dWd1VoeTNqVTVEM2M5VTNVcndDcVRPMHd0dlFlaFBsdGVOWnVY?=
- =?utf-8?B?VS8wZ2xKd01HYmRnVnhjbU5DbTNxS1l2QkF0RTlSdm5WWUVIczNtbHc1R0ZW?=
- =?utf-8?B?T0w5TUxkL21TbWlqREpvbVEwa3dIcW0xblpJTmlJcHVDOXBCcUZvRzNwZDhQ?=
- =?utf-8?B?Qmx4UDJSUmt0ejRJK3VIU1BwOThLcXV2TEtjRDU1T0VscTd1bGRiblVIWkd5?=
- =?utf-8?B?V3AvWjhFei84N3BSWTdmSFZzc0xYMFFvdGtxVlJUKzhiNnlpeTdDblFOYkdL?=
- =?utf-8?B?YmExVmhCSkdrb3lITzBaMEFQTmdFM0hFMUpJdWMvVzI0K21ZTHh0ZHc4Mldh?=
- =?utf-8?B?UC80K2ZKd01EWjZaYWZ4bFV1ekUzeEhMaVU2Y1k0U3p5VHRpNzVoVjZvemxm?=
- =?utf-8?B?VkR3eURJc202bHJlMHpyV1lRZWJyMU85dnpYY2FsNldGK3Z3MFg5dXcrTVQx?=
- =?utf-8?B?L0JvUElHTGVCZysrU2VQVXBjRWxwUnh4NEM0d1lCM2o3YTJhc2lkQWlKaWQ5?=
- =?utf-8?B?NXUvQnhsdnMzSjFCRFAxbUpNN2ZIajM1Rmw4TEVnQ1NGcXJYUUpLbVJ0SDVh?=
- =?utf-8?B?Tm5VSWtQeFhTR2c1UWhVaERPNnZIVFVPUS9EanJnRmxBbFQ1SXJpbGRtS1hL?=
- =?utf-8?B?UDVCNDhkOW93TVFnZHJOdXF5WmFPNEIvZmNjSUVybGsxL0JjOFJ6eDdsSFIx?=
- =?utf-8?B?QkNxZWxGdSswWFd0L2lQcGZqVmFIQk9PNlB0VTBsaHBVSncydGdJL0o2M1Jp?=
- =?utf-8?B?d0xWTkRhT29vR2ZTSnBLRzhUTFQ0eURLMTd6OG5lZW5mTmxpZ01haEt6YzY3?=
- =?utf-8?B?OUNLOTYvZXpBQ3FvUEtNMFViNHBZUHBSS2NVNXNvQmVlWERJaS9JVW5ubEhn?=
- =?utf-8?B?VTNFWE84NlZOUjBHV09YVGpjVmV2azU0ZUVGN2xtUEJTcjdCZ3lBQkhIYjk3?=
- =?utf-8?B?STZyTkZFNkd3dnNOeWN4eDVlS09wc3M1bzFOeFBKUGxEZmlOeGlkbW9nZ1Q0?=
- =?utf-8?B?d2lyTkNrbEZHLzRqZ3JSNGV4a2FWYk91NS91eWIvM0RMR3JRR1ZJRkhhWWNo?=
- =?utf-8?B?VHUveDIvOGRjSE1qY1VoT2FGM1NmUEE4S1I2K0dlQU5Mb0taVU5pQ2trYmJM?=
- =?utf-8?B?ZC9sdzdCTVRJQitlZ01CVEJ0Mk5HdXJKNmlIQWN4eFJLeXlDUkZodThrYzhh?=
- =?utf-8?B?SWlNL1dnSHJsMmdaNERDbGI1UUxWd3lRSUwrOHUwY3BmUnQ1b1hYdWhqMmdw?=
- =?utf-8?B?MldPb0xWblRuSnQ2ems5aFBod1BQR0R3eTJESE0vbEdxaFJhUnBjbFJ3OUVy?=
- =?utf-8?B?WnZPdDFnZEtScmdFSWlnWWdPTmVCNld0T0RVc2dWVmFFZDNScmRBa0ZOTU1L?=
- =?utf-8?B?NGhtRGh0YlNzODJDMEZMTk4xMFo3SHZpakZ5cnVyN1JNTEZxVC9VNEtKbHRE?=
- =?utf-8?B?cDE2NmllNUhpckpORDhlVmE5QkRFWkNnbFFKM3hyRk1kVEhMT2M4MGNETE9U?=
- =?utf-8?B?Q0xRZmpKdWxBN0xQazNnSW15L1h1R0lBeEVsNE1rSnNxdlhoT3hEZWZ3eXIz?=
- =?utf-8?B?QjgxS2Q1VFlPMys2dEpEeFRkbXZYc2xrWThGZVpLa2JQMU5mNERtSzk5cjNF?=
- =?utf-8?B?MlQ2WHhaUWhjQVZUa1EvNkVmSmpSdmttaE4xRDZxd2hUb25oU05lcVNwSUVa?=
- =?utf-8?B?MnQ1QTVkQjFZbjlGTlorWGk5OHF2YWgvOFR1VU1LUkF0WW1SV05VUTVsT0Mx?=
- =?utf-8?B?cVdpYVRTQUtNZDd2SU0vSWZncGJqQzdZbjFyTzlxeW1oMm5JTkNGOU5YamdK?=
- =?utf-8?B?U1YvS2NyaStGeEZuS01qclRkdkI4Y2FyYzZnbllVNmlPUURVU1FpMzRhYm1i?=
- =?utf-8?B?S3NzUU1NZVFBMjNHa1VGQU52bHNublJmSkZOWGJocFovcXNzRnR3R0pseUU2?=
- =?utf-8?B?RzBBVUpFTDhBRUdCN2dxdWRabldRQTJHOHJoU0JJRjNYbjdvdVZPNzRLajJt?=
- =?utf-8?B?QjR2TGVmOGF6UUtZNzE0eVdsd2tma1lDZEluWGhOMWZhMUp2dmNpb2FUV3Z6?=
- =?utf-8?B?S3NFazVNMXI2NElWLzF2cVRYZkg5ZzVVSUxWeE5SMCs3NDJVaDZ4YmF2eG1o?=
- =?utf-8?B?Qjc5OUpiQitQRnRYbU5hNDJ0TUV3bjRZSEZoMW1QMnJsbitlcWtSSkxRdUUz?=
- =?utf-8?Q?w5JrS5Mb4b3uKg79Zd9mpzkbNnuCeE4LSyhBj4TPNQMf?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CF865A62E424C840B74A6959CC1374E6@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.38; Wed, 12 Apr
+ 2023 08:47:51 +0000
+Received: from DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:18f:cafe::a2) by DM6PR14CA0067.outlook.office365.com
+ (2603:10b6:5:18f::44) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.30 via Frontend
+ Transport; Wed, 12 Apr 2023 08:47:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DM6NAM11FT061.mail.protection.outlook.com (10.13.173.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6298.30 via Frontend Transport; Wed, 12 Apr 2023 08:47:50 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 12 Apr 2023
+ 01:47:42 -0700
+Received: from dev.nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 12 Apr
+ 2023 01:47:41 -0700
+From:   Chaitanya Kulkarni <kch@nvidia.com>
+To:     <linux-block@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
+        <kch@nvidia.com>, <johannes.thumshirn@wdc.com>,
+        <bvanassche@acm.org>, <vincent.fu@samsung.com>,
+        <shinichiro.kawasaki@wdc.com>, <yukuai3@huawei.com>
+Subject: [PATCH 0/1] null_blk: allow user to set QUEUE_FLAG_NOWAIT
+Date:   Wed, 12 Apr 2023 01:47:29 -0700
+Message-ID: <20230412084730.51694-1-kch@nvidia.com>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.37]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT061:EE_|IA0PR12MB7776:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64950331-73e3-4f72-58a6-08db3b329944
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 3saQBPGEX+PUUfiWRpU9X8/Ap8mSDM+d87K5v43JP4JIdH5ZYat0PaNe5xU/NfeoJ7ddSdkjk27CVLEs1zVzDvhnJHnMXcOgO6dajS4F3kXAV2XMTGoZlwpZZQcbz61H6UwxZ9ec+qpj7rhyvDKCHI/Thv8hCaVEER3U9MwcfRhneNgJsW9Pa7eWi+NG/HQtRH2M6WNQow5nh9gX3SC0Xt4SHaVK2YMPeYxxLjrWZU7vndUvuAuaw8TMiyntukD/eqTPKfaYBQyZNE2Asz3fuuNYVuxRN6pAo4aIirbzenv1EiWLTusGv0S5MGNM25cs19Tjyu7d93OJBmvFIte2X3uVENkUjEg9AIfsihJJZmKEUt0UZiDbwYxOeiLdJLBXbMKn7O/sVAwBkHkRNOkZQq3T5IcirrSO2NYiOVaZgCl9Blj7/a3jKpBfmkJRnVAHyjFQbhEGiO1IjUVfdbwqzW4r10HnA8PFzk1x3HJwaDliUDd+jGBBIB9tvqnSvjRwlG3y/NmFRN4OWdne7ijo/cE4krjQd3V/4VcjYQza9MAHTBPgzhY1XIgnxyuqX6KnFAKF1kkT/IJJGpOxmF3be2LZzAo0xfDcJeaubgTxuggj2BBjWKfcC56spqZNnEeHGChaxLkFQNxj/cMjieTN+lzbtU/QvfCEOlJGOseNNWfE1Mml83DWxRlHGbGoOZf/LaAYEtX4IkozimTcj5N5aqYsN25Jtwi7FUz24XUc/YTGLXo4boQHnimSALgZ34hTa1VN300Sp80hP1Ttn3LyQuezUV48E7ObwR6oKN4QwzE=
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(136003)(396003)(376002)(451199021)(46966006)(36840700001)(40470700004)(40460700003)(5660300002)(30864003)(8936002)(47076005)(2616005)(83380400001)(336012)(426003)(2906002)(16526019)(36756003)(186003)(356005)(7636003)(82740400003)(34070700002)(36860700001)(82310400005)(1076003)(26005)(40480700001)(6666004)(41300700001)(478600001)(54906003)(70586007)(8676002)(6916009)(4326008)(70206006)(7696005)(316002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 409158d1-a60e-401b-149e-08db3b33022c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Apr 2023 08:50:46.8448
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2023 08:47:50.7291
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ti4mDcVNxiBgwAPo2sW1EkyONBVW2IX9dU1gdUbF/lrpNzxupvMH1C3FHEqQI9VHppJhYIJmF4ryUYe+0J2Qqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5749
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64950331-73e3-4f72-58a6-08db3b329944
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7776
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-KyBkbGVtb2FsQGtlbnJlbC5vcmcuDQoNCk9uIDQvMTIvMjMgMDE6NDcsIENoYWl0YW55YSBLdWxr
-YXJuaSB3cm90ZToNCj4gUVVFVUVfRkxBR19OT1dBSVQgaXMgc2V0IGJ5IGRlZmF1bHQgdG8gbXEg
-ZHJpdmVycyBzdWNoIG51bGxfYmxrIHdoZW4NCj4gaXQgaXMgdXNlZCB3aXRoIE5VTExfUV9NUSBt
-b2RlIGFzIGEgcGFydCBvZiBRVUVVRV9GTEFHX01RX0RFRkFVTFQgdGhhdA0KPiBnZXRzIGFzc2ln
-bmVkIGluIGZvbGxvd2luZyBjb2RlIHBhdGggc2VlIGJsa19tcV9pbml0X2FsbG9jYXRlZF9xdWV1
-ZSgpOi0NCj4NCj4gbnVsbF9hZGRfZGV2KCkNCj4gaWYgKGRldi0+cXVldWVfbW9kZSA9PSBOVUxM
-X1FfTVEpIHsNCj4gICAgICAgICAgYmxrX21xX2FsbG9jX2Rpc2soKQ0KPiAgICAgICAgICAgIF9f
-YmxrX21xX2FsbG9jX2Rpc2soKQ0KPiAJICAgIGJsa19tcV9pbml0X3F1ZXVlX2RhdGEoKQ0KPiAg
-ICAgICAgICAgICAgICBibGtfbXFfaW5pdF9hbGxvY2F0ZWRfcXVldWUoKQ0KPiAgICAgICAgICAg
-ICAgICAgIHEtPnF1ZXVlX2ZsYWdzIHw9IFFVRVVFX0ZMQUdfTVFfREVGQVVMVDsNCj4gfQ0KPg0K
-PiBCdXQgaXQgaXMgbm90IHNldCB3aGVuIG51bGxfYmxrIGlzIGxvYWRlZCB3aXRoIE5VTExfUV9C
-SU8gbW9kZSBpbiBmb2xsb3dpbmcNCj4gY29kZSBwYXRoIGxpa2Ugb3RoZXIgYmlvIGRyaXZlcnMg
-ZG8gZS5nLiBudm1lLW11bHRpcGF0aCA6LQ0KPg0KPiBpZiAoZGV2LT5xdWV1ZV9tb2RlID09IE5V
-TExfUV9CSU8pIHsNCj4gICAgICAgICAgbnVsbGItPmRpc2sgPSBibGtfYWxsb2NfZGlzayhudWxs
-Yi0+ZGV2LT5ob21lX25vZGUpOw0KPiAgICAgICAgICAJYmxrX2FsbG9jX2Rpc2soKQ0KPiAgICAg
-ICAgICAJICBibGtfYWxsb2NfcXVldWUoKQ0KPiAgICAgICAgICAJICBfX2FsbG9jX2Rpc2tfbm9k
-dygpDQo+IH0NCj4NCj4gQWRkIGEgbmV3IG1vZHVsZSBwYXJhbWV0ZXIgbm93YWl0IGFuZCByZXNw
-ZWN0aXZlIGNvbmZpZ2ZzIGF0dHIgdGhhdCB3aWxsDQo+IHNldCBvciBjbGVhciB0aGUgUVVFVUVf
-RkxBR19OT1dBSVQgYmFzZWQgb24gYSB2YWx1ZSBzZXQgYnkgdXNlciBpbg0KPiBudWxsX2FkZF9k
-ZXYoKSBpcnJlc3BlY3RpdmUgb2YgdGhlIHF1ZXVlIG1vZGUsIGJ5IGRlZmF1bHQga2VlcCBpdA0K
-PiBlbmFibGVkIHRvIHJldGFpbiB0aGUgb3JpZ2luYWwgYmVoYXZpb3VyIGZvciB0aGUgTlVMTF9R
-X01RIG1vZGUuDQo+DQo+IERlcGVuZGluZyBvbiBub3dhaXQgdmFsdWUgdXNlIEdGUF9OT1dBSVQg
-b3IgR0ZQX05PSU8gZm9yIHRoZSBhbGxvY3Rpb24NCj4gaW4gdGhlIG51bGxfYWxsb2NfcGFnZSgp
-IGZvciBhbGxvY19wYWdlcygpIGFuZCBpbiBudWxsX2luc2VydF9wYWdlKCkNCj4gZm9yIHJhZGl4
-X3RyZWVfcHJlbG9hZCgpLg0KPg0KPiBPYnNlcnZlZCBwZXJmb3JtYW5jZSBkaWZmZXJlbmNlIHdp
-dGggdGhpcyBwYXRjaCBmb3IgZmlvIGlvdXJpbmcgd2l0aA0KPiBjb25maWdmcyBhbmQgbm9uIGNv
-bmZpZ2ZzIG51bGxfYmxrIHdpdGggcXVldWUgbW9kZXMgTlVMTF9RX0JJTyBhbmQNCj4gTlVMTF9R
-X01ROi0NCj4NCj4gKiBDb25maWdmcyBNZW1iYWNrZWQgbW9kZTotDQo+DQo+IE5VTExfUV9CSU8g
-bW9kZSBRVUVVRV9GTEFHX05PV0FJVCBkaXNhYmxlZCA6LQ0KPiAtLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gY29uZmlnZnMtcW1vZGUtMC1ub3dhaXQtMC1m
-aW8tMS5sb2c6ICByZWFkOiBJT1BTPTEyOTVrLCBCVz01MDU4TWlCL3MNCj4gY29uZmlnZnMtcW1v
-ZGUtMC1ub3dhaXQtMC1maW8tMi5sb2c6ICByZWFkOiBJT1BTPTEzNjJrLCBCVz01MzE4TWlCL3MN
-Cj4gY29uZmlnZnMtcW1vZGUtMC1ub3dhaXQtMC1maW8tMy5sb2c6ICByZWFkOiBJT1BTPTEzMzJr
-LCBCVz01MjAxTWlCL3MNCj4NCj4gTlVMTF9RX0JJTyBtb2RlIFFVRVVFX0ZMQUdfTk9XQUlUIGVu
-YWJsZWQgOi0NCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-DQo+IGNvbmZpZ2ZzLXFtb2RlLTAtbm93YWl0LTEtZmlvLTEubG9nOiAgcmVhZDogSU9QUz0yMDk1
-aywgQlc9ODE4M01pQi9zDQo+IGNvbmZpZ2ZzLXFtb2RlLTAtbm93YWl0LTEtZmlvLTIubG9nOiAg
-cmVhZDogSU9QUz0yMDg1aywgQlc9ODE0NU1pQi9zDQo+IGNvbmZpZ2ZzLXFtb2RlLTAtbm93YWl0
-LTEtZmlvLTMubG9nOiAgcmVhZDogSU9QUz0yMDM2aywgQlc9Nzk1NU1pQi9zDQo+DQo+IE5VTExf
-UV9NUSBtb2RlIFFVRVVFX0ZMQUdfTk9XQUlUIGRpc2FibGVkIDotDQo+IC0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiBjb25maWdmcy1xbW9kZS0yLW5vd2Fp
-dC0wLWZpby0xLmxvZzogIHJlYWQ6IElPUFM9MTI4OGssIEJXPTUwMzFNaUIvcw0KPiBjb25maWdm
-cy1xbW9kZS0yLW5vd2FpdC0wLWZpby0yLmxvZzogIHJlYWQ6IElPUFM9MTIzOWssIEJXPTQ4MzlN
-aUIvcw0KPiBjb25maWdmcy1xbW9kZS0yLW5vd2FpdC0wLWZpby0zLmxvZzogIHJlYWQ6IElPUFM9
-MTI1MmssIEJXPTQ4ODlNaUIvcw0KPg0KPiBOVUxMX1FfTVEgbW9kZSBRVUVVRV9GTEFHX05PV0FJ
-VCBlbmFibGVkIDotDQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLQ0KPiBjb25maWdmcy1xbW9kZS0yLW5vd2FpdC0xLWZpby0xLmxvZzogIHJlYWQ6IElPUFM9
-MjEwMWssIEJXPTgyMDhNaUIvcw0KPiBjb25maWdmcy1xbW9kZS0yLW5vd2FpdC0xLWZpby0yLmxv
-ZzogIHJlYWQ6IElPUFM9MjA5MWssIEJXPTgxNjlNaUIvcw0KPiBjb25maWdmcy1xbW9kZS0yLW5v
-d2FpdC0xLWZpby0zLmxvZzogIHJlYWQ6IElPUFM9MjA4OGssIEJXPTgxNTVNaUIvcw0KPg0KPiAq
-IE5vbiBDb25maWdmcyBub24tbWVtYmFja2VkIG1vZGU6LQ0KPg0KPiBOVUxMX1FfQklPIG1vZGUg
-UVVFVUVfRkxBR19OT1dBSVQgZGlzYWJsZWQgOi0NCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+IHFtb2RlLTAtbm93YWl0LTAtZmlvLTEubG9nOiAgcmVh
-ZDogSU9QUz0xMzYyaywgQlc9NTMyMU1pQi9zDQo+IHFtb2RlLTAtbm93YWl0LTAtZmlvLTIubG9n
-OiAgcmVhZDogSU9QUz0xMzM0aywgQlc9NTIxME1pQi9zDQo+IHFtb2RlLTAtbm93YWl0LTAtZmlv
-LTMubG9nOiAgcmVhZDogSU9QUz0xMzg2aywgQlc9NTQxNk1pQi9zDQo+DQo+IE5VTExfUV9CSU8g
-bW9kZSBRVUVVRV9GTEFHX05PV0FJVCBlbmFibGVkIDotDQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiBxbW9kZS0wLW5vd2FpdC0xLWZpby0xLmxvZzog
-IHJlYWQ6IElPUFM9NTQwNWssIEJXPTIwLjZHaUIvcw0KPiBxbW9kZS0wLW5vd2FpdC0xLWZpby0y
-LmxvZzogIHJlYWQ6IElPUFM9NTUwMmssIEJXPTIxLjBHaUIvcw0KPiBxbW9kZS0wLW5vd2FpdC0x
-LWZpby0zLmxvZzogIHJlYWQ6IElPUFM9NTUxOGssIEJXPTIxLjBHaUIvcw0KPg0KPiBOVUxMX1Ff
-TVEgbW9kZSBRVUVVRV9GTEFHX05PV0FJVCBkaXNhYmxlZCA6LQ0KPiAtLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gcW1vZGUtMi1ub3dhaXQtMC1maW8tMS5s
-b2c6ICByZWFkOiBJT1BTPTEzNTZrLCBCVz01Mjk2TWlCL3MNCj4gcW1vZGUtMi1ub3dhaXQtMC1m
-aW8tMi5sb2c6ICByZWFkOiBJT1BTPTEzMThrLCBCVz01MTQ4TWlCL3MNCj4gcW1vZGUtMi1ub3dh
-aXQtMC1maW8tMy5sb2c6ICByZWFkOiBJT1BTPTEyNTJrLCBCVz00ODkxTWlCL3MNCj4NCj4gTlVM
-TF9RX01RIG1vZGUgUVVFVUVfRkxBR19OT1dBSVQgZW5hYmxlZCA6LQ0KPiAtLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gcW1vZGUtMi1ub3dhaXQtMS1maW8t
-MS5sb2c6ICByZWFkOiBJT1BTPTU0NjZrLCBCVz0yMC45R2lCL3MNCj4gcW1vZGUtMi1ub3dhaXQt
-MS1maW8tMi5sb2c6ICByZWFkOiBJT1BTPTU0NDZrLCBCVz0yMC44R2lCL3MNCj4gcW1vZGUtMi1u
-b3dhaXQtMS1maW8tMy5sb2c6ICByZWFkOiBJT1BTPTU0ODJrLCBCVz0yMC45R2lCL3MNCj4NCj4g
-U2lnbmVkLW9mZi1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCj4gLS0t
-DQo+DQo+IEluIGNhZXMgcHJlcCBwYXRjaCBpcyBuZWVkZWQgKGlkZWFsbHkgaXQgc2hvdWxkIGJl
-KSBmb3IgYWRkaW5nDQo+IGdmcCBhcmdzIHRvIG51bGxfYWxsb2NfcGFnZSgpIHBsZWFzZSBsZXQg
-bWUga25vdy4NCj4NCj4gLWNrDQo+DQo+ICAgZHJpdmVycy9ibG9jay9udWxsX2Jsay9tYWluLmMg
-ICAgIHwgMjIgKysrKysrKysrKysrKysrKystLS0tLQ0KPiAgIGRyaXZlcnMvYmxvY2svbnVsbF9i
-bGsvbnVsbF9ibGsuaCB8ICAxICsNCj4gICAyIGZpbGVzIGNoYW5nZWQsIDE4IGluc2VydGlvbnMo
-KyksIDUgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL251bGxf
-YmxrL21haW4uYyBiL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsvbWFpbi5jDQo+IGluZGV4IGJjMmM1
-ODcyNGRmMy4uNjc2ODNmMmZkNmUxIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2Jsb2NrL251bGxf
-YmxrL21haW4uYw0KPiArKysgYi9kcml2ZXJzL2Jsb2NrL251bGxfYmxrL21haW4uYw0KPiBAQCAt
-NzcsNiArNzcsMTAgQEAgZW51bSB7DQo+ICAgCU5VTExfSVJRX1RJTUVSCQk9IDIsDQo+ICAgfTsN
-Cj4gICANCj4gK3N0YXRpYyBib29sIGdfbm93YWl0ID0gdHJ1ZTsNCj4gK21vZHVsZV9wYXJhbV9u
-YW1lZChub3dhaXQsIGdfbm93YWl0LCBib29sLCAwNDQ0KTsNCj4gK01PRFVMRV9QQVJNX0RFU0Mo
-dmlydF9ib3VuZGFyeSwgIlNldCBRVUVVRV9GTEFHX05PV0FJVCBpcnJlc3BlY3RpdmUgb2YgcXVl
-dWUgbW9kZS4gRGVmYXVsdDogVHJ1ZSIpOw0KPiArDQo+ICAgc3RhdGljIGJvb2wgZ192aXJ0X2Jv
-dW5kYXJ5ID0gZmFsc2U7DQo+ICAgbW9kdWxlX3BhcmFtX25hbWVkKHZpcnRfYm91bmRhcnksIGdf
-dmlydF9ib3VuZGFyeSwgYm9vbCwgMDQ0NCk7DQo+ICAgTU9EVUxFX1BBUk1fREVTQyh2aXJ0X2Jv
-dW5kYXJ5LCAiUmVxdWlyZSBhIHZpcnR1YWwgYm91bmRhcnkgZm9yIHRoZSBkZXZpY2UuIERlZmF1
-bHQ6IEZhbHNlIik7DQo+IEBAIC00MTMsNiArNDE3LDcgQEAgTlVMTEJfREVWSUNFX0FUVFIoaXJx
-bW9kZSwgdWludCwgTlVMTCk7DQo+ICAgTlVMTEJfREVWSUNFX0FUVFIoaHdfcXVldWVfZGVwdGgs
-IHVpbnQsIE5VTEwpOw0KPiAgIE5VTExCX0RFVklDRV9BVFRSKGluZGV4LCB1aW50LCBOVUxMKTsN
-Cj4gICBOVUxMQl9ERVZJQ0VfQVRUUihibG9ja2luZywgYm9vbCwgTlVMTCk7DQo+ICtOVUxMQl9E
-RVZJQ0VfQVRUUihub3dhaXQsIGJvb2wsIE5VTEwpOw0KPiAgIE5VTExCX0RFVklDRV9BVFRSKHVz
-ZV9wZXJfbm9kZV9oY3R4LCBib29sLCBOVUxMKTsNCj4gICBOVUxMQl9ERVZJQ0VfQVRUUihtZW1v
-cnlfYmFja2VkLCBib29sLCBOVUxMKTsNCj4gICBOVUxMQl9ERVZJQ0VfQVRUUihkaXNjYXJkLCBi
-b29sLCBOVUxMKTsNCj4gQEAgLTU1NCw2ICs1NTksNyBAQCBzdGF0aWMgc3RydWN0IGNvbmZpZ2Zz
-X2F0dHJpYnV0ZSAqbnVsbGJfZGV2aWNlX2F0dHJzW10gPSB7DQo+ICAgCSZudWxsYl9kZXZpY2Vf
-YXR0cl9od19xdWV1ZV9kZXB0aCwNCj4gICAJJm51bGxiX2RldmljZV9hdHRyX2luZGV4LA0KPiAg
-IAkmbnVsbGJfZGV2aWNlX2F0dHJfYmxvY2tpbmcsDQo+ICsJJm51bGxiX2RldmljZV9hdHRyX25v
-d2FpdCwNCj4gICAJJm51bGxiX2RldmljZV9hdHRyX3VzZV9wZXJfbm9kZV9oY3R4LA0KPiAgIAkm
-bnVsbGJfZGV2aWNlX2F0dHJfcG93ZXIsDQo+ICAgCSZudWxsYl9kZXZpY2VfYXR0cl9tZW1vcnlf
-YmFja2VkLA0KPiBAQCAtNjI4LDcgKzYzNCw3IEBAIG51bGxiX2dyb3VwX2Ryb3BfaXRlbShzdHJ1
-Y3QgY29uZmlnX2dyb3VwICpncm91cCwgc3RydWN0IGNvbmZpZ19pdGVtICppdGVtKQ0KPiAgIHN0
-YXRpYyBzc2l6ZV90IG1lbWJfZ3JvdXBfZmVhdHVyZXNfc2hvdyhzdHJ1Y3QgY29uZmlnX2l0ZW0g
-Kml0ZW0sIGNoYXIgKnBhZ2UpDQo+ICAgew0KPiAgIAlyZXR1cm4gc25wcmludGYocGFnZSwgUEFH
-RV9TSVpFLA0KPiAtCQkJImJhZGJsb2NrcyxibG9ja2luZyxibG9ja3NpemUsY2FjaGVfc2l6ZSwi
-DQo+ICsJCQkiYmFkYmxvY2tzLGJsb2NraW5nLG5vd2FpdCxibG9ja3NpemUsY2FjaGVfc2l6ZSwi
-DQo+ICAgCQkJImNvbXBsZXRpb25fbnNlYyxkaXNjYXJkLGhvbWVfbm9kZSxod19xdWV1ZV9kZXB0
-aCwiDQo+ICAgCQkJImlycW1vZGUsbWF4X3NlY3RvcnMsbWJwcyxtZW1vcnlfYmFja2VkLG5vX3Nj
-aGVkLCINCj4gICAJCQkicG9sbF9xdWV1ZXMscG93ZXIscXVldWVfbW9kZSxzaGFyZWRfdGFnX2Jp
-dG1hcCxzaXplLCINCj4gQEAgLTY5Niw2ICs3MDIsNyBAQCBzdGF0aWMgc3RydWN0IG51bGxiX2Rl
-dmljZSAqbnVsbF9hbGxvY19kZXYodm9pZCkNCj4gICAJZGV2LT5pcnFtb2RlID0gZ19pcnFtb2Rl
-Ow0KPiAgIAlkZXYtPmh3X3F1ZXVlX2RlcHRoID0gZ19od19xdWV1ZV9kZXB0aDsNCj4gICAJZGV2
-LT5ibG9ja2luZyA9IGdfYmxvY2tpbmc7DQo+ICsJZGV2LT5ub3dhaXQgPSBnX25vd2FpdDsNCj4g
-ICAJZGV2LT5tZW1vcnlfYmFja2VkID0gZ19tZW1vcnlfYmFja2VkOw0KPiAgIAlkZXYtPmRpc2Nh
-cmQgPSBnX2Rpc2NhcmQ7DQo+ICAgCWRldi0+Y2FjaGVfc2l6ZSA9IGdfY2FjaGVfc2l6ZTsNCj4g
-QEAgLTgzMCw3ICs4MzcsNyBAQCBzdGF0aWMgdm9pZCBudWxsX2NvbXBsZXRlX3JxKHN0cnVjdCBy
-ZXF1ZXN0ICpycSkNCj4gICAJZW5kX2NtZChibGtfbXFfcnFfdG9fcGR1KHJxKSk7DQo+ICAgfQ0K
-PiAgIA0KPiAtc3RhdGljIHN0cnVjdCBudWxsYl9wYWdlICpudWxsX2FsbG9jX3BhZ2Uodm9pZCkN
-Cj4gK3N0YXRpYyBzdHJ1Y3QgbnVsbGJfcGFnZSAqbnVsbF9hbGxvY19wYWdlKGdmcF90IGdmcCkN
-Cj4gICB7DQo+ICAgCXN0cnVjdCBudWxsYl9wYWdlICp0X3BhZ2U7DQo+ICAgDQo+IEBAIC04Mzgs
-NyArODQ1LDcgQEAgc3RhdGljIHN0cnVjdCBudWxsYl9wYWdlICpudWxsX2FsbG9jX3BhZ2Uodm9p
-ZCkNCj4gICAJaWYgKCF0X3BhZ2UpDQo+ICAgCQlyZXR1cm4gTlVMTDsNCj4gICANCj4gLQl0X3Bh
-Z2UtPnBhZ2UgPSBhbGxvY19wYWdlcyhHRlBfTk9JTywgMCk7DQo+ICsJdF9wYWdlLT5wYWdlID0g
-YWxsb2NfcGFnZXMoZ2ZwLCAwKTsNCj4gICAJaWYgKCF0X3BhZ2UtPnBhZ2UpIHsNCj4gICAJCWtm
-cmVlKHRfcGFnZSk7DQo+ICAgCQlyZXR1cm4gTlVMTDsNCj4gQEAgLTk4MywxMSArOTkwLDExIEBA
-IHN0YXRpYyBzdHJ1Y3QgbnVsbGJfcGFnZSAqbnVsbF9pbnNlcnRfcGFnZShzdHJ1Y3QgbnVsbGIg
-Km51bGxiLA0KPiAgIA0KPiAgIAlzcGluX3VubG9ja19pcnEoJm51bGxiLT5sb2NrKTsNCj4gICAN
-Cj4gLQl0X3BhZ2UgPSBudWxsX2FsbG9jX3BhZ2UoKTsNCj4gKwl0X3BhZ2UgPSBudWxsX2FsbG9j
-X3BhZ2UobnVsbGItPmRldi0+bm93YWl0ID8gR0ZQX05PV0FJVCA6IEdGUF9OT0lPKTsNCj4gICAJ
-aWYgKCF0X3BhZ2UpDQo+ICAgCQlnb3RvIG91dF9sb2NrOw0KPiAgIA0KPiAtCWlmIChyYWRpeF90
-cmVlX3ByZWxvYWQoR0ZQX05PSU8pKQ0KPiArCWlmIChyYWRpeF90cmVlX3ByZWxvYWQobnVsbGIt
-PmRldi0+bm93YWl0ID8gR0ZQX05PV0FJVCA6IEdGUF9OT0lPKSkNCj4gICAJCWdvdG8gb3V0X2Zy
-ZWVwYWdlOw0KPiAgIA0KPiAgIAlzcGluX2xvY2tfaXJxKCZudWxsYi0+bG9jayk7DQo+IEBAIC0y
-MDkzLDYgKzIxMDAsMTEgQEAgc3RhdGljIGludCBudWxsX2FkZF9kZXYoc3RydWN0IG51bGxiX2Rl
-dmljZSAqZGV2KQ0KPiAgIAlibGtfcXVldWVfZmxhZ19zZXQoUVVFVUVfRkxBR19OT05ST1QsIG51
-bGxiLT5xKTsNCj4gICAJYmxrX3F1ZXVlX2ZsYWdfY2xlYXIoUVVFVUVfRkxBR19BRERfUkFORE9N
-LCBudWxsYi0+cSk7DQo+ICAgDQo+ICsJaWYgKGRldi0+bm93YWl0KQ0KPiArCQlibGtfcXVldWVf
-ZmxhZ19zZXQoUVVFVUVfRkxBR19OT1dBSVQsIG51bGxiLT5xKTsNCj4gKwllbHNlDQo+ICsJCWJs
-a19xdWV1ZV9mbGFnX2NsZWFyKFFVRVVFX0ZMQUdfTk9XQUlULCBudWxsYi0+cSk7DQo+ICsNCj4g
-ICAJbXV0ZXhfbG9jaygmbG9jayk7DQo+ICAgCXJ2ID0gaWRhX3NpbXBsZV9nZXQoJm51bGxiX2lu
-ZGV4ZXMsIDAsIDAsIEdGUF9LRVJORUwpOw0KPiAgIAlpZiAocnYgPCAwKSB7DQo+IGRpZmYgLS1n
-aXQgYS9kcml2ZXJzL2Jsb2NrL251bGxfYmxrL251bGxfYmxrLmggYi9kcml2ZXJzL2Jsb2NrL251
-bGxfYmxrL251bGxfYmxrLmgNCj4gaW5kZXggZWI1OTcyYzUwYmU4Li4xZDdhZjQ0NmQ3MjggMTAw
-NjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsvbnVsbF9ibGsuaA0KPiArKysgYi9k
-cml2ZXJzL2Jsb2NrL251bGxfYmxrL251bGxfYmxrLmgNCj4gQEAgLTEwNyw2ICsxMDcsNyBAQCBz
-dHJ1Y3QgbnVsbGJfZGV2aWNlIHsNCj4gICAJdW5zaWduZWQgaW50IGluZGV4OyAvKiBpbmRleCBv
-ZiB0aGUgZGlzaywgb25seSB2YWxpZCB3aXRoIGEgZGlzayAqLw0KPiAgIAl1bnNpZ25lZCBpbnQg
-bWJwczsgLyogQmFuZHdpZHRoIHRocm90dGxlIGNhcCAoaW4gTUIvcykgKi8NCj4gICAJYm9vbCBi
-bG9ja2luZzsgLyogYmxvY2tpbmcgYmxrLW1xIGRldmljZSAqLw0KPiArCWJvb2wgbm93YWl0OyAv
-KiB0byBzZXQgUVVFVUVfRkxBR19OT1dBSVQgb24gZGV2aWNlIHF1ZXVlICovDQo+ICAgCWJvb2wg
-dXNlX3Blcl9ub2RlX2hjdHg7IC8qIHVzZSBwZXItbm9kZSBhbGxvY2F0aW9uIGZvciBoYXJkd2Fy
-ZSBjb250ZXh0ICovDQo+ICAgCWJvb2wgcG93ZXI7IC8qIHBvd2VyIG9uL29mZiB0aGUgZGV2aWNl
-ICovDQo+ICAgCWJvb2wgbWVtb3J5X2JhY2tlZDsgLyogaWYgZGF0YSBpcyBzdG9yZWQgaW4gbWVt
-b3J5ICovDQoNCg==
+Hi,
+
+QUEUE_FLAG_NOWAIT is set by default to mq drivers such as null_blk as
+a part of QUEUE_FLAG_MQ_DEFAULT that gets assigned in following code
+path see blk_mq_init_allocated_queue():-
+
+null_add_dev()
+if (dev->queue_mode == NULL_Q_MQ) {
+        blk_mq_alloc_disk()
+          __blk_mq_alloc_disk()
+	    blk_mq_init_queue_data()
+              blk_mq_init_allocated_queue()
+                q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+}
+
+But it not set when null_blk is loaded with NULL_Q_BIO mode in following
+code path :-
+
+if (dev->queue_mode == NULL_Q_BIO) {
+        nullb->disk = blk_alloc_disk(nullb->dev->home_node);
+        	blk_alloc_disk()
+        	  blk_alloc_queue()
+        	  __alloc_disk_nodw()
+}
+
+Add a new module parameter nowait and respective configfs attr
+that will set and clear the QUEUE_FLAG_NOWAIT based on a value set by
+user in null_add_dev() irrespective of the queue mode, by default keep
+it enabled to retain the original behaviour for the NULL_Q_MQ mode.
+
+* Configfs Membacked mode:-
+
+NULL_Q_BIO mode QUEUE_FLAG_NOWAIT disabled:-
+---------------------------------------------
+configfs-qmode-0-nowait-0-fio-1.log:  read: IOPS=1295k, BW=5058MiB/s
+configfs-qmode-0-nowait-0-fio-2.log:  read: IOPS=1362k, BW=5318MiB/s
+configfs-qmode-0-nowait-0-fio-3.log:  read: IOPS=1332k, BW=5201MiB/s
+
+NULL_Q_BIO mode QUEUE_FLAG_NOWAIT enabled :-
+---------------------------------------------
+configfs-qmode-0-nowait-1-fio-1.log:  read: IOPS=2095k, BW=8183MiB/s
+configfs-qmode-0-nowait-1-fio-2.log:  read: IOPS=2085k, BW=8145MiB/s
+configfs-qmode-0-nowait-1-fio-3.log:  read: IOPS=2036k, BW=7955MiB/s
+
+NULL_Q_MQ mode QUEUE_FLAG_NOWAIT disabled :-
+---------------------------------------------
+configfs-qmode-2-nowait-0-fio-1.log:  read: IOPS=1288k, BW=5031MiB/s
+configfs-qmode-2-nowait-0-fio-2.log:  read: IOPS=1239k, BW=4839MiB/s
+configfs-qmode-2-nowait-0-fio-3.log:  read: IOPS=1252k, BW=4889MiB/s
+
+NULL_Q_MQ mode QUEUE_FLAG_NOWAIT enabled :-
+---------------------------------------------
+configfs-qmode-2-nowait-1-fio-1.log:  read: IOPS=2101k, BW=8208MiB/s
+configfs-qmode-2-nowait-1-fio-2.log:  read: IOPS=2091k, BW=8169MiB/s
+configfs-qmode-2-nowait-1-fio-3.log:  read: IOPS=2088k, BW=8155MiB/s
+
+* Non Configfs non-membacked mode:-
+
+NULL_Q_BIO mode QUEUE_FLAG_NOWAIT disabled:-
+---------------------------------------------
+qmode-0-nowait-0-fio-1.log:  read: IOPS=1362k, BW=5321MiB/s
+qmode-0-nowait-0-fio-2.log:  read: IOPS=1334k, BW=5210MiB/s
+qmode-0-nowait-0-fio-3.log:  read: IOPS=1386k, BW=5416MiB/s
+
+NULL_Q_BIO mode QUEUE_FLAG_NOWAIT enabled :-
+---------------------------------------------
+qmode-0-nowait-1-fio-1.log:  read: IOPS=5405k, BW=20.6GiB/s
+qmode-0-nowait-1-fio-2.log:  read: IOPS=5502k, BW=21.0GiB/s
+qmode-0-nowait-1-fio-3.log:  read: IOPS=5518k, BW=21.0GiB/s
+
+NULL_Q_MQ mode QUEUE_FLAG_NOWAIT disabled :-
+---------------------------------------------
+qmode-2-nowait-0-fio-1.log:  read: IOPS=1356k, BW=5296MiB/s
+qmode-2-nowait-0-fio-2.log:  read: IOPS=1318k, BW=5148MiB/s
+qmode-2-nowait-0-fio-3.log:  read: IOPS=1252k, BW=4891MiB/s
+
+NULL_Q_MQ mode QUEUE_FLAG_NOWAIT enabled :-
+---------------------------------------------
+qmode-2-nowait-1-fio-1.log:  read: IOPS=5466k, BW=20.9GiB/s
+qmode-2-nowait-1-fio-2.log:  read: IOPS=5446k, BW=20.8GiB/s
+qmode-2-nowait-1-fio-3.log:  read: IOPS=5482k, BW=20.9GiB/s
+
+Below is a performance test log for with and without configfs mambeacked
+mode.
+
+-ck
+
+Chaitanya Kulkarni (1):
+  null_blk: allow user to set QUEUE_FLAG_NOWAIT
+
+ drivers/block/null_blk/main.c     | 22 +++++++++++++++++-----
+ drivers/block/null_blk/null_blk.h |  1 +
+ 2 files changed, 18 insertions(+), 5 deletions(-)
+
+Performance test log for null_blk configfs and non-configfs:-
+
+linux-block (for-next) # sh test-null-blk-no-wait.sh 
++ modprobe -r null_blk
++ ./compile_nullb.sh
++ umount /mnt/nullb0
+umount: /mnt/nullb0: not mounted.
++ rmdir 'config/nullb/nullb*'
+rmdir: failed to remove 'config/nullb/nullb*': No such file or directory
++ dmesg -c
++ modprobe -r null_blk
++ lsmod
++ grep null_blk
+++ nproc
++ make -j 48 M=drivers/block/ clean
+  CLEAN   drivers/block/Module.symvers
+++ nproc
++ make -j 48 M=drivers/block modules
+  CC [M]  drivers/block/floppy.o
+  CC [M]  drivers/block/brd.o
+  CC [M]  drivers/block/loop.o
+  CC [M]  drivers/block/nbd.o
+  CC [M]  drivers/block/virtio_blk.o
+  CC [M]  drivers/block/xen-blkfront.o
+  CC [M]  drivers/block/rbd.o
+  CC [M]  drivers/block/drbd/drbd_buildtag.o
+  CC [M]  drivers/block/xen-blkback/blkback.o
+  CC [M]  drivers/block/mtip32xx/mtip32xx.o
+  CC [M]  drivers/block/zram/zcomp.o
+  CC [M]  drivers/block/drbd/drbd_bitmap.o
+  CC [M]  drivers/block/drbd/drbd_proc.o
+  CC [M]  drivers/block/xen-blkback/xenbus.o
+  CC [M]  drivers/block/zram/zram_drv.o
+  CC [M]  drivers/block/drbd/drbd_worker.o
+  CC [M]  drivers/block/null_blk/main.o
+  CC [M]  drivers/block/drbd/drbd_receiver.o
+  CC [M]  drivers/block/null_blk/trace.o
+  CC [M]  drivers/block/null_blk/zoned.o
+  CC [M]  drivers/block/drbd/drbd_req.o
+  CC [M]  drivers/block/drbd/drbd_actlog.o
+  CC [M]  drivers/block/drbd/drbd_main.o
+  CC [M]  drivers/block/drbd/drbd_strings.o
+  CC [M]  drivers/block/drbd/drbd_nl.o
+  CC [M]  drivers/block/drbd/drbd_interval.o
+  CC [M]  drivers/block/drbd/drbd_state.o
+  CC [M]  drivers/block/drbd/drbd_nla.o
+  CC [M]  drivers/block/drbd/drbd_debugfs.o
+  LD [M]  drivers/block/zram/zram.o
+  LD [M]  drivers/block/null_blk/null_blk.o
+  LD [M]  drivers/block/xen-blkback/xen-blkback.o
+  LD [M]  drivers/block/drbd/drbd.o
+  MODPOST drivers/block/Module.symvers
+  CC [M]  drivers/block/floppy.mod.o
+  CC [M]  drivers/block/brd.mod.o
+  CC [M]  drivers/block/loop.mod.o
+  CC [M]  drivers/block/nbd.mod.o
+  CC [M]  drivers/block/virtio_blk.mod.o
+  CC [M]  drivers/block/xen-blkfront.mod.o
+  CC [M]  drivers/block/xen-blkback/xen-blkback.mod.o
+  CC [M]  drivers/block/drbd/drbd.mod.o
+  CC [M]  drivers/block/rbd.mod.o
+  CC [M]  drivers/block/mtip32xx/mtip32xx.mod.o
+  CC [M]  drivers/block/zram/zram.mod.o
+  CC [M]  drivers/block/null_blk/null_blk.mod.o
+  LD [M]  drivers/block/xen-blkfront.ko
+  LD [M]  drivers/block/brd.ko
+  LD [M]  drivers/block/xen-blkback/xen-blkback.ko
+  LD [M]  drivers/block/loop.ko
+  LD [M]  drivers/block/virtio_blk.ko
+  LD [M]  drivers/block/mtip32xx/mtip32xx.ko
+  LD [M]  drivers/block/rbd.ko
+  LD [M]  drivers/block/zram/zram.ko
+  LD [M]  drivers/block/nbd.ko
+  LD [M]  drivers/block/drbd/drbd.ko
+  LD [M]  drivers/block/floppy.ko
+  LD [M]  drivers/block/null_blk/null_blk.ko
++ HOST=drivers/block/null_blk/
+++ uname -r
++ HOST_DEST=/lib/modules/6.3.0-rc5lblk+/kernel/drivers/block/null_blk/
++ cp drivers/block/null_blk//null_blk.ko /lib/modules/6.3.0-rc5lblk+/kernel/drivers/block/null_blk//
++ ls -lrth /lib/modules/6.3.0-rc5lblk+/kernel/drivers/block/null_blk//null_blk.ko
+-rw-r--r--. 1 root root 1.2M Apr 12 01:01 /lib/modules/6.3.0-rc5lblk+/kernel/drivers/block/null_blk//null_blk.ko
++ sleep 1
++ dmesg -c
++ test_non_configfs
++ modprobe null_blk nowait=0 queue_mode=0
++ dmesg -c
+[ 9509.969343] null_blk: disk nullb0 created
+[ 9509.969347] null_blk: module loaded
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-0-nowait-0-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=5415MiB/s][r=1386k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-0-nowait-0-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=5184MiB/s][r=1327k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-0-nowait-0-fio-3.log
++ modprobe -r null_blk)][100.0%][r=5525MiB/s][r=1414k IOPS][eta 00m:00s]
++ modprobe null_blk nowait=1 queue_mode=0
++ dmesg -c
+[ 9570.634724] null_blk: disk nullb0 created
+[ 9570.634729] null_blk: module loaded
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-0-nowait-1-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=20.8GiB/s][r=5452k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-0-nowait-1-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=21.3GiB/s][r=5577k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-0-nowait-1-fio-3.log
++ modprobe -r null_blk)][100.0%][r=21.1GiB/s][r=5536k IOPS][eta 00m:00s]
++ modprobe null_blk nowait=0 queue_mode=2
++ dmesg -c
+[ 9631.320182] null_blk: disk nullb0 created
+[ 9631.320186] null_blk: module loaded
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-2-nowait-0-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=6132MiB/s][r=1570k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-2-nowait-0-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=5554MiB/s][r=1422k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-2-nowait-0-fio-3.log
++ modprobe -r null_blk)][100.0%][r=5218MiB/s][r=1336k IOPS][eta 00m:00s]
++ modprobe null_blk nowait=1 queue_mode=2
++ dmesg -c
+[ 9691.986330] null_blk: disk nullb0 created
+[ 9691.986333] null_blk: module loaded
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-2-nowait-1-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=21.2GiB/s][r=5547k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-2-nowait-1-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=20.3GiB/s][r=5313k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=qmode-2-nowait-1-fio-3.log
++ modprobe -r null_blk)][100.0%][r=21.2GiB/s][r=5547k IOPS][eta 00m:00s]
++ test_configfs 0 0
++ qmode=0
++ nowait=0
++ modprobe null_blk nr_devices=0
++ NULLB_DIR=config/nullb/nullb0
++ mkdir config/nullb/nullb0
++ echo 1
++ echo 4096
++ echo 20480
++ echo 0
++ echo 0
++ echo 1
++ '[' 0 -ne 0 ']'
++ sleep .50
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-0-nowait-0-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=5174MiB/s][r=1325k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-0-nowait-0-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=5904MiB/s][r=1512k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-0-nowait-0-fio-3.log
++ rmdir config/nullb/nullb00.0%][r=5493MiB/s][r=1406k IOPS][eta 00m:00s]
++ modprobe -r null_blk
++ test_configfs 0 1
++ qmode=0
++ nowait=1
++ modprobe null_blk nr_devices=0
++ NULLB_DIR=config/nullb/nullb0
++ mkdir config/nullb/nullb0
++ echo 1
++ echo 4096
++ echo 20480
++ echo 0
++ echo 1
++ echo 1
++ '[' 0 -ne 0 ']'
++ sleep .50
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-0-nowait-1-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=8265MiB/s][r=2116k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-0-nowait-1-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=8090MiB/s][r=2071k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-0-nowait-1-fio-3.log
++ rmdir config/nullb/nullb00.0%][r=7971MiB/s][r=2041k IOPS][eta 00m:00s]
++ modprobe -r null_blk
++ test_configfs 2 0
++ qmode=2
++ nowait=0
++ modprobe null_blk nr_devices=0
++ NULLB_DIR=config/nullb/nullb0
++ mkdir config/nullb/nullb0
++ echo 1
++ echo 4096
++ echo 20480
++ echo 2
++ echo 0
++ echo 1
++ '[' 0 -ne 0 ']'
++ sleep .50
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-2-nowait-0-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=5247MiB/s][r=1343k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-2-nowait-0-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=5132MiB/s][r=1314k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-2-nowait-0-fio-3.log
++ rmdir config/nullb/nullb00.0%][r=4960MiB/s][r=1270k IOPS][eta 00m:00s]
++ modprobe -r null_blk
++ test_configfs 2 1
++ qmode=2
++ nowait=1
++ modprobe null_blk nr_devices=0
++ NULLB_DIR=config/nullb/nullb0
++ mkdir config/nullb/nullb0
++ echo 1
++ echo 4096
++ echo 20480
++ echo 2
++ echo 1
++ echo 1
++ '[' 0 -ne 0 ']'
++ sleep .50
++ for i in 1 2 3
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-2-nowait-1-fio-1.log
++ for i in 1 2 3 [r(24)][100.0%][r=8220MiB/s][r=2104k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-2-nowait-1-fio-2.log
++ for i in 1 2 3 [r(24)][100.0%][r=8257MiB/s][r=2114k IOPS][eta 00m:00s]
++ fio fio/randread.fio --filename=/dev/nullb0 --output=configfs-qmode-2-nowait-1-fio-3.log
++ rmdir config/nullb/nullb00.0%][r=8163MiB/s][r=2090k IOPS][eta 00m:00s]
++ modprobe -r null_blk
+linux-block (for-next) # 
+linux-block (for-next) # 
+linux-block (for-next) # 
+linux-block (for-next) # 
+linux-block (for-next) # grep IOPS *fio*log 
+configfs-qmode-0-nowait-0-fio-1.log:  read: IOPS=1295k, BW=5058MiB/s (5303MB/s)(98.8GiB/20002msec)
+configfs-qmode-0-nowait-0-fio-2.log:  read: IOPS=1362k, BW=5318MiB/s (5577MB/s)(104GiB/20002msec)
+configfs-qmode-0-nowait-0-fio-3.log:  read: IOPS=1332k, BW=5201MiB/s (5454MB/s)(102GiB/20001msec)
+configfs-qmode-0-nowait-1-fio-1.log:  read: IOPS=2095k, BW=8183MiB/s (8581MB/s)(160GiB/20001msec)
+configfs-qmode-0-nowait-1-fio-2.log:  read: IOPS=2085k, BW=8145MiB/s (8541MB/s)(159GiB/20002msec)
+configfs-qmode-0-nowait-1-fio-3.log:  read: IOPS=2036k, BW=7955MiB/s (8341MB/s)(155GiB/20001msec)
+configfs-qmode-2-nowait-0-fio-1.log:  read: IOPS=1288k, BW=5031MiB/s (5275MB/s)(98.3GiB/20002msec)
+configfs-qmode-2-nowait-0-fio-2.log:  read: IOPS=1239k, BW=4839MiB/s (5074MB/s)(94.5GiB/20001msec)
+configfs-qmode-2-nowait-0-fio-3.log:  read: IOPS=1252k, BW=4889MiB/s (5127MB/s)(95.5GiB/20001msec)
+configfs-qmode-2-nowait-1-fio-1.log:  read: IOPS=2101k, BW=8208MiB/s (8607MB/s)(160GiB/20001msec)
+configfs-qmode-2-nowait-1-fio-2.log:  read: IOPS=2091k, BW=8169MiB/s (8565MB/s)(160GiB/20001msec)
+configfs-qmode-2-nowait-1-fio-3.log:  read: IOPS=2088k, BW=8155MiB/s (8551MB/s)(159GiB/20001msec)
+qmode-0-nowait-0-fio-1.log:  read: IOPS=1362k, BW=5321MiB/s (5579MB/s)(104GiB/20001msec)
+qmode-0-nowait-0-fio-2.log:  read: IOPS=1334k, BW=5210MiB/s (5463MB/s)(102GiB/20001msec)
+qmode-0-nowait-0-fio-3.log:  read: IOPS=1386k, BW=5416MiB/s (5679MB/s)(106GiB/20001msec)
+qmode-0-nowait-1-fio-1.log:  read: IOPS=5405k, BW=20.6GiB/s (22.1GB/s)(412GiB/20002msec)
+qmode-0-nowait-1-fio-2.log:  read: IOPS=5502k, BW=21.0GiB/s (22.5GB/s)(420GiB/20001msec)
+qmode-0-nowait-1-fio-3.log:  read: IOPS=5518k, BW=21.0GiB/s (22.6GB/s)(421GiB/20002msec)
+qmode-2-nowait-0-fio-1.log:  read: IOPS=1356k, BW=5296MiB/s (5554MB/s)(103GiB/20001msec)
+qmode-2-nowait-0-fio-2.log:  read: IOPS=1318k, BW=5148MiB/s (5398MB/s)(101GiB/20001msec)
+qmode-2-nowait-0-fio-3.log:  read: IOPS=1252k, BW=4891MiB/s (5128MB/s)(95.5GiB/20001msec)
+qmode-2-nowait-1-fio-1.log:  read: IOPS=5466k, BW=20.9GiB/s (22.4GB/s)(417GiB/20001msec)
+qmode-2-nowait-1-fio-2.log:  read: IOPS=5446k, BW=20.8GiB/s (22.3GB/s)(416GiB/20002msec)
+qmode-2-nowait-1-fio-3.log:  read: IOPS=5482k, BW=20.9GiB/s (22.5GB/s)(418GiB/20002msec)
+
+-- 
+2.29.0
+
