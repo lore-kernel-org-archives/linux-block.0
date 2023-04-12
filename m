@@ -2,48 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB1FAC77B75
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 05:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC06C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 06:38:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjDLFej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 01:34:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48708 "EHLO
+        id S229757AbjDLGiA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 02:38:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjDLFei (ORCPT
+        with ESMTP id S229710AbjDLGh6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 01:34:38 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB31CB9;
-        Tue, 11 Apr 2023 22:34:37 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id F2F3868BFE; Wed, 12 Apr 2023 07:34:32 +0200 (CEST)
-Date:   Wed, 12 Apr 2023 07:34:32 +0200
+        Wed, 12 Apr 2023 02:37:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE52B5B8E
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 23:37:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=4+jC496WGaXp+r9NRdzpXwuQGAeApCgH661SvYpOTPM=; b=Xvh/gU8tijFoN5Y3II4k78dgON
+        qPBK90PacBHXsOgXWiPBb6wlv6K8WF5v2eqUVdlurk6s3om+RTvzQuf1dVWZzryP4Yk0heqjMxB7a
+        vs+547jvyMk5ihIjjSqtendHrIQSlHuFb3SA+v18i3M0yB0SOivZjZ2mikTdRVuexgm1rAll8mxwX
+        IyncGnNVZvMFAavq562WdLtNYc6a8QclrpDx0XtEQnDse9QgJ0wM9PP4EagU2WA5fV6A+V8I8X3Wg
+        D/BQg7+wo9DgxlAI52qO3qyWQmFXKkPAkEG8en8DEO4tbGPQD0HNcWEnlkOKLSxlorQUyZkUBOgvD
+        d+RaoVEQ==;
+Received: from [2001:4bb8:192:2d6c:58da:8aa2:ef59:390f] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pmU71-001z7E-0f;
+        Wed, 12 Apr 2023 06:37:47 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Niklas Cassel <nks@flawful.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v6 09/19] scsi: allow enabling and disabling command
- duration limits
-Message-ID: <20230412053432.GA18941@lst.de>
-References: <20230406113252.41211-1-nks@flawful.org> <20230406113252.41211-10-nks@flawful.org> <20230411061648.GD18719@lst.de> <e9cf65ce-e1f0-4d99-31e7-75b8e88e2a89@kernel.org> <20230411072317.GA22683@lst.de> <15ad7cf9-e385-9cea-964a-4a2eac35385c@kernel.org> <ZDVLsIi/OhkxNcGb@x1-carbon> <85d6ea79-eda1-de58-6ce4-1fab90335ac8@kernel.org> <20230412044348.GA17806@lst.de> <3ac7f4a1-eaa6-d1db-3056-b0ed6681ef36@kernel.org>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 1/2] blk-mq: call blk_mq_hctx_stopped in __blk_mq_run_hw_queue
+Date:   Wed, 12 Apr 2023 08:37:42 +0200
+Message-Id: <20230412063743.618957-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3ac7f4a1-eaa6-d1db-3056-b0ed6681ef36@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 12, 2023 at 02:32:30PM +0900, Damien Le Moal wrote:
-> It is T10 rather than T13 that screwed up: if SPC also defined a CDL feature
-> on/off through mode sense/select, we would not need any "if (is_ata)"...
-> For ATA/T13, the on/off makes sense because of the mutual exclusion with NCQ
-> priority.
+Instead of calling blk_mq_hctx_stopped in both callers, move it right
+next to the dispatching.
 
-Same persons really, so they should know better..
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 03c6fa4afcdb91..cdf1d5ca04bba2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2150,6 +2150,8 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
+ 	 */
+ 	WARN_ON_ONCE(in_interrupt());
+ 
++	if (blk_mq_hctx_stopped(hctx))
++		return;
+ 	blk_mq_run_dispatch_ops(hctx->queue,
+ 			blk_mq_sched_dispatch_requests(hctx));
+ }
+@@ -2221,9 +2223,6 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
+-	if (unlikely(blk_mq_hctx_stopped(hctx)))
+-		return;
+-
+ 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
+ 		if (cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
+ 			__blk_mq_run_hw_queue(hctx);
+@@ -2231,6 +2230,8 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 		}
+ 	}
+ 
++	if (unlikely(blk_mq_hctx_stopped(hctx)))
++		return;
+ 	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
+ 				    msecs_to_jiffies(msecs));
+ }
+@@ -2439,15 +2440,8 @@ EXPORT_SYMBOL(blk_mq_start_stopped_hw_queues);
+ 
+ static void blk_mq_run_work_fn(struct work_struct *work)
+ {
+-	struct blk_mq_hw_ctx *hctx;
+-
+-	hctx = container_of(work, struct blk_mq_hw_ctx, run_work.work);
+-
+-	/*
+-	 * If we are stopped, don't run the queue.
+-	 */
+-	if (blk_mq_hctx_stopped(hctx))
+-		return;
++	struct blk_mq_hw_ctx *hctx =
++		container_of(work, struct blk_mq_hw_ctx, run_work.work);
+ 
+ 	__blk_mq_run_hw_queue(hctx);
+ }
+-- 
+2.39.2
+
