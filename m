@@ -2,69 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC089C77B76
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 21:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A90C77B6E
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 22:29:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbjDLVqm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 17:46:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43552 "EHLO
+        id S229696AbjDLW3N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 18:29:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjDLVql (ORCPT
+        with ESMTP id S229451AbjDLW3M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 17:46:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A7F59C1
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 14:45:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681335949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2ilGBHufiMuaxBpgsvUmfNQz6PArJGM0NKDutiuuFlQ=;
-        b=KGzgggi0J12RboH44/FttBW8TdtLqtnX5xius8+r1dTRKpSssyri/OivRvUkXkHezC3bXx
-        kwdKpWLV8yCiCiqQxLeqYfGLokD7klnf2brrFpMEhQ6hdXI7LxsmsNgpm5GIQnwiXlETfO
-        tNzYtbBmXsCCBKCox05iQYCZG9fAJN0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-312-Xgs_wkh3NcKNsJv-O4nu6Q-1; Wed, 12 Apr 2023 17:45:44 -0400
-X-MC-Unique: Xgs_wkh3NcKNsJv-O4nu6Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 12 Apr 2023 18:29:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E0A7D81;
+        Wed, 12 Apr 2023 15:29:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 784D43C10EC1;
-        Wed, 12 Apr 2023 21:45:44 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.177])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D6BC61121320;
-        Wed, 12 Apr 2023 21:45:43 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20230403142543.1913749-3-hch@lst.de>
-References: <20230403142543.1913749-3-hch@lst.de> <20230403142543.1913749-1-hch@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dhowells@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 2/3] iov_iter: remove iov_iter_get_pages_alloc
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 54330638E0;
+        Wed, 12 Apr 2023 22:29:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27186C433EF;
+        Wed, 12 Apr 2023 22:29:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681338547;
+        bh=aECm2tZB/vDnVu4A3LP7xh5xQgQuB2VMr36U6ePH4R0=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=fMg/ody7gG6VpASyqfK8NQmVVPRTQyBVSL1eLzoRJXg+XJlUPGdoZLBXgcHIKvF7i
+         OV/0gSMNd/DwmCr3rZrWXwbj350kN1PjLrZ+Kx1QcFz1riysedu3mNjXZ3t/lEu4Sk
+         s9xIldozXjENU6Na5zPlA/pjyr/atl4uUcTR4XBFKVoWIwsstHNehtDDRVP/F5fP0A
+         s+BLtWlBjR0oRffQmzvx8WypJPq2rQNnI9MTSlHUuQT8LBcM7xTXa9/F51QbN5RPvr
+         b0J5DqK6JYmi4M/DcnUff409hq2hDMgf9WCiOp4CjPvwNS+kFw5pXUFNqXOiUbEGUL
+         Up5/2fU+VzooQ==
+Message-ID: <fe9fdfc9-5eff-ba29-5139-0aa44ddadc35@kernel.org>
+Date:   Thu, 13 Apr 2023 07:29:04 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <394965.1681335943.1@warthog.procyon.org.uk>
-Date:   Wed, 12 Apr 2023 22:45:43 +0100
-Message-ID: <394966.1681335943@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v6 00/19] Add Command Duration Limits support
+Content-Language: en-US
+To:     Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20230406113252.41211-1-nks@flawful.org>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20230406113252.41211-1-nks@flawful.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> wrote:
+On 4/6/23 20:32, Niklas Cassel wrote:
+> From: Niklas Cassel <niklas.cassel@wdc.com>
+> 
+> Hello,
+> 
+> This series adds support for Command Duration Limits.
+> The series is based on linux tag: v6.3-rc5
+> The series can also be found in git:
+> https://github.com/floatious/linux/commits/cdl-v6
 
-> -EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
-> +EXPORT_SYMBOL_GPL(iov_iter_get_pages_alloc2);
+Jens, Martin, James,
 
-This is not within the description of the patch and should probably be a
-separate patch.
+Any thought on this series ? Can we get this queued for 6.4 ?
 
-David
+
 
