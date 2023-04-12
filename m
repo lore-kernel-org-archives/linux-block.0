@@ -2,99 +2,130 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 533E3C76196
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 02:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A972C77B70
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 03:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229483AbjDLCeq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 22:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41692 "EHLO
+        id S229491AbjDLDGD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 23:06:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjDLCep (ORCPT
+        with ESMTP id S229486AbjDLDGB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 22:34:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84DC740D8
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 19:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681266838;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Xh3vi0ofSx2QU0YO2XPzgPE7lLpEQCLz4mn3+VeIaYI=;
-        b=hRSjd8Arr/a8rcvNixqGy5XMYoAVFGh7XdTDYXBomTOsMbVSypRDeiXNMW9c489Cr+NA9X
-        v/znCwwVhgrkQZOG5WwErr3JCmlK1j+163n4GXubRy/YQYaQSgn7U8JzkxRj2CvZiGwSJZ
-        XzQDdkOq2x1/5AJeRExFrZlTpAC2thg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-272-inwUphz5MJKiZgElRWbuDg-1; Tue, 11 Apr 2023 22:33:55 -0400
-X-MC-Unique: inwUphz5MJKiZgElRWbuDg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C4E5811E7C;
-        Wed, 12 Apr 2023 02:33:54 +0000 (UTC)
-Received: from ovpn-8-26.pek2.redhat.com (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D8F7740C83A9;
-        Wed, 12 Apr 2023 02:33:45 +0000 (UTC)
-Date:   Wed, 12 Apr 2023 10:33:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Kanchan Joshi <joshiiitr@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
-        hch@lst.de, kbusch@kernel.org, ming.lei@redhat.com
-Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
-Message-ID: <ZDYYhE1h1qvCvVmt@ovpn-8-26.pek2.redhat.com>
-References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
- <20230210180033.321377-1-joshi.k@samsung.com>
- <39a543d7-658c-0309-7a68-f07ffe850d0e@kernel.dk>
- <CA+1E3rLLu2ZzBHp30gwXBWzkCvOA4KD7PS70mLuGE8tYFpNEmA@mail.gmail.com>
+        Tue, 11 Apr 2023 23:06:01 -0400
+Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE14F10C3;
+        Tue, 11 Apr 2023 20:05:59 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 22C665823DC;
+        Tue, 11 Apr 2023 23:05:56 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Tue, 11 Apr 2023 23:05:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1681268756; x=1681269356; bh=IV
+        QogybHkDC30haD/hPAJ0xHNHCLaD023WW6qkRFZlo=; b=DUiD+QcvT1Mj6zjUzO
+        KIYP8xoaiGUexa2Zl7b6xwBzL+JHGQeqKNHJUBGWdWN+7jIg+Vp41xaYjj93nDqn
+        zXXJsXdiXeaZgCJypXBvk79dA6WSvoNV8ygKtqFiiiRZ65mMMvc8if8ElNXOaBRG
+        LuAKFUp6+ZOyRk2JE3OoKiyAonaDK3Uu+XQjJfcQ0cODB8qdTxayaC5NY1paMLWj
+        VKI+gD+BmJ0gkA/8xAI22MCYJkSkRq/A2QwO7vrV7hagtAz3CxQlFTmuAhEORGXh
+        iksibwAWWxPhouSDFvyekpUB1EJmV8rB0LyWRRQiF8JpXbpcaXRT+qjS+zBOYFsk
+        bmMA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=ie1e949a3.fm3; t=1681268756; x=1681269356; bh=IVQ
+        ogybHkDC30haD/hPAJ0xHNHCLaD023WW6qkRFZlo=; b=Viivpd2xdLzx4FotxxF
+        84+fTR430q5HwBVCmehQRFW1pEUgnCaSfe9NutEqvOMI4BJ84qgDOTsSFhInpi5T
+        FBh2S1tDkxpTXBJ1y57DqDfQPPuvgrT9vEwqw2AI0QdRcz69h6PT1tqKTRfZN8R7
+        rXGRACBxl38EkA8KtylGIpj9mY1dmDQYALLmYq3vT2nuvWr1mkfCV+yDZnl+zr+w
+        4T+NDojjEgtE53lJEI2ye6UEdbQpxuGHfnlJkhRcmCpzELLkzJx2FmFQiECEfMu/
+        IIQMXQZB1ERvjAZSxFsXEQBd4cm1Ro4ccpieRZwuIupC++6nR23xtTZEZVweOZt2
+        RlQ==
+X-ME-Sender: <xms:EyA2ZDU4rwMFXxC0phxJPhN5nnRdjMyhbvA7xkDb_XEE8TWfSj4JEQ>
+    <xme:EyA2ZLmo7AyLxBkMlHIcBbt1s363w4hTa9UM90trnKUiCVkhnKiqqsK4b_gYMv7hq
+    8QWOT4bLN8MU2vvJL8>
+X-ME-Received: <xmr:EyA2ZPZkRhC0DfxkI5qyn7Fz5PcvOmIE9snK30WHS1jg9lU9DxjMcJRqkZQb6Wj7JDpiS__yiolys-fBAfcx0Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekhedgieejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
+    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
+    hilhdrtghomheqnecuggftrfgrthhtvghrnhepvdegtdfgvdfhgfekvdektdfgfeeljeel
+    gefgkedujeeiteehgefhgeethffgheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
+    mh
+X-ME-Proxy: <xmx:EyA2ZOVsWdhxRnpTbGJBCIokMREM-why9Pv6L28TprXajstMcBqPxw>
+    <xmx:EyA2ZNnfSKsO0G91vC61jzGGZYHOD8X3oiQWGOObtda4exN2z93Ahw>
+    <xmx:EyA2ZLfhFnIHwVVyNLJNyFrKIvEDrjR-qoiPE17qSzvUUilSqJsjQA>
+    <xmx:FCA2ZAtZR_XEUCEY3_bBTVkz3icqVzuwuJTvLQKUxkFbMe4F7Kg1fmmV9PI>
+Feedback-ID: ie1e949a3:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 11 Apr 2023 23:05:53 -0400 (EDT)
+Date:   Wed, 12 Apr 2023 12:05:51 +0900
+From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+To:     Akinobu Mita <akinobu.mita@gmail.com>
+Cc:     chaitanyak@nvidia.com, akpm@linux-foundation.org, axboe@kernel.dk,
+        hch@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH blktests] don't require modular null_blk for
+ fault-injection
+Message-ID: <c57uedevavvjwlcvgxfv453dfiy4cgq4f23dscu5dy77sujgw2@pb6fyyfov5se>
+References: <7c00f4f8-5bdf-4fa6-d9f0-141cf88c9ec9@nvidia.com>
+ <20230329162145.147395-1-akinobu.mita@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+1E3rLLu2ZzBHp30gwXBWzkCvOA4KD7PS70mLuGE8tYFpNEmA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+In-Reply-To: <20230329162145.147395-1-akinobu.mita@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 12, 2023 at 04:18:16AM +0530, Kanchan Joshi wrote:
-> > > 4. Direct NVMe queues - will there be interest in having io_uring
-> > > managed NVMe queues?  Sort of a new ring, for which I/O is destaged from
-> > > io_uring SQE to NVMe SQE without having to go through intermediate
-> > > constructs (i.e., bio/request). Hopefully,that can further amp up the
-> > > efficiency of IO.
-> >
-> > This is interesting, and I've pondered something like that before too. I
-> > think it's worth investigating and hacking up a prototype. I recently
-> > had one user of IOPOLL assume that setting up a ring with IOPOLL would
-> > automatically create a polled queue on the driver side and that is what
-> > would be used for IO. And while that's not how it currently works, it
-> > definitely does make sense and we could make some things faster like
-> > that. It would also potentially easier enable cancelation referenced in
-> > #1 above, if it's restricted to the queue(s) that the ring "owns".
+Akinobu, thanks for the patch, and sorry for this slow response.
+
+On Mar 30, 2023 / 01:21, Akinobu Mita wrote:
+> I'm trying to allow configuration of null_blk fault-injection via configfs.
 > 
-> So I am looking at prototyping it, exclusively for the polled-io case.
-> And for that, is there already a way to ensure that there are no
-> concurrent submissions to this ring (set with IORING_SETUP_IOPOLL
-> flag)?
-> That will be the case generally (and submissions happen under
-> uring_lock mutex), but submission may still get punted to io-wq
-> worker(s) which do not take that mutex.
-> So the original task and worker may get into doing concurrent submissions.
+> This blktests change changes null_blk fault-injection settings to be
+> configured via configfs instead of module parameters.
+> This allows null_blk fault-injection tests to run even if the null_blk is
+> built-in the kernel and not built as a module.
 
-It seems one defect for uring command support, since io_ring_ctx and
-io_ring_submit_lock() can't be exported for driver.
+It's good that the three test case can run with built-in null_blk.
 
-It could be triggered if the request is in one link chain too.
+> 
+> However, to keep the scripts simple, we will skip testing if the null_blk
+> does not yet support configuring fault-injection via configfs.
 
-Probably the issue may be workaround by:
+Hmm, it means that blktests coverage will be lost on older kernels without the
+configfs support. Before this change, the test cases were not skipped on older
+kernel with loadable null_blk. After this patch, the test cases will be skipped.
 
-	if (issue_flags & IO_URING_F_UNLOCKED)
-		io_uring_cmd_complete_in_task(task_work_cb);
+Can we cover both the new and old ways? When the null_blk set up with configfs
+fails, we can fallback to the old way with module parameters.
 
+For example, null_blk set up of block/014 can be like this:
 
-Thanks,
-Ming
+	# Here, we fail 50% of I/Os.
+	if ! _configure_null_blk faultb0 timeout_inject/probability=50 \
+	     timeout_inject/times=-1 timeout_inject/verbose=0 power=1 \
+	     > /dev/null 2>&1; then
+		rmdir /sys/kernel/config/nullb/faultb0
+		if [[ -d /sys/kernel/config/nullb/faultb0/timeout_inject ]]; then
+			echo "Configuring null_blk failed"
+			return 1
+		elif _module_file_exists null_blk; then
+			# Fall back to set up with module parameter. The format
+			# is "<interval>,<probability>,<space>,<times>"
+			if ! _init_null_blk timeout='1,50,0,-1'; then
+				echo "Configuring null_blk failed"
+				return 1;
+			fi
+		else
+			SKIP_REASONS+=("requires fault injection via configfs or modular null_blk")
+			return 1
+		fi
+	fi
 
