@@ -2,135 +2,178 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC60CC77B6E
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 10:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB78BC77B72
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 10:57:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229532AbjDLKyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 06:54:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52102 "EHLO
+        id S229536AbjDLK5s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 06:57:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbjDLKyC (ORCPT
+        with ESMTP id S229580AbjDLK5r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 06:54:02 -0400
-X-Greylist: delayed 595 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Apr 2023 03:54:00 PDT
-Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E106A68;
-        Wed, 12 Apr 2023 03:54:00 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id 5E49F410B4;
-        Wed, 12 Apr 2023 06:44:03 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1681296243;
-        bh=TPNFqwLjRJ0dSpelUvGaISC1WZt9udnm/M5g6U8mfho=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=Jpb8mQX0tWPhAyC1eUZUt5p5BKcZObgs+b8rksCcYb9kgV/bhPACDz2ybdMU7fHbD
-         rKc02SQyUElrSx/P2moawjLbDIcR1lPCQnl1bRJ/AM0Er82gEZn+MOIdvX6hYuHbfO
-         TMaGu2Zj6hm1txK79Hfzij6tu7JDOIDSD9WthyTLuukW+fSoPSeePCYvZTyoNxrJQg
-         BlIWPLhcW06CmqJPl+ZDTtX+U+HRwgQmVXsuYaqYIlz/ERk1uvYNktDW8zPHYlJH7c
-         Wt72/OL8nsYim8iO4HeXtbcqqnz5lO2aG04x6BllElCSXLxUc88kqekrJZckD6hOah
-         OEnLHTcj0Vryg==
-Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
- (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Wed, 12 Apr
- 2023 12:43:56 +0200
-Message-ID: <50d131e3-7528-2064-fbe6-65482db46ae4@veeam.com>
-Date:   Wed, 12 Apr 2023 12:43:40 +0200
+        Wed, 12 Apr 2023 06:57:47 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871A26A69
+        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 03:57:44 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id j8so9469736pjy.4
+        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 03:57:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1681297064; x=1683889064;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CcYYNtaDxHlH75DVzktS520/qEGVSpcAU/4xvgOpO10=;
+        b=i7rneX3b+KZfC/JY42g2UXg/jZCIZugN68wJy4Z1KJD193cGw8Hvs83yWHdvOw/+UL
+         aG/7ZWotaY8dLOMOpf4a0a686XIq39aTHAcIHh/CvI3HFIdbAyhOn4xStHo4rWx6Ggvi
+         vK6C/I8B5vgGMw3Srm4uHGrhYlUjPiG8Pu6IV6iFjHT3wsHHnNiNlXkSGus7uNW0HoyM
+         ZG+cxWGWtAbKYuYEACTajY+7NMa97FLZFNImMvXsGAi6DRdiD2F1VDBCRy9Vt8YZCVtc
+         mUik5AMV9ASbCmU8NuTKGrfP7mhSeQZC3OTuCvQ8s3Kf2iXdAVN49BBRoNCmYRvgDaB/
+         T2zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1681297064; x=1683889064;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CcYYNtaDxHlH75DVzktS520/qEGVSpcAU/4xvgOpO10=;
+        b=NCH64131dDadGyyEIu/Wp64VV2W8dLukYb+1V09Z7B+fMT22/dQOFMdy2I1FHs81Bc
+         GjryCWon1eRx2tDMiHhcoD5JAxNl1c/Wbq3/PkEIy3AvO6rnMJBj22oW63lQweM490A3
+         IcBYWl3aelgCMliMBeCGvzhlGaSXS3ZPCwsXo0s7ubV2wSNC1IebmT4dSzit+AfzRq1A
+         lVnG3mBypxPP4KA1ThCq6wESc730t1lkykJjDe5pbD5eTn7yjXGXqFtX5yKKoZOf+QxQ
+         67xz97/KgoG2GxN01pm3g1i/nLNznesHETS6XdNLZo/kRUNgyAQAdxVgvoEe11e4raRj
+         4aLQ==
+X-Gm-Message-State: AAQBX9ePK2FD42sRpqDcBbMdhcU0VQNi8i/oHYZUtuLJ2sv6EiXqPyDy
+        V5j1clheQAkj4q9Fz+Yudg6r4w==
+X-Google-Smtp-Source: AKy350b6VhmArfjtfG5hPTUB1cljJ9QaEx7TyP53/04DDnKkbVZXFIF0jKcWKxQnKxuBsS2tM1Ls6A==
+X-Received: by 2002:a17:902:fa05:b0:1a6:3af1:9c3a with SMTP id la5-20020a170902fa0500b001a63af19c3amr9987792plb.22.1681297063711;
+        Wed, 12 Apr 2023 03:57:43 -0700 (PDT)
+Received: from localhost.localdomain ([124.123.191.81])
+        by smtp.gmail.com with ESMTPSA id p10-20020a1709026b8a00b001a6467cfbeasm4942246plk.53.2023.04.12.03.57.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Apr 2023 03:57:43 -0700 (PDT)
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+To:     michael.christie@oracle.com
+Cc:     axboe@kernel.dk, bvanassche@acm.org, chaitanyak@nvidia.com,
+        dm-devel@redhat.com, hch@lst.de,
+        james.bottomley@hansenpartnership.com, kbusch@kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
+        snitzer@kernel.org, target-devel@vger.kernel.org,
+        linux-mm@kvack.org, akpm@linux-foundation.org,
+        kirill.shutemov@linux.intel.com, willy@infradead.org,
+        mkoutny@suse.com, roman.gushchin@linux.dev, ryan.roberts@arm.com,
+        shy828301@gmail.com, yuzhao@google.com, zokeefe@google.com,
+        lkft-triage@lists.linaro.org
+Subject: [PATCH v6 00/18] Use block pr_ops in LIO
+Date:   Wed, 12 Apr 2023 16:27:34 +0530
+Message-Id: <20230412105734.293024-1-naresh.kamboju@linaro.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230407200551.12660-1-michael.christie@oracle.com>
+References: <20230407200551.12660-1-michael.christie@oracle.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>,
-        Donald Buczek <buczek@molgen.mpg.de>
-CC:     <axboe@kernel.dk>, <corbet@lwn.net>, <snitzer@kernel.org>,
-        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <willy@infradead.org>, <kch@nvidia.com>,
-        <martin.petersen@oracle.com>, <vkoul@kernel.org>,
-        <ming.lei@redhat.com>, <gregkh@linuxfoundation.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
- <20230404140835.25166-3-sergei.shtepa@veeam.com>
- <793db44e-9e6d-d118-3f88-cdbffc9ad018@molgen.mpg.de>
- <ZDT9PjLeQgjVA16P@infradead.org>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <ZDT9PjLeQgjVA16P@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: colmbx01.amust.local (172.31.112.31) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2924031554647062
-X-Veeam-MMEX: True
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+[sorry for the adding you in CC]
+
+While running LTP controllers test suite on this patch set applied on top of
+the next-20230406 and the following kernel panic noticed on qemu-x86_64.
 
 
-On 4/11/23 08:25, Christoph Hellwig wrote:
-> Subject:
-> Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
-> From:
-> Christoph Hellwig <hch@infradead.org>
-> Date:
-> 4/11/23, 08:25
-> 
-> To:
-> Donald Buczek <buczek@molgen.mpg.de>
-> CC:
-> Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-> 
-> 
-> On Sat, Apr 08, 2023 at 05:30:19PM +0200, Donald Buczek wrote:
->> Maybe detach the old filter and attach the new one instead? An atomic replace might be usefull and it wouldn't complicate the code to do that instead. If its the same filter, maybe just return success and don't go through ops->detach and ops->attach?
-> I don't think a replace makes any sense.  We might want multiple
-> filters eventually, but unless we have a good use case for even just
-> more than a single driver we can deal with that once needed.  The
-> interface is prepared to support multiple attached filters already.
-> 
+Lore link: https://lore.kernel.org/linux-block/20230407200551.12660-1-michael.christie@oracle.com/
 
 
-Thank you Donald for your comment. It got me thinking.
+cpuset_inherit 31 TPASS: mem_exclusive: Inherited information is right!
+cpuset_inherit 33 TPASS: mem_hardwall: Inherited information is right!
+<4>[ 1234.875309] int3: 0000 [#1] PREEMPT SMP PTI
+<4>[ 1234.875748] CPU: 1 PID: 32990 Comm: umount Not tainted 6.3.0-rc5-next-20230406 #1
+<4>[ 1234.875946] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+<4>[ 1234.876062] RIP: 0010:__alloc_pages+0xdf/0x310
+<4>[ 1234.876666] Code: 4c 89 45 b0 83 3d b8 1c cb 01 00 0f 85 a2 01 00 00 44 89 f0 c1 e8 03 83 e0 03 89 75 a0 89 45 c0 be 01 00 00 00 4c 89 45 98 0f <1f> 44 00 00 4d 89 c5 44 89 f0 44 89 75 a4 41 f7 c6 00 04 00 00 74
+<4>[ 1234.876885] RSP: 0000:ffff8b9305f47c10 EFLAGS: 00000202
+<4>[ 1234.877418] RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+<4>[ 1234.877433] RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000140cca
+<4>[ 1234.877446] RBP: ffff8b9305f47c78 R08: 0000000000000000 R09: 0000000000000000
+<4>[ 1234.877460] R10: 0000000000100cca R11: 0000000000000000 R12: 0000000000000003
+<4>[ 1234.877472] R13: ffff88d28b753b00 R14: 0000000000140cca R15: ffff88d2ffffb300
+<4>[ 1234.877518] FS:  0000000000000000(0000) GS:ffff88d2fbd00000(0000) knlGS:0000000000000000
+<4>[ 1234.877547] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[ 1234.877568] CR2: 0000000000408ee0 CR3: 0000000111432000 CR4: 00000000000006e0
+<4>[ 1234.877662] Call Trace:
+<4>[ 1234.877828]  <TASK>
+<4>[ 1234.877954]  __folio_alloc+0x1e/0x50
+<4>[ 1234.878051]  vma_alloc_folio+0x4af/0x520
+<4>[ 1234.878066]  ? _raw_spin_unlock+0x1a/0x40
+<4>[ 1234.878079]  ? do_wp_page+0x164/0xdd0
+<4>[ 1234.878093]  ? trace_preempt_on+0x1e/0x80
+<4>[ 1234.878105]  ? preempt_count_sub+0x63/0x80
+<4>[ 1234.878118]  do_wp_page+0x3cb/0xdd0
+<4>[ 1234.878129]  ? handle_mm_fault+0x739/0x19e0
+<4>[ 1234.878142]  ? _raw_spin_lock+0x23/0x50
+<4>[ 1234.878159]  handle_mm_fault+0x770/0x19e0
+<4>[ 1234.878170]  ? up_write+0x52/0xe0
+<4>[ 1234.878196]  do_user_addr_fault+0x4d4/0x6c0
+<4>[ 1234.878210]  ? trace_hardirqs_off_finish+0x38/0x90
+<4>[ 1234.878222]  exc_page_fault+0x80/0x1d0
+<4>[ 1234.878234]  asm_exc_page_fault+0x2b/0x30
+<4>[ 1234.878291] RIP: 0033:0x7f3f910e65f6
+<4>[ 1234.878542] Code: 2f 0a 00 00 e8 5b 23 ff ff 48 89 85 60 fd ff ff 48 8b 85 88 fd ff ff 48 8b 80 e8 00 00 00 48 85 c0 74 0b 48 8b 9d 68 fd ff ff <48> 89 58 08 48 8b 85 68 fd ff ff c7 40 18 01 00 00 00 e8 43 2b fe
+<4>[ 1234.878552] RSP: 002b:00007fff6f8dce50 EFLAGS: 00000206
+<4>[ 1234.878563] RAX: 0000000000408ed8 RBX: 00007f3f910fe0d8 RCX: 00007f3f910c6270
+<4>[ 1234.878569] RDX: 0000000000000000 RSI: 00007f3f910fe2a0 RDI: 00007fff6f8dcf10
+<4>[ 1234.878575] RBP: 00007fff6f8dd110 R08: 0000000000000000 R09: 0000000000000007
+<4>[ 1234.878581] R10: 0000000000000000 R11: 0000000000000008 R12: 0000000000000000
+<4>[ 1234.878585] R13: 00007f3f910fe2a0 R14: 00007fff6f8dced0 R15: 0000000000000000
+<4>[ 1234.878636]  </TASK>
+<4>[ 1234.878693] Modules linked in:
+<4>[ 1234.894886] ---[ end trace 0000000000000000 ]---
+<4>[ 1234.895879] RIP: 0010:__alloc_pages+0xdf/0x310
+<4>[ 1234.895921] Code: 4c 89 45 b0 83 3d b8 1c cb 01 00 0f 85 a2 01 00 00 44 89 f0 c1 e8 03 83 e0 03 89 75 a0 89 45 c0 be 01 00 00 00 4c 89 45 98 0f <1f> 44 00 00 4d 89 c5 44 89 f0 44 89 75 a4 41 f7 c6 00 04 00 00 74
+<4>[ 1234.895936] RSP: 0000:ffff8b9305f47c10 EFLAGS: 00000202
+<4>[ 1234.895956] RAX: 0000000000000001 RBX: 0000000000000000 RCX: 0000000000000000
+<4>[ 1234.895966] RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000140cca
+<4>[ 1234.895977] RBP: ffff8b9305f47c78 R08: 0000000000000000 R09: 0000000000000000
+<4>[ 1234.895985] R10: 0000000000100cca R11: 0000000000000000 R12: 0000000000000003
+<4>[ 1234.895993] R13: ffff88d28b753b00 R14: 0000000000140cca R15: ffff88d2ffffb300
+<4>[ 1234.896003] FS:  0000000000000000(0000) GS:ffff88d2fbd00000(0000) knlGS:0000000000000000
+<4>[ 1234.896016] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[ 1234.896026] CR2: 0000000000408ee0 CR3: 0000000111432000 CR4: 00000000000006e0
+<0>[ 1234.896379] Kernel panic - not syncing: Fatal exception in interrupt
+<0>[ 1234.900046] Kernel Offset: 0x8800000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
 
-Despite the fact that only one filter is currently offered for the kernel,
-I think that out-of-tree filters of block devices may appear very soon.
-It would be good to think about it in advance.
-And, I agree with Christophe, we would not like to redo the blk-filter interface
-when new filters appear in the tree.
+Links:
+https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/build/lore_kernel_org_linux-block_20230407200551_12660-1-michael_christie_oracle_com/testrun/16172098/suite/log-parser-test/test/check-kernel-panic/log
+https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/build/lore_kernel_org_linux-block_20230407200551_12660-1-michael_christie_oracle_com/testrun/16172061/suite/log-parser-test/test/check-kernel-panic/log
 
-We can consider a block device as a resource that two actor want to take over.
-There are two possible behavioral strategies:
-1. If one owner occupies a resource, then for other actors, the ownership
-request will end with a refusal. The owner will not lose his resource.
-2. Any actor can take away a resource from the owner and inform him about its
-loss using a callback.
+https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/build/lore_kernel_org_linux-block_20230407200551_12660-1-michael_christie_oracle_com/testrun/16172098/suite/log-parser-test/tests/
+https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/build/lore_kernel_org_linux-block_20230407200551_12660-1-michael_christie_oracle_com/testrun/16172061/suite/log-parser-test/tests/
 
-I think the first strategy is safer. When calling ioctl BLKFILTER_ATTACH, the
-kernel informs the actor that the resource is busy.
-Of course, there is still an option to grab someone else's occupied resource.
-To do this, he will have to call ioctl BLKFILTER_DETACH, specifying the name
-of the filter that needs to be detached. It is assumed that such detached
-should be performed by the same actor that attached it there.
 
-If we replace the owner at each ioctl BLKFILTER_ATTACH, then we can get a
-situation of competition between two actors. At the same time, they won't
-even get a message that something is going wrong.
+Steps to reproduce:
+-------------------
 
-An example from life. The user compares different backup tools. Install one,
-then another. Each uses its own filter (And why not? this is technically
-possible).
-With the first strategy, the second tool will make it clear to the user that
-it cannot work, since the resource is already occupied by another.
-The user will have to experiment first with one tool, uninstall it, and then
-experiment with another.
-With the second strategy, both tools will unload each other's filters. In the
-best case, this will lead to disruption of their work. At a minimum, blksnap,
-when detached, will reset the change tracker and each backup will perform a
-full read of the block device. As a result, the user will receive distorted
-data, the system will not work as planned, although there will be no error
-message.
+# To install tuxrun on your system globally:
+# sudo pip3 install -U tuxrun==0.41.0
+#
+# See https://tuxrun.org/ for complete documentation.
+
+tuxrun   \
+ --runtime podman   \
+ --device qemu-x86_64   \
+ --kernel https://storage.tuxsuite.com/public/linaro/anders/builds/2OGpdVeBBG4Gj6aACnSdSGva2LN/bzImage   \
+ --modules https://storage.tuxsuite.com/public/linaro/anders/builds/2OGpdVeBBG4Gj6aACnSdSGva2LN/modules.tar.xz   \
+ --rootfs https://storage.tuxsuite.com/public/linaro/lkft/oebuilds/2OFRZUnV2Q9jOFdE3gH3Gq2v692/images/intel-corei7-64/lkft-tux-image-intel-corei7-64-20230410193144.rootfs.ext4.gz   \
+ --parameters SKIPFILE=skipfile-lkft.yaml   \
+ --parameters SHARD_NUMBER=10   \
+ --parameters SHARD_INDEX=10   \
+ --image docker.io/lavasoftware/lava-dispatcher:2023.01.0020.gc1598238f   \
+ --tests ltp-controllers   \
+ --timeouts boot=15 ltp-controllers=80
+
+
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
