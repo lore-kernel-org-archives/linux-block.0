@@ -2,76 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FCF7C77B6E
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 09:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C96C77B71
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 10:18:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230099AbjDLJnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 05:43:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58978 "EHLO
+        id S230330AbjDLKSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 06:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbjDLJnV (ORCPT
+        with ESMTP id S229508AbjDLKSb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 05:43:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40854A2
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 02:43:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 12 Apr 2023 06:18:31 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0C4E30FF;
+        Wed, 12 Apr 2023 03:18:30 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CDB4561058
-        for <linux-block@vger.kernel.org>; Wed, 12 Apr 2023 09:43:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC757C4339B;
-        Wed, 12 Apr 2023 09:43:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681292598;
-        bh=cQYy5EIASxhVv4ZtqNdpgM7yrx4hR1zsGS/O2nBk23g=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=bmsbkzpDwuGA7r/QZ+cpt2Dk7OU2BNYt7z083JPEqsINwlmIpKDNxS6mBP1mfYMTI
-         5Y1FghndOcNNgaeOv8eWZtmeiPyx7rGDjV9nM1HgIpjSaOwrJOJ1KwIQ6zjT6ixZcf
-         cVdO0it+dZH0C0/Kd6pPpkgFO7dRbAzPWHHT2WYLcjyLqpvrqtyurQQwnYYQ8SAD+g
-         mZCwyuOZFSJFRD0c6PMtGsFfXa9HT00WttabSb0heddNVY0zundkhuo9tU8VwBmtbp
-         IwUiJfY2Hk4LpKtZo6T0h8D17IVsTDmUcS49ybdVXYIrNGMEkQCnOWsYPh5hORChJy
-         AUbvfkmW0CstQ==
-Message-ID: <8e239f96-8578-c40c-f6b1-b62cff102eb0@kernel.org>
-Date:   Wed, 12 Apr 2023 18:43:15 +0900
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5E3541F6E6;
+        Wed, 12 Apr 2023 10:18:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1681294709; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1jO49i5gScCoN4EohEbYxBmHDQejCs3zeE3mWhaPo2E=;
+        b=JwdCwmezTFhgu3Nqrw3CuY7MyRRtLJom+0BAtAr9yKwHmtpii+93jpQgcZcGV0aqM/aMgP
+        iJXt3STNEfz9Edbn8Ursi9Zd42xpuziVsjGsuxrwuvbGOyKKybk1gMM4THXER+wXnrkrw+
+        e0NfNGGMpvRpM5E6PKGGzch776QFTBQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1681294709;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1jO49i5gScCoN4EohEbYxBmHDQejCs3zeE3mWhaPo2E=;
+        b=4gWzLfQxiYYx/4k40P81GmshV1aP9VQvMLGhFTitbwirp7RoA9OLqZeEKlgE+w+rPiL+c6
+        oxa6BU1MCV0bvACg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 51386132C7;
+        Wed, 12 Apr 2023 10:18:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id MyJpE3WFNmRPFQAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 12 Apr 2023 10:18:29 +0000
+Message-ID: <6ca617db-5370-7f06-8b4e-c9e10f2fa567@suse.de>
+Date:   Wed, 12 Apr 2023 12:18:29 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH] null_blk: fix queue mode Oops for membacked
+ Thunderbird/102.8.0
 Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        johannes.thumshirn@wdc.com, bvanassche@acm.org,
-        vincent.fu@samsung.com, shinichiro.kawasaki@wdc.com,
-        error27@gmail.com
-References: <20230412040827.8082-1-kch@nvidia.com>
- <CGME20230412091807epcas5p10b99767a999ded5789cb8ffce2189394@epcas5p1.samsung.com>
- <20230412091716.unhpznj4gzjjfehj@green5>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230412091716.unhpznj4gzjjfehj@green5>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Hannes Reinecke <hare@suse.de>
+Subject: [LSF/MM/BPF TOPIC] Sunsetting buffer_heads
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/12/23 18:17, Nitesh Shetty wrote:
-> On 23/04/11 09:08PM, Chaitanya Kulkarni wrote:
->> Make sure to check device queue mode in the null_validate_conf()
->> and return error for NULL_Q_RQ as we don't allow legacy I/O path,
-> 
-> Can't we do away with NULL_Q_RQ defination itself ?
-> I mean, since I see in code we are not using NULL_Q_RQ anywhere,
-> if we can remove NULL_Q_RQ defination from enum in null_blk.h,
-> we can remove your suggested check, as well as check in null_init.
+Ceterum censeo ...
 
-I think it is being kept around to avoid reusing this value to not confuse old
-scripts.
+Having looked at implementing large blocksizes I constantly get bogged 
+down by buffer_heads and being as they are intricately linked into 
+filesystems and mm.
 
-> 
-> --Nitesh Shetty
-> 
-> 
+And also everyone seems to have agreed to phase out buffer_heads eventually.
 
+So maybe it's time to start discussing exactly _how_ this could be done.
+And LSF/MM seems to be the idea location for it.
+
+So far I've came across the following issues:
+
+- reading superblocks / bread(): maybe convert to ->read_folio() ?
+- bh_lru and friends (maybe pointless once bread() has been converted)
+- How to handle legacy filesystems still running on buffer_heads
+
+I'm sure this is an incomplete list, and I'm equally sure that several
+people have their own ideas what should or need to be done.
+
+So this BOF will be about collecting these ideas and coming up with a 
+design how we can deprecated buffer_heads.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Frankenstr. 146, 90461 Nürnberg
+Managing Directors: I. Totev, A. Myers, A. McDonald, M. B. Moerman
+(HRB 36809, AG Nürnberg)
