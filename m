@@ -2,70 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E860EC7619A
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 12:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59755C77B6E
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 13:17:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230334AbjDLMkj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 08:40:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55476 "EHLO
+        id S229978AbjDLNRk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 09:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231625AbjDLMki (ORCPT
+        with ESMTP id S230397AbjDLNRa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 08:40:38 -0400
-Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9EE17EC6;
-        Wed, 12 Apr 2023 05:40:10 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id 6DA9D406BD;
-        Wed, 12 Apr 2023 08:39:53 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx2-2022; t=1681303193;
-        bh=ZsREK7Jdmk5/bS3HMVbcUFFY2ynvc5y6DHn+evYJiIo=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=SF1B2Nsiq0/ZYmAlZBDyu/yXVj4ytwYuY9AoNhXvBgiaH8IE40FJ4JlV48QH9GdDv
-         pUjp74EqI4D+JZ0wS4FEdluiM7kmxAE4QJk6ZhqpzlyPh/bP8zC7r+0aSNLtEXSd+o
-         x4B/tQxvhhSUPdD0O8zmgyBc4FOBTwEqzyurcj+uW9Dx2aRLX0Tu/BRAa17m3gXvc/
-         J94mZl/i0GdKZxPlxoevDUQWnSmNkOGTlTziVuVI6YJW8h4eYq+DdfFWYbB5ZnmhdG
-         E2Er8Q6vWJmYxHdn8ePQrmQwtUzesurwtRqsWW1oXZ1Eev70c7Bs23amGor+1ACAqp
-         LDmrV+4zVNOAg==
-Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
- (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Wed, 12 Apr
- 2023 14:39:50 +0200
-Message-ID: <62b90944-724d-093a-2e83-c7665d5dbd54@veeam.com>
-Date:   Wed, 12 Apr 2023 14:39:45 +0200
+        Wed, 12 Apr 2023 09:17:30 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABEF7D93;
+        Wed, 12 Apr 2023 06:17:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=4VlHv/eebtSZNw6qu18EWYsd77UMuH83TrbZ82hi3l0=; b=wJABmqoHBB/1fbJ+CFk75TYDpj
+        A2zXjfrZgJ++GI4OYOnjfDTS+OSmfq1uj9xYjZaSTVcKK0r6fSRhzj/WQ3bE/ET6bWUPDh+g39VMt
+        KTElskCTjuo/Kvu27Qyyh6dxJvpvbPJPJmYNLjBowGg3WlAwxMdFG7YxSUcWGsAay1c9nqm1Vxn98
+        N8YZqBRqYRrVR/AcQx/wP8sRKwxULN94IM7yOiU2koGBo8LKIpqaTLBGZlXZF1RoOU7kLBFF7Rs7w
+        gHWu7CB35+j4NH//ricdi3SsKdWQBcURwfXDHNkF1A1UmW9o6mnbzs+nW1c7uyEcHDE9TS0tou5+E
+        9GfhWBjQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pmaKv-006tS5-Kq; Wed, 12 Apr 2023 13:16:33 +0000
+Date:   Wed, 12 Apr 2023 14:16:33 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [LSF/MM/BPF TOPIC] Sunsetting buffer_heads
+Message-ID: <ZDavMfPMwEeWa4uQ@casper.infradead.org>
+References: <6ca617db-5370-7f06-8b4e-c9e10f2fa567@suse.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v3 01/11] documentation: Block Device Filtering Mechanism
-Content-Language: en-US
-To:     Bagas Sanjaya <bagasdotme@gmail.com>, <axboe@kernel.dk>,
-        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
-CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <willy@infradead.org>, <kch@nvidia.com>,
-        <martin.petersen@oracle.com>, <vkoul@kernel.org>,
-        <ming.lei@redhat.com>, <gregkh@linuxfoundation.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
- <20230404140835.25166-2-sergei.shtepa@veeam.com> <ZDOY4tWY9wjPDb/c@debian.me>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <ZDOY4tWY9wjPDb/c@debian.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2924031554647062
-X-Veeam-MMEX: True
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ca617db-5370-7f06-8b4e-c9e10f2fa567@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks, Bagas!
+On Wed, Apr 12, 2023 at 12:18:29PM +0200, Hannes Reinecke wrote:
+> Ceterum censeo ...
+> 
+> Having looked at implementing large blocksizes I constantly get bogged down
+> by buffer_heads and being as they are intricately linked into filesystems
+> and mm.
+> 
+> And also everyone seems to have agreed to phase out buffer_heads eventually.
+> 
+> So maybe it's time to start discussing exactly _how_ this could be done.
+> And LSF/MM seems to be the idea location for it.
+> 
+> So far I've came across the following issues:
+> 
+> - reading superblocks / bread(): maybe convert to ->read_folio() ?
+> - bh_lru and friends (maybe pointless once bread() has been converted)
+> - How to handle legacy filesystems still running on buffer_heads
+> 
+> I'm sure this is an incomplete list, and I'm equally sure that several
+> people have their own ideas what should or need to be done.
+> 
+> So this BOF will be about collecting these ideas and coming up with a design
+> how we can deprecated buffer_heads.
 
-I have made changes in my repository.
-Link: https://github.com/SergeiShtepa/linux/commit/d3309add0f355ef09483238868636c5db1258135
+Might be worth reviewing this thread:
+
+https://lore.kernel.org/linux-fsdevel/20230129044645.3cb2ayyxwxvxzhah@garbanzo/
