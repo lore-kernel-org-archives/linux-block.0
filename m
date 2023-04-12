@@ -2,116 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68657C77B6F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Apr 2023 23:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FEDC7619A
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 00:59:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjDKX3K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Apr 2023 19:29:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34438 "EHLO
+        id S229609AbjDLA7g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Apr 2023 20:59:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbjDKX3J (ORCPT
+        with ESMTP id S229611AbjDLA7f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Apr 2023 19:29:09 -0400
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAF8230EB;
-        Tue, 11 Apr 2023 16:29:07 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id l10-20020a05600c1d0a00b003f04bd3691eso16145467wms.5;
-        Tue, 11 Apr 2023 16:29:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681255746; x=1683847746;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M0CkMqYq+hUDaj5V0hhmDO1UTL5tLPTAw4HpqPGo/CI=;
-        b=J3LVgwoNptw8bLlvE41uEG2j9TStrqHfFmkNM6ZeN/M4Nm7cEKyqL4PoocH7sjia4K
-         pmJCOY0Fcah03z3qiU5733K/51RLO11+fXGsh6oThEdOkujyg1PJLP/Z1V/HMzVmYgMG
-         yHH3baF+ux6fjywMOlkIFwK9Dd3mFTOHXXurmP+fyqJ/09BKbnqsweeDE5YPrjHccoOH
-         OtJHdtkNvpGsCbm+hsQ0kA08LIDZ1iVVUiRg0cOtyl+7X29/1W2AF2RsWvo3Ba0ifrLW
-         uN5naQd1ruuU6z5zDFdPdgGNWjJbvD0mTR5ol480+J+obbxotva53tnV7wMjs7q4wlfe
-         rUdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681255746; x=1683847746;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M0CkMqYq+hUDaj5V0hhmDO1UTL5tLPTAw4HpqPGo/CI=;
-        b=vckO7eghj9ZMRFPZoA2YWmKzc3XONvuWo07szSFXz3rJtq9L5LUGMiix1p/P8D70hA
-         ILUt22ZjC8wUK8OcblYVU6+aVxtzlyFtn0Bclj/XPcb1Aa9GPTEiItdm6AbOY9GzD3K4
-         T7W03k0c0jmv1aK+H8fDiwBvG74NlJMfSHNOV7gXi/qo/vdOWXQti8/7rZBBFHSDFwe3
-         3EQIv9lGC7Skr0+X5dKlimHIUWAdvoGysith0+3ontePWlincPeGwcfus5eE5QSAAMGV
-         GQzlJctrar9EbsUi4Hf/IGcCKODm3ziMkeVENm0edaZi6ATSK3ccfT2CFqBlu+ZR1TrU
-         7AZQ==
-X-Gm-Message-State: AAQBX9c1V7K8baG3NnMf4cho2tD8L2EK7y0O8U5xdNBYSFhTi4iBVpHP
-        tlfk5PHlssi9qWPTGOQ5L8L3Hs0eaH0Gk+BHTw8=
-X-Google-Smtp-Source: AKy350a1/csCz3HEkVzqo/HDghWSl2B+ymjb4pAz7T2EVD2DK+b9INtbNQYEaj+mLr1tmIiLdpbp4f4mFehjNbzhVfw=
-X-Received: by 2002:a05:600c:3797:b0:3ef:66ec:1e73 with SMTP id
- o23-20020a05600c379700b003ef66ec1e73mr2652309wmr.6.1681255745960; Tue, 11 Apr
- 2023 16:29:05 -0700 (PDT)
+        Tue, 11 Apr 2023 20:59:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF6F73C0D;
+        Tue, 11 Apr 2023 17:59:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A10E62883;
+        Wed, 12 Apr 2023 00:59:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44FFEC433D2;
+        Wed, 12 Apr 2023 00:59:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681261173;
+        bh=21X7G3ujtwPj1BsO2o9DbkG+h4dix6yYEdsKo2U3vak=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=C5c1EjPJnpgMVWPGANVK6LJh/SL1io4hnzRhHLLmUjrXZXwkekJjHomj3ri2hTqsr
+         4/xsjNCwRbY7ET0jWgMQr5IBbCwIq7rsLwMVBn8Y5IBrqj+ZwaPw/1UAbjr7QrwGNv
+         Exbkz+R3AadRZsqQ8gURY7+2fb3ZhpW8gnOFgo7vJh3tOCeSfalCQ5YAuwHFs1oUIk
+         M3BRA2CIEY4KxuHlG8RSrOaPx+arav7SArZ6AS7XUvIvtmLktHpiHAaeBplAhES3eu
+         ZiljESdElPUnMtOuUyVPvtrTXMm5TQL4mHkhsiRgB2qVSmMyS5syPtu0mqpcKB0yNd
+         qjFuwKM6WumJQ==
+Message-ID: <85d6ea79-eda1-de58-6ce4-1fab90335ac8@kernel.org>
+Date:   Wed, 12 Apr 2023 09:59:30 +0900
 MIME-Version: 1.0
-References: <CGME20230210180226epcas5p1bd2e1150de067f8af61de2bbf571594d@epcas5p1.samsung.com>
- <20230210180033.321377-1-joshi.k@samsung.com> <39a543d7-658c-0309-7a68-f07ffe850d0e@kernel.dk>
- <CA+1E3rLLu2ZzBHp30gwXBWzkCvOA4KD7PS70mLuGE8tYFpNEmA@mail.gmail.com> <09a546bd-ec30-f2db-f63f-b7708e6d63a1@kernel.dk>
-In-Reply-To: <09a546bd-ec30-f2db-f63f-b7708e6d63a1@kernel.dk>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Wed, 12 Apr 2023 04:58:41 +0530
-Message-ID: <CA+1E3rKrXOOBEaRb4pfE29wmhRP-fcUcSwQ4gobKGRxMGyS8jg@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF Topic] Non-block IO
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, io-uring@vger.kernel.org,
-        hch@lst.de, kbusch@kernel.org, ming.lei@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v6 09/19] scsi: allow enabling and disabling command
+ duration limits
+To:     Niklas Cassel <nks@flawful.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>, linux-scsi@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-block@vger.kernel.org
+References: <20230406113252.41211-1-nks@flawful.org>
+ <20230406113252.41211-10-nks@flawful.org> <20230411061648.GD18719@lst.de>
+ <e9cf65ce-e1f0-4d99-31e7-75b8e88e2a89@kernel.org>
+ <20230411072317.GA22683@lst.de>
+ <15ad7cf9-e385-9cea-964a-4a2eac35385c@kernel.org>
+ <ZDVLsIi/OhkxNcGb@x1-carbon>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ZDVLsIi/OhkxNcGb@x1-carbon>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 12, 2023 at 4:23=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 4/11/23 4:48=E2=80=AFPM, Kanchan Joshi wrote:
-> >>> 4. Direct NVMe queues - will there be interest in having io_uring
-> >>> managed NVMe queues?  Sort of a new ring, for which I/O is destaged f=
-rom
-> >>> io_uring SQE to NVMe SQE without having to go through intermediate
-> >>> constructs (i.e., bio/request). Hopefully,that can further amp up the
-> >>> efficiency of IO.
-> >>
-> >> This is interesting, and I've pondered something like that before too.=
- I
-> >> think it's worth investigating and hacking up a prototype. I recently
-> >> had one user of IOPOLL assume that setting up a ring with IOPOLL would
-> >> automatically create a polled queue on the driver side and that is wha=
-t
-> >> would be used for IO. And while that's not how it currently works, it
-> >> definitely does make sense and we could make some things faster like
-> >> that. It would also potentially easier enable cancelation referenced i=
-n
-> >> #1 above, if it's restricted to the queue(s) that the ring "owns".
-> >
-> > So I am looking at prototyping it, exclusively for the polled-io case.
-> > And for that, is there already a way to ensure that there are no
-> > concurrent submissions to this ring (set with IORING_SETUP_IOPOLL
-> > flag)?
-> > That will be the case generally (and submissions happen under
-> > uring_lock mutex), but submission may still get punted to io-wq
-> > worker(s) which do not take that mutex.
-> > So the original task and worker may get into doing concurrent submissio=
-ns.
->
-> io-wq may indeed get in your way. But I think for something like this,
-> you'd never want to punt to io-wq to begin with. If userspace is managing
-> the queue, then by definition you cannot run out of tags.
+On 4/11/23 20:59, Niklas Cassel wrote:
+> On Tue, Apr 11, 2023 at 04:38:48PM +0900, Damien Le Moal wrote:
+>> On 4/11/23 16:23, Christoph Hellwig wrote:
+>>> On Tue, Apr 11, 2023 at 04:09:34PM +0900, Damien Le Moal wrote:
+>>>> But yes, I guess we could just unconditionally enable CDL for ATA on device scan
+>>>> to be on par with scsi, which has CDL always enabled.
+>>>
+>>> I'd prefer that.  With a module option to not enable it just to be
+>>> safe.
+>>
+>> Then it may be better to move the cdl_enable attribute store definition for ATA
+>> devices to libata. That would be less messy that way. Let me see if that can be
+>> done cleanly.
+> 
+> I don't think that the SCSI mode select can just be replaced with simple
+> SET FEATURES in libata.
+> 
+> If we move the SET FEATURES call to a function in libata, and then use a
+> function pointer in the scsi_host_template, and let only libata set this
+> function pointer (similar to e.g. how the queue_depth sysfs attribute works),
+> then the code will no longer work for SATA devices connected to a SAS HBA.
+> 
+> 
+> 
+> The current code simply checks if VPD page89 (the ATA Information VPD
+> page - which is defined in the SCSI to ATA Translation (SAT) standard)
+> exists. This page (and thus the sdev->vpd_pg89 pointer) will only exist
+> if either:
+> 1) An ATA device is connected to a SATA controller. This page will then
+> be implemented by libata.
+> 2) An ATA device is connected to a SAS HBA. The SAS HB will then provide
+> this page. (The page will not exist for SCSI devices connected to the
+> same SAS HBA.)
+> 
+> For case 1) with the current code, scsi.c will call scsi_mode_select()
+> which will be translated by libata before being sent down to the device.
+> 
+> For case 2) with the current code, scsi.c will send down a SCSI mode
+> select to the SAS HBA, and the SAS HBA will be responsible for translating
+> the command before sending it to the device.
+> 
+> So I actually think that the current way to check if vpd page89 exists
+> is probably the "cleanest" solution that I can think of.
+> 
+> If you have a better suggestion that will work for both case 1) and
+> case 2), I will be happy to change the code accordingly.
 
-Unfortunately we have lifetime differences between io_uring and NVMe.
-NVMe tag remains valid/occupied until completion (we do not have a
-nice sq->head to look at and decide).
-For io_uring, it can be reused much earlier i.e. just after submission.
-So tag shortage is possible.
+Good point. If we move the code for cdl_enable to libata, then we will not be
+covering the SAS HBA cases.
 
->If there are
-> other conditions for this kind of request that may run into out-of-memory
-> conditions, then the error just needs to be returned.
+Christoph,
 
-I see, and IOSQE_ASYNC can also be flagged as an error/not-supported. Thank=
-s.
+I do not see a cleaner solution... Can we keep this patch as is ? Any other idea ?
+
