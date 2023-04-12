@@ -2,74 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A90C77B6E
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 22:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99776C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 23:36:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbjDLW3N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 18:29:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37384 "EHLO
+        id S229517AbjDLXgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 19:36:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjDLW3M (ORCPT
+        with ESMTP id S229484AbjDLXgL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 18:29:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E0A7D81;
-        Wed, 12 Apr 2023 15:29:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 54330638E0;
-        Wed, 12 Apr 2023 22:29:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27186C433EF;
-        Wed, 12 Apr 2023 22:29:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681338547;
-        bh=aECm2tZB/vDnVu4A3LP7xh5xQgQuB2VMr36U6ePH4R0=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=fMg/ody7gG6VpASyqfK8NQmVVPRTQyBVSL1eLzoRJXg+XJlUPGdoZLBXgcHIKvF7i
-         OV/0gSMNd/DwmCr3rZrWXwbj350kN1PjLrZ+Kx1QcFz1riysedu3mNjXZ3t/lEu4Sk
-         s9xIldozXjENU6Na5zPlA/pjyr/atl4uUcTR4XBFKVoWIwsstHNehtDDRVP/F5fP0A
-         s+BLtWlBjR0oRffQmzvx8WypJPq2rQNnI9MTSlHUuQT8LBcM7xTXa9/F51QbN5RPvr
-         b0J5DqK6JYmi4M/DcnUff409hq2hDMgf9WCiOp4CjPvwNS+kFw5pXUFNqXOiUbEGUL
-         Up5/2fU+VzooQ==
-Message-ID: <fe9fdfc9-5eff-ba29-5139-0aa44ddadc35@kernel.org>
-Date:   Thu, 13 Apr 2023 07:29:04 +0900
+        Wed, 12 Apr 2023 19:36:11 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 07DE419BE;
+        Wed, 12 Apr 2023 16:36:07 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1052)
+        id 7CD3D21779D8; Wed, 12 Apr 2023 16:36:06 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7CD3D21779D8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1681342566;
+        bh=YPXWa/7TYeGcUcrSe6JmCqFPK2vN2hRqkpxy8Lf9hp8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YuvgGUEjnvrbLnB0mThO0/tNDZ+pzM/L8mr1DVspNRj6O+y0N8B/6epPpbYWZWjbK
+         G1mzu0i9tJ7cZl4x+x8Od4BO0L1b9Enskrn3H6DdyL1bIL3S4RtVPsZ/KFIcIROYQZ
+         0JLI4PQ8S0LdHkBOtrPDOXTqszDAjnr9JhbX5NBs=
+Date:   Wed, 12 Apr 2023 16:36:06 -0700
+From:   Fan Wu <wufan@linux.microsoft.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
+        Deven Bowers <deven.desai@linux.microsoft.com>
+Subject: Re: [RFC PATCH v9 05/16] ipe: add userspace interface
+Message-ID: <20230412233606.GA16658@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
+ <1675119451-23180-6-git-send-email-wufan@linux.microsoft.com>
+ <CAHC9VhRa+NwKzLfQBmHfMgUp6_d5soQG7JBq-Vn=MUeUAt4tuQ@mail.gmail.com>
+ <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v6 00/19] Add Command Duration Limits support
-Content-Language: en-US
-To:     Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20230406113252.41211-1-nks@flawful.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230406113252.41211-1-nks@flawful.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/23 20:32, Niklas Cassel wrote:
-> From: Niklas Cassel <niklas.cassel@wdc.com>
+On Tue, Apr 11, 2023 at 05:45:41PM -0400, Paul Moore wrote:
+> On Mon, Apr 10, 2023 at 3:10???PM Fan Wu <wufan@linux.microsoft.com> wrote:
+> > On Thu, Mar 02, 2023 at 02:04:42PM -0500, Paul Moore wrote:
+> > > On Mon, Jan 30, 2023 at 5:58???PM Fan Wu <wufan@linux.microsoft.com> wrote:
+> > > >
+> > > > From: Deven Bowers <deven.desai@linux.microsoft.com>
+> > > >
+> > > > As is typical with LSMs, IPE uses securityfs as its interface with
+> > > > userspace. for a complete list of the interfaces and the respective
+> > > > inputs/outputs, please see the documentation under
+> > > > admin-guide/LSM/ipe.rst
+> > > >
+> > > > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> > > > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> > >
+> > > ...
+> > >
+> > > > ---
+> > > >  security/ipe/Makefile    |   2 +
+> > > >  security/ipe/fs.c        | 101 +++++++++
+> > > >  security/ipe/fs.h        |  17 ++
+> > > >  security/ipe/ipe.c       |   3 +
+> > > >  security/ipe/ipe.h       |   2 +
+> > > >  security/ipe/policy.c    | 135 ++++++++++++
+> > > >  security/ipe/policy.h    |   7 +
+> > > >  security/ipe/policy_fs.c | 459 +++++++++++++++++++++++++++++++++++++++
+> > > >  8 files changed, 726 insertions(+)
+> > > >  create mode 100644 security/ipe/fs.c
+> > > >  create mode 100644 security/ipe/fs.h
+> > > >  create mode 100644 security/ipe/policy_fs.c
 > 
-> Hello,
+> ...
 > 
-> This series adds support for Command Duration Limits.
-> The series is based on linux tag: v6.3-rc5
-> The series can also be found in git:
-> https://github.com/floatious/linux/commits/cdl-v6
+> > > > +/**
+> > > > + * ipe_update_policy - parse a new policy and replace @old with it.
+> > > > + * @addr: Supplies a pointer to the i_private for saving policy.
+> > > > + * @text: Supplies a pointer to the plain text policy.
+> > > > + * @textlen: Supplies the length of @text.
+> > > > + * @pkcs7: Supplies a pointer to a buffer containing a pkcs7 message.
+> > > > + * @pkcs7len: Supplies the length of @pkcs7len.
+> > > > + *
+> > > > + * @text/@textlen is mutually exclusive with @pkcs7/@pkcs7len - see
+> > > > + * ipe_new_policy.
+> > > > + *
+> > > > + * Return:
+> > > > + * * !IS_ERR   - OK
+> > > > + * * -ENOENT   - Policy doesn't exist
+> > > > + * * -EINVAL   - New policy is invalid
+> > > > + */
+> > > > +struct ipe_policy *ipe_update_policy(struct ipe_policy __rcu **addr,
+> > > > +                                    const char *text, size_t textlen,
+> > > > +                                    const char *pkcs7, size_t pkcs7len)
+> > > > +{
+> > > > +       int rc = 0;
+> > > > +       struct ipe_policy *old, *new;
+> > > > +
+> > > > +       old = ipe_get_policy_rcu(*addr);
+> > > > +       if (!old) {
+> > > > +               rc = -ENOENT;
+> > > > +               goto err;
+> > > > +       }
+> > > > +
+> > > > +       new = ipe_new_policy(text, textlen, pkcs7, pkcs7len);
+> > > > +       if (IS_ERR(new)) {
+> > > > +               rc = PTR_ERR(new);
+> > > > +               goto err;
+> > > > +       }
+> > > > +
+> > > > +       if (strcmp(new->parsed->name, old->parsed->name)) {
+> > > > +               rc = -EINVAL;
+> > > > +               goto err;
+> > > > +       }
+> > > > +
+> > > > +       if (ver_to_u64(old) > ver_to_u64(new)) {
+> > > > +               rc = -EINVAL;
+> > > > +               goto err;
+> > > > +       }
+> > > > +
+> > > > +       if (ipe_is_policy_active(old)) {
+> > >
+> > > I don't understand the is-active check, you want to make @new the new
+> > > active policy regardless, right?  Could this is-active check ever be
+> > > false?
+> >
+> > Actually this is needed. Policy updates can be applied to any deployed
+> > policy, which may be saved in two places: the securityfs file node
+> > and the ipe_active_policy pointer. To update a policy, this function first
+> > checks if the policy saved in the securityfs file node is currently active.
+> > If so, it updates the ipe_active_policy pointer to point to the new policy,
+> > and finally updates the policy pointer in the securityfs to the new policy.
+> 
+> Ah, okay.  I must have forgotten, or not realized, that multiple
+> policies could be loaded and not active.
+> 
+> I guess this does make me wonder about keeping a non-active policy
+> loaded in the kernel, what purpose does that serve?
+> 
 
-Jens, Martin, James,
+The non-active policy doesn't serve anything unless it is activated. User can
+even delete a policy if that is no longer needed. Non-active is just the default
+state when a new policy is loaded.
 
-Any thought on this series ? Can we get this queued for 6.4 ?
+If IPE supports namespace, there is another use case where different containers
+can select different policies as the active policy from among multiple loaded
+policies. Deven has presented a demo of this during LSS 2021. But this goes
+beyond the scope of this version.
 
+-Fan
 
-
+> -- 
+> paul-moore.com
