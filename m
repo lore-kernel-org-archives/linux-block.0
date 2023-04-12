@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C65C77B6E
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 05:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63AC9C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 05:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229654AbjDLFdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 01:33:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48050 "EHLO
+        id S229659AbjDLFdj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 01:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229643AbjDLFdc (ORCPT
+        with ESMTP id S229643AbjDLFdi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 01:33:32 -0400
+        Wed, 12 Apr 2023 01:33:38 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AEEC6
-        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 22:33:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3385597
+        for <linux-block@vger.kernel.org>; Tue, 11 Apr 2023 22:33:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=1YKj82pCOJN3Xa1IrB01ONFzm2yUIZ0mkNglCT04JV8=; b=aTTebKXjCsBsObVzEXSY8N6eCr
-        s/HIzzuvusEsJ3WvmxlOq6HSwCyps/pORvX4bW4+5FmT9EbhgTdF+nmQOrnNiVSKT8jfVdsQc6V8t
-        dRx+G22r2G9t+xLCBU9fTBMVofpK8SxKcdWpuxMJGit3vTCeGxZYNbc1Py0+CbMD6GdX9zPm9u3KS
-        FfLy3IgA3EXYMeMVxCKRrPc9vdMvt/P8rKxdxILao06XUSP5EMDRgR+7QFb1j2J/W0S4EP6AP7Ip5
-        YAIQ+5BBB+oUXJHhkawV0oZ4p+uUg2IMrO5ibJ2mGFboXDSAS1UqJydNqHHpS1ZL9R8hpNGx/1Aw6
-        Aa2OQ71Q==;
+        bh=6TTd01gvipOMKbzTrM24c9KD9aqfwtrFdS2ocbbnKhY=; b=1oj0RrFzHIAqW6gdeE5q1U6Wko
+        bLi0LU/18m60KlGqrvpncpjNH6m0mjIHe5DFTWyAb9x+e5zNnhJ8c2WPtvJ87kJKorC3uO+/LxKJX
+        7E5AGdMjX/XRyCjtfUlhxyn8tgaCBWLmBFc8eCMbh/vV53AgqA4/TNkqclv8GcSVCT37UmMTAY76g
+        nq/qDivie8cwo6DcfMD4DkQwpERCImR9pw6oQfSYn9OW49znl+LnMg2vbNBqGiWIdY5sGNxkzDMAV
+        aevOglIEMqpV1a/heNV7Mv41TgESC6ngQJAvkRNS3cAFRAetghEoMngk5LcI+2ul94lk9SeEnd73v
+        V4vityiA==;
 Received: from [2001:4bb8:192:2d6c:58da:8aa2:ef59:390f] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pmT6l-001rKo-1w;
-        Wed, 12 Apr 2023 05:33:27 +0000
+        id 1pmT6o-001rLB-0M;
+        Wed, 12 Apr 2023 05:33:30 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-Subject: [PATCH 14/18] blk-mq: don't run the hw_queue from blk_mq_insert_request
-Date:   Wed, 12 Apr 2023 07:32:44 +0200
-Message-Id: <20230412053248.601961-15-hch@lst.de>
+Subject: [PATCH 15/18] blk-mq: don't run the hw_queue from blk_mq_request_bypass_insert
+Date:   Wed, 12 Apr 2023 07:32:45 +0200
+Message-Id: <20230412053248.601961-16-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230412053248.601961-1-hch@lst.de>
 References: <20230412053248.601961-1-hch@lst.de>
@@ -45,172 +45,141 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_insert_request takes two bool parameters to control how to run
+blk_mq_request_bypass_insert takes a bool parameter to control how to run
 the queue at the end of the function.  Move the blk_mq_run_hw_queue call
 to the callers that want it instead.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c | 56 ++++++++++++++++++++++++++++----------------------
- 1 file changed, 32 insertions(+), 24 deletions(-)
+ block/blk-flush.c |  4 +++-
+ block/blk-mq.c    | 24 +++++++++++-------------
+ block/blk-mq.h    |  3 +--
+ 3 files changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4309debfa1ca84..90a0c365db9152 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -44,8 +44,7 @@
- 
- static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
- 
--static void blk_mq_insert_request(struct request *rq, bool at_head,
--		bool run_queue, bool async);
-+static void blk_mq_insert_request(struct request *rq, bool at_head);
- static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list);
- 
-@@ -1292,6 +1291,8 @@ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
-  */
- void blk_execute_rq_nowait(struct request *rq, bool at_head)
- {
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 62ef98f604fbf9..3561aba8cc23f8 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -389,6 +389,7 @@ void blk_insert_flush(struct request *rq)
+ 	unsigned long fflags = q->queue_flags;	/* may change, cache */
+ 	unsigned int policy = blk_flush_policy(fflags, rq);
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
 +	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
-+
- 	WARN_ON(irqs_disabled());
- 	WARN_ON(!blk_rq_is_passthrough(rq));
  
-@@ -1302,10 +1303,13 @@ void blk_execute_rq_nowait(struct request *rq, bool at_head)
- 	 * device, directly accessing the plug instead of using blk_mq_plug()
- 	 * should not have any consequences.
+ 	/*
+ 	 * @policy now records what operations need to be done.  Adjust
+@@ -425,7 +426,8 @@ void blk_insert_flush(struct request *rq)
  	 */
--	if (current->plug && !at_head)
-+	if (current->plug && !at_head) {
- 		blk_add_rq_to_plug(current->plug, rq);
--	else
--		blk_mq_insert_request(rq, at_head, true, false);
-+		return;
-+	}
-+
-+	blk_mq_insert_request(rq, at_head);
-+	blk_mq_run_hw_queue(hctx, false);
- }
- EXPORT_SYMBOL_GPL(blk_execute_rq_nowait);
- 
-@@ -1355,6 +1359,7 @@ static void blk_rq_poll_completion(struct request *rq, struct completion *wait)
-  */
- blk_status_t blk_execute_rq(struct request *rq, bool at_head)
- {
-+	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
- 	struct blk_rq_wait wait = {
- 		.done = COMPLETION_INITIALIZER_ONSTACK(wait.done),
- 	};
-@@ -1366,7 +1371,8 @@ blk_status_t blk_execute_rq(struct request *rq, bool at_head)
- 	rq->end_io = blk_end_sync_rq;
- 
- 	blk_account_io_start(rq);
--	blk_mq_insert_request(rq, at_head, true, false);
-+	blk_mq_insert_request(rq, at_head);
-+	blk_mq_run_hw_queue(hctx, false);
- 
- 	if (blk_rq_is_poll(rq)) {
- 		blk_rq_poll_completion(rq, &wait.done);
-@@ -1439,14 +1445,14 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 		} else if (rq->rq_flags & RQF_SOFTBARRIER) {
- 			rq->rq_flags &= ~RQF_SOFTBARRIER;
- 			list_del_init(&rq->queuelist);
--			blk_mq_insert_request(rq, true, false, false);
-+			blk_mq_insert_request(rq, true);
- 		}
- 	}
- 
- 	while (!list_empty(&rq_list)) {
- 		rq = list_entry(rq_list.next, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
--		blk_mq_insert_request(rq, false, false, false);
-+		blk_mq_insert_request(rq, false);
- 	}
- 
- 	blk_mq_run_hw_queues(q, false);
-@@ -2506,8 +2512,7 @@ static void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx,
- 	blk_mq_run_hw_queue(hctx, run_queue_async);
- }
- 
--static void blk_mq_insert_request(struct request *rq, bool at_head,
--		bool run_queue, bool async)
-+static void blk_mq_insert_request(struct request *rq, bool at_head)
- {
- 	struct request_queue *q = rq->q;
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
-@@ -2567,9 +2572,6 @@ static void blk_mq_insert_request(struct request *rq, bool at_head,
- 		blk_mq_hctx_mark_pending(hctx, ctx);
- 		spin_unlock(&ctx->lock);
- 	}
--
--	if (run_queue)
--		blk_mq_run_hw_queue(hctx, async);
- }
- 
- static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
-@@ -2654,12 +2656,13 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	blk_status_t ret;
- 
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(rq->q)) {
--		blk_mq_insert_request(rq, false, false, false);
-+		blk_mq_insert_request(rq, false);
- 		return;
- 	}
- 
- 	if ((rq->rq_flags & RQF_ELV) || !blk_mq_get_budget_and_tag(rq)) {
--		blk_mq_insert_request(rq, false, true, false);
-+		blk_mq_insert_request(rq, false);
+ 	if ((policy & REQ_FSEQ_DATA) &&
+ 	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
+-		blk_mq_request_bypass_insert(rq, false, true);
++		blk_mq_request_bypass_insert(rq, false);
 +		blk_mq_run_hw_queue(hctx, false);
  		return;
  	}
  
-@@ -2682,7 +2685,7 @@ static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 90a0c365db9152..0e4a02ea6ed335 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1441,7 +1441,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
+ 		if (rq->rq_flags & RQF_DONTPREP) {
+ 			rq->rq_flags &= ~RQF_SOFTBARRIER;
+ 			list_del_init(&rq->queuelist);
+-			blk_mq_request_bypass_insert(rq, false, false);
++			blk_mq_request_bypass_insert(rq, false);
+ 		} else if (rq->rq_flags & RQF_SOFTBARRIER) {
+ 			rq->rq_flags &= ~RQF_SOFTBARRIER;
+ 			list_del_init(&rq->queuelist);
+@@ -2456,13 +2456,11 @@ static void blk_mq_run_work_fn(struct work_struct *work)
+  * blk_mq_request_bypass_insert - Insert a request at dispatch list.
+  * @rq: Pointer to request to be inserted.
+  * @at_head: true if the request should be inserted at the head of the list.
+- * @run_queue: If we should run the hardware queue after inserting the request.
+  *
+  * Should only be used carefully, when the caller knows we want to
+  * bypass a potential IO scheduler on the target device.
+  */
+-void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
+-				  bool run_queue)
++void blk_mq_request_bypass_insert(struct request *rq, bool at_head)
+ {
  	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
  
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(rq->q)) {
--		blk_mq_insert_request(rq, false, false, false);
-+		blk_mq_insert_request(rq, false);
- 		return BLK_STS_OK;
- 	}
- 
-@@ -2962,6 +2965,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
- 	struct blk_plug *plug = blk_mq_plug(bio);
- 	const int is_sync = op_is_sync(bio->bi_opf);
-+	struct blk_mq_hw_ctx *hctx;
- 	struct request *rq;
- 	unsigned int nr_segs = 1;
- 	blk_status_t ret;
-@@ -3006,15 +3010,19 @@ void blk_mq_submit_bio(struct bio *bio)
- 		return;
- 	}
- 
--	if (plug)
-+	if (plug) {
- 		blk_add_rq_to_plug(plug, rq);
--	else if ((rq->rq_flags & RQF_ELV) ||
--		 (rq->mq_hctx->dispatch_busy &&
--		  (q->nr_hw_queues == 1 || !is_sync)))
--		blk_mq_insert_request(rq, false, true, true);
--	else
--		blk_mq_run_dispatch_ops(rq->q,
--				blk_mq_try_issue_directly(rq->mq_hctx, rq));
-+		return;
-+	}
-+
-+	hctx = rq->mq_hctx;
-+	if ((rq->rq_flags & RQF_ELV) ||
-+	    (hctx->dispatch_busy && (q->nr_hw_queues == 1 || !is_sync))) {
-+		blk_mq_insert_request(rq, false);
-+		blk_mq_run_hw_queue(hctx, true);
-+	} else {
-+		blk_mq_run_dispatch_ops(q, blk_mq_try_issue_directly(hctx, rq));
-+	}
+@@ -2472,9 +2470,6 @@ void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
+ 	else
+ 		list_add_tail(&rq->queuelist, &hctx->dispatch);
+ 	spin_unlock(&hctx->lock);
+-
+-	if (run_queue)
+-		blk_mq_run_hw_queue(hctx, false);
  }
  
- #ifdef CONFIG_BLK_MQ_STACKING
+ static void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx,
+@@ -2529,7 +2524,7 @@ static void blk_mq_insert_request(struct request *rq, bool at_head)
+ 		 * and it is added to the scheduler queue, there is no chance to
+ 		 * dispatch it given we prioritize requests in hctx->dispatch.
+ 		 */
+-		blk_mq_request_bypass_insert(rq, at_head, false);
++		blk_mq_request_bypass_insert(rq, at_head);
+ 	} else if (rq->rq_flags & RQF_FLUSH_SEQ) {
+ 		/*
+ 		 * Firstly normal IO request is inserted to scheduler queue or
+@@ -2552,7 +2547,7 @@ static void blk_mq_insert_request(struct request *rq, bool at_head)
+ 		 * Simply queue flush rq to the front of hctx->dispatch so that
+ 		 * intensive flush workloads can benefit in case of NCQ HW.
+ 		 */
+-		blk_mq_request_bypass_insert(rq, true, false);
++		blk_mq_request_bypass_insert(rq, true);
+ 	} else if (q->elevator) {
+ 		LIST_HEAD(list);
+ 
+@@ -2672,7 +2667,8 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 		break;
+ 	case BLK_STS_RESOURCE:
+ 	case BLK_STS_DEV_RESOURCE:
+-		blk_mq_request_bypass_insert(rq, false, true);
++		blk_mq_request_bypass_insert(rq, false);
++		blk_mq_run_hw_queue(hctx, false);
+ 		break;
+ 	default:
+ 		blk_mq_end_request(rq, ret);
+@@ -2719,7 +2715,8 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug)
+ 			break;
+ 		case BLK_STS_RESOURCE:
+ 		case BLK_STS_DEV_RESOURCE:
+-			blk_mq_request_bypass_insert(rq, false, true);
++			blk_mq_request_bypass_insert(rq, false);
++			blk_mq_run_hw_queue(hctx, false);
+ 			goto out;
+ 		default:
+ 			blk_mq_end_request(rq, ret);
+@@ -2837,8 +2834,9 @@ static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 			break;
+ 		case BLK_STS_RESOURCE:
+ 		case BLK_STS_DEV_RESOURCE:
+-			blk_mq_request_bypass_insert(rq, false,
+-						     list_empty(list));
++			blk_mq_request_bypass_insert(rq, false);
++			if (list_empty(list))
++				blk_mq_run_hw_queue(hctx, false);
+ 			goto out;
+ 		default:
+ 			blk_mq_end_request(rq, ret);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index e2d59e33046e30..f30f99166f3870 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -65,8 +65,7 @@ void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
+ /*
+  * Internal helpers for request insertion into sw queues
+  */
+-void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
+-				  bool run_queue);
++void blk_mq_request_bypass_insert(struct request *rq, bool at_head);
+ 
+ /*
+  * CPU -> queue mappings
 -- 
 2.39.2
 
