@@ -2,241 +2,249 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A7EC77B6E
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 18:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEB2C7619A
+	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 19:38:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229597AbjDLS3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 14:29:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44558 "EHLO
+        id S229647AbjDLTig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 15:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjDLS3i (ORCPT
+        with ESMTP id S229603AbjDLTif (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 14:29:38 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B23B319F;
-        Wed, 12 Apr 2023 11:29:37 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33CHDrQX012022;
-        Wed, 12 Apr 2023 18:28:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=dfLbzVkX4DEX/xi/gA8qYNInRmV2hGIsflqS33WBiLs=;
- b=a4VIDeUzIiHieUeb6alcU5nAqiyerD/xUO7KL68IJl9f4ruK1gCF93U8gphslZFlpUZ7
- 9maS+rGMItBbKW+C77kdfvQMAcHknAE7uH/t6S6LFsGXVtWm/13/4n/G2EqdGTHMz0R0
- Nm56PgtVWk3Xx8pcBmuQudPsqul8LpF/jYDKGPrD5yO+/JGCiDZXdpmFzH8WQlzEMx50
- Cezrk5HHU17NGjM3G6XDazNEawcOMzDa4aBLElortymPjHdG0DORSlzAgPf21wMqQkPK
- dJ9TAI//T56IXCMFaLwvd1ja1hIBk1nBnHhNAizWg5rJLwhOsh2rwoRjwuG5/tDbWs1j ew== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pu0hc91ky-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Apr 2023 18:28:42 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33CHBSdL017471;
-        Wed, 12 Apr 2023 18:28:42 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3puw897kvh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Apr 2023 18:28:42 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VNQme/GQLukypl75qNi0n/p9FlPlPKjVM76/BD5cHVNDuC+OGFnHlUbbUCuPBmn5+PBB3cnsuFOvqTKhd6BOrKkT36EUx5v381GbjYEXvOQiv1qtycjndl1dEWDjf+aEn76TuIgQ3rvisws7Ivl4kHDLJrbK9QSKIhcaoumkt7N5s+CcR/AwHl1Di7nZ4LAA7VuAYhB32wSrJ9X+yMZSQX/bHKp0uQ9tQcG7FKBy4CRrlrM1MNDO9QokwBsBuThxPxOPxAW0J8QxPB16IIaHFZ4L+xsV+TI857iCmQcmlL1yVRP5hAH1RfMejg4pZuQ7cNC66lqw0kuAEC/FeLt8Fg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dfLbzVkX4DEX/xi/gA8qYNInRmV2hGIsflqS33WBiLs=;
- b=eyYEhheb/zCTUCZZanq7DZSTwjXN2r37S8IgZWC8zkI9vxv3oAsSEVxqAq68msqfnyOPp5U7fJCgYFplj50G6XVORCt4/vh7x5IB0Ox+3kGBcdUh9ZHfvBhFhbGJepmdCebNYjq4Ex7Mxm2sUfqla3adXQ1Hmr9uKwivSL6SP+nGauEDBeGyrJou93kxFf28/YUrWWBtFxbe1rmd/VhYLxANN/0Fs0MsldVOt4HHc+t/1zUOj0/8ThAz/ULRE+xpcg/1fHr3Lvqzu7OkeD7pXtHQby2tKUI93iZRXGG4Xirbaomks5qkcYzFJi7kSilHs6P5jiA6vmOB2Oa3xPSieQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dfLbzVkX4DEX/xi/gA8qYNInRmV2hGIsflqS33WBiLs=;
- b=rmsnYg9QdF116qICJWCqxJ7Ruwu3vUPKe9HKLx9cpatCVoO2cAzrO7P5AGprmufUtwZc4WpnG+3dukSvslBbSug2xtB6wKs2yy7fwQSp3Rb+dYUFMbbo6Jf3MXoTLDn6xbGH/vMVCYMrH1VOzE4mlEfc6E1ojIt6L7Nxmk7+boI=
-Received: from DM5PR10MB1466.namprd10.prod.outlook.com (2603:10b6:3:b::7) by
- IA1PR10MB7513.namprd10.prod.outlook.com (2603:10b6:208:451::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.35; Wed, 12 Apr
- 2023 18:28:39 +0000
-Received: from DM5PR10MB1466.namprd10.prod.outlook.com
- ([fe80::a870:411d:9426:21b3]) by DM5PR10MB1466.namprd10.prod.outlook.com
- ([fe80::a870:411d:9426:21b3%10]) with mapi id 15.20.6298.030; Wed, 12 Apr
- 2023 18:28:39 +0000
-Message-ID: <e85746b2-9736-9041-9327-1ad1299aa155@oracle.com>
-Date:   Wed, 12 Apr 2023 13:28:37 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v6 00/18] Use block pr_ops in LIO
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     axboe@kernel.dk, bvanassche@acm.org, chaitanyak@nvidia.com,
-        dm-devel@redhat.com, hch@lst.de,
-        james.bottomley@hansenpartnership.com, kbusch@kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        snitzer@kernel.org, target-devel@vger.kernel.org, vbabka@suse.cz,
-        mgorman@techsingularity.net, halbuer@sra.uni-hannover.de,
-        keescook@chromium.org, akpm@linux-foundation.org,
-        kirill.shutemov@linux.intel.com, willy@infradead.org,
-        mkoutny@suse.com, roman.gushchin@linux.dev, ryan.roberts@arm.com,
-        shy828301@gmail.com, yuzhao@google.com, zokeefe@google.com
-References: <20230407200551.12660-1-michael.christie@oracle.com>
- <20230412093617.285177-1-naresh.kamboju@linaro.org>
- <CA+G9fYv2nEBe=kJK4veunkvXD9GvqyaPFQ7rUbMD1S4+0nUS3Q@mail.gmail.com>
-Content-Language: en-US
-From:   Mike Christie <michael.christie@oracle.com>
-In-Reply-To: <CA+G9fYv2nEBe=kJK4veunkvXD9GvqyaPFQ7rUbMD1S4+0nUS3Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DS7PR03CA0164.namprd03.prod.outlook.com
- (2603:10b6:5:3b2::19) To DM5PR10MB1466.namprd10.prod.outlook.com
- (2603:10b6:3:b::7)
+        Wed, 12 Apr 2023 15:38:35 -0400
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8EF1FE9;
+        Wed, 12 Apr 2023 12:38:30 -0700 (PDT)
+Received: from [192.168.1.190] (ip5b426bea.dynamic.kabel-deutschland.de [91.66.107.234])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: buczek)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id C628860027FEB;
+        Wed, 12 Apr 2023 21:38:25 +0200 (CEST)
+Message-ID: <cb0cc2f1-48cb-8b15-35af-33a31ccc922c@molgen.mpg.de>
+Date:   Wed, 12 Apr 2023 21:38:24 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM5PR10MB1466:EE_|IA1PR10MB7513:EE_
-X-MS-Office365-Filtering-Correlation-Id: f118d117-1ea1-4028-9440-08db3b83bc66
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4Q4P+PPvhAPRe3fGn+8B5irB2ovxt4aIfkm2n4qUuHdh9ZBM7UQygl2v7ehun2DdHXhiCnSz6sSVMptqf20BJ1jugUo0DJmzza/arhDGNlm6PVi+NMz1drAQ3Vl7LVHPEV4mzVU7jL84+p9ZaHP6qtpQxt/7jI5NAyA9SBkaNF/vM+oXrqlB73JV3KDdtJdo0r//Tp2/jvnPVMQNGqLCRlhfg5UWPX26Xa7sOlEMwZTLWLvR4H72Q7em5kyft2VIjerIP2eWDfflsqJJ9EEBU+Xt/PIJSMRIZJXJWSCgSi5kkBA/HNvUfhI43F+N9plyvEhSAucBsN69QScwld7AMbZahsf0kNTlY46kFh5zSifpqaPaTEL71oZabb6ziWtfjhgCD2gvUMKhmhmUaAbXZ/xSkSMlK2JYTh8B4TdY5Gzq/8J1PlJu+w4p6D1rM0m9aFxKZkjeilh3wePUe9NaBnuMIyrkyqrR4vWTiapNx5M8bFj/YEPbguzRixR+HZjLBymBs1ftYj6vYHRP/lQNqdTiyO0wzsRu69QpEo28U8Ssg1hHuZ/dllHIMGvBxIcP707gmZeQgQo2v+M1T9FEMjtx/BYBmRqY8yoObE7Btxd9w1xfD9wbjlzHHo1U9stl
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR10MB1466.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(376002)(346002)(366004)(136003)(396003)(451199021)(31696002)(478600001)(53546011)(26005)(6512007)(6506007)(5660300002)(186003)(316002)(6486002)(966005)(2906002)(66476007)(66556008)(66946007)(8676002)(4326008)(7416002)(8936002)(41300700001)(6916009)(86362001)(38100700002)(83380400001)(36756003)(2616005)(31686004)(84970400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T1dsUTlxWURMRmN3eXllUVZieUorQWxlZ2gxYWl2aXJiNll5d2FGTmdoNkx6?=
- =?utf-8?B?RURoN1I1YU9mNFhOWU54QnF5M3cxcmJaRmthTjh5bmRpT2ZIVStpNzUrem5j?=
- =?utf-8?B?TmUxRWxDRU5GVW9VMm5pU0lkaUpDR1BPNHZiNHJXWGI5eXQ2a3orVzVFL3FV?=
- =?utf-8?B?bVJ1SmxneExYV3o0YzZtZ1BjQmtUUlBmVmI1T09TQUFkRys1di9GR29KdFFo?=
- =?utf-8?B?aklBZnBxcFV1ckpaUS8zVUs0WWhhanhYL2drVWxKM1ByeXBaaWlUS0ZZOEY3?=
- =?utf-8?B?ZmtIc3pPcXJNZ001UXRRT0p1dTJ4cG9Pa2xCTnFldWtzYUpKQlJTMElmRlFx?=
- =?utf-8?B?eFhKVTFIRGsxT2RTMS8xUDFQSUJvdHdPUGt3dXNBcUtEU05yOUd2SFRERTEy?=
- =?utf-8?B?aWlUK1ZjMFVSdUVuL01MaVQzemZDc0JJRXptalpDTExNUWE2TmdEOXA1S1Nm?=
- =?utf-8?B?aHRpelZNV2FJTVpvZVV2cDJUOVl4djJjSFZNbmwweldSUkRCblVXdVRtZnFh?=
- =?utf-8?B?czVMaFdXWHlrRHFONmRoaTZudDlSd0I1cDFxSFZHODMreExSMmRYOVRzS042?=
- =?utf-8?B?aHBFc0tpTWNTZnZRcmxwemo0NE95YmNhVTVLNG1KaUZ5d1V0eS9rdXFjVEJW?=
- =?utf-8?B?MDI0U0piSUtwTlVlNDRhdVIwZGlLZnVzKytnWDhjQk9SelNGcUIyU0pRdW5t?=
- =?utf-8?B?QjcwQUVOZ3ByRDNHSGhhY1ZSRE1kQ3FpTjBTd0VOR2NEb3d2T2xGR25tazZ6?=
- =?utf-8?B?LzBXSFA4SWRjbC8wd0pLdlJ5WHNQVGJDUjhUTk9JSXA4MUY3czcwWnJLanVL?=
- =?utf-8?B?L1ZFS2VlaU1zWTJvYUowM1RXQkdoS2lheEJac05wZ21iRGcxSUlCZHdPWGtG?=
- =?utf-8?B?UXVTZUgxNTUrVFdYdUxXS3lsSE1JSjNJY3R2aHYxRWV0WGFGQ1VkS2hQOGt4?=
- =?utf-8?B?aEowSzlhUm8yL1B1MmtXSCtMWjNxTWlFbUhVKzBpaGJlUC8yOVZmaitBbXpS?=
- =?utf-8?B?aXRpZDFQdHFZbHd3aFhIeW95OXliYWM5aE1WRWlHYkJMendkZFBkNkVMaHQ0?=
- =?utf-8?B?QUw2ZnQzMUM5UnVaSEw2VlFjSE1mSjhkdzc0bXhOcEY0cnlzWnhEbUxXNHF3?=
- =?utf-8?B?MHZLMG1NdUZ4aENoWTBPZzRKZTVjZDBYaTQrMitrSDRiUVRlelN1L2pZR1Vu?=
- =?utf-8?B?SXF2WHpXWG1MQXQ0QkxjSzBlTkdoMVFBcGN3WEc2Yy92R1dyblBoN0N4dFA0?=
- =?utf-8?B?aHhUMElOYnMzQ05PVEV5Sk5lUWZ1OTBQUDVSYjAweHg0TEhUbXVYdmlDTUg4?=
- =?utf-8?B?cDM1UG9zMDVXVk5xRWdwRkFKRUhrNmVDMjFiN0VsWWpLT2NCNUhFS0g4SWRY?=
- =?utf-8?B?bGVzQWtOazlGSEFSUWxJSnBKUHR6UzMvUnVPUWd0Ui9OU1NXZmNpMU9iNTVs?=
- =?utf-8?B?bng5ZHZQd2NZRFhDQ3ZaUnNKTjBPZ1padzJrei9jRjJKbzAzL21yUnZlRFN3?=
- =?utf-8?B?RFZwcTZRbDkraC8vQU15emhxZzd6S3ZmWC9iRG45aWJ6QTdGdlFUMTRYMHJp?=
- =?utf-8?B?M3d2R29PNkVhUHAyVk9EaDlnM2pYVEZKM3hMa204aFRBODM2QUNpbk9tcjVj?=
- =?utf-8?B?RUFsZGtxa1YveU9LNVBnaEt3RkY4S3NzVitaZWZYanZJYWJFYVdwVW1xcmlq?=
- =?utf-8?B?YjRyZURkKyt5NTlyNFM4QlpURDVTb3JzSDk2OFpRUkcvVGpEYTN1blFlRG1C?=
- =?utf-8?B?aSt0V0UwZ0x3WUd3ZHluR3lwSjBDRWFudFd2Q0d3WkVVV3dWQ2dvNWFXLzQ5?=
- =?utf-8?B?Q3VRaWx4QWxQenROUkJOVEYrdGFONWROYzAyUHNJT1NsSElxMGlSOUsvWjZ1?=
- =?utf-8?B?S3dWeXNEMHpVeHdLeTBURU1Eb2xleHowVUhXcVRLZWY1TXFDN1NuNXZyWFlq?=
- =?utf-8?B?STJtOFlBQ1Y5VHgvUGJ0NU53YTlzZXJRbmNoZ2tkNUUwUUsrTGRWUDhVNHda?=
- =?utf-8?B?K3FJTnBTaHlBYklaVHdjSmJhTjZibnFqUXJYbE5Oem96ZXc1U2JIQ1lYOFEy?=
- =?utf-8?B?QVBTeGtINllhekhlM1FOeHhzQnFvQTNxNVBEUXdlcnp2bVFtMkNROXJ6czFi?=
- =?utf-8?B?V2FvTFJIckpSQktaV0w4aXhFWEZDYVViRks1R0x4L0dWcHROWmFFS2F2c0Uv?=
- =?utf-8?B?RFE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?dzc1b1JzV3dEK21oSXlHYVpuQlB2R09ZM2FLRDhibWFTMWRQYnprT211WG80?=
- =?utf-8?B?ZForTG41cmVyQ3lqUDE3ZnBleDJ1WFhpOXZwaHBGbDJ6K2NQQXFhakw1WWNw?=
- =?utf-8?B?U2RlRUVYZStjbFM5ZklmL1lKVSt4Yy90Ky9haUdvdTV2cTNYM0JnZWVQdlow?=
- =?utf-8?B?MlB6STl6MlJiUDJqRzk5UXQyOGlwVVNSV0dsL0laTVVNY3VzT0ZTWjdKKzAy?=
- =?utf-8?B?dS9FTjBEZGlHQTA3Um0reWFXNW0wNHVmU3o1MlFlSVBYZWhXcDRGa3ZDRUtI?=
- =?utf-8?B?eVh2NDZVRG4vaDREQzRPVlFiOXd5ZlR6dG94Z0hGQ044c0hQTWdRaVVQRTBm?=
- =?utf-8?B?dlplSElIeWFTMmtKS0FtWitOQk5GVnpCeFJMNnZLQWJrUjZaczVKTXhoclUr?=
- =?utf-8?B?N3BsWFYzRTIzY0pMbzdpMVlOTmQzU1hsbzhCM21Lb1BVZXZUamZYbSt5REFj?=
- =?utf-8?B?Skd4eWhWOHpuTnp1MmNva29Ed2tEV1FxdG5DL29CVmdRYzNoVXhxN0U2RHYx?=
- =?utf-8?B?blpvR3FKV1dzc2FxNkh4TXZvRXVpdGMwQXJVT3RXTUJRM3FNclRlT25TLy92?=
- =?utf-8?B?Ti9GR0FwN05GKytJbm9TT0ZFc2VrRlo3c1d3c2x1WUh1Wmo4KzlkRmRIVTAr?=
- =?utf-8?B?djIrWHVnOVZ2ZGVnMVh5Ym1xYkRKdDR2Tk0zRnhsRERtOWhFb21LQUQrbnVw?=
- =?utf-8?B?SFJZYTRIWWluYnZVbTFuOXJYK09mUUZmWjJvWHBhWE93Ui9ucFZDaTRPZzk5?=
- =?utf-8?B?YUFudzJDYlZIbzlveCtpOFc2cmtCSWJkcVlTTzNWU2M5WkUzRnorK1pvcXVt?=
- =?utf-8?B?T0E5Q2hzZzdlaE1mRkEzRjQxL3JhREtUUzlzM2hPc1NBbHFPaEF0Y201RGIv?=
- =?utf-8?B?RXVZL0hsTlNqRVhuQmZVb1Y4WXdCTnhoNS81SzdEQ2pWMXE3Z2owTWxOSXhZ?=
- =?utf-8?B?Rm9oSGNWMlNTV25Zb3ppT1dPSFdtYmlZaWJMWTJsSE9Fa2dtNE5CdkppT1Fj?=
- =?utf-8?B?Q0ZwcEF4Q3dnNTVscklVWEpyVjFseGs2czM2ZXZUc285VnhROEhoWTRSd0NX?=
- =?utf-8?B?YUhkSWVkbEprbGxkOU9mY0pyRXZkblR3M1BNY2dYRU5hbVI5YWw4SG40RHZ2?=
- =?utf-8?B?Rm5BeVBOQjQvWTAyL2VqbmlCcmIwU1Q5Q0N0VkVETkdsUmpKcGh2LzdPdXBO?=
- =?utf-8?B?S3gwa0FLR3lIRHByemFPQ3ZnaHkwTGttdEYzcTZETGY2T0dQVHlyYXB1Q3BS?=
- =?utf-8?B?bkNESXM2YzJabkdFdGluY21RWWN3a3dkWTk5NXo4dzh3Z0ZNWnJBTzd4Y0tT?=
- =?utf-8?B?bG1Vb3pPbElEWlJxWUZjNWpoRm15ZnNOUnErOU1RUW1weHlMa3V3bk56TXZC?=
- =?utf-8?B?ckl6YTZmci9KcG1jbDJlTXVPS1g4czVDWlJueHdqbVBFc0lqZlBlUTBQVFhB?=
- =?utf-8?B?L2FaMS9OQmtOdlVYMEN4bUJUYk1XVThob3BjTVdtZmdXNWpNeTZ0bUVReEQ3?=
- =?utf-8?B?SDNnVm1KSktvWWJZcWFUZmZrVUdRdWZhZGpsSDMyVjBLbDNERzhGaXZXSUZ5?=
- =?utf-8?B?elJFQytyaUl1NUF5ZmZYa2NxZjE0eDluak5jUVNWV0x2S2VWakhDQ3RXcWV1?=
- =?utf-8?B?S0lSbS93U3VhcHUzYkVvWTcyenJZWTNGelNQdXFmbjRCcGRyR3RmaUhjaWNW?=
- =?utf-8?B?ZzI1aURod2ZqQm9JOHBVWmxYenF3MEdJaTgrZWhHL0o1SUcyMkJWaGk5VThh?=
- =?utf-8?B?WGdRejMyMU1iOG9xUlRVdFZ4M1oxc01vRkIxNU1XNis3WTREVVpjeDhxOUVE?=
- =?utf-8?B?bVFVUTNqQWtQUURHNDM1Z3hDYmh0SGlrQ0xUL1JwSktkZnlXUzlPYWpUYktX?=
- =?utf-8?B?aGJpbVBReStmM1dRVXdTTWNCMWZDblVhQTl1T2lTMis3QzJpM1BVR1o0MTJC?=
- =?utf-8?B?RHlpNGl1cjZEbnd5NExjWkF4aXZTWjlvRlFJZk0vcytjOXZYWlhLV3ZIYmdB?=
- =?utf-8?Q?X2KEcJaeZyqj9Y74FmRLFp65KTMho0=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f118d117-1ea1-4028-9440-08db3b83bc66
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR10MB1466.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2023 18:28:39.3084
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7WpTzkd+cxY4yXMXC/WH/InJsuMC+gdOVtBJd8gO33YKtXM2AqX6mWPD8Jjo+HW5U/4dk7GVCSwry1uvAPx3+GIPnzfACzdpMEiR3zxq30U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7513
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-12_10,2023-04-12_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- phishscore=0 mlxscore=0 malwarescore=0 suspectscore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304120159
-X-Proofpoint-GUID: 5Dl-6VgABmBOq0Wq6CGqfzDriG7RAiET
-X-Proofpoint-ORIG-GUID: 5Dl-6VgABmBOq0Wq6CGqfzDriG7RAiET
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
+Content-Language: en-US
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+        kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org,
+        ming.lei@redhat.com, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
+ <20230404140835.25166-4-sergei.shtepa@veeam.com>
+From:   Donald Buczek <buczek@molgen.mpg.de>
+In-Reply-To: <20230404140835.25166-4-sergei.shtepa@veeam.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/12/23 5:25 AM, Naresh Kamboju wrote:
-> On Wed, 12 Apr 2023 at 15:06, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
->>
->> [sorry for the adding you in CC]
->>
->> While running LTP controllers test suite on this patch set applied on top of
->> the next-20230406 and the following kernel panic noticed on qemu-i386.
-> 
-> Also noticed on qemu-x86_64.
-> 
-> Crash log link,
-> ------------------
-> - https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/build/lore_kernel_org_linux-block_20230404140835_25166-1-sergei_shtepa_veeam_com/testrun/16171908/suite/log-parser-test/test/check-kernel-panic/log
-> - https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/build/lore_kernel_org_linux-block_20230404140835_25166-1-sergei_shtepa_veeam_com/testrun/16171908/suite/log-parser-test/tests/
+I think, you can trigger all kind of user-after-free when userspace deletes a snapshot image or the snapshot image and the tracker while the disk device snapshot image is kept alive (mounted or just opened) and doing I/O.
 
-Can you point me to the original report? I don't think my patches are the cause of
-the failure, or if they are there is a crazy bug.
+Here is what I did to provoke that:
 
-Above, I think you pointed me to the wrong link above because it looks like that's
-for a different patchset. Or did I misunderstand the testing and that link has my
-patches included?
+root@dose:~# s=$(blksnap snapshot_create -d /dev/vdb)
+root@dose:~# blksnap snapshot_appendstorage -i $s -f /scratch/local/test.dat
+device path: '/dev/block/253:2'
+allocate range: ofs=11264624 cnt=2097152
+root@dose:~# blksnap snapshot_take -i $s
+root@dose:~# mount /dev/blksnap-image_253\:16 /mnt
+root@dose:~# dd if=/dev/zero of=/mnt/x.x &
+[1] 2514
+root@dose:~# blksnap snapshot_destroy -i $s
+dd: writing to '/mnt/x.x': No space left on device
+1996041+0 records in
+1996040+0 records out
+1021972480 bytes (1.0 GB, 975 MiB) copied, 8.48923 s, 120 MB/s
+[1]+  Exit 1                  dd if=/dev/zero of=/mnt/x.x
 
-I did see my patches tested:
+And here's the UAF:
 
-https://qa-reports.linaro.org/~anders.roxell/linux-mainline-patches/
+[ 4508.526091] [2475] diff_storage_event_low:64: blksnap-diff-storage: Diff storage low free space. Portion: 2097152 sectors, requested: 2097152
+[ 4508.526141] [2475] event_gen:44: blksnap-event_queue: Generate event: time=4507748140846 code=0 data_size=8
+[ 4508.526158] blksnap-snapshot: Snapshot aa986b45-bf07-46f7-a52d-8d7829221f24 was created
+[ 4512.731380] [2478] ioctl_snapshot_append_storage:195: blksnap: Append difference storage
+[ 4512.731417] [2478] diff_storage_append_block:223: blksnap-diff-storage: Append 1 blocks
+[ 4512.731485] [2478] diff_storage_add_range:193: blksnap-diff-storage: Add range to diff storage: [253:2] 11264624:2097152
+[ 4512.780757] [2481] diff_area_new:180: blksnap-diff-area: Open device [253:16]
+[ 4512.780786] [2481] diff_area_calculate_chunk_size:57: blksnap-diff-area: Minimal IO block 1 sectors
+[ 4512.780794] [2481] diff_area_calculate_chunk_size:58: blksnap-diff-area: Device capacity 2097152 sectors
+[ 4512.780801] [2481] diff_area_calculate_chunk_size:61: blksnap-diff-area: Chunks count 4096
+[ 4512.780808] [2481] diff_area_calculate_chunk_size:76: blksnap-diff-area: The optimal chunk size was calculated as 262144 bytes for device [253:16]
+[ 4512.780817] [2481] diff_area_new:200: blksnap-diff-area: Chunk size 262144 in bytes
+[ 4512.780824] [2481] diff_area_new:201: blksnap-diff-area: Chunk count 4096
+[ 4512.828814] [2481] snapshot_take_trackers:250: blksnap-snapshot: Device [253:16] was frozen
+[ 4512.834029] [2481] cbt_map_switch:142: blksnap-cbt_map: CBT map switch
+[ 4512.834051] [2481] snapshot_take_trackers:277: blksnap-snapshot: Device [253:16] was unfrozen
+[ 4512.834058] blksnap-image: Create snapshot image device for original device [253:16]
+[ 4512.835437] [2481] snapimage_create:97: blksnap-image: Snapshot image disk name [blksnap-image_253:16]
+[ 4512.838499] [2481] snapimage_create:112: blksnap-image: Image block device [259:1] has been created
+[ 4512.838508] blksnap-snapshot: Snapshot aa986b45-bf07-46f7-a52d-8d7829221f24 was taken successfully
+[ 4525.592286] XFS (blksnap-image_253:16): Mounting V5 Filesystem 35f0c7a2-27fa-4183-8ede-7462ac31a97d
+[ 4525.619281] XFS (blksnap-image_253:16): Ending clean mount
+[ 4558.292030] clocksource: timekeeping watchdog on CPU10: hpet retried 2 times before success
+[ 4558.486074] blksnap-snapshot: Destroy snapshot aa986b45-bf07-46f7-a52d-8d7829221f24
+[ 4558.488731] blksnap-snapshot: Release snapshot aa986b45-bf07-46f7-a52d-8d7829221f24
+[ 4558.505931] [2527] tracker_release_snapshot:293: blksnap-tracker: Tracker for device [253:16] release snapshot
+[ 4558.505959] [2527] snapimage_free:63: blksnap-image: Snapshot image disk blksnap-image_253:16 delete
+[ 4558.548358] [1899] diff_storage_event_low:64: blksnap-diff-storage: Diff storage low free space. Portion: 2097152 sectors, requested: 4194304
+[ 4558.548378] [1899] event_gen:44: blksnap-event_queue: Generate event: time=4557770519985 code=0 data_size=8
+[ 4561.444548] ==================================================================
+[ 4561.446224] BUG: KASAN: slab-use-after-free in chunk_notify_store+0x40/0x190 [blksnap]
+[ 4561.448018] Read of size 8 at addr ffff888112d21500 by task kworker/13:0/1504
 
-but they seem to fail in similar places as other failures that day, and the
-failures don't seem related to my patches. It doesn't look like you are doing
-anything nvme or block pr ioctl related and just failing on forks and OOM.
-It looks like you are booting from a scsi device but I only touched the scsi
-layer's code for persistent reservations and the tests don't seem to be
-using that code.
+[ 4561.449965] CPU: 13 PID: 1504 Comm: kworker/13:0 Not tainted 6.3.0-rc5.mx64.428-00094-g21dc08a94f59 #40
+[ 4561.452025] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
+[ 4561.454538] Workqueue: events chunk_notify_store [blksnap]
+[ 4561.455809] Call Trace:
+[ 4561.456393]  <TASK>
+[ 4561.456915]  dump_stack_lvl+0x37/0x50
+[ 4561.457807]  print_report+0xcc/0x630
+[ 4561.458650]  ? __virt_addr_valid+0xf5/0x180
+[ 4561.459607]  ? chunk_notify_store+0x40/0x190 [blksnap]
+[ 4561.460785]  kasan_report+0xb2/0xe0
+[ 4561.468472]  ? chunk_notify_store+0x40/0x190 [blksnap]
+[ 4561.476365]  chunk_notify_store+0x40/0x190 [blksnap]
+[ 4561.483755]  process_one_work+0x407/0x790
+[ 4561.490118]  worker_thread+0x2ab/0x700
+[ 4561.495707]  ? __pfx_set_cpus_allowed_ptr+0x10/0x10
+[ 4561.500883]  ? __pfx_worker_thread+0x10/0x10
+[ 4561.505664]  kthread+0x15d/0x190
+[ 4561.509864]  ? __pfx_kthread+0x10/0x10
+[ 4561.513824]  ret_from_fork+0x2c/0x50
+[ 4561.517546]  </TASK>
+
+[ 4561.524020] Allocated by task 2481:
+[ 4561.527147]  kasan_save_stack+0x22/0x50
+[ 4561.530226]  kasan_set_track+0x25/0x30
+[ 4561.533096]  __kasan_kmalloc+0x80/0x90
+[ 4561.535868]  chunk_alloc+0x37/0xf0 [blksnap]
+[ 4561.538569]  diff_area_new+0x42d/0x690 [blksnap]
+[ 4561.541251]  snapshot_take+0x13b/0x530 [blksnap]
+[ 4561.543853]  ioctl_snapshot_take+0x7a/0xc0 [blksnap]
+[ 4561.546394]  ctrl_unlocked_ioctl+0x3a/0x60 [blksnap]
+[ 4561.548898]  __x64_sys_ioctl+0xc6/0xe0
+[ 4561.551276]  do_syscall_64+0x47/0xa0
+[ 4561.553621]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+[ 4561.558154] Freed by task 2527:
+[ 4561.560350]  kasan_save_stack+0x22/0x50
+[ 4561.562569]  kasan_set_track+0x25/0x30
+[ 4561.564788]  kasan_save_free_info+0x2b/0x50
+[ 4561.567012]  ____kasan_slab_free+0xf9/0x1a0
+[ 4561.569210]  __kmem_cache_free+0x141/0x200
+[ 4561.571370]  diff_area_free+0xab/0x150 [blksnap]
+[ 4561.573546]  tracker_release_snapshot+0xc8/0x110 [blksnap]
+[ 4561.575763]  snapshot_free+0x9f/0x170 [blksnap]
+[ 4561.577882]  snapshot_destroy+0x119/0x170 [blksnap]
+[ 4561.579992]  ioctl_snapshot_destroy+0x7a/0xc0 [blksnap]
+[ 4561.582155]  ctrl_unlocked_ioctl+0x3a/0x60 [blksnap]
+[ 4561.584270]  __x64_sys_ioctl+0xc6/0xe0
+[ 4561.586247]  do_syscall_64+0x47/0xa0
+[ 4561.588176]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+[ 4561.591915] Last potentially related work creation:
+[ 4561.593833]  kasan_save_stack+0x22/0x50
+[ 4561.595611]  __kasan_record_aux_stack+0x60/0x70
+[ 4561.597442]  kvfree_call_rcu+0x2e/0x460
+[ 4561.599235]  cache_clean+0x46d/0x500 [sunrpc]
+[ 4561.601181]  cache_flush+0x15/0x40 [sunrpc]
+[ 4561.603096]  ip_map_parse+0x2ca/0x300 [sunrpc]
+[ 4561.605035]  cache_do_downcall+0x59/0x90 [sunrpc]
+[ 4561.606993]  cache_write_procfs+0x90/0xd0 [sunrpc]
+[ 4561.608946]  proc_reg_write+0xe0/0x140
+[ 4561.610728]  vfs_write+0x186/0x680
+[ 4561.612465]  ksys_write+0xbd/0x160
+[ 4561.614186]  do_syscall_64+0x47/0xa0
+[ 4561.615922]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+[ 4561.619340] The buggy address belongs to the object at ffff888112d21500
+                 which belongs to the cache kmalloc-96 of size 96
+[ 4561.623265] The buggy address is located 0 bytes inside of
+                 freed 96-byte region [ffff888112d21500, ffff888112d21560)
+
+[ 4561.628960] The buggy address belongs to the physical page:
+[ 4561.631000] page:00000000b32dc240 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x112d21
+[ 4561.633393] flags: 0x17fffc000000200(slab|node=0|zone=2|lastcpupid=0x1ffff)
+[ 4561.635646] raw: 017fffc000000200 ffff888100040300 ffffea0004317ed0 ffffea000406a350
+[ 4561.637982] raw: 0000000000000000 ffff888112d21000 0000000100000020 0000000000000000
+[ 4561.640338] page dumped because: kasan: bad access detected
+
+[ 4561.644448] Memory state around the buggy address:
+[ 4561.646610]  ffff888112d21400: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+[ 4561.649000]  ffff888112d21480: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+[ 4561.651367] >ffff888112d21500: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+[ 4561.653709]                    ^
+[ 4561.655754]  ffff888112d21580: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+[ 4561.658132]  ffff888112d21600: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+[ 4561.660503] ==================================================================
+[ 4561.662931] Disabling lock debugging due to kernel taint
+[ 4561.665449] general protection fault, probably for non-canonical address 0x79a00c8000009df: 0000 [#1] PREEMPT SMP KASAN PTI
+[ 4561.668387] CPU: 13 PID: 1504 Comm: kworker/13:0 Tainted: G    B              6.3.0-rc5.mx64.428-00094-g21dc08a94f59 #40
+[ 4561.671243] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
+[ 4561.674216] Workqueue: events chunk_notify_store [blksnap]
+[ 4561.676778] RIP: 0010:chunk_notify_store+0x66/0x190 [blksnap]
+[ 4561.679365] Code: d0 f5 90 e0 4c 8b 75 00 48 8d 7d 08 e8 c3 f5 90 e0 4c 8b 65 08 49 8d 7e 08 e8 66 f6 90 e0 4d 89 66 08 4c 89 e7 e8 5a f6 90 e0 <4d> 89 34 24 48 89 ef 4c 8d 73 68 e8 4a f6 90 e0 48 89 6d 00 48 89
+[ 4561.685274] RSP: 0000:ffff88810e49fdd0 EFLAGS: 00010282
+[ 4561.687972] RAX: 0000000000000000 RBX: ffff888181be3300 RCX: ffffffffa0b98f56
+[ 4561.690821] RDX: 0000000000000001 RSI: 0000000000000008 RDI: 079a00c8000009df
+[ 4561.693676] RBP: ffff888112d21500 R08: 0000000000000001 R09: ffffffff84286a47
+[ 4561.696550] R10: fffffbfff0850d48 R11: 0000000000000001 R12: 079a00c8000009df
+[ 4561.699418] R13: ffff888181be3320 R14: ffff88817f708800 R15: ffff888181be3308
+[ 4561.702307] FS:  0000000000000000(0000) GS:ffff888261c80000(0000) knlGS:0000000000000000
+[ 4561.705292] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 4561.708105] CR2: 00007f7189264c58 CR3: 0000000111dec001 CR4: 0000000000170ee0
+[ 4561.711052] Call Trace:
+[ 4561.713647]  <TASK>
+[ 4561.716196]  process_one_work+0x407/0x790
+[ 4561.718912]  worker_thread+0x2ab/0x700
+[ 4561.721597]  ? __pfx_set_cpus_allowed_ptr+0x10/0x10
+[ 4561.724372]  ? __pfx_worker_thread+0x10/0x10
+[ 4561.727101]  kthread+0x15d/0x190
+[ 4561.729745]  ? __pfx_kthread+0x10/0x10
+[ 4561.732418]  ret_from_fork+0x2c/0x50
+[ 4561.735097]  </TASK>
+[ 4561.737655] Modules linked in: blksnap rpcsec_gss_krb5 nfsv4 nfs 8021q garp stp mrp llc bochs kvm_intel drm_vram_helper drm_ttm_helper ttm kvm drm_kms_helper input_leds led_class drm virtio_net irqbypass syscopyarea net_failover sysfillrect intel_agp crc32c_intel failover floppy sysimgblt intel_gtt i2c_piix4 nfsd auth_rpcgss oid_registry nfs_acl lockd grace sunrpc ip_tables x_tables unix ipv6 autofs4
+[ 4561.748159] ---[ end trace 0000000000000000 ]---
+[ 4561.751205] RIP: 0010:chunk_notify_store+0x66/0x190 [blksnap]
+[ 4561.754393] Code: d0 f5 90 e0 4c 8b 75 00 48 8d 7d 08 e8 c3 f5 90 e0 4c 8b 65 08 49 8d 7e 08 e8 66 f6 90 e0 4d 89 66 08 4c 89 e7 e8 5a f6 90 e0 <4d> 89 34 24 48 89 ef 4c 8d 73 68 e8 4a f6 90 e0 48 89 6d 00 48 89
+[ 4561.761441] RSP: 0000:ffff88810e49fdd0 EFLAGS: 00010282
+[ 4561.764695] RAX: 0000000000000000 RBX: ffff888181be3300 RCX: ffffffffa0b98f56
+[ 4561.768108] RDX: 0000000000000001 RSI: 0000000000000008 RDI: 079a00c8000009df
+[ 4561.771488] RBP: ffff888112d21500 R08: 0000000000000001 R09: ffffffff84286a47
+[ 4561.774845] R10: fffffbfff0850d48 R11: 0000000000000001 R12: 079a00c8000009df
+[ 4561.778140] R13: ffff888181be3320 R14: ffff88817f708800 R15: ffff888181be3308
+[ 4561.781476] FS:  0000000000000000(0000) GS:ffff888261c80000(0000) knlGS:0000000000000000
+[ 4561.784909] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 4561.788164] CR2: 00007f7189264c58 CR3: 0000000111dec001 CR4: 0000000000170ee0
+[ 4586.218197] XFS (blksnap-image_253:16): log I/O error -5
+[ 4586.218889] XFS (blksnap-image_253:16): metadata I/O error in "xfs_buf_ioend+0x3ea/0xb50" at daddr 0x1 len 1 error 5
+[ 4586.225814] XFS (blksnap-image_253:16): Filesystem has been shut down due to log error (0x2).
+[ 4586.246191] XFS (blksnap-image_253:16): Please unmount the filesystem and rectify the problem(s).
 
 
+I was actually targeting this deref in snapimage.c:
 
-> 
-> lore link,
-> https://lore.kernel.org/linux-block/20230407200551.12660-1-michael.christie@oracle.com/
-> 
-> 
-> --
-> Linaro LKFT
-> https://lkft.linaro.org
+     +static void snapimage_submit_bio(struct bio *bio)
+     +{
+     +	struct tracker *tracker = bio->bi_bdev->bd_disk->private_data;
+     +	struct diff_area *diff_area = tracker->diff_area;
 
+but didn't even get to delete the tracker...
+
+
+Best
+
+   Donald
+
+-- 
+Donald Buczek
+buczek@molgen.mpg.de
+Tel: +49 30 8413 1433
