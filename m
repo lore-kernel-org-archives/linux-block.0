@@ -2,166 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99776C77B73
-	for <linux-block@archiver.kernel.org>; Wed, 12 Apr 2023 23:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5B1C77B6C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Apr 2023 00:07:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229517AbjDLXgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 19:36:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41204 "EHLO
+        id S229615AbjDMAG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 20:06:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjDLXgL (ORCPT
+        with ESMTP id S229441AbjDMAG5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 19:36:11 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 07DE419BE;
-        Wed, 12 Apr 2023 16:36:07 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 7CD3D21779D8; Wed, 12 Apr 2023 16:36:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7CD3D21779D8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1681342566;
-        bh=YPXWa/7TYeGcUcrSe6JmCqFPK2vN2hRqkpxy8Lf9hp8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YuvgGUEjnvrbLnB0mThO0/tNDZ+pzM/L8mr1DVspNRj6O+y0N8B/6epPpbYWZWjbK
-         G1mzu0i9tJ7cZl4x+x8Od4BO0L1b9Enskrn3H6DdyL1bIL3S4RtVPsZ/KFIcIROYQZ
-         0JLI4PQ8S0LdHkBOtrPDOXTqszDAjnr9JhbX5NBs=
-Date:   Wed, 12 Apr 2023 16:36:06 -0700
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [RFC PATCH v9 05/16] ipe: add userspace interface
-Message-ID: <20230412233606.GA16658@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <1675119451-23180-6-git-send-email-wufan@linux.microsoft.com>
- <CAHC9VhRa+NwKzLfQBmHfMgUp6_d5soQG7JBq-Vn=MUeUAt4tuQ@mail.gmail.com>
- <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
+        Wed, 12 Apr 2023 20:06:57 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213BE5599;
+        Wed, 12 Apr 2023 17:06:56 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id i8so4241607plt.10;
+        Wed, 12 Apr 2023 17:06:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681344415; x=1683936415;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=uW6vU7xQLZdXTM+N0W2uZdj4wLLbZ0pkWxeLicfHFn4=;
+        b=gnysKRSLEIcDhi/vRIbU4FfivKL9YySdh6NpSVNnjQYEXAAC5Vx2EQNU+cw0HR3J0D
+         ojzZbNy+0gTam02R5x/0AtiJkfnwAhAIvjQ4jfoIWF+j4tHLHDgtJCoLwKhnyperCjY8
+         qxf7MIIeyx1W5Hz4yBCAtjmXghfZmYrkLIhErCzMVSC7EePeN/adeyWZYUWd4iSBLj8U
+         wIV4sInnRSkpxHMcyU4Bs0BzsJkR83RudottRyQTd0hr7sFibp9f+5TFvxQ3m5bQAxvP
+         2WnE9MxdqbC1MQVZY1foWyOKQaIewe5PR/QQt+AuJEdpPj9DMJJtNMGsfuZGP4WcdJyK
+         bo1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681344415; x=1683936415;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uW6vU7xQLZdXTM+N0W2uZdj4wLLbZ0pkWxeLicfHFn4=;
+        b=k6wgpBK4GF3UbB9Q+FgzmJHPOGJpwwVPiUhy+gYPvYa465MgHh/fgGpiKp2BZGHwOQ
+         4YjjByiJWC5Tkci5yO4MeZTomaKHaaXkgfGBNMYB/Id6mIRpApZefIktF2V3c0LCAjWZ
+         MHPDnl/IHGpnHDRnMABnNl96JokMqUKzOzeE47zeOL0IjB/1CMASvZuA1J6ZhftqDGbI
+         u9GPtbA29ko0ikOy5s1e9btHFetRFcV6aaJ2to5zjp5vPxrAQdvjQCZrlFGaiE3e3vgB
+         DSd9ONL2lilHKtNzJndDhBN9HxZpPivh/PrMuwGbChCIKAfbD2sloX7BYTwNzcmwl/EY
+         AraA==
+X-Gm-Message-State: AAQBX9d5060Zz17iyIdg/YDLuaRziqRnjD/xDGhABa7KBzCq/x8wf2L2
+        H4V8y0W8opjm04+SoRINdbaK65o3LTQ=
+X-Google-Smtp-Source: AKy350a57dN2inXLLXfBg9c5YPLvhJvu+WQYcXcMo4K3CA8FTdvQH4unXz0sy9KZcD99u7nqDWBSLA==
+X-Received: by 2002:a17:90b:4c8e:b0:231:24c1:8028 with SMTP id my14-20020a17090b4c8e00b0023124c18028mr11721732pjb.29.1681344415422;
+        Wed, 12 Apr 2023 17:06:55 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id p5-20020a17090ad30500b00246f856d678sm136599pju.1.2023.04.12.17.06.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Apr 2023 17:06:55 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+From:   Tejun Heo <tj@kernel.org>
+To:     axboe@kernel.dk, josef@toxicpanda.com, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai1@huaweicloud.com
+Subject: [PATCHSET v4 block/for-next] blkcg: Improve blkg config helpers and make iolatency init lazy
+Date:   Wed, 12 Apr 2023 14:06:45 -1000
+Message-Id: <20230413000649.115785-1-tj@kernel.org>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 11, 2023 at 05:45:41PM -0400, Paul Moore wrote:
-> On Mon, Apr 10, 2023 at 3:10???PM Fan Wu <wufan@linux.microsoft.com> wrote:
-> > On Thu, Mar 02, 2023 at 02:04:42PM -0500, Paul Moore wrote:
-> > > On Mon, Jan 30, 2023 at 5:58???PM Fan Wu <wufan@linux.microsoft.com> wrote:
-> > > >
-> > > > From: Deven Bowers <deven.desai@linux.microsoft.com>
-> > > >
-> > > > As is typical with LSMs, IPE uses securityfs as its interface with
-> > > > userspace. for a complete list of the interfaces and the respective
-> > > > inputs/outputs, please see the documentation under
-> > > > admin-guide/LSM/ipe.rst
-> > > >
-> > > > Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
-> > > > Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
-> > >
-> > > ...
-> > >
-> > > > ---
-> > > >  security/ipe/Makefile    |   2 +
-> > > >  security/ipe/fs.c        | 101 +++++++++
-> > > >  security/ipe/fs.h        |  17 ++
-> > > >  security/ipe/ipe.c       |   3 +
-> > > >  security/ipe/ipe.h       |   2 +
-> > > >  security/ipe/policy.c    | 135 ++++++++++++
-> > > >  security/ipe/policy.h    |   7 +
-> > > >  security/ipe/policy_fs.c | 459 +++++++++++++++++++++++++++++++++++++++
-> > > >  8 files changed, 726 insertions(+)
-> > > >  create mode 100644 security/ipe/fs.c
-> > > >  create mode 100644 security/ipe/fs.h
-> > > >  create mode 100644 security/ipe/policy_fs.c
-> 
-> ...
-> 
-> > > > +/**
-> > > > + * ipe_update_policy - parse a new policy and replace @old with it.
-> > > > + * @addr: Supplies a pointer to the i_private for saving policy.
-> > > > + * @text: Supplies a pointer to the plain text policy.
-> > > > + * @textlen: Supplies the length of @text.
-> > > > + * @pkcs7: Supplies a pointer to a buffer containing a pkcs7 message.
-> > > > + * @pkcs7len: Supplies the length of @pkcs7len.
-> > > > + *
-> > > > + * @text/@textlen is mutually exclusive with @pkcs7/@pkcs7len - see
-> > > > + * ipe_new_policy.
-> > > > + *
-> > > > + * Return:
-> > > > + * * !IS_ERR   - OK
-> > > > + * * -ENOENT   - Policy doesn't exist
-> > > > + * * -EINVAL   - New policy is invalid
-> > > > + */
-> > > > +struct ipe_policy *ipe_update_policy(struct ipe_policy __rcu **addr,
-> > > > +                                    const char *text, size_t textlen,
-> > > > +                                    const char *pkcs7, size_t pkcs7len)
-> > > > +{
-> > > > +       int rc = 0;
-> > > > +       struct ipe_policy *old, *new;
-> > > > +
-> > > > +       old = ipe_get_policy_rcu(*addr);
-> > > > +       if (!old) {
-> > > > +               rc = -ENOENT;
-> > > > +               goto err;
-> > > > +       }
-> > > > +
-> > > > +       new = ipe_new_policy(text, textlen, pkcs7, pkcs7len);
-> > > > +       if (IS_ERR(new)) {
-> > > > +               rc = PTR_ERR(new);
-> > > > +               goto err;
-> > > > +       }
-> > > > +
-> > > > +       if (strcmp(new->parsed->name, old->parsed->name)) {
-> > > > +               rc = -EINVAL;
-> > > > +               goto err;
-> > > > +       }
-> > > > +
-> > > > +       if (ver_to_u64(old) > ver_to_u64(new)) {
-> > > > +               rc = -EINVAL;
-> > > > +               goto err;
-> > > > +       }
-> > > > +
-> > > > +       if (ipe_is_policy_active(old)) {
-> > >
-> > > I don't understand the is-active check, you want to make @new the new
-> > > active policy regardless, right?  Could this is-active check ever be
-> > > false?
-> >
-> > Actually this is needed. Policy updates can be applied to any deployed
-> > policy, which may be saved in two places: the securityfs file node
-> > and the ipe_active_policy pointer. To update a policy, this function first
-> > checks if the policy saved in the securityfs file node is currently active.
-> > If so, it updates the ipe_active_policy pointer to point to the new policy,
-> > and finally updates the policy pointer in the securityfs to the new policy.
-> 
-> Ah, okay.  I must have forgotten, or not realized, that multiple
-> policies could be loaded and not active.
-> 
-> I guess this does make me wonder about keeping a non-active policy
-> loaded in the kernel, what purpose does that serve?
-> 
+Hello,
 
-The non-active policy doesn't serve anything unless it is activated. User can
-even delete a policy if that is no longer needed. Non-active is just the default
-state when a new policy is loaded.
+* v2[2] fixes the build failure caused by v1[1] forgetting to update bfq.
 
-If IPE supports namespace, there is another use case where different containers
-can select different policies as the active policy from among multiple loaded
-policies. Deven has presented a demo of this during LSS 2021. But this goes
-beyond the scope of this version.
+* v3[3] drops __acuquires/__releases() changes and updates patch descriptions.
 
--Fan
+* v4 rebases on top of the current block/for-next.
 
-> -- 
-> paul-moore.com
+This patchset:
+
+* Improves blkg config helpers so that they can be used consistently for all
+  the existing use cases. This also allows keeps using the same bdev open
+  instance across lazy init of rq_qos policies.
+
+* Updates iolatency so that it initializes lazily when a latency target is
+  set for the first time. This avoids registering the rq_qos policy when
+  iolatency is not used which removes unnecessary calls into iolat from IO
+  hot paths.
+
+and contains the following four patches:
+
+ 0001-blkcg-Drop-unnecessary-RCU-read-un-locks-from-blkg_c.patch
+ 0002-blkcg-Restructure-blkg_conf_prep-and-friends.patch
+ 0003-blk-iolatency-s-blkcg_rq_qos-iolat_rq_qos.patch
+ 0004-blk-iolatency-Make-initialization-lazy.patch
+
+and is also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/misc.git iolat-lazy-init-v4
+
+diffstat follows. Thanks.
+
+ block/bfq-cgroup.c    |    8 ++-
+ block/blk-cgroup.c    |  122 ++++++++++++++++++++++++++++----------------------
+ block/blk-cgroup.h    |   10 ++--
+ block/blk-iocost.c    |   58 +++++++++++++----------
+ block/blk-iolatency.c |   39 +++++++++++++--
+ block/blk-rq-qos.h    |    2 
+ block/blk-throttle.c  |   16 ++++--
+ block/blk.h           |    6 --
+ 8 files changed, 159 insertions(+), 102 deletions(-)
+
+[1] https://lkml.kernel.org/r/20230105002007.157497-1-tj@kernel.org
+[2] https://lkml.kernel.org/r/20230105212432.289569-1-tj@kernel.org
+[3] https://lkml.kernel.org/r/20230110222714.552241-1-tj@kernel.org
+
