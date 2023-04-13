@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4023CC7619A
-	for <linux-block@archiver.kernel.org>; Thu, 13 Apr 2023 00:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D63D3C77B6C
+	for <linux-block@archiver.kernel.org>; Thu, 13 Apr 2023 00:07:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbjDMAG7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Apr 2023 20:06:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56990 "EHLO
+        id S229760AbjDMAHG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Apr 2023 20:07:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjDMAG6 (ORCPT
+        with ESMTP id S229732AbjDMAHE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Apr 2023 20:06:58 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02847448F;
-        Wed, 12 Apr 2023 17:06:58 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id kh6so11636557plb.0;
-        Wed, 12 Apr 2023 17:06:57 -0700 (PDT)
+        Wed, 12 Apr 2023 20:07:04 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E546B76BB;
+        Wed, 12 Apr 2023 17:07:01 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id l9-20020a17090a3f0900b0023d32684e7fso4994198pjc.1;
+        Wed, 12 Apr 2023 17:07:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681344417; x=1683936417;
+        d=gmail.com; s=20221208; t=1681344421; x=1683936421;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+c1yUpkzswmzq/oMrJxXHf4ZggUo4IZgO2KUwSt5A/4=;
-        b=VLtSIZymPOxj5fb0NSKxrUzsmKlOO0xUCBks6vYGJpb25czz5XiWa812SUs7RjyOZa
-         BKFa1UXONpNf3P76SXq4ZK6owNzs3QosAXdpYc/m3XKy2GVCbCIezHzndHeU1lG2HEsp
-         ebkviD/eIEndrW/8/N863hw5FYz7jBm4tn9lneqLIftYtMgyLk/t0Ge39rD/JGw0CvQa
-         Bcs9/6F1btD+Kxpp0NuBlZiCjGa2PZF4l1vcPgAWA4f6ssqEH/ISC+i+RisrA6F50To4
-         K+uK6SsOVSOOajB23lhnWkwDmDSvCVMK5n2lyEQuuDuv6iHCMKEatWXRpQlZYSWm5Nvk
-         z+FA==
+        bh=M4IbWZnTXBOzIxRU6MUG4lSyI23IeZVC+QVDJ/RpU5E=;
+        b=P0pDbjFzPRdinRnTj4Ok5PfWTprkWOlQNhTcHfH4iCyJTQETRXAdDh9h7uI8XvcIdN
+         /QuJd9YxROGZU2xH+d1hueAaUAuoHHtWvWSIif9i0fYxHMo6pF+LZTl4kGd69KCzuiD1
+         k1zfNZ3qJidbW+m/ZniOa1xmrvND9MOsEI5UrTq6ulqBYzK1EWosHwuy/MtP8w++u1Po
+         Hlv0/AiL2/8kqN4A2PnIhg8fDdlheWLG6NdE/NoO/+4FKA0GMbv8fx0V4KUBZ0IXTlIz
+         YNdbBP9pPsVzloBfKHNdJtBQimbBXz0IIrnTCHwqn7se+I1bU6hYH5L8IoW0pwBDn0Qr
+         R5UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681344417; x=1683936417;
+        d=1e100.net; s=20221208; t=1681344421; x=1683936421;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+c1yUpkzswmzq/oMrJxXHf4ZggUo4IZgO2KUwSt5A/4=;
-        b=Zw6zy/tjN2JjknKEWIfrGIZboVpRAcFVO/qsVY7BsDpyue9HM6uaM2wDUX20VWtUw2
-         zab/JWg5dEPU6YdmzW472DsR8DTqBCQgaaL5H6b+wa/6YQIu13my7Cw69UxXKDwGo4Ux
-         y++7aGrsG6Ik7JKp7MKZoZqaNePqby5vxF2C37OIAGHmv6JOO8syxasS5JMhsFZrTyjY
-         s6YofVz+B7HVNMzQrIiEiGGKIY9M7gJZE1U/iRAaZNWSbUX6wWwluwrQ9CL2VyvLgbMS
-         051y5Ii3IJ/G8W/kC59Jv1mnerks5upPLuwkVVUO9Mg+j9pQwvFTUsNXQOJYxQwJsa0d
-         BbeA==
-X-Gm-Message-State: AAQBX9dnWN01tJrZeOYjn3dRGNYp44IPac8eba++DPWZ5vpoKcPG9dRZ
-        Zo9UZVVoheZop/oZ4I01Zfc=
-X-Google-Smtp-Source: AKy350YDLlg0qRTKX3Voc4vDlbECcwCD//NpNhmfQJwJ7widmWUrX0ZepcpGPCbp56HaPMmeXLqTFw==
-X-Received: by 2002:a17:90a:e545:b0:240:5c46:e9b0 with SMTP id ei5-20020a17090ae54500b002405c46e9b0mr4963211pjb.2.1681344417156;
-        Wed, 12 Apr 2023 17:06:57 -0700 (PDT)
+        bh=M4IbWZnTXBOzIxRU6MUG4lSyI23IeZVC+QVDJ/RpU5E=;
+        b=HwU6e+pzUHrlocXgOFxz8Kqpj/bPL6EtQq9uYjbu0X5sXHBy4aaBrenki06I4Y/T6b
+         h1kU6iTW1EjvZv0WxIARGdnbelZWaGyQjg8gIG9lgn/GyXRneGNwjzJuVuklGWDpujaK
+         wQzcMJCaPRGEQV+VkystokkD2WtRYtnBMNo2ATTntavCkvrioBZQCtpYftHXbWcxsGhw
+         BG8D6W4g8fgAi6iMAMNpMrmQD4l9/C+sdUnDwMzp7YHp75cfYRHXTU8+MXWr35mRuJEl
+         XvqznPKwsFYFCElspyBGrVhVOI4gWJjjpDwvfUO4NbJW7NTMwSuz+gGPJ+u41JbdyX0g
+         zrJw==
+X-Gm-Message-State: AAQBX9fr4epoEEq9wKz0qdXRUoqJmI1sdbWdgP+fi7CDQ4jJPT1B+OWh
+        UJqeZM7D0+rnT7HX31oxi24=
+X-Google-Smtp-Source: AKy350bA/wlhMB8kKD1xq6pWlj3VZ8nNDPo12O7Qsjx0TisZprIXr5POdtVTyjuAtCMyizXNrqt+fw==
+X-Received: by 2002:a17:902:e54f:b0:19c:a9b8:4349 with SMTP id n15-20020a170902e54f00b0019ca9b84349mr152990plf.32.1681344421005;
+        Wed, 12 Apr 2023 17:07:01 -0700 (PDT)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id t13-20020a17090a2f8d00b002349fcf17f8sm1979486pjd.15.2023.04.12.17.06.56
+        by smtp.gmail.com with ESMTPSA id bi12-20020a170902bf0c00b001a63c61f06esm140111plb.195.2023.04.12.17.07.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Apr 2023 17:06:56 -0700 (PDT)
+        Wed, 12 Apr 2023 17:07:00 -0700 (PDT)
 Sender: Tejun Heo <htejun@gmail.com>
 From:   Tejun Heo <tj@kernel.org>
 To:     axboe@kernel.dk, josef@toxicpanda.com, hch@lst.de
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai1@huaweicloud.com, Tejun Heo <tj@kernel.org>
-Subject: [PATCH 1/4] blkcg: Drop unnecessary RCU read [un]locks from blkg_conf_prep/finish()
-Date:   Wed, 12 Apr 2023 14:06:46 -1000
-Message-Id: <20230413000649.115785-2-tj@kernel.org>
+Subject: [PATCH 3/4] blk-iolatency: s/blkcg_rq_qos/iolat_rq_qos/
+Date:   Wed, 12 Apr 2023 14:06:48 -1000
+Message-Id: <20230413000649.115785-4-tj@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230413000649.115785-1-tj@kernel.org>
 References: <20230413000649.115785-1-tj@kernel.org>
@@ -67,82 +67,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that all RCU flavors have been combined either holding a spin lock,
-disabling irq or disabling preemption implies RCU read lock, so there's no
-need to use rcu_read_[un]lock() explicitly while holding queue_lock. This
-shouldn't cause any behavior changes.
-
-v2: Description updated. Leave __acquires/release on queue_lock alone.
+The name was too generic given that there are multiple blkcg rq-qos
+policies.
 
 Signed-off-by: Tejun Heo <tj@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Cc: Josef Bacik <josef@toxicpanda.com>
 ---
- block/blk-cgroup.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ block/blk-iolatency.c | 2 +-
+ block/blk-rq-qos.h    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 18331cb92914..0a2c19d74d95 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -699,12 +699,12 @@ struct block_device *blkcg_conf_open_bdev(char **inputp)
-  *
-  * Parse per-blkg config update from @input and initialize @ctx with the
-  * result.  @ctx->blkg points to the blkg to be updated and @ctx->body the
-- * part of @input following MAJ:MIN.  This function returns with RCU read
-- * lock and queue lock held and must be paired with blkg_conf_finish().
-+ * part of @input following MAJ:MIN.  This function returns with queue lock
-+ * held and must be paired with blkg_conf_finish().
-  */
- int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 		   char *input, struct blkg_conf_ctx *ctx)
--	__acquires(rcu) __acquires(&bdev->bd_queue->queue_lock)
-+	__acquires(&bdev->bd_queue->queue_lock)
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 6707164c37f1..2560708b9109 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -969,7 +969,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
  {
- 	struct block_device *bdev;
- 	struct gendisk *disk;
-@@ -726,7 +726,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 	if (ret)
- 		goto fail;
- 
--	rcu_read_lock();
- 	spin_lock_irq(&q->queue_lock);
- 
- 	if (!blkcg_policy_enabled(q, pol)) {
-@@ -755,7 +754,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 
- 		/* Drop locks to do new blkg allocation with GFP_KERNEL. */
- 		spin_unlock_irq(&q->queue_lock);
--		rcu_read_unlock();
- 
- 		new_blkg = blkg_alloc(pos, disk, GFP_KERNEL);
- 		if (unlikely(!new_blkg)) {
-@@ -769,7 +767,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 			goto fail_exit_queue;
- 		}
- 
--		rcu_read_lock();
- 		spin_lock_irq(&q->queue_lock);
- 
- 		if (!blkcg_policy_enabled(q, pol)) {
-@@ -805,7 +802,6 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 	radix_tree_preload_end();
- fail_unlock:
- 	spin_unlock_irq(&q->queue_lock);
--	rcu_read_unlock();
- fail_exit_queue:
- 	blk_queue_exit(q);
- fail:
-@@ -832,10 +828,9 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
-  * with blkg_conf_prep().
-  */
- void blkg_conf_finish(struct blkg_conf_ctx *ctx)
--	__releases(&ctx->bdev->bd_queue->queue_lock) __releases(rcu)
-+	__releases(&ctx->bdev->bd_queue->queue_lock)
- {
- 	spin_unlock_irq(&bdev_get_queue(ctx->bdev)->queue_lock);
--	rcu_read_unlock();
- 	blkdev_put_no_open(ctx->bdev);
+ 	struct iolatency_grp *iolat = pd_to_lat(pd);
+ 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
+-	struct rq_qos *rqos = blkcg_rq_qos(blkg->q);
++	struct rq_qos *rqos = iolat_rq_qos(blkg->q);
+ 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
+ 	u64 now = ktime_to_ns(ktime_get());
+ 	int cpu;
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index b02a1a3d33a8..f48ee150d667 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -74,7 +74,7 @@ static inline struct rq_qos *wbt_rq_qos(struct request_queue *q)
+ 	return rq_qos_id(q, RQ_QOS_WBT);
  }
- EXPORT_SYMBOL_GPL(blkg_conf_finish);
+ 
+-static inline struct rq_qos *blkcg_rq_qos(struct request_queue *q)
++static inline struct rq_qos *iolat_rq_qos(struct request_queue *q)
+ {
+ 	return rq_qos_id(q, RQ_QOS_LATENCY);
+ }
 -- 
 2.40.0
 
