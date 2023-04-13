@@ -2,132 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755A3C77B6E
-	for <linux-block@archiver.kernel.org>; Thu, 13 Apr 2023 13:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4943FC77B6F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Apr 2023 13:30:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230225AbjDMNML (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Apr 2023 09:12:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42748 "EHLO
+        id S229864AbjDMNax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Apr 2023 09:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbjDMNMK (ORCPT
+        with ESMTP id S231454AbjDMNai (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Apr 2023 09:12:10 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A1AAF11
-        for <linux-block@vger.kernel.org>; Thu, 13 Apr 2023 06:11:34 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-63243b0e85aso533462b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 13 Apr 2023 06:11:34 -0700 (PDT)
+        Thu, 13 Apr 2023 09:30:38 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E2639755;
+        Thu, 13 Apr 2023 06:30:13 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id l18so14198099wrb.9;
+        Thu, 13 Apr 2023 06:30:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681391487; x=1683983487;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0j7Htpm8UoV0PWEokgdSWz4aWONGj1Ju1iipPf5HTjk=;
-        b=KS8DOQChwGI8qhCsmrfKwapMiMj77xvUrDPVEy6KzssGyh2Ut2QsU2SwMRb0o5ClIp
-         6DfsuSLQPGZWBaw/34CaX0yejjhOCHMBM522YWh6Qw25ncewbpYGMjr3el1X+kb7Hed3
-         F2Xnljy1DSWQf9VLyRT00H5DOYSUlmMYrC23s3zjqGXHXFEQGHW4um5ZmYqQ9kIFbko+
-         q8PZ2uSeGzNWAAjLk0xaX1l6ojKzSfIWcKK3yES+/TssbiDAe9q9rDd8UVIYt/NJQqWh
-         E/NPC+semw4uY3kkJ9NUKS+nstZrHLYe5MEq4vRpZXTtNaqGDRYA27yYM0nmiiSoxoye
-         qcAQ==
+        d=gmail.com; s=20221208; t=1681392611; x=1683984611;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7vuUepV4dAJ+nkaSvL/ErL7Y/nu4CyeJdvToecRq5Q8=;
+        b=GO3KIgO1Au7XBl//B835y3fVl6xQs3EDJoDX72iO1VBi+gafdvC8Jrj47R96KSpGTR
+         GEoA49VUWHWXW1k2k9/KzCWjymdqVctxdUGMl/3VyAbjiDSKzo5oJ59GtF4P+B0VTRF0
+         +wrXtMVM1/gZGRKcgpZk0qdi6FiCwIlWFMqIQaMJIOAzq/MuBq0i+3pD6+t/gJ5VR/sE
+         8Wf+o2wlWcDHTH7BwaJ9uyhpW713f+Bv7+4Pb5Nj4RcSIp57S3f6lt+eoGfR0+Jyh07/
+         v7zR4U5vFg6burt5kbGfG6LUGMW6Jx0UIp7Mw033DPT6BAA1kuzuxQidFGdQZYHLWexj
+         APtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681391487; x=1683983487;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0j7Htpm8UoV0PWEokgdSWz4aWONGj1Ju1iipPf5HTjk=;
-        b=Giu76ggrS0KJuXo58UrbaJbw9Op/oUZKFvZcnteNDQVh5zila5veEPJprBKq5BbU7k
-         C73xpJL1pHUG3+QSzmzaeSgbM0L9P4Hf9VMDpoSjJWSU/DJN9jX2CSIGwD6DoSlE8k8G
-         TLah5iNadUXXOi1F2TD3yBingPeJmYogjPTFa9clXkg28zhVcIpMkrVKx2tsG+VvhkKC
-         lIC+QRb+N3Ua40DkMXdVUHFz1mFl8S3anlwyLumqvbwbmrLzPVbPpfWveJeVY6ca6f4V
-         l6cuQahkYlqzWiCFMi3F0TEeAA6hGU7NowvtFEV77FFKoZ1birS6OrjnXpICzrnzqjfb
-         aC7A==
-X-Gm-Message-State: AAQBX9fw5HOW7ZHH1x9Kvr20PwHDHOcV9RfDt+2PCJQpGn0lIoUiEPcJ
-        EfEuGN/Poa3BtB3FqcNUbnlwteYYGHXr8xzoqoI=
-X-Google-Smtp-Source: AKy350ZdayUl/38EVoeEtiEZ+ccaTlxOympD4GhbwPXe/PLdeXBjmqoZmZLqskCWYTAcFtP2QF/dlg==
-X-Received: by 2002:a05:6a00:418e:b0:634:c6b9:92e4 with SMTP id ca14-20020a056a00418e00b00634c6b992e4mr2865016pfb.0.1681391487472;
-        Thu, 13 Apr 2023 06:11:27 -0700 (PDT)
-Received: from [127.0.0.1] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id s18-20020a62e712000000b0062dee0221b2sm1387575pfh.21.2023.04.13.06.11.26
+        d=1e100.net; s=20221208; t=1681392611; x=1683984611;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7vuUepV4dAJ+nkaSvL/ErL7Y/nu4CyeJdvToecRq5Q8=;
+        b=bkN0Z4clxWELo9CEsLYoXeHlKhaDyNXRC4nIi7/NuEC6AH73Y/SxLIl2eWW2nJ37OX
+         OS5lkGU9QbMXr2QKAVSTCi9Ctz9ER1AD9PytDSlJeEKzUWFdvcn3yQpwQ3gVBIgbPA1A
+         Xi1tavayNFuTBpCvx7zN0LMncfNXmbeTHEDyiEv6NrshHiWxtjOZ4sJRfHCchcYeBur+
+         LS0zh8oJJqBVKrNDCgt8dMxclMFyrxc8n9MxkWgBB2R17aiBsCT1fvfzkdfB+4UJayYG
+         DtO5BlmNwpbd0OVDv7YN1xZdLEjMe4dtF0OkJLHdGZMKLEN0cslyjcg1C9w6/sawJFwU
+         +9/Q==
+X-Gm-Message-State: AAQBX9dW5Hij/YZUSx8ghoPI6Ij9VuXYwHc6S1hoZwVgwwphHb80FwbY
+        Ojl3RpLGHq0QWVMdp5fNuZk=
+X-Google-Smtp-Source: AKy350bLYbMF89ZC+MJVjwk3fnMTGMycUXZjXTHbi9DZpOpVl1PLukpxYkHqByWwrepviu7nhYpAnQ==
+X-Received: by 2002:a05:6000:1365:b0:2c7:1e16:57cf with SMTP id q5-20020a056000136500b002c71e1657cfmr1500704wrz.67.1681392610996;
+        Thu, 13 Apr 2023 06:30:10 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id b11-20020a5d4d8b000000b002c7066a6f77sm1315780wru.31.2023.04.13.06.30.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Apr 2023 06:11:27 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20230413064057.707578-1-hch@lst.de>
-References: <20230413064057.707578-1-hch@lst.de>
-Subject: Re: cleanup request insertation parameters v3
-Message-Id: <168139148674.18684.3205092880375599716.b4-ty@kernel.dk>
-Date:   Thu, 13 Apr 2023 07:11:26 -0600
+        Thu, 13 Apr 2023 06:30:10 -0700 (PDT)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] block, bfq: Fix division by zero error on zero wsum
+Date:   Thu, 13 Apr 2023 14:30:09 +0100
+Message-Id: <20230413133009.1605335-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+When the weighted sum is zero the calculation of limit causes
+a division by zero error. Fix this by continuing to the next level.
 
-On Thu, 13 Apr 2023 08:40:37 +0200, Christoph Hellwig wrote:
-> in context of his latest series Bart commented that it's too hard
-> to find all spots that do a head insertation into the blk-mq dispatch
-> queues.  This series collapses various far too deep callchains, drop
-> two of the three bools and then replaced the final once with a greppable
-> constant.
-> 
-> This will create some rebased work for Bart of top of the other comments
-> he got, but I think this will allow us to sort out some of the request
-> order issues much better while also making the code a lot more readable.
-> 
-> [...]
+This was discovered by running as root:
 
-Applied, thanks!
+stress-ng --ioprio 0
 
-[01/20] blk-mq: don't plug for head insertions in blk_execute_rq_nowait
-        commit: 50947d7fe9fa6abe3ddc40769dfb02a51c58edb6
-[02/20] blk-mq: remove blk-mq-tag.h
-        commit: bebe84ebeec4d030aa65af58376305749762e5a0
-[03/20] blk-mq: include <linux/blk-mq.h> in block/blk-mq.h
-        commit: 90110e04f265b95f59fbae09c228c5920b8a302f
-[04/20] blk-mq: move more logic into blk_mq_insert_requests
-        commit: 94aa228c2a2f6edc8e9b7c4745942ea4c5978977
-[05/20] blk-mq: fold blk_mq_sched_insert_requests into blk_mq_dispatch_plug_list
-        commit: 05a93117703e7b2e40fa9193e622079b30395bcc
-[06/20] blk-mq: move blk_mq_sched_insert_request to blk-mq.c
-        commit: 2bd215df791b5d36ca1d20c07683100b48310cc2
-[07/20] blk-mq: fold __blk_mq_insert_request into blk_mq_insert_request
-        commit: a88db1e0003eda8adbe3c499b81f736d8065b952
-[08/20] blk-mq: fold __blk_mq_insert_req_list into blk_mq_insert_request
-        commit: 4ec5c0553c33e42f2d650785309de17d4cb8f5ba
-[09/20] blk-mq: remove blk_flush_queue_rq
-        commit: a4fa57ffb7671c2df4ce597d03ef9f7d6d905a60
-[10/20] blk-mq: refactor passthrough vs flush handling in blk_mq_insert_request
-        commit: 53548d2a945eb2c277332c66f57505881392e5a9
-[11/20] blk-mq: refactor the DONTPREP/SOFTBARRIER andling in blk_mq_requeue_work
-        commit: a1e948b81ad21d635b99c1284f945423cb02b4c4
-[12/20] blk-mq: factor out a blk_mq_get_budget_and_tag helper
-        commit: 2b71b8770710f2913e29053f01b6c7df1a5c7f75
-[13/20] blk-mq: fold __blk_mq_try_issue_directly into its two callers
-        commit: e1f44ac0d7f48ec44a1eacfe637e545c408ede40
-[14/20] blk-mq: don't run the hw_queue from blk_mq_insert_request
-        commit: f0dbe6e88e1bf4003ef778527b975ff60dbdd35a
-[15/20] blk-mq: don't run the hw_queue from blk_mq_request_bypass_insert
-        commit: 2394395cd598f6404c57ae0b63afb5d37e94924d
-[16/20] blk-mq: don't kick the requeue_list in blk_mq_add_to_requeue_list
-        commit: 214a441805b8cc090930fb00193125e22466a95a
-[17/20] blk-mq: pass a flags argument to blk_mq_insert_request
-        commit: 710fa3789ed94ceee9675f8e189aaf3e7525269a
-[18/20] blk-mq: pass a flags argument to blk_mq_request_bypass_insert
-        commit: 2b5976134bfbc753dec6281da0890c5f194c00c9
-[19/20] blk-mq: pass a flags argument to elevator_type->insert_requests
-        commit: 93fffe16f7ee18600f15838e2e8b5cf353f245c8
-[20/20] blk-mq: pass a flags argument to blk_mq_add_to_requeue_list
-        commit: b12e5c6c755ae8bec44723f77f037873e3d08021
+Fixes divison by error oops:
 
-Best regards,
+[  521.450556] divide error: 0000 [#1] SMP NOPTI
+[  521.450766] CPU: 2 PID: 2684464 Comm: stress-ng-iopri Not tainted 6.2.1-1280.native #1
+[  521.451117] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org 04/01/2014
+[  521.451627] RIP: 0010:bfqq_request_over_limit+0x207/0x400
+[  521.451875] Code: 01 48 8d 0c c8 74 0b 48 8b 82 98 00 00 00 48 8d 0c c8 8b 85 34 ff ff ff 48 89 ca 41 0f af 41 50 48 d1 ea 48 98 48 01 d0 31 d2 <48> f7 f1 41 39 41 48 89 85 34 ff ff ff 0f 8c 7b 01 00 00 49 8b 44
+[  521.452699] RSP: 0018:ffffb1af84eb3948 EFLAGS: 00010046
+[  521.452938] RAX: 000000000000003c RBX: 0000000000000000 RCX: 0000000000000000
+[  521.453262] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffb1af84eb3978
+[  521.453584] RBP: ffffb1af84eb3a30 R08: 0000000000000001 R09: ffff8f88ab8a4ba0
+[  521.453905] R10: 0000000000000000 R11: 0000000000000001 R12: ffff8f88ab8a4b18
+[  521.454224] R13: ffff8f8699093000 R14: 0000000000000001 R15: ffffb1af84eb3970
+[  521.454549] FS:  00005640b6b0b580(0000) GS:ffff8f88b3880000(0000) knlGS:0000000000000000
+[  521.454912] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  521.455170] CR2: 00007ffcbcae4e38 CR3: 00000002e46de001 CR4: 0000000000770ee0
+[  521.455491] PKRU: 55555554
+[  521.455619] Call Trace:
+[  521.455736]  <TASK>
+[  521.455837]  ? bfq_request_merge+0x3a/0xc0
+[  521.456027]  ? elv_merge+0x115/0x140
+[  521.456191]  bfq_limit_depth+0xc8/0x240
+[  521.456366]  __blk_mq_alloc_requests+0x21a/0x2c0
+[  521.456577]  blk_mq_submit_bio+0x23c/0x6c0
+[  521.456766]  __submit_bio+0xb8/0x140
+[  521.457236]  submit_bio_noacct_nocheck+0x212/0x300
+[  521.457748]  submit_bio_noacct+0x1a6/0x580
+[  521.458220]  submit_bio+0x43/0x80
+[  521.458660]  ext4_io_submit+0x23/0x80
+[  521.459116]  ext4_do_writepages+0x40a/0xd00
+[  521.459596]  ext4_writepages+0x65/0x100
+[  521.460050]  do_writepages+0xb7/0x1c0
+[  521.460492]  __filemap_fdatawrite_range+0xa6/0x100
+[  521.460979]  file_write_and_wait_range+0xbf/0x140
+[  521.461452]  ext4_sync_file+0x105/0x340
+[  521.461882]  __x64_sys_fsync+0x67/0x100
+[  521.462305]  ? syscall_exit_to_user_mode+0x2c/0x1c0
+[  521.462768]  do_syscall_64+0x3b/0xc0
+[  521.463165]  entry_SYSCALL_64_after_hwframe+0x5a/0xc4
+[  521.463621] RIP: 0033:0x5640b6c56590
+[  521.464006] Code: 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 80 3d 71 70 0e 00 00 74 17 b8 4a 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ block/bfq-iosched.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index d9ed3108c17a..bac977da4eb5 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -649,6 +649,8 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
+ 					sched_data->service_tree[i].wsum;
+ 			}
+ 		}
++		if (!wsum)
++			continue;
+ 		limit = DIV_ROUND_CLOSEST(limit * entity->weight, wsum);
+ 		if (entity->allocated >= limit) {
+ 			bfq_log_bfqq(bfqq->bfqd, bfqq,
 -- 
-Jens Axboe
-
-
+2.30.2
 
