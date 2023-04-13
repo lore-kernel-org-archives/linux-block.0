@@ -2,227 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0108C77B6E
-	for <linux-block@archiver.kernel.org>; Thu, 13 Apr 2023 17:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A9DFC77B61
+	for <linux-block@archiver.kernel.org>; Thu, 13 Apr 2023 17:24:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbjDMRTW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Apr 2023 13:19:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48388 "EHLO
+        id S229840AbjDMRY4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Apr 2023 13:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbjDMRTV (ORCPT
+        with ESMTP id S229633AbjDMRYz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Apr 2023 13:19:21 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B2211C
-        for <linux-block@vger.kernel.org>; Thu, 13 Apr 2023 10:19:19 -0700 (PDT)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33DGSrrT017864;
-        Thu, 13 Apr 2023 17:19:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=xdbixUbKDbWQcce21VE5lbhjTLfhadCyWBa5XH7683A=;
- b=sRKScG2t7JmdQ2JIYigUs//GYqzApsj9Ulot9tzTD2LTkRZPA1kfKEoq2mSTufb3zO0S
- TO7E43BOSROtDCNGwxB6wBlmF2aQyckCFZtL+P1oOXo7Wt0UAjWPDGTI/pjgFBcLVqi0
- ic6Bg9H5SdNfsGoboLv1VJ0oidqdMUpsBJ+dAppr4rZ7sh7hv6OzmRQVAU2/x8E96XFp
- Vu/+HZtyS5GgO8aje6f1iY3uk3mWCaQ8JmqMtrUQ2nj1jDyCTFl1xjnuNqjMYFdpis4X
- sn57MGVzG3M/WDFv/vV5lurEPxh7zIeOFRG/uVincbP2kndlo//IZ+rXjdD9Lm5BefXp 9g== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pu0eqbumd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Apr 2023 17:19:08 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33DH6OUd012688;
-        Thu, 13 Apr 2023 17:19:08 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2169.outbound.protection.outlook.com [104.47.55.169])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3puweb3wnc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Apr 2023 17:19:07 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b/oXGlcJ7AbLQNFRNTvHqgmVzqRZescqirhSD4gCX56Th/YvfY6nht/THdN4QanJ/SiKFOoYUlqadviFEjIS+/ePji05qahlvKVU7SN7oZGhRDLeMd1QRRKNYPu1z1gxa4dLoTHEaQqMv1MsS3+sn3fbmlU0bBFwHkPXK0bfg5RYhTqHqxK7ZptC8oxG6tdb1CsQIna4M1NHmPrZxxiztjkAfxc3uW2fRYVg6qNs4tztjst1pyPKAbouuKd96XcHcED9fnhBqindvUdSP+XLNV1KPtW/2s1372c5DWKaoBYGff4VRzhZ6cAK1d/4FvXn1YKbDaBK93Rfe8GLcBtZaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xdbixUbKDbWQcce21VE5lbhjTLfhadCyWBa5XH7683A=;
- b=hRwjqEHll30IhKm4KtNAQ9YCvisd8FtsKWl8jMYi9mXDzPlpFR0DxO17uUO791jDkFkgkS4qMEuE+Uq2lMIr1oxZ4dyO7tgsGcCTIheT4Imy9cXmMloF5K0XdtFdfB7UNYThbDYX98ehj2Hbbdm/mMxDtpmJrr1S2cFD6Ax5BW5haiVlqsvF7I+oet7ooO1Rt5Rd76vmupqMJBErvF7OA6jA6X5DL0uJFgnKJxJIVxPFQ3xWxsK5jvWFpvOTZqB9YYGIuO+WZdYxK9rGYq2mj54aPrPQ4XDzGgx7itoZKZxIRumo39HpbryV09ZzVqOtVOpa74tCruczrvU1IP1aPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xdbixUbKDbWQcce21VE5lbhjTLfhadCyWBa5XH7683A=;
- b=wHnp6jO1JIM4HxvB4OOkLkehwKL5NCVPJ+DOt2y1zeA9yl6j5TU3MGwnCfgpqfGX6JyYktS+bljtXusTKJzoajTC71uvJdfSobrcT1BHywbqxUHgr6VWxpaIynQTqzX3A5vqk3K4B93zgGNmuc4y7LPbiNm13zuStRlL1UdV6lc=
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com (2603:10b6:a03:3d3::5)
- by CH2PR10MB4294.namprd10.prod.outlook.com (2603:10b6:610:a7::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.30; Thu, 13 Apr
- 2023 17:19:06 +0000
-Received: from SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::e206:6854:c7ed:225c]) by SJ0PR10MB5550.namprd10.prod.outlook.com
- ([fe80::e206:6854:c7ed:225c%7]) with mapi id 15.20.6298.030; Thu, 13 Apr 2023
- 17:19:06 +0000
-Message-ID: <3216ff1f-ecde-967b-75b1-7da643570ed9@oracle.com>
-Date:   Thu, 13 Apr 2023 10:19:01 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.1
-Subject: Re: [PATCH blktests] nvme/039: avoid failure by error message rate
- limit
-Content-Language: en-US
-To:     Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20230412085923.1616977-1-shinichiro@fastmail.com>
- <34019736-06eb-b5dd-b6a1-101907c38917@oracle.com>
- <saejpr554r5sxjhqjps3yqgdwhrgufauki2f5npp2yzu6xtvum@q7oz2nwzic3r>
- <lhy27pg5my4fw7a7lyt5ag6zms4vnnaoab2laylatjqwkckdzv@55ebsbgtgpbs>
-From:   alan.adamson@oracle.com
-In-Reply-To: <lhy27pg5my4fw7a7lyt5ag6zms4vnnaoab2laylatjqwkckdzv@55ebsbgtgpbs>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA9PR13CA0006.namprd13.prod.outlook.com
- (2603:10b6:806:21::11) To SJ0PR10MB5550.namprd10.prod.outlook.com
- (2603:10b6:a03:3d3::5)
+        Thu, 13 Apr 2023 13:24:55 -0400
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E356595
+        for <linux-block@vger.kernel.org>; Thu, 13 Apr 2023 10:24:53 -0700 (PDT)
+Received: by mail-io1-f70.google.com with SMTP id y198-20020a6bc8cf000000b00760b47349b4so1192712iof.17
+        for <linux-block@vger.kernel.org>; Thu, 13 Apr 2023 10:24:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681406693; x=1683998693;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=het8HlJMdVytErwlzObZICB1SroiwS2yUvlml5Qdc98=;
+        b=hoCsP+io8N5N8DDH0gUdOq2ks6pYrURwvH9VW9z8G+LmWtqV0Uw0e8LoGujN+6j3YC
+         1OgZLxS1eQKohko49/RgXP/QfodilwaeexVdNipTUG7lQWNWFCTdimoZYAkveIv60zZl
+         vqkJNHla/vAvK8o2qReUNuhIpDBgIzHsQ42zUIwi0ZXm6rWp1wwAVNcekQ5xLccZD6ux
+         o43M5ygNNJf7kgzwae0SuEQOZu6eXm4j7GAeimTHnjMQolLwQHidC/IQ0UdwkebA6ktP
+         i9FoZMsdyfQtsHbo81vaKkEN7PZ6ffvJeHiYPsdslZdnO8PnJ9p9nzy7BrqL82SDI/52
+         +q3A==
+X-Gm-Message-State: AAQBX9eqgjBrsNhkAEjvrKMqiVBCUF2vBsHVQQ0WSXvC6fdQEtzuPOKe
+        g/Ue3hBPbkxtbQlO5jit/mY176KEfyk2qMlwpXevTV342nuX
+X-Google-Smtp-Source: AKy350Y+zTXUXP8+Olm4yxgeHugP3Wwji8D+h9ozFpiwrKT4vPdDjy9AwaZXRAKMLcA3csFnDBkbG1ekHnOs/rdE+4fo+kSjNZOQ
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB5550:EE_|CH2PR10MB4294:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc4fff12-f371-49ae-ae3c-08db3c432f7f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YetTcDnoGdJVHEiPxhsGq8VQ5QavIureOILQQk6//gpo+9lnOxZWpBs22pA9FNOf1yqTFiTAr6zG1aZR4mLiyOWJU6TlhdqgO+RdbsDoEq7qfCjLgw72LmlNHZhPRLCK1Bd+sUqWf0f3eZEketmBo+iHqdIKOjf8hcaz5UeRI7aqy7Ma4+mJO1xEt7q9GUJkCFtgLR4/7XN6XV3L6RoRYNTdDNzLepZ7e09dd4Sm8s+GiBF0ueRr4XzeiLh1azBxwz9aSQVb2+L1NunAE9MNLi08MJmLsLHcKAilrLORiDf3I0rLck52zEQeJKjhCFeFXhsmBqCLmSQRSNY67XdrqeF0H4IqTGhqexUgM8aCCZ4ykX1bbBO7vy/JRj/OsoRu95NSQjjBTWmKpFnU0cHbS0BpGYNPjcw8LG+1VvJyhHHMseUCzyvBEWDC3Ufe1K7kaDS+jaBZSzGvkgqxNtOqYeEtlt2l/7P8joAzJt7hxd6IIWH0LTS/iTyg9zoWLMWrAKk+U4WlmeuS4quhAovCToyOTXptJK3SJmNSeo0M4ZgBraorC5q97XTB/vcBkeid2OG+fncsG9FQSsZxSxqjnR9NeU2CXa8a+BV5BGtxnobE8+H0siAvw4y3Xf4SxGZ3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB5550.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(396003)(136003)(39860400002)(366004)(376002)(451199021)(31686004)(83380400001)(38100700002)(186003)(6666004)(66556008)(31696002)(66476007)(6916009)(316002)(4326008)(6486002)(86362001)(36756003)(41300700001)(478600001)(66946007)(53546011)(26005)(9686003)(6512007)(6506007)(8676002)(5660300002)(8936002)(2616005)(15650500001)(2906002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cjZsSGV0S0RIbFo2dHNzZi96enozZW9kbmI3Ujh0R2dDRjFRd1M1QnJ6amJt?=
- =?utf-8?B?SnJGVXNyeUlPZk1NSmxsNzJlU1NSZk4vOTJVUlJmb0I0dlVBL29tMHNBc0NM?=
- =?utf-8?B?MVZXU0JWZkFpVGtGYmpGazUxdDRpbG9uMnJ5WU8zM0NwV2tKMTkrSXcxdWtu?=
- =?utf-8?B?SUNuR2FoSGZLcks1bTIyVlp0RmFHUEhPcGl3dUVXdHpvVEpWeVJOMlRvSzFx?=
- =?utf-8?B?clltaktnY29Wcy9LVUovZm5zVGE5T0xxQ0lCcTdqaU4reFcvWXNsY281Y2dL?=
- =?utf-8?B?WEpObC9Ody95SVRibkZpQ09PN3o1VGdsZU4xRFdWK1lDbmI4TXFiZXFZU0pi?=
- =?utf-8?B?b3hDSW5jWThKVGQwcEhoalZDNzVOZDNMUFRldlVCcE82akZYcmFqbmpVNTRr?=
- =?utf-8?B?ZTNHejVueStmN1ZqT1V2REJvM3VUWmxSbHQ3YmphZGRoTXk5UlY3eUtoaWxB?=
- =?utf-8?B?Y045V0FZdVVFODVzSm4xVm5BY3BySWVSV3N5RjdtQnhrREpOK254dGY5VGVS?=
- =?utf-8?B?TllibG12ZkxYVWpZcGJiZGRpdzh5ajdvRDl1U2lCNmFIZWw1TGdsN1VQT2Rt?=
- =?utf-8?B?OUxqMW50dmE4cis5RG82WFozZ0JCemowVlhoWTFGNTIwWC9McVdKNm56cll2?=
- =?utf-8?B?Sm1XRzl4cWozTUEzeUFPNUxkZjNubUVXMEo3b2RiVWVYODZWRCt2N1BaVlZU?=
- =?utf-8?B?MGFCZ0pzcFdrK3lraUZscjNQQ3E1QjgvTWl4d1dXcmdOREpuWm52RTBpZE4y?=
- =?utf-8?B?bzNzVlhPNUM1Y2dsSEpERjZQa1dsTmxqY0ZVKzl0d3hrRDdYZ2s3c1hUWmQ4?=
- =?utf-8?B?U0c2UWx4SUhxSkQ4Ky96VUZ5TkVUVDNYNVJwUHdzQXVHMHoxc0FFckV2MGxu?=
- =?utf-8?B?RTNRWXJwODFlMHdNU2lkSGtOSndKNkZvTWRDVkR1ZE5qSVArcittY3JBRDJK?=
- =?utf-8?B?SGdnSE1ZYXBCOEZjaG0vL1RKRTdyK3lCMUswVzBSRWV0SVRyQjRzVGpzanVV?=
- =?utf-8?B?WXdldTlSbWd3cnZuWVFMR2J4Znk1aUplZ2pUUVRTTUxDMGJsTlJ2OU91cHUw?=
- =?utf-8?B?VDN2R0RncU9QYzRUdXR1ckluUUlrWlh3NXBaeDVyMUQ2ZkJWcHNQTW5nTDVz?=
- =?utf-8?B?QktWNDRRU2RhazgraUVrOUpEUisrMW8xQ25aYmFZMXZtWGVpTlVhOEViL0Fp?=
- =?utf-8?B?enRucE5EYnl5anVYZDRjenp3TnQ5ZE85WE9BdXErbjZ5RzVOV0psMXJoc0hH?=
- =?utf-8?B?d1dYamJRWm1aMVgzbVl2YjFwSkJpK0F2bVJyaElPSEFSL2tIbTQwSmtIa1RM?=
- =?utf-8?B?VFlSWCtpeFNJcG1Bd0RpTjRybUJVa2I0Y0hlbkdoNmlzd2ZMTEx2L29mc3pI?=
- =?utf-8?B?djNmbDYvYkhyUWJPSC9UMDN3MjYxeU1JMFhCenY2QS9zVlNabUpJMFUwcitx?=
- =?utf-8?B?cUNkdm5adnREV0luaVFhNEw1V0llVHdDSEoxVXJNcHpMUXY5dzFXZlRHZ1pn?=
- =?utf-8?B?TWszRGpieDZ4Uk1DN2NJeDl2cFhjcCswVkhvbzRzMkcwWHhwNTBIYUs2TUhX?=
- =?utf-8?B?UTI0SFQySSt6SEtBUlE5UnNyK0FpZHFBYStNQWx5REdsbFVrUVA2dUxXdVpG?=
- =?utf-8?B?SnR1aDRJbGdOSEpZbVNhbEhqbmhFd3ZlUTdORm5ZU21xQldlNmE2VXo4ODFh?=
- =?utf-8?B?MlpYeGlpNEppRktJYzRTd2t2dk9OcG51dHREaU9CNWxlL3VOVk5TYTN6ZkZo?=
- =?utf-8?B?cnNhMlhZVnpoaWhZTEJxamlOa3owRXpqT2x1cVdJTWNZTlhLTnNINC80cEdl?=
- =?utf-8?B?SnRSWGFleml0bGk3bkNRRk80TFFNdDVPaDljUnNkOEIwdnhMSm5NMHY0QTNH?=
- =?utf-8?B?U3RlZDFJMjFwQldkdEFsbFVkRzU0WFF0RWRBSWZaSExHSmJhTzBzYnEyQUdQ?=
- =?utf-8?B?Und3RWJzcXoveGtMcGNseDV1bitKZEtWaWRqSDVKL0JlQXlIcHdXeDNIa1I4?=
- =?utf-8?B?VE1GdGNvcTBaSUpZeUh6YWRhY1doVE5FaEpYSEI4cFp2VmpXYnZmZWtCOFNp?=
- =?utf-8?B?VlNpcHd6THoyZVJ5aW9HN0xaSU9aWDZhMEZzN1JLZFlaa2JkVkNoUXc3RytY?=
- =?utf-8?Q?/lvV3OFFCIZx6KRlHJQ/n/WeS?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: +RpJMRlq4aHeIy4+PR48JXCgL4hPPV1T6gVLSUTDZTXgwk7en9e4mXq7BO1stYpITNkIgvIsVXNu9Weaus14sP9H5MhI3Yw1F1NZcdFiQ1un6nnIWRIGJTNneg5wscxlPZVLt6BdIBZrKIiaRcILYNOqWTMXX5/QAVgeL2itxTtOZVWodbMY6cJ+9OyNIF4TJKhC/8jEcvssFEFLWwMvdpkhAwEloGOU8v8pOH2uj3+eRNAUqqUM7qpZuI9BBz/qQPcsfocDKGgxlfmalpOu6ifzcV+t9x0KGDtxI3yykeX9UmV3vIuOUvTYNdvUk7603SQf0O7hEhl218x7xXLakZfDupi9YsElM0JL7sn0eIautjZr/yXCmh3MozPxi3uaIXvVTJCrTbadQPVOyO/M1FW8h491oBbn2NyRCliEqsva9xK3VX7NUu4bqQD2BntVEAYlNUc7m0gisNGT6562C2MAg32LyfwZB1Y3fETELeTDnkrGJ5DvurnzC1Xeb4CxpHSGX+oMsiAsN484FfiObyr5FiLPo9aSJHb96t6uiJSLSoYhYl0+hKWiFzg4fFcHv5lCVx2sgeiWz2ZYdoHhJtdCYxrYPDff4m4ud2VX1V44LfBp7prLr/4D3zzRxgQfQMuyTyuQkYGt3N5c0v3k7sxFsWRSsQWkZXWVAASW4Sg2r6fq1s89sdc2h6hqbEjywVa511hlGorTG9H+B+AMX3IYLqyV4j8Fdq4X3AWlsWcNjHj/nSB3kKfM6JFGQsk2+mTOK82P6dVAcfoLb2VOW8W8yeGa2GB5S872E6CkypmFh/ZkpNFmYD0xEfLb5BmB1G2DphmdCFJY0RszVx8yxPgC3KKx8CdPK1BdW+uWQ3joh+xniO7nfXvtUBcEbmEL
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc4fff12-f371-49ae-ae3c-08db3c432f7f
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB5550.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2023 17:19:06.3172
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CyWkrIVBg5JVDxxF7ecduGLtTmKKXCIPCMebwXrMZSQYCIBfMLjj87638uqOoRALdhCf/xULdON4uqTGXzW49Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4294
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-13_12,2023-04-13_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- adultscore=0 spamscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2304130153
-X-Proofpoint-GUID: RhcPPfkALGkS5b9rhTSw4oJ5Ul-Pw-rM
-X-Proofpoint-ORIG-GUID: RhcPPfkALGkS5b9rhTSw4oJ5Ul-Pw-rM
+X-Received: by 2002:a02:7a4a:0:b0:406:29c8:2d7c with SMTP id
+ z10-20020a027a4a000000b0040629c82d7cmr974631jad.5.1681406693287; Thu, 13 Apr
+ 2023 10:24:53 -0700 (PDT)
+Date:   Thu, 13 Apr 2023 10:24:53 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ad319d05f93b0045@google.com>
+Subject: [syzbot] [block?] WARNING in fd_locked_ioctl
+From:   syzbot <syzbot+641182a53d64479c27e7@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-On 4/12/23 8:56 PM, Shin'ichiro Kawasaki wrote:
-> On Apr 13, 2023 / 09:20, Shin'ichiro Kawasaki wrote:
->> On Apr 12, 2023 / 10:49, alan.adamson@oracle.com wrote:
->>> On 4/12/23 1:59 AM, Shin'ichiro Kawasaki wrote:
->>>> From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->>>>
->>>> The test case nvme/039 tests that expected error messages are printed
->>>> for errors injected to the nvme driver. However, the test case fails by
->>>> chance when previous test cases generate many error messages. In this
->>>> case, the kernel function pr_err_ratelimited() may suppress the error
->>>> messages that the test case expects. Also, it may print messages that
->>>> the test case does not expect, such as "blk_print_req_error: xxxx
->>>> callbacks suppressed".
->>>>
->>>> To avoid the failure, make two improvements for the test case. Firstly,
->>>> wait DEFAULT_RATE_LIMIT seconds at the beginning of the test to ensure
->>>> the expected error messages are not suppressed. Secondly, exclude the
->>>> unexpected message for the error message check. Introduce a helper
->>>> function last_dmesg() for the second improvement.
->>> Why are we seeing the callback messages?  By the time the test starts
->>> generating errors (after a 5 sec delay) we should be able to log 10 messages
->>> without any being suppressed.
->> That is because other test cases before nvme/039 can generate errors. For
->> instance, block/014 generates many errors. When I ran block/014 and nvme/039 in
->> sequence, I always observe nvme/039 failure even with the 5 seconds wait in
->> nvme/039. I suggest to excldue the "callbacks message" to avoid the nvme/038
->> failure regardless of the errors generated before nvme/039.
-> Reading back my explanation above, I found it may not be clear enough. Let me
-> ammend it. My understanding is as follows.
->
-> The test case block/014 generates many error messages by blk_print_req_error().
-> The messages are rate limited and some of them are suppressed. At that time,
-> __ratelimit() calls printk_deferred() to print the "callbacks suppressed"
-> message, which is deferred and not printed during block/014. When nvme/039
-> triggers an error message (after the 5 sec delay), the "callbacks suppressed"
-> message for blk_print_req_error() and block/014 is printed. It makes the
-> nvme/039 fail, since nvme/039 expects the error message it triggered, but it
-> finds the "callbacks suppressed" message instead. In theory, not only block/014
-> but also other workload with rate limited error messages can cause this nvme/039
-> failure.
->
-> The 5 sec delay in nvme/039 ensures that the error messages for nvme/039 are not
-> suppressed, but it can not avoid the "callbacks suppressed" messages that
-> deferred before nvme/039.
+syzbot found the following issue on:
 
-That's right.  I went through the rate limit code and that's how it 
-works, you will get a "callback suppressed" message along with the first 
-message nvme/039 logs.
+HEAD commit:    cdc9718d5e59 Merge tag '6.3-rc5-smb3-cifs-client-fixes' of..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1276f863c80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=adfc55aec6afccdd
+dashboard link: https://syzkaller.appspot.com/bug?extid=641182a53d64479c27e7
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-I ran the following for a while:
+Unfortunately, I don't have any reproducer for this issue yet.
 
-while true
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+641182a53d64479c27e7@syzkaller.appspotmail.com
 
-do
-
-./check block/014
-
-./check nvme/039
-
-done
-
-
-Reviewed-by: Alan Adamson <alan.adamson@oracle.com>
-
-Tested-by: Alan Adamson <alan.adamson@oracle.com>
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 29187 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 0 PID: 29187 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
+WARNING: CPU: 0 PID: 29187 at drivers/block/floppy.c:999 do_format drivers/block/floppy.c:2239 [inline]
+WARNING: CPU: 0 PID: 29187 at drivers/block/floppy.c:999 fd_locked_ioctl+0x1607/0x1990 drivers/block/floppy.c:3501
+Modules linked in:
+CPU: 0 PID: 29187 Comm: syz-executor.0 Not tainted 6.3.0-rc5-syzkaller-00247-gcdc9718d5e59 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
+RIP: 0010:do_format drivers/block/floppy.c:2239 [inline]
+RIP: 0010:fd_locked_ioctl+0x1607/0x1990 drivers/block/floppy.c:3501
+Code: 3d f8 ff ff 41 bf f0 ff ff ff e9 e3 ee ff ff e8 9f d8 65 fc 0f 0b e9 c9 f2 ff ff e8 93 d8 65 fc e9 68 ee ff ff e8 89 d8 65 fc <0f> 0b e9 93 ee ff ff 48 8b 34 24 48 c7 c7 80 47 44 8d e8 92 03 22
+RSP: 0018:ffffc90025edfcd8 EFLAGS: 00010212
+RAX: 00000000000023eb RBX: 0000000000000001 RCX: ffffc90008501000
+RDX: 0000000000040000 RSI: ffffffff851c2227 RDI: 0000000000000001
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000004
+R13: 000000000000000c R14: 0000000000000001 R15: 0000000000000007
+FS:  00007f8e9362f700(0000) GS:ffff88802ca00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f79a81ad988 CR3: 000000007486d000 CR4: 0000000000150ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ fd_ioctl+0x39/0x60 drivers/block/floppy.c:3574
+ blkdev_ioctl+0x372/0x800 block/ioctl.c:615
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f8e9288c169
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8e9362f168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f8e929abf80 RCX: 00007f8e9288c169
+RDX: 0000000020000000 RSI: 00000000400c0248 RDI: 0000000000000003
+RBP: 00007f8e928e7ca1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fff829ac3cf R14: 00007f8e9362f300 R15: 0000000000022000
+ </TASK>
 
 
-Alan
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
