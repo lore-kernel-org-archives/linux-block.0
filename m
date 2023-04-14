@@ -2,66 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92070C77B72
-	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 12:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE6BC77B78
+	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 13:40:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbjDNMo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Apr 2023 08:44:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60686 "EHLO
+        id S229797AbjDNNkU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Apr 2023 09:40:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjDNMo6 (ORCPT
+        with ESMTP id S229544AbjDNNkT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2023 08:44:58 -0400
-X-Greylist: delayed 595 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 14 Apr 2023 05:44:56 PDT
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2FF59E7;
-        Fri, 14 Apr 2023 05:44:56 -0700 (PDT)
+        Fri, 14 Apr 2023 09:40:19 -0400
+Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C31E77D90;
+        Fri, 14 Apr 2023 06:40:17 -0700 (PDT)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 33B5011CC0A;
-        Fri, 14 Apr 2023 15:34:59 +0300 (MSK)
+        by mx1.veeam.com (Postfix) with ESMTPS id C027741C70;
+        Fri, 14 Apr 2023 09:40:10 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1681475699;
-        bh=6eHJcBI5XG1X+5qba8P/84pQnzVU4oVxsQVFl2HGTl8=;
+        s=mx1-2022; t=1681479611;
+        bh=5ZfR/VR7XwIlnUKAwCwTcnTBsRgdwQ0T4cmQ7Jf9od8=;
         h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=vO3OQVh6xTQaXwKXhARpMn3pZp5rI4dMl5tRCqcWErkLRzQkQ/jJ54jrliKu51ztm
-         QCyK1M5J8MGWe57hdsgaTGomJGfpi2UUj2DosPBYOeO8InY8rIGapOuk3oHw4RGrWa
-         IMXcojxy4u5dhnoDObZGPxP0IGpfHJfHDyQRjp9DIaUvC/iQuXA8WMWuT2E/ZnHqkW
-         n7DpdZmPKRf4WPhtRzLNzfIu3nzaxg/JF4rWXow4tdgeJiElBxmoy34sEIpvDQdTgT
-         X5QxZCvW8RavWZKh87yXRDPBY5KD1zYkR9r5DP8STlFc04R3/5McCdhsdsMjHxINmw
-         xTzMCxBDsBsHA==
+        b=sOz5OJNAhKo96IYXETOEtDOEjT144qiybYpenX9d9MdAjWZJEOlvz8dwQm8rLQHA4
+         4C3dFTdeIjdvy0kkQpv7Kv2yhHBFsSe6EDOyUyebaR2Sf3dkuEi+/KxAWGbc3eW0f7
+         JEu5IS22FYzRd4Rh01dGrEzqXBtiG+0uygxVbIhK9jEPd85uQk0qvRnw0UPgBwFQ/O
+         ZDUEn1GdJCvekOGk4XmtOntu1Gv3aR1WJfDxcH9AV/mqchoA4x6O77+AkR71W5AXAK
+         Lj304TsHBbVd1OnISj+r8gBjbiIHB9yPszIgoZc9I8nNcf8JUlL/8tCxRvc2a/9OT8
+         zibD8wXbUwVCg==
 Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
  (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Fri, 14 Apr
- 2023 14:34:56 +0200
-Message-ID: <86068780-bab3-2fc2-3f6f-1868be119b38@veeam.com>
-Date:   Fri, 14 Apr 2023 14:34:47 +0200
+ 2023 15:40:08 +0200
+Message-ID: <93fbcd21-14e3-a46e-91ab-8cc7ca9ed550@veeam.com>
+Date:   Fri, 14 Apr 2023 15:39:59 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.1
-Subject: Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
+Subject: Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
 Content-Language: en-US
-To:     Donald Buczek <buczek@molgen.mpg.de>, <axboe@kernel.dk>,
-        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
-CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+To:     Donald Buczek <buczek@molgen.mpg.de>,
+        Christoph Hellwig <hch@infradead.org>
+CC:     <axboe@kernel.dk>, <corbet@lwn.net>, <snitzer@kernel.org>,
+        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
         <willy@infradead.org>, <kch@nvidia.com>,
         <martin.petersen@oracle.com>, <vkoul@kernel.org>,
         <ming.lei@redhat.com>, <gregkh@linuxfoundation.org>,
         <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
 References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
- <20230404140835.25166-4-sergei.shtepa@veeam.com>
- <cb0cc2f1-48cb-8b15-35af-33a31ccc922c@molgen.mpg.de>
+ <20230404140835.25166-3-sergei.shtepa@veeam.com>
+ <793db44e-9e6d-d118-3f88-cdbffc9ad018@molgen.mpg.de>
+ <ZDT9PjLeQgjVA16P@infradead.org>
+ <50d131e3-7528-2064-fbe6-65482db46ae4@veeam.com>
+ <9d598566-5729-630e-5025-b4173cf307e4@molgen.mpg.de>
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <cb0cc2f1-48cb-8b15-35af-33a31ccc922c@molgen.mpg.de>
+In-Reply-To: <9d598566-5729-630e-5025-b4173cf307e4@molgen.mpg.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [172.24.10.107]
 X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
  prgmbx01.amust.local (172.24.128.102)
 X-EsetResult: clean, is OK
-X-EsetId: 37303A2924031554647266
+X-EsetId: 37303A2924031554647264
 X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -69,43 +72,105 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 4/12/23 21:38, Donald Buczek wrote:
+On 4/12/23 21:59, Donald Buczek wrote:
 > Subject:
-> Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
+> Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
 > From:
 > Donald Buczek <buczek@molgen.mpg.de>
 > Date:
-> 4/12/23, 21:38
+> 4/12/23, 21:59
 > 
 > To:
-> Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+> Sergei Shtepa <sergei.shtepa@veeam.com>, Christoph Hellwig <hch@infradead.org>
 > CC:
-> viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+> axboe@kernel.dk, corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
 > 
 > 
-> I think, you can trigger all kind of user-after-free when userspace deletes a snapshot image or the snapshot image and the tracker while the disk device snapshot image is kept alive (mounted or just opened) and doing I/O.
+> On 4/12/23 12:43, Sergei Shtepa wrote:
+>>
+>>
+>> On 4/11/23 08:25, Christoph Hellwig wrote:
+>>> Subject:
+>>> Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
+>>> From:
+>>> Christoph Hellwig <hch@infradead.org>
+>>> Date:
+>>> 4/11/23, 08:25
+>>>
+>>> To:
+>>> Donald Buczek <buczek@molgen.mpg.de>
+>>> CC:
+>>> Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+>>>
+>>>
+>>> On Sat, Apr 08, 2023 at 05:30:19PM +0200, Donald Buczek wrote:
+>>>> Maybe detach the old filter and attach the new one instead? An atomic replace might be usefull and it wouldn't complicate the code to do that instead. If its the same filter, maybe just return success and don't go through ops->detach and ops->attach?
+>>> I don't think a replace makes any sense.  We might want multiple
+>>> filters eventually, but unless we have a good use case for even just
+>>> more than a single driver we can deal with that once needed.  The
+>>> interface is prepared to support multiple attached filters already.
+>>>
+>>
+>>
+>> Thank you Donald for your comment. It got me thinking.
+>>
+>> Despite the fact that only one filter is currently offered for the kernel,
+>> I think that out-of-tree filters of block devices may appear very soon.
+>> It would be good to think about it in advance.
+>> And, I agree with Christophe, we would not like to redo the blk-filter interface
+>> when new filters appear in the tree.
+>>
+>> We can consider a block device as a resource that two actor want to take over.
+>> There are two possible behavioral strategies:
+>> 1. If one owner occupies a resource, then for other actors, the ownership
+>> request will end with a refusal. The owner will not lose his resource.
+>> 2. Any actor can take away a resource from the owner and inform him about its
+>> loss using a callback.
+>>
+>> I think the first strategy is safer. When calling ioctl BLKFILTER_ATTACH, the
+>> kernel informs the actor that the resource is busy.
+>> Of course, there is still an option to grab someone else's occupied resource.
+>> To do this, he will have to call ioctl BLKFILTER_DETACH, specifying the name
+>> of the filter that needs to be detached. It is assumed that such detached
+>> should be performed by the same actor that attached it there.
+>>
+>> If we replace the owner at each ioctl BLKFILTER_ATTACH, then we can get a
+>> situation of competition between two actors. At the same time, they won't
+>> even get a message that something is going wrong.
+>>
+>> An example from life. The user compares different backup tools. Install one,
+>> then another. Each uses its own filter (And why not? this is technically
+>> possible).
+>> With the first strategy, the second tool will make it clear to the user that
+>> it cannot work, since the resource is already occupied by another.
+>> The user will have to experiment first with one tool, uninstall it, and then
+>> experiment with another.
+>> With the second strategy, both tools will unload each other's filters. In the
+>> best case, this will lead to disruption of their work. At a minimum, blksnap,
+>> when detached, will reset the change tracker and each backup will perform a
+>> full read of the block device. As a result, the user will receive distorted
+>> data, the system will not work as planned, although there will be no error
+>> message.
 > 
-> Here is what I did to provoke that:
-> 
-> root@dose:~# s=$(blksnap snapshot_create -d /dev/vdb)
-> root@dose:~# blksnap snapshot_appendstorage -i $s -f /scratch/local/test.dat
-> device path: '/dev/block/253:2'
-> allocate range: ofs=11264624 cnt=2097152
-> root@dose:~# blksnap snapshot_take -i $s
-> root@dose:~# mount /dev/blksnap-image_253\:16 /mnt
-> root@dose:~# dd if=/dev/zero of=/mnt/x.x &
-> [1] 2514
-> root@dose:~# blksnap snapshot_destroy -i $s
-> dd: writing to '/mnt/x.x': No space left on device
-> 1996041+0 records in
-> 1996040+0 records out
-> 1021972480 bytes (1.0 GB, 975 MiB) copied, 8.48923 s, 120 MB/s
-> [1]+  Exit 1                  dd if=/dev/zero of=/mnt/x.x
-> 
+> I had a more complicated scenario in mind. For example, some kind of live migration
+> from one block device to another, when you switch from the filter which clones from the
+> source device to the target device to the filter which just redirects from the source
+> device to the target device as the last step.
 
-Thanks!
-I am very glad that the blksnap tool turned out to be useful in the review.
-This snapshot deletion scenario is not the most typical, but of course it is
-quite possible.
-I will need to solve this problem and add such a scenario to the test suite.
+'Live migration' - I've heard that idea before.
+I think it makes sense to create a description of what 'live migration' should
+look like for Linux. Describe the purpose, what cases it would be useful, the
+general algorithm of work.
+It seems to me that the implementation of 'live migration' may be similar to
+what is implemented in blksnap. Perhaps I could be useful in such a project. 
 
+> OTOH, that may be a very distant vision. Plus, one single and simple filter, which
+> redirects I/O into a DM stack, would be enough or better anyway to do the more
+> complicated things using the DM features, which include atomic replacement and
+> stacking and everything.
+> 
+> I don't have a strong opinion.
+
+About one single and simple filter, which redirects I/O into a DM stack.
+Yes, at first glance, such an implementation looks simple and obvious.
+I tried to go this way - I failed. Maybe someone can do it. I'll be glad.
