@@ -2,76 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C32C77B76
-	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 13:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD5C77B72
+	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 13:49:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229720AbjDNNtI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Apr 2023 09:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38034 "EHLO
+        id S229917AbjDNNtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Apr 2023 09:49:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229995AbjDNNtD (ORCPT
+        with ESMTP id S229815AbjDNNtG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2023 09:49:03 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F11EB745
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:51 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1a6684fd760so2601215ad.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:51 -0700 (PDT)
+        Fri, 14 Apr 2023 09:49:06 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F91FB45A
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:52 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1a66895aafdso1749925ad.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681480130; x=1684072130;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HGEc3b/5raGNTqnY3atFX+H91beKu21OZnUAnPJHGEU=;
-        b=PRCNOs6GU/xpOMG+nxtDhsoiJxRT/WjfvNlD0bgucODQD1Rvehi6voQ3b21mjQsVBU
-         yeic93WvC3b+wbTYQKlu7u60WUfdlZ68iC+d5IshLbfc91LN5SZOHTfHGd6QyZkhOw1g
-         D1eFSnhplB1oDGnFbJp33PahepyXh0WOe4+X4G88P8/nJpIRJCUCENfFGxrBS6M2XxkI
-         nMhz/73K9riSNCqmRfJouvY0btKtKaS4yfha88hnllcvNV4XOi5XqWOv9m4hbcYmNm4Z
-         O8gUI/019i4a8KXmYRrHTFfpQTGDpe+Eix8a+P+kBhxtSfFRam9Y7Te3Iu/jV7MexRLU
-         2Hvw==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681480131; x=1684072131;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hmSiKXqvz00zYDgU054mNL1FXOdFpcNC0+3TAl/31Ms=;
+        b=pEG0fGbSAa50b7bmERp/Sh2M05tS9uI8wqHyWfMCYiNyKKD7JOIpIGh4fAhE9UKA2r
+         Fj5DYBTDX9paTVnhV695vx+pDDGljTh0QNJv5vuhj+3CMmWhJhgja7UVRkYg5k1zof9H
+         XXfz02TgkSQkr7j5w4Uq+7EZyzaXn4t2E6jwTMR2uudsZ34YGHMCwAnDZ1Vs0AE8pcF9
+         AlrHu9syuWk0qgBQrQgM0ASP7kP8/wWA1/Alv5Awat/LJBe8bQVo4UgFVXGRexKCK/j7
+         WGTvDYtLEWWFfXtHC1cztPSMM10C/tblKm3AmUWQx6StCMVK8zBOaqHRtKBn+mrjhJMV
+         8DXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681480130; x=1684072130;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HGEc3b/5raGNTqnY3atFX+H91beKu21OZnUAnPJHGEU=;
-        b=FNcfSvxxwh+YFS9REOTnj7bkimiKGTuH0su2Plhd7Tk8ISfcc0+YBGWeANnBuh8TSU
-         q5H5Uk00+rc70Z1atb6l80QGAUov+9H28cefqFPUyLy8gJs+6vibYNhwJqoK40cSaVW9
-         4OsLH3lQ9Z2U0+Pca3YLoFtYUiqV3ibLYRIlhR8Eg+mIjO7lneHFQimRqhEqsIM9YY0F
-         g+PraFZWvnSoCGKy+MX0CDvsrcfPTJxYKOlCsZEVFnX0ZcGQkok7zlK2qsLrePI/QdeT
-         8O8deVJnvTmSPXuVoJFO1AyZXmjEhfaCV1xT8sUcbH95dUkvXvAorn1+jKLmanPXmvk+
-         57aQ==
-X-Gm-Message-State: AAQBX9fCJ49U4x6R8Ri9POpWoc6kcf+b2XeQ64mMvg3Oks91tmut+ohb
-        gBWdpLqgS3v5xm0KlOT5UcBhAdDABB5RnS5pLic=
-X-Google-Smtp-Source: AKy350byNln2Xu6FOPWUbpwyRDbnlNY3ig8slo0Rq48xAy7l4Q35RhY2+/MQXntaeXg3xxZMXtxrrw==
-X-Received: by 2002:a17:902:cec7:b0:1a5:2dd2:34ad with SMTP id d7-20020a170902cec700b001a52dd234admr3001043plg.1.1681480130496;
-        Fri, 14 Apr 2023 06:48:50 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1681480131; x=1684072131;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hmSiKXqvz00zYDgU054mNL1FXOdFpcNC0+3TAl/31Ms=;
+        b=BzIKYRgDYpUUglOvIRaqsP4MJSyCTB2bVqvkPPPyOcpJAEXFMXVsimmYjzN8VpVEgn
+         nuka3pF8V5pee1PVKRN4DTtk6xdITC5m0JNYGjo3Oa1B98QaPa1F6spEzAtsjb+BkZDT
+         HYQTbhsO1bSXrXbmE0ICTdJ0CKFK8oBgCSDiKoZ08nico4foVkrIsSs7gGwOqFVrdpPe
+         0GudF8Jwt+iEFya86flvqXOWRc0S0hGzJ3RtCJzWoVdFNVa2V5LkB6eVYGgqyjTxyNeX
+         P3DQXAMBFB08EOgkahpqoH2h8fi4xUe1123eddCYNcryN03aTPgz7jcgVPQxbxWmE/aF
+         /AsQ==
+X-Gm-Message-State: AAQBX9eFVIRvI83uwXpTUxbOKRUBIC7wepyC28MOwhgizQAnHH/nYn1I
+        pzb6Ay436KX8Ns8slJqD3ucoUWSaRiP0blntaD8=
+X-Google-Smtp-Source: AKy350acYjSMpHhwcPj5V3g2LtPa1wzhvDzI4EPPACCJ8AGomPb0VyBjeo00MLefK6qrTOmrAKSmbQ==
+X-Received: by 2002:a17:902:d482:b0:1a6:93cc:924b with SMTP id c2-20020a170902d48200b001a693cc924bmr3078928plg.3.1681480131486;
+        Fri, 14 Apr 2023 06:48:51 -0700 (PDT)
 Received: from localhost.localdomain (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id 20-20020a170902ee5400b001a19bac463fsm3098980plo.42.2023.04.14.06.48.49
-        for <linux-block@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id 20-20020a170902ee5400b001a19bac463fsm3098980plo.42.2023.04.14.06.48.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Apr 2023 06:48:50 -0700 (PDT)
+        Fri, 14 Apr 2023 06:48:51 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
-Subject: [PATCHSET 0/2] Optimize block_device utilization
-Date:   Fri, 14 Apr 2023 07:48:46 -0600
-Message-Id: <20230414134848.91563-1-axboe@kernel.dk>
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/2] block: re-arrange the struct block_device fields for better layout
+Date:   Fri, 14 Apr 2023 07:48:47 -0600
+Message-Id: <20230414134848.91563-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230414134848.91563-1-axboe@kernel.dk>
+References: <20230414134848.91563-1-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+This moves struct device out-of-line as it's just used at open/close
+time, so we can keep some of the commonly used fields closer together.
+On a standard setup, it also reduces the size from 864 bytes to 848
+bytes. Yes, struct device is a pig...
 
-First is just a prep patch that moves struct device, which is quite the
-pig, out of line in block_device, and then shuffles a few fields for
-better layout. It also saves 16 bytes of space in there while at it.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ include/linux/blk_types.h | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Second patch caches the bdev->disk->fops->submit_bio state in the bdev,
-so we can avoid this long dependent memory load chain in the fast
-path.
-
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 99be590f952f..d68d6e951fad 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -40,26 +40,25 @@ struct bio_crypt_ctx;
+ struct block_device {
+ 	sector_t		bd_start_sect;
+ 	sector_t		bd_nr_sectors;
++	struct gendisk *	bd_disk;
++	struct request_queue *	bd_queue;
+ 	struct disk_stats __percpu *bd_stats;
+ 	unsigned long		bd_stamp;
+ 	bool			bd_read_only;	/* read-only policy */
++	u8			bd_partno;
++	bool			bd_write_holder;
+ 	dev_t			bd_dev;
+ 	atomic_t		bd_openers;
++	spinlock_t		bd_size_lock; /* for bd_inode->i_size updates */
+ 	struct inode *		bd_inode;	/* will die */
+ 	struct super_block *	bd_super;
+ 	void *			bd_claiming;
+-	struct device		bd_device;
+ 	void *			bd_holder;
++	/* The counter of freeze processes */
++	int			bd_fsfreeze_count;
+ 	int			bd_holders;
+-	bool			bd_write_holder;
+ 	struct kobject		*bd_holder_dir;
+-	u8			bd_partno;
+-	spinlock_t		bd_size_lock; /* for bd_inode->i_size updates */
+-	struct gendisk *	bd_disk;
+-	struct request_queue *	bd_queue;
+ 
+-	/* The counter of freeze processes */
+-	int			bd_fsfreeze_count;
+ 	/* Mutex for freeze */
+ 	struct mutex		bd_fsfreeze_mutex;
+ 	struct super_block	*bd_fsfreeze_sb;
+@@ -68,6 +67,7 @@ struct block_device {
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ 	bool			bd_make_it_fail;
+ #endif
++	struct device		bd_device;
+ } __randomize_layout;
+ 
+ #define bdev_whole(_bdev) \
 -- 
-Jens Axboe
-
+2.39.2
 
