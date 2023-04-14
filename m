@@ -2,256 +2,130 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE79BC77B70
-	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 08:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8A8C77B71
+	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 08:53:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbjDNIlY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Apr 2023 04:41:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50348 "EHLO
+        id S229786AbjDNIxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Apr 2023 04:53:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbjDNIlX (ORCPT
+        with ESMTP id S229547AbjDNIxn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2023 04:41:23 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D04056181;
-        Fri, 14 Apr 2023 01:41:18 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4PyVKQ5txVz4f3v54;
-        Fri, 14 Apr 2023 16:41:14 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAHcLOqETlkNuZ+HQ--.18869S4;
-        Fri, 14 Apr 2023 16:41:16 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     tj@kernel.org, hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH for-6.4/block] block/rq_qos: protect rq_qos apis with a new lock
-Date:   Fri, 14 Apr 2023 16:40:08 +0800
-Message-Id: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        Fri, 14 Apr 2023 04:53:43 -0400
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967A75FDB;
+        Fri, 14 Apr 2023 01:53:42 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailnew.nyi.internal (Postfix) with ESMTP id CC27B582314;
+        Fri, 14 Apr 2023 04:53:41 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Fri, 14 Apr 2023 04:53:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1681462421; x=1681463021; bh=xx
+        MUPiuha58jutCU1j4BdfX/BYUAocQhJKarQ7Lpi9Q=; b=ZhMiv/LG/u+WBdrdQB
+        KwSw5kEoXq9wWkhqY1mogYc7CfTrjwq6WQuASCx+4+W8RCMyXj+kN28qtFkiEOLW
+        ICzKmRil5qaTqEDqHg7KcrLEK4VjNHlLeDYCQUX6xNeUqyuauYa8kFVe9MLI4HiZ
+        vcJvZ8DmTjpM85zlmcqND13qDYLCZhrEOKPJ2w2/3nnomMjitxtOdMIVApuYKI5n
+        9oGHdkgirkMZXm0gpgb4w09QjuUeP/VJ6VPAfLQeV+BTT1ysywLmJwpvT5aVN/sA
+        W0U/RhIWA8SB9rhV276SGtMu7b5s3eGRzrFh3GF7dzIE0/6XIcaUQUhOPxOsHfaA
+        MjPw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=ie1e949a3.fm3; t=1681462421; x=1681463021; bh=xxM
+        UPiuha58jutCU1j4BdfX/BYUAocQhJKarQ7Lpi9Q=; b=NMnNs3/dbiRw8UX4zTN
+        /r7iwYmUS3UtMCMgPzohu3mjKD3GXAUzANokBoYEivT8HQEbRWFsPakcUhv1qhhd
+        l7yXXQKdJd03AnqmCp4hsUcsTCyz1aW/lZwOGoSwsefvdNokCkHqlZK5pKgmrU/2
+        F+5ARKLaFNqS/+C8SWALzU0vnDrBEysQQhDDi/oauAmPe3oX76F/Qj6oz8O8l7oe
+        7vVL1h9QE9eFjWVoYoi2NGuMf/GQk/olxzZTElFhLp6CH6IqvWERZrnAIiPzlwUI
+        KsG4WT512piys3caLZz+Rg8PqPSh/FoSLMler7pSGVJQgacGW0V25sn+KGlekJpr
+        0xQ==
+X-ME-Sender: <xms:lRQ5ZIhGXdFCz8jWVgwH7s4p2yn2AqvNjQHeiNJXYECX1lto20V3qQ>
+    <xme:lRQ5ZBBUay_160hxfOInL-ls5NUUvUUUcKN4520bwQp1JnVMkJEk7v4g9Hl0-4TBh
+    XG5s-1gFkHJ97N6YWc>
+X-ME-Received: <xmr:lRQ5ZAGDWfQGkKEj9LfztoT1O3kzdWCLto3R3jGis0NFGUZYUe7z7eLPybEZO4Oql6kFBEpq70OpAoo_ju2qTA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdeltddgtdekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
+    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
+    hilhdrtghomheqnecuggftrfgrthhtvghrnhepvdegtdfgvdfhgfekvdektdfgfeeljeel
+    gefgkedujeeiteehgefhgeethffgheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
+    mh
+X-ME-Proxy: <xmx:lRQ5ZJQZn13r-kLNYqpcaJC3qtQV1lqu9km4gYtlXoJP6qEjAZdwhg>
+    <xmx:lRQ5ZFygbPYr-qQ2wfpyUQkYChcuW5Z6v37-qGGTJOdJpi-T30xtqg>
+    <xmx:lRQ5ZH6LCaINl1kRVYrUp6e9vWFfWtNm6C8YtzUak-saZ8K_vHWFeQ>
+    <xmx:lRQ5ZA_dsElmYp0p7exeD26ytSpZT1Uwd-UAGO1-B8nY62i7BmvnLJ-WXWI>
+Feedback-ID: ie1e949a3:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 14 Apr 2023 04:53:40 -0400 (EDT)
+Date:   Fri, 14 Apr 2023 17:53:37 +0900
+From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: blktests scsi/007 failure
+Message-ID: <pdj4fz6ega2cvfpzila7cgw3sunkkmswln4rtbt2lsqfvlfx64@owwc36bxvgaw>
+References: <725nkvuvvbf4qwiylarw5r56tjt3r6nrvy5sijk6affzqv2s3e@6xapeviellsp>
+ <06f976f7-84fe-2994-4632-c23aaff568bb@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHcLOqETlkNuZ+HQ--.18869S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3Wr45uw18AFW7CF47tFykuFg_yoWxXF4rpa
-        y0gr13A392gr4kZa1DGw4xXwsrKws5GrW8JrWfu3yavrZF9r10vF1vyFyUWFWfArZxAFs2
-        qrWrWrZYkr1UCrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v2
-        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
-        UdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <06f976f7-84fe-2994-4632-c23aaff568bb@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Apr 14, 2023 / 08:09, Chaitanya Kulkarni wrote:
+> On 4/14/2023 12:36 AM, Shin'ichiro Kawasaki wrote:
+> > Hello Bart,
+> > 
+> > Recently, I built a new blktests trial environment on QEMU. With this
+> > environment, I observe scsi/007 failure. FYI, let me share blktests output [1]
+> > and kernel message [2].
+> > 
+> > I found the failure depends on kernel configs for debug such as KASAN. When I
+> > enable KASAN, the test case fails. When I disable KASAN, the test case passes.
+> > It looks that the failure depends on the slow kernel (and/or slow machine).
+> > 
+> > The test case sets 1 second to the block layer timeout to trigger the SCSI error
+> > handler. It also sets 3 seconds to scsi_debug delay assuming the error handler
+> > completes before the 3 seconds. From the kernel message, it looks that the error
+> > handler takes longer than the 3 seconds delay, so I/O completes as success
+> > before the error handler completion. This I/O success is not expected then the
+> > test case fails. As a trial, I extended the scsi_debug delay time to 10 seconds,
+> > then I observed the test case passes.
+> > 
+> > Do you expect the I/O success by slow SCSI error handler? If so, the test case
+> > needs improvement by extending the scsi_debug delay time.
+> > 
+> > 
+> 
+> I faced the same problem, but increased timeout it is passing :-
 
-commit 50e34d78815e ("block: disable the elevator int del_gendisk")
-move rq_qos_exit() from disk_release() to del_gendisk(), this will
-introduce some problems:
+Good to know that I'm not the only one seeing this issue :)
 
-1) If rq_qos_add() is triggered by enabling iocost/iolatency through
-   cgroupfs, then it can concurrent with del_gendisk(), it's not safe to
-   write 'q->rq_qos' concurrently.
+[snip]
 
-2) Activate cgroup policy that is relied on rq_qos will call
-   rq_qos_add() and blkcg_activate_policy(), and if rq_qos_exit() is
-   called in the middle, null-ptr-dereference will be triggered in
-   blkcg_activate_policy().
+> 
+> echo "I/O timeout = $(<"/sys/class/block/$dev/queue/io_timeout")" 
+>  >>"$FULL"                                                   # Change 
+> the scsi_debug delay to 3 seconds. 
+>                                    -       delay_s=3 
+>  
+>                 +       delay_s=10 
 
-3) blkg_conf_open_bdev() can call blkdev_get_no_open() first to find the
-   disk, then if rq_qos_exit() from del_gendisk() is done before
-   rq_qos_add(), then memory will be leaked.
-
-This patch add a new disk level mutex 'rq_qos_mutex':
-
-1) The lock will protect rq_qos_exit() directly.
-
-2) For wbt that doesn't relied on blk-cgroup, rq_qos_add() can only be
-   called from disk initialization for now because wbt can't be
-   destructed until rq_qos_exit(), so it's safe not to protect wbt for
-   now. Hoever, in case that rq_qos dynamically destruction is supported
-   in the furture, this patch also protect rq_qos_add() from wbt_init()
-   directly, this is enough because blk-sysfs already synchronize
-   writers with disk removal.
-
-3) For iocost and iolatency, in order to synchronize disk removal and
-   cgroup configuration, the lock is held after blkdev_get_no_open()
-   from blkg_conf_open_bdev(), and is released in blkg_conf_exit().
-   In order to fix the above memory leak, disk_live() is checked after
-   holding the new lock.
-
-Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-cgroup.c     |  9 +++++++++
- block/blk-core.c       |  1 +
- block/blk-rq-qos.c     | 20 ++++++--------------
- block/blk-wbt.c        |  2 ++
- include/linux/blkdev.h |  1 +
- 5 files changed, 19 insertions(+), 14 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 1c1ebeb51003..0d79d864ecb1 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -705,6 +705,13 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
- 		return -ENODEV;
- 	}
- 
-+	mutex_lock(&bdev->bd_queue->rq_qos_mutex);
-+	if (!disk_live(bdev->bd_disk)) {
-+		blkdev_put_no_open(bdev);
-+		mutex_unlock(&bdev->bd_queue->rq_qos_mutex);
-+		return -ENODEV;
-+	}
-+
- 	ctx->body = input;
- 	ctx->bdev = bdev;
- 	return 0;
-@@ -849,6 +856,7 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
-  */
- void blkg_conf_exit(struct blkg_conf_ctx *ctx)
- 	__releases(&ctx->bdev->bd_queue->queue_lock)
-+	__releases(&ctx->bdev->bd_queue->rq_qos_mutex)
- {
- 	if (ctx->blkg) {
- 		spin_unlock_irq(&bdev_get_queue(ctx->bdev)->queue_lock);
-@@ -856,6 +864,7 @@ void blkg_conf_exit(struct blkg_conf_ctx *ctx)
- 	}
- 
- 	if (ctx->bdev) {
-+		mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
- 		blkdev_put_no_open(ctx->bdev);
- 		ctx->body = NULL;
- 		ctx->bdev = NULL;
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 269765d16cfd..fc7f902bdf5b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -420,6 +420,7 @@ struct request_queue *blk_alloc_queue(int node_id)
- 	mutex_init(&q->debugfs_mutex);
- 	mutex_init(&q->sysfs_lock);
- 	mutex_init(&q->sysfs_dir_lock);
-+	mutex_init(&q->rq_qos_mutex);
- 	spin_lock_init(&q->queue_lock);
- 
- 	init_waitqueue_head(&q->mq_freeze_wq);
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index d8cc820a365e..167be74df4ee 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -288,11 +288,13 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 
- void rq_qos_exit(struct request_queue *q)
- {
-+	mutex_lock(&q->rq_qos_mutex);
- 	while (q->rq_qos) {
- 		struct rq_qos *rqos = q->rq_qos;
- 		q->rq_qos = rqos->next;
- 		rqos->ops->exit(rqos);
- 	}
-+	mutex_unlock(&q->rq_qos_mutex);
- }
- 
- int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
-@@ -300,6 +302,8 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- {
- 	struct request_queue *q = disk->queue;
- 
-+	lockdep_assert_held(&q->rq_qos_mutex);
-+
- 	rqos->disk = disk;
- 	rqos->id = id;
- 	rqos->ops = ops;
-@@ -307,18 +311,13 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 	/*
- 	 * No IO can be in-flight when adding rqos, so freeze queue, which
- 	 * is fine since we only support rq_qos for blk-mq queue.
--	 *
--	 * Reuse ->queue_lock for protecting against other concurrent
--	 * rq_qos adding/deleting
- 	 */
- 	blk_mq_freeze_queue(q);
- 
--	spin_lock_irq(&q->queue_lock);
- 	if (rq_qos_id(q, rqos->id))
- 		goto ebusy;
- 	rqos->next = q->rq_qos;
- 	q->rq_qos = rqos;
--	spin_unlock_irq(&q->queue_lock);
- 
- 	blk_mq_unfreeze_queue(q);
- 
-@@ -330,7 +329,6 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 
- 	return 0;
- ebusy:
--	spin_unlock_irq(&q->queue_lock);
- 	blk_mq_unfreeze_queue(q);
- 	return -EBUSY;
- }
-@@ -340,21 +338,15 @@ void rq_qos_del(struct rq_qos *rqos)
- 	struct request_queue *q = rqos->disk->queue;
- 	struct rq_qos **cur;
- 
--	/*
--	 * See comment in rq_qos_add() about freezing queue & using
--	 * ->queue_lock.
--	 */
--	blk_mq_freeze_queue(q);
-+	lockdep_assert_held(&q->rq_qos_mutex);
- 
--	spin_lock_irq(&q->queue_lock);
-+	blk_mq_freeze_queue(q);
- 	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
- 		if (*cur == rqos) {
- 			*cur = rqos->next;
- 			break;
- 		}
- 	}
--	spin_unlock_irq(&q->queue_lock);
--
- 	blk_mq_unfreeze_queue(q);
- 
- 	mutex_lock(&q->debugfs_mutex);
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index e49a48684532..53bf5aa6f9ad 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -942,7 +942,9 @@ int wbt_init(struct gendisk *disk)
- 	/*
- 	 * Assign rwb and add the stats callback.
- 	 */
-+	mutex_lock(&q->rq_qos_mutex);
- 	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
-+	mutex_unlock(&q->rq_qos_mutex);
- 	if (ret)
- 		goto err_free;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6ede578dfbc6..17774f55743e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -395,6 +395,7 @@ struct request_queue {
- 
- 	struct blk_queue_stats	*stats;
- 	struct rq_qos		*rq_qos;
-+	struct mutex		rq_qos_mutex;
- 
- 	const struct blk_mq_ops	*mq_ops;
- 
--- 
-2.39.2
+Yes, I did similar trial and observed the test case passes. While I tried it, I
+observed that longer delay time is required when I add more kernel debug options
+(KASAN, lock related options, etc). So, delay extension to 10 seconds may not be
+enough to cover slower kernels or slower systems. I guess the test case will
+need some time measurement to decide the delay time good for the system. But
+before discussing such test case fix, I wanted to confirm that the delay time
+extension is the right fix approach.
 
