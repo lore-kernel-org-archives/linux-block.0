@@ -2,175 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE6BC77B78
-	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 13:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C32C77B76
+	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 13:49:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbjDNNkU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Apr 2023 09:40:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33396 "EHLO
+        id S229720AbjDNNtI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Apr 2023 09:49:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbjDNNkT (ORCPT
+        with ESMTP id S229995AbjDNNtD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2023 09:40:19 -0400
-Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C31E77D90;
-        Fri, 14 Apr 2023 06:40:17 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id C027741C70;
-        Fri, 14 Apr 2023 09:40:10 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1681479611;
-        bh=5ZfR/VR7XwIlnUKAwCwTcnTBsRgdwQ0T4cmQ7Jf9od8=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=sOz5OJNAhKo96IYXETOEtDOEjT144qiybYpenX9d9MdAjWZJEOlvz8dwQm8rLQHA4
-         4C3dFTdeIjdvy0kkQpv7Kv2yhHBFsSe6EDOyUyebaR2Sf3dkuEi+/KxAWGbc3eW0f7
-         JEu5IS22FYzRd4Rh01dGrEzqXBtiG+0uygxVbIhK9jEPd85uQk0qvRnw0UPgBwFQ/O
-         ZDUEn1GdJCvekOGk4XmtOntu1Gv3aR1WJfDxcH9AV/mqchoA4x6O77+AkR71W5AXAK
-         Lj304TsHBbVd1OnISj+r8gBjbiIHB9yPszIgoZc9I8nNcf8JUlL/8tCxRvc2a/9OT8
-         zibD8wXbUwVCg==
-Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
- (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Fri, 14 Apr
- 2023 15:40:08 +0200
-Message-ID: <93fbcd21-14e3-a46e-91ab-8cc7ca9ed550@veeam.com>
-Date:   Fri, 14 Apr 2023 15:39:59 +0200
+        Fri, 14 Apr 2023 09:49:03 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F11EB745
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:51 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1a6684fd760so2601215ad.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681480130; x=1684072130;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HGEc3b/5raGNTqnY3atFX+H91beKu21OZnUAnPJHGEU=;
+        b=PRCNOs6GU/xpOMG+nxtDhsoiJxRT/WjfvNlD0bgucODQD1Rvehi6voQ3b21mjQsVBU
+         yeic93WvC3b+wbTYQKlu7u60WUfdlZ68iC+d5IshLbfc91LN5SZOHTfHGd6QyZkhOw1g
+         D1eFSnhplB1oDGnFbJp33PahepyXh0WOe4+X4G88P8/nJpIRJCUCENfFGxrBS6M2XxkI
+         nMhz/73K9riSNCqmRfJouvY0btKtKaS4yfha88hnllcvNV4XOi5XqWOv9m4hbcYmNm4Z
+         O8gUI/019i4a8KXmYRrHTFfpQTGDpe+Eix8a+P+kBhxtSfFRam9Y7Te3Iu/jV7MexRLU
+         2Hvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681480130; x=1684072130;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HGEc3b/5raGNTqnY3atFX+H91beKu21OZnUAnPJHGEU=;
+        b=FNcfSvxxwh+YFS9REOTnj7bkimiKGTuH0su2Plhd7Tk8ISfcc0+YBGWeANnBuh8TSU
+         q5H5Uk00+rc70Z1atb6l80QGAUov+9H28cefqFPUyLy8gJs+6vibYNhwJqoK40cSaVW9
+         4OsLH3lQ9Z2U0+Pca3YLoFtYUiqV3ibLYRIlhR8Eg+mIjO7lneHFQimRqhEqsIM9YY0F
+         g+PraFZWvnSoCGKy+MX0CDvsrcfPTJxYKOlCsZEVFnX0ZcGQkok7zlK2qsLrePI/QdeT
+         8O8deVJnvTmSPXuVoJFO1AyZXmjEhfaCV1xT8sUcbH95dUkvXvAorn1+jKLmanPXmvk+
+         57aQ==
+X-Gm-Message-State: AAQBX9fCJ49U4x6R8Ri9POpWoc6kcf+b2XeQ64mMvg3Oks91tmut+ohb
+        gBWdpLqgS3v5xm0KlOT5UcBhAdDABB5RnS5pLic=
+X-Google-Smtp-Source: AKy350byNln2Xu6FOPWUbpwyRDbnlNY3ig8slo0Rq48xAy7l4Q35RhY2+/MQXntaeXg3xxZMXtxrrw==
+X-Received: by 2002:a17:902:cec7:b0:1a5:2dd2:34ad with SMTP id d7-20020a170902cec700b001a52dd234admr3001043plg.1.1681480130496;
+        Fri, 14 Apr 2023 06:48:50 -0700 (PDT)
+Received: from localhost.localdomain (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id 20-20020a170902ee5400b001a19bac463fsm3098980plo.42.2023.04.14.06.48.49
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Apr 2023 06:48:50 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org
+Subject: [PATCHSET 0/2] Optimize block_device utilization
+Date:   Fri, 14 Apr 2023 07:48:46 -0600
+Message-Id: <20230414134848.91563-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
-Content-Language: en-US
-To:     Donald Buczek <buczek@molgen.mpg.de>,
-        Christoph Hellwig <hch@infradead.org>
-CC:     <axboe@kernel.dk>, <corbet@lwn.net>, <snitzer@kernel.org>,
-        <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <willy@infradead.org>, <kch@nvidia.com>,
-        <martin.petersen@oracle.com>, <vkoul@kernel.org>,
-        <ming.lei@redhat.com>, <gregkh@linuxfoundation.org>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
-References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
- <20230404140835.25166-3-sergei.shtepa@veeam.com>
- <793db44e-9e6d-d118-3f88-cdbffc9ad018@molgen.mpg.de>
- <ZDT9PjLeQgjVA16P@infradead.org>
- <50d131e3-7528-2064-fbe6-65482db46ae4@veeam.com>
- <9d598566-5729-630e-5025-b4173cf307e4@molgen.mpg.de>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <9d598566-5729-630e-5025-b4173cf307e4@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2924031554647264
-X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
+
+First is just a prep patch that moves struct device, which is quite the
+pig, out of line in block_device, and then shuffles a few fields for
+better layout. It also saves 16 bytes of space in there while at it.
+
+Second patch caches the bdev->disk->fops->submit_bio state in the bdev,
+so we can avoid this long dependent memory load chain in the fast
+path.
+
+-- 
+Jens Axboe
 
 
-On 4/12/23 21:59, Donald Buczek wrote:
-> Subject:
-> Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
-> From:
-> Donald Buczek <buczek@molgen.mpg.de>
-> Date:
-> 4/12/23, 21:59
-> 
-> To:
-> Sergei Shtepa <sergei.shtepa@veeam.com>, Christoph Hellwig <hch@infradead.org>
-> CC:
-> axboe@kernel.dk, corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-> 
-> 
-> On 4/12/23 12:43, Sergei Shtepa wrote:
->>
->>
->> On 4/11/23 08:25, Christoph Hellwig wrote:
->>> Subject:
->>> Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
->>> From:
->>> Christoph Hellwig <hch@infradead.org>
->>> Date:
->>> 4/11/23, 08:25
->>>
->>> To:
->>> Donald Buczek <buczek@molgen.mpg.de>
->>> CC:
->>> Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
->>>
->>>
->>> On Sat, Apr 08, 2023 at 05:30:19PM +0200, Donald Buczek wrote:
->>>> Maybe detach the old filter and attach the new one instead? An atomic replace might be usefull and it wouldn't complicate the code to do that instead. If its the same filter, maybe just return success and don't go through ops->detach and ops->attach?
->>> I don't think a replace makes any sense.  We might want multiple
->>> filters eventually, but unless we have a good use case for even just
->>> more than a single driver we can deal with that once needed.  The
->>> interface is prepared to support multiple attached filters already.
->>>
->>
->>
->> Thank you Donald for your comment. It got me thinking.
->>
->> Despite the fact that only one filter is currently offered for the kernel,
->> I think that out-of-tree filters of block devices may appear very soon.
->> It would be good to think about it in advance.
->> And, I agree with Christophe, we would not like to redo the blk-filter interface
->> when new filters appear in the tree.
->>
->> We can consider a block device as a resource that two actor want to take over.
->> There are two possible behavioral strategies:
->> 1. If one owner occupies a resource, then for other actors, the ownership
->> request will end with a refusal. The owner will not lose his resource.
->> 2. Any actor can take away a resource from the owner and inform him about its
->> loss using a callback.
->>
->> I think the first strategy is safer. When calling ioctl BLKFILTER_ATTACH, the
->> kernel informs the actor that the resource is busy.
->> Of course, there is still an option to grab someone else's occupied resource.
->> To do this, he will have to call ioctl BLKFILTER_DETACH, specifying the name
->> of the filter that needs to be detached. It is assumed that such detached
->> should be performed by the same actor that attached it there.
->>
->> If we replace the owner at each ioctl BLKFILTER_ATTACH, then we can get a
->> situation of competition between two actors. At the same time, they won't
->> even get a message that something is going wrong.
->>
->> An example from life. The user compares different backup tools. Install one,
->> then another. Each uses its own filter (And why not? this is technically
->> possible).
->> With the first strategy, the second tool will make it clear to the user that
->> it cannot work, since the resource is already occupied by another.
->> The user will have to experiment first with one tool, uninstall it, and then
->> experiment with another.
->> With the second strategy, both tools will unload each other's filters. In the
->> best case, this will lead to disruption of their work. At a minimum, blksnap,
->> when detached, will reset the change tracker and each backup will perform a
->> full read of the block device. As a result, the user will receive distorted
->> data, the system will not work as planned, although there will be no error
->> message.
-> 
-> I had a more complicated scenario in mind. For example, some kind of live migration
-> from one block device to another, when you switch from the filter which clones from the
-> source device to the target device to the filter which just redirects from the source
-> device to the target device as the last step.
-
-'Live migration' - I've heard that idea before.
-I think it makes sense to create a description of what 'live migration' should
-look like for Linux. Describe the purpose, what cases it would be useful, the
-general algorithm of work.
-It seems to me that the implementation of 'live migration' may be similar to
-what is implemented in blksnap. Perhaps I could be useful in such a project. 
-
-> OTOH, that may be a very distant vision. Plus, one single and simple filter, which
-> redirects I/O into a DM stack, would be enough or better anyway to do the more
-> complicated things using the DM features, which include atomic replacement and
-> stacking and everything.
-> 
-> I don't have a strong opinion.
-
-About one single and simple filter, which redirects I/O into a DM stack.
-Yes, at first glance, such an implementation looks simple and obvious.
-I tried to go this way - I failed. Maybe someone can do it. I'll be glad.
