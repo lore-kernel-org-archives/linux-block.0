@@ -2,132 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1248C77B71
-	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 05:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58380C77B70
+	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 07:37:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbjDNFWk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Apr 2023 01:22:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50042 "EHLO
+        id S229876AbjDNHh4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Apr 2023 03:37:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbjDNFWj (ORCPT
+        with ESMTP id S229815AbjDNHhz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2023 01:22:39 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3899C1FD2
-        for <linux-block@vger.kernel.org>; Thu, 13 Apr 2023 22:22:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=AGeICsuA9uEhadHjkh4URyIX1Dc4rlat2MsAlY3egPs=; b=p/RY894meWRGQTjLtT9y4wYH6p
-        Md1iDcb1Xk/iMO2IUQxFYFUQpEdLDzyWT18iU75Ho7dE+TEuoMyYmV43wiJC3XyeYOWXRNCXfHnG7
-        65jvqMkI8Ze0S35YIfAYCXTP4CvSD7Ucngc3gwHpts7Hm6IhVAKJpIxRuE2jMPYN6d5IVlqwgM1mE
-        h4F3akndUSM7zIY79aZjhWvKsO0GGgQaqE0mbtgUB4+0CA7r1+aSDjeYII6xbI6GEWozZG8jzBBmU
-        gwXu2IaT8SJT8EPMc5zlCNtN8iIGltWx7p/OQSV/6pkRwzh7Nz5Hep6+Hgscn0K61kwwgsEgWQ5WB
-        72bT/2kA==;
-Received: from [2001:4bb8:192:2d6c:7f18:1319:183f:920d] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pnBtJ-008M2y-1G;
-        Fri, 14 Apr 2023 05:22:33 +0000
-Date:   Fri, 14 Apr 2023 07:22:31 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme updates for Linux 6.4
-Message-ID: <ZDjjF9NWdq+gC0tI@infradead.org>
+        Fri, 14 Apr 2023 03:37:55 -0400
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3E6F6A42;
+        Fri, 14 Apr 2023 00:37:30 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id E30575822FC;
+        Fri, 14 Apr 2023 03:37:00 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Fri, 14 Apr 2023 03:37:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:content-type:content-type:date:date:from:from:in-reply-to
+        :message-id:mime-version:reply-to:sender:subject:subject:to:to;
+         s=fm3; t=1681457820; x=1681458420; bh=XLLhERAerHpvpvWR7EwIHo+3j
+        h0i7E/z1J3JQz8Orpw=; b=eAIk8xQz+ndoutT10tmKcuQMcVbaEZ6jOC2sNIvDI
+        k9APx1OqbwX/8RYRAttpjdqF+qfonmTUlk6loB2bP2EJFvELUVD0cAvWkhhE+hJM
+        coYWPWs05HKuSswcpj/F99G2BdFhfJRCft6G05pG9yakiA3R0Kla3zQFavy1mVxb
+        DAtHo0hFxtaw/rofVQQSLpSLHjjRn90/fnr0TEcMpdHUFD8n4cZv47bIwntQq5Fo
+        a0TuGDdp28VRzhjOCaXPTIN21oeJmPUerJBNsHxmVo6MqnYprcJPaXClWmQs0WsX
+        csIS1NKPcVHoOa8A9gax9q4EdztCFWeQcbPJ7uhYO8/wQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=ie1e949a3.fm3;
+         t=1681457820; x=1681458420; bh=XLLhERAerHpvpvWR7EwIHo+3jh0i7E/z
+        1J3JQz8Orpw=; b=hkHW+vody89G4EVZZ20L0XPxQacKSeby9hupUL6V8ut5f7ge
+        AO2Zo5qqNExEUItKEgwA9yTNYKZp8Aa4vVRgwFC7PbvPyp6PyuX4I1y/UQyJhtRq
+        dAoc09WPkscVK9xLNqitjTqM2xLS1ZsMqMAnkByGU7aTAeQ/VkeGfQx46cbpleY/
+        WmOG5hLgE+43IA30XSWkmJqprP86oNh11ZwNrV1w3X2JKvzJOAvuc7W3OVg3Nb3Q
+        o6OD5vfWTZvTsysmB9u/Rfsb1746l5EpHOKuvvQY7Jx6z+0MwR5HaP64F1DRABrm
+        8+lJ4BiKYUcWMT6x2jm3jjAfrL4ycA94aQdmaw==
+X-ME-Sender: <xms:nAI5ZP_97Zje1Bd8kVllHzDPc_A4j0kpDNLvowBIznvHYydeRkTOrQ>
+    <xme:nAI5ZLtbkoDxuf0eBG0NNVatKVE6apKGmyvrLFu0EcU7mYCgFQpRdsswVQkWeUWEi
+    7R5BXeeE_M1V83ZnZI>
+X-ME-Received: <xmr:nAI5ZNBof-7M_h4JK1lfGoAhOAgljGDXOV6KfZcK1-gHTk4gnLZqLv-4Xfpj9pRyydr2oQd3oHpgnZZeBvlgEQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdekledguddvhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvuffkgggtugesthdtsfdttddtvdenucfhrhhomhepufhhihhnkdhi
+    tghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrghilh
+    drtghomheqnecuggftrfgrthhtvghrnhepveevgeevveeivdehfeeggeeiveevfeekvdeg
+    udetgeelieduheeuieekieeftedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtghomh
+X-ME-Proxy: <xmx:nAI5ZLfsDUmXHg_CEzedSe3anoAzathy2hg41XhMGVb_q08jT0pLug>
+    <xmx:nAI5ZEP4kcTqbZJz-Gdj5_QZyCimXrmfqFOlTvCxLa11MxXmhaU39Q>
+    <xmx:nAI5ZNmC3U8BL2gTCcGbisbJOrFsP-7fdpImSWxbGf6MTUgJDODq0A>
+    <xmx:nAI5ZO03mwthqCfoI8OkU1eL010_ocGZIsAUo82Q2TCrWodtMH5DyWBWHNg>
+Feedback-ID: ie1e949a3:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 14 Apr 2023 03:36:59 -0400 (EDT)
+Date:   Fri, 14 Apr 2023 16:36:55 +0900
+From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+To:     Bart Van Assche <bvanassche@acm.org>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: blktests scsi/007 failure
+Message-ID: <725nkvuvvbf4qwiylarw5r56tjt3r6nrvy5sijk6affzqv2s3e@6xapeviellsp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit d8898ee50edecacdf0141f26fd90acf43d7e9cd7:
+Hello Bart,
 
-  s390/dasd: fix hanging blockdevice after request requeue (2023-04-11 19:53:08 -0600)
+Recently, I built a new blktests trial environment on QEMU. With this
+environment, I observe scsi/007 failure. FYI, let me share blktests output [1]
+and kernel message [2].
 
-are available in the Git repository at:
+I found the failure depends on kernel configs for debug such as KASAN. When I
+enable KASAN, the test case fails. When I disable KASAN, the test case passes.
+It looks that the failure depends on the slow kernel (and/or slow machine).
 
-  git://git.infradead.org/nvme.git tags/nvme-6.4-2023-04-14
+The test case sets 1 second to the block layer timeout to trigger the SCSI error
+handler. It also sets 3 seconds to scsi_debug delay assuming the error handler
+completes before the 3 seconds. From the kernel message, it looks that the error
+handler takes longer than the 3 seconds delay, so I/O completes as success
+before the error handler completion. This I/O success is not expected then the
+test case fails. As a trial, I extended the scsi_debug delay time to 10 seconds,
+then I observed the test case passes.
 
-for you to fetch changes up to 4f86a6ff6fbd891232dda3ca97fd1b9630b59809:
+Do you expect the I/O success by slow SCSI error handler? If so, the test case
+needs improvement by extending the scsi_debug delay time.
 
-  nvme-fcloop: fix "inconsistent {IN-HARDIRQ-W} -> {HARDIRQ-ON-W} usage" (2023-04-13 09:02:55 +0200)
 
-----------------------------------------------------------------
-nvme updates for Linux 6.4
+[1] blktests output
 
- - drop redundant pci_enable_pcie_error_reporting (Bjorn Helgaas)
- - validate nvmet module parameters (Chaitanya Kulkarni)
- - fence TCP socket on receive error (Chris Leech)
- - fix async event trace event (Keith Busch)
- - minor cleanups (Chaitanya Kulkarni, zhenwei pi)
- - fix and cleanup nvmet Identify handling (Damien Le Moal,
-   Christoph Hellwig)
- - fix double blk_mq_complete_request race in the timeout handler
-   (Lei Yin)
- - fix irq locking in nvme-fcloop (Ming Lei)
- - remove queue mapping helper for rdma devices (Sagi Grimberg)
+scsi/007 (Trigger the SCSI error handler)                    [failed]
+    runtime  25.594s  ...  13.646s
+    --- tests/scsi/007.out      2023-04-06 10:11:07.926670528 +0900
+    +++ /home/shin/Blktests/blktests/results/nodev/scsi/007.out.bad     2023-04-14 16:09:45.447892078 +0900
+    @@ -1,3 +1,3 @@
+     Running scsi/007
+    -Reading from scsi_debug failed
+    +Reading from scsi_debug succeeded
+     Test complete
 
-----------------------------------------------------------------
-Bjorn Helgaas (1):
-      nvme-pci: drop redundant pci_enable_pcie_error_reporting()
+[2] kernel message
 
-Chaitanya Kulkarni (4):
-      nvmet-tcp: validate so_priority modparam value
-      nvmet-tcp: validate idle poll modparam value
-      nvme-apple: return directly instead of else
-      nvme-apple: return directly instead of else
+[ 3714.407999] run blktests scsi/007 at 2023-04-14 16:09:31
+[ 3714.523102] scsi_debug:sdebug_driver_probe: scsi_debug: trim poll_queues to 0. poll_q/nr_hw = (0/1)
+[ 3714.525023] scsi host3: scsi_debug: version 0191 [20210520]
+                 dev_size_mb=8, opts=0x0, submit_queues=1, statistics=0
+[ 3714.533733] scsi 3:0:0:0: Direct-Access     Linux    scsi_debug       0191 PQ: 0 ANSI: 7
+[ 3714.543198] sd 3:0:0:0: Power-on or device reset occurred
+[ 3714.543250] sd 3:0:0:0: Attached scsi generic sg2 type 0
+[ 3714.550936] sd 3:0:0:0: [sdc] 16384 512-byte logical blocks: (8.39 MB/8.00 MiB)
+[ 3714.554821] sd 3:0:0:0: [sdc] Write Protect is off
+[ 3714.558024] sd 3:0:0:0: [sdc] Mode Sense: 73 00 10 08
+[ 3714.562414] sd 3:0:0:0: [sdc] Write cache: enabled, read cache: enabled, supports DPO and FUA
+[ 3714.566601] sd 3:0:0:0: [sdc] Preferred minimum I/O size 512 bytes
+[ 3714.570045] sd 3:0:0:0: [sdc] Optimal transfer size 524288 bytes
+[ 3714.586397] sd 3:0:0:0: [sdc] Attached SCSI disk
+[ 3715.999917] sd 3:0:0:0: [sdc] tag#103 abort scheduled
+[ 3716.015174] sd 3:0:0:0: [sdc] tag#103 aborting command
+[ 3716.019935] sd 3:0:0:0: [sdc] tag#103 retry aborted command
+[ 3717.090803] sd 3:0:0:0: [sdc] tag#178 previous abort failed
+[ 3717.098780] scsi host3: Waking error handler thread
+[ 3717.098917] scsi host3: scsi_eh_3: waking up 0/1/1
+[ 3717.106279] scsi host3: scsi_eh_prt_fail_stats: cmds failed: 0, cancel: 1
+[ 3717.111212] scsi host3: Total of 1 commands on 1 devices require eh work
+[ 3717.116170] sd 3:0:0:0: scsi_eh_3: Sending BDR
+[ 3717.120493] sd 3:0:0:0: [sdc] tag#178 scsi_eh_done result: 2
+[ 3717.125183] sd 3:0:0:0: [sdc] tag#178 scsi_send_eh_cmnd timeleft: 10000
+[ 3717.130301] sd 3:0:0:0: Power-on or device reset occurred
+[ 3717.134935] sd 3:0:0:0: [sdc] tag#178 scsi_send_eh_cmnd: scsi_eh_completed_normally 2001
+[ 3717.140241] sd 3:0:0:0: [sdc] tag#178 scsi_eh_tur return: 2001
+[ 3719.033180] sd 3:0:0:0: [sdc] tag#178 scsi_eh_done result: 0
+[ 3719.037656] sd 3:0:0:0: [sdc] tag#178 scsi_send_eh_cmnd timeleft: 8114
+[ 3719.043293] sd 3:0:0:0: [sdc] tag#178 scsi_send_eh_cmnd: scsi_eh_completed_normally 2002
+[ 3719.049631] sd 3:0:0:0: [sdc] tag#178 scsi_eh_tur return: 2002
+[ 3719.055489] sd 3:0:0:0: [sdc] tag#178 scsi_eh_3: flush retry cmd
+[ 3719.061420] scsi host3: waking up host to restart
+[ 3719.069512] scsi host3: scsi_eh_3: sleeping
+[ 3720.175944] sd 3:0:0:0: [sdc] tag#180 FAILED Result: hostbyte=DID_TIME_OUT driverbyte=DRIVER_OK cmd_age=1s
+[ 3720.182709] sd 3:0:0:0: [sdc] tag#180 CDB: Read(10) 28 00 00 00 3f 80 00 00 08 00
+[ 3720.189825] I/O error, dev sdc, sector 16256 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 2
+[ 3722.342015] sd 3:0:0:0: Power-on or device reset occurred
+[ 3725.349863] sd 3:0:0:0: Power-on or device reset occurred
+[ 3727.275069] sd 3:0:0:0: [sdc] tag#79 Medium access timeout failure. Offlining disk!
+[ 3727.279944] sd 3:0:0:0: [sdc] tag#79 FAILED Result: hostbyte=DID_TIME_OUT driverbyte=DRIVER_OK cmd_age=7s
+[ 3727.285131] sd 3:0:0:0: [sdc] tag#79 CDB: Read(10) 28 00 00 00 3f 80 00 00 08 00
+[ 3727.289961] I/O error, dev sdc, sector 16256 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
+[ 3727.294862] Buffer I/O error on dev sdc, logical block 2032, async page read
+[ 3727.996161] sd 3:0:0:0: [sdc] Synchronizing SCSI cache
 
-Chris Leech (1):
-      nvme-tcp: fence TCP socket on receive error
-
-Christoph Hellwig (3):
-      nvmet: fix Identify Identification Descriptor List handling
-      nvmet: rename nvmet_execute_identify_cns_cs_ns
-      nvmet: remove nvmet_req_cns_error_complete
-
-Damien Le Moal (6):
-      nvmet: fix error handling in nvmet_execute_identify_cns_cs_ns()
-      nvmet: fix Identify Namespace handling
-      nvmet: fix Identify Controller handling
-      nvmet: fix Identify Active Namespace ID list handling
-      nvmet: fix I/O Command Set specific Identify Controller
-      nvmet: cleanup nvmet_execute_identify()
-
-Keith Busch (1):
-      nvme: fix async event trace event
-
-Lei Yin (1):
-      nvme: fix double blk_mq_complete_request for timeout request with low probability
-
-Ming Lei (1):
-      nvme-fcloop: fix "inconsistent {IN-HARDIRQ-W} -> {HARDIRQ-ON-W} usage"
-
-Sagi Grimberg (1):
-      blk-mq-rdma: remove queue mapping helper for rdma devices
-
-zhenwei pi (1):
-      nvme-rdma: minor cleanup in nvme_rdma_create_cq()
-
- block/Kconfig                   |  5 ---
- block/Makefile                  |  1 -
- block/blk-mq-rdma.c             | 44 ----------------------
- drivers/nvme/host/apple.c       |  8 ++--
- drivers/nvme/host/core.c        |  9 ++---
- drivers/nvme/host/pci.c         |  6 +--
- drivers/nvme/host/rdma.c        | 19 +++-------
- drivers/nvme/host/tcp.c         |  3 ++
- drivers/nvme/host/trace.h       | 15 +++-----
- drivers/nvme/target/admin-cmd.c | 81 +++++++++++++++++------------------------
- drivers/nvme/target/fcloop.c    | 48 +++++++++++++-----------
- drivers/nvme/target/nvmet.h     | 12 +-----
- drivers/nvme/target/tcp.c       | 34 +++++++++++++++--
- drivers/nvme/target/zns.c       | 20 +++++-----
- include/linux/blk-mq-rdma.h     | 11 ------
- 15 files changed, 126 insertions(+), 190 deletions(-)
- delete mode 100644 block/blk-mq-rdma.c
- delete mode 100644 include/linux/blk-mq-rdma.h
