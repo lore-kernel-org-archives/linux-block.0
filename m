@@ -2,152 +2,179 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF31C77B76
-	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 13:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 036EFC77B72
+	for <linux-block@archiver.kernel.org>; Fri, 14 Apr 2023 15:05:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230027AbjDNNtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Apr 2023 09:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37990 "EHLO
+        id S229804AbjDNPFK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Apr 2023 11:05:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230056AbjDNNtH (ORCPT
+        with ESMTP id S229469AbjDNPFK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2023 09:49:07 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B55CB769
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:53 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-517ca8972c5so145077a12.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 06:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681480132; x=1684072132;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ay/yqTRFl1MCbf/8Li/8YkgX3Ugfpqa4A6skVroSMS8=;
-        b=5HtYI13ssEUtVwYeSuFkN3S8N/iGh0N/+dJ15Z1+cqTCD0wBGgtQ2Aco7EBL15bHwN
-         mvjIuAHqGSKDH4gheP9RWfhz4J1FYw++0gA0LXz/IaxvAOqxJVTbYMl0rT9H3/fCRr5f
-         cfg3OuGJjxrqxNfCC17TyC5WevV7v3OvMQ9AqlkZur9XucYzZn/D/xsjv59jeINDX/Yb
-         uvFwfN2fkocMSdvsp0J6yLYtwbQ5GQ6XR22HrjOwv5Pzzr9u9aANwgljmIVbBHJfV+61
-         NGujx1FTW0h9/1BAsKdG1mRkkbASjftbo8gMqtcYw/FED6uuLVIhvKmO7/tb2k64GKTG
-         dKNQ==
+        Fri, 14 Apr 2023 11:05:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4A92136
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 08:04:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681484660;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=P2n3Dg/504CTsFv4j3fFC68/gVUlJ8C3s+EH+N39aso=;
+        b=cCuPwMoM0i+HyWwqXPrNQCqmG6sa7//4f9++CPG2x0gxJs+LomQeERMi6Ix4YFnGM8Rj4W
+        7Ujivurtsl8FWOs/wj1TPnWDLDNElVVo3PJ7hWHgJNnjWg5SGaCKEmtCqDxZuHSyh4TEBC
+        +bQiT5o2Hzf5Rn3oiP9ZhwguuW9VSoI=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-278-ff8dgFdOPK-LxA7cDOh5-w-1; Fri, 14 Apr 2023 11:04:19 -0400
+X-MC-Unique: ff8dgFdOPK-LxA7cDOh5-w-1
+Received: by mail-pg1-f200.google.com with SMTP id l65-20020a639144000000b005091ec4f2d4so8009458pge.20
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 08:04:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681480132; x=1684072132;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ay/yqTRFl1MCbf/8Li/8YkgX3Ugfpqa4A6skVroSMS8=;
-        b=WdV7wBH3Oev5vfFNKiWlxuOqbNvv0FJXCNwCwuUCjJ38dtCGeAdkE94P2Zsiq0K+us
-         OsdrM12Vv3aTMaTXU6UIz5tGklTS5SHCWEzkpESm0jD+y5KFIWcQqy0/7gYyfxQjca3S
-         oCYKgup9AwUiwRqa9/lGzm19NMWef5BzxzR88WbkTQMnrfD9+pi13yCMK0c2Ps8f+t1E
-         37HXTbfAYgGhBmBgFSkHqNKqgS5V63d2J8iUbGY69GPcH+f/Tm0GLOPID+2mZTbyL93e
-         4FbwcfDbmO37fD58QKd/sUgipF30+P8NelbNC1soKS2645dEFjREFz4nNlj5GSDdFi3J
-         symA==
-X-Gm-Message-State: AAQBX9dX5yMSKRGBorI+XIpNazedIWk14mTefnKFxwrcjnyHLq/9IYzO
-        jiKvO0gbyomCF3pIAGZYZg98XEklPim7O+hRzS8=
-X-Google-Smtp-Source: AKy350bwv03dCHUtNrLfnLfQtobPCr8WNHR/RkXME/xetrA1GlzU578gh6F6Nz62OMYpReQVakJoLQ==
-X-Received: by 2002:a17:902:e547:b0:196:8d96:dc6b with SMTP id n7-20020a170902e54700b001968d96dc6bmr3025940plf.2.1681480132545;
-        Fri, 14 Apr 2023 06:48:52 -0700 (PDT)
-Received: from localhost.localdomain (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id 20-20020a170902ee5400b001a19bac463fsm3098980plo.42.2023.04.14.06.48.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Apr 2023 06:48:51 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] block: store bdev->bd_disk->fops->submit_bio state in bdev
-Date:   Fri, 14 Apr 2023 07:48:48 -0600
-Message-Id: <20230414134848.91563-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230414134848.91563-1-axboe@kernel.dk>
-References: <20230414134848.91563-1-axboe@kernel.dk>
+        d=1e100.net; s=20221208; t=1681484658; x=1684076658;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P2n3Dg/504CTsFv4j3fFC68/gVUlJ8C3s+EH+N39aso=;
+        b=Rx7iVvDg1j1g4gZ5VLr3J1cej/E/JJJygBsznaqECmsyR8k+etEioQdXZ1Mzs9p6cE
+         VQCMGm7z6jht3t1XgO/GEZkRB4X/p9HP9fmzZqCIRoRTyEfgXe5hx4un90YCNP/+maXF
+         SZkt/+BTVDOyMMXMGKLzv3Yc/eIaCdEdETXu9LiWuiilS1ukdDnalgvIPYSAsru+c5vT
+         3O+tDjoJKzsdv39qnwEBOfl+fLSUWjCOhjBEzSWSMCVZGyMQbxO0LxHByhYLNxvlRy9P
+         ARIif3K9lkUASSlXIau3M3n3P4i9gFdJRYcaU1pqZBVSzhDr3PHLgvU5DP1LxFsXUlZU
+         +3EQ==
+X-Gm-Message-State: AAQBX9e0dqONoP7EFFcUgceCTl5MhHtkE4fi4de+kXA+IVSwqLKTsOj+
+        0Xa3zme6JSpsFAekgdnk2dq88JdnNBm4coYLruhgu0oTNHiFLiXnhhyfkjaa127HkFmwMFPaMqH
+        d9uR3jS/nMHqoOG3s/NHbc0Vna9I62uBiHVF9FbzloyWlZToCLbx4qVk=
+X-Received: by 2002:a63:fb45:0:b0:50c:bde:50c7 with SMTP id w5-20020a63fb45000000b0050c0bde50c7mr802099pgj.12.1681484657698;
+        Fri, 14 Apr 2023 08:04:17 -0700 (PDT)
+X-Google-Smtp-Source: AKy350Y/Qvm3eXYhQuHGWzC29MZmXJ8Mf4izJB+JX/ZshJ2jLmjMt9h63L8LhtUnXzfK0VEzo6Gg6frbMA5nMppU57U=
+X-Received: by 2002:a63:fb45:0:b0:50c:bde:50c7 with SMTP id
+ w5-20020a63fb45000000b0050c0bde50c7mr802093pgj.12.1681484657236; Fri, 14 Apr
+ 2023 08:04:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Fri, 14 Apr 2023 23:04:05 +0800
+Message-ID: <CAHj4cs9-PhuUM0ztSnCuryKkOa+tX-RGP+M=zX-UoCE5f9E6FA@mail.gmail.com>
+Subject: [bug report] general protection fault at kyber_bio_merge+0x123/0x300
+To:     linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have a long chain of memory dereferencing just to whether or not
-this disk has a special submit_bio helper. As that's not necessarily
-the common case, add a bd_submit_bio state in the bdev to avoid
-traversing this memory dependency chain if we don't need to.
+Hello
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bdev.c              | 1 +
- block/blk-core.c          | 8 ++++----
- block/genhd.c             | 4 ++++
- include/linux/blk_types.h | 1 +
- 4 files changed, 10 insertions(+), 4 deletions(-)
+Bellow panic triggered during nvme disks queue/nr_request update with
+fio background, pls help check it and let me know if you need any
+info/test, thanks.
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 1795c7d4b99e..31a5d25b2b44 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -419,6 +419,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
- 	bdev->bd_inode = inode;
- 	bdev->bd_queue = disk->queue;
- 	bdev->bd_stats = alloc_percpu(struct disk_stats);
-+	bdev->bd_submit_bio = 0;
- 	if (!bdev->bd_stats) {
- 		iput(inode);
- 		return NULL;
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 269765d16cfd..ae7953539dc0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -587,14 +587,14 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
- 
- static void __submit_bio(struct bio *bio)
- {
--	struct gendisk *disk = bio->bi_bdev->bd_disk;
--
- 	if (unlikely(!blk_crypto_bio_prep(&bio)))
- 		return;
- 
--	if (!disk->fops->submit_bio) {
-+	if (!bio->bi_bdev->bd_submit_bio) {
- 		blk_mq_submit_bio(bio);
- 	} else if (likely(bio_queue_enter(bio) == 0)) {
-+		struct gendisk *disk = bio->bi_bdev->bd_disk;
-+
- 		disk->fops->submit_bio(bio);
- 		blk_queue_exit(disk->queue);
- 	}
-@@ -698,7 +698,7 @@ void submit_bio_noacct_nocheck(struct bio *bio)
- 	 */
- 	if (current->bio_list)
- 		bio_list_add(&current->bio_list[0], bio);
--	else if (!bio->bi_bdev->bd_disk->fops->submit_bio)
-+	else if (!bio->bi_bdev->bd_submit_bio)
- 		__submit_bio_noacct_mq(bio);
- 	else
- 		__submit_bio_noacct(bio);
-diff --git a/block/genhd.c b/block/genhd.c
-index 02d9cfb9e077..07736c5db988 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -420,6 +420,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 	 */
- 	elevator_init_mq(disk->queue);
- 
-+	/* Mark bdev as having a submit_bio, if needed */
-+	if (disk->fops->submit_bio)
-+		disk->part0->bd_submit_bio = 1;
-+
- 	/*
- 	 * If the driver provides an explicit major number it also must provide
- 	 * the number of minors numbers supported, and those will be used to
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d68d6e951fad..c08e1c08b7ba 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -47,6 +47,7 @@ struct block_device {
- 	bool			bd_read_only;	/* read-only policy */
- 	u8			bd_partno;
- 	bool			bd_write_holder;
-+	bool			bd_submit_bio;
- 	dev_t			bd_dev;
- 	atomic_t		bd_openers;
- 	spinlock_t		bd_size_lock; /* for bd_inode->i_size updates */
--- 
-2.39.2
+commit: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-next&id=7001edb72462d95482c98739e6f51f536b000587
+
+(gdb) l *(kyber_bio_merge+0x123)
+0xffffffff820a8723 is in kyber_bio_merge (block/kyber-iosched.c:573).
+568 unsigned int nr_segs)
+569 {
+570 struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
+571 struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, bio->bi_opf, ctx);
+572 struct kyber_hctx_data *khd = hctx->sched_data;
+573 struct kyber_ctx_queue *kcq = &khd->kcqs[ctx->index_hw[hctx->type]];
+574 unsigned int sched_domain = kyber_sched_domain(bio->bi_opf);
+575 struct list_head *rq_list = &kcq->rq_list[sched_domain];
+576 bool merged;
+577
+
+[ 8490.041684] general protection fault, probably for non-canonical
+address 0xdffffc0000000012: 0000 [#1] PREEMPT SMP KASAN NOPTI
+[ 8490.053084] KASAN: null-ptr-deref in range
+[0x0000000000000090-0x0000000000000097]
+[ 8490.060656] CPU: 14 PID: 57468 Comm: fio Not tainted 6.3.0-rc5+ #2
+[ 8490.066845] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS
+2.9.3 08/05/2022
+[ 8490.074419] RIP: 0010:kyber_bio_merge+0x123/0x300
+[ 8490.079142] Code: 80 3c 01 00 0f 85 e8 01 00 00 4c 8b a5 50 01 00
+00 48 b8 00 00 00 00 00 fc ff df 49 8d bc 24 90 00 00 00 48 89 f9 48
+c1 e9 03 <80> 3c 01 00 0f 85 80 01 00 00 48 8d bd 9c 01 00 00 4d 8b a4
+24 90
+[ 8490.097896] RSP: 0018:ffffc900077ef668 EFLAGS: 00010216
+[ 8490.103131] RAX: dffffc0000000000 RBX: ffffe8ffff6c7f00 RCX: 0000000000000012
+[ 8490.110271] RDX: 0000000000000001 RSI: ffffc900077efa30 RDI: 0000000000000090
+[ 8490.117411] RBP: ffff8881b0055000 R08: 0000000000000000 R09: ffff888235885e8f
+[ 8490.124544] R10: ffffed1046b10bd1 R11: 0000000000000001 R12: 0000000000000000
+[ 8490.131677] R13: ffffc900077efa30 R14: 0000000000008801 R15: 0000000000000002
+[ 8490.138810] FS:  00007f1efa834640(0000) GS:ffff8887a1000000(0000)
+knlGS:0000000000000000
+[ 8490.146895] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 8490.152640] CR2: 000055b13696c008 CR3: 000000012354e000 CR4: 0000000000350ee0
+[ 8490.159771] Call Trace:
+[ 8490.162225]  <TASK>
+[ 8490.164332]  blk_mq_submit_bio+0x214/0x1600
+[ 8490.168526]  ? __pfx___lock_release+0x10/0x10
+[ 8490.172886]  ? __pfx_blk_mq_submit_bio+0x10/0x10
+[ 8490.177506]  ? iov_iter_extract_pages+0x229/0xca0
+[ 8490.182210]  ? ktime_get+0x14e/0x180
+[ 8490.185787]  ? lockdep_hardirqs_on+0x79/0x100
+[ 8490.190150]  submit_bio_noacct_nocheck+0x51a/0x6a0
+[ 8490.194950]  ? __pfx_submit_bio_noacct_nocheck+0x10/0x10
+[ 8490.200262]  ? blk_partition_remap+0x2de/0x390
+[ 8490.204710]  ? submit_bio_noacct+0x331/0x15f0
+[ 8490.209070]  submit_bio_wait+0xfe/0x200
+[ 8490.212908]  ? __pfx_submit_bio_wait+0x10/0x10
+[ 8490.217356]  ? bio_iov_iter_get_pages+0x9e/0x250
+[ 8490.221972]  ? bio_init+0x317/0x580
+[ 8490.225466]  __blkdev_direct_IO_simple+0x3ef/0x710
+[ 8490.230259]  ? __pfx___blkdev_direct_IO_simple+0x10/0x10
+[ 8490.235570]  ? filemap_get_read_batch+0x3b0/0x6a0
+[ 8490.240275]  ? __pfx___filemap_fdatawrite_range+0x10/0x10
+[ 8490.245674]  ? __pfx_submit_bio_wait_endio+0x10/0x10
+[ 8490.250646]  generic_file_direct_write+0x1d4/0x4b0
+[ 8490.255443]  __generic_file_write_iter+0x165/0x420
+[ 8490.260237]  blkdev_write_iter+0x358/0x7e0
+[ 8490.264335]  ? __pfx_blkdev_write_iter+0x10/0x10
+[ 8490.268955]  ? selinux_file_permission+0x356/0x440
+[ 8490.273757]  vfs_write+0x802/0xc60
+[ 8490.277170]  ? __pfx_vfs_write+0x10/0x10
+[ 8490.281096]  ? __fget_files+0x1b8/0x3f0
+[ 8490.284938]  __x64_sys_pwrite64+0x1a0/0x1f0
+[ 8490.289128]  ? __pfx___x64_sys_pwrite64+0x10/0x10
+[ 8490.293833]  ? ktime_get_coarse_real_ts64+0x130/0x170
+[ 8490.298888]  do_syscall_64+0x5c/0x90
+[ 8490.302465]  ? lockdep_hardirqs_on+0x79/0x100
+[ 8490.306823]  ? do_syscall_64+0x69/0x90
+[ 8490.310576]  ? do_syscall_64+0x69/0x90
+[ 8490.314331]  ? lockdep_hardirqs_on+0x79/0x100
+[ 8490.318688]  ? do_syscall_64+0x69/0x90
+[ 8490.322442]  ? asm_common_interrupt+0x22/0x40
+[ 8490.326800]  ? lockdep_hardirqs_on+0x79/0x100
+[ 8490.331160]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[ 8490.336213] RIP: 0033:0x7f1f0cd3cc0f
+[ 8490.339793] Code: 08 89 3c 24 48 89 4c 24 18 e8 fd ef f5 ff 4c 8b
+54 24 18 48 8b 54 24 10 41 89 c0 48 8b 74 24 08 8b 3c 24 b8 12 00 00
+00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 04 24 e8 4d f0 f5 ff
+48 8b
+[ 8490.358538] RSP: 002b:00007f1efa833b60 EFLAGS: 00000293 ORIG_RAX:
+0000000000000012
+[ 8490.366103] RAX: ffffffffffffffda RBX: 00007f1eac000bc0 RCX: 00007f1f0cd3cc0f
+[ 8490.373233] RDX: 0000000000001400 RSI: 00007f1eac001000 RDI: 000000000000001c
+[ 8490.380366] RBP: 00007f1eac000bc0 R08: 0000000000000000 R09: 0000000000006802
+[ 8490.387501] R10: 00000002080b4000 R11: 0000000000000293 R12: 00007f1f04349a70
+[ 8490.394632] R13: 0000000000000001 R14: 0000000000001400 R15: 00007f1f0438e198
+[ 8490.401772]  </TASK>
+[ 8490.403967] Modules linked in: tls sunrpc vfat fat dm_multipath
+intel_rapl_msr intel_rapl_common amd64_edac edac_mce_amd kvm_amd
+ledtrig_audio rfkill video dell_smbios dcdbas kvm mgag200 ipmi_ssif
+i2c_algo_bit dell_wmi_descriptor wmi_bmof irqbypass drm_shmem_helper
+rapl pcspkr drm_kms_helper syscopyarea sysfillrect sysimgblt acpi_ipmi
+ptdma i2c_piix4 k10temp ipmi_si ipmi_devintf ipmi_msghandler
+acpi_power_meter acpi_cpufreq drm fuse xfs libcrc32c sd_mod sg
+crct10dif_pclmul crc32_pclmul crc32c_intel nvme ghash_clmulni_intel
+ahci libahci mpt3sas nvme_core tg3 libata nvme_common ccp raid_class
+t10_pi scsi_transport_sas wmi sp5100_tco dm_mirror dm_region_hash
+dm_log dm_mod
+[ 8490.463207] general protection fault, probably for non-canonical
+address 0xdffffc0000000012: 0000 [#2] PREEMPT SMP KASAN NOPTI
+[ 8490.463385] ---[ end trace 0000000000000000 ]---
+
+
+--
+Best Regards,
+  Yi Zhang
 
