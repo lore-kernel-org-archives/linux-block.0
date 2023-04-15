@@ -2,287 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01404C7619A
-	for <linux-block@archiver.kernel.org>; Sat, 15 Apr 2023 08:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13854C77B71
+	for <linux-block@archiver.kernel.org>; Sat, 15 Apr 2023 10:30:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbjDOIWA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Apr 2023 04:22:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53660 "EHLO
+        id S229540AbjDOKaF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Apr 2023 06:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbjDOIV7 (ORCPT
+        with ESMTP id S229468AbjDOKaE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2023 04:21:59 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B105F5BB0;
-        Sat, 15 Apr 2023 01:21:55 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Pz5rb0Wppz4f3mVn;
-        Sat, 15 Apr 2023 16:21:51 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgCH77KeXjpkuM3BHQ--.4991S4;
-        Sat, 15 Apr 2023 16:21:52 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH RFC -next] block: support enable/disable blk-mq debugfs dynamically
-Date:   Sat, 15 Apr 2023 16:20:42 +0800
-Message-Id: <20230415082042.2120295-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        Sat, 15 Apr 2023 06:30:04 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C27C421B;
+        Sat, 15 Apr 2023 03:30:02 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4ec8143400aso364568e87.0;
+        Sat, 15 Apr 2023 03:30:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681554600; x=1684146600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lf5kBrHHAquO9tTTXJJNq3KA4F/3xZQlU3y8nwKtzZY=;
+        b=mTL5rjdi3lwF+8L3TrGB4cnbYvpNPkaiqYzPIU2ibMXZNI+brOk/v1nQCJRrKL6T+G
+         UIB0438M9uKn5UJJVPOZv+Is6urzbh0ahLN39PQlfU/aG1I/GW32VZ619j2nDw8rojPi
+         GwcOJ4LRSaOW8VWlU9sUkksv38tsPOOUzzWXQ59jzvyDuH7Npn4Ul3zbhSz2Gn90AvzN
+         aqfUrpYFmNvydAl3NgIo79qaYpnja3s0k4Tx/8OoEq/0TLuE4eKyZePUL3tlwGnlZlZC
+         sEnlNg9uWI3pmF45KQJYPAGTBkSBCQN3PbYdYDGNZE6Ii+bX1HerDiTFPOCNwXEclJ7E
+         UWew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681554600; x=1684146600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lf5kBrHHAquO9tTTXJJNq3KA4F/3xZQlU3y8nwKtzZY=;
+        b=EA8yeYF7i62+R2+93mMjYTwVpZfw4/4sfiAIG8atlqeQcO0UWP99KfnsToLyUMsynJ
+         sZFUshw1NsBXLfb0f1FxJjF/0lb1/KrxUUYC6207SYqhJRWEAZvQWkTKxQ3ZuCsAqsjh
+         9z3nOOHr36ClW6YVUdTZM0jf/vYA972X4zf+q4XUTCqk76wM1nxZCSQGFg469FbkLM+I
+         k7PaXucZwKixVwm4x7v0ZyvRT9/tFgwOarERsI8eOJaWvQrhWu3GVXYIkWQYgT11bJ06
+         XOwzkGyAgV218kLGt9sMZNwYs0QgxrATg7d0Gs6EIfxqN0MrjUgCeW5Fwyxr+ZYSjyti
+         akJg==
+X-Gm-Message-State: AAQBX9eYw9fJS81sUT0jdIAJdN3RR8bShTsarEZ6O7ufucuD0JNWihJY
+        IXXDvhGzSZu4Vd6oQm91E9sR6sMN+E/6T6yxqGE=
+X-Google-Smtp-Source: AKy350Y4mZo9R6GywEnBykaletNodZgw01NzVQS+lZb6P86QJ0T7PT5Pt0CC6t9Llo9xgu1q/QfBKJ6jj5bBbfXILT4=
+X-Received: by 2002:a19:c50f:0:b0:4ec:8e50:5032 with SMTP id
+ w15-20020a19c50f000000b004ec8e505032mr503319lfe.13.1681554600517; Sat, 15 Apr
+ 2023 03:30:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCH77KeXjpkuM3BHQ--.4991S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3XF18Wr1Uur18XF1UtFWUArb_yoW3Wr45pa
-        yDGa15tw10yr43XFyfCa17Ar1fK3yvgr17ZryS9ryYvwn5Kr1rXF18tFWUJrWkWrWkCr42
-        vr15J3yq9ryjqFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-        vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IY
-        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
-        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-        67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <7c00f4f8-5bdf-4fa6-d9f0-141cf88c9ec9@nvidia.com>
+ <20230329162145.147395-1-akinobu.mita@gmail.com> <c57uedevavvjwlcvgxfv453dfiy4cgq4f23dscu5dy77sujgw2@pb6fyyfov5se>
+In-Reply-To: <c57uedevavvjwlcvgxfv453dfiy4cgq4f23dscu5dy77sujgw2@pb6fyyfov5se>
+From:   Akinobu Mita <akinobu.mita@gmail.com>
+Date:   Sat, 15 Apr 2023 19:29:48 +0900
+Message-ID: <CAC5umyhVXdRN570SmcvMNtW-xL38siQ38PeYHrJgATxHyU4g0A@mail.gmail.com>
+Subject: Re: [PATCH blktests] don't require modular null_blk for fault-injection
+To:     "Shin'ichiro Kawasaki" <shinichiro@fastmail.com>
+Cc:     chaitanyak@nvidia.com, akpm@linux-foundation.org, axboe@kernel.dk,
+        hch@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+2023=E5=B9=B44=E6=9C=8812=E6=97=A5(=E6=B0=B4) 12:05 Shin'ichiro Kawasaki <s=
+hinichiro@fastmail.com>:
+>
+> Akinobu, thanks for the patch, and sorry for this slow response.
+>
+> On Mar 30, 2023 / 01:21, Akinobu Mita wrote:
+> > I'm trying to allow configuration of null_blk fault-injection via confi=
+gfs.
+> >
+> > This blktests change changes null_blk fault-injection settings to be
+> > configured via configfs instead of module parameters.
+> > This allows null_blk fault-injection tests to run even if the null_blk =
+is
+> > built-in the kernel and not built as a module.
+>
+> It's good that the three test case can run with built-in null_blk.
+>
+> >
+> > However, to keep the scripts simple, we will skip testing if the null_b=
+lk
+> > does not yet support configuring fault-injection via configfs.
+>
+> Hmm, it means that blktests coverage will be lost on older kernels withou=
+t the
+> configfs support. Before this change, the test cases were not skipped on =
+older
+> kernel with loadable null_blk. After this patch, the test cases will be s=
+kipped.
+>
+> Can we cover both the new and old ways? When the null_blk set up with con=
+figfs
+> fails, we can fallback to the old way with module parameters.
+>
+> For example, null_blk set up of block/014 can be like this:
 
-After a disk is created, debugfs inode and dentry will be created
-together, and the memory used for debugfs can't be freed until disk
-removal.
-
-The number of debugfs inode and dentry is based on how many cpus and
-hctxs. For example, testing on a 128-core environemt, with default
-module parameters, each loop device will cost 1679KB memory, and debugfs
-will cost 336KB(20%).
-
-The memory cost for debugfs for a disk seems little, but if a big machine
-contains thousands of disks, the cost will be xxGB. This memory overhead
-can be avoided by disabling CONFIG_BLK_DEBUG_FS.
-
-This patch add a disk level switch that can enable/disable debugfs
-dynamically, so that user can disable debugfs if they care about the
-memory overhead, in the meantime, debugfs can be enabled again in demand.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-mq-debugfs.c | 58 ++++++++++++++++++++++++++++++++++++++----
- block/blk-mq-debugfs.h |  1 +
- block/blk-sysfs.c      | 41 +++++++++++++++++++++++++++++
- include/linux/blkdev.h |  2 ++
- 4 files changed, 97 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 212a7f301e73..3ffc27fd4d07 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -657,6 +657,9 @@ void blk_mq_debugfs_register(struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
- 
-+	if (!test_bit(QUEUE_FLAG_DEBUGFS, &q->queue_flags))
-+		return;
-+
- 	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
- 
- 	/*
-@@ -685,6 +688,47 @@ void blk_mq_debugfs_register(struct request_queue *q)
- 	}
- }
- 
-+static void debugfs_remove_files(struct dentry *parent,
-+				 const struct blk_mq_debugfs_attr *attr)
-+{
-+	if (IS_ERR_OR_NULL(parent))
-+		return;
-+
-+	for (; attr->name; attr++)
-+		debugfs_lookup_and_remove(attr->name, parent);
-+}
-+
-+void blk_mq_debugfs_unregister(struct request_queue *q)
-+{
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long i;
-+
-+	if (q->rq_qos) {
-+		struct rq_qos *rqos = q->rq_qos;
-+
-+		while (rqos) {
-+			if (rqos->debugfs_dir)
-+				blk_mq_debugfs_unregister_rqos(rqos);
-+			rqos = rqos->next;
-+		}
-+	}
-+
-+	debugfs_remove_recursive(q->rqos_debugfs_dir);
-+	q->rqos_debugfs_dir = NULL;
-+
-+	queue_for_each_hw_ctx(q, hctx, i) {
-+		if (hctx->debugfs_dir)
-+			blk_mq_debugfs_unregister_hctx(hctx);
-+		if (hctx->sched_debugfs_dir)
-+			blk_mq_debugfs_unregister_sched_hctx(hctx);
-+	}
-+
-+	if (q->sched_debugfs_dir)
-+		blk_mq_debugfs_unregister_sched(q);
-+
-+	debugfs_remove_files(q->debugfs_dir, blk_mq_debugfs_queue_attrs);
-+}
-+
- static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_ctx *ctx)
- {
-@@ -704,7 +748,7 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
- 	char name[20];
- 	int i;
- 
--	if (!q->debugfs_dir)
-+	if (!q->debugfs_dir || !test_bit(QUEUE_FLAG_DEBUGFS, &q->queue_flags))
- 		return;
- 
- 	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
-@@ -718,7 +762,8 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
- 
- void blk_mq_debugfs_unregister_hctx(struct blk_mq_hw_ctx *hctx)
- {
--	if (!hctx->queue->debugfs_dir)
-+	if (!hctx->queue->debugfs_dir ||
-+	    !test_bit(QUEUE_FLAG_DEBUGFS, &hctx->queue->queue_flags))
- 		return;
- 	debugfs_remove_recursive(hctx->debugfs_dir);
- 	hctx->sched_debugfs_dir = NULL;
-@@ -756,7 +801,8 @@ void blk_mq_debugfs_register_sched(struct request_queue *q)
- 	if (!q->debugfs_dir)
- 		return;
- 
--	if (!e->queue_debugfs_attrs)
-+	if (!e->queue_debugfs_attrs ||
-+	    !test_bit(QUEUE_FLAG_DEBUGFS, &q->queue_flags))
- 		return;
- 
- 	q->sched_debugfs_dir = debugfs_create_dir("sched", q->debugfs_dir);
-@@ -802,7 +848,8 @@ void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- 
- 	lockdep_assert_held(&q->debugfs_mutex);
- 
--	if (rqos->debugfs_dir || !rqos->ops->debugfs_attrs)
-+	if (rqos->debugfs_dir || !rqos->ops->debugfs_attrs ||
-+	    !test_bit(QUEUE_FLAG_DEBUGFS, &q->queue_flags))
- 		return;
- 
- 	if (!q->rqos_debugfs_dir)
-@@ -828,7 +875,8 @@ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
- 	if (!hctx->debugfs_dir)
- 		return;
- 
--	if (!e->hctx_debugfs_attrs)
-+	if (!e->hctx_debugfs_attrs ||
-+	    !test_bit(QUEUE_FLAG_DEBUGFS, &q->queue_flags))
- 		return;
- 
- 	hctx->sched_debugfs_dir = debugfs_create_dir("sched",
-diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-index 9c7d4b6117d4..c8dd03f73d8c 100644
---- a/block/blk-mq-debugfs.h
-+++ b/block/blk-mq-debugfs.h
-@@ -21,6 +21,7 @@ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq);
- int blk_mq_debugfs_rq_show(struct seq_file *m, void *v);
- 
- void blk_mq_debugfs_register(struct request_queue *q);
-+void blk_mq_debugfs_unregister(struct request_queue *q);
- void blk_mq_debugfs_register_hctx(struct request_queue *q,
- 				  struct blk_mq_hw_ctx *hctx);
- void blk_mq_debugfs_unregister_hctx(struct blk_mq_hw_ctx *hctx);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 1a743b4f2958..450acea23f21 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -618,6 +618,44 @@ QUEUE_RW_ENTRY(queue_iostats, "iostats");
- QUEUE_RW_ENTRY(queue_random, "add_random");
- QUEUE_RW_ENTRY(queue_stable_writes, "stable_writes");
- 
-+#ifdef CONFIG_BLK_DEBUG_FS
-+static ssize_t queue_debugfs_show(struct request_queue *q, char *page)
-+{
-+	return queue_var_show(test_bit(QUEUE_FLAG_DEBUGFS, &q->queue_flags),
-+			      page);
-+}
-+
-+static ssize_t queue_debugfs_store(struct request_queue *q, const char *page,
-+				   size_t count)
-+{
-+	unsigned long val;
-+	bool enabled;
-+	ssize_t ret = queue_var_store(&val, page, count);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	mutex_lock(&q->debugfs_mutex);
-+	enabled = test_bit(QUEUE_FLAG_DEBUGFS, &q->queue_flags);
-+	if (val) {
-+		if (!enabled && queue_is_mq(q)) {
-+			blk_queue_flag_set(QUEUE_FLAG_DEBUGFS, q);
-+			blk_mq_debugfs_register(q);
-+		}
-+	} else {
-+		if (enabled) {
-+			blk_mq_debugfs_unregister(q);
-+			blk_queue_flag_clear(QUEUE_FLAG_DEBUGFS, q);
-+		}
-+	}
-+	mutex_unlock(&q->debugfs_mutex);
-+
-+	return ret;
-+}
-+
-+QUEUE_RW_ENTRY(queue_debugfs, "debugfs");
-+#endif
-+
- static struct attribute *queue_attrs[] = {
- 	&queue_requests_entry.attr,
- 	&queue_ra_entry.attr,
-@@ -664,6 +702,9 @@ static struct attribute *queue_attrs[] = {
- #endif
- 	&queue_virt_boundary_mask_entry.attr,
- 	&queue_dma_alignment_entry.attr,
-+#ifdef CONFIG_BLK_DEBUG_FS
-+	&queue_debugfs_entry.attr,
-+#endif
- 	NULL,
- };
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e3242e67a8e3..be51592751b2 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -544,6 +544,7 @@ struct request_queue {
- #define QUEUE_FLAG_NONROT	6	/* non-rotational device (SSD) */
- #define QUEUE_FLAG_VIRT		QUEUE_FLAG_NONROT /* paravirt device */
- #define QUEUE_FLAG_IO_STAT	7	/* do disk/partitions IO accounting */
-+#define QUEUE_FLAG_DEBUGFS	8	/* supports debugfs */
- #define QUEUE_FLAG_NOXMERGES	9	/* No extended merges */
- #define QUEUE_FLAG_ADD_RANDOM	10	/* Contributes to random pool */
- #define QUEUE_FLAG_SYNCHRONOUS	11	/* always completes in submit context */
-@@ -566,6 +567,7 @@ struct request_queue {
- #define QUEUE_FLAG_SKIP_TAGSET_QUIESCE	31 /* quiesce_tagset skip the queue*/
- 
- #define QUEUE_FLAG_MQ_DEFAULT	((1UL << QUEUE_FLAG_IO_STAT) |		\
-+				 (1UL << QUEUE_FLAG_DEBUGFS) |	\
- 				 (1UL << QUEUE_FLAG_SAME_COMP) |	\
- 				 (1UL << QUEUE_FLAG_NOWAIT))
- 
--- 
-2.39.2
-
+OK, I'll update the tests and give it a try.
