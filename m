@@ -2,68 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFDFC77B70
-	for <linux-block@archiver.kernel.org>; Sat, 15 Apr 2023 18:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C1E8C77B70
+	for <linux-block@archiver.kernel.org>; Sat, 15 Apr 2023 20:41:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbjDOSLg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Apr 2023 14:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57868 "EHLO
+        id S229865AbjDOUlA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Apr 2023 16:41:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229930AbjDOSLe (ORCPT
+        with ESMTP id S229683AbjDOUk7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Apr 2023 14:11:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D80654232
-        for <linux-block@vger.kernel.org>; Sat, 15 Apr 2023 11:11:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4C8DC612FB
-        for <linux-block@vger.kernel.org>; Sat, 15 Apr 2023 18:11:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B184AC4339B;
-        Sat, 15 Apr 2023 18:11:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681582292;
-        bh=ht8zQClR1hXMzh3KD5d8Tw8QvL9RzPi4mMgpxlwFLdA=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=l0y8ZSHfzMPSysy8czj2byC8t7hf4XJHZd5gQIE30X2KnibVCYxjOdYDm3Bsyj88w
-         RJYoldR6uUXvu8SpyHFJkF8yTHm1YxGqx/j3d3rDLMhprbOeraZERnJAOx9vBURDDM
-         zSHG1+x8y7rRTpy49LDcZzI2x3r7DL8OXeoLmGU/2ybB/p4fI02Hls2HNbCO8sXMCE
-         erL3PCv/pMy6LCcxdvHT8hIQITrbM/Ov87Z6KlM7ecFk8Acm+BBZiFZ4gONn6gAH2G
-         NstH0xp/BUuhZUeNg1KkpsCYSslaJBEFIcQm0RSObrGMPfeXej70FcF8XnaJK0GJfN
-         SbENSdF01AVUw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9FBB9E52446;
-        Sat, 15 Apr 2023 18:11:32 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fix for 6.3-rc7
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <9d88e759-5201-82c4-792f-dcb6e29c808a@kernel.dk>
-References: <9d88e759-5201-82c4-792f-dcb6e29c808a@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <9d88e759-5201-82c4-792f-dcb6e29c808a@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.3-2023-04-14
-X-PR-Tracked-Commit-Id: f7ca1ae32bd89ab035568c63b4443eb55420b423
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cdcc6696d22dbb8fa2982d523d17f6ad2777d0f2
-Message-Id: <168158229265.18559.17663123145925182633.pr-tracker-bot@kernel.org>
-Date:   Sat, 15 Apr 2023 18:11:32 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Sat, 15 Apr 2023 16:40:59 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A48DC9
+        for <linux-block@vger.kernel.org>; Sat, 15 Apr 2023 13:40:58 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-5e7534b6736so3860716d6.0
+        for <linux-block@vger.kernel.org>; Sat, 15 Apr 2023 13:40:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681591258; x=1684183258;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K5ZpJOS2H9PgGp4Q72WdTfSs9gPQF5dEYfpY40h9OUQ=;
+        b=UzU//76cztdU1LgexNLanS+PonvEY1gfbmf2XiwBHWabM0B+HR+5mkKYMsJklwCCn/
+         D5bcRCSYS143FhZdjgcNigSfttd9A+nUNaSO8oI9FcIbEQcL+e5M6JLXwQJ36h5j4cWw
+         9Y87Z871/OiG5GP0uPnJxCGb0J1Q3je9mvsT5eLZICyaQaXJFk38RCH6wZI6fMyCoA03
+         ig/CUVoT4ZH8CnNByrhBkIojoU+mZC+T/3OV1nMOMHShB6czLciDHtzBzG6WajheDuS0
+         mpGwt9J6iuTLkiRY8Nv8/67dpQ4L1Q51NpHQLMMqBDZGgRUPlFtGugqsj/pi8PLZ9Rgm
+         NeTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681591258; x=1684183258;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K5ZpJOS2H9PgGp4Q72WdTfSs9gPQF5dEYfpY40h9OUQ=;
+        b=Gpym6azClwCNWfRND9y7iiBv+1RH3CbEG/J+S1+8cHeI/822m0ZN3rdLDA8lWB8HQ2
+         GZTjCg2vbwmot81xOT1CdbQaxaO13zv3XgAjX3+WsIJBVI04Wown4NlOMjkpH7q5P9pi
+         K6NaAE/UFm5Gj/QeVgWtb23g84mu0kSuGzITSJWwRzRLMc2yk2174EZ0v9X/p3Cb+2dH
+         hooitFhU7zY9q42qyPt0DYV64N3wzvEpIGoOiPQBE63EB+4n/zSe2K2WcVIdKEU4n4+S
+         A6vXPwcOah6hLF8NUGg3KUBA4vhBvXAOVJqBBrtF3g3Dl/u5zDIZklc9deDHpyNiqJZL
+         zGpw==
+X-Gm-Message-State: AAQBX9d7ZyC4YPei46A5lY6fIwnPOTNjk9WLb05R7+Q9hKRFMDevqQPk
+        gSzmaLXcF9k7TNimUGet2/vHvrM4yZYzUTECndw=
+X-Google-Smtp-Source: AKy350b7Jgq/iFYYGf1L3SXkiJAspR6o8DYiL85urxLnUkV+LsBU0p8W38LeUr7ZJa9KfcGW8yLuuw==
+X-Received: by 2002:a05:6214:3011:b0:5ef:5132:7ad7 with SMTP id ke17-20020a056214301100b005ef51327ad7mr9930130qvb.2.1681591257782;
+        Sat, 15 Apr 2023 13:40:57 -0700 (PDT)
+Received: from [127.0.0.1] ([216.250.210.6])
+        by smtp.gmail.com with ESMTPSA id pp26-20020a056214139a00b005dd8b934571sm1996244qvb.9.2023.04.15.13.40.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Apr 2023 13:40:57 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     lkp@intel.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Akinobu Mita <akinobu.mita@gmail.com>
+Cc:     oe-kbuild-all@lists.linux.dev, shinichiro.kawasaki@wdc.com,
+        chaitanyak@nvidia.com, akpm@linux-foundation.org, hch@infradead.org
+In-Reply-To: <20230415125705.180426-1-akinobu.mita@gmail.com>
+References: <202304150025.K0hczLR4-lkp@intel.com>
+ <20230415125705.180426-1-akinobu.mita@gmail.com>
+Subject: Re: [PATCH -block] fault-inject: fix build error when
+ FAULT_INJECTION_CONFIGFS=y and CONFIGFS_FS=m
+Message-Id: <168159125392.9478.18069985091201670556.b4-ty@kernel.dk>
+Date:   Sat, 15 Apr 2023 14:40:53 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 14 Apr 2023 21:43:48 -0600:
 
-> git://git.kernel.dk/linux.git tags/block-6.3-2023-04-14
+On Sat, 15 Apr 2023 21:57:05 +0900, Akinobu Mita wrote:
+> This fixes a build error when CONFIG_FAULT_INJECTION_CONFIGFS=y and
+> CONFIG_CONFIGFS_FS=m.
+> 
+> Since the fault-injection library cannot built as a module, avoid building
+> configfs as a module.
+> 
+> 
+> [...]
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cdcc6696d22dbb8fa2982d523d17f6ad2777d0f2
+Applied, thanks!
 
-Thank you!
+[1/1] fault-inject: fix build error when FAULT_INJECTION_CONFIGFS=y and CONFIGFS_FS=m
+      commit: 5347c9321845e5a94be19ea951746d4f2b8b194f
 
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jens Axboe
+
+
+
