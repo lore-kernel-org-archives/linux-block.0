@@ -2,129 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F263EC77B71
-	for <linux-block@archiver.kernel.org>; Sat, 15 Apr 2023 03:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9C1C77B71
+	for <linux-block@archiver.kernel.org>; Sat, 15 Apr 2023 03:43:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbjDODlT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Apr 2023 23:41:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38544 "EHLO
+        id S229790AbjDODnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Apr 2023 23:43:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbjDODlT (ORCPT
+        with ESMTP id S229625AbjDODnv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Apr 2023 23:41:19 -0400
+        Fri, 14 Apr 2023 23:43:51 -0400
 Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27F23C27
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 20:41:17 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-63b781c9787so152749b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 20:41:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6095270
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 20:43:50 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-63b621b1dabso391424b3a.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Apr 2023 20:43:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681530077; x=1684122077;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8sNozpdx31abguSyVSF9qhZOX9oqhbNtIPjBrNvBDXo=;
-        b=zAR6U9OfcJXl1UaLi7zKV0pyJWH68PG7A2zCVyQ3Nz98G3D1UJKVT6Y8AxFfIv4Vh9
-         6h2y7QQmjhH7EpFX4I9/P89YUuJ852u3YDTXy5QvEIgw3Nx4fG3s3Ljb+WyYafBDPqh4
-         hiioLy5rL6WtE2jKn3GMZJRDvLWggcuKr0uk/uUmkbaMbHlO25/yw5dIWN1e8HbTI58+
-         507XvL5aSoWjIDFhKpIKnxB60tedQwfnp3S+eii5Jd4+wklElzbxOgU391kzDGjfsDx6
-         kwAxBkDF+tsyYjvDGkXzGOXcDAYFGrnnLBiH/c75BH0zrrG9JIxrvakjHllJCxuKMQcm
-         qAxQ==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681530230; x=1684122230;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1FZwsA5lGAAJ6WyZakIZfb86WvlsXSAR4mhCeCsLVgM=;
+        b=ZrwL6Owcfnet/9BBFTHVY82v13SgXDk1tX4xPrPGyrlDWnZ82bFVMe0PzUbL9gYG2i
+         h1Zzl/zLoUBJbpD86BXeJp8Hub4Ugkx2copgpWiR7h8xNdmu1E5B9zZp78nkhkGzyoNc
+         USe7myl6g7HGT36E0UJPVceokAafSvSq60wQ7P0GeMRGQBHcag3Er6tzTFYCg57FnbfK
+         Bb3RsDV3nAlhll4DrR3tfzvd6BAUg7ui4kffxTxv1u1zbVwFfBsMioqXe4C7mjCe2t4R
+         tj1/OcYaYL/GxZynLr0+SGvKRsoooW3/o6i83qZZ7R6RDvVHV8tr4Q2glhRZs0am1Xty
+         4MGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681530077; x=1684122077;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8sNozpdx31abguSyVSF9qhZOX9oqhbNtIPjBrNvBDXo=;
-        b=Z5OvC4BmmzZ9TPt0OrblIr/LLW8XX1Mm95NLD63qL5WpqGv9jkHv38pUlOlu4/dhFr
-         k5yfCvTh4UE4KRmgU4mX16me6jfoLuGGDycCV4bUsAX+tEMV1r4snOUcbttqjg3IpnxR
-         xX1NqQaZNM7tclbgm/ryhNXg67d5SElRFrJg3XQm+DZAcfAY+rxY2501Tr1grCC4fYHv
-         ETPPRdOZjt6iJR+jIWhEi4xsZtsc0lgXXDB3o+pAKaKAICvvKm+Y5g3eKxpYs15HBOYZ
-         aXqhVbvhdXrahYqUmb72fVxhzGAfUfGjx+cOQjDjEBy6DrZXRlHpSsTuzD7Vl3NAZhLp
-         5WyQ==
-X-Gm-Message-State: AAQBX9fqHxyeSwpgfE3jHTuT3PcPvP1+9duqwk6nD7PyewUmnUaCeA02
-        Jw2/ynjJoC4ymnsunkBbD40+t6Tgud2afVGCFP8=
-X-Google-Smtp-Source: AKy350aOJKVvcKfczURlqvns5/ZWq7cfl1FIrXQVS84Wc9q/0eAu9VYrxkqIdAqpEVlyUOw5Z0i/2Q==
-X-Received: by 2002:a17:903:2308:b0:19a:a815:2877 with SMTP id d8-20020a170903230800b0019aa8152877mr5468822plh.6.1681530077021;
-        Fri, 14 Apr 2023 20:41:17 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1681530230; x=1684122230;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1FZwsA5lGAAJ6WyZakIZfb86WvlsXSAR4mhCeCsLVgM=;
+        b=SP9st7hop1DYunKVmRuraWwTbCftSKatYySInFZTtL7V6BFHEj77deSyFy82ewxb7k
+         jcD8FvxVGJ7Ul0qVbget4yGUXThFJRYVufCRQ2Ttgiu/C+dYFLPlBJCfYcezxEmqpxXy
+         w+v79Kle61Xvz0OdDh5Ng0hQKGcTDWHU0T4ezB95WmPm71fGcRVg7aMmqlPyVLa2UQnf
+         DKyXTyDtIqPN0bwmyKW2c/Tu2t4TRtPnmpTvcdHs+8Hw6ILQWj2fZNZ84yuUkIVj0zc2
+         mftSrxvFMsv82Jx607DlbHiyc6bRwM7Ur8oiGq4v2YDgaY2QrUJWdRPTGezY8xpsVmJy
+         fqng==
+X-Gm-Message-State: AAQBX9cn4WZ4oMXbHwEsbdOOpKqbV+dCKboJlEUlpInE7JPEpicvUbHc
+        +O/0NzL0A4uM5Q7k7UwQVXLkVLWmUZj5VsRYN4U=
+X-Google-Smtp-Source: AKy350YzZEnf3env4LRuhlqp3OmKP0I31LZCzuW98YiVs9Wg1eshzha/sdUhsv078iLkOvbG87ZWNQ==
+X-Received: by 2002:a05:6a00:310c:b0:624:bf7e:9d8c with SMTP id bi12-20020a056a00310c00b00624bf7e9d8cmr5164785pfb.1.1681530229820;
+        Fri, 14 Apr 2023 20:43:49 -0700 (PDT)
 Received: from [192.168.4.201] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id i7-20020a17090aee8700b00246eea97f0dsm5299529pjz.47.2023.04.14.20.41.16
+        by smtp.gmail.com with ESMTPSA id s20-20020aa78294000000b005921c46cbadsm3832731pfm.99.2023.04.14.20.43.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Apr 2023 20:41:16 -0700 (PDT)
-Message-ID: <d790086e-1bfe-6882-2e84-8110d7b9bc28@kernel.dk>
-Date:   Fri, 14 Apr 2023 21:41:15 -0600
+        Fri, 14 Apr 2023 20:43:49 -0700 (PDT)
+Message-ID: <9d88e759-5201-82c4-792f-dcb6e29c808a@kernel.dk>
+Date:   Fri, 14 Apr 2023 21:43:48 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.0
-Subject: Re: [PATCH 2/2] block: store bdev->bd_disk->fops->submit_bio state in
- bdev
 Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
-References: <20230414134848.91563-1-axboe@kernel.dk>
- <20230414134848.91563-3-axboe@kernel.dk>
- <61ee258c-b330-ba93-cab5-83e7bd9cd105@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <61ee258c-b330-ba93-cab5-83e7bd9cd105@kernel.org>
+Subject: [GIT PULL] Block fix for 6.3-rc7
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/14/23 8:43?PM, Damien Le Moal wrote:
-> On 4/14/23 22:48, Jens Axboe wrote:
->> We have a long chain of memory dereferencing just to whether or not
->> this disk has a special submit_bio helper. As that's not necessarily
->> the common case, add a bd_submit_bio state in the bdev to avoid
->> traversing this memory dependency chain if we don't need to.
->>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> ---
->>  block/bdev.c              | 1 +
->>  block/blk-core.c          | 8 ++++----
->>  block/genhd.c             | 4 ++++
->>  include/linux/blk_types.h | 1 +
->>  4 files changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/block/bdev.c b/block/bdev.c
->> index 1795c7d4b99e..31a5d25b2b44 100644
->> --- a/block/bdev.c
->> +++ b/block/bdev.c
->> @@ -419,6 +419,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
->>  	bdev->bd_inode = inode;
->>  	bdev->bd_queue = disk->queue;
->>  	bdev->bd_stats = alloc_percpu(struct disk_stats);
->> +	bdev->bd_submit_bio = 0;
-> 
-> "= false;" would be better to match bd_submit_bio type.
+Hi Linus,
 
-Done
+Just an NVMe pull request, with a single quirk entry addition. Please
+pull!
 
->> diff --git a/block/genhd.c b/block/genhd.c
->> index 02d9cfb9e077..07736c5db988 100644
->> --- a/block/genhd.c
->> +++ b/block/genhd.c
->> @@ -420,6 +420,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
->>  	 */
->>  	elevator_init_mq(disk->queue);
->>  
->> +	/* Mark bdev as having a submit_bio, if needed */
->> +	if (disk->fops->submit_bio)
->> +		disk->part0->bd_submit_bio = 1;
-> 
-> "= true;" would be better to match the type.
-> 
-> Note that this could also be:
-> 
-> disk->part0->bd_submit_bio = disk->fops->submit_bio;
-> 
-> thus removing the if.
 
-I made it:
+The following changes since commit 3723091ea1884d599cc8b8bf719d6f42e8d4d8b1:
 
-disk->part0->bd_submit_bio = disk->fops->submit_bio != NULL;
+  block: don't set GD_NEED_PART_SCAN if scan partition failed (2023-04-06 20:41:53 -0600)
 
-instead to make it explicit, I don't think that assignment would be
-happy otherwise.
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.3-2023-04-14
+
+for you to fetch changes up to f7ca1ae32bd89ab035568c63b4443eb55420b423:
+
+  Merge branch 'nvme-6.3' of git://git.infradead.org/nvme into block-6.3 (2023-04-14 06:29:00 -0600)
+
+----------------------------------------------------------------
+block-6.3-2023-04-14
+
+----------------------------------------------------------------
+Duy Truong (1):
+      nvme-pci: add NVME_QUIRK_BOGUS_NID for T-FORCE Z330 SSD
+
+Jens Axboe (1):
+      Merge branch 'nvme-6.3' of git://git.infradead.org/nvme into block-6.3
+
+ drivers/nvme/host/pci.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 -- 
 Jens Axboe
