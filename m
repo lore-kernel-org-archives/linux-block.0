@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF80C77B76
-	for <linux-block@archiver.kernel.org>; Sun, 16 Apr 2023 20:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC949C77B73
+	for <linux-block@archiver.kernel.org>; Sun, 16 Apr 2023 20:09:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbjDPUJv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Apr 2023 16:09:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41240 "EHLO
+        id S229494AbjDPUJ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Apr 2023 16:09:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjDPUJu (ORCPT
+        with ESMTP id S229446AbjDPUJz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Apr 2023 16:09:50 -0400
+        Sun, 16 Apr 2023 16:09:55 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884091FE8
-        for <linux-block@vger.kernel.org>; Sun, 16 Apr 2023 13:09:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F5F30D8
+        for <linux-block@vger.kernel.org>; Sun, 16 Apr 2023 13:09:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=d51jTUgTf+HsfInkkWmMuDwS2m4QhnnekxPqCNQ/t9o=; b=wtgnJb2sD/qgNDwIT8i7WGT22q
-        uoMZE4Gr7A7eiaRfvd+Ad1zQjr4w/Q47/KldESidFDOMQVZzUJex92OUQWaBdZj+AAn9R9RP4d6Se
-        WO12lZ4pr3NH3KfDSgvUhYBVm/E/L++9Xo1L03+LJrjinNWhuvEB3Z7JWu4jtIgG2e4ao8vUE7TQj
-        cmpmhROIUO6cfS3Y6jR6IrJGnyH97mIF9TQhDUrj+RUSjkS9RSjG/4V0TtV54GrY0jk1/KcFbMd1M
-        vyrED40DdxjIESL3z6SK7oa6u3mIhtyf3CF76U/TFPDDDid7LtBUhgL345qL0Y3dB9+sN3wvWzkme
-        CEyjZ/rw==;
+        bh=8hVg0g62RRffpXLUyIK5aTgeqcCbYnSWk4m2wMSS/t8=; b=UTk/H+F/kHO9Nte89C0ZyMw9JS
+        HZdLlsKRmlsoNacEFz/bxsXwL6+TclomyjLajIsawP9TSjKs5T87us1hnA5AOOGmptaEi3THYg1Tu
+        RPbPHarkd2x06kUSywsjlcD12PNG+hIv/KdYJBkYlslAeMzdcH1MsFoqXNCdYa2jJM3tpIE9EdKxX
+        qqxJqO5PlhJDwNnkzpPcTt5cQGnJAVzzG6pwzd0RtQ+Af8oeIOJIgLZLQ7dn6Otw6wAf7QB9jgqiJ
+        3L/T6QDVLuEH5Di7AVL+WZX5NTJXgqLM7mOHTaQAwYmw/YvmfMyHK6dE+7mHcqK5XflInlfD1sEb4
+        zvIhSUuw==;
 Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1po8h1-00EOIE-0I;
-        Sun, 16 Apr 2023 20:09:47 +0000
+        id 1po8h4-00EOIV-0q;
+        Sun, 16 Apr 2023 20:09:50 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Bart Van Assche <bvanassche@acm.org>,
         Damien Le Moal <dlemoal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH 3/7] blk-mq: defer to the normal submission path for non-flush flush commands
-Date:   Sun, 16 Apr 2023 22:09:26 +0200
-Message-Id: <20230416200930.29542-4-hch@lst.de>
+Subject: [PATCH 4/7] blk-mq: also use the I/O scheduler for requests from the flush state machine
+Date:   Sun, 16 Apr 2023 22:09:27 +0200
+Message-Id: <20230416200930.29542-5-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230416200930.29542-1-hch@lst.de>
 References: <20230416200930.29542-1-hch@lst.de>
@@ -47,140 +47,173 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If blk_insert_flush decides that a command does not need to use the
-flush state machine, return false and let blk_mq_submit_bio handle
-it the normal way (including using an I/O scheduler) instead of doing
-a bypass insert.
+From: Bart Van Assche <bvanassche@acm.org>
 
+Send write requests issued by the flush state machine through the normal
+I/O submission path including the I/O scheduler (if present) so that I/O
+scheduler policies are applied to writes with the FUA flag set.
+
+Separate the I/O scheduler members from the flush members in struct
+request since now a request may pass through both an I/O scheduler
+and the flush machinery.
+
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+[hch: rebased]
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-flush.c | 22 ++++++++--------------
- block/blk-mq.c    |  8 ++++----
- block/blk-mq.h    |  4 ----
- block/blk.h       |  2 +-
- 4 files changed, 13 insertions(+), 23 deletions(-)
+ block/blk-flush.c      |  5 ++++-
+ block/blk-mq-sched.c   | 14 ++++++++++++++
+ block/blk-mq-sched.h   |  1 +
+ block/blk-mq.c         | 24 ++++++------------------
+ include/linux/blk-mq.h | 27 +++++++++++----------------
+ 5 files changed, 36 insertions(+), 35 deletions(-)
 
 diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 9fcfee7394f27d..5bc462524473b2 100644
+index 5bc462524473b2..f62e74d9d56bc8 100644
 --- a/block/blk-flush.c
 +++ b/block/blk-flush.c
-@@ -385,22 +385,17 @@ static void blk_rq_init_flush(struct request *rq)
- 	rq->end_io = mq_flush_data_end_io;
- }
+@@ -330,8 +330,11 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
+ 		 * account of this driver tag
+ 		 */
+ 		flush_rq->rq_flags |= RQF_MQ_INFLIGHT;
+-	} else
++	} else {
+ 		flush_rq->internal_tag = first_rq->internal_tag;
++		flush_rq->rq_flags |= RQF_ELV;
++		blk_mq_sched_prepare(flush_rq);
++	}
  
--/**
-- * blk_insert_flush - insert a new PREFLUSH/FUA request
-- * @rq: request to insert
-- *
-- * To be called from __elv_add_request() for %ELEVATOR_INSERT_FLUSH insertions.
-- * or __blk_mq_run_hw_queue() to dispatch request.
-- * @rq is being submitted.  Analyze what needs to be done and put it on the
-- * right queue.
-+/*
-+ * Insert a PREFLUSH/FUA request into the flush state machine.
-+ * Returns true if the request has been consumed by the flush state machine,
-+ * or false if the caller should continue to process it.
+ 	flush_rq->cmd_flags = REQ_OP_FLUSH | REQ_PREFLUSH;
+ 	flush_rq->cmd_flags |= (flags & REQ_DRV) | (flags & REQ_FAILFAST_MASK);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 67c95f31b15bb1..70087554eeb8f4 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -16,6 +16,20 @@
+ #include "blk-mq-sched.h"
+ #include "blk-wbt.h"
+ 
++/* Prepare a request for insertion into an I/O scheduler. */
++void blk_mq_sched_prepare(struct request *rq)
++{
++	struct elevator_queue *e = rq->q->elevator;
++
++	INIT_HLIST_NODE(&rq->hash);
++	RB_CLEAR_NODE(&rq->rb_node);
++
++	if (e->type->ops.prepare_request) {
++		e->type->ops.prepare_request(rq);
++		rq->rq_flags |= RQF_ELVPRIV;
++	}
++}
++
+ /*
+  * Mark a hardware queue as needing a restart.
   */
--void blk_insert_flush(struct request *rq)
-+bool blk_insert_flush(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
- 	unsigned long fflags = q->queue_flags;	/* may change, cache */
- 	unsigned int policy = blk_flush_policy(fflags, rq);
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
--	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 7c3cbad17f3052..3049e988ca5916 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -7,6 +7,7 @@
  
- 	/* FLUSH/FUA request must never be merged */
- 	WARN_ON_ONCE(rq->bio != rq->biotail);
-@@ -429,16 +424,14 @@ void blk_insert_flush(struct request *rq)
- 		 * complete the request.
- 		 */
- 		blk_mq_end_request(rq, 0);
--		return;
-+		return true;
- 	case REQ_FSEQ_DATA:
- 		/*
- 		 * If there's data, but no flush is necessary, the request can
- 		 * be processed directly without going through flush machinery.
- 		 * Queue for normal execution.
- 		 */
--		blk_mq_request_bypass_insert(rq, 0);
--		blk_mq_run_hw_queue(hctx, false);
--		return;
-+		return false;
- 	default:
- 		/*
- 		 * Mark the request as part of a flush sequence and submit it
-@@ -448,6 +441,7 @@ void blk_insert_flush(struct request *rq)
- 		spin_lock_irq(&fq->mq_flush_lock);
- 		blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
- 		spin_unlock_irq(&fq->mq_flush_lock);
-+		return true;
- 	}
- }
+ #define MAX_SCHED_RQ (16 * BLKDEV_DEFAULT_RQ)
  
++void blk_mq_sched_prepare(struct request *rq);
+ bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+ 		unsigned int nr_segs, struct request **merged_request);
+ bool blk_mq_sched_bio_merge(struct request_queue *q, struct bio *bio,
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c2d297efe229db..452bc17cce4dcf 100644
+index 452bc17cce4dcf..50a03e1592819c 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -45,6 +45,8 @@
- static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
+@@ -388,18 +388,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	WRITE_ONCE(rq->deadline, 0);
+ 	req_ref_set(rq, 1);
  
- static void blk_mq_insert_request(struct request *rq, blk_insert_t flags);
-+static void blk_mq_request_bypass_insert(struct request *rq,
-+		blk_insert_t flags);
- static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list);
- 
-@@ -2429,7 +2431,7 @@ static void blk_mq_run_work_fn(struct work_struct *work)
-  * Should only be used carefully, when the caller knows we want to
-  * bypass a potential IO scheduler on the target device.
-  */
--void blk_mq_request_bypass_insert(struct request *rq, blk_insert_t flags)
-+static void blk_mq_request_bypass_insert(struct request *rq, blk_insert_t flags)
- {
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
- 
-@@ -2972,10 +2974,8 @@ void blk_mq_submit_bio(struct bio *bio)
- 		return;
- 	}
- 
--	if (op_is_flush(bio->bi_opf)) {
--		blk_insert_flush(rq);
-+	if (op_is_flush(bio->bi_opf) && blk_insert_flush(rq))
- 		return;
+-	if (rq->rq_flags & RQF_ELV) {
+-		struct elevator_queue *e = data->q->elevator;
+-
+-		INIT_HLIST_NODE(&rq->hash);
+-		RB_CLEAR_NODE(&rq->rb_node);
+-
+-		if (!op_is_flush(data->cmd_flags) &&
+-		    e->type->ops.prepare_request) {
+-			e->type->ops.prepare_request(rq);
+-			rq->rq_flags |= RQF_ELVPRIV;
+-		}
 -	}
++	if (rq->rq_flags & RQF_ELV)
++		blk_mq_sched_prepare(rq);
  
- 	if (plug) {
- 		blk_add_rq_to_plug(plug, rq);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index f882677ff106a5..62c505e6ef1e40 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -64,10 +64,6 @@ struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
- void blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
- 			     struct blk_mq_tags *tags,
- 			     unsigned int hctx_idx);
--/*
-- * Internal helpers for request insertion into sw queues
-- */
--void blk_mq_request_bypass_insert(struct request *rq, blk_insert_t flags);
+ 	return rq;
+ }
+@@ -456,13 +446,11 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 		data->rq_flags |= RQF_ELV;
  
- /*
-  * CPU -> queue mappings
-diff --git a/block/blk.h b/block/blk.h
-index 2da83110347173..512a1c0db6ba15 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -277,7 +277,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
-  */
- #define ELV_ON_HASH(rq) ((rq)->rq_flags & RQF_HASHED)
+ 		/*
+-		 * Flush/passthrough requests are special and go directly to the
+-		 * dispatch list. Don't include reserved tags in the
+-		 * limiting, as it isn't useful.
++		 * Do not limit the depth for passthrough requests nor for
++		 * requests with a reserved tag.
+ 		 */
+-		if (!op_is_flush(data->cmd_flags) &&
++		if (e->type->ops.limit_depth &&
+ 		    !blk_op_is_passthrough(data->cmd_flags) &&
+-		    e->type->ops.limit_depth &&
+ 		    !(data->flags & BLK_MQ_REQ_RESERVED))
+ 			e->type->ops.limit_depth(data->cmd_flags, data);
+ 	}
+@@ -2496,7 +2484,7 @@ static void blk_mq_insert_request(struct request *rq, blk_insert_t flags)
+ 		 * dispatch it given we prioritize requests in hctx->dispatch.
+ 		 */
+ 		blk_mq_request_bypass_insert(rq, flags);
+-	} else if (rq->rq_flags & RQF_FLUSH_SEQ) {
++	} else if (req_op(rq) == REQ_OP_FLUSH) {
+ 		/*
+ 		 * Firstly normal IO request is inserted to scheduler queue or
+ 		 * sw queue, meantime we add flush request to dispatch queue(
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 1dacb2c81fdda1..a204a5f3cc9524 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -169,25 +169,20 @@ struct request {
+ 		void *completion_data;
+ 	};
  
--void blk_insert_flush(struct request *rq);
-+bool blk_insert_flush(struct request *rq);
+-
+ 	/*
+ 	 * Three pointers are available for the IO schedulers, if they need
+-	 * more they have to dynamically allocate it.  Flush requests are
+-	 * never put on the IO scheduler. So let the flush fields share
+-	 * space with the elevator data.
++	 * more they have to dynamically allocate it.
+ 	 */
+-	union {
+-		struct {
+-			struct io_cq		*icq;
+-			void			*priv[2];
+-		} elv;
+-
+-		struct {
+-			unsigned int		seq;
+-			struct list_head	list;
+-			rq_end_io_fn		*saved_end_io;
+-		} flush;
+-	};
++	struct {
++		struct io_cq		*icq;
++		void			*priv[2];
++	} elv;
++
++	struct {
++		unsigned int		seq;
++		struct list_head	list;
++		rq_end_io_fn		*saved_end_io;
++	} flush;
  
- int elevator_switch(struct request_queue *q, struct elevator_type *new_e);
- void elevator_disable(struct request_queue *q);
+ 	union {
+ 		struct __call_single_data csd;
 -- 
 2.39.2
 
