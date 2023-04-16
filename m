@@ -2,69 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7A5C77B61
-	for <linux-block@archiver.kernel.org>; Sun, 16 Apr 2023 07:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6458C77B61
+	for <linux-block@archiver.kernel.org>; Sun, 16 Apr 2023 09:53:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230327AbjDPHf6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Apr 2023 03:35:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39304 "EHLO
+        id S230382AbjDPJxd convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Apr 2023 05:53:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229648AbjDPHf5 (ORCPT
+        with ESMTP id S230363AbjDPJxc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Apr 2023 03:35:57 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16BE719AE
-        for <linux-block@vger.kernel.org>; Sun, 16 Apr 2023 00:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=OZwo1ZpM4yYcLMphoE1u2iirqt7c0SIC/ViSQ2GRcV4=; b=ocbxuRvxZqehasEVPuwqh0MGky
-        lmSjoNzm1+WQVPupX4Tnd/W/8U9nGHWQyWfdNDTVs3sRr+DTOQDak8k3uFKsyeCaYjEjf7qo+Pd+w
-        2NlVubNL5ovdUKmPn1fa5J7lZIgRGea+e50hcZBBf3i4D1KFRi4d2glqKYeSX5PqI8J5xLT6rLZpv
-        r3gYz8rJten9HSBbJaDNa/I9Sb6jQYySiE+AyFq84nG9qf4ilmAfxpjNlEIEz268lvB1C8VfDBtwo
-        pZWtm8M6hGRsjOWkBJ0Li0qPvRxt2qo9EnYrFOpfEUopEaRvwhTw8qusyimRrPARM6draPIm2eOj6
-        o9/DrPRg==;
-Received: from [2001:4bb8:192:2d6c:1ebd:68b7:179c:f32a] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pnwvT-00DJRQ-1N;
-        Sun, 16 Apr 2023 07:35:55 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] blk-mq: fix the blk_mq_add_to_requeue_list call in blk_kick_flush
-Date:   Sun, 16 Apr 2023 09:35:53 +0200
-Message-Id: <20230416073553.966161-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+        Sun, 16 Apr 2023 05:53:32 -0400
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 401241BDA;
+        Sun, 16 Apr 2023 02:53:31 -0700 (PDT)
+Received: by mail-yb1-f180.google.com with SMTP id y16so7901146ybb.2;
+        Sun, 16 Apr 2023 02:53:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681638810; x=1684230810;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vy0goH1eR4IHNE8qypyyzP1OUcgfs+Sxeg1e6E0IW/k=;
+        b=MNTIB/514fLN8+REJ+SUiqDm3FemzuDzeeOJM2+yltuLiDNRPQ8gHdpjHYYA/K34xr
+         w317Cxd/lj/qoJlq4d7evz37RYQCqb8qgzOHAosmnDBlEYHqdTiG7PFIKYx/hDELbQvD
+         JBdGWbLlxnDTadColGMxS5/9HONdGtgpaLm98KPOc1jcbhUNZLP4OrK4bAv8c86ZoTlN
+         /RU57jg3JypA/7HVXjJ/ve1rncJpVx2X/kW3AYCj/9iwS1dzCjSUwOrrA8BK8eYLWqTi
+         ulLOfMMJv+fe5YSkMDrQHHYFLNkxwSc5QceuKzCohL34dNeJizYk6kLLKyTRVYE7xeM6
+         Matw==
+X-Gm-Message-State: AAQBX9c31tXBZvW5CfPUZETIa18RWrmJY6auvelawfGLf9dA4+QDaP87
+        af6+R0Ep0GPmgbQ8s0X1mr5plT414XUaLA==
+X-Google-Smtp-Source: AKy350YJ5sgTQqbpk2nz2JhuJ0ZdAV99KHIhZ2YoNJjxxBLOwmpeNPDngqZFhmhxuX4a8fFMdywozw==
+X-Received: by 2002:a25:7388:0:b0:b92:5277:ebc2 with SMTP id o130-20020a257388000000b00b925277ebc2mr28742ybc.29.1681638810279;
+        Sun, 16 Apr 2023 02:53:30 -0700 (PDT)
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com. [209.85.128.170])
+        by smtp.gmail.com with ESMTPSA id 126-20020a250a84000000b00b8f54571fc0sm785758ybk.5.2023.04.16.02.53.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Apr 2023 02:53:29 -0700 (PDT)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-54fe3cd445aso86100027b3.5;
+        Sun, 16 Apr 2023 02:53:29 -0700 (PDT)
+X-Received: by 2002:a81:e54b:0:b0:552:d6aa:80d9 with SMTP id
+ c11-20020a81e54b000000b00552d6aa80d9mr275295ywm.4.1681638809536; Sun, 16 Apr
+ 2023 02:53:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <202304150025.K0hczLR4-lkp@intel.com> <20230415125705.180426-1-akinobu.mita@gmail.com>
+In-Reply-To: <20230415125705.180426-1-akinobu.mita@gmail.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Sun, 16 Apr 2023 11:53:18 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWNQRgXzaEsb1M=SGm683dTOU2gLyjD2UuoD8qy+Ex74Q@mail.gmail.com>
+Message-ID: <CAMuHMdWNQRgXzaEsb1M=SGm683dTOU2gLyjD2UuoD8qy+Ex74Q@mail.gmail.com>
+Subject: Re: [PATCH -block] fault-inject: fix build error when
+ FAULT_INJECTION_CONFIGFS=y and CONFIGFS_FS=m
+To:     Akinobu Mita <akinobu.mita@gmail.com>
+Cc:     lkp@intel.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        oe-kbuild-all@lists.linux.dev, shinichiro.kawasaki@wdc.com,
+        chaitanyak@nvidia.com, akpm@linux-foundation.org,
+        hch@infradead.org, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit b12e5c6c755a accidentally changes blk_kick_flush to do a head
-insert into the requeue list, fix this up.
+Hi Mita-san,
 
-Fixes: b12e5c6c755a ("blk-mq: pass a flags argument to blk_mq_add_to_requeue_list")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-flush.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sat, Apr 15, 2023 at 3:09 PM Akinobu Mita <akinobu.mita@gmail.com> wrote:
+> This fixes a build error when CONFIG_FAULT_INJECTION_CONFIGFS=y and
+> CONFIG_CONFIGFS_FS=m.
+>
+> Since the fault-injection library cannot built as a module, avoid building
+> configfs as a module.
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Link: https://lore.kernel.org/oe-kbuild-all/202304150025.K0hczLR4-lkp@intel.com/
+> Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 00dd2f61312d89..04698ed9bcd4a9 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -346,7 +346,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	smp_wmb();
- 	req_ref_set(flush_rq, 1);
- 
--	blk_mq_add_to_requeue_list(flush_rq, BLK_MQ_INSERT_AT_HEAD);
-+	blk_mq_add_to_requeue_list(flush_rq, 0);
- 	blk_mq_kick_requeue_list(q);
- }
- 
+Thanks for your patch!
+
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -1979,7 +1979,8 @@ config FAIL_SUNRPC
+>
+>  config FAULT_INJECTION_CONFIGFS
+>         bool "Configfs interface for fault-injection capabilities"
+> -       depends on FAULT_INJECTION && CONFIGFS_FS
+> +       depends on FAULT_INJECTION
+> +       select CONFIGFS_FS
+
+My first thought was "please do not select CONFIGFS_FS", but
+apparently this is what most users do, so I guess it's OK.
+
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+The alternative would be to do:
+
+-       depends on FAULT_INJECTION && CONFIGFS_FS
++       depends on FAULT_INJECTION && (CONFIGFS_FS=y ||
+CONFIGFS_FS=FAULT_INJECTION)
+
+>         help
+>           This option allows configfs-based drivers to dynamically configure
+>           fault-injection via configfs.  Each parameter for driver-specific
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.39.2
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
