@@ -2,63 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E8FC77B61
-	for <linux-block@archiver.kernel.org>; Sun, 16 Apr 2023 05:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50578C77B72
+	for <linux-block@archiver.kernel.org>; Sun, 16 Apr 2023 06:07:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229838AbjDPFx6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Apr 2023 01:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40216 "EHLO
+        id S229967AbjDPGG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Apr 2023 02:06:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbjDPFx5 (ORCPT
+        with ESMTP id S229472AbjDPGG5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Apr 2023 01:53:57 -0400
+        Sun, 16 Apr 2023 02:06:57 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2371A2D52
-        for <linux-block@vger.kernel.org>; Sat, 15 Apr 2023 22:53:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887571BC0;
+        Sat, 15 Apr 2023 23:06:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=bSwuvOu1GCLIkQmHMuQysnhR2LFzOSj1yd6mu/sn+gY=; b=uWE7J2zS+h2C0S1VgNprhnQMb/
-        Q9ZnlxbE6jMw9yckULxH1Cg7U4qskel1zi3ozslAKIragxfiLiV3oW38ZaSEBxBsbg0p2xtmKqo3a
-        +2k/nSbeNVVOK7IxEWPs/m2fks9qFt8CLesm6COTXSgVJXOZSAhn3yqsOlTdLh/8v7RZdv6MKg/ca
-        QC8YU9/XlOZhnAPP40VU5ukHfM4IrhQ5lE4+M8o9qB4S3W/eTNH2b2eRHvLi56Qx5kvNzHX3qqiOj
-        yY1HIhWv4CBxeCpwCarXUjkjnsaqwHX5Wye+rHLSLa9A2lvLbGAJNzOcmlhOAK8tj+gqVBNPHNRPW
-        +LYOLhEg==;
+        bh=870+ju68AUkL3/ICw4Z6V/MOWACfncjZgY2GQzuwtCw=; b=ExDpi3BVATUPdHlZ6seMw2Iqsk
+        9sCYv3O6DKwnCLHyLpQVJ8ijk/2pv1T6DtXfsV0Jyk+8ho/61G52Klxkha0Hm5f+v8d49DVHjQm4y
+        T8R6SOJAKi5fZg2s7KELpuUwoD/y9noQczjAFqoS1D+F/0dxWahTrMfA9Z3QWc/5NLOUV5GTz4cTW
+        tUgQsF8wvWg499CoZOStihUiw461Ql6bbwePhkbwuT6IWpiJ7ZrmfUOVTx82WkEB9oLeyoCBEy7/3
+        uf4w8T4AGdBZjKQ7XAPnpsI1wL4pfNIQrOsC27t5Ut8lGFwFV4cD4PhhLTiDf6cLArckA9tTQzbAo
+        MzZPUNQg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pnvKn-00DBtN-05;
-        Sun, 16 Apr 2023 05:53:57 +0000
-Date:   Sat, 15 Apr 2023 22:53:57 -0700
+        id 1pnvWz-00DChS-0J;
+        Sun, 16 Apr 2023 06:06:33 +0000
+Date:   Sat, 15 Apr 2023 23:06:33 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: store bdev->bd_disk->fops->submit_bio state
- in bdev
-Message-ID: <ZDuNdUjnrfQF2D7E@infradead.org>
-References: <20230414134848.91563-1-axboe@kernel.dk>
- <20230414134848.91563-3-axboe@kernel.dk>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Donald Buczek <buczek@molgen.mpg.de>, axboe@kernel.dk,
+        corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk,
+        brauner@kernel.org, willy@infradead.org, kch@nvidia.com,
+        martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v3 02/11] block: Block Device Filtering Mechanism
+Message-ID: <ZDuQacsbY889iVYH@infradead.org>
+References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
+ <20230404140835.25166-3-sergei.shtepa@veeam.com>
+ <793db44e-9e6d-d118-3f88-cdbffc9ad018@molgen.mpg.de>
+ <ZDT9PjLeQgjVA16P@infradead.org>
+ <50d131e3-7528-2064-fbe6-65482db46ae4@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230414134848.91563-3-axboe@kernel.dk>
+In-Reply-To: <50d131e3-7528-2064-fbe6-65482db46ae4@veeam.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 14, 2023 at 07:48:48AM -0600, Jens Axboe wrote:
-> We have a long chain of memory dereferencing just to whether or not
-> this disk has a special submit_bio helper. As that's not necessarily
-> the common case, add a bd_submit_bio state in the bdev to avoid
-> traversing this memory dependency chain if we don't need to.
+On Wed, Apr 12, 2023 at 12:43:40PM +0200, Sergei Shtepa wrote:
+> We can consider a block device as a resource that two actor want to take over.
+> There are two possible behavioral strategies:
+> 1. If one owner occupies a resource, then for other actors, the ownership
+> request will end with a refusal. The owner will not lose his resource.
+> 2. Any actor can take away a resource from the owner and inform him about its
+> loss using a callback.
+> 
+> I think the first strategy is safer. When calling ioctl BLKFILTER_ATTACH, the
+> kernel informs the actor that the resource is busy.
+> Of course, there is still an option to grab someone else's occupied resource.
+> To do this, he will have to call ioctl BLKFILTER_DETACH, specifying the name
+> of the filter that needs to be detached. It is assumed that such detached
+> should be performed by the same actor that attached it there.
 
-Do you have any numbers on how this helps?
+Yes.
 
-> +	bdev->bd_submit_bio = 0;
+> If we replace the owner at each ioctl BLKFILTER_ATTACH, then we can get a
+> situation of competition between two actors. At the same time, they won't
+> even get a message that something is going wrong.
 
-bd_submit_bio sounds like a function call, so I'd name this
-bd_has_submit_io.
+> With the second strategy, both tools will unload each other's filters. In the
+> best case, this will lead to disruption of their work. At a minimum, blksnap,
+> when detached, will reset the change tracker and each backup will perform a
+> full read of the block device. As a result, the user will receive distorted
+> data, the system will not work as planned, although there will be no error
+> message.
 
-But maybe it might make more sense to just add a bit that this is
-a blk-mq backed device into bd_state as that might be handy in other
-places as well?
+Exactly.  Silent replacement is a bad idea.  Maybe we can stupport
+multiple filters, but I'm not entirely sold on that either.  But
+silently replacing an existing one is a bad idea.
