@@ -2,101 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21461C77B7E
-	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 18:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9568C77B76
+	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 19:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbjDQSGz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Apr 2023 14:06:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55958 "EHLO
+        id S230147AbjDQTMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Apr 2023 15:12:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjDQSG1 (ORCPT
+        with ESMTP id S230090AbjDQTMx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2023 14:06:27 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2205FAF15;
-        Mon, 17 Apr 2023 11:06:06 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1052)
-        id 627AA21C1E42; Mon, 17 Apr 2023 11:06:05 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 627AA21C1E42
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1681754765;
-        bh=PjG74HOKXwe7va7p2A9jFByxA/BP+3mUkctDdGY/Zmw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ipOJl4sHtP4MosUagWDfkLRxaakERXlkvVNtSL+yWRdW+u/MZwdek29UIuC+s2Olc
-         iflWufz/4Z0zo7AOuyThvZFM1U7EPXcdfGops8XtfxDhvZsEXUt5hCBaejNJhNpHmD
-         E5bXgrGu6xGy+ERVXHDwBp1XqaykYLwf0ng09oug=
-Date:   Mon, 17 Apr 2023 11:06:05 -0700
-From:   Fan Wu <wufan@linux.microsoft.com>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Subject: Re: [RFC PATCH v9 05/16] ipe: add userspace interface
-Message-ID: <20230417180605.GA402@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <1675119451-23180-6-git-send-email-wufan@linux.microsoft.com>
- <CAHC9VhRa+NwKzLfQBmHfMgUp6_d5soQG7JBq-Vn=MUeUAt4tuQ@mail.gmail.com>
- <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
- <20230412233606.GA16658@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CAHC9VhTs3Njfg=1baQ6=58rPLBmyB3cW0R-MfAaEcRF-jAaYBw@mail.gmail.com>
+        Mon, 17 Apr 2023 15:12:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB9F59EE
+        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 12:12:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681758722;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=J3CbznqNeX4k5gfBl/por4zkotI1j8zz1N4+FYt2z3s=;
+        b=gEIik2cK9DO28IQOBGUrNdl2TTkexIN56cv1KuUtsirUSstYpnnZM9W6WKcMuluehyWtoG
+        Bzu/dX+lBFi8t5hzRgkhMT3y29P38x7HcCsufGFb/xSEE8LR56wWOkFD2dNMc2MPtKQmUP
+        Ecpq7rxn8f1WcP8U5MCxTsWW8W/m1fg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-171-jmjybXY9M2iJCHi_f1s6Mw-1; Mon, 17 Apr 2023 15:11:58 -0400
+X-MC-Unique: jmjybXY9M2iJCHi_f1s6Mw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 58880185A7BA;
+        Mon, 17 Apr 2023 19:11:58 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B7C1492B0C;
+        Mon, 17 Apr 2023 19:11:58 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 33HJBwvl020263;
+        Mon, 17 Apr 2023 15:11:58 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 33HJBvCi020259;
+        Mon, 17 Apr 2023 15:11:57 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Mon, 17 Apr 2023 15:11:57 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        "Darrick J. Wong" <djwong@kernel.org>
+cc:     Mike Snitzer <msnitzer@redhat.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH] block: fix a crash when bio_for_each_folio_all iterates over
+ an empty bio
+Message-ID: <alpine.LRH.2.21.2304171433370.17217@file01.intranet.prod.int.rdu2.redhat.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHC9VhTs3Njfg=1baQ6=58rPLBmyB3cW0R-MfAaEcRF-jAaYBw@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 13, 2023 at 02:45:07PM -0400, Paul Moore wrote:
-> On Wed, Apr 12, 2023 at 7:36???PM Fan Wu <wufan@linux.microsoft.com> wrote:
-> > On Tue, Apr 11, 2023 at 05:45:41PM -0400, Paul Moore wrote:
-> > > On Mon, Apr 10, 2023 at 3:10???PM Fan Wu <wufan@linux.microsoft.com> wrote:
-> > > > On Thu, Mar 02, 2023 at 02:04:42PM -0500, Paul Moore wrote:
-> > > > > On Mon, Jan 30, 2023 at 5:58???PM Fan Wu <wufan@linux.microsoft.com> wrote:
-> 
-> ...
-> 
-> > > I guess this does make me wonder about keeping a non-active policy
-> > > loaded in the kernel, what purpose does that serve?
-> > >
-> >
-> > The non-active policy doesn't serve anything unless it is activated. User can
-> > even delete a policy if that is no longer needed. Non-active is just the default
-> > state when a new policy is loaded.
-> >
-> > If IPE supports namespace, there is another use case where different containers
-> > can select different policies as the active policy from among multiple loaded
-> > policies. Deven has presented a demo of this during LSS 2021. But this goes
-> > beyond the scope of this version.
-> 
-> Do you plan to add namespace support at some point in the
-> not-too-distant future?  If so, I'm okay with keeping support for
-> multiple policies, but if you think you're only going to support one
-> active policy at a time, it might be better to remove support for
-> multiple (inactive) policies.
-> 
-> -- 
-> paul-moore.com
+If we use bio_for_each_folio_all on an empty bio, it will access the first
+bio vector unconditionally (it is uninitialized) and it may crash
+depending on the uninitialized data.
 
-Another benefit of having multiple policies is that it provides isolation
-between different policies. For instance, if we have two policies named
-"policy_a" and "policy_b," we can ensure that only team a can update "policy_a,"
-and only team b can update "policy_b." This way, both teams can update
-their policy without affecting others. However, if there is only one policy
-in the system, both teams will have to operate on the same policy, making it
-less manageable.
+This patch fixes it by checking the parameter "i" against "bio->bi_vcnt"
+and returning NULL fi->folio if it is out of range.
 
-Besides, removing multiple (inactive) policies support will
-render the policy_name field meaningless, and we should only audit the policy
-hash. I am fine if we decide to go for the single policy option.
+The patch also drops the test "if (fi->_i + 1 < bio->bi_vcnt)" from
+bio_next_folio because the same condition is already being checked in
+bio_first_folio.
 
--Fan
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+
+---
+ include/linux/bio.h |   24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
+
+Index: linux-2.6/include/linux/bio.h
+===================================================================
+--- linux-2.6.orig/include/linux/bio.h
++++ linux-2.6/include/linux/bio.h
+@@ -279,15 +279,19 @@ struct folio_iter {
+ static inline void bio_first_folio(struct folio_iter *fi, struct bio *bio,
+ 				   int i)
+ {
+-	struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
++	if (i < bio->bi_vcnt) {
++		struct bio_vec *bvec = bio_first_bvec_all(bio) + i;
+ 
+-	fi->folio = page_folio(bvec->bv_page);
+-	fi->offset = bvec->bv_offset +
+-			PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
+-	fi->_seg_count = bvec->bv_len;
+-	fi->length = min(folio_size(fi->folio) - fi->offset, fi->_seg_count);
+-	fi->_next = folio_next(fi->folio);
+-	fi->_i = i;
++		fi->folio = page_folio(bvec->bv_page);
++		fi->offset = bvec->bv_offset +
++				PAGE_SIZE * (bvec->bv_page - &fi->folio->page);
++		fi->_seg_count = bvec->bv_len;
++		fi->length = min(folio_size(fi->folio) - fi->offset, fi->_seg_count);
++		fi->_next = folio_next(fi->folio);
++		fi->_i = i;
++	} else {
++		fi->folio = NULL;
++	}
+ }
+ 
+ static inline void bio_next_folio(struct folio_iter *fi, struct bio *bio)
+@@ -298,10 +302,8 @@ static inline void bio_next_folio(struct
+ 		fi->offset = 0;
+ 		fi->length = min(folio_size(fi->folio), fi->_seg_count);
+ 		fi->_next = folio_next(fi->folio);
+-	} else if (fi->_i + 1 < bio->bi_vcnt) {
+-		bio_first_folio(fi, bio, fi->_i + 1);
+ 	} else {
+-		fi->folio = NULL;
++		bio_first_folio(fi, bio, fi->_i + 1);
+ 	}
+ }
+ 
+
