@@ -2,119 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E05DC77B77
-	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 06:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1147AC77B79
+	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 06:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjDQGHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Apr 2023 02:07:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46358 "EHLO
+        id S230137AbjDQGW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Apr 2023 02:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjDQGHO (ORCPT
+        with ESMTP id S230043AbjDQGW0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2023 02:07:14 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958C49C;
-        Sun, 16 Apr 2023 23:07:13 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id f10so10399178vsv.13;
-        Sun, 16 Apr 2023 23:07:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681711632; x=1684303632;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7FkOa290pQSu7Yiad6ob7YP0SrNBnVarBHAEhR+m7OY=;
-        b=ka5OEDfZi7wvCtTPIJPI/MJiqyFidxK1FSQERrW+7KhnsJIJ6x6gmw1O/KKP5YmscO
-         eqplWr9JSEAYM2XYuAQJSi9sLznG9mamx+Orb95GC2f+ONqBWCBKm8sI6Ihlw2BSKMtz
-         XOE9DMRAKCmUt0XVzHqzIohzOQx2ga2e3xlwhRfMwMlB8DkZL+yjfyUqhi0+VJg1Fki8
-         JoHow9BrgW8KV3J3sl7LsVyMX08df0HabftN7yTkhJ5Zxk8EBzChPcGhNIYh/TyaypYc
-         /vaHqeNMyTnUvklOFMD5ttf55m71/R9xQHqlv8e4xDEhZSZGpMbOCgo1BlRE6VEkfBNA
-         Wj3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681711632; x=1684303632;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7FkOa290pQSu7Yiad6ob7YP0SrNBnVarBHAEhR+m7OY=;
-        b=YvWzd6aqQq/NXZOe8QO/4XjF8HEtri24CPJOZBTXtIUQTnUWvQis0KFe0SChE1f0VZ
-         jcrgD1al2VBLf6kSVK1erGkprNZPumApCvcfwIWWN7+g+dz4XqMCihQO/FlsI6g+D8Vy
-         306Rjhr9l5zqzxXVt+/5iUO/8U+5I7KNSWbXS6Xcg7X34u+VdYp8mQ41lG4SDe8Hika7
-         Zx8cBvx0A3ARHcV0H8PPMk946af30jpaIcBkcO6k/gNvkJlMn/L5teqdFXlJsRLD96xc
-         a0wVpu7nkopnCuNIqLHiaZH4ZibvACahrklVlB6C/qLJuEPXoA6at92nR0l5Oto3FbKV
-         BR2g==
-X-Gm-Message-State: AAQBX9dfHPODWGzuVlu8VGBcaudIEwVj2Sz6Q3Bz5eaIbyvENuDR4cxa
-        eBSrClvy+mPSfbeT+Xi6q7r+wFG/3PO2fjhvgqbyoytfzvE=
-X-Google-Smtp-Source: AKy350ZdNlrvY6SfEP/KQCnkty7ZUMlHpXigx3KCKfGjfdYNyKBei1uMesVBrTPoHvkyEMsJbfbQJ/7eM7/vxaPq/jQ=
-X-Received: by 2002:a67:d783:0:b0:42e:38a3:244b with SMTP id
- q3-20020a67d783000000b0042e38a3244bmr6775628vsj.5.1681711632628; Sun, 16 Apr
- 2023 23:07:12 -0700 (PDT)
+        Mon, 17 Apr 2023 02:22:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE2C35AD
+        for <linux-block@vger.kernel.org>; Sun, 16 Apr 2023 23:22:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 071B161E55
+        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 06:22:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B41E7C433D2;
+        Mon, 17 Apr 2023 06:22:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681712543;
+        bh=b0LVBEutUs9vujlXDCwD/tIOxnSfIOQM3+R5DLFF4Js=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=c4DC7yUVxKEjwjXtzR8tb7nyvguLTPOqkNp4F21i6fXUyGPQ0QEdUiJ+12lYmJA/D
+         fHf82RkWXEpydeuPcjmr3yVO0M/azIKawzFEudG0TsdIcCH5f2v+vCdcmliozx3+kE
+         ghnxW7AJlXAENJ6bOasRhtiwWtImSIcs/NSqcuCmFYPNWHuB2raXjL1S+9eSQoIwWC
+         uhm6AYIjV5kEXD4xBCWYzFpXdHxZrakVHNANaqQOZgTY8Ud0vcgqPJy14fQ68tljfK
+         IM6EpIzRebC5ibK6DpnQ0i/BOeGPZ+4WP2YNnGGQybxContYZwAHmOJPbWwnSkckzo
+         YLQqCcKNPqmGw==
+Message-ID: <3947a26e-ceb6-4117-7b45-fd7578710120@kernel.org>
+Date:   Mon, 17 Apr 2023 15:22:21 +0900
 MIME-Version: 1.0
-References: <CACsaVZJGPux1yhrMWnq+7nt3Zz5wZ6zEo2+S2pf=4czpYLFyjg@mail.gmail.com>
- <ZDzgojYAZXS_D_OH@kroah.com>
-In-Reply-To: <ZDzgojYAZXS_D_OH@kroah.com>
-From:   Kyle Sanderson <kyle.leet@gmail.com>
-Date:   Sun, 16 Apr 2023 23:07:00 -0700
-Message-ID: <CACsaVZ+8iGR3sD7d4wO12LqKBZnJ+xhOs9+RXvqjrGKp35_-xg@mail.gmail.com>
-Subject: Re: btrfs induced data loss (on xfs) - 5.19.0-38-generic
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     linux-btrfs@vger.kernel.org,
-        Linux-Kernal <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 1/7] blk-mq: factor out a blk_rq_init_flush helper
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
+References: <20230416200930.29542-1-hch@lst.de>
+ <20230416200930.29542-2-hch@lst.de>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20230416200930.29542-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 16, 2023 at 11:01=E2=80=AFPM Greg KH <gregkh@linuxfoundation.or=
-g> wrote:
->
-> On Sun, Apr 16, 2023 at 10:20:45PM -0700, Kyle Sanderson wrote:
-> > The single btrfs disk was at 100% utilization and a wa of 50~, reading
-> > back at around 2MB/s. df and similar would simply freeze. Leading up
-> > to this I removed around 2T of data from a single btrfs disk. I
-> > managed to get most of the services shutdown and disks unmounted, but
-> > when the system came back up I had to use xfs_repair (for the first
-> > time in a very long time) to boot into my system. I likely should have
-> > just pulled the power...
-> >
-> > [1147997.255020] INFO: task happywriter:3425205 blocked for more than
-> > 120 seconds.
-> > [1147997.255088]       Not tainted 5.19.0-38-generic #39~22.04.1-Ubuntu
->
-> This is a distro-specific kernel, sorry, nothing to do with our releases
-> as the 5.19 kernel branch is long end-of-life.  Please work with your
-> distro for this issue if you wish to stick to this kernel version.
->
-> good luck!
->
-> greg k-h
+On 4/17/23 05:09, Christoph Hellwig wrote:
+> Factor out a helper from blk_insert_flush that initializes the flush
+> machine related fields in struct request.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-flush.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 04698ed9bcd4a9..422a6d5446d1c5 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -376,6 +376,15 @@ static enum rq_end_io_ret mq_flush_data_end_io(struct request *rq,
+>  	return RQ_END_IO_NONE;
+>  }
+>  
+> +static void blk_rq_init_flush(struct request *rq)
+> +{
+> +	memset(&rq->flush, 0, sizeof(rq->flush));
+> +	INIT_LIST_HEAD(&rq->flush.list);
+> +	rq->rq_flags |= RQF_FLUSH_SEQ;
+> +	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
+> +	rq->end_io = mq_flush_data_end_io;
+> +}
 
-Disappointing but fair (default kernel for Ubuntu Jammy, they offer no
-lts options unfortunately) - thanks for taking a look anyway.
+struct flush is:
 
-K.
+struct {
+	unsigned int		seq;
+	struct list_head	list;
+	rq_end_io_fn		*saved_end_io;
+} flush;
 
-On Sun, Apr 16, 2023 at 11:01=E2=80=AFPM Greg KH <gregkh@linuxfoundation.or=
-g> wrote:
->
-> On Sun, Apr 16, 2023 at 10:20:45PM -0700, Kyle Sanderson wrote:
-> > The single btrfs disk was at 100% utilization and a wa of 50~, reading
-> > back at around 2MB/s. df and similar would simply freeze. Leading up
-> > to this I removed around 2T of data from a single btrfs disk. I
-> > managed to get most of the services shutdown and disks unmounted, but
-> > when the system came back up I had to use xfs_repair (for the first
-> > time in a very long time) to boot into my system. I likely should have
-> > just pulled the power...
-> >
-> > [1147997.255020] INFO: task happywriter:3425205 blocked for more than
-> > 120 seconds.
-> > [1147997.255088]       Not tainted 5.19.0-38-generic #39~22.04.1-Ubuntu
->
-> This is a distro-specific kernel, sorry, nothing to do with our releases
-> as the 5.19 kernel branch is long end-of-life.  Please work with your
-> distro for this issue if you wish to stick to this kernel version.
->
-> good luck!
->
-> greg k-h
+So given that list and saved_end_io are initialized here, we could remove the
+memset() by initializing seq "manually":
+
++static void blk_rq_init_flush(struct request *rq)
++{
++	rq->flush.seq = 0;
++	INIT_LIST_HEAD(&rq->flush.list);
++	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
++	rq->rq_flags |= RQF_FLUSH_SEQ;
++	rq->end_io = mq_flush_data_end_io;
++}
+
+No ?
+
+Otherwise, look good to me.
+
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+> +
+>  /**
+>   * blk_insert_flush - insert a new PREFLUSH/FUA request
+>   * @rq: request to insert
+> @@ -437,13 +446,7 @@ void blk_insert_flush(struct request *rq)
+>  	 * @rq should go through flush machinery.  Mark it part of flush
+>  	 * sequence and submit for further processing.
+>  	 */
+> -	memset(&rq->flush, 0, sizeof(rq->flush));
+> -	INIT_LIST_HEAD(&rq->flush.list);
+> -	rq->rq_flags |= RQF_FLUSH_SEQ;
+> -	rq->flush.saved_end_io = rq->end_io; /* Usually NULL */
+> -
+> -	rq->end_io = mq_flush_data_end_io;
+> -
+> +	blk_rq_init_flush(rq);
+>  	spin_lock_irq(&fq->mq_flush_lock);
+>  	blk_flush_complete_seq(rq, fq, REQ_FSEQ_ACTIONS & ~policy, 0);
+>  	spin_unlock_irq(&fq->mq_flush_lock);
+
