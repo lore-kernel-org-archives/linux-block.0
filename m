@@ -2,100 +2,302 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D30DC77B76
-	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 13:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA7AC77B7A
+	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 16:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbjDQNsk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Apr 2023 09:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44912 "EHLO
+        id S229554AbjDQQrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Apr 2023 12:47:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjDQNsk (ORCPT
+        with ESMTP id S229548AbjDQQq7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2023 09:48:40 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 345121BEB
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 06:48:39 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-2465835cf6fso764754a91.1
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 06:48:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681739318; x=1684331318;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UHg8YyCx2xNTrsopj4h1edhvH1uexqsIIEbf1PiCdJU=;
-        b=cTT1QFY3N3vCQgxN3UdgC4oWj8Nv/WABDvSZ4XliH7WQy6NObF7JURr0Nn0w5n8F5y
-         5vdR1p22xGRuKM1sO0lDiWRMCVkjPppZ5oz3ymUBOGjkPU9Yl6L0z8ksSkCMhWl/PdMD
-         Vd/uaIHE5/sMukmGe+x06ggs0hhu1NTB2GfprrTFDHytML+DHk1xGYNuXTrSTBbvmYU8
-         rAerxB2i9QooHWWqN9y//KklB2mhh0zW+rk3lKYYjgM/y6xt+DR8aJq+lfrfejX1FvmC
-         hphFA6Zjrs2RaZa7OqmLJo01jrneng6BjbhuShcHe7+BZas5pUaQRLqeRTULkZOekHY1
-         5oWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681739318; x=1684331318;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UHg8YyCx2xNTrsopj4h1edhvH1uexqsIIEbf1PiCdJU=;
-        b=I9KoJAub7dyazxPcN5riUXfBMJ6xt6Tnvf/dFTNuOYM8z/NMl3gQmHvmcqSxpKoyCV
-         td4ZteSK7WgvvBy6T0YPeRdTXUoHdmcsJwJ+L0MuZ0ALSBLWuWItMn9FhQoIFI5/9fLu
-         O8TLcEM3S1xrupBAlSZ7APXO/GulkWbwJ3DM2i2WmG1cAe4Wcqm7Z+Assk/Fw62lXSIq
-         DOnfSDRNtsZSzrF8KySwblph6tcGlVShnEybaxfBotyjK6BryYYuy37C4tn0F2DNJpE0
-         XsGsf8mdu9wcgsvyVu65cGZ6e16E9IwSAN7fA9YhWl9fNUylPcYmngga8SjpNAwXNZ9B
-         PQGQ==
-X-Gm-Message-State: AAQBX9ck05FBkZk7BUng68f/upwRT0xLuM79zbR7vhCQ8XQHKypJAnY8
-        m/qYLUvGfsGRLeXFZf57nO1V7w==
-X-Google-Smtp-Source: AKy350ZsvqcPhW6H6wNx86fi0atUBZQkuxHTaZ57q1x/i9eRxrLUDxUCPD/Jiw09W1ZiGmH0vxoyxw==
-X-Received: by 2002:a17:90a:19d1:b0:240:c067:6f50 with SMTP id 17-20020a17090a19d100b00240c0676f50mr10207702pjj.0.1681739318596;
-        Mon, 17 Apr 2023 06:48:38 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id v14-20020a17090a088e00b0023cfdbb6496sm8927319pjc.1.2023.04.17.06.48.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Apr 2023 06:48:38 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     David Howells <dhowells@redhat.com>,
-        Hugh Dickins <hughd@google.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        David Hildenbrand <david@redhat.com>,
-        Yang Shi <shy828301@gmail.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-In-Reply-To: <2d5fa5e3-dac5-6973-74e5-eeedf36a42b@google.com>
-References: <2d5fa5e3-dac5-6973-74e5-eeedf36a42b@google.com>
-Subject: Re: [PATCH next] shmem: minor fixes to splice-read implementation
-Message-Id: <168173931746.319007.17265276905089710599.b4-ty@kernel.dk>
-Date:   Mon, 17 Apr 2023 07:48:37 -0600
+        Mon, 17 Apr 2023 12:46:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 362E97EFD
+        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 09:46:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681749979;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=uR/jZlMPYOlzO5iI1kgxh5aDTsyzMD4r60HiSJx6YxE=;
+        b=IPXdg2ogLWY8L//uERfXX8wSU0ucPM6mqHF5lUbUHjGMaCsbRizw8r8UKncVrsy9BUqcwP
+        sHH5IjlJPqZs4ggbM+/95xsT5UvNTgVjPww3n60RiTbdC8aOMjhLaChNES/rDqxSt6EWt3
+        Av9S04wUf+U8jsWbZn2v3HZetKkGXoQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-449-A599nRTvPQSupLpf5YGxXQ-1; Mon, 17 Apr 2023 12:46:17 -0400
+X-MC-Unique: A599nRTvPQSupLpf5YGxXQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5722B101A552;
+        Mon, 17 Apr 2023 16:46:17 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A283F492B0C;
+        Mon, 17 Apr 2023 16:46:14 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ken Kurematsu <k.kurematsu@nskint.co.jp>
+Subject: [PATCH V2] block: ublk: switch to ioctl command encoding
+Date:   Tue, 18 Apr 2023 00:46:08 +0800
+Message-Id: <20230417164608.781022-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+All ublk commands(control, IO) should have taken ioctl command encoding
+from the beginning, because ioctl command encoding defines each code
+uniquely, so driver can figure out wrong command sent from userspace easily;
+2) it might help security subsystem for audit uring cmd[1].
 
-On Sun, 16 Apr 2023 21:46:16 -0700, Hugh Dickins wrote:
-> generic_file_splice_read() makes a couple of preliminary checks (for
-> s_maxbytes and zero len), but shmem_file_splice_read() is called without
-> those: so check them inside it.  (But shmem does not support O_DIRECT,
-> so no need for that one here - and even if O_DIRECT support were stubbed
-> in, it would still just be using the page cache.)
-> 
-> HWPoison: my reading of folio_test_hwpoison() is that it only tests the
-> head page of a large folio, whereas splice_folio_into_pipe() will splice
-> as much of the folio as it can: so for safety we should also check the
-> has_hwpoisoned flag, set if any of the folio's pages are hwpoisoned.
-> (Perhaps that ugliness can be improved at the mm end later.)
-> 
-> [...]
+Unfortunately we didn't do that way, and it could be one lesson for ublk driver.
 
-Applied, thanks!
+So switch to ioctl command encoding now, we still support commands encoded in
+old way, but they become legacy definition. Any new command should take ioctl
+encoding.
 
-[1/1] shmem: minor fixes to splice-read implementation
-      commit: 72887c976a7c9ee7527f4a2e3d109576efea98ab
+ublksrv code for switching to ioctl command encoding:
 
-Best regards,
+	https://github.com/ming1/ubdsrv/commits/ioctl_cmd_encoding
+
+[1] https://lore.kernel.org/io-uring/CAHC9VhSVzujW9LOj5Km80AjU0EfAuukoLrxO6BEfnXeK_s6bAg@mail.gmail.com/
+
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Ken Kurematsu <k.kurematsu@nskint.co.jp>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- simplify implementation
+	- add config option of BLK_DEV_UBLK_NO_OLD_CMD, suggested by
+	  Christoph
+    - improve commit log, and fix typo
+
+ drivers/block/Kconfig         | 17 ++++++++++++++
+ drivers/block/ublk_drv.c      | 29 +++++++++++++++++------
+ include/uapi/linux/ublk_cmd.h | 43 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 82 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index f79f20430ef7..de0a3b97e4c8 100644
+--- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -385,6 +385,23 @@ config BLK_DEV_UBLK
+ 	  can handle batch more effectively, but task_work_add() isn't exported
+ 	  for module, so ublk has to be built to kernel.
+ 
++config BLK_DEV_UBLK_NO_OLD_CMD
++	bool "Disable old command opcode"
++	depends on BLK_DEV_UBLK
++	default n
++	help
++	  ublk driver started to take plain command encoding, which turns out
++	  one bad way. The traditional ioctl command opcode encodes more
++	  info and basically defines each code uniquely, so opcode conflict
++	  is avoided, and driver can handle wrong cmd easily, meantime it
++	  may help security subsystem to audit uring command.
++
++	  Say Y if you don't want to support old command opcode. It is suggested
++	  to enable Y if your application(ublk server) switches to ioctl cmd
++	  encoding.
++
++	  Say N if your application still uses old command opcode.
++
+ source "drivers/block/rnbd/Kconfig"
+ 
+ endif # BLK_DEV
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 1223fcbfc6c9..b30e7326a826 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -53,7 +53,8 @@
+ 		| UBLK_F_NEED_GET_DATA \
+ 		| UBLK_F_USER_RECOVERY \
+ 		| UBLK_F_USER_RECOVERY_REISSUE \
+-		| UBLK_F_UNPRIVILEGED_DEV)
++		| UBLK_F_UNPRIVILEGED_DEV \
++		| UBLK_F_CMD_IOCTL_ENCODE)
+ 
+ /* All UBLK_PARAM_TYPE_* should be included here */
+ #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
+@@ -1260,6 +1261,7 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 	struct ublk_queue *ubq;
+ 	struct ublk_io *io;
+ 	u32 cmd_op = cmd->cmd_op;
++	u32 ioc_type = _IOC_TYPE(cmd_op);
+ 	unsigned tag = ub_cmd->tag;
+ 	int ret = -EINVAL;
+ 	struct request *req;
+@@ -1268,6 +1270,11 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
+ 			ub_cmd->result);
+ 
++	if (IS_ENABLED(CONFIG_BLK_DEV_UBLK_NO_OLD_CMD) && ioc_type != 'u')
++		return -EOPNOTSUPP;
++	if (ioc_type != 'u' && ioc_type != 0)
++		return -EOPNOTSUPP;
++
+ 	if (ub_cmd->q_id >= ub->dev_info.nr_hw_queues)
+ 		goto out;
+ 
+@@ -1294,10 +1301,10 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 	 * iff the driver have set the UBLK_IO_FLAG_NEED_GET_DATA.
+ 	 */
+ 	if ((!!(io->flags & UBLK_IO_FLAG_NEED_GET_DATA))
+-			^ (cmd_op == UBLK_IO_NEED_GET_DATA))
++			^ (_IOC_NR(cmd_op) == UBLK_IO_NEED_GET_DATA))
+ 		goto out;
+ 
+-	switch (cmd_op) {
++	switch (_IOC_NR(cmd_op)) {
+ 	case UBLK_IO_FETCH_REQ:
+ 		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
+ 		if (ublk_queue_ready(ubq)) {
+@@ -1743,6 +1750,8 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+ 	if (!IS_BUILTIN(CONFIG_BLK_DEV_UBLK))
+ 		ub->dev_info.flags |= UBLK_F_URING_CMD_COMP_IN_TASK;
+ 
++	ub->dev_info.flags |= UBLK_F_CMD_IOCTL_ENCODE;
++
+ 	/* We are not ready to support zero copy */
+ 	ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
+ 
+@@ -2099,7 +2108,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+ 		 * know if the specified device is created as unprivileged
+ 		 * mode.
+ 		 */
+-		if (cmd->cmd_op != UBLK_CMD_GET_DEV_INFO2)
++		if (_IOC_NR(cmd->cmd_op) != UBLK_CMD_GET_DEV_INFO2)
+ 			return 0;
+ 	}
+ 
+@@ -2125,7 +2134,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+ 	dev_path[header->dev_path_len] = 0;
+ 
+ 	ret = -EINVAL;
+-	switch (cmd->cmd_op) {
++	switch (_IOC_NR(cmd->cmd_op)) {
+ 	case UBLK_CMD_GET_DEV_INFO:
+ 	case UBLK_CMD_GET_DEV_INFO2:
+ 	case UBLK_CMD_GET_QUEUE_AFFINITY:
+@@ -2164,8 +2173,14 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ {
+ 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
+ 	struct ublk_device *ub = NULL;
++	u32 ioc_type = _IOC_TYPE(cmd->cmd_op);
+ 	int ret = -EINVAL;
+ 
++	if (IS_ENABLED(CONFIG_BLK_DEV_UBLK_NO_OLD_CMD) && ioc_type != 'u')
++		return -EOPNOTSUPP;
++	if (ioc_type != 'u' && ioc_type != 0)
++		return -EOPNOTSUPP;
++
+ 	if (issue_flags & IO_URING_F_NONBLOCK)
+ 		return -EAGAIN;
+ 
+@@ -2174,7 +2189,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 	if (!(issue_flags & IO_URING_F_SQE128))
+ 		goto out;
+ 
+-	if (cmd->cmd_op != UBLK_CMD_ADD_DEV) {
++	if (_IOC_NR(cmd->cmd_op) != UBLK_CMD_ADD_DEV) {
+ 		ret = -ENODEV;
+ 		ub = ublk_get_device_from_id(header->dev_id);
+ 		if (!ub)
+@@ -2189,7 +2204,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 	if (ret)
+ 		goto put_dev;
+ 
+-	switch (cmd->cmd_op) {
++	switch (_IOC_NR(cmd->cmd_op)) {
+ 	case UBLK_CMD_START_DEV:
+ 		ret = ublk_ctrl_start_dev(ub, cmd);
+ 		break;
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index f6238ccc7800..640bf687b94a 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -8,6 +8,9 @@
+ 
+ /*
+  * Admin commands, issued by ublk server, and handled by ublk driver.
++ *
++ * Legacy command definition, don't use in new application, and don't
++ * add new such definition any more
+  */
+ #define	UBLK_CMD_GET_QUEUE_AFFINITY	0x01
+ #define	UBLK_CMD_GET_DEV_INFO	0x02
+@@ -21,6 +24,30 @@
+ #define	UBLK_CMD_END_USER_RECOVERY	0x11
+ #define	UBLK_CMD_GET_DEV_INFO2		0x12
+ 
++/* Any new ctrl command should encode by __IO*() */
++#define UBLK_U_CMD_GET_QUEUE_AFFINITY	\
++	_IOR('u', UBLK_CMD_GET_QUEUE_AFFINITY, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_GET_DEV_INFO		\
++	_IOR('u', UBLK_CMD_GET_DEV_INFO, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_ADD_DEV		\
++	_IOWR('u', UBLK_CMD_ADD_DEV, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_DEL_DEV		\
++	_IOWR('u', UBLK_CMD_DEL_DEV, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_START_DEV		\
++	_IOWR('u', UBLK_CMD_START_DEV, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_STOP_DEV		\
++	_IOWR('u', UBLK_CMD_STOP_DEV, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_SET_PARAMS		\
++	_IOWR('u', UBLK_CMD_SET_PARAMS, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_GET_PARAMS		\
++	_IOR('u', UBLK_CMD_GET_PARAMS, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_START_USER_RECOVERY	\
++	_IOWR('u', UBLK_CMD_START_USER_RECOVERY, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_END_USER_RECOVERY	\
++	_IOWR('u', UBLK_CMD_END_USER_RECOVERY, struct ublksrv_ctrl_cmd)
++#define UBLK_U_CMD_GET_DEV_INFO2	\
++	_IOR('u', UBLK_CMD_GET_DEV_INFO2, struct ublksrv_ctrl_cmd)
++
+ /*
+  * IO commands, issued by ublk server, and handled by ublk driver.
+  *
+@@ -41,10 +68,23 @@
+  *      It is only used if ublksrv set UBLK_F_NEED_GET_DATA flag
+  *      while starting a ublk device.
+  */
++
++/*
++ * Legacy IO command definition, don't use in new application, and don't
++ * add new such definition any more
++ */
+ #define	UBLK_IO_FETCH_REQ		0x20
+ #define	UBLK_IO_COMMIT_AND_FETCH_REQ	0x21
+ #define	UBLK_IO_NEED_GET_DATA	0x22
+ 
++/* Any new IO command should encode by __IOWR() */
++#define	UBLK_U_IO_FETCH_REQ		\
++	_IOWR('u', UBLK_IO_FETCH_REQ, struct ublksrv_io_cmd)
++#define	UBLK_U_IO_COMMIT_AND_FETCH_REQ	\
++	_IOWR('u', UBLK_IO_COMMIT_AND_FETCH_REQ, struct ublksrv_io_cmd)
++#define	UBLK_U_IO_NEED_GET_DATA		\
++	_IOWR('u', UBLK_IO_NEED_GET_DATA, struct ublksrv_io_cmd)
++
+ /* only ABORT means that no re-fetch */
+ #define UBLK_IO_RES_OK			0
+ #define UBLK_IO_RES_NEED_GET_DATA	1
+@@ -102,6 +142,9 @@
+  */
+ #define UBLK_F_UNPRIVILEGED_DEV	(1UL << 5)
+ 
++/* use ioctl encoding for uring command */
++#define UBLK_F_CMD_IOCTL_ENCODE	(1UL << 6)
++
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
+ #define UBLK_S_DEV_LIVE	1
 -- 
-Jens Axboe
-
-
+2.38.1
 
