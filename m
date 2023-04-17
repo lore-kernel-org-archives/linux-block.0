@@ -2,163 +2,136 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62638C77B70
-	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 11:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C3DC77B70
+	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 12:48:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230229AbjDQLYq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Apr 2023 07:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46994 "EHLO
+        id S231226AbjDQMsQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Apr 2023 08:48:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230414AbjDQLYp (ORCPT
+        with ESMTP id S231182AbjDQMsP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2023 07:24:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D557F7EF9
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 04:23:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681730515;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mkcwhp5zTW1yRaiHiJTdOs9s0Tvzr5julsI/kTPOe68=;
-        b=HO0+YObt/3aVi67/IEtOuxKqjMnIa2b6AQnoxpD+Gcb6sAHnKpfwQKeHYCmROOwttBH0Jy
-        j/zqCpSjP+IljcpWrOpIGI8+jFP6J0ZJa1lV6L2w/fReU+M/zjYojNePlTpZNjj8v6fQxX
-        h3i/J92KNj0+x+slDLHNO1MCpcxW5JA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-K7HfZSIxMZu2_WQq-degBQ-1; Mon, 17 Apr 2023 07:21:54 -0400
-X-MC-Unique: K7HfZSIxMZu2_WQq-degBQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-2eef9c48d49so680011f8f.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 04:21:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681730513; x=1684322513;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mkcwhp5zTW1yRaiHiJTdOs9s0Tvzr5julsI/kTPOe68=;
-        b=EMPsxv+lkrYWyQwAOvsvl1PJ4ZPCa1GQpa533rfT9lOAAz2aHko3y8Xw8Yhgj166ES
-         9ROC6RnfAZp/c1NhULv9T5PKUiDvOddRkvq8PB5IGY4B44dMMOqq2P71bSRV1y8um3HR
-         11XU1HY53u1aLLZ96tsMGgu1vntR1pFUarsDCtJPVVwgWmcAKZvgb1Nf18kn3r92JoJ9
-         dIWIAw9IHXl88KgTHnSrVuuoDT01jYPLn114BFz0591fzJp2Kduigo8GFCwCKuFhyQJP
-         Z+QWdHM36WUUyCTo5RBNAoNk5BpqIN0fcVbZ1orpZ4WgwG7Ze3152D4+6kl4iBJhPcav
-         /zyg==
-X-Gm-Message-State: AAQBX9ex3PL1Rmy7CfPxZGkt56uW3LwJ+zvI0Q9vMocRwaZc5J2aferl
-        bfIgK87h+MqyGR6XQa2wcdCEmdPgBgLrco9XfVNIkAnWmV73LlMU/lOn9e5DV/AN7sBugqASwcX
-        UQ5aoQJR7p8bUEZZiNGYt/e0=
-X-Received: by 2002:adf:ff85:0:b0:2f9:dfab:1b8c with SMTP id j5-20020adfff85000000b002f9dfab1b8cmr2581409wrr.50.1681730513174;
-        Mon, 17 Apr 2023 04:21:53 -0700 (PDT)
-X-Google-Smtp-Source: AKy350abZRZAOfdMv9lYJhbEZufnC86FDoAE2OKI65tR0JXtMEmI74JIW99/H3RyhX6ngBR4MbJnEg==
-X-Received: by 2002:adf:ff85:0:b0:2f9:dfab:1b8c with SMTP id j5-20020adfff85000000b002f9dfab1b8cmr2581395wrr.50.1681730512826;
-        Mon, 17 Apr 2023 04:21:52 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c700:fc00:db07:68a9:6af5:ecdf? (p200300cbc700fc00db0768a96af5ecdf.dip0.t-ipconnect.de. [2003:cb:c700:fc00:db07:68a9:6af5:ecdf])
-        by smtp.gmail.com with ESMTPSA id e6-20020adff346000000b002efac42ff35sm10294758wrp.37.2023.04.17.04.21.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Apr 2023 04:21:52 -0700 (PDT)
-Message-ID: <dfa218f9-1a99-f877-4c9d-a4d185b6ebd5@redhat.com>
-Date:   Mon, 17 Apr 2023 13:21:50 +0200
+        Mon, 17 Apr 2023 08:48:15 -0400
+Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C6B7683;
+        Mon, 17 Apr 2023 05:47:52 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailnew.west.internal (Postfix) with ESMTP id 4D8DF2B0673E;
+        Mon, 17 Apr 2023 08:47:50 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Mon, 17 Apr 2023 08:47:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-transfer-encoding:content-type:date:date:from:from
+        :in-reply-to:message-id:mime-version:reply-to:sender:subject
+        :subject:to:to; s=fm3; t=1681735669; x=1681736269; bh=Cjs9NDQpI3
+        lodejBiOUacfZOZsr5wOLfjoc+sDV3Kd0=; b=SJHK5UL4HREV5gOjeXhMOSZZQi
+        pWrT5DvwSFmHcAxWriZHGwlVM88Ue2Uh4kZG7OwyNqtsEtPjhqI6PzVmnnX4JtgS
+        GorV97YAdDAB5Ll1x8ZUUIOZMEDbZG3xgM9I6pBa+9vek8EOx7z043bYeLAfV+6d
+        uFhy/5JPy0MmcRQReKv1i4nEcdW5dA7Pl7ll2jhreacEwXqipdz47xgn0ELzgpDY
+        vc+oMNtkX8/CBHny4FsHElwP5X/rwfPhdXka0iCYZJg5O2hjLbSei0XKZQ/Daxjm
+        XwM+D4pretBJkxDXIv/cTErzL30K6ShbUUDktSBSP2kbNY0rPM8WikEhqT9A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:date:date:feedback-id:feedback-id:from:from
+        :in-reply-to:message-id:mime-version:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=ie1e949a3.fm3; t=1681735669; x=1681736269; bh=Cjs
+        9NDQpI3lodejBiOUacfZOZsr5wOLfjoc+sDV3Kd0=; b=TXFn8pVSTa2zRLTD3H0
+        Od06q2uCVBwb0qNt8GR4r8uj5+6BGx1B4pmG1xQPPw+dWCiRdsFW3GR5K8AdgBv+
+        nUeSlqCPjeaJrZy2y8pFSwlfOdwcVGSpJhO7dtil6oy/obWJXIYINThqZoTdhAca
+        lUKGbdu9QTeA2UoIay0BuhDJ190IMd42izLYru4ttbvICEblVO+NELzqdOxHwryc
+        c/PY/7t5E2pvofFNfi8CpESSRMap/bl8d5t0Y0E6R4InXoG72oiWv5/q0dAQxfcE
+        uvNVBuE9awDTF3yKMp691PHmyzNwAdQc/ANiq1nOwF+Fo1GATLwIY0UpVn5fN4bz
+        qlA==
+X-ME-Sender: <xms:9T89ZGKx4Ya1NqNzCV9PDPENoJYKFbMTQ1Q4SF4ZG-3uQJOawGk7Dg>
+    <xme:9T89ZOKuxP1h9j5IGdtJZHaW6vXQ8gVFsPSOuVqsnLnBNBsapDwp4OU2fbH0mCZ6q
+    4SY2EpvXOPSTaq8iwI>
+X-ME-Received: <xmr:9T89ZGvale0Ju0txRkr_UHJHYJ9KImCQ9-yRTnRzWbLYEqd2cVUl1WlCf2d-mOFRahjOn5He__k0OFGb8h8dnRafkkaB-ci8-MadNbYN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdeliedgheegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertd
+    ertddtnecuhfhrohhmpefuhhhinhdkihgthhhirhhoucfmrgifrghsrghkihcuoehshhhi
+    nhhitghhihhrohesfhgrshhtmhgrihhlrdgtohhmqeenucggtffrrghtthgvrhhnpefgud
+    ekgfefvdffgfefueeigfetlefghfffieekvddvkeetieeltdetieevgfffveenucffohhm
+    rghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtghomh
+X-ME-Proxy: <xmx:9T89ZLaNkTR6ty9fKFktzoPnGKcgBk5v664VZ682l-Ki4yimbGYXtQ>
+    <xmx:9T89ZNaeVttSqc07kjfMVkb_K7Uv5P3aapYQ9gWhRWeL92TF_YOp1Q>
+    <xmx:9T89ZHCBxLjxiG7TcEOW_r-scisP-I-m6aenHfw7n_qonGf8m_HJKQ>
+    <xmx:9T89ZMlwiq6HeFdVEHW9xdtS4EbEk1S3f1INBzyW9XEIk4jPynqZF74KXPZgVego>
+Feedback-ID: ie1e949a3:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 17 Apr 2023 08:47:48 -0400 (EDT)
+From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Cc:     Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 0/9] support built-in scsi_debug
+Date:   Mon, 17 Apr 2023 21:47:19 +0900
+Message-Id: <20230417124728.458630-1-shinichiro@fastmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH next] shmem: minor fixes to splice-read implementation
-Content-Language: en-US
-To:     Hugh Dickins <hughd@google.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Yang Shi <shy828301@gmail.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-References: <2d5fa5e3-dac5-6973-74e5-eeedf36a42b@google.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <2d5fa5e3-dac5-6973-74e5-eeedf36a42b@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 17.04.23 06:46, Hugh Dickins wrote:
-> generic_file_splice_read() makes a couple of preliminary checks (for
-> s_maxbytes and zero len), but shmem_file_splice_read() is called without
-> those: so check them inside it.  (But shmem does not support O_DIRECT,
-> so no need for that one here - and even if O_DIRECT support were stubbed
-> in, it would still just be using the page cache.)
-> 
-> HWPoison: my reading of folio_test_hwpoison() is that it only tests the
-> head page of a large folio, whereas splice_folio_into_pipe() will splice
-> as much of the folio as it can: so for safety we should also check the
-> has_hwpoisoned flag, set if any of the folio's pages are hwpoisoned.
-> (Perhaps that ugliness can be improved at the mm end later.)
-> 
-> The call to splice_zeropage_into_pipe() risked overrunning past EOF:
-> ask it for "part" not "len".
-> 
-> Fixes: b81d7b89becc ("shmem: Implement splice-read")
-> Signed-off-by: Hugh Dickins <hughd@google.com>
-> ---
-> Thank you, David, for attending to tmpfs in your splice update:
-> yes, I too wish it could have just used the generic, but I'm sure
-> you're right that there's a number of reasons it needs its own.
-> 
->   mm/shmem.c | 14 +++++++++++---
->   1 file changed, 11 insertions(+), 3 deletions(-)
-> 
-> --- a/mm/shmem.c
-> +++ b/mm/shmem.c
-> @@ -2902,6 +2902,11 @@ static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
->   	loff_t isize;
->   	int error = 0;
->   
-> +	if (unlikely(*ppos >= MAX_LFS_FILESIZE))
-> +		return 0;
-> +	if (unlikely(!len))
-> +		return 0;
-> +
->   	/* Work out how much data we can actually add into the pipe */
->   	used = pipe_occupancy(pipe->head, pipe->tail);
->   	npages = max_t(ssize_t, pipe->max_usage - used, 0);
-> @@ -2911,7 +2916,8 @@ static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
->   		if (*ppos >= i_size_read(inode))
->   			break;
->   
-> -		error = shmem_get_folio(inode, *ppos / PAGE_SIZE, &folio, SGP_READ);
-> +		error = shmem_get_folio(inode, *ppos / PAGE_SIZE, &folio,
-> +					SGP_READ);
->   		if (error) {
->   			if (error == -EINVAL)
->   				error = 0;
-> @@ -2920,7 +2926,9 @@ static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
->   		if (folio) {
->   			folio_unlock(folio);
->   
-> -			if (folio_test_hwpoison(folio)) {
-> +			if (folio_test_hwpoison(folio) ||
-> +			    (folio_test_large(folio) &&
-> +			     folio_test_has_hwpoisoned(folio))) {
->   				error = -EIO;
->   				break;
->   			}
-> @@ -2956,7 +2964,7 @@ static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
->   			folio_put(folio);
->   			folio = NULL;
->   		} else {
-> -			n = splice_zeropage_into_pipe(pipe, *ppos, len);
-> +			n = splice_zeropage_into_pipe(pipe, *ppos, part);
->   		}
->   
->   		if (!n)
-> 
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-FWIW, looks good to me.
+In the past, there was an issue related to scsi_debug module unload [1]. At that
+time, it was suggested to modify blktests not to rely on module load and unload.
+Based on that discussion, blktests was modified not to load or unload null_blk
+driver [2][3]. As of today, a number of test cases with null_blk can be run with
+built-in null_blk.
 
+This series introduces similar support for built-in scsi_debug. This patch adds
+a new helper function _configure_scsi_debug which can set up scsi_debug device
+without module load and unload. Also it enables 5 test cases to run with built-
+in scsi_debug.
+
+The first patch in this series fixes a minor issue found during this work. Next
+two patches modify common/scsi_debug functions as preparation. The 4th patch
+introduces the new function _configure_scsi_debug. Following 5 patches modify
+the 5 test cases so that they can run with built-in scsi debug.
+
+Of note is that still 9 test cases are left to require loadable scsi_debug. 8 of
+them can not be run with built-in scsi_debug because the parameters they set are
+read-only on sysfs. The other one test case scsi/007 has other failure symptom
+now, so I leave it untouched at this moment.
+
+[1] https://lore.kernel.org/linux-block/bc0b2c10-10e6-a1d9-4139-ac93ad3512b2@interlog.com/
+[2] https://lore.kernel.org/linux-block/20220601064837.3473709-1-hch@lst.de/
+[3] https://lore.kernel.org/linux-block/20220607124739.1259977-1-hch@lst.de/
+
+Shin'ichiro Kawasaki (9):
+  common/rc: skip module file check if modules path does not exist
+  common/scsi_debug, tests/*: re-define _have_scsi_debug
+  common/scsi_debug: factor out _setup_scsi_debug_vars
+  common/scsi_debug: introduce _configure_scsi_debug
+  scsi/004: allow to run with built-in scsi_debug
+  scsi/005: allow to run with built-in scsi_debug
+  block/001: allow to run with built-in scsi_debug and sd_mod
+  block/002: allow to run with built-in scsi_debug
+  block/027: allow to run with built-in scsi_debug
+
+ common/rc         |   1 +
+ common/scsi_debug | 139 ++++++++++++++++++++++++++++++++++++++++++----
+ tests/block/001   |   4 +-
+ tests/block/002   |   5 +-
+ tests/block/009   |   3 +-
+ tests/block/025   |   2 +-
+ tests/block/027   |   6 +-
+ tests/block/028   |   2 +-
+ tests/block/032   |   3 +-
+ tests/loop/004    |   5 +-
+ tests/scsi/004    |  15 ++++-
+ tests/scsi/005    |   5 +-
+ tests/scsi/007    |   2 +-
+ tests/zbd/008     |   5 +-
+ tests/zbd/009     |   2 +-
+ tests/zbd/010     |   2 +-
+ 16 files changed, 169 insertions(+), 32 deletions(-)
 
 -- 
-Thanks,
-
-David / dhildenb
+2.39.2
 
