@@ -2,302 +2,260 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA7AC77B7A
-	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 16:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17861C77B7A
+	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 17:34:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjDQQrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Apr 2023 12:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57266 "EHLO
+        id S230271AbjDQReo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Apr 2023 13:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbjDQQq7 (ORCPT
+        with ESMTP id S230361AbjDQRef (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2023 12:46:59 -0400
+        Mon, 17 Apr 2023 13:34:35 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 362E97EFD
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 09:46:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DC0421D
+        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 10:33:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681749979;
+        s=mimecast20190719; t=1681752826;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=uR/jZlMPYOlzO5iI1kgxh5aDTsyzMD4r60HiSJx6YxE=;
-        b=IPXdg2ogLWY8L//uERfXX8wSU0ucPM6mqHF5lUbUHjGMaCsbRizw8r8UKncVrsy9BUqcwP
-        sHH5IjlJPqZs4ggbM+/95xsT5UvNTgVjPww3n60RiTbdC8aOMjhLaChNES/rDqxSt6EWt3
-        Av9S04wUf+U8jsWbZn2v3HZetKkGXoQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-449-A599nRTvPQSupLpf5YGxXQ-1; Mon, 17 Apr 2023 12:46:17 -0400
-X-MC-Unique: A599nRTvPQSupLpf5YGxXQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5722B101A552;
-        Mon, 17 Apr 2023 16:46:17 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A283F492B0C;
-        Mon, 17 Apr 2023 16:46:14 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jm85SSVaopQAxnU3x7Lrot1DU+GlbD9SOLxgFW9cj5k=;
+        b=c2moo9YH8STRbnVlFl98w9cL6GP0h32x+n9S85qFWy7vH6+Ly0u7o8Pd13sqc0xiMmjBbM
+        xgoYKl8aH1G4bxr8+Lvj3XvyKsrOI9wUnE40thast8q1Tbu/32Opq5l09MCFqINRAlGCPb
+        PLr7Y5n8hQVolJO78aiCSPi/USohEFk=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-583-lT-GAOA1N6ylGWOxO8b-bg-1; Mon, 17 Apr 2023 13:33:45 -0400
+X-MC-Unique: lT-GAOA1N6ylGWOxO8b-bg-1
+Received: by mail-qv1-f72.google.com with SMTP id n12-20020a0cbe8c000000b005e79f8d1417so13501367qvi.13
+        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 10:33:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681752824; x=1684344824;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jm85SSVaopQAxnU3x7Lrot1DU+GlbD9SOLxgFW9cj5k=;
+        b=LmaoTF/G1XhKfTef4GbP1KZ3G9wTTp34jWdG/dGZv4DHH++449mirwPmQwFp4snTF+
+         BiCe5yxAr58sX86h21q3+JuQjUF9QkOEFZVsZg2IhglwZcyPI8swsLbn0j8eMUzNQgP9
+         3932CVHecrrIlVkS2Hk800v1FwSyuzpe41Cjo4Ka30la1x+tODMfPzUPXE+mg+fXFrQi
+         ok6vSBiyoVOD/s1KUj2C5FqxH1FslvtFJvorRW2ImwV6Q0TukBoiGdP5QlpJd8HDbhg0
+         PrFffx/KWKeY+kckZsTLAFc+HHs+7QiomGNbcRmPIEWTLmwpfQ4y4OXvYPOXEJXyApER
+         qrxQ==
+X-Gm-Message-State: AAQBX9dMrgf7L4Z8DL7tWWRYQlhd6UcgBXLNN16WzSqtONny6T96ixCj
+        /fClEhCudsXZm4KgbkrQlNJb968E+uG6UpSiZkI1zUw/b5lwMtjXYdwohlwuRusah1zu4yMofvb
+        WjnVbeghLiIjg797YnDJik0k=
+X-Received: by 2002:a05:622a:1746:b0:3ec:e29f:6f4f with SMTP id l6-20020a05622a174600b003ece29f6f4fmr13735668qtk.33.1681752824519;
+        Mon, 17 Apr 2023 10:33:44 -0700 (PDT)
+X-Google-Smtp-Source: AKy350ZygDANXtkSDESQaT+/nlutXw5EifsNXMDbt5vvWnxrF6WrCl5NaVCG+oOnpCy/E82arPOA9Q==
+X-Received: by 2002:a05:622a:1746:b0:3ec:e29f:6f4f with SMTP id l6-20020a05622a174600b003ece29f6f4fmr13735633qtk.33.1681752824192;
+        Mon, 17 Apr 2023 10:33:44 -0700 (PDT)
+Received: from bfoster (c-24-61-119-116.hsd1.ma.comcast.net. [24.61.119.116])
+        by smtp.gmail.com with ESMTPSA id p24-20020a05620a22f800b0074a2467f541sm3337263qki.35.2023.04.17.10.33.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Apr 2023 10:33:43 -0700 (PDT)
+Date:   Mon, 17 Apr 2023 13:35:46 -0400
+From:   Brian Foster <bfoster@redhat.com>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     sarthakkukreti@google.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
         Christoph Hellwig <hch@infradead.org>,
-        Ken Kurematsu <k.kurematsu@nskint.co.jp>
-Subject: [PATCH V2] block: ublk: switch to ioctl command encoding
-Date:   Tue, 18 Apr 2023 00:46:08 +0800
-Message-Id: <20230417164608.781022-1-ming.lei@redhat.com>
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v3 1/3] block: Introduce provisioning primitives
+Message-ID: <ZD2DcvyHdNmkdwr1@bfoster>
+References: <20221229071647.437095-1-sarthakkukreti@chromium.org>
+ <20230414000219.92640-1-sarthakkukreti@chromium.org>
+ <20230414000219.92640-2-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230414000219.92640-2-sarthakkukreti@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All ublk commands(control, IO) should have taken ioctl command encoding
-from the beginning, because ioctl command encoding defines each code
-uniquely, so driver can figure out wrong command sent from userspace easily;
-2) it might help security subsystem for audit uring cmd[1].
+On Thu, Apr 13, 2023 at 05:02:17PM -0700, Sarthak Kukreti wrote:
+> Introduce block request REQ_OP_PROVISION. The intent of this request
+> is to request underlying storage to preallocate disk space for the given
+> block range. Block devices that support this capability will export
+> a provision limit within their request queues.
+> 
+> This patch also adds the capability to call fallocate() in mode 0
+> on block devices, which will send REQ_OP_PROVISION to the block
+> device for the specified range,
+> 
+> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> ---
+>  block/blk-core.c          |  5 ++++
+>  block/blk-lib.c           | 53 +++++++++++++++++++++++++++++++++++++++
+>  block/blk-merge.c         | 18 +++++++++++++
+>  block/blk-settings.c      | 19 ++++++++++++++
+>  block/blk-sysfs.c         |  8 ++++++
+>  block/bounce.c            |  1 +
+>  block/fops.c              | 14 ++++++++---
+>  include/linux/bio.h       |  6 +++--
+>  include/linux/blk_types.h |  5 +++-
+>  include/linux/blkdev.h    | 16 ++++++++++++
+>  10 files changed, 138 insertions(+), 7 deletions(-)
+> 
+...
+> diff --git a/block/fops.c b/block/fops.c
+> index d2e6be4e3d1c..f82da2fb8af0 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -625,7 +625,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  	int error;
+>  
+>  	/* Fail if we don't recognize the flags. */
+> -	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
+> +	if (mode != 0 && mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
+>  		return -EOPNOTSUPP;
+>  
+>  	/* Don't go off the end of the device. */
+> @@ -649,11 +649,17 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  	filemap_invalidate_lock(inode->i_mapping);
+>  
+>  	/* Invalidate the page cache, including dirty pages. */
+> -	error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> -	if (error)
+> -		goto fail;
+> +	if (mode != 0) {
+> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> +		if (error)
+> +			goto fail;
+> +	}
+>  
+>  	switch (mode) {
+> +	case 0:
+> +		error = blkdev_issue_provision(bdev, start >> SECTOR_SHIFT,
+> +					       len >> SECTOR_SHIFT, GFP_KERNEL);
+> +		break;
 
-Unfortunately we didn't do that way, and it could be one lesson for ublk driver.
+I would think we'd want to support any combination of
+FALLOC_FL_KEEP_SIZE and FALLOC_FL_UNSHARE_RANGE..? All of the other
+commands support the former modifier, for one. It also looks like if
+somebody attempts to invoke with mode == FALLOC_FL_KEEP_SIZE, even with
+the current upstream code that would perform the bdev truncate before
+returning -EOPNOTSUPP. That seems like a bit of an unfortunate side
+effect to me.
 
-So switch to ioctl command encoding now, we still support commands encoded in
-old way, but they become legacy definition. Any new command should take ioctl
-encoding.
+WRT to unshare, if the PROVISION request is always going to imply an
+unshare (which seems reasonable to me), there's probably no reason to
+-EOPNOTSUPP if a caller explicitly passes UNSHARE_RANGE.
 
-ublksrv code for switching to ioctl command encoding:
+Brian
 
-	https://github.com/ming1/ubdsrv/commits/ioctl_cmd_encoding
-
-[1] https://lore.kernel.org/io-uring/CAHC9VhSVzujW9LOj5Km80AjU0EfAuukoLrxO6BEfnXeK_s6bAg@mail.gmail.com/
-
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: Ken Kurematsu <k.kurematsu@nskint.co.jp>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- simplify implementation
-	- add config option of BLK_DEV_UBLK_NO_OLD_CMD, suggested by
-	  Christoph
-    - improve commit log, and fix typo
-
- drivers/block/Kconfig         | 17 ++++++++++++++
- drivers/block/ublk_drv.c      | 29 +++++++++++++++++------
- include/uapi/linux/ublk_cmd.h | 43 +++++++++++++++++++++++++++++++++++
- 3 files changed, 82 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index f79f20430ef7..de0a3b97e4c8 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -385,6 +385,23 @@ config BLK_DEV_UBLK
- 	  can handle batch more effectively, but task_work_add() isn't exported
- 	  for module, so ublk has to be built to kernel.
- 
-+config BLK_DEV_UBLK_NO_OLD_CMD
-+	bool "Disable old command opcode"
-+	depends on BLK_DEV_UBLK
-+	default n
-+	help
-+	  ublk driver started to take plain command encoding, which turns out
-+	  one bad way. The traditional ioctl command opcode encodes more
-+	  info and basically defines each code uniquely, so opcode conflict
-+	  is avoided, and driver can handle wrong cmd easily, meantime it
-+	  may help security subsystem to audit uring command.
-+
-+	  Say Y if you don't want to support old command opcode. It is suggested
-+	  to enable Y if your application(ublk server) switches to ioctl cmd
-+	  encoding.
-+
-+	  Say N if your application still uses old command opcode.
-+
- source "drivers/block/rnbd/Kconfig"
- 
- endif # BLK_DEV
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 1223fcbfc6c9..b30e7326a826 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -53,7 +53,8 @@
- 		| UBLK_F_NEED_GET_DATA \
- 		| UBLK_F_USER_RECOVERY \
- 		| UBLK_F_USER_RECOVERY_REISSUE \
--		| UBLK_F_UNPRIVILEGED_DEV)
-+		| UBLK_F_UNPRIVILEGED_DEV \
-+		| UBLK_F_CMD_IOCTL_ENCODE)
- 
- /* All UBLK_PARAM_TYPE_* should be included here */
- #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
-@@ -1260,6 +1261,7 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	struct ublk_queue *ubq;
- 	struct ublk_io *io;
- 	u32 cmd_op = cmd->cmd_op;
-+	u32 ioc_type = _IOC_TYPE(cmd_op);
- 	unsigned tag = ub_cmd->tag;
- 	int ret = -EINVAL;
- 	struct request *req;
-@@ -1268,6 +1270,11 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
- 			ub_cmd->result);
- 
-+	if (IS_ENABLED(CONFIG_BLK_DEV_UBLK_NO_OLD_CMD) && ioc_type != 'u')
-+		return -EOPNOTSUPP;
-+	if (ioc_type != 'u' && ioc_type != 0)
-+		return -EOPNOTSUPP;
-+
- 	if (ub_cmd->q_id >= ub->dev_info.nr_hw_queues)
- 		goto out;
- 
-@@ -1294,10 +1301,10 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	 * iff the driver have set the UBLK_IO_FLAG_NEED_GET_DATA.
- 	 */
- 	if ((!!(io->flags & UBLK_IO_FLAG_NEED_GET_DATA))
--			^ (cmd_op == UBLK_IO_NEED_GET_DATA))
-+			^ (_IOC_NR(cmd_op) == UBLK_IO_NEED_GET_DATA))
- 		goto out;
- 
--	switch (cmd_op) {
-+	switch (_IOC_NR(cmd_op)) {
- 	case UBLK_IO_FETCH_REQ:
- 		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
- 		if (ublk_queue_ready(ubq)) {
-@@ -1743,6 +1750,8 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	if (!IS_BUILTIN(CONFIG_BLK_DEV_UBLK))
- 		ub->dev_info.flags |= UBLK_F_URING_CMD_COMP_IN_TASK;
- 
-+	ub->dev_info.flags |= UBLK_F_CMD_IOCTL_ENCODE;
-+
- 	/* We are not ready to support zero copy */
- 	ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
- 
-@@ -2099,7 +2108,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
- 		 * know if the specified device is created as unprivileged
- 		 * mode.
- 		 */
--		if (cmd->cmd_op != UBLK_CMD_GET_DEV_INFO2)
-+		if (_IOC_NR(cmd->cmd_op) != UBLK_CMD_GET_DEV_INFO2)
- 			return 0;
- 	}
- 
-@@ -2125,7 +2134,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
- 	dev_path[header->dev_path_len] = 0;
- 
- 	ret = -EINVAL;
--	switch (cmd->cmd_op) {
-+	switch (_IOC_NR(cmd->cmd_op)) {
- 	case UBLK_CMD_GET_DEV_INFO:
- 	case UBLK_CMD_GET_DEV_INFO2:
- 	case UBLK_CMD_GET_QUEUE_AFFINITY:
-@@ -2164,8 +2173,14 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- {
- 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
- 	struct ublk_device *ub = NULL;
-+	u32 ioc_type = _IOC_TYPE(cmd->cmd_op);
- 	int ret = -EINVAL;
- 
-+	if (IS_ENABLED(CONFIG_BLK_DEV_UBLK_NO_OLD_CMD) && ioc_type != 'u')
-+		return -EOPNOTSUPP;
-+	if (ioc_type != 'u' && ioc_type != 0)
-+		return -EOPNOTSUPP;
-+
- 	if (issue_flags & IO_URING_F_NONBLOCK)
- 		return -EAGAIN;
- 
-@@ -2174,7 +2189,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	if (!(issue_flags & IO_URING_F_SQE128))
- 		goto out;
- 
--	if (cmd->cmd_op != UBLK_CMD_ADD_DEV) {
-+	if (_IOC_NR(cmd->cmd_op) != UBLK_CMD_ADD_DEV) {
- 		ret = -ENODEV;
- 		ub = ublk_get_device_from_id(header->dev_id);
- 		if (!ub)
-@@ -2189,7 +2204,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	if (ret)
- 		goto put_dev;
- 
--	switch (cmd->cmd_op) {
-+	switch (_IOC_NR(cmd->cmd_op)) {
- 	case UBLK_CMD_START_DEV:
- 		ret = ublk_ctrl_start_dev(ub, cmd);
- 		break;
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index f6238ccc7800..640bf687b94a 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -8,6 +8,9 @@
- 
- /*
-  * Admin commands, issued by ublk server, and handled by ublk driver.
-+ *
-+ * Legacy command definition, don't use in new application, and don't
-+ * add new such definition any more
-  */
- #define	UBLK_CMD_GET_QUEUE_AFFINITY	0x01
- #define	UBLK_CMD_GET_DEV_INFO	0x02
-@@ -21,6 +24,30 @@
- #define	UBLK_CMD_END_USER_RECOVERY	0x11
- #define	UBLK_CMD_GET_DEV_INFO2		0x12
- 
-+/* Any new ctrl command should encode by __IO*() */
-+#define UBLK_U_CMD_GET_QUEUE_AFFINITY	\
-+	_IOR('u', UBLK_CMD_GET_QUEUE_AFFINITY, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_GET_DEV_INFO		\
-+	_IOR('u', UBLK_CMD_GET_DEV_INFO, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_ADD_DEV		\
-+	_IOWR('u', UBLK_CMD_ADD_DEV, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_DEL_DEV		\
-+	_IOWR('u', UBLK_CMD_DEL_DEV, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_START_DEV		\
-+	_IOWR('u', UBLK_CMD_START_DEV, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_STOP_DEV		\
-+	_IOWR('u', UBLK_CMD_STOP_DEV, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_SET_PARAMS		\
-+	_IOWR('u', UBLK_CMD_SET_PARAMS, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_GET_PARAMS		\
-+	_IOR('u', UBLK_CMD_GET_PARAMS, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_START_USER_RECOVERY	\
-+	_IOWR('u', UBLK_CMD_START_USER_RECOVERY, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_END_USER_RECOVERY	\
-+	_IOWR('u', UBLK_CMD_END_USER_RECOVERY, struct ublksrv_ctrl_cmd)
-+#define UBLK_U_CMD_GET_DEV_INFO2	\
-+	_IOR('u', UBLK_CMD_GET_DEV_INFO2, struct ublksrv_ctrl_cmd)
-+
- /*
-  * IO commands, issued by ublk server, and handled by ublk driver.
-  *
-@@ -41,10 +68,23 @@
-  *      It is only used if ublksrv set UBLK_F_NEED_GET_DATA flag
-  *      while starting a ublk device.
-  */
-+
-+/*
-+ * Legacy IO command definition, don't use in new application, and don't
-+ * add new such definition any more
-+ */
- #define	UBLK_IO_FETCH_REQ		0x20
- #define	UBLK_IO_COMMIT_AND_FETCH_REQ	0x21
- #define	UBLK_IO_NEED_GET_DATA	0x22
- 
-+/* Any new IO command should encode by __IOWR() */
-+#define	UBLK_U_IO_FETCH_REQ		\
-+	_IOWR('u', UBLK_IO_FETCH_REQ, struct ublksrv_io_cmd)
-+#define	UBLK_U_IO_COMMIT_AND_FETCH_REQ	\
-+	_IOWR('u', UBLK_IO_COMMIT_AND_FETCH_REQ, struct ublksrv_io_cmd)
-+#define	UBLK_U_IO_NEED_GET_DATA		\
-+	_IOWR('u', UBLK_IO_NEED_GET_DATA, struct ublksrv_io_cmd)
-+
- /* only ABORT means that no re-fetch */
- #define UBLK_IO_RES_OK			0
- #define UBLK_IO_RES_NEED_GET_DATA	1
-@@ -102,6 +142,9 @@
-  */
- #define UBLK_F_UNPRIVILEGED_DEV	(1UL << 5)
- 
-+/* use ioctl encoding for uring command */
-+#define UBLK_F_CMD_IOCTL_ENCODE	(1UL << 6)
-+
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
--- 
-2.38.1
+>  	case FALLOC_FL_ZERO_RANGE:
+>  	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
+>  		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index d766be7152e1..9820b3b039f2 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -57,7 +57,8 @@ static inline bool bio_has_data(struct bio *bio)
+>  	    bio->bi_iter.bi_size &&
+>  	    bio_op(bio) != REQ_OP_DISCARD &&
+>  	    bio_op(bio) != REQ_OP_SECURE_ERASE &&
+> -	    bio_op(bio) != REQ_OP_WRITE_ZEROES)
+> +	    bio_op(bio) != REQ_OP_WRITE_ZEROES &&
+> +	    bio_op(bio) != REQ_OP_PROVISION)
+>  		return true;
+>  
+>  	return false;
+> @@ -67,7 +68,8 @@ static inline bool bio_no_advance_iter(const struct bio *bio)
+>  {
+>  	return bio_op(bio) == REQ_OP_DISCARD ||
+>  	       bio_op(bio) == REQ_OP_SECURE_ERASE ||
+> -	       bio_op(bio) == REQ_OP_WRITE_ZEROES;
+> +	       bio_op(bio) == REQ_OP_WRITE_ZEROES ||
+> +	       bio_op(bio) == REQ_OP_PROVISION;
+>  }
+>  
+>  static inline void *bio_data(struct bio *bio)
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 99be590f952f..27bdf88f541c 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -385,7 +385,10 @@ enum req_op {
+>  	REQ_OP_DRV_IN		= (__force blk_opf_t)34,
+>  	REQ_OP_DRV_OUT		= (__force blk_opf_t)35,
+>  
+> -	REQ_OP_LAST		= (__force blk_opf_t)36,
+> +	/* request device to provision block */
+> +	REQ_OP_PROVISION        = (__force blk_opf_t)37,
+> +
+> +	REQ_OP_LAST		= (__force blk_opf_t)38,
+>  };
+>  
+>  enum req_flag_bits {
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 941304f17492..239e2f418b6e 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -303,6 +303,7 @@ struct queue_limits {
+>  	unsigned int		discard_granularity;
+>  	unsigned int		discard_alignment;
+>  	unsigned int		zone_write_granularity;
+> +	unsigned int		max_provision_sectors;
+>  
+>  	unsigned short		max_segments;
+>  	unsigned short		max_integrity_segments;
+> @@ -921,6 +922,8 @@ extern void blk_queue_max_discard_sectors(struct request_queue *q,
+>  		unsigned int max_discard_sectors);
+>  extern void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
+>  		unsigned int max_write_same_sectors);
+> +extern void blk_queue_max_provision_sectors(struct request_queue *q,
+> +		unsigned int max_provision_sectors);
+>  extern void blk_queue_logical_block_size(struct request_queue *, unsigned int);
+>  extern void blk_queue_max_zone_append_sectors(struct request_queue *q,
+>  		unsigned int max_zone_append_sectors);
+> @@ -1060,6 +1063,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
+>  		sector_t nr_sects, gfp_t gfp);
+>  
+> +extern int blkdev_issue_provision(struct block_device *bdev, sector_t sector,
+> +		sector_t nr_sects, gfp_t gfp_mask);
+> +
+>  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
+>  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
+>  
+> @@ -1139,6 +1145,11 @@ static inline unsigned short queue_max_discard_segments(const struct request_que
+>  	return q->limits.max_discard_segments;
+>  }
+>  
+> +static inline unsigned short queue_max_provision_sectors(const struct request_queue *q)
+> +{
+> +	return q->limits.max_provision_sectors;
+> +}
+> +
+>  static inline unsigned int queue_max_segment_size(const struct request_queue *q)
+>  {
+>  	return q->limits.max_segment_size;
+> @@ -1281,6 +1292,11 @@ static inline bool bdev_nowait(struct block_device *bdev)
+>  	return test_bit(QUEUE_FLAG_NOWAIT, &bdev_get_queue(bdev)->queue_flags);
+>  }
+>  
+> +static inline unsigned int bdev_max_provision_sectors(struct block_device *bdev)
+> +{
+> +	return bdev_get_queue(bdev)->limits.max_provision_sectors;
+> +}
+> +
+>  static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+>  {
+>  	return blk_queue_zoned_model(bdev_get_queue(bdev));
+> -- 
+> 2.40.0.634.g4ca3ef3211-goog
+> 
 
