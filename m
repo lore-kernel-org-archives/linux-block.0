@@ -2,129 +2,267 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50797C77B76
-	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 12:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3505C77B7F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 13:02:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231847AbjDRMlT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 08:41:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57944 "EHLO
+        id S230033AbjDRNCU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 09:02:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231854AbjDRMlT (ORCPT
+        with ESMTP id S232284AbjDRNCS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2023 08:41:19 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0486E146C1
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 05:41:11 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230418123148epoutp02ce8bab3b32afc735257a1edebc72c9c5~XB2MflvMl0870908709epoutp02q
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 12:31:48 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230418123148epoutp02ce8bab3b32afc735257a1edebc72c9c5~XB2MflvMl0870908709epoutp02q
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1681821108;
-        bh=1WRd5iEcmaNEFf0Z9O+4Q40zENmc+eV+2VGKGjrgUBI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=OXZT50kFmh+745VlsiYpm6nFrif11zTT6RxWGVeUJF1I5e6fnEGoXw1yjei3L0meT
-         hJlT5oqLBjLrdq6YLKcK1ZoEDqBTDx9KtrpZ0TSP9Z8R7G+gq87eWqr7l1c+W2drSN
-         SqrrBGtjbf2YcHYcIiRxaOFJ0IHROYokxNkCrn7s=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20230418123147epcas5p2d7ad8d98b29d88095db90a0871892d69~XB2MRX-Wg1589215892epcas5p2g;
-        Tue, 18 Apr 2023 12:31:47 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.180]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4Q13FZ59f8z4x9Px; Tue, 18 Apr
-        2023 12:31:46 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        EA.79.09987.2BD8E346; Tue, 18 Apr 2023 21:31:46 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20230418123146epcas5p38b605ff4561743cae7025a744043c941~XB2K5Tvrq0836608366epcas5p3j;
-        Tue, 18 Apr 2023 12:31:46 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230418123146epsmtrp189f4bcbad33c0dc79a0b047e2ef16d56~XB2K4pDEl2680126801epsmtrp1c;
-        Tue, 18 Apr 2023 12:31:46 +0000 (GMT)
-X-AuditID: b6c32a4b-a67fd70000002703-4e-643e8db28988
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        2B.0B.08279.2BD8E346; Tue, 18 Apr 2023 21:31:46 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230418123145epsmtip281a72049f2eb50bed77fcf10eac688b0~XB2KPQRZM0356303563epsmtip2K;
-        Tue, 18 Apr 2023 12:31:45 +0000 (GMT)
-Date:   Tue, 18 Apr 2023 17:58:51 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     hch@lst.de, linux-block@vger.kernel.org
-Subject: Re: How best to get the size of a blockdev from a file?
-Message-ID: <20230418122833.GA14457@green245>
+        Tue, 18 Apr 2023 09:02:18 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3542126AE;
+        Tue, 18 Apr 2023 06:02:11 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B54D31F8D7;
+        Tue, 18 Apr 2023 13:02:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1681822929; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=YmGp27V7vgaUQ2zzNolY+Ow/6qOXdLQK1cMzzRDMuOk=;
+        b=TaqJz3lZ9k/JoSEsopHdTwbbvy1xzajMsauU/asXld2VdNGbINE1d4vJMk7EexpwQr3WM5
+        EE+Uv6CWnJ3w7KgaA8652FNurshiZximbz0QuB8aVheYUcupwancHXaJP3/Ffb1tqzYgD8
+        yXjDglvaOQM8PL3by9STJV2q1axcWxg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1681822929;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=YmGp27V7vgaUQ2zzNolY+Ow/6qOXdLQK1cMzzRDMuOk=;
+        b=7ldHwj8B7xsHusrsjiTm5Y5kIGlLISsrljbhlm3lZl3QTHFXgwrslVLYfoS+pr1wAoZvfV
+        cP60mqwTym1YS3AA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A3D3E139EC;
+        Tue, 18 Apr 2023 13:02:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id hED5J9GUPmR8JwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 18 Apr 2023 13:02:09 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Martin Belanger <Martin.Belanger@dell.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH v3 0/4] nvmet-fcloop: unblock module removal
+Date:   Tue, 18 Apr 2023 15:01:55 +0200
+Message-Id: <20230418130159.11075-1-dwagner@suse.de>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-In-Reply-To: <1609851.1681812012@warthog.procyon.org.uk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrPKsWRmVeSWpSXmKPExsWy7bCmuu6mXrsUg98P1SzeNf1msVi5+iiT
-        xd5b2g7MHrtvNrB5vN93lc3j8ya5AOaobJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11D
-        SwtzJYW8xNxUWyUXnwBdt8wcoD1KCmWJOaVAoYDE4mIlfTubovzSklSFjPziElul1IKUnAKT
-        Ar3ixNzi0rx0vbzUEitDAwMjU6DChOyM1sZG5oI+toq+608ZGxgXs3YxcnJICJhIrPt8nq2L
-        kYtDSGA3o8SftQuYIZxPjBKzu84wQTjfGCVmXD7JDtPy/v1hZhBbSGAvo8TBpXUQRc8YJS5/
-        f8oEkmARUJW437KEsYuRg4NNQFPiwuRSkLCIgLrEo2UbwXqZBbQlZt7ZxwZiCws4SMw/9wCs
-        lVdAV2LXzw5WCFtQ4uTMJywgNqeAhcTEr3fBekUFlCUObDsOdpyEwDl2iesvNjFDHOcisWjr
-        DxYIW1ji1fEtUEdLSbzsb4OykyUuzTzHBGGXSDzecxDKtpdoPdUPdVyGxOfrG9ggbD6J3t9P
-        mEB+kRDglehoE4IoV5S4N+kpNBjFJR7OWAJle0hcvvqCHRIm3YwSt/5uZZ/AKDcLyT+zkKyA
-        sK0kOj80sc4CWsEsIC2x/B8HhKkpsX6X/gJG1lWMkqkFxbnpqcWmBcZ5qeXwOE7Oz93ECE55
-        Wt47GB89+KB3iJGJg/EQowQHs5II7xlXqxQh3pTEyqrUovz4otKc1OJDjKbA6JnILCWanA9M
-        unkl8YYmlgYmZmZmJpbGZoZK4rzqtieThQTSE0tSs1NTC1KLYPqYODilGpjYAi6+V1id9Gdm
-        iVC7eJJfjuh6KfmD699o/+PaYrBJsnl2QPxWazFXsXfJ007zfHE3uGPxJ23Lv9e2PJv5MlaU
-        aWYolHd+sFiw+PnXT3VTFdILWuqPvAxg/Jp86IH+jHXLDijM+nZx86n/N39O9cnxvZyq16qw
-        tfW65H5+v9B7/7586srkYJxobv1TvG5vTK7L0SX/9/fHV356Un3ARPP906sLGm6pmLkcMA6+
-        ff5z7MlLC6Jf7zPbOYO9+M3y0zWzz0g5n13m9eakyOzidcyxIqo51/Z7XEs1rgpV5Mq6aXNt
-        8SR/K0bPJX8n2k7XOt/A/vp7vXur68x3LEae+qa3F9Rcq4+WEd9+zZxPxGCSEktxRqKhFnNR
-        cSIAmJyyEwIEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHLMWRmVeSWpSXmKPExsWy7bCSvO6mXrsUgxXPhCzeNf1msVi5+iiT
-        xd5b2g7MHrtvNrB5vN93lc3j8ya5AOYoLpuU1JzMstQifbsEroyF53czFhxgrtjS+oG9gfE9
-        UxcjJ4eEgInE+/eHmbsYuTiEBHYzSmy5/54dIiEu0XztB5QtLLHy33N2iKInjBJdvRcZQRIs
-        AqoS91uWANkcHGwCmhIXJpeChEUE1CUeLdvIDGIzC2hLzLyzjw3EFhZwkJh/7gHYYl4BXYld
-        PztYIWZ2M0o0nzjBDpEQlDg58wkLRLOZxLzND5lB5jMLSEss/8cBEuYUsJCY+PUu2HxRAWWJ
-        A9uOM01gFJyFpHsWku5ZCN0LGJlXMUqmFhTnpucWGxYY5qWW6xUn5haX5qXrJefnbmIEB7GW
-        5g7G7as+6B1iZOJgPMQowcGsJMJ7xtUqRYg3JbGyKrUoP76oNCe1+BCjNAeLkjjvha6T8UIC
-        6YklqdmpqQWpRTBZJg5OqQYmVrNXU5oWMzWXplgvmxH/dynHQtsX7K8cC67EONQs3FpYvM9J
-        xS58S9nXfYrtC7gWLOhqXb44J+Zgy77bc8QmXJskfVSEbfF1u6U/3v3irTZokYiuZ9taN2e7
-        tc/PEJYvITt9w0+flmrbwfioMDch7eqt6hPzHW6oVoeLTOGRUy1ebhAz+8QPzrIM590f2w89
-        vODjeLt/SqBSf3/t/+1Bs3p9EhM41FSEtkxOez29c/GV9a9sU1a2Z/yYPW2iVa+19dG0KauK
-        zZQ+VVw78GGV3enF351vhxgzuxrpPDCcdGXBj3+rvXiyfuz/tahY1qzc/ef0iEdu0k3CjyTC
-        VRzf7zQ0ttK51LVSvUiY98YBJZbijERDLeai4kQAiwHoi9ECAAA=
-X-CMS-MailID: 20230418123146epcas5p38b605ff4561743cae7025a744043c941
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_27504_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230418100108epcas5p2d0f2a7a274e78731373986b3d4fced9b
-References: <CGME20230418100108epcas5p2d0f2a7a274e78731373986b3d4fced9b@epcas5p2.samsung.com>
-        <1609851.1681812012@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_27504_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+I got it somewhat working with this version here and the blktest fcloop cleanup
+fix[1].
 
-On Tue, Apr 18, 2023 at 11:00:12AM +0100, David Howells wrote:
->Hi Christoph,
->
->It seems that my use of i_size_read(file_inode(in)) in filemap_splice_read()
->to get the size of the file to be spliced from doesn't work in the case of
->blockdevs and it always returns 0.
->
->What would be the best way to get the blockdev size?  Look at
->file->f_mapping->i_size maybe?
+There is a BIG if though. I have to disable manually the auto connect udev rules
+from the host system. I've played a bit around how to disable them during
+runtime. There is a way to inject a runtime global variable into udev rules via
+'udevadm control -p BLKTESTS=1'. The udev rule file can then be extended with a
+rule like 'ENV{BLKTESTS}="1", GOTO=...' but I was not able to get this working
+reliable. It looks like the update is not getting promotted to all udev daemon
+threads. Even a 'sleep 5' or 'udevadm settle' didn't help.
 
-bdev_nr_bytes(I_BDEV(file->f_mapping->host))
-should work I suppose.
+The only way I found so far is to do
 
-------M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_27504_
-Content-Type: text/plain; charset="utf-8"
+  ln -s /dev/null /etc/udev/rules.d/70-nvmf-autoconnect.rules
 
+which obviously sucks. IIRC, Martin B has the same issue with nvme-stats and
+nvme-cli...
 
-------M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_27504_--
+Anyway, it doesn't creash anymore and there are not warning from lockdep or
+KASAN. The first few tests cases are passing. So the failing ones could actually
+be 'real' bugs, who knows :)
+
+# nvme_trtype=fc ./check nvme
+nvme/002 (create many subsystems and test discovery)         [not run]
+    nvme_trtype=fc is not supported in this test
+nvme/003 (test if we're sending keep-alives to a discovery controller)
+nvme/003 (test if we're sending keep-alives to a discovery controller) [passed]
+    runtime  10.277s  ...  10.479srt: No such file or directory
+nvme/004 (test nvme and nvmet UUID NS descriptors)           [passed]
+    runtime  1.976s  ...  1.723s
+nvme/005 (reset local loopback target)                       [passed]
+    runtime  2.203s  ...  1.829s
+nvme/006 (create an NVMeOF target with a block device-backed ns) [passed]
+    runtime  0.248s  ...  0.221s
+nvme/007 (create an NVMeOF target with a file-backed ns)     [passed]
+    runtime  0.156s  ...  0.127s
+nvme/008 (create an NVMeOF host with a block device-backed ns) [passed]
+    runtime  1.945s  ...  1.658s
+nvme/009 (create an NVMeOF host with a file-backed ns)       [passed]
+    runtime  1.854s  ...  1.711s
+nvme/010 (run data verification fio job on NVMeOF block device-backed ns) [passed]
+    runtime  44.555s  ...  41.625s
+nvme/011 (run data verification fio job on NVMeOF file-backed ns) [passed]
+    runtime  89.795s  ...  71.931s
+nvme/012 (run mkfs and data verification fio job on NVMeOF block device-backed ns) [passed]
+    runtime  61.607s  ...  49.917s
+nvme/013 (run mkfs and data verification fio job on NVMeOF file-backed ns) [passed]
+    runtime  109.725s  ...  79.189s
+nvme/014 (flush a NVMeOF block device-backed ns)             [passed]
+    runtime  7.902s  ...  5.977s
+nvme/015 (unit test for NVMe flush for file backed ns)       [passed]
+    runtime  7.229s  ...  5.734s
+nvme/016 (create/delete many NVMeOF block device-backed ns and test discovery) [not run]
+    runtime  44.446s  ...  
+    nvme_trtype=fc is not supported in this test
+nvme/017 (create/delete many file-ns and test discovery)     [not run]
+    runtime  45.306s  ...  
+    nvme_trtype=fc is not supported in this test
+nvme/018 (unit test NVMe-oF out of range access on a file backend) [passed]
+    runtime  1.834s  ...  1.721s
+nvme/019 (test NVMe DSM Discard command on NVMeOF block-device ns) [passed]
+    runtime  1.832s  ...  1.804s
+nvme/020 (test NVMe DSM Discard command on NVMeOF file-backed ns) [passed]
+    runtime  1.811s  ...  1.717s
+nvme/021 (test NVMe list command on NVMeOF file-backed ns)   [passed]
+    runtime  1.807s  ...  1.703s
+nvme/022 (test NVMe reset command on NVMeOF file-backed ns)  [passed]
+    runtime  1.914s  ...  1.784s
+nvme/023 (test NVMe smart-log command on NVMeOF block-device ns) [passed]
+    runtime  1.852s  ...  1.730s
+nvme/024 (test NVMe smart-log command on NVMeOF file-backed ns) [passed]
+    runtime  1.730s  ...  1.754s
+nvme/025 (test NVMe effects-log command on NVMeOF file-backed ns) [passed]
+    runtime  1.759s  ...  1.719s
+nvme/026 (test NVMe ns-descs command on NVMeOF file-backed ns) [passed]
+    runtime  1.764s  ...  1.675s
+nvme/027 (test NVMe ns-rescan command on NVMeOF file-backed ns) [passed]
+    runtime  1.734s  ...  1.703s
+nvme/028 (test NVMe list-subsys command on NVMeOF file-backed ns) [passed]
+    runtime  1.831s  ...  1.732s
+nvme/029 (test userspace IO via nvme-cli read/write interface) [passed]
+    runtime  2.388s  ...  2.065s
+nvme/030 (ensure the discovery generation counter is updated appropriately) [passed]
+    runtime  0.756s  ...  0.631s
+nvme/031 (test deletion of NVMeOF controllers immediately after setup) [passed]
+    runtime  4.566s  ...  3.441s
+nvme/038 (test deletion of NVMeOF subsystem without enabling) [passed]
+    runtime  0.054s  ...  0.055s
+nvme/040 (test nvme fabrics controller reset/disconnect operation during I/O)
+nvme/040 (test nvme fabrics controller reset/disconnect operation during I/O) [passed]
+    runtime  7.948s  ...  7.866srk/blktests/results/tmpdir.nvme.040.4lT': Directory not empty
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+modprobe: FATAL: Module loop is in use.
+nvme/041 (Create authenticated connections)                 
+    runtime  0.964s  ...
+WARNING: Test did not clean up fc device: nvme0
+nvme/041 (Create authenticated connections)                  [failed]
+    runtime  0.964s  ...  0.311s
+    --- tests/nvme/041.out      2023-02-20 10:31:10.953935278 +0100
+    +++ /home/wagi/work/blktests/results/nodev/nvme/041.out.bad 2023-04-18 14:31:05.122062907 +0200
+    @@ -1,6 +1,8 @@
+     Running nvme/041
+     Test unauthenticated connection (should fail)
+    +failed to lookup subsystem for controller nvme0
+     NQN:blktests-subsystem-1 disconnected 0 controller(s)
+     Test authenticated connection
+    -NQN:blktests-subsystem-1 disconnected 1 controller(s)
+    +failed to lookup subsystem for controller nvme0
+    ...
+    (Run 'diff -u tests/nvme/041.out /home/wagi/work/blktests/results/nodev/nvme/041.out.bad' to see the entire diff)
+WARNING: Test did not clean up fc device: nvme0
+failed to lookup subsystem for controller nvme0
+Did not find device nvme0
+nvme/042 (Test dhchap key types for authenticated connections) [failed]
+    runtime  4.495s  ...  4.226s
+    --- tests/nvme/042.out      2022-08-30 10:20:14.174819528 +0200
+    +++ /home/wagi/work/blktests/results/nodev/nvme/042.out.bad 2023-04-18 14:31:09.654086133 +0200
+    @@ -1,7 +1,9 @@
+     Running nvme/042
+     Testing hmac 0
+    +failed to lookup subsystem for controller nvme0
+     NQN:blktests-subsystem-1 disconnected 1 controller(s)
+     Testing hmac 1
+    +failed to lookup subsystem for controller nvme0
+     NQN:blktests-subsystem-1 disconnected 1 controller(s)
+    ...
+    (Run 'diff -u tests/nvme/042.out /home/wagi/work/blktests/results/nodev/nvme/042.out.bad' to see the entire diff)
+nvme/043 (Test hash and DH group variations for authenticated connections) [passed]
+    runtime  3.592s  ...  8.750s
+nvme/044 (Test bi-directional authentication)               
+    runtime  1.099s  ...
+WARNING: Test did not clean up fc device: nvme0
+nvme/044 (Test bi-directional authentication)                [failed]
+    runtime  1.099s  ...  1.064s
+    --- tests/nvme/044.out      2023-02-20 10:31:10.953935278 +0100
+    +++ /home/wagi/work/blktests/results/nodev/nvme/044.out.bad 2023-04-18 14:31:20.042139370 +0200
+    @@ -2,9 +2,12 @@
+     Test host authentication
+     NQN:blktests-subsystem-1 disconnected 1 controller(s)
+     Test invalid ctrl authentication (should fail)
+    +failed to lookup subsystem for controller nvme0
+     NQN:blktests-subsystem-1 disconnected 0 controller(s)
+     Test valid ctrl authentication
+    -NQN:blktests-subsystem-1 disconnected 1 controller(s)
+    ...
+    (Run 'diff -u tests/nvme/044.out /home/wagi/work/blktests/results/nodev/nvme/044.out.bad' to see the entire diff)
+WARNING: Test did not clean up fc device: nvme0
+failed to lookup subsystem for controller nvme0
+Did not find device nvme0
+nvme/045 (Test re-authentication)                            [passed]
+    runtime  5.582s  ...  6.262s
+nvme/047 (test different queue types for fabric transports)  [not run]
+    nvme_trtype=fc is not supported in this test
+nvme/048 (Test queue count changes on reconnect)             [failed]
+    runtime  15.586s  ...  16.545s
+    --- tests/nvme/048.out      2023-04-06 10:12:58.333064747 +0200
+    +++ /home/wagi/work/blktests/results/nodev/nvme/048.out.bad 2023-04-18 14:31:43.614260172 +0200
+    @@ -1,3 +1,7 @@
+     Running nvme/048
+    +expected state "connecting" not  reached within 5 seconds
+    +FAIL
+    +expected state "connecting" not  reached within 5 seconds
+    +FAIL
+     NQN:blktests-subsystem-1 disconnected 1 controller(s)
+     Test complete
+
+[1] https://lore.kernel.org/linux-nvme/20230418123252.3725-1-dwagner@suse.de/
+
+changes:
+v3:
+  - do not unlink rport twice
+
+v2:
+  - added additional fixes
+  - https://lore.kernel.org/linux-nvme/20230411120718.14477-1-dwagner@suse.de/
+
+v1:
+  - initial version
+  - https://lore.kernel.org/linux-nvme/20230411092209.12719-1-dwagner@suse.de/
+
+Daniel Wagner (4):
+  nvmet-fcloop: Remove remote port from list when unlinking
+  nvmet-fcloop: Do not wait on completion when unregister fails
+  nvmet-fc: Do not wait in vain when unloading module
+  nvmet-fc: Release reference on target port
+
+ drivers/nvme/host/fc.c       | 20 +++++++++++++-------
+ drivers/nvme/target/fc.c     |  1 +
+ drivers/nvme/target/fcloop.c | 10 ++++------
+ 3 files changed, 18 insertions(+), 13 deletions(-)
+
+-- 
+2.40.0
+
