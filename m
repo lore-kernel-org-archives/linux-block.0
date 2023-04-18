@@ -2,304 +2,138 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4CEC77B75
-	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 04:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 603E6C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 04:29:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbjDREZA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 00:25:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39710 "EHLO
+        id S229687AbjDRE3f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 00:29:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjDREY7 (ORCPT
+        with ESMTP id S229518AbjDRE3e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2023 00:24:59 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664B9C9
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 21:24:56 -0700 (PDT)
+        Tue, 18 Apr 2023 00:29:34 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2044.outbound.protection.outlook.com [40.107.220.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C03A8
+        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 21:29:32 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mRyQnjk4Kntre4MuweZLe3IBygI1GfpgGhax3W8IKTehNTHYxrd3EW6qxBBHuzOP2ICu1N7H/x1CI5fBJykx2ymgGPYdRrUUr0kqIbPcl1eSxhGmZhGR1aYt9PkiEOPAHwxVPtezNfhJYyjueZaVDTGIgTyCoTVzppaDK37Bl8ZCxJAXeA+bvd7Fz974soc/eQCTkxijKIV3JBPE5Htg9wm/9vvF/rUcMuMynMe9jXETdY5QXvn1acJl2pM6UT3sSeZlxey9dhYrEAwYGmcvoMHlNzo1KBfQ+Zjhxh8WIa6YjydWZ4Kij+ar/0yxbauXYHWRtQPGi70AEGTUPcukRQ==
+ b=nG6HxJcJlc+ROvvMn+lhM+ujmmOY38qVpbo3fHQoQFJod4Da/FouXRhhEIqaEKP76yde85I03+2ZxyxQ01Vv999tYyimnh27hg7V3SMDKOkBKHIB9lXZIRUYpNmb4f0fruHjUQDbLsXVRaY1S41Ooli6CkCaFvf4CmAlv+wEqLYWi0u0V9xkHeO9ae1W/MVKajfJUI3g2XnCjAJybQPg/i4qoG7X1FR1GPCtKVBD5acgKT4O5qNPsbrW1gA4zpv5YvBuTvf/1du1rLbKEHbkSsq0SoUz+WiEETrLSCktVvUO8oia+4R7g+0jnXUt7iXMUc6FXo3sbUQi5YXk1qll0w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kG/uHlfBa3B55v0Fum/OIpsLE7OShSyeNqf73PqkOV8=;
- b=kxGOqBuj8aFxO8AenGKnF2NllBxvNG32ehF2LVJJBhLYSbmzaFQTWXxoIi0s/p7i/XYvxMWy1MyeXdrcwpd1ZWrOzqdhs/K5gdl4myAZLQupL07yOHzb+7tal3niv5B38H8AHG2eg15htsG4H8dPy/8jUQpJmS7G8zHKx/CoNlKA6UcIVTcAU0kU+IXAx2thRv76q76c0H9/AbY2Y+XEBfR7tFLDieOkgR3P90bFlrCp2u8bBvb+UtTsDVv8O8CrzlXnpI3xjLnpR4Nc6Cr/62HxXQT39Hvn0oQhGXmwq8bd4+zkVn/1zzU5FsLdQ5zQ7jeX8PAwsWuIh4+cY1WrSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
+ bh=JUufWcbKa94OAH6nVaGwincB+wzFepjjgL2SGzXSUsE=;
+ b=gmJ/qh4ng2PYACnPGoIucu63sdcHLvvWIPphfQLsEWdw+0Wa5PGl1s5RAsVboD3NPpQjc0F25vvXlxHZpzxOACVSWX9Afe6796jOMHjZMjmQuUdZVW0XiAW0JDXwlfmIdMLeoRaUgoYiEdEaoiBEMdDF7VYKwQ9Te4CXW7j+B5bA+SPwi59VuwK9KJGIHHptJ8kKxkda3qE0O9fAzxuGqYf7xrb3ohKoDJhzyeCQaRhM8q05QlPfrF4kRLCrI/8ECIKX3VEOZMFQByAGT9gdeq8tVBC8Ova28GU4L0nX5wh9plupNjY6pwa2hFn1wr/4jsxrB0wyGvUaEFLDgCn/DA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kG/uHlfBa3B55v0Fum/OIpsLE7OShSyeNqf73PqkOV8=;
- b=rj1TIH5jaqiMSX+5zIXGMk61GwBMopEtzoj3QtwabmpycViZbV0NLZavsHWaKIg2CptqtwhDtBCugqjVj3bqwD9T/xVjr+fTHT+LkyPAFDReXqE1fLCK1XALL0ol7qCcyRdv4p/kENXV/Ps1EUvbjdKert3MxOOrdJ/FYYhOjXG4Nspvr3nogNdafT+CHayEXu+peExDYPlWOpp5FRCq5tRLbPywgREVZno6UluBNtnWH9wdheG/Zn0pYi6phoPDPrjnZ/PadBzw2OernT5L9VdyneK6gYDvKyYM2rUful1gzxEn4XJhWKWnZH6qg/pvvB0uxA3A7VFud4m6cJth/w==
-Received: from DM6PR02CA0164.namprd02.prod.outlook.com (2603:10b6:5:332::31)
- by DS0PR12MB8504.namprd12.prod.outlook.com (2603:10b6:8:155::11) with
+ bh=JUufWcbKa94OAH6nVaGwincB+wzFepjjgL2SGzXSUsE=;
+ b=GIDHkxiXoalPaNfEW9sPZG70x5WmFbqJ3heaAtgQADn+ZjZN9yjh5HWaVJJK7eCZnV03/JJggMHwGd9q3m+2WjmtEOBZN4GSKWjBhA48xVsDkHf45+hjPOpQ+784kewJeIvxsoKaalkXPtAvldiSJDzb/NfHKshTxqfNqopREi9ZJsODFi5t7yjkjUmITs/MjneuYv2YPG90m1A6WTlnm556h3F1Zp82yP9wDhnXXAMC1WGLXlvaexCNWqs/lFvrZCq4V2Z1z+KCrdQA6OyLvxBkXGgYBhLeYE4AyY49PDaXpLrLSV/dcQ3AX8qcZopcN9UO//6kpGAHqY3CZNFhug==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by BN9PR12MB5081.namprd12.prod.outlook.com (2603:10b6:408:132::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Tue, 18 Apr
- 2023 04:24:54 +0000
-Received: from DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:332:cafe::da) by DM6PR02CA0164.outlook.office365.com
- (2603:10b6:5:332::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.47 via Frontend
- Transport; Tue, 18 Apr 2023 04:24:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DM6NAM11FT025.mail.protection.outlook.com (10.13.172.197) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6319.20 via Frontend Transport; Tue, 18 Apr 2023 04:24:54 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 17 Apr 2023
- 21:24:43 -0700
-Received: from dev.nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 17 Apr
- 2023 21:24:42 -0700
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <dlemoal@kernel.org>, <kch@nvidia.com>,
-        <johannes.thumshirn@wdc.com>, <bvanassche@acm.org>,
-        <vincent.fu@samsung.com>, <shinichiro.kawasaki@wdc.com>,
-        <yukuai3@huawei.com>
-Subject: [PATCH V2 1/1] null_blk: allow user to set QUEUE_FLAG_NOWAIT
-Date:   Mon, 17 Apr 2023 21:24:20 -0700
-Message-ID: <20230418042420.93629-2-kch@nvidia.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230418042420.93629-1-kch@nvidia.com>
+ 2023 04:29:30 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6b01:9498:e881:8fb3]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6b01:9498:e881:8fb3%4]) with mapi id 15.20.6298.045; Tue, 18 Apr 2023
+ 04:29:30 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "dlemoal@kernel.org" <dlemoal@kernel.org>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "vincent.fu@samsung.com" <vincent.fu@samsung.com>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        "yukuai3@huawei.com" <yukuai3@huawei.com>
+Subject: Re: [PATCH V2 0/1] null_blk: allow user to set QUEUE_FLAG_NOWAIT
+Thread-Topic: [PATCH V2 0/1] null_blk: allow user to set QUEUE_FLAG_NOWAIT
+Thread-Index: AQHZca2xYugBeVTozkmbf7tBOkXhuK8weV+A
+Date:   Tue, 18 Apr 2023 04:29:29 +0000
+Message-ID: <f7572514-7ec6-fcd8-c3a4-7bfe5f188e86@nvidia.com>
 References: <20230418042420.93629-1-kch@nvidia.com>
+In-Reply-To: <20230418042420.93629-1-kch@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|BN9PR12MB5081:EE_
+x-ms-office365-filtering-correlation-id: 09e89b96-1fbb-41c7-1f54-08db3fc58086
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 8+L7WYQdWEb9ad4oHS28+vqOyWG6rENSwY30yAyZ0WPE650zIFcn+KqGQ0RFV3WuJOdBtML3pOQFUSruU/7E7p8HUZOLM6fvuhKcoxAUoc49Awlu+UltwVIpB1BMWxRgt27p2N7fePElC/TC1KLUeZ1snhSe8b2/Ow3B/2nzYv38snMBI1x+9AHyOUMHCcLmpTHGaybTYwFREnAz8iukGopcRL3z/AlHxQKA7wWpIIoM0DJIIIBXIf8PyA4/9zFq0/32KtcpdQMXYV2xC7Aeax93FqaZqG4B6qJTF33QBLd+PSGsCaQ7sB4tJE2d4lpKl/po9k6Z34WeJtcut7uXihnkBKys3Gfgf9kqmIw4v7X3N9L0yz5RDB0CnccJ0RZV1bKYxvFkNjDrEQm1JMaoZ8gFTnZ0dkp81YlXdyK5u/CT9cu6mJThez0D3qmvSOfxYQbSCWwXWDxrJdQe8kExF3AfzukzdiVx3NcGkxtCM/nZ00Ktb+G5vtOHCFPpMv/fp/fLzwR4D2VNHOZatf+FppcjPD++dZknkAA0xMS4011YycsJkgCXCCZgrQqNN0TxSfU4TBZ9xviau2WspjLWHTXnbGxCv/c5zCPCJs8FVWTu11YZ0JGDokWF5FspT6KPItbKt67xnwJMD3F0xJ3mc/G73tuSauhYxBSgUSUvHa8QpBWyI1RDAMP6EsxubSh9
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(366004)(376002)(396003)(136003)(451199021)(36756003)(38070700005)(2906002)(4744005)(5660300002)(8936002)(8676002)(41300700001)(122000001)(86362001)(31696002)(38100700002)(31686004)(478600001)(110136005)(2616005)(6506007)(53546011)(6512007)(54906003)(186003)(71200400001)(6486002)(4326008)(91956017)(64756008)(66476007)(66556008)(66946007)(76116006)(66446008)(83380400001)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RHBJamlLU1VvUWlNYkxLcCtPMlBKV3hjY3NseTlidXA0SDVxY2twTVJrdHRy?=
+ =?utf-8?B?N3FpeEJ3ZE5TOWI1MmNJbFJFdWFEL0JZZDJXRXRydG9wUmh5T0VlWVVpMXBE?=
+ =?utf-8?B?NEF5U0Rib2JKM2Rxd2VMOFlGZzhmTkp6WmVud3J2UTZrY0ZwRHNxL3J2NU8w?=
+ =?utf-8?B?TjBJYVEvZ2QyZERHcGRHQUpoajZKZkFGamx3ZllGM1dkMXQ4K2pSQ0RjYVhv?=
+ =?utf-8?B?cXdZYzlSMWVHRkVZQnp2Unc3UjJza0cxZ2ZRdEQ0ODVCWnhaN2t2c1NBc2Rs?=
+ =?utf-8?B?MkhWWVNobG1lS3pEbGlNaHV3Y0gzNlpOMEFKTmQwakZJaTRFVUR4TEZJNzVD?=
+ =?utf-8?B?MHRwaHlpb09iQVBURi9zVys4VWNnSnpwdU1JZ1ZEQ0REODRaM2trK2p5SDRE?=
+ =?utf-8?B?Z3c5MHdFYVNEV0pDd1VIc3lKMlRObDdkbjJlL1dIY3Y2N2xyQUpteXBDUFht?=
+ =?utf-8?B?VkdkdWh6TTB3dnJFbEhMbERnVmwrVTBlWTRlRVNzQk83Y2pjaG9GcnBnQzN0?=
+ =?utf-8?B?WXlaMXZWLy90UncyQTcvNU12V2gyTTZmc0xkS2VBaHFhWTltTHIvWnJkcTJV?=
+ =?utf-8?B?VDVWVEV2eWVSbGt3dk5YN2pjbXNuQWxxNVlWODh2QndUSmh4dG1WeG1WY1VE?=
+ =?utf-8?B?WEc4UlBieHVZVk0ra09jcjBQSVdMMHVOeFdpMmF6c1BoZ3JvSHoxK2FmSnJ6?=
+ =?utf-8?B?ajlVTUljYTI2RDRNTi93Ty81ZmJSRlRQUWhVanhHUkdCLzBZL1BMVmNmOWIy?=
+ =?utf-8?B?ZUM2M2tiemZQR1Fsci9neFk0Lzg0QkRmWHJ6U1dGL1YxbVZNZWVwdnhVaE12?=
+ =?utf-8?B?S0tCSm1DZHBMeXJwcE45RUZ5Z0hWNVdYSW41WldiY0pCZHhFT3VXWnl0Szdv?=
+ =?utf-8?B?MkV0OFdlLzdBem1PSUNQNGZFM0FGTUxtWUJOL0k0N29iM2d3dDBxR1UzQUlD?=
+ =?utf-8?B?dGk2bHJhNEVwYk81SitRRlZMcGtmdXBPTVRmUm1pNjdyQVpmUjJqa0xaTGJy?=
+ =?utf-8?B?cVl2TWh3V3k5d2dHTmJzQWE2TURORGpJTmdHTG5PRjlpVXJRa3hxZDNsa21U?=
+ =?utf-8?B?WVZ6WkpIV0E2a21DRDNKSDhBSlNCS2MrRDFVZ0dDMHoySlJGV3VFVUNQZTZu?=
+ =?utf-8?B?d29BcEJSa3lhWmJqa04vWnA1dSsvYXo4Z29TZGhzZDdYUWVZUHl1WWhxSEYr?=
+ =?utf-8?B?WEd3TXZVVWxpTHk1ZVdUcTNSZFVTeGN5YmlMWFVOekEyWVlSbUhPQnVXVzFv?=
+ =?utf-8?B?TjFZbTNLUWNlTjlQQ2QwWWxIK0dIdXdFUG55eTVKcFZxejBWcm1oY3M2bWF0?=
+ =?utf-8?B?emRScktPa2IxVEQrcDNNRVRZQ3E5eEpBN3doek1IL2IxOUpaVUlLemJWbXow?=
+ =?utf-8?B?TktVS3c0TlBKWExOY2owTlZEZ2RsdXVDZmhJV2xjNFl2cG9PMm1WSEJyY0xm?=
+ =?utf-8?B?RUFGNW1ZY3MwZHUvdmFTWE9YTWc0dUdlNi9ocWZuYUgxck1XK2dzVEtlajdP?=
+ =?utf-8?B?Z3pPYWtHWlR5OHhPYmlIMmZqVWt0aDU2alI0Zm81M3lpNk5pVDl4dWNLZHpC?=
+ =?utf-8?B?K3RRWGVPQTlHUVVSNGdkL1JFdVJ1WDU4OU9DTWZDVmNzb2hsTkpUdENVdUU2?=
+ =?utf-8?B?dEN6emVjUy9iVGZGUW9TVHNhNFZUcTBrU3luV1JuTlpSeFZxNnprUnZpalAv?=
+ =?utf-8?B?RmsrcGdhVXVMTXA0TU1vNjZ0WWVYaUtqeGdDSDJ2K1B6a25zYnJMTXBNQnpJ?=
+ =?utf-8?B?K0JGZ0JVdEQrYmFhZzdEa3hVWjZqOVphSlcxV0tnVVBRZUFhdGxibkVTcjBT?=
+ =?utf-8?B?MXd3OEN0MGt5MHI4aW9Vc25wMG1CZ1Rxc0tNMTJPUXpqWEFiZmxxRzc3YXZF?=
+ =?utf-8?B?M2dQK0ZYR3cycUJBTTFWNjh3OEFCTE9jZU9ReUFZWnJma01vK1BhMkZQWmd2?=
+ =?utf-8?B?VU1RVFVHUnJ4S3JZQXQvaTJCeXcvWUtLUlRZWE1nSlpFeFZOdmhsUjZLMFJZ?=
+ =?utf-8?B?WEt0djByRm5PdW1pVGM0TmZYdkU3ei9FSW9ZNmxlK3lVN1JKU0x2eW5qNk5E?=
+ =?utf-8?B?M2hZRWdVQmZ1em1VS2JHOCtXeXJKdEJTNGpHZWsrckhlREtYUDV1aC9ERDdO?=
+ =?utf-8?B?VC93ZWlNelFSeGdrcDhoWXlNcVpqMHpRUms4dFgvZkZsamRhUzNBaHY0WCtn?=
+ =?utf-8?Q?rpd9BWVeFfwPXpImbaIGDReUvu5HU0DqsC4WofDSK87P?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FE25359B7D5D834F8E4C00A9CB8A5C7D@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.37]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT025:EE_|DS0PR12MB8504:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ded8ab7-3191-4604-db5a-08db3fc4dc51
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3VKMVjyG5+RN6f55Yp42V7wFhQBRPTG+4YnO7EC/4j6BF34TgFc8R6YTujO3AO6HG36Sx+VV4CXvmgaoPBJ2rIomGhfFuUBk8liM9OV3ev/l6BzmJ6h+M0HF0kTBTfAZQW8Q4u1muaUl8Xl2yao9YZWyI6+qWEDsHobov7tX9acx1o1PXKzLQRGZupAffM0SaqMiTnbqMhYD4qYj9q9FEIcToVka84+eZqTxXfAY8BKxaYhvqnwdYxKVxNMBCp40n1qFBQ8TYQjZyr9JkFiJ8kY/dhmgB3wchsCqeIQB/tsAUjwz+eTINXqRUMjE5abyw3Slu+QE3wLLG+SEk4Ai/UpPFKu3s8tWlDfPl3UcdHiMAqLvK7ClzXSxbfnSQtrrTwocOsxV42aUKA/ygGsO6nyiRgDsNdS8sH6w2QbpeRsu/j46Jl14FQsxItksAxBuNWQu+sOJX5qO0NT/a/YxK//AjCMObz0Cdd7DXkuzLyEUVaS7Uey8gisOu2vm96rPnmKLrcl5vwh3vv2IyT8ZPtEiBECmsHYJwFvicYMUOQPIB7nd07LZbYy5hYmlrCxYTZiOtHnatQ97AH3Hw/0w0wFsivZh6lAwOLuCnT7NT4JhgEwpXdbwwoYqDO5yUT2nsNlS+kCugXgWeG9X8/JE2ynAwbznnMy37H6ZGibjRiRb7sxaEljlzCYXDGKeFsj3zDPUjOiY1W3XLsbkUex40r2B8Id1mJvYGiavr4xUdzZRGVSy2CdglXMtZSZcoLeCYSsSWqUOAVA7py/bLoUv7olOcz3D+gbI1XAq6vL8oHU=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(136003)(376002)(346002)(451199021)(46966006)(36840700001)(40470700004)(478600001)(6666004)(34020700004)(8936002)(8676002)(316002)(41300700001)(82740400003)(6916009)(4326008)(70586007)(70206006)(40480700001)(54906003)(7636003)(356005)(40460700003)(16526019)(186003)(2906002)(1076003)(336012)(426003)(26005)(83380400001)(36756003)(47076005)(82310400005)(2616005)(36860700001)(5660300002)(7696005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2023 04:24:54.4142
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09e89b96-1fbb-41c7-1f54-08db3fc58086
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2023 04:29:29.9989
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ded8ab7-3191-4604-db5a-08db3fc4dc51
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT025.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8504
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TfoqgknRn/1alo0P0IzZ+lGpaUZFtLN2ul47VQ9u1tJaL7Rj9FxtGOCbqhSMwnJm6aGtkzMkZePAIgW7O8KPrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5081
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-One of the default flags used to define QUEUE_FLAG_MQ_DEFAULT is
-QUEUE_FLAG_NOWAIT. For null_blk QUEUE_FLAG_NOWAIT is set by default when
-it is used with NULL_Q_MQ mode as a part of following call chain see
-blk_mq_init_allocated_queue() :-
-
-null_add_dev()
-if (dev->queue_mode == NULL_Q_MQ) {
-        blk_mq_alloc_disk()
-          __blk_mq_alloc_disk()
-	    blk_mq_init_queue_data()
-              blk_mq_init_allocated_queue()
-                q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
-}
-
-But it is not set when null_blk is loaded with NULL_Q_BIO mode in following
-code path like other bio drivers do e.g. nvme-multipath :-
-
-if (dev->queue_mode == NULL_Q_BIO) {
-        nullb->disk = blk_alloc_disk(nullb->dev->home_node);
-        	blk_alloc_disk()
-        	  blk_alloc_queue()
-        	  __alloc_disk_nodw()
-}
-
-Add a new module parameter nowait and respective configfs attr that will
-set or clear the QUEUE_FLAG_NOWAIT based on a value set by user in
-null_add_dev() when queue_mode is set to NULL_Q_BIO, by default keep it
-disabled to retain the original behaviour for the NULL_Q_BIO mode.
-
-Only when queue_mode is NULL_Q_BIO, depending on nowait value use
-GFP_NOWAIT or GFP_NOIO for the alloction in the null_alloc_page() for
-alloc_pages() and in null_insert_page() for radix_tree_preload().
-
-Observed performance difference with this patch for fio iouring with
-configfs and non configfs null_blk when queue_mode=NULL_Q_BIO:-
-
-* Configfs non-membacked mode:-
-
-QUEUE_FLAG_NOWAIT disabled :-
----------------------------------------------
-configfs-qmode-0-nowait-0-fio-1.log:  read: IOPS=1299k, BW=5076MiB/s
-configfs-qmode-0-nowait-0-fio-2.log:  read: IOPS=1250k, BW=4884MiB/s
-configfs-qmode-0-nowait-0-fio-3.log:  read: IOPS=1251k, BW=4888MiB/s
-
-
-QUEUE_FLAG_NOWAIT enabled :-
----------------------------------------------
-configfs-qmode-0-nowait-1-fio-1.log:  read: IOPS=5469k, BW=20.9GiB/s
-configfs-qmode-0-nowait-1-fio-2.log:  read: IOPS=5525k, BW=21.1GiB/s
-configfs-qmode-0-nowait-1-fio-3.log:  read: IOPS=5561k, BW=21.2GiB/s
-
-* Non Configfs non-membacked mode:-
-
-QUEUE_FLAG_NOWAIT disabled :-
----------------------------------------------
-qmode-0-nowait-0-fio-1.log:  read: IOPS=1261k, BW=4924MiB/s
-qmode-0-nowait-0-fio-2.log:  read: IOPS=1295k, BW=5060MiB/s
-qmode-0-nowait-0-fio-3.log:  read: IOPS=1280k, BW=4999MiB/s
-
-QUEUE_FLAG_NOWAIT enabled :-
----------------------------------------------
-qmode-0-nowait-1-fio-1.log:  read: IOPS=5521k, BW=21.1GiB/s
-qmode-0-nowait-1-fio-2.log:  read: IOPS=5524k, BW=21.1GiB/s
-qmode-0-nowait-1-fio-3.log:  read: IOPS=5541k, BW=21.1GiB/s
-
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- drivers/block/null_blk/main.c     | 33 ++++++++++++++++++++++++++-----
- drivers/block/null_blk/null_blk.h |  1 +
- 2 files changed, 29 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index b195b8b9fe32..afffe48f5cb1 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -77,6 +77,10 @@ enum {
- 	NULL_IRQ_TIMER		= 2,
- };
- 
-+static bool g_nowait = false;
-+module_param_named(nowait, g_nowait, bool, 0444);
-+MODULE_PARM_DESC(virt_boundary, "Set QUEUE_FLAG_NOWAIT for qmode=BIO. Default: False");
-+
- static bool g_virt_boundary = false;
- module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
- MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
-@@ -413,6 +417,7 @@ NULLB_DEVICE_ATTR(irqmode, uint, NULL);
- NULLB_DEVICE_ATTR(hw_queue_depth, uint, NULL);
- NULLB_DEVICE_ATTR(index, uint, NULL);
- NULLB_DEVICE_ATTR(blocking, bool, NULL);
-+NULLB_DEVICE_ATTR(nowait, bool, NULL);
- NULLB_DEVICE_ATTR(use_per_node_hctx, bool, NULL);
- NULLB_DEVICE_ATTR(memory_backed, bool, NULL);
- NULLB_DEVICE_ATTR(discard, bool, NULL);
-@@ -554,6 +559,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_hw_queue_depth,
- 	&nullb_device_attr_index,
- 	&nullb_device_attr_blocking,
-+	&nullb_device_attr_nowait,
- 	&nullb_device_attr_use_per_node_hctx,
- 	&nullb_device_attr_power,
- 	&nullb_device_attr_memory_backed,
-@@ -650,7 +656,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
- 	return snprintf(page, PAGE_SIZE,
--			"badblocks,blocking,blocksize,cache_size,"
-+			"badblocks,blocking,nowait,blocksize,cache_size,"
- 			"completion_nsec,discard,home_node,hw_queue_depth,"
- 			"irqmode,max_sectors,mbps,memory_backed,no_sched,"
- 			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
-@@ -725,6 +731,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->irqmode = g_irqmode;
- 	dev->hw_queue_depth = g_hw_queue_depth;
- 	dev->blocking = g_blocking;
-+	dev->nowait = g_nowait;
- 	dev->memory_backed = g_memory_backed;
- 	dev->discard = g_discard;
- 	dev->cache_size = g_cache_size;
-@@ -859,7 +866,7 @@ static void null_complete_rq(struct request *rq)
- 	end_cmd(blk_mq_rq_to_pdu(rq));
- }
- 
--static struct nullb_page *null_alloc_page(void)
-+static struct nullb_page *null_alloc_page(gfp_t gfp)
- {
- 	struct nullb_page *t_page;
- 
-@@ -867,7 +874,7 @@ static struct nullb_page *null_alloc_page(void)
- 	if (!t_page)
- 		return NULL;
- 
--	t_page->page = alloc_pages(GFP_NOIO, 0);
-+	t_page->page = alloc_pages(gfp, 0);
- 	if (!t_page->page) {
- 		kfree(t_page);
- 		return NULL;
-@@ -1005,6 +1012,12 @@ static struct nullb_page *null_insert_page(struct nullb *nullb,
- {
- 	u64 idx;
- 	struct nullb_page *t_page;
-+	gfp_t gfp;
-+
-+	if (nullb->dev->nowait && nullb->dev->queue_mode == NULL_Q_BIO)
-+		gfp = GFP_NOWAIT;
-+	else
-+		gfp = GFP_NOIO;
- 
- 	t_page = null_lookup_page(nullb, sector, true, ignore_cache);
- 	if (t_page)
-@@ -1012,11 +1025,11 @@ static struct nullb_page *null_insert_page(struct nullb *nullb,
- 
- 	spin_unlock_irq(&nullb->lock);
- 
--	t_page = null_alloc_page();
-+	t_page = null_alloc_page(gfp);
- 	if (!t_page)
- 		goto out_lock;
- 
--	if (radix_tree_preload(GFP_NOIO))
-+	if (radix_tree_preload(gfp))
- 		goto out_freepage;
- 
- 	spin_lock_irq(&nullb->lock);
-@@ -2005,6 +2018,11 @@ static int null_validate_conf(struct nullb_device *dev)
- 		return -EINVAL;
- 	}
- 
-+	if (dev->nowait && dev->queue_mode != NULL_Q_BIO) {
-+		pr_err("nowait is only allowed with queue_mode=BIO\n");
-+		return -EINVAL;
-+	}
-+
- 	dev->blocksize = round_down(dev->blocksize, 512);
- 	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
- 
-@@ -2146,6 +2164,11 @@ static int null_add_dev(struct nullb_device *dev)
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, nullb->q);
- 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, nullb->q);
- 
-+	if (dev->nowait)
-+		blk_queue_flag_set(QUEUE_FLAG_NOWAIT, nullb->q);
-+	else
-+		blk_queue_flag_clear(QUEUE_FLAG_NOWAIT, nullb->q);
-+
- 	mutex_lock(&lock);
- 	rv = ida_simple_get(&nullb_indexes, 0, 0, GFP_KERNEL);
- 	if (rv < 0) {
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index 929f659dd255..c52aa018657b 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -112,6 +112,7 @@ struct nullb_device {
- 	unsigned int index; /* index of the disk, only valid with a disk */
- 	unsigned int mbps; /* Bandwidth throttle cap (in MB/s) */
- 	bool blocking; /* blocking blk-mq device */
-+	bool nowait; /* to set QUEUE_FLAG_NOWAIT on device queue */
- 	bool use_per_node_hctx; /* use per-node allocation for hardware context */
- 	bool power; /* power on/off the device */
- 	bool memory_backed; /* if data is stored in memory */
--- 
-2.40.0
-
+T24gNC8xNy8yMyAyMToyNCwgQ2hhaXRhbnlhIEt1bGthcm5pIHdyb3RlOg0KPiBRVUVVRV9GTEFH
+X05PV0FJVCBpcyBzZXQgYnkgZGVmYXVsdCB0byBtcSBkcml2ZXJzIHN1Y2ggbnVsbF9ibGsgd2hl
+bg0KPiBpdCBpcyB1c2VkIHdpdGggTlVMTF9RX01RIG1vZGUgYXMgYSBwYXJ0IG9mIFFVRVVFX0ZM
+QUdfTVFfREVGQVVMVCB0aGF0DQo+IGdldHMgYXNzaWduZWQgaW4gZm9sbG93aW5nIGNvZGUgcGF0
+aCBzZWUgYmxrX21xX2luaXRfYWxsb2NhdGVkX3F1ZXVlKCk6LQ0KPg0KPg0KDQpQbGVhc2UgaWdu
+b3JlIHRoaXMsIEkgZm9yZ2V0IHRvIGNoZWNrIGZvciBCTEtfTVFfRl9CTE9DS0lORyBpZiBpdCBp
+cw0KY29tcGF0aWJsZSBvciBub3Qgd2l0aCBHRlBfTk9XQUlULg0KDQpJJ2xsIHNlbmQgVjMgc29v
+biB3aXRoIGNoZWNrIGFkZGVkLCBzb3JyeSBmb3IgdGhlIG5vaXNlLg0KDQotY2sNCg0KDQo=
