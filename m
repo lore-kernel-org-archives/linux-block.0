@@ -2,47 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A63C77B75
-	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 15:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FA6C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 16:17:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbjDRPlC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 11:41:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56874 "EHLO
+        id S232300AbjDRQRx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 12:17:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231488AbjDRPlB (ORCPT
+        with ESMTP id S231995AbjDRQRt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2023 11:41:01 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D880B9EC7
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 08:40:58 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id C96176732D; Tue, 18 Apr 2023 17:34:56 +0200 (CEST)
-Date:   Tue, 18 Apr 2023 17:34:56 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     David Howells <dhowells@redhat.com>
-Cc:     hch@lst.de, linux-block@vger.kernel.org
-Subject: Re: How best to get the size of a blockdev from a file?
-Message-ID: <20230418153456.GA10282@lst.de>
-References: <1609851.1681812012@warthog.procyon.org.uk>
+        Tue, 18 Apr 2023 12:17:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D83B3C38;
+        Tue, 18 Apr 2023 09:17:43 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 50E3821A73;
+        Tue, 18 Apr 2023 16:17:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1681834662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=b2qUHxbFNWuVEA2GFkOYquFZaX+TXj0U5db+f7oebUc=;
+        b=YprVtvHJtRcqjlb3CsUw2yq2ICBKIMjhBhRuz0tFbup2qCvM5Ywz1qUmcgSSLHy4ffJKti
+        QPVjiXbxBgVO02PXo3Rc0Yke5FyuchVzvW9vF14UdYg4Vem2xful+Ro260ioOiYODQuGLE
+        FjSaZcciQgN60rDLszBPTMWiEMyQwLk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1681834662;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=b2qUHxbFNWuVEA2GFkOYquFZaX+TXj0U5db+f7oebUc=;
+        b=H/2rgK6FudddyhQ9P22occLyWHJ43icsOXCK30w75uiWE++dPUKrrlBZDKldFoK37CqXz3
+        cZ4ZlCGz/2W6w8CQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 410D613581;
+        Tue, 18 Apr 2023 16:17:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id owDcD6bCPmSMHwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 18 Apr 2023 16:17:42 +0000
+Date:   Tue, 18 Apr 2023 18:17:41 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+Subject: Re: [PATCH blktests] nvme-rc: Cleanup fcloop resources in reverse
+ order
+Message-ID: <wdecxjd73uaser6l2274rvgz6q4xr7ytcljor3zyggbebjf3w6@kt4mfriults3>
+References: <20230418123252.3725-1-dwagner@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1609851.1681812012@warthog.procyon.org.uk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20230418123252.3725-1-dwagner@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 18, 2023 at 11:00:12AM +0100, David Howells wrote:
-> Hi Christoph,
-> 
-> It seems that my use of i_size_read(file_inode(in)) in filemap_splice_read()
-> to get the size of the file to be spliced from doesn't work in the case of
-> blockdevs and it always returns 0.
->
-> What would be the best way to get the blockdev size?  Look at
-> file->f_mapping->i_size maybe?
+On Tue, Apr 18, 2023 at 02:32:52PM +0200, Daniel Wagner wrote:
+> We need to free the resources in the opposite order as we allocate them.
+> The deleting the rport first will also free the other resources. When
+> we try to release lport and tport they are already gone.
 
-Yes.  Everything using an inode in generic read/write helpers always
-needs to use file->f_mapping->host to get at the inode.  Not just for
-the size.
+I found some more ordering issues with fcloop resources.
