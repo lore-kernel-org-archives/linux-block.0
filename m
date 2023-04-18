@@ -2,184 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF30FC77B76
-	for <linux-block@archiver.kernel.org>; Mon, 17 Apr 2023 21:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D471C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 02:18:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230430AbjDQVb1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Apr 2023 17:31:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36234 "EHLO
+        id S231144AbjDRCSD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Apr 2023 22:18:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230288AbjDQVb0 (ORCPT
+        with ESMTP id S230445AbjDRCSC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Apr 2023 17:31:26 -0400
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A818F49ED
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 14:31:23 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-54fc337a650so182181697b3.4
-        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 14:31:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1681767083; x=1684359083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BCzVu2UsKp7hdLDjLx5y43eqwBluLCZhJw8zkmfWK7s=;
-        b=L4lIgMDUo+CoVwZROqgkHM1P5l8PMDt1tMF+3n6mYb/oTyl6jZZARiOyi4mY749zTf
-         kd6MKQWITu/+gFbXbDd8PRN889Ab1UneKVGjM8dJfGHZk1x69itMrG6mVAMXx6c94Kgj
-         wsnxittzLcJmNlQ2TmgAffk7LZPA0GjY7q3YVrjMNaQxDody759vfh8QxNsbIEZIbNpi
-         YEiGC7lB/ogD9pMXaYUg7qcmHjeO7XkF2svcHQ6pd/dMN/CipBYMhe50S/ctKhKU/5Xb
-         VduqXgJXIwtVunLI04d/oZ9995Fp6s9L0vc6khDXs8odobPBxwM6nmpDBHJfyzOBpVBf
-         lSXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681767083; x=1684359083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BCzVu2UsKp7hdLDjLx5y43eqwBluLCZhJw8zkmfWK7s=;
-        b=SBVoF8jJ98XO5GPfqzrpmft63ADhJuidtVFxU+pM9zrSdyzh+LqwpLNPJOEP0D9KSD
-         K/JuJj+2VCgcD/GMtW3trXLPn8ng7aNxjW624xwT1rJ0xpdICAP/dChRixIs+ysahtYs
-         atuQ485WnxV6956ls6+SHB3VPre16AY05i8Vxa3MUTOgiV7KQ7ru3OLDeylFQhJyj4FU
-         aD+IHN4pul/JtrjhZ+RQFPn51jqXdJv13FeLpZqmDaZ3DBQP8n71WNQW64qS+ePH5qQq
-         ISqgdMddwZdR6MvvGQM6+MPUHbk020dWHKUsxgfRM/xRyOQxaCw91sCephpURvh65fIY
-         KodQ==
-X-Gm-Message-State: AAQBX9dXtvU94y8drk7YI0s7zhykMfcX3mKv1LXr5Z1BUF+wEYyronHI
-        EJ4QX67Xrou36hUHxVtfB1EkueI3Snhkl+chChxx
-X-Google-Smtp-Source: AKy350bgu9ZFLZmYkOlWaVpVvG9J/JdkBbU14XNGAtkoY2ENWGlUCNYD5NN6A3BCb0Ne4rd9gsfKQgsCVLB08+3wRKo=
-X-Received: by 2002:a81:c649:0:b0:54f:2b65:a865 with SMTP id
- q9-20020a81c649000000b0054f2b65a865mr10208390ywj.8.1681767082657; Mon, 17 Apr
- 2023 14:31:22 -0700 (PDT)
+        Mon, 17 Apr 2023 22:18:02 -0400
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4CED3C10
+        for <linux-block@vger.kernel.org>; Mon, 17 Apr 2023 19:17:55 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 8AFD25828AA;
+        Mon, 17 Apr 2023 22:17:52 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Mon, 17 Apr 2023 22:17:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1681784272; x=1681784872; bh=F3
+        gwOs5yZ09ScguDMjDgLq/mG1QfFQkfqrF7Mazy/tQ=; b=ev8PFUk1g/X+m6yY7b
+        yF1/gOiLxzYOI7zajEx5zsek1CaxBvaHJx4pRjcY5s6quCMfk3u9Q4uugRRlVeNI
+        m7917LE2AUFKA8ctb89vpKD82lEBILJksKuUzfp7OY28DQfPlLGzYItd/KHgHXhL
+        ho12jny+sxo7nxhXda2g/6QciNNIxreiMKSsS7HoQmPkQrRQgUr9sIq/Ym38kAEk
+        hm0QdcvRy9EQFS/MbAsIqjowi+pk3db7Sv1A5H2CNPx9mfdmrP0agffTUIV9Od4B
+        eklv3KT3UsXOUNY+iYmQq8kEEirpnOnkRpbX28wXoHxzH0hSUG0t+do5vd+UpJYS
+        i6+Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=ie1e949a3.fm3; t=1681784272; x=1681784872; bh=F3g
+        wOs5yZ09ScguDMjDgLq/mG1QfFQkfqrF7Mazy/tQ=; b=Z1ZtL9rSnbkP4cfLdTe
+        J+yKVOJo7R39npGanpuXIMFUG0kdiXxkta0jTqcNMYqwK0CpKIdMglCIL5BvToQj
+        SX4cUCHnfeIZS8IePo9Nv2lt9UhFbZuiLidczPTwDOEvcJdN6S+Vdg18Vmu04vMQ
+        fquXBIyGxXPpvfhh13b4DQ/nW5DLGrcoZYNmf1g2j9ikAWiHk1d+3Nu24o2Yg2hZ
+        faR90NSkF+fIcToMQSGJZMmjd9HqiU2ZPixYztQfe0mlpkZpncQDW6VUXP+3H32u
+        4uCGC4EILSfKueg7Oo8E11bdbs9ykrql1gQmAngsPeLAD7AfQzcbU63Qjnp3Eh/Y
+        DFg==
+X-ME-Sender: <xms:0P09ZJUgQ-dSQgzP0mwltSh8WD2k0rWTH7XwOZ1fVGiLyCwQ5-HV6g>
+    <xme:0P09ZJnZLE4N2oegFeVlS4_yeImlNzZD8bxAPuza8Gn63eSAcIYA-cZtXciYfVaKA
+    xb90fXVD2ATMQVZTC8>
+X-ME-Received: <xmr:0P09ZFZ0BNMmVSEfqMMzBAhX63rnqX0HfhAbVaiI4DApezqSTuaYcDiThCZunHjHF-fXSo4YzPNPjMtXysnkpA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdeljedgheekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttd
+    fstddttddvnecuhfhrohhmpefuhhhinhdkihgthhhirhhoucfmrgifrghsrghkihcuoehs
+    hhhinhhitghhihhrohesfhgrshhtmhgrihhlrdgtohhmqeenucggtffrrghtthgvrhhnpe
+    dvgedtgfdvhffgkedvkedtgfefleejleeggfekudejieetheeghfegtefhgfehheenucev
+    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehshhhinhhitg
+    hhihhrohesfhgrshhtmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:0P09ZMU4lvHxLck3DorXKCQarj5tvNnBP8E0AtB41IDikC-CTUfxPw>
+    <xmx:0P09ZDnu1juapsyUXQyzJtbySB8J361xXetIRvM2Jz5KcWllDveWrw>
+    <xmx:0P09ZJdA_R9NbeRJbLEPiMwKB8loFgWbpofH0J3sPA5rwPsT31iitQ>
+    <xmx:0P09ZIwpssZXYOmQEr6wM83c5VHL2i0HSFkSs0gVf_BYb9eltbRkI0F1SVQ>
+Feedback-ID: ie1e949a3:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 17 Apr 2023 22:17:50 -0400 (EDT)
+Date:   Tue, 18 Apr 2023 11:17:46 +0900
+From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+To:     alan.adamson@oracle.com
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH blktests] nvme/039: avoid failure by error message rate
+ limit
+Message-ID: <26coaxpjtu5vkzxp6tp6wysbzydvg7mjptudbwnxl3xthzxdh7@kl32wqat4z6k>
+References: <20230412085923.1616977-1-shinichiro@fastmail.com>
+ <34019736-06eb-b5dd-b6a1-101907c38917@oracle.com>
+ <saejpr554r5sxjhqjps3yqgdwhrgufauki2f5npp2yzu6xtvum@q7oz2nwzic3r>
+ <lhy27pg5my4fw7a7lyt5ag6zms4vnnaoab2laylatjqwkckdzv@55ebsbgtgpbs>
+ <3216ff1f-ecde-967b-75b1-7da643570ed9@oracle.com>
 MIME-Version: 1.0
-References: <1675119451-23180-1-git-send-email-wufan@linux.microsoft.com>
- <1675119451-23180-6-git-send-email-wufan@linux.microsoft.com>
- <CAHC9VhRa+NwKzLfQBmHfMgUp6_d5soQG7JBq-Vn=MUeUAt4tuQ@mail.gmail.com>
- <20230410191035.GB18827@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CAHC9VhQDvWDshaZvJrHmjcwyHFxv9oYTN9bn0xiTtFZQRp+GPg@mail.gmail.com>
- <20230412233606.GA16658@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CAHC9VhTs3Njfg=1baQ6=58rPLBmyB3cW0R-MfAaEcRF-jAaYBw@mail.gmail.com>
- <20230417180605.GA402@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CAHC9VhSnKbhtgFxOAY7NYZyOkV4kEA0=mVsCyogLBSCJs0r_ig@mail.gmail.com> <20230417211826.GA6475@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To: <20230417211826.GA6475@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-From:   Paul Moore <paul@paul-moore.com>
-Date:   Mon, 17 Apr 2023 17:31:11 -0400
-Message-ID: <CAHC9VhT9uTYrtEsXUvj5qaTpNL2ix762dE5AzUaSqzas8-frXA@mail.gmail.com>
-Subject: Re: [RFC PATCH v9 05/16] ipe: add userspace interface
-To:     Fan Wu <wufan@linux.microsoft.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org,
-        Deven Bowers <deven.desai@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3216ff1f-ecde-967b-75b1-7da643570ed9@oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 17, 2023 at 5:18=E2=80=AFPM Fan Wu <wufan@linux.microsoft.com> =
-wrote:
-> On Mon, Apr 17, 2023 at 04:16:29PM -0400, Paul Moore wrote:
-> > On Mon, Apr 17, 2023 at 2:06???PM Fan Wu <wufan@linux.microsoft.com> wr=
-ote:
-> > > On Thu, Apr 13, 2023 at 02:45:07PM -0400, Paul Moore wrote:
-> > > > On Wed, Apr 12, 2023 at 7:36???PM Fan Wu <wufan@linux.microsoft.com=
-> wrote:
-> > > > > On Tue, Apr 11, 2023 at 05:45:41PM -0400, Paul Moore wrote:
-> > > > > > On Mon, Apr 10, 2023 at 3:10???PM Fan Wu <wufan@linux.microsoft=
-.com> wrote:
-> > > > > > > On Thu, Mar 02, 2023 at 02:04:42PM -0500, Paul Moore wrote:
-> > > > > > > > On Mon, Jan 30, 2023 at 5:58???PM Fan Wu <wufan@linux.micro=
-soft.com> wrote:
-> > > >
-> > > > ...
-> > > >
-> > > > > > I guess this does make me wonder about keeping a non-active pol=
-icy
-> > > > > > loaded in the kernel, what purpose does that serve?
-> > > > > >
-> > > > >
-> > > > > The non-active policy doesn't serve anything unless it is activat=
-ed. User can
-> > > > > even delete a policy if that is no longer needed. Non-active is j=
-ust the default
-> > > > > state when a new policy is loaded.
-> > > > >
-> > > > > If IPE supports namespace, there is another use case where differ=
-ent containers
-> > > > > can select different policies as the active policy from among mul=
-tiple loaded
-> > > > > policies. Deven has presented a demo of this during LSS 2021. But=
- this goes
-> > > > > beyond the scope of this version.
-> > > >
-> > > > Do you plan to add namespace support at some point in the
-> > > > not-too-distant future?  If so, I'm okay with keeping support for
-> > > > multiple policies, but if you think you're only going to support on=
-e
-> > > > active policy at a time, it might be better to remove support for
-> > > > multiple (inactive) policies.
-> > > >
-> > > > --
-> > > > paul-moore.com
-> > >
-> > > Another benefit of having multiple policies is that it provides isola=
-tion
-> > > between different policies. For instance, if we have two policies nam=
-ed
-> > > "policy_a" and "policy_b," we can ensure that only team a can update =
-"policy_a,"
-> > > and only team b can update "policy_b." This way, both teams can updat=
-e
-> > > their policy without affecting others. However, if there is only one =
-policy
-> > > in the system, both teams will have to operate on the same policy, ma=
-king it
-> > > less manageable.
-> >
-> > That only really matters if both policies are active at the same time;
-> > if only one policy can be active at one point in time the only
-> > permission that matters is the one who can load/activate a policy.
-> >
-> > Allowing for multiple policies complicates the code.  If there is
-> > another feature that requires multiple policies, e.g. IPE namespaces,
-> > then that is okay.  However, if there is no feature which requires
-> > multiple active policies, supporting multiple loaded policies only
-> > increases the risk of an exploitable bug in the IPE code.
-> >
-> > > Besides, removing multiple (inactive) policies support will
-> > > render the policy_name field meaningless, and we should only audit th=
-e policy
-> > > hash. I am fine if we decide to go for the single policy option.
-> >
-> > Once again, I think it comes back to: do you still want to support IPE
-> > namespaces at some point in the future, and if so, when do you expect
-> > to work on that?
->
-> Yes, absolutely! We definitely have plans to support namespaces in the fu=
-ture.
-> However, it's worth mentioning that there are other tasks that we may nee=
-d
-> to prioritize due to their relatively lower complexity. For example, befo=
-re
-> we can fully implement namespaces, we need to address some other importan=
-t
-> aspects of the system, such as adding a policy language for integrity
-> enforcement on configuration files and defining trusted certificates
-> that can sign the root hash. Therefore, the timeline for implementing
-> namespaces will depend on the completion time of these tasks.
->
-> I understand your concerns, and we can proceed with a single policy desig=
-n
-> for the initial version.
+On Apr 13, 2023 / 10:19, alan.adamson@oracle.com wrote:
+[...]
+> Reviewed-by: Alan Adamson <alan.adamson@oracle.com>
+> 
+> Tested-by: Alan Adamson <alan.adamson@oracle.com>
 
-I think it's okay to stick with the multi-policy code for the initial
-submission, you've got the code now, and it's tested.  I just wanted
-to make sure there were plans to make use of it at some point, if not
-we might as well drop it now.  However, it sounds like you've got a
-plan to utilize the multi-policy support so that's fine with me.
-
---=20
-paul-moore.com
+Thanks for the review and the test. I've applied the fix.
