@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFF8C77B7E
-	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 22:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2723C6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 22:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbjDRWk1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 18:40:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60718 "EHLO
+        id S231210AbjDRWk0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 18:40:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232681AbjDRWkX (ORCPT
+        with ESMTP id S232406AbjDRWkX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 18 Apr 2023 18:40:23 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 386D493E4
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 15:40:12 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-63b73203e0aso12172382b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 15:40:12 -0700 (PDT)
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3509014
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 15:40:11 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id x8-20020a17090a6b4800b002474c5d3367so202490pjl.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 15:40:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681857611; x=1684449611;
+        d=1e100.net; s=20221208; t=1681857610; x=1684449610;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V5JB4ZNYPPKiOFWoJNfkhNFu9XV3lVyy0nfKwRV+Z6o=;
-        b=gaP6NVedSDIsWWzGBIh3KsS2iCYTppVxDXpA5ZRV6dtr+PwqRETEFF4TYUde+j98PY
-         l4BJ6fijnmZKAPuVhJy/yx6JNkwzPcMBt4bqk+nnTQWqWiiGwL76odjU6CL6i7Q0Zemc
-         OrDmj7sTq+NS10wFoNq691KbvOoKkDhepH1JR2lMkrzxZwDgSk13lkduI+mTNv+SY1I9
-         zQTW2GSVCTeAMEIoZXsTiClo6Rg6tY6/AUzZ87tfPj+X4s31q/xwtOdB4HVnLusp7kiI
-         TUiGm25wky5doGq9e4tcyANiiIwqlsB0XANfny+IlPWE908NlMTSa53qwSZSNaWDqXee
-         kRXA==
-X-Gm-Message-State: AAQBX9eX8rkaRcvEilVyua7YpLxRquWV77Wz2BCSVRTS+V18p/4c5tP4
-        mMpldlqQWTZwn9R4kOolN+A=
-X-Google-Smtp-Source: AKy350YgepGuT92qJw0DsQu6wMD9lLwiBV+UwAzkQumo18ElVZQfgUlYM6fltvUKwX4n66A4kpFZOA==
-X-Received: by 2002:a17:902:e5c5:b0:1a6:48e6:ea8e with SMTP id u5-20020a170902e5c500b001a648e6ea8emr420764plf.4.1681857611694;
-        Tue, 18 Apr 2023 15:40:11 -0700 (PDT)
+        bh=l2A9uSLQqM4lhpLKSZo2fi+4H/cRk9MYZu3vr8t9nn4=;
+        b=dqGRXDJiFTSBEtk5x7dATPpcrRdTS6TRfS8vP/JcOYT7L9TqYn2VVthb4/48HdLHr6
+         VTMWaIgu7eXNxZh7VKbEPOw4Gc0Bh7drrAgd48V/au2cK953cV/xsjijVICKlwQIcTU2
+         W4coOopt5pcCvNdAs+85DRajjO+Z3nVgkMbRT4hRZDwDYPK/9sDKDmkXZuCfTod4XMht
+         N1zYyFJRTcn7m01raeOuFSlQnT64O9p6gLR6aCTA/py+TPsyY7X49Y5zXWMjDRwDk1+i
+         EskVpePa4/tfaV3n6stGI52u053XB4dozIaLtvbGZxy6GASBc0vMW0MP6dJdsnFX/d28
+         +srQ==
+X-Gm-Message-State: AAQBX9fSofo78hZRj3UiaJYX2Q8vdRmTH1+7H66dXRnKhksM1VoVvvx+
+        t3Mo/tMudVoII+Rbl9r+FcI=
+X-Google-Smtp-Source: AKy350a1hGWZPF79H5Af1pSM45uASq0l/1vSfM+O40GkLB5Ba4heC4JlZ24k+XAlMzCYkagvKuyGkw==
+X-Received: by 2002:a05:6a20:12d0:b0:eb:c48b:d11d with SMTP id v16-20020a056a2012d000b000ebc48bd11dmr1213719pzg.30.1681857610430;
+        Tue, 18 Apr 2023 15:40:10 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:5d9b:263d:206c:895a])
-        by smtp.gmail.com with ESMTPSA id bb6-20020a170902bc8600b001a4ee93efa2sm8285646plb.137.2023.04.18.15.40.10
+        by smtp.gmail.com with ESMTPSA id bb6-20020a170902bc8600b001a4ee93efa2sm8285646plb.137.2023.04.18.15.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 15:40:11 -0700 (PDT)
+        Tue, 18 Apr 2023 15:40:10 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
@@ -45,9 +45,9 @@ Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 03/11] block: Introduce blk_rq_is_seq_zoned_write()
-Date:   Tue, 18 Apr 2023 15:39:54 -0700
-Message-ID: <20230418224002.1195163-4-bvanassche@acm.org>
+Subject: [PATCH v2 02/11] block: Micro-optimize blk_req_needs_zone_write_lock()
+Date:   Tue, 18 Apr 2023 15:39:53 -0700
+Message-ID: <20230418224002.1195163-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
 In-Reply-To: <20230418224002.1195163-1-bvanassche@acm.org>
 References: <20230418224002.1195163-1-bvanassche@acm.org>
@@ -57,83 +57,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce the function blk_rq_is_seq_zoned_write(). This function will
-be used in later patches to preserve the order of zoned writes for which
-the order needs to be preserved.
+Instead of using the following expression to translate a request pointer
+into a request queue pointer: rq->q->disk->part0->bd_queue, use the
+following expression: rq->q.
 
 Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-zoned.c      | 25 +++++++++++++++++++++----
- include/linux/blk-mq.h |  6 ++++++
- 2 files changed, 27 insertions(+), 4 deletions(-)
+ block/blk-mq.h         | 2 +-
+ block/blk-zoned.c      | 2 +-
+ include/linux/blkdev.h | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index e876584d3516..6b5bc0b8d7b8 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -368,7 +368,7 @@ static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+ {
+ 	/* Zoned block device write operation case: do not plug the BIO */
+ 	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+-	    bdev_op_is_zoned_write(bio->bi_bdev, bio_op(bio)))
++	    queue_op_is_zoned_write(bdev_get_queue(bio->bi_bdev), bio_op(bio)))
+ 		return NULL;
+ 
+ 	/*
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index c93a26ce4670..9b9cd6adfd1b 100644
+index 835d9e937d4d..c93a26ce4670 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -52,6 +52,26 @@ const char *blk_zone_cond_str(enum blk_zone_cond zone_cond)
- }
- EXPORT_SYMBOL_GPL(blk_zone_cond_str);
- 
-+/**
-+ * blk_rq_is_seq_zoned_write() - Whether @rq is a zoned write for which the order matters.
-+ * @rq: Request to examine.
-+ *
-+ * In this context sequential zone means either a sequential write required or
-+ * to a sequential write preferred zone.
-+ */
-+bool blk_rq_is_seq_zoned_write(struct request *rq)
-+{
-+	switch (req_op(rq)) {
-+	case REQ_OP_WRITE:
-+	case REQ_OP_WRITE_ZEROES:
-+		return blk_rq_zone_is_seq(rq);
-+	case REQ_OP_ZONE_APPEND:
-+	default:
-+		return false;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(blk_rq_is_seq_zoned_write);
-+
- /*
-  * Return true if a request is a write requests that needs zone write locking.
-  */
-@@ -60,10 +80,7 @@ bool blk_req_needs_zone_write_lock(struct request *rq)
+@@ -60,7 +60,7 @@ bool blk_req_needs_zone_write_lock(struct request *rq)
  	if (!rq->q->disk->seq_zones_wlock)
  		return false;
  
--	if (queue_op_is_zoned_write(rq->q, req_op(rq)))
--		return blk_rq_zone_is_seq(rq);
--
--	return false;
-+	return blk_rq_is_seq_zoned_write(rq);
- }
- EXPORT_SYMBOL_GPL(blk_req_needs_zone_write_lock);
+-	if (bdev_op_is_zoned_write(rq->q->disk->part0, req_op(rq)))
++	if (queue_op_is_zoned_write(rq->q, req_op(rq)))
+ 		return blk_rq_zone_is_seq(rq);
  
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 06caacd77ed6..e498b85bc470 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -1164,6 +1164,7 @@ static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
- 	return disk_zone_is_seq(rq->q->disk, blk_rq_pos(rq));
- }
- 
-+bool blk_rq_is_seq_zoned_write(struct request *rq);
- bool blk_req_needs_zone_write_lock(struct request *rq);
- bool blk_req_zone_write_trylock(struct request *rq);
- void __blk_req_zone_write_lock(struct request *rq);
-@@ -1194,6 +1195,11 @@ static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
- 	return !blk_req_zone_is_write_locked(rq);
- }
- #else /* CONFIG_BLK_DEV_ZONED */
-+static inline bool blk_rq_is_seq_zoned_write(struct request *rq)
-+{
-+	return false;
-+}
-+
- static inline bool blk_req_needs_zone_write_lock(struct request *rq)
- {
  	return false;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e3242e67a8e3..261538319bbf 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1284,10 +1284,10 @@ static inline unsigned int bdev_zone_no(struct block_device *bdev, sector_t sec)
+ 	return disk_zone_no(bdev->bd_disk, sec);
+ }
+ 
+-static inline bool bdev_op_is_zoned_write(struct block_device *bdev,
+-					  blk_opf_t op)
++static inline bool queue_op_is_zoned_write(struct request_queue *q,
++					   enum req_op op)
+ {
+-	if (!bdev_is_zoned(bdev))
++	if (!blk_queue_is_zoned(q))
+ 		return false;
+ 
+ 	return op == REQ_OP_WRITE || op == REQ_OP_WRITE_ZEROES;
