@@ -2,50 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE0EC6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 15:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A63C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 15:41:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbjDRPg0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 11:36:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52790 "EHLO
+        id S229972AbjDRPlC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 11:41:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230435AbjDRPgZ (ORCPT
+        with ESMTP id S231488AbjDRPlB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2023 11:36:25 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247A113C20
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 08:36:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=Vdq/bqbZ+gdU0P0Ie8/OyHDCyj
-        YdUqxF2gG6NRrarcsVH39n99R/VHDdVgqDnawCXelQBIhhnbsubWW5Gy0jEcgFDhqAoSNxsMV5T4V
-        dRy+tPuLhfl2Fn6y4nichNT7Oxq8JDNEu75H5CIerqd+4mCR5yQ7AJJerIZC0zYhNbYU9hErW+ba5
-        F5M+Ry7gFhKxujr0m4u22BvutU3HHLy2F1lCTBpVIWgRhuWWjPBV8Feu1GzT3sZeqcu+eSXztohJY
-        svB/CHkeYLcsZ8wVVWWOjePZjKPXtUAxEASxQMaJS7qh6O0uSqLKyuG3hfgHFnU6+MyP9rcjb5pWo
-        94YxB9YA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1ponMx-002dz4-2w;
-        Tue, 18 Apr 2023 15:35:47 +0000
-Date:   Tue, 18 Apr 2023 08:35:47 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ken Kurematsu <k.kurematsu@nskint.co.jp>
-Subject: Re: [PATCH V3] block: ublk: switch to ioctl command encoding
-Message-ID: <ZD6402ib4J7tz7f/@infradead.org>
-References: <20230418131810.855959-1-ming.lei@redhat.com>
+        Tue, 18 Apr 2023 11:41:01 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D880B9EC7
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 08:40:58 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C96176732D; Tue, 18 Apr 2023 17:34:56 +0200 (CEST)
+Date:   Tue, 18 Apr 2023 17:34:56 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     David Howells <dhowells@redhat.com>
+Cc:     hch@lst.de, linux-block@vger.kernel.org
+Subject: Re: How best to get the size of a blockdev from a file?
+Message-ID: <20230418153456.GA10282@lst.de>
+References: <1609851.1681812012@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230418131810.855959-1-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <1609851.1681812012@warthog.procyon.org.uk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Tue, Apr 18, 2023 at 11:00:12AM +0100, David Howells wrote:
+> Hi Christoph,
+> 
+> It seems that my use of i_size_read(file_inode(in)) in filemap_splice_read()
+> to get the size of the file to be spliced from doesn't work in the case of
+> blockdevs and it always returns 0.
+>
+> What would be the best way to get the blockdev size?  Look at
+> file->f_mapping->i_size maybe?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Yes.  Everything using an inode in generic read/write helpers always
+needs to use file->f_mapping->host to get at the inode.  Not just for
+the size.
