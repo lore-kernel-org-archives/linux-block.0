@@ -2,76 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 894E8C77B76
-	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 13:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E094AC6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 18 Apr 2023 14:05:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231767AbjDRNnY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 09:43:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57486 "EHLO
+        id S230343AbjDROFZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 10:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231430AbjDRNnY (ORCPT
+        with ESMTP id S231308AbjDROFZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2023 09:43:24 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56391B464;
-        Tue, 18 Apr 2023 06:43:23 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 111E31F8D7;
-        Tue, 18 Apr 2023 13:43:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1681825402; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oMzXDgeIe9bFmA8zBDQFasaEMBj1BPB8PAmctp5SKQA=;
-        b=CHxs2l1AEj5yGxv61LcqpY0Y4cgMYFe4bldA2RQC2uDDd8nXfC1fSU26Zdrx+9CgXmUtH3
-        QEssjcy8kgDoeaho/XiY1XGrlxO6YB2tQqzWUWPXgmVLOwjy9bn+v0zM72A79fWqgDipmN
-        gTceghiK5McVB3rDEr97Y/IdRUugGs8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1681825402;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oMzXDgeIe9bFmA8zBDQFasaEMBj1BPB8PAmctp5SKQA=;
-        b=KSexhj329+sezaAzmQF0TKFP8+X7DF5TORB/c3xF8eRfF1h5evdqburXoZU4hWjVQMhCGN
-        JhCJQjp9ljY4XuAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 00FC513581;
-        Tue, 18 Apr 2023 13:43:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id yDI9AHqePmTLQAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Tue, 18 Apr 2023 13:43:22 +0000
-Date:   Tue, 18 Apr 2023 15:43:21 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Martin Belanger <Martin.Belanger@dell.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH v3 0/4] nvmet-fcloop: unblock module removal
-Message-ID: <nlogr5rdxqvilsz4iolktfpdvflvvithwaoa3vrx2fsjqlho4q@4upw7jq3aem2>
-References: <20230418130159.11075-1-dwagner@suse.de>
+        Tue, 18 Apr 2023 10:05:25 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD3AF12CB0
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 07:05:23 -0700 (PDT)
+Received: from canpemm100004.china.huawei.com (unknown [7.192.105.92])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Q15JQ4yVHz8x4N;
+        Tue, 18 Apr 2023 22:04:22 +0800 (CST)
+Received: from [10.174.179.14] (10.174.179.14) by
+ canpemm100004.china.huawei.com (7.192.105.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 18 Apr 2023 22:05:12 +0800
+Subject: Re: How best to get the size of a blockdev from a file?
+To:     Kanchan Joshi <joshi.k@samsung.com>,
+        David Howells <dhowells@redhat.com>
+CC:     <hch@lst.de>, <linux-block@vger.kernel.org>
+References: <CGME20230418100108epcas5p2d0f2a7a274e78731373986b3d4fced9b@epcas5p2.samsung.com>
+ <1609851.1681812012@warthog.procyon.org.uk> <20230418122833.GA14457@green245>
+From:   Jason Yan <yanaijie@huawei.com>
+Message-ID: <e4f7df06-ccba-700b-5a69-ea44bd54e672@huawei.com>
+Date:   Tue, 18 Apr 2023 22:05:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230418130159.11075-1-dwagner@suse.de>
+In-Reply-To: <20230418122833.GA14457@green245>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.14]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm100004.china.huawei.com (7.192.105.92)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 18, 2023 at 03:01:55PM +0200, Daniel Wagner wrote:
-> nvme/041 (Create authenticated connections)                  [failed]
-> nvme/042 (Test dhchap key types for authenticated connections) [failed]
-> nvme/043 (Test hash and DH group variations for authenticated connections) [passed]
-> nvme/044 (Test bi-directional authentication)                [failed]
-> nvme/045 (Test re-authentication)                            [passed]
+On 2023/4/18 20:28, Kanchan Joshi wrote:
+> On Tue, Apr 18, 2023 at 11:00:12AM +0100, David Howells wrote:
+>> Hi Christoph,
+>>
+>> It seems that my use of i_size_read(file_inode(in)) in 
+>> filemap_splice_read()
+>> to get the size of the file to be spliced from doesn't work in the 
+>> case of
+>> blockdevs and it always returns 0.
+>>
+>> What would be the best way to get the blockdev size?  Look at
+>> file->f_mapping->i_size maybe?
+> 
+> bdev_nr_bytes(I_BDEV(file->f_mapping->host))
+> should work I suppose.
+> 
 
-I suppose these should be disabled for fc as all this is tcp specific.
+This needs the caller to check if the file is a blockdev. Can we fill 
+the upper inode size which belongs to devtmpfs so that the generic code 
+do not need to aware the low level inode type?
