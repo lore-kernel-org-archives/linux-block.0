@@ -2,148 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFFCC6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 01:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C86E2C77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 01:55:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231643AbjDSBwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 21:52:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39162 "EHLO
+        id S229633AbjDSBzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 21:55:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230153AbjDSBwg (ORCPT
+        with ESMTP id S231251AbjDSBzS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2023 21:52:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F72544B3
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 18:51:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681869108;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nm+Uhj6RHTkYm3b6JjoRshvkHqJVCbr9ria5liA5ewk=;
-        b=fYZ/nWl0gTwqz8PxqSp3r7OsfTjWzaAA1rNek7C60xC688QYHoj2r0lwVYRGUkpm4VE7xk
-        jMqTfR4p1+1hzryWZtBsRPyvOznUaBD9RlaWBOd7Q+xprPWo5zeSRXT02u4LTIkJiXDOwX
-        pI+n98gkWEdzpn77TWxUe6+4tkP5nco=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-107-bp3ltgHBOdelkEkuJ4WAlQ-1; Tue, 18 Apr 2023 21:51:45 -0400
-X-MC-Unique: bp3ltgHBOdelkEkuJ4WAlQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8CC6D2999B23;
-        Wed, 19 Apr 2023 01:51:44 +0000 (UTC)
-Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EF8EE483EC4;
-        Wed, 19 Apr 2023 01:51:36 +0000 (UTC)
-Date:   Wed, 19 Apr 2023 09:51:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bernd Schubert <bschubert@ddn.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Amir Goldstein <amir73il@gmail.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V6 00/17] io_uring/ublk: add generic IORING_OP_FUSED_CMD
-Message-ID: <ZD9JI/JlwrzXQPZ7@ovpn-8-18.pek2.redhat.com>
-References: <20230330113630.1388860-1-ming.lei@redhat.com>
- <78fe6617-2f5e-3e8e-d853-6dc8ffb5f82c@ddn.com>
+        Tue, 18 Apr 2023 21:55:18 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8FE4ECD
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 18:55:17 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-24762b39b0dso1142176a91.1
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 18:55:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1681869316; x=1684461316;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3yMx5fYxd9C175mfLe8lqRxl1QU04ZvuY5JHAMxvGXI=;
+        b=JTClS8+wTrBV1rxVUYS9q8uw6u8dxR78MWe0zSZtLpo7xGsS5N13qILbeTwPfuR0ar
+         tn5NCTU/65rxbpjaDHm7RZDl9/mBDWgcHrb1XHuhk9gxZAOWU4UtyHeMdlmWaoivNs6e
+         86hhFHd0CBqlgV4YhYI1FCmyfI1hEleIBZvwCGnclJ3ff7ARjN2lP7ffpEFpIn/McnFF
+         SEeteH+38HCv4YcfI/54X2QbUFxBS00XVyu3OVNCm8yZ9OhuqIUo3YhTaM9nPs1kgjFr
+         2An2ZPym3KKxd6fTJMmim9vYZGlzHgtPqcea3Vx76lWTShqGuRmLCJexaOceORZksQ+Z
+         7TZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681869316; x=1684461316;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3yMx5fYxd9C175mfLe8lqRxl1QU04ZvuY5JHAMxvGXI=;
+        b=b8X4/541Ozz2hMnMon1k3w+OX6scLvR9hI7BIWaDV0EP/pqNKw3hhjgRYb172Ul20k
+         pMwHhR5/yMxw+iUCmvYnw0cH4b3K74HL5wz43Dfi+PqNiJIVIp65bYhv6EiSaTz9lN5Q
+         1FE6v3547VADV6/MteN4Sg36UeDOD6rTnBlaKeINY+w5u4NCa/AXW1fk2vrpMPByY2+N
+         T1/MP93gGQt8LctQbE56DEngaqbjZbphijGdz02QrAyShD7PA5sstJF0JRSqHSWXYeFu
+         SLFXNYU/43eUmInF9cw0f9vdxgASSqCrnR1P4Y9RPkoNj2KDdrlCjCucyyGvbrGCsuM5
+         c3mw==
+X-Gm-Message-State: AAQBX9c9eohvZgW3PWnRqqUUyoI3xxerZGGa3fCpMdrcT0GTsk0Tywnk
+        7WsoldIOwnmCX7ZY+7S0wDpxJQ==
+X-Google-Smtp-Source: AKy350ZkIYBC14VQSQlaDtDhGCzV/AiSdCVbEF8ylA2ILJmqON245CqgcSEfoq2eYAbHZoKwQcxWUg==
+X-Received: by 2002:a17:90a:a894:b0:23c:fef0:d441 with SMTP id h20-20020a17090aa89400b0023cfef0d441mr1301184pjq.33.1681869316634;
+        Tue, 18 Apr 2023 18:55:16 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-41-174.pa.nsw.optusnet.com.au. [49.180.41.174])
+        by smtp.gmail.com with ESMTPSA id k8-20020a634b48000000b0051ba4d6fe4fsm4796613pgl.56.2023.04.18.18.55.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Apr 2023 18:55:15 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1pox2O-0055Sk-P8; Wed, 19 Apr 2023 11:55:12 +1000
+Date:   Wed, 19 Apr 2023 11:55:12 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Kyle Sanderson <kyle.leet@gmail.com>
+Cc:     linux-btrfs@vger.kernel.org,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: btrfs induced data loss (on xfs) - 5.19.0-38-generic
+Message-ID: <20230419015512.GI447837@dread.disaster.area>
+References: <CACsaVZJGPux1yhrMWnq+7nt3Zz5wZ6zEo2+S2pf=4czpYLFyjg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <78fe6617-2f5e-3e8e-d853-6dc8ffb5f82c@ddn.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+In-Reply-To: <CACsaVZJGPux1yhrMWnq+7nt3Zz5wZ6zEo2+S2pf=4czpYLFyjg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 18, 2023 at 07:38:03PM +0000, Bernd Schubert wrote:
-> On 3/30/23 13:36, Ming Lei wrote:
-> [...]
-> > V6:
-> > 	- re-design fused command, and make it more generic, moving sharing buffer
-> > 	as one plugin of fused command, so in future we can implement more plugins
-> > 	- document potential other use cases of fused command
-> > 	- drop support for builtin secondary sqe in SQE128, so all secondary
-> > 	  requests has standalone SQE
-> > 	- make fused command as one feature
-> > 	- cleanup & improve naming
-> 
-> Hi Ming, et al.,
-> 
-> I started to wonder if fused SQE could be extended to combine multiple 
-> syscalls, for example open/read/close.  Which would be another solution 
-> for the readfile syscall Miklos had proposed some time ago.
-> 
-> https://lore.kernel.org/lkml/CAJfpegusi8BjWFzEi05926d4RsEQvPnRW-w7My=ibBHQ8NgCuw@mail.gmail.com/
-> 
-> If fused SQEs could be extended, I think it would be quite helpful for 
-> many other patterns. Another similar examples would open/write/close, 
-> but ideal would be also to allow to have it more complex like 
-> "open/write/sync_file_range/close" - open/write/close might be the 
-> fastest and could possibly return before sync_file_range. Use case for 
-> the latter would be a file server that wants to give notifications to 
-> client when pages have been written out.
+On Sun, Apr 16, 2023 at 10:20:45PM -0700, Kyle Sanderson wrote:
+> The single btrfs disk was at 100% utilization and a wa of 50~, reading
+> back at around 2MB/s. df and similar would simply freeze. Leading up
+> to this I removed around 2T of data from a single btrfs disk. I
+> managed to get most of the services shutdown and disks unmounted, but
+> when the system came back up I had to use xfs_repair (for the first
 
-The above pattern needn't fused command, and it can be done by plain
-SQEs chain, follows the usage:
+What exactly was the error messages XFS emitted when it failed to
+mount, and what did xfs_repair fix to enable it to boot? Unless you
+have a broken disk (i.e. firmware either lies about cache flush
+completion or the implementation is broken), there is no reason for
+any amount of load on the disk to cause filesystem corruption....
 
-1) suppose you get one command from /dev/fuse, then FUSE daemon
-needs to handle the command as open/write/sync/close
-2) get sqe1, prepare it for open syscall, mark it as IOSQE_IO_LINK;
-3) get sqe2, prepare it for write syscall, mark it as IOSQE_IO_LINK;
-4) get sqe3, prepare it for sync file range syscall, mark it as IOSQE_IO_LINK;
-5) get sqe4, prepare it for close syscall
-6) io_uring_enter();	//for submit and get events
-
-Then all the four OPs are done one by one by io_uring internal
-machinery, and you can choose to get successful CQE for each OP.
-
-Is the above what you want to do?
-
-The fused command proposal is actually for zero copy(but not limited to zc).
-
-If the above write OP need to write to file with in-kernel buffer
-of /dev/fuse directly, you can get one sqe0 and prepare it for primary command
-before 1), and set sqe2->addr to offet of the buffer in 3).
-
-However, fused command is usually used in the following way, such as FUSE daemon
-gets one READ request from /dev/fuse, FUSE userspace can handle the READ request
-as io_uring fused command:
-
-1) get sqe0 and prepare it for primary command, in which you need to
-provide info for retrieving kernel buffer/pages of this READ request
-
-2) suppose this READ request needs to be handled by translating it to
-READs to two files/devices, considering it as one mirror:
-
-- get sqe1, prepare it for read from file1, and set sqe->addr to offset
-  of the buffer in 1), set sqe->len as length for read; this READ OP
-  uses the kernel buffer in 1) directly 
-
-- get sqe2, prepare it for read from file2, and set sqe->addr to offset
-  of buffer in 1), set sqe->len as length for read;  this READ OP
-  uses the kernel buffer in 1) directly 
-
-3) submit the three sqe by io_uring_enter()
-
-sqe1 and sqe2 can be submitted concurrently or be issued one by one
-in order, fused command supports both, and depends on user requirement.
-But io_uring linked OPs is usually slower.
-
-Also file1/file2 needs to be opened beforehand in this example, and FD is
-passed to sqe1/sqe2, another choice is to use fixed File; Also you can
-add the open/close() OPs into above steps, which need these open/close/READ
-to be linked in order, usually slower tnan non-linked OPs.
-
-
-Thanks, 
-Ming
-
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
