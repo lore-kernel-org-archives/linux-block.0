@@ -2,71 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C40D3C77B7F
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 13:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CE2C6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 13:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233460AbjDSNXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 09:23:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59870 "EHLO
+        id S233534AbjDSNa5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 09:30:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233285AbjDSNXW (ORCPT
+        with ESMTP id S233527AbjDSNa4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 09:23:22 -0400
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF871544B;
-        Wed, 19 Apr 2023 06:22:57 -0700 (PDT)
-From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-        s=mail; t=1681910575;
-        bh=8DxUrecEQXlbonVWV4Ctfw1+JpOz8+kV4zNOKiNZtnI=;
-        h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=EuPD8BRIlvKUCLVjp7Upw3ZZO5pD4ibHJE9vtrc4epUR2LZaoLh9ECIH+2n32WZ4m
-         cjxNEGlufps3Mm6d4lT5ibxTd1/9caMUNAT0U/0V9ZjKhemjWY9rC8g/1NDoV+ZNNy
-         /9K9OkyjZ35rAPk5FiE7xu0MlAS46KPL/txh+XUg=
-Date:   Wed, 19 Apr 2023 15:22:56 +0200
-Subject: [PATCH v2 4/4] block: constify the whole_disk device_attribute
+        Wed, 19 Apr 2023 09:30:56 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CD549C1;
+        Wed, 19 Apr 2023 06:30:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681911055; x=1713447055;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=N/GSlYqreKAXPu9B0lGYZfv80oraXkzW4fyW3/FG+wQ=;
+  b=brt7qoQAhklTou6CPSiTL97Ycejns7sjBu8bNAF/42G31XXU8+KVZBZX
+   7J6aXiaDoS1mgmnDcc906PZY+5ZeSlxDdBQpk4yhz9buvpOE9CLwNvNTj
+   D+70aaDlFEkIioo1JAMZYj04jLbmhIJTgP3Nk0Wxfz6ar0s656Udbdbo+
+   Jun7k/I5lrzZOMrzO9eP+O9kOYQM2uiA+rfXr90y9+2QX7QuNWgQOo+l7
+   cK9dxhI4m3VPGgtGTWzfiPk12AsGIt/iUTI1tabnkx9sV+WUbVT42hJg9
+   vMYzVUK6HtvTdkvbwba7OWIySnSQVe625eTCjw32RpYnVQ/LjHbXzXdC1
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="325062178"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="325062178"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2023 06:30:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="684981964"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="684981964"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 19 Apr 2023 06:30:51 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pp7tb-000euR-0p;
+        Wed, 19 Apr 2023 13:30:51 +0000
+Date:   Wed, 19 Apr 2023 21:29:58 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Subject: Re: [PATCH 1/4] block: constify partition prober array
+Message-ID: <202304192132.a6MR0cFR-lkp@intel.com>
+References: <20230419-const-partition-v1-1-2d66f2d83873@weissschuh.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20230419-const-partition-v2-4-817b58f85cd1@weissschuh.net>
-References: <20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net>
-In-Reply-To: <20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1681910574; l=692;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=8DxUrecEQXlbonVWV4Ctfw1+JpOz8+kV4zNOKiNZtnI=;
- b=W8wtHEqlEeRjokNrSDbMW0sWD5kabWuQvCIsJIndbub7dUQ4ew9L9Tn1wyDt7ehZLINwcbk5q
- EJhucksR1XXAklmW8BR7VVTUdQzMu/jEbFgwm4/erFLRVkb9Mop3OdE
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230419-const-partition-v1-1-2d66f2d83873@weissschuh.net>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The struct is never modified so it can be const.
+Hi Thomas,
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- block/partitions/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index cb37ac71868e..302ac06708e6 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -296,7 +296,7 @@ static ssize_t whole_disk_show(struct device *dev,
- {
- 	return 0;
- }
--static DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
-+static const DEVICE_ATTR(whole_disk, 0444, whole_disk_show, NULL);
- 
- /*
-  * Must be called either with open_mutex held, before a disk can be opened or
+[auto build test WARNING on af67688dca57999fd848f051eeea1d375ba546b2]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Thomas-Wei-schuh/block-constify-partition-prober-array/20230419-155356
+base:   af67688dca57999fd848f051eeea1d375ba546b2
+patch link:    https://lore.kernel.org/r/20230419-const-partition-v1-1-2d66f2d83873%40weissschuh.net
+patch subject: [PATCH 1/4] block: constify partition prober array
+config: arm64-randconfig-r001-20230416 (https://download.01.org/0day-ci/archive/20230419/202304192132.a6MR0cFR-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 437b7602e4a998220871de78afcb020b9c14a661)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm64 cross compiling tool for clang build
+        # apt-get install binutils-aarch64-linux-gnu
+        # https://github.com/intel-lab-lkp/linux/commit/9bc1f4308c10322c327c9e86ede6bb9e862440aa
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Thomas-Wei-schuh/block-constify-partition-prober-array/20230419-155356
+        git checkout 9bc1f4308c10322c327c9e86ede6bb9e862440aa
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash block/partitions/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304192132.a6MR0cFR-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> block/partitions/core.c:15:8: warning: 'const' type qualifier on return type has no effect [-Wignored-qualifiers]
+   static const int (*check_part[])(struct parsed_partitions *) = {
+          ^~~~~~
+   block/partitions/core.c:47:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
+           efi_partition,          /* this must come before msdos */
+           ^~~~~~~~~~~~~
+   block/partitions/core.c:50:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
+           sgi_partition,
+           ^~~~~~~~~~~~~
+   block/partitions/core.c:56:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
+           msdos_partition,
+           ^~~~~~~~~~~~~~~
+   block/partitions/core.c:59:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
+           osf_partition,
+           ^~~~~~~~~~~~~
+   block/partitions/core.c:62:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
+           sun_partition,
+           ^~~~~~~~~~~~~
+   block/partitions/core.c:65:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
+           amiga_partition,
+           ^~~~~~~~~~~~~~~
+   block/partitions/core.c:71:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
+           mac_partition,
+           ^~~~~~~~~~~~~
+   1 warning and 7 errors generated.
+
+
+vim +/const +15 block/partitions/core.c
+
+    14	
+  > 15	static const int (*check_part[])(struct parsed_partitions *) = {
+    16		/*
+    17		 * Probe partition formats with tables at disk address 0
+    18		 * that also have an ADFS boot block at 0xdc0.
+    19		 */
+    20	#ifdef CONFIG_ACORN_PARTITION_ICS
+    21		adfspart_check_ICS,
+    22	#endif
+    23	#ifdef CONFIG_ACORN_PARTITION_POWERTEC
+    24		adfspart_check_POWERTEC,
+    25	#endif
+    26	#ifdef CONFIG_ACORN_PARTITION_EESOX
+    27		adfspart_check_EESOX,
+    28	#endif
+    29	
+    30		/*
+    31		 * Now move on to formats that only have partition info at
+    32		 * disk address 0xdc0.  Since these may also have stale
+    33		 * PC/BIOS partition tables, they need to come before
+    34		 * the msdos entry.
+    35		 */
+    36	#ifdef CONFIG_ACORN_PARTITION_CUMANA
+    37		adfspart_check_CUMANA,
+    38	#endif
+    39	#ifdef CONFIG_ACORN_PARTITION_ADFS
+    40		adfspart_check_ADFS,
+    41	#endif
+    42	
 
 -- 
-2.40.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
