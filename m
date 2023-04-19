@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12ADCC77B75
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 12:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 856B1C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 13:02:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbjDSM6k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 08:58:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40916 "EHLO
+        id S232706AbjDSNCS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 09:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbjDSM6j (ORCPT
+        with ESMTP id S232791AbjDSNCR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 08:58:39 -0400
+        Wed, 19 Apr 2023 09:02:17 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F113ABBBC
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 05:57:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9BCDD
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 06:01:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681909065;
+        s=mimecast20190719; t=1681909286;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=gnR6bjG9bok7jCQk9F5NYnSJuEBp2LyQ4n6UhEpwshQ=;
-        b=EOt06uqoo6lcrDu35fH8yZ0xewDcTzkpvzCuaxwNkJB0nSmNauQsoZODpDdMfUrcKFYTN1
-        boldz5LlgeCtm8AtorxkxzoNxsB+p5WGSmSMb203u3Jkqtsb6Rps5uX5+4VcMtWARtXkBo
-        r1FxW8MR6iLSDSS7UpuBQ2Vf2brpxok=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=f16w+eV0+2Sr0OvGkfcho9W3kJDfX6onkCcXskuyqPs=;
+        b=GCSFOUC/NigrVrHuR5Cu/fhpGrSDqYdlaGVRh4LJl1rBGuqKX5xW41r2tBOw7OsUsM7ShM
+        TnMMtS4SZhnj9qLt4uH7FIpZHPhxkc1NLmRH8F89zhYmm7mRHCrkMGVRAx2s+NgxgBDrE8
+        WqmeaMpo+UoHfIdJdFbr33VHJbxJiqM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-Bku-NdbwN6yyVpmqR7UGLw-1; Wed, 19 Apr 2023 08:57:38 -0400
-X-MC-Unique: Bku-NdbwN6yyVpmqR7UGLw-1
+ us-mta-99--ci2SF8-NGKZHk1uBniPUg-1; Wed, 19 Apr 2023 09:01:23 -0400
+X-MC-Unique: -ci2SF8-NGKZHk1uBniPUg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6E012185A78B;
-        Wed, 19 Apr 2023 12:57:37 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 58F453815EF4;
+        Wed, 19 Apr 2023 13:01:22 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D05861121314;
-        Wed, 19 Apr 2023 12:57:35 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1937C1121314;
+        Wed, 19 Apr 2023 13:01:21 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
@@ -56,26 +56,19 @@ Cc:     dhowells@redhat.com, Ayush Jain <ayush.jain3@amd.com>,
 Subject: Re: [PATCH] splice: Fix filemap of a blockdev
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1828925.1681909055.1@warthog.procyon.org.uk>
-Date:   Wed, 19 Apr 2023 13:57:35 +0100
-Message-ID: <1828932.1681909055@warthog.procyon.org.uk>
+Content-ID: <1842477.1681909280.1@warthog.procyon.org.uk>
+Date:   Wed, 19 Apr 2023 14:01:20 +0100
+Message-ID: <1842478.1681909280@warthog.procyon.org.uk>
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> wrote:
+Note that this shouldn't affect direct_splice_read() as that doesn't look at
+the size of the file, but rather just keeps reading from it until the
+requested amount is read, the pipe is full or ->read_iter() indicates EOF by
+returning 0 (so it could work for copy-splicing from a pipe/socket/chardev
+too).
 
-> [1/1] splice: Fix filemap of a blockdev
-
-Actually, would you be able to fix the subject?  I left a word out:
-
-	splice: Fix filemap splice of a blockdev
-
-or maybe:
-
-	splice: Fix buffered splice of a blockdev
-
-Sorry about that,
 David
 
