@@ -2,89 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C86E2C77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 01:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D44C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 02:16:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjDSBzT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Apr 2023 21:55:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41114 "EHLO
+        id S231221AbjDSCQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Apr 2023 22:16:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231251AbjDSBzS (ORCPT
+        with ESMTP id S231159AbjDSCQ4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Apr 2023 21:55:18 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8FE4ECD
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 18:55:17 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-24762b39b0dso1142176a91.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 18:55:17 -0700 (PDT)
+        Tue, 18 Apr 2023 22:16:56 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B47040D7
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 19:16:55 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id 41be03b00d2f7-520de6d3721so2993a12.0
+        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 19:16:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1681869316; x=1684461316;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3yMx5fYxd9C175mfLe8lqRxl1QU04ZvuY5JHAMxvGXI=;
-        b=JTClS8+wTrBV1rxVUYS9q8uw6u8dxR78MWe0zSZtLpo7xGsS5N13qILbeTwPfuR0ar
-         tn5NCTU/65rxbpjaDHm7RZDl9/mBDWgcHrb1XHuhk9gxZAOWU4UtyHeMdlmWaoivNs6e
-         86hhFHd0CBqlgV4YhYI1FCmyfI1hEleIBZvwCGnclJ3ff7ARjN2lP7ffpEFpIn/McnFF
-         SEeteH+38HCv4YcfI/54X2QbUFxBS00XVyu3OVNCm8yZ9OhuqIUo3YhTaM9nPs1kgjFr
-         2An2ZPym3KKxd6fTJMmim9vYZGlzHgtPqcea3Vx76lWTShqGuRmLCJexaOceORZksQ+Z
-         7TZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681869316; x=1684461316;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681870615; x=1684462615;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3yMx5fYxd9C175mfLe8lqRxl1QU04ZvuY5JHAMxvGXI=;
-        b=b8X4/541Ozz2hMnMon1k3w+OX6scLvR9hI7BIWaDV0EP/pqNKw3hhjgRYb172Ul20k
-         pMwHhR5/yMxw+iUCmvYnw0cH4b3K74HL5wz43Dfi+PqNiJIVIp65bYhv6EiSaTz9lN5Q
-         1FE6v3547VADV6/MteN4Sg36UeDOD6rTnBlaKeINY+w5u4NCa/AXW1fk2vrpMPByY2+N
-         T1/MP93gGQt8LctQbE56DEngaqbjZbphijGdz02QrAyShD7PA5sstJF0JRSqHSWXYeFu
-         SLFXNYU/43eUmInF9cw0f9vdxgASSqCrnR1P4Y9RPkoNj2KDdrlCjCucyyGvbrGCsuM5
-         c3mw==
-X-Gm-Message-State: AAQBX9c9eohvZgW3PWnRqqUUyoI3xxerZGGa3fCpMdrcT0GTsk0Tywnk
-        7WsoldIOwnmCX7ZY+7S0wDpxJQ==
-X-Google-Smtp-Source: AKy350ZkIYBC14VQSQlaDtDhGCzV/AiSdCVbEF8ylA2ILJmqON245CqgcSEfoq2eYAbHZoKwQcxWUg==
-X-Received: by 2002:a17:90a:a894:b0:23c:fef0:d441 with SMTP id h20-20020a17090aa89400b0023cfef0d441mr1301184pjq.33.1681869316634;
-        Tue, 18 Apr 2023 18:55:16 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-41-174.pa.nsw.optusnet.com.au. [49.180.41.174])
-        by smtp.gmail.com with ESMTPSA id k8-20020a634b48000000b0051ba4d6fe4fsm4796613pgl.56.2023.04.18.18.55.15
+        bh=m8Cwf7mS0hqiAQbvKm/d6kdWRNPIDIXo8r/9IaEH2Yo=;
+        b=eB+K4BPVLT2Vml0+6TCCKXYraAAiPLDH3jdJEJ90wc8ofTtAMGRTBGsNT6OQ39tPTe
+         IYb0aqw0I7c9uGVjWX99dLweZBCA+XrOuucGYq6P0HaJoeRg8utBGJ2IFwvWUEfsk971
+         TB0BYWM4itBR8HO7P7zn0pw3/6BGvqLNjPVESHQE0+vO68NGKHHAwRizMQoLQ+MdHSj1
+         BLfSsTHJtHC8ZyPEznq17oRuIEatWTx847eLvxJg/2cIaZHFdzSPcugeqD6jeRyauJQ8
+         S4hxJCTq5go8iZvbtbhDST+KrByftmOSY90ZUEW9U+DLIc+k1kbL++UVcWnn0gI/L3xM
+         BiQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681870615; x=1684462615;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m8Cwf7mS0hqiAQbvKm/d6kdWRNPIDIXo8r/9IaEH2Yo=;
+        b=WSNJM07T/zqaVHvTmBCMJSGZbCWa2/Yk9Xryks4dxha1+llwXB3DtKLSMYWFEh2Ptf
+         tUtX6wHMw/W1xYTcnTsBxttuto8w11EyGGjXIvq45L3cAaRLDMcHQfiYgZku82t9bAXU
+         CeTDt7lAFr75hEdc2htqewD64Q/uYiFay50Bre3asOkkNU4ytDWX+0AFJSWcECgKVuNR
+         CJGlviqbZWUVtlYXnXTuMbo368D0//VKn+r2ZqSUiyD9R7o1IzFv+cWZYrnhwRdBotw4
+         9ZhOESv925Q+/nJPLoq9I3P+gM34El4iozlgomg2cF9AvpMmFacBjrKNzZs8OBLwxy6L
+         QPBg==
+X-Gm-Message-State: AAQBX9cdz4sIiZl6YhMQWhEHR1KA/FFnGasifE/gvaUBtlR/4KcLMfKD
+        fVWpj4xREJKAuMkOhnXS/53CNmFs/nr89uMppr4=
+X-Google-Smtp-Source: AKy350as3fy4qCgt2FHQwskrVVS5zzRf84hsEv15298tm/MvYUI9UbPQ7+2kCoMQ8HSYexOlS4KBVA==
+X-Received: by 2002:a17:902:ea0b:b0:1a6:e00b:c3e5 with SMTP id s11-20020a170902ea0b00b001a6e00bc3e5mr9489961plg.4.1681870614705;
+        Tue, 18 Apr 2023 19:16:54 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id g21-20020a170902869500b001a5260a6e6csm10210138plo.206.2023.04.18.19.16.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 18:55:15 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1pox2O-0055Sk-P8; Wed, 19 Apr 2023 11:55:12 +1000
-Date:   Wed, 19 Apr 2023 11:55:12 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Kyle Sanderson <kyle.leet@gmail.com>
-Cc:     linux-btrfs@vger.kernel.org,
-        Linux-Kernal <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: btrfs induced data loss (on xfs) - 5.19.0-38-generic
-Message-ID: <20230419015512.GI447837@dread.disaster.area>
-References: <CACsaVZJGPux1yhrMWnq+7nt3Zz5wZ6zEo2+S2pf=4czpYLFyjg@mail.gmail.com>
+        Tue, 18 Apr 2023 19:16:54 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ken Kurematsu <k.kurematsu@nskint.co.jp>
+In-Reply-To: <20230418131810.855959-1-ming.lei@redhat.com>
+References: <20230418131810.855959-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V3] block: ublk: switch to ioctl command encoding
+Message-Id: <168187061377.411072.9389338889592369047.b4-ty@kernel.dk>
+Date:   Tue, 18 Apr 2023 20:16:53 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACsaVZJGPux1yhrMWnq+7nt3Zz5wZ6zEo2+S2pf=4czpYLFyjg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 16, 2023 at 10:20:45PM -0700, Kyle Sanderson wrote:
-> The single btrfs disk was at 100% utilization and a wa of 50~, reading
-> back at around 2MB/s. df and similar would simply freeze. Leading up
-> to this I removed around 2T of data from a single btrfs disk. I
-> managed to get most of the services shutdown and disks unmounted, but
-> when the system came back up I had to use xfs_repair (for the first
 
-What exactly was the error messages XFS emitted when it failed to
-mount, and what did xfs_repair fix to enable it to boot? Unless you
-have a broken disk (i.e. firmware either lies about cache flush
-completion or the implementation is broken), there is no reason for
-any amount of load on the disk to cause filesystem corruption....
+On Tue, 18 Apr 2023 21:18:10 +0800, Ming Lei wrote:
+> All ublk commands(control, IO) should have taken ioctl command encoding
+> from the beginning, because ioctl command encoding defines each code
+> uniquely, so driver can figure out wrong command sent from userspace
+> easily; 2) it might help security subsystem for audit uring cmd[1].
+> 
+> Unfortunately we didn't do that way, and it could be one lesson for
+> ublk driver.
+> 
+> [...]
 
--Dave.
+Applied, thanks!
+
+[1/1] block: ublk: switch to ioctl command encoding
+      commit: 2d786e66c9662d84cbeab981ce3a371d2fb5a4bb
+
+Best regards,
 -- 
-Dave Chinner
-david@fromorbit.com
+Jens Axboe
+
+
+
