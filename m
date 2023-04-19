@@ -2,115 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3EAFC77B78
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 08:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C46C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 08:55:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232744AbjDSIsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 04:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56104 "EHLO
+        id S231799AbjDSIzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 04:55:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232730AbjDSIsF (ORCPT
+        with ESMTP id S232799AbjDSIy6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 04:48:05 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F29E1A4;
-        Wed, 19 Apr 2023 01:48:04 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 19 Apr 2023 04:54:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31C16E8A
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 01:54:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681894457;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=J099iEeGas8X+c0Ugwu2YYwSR8o/a4NF1OsG1hAhZcc=;
+        b=E1NxjYf//Dyhe34vdpIDycJkEsXgLmnhsduRP5H+RdrVxE35yRS1qs6AlV5n9FlMQpTEhQ
+        vf4ZyM/SIcMEsz74DD0fUXW9r4ri46WH+9eLUY/Vn6FD5gtk8wTV4gKJ8xUd0/PswStvoe
+        p4YypG+37HREIjMuh8uA6eMEwUpgpb8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-538-1ikd473jN-q5I59GX08wYA-1; Wed, 19 Apr 2023 04:54:14 -0400
+X-MC-Unique: 1ikd473jN-q5I59GX08wYA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 203E321908;
-        Wed, 19 Apr 2023 08:48:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1681894083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NEnZ644JL7BzqvU0sxbGAoBWYjk3iv5CXkJiuBwPN/c=;
-        b=M8tPaWGNuTcM0+4I5u+VLunpNCH8/cK5wAYTEPICSez2IJ173pcGHxIEgnWuXF/lZE2ZIS
-        3TyNEuKQ+TzkG6vjv5A5Gn/d+vsINCs4VC6Y8mnBxfCoUfRq5wOewasrdEfwpvrVCeBe+V
-        FJMcsL7No4pmM/LALJEENsiuc1prKSM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1681894083;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NEnZ644JL7BzqvU0sxbGAoBWYjk3iv5CXkJiuBwPN/c=;
-        b=FHGWW/rllpupFShePGQj1O4dUlE0IMPgumOX32O9iG61oeSYDLecrcR+QYrvAf3mtcmTuO
-        HF8gZr+O13sZBjBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 118961390E;
-        Wed, 19 Apr 2023 08:48:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id yasgBMOqP2S7dQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 19 Apr 2023 08:48:03 +0000
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v2 2/2] nvme-rc: Cleanup fc resource before module unloading
-Date:   Wed, 19 Apr 2023 10:47:57 +0200
-Message-Id: <20230419084757.24846-3-dwagner@suse.de>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230419084757.24846-1-dwagner@suse.de>
-References: <20230419084757.24846-1-dwagner@suse.de>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 532FE101A557;
+        Wed, 19 Apr 2023 08:54:13 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A32BA1121314;
+        Wed, 19 Apr 2023 08:54:11 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     dhowells@redhat.com, Ayush Jain <ayush.jain3@amd.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        David Hildenbrand <david@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Steve French <stfrench@microsoft.com>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] splice: Fix filemap of a blockdev
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1770754.1681894451.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 19 Apr 2023 09:54:11 +0100
+Message-ID: <1770755.1681894451@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Before we unload the module we should cleanup the fc resources first,
-basically reorder the shutdown sequence to be in reverse order of the
-setup path.
+Fix the new filemap_splice_read() function to get i_size from
+in->f_mapping->host, not in->f_inode so that it works with block devices
+too (in->f_inode points to the device file, which is typically zero size).
 
-Also unload the nvme-fcloop after usage.
-
-While at it also update the rdma stop_soft_rdma before the module
-unloading for the same reasoning.
-
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
+Fixes: 07073eb01c5f ("splice: Add a func to do a splice from a buffered fi=
+le without ITER_PIPE")
+Link: https://lore.kernel.org/r/0c6b661c-f7ff-cf12-b7f0-00b6b2f1317b@amd.c=
+om/
+Reported-by: Ayush Jain <ayush.jain3@amd.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: Steve French <stfrench@microsoft.com>
+cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 ---
- tests/nvme/rc | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ mm/filemap.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index ec0cc2d8d8cc..41f196b037d6 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -260,18 +260,20 @@ _cleanup_nvmet() {
- 	shopt -u nullglob
- 	trap SIGINT
- 
--	modprobe -rq nvme-"${nvme_trtype}" 2>/dev/null
--	if [[ "${nvme_trtype}" != "loop" ]]; then
--		modprobe -rq nvmet-"${nvme_trtype}" 2>/dev/null
--	fi
--	modprobe -rq nvmet 2>/dev/null
- 	if [[ "${nvme_trtype}" == "rdma" ]]; then
- 		stop_soft_rdma
- 	fi
- 	if [[ "${nvme_trtype}" == "fc" ]]; then
- 		_cleanup_fcloop "${def_local_wwnn}" "${def_local_wwpn}" \
- 			        "${def_remote_wwnn}" "${def_remote_wwpn}"
-+		modprobe -rq nvme-fcloop
- 	fi
-+
-+	modprobe -rq nvme-"${nvme_trtype}" 2>/dev/null
-+	if [[ "${nvme_trtype}" != "loop" ]]; then
-+		modprobe -rq nvmet-"${nvme_trtype}" 2>/dev/null
-+	fi
-+	modprobe -rq nvmet 2>/dev/null
- }
- 
- _setup_nvmet() {
--- 
-2.40.0
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 470be06b6096..f86cc8acf33a 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2902,7 +2902,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t =
+*ppos,
+ 	do {
+ 		cond_resched();
+ =
+
+-		if (*ppos >=3D i_size_read(file_inode(in)))
++		if (*ppos >=3D i_size_read(in->f_mapping->host))
+ 			break;
+ =
+
+ 		iocb.ki_pos =3D *ppos;
+@@ -2918,7 +2918,7 @@ ssize_t filemap_splice_read(struct file *in, loff_t =
+*ppos,
+ 		 * part of the page is not copied back to userspace (unless
+ 		 * another truncate extends the file - this is desired though).
+ 		 */
+-		isize =3D i_size_read(file_inode(in));
++		isize =3D i_size_read(in->f_mapping->host);
+ 		if (unlikely(*ppos >=3D isize))
+ 			break;
+ 		end_offset =3D min_t(loff_t, isize, *ppos + len);
 
