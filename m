@@ -2,356 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC0DC77B73
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 11:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B85C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 12:39:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233084AbjDSLz4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 07:55:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45842 "EHLO
+        id S231215AbjDSMjA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 08:39:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233099AbjDSLzO (ORCPT
+        with ESMTP id S231592AbjDSMi6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 07:55:14 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 045B115616
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 04:54:58 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230419115457epoutp03e85d49f856ca24367ff685262787177f~XU-T2jhDO1371913719epoutp03E
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 11:54:57 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230419115457epoutp03e85d49f856ca24367ff685262787177f~XU-T2jhDO1371913719epoutp03E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1681905297;
-        bh=/MVZrDYgNIh/mjvCvKoJUXnOyDfXEO11lYxG5YriEZA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GK2s24DISr8KuidwXO1T2DqTNYOmvHPFeThTGJS0iUeAkwqwzMBaWoFyvf1i+Sfuq
-         uS0lUdNYFIBe1NNb6uwmcS0VYOZpgMmk+CSdkRiR3HIS01nknMzhB2JnpNeF4jdRSE
-         FIOOPvPae8BpPrTQByCmQNoS+wVBp0nZfdDu5PdQ=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20230419115456epcas5p2fe3ba66a84ae572af0d21e62bc772135~XU-TbEuka1844418444epcas5p26;
-        Wed, 19 Apr 2023 11:54:56 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.177]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4Q1fNb2m7sz4x9Py; Wed, 19 Apr
-        2023 11:54:55 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C6.34.09987.F86DF346; Wed, 19 Apr 2023 20:54:55 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20230419114810epcas5p3b10b7eddf9dae9ddc41940f09b483813~XU5Yporf_0874908749epcas5p3G;
-        Wed, 19 Apr 2023 11:48:10 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230419114810epsmtrp142f95b564da6872f61544594de8071cf~XU5YofKW61896418964epsmtrp1C;
-        Wed, 19 Apr 2023 11:48:10 +0000 (GMT)
-X-AuditID: b6c32a4b-a67fd70000002703-72-643fd68fccb9
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4E.97.08279.AF4DF346; Wed, 19 Apr 2023 20:48:10 +0900 (KST)
-Received: from green245.sa.corp.samsungelectronics.net (unknown
-        [107.99.41.245]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230419114806epsmtip15324f8047867f14d72c9bdf9f1f60c86~XU5VStBYa2332323323epsmtip1n;
-        Wed, 19 Apr 2023 11:48:06 +0000 (GMT)
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Cc:     bvanassche@acm.org, hare@suse.de, ming.lei@redhat.com,
-        dlemoal@kernel.org, anuj20.g@samsung.com, joshi.k@samsung.com,
-        nitheshshetty@gmail.com, gost.dev@samsung.com,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Vincent Fu <vincent.fu@samsung.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH v10 9/9] null_blk: add support for copy offload
-Date:   Wed, 19 Apr 2023 17:13:14 +0530
-Message-Id: <20230419114320.13674-10-nj.shetty@samsung.com>
-X-Mailer: git-send-email 2.35.1.500.gb896f729e2
-In-Reply-To: <20230419114320.13674-1-nj.shetty@samsung.com>
+        Wed, 19 Apr 2023 08:38:58 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294EA1BD2
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 05:38:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681907933; x=1713443933;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=U0OhEmkyN374yvgpmdDmLbFBPlNFpp5IE/9XwHhYyqM=;
+  b=FmNIVK5eTMy3nKPxE24OtHTlO6Dmk86wkuocoftXqytkIwK3YnedpjcR
+   n0UGWxJRTigP7lKA08OlhsQ0Pm2hndLjtSvoObd4KwrEMehiTX103QTt8
+   H20D/iR41VH416+KAwLzkg1JMfI/1lXrubim5JMTkDgWdDsvosrcl16zV
+   /qPaCExF5Ns3KigRd25rfnZ4+rRDT5O+LCy+zKmR0eQX1ZqQ52e8xUZgI
+   FWgs3Wvy7xeBY6Po3cfLr/aIcyIhTQ+nsE92JYP5PrbaPVsMG/rqTWd5I
+   qJavwaJDngX9vefah7sno68k2rb9j/1cO5z4rRc0XbEu2fty7SzKWaxr8
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="431711218"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="431711218"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2023 05:38:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10684"; a="865821365"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="865821365"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 19 Apr 2023 05:38:50 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pp75G-000esf-0m;
+        Wed, 19 Apr 2023 12:38:50 +0000
+Date:   Wed, 19 Apr 2023 20:37:52 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 7/7] blk-mq: don't use the requeue list to queue flush
+ commands
+Message-ID: <202304192001.KzxpDQmK-lkp@intel.com>
+References: <20230416200930.29542-8-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xbZRTPd297W3CFy8P4DZnDmmU85FFWygeOIQ7wEtSQLCZmQbChN4UA
-        bW3pcBId7zAYYzDArMzR6RwUykNgjJWHGwR5CwkDBeQhDze3DFj3ILMCtlzQ/ff7/c453znn
-        9+VwcfvLHCdugiyFVsrESXzCmtXa43bYs2gyWOJj7LBBDYM/4yjzwiaOameLCPSwxwhQ+foL
-        HJlGRnG08FMw6lytYKOp27cw1PFdCYZ0tb0Yar/6GEO9248IVNI9CdDKhAZDndMeqKNzgIXG
-        DZcJVHl9hYO6L2ZhqG05A6BWUyWO6h+usVD/9OtoqSAPoNHNPva7TtT43UhKMz9CULc0sxxq
-        dO5HFjU+oqaaas4SVPO1M1T7VDpBFWatmhNy5tnUWtcEQZ1vqQFU81Aa9aTpDapp+REWZXsy
-        8Wg8LZbQShdaFieXJMikQfzIE7HHY/1EPgJPQQDy57vIxMl0ED/0gyjP8IQksyF8l1PiJLVZ
-        ihKrVHzvY0eVcnUK7RIvV6UE8WmFJEkhVHipxMkqtUzqJaNTAgU+Pr5+5sTPEuPv11WxFd8G
-        f5GdN4qngxVhPrDiQlIIx/4Z5+QDa6492Q7glDaXzRAjgBV5dwBDngO4/EMmsVeSUfcbwQQ6
-        AZzRGHGG5GBwVL/FygdcLkF6wKFtrkV3JHNx+HjlLMtCcFKPw4V1E7A85UAGwxddZSwLZpGH
-        oK7iHMeCeeQ7sHp6BbM8BElvWDRvZ5GtzHJV10WcSbGDA5eWd0px8iDMulGxMwQkm63gXPaf
-        bGbUUPi3qYXFYAf4oK+Fw2An+FdR7i5OhbrSaoIpzgZQ86sGMIFgmDNYhFuGwEk32GDwZuQD
-        sGywHmMa28BC0zLG6DzYdmUPvwX1Ddpdu/bDyY2MXUzBkmc5uwafB1B3bQZcAC6alxbSvLSQ
-        5v/WWoDXgP20QpUspVV+iiMyOvW/f46TJzeBnTNxj2wDiwvrXt0A44JuALk435E3HBYosedJ
-        xKe/pJXyWKU6iVZ1Az+z4cW406txcvOdyVJiBcIAH6FIJBIGHBEJ+K/xDgcNxNmTUnEKnUjT
-        Clq5V4dxrZzSMfu3i4lGf35Irr7g3r6bDc6+gVfebz02vRBeVfv75xNd4eWNlbdfic5zfR5z
-        AeW2xGgXP+nvaSrNsbmrhalrb+rqn6TBG6cChALOmW3pgW+eHgoYc/7jl5D0j+fC+13j7qgf
-        0Lw5laeo3HV4yXEpsjE+ctNoJ6sN/cgdi0itc19Uv6d/aviKN+w/FJXe67BqWLW6et9F4FHY
-        9SGh8/16ONr/2RQdRri2xxSknjgXlpNh083S62yr08Y2JBEzUyHVtupE6b1Y0F+6NXvSmdto
-        6FMWa/dJRxsK2J/a6Oc1Gb1sg9H6Zual69+bTi+7FcUG5G95lx3sj4vmqjd0DhFt8mQ+SxUv
-        FrjjSpX4XzyXjwevBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Ra0hTcRjG+59zdnYcLc+m0V8lq0FSRqZk9ceGMyo7dKOwL2ZSSw/mfWxa
-        WVRbWtk0My3DWWgqLq+lZrq8VFMrK5l5KyWdkqNE5iwpMVFzjsBvz/v8nvd9PrwULuwgnKnw
-        mDhWHiONEpE84nmzyHXz325JqGfqKImevH+Do6vpszgqHbhNorHmXwBlTUzjaKbdgKOhlxLU
-        OJ7DQX2vdBhqyM/AUHFpK4bqH/3EUOu8mUQZ+l6ATD0aDDX2b0INjW0E6nrxgES5RSYu0mcm
-        YqhuRAXQ85lcHFWMWQj0rt8FfUtJBsgw+5bj58x0dR9gNMZ2ktFpBriMYbCSYLra45mqkpsk
-        U114hanvU5LMrcTxhcA1I4exNPWQTNqzEsBUf7jITFa5MlUjZuyI/XGeOJSNCj/Lyrf4nuKd
-        +VGu5cgeSs4nJRtwJTB5q4EdBWlvqCr/QqoBjxLS9QA2t01xbcAJFs224DbtAIvnvnNtoUQM
-        ZtaqFwaKIulN8MM8ZfUd6XQcdhqVpHUBpxtwWJy3y6odaAmcbrpHWDVBr4fFOamLBXx6J3zc
-        b8KsdyC9Bd42Cqy23YKtbcpc7BXSPjBVPwdscQFsyx4hbOfXwMSaHDwd0JolSLME5QGsBDix
-        MkV0WLTCS+YVw57zUEijFfExYR4hsdFVYPHp7hvrQG3JhIceYBTQA0jhIkf+PrFvqJAfKk24
-        wMpjT8rjo1iFHrhQhGgVv0PddlJIh0nj2EiWlbHy/xSj7JyVWNqpG/LA1kP+E8I66d1cex/0
-        60bOdp9PQ5Eha0V8nRepTcjMsjMOtFfMsC2/z1eeHr+8p2Zq9bJgUeClr70rXCTm6d4f+UEf
-        C7PPqTIEY/al3Y6elQJVSM+qmnXu/uSwutBNpjV4kBnkn9jlh7UJrkYsJWD/DoeAhGCZZ++h
-        j4LG0b3cstTfZjytLMjk6J2XJubyXr9O4URYfLFa3VFjXOw+3bA2r3tr/aibr2inf+SJyXdh
-        k9UbjsbrAgqcWhuOPJWYx7XK8Cmx3qewYHfSSnFdCieOf+zzEGO5479rSnXB0nF9c74f96Bx
-        /Tx0v9+5tnrw8l7hNj+niCD9ntVcEaE4I/Vyx+UK6T+V/wzJYwMAAA==
-X-CMS-MailID: 20230419114810epcas5p3b10b7eddf9dae9ddc41940f09b483813
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230419114810epcas5p3b10b7eddf9dae9ddc41940f09b483813
-References: <20230419114320.13674-1-nj.shetty@samsung.com>
-        <CGME20230419114810epcas5p3b10b7eddf9dae9ddc41940f09b483813@epcas5p3.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230416200930.29542-8-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implementaion is based on existing read and write infrastructure.
-copy_max_bytes: A new configfs and module parameter is introduced, which
-can be used to set hardware/driver supported maximum copy limit.
+Hi Christoph,
 
-Suggested-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
----
- drivers/block/null_blk/main.c     | 108 ++++++++++++++++++++++++++++--
- drivers/block/null_blk/null_blk.h |   8 +++
- 2 files changed, 111 insertions(+), 5 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 5d54834d8690..9028aae1efbd 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -157,6 +157,10 @@ static int g_max_sectors;
- module_param_named(max_sectors, g_max_sectors, int, 0444);
- MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sectors)");
- 
-+static unsigned long g_copy_max_bytes = COPY_MAX_BYTES;
-+module_param_named(copy_max_bytes, g_copy_max_bytes, ulong, 0444);
-+MODULE_PARM_DESC(copy_max_bytes, "Maximum size of a copy command (in bytes)");
-+
- static unsigned int nr_devices = 1;
- module_param(nr_devices, uint, 0444);
- MODULE_PARM_DESC(nr_devices, "Number of devices to register");
-@@ -409,6 +413,7 @@ NULLB_DEVICE_ATTR(home_node, uint, NULL);
- NULLB_DEVICE_ATTR(queue_mode, uint, NULL);
- NULLB_DEVICE_ATTR(blocksize, uint, NULL);
- NULLB_DEVICE_ATTR(max_sectors, uint, NULL);
-+NULLB_DEVICE_ATTR(copy_max_bytes, uint, NULL);
- NULLB_DEVICE_ATTR(irqmode, uint, NULL);
- NULLB_DEVICE_ATTR(hw_queue_depth, uint, NULL);
- NULLB_DEVICE_ATTR(index, uint, NULL);
-@@ -550,6 +555,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_queue_mode,
- 	&nullb_device_attr_blocksize,
- 	&nullb_device_attr_max_sectors,
-+	&nullb_device_attr_copy_max_bytes,
- 	&nullb_device_attr_irqmode,
- 	&nullb_device_attr_hw_queue_depth,
- 	&nullb_device_attr_index,
-@@ -656,7 +662,8 @@ static ssize_t memb_group_features_show(struct config_item *item, char *page)
- 			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
- 			"submit_queues,use_per_node_hctx,virt_boundary,zoned,"
- 			"zone_capacity,zone_max_active,zone_max_open,"
--			"zone_nr_conv,zone_offline,zone_readonly,zone_size\n");
-+			"zone_nr_conv,zone_offline,zone_readonly,zone_size,"
-+			"copy_max_bytes\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -722,6 +729,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->queue_mode = g_queue_mode;
- 	dev->blocksize = g_bs;
- 	dev->max_sectors = g_max_sectors;
-+	dev->copy_max_bytes = g_copy_max_bytes;
- 	dev->irqmode = g_irqmode;
- 	dev->hw_queue_depth = g_hw_queue_depth;
- 	dev->blocking = g_blocking;
-@@ -1271,6 +1279,78 @@ static int null_transfer(struct nullb *nullb, struct page *page,
- 	return err;
- }
- 
-+static inline void nullb_setup_copy_read(struct nullb *nullb, struct bio *bio)
-+{
-+	struct nullb_copy_token *token = bvec_kmap_local(&bio->bi_io_vec[0]);
-+
-+	token->subsys = "nullb";
-+	token->sector_in = bio->bi_iter.bi_sector;
-+	token->nullb = nullb;
-+	token->sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-+}
-+
-+static inline int nullb_setup_copy_write(struct nullb *nullb,
-+		struct bio *bio, bool is_fua)
-+{
-+	struct nullb_copy_token *token = bvec_kmap_local(&bio->bi_io_vec[0]);
-+	sector_t sector_in, sector_out;
-+	void *in, *out;
-+	size_t rem, temp;
-+	unsigned long offset_in, offset_out;
-+	struct nullb_page *t_page_in, *t_page_out;
-+	int ret = -EIO;
-+
-+	if (unlikely(memcmp(token->subsys, "nullb", 5)))
-+		return -EINVAL;
-+	if (unlikely(token->nullb != nullb))
-+		return -EINVAL;
-+	if (WARN_ON(token->sectors != bio->bi_iter.bi_size >> SECTOR_SHIFT))
-+		return -EINVAL;
-+
-+	sector_in = token->sector_in;
-+	sector_out = bio->bi_iter.bi_sector;
-+	rem = token->sectors << SECTOR_SHIFT;
-+
-+	spin_lock_irq(&nullb->lock);
-+	while (rem > 0) {
-+		temp = min_t(size_t, nullb->dev->blocksize, rem);
-+		offset_in = (sector_in & SECTOR_MASK) << SECTOR_SHIFT;
-+		offset_out = (sector_out & SECTOR_MASK) << SECTOR_SHIFT;
-+
-+		if (null_cache_active(nullb) && !is_fua)
-+			null_make_cache_space(nullb, PAGE_SIZE);
-+
-+		t_page_in = null_lookup_page(nullb, sector_in, false,
-+			!null_cache_active(nullb));
-+		if (!t_page_in)
-+			goto err;
-+		t_page_out = null_insert_page(nullb, sector_out,
-+			!null_cache_active(nullb) || is_fua);
-+		if (!t_page_out)
-+			goto err;
-+
-+		in = kmap_local_page(t_page_in->page);
-+		out = kmap_local_page(t_page_out->page);
-+
-+		memcpy(out + offset_out, in + offset_in, temp);
-+		kunmap_local(out);
-+		kunmap_local(in);
-+		__set_bit(sector_out & SECTOR_MASK, t_page_out->bitmap);
-+
-+		if (is_fua)
-+			null_free_sector(nullb, sector_out, true);
-+
-+		rem -= temp;
-+		sector_in += temp >> SECTOR_SHIFT;
-+		sector_out += temp >> SECTOR_SHIFT;
-+	}
-+
-+	ret = 0;
-+err:
-+	spin_unlock_irq(&nullb->lock);
-+	return ret;
-+}
-+
- static int null_handle_rq(struct nullb_cmd *cmd)
- {
- 	struct request *rq = cmd->rq;
-@@ -1280,13 +1360,20 @@ static int null_handle_rq(struct nullb_cmd *cmd)
- 	sector_t sector = blk_rq_pos(rq);
- 	struct req_iterator iter;
- 	struct bio_vec bvec;
-+	bool fua = rq->cmd_flags & REQ_FUA;
-+
-+	if (rq->cmd_flags & REQ_COPY) {
-+		if (op_is_write(req_op(rq)))
-+			return nullb_setup_copy_write(nullb, rq->bio, fua);
-+		nullb_setup_copy_read(nullb, rq->bio);
-+		return 0;
-+	}
- 
- 	spin_lock_irq(&nullb->lock);
- 	rq_for_each_segment(bvec, rq, iter) {
- 		len = bvec.bv_len;
- 		err = null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
--				     op_is_write(req_op(rq)), sector,
--				     rq->cmd_flags & REQ_FUA);
-+				     op_is_write(req_op(rq)), sector, fua);
- 		if (err) {
- 			spin_unlock_irq(&nullb->lock);
- 			return err;
-@@ -1307,13 +1394,20 @@ static int null_handle_bio(struct nullb_cmd *cmd)
- 	sector_t sector = bio->bi_iter.bi_sector;
- 	struct bio_vec bvec;
- 	struct bvec_iter iter;
-+	bool fua = bio->bi_opf & REQ_FUA;
-+
-+	if (bio->bi_opf & REQ_COPY) {
-+		if (op_is_write(bio_op(bio)))
-+			return nullb_setup_copy_write(nullb, bio, fua);
-+		nullb_setup_copy_read(nullb, bio);
-+		return 0;
-+	}
- 
- 	spin_lock_irq(&nullb->lock);
- 	bio_for_each_segment(bvec, bio, iter) {
- 		len = bvec.bv_len;
- 		err = null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
--				     op_is_write(bio_op(bio)), sector,
--				     bio->bi_opf & REQ_FUA);
-+				     op_is_write(bio_op(bio)), sector, fua);
- 		if (err) {
- 			spin_unlock_irq(&nullb->lock);
- 			return err;
-@@ -2157,6 +2251,10 @@ static int null_add_dev(struct nullb_device *dev)
- 		dev->max_sectors = queue_max_hw_sectors(nullb->q);
- 	dev->max_sectors = min(dev->max_sectors, BLK_DEF_MAX_SECTORS);
- 	blk_queue_max_hw_sectors(nullb->q, dev->max_sectors);
-+	blk_queue_max_copy_sectors_hw(nullb->q,
-+			       dev->copy_max_bytes >> SECTOR_SHIFT);
-+	if (dev->copy_max_bytes)
-+		blk_queue_flag_set(QUEUE_FLAG_COPY, nullb->disk->queue);
- 
- 	if (dev->virt_boundary)
- 		blk_queue_virt_boundary(nullb->q, PAGE_SIZE - 1);
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index 929f659dd255..3dda593b0747 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -67,6 +67,13 @@ enum {
- 	NULL_Q_MQ	= 2,
- };
- 
-+struct nullb_copy_token {
-+	char *subsys;
-+	struct nullb *nullb;
-+	sector_t sector_in;
-+	sector_t sectors;
-+};
-+
- struct nullb_device {
- 	struct nullb *nullb;
- 	struct config_group group;
-@@ -107,6 +114,7 @@ struct nullb_device {
- 	unsigned int queue_mode; /* block interface */
- 	unsigned int blocksize; /* block size */
- 	unsigned int max_sectors; /* Max sectors per command */
-+	unsigned long copy_max_bytes; /* Max copy offload length in bytes */
- 	unsigned int irqmode; /* IRQ completion handler */
- 	unsigned int hw_queue_depth; /* queue depth */
- 	unsigned int index; /* index of the disk, only valid with a disk */
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on next-20230418]
+[cannot apply to linus/master v6.3-rc7]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/blk-mq-reflow-blk_insert_flush/20230417-051014
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230416200930.29542-8-hch%40lst.de
+patch subject: [PATCH 7/7] blk-mq: don't use the requeue list to queue flush commands
+config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20230419/202304192001.KzxpDQmK-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/c1197e1a4ff5b38b73d3ec923987ca857f5e2695
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Christoph-Hellwig/blk-mq-reflow-blk_insert_flush/20230417-051014
+        git checkout c1197e1a4ff5b38b73d3ec923987ca857f5e2695
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 olddefconfig
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304192001.KzxpDQmK-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> block/blk-mq.c:1461:6: warning: no previous prototype for 'blk_flush_queue_insert' [-Wmissing-prototypes]
+    1461 | void blk_flush_queue_insert(struct request *rq)
+         |      ^~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/blk_flush_queue_insert +1461 block/blk-mq.c
+
+  1460	
+> 1461	void blk_flush_queue_insert(struct request *rq)
+  1462	{
+  1463		struct request_queue *q = rq->q;
+  1464		unsigned long flags;
+  1465	
+  1466		spin_lock_irqsave(&q->requeue_lock, flags);
+  1467		list_add_tail(&rq->queuelist, &q->flush_list);
+  1468		spin_unlock_irqrestore(&q->requeue_lock, flags);
+  1469	}
+  1470	
+
 -- 
-2.35.1.500.gb896f729e2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
