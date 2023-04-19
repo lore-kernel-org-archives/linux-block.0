@@ -2,116 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BC1C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 13:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C3FC6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 13:23:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233380AbjDSNPw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 09:15:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53590 "EHLO
+        id S233014AbjDSNXV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 09:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233378AbjDSNPw (ORCPT
+        with ESMTP id S230154AbjDSNXV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 09:15:52 -0400
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B741D13C34;
-        Wed, 19 Apr 2023 06:15:50 -0700 (PDT)
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-2f94fe993edso476860f8f.1;
-        Wed, 19 Apr 2023 06:15:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681910149; x=1684502149;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZIgRlyZSNH/SNYRlepaN+njO6QBAl9chuqcWN0oyisY=;
-        b=SkshjrmWssSuD2f1iITqPrqGqeOomeCw9+gjW0AxlIkPPRu4jJvkBMx3kdlpxe7QpE
-         Th0ZaHMHVMIQ//fe56jEkOCwc8zBRAnQa075vEUx91qZUII1phQ8QY9xJ57hbf3mq7HV
-         Gdbm8q2yedSrYtpUT5KCe783hnTJmPu5WFGFYAV8V791r4F2rgORI0OuaY8ax4dQgRSw
-         Yjw+Qu+qJ2A3QyetTB9ePKMRe0GoafYeAB83CznLRqpq/wVQm0s4XavIgAgfMfny/wNy
-         Z1ctPvdWUQZtDTnMYL/mMPwfl6qbS3nnpnKcY8H5cavNVt0jwKTc4zwc3VPs8OT6wGbi
-         H8UQ==
-X-Gm-Message-State: AAQBX9eoc1dROPyotTOLbzPAO3GRMdP+WaTpm8Get4ld9XW9DgCJAZvo
-        hzxf+SJk5/GM9kgKqDyUUPVV5w0NM4E=
-X-Google-Smtp-Source: AKy350aM3txglqO3IBUp/d4qIVyIrEs8rob4csV9yafFShyvmuXFrJJ0427NCQSlvWFhFQKDFVdKKg==
-X-Received: by 2002:a5d:548e:0:b0:2c7:1c72:699f with SMTP id h14-20020a5d548e000000b002c71c72699fmr11405069wrv.4.1681910149047;
-        Wed, 19 Apr 2023 06:15:49 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id q4-20020adff944000000b002fda1b12a0bsm4211767wrr.2.2023.04.19.06.15.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 06:15:48 -0700 (PDT)
-Message-ID: <6a5feb66-632f-b843-c04d-e0aaa2d51415@grimberg.me>
-Date:   Wed, 19 Apr 2023 16:15:47 +0300
+        Wed, 19 Apr 2023 09:23:21 -0400
+Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7F2146E4;
+        Wed, 19 Apr 2023 06:22:57 -0700 (PDT)
+From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+        s=mail; t=1681910575;
+        bh=kF2K3Rlh4UxwVdG+nyD6f0YN/COQ4qVDn3yxp2SKVxc=;
+        h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+        b=YFcCgHB8hGVlTs6lQ4T9459c4/d4RD3GEKKZ6KWt41n4/reI6B9YihsWBxTuhXcGe
+         ZJ2q4Lm8Q1519saGzleo4rXllH3ATrhOp+8odSpXU2VUCGYNS47aTycBDc5SLXGlPk
+         txYPxfm5rUXQ8DsBx0VWYqP4eurgBl6AngEUgVnE=
+Date:   Wed, 19 Apr 2023 15:22:55 +0200
+Subject: [PATCH v2 3/4] block: constify struct part_attr_group
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC v1 0/1] nvme testsuite runtime optimization
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-References: <20230419085643.25714-1-dwagner@suse.de>
- <f0d2ddd5-37d6-8fba-a5e3-965fb9f41474@nvidia.com>
- <9a1f1709-baaf-5661-2cbf-c34e2da9e42e@grimberg.me>
- <zlavgcdalmmtabiabu76m4s3oo5hyaehckmwcxvqrnu3j6q6xo@5ke6gv5h3j7i>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <zlavgcdalmmtabiabu76m4s3oo5hyaehckmwcxvqrnu3j6q6xo@5ke6gv5h3j7i>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20230419-const-partition-v2-3-817b58f85cd1@weissschuh.net>
+References: <20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net>
+In-Reply-To: <20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1681910574; l=600;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=kF2K3Rlh4UxwVdG+nyD6f0YN/COQ4qVDn3yxp2SKVxc=;
+ b=hGep4w3kBAcn2BOjS1uLDC86/cXeBxeh1sDHAoHUGWD8Pzz7IlRumdd7npMtycAN4auCvh7xQ
+ P701kG2CAYvBm+/VUjf4ZtHX2qeArE5wFJh037KFpKqwZ10UILi7IMP
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The struct is never modified so it can be const.
 
->>>> While testing the fc transport I got a bit tired of wait for the I/O jobs to
->>>> finish. Thus here some runtime optimization.
->>>>
->>>> With a small/slow VM I got following values:
->>>>
->>>> with 'optimizations'
->>>>      loop:
->>>>        real    4m43.981s
->>>>        user    0m17.754s
->>>>        sys     2m6.249s
->>
->> How come loop is doubling the time with this patch?
->> ratio is not the same before and after.
-> 
-> first run was with loop, second one with rdma:
-> 
-> nvme/002 (create many subsystems and test discovery)         [not run]
->      runtime  82.089s  ...
->      nvme_trtype=rdma is not supported in this test
-> 
-> nvme/016 (create/delete many NVMeOF block device-backed ns and test discovery) [not run]
->      runtime  39.948s  ...
->      nvme_trtype=rdma is not supported in this test
-> nvme/017 (create/delete many file-ns and test discovery)     [not run]
->      runtime  40.237s  ...
-> 
-> nvme/047 (test different queue types for fabric transports)  [passed]
->      runtime    ...  13.580s
-> nvme/048 (Test queue count changes on reconnect)             [passed]
->      runtime    ...  6.287s
-> 
-> 82 + 40 + 40 - 14 - 6 = 142. So loop runs additional tests. Hmm, though my
-> optimization didn't work there...
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ block/partitions/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-How come loop is 4m+ while the others are 2m+ when before all
-were the same timeframe more or less?
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 43bde8118a78..cb37ac71868e 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -236,7 +236,7 @@ static struct attribute *part_attrs[] = {
+ 	NULL
+ };
+ 
+-static struct attribute_group part_attr_group = {
++static const struct attribute_group part_attr_group = {
+ 	.attrs = part_attrs,
+ };
+ 
 
-> 
->>> Those jobs are meant to be run for at least 1G to establish
->>> confidence on the data set and the system under test since SSDs
->>> are in TBs nowadays and we don't even get anywhere close to that,
->>> with your suggestion we are going even lower ...
->>
->> Where does the 1G boundary coming from?
-> 
-> No idea, it just the existing hard coded values. I guess it might be from
-> efa06fcf3c83 ("loop: test partition scanning") which was the first real test
-> case (according the logs).
+-- 
+2.40.0
 
-Was asking Chaitanya why is 1G considered sufficient vs. other sizes?
-Why not 10G? Why not 100M?
