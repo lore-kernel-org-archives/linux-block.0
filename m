@@ -2,112 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91738C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 15:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E05C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 16:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233719AbjDSPuy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 11:50:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
+        id S229879AbjDSQIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 12:08:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233691AbjDSPuo (ORCPT
+        with ESMTP id S232767AbjDSQIE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 11:50:44 -0400
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD3A5AD14;
-        Wed, 19 Apr 2023 08:50:20 -0700 (PDT)
-Received: by mail-ej1-f44.google.com with SMTP id a5so26396557ejb.6;
-        Wed, 19 Apr 2023 08:50:20 -0700 (PDT)
+        Wed, 19 Apr 2023 12:08:04 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA91C358C
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 09:08:02 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1a7111e0696so272825ad.1
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 09:08:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681920482; x=1684512482;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=toVfklchumbtFrUnA8SGKenhZ6u9CN2GQvMh+PIxLnU=;
+        b=25Pak+4kHlmsORoGLLv0Z/iEqWUnupCNDEZYeTJpRP0o+NlEtqRqKXoDFmYgKIHwug
+         pxNHPqZNWc33Bj0jN1RBYMucAq355eJPcYFz9gJoaEbIXH3cHLCkYxcNs8GtLHsc/k2g
+         CAvukhZKhF1dhsgPVlSmiQq+7N+/8BteV1Xw4g0bzr+o32zzAfPxoJiONDLapyVHEP9d
+         ryNmh35ESsqO/oLjkx43qtPszwGSP9kXu+dbtZgxm+k/wAJ0wQTft/EIWzB9jsbhhaHo
+         sykuKcScu1Dk71d97Ntk++nDKZtVN7S4slvRJ2y94lFh7xjAOPP0DBxwg5wGs7VfsGR3
+         R/DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681919371; x=1684511371;
-        h=content-transfer-encoding:in-reply-to:subject:from:content-language
-         :references:cc:to:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eOUql/Ro9WMFOAkCEiG4JHxRup0JACmg1t6/598D9Co=;
-        b=ZWM2zrXfhtV/QPwHWKu0Xd2NIH2Dwt2+fAdSZMP/EKAjohBUqwURiwwYg4sxRoFWv7
-         TvX/RHZHIPcp4EL1ohgY3TfrUBiog0fuyjWApEIR/YYrM0ea0n1G40Cfw7GriWgIjrLh
-         diNooW/Wh0Fg2vAm6IEstcPXUuHw/lAfbc5S9bV7yCxAE/krnRdv+nV115joymtI04kM
-         LZrwgzr0V52Cdhg00o4AjSi9MRitUjhX3uSmXEN9sL07w1njMOXQuvq5pK0W/cL54cmX
-         hp/Om1geOVXFsCSHcuit/fE7S6EParBOetrJHGcSLcaxFp6sC1RzsOKPvRhZYZvVqk+s
-         lWGw==
-X-Gm-Message-State: AAQBX9e5nacbjl0OzMK1VdkflBrs9GX/AzSgyNdJqvp92xBj1FQmAx86
-        pWhacyfqZ5Rq1jKfaW2uZNc=
-X-Google-Smtp-Source: AKy350aGL2zkmqe4oR+uMj3AvMO3DzPKJ+2nYfKvNg29gbfKfCGrXHIDbSOpWzqvwSwoi/4pOYVBdg==
-X-Received: by 2002:a17:907:98ef:b0:92c:8e4a:1a42 with SMTP id ke15-20020a17090798ef00b0092c8e4a1a42mr15999637ejc.32.1681919370719;
-        Wed, 19 Apr 2023 08:49:30 -0700 (PDT)
-Received: from [192.168.32.129] (aftr-62-216-205-204.dynamic.mnet-online.de. [62.216.205.204])
-        by smtp.gmail.com with ESMTPSA id o26-20020a1709061d5a00b0094e44899367sm9373601ejh.101.2023.04.19.08.49.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 08:49:30 -0700 (PDT)
-Message-ID: <0388e267-6a5f-85b8-83eb-62ea5aae06e1@kernel.org>
-Date:   Wed, 19 Apr 2023 17:49:28 +0200
+        d=1e100.net; s=20221208; t=1681920482; x=1684512482;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=toVfklchumbtFrUnA8SGKenhZ6u9CN2GQvMh+PIxLnU=;
+        b=YgFORaDm6FoSEynU4EMDVpEd+NitECL9cx20cOLVZ6Dh1xuEKXr4r03PguF0dxNGp0
+         DDxFQpPSOeQ8orISr5XZs7P4ubeWaJpBLxF07TTNiSmUNobtj7X2QvsLCfqhdMsQEmYz
+         Z3i260SMZDkXTGY9kfWNB72NII+F4WyfZzrTGkvG4n3YT2iY/xQOpdT6hG5cvDl36i0v
+         /36hE1QSKoqHs6UZtuVm5sIflDbM15JjTQ5zfXxTA6PB5TBT5UzzvbBSCmYtAp5/cjbO
+         IxNikK6GgLR38wdNX+762coaAION6iVs3szXtE0JhEMULvU4N8vshXIylGOJbg4kcpw6
+         NiDA==
+X-Gm-Message-State: AAQBX9c1gAMD0q/B+nOVjnoCovO+2b5/zdKdcXtUbs7Y+RiTGNZOHKUu
+        wF7CIAak2w8axnnXiYtU5u0/9ZU9Vc8melNe7lI=
+X-Google-Smtp-Source: AKy350YXBGA7Z7uePmF6aNqhjIxSITc+JU17mnAdW6x+y7w75rtI3MiAB3/+mPiAYPP3fUfOV6pldA==
+X-Received: by 2002:a17:903:11c9:b0:1a6:6bdb:b548 with SMTP id q9-20020a17090311c900b001a66bdbb548mr22124374plh.1.1681920482057;
+        Wed, 19 Apr 2023 09:08:02 -0700 (PDT)
+Received: from localhost.localdomain ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ik14-20020a17090b428e00b00246f9725ffcsm1566258pjb.33.2023.04.19.09.08.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 09:08:01 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org
+Cc:     luhongfei@vivo.com
+Subject: [PATCHSET 0/6] Enable NO_OFFLOAD support
+Date:   Wed, 19 Apr 2023 10:07:53 -0600
+Message-Id: <20230419160759.568904-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com, agruenba@redhat.com,
-        cluster-devel@redhat.com, damien.lemoal@wdc.com,
-        dm-devel@redhat.com, dsterba@suse.com, hare@suse.de, hch@lst.de,
-        jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-raid@vger.kernel.org, ming.lei@redhat.com,
-        rpeterso@redhat.com, shaggy@kernel.org, snitzer@kernel.org,
-        song@kernel.org, Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20230419140929.5924-1-jth@kernel.org>
- <20230419140929.5924-20-jth@kernel.org>
- <ZD/4b9ZQ1YZRTgHL@casper.infradead.org>
-Content-Language: en-US
-From:   Johannes Thumshirn <jth@kernel.org>
-Subject: Re: [PATCH v3 19/19] block: mark bio_add_page as __must_check
-In-Reply-To: <ZD/4b9ZQ1YZRTgHL@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19/04/2023 16:19, Matthew Wilcox wrote:
-> On Wed, Apr 19, 2023 at 04:09:29PM +0200, Johannes Thumshirn wrote:
->> Now that all users of bio_add_page check for the return value, mark
->> bio_add_page as __must_check.
-> 
-> Should probably add __must_check to bio_add_folio too?  If this is
-> really the way you want to go ... means we also need a
-> __bio_add_folio().
+Hi,
 
-I admit I haven't thought of folios, mea culpa.
+This series enables support for forcing no-offload for requests that
+otherwise would have been punted to io-wq. In essence, it bypasses
+the normal non-blocking issue in favor of just letting the issue block.
+This is only done for requests that would've otherwise hit io-wq in
+the offload path, anything pollable will still be doing non-blocking
+issue. See patch 3 for details.
 
-3 of the callers of bio_add_folio() don't check the return value:
-$ git grep -E '\sbio_add_folio\b'
-fs/iomap/buffered-io.c:         bio_add_folio(ctx->bio, folio, plen, poff);
-fs/iomap/buffered-io.c: bio_add_folio(&bio, folio, plen, poff);
-fs/iomap/buffered-io.c:         bio_add_folio(wpc->ioend->io_bio, folio, 
-len, poff);
+Patches 1-2 are just prep patches, and patch 4-5 are reverts of async
+cleanups, and patch 6 enables this for requests that don't support
+nonblocking issue at all.
 
-But from a quick look they look OK to me.
-
-Does that look reasonable to you:
-
-diff --git a/block/bio.c b/block/bio.c
-index fd11614bba4d..f3a3524b53e4 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1138,6 +1138,14 @@ int bio_add_page(struct bio *bio, struct page *page,
-  }
-  EXPORT_SYMBOL(bio_add_page);
-
-+void __bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
-+                    size_t off)
-+{
-+       WARN_ON_ONCE(len > UINT_MAX);
-+       WARN_ON_ONCE(off > UINT_MAX);
-+       __bio_add_page(bio, &folio->page, len, off);
-+}
-+
-  /**
-   * bio_add_folio - Attempt to add part of a folio to a bio.
-   * @bio: BIO to add to.
+-- 
+Jens Axboe
 
 
-Byte,
-	Johannes
