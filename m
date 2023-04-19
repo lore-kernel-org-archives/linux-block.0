@@ -2,101 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B64C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 10:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25382C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 11:13:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230179AbjDSKp6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 06:45:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51784 "EHLO
+        id S232930AbjDSLNS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 07:13:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232173AbjDSKpw (ORCPT
+        with ESMTP id S233004AbjDSLNN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 06:45:52 -0400
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926AF1BDF;
-        Wed, 19 Apr 2023 03:45:50 -0700 (PDT)
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-2f67111b2d0so747746f8f.0;
-        Wed, 19 Apr 2023 03:45:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681901149; x=1684493149;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V3x0k4rJnKaOmkvnCDjyE+jovLY1Kmv7i3ZtuK09oys=;
-        b=M7apLshLdCWDQ8ivH2Y5a3cBsud/x+4PkTYM0M5OHISFRw7CCy2k5st/zJCnkNXj0d
-         ULn+oQ0DQ8H+j5FC/n+MkJfaOesvVOrNrVuJwEXoZuMZpKBF+pXWj4F4/XIpGBC1kX4a
-         RwhW1NYXMMNsnH2ivm/UFwj3QTP1YE4IpF/bosrYv7u6RCu+yuYahr11o8qBGy+5sPUH
-         N397apf/Fxikxs+IVS3UgyERh2xiu0TP0lsHDUUtd1lSC0OTNgb/OmJnY8Qy8+VlTLzj
-         X/1ApaCl1x8QJ055r2gj5AEsoaHwn1AHG2SjLfiYGXbhbVsGvgBn45Jx7WD2DSVjP7FW
-         vmsQ==
-X-Gm-Message-State: AAQBX9eK7PacYWqGk3d0DA7bRBwVNQ/6OQ8lXl3dwA5Rmy/bjMeJ0wEr
-        PHgQCMFJKc06boPx6NUe2oHhCFNEllg=
-X-Google-Smtp-Source: AKy350a455Yk+wWzCcfcpBQdd1niGJgBmD50m/H70Uo03NiG9EIf9Lo+fxiile8UcebRMBEQPqYUbg==
-X-Received: by 2002:a5d:6352:0:b0:2f5:7487:7b3d with SMTP id b18-20020a5d6352000000b002f574877b3dmr10467874wrw.1.1681901148946;
-        Wed, 19 Apr 2023 03:45:48 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id q1-20020adfcd81000000b002ff77b033b1sm419188wrj.33.2023.04.19.03.45.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 03:45:48 -0700 (PDT)
-Message-ID: <1b060988-fc63-4a86-33b8-88ba61c9358f@grimberg.me>
-Date:   Wed, 19 Apr 2023 13:45:47 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH blktests v2 2/2] nvme-rc: Cleanup fc resource before
- module unloading
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Wed, 19 Apr 2023 07:13:13 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD8A146C1;
+        Wed, 19 Apr 2023 04:12:36 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1B7D821996;
+        Wed, 19 Apr 2023 11:10:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1681902653; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H0TQZIlSiUIAMArLDTJtF4bmMqFaEz7hFLHtBMFTIAw=;
+        b=RDrPZ7T7dltq32OA62C7S6zsfLvhiouuuIeL+yxO88jbUmgI0+gtkMUBhlVVvlecs8OqWI
+        b8etUN3s4oCcZULFDO5NTvgEWmRiSTZnT97Z/7HfBMy7bEdKY+2x8gTV+D3fRDGWb2QIH3
+        ydRRUdA2i1T4LL6m8wuI/URN49nIce4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1681902653;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H0TQZIlSiUIAMArLDTJtF4bmMqFaEz7hFLHtBMFTIAw=;
+        b=7Xi/x7w1wqWQhdAskPhzqt9RZ/JdoGktzYrMkA2OMN6cMPNeJ/kwll1v2VC8deZ8vZhVGp
+        SxEpnZr5aQECcbBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 06E911390E;
+        Wed, 19 Apr 2023 11:10:53 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Yz9xAT3MP2RIRQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 19 Apr 2023 11:10:53 +0000
+Date:   Wed, 19 Apr 2023 13:10:52 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-References: <20230419084757.24846-1-dwagner@suse.de>
- <20230419084757.24846-3-dwagner@suse.de>
- <3ec250a9-54c7-3e0d-2463-f8faf15cdb58@grimberg.me>
- <3euieyvxpsww5p4m457pzupfipbnbv3atxauh2lrp54gqmqcco@hs7ytoop5osf>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <3euieyvxpsww5p4m457pzupfipbnbv3atxauh2lrp54gqmqcco@hs7ytoop5osf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [RFC v1 0/1] nvme testsuite runtime optimization
+Message-ID: <zlavgcdalmmtabiabu76m4s3oo5hyaehckmwcxvqrnu3j6q6xo@5ke6gv5h3j7i>
+References: <20230419085643.25714-1-dwagner@suse.de>
+ <f0d2ddd5-37d6-8fba-a5e3-965fb9f41474@nvidia.com>
+ <9a1f1709-baaf-5661-2cbf-c34e2da9e42e@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9a1f1709-baaf-5661-2cbf-c34e2da9e42e@grimberg.me>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Apr 19, 2023 at 12:50:10PM +0300, Sagi Grimberg wrote:
+> 
+> > > While testing the fc transport I got a bit tired of wait for the I/O jobs to
+> > > finish. Thus here some runtime optimization.
+> > > 
+> > > With a small/slow VM I got following values:
+> > > 
+> > > with 'optimizations'
+> > >     loop:
+> > >       real    4m43.981s
+> > >       user    0m17.754s
+> > >       sys     2m6.249s
+> 
+> How come loop is doubling the time with this patch?
+> ratio is not the same before and after.
 
->>> Before we unload the module we should cleanup the fc resources first,
->>> basically reorder the shutdown sequence to be in reverse order of the
->>> setup path.
->>
->> If this triggers a bug, then I think it is a good idea to have a
->> dedicated test that reproduces it if we are changing the default
->> behavior.
-> 
-> Right, though I would like to tackle one problem after the other, first get fc
-> working with the 'correct' order.
-> 
->>> While at it also update the rdma stop_soft_rdma before the module
->>> unloading for the same reasoning.
->>
->> Why? it creates the wrong reverse ordering.
->>
->> 1. setup soft-rdma
->> 2. setup nvme-rdma
->>
->> 2. teardown nvme-rdma
->> 1. teardown soft-rdma
->>
->> I don't think we need this change. I mean it is a good test
->> to have that the rdma device goes away underneath nvme-rdma
->> but it is good for a dedicated test.
-> 
-> I was woried about this setup sequence here:
-> 
-> 	modprobe -q nvme-"${nvme_trtype}"
-> 	if [[ "${nvme_trtype}" == "rdma" ]]; then
-> 		start_soft_rdma
-> 
-> The module is loaded before start_soft_rdma is started, thus I thought we should
-> do the reverse, first call stop_soft_rdma and the unload the module.
+first run was with loop, second one with rdma:
 
-They should be unrelated. the safe route is to first remove the uld and
-then the device.
+nvme/002 (create many subsystems and test discovery)         [not run]
+    runtime  82.089s  ...
+    nvme_trtype=rdma is not supported in this test
+
+nvme/016 (create/delete many NVMeOF block device-backed ns and test discovery) [not run]
+    runtime  39.948s  ...
+    nvme_trtype=rdma is not supported in this test
+nvme/017 (create/delete many file-ns and test discovery)     [not run]
+    runtime  40.237s  ...
+
+nvme/047 (test different queue types for fabric transports)  [passed]
+    runtime    ...  13.580s
+nvme/048 (Test queue count changes on reconnect)             [passed]
+    runtime    ...  6.287s
+
+82 + 40 + 40 - 14 - 6 = 142. So loop runs additional tests. Hmm, though my
+optimization didn't work there...
+
+> > Those jobs are meant to be run for at least 1G to establish
+> > confidence on the data set and the system under test since SSDs
+> > are in TBs nowadays and we don't even get anywhere close to that,
+> > with your suggestion we are going even lower ...
+> 
+> Where does the 1G boundary coming from?
+
+No idea, it just the existing hard coded values. I guess it might be from
+efa06fcf3c83 ("loop: test partition scanning") which was the first real test
+case (according the logs).
+
+> > we cannot change the dataset size for slow VMs, instead add
+> > a command line argument and pass it to tests e.g.
+> > nvme_verification_size=XXX similar to nvme_trtype but don't change
+> > the default values which we have been testing for years now
+> > 
+> > Testing is supposed to be time consuming especially verification jobs..
+> 
+> I like the idea, but I think it may need to be the other way around.
+> Have shortest possible runs by default.
+
+Good point, I'll make it configurable. What is a good small default then? There
+are some test cases in loop which allocated a 1M file. That's propably too
+small.
