@@ -2,78 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F40DC77B73
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 10:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E34C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 10:42:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232435AbjDSKhG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 06:37:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45946 "EHLO
+        id S232358AbjDSKmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 06:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232243AbjDSKgu (ORCPT
+        with ESMTP id S232677AbjDSKm3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 06:36:50 -0400
+        Wed, 19 Apr 2023 06:42:29 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09818A41;
-        Wed, 19 Apr 2023 03:36:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1032118D4;
+        Wed, 19 Apr 2023 03:42:25 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6054D21987;
-        Wed, 19 Apr 2023 10:36:48 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B04152198F;
+        Wed, 19 Apr 2023 10:42:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1681900608; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1681900944; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=hBTOg25IsPxj0qWqx13dMLrckoNY7imS5h0ZNya05Po=;
-        b=MWDz91LRmEubYBZAiah6DeyOVOVtq8pKh2mzdW6z+gbPWzUtDnVK/VTHX0zWf1eAPkdFcR
-        LbPBlHy9cBSR6pP18I7GyNKBjNj8blCHka4YGQMBjKADUm29R8yAUX7/lEyyXfj/7bkqqA
-        Q+NMjYIoLXVGoNGIa0cXe0KX8jXEx2A=
+        bh=8qfmxrU7rqgnnhieg7x5c1b8MRuikfwddv02sfKrFJY=;
+        b=nLgX070cza+RuPu4YZP37+VLVfH6ak/LLTFRb/U1HF6XzHVeH/fW1RwLUU8a/vUEtx0iNT
+        XNL+akAOACz4WakiT2lbQeYw0TzJXfv5b/gyUtRcV9sKI+UYHrNMshYJdmHhJMSbZfSIZA
+        xgeADsGl1K8qpCfPZlS9GKDWq4wCx60=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1681900608;
+        s=susede2_ed25519; t=1681900944;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=hBTOg25IsPxj0qWqx13dMLrckoNY7imS5h0ZNya05Po=;
-        b=IWiD+xzT5spCLdsQiQZE3mF6+D+NtBLOyoRVZjUbMy6J9Bsdd+AUlrx4edsrExAKbhUYRB
-        OHyguUy4mLe/9NCA==
+        bh=8qfmxrU7rqgnnhieg7x5c1b8MRuikfwddv02sfKrFJY=;
+        b=yl6kT564O47BeIeAbbUCpKJIOf6nSvnKUnH3AjGY0NHAr9fldXgBeIQXbQGRLfO9SwDait
+        fcMkPOs9l6w35EAQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 527D81390E;
-        Wed, 19 Apr 2023 10:36:48 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A115F1390E;
+        Wed, 19 Apr 2023 10:42:24 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id xOoPFEDEP2S3MgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 19 Apr 2023 10:36:48 +0000
-Date:   Wed, 19 Apr 2023 12:36:47 +0200
+        id 2OBCJ5DFP2TENQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 19 Apr 2023 10:42:24 +0000
+Date:   Wed, 19 Apr 2023 12:42:24 +0200
 From:   Daniel Wagner <dwagner@suse.de>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>
 Subject: Re: [PATCH blktests v2 2/2] nvme-rc: Cleanup fc resource before
  module unloading
-Message-ID: <xwkb2nrwcc2ysgynznx6txhfjn73xy24qg5jvnye6r7k6jlw77@wwmiqgy6mooc>
+Message-ID: <3euieyvxpsww5p4m457pzupfipbnbv3atxauh2lrp54gqmqcco@hs7ytoop5osf>
 References: <20230419084757.24846-1-dwagner@suse.de>
  <20230419084757.24846-3-dwagner@suse.de>
- <dd3850e3-045f-75a0-4980-9f44a05fd397@nvidia.com>
+ <3ec250a9-54c7-3e0d-2463-f8faf15cdb58@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd3850e3-045f-75a0-4980-9f44a05fd397@nvidia.com>
+In-Reply-To: <3ec250a9-54c7-3e0d-2463-f8faf15cdb58@grimberg.me>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 09:41:28AM +0000, Chaitanya Kulkarni wrote:
-> were you able to test this with RDMA ?
+On Wed, Apr 19, 2023 at 12:44:42PM +0300, Sagi Grimberg wrote:
+> 
+> > Before we unload the module we should cleanup the fc resources first,
+> > basically reorder the shutdown sequence to be in reverse order of the
+> > setup path.
+> 
+> If this triggers a bug, then I think it is a good idea to have a
+> dedicated test that reproduces it if we are changing the default
+> behavior.
 
-Yes, I've tested it with all transports (loop, tcp, rdma, fc)
+Right, though I would like to tackle one problem after the other, first get fc
+working with the 'correct' order.
 
-> just want to make sure we are not breaking anything since we are changing
-> the order of module unload and stop_soft_rdma() in this patch ...
+> > While at it also update the rdma stop_soft_rdma before the module
+> > unloading for the same reasoning.
+> 
+> Why? it creates the wrong reverse ordering.
+> 
+> 1. setup soft-rdma
+> 2. setup nvme-rdma
+> 
+> 2. teardown nvme-rdma
+> 1. teardown soft-rdma
+> 
+> I don't think we need this change. I mean it is a good test
+> to have that the rdma device goes away underneath nvme-rdma
+> but it is good for a dedicated test.
 
-Sure thing
+I was woried about this setup sequence here:
+
+	modprobe -q nvme-"${nvme_trtype}"
+	if [[ "${nvme_trtype}" == "rdma" ]]; then
+		start_soft_rdma
+
+The module is loaded before start_soft_rdma is started, thus I thought we should
+do the reverse, first call stop_soft_rdma and the unload the module.
