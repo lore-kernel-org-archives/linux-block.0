@@ -2,241 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9779C77B73
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 17:26:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD61C6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 17:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232473AbjDSR0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 13:26:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40040 "EHLO
+        id S229599AbjDSRfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 13:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbjDSR0F (ORCPT
+        with ESMTP id S229575AbjDSRfG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 13:26:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEDEA659B;
-        Wed, 19 Apr 2023 10:26:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 53B6A64122;
-        Wed, 19 Apr 2023 17:26:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD6ABC433EF;
-        Wed, 19 Apr 2023 17:26:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681925162;
-        bh=VFRws15p+q59RSTrU0VATjC0LQ6eFGIpuOjxTTSlgZA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UycFIy4d7bCijEj9Km8Xjqeq9Y7EDL81kXO55cTmYZWaCoWU32Dc670Zrnc7oLZIE
-         zohoopB6vvjwHWAIgZi2HjslXGgNOIJNhWwyycPnyOYwJZEXyC3u+30gOvOxZSPYmz
-         UoBxqtx/hq9Yb4HYkTl/ePo7blbSjZczejMiqCwIcKJRmGoEgpFxw635kJIa5LL6cK
-         fj7fBUFeirx+lzm/NNEwcg+rYsJHgsDOwXoE9yDM1+xQ7Vq0YueKHyzojjw0y6iVIo
-         MzRSXQLJPb3cF4Xqo1ry0NuHAPTGe48TEIN9UMSK0LxFIaOB2wSFR2bO9Zr4jBxkZj
-         6EldBf3ubjw1Q==
-Date:   Wed, 19 Apr 2023 10:26:02 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Sarthak Kukreti <sarthakkukreti@chromium.org>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Theodore Ts'o <tytso@mit.edu>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Daniil Lunev <dlunev@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Brian Foster <bfoster@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v4 1/4] block: Introduce provisioning primitives
-Message-ID: <20230419172602.GE360881@frogsfrogsfrogs>
-References: <20230414000219.92640-1-sarthakkukreti@chromium.org>
- <20230418221207.244685-1-sarthakkukreti@chromium.org>
- <20230418221207.244685-2-sarthakkukreti@chromium.org>
- <20230419153611.GE360885@frogsfrogsfrogs>
- <ZEAUHnWqt9cIiJRb@redhat.com>
+        Wed, 19 Apr 2023 13:35:06 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48D3B46B3
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 10:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1681925702; x=1713461702;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=V+63/HRIM6OQU4SjsCOxWii4OO8Ny2FbAhnQKO/QFes=;
+  b=JF2E+M4kB1v2teMrtqsliD1xwqGqoLl+KCIzc6DGC18NZ9KLE39E28vL
+   N9muVkNsn4CFlZo8luDHQfLgLA1eKYuSXWA8F9PMlYaL7O9NRTP3sGKLU
+   bWga3Zqx0ZFWx91ol5Us2uYGczVR842kp2KjsT7Y7b71hvdwSGNuf9z+q
+   1L/k3r82gOQj6eQZMNxjNDRjJIQccaNPXAXaMrobdPlD82AYWzIPIQVXk
+   FuKR8QUu3dpF0TT+r/XFefCQiH2Wj8Xiox+eSXbln6rqeSAhmRdpokkT+
+   Yy63ou0T22131ylZ5ZXzMU2gSJ2HyHAglOBBdydyaig37m6VPyBc8bGm3
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="347364376"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="347364376"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2023 10:35:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="756179872"
+X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
+   d="scan'208";a="756179872"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 19 Apr 2023 10:34:59 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1ppBhq-000f3o-1d;
+        Wed, 19 Apr 2023 17:34:58 +0000
+Date:   Thu, 20 Apr 2023 01:34:30 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 7/7] blk-mq: don't use the requeue list to queue flush
+ commands
+Message-ID: <202304200122.GEFsqxFh-lkp@intel.com>
+References: <20230416200930.29542-8-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZEAUHnWqt9cIiJRb@redhat.com>
+In-Reply-To: <20230416200930.29542-8-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 12:17:34PM -0400, Mike Snitzer wrote:
-> On Wed, Apr 19 2023 at 11:36P -0400,
-> Darrick J. Wong <djwong@kernel.org> wrote:
-> 
-> > On Tue, Apr 18, 2023 at 03:12:04PM -0700, Sarthak Kukreti wrote:
-> > > Introduce block request REQ_OP_PROVISION. The intent of this request
-> > > is to request underlying storage to preallocate disk space for the given
-> > > block range. Block devices that support this capability will export
-> > > a provision limit within their request queues.
-> > > 
-> > > This patch also adds the capability to call fallocate() in mode 0
-> > > on block devices, which will send REQ_OP_PROVISION to the block
-> > > device for the specified range,
-> > > 
-> > > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > > ---
-> > >  block/blk-core.c          |  5 ++++
-> > >  block/blk-lib.c           | 53 +++++++++++++++++++++++++++++++++++++++
-> > >  block/blk-merge.c         | 18 +++++++++++++
-> > >  block/blk-settings.c      | 19 ++++++++++++++
-> > >  block/blk-sysfs.c         |  8 ++++++
-> > >  block/bounce.c            |  1 +
-> > >  block/fops.c              | 25 +++++++++++++-----
-> > >  include/linux/bio.h       |  6 +++--
-> > >  include/linux/blk_types.h |  5 +++-
-> > >  include/linux/blkdev.h    | 16 ++++++++++++
-> > >  10 files changed, 147 insertions(+), 9 deletions(-)
-> > > 
-> > 
-> > <cut to the fallocate part; the block/ changes look fine to /me/ at
-> > first glance, but what do I know... ;)>
-> > 
-> > > diff --git a/block/fops.c b/block/fops.c
-> > > index d2e6be4e3d1c..e1775269654a 100644
-> > > --- a/block/fops.c
-> > > +++ b/block/fops.c
-> > > @@ -611,9 +611,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
-> > >  	return ret;
-> > >  }
-> > >  
-> > > +#define	BLKDEV_FALLOC_FL_TRUNCATE				\
-> > 
-> > At first I thought from this name that you were defining a new truncate
-> > mode for fallocate, then I realized that this is mask for deciding if we
-> > /want/ to truncate the pagecache.
-> > 
-> > #define		BLKDEV_FALLOC_TRUNCATE_MASK ?
-> > 
-> > > +		(FALLOC_FL_PUNCH_HOLE |	FALLOC_FL_ZERO_RANGE |	\
-> > 
-> > Ok, so discarding and writing zeroes truncates the page cache, makes
-> > sense since we're "writing" directly to the block device.
-> > 
-> > > +		 FALLOC_FL_NO_HIDE_STALE)
-> > 
-> > Here things get tricky -- some of the FALLOC_FL mode bits are really an
-> > opcode and cannot be specified together, whereas others select optional
-> > behavior for certain opcodes.
-> > 
-> > IIRC, the mutually exclusive opcodes are:
-> > 
-> > 	PUNCH_HOLE
-> > 	ZERO_RANGE
-> > 	COLLAPSE_RANGE
-> > 	INSERT_RANGE
-> > 	(none of the above, for allocation)
-> > 
-> > and the "variants on a theme are":
-> > 
-> > 	KEEP_SIZE
-> > 	NO_HIDE_STALE
-> > 	UNSHARE_RANGE
-> > 
-> > not all of which are supported by all the opcodes.
-> > 
-> > Does it make sense to truncate the page cache if userspace passes in
-> > mode == NO_HIDE_STALE?  There's currently no defined meaning for this
-> > combination, but I think this means we'll truncate the pagecache before
-> > deciding if we're actually going to issue any commands.
-> > 
-> > I think that's just a bug in the existing code -- it should be
-> > validating that @mode is any of the supported combinations *before*
-> > truncating the pagecache.
-> > 
-> > Otherwise you could have a mkfs program that starts writing new fs
-> > metadata, decides to provision the storage (say for a logging region),
-> > doesn't realize it's running on an old kernel, and then oops the
-> > provision attempt fails but have we now shredded the pagecache and lost
-> > all the writes?
-> 
-> While that just caused me to have an "oh shit, that's crazy" (in a
-> scary way) belly laugh...
+Hi Christoph,
 
-I just tried this and:
+kernel test robot noticed the following build warnings:
 
-# xfs_io -c 'pwrite -S 0x58 1m 1m' -c fsync -c 'pwrite -S 0x59 1m 4096' -c 'pread -v 1m 64' -c 'falloc 1m 4096' -c 'pread -v 1m 64' /dev/sda
-wrote 1048576/1048576 bytes at offset 1048576
-1 MiB, 256 ops; 0.0013 sec (723.589 MiB/sec and 185238.7844 ops/sec)
-wrote 4096/4096 bytes at offset 1048576
-4 KiB, 1 ops; 0.0000 sec (355.114 MiB/sec and 90909.0909 ops/sec)
-00100000:  59 59 59 59 59 59 59 59 59 59 59 59 59 59 59 59  YYYYYYYYYYYYYYYY
-00100010:  59 59 59 59 59 59 59 59 59 59 59 59 59 59 59 59  YYYYYYYYYYYYYYYY
-00100020:  59 59 59 59 59 59 59 59 59 59 59 59 59 59 59 59  YYYYYYYYYYYYYYYY
-00100030:  59 59 59 59 59 59 59 59 59 59 59 59 59 59 59 59  YYYYYYYYYYYYYYYY
-read 64/64 bytes at offset 1048576
-64.000000 bytes, 1 ops; 0.0000 sec (1.565 MiB/sec and 25641.0256 ops/sec)
-fallocate: Operation not supported
-00100000:  58 58 58 58 58 58 58 58 58 58 58 58 58 58 58 58  XXXXXXXXXXXXXXXX
-00100010:  58 58 58 58 58 58 58 58 58 58 58 58 58 58 58 58  XXXXXXXXXXXXXXXX
-00100020:  58 58 58 58 58 58 58 58 58 58 58 58 58 58 58 58  XXXXXXXXXXXXXXXX
-00100030:  58 58 58 58 58 58 58 58 58 58 58 58 58 58 58 58  XXXXXXXXXXXXXXXX
-read 64/64 bytes at offset 1048576
-64.000000 bytes, 1 ops; 0.0003 sec (176.554 KiB/sec and 2824.8588 ops/sec)
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on next-20230418]
+[cannot apply to linus/master v6.3-rc7]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-(Write 1MB of Xs, flush it to disk, write 4k of Ys, confirm the Y's are
-in the page cache, fail to fallocate, reread and spot the Xs that we
-supposedly overwrote.)
+url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/blk-mq-reflow-blk_insert_flush/20230417-051014
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230416200930.29542-8-hch%40lst.de
+patch subject: [PATCH 7/7] blk-mq: don't use the requeue list to queue flush commands
+config: x86_64-randconfig-a013-20230417 (https://download.01.org/0day-ci/archive/20230420/202304200122.GEFsqxFh-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/c1197e1a4ff5b38b73d3ec923987ca857f5e2695
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Christoph-Hellwig/blk-mq-reflow-blk_insert_flush/20230417-051014
+        git checkout c1197e1a4ff5b38b73d3ec923987ca857f5e2695
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
 
-oops.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304200122.GEFsqxFh-lkp@intel.com/
 
-> (And obviously needs fixing independent of this patchset)
-> 
-> Shouldn't mkfs first check that the underlying storage supports
-> REQ_OP_PROVISION by verifying
-> /sys/block/<dev>/queue/provision_max_bytes exists and is not 0?
-> (Just saying, we need to add new features more defensively.. you just
-> made the case based on this scenario's implications alone)
+All warnings (new ones prefixed by >>):
 
-Not for fallocate -- for regular files, there's no way to check if the
-filesystem actually supports the operation requested other than to try
-it and see if it succeeds.  We probably should've defined a DRY_RUN flag
-for that purpose back when it was introduced.
+>> block/blk-mq.c:1461:6: warning: no previous prototype for function 'blk_flush_queue_insert' [-Wmissing-prototypes]
+   void blk_flush_queue_insert(struct request *rq)
+        ^
+   block/blk-mq.c:1461:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   void blk_flush_queue_insert(struct request *rq)
+   ^
+   static 
+   1 warning generated.
 
-For fallocate calls to block devices, yes, the program can check the
-queue limits in sysfs if fstat says the supplied path is a block device,
-but I don't know that most programs are that thorough.  The fallocate(1)
-CLI program does not check.
 
-Then I moved on to fs utilities:
+vim +/blk_flush_queue_insert +1461 block/blk-mq.c
 
-ext4: For discard, mke2fs calls BLKDISCARD if it detects a block device
-via fstat, and falloc(PUNCH|KEEP_SIZE) for anything else.  For zeroing,
-it only uses falloc(ZERO) or falloc(PUNCH|KEEP_SIZE) and does not try to
-use BLKZEROOUT.  It does not check sysfs queue limits at all.
+  1460	
+> 1461	void blk_flush_queue_insert(struct request *rq)
+  1462	{
+  1463		struct request_queue *q = rq->q;
+  1464		unsigned long flags;
+  1465	
+  1466		spin_lock_irqsave(&q->requeue_lock, flags);
+  1467		list_add_tail(&rq->queuelist, &q->flush_list);
+  1468		spin_unlock_irqrestore(&q->requeue_lock, flags);
+  1469	}
+  1470	
 
-XFS: mkfs.xfs issues BLKDISCARD before writing anything to the device,
-so that's fine.  It uses falloc(ZERO) to erase the log, but since
-xfsprogs provides its own buffer cache and uses O_DIRECT, pagecache
-coherency problems aren't an issue.
-
-btrfs: mkfs.btrfs only issues BLKDISCARD, and only before it starts
-writing the new fs, so no problems there.
-
---D
-
-> Sarthak, please note I said "provision_max_bytes": all other ops
-> (e.g. DISCARD, WRITE_ZEROES, etc) have <op>_max_bytes exported through
-> sysfs, not <op>_max_sectors.  Please export provision_max_bytes, e.g.:
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 202aa78f933e..2e5ac7b1ffbd 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -605,12 +605,12 @@ QUEUE_RO_ENTRY(queue_io_min, "minimum_io_size");
->  QUEUE_RO_ENTRY(queue_io_opt, "optimal_io_size");
->  
->  QUEUE_RO_ENTRY(queue_max_discard_segments, "max_discard_segments");
-> -QUEUE_RO_ENTRY(queue_max_provision_sectors, "max_provision_sectors");
->  QUEUE_RO_ENTRY(queue_discard_granularity, "discard_granularity");
->  QUEUE_RO_ENTRY(queue_discard_max_hw, "discard_max_hw_bytes");
->  QUEUE_RW_ENTRY(queue_discard_max, "discard_max_bytes");
->  QUEUE_RO_ENTRY(queue_discard_zeroes_data, "discard_zeroes_data");
->  
-> +QUEUE_RO_ENTRY(queue_provision_max, "provision_max_bytes");
->  QUEUE_RO_ENTRY(queue_write_same_max, "write_same_max_bytes");
->  QUEUE_RO_ENTRY(queue_write_zeroes_max, "write_zeroes_max_bytes");
->  QUEUE_RO_ENTRY(queue_zone_append_max, "zone_append_max_bytes");
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
