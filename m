@@ -2,123 +2,297 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4309C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 15:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A954DC6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 15:36:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232776AbjDSP2Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 11:28:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51858 "EHLO
+        id S233212AbjDSPgP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 11:36:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233029AbjDSP2V (ORCPT
+        with ESMTP id S233187AbjDSPgO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 11:28:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585A51716
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 08:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681917951;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tk4ILYUitykXDNv2nAhy0f5ydU+4a31pQqGhvmwhdPk=;
-        b=KXda9Kgp4s+caob5j/b3sadBsUfJUqFlh5wJYQChPWgPRQyPMKXKKrQiy/7q0uapw65y/w
-        ZZVcjbzs4yfizdltrC4cCQ9C5hl8cP4u5OQyHLaUriB8ILF8wsownH0NVGNEgn28nTPO+w
-        dzZco/J/2giY8srsZHcwmnyIVxbso5s=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-324-0mWDGmRVOVy7pb-tpshiwA-1; Wed, 19 Apr 2023 11:19:45 -0400
-X-MC-Unique: 0mWDGmRVOVy7pb-tpshiwA-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-24b28355b5eso453970a91.0
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 08:19:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681917584; x=1684509584;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tk4ILYUitykXDNv2nAhy0f5ydU+4a31pQqGhvmwhdPk=;
-        b=GXDtg0zG/qd+C+5KQ8uKozG4L3isTqxokD5kE236eH4SiKtm5yTc7hnA5rlcozCVdW
-         XPM+ZvOEm5Xf35p59uAIdlwPj2Jw56je5YIKGBUNRfPTkqya9asF4C8x0IDByg5AHhrn
-         wBBkNWvzkNtJC+ICkMUrdsw78snMJIMGsMMp3HEFfKGJI0zY+BbLSiTMd+7Uhm2v0+Ny
-         a7M4FjbUmav0J9XGn5PYvT+W8F1XeTmiJLChN8euzXJgbJsei5K76leEo8SCm6lbeXXT
-         LFBoSTDpy5k/lF9oADtJT4qiXu89yvHLaimLW3saEtQkYe/iA+fJ2REpyUcr60ZryFjz
-         DEqA==
-X-Gm-Message-State: AAQBX9dkd6jEP01ChHZX3AUVX240zQQc2/fndMo+dh2Wi324UXCikDDt
-        /gKsJUZ4itMVsHBg/vBrzDGPmQ+Rzkr7wUpVoC0Ys49b16LgacTNenAF0zIwbmj1OWqrV8dWN9y
-        J2HCin1RY4mpo9okc8hfVZFKfK78JzH2Fg474Y+0=
-X-Received: by 2002:a17:90a:2ca4:b0:247:fec:3cf with SMTP id n33-20020a17090a2ca400b002470fec03cfmr1032475pjd.9.1681917584665;
-        Wed, 19 Apr 2023 08:19:44 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZilzTP35l+fCVfSRmyAr7TA2z2HByJ2c77EoLXxjUVlBIE5WaJ/vbFqG27YJf1gGuB7p5La9B7yskBhiQ6yjg=
-X-Received: by 2002:a17:90a:2ca4:b0:247:fec:3cf with SMTP id
- n33-20020a17090a2ca400b002470fec03cfmr1032449pjd.9.1681917584368; Wed, 19 Apr
- 2023 08:19:44 -0700 (PDT)
+        Wed, 19 Apr 2023 11:36:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E01552702;
+        Wed, 19 Apr 2023 08:36:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 639C962DE1;
+        Wed, 19 Apr 2023 15:36:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B27E8C4339B;
+        Wed, 19 Apr 2023 15:36:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681918571;
+        bh=7yO8igzR+tFz5qq3cMgXsjgERkys/bHwVVMy1POC8D8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=R205qyx40segdQjwa4sPe2Sc+nS3GNhfuo1ay4/1X0J4Z322M+3fHeBTL6jaSdFX2
+         ETO4QuLxyb5hBdJnlWFlaPex12/erWxiYBdBGWM+yTFV+QZ4KobI1UGJUL+Z+KwnJJ
+         nr0fKap9u9hI52CoGdIHW4vLsLMbyYEuNABfpDi+tEC/WDIl76XRVEPCWUr/OAYe/e
+         R2M4MHlzMOMlEWSuWzlzEPp+1PIBoLuS0QxfQg70/92XM//V4esPiz614G4sVDlvkN
+         RNB/KGyoc+9dZp757s6QMjwQIkF+rO8xm1J99YMUUwibyKprR+WQNhDGXyp+P7W6PE
+         RXeW+jivhAHjw==
+Date:   Wed, 19 Apr 2023 08:36:11 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Daniil Lunev <dlunev@google.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Brian Foster <bfoster@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [dm-devel] [PATCH v4 1/4] block: Introduce provisioning
+ primitives
+Message-ID: <20230419153611.GE360885@frogsfrogsfrogs>
+References: <20230414000219.92640-1-sarthakkukreti@chromium.org>
+ <20230418221207.244685-1-sarthakkukreti@chromium.org>
+ <20230418221207.244685-2-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
-References: <20230419140929.5924-1-jth@kernel.org> <20230419140929.5924-12-jth@kernel.org>
-In-Reply-To: <20230419140929.5924-12-jth@kernel.org>
-From:   Andreas Gruenbacher <agruenba@redhat.com>
-Date:   Wed, 19 Apr 2023 17:19:31 +0200
-Message-ID: <CAHc6FU6U1yZguZGeCc7BUqd1Qm4+SSRK8xbNZWBUSXTk_jjvVQ@mail.gmail.com>
-Subject: Re: [PATCH v3 11/19] gfs: use __bio_add_page for adding single page
- to bio
-To:     Johannes Thumshirn <jth@kernel.org>
-Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com,
-        cluster-devel@redhat.com, damien.lemoal@wdc.com,
-        dm-devel@redhat.com, dsterba@suse.com, hare@suse.de, hch@lst.de,
-        jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-raid@vger.kernel.org, ming.lei@redhat.com,
-        rpeterso@redhat.com, shaggy@kernel.org, snitzer@kernel.org,
-        song@kernel.org, willy@infradead.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230418221207.244685-2-sarthakkukreti@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 4:10=E2=80=AFPM Johannes Thumshirn <jth@kernel.org>=
- wrote:
->
-> From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
->
-> The GFS superblock reading code uses bio_add_page() to add a page to a
-> newly created bio. bio_add_page() can fail, but the return value is never
-> checked.
-
-It's GFS2, not GFS, but otherwise this is obviously fine, thanks.
-
-> Use __bio_add_page() as adding a single page to a newly created bio is
-> guaranteed to succeed.
->
-> This brings us a step closer to marking bio_add_page() as __must_check.
->
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-
-Reviewed-by: Andreas Gruenbacher <agruenba@redhat.com>
-
+On Tue, Apr 18, 2023 at 03:12:04PM -0700, Sarthak Kukreti wrote:
+> Introduce block request REQ_OP_PROVISION. The intent of this request
+> is to request underlying storage to preallocate disk space for the given
+> block range. Block devices that support this capability will export
+> a provision limit within their request queues.
+> 
+> This patch also adds the capability to call fallocate() in mode 0
+> on block devices, which will send REQ_OP_PROVISION to the block
+> device for the specified range,
+> 
+> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
 > ---
->  fs/gfs2/ops_fstype.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/gfs2/ops_fstype.c b/fs/gfs2/ops_fstype.c
-> index 6de901c3b89b..e0cd0d43b12f 100644
-> --- a/fs/gfs2/ops_fstype.c
-> +++ b/fs/gfs2/ops_fstype.c
-> @@ -254,7 +254,7 @@ static int gfs2_read_super(struct gfs2_sbd *sdp, sect=
-or_t sector, int silent)
->
->         bio =3D bio_alloc(sb->s_bdev, 1, REQ_OP_READ | REQ_META, GFP_NOFS=
-);
->         bio->bi_iter.bi_sector =3D sector * (sb->s_blocksize >> 9);
-> -       bio_add_page(bio, page, PAGE_SIZE, 0);
-> +       __bio_add_page(bio, page, PAGE_SIZE, 0);
->
->         bio->bi_end_io =3D end_bio_io_page;
->         bio->bi_private =3D page;
-> --
-> 2.39.2
->
+>  block/blk-core.c          |  5 ++++
+>  block/blk-lib.c           | 53 +++++++++++++++++++++++++++++++++++++++
+>  block/blk-merge.c         | 18 +++++++++++++
+>  block/blk-settings.c      | 19 ++++++++++++++
+>  block/blk-sysfs.c         |  8 ++++++
+>  block/bounce.c            |  1 +
+>  block/fops.c              | 25 +++++++++++++-----
+>  include/linux/bio.h       |  6 +++--
+>  include/linux/blk_types.h |  5 +++-
+>  include/linux/blkdev.h    | 16 ++++++++++++
+>  10 files changed, 147 insertions(+), 9 deletions(-)
+> 
 
+<cut to the fallocate part; the block/ changes look fine to /me/ at
+first glance, but what do I know... ;)>
+
+> diff --git a/block/fops.c b/block/fops.c
+> index d2e6be4e3d1c..e1775269654a 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -611,9 +611,13 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+>  	return ret;
+>  }
+>  
+> +#define	BLKDEV_FALLOC_FL_TRUNCATE				\
+
+At first I thought from this name that you were defining a new truncate
+mode for fallocate, then I realized that this is mask for deciding if we
+/want/ to truncate the pagecache.
+
+#define		BLKDEV_FALLOC_TRUNCATE_MASK ?
+
+> +		(FALLOC_FL_PUNCH_HOLE |	FALLOC_FL_ZERO_RANGE |	\
+
+Ok, so discarding and writing zeroes truncates the page cache, makes
+sense since we're "writing" directly to the block device.
+
+> +		 FALLOC_FL_NO_HIDE_STALE)
+
+Here things get tricky -- some of the FALLOC_FL mode bits are really an
+opcode and cannot be specified together, whereas others select optional
+behavior for certain opcodes.
+
+IIRC, the mutually exclusive opcodes are:
+
+	PUNCH_HOLE
+	ZERO_RANGE
+	COLLAPSE_RANGE
+	INSERT_RANGE
+	(none of the above, for allocation)
+
+and the "variants on a theme are":
+
+	KEEP_SIZE
+	NO_HIDE_STALE
+	UNSHARE_RANGE
+
+not all of which are supported by all the opcodes.
+
+Does it make sense to truncate the page cache if userspace passes in
+mode == NO_HIDE_STALE?  There's currently no defined meaning for this
+combination, but I think this means we'll truncate the pagecache before
+deciding if we're actually going to issue any commands.
+
+I think that's just a bug in the existing code -- it should be
+validating that @mode is any of the supported combinations *before*
+truncating the pagecache.
+
+Otherwise you could have a mkfs program that starts writing new fs
+metadata, decides to provision the storage (say for a logging region),
+doesn't realize it's running on an old kernel, and then oops the
+provision attempt fails but have we now shredded the pagecache and lost
+all the writes?
+
+--D
+
+> +
+>  #define	BLKDEV_FALLOC_FL_SUPPORTED					\
+> -		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
+> -		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
+> +		(BLKDEV_FALLOC_FL_TRUNCATE | FALLOC_FL_KEEP_SIZE |	\
+> +		 FALLOC_FL_UNSHARE_RANGE)
+>  
+>  static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  			     loff_t len)
+> @@ -625,7 +629,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  	int error;
+>  
+>  	/* Fail if we don't recognize the flags. */
+> -	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
+> +	if (mode != 0 && mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
+>  		return -EOPNOTSUPP;
+>  
+>  	/* Don't go off the end of the device. */
+> @@ -649,11 +653,20 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  	filemap_invalidate_lock(inode->i_mapping);
+>  
+>  	/* Invalidate the page cache, including dirty pages. */
+> -	error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> -	if (error)
+> -		goto fail;
+> +	if (mode & BLKDEV_FALLOC_FL_TRUNCATE) {
+> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> +		if (error)
+> +			goto fail;
+> +	}
+>  
+>  	switch (mode) {
+> +	case 0:
+> +	case FALLOC_FL_UNSHARE_RANGE:
+> +	case FALLOC_FL_KEEP_SIZE:
+> +	case FALLOC_FL_UNSHARE_RANGE | FALLOC_FL_KEEP_SIZE:
+> +		error = blkdev_issue_provision(bdev, start >> SECTOR_SHIFT,
+> +					       len >> SECTOR_SHIFT, GFP_KERNEL);
+> +		break;
+>  	case FALLOC_FL_ZERO_RANGE:
+>  	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
+>  		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index d766be7152e1..9820b3b039f2 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -57,7 +57,8 @@ static inline bool bio_has_data(struct bio *bio)
+>  	    bio->bi_iter.bi_size &&
+>  	    bio_op(bio) != REQ_OP_DISCARD &&
+>  	    bio_op(bio) != REQ_OP_SECURE_ERASE &&
+> -	    bio_op(bio) != REQ_OP_WRITE_ZEROES)
+> +	    bio_op(bio) != REQ_OP_WRITE_ZEROES &&
+> +	    bio_op(bio) != REQ_OP_PROVISION)
+>  		return true;
+>  
+>  	return false;
+> @@ -67,7 +68,8 @@ static inline bool bio_no_advance_iter(const struct bio *bio)
+>  {
+>  	return bio_op(bio) == REQ_OP_DISCARD ||
+>  	       bio_op(bio) == REQ_OP_SECURE_ERASE ||
+> -	       bio_op(bio) == REQ_OP_WRITE_ZEROES;
+> +	       bio_op(bio) == REQ_OP_WRITE_ZEROES ||
+> +	       bio_op(bio) == REQ_OP_PROVISION;
+>  }
+>  
+>  static inline void *bio_data(struct bio *bio)
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 99be590f952f..27bdf88f541c 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -385,7 +385,10 @@ enum req_op {
+>  	REQ_OP_DRV_IN		= (__force blk_opf_t)34,
+>  	REQ_OP_DRV_OUT		= (__force blk_opf_t)35,
+>  
+> -	REQ_OP_LAST		= (__force blk_opf_t)36,
+> +	/* request device to provision block */
+> +	REQ_OP_PROVISION        = (__force blk_opf_t)37,
+> +
+> +	REQ_OP_LAST		= (__force blk_opf_t)38,
+>  };
+>  
+>  enum req_flag_bits {
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 941304f17492..239e2f418b6e 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -303,6 +303,7 @@ struct queue_limits {
+>  	unsigned int		discard_granularity;
+>  	unsigned int		discard_alignment;
+>  	unsigned int		zone_write_granularity;
+> +	unsigned int		max_provision_sectors;
+>  
+>  	unsigned short		max_segments;
+>  	unsigned short		max_integrity_segments;
+> @@ -921,6 +922,8 @@ extern void blk_queue_max_discard_sectors(struct request_queue *q,
+>  		unsigned int max_discard_sectors);
+>  extern void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
+>  		unsigned int max_write_same_sectors);
+> +extern void blk_queue_max_provision_sectors(struct request_queue *q,
+> +		unsigned int max_provision_sectors);
+>  extern void blk_queue_logical_block_size(struct request_queue *, unsigned int);
+>  extern void blk_queue_max_zone_append_sectors(struct request_queue *q,
+>  		unsigned int max_zone_append_sectors);
+> @@ -1060,6 +1063,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>  int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
+>  		sector_t nr_sects, gfp_t gfp);
+>  
+> +extern int blkdev_issue_provision(struct block_device *bdev, sector_t sector,
+> +		sector_t nr_sects, gfp_t gfp_mask);
+> +
+>  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
+>  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
+>  
+> @@ -1139,6 +1145,11 @@ static inline unsigned short queue_max_discard_segments(const struct request_que
+>  	return q->limits.max_discard_segments;
+>  }
+>  
+> +static inline unsigned short queue_max_provision_sectors(const struct request_queue *q)
+> +{
+> +	return q->limits.max_provision_sectors;
+> +}
+> +
+>  static inline unsigned int queue_max_segment_size(const struct request_queue *q)
+>  {
+>  	return q->limits.max_segment_size;
+> @@ -1281,6 +1292,11 @@ static inline bool bdev_nowait(struct block_device *bdev)
+>  	return test_bit(QUEUE_FLAG_NOWAIT, &bdev_get_queue(bdev)->queue_flags);
+>  }
+>  
+> +static inline unsigned int bdev_max_provision_sectors(struct block_device *bdev)
+> +{
+> +	return bdev_get_queue(bdev)->limits.max_provision_sectors;
+> +}
+> +
+>  static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+>  {
+>  	return blk_queue_zoned_model(bdev_get_queue(bdev));
+> -- 
+> 2.40.0.634.g4ca3ef3211-goog
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://listman.redhat.com/mailman/listinfo/dm-devel
+> 
