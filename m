@@ -2,100 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D91C77B73
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 23:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EB8C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 23:21:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbjDSXCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 19:02:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36986 "EHLO
+        id S229479AbjDSXV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 19:21:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232361AbjDSXCs (ORCPT
+        with ESMTP id S231448AbjDSXVZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 19:02:48 -0400
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA3440EE
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 16:02:21 -0700 (PDT)
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-63b70ca0a84so491492b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 16:02:21 -0700 (PDT)
+        Wed, 19 Apr 2023 19:21:25 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 646131BF9
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 16:21:22 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-63b64a32fd2so537842b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 16:21:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1681946482; x=1684538482;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O4EzLlnke++OBfC+QU/8848E+9V2OKTR6syW6axwlV8=;
+        b=1rSGerHklr5JAXi27oI/uAKbIpnzmbhuAcqtkq9Ewpy+oxiEbVyn+NXg0Nte1Jz5gb
+         Jddew7juj8EN4LNPm7rX/98XzjawOZWNBXgYRDT4svPbR6SgKWYB3DBdvEC6M5GMrfwT
+         NVGwJGMv68WQml94zJmFq7eiIKhhHdqtvpReJGsxvaD7E+Q5v+/9MtrHrCKvxTmZ6EDY
+         BasRW6aVsh4KPRIad1iWbms6wcLJVor1YOWpS9y4GmXYAKYprdaeppUQ33xbvQC/eBjL
+         dLUjVVOrNBmfM3cIFzadvXJVlSI7PHUWmH/8OBSUCDMgpYod0Y/sBth54czPU5qQiJoJ
+         NrDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681945289; x=1684537289;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jCGGik+Dh34m/LHPIISsgDwZwS1lPtqv0VLubLC6Woo=;
-        b=braqGM8s0jThG4tpLsIiH1qUqCaPHBkVw6KDMtRez2WlioTEzFcVIDS3ieYactzbCy
-         Sm9/adKqdoH3qR1OaTOpXPNIe0/kgotxK9EhvPgZRcoADM1P1TVKr3fz7bClWx/hVI5i
-         r2d0pmRMpH8WE4ZDQ7ZOgfWbqXdilhHdOmTCavn7gLLyxAO0E+OU/Q89/Ol2sgUVdo1a
-         +5NRfvj2PgtRdCuRZ27+ZYL3svFL3yQJ9Se1q3q73C3F8IWCb8cdp6zBxApEW0XyqJcc
-         DgFsYx7cb5T3fV1IZh576IvVCzC8znB6y5ZnalEAJMAJPBUj9vbUqJ/48+esAsCYSozK
-         Av5Q==
-X-Gm-Message-State: AAQBX9ecjV1m9ICIqbO0ccswVT3ik994NxQCa2LPCutF9wPxKGnTZDKi
-        XHAxV9UVqKyzFRphCoQvzG4=
-X-Google-Smtp-Source: AKy350YxcBHYwqxWw1UVaWMHNJh7TDAif06+UOMxfXBtraYc4Mrq4WCVnIGDqOEuogTFIrBrYgoanQ==
-X-Received: by 2002:a05:6a20:748d:b0:d9:27f7:8c4a with SMTP id p13-20020a056a20748d00b000d927f78c4amr339551pzd.0.1681945289031;
-        Wed, 19 Apr 2023 16:01:29 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:216b:53b9:f55c:cf92? ([2620:15c:211:201:216b:53b9:f55c:cf92])
-        by smtp.gmail.com with ESMTPSA id q10-20020a63d60a000000b0050bcf117643sm10566740pgg.17.2023.04.19.16.01.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 16:01:28 -0700 (PDT)
-Message-ID: <64b56eb3-bcf5-c48a-df96-bf1956f6992e@acm.org>
-Date:   Wed, 19 Apr 2023 16:01:26 -0700
+        d=1e100.net; s=20221208; t=1681946482; x=1684538482;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O4EzLlnke++OBfC+QU/8848E+9V2OKTR6syW6axwlV8=;
+        b=NIAo6mWJYqcklM/5nglAtuNBsRIc/FYVwOvskSZy/T4XyJp6dBMKrEfl+0iugbB7BU
+         EFKx1fs3a4RsjWSFbZeRlKmx+LqDbwy54VtqZxHi+DitHFe4PRzcq2p0pvbb/e1MmCtO
+         UuiNQGpGFXlAp++O+JAY3U/l0euZS4wicCU9tSHedUjH83FEIViDd7lTLhtVZh3W8T5k
+         4uhabPpG6pfcWgQ8polcBjIKrjcKozUxNlI9LckoZAud9QLFkYeHtTM+w1+tnHYlea2U
+         +Yyeozl2K0cRWaMT/+/I74zDfHkQdVbmZ5NHNt5KqCS/5qz6NjNtoO7BabC3O7NUmDjI
+         aB+w==
+X-Gm-Message-State: AAQBX9cdq+HoLy1T/svFBFPld1UwMi5dw8NYZ9IoMpS9lxAAtnooFi35
+        tJa/D0/iYpg0lLxkLBVL+nDKZw==
+X-Google-Smtp-Source: AKy350Z4u0R970I4rdGzZzRQmNJeDe7b2z6B1qSAUlPIrkwDXPChvEc+qQO8pUmxrKDtn7iIylQMpQ==
+X-Received: by 2002:a17:902:b089:b0:19d:611:2815 with SMTP id p9-20020a170902b08900b0019d06112815mr6659257plr.42.1681946481873;
+        Wed, 19 Apr 2023 16:21:21 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-41-174.pa.nsw.optusnet.com.au. [49.180.41.174])
+        by smtp.gmail.com with ESMTPSA id ja13-20020a170902efcd00b0019682e27995sm6226725plb.223.2023.04.19.16.21.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 16:21:21 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1ppH70-005RJM-QK; Thu, 20 Apr 2023 09:21:18 +1000
+Date:   Thu, 20 Apr 2023 09:21:18 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     "Darrick J. Wong" <djwong@kernel.org>
+Cc:     Mike Snitzer <snitzer@kernel.org>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Daniil Lunev <dlunev@google.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Brian Foster <bfoster@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v4 1/4] block: Introduce provisioning primitives
+Message-ID: <20230419232118.GL447837@dread.disaster.area>
+References: <20230414000219.92640-1-sarthakkukreti@chromium.org>
+ <20230418221207.244685-1-sarthakkukreti@chromium.org>
+ <20230418221207.244685-2-sarthakkukreti@chromium.org>
+ <20230419153611.GE360885@frogsfrogsfrogs>
+ <ZEAUHnWqt9cIiJRb@redhat.com>
+ <20230419172602.GE360881@frogsfrogsfrogs>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v2 09/11] block: mq-deadline: Handle requeued requests
- correctly
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230418224002.1195163-1-bvanassche@acm.org>
- <20230418224002.1195163-10-bvanassche@acm.org>
- <20230419050758.GD25898@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230419050758.GD25898@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230419172602.GE360881@frogsfrogsfrogs>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/18/23 22:07, Christoph Hellwig wrote:
->>   deadline_add_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
->>   {
->>   	struct rb_root *root = deadline_rb_root(per_prio, rq);
->> +	struct request **next_rq __maybe_unused;
->>   
->>   	elv_rb_add(root, rq);
->> +#ifdef CONFIG_BLK_DEV_ZONED
->> +	next_rq = &per_prio->next_rq[rq_data_dir(rq)];
->> +	if (*next_rq == NULL || !blk_queue_is_zoned(rq->q))
->> +		return;
->> +	/*
->> +	 * If a request got requeued or requests have been submitted out of
->> +	 * order, make sure that per zone the request with the lowest LBA is
->> +	 * submitted first.
->> +	 */
->> +	if (blk_rq_pos(rq) < blk_rq_pos(*next_rq) &&
->> +	    blk_rq_zone_no(rq) == blk_rq_zone_no(*next_rq))
->> +		*next_rq = rq;
->> +#endif
+On Wed, Apr 19, 2023 at 10:26:02AM -0700, Darrick J. Wong wrote:
+> On Wed, Apr 19, 2023 at 12:17:34PM -0400, Mike Snitzer wrote:
+> > (And obviously needs fixing independent of this patchset)
+> > 
+> > Shouldn't mkfs first check that the underlying storage supports
+> > REQ_OP_PROVISION by verifying
+> > /sys/block/<dev>/queue/provision_max_bytes exists and is not 0?
+> > (Just saying, we need to add new features more defensively.. you just
+> > made the case based on this scenario's implications alone)
 > 
-> Please key move this into a helper only called when blk_queue_is_zoned
-> is true.
-Hi Christoph,
+> Not for fallocate -- for regular files, there's no way to check if the
+> filesystem actually supports the operation requested other than to try
+> it and see if it succeeds.  We probably should've defined a DRY_RUN flag
+> for that purpose back when it was introduced.
 
-I'm looking into an alternative, namely to remove the next_rq member 
-from struct dd_per_prio and instead to do the following:
-* Track the offset (blk_rq_pos()) of the most recently dispatched 
-request ("latest_pos").
-* Where the next_rq member is read, look up the request that comes after 
-latest_pos in the RB-tree. This should require an effort that is similar 
-to updating next_rq after having dispatched a request.
+That ignores the fact that fallocate() was never intended to
+guarantee it will work in all contexts - it's an advisory interface
+at it's most basic level. If the call succeeds, then great, it does
+what is says on the box, but if it fails then it should have no
+visible effect on user data at all and the application still needs
+to perform whatever modification it needed done in some other way.
 
-With this approach the code quoted above and that is surrounded with 
-#ifdef/#endif will disappear.
+IOWs, calling it one a block device without first checking if the
+block device supports that fallocate operation is exactly how it is
+supposed to be used. If the kernel can't handle this gracefully
+without corrupting data, then that's a kernel bug and not an
+application problem.
 
-Bart.
+> For fallocate calls to block devices, yes, the program can check the
+> queue limits in sysfs if fstat says the supplied path is a block device,
+> but I don't know that most programs are that thorough.  The fallocate(1)
+> CLI program does not check.
+
+Right. fallocate() was intended to just do the right thing without
+the application having to jump thrown an unknown number of hoops to
+determine if fallocate() can be used or not in the context it is
+executing in.  The kernel implementation is supposed to abstract all that
+context-dependent behaviour away from the application; all the
+application has to do is implement the fallocate() fast path and a
+single generic "do the right thing the slow way" fallback when the
+fallocate() method it called is not supported...
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
