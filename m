@@ -2,59 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D9CC6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 09:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 975CBC77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 09:41:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232939AbjDSJfY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 05:35:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60784 "EHLO
+        id S232282AbjDSJlj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 05:41:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232952AbjDSJfX (ORCPT
+        with ESMTP id S232348AbjDSJlb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 05:35:23 -0400
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA4113846;
-        Wed, 19 Apr 2023 02:35:12 -0700 (PDT)
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-2f4d0fc8df4so853382f8f.0;
-        Wed, 19 Apr 2023 02:35:12 -0700 (PDT)
+        Wed, 19 Apr 2023 05:41:31 -0400
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA751387E;
+        Wed, 19 Apr 2023 02:41:13 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-3f1754e6ac2so4822515e9.1;
+        Wed, 19 Apr 2023 02:41:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681896910; x=1684488910;
+        d=1e100.net; s=20221208; t=1681897272; x=1684489272;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0sWY1I1ouoHv+2nnWuzegkDW1CdXzXe2ZWoPGTCpomo=;
-        b=VPB06pad+ipYRd1BBTBcHytzm4WTXOJygQVAbbeu0IeMmR/GQEJbl2rPcI6GF5oJK7
-         U2mdaEIOZimtyyJP2j4O5CYoXXXiA0WqKZcrbIUKvKKxp7jKdjx/FzpZEJPZvT2bqxOJ
-         XJiq0XhoSpNnIAVVxJ1qYe6uSnC4acw/y+TihbP6bLdHTqQTCj8ZKELs9qdoRafZxMVP
-         Wn9mzUaGq2bfaVHmm4B47cnJu9/wsnljql1dyHw2vAfPK0gGAg2/Onh4uCYL1MsBf1D2
-         wl8omScuTHy+4O/ueW+BOYDBMe9IlpZ+KonNTlPV1V80PTg8ObxeTx4Yvy1PrFKa8EBl
-         AgoQ==
-X-Gm-Message-State: AAQBX9dZ6NyjBeEmA3zfh5vqsAxns+SGgM8U4zrMCgwI0ukpn9lMvjsJ
-        ScHrgQo6h1nA6RZCg0lYfjA=
-X-Google-Smtp-Source: AKy350ZwhuxxJWTKUjlgixT4N2ciSdmd6sKtnqLbDals7lQi48bSv7DKA2JD7JxtmJFBt1aMbuu8Hw==
-X-Received: by 2002:a05:6000:112:b0:2f9:ee11:e5c3 with SMTP id o18-20020a056000011200b002f9ee11e5c3mr6340073wrx.2.1681896910530;
-        Wed, 19 Apr 2023 02:35:10 -0700 (PDT)
+        bh=UrbQ52WnCDEzpuP7mp+Xy8URjdCv/Ow5DtS1hYS2qVQ=;
+        b=KI7kXz3RVeQyr7Xi2TDWwntQGUR8xuJ+AQMLE7DzUtiUDPYgv3Y6CFkfhRFjDJ8Itv
+         PfBuFhYnba4gF1O3ywQl+4YfJkkPb9MUdRS3Cx5nVarwNRm411SYbYU8ciVrl/6rmXxJ
+         Cl16JMLxKAJBEg9ZLTdRfzE62UEHJgff3ONUPFLort3y7ZOS7r+drzwaMG8BYQ4aRLuC
+         RV+4bp4It8KPdzJn8GkqBeKoaNTZy8nVKXaWhBOOe8JuwlCLqfttSjFt+zeNWSN3lX0o
+         OiMQblrZjoCF+D3LVUb8dCivwGzTFmGe/syniv1iF+kcp5n+yvgJBJPSXPTbC+ClY+1L
+         1w7g==
+X-Gm-Message-State: AAQBX9dF6C1mdeRxaZ60jNo/uXXT9cKo7WnOYPGB43fqnM5dZ4g0zaZN
+        u1TDhNWckOvaWJr5TGKa1BZO2aCyq7I=
+X-Google-Smtp-Source: AKy350YN/Rf2SZ1ME0rb1VR3LA6oyESPfK71x6IS5j3OPheOdpplpGnd4DdvemgbvhcXY4+S55JHBw==
+X-Received: by 2002:a05:600c:310e:b0:3f1:78bd:c38b with SMTP id g14-20020a05600c310e00b003f178bdc38bmr4795553wmo.4.1681897271920;
+        Wed, 19 Apr 2023 02:41:11 -0700 (PDT)
 Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id o3-20020a5d4743000000b002f9e04459desm8458477wrs.109.2023.04.19.02.35.09
+        by smtp.gmail.com with ESMTPSA id g11-20020a05600c310b00b003f0aefcc457sm1608734wmo.45.2023.04.19.02.41.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 02:35:10 -0700 (PDT)
-Message-ID: <088e9b60-3092-2642-b3c3-2248e2e51cd6@grimberg.me>
-Date:   Wed, 19 Apr 2023 12:35:08 +0300
+        Wed, 19 Apr 2023 02:41:11 -0700 (PDT)
+Message-ID: <a58b526d-2e29-6c4a-e277-b684f98636eb@grimberg.me>
+Date:   Wed, 19 Apr 2023 12:41:10 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH v3 0/4] nvmet-fcloop: unblock module removal
+Subject: Re: [PATCH blktests v2 1/2] nvme-rc: Cleanup fc ports in reverse
+ order
 Content-Language: en-US
 To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        James Smart <james.smart@broadcom.com>,
         Chaitanya Kulkarni <kch@nvidia.com>,
-        Martin Belanger <Martin.Belanger@dell.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <20230418130159.11075-1-dwagner@suse.de>
- <nlogr5rdxqvilsz4iolktfpdvflvvithwaoa3vrx2fsjqlho4q@4upw7jq3aem2>
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+References: <20230419084757.24846-1-dwagner@suse.de>
+ <20230419084757.24846-2-dwagner@suse.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <nlogr5rdxqvilsz4iolktfpdvflvvithwaoa3vrx2fsjqlho4q@4upw7jq3aem2>
+In-Reply-To: <20230419084757.24846-2-dwagner@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -62,12 +61,33 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->> nvme/041 (Create authenticated connections)                  [failed]
->> nvme/042 (Test dhchap key types for authenticated connections) [failed]
->> nvme/043 (Test hash and DH group variations for authenticated connections) [passed]
->> nvme/044 (Test bi-directional authentication)                [failed]
->> nvme/045 (Test re-authentication)                            [passed]
-> 
-> I suppose these should be disabled for fc as all this is tcp specific.
 
-Umm, no their not...
+On 4/19/23 11:47, Daniel Wagner wrote:
+> We need to free the resources in the opposite order as we allocate them.
+> 
+> Signed-off-by: Daniel Wagner <dwagner@suse.de>
+> ---
+>   tests/nvme/rc | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index b44239446dcf..ec0cc2d8d8cc 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -204,10 +204,10 @@ _cleanup_fcloop() {
+>   	local remote_wwnn="${3:-$def_remote_wwnn}"
+>   	local remote_wwpn="${4:-$def_remote_wwpn}"
+>   
+> -	_nvme_fcloop_del_rport "${local_wwnn}" "${local_wwpn}" \
+> -			       "${remote_wwnn}" "${remote_wwpn}"
+>   	_nvme_fcloop_del_tport "${remote_wwnn}" "${remote_wwpn}"
+>   	_nvme_fcloop_del_lport "${local_wwnn}" "${local_wwpn}"
+> +	_nvme_fcloop_del_rport "${local_wwnn}" "${local_wwpn}" \
+> +			       "${remote_wwnn}" "${remote_wwpn}"
+>   }
+>   
+>   _cleanup_nvmet() {
+
+Does this fix a bug? if it does, than it should probably be documented
+that there is a driver bug because userspace teardown ordering should
+not trigger a driver bug.
