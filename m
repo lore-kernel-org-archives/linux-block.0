@@ -2,137 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54033C77B73
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 06:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3389CC6FD18
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 07:34:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231464AbjDSGFI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 02:05:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52894 "EHLO
+        id S232329AbjDSHeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 03:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230153AbjDSGFH (ORCPT
+        with ESMTP id S232355AbjDSHeD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 02:05:07 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 133866A48
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 23:05:06 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-760eead6a4aso191672839f.3
-        for <linux-block@vger.kernel.org>; Tue, 18 Apr 2023 23:05:06 -0700 (PDT)
+        Wed, 19 Apr 2023 03:34:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF7861BE
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 00:33:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681889596;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qFk0SDi3a5cx1k87dtvoTAIyvSTI1GDLMwxUDSm0tzU=;
+        b=dB7f7hbvdZAsEb/EgLNmXg7p9D92KIydp/t2WNlID+8HlzEhTPzJOjLB15XmtFBPyXtjLG
+        eNT1mxmBvh6X52ixR8v7/dI2fhqDoruELq5hWbMEvu42y0Cmw6GnXFl8G7VbnmF1EAjYIW
+        DWxl8V6imq1OLNrKNmUUHkhu2mBCLkc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-148-U82PXjPFPf-w6uPV_k6IMA-1; Wed, 19 Apr 2023 03:33:15 -0400
+X-MC-Unique: U82PXjPFPf-w6uPV_k6IMA-1
+Received: by mail-wr1-f70.google.com with SMTP id q9-20020adfab09000000b002f513905032so2983330wrc.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 00:33:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681884305; x=1684476305;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kouztW6HEdVb3Wh3hzPt7Cdw/KSYIA8iEGxKFUZNtcg=;
-        b=LguUra7yL9j/X/f2JZZkB2spuZjUJrOywGPIJ6IeGTN4LhKOAVxtQAziPy097fmixk
-         LRhAHcmhigYdAVwZUuJZ2FgQi9JqVesxArB5mwiRek/HwrNLl6Z2xYcizTkMEMf4N4O+
-         wiF7/rt9yuom3522fl+CH/6WKOTSOjmfvNFnaUNpsbCYbEwxKDQq4KCb3+3T/NlVljcC
-         W5wHDzrgk394AcEzZWiy/G8qD4FnsYPdMzTxaW8OEg50aP+CZr0hNavPz2YIFP/XmR4m
-         nEKFA/8aa7EGJ4jFPytNQfTvGFdJumZRIM7ImIYaKbebkaQFiJC0juSIBfHtTlrd1eda
-         Gcbw==
-X-Gm-Message-State: AAQBX9czAUyHZcQGFFVH8/+lwE+suxzu3DN51Oe2f7aC4gg/JqrfXgSP
-        KWpSsEfVmtTy/8u5fLgIkLKvF1ybRpqZzss8kiC9lv9WTlh9
-X-Google-Smtp-Source: AKy350bTZI9wmT6d8rLs3C74F0my4WtD8gHmXBVjilfOUhe+qHbz8M0h/VKExey9ixETAplOTY7o//M7RW/snMt7eoI3vGqm7k6N
+        d=1e100.net; s=20221208; t=1681889594; x=1684481594;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qFk0SDi3a5cx1k87dtvoTAIyvSTI1GDLMwxUDSm0tzU=;
+        b=KcmjTLdSTbsBhZ3G0BpgsJmd2dEflHcKY0tDDujHocSHbrdHPNYdsrmtJ91R8XrLNf
+         9YcikUT+11EHqlee5v+LVm4dJCiIW4EpULlH0zmoohjoX4nkoyr64ZW3wU/27vtzBJNZ
+         BJNu8QmjhoI9MhlxdqwbM8B/JdTKc2CD4nq/dzfhVNSnsp6DiQMD3la0ZkuQNefMQwI1
+         qc32eQOWRxLZ5A1+jrPKqSOO0N4E/JVY9o06SM8sWXO6SIuMS+4+zSguEbnos0xGLjTT
+         wQh1RIdyOCxEEo8GmD5rUwoaIHxXDC1JQ1ZMq6C8pBpPljQyYZYECcqdUD/+of547MtO
+         cwiA==
+X-Gm-Message-State: AAQBX9dp7+zw+GGjtRAFNegxL/Uxls98ZyYYD/TVDLzGc1pn+D8lzmOo
+        je45yMiXJE3/cRaTXLZELkbOPsq7mrsdGu1BR7Joc438Zqxa6XityAycwQF2n7Vki05uNppXscw
+        VFdQBpJINZyNx3hPOY/p8BA==
+X-Received: by 2002:a05:600c:22d9:b0:3f1:72ee:97b7 with SMTP id 25-20020a05600c22d900b003f172ee97b7mr8545922wmg.15.1681889594275;
+        Wed, 19 Apr 2023 00:33:14 -0700 (PDT)
+X-Google-Smtp-Source: AKy350YBAVtRpOTsSTqGfNCvK/e0agfpLarrgNXcpFi//za/NhDLDVp4b73+IECdM9SXUlK0O4AKzw==
+X-Received: by 2002:a05:600c:22d9:b0:3f1:72ee:97b7 with SMTP id 25-20020a05600c22d900b003f172ee97b7mr8545904wmg.15.1681889594031;
+        Wed, 19 Apr 2023 00:33:14 -0700 (PDT)
+Received: from [192.168.50.108] ([83.240.60.42])
+        by smtp.gmail.com with ESMTPSA id u19-20020a05600c211300b003f17316ab46sm1259908wml.13.2023.04.19.00.33.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Apr 2023 00:33:13 -0700 (PDT)
+Message-ID: <c3443f2a-e74c-4dd0-178b-4e46e3114744@redhat.com>
+Date:   Wed, 19 Apr 2023 09:33:12 +0200
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3146:b0:760:e9b6:e6de with SMTP id
- m6-20020a056602314600b00760e9b6e6demr3156572ioy.0.1681884305405; Tue, 18 Apr
- 2023 23:05:05 -0700 (PDT)
-Date:   Tue, 18 Apr 2023 23:05:05 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000093c4d105f9aa34d6@google.com>
-Subject: [syzbot] [block?] general protection fault in reset_interrupt (3)
-From:   syzbot <syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Content-Language: en-US
+To:     axboe@kernel.dk
+Cc:     bluca@debian.org, gmazyland@gmail.com, hch@infradead.org,
+        brauner@kernel.org, jonathan.derrick@linux.dev,
+        linux-block@vger.kernel.org
+References: <20230406131934.340155-1-okozina@redhat.com>
+ <20230411090931.9193-1-okozina@redhat.com>
+From:   Ondrej Kozina <okozina@redhat.com>
+Subject: Re: [PATCH v2 0/1] sed-opal: geometry feature reporting command
+In-Reply-To: <20230411090931.9193-1-okozina@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 11. 04. 23 11:09, Ondrej Kozina wrote:
+>    sed-opal: geometry feature reporting command
+> 
 
-syzbot found the following issue on:
+Hi Jens,
 
-HEAD commit:    95abc817ab3a Merge tag 'acpi-6.3-rc7' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10f8677bc80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=90aa79dcf599c3f1
-dashboard link: https://syzkaller.appspot.com/bug?extid=619e27617b2abe6b9b72
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+could we get this in 6.4? It's the last kernel bit we'd like to have to 
+move further with userspace code discussed here:
+https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/461
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Kind regards
+Ondrej
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+619e27617b2abe6b9b72@syzkaller.appspotmail.com
-
-c1 00                                            ..
-status=80
-fdc_busy=0
-cont=0000000000000000
-current_req=0000000000000000
-command_status=-1
-general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-CPU: 3 PID: 5216 Comm: kworker/u16:3 Not tainted 6.3.0-rc6-syzkaller-00168-g95abc817ab3a #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-Workqueue: floppy floppy_work_workfn
-RIP: 0010:reset_interrupt+0x17a/0x230 drivers/block/floppy.c:1789
-Code: 6c d3 4a fc e9 0e ff ff ff e8 82 d8 66 fc 48 8b 1d 4b 30 ed 0c 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 10 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 80 00 00 00 48 8b 73 10 48 c7 c7 c0 c6 ce 8a e8
-RSP: 0018:ffffc9000375fd08 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000002 RSI: ffffffff851b338e RDI: 0000000000000010
-RBP: ffffffff8d44d380 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffc9000375fda8
-R13: ffffffff8d44d390 R14: ffff88801d3d8000 R15: ffff888012479000
-FS:  0000000000000000(0000) GS:ffff88802c900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fcacaedee08 CR3: 00000000496e5000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- process_one_work+0x991/0x15c0 kernel/workqueue.c:2390
- worker_thread+0x669/0x1090 kernel/workqueue.c:2537
- kthread+0x2e8/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:reset_interrupt+0x17a/0x230 drivers/block/floppy.c:1789
-Code: 6c d3 4a fc e9 0e ff ff ff e8 82 d8 66 fc 48 8b 1d 4b 30 ed 0c 48 b8 00 00 00 00 00 fc ff df 48 8d 7b 10 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 80 00 00 00 48 8b 73 10 48 c7 c7 c0 c6 ce 8a e8
-RSP: 0018:ffffc9000375fd08 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000002 RSI: ffffffff851b338e RDI: 0000000000000010
-RBP: ffffffff8d44d380 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffc9000375fda8
-R13: ffffffff8d44d390 R14: ffff88801d3d8000 R15: ffff888012479000
-FS:  0000000000000000(0000) GS:ffff88802c900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fcacaedee08 CR3: 00000000496e5000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	6c                   	insb   (%dx),%es:(%rdi)
-   1:	d3 4a fc             	rorl   %cl,-0x4(%rdx)
-   4:	e9 0e ff ff ff       	jmpq   0xffffff17
-   9:	e8 82 d8 66 fc       	callq  0xfc66d890
-   e:	48 8b 1d 4b 30 ed 0c 	mov    0xced304b(%rip),%rbx        # 0xced3060
-  15:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  1c:	fc ff df
-  1f:	48 8d 7b 10          	lea    0x10(%rbx),%rdi
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 80 00 00 00    	jne    0xb4
-  34:	48 8b 73 10          	mov    0x10(%rbx),%rsi
-  38:	48 c7 c7 c0 c6 ce 8a 	mov    $0xffffffff8acec6c0,%rdi
-  3f:	e8                   	.byte 0xe8
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
