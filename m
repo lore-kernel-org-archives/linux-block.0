@@ -2,49 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BAC2C77B73
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 22:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D91C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 23:02:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231627AbjDSWof (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 18:44:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44960 "EHLO
+        id S231387AbjDSXCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 19:02:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231509AbjDSWoe (ORCPT
+        with ESMTP id S232361AbjDSXCs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 18:44:34 -0400
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C4C6EA8
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 15:44:07 -0700 (PDT)
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-63d4595d60fso3025415b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 15:44:07 -0700 (PDT)
+        Wed, 19 Apr 2023 19:02:48 -0400
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA3440EE
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 16:02:21 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-63b70ca0a84so491492b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 16:02:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681944223; x=1684536223;
+        d=1e100.net; s=20221208; t=1681945289; x=1684537289;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jA4vrI3Esu2z7vBZNEoRsk04bWLH+Oh9ZePo9xRxzVk=;
-        b=cVyxF0HEUMP9869+0chQcwi/aKsvlrrbbK9RpndRLjWH+DoHWrIExlrzjvoyqmtLsE
-         2FWUOm8Oj+DtYEETjSseuZyIrcf6ysmliuhg8rQ5mV9jgu4qndcppLpXHrFmg+Y/hODf
-         fjXlS7/wwwMlEBGgDfMprjsteMdmZZgJjlSreMt/fxow2MPgyVqJESk++fSikLVN7wer
-         oXc5aScB79vc3qedsG23Vxc/zvAArHauEePYGQujp7gk0Rj9xIOnKNAxBbcoT22/SiLr
-         ZmQl0YREHb/ddsexSKKLF6/xLX1f2A4C6/oHsEv0npnogufK929q1axuwP/5HSzVKb5u
-         +Ajw==
-X-Gm-Message-State: AAQBX9cj8cA3DTzYYL7mYi1YfZdUnKxPIo6i+GJkBHiEtIEpd8WzNm+E
-        wCY9ROc38zPHvRJw/EWkJ2M=
-X-Google-Smtp-Source: AKy350ZoAK0uv4daaBOGN+iwfdqdjT4BzicenBFN+Uo2OVPOyja19wkrZqJYCUQZ+ayeLaMxSeHS7w==
-X-Received: by 2002:a05:6a20:7d96:b0:f0:9de1:193e with SMTP id v22-20020a056a207d9600b000f09de1193emr200591pzj.6.1681944223548;
-        Wed, 19 Apr 2023 15:43:43 -0700 (PDT)
+        bh=jCGGik+Dh34m/LHPIISsgDwZwS1lPtqv0VLubLC6Woo=;
+        b=braqGM8s0jThG4tpLsIiH1qUqCaPHBkVw6KDMtRez2WlioTEzFcVIDS3ieYactzbCy
+         Sm9/adKqdoH3qR1OaTOpXPNIe0/kgotxK9EhvPgZRcoADM1P1TVKr3fz7bClWx/hVI5i
+         r2d0pmRMpH8WE4ZDQ7ZOgfWbqXdilhHdOmTCavn7gLLyxAO0E+OU/Q89/Ol2sgUVdo1a
+         +5NRfvj2PgtRdCuRZ27+ZYL3svFL3yQJ9Se1q3q73C3F8IWCb8cdp6zBxApEW0XyqJcc
+         DgFsYx7cb5T3fV1IZh576IvVCzC8znB6y5ZnalEAJMAJPBUj9vbUqJ/48+esAsCYSozK
+         Av5Q==
+X-Gm-Message-State: AAQBX9ecjV1m9ICIqbO0ccswVT3ik994NxQCa2LPCutF9wPxKGnTZDKi
+        XHAxV9UVqKyzFRphCoQvzG4=
+X-Google-Smtp-Source: AKy350YxcBHYwqxWw1UVaWMHNJh7TDAif06+UOMxfXBtraYc4Mrq4WCVnIGDqOEuogTFIrBrYgoanQ==
+X-Received: by 2002:a05:6a20:748d:b0:d9:27f7:8c4a with SMTP id p13-20020a056a20748d00b000d927f78c4amr339551pzd.0.1681945289031;
+        Wed, 19 Apr 2023 16:01:29 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:216b:53b9:f55c:cf92? ([2620:15c:211:201:216b:53b9:f55c:cf92])
-        by smtp.gmail.com with ESMTPSA id w30-20020a63161e000000b00517f165d0a6sm10827858pgl.4.2023.04.19.15.43.42
+        by smtp.gmail.com with ESMTPSA id q10-20020a63d60a000000b0050bcf117643sm10566740pgg.17.2023.04.19.16.01.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Apr 2023 15:43:43 -0700 (PDT)
-Message-ID: <e6adbe81-c45f-9801-bee6-a5a7ccad8945@acm.org>
-Date:   Wed, 19 Apr 2023 15:43:41 -0700
+        Wed, 19 Apr 2023 16:01:28 -0700 (PDT)
+Message-ID: <64b56eb3-bcf5-c48a-df96-bf1956f6992e@acm.org>
+Date:   Wed, 19 Apr 2023 16:01:26 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.1
-Subject: Re: [PATCH v2 06/11] block: mq-deadline: Disable head insertion for
- zoned writes
+Subject: Re: [PATCH v2 09/11] block: mq-deadline: Handle requeued requests
+ correctly
 Content-Language: en-US
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -52,37 +52,50 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Ming Lei <ming.lei@redhat.com>
 References: <20230418224002.1195163-1-bvanassche@acm.org>
- <20230418224002.1195163-7-bvanassche@acm.org> <20230419043044.GC25329@lst.de>
+ <20230418224002.1195163-10-bvanassche@acm.org>
+ <20230419050758.GD25898@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230419043044.GC25329@lst.de>
+In-Reply-To: <20230419050758.GD25898@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/18/23 21:30, Christoph Hellwig wrote:
-> On Tue, Apr 18, 2023 at 03:39:57PM -0700, Bart Van Assche wrote:
->> Make sure that zoned writes (REQ_OP_WRITE and REQ_OP_WRITE_ZEROES) are
->> submitted in LBA order. This patch does not affect REQ_OP_WRITE_APPEND
->> requests.
+On 4/18/23 22:07, Christoph Hellwig wrote:
+>>   deadline_add_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
+>>   {
+>>   	struct rb_root *root = deadline_rb_root(per_prio, rq);
+>> +	struct request **next_rq __maybe_unused;
+>>   
+>>   	elv_rb_add(root, rq);
+>> +#ifdef CONFIG_BLK_DEV_ZONED
+>> +	next_rq = &per_prio->next_rq[rq_data_dir(rq)];
+>> +	if (*next_rq == NULL || !blk_queue_is_zoned(rq->q))
+>> +		return;
+>> +	/*
+>> +	 * If a request got requeued or requests have been submitted out of
+>> +	 * order, make sure that per zone the request with the lowest LBA is
+>> +	 * submitted first.
+>> +	 */
+>> +	if (blk_rq_pos(rq) < blk_rq_pos(*next_rq) &&
+>> +	    blk_rq_zone_no(rq) == blk_rq_zone_no(*next_rq))
+>> +		*next_rq = rq;
+>> +#endif
 > 
-> As said before this is not correct.  What we need to instead is to
-> support proper patch insertation when the at_head flag is set so
-> that the requests get inserted before the existing requests, but
-> in ordered they are passed to the I/O scheduler.
+> Please key move this into a helper only called when blk_queue_is_zoned
+> is true.
+Hi Christoph,
 
-It is not clear to me how this approach should work if the AT_HEAD flag 
-is set for some zoned writes but not for other zoned writes for the same 
-zone? The mq-deadline scheduler uses separate lists for at-head and for 
-other requests. Having to check both lists before dispatching a request 
-would significantly complicate the mq-deadline scheduler.
+I'm looking into an alternative, namely to remove the next_rq member 
+from struct dd_per_prio and instead to do the following:
+* Track the offset (blk_rq_pos()) of the most recently dispatched 
+request ("latest_pos").
+* Where the next_rq member is read, look up the request that comes after 
+latest_pos in the RB-tree. This should require an effort that is similar 
+to updating next_rq after having dispatched a request.
 
-> This also needs to be done for the other two I/O schedulers.
-
-As far as I know neither Kyber nor BFQ support zoned storage so we don't 
-need to worry about how these schedulers handle zoned writes?
-
-Thanks,
+With this approach the code quoted above and that is surrounded with 
+#ifdef/#endif will disappear.
 
 Bart.
