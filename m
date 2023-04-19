@@ -2,118 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B85C77B75
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 12:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D55C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 12:45:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbjDSMjA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 08:39:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
+        id S233048AbjDSMpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 08:45:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231592AbjDSMi6 (ORCPT
+        with ESMTP id S232607AbjDSMpn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 08:38:58 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294EA1BD2
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 05:38:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681907933; x=1713443933;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=U0OhEmkyN374yvgpmdDmLbFBPlNFpp5IE/9XwHhYyqM=;
-  b=FmNIVK5eTMy3nKPxE24OtHTlO6Dmk86wkuocoftXqytkIwK3YnedpjcR
-   n0UGWxJRTigP7lKA08OlhsQ0Pm2hndLjtSvoObd4KwrEMehiTX103QTt8
-   H20D/iR41VH416+KAwLzkg1JMfI/1lXrubim5JMTkDgWdDsvosrcl16zV
-   /qPaCExF5Ns3KigRd25rfnZ4+rRDT5O+LCy+zKmR0eQX1ZqQ52e8xUZgI
-   FWgs3Wvy7xeBY6Po3cfLr/aIcyIhTQ+nsE92JYP5PrbaPVsMG/rqTWd5I
-   qJavwaJDngX9vefah7sno68k2rb9j/1cO5z4rRc0XbEu2fty7SzKWaxr8
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="431711218"
-X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
-   d="scan'208";a="431711218"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2023 05:38:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10684"; a="865821365"
-X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
-   d="scan'208";a="865821365"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 19 Apr 2023 05:38:50 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pp75G-000esf-0m;
-        Wed, 19 Apr 2023 12:38:50 +0000
-Date:   Wed, 19 Apr 2023 20:37:52 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 7/7] blk-mq: don't use the requeue list to queue flush
- commands
-Message-ID: <202304192001.KzxpDQmK-lkp@intel.com>
-References: <20230416200930.29542-8-hch@lst.de>
+        Wed, 19 Apr 2023 08:45:43 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7DA3C1F
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 05:45:41 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-63b78525ac5so1315884b3a.0
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 05:45:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681908340; x=1684500340;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UWkATxwUI54Wjf29X1y6InilmbSwGYCaupz7wL2xoYA=;
+        b=V/Zcy6Qn3ntP2MHoNED004N6bQmV9wF3ftWYZh6tBptsdhl634WOoMOrhxWZa09I0E
+         BhbUDuv3/vLqZQ3/fuC0QJi4YYd6uwouwggm+7jdkzU9qjrzbrWNa2UORInkpFcnVCHg
+         xIqXThcvzQMSqo6MOmPMDbyGP2XRWEalPvVi47srhbKaPo3iKAIPhFnkLhPeO9q8LvFb
+         CdDM9FLOXiV0XIhZiQOKkbwjfp3Ycbb6kxNdOikLX/rI2yPmTfRO0OBIbLaFAI1ybmvr
+         x1JzceTadJIKEShma9KMfX8wo/OeN/RW3l74s5Wl3nxYqBfCwilA6DnJG9f4VeyL0Vzo
+         Mx0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681908340; x=1684500340;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UWkATxwUI54Wjf29X1y6InilmbSwGYCaupz7wL2xoYA=;
+        b=O69Vwey63ZaEyJNlGaa91Ki5FfssRbYQ2M/zsatN/h35YESfecXC7xaMgnrXFFI7Z/
+         FX33QzkroWIh6+RSkyw+RIM1oJD719U84DKYG7BwVdvTA6NAxHVsFq2xS3LDGF/N/Phs
+         V+WIksuPuJFbtUNtsMMJV3WdxQjDzv+EIOEoa9pmtJrm8TGuppb1ORZYqCyc0onFDNVL
+         eBuPQXLbE/3taPS1vki+JSPzOmoW1WcJNA3un9Hrr8cNJtX6024SmS7KgrEVC4Jsb8gy
+         NtEF2jLY7BuuXW+yUxqXXqeAryq3JFDt0/Vou9M/wTIdlOxEZGRrIyFW3tyB0skX9Qfc
+         fvPw==
+X-Gm-Message-State: AAQBX9fd4UDByA6dN7OJJn+5zt+M3yLCCi1W40upoDiBjlBnNw+zaxWX
+        F+SfYhr6gGltfe950P6/s/cqh9o4XunDjP7GwFY=
+X-Google-Smtp-Source: AKy350YZ068gLQ817k+Ij6jge/IubKk6mC1ANeALBOZN7osif6ym1dK+BGMD9/8chbAcO3bPTjBUtQ==
+X-Received: by 2002:a05:6a20:3c92:b0:f1:1ab5:5076 with SMTP id b18-20020a056a203c9200b000f11ab55076mr3391077pzj.2.1681908340445;
+        Wed, 19 Apr 2023 05:45:40 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e17-20020aa78c51000000b0063b79bae907sm7731602pfd.122.2023.04.19.05.45.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 05:45:40 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Ayush Jain <ayush.jain3@amd.com>, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        David Hildenbrand <david@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Steve French <stfrench@microsoft.com>, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <1770755.1681894451@warthog.procyon.org.uk>
+References: <1770755.1681894451@warthog.procyon.org.uk>
+Subject: Re: [PATCH] splice: Fix filemap of a blockdev
+Message-Id: <168190833944.417103.14222689199936898089.b4-ty@kernel.dk>
+Date:   Wed, 19 Apr 2023 06:45:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230416200930.29542-8-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
 
-kernel test robot noticed the following build warnings:
+On Wed, 19 Apr 2023 09:54:11 +0100, David Howells wrote:
+> Fix the new filemap_splice_read() function to get i_size from
+> in->f_mapping->host, not in->f_inode so that it works with block devices
+> too (in->f_inode points to the device file, which is typically zero size).
+> 
+> 
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on next-20230418]
-[cannot apply to linus/master v6.3-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Applied, thanks!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/blk-mq-reflow-blk_insert_flush/20230417-051014
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20230416200930.29542-8-hch%40lst.de
-patch subject: [PATCH 7/7] blk-mq: don't use the requeue list to queue flush commands
-config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20230419/202304192001.KzxpDQmK-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/c1197e1a4ff5b38b73d3ec923987ca857f5e2695
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Christoph-Hellwig/blk-mq-reflow-blk_insert_flush/20230417-051014
-        git checkout c1197e1a4ff5b38b73d3ec923987ca857f5e2695
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 olddefconfig
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+[1/1] splice: Fix filemap of a blockdev
+      commit: 5a9515a407d1aec1dd76c24fe99d9981730b74fb
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304192001.KzxpDQmK-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> block/blk-mq.c:1461:6: warning: no previous prototype for 'blk_flush_queue_insert' [-Wmissing-prototypes]
-    1461 | void blk_flush_queue_insert(struct request *rq)
-         |      ^~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/blk_flush_queue_insert +1461 block/blk-mq.c
-
-  1460	
-> 1461	void blk_flush_queue_insert(struct request *rq)
-  1462	{
-  1463		struct request_queue *q = rq->q;
-  1464		unsigned long flags;
-  1465	
-  1466		spin_lock_irqsave(&q->requeue_lock, flags);
-  1467		list_add_tail(&rq->queuelist, &q->flush_list);
-  1468		spin_unlock_irqrestore(&q->requeue_lock, flags);
-  1469	}
-  1470	
-
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Jens Axboe
+
+
+
