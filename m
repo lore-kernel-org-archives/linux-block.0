@@ -2,156 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CE2C6FD18
-	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 13:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D303C77B7E
+	for <linux-block@archiver.kernel.org>; Wed, 19 Apr 2023 14:10:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233534AbjDSNa5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 09:30:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38618 "EHLO
+        id S231977AbjDSOKq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 10:10:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233527AbjDSNa4 (ORCPT
+        with ESMTP id S231319AbjDSOKo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 09:30:56 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CD549C1;
-        Wed, 19 Apr 2023 06:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1681911055; x=1713447055;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=N/GSlYqreKAXPu9B0lGYZfv80oraXkzW4fyW3/FG+wQ=;
-  b=brt7qoQAhklTou6CPSiTL97Ycejns7sjBu8bNAF/42G31XXU8+KVZBZX
-   7J6aXiaDoS1mgmnDcc906PZY+5ZeSlxDdBQpk4yhz9buvpOE9CLwNvNTj
-   D+70aaDlFEkIioo1JAMZYj04jLbmhIJTgP3Nk0Wxfz6ar0s656Udbdbo+
-   Jun7k/I5lrzZOMrzO9eP+O9kOYQM2uiA+rfXr90y9+2QX7QuNWgQOo+l7
-   cK9dxhI4m3VPGgtGTWzfiPk12AsGIt/iUTI1tabnkx9sV+WUbVT42hJg9
-   vMYzVUK6HtvTdkvbwba7OWIySnSQVe625eTCjw32RpYnVQ/LjHbXzXdC1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="325062178"
-X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
-   d="scan'208";a="325062178"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2023 06:30:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10685"; a="684981964"
-X-IronPort-AV: E=Sophos;i="5.99,208,1677571200"; 
-   d="scan'208";a="684981964"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 19 Apr 2023 06:30:51 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pp7tb-000euR-0p;
-        Wed, 19 Apr 2023 13:30:51 +0000
-Date:   Wed, 19 Apr 2023 21:29:58 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
-Subject: Re: [PATCH 1/4] block: constify partition prober array
-Message-ID: <202304192132.a6MR0cFR-lkp@intel.com>
-References: <20230419-const-partition-v1-1-2d66f2d83873@weissschuh.net>
+        Wed, 19 Apr 2023 10:10:44 -0400
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C6EB15A10;
+        Wed, 19 Apr 2023 07:10:30 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id he11-20020a05600c540b00b003ef6d684102so1520272wmb.3;
+        Wed, 19 Apr 2023 07:10:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681913428; x=1684505428;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ds+4u+CqEC3ZGaEOp3gVvQ4zLD/cUEcU9lJQRjxdLNA=;
+        b=WX5EowMjS9XI2UcO7k7N2sKja7Qujs2MuxPF+ITs9uQJ59E2W7CDS4aAFza9vyYC5V
+         A+lcsR43X3/BqzbYfET7qJhVlroKrkZXjRXWFs1E0vc9jD440wiQigJ/yyg6NlwCOqdM
+         V/fA4dLotHR+ti15hsg6t7bcWZSie2Y8BRuiOIOYRHG04f5vvZIx7YmnqymPxqj6v6u9
+         L6UxUPiU/uwj9rQ8jTGS9E09iyLTjAjTct1kkGiZZKb48Ji7IjsqkenNkt65LuQHujPU
+         bUZ8zz2lTh51vIefhWpXPr1zYtAeh1V+t0xN+eOv1BKu4/WRIwyg2vHauowhB4ge+N2y
+         6fpQ==
+X-Gm-Message-State: AAQBX9dCt3wzuDiI9i96wDEslyFOlFG83SOUY+MffW5H+ir0Ko8xdqkc
+        CQXft7cNlIWsv78MbBabI80=
+X-Google-Smtp-Source: AKy350Y4xTG1OoU4RldSmLjAWxwSQmurOCS31djj2xM4db5/3zz7gZSX8s3hL+Z3d0qabHExFnk4cg==
+X-Received: by 2002:a05:600c:3ca2:b0:3f1:7371:86bb with SMTP id bg34-20020a05600c3ca200b003f1737186bbmr1907296wmb.20.1681913428480;
+        Wed, 19 Apr 2023 07:10:28 -0700 (PDT)
+Received: from localhost.localdomain (aftr-62-216-205-204.dynamic.mnet-online.de. [62.216.205.204])
+        by smtp.googlemail.com with ESMTPSA id q17-20020a5d61d1000000b002faaa9a1721sm7612089wrv.58.2023.04.19.07.10.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 07:10:27 -0700 (PDT)
+From:   Johannes Thumshirn <jth@kernel.org>
+To:     axboe@kernel.dk
+Cc:     johannes.thumshirn@wdc.com, agruenba@redhat.com,
+        cluster-devel@redhat.com, damien.lemoal@wdc.com,
+        dm-devel@redhat.com, dsterba@suse.com, hare@suse.de, hch@lst.de,
+        jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-raid@vger.kernel.org, ming.lei@redhat.com,
+        rpeterso@redhat.com, shaggy@kernel.org, snitzer@kernel.org,
+        song@kernel.org, willy@infradead.org,
+        Johannes Thumshirn <jth@kernel.org>
+Subject: [PATCH v3 00/19] bio: check return values of bio_add_page
+Date:   Wed, 19 Apr 2023 16:09:10 +0200
+Message-Id: <20230419140929.5924-1-jth@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230419-const-partition-v1-1-2d66f2d83873@weissschuh.net>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Thomas,
+We have two functions for adding a page to a bio, __bio_add_page() which is
+used to add a single page to a freshly created bio and bio_add_page() which is
+used to add a page to an existing bio.
 
-kernel test robot noticed the following build warnings:
+While __bio_add_page() is expected to succeed, bio_add_page() can fail.
 
-[auto build test WARNING on af67688dca57999fd848f051eeea1d375ba546b2]
+This series converts the callers of bio_add_page() which can easily use
+__bio_add_page() to using it and checks the return of bio_add_page() for
+callers that don't work on a freshly created bio.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Thomas-Wei-schuh/block-constify-partition-prober-array/20230419-155356
-base:   af67688dca57999fd848f051eeea1d375ba546b2
-patch link:    https://lore.kernel.org/r/20230419-const-partition-v1-1-2d66f2d83873%40weissschuh.net
-patch subject: [PATCH 1/4] block: constify partition prober array
-config: arm64-randconfig-r001-20230416 (https://download.01.org/0day-ci/archive/20230419/202304192132.a6MR0cFR-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 437b7602e4a998220871de78afcb020b9c14a661)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm64 cross compiling tool for clang build
-        # apt-get install binutils-aarch64-linux-gnu
-        # https://github.com/intel-lab-lkp/linux/commit/9bc1f4308c10322c327c9e86ede6bb9e862440aa
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Thomas-Wei-schuh/block-constify-partition-prober-array/20230419-155356
-        git checkout 9bc1f4308c10322c327c9e86ede6bb9e862440aa
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash block/partitions/
+Lastly it marks bio_add_page() as __must_check so we don't have to go again
+and audit all callers.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304192132.a6MR0cFR-lkp@intel.com/
+NOTE: David already applied the two btrfs patches to his tree but I've left
+them in the series to make the build bot happy.
 
-All warnings (new ones prefixed by >>):
+Changes to v2:
+- Removed 'wont fail' comments pointed out by Song
 
->> block/partitions/core.c:15:8: warning: 'const' type qualifier on return type has no effect [-Wignored-qualifiers]
-   static const int (*check_part[])(struct parsed_partitions *) = {
-          ^~~~~~
-   block/partitions/core.c:47:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
-           efi_partition,          /* this must come before msdos */
-           ^~~~~~~~~~~~~
-   block/partitions/core.c:50:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
-           sgi_partition,
-           ^~~~~~~~~~~~~
-   block/partitions/core.c:56:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
-           msdos_partition,
-           ^~~~~~~~~~~~~~~
-   block/partitions/core.c:59:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
-           osf_partition,
-           ^~~~~~~~~~~~~
-   block/partitions/core.c:62:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
-           sun_partition,
-           ^~~~~~~~~~~~~
-   block/partitions/core.c:65:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
-           amiga_partition,
-           ^~~~~~~~~~~~~~~
-   block/partitions/core.c:71:2: error: incompatible function pointer types initializing 'const int (*)(struct parsed_partitions *)' with an expression of type 'int (struct parsed_partitions *)' [-Wincompatible-function-pointer-types]
-           mac_partition,
-           ^~~~~~~~~~~~~
-   1 warning and 7 errors generated.
+Changes to v1:
+- Removed pointless comment pointed out by Willy
+- Changed commit messages pointed out by Damien
+- Colledted Damien's Reviews and Acks
+
+Johannes Thumshirn (19):
+  swap: use __bio_add_page to add page to bio
+  drbd: use __bio_add_page to add page to bio
+  dm: dm-zoned: use __bio_add_page for adding single metadata page
+  fs: buffer: use __bio_add_page to add single page to bio
+  md: use __bio_add_page to add single page
+  md: raid5-log: use __bio_add_page to add single page
+  md: raid5: use __bio_add_page to add single page to new bio
+  btrfs: repair: use __bio_add_page for adding single page
+  btrfs: raid56: use __bio_add_page to add single page
+  jfs: logmgr: use __bio_add_page to add single page to bio
+  gfs: use __bio_add_page for adding single page to bio
+  zonefs: use __bio_add_page for adding single page to bio
+  zram: use __bio_add_page for adding single page to bio
+  floppy: use __bio_add_page for adding single page to bio
+  md: check for failure when adding pages in alloc_behind_master_bio
+  md: raid1: use __bio_add_page for adding single page to bio
+  md: raid1: check if adding pages to resync bio fails
+  dm-crypt: check if adding pages to clone bio fails
+  block: mark bio_add_page as __must_check
+
+ drivers/block/drbd/drbd_bitmap.c |  4 +---
+ drivers/block/floppy.c           |  2 +-
+ drivers/block/zram/zram_drv.c    |  2 +-
+ drivers/md/dm-crypt.c            |  9 ++++++++-
+ drivers/md/dm-zoned-metadata.c   |  6 +++---
+ drivers/md/md.c                  |  4 ++--
+ drivers/md/raid1-10.c            | 11 ++++++-----
+ drivers/md/raid1.c               |  7 +++++--
+ drivers/md/raid10.c              | 20 ++++++++++----------
+ drivers/md/raid5-cache.c         |  2 +-
+ drivers/md/raid5-ppl.c           |  4 ++--
+ fs/btrfs/bio.c                   |  2 +-
+ fs/btrfs/raid56.c                |  2 +-
+ fs/buffer.c                      |  2 +-
+ fs/gfs2/ops_fstype.c             |  2 +-
+ fs/jfs/jfs_logmgr.c              |  4 ++--
+ fs/zonefs/super.c                |  2 +-
+ include/linux/bio.h              |  2 +-
+ mm/page_io.c                     |  8 ++++----
+ 19 files changed, 52 insertions(+), 43 deletions(-)
 
 
-vim +/const +15 block/partitions/core.c
-
-    14	
-  > 15	static const int (*check_part[])(struct parsed_partitions *) = {
-    16		/*
-    17		 * Probe partition formats with tables at disk address 0
-    18		 * that also have an ADFS boot block at 0xdc0.
-    19		 */
-    20	#ifdef CONFIG_ACORN_PARTITION_ICS
-    21		adfspart_check_ICS,
-    22	#endif
-    23	#ifdef CONFIG_ACORN_PARTITION_POWERTEC
-    24		adfspart_check_POWERTEC,
-    25	#endif
-    26	#ifdef CONFIG_ACORN_PARTITION_EESOX
-    27		adfspart_check_EESOX,
-    28	#endif
-    29	
-    30		/*
-    31		 * Now move on to formats that only have partition info at
-    32		 * disk address 0xdc0.  Since these may also have stale
-    33		 * PC/BIOS partition tables, they need to come before
-    34		 * the msdos entry.
-    35		 */
-    36	#ifdef CONFIG_ACORN_PARTITION_CUMANA
-    37		adfspart_check_CUMANA,
-    38	#endif
-    39	#ifdef CONFIG_ACORN_PARTITION_ADFS
-    40		adfspart_check_ADFS,
-    41	#endif
-    42	
-
+base-commit: af67688dca57999fd848f051eeea1d375ba546b2
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.39.2
+
