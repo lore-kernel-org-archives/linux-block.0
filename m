@@ -2,83 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5FAC77B72
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 09:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D85C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 09:13:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234255AbjDTJBM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 05:01:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52460 "EHLO
+        id S233754AbjDTJNV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 05:13:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234063AbjDTJA2 (ORCPT
+        with ESMTP id S234261AbjDTJNN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 05:00:28 -0400
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B708A59;
-        Thu, 20 Apr 2023 01:56:40 -0700 (PDT)
-Received: by mail-wm1-f46.google.com with SMTP id bi21-20020a05600c3d9500b003f17a8eaedbso2706701wmb.1;
-        Thu, 20 Apr 2023 01:56:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681980932; x=1684572932;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z3oaCtnRgdVnX+/49rnLNjwqRbR+N3XhGwT33lpTGps=;
-        b=bDzgPWwdKH1qMEnqSFq1A4LRveY5MJ2A7oTRSAj79iqYOFoSo1UgWtBIFW/ZB8K9e7
-         JlIX1JYieMobKCujWzsrrrD38UP2oT4qFE6i25X2dd5qprIevNVD6uFCbqxKIPjpNvQK
-         eKT2EGKN57YDOI5XNH4nzBaJHI+tBJMDStelAU3FY4ULn86HX5X25Z4mICFaFqgXefo9
-         WTSUtInHUCZj+Fh05bdO4dq1fTX0G/fW/aVg+Q1SpToCWqUMCbPCpDKVWdCfMApJkiAE
-         N819UxtdxAVq+LpkREHwxzjVw43/w3oeocx1CZL1LoAdYbZ/Yadhx5HbVzxq41UNcJtn
-         5BVQ==
-X-Gm-Message-State: AAQBX9fIjhWBtPnHPZU6SzPZzNWFUqBRi1FZC6ht3rIoor/UwTJ8fB+z
-        Z+/Y2re/P5lqE19non0D3vi2WhaNJn6qQNNc
-X-Google-Smtp-Source: AKy350bKYLeXMzDzDJ6Y6qo/aThxWX/i4drIepoJR2AxRlr5KQ8S+fMnYJCtI7ItM3tNru7pKV43XQ==
-X-Received: by 2002:a05:600c:acf:b0:3f1:72e6:2a69 with SMTP id c15-20020a05600c0acf00b003f172e62a69mr740456wmr.4.1681980932068;
-        Thu, 20 Apr 2023 01:55:32 -0700 (PDT)
-Received: from [192.168.32.129] (aftr-62-216-205-152.dynamic.mnet-online.de. [62.216.205.152])
-        by smtp.gmail.com with ESMTPSA id ip29-20020a05600ca69d00b003f1712b1402sm4669681wmb.30.2023.04.20.01.55.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Apr 2023 01:55:31 -0700 (PDT)
-Message-ID: <0028b1b9-980a-4b3b-b290-099368e44f9f@kernel.org>
-Date:   Thu, 20 Apr 2023 10:55:29 +0200
+        Thu, 20 Apr 2023 05:13:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 495FB5B8E
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 02:12:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1681981900;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=5Tse1OBd3u9F60hu0ga9PRSiCenr2h+REyL1RNAeH/E=;
+        b=RYIf+9qIn5o8RVwn43U05+4DIBYFZZ2OdzoAdM1M0GecxgbuHEjFt6YAJSNfbI1Py5r/dB
+        4o/iPyCQNuRA/yBBKPszqO7I0H0qoHbpGdaUcIP8e7AL2L5a9+Emif9AHgWxcv0Q7yC6zs
+        PsZTcauNaMmW2e+BfRnImPf6ORaVljs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-397-bXsJN0sTPrS1l5zfgOIgDQ-1; Thu, 20 Apr 2023 05:11:36 -0400
+X-MC-Unique: bXsJN0sTPrS1l5zfgOIgDQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5435629AA3B8;
+        Thu, 20 Apr 2023 09:11:36 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A1E1E1121315;
+        Thu, 20 Apr 2023 09:11:16 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] ublk: don't return 0 in case of any failure
+Date:   Thu, 20 Apr 2023 17:11:04 +0800
+Message-Id: <20230420091104.1092972-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v3 11/19] gfs: use __bio_add_page for adding single page
- to bio
-To:     Andreas Gruenbacher <agruenba@redhat.com>
-Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com,
-        cluster-devel@redhat.com, damien.lemoal@wdc.com,
-        dm-devel@redhat.com, dsterba@suse.com, hare@suse.de, hch@lst.de,
-        jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-raid@vger.kernel.org, ming.lei@redhat.com,
-        rpeterso@redhat.com, shaggy@kernel.org, snitzer@kernel.org,
-        song@kernel.org, willy@infradead.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20230419140929.5924-1-jth@kernel.org>
- <20230419140929.5924-12-jth@kernel.org>
- <CAHc6FU6U1yZguZGeCc7BUqd1Qm4+SSRK8xbNZWBUSXTk_jjvVQ@mail.gmail.com>
-Content-Language: en-US
-From:   Johannes Thumshirn <jth@kernel.org>
-In-Reply-To: <CAHc6FU6U1yZguZGeCc7BUqd1Qm4+SSRK8xbNZWBUSXTk_jjvVQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19/04/2023 17:19, Andreas Gruenbacher wrote:
-> On Wed, Apr 19, 2023 at 4:10 PM Johannes Thumshirn <jth@kernel.org> wrote:
->>
->> From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
->>
->> The GFS superblock reading code uses bio_add_page() to add a page to a
->> newly created bio. bio_add_page() can fail, but the return value is never
->> checked.
-> 
-> It's GFS2, not GFS, but otherwise this is obviously fine, thanks.
-> 
+Commit 2d786e66c966 ("block: ublk: switch to ioctl command encoding")
+starts to reset local variable of 'ret' as zero, then if any failure
+happens when handling the three IO commands, 0 can be returned to ublk
+server.
 
-Oops fixed in v4
+Fix it by returning -EINVAL in case of command handling failure.
+
+Cc: Christoph Hellwig <hch@lst.de>
+Fixes: 2d786e66c966 ("block: ublk: switch to ioctl command encoding")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 5a03b765a6c1..cddfb33a5c3b 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1315,6 +1315,7 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 	if (ret)
+ 		goto out;
+ 
++	ret = -EINVAL;
+ 	switch (_IOC_NR(cmd_op)) {
+ 	case UBLK_IO_FETCH_REQ:
+ 		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
+-- 
+2.38.1
 
