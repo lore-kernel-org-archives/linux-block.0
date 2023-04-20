@@ -2,89 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F9D1C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 15:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12267C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 16:21:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232397AbjDTPrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 11:47:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44650 "EHLO
+        id S232549AbjDTQVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 12:21:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232377AbjDTPrk (ORCPT
+        with ESMTP id S232332AbjDTQVP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 11:47:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 142DA1A7
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 08:46:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682005614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=F0qPfXIAn4cdGYAGROpk5ybZVXPszceXcUMH91E0FcY=;
-        b=d8gMgQd1A7JRb8UuEKiDc5OvNs62E5XAyTBAwENJD/qkkabCJQUYLHusbIUT0/9+rAvvKA
-        AiIRJ2JQOLn2JgZ8gDQdijVCsFitu9GxK2BtHkxWIauhB3l4kVom+iG6XxClmUuL0Fk+Hm
-        k12Ux6owucjptb+EInh7b62zZSX/am4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-4zC34LWSOnmTk65TNLMzMQ-1; Thu, 20 Apr 2023 11:46:50 -0400
-X-MC-Unique: 4zC34LWSOnmTk65TNLMzMQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 95200101A555;
-        Thu, 20 Apr 2023 15:46:50 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 11A4C492C3E;
-        Thu, 20 Apr 2023 15:46:47 +0000 (UTC)
-Date:   Thu, 20 Apr 2023 23:46:42 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: Re: [PATCH 0/7] ublk: cleanup and support user copy
-Message-ID: <ZEFeYsQ/ntUjUv2Y@ovpn-8-16.pek2.redhat.com>
-References: <20230420154032.1272836-1-ming.lei@redhat.com>
+        Thu, 20 Apr 2023 12:21:15 -0400
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D78B2139
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 09:20:30 -0700 (PDT)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-74e17099772so79894085a.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 09:20:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682007629; x=1684599629;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mi8BRALKHs7eage0Q9/aKDKQbgLFo1rksVSh6HXojUM=;
+        b=ZHoq0ot3luw63xh9WuyuFE9AeqB9fljjYPo4b6HBtrRw49w9AQoHNg62pvmjtzk+E4
+         hBSvvaMmpvYm4mFSBQ28QvLCj8suGRMJGw8lJD6XdoHz2qwAlRKibKKP9Fqw3OHf3UFM
+         3X+EAx/c0eEaSUgwzy3yk2tjVbVRc4j6dF08G7kD3p8NIBqubJsZDrbGJ4H+Nx5hi8TR
+         aU2wg9QbKCMHvgrl6mQuCaddODBfSxJWtZ9OZSuKYKaI2Lxb4j8OKoIkgV4RoPm+lE7c
+         lSIo8Kww7Fg9IvUMJU2d7zaudtpWttMMpi7IYxky//Z8yhIrtykrRjD3IshIuntJQNpy
+         Rnyw==
+X-Gm-Message-State: AAQBX9esjtwAPZjuIGvOpyk86ogADzOb9LwyvzEOS/8e9rX7cR4Y0dSc
+        Ch67YQT1l8XE9fnHTKLxlzMD
+X-Google-Smtp-Source: AKy350ZdxFbx3P6KW7oGgzZkOdBts5SMHV3jmQ7iV4w8PdU+G+NU8GyRCb0ZtSnye0JdmMgLiXUHqw==
+X-Received: by 2002:a05:6214:1c4e:b0:5f0:23be:a301 with SMTP id if14-20020a0562141c4e00b005f023bea301mr2999579qvb.5.1682007629560;
+        Thu, 20 Apr 2023 09:20:29 -0700 (PDT)
+Received: from localhost ([37.19.196.135])
+        by smtp.gmail.com with ESMTPSA id b17-20020a05620a271100b0074e034915d4sm539562qkp.73.2023.04.20.09.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Apr 2023 09:20:28 -0700 (PDT)
+Date:   Thu, 20 Apr 2023 12:20:27 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Daniil Lunev <dlunev@google.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Brian Foster <bfoster@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v5-fix 1/5] block: Don't invalidate pagecache for invalid
+ falloc modes
+Message-ID: <ZEFmS9h81Wwlv9+/@redhat.com>
+References: <20230420004850.297045-2-sarthakkukreti@chromium.org>
+ <20230420014734.302304-1-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230420154032.1272836-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+In-Reply-To: <20230420014734.302304-1-sarthakkukreti@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 20, 2023 at 11:40:25PM +0800, Ming Lei wrote:
-> Hello,
-> 
-> The 1st 3 patch are cleanup.
-> 
-> The other patches supports to move data copy between io request pages and
-> userspace buffer into ublk server(userspace). This way avoids one round trip
-> of uring command(UBLK_F_NEED_GET_DATA), and solve buffer release issue for
-> READ. Meantime both sides becomes cleaner. Also it can be thought as
-> prep patch for supporting zero copy.
-> 
-> 
-> Ming Lei (7):
->   ublk: kill queuing request by task_work_add
->   ublk: cleanup io cmd code path by adding ublk_fill_io()
->   ublk: cleanup ublk_copy_user_pages
->   ublk: grab request reference when the request is handled by userspace
->   ublk: support to copy any part of request pages
->   ublk: add read()/write() support for ublk char device
->   ublk: support user copy
-> 
->  drivers/block/ublk_drv.c      | 457 +++++++++++++++++++++++++---------
->  include/uapi/linux/ublk_cmd.h |  25 +-
->  2 files changed, 361 insertions(+), 121 deletions(-)
+On Wed, Apr 19 2023 at  9:47P -0400,
+Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
 
-ublksrv code for supporting user copy(only loop implements it, and
-easy for others to support it):
+> Only call truncate_bdev_range() if the fallocate mode is
+> supported. This fixes a bug where data in the pagecache
+> could be invalidated if the fallocate() was called on the
+> block device with an invalid mode.
+> 
+> Fixes: 25f4c41415e5 ("block: implement (some of) fallocate for block devices")
 
-https://github.com/ming1/ubdsrv/commits/usercopy
+You should add:
+
+Cc: stable@vger.kernel.org
+Reported-by: Darrick J. Wong <djwong@kernel.org>
+
+> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> ---
+>  block/fops.c | 37 ++++++++++++++++++++++++-------------
+>  1 file changed, 24 insertions(+), 13 deletions(-)
+> 
+> diff --git a/block/fops.c b/block/fops.c
+> index d2e6be4e3d1c..d359254c645d 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -648,26 +648,37 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  
+>  	filemap_invalidate_lock(inode->i_mapping);
+>  
+> -	/* Invalidate the page cache, including dirty pages. */
+> -	error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> -	if (error)
+> -		goto fail;
+> -
+
+You remove the only user of the 'fail' label.  But I think it'd be
+cleaner to keep using it below (reduces indentation churn too).
+
+> +	/*
+> +	 * Invalidate the page cache, including dirty pages, for valid
+> +	 * de-allocate mode calls to fallocate().
+> +	 */
+>  	switch (mode) {
+>  	case FALLOC_FL_ZERO_RANGE:
+>  	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
+> -		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
+> -					     len >> SECTOR_SHIFT, GFP_KERNEL,
+> -					     BLKDEV_ZERO_NOUNMAP);
+> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> +		if (!error)
+> +			error = blkdev_issue_zeroout(bdev,
+> +						     start >> SECTOR_SHIFT,
+> +						     len >> SECTOR_SHIFT,
+> +						     GFP_KERNEL,
+> +						     BLKDEV_ZERO_NOUNMAP);
+>  		break;
 
 
-Thanks,
-Ming
+So:
 
+		error = truncate_bdev_range(bdev, file->f_mode, start, end);
+		if (error)
+		        goto fail;
+		...
+
+
+>  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
+> -		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
+> -					     len >> SECTOR_SHIFT, GFP_KERNEL,
+> -					     BLKDEV_ZERO_NOFALLBACK);
+> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> +		if (!error)
+> +			error = blkdev_issue_zeroout(bdev,
+> +						     start >> SECTOR_SHIFT,
+> +						     len >> SECTOR_SHIFT,
+> +						     GFP_KERNEL,
+> +						     BLKDEV_ZERO_NOFALLBACK);
+>  		break;
+
+Same.
+
+>  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
+> -		error = blkdev_issue_discard(bdev, start >> SECTOR_SHIFT,
+> -					     len >> SECTOR_SHIFT, GFP_KERNEL);
+> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
+> +		if (!error)
+> +			error = blkdev_issue_discard(bdev,
+> +						     start >> SECTOR_SHIFT,
+> +						     len >> SECTOR_SHIFT,
+> +						     GFP_KERNEL);
+>  		break;
+
+Same.
