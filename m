@@ -2,104 +2,178 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5191AC6FD18
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 01:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA76C6FD18
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 01:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230059AbjDTBHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 21:07:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58628 "EHLO
+        id S230335AbjDTBV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 21:21:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjDTBHV (ORCPT
+        with ESMTP id S229998AbjDTBV1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 21:07:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805583C32
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 18:07:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 11BEF64437
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 01:07:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75461C433EF;
-        Thu, 20 Apr 2023 01:07:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681952838;
-        bh=AVq7iju1XpZLO1Or9OwQ+14Td19UKDRs7H2YK73ePSg=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=MdCWF99Rgxtmt4srnuVEcFP2Tqyw2ckeQJzZ9RmG0d5plB1grpiYyJzQu7dWbVJIg
-         OGkLSXiBxLCebF4BV8j/kCpvxXfqpVvKd5j2VYXFzAUVBLKggJ0QMmminm/6Mm24E+
-         Z8SuDPDx6D8Fq7UYZwNN1tNY1oMPgW79sqbWk3jX5D/N666ElR5xqHyBdI6UKoeU7J
-         UYjsv19I5lEW+U1pUaGl4RSPru1rtUoVIj+PaqD9s8bNQvHLTMDdDeAyWLkGB+cDWL
-         0QHVV+wVIWaYBgx1NTSKeowCpeCTAlBrNP9ZyMq4hPYddqb/chJb3yJMhFhhUWojHd
-         VVV/tPi6xwdpw==
-Message-ID: <95b697c5-fb54-96d3-43a8-ee81c3c76607@kernel.org>
-Date:   Thu, 20 Apr 2023 10:07:16 +0900
+        Wed, 19 Apr 2023 21:21:27 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB5049DB;
+        Wed, 19 Apr 2023 18:21:25 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3f176a16c03so1773715e9.2;
+        Wed, 19 Apr 2023 18:21:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681953684; x=1684545684;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WUN6XokhMco8R1MkndUTrZgbr76wv2mMBzKNedq/oUA=;
+        b=gRLI9Edae0hVH3FpMfbxKcw+TOYp71C846wntDG1BR89i2+nJXifud8U29umJp0wAo
+         ynWMnNNEN8VBn5goPhEDls/iVZZQ/LLmZP3CIRbOlzplfeRLADLmUfK9QWE72mRhmUwA
+         yCj5WSLneUv3HsJgjRaNnqCBOVWQM6Se1UGNEx3FEMqsf6X0iigpe1r7RCnkG3HYi/eP
+         V6WUKRWy+vQw8/scEqIFDo02NsrbAcMa3EWsYT46ycRMosKWiUu1M/u4xx22VX7Gb37T
+         9N4jaEQKKprECsLcY46Qb43Z4TgTP6eNQaXDTZdVtCrxgXqkaZ/93uuoMq+TzOCFJGu8
+         +wyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681953684; x=1684545684;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WUN6XokhMco8R1MkndUTrZgbr76wv2mMBzKNedq/oUA=;
+        b=iVJ9uQbt37DUdrwQ8NvKUpyalGE+l8r3avtUj7IdBJVE+PygVzpguh+nqZhV5VG5hT
+         Yy8bKqb0HsxUWAVazzM1Q3t59Jc/FlUJ1dk4Qh2bn3Hpy/ZLOCc+wpQ7afpGzXvSRZQG
+         SF8vHfON+MuSPJOou7SgS2Q8h9b9wFFdIvgLQE1/W7/hTwHqfYGps4I9bOAE+1K6a8rn
+         hLWWCGJw1SNiP2JtCYha4dK1lB7/RqOfO1CT80LcBopC/fWRzTioIoBm90zbS6dI9sDy
+         89azi/YWABmX3X3TRBWaJ1DL1gi5umG39N5DH3OpXwuQS20BV6lQVMBB06V47wL37ova
+         rAoQ==
+X-Gm-Message-State: AAQBX9eHaB+hcUS60NloRKAFpl/qdoZJKwtgKcEuY3cm4xHDWnGJkPDT
+        O9xhM6H9OUq/nYpP6eLvvLbsjCH3zYs=
+X-Google-Smtp-Source: AKy350bH2QS1qbMRigFZRbJL3t5b1IVOINWl+BtnAr5FPwGsK2XEB2lll0gSzTZWcxIS4aIdOEV8zA==
+X-Received: by 2002:a5d:6a11:0:b0:2cb:2775:6e6 with SMTP id m17-20020a5d6a11000000b002cb277506e6mr6064123wru.45.1681953683700;
+        Wed, 19 Apr 2023 18:21:23 -0700 (PDT)
+Received: from [192.168.8.100] (188.28.97.56.threembb.co.uk. [188.28.97.56])
+        by smtp.gmail.com with ESMTPSA id l7-20020a5d4bc7000000b002fefe2edb72sm532772wrt.17.2023.04.19.18.21.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Apr 2023 18:21:23 -0700 (PDT)
+Message-ID: <91a8f4d6-3518-c0e0-a2c5-f9886d675249@gmail.com>
+Date:   Thu, 20 Apr 2023 02:18:25 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v2 09/11] block: mq-deadline: Handle requeued requests
- correctly
+ Thunderbird/102.10.0
+Subject: Re: [PATCH V6 00/17] io_uring/ublk: add generic IORING_OP_FUSED_CMD
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230418224002.1195163-1-bvanassche@acm.org>
- <20230418224002.1195163-10-bvanassche@acm.org>
- <20230419050758.GD25898@lst.de>
- <64b56eb3-bcf5-c48a-df96-bf1956f6992e@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <64b56eb3-bcf5-c48a-df96-bf1956f6992e@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Bernd Schubert <bschubert@ddn.com>, Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Amir Goldstein <amir73il@gmail.com>
+References: <20230330113630.1388860-1-ming.lei@redhat.com>
+ <78fe6617-2f5e-3e8e-d853-6dc8ffb5f82c@ddn.com>
+ <ZD9JI/JlwrzXQPZ7@ovpn-8-18.pek2.redhat.com>
+ <b6188050-1b12-703c-57e8-67fd27adb85c@ddn.com>
+ <ZD/ONON4AzwvtlLB@ovpn-8-18.pek2.redhat.com>
+ <6ed5c6f4-6abe-3eff-5a36-b1478a830c49@ddn.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <6ed5c6f4-6abe-3eff-5a36-b1478a830c49@ddn.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/20/23 08:01, Bart Van Assche wrote:
-> On 4/18/23 22:07, Christoph Hellwig wrote:
->>>   deadline_add_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
->>>   {
->>>   	struct rb_root *root = deadline_rb_root(per_prio, rq);
->>> +	struct request **next_rq __maybe_unused;
->>>   
->>>   	elv_rb_add(root, rq);
->>> +#ifdef CONFIG_BLK_DEV_ZONED
->>> +	next_rq = &per_prio->next_rq[rq_data_dir(rq)];
->>> +	if (*next_rq == NULL || !blk_queue_is_zoned(rq->q))
->>> +		return;
->>> +	/*
->>> +	 * If a request got requeued or requests have been submitted out of
->>> +	 * order, make sure that per zone the request with the lowest LBA is
->>> +	 * submitted first.
->>> +	 */
->>> +	if (blk_rq_pos(rq) < blk_rq_pos(*next_rq) &&
->>> +	    blk_rq_zone_no(rq) == blk_rq_zone_no(*next_rq))
->>> +		*next_rq = rq;
->>> +#endif
+On 4/19/23 16:42, Bernd Schubert wrote:
+> On 4/19/23 13:19, Ming Lei wrote:
+>> On Wed, Apr 19, 2023 at 09:56:43AM +0000, Bernd Schubert wrote:
+>>> On 4/19/23 03:51, Ming Lei wrote:
+>>>> On Tue, Apr 18, 2023 at 07:38:03PM +0000, Bernd Schubert wrote:
+>>>>> On 3/30/23 13:36, Ming Lei wrote:
+>>>>> [...]
+>>>>>> V6:
+>>>>>> 	- re-design fused command, and make it more generic, moving sharing buffer
+>>>>>> 	as one plugin of fused command, so in future we can implement more plugins
+>>>>>> 	- document potential other use cases of fused command
+>>>>>> 	- drop support for builtin secondary sqe in SQE128, so all secondary
+>>>>>> 	  requests has standalone SQE
+>>>>>> 	- make fused command as one feature
+>>>>>> 	- cleanup & improve naming
+>>>>>
+>>>>> Hi Ming, et al.,
+>>>>>
+>>>>> I started to wonder if fused SQE could be extended to combine multiple
+>>>>> syscalls, for example open/read/close.  Which would be another solution
+>>>>> for the readfile syscall Miklos had proposed some time ago.
+>>>>>
+>>>>> https://lore.kernel.org/lkml/CAJfpegusi8BjWFzEi05926d4RsEQvPnRW-w7My=ibBHQ8NgCuw@mail.gmail.com/
+>>>>>
+>>>>> If fused SQEs could be extended, I think it would be quite helpful for
+>>>>> many other patterns. Another similar examples would open/write/close,
+>>>>> but ideal would be also to allow to have it more complex like
+>>>>> "open/write/sync_file_range/close" - open/write/close might be the
+>>>>> fastest and could possibly return before sync_file_range. Use case for
+>>>>> the latter would be a file server that wants to give notifications to
+>>>>> client when pages have been written out.
+>>>>
+>>>> The above pattern needn't fused command, and it can be done by plain
+>>>> SQEs chain, follows the usage:
+>>>>
+>>>> 1) suppose you get one command from /dev/fuse, then FUSE daemon
+>>>> needs to handle the command as open/write/sync/close
+>>>> 2) get sqe1, prepare it for open syscall, mark it as IOSQE_IO_LINK;
+>>>> 3) get sqe2, prepare it for write syscall, mark it as IOSQE_IO_LINK;
+>>>> 4) get sqe3, prepare it for sync file range syscall, mark it as IOSQE_IO_LINK;
+>>>> 5) get sqe4, prepare it for close syscall
+>>>> 6) io_uring_enter();	//for submit and get events
+>>>
+>>> Oh, I was not aware that IOSQE_IO_LINK could pass the result of open
+>>> down to the others. Hmm, the example I find for open is
+>>> io_uring_prep_openat_direct in test_open_fixed(). It probably gets off
+>>> topic here, but one needs to have ring prepared with
+>>> io_uring_register_files_sparse, then manually manages available indexes
+>>> and can then link commands? Interesting!
 >>
->> Please key move this into a helper only called when blk_queue_is_zoned
->> is true.
-> Hi Christoph,
+>> Yeah,  see test/fixed-reuse.c of liburing
+>>
+>>>
+>>>>
+>>>> Then all the four OPs are done one by one by io_uring internal
+>>>> machinery, and you can choose to get successful CQE for each OP.
+>>>>
+>>>> Is the above what you want to do?
+>>>>
+>>>> The fused command proposal is actually for zero copy(but not limited to zc).
+>>>
+>>> Yeah, I had just thought that IORING_OP_FUSED_CMD could be modified to
+>>> support generic passing, as it kind of hands data (buffers) from one sqe
+>>> to the other. I.e. instead of buffers it would have passed the fd, but
+>>> if this is already possible - no need to make IORING_OP_FUSED_CMD more
+>>> complex.man
+>>
+>> The way of passing FD introduces other cost, read op running into async,
+>> and adding it into global table, which introduces runtime cost.
 > 
-> I'm looking into an alternative, namely to remove the next_rq member 
-> from struct dd_per_prio and instead to do the following:
-> * Track the offset (blk_rq_pos()) of the most recently dispatched 
-> request ("latest_pos").
-> * Where the next_rq member is read, look up the request that comes after 
-> latest_pos in the RB-tree. This should require an effort that is similar 
-> to updating next_rq after having dispatched a request.
-> 
-> With this approach the code quoted above and that is surrounded with 
-> #ifdef/#endif will disappear.
+> Hmm, question from my side is why it needs to be in the global table,
+> when it could be just passed to the linked or fused sqe?
 
-This sounds much better, given that there are in practice lots of cases where
-next_rq is set null and we endup getting the next req from the fifo list head.
-At least last time I looked at this is what I saw (it was when I patched for the
-skip seq writes over 2 zones).
+Because for every such type of state you need to write custom code,
+it's not scalable, not to say that it usually can't be kept to a
+specific operation and leaks into generic paths / other requests.
 
-> 
-> Bart.
+Some may want to pass a file or a buffer, there might be a need
+to pass a result in some specific way (e.g. nr = recv(); send(nr)),
+and the list continues...
 
+I tried adding BPF in the middle ~2y ago, but it was no
+different in perf than returning to the userspace, and gets
+worse with higher submission batching. Maybe I need to test
+it again.
+
+>> That is the reason why fused command is designed in the following way:
+>>
+>> - link can be avoided, so OPs needn't to be run in async
+>> - no need to add buffer into global table
+>>
+>> Cause it is really in fast io path.
+>>
+-- 
+Pavel Begunkov
