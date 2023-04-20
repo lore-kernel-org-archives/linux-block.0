@@ -2,161 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12267C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 16:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA9FC77B7C
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 17:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232549AbjDTQVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 12:21:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41020 "EHLO
+        id S230346AbjDTRAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 13:00:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232332AbjDTQVP (ORCPT
+        with ESMTP id S230333AbjDTRAd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 12:21:15 -0400
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D78B2139
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 09:20:30 -0700 (PDT)
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-74e17099772so79894085a.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 09:20:30 -0700 (PDT)
+        Thu, 20 Apr 2023 13:00:33 -0400
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605A52D78
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 10:00:11 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-63b8b19901fso1609385b3a.3
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 10:00:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682007629; x=1684599629;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mi8BRALKHs7eage0Q9/aKDKQbgLFo1rksVSh6HXojUM=;
-        b=ZHoq0ot3luw63xh9WuyuFE9AeqB9fljjYPo4b6HBtrRw49w9AQoHNg62pvmjtzk+E4
-         hBSvvaMmpvYm4mFSBQ28QvLCj8suGRMJGw8lJD6XdoHz2qwAlRKibKKP9Fqw3OHf3UFM
-         3X+EAx/c0eEaSUgwzy3yk2tjVbVRc4j6dF08G7kD3p8NIBqubJsZDrbGJ4H+Nx5hi8TR
-         aU2wg9QbKCMHvgrl6mQuCaddODBfSxJWtZ9OZSuKYKaI2Lxb4j8OKoIkgV4RoPm+lE7c
-         lSIo8Kww7Fg9IvUMJU2d7zaudtpWttMMpi7IYxky//Z8yhIrtykrRjD3IshIuntJQNpy
-         Rnyw==
-X-Gm-Message-State: AAQBX9esjtwAPZjuIGvOpyk86ogADzOb9LwyvzEOS/8e9rX7cR4Y0dSc
-        Ch67YQT1l8XE9fnHTKLxlzMD
-X-Google-Smtp-Source: AKy350ZdxFbx3P6KW7oGgzZkOdBts5SMHV3jmQ7iV4w8PdU+G+NU8GyRCb0ZtSnye0JdmMgLiXUHqw==
-X-Received: by 2002:a05:6214:1c4e:b0:5f0:23be:a301 with SMTP id if14-20020a0562141c4e00b005f023bea301mr2999579qvb.5.1682007629560;
-        Thu, 20 Apr 2023 09:20:29 -0700 (PDT)
-Received: from localhost ([37.19.196.135])
-        by smtp.gmail.com with ESMTPSA id b17-20020a05620a271100b0074e034915d4sm539562qkp.73.2023.04.20.09.20.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 09:20:28 -0700 (PDT)
-Date:   Thu, 20 Apr 2023 12:20:27 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Daniil Lunev <dlunev@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Brian Foster <bfoster@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v5-fix 1/5] block: Don't invalidate pagecache for invalid
- falloc modes
-Message-ID: <ZEFmS9h81Wwlv9+/@redhat.com>
-References: <20230420004850.297045-2-sarthakkukreti@chromium.org>
- <20230420014734.302304-1-sarthakkukreti@chromium.org>
+        d=1e100.net; s=20221208; t=1682010011; x=1684602011;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nk/aXnAftkLsiVI0cOrdaWp9cVF6Sn9pwMOIZ62LuGA=;
+        b=HZa2y2VB60zbpNexgxZSY2npuiLAvnUTFHnuYMzHnKTq/RRG6MjZ9PKL5GZ26Xa4MW
+         yOs4FZKKB1q0as1PObMQx+hpdRpNQq9MC4ecPkpFzz/VgMCN+rHm9vEMHRg8Cdnc+s+p
+         xIi8jQo0KeOlNbNR73AiGLd2u7Fv1SnzHLu6y+QVt2NGq5CA8VB6erGpYvXWV1c7h2VT
+         woQoW1pbC0RlZtmy8enLZpMUITVF3oyn+FxxrP/4y8EQpuqEB1d+0jTvq2yWNTaRkgFX
+         jUmMblNwFQoEik6XjRJZSANn+UuVB9YHVDxM2jEr6y1LQlku1WPS/NNwyThjJ+mwzCR0
+         y8dw==
+X-Gm-Message-State: AAQBX9eiChNUvizGv81tt70gdBVaP66NMBxLLEWiRuyLCftnfkne0Rue
+        Wi79z45OydOlvEiZr9izZhQ=
+X-Google-Smtp-Source: AKy350bQIWQckimXF8G5x0zBjONUWOv5LnnvU0bCcdayqM4GSpbSKyrdg3tO3BYQGiAu3Lgv6heMwA==
+X-Received: by 2002:a05:6a20:e186:b0:f0:ab4c:c04d with SMTP id ks6-20020a056a20e18600b000f0ab4cc04dmr2574745pzb.40.1682010010611;
+        Thu, 20 Apr 2023 10:00:10 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:216b:53b9:f55c:cf92? ([2620:15c:211:201:216b:53b9:f55c:cf92])
+        by smtp.gmail.com with ESMTPSA id k17-20020a63f011000000b0051ba16c35cfsm1350895pgh.29.2023.04.20.10.00.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Apr 2023 10:00:10 -0700 (PDT)
+Message-ID: <05e3962f-73c8-a721-a457-605243b64e66@acm.org>
+Date:   Thu, 20 Apr 2023 10:00:07 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230420014734.302304-1-sarthakkukreti@chromium.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v2 06/11] block: mq-deadline: Disable head insertion for
+ zoned writes
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20230418224002.1195163-1-bvanassche@acm.org>
+ <20230418224002.1195163-7-bvanassche@acm.org> <20230419043044.GC25329@lst.de>
+ <e6adbe81-c45f-9801-bee6-a5a7ccad8945@acm.org> <20230420050619.GC4371@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230420050619.GC4371@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 19 2023 at  9:47P -0400,
-Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
-
-> Only call truncate_bdev_range() if the fallocate mode is
-> supported. This fixes a bug where data in the pagecache
-> could be invalidated if the fallocate() was called on the
-> block device with an invalid mode.
+On 4/19/23 22:06, Christoph Hellwig wrote:
+> The problem is that we now run into different handling depending
+> on which kind of write is coming in.  So we need to find a policy
+> that works for everyone.  Remember that as of the current for-6.4/block
+> branch the only at_head inservations remaining are:
 > 
-> Fixes: 25f4c41415e5 ("block: implement (some of) fallocate for block devices")
-
-You should add:
-
-Cc: stable@vger.kernel.org
-Reported-by: Darrick J. Wong <djwong@kernel.org>
-
-> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> ---
->  block/fops.c | 37 ++++++++++++++++++++++++-------------
->  1 file changed, 24 insertions(+), 13 deletions(-)
+>   - blk_execute* for passthrough requests that never enter the I/O
+>     scheduler
+>   - REQ_OP_FLUSH that never enter the I/O scheduler
+>   - requeues using blk_mq_requeue_request
+>   - processing of the actual writes in the flush state machine
 > 
-> diff --git a/block/fops.c b/block/fops.c
-> index d2e6be4e3d1c..d359254c645d 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -648,26 +648,37 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
->  
->  	filemap_invalidate_lock(inode->i_mapping);
->  
-> -	/* Invalidate the page cache, including dirty pages. */
-> -	error = truncate_bdev_range(bdev, file->f_mode, start, end);
-> -	if (error)
-> -		goto fail;
-> -
+> with the last one going away in my RFC series.
+> 
+> So if we come to the conclusion that requeues from the driver do not
+> actually need at_head insertations to avoid starvation or similar
+> we should just remove at_head insertations from the I/O scheduler.
+> If we can't do that, we need to handle them for zoned writes as well.
 
-You remove the only user of the 'fail' label.  But I think it'd be
-cleaner to keep using it below (reduces indentation churn too).
+Hi Christoph,
 
-> +	/*
-> +	 * Invalidate the page cache, including dirty pages, for valid
-> +	 * de-allocate mode calls to fallocate().
-> +	 */
->  	switch (mode) {
->  	case FALLOC_FL_ZERO_RANGE:
->  	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
-> -		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
-> -					     len >> SECTOR_SHIFT, GFP_KERNEL,
-> -					     BLKDEV_ZERO_NOUNMAP);
-> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
-> +		if (!error)
-> +			error = blkdev_issue_zeroout(bdev,
-> +						     start >> SECTOR_SHIFT,
-> +						     len >> SECTOR_SHIFT,
-> +						     GFP_KERNEL,
-> +						     BLKDEV_ZERO_NOUNMAP);
->  		break;
+I'm fine with not inserting requeued requests at the head of the queue. 
+Inserting requeued requests at the head of the queue only preserves the 
+original submission order if a single request is requeued. If multiple 
+requests are requeued inserting at the head of the queue will cause 
+inversion of the order of the requeued requests.
 
+This implies that the I/O scheduler or disk controller (if no I/O 
+scheduler is configured) will become responsible for optimizing the 
+request order if requeuing happens.
 
-So:
-
-		error = truncate_bdev_range(bdev, file->f_mode, start, end);
-		if (error)
-		        goto fail;
-		...
-
-
->  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
-> -		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
-> -					     len >> SECTOR_SHIFT, GFP_KERNEL,
-> -					     BLKDEV_ZERO_NOFALLBACK);
-> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
-> +		if (!error)
-> +			error = blkdev_issue_zeroout(bdev,
-> +						     start >> SECTOR_SHIFT,
-> +						     len >> SECTOR_SHIFT,
-> +						     GFP_KERNEL,
-> +						     BLKDEV_ZERO_NOFALLBACK);
->  		break;
-
-Same.
-
->  	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
-> -		error = blkdev_issue_discard(bdev, start >> SECTOR_SHIFT,
-> -					     len >> SECTOR_SHIFT, GFP_KERNEL);
-> +		error = truncate_bdev_range(bdev, file->f_mode, start, end);
-> +		if (!error)
-> +			error = blkdev_issue_discard(bdev,
-> +						     start >> SECTOR_SHIFT,
-> +						     len >> SECTOR_SHIFT,
-> +						     GFP_KERNEL);
->  		break;
-
-Same.
+Bart.
