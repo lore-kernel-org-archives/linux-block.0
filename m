@@ -2,138 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E053C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 00:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF1DC6FD18
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 01:00:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231658AbjDTAyN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 20:54:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52984 "EHLO
+        id S232577AbjDTBAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 21:00:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbjDTAyM (ORCPT
+        with ESMTP id S230024AbjDTBAN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 20:54:12 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7DD2D42
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 17:54:11 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-50674656309so401194a12.0
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 17:54:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1681952049; x=1684544049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CEZZksfYsGWpaWEP90hGUd/QDkimEQeeLBa7ojWXyLA=;
-        b=mHIqqwSc25lfW3PRtDHaxw4X6N2TnD+fDXQQXVKqR+Y4Ni7XFmZuF2Anv4LTKQqX8D
-         +UVwoeT1jGo7BVoinlsnl4aqpck+17bBw8kNVcn9qz+AZJbYuvkShd+gKGb13fm9VE2o
-         MxLZ0mnclVkF8kl6G805ooDsknwHf00fYwQFc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681952049; x=1684544049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CEZZksfYsGWpaWEP90hGUd/QDkimEQeeLBa7ojWXyLA=;
-        b=FAo0sJpmTb7vsE3LrZTr/iAj9/zOgidMS2NEuFwWcE5iyljbQGpHj2cgb9Tia+C0K2
-         ddpobErR0zcKYYuPUoNutt9I5V4rOtd3ziptoqal+JexkjFJ19iB+QFWAB2gHYI/sVGu
-         QPli0PuALs5+R3YrP3MqeE/jduhfvFiiRkOFBdFcug2/pokS22fftlXlPBDf3KS/3CL4
-         C4xNLmhO8Z3JMtlqR1snGw/iKNh6HloWsjsPI8StPaaOdqbH1t4GomQpPmA8gbv/IEiw
-         XcSfd2Jrs9wG4Crrn4TU7+3S0vlZWijQIDzX4At4N72AsRM1/x8LNp5J8keXfqQvfVI4
-         QLBg==
-X-Gm-Message-State: AAQBX9ell/k2uKnFE8PMtSjhC0kSBxZnLMTXeclVQWsgwHk41OWX5e28
-        mz3sG6yxXT9uBir4wpzgMYptsHGh7WmqfivXveGG6g==
-X-Google-Smtp-Source: AKy350YAC+sf3TWZtlZrZvPaKG0+dzlZ7DQ7BVfpG5/0uqvM2SXFWEF2eIB5c1sxQ1bKurWeSP65JttCPBnGIFCMuXg=
-X-Received: by 2002:a05:6402:406:b0:504:9ae7:f73b with SMTP id
- q6-20020a056402040600b005049ae7f73bmr7162959edv.2.1681952049439; Wed, 19 Apr
- 2023 17:54:09 -0700 (PDT)
+        Wed, 19 Apr 2023 21:00:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8297140DA
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 18:00:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1E34064426
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 01:00:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61184C433D2;
+        Thu, 20 Apr 2023 01:00:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681952411;
+        bh=F3mjbHMaxWU0QIu/h9Bcpba1Rql6qhBaqmx6dXQagVc=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=pIxpB+qaUZaO03mLcS1Vy+MuV2+1lHeoWW/oKMUfPPKligjR1Rg7JdP2qrdYlSbXX
+         5FD4Jvsqyc0TVwmIjnBnJtneISsKfj6OqXFuiMvBZBM3X8XGw5fc8jQClF9/YwFpPs
+         ++AzK6QdAFDbtcxTn1QnIxZjZ0egFKv6KKpeEUHyuvBLfayaYD2Wj1rVG48WYcnjeS
+         duOL76z7XdovgflKI1JRq+LQYhVjcPEdckloFRk3CkAFCBbAa8+FtodMQfevWQ2RjK
+         tnlKMfn79me8ddKAxL+qHeO8Cxu+bilh3Xgq9YwYROe7n2qmSM3U0JqOcE0U1uwyXE
+         xCX22Yg0upjng==
+Message-ID: <c7078aa8-76fb-6831-673e-5972208680d3@kernel.org>
+Date:   Thu, 20 Apr 2023 10:00:09 +0900
 MIME-Version: 1.0
-References: <20230414000219.92640-1-sarthakkukreti@chromium.org>
- <20230418221207.244685-1-sarthakkukreti@chromium.org> <20230418221207.244685-2-sarthakkukreti@chromium.org>
- <20230419153611.GE360885@frogsfrogsfrogs> <ZEAUHnWqt9cIiJRb@redhat.com>
- <20230419172602.GE360881@frogsfrogsfrogs> <20230419232118.GL447837@dread.disaster.area>
-In-Reply-To: <20230419232118.GL447837@dread.disaster.area>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Wed, 19 Apr 2023 17:53:58 -0700
-Message-ID: <CAG9=OMNYp+uY9VG5VVB=-cjFBJj5iXbsiNWN5KxMXtwnGDFfbw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] block: Introduce provisioning primitives
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, "Theodore Ts'o" <tytso@mit.edu>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Daniil Lunev <dlunev@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Brian Foster <bfoster@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v2 08/11] block: mq-deadline: Fix a race condition related
+ to zoned writes
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20230418224002.1195163-1-bvanassche@acm.org>
+ <20230418224002.1195163-9-bvanassche@acm.org> <20230419050706.GC25898@lst.de>
+ <efd020f5-9528-aa5e-ecd6-f0390c41fb02@acm.org>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <efd020f5-9528-aa5e-ecd6-f0390c41fb02@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 4:21=E2=80=AFPM Dave Chinner <david@fromorbit.com> =
-wrote:
->
-> On Wed, Apr 19, 2023 at 10:26:02AM -0700, Darrick J. Wong wrote:
-> > On Wed, Apr 19, 2023 at 12:17:34PM -0400, Mike Snitzer wrote:
-> > > (And obviously needs fixing independent of this patchset)
-> > >
-> > > Shouldn't mkfs first check that the underlying storage supports
-> > > REQ_OP_PROVISION by verifying
-> > > /sys/block/<dev>/queue/provision_max_bytes exists and is not 0?
-> > > (Just saying, we need to add new features more defensively.. you just
-> > > made the case based on this scenario's implications alone)
-> >
-> > Not for fallocate -- for regular files, there's no way to check if the
-> > filesystem actually supports the operation requested other than to try
-> > it and see if it succeeds.  We probably should've defined a DRY_RUN fla=
-g
-> > for that purpose back when it was introduced.
->
-> That ignores the fact that fallocate() was never intended to
-> guarantee it will work in all contexts - it's an advisory interface
-> at it's most basic level. If the call succeeds, then great, it does
-> what is says on the box, but if it fails then it should have no
-> visible effect on user data at all and the application still needs
-> to perform whatever modification it needed done in some other way.
->
-> IOWs, calling it one a block device without first checking if the
-> block device supports that fallocate operation is exactly how it is
-> supposed to be used. If the kernel can't handle this gracefully
-> without corrupting data, then that's a kernel bug and not an
-> application problem.
->
-> > For fallocate calls to block devices, yes, the program can check the
-> > queue limits in sysfs if fstat says the supplied path is a block device=
-,
-> > but I don't know that most programs are that thorough.  The fallocate(1=
-)
-> > CLI program does not check.
->
-> Right. fallocate() was intended to just do the right thing without
-> the application having to jump thrown an unknown number of hoops to
-> determine if fallocate() can be used or not in the context it is
-> executing in.  The kernel implementation is supposed to abstract all that
-> context-dependent behaviour away from the application; all the
-> application has to do is implement the fallocate() fast path and a
-> single generic "do the right thing the slow way" fallback when the
-> fallocate() method it called is not supported...
->
-I added a separate commit[1] to fix this so that we only
-truncate_bdev_range() iff we are in a supported de-allocate mode call.
-Subsequently, the REQ_OP_PROVISION patch is a bit simpler when rebased
-on top.
+On 4/20/23 03:46, Bart Van Assche wrote:
+> On 4/18/23 22:07, Christoph Hellwig wrote:
+>> On Tue, Apr 18, 2023 at 03:39:59PM -0700, Bart Van Assche wrote:
+>>> Let deadline_next_request() only consider the first zoned write per
+>>> zone. This patch fixes a race condition between deadline_next_request()
+>>> and completion of zoned writes.
+>>
+>> Can you explain the condition in a bit more detail?
+> 
+> Hi Christoph,
+> 
+> I'm concerned about the following scenario:
+> * deadline_next_request() starts iterating over the writes for a
+>    particular zone.
+> * blk_req_can_dispatch_to_zone() returns false for the first zoned write
+>    examined by deadline_next_request().
+> * A write for the same zone completes.
+> * deadline_next_request() continues examining zoned writes and
+>    blk_req_can_dispatch_to_zone() returns true for another write than the
+>    first write for a zone. This would result in an UNALIGNED WRITE
+>    COMMAND error for zoned SCSI devices.
 
-[1] https://www.spinics.net/lists/kernel/msg4765688.html
+Examining zoned writes has to be done with deadline zone lock held, exactly to
+avoid this issue.
 
-Best
-Sarthak
+> 
+> Bart.
+> 
 
-> -Dave.
-> --
-> Dave Chinner
-> david@fromorbit.com
