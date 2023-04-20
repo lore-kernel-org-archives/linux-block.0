@@ -2,84 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11588C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 04:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DB4C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 04:57:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233625AbjDTEkF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 00:40:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54198 "EHLO
+        id S233549AbjDTE5T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 00:57:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233502AbjDTEkC (ORCPT
+        with ESMTP id S230102AbjDTE5S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 00:40:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F1840D7;
-        Wed, 19 Apr 2023 21:39:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B23EE642A4;
-        Thu, 20 Apr 2023 04:39:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17FB0C433A8;
-        Thu, 20 Apr 2023 04:39:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681965598;
-        bh=e2kMjxLw00pT2+EDznrCtqL7waGns3hQPtXSEb5TvkE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=OZ9xegZ7ko8U1oo6qnsJk+3Pue6KDnodVJn0JAIQi6gTJIo4nyPvSZDS93d7D+vr6
-         HIgyAvgojEeu4pt/P44ll5AqnZwiJHnbs6iMDCEqQSt7HwVSMWRrf4HqNSdo0BrgOs
-         xe60XU9lC7sT4MIUWnPe+q4M56UlazdoGKbSZgDHhV2toutGfHKEiW2zHkBf82rtwg
-         jZ1Ep03Bk3ysAlufjJiB3rHHPBUJanT/0EGQIb6R1EQpNOJRGLVX8GXOxyThgYx9dE
-         LsZTtGjje+HVmrDl5lhNSNKWHgqslD5QxmtOpsTAaT5taPjWTrBab4k4khEjZkh+si
-         KFUa9x5OVGXTA==
-Received: by mail-lj1-f177.google.com with SMTP id x34so1433755ljq.1;
-        Wed, 19 Apr 2023 21:39:57 -0700 (PDT)
-X-Gm-Message-State: AAQBX9crgvlbT6zSJObHBAnv+dhQ+qzNfhVfg2PH3X7CcsnPVlDYcI+E
-        xyhSr0RY+G7SncMTMqAnVFSSjosM5loxwX7h/S4=
-X-Google-Smtp-Source: AKy350brjGRI86LwVWGkzPXSEalUdCI4Td6YNPTTcnNRSEuyUW/eSnxVnpWQ0bvhloD205Vvr5DEOhYwggyQMmUmPfI=
-X-Received: by 2002:a2e:a313:0:b0:2a8:928d:2e2e with SMTP id
- l19-20020a2ea313000000b002a8928d2e2emr2679277lje.5.1681965595968; Wed, 19 Apr
- 2023 21:39:55 -0700 (PDT)
+        Thu, 20 Apr 2023 00:57:18 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC9346AA;
+        Wed, 19 Apr 2023 21:57:17 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 85E8E68AFE; Thu, 20 Apr 2023 06:57:12 +0200 (CEST)
+Date:   Thu, 20 Apr 2023 06:57:12 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Breno Leitao <leitao@debian.org>
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        asml.silence@gmail.com, axboe@kernel.dk, leit@fb.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
+        ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] io_uring: Pass whole sqe to commands
+Message-ID: <20230420045712.GA4239@lst.de>
+References: <20230419102930.2979231-1-leitao@debian.org> <20230419102930.2979231-2-leitao@debian.org>
 MIME-Version: 1.0
-References: <20230419140929.5924-1-jth@kernel.org> <20230419140929.5924-18-jth@kernel.org>
-In-Reply-To: <20230419140929.5924-18-jth@kernel.org>
-From:   Song Liu <song@kernel.org>
-Date:   Wed, 19 Apr 2023 21:39:44 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW7n5Gb68+br0Cf47J5wu25FtTzfBs0cSihg49f2tSY8jA@mail.gmail.com>
-Message-ID: <CAPhsuW7n5Gb68+br0Cf47J5wu25FtTzfBs0cSihg49f2tSY8jA@mail.gmail.com>
-Subject: Re: [PATCH v3 17/19] md: raid1: check if adding pages to resync bio fails
-To:     Johannes Thumshirn <jth@kernel.org>
-Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com, agruenba@redhat.com,
-        cluster-devel@redhat.com, damien.lemoal@wdc.com,
-        dm-devel@redhat.com, dsterba@suse.com, hare@suse.de, hch@lst.de,
-        jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-raid@vger.kernel.org, ming.lei@redhat.com,
-        rpeterso@redhat.com, shaggy@kernel.org, snitzer@kernel.org,
-        willy@infradead.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230419102930.2979231-2-leitao@debian.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 19, 2023 at 7:11=E2=80=AFAM Johannes Thumshirn <jth@kernel.org>=
- wrote:
->
-> From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
->
-> Check if adding pages to resync bio fails and if bail out.
->
-> As the comment above suggests this cannot happen, WARN if it actually
-> happens.
->
-> This way we can mark bio_add_pages as __must_check.
->
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+On Wed, Apr 19, 2023 at 03:29:29AM -0700, Breno Leitao wrote:
+>  	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+> -	const struct nvme_uring_cmd *cmd = ioucmd->cmd;
+> +	const struct nvme_uring_cmd *cmd = (struct nvme_uring_cmd *)ioucmd->sqe->cmd;
 
-Acked-by: Song Liu <song@kernel.org>
+Please don't add the pointless cast.  And in general avoid the overly
+long lines.
 
-Thanks!
+I suspect most other users should just also defined their structures
+const instead of adding all theses casts thare are a sign of problems,
+but that's a pre-existing issue.
+>  	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+> -	size_t cmd_size;
+> +	size_t size = sizeof(struct io_uring_sqe);
+>  
+>  	BUILD_BUG_ON(uring_cmd_pdu_size(0) != 16);
+>  	BUILD_BUG_ON(uring_cmd_pdu_size(1) != 80);
+>  
+> -	cmd_size = uring_cmd_pdu_size(req->ctx->flags & IORING_SETUP_SQE128);
+> +	if (req->ctx->flags & IORING_SETUP_SQE128)
+> +		size <<= 1;
+
+
+Why does this stop using uring_cmd_pdu_size()?
