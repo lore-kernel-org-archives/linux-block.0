@@ -2,90 +2,123 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11370C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 12:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4740AC77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 12:57:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbjDTMyf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 08:54:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45782 "EHLO
+        id S229677AbjDTM5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 08:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbjDTMyd (ORCPT
+        with ESMTP id S229521AbjDTM5l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 08:54:33 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B2F2108
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 05:54:32 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1a66e6160easo1612225ad.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 05:54:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1681995272; x=1684587272;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gVzO15Juxs8nOOxJ1geYyFLICHAljZ7K0IVifP9hASU=;
-        b=MZrxYXq35oDsBPI0vKz0kL9+8URg5FjmRtTUuKQQlvPWCezaWL6BzUmJeHeLxO7l0R
-         Maw959cUkEwJShZkOVkPEDun8hgNilaDtiSA8dDVa9/punzIsWlW+Z3UEQiFUWVQP21c
-         hvwYnSY3yHNId+2DC+3AcxHAUEhGm++dC+5QjvoFvu2BkCGF+b0BGjisbfeXpjWGtWES
-         0Gi0ZLKOMWoyf8YFufrJ+BcpZ3EUKL0SXtdzzPmHtadkOdBI7qwJjP8Zg+vm1a1N524q
-         bO9xc2jh+apSoHI3ziWCEAIMTPWO1fLzVvKhbY2m4V4NbH3Y/QqKB3bysfOeTV6+JXVU
-         9cfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681995272; x=1684587272;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gVzO15Juxs8nOOxJ1geYyFLICHAljZ7K0IVifP9hASU=;
-        b=BHtf/Hnt7h/DZ2KDfUUR3v0P4hjnJef+BY+129WdaX9UCpxXcECP+FrbaRMQ43uh/o
-         b1qGR6FtL2TpEH61uvQ98AQf2iaJGhVLm7PknmMVI8CrmJwXukA3H14F4GvUI/LHI1lQ
-         lfXbezQI8EtJi0pUDKyPlfzDcAQeBV/n1iLG3skJqOjggfv6Ddh+j2xNzB5vrVck4Zu+
-         5BRrqpwPArAhr0HMov4jwbGTcy10fo/1fFpUud+xrPi+CN6MNAEldRPgiEMXfAtXguId
-         YoI5iMbgkBGqEPqn+ZR7y1UODV/stMw3Zrm60fScao9t+A7+vhngZ3ZtOmHYs6mf1KF+
-         KG9A==
-X-Gm-Message-State: AAQBX9fb2EdgH+KuyQpP4ALp9sB08j+dqNBlTM2ihUy9n5rSnOSliCMh
-        UT893p0LxZh/hEOlg/2t6QIyCb6acQIPs1aW2jE=
-X-Google-Smtp-Source: AKy350ZURFc1RYbCKW/5MwYAP+oCjydxAjpbHjuJEC2yk6M2f/fV2wNOd6Kh0ac0C0hfrNfUyHGlnw==
-X-Received: by 2002:a17:902:c94f:b0:19d:2a3:f019 with SMTP id i15-20020a170902c94f00b0019d02a3f019mr1755883pla.1.1681995272137;
-        Thu, 20 Apr 2023 05:54:32 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d1-20020a170902728100b001a6b02659c0sm1130771pll.159.2023.04.20.05.54.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 05:54:31 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Xiao Ni <xni@redhat.com>,
-        Yi Zhang <yi.zhang@redhat.com>
-In-Reply-To: <20230420112018.1108058-1-ming.lei@redhat.com>
-References: <20230420112018.1108058-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] Revert "block: Merge bio before checking ->cached_rq"
-Message-Id: <168199527140.701888.5216274415727018945.b4-ty@kernel.dk>
-Date:   Thu, 20 Apr 2023 06:54:31 -0600
+        Thu, 20 Apr 2023 08:57:41 -0400
+Received: from phd-imap.ethz.ch (phd-imap.ethz.ch [129.132.80.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511281FFD
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 05:57:40 -0700 (PDT)
+Received: from localhost (192-168-127-49.net4.ethz.ch [192.168.127.49])
+        by phd-imap.ethz.ch (Postfix) with ESMTP id 4Q2HkV2Jkqz3D;
+        Thu, 20 Apr 2023 14:57:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=phys.ethz.ch;
+        s=2023; t=1681995458;
+        bh=Z4MWX3VwhFYFX0qs1bSu3B8t/XLbQRc4QjgX0KP4uzY=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=goXhP4T76nkuUbtb8hltNuv1qWudJ4oAOcJu19wrV9JymokSIa83YQyYetYmde/nO
+         OPUjroPIvUD1WkY9/X6BjGe+RbG2zTc/wdm9v0V4ZdFCms7F3aeZfiMyAS96EC2Yet
+         89RHjTCA7yzb6BoFOl/Pafy4ixWFD9l0wGa+NFjlr19FRjOtn4y6tvkqP1/rTNrRlA
+         255Mhi45G5q+Cu83tqajpZ0M2pNvB91/Qyo+IvBMqKKQcev9rtH3ffR97ZgTnw9LTQ
+         IydTfP+nQS54AzVVo/HYT8hyGvgPDN3qeUnixir9wX5y7tPIsxvkx2vJugU7o7tAlp
+         caBr2kTroM7kQ==
+X-Virus-Scanned: Debian amavisd-new at phys.ethz.ch
+Received: from phd-mxin.ethz.ch ([192.168.127.53])
+        by localhost (phd-mailscan.ethz.ch [192.168.127.49]) (amavisd-new, port 10024)
+        with LMTP id WZ6rfxVDfBML; Thu, 20 Apr 2023 14:57:38 +0200 (CEST)
+Received: from phys.ethz.ch (mothership.ethz.ch [192.33.96.20])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: daduke@phd-mxin.ethz.ch)
+        by phd-mxin.ethz.ch (Postfix) with ESMTPSA id 4Q2HkV1QsQz9x;
+        Thu, 20 Apr 2023 14:57:38 +0200 (CEST)
+Date:   Thu, 20 Apr 2023 14:57:37 +0200
+From:   Christian Herzog <herzog@phys.ethz.ch>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: file server freezes with all nfsds stuck in D state after
+ upgrade to Debian bookworm
+Message-ID: <ZEE2wZPpY7JBWbY8@phys.ethz.ch>
+Reply-To: Christian Herzog <herzog@phys.ethz.ch>
+References: <ZC76dIshWvaWlki4@phys.ethz.ch>
+ <50766556-cd33-7506-13b1-64940b5995bb@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <50766556-cd33-7506-13b1-64940b5995bb@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Dear all,
 
-On Thu, 20 Apr 2023 19:20:18 +0800, Ming Lei wrote:
-> This reverts commit 23f3e3272e7a4d9fb870485cd6df1e4f9539282c.
-> 
-> blk-mq sched bio merge still needs request to grab queue usage counter,
-> so we can't simply call blk_mq_attempt_bio_merge() when queue usage
-> counter isn't held.
-> 
-> 
-> [...]
+we just had another freeze on one of our bookworm file servers. The scenario
+is a bit different, but the root cause might be just the same. So what
+happened:
 
-Applied, thanks!
+- the server had been happily serving NFS + SMB for two weeks
+- today I noticed a left-over rsync process from a recent backup run that
+  didn't do any IO and was in D state
+- I killed this rsync process, but since it was in D, it never died
+- after a few minutes I noticed an nfsd in D state too (but just one). I
+  watched it for a bit and then decided to try "service nfs-kernel-server
+  restart" to see if again nfs was involved. I guess it was...
+- from then on, all sorts of processes entered eternal D: several smbd,
+  autofs, the rsync and one nfsd
+- however: at all times, the underlying file systems seemed perfectly fine. We
+  could write to every single one of them and gdu the hundred-TiB ones without
+  a problem
+- my impression is that at least this time, nfsd was just one of the victims
+  of a deeper problem
+- we took all the forensics suggested last time by Kuai and Bob. I don't
+  really understand them, but here's the facts:
+  - memory on the machine is completely uncritical, < 20% used
+  - the rqos/wbt/inflight of all block devices are 0 (remember: those are
+    iSCSI LUNs)
+  - all the hctx* values seem unsuspicious to me, but what do I know
+  - the stacks traces of the D processes don't show any rq_qos_wait this time
 
-[1/1] Revert "block: Merge bio before checking ->cached_rq"
-      commit: 81ea1222f2fa5006f4b9759c2fe1ec154109622d
+here's the D rsync trace:
 
-Best regards,
+[<0>] iterate_dir+0x52/0x1c0
+[<0>] __x64_sys_getdents64+0x84/0x120
+[<0>] do_syscall_64+0x58/0xc0
+[<0>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+
+and the D nfsd:
+
+[<0>] vfs_rename+0x266/0xd70
+[<0>] nfsd_rename+0x327/0x470 [nfsd]
+[<0>] nfsd4_rename+0x53/0x110 [nfsd]
+[<0>] nfsd4_proc_compound+0x352/0x660 [nfsd]
+[<0>] nfsd_dispatch+0x167/0x280 [nfsd]
+[<0>] svc_process_common+0x286/0x5e0 [sunrpc]
+[<0>] svc_process+0xad/0x100 [sunrpc]
+[<0>] nfsd+0xd5/0x190 [nfsd]
+[<0>] kthread+0xe6/0x110
+[<0>] ret_from_fork+0x1f/0x30
+
+all the forensics are contained in
+https://people.phys.ethz.ch/~daduke/freeze.tgz
+
+we would be extremely grateful for any hints how we can debug (or even solve)
+this. We're really at a loss here...
+
+
+thanks and kind regards,
+-Christian
+
+
 -- 
-Jens Axboe
-
-
-
+Dr. Christian Herzog <herzog@phys.ethz.ch>  support: +41 44 633 26 68
+Head, IT Services Group, HPT H 8              voice: +41 44 633 39 50
+Department of Physics, ETH Zurich           
+8093 Zurich, Switzerland                     http://isg.phys.ethz.ch/
