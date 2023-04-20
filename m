@@ -2,93 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2277FC77B72
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 11:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95607C77B72
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 12:29:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234301AbjDTLYE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 07:24:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47992 "EHLO
+        id S229884AbjDTM3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 08:29:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234047AbjDTLXm (ORCPT
+        with ESMTP id S232026AbjDTM3Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 07:23:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA639B750
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 04:21:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681989629;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=d2n7fnjsQvwaWtsjGf1IgInvHC2ml3w9pgOGz8iRVDw=;
-        b=Ze9vpKAS1RNyq05cNng0z1SMLQfhJf2f4vT+jsAYK9OHs0SlsIJbBnhSqbWXOQjeVT60pW
-        21aQSHlWcoXmFMezrCDpz7Np+WxJoqv0XZpibsXJ8QxgQKsNalkYlbQvOFnfcd5sFYCVco
-        B0vtPSsYpvdpNMycBKn89pzB5qfGlsA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-115-U-bYexGrNW2mgQ6DMJVpMg-1; Thu, 20 Apr 2023 07:20:28 -0400
-X-MC-Unique: U-bYexGrNW2mgQ6DMJVpMg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA5BF8996F3;
-        Thu, 20 Apr 2023 11:20:27 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 052C451E3;
-        Thu, 20 Apr 2023 11:20:26 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Xiao Ni <xni@redhat.com>, Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH] Revert "block: Merge bio before checking ->cached_rq"
-Date:   Thu, 20 Apr 2023 19:20:18 +0800
-Message-Id: <20230420112018.1108058-1-ming.lei@redhat.com>
+        Thu, 20 Apr 2023 08:29:24 -0400
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 333625BAD;
+        Thu, 20 Apr 2023 05:29:22 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id bi21-20020a05600c3d9500b003f17a8eaedbso2993246wmb.1;
+        Thu, 20 Apr 2023 05:29:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681993760; x=1684585760;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RTcuP2C+AJHG/nFwJnZGd+3L+CfBLV6Vu/A/V4+9EqA=;
+        b=Bzs4hIlK+NWIiwvwAKXTNutwQZjfCcoTpmRSYsfZRvzigTUCmy/jgjXmxz7yCocTag
+         DjpOh0ByVhML3Vgz3PAHIM7akKRY1wQ8LoPBks65Pu0+jbF2z9YiwQgfzPSgxYLFjLvB
+         rr//rAgOqhvht4gWh6PAtbhcUrx7onWaVqoWwmdHJuUDKk2nZ+Eo8ujcJ1LHRuam3PZf
+         u2idENlQgn+02e0AHLRy1LJ0MvbZt4seatLEDzDXRamEXDMOzHeuWlM/QIvmvoUc3BUu
+         8OijfS4FsOu2SqinzwQjb0vHJjPBrLTKRoyYIFER2+xn5qV68GT3xIBSKjZrXdNXYX2f
+         HaCA==
+X-Gm-Message-State: AAQBX9duh8PxvrgHh7LC+cfEEF7S+sE9BOJUoqt/I8UesiHbGYtPaYcU
+        Z82Xi5WH5tZJGIUgyKOq4IE=
+X-Google-Smtp-Source: AKy350aaCNOtF1Dp5FVmsyixW1o7a582KZIzbTA6bAcNcvBvAfmJ9yC1qp5VWWLw8itQjbmItpc17w==
+X-Received: by 2002:a1c:6a02:0:b0:3ee:3e07:5d26 with SMTP id f2-20020a1c6a02000000b003ee3e075d26mr1076568wmc.24.1681993760341;
+        Thu, 20 Apr 2023 05:29:20 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-015.fbsv.net. [2a03:2880:31ff:f::face:b00c])
+        by smtp.gmail.com with ESMTPSA id o2-20020a05600c4fc200b003f1738e64c0sm5317875wmq.20.2023.04.20.05.29.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Apr 2023 05:29:19 -0700 (PDT)
+Date:   Thu, 20 Apr 2023 05:29:18 -0700
+From:   Breno Leitao <leitao@debian.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        asml.silence@gmail.com, axboe@kernel.dk, leit@fb.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        sagi@grimberg.me, kbusch@kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] io_uring: Pass whole sqe to commands
+Message-ID: <ZEEwHk32Y8IcT20n@gmail.com>
+References: <20230419102930.2979231-1-leitao@debian.org>
+ <20230419102930.2979231-2-leitao@debian.org>
+ <20230420045712.GA4239@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230420045712.GA4239@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit 23f3e3272e7a4d9fb870485cd6df1e4f9539282c.
+Hello Christoph,
 
-blk-mq sched bio merge still needs request to grab queue usage counter,
-so we can't simply call blk_mq_attempt_bio_merge() when queue usage
-counter isn't held.
+On Thu, Apr 20, 2023 at 06:57:12AM +0200, Christoph Hellwig wrote:
+> On Wed, Apr 19, 2023 at 03:29:29AM -0700, Breno Leitao wrote:
+> >  	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+> > -	const struct nvme_uring_cmd *cmd = ioucmd->cmd;
+> > +	const struct nvme_uring_cmd *cmd = (struct nvme_uring_cmd *)ioucmd->sqe->cmd;
+> 
+> Please don't add the pointless cast.  And in general avoid the overly
+> long lines.
 
-Fixes: 23f3e3272e7a ("block: Merge bio before checking ->cached_rq")
-Cc: Xiao Ni <xni@redhat.com>
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Ack!
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index cf1a39adf9a5..27a628a8ee88 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2880,16 +2880,15 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 
- 	if (!plug)
- 		return NULL;
-+	rq = rq_list_peek(&plug->cached_rq);
-+	if (!rq || rq->q != q)
-+		return NULL;
- 
- 	if (blk_mq_attempt_bio_merge(q, *bio, nsegs)) {
- 		*bio = NULL;
- 		return NULL;
- 	}
- 
--	rq = rq_list_peek(&plug->cached_rq);
--	if (!rq || rq->q != q)
--		return NULL;
--
- 	type = blk_mq_get_hctx_type((*bio)->bi_opf);
- 	hctx_type = rq->mq_hctx->type;
- 	if (type != hctx_type &&
--- 
-2.39.2
+> 
+> I suspect most other users should just also defined their structures
+> const instead of adding all theses casts thare are a sign of problems,
+> but that's a pre-existing issue.
+> >  	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+> > -	size_t cmd_size;
+> > +	size_t size = sizeof(struct io_uring_sqe);
+> >  
+> >  	BUILD_BUG_ON(uring_cmd_pdu_size(0) != 16);
+> >  	BUILD_BUG_ON(uring_cmd_pdu_size(1) != 80);
+> >  
+> > -	cmd_size = uring_cmd_pdu_size(req->ctx->flags & IORING_SETUP_SQE128);
+> > +	if (req->ctx->flags & IORING_SETUP_SQE128)
+> > +		size <<= 1;
+> 
+> 
+> Why does this stop using uring_cmd_pdu_size()?
 
+Before, only the cmd payload (sqe->cmd) was being copied to the async
+structure. We are copying over the whole sqe now, since we can use SQE
+fields inside the ioctl callbacks (instead of only cmd fields). So, the
+copy now is 64 bytes for single SQE or 128 for double SQEs.
+
+This has two major advantages:
+ * It is not necessary to create a cmd structure for every command
+   operations (which will be mapped in sqe->cmd) to pass arguments. The
+   arguments could be passed as fields in SQE.
+
+ * sqe->cmd is 16 bytes on single SQEs. Passing the whole SQE to cmd
+   will reduce the necessity to use double SQE for operations that
+   require large fields, such as {g,s}etsockopt().
+
+There are some discussions about it also at
+https://lkml.org/lkml/2023/4/6/786
+
+Thanks for the review!
