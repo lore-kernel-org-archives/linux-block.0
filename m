@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F1AC77B7A
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 18:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A12EAC77B7C
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 18:32:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231872AbjDTSb5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 14:31:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41958 "EHLO
+        id S231690AbjDTScB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 14:32:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbjDTSbn (ORCPT
+        with ESMTP id S231837AbjDTSbz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 14:31:43 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43A130F2;
-        Thu, 20 Apr 2023 11:31:28 -0700 (PDT)
+        Thu, 20 Apr 2023 14:31:55 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E813526F;
+        Thu, 20 Apr 2023 11:31:32 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 86F331FDC8;
-        Thu, 20 Apr 2023 18:31:27 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 27B5A1FDCA;
+        Thu, 20 Apr 2023 18:31:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1682015487; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1682015491; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=olx1mZYcFFV0s06Pc7VZextyqfNpbUfhWxOb4Y0as/Y=;
-        b=soxmkT2Y77njP2SkNEMlj0oWi/D+NOBX41g0aLaM6Fnf8P9FzPnuAOP2PBqLza/kDX+UTf
-        ilTUWfwYI10Kt72hOqxrOve+emDiS738p9sTfJMwF471FiGTkKIB1PWZAFbsZIO4K8QAAJ
-        EOHsAuK++9LzR6odCNPKZZZhVh0o8NU=
+        bh=p5w7/u9ISF5o5lHXLzxfuZV9gNo85LTpV8ROuY1d0Ww=;
+        b=S3WMJVlJ3kpoVNrSiHZnKrnN4dNDufFHFPiXaSVWdYgXlDB9QSDwOVzMxVrnlQqyGrN+7M
+        GNyOJ6IiJPpSDx07bAs0MYsyY0RDZ6vaesBlF4eD6RuBj8JLLX7HA+skGacYZdMiwDgter
+        dD3RUdg4/n/zsiqPBVO4BXo495iKWTA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1682015487;
+        s=susede2_ed25519; t=1682015491;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=olx1mZYcFFV0s06Pc7VZextyqfNpbUfhWxOb4Y0as/Y=;
-        b=oZDSMY2MP0TIEZKh4mROv9cxMp+A3VXyg5StXYBR/vuNZd57O7vrpOtdQKr43sCWje5NJ7
-        oiQI14J13Y6lsuAg==
+        bh=p5w7/u9ISF5o5lHXLzxfuZV9gNo85LTpV8ROuY1d0Ww=;
+        b=hWOfWzfaBN18Mn47HpatDjGFKK7q0b6iJ+mOGuVQUxNyfh0gkDkF1SrcTub4rqhe08fHb/
+        HiOwTRvMNd4TFcDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6E6EC13584;
-        Thu, 20 Apr 2023 18:31:27 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0F67513584;
+        Thu, 20 Apr 2023 18:31:31 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 2oHhGv+EQWStNAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Thu, 20 Apr 2023 18:31:27 +0000
+        id DFW9AwOFQWS8NAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Thu, 20 Apr 2023 18:31:31 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v2 3/4] nvme-rc: Move discovery generation counter code to rc
-Date:   Thu, 20 Apr 2023 20:31:14 +0200
-Message-Id: <20230420183121.4489-6-dwagner@suse.de>
+Subject: [PATCH blktests v2 8/9] nvme-rc: Move discovery generation counter code to rc
+Date:   Thu, 20 Apr 2023 20:31:20 +0200
+Message-Id: <20230420183121.4489-12-dwagner@suse.de>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230420183121.4489-1-dwagner@suse.de>
 References: <20230420183121.4489-1-dwagner@suse.de>
@@ -3160,10 +3160,10 @@ index 20fef696e565..cfcdcbe6be23 100755
  	_remove_nvmet_subsystem_from_port "${port}" "${subsys}1"
  	_remove_nvmet_subsystem "${subsys}1"
 diff --git a/tests/nvme/rc b/tests/nvme/rc
-index e6075e31178f..8cd89af703bb 100644
+index 172f510527ed..2aa34fb0c9b8 100644
 --- a/tests/nvme/rc
 +++ b/tests/nvme/rc
-@@ -720,6 +720,19 @@ _discovery_genctr() {
+@@ -755,6 +755,19 @@ _discovery_genctr() {
  		sed -n -e 's/^.*Generation counter \([0-9]\+\).*$/\1/p'
  }
  
