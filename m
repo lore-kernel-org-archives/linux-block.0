@@ -2,243 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81852C77B72
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 15:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 654D0C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 15:42:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231298AbjDTPm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 11:42:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40804 "EHLO
+        id S232181AbjDTPmb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 11:42:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231553AbjDTPmY (ORCPT
+        with ESMTP id S231986AbjDTPm0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 11:42:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41DDF55BD
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 08:41:28 -0700 (PDT)
+        Thu, 20 Apr 2023 11:42:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F17D5251
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 08:41:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682005287;
+        s=mimecast20190719; t=1682005292;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TTD5CA4FHIYYzHpsi39bABtfMSG0wtrbBpTPXxQGOHg=;
-        b=Ha+MyJ2H9O7c6eED+/EXBbZEs9i8wFDue72200S56JE3JEropfJ3GoRB5V7Pg+l6/alshg
-        ypGnhPOOj1pW1zPe9mvDG9jdeJ420SPyl1qbXVcOnTItTJ5mzfIMPk898auXhQktOIv/Hm
-        AWOgi27X5zbjwUuqbq25c2BUSIZ0RDg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=92twkPxGd5T574eTL5Yh2cPAApi82Wy5O16krM4Zwow=;
+        b=CoeCAc8OO6qOuGepH10IgylUF/vpPTSgxlMb/KXfldW9LriKRikshrzmRUiMIhfwKwUbBQ
+        QtkT/RtHsrp3oQWZ4dG0i2PdC+Tt8mP0Q+JZ9HfkfyeUGRWg2/JhEg+/DDmrEON++VqWjV
+        jTyevk5A3eAmk/ZEnzNVEjNvHHsUpYY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-564-agX-yjIoN-SMIykp5QEOmA-1; Thu, 20 Apr 2023 11:41:24 -0400
-X-MC-Unique: agX-yjIoN-SMIykp5QEOmA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-399-Zgu_UCK4MJyl62fbt446dg-1; Thu, 20 Apr 2023 11:41:31 -0400
+X-MC-Unique: Zgu_UCK4MJyl62fbt446dg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B0CF6101A531;
-        Thu, 20 Apr 2023 15:41:23 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AC3C02A59552;
+        Thu, 20 Apr 2023 15:41:30 +0000 (UTC)
 Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB43163A68;
-        Thu, 20 Apr 2023 15:41:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D0757492B05;
+        Thu, 20 Apr 2023 15:41:29 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 3/7] ublk: cleanup ublk_copy_user_pages
-Date:   Thu, 20 Apr 2023 23:40:28 +0800
-Message-Id: <20230420154032.1272836-4-ming.lei@redhat.com>
+Subject: [PATCH 5/7] ublk: support to copy any part of request pages
+Date:   Thu, 20 Apr 2023 23:40:30 +0800
+Message-Id: <20230420154032.1272836-6-ming.lei@redhat.com>
 In-Reply-To: <20230420154032.1272836-1-ming.lei@redhat.com>
 References: <20230420154032.1272836-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Clean up ublk_copy_user_pages() by using iov_iter_get_pages2, and code
-gets simplified a lot and becomes much more readable than before.
+Add 'offset' to 'struct ublk_map_data', so that ublk_copy_user_pages()
+can be used to copy any sub-buffer(linear mapped) of the request.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 112 +++++++++++++++++----------------------
- 1 file changed, 49 insertions(+), 63 deletions(-)
+ drivers/block/ublk_drv.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 6baca0383b44..fee8c603c096 100644
+index 11ce55f0c395..7d21ee22e503 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -411,49 +411,39 @@ static const struct block_device_operations ub_fops = {
- 
- #define UBLK_MAX_PIN_PAGES	32
- 
--struct ublk_map_data {
--	const struct request *rq;
--	unsigned long	ubuf;
--	unsigned int	len;
--};
--
- struct ublk_io_iter {
- 	struct page *pages[UBLK_MAX_PIN_PAGES];
--	unsigned pg_off;	/* offset in the 1st page in pages */
--	int nr_pages;		/* how many page pointers in pages */
- 	struct bio *bio;
- 	struct bvec_iter iter;
- };
- 
--static inline unsigned ublk_copy_io_pages(struct ublk_io_iter *data,
--		unsigned max_bytes, bool to_vm)
-+/* return how many pages are copied */
-+static void ublk_copy_io_pages(struct ublk_io_iter *data,
-+		size_t total, size_t pg_off, int dir)
- {
--	const unsigned total = min_t(unsigned, max_bytes,
--			PAGE_SIZE - data->pg_off +
--			((data->nr_pages - 1) << PAGE_SHIFT));
- 	unsigned done = 0;
- 	unsigned pg_idx = 0;
- 
- 	while (done < total) {
- 		struct bio_vec bv = bio_iter_iovec(data->bio, data->iter);
--		const unsigned int bytes = min3(bv.bv_len, total - done,
--				(unsigned)(PAGE_SIZE - data->pg_off));
-+		unsigned int bytes = min3(bv.bv_len, (unsigned)total - done,
-+				(unsigned)(PAGE_SIZE - pg_off));
- 		void *bv_buf = bvec_kmap_local(&bv);
- 		void *pg_buf = kmap_local_page(data->pages[pg_idx]);
- 
--		if (to_vm)
--			memcpy(pg_buf + data->pg_off, bv_buf, bytes);
-+		if (dir == ITER_DEST)
-+			memcpy(pg_buf + pg_off, bv_buf, bytes);
- 		else
--			memcpy(bv_buf, pg_buf + data->pg_off, bytes);
-+			memcpy(bv_buf, pg_buf + pg_off, bytes);
- 
- 		kunmap_local(pg_buf);
- 		kunmap_local(bv_buf);
- 
- 		/* advance page array */
--		data->pg_off += bytes;
--		if (data->pg_off == PAGE_SIZE) {
-+		pg_off += bytes;
-+		if (pg_off == PAGE_SIZE) {
- 			pg_idx += 1;
--			data->pg_off = 0;
-+			pg_off = 0;
- 		}
- 
- 		done += bytes;
-@@ -467,41 +457,40 @@ static inline unsigned ublk_copy_io_pages(struct ublk_io_iter *data,
- 			data->iter = data->bio->bi_iter;
- 		}
+@@ -504,19 +504,36 @@ static void ublk_copy_io_pages(struct ublk_io_iter *data,
  	}
--
--	return done;
  }
  
--static int ublk_copy_user_pages(struct ublk_map_data *data, bool to_vm)
-+/*
-+ * Copy data between request pages and io_iter, and 'offset'
-+ * is the start point of linear offset of request.
-+ */
-+static size_t ublk_copy_user_pages(const struct request *req,
-+		struct iov_iter *uiter, int dir)
++static bool ublk_advance_io_iter(const struct request *req,
++		struct ublk_io_iter *iter, unsigned int offset)
++{
++	struct bio *bio = req->bio;
++
++	for_each_bio(bio) {
++		if (bio->bi_iter.bi_size > offset) {
++			iter->bio = bio;
++			iter->iter = bio->bi_iter;
++			bio_advance_iter(iter->bio, &iter->iter, offset);
++			return true;
++		}
++		offset -= bio->bi_iter.bi_size;
++	}
++	return false;
++}
++
+ /*
+  * Copy data between request pages and io_iter, and 'offset'
+  * is the start point of linear offset of request.
+  */
+ static size_t ublk_copy_user_pages(const struct request *req,
+-		struct iov_iter *uiter, int dir)
++		unsigned offset, struct iov_iter *uiter, int dir)
  {
--	const unsigned int gup_flags = to_vm ? FOLL_WRITE : 0;
--	const unsigned long start_vm = data->ubuf;
--	unsigned int done = 0;
- 	struct ublk_io_iter iter = {
--		.pg_off	= start_vm & (PAGE_SIZE - 1),
--		.bio	= data->rq->bio,
--		.iter	= data->rq->bio->bi_iter,
-+		.bio	= req->bio,
-+		.iter	= req->bio->bi_iter,
- 	};
--	const unsigned int nr_pages = round_up(data->len +
--			(start_vm & (PAGE_SIZE - 1)), PAGE_SIZE) >> PAGE_SHIFT;
--
--	while (done < nr_pages) {
--		const unsigned to_pin = min_t(unsigned, UBLK_MAX_PIN_PAGES,
--				nr_pages - done);
--		unsigned i, len;
--
--		iter.nr_pages = get_user_pages_fast(start_vm +
--				(done << PAGE_SHIFT), to_pin, gup_flags,
--				iter.pages);
--		if (iter.nr_pages <= 0)
--			return done == 0 ? iter.nr_pages : done;
--		len = ublk_copy_io_pages(&iter, data->len, to_vm);
--		for (i = 0; i < iter.nr_pages; i++) {
--			if (to_vm)
-+	size_t done = 0;
-+
-+	while (iov_iter_count(uiter) && iter.bio) {
-+		unsigned nr_pages;
-+		size_t len, off;
-+		int i;
-+
-+		len = iov_iter_get_pages2(uiter, iter.pages,
-+				iov_iter_count(uiter),
-+				UBLK_MAX_PIN_PAGES, &off);
-+		if (len <= 0)
-+			return done;
-+
-+		ublk_copy_io_pages(&iter, len, off, dir);
-+		nr_pages = DIV_ROUND_UP(len + off, PAGE_SIZE);
-+		for (i = 0; i < nr_pages; i++) {
-+			if (dir == ITER_DEST)
- 				set_page_dirty(iter.pages[i]);
- 			put_page(iter.pages[i]);
- 		}
--		data->len -= len;
--		done += iter.nr_pages;
-+		done += len;
- 	}
+-	struct ublk_io_iter iter = {
+-		.bio	= req->bio,
+-		.iter	= req->bio->bi_iter,
+-	};
++	struct ublk_io_iter iter;
+ 	size_t done = 0;
  
- 	return done;
-@@ -528,15 +517,14 @@ static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
- 	 * context is pretty fast, see ublk_pin_user_pages
- 	 */
- 	if (ublk_need_map_req(req)) {
--		struct ublk_map_data data = {
--			.rq	=	req,
--			.ubuf	=	io->addr,
--			.len	=	rq_bytes,
--		};
-+		struct iov_iter iter;
-+		struct iovec iov;
-+		const int dir = ITER_DEST;
++	if (!ublk_advance_io_iter(req, &iter, offset))
++		return 0;
++
+ 	while (iov_iter_count(uiter) && iter.bio) {
+ 		unsigned nr_pages;
+ 		size_t len, off;
+@@ -569,7 +586,7 @@ static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
+ 		import_single_range(dir, u64_to_user_ptr(io->addr), rq_bytes,
+ 				&iov, &iter);
  
--		ublk_copy_user_pages(&data, true);
-+		import_single_range(dir, u64_to_user_ptr(io->addr), rq_bytes,
-+				&iov, &iter);
- 
--		return rq_bytes - data.len;
-+		return ublk_copy_user_pages(req, &iter, dir);
+-		return ublk_copy_user_pages(req, &iter, dir);
++		return ublk_copy_user_pages(req, 0, &iter, dir);
  	}
  	return rq_bytes;
  }
-@@ -548,17 +536,15 @@ static int ublk_unmap_io(const struct ublk_queue *ubq,
- 	const unsigned int rq_bytes = blk_rq_bytes(req);
+@@ -589,7 +606,7 @@ static int ublk_unmap_io(const struct ublk_queue *ubq,
  
- 	if (ublk_need_unmap_req(req)) {
--		struct ublk_map_data data = {
--			.rq	=	req,
--			.ubuf	=	io->addr,
--			.len	=	io->res,
--		};
-+		struct iov_iter iter;
-+		struct iovec iov;
-+		const int dir = ITER_SOURCE;
- 
- 		WARN_ON_ONCE(io->res > rq_bytes);
- 
--		ublk_copy_user_pages(&data, false);
--
--		return io->res - data.len;
-+		import_single_range(dir, u64_to_user_ptr(io->addr), io->res,
-+				&iov, &iter);
-+		return ublk_copy_user_pages(req, &iter, dir);
+ 		import_single_range(dir, u64_to_user_ptr(io->addr), io->res,
+ 				&iov, &iter);
+-		return ublk_copy_user_pages(req, &iter, dir);
++		return ublk_copy_user_pages(req, 0, &iter, dir);
  	}
  	return rq_bytes;
  }
