@@ -2,111 +2,177 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A7BC77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 19:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7F3C77B7C
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 21:54:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231898AbjDTTlV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 15:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53532 "EHLO
+        id S231909AbjDTVx6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 17:53:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231244AbjDTTlU (ORCPT
+        with ESMTP id S231728AbjDTVx5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 15:41:20 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 695173C0D
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 12:41:19 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-74e0180b7d3so55229185a.2
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 12:41:19 -0700 (PDT)
+        Thu, 20 Apr 2023 17:53:57 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA901730;
+        Thu, 20 Apr 2023 14:53:56 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33KK1lhd002114;
+        Thu, 20 Apr 2023 21:53:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references :
+ content-transfer-encoding : content-type : mime-version;
+ s=corp-2023-03-30; bh=wX9gDl7MwAkkjyL5VOUvTctIf8owQ51L8PKd1cTmMaA=;
+ b=l2nyumOkMnvAgH14dmDkBgdwYq/UpsszYGZV8qle9LjwTsvyaogxDsNU3vkjSYTAypZl
+ uPy2iH/crATRzuWVRBN9yK/RG42B1yb4TIkzIkTNnhzxM/Or+PUpjJ2XoqRa7QJGMfV3
+ u10VGVDdGK6Xucn89GElK8mf4feiIuafEFMkZktcGGKhm/o3Vy06F2uEJDoumhNpO4Cx
+ LEl2vqUye4pfLzdTjhJtcXDBDY9arwNT7AvWk43iGE+G/NcYMhrupS5II6Gnbi8TNa3l
+ uIktl6xaOp0E/jsqRO3a0qMTqbkEf79ZQSaCGS522gF9LtvNzky7ENdhubdmAjuuTdIU Rg== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3pykhu40wx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Apr 2023 21:53:50 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33KK666E037795;
+        Thu, 20 Apr 2023 21:53:49 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3pyjc8ug3u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Apr 2023 21:53:49 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S/xqLcQpfWFY054qOEX87zzOABp2ZyD1YHvoPCvL9ZlXyFqf9zEyWBuhMESrJpRt2nFL2qAqctay3aNKTTbQeJ+HoWLr4cpXr+HxgMc/j6RR8u+7L84J0P9Nl+TkcpV0KBzRlzZVWp23dZVVHltOhwgKJHUGNoQEz2uWpUOz/2XsbNIZy5lpyl9vFm/JvpF2jzf07fzTh/tGNUiUSXZR5tA9MoXSRIV1i31IRgNpbR78qTiKt9UDsmIYc1qfWmbjhWEpLQ41cwk6Tg7Nw/bxWphlXtkr2LnFtXcOxuXlrjUnTllAsDCnTNVhttuILUqFiXMINg0wHIS+UU4OwWyuaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wX9gDl7MwAkkjyL5VOUvTctIf8owQ51L8PKd1cTmMaA=;
+ b=N7VQcNDFH+uVrYYBdzOfNaGHbO0/AM/rDyAL9gmOPG2uMpbycb+v80OGvA9adAOfm5i+neK+CVj0TKJPT+ksZUyn4kuqQQT0OfAmzuemyAW7vi8PBPegCSRn8RJYWYqX8CJrH7qhaOZyLycF7/Y7qdCPhC2mee60fAjFnRJ1YfDMRgNpMvnUkcpv8/edDuGvvZjCgW9wo+Xm9iupnSVxLDxRFdZwj5mSwFH63D3LQMOhtcPOQ+HgMBjvd6St/n6ZMHo/CSt3pBmDFFUPQJ1dsebIJ31ulmd/X1bBYD1GTA5N+w68f7qi+s+S2Z+ejHPKv/0VvWXJQZfZCI3BcQkOLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20221208.gappssmtp.com; s=20221208; t=1682019678; x=1684611678;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hp2WoMYe8f0cA1azbQnh2XYZtbHDV4zsKL0sy4t3HRk=;
-        b=cokRKqTe/KXOWR8TgrgKE35GN/QC9l9kuQHbG/6uekngK4te5Ju9kOuReHGCH2JCB7
-         ctFyVY/HKqw53zXlDHfduMSnZZPS6ZVJ+FPUmcB/J9IOV83qIRPuCM4gYbngj1kdW5vK
-         Runi1pNLAMlkYVXyEeG7lHjgtt7WRvWtTVT6ZBBo05cA+Gnu2hFswC1rfKfnIvLLK/c6
-         HhkBTuMrKll6CjPW0vrjT4qOY/1xXEtAIMlLBeuZsJ/agTTbdx1B4sIy5PDCwMctLQS+
-         M7WitvFtu6bdQl8U+8ucEGoUD4Js5gRj77jSi7N1+q3jIsg/GVycnTQIx6z8QI/eFmW0
-         95nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682019678; x=1684611678;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hp2WoMYe8f0cA1azbQnh2XYZtbHDV4zsKL0sy4t3HRk=;
-        b=O2ImeC+BZg4tBTlb3DTDfP/088C4PaM38F9Hupw1oOA2QUQGAygqFWU+8j6Qsr4XFO
-         JRxM4Am89qpdxlY/IwQq3DJn3bE7AzA88yO3Rr8qelwxv7iA8Z2plfT4JdgSgdPaQPXj
-         QGmqjUkj5/fLEeE2xq/WwhkPWzTm6wS63gCAYlWB3iT6kCiz3k8DRVeAYYDXnI5F5CVd
-         4HaZhL91IGDCZQABHjUw93Bvjpctwl8DRSSOIIGRhytKEuT/Rggrk6Ditucbu+LMtMai
-         xPJ28L9/EjrZ1R1HOGNFDB7AugvKRcSH8ESC+HyYgZ/P73mySOQUFwhaN9100J/6q1Uv
-         /iFQ==
-X-Gm-Message-State: AAQBX9fnUocwu9/FBtV3+YEo+Ni2+VdsFDj2xaKt/wdWntZlCnibhP3O
-        lPp1an57DYXz1zrq+J8g5DPV9DDwOimmAg0Cl26gsw==
-X-Google-Smtp-Source: AKy350YHZGfUCPsTXzxR0dSmjqT1qchvqDRAVjb1f3XBS1FGLghWbLDnz+KIU+WWC8QMjSXcknjIpQ==
-X-Received: by 2002:a05:6214:e4e:b0:5ef:4ecb:cf9d with SMTP id o14-20020a0562140e4e00b005ef4ecbcf9dmr4390667qvc.6.1682019678370;
-        Thu, 20 Apr 2023 12:41:18 -0700 (PDT)
-Received: from localhost (hs-nc-a03feba254-450087-1.tingfiber.com. [64.98.124.17])
-        by smtp.gmail.com with ESMTPSA id i10-20020a0cedca000000b005dd8b9345b4sm597931qvr.76.2023.04.20.12.41.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 12:41:17 -0700 (PDT)
-Date:   Thu, 20 Apr 2023 15:41:17 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Zhong Jinghua <zhongjinghua@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yukuai3@huawei.com, houtao1@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH-next] nbd: fix incomplete validation of ioctl arg
-Message-ID: <20230420194117.GA2179876@localhost.localdomain>
-References: <20230206145805.2645671-1-zhongjinghua@huawei.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wX9gDl7MwAkkjyL5VOUvTctIf8owQ51L8PKd1cTmMaA=;
+ b=xJlAqp9x7LeUvnP24iUPz/ITFukDbck/IXpKknDCKHDe2SSzl05D+dUlmSHvOE1XJyPOufhgv2eZVn/MGrR0ko/FBt38E03OXU061GsYizWaldsA4udL4ixjemV2j0x8H2ySOc6gYi9i8MxNIS5vcQ9yg9SetZzwv1Nrw9oxFbo=
+Received: from SJ0PR10MB4752.namprd10.prod.outlook.com (2603:10b6:a03:2d7::19)
+ by PH7PR10MB7036.namprd10.prod.outlook.com (2603:10b6:510:274::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Thu, 20 Apr
+ 2023 21:53:47 +0000
+Received: from SJ0PR10MB4752.namprd10.prod.outlook.com
+ ([fe80::4a9d:b42c:57c7:b53c]) by SJ0PR10MB4752.namprd10.prod.outlook.com
+ ([fe80::4a9d:b42c:57c7:b53c%5]) with mapi id 15.20.6319.022; Thu, 20 Apr 2023
+ 21:53:47 +0000
+From:   Junxiao Bi <junxiao.bi@oracle.com>
+To:     linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     paul@paul-moore.com, nathanl@linux.ibm.com, axboe@kernel.dk,
+        jmorris@namei.org, serge@hallyn.com, konrad.wilk@oracle.com,
+        joe.jin@oracle.com, junxiao.bi@oracle.com
+Subject: [PATCH V4 2/2] blktrace: allow access trace file in lockdown mode
+Date:   Thu, 20 Apr 2023 14:53:31 -0700
+Message-Id: <20230420215331.88326-2-junxiao.bi@oracle.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+In-Reply-To: <20230420215331.88326-1-junxiao.bi@oracle.com>
+References: <20230420215331.88326-1-junxiao.bi@oracle.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO2P123CA0046.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600::34)
+ To SJ0PR10MB4752.namprd10.prod.outlook.com (2603:10b6:a03:2d7::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230206145805.2645671-1-zhongjinghua@huawei.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ0PR10MB4752:EE_|PH7PR10MB7036:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8475b27d-7caa-44cd-898b-08db41e9b7b1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cStGXCJumBZmjK7y7/xY93wbDZzDeNw66HwieSMtfsPT9TelKch8wrVrJxAXpnFX/51yEgsROPoKt6MLq1pUsP/8tDfPFRf4MuJ37Ck/VvBKdWe3f8BjuYl5vdhhHHUWzNshFmPZ+S77PzHZpI8eKA5BlGklYenKUHWqeP9nEcNJ3phwFDNHmOclk72GEPhK9qTgQnCpSZVPB2uOm0rw9suwJPmzdHF75cWamadbP/sj9NqUXBGsYhRpbuQnK9m8+EV5s8LtlpC0RCOku0Xm3VcH6tDFw152tgkUt/DBzg/KFqQ/JsVdrjjuSXV91x/Ny2bvs864G4sdGmwywCQdRfjd2brBgNx/uTq59oWzd1WrfwoPoqsQbAbBpaKFWDBnLi5GC04L9OoQ28yvniHzELAUGYeuE7peJ0znLklEpj0LN8a1xpFdXT1kBDaJZ7CRwWYDNT4aYP6raPVHEjx+LM319z8BsGhVZ5uzsIkjfnFRQwXe0LjoTpRTs/zgQdlgzMl9QyrgLLKw0MdnhVu0qKYyIHJ+8+v+ksFOS3R8dWErW92zJQCWuoS2Jdj2ML1v
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB4752.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(39860400002)(376002)(396003)(346002)(136003)(451199021)(5660300002)(44832011)(2616005)(41300700001)(83380400001)(86362001)(107886003)(1076003)(6512007)(6506007)(186003)(38100700002)(8936002)(8676002)(478600001)(6666004)(6486002)(316002)(36756003)(66946007)(66556008)(66476007)(4326008)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0w6YP0qNKeh5/qcqdLsJOa9BIDgbrk1IqhSHvQJtwSPTRMIHSlWF3lzC4UPh?=
+ =?us-ascii?Q?gMgAlsIfMFQGdI7MCybyMzIeT+GYLoyxLMtguoLsDtOQldj52F8qF5vH6PJe?=
+ =?us-ascii?Q?vr4dY2bP8cubL7CdOEcy9HSssBKroenlgCDlrgcOlJiE3s4CtTtBrPEbPqzO?=
+ =?us-ascii?Q?M7c7aEKkeRMpavF8Fxy6nqq9R/Fnnj8PdnrH8DVcd5+qtm8xxMhx3agV5qA7?=
+ =?us-ascii?Q?VaNkIlarBeM9AYizNiAC/TY12SmtSGmdEh82mPHAvmHUCk5UgbDs/FMZ4OD0?=
+ =?us-ascii?Q?W9bNsxTEi2AG4wFAjBeUyXQuds5Yv/yqEmUssF9/KRfCjSkRsQDidmy3RRNo?=
+ =?us-ascii?Q?DntpUDp2X7ql9FDChxqDd5Wt4g57O6Kf+62IJ3U4Gj5MK7lycMU20XWUeA+q?=
+ =?us-ascii?Q?XNeevhgwwrSjZtZ7CfT5rN4FxqyBQjaJC89nFO3zfTJYGYIqOFB6r0gs7QCM?=
+ =?us-ascii?Q?kzlmAyoZoWnshjc3l9VWWUcEPKALTN31ANaUFRkUrsLD8rvbhzD/fLhj7SBT?=
+ =?us-ascii?Q?YM9sKqI4FcDCi1XeRNzkKv3kziLpofxRBAiOKYrAznUXo3fAPibnVhzhlQzO?=
+ =?us-ascii?Q?zVnfXCguSCINu3RTaOiexIxHbwb/fH1DchuYApn/CnYV71Anx2IZvsMCt9aH?=
+ =?us-ascii?Q?B9w0ebbJbt+uFDgaZ7En/VUkjVUGgqBWaYnS/FARYdoYBY0zl1euITJwMhfx?=
+ =?us-ascii?Q?1Nv3dBqZve930w9wZeopx3/t+oaO3RVGVlCIGeZXuHAoY3nYVyH0Mjp4ZGYQ?=
+ =?us-ascii?Q?wWsJy4AcPj3KMqExXr88SGjyTtmjhPFTqtN/JX+4fK5EKL05rsJa6uu911vw?=
+ =?us-ascii?Q?d5sqYXtqFFAK27bqopfflsEtOrJsjhrjML9P8miXsUyCuNnM87GBqN4Cm7cy?=
+ =?us-ascii?Q?0Pl0S+MrRgQ3cLsNoG1T61sWN4o90woFu9Scr7Iq3XPg7yjkkM5gG8crw7+c?=
+ =?us-ascii?Q?XV2EX/uMW6K/DjinrtYT5qK2jwkI0QYlxumwd9A8da3MyB0oze49jlVmEbPR?=
+ =?us-ascii?Q?aq4q+pR+M3SbJTCWWnKt1zOTaMBoJOSKk/q6c1+HQKSpGukUVsaXKlUn9rYT?=
+ =?us-ascii?Q?BsvrZ6jMWO3xyzFaWmJCapwPxOIqifJlce33w7H/5HgWVkSI5+F9N0YxP+/v?=
+ =?us-ascii?Q?PR/z/vABSYkP2Csg8KDc+TCZKNSOysQO9QXzrDgS454jzsWaax7mbxhM3oBh?=
+ =?us-ascii?Q?p8Ca8SvvECgKS72pAY21DaXOa05LApJe/xhM0Arv36mB2gJJywKm3RYGP3aI?=
+ =?us-ascii?Q?ljNo5mONEddWY7/XIBVfmwSdlEgpzvGGiIEkZOIVOdUFffGqDl1/yRuhVvrb?=
+ =?us-ascii?Q?jwxefkeiHy2uH0M7exmjjOQwxL4fzr7vegnnj0LkyOnIwn1oE5XEU9yLvuin?=
+ =?us-ascii?Q?BfdDH/MEaKJAVjMgIMK7c6BGMvHflpjJwZmnY+rrARwo/7A2DY6+sfbA9NaJ?=
+ =?us-ascii?Q?BY04kc+TK5Y2AiwFUqT5NOhefOvw+SSDD68h91ryMyAHek/1B1puLNyuTbxg?=
+ =?us-ascii?Q?bMAFVreWXsl2iXR8TFZn+yQw6EunCzBtBsqt91U6FpaoZDW/n9EJugzVYtMf?=
+ =?us-ascii?Q?QLAzbCXNwejbE4B4/ogtitRCCEI7wls3tfnw1nAjF96WN3REQj/gEgOMhK0O?=
+ =?us-ascii?Q?fWOy8vOsMubyZWn7IOxjJjM=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 8/teiFWywI+2Mj+wtW7IKGiQ4nz1HKAcQT5L0SifLzS6LjT6Jhethhai497x56Ta9ZOPchGV9lAENoD9gEmUmFJkrDFEpwRHlZ27gt71iVRDDFhRnPh8qq6v0G38FNSsnKa/rm3VGnwuShv9zpsZCX+7teTYYJuJyIasvrzZw9wAt++Ce4iw0aZkQPjz0cT2TuQcFC4A5pZX6KB6GgS9waKMRh9c1UsHSEU/+fGgBnIXgNJsomTQqgz6hUajemkvidjL1Yr8WYd7NXy5Vfo6zu+XEDC0pd7XpMdQZF4NgVGjMg9DU9UI92QfqjWAa8CHaB7u5Ski4M0PABbQqR640sdCe/S4gFjQsVyqCOTkJptSPDc2uCIblGN4uzLYYoUu2Yleg55jidvDeH7k9vJVcs3eGozEkByGKaCdcRSDUyWEmCeUgnpkbSlg2RHYWLwyVqI680TNe3U7kO3j77pdPR4YulkHSyI2jnfTY+1viJt96t7ns4cDKhyAWhLTBYxxHCk8Bqu0pzxgEFBqV/H+2J+FaY1Wx5XH9ULwPEc5dB6KC7elQkg5N70NfJyKgcWBsWtO/BdBvwH1sOraA09v90fHYgEx9cgEH9lUXKpVbkkWBiNgYUhVvRmPs2Bk51ao0yHH+rejBHl+RvDQgkxKT0WVdUpLeYLqwG2LT+uHfRrZPTIIID5Fk6GEuE/uJuYUwCQhcT1BR513jXVNiWbT2+hmEY51JBU4ZJiRDv6QqZNeq8s58kMgJHc0oZFRMaKsyLWqRpnFDCUJxalKX6s8TcFwsYb5I48gMDN0aw4KC7bsKHEzaRzOxKL6X+VaNU3VtJVGdE+UIVn6cSdVGKbkJSssMxutkKLBuf7JraZXGZBkcgbAtecC7T4or3JhqNq0RFw7JWkuiTBsT0UUdznYW6CaimeEC9M3tO2mdAA9njg=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8475b27d-7caa-44cd-898b-08db41e9b7b1
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB4752.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Apr 2023 21:53:47.3150
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ES19ecZs3TZgThBm68jH9aTMota3q3yEpiqmNVpgTUb5FrsDbGKgWVNd+RIc8vRpiuGYDpZUc20OhyLhoqTHug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB7036
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-20_15,2023-04-20_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ spamscore=0 malwarescore=0 suspectscore=0 mlxscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304200185
+X-Proofpoint-GUID: _nEKtGSYN58_925wjIfNpUeL4LuoX7mu
+X-Proofpoint-ORIG-GUID: _nEKtGSYN58_925wjIfNpUeL4LuoX7mu
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 10:58:05PM +0800, Zhong Jinghua wrote:
-> We tested and found an alarm caused by nbd_ioctl arg without verification.
-> The UBSAN warning calltrace like below:
-> 
-> UBSAN: Undefined behaviour in fs/buffer.c:1709:35
-> signed integer overflow:
-> -9223372036854775808 - 1 cannot be represented in type 'long long int'
-> CPU: 3 PID: 2523 Comm: syz-executor.0 Not tainted 4.19.90 #1
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace+0x0/0x3f0 arch/arm64/kernel/time.c:78
->  show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
->  __dump_stack lib/dump_stack.c:77 [inline]
->  dump_stack+0x170/0x1dc lib/dump_stack.c:118
->  ubsan_epilogue+0x18/0xb4 lib/ubsan.c:161
->  handle_overflow+0x188/0x1dc lib/ubsan.c:192
->  __ubsan_handle_sub_overflow+0x34/0x44 lib/ubsan.c:206
->  __block_write_full_page+0x94c/0xa20 fs/buffer.c:1709
->  block_write_full_page+0x1f0/0x280 fs/buffer.c:2934
->  blkdev_writepage+0x34/0x40 fs/block_dev.c:607
->  __writepage+0x68/0xe8 mm/page-writeback.c:2305
->  write_cache_pages+0x44c/0xc70 mm/page-writeback.c:2240
->  generic_writepages+0xdc/0x148 mm/page-writeback.c:2329
->  blkdev_writepages+0x2c/0x38 fs/block_dev.c:2114
->  do_writepages+0xd4/0x250 mm/page-writeback.c:2344
-> 
-> The reason for triggering this warning is __block_write_full_page()
-> -> i_size_read(inode) - 1 overflow.
-> inode->i_size is assigned in __nbd_ioctl() -> nbd_set_size() -> bytesize.
-> We think it is necessary to limit the size of arg to prevent errors.
-> 
-> Moreover, __nbd_ioctl() -> nbd_add_socket(), arg will be cast to int.
-> Assuming the value of arg is 0x80000000000000001) (on a 64-bit machine),
-> it will become 1 after the coercion, which will return unexpected results.
-> 
-> Fix it by adding checks to prevent passing in too large numbers.
-> 
-> Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+blktrace trace files are per-cpu relay files that are used by kernel to
+export IO metadata(IO events, type, target disk, offset and len etc.) to
+userspace, no data from IO itself will be exported. Bypass lockdown for
+these files will make blktrace work in lockdown mode.
 
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Signed-off-by: Junxiao Bi <junxiao.bi@oracle.com>
+---
+ kernel/trace/blktrace.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Thanks,
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index d5d94510afd3..e1a9f8b7d710 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -490,10 +490,16 @@ static struct dentry *blk_create_buf_file_callback(const char *filename,
+ 					&relay_file_operations);
+ }
+ 
++static bool blk_bypass_lockdown(struct inode *inode)
++{
++	return true;
++}
++
+ static const struct rchan_callbacks blk_relay_callbacks = {
+ 	.subbuf_start		= blk_subbuf_start_callback,
+ 	.create_buf_file	= blk_create_buf_file_callback,
+ 	.remove_buf_file	= blk_remove_buf_file_callback,
++	.bypass_lockdown	= blk_bypass_lockdown,
+ };
+ 
+ static void blk_trace_setup_lba(struct blk_trace *bt,
+-- 
+2.24.3 (Apple Git-128)
 
-Josef
