@@ -2,82 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 477A4C7618E
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 22:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D559C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 22:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229833AbjDTWAW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 18:00:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35632 "EHLO
+        id S229599AbjDTWKX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 18:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbjDTWAV (ORCPT
+        with ESMTP id S231610AbjDTWKW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 18:00:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 944EE1FE9
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 15:00:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 394C9649F4
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 22:00:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37CE8C433EF;
-        Thu, 20 Apr 2023 22:00:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682028019;
-        bh=lpeuFqq+JJBC7Hijr6nx2Hv/xZ+LaNP4GGeIkHluD8c=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=dDWeIc/ABJAxGAvHQ5Ld20nqU9B/gvShn9i0sHZZKR867DH5qIouOwiexSngLmiJn
-         sHlh2NASFnIIpCgTv8Hbp1UqzbeaTdh7Awuxx9dxKOVxptbbavtgwy9ZXNFG8fkGvD
-         QkjLA4/M4IPmzbfaPUn4LzSaiMeriT+YglMAa6Q0bUZUAOPnm7NWPATajc7be3Ta9o
-         r1N63CaPzdm30795iDgKuwBQ9KcLiNUJRADjVImiVW7w0OGERCTsRV9HpT9yin2uaE
-         y6PUr2bwhsK8hD7VUTX2k4IijZ/OC4KxKK9yDStIY4SIbwZCCOVmKXF2kXcCFqQqOQ
-         IMptQ64tjySvw==
-Message-ID: <141aee35-4288-1670-6424-e6c41c8ef4c9@kernel.org>
-Date:   Fri, 21 Apr 2023 07:00:16 +0900
+        Thu, 20 Apr 2023 18:10:22 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46444AD
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 15:10:21 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2470f9acb51so220729a91.0
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 15:10:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682028619; x=1684620619;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yq8kvKP0mTJEmtb5lHkCR7d4m4oQ1PJeoKQIkottUnE=;
+        b=0L/jgWqlEpn2/W+Oqrfi2bayfxyzNQCMNTnOf0wXt+Oshq+coWJFAFQhbe0mpIgLr4
+         KgBRI1g80BDKfwzj2hekcoafYa6y3uZorskjP2ynS26n+IGHaTiNY2l5x9oa12HI80AZ
+         1oK/eLQ2HtNICBtFelvRLfzZDKw7ejnpgbNC7eKal0mSk9RlGujptFjVsHi3geHddZVQ
+         4wFkd94e8kCRSR2O8KX7tdPigYhRrzQ7xTRh0/ZVRqu9cQBNGbspLM5wtulN5Rcjinw/
+         wqEwjyh4+uJcJHMieC53UJ93UQirFyiUkq6KUJGkIxneaUwuKdv3aIx1gJhddNMdd9Hx
+         rgwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682028619; x=1684620619;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yq8kvKP0mTJEmtb5lHkCR7d4m4oQ1PJeoKQIkottUnE=;
+        b=c41pFF5himaDX6Zm3xTgBsOGKMWes8BoXi592keLi2zRjtBp5T+0/MtISaCHaF4g3x
+         lXSjdR0uOby3w2nfsByjvloR8hBhTOBSdRM3s6FE4ZStfOEOS8phMNw8XiF5cCDkXazy
+         2OvpT3c4gdh+ZS/RZyJ135qnP22s7hOzqm0Y2Pz+CrXRi/V97GDVZtTOGAeZSIRRlXEs
+         TCAi4bcYJme7NCUCGRJIVQJ/kr0E9KK35ZKWA5P/Olcu+SuvDznFnnKuCx6Vy1as4JAb
+         2DODK+UhEoK7sroz+25obKR/WLSms63FIhC24bkAn7nRWhvWep++moknDRHOQgDQRGrW
+         uQIA==
+X-Gm-Message-State: AAQBX9cMPsT+dKutpUQxGYOYALf0Ca6Q1XVsuAcMjzFHydQmbH38JkjI
+        aykMSa7tD0CUFN+8uSYK+BArgg==
+X-Google-Smtp-Source: AKy350ZhMBy5GKPZV59Ht+GzZkefxM2EyRmdhC3qSdMPg5RpTSYC/as5CqeeIR8Pc77vGTXyBXq6DQ==
+X-Received: by 2002:a17:90a:1d3:b0:245:eb4c:3df8 with SMTP id 19-20020a17090a01d300b00245eb4c3df8mr2843826pjd.2.1682028619241;
+        Thu, 20 Apr 2023 15:10:19 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 3-20020a17090a08c300b00247bdd05fe5sm1590001pjn.29.2023.04.20.15.10.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Apr 2023 15:10:18 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     josef@toxicpanda.com, Zhong Jinghua <zhongjinghua@huawei.com>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yukuai3@huawei.com, houtao1@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230206145805.2645671-1-zhongjinghua@huawei.com>
+References: <20230206145805.2645671-1-zhongjinghua@huawei.com>
+Subject: Re: [PATCH-next] nbd: fix incomplete validation of ioctl arg
+Message-Id: <168202861821.155232.3879480866523352390.b4-ty@kernel.dk>
+Date:   Thu, 20 Apr 2023 16:10:18 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v2 10/11] block: Add support for the zone capacity concept
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <nks@flawful.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matias Bjorling <mb@lightnvm.io>
-References: <20230418224002.1195163-1-bvanassche@acm.org>
- <20230418224002.1195163-11-bvanassche@acm.org> <ZEEEm/5+i7x2i8a5@x1-carbon>
- <f9d35d19-d0ba-fcb7-e44b-f0b8c55ba399@acm.org>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <f9d35d19-d0ba-fcb7-e44b-f0b8c55ba399@acm.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/21/23 02:12, Bart Van Assche wrote:
-> On 4/20/23 02:23, Niklas Cassel wrote:
->> With your change above, we would start rejecting such devices.
->>
->> Is this reduction of supported NVMe ZNS SSD devices really desired?
-> 
-> Hi Niklas,
-> 
-> This is not my intention. A possible solution is to modify the NVMe 
-> driver and SCSI core such that the "zone is full" information is stored 
-> in struct request when a command completes. That will remove the need 
-> for the mq-deadline scheduler to know the zone capacity.
 
-I am not following... Why would the scheduler need to know the zone capacity ?
-
-If the user does stupid things like accessing sectors between zone capacity and
-zone size or trying to write to a full zone, the commands will be failed by the
-drive and I do not see why the scheduler need to care about that.
-
+On Mon, 06 Feb 2023 22:58:05 +0800, Zhong Jinghua wrote:
+> We tested and found an alarm caused by nbd_ioctl arg without verification.
+> The UBSAN warning calltrace like below:
 > 
-> Bart.
+> UBSAN: Undefined behaviour in fs/buffer.c:1709:35
+> signed integer overflow:
+> -9223372036854775808 - 1 cannot be represented in type 'long long int'
+> CPU: 3 PID: 2523 Comm: syz-executor.0 Not tainted 4.19.90 #1
+> Hardware name: linux,dummy-virt (DT)
+> Call trace:
+>  dump_backtrace+0x0/0x3f0 arch/arm64/kernel/time.c:78
+>  show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0x170/0x1dc lib/dump_stack.c:118
+>  ubsan_epilogue+0x18/0xb4 lib/ubsan.c:161
+>  handle_overflow+0x188/0x1dc lib/ubsan.c:192
+>  __ubsan_handle_sub_overflow+0x34/0x44 lib/ubsan.c:206
+>  __block_write_full_page+0x94c/0xa20 fs/buffer.c:1709
+>  block_write_full_page+0x1f0/0x280 fs/buffer.c:2934
+>  blkdev_writepage+0x34/0x40 fs/block_dev.c:607
+>  __writepage+0x68/0xe8 mm/page-writeback.c:2305
+>  write_cache_pages+0x44c/0xc70 mm/page-writeback.c:2240
+>  generic_writepages+0xdc/0x148 mm/page-writeback.c:2329
+>  blkdev_writepages+0x2c/0x38 fs/block_dev.c:2114
+>  do_writepages+0xd4/0x250 mm/page-writeback.c:2344
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] nbd: fix incomplete validation of ioctl arg
+      commit: 55793ea54d77719a071b1ccc05a05056e3b5e009
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
