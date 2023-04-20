@@ -2,61 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC83C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 17:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFF7C77B7E
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 18:15:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231645AbjDTRmP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 13:42:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44148 "EHLO
+        id S231483AbjDTSPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 14:15:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231649AbjDTRmN (ORCPT
+        with ESMTP id S231307AbjDTSPr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 13:42:13 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C1110DC
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 10:42:10 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-94a342f7c4cso98736466b.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 10:42:10 -0700 (PDT)
+        Thu, 20 Apr 2023 14:15:47 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FD9D3A88
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 11:15:44 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-24986ade373so1129685a91.2
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 11:15:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1682012529; x=1684604529;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=chromium.org; s=google; t=1682014544; x=1684606544;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jOShlAmW5KtWyt18VPabl3AojpTzB/52zpa39oAofYI=;
-        b=YmddgtRtW8ICTes0+dab7w6Oem6Kx16VyROeBvQ/nYxGBP5/ZMHSlacbBwi0Ijvq0Z
-         HBwAMMZMA69v0M6/JecoGitZ1Z+oEhnr95tNJhaUhyTkNIF355Sm7sagw0sExkPzRaWQ
-         YaW0R2WKdh8uu6dv0MaNqSyH0IBqw4UGq2EDA=
+        bh=jdrDhaZEOy+UKGsi82P8bV8Exkli2SlfWKGwO5/v5to=;
+        b=C6iwSPnNEkACtdMWtmTCTc4J4utsn2bNXPhh/YIsthCiGtPItJj5nljqHj+E8kbk4c
+         CiZNtCni6d4pm5zyJsFVUAqfG5r04hyRZxlZliwhm/K3WmBYFudunroOc9P6zwp5l4a7
+         qY2X9w7GTSr24KWOxRAyRQFjH7TYyIQ7Gek5c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682012529; x=1684604529;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1682014544; x=1684606544;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jOShlAmW5KtWyt18VPabl3AojpTzB/52zpa39oAofYI=;
-        b=A0myPN1CRxN+VO/gbXvOmn/AbJ8lmLsqxqbESn75qnWmXiDttQWLjGYDqpeDYw2UQu
-         pyXH9ZX/5d/jjKCxHzIo/SW2TY6+VOeCAl4G/jEdHlB8Wd3L7HhOpMTMcWffQSQ89Ynj
-         0L1lKI2vvsfJEDh+wK7vpuX1BuTY3/0fEr22LX3k9OVUOXJ8BA7znJVyVoGJ99XQ4UoV
-         2hBDSyYvD38OXqR1nPbBv9yXss8ng54R6ANVB25GI5PUpTJoBvvDEGpaHQ3VfYiZj+mQ
-         nNABzSavfK6WoQhURE2luiD7COPKatdWAaKDguk+QtVRC4/RgLMRGWzfatQK+6CgwDid
-         K/Nw==
-X-Gm-Message-State: AAQBX9fbZEMVrNTQoJ1DS4/sh54fhmaVCJxyDW0cowgSkjzSP039aCVn
-        XgWYmz6tB0Zrlw5uaoBv6I/YTHlwc6lLDMPLpvzGjA==
-X-Google-Smtp-Source: AKy350auT20t6FOb+4AgjUmWFcoyThBQnArWZX8Nl6LqCPFqucTjIuxXlPmzUnAM2Xrg1Nu+DICIWX/ywGGGDp/EAL0=
-X-Received: by 2002:a05:6402:7d8:b0:502:2265:8428 with SMTP id
- u24-20020a05640207d800b0050222658428mr2195635edy.38.1682012529194; Thu, 20
- Apr 2023 10:42:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230414000219.92640-1-sarthakkukreti@chromium.org>
- <20230418221207.244685-1-sarthakkukreti@chromium.org> <20230418221207.244685-2-sarthakkukreti@chromium.org>
- <b74cc3d8-bfde-8375-3b19-24ea13eb1196@acm.org>
-In-Reply-To: <b74cc3d8-bfde-8375-3b19-24ea13eb1196@acm.org>
+        bh=jdrDhaZEOy+UKGsi82P8bV8Exkli2SlfWKGwO5/v5to=;
+        b=dwvjsXk3TdwklHQ/OC6JVsuzb5c0IZj1PRaLRHSvkf7AqJN3GT+KjWOSBb4FT9Mw9f
+         FN0l0x3R5jf6t/8vQI4A93in6hiM77zgJmv5oOjcXWNrFV4bK7/GovLI3IvIwqEYMYO5
+         +2o0T6FpsEitPv8iddCcv0olgwTzJNyYahDUiej+XQgJ7ef+SJfRcUPRAJzcozrm0U1G
+         WYYKluCvKd8tZMnd8CsQsex/AImtpg0fE8gwaDbUqWPfUovjzsALozkJ1iTvZ/r00664
+         Tj5Y2dnbOuSxQvvm8RNrOHkh5WgxVk95IGl7K1tAYY4Bs7S543ktqaRYJYuzRTYoiwz6
+         MJGA==
+X-Gm-Message-State: AAQBX9e4BbOcAP5ngJncmxKXngEKGv33iW9wJnJZURdJ2vMsnBWZKlRy
+        52FRjqyYkcL+SJDu6bDtlHujkg==
+X-Google-Smtp-Source: AKy350ZaDYxOz1KaCvteqlMJzUhYsjwN2ABUnz4TxRTY2yv//E9hm9d6g/BfyYrSik+PBwHYtByO3w==
+X-Received: by 2002:a17:90a:4f0b:b0:247:1e13:90ef with SMTP id p11-20020a17090a4f0b00b002471e1390efmr2574129pjh.20.1682014544026;
+        Thu, 20 Apr 2023 11:15:44 -0700 (PDT)
+Received: from sarthakkukreti-glaptop.hsd1.ca.comcast.net ([2601:647:4200:b5b0:236d:acb8:49ac:b60a])
+        by smtp.gmail.com with ESMTPSA id il7-20020a17090b164700b00247150f2091sm3373157pjb.8.2023.04.20.11.15.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Apr 2023 11:15:43 -0700 (PDT)
 From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Thu, 20 Apr 2023 10:41:57 -0700
-Message-ID: <CAG9=OMOfpJHB3HbjK46_bh_P6b4vdSfBt1Q39ukuKhZzyscnow@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] block: Introduce provisioning primitives
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-fsdevel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
@@ -64,35 +59,81 @@ Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         Mike Snitzer <snitzer@kernel.org>,
         Christoph Hellwig <hch@infradead.org>,
         Brian Foster <bfoster@redhat.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Bart Van Assche <bvanassche@google.com>,
         Daniil Lunev <dlunev@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "Darrick J. Wong" <djwong@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH v5-fix 1/5] block: Don't invalidate pagecache for invalid falloc modes
+Date:   Thu, 20 Apr 2023 11:15:40 -0700
+Message-ID: <20230420181540.337203-1-sarthakkukreti@chromium.org>
+X-Mailer: git-send-email 2.40.0.396.gfff15efe05-goog
+In-Reply-To: <ZEFmS9h81Wwlv9+/@redhat.com>
+References: <ZEFmS9h81Wwlv9+/@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dropped in v5.
+Only call truncate_bdev_range() if the fallocate mode is
+supported. This fixes a bug where data in the pagecache
+could be invalidated if the fallocate() was called on the
+block device with an invalid mode.
 
-Thanks!
-Sarthak
+Fixes: 25f4c41415e5 ("block: implement (some of) fallocate for block devices")
+Cc: stable@vger.kernel.org
+Reported-by: Darrick J. Wong <djwong@kernel.org>
+Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+---
+ block/fops.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
-On Tue, Apr 18, 2023 at 3:43=E2=80=AFPM Bart Van Assche <bvanassche@acm.org=
-> wrote:
->
-> On 4/18/23 15:12, Sarthak Kukreti wrote:
-> >       /* Fail if we don't recognize the flags. */
-> > -     if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
-> > +     if (mode !=3D 0 && mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
-> >               return -EOPNOTSUPP;
->
-> Is this change necessary? Doesn't (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
-> !=3D 0 imply that mode !=3D 0?
->
-> Thanks,
->
-> Bart.
->
+diff --git a/block/fops.c b/block/fops.c
+index d2e6be4e3d1c..4c70fdc546e7 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -648,24 +648,35 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 
+ 	filemap_invalidate_lock(inode->i_mapping);
+ 
+-	/* Invalidate the page cache, including dirty pages. */
+-	error = truncate_bdev_range(bdev, file->f_mode, start, end);
+-	if (error)
+-		goto fail;
+-
++	/*
++	 * Invalidate the page cache, including dirty pages, for valid
++	 * de-allocate mode calls to fallocate().
++	 */
+ 	switch (mode) {
+ 	case FALLOC_FL_ZERO_RANGE:
+ 	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
++		error = truncate_bdev_range(bdev, file->f_mode, start, end);
++		if (error)
++			goto fail;
++
+ 		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
+ 					     len >> SECTOR_SHIFT, GFP_KERNEL,
+ 					     BLKDEV_ZERO_NOUNMAP);
+ 		break;
+ 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE:
++		error = truncate_bdev_range(bdev, file->f_mode, start, end);
++		if (error)
++			goto fail;
++
+ 		error = blkdev_issue_zeroout(bdev, start >> SECTOR_SHIFT,
+ 					     len >> SECTOR_SHIFT, GFP_KERNEL,
+ 					     BLKDEV_ZERO_NOFALLBACK);
+ 		break;
+ 	case FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE | FALLOC_FL_NO_HIDE_STALE:
++		error = truncate_bdev_range(bdev, file->f_mode, start, end);
++		if (error)
++			goto fail;
++
+ 		error = blkdev_issue_discard(bdev, start >> SECTOR_SHIFT,
+ 					     len >> SECTOR_SHIFT, GFP_KERNEL);
+ 		break;
+-- 
+2.40.0.396.gfff15efe05-goog
+
