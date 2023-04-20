@@ -2,96 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFF4C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 01:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5191AC6FD18
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 01:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjDTBDW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 21:03:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57240 "EHLO
+        id S230059AbjDTBHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 21:07:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjDTBDV (ORCPT
+        with ESMTP id S229547AbjDTBHV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 21:03:21 -0400
+        Wed, 19 Apr 2023 21:07:21 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B19358C
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 18:03:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805583C32
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 18:07:19 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5288863AB4
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 01:03:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5BF2C433D2;
-        Thu, 20 Apr 2023 01:03:17 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 11BEF64437
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 01:07:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75461C433EF;
+        Thu, 20 Apr 2023 01:07:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681952598;
-        bh=zsdlI1haO7dDV4xh2XqBQh60zMdEAvml2KkfiHm2/K4=;
+        s=k20201202; t=1681952838;
+        bh=AVq7iju1XpZLO1Or9OwQ+14Td19UKDRs7H2YK73ePSg=;
         h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=f/v5QfVBm2bDQmi547SxLd27ZO7bJFV2Ys9FfklpzKTrUkkO/ZE8EqOHcKhgadw2Q
-         6MTD1/tiL3zayrnzF+KBG49lZ1Fs2HwKqidVGtRmpN/EPDZZtjOdaU+na2L3F1OG2Y
-         eAWDX8c/sT29POBVzUp6Q7AqY635STRH6knsvmQemNxhw1GWyTKw8hyD/SfZftHCkN
-         MDdl3W0dhHLk0l2wOYpr6m+6S7lzsFCKlHng7XF7vnkAe+QvfPIRnxJWgR0iTHAD0/
-         OBv2AlufRVh9FwU24g3iQnhFNxreRlKQvAKJ4vX+s1jIRkM5lzj3vhf0uuJX+WYqSi
-         DSpAylxLMKcig==
-Message-ID: <3995e9fd-d9b3-feaa-39a7-d3d518468604@kernel.org>
-Date:   Thu, 20 Apr 2023 10:03:16 +0900
+        b=MdCWF99Rgxtmt4srnuVEcFP2Tqyw2ckeQJzZ9RmG0d5plB1grpiYyJzQu7dWbVJIg
+         OGkLSXiBxLCebF4BV8j/kCpvxXfqpVvKd5j2VYXFzAUVBLKggJ0QMmminm/6Mm24E+
+         Z8SuDPDx6D8Fq7UYZwNN1tNY1oMPgW79sqbWk3jX5D/N666ElR5xqHyBdI6UKoeU7J
+         UYjsv19I5lEW+U1pUaGl4RSPru1rtUoVIj+PaqD9s8bNQvHLTMDdDeAyWLkGB+cDWL
+         0QHVV+wVIWaYBgx1NTSKeowCpeCTAlBrNP9ZyMq4hPYddqb/chJb3yJMhFhhUWojHd
+         VVV/tPi6xwdpw==
+Message-ID: <95b697c5-fb54-96d3-43a8-ee81c3c76607@kernel.org>
+Date:   Thu, 20 Apr 2023 10:07:16 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.9.1
-Subject: Re: [PATCH v2 03/11] block: Introduce blk_rq_is_seq_zoned_write()
+Subject: Re: [PATCH v2 09/11] block: mq-deadline: Handle requeued requests
+ correctly
 Content-Language: en-US
 To:     Bart Van Assche <bvanassche@acm.org>,
         Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Ming Lei <ming.lei@redhat.com>
 References: <20230418224002.1195163-1-bvanassche@acm.org>
- <20230418224002.1195163-4-bvanassche@acm.org> <20230419045000.GA25898@lst.de>
- <80cf216a-dc41-0673-6d55-adb32ff42e46@acm.org>
+ <20230418224002.1195163-10-bvanassche@acm.org>
+ <20230419050758.GD25898@lst.de>
+ <64b56eb3-bcf5-c48a-df96-bf1956f6992e@acm.org>
 From:   Damien Le Moal <dlemoal@kernel.org>
 Organization: Western Digital Research
-In-Reply-To: <80cf216a-dc41-0673-6d55-adb32ff42e46@acm.org>
+In-Reply-To: <64b56eb3-bcf5-c48a-df96-bf1956f6992e@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/20/23 06:12, Bart Van Assche wrote:
-> On 4/18/23 21:50, Christoph Hellwig wrote:
->> On Tue, Apr 18, 2023 at 03:39:54PM -0700, Bart Van Assche wrote:
->>> +/**
->>> + * blk_rq_is_seq_zoned_write() - Whether @rq is a zoned write for which the order matters.
+On 4/20/23 08:01, Bart Van Assche wrote:
+> On 4/18/23 22:07, Christoph Hellwig wrote:
+>>>   deadline_add_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
+>>>   {
+>>>   	struct rb_root *root = deadline_rb_root(per_prio, rq);
+>>> +	struct request **next_rq __maybe_unused;
+>>>   
+>>>   	elv_rb_add(root, rq);
+>>> +#ifdef CONFIG_BLK_DEV_ZONED
+>>> +	next_rq = &per_prio->next_rq[rq_data_dir(rq)];
+>>> +	if (*next_rq == NULL || !blk_queue_is_zoned(rq->q))
+>>> +		return;
+>>> +	/*
+>>> +	 * If a request got requeued or requests have been submitted out of
+>>> +	 * order, make sure that per zone the request with the lowest LBA is
+>>> +	 * submitted first.
+>>> +	 */
+>>> +	if (blk_rq_pos(rq) < blk_rq_pos(*next_rq) &&
+>>> +	    blk_rq_zone_no(rq) == blk_rq_zone_no(*next_rq))
+>>> +		*next_rq = rq;
+>>> +#endif
 >>
->> Maybe:
->>
->>   * blk_rq_is_seq_zoned_write() - check if @rq needs zoned write serialization
+>> Please key move this into a helper only called when blk_queue_is_zoned
+>> is true.
+> Hi Christoph,
 > 
-> That looks better to me :-)
+> I'm looking into an alternative, namely to remove the next_rq member 
+> from struct dd_per_prio and instead to do the following:
+> * Track the offset (blk_rq_pos()) of the most recently dispatched 
+> request ("latest_pos").
+> * Where the next_rq member is read, look up the request that comes after 
+> latest_pos in the RB-tree. This should require an effort that is similar 
+> to updating next_rq after having dispatched a request.
 > 
->>> +bool blk_rq_is_seq_zoned_write(struct request *rq)
->>> +{
->>> +	switch (req_op(rq)) {
->>> +	case REQ_OP_WRITE:
->>> +	case REQ_OP_WRITE_ZEROES:
->>> +		return blk_rq_zone_is_seq(rq);
->>> +	case REQ_OP_ZONE_APPEND:
->>> +	default:
->>
->> The REQ_OP_ZONE_APPEND case here is superflous.
-> 
-> Agreed, but I'd like to keep it since last time I posted this patch I 
-> was asked whether I had perhaps overlooked the REQ_OP_ZONE_APPEND case. 
-> I added "case REQ_OP_ZONE_APPEND:" to prevent such questions. Are you OK 
-> with keeping "case REQ_OP_ZONE_APPEND:" or do you perhaps prefer that I 
-> remove it?
-> 
+> With this approach the code quoted above and that is surrounded with 
+> #ifdef/#endif will disappear.
 
-Could also have a comment on top of the switch explicitly saying that only WRITE
-and WRITE ZEROES need to be checked, and that all other commands, including zone
-append writes, do not have strong reordering requirements. This way, no need to
-superfluous cases.
+This sounds much better, given that there are in practice lots of cases where
+next_rq is set null and we endup getting the next req from the fifo list head.
+At least last time I looked at this is what I saw (it was when I patched for the
+skip seq writes over 2 zones).
 
+> 
 > Bart.
-> 
 
