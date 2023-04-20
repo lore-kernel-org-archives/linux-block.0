@@ -2,178 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42276C77B72
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 09:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FE9C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 10:06:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234201AbjDTJZF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 05:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44428 "EHLO
+        id S234260AbjDTKGZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 06:06:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234410AbjDTJYr (ORCPT
+        with ESMTP id S234114AbjDTKF7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 05:24:47 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233D055AF
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 02:24:26 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4eed6ddcae1so1992365e87.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 02:24:26 -0700 (PDT)
+        Thu, 20 Apr 2023 06:05:59 -0400
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A087930E9;
+        Thu, 20 Apr 2023 03:05:51 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-3f086770a50so3647345e9.2;
+        Thu, 20 Apr 2023 03:05:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681982665; x=1684574665;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:dkim-signature:dkim-signature
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7cufFZMShQIGv7Tp6KtzJ3aFKk01AjlpruMksMwAdX8=;
-        b=eO6k38rQ3r87lKie72GTuQGtAoD6IMDbMsTDcGNi2LUpKW1EHM3O4uT5tIitBIb5OZ
-         pS9Nik3WazATx9u+KXyb7ZMMJbuO19xOZ8UZ0xMp1DKnqPR6cKcfUkjngbr2y/6WqAdO
-         405r8YYIVFjJYDh1mUyB3tunQRX4NipvOxv8BS8i6I2086Parvq+JwQin7x3pwjqCKhV
-         ISvxby90gBfz1fcPqUX4tCKTXzh4jcOhgKrJpdC4iElXIxs5UiQOK4iCt+MIrZJkNSGh
-         MLPPPbXA0M8mTOOJoOm2Ht2RXQ5CPZQOWNeWHhwhtj1JR+S6rr4anH9v7Gq/WB1IcLWG
-         7Ffg==
-X-Gm-Message-State: AAQBX9ehQtUcH1M3jB3b/2EbW++/D9hI/egJFxY+uclbv5jcOzSHEA3r
-        5lGvdhOP/VKamJxWQp1NSf9EW0oSxdUEtQ==
-X-Google-Smtp-Source: AKy350b+q9JavswOfioGNMjpO6qd6aiy58dQmqQl2F2wFMXH45hsrXg11womj/3bCLBXCh/nYYxg/Q==
-X-Received: by 2002:a05:6512:96b:b0:4ed:d629:8d34 with SMTP id v11-20020a056512096b00b004edd6298d34mr341149lft.5.1681982665063;
-        Thu, 20 Apr 2023 02:24:25 -0700 (PDT)
-Received: from flawful.org (c-fcf6e255.011-101-6d6c6d3.bbcust.telenor.se. [85.226.246.252])
-        by smtp.gmail.com with ESMTPSA id j21-20020ac24555000000b004dc4c5149dasm151363lfm.301.2023.04.20.02.24.24
-        for <linux-block@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1681985150; x=1684577150;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZcXCJ3SJOteyet1IXFZTQ3OoqtJ2euWeW1pB3mgV2W4=;
+        b=gOmaBNUINaELEEmzJIrkDSYT5XTofJXOk2uTeqC86Gb2i1Kz9V8PRNXcgB/VcQnMyT
+         XC1Kw2H033roxo1EzJQCb2qfY0mqdoZiVZ1jcHLFl6TtphDKP8eeadcx12xuCxZwWvSl
+         7CcSPMo8/+FGdAbTmxOgBf8Ru1tZwGTBIENFOhUMvIk+rGejbdpyb8VVNj0mCUsABdjU
+         YgPmf43+vOEKrSl0WhvzUlsyYD5zduVuDpuBQg7SyenOmaQf6kqqQFxJrshC66V15esj
+         f+m+K3+zXSIsX925ac3IXTOaM0O3EERfU17QsEot+fyW7x7arvmt6gsJxz35wETfF6IT
+         Wr/Q==
+X-Gm-Message-State: AAQBX9ebbKd7xiivYeCpy0ueDiF1e0K5R1VbNdML+6Yppup/KB8/8RZk
+        ltVg/L6IeDgdYPNoO8CsePxBnGVVpQaqIuk/
+X-Google-Smtp-Source: AKy350ZgMStjbiqJTTKXUPdei9S3WxVemsjZICWKQrqIJ34flrxB2Hb2jlcmCp+kqLQGz5LFUepZLA==
+X-Received: by 2002:a5d:5683:0:b0:2f7:8acb:b823 with SMTP id f3-20020a5d5683000000b002f78acbb823mr707539wrv.56.1681985149859;
+        Thu, 20 Apr 2023 03:05:49 -0700 (PDT)
+Received: from localhost.localdomain (aftr-62-216-205-208.dynamic.mnet-online.de. [62.216.205.208])
+        by smtp.googlemail.com with ESMTPSA id l11-20020a5d674b000000b0030276f42f08sm201410wrw.88.2023.04.20.03.05.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 02:24:24 -0700 (PDT)
-Received: by flawful.org (Postfix, from userid 112)
-        id 132A7425; Thu, 20 Apr 2023 11:24:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1681982664; bh=p3GEyJI5wMAJYPo02UWwZbly8zOIOBhynK6jW4ibyZM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Xxtx7igzUJFu6YCzZ93BeAYp+aKneqO51czfl9ChbdNuz7D+sOlVfQtEzxT52I5Q6
-         SmCAKSlFNz4DZrZlouYWHmh7L5FuK6rVByIITYYHHdUZGz11eCFSj0EAW0EpCaVsWC
-         hfoQD2XaLnEVA75iga6q29/PIOllT+SCZPJyeqXI=
-Received: from x1-carbon (OpenWrt.lan [192.168.1.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by flawful.org (Postfix) with ESMTPSA id 5E3E33B3;
-        Thu, 20 Apr 2023 11:23:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=flawful.org; s=mail;
-        t=1681982630; bh=p3GEyJI5wMAJYPo02UWwZbly8zOIOBhynK6jW4ibyZM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I4ic5HB2sR5AVxxUhPVuneKmOqdl9v08+TD6Mq7mAwDM8P4nS1f/7V4cs1JPT4erx
-         vi5wt5t85Ml5mfuM+FRiE0WJE5otqLrgRoCuQHr2Xf5Z8Rbnbh4c2G7g8jeUKnGz0S
-         di+Q3/uBmGd3L9FiPXI6VH0NCXqWAxL7hQcx8V2k=
-Date:   Thu, 20 Apr 2023 11:23:39 +0200
-From:   Niklas Cassel <nks@flawful.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matias Bjorling <mb@lightnvm.io>
-Subject: Re: [PATCH v2 10/11] block: Add support for the zone capacity concept
-Message-ID: <ZEEEm/5+i7x2i8a5@x1-carbon>
-References: <20230418224002.1195163-1-bvanassche@acm.org>
- <20230418224002.1195163-11-bvanassche@acm.org>
+        Thu, 20 Apr 2023 03:05:49 -0700 (PDT)
+From:   Johannes Thumshirn <jth@kernel.org>
+To:     axboe@kernel.dk
+Cc:     johannes.thumshirn@wdc.com, agruenba@redhat.com,
+        cluster-devel@redhat.com, damien.lemoal@wdc.com,
+        dm-devel@redhat.com, dsterba@suse.com, hare@suse.de, hch@lst.de,
+        jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
+        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-raid@vger.kernel.org, ming.lei@redhat.com,
+        rpeterso@redhat.com, shaggy@kernel.org, snitzer@kernel.org,
+        song@kernel.org, willy@infradead.org,
+        Johannes Thumshirn <jth@kernel.org>
+Subject: [PATCH v4 00/22] bio: check return values of bio_add_page
+Date:   Thu, 20 Apr 2023 12:04:39 +0200
+Message-Id: <20230420100501.32981-1-jth@kernel.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230418224002.1195163-11-bvanassche@acm.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 18, 2023 at 03:40:01PM -0700, Bart Van Assche wrote:
-> Make the zone capacity available in struct queue_limits for those
-> drivers that need it.
-> 
-> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  Documentation/ABI/stable/sysfs-block |  8 ++++++++
->  block/blk-settings.c                 |  1 +
->  block/blk-sysfs.c                    |  7 +++++++
->  block/blk-zoned.c                    | 15 +++++++++++++++
->  include/linux/blkdev.h               |  1 +
->  5 files changed, 32 insertions(+)
-> 
-> diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-> index c57e5b7cb532..4527d0514fdb 100644
-> --- a/Documentation/ABI/stable/sysfs-block
-> +++ b/Documentation/ABI/stable/sysfs-block
-> @@ -671,6 +671,14 @@ Description:
->  		regular block devices.
->  
->  
-> +What:		/sys/block/<disk>/queue/zone_capacity
-> +Date:		March 2023
-> +Contact:	linux-block@vger.kernel.org
-> +Description:
-> +		[RO] The number of 512-byte sectors in a zone that can be read
-> +		or written. This number is less than or equal to the zone size.
-> +
-> +
->  What:		/sys/block/<disk>/queue/zone_write_granularity
->  Date:		January 2021
->  Contact:	linux-block@vger.kernel.org
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 896b4654ab00..96f5dc63a815 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -685,6 +685,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  						   b->max_secure_erase_sectors);
->  	t->zone_write_granularity = max(t->zone_write_granularity,
->  					b->zone_write_granularity);
-> +	t->zone_capacity = max(t->zone_capacity, b->zone_capacity);
->  	t->zoned = max(t->zoned, b->zoned);
->  	return ret;
->  }
+We have two functions for adding a page to a bio, __bio_add_page() which is
+used to add a single page to a freshly created bio and bio_add_page() which is
+used to add a page to an existing bio.
 
-(snip)
+While __bio_add_page() is expected to succeed, bio_add_page() can fail.
 
-> @@ -496,12 +498,23 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
->  				disk->disk_name);
->  			return -ENODEV;
->  		}
-> +		if (zone->capacity != args->zone_capacity) {
-> +			pr_warn("%s: Invalid zoned device with non constant zone capacity\n",
-> +				disk->disk_name);
-> +			return -ENODEV;
+This series converts the callers of bio_add_page() which can easily use
+__bio_add_page() to using it and checks the return of bio_add_page() for
+callers that don't work on a freshly created bio.
 
-Hello Bart,
+Lastly it marks bio_add_page() as __must_check so we don't have to go again
+and audit all callers.
 
-The NVMe Zoned Namespace Command Set Specification:
-https://nvmexpress.org/wp-content/uploads/NVM-Express-Zoned-Namespace-Command-Set-Specification-1.1c-2022.10.03-Ratified.pdf
+NOTE: David already applied the two btrfs patches to his tree but I've left
+them in the series to make the build bot happy.
 
-specifies the Zone Capacity (ZCAP) field in each Zone Descriptor.
-The Descriptors are part of the Report Zones Data Structure.
+Changes to v3:
+- Added __bio_add_folio and use it in iomap (Willy)
+- Mark bio_add_folio must check (Willy)
+- s/GFS/GFS2/ (Andreas)
 
-This means that while the zone size is the same for all zones,
-the zone capacity can be different for each zone.
+Changes to v2:
+- Removed 'wont fail' comments pointed out by Song
 
-While the single NVMe ZNS SSD that I've encountered so far did
-coincidentally have the same zone capacity for all zones, this
-is not required by the specification.
+Changes to v1:
+- Removed pointless comment pointed out by Willy
+- Changed commit messages pointed out by Damien
+- Colledted Damien's Reviews and Acks
 
-The NVMe driver does reject a ZNS device that has support for
-Variable Zone Capacity (which is defined in the ZOC field):
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/nvme/host/zns.c?h=v6.3-rc7#n95
+Johannes Thumshirn (22):
+  swap: use __bio_add_page to add page to bio
+  drbd: use __bio_add_page to add page to bio
+  dm: dm-zoned: use __bio_add_page for adding single metadata page
+  fs: buffer: use __bio_add_page to add single page to bio
+  md: use __bio_add_page to add single page
+  md: raid5-log: use __bio_add_page to add single page
+  md: raid5: use __bio_add_page to add single page to new bio
+  btrfs: repair: use __bio_add_page for adding single page
+  btrfs: raid56: use __bio_add_page to add single page
+  jfs: logmgr: use __bio_add_page to add single page to bio
+  gfs2: use __bio_add_page for adding single page to bio
+  zonefs: use __bio_add_page for adding single page to bio
+  zram: use __bio_add_page for adding single page to bio
+  floppy: use __bio_add_page for adding single page to bio
+  md: check for failure when adding pages in alloc_behind_master_bio
+  md: raid1: use __bio_add_page for adding single page to bio
+  md: raid1: check if adding pages to resync bio fails
+  dm-crypt: check if adding pages to clone bio fails
+  block: mark bio_add_page as __must_check
+  block: add __bio_add_folio
+  fs: iomap: use __bio_add_folio where possible
+  block: mark bio_add_folio as __must_check
 
-Variable Zone Capacity simply means the the zone capacities
-cannot change without a NVM format.
-
-However, even when Variable Zone Capacity is not supported,
-a NVMe ZNS device can still have different zone capacities,
-and AFAICT, such devices are currently supported.
-
-With your change above, we would start rejecting such devices.
+ block/bio.c                      |  8 ++++++++
+ drivers/block/drbd/drbd_bitmap.c |  4 +---
+ drivers/block/floppy.c           |  2 +-
+ drivers/block/zram/zram_drv.c    |  2 +-
+ drivers/md/dm-crypt.c            |  9 ++++++++-
+ drivers/md/dm-zoned-metadata.c   |  6 +++---
+ drivers/md/md.c                  |  4 ++--
+ drivers/md/raid1-10.c            | 11 ++++++-----
+ drivers/md/raid1.c               |  7 +++++--
+ drivers/md/raid10.c              | 20 ++++++++++----------
+ drivers/md/raid5-cache.c         |  2 +-
+ drivers/md/raid5-ppl.c           |  4 ++--
+ fs/btrfs/bio.c                   |  2 +-
+ fs/btrfs/raid56.c                |  2 +-
+ fs/buffer.c                      |  2 +-
+ fs/gfs2/ops_fstype.c             |  2 +-
+ fs/iomap/buffered-io.c           |  6 +++---
+ fs/jfs/jfs_logmgr.c              |  4 ++--
+ fs/zonefs/super.c                |  2 +-
+ include/linux/bio.h              |  5 +++--
+ mm/page_io.c                     |  8 ++++----
+ 21 files changed, 65 insertions(+), 47 deletions(-)
 
 
-Is this reduction of supported NVMe ZNS SSD devices really desired?
+base-commit: af67688dca57999fd848f051eeea1d375ba546b2
+-- 
+2.39.2
 
-If it is, then I would at least expect to find a motivation of why we
-are reducing the scope of the currently supported NVMe ZNS devices
-to be found somewhere in the commit message.
-
-
-Kind regards,
-Niklas
