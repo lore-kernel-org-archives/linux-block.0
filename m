@@ -2,109 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D559C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 22:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBD7AC77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 22:23:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229599AbjDTWKX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 18:10:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42286 "EHLO
+        id S233045AbjDTWXC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 18:23:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231610AbjDTWKW (ORCPT
+        with ESMTP id S232698AbjDTWW5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 18:10:22 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46444AD
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 15:10:21 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2470f9acb51so220729a91.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 15:10:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682028619; x=1684620619;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yq8kvKP0mTJEmtb5lHkCR7d4m4oQ1PJeoKQIkottUnE=;
-        b=0L/jgWqlEpn2/W+Oqrfi2bayfxyzNQCMNTnOf0wXt+Oshq+coWJFAFQhbe0mpIgLr4
-         KgBRI1g80BDKfwzj2hekcoafYa6y3uZorskjP2ynS26n+IGHaTiNY2l5x9oa12HI80AZ
-         1oK/eLQ2HtNICBtFelvRLfzZDKw7ejnpgbNC7eKal0mSk9RlGujptFjVsHi3geHddZVQ
-         4wFkd94e8kCRSR2O8KX7tdPigYhRrzQ7xTRh0/ZVRqu9cQBNGbspLM5wtulN5Rcjinw/
-         wqEwjyh4+uJcJHMieC53UJ93UQirFyiUkq6KUJGkIxneaUwuKdv3aIx1gJhddNMdd9Hx
-         rgwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682028619; x=1684620619;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yq8kvKP0mTJEmtb5lHkCR7d4m4oQ1PJeoKQIkottUnE=;
-        b=c41pFF5himaDX6Zm3xTgBsOGKMWes8BoXi592keLi2zRjtBp5T+0/MtISaCHaF4g3x
-         lXSjdR0uOby3w2nfsByjvloR8hBhTOBSdRM3s6FE4ZStfOEOS8phMNw8XiF5cCDkXazy
-         2OvpT3c4gdh+ZS/RZyJ135qnP22s7hOzqm0Y2Pz+CrXRi/V97GDVZtTOGAeZSIRRlXEs
-         TCAi4bcYJme7NCUCGRJIVQJ/kr0E9KK35ZKWA5P/Olcu+SuvDznFnnKuCx6Vy1as4JAb
-         2DODK+UhEoK7sroz+25obKR/WLSms63FIhC24bkAn7nRWhvWep++moknDRHOQgDQRGrW
-         uQIA==
-X-Gm-Message-State: AAQBX9cMPsT+dKutpUQxGYOYALf0Ca6Q1XVsuAcMjzFHydQmbH38JkjI
-        aykMSa7tD0CUFN+8uSYK+BArgg==
-X-Google-Smtp-Source: AKy350ZhMBy5GKPZV59Ht+GzZkefxM2EyRmdhC3qSdMPg5RpTSYC/as5CqeeIR8Pc77vGTXyBXq6DQ==
-X-Received: by 2002:a17:90a:1d3:b0:245:eb4c:3df8 with SMTP id 19-20020a17090a01d300b00245eb4c3df8mr2843826pjd.2.1682028619241;
-        Thu, 20 Apr 2023 15:10:19 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 3-20020a17090a08c300b00247bdd05fe5sm1590001pjn.29.2023.04.20.15.10.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 15:10:18 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     josef@toxicpanda.com, Zhong Jinghua <zhongjinghua@huawei.com>
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yukuai3@huawei.com, houtao1@huawei.com, yangerkun@huawei.com
-In-Reply-To: <20230206145805.2645671-1-zhongjinghua@huawei.com>
-References: <20230206145805.2645671-1-zhongjinghua@huawei.com>
-Subject: Re: [PATCH-next] nbd: fix incomplete validation of ioctl arg
-Message-Id: <168202861821.155232.3879480866523352390.b4-ty@kernel.dk>
-Date:   Thu, 20 Apr 2023 16:10:18 -0600
+        Thu, 20 Apr 2023 18:22:57 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C5B4487;
+        Thu, 20 Apr 2023 15:22:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Xah23523mqBQohWHxtgP96LS5q9in7j2/iSJEIHA+i4=; b=uWQX2u7nCtxAfooM1lBJbswwMe
+        yrDts7jLwaUKxWtJ6KySS/gMr1q+DoMl298/FpmeMZG4cigTuZO5FA1JMQPe+7f9w5YdnDzljFdKo
+        I1cKGoP5tNWRThp4wROEmTC8eeAtTatxsv+0x1ngADsoWMGo1705n8DrCZyQHFPTqFHajq1tOnI2C
+        V8NHsW3Y7sjRuWVVDwsBrbp9Znx/xhLS84lHDoQDBcBldrLC9zC6Yyl164qI2zY/ilIRGIxUtd0CV
+        nDYwXxea1x8FUCxsE6AxpwklMdoi9mi0J5KaxB5chppMC8CZDsViwzaQU+dPLjV8JTL7QREI+VJoo
+        wppN3E/Q==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1ppcff-00Ayid-0P;
+        Thu, 20 Apr 2023 22:22:31 +0000
+Date:   Thu, 20 Apr 2023 23:22:31 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v18 09/15] iov_iter: Kill ITER_PIPE
+Message-ID: <20230420222231.GT3390869@ZenIV>
+References: <20230314220757.3827941-1-dhowells@redhat.com>
+ <20230314220757.3827941-10-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230314220757.3827941-10-dhowells@redhat.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Mar 14, 2023 at 10:07:51PM +0000, David Howells wrote:
+> The ITER_PIPE-type iterator was only used for generic_file_splice_read(),
+> but that has now been switched to either pull pages directly from the
+> pagecache for buffered file splice-reads or to use ITER_BVEC instead for
+> O_DIRECT file splice-reads.  This leaves ITER_PIPE unused - so remove it.
 
-On Mon, 06 Feb 2023 22:58:05 +0800, Zhong Jinghua wrote:
-> We tested and found an alarm caused by nbd_ioctl arg without verification.
-> The UBSAN warning calltrace like below:
-> 
-> UBSAN: Undefined behaviour in fs/buffer.c:1709:35
-> signed integer overflow:
-> -9223372036854775808 - 1 cannot be represented in type 'long long int'
-> CPU: 3 PID: 2523 Comm: syz-executor.0 Not tainted 4.19.90 #1
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace+0x0/0x3f0 arch/arm64/kernel/time.c:78
->  show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
->  __dump_stack lib/dump_stack.c:77 [inline]
->  dump_stack+0x170/0x1dc lib/dump_stack.c:118
->  ubsan_epilogue+0x18/0xb4 lib/ubsan.c:161
->  handle_overflow+0x188/0x1dc lib/ubsan.c:192
->  __ubsan_handle_sub_overflow+0x34/0x44 lib/ubsan.c:206
->  __block_write_full_page+0x94c/0xa20 fs/buffer.c:1709
->  block_write_full_page+0x1f0/0x280 fs/buffer.c:2934
->  blkdev_writepage+0x34/0x40 fs/block_dev.c:607
->  __writepage+0x68/0xe8 mm/page-writeback.c:2305
->  write_cache_pages+0x44c/0xc70 mm/page-writeback.c:2240
->  generic_writepages+0xdc/0x148 mm/page-writeback.c:2329
->  blkdev_writepages+0x2c/0x38 fs/block_dev.c:2114
->  do_writepages+0xd4/0x250 mm/page-writeback.c:2344
-> 
-> [...]
+Wonderful, except that now you've got duplicates of ->read_iter() for
+everyone who wants zero-copy on ->splice_read() ;-/
 
-Applied, thanks!
+I understand the attraction of arbitrary seeks on those suckers; ITER_PIPE
+is a massive headache in that respect.  But I really don't like what your
+approach trades it for.
 
-[1/1] nbd: fix incomplete validation of ioctl arg
-      commit: 55793ea54d77719a071b1ccc05a05056e3b5e009
+And you are nowhere near done - consider e.g. NFS.  Mainline has it
+feed ITER_PIPE to nfs_file_read(), which does call generic_file_read_iter() -
+after
+        result = nfs_revalidate_mapping(inode, iocb->ki_filp->f_mapping);
 
-Best regards,
--- 
-Jens Axboe
+Sure, you can add nfs_file_splice_read() that would do what nfs_file_read()
+does, calling filemap_spice_read() instead of generic_file_read_iter().
 
-
-
+Repeat the same for ocfs2 (locking of its own).  And orangefs.  And
+XFS (locking, again).  And your own AFS, while we are at it.  Et sodding
+cetera - *everything* that uses generic_file_splice_read() with
+->read_iter other than generic_file_read_iter() needs review and,
+quite likely, a ->splice_read() instance of its own.
