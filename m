@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6EAC77B7C
-	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 00:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AA9C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 20 Apr 2023 00:49:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232558AbjDTAtU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Apr 2023 20:49:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48656 "EHLO
+        id S229469AbjDTAt1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Apr 2023 20:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232577AbjDTAtC (ORCPT
+        with ESMTP id S232628AbjDTAtM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Apr 2023 20:49:02 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5B54EF6
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 17:48:59 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1a6670671e3so5603485ad.0
-        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 17:48:59 -0700 (PDT)
+        Wed, 19 Apr 2023 20:49:12 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C275FFA
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 17:49:04 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-51efefe7814so388338a12.3
+        for <linux-block@vger.kernel.org>; Wed, 19 Apr 2023 17:49:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1681951739; x=1684543739;
+        d=chromium.org; s=google; t=1681951743; x=1684543743;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ge5ae5s/zTUTW+xFevsGXCZgK4RSj4PVy8hKUSBMXvk=;
-        b=UzDM2iyCH2CKC3wFPV0YG581woZ6SIZbhdfTRI0EoojcriW0jD+F8+vr1t1zXHPiWg
-         U8GlwnfpoTHg9NaR02soE7YFxOCKceR88sDHohf6YrPdlZKNhnQL0U5lYlI35sNlujXo
-         QvMV9j1uWUileMKQ2YVBWgpgiUR9ZNd3RKg1E=
+        bh=TaRkZLFdq6iB8YT++07ypsMh1Ei2+nMtmkI0wjjAr+E=;
+        b=DHUsnLMP1v5oaeRmmnbbE/U5NIHkwVR0EwfOtvZnueT49CaqN63WVYqu5wmp79o157
+         Y0zhKRO/cyJPB+h5YWITKVZ+HRmjeUNqrqufqdRhcgy1FKy3nxQvrphJaXWi/Cp9z76K
+         S51qv8kZYwCk+6X3jVxJ13oE5RwoREq36V8bk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681951739; x=1684543739;
+        d=1e100.net; s=20221208; t=1681951743; x=1684543743;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ge5ae5s/zTUTW+xFevsGXCZgK4RSj4PVy8hKUSBMXvk=;
-        b=iYeT5gNyjjwL/KUBZ3dW/H3UFsd0NS3GrRboLtWpLxnD+648YZUBq1+ck0H7wfvXbP
-         VoxepJ14IPMEgv0ryiSncfmo3/XlYUdNpKGqUm97JuZstRrjuBSYeMpu6SABmNCqY9RL
-         iQYzQShb4SFQqNWsxjqj82Jp3B0yp9UJBRo0B0o25eRYtgyEWAffxvRtpaW0+USBCG3M
-         heHmqs1Fj/4hNSOOewptjxOWTqcCoOT2bIgpOtUmxyGsE6oX1gKHCdqEgSsEe0hspCUe
-         Oxo/Y09hgwa11cGfaY0f8WRuZiNNf32hZUkjVQlbS17QUfnNHnda7gUPDSuPhyQhmcnU
-         bDeg==
-X-Gm-Message-State: AAQBX9fgQ8mtD8yPvBjcF7nie7yt1MJ2TkUL6E71wCCuzZ+x28bcvwVW
-        z1lY5e3nT4gvKka+sa0dOMs/We+ExFKxbSjFnLE=
-X-Google-Smtp-Source: AKy350YsalSiiDa6/ioe6KuTBiAb4Q6GnbfFX32GTviM8SeqtoQmN3fRUIe6kYLYTzuEAHw7Yl/C1g==
-X-Received: by 2002:a17:902:eb8d:b0:19c:f476:4793 with SMTP id q13-20020a170902eb8d00b0019cf4764793mr6312520plg.51.1681951739281;
-        Wed, 19 Apr 2023 17:48:59 -0700 (PDT)
+        bh=TaRkZLFdq6iB8YT++07ypsMh1Ei2+nMtmkI0wjjAr+E=;
+        b=jhjt0i1z/uSciVuuH8CoA6nUkOud3gYlotWh14QjvMbTgkhhpkvXSp1WR3ka1fs97+
+         I5O65Z4O4pmaAwWuZDmi/7voMqxZu7rVyszOiEpmpQycxJksnEAZ/8ewj1oNgzyMXAjk
+         9NSh3TNiUBf4wvmVzA1t5WAao1mbb1ix29jXR7hFqrVlMUNc3n+SuhjeqXluJg4/1EqQ
+         i/fpvfIieaMZBN8Ox8VKUw142X5YMmgVUQLbJ82d3FLPVPy9OjA2JjRJZMZl/OoZZzin
+         tSBbZz1BPFqBLTu4NdVfZ8DUa9JrrcOjkdX3IxZxcaarenBHLTrK3tq9VMrgmAfTaDtl
+         vYvw==
+X-Gm-Message-State: AAQBX9cTg0UW4sxpyXDgjn4qq3o7PamwFwOI6skVdxwL7WpAwksxQZT0
+        fLMSW1Ka4AWWiPVS9a9Oj9DRDw==
+X-Google-Smtp-Source: AKy350ZTS0kWGW+doA+M2fMNYTglwoDWa1lLyikxdZz12Cp/X0+QqkuEAwvn5bRsdiFf0rVsYOAFlw==
+X-Received: by 2002:a17:903:2905:b0:19a:b869:f2f8 with SMTP id lh5-20020a170903290500b0019ab869f2f8mr6266808plb.21.1681951743472;
+        Wed, 19 Apr 2023 17:49:03 -0700 (PDT)
 Received: from sarthakkukreti-glaptop.corp.google.com ([2620:15c:9d:200:5113:a333:10ce:e2d])
-        by smtp.gmail.com with ESMTPSA id io18-20020a17090312d200b001a65575c13asm74323plb.48.2023.04.19.17.48.57
+        by smtp.gmail.com with ESMTPSA id io18-20020a17090312d200b001a65575c13asm74323plb.48.2023.04.19.17.49.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Apr 2023 17:48:58 -0700 (PDT)
+        Wed, 19 Apr 2023 17:49:03 -0700 (PDT)
 From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
 To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -64,9 +64,9 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         Bart Van Assche <bvanassche@google.com>,
         Daniil Lunev <dlunev@google.com>,
         "Darrick J. Wong" <djwong@kernel.org>
-Subject: [PATCH v5 2/5] block: Introduce provisioning primitives
-Date:   Wed, 19 Apr 2023 17:48:47 -0700
-Message-ID: <20230420004850.297045-3-sarthakkukreti@chromium.org>
+Subject: [PATCH v5 4/5] dm-thin: Add REQ_OP_PROVISION support
+Date:   Wed, 19 Apr 2023 17:48:49 -0700
+Message-ID: <20230420004850.297045-5-sarthakkukreti@chromium.org>
 X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
 In-Reply-To: <20230420004850.297045-1-sarthakkukreti@chromium.org>
 References: <20230414000219.92640-1-sarthakkukreti@chromium.org>
@@ -77,369 +77,195 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce block request REQ_OP_PROVISION. The intent of this request
-is to request underlying storage to preallocate disk space for the given
-block range. Block devices that support this capability will export
-a provision limit within their request queues.
+dm-thinpool uses the provision request to provision
+blocks for a dm-thin device. dm-thinpool currently does not
+pass through REQ_OP_PROVISION to underlying devices.
 
-This patch also adds the capability to call fallocate() in mode 0
-on block devices, which will send REQ_OP_PROVISION to the block
-device for the specified range,
+For shared blocks, provision requests will break sharing and copy the
+contents of the entire block. Additionally, if 'skip_block_zeroing'
+is not set, dm-thin will opt to zero out the entire range as a part
+of provisioning.
 
 Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
 ---
- block/blk-core.c          |  5 ++++
- block/blk-lib.c           | 53 +++++++++++++++++++++++++++++++++++++++
- block/blk-merge.c         | 18 +++++++++++++
- block/blk-settings.c      | 19 ++++++++++++++
- block/blk-sysfs.c         |  9 +++++++
- block/bounce.c            |  1 +
- block/fops.c              | 10 +++++++-
- include/linux/bio.h       |  6 +++--
- include/linux/blk_types.h |  5 +++-
- include/linux/blkdev.h    | 16 ++++++++++++
- 10 files changed, 138 insertions(+), 4 deletions(-)
+ drivers/md/dm-thin.c | 73 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 68 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 42926e6cb83c..4a2342ba3a8b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -123,6 +123,7 @@ static const char *const blk_op_name[] = {
- 	REQ_OP_NAME(WRITE_ZEROES),
- 	REQ_OP_NAME(DRV_IN),
- 	REQ_OP_NAME(DRV_OUT),
-+	REQ_OP_NAME(PROVISION)
- };
- #undef REQ_OP_NAME
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index 2b13c949bd72..58d633f5c928 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -274,6 +274,7 @@ struct pool {
  
-@@ -798,6 +799,10 @@ void submit_bio_noacct(struct bio *bio)
- 		if (!q->limits.max_write_zeroes_sectors)
- 			goto not_supported;
- 		break;
-+	case REQ_OP_PROVISION:
-+		if (!q->limits.max_provision_sectors)
-+			goto not_supported;
-+		break;
- 	default:
- 		break;
+ 	process_bio_fn process_bio;
+ 	process_bio_fn process_discard;
++	process_bio_fn process_provision;
+ 
+ 	process_cell_fn process_cell;
+ 	process_cell_fn process_discard_cell;
+@@ -913,7 +914,8 @@ static void __inc_remap_and_issue_cell(void *context,
+ 	struct bio *bio;
+ 
+ 	while ((bio = bio_list_pop(&cell->bios))) {
+-		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD)
++		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
++		    bio_op(bio) == REQ_OP_PROVISION)
+ 			bio_list_add(&info->defer_bios, bio);
+ 		else {
+ 			inc_all_io_entry(info->tc->pool, bio);
+@@ -1245,8 +1247,8 @@ static int io_overlaps_block(struct pool *pool, struct bio *bio)
+ 
+ static int io_overwrites_block(struct pool *pool, struct bio *bio)
+ {
+-	return (bio_data_dir(bio) == WRITE) &&
+-		io_overlaps_block(pool, bio);
++	return (bio_data_dir(bio) == WRITE) && io_overlaps_block(pool, bio) &&
++	       bio_op(bio) != REQ_OP_PROVISION;
+ }
+ 
+ static void save_and_set_endio(struct bio *bio, bio_end_io_t **save,
+@@ -1891,7 +1893,8 @@ static void process_shared_bio(struct thin_c *tc, struct bio *bio,
+ 
+ 	if (bio_data_dir(bio) == WRITE && bio->bi_iter.bi_size) {
+ 		break_sharing(tc, bio, block, &key, lookup_result, data_cell);
+-		cell_defer_no_holder(tc, virt_cell);
++		if (bio_op(bio) != REQ_OP_PROVISION)
++			cell_defer_no_holder(tc, virt_cell);
+ 	} else {
+ 		struct dm_thin_endio_hook *h = dm_per_bio_data(bio, sizeof(struct dm_thin_endio_hook));
+ 
+@@ -1953,6 +1956,51 @@ static void provision_block(struct thin_c *tc, struct bio *bio, dm_block_t block
  	}
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index e59c3069e835..647b6451660b 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -343,3 +343,56 @@ int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
- 	return ret;
  }
- EXPORT_SYMBOL(blkdev_issue_secure_erase);
-+
-+/**
-+ * blkdev_issue_provision - provision a block range
-+ * @bdev:	blockdev to write
-+ * @sector:	start sector
-+ * @nr_sects:	number of sectors to provision
-+ * @gfp_mask:	memory allocation flags (for bio_alloc)
-+ *
-+ * Description:
-+ *  Issues a provision request to the block device for the range of sectors.
-+ *  For thinly provisioned block devices, this acts as a signal for the
-+ *  underlying storage pool to allocate space for this block range.
-+ */
-+int blkdev_issue_provision(struct block_device *bdev, sector_t sector,
-+		sector_t nr_sects, gfp_t gfp)
+ 
++static void process_provision_bio(struct thin_c *tc, struct bio *bio)
 +{
-+	sector_t bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
-+	unsigned int max_sectors = bdev_max_provision_sectors(bdev);
-+	struct bio *bio = NULL;
-+	struct blk_plug plug;
-+	int ret = 0;
++	int r;
++	struct pool *pool = tc->pool;
++	dm_block_t block = get_bio_block(tc, bio);
++	struct dm_bio_prison_cell *cell;
++	struct dm_cell_key key;
++	struct dm_thin_lookup_result lookup_result;
 +
-+	if (max_sectors == 0)
-+		return -EOPNOTSUPP;
-+	if ((sector | nr_sects) & bs_mask)
-+		return -EINVAL;
-+	if (bdev_read_only(bdev))
-+		return -EPERM;
++	/*
++	 * If cell is already occupied, then the block is already
++	 * being provisioned so we have nothing further to do here.
++	 */
++	build_virtual_key(tc->td, block, &key);
++	if (bio_detain(pool, &key, bio, &cell))
++		return;
 +
-+	blk_start_plug(&plug);
-+	for (;;) {
-+		unsigned int req_sects = min_t(sector_t, nr_sects, max_sectors);
-+
-+		bio = blk_next_bio(bio, bdev, 0, REQ_OP_PROVISION, gfp);
-+		bio->bi_iter.bi_sector = sector;
-+		bio->bi_iter.bi_size = req_sects << SECTOR_SHIFT;
-+
-+		sector += req_sects;
-+		nr_sects -= req_sects;
-+		if (!nr_sects) {
-+			ret = submit_bio_wait(bio);
-+			if (ret == -EOPNOTSUPP)
-+				ret = 0;
-+			bio_put(bio);
-+			break;
-+		}
-+		cond_resched();
++	if (tc->requeue_mode) {
++		cell_requeue(pool, cell);
++		return;
 +	}
-+	blk_finish_plug(&plug);
 +
-+	return ret;
-+}
-+EXPORT_SYMBOL(blkdev_issue_provision);
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 6460abdb2426..a3ffebb97a1d 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -158,6 +158,21 @@ static struct bio *bio_split_write_zeroes(struct bio *bio,
- 	return bio_split(bio, lim->max_write_zeroes_sectors, GFP_NOIO, bs);
- }
- 
-+static struct bio *bio_split_provision(struct bio *bio,
-+					const struct queue_limits *lim,
-+					unsigned int *nsegs, struct bio_set *bs)
-+{
-+	*nsegs = 0;
-+
-+	if (!lim->max_provision_sectors)
-+		return NULL;
-+
-+	if (bio_sectors(bio) <= lim->max_provision_sectors)
-+		return NULL;
-+
-+	return bio_split(bio, lim->max_provision_sectors, GFP_NOIO, bs);
-+}
-+
- /*
-  * Return the maximum number of sectors from the start of a bio that may be
-  * submitted as a single request to a block device. If enough sectors remain,
-@@ -366,6 +381,9 @@ struct bio *__bio_split_to_limits(struct bio *bio,
- 	case REQ_OP_WRITE_ZEROES:
- 		split = bio_split_write_zeroes(bio, lim, nr_segs, bs);
- 		break;
-+	case REQ_OP_PROVISION:
-+		split = bio_split_provision(bio, lim, nr_segs, bs);
-+		break;
- 	default:
- 		split = bio_split_rw(bio, lim, nr_segs, bs,
- 				get_max_io_size(bio, lim) << SECTOR_SHIFT);
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 896b4654ab00..d303e6614c36 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -59,6 +59,7 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->zoned = BLK_ZONED_NONE;
- 	lim->zone_write_granularity = 0;
- 	lim->dma_alignment = 511;
-+	lim->max_provision_sectors = 0;
- }
- 
- /**
-@@ -82,6 +83,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
- 	lim->max_dev_sectors = UINT_MAX;
- 	lim->max_write_zeroes_sectors = UINT_MAX;
- 	lim->max_zone_append_sectors = UINT_MAX;
-+	lim->max_provision_sectors = UINT_MAX;
- }
- EXPORT_SYMBOL(blk_set_stacking_limits);
- 
-@@ -208,6 +210,20 @@ void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
- }
- EXPORT_SYMBOL(blk_queue_max_write_zeroes_sectors);
- 
-+/**
-+ * blk_queue_max_provision_sectors - set max sectors for a single provision
-+ *
-+ * @q:  the request queue for the device
-+ * @max_provision_sectors: maximum number of sectors to provision per command
-+ **/
-+
-+void blk_queue_max_provision_sectors(struct request_queue *q,
-+		unsigned int max_provision_sectors)
-+{
-+	q->limits.max_provision_sectors = max_provision_sectors;
-+}
-+EXPORT_SYMBOL(blk_queue_max_provision_sectors);
-+
- /**
-  * blk_queue_max_zone_append_sectors - set max sectors for a single zone append
-  * @q:  the request queue for the device
-@@ -578,6 +594,9 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 	t->max_segment_size = min_not_zero(t->max_segment_size,
- 					   b->max_segment_size);
- 
-+	t->max_provision_sectors = min_not_zero(t->max_provision_sectors,
-+						b->max_provision_sectors);
-+
- 	t->misaligned |= b->misaligned;
- 
- 	alignment = queue_limit_alignment_offset(b, start);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index f1fce1c7fa44..0a3165211c66 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -213,6 +213,13 @@ static ssize_t queue_discard_zeroes_data_show(struct request_queue *q, char *pag
- 	return queue_var_show(0, page);
- }
- 
-+static ssize_t queue_provision_max_show(struct request_queue *q,
-+		char *page)
-+{
-+	return sprintf(page, "%llu\n",
-+		(unsigned long long)q->limits.max_provision_sectors << 9);
-+}
-+
- static ssize_t queue_write_same_max_show(struct request_queue *q, char *page)
- {
- 	return queue_var_show(0, page);
-@@ -604,6 +611,7 @@ QUEUE_RO_ENTRY(queue_discard_max_hw, "discard_max_hw_bytes");
- QUEUE_RW_ENTRY(queue_discard_max, "discard_max_bytes");
- QUEUE_RO_ENTRY(queue_discard_zeroes_data, "discard_zeroes_data");
- 
-+QUEUE_RO_ENTRY(queue_provision_max, "provision_max_bytes");
- QUEUE_RO_ENTRY(queue_write_same_max, "write_same_max_bytes");
- QUEUE_RO_ENTRY(queue_write_zeroes_max, "write_zeroes_max_bytes");
- QUEUE_RO_ENTRY(queue_zone_append_max, "zone_append_max_bytes");
-@@ -661,6 +669,7 @@ static struct attribute *queue_attrs[] = {
- 	&queue_discard_max_entry.attr,
- 	&queue_discard_max_hw_entry.attr,
- 	&queue_discard_zeroes_data_entry.attr,
-+	&queue_provision_max_entry.attr,
- 	&queue_write_same_max_entry.attr,
- 	&queue_write_zeroes_max_entry.attr,
- 	&queue_zone_append_max_entry.attr,
-diff --git a/block/bounce.c b/block/bounce.c
-index 7cfcb242f9a1..ab9d8723ae64 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -176,6 +176,7 @@ static struct bio *bounce_clone_bio(struct bio *bio_src)
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
- 	case REQ_OP_WRITE_ZEROES:
-+	case REQ_OP_PROVISION:
- 		break;
- 	default:
- 		bio_for_each_segment(bv, bio_src, iter)
-diff --git a/block/fops.c b/block/fops.c
-index 2fd7e8b9ab48..16420c5fe4a2 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -613,7 +613,8 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 
- #define	BLKDEV_FALLOC_FL_SUPPORTED					\
- 		(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |		\
--		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE)
-+		 FALLOC_FL_ZERO_RANGE | FALLOC_FL_NO_HIDE_STALE |	\
-+		 FALLOC_FL_UNSHARE_RANGE)
- 
- static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 			     loff_t len)
-@@ -653,6 +654,13 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 	 * de-allocate mode calls to fallocate().
- 	 */
- 	switch (mode) {
++	r = dm_thin_find_block(tc->td, block, 1, &lookup_result);
++	switch (r) {
 +	case 0:
-+	case FALLOC_FL_UNSHARE_RANGE:
-+	case FALLOC_FL_KEEP_SIZE:
-+	case FALLOC_FL_UNSHARE_RANGE | FALLOC_FL_KEEP_SIZE:
-+		error = blkdev_issue_provision(bdev, start >> SECTOR_SHIFT,
-+					       len >> SECTOR_SHIFT, GFP_KERNEL);
++		if (lookup_result.shared) {
++			process_shared_bio(tc, bio, block, &lookup_result, cell);
++		} else {
++			bio_endio(bio);
++			cell_defer_no_holder(tc, cell);
++		}
 +		break;
- 	case FALLOC_FL_ZERO_RANGE:
- 	case FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE:
- 		error = truncate_bdev_range(bdev, file->f_mode, start, end) ||
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d766be7152e1..9820b3b039f2 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -57,7 +57,8 @@ static inline bool bio_has_data(struct bio *bio)
- 	    bio->bi_iter.bi_size &&
- 	    bio_op(bio) != REQ_OP_DISCARD &&
- 	    bio_op(bio) != REQ_OP_SECURE_ERASE &&
--	    bio_op(bio) != REQ_OP_WRITE_ZEROES)
-+	    bio_op(bio) != REQ_OP_WRITE_ZEROES &&
-+	    bio_op(bio) != REQ_OP_PROVISION)
- 		return true;
- 
- 	return false;
-@@ -67,7 +68,8 @@ static inline bool bio_no_advance_iter(const struct bio *bio)
- {
- 	return bio_op(bio) == REQ_OP_DISCARD ||
- 	       bio_op(bio) == REQ_OP_SECURE_ERASE ||
--	       bio_op(bio) == REQ_OP_WRITE_ZEROES;
-+	       bio_op(bio) == REQ_OP_WRITE_ZEROES ||
-+	       bio_op(bio) == REQ_OP_PROVISION;
- }
- 
- static inline void *bio_data(struct bio *bio)
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 99be590f952f..27bdf88f541c 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -385,7 +385,10 @@ enum req_op {
- 	REQ_OP_DRV_IN		= (__force blk_opf_t)34,
- 	REQ_OP_DRV_OUT		= (__force blk_opf_t)35,
- 
--	REQ_OP_LAST		= (__force blk_opf_t)36,
-+	/* request device to provision block */
-+	REQ_OP_PROVISION        = (__force blk_opf_t)37,
++	case -ENODATA:
++		provision_block(tc, bio, block, cell);
++		break;
 +
-+	REQ_OP_LAST		= (__force blk_opf_t)38,
- };
- 
- enum req_flag_bits {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 941304f17492..239e2f418b6e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -303,6 +303,7 @@ struct queue_limits {
- 	unsigned int		discard_granularity;
- 	unsigned int		discard_alignment;
- 	unsigned int		zone_write_granularity;
-+	unsigned int		max_provision_sectors;
- 
- 	unsigned short		max_segments;
- 	unsigned short		max_integrity_segments;
-@@ -921,6 +922,8 @@ extern void blk_queue_max_discard_sectors(struct request_queue *q,
- 		unsigned int max_discard_sectors);
- extern void blk_queue_max_write_zeroes_sectors(struct request_queue *q,
- 		unsigned int max_write_same_sectors);
-+extern void blk_queue_max_provision_sectors(struct request_queue *q,
-+		unsigned int max_provision_sectors);
- extern void blk_queue_logical_block_size(struct request_queue *, unsigned int);
- extern void blk_queue_max_zone_append_sectors(struct request_queue *q,
- 		unsigned int max_zone_append_sectors);
-@@ -1060,6 +1063,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
- 		sector_t nr_sects, gfp_t gfp);
- 
-+extern int blkdev_issue_provision(struct block_device *bdev, sector_t sector,
-+		sector_t nr_sects, gfp_t gfp_mask);
-+
- #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
- #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
- 
-@@ -1139,6 +1145,11 @@ static inline unsigned short queue_max_discard_segments(const struct request_que
- 	return q->limits.max_discard_segments;
- }
- 
-+static inline unsigned short queue_max_provision_sectors(const struct request_queue *q)
-+{
-+	return q->limits.max_provision_sectors;
++	default:
++		DMERR_LIMIT("%s: dm_thin_find_block() failed: error = %d",
++			    __func__, r);
++		cell_defer_no_holder(tc, cell);
++		bio_io_error(bio);
++		break;
++	}
 +}
 +
- static inline unsigned int queue_max_segment_size(const struct request_queue *q)
+ static void process_cell(struct thin_c *tc, struct dm_bio_prison_cell *cell)
  {
- 	return q->limits.max_segment_size;
-@@ -1281,6 +1292,11 @@ static inline bool bdev_nowait(struct block_device *bdev)
- 	return test_bit(QUEUE_FLAG_NOWAIT, &bdev_get_queue(bdev)->queue_flags);
+ 	int r;
+@@ -2228,6 +2276,8 @@ static void process_thin_deferred_bios(struct thin_c *tc)
+ 
+ 		if (bio_op(bio) == REQ_OP_DISCARD)
+ 			pool->process_discard(tc, bio);
++		else if (bio_op(bio) == REQ_OP_PROVISION)
++			pool->process_provision(tc, bio);
+ 		else
+ 			pool->process_bio(tc, bio);
+ 
+@@ -2579,6 +2629,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
+ 		dm_pool_metadata_read_only(pool->pmd);
+ 		pool->process_bio = process_bio_fail;
+ 		pool->process_discard = process_bio_fail;
++		pool->process_provision = process_bio_fail;
+ 		pool->process_cell = process_cell_fail;
+ 		pool->process_discard_cell = process_cell_fail;
+ 		pool->process_prepared_mapping = process_prepared_mapping_fail;
+@@ -2592,6 +2643,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
+ 		dm_pool_metadata_read_only(pool->pmd);
+ 		pool->process_bio = process_bio_read_only;
+ 		pool->process_discard = process_bio_success;
++		pool->process_provision = process_bio_fail;
+ 		pool->process_cell = process_cell_read_only;
+ 		pool->process_discard_cell = process_cell_success;
+ 		pool->process_prepared_mapping = process_prepared_mapping_fail;
+@@ -2612,6 +2664,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
+ 		pool->out_of_data_space = true;
+ 		pool->process_bio = process_bio_read_only;
+ 		pool->process_discard = process_discard_bio;
++		pool->process_provision = process_bio_fail;
+ 		pool->process_cell = process_cell_read_only;
+ 		pool->process_prepared_mapping = process_prepared_mapping;
+ 		set_discard_callbacks(pool);
+@@ -2628,6 +2681,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
+ 		dm_pool_metadata_read_write(pool->pmd);
+ 		pool->process_bio = process_bio;
+ 		pool->process_discard = process_discard_bio;
++		pool->process_provision = process_provision_bio;
+ 		pool->process_cell = process_cell;
+ 		pool->process_prepared_mapping = process_prepared_mapping;
+ 		set_discard_callbacks(pool);
+@@ -2749,7 +2803,8 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
+ 		return DM_MAPIO_SUBMITTED;
+ 	}
+ 
+-	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD) {
++	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
++	    bio_op(bio) == REQ_OP_PROVISION) {
+ 		thin_defer_bio_with_throttle(tc, bio);
+ 		return DM_MAPIO_SUBMITTED;
+ 	}
+@@ -3396,6 +3451,9 @@ static int pool_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	pt->adjusted_pf = pt->requested_pf = pf;
+ 	ti->num_flush_bios = 1;
+ 	ti->limit_swap_bios = true;
++	ti->num_provision_bios = 1;
++	ti->provision_supported = true;
++	ti->max_provision_granularity = true;
+ 
+ 	/*
+ 	 * Only need to enable discards if the pool should pass
+@@ -4288,6 +4346,9 @@ static int thin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 		ti->max_discard_granularity = true;
+ 	}
+ 
++	ti->num_provision_bios = 1;
++	ti->provision_supported = true;
++
+ 	mutex_unlock(&dm_thin_pool_table.mutex);
+ 
+ 	spin_lock_irq(&tc->pool->lock);
+@@ -4502,6 +4563,8 @@ static void thin_io_hints(struct dm_target *ti, struct queue_limits *limits)
+ 
+ 	limits->discard_granularity = pool->sectors_per_block << SECTOR_SHIFT;
+ 	limits->max_discard_sectors = pool->sectors_per_block * BIO_PRISON_MAX_RANGE;
++
++	limits->max_provision_sectors = pool->sectors_per_block;
  }
  
-+static inline unsigned int bdev_max_provision_sectors(struct block_device *bdev)
-+{
-+	return bdev_get_queue(bdev)->limits.max_provision_sectors;
-+}
-+
- static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
- {
- 	return blk_queue_zoned_model(bdev_get_queue(bdev));
+ static struct target_type thin_target = {
 -- 
 2.40.0.634.g4ca3ef3211-goog
 
