@@ -2,140 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C74C77B75
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 12:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 467BEC7618E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 15:02:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230450AbjDUMTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 08:19:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
+        id S232430AbjDUPB6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 11:01:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbjDUMTJ (ORCPT
+        with ESMTP id S232417AbjDUPB5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 08:19:09 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C971984
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 05:19:07 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230421121905epoutp04e7a1eed004f751eddbc2800039593a06~X8m83fXHt1572115721epoutp04c
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 12:19:05 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230421121905epoutp04e7a1eed004f751eddbc2800039593a06~X8m83fXHt1572115721epoutp04c
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1682079545;
-        bh=aG6CvdnKAQ/G7eThPVIYT4X7N/OR4iJxhfybZE60YQs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VHnEt9Sz8DL6dH7PL/djzxUJk1a2lO8RhCghWoJ9xZMlKqDfwWlrVH1TmOobfCXMj
-         dpINhCZuIt1FhyUrQ/4jhANC7107dsSLV7d+Gwyh9Q6vW8VV2WFPDlpPm+BHnLDBCH
-         bUtxswmuEO/NlP8hGuMtbNcUuFZNws23nDQsrBf0=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20230421121904epcas5p1bc7ae5c34a38da71bfa4dc20ea87a478~X8m8fQQX00882608826epcas5p1I;
-        Fri, 21 Apr 2023 12:19:04 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.183]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4Q2tqW2Sv0z4x9Pt; Fri, 21 Apr
-        2023 12:19:03 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        52.6D.09961.73F72446; Fri, 21 Apr 2023 21:19:03 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20230421121902epcas5p476b16ea1b5ca093afcee51662331189f~X8m6k818u2683326833epcas5p4G;
-        Fri, 21 Apr 2023 12:19:02 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230421121902epsmtrp24c7f5a6c3cc979d5f83c481b3f964be4~X8m6j6WCb2454524545epsmtrp2m;
-        Fri, 21 Apr 2023 12:19:02 +0000 (GMT)
-X-AuditID: b6c32a49-2c1ff700000026e9-dc-64427f3728e1
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        12.E6.08609.63F72446; Fri, 21 Apr 2023 21:19:02 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230421121901epsmtip1e58fc934cbfd3ec05ffda0f2b5ca2c0a~X8m41Ufbo1246212462epsmtip1D;
-        Fri, 21 Apr 2023 12:19:00 +0000 (GMT)
-Date:   Fri, 21 Apr 2023 17:46:05 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Breno Leitao <leitao@debian.org>
-Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        asml.silence@gmail.com, axboe@kernel.dk, leit@fb.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
-        ming.lei@redhat.com
-Subject: Re: [PATCH v2 0/3] io_uring: Pass the whole sqe to commands
-Message-ID: <20230421121605.GA30924@green245>
+        Fri, 21 Apr 2023 11:01:57 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B31F6584
+        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 08:01:56 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1a6684fd760so3228065ad.0
+        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 08:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682089316; x=1684681316;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j/3ZGzlb2mzTeIHWTlKM085CX8jpj4XHUVIgCrqH61I=;
+        b=uoZ6opjH4h4nxy6GOQvcxOJJECYZflgtN5Sh3jDOhrUUZ0n+Vi+Iiqm68RkQWeFEJP
+         +wHI42IWLu0IRnHwUw6K9736QHF3a11MbWY1VdElPG4drG3xKqJ9f0d443OJZS8VenWm
+         /hzztsfKOoQwq+pbqr0YvG0ncyDz92Hj6eAOb2FuKKbbL5WEjs+d3d7XjY5LqFKSLHvB
+         ebC2pTR86vcJ+FrY3Vh/jU1u91SjafLeWyBPgKQ1cCMwGM7qbHHEK6KB2+qAcYfCY8N1
+         c98d1IJ9dYooWeaaLmvkBMAnAtT1i7YcBMeDYgI1Owo1gG4tus4fAN64YGmFgwxq8mpw
+         Io3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682089316; x=1684681316;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=j/3ZGzlb2mzTeIHWTlKM085CX8jpj4XHUVIgCrqH61I=;
+        b=k588NpoeIS+I9jdaTBgQAX6D/FWlZscUjoglepUY8/YlhuyiBETbT4w4AFQjnMYIiR
+         wC5OwOWnj5iIPqF45Q60yCCiQA6bIoaXLn9t0Gv7Vk/yJle+bmq7O3JDuZXcsSjKvRKE
+         fsqVC/0YfLRWg4bd+Oj6pEmIGRqjxAw7iulUKZQuTYEfuZC16771xSN3qL9b/pSmDO8T
+         eFDpbfzvV1/25/8q/wokIiicaoidopf3bQWAHF/o0hdx25W1p/Gj/jNUAc+D8Quobu2p
+         fQ5v/ZKkS+AnXJ1jjuMokDUlkwP1e3nP70YdHsRavMnnzXRb42SOeLuRGbDDdKZMepmE
+         ufbw==
+X-Gm-Message-State: AAQBX9dwV68VTXPZi1uRpdoyaiYNyR56cLtnoBNKsw3mLKNKazrZRUDM
+        fj4jMQXiw+BJ/AcKs+p58rj1T8L0KdsKCv+cOog=
+X-Google-Smtp-Source: AKy350aKpTxdlF1iiMN2Q1gxVW7eY9lgtbejHVl84lzFqJluwjzue0nqNFMyrDNK1udueYsA9aYd3w==
+X-Received: by 2002:a17:902:d4ca:b0:1a6:6edd:d143 with SMTP id o10-20020a170902d4ca00b001a66eddd143mr6208036plg.6.1682089315831;
+        Fri, 21 Apr 2023 08:01:55 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id q7-20020a170902bd8700b001a6ff7bd4d9sm2887651pls.15.2023.04.21.08.01.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Apr 2023 08:01:55 -0700 (PDT)
+Message-ID: <0afbb007-a1d5-ed34-9304-04bb91264d7c@kernel.dk>
+Date:   Fri, 21 Apr 2023 09:01:54 -0600
 MIME-Version: 1.0
-In-Reply-To: <20230421114440.3343473-1-leitao@debian.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNJsWRmVeSWpSXmKPExsWy7bCmlq55vVOKwZL7AhZzVm1jtFh9t5/N
-        YuXqo0wW71rPsVhMOnSN0WLVrHtMFm8nbGG02HtL2+LyrjlsFvOXPWW3ODS5mcli3ev3LA48
-        Hr/a5jJ7TGx+x+6xc9Zddo/z9zayeFw+W+qxaVUnm8fmJfUeu282sHm833eVzePzJrkArqhs
-        m4zUxJTUIoXUvOT8lMy8dFsl7+B453hTMwNDXUNLC3MlhbzE3FRbJRefAF23zBygq5UUyhJz
-        SoFCAYnFxUr6djZF+aUlqQoZ+cUltkqpBSk5BSYFesWJucWleel6eaklVoYGBkamQIUJ2RlH
-        1zxlKTjGUbFz2k7WBsa17F2MnBwSAiYSrX3LGEFsIYHdjBJNf+K7GLmA7E+MEos7VrNDOJ8Z
-        JWbO3MwC03Gtv58RIrELKNGwmgnCecYoceXfZ1aQKhYBVYnlF7YAJTg42AQ0JS5MLgUJiwio
-        SEw82wM2lVngJ6PEzoX3wO4QFnCR2PRlHxuIzSugK/Hn3CtWCFtQ4uTMJywgczgFLCUWnXAC
-        CYsKKEsc2HYcbK+EwAkOiUWfrjOC1EgAzTm0QQjiUGGJV8e3QL0pJfH53V42CDtZ4tLMc0wQ
-        donE4z0HoWx7idZT/cwgNrNAhsTH7f/ZIWw+id7fT5ggxvNKdLRBjVeUuDfpKSuELS7xcMYS
-        VogSD4n+g9Dg6WGU6Lxyn3kCo9wsJM/MQrIBwraS6PzQxDoLqJ1ZQFpi+T8OCFNTYv0u/QWM
-        rKsYJVMLinPTU4tNCwzzUsvhMZycn7uJEZyKtTx3MN598EHvECMTB+MhRgkOZiURXo9SpxQh
-        3pTEyqrUovz4otKc1OJDjKbAyJnILCWanA/MBnkl8YYmlgYmZmZmJpbGZoZK4rzqtieThQTS
-        E0tSs1NTC1KLYPqYODilGpgyZYOeHpgcP3/SWZnyFR+TZe2nKKydYbnwnqdNd3B91qGmNUa1
-        1u/ToxfNDAxe+IX35aTnrAylCt0vV7mFnvzIpbZpunXE63vHlh44/5HZjfX5kf/Wd8slGN0/
-        m++QWK8sInl2d4pAp8Qldr1nndci2f/yahUGGCrObUvwfBfnviNvhs7C3QWa7wOd9metPJYk
-        ebP6TMLZfdEuGT7xcod+yXNx7PwY2RO4re4F2yPFhKK7X7SPiu/38/l99sBlZbNZnF3fIh1f
-        H+oJ+KUiLObUazR9f7vBA7mHiTtzdQ9cLLCzlN3IprW09eCkuocPeGdzrjl4XNC4uf2cFfvF
-        JdkMXSGyVm8eNwSph/QocCqxFGckGmoxFxUnAgByXh1eTgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphkeLIzCtJLcpLzFFi42LZdlhJTtes3inFYNlKPYs5q7YxWqy+289m
-        sXL1USaLd63nWCwmHbrGaLFq1j0mi7cTtjBa7L2lbXF51xw2i/nLnrJbHJrczGSx7vV7Fgce
-        j19tc5k9Jja/Y/fYOesuu8f5extZPC6fLfXYtKqTzWPzknqP3Tcb2Dze77vK5vF5k1wAVxSX
-        TUpqTmZZapG+XQJXxuIV71kKfrBWtB3rYWpg/MnSxcjJISFgInGtv5+xi5GLQ0hgB6PE6d+X
-        2SES4hLN135A2cISK/89Z4coesIocfX7ETaQBIuAqsTyC1uYuhg5ONgENCUuTC4FCYsIqEhM
-        PNsDVs8s8JtRYsqn1awgCWEBF4lNX/aB9fIK6Er8OfeKFWJoD6PEzBvXGCESghInZz4BO49Z
-        wExi3uaHzCALmAWkJZb/4wAxOQUsJRadcAKpEBVQljiw7TjTBEbBWUiaZyFpnoXQvICReRWj
-        ZGpBcW56brFhgVFearlecWJucWleul5yfu4mRnCEaWntYNyz6oPeIUYmDsZDjBIczEoivB6l
-        TilCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnNTk0tSC2CyTJxcEo1MB38YmPN
-        ePEgz8T75x6f6f+twGWuI/PwkcrB60cvHGg73tv38sPTwiBFn1nVBw0Xy2xjOmj03Dup9aCP
-        w5+t8zySns/bpaUrmG4ybwujhsj9izef9TX0ZJieS37GM0fcr6np1mzzlJmyj0IvzrlWHH13
-        TsJR65UP+v/FbeTLVA6clbNynRVzeWfkbA7/02LXFW2ba0s7ZBUO1eed3Gox64g6y7VZfFtE
-        dJ2Z95ZWrWBwanGoPxl0as6ThQ/F521733mGWdRuWsuFwuky5h86nvFotJ6fFR9y5Njnyw7T
-        Kn4xvJbadEGiLdJV8uSDadPXsM0KnZY7P/2cUenW0xdalkW+W296QOjBAbnPnO7mKWeUWIoz
-        Eg21mIuKEwGi4fDXHwMAAA==
-X-CMS-MailID: 20230421121902epcas5p476b16ea1b5ca093afcee51662331189f
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230421114703epcas5p37cd0ddb29674d8f3d5fe2f1fa494d1f0
-References: <CGME20230421114703epcas5p37cd0ddb29674d8f3d5fe2f1fa494d1f0@epcas5p3.samsung.com>
-        <20230421114440.3343473-1-leitao@debian.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 6.3-final
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+Hi Linus,
 
-On Fri, Apr 21, 2023 at 04:44:37AM -0700, Breno Leitao wrote:
->These three patches prepare for the sock support in the io_uring cmd, as
->described in the following RFC:
->
->	https://lore.kernel.org/lkml/20230406144330.1932798-1-leitao@debian.org/
->
->Since the support linked above depends on other refactors, such as the sock
->ioctl() sock refactor[1], I would like to start integrating patches that have
->consensus and can bring value right now.  This will also reduce the patchset
->size later.
->
->Regarding to these three patches, they are simple changes that turn
->io_uring cmd subsystem more flexible (by passing the whole SQE to the
->command), and cleaning up an unnecessary compile check.
-
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
-
-------DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_
-Content-Type: text/plain; charset="utf-8"
+Just a single revert of a patch from the 6.3 series, please pull!
 
 
-------DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_--
+The following changes since commit f7ca1ae32bd89ab035568c63b4443eb55420b423:
+
+  Merge branch 'nvme-6.3' of git://git.infradead.org/nvme into block-6.3 (2023-04-14 06:29:00 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.3-2023-04-21
+
+for you to fetch changes up to 81ea1222f2fa5006f4b9759c2fe1ec154109622d:
+
+  Revert "block: Merge bio before checking ->cached_rq" (2023-04-20 06:54:17 -0600)
+
+----------------------------------------------------------------
+block-6.3-2023-04-21
+
+----------------------------------------------------------------
+Ming Lei (1):
+      Revert "block: Merge bio before checking ->cached_rq"
+
+ block/blk-mq.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+-- 
+Jens Axboe
+
