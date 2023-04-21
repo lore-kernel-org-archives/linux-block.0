@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2616C7618E
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 09:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55449C77B78
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 11:13:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230415AbjDUJmc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 05:42:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50554 "EHLO
+        id S231355AbjDULNM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 07:13:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230450AbjDUJmb (ORCPT
+        with ESMTP id S229657AbjDULNL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 05:42:31 -0400
+        Fri, 21 Apr 2023 07:13:11 -0400
 Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216F2A5FF
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 02:42:30 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id E1E55582110;
-        Fri, 21 Apr 2023 05:42:26 -0400 (EDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09F8A257;
+        Fri, 21 Apr 2023 04:13:09 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 6BF5F582152;
+        Fri, 21 Apr 2023 07:13:07 -0400 (EDT)
 Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Fri, 21 Apr 2023 05:42:26 -0400
+  by compute1.internal (MEProxy); Fri, 21 Apr 2023 07:13:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
         cc:cc:content-type:content-type:date:date:from:from:in-reply-to
         :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1682070146; x=1682070746; bh=I7
-        vX/0YfzsfZsRGHX5jgTWrTU6BxxAyi+YLlm5BZnp0=; b=apYdKa+J4E7tHyMRm+
-        5vKZ1YvQ0XQtDYxVNtLZ8tsJ3GkTCqEY8hmqV4gbCNZ2FQGm6zH/DzvqE/9UrU2m
-        Huucq/WpE6/0bNdAOdMhicuvFK7HE1R5Cbq4s1HKDu4Uyktv5aKCGBLuI3YQfZbP
-        fwCup2gIdBbzpowT6p5VcU08wXXRZ5qkyALHRic5h5pBeMySww2P/IKQWISKq1sc
-        L6Z7dg2IOgouqOGju3nA8odRi/CnckVFmcEeydy2Ed4mzITODhv9usXjOXjIZLP8
-        56IuDg0Z7lm06t7XtppViYuhRIOrATXq5ikXKgXPmhsw7xuDI22of5qw+vPDcink
-        1fDg==
+        :subject:subject:to:to; s=fm3; t=1682075587; x=1682076187; bh=0t
+        2qq+tQTWqA4ZpWihOO91zumC8XpczzQjvKGW1H0LE=; b=B6yYwcD4IOXkq7c+14
+        fs0gD5K2A0OeZzLjcbgF6Xun91hwQzVIqO6Xa/JaBCPoh5eMdcuuFe4TFQP7VKST
+        g6/LQQ7epWd41yphBcrfCdPOxRT/4I9iBmZlwlFsc4xAVJ00JHbf951eMKf4OAZF
+        RxAKL1212bUp+vQd35Z6wTyYX2n0X42PzR4teQ3beOuceYQQUF5BoKoLJ9EILxyj
+        ASZbAMhVnXA04AP1T6H4d3plsTm6C+SV9wgTOasrTeqG0Ynn0JOu9fsUpIttm4/F
+        XXN1/0TCCo1DIfb5PVWBbVAavQJhygB+s3aXSEi6pAW6VBgBp9vLeEd8dmSt1oss
+        RO7g==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-type:content-type:date:date
         :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
         :message-id:mime-version:references:reply-to:sender:subject
         :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=ie1e949a3.fm3; t=1682070146; x=1682070746; bh=I7v
-        X/0YfzsfZsRGHX5jgTWrTU6BxxAyi+YLlm5BZnp0=; b=NUc9Inp6IT4dqgv6F7E
-        MEXcDJFASiJEQdWIbmXDN1WLB7KJvBOgt3q/ADeQHjUOkj2l25NkXdXhXKRzi3sh
-        HjtMaBar3fMKYlIzv7RPIrh4/Y/esi+vhfAQ5wJvBPG4xcwFAwksHRM0gxW03BTn
-        6YR9ROOYsSTY/IvPklDRvwMYftBL8Tp8HkgHV8huqRalq3b1xe+j7lQHjBN/oH/o
-        zYkcBNLu2KsbSsTRJ2vCLlOQgkxef7fyykS6L0pOwWp5JGbH5eDvVnPs9dY+tSLN
-        rccql5aB3zJmLMg+kHvXmfYKZqqPi4J4UUlVDZv68ZlSRIGkRYj5TW/nUi7WY5Nx
-        7OQ==
-X-ME-Sender: <xms:glpCZP2OuD0w7E6VnopfBqguvUNF2cKTkv_2ykXTbqr0Ms4Vrt-uag>
-    <xme:glpCZOFLPpeKyzHdoy50HS4_jwSFgbmpLdqPHajjUocBHoKqTk8Z3WNqbNimdOGnk
-    4R-raRZox_zSOquNFo>
-X-ME-Received: <xmr:glpCZP7MfmZ1XrSovmdlmBA874MPNvhzpKYixuKCrvdVC64yvaIm9fmHiDDuiJz0JlSohaNTdw-no0LgPaGoJg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedtgedgudekucetufdoteggodetrfdotf
+        :x-sasl-enc; s=ie1e949a3.fm3; t=1682075587; x=1682076187; bh=0t2
+        qq+tQTWqA4ZpWihOO91zumC8XpczzQjvKGW1H0LE=; b=QPnvv6pfRl/7Ei7ANn0
+        Xj236EDf7U5my6lgbtn1NAavbK3/lDVZ6QWnk71wp9GfJUzjXSc+ecvPCwcEA4q/
+        dh7hPwMsI5viGFzSzn5v8I7ZZwpP8ItWAMp4V6LJvACg6hye/SYlx3kKtOByzbiH
+        oYCafvedYPzQX355k+lYuFAw89dys5yLpjpIDFa9FwN01LskbMajwiMYFpD5+yMg
+        NkW21vFUxZ7Bvarpq29cEIguA8m9K5Az1ssQjjs6xvnBdh/CFrXZzSYMMBWZ2ikX
+        Ea4OvCV1PC5OMTNwZEUXrM6ljlTzEfFdDRdSXu1me89W1di3RgH6E/BFGCBDSEzx
+        LcA==
+X-ME-Sender: <xms:w29CZL236wP8bmLmnSG9BL-oOfeCW1MpxP91CFmzdbxT5YkwblUsfA>
+    <xme:w29CZKElowL7pjG7iyK8vxMnVAzelLA7wkx1WvGxgOPTSf5CAzOXPU2X2bROQXS9c
+    reSb0bJTof4hpRnZlk>
+X-ME-Received: <xmr:w29CZL4DEvk7qvWyHD-JyUChI6Sh66hIzILJYXWxAgAziqaRRvV7ZH0s9P4x7f1JzYCYW9bN2hSpZpmtNf1cUw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedtgedgfeeiucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
     cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
@@ -57,52 +57,64 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedtgedgudekucetufdoteggod
     gefgkedujeeiteehgefhgeethffgheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
     hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
     mh
-X-ME-Proxy: <xmx:glpCZE3oNBPAFYiiXRiHBLcWt0r9UxbhPp4Hf_YCNyrKjEA3YuTybA>
-    <xmx:glpCZCHbe98-aVlSbQMphtZchvKyjz0uxLOMvNZM1IfOVEcBsExCvA>
-    <xmx:glpCZF-P7o9fttxV6oe7v-29_gW28IiTBTN9nZrk0JqZwuJdhECnrw>
-    <xmx:glpCZOgLZuTKWF8gJc4swNYgUzIgOEvbBe4pDRqmxgo42EUSdrg7c73zkak>
+X-ME-Proxy: <xmx:w29CZA24E7gcTexPJ8fwIsEm67fKCD_aZd_lDZLuuMUTGVwoyxA9Gg>
+    <xmx:w29CZOHPAEbbggBQXvLcurL1aEJ8wiUJWPNxhheYEFDsOVow4Rpnlw>
+    <xmx:w29CZB9Fb8t5pCr_-ePdJICNIFwsNldz9TT7UY5_A4MnClAmIjZVHw>
+    <xmx:w29CZDSYhw4Cfzzh0c-EZ2z8Ssf4FpTVvDxYvv-i7y-U2gXd9-keOiqT4fI>
 Feedback-ID: ie1e949a3:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 21 Apr 2023 05:42:24 -0400 (EDT)
-Date:   Fri, 21 Apr 2023 18:42:22 +0900
+ 21 Apr 2023 07:13:05 -0400 (EDT)
+Date:   Fri, 21 Apr 2023 20:13:02 +0900
 From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     Akinobu Mita <akinobu.mita@gmail.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        shinichiro.kawasaki@wdc.com, chaitanyak@nvidia.com,
-        hch@infradead.org
-Subject: Re: [PATCH v2 blktests] don't require modular null_blk for
- fault-injection
-Message-ID: <fieo7bgfpmqstvycvcq6ucdsg7h5bjhpkpsucs6uk4njzimahf@gx6emcqngf4m>
-References: <20230416043744.25646-1-akinobu.mita@gmail.com>
- <55byiexrqbbhiftyiwi6xg7t2av5va6jj5zyntejqniq4l2g7z@ofej27qygtqg>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH blktests 5/9] scsi/004: allow to run with built-in
+ scsi_debug
+Message-ID: <4mab5xvql3xl6saolhvnbggeehovhdp3y4glz2ccfxvkqj34ur@wpnku3bybtrv>
+References: <20230417125913.458726-1-shinichiro@fastmail.com>
+ <f4997765-6ea5-52ad-e329-73b9e5eedde5@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <55byiexrqbbhiftyiwi6xg7t2av5va6jj5zyntejqniq4l2g7z@ofej27qygtqg>
+In-Reply-To: <f4997765-6ea5-52ad-e329-73b9e5eedde5@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 18, 2023 / 21:37, Shin'ichiro Kawasaki wrote:
-> On Apr 16, 2023 / 13:37, Akinobu Mita wrote:
-> > This blktests change changes null_blk fault-injection settings to be
-> > configured via configfs instead of module parameters.
-> > This allows null_blk fault-injection tests to run even if the null_blk is
-> > built-in the kernel and not built as a module.
-> > 
-> > If the null_blk does not yet support configuring fault-injection via
-> > configfs, fall back to set up with module parameter.
-> > 
-> > Signed-off-by: Akinobu Mita <akinobu.mita@gmail.com>
+On Apr 18, 2023 / 20:18, Chaitanya Kulkarni wrote:
+> On 4/17/23 05:59, Shin'ichiro Kawasaki wrote:
+> > From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> >
+> > To allow the test case run with build-in scsi_debug, replace
+> > '_have_module scsi_debug' with _have_scsi_debug, and replace
+> > _init_scsi_debug with _configure_scsi_debug.
+> >
+> > Also, save and restore the values of scsi_debug parameters 'opts' and
+> > 'ndelay'. The test case modifies the parameters and do not restore their
+> > original values. It is fine when scsi_debug is loadable since scsi_debug
+> > is unloaded after the test case run. However, when scsi_debug is built-
+> > in, the modified parameters may affect following test cases. To avoid
+> > potential impact on following test cases, save original values of the
+> > parameters and restore them at the end of the test case.
+> >
+> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 > > ---
-> > * v2
-> > - don't skip the tests on older kernels without fault-injection via configfs
+> >
 > 
-> Thanks for this v2 patch. It looks good to me. I'll wait a few more days before
-> I apply it in case anyone has some more comments.
-> 
-> One nit in the commit title: it's the better to have the prefix
-> "block/{014,015,030}: " to clarify the test cases this commit touches. I'll do
-> the edit when I apply this patch.
+> Perhaps we should look into a helper to record other default
+> parameters before the testcase and restore it after when
+> it is built in ?
 
-I've applied the patch with the edit. Thanks!
+Hi Chaitanya, thanks for the review comments. Your idea sounds good. I will try
+to implement it.
+
+> 
+> Irrespective of that, looks good.
+> 
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> 
+> -ck
+> 
+> 
