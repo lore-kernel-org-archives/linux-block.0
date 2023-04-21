@@ -2,128 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F43CC77B73
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 01:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4CFC7618E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 01:52:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232543AbjDUBiz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 21:38:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39686 "EHLO
+        id S233394AbjDUBwa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 21:52:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229963AbjDUBiy (ORCPT
+        with ESMTP id S233383AbjDUBwa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 21:38:54 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C58C3AAE
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 18:38:41 -0700 (PDT)
-Received: from canpemm100004.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Q2cWp4P4LzSwFq;
-        Fri, 21 Apr 2023 09:34:30 +0800 (CST)
-Received: from [10.174.179.14] (10.174.179.14) by
- canpemm100004.china.huawei.com (7.192.105.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 21 Apr 2023 09:38:39 +0800
-Subject: Re: How best to get the size of a blockdev from a file?
-To:     Al Viro <viro@zeniv.linux.org.uk>
-CC:     Kanchan Joshi <joshi.k@samsung.com>,
-        David Howells <dhowells@redhat.com>, <hch@lst.de>,
-        <linux-block@vger.kernel.org>
-References: <CGME20230418100108epcas5p2d0f2a7a274e78731373986b3d4fced9b@epcas5p2.samsung.com>
- <1609851.1681812012@warthog.procyon.org.uk> <20230418122833.GA14457@green245>
- <e4f7df06-ccba-700b-5a69-ea44bd54e672@huawei.com>
- <20230420190411.GM3390869@ZenIV>
-From:   Jason Yan <yanaijie@huawei.com>
-Message-ID: <66975b71-7b50-cec7-af17-95380657b946@huawei.com>
-Date:   Fri, 21 Apr 2023 09:38:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Thu, 20 Apr 2023 21:52:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DB41BCE
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 18:52:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 24C0C64C61
+        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 01:52:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F27BC433D2;
+        Fri, 21 Apr 2023 01:52:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682041938;
+        bh=fk3Tw243RNAngStyyRixVc4B6qKh1JwbJ3bHjv8dkyA=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=scM5/lAenEX6ZkyyfIbmHBanWr3vHghJ3lh1jjbtciH2EuAcv3ok7XgX6fZo/Fpgh
+         yuEcHZGCwp8lZalZPeYdc93RtRxg7KbVRo1d6qAJoxtGfsDWOA2zTyCpD9BfBsRkjD
+         fUM4Iu2cwAc5orZmGGgUEPKliMbfR/QZ5LQJqZttjYnTO3RIQVSY/L3Q3T+EPaqOa+
+         QNSEsC/W2K9z2z9ZH1m66Tk68UKOAqNWz4wYsNsiva+DIfzDLLfVh//IEtBZwM0rVl
+         O5qBpWtsyorL4Oj48DWN95RklepdQicVHvdC2TdTaGMwIgX9V8OT/FkL7M5IyYSYh0
+         iyfa3YhAal/yQ==
+Message-ID: <c12582e0-f2c8-d001-1fc1-6f7e17eeba7c@kernel.org>
+Date:   Fri, 21 Apr 2023 10:52:15 +0900
 MIME-Version: 1.0
-In-Reply-To: <20230420190411.GM3390869@ZenIV>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v2 10/11] block: Add support for the zone capacity concept
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.14]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm100004.china.huawei.com (7.192.105.92)
-X-CFilter-Loop: Reflected
+To:     Jaegeuk Kim <jaegeuk@kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Matias Bjorling <mb@lightnvm.io>
+References: <20230418224002.1195163-1-bvanassche@acm.org>
+ <20230418224002.1195163-11-bvanassche@acm.org> <ZEEEm/5+i7x2i8a5@x1-carbon>
+ <f9d35d19-d0ba-fcb7-e44b-f0b8c55ba399@acm.org>
+ <141aee35-4288-1670-6424-e6c41c8ef4c9@kernel.org>
+ <ec7cdc7d-9eb7-65a4-6ba9-1ae6cf6f43d2@acm.org>
+ <a5d9a370-6264-ebdf-f9f8-7b3263c2b6f0@kernel.org>
+ <490ed061-6d82-f9fb-2050-4a386e2e4c8e@acm.org>
+ <c4a52bff-5cab-5029-ad7f-e5f9452bc0e2@kernel.org>
+ <ZEHY2PIRCCLOZsC4@google.com>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <ZEHY2PIRCCLOZsC4@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/4/21 3:04, Al Viro wrote:
-> On Tue, Apr 18, 2023 at 10:05:12PM +0800, Jason Yan wrote:
->> On 2023/4/18 20:28, Kanchan Joshi wrote:
->>> On Tue, Apr 18, 2023 at 11:00:12AM +0100, David Howells wrote:
->>>> Hi Christoph,
->>>>
->>>> It seems that my use of i_size_read(file_inode(in)) in
->>>> filemap_splice_read()
->>>> to get the size of the file to be spliced from doesn't work in the
->>>> case of
->>>> blockdevs and it always returns 0.
->>>>
->>>> What would be the best way to get the blockdev size?  Look at
->>>> file->f_mapping->i_size maybe?
+On 4/21/23 09:29, Jaegeuk Kim wrote:
+> On 04/21, Damien Le Moal wrote:
+>> On 4/21/23 08:44, Bart Van Assche wrote:
+>>> On 4/20/23 16:37, Damien Le Moal wrote:
+>>>> Why would you need to handle the max active zone number restriction in the
+>>>> scheduler ? That is the user responsibility. btrfs does it (that is still buggy
+>>>> though, working on it).
 >>>
->>> bdev_nr_bytes(I_BDEV(file->f_mapping->host))
->>> should work I suppose.
+>>> Hi Damien,
 >>>
+>>> If the user (filesystem) restricts the number of active zones, the code 
+>>> for restricting the number of active zones will have to be duplicated 
+>>> into every filesystem that supports zoned devices. Wouldn't it be better 
+>>> if the I/O scheduler tracks the number of active zones?
 >>
->> This needs the caller to check if the file is a blockdev. Can we fill the
->> upper inode size which belongs to devtmpfs so that the generic code do not
->> need to aware the low level inode type?
+>> I do not think so. The reason is that for a file system, the block allocator
+>> must be aware of any active zone limit of the underlying device to make the best
+>> decision possible regarding where to allocate blocks for files and metadata. For
 > 
-> We do:
-> 
-> static inline loff_t bdev_nr_bytes(struct block_device *bdev)
-> {
-> 	return (loff_t)bdev_nr_sectors(bdev) << SECTOR_SHIFT;
-> }
-> 
-> static inline sector_t bdev_nr_sectors(struct block_device *bdev)
-> {
->          return bdev->bd_nr_sectors;
-> }
-> 
-> $ git grep -n -w bd_nr_sectors
-> block/genhd.c:64:       bdev->bd_nr_sectors = sectors;
-> block/partitions/core.c:92:     bdev->bd_nr_sectors = sectors;
-> include/linux/blk_types.h:42:   sector_t                bd_nr_sectors;
-> include/linux/blkdev.h:785:     return bdev->bd_nr_sectors;
-> 
-> and if you look into the functions with those assignments you'll see
-> void set_capacity(struct gendisk *disk, sector_t sectors)
-> {
->          struct block_device *bdev = disk->part0;
-> 
-> 	spin_lock(&bdev->bd_size_lock);
-> 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
-> 	bdev->bd_nr_sectors = sectors;
-> 	spin_unlock(&bdev->bd_size_lock);
-> }
-> 
-> and
-> 
-> static void bdev_set_nr_sectors(struct block_device *bdev, sector_t sectors)
-> {
->          spin_lock(&bdev->bd_size_lock);
-> 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
-> 	bdev->bd_nr_sectors = sectors;
-> 	spin_unlock(&bdev->bd_size_lock);
-> }
-> 
-> As you can see, both do i_size_write() on bdev->bd_inode with the value
-> equal to what bdev_nr_bytes() will return after the store to ->bd_nr_sectors.
-> 
-> Now, bdev->bd_inode always points to inode coallocated with bdev
-> (see bdev_alloc() for details) and that's what we have
-> ->f_mapping->host pointing to for opened file after
-> blkdev_open() - see
->          filp->f_mapping = bdev->bd_inode->i_mapping;
-> in there combined with inode->i_mapping.host set to inode by
-> inode_init_always()<-alloc_inode()<-new_inode_pseudo()<-new_inode()<-bdev_alloc().
-> 
-> IOW, i_size_read(file->f_mapping->host) is correct answer for any kind of file.
+> Well, I'm wondering what kind of decision FS can make when allocating zones?
 
-Ah, yes. Thanks for your patient explanation.
+Not sure what you mean... It is very similar to regular block device case. The
+FS does block allocation based on whatever block placement policy it wants/need
+to implement. With zoned devices, the FS block management object are mapped to
+zones (btrfs: block group == zone, f2fs: section == zone) and the active zone
+limits simply adds one more constraint regarding the selection of block groups
+for allocating blocks. This is a resource management issue.
 
-Jason
+>> btrfs, we added "active block groups" management for that purpose. And we have
+>> tracking of a block group active state so that the block allocator can start
+>> using new block groups (inactive ones) when previously used ones become full. We
+>> also have a "finish block group" for cases when there is not enough remaining
+>> free blocks in a group/zone (this does a finish zone operation to make a
+>> non-full zone full, that is, inactive).
+>>
+>> Even if the block IO scheduler were to track active zones, the FS would still
+>> need to do its own tracking (e.g. to be able to finish zones when needed). So I
+> 
+> Why does FS also need to track the # of open zones redundantly? I have two
+
+Because the FS should not be issuing writes to a zone that cannot be activated
+on the device, e.g. starting writing to an empty zone when there are already N
+zones being written or partly written, with N >= max active zones, will result
+in IO failures. Even if you have active zone tracking in the block IO scheduler,
+there is absolutely NOTHING that the scheduler can do to prevent such errors.
+E.g. think of this simple case:
+1) Let's take a device with max active zones = N (N != 0)
+2) The FS implements a block allocation policy which results in new files being
+written to empty block groups, with 1 block group == 1 zone
+3) User writes N files of 4KB
+
+After step 3, the device has N active zones. So if the user tries to write a new
+file, it will fail (cannot write to an empty zone as that will result in an
+error because that zone cannot be activated by the device). AND the FS cannot
+write metadata for these files into a metadata block group.
+
+There is nothing that the IO scheduler can do about all this. The FS has to be
+more intelligent and do block allocation also based on the current
+active/inactive state of the zones used by block groups.
+
+> concerns if FS needs to force it:
+> 1) performance - waiting for finish_zone before allocating a new zone can break
+> the IO pipeline and block FS operations.
+
+The need to perform a zone finish is purely an optimization if, for instance,
+you want to reduce fragmentation. E.g., if there is only 4K of free space left
+in a zone and need to write a 1MB extent, you can write the last 4K of that
+zone, making it inactive and write the remaining 1MB - 4KB in another zone and
+you are guaranteed that this other zone can be written since you just
+deactivated one zone.
+
+But if you do not want to fragment that 1MB extent, then you must finish that
+zone with only 4KB left first, to ensure that another zone can be activated.
+
+This of course also depends on the current number of active zones N. If N < max
+active zone limit, then there is no need to finish a zone.
+
+> 2) multiple partition support - if F2FS uses two partitions, one on conventional
+> partition while the other on zoned partition, we have to maintain such tracking
+> mechanism on zoned partition only which gives some code complexity.
+
+Conventional zones have no concept of active zones. All active zone resources
+can be allocated to the sequential zones. And zoned block devices do not support
+partitions anyway.
+
+> In general, doesn't it make sense that FS (not zoned-device FS) just needs to
+> guarantee sequential writes per zone, while IO scheduler needs to limit the #
+> of open zones gracefully?
+
+No. That will never work. See the example above: you can endup in a situation
+where the drive becomes read-only (all writes failing) if the FS does not direct
+block allocation & writes to zones that are already active. No amount of
+trickery in the IO scheduler can change that fact.
+
+If you want to hide the active zone limit to the FS, then what is needed is a
+device mapper that remaps blocks. That is a lot more overhead that implementing
+that support in the FS, and the FS can do a much better job at optimizing block
+placement.
