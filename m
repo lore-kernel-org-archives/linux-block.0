@@ -2,270 +2,140 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A8FC77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 11:47:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C74C77B75
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 12:19:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231969AbjDULrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 07:47:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40172 "EHLO
+        id S230450AbjDUMTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 08:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231794AbjDULrB (ORCPT
+        with ESMTP id S229612AbjDUMTJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 07:47:01 -0400
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B466BC3;
-        Fri, 21 Apr 2023 04:46:59 -0700 (PDT)
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-3f09b9ac51dso46714125e9.0;
-        Fri, 21 Apr 2023 04:46:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682077618; x=1684669618;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UXPdTSA6S0G0fQ/xI7HseGs1qPi1doE/WEhehIGxGzU=;
-        b=Fh/ppJmnl7tXOHCdlvqnCDnVI2geiDEkG3MsM6onpwlwJq9bh2qyOgATxSGx8v930n
-         fdWGbK9XmRn4bQgxwJYGLYxR3ZvF3ZOnOAx9BYZvJqaskXpPpMtbW6X8dw9JHdHtGOvM
-         3AJOSYwpozmbzTx2SO3b6/3/ld3+dsaBcuJDktqUxwVcQZpSLSLi8QPwyvPLs/r4fMNn
-         fftuxJd3uTGBfJdXf/IPh8UkduilrRYlaSs2q17KvzWwYqibOj0iCtzalOGkmODyVf+I
-         oYKsiLfOkSXOBkGtpRRPjXR9hPr7fGR2H+sO/Z8P+SD3mP5uQvh9zPbEri7hO/VNpwtC
-         bmsg==
-X-Gm-Message-State: AAQBX9cGKjxxeCTiFLkILMA/bm9/k/4k2PnBmSHRw8YifJ3ZnxOGHOUT
-        Cvra/Y84+jTCZrlrsAevGhqjADPdFp+GKQ==
-X-Google-Smtp-Source: AKy350Yp3XSiyxy6Ks3P6ULJ59nqsu8vWJgCG7uCEQ0jPznM7pR8IwHciHWn7mLLw+RI9ZfdW33TXQ==
-X-Received: by 2002:a5d:518e:0:b0:2fa:7203:5bae with SMTP id k14-20020a5d518e000000b002fa72035baemr7344515wrv.18.1682077617722;
-        Fri, 21 Apr 2023 04:46:57 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-012.fbsv.net. [2a03:2880:31ff:c::face:b00c])
-        by smtp.gmail.com with ESMTPSA id y5-20020a1c4b05000000b003e91b9a92c9sm4621191wma.24.2023.04.21.04.46.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Apr 2023 04:46:57 -0700 (PDT)
-From:   Breno Leitao <leitao@debian.org>
-To:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        asml.silence@gmail.com, axboe@kernel.dk
-Cc:     leit@fb.com, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, sagi@grimberg.me, hch@lst.de,
-        kbusch@kernel.org, ming.lei@redhat.com
-Subject: [PATCH v2 2/3] io_uring: Pass whole sqe to commands
-Date:   Fri, 21 Apr 2023 04:44:39 -0700
-Message-Id: <20230421114440.3343473-3-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230421114440.3343473-1-leitao@debian.org>
-References: <20230421114440.3343473-1-leitao@debian.org>
+        Fri, 21 Apr 2023 08:19:09 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C971984
+        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 05:19:07 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230421121905epoutp04e7a1eed004f751eddbc2800039593a06~X8m83fXHt1572115721epoutp04c
+        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 12:19:05 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230421121905epoutp04e7a1eed004f751eddbc2800039593a06~X8m83fXHt1572115721epoutp04c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1682079545;
+        bh=aG6CvdnKAQ/G7eThPVIYT4X7N/OR4iJxhfybZE60YQs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VHnEt9Sz8DL6dH7PL/djzxUJk1a2lO8RhCghWoJ9xZMlKqDfwWlrVH1TmOobfCXMj
+         dpINhCZuIt1FhyUrQ/4jhANC7107dsSLV7d+Gwyh9Q6vW8VV2WFPDlpPm+BHnLDBCH
+         bUtxswmuEO/NlP8hGuMtbNcUuFZNws23nDQsrBf0=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20230421121904epcas5p1bc7ae5c34a38da71bfa4dc20ea87a478~X8m8fQQX00882608826epcas5p1I;
+        Fri, 21 Apr 2023 12:19:04 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.183]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4Q2tqW2Sv0z4x9Pt; Fri, 21 Apr
+        2023 12:19:03 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        52.6D.09961.73F72446; Fri, 21 Apr 2023 21:19:03 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20230421121902epcas5p476b16ea1b5ca093afcee51662331189f~X8m6k818u2683326833epcas5p4G;
+        Fri, 21 Apr 2023 12:19:02 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230421121902epsmtrp24c7f5a6c3cc979d5f83c481b3f964be4~X8m6j6WCb2454524545epsmtrp2m;
+        Fri, 21 Apr 2023 12:19:02 +0000 (GMT)
+X-AuditID: b6c32a49-2c1ff700000026e9-dc-64427f3728e1
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        12.E6.08609.63F72446; Fri, 21 Apr 2023 21:19:02 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230421121901epsmtip1e58fc934cbfd3ec05ffda0f2b5ca2c0a~X8m41Ufbo1246212462epsmtip1D;
+        Fri, 21 Apr 2023 12:19:00 +0000 (GMT)
+Date:   Fri, 21 Apr 2023 17:46:05 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Breno Leitao <leitao@debian.org>
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        asml.silence@gmail.com, axboe@kernel.dk, leit@fb.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
+        ming.lei@redhat.com
+Subject: Re: [PATCH v2 0/3] io_uring: Pass the whole sqe to commands
+Message-ID: <20230421121605.GA30924@green245>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230421114440.3343473-1-leitao@debian.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNJsWRmVeSWpSXmKPExsWy7bCmlq55vVOKwZL7AhZzVm1jtFh9t5/N
+        YuXqo0wW71rPsVhMOnSN0WLVrHtMFm8nbGG02HtL2+LyrjlsFvOXPWW3ODS5mcli3ev3LA48
+        Hr/a5jJ7TGx+x+6xc9Zddo/z9zayeFw+W+qxaVUnm8fmJfUeu282sHm833eVzePzJrkArqhs
+        m4zUxJTUIoXUvOT8lMy8dFsl7+B453hTMwNDXUNLC3MlhbzE3FRbJRefAF23zBygq5UUyhJz
+        SoFCAYnFxUr6djZF+aUlqQoZ+cUltkqpBSk5BSYFesWJucWleel6eaklVoYGBkamQIUJ2RlH
+        1zxlKTjGUbFz2k7WBsa17F2MnBwSAiYSrX3LGEFsIYHdjBJNf+K7GLmA7E+MEos7VrNDOJ8Z
+        JWbO3MwC03Gtv58RIrELKNGwmgnCecYoceXfZ1aQKhYBVYnlF7YAJTg42AQ0JS5MLgUJiwio
+        SEw82wM2lVngJ6PEzoX3wO4QFnCR2PRlHxuIzSugK/Hn3CtWCFtQ4uTMJywgczgFLCUWnXAC
+        CYsKKEsc2HYcbK+EwAkOiUWfrjOC1EgAzTm0QQjiUGGJV8e3QL0pJfH53V42CDtZ4tLMc0wQ
+        donE4z0HoWx7idZT/cwgNrNAhsTH7f/ZIWw+id7fT5ggxvNKdLRBjVeUuDfpKSuELS7xcMYS
+        VogSD4n+g9Dg6WGU6Lxyn3kCo9wsJM/MQrIBwraS6PzQxDoLqJ1ZQFpi+T8OCFNTYv0u/QWM
+        rKsYJVMLinPTU4tNCwzzUsvhMZycn7uJEZyKtTx3MN598EHvECMTB+MhRgkOZiURXo9SpxQh
+        3pTEyqrUovz4otKc1OJDjKbAyJnILCWanA/MBnkl8YYmlgYmZmZmJpbGZoZK4rzqtieThQTS
+        E0tSs1NTC1KLYPqYODilGpgyZYOeHpgcP3/SWZnyFR+TZe2nKKydYbnwnqdNd3B91qGmNUa1
+        1u/ToxfNDAxe+IX35aTnrAylCt0vV7mFnvzIpbZpunXE63vHlh44/5HZjfX5kf/Wd8slGN0/
+        m++QWK8sInl2d4pAp8Qldr1nndci2f/yahUGGCrObUvwfBfnviNvhs7C3QWa7wOd9metPJYk
+        ebP6TMLZfdEuGT7xcod+yXNx7PwY2RO4re4F2yPFhKK7X7SPiu/38/l99sBlZbNZnF3fIh1f
+        H+oJ+KUiLObUazR9f7vBA7mHiTtzdQ9cLLCzlN3IprW09eCkuocPeGdzrjl4XNC4uf2cFfvF
+        JdkMXSGyVm8eNwSph/QocCqxFGckGmoxFxUnAgByXh1eTgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphkeLIzCtJLcpLzFFi42LZdlhJTtes3inFYNlKPYs5q7YxWqy+289m
+        sXL1USaLd63nWCwmHbrGaLFq1j0mi7cTtjBa7L2lbXF51xw2i/nLnrJbHJrczGSx7vV7Fgce
+        j19tc5k9Jja/Y/fYOesuu8f5extZPC6fLfXYtKqTzWPzknqP3Tcb2Dze77vK5vF5k1wAVxSX
+        TUpqTmZZapG+XQJXxuIV71kKfrBWtB3rYWpg/MnSxcjJISFgInGtv5+xi5GLQ0hgB6PE6d+X
+        2SES4hLN135A2cISK/89Z4coesIocfX7ETaQBIuAqsTyC1uYuhg5ONgENCUuTC4FCYsIqEhM
+        PNsDVs8s8JtRYsqn1awgCWEBF4lNX/aB9fIK6Er8OfeKFWJoD6PEzBvXGCESghInZz4BO49Z
+        wExi3uaHzCALmAWkJZb/4wAxOQUsJRadcAKpEBVQljiw7TjTBEbBWUiaZyFpnoXQvICReRWj
+        ZGpBcW56brFhgVFearlecWJucWleul5yfu4mRnCEaWntYNyz6oPeIUYmDsZDjBIczEoivB6l
+        TilCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnNTk0tSC2CyTJxcEo1MB38YmPN
+        ePEgz8T75x6f6f+twGWuI/PwkcrB60cvHGg73tv38sPTwiBFn1nVBw0Xy2xjOmj03Dup9aCP
+        w5+t8zySns/bpaUrmG4ybwujhsj9izef9TX0ZJieS37GM0fcr6np1mzzlJmyj0IvzrlWHH13
+        TsJR65UP+v/FbeTLVA6clbNynRVzeWfkbA7/02LXFW2ba0s7ZBUO1eed3Gox64g6y7VZfFtE
+        dJ2Z95ZWrWBwanGoPxl0as6ThQ/F521733mGWdRuWsuFwuky5h86nvFotJ6fFR9y5Njnyw7T
+        Kn4xvJbadEGiLdJV8uSDadPXsM0KnZY7P/2cUenW0xdalkW+W296QOjBAbnPnO7mKWeUWIoz
+        Eg21mIuKEwGi4fDXHwMAAA==
+X-CMS-MailID: 20230421121902epcas5p476b16ea1b5ca093afcee51662331189f
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230421114703epcas5p37cd0ddb29674d8f3d5fe2f1fa494d1f0
+References: <CGME20230421114703epcas5p37cd0ddb29674d8f3d5fe2f1fa494d1f0@epcas5p3.samsung.com>
+        <20230421114440.3343473-1-leitao@debian.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently uring CMD operation relies on having large SQEs, but future
-operations might want to use normal SQE.
+------DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-The io_uring_cmd currently only saves the payload (cmd) part of the SQE,
-but, for commands that use normal SQE size, it might be necessary to
-access the initial SQE fields outside of the payload/cmd block.  So,
-saves the whole SQE other than just the pdu.
+On Fri, Apr 21, 2023 at 04:44:37AM -0700, Breno Leitao wrote:
+>These three patches prepare for the sock support in the io_uring cmd, as
+>described in the following RFC:
+>
+>	https://lore.kernel.org/lkml/20230406144330.1932798-1-leitao@debian.org/
+>
+>Since the support linked above depends on other refactors, such as the sock
+>ioctl() sock refactor[1], I would like to start integrating patches that have
+>consensus and can bring value right now.  This will also reduce the patchset
+>size later.
+>
+>Regarding to these three patches, they are simple changes that turn
+>io_uring cmd subsystem more flexible (by passing the whole SQE to the
+>command), and cleaning up an unnecessary compile check.
 
-This changes slightly how the io_uring_cmd works, since the cmd
-structures and callbacks are not opaque to io_uring anymore. I.e, the
-callbacks can look at the SQE entries, not only, in the cmd structure.
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
-The main advantage is that we don't need to create custom structures for
-simple commands.
+------DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_
+Content-Type: text/plain; charset="utf-8"
 
-Suggested-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
----
- drivers/block/ublk_drv.c  | 24 ++++++++++++------------
- drivers/nvme/host/ioctl.c |  3 ++-
- include/linux/io_uring.h  |  2 +-
- io_uring/opdef.c          |  2 +-
- io_uring/uring_cmd.c      | 10 ++++------
- 5 files changed, 20 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c73cc57ec547..ec23a3c9fac8 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1263,7 +1263,7 @@ static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
- 
- static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- {
--	struct ublksrv_io_cmd *ub_cmd = (struct ublksrv_io_cmd *)cmd->cmd;
-+	struct ublksrv_io_cmd *ub_cmd = (struct ublksrv_io_cmd *)cmd->sqe->cmd;
- 	struct ublk_device *ub = cmd->file->private_data;
- 	struct ublk_queue *ubq;
- 	struct ublk_io *io;
-@@ -1567,7 +1567,7 @@ static struct ublk_device *ublk_get_device_from_id(int idx)
- 
- static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	int ublksrv_pid = (int)header->data[0];
- 	struct gendisk *disk;
- 	int ret = -EINVAL;
-@@ -1630,7 +1630,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
- static int ublk_ctrl_get_queue_affinity(struct ublk_device *ub,
- 		struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 	cpumask_var_t cpumask;
- 	unsigned long queue;
-@@ -1681,7 +1681,7 @@ static inline void ublk_dump_dev_info(struct ublksrv_ctrl_dev_info *info)
- 
- static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 	struct ublksrv_ctrl_dev_info info;
- 	struct ublk_device *ub;
-@@ -1844,7 +1844,7 @@ static int ublk_ctrl_del_dev(struct ublk_device **p_ub)
- 
- static inline void ublk_ctrl_cmd_dump(struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 
- 	pr_devel("%s: cmd_op %x, dev id %d qid %d data %llx buf %llx len %u\n",
- 			__func__, cmd->cmd_op, header->dev_id, header->queue_id,
-@@ -1863,7 +1863,7 @@ static int ublk_ctrl_stop_dev(struct ublk_device *ub)
- static int ublk_ctrl_get_dev_info(struct ublk_device *ub,
- 		struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 
- 	if (header->len < sizeof(struct ublksrv_ctrl_dev_info) || !header->addr)
-@@ -1894,7 +1894,7 @@ static void ublk_ctrl_fill_params_devt(struct ublk_device *ub)
- static int ublk_ctrl_get_params(struct ublk_device *ub,
- 		struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 	struct ublk_params_header ph;
- 	int ret;
-@@ -1925,7 +1925,7 @@ static int ublk_ctrl_get_params(struct ublk_device *ub,
- static int ublk_ctrl_set_params(struct ublk_device *ub,
- 		struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 	struct ublk_params_header ph;
- 	int ret = -EFAULT;
-@@ -1983,7 +1983,7 @@ static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
- static int ublk_ctrl_start_recovery(struct ublk_device *ub,
- 		struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	int ret = -EINVAL;
- 	int i;
- 
-@@ -2025,7 +2025,7 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
- static int ublk_ctrl_end_recovery(struct ublk_device *ub,
- 		struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	int ublksrv_pid = (int)header->data[0];
- 	int ret = -EINVAL;
- 
-@@ -2092,7 +2092,7 @@ static int ublk_char_dev_permission(struct ublk_device *ub,
- static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
- 		struct io_uring_cmd *cmd)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	bool unprivileged = ub->dev_info.flags & UBLK_F_UNPRIVILEGED_DEV;
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 	char *dev_path = NULL;
-@@ -2171,7 +2171,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
- static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
--	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->sqe->cmd;
- 	struct ublk_device *ub = NULL;
- 	int ret = -EINVAL;
- 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index d24ea2e05156..b69604485670 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -552,7 +552,8 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 		struct io_uring_cmd *ioucmd, unsigned int issue_flags, bool vec)
- {
- 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
--	const struct nvme_uring_cmd *cmd = ioucmd->cmd;
-+	const struct nvme_uring_cmd *cmd =
-+			(struct nvme_uring_cmd *)ioucmd->sqe->cmd;
- 	struct request_queue *q = ns ? ns->queue : ctrl->admin_q;
- 	struct nvme_uring_data d;
- 	struct nvme_command c;
-diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-index 35b9328ca335..2dfc81dd6d1a 100644
---- a/include/linux/io_uring.h
-+++ b/include/linux/io_uring.h
-@@ -24,7 +24,7 @@ enum io_uring_cmd_flags {
- 
- struct io_uring_cmd {
- 	struct file	*file;
--	const void	*cmd;
-+	const struct io_uring_sqe *sqe;
- 	union {
- 		/* callback to defer completions to task context */
- 		void (*task_work_cb)(struct io_uring_cmd *cmd, unsigned);
-diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index cca7c5b55208..3b9c6489b8b6 100644
---- a/io_uring/opdef.c
-+++ b/io_uring/opdef.c
-@@ -627,7 +627,7 @@ const struct io_cold_def io_cold_defs[] = {
- 	},
- 	[IORING_OP_URING_CMD] = {
- 		.name			= "URING_CMD",
--		.async_size		= uring_cmd_pdu_size(1),
-+		.async_size		= 2 * sizeof(struct io_uring_sqe),
- 		.prep_async		= io_uring_cmd_prep_async,
- 	},
- 	[IORING_OP_SEND_ZC] = {
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index 5113c9a48583..a1be746cd009 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -69,15 +69,13 @@ EXPORT_SYMBOL_GPL(io_uring_cmd_done);
- int io_uring_cmd_prep_async(struct io_kiocb *req)
- {
- 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
--	size_t cmd_size;
-+	size_t size = uring_sqe_size(req->ctx);
- 
- 	BUILD_BUG_ON(uring_cmd_pdu_size(0) != 16);
- 	BUILD_BUG_ON(uring_cmd_pdu_size(1) != 80);
- 
--	cmd_size = uring_cmd_pdu_size(req->ctx->flags & IORING_SETUP_SQE128);
--
--	memcpy(req->async_data, ioucmd->cmd, cmd_size);
--	ioucmd->cmd = req->async_data;
-+	memcpy(req->async_data, ioucmd->sqe, size);
-+	ioucmd->sqe = req->async_data;
- 	return 0;
- }
- 
-@@ -103,7 +101,7 @@ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 		req->imu = ctx->user_bufs[index];
- 		io_req_set_rsrc_node(req, ctx, 0);
- 	}
--	ioucmd->cmd = sqe->cmd;
-+	ioucmd->sqe = sqe;
- 	ioucmd->cmd_op = READ_ONCE(sqe->cmd_op);
- 	return 0;
- }
--- 
-2.34.1
-
+------DBoZ3SwRANBUL.4oxx5P7t7PoRgN1JiEjGDoy8d5VOZGQ23m=_36c71_--
