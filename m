@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAE3C77B75
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BECC77B7F
 	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 06:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232129AbjDUGGF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 02:06:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47298 "EHLO
+        id S233095AbjDUGGN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 02:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233767AbjDUGFy (ORCPT
+        with ESMTP id S233769AbjDUGGG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 02:05:54 -0400
+        Fri, 21 Apr 2023 02:06:06 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB656E92;
-        Thu, 20 Apr 2023 23:05:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5040F768E;
+        Thu, 20 Apr 2023 23:05:56 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B0EA91FDDF;
-        Fri, 21 Apr 2023 06:05:17 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9EEA81FDE2;
+        Fri, 21 Apr 2023 06:05:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1682057117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1682057121; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Piq20gmCbu/sfasT+BJykUx1CpQBqc0w9RDrikSeIvU=;
-        b=HLT8Ja5MNTGaFTfOk3Pl7fzS2fkTGyqMim0UtWnJfwx4W0wMFVesGi94EVYD9cJSwYNGfE
-        MEBBtiX5zqoaDxnFI23RHSMvo2+VjdDRStOru7jUoKg60r3DtrZh6dQAZscLuQdJMtdIrP
-        43fBZo+26MTt/VMZO//X6WsRVIE7FU8=
+        bh=64UivdY+JtKHHGrkt+vaul9Etj91J7nvEO+ZQNudNu8=;
+        b=EoDlVx7FPNaOzfpIOSof4jUY/6TuLVkrAyfprfZJfhy51GvMUM+n3ATkasGkLnJs+C5dIO
+        Fyq7gr10RKobM0kDmJs+7SnK1o4KX/w6yFyaD46VkRmYMlY7DT3oYzbLPb0sCTY5l72lbK
+        6SUu6B8aGNy+riILvgXic0sEaMv6Rpk=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1682057117;
+        s=susede2_ed25519; t=1682057121;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Piq20gmCbu/sfasT+BJykUx1CpQBqc0w9RDrikSeIvU=;
-        b=v1kEqw5z6Bt0MQ0mGl4DaaDdmldtIaXqdn7cEdJVh41Yg1Xuh93MjYqPX6+9I0Q16hW3Q2
-        7ZmELlOgrL2BFOAQ==
+        bh=64UivdY+JtKHHGrkt+vaul9Etj91J7nvEO+ZQNudNu8=;
+        b=ZoTN2WdrMBxSwpS2IqkFOu5Yqa1VIXEp6PiWZwtMiPNUAwRRCg+aBF/tgnYjlop0XjvaQb
+        GQcRmDXfFpwu00Cg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A32371390E;
-        Fri, 21 Apr 2023 06:05:17 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 914831390E;
+        Fri, 21 Apr 2023 06:05:21 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id +tHUJ50nQmRuZgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 21 Apr 2023 06:05:17 +0000
+        id 46mJI6EnQmSAZgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 21 Apr 2023 06:05:21 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH REPOST blktests v2 3/9] common-xfs: Make size argument optional for _xfs_run_fio_verify_io
-Date:   Fri, 21 Apr 2023 08:04:59 +0200
-Message-Id: <20230421060505.10132-4-dwagner@suse.de>
+Subject: [PATCH REPOST blktests v2 9/9] nvme: Make the number iterations configurable
+Date:   Fri, 21 Apr 2023 08:05:05 +0200
+Message-Id: <20230421060505.10132-10-dwagner@suse.de>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230421060505.10132-1-dwagner@suse.de>
 References: <20230421060505.10132-1-dwagner@suse.de>
@@ -67,74 +67,69 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make the size argument optional by reading the filesystem info. The
-caller doesn't have to guess (or calculate) how big the max IO size.
-The log data structure of XFS is reducing the capacity.
+Some tests hard code high values of iterations. This makes them run
+relatively long compared to the other tests. Introduce a new environment
+variable nvme_num_iter to allow tune the runtime.
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
- common/xfs     | 6 ++++++
- tests/nvme/012 | 2 +-
- tests/nvme/013 | 2 +-
- tests/nvme/035 | 2 +-
- 4 files changed, 9 insertions(+), 3 deletions(-)
+ tests/nvme/002 | 2 +-
+ tests/nvme/016 | 2 +-
+ tests/nvme/017 | 2 +-
+ tests/nvme/rc  | 1 +
+ 4 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/common/xfs b/common/xfs
-index 2c5d96164ac1..ec35599e017b 100644
---- a/common/xfs
-+++ b/common/xfs
-@@ -27,6 +27,12 @@ _xfs_run_fio_verify_io() {
+diff --git a/tests/nvme/002 b/tests/nvme/002
+index 6b8484844b4d..c28035483514 100755
+--- a/tests/nvme/002
++++ b/tests/nvme/002
+@@ -20,7 +20,7 @@ test() {
  
- 	_xfs_mkfs_and_mount "${bdev}" "${mount_dir}" >> "${FULL}" 2>&1
+ 	_setup_nvmet
  
-+	if [[ -z "${sz}" ]]; then
-+		local avail
-+		avail="$(df --output=avail "${mount_dir}" | awk 'NR==2 {print $1}')"
-+		sz="$(printf "%d" $((avail / 1024 - 1 )))m"
-+	fi
-+
- 	_run_fio_verify_io --size="$sz" --directory="${mount_dir}/"
+-	local iterations=1000
++	local iterations="${nvme_num_iter}"
+ 	local port
+ 	port="$(_create_nvmet_port "${nvme_trtype}")"
  
- 	umount "${mount_dir}" >> "${FULL}" 2>&1
-diff --git a/tests/nvme/012 b/tests/nvme/012
-index e60082c2e751..c9d24388306d 100755
---- a/tests/nvme/012
-+++ b/tests/nvme/012
-@@ -44,7 +44,7 @@ test() {
- 	cat "/sys/block/${nvmedev}n1/uuid"
- 	cat "/sys/block/${nvmedev}n1/wwid"
+diff --git a/tests/nvme/016 b/tests/nvme/016
+index 4eba30223a08..c0c31a55b190 100755
+--- a/tests/nvme/016
++++ b/tests/nvme/016
+@@ -17,7 +17,7 @@ test() {
+ 	echo "Running ${TEST_NAME}"
  
--	_xfs_run_fio_verify_io "/dev/${nvmedev}n1" "900m"
-+	_xfs_run_fio_verify_io "/dev/${nvmedev}n1"
+ 	local port
+-	local iterations=1000
++	local iterations="${nvme_num_iter}"
+ 	local loop_dev
+ 	local subsys_nqn="blktests-subsystem-1"
  
- 	_nvme_disconnect_subsys "${subsys_name}"
+diff --git a/tests/nvme/017 b/tests/nvme/017
+index 0248aee9bc41..e1674508f654 100755
+--- a/tests/nvme/017
++++ b/tests/nvme/017
+@@ -18,7 +18,7 @@ test() {
  
-diff --git a/tests/nvme/013 b/tests/nvme/013
-index 9d60a7df4577..265b6968fd34 100755
---- a/tests/nvme/013
-+++ b/tests/nvme/013
-@@ -41,7 +41,7 @@ test() {
- 	cat "/sys/block/${nvmedev}n1/uuid"
- 	cat "/sys/block/${nvmedev}n1/wwid"
+ 	local port
+ 	local file_path
+-	local iterations=1000
++	local iterations="${nvme_num_iter}"
+ 	local subsys_name="blktests-subsystem-1"
  
--	_xfs_run_fio_verify_io "/dev/${nvmedev}n1" "900m"
-+	_xfs_run_fio_verify_io "/dev/${nvmedev}n1"
+ 	_setup_nvmet
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index 2aa34fb0c9b8..bb135502220a 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -18,6 +18,7 @@ def_hostnqn="$(cat /etc/nvme/hostnqn 2> /dev/null)"
+ def_hostid="$(cat /etc/nvme/hostid 2> /dev/null)"
+ nvme_trtype=${nvme_trtype:-"loop"}
+ nvme_img_size=${nvme_img_size:-"350M"}
++nvme_num_iter=${nvme_num_iter:-"100"}
  
- 	_nvme_disconnect_subsys "${subsys_name}"
- 
-diff --git a/tests/nvme/035 b/tests/nvme/035
-index eb1024edddbf..8b485bc8e682 100755
---- a/tests/nvme/035
-+++ b/tests/nvme/035
-@@ -32,7 +32,7 @@ test_device() {
- 	port=$(_nvmet_passthru_target_setup "${subsys}")
- 	nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" "${subsys}")
- 
--	_xfs_run_fio_verify_io "${nsdev}" "900m"
-+	_xfs_run_fio_verify_io "${nsdev}"
- 
- 	_nvme_disconnect_subsys "${subsys}"
- 	_nvmet_passthru_target_cleanup "${port}" "${subsys}"
+ _nvme_requires() {
+ 	_have_program nvme
 -- 
 2.40.0
 
