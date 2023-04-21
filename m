@@ -2,93 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3437EC7618E
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 06:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD23AC7618E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 07:03:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230298AbjDUG6G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 02:58:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46580 "EHLO
+        id S230273AbjDUHDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 03:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230328AbjDUG6E (ORCPT
+        with ESMTP id S229659AbjDUHDh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 02:58:04 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E99B3170A
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 23:57:56 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-63b73203e0aso12292135b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 23:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1682060276; x=1684652276;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iCQQOrDHvv7muofgTvhggno9gmpvYe5WVwBD+zXre78=;
-        b=hbF+Bk8ojjiZO6o2ok3vxf1WbShiuo5T081GBEE0UAfUBksGieFJSgkGacjYqBeK8w
-         zt8XcYoWlevrCYjZed9y77ALfx/FxTMIwIwFlhupB/WwZM1Z1umn0C+QVKNQOjZ4t1v4
-         rUbAMrVRBbyd04gOqF9r0veBQA2+tqYWKmYcY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682060276; x=1684652276;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iCQQOrDHvv7muofgTvhggno9gmpvYe5WVwBD+zXre78=;
-        b=d4Pi6nZNr7SH7E/3ZTffOTgvHOptS0il6a66F+lBHGjvxgnHFu8/fKTaaTV30aPEr9
-         tWqyUshQTZne2sqUxDQwC3B/dd+lrU8Mmz90gKp+BzIKqzgwd0gLIiTwCwpdSaPx3e8n
-         MrP26J7HbweDJN2y3ybjZgIv12Y6qAq0kpl7XnitTXD8rNyi8CS7HQi8u/a10SHO6w49
-         Q3FDTK3WB8Jdgx7xfduIyMw5js0pwAZyfaHIsahlt5T4NdZEOYhwdRu/xI5PBnXxcAUP
-         b+LYUoHDlX4MNyOg1LU7QRxGcEOR2Z96pg5XcTOZ3reRcK+o5RjuecboVLFVHqbj4ZaP
-         ZCFQ==
-X-Gm-Message-State: AAQBX9dVHtgDFC9mxU+oAha3Q6Zyd7q4VOyJhuXnl2A4Vc4IWzXd561O
-        wufBDjljpGzz7U3NZ6YRgrakSg==
-X-Google-Smtp-Source: AKy350ZEEP/PrU7kYgyyZkKivdaMPHUVf5WGz+Wiu1WQ8mlkUVfjfkCNB7ZnxyH4DOCp4JsT1PbWNg==
-X-Received: by 2002:aa7:8554:0:b0:63d:40bb:a88b with SMTP id y20-20020aa78554000000b0063d40bba88bmr8194787pfn.14.1682060275718;
-        Thu, 20 Apr 2023 23:57:55 -0700 (PDT)
-Received: from google.com (KD124209188001.ppp-bb.dion.ne.jp. [124.209.188.1])
-        by smtp.gmail.com with ESMTPSA id 136-20020a63008e000000b0051806da5cd6sm2038374pga.60.2023.04.20.23.57.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Apr 2023 23:57:54 -0700 (PDT)
-Date:   Fri, 21 Apr 2023 15:57:47 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Johannes Thumshirn <jth@kernel.org>
-Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com, agruenba@redhat.com,
-        cluster-devel@redhat.com, damien.lemoal@wdc.com,
-        dm-devel@redhat.com, dsterba@suse.com, hare@suse.de, hch@lst.de,
-        jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
-        linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-raid@vger.kernel.org, ming.lei@redhat.com,
-        rpeterso@redhat.com, shaggy@kernel.org, snitzer@kernel.org,
-        song@kernel.org, willy@infradead.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Minchan Kim <minchan@kernel.org>
-Subject: Re: [PATCH v4 13/22] zram: use __bio_add_page for adding single page
- to bio
-Message-ID: <20230421065747.GB1496740@google.com>
-References: <20230420100501.32981-1-jth@kernel.org>
- <20230420100501.32981-14-jth@kernel.org>
+        Fri, 21 Apr 2023 03:03:37 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCC271FE7;
+        Fri, 21 Apr 2023 00:03:35 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 76E591FDDC;
+        Fri, 21 Apr 2023 07:03:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1682060614; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2rtWXlVT5BsQ+9u99bjnLdBNoxWAcQElzaxacnHOXTI=;
+        b=1F8t7EYbDxtAnuR9jahNG2NSpaCyAN8tuFMnBdX0e9yVSzLrb9UO6uG+6VmdWHToruPTJO
+        XcUaXvQOq9jPc2JZs1O7be9XRrm0QG703Ik2bv+15LpnlHvGuZlcjp0axKo+Wz/waAjm4w
+        JxUni3tpgaWPkf0K7MZFqLolAmpSCn4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1682060614;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2rtWXlVT5BsQ+9u99bjnLdBNoxWAcQElzaxacnHOXTI=;
+        b=VtwYNriBGsu5v97+sGmbgOcQAu2YRRbXwoACP3zhiPTY+elacxfqPuPXXNBKyBMxkmzwlN
+        Vkk0IGGso0ShA1Dg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A10F13456;
+        Fri, 21 Apr 2023 07:03:34 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id zZbgGUY1QmRKAgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 21 Apr 2023 07:03:34 +0000
+Date:   Fri, 21 Apr 2023 09:03:33 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+Subject: Re: [PATCH REPOST blktests v2 7/9] nvme-rc: Calculate IO size for
+ fio jobs
+Message-ID: <7qew4jvwfgvpsqlci6dh6r6vjmzrzaphbqzzxqvvpdfadkj3ab@vxvbvh26bvji>
+References: <20230421060505.10132-1-dwagner@suse.de>
+ <20230421060505.10132-8-dwagner@suse.de>
+ <6aa42bc9-e04e-cfc6-32cf-f1739944070b@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230420100501.32981-14-jth@kernel.org>
+In-Reply-To: <6aa42bc9-e04e-cfc6-32cf-f1739944070b@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+ Minchan
+On Fri, Apr 21, 2023 at 08:33:46AM +0200, Hannes Reinecke wrote:
+ > +_nvme_calc_rand_io_size() {
+> > +	local img_size_mb
+> > +	local io_size_mb
+> > +
+> > +	img_size_mb="$(convert_to_mb "$1")"
+> > +	io_size_mb="$(printf "%d" $((((img_size_mb * 1024 * 1024) / $(nproc) - 1) / 1024)))"
+> > +
+> 
+> ... ending with ridiculous small io sizes on machines with lots of CPUs.
+> Please cap nproc by something sane like 32.
 
-On (23/04/20 12:04), Johannes Thumshirn wrote:
-> 
-> From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> 
-> The zram writeback code uses bio_add_page() to add a page to a newly
-> created bio. bio_add_page() can fail, but the return value is never
-> checked.
-> 
-> Use __bio_add_page() as adding a single page to a newly created bio is
-> guaranteed to succeed.
-> 
-> This brings us a step closer to marking bio_add_page() as __must_check.
-> 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Yeah, propably not really good long time strategy. I was wondering if we should
+make run_fio() variants smarter and do the size callculation there and not by
+the callee. If we do this, we could make the number of jobs dependend on CPUs
+and image size a bit nicer.
