@@ -2,105 +2,152 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBE4C7618E
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 00:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A94C7618E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 00:38:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232698AbjDUA3S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 20:29:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50854 "EHLO
+        id S230127AbjDUAiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 20:38:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbjDUA3R (ORCPT
+        with ESMTP id S229829AbjDUAiX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 20:29:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB85468A
-        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 17:29:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7A64F6144D
-        for <linux-block@vger.kernel.org>; Fri, 21 Apr 2023 00:29:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC7BFC4339B;
-        Fri, 21 Apr 2023 00:29:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682036954;
-        bh=DVIpfpEfRnQPbQovpPkz14y31eafz3HvawMnzlvMuyg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RiAYFZV6yQ7ThjMzh4m7YPSOWbxbXvbQSWFUiMrtFKKnfNpC4qn+tMDACDoFlAU8X
-         Xos9CYDpyudN//gs0nWYcVTczno0LFqWfxHUAqZ6kv3WkSag9VROeUTcQSJaqaM8L6
-         jHTeUHL+EFu7RghgGPl1RwHqkmOK9MffqIcI4zzr0wrVlmtI3isse8HIEmOATbI3zN
-         troA/kYvY/OF8xl3+zf/gca36sWvXI45wrdYxDwNtyhmvxlAExdpiHH3wspPI1eqdE
-         3U60DeU6ZX7HeslsrmLqA4XL4j3NFOjFjuWp2jSR8HEWIb7uCWpDixsnD6ffIlwo+z
-         OsNky0VqQerpw==
-Date:   Thu, 20 Apr 2023 17:29:12 -0700
-From:   Jaegeuk Kim <jaegeuk@kernel.org>
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matias Bjorling <mb@lightnvm.io>
-Subject: Re: [PATCH v2 10/11] block: Add support for the zone capacity concept
-Message-ID: <ZEHY2PIRCCLOZsC4@google.com>
-References: <20230418224002.1195163-1-bvanassche@acm.org>
- <20230418224002.1195163-11-bvanassche@acm.org>
- <ZEEEm/5+i7x2i8a5@x1-carbon>
- <f9d35d19-d0ba-fcb7-e44b-f0b8c55ba399@acm.org>
- <141aee35-4288-1670-6424-e6c41c8ef4c9@kernel.org>
- <ec7cdc7d-9eb7-65a4-6ba9-1ae6cf6f43d2@acm.org>
- <a5d9a370-6264-ebdf-f9f8-7b3263c2b6f0@kernel.org>
- <490ed061-6d82-f9fb-2050-4a386e2e4c8e@acm.org>
- <c4a52bff-5cab-5029-ad7f-e5f9452bc0e2@kernel.org>
+        Thu, 20 Apr 2023 20:38:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D61C4EED
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 17:37:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682037448;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=xtTSOUac3kURN73axxeyk2EO2Etq2XUZGphvjz6bVkE=;
+        b=DSJpdMvRNjiu+R0fln7+WjZXXjr2QNnoDSwcu6SoR63ZSnq3uq8ZsIMfh70f52Vy7FTfDg
+        Lc+T6dBKK/degkxvyBFBH54vXLdFQlitk/EfwHEZ+k8bCHcSQG+UA/eOrH2zzxuKvdlrtu
+        RXr3lTATBPPUGvEndO2wYbDrQ0sGPNU=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-83-Y5AgSROrOUaFI5jEFh-08w-1; Thu, 20 Apr 2023 20:37:26 -0400
+X-MC-Unique: Y5AgSROrOUaFI5jEFh-08w-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1a681ad22c8so10450645ad.2
+        for <linux-block@vger.kernel.org>; Thu, 20 Apr 2023 17:37:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682037445; x=1684629445;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xtTSOUac3kURN73axxeyk2EO2Etq2XUZGphvjz6bVkE=;
+        b=UOSuRPpMwRxRR5nekv0JAIA2UgynzDZ17If6AdRExj2HxgLVkx6s+jpnXCJucDLGkT
+         XJzpeckLPlfwN31ejs/n7afqNY9mWzgkqnFf/HuMKF6OQofBxp3OhUHEMhPEQeFRMQ6E
+         6IB42pWLjY/0rrbcR6xQPl3N/rs2yER8/Y3wRcbLh97RoTaI39WKcypXUMQcBMS5GRRK
+         wjQjqP4LK3K3N3JSHO6AhXx87Gqkzvw4vh2nWmhGlnAavgcLD+/HtKFIklGigWG7vI8o
+         SGM64PfFZgrL8I/Fjj7hAv9Gl4UDshafDHlcmXP5UAT6zmxr3A7+MJUyOqi40OrPl2c9
+         8ASA==
+X-Gm-Message-State: AAQBX9cr2yq76NS+tZo4AkDkU5wY8aYsrVyfUH5aQRx/UuG73GN/3tH0
+        BzPAAyxGt2vYIvUcAup8xLeYI5J/thcVaa+gNPimyAarG0JsaO30D+GZ4qdwFQhoYxyvEKPL3Gz
+        a/CvnkDLua7omMDAUzRs8XUaRBKOVTdNzdUsWccIS5X4ihMevqlwT
+X-Received: by 2002:a17:903:41ca:b0:1a4:fca9:7f44 with SMTP id u10-20020a17090341ca00b001a4fca97f44mr3972060ple.56.1682037445395;
+        Thu, 20 Apr 2023 17:37:25 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bmg9kOpRdodDz0e6pUCkhTFuNUm4NdfOAr2pmDQLjKJaZkHz3mrlH4YnTDS70fAzUC+LGhjHpTvqiKMdD2QnA=
+X-Received: by 2002:a17:903:41ca:b0:1a4:fca9:7f44 with SMTP id
+ u10-20020a17090341ca00b001a4fca97f44mr3972037ple.56.1682037445037; Thu, 20
+ Apr 2023 17:37:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c4a52bff-5cab-5029-ad7f-e5f9452bc0e2@kernel.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Fri, 21 Apr 2023 08:37:13 +0800
+Message-ID: <CAHj4cs-nDaKzMx2txO4dbE+Mz9ePwLtU0e3egz+StmzOUgWUrA@mail.gmail.com>
+Subject: [bug report] kmemleak observed during blktests nvme-tcp
+To:     linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Cc:     Hannes Reinecke <hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04/21, Damien Le Moal wrote:
-> On 4/21/23 08:44, Bart Van Assche wrote:
-> > On 4/20/23 16:37, Damien Le Moal wrote:
-> >> Why would you need to handle the max active zone number restriction in the
-> >> scheduler ? That is the user responsibility. btrfs does it (that is still buggy
-> >> though, working on it).
-> > 
-> > Hi Damien,
-> > 
-> > If the user (filesystem) restricts the number of active zones, the code 
-> > for restricting the number of active zones will have to be duplicated 
-> > into every filesystem that supports zoned devices. Wouldn't it be better 
-> > if the I/O scheduler tracks the number of active zones?
-> 
-> I do not think so. The reason is that for a file system, the block allocator
-> must be aware of any active zone limit of the underlying device to make the best
-> decision possible regarding where to allocate blocks for files and metadata. For
+Hello
 
-Well, I'm wondering what kind of decision FS can make when allocating zones?
+Below kmemleak observed after blktests nvme-tcp, pls help check it, thanks.
 
-> btrfs, we added "active block groups" management for that purpose. And we have
-> tracking of a block group active state so that the block allocator can start
-> using new block groups (inactive ones) when previously used ones become full. We
-> also have a "finish block group" for cases when there is not enough remaining
-> free blocks in a group/zone (this does a finish zone operation to make a
-> non-full zone full, that is, inactive).
-> 
-> Even if the block IO scheduler were to track active zones, the FS would still
-> need to do its own tracking (e.g. to be able to finish zones when needed). So I
+commit: linux-block/for-next
+aaf9cff31abe (origin/for-next) Merge branch 'for-6.4/io_uring' into for-next
 
-Why does FS also need to track the # of open zones redundantly? I have two
-concerns if FS needs to force it:
-1) performance - waiting for finish_zone before allocating a new zone can break
-the IO pipeline and block FS operations.
-2) multiple partition support - if F2FS uses two partitions, one on conventional
-partition while the other on zoned partition, we have to maintain such tracking
-mechanism on zoned partition only which gives some code complexity.
+unreferenced object 0xffff88821f0cc880 (size 32):
+  comm "kworker/1:2H", pid 3067, jiffies 4295825061 (age 12918.254s)
+  hex dump (first 32 bytes):
+    82 0c 38 08 00 ea ff ff 00 00 00 00 00 10 00 00  ..8.............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
+    [<ffffffff8776d0bf>] sgl_alloc_order+0x7f/0x360
+    [<ffffffffc0ba9875>] 0xffffffffc0ba9875
+    [<ffffffffc0bb068f>] 0xffffffffc0bb068f
+    [<ffffffffc0bb2038>] 0xffffffffc0bb2038
+    [<ffffffffc0bb257c>] 0xffffffffc0bb257c
+    [<ffffffffc0bb2de3>] 0xffffffffc0bb2de3
+    [<ffffffff86897f49>] process_one_work+0x8b9/0x1550
+    [<ffffffff8689919c>] worker_thread+0x5ac/0xed0
+    [<ffffffff868b2222>] kthread+0x2a2/0x340
+    [<ffffffff866063ac>] ret_from_fork+0x2c/0x50
+unreferenced object 0xffff88823abb7c00 (size 512):
+  comm "nvme", pid 6312, jiffies 4295856007 (age 12887.309s)
+  hex dump (first 32 bytes):
+    00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+    ff ff ff ff ff ff ff ff a0 53 5f 8e ff ff ff ff  .........S_.....
+  backtrace:
+    [<ffffffff86f63da7>] kmalloc_trace+0x27/0xe0
+    [<ffffffff87d61205>] device_add+0x645/0x12f0
+    [<ffffffff871c2a73>] cdev_device_add+0xf3/0x230
+    [<ffffffffc09ed7c6>] nvme_init_ctrl+0xbe6/0x1140 [nvme_core]
+    [<ffffffffc0b54e0c>] 0xffffffffc0b54e0c
+    [<ffffffffc086b177>] 0xffffffffc086b177
+    [<ffffffffc086b613>] 0xffffffffc086b613
+    [<ffffffff871b41e6>] vfs_write+0x216/0xc60
+    [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+    [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+    [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
+unreferenced object 0xffff88810ccc9b80 (size 96):
+  comm "nvme", pid 6312, jiffies 4295856008 (age 12887.308s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff86f63da7>] kmalloc_trace+0x27/0xe0
+    [<ffffffff87d918e0>] dev_pm_qos_update_user_latency_tolerance+0xe0/0x200
+    [<ffffffffc09ed83c>] nvme_init_ctrl+0xc5c/0x1140 [nvme_core]
+    [<ffffffffc0b54e0c>] 0xffffffffc0b54e0c
+    [<ffffffffc086b177>] 0xffffffffc086b177
+    [<ffffffffc086b613>] 0xffffffffc086b613
+    [<ffffffff871b41e6>] vfs_write+0x216/0xc60
+    [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+    [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+    [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
+unreferenced object 0xffff8881d1fdb780 (size 64):
+  comm "check", pid 6358, jiffies 4295859851 (age 12883.466s)
+  hex dump (first 32 bytes):
+    44 48 48 43 2d 31 3a 30 30 3a 4e 46 76 44 6d 75  DHHC-1:00:NFvDmu
+    52 58 77 79 54 79 62 57 78 70 43 4a 45 4a 68 36  RXwyTybWxpCJEJh6
+  backtrace:
+    [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
+    [<ffffffffc09fb710>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nvme_core]
+    [<ffffffff873cc848>] kernfs_fop_write_iter+0x358/0x530
+    [<ffffffff871b47d2>] vfs_write+0x802/0xc60
+    [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+    [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+    [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
+unreferenced object 0xffff8881d1fdb600 (size 64):
+  comm "check", pid 6358, jiffies 4295859908 (age 12883.409s)
+  hex dump (first 32 bytes):
+    44 48 48 43 2d 31 3a 30 30 3a 4e 46 76 44 6d 75  DHHC-1:00:NFvDmu
+    52 58 77 79 54 79 62 57 78 70 43 4a 45 4a 68 36  RXwyTybWxpCJEJh6
+  backtrace:
+    [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
+    [<ffffffffc09fb710>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nvme_core]
+    [<ffffffff873cc848>] kernfs_fop_write_iter+0x358/0x530
+    [<ffffffff871b47d2>] vfs_write+0x802/0xc60
+    [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+    [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+    [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
 
-In general, doesn't it make sense that FS (not zoned-device FS) just needs to
-guarantee sequential writes per zone, while IO scheduler needs to limit the #
-of open zones gracefully?
+--
+Best Regards,
+  Yi Zhang
 
-> do not see the point in having the block scheduler doing anything about active
-> zones.
-> 
