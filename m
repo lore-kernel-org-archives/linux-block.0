@@ -2,119 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55449C77B78
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 11:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AF5C7618E
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 11:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231355AbjDULNM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 07:13:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49522 "EHLO
+        id S229991AbjDULq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 07:46:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbjDULNL (ORCPT
+        with ESMTP id S229657AbjDULq7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 07:13:11 -0400
-Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09F8A257;
-        Fri, 21 Apr 2023 04:13:09 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 6BF5F582152;
-        Fri, 21 Apr 2023 07:13:07 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Fri, 21 Apr 2023 07:13:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1682075587; x=1682076187; bh=0t
-        2qq+tQTWqA4ZpWihOO91zumC8XpczzQjvKGW1H0LE=; b=B6yYwcD4IOXkq7c+14
-        fs0gD5K2A0OeZzLjcbgF6Xun91hwQzVIqO6Xa/JaBCPoh5eMdcuuFe4TFQP7VKST
-        g6/LQQ7epWd41yphBcrfCdPOxRT/4I9iBmZlwlFsc4xAVJ00JHbf951eMKf4OAZF
-        RxAKL1212bUp+vQd35Z6wTyYX2n0X42PzR4teQ3beOuceYQQUF5BoKoLJ9EILxyj
-        ASZbAMhVnXA04AP1T6H4d3plsTm6C+SV9wgTOasrTeqG0Ynn0JOu9fsUpIttm4/F
-        XXN1/0TCCo1DIfb5PVWBbVAavQJhygB+s3aXSEi6pAW6VBgBp9vLeEd8dmSt1oss
-        RO7g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=ie1e949a3.fm3; t=1682075587; x=1682076187; bh=0t2
-        qq+tQTWqA4ZpWihOO91zumC8XpczzQjvKGW1H0LE=; b=QPnvv6pfRl/7Ei7ANn0
-        Xj236EDf7U5my6lgbtn1NAavbK3/lDVZ6QWnk71wp9GfJUzjXSc+ecvPCwcEA4q/
-        dh7hPwMsI5viGFzSzn5v8I7ZZwpP8ItWAMp4V6LJvACg6hye/SYlx3kKtOByzbiH
-        oYCafvedYPzQX355k+lYuFAw89dys5yLpjpIDFa9FwN01LskbMajwiMYFpD5+yMg
-        NkW21vFUxZ7Bvarpq29cEIguA8m9K5Az1ssQjjs6xvnBdh/CFrXZzSYMMBWZ2ikX
-        Ea4OvCV1PC5OMTNwZEUXrM6ljlTzEfFdDRdSXu1me89W1di3RgH6E/BFGCBDSEzx
-        LcA==
-X-ME-Sender: <xms:w29CZL236wP8bmLmnSG9BL-oOfeCW1MpxP91CFmzdbxT5YkwblUsfA>
-    <xme:w29CZKElowL7pjG7iyK8vxMnVAzelLA7wkx1WvGxgOPTSf5CAzOXPU2X2bROQXS9c
-    reSb0bJTof4hpRnZlk>
-X-ME-Received: <xmr:w29CZL4DEvk7qvWyHD-JyUChI6Sh66hIzILJYXWxAgAziqaRRvV7ZH0s9P4x7f1JzYCYW9bN2hSpZpmtNf1cUw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedtgedgfeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
-    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepvdegtdfgvdfhgfekvdektdfgfeeljeel
-    gefgkedujeeiteehgefhgeethffgheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
-    mh
-X-ME-Proxy: <xmx:w29CZA24E7gcTexPJ8fwIsEm67fKCD_aZd_lDZLuuMUTGVwoyxA9Gg>
-    <xmx:w29CZOHPAEbbggBQXvLcurL1aEJ8wiUJWPNxhheYEFDsOVow4Rpnlw>
-    <xmx:w29CZB9Fb8t5pCr_-ePdJICNIFwsNldz9TT7UY5_A4MnClAmIjZVHw>
-    <xmx:w29CZDSYhw4Cfzzh0c-EZ2z8Ssf4FpTVvDxYvv-i7y-U2gXd9-keOiqT4fI>
-Feedback-ID: ie1e949a3:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 21 Apr 2023 07:13:05 -0400 (EDT)
-Date:   Fri, 21 Apr 2023 20:13:02 +0900
-From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH blktests 5/9] scsi/004: allow to run with built-in
- scsi_debug
-Message-ID: <4mab5xvql3xl6saolhvnbggeehovhdp3y4glz2ccfxvkqj34ur@wpnku3bybtrv>
-References: <20230417125913.458726-1-shinichiro@fastmail.com>
- <f4997765-6ea5-52ad-e329-73b9e5eedde5@nvidia.com>
+        Fri, 21 Apr 2023 07:46:59 -0400
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66D37C3;
+        Fri, 21 Apr 2023 04:46:57 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-2f939bea9ebso1501474f8f.0;
+        Fri, 21 Apr 2023 04:46:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682077615; x=1684669615;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=drtJY3bzG70qwaMh3FrpvU2+Y1e1A4ULSdaEvu4w4Po=;
+        b=EOJ7JbXW2POm4MAEP8Q3Dk/oMUsLe+/FZDvgiRJR2LZQX8Lw7fuGv33rsokdl6Tdlk
+         6jIz+TwxmvxlQPk6iZt7DcWx27gRU+MCBX9KVclzIgLLNMPS0zdZG0NJrg1aeO+AjeTl
+         Dl0mVL/FXkioozVBOTllzspH/LHqL9H9WIco1kOyHsufCjJe2z13CiL/LZ6Wb20in05K
+         SJ0ppVIru5vtyUAhnNyrtoi0Vu9xBmNxp66rMn0R94QxdRL38qxs99fv5zxATOmuybMt
+         68sP6fLCj1rZ01M9wBhMT3IlxDFG8gPMZWaCwydvWNZmniUHcFt6UvgGMnojnkBa7+Z5
+         V92w==
+X-Gm-Message-State: AAQBX9dUvJsq9yFg4vcCCK4ZQwflcEr13hVK8smlCq5ouKteZqvbZh96
+        9eJ21m6Sso4DA/Lxovfv+8Hp3uP8nm/2QQ==
+X-Google-Smtp-Source: AKy350Z6FaO9dagmTH/zhPsTsiWB9kCDDLYbt3lKidgLFGw1aZUHkPY05gtP2GpQhwHrfkyzdSr6OQ==
+X-Received: by 2002:a5d:5902:0:b0:2fd:1a81:6b0e with SMTP id v2-20020a5d5902000000b002fd1a816b0emr3474376wrd.33.1682077615300;
+        Fri, 21 Apr 2023 04:46:55 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-019.fbsv.net. [2a03:2880:31ff:13::face:b00c])
+        by smtp.gmail.com with ESMTPSA id s13-20020adfeb0d000000b002fb6a79dea0sm4298485wrn.7.2023.04.21.04.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Apr 2023 04:46:54 -0700 (PDT)
+From:   Breno Leitao <leitao@debian.org>
+To:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        asml.silence@gmail.com, axboe@kernel.dk
+Cc:     leit@fb.com, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, sagi@grimberg.me, hch@lst.de,
+        kbusch@kernel.org, ming.lei@redhat.com
+Subject: [PATCH v2 0/3] io_uring: Pass the whole sqe to commands
+Date:   Fri, 21 Apr 2023 04:44:37 -0700
+Message-Id: <20230421114440.3343473-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f4997765-6ea5-52ad-e329-73b9e5eedde5@nvidia.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 18, 2023 / 20:18, Chaitanya Kulkarni wrote:
-> On 4/17/23 05:59, Shin'ichiro Kawasaki wrote:
-> > From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> >
-> > To allow the test case run with build-in scsi_debug, replace
-> > '_have_module scsi_debug' with _have_scsi_debug, and replace
-> > _init_scsi_debug with _configure_scsi_debug.
-> >
-> > Also, save and restore the values of scsi_debug parameters 'opts' and
-> > 'ndelay'. The test case modifies the parameters and do not restore their
-> > original values. It is fine when scsi_debug is loadable since scsi_debug
-> > is unloaded after the test case run. However, when scsi_debug is built-
-> > in, the modified parameters may affect following test cases. To avoid
-> > potential impact on following test cases, save original values of the
-> > parameters and restore them at the end of the test case.
-> >
-> > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > ---
-> >
-> 
-> Perhaps we should look into a helper to record other default
-> parameters before the testcase and restore it after when
-> it is built in ?
+These three patches prepare for the sock support in the io_uring cmd, as
+described in the following RFC:
 
-Hi Chaitanya, thanks for the review comments. Your idea sounds good. I will try
-to implement it.
+	https://lore.kernel.org/lkml/20230406144330.1932798-1-leitao@debian.org/
 
-> 
-> Irrespective of that, looks good.
-> 
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> 
-> -ck
-> 
-> 
+Since the support linked above depends on other refactors, such as the sock
+ioctl() sock refactor[1], I would like to start integrating patches that have
+consensus and can bring value right now.  This will also reduce the patchset
+size later.
+
+Regarding to these three patches, they are simple changes that turn
+io_uring cmd subsystem more flexible (by passing the whole SQE to the
+command), and cleaning up an unnecessary compile check.
+
+These patches were tested by creating a file system and mounting an NVME disk
+using ubdsrv/ublkb0.
+
+[1] ZD6Zw1GAZR28++3v@gmail.com/">https://lore.kernel.org/lkml/ZD6Zw1GAZR28++3v@gmail.com/
+
+V1 -> V2 : 
+  * Create a helper to return the size of the SQE
+
+Breno Leitao (3):
+  io_uring: Create a helper to return the SQE size
+  io_uring: Pass whole sqe to commands
+  io_uring: Remove unnecessary BUILD_BUG_ON
+
+ drivers/block/ublk_drv.c  | 24 ++++++++++++------------
+ drivers/nvme/host/ioctl.c |  2 +-
+ include/linux/io_uring.h  |  2 +-
+ io_uring/io_uring.h       |  3 +++
+ io_uring/opdef.c          |  2 +-
+ io_uring/uring_cmd.c      | 13 ++++---------
+ io_uring/uring_cmd.h      |  8 --------
+ 7 files changed, 22 insertions(+), 32 deletions(-)
+
+-- 
+2.34.1
+
