@@ -2,60 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0D6C77B78
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 20:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E707C77B76
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 21:44:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232389AbjDUUPY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 16:15:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37496 "EHLO
+        id S233524AbjDUVoT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 17:44:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232072AbjDUUPW (ORCPT
+        with ESMTP id S229748AbjDUVoS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 16:15:22 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED9E82719;
-        Fri, 21 Apr 2023 13:15:21 -0700 (PDT)
+        Fri, 21 Apr 2023 17:44:18 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E26E61FC7;
+        Fri, 21 Apr 2023 14:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7jDGoKVRVE8/8Iw2EXqkPonvmAc0gvYRAzqps4fjwwg=; b=mr+zjn1yXtzKk4APmgRaOn77YC
-        qyrdJusW0V5fFBehp0H4LgJmcOzWB0HiZ/19FHS9XzMMBWYiQQiK2ov9vzahR7YBu95NK76q9JJZs
-        AkLKN4MUKm/MQ5+LZ/SLYHWNNTKsZIr04BKzck1FGkgdltQkKD7lNhCvCFoMTcFExtsIMgiMKVPre
-        m9Im6jnJmlKaq2x+wCYrcuNfTZjtNWDTsZNJmxJoZAgKC50KnsIBoeDx/zoi7hd2VV9XP++ihIvTA
-        tOEZ5yH+/ubaSmLHWmwzD23OC6iMGfb2/N5vqIvhKd4FYrTP8/q/0FOd4KBWDZDlc9qXT016NGn1F
-        NwwreEtg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ppxA3-00FZsC-AG; Fri, 21 Apr 2023 20:15:15 +0000
-Date:   Fri, 21 Apr 2023 21:15:15 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, hch@infradead.org,
-        djwong@kernel.org, minchan@kernel.org, senozhatsky@chromium.org,
-        patches@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        hare@suse.de, p.raghav@samsung.com, da.gomez@samsung.com,
-        kbusch@kernel.org
-Subject: Re: [PATCH 1/5] dm integrity: simplify by using PAGE_SECTORS_SHIFT
-Message-ID: <ZELu017UCTZWrCjv@casper.infradead.org>
-References: <20230421195807.2804512-1-mcgrof@kernel.org>
- <20230421195807.2804512-2-mcgrof@kernel.org>
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=HAZkfNRruAgARTe618ACsQ6wCYRRSd9EZooPKA+qgbw=; b=DnGs3ejEo/+K910m27ugy2zmJh
+        qb5mcLlEfR2wdQNE/p1//CuFDbtuczZKd7j27Gu+GCzFIVBmDmCr5B7yxLhtPcDngNB4k80THHDuR
+        w2DMyrzuDU9msgM7Zy+oghoVKusNkUcBRoJC/pAS7Cc8RxdQEaVjJ+Bd2tc6Z6+C7gpfmYibKo708
+        Vi5Tb7IXkNa4kvn4N3d3BddjBa5cCKcG9E33SvWZ4GkM7ZwxcmNuAPg77qD1HGAf/ilG221q1rmJ5
+        9ejkkgHgonznxoi20BOMaCnyIcdksGRblL0lJg1XSWnZUtylSqq5ykxsRsCRkUyoDucbBY5Vd4B0h
+        p73Bmwcw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1ppyY1-00Btoi-1l;
+        Fri, 21 Apr 2023 21:44:05 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     hughd@google.com, akpm@linux-foundation.org, willy@infradead.org,
+        brauner@kernel.org, djwong@kernel.org
+Cc:     p.raghav@samsung.com, da.gomez@samsung.com,
+        a.manzanares@samsung.com, dave@stgolabs.net, yosryahmed@google.com,
+        keescook@chromium.org, hare@suse.de, kbusch@kernel.org,
+        mcgrof@kernel.org, patches@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: [RFC 1/8] shmem: replace BLOCKS_PER_PAGE with PAGE_SECTORS
+Date:   Fri, 21 Apr 2023 14:43:53 -0700
+Message-Id: <20230421214400.2836131-2-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230421214400.2836131-1-mcgrof@kernel.org>
+References: <20230421214400.2836131-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230421195807.2804512-2-mcgrof@kernel.org>
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 21, 2023 at 12:58:03PM -0700, Luis Chamberlain wrote:
-> -	*pl_index = sector >> (PAGE_SHIFT - SECTOR_SHIFT);
-> +	*pl_index = sector >> (PAGE_SECTORS_SHIFT);
+Instead of having our own macro use the generic PAGE_SECTORS.
+It also makes it clearer what we are trying to compute here on
+the inode->i_blocks. We get the inode size by as define din
+__inode_get_bytes() by:
 
-You could/should remove the () around PAGE_SECTORS_SHIFT
+(inode->i_blocks << SECTOR_SHIFT) + inode->i_bytes
 
-(throughout)
+This produces no functional changes.
+
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ mm/shmem.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/mm/shmem.c b/mm/shmem.c
+index b5d102a2a766..5bf92d571092 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -86,7 +86,6 @@ static struct vfsmount *shm_mnt;
+ 
+ #include "internal.h"
+ 
+-#define BLOCKS_PER_PAGE  (PAGE_SIZE/512)
+ #define VM_ACCT(size)    (PAGE_ALIGN(size) >> PAGE_SHIFT)
+ 
+ /* Pretend that each entry is of this size in directory's i_size */
+@@ -363,7 +362,7 @@ static void shmem_recalc_inode(struct inode *inode)
+ 	freed = info->alloced - info->swapped - inode->i_mapping->nrpages;
+ 	if (freed > 0) {
+ 		info->alloced -= freed;
+-		inode->i_blocks -= freed * BLOCKS_PER_PAGE;
++		inode->i_blocks -= freed * PAGE_SECTORS;
+ 		shmem_inode_unacct_blocks(inode, freed);
+ 	}
+ }
+@@ -381,7 +380,7 @@ bool shmem_charge(struct inode *inode, long pages)
+ 
+ 	spin_lock_irqsave(&info->lock, flags);
+ 	info->alloced += pages;
+-	inode->i_blocks += pages * BLOCKS_PER_PAGE;
++	inode->i_blocks += pages * PAGE_SECTORS;
+ 	shmem_recalc_inode(inode);
+ 	spin_unlock_irqrestore(&info->lock, flags);
+ 
+@@ -397,7 +396,7 @@ void shmem_uncharge(struct inode *inode, long pages)
+ 
+ 	spin_lock_irqsave(&info->lock, flags);
+ 	info->alloced -= pages;
+-	inode->i_blocks -= pages * BLOCKS_PER_PAGE;
++	inode->i_blocks -= pages * PAGE_SECTORS;
+ 	shmem_recalc_inode(inode);
+ 	spin_unlock_irqrestore(&info->lock, flags);
+ 
+@@ -2002,7 +2001,7 @@ static int shmem_get_folio_gfp(struct inode *inode, pgoff_t index,
+ 
+ 	spin_lock_irq(&info->lock);
+ 	info->alloced += folio_nr_pages(folio);
+-	inode->i_blocks += (blkcnt_t)BLOCKS_PER_PAGE << folio_order(folio);
++	inode->i_blocks += (blkcnt_t) PAGE_SECTORS << folio_order(folio);
+ 	shmem_recalc_inode(inode);
+ 	spin_unlock_irq(&info->lock);
+ 	alloced = true;
+@@ -2659,7 +2658,7 @@ int shmem_mfill_atomic_pte(pmd_t *dst_pmd,
+ 
+ 	spin_lock_irq(&info->lock);
+ 	info->alloced++;
+-	inode->i_blocks += BLOCKS_PER_PAGE;
++	inode->i_blocks += PAGE_SECTORS;
+ 	shmem_recalc_inode(inode);
+ 	spin_unlock_irq(&info->lock);
+ 
+-- 
+2.39.2
+
