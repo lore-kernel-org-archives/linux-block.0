@@ -2,104 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA023C77B76
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 01:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0133AC77B78
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 01:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbjDUBD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Apr 2023 21:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
+        id S231504AbjDUBMJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Apr 2023 21:12:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbjDUBD0 (ORCPT
+        with ESMTP id S231590AbjDUBMH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Apr 2023 21:03:26 -0400
-Received: from wnew2-smtp.messagingengine.com (wnew2-smtp.messagingengine.com [64.147.123.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F1EFCF;
-        Thu, 20 Apr 2023 18:03:25 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.west.internal (Postfix) with ESMTP id 1A6A32B066B4;
-        Thu, 20 Apr 2023 21:03:22 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Thu, 20 Apr 2023 21:03:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1682039001; x=1682039601; bh=pk
-        rWfhb7gpYeNRUXTFdCYjUNjl9GpqluqfVMyBD//HI=; b=S0T47FOQrHklns1CPC
-        1NqHltqRJYnOADr+spNVgchWPrzOJ4r7lIeEtaYjSAa/tgarljR+QYbuEJ1NP+5O
-        Z/NTo7pcpy//Xfs80iupBrzsz/YrbSfHylxQJGBTfpCscfjNR5qm8+Atu5CzK109
-        j5G8ZiWk1wN7QghB+3DYmXTjzqUGOn6w4BGI+4uLLnUXGA1ydDijOJcWPR1yyLR+
-        f3aAz5rGxDAFDwbAXnuPllU89I8DT9SaHZNsI6NeosiGdbK59nsyJesBTVrGrsVJ
-        XhKzWY2PSs271yKePjiQ+6mRouV4sTkD+gsU7O1+advYradjKDpUmeFzJ7Jmz9mP
-        zqgw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=ie1e949a3.fm3; t=1682039001; x=1682039601; bh=pkr
-        Wfhb7gpYeNRUXTFdCYjUNjl9GpqluqfVMyBD//HI=; b=DDLCuns4O61jg9rK5T9
-        Glcmd63YNnwh4KAPc3WDm1JrNMObuikw8B0pQEi0SxJ1MSxrAopdQxlpejBtxEKx
-        ZDU582f+p2EVS6uvWwC2pPlnXbuga24ryqp86GfdVHxpLr+l4o6cKhNLNmkAOpUZ
-        9G+3gj0etboTYJW3kKRFK2wMdViC20iqc+4h50zivEjf9/YjLJHxeLWZH/+9VrYb
-        Bs5IG+bTCLsxAsbDhZKMKhAwFdnBIm18Nox0f58/OCKsK6anr6PLvNmijSn4WI0k
-        QXzETl3dsw8jAXUFv4ZL2uwN0XFhZ81tp2wkLP21DnK6IUuBG1bE+T2vV6I2iRpx
-        0aA==
-X-ME-Sender: <xms:2eBBZDge3nFiqHh2i1Ab52yx5q5buijzHoh9y-XJX4r10ntLeSxh7A>
-    <xme:2eBBZABKT74JSNKrXOBODotGVqo9w_QNLIrhw8cC8KzoQiKAxazdRFdNnGVJH_oig
-    qIdAzY83UxlFOQ9YV4>
-X-ME-Received: <xmr:2eBBZDHannPNf6eRf8Ft1FtDUXC9fBw1nuwJcfN-rTG1SNjfGaN8j5xzawfssYwlwThBsCysMWpP4JJGHOfmqQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedtfedggedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtsfdttddtvdenucfhrhhomhepufhhihhn
-    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepvdegtdfgvdfhgfekvdektdfgfeeljeel
-    gefgkedujeeiteehgefhgeethffgheehnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
-    mh
-X-ME-Proxy: <xmx:2eBBZARZuto-5rJJEcJWanTKwNb8Wv_P-a5rUOCGBm51TGIB5wR8oQ>
-    <xmx:2eBBZAxDRVH2IkehAAWhnJ_q4NefTVY0g-raYdMGJALVzjVrFg2PUg>
-    <xmx:2eBBZG7wsIzoMhExjXsbyO2NyjrJcdx4pICaW7eR5EVJJISHBI2SlQ>
-    <xmx:2eBBZM-1sf9yNuO-TLZxiogEKtwJr9Opf5yluWtzzLHZJFj_nK3CBrmGfKva4xRN>
-Feedback-ID: ie1e949a3:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 20 Apr 2023 21:03:19 -0400 (EDT)
-Date:   Fri, 21 Apr 2023 10:03:16 +0900
-From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     John Garry <john.g.garry@oracle.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, dgilbert@interlog.com
-Subject: Re: blktests scsi/007 failure
-Message-ID: <w7a2ldas7jrgv3s5zclvt6xck73p4cufym6binh5gs3wrj5gvq@qn2qbjwjc67u>
-References: <725nkvuvvbf4qwiylarw5r56tjt3r6nrvy5sijk6affzqv2s3e@6xapeviellsp>
- <5ebd61e0-0835-94cd-b55b-942a9c72b5b5@oracle.com>
- <3xwglpdpmit2obtf5p475gojdoqe42rmteki5hvoavzwle6kqr@bl7xginwaeli>
- <yqe6sjp6ukfoafaoetwacddkpo2y5mk4hsnxgw377iwholxo52@psw2zzelcmig>
- <15edb8ec-704c-cf0c-00a9-014391ba15f9@oracle.com>
+        Thu, 20 Apr 2023 21:12:07 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C52D2108;
+        Thu, 20 Apr 2023 18:12:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=dnj+MwCbtv8NOzvIf0pmIsPDMO0RM2xq9qIHLD7iX50=; b=CPHwR0igmjjSKRMhIU5CVABr3L
+        RHq9WCCAqi4m5UCt2vC7XJSeG8JnOkQet7uVZUngpAaKWXFx+5pFKYKJBSfhCYo3yAQNXNHw5rgLG
+        FWZA/tfrftfflE9xd3redguLME3UR69V2eBvI55VD9KpYcxqcxoNOGDdDse5lMvIZnbw06FpNsMkT
+        PwrmaLqmPHRIKfGi/j2ol1hbGra+C3hUFICY9D7elfvypvHe9KF2TrNn8RQqmGcm4QgViKj6jNG38
+        gyHy7f8m1WiCKigzm2GfHG24I6DKi/g8IhlvoNIk/YyQlr1NclnTDFE7jg+tNPVFIPm0ypj3jj54l
+        mD42JdcQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1ppfJR-00B1x8-0S;
+        Fri, 21 Apr 2023 01:11:45 +0000
+Date:   Fri, 21 Apr 2023 02:11:45 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v18 09/15] iov_iter: Kill ITER_PIPE
+Message-ID: <20230421011145.GW3390869@ZenIV>
+References: <20230314220757.3827941-1-dhowells@redhat.com>
+ <20230314220757.3827941-10-dhowells@redhat.com>
+ <20230420222231.GT3390869@ZenIV>
+ <20230420223657.GV3390869@ZenIV>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <15edb8ec-704c-cf0c-00a9-014391ba15f9@oracle.com>
+In-Reply-To: <20230420223657.GV3390869@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 20, 2023 / 13:59, John Garry wrote:
-[...]
-> Do you know why you specifically were seeing this issue for v6.3-rc7? Is it
-> just timing related? I seem to remember you mentioning debug configs
-> earlier.
+On Thu, Apr 20, 2023 at 11:36:57PM +0100, Al Viro wrote:
 
-The test case failure was observed with v6.2 also. I did not try older kernels,
-but I guess the issue has been existing for long time. The failure is observed
-by chance, and the failure ratio increases when I enable kernel debug options. I
-think the issue has been hidden, and unveiled with slow kernel and slow system.
-Also I think the issue is timing related based on my observations.
+> Don't get me wrong - I'd love to kill ITER_PIPE off; it's just that tons
+> of ->splice_read() duplicating the corresponding ->read_iter() up to the
+> point where it would call generic_file_read_iter(), modulo ignoring
+> O_DIRECT case and then calling filemap_splice_read() instead...  Painful
+> and asking for trouble down the road.
 
-> 
-> It would be nice to see this issue fixed for 6.3 and earlier, but,
-> considering the circumstances, it doesn't look straightforward.
+FWIW, broken in this series:
+	* a bunch of 9p variants (those could probably switch to direct)
+	* afs
+	* ceph (very likely)
+	* ecryptfs (atime propagation)
+	* dax on various filesystems (probably)
+	* f2fs
+	* gfs2
+	* nfs
+	* ocfs2
+	* orangefs
+	* xfs
+	* zonefs (probably)
+	* splice from UDP sockets, unless I'm misreading something.
+Your sock_splice_read() still falls back to generic_file_splice_read(),
+rather than to direct_splice_read() and sockets don't have O_DIRECT
+in flags.  Neither do they have associated page cache ;-)
 
-Agreed. The fix patch can not be applied to kernel v6.3 or older version. This
-is scsi_debug issue, and I'm not sure if it's worth back-porting effort to
-stable kernels.
+Sure, we could provide a bunch of ->splice_read(), but then we'd have to make
+sure that all subsequent changes to matching ->read_iter() get duplicated -
+unless they are on O_DIRECT-only paths, that is...
