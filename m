@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0027EC7EE22
-	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 21:44:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0A3C7EE23
+	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 21:44:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233617AbjDUVoW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 17:44:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36282 "EHLO
+        id S233654AbjDUVoX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 17:44:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233393AbjDUVoS (ORCPT
+        with ESMTP id S233563AbjDUVoT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 17:44:18 -0400
+        Fri, 21 Apr 2023 17:44:19 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25F21FC6;
-        Fri, 21 Apr 2023 14:44:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68A392116;
+        Fri, 21 Apr 2023 14:44:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Pwtny366FbTbrb7vPgMXDOxfQYz6bsR4vwvBIbUUYzg=; b=l1UKRS+6uYC4EXAjJgBrQTAp5j
-        xsYvwCnnNonL+zWZMEy71A3Ta6km8F6dSzKQvEcpRo5TV7XBXl9OERI0fsz5C845ifOI1VFCEHRc1
-        Zre0qUD7V89WFxot/x0Dllx9YnFxYQ7Yz7zDqe598RN0r0tdnLI/4pmF0Tvd/CygY81NUfyF7TcfO
-        R1q/JTspIPOKlYq6NoZibJ4hLTLlDqaLHYjGQRhRwv9u7o7cGbziZ6ambxSZLU25fgMv7Z5We7Z9g
-        4m2TriUxFygO3OJdPvzDe0pBPp5xw1iklrlut7//xUpzOnTPbemmyDvmuxTGhDtulG3XxP+CyxfK9
-        9RMFdwJQ==;
+        bh=LRGm8v+C2VnFh3pJYXzbKwj2NvliqmXVbLHOoz9D9rs=; b=Gv4xXUfwg6Tqrov7HtOq12Iot5
+        YO5wR1wBRRe+FoidC8runo8IO16BDwaMfjnowR194HePAotck078Dc52Y5LhgHsJWaSdFz/ExDOoW
+        7UvJg+gaENVFRZFuUklS2jbQPIu6sP031vvUKDVO8op0VWHJ/pcNAbKtxQ6EJtE3JOGWA8i9aCI4G
+        c82Y5dwvzAyUa4CC4Jt/QPxPn6XSF0jejQ+JpFEAjr1mjFYM6xQTv/oz9ZsmadJRNPxXXDoGL2kGk
+        x5ARZON7gmkNiGzDhbMd8jQFJ5x3RYgTnUCgMJhDF50jxO3kH/6kEmfu6+iJAJL3r0nsysDSme+ZO
+        aDY1SY0g==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1ppyY1-00Btok-1t;
+        id 1ppyY1-00Btou-2Z;
         Fri, 21 Apr 2023 21:44:05 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     hughd@google.com, akpm@linux-foundation.org, willy@infradead.org,
@@ -37,9 +37,9 @@ Cc:     p.raghav@samsung.com, da.gomez@samsung.com,
         mcgrof@kernel.org, patches@lists.linux.dev,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [RFC 2/8] shmem: convert to use folio_test_hwpoison()
-Date:   Fri, 21 Apr 2023 14:43:54 -0700
-Message-Id: <20230421214400.2836131-3-mcgrof@kernel.org>
+Subject: [RFC 7/8] shmem: add high order page support
+Date:   Fri, 21 Apr 2023 14:43:59 -0700
+Message-Id: <20230421214400.2836131-8-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230421214400.2836131-1-mcgrof@kernel.org>
 References: <20230421214400.2836131-1-mcgrof@kernel.org>
@@ -50,45 +50,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The PageHWPoison() call can be converted over to the respective folio call
-folio_test_hwpoison(). This introduces no functional changes.
+To support high order block sizes we want to support a high order
+folios so to treat the larger block atomically. Add support for this
+for tmpfs mounts.
+
+Right now this produces no functional changes since we only allow one
+single block size, matching the PAGE_SIZE and so the order is always 0.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- mm/shmem.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ mm/shmem.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/mm/shmem.c b/mm/shmem.c
-index 5bf92d571092..6f117c3cbe89 100644
+index 5a64efd1f3c2..740b4448f936 100644
 --- a/mm/shmem.c
 +++ b/mm/shmem.c
-@@ -3483,7 +3483,7 @@ static const char *shmem_get_link(struct dentry *dentry,
- 		folio = filemap_get_folio(inode->i_mapping, 0);
- 		if (IS_ERR(folio))
- 			return ERR_PTR(-ECHILD);
--		if (PageHWPoison(folio_page(folio, 0)) ||
-+		if (folio_test_hwpoison(folio) ||
- 		    !folio_test_uptodate(folio)) {
- 			folio_put(folio);
- 			return ERR_PTR(-ECHILD);
-@@ -3494,7 +3494,7 @@ static const char *shmem_get_link(struct dentry *dentry,
- 			return ERR_PTR(error);
- 		if (!folio)
- 			return ERR_PTR(-ECHILD);
--		if (PageHWPoison(folio_page(folio, 0))) {
-+		if (folio_test_hwpoison(folio)) {
- 			folio_unlock(folio);
- 			folio_put(folio);
- 			return ERR_PTR(-ECHILD);
-@@ -4672,7 +4672,7 @@ struct page *shmem_read_mapping_page_gfp(struct address_space *mapping,
- 		return &folio->page;
+@@ -1621,9 +1621,15 @@ static struct folio *shmem_alloc_folio(gfp_t gfp,
+ {
+ 	struct vm_area_struct pvma;
+ 	struct folio *folio;
++	struct inode *inode = &info->vfs_inode;
++	struct super_block *i_sb = inode->i_sb;
++	int order = 0;
++
++	if (!(i_sb->s_flags & SB_KERNMOUNT))
++		order = i_sb->s_blocksize_bits - PAGE_SHIFT;
  
- 	page = folio_file_page(folio, index);
--	if (PageHWPoison(page)) {
-+	if (folio_test_hwpoison(folio)) {
- 		folio_put(folio);
- 		return ERR_PTR(-EIO);
- 	}
+ 	shmem_pseudo_vma_init(&pvma, info, index);
+-	folio = vma_alloc_folio(gfp, 0, &pvma, 0, false);
++	folio = vma_alloc_folio(gfp, order, &pvma, 0, false);
+ 	shmem_pseudo_vma_destroy(&pvma);
+ 
+ 	return folio;
 -- 
 2.39.2
 
