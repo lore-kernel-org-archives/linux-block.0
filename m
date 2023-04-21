@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D4EC7EE29
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7383FC7EE2C
 	for <linux-block@archiver.kernel.org>; Fri, 21 Apr 2023 06:12:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233674AbjDUGFY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Apr 2023 02:05:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46914 "EHLO
+        id S233786AbjDUGGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Apr 2023 02:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233614AbjDUGFW (ORCPT
+        with ESMTP id S233766AbjDUGFx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Apr 2023 02:05:22 -0400
+        Fri, 21 Apr 2023 02:05:53 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F09B6EB6;
-        Thu, 20 Apr 2023 23:05:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2057D9B;
+        Thu, 20 Apr 2023 23:05:48 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 5271821A4D;
-        Fri, 21 Apr 2023 06:05:18 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 15D6021A46;
+        Fri, 21 Apr 2023 06:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1682057118; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1682057117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LGJ8+x4oOv8BH7OP38itoB2VZdEGzcVipLnzQChvils=;
-        b=DZ15V/HvLxBq2r2bgHoG1xS5kyfy4gaSy7xE8TN0kVwp9cp4jBjzlv/nqCN3Sikc5kkep1
-        uUMG70Li7Eff6ZCOugtPv5+wiBIA81stOPEMcrEwb0sw9n2M0wcK5BJZYLwJOOvqbs3ka5
-        I83+K52As+1GaQ0pBTLG7ld51/Rqa18=
+        bh=9lIVFZmI6Kd5BjqNKBTjO2IfwGUAsCicokfMeR7skIo=;
+        b=GEw6TKHoazlhD6fIfZGSNs5r3O+3MOd9mphNy516ylLPLONcYrxYz3YNkm63nd5uvjR7Wb
+        ZTvT0IacChM06xccvg+/Aw/Qon+oJwhgRiq0yywrmCRONJAocqWG6emA8WUMO6U3RNYlq6
+        M8LKXIUWL+K0Y+YHEdaof16GtVVQZkA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1682057118;
+        s=susede2_ed25519; t=1682057117;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LGJ8+x4oOv8BH7OP38itoB2VZdEGzcVipLnzQChvils=;
-        b=S6eSmvAfJDTowASuZ2A/26fCrgrDvhNT2GFO6JIZbEjjO4y2aLwW50A1ZMezXI/NuEaxN7
-        AY1wBorEmIZPupAg==
+        bh=9lIVFZmI6Kd5BjqNKBTjO2IfwGUAsCicokfMeR7skIo=;
+        b=7Rygyhert0Lviw6K0Vm49y/D7gG0WOqgrud4pzBkv+TULlnm/BGxLzv3dQYu4JS33hGlys
+        1s0gAphw2aAZ6WBw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 45DE31390E;
-        Fri, 21 Apr 2023 06:05:18 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 09A0C1390E;
+        Fri, 21 Apr 2023 06:05:17 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id caYLEZ4nQmRwZgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 21 Apr 2023 06:05:18 +0000
+        id JKFXAp0nQmRsZgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 21 Apr 2023 06:05:17 +0000
 From:   Daniel Wagner <dwagner@suse.de>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
         Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH REPOST blktests v2 4/9] nvme: Use runtime fio background jobs
-Date:   Fri, 21 Apr 2023 08:05:00 +0200
-Message-Id: <20230421060505.10132-5-dwagner@suse.de>
+Subject: [PATCH REPOST blktests v2 2/9] nvme: Do not hard code device size for dd test
+Date:   Fri, 21 Apr 2023 08:04:58 +0200
+Message-Id: <20230421060505.10132-3-dwagner@suse.de>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230421060505.10132-1-dwagner@suse.de>
 References: <20230421060505.10132-1-dwagner@suse.de>
@@ -67,42 +67,70 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The fio jobs are supposed to run long in background during the test.
-Instead relying on a job size use explicit runtime for this.
+Read the block device sizes instead hard coding them.
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
- tests/nvme/032 | 2 +-
- tests/nvme/040 | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ tests/nvme/014 | 10 +++++++++-
+ tests/nvme/015 | 10 +++++++++-
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/tests/nvme/032 b/tests/nvme/032
-index 017d4a339971..81e074cc11bc 100755
---- a/tests/nvme/032
-+++ b/tests/nvme/032
-@@ -39,7 +39,7 @@ test_device() {
+diff --git a/tests/nvme/014 b/tests/nvme/014
+index d13cff7921da..28913641ae40 100755
+--- a/tests/nvme/014
++++ b/tests/nvme/014
+@@ -23,6 +23,9 @@ test() {
+ 	local port
+ 	local nvmedev
+ 	local loop_dev
++	local size
++	local bs
++	local count
+ 	local file_path="$TMPDIR/img"
+ 	local subsys_name="blktests-subsystem-1"
  
- 	# start fio job
- 	_run_fio_rand_io --filename="$TEST_DEV" --size=1g \
--		--group_reporting  &> /dev/null &
-+		--group_reporting --time_based --runtime=1m &> /dev/null &
+@@ -41,7 +44,12 @@ test() {
+ 	cat "/sys/block/${nvmedev}n1/uuid"
+ 	cat "/sys/block/${nvmedev}n1/wwid"
  
- 	sleep 5
+-	dd if=/dev/urandom of="/dev/${nvmedev}n1" count=128000 bs=4k status=none
++	size="$(blockdev --getsize64 "/dev/${nvmedev}n1")"
++	bs="$(blockdev --getbsz "/dev/${nvmedev}n1")"
++	count=$((size / bs - 1))
++
++	dd if=/dev/urandom of="/dev/${nvmedev}n1" \
++		count="${count}" bs="${bs}" status=none
  
-diff --git a/tests/nvme/040 b/tests/nvme/040
-index 04bd726cd309..8d29f905adb5 100755
---- a/tests/nvme/040
-+++ b/tests/nvme/040
-@@ -38,7 +38,8 @@ test() {
- 	# start fio job
- 	echo "starting background fio"
- 	_run_fio_rand_io --filename="/dev/${nvmedev}n1" --size=1g \
--		--group_reporting --ramp_time=5  &> /dev/null &
-+		--group_reporting --ramp_time=5 \
-+		--time_based --runtime=1m &> /dev/null &
- 	sleep 5
+ 	nvme flush "/dev/${nvmedev}" -n 1
  
- 	# do reset/remove operation
+diff --git a/tests/nvme/015 b/tests/nvme/015
+index bb52ba2598db..2f7957caac88 100755
+--- a/tests/nvme/015
++++ b/tests/nvme/015
+@@ -22,6 +22,9 @@ test() {
+ 
+ 	local port
+ 	local nvmedev
++	local size
++	local bs
++	local count
+ 	local file_path="$TMPDIR/img"
+ 	local subsys_name="blktests-subsystem-1"
+ 
+@@ -38,7 +41,12 @@ test() {
+ 	cat "/sys/block/${nvmedev}n1/uuid"
+ 	cat "/sys/block/${nvmedev}n1/wwid"
+ 
+-	dd if=/dev/urandom of="/dev/${nvmedev}n1" count=128000 bs=4k status=none
++	size="$(blockdev --getsize64 "/dev/${nvmedev}n1")"
++	bs="$(blockdev --getbsz "/dev/${nvmedev}n1")"
++	count=$((size / bs - 1))
++
++	dd if=/dev/urandom of="/dev/${nvmedev}n1" \
++		count="${count}" bs="${bs}" status=none
+ 
+ 	nvme flush "/dev/${nvmedev}n1" -n 1
+ 
 -- 
 2.40.0
 
