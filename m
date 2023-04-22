@@ -2,206 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCB0C6FD18
-	for <linux-block@archiver.kernel.org>; Sat, 22 Apr 2023 05:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12227C77B78
+	for <linux-block@archiver.kernel.org>; Sat, 22 Apr 2023 20:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbjDVFL0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Apr 2023 01:11:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52248 "EHLO
+        id S229612AbjDVUBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Apr 2023 16:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjDVFLY (ORCPT
+        with ESMTP id S229565AbjDVUBe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Apr 2023 01:11:24 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3A01BEF;
-        Fri, 21 Apr 2023 22:11:23 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33M3wUBn012003;
-        Sat, 22 Apr 2023 05:10:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=b4tEBammvyrvb+GUjcnY6vblvRFhOx1gAT6uu/MtK6I=;
- b=fj0EvHk1wWCPsOavx4rsbW/murL/tGecGS+2t56epinK2HZcT0FnYJZWnnVj9Dck7zBn
- nfeGhOYTyyf2GCqm3xxtYOcxfVdOzoqjd+JpJKgC48JZJAvyyM3+1xC8MfNzlR79Bqvt
- VEWvjEZVyszr0C87f0Ah0uNkbUePeOt+TQCnRaJ0csMokjKrTu/A2EV6KzTM8G3DiD+3
- TCCNbZGQuPfskJ1me9qTTtNGx4JrysWGTPHx8omNRTkmyYnPttuDij4eVtG70s6Hgu6Y
- Byu4fpsiPL+RdRbqr56sCBNI7J99q9JOkL767x5F/3kc27qgqINfcc3PB4mR0TotX9wY 2A== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3q484ug15j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 22 Apr 2023 05:10:50 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 33M1X0ib012755;
-        Sat, 22 Apr 2023 05:10:48 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2049.outbound.protection.outlook.com [104.47.56.49])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3q4612v9ds-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 22 Apr 2023 05:10:48 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AJHUIuExt7m4t+hdzELKQiAt3hQ8OMV4GQlT8PbkEm1lf4j5m5HK0f02B66kXxVN680tytv8GbsVE6VgypHQuPAShuVCsrq8Iyv5URVe22VbuqnqUx+HoqtWM9Xc/ICLuVSsAKphmu7sNNAs22D3JnKjymy1uFYmA6kLvKZG+w8NXfNQ7ybmPJ/WQbeZP/ty84zfYuL8gfdfAkUWfWiarsHKIczK9GKhBMegyhomjEA3e/tUSG4N2eHSjSaJ8ge6O9YWjMNG19GIHk2HahlgTyS1LmcI6dAGA1N5OghfoKcrAI4t3dux5yYSHMMbGw+7DaYcsYQFNOp0+w0RmS/x7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b4tEBammvyrvb+GUjcnY6vblvRFhOx1gAT6uu/MtK6I=;
- b=Z5a4pTMQqLe6hcGYmjwuTF0UWtIGvLKqL3Srjcge5lIpU9fJpNQZp4JTo0HMk37+a84C3ptQz811KGfpG+KkpqZqlc0NvyUsHXAfA8MYcnTBV0if9lXqoEwlqSIecs2/HNJQa6gGgZ2tt0bnBblwxlJFTOOlLsCwJYh7LgM6qEvBJGnLd3yVedPfBuyQUPkMikNnmSYgsyeO19HP4ujPprwQS9Np8l2bnTZ5djf4rMEF13DWsWZpZk97Sg0dIxWHFL5yOveOhp0vTf0g4d2mJpJngzbIAyTPLxfvi4ATD0plUmIVkBiFUH+2Uyr4njF4ksIULmsj/r/z/ODHCgEoiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b4tEBammvyrvb+GUjcnY6vblvRFhOx1gAT6uu/MtK6I=;
- b=BuLLkUwvDLanN6yGEmt7yikPXhOtbpAA6hi7qnfVxLgMmQmpz/YijlpM6YKhgJrt1H23nYggwDDGHbi+x/yxENdx5evwyNHZDO/j4aTdvtO9nkW2EuVtzJTj76+j2AgWPxQpsrRZn3vLOhz5OYYULKwy4GE07+DEPkxwyPbDHxY=
-Received: from SJ0PR10MB4429.namprd10.prod.outlook.com (2603:10b6:a03:2d1::14)
- by MW6PR10MB7637.namprd10.prod.outlook.com (2603:10b6:303:246::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.22; Sat, 22 Apr
- 2023 05:10:46 +0000
-Received: from SJ0PR10MB4429.namprd10.prod.outlook.com
- ([fe80::256d:125b:8053:eeb9]) by SJ0PR10MB4429.namprd10.prod.outlook.com
- ([fe80::256d:125b:8053:eeb9%5]) with mapi id 15.20.6319.022; Sat, 22 Apr 2023
- 05:10:46 +0000
-Message-ID: <42169da4-f453-af92-1c1e-76e65346c4af@oracle.com>
-Date:   Fri, 21 Apr 2023 22:10:39 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [RFC 8/8] shmem: add support to customize block size on multiple
- PAGE_SIZE
-To:     Luis Chamberlain <mcgrof@kernel.org>, hughd@google.com,
-        akpm@linux-foundation.org, willy@infradead.org, brauner@kernel.org,
-        djwong@kernel.org
-Cc:     p.raghav@samsung.com, da.gomez@samsung.com,
-        a.manzanares@samsung.com, dave@stgolabs.net, yosryahmed@google.com,
-        keescook@chromium.org, hare@suse.de, kbusch@kernel.org,
-        patches@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-References: <20230421214400.2836131-1-mcgrof@kernel.org>
- <20230421214400.2836131-9-mcgrof@kernel.org>
-Content-Language: en-US
-From:   Jane Chu <jane.chu@oracle.com>
-In-Reply-To: <20230421214400.2836131-9-mcgrof@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0018.namprd11.prod.outlook.com
- (2603:10b6:806:d3::23) To SJ0PR10MB4429.namprd10.prod.outlook.com
- (2603:10b6:a03:2d1::14)
+        Sat, 22 Apr 2023 16:01:34 -0400
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A031FE3;
+        Sat, 22 Apr 2023 13:01:32 -0700 (PDT)
+Received: from [192.168.1.190] (ip5b42332c.dynamic.kabel-deutschland.de [91.66.51.44])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: buczek)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 83D7461E4052B;
+        Sat, 22 Apr 2023 22:01:29 +0200 (CEST)
+Message-ID: <3972fe6d-34f4-3a9b-b939-494fd19f1bfb@molgen.mpg.de>
+Date:   Sat, 22 Apr 2023 22:01:29 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB4429:EE_|MW6PR10MB7637:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5c6d2f95-bb76-4bce-aabc-08db42efede0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Mz7pfNjPUdyt4/jQnJtsXBT52YSFR8zfpGQs1gMsZhuMct0rujgCkWT7o4+Bt2X8n5Z+VS+WpUq+TSLTA5zHhlBl6Y92AE0dK+bPh+YwBjcpEw7h5f+tw77Jer7xCB6IzI/SQW3KTb9vYNr3cn7u4AVV7P1XXZXYWRodyrbfk9ugOI9GMipNV/imYbkrKOIujLWZFcb1XxPTc4NrieidvWyqT7hJdGapm61FrLOV4qQ9agVu2IX6g+96/EuboKnp4miCpjdOtDUWVVG+LvtCbLbV6dH6wMMOYoXYwTcMgPNGe6uX9Z/mqBhi5hWogtSMdDO2qhbUs2UM6tp1daSjlE7dsDp75SQXsFLVVz4zpWp3hRFhTMk1z/X03VJ6SyNd3KCaPlQp/yioVudtos+bcqlGJNYAx2Y8JN8R8Hcda7aLilReCd2yFRa+HufAzC3d7s94/kyMgzXwz+JqBRKkB0wzAp4mOAubodP4v6idynC+/rHGtOFSS0ApBPQaFeiZ7yCZBpba3H6rHEhG2ZoMX2PZGzGmhIL9ut3mwbQc1eBz9z94pCNtu6gMwMJv40XhArWUtZMHJQwODQnYFtG2T1OW4sc2sHJqbZns+WK20rmqAV9O14Bysg+ajhjvlGBs5dHbKAcY5GWcdR0c81LOgQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB4429.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(396003)(136003)(346002)(39860400002)(376002)(451199021)(31686004)(4326008)(316002)(66946007)(66476007)(66556008)(36756003)(6506007)(53546011)(26005)(83380400001)(6512007)(38100700002)(2616005)(186003)(8676002)(41300700001)(5660300002)(6486002)(478600001)(2906002)(6666004)(8936002)(31696002)(86362001)(7416002)(4744005)(44832011)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dHpTU25MZkpaeXRVRVVaM3gvdzdTK1hUejdZSEdwd0VEZGxFVXlscHNKVVl3?=
- =?utf-8?B?bEdvT2l1aVgxclR6K0haVDlhbHBreGNQb2t0ZHJySDA2SnlkTUoyRFVLNnhw?=
- =?utf-8?B?VVovUk5QcmJwd2JtNnkyVVJBV2lQR0FoaDNEN1RVUmlrM1dqWTNxK1hjL3Rt?=
- =?utf-8?B?Wk9zNzE2Y1FEYjZqNEE1cklCWmtrWllndHhSS3h0Q1RlaFpQa244dDBpZUN0?=
- =?utf-8?B?bzdseUhiNGYwU25xZ0Nia0tFbHlZQ1ZHZlUweGtCb3M3d3FGaW5rbU81SDFh?=
- =?utf-8?B?TG9MblZNRy92ZitubmVWZHlnRDNvRzZoN2pBN3dNdXNqa25Ta3d2c3l0T2Rw?=
- =?utf-8?B?aU4vaW9OUDFKWjZvRWlObnNVWFNaWDRJY3ViV0VaQ0RnNjNYZnlqQW9zRTNm?=
- =?utf-8?B?azF3V2pwQzdRdHF2akh4dnNibHRFVWx4WnZvYWtQc0RDMk0raEM2RGxzV2hS?=
- =?utf-8?B?NFc2S1IwSXp1akFxZGl0UTBiSUNMZlNPNndmbFZxRTM1c3lmNndFNCtDcjh1?=
- =?utf-8?B?Q2QxVTFNOFpMQWlhUUdaVGxWZ05yZy95dGZXNlN0YUorTjVjN3dZUURJWVhr?=
- =?utf-8?B?ZWpLSDEzdW83c1haeFQ4OUJzU1gzUU5EMnovYmc5dzRCSGI0clo1c2dZRXFP?=
- =?utf-8?B?d2ZuS24xRUJ4VHh2WVRBeExsOFFZRWpxY0p2Y3hVQnNQWGFld0pOODdIOE9p?=
- =?utf-8?B?Nmd4S1lEU014YUxMVm1aQ2FhN0FBLys2SFhaYis5SkRITUtXZGNod2tMVldr?=
- =?utf-8?B?cmRPN3labktKY092SHNBSjFITE0xMVdsUkh1c3B2STZkN3Exd3FRYmExM29X?=
- =?utf-8?B?c3JNeGVCNEwrWVBYWXhYa21EKzgwalFBZTVKVCtZeVhaeUVkOUxNUW8wVCtp?=
- =?utf-8?B?RmgxSy9GWEw5RnFVcXJqVldvV0UyLzNlb1lTcDhwaFJOMlh1RWNqcW92bU5N?=
- =?utf-8?B?bVRPR2ZUVTRyYkVUbFc4cGVRY2dvSTlBbk1tWU1ybGFOcXFXM0JEclNNeWxH?=
- =?utf-8?B?cVI2L3ZQNHoyelNlZkJRZTBpQ3Z4WVNHVm1XK1NwQmIxV3YwZysrZ2dTTUEw?=
- =?utf-8?B?OFpLTEJpZ2NUVFIzZUt1K3pYTzZlQjQwMzBpL1FWY1JrT3RYNkowVXRsTTZ6?=
- =?utf-8?B?UFZsUzkzMXc5RDdpdURzOWpLWE42eVhleWtFTTRubkYrNkNFOEw0alV6N1lK?=
- =?utf-8?B?eER1MTRNVnpHZHI5WWtpRTdYdTRWZmtEbDBxc084VkRLd0RuSGdNYURNalpD?=
- =?utf-8?B?TVMyQyt6V3RFN016QXo3L01zV2MwZHNUS3dxVFFzSUcxV3pjR3RLcGlqS1Z2?=
- =?utf-8?B?bzZmeDZJMkd0YUhRcFo1N0djRjNianE3dWRaY055bXpFSjVaYk1QNWF0ZVhT?=
- =?utf-8?B?R0l3SXNmSW96cVFnd1JtZGM4VUFjQkYzWjE5U1VvSVJxN2hiR1p5VmFLa1RL?=
- =?utf-8?B?Vmo0TWhlVXN3RGlqc1ZVQTJac3FpakZNSTMzRjhpL0EwWlk0azZlYkR2NGNy?=
- =?utf-8?B?djlyRFVUM3ViYnFqc0xBTDlpN3ErcmxaNHM0ZmV3SUFXclA1RU1wOEg3Qkdw?=
- =?utf-8?B?SGU0V2ZBR2Y5RzMya3JLdWZnWWxSY3BvcFBTMlhvb2JBUWJsM2Z2MXc2Qis0?=
- =?utf-8?B?WkExZkFiVWlvRVpMZ3FlTlp4c3RwbkhSZ1Z5UUpZVVhNZFh6azAremVvbXBE?=
- =?utf-8?B?QU1HUWhicEtWcjg3eHBpdzFSYTMreDFDZEF5UVBsUi8ydEN6UThNNmNzcUJ4?=
- =?utf-8?B?Z0owN2ZBc0Q1MnZoRkh4ZTlUVm55TnZwc3B2N2lJNjhKQ2VNMVB6dkdkdnhR?=
- =?utf-8?B?TVFab2x5L05HMmttcS9LUVdvOFVLVVJ5d283eVcwRW9Qc3pkQ0dGbUk1ZDcy?=
- =?utf-8?B?RWYwbUU3RHpWYTlVVGZBeUNWQWFXYittbWQwNUNZOExIZ0Q0R3g3WTB3Qkkr?=
- =?utf-8?B?eWxZY1pXN2NvNGNLNWhrZkRaNE1oYTN2dTMxMVpUQnlrUXNnLzl4QUJtZWRC?=
- =?utf-8?B?SlVNc0QzbXJnNS92bHljRjluekZ4bXQzSkJ4WkUrOFIrbUY3UTRvYVMzWStH?=
- =?utf-8?B?M2hsdXJac0ViNXArVU5tWld5MWtEN3RvOUdySlRPUlhqMzBtZEFhMENLZnY1?=
- =?utf-8?Q?Necbqb+FH4yLDqI4w7zX9ueQ6?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?cDNpQUwwamZEZitwWGxnS3lPdW9ZaDY1VE1GSTdYanBKQW04UlJUK3l3QkdM?=
- =?utf-8?B?UU82TndkbmxjV1NMNUJ3Y09Oa1VNY1krTzBPQnAxaWhTV3pKN2ZCRXNPejJ3?=
- =?utf-8?B?TVRESnlCTjFMMW85ZFhMOXYrTndZd3hxOFFQSU1TQ1dqTzZCWHM5a2phK3oy?=
- =?utf-8?B?NXJZSUl6N25jYlBlYjQybDZvUGFWL1N5NDZGVlZvVUVOMUFTUlJuazVyNnI0?=
- =?utf-8?B?YjgrVHZ5d210YVdjT3gvd2dLdUVENmFCUXlsdmlFUE1UOHFWMnRSVmpYUCtS?=
- =?utf-8?B?THdCVkh2TXdycE91YWRkRUp3cm9QM1N3OTFKbDZ2bHpQYUcwYjJyOFNIb3k1?=
- =?utf-8?B?Ryt4ZEZ3dFp2UWhMb3N2d2NITVllZHJ6M2FMRXRQNWY3SkZOblh5VU1Na21T?=
- =?utf-8?B?K2hjejBnMHZrNUo2ZXpaVXhlK2FhZ2lERmRvais0WDFQcHFMd1FYTEdWbHlj?=
- =?utf-8?B?TU95T0ZNSG5hS1JqZnlKc0x1UlBBRmF1Y0JSUzdMYXNEeTN4cExFN3YwYmtj?=
- =?utf-8?B?VG5iV2lYNXZaeDNta1FjSDZrZm0xZVpmTkVzcThHTGJua3E5MGtjZElCM3Bp?=
- =?utf-8?B?bWRmb04rc2l2d0VCUDRLSUtSMTI2cG9qZUcrc09FL3h3cnQzd1J4UHRqZmdK?=
- =?utf-8?B?cGwxaVBoOGtRQUVtYmRZS09WMTJGV0grWnNvK3lXajg0U2JsbVlMUExERW5p?=
- =?utf-8?B?Z1BIcERjbHdLQmQ0RVJWT3NUd3BNSTlJT0JwdTZnZ0xsNlAvc0FRUS84UlVY?=
- =?utf-8?B?VGNCTDd5dWIzTi9CNk50S0JrT2JQVnF4UithV3Bja0pTdG84NmcyVy82VXpk?=
- =?utf-8?B?RTc5dWF2WlEyRXk1bGZ0MlJucXNoUkpGSG5hYnBYVlgxRXJaRFJHbyswd0Mw?=
- =?utf-8?B?R3ZVdDlVMDJLZzNwZ2orV1BKWWhBUmloWVV4UC9nRTNIRG9PL3FSckRieGRl?=
- =?utf-8?B?L09NZmQxZUZianhkdlVJdzZwL01EaGprbnJhWlJyTkdnRm9pNlZwcGNnbkxl?=
- =?utf-8?B?THZGNFJkWmRMUnV0Q01mcjd4SDhmZVlTSXpPMUZuaVoyOE9lMXZ4Q2x1QmlQ?=
- =?utf-8?B?Q1RVODg1M0tZaUdBek5PM2JHYW8zMnZMcy9wRnRPV3VBSlJFYU1WVlVJazlW?=
- =?utf-8?B?RHlxZUp2bkJUQklKT3h2c1p6d2MyMWczbU5tUnlLZy9scVBoTjRlTFlMNzhH?=
- =?utf-8?B?YTFUc3NlaS9GY25CV0k0cDNjT3hQOCsvTTlDcEpJTE5GU3gyaU10bmVQQTh6?=
- =?utf-8?B?Y2wxL0RsdzJSY2N6aGVzVmFXS2ZDOFFLaUd4SHRYdzQrWkxrODFadEhwMlVZ?=
- =?utf-8?B?cURTL3lHam1wRlF0dXdna2hiQUIzZzZLRGliNVRUREQzSWswME1iVTF1ZGVL?=
- =?utf-8?B?eHJheUZWNmMvVmUzK3N0eW9qcUcvQThEOUtEbGdhcEZtVFlPUnArVmdMVlBY?=
- =?utf-8?B?T09GMDVtQm1rdkxPbHcrQldocVJjLzgrRXBqMXZoV3FLV01tNnNqbGJHVmJZ?=
- =?utf-8?Q?Ms4A+w=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c6d2f95-bb76-4bce-aabc-08db42efede0
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB4429.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2023 05:10:46.2036
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cGFAN9B0sFug22nM0jrluIsDWt7EHn1oEIhpsqxhEbEM0guV5iFFOBRfb6ftMmLGHRvSjuU9njA/IxW+dRWn1Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR10MB7637
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-04-21_08,2023-04-21_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 phishscore=0
- adultscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
- definitions=main-2304220047
-X-Proofpoint-GUID: -x80ccYHPoUcbGfWi4wD9EFTi2aI1x1j
-X-Proofpoint-ORIG-GUID: -x80ccYHPoUcbGfWi4wD9EFTi2aI1x1j
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
+Content-Language: en-US
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+        kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org,
+        ming.lei@redhat.com, gregkh@linuxfoundation.org,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
+ <20230404140835.25166-4-sergei.shtepa@veeam.com>
+ <cb0cc2f1-48cb-8b15-35af-33a31ccc922c@molgen.mpg.de>
+ <86068780-bab3-2fc2-3f6f-1868be119b38@veeam.com>
+ <a1854604-cec1-abd5-1d49-6cf6a19ee7a1@veeam.com>
+ <1dc227d0-9528-9b77-63ff-b49b0579caa1@molgen.mpg.de>
+ <c05fd3e7-5610-4f63-9012-df1b808d9536@veeam.com>
+ <955ede49-bb69-2ab2-d256-a329fe1b728c@molgen.mpg.de>
+ <3b589d44-3fbd-1f4f-8efb-9b334c26a20f@molgen.mpg.de>
+ <b6516901-b7ba-cde9-644c-84dfdef012ad@veeam.com>
+ <a670606b-ad27-ff7c-f74c-e36269f2ddfc@veeam.com>
+From:   Donald Buczek <buczek@molgen.mpg.de>
+In-Reply-To: <a670606b-ad27-ff7c-f74c-e36269f2ddfc@veeam.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On 4/21/2023 2:44 PM, Luis Chamberlain wrote:
-[..]
-> +		/*
-> +		 * We cap this to allow a block to be at least allowed to
-> +		 * be allocated using the buddy allocator. That's MAX_ORDER
-> +		 * pages. So 4 MiB on x86_64.
 
-8 MiB? since MAX_ORDER is 11.
+On 4/21/23 19:32, Sergei Shtepa wrote:
+> 
+> 
+> On 4/20/23 21:17, Sergei Shtepa wrote:
+>> Subject:
+>> Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
+>> From:
+>> Sergei Shtepa <sergei.shtepa@veeam.com>
+>> Date:
+>> 4/20/23, 21:17
+>>
+>> To:
+>> Donald Buczek <buczek@molgen.mpg.de>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+>> CC:
+>> viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+>>
+>>
+>>
+>> On 4/20/23 16:44, Donald Buczek wrote:
+>>> Subject:
+>>> Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
+>>> From:
+>>> Donald Buczek <buczek@molgen.mpg.de>
+>>> Date:
+>>> 4/20/23, 16:44
+>>>
+>>> To:
+>>> Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+>>> CC:
+>>> viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
+>>>
+>>>
+>>> On 4/19/23 21:42, Donald Buczek wrote:
+>>>> Dear Sergei,
+>>>>
+>>>> On 4/19/23 15:05, Sergei Shtepa wrote:
+>>>>> [...]
+>>>>>
+>>>>> Patches in attach and https://github.com/SergeiShtepa/linux/tree/blksnap-master
+>>>> Thanks. I can confirm that this fixes the reported problem and I no longer can trigger the UAF. 😄
+>>>>
+>>>> Tested-Bny: Donald Buczek <buczek@molgen.mpg.de>
+>>>>
+>>>> Maybe you can add me to the cc list for v4 as I'm not subscribed to the lists.
+>>>
+>>> Sorry, found another one. Reproducer:
+>>>
+>>> =====
+>>> #! /bin/bash
+>>> set -xe
+>>> modprobe blksnap
+>>> test -e /scratch/local/test.dat || fallocate -l 1G /scratch/local/test.dat
+>>> s=$(blksnap snapshot_create -d /dev/vdb)
+>>> blksnap snapshot_appendstorage -i $s -f /scratch/local/test.dat
+>>> blksnap snapshot_take -i $s
+>>> s2=$(blksnap snapshot_create -d /dev/vdb)
+>>> blksnap snapshot_destroy -i $s2
+>>> blksnap snapshot_destroy -i $s
+>>> =====
+>>>
+>>>
+>>> [20382.402921] blksnap-snapshot: Snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa was created
+>>> [20382.535933] blksnap-image: Create snapshot image device for original device [253:16]
+>>> [20382.542405] blksnap-snapshot: Snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa was taken successfully
+>>> [20382.572564] blksnap-snapshot: Snapshot 4b2d571d-9a24-419d-96c2-8d64a07c4966 was created
+>>> [20382.600521] blksnap-snapshot: Destroy snapshot 4b2d571d-9a24-419d-96c2-8d64a07c4966
+>>> [20382.602373] blksnap-snapshot: Release snapshot 4b2d571d-9a24-419d-96c2-8d64a07c4966
+>>> [20382.722137] blksnap-snapshot: Destroy snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa
+>>> [20382.724033] blksnap-snapshot: Release snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa
+>>> [20382.725850] ==================================================================
+>>> [20382.727641] BUG: KASAN: wild-memory-access in snapshot_free+0x73/0x170 [blksnap]
+>>> [20382.729326] Write of size 8 at addr dead000000000108 by task blksnap/8297
+>>> ...
+>> Great! Thanks.
+>>
+>> There is no protection against re-adding a block device to the snapshot.
+>> I'll take care of it.
+>>
+> 
+> Hi!
+> 
+> I think the fix turned out to be quite beautiful.
+> Now you will get an error "Device or resource busy".
+> Fix in attach and on github.
+> Link: https://github.com/SergeiShtepa/linux/commit/43a5d3dd9858f092b734187b6a62ce75acaa47c7
 
-> +		 */
-> +		if (ctx->blocksize > (1 << (MAX_ORDER + PAGE_SHIFT)))
-> +			goto bad_value; > +
-> +		/* The blocksize must be a multiple of the page size so must be aligned */
-> +		if (!PAGE_ALIGNED(ctx->blocksize))
-> +			goto bad_value;
-> +		break;
->   	}
->   	return 0;
+I can confirm, that this fixes the problem.
 
--jane
+     root@dose:~# blksnap snapshot_create -d /dev/vda -d /dev/vda
+     fdcd3ee3-a25f-4c2a-93d7-2d951520e938
+     Operation already in progress
+     root@dose:~# echo $?
+     1
+
+
+Tested-By: Donald Buczek <buczek@molgen.mpg.de>
+
+Best
+   Donald
+
+-- 
+Donald Buczek
+buczek@molgen.mpg.de
+Tel: +49 30 8413 1433
