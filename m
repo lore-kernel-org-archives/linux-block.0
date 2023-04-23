@@ -2,143 +2,154 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9347BC6FD18
-	for <linux-block@archiver.kernel.org>; Sun, 23 Apr 2023 14:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED0CC77B60
+	for <linux-block@archiver.kernel.org>; Sun, 23 Apr 2023 14:17:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbjDWOOr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 23 Apr 2023 10:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34136 "EHLO
+        id S230272AbjDWORG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Apr 2023 10:17:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230312AbjDWOOm (ORCPT
+        with ESMTP id S230292AbjDWORB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 23 Apr 2023 10:14:42 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on20601.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eae::601])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04235211D
-        for <linux-block@vger.kernel.org>; Sun, 23 Apr 2023 07:14:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zx1uy3OWUZpTf4yppV0cACdLe961XU5qLZG1f3yDUlMsSCaLAaQHypkjRCZO19V6r26NZaM9ZzV2IiwyrQLaq6mUWIQORlDnZiebbEEwoxyFsn+YXMyWr3pTmhGqnkP+Ce7opP1SAMHVzmmn+ZutTVmUElcn6yNPytjh/AQ3YL+dUufRDvTdmLQZKlxJFvICJ54RNqf0HtSopiO2pHcfGYfFfXhBWhvx0ZEvkcVqrErheZld7YV+RRLUH0EMnDJxq5izLLKRwzBxeimgWVseWxu4AQ2JZXKkDr6jWpwvq5JU6EThJSWRPyRVnrR1/q0TybVwd4RkzpVuUaoy5ycu1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TBzr2wsHFDY5MRNjiXZr517dh+qC2IlhgyJeFWBYqtw=;
- b=PLlOf7s2eH6DkMirkGUto4T6mKO+oKpuQ7Au2hSH4x7RDwjb9AlE0ut+KnIaO2+gmUhEjRhpvnECjtqhNGxTRe3OZ9xHM86S1lCIQ/NRA0pbtJEWr+WKQbpna8mL8B0wVUu4pzaYbQpt1c+GpYzGNHLTg19ospm4AZeVNBsti+J9JIDjQ3qtWYXHWFDNBR/kkotbG3TvjdMqGTUkFPqV3IVdr5vG3P1IfJ1pFO5ZtZ0mN15AQJjx5iEDTOvTTJECXU5zQb+4HYK+QKG4kaua3MRahwdUwX0rxe+FpESol9tlTeh1mhWoy4O4aWlWGE37m85ifECrR4uvURvzTzSiCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TBzr2wsHFDY5MRNjiXZr517dh+qC2IlhgyJeFWBYqtw=;
- b=pIHI99CY3Ll+IZ83FM3mzRuXV6t2HWdBCCsE6y1mLYGF7Eendlj+nXGFuA/nfqApiIEqaPLLYzmbymAt2lMChtEbln1/5nQ47E+QehsUfFZ36Ca9Rp+4fUNY0pgbqSy8xWYV5NHDlWOmkE5qs5Zpr+x3XqbiXtb1v2qG4ul058uP+osLe2iKj90chUM+ePmPTqP8PGXAs+yOgPtcL9WD4phBfZvEhNBomrC9t9G8BRfHeb1uP23Wi1jUQGqX2RGXx07SwsZ1LLknAcl3yfG5DyN7oDOzJagYj9Xq9Sc475JSjeiyaADlrkyVRvQmTEkG9NHgbf+UWXyhjpahUK0WTA==
-Received: from DS7PR05CA0053.namprd05.prod.outlook.com (2603:10b6:8:2f::34) by
- SA1PR12MB8141.namprd12.prod.outlook.com (2603:10b6:806:339::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6319.22; Sun, 23 Apr 2023 14:13:43 +0000
-Received: from DM6NAM11FT103.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:2f:cafe::6a) by DS7PR05CA0053.outlook.office365.com
- (2603:10b6:8:2f::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.19 via Frontend
- Transport; Sun, 23 Apr 2023 14:13:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DM6NAM11FT103.mail.protection.outlook.com (10.13.172.75) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6340.19 via Frontend Transport; Sun, 23 Apr 2023 14:13:42 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Sun, 23 Apr 2023
- 07:13:40 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Sun, 23 Apr
- 2023 07:13:39 -0700
-Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server id 15.2.986.37 via Frontend
- Transport; Sun, 23 Apr 2023 07:13:37 -0700
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <martin.petersen@oracle.com>, <hch@lst.de>, <sagi@grimberg.me>,
-        <linux-nvme@lists.infradead.org>
-CC:     <kbusch@kernel.org>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <oren@nvidia.com>,
-        <oevron@nvidia.com>, <israelr@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH v1 2/2] nvme-multipath: fix path failover for integrity ns
-Date:   Sun, 23 Apr 2023 17:13:30 +0300
-Message-ID: <20230423141330.40437-3-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.18.1
-In-Reply-To: <20230423141330.40437-1-mgurtovoy@nvidia.com>
-References: <20230423141330.40437-1-mgurtovoy@nvidia.com>
+        Sun, 23 Apr 2023 10:17:01 -0400
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B39A9
+        for <linux-block@vger.kernel.org>; Sun, 23 Apr 2023 07:16:32 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-3f1745b7132so7712595e9.1
+        for <linux-block@vger.kernel.org>; Sun, 23 Apr 2023 07:16:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682259329; x=1684851329;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1VP8GUfZAP8K+9SRs7eH1Cyi0t6YeBe3zXCPUWGNKPA=;
+        b=fg3Ao53zGc/b5DkKhiLCKBWo10a5R6UZub3XP7qsAin+hd4PoMnvzWstsfzQdm7Yxh
+         iRG5pGX5vnWJ0tIPV6lNvlKtTXYUmSPHM/19wFf1FzbQkpaDsUmiNKLPZfdCID1U8j2y
+         jUIFJSQf/Ke8QwElxD8nQybePkQEuveH3mF8o64KQZT6Q0YmMTaWKHcvjT1yKItCrvVw
+         aSFP08Jp5rj2KcEdo0p8Zs/AUeINYseYj1p1s/u55F6w1iqziasqWYevcZI/LuP6Wyzj
+         k8WcnWyukcg4YYViPqNfjtZRNRqqEgSMiOhu+TNi1cDlxruGr+ccFWn5nRm8fyAkJeDi
+         Czww==
+X-Gm-Message-State: AAQBX9dXVSnKCcy1O5pwbNmmiapZfy3X/HadxZDruXJx6dlrmorNZrlW
+        6FWfAcBOZYkO3K6KW6MIPWhQ5uzhT4Q=
+X-Google-Smtp-Source: AKy350b2tVddSJus/vOh0P/IZ4YDEhVzZ2offbsjjmAhv7Eptn9tPDPPuEIcIYfFH25yIGJokYT6Gg==
+X-Received: by 2002:a05:600c:3581:b0:3f1:6f37:e48 with SMTP id p1-20020a05600c358100b003f16f370e48mr7889490wmq.1.1682259328590;
+        Sun, 23 Apr 2023 07:15:28 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id f15-20020a7bcd0f000000b003f182cc55c4sm9754443wmj.12.2023.04.23.07.15.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 23 Apr 2023 07:15:28 -0700 (PDT)
+Message-ID: <6e06dffd-e9a1-da5a-023f-ac68a556692f@grimberg.me>
+Date:   Sun, 23 Apr 2023 17:15:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT103:EE_|SA1PR12MB8141:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4b78630a-e23e-4f18-ca06-08db4404f1c4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: h2bxQCZMxYEEIjecJt5su/egkaExJt9gajVed96ckmS5FlrNrtyjNql4mbSXDKdStL/hj45ykdpM8Vavgwk7ZYysE1vpS/5X2vfDjgyms9r7/hMi8tt51SHc4YSl/JrJjnvWPVgvMLQ9AJC0shanrlZIU2d/HnbS9XDOZOOmbqI2bfOffCmieTF7iXuWz2JQJ/A1MtxuIT82Ket+XH6od2C5P3eltCM1mZF184dKzZHH+EXjra0+CV59GdMoqgBxdpOY8Ir6LI78w3SdSkQrulV8DRg9V65t82K4u/XRBjhV6XpQ/jiP814yqkBoZoWmu0n4PU1HV+Cdm/6kriR0kQ6y2JOqAIta+BmoaHc+w4XaDeGpqVh+6NuYVfAzppOSIMSB+jcFCLOxp3HLMvimnM+fnKOwcSJWc0/Margj7n3nWyeoqWzmnGF7tKY3dldh/qKL9E2wse/2wQ6FJ7PjrLHxexeNC0V8yu09yW7UBhYeVIlHeJWP15wIlPZL8p06a12H5fI74DH5n7fYGngpsqRaF61JBYFJXqobiEyDB5T8sDqfiRGGlR0U5/wf7i6xAWMoERunpuB55PHjTnNmik/Rud4iynSMu5mEFZVuxNyAW6zt8cTVpJp3IvlwzfGwPv8dPNRh2nzDi9o9kkklU5YcrsLWQ0ttBbh/AJlFwB5BQvQI6BwIhDK1+aGRHpfN7az0ZRNsLa8a+SyHhbspnzYfVoGm712F9fLSRXtho1E=
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(346002)(39860400002)(376002)(451199021)(40470700004)(46966006)(36840700001)(34020700004)(36756003)(54906003)(83380400001)(478600001)(2616005)(36860700001)(47076005)(40480700001)(1076003)(107886003)(26005)(6666004)(316002)(110136005)(4326008)(186003)(336012)(426003)(82740400003)(70206006)(70586007)(5660300002)(8936002)(2906002)(8676002)(356005)(40460700003)(7636003)(41300700001)(86362001)(82310400005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2023 14:13:42.8414
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b78630a-e23e-4f18-ca06-08db4404f1c4
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT103.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8141
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [bug report] kmemleak observed during blktests nvme-tcp
+To:     Yi Zhang <yi.zhang@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Cc:     Hannes Reinecke <hare@suse.de>
+References: <CAHj4cs-nDaKzMx2txO4dbE+Mz9ePwLtU0e3egz+StmzOUgWUrA@mail.gmail.com>
+Content-Language: en-US
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <CAHj4cs-nDaKzMx2txO4dbE+Mz9ePwLtU0e3egz+StmzOUgWUrA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case the integrity capabilities of the failed path and the failover
-path don't match, we may run into NULL dereference. Free the integrity
-context during the path failover and let the block layer prepare it
-again if needed during bio_submit.
 
-Reviewed-by: Israel Rukshin <israelr@nvidia.com>
-Tested-by: Ori Evron <oevron@nvidia.com>
-Signed-off-by: Ori Evron <oevron@nvidia.com>
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
----
- drivers/nvme/host/multipath.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+> Hello
+> 
+> Below kmemleak observed after blktests nvme-tcp, pls help check it, thanks.
+> 
+> commit: linux-block/for-next
+> aaf9cff31abe (origin/for-next) Merge branch 'for-6.4/io_uring' into for-next
 
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 9171452e2f6d..f439916f4447 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -6,6 +6,7 @@
- #include <linux/backing-dev.h>
- #include <linux/moduleparam.h>
- #include <linux/vmalloc.h>
-+#include <linux/blk-integrity.h>
- #include <trace/events/block.h>
- #include "nvme.h"
- 
-@@ -106,6 +107,14 @@ void nvme_failover_req(struct request *req)
- 			bio->bi_opf &= ~REQ_POLLED;
- 			bio->bi_cookie = BLK_QC_T_NONE;
- 		}
-+		/*
-+		 * If the failover path will not be integrity capable the bio
-+		 * should not have integrity context.
-+		 * If the failover path will be integrity capable the bio will
-+		 * be prepared for integrity again.
-+		 */
-+		if (bio_integrity(bio))
-+			bio_integrity_free(bio);
- 	}
- 	blk_steal_bios(&ns->head->requeue_list, req);
- 	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
--- 
-2.18.1
+Hey Yi,
 
+Is this a regression?
+And can you correlate to specific tests that trigger this?
+
+> 
+> unreferenced object 0xffff88821f0cc880 (size 32):
+>    comm "kworker/1:2H", pid 3067, jiffies 4295825061 (age 12918.254s)
+>    hex dump (first 32 bytes):
+>      82 0c 38 08 00 ea ff ff 00 00 00 00 00 10 00 00  ..8.............
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    backtrace:
+>      [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
+>      [<ffffffff8776d0bf>] sgl_alloc_order+0x7f/0x360
+>      [<ffffffffc0ba9875>] 0xffffffffc0ba9875
+>      [<ffffffffc0bb068f>] 0xffffffffc0bb068f
+>      [<ffffffffc0bb2038>] 0xffffffffc0bb2038
+>      [<ffffffffc0bb257c>] 0xffffffffc0bb257c
+>      [<ffffffffc0bb2de3>] 0xffffffffc0bb2de3
+>      [<ffffffff86897f49>] process_one_work+0x8b9/0x1550
+>      [<ffffffff8689919c>] worker_thread+0x5ac/0xed0
+>      [<ffffffff868b2222>] kthread+0x2a2/0x340
+>      [<ffffffff866063ac>] ret_from_fork+0x2c/0x50
+> unreferenced object 0xffff88823abb7c00 (size 512):
+>    comm "nvme", pid 6312, jiffies 4295856007 (age 12887.309s)
+>    hex dump (first 32 bytes):
+>      00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+>      ff ff ff ff ff ff ff ff a0 53 5f 8e ff ff ff ff  .........S_.....
+>    backtrace:
+>      [<ffffffff86f63da7>] kmalloc_trace+0x27/0xe0
+>      [<ffffffff87d61205>] device_add+0x645/0x12f0
+>      [<ffffffff871c2a73>] cdev_device_add+0xf3/0x230
+>      [<ffffffffc09ed7c6>] nvme_init_ctrl+0xbe6/0x1140 [nvme_core]
+>      [<ffffffffc0b54e0c>] 0xffffffffc0b54e0c
+>      [<ffffffffc086b177>] 0xffffffffc086b177
+>      [<ffffffffc086b613>] 0xffffffffc086b613
+>      [<ffffffff871b41e6>] vfs_write+0x216/0xc60
+>      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+>      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+>      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> unreferenced object 0xffff88810ccc9b80 (size 96):
+>    comm "nvme", pid 6312, jiffies 4295856008 (age 12887.308s)
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>    backtrace:
+>      [<ffffffff86f63da7>] kmalloc_trace+0x27/0xe0
+>      [<ffffffff87d918e0>] dev_pm_qos_update_user_latency_tolerance+0xe0/0x200
+>      [<ffffffffc09ed83c>] nvme_init_ctrl+0xc5c/0x1140 [nvme_core]
+>      [<ffffffffc0b54e0c>] 0xffffffffc0b54e0c
+>      [<ffffffffc086b177>] 0xffffffffc086b177
+>      [<ffffffffc086b613>] 0xffffffffc086b613
+>      [<ffffffff871b41e6>] vfs_write+0x216/0xc60
+>      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+>      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+>      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> unreferenced object 0xffff8881d1fdb780 (size 64):
+>    comm "check", pid 6358, jiffies 4295859851 (age 12883.466s)
+>    hex dump (first 32 bytes):
+>      44 48 48 43 2d 31 3a 30 30 3a 4e 46 76 44 6d 75  DHHC-1:00:NFvDmu
+>      52 58 77 79 54 79 62 57 78 70 43 4a 45 4a 68 36  RXwyTybWxpCJEJh6
+>    backtrace:
+>      [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
+>      [<ffffffffc09fb710>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nvme_core]
+>      [<ffffffff873cc848>] kernfs_fop_write_iter+0x358/0x530
+>      [<ffffffff871b47d2>] vfs_write+0x802/0xc60
+>      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+>      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+>      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> unreferenced object 0xffff8881d1fdb600 (size 64):
+>    comm "check", pid 6358, jiffies 4295859908 (age 12883.409s)
+>    hex dump (first 32 bytes):
+>      44 48 48 43 2d 31 3a 30 30 3a 4e 46 76 44 6d 75  DHHC-1:00:NFvDmu
+>      52 58 77 79 54 79 62 57 78 70 43 4a 45 4a 68 36  RXwyTybWxpCJEJh6
+>    backtrace:
+>      [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
+>      [<ffffffffc09fb710>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nvme_core]
+>      [<ffffffff873cc848>] kernfs_fop_write_iter+0x358/0x530
+>      [<ffffffff871b47d2>] vfs_write+0x802/0xc60
+>      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
+>      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
+>      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> 
+> --
+> Best Regards,
+>    Yi Zhang
+> 
