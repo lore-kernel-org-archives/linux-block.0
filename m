@@ -2,162 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12227C77B78
-	for <linux-block@archiver.kernel.org>; Sat, 22 Apr 2023 20:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C355FC77B76
+	for <linux-block@archiver.kernel.org>; Sun, 23 Apr 2023 03:40:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbjDVUBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Apr 2023 16:01:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36378 "EHLO
+        id S229863AbjDWDj6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Apr 2023 23:39:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbjDVUBe (ORCPT
+        with ESMTP id S229556AbjDWDj4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Apr 2023 16:01:34 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A031FE3;
-        Sat, 22 Apr 2023 13:01:32 -0700 (PDT)
-Received: from [192.168.1.190] (ip5b42332c.dynamic.kabel-deutschland.de [91.66.51.44])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: buczek)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 83D7461E4052B;
-        Sat, 22 Apr 2023 22:01:29 +0200 (CEST)
-Message-ID: <3972fe6d-34f4-3a9b-b939-494fd19f1bfb@molgen.mpg.de>
-Date:   Sat, 22 Apr 2023 22:01:29 +0200
+        Sat, 22 Apr 2023 23:39:56 -0400
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F6AA210E
+        for <linux-block@vger.kernel.org>; Sat, 22 Apr 2023 20:39:55 -0700 (PDT)
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-32ab192a7b3so22695305ab.1
+        for <linux-block@vger.kernel.org>; Sat, 22 Apr 2023 20:39:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682221195; x=1684813195;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=npvT4Nc+3jsQslBncgvFu5I8Z+wKN+EOxAHFerKKXVc=;
+        b=AdWC9s3kdO/x8sPcP/jZC46npTsFV6fhqKUpHrmHQIw9Xv8MLMyyfQrVru/a5H0zCw
+         omX6HFtUsqe28CTuyN0Lx/vt3yF08gbps4gvZYXpFFxw64W9ob8iSCbSVdvRNgBOppyL
+         0OuxHJZW7qstnPYaP3RTexti1Y2IDfztbts8352tBXYrGkdcKtJZzcBrjN/N7yx9Cs3V
+         iMCavzQLmaZdJxIhbziaaYuxdOXwPZa4EZ/sIKsAwxvxCxdF/FStTgLjYk/CKzf/magI
+         FMCVnRFHdnI+uJ5TAcAWb78dzK1KGQfyY017qjJmBskGE26wMgHFu9sMfrvmCTv49Zro
+         xPqA==
+X-Gm-Message-State: AAQBX9cd6qAvGQ2KoQsQuuBPhJKEa7TFYfpIAXiQNi8VZwTabx2fXaOZ
+        02o6HnDKmE029zzO12LANWlUkioKYk9Y0DIA8UrOh+1WJBXo
+X-Google-Smtp-Source: AKy350Z7l98dnzXjreJ4hDiZKSJunzAGGuLRtXfuD8/8FdEnIL8cYmY/ZOqir9TvKdeaAxJgOl2QJmNfVdM9yIjsrHiPCsZVH+7X
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
-Content-Language: en-US
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
-Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
-        kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org,
-        ming.lei@redhat.com, gregkh@linuxfoundation.org,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20230404140835.25166-1-sergei.shtepa@veeam.com>
- <20230404140835.25166-4-sergei.shtepa@veeam.com>
- <cb0cc2f1-48cb-8b15-35af-33a31ccc922c@molgen.mpg.de>
- <86068780-bab3-2fc2-3f6f-1868be119b38@veeam.com>
- <a1854604-cec1-abd5-1d49-6cf6a19ee7a1@veeam.com>
- <1dc227d0-9528-9b77-63ff-b49b0579caa1@molgen.mpg.de>
- <c05fd3e7-5610-4f63-9012-df1b808d9536@veeam.com>
- <955ede49-bb69-2ab2-d256-a329fe1b728c@molgen.mpg.de>
- <3b589d44-3fbd-1f4f-8efb-9b334c26a20f@molgen.mpg.de>
- <b6516901-b7ba-cde9-644c-84dfdef012ad@veeam.com>
- <a670606b-ad27-ff7c-f74c-e36269f2ddfc@veeam.com>
-From:   Donald Buczek <buczek@molgen.mpg.de>
-In-Reply-To: <a670606b-ad27-ff7c-f74c-e36269f2ddfc@veeam.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:d9cf:0:b0:32b:8bf:4d77 with SMTP id
+ n15-20020a92d9cf000000b0032b08bf4d77mr2406958ilq.1.1682221194864; Sat, 22 Apr
+ 2023 20:39:54 -0700 (PDT)
+Date:   Sat, 22 Apr 2023 20:39:54 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c0f30f05f9f8a464@google.com>
+Subject: [syzbot] [block?] WARNING in __floppy_read_block_0 (2)
+From:   syzbot <syzbot+4bc99b8be4d209da97f2@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    af67688dca57 Merge tag 'mmc-v6.3-rc3' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17ad3cb3c80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=11869c60f54496a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=4bc99b8be4d209da97f2
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4bc99b8be4d209da97f2@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 15731 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 0 PID: 15731 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
+WARNING: CPU: 0 PID: 15731 at drivers/block/floppy.c:999 __floppy_read_block_0.isra.0+0x28b/0x320 drivers/block/floppy.c:4160
+Modules linked in:
+CPU: 0 PID: 15731 Comm: syz-executor.2 Not tainted 6.3.0-rc7-syzkaller-00043-gaf67688dca57 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
+RIP: 0010:__floppy_read_block_0.isra.0+0x28b/0x320 drivers/block/floppy.c:4160
+Code: 84 24 b8 01 00 00 65 48 2b 04 25 28 00 00 00 0f 85 9e 00 00 00 48 81 c4 c0 01 00 00 5b 5d 41 5c 41 5d 41 5e c3 e8 65 0f 66 fc <0f> 0b e9 5a ff ff ff e8 19 21 b7 fc e9 80 fe ff ff e8 4f 0f 66 fc
+RSP: 0018:ffffc90002cef6c8 EFLAGS: 00010216
+RAX: 0000000000000ca1 RBX: 0000000000000001 RCX: ffffc9000cea8000
+RDX: 0000000000040000 RSI: ffffffff851cdbfb RDI: 0000000000000001
+RBP: ffffea0001b91c40 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 1ffff9200059ded9
+R13: ffffc90002cef798 R14: dffffc0000000000 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff88802c600000(0063) knlGS:00000000f7fdfb40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 0000000020000040 CR3: 000000004ed67000 CR4: 0000000000150ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_revalidate.isra.0+0x7ed/0xbf0 drivers/block/floppy.c:4206
+ floppy_open+0xacc/0xe90 drivers/block/floppy.c:4058
+ blkdev_get_whole+0x99/0x2d0 block/bdev.c:594
+ blkdev_get_by_dev.part.0+0x5e0/0xb80 block/bdev.c:744
+ blkdev_get_by_dev+0x6f/0x90 block/bdev.c:778
+ blkdev_open+0x140/0x2c0 block/fops.c:493
+ do_dentry_open+0x6cc/0x13f0 fs/open.c:920
+ do_open fs/namei.c:3560 [inline]
+ path_openat+0x1baa/0x2750 fs/namei.c:3715
+ do_filp_open+0x1ba/0x410 fs/namei.c:3742
+ do_sys_openat2+0x16d/0x4c0 fs/open.c:1348
+ do_sys_open fs/open.c:1364 [inline]
+ __do_compat_sys_openat fs/open.c:1424 [inline]
+ __se_compat_sys_openat fs/open.c:1422 [inline]
+ __ia32_compat_sys_openat+0x143/0x1f0 fs/open.c:1422
+ do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+ __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
+ do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
+ entry_SYSENTER_compat_after_hwframe+0x70/0x82
+RIP: 0023:0xf7fe4579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f7fdf170 EFLAGS: 00000286 ORIG_RAX: 0000000000000127
+RAX: ffffffffffffffda RBX: 00000000ffffff9c RCX: 00000000f7fdf1c0
+RDX: 0000000000004000 RSI: 0000000000000000 RDI: 00000000f734e000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess), 2 bytes skipped:
+   0:	10 06                	adc    %al,(%rsi)
+   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+   6:	10 07                	adc    %al,(%rdi)
+   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+   c:	10 08                	adc    %cl,(%rax)
+   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  1e:	00 51 52             	add    %dl,0x52(%rcx)
+  21:	55                   	push   %rbp
+  22:	89 e5                	mov    %esp,%ebp
+  24:	0f 34                	sysenter
+  26:	cd 80                	int    $0x80
+* 28:	5d                   	pop    %rbp <-- trapping instruction
+  29:	5a                   	pop    %rdx
+  2a:	59                   	pop    %rcx
+  2b:	c3                   	retq
+  2c:	90                   	nop
+  2d:	90                   	nop
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
 
 
-On 4/21/23 19:32, Sergei Shtepa wrote:
-> 
-> 
-> On 4/20/23 21:17, Sergei Shtepa wrote:
->> Subject:
->> Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
->> From:
->> Sergei Shtepa <sergei.shtepa@veeam.com>
->> Date:
->> 4/20/23, 21:17
->>
->> To:
->> Donald Buczek <buczek@molgen.mpg.de>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
->> CC:
->> viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
->>
->>
->>
->> On 4/20/23 16:44, Donald Buczek wrote:
->>> Subject:
->>> Re: [PATCH v3 03/11] documentation: Block Devices Snapshots Module
->>> From:
->>> Donald Buczek <buczek@molgen.mpg.de>
->>> Date:
->>> 4/20/23, 16:44
->>>
->>> To:
->>> Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk, hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
->>> CC:
->>> viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org, kch@nvidia.com, martin.petersen@oracle.com, vkoul@kernel.org, ming.lei@redhat.com, gregkh@linuxfoundation.org, linux-block@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
->>>
->>>
->>> On 4/19/23 21:42, Donald Buczek wrote:
->>>> Dear Sergei,
->>>>
->>>> On 4/19/23 15:05, Sergei Shtepa wrote:
->>>>> [...]
->>>>>
->>>>> Patches in attach and https://github.com/SergeiShtepa/linux/tree/blksnap-master
->>>> Thanks. I can confirm that this fixes the reported problem and I no longer can trigger the UAF. 😄
->>>>
->>>> Tested-Bny: Donald Buczek <buczek@molgen.mpg.de>
->>>>
->>>> Maybe you can add me to the cc list for v4 as I'm not subscribed to the lists.
->>>
->>> Sorry, found another one. Reproducer:
->>>
->>> =====
->>> #! /bin/bash
->>> set -xe
->>> modprobe blksnap
->>> test -e /scratch/local/test.dat || fallocate -l 1G /scratch/local/test.dat
->>> s=$(blksnap snapshot_create -d /dev/vdb)
->>> blksnap snapshot_appendstorage -i $s -f /scratch/local/test.dat
->>> blksnap snapshot_take -i $s
->>> s2=$(blksnap snapshot_create -d /dev/vdb)
->>> blksnap snapshot_destroy -i $s2
->>> blksnap snapshot_destroy -i $s
->>> =====
->>>
->>>
->>> [20382.402921] blksnap-snapshot: Snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa was created
->>> [20382.535933] blksnap-image: Create snapshot image device for original device [253:16]
->>> [20382.542405] blksnap-snapshot: Snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa was taken successfully
->>> [20382.572564] blksnap-snapshot: Snapshot 4b2d571d-9a24-419d-96c2-8d64a07c4966 was created
->>> [20382.600521] blksnap-snapshot: Destroy snapshot 4b2d571d-9a24-419d-96c2-8d64a07c4966
->>> [20382.602373] blksnap-snapshot: Release snapshot 4b2d571d-9a24-419d-96c2-8d64a07c4966
->>> [20382.722137] blksnap-snapshot: Destroy snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa
->>> [20382.724033] blksnap-snapshot: Release snapshot ff1c54f1-3e8c-4c99-bb26-35e82dc1c9fa
->>> [20382.725850] ==================================================================
->>> [20382.727641] BUG: KASAN: wild-memory-access in snapshot_free+0x73/0x170 [blksnap]
->>> [20382.729326] Write of size 8 at addr dead000000000108 by task blksnap/8297
->>> ...
->> Great! Thanks.
->>
->> There is no protection against re-adding a block device to the snapshot.
->> I'll take care of it.
->>
-> 
-> Hi!
-> 
-> I think the fix turned out to be quite beautiful.
-> Now you will get an error "Device or resource busy".
-> Fix in attach and on github.
-> Link: https://github.com/SergeiShtepa/linux/commit/43a5d3dd9858f092b734187b6a62ce75acaa47c7
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I can confirm, that this fixes the problem.
-
-     root@dose:~# blksnap snapshot_create -d /dev/vda -d /dev/vda
-     fdcd3ee3-a25f-4c2a-93d7-2d951520e938
-     Operation already in progress
-     root@dose:~# echo $?
-     1
-
-
-Tested-By: Donald Buczek <buczek@molgen.mpg.de>
-
-Best
-   Donald
-
--- 
-Donald Buczek
-buczek@molgen.mpg.de
-Tel: +49 30 8413 1433
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
