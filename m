@@ -2,150 +2,269 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C355FC77B76
-	for <linux-block@archiver.kernel.org>; Sun, 23 Apr 2023 03:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8863C77B76
+	for <linux-block@archiver.kernel.org>; Sun, 23 Apr 2023 08:16:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbjDWDj6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Apr 2023 23:39:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57332 "EHLO
+        id S229534AbjDWIQM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Apr 2023 04:16:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbjDWDj4 (ORCPT
+        with ESMTP id S229511AbjDWIQL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Apr 2023 23:39:56 -0400
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F6AA210E
-        for <linux-block@vger.kernel.org>; Sat, 22 Apr 2023 20:39:55 -0700 (PDT)
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-32ab192a7b3so22695305ab.1
-        for <linux-block@vger.kernel.org>; Sat, 22 Apr 2023 20:39:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682221195; x=1684813195;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=npvT4Nc+3jsQslBncgvFu5I8Z+wKN+EOxAHFerKKXVc=;
-        b=AdWC9s3kdO/x8sPcP/jZC46npTsFV6fhqKUpHrmHQIw9Xv8MLMyyfQrVru/a5H0zCw
-         omX6HFtUsqe28CTuyN0Lx/vt3yF08gbps4gvZYXpFFxw64W9ob8iSCbSVdvRNgBOppyL
-         0OuxHJZW7qstnPYaP3RTexti1Y2IDfztbts8352tBXYrGkdcKtJZzcBrjN/N7yx9Cs3V
-         iMCavzQLmaZdJxIhbziaaYuxdOXwPZa4EZ/sIKsAwxvxCxdF/FStTgLjYk/CKzf/magI
-         FMCVnRFHdnI+uJ5TAcAWb78dzK1KGQfyY017qjJmBskGE26wMgHFu9sMfrvmCTv49Zro
-         xPqA==
-X-Gm-Message-State: AAQBX9cd6qAvGQ2KoQsQuuBPhJKEa7TFYfpIAXiQNi8VZwTabx2fXaOZ
-        02o6HnDKmE029zzO12LANWlUkioKYk9Y0DIA8UrOh+1WJBXo
-X-Google-Smtp-Source: AKy350Z7l98dnzXjreJ4hDiZKSJunzAGGuLRtXfuD8/8FdEnIL8cYmY/ZOqir9TvKdeaAxJgOl2QJmNfVdM9yIjsrHiPCsZVH+7X
+        Sun, 23 Apr 2023 04:16:11 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E56651986;
+        Sun, 23 Apr 2023 01:16:05 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Q41L817nHz4f3khR;
+        Sun, 23 Apr 2023 16:16:00 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgD3X7NA6URkr9jnHw--.47528S3;
+        Sun, 23 Apr 2023 16:16:01 +0800 (CST)
+Subject: Re: [PATCH for-6.4/block] block/rq_qos: protect rq_qos apis with a
+ new lock
+To:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, hch@lst.de,
+        josef@toxicpanda.com, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <dde18143-b3bf-e493-c10a-5ffd2d8b772a@huaweicloud.com>
+Date:   Sun, 23 Apr 2023 16:15:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Received: by 2002:a92:d9cf:0:b0:32b:8bf:4d77 with SMTP id
- n15-20020a92d9cf000000b0032b08bf4d77mr2406958ilq.1.1682221194864; Sat, 22 Apr
- 2023 20:39:54 -0700 (PDT)
-Date:   Sat, 22 Apr 2023 20:39:54 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c0f30f05f9f8a464@google.com>
-Subject: [syzbot] [block?] WARNING in __floppy_read_block_0 (2)
-From:   syzbot <syzbot+4bc99b8be4d209da97f2@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgD3X7NA6URkr9jnHw--.47528S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3Wry7JF1DtFyfJFyDKFy8Xwb_yoWxCr17pa
+        y8KF43A392gr4Dua1DGw4xXwsIgws5KrW8CrWfW34ayrZF9r10vF1kAFyUWFWrArsxZF4k
+        XrW8WrsYkr1UCrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+ÔÚ 2023/04/14 16:40, Yu Kuai Ð´µÀ:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> commit 50e34d78815e ("block: disable the elevator int del_gendisk")
+> move rq_qos_exit() from disk_release() to del_gendisk(), this will
+> introduce some problems:
+> 
+> 1) If rq_qos_add() is triggered by enabling iocost/iolatency through
+>     cgroupfs, then it can concurrent with del_gendisk(), it's not safe to
+>     write 'q->rq_qos' concurrently.
+> 
+> 2) Activate cgroup policy that is relied on rq_qos will call
+>     rq_qos_add() and blkcg_activate_policy(), and if rq_qos_exit() is
+>     called in the middle, null-ptr-dereference will be triggered in
+>     blkcg_activate_policy().
+> 
+> 3) blkg_conf_open_bdev() can call blkdev_get_no_open() first to find the
+>     disk, then if rq_qos_exit() from del_gendisk() is done before
+>     rq_qos_add(), then memory will be leaked.
+> 
+> This patch add a new disk level mutex 'rq_qos_mutex':
+> 
+> 1) The lock will protect rq_qos_exit() directly.
+> 
+> 2) For wbt that doesn't relied on blk-cgroup, rq_qos_add() can only be
+>     called from disk initialization for now because wbt can't be
+>     destructed until rq_qos_exit(), so it's safe not to protect wbt for
+>     now. Hoever, in case that rq_qos dynamically destruction is supported
+>     in the furture, this patch also protect rq_qos_add() from wbt_init()
+>     directly, this is enough because blk-sysfs already synchronize
+>     writers with disk removal.
+> 
+> 3) For iocost and iolatency, in order to synchronize disk removal and
+>     cgroup configuration, the lock is held after blkdev_get_no_open()
+>     from blkg_conf_open_bdev(), and is released in blkg_conf_exit().
+>     In order to fix the above memory leak, disk_live() is checked after
+>     holding the new lock.
+> 
 
-HEAD commit:    af67688dca57 Merge tag 'mmc-v6.3-rc3' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17ad3cb3c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=11869c60f54496a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=4bc99b8be4d209da97f2
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: i386
+Friendly ping ...
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thanks,
+Kuai
+> Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/blk-cgroup.c     |  9 +++++++++
+>   block/blk-core.c       |  1 +
+>   block/blk-rq-qos.c     | 20 ++++++--------------
+>   block/blk-wbt.c        |  2 ++
+>   include/linux/blkdev.h |  1 +
+>   5 files changed, 19 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 1c1ebeb51003..0d79d864ecb1 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -705,6 +705,13 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
+>   		return -ENODEV;
+>   	}
+>   
+> +	mutex_lock(&bdev->bd_queue->rq_qos_mutex);
+> +	if (!disk_live(bdev->bd_disk)) {
+> +		blkdev_put_no_open(bdev);
+> +		mutex_unlock(&bdev->bd_queue->rq_qos_mutex);
+> +		return -ENODEV;
+> +	}
+> +
+>   	ctx->body = input;
+>   	ctx->bdev = bdev;
+>   	return 0;
+> @@ -849,6 +856,7 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
+>    */
+>   void blkg_conf_exit(struct blkg_conf_ctx *ctx)
+>   	__releases(&ctx->bdev->bd_queue->queue_lock)
+> +	__releases(&ctx->bdev->bd_queue->rq_qos_mutex)
+>   {
+>   	if (ctx->blkg) {
+>   		spin_unlock_irq(&bdev_get_queue(ctx->bdev)->queue_lock);
+> @@ -856,6 +864,7 @@ void blkg_conf_exit(struct blkg_conf_ctx *ctx)
+>   	}
+>   
+>   	if (ctx->bdev) {
+> +		mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
+>   		blkdev_put_no_open(ctx->bdev);
+>   		ctx->body = NULL;
+>   		ctx->bdev = NULL;
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 269765d16cfd..fc7f902bdf5b 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -420,6 +420,7 @@ struct request_queue *blk_alloc_queue(int node_id)
+>   	mutex_init(&q->debugfs_mutex);
+>   	mutex_init(&q->sysfs_lock);
+>   	mutex_init(&q->sysfs_dir_lock);
+> +	mutex_init(&q->rq_qos_mutex);
+>   	spin_lock_init(&q->queue_lock);
+>   
+>   	init_waitqueue_head(&q->mq_freeze_wq);
+> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+> index d8cc820a365e..167be74df4ee 100644
+> --- a/block/blk-rq-qos.c
+> +++ b/block/blk-rq-qos.c
+> @@ -288,11 +288,13 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
+>   
+>   void rq_qos_exit(struct request_queue *q)
+>   {
+> +	mutex_lock(&q->rq_qos_mutex);
+>   	while (q->rq_qos) {
+>   		struct rq_qos *rqos = q->rq_qos;
+>   		q->rq_qos = rqos->next;
+>   		rqos->ops->exit(rqos);
+>   	}
+> +	mutex_unlock(&q->rq_qos_mutex);
+>   }
+>   
+>   int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+> @@ -300,6 +302,8 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+>   {
+>   	struct request_queue *q = disk->queue;
+>   
+> +	lockdep_assert_held(&q->rq_qos_mutex);
+> +
+>   	rqos->disk = disk;
+>   	rqos->id = id;
+>   	rqos->ops = ops;
+> @@ -307,18 +311,13 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+>   	/*
+>   	 * No IO can be in-flight when adding rqos, so freeze queue, which
+>   	 * is fine since we only support rq_qos for blk-mq queue.
+> -	 *
+> -	 * Reuse ->queue_lock for protecting against other concurrent
+> -	 * rq_qos adding/deleting
+>   	 */
+>   	blk_mq_freeze_queue(q);
+>   
+> -	spin_lock_irq(&q->queue_lock);
+>   	if (rq_qos_id(q, rqos->id))
+>   		goto ebusy;
+>   	rqos->next = q->rq_qos;
+>   	q->rq_qos = rqos;
+> -	spin_unlock_irq(&q->queue_lock);
+>   
+>   	blk_mq_unfreeze_queue(q);
+>   
+> @@ -330,7 +329,6 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+>   
+>   	return 0;
+>   ebusy:
+> -	spin_unlock_irq(&q->queue_lock);
+>   	blk_mq_unfreeze_queue(q);
+>   	return -EBUSY;
+>   }
+> @@ -340,21 +338,15 @@ void rq_qos_del(struct rq_qos *rqos)
+>   	struct request_queue *q = rqos->disk->queue;
+>   	struct rq_qos **cur;
+>   
+> -	/*
+> -	 * See comment in rq_qos_add() about freezing queue & using
+> -	 * ->queue_lock.
+> -	 */
+> -	blk_mq_freeze_queue(q);
+> +	lockdep_assert_held(&q->rq_qos_mutex);
+>   
+> -	spin_lock_irq(&q->queue_lock);
+> +	blk_mq_freeze_queue(q);
+>   	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
+>   		if (*cur == rqos) {
+>   			*cur = rqos->next;
+>   			break;
+>   		}
+>   	}
+> -	spin_unlock_irq(&q->queue_lock);
+> -
+>   	blk_mq_unfreeze_queue(q);
+>   
+>   	mutex_lock(&q->debugfs_mutex);
+> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> index e49a48684532..53bf5aa6f9ad 100644
+> --- a/block/blk-wbt.c
+> +++ b/block/blk-wbt.c
+> @@ -942,7 +942,9 @@ int wbt_init(struct gendisk *disk)
+>   	/*
+>   	 * Assign rwb and add the stats callback.
+>   	 */
+> +	mutex_lock(&q->rq_qos_mutex);
+>   	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
+> +	mutex_unlock(&q->rq_qos_mutex);
+>   	if (ret)
+>   		goto err_free;
+>   
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 6ede578dfbc6..17774f55743e 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -395,6 +395,7 @@ struct request_queue {
+>   
+>   	struct blk_queue_stats	*stats;
+>   	struct rq_qos		*rq_qos;
+> +	struct mutex		rq_qos_mutex;
+>   
+>   	const struct blk_mq_ops	*mq_ops;
+>   
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4bc99b8be4d209da97f2@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 15731 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 0 PID: 15731 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
-WARNING: CPU: 0 PID: 15731 at drivers/block/floppy.c:999 __floppy_read_block_0.isra.0+0x28b/0x320 drivers/block/floppy.c:4160
-Modules linked in:
-CPU: 0 PID: 15731 Comm: syz-executor.2 Not tainted 6.3.0-rc7-syzkaller-00043-gaf67688dca57 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
-RIP: 0010:__floppy_read_block_0.isra.0+0x28b/0x320 drivers/block/floppy.c:4160
-Code: 84 24 b8 01 00 00 65 48 2b 04 25 28 00 00 00 0f 85 9e 00 00 00 48 81 c4 c0 01 00 00 5b 5d 41 5c 41 5d 41 5e c3 e8 65 0f 66 fc <0f> 0b e9 5a ff ff ff e8 19 21 b7 fc e9 80 fe ff ff e8 4f 0f 66 fc
-RSP: 0018:ffffc90002cef6c8 EFLAGS: 00010216
-RAX: 0000000000000ca1 RBX: 0000000000000001 RCX: ffffc9000cea8000
-RDX: 0000000000040000 RSI: ffffffff851cdbfb RDI: 0000000000000001
-RBP: ffffea0001b91c40 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: 1ffff9200059ded9
-R13: ffffc90002cef798 R14: dffffc0000000000 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff88802c600000(0063) knlGS:00000000f7fdfb40
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 0000000020000040 CR3: 000000004ed67000 CR4: 0000000000150ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- floppy_revalidate.isra.0+0x7ed/0xbf0 drivers/block/floppy.c:4206
- floppy_open+0xacc/0xe90 drivers/block/floppy.c:4058
- blkdev_get_whole+0x99/0x2d0 block/bdev.c:594
- blkdev_get_by_dev.part.0+0x5e0/0xb80 block/bdev.c:744
- blkdev_get_by_dev+0x6f/0x90 block/bdev.c:778
- blkdev_open+0x140/0x2c0 block/fops.c:493
- do_dentry_open+0x6cc/0x13f0 fs/open.c:920
- do_open fs/namei.c:3560 [inline]
- path_openat+0x1baa/0x2750 fs/namei.c:3715
- do_filp_open+0x1ba/0x410 fs/namei.c:3742
- do_sys_openat2+0x16d/0x4c0 fs/open.c:1348
- do_sys_open fs/open.c:1364 [inline]
- __do_compat_sys_openat fs/open.c:1424 [inline]
- __se_compat_sys_openat fs/open.c:1422 [inline]
- __ia32_compat_sys_openat+0x143/0x1f0 fs/open.c:1422
- do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
- __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
- do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
- entry_SYSENTER_compat_after_hwframe+0x70/0x82
-RIP: 0023:0xf7fe4579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000f7fdf170 EFLAGS: 00000286 ORIG_RAX: 0000000000000127
-RAX: ffffffffffffffda RBX: 00000000ffffff9c RCX: 00000000f7fdf1c0
-RDX: 0000000000004000 RSI: 0000000000000000 RDI: 00000000f734e000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	10 06                	adc    %al,(%rsi)
-   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
-   6:	10 07                	adc    %al,(%rdi)
-   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
-   c:	10 08                	adc    %cl,(%rax)
-   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-  1e:	00 51 52             	add    %dl,0x52(%rcx)
-  21:	55                   	push   %rbp
-  22:	89 e5                	mov    %esp,%ebp
-  24:	0f 34                	sysenter
-  26:	cd 80                	int    $0x80
-* 28:	5d                   	pop    %rbp <-- trapping instruction
-  29:	5a                   	pop    %rdx
-  2a:	59                   	pop    %rcx
-  2b:	c3                   	retq
-  2c:	90                   	nop
-  2d:	90                   	nop
-  2e:	90                   	nop
-  2f:	90                   	nop
-  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
