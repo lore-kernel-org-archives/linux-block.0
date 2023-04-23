@@ -2,269 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8863C77B76
-	for <linux-block@archiver.kernel.org>; Sun, 23 Apr 2023 08:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 428FDC6FD18
+	for <linux-block@archiver.kernel.org>; Sun, 23 Apr 2023 14:14:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbjDWIQM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 23 Apr 2023 04:16:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40426 "EHLO
+        id S230300AbjDWOOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Apr 2023 10:14:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbjDWIQL (ORCPT
+        with ESMTP id S230305AbjDWOOl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 23 Apr 2023 04:16:11 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E56651986;
-        Sun, 23 Apr 2023 01:16:05 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Q41L817nHz4f3khR;
-        Sun, 23 Apr 2023 16:16:00 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgD3X7NA6URkr9jnHw--.47528S3;
-        Sun, 23 Apr 2023 16:16:01 +0800 (CST)
-Subject: Re: [PATCH for-6.4/block] block/rq_qos: protect rq_qos apis with a
- new lock
-To:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, hch@lst.de,
-        josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <dde18143-b3bf-e493-c10a-5ffd2d8b772a@huaweicloud.com>
-Date:   Sun, 23 Apr 2023 16:15:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sun, 23 Apr 2023 10:14:41 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on20616.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8d::616])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDFDE3588
+        for <linux-block@vger.kernel.org>; Sun, 23 Apr 2023 07:14:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IqRhgCj1besjdNz9ObyDPhUV63pNzl9IEKPhccP1XLzr3uOeJbURCQUG7B2DyqlQyRtsp7X33Sju+DlqWTsLS90RKHPcHV/xfuMPOu1NjijWsCInTS041kBd5CHIrxu43C/096V2M5KMdjjZuG7iyIuKSrPMharMIarNKxGVjZo8i3pLQ+7fGDNTNOtjl8GZSLoRQhFQMHDyV/S4x4Z9DMc3PC44xqaYNUwy1SA6NeXElSJJTXl9Cq4VaVNHgxIUMMBB/R07Gb9U9YYyVYSR8Sgyx8B7bYRpPlTu84k1lsf1sNAQEjyOYoKanKnPIdlMN6htTJpKa+DVk2HMy2pcxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=D8nmwQsNxBCNLUdxpQo0CuuUF6jcsFhD6ki8Bq/5KUg=;
+ b=NlsZHWNuLG5ntoZCMG8rX8QPxOMkcGVeg4TD+OQYQZZFwatZm+AYaVmp/0xQP0RyCWVrxgI/bjHunepfYDFr9XO7yxbXrEbJxSY8rM3x4tv8nMSNbD337QnAAfb2lavpKrYOmU7eGPzNKjMJ1XQiccDLVxtoI0tZZ/0CREqFevUVk/2KWQ7oy4EaIaFK4ED7nFvk3SUEvyiTJlIRERRUBKNEROBBdoIfFv7fOgo/rcLhVbwY+BDVe1Ut34uRnjrpHb3EiQO3EdzDGOnEm14sQA6zYAapIMthmvwHWSn9qHOnnN/nqWkibMGbbTqw4pVjhZJKyUk1iyMTw+obS4b7gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=D8nmwQsNxBCNLUdxpQo0CuuUF6jcsFhD6ki8Bq/5KUg=;
+ b=oho4sckpAU8Q0Qg+Pqemjs6TmftusGo0915kY+zHwTpUn5j229QlP6vmZag8FV8VIhFJD0cTsROob6gEyWcGbTu87/yssB7ER6ipvT1hmHvcoEavuahFbwhZF0rSDvjfJ7tHsd80afK0aRXwGAK/CX7alsEUbcieZ0kDm/xyOWFW6N/p+ys+xahuMjRKrN3OY5MfjCl5Iq7ZevJ0Lr81TQt1D5UhKiLsVKeH5VJSu5lMajY+MqWg8Awsx1DHyCwJ1Mrjte+jI/c9220bAGVrdaeGYKWVGYwZn/nRioeRfZNv6acEk+EQNR1zo1/d6JPopuEgV6r+cqLERSwVAXF0Rw==
+Received: from DS7PR06CA0047.namprd06.prod.outlook.com (2603:10b6:8:54::27) by
+ PH7PR12MB6419.namprd12.prod.outlook.com (2603:10b6:510:1fd::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6319.32; Sun, 23 Apr 2023 14:13:38 +0000
+Received: from DM6NAM11FT115.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:54:cafe::14) by DS7PR06CA0047.outlook.office365.com
+ (2603:10b6:8:54::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.32 via Frontend
+ Transport; Sun, 23 Apr 2023 14:13:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DM6NAM11FT115.mail.protection.outlook.com (10.13.173.33) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6340.18 via Frontend Transport; Sun, 23 Apr 2023 14:13:38 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Sun, 23 Apr 2023
+ 07:13:37 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Sun, 23 Apr
+ 2023 07:13:36 -0700
+Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server id 15.2.986.37 via Frontend
+ Transport; Sun, 23 Apr 2023 07:13:34 -0700
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+To:     <martin.petersen@oracle.com>, <hch@lst.de>, <sagi@grimberg.me>,
+        <linux-nvme@lists.infradead.org>
+CC:     <kbusch@kernel.org>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <oren@nvidia.com>,
+        <oevron@nvidia.com>, <israelr@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH v1 1/2] block: bio-integrity: export bio_integrity_free func
+Date:   Sun, 23 Apr 2023 17:13:29 +0300
+Message-ID: <20230423141330.40437-2-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
+In-Reply-To: <20230423141330.40437-1-mgurtovoy@nvidia.com>
+References: <20230423141330.40437-1-mgurtovoy@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3X7NA6URkr9jnHw--.47528S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3Wry7JF1DtFyfJFyDKFy8Xwb_yoWxCr17pa
-        y8KF43A392gr4Dua1DGw4xXwsIgws5KrW8CrWfW34ayrZF9r10vF1kAFyUWFWrArsxZF4k
-        XrW8WrsYkr1UCrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT115:EE_|PH7PR12MB6419:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4204af7-9bf4-48bf-f161-08db4404eefa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Zf8OLDweHYSbtIi5E1VH1Yt4SoQr4rc3ZzRDtcRR7zHAaEzva4muGlR+FoEHogYyba1m6ClNKowXsgu9N4ULrgD4naq4fadeE6Ob4PhGtoomYzCQrX3ZSBSFf/DL0Yl9LxMsy3r3z1OR7rFaP+/nWVw+1tC2e8xqRy9heiOsiTwnlaoNYUYAJUvhy5KenuKPvRlSPOOwCU2LLzW/W+Lf4KcUzHOHb9ID6LaEeJpuoq6k0gVGSb3gkPFQrkLtADVwtfA8G2eZvUHrEcOEP4wbtIPK1m3mS+lcSam6Ym/c3mgRQUjzQYKcBGTwcBKM1LmzBuIuFvUGLJCV6C88lgMFFifj1svPnmX47w4A7WJ5oDRscinqoxA1K55HfYDGDf9R9fH36qjv9JuhHDjyMBX5nWnplKUIjHyk1O/ikdEOuRAhYJUfg77Xd3WSj+uA9Hx3oxRTIs+pnEqUJ2cw0dzx9t8/gRnHFtvJjgDMNv3+8wOuBO3ZW03MV6KwyS4HqCrdqEvxSikNxkDUd8RBnd7ohcOY3OLHD70+GGehXcKMFK9yUvTOrIfKeXa/gUhVmbYBcZnsDJXdx2Gg/QI0fgjeynwrK5N/KKPJGxd92hTAqWZDwmhRSN7knpsfsvnh4H1TGK4DVEV72WeqyjUN7z88sbvLo8XemWXQeDWlBl9SWupGQFwTwKZfBELa0lhISa6BwxGl5DtdAoPWOXKZ/i7r8BrVxZ9hxoH+vw06gsDthkU=
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(39860400002)(346002)(376002)(451199021)(46966006)(40470700004)(36840700001)(107886003)(1076003)(26005)(8676002)(8936002)(4326008)(70206006)(70586007)(54906003)(316002)(36756003)(110136005)(41300700001)(478600001)(40460700003)(6666004)(5660300002)(40480700001)(36860700001)(47076005)(7636003)(356005)(82740400003)(34020700004)(86362001)(2906002)(2616005)(186003)(83380400001)(82310400005)(336012)(426003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2023 14:13:38.1632
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4204af7-9bf4-48bf-f161-08db4404eefa
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT115.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6419
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+This function is the complementary function to bio_integrity_alloc.
+Export it for users that would like to free the integrity context
+explicitly.
 
-ÔÚ 2023/04/14 16:40, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> commit 50e34d78815e ("block: disable the elevator int del_gendisk")
-> move rq_qos_exit() from disk_release() to del_gendisk(), this will
-> introduce some problems:
-> 
-> 1) If rq_qos_add() is triggered by enabling iocost/iolatency through
->     cgroupfs, then it can concurrent with del_gendisk(), it's not safe to
->     write 'q->rq_qos' concurrently.
-> 
-> 2) Activate cgroup policy that is relied on rq_qos will call
->     rq_qos_add() and blkcg_activate_policy(), and if rq_qos_exit() is
->     called in the middle, null-ptr-dereference will be triggered in
->     blkcg_activate_policy().
-> 
-> 3) blkg_conf_open_bdev() can call blkdev_get_no_open() first to find the
->     disk, then if rq_qos_exit() from del_gendisk() is done before
->     rq_qos_add(), then memory will be leaked.
-> 
-> This patch add a new disk level mutex 'rq_qos_mutex':
-> 
-> 1) The lock will protect rq_qos_exit() directly.
-> 
-> 2) For wbt that doesn't relied on blk-cgroup, rq_qos_add() can only be
->     called from disk initialization for now because wbt can't be
->     destructed until rq_qos_exit(), so it's safe not to protect wbt for
->     now. Hoever, in case that rq_qos dynamically destruction is supported
->     in the furture, this patch also protect rq_qos_add() from wbt_init()
->     directly, this is enough because blk-sysfs already synchronize
->     writers with disk removal.
-> 
-> 3) For iocost and iolatency, in order to synchronize disk removal and
->     cgroup configuration, the lock is held after blkdev_get_no_open()
->     from blkg_conf_open_bdev(), and is released in blkg_conf_exit().
->     In order to fix the above memory leak, disk_live() is checked after
->     holding the new lock.
-> 
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ block/bio-integrity.c | 1 +
+ include/linux/bio.h   | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-Friendly ping ...
-
-Thanks,
-Kuai
-> Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   block/blk-cgroup.c     |  9 +++++++++
->   block/blk-core.c       |  1 +
->   block/blk-rq-qos.c     | 20 ++++++--------------
->   block/blk-wbt.c        |  2 ++
->   include/linux/blkdev.h |  1 +
->   5 files changed, 19 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 1c1ebeb51003..0d79d864ecb1 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -705,6 +705,13 @@ int blkg_conf_open_bdev(struct blkg_conf_ctx *ctx)
->   		return -ENODEV;
->   	}
->   
-> +	mutex_lock(&bdev->bd_queue->rq_qos_mutex);
-> +	if (!disk_live(bdev->bd_disk)) {
-> +		blkdev_put_no_open(bdev);
-> +		mutex_unlock(&bdev->bd_queue->rq_qos_mutex);
-> +		return -ENODEV;
-> +	}
-> +
->   	ctx->body = input;
->   	ctx->bdev = bdev;
->   	return 0;
-> @@ -849,6 +856,7 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
->    */
->   void blkg_conf_exit(struct blkg_conf_ctx *ctx)
->   	__releases(&ctx->bdev->bd_queue->queue_lock)
-> +	__releases(&ctx->bdev->bd_queue->rq_qos_mutex)
->   {
->   	if (ctx->blkg) {
->   		spin_unlock_irq(&bdev_get_queue(ctx->bdev)->queue_lock);
-> @@ -856,6 +864,7 @@ void blkg_conf_exit(struct blkg_conf_ctx *ctx)
->   	}
->   
->   	if (ctx->bdev) {
-> +		mutex_unlock(&ctx->bdev->bd_queue->rq_qos_mutex);
->   		blkdev_put_no_open(ctx->bdev);
->   		ctx->body = NULL;
->   		ctx->bdev = NULL;
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 269765d16cfd..fc7f902bdf5b 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -420,6 +420,7 @@ struct request_queue *blk_alloc_queue(int node_id)
->   	mutex_init(&q->debugfs_mutex);
->   	mutex_init(&q->sysfs_lock);
->   	mutex_init(&q->sysfs_dir_lock);
-> +	mutex_init(&q->rq_qos_mutex);
->   	spin_lock_init(&q->queue_lock);
->   
->   	init_waitqueue_head(&q->mq_freeze_wq);
-> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-> index d8cc820a365e..167be74df4ee 100644
-> --- a/block/blk-rq-qos.c
-> +++ b/block/blk-rq-qos.c
-> @@ -288,11 +288,13 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
->   
->   void rq_qos_exit(struct request_queue *q)
->   {
-> +	mutex_lock(&q->rq_qos_mutex);
->   	while (q->rq_qos) {
->   		struct rq_qos *rqos = q->rq_qos;
->   		q->rq_qos = rqos->next;
->   		rqos->ops->exit(rqos);
->   	}
-> +	mutex_unlock(&q->rq_qos_mutex);
->   }
->   
->   int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
-> @@ -300,6 +302,8 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
->   {
->   	struct request_queue *q = disk->queue;
->   
-> +	lockdep_assert_held(&q->rq_qos_mutex);
-> +
->   	rqos->disk = disk;
->   	rqos->id = id;
->   	rqos->ops = ops;
-> @@ -307,18 +311,13 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
->   	/*
->   	 * No IO can be in-flight when adding rqos, so freeze queue, which
->   	 * is fine since we only support rq_qos for blk-mq queue.
-> -	 *
-> -	 * Reuse ->queue_lock for protecting against other concurrent
-> -	 * rq_qos adding/deleting
->   	 */
->   	blk_mq_freeze_queue(q);
->   
-> -	spin_lock_irq(&q->queue_lock);
->   	if (rq_qos_id(q, rqos->id))
->   		goto ebusy;
->   	rqos->next = q->rq_qos;
->   	q->rq_qos = rqos;
-> -	spin_unlock_irq(&q->queue_lock);
->   
->   	blk_mq_unfreeze_queue(q);
->   
-> @@ -330,7 +329,6 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
->   
->   	return 0;
->   ebusy:
-> -	spin_unlock_irq(&q->queue_lock);
->   	blk_mq_unfreeze_queue(q);
->   	return -EBUSY;
->   }
-> @@ -340,21 +338,15 @@ void rq_qos_del(struct rq_qos *rqos)
->   	struct request_queue *q = rqos->disk->queue;
->   	struct rq_qos **cur;
->   
-> -	/*
-> -	 * See comment in rq_qos_add() about freezing queue & using
-> -	 * ->queue_lock.
-> -	 */
-> -	blk_mq_freeze_queue(q);
-> +	lockdep_assert_held(&q->rq_qos_mutex);
->   
-> -	spin_lock_irq(&q->queue_lock);
-> +	blk_mq_freeze_queue(q);
->   	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
->   		if (*cur == rqos) {
->   			*cur = rqos->next;
->   			break;
->   		}
->   	}
-> -	spin_unlock_irq(&q->queue_lock);
-> -
->   	blk_mq_unfreeze_queue(q);
->   
->   	mutex_lock(&q->debugfs_mutex);
-> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> index e49a48684532..53bf5aa6f9ad 100644
-> --- a/block/blk-wbt.c
-> +++ b/block/blk-wbt.c
-> @@ -942,7 +942,9 @@ int wbt_init(struct gendisk *disk)
->   	/*
->   	 * Assign rwb and add the stats callback.
->   	 */
-> +	mutex_lock(&q->rq_qos_mutex);
->   	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
-> +	mutex_unlock(&q->rq_qos_mutex);
->   	if (ret)
->   		goto err_free;
->   
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 6ede578dfbc6..17774f55743e 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -395,6 +395,7 @@ struct request_queue {
->   
->   	struct blk_queue_stats	*stats;
->   	struct rq_qos		*rq_qos;
-> +	struct mutex		rq_qos_mutex;
->   
->   	const struct blk_mq_ops	*mq_ops;
->   
-> 
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 4533eb491661..276ca86fc1d3 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -110,6 +110,7 @@ void bio_integrity_free(struct bio *bio)
+ 	bio->bi_integrity = NULL;
+ 	bio->bi_opf &= ~REQ_INTEGRITY;
+ }
++EXPORT_SYMBOL(bio_integrity_free);
+ 
+ /**
+  * bio_integrity_add_page - Attach integrity metadata
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d766be7152e1..3888a609b4bb 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -700,6 +700,7 @@ static inline bool bioset_initialized(struct bio_set *bs)
+ 		bip_for_each_vec(_bvl, _bio->bi_integrity, _iter)
+ 
+ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
++extern void bio_integrity_free(struct bio *);
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
+ extern bool bio_integrity_prep(struct bio *);
+ extern void bio_integrity_advance(struct bio *, unsigned int);
+@@ -764,6 +765,10 @@ static inline void *bio_integrity_alloc(struct bio * bio, gfp_t gfp,
+ 	return ERR_PTR(-EINVAL);
+ }
+ 
++void bio_integrity_free(struct bio *bio)
++{
++}
++
+ static inline int bio_integrity_add_page(struct bio *bio, struct page *page,
+ 					unsigned int len, unsigned int offset)
+ {
+-- 
+2.18.1
 
