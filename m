@@ -2,82 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FFA0C77B61
-	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 05:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57856C7EE20
+	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 06:03:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230331AbjDXF5Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Apr 2023 01:57:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55774 "EHLO
+        id S231388AbjDXGDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Apr 2023 02:03:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231376AbjDXF5L (ORCPT
+        with ESMTP id S231384AbjDXGC3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2023 01:57:11 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7535D3A99;
-        Sun, 23 Apr 2023 22:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=edf2YE6tOjy5o639pmoNCDDnqNTZQ8NPmup4HBvbC60=; b=qBKmlBP0RbumDgdRWERGFEVbSD
-        kDf8Kr5lk5aB2+nWak9xt17TfHD2PupAuPb1mUJmwaPm/dURvhYPVWSPaaOFCU9vr679O7rjTbCXX
-        FY14jwJ6foFME5jmhn6hiaV5cvLy3w+4wiA9HOCqY9FKPUwzVOJnoZoumJfKXe+j3dCSf+I4DhyyN
-        meS9IcfszZYuw8bakpryb8WeNnXvLqGFAShnlXlum+ZdAx1uWAgWfJ88JFAJBehhF7KCT0OC/pGsx
-        saWH2fGCCZFbpsAwVDoLKGMeyxz9Qo8euhIsqOiC8WZE42QMSALorud5SvHI394LQ9T2HdWzjtMUM
-        uj/muRvg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pqpAv-00FPys-1e;
-        Mon, 24 Apr 2023 05:55:45 +0000
-Date:   Sun, 23 Apr 2023 22:55:45 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>, axboe@kernel.dk,
-        agk@redhat.com, snitzer@kernel.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-        hch@infradead.org, djwong@kernel.org, minchan@kernel.org,
-        senozhatsky@chromium.org, patches@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
-        linux-kernel@vger.kernel.org, hare@suse.de, p.raghav@samsung.com,
-        da.gomez@samsung.com, kbusch@kernel.org
-Subject: Re: [PATCH 3/5] iomap: simplify iomap_init() with PAGE_SECTORS
-Message-ID: <ZEYZ4ScVDXviFJ/J@infradead.org>
-References: <20230421195807.2804512-1-mcgrof@kernel.org>
- <20230421195807.2804512-4-mcgrof@kernel.org>
- <ZELuiBNNHTk4EdxH@casper.infradead.org>
- <ZEMH9h/cd9Cp1t+X@bombadil.infradead.org>
- <20230421223420.GH3223426@dread.disaster.area>
+        Mon, 24 Apr 2023 02:02:29 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CEEF49CB
+        for <linux-block@vger.kernel.org>; Sun, 23 Apr 2023 23:01:44 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id D1E0C67373; Mon, 24 Apr 2023 08:01:39 +0200 (CEST)
+Date:   Mon, 24 Apr 2023 08:01:39 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Damien Le Moal <dlemoal@kernel.org>
+Cc:     Jaegeuk Kim <jaegeuk@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Matias Bjorling <mb@lightnvm.io>
+Subject: Re: [PATCH v2 10/11] block: Add support for the zone capacity
+ concept
+Message-ID: <20230424060139.GA9805@lst.de>
+References: <f9d35d19-d0ba-fcb7-e44b-f0b8c55ba399@acm.org> <141aee35-4288-1670-6424-e6c41c8ef4c9@kernel.org> <ec7cdc7d-9eb7-65a4-6ba9-1ae6cf6f43d2@acm.org> <a5d9a370-6264-ebdf-f9f8-7b3263c2b6f0@kernel.org> <490ed061-6d82-f9fb-2050-4a386e2e4c8e@acm.org> <c4a52bff-5cab-5029-ad7f-e5f9452bc0e2@kernel.org> <ZEHY2PIRCCLOZsC4@google.com> <c12582e0-f2c8-d001-1fc1-6f7e17eeba7c@kernel.org> <ZELu0yKwnGg3iBmA@google.com> <335b63b0-5a9e-472d-2cce-c0158ae93cf3@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230421223420.GH3223426@dread.disaster.area>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <335b63b0-5a9e-472d-2cce-c0158ae93cf3@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 22, 2023 at 08:34:20AM +1000, Dave Chinner wrote:
+On Sat, Apr 22, 2023 at 07:25:33AM +0900, Damien Le Moal wrote:
+> >> for allocating blocks. This is a resource management issue.
 > > 
-> > -	return bioset_init(&iomap_ioend_bioset, 4 * (PAGE_SIZE / SECTOR_SIZE),
-> > +	return bioset_init(&iomap_ioend_bioset, 4 * PAGE_SECTORS,
+> > Ok, so it seems I overlooked there might be something in the zone allocation
+> > policy. So, f2fs already manages 6 open zones by design.
 > 
-> Yes, please.
-> 
-> > The shift just seemed optimal if we're just going to change it.
-> 
-> Nope, it's just premature optimisation at the expense of
-> maintainability. The compiler will optimise the multiplication into
-> shifts if that is the fastest way to do it for the given
-> architecture the code is being compiled to.
+> Yes, so as long as the device allows for at least 6 active zones, there are no
+> issues with f2fs.
 
-We still had cases of the compiler not doing obvious
-multiplication/division to shift conversion lately.  That being said:
-
- 1) this is an initialization path, no one actually cares
- 2) we're dealing with constants here, and compilers are really good
-    at constant folding
-
-so yes, this should be using the much more readable version.
-
+I don't think it's quite as rosy, because f2fs can still schedule
+I/O to the old zone after already scheduling I/O to a new zone for
+any of these 6 slots.  It'll need code to wait for all I/O to the old
+zone to finish first, similar to btrfs.
