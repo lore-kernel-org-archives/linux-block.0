@@ -2,117 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2508EC77B7E
-	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 08:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3A6C7618E
+	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 08:53:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231205AbjDXI0h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Apr 2023 04:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55908 "EHLO
+        id S229522AbjDXIxx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Apr 2023 04:53:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230373AbjDXI0g (ORCPT
+        with ESMTP id S230287AbjDXIxw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2023 04:26:36 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 857AD10F3
-        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 01:26:33 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3f199696149so11020485e9.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 01:26:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20221208.gappssmtp.com; s=20221208; t=1682324792; x=1684916792;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3pxlWKD7dnb+hgIonOTuPgqaiGVvQd+hXe0K6IdPi2M=;
-        b=BCLvweSQah01sJW9SBAyC5wgM9gcCgmoD6eVt1pixm6TIMPKSMsfDJ/G6pQ7WifY+a
-         jCWSatlOFJoGBGRyqNjpnC83+YZxWwidqcfJV7qrZVFpoOQQ5qGdcpNUfD/1uI304Bsr
-         n5t0aKbFfDOlYu2sfU/KiJsKG+tbC5Q3pej1LUOiQjmwv12srCYdM4fwvJqfC1vIGgHG
-         i7xM2mHs1udxBgFRdzJGUIySnuCvM4rCCc4KxRtFlArnjXACALMboZpw/c8XanndS9Ts
-         WTUnWIGWHkbm7Rk6Wg/mlO7SJDa+qk0PwimjElI9r8oOeFo6sLYUJveYcdOozE2aiQA6
-         piSQ==
+        Mon, 24 Apr 2023 04:53:52 -0400
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8168135
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 01:53:49 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-3f17b5552e9so10707315e9.1
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 01:53:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682324792; x=1684916792;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1682326428; x=1684918428;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3pxlWKD7dnb+hgIonOTuPgqaiGVvQd+hXe0K6IdPi2M=;
-        b=CV5Bag8ieVYfDL0eiOTDCUAbGJBsc9LpLcQbfHUzb7ZxlZ8zOwe9lTL4uE7nKsnjhH
-         4GHidU9vEuW498r0u78s4x5oj6KtGAaGJOE45s6CvK7lDRjl2ku9vfJOyUdcC/U91EI0
-         w1rPRQE485EFxpHrLQ7ConmZtYRqZxS3nY7lua2zMhnGrRll4HCMQXA8ONz1cTU1gEqJ
-         D7lWA12OyVYy9Xejc6ehDmqax8SSS3t/YaAvgVLbShP1WJx15fuEQ6XexMobxVeQPwVD
-         zYYkkjHWIBP6HqQqh+e6uwP7HCPm4wJy9IME9FTnSs/ydNq4j0Itv4Z0btpIv3DOW0Oc
-         TLmg==
-X-Gm-Message-State: AAQBX9c7FxNFLk1ayAaF2yopu+au1CRU5mgXKyfHvloqWPnfEm7si/ZR
-        8OhQy8Tl08Fw26PC8G92XbwILw==
-X-Google-Smtp-Source: AKy350byXoD5GzDBK8BfQEyK98TvcOHuQxalfYGEuCyUBUv+0C+wGb7Sf32jhfdSzffUY8tfHfxXdw==
-X-Received: by 2002:a05:600c:259:b0:3f1:662a:93d0 with SMTP id 25-20020a05600c025900b003f1662a93d0mr7829493wmj.15.1682324791970;
-        Mon, 24 Apr 2023 01:26:31 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id l20-20020a05600c16d400b003f19bca8f03sm4904838wmn.43.2023.04.24.01.26.30
+        bh=2GiHUcSnMSP1Hvh+56AcVC729SXkx17RkcpbunNrDak=;
+        b=Dedk7tB/0VRST1vwLQkf4N1YBGhth+4eMEmZ439Gz0nyx3wBw53/Iid1n3VREY+2Ww
+         +rRqQgm5xvJ4aznUaqWqvr8OxB219kQo+LuFHSyRetEWaZPsVJ7UVgMJaXGs++LKDsj6
+         Zcdz72OM5TtEGt/frNwVBHNAng2frTdrVhBc41Hardz72YabZ99kEssLZKTd3pfxuEqO
+         TBNxrIPLm35KfO5R9ixCIzshT6KCiJfFYSthq1gLNb3/+oQyFYZvlUOvfSJ9MccxsRNe
+         870ncLnXWNYmhE1ZS2TxMmS6g75bDMf9l9ExiTYQpY8Z2Fw8WUOyUd9vURQuJb8H5QUC
+         Y3IA==
+X-Gm-Message-State: AAQBX9dLRl5w/AJwKJ0uYhe3pYbZzUxwEbBOuksBF+YFHsNvCqaz50PE
+        hvxEC/FPGe1M+6CJ1zXvz9Y=
+X-Google-Smtp-Source: AKy350akP3bYDfe+vbBKt69VIsKGEZTVjxqhatKenixSFNbBXRYARwbMSEYZ1XiaqIZzjp4k27n4hA==
+X-Received: by 2002:a05:600c:3baa:b0:3f1:960d:68ce with SMTP id n42-20020a05600c3baa00b003f1960d68cemr6052169wms.3.1682326428292;
+        Mon, 24 Apr 2023 01:53:48 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id s1-20020adff801000000b00300aee6c9cesm10329789wrp.20.2023.04.24.01.53.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Apr 2023 01:26:31 -0700 (PDT)
-Message-ID: <42c89d18-b68f-a7d0-921a-6f45b54da356@linbit.com>
-Date:   Mon, 24 Apr 2023 10:26:30 +0200
+        Mon, 24 Apr 2023 01:53:47 -0700 (PDT)
+Message-ID: <9b3da2c2-b158-ff4a-e7e3-62e49f366ac2@grimberg.me>
+Date:   Mon, 24 Apr 2023 11:53:46 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 2/5] drbd: use PAGE_SECTORS_SHIFT and PAGE_SECTORS
-To:     Luis Chamberlain <mcgrof@kernel.org>, axboe@kernel.dk,
-        agk@redhat.com, snitzer@kernel.org, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, hch@infradead.org, djwong@kernel.org,
-        minchan@kernel.org, senozhatsky@chromium.org
-Cc:     patches@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, hare@suse.de, p.raghav@samsung.com,
-        da.gomez@samsung.com, kbusch@kernel.org
-References: <20230421195807.2804512-1-mcgrof@kernel.org>
- <20230421195807.2804512-3-mcgrof@kernel.org>
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v1 0/2] Fix failover to non integrity NVMe path
 Content-Language: en-US
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-In-Reply-To: <20230421195807.2804512-3-mcgrof@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, martin.petersen@oracle.com,
+        linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, oren@nvidia.com, oevron@nvidia.com,
+        israelr@nvidia.com
+References: <20230423141330.40437-1-mgurtovoy@nvidia.com>
+ <20230424051144.GA9288@lst.de> <5b7ca121-2b85-ddd0-d94b-1739cc5dcbec@suse.de>
+ <20230424062040.GA10281@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230424062040.GA10281@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Am 21.04.23 um 21:58 schrieb Luis Chamberlain:
-> Replace common constants with generic versions.
-> This produces no functional changes.
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  drivers/block/drbd/drbd_bitmap.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-> index 6ac8c54b44c7..b556e6634f13 100644
-> --- a/drivers/block/drbd/drbd_bitmap.c
-> +++ b/drivers/block/drbd/drbd_bitmap.c
-> @@ -1000,7 +1000,7 @@ static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_ho
->  	unsigned int len;
->  
->  	first_bm_sect = device->ldev->md.md_offset + device->ldev->md.bm_offset;
-> -	on_disk_sector = first_bm_sect + (((sector_t)page_nr) << (PAGE_SHIFT-SECTOR_SHIFT));
-> +	on_disk_sector = first_bm_sect + (((sector_t)page_nr) << PAGE_SECTORS_SHIFT);
->  
->  	/* this might happen with very small
->  	 * flexible external meta data device,
-> @@ -1008,7 +1008,7 @@ static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_ho
->  	last_bm_sect = drbd_md_last_bitmap_sector(device->ldev);
->  	if (first_bm_sect <= on_disk_sector && last_bm_sect >= on_disk_sector) {
->  		sector_t len_sect = last_bm_sect - on_disk_sector + 1;
-> -		if (len_sect < PAGE_SIZE/SECTOR_SIZE)
-> +		if (len_sect < PAGE_SECTORS)
->  			len = (unsigned int)len_sect*SECTOR_SIZE;
->  		else
->  			len = PAGE_SIZE;
 
-Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+>> Yeah, I'm slightly unhappy with this whole setup.
+>> If we were just doing DIF I guess the setup could work, but then we have to
+>> disable DIX (as we cannot support integrity data on the non-PI path).
+>> But we would need an additional patch to disable DIX functionality in those
+>> cases.
+> 
+> NVMeoF only supports inline integrity data, the remapping from out of
+> line integrity data is always done by the HCA for NVMe over RDMA,
+> and integrity data is not supported without that.
+> 
+> Because of that I can't see how we could sensibly support one path with
+> integrity offload and one without.  And yes, it might make sense to
+> offer a way to explicitly disable integrity support to allow forming such
+> a multipath setup.
 
--- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+I agree. I didn't read through the change log well enough, I thought
+that one path is DIF and the other is DIX.
+
+I agree that we should not permit such a configuration.
