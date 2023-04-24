@@ -2,82 +2,167 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E7EEC77B76
-	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 12:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29127C77B76
+	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 12:33:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231665AbjDXMbK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Apr 2023 08:31:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37934 "EHLO
+        id S230499AbjDXMdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Apr 2023 08:33:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231635AbjDXMbJ (ORCPT
+        with ESMTP id S231445AbjDXMdY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2023 08:31:09 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 331B8120;
-        Mon, 24 Apr 2023 05:31:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l7hQoBJfzkfgPB29S154KGrGt0ixs3oVFi/jSX9Pzms=; b=sjx8klUbwyW5poG4vtt9GHne3M
-        IuyC7Pa8loDQwweiLoc92ELtPUZyx8Y42tUlRWkmi+KS7dfAwluiV36VnGBR2M/SrIGpjbF22vMJA
-        fCM1/e9rmvocI23ApG30mhO1wQBkljHUh+CKbIyl5bQDqXNwpBmyu8qZgNeWIQrzDN6H755jlAs0Y
-        Toyra5f2h2BCeN8TevH1pz8ysOh3rTJ7JqmgtPqbuOBunT5NfKQYVe6DXf3nr/uzVcn3ul4X5UhcH
-        HhvUG30dtGsHbTs4kvAre8IQDSsrz8oZGgbcBdRNHAlnoc53J7ERcVSRH1P61KtUHQOB4hTGaITiV
-        nwQQzrzQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pqvLM-000RHP-Lv; Mon, 24 Apr 2023 12:30:56 +0000
-Date:   Mon, 24 Apr 2023 13:30:56 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/17] fs: rename and move block_page_mkwrite_return
-Message-ID: <ZEZ2gCYFlurJfeDE@casper.infradead.org>
-References: <20230424054926.26927-1-hch@lst.de>
- <20230424054926.26927-4-hch@lst.de>
+        Mon, 24 Apr 2023 08:33:24 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCACD2D79
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 05:33:10 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230424123307epoutp01d50fa416c9db029b0a88b077ae5cb4d5~Y3vDx3H_W2633226332epoutp01M
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 12:33:07 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230424123307epoutp01d50fa416c9db029b0a88b077ae5cb4d5~Y3vDx3H_W2633226332epoutp01M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1682339587;
+        bh=6LtiAqDVhvqj4Zceo1FaUHVR0UivOdGpy/tkN42+w0A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iVEHsw0VmrDp76LR9WykfX9vJQx5K4DfbZI0Teqxqz5Qq5f88OzbuD4RwiDY9R9YV
+         BMpG58H2VztL+3mGmHMAH+HK4gKBGlCy60x4nOYeHMeAkVZp7vZQWZQmPosReivjAG
+         pLwf3zlJetDVBhdUQvJmVv2CDle/KwmzfLfS7WTI=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230424123306epcas5p2a2d87cb75e53d0220d347e4562a37972~Y3vDU6Hg01838718387epcas5p2h;
+        Mon, 24 Apr 2023 12:33:06 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.177]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4Q4l0K1rQ7z4x9Pw; Mon, 24 Apr
+        2023 12:33:05 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        CD.3D.55646.10776446; Mon, 24 Apr 2023 21:33:05 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230424104340epcas5p16e004dc5fc3cf147b6cdde64085ea6ec~Y2Pfni12I2875628756epcas5p1I;
+        Mon, 24 Apr 2023 10:43:40 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230424104340epsmtrp1e88ce846a961976f4d575da83c1627af~Y2PfmpPG82606426064epsmtrp1l;
+        Mon, 24 Apr 2023 10:43:40 +0000 (GMT)
+X-AuditID: b6c32a4b-b71fa7000001d95e-1d-644677010477
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        49.E9.27706.B5D56446; Mon, 24 Apr 2023 19:43:39 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230424104337epsmtip239a08f2be0a1b63630c4dfaf82013362~Y2PdWgrKR1658516585epsmtip22;
+        Mon, 24 Apr 2023 10:43:37 +0000 (GMT)
+Date:   Mon, 24 Apr 2023 16:10:46 +0530
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
+        "colyli@suse.de" <colyli@suse.de>,
+        "kent.overstreet@gmail.com" <kent.overstreet@gmail.com>,
+        "dlemoal@kernel.org" <dlemoal@kernel.org>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "vincent.fu@samsung.com" <vincent.fu@samsung.com>,
+        "akinobu.mita@gmail.com" <akinobu.mita@gmail.com>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        "nbd@other.debian.org" <nbd@other.debian.org>,
+        "Jason@zx2c4.com" <Jason@zx2c4.com>
+Subject: Re: [PATCH 0/5] block/drivers: don't clear the flag that is not set
+Message-ID: <20230424104046.GA17688@green245>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230424054926.26927-4-hch@lst.de>
+In-Reply-To: <86043b4b-0960-215f-17a7-4c1facdb0713@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrGJsWRmVeSWpSXmKPExsWy7bCmhi5juVuKwfUP3BavDnQwWqy+289m
+        Me3DT2aL9wcfs1pMbzzPbvFgv73Fg6tSFn+77jFZ/HloaHGkqcri2LZrTBZ7b2lbLPv6nt3i
+        99O1TBa7Ny5is9g3y9PicXcHo4Ogx+Ur3h6zGy6yeOycdZfd4/LZUo9NqzrZPHqb37F5XP3W
+        zOzRt2UVo8fm09UeEzZvZPX4vEnOo/1AN5PH5L9PmQN4o7JtMlITU1KLFFLzkvNTMvPSbZW8
+        g+Od403NDAx1DS0tzJUU8hJzU22VXHwCdN0yc4D+UlIoS8wpBQoFJBYXK+nb2RTll5akKmTk
+        F5fYKqUWpOQUmBToFSfmFpfmpevlpZZYGRoYGJkCFSZkZzy8llZwgaOipbWRqYGxjb2LkYND
+        QsBE4sgL0y5GLg4hgd2MEk+nP2aEcD4xSpw/1ArlfGOU+Lj/FhNMx9JJLBDxvYwS/TcXARVx
+        AjnPGCUW/S4CsVkEVCU+bvnKBlLPJqAtcfo/B0hYREBP4uqtG+wgvcwC69gk1k/uAOsVFvCR
+        ONf2iR3E5hXQlbj1dB8bhC0ocXLmExYQm1PATuLHhXlgcVEBZYkD244zgdgSAl84JHbeqoew
+        XSSeHGuCigtLvDq+hR3ClpJ42d8GZZdLrJyygg3kCAmBFkaJWddnMUIk7CVaT/UzgxzNLJAh
+        MW9dAkRYVmLqqXVgM5kF+CR6fz+Bms8rsWMejK0ssWb9AjYIW1Li2vdGNkhYeUjMvywNCZ4X
+        jBJvf8lOYJSfheSzWQjLZoEt0JFYsPsTG0RYWmL5Pw4IU1Ni/S79BYysqxglUwuKc9NTi00L
+        jPNSy+FRnZyfu4kRnOC1vHcwPnrwQe8QIxMH4yFGCQ5mJRFe4Sy3FCHelMTKqtSi/Pii0pzU
+        4kOMpsCImsgsJZqcD8wxeSXxhiaWBiZmZmYmlsZmhkrivOq2J5OFBNITS1KzU1MLUotg+pg4
+        OKUamOQyTO2DTqkk2c3r55Sw8V2b+G3DpisKf3bskgs/WOKklf8m4E2g1CLeyhdpPl3cu3tm
+        mpjzLFTfG5Ic+dK40P53qFy90xXV02cYRS9Oy1jP+n75Ju6HkooNcqmbmAJ/r/jF/ERBPn31
+        KlXeyC5nX8WDth2/bTeaGr4/lcLZaSK1TKDp5K0rKdImVeFMnlvPuro8sb9ufe/j69Szd7N+
+        qDvwVr938/i7eXbM+hrrSWbiPY4H5FaLNjL/+j/1Ds/P4ESBMpX2RQtvxm04n2BUeeKf/6bu
+        jKTcI4Wv73+zlX+2S1BUIt2nVHmKlOy8ojOmdlcsbzzZoDw70rF8S2nJmu2psxh4p1ud8f3Z
+        Xd+jxFKckWioxVxUnAgAg8IEN3kEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHIsWRmVeSWpSXmKPExsWy7bCSvG50rFuKwaFtVhavDnQwWqy+289m
+        Me3DT2aL9wcfs1pMbzzPbvFgv73Fg6tSFn+77jFZ/HloaHGkqcri2LZrTBZ7b2lbLPv6nt3i
+        99O1TBa7Ny5is9g3y9PicXcHo4Ogx+Ur3h6zGy6yeOycdZfd4/LZUo9NqzrZPHqb37F5XP3W
+        zOzRt2UVo8fm09UeEzZvZPX4vEnOo/1AN5PH5L9PmQN4o7hsUlJzMstSi/TtErgy3v68xlQw
+        ga1iz5TV7A2M91m6GDk4JARMJJZOAjK5OIQEdjNKNB96wtbFyAkUl5RY9vcIM4QtLLHy33N2
+        iKInjBIbN51mB0mwCKhKfNzylQ1kEJuAtsTp/xwgYREBPYmrt26A1TMLbGOTeLDtB9ggYQEf
+        iXNtn8B6eQV0JW493ccGMfQFo0TrzCuMEAlBiZMzn7CA2MwCWhI3/r1kAlnALCAtsfwf2AJO
+        ATuJHxfmgR0qKqAscWDbcaYJjIKzkHTPQtI9C6F7ASPzKkbJ1ILi3PTcYsMCw7zUcr3ixNzi
+        0rx0veT83E2M4CjV0tzBuH3VB71DjEwcjIcYJTiYlUR4PUqdUoR4UxIrq1KL8uOLSnNSiw8x
+        SnOwKInzXug6GS8kkJ5YkpqdmlqQWgSTZeLglGpgEi3a2Lx/883ZZ65slO1P7P19z11XZc7M
+        HOtHbAxnrimtSPrL6HcpzHdeUHvA5o/n+ZS9L5cLZwrPXH0u4iy35Lk3jZ3tU77r+Gv7KtTF
+        PpZdkr7n1RedmvtxlW3H/zGev/ja9ZJGknlV9FOTV8KPjS/556yU1O3W7LsTdle2u8dPdGbW
+        YsYlF0NW7d428bXJ688Oz99/FbMJe2Itq7AoWL+4O0Hoza4rkw6IuicJBuwsXqYy7bHnV6O7
+        6Vev81T5/8tRN+R0fnr264O9bx9Y7yt4/mBN7Fa9C+2LqzSKZ7Vcs9mwnMnj9RFPbosYY/3P
+        YZMV2mXP9aWdmjCr8aCFrvC5xzuTj/gmvlaT7IiVVGIpzkg01GIuKk4EANc7wnBBAwAA
+X-CMS-MailID: 20230424104340epcas5p16e004dc5fc3cf147b6cdde64085ea6ec
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_3f4e1_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230424092940epcas5p3407002e7d5c79593ffbafc38f2b49e51
+References: <20230424073023.38935-1-kch@nvidia.com>
+        <CGME20230424092940epcas5p3407002e7d5c79593ffbafc38f2b49e51@epcas5p3.samsung.com>
+        <20230424092641.u6u25eyojewvasj4@green245>
+        <86043b4b-0960-215f-17a7-4c1facdb0713@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 24, 2023 at 07:49:12AM +0200, Christoph Hellwig wrote:
-> block_page_mkwrite_return is neither block nor mkwrite specific, and
-> should not be under CONFIG_BLOCK.  Move it to mm.h and rename it to
-> errno_to_vmfault.
+------M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_3f4e1_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-Could you move it about 300 lines down and put it near vmf_error()
-so we think about how to unify the two at some point?
+On Mon, Apr 24, 2023 at 10:25:34AM +0000, Chaitanya Kulkarni wrote:
+> On 4/24/23 02:26, Nitesh Shetty wrote:
+> > On 23/04/24 12:30AM, Chaitanya Kulkarni wrote:
+> >> null_blk
+> >> brd
+> >> nbd
+> >> zram
+> >> bcache
+> >
+> > Any particular reason for leaving out mtip and s390 drivers ?
+> >
+> 
+> I didn't find why this flag is clear at first place,
+> if this gets accepted I'll others gradually..
+> 
+> > Will it be better to use the flag similar to scsi devices and
+> > use it for random number generation ?
+> >
+> 
+> I didn't understand this comment.
+> 
 
-Perhaps it should better be called vmf_fs_error() for now since the
-errnos it handles are the kind generated by filesystems.
+My bad. I intended, may be we can set QUEUE_FLAG_ADD_RANDOM flag.
+Similar to scsi once the request completes, using function
+add_disc_randomness() random generator can be updated.
 
-> +++ b/include/linux/mm.h
-> @@ -3061,6 +3061,19 @@ extern vm_fault_t filemap_map_pages(struct vm_fault *vmf,
->  		pgoff_t start_pgoff, pgoff_t end_pgoff);
->  extern vm_fault_t filemap_page_mkwrite(struct vm_fault *vmf);
->  
-> +/* Convert errno to return value from ->page_mkwrite() call */
-> +static inline vm_fault_t errno_to_vmfault(int err)
-> +{
-> +	if (err == 0)
-> +		return VM_FAULT_LOCKED;
-> +	if (err == -EFAULT || err == -EAGAIN)
-> +		return VM_FAULT_NOPAGE;
-> +	if (err == -ENOMEM)
-> +		return VM_FAULT_OOM;
-> +	/* -ENOSPC, -EDQUOT, -EIO ... */
-> +	return VM_FAULT_SIGBUS;
-> +}
-> +
->  extern unsigned long stack_guard_gap;
+Regards,
+Nitesh Shetty
+
+------M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_3f4e1_
+Content-Type: text/plain; charset="utf-8"
+
+
+------M1XhpxpcEzXMl-TZDJz3dv6uQhpc8LNXMKbaeBmU9jEugurT=_3f4e1_--
