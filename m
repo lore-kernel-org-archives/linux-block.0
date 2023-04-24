@@ -2,167 +2,144 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B593C77B61
-	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 09:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4347EC77B61
+	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 09:49:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229658AbjDXJRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Apr 2023 05:17:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51752 "EHLO
+        id S231625AbjDXJtq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Apr 2023 05:49:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231278AbjDXJRo (ORCPT
+        with ESMTP id S231517AbjDXJtc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2023 05:17:44 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C4110E5
-        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 02:17:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XQA12L6w02vk8sD/GyV8fbFZxunJFkmSU5CHW/arY2+AjptgYo7I7KCaJqGT046KKd2ij+nZCMXbEEcOnDP8zrbrlfjKRfFpxdvqy5+f4vVYPXOHdKcvM1kI2n7mjvoAU1OcJKY8o1oXd0Uh2OAiyylAPlMtbiN/FDut+mZbpcTsAozZBj+/V8RWKeDJJcAEA+j4VVxdeXpFheX5dekvE3pgkvadaHSESkT5ztfpjz8u7+6bPswVcturNNMoxi0k0UUUt6H0I1bV7BzVedGw6xO0ImD7V4n8kEh0CkCyCiywoyHPSLqma6qyd8AfEL7iQwzvxmL2or/yMqjE5p6MGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4Ijw3juk4YmBbaxblSKDIyd9EK10D+kcIJZQrcAd9NA=;
- b=ItJWvU5jkZlwIOsppt+74v0kpGcDcWwUdFWjsxj247bEM7wrtakKqtmOMYFzRPZdhK5sI3oRXFLZt1kRSP2hMt7LAuxV52L8J4u0iVnjeGV3C6faSr1S20kDKo93v/m/cWLQ3Om7FXsyc5rKk2EM+n3iEW0Li7jEuiWmJOXM5yh7aCRcLguk6ih0DIcODWLSxGyTupUGD7d3cnPqW2tfMGJR05dO9K3fMz9SjHlrEUlfvE0rT0fwrCrzAD0ZBMBwSgHgBdM6BFuxqZRF8xhYFjH6VJL7iRudKlb1aYhHwRDoDydQJi3ey6mTlAUgoG+BbPaghC2WjOXMYgVKG6j9jA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4Ijw3juk4YmBbaxblSKDIyd9EK10D+kcIJZQrcAd9NA=;
- b=AgoGaG4GS+SEkF/ewQgMJID9vvH9iEeULVpC/m+i0yBjPai7U4TGBhyZnun1DKIzAUK/Bvjm/JM67P53+eHD+azXLn+LQtCdWLYM6jWPThLRGyWKSE8C72g2HicoI3WUyPrw/M6FvEo0DLIfflvhxEkfzT+NQF++cXJhlTMZEiQuRLl2Bkxr/N1Jwbvi1uewHPpEOucgzyuTz9njpZX9VCOQckgM6sMq9r4qm0VcRLS6f0KbkEsPxWDkThDFH5Pg8IzjL0nwbLC28x1sWvs/kieATnnPoKkRzX7eC4sY52/KZA4o3eyQ5ISFSXnCnvwdo8hfEv67tu1hmyijSTeQEA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
- by SA1PR12MB7174.namprd12.prod.outlook.com (2603:10b6:806:2b1::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.35; Mon, 24 Apr
- 2023 09:17:40 +0000
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::61c3:1cd:90b6:c307]) by DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::61c3:1cd:90b6:c307%3]) with mapi id 15.20.6319.033; Mon, 24 Apr 2023
- 09:17:40 +0000
-Message-ID: <729e6964-78b6-cdf2-b7e9-0ea5562a10e2@nvidia.com>
-Date:   Mon, 24 Apr 2023 12:17:32 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v1 0/2] Fix failover to non integrity NVMe path
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>
-Cc:     martin.petersen@oracle.com, linux-nvme@lists.infradead.org,
-        kbusch@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-        oren@nvidia.com, oevron@nvidia.com, israelr@nvidia.com
-References: <20230423141330.40437-1-mgurtovoy@nvidia.com>
- <20230424051144.GA9288@lst.de> <5b7ca121-2b85-ddd0-d94b-1739cc5dcbec@suse.de>
- <20230424062040.GA10281@lst.de>
- <9b3da2c2-b158-ff4a-e7e3-62e49f366ac2@grimberg.me>
-Content-Language: en-US
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <9b3da2c2-b158-ff4a-e7e3-62e49f366ac2@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MRXP264CA0037.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:500:14::25) To DM4PR12MB5040.namprd12.prod.outlook.com
- (2603:10b6:5:38b::19)
+        Mon, 24 Apr 2023 05:49:32 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A321713
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 02:49:24 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230424094922epoutp02ca352cea326b416cbf6a44b3d61548ba~Y1gFbsqrR2603326033epoutp02E
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 09:49:22 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230424094922epoutp02ca352cea326b416cbf6a44b3d61548ba~Y1gFbsqrR2603326033epoutp02E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1682329762;
+        bh=31RWr4izbPdOzAjp5njGY46la8LA9hZVsJhRUiuap1A=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=knWrGkKDgVyfX2HdOQAUVW+EcuDk6gTCHb6pj25SxR4gcWVbESQJWrMY4kbp3UdaP
+         2jyTwIFRIiXRkIxKdj5EVKhCzLNax1zbEdm4GZb/PyEGgSTOBZDoFqs9kBnUTMh0Qg
+         BIgSKogYte2CfFr96cwN3uq3QCBTR0agf3lktDsg=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230424094921epcas5p226e6574fce697200e5b529220d615123~Y1gE7W_b42348523485epcas5p2U;
+        Mon, 24 Apr 2023 09:49:21 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.177]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4Q4gMM6cvHz4x9Pp; Mon, 24 Apr
+        2023 09:49:19 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F5.38.54880.F9056446; Mon, 24 Apr 2023 18:49:19 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20230424092940epcas5p3407002e7d5c79593ffbafc38f2b49e51~Y1O4ma3pU2242622426epcas5p3H;
+        Mon, 24 Apr 2023 09:29:40 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230424092940epsmtrp10d8a2619094be279d56ab0a06e1ffd23~Y1O4k3zOG1327913279epsmtrp1X;
+        Mon, 24 Apr 2023 09:29:40 +0000 (GMT)
+X-AuditID: b6c32a49-8c5ff7000001d660-a7-6446509febca
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        9F.41.27706.30C46446; Mon, 24 Apr 2023 18:29:39 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230424092937epsmtip1f2178ee6e7ac23f48d0d223ba1f56cf6~Y1O2MU2HJ0425804258epsmtip1T;
+        Mon, 24 Apr 2023 09:29:37 +0000 (GMT)
+Date:   Mon, 24 Apr 2023 14:56:41 +0530
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        axboe@kernel.dk, josef@toxicpanda.com, minchan@kernel.org,
+        senozhatsky@chromium.org, colyli@suse.de,
+        kent.overstreet@gmail.com, dlemoal@kernel.org,
+        johannes.thumshirn@wdc.com, bvanassche@acm.org,
+        vincent.fu@samsung.com, akinobu.mita@gmail.com,
+        shinichiro.kawasaki@wdc.com, nbd@other.debian.org, Jason@zx2c4.com
+Subject: Re: [PATCH 0/5] block/drivers: don't clear the flag that is not set
+Message-ID: <20230424092641.u6u25eyojewvasj4@green245>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|SA1PR12MB7174:EE_
-X-MS-Office365-Filtering-Correlation-Id: e23ee406-7ef3-46f2-10b8-08db44a4c098
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z73/bdcCueiPCuqiH5bW0fypeBC3yU+7piQs2qTsY5q01uZGULeMerpgAQ7OqDXoptnt2tdpU4Jkka65S5NdcwM/oJwVbXwX26rPRW4oney8bqFis1zL00Is8bGgo0MkPtam2lpJ/2h7wnL5jx3wN6tG4JBNqWC0djzvBiTB4T9dBeiBdzS1OBS2SsdoDZmjTPvowKkNSZQDWVsbxpoPaoxxnPzyofXIXPXctAftzy+mGKCa2a3yy6MlzTXvTN5AB4QCjnZx85uF+zQoOY4UyKFTiuBzb6pxBvMUO6fycQDH6JSiM2f3wq3IxCu5PT0NJBWf7CCsljspP0Fnu9tj5AJEOUmWjhR8CaTlEcyidbwCwLqXqRTGhPpgTb1lklNVXb7tPjs3/D4eEBnylHWraqsuvppz/DYPwPhVdRx7AZZoq1hzskKw2qWyILD7lhgtVN+kOKlTnZfsXxhvXVWg+83lyx4DTuuOf4MrryzklVfp5BNWN7U1VJzTp+BzTkPaRLPbj/NRnw1al9PSs45nL/2VleQ2j30mw++/5Cn/HXzuye2qFZH/KbWx9Z2XFpMi6B2Crx/Snp2j2lIQbsZcJe5cipVMD8JjsKDumuODbBDQ/Nvm9WSMYCIoyF0x1KTTvHkk/GBfbayBdWVJe8YT1A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(346002)(136003)(376002)(396003)(451199021)(31686004)(66556008)(66946007)(8676002)(5660300002)(66476007)(6506007)(478600001)(86362001)(41300700001)(4326008)(8936002)(6486002)(66899021)(53546011)(316002)(6512007)(31696002)(110136005)(6666004)(107886003)(186003)(2616005)(2906002)(36756003)(83380400001)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dXFJdkVLTEZnK0Fiak1kTUdweVB4UEZwb3lpVlc4SnlxYi9hZ2szSk5yV29i?=
- =?utf-8?B?RExQRk9WMFg3OHBOdmRtaHI2N0RJajlFUHpsNVgxS0VVOVRlZUttZ0xsdHBP?=
- =?utf-8?B?SVdwRjM4STIrSWVoTkhnNWJ3bjlQNVhLejd1QUZFRmYyNC95MGxCNnY1UG05?=
- =?utf-8?B?bW9BaG5YZ2J0UXR4K1JYMGU0ZE9IWGJoNTYrTUdYVXR4QU9GRmJRdXJENjFq?=
- =?utf-8?B?TEJYNllya3ZqQUtnRk5mU3E2cS9MUWoxYm1IQTVzUkhGaGxWWStsR0MvcHN5?=
- =?utf-8?B?WlVNSTFhdUhKOWpnMkFxc3FMcDdFUlFRSkxBd0w2TW9xU0p2UjdnNDRSSmdB?=
- =?utf-8?B?ZmhiMm4yTXhhaGZ2L2doOGk1aWhLNjlmR00zS0pHVTBGK2tzdHFTYlpOUTAx?=
- =?utf-8?B?OU91bGxKSTdVV1ZmMDRTd1YzVTQzWUY3cnVzWFY5NEhYZkJvUWMwQjArbkdQ?=
- =?utf-8?B?T0xHdzk0RFQvdXp0S0MwaXFEekNZTGEwbU9QcHlScTdPckMwOGZEUjFURU45?=
- =?utf-8?B?RGpZbHpPMGdvU3kzblJQRGtXVXRrVXdGRXg1THhQU3ExQ2g1Yk9tQ0FJSWZI?=
- =?utf-8?B?TVBsVTdxNStPQUJKQkt3bkQwdWpMR0dhRWlDTHVKYWJrUFoyTXRsM2Q0eWhp?=
- =?utf-8?B?b1QzMUUzY0lwVzQrSm80VGUwUS9hSFA4TWtzOWNHZWRBdmc3TjdObzdnUk8r?=
- =?utf-8?B?TXhHODJlS2djc0U1N1NMSEVlUUpVNUtZRHZUNUJYd25aS2ZKK3RNeWNCa2Qr?=
- =?utf-8?B?NXlRUFlpck5FeGlTTEJjN1NPbm9reiszMSsydXpUUlhBRE5xbDg1Q1ZEdWdj?=
- =?utf-8?B?MWVhVkk4RkRKWDdLcFVyNHErcHl6Y2hjMWU1NDZYNHZ6ekhUL3RSQjIyOXQw?=
- =?utf-8?B?cTU3bUNQQUZXWWJOaWNwdTVoTzBia1JvejVwdWdCZDByVjd5YjJHYTg3Q2R5?=
- =?utf-8?B?bFZaSVd2SklPMDF0R3ArQ3NhRmxiazhrVUFFZUxlU2tmVXhJaHdzQ0pnU2dZ?=
- =?utf-8?B?SE4zcEJxT2NlckFJUlQvZTNRQ0pUd3JjMldDRWpXMFY2NFpzMS9DMW94WThX?=
- =?utf-8?B?R3dzRFZTNUxnd2hPZitVSFVYaXNGUXJKMkdoeTA3b3psUkkzMzJrREhBMFdS?=
- =?utf-8?B?N3lvbGhpdy9EU0x4N1M2Qk9MNCtOVHcxWFQ2Mi9JUDdmYk94K3FFRXJLemFi?=
- =?utf-8?B?ZHlPMXRDZ3MvMU84RHNPd2ZtV3Z1T2NXUlVFN01zSTVCaXlua21EZXUvUTd3?=
- =?utf-8?B?a2Jpc1IyMnphS3pvUExYYVhFTk5WeVJrWitGdndCby8vU1lVMXBvZ1RRcjhZ?=
- =?utf-8?B?WkIvY1RscXU1NFZGN1YxMDVIYlREdmtybnd6RUYwSUdKcGozaEp4MmpyRnRX?=
- =?utf-8?B?d25KZzZPLzZwZU1vb0tXbkZESllodFRid1h5Q290R0hvL2tsUjBFb2VPd3J6?=
- =?utf-8?B?NW5xMjhsYjN4MWlxOG42NmlYaTMvLzZlcTJ2VGNEeW8rT1pHbnJCMTVKQ2Fv?=
- =?utf-8?B?dWE0SjJwa3Z3Ui9HOHBKQXVRb05JbGNmK2ppTGM2a1ppUkRoZ2d1UXhlK3Jr?=
- =?utf-8?B?WlR3ZzQyYkZMUDFHV1FCTlo4YXBTWlFENm92WGJWSzM0M3A2Q3krdjFTMkNk?=
- =?utf-8?B?VkZ6VE5aT1dSZlNPSU41cjVQbDBtb3dVOXpNSTBydkRPRUxFeGkzZFVzamwr?=
- =?utf-8?B?bDE0cVZJWkJmTDdnUG14VlNFZ2NSYjBnbDYwYm1Sdm9BVi9pcklDaHhCcDhh?=
- =?utf-8?B?ZmVKeDYrdlhGbVZNVUw3T2srcXFmNWtLOGdVRWx5bDdrU0ZoWXB5WXltVnh4?=
- =?utf-8?B?T1N3czY4VEpEem9nWU9uQllqbkNGWll1VEdTa3JFaVFjZ1h5bnMzODRERWlU?=
- =?utf-8?B?UGNLMVd1eGsxV0xzdVhhRHhaMjQ1TGFRSnVFV2oxTGxTUFduRFdSaXFVcnR3?=
- =?utf-8?B?aDl2SVc0VUpQcEdaMlVNcHZYNWViUzZTWCtNa0NPdDVTZnJkcE1KVXZqU1Yy?=
- =?utf-8?B?MWc5OUpRYXVqYktTUXI2aWVpQ09ZQW1xd2Yrbm81dEFSa093Snk4ZTc1SE9I?=
- =?utf-8?B?ZjcxK2wzaU93TnBrWG5iSkZNN1R6aStDNHgzelh2cC9CZ3J1aXZoRStGcFpq?=
- =?utf-8?B?dm5TQzR0dURnN0xJSk44SklzN1pUWFlBT2pGZFhNaE1NYlhnT3ZFTUxESTFx?=
- =?utf-8?Q?eh3ciJBuNy1gWAF02LMe3fXqCQMu+l2OPPynPk93+ASA?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e23ee406-7ef3-46f2-10b8-08db44a4c098
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2023 09:17:40.2029
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /re+agv8IqDtt4sYHKX9Z7dNdY05LcCYYaplDEJKa+YXJ3lXEZ4TalLb0QKC5D2l7lL0gmtuWwGHZ4JnGC8krw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7174
+In-Reply-To: <20230424073023.38935-1-kch@nvidia.com>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBJsWRmVeSWpSXmKPExsWy7bCmhu78ALcUg1/njCxeHehgtFh9t5/N
+        YtqHn8wW0xvPs1s82G9v8eCqlMXfrntMFn8eGlo8vTqLyeJIU5XFsW3XmCz23tK2WPb1PbvF
+        76drmSx2b1zEZrFvlqfF4+4ORgdBj8tXvD1mN1xk8dg56y67x+WzpR6bVnWyefQ2v2PzuPqt
+        mdmjb8sqRo/Np6s9JmzeyOrxeZOcR/uBbiaPyX+fMgfwRmXbZKQmpqQWKaTmJeenZOal2yp5
+        B8c7x5uaGRjqGlpamCsp5CXmptoqufgE6Lpl5gD9paRQlphTChQKSCwuVtK3synKLy1JVcjI
+        Ly6xVUotSMkpMCnQK07MLS7NS9fLSy2xMjQwMDIFKkzIzjiz9ANjQQdrxaUn2Q2MK1i6GDk4
+        JARMJLa9Tu9i5OIQEtjNKNFzch0ThPOJUeLm3eOsXYycQM43RonOz/ogNkjDt4vdzBDxvYwS
+        zy+oQtjPGCX+XvAGsVkEVCXWL77EDrKATUBb4vR/DpCwiIC6xNQDPawg85kF/jNJdPRtYARJ
+        CAv4SJxr+8QOYvMKmEn827CLEcIWlDg58wkLiM0JtHfx8ilgNaICMhIzln5lBhkkIfCFQ+Lc
+        uzksEMe5SBya0Q1lC0u8Or6FHcKWknjZ3wZll0usnLKCDaK5hVFi1vVZjBAJe4nWU/1gnzEL
+        ZEhM2DsdapCsxNRToGABifNJ9P5+wgQR55XYMQ/GVpZYs34BG4QtKXHteyMbJHg9JOZfloYE
+        UDujxPsT/hMY5Wch+W0Wkm0QtpVE54cm1llA3cwC0hLL/3FAmJoS63fpL2BkXcUomVpQnJue
+        WmxaYJiXWg6P7OT83E2M4CSv5bmD8e6DD3qHGJk4GA8xSnAwK4nwepQ6pQjxpiRWVqUW5ccX
+        leakFh9iNAXG1URmKdHkfGCeySuJNzSxNDAxMzMzsTQ2M1QS51W3PZksJJCeWJKanZpakFoE
+        08fEwSnVwMS4SkK+/0joLaemjtC+3u/3DDPuHzn1qa555Qb9/L+T39ROZ9k5/ah/mYeXwvOw
+        60+3dm+7xGC26s6xprDOv0Epu+Z3KJdtDJwctHZqruuiI8db77dIRd9ONF/mNv37ebG8hASp
+        24qGD5vzQx96nlSp1BeN9Sg/fyT8R2t+44GIQsObLjomG7T/vFddsvraAr9XAgu41xbpq0yf
+        NCPJaN+BD9JsESv82opWBEjwfKk0uuMuai/orKr55c5hRYZ3cpM1etTEVZtbp5udFjJS/lyr
+        ZHBn3f/WSRo3RSbN1zGvyDaP/LR4+dYv2yu/LCtd0acSqR5Ueex8XEOqwgSRHs1zB65z657Z
+        8W7RsoJ5z5VYijMSDbWYi4oTAVgfIwR7BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHIsWRmVeSWpSXmKPExsWy7bCSnC6zj1uKwdWrNhavDnQwWqy+289m
+        Me3DT2aL6Y3n2S0e7Le3eHBVyuJv1z0miz8PDS2eXp3FZHGkqcri2LZrTBZ7b2lbLPv6nt3i
+        99O1TBa7Ny5is9g3y9PicXcHo4Ogx+Ur3h6zGy6yeOycdZfd4/LZUo9NqzrZPHqb37F5XP3W
+        zOzRt2UVo8fm09UeEzZvZPX4vEnOo/1AN5PH5L9PmQN4o7hsUlJzMstSi/TtErgyjt3YzFKw
+        i6ni0dTF7A2MXxi7GDk5JARMJL5d7GbuYuTiEBLYzShxd+YKqISkxLK/R5ghbGGJlf+es0MU
+        PWGUWLX0IgtIgkVAVWL94ktACQ4ONgFtidP/OUDCIgLqElMP9LCC1DML/GeS2NXWCDZIWMBH
+        4lzbJ3YQm1fATOLfhl1gy4QEjCWenVvFChEXlDg58wnYfGagmnmbHzKDzGcWkJZY/g9sPifQ
+        0YuXTwEbIyogIzFj6VfmCYyCs5B0z0LSPQuhewEj8ypGydSC4tz03GLDAsO81HK94sTc4tK8
+        dL3k/NxNjOAo1dLcwbh91Qe9Q4xMHIyHGCU4mJVEeD1KnVKEeFMSK6tSi/Lji0pzUosPMUpz
+        sCiJ817oOhkvJJCeWJKanZpakFoEk2Xi4JRqYBJx3HiibFLrPZ4DGpwzFylMVnRKSxZYYzyt
+        7hL793uyj0/PEj1/uTXqRu3SzUV+mec0ZhgEJu0wjYmqs79d4F3eUrw9a2vzq8D1aZNv6B0w
+        ujznw48pL77MfL2l/3NA+3H1U5x7pl5uX3xnwck/Zq5LNrxQXcCWNeXBzFSnxLKGQx1lljvu
+        LwmfNOm4rZTb6qzfjlNnPu07HN4f35caM91M5fXjhjRjo/Xhj5mKbe+4KKicvZjsVK93757Z
+        luV3JG5zlD43qEzJPtP/7JTjE4GGc4+bFp2yKN7JKHA1076ogZM5SqJjyemZR2uao5Q+hzEZ
+        7GwIMzl48LpH9D3tmZPkP8semz7tpoPja99fLySVWIozEg21mIuKEwFY4cnVQQMAAA==
+X-CMS-MailID: 20230424092940epcas5p3407002e7d5c79593ffbafc38f2b49e51
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_3f117_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230424092940epcas5p3407002e7d5c79593ffbafc38f2b49e51
+References: <20230424073023.38935-1-kch@nvidia.com>
+        <CGME20230424092940epcas5p3407002e7d5c79593ffbafc38f2b49e51@epcas5p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_3f117_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+
+On 23/04/24 12:30AM, Chaitanya Kulkarni wrote:
+>null_blk
+>brd
+>nbd
+>zram
+>bcache
+
+Any particular reason for leaving out mtip and s390 drivers ?
+
+Will it be better to use the flag similar to scsi devices and
+use it for random number generation ?
+
+Otherwise looks good to me.
+
+Regards,
+Nitesh Shetty
+
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_3f117_
+Content-Type: text/plain; charset="utf-8"
 
 
-On 24/04/2023 11:53, Sagi Grimberg wrote:
-> 
->>> Yeah, I'm slightly unhappy with this whole setup.
->>> If we were just doing DIF I guess the setup could work, but then we 
->>> have to
->>> disable DIX (as we cannot support integrity data on the non-PI path).
->>> But we would need an additional patch to disable DIX functionality in 
->>> those
->>> cases.
->>
->> NVMeoF only supports inline integrity data, the remapping from out of
->> line integrity data is always done by the HCA for NVMe over RDMA,
->> and integrity data is not supported without that.
->>
->> Because of that I can't see how we could sensibly support one path with
->> integrity offload and one without.  And yes, it might make sense to
->> offer a way to explicitly disable integrity support to allow forming such
->> a multipath setup.
-> 
-> I agree. I didn't read through the change log well enough, I thought
-> that one path is DIF and the other is DIX.
-> 
-> I agree that we should not permit such a configuration.
-
-I'm not yet convinced why not to permit it.
-The spec allows this to happen and I can think about scenarios that 
-users will want this kind of configuration.
-
-We also support it today (with the exception on this bug).
-There is a special PRACT bit in the spec that asks the controller to 
-take action upon each R/W IO request.
-
-The Multipath is not related to md IMO. One path can generate/verify md 
-and other can raise PRACT bit.
-
-You can also create 2 paths from different hosts to same target and one 
-will have ConnectX-5 and other ConnectX-3. The fact that these path are 
-from the same host is not so important IMO.
-
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_3f117_--
