@@ -2,73 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FD8C7618E
-	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 19:37:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75487C7618E
+	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 20:33:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232587AbjDXThY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Apr 2023 15:37:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
+        id S232106AbjDXUdg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Apr 2023 16:33:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232453AbjDXThX (ORCPT
+        with ESMTP id S230430AbjDXUdf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2023 15:37:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9BAE5B88;
-        Mon, 24 Apr 2023 12:37:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3359462883;
-        Mon, 24 Apr 2023 19:37:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 566D4C433B3;
-        Mon, 24 Apr 2023 19:37:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682365041;
-        bh=YWbSyHY7pUE5AOb/3VWzPWd3sWsQ69Y7x41HE1Dt2f8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kDBWBxcRX36vIRCPQdN4ZUSdbSHX1O4Pd+ZO4nc3vupupBHzNk5Dk91nuDsIQ1rOH
-         TqW+/Qd/EiK0dYyV1/5FLrIBnUSpq7xs31OE+7UwRsA5LpC1j9OwF7djbzyJxgWSHk
-         cTzUpSzsdO3OotdRptYWv3/TZvD6lEfUf01ojwlUPWNODt2ILOz0Uec1W97Nv2KpIK
-         2MP4gf/Xry+1mHMPMV0NAd9hTZgWH4WczEdoc62VroOonVWQQs1erBn2kICiokJEP7
-         PLFzocQ/KEmEsnnhZ4aDYS/btGy3oYDzDHqf6NvUrV/g4vv33mYH1BCgXtB4Gbp2FJ
-         D0frIKzhrqALw==
-Date:   Mon, 24 Apr 2023 13:37:18 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/17] fs: remove the special !CONFIG_BLOCK def_blk_fops
-Message-ID: <ZEbabjCZhl6j1Pk+@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230424054926.26927-1-hch@lst.de>
- <20230424054926.26927-3-hch@lst.de>
- <5f30b56e-b46b-1d3f-75fb-7f30ff6ca3e9@infradead.org>
+        Mon, 24 Apr 2023 16:33:35 -0400
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C25855AE
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 13:33:34 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-63b73203e0aso30789632b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 13:33:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682368414; x=1684960414;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7TtGnjYWBb/HSJwi+jPEjTEx/+KHYw0qC+vfPVPlv+w=;
+        b=hNDWufkSYQAGNiLHw/bPDZOtsjLm0c9lk2Mp0qV9hokOSEVyq+u0a7lxuex6NYhPBb
+         QGYt0izTDjW1SI6CO3A4fCBAOSLBrcOy3ZpzKLcNFuNO6cYHXIzWawPW5TaiXkkvPkrS
+         qgJ/JRgDcXYjwQZpoEIicHlpV0gyB4Flg4RscfV/NLUp3aVgMZJDQuTAKFGknLYQMTc1
+         SWZNX5PEH2kC4HdfisC5zVMDzNUJv0D5QOW3roIyX7Ku0PFJphPNHIkG+VoLLevLkLUf
+         Ujys98xEFrpFhA4B0+tOZpDMoIT6unU3zpMJrZ6NLjSGsOHFkuDxErqhIQiDLOcvgWJt
+         yXqA==
+X-Gm-Message-State: AAQBX9fVX4oDooRlNWNtcvMmjhEnlUBS/WbQ7NfJMftY/+5i5n5LBd2b
+        YBghqsmjqcTxBOH8AZvAoOw=
+X-Google-Smtp-Source: AKy350ZVD5TWIQEHEpwWl6ggdvhhg6WT7V2eViNHJFgJS3e2x+iL8AukR3+nlVyizztGqOnbUbXoMg==
+X-Received: by 2002:a05:6a00:2450:b0:634:c34f:e214 with SMTP id d16-20020a056a00245000b00634c34fe214mr21268977pfj.10.1682368413684;
+        Mon, 24 Apr 2023 13:33:33 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:56cb:b39a:c8b:8c37])
+        by smtp.gmail.com with ESMTPSA id k16-20020aa788d0000000b00625616f59a1sm7417505pff.73.2023.04.24.13.33.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Apr 2023 13:33:33 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v3 0/9] mq-deadline: Improve support for zoned block devices
+Date:   Mon, 24 Apr 2023 13:33:20 -0700
+Message-ID: <20230424203329.2369688-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.40.0.634.g4ca3ef3211-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f30b56e-b46b-1d3f-75fb-7f30ff6ca3e9@infradead.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 24, 2023 at 12:22:30PM -0700, Randy Dunlap wrote:
-> On 4/23/23 22:49, Christoph Hellwig wrote:
-> > +		if (IS_ENABLED(CONFIG_BLOCK))
-> > +			inode->i_fop = &def_blk_fops;
-> 
-> It looks like def_blk_fops is being removed (commit message and patch
-> fragment below), but here (above line) it is being used.
-> 
-> Am I just confused?
+Hi Jens,
 
-The def_blk_fops is removed only for the !CONFIG_BLOCK case. Its usage is under
-a branch known at compile time, so it's optimized out for that case before
-trying to resolve the symbol.
+This patch series improves support for zoned block devices in the mq-deadline
+scheduler as follows:
+* The order of requeued writes (REQ_OP_WRITE*) is preserved.
+* The active zone limit is enforced.
+
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Changes compared to v2:
+- In the patch that micro-optimizes blk_req_needs_zone_write_lock(), inline
+  bdev_op_is_zoned_write() instead of modifying it.
+- In patch "block: Introduce blk_rq_is_seq_zoned_write()", converted "case
+  REQ_OP_ZONE_APPEND" into a source code comment.
+- Reworked deadline_skip_seq_writes() as suggested by Christoph.
+- Dropped the patch that disabled head insertion for zoned writes.
+- Dropped patch "mq-deadline: Fix a race condition related to zoned writes".
+- Reworked handling of requeued requests: the 'next_rq' pointer has been
+  removed and instead the position of the most recently dispatched request is
+  tracked.
+- Dropped the patches for tracking zone capacity and for restricting the number
+  of active zones.
+
+Changes compared to v1:
+- Left out the patches related to request insertion and requeuing since
+  Christoph is busy with reworking these patches.
+- Added a patch for enforcing the active zone limit.
+
+Bart Van Assche (9):
+  block: Simplify blk_req_needs_zone_write_lock()
+  block: Micro-optimize blk_req_needs_zone_write_lock()
+  block: Introduce blk_rq_is_seq_zoned_write()
+  block: mq-deadline: Clean up deadline_check_fifo()
+  block: mq-deadline: Simplify deadline_skip_seq_writes()
+  block: mq-deadline: Improve deadline_skip_seq_writes()
+  block: mq-deadline: Track the dispatch position
+  block: mq-deadline: Handle requeued requests correctly
+  block: mq-deadline: Fix handling of at-head zoned writes
+
+ block/blk-mq.h         |   4 +-
+ block/blk-zoned.c      |  28 ++++++----
+ block/mq-deadline.c    | 114 +++++++++++++++++++++++++++--------------
+ include/linux/blk-mq.h |   6 +++
+ include/linux/blkdev.h |   9 ----
+ 5 files changed, 102 insertions(+), 59 deletions(-)
+
