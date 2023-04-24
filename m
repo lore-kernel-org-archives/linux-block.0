@@ -2,53 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57856C7EE20
-	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 06:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7EA5C7618E
+	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 06:11:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231388AbjDXGDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Apr 2023 02:03:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58288 "EHLO
+        id S229478AbjDXGLH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Apr 2023 02:11:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231384AbjDXGC3 (ORCPT
+        with ESMTP id S229458AbjDXGLG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2023 02:02:29 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CEEF49CB
-        for <linux-block@vger.kernel.org>; Sun, 23 Apr 2023 23:01:44 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id D1E0C67373; Mon, 24 Apr 2023 08:01:39 +0200 (CEST)
-Date:   Mon, 24 Apr 2023 08:01:39 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matias Bjorling <mb@lightnvm.io>
-Subject: Re: [PATCH v2 10/11] block: Add support for the zone capacity
- concept
-Message-ID: <20230424060139.GA9805@lst.de>
-References: <f9d35d19-d0ba-fcb7-e44b-f0b8c55ba399@acm.org> <141aee35-4288-1670-6424-e6c41c8ef4c9@kernel.org> <ec7cdc7d-9eb7-65a4-6ba9-1ae6cf6f43d2@acm.org> <a5d9a370-6264-ebdf-f9f8-7b3263c2b6f0@kernel.org> <490ed061-6d82-f9fb-2050-4a386e2e4c8e@acm.org> <c4a52bff-5cab-5029-ad7f-e5f9452bc0e2@kernel.org> <ZEHY2PIRCCLOZsC4@google.com> <c12582e0-f2c8-d001-1fc1-6f7e17eeba7c@kernel.org> <ZELu0yKwnGg3iBmA@google.com> <335b63b0-5a9e-472d-2cce-c0158ae93cf3@kernel.org>
+        Mon, 24 Apr 2023 02:11:06 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8E7CA
+        for <linux-block@vger.kernel.org>; Sun, 23 Apr 2023 23:11:01 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 889181FD7B;
+        Mon, 24 Apr 2023 06:11:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1682316660; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R/dJBKipj2BTYlAHwALrSBvABtFqG0TvrGDD9iTnPQE=;
+        b=odY6KUD+HvzBFk5FATpkTmwmlDN4b/LjIeJY36wvs58PftePjyBOI96nhM1RGwbP7+LKwH
+        YdY7XeFH+tXCQ2y3pBCiO1z+bpaL+C5pCpeQkB5/328AaXoStq8EpJ7hQwwsKwehVG5c7x
+        wIBWZtEv01tz09D8LIGgzkk9MW+3nn0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1682316660;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R/dJBKipj2BTYlAHwALrSBvABtFqG0TvrGDD9iTnPQE=;
+        b=sXmMQxHxR+heL5M0+44KuS3Bg25M7m3SagAFUNxEANoaAnn5taAdc/uXETxV5XShElqMKw
+        mbV2+7femH7VdABw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2E95513780;
+        Mon, 24 Apr 2023 06:11:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 0351CXQdRmTHIAAAMHmgww
+        (envelope-from <hare@suse.de>); Mon, 24 Apr 2023 06:11:00 +0000
+Message-ID: <5b7ca121-2b85-ddd0-d94b-1739cc5dcbec@suse.de>
+Date:   Mon, 24 Apr 2023 08:10:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <335b63b0-5a9e-472d-2cce-c0158ae93cf3@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v1 0/2] Fix failover to non integrity NVMe path
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     martin.petersen@oracle.com, sagi@grimberg.me,
+        linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, oren@nvidia.com, oevron@nvidia.com,
+        israelr@nvidia.com
+References: <20230423141330.40437-1-mgurtovoy@nvidia.com>
+ <20230424051144.GA9288@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230424051144.GA9288@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 22, 2023 at 07:25:33AM +0900, Damien Le Moal wrote:
-> >> for allocating blocks. This is a resource management issue.
-> > 
-> > Ok, so it seems I overlooked there might be something in the zone allocation
-> > policy. So, f2fs already manages 6 open zones by design.
+On 4/24/23 07:11, Christoph Hellwig wrote:
+> On Sun, Apr 23, 2023 at 05:13:28PM +0300, Max Gurtovoy wrote:
+>> Hi Christoph/Sagi/Martin,
+>>
+>> We're encountered a crash while testing failover between NVMeF/RDMA
+>> paths to a target that expose a namespace with metadata. The scenario is
+>> the following:
+>> Configure one initiator/host path on PI offload capable port (e.g ConnectX-5
+>> device) and configure second initiator/host path on non PI offload capable
+>> port (e.g ConnectX-3).
 > 
-> Yes, so as long as the device allows for at least 6 active zones, there are no
-> issues with f2fs.
+> Hmm.  I suspect the right thing to do here is to just fail the second
+> connect.
 
-I don't think it's quite as rosy, because f2fs can still schedule
-I/O to the old zone after already scheduling I/O to a new zone for
-any of these 6 slots.  It'll need code to wait for all I/O to the old
-zone to finish first, similar to btrfs.
+Yeah, I'm slightly unhappy with this whole setup.
+If we were just doing DIF I guess the setup could work, but then we have 
+to disable DIX (as we cannot support integrity data on the non-PI path).
+But we would need an additional patch to disable DIX functionality in 
+those cases.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
