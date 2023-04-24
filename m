@@ -2,45 +2,46 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB292C7618E
-	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 07:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4F2C7618E
+	for <linux-block@archiver.kernel.org>; Mon, 24 Apr 2023 07:21:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230396AbjDXHVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Apr 2023 03:21:06 -0400
+        id S230454AbjDXHVM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Apr 2023 03:21:12 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230005AbjDXHVF (ORCPT
+        with ESMTP id S230515AbjDXHVH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Apr 2023 03:21:05 -0400
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C01835A6
+        Mon, 24 Apr 2023 03:21:07 -0400
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 581F335AF
         for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 00:20:47 -0700 (PDT)
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7606d6b2fddso694771839f.2
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-32afe238257so29550085ab.3
         for <linux-block@vger.kernel.org>; Mon, 24 Apr 2023 00:20:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1682320846; x=1684912846;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=PemElVUZPDUlSEqORBOOBPYv/4pd8BGjx60bDqC5Fd0=;
-        b=B1/N5k/Ul3OQvYUhCoRbPLnkZtEj89eAJRDn8yboUbnbjMI9lcdbUvshrnyJeV6Fta
-         /0TGIkRKUG6VYcOS0Qxyzb3TVnTxRJ7BHaJI7pS9joEWWMVjUZcoXtKY1G5hAPsJUmur
-         qeFE7pL0FZoZbBGQKVX5pmGgwjGbfEhg2BTaBHB9wtoiC+sQ9kNbrsG9J84EynLK+qLr
-         raAMtLCamUTrPWX65R7sDSoO5hsvWMnta6PyegZmZaRzGJ8c36UuLbOb3GcjB1hcpOc3
-         YaNlIwj9DFatYkbK3zw6ddF5Ivj1fY+0/sVb3QmE50XAq3vfWNAVEkfnnss/EYf6FmO6
-         Y89g==
-X-Gm-Message-State: AAQBX9d3848a0aB8Gebb532adaqGW1EKF1jCDbDFw0G7qv9zICUULFhI
-        1nXF73RRUBUb3mEoheCtDYUXPZPbh69SqeKeY5ASa2JbnEXO
-X-Google-Smtp-Source: AKy350Zm6j/ODxfO39PwH9P/0e7nkeWgN5FOdVmKrARV+imtnemEVPFoovMLXBeUeF/QT1K23d7kXScRuWN/hmfGXRymDW/JANOh
+        bh=641X8TIeBPrHbjUBnznHK1cRl0WGKLF1lPeAjBl/3gE=;
+        b=Ec5xgKd/nHy59RDwUIWwIzNWtxrg6S2k7hvbAK2etYg1S08ZPcU6Jhuhox4ZbY9D9n
+         PA/LIEvb1CqF66skDI0fCmVLXnX386s0PydtPxO6IfZxaLVM74XGoZK25/s+7MteQch+
+         0phbEuis/nrrnm2KW83o2SByB25RcLYHxX5QxAgvmer6yfXlPi1nB8pFmafnXURdL1iw
+         t+1yu8U/4HB9SCtuKKKY/vgCl0UW+8lWTGpyGYNzjHG68m9kGIHgWAx3wKVyp+12wtMI
+         nUwR/bTx5mTQIj7LFYBeQpFEXfqL7fm9E/Bp4z0PFo8ZKai9GWDzUJAZAtP6UWledI7x
+         /8nQ==
+X-Gm-Message-State: AAQBX9ebK+ady2jV/O51tuAoQBQ2eu+/Y34pRz/sA0it38/jaFJyx7nh
+        D+v7FHaGNoesg0N1P/Olhq3b3zVXDv/Q7W+XzHfoe0XMjWej
+X-Google-Smtp-Source: AKy350ZEnx3Zx4Cj+mbDrjnj+JoW8mp9J0S7zQYAYKCC1TsC1EbxfeOlUwMXe29q77jAGUzC6IVnZ2n7ccHXt97HFizlWxzfX+rR
 MIME-Version: 1.0
-X-Received: by 2002:a6b:c407:0:b0:760:efd4:9583 with SMTP id
- y7-20020a6bc407000000b00760efd49583mr4136641ioa.1.1682320846333; Mon, 24 Apr
+X-Received: by 2002:a02:95c2:0:b0:40f:8b6d:c549 with SMTP id
+ b60-20020a0295c2000000b0040f8b6dc549mr4114436jai.2.1682320846514; Mon, 24 Apr
  2023 00:20:46 -0700 (PDT)
 Date:   Mon, 24 Apr 2023 00:20:46 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000071af7a05fa0fd8dc@google.com>
-Subject: [syzbot] [block?] KCSAN: data-race in __get_task_ioprio / set_task_ioprio
-From:   syzbot <syzbot+28ed267c18c614a9376f@syzkaller.appspotmail.com>
+Message-ID: <0000000000007470fe05fa0fd8ba@google.com>
+Subject: [syzbot] [block?] KCSAN: data-race in __filemap_add_folio /
+ invalidate_bdev (3)
+From:   syzbot <syzbot+8a416e3cb063d4787b0f@syzkaller.appspotmail.com>
 To:     axboe@kernel.dk, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
@@ -52,57 +53,63 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    44149752e998 Merge tag 'cgroup-for-6.3-rc6-fixes' of git:/..
+HEAD commit:    3e7bb4f24617 Merge tag '6.3-rc6-smb311-client-negcontext-f..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=147afc8fc80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13c2e6ebc80000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=710057cbb8def08c
-dashboard link: https://syzkaller.appspot.com/bug?extid=28ed267c18c614a9376f
+dashboard link: https://syzkaller.appspot.com/bug?extid=8a416e3cb063d4787b0f
 compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
 
 Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7bfa303f05cc/disk-44149752.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4e8ea8730409/vmlinux-44149752.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e584bce13ba7/bzImage-44149752.xz
+disk image: https://storage.googleapis.com/syzbot-assets/d1f21f86a5e7/disk-3e7bb4f2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5769a034d50c/vmlinux-3e7bb4f2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/82288ce4b761/bzImage-3e7bb4f2.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+28ed267c18c614a9376f@syzkaller.appspotmail.com
+Reported-by: syzbot+8a416e3cb063d4787b0f@syzkaller.appspotmail.com
 
 ==================================================================
-BUG: KCSAN: data-race in __get_task_ioprio / set_task_ioprio
+BUG: KCSAN: data-race in __filemap_add_folio / invalidate_bdev
 
-write to 0xffff888108c83888 of 8 bytes by task 15748 on cpu 0:
- set_task_ioprio+0x23b/0x260 block/blk-ioc.c:291
- __do_sys_ioprio_set block/ioprio.c:124 [inline]
- __se_sys_ioprio_set+0x272/0x5a0 block/ioprio.c:68
- __x64_sys_ioprio_set+0x43/0x50 block/ioprio.c:68
+read-write to 0xffff8881023fec48 of 8 bytes by task 5672 on cpu 1:
+ __filemap_add_folio+0x38c/0x720 mm/filemap.c:904
+ filemap_add_folio+0x6f/0x150 mm/filemap.c:939
+ filemap_create_folio mm/filemap.c:2545 [inline]
+ filemap_get_pages+0x5d2/0xea0 mm/filemap.c:2605
+ filemap_read+0x223/0x680 mm/filemap.c:2693
+ blkdev_read_iter+0x2ca/0x370 block/fops.c:606
+ call_read_iter include/linux/fs.h:1845 [inline]
+ new_sync_read fs/read_write.c:389 [inline]
+ vfs_read+0x39a/0x560 fs/read_write.c:470
+ ksys_read+0xeb/0x1a0 fs/read_write.c:613
+ __do_sys_read fs/read_write.c:623 [inline]
+ __se_sys_read fs/read_write.c:621 [inline]
+ __x64_sys_read+0x42/0x50 fs/read_write.c:621
  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
  do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-read to 0xffff888108c83888 of 8 bytes by task 15749 on cpu 1:
- __get_task_ioprio+0x1c/0x110 block/ioprio.c:150
- get_current_ioprio include/linux/ioprio.h:60 [inline]
- init_sync_kiocb include/linux/fs.h:2003 [inline]
- __kernel_write_iter+0xe2/0x380 fs/read_write.c:515
- dump_emit_page fs/coredump.c:885 [inline]
- dump_user_range+0x258/0x480 fs/coredump.c:912
- elf_core_dump+0x1a73/0x1b90 fs/binfmt_elf.c:2142
- do_coredump+0xfeb/0x1840 fs/coredump.c:762
- get_signal+0xd65/0xff0 kernel/signal.c:2845
- arch_do_signal_or_restart+0x89/0x2a0 arch/x86/kernel/signal.c:306
- exit_to_user_mode_loop+0x6f/0xe0 kernel/entry/common.c:168
- exit_to_user_mode_prepare+0x6c/0xb0 kernel/entry/common.c:204
- irqentry_exit_to_user_mode+0x9/0x20 kernel/entry/common.c:310
- irqentry_exit+0x12/0x40 kernel/entry/common.c:413
- exc_general_protection+0x339/0x4c0 arch/x86/kernel/traps.c:728
- asm_exc_general_protection+0x26/0x30 arch/x86/include/asm/idtentry.h:564
+read to 0xffff8881023fec48 of 8 bytes by task 3141 on cpu 0:
+ invalidate_bdev+0x35/0x80 block/bdev.c:84
+ bdev_disk_changed+0x102/0xbb0 block/partitions/core.c:668
+ __loop_clr_fd+0x2b9/0x3b0 drivers/block/loop.c:1189
+ loop_clr_fd drivers/block/loop.c:1257 [inline]
+ lo_ioctl+0xe9e/0x12f0 drivers/block/loop.c:1563
+ blkdev_ioctl+0x3a0/0x490 block/ioctl.c:615
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0xc9/0x140 fs/ioctl.c:856
+ __x64_sys_ioctl+0x43/0x50 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-value changed: 0x0000000000000000 -> 0xffff8881049b5c90
+value changed: 0x0000000000000000 -> 0x0000000000000001
 
 Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 15749 Comm: syz-executor.5 Tainted: G        W          6.3.0-rc6-syzkaller-00138-g44149752e998 #0
+CPU: 0 PID: 3141 Comm: syz-executor.2 Not tainted 6.3.0-rc6-syzkaller-00188-g3e7bb4f24617 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
 ==================================================================
 
