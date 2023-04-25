@@ -2,85 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51F7C6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 07:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF9DC6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 08:09:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229705AbjDYH7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 03:59:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33762 "EHLO
+        id S233470AbjDYIJn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 04:09:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233383AbjDYH7b (ORCPT
+        with ESMTP id S233416AbjDYIJm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 03:59:31 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BE0AE4E;
-        Tue, 25 Apr 2023 00:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682409570; x=1713945570;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Gocix4vBihVS2BVVbk9Z88th8E0zeu5NrQL381uKtvk=;
-  b=ZQbyszvvJQ3k/bVwlHm0JKpwPubxESydTSY4zjIiZggljrpuhGEErtj4
-   4DjLtPqJ9S4BsmZuFeqgZUfiCpKvl8S+KVPwopRbE6dlXL+0wctlKCNt3
-   SnTKJbASd5JPhLY7xvIbJWQNMqn1WP0JKSe+p5mgIaKo7iEsA5+u1OC7w
-   juuq7DBfOaCUGuUvEPkhjojvTuXVZ+u2tABb5AKB0p0ltZMfRHCieZPE6
-   8dvegy95WdsCy3ujpPrVt9KFUA5HffzC5JwTqXroDHLvcAbZ5aBmfHy2+
-   BxI+4u4iOJNGkvDlHOSbLSv19a0BHyAN+vMTNlsKyf2PnDiofpNFIbsVm
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="409630585"
-X-IronPort-AV: E=Sophos;i="5.99,225,1677571200"; 
-   d="scan'208";a="409630585"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2023 00:59:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="1023038048"
-X-IronPort-AV: E=Sophos;i="5.99,225,1677571200"; 
-   d="scan'208";a="1023038048"
-Received: from st-server.bj.intel.com ([10.240.193.90])
-  by fmsmga005.fm.intel.com with ESMTP; 25 Apr 2023 00:59:14 -0700
-From:   Tao Su <tao1.su@linux.intel.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        tao1.su@linux.intel.com
-Subject: [PATCH] Remove blkg node after destroying blkg
-Date:   Tue, 25 Apr 2023 15:59:11 +0800
-Message-Id: <20230425075911.839539-1-tao1.su@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
+        Tue, 25 Apr 2023 04:09:42 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 203FEA2;
+        Tue, 25 Apr 2023 01:09:39 -0700 (PDT)
+Received: from kwepemm600009.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Q5F0w0f5GzSsln;
+        Tue, 25 Apr 2023 16:05:20 +0800 (CST)
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 25 Apr 2023 16:09:35 +0800
+Subject: Re: [PATCH] Remove blkg node after destroying blkg
+To:     Tao Su <tao1.su@linux.intel.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230425075911.839539-1-tao1.su@linux.intel.com>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <aa5de32c-c92b-d032-e9bb-83d2436ff72c@huawei.com>
+Date:   Tue, 25 Apr 2023 16:09:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20230425075911.839539-1-tao1.su@linux.intel.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Kernel hang when poweroff or reboot, due to infinite restart in function
-blkg_destroy_all. It will goto restart label when a batch of blkgs are
-destroyed, but not remove blkg node in blkg_list. So the blkg_list is
-same in every 'restart' and result in kernel hang.
+Hi,
 
-By adding list_del to remove blkg node after destroying, can solve this
-kernel hang issue and satisfy the previous will to 'restart'.
+ÔÚ 2023/04/25 15:59, Tao Su Ð´µÀ:
+> Kernel hang when poweroff or reboot, due to infinite restart in function
+> blkg_destroy_all. It will goto restart label when a batch of blkgs are
+> destroyed, but not remove blkg node in blkg_list. So the blkg_list is
+> same in every 'restart' and result in kernel hang.
+> 
+> By adding list_del to remove blkg node after destroying, can solve this
+> kernel hang issue and satisfy the previous will to 'restart'.
+> 
+> Reported-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+> Tested-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+> Tested-by: Farrah Chen <farrah.chen@intel.com>
+> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+> ---
+>   block/blk-cgroup.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index bd50b55bdb61..960eb538a704 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -530,6 +530,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+>   
+>   		spin_lock(&blkcg->lock);
+>   		blkg_destroy(blkg);
+> +		list_del(&blkg->q_node);
 
-Reported-by: Xiangfei Ma <xiangfeix.ma@intel.com>
-Tested-by: Xiangfei Ma <xiangfeix.ma@intel.com>
-Tested-by: Farrah Chen <farrah.chen@intel.com>
-Signed-off-by: Tao Su <tao1.su@linux.intel.com>
----
- block/blk-cgroup.c | 1 +
- 1 file changed, 1 insertion(+)
+blkg should stay on the queue list until blkg_free_workfn(), otherwise
+parent blkg can be freed before child, which will cause some known
+issue.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index bd50b55bdb61..960eb538a704 100644
+I think this hung happens when total blkg is greater than
+BLKG_DESTROY_BATCH_SIZE, right?
+
+Can you try if following patch fix your problem?
+
+index 1c1ebeb51003..0ecb4cce8af2 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -530,6 +530,7 @@ static void blkg_destroy_all(struct gendisk *disk)
- 
- 		spin_lock(&blkcg->lock);
- 		blkg_destroy(blkg);
-+		list_del(&blkg->q_node);
- 		spin_unlock(&blkcg->lock);
- 
- 		/*
--- 
-2.34.1
+@@ -527,6 +527,9 @@ static void blkg_destroy_all(struct gendisk *disk)
+         list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
+                 struct blkcg *blkcg = blkg->blkcg;
 
++               if (hlist_unhashed(&blkg->blkcg_node))
++                       continue;
++
+                 spin_lock(&blkcg->lock);
+                 blkg_destroy(blkg);
+                 spin_unlock(&blkcg->lock);
+
+>   		spin_unlock(&blkcg->lock);
+>   
+>   		/*
+> 
