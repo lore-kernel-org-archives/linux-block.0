@@ -2,144 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3E1C77B61
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 11:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F06C6FD18
+	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 11:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233947AbjDYLKM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 07:10:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59822 "EHLO
+        id S233424AbjDYLsT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 07:48:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233757AbjDYLKD (ORCPT
+        with ESMTP id S233539AbjDYLsS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 07:10:03 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC6EA13C05;
-        Tue, 25 Apr 2023 04:09:58 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q5K5s0B3mz4f41GZ;
-        Tue, 25 Apr 2023 19:09:53 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBnHbEAtUdk4hV8IA--.17578S3;
-        Tue, 25 Apr 2023 19:09:54 +0800 (CST)
-Subject: Re: [PATCH] Remove blkg node after destroying blkg
-To:     Tao Su <tao1.su@linux.intel.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230425075911.839539-1-tao1.su@linux.intel.com>
- <aa5de32c-c92b-d032-e9bb-83d2436ff72c@huawei.com>
- <ZEegQCCZ96ij6mw5@linux.bj.intel.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <6d486f85-87ed-fa35-00cb-4c37fef17536@huaweicloud.com>
-Date:   Tue, 25 Apr 2023 19:09:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 25 Apr 2023 07:48:18 -0400
+Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC28413C2C;
+        Tue, 25 Apr 2023 04:48:03 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.west.internal (Postfix) with ESMTP id 2C8F52B066F9;
+        Tue, 25 Apr 2023 07:48:03 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Tue, 25 Apr 2023 07:48:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        cc:cc:content-transfer-encoding:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm3; t=1682423282; x=
+        1682423882; bh=8g6EvhdGCq2wC/q3XFsQYHoYVIEBXGvDsLbPrkyIUkQ=; b=k
+        XBn7XL/In3YgAEuibI+1IYbwkaJULRx+diZaeSf4vVNwkGl8ZJB5fE0B9jaU52fV
+        f7eIDWnClKRcvCqOQsxOn0UUTN8AY4qurqKHUVXbYece0xjpZydf+e/rm6Aq9TaQ
+        ov1/MmzbhlwSJG7ez906KC3GrtdwcwLMakwqzJgnEiWH+pAF+9g55iC/ZjpRpBwx
+        2NqanMLYcecsfs0MHDOubUgSzEvV9lhWFNgMqme/ab+okOVuzKpQmxfkd9cLIi12
+        +qy0cpln7yCTYN15FHu9kAOJ5X2aaJsv8L61IWTcZ/BIjrFVqw397KPzQQUAm27l
+        ymMHn9faqZumvRXuj7RtQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:date:date:feedback-id:feedback-id:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=ie1e949a3.fm3; t=
+        1682423282; x=1682423882; bh=8g6EvhdGCq2wC/q3XFsQYHoYVIEBXGvDsLb
+        PrkyIUkQ=; b=a4siOPpH/tpxgIo5/8DUQ2XEznd2FpbRksvChb9Uz15o7SC9sRq
+        QzBR/Clv/amqutN96drOrloiRhAa7Au9LIdUR4utsRcpeHlRxq0O2spCNsrO1Z9m
+        i+jz+CvhU4wkr5qQFIwIzVuBwleio6avHJ1Qgr4DuKS00k9jSJU5w8j6NjnPEEot
+        aNyPhQzsM4xmdgClpsRXcmYlgffS6HJSedpPv0E2Ul9fIzsOI7pDRR6LvF6nlWBp
+        rrIE5lDzGjboDGdiZpfEQBtfr7NAZgO+5wy7cwXaHYdzfWNlxCPIw3A3M2zDFV89
+        XulN92g1Rw5NHb9ZbHtx/GL/bPIliY49y2A==
+X-ME-Sender: <xms:8r1HZHZZhVV14PqxwKp8A1a1wrvm2W0sl-j1fIzOJILAWqxzVgu22Q>
+    <xme:8r1HZGY35Uyx4mhR48qFX2MHyk4ENNcdJwG5uSdCREu2-H17D0B_tEN0Shfsv_M3T
+    LNDHr0pz1NeHXFPZqk>
+X-ME-Received: <xmr:8r1HZJ-Sxir3xv_S6ZlRCJKFu55bZKMyhKXQuf9QzaEXVCwfZC3kSYUD13fYSTIs2kZ2QXK21BxASVJhqBwk2sgv5dZxq-3mzjynTJHV>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeduvddggeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufhhihhn
+    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
+    hilhdrtghomheqnecuggftrfgrthhtvghrnhepgffggeffjeegfeeuteegueekvdfhledu
+    hfehffdtiedthfetleeifeeihfeukeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
+    mh
+X-ME-Proxy: <xmx:8r1HZNqzvu-agKDZKjQXvkhEBpZFWTcE5s-rEsSUyOZHkwYoaQ6FQA>
+    <xmx:8r1HZCo0BH_V1KxXiRvT26MBAQLZv_9qUsm5PpwBfbGZmOi3HS7J4Q>
+    <xmx:8r1HZDSORt_WOqbtGNB9iMhEsdnwn3tpHQDGJrQXSiSDkfKnDitagQ>
+    <xmx:8r1HZFUGl1lp4maia1rY8U1OVUQ-QUd6Bs3xqXK-XeHb7vSZB_xEH5DfJ-Tbji2s>
+Feedback-ID: ie1e949a3:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Apr 2023 07:48:00 -0400 (EDT)
+From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 1/6] common/rc: skip module file check if modules path does not exist
+Date:   Tue, 25 Apr 2023 20:47:40 +0900
+Message-Id: <20230425114745.376322-2-shinichiro@fastmail.com>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230425114745.376322-1-shinichiro@fastmail.com>
+References: <20230425114745.376322-1-shinichiro@fastmail.com>
 MIME-Version: 1.0
-In-Reply-To: <ZEegQCCZ96ij6mw5@linux.bj.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnHbEAtUdk4hV8IA--.17578S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxuFy8tFW3JrW8CF1Dur4DJwb_yoW5Jw17pw
-        47G3WYya95tFn29a10g3Wagw40qa1kGry5W3yDWFy5Cr9rXrn2qF1j9rWDuF9rZF47Grs0
-        vrW5tryakw48u3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-在 2023/04/25 17:41, Tao Su 写道:
-> On Tue, Apr 25, 2023 at 04:09:34PM +0800, Yu Kuai wrote:
->> Hi,
->>
->> 在 2023/04/25 15:59, Tao Su 写道:
->>> Kernel hang when poweroff or reboot, due to infinite restart in function
->>> blkg_destroy_all. It will goto restart label when a batch of blkgs are
->>> destroyed, but not remove blkg node in blkg_list. So the blkg_list is
->>> same in every 'restart' and result in kernel hang.
->>>
->>> By adding list_del to remove blkg node after destroying, can solve this
->>> kernel hang issue and satisfy the previous will to 'restart'.
->>>
->>> Reported-by: Xiangfei Ma <xiangfeix.ma@intel.com>
->>> Tested-by: Xiangfei Ma <xiangfeix.ma@intel.com>
->>> Tested-by: Farrah Chen <farrah.chen@intel.com>
->>> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
->>> ---
->>>    block/blk-cgroup.c | 1 +
->>>    1 file changed, 1 insertion(+)
->>>
->>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->>> index bd50b55bdb61..960eb538a704 100644
->>> --- a/block/blk-cgroup.c
->>> +++ b/block/blk-cgroup.c
->>> @@ -530,6 +530,7 @@ static void blkg_destroy_all(struct gendisk *disk)
->>>    		spin_lock(&blkcg->lock);
->>>    		blkg_destroy(blkg);
->>> +		list_del(&blkg->q_node);
->>
->> blkg should stay on the queue list until blkg_free_workfn(), otherwise
->> parent blkg can be freed before child, which will cause some known
->> issue.
-> 
-> Yes, directly removing blkg node is not appropriate, which I noticed some
-> comments in blkg_destroy(), thanks for pointing out this issue.
-> 
->>
->> I think this hung happens when total blkg is greater than
->> BLKG_DESTROY_BATCH_SIZE, right?
-> 
-> Yes, you are right.
-> 
->>
->> Can you try if following patch fix your problem?
-> 
-> This patch can also fix my problem, and indeed is a more secure way.
+When all of the kernel modules are built-in, /lib/modules/*/kernel path
+may not exist. In this case, check for the path results in failure. Skip
+the check when the path does not exist.
 
-Thanks for the test, for a better solution, I think 'blkcg_mutex' can
-be used to protect 'blkg->q_node' list instead of 'queue_lock', so that
-the 'restart' can be removed because softlockup can be avoided.
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+---
+ common/rc | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-Kuai
-
-> 
-> Thanks,
-> Tao
-> 
->>
->> index 1c1ebeb51003..0ecb4cce8af2 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -527,6 +527,9 @@ static void blkg_destroy_all(struct gendisk *disk)
->>          list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
->>                  struct blkcg *blkcg = blkg->blkcg;
->>
->> +               if (hlist_unhashed(&blkg->blkcg_node))
->> +                       continue;
->> +
->>                  spin_lock(&blkcg->lock);
->>                  blkg_destroy(blkg);
->>                  spin_unlock(&blkcg->lock);
->>
->>>    		spin_unlock(&blkcg->lock);
->>>    		/*
->>>
-> 
-> .
-> 
+diff --git a/common/rc b/common/rc
+index af4c0b1..f67b434 100644
+--- a/common/rc
++++ b/common/rc
+@@ -36,6 +36,7 @@ _module_file_exists()
+ 	local -i count
+ 
+ 	libpath="/lib/modules/$(uname -r)/kernel"
++	[[ ! -d $libpath ]] && return 1
+ 	count=$(find "$libpath" -name "$ko_underscore*" -o \
+ 		     -name "$ko_hyphen*" | wc -l)
+ 	((count)) && return 0
+-- 
+2.40.0
 
