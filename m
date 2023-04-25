@@ -2,140 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A9EC7EE21
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 11:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD70C77B76
+	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 11:55:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233937AbjDYLs3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 07:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49748 "EHLO
+        id S233975AbjDYLzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 07:55:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233944AbjDYLsZ (ORCPT
+        with ESMTP id S233859AbjDYLzA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 07:48:25 -0400
-Received: from wnew1-smtp.messagingengine.com (wnew1-smtp.messagingengine.com [64.147.123.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D3659CD;
-        Tue, 25 Apr 2023 04:48:18 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.west.internal (Postfix) with ESMTP id ECF172B066FC;
-        Tue, 25 Apr 2023 07:48:14 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Tue, 25 Apr 2023 07:48:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-transfer-encoding:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm3; t=1682423294; x=
-        1682423894; bh=mj3LqWfjihVWv+zbTeME8/Bh8GDHTxC6knqcFWrBxrk=; b=O
-        BrQQtArUh8bcWroB35Hb/hN7xXBjc46Ym6YALi5Gt2G4X5u32B5q3f4v51JSw9go
-        Rz/eRpa6EGvVdrQ0eEPme3cMvPswC9pNz+DVXAGwQ4gRsCAVFZ5q91nSZSZTG1VT
-        4c92T92PidnpoaPNfIA6g8tFip7w7tbNuXMiAhPGXxAAme+phe518UyCCF+LEDdm
-        ItUZoBrwConzfvRljUiBEkd6hmdgVlfXeubOzxhWzxbZn4JyfJquJnO7SH/8kO8f
-        2E8w+YLSv9JbhxmK3CtqAp1CtydXkHyZt4CXC/32/2/W0WU6struYZC2+6K/fQRt
-        ZBPf3qsv/t9dgO/d27qeA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=ie1e949a3.fm3; t=
-        1682423294; x=1682423894; bh=mj3LqWfjihVWv+zbTeME8/Bh8GDHTxC6knq
-        cFWrBxrk=; b=alYLqy36Bkk8GFp/B6jHO8K5IhclpVkO14NLYLEV8QnXGLCJENc
-        z3tPf1xFZc6sK8ZcVZbKNJ4rh86HRk/v+hh23o/fEf3JbuaiPAJwpgdwzmLXDsn6
-        Sr1Wdv4B6mhjPUUvtTDQXrU7fkKAnOb5VLiM3Nuc2EPgqwPAG5kqWzq1owCFj00W
-        93q3V6x0k/dmW/beHjh3uGwKhfu0wSN1b9Zf/1x3pOdU2YZcfOkL3rsiSQ/9HLhO
-        JuiEe3LrerRNINgu8e4NklvF+6zoeKXxVcQheUh/mLv9c2RtH/JE92z7VX0UyeBI
-        tCyjJHRLY4IX3QXKYQ5/hk+lskyC+6rB1YQ==
-X-ME-Sender: <xms:_r1HZLkAEvu-eTyOuUTmwhIE-RTObLTDo62Lc8XRm5KqLxPqPc391A>
-    <xme:_r1HZO2g0nO9V1-Bp_Ax0SJsk93M945J0kjY4SNw1OpYPipxX6_4_wIhNR_J28E15
-    2nlVL-dOIz8nrcT1QM>
-X-ME-Received: <xmr:_r1HZBrLH2X0kd1pf9o_LzGK3Twosb0cU_eoIQEfcsWzJ5FSyJgzoq3Cac4xO5_qPDDvH0fyJTud_WnZClp79WyDzAUyfl5EO1oAikAq>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeduvddggeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufhhihhn
-    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepgffggeffjeegfeeuteegueekvdfhledu
-    hfehffdtiedthfetleeifeeihfeukeegnecuvehluhhsthgvrhfuihiivgepudenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
-    mh
-X-ME-Proxy: <xmx:_r1HZDlC3qvBVkxYEyCrkFTfP9XNaGNIvwmfExdS54CduvtqPkZqGg>
-    <xmx:_r1HZJ0s8ZO0M5xEMafznKiDObzyMTQ3HW_LpsrbiDYdLT-mOXIqmw>
-    <xmx:_r1HZCupZ3PzzbCOOjUuLsQf0YjcYykZlCa2SNzIcxG3rL2BHFH86A>
-    <xmx:_r1HZCzpTVCeigBcdmlySlnvplY0rN-TEUkSHYW5R2svXCr0vwZ0K3_9WBO-cH1E>
-Feedback-ID: ie1e949a3:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Apr 2023 07:48:12 -0400 (EDT)
-From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v2 5/6] scsi/{004,005}: allow to run with built-in scsi_debug
-Date:   Tue, 25 Apr 2023 20:47:44 +0900
-Message-Id: <20230425114745.376322-6-shinichiro@fastmail.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230425114745.376322-1-shinichiro@fastmail.com>
-References: <20230425114745.376322-1-shinichiro@fastmail.com>
+        Tue, 25 Apr 2023 07:55:00 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF86524B;
+        Tue, 25 Apr 2023 04:54:43 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q5L5X0kZpz4f4QGk;
+        Tue, 25 Apr 2023 19:54:40 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbF+v0dkGEZ+IA--.20559S6;
+        Tue, 25 Apr 2023 19:54:41 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     logang@deltatee.com, axboe@kernel.dk, song@kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next v7 2/5] dm-raid: remove useless checking in raid_message()
+Date:   Tue, 25 Apr 2023 19:52:53 +0800
+Message-Id: <20230425115256.3663932-3-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230425115256.3663932-1-yukuai1@huaweicloud.com>
+References: <20230425115256.3663932-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBnHbF+v0dkGEZ+IA--.20559S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrZrW7trWxXry3Gr1kGF4rXwb_yoWfuFcEga
+        1rXr9Fgr17u34fA3W2vw4Fvr90ywn5ur1kWF1rtFWayFyrKrWrXr1ruwn8CwnrZFW7Cryj
+        krWjkr1fCr4vkjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb6AFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
+        0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
+        v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_
+        Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x
+        0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8
+        JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIx
+        AIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjYiiDUUUUU=
+        =
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+From: Yu Kuai <yukuai3@huawei.com>
 
-To allow the test case run with build-in scsi_debug, replace
-'_have_module scsi_debug' with _have_scsi_debug, and replace
-_init_scsi_debug with _configure_scsi_debug.
+md_wakeup_thread() handle the case that pass in md_thread is NULL, there
+is no need to check this. Prepare to protect md_thread with rcu.
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- tests/scsi/004 | 4 ++--
- tests/scsi/005 | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/md/dm-raid.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/scsi/004 b/tests/scsi/004
-index f0845c1..7d0af54 100755
---- a/tests/scsi/004
-+++ b/tests/scsi/004
-@@ -18,13 +18,13 @@ DESCRIPTION="ensure repeated TASK SET FULL results in EIO on timing out command"
- CAN_BE_ZONED=1
+diff --git a/drivers/md/dm-raid.c b/drivers/md/dm-raid.c
+index c8821fcb8299..8846bf510a35 100644
+--- a/drivers/md/dm-raid.c
++++ b/drivers/md/dm-raid.c
+@@ -3750,11 +3750,11 @@ static int raid_message(struct dm_target *ti, unsigned int argc, char **argv,
+ 		 * canceling read-auto mode
+ 		 */
+ 		mddev->ro = 0;
+-		if (!mddev->suspended && mddev->sync_thread)
++		if (!mddev->suspended)
+ 			md_wakeup_thread(mddev->sync_thread);
+ 	}
+ 	set_bit(MD_RECOVERY_NEEDED, &mddev->recovery);
+-	if (!mddev->suspended && mddev->thread)
++	if (!mddev->suspended)
+ 		md_wakeup_thread(mddev->thread);
  
- requires() {
--	_have_module scsi_debug
-+	_have_scsi_debug
- }
- 
- test() {
- 	echo "Running ${TEST_NAME}"
- 
--	if ! _init_scsi_debug add_host=1 max_luns=1 statistics=1 every_nth=1; then
-+	if ! _configure_scsi_debug max_luns=1 statistics=1 every_nth=1; then
- 	    return 1
- 	fi
- 	echo 5 > "/sys/block/${SCSI_DEBUG_DEVICES[0]}/device/timeout"
-diff --git a/tests/scsi/005 b/tests/scsi/005
-index efd3d82..bfa1014 100755
---- a/tests/scsi/005
-+++ b/tests/scsi/005
-@@ -11,7 +11,7 @@ DESCRIPTION="test SCSI device blacklisting"
- QUICK=1
- 
- requires() {
--	_have_module scsi_debug
-+	_have_scsi_debug
- 	_have_module_param scsi_debug inq_vendor
- }
- 
-@@ -33,7 +33,7 @@ test() {
- 	for inq in "${inqs[@]}"; do
- 		vendor="${inq:0:8}"
- 		model="${inq:8:16}"
--		if ! _init_scsi_debug inq_vendor="$vendor" inq_product="$model"; then
-+		if ! _configure_scsi_debug inq_vendor="$vendor" inq_product="$model"; then
- 			continue
- 		fi
- 		vendor="$(cat "/sys/block/${SCSI_DEBUG_DEVICES[0]}/device/vendor")"
+ 	return 0;
 -- 
-2.40.0
+2.39.2
 
