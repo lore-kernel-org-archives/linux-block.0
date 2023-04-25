@@ -2,253 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A6FC6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 09:55:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E43A9C7EE21
+	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 10:25:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233013AbjDYJzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 05:55:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47618 "EHLO
+        id S233754AbjDYKZP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 06:25:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231186AbjDYJzK (ORCPT
+        with ESMTP id S233775AbjDYKYy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 05:55:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100585BBA
-        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 02:54:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682416463;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CQPavGMXm4ldeRohBma2CnLIbYX/ZIAzG7+DRb/+j3Y=;
-        b=BUcRn/BrXM15HfITc9ICCSIQnrKpz6e9vuCMHILJ+MRXZDdbRQ60wl3hci4Gil7Iln/g26
-        LqMaPIefLPFomUFjcgKjnSL0FBNK4HIs3kDcvPtV4pjthtMIdw1rteE7KwARO/VjW5rO4W
-        XiR8naHCwzHI9ElnBcnJxBP2pwyWuaM=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-27-XxLrXuy0OJW0dWeZP8uF6Q-1; Tue, 25 Apr 2023 05:54:21 -0400
-X-MC-Unique: XxLrXuy0OJW0dWeZP8uF6Q-1
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-63d30b08700so29255156b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 02:54:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682416460; x=1685008460;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CQPavGMXm4ldeRohBma2CnLIbYX/ZIAzG7+DRb/+j3Y=;
-        b=CzzNxu3U3PiSKnFebuktHnIAEtatjT0pfbSdKVD4rqLNGj6R7HiGRJtVaJdl2vO3TO
-         9Sf78h1LZsT6aKjx7Ba5f+MYtFcMbfG2BRoy98ZmMOMTVfUYi+Y0h5+5/qumjdtY+vfi
-         f3g0n8ZbC6gnmlC2WBwl5PV70dvXiw0eY2GoTYpKeETmpbF01o85iJDdyfptbjUc8iV7
-         j95SYN8q51DtVH8dOLBy0BaW5tFjrH7H8WfqxWNDIZvTqn8JiKB9v2tcZ/TFpCq+g0l+
-         MaQtihQcU5SwH3jg5DWcVbHTxfsqFdVgJbKmGSwNrqjIRIuLF70H4O4XlJuyY8dFRg5x
-         Wo0w==
-X-Gm-Message-State: AAQBX9fyFm87lduXHRHaKSYnvBa4+aQNf4Kr+t9/fymjEzawaL+sLcfT
-        a/wwbBUorTkos+ubgknNnER5TbSP7hiJRyv7Xx2Zr2G13TItuzeSOoNTc068GhLka5X8ey5PkRJ
-        bIDeA+eOClJXOyDOQjQQVQ1SfvlnzNL95hFfj+r4=
-X-Received: by 2002:a17:90b:1906:b0:23d:54e8:3bb7 with SMTP id mp6-20020a17090b190600b0023d54e83bb7mr19997961pjb.17.1682416459653;
-        Tue, 25 Apr 2023 02:54:19 -0700 (PDT)
-X-Google-Smtp-Source: AKy350ZPHkaXLHpLyIkFQ1+t9KgPo9wcC1aoWyUrNN8iZeKHcFKB37OmKfMJkwC6se6EFGBNaBG4pwNUvJpe1+vIScw=
-X-Received: by 2002:a17:90b:1906:b0:23d:54e8:3bb7 with SMTP id
- mp6-20020a17090b190600b0023d54e83bb7mr19997948pjb.17.1682416459307; Tue, 25
- Apr 2023 02:54:19 -0700 (PDT)
+        Tue, 25 Apr 2023 06:24:54 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B34512C84
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 03:24:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MLOOGyHytGSBP1VAhd26X1UKEpYixIJTVBakAS96HhtuOOHHx+RcVVcBeBMMefEvZ7/pwCEdBcHpB59yTXU/3/vhu4DG+4dw8Gos7+DkEAHyKxDlJVx62PPmwuu8Efti5Pqmj/yzYLR749//O4SMSBjQHp2SnN19sxHBh15RsNF+JMORIB7k9iuAIDkTyfelE3/YVj+jwJlkg5+G21zjUjnZjxx2Jy35DP2s2VHNvJ2FI6KFUtuBGjhTPfGvxdMknGpbGje6Pfjcl0XHkd63MuV5CnNLEVY+fRc+LtEvV04QliihmIDrYBBsz3RqCFptwtRXzzkUgmAI2LtuLQaCfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7nGAcme1Dpqfyr+x5T4bg7q14EUteZ3N83glVG6efxM=;
+ b=QhS1JVRzDHvv2/4W0fzZIWEbyIJUtmzMzveG/IFeHjb+zHqMP3UwkrD5mlUKEixJhTJ1C/ErKg4sOsidogtTQ0MvLiGh2M+AHK3xRrKkAczTeEmbE6r3AnK23LOLalShvWiyJcULbsTs6qwaZkAWDTbHX+JKQBGvDwI09Od+HujMogyhOMpoiCmybjtKk78CIc7bIzas4RnxpCeuBI1gPcZqeg7gCfzpduTroernv3a52HpXuOWhhBeUKgpu0vCFnhlNav0O3fOqHJmO0l07GPbKMa84fFHN1qmOwQoYoKoWM52ExG8TUoXse8Kj7EM0mh9DneXj6U+HAqU1K41cvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7nGAcme1Dpqfyr+x5T4bg7q14EUteZ3N83glVG6efxM=;
+ b=UTj/PTjGRKaRoealRBZKl7i5zobpzhDEYNc+xaTBWKxDytiCNqO83K4Vl7O+oBGx5oraDJ+Cdm2Ncp4CjWnV9XyEMCjx5bfrR9t3EZAjMhwS+a6TBsMD4pZn+yGMIpLLiHnBCd5shYiubAzmf63s2AtEb247ybHJuTyrcrnuWuJWn9F86bow753xHcJzMuFXOmQlb0EJ0TNhOj2J6X+0W0IC2P4TF5xmb2alFCNSAJeRvEtFNYLhmTazXuip1SE+ODK9wZhDuQpKYgwiBPlqzCdYqHeK7mgonlLNqHXKvCtFFyyPxMbdWjQpxrvV0k/45Qp4REdQExQI+HsM5SmK4w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
+ by PH0PR12MB7488.namprd12.prod.outlook.com (2603:10b6:510:1e9::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6298.45; Tue, 25 Apr
+ 2023 10:24:39 +0000
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::61c3:1cd:90b6:c307]) by DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::61c3:1cd:90b6:c307%3]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
+ 10:24:39 +0000
+Message-ID: <85974694-c544-be82-97ce-c318adacda49@nvidia.com>
+Date:   Tue, 25 Apr 2023 13:24:31 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v2 2/2] nvme-multipath: fix path failover for integrity ns
+Content-Language: en-US
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     hch@lst.de, sagi@grimberg.me, linux-nvme@lists.infradead.org,
+        hare@suse.de, kbusch@kernel.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, oren@nvidia.com, oevron@nvidia.com,
+        israelr@nvidia.com
+References: <20230424225442.18916-1-mgurtovoy@nvidia.com>
+ <20230424225442.18916-3-mgurtovoy@nvidia.com>
+ <yq1jzy0lnyl.fsf@ca-mkp.ca.oracle.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+In-Reply-To: <yq1jzy0lnyl.fsf@ca-mkp.ca.oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0095.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a1::7) To DM4PR12MB5040.namprd12.prod.outlook.com
+ (2603:10b6:5:38b::19)
 MIME-Version: 1.0
-References: <CAHj4cs-nDaKzMx2txO4dbE+Mz9ePwLtU0e3egz+StmzOUgWUrA@mail.gmail.com>
- <6e06dffd-e9a1-da5a-023f-ac68a556692f@grimberg.me>
-In-Reply-To: <6e06dffd-e9a1-da5a-023f-ac68a556692f@grimberg.me>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Tue, 25 Apr 2023 17:54:06 +0800
-Message-ID: <CAHj4cs99us_r4Ebth5oAJMqHHA9aXZCpq0A3uu1BEdNw2GeRww@mail.gmail.com>
-Subject: Re: [bug report] kmemleak observed during blktests nvme-tcp
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        Hannes Reinecke <hare@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|PH0PR12MB7488:EE_
+X-MS-Office365-Filtering-Correlation-Id: 81425076-0126-4e3a-1de5-08db457746bd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cSFP9BobspEfAHY3vNJ8ZLshEd/1JHer0jXttJoEMG+5NiEovLRrWZ5GZpQdKnqeiCSfq6JqmyLU+C3fuzazOgDCNUEViIfrJ2K0Obh1fEoS9ybRAUFMPmc9TTdoPyu5VSY6vYyMcaQ+NhPyAfwluVALbb9gV5kDOtsRm9bYR85CoNiUJnN8GNo8imq64Q+Jc/TroCN6N0ENS9WmBlEzCVhrRP7tWYwDsVUaQxzxfKLY9PJk29xpjzxfWEycrGPaXYBaL4BSbzOJYzjShMVs1mfg2r6vPT92EK8fIWyAqrfpz3PcuZVuN16+RyU+S8A75Duqt7OP6/kJGWKUQskfUX7xzX6P7EAqmrHhmdze05aRiduX1ViKPBpOpIaEo4YEIQGLF5JLWD2NfqRdVooYU+jPtanm4N0vpmf7pyGqvT4qoJ+WCUb+osYOsgZfOc4aCFL6wb+pvBt1aTchj/5cLW9WYHYzimx+Kdkl/dr7JAUtjhO4XawQvheQJDUM984JeRROVNSKa45oYP37Xj50ElnrQQ7g8GzXOm3RLDRetX5xf3q/DXZHmfzS8sF6FKS7Xaf+zxa/0C7A8t3RtDrZK4vpT5Qm54a+Si6hpacBYW89UDGvchrPAM4xdCv5wPmlmZfvPaeW276QU9qIsX3E+A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(376002)(346002)(396003)(39860400002)(451199021)(36756003)(8936002)(8676002)(38100700002)(5660300002)(2906002)(86362001)(31696002)(6486002)(6666004)(478600001)(31686004)(107886003)(186003)(2616005)(53546011)(66946007)(66476007)(6506007)(6512007)(316002)(83380400001)(6916009)(4326008)(41300700001)(66556008)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UUZxQ3FWd2toWm1oblZKZkNNUGx1MnpUVWdaazhFeExBcW9paVRSTFVGWjFv?=
+ =?utf-8?B?WjVKcWJNUW9wOGpLWWFxc1lSdGZxOXJuVFVJYTcvdUhYa3gzN2lnVWZyYytE?=
+ =?utf-8?B?NGc1VmI4SXllNGlkQmEvWmFHZUh3NVcwZHNhc3N5MTk2WUZYVTRITHhUdkZO?=
+ =?utf-8?B?T0UrYVFDblM5OHNSRlpBYnE3a0cvUDRoVTk2c01ScDhBbHk4a0hxRXFicDBS?=
+ =?utf-8?B?OFp2SmpEamZOYjlNdGpzWHVkY29BaTZ0ZjVrR2hseG00TE9Wa1Z2Z1RwRWNP?=
+ =?utf-8?B?L2FkMUdLVlJOZTgwbHlHdHdJbmp3M2tKNHVWUzlWbTk1NFVmekFsLzM4NEpt?=
+ =?utf-8?B?OFhJKzVJZ3poZWY1bU1kWWdSWjMvM1V4UVJqeHMybm1qYUFZQ0FWNUptME5H?=
+ =?utf-8?B?c2pINHlXcG5YUTlTc3ZkUEs5NEx6RUpZcEkyZGxrbUF2RnRaSlRROFlzMVFD?=
+ =?utf-8?B?MHNOK3RzKzJ4SG9GSkZaWm9taUxlMlg4Qk1Wd2xBVXZ0amw4eXZzakRsTFMv?=
+ =?utf-8?B?LzIrYkQ3MFFPSlFTZWlOOWdqWTFJcXE4RE5BNXlISXUwSG80MWZuR2FIWUJ2?=
+ =?utf-8?B?elhJcWg2cXlJVlRIOXRZZ291S1JmOVEwSmpzcENVZVY0WVRiZWVZdWdSN04y?=
+ =?utf-8?B?bW1oclVGMWVhbDBUWkVqMzMwdmcyNnhQTkZsUjJWQi9iNVEwSkNiTnMydzVm?=
+ =?utf-8?B?WmVoUkNQRzBQUmRHZlowM1ZOTURaaGpOVjgzU3RUaGl1bHI4Lzd3cGQyamg2?=
+ =?utf-8?B?dHBMSHJTNW5WL3pqUnh5b0F3QlB4bmJCbUZpM3BmL2E4clRPNHZPZkE4M1pn?=
+ =?utf-8?B?L0t5RCtHM2RuUUw3aVpOVFVqOGJqWlFSUUN1ck5UWXhRanNBdEVGTFY4emFV?=
+ =?utf-8?B?SHlwTUNhWEtYNkRVT1hMcXhVOWJmZVlibmY4NXdwZGRrdFpGN1g4d1dKRkdZ?=
+ =?utf-8?B?U2k5TUZUMktvRFBWSHJyaEE3QklCaVhWVEs1MlB0SmFocWFWRUoxaCtBNVBu?=
+ =?utf-8?B?YVlJOTBFSkU3amtpcjBWYkVONlVRdUpkOUZYeDh3WTg2M3VWdGoxSDYrOWNv?=
+ =?utf-8?B?MzAxOVhmQjJWUjB6RzMxZ3dRSTMwUXA5WjJiNW55Ny9qUjRzSS9wUVRVU3pJ?=
+ =?utf-8?B?K281dmYyWGZ6U1hZanpnSWRnOWpCSHpkTFRHREZFNWV4RTlveEttYmZxSkJP?=
+ =?utf-8?B?OExCWEtvNGpSQzdTTHdQYkorS0R1aDVwVCtUNDg5R0tNdFhzNElhcUU4dFFW?=
+ =?utf-8?B?RjFCQllRR2wzNXluZWY5YWgzQXNvQmRvZkFadFdJcjVQa1MxYUltcVdvV2xY?=
+ =?utf-8?B?WU9FRWtVdGl3RXRiaWNRWFU1OVNOa2FpU0hMUUljM3BybTJrY2lGTURsMkI0?=
+ =?utf-8?B?bVhuZlRkbTd3eXJvZ3I2UlRlK0M1SVJWRWNPUnFiZlFndHJhQ1loM080aDBp?=
+ =?utf-8?B?bkd4dUJEaFBNT1Zhc2NOaUJIWUdLd2YzZmxyMXdpZnlWTnVpSFFpcXRmcUNU?=
+ =?utf-8?B?V0k3d2ZvYUtLb3lTR2YrcHdOd1A2c0lvSHBlS2dBbldXTTJaVnlhKzI4UWZQ?=
+ =?utf-8?B?eGN1WUF6TVREd0txdUNIVlJWSzlUS3M0cDhFb3pGWU91R3FPeTM3Z2RBTk5U?=
+ =?utf-8?B?QTY0dW9Rb3JoaEVib0RPdFczd1A3K0dRWE5LY1Y4MnR6ajJTVXRaR1kzTHRn?=
+ =?utf-8?B?NFNiSit6SUpmT0Z6RnNFcTE2RzdwbXc1ZG9HWS94T1Q1dS9pRFA2R1JlUUVa?=
+ =?utf-8?B?Ulp0empGYUhXT2prT24xTC9EaWg2QndVT3JCZmdhRUx2UngwVVhMdWoybUVl?=
+ =?utf-8?B?WldLdzlIalZMd3M5bnh6aGJoMkZoL1IvOXRKNC9LNENrUDl2Y245Z2FXMWlU?=
+ =?utf-8?B?K0JxQkdIbFREcEJnSGtEVE1rT1hiZ09RYkplUWF5VmM3ZkFIVjBTK1QxNEd5?=
+ =?utf-8?B?UHJIM243eEJyc2FKeERSc1lJMEhqejJ4SS9rek1VVFhxWEZGQTA5d2xOd1pK?=
+ =?utf-8?B?cGZPd2tYdE1xT0FrSVRzY29kODBNUTMrdGw5ejV0Tjd2eVJLd3VrQkFkbkIx?=
+ =?utf-8?B?TklzN0dhZjFLS3FhL2taRGFwUzF1M1VaUWs1bmE4WVlKandHcVRUSE9oVHZx?=
+ =?utf-8?B?cW5OdHh0RlNQRXIrbC90VmhzUEJPaEhXNnFHUEppbGltTGp3bnNmMVJONlNj?=
+ =?utf-8?B?UHc9PQ==?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81425076-0126-4e3a-1de5-08db457746bd
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Apr 2023 10:24:39.6091
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5OvrEta5qI29cASuMvBKIBMS4H0fknOiXme/b6zhU4cR49DIl7qGNokTVhlCP4SDNTzfEHmN2gA31EoGRAV+bQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7488
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 23, 2023 at 10:15=E2=80=AFPM Sagi Grimberg <sagi@grimberg.me> w=
-rote:
->
->
-> > Hello
-> >
-> > Below kmemleak observed after blktests nvme-tcp, pls help check it, tha=
-nks.
-> >
-> > commit: linux-block/for-next
-> > aaf9cff31abe (origin/for-next) Merge branch 'for-6.4/io_uring' into for=
--next
->
-> Hey Yi,
->
-> Is this a regression?
-I'm not sure, but both can be reproduced on 6.2.0
-
-> And can you correlate to specific tests that trigger this?
->
-
-Yes, just run blktests nvme-tcp nvme/044 nvme/045 could trigger them:
-
-nvme/044
-unreferenced object 0xffff8881911f7800 (size 512):
-  comm "nvme", pid 8233, jiffies 4295443413 (age 157.206s)
-  hex dump (first 32 bytes):
-    00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
-    ff ff ff ff ff ff ff ff 60 70 79 9b ff ff ff ff  ........`py.....
-  backtrace:
-    [<ffffffff93767af7>] kmalloc_trace+0x27/0xe0
-    [<ffffffff94568e85>] device_add+0x645/0x12f0
-    [<ffffffff939c6fa3>] cdev_device_add+0xf3/0x230
-    [<ffffffffc0a697c6>] nvme_init_ctrl+0xbe6/0x1140 [nvme_core]
-    [<ffffffffc1f6ce0c>] 0xffffffffc1f6ce0c
-    [<ffffffffc1f4d177>] 0xffffffffc1f4d177
-    [<ffffffffc1f4d613>] 0xffffffffc1f4d613
-    [<ffffffff939b8716>] vfs_write+0x216/0xc60
-    [<ffffffff939b99a9>] ksys_write+0xf9/0x1d0
-    [<ffffffff95378c4c>] do_syscall_64+0x5c/0x90
-    [<ffffffff954000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-unreferenced object 0xffff8882297fc780 (size 96):
-  comm "nvme", pid 8233, jiffies 4295443414 (age 157.205s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff93767af7>] kmalloc_trace+0x27/0xe0
-    [<ffffffff94599560>] dev_pm_qos_update_user_latency_tolerance+0xe0/0x20=
-0
-    [<ffffffffc0a6983c>] nvme_init_ctrl+0xc5c/0x1140 [nvme_core]
-    [<ffffffffc1f6ce0c>] 0xffffffffc1f6ce0c
-    [<ffffffffc1f4d177>] 0xffffffffc1f4d177
-    [<ffffffffc1f4d613>] 0xffffffffc1f4d613
-    [<ffffffff939b8716>] vfs_write+0x216/0xc60
-    [<ffffffff939b99a9>] ksys_write+0xf9/0x1d0
-    [<ffffffff95378c4c>] do_syscall_64+0x5c/0x90
-    [<ffffffff954000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-
-nvme/045
-unreferenced object 0xffff8881e3b32200 (size 64):
-  comm "check", pid 8335, jiffies 4295703407 (age 177.101s)
-  hex dump (first 32 bytes):
-    44 48 48 43 2d 31 3a 30 30 3a 77 59 5a 2f 37 4f  DHHC-1:00:wYZ/7O
-    4f 33 2b 71 34 74 6c 38 45 6c 73 71 59 68 55 41  O3+q4tl8ElsqYhUA
-  backtrace:
-    [<ffffffff937683fb>] __kmalloc+0x4b/0x190
-    [<ffffffffc0a77830>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nvme_co=
-re]
-    [<ffffffff93bd1708>] kernfs_fop_write_iter+0x358/0x530
-    [<ffffffff939b8d02>] vfs_write+0x802/0xc60
-    [<ffffffff939b99a9>] ksys_write+0xf9/0x1d0
-    [<ffffffff95378c4c>] do_syscall_64+0x5c/0x90
-    [<ffffffff954000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-unreferenced object 0xffff8881e3b32100 (size 64):
-  comm "check", pid 8335, jiffies 4295703468 (age 177.040s)
-  hex dump (first 32 bytes):
-    44 48 48 43 2d 31 3a 30 30 3a 77 59 5a 2f 37 4f  DHHC-1:00:wYZ/7O
-    4f 33 2b 71 34 74 6c 38 45 6c 73 71 59 68 55 41  O3+q4tl8ElsqYhUA
-  backtrace:
-    [<ffffffff937683fb>] __kmalloc+0x4b/0x190
-    [<ffffffffc0a77830>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nvme_co=
-re]
-    [<ffffffff93bd1708>] kernfs_fop_write_iter+0x358/0x530
-    [<ffffffff939b8d02>] vfs_write+0x802/0xc60
-    [<ffffffff939b99a9>] ksys_write+0xf9/0x1d0
-    [<ffffffff95378c4c>] do_syscall_64+0x5c/0x90
-    [<ffffffff954000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-
-> >
-> > unreferenced object 0xffff88821f0cc880 (size 32):
-> >    comm "kworker/1:2H", pid 3067, jiffies 4295825061 (age 12918.254s)
-> >    hex dump (first 32 bytes):
-> >      82 0c 38 08 00 ea ff ff 00 00 00 00 00 10 00 00  ..8.............
-> >      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >    backtrace:
-> >      [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
-> >      [<ffffffff8776d0bf>] sgl_alloc_order+0x7f/0x360
-> >      [<ffffffffc0ba9875>] 0xffffffffc0ba9875
-> >      [<ffffffffc0bb068f>] 0xffffffffc0bb068f
-> >      [<ffffffffc0bb2038>] 0xffffffffc0bb2038
-> >      [<ffffffffc0bb257c>] 0xffffffffc0bb257c
-> >      [<ffffffffc0bb2de3>] 0xffffffffc0bb2de3
-> >      [<ffffffff86897f49>] process_one_work+0x8b9/0x1550
-> >      [<ffffffff8689919c>] worker_thread+0x5ac/0xed0
-> >      [<ffffffff868b2222>] kthread+0x2a2/0x340
-> >      [<ffffffff866063ac>] ret_from_fork+0x2c/0x50
-> > unreferenced object 0xffff88823abb7c00 (size 512):
-> >    comm "nvme", pid 6312, jiffies 4295856007 (age 12887.309s)
-> >    hex dump (first 32 bytes):
-> >      00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
-> >      ff ff ff ff ff ff ff ff a0 53 5f 8e ff ff ff ff  .........S_.....
-> >    backtrace:
-> >      [<ffffffff86f63da7>] kmalloc_trace+0x27/0xe0
-> >      [<ffffffff87d61205>] device_add+0x645/0x12f0
-> >      [<ffffffff871c2a73>] cdev_device_add+0xf3/0x230
-> >      [<ffffffffc09ed7c6>] nvme_init_ctrl+0xbe6/0x1140 [nvme_core]
-> >      [<ffffffffc0b54e0c>] 0xffffffffc0b54e0c
-> >      [<ffffffffc086b177>] 0xffffffffc086b177
-> >      [<ffffffffc086b613>] 0xffffffffc086b613
-> >      [<ffffffff871b41e6>] vfs_write+0x216/0xc60
-> >      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
-> >      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
-> >      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> > unreferenced object 0xffff88810ccc9b80 (size 96):
-> >    comm "nvme", pid 6312, jiffies 4295856008 (age 12887.308s)
-> >    hex dump (first 32 bytes):
-> >      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >    backtrace:
-> >      [<ffffffff86f63da7>] kmalloc_trace+0x27/0xe0
-> >      [<ffffffff87d918e0>] dev_pm_qos_update_user_latency_tolerance+0xe0=
-/0x200
-> >      [<ffffffffc09ed83c>] nvme_init_ctrl+0xc5c/0x1140 [nvme_core]
-> >      [<ffffffffc0b54e0c>] 0xffffffffc0b54e0c
-> >      [<ffffffffc086b177>] 0xffffffffc086b177
-> >      [<ffffffffc086b613>] 0xffffffffc086b613
-> >      [<ffffffff871b41e6>] vfs_write+0x216/0xc60
-> >      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
-> >      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
-> >      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> > unreferenced object 0xffff8881d1fdb780 (size 64):
-> >    comm "check", pid 6358, jiffies 4295859851 (age 12883.466s)
-> >    hex dump (first 32 bytes):
-> >      44 48 48 43 2d 31 3a 30 30 3a 4e 46 76 44 6d 75  DHHC-1:00:NFvDmu
-> >      52 58 77 79 54 79 62 57 78 70 43 4a 45 4a 68 36  RXwyTybWxpCJEJh6
-> >    backtrace:
-> >      [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
-> >      [<ffffffffc09fb710>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nv=
-me_core]
-> >      [<ffffffff873cc848>] kernfs_fop_write_iter+0x358/0x530
-> >      [<ffffffff871b47d2>] vfs_write+0x802/0xc60
-> >      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
-> >      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
-> >      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> > unreferenced object 0xffff8881d1fdb600 (size 64):
-> >    comm "check", pid 6358, jiffies 4295859908 (age 12883.409s)
-> >    hex dump (first 32 bytes):
-> >      44 48 48 43 2d 31 3a 30 30 3a 4e 46 76 44 6d 75  DHHC-1:00:NFvDmu
-> >      52 58 77 79 54 79 62 57 78 70 43 4a 45 4a 68 36  RXwyTybWxpCJEJh6
-> >    backtrace:
-> >      [<ffffffff86f646ab>] __kmalloc+0x4b/0x190
-> >      [<ffffffffc09fb710>] nvme_ctrl_dhchap_secret_store+0x110/0x350 [nv=
-me_core]
-> >      [<ffffffff873cc848>] kernfs_fop_write_iter+0x358/0x530
-> >      [<ffffffff871b47d2>] vfs_write+0x802/0xc60
-> >      [<ffffffff871b5479>] ksys_write+0xf9/0x1d0
-> >      [<ffffffff88ba8f9c>] do_syscall_64+0x5c/0x90
-> >      [<ffffffff88c000aa>] entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> >
-> > --
-> > Best Regards,
-> >    Yi Zhang
-> >
->
 
 
---=20
-Best Regards,
-  Yi Zhang
+On 25/04/2023 5:12, Martin K. Petersen wrote:
+> 
+> Hi Max!
+> 
+>> In case the integrity capabilities of the failed path and the failover
+>> path don't match, we may run into NULL dereference. Free the integrity
+>> context during the path failover and let the block layer prepare it
+>> again if needed during bio_submit.
+> 
+> This assumes that the protection information is just an ephemeral
+> checksum. However, that is not always the case. The application may
+> store values in the application or storage tags which must be returned
+> on a subsequent read.
 
+Interesting.
+
+Maybe you can point me to this API that allow applications to store 
+application tag in PI field ?
+
+I see that app_tag is 0 in Linux and we don't set the nvme_cmd->apptag 
+to non zero value.
+It's been a while since I was working on this so I might be wrong here :).
+
+I've noticed that in t10_pi_generate and ext_pi_crc64_generate we set it 
+to 0 as well.
+
+The way I see it now, and I might be wrong, is that the Linux kernel is 
+not supporting application to store apptag values unless it's using some 
+passthrough command.
+
+> 
+> In addition, in some overseas markets (financial, government), PI is a
+> regulatory requirement. It would be really bad for us to expose a device
+> claiming PI support and then it turns out the protection isn't actually
+> always active.
+> 
+> DM multipathing doesn't allow mismatched integrity profiles. I don't
+> think NVMe should either.
+> 
+
+AFAIU, the DM multipath is not a specification but a Linux 
+implementation. NVMe multipathing follows a standard.
