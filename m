@@ -2,144 +2,208 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686A0C77B76
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 08:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE9EC77B61
+	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 08:22:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233416AbjDYIN2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 04:13:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41170 "EHLO
+        id S233558AbjDYIWP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 04:22:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233575AbjDYIN0 (ORCPT
+        with ESMTP id S233472AbjDYIWO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 04:13:26 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2088.outbound.protection.outlook.com [40.107.223.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09A24EED;
-        Tue, 25 Apr 2023 01:13:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nNDLmlD+H6Jhn9dGqETg/doRT5HpuDEgEJeufFhRKUOq/awySBvK6Bvvqh3OKCXYOZGLk8QFzOirrCqMme/5dORkXkBUXp0oRbTpClRQmo/ncPXvZOlR+EgkY6eGPo7CegeaoLer0bl3Ly0oz/n0QDIQ7rfZ6GDsWvkSd8vCqS+f4BxDVkcsh8ak/KcQ3AD1kmsQbM5wcaFwYzNbqrBs1j93CoUMAfRj2WeHBTmTok0ItJfyQH09vGQXtdlN2YTfslptdqZPFOo7M604ecqZTT860sKo8KxoolwD1vqKJ+SwXRiA8UK0efUdQpWQ6nrYkRA0Y7IBh0SN6YIMAmM3og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xONG4PdXXNFagEhiOJysrBGyQcbas2YVIWKfVTtWcV4=;
- b=c0dsIuWU2Ng7lkuJHCtDL0vJ+YbEEVvW29ORH86Sba4qv9xYDU0dZZ+f/Ogps2I1bTMkvTFtpXhaOtpmaLXkJ6eCLWAFKO2piXVhPLEGklXJc7Q8ses9OMKTa/eq1Ocd2IPhMAhl1y8ZWB99PAMpWM0LxPITLtXf/KpJg3lU7c7D1efHy/0kolGQqocljGKPz7448vgVSuhlU0HyFUi5dsQ3tueonY3WNMUgeNmVKY85d/+uadwuThy6gim3gO+P0LNiGLSKkAGv03IIs5Gqu4BApJXt50YegchwQ7YqY6BmWnw1jd/PbmdHeO8nsU94aa++Al+SFiLbnbStJOgpmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xONG4PdXXNFagEhiOJysrBGyQcbas2YVIWKfVTtWcV4=;
- b=ub0t5ZMQXcCMav1K4YoPyL9gZPAYW4jETVS8fTeUWwRLV5Jb7AHH9ZoDGiaiHfLng4hTZruYytEhz1AW+GdJdFN8erZWPGoxv1zG0zUyJKi7XSuSUeqFU2kMRleumKgHVfywBWWoHMhpDYiKNLyr9h884Ao8tFQOFYBE3sJR3jnwopptCHcWd1yw8vP4G4IKj5CS/9DkKLlMJwC8sJZlPbrqta+rh8H631raOefHuk4Akpl//s7KGTBNg1ZoUXRzK6n1/AVTPJT18wZYeUj3GuHzRhoOV7DcDjPtQAnH+ZXWrcE9Hm+JJoHsnTaSn6JBTcty8GEZ2PbsbKyxpPTOOQ==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by BL1PR12MB5141.namprd12.prod.outlook.com (2603:10b6:208:309::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6319.34; Tue, 25 Apr
- 2023 08:13:22 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::6922:cae7:b3cc:4c2a]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::6922:cae7:b3cc:4c2a%5]) with mapi id 15.20.6319.033; Tue, 25 Apr 2023
- 08:13:22 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Li Lingfeng <lilingfeng@huaweicloud.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "yukuai1@huaweicloud.com" <yukuai1@huaweicloud.com>,
-        "houtao1@huawei.com" <houtao1@huawei.com>,
+        Tue, 25 Apr 2023 04:22:14 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF707E4
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 01:22:11 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q5FNH47hsz4f3wtN
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 16:22:07 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgD3rLCujUdkd9xzIA--.34816S3;
+        Tue, 25 Apr 2023 16:22:08 +0800 (CST)
+Subject: Re: [PATCH blktests] dm: add a regression test
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "yangerkun@huawei.com" <yangerkun@huawei.com>,
         "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH -next] block: don't allow a disk link holder to its
- ancestor
-Thread-Topic: [PATCH -next] block: don't allow a disk link holder to its
- ancestor
-Thread-Index: AQHZd0u02IE3eVCdDkam5FONer2fFq87rQIA
-Date:   Tue, 25 Apr 2023 08:13:22 +0000
-Message-ID: <2b466945-0ad1-43e9-5530-4bcd3d469e33@nvidia.com>
-References: <20230425075558.3450970-1-lilingfeng@huaweicloud.com>
-In-Reply-To: <20230425075558.3450970-1-lilingfeng@huaweicloud.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|BL1PR12MB5141:EE_
-x-ms-office365-filtering-correlation-id: c1ad7fda-99d1-4f4f-d1c8-08db4564efda
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: LUAw8+k6yCLgKSZbwqZ3oitR9aUyqLmdgK4OXPKyWPCkeuMyf52NoiuQBVgRpCTe30gjyaeIf8JJiFNF4nvcf9xgzHl73hJ5B9Z7XLmOYlzlhK+ARLIiafNze5AM5i/ihSyQlrftZIwa41KaCEU/+kdsOlGFJ/HhWQY2VCp1ah0Ae89o2BTG2lFnODuig0Bi+kQynzRRlK3Z3AMLsOe4A1Bb2kM1TUMmdGdmuaxtHggmdT0hVrwslSS7Ih7zA+XGIcpVFkK+HDG8BaxujGBrwUvNdUoz94zzuG33nzzAaKVUnGrTiWXRfInMXxHsbC4AQw1cCXKo6qAW1wwHLbq0XbGe3bUul0VmDD7K896jV4pH0Y5nLlYpCozaMAZCkSvnF04rDmTwYazF/7uK4sFpG/Bxmp9WpeltCuLEhneuti6MQR9TA5sfcNBE6YmRi8uOAqeYfAwva4pcysYlCJFQ/ZuaFpLMNhnSsTKD0tWjDycfDxvFDNmwXth8nWviCMFlGacxObh66OKUmx3CaVJWrs3OJSyQpMzDP+lSFaMp99MReFZ+WM5Qg0fB4DrjyCjYMtZsaMZn2VWQ3U9D5QNPszMK28BzRLFPxHR/EAOcbYHAPcPzRQxe5VyBIkBEdBCYWrwA4p/Gptgk8weJoHJyMEp/bNKMTIoh1dfU41v+EWDzZCOJ9cD5yN8SS0Y9WPyM
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(376002)(396003)(39860400002)(346002)(451199021)(316002)(64756008)(66446008)(6916009)(4326008)(38100700002)(41300700001)(122000001)(5660300002)(8936002)(8676002)(36756003)(31696002)(86362001)(38070700005)(2906002)(4744005)(66476007)(66556008)(6486002)(71200400001)(53546011)(6512007)(6506007)(478600001)(2616005)(83380400001)(186003)(31686004)(54906003)(76116006)(91956017)(66946007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WVlwY0lUODJEY3FTcFVRS205dXZvQytwRkNVYXJTS2dWN2wwK0pWQzFNRjNm?=
- =?utf-8?B?YVJrMno0bGFyMHZ5Qk5OdUlQSjhWSHdPWjduYStlaVBmYzVlRnJKVnlhNzNy?=
- =?utf-8?B?c3ZRY1VvVmJINDArMGJLeEQxRlgwK3cwMXVOS2o5VEdQaEoycUxhOGQxdlBR?=
- =?utf-8?B?MDY4QTV3TnlPR054ckxvcG00d3NUZmcxQUwvb09NVWs1dTFZTmorbWl1OFZ3?=
- =?utf-8?B?bnR5STlpMnVJZC9KNC92aE5seTY3NHBFdGRGVUdrRkNPdFBEaXZjd2dUOTRN?=
- =?utf-8?B?dWx5THhCdnhUbFhuWFpnZkkwZllCc3ZaUFUxKzkyZElRNzBXQ09pVnZGZ3R6?=
- =?utf-8?B?cWxpeUlob1l5MzFjN3FCMS82RzI0YXljejROa2RsVXNIeVdyMVpnbEZzUnJM?=
- =?utf-8?B?R0dkOU1xbU5kUVNsa1o4NzNoWEFwZGJGbnNja1JiVVZnRTJVVytzRDBWVk03?=
- =?utf-8?B?eTNTL1B4UU5QUDB0T2VYYUhqYkQ4RWZrZlpPM3BCQXhVRGFsNjBGaEJBNUVx?=
- =?utf-8?B?Vm4wV1ZwWitHUG0xV252OHl0Vk16VE5PeGVXRmcxbVBwek82SDY2ZUNkeVp5?=
- =?utf-8?B?WUFrWkg0T21URmZsQVFwbXlBWEhLbHR0MW1JMHBIZlZyS3diTTVnL3RMckI5?=
- =?utf-8?B?L3IxVndyVXBFaS9RbFpEQUQ0T08xWTltYi9ubGlzYkxJZU9NZEdpTUJQcElJ?=
- =?utf-8?B?eXEydE5qOHI4SEkzTWtYZ3U2T09EVUM1aEpZYmR1TkVZOURUeGh0OGc5bVQv?=
- =?utf-8?B?ZGFQMk4yanRuZjhJM1paOGVqbXZ2V2J3ck1KeHdKM2g0VDZaYzVzVE9RT0Nw?=
- =?utf-8?B?NHBuVFpnWmhMY1hzM3plL3dKUEl4ZUl0bGFpaFYvQVQ3MEUydmVOL1ZEZ0U3?=
- =?utf-8?B?WUJUY2tpdWFzcEJySE15aE9mcnJRdWNTZEV5Zk4zbEhDVzlZWGV3U0ljbVF3?=
- =?utf-8?B?TmwxWXA4MTRsL0FhNmNGd1VRTUN5MHlsVFgvQjlYQU5LZ05HUHRZUHpwVG55?=
- =?utf-8?B?U1NPWWZGQTI4enZYQTFrbkdHc3FwOU5JeFdPYklta240eks5M1FLRGs4YVhD?=
- =?utf-8?B?WEFlWnM0bGZ6SzZPbEJSc090ZHBQbTU4UktGNHVRN0t6L3NoTTRiY2lWVzBq?=
- =?utf-8?B?UlhOeDdOaDlNNjc2TVpUb0k2ZFQzNGlKZlJ6aTR0dEEzSDA3YWY5TDBCNEg5?=
- =?utf-8?B?b3RnL1JZUnJEQWRyV2Q2OGY2bVUwSzFkTE5oOUp4OFVNQlhoWTg1TXhSL1Zs?=
- =?utf-8?B?UjhCaDZZYWhndjZyNXRBL0JQNGFVRXRhMEtuMjBXU0hEcUQrd3lIeDNvVlhH?=
- =?utf-8?B?R1FWd0FLcWpzUGhGOFFlWkdNR2xjNUhLVVlnRFhhN25HVk1jc3RaRGtoV3NG?=
- =?utf-8?B?V2lWZTkwcUh3SDBRdDhwVDJ5L3djdzJwQ2pUUndBMUNzZ1U0cFQwYi9vejhR?=
- =?utf-8?B?WlBxbloraFVwWk41YjQ0T2lHVVRTTFgxNXZqSVI0V3EyUEZoNVBZNXZleE5Q?=
- =?utf-8?B?NzIrUVE5NmhNaEttNjd4QWpXY1pHSVNuN04rYk5DYkFsSmZlZE0vb0VyaDJB?=
- =?utf-8?B?bzRWejIvY1YvWjJaZlVReEtmNk1IbUZFVE9XdE9ob2NVNnozV0Zod1JhM3lm?=
- =?utf-8?B?Y1BiV1JaZ3p2ekN6cWJHNmt3QjkxK05MQ2VwWVRieGJhZFp5T01kQ1lBYU9r?=
- =?utf-8?B?MVQyTU5uL3RJWG05RGYxaE9lVThxZEFSZTE4eEdGSWdObUxpMnRHU1U0UGEy?=
- =?utf-8?B?U0hZc28rbFE5c2ZMOUY5V3gxSU0vdVpLQ0NVV2p1cDcwaTNQM0tVT2N5UkdT?=
- =?utf-8?B?dThha3NQU1BIU1lRTVVXVldxMURGQW4wQUNINWlOQTB4R2NGT211UWdOZC82?=
- =?utf-8?B?QnVlTTVRRGxGS3JxOWhOM2pQWWpnQ245ak1FNHY5U082bDVXc3ovb3VEckFO?=
- =?utf-8?B?a0s0NkZvbkJEVFVFQ1VjZlRsdEd0eGJDUFpsUkM4eDBuUDBIcUZYNnQ2Vk0z?=
- =?utf-8?B?UU12NTh3ZzhuMGtrbzJjNHBCNlhwbHdPc3p5azlBcFpmc1ZJaENta3hibkdp?=
- =?utf-8?B?K001TmxHQktRRWpxZ3pycTR4WUlUN3FwT3k0aEMzS3MzNXVHbFBKbTVQT2Rv?=
- =?utf-8?B?WForTlJNbmhKWHBiUVloZkkyaHRBbUQ5MjlORGlVazkwS2g5Rm5jeHgrdWx6?=
- =?utf-8?Q?3FgV8YmISiQdqgjKai+AFsKmKsLssSKoWYbIqQlZ5FuY?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <215A1C1C04DD4145B7266E2F722CBAB2@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        "snitzer@kernel.org" <snitzer@kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "yukuai (C)" <yukuai3@huawei.com>,
+        Li Lingfeng <lilingfeng3@huawei.com>
+References: <20221230065424.19998-1-yukuai1@huaweicloud.com>
+ <20230112010554.qmjuqtjoai3qqaj7@shindev>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <6ccff2ec-b4bd-a1a6-5340-b9380adc1fff@huaweicloud.com>
+Date:   Tue, 25 Apr 2023 16:22:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1ad7fda-99d1-4f4f-d1c8-08db4564efda
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Apr 2023 08:13:22.5960
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: W+NKSPWrnFrwFtK/43R9e/erPfJ3tw/w4akWaY0B/3nqoOHOerwUCz5JIofMW0meYX6bRSGULysG0KFDahQpig==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5141
+In-Reply-To: <20230112010554.qmjuqtjoai3qqaj7@shindev>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgD3rLCujUdkd9xzIA--.34816S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAF4fGF4fCF15Kr4rGF18uFg_yoWrGF1kpa
+        yjkF4Ykrs7AF12yF1avw17ua4rAw4fCr45Cr13Kr1UZrW3Zr1kGa47Kr47CryfXrZYqa97
+        Z3Wvqrn5ur4jyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-TGksDQoNCk9uIDQvMjUvMjMgMDA6NTUsIExpIExpbmdmZW5nIHdyb3RlOg0KPiBGcm9tOiBMaSBM
-aW5nZmVuZyA8bGlsaW5nZmVuZzNAaHVhd2VpLmNvbT4NCj4NCj4gUHJldmlvdXNseSBjb21taXQg
-MDc3YTQwMzM1NDFmICgiYmxvY2s6IGRvbid0IGFsbG93IGEgZGlzayBsaW5rIGhvbGRlcg0KPiB0
-byBpdHNlbGYiKSBwcmV2ZW50IHVzZXIgZnJvbSByZWxvYWRpbmcgZG0gd2l0aCBpdHNlbGYuIEhv
-d2V2ZXIsIHVzZXINCj4gY2FuIHJlbG9hZCBkbSB3aXRoIGl0cyBhbmNlc3RvciB3aGljaCB3aWxs
-IHRyaWdnZXIgZGVhZCBsb29wIGFuZCByZXN1bHQNCj4gaW4gb29tLg0KPg0KPiBUZXN0IHByb2Nl
-ZHVyZXM6DQo+IDEpIGRtc2V0dXAgY3JlYXRlIHRlc3QgLS10YWJsZSAiMCAyMDk3MTUyMCBsaW5l
-YXIgL2Rldi9zZGQgMCINCj4gMikgZG1zZXR1cCBjcmVhdGUgdGVzdDEgLS10YWJsZSAiMCAyMDk3
-MTUyMCBsaW5lYXIgL2Rldi9zZGQgMjA5NzE1MjAiDQo+IDMpIGRtc2V0dXAgc3VzcGVuZCB0ZXN0
-DQo+IDQpIGRtc2V0dXAgcmVsb2FkIHRlc3QgLS10YWJsZSAiMCAyMDQ4IGxpbmVhciAvZGV2L21h
-cHBlci90ZXN0MSAwIg0KPiA1KSBkbXNldHVwIHJlc3VtZSB0ZXN0DQo+IDYpIGRtc2V0dXAgc3Vz
-cGVuZCB0ZXN0MQ0KPiA3KSBkbXNldHVwIHJlbG9hZCB0ZXN0MSAtLXRhYmxlICIwIDIwNDggbGlu
-ZWFyIC9kZXYvbWFwcGVyL3Rlc3QgMCINCj4gOCkgZG1zZXR1cCByZXN1bWUgdGVzdDENCj4NCg0K
-Q2FuIHlvdSBwbGVhc2UgYWRkIGJsa3Rlc3QgZm9yIHRoaXMgb25lID8NCg0KLWNrDQoNCg0K
+Hi,
+
+ÔÚ 2023/01/12 9:05, Shinichiro Kawasaki Ð´µÀ:
+> Hello Yu, thanks for the patch. I think it is good to have this test case to
+> avoid repeating the same regression. Please find my comments in line.
+> 
+> CC+: Mike, dm-devel,
+> 
+> Mike, could you take a look in this new test case? It adds "dm" test group to
+> blktests. If you have thoughts on how to add device-mapper related test cases
+> to blktests, please share (Or we may be able to discuss later at LSF 2023).
+
+Can we add "dm" test group to blktests? I'll send a new version if we
+can.
+
+Thanks,
+Kuai
+> 
+> On Dec 30, 2022 / 14:54, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Verify that reload a dm with itself won't crash the kernel.
+> 
+> With this test case, I observed the system crash on Fedora default kernel
+> 6.0.18-300.fc37. Will the kernel fix be delivered to stable kernels? If not,
+> it would be the better to require kernel version 6.2 for this test case not
+> to surprise the blktests users.
+> 
+> Regarding the wording, "reload a dm with itself" is a bit confusing for me.
+> How about "reload a dm with maps to itself"?
+> 
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   tests/dm/001     | 27 +++++++++++++++++++++++++++
+>>   tests/dm/001.out |  4 ++++
+>>   tests/dm/rc      | 11 +++++++++++
+>>   3 files changed, 42 insertions(+)
+>>   create mode 100755 tests/dm/001
+>>   create mode 100644 tests/dm/001.out
+>>   create mode 100644 tests/dm/rc
+>>
+>> diff --git a/tests/dm/001 b/tests/dm/001
+>> new file mode 100755
+>> index 0000000..55e07f3
+>> --- /dev/null
+>> +++ b/tests/dm/001
+>> @@ -0,0 +1,27 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2022 Yu Kuai
+>> +#
+>> +# Regression test for commit 077a4033541f ("block: don't allow a disk link
+>> +# holder to itself")
+>> +
+>> +. tests/dm/rc
+>> +
+>> +DESCRIPTION="reload a dm with itself"
+> 
+> Same comment on wording as the commit message.
+> 
+>> +QUICK=1
+>> +
+>> +requires() {
+>> +	_have_program dmsetup && _have_driver dm-mod
+> 
+> I suggest to move these checks to group_requires in dm/rc, since future new test
+> cases in dm group will require them also.
+> 
+> Nit: '&&' is no longer required to check multiple requirements. Just,
+> 
+> 	_have_program dmsetup
+> 	_have_driver dm-mod
+> 
+> is fine and a bit better.
+> 
+>> +}
+>> +
+>> +test_device() {
+>> +	echo "Running ${TEST_NAME}"
+>> +
+>> +	dmsetup create test --table "0 8192 linear ${TEST_DEV} 0"
+>> +	dmsetup suspend test
+>> +	dmsetup reload test --table "0 8192 linear /dev/mapper/test 0"
+>> +	dmsetup resume test
+>> +	dmsetup remove test
+>> +
+>> +	echo "Test complete"
+>> +}
+>> diff --git a/tests/dm/001.out b/tests/dm/001.out
+>> new file mode 100644
+>> index 0000000..23cf1f0
+>> --- /dev/null
+>> +++ b/tests/dm/001.out
+>> @@ -0,0 +1,4 @@
+>> +Running dm/001
+>> +device-mapper: reload ioctl on test failed: Invalid argument
+>> +Command failed
+>> +Test complete
+> 
+> With my test system and kernel v6.2-rc3, the messages above were slightly
+> diffrent. To make the test case pass, I needed changes below:
+> 
+> diff --git a/tests/dm/001.out b/tests/dm/001.out
+> index 23cf1f0..543b1db 100644
+> --- a/tests/dm/001.out
+> +++ b/tests/dm/001.out
+> @@ -1,4 +1,4 @@
+>   Running dm/001
+> -device-mapper: reload ioctl on test failed: Invalid argument
+> -Command failed
+> +device-mapper: reload ioctl on test  failed: Invalid argument
+> +Command failed.
+>   Test complete
+> 
+> 
+>> diff --git a/tests/dm/rc b/tests/dm/rc
+>> new file mode 100644
+>> index 0000000..e1ad6c6
+>> --- /dev/null
+>> +++ b/tests/dm/rc
+>> @@ -0,0 +1,11 @@
+>> +#!/bin/bash
+>> +# SPDX-License-Identifier: GPL-3.0+
+>> +# Copyright (C) 2022 Yu Kuai
+>> +#
+>> +# TODO: provide a brief description of the group here.
+> 
+> Let's not leave this TODO. How about "# Tests for device-mapper."?
+> 
+>> +
+>> +. common/rc
+>> +
+>> +group_requires() {
+>> +	_have_root
+>> +}
+>> -- 
+>> 2.31.1
+>>
+> 
+
