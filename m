@@ -2,83 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1850C77B61
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 13:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47900C77B61
+	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 13:48:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233944AbjDYNix (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 09:38:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37218 "EHLO
+        id S233452AbjDYNsa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 09:48:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233511AbjDYNiw (ORCPT
+        with ESMTP id S231493AbjDYNs3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 09:38:52 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34CBFF
-        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 06:38:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 49C2962534
-        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 13:38:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40142C433EF;
-        Tue, 25 Apr 2023 13:38:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682429930;
-        bh=n5wEodSDS1fsScLM3fwMTWWhf9vKTFG8fbF0I5rZvLE=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=S6LnAOZs+24E099OStgxIjzhlMiYc6NxmnxM6F1B3KbRMyvwkvikoZGeNd/O9/LaK
-         sSFzqnNApbOtZ+ADnhFMa5Gu6hZy5hI2hW2//yVq3VMn+2VVKkhy6hs0Cbkpnr2Wss
-         n6bDqlIbNYDqT6McmCORSS4b9k5co5s64FJ4kJSuKC6DGb/abpr9WU6ntldeQq9E7Z
-         Q2z22a04j2gMecy2GiQ1tMVRLssKLEY2vx1EVmZtkpYgT9QzkwLHjdljtgIVWYWUva
-         0kpcy9ofkv+4bkVcV3uNhj4pqSmSZ7oYSe7p7LztwgyhZ+n8WB/afW596mOhMnUALv
-         XB2JDRQ52q55w==
-Message-ID: <9e1a1dab-77c3-77c1-b71b-0385a15a599e@kernel.org>
-Date:   Tue, 25 Apr 2023 22:38:47 +0900
+        Tue, 25 Apr 2023 09:48:29 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119C4133
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 06:48:25 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-32e74139877so1094695ab.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 06:48:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682430504; x=1685022504;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aZwRlr+hy/zUh+AabZX3wrvhWJ7uoRqat5P5byj3iBM=;
+        b=y2xcrkjONsb2tcCQrQC6OE9FbjKXCxpPwQibhOv105RREvOPcrEy0ApmTQznllayUY
+         UnMdJjdl7UcohtCxklKbUoprb1tLGDXs7tPtwbrpYpXjbAgptaFQsSgc3tX94OfP87qJ
+         Fk6Vv4PJ/V577Kqg0PfYMzGlLtQlRPsBCH3IneiXtq1u8aXbs1kigyCWW1vCx6o7pnPd
+         vbw68LqkIM7ztMinqzQ9AydT2sNMNdwOImjpAFenUVYs3FiTZV7hqsTbtxVgJq5cQq5f
+         wOPuwAuEtQwUXD5LNh2FsShU7d2KwrMdiSgc7h5ZT2h6Lj8axmNjp12qjK8HDAyzibIU
+         93JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682430504; x=1685022504;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aZwRlr+hy/zUh+AabZX3wrvhWJ7uoRqat5P5byj3iBM=;
+        b=T3LTfoKeaN6k9gQjZbVzRra+KfG8WyQw6J8HZArOOEZw6DPfemTf/Sz/rksydlyD3y
+         b6Pib9x3J6my9SfGi4ke0t2Jv3iiWAdx5w6r+HUu5iMJRWRbDbYKlIjBzywCc3ByWh2/
+         BPjlYMt1LA9Eb+NZH6KWyfdH86GMi6XPwXRTfpSFuxvS+0n/PUIEJV9D5aGKQfRiBf+I
+         Ybj35ix/taQKlSnlALx5wfQS3E0lqgWCL3vN9g0ZBWZ0PkHg+KJzj74t2l6ZFAVZWWwC
+         BYH2qC0xwC4nP2HnPBjvFyQzcMawFLHBUsXJloowPMbM86lX66sX9UxXYtnpwXUVevl2
+         Hnnw==
+X-Gm-Message-State: AAQBX9enHUpMl8EW5KpEA8gojsxggevq784RBW9zLIbE+P89pzu/++52
+        aRX97Zv7xN550RH8eB0VSWgxfw==
+X-Google-Smtp-Source: AKy350azkiWJEsqUbWopmNtBmN198gwlCJJkTgG8iwbb0OM0fay/vHbhRl2xh6tFaRHS51Sp650VGQ==
+X-Received: by 2002:a05:6e02:1609:b0:325:f635:26c5 with SMTP id t9-20020a056e02160900b00325f63526c5mr11650283ilu.3.1682430504422;
+        Tue, 25 Apr 2023 06:48:24 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id m11-20020a056638408b00b0040faf78330asm4233147jam.28.2023.04.25.06.48.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Apr 2023 06:48:24 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
+In-Reply-To: <20230425034154.110099-1-ming.lei@redhat.com>
+References: <20230425034154.110099-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] block: sync part's ->bd_has_submit_bio with disk's
+Message-Id: <168243050382.16933.11939896925923255565.b4-ty@kernel.dk>
+Date:   Tue, 25 Apr 2023 07:48:23 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v2 10/11] block: Add support for the zone capacity concept
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Matias Bjorling <mb@lightnvm.io>
-References: <f9d35d19-d0ba-fcb7-e44b-f0b8c55ba399@acm.org>
- <141aee35-4288-1670-6424-e6c41c8ef4c9@kernel.org>
- <ec7cdc7d-9eb7-65a4-6ba9-1ae6cf6f43d2@acm.org>
- <a5d9a370-6264-ebdf-f9f8-7b3263c2b6f0@kernel.org>
- <490ed061-6d82-f9fb-2050-4a386e2e4c8e@acm.org>
- <c4a52bff-5cab-5029-ad7f-e5f9452bc0e2@kernel.org>
- <ZEHY2PIRCCLOZsC4@google.com>
- <c12582e0-f2c8-d001-1fc1-6f7e17eeba7c@kernel.org>
- <ZELu0yKwnGg3iBmA@google.com>
- <335b63b0-5a9e-472d-2cce-c0158ae93cf3@kernel.org>
- <20230424060139.GA9805@lst.de>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230424060139.GA9805@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/24/23 15:01, Christoph Hellwig wrote:
-> On Sat, Apr 22, 2023 at 07:25:33AM +0900, Damien Le Moal wrote:
->>>> for allocating blocks. This is a resource management issue.
->>>
->>> Ok, so it seems I overlooked there might be something in the zone allocation
->>> policy. So, f2fs already manages 6 open zones by design.
->>
->> Yes, so as long as the device allows for at least 6 active zones, there are no
->> issues with f2fs.
-> 
-> I don't think it's quite as rosy, because f2fs can still schedule
-> I/O to the old zone after already scheduling I/O to a new zone for
-> any of these 6 slots.  It'll need code to wait for all I/O to the old
-> zone to finish first, similar to btrfs.
 
-Indeed. Good point.
+On Tue, 25 Apr 2023 11:41:54 +0800, Ming Lei wrote:
+> submit_bio() always uses bio->bi_bdev->bd_has_submit_bio to decide if
+> disk's ->submit_bio() is called, and bio->bi_bdev could point to one
+> partition device.
+> 
+> So we have to sync part bdev's ->bd_has_submit_bio with disk's.
+> 
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] block: sync part's ->bd_has_submit_bio with disk's
+      (no commit info)
+
+Best regards,
+-- 
+Jens Axboe
+
+
 
