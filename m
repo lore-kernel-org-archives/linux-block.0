@@ -2,162 +2,144 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A9EC6FD18
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 11:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3E1C77B61
+	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 11:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233615AbjDYLJt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 07:09:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59628 "EHLO
+        id S233947AbjDYLKM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 07:10:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233717AbjDYLJp (ORCPT
+        with ESMTP id S233757AbjDYLKD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 07:09:45 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 581D410E6
-        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 04:09:25 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230425110914euoutp0167238bc9d22190a13ae8989fe33c4dc1~ZKPGncx8K3109531095euoutp01V
-        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 11:09:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230425110914euoutp0167238bc9d22190a13ae8989fe33c4dc1~ZKPGncx8K3109531095euoutp01V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1682420954;
-        bh=Gc4jFl8KquubYFrW8xZv5Gqj3fqTntNDZhVWlXh2E4U=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=ZpSJzBmgfMItZFL1GydmZGuV7A9DANq+FLr4aQyVdi24VNkp/SuxI81tY4tcnNRaV
-         3TrgU08eOtDduHCeRgPsbbuWnbT/tHv4qBl75aPD8lMuKfp3gUQQybyMeeCLzIy3wC
-         b/oxmLOkUJ6jVhljx5E7e8dQa4fwLiz5ctZJI/P0=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230425110913eucas1p16ebb723297aa94d2766c734d83183e6b~ZKPGNItUH1270512705eucas1p1e;
-        Tue, 25 Apr 2023 11:09:13 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 6E.2B.42423.9D4B7446; Tue, 25
-        Apr 2023 12:09:13 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230425110913eucas1p22cf9d4c7401881999adb12134b985273~ZKPFz5aeZ0812808128eucas1p2k;
-        Tue, 25 Apr 2023 11:09:13 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230425110913eusmtrp2c46b12ef17d135e5deccacac75179df6~ZKPFzHa7Q1014910149eusmtrp2o;
-        Tue, 25 Apr 2023 11:09:13 +0000 (GMT)
-X-AuditID: cbfec7f2-25927a800002a5b7-37-6447b4d905ba
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 2C.57.10549.9D4B7446; Tue, 25
-        Apr 2023 12:09:13 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20230425110913eusmtip20311b17f49b03fde53a0b57a9dc3c58f~ZKPFnrhol0897708977eusmtip2H;
-        Tue, 25 Apr 2023 11:09:13 +0000 (GMT)
-Received: from localhost (106.110.32.140) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Tue, 25 Apr 2023 12:09:12 +0100
-Date:   Tue, 25 Apr 2023 13:00:25 +0200
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     Matthew Wilcox <willy@infradead.org>
-CC:     Luis Chamberlain <mcgrof@kernel.org>, <hughd@google.com>,
-        <akpm@linux-foundation.org>, <brauner@kernel.org>,
-        <djwong@kernel.org>, <da.gomez@samsung.com>,
-        <a.manzanares@samsung.com>, <dave@stgolabs.net>,
-        <yosryahmed@google.com>, <keescook@chromium.org>, <hare@suse.de>,
-        <kbusch@kernel.org>, <patches@lists.linux.dev>,
-        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
-        <p.raghav@samsung.com>
-Subject: Re: [RFC 2/8] shmem: convert to use folio_test_hwpoison()
-Message-ID: <20230425110025.7tq5vdr2jfom2zdh@localhost>
+        Tue, 25 Apr 2023 07:10:03 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC6EA13C05;
+        Tue, 25 Apr 2023 04:09:58 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q5K5s0B3mz4f41GZ;
+        Tue, 25 Apr 2023 19:09:53 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbEAtUdk4hV8IA--.17578S3;
+        Tue, 25 Apr 2023 19:09:54 +0800 (CST)
+Subject: Re: [PATCH] Remove blkg node after destroying blkg
+To:     Tao Su <tao1.su@linux.intel.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230425075911.839539-1-tao1.su@linux.intel.com>
+ <aa5de32c-c92b-d032-e9bb-83d2436ff72c@huawei.com>
+ <ZEegQCCZ96ij6mw5@linux.bj.intel.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <6d486f85-87ed-fa35-00cb-4c37fef17536@huaweicloud.com>
+Date:   Tue, 25 Apr 2023 19:09:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <ZEMRbcHSQqyek8Ov@casper.infradead.org>
-X-Originating-IP: [106.110.32.140]
-X-ClientProxiedBy: CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMKsWRmVeSWpSXmKPExsWy7djPc7o3t7inGDyfrW4xZ/0aNovXhz8x
-        Wqy+uYbR4vITPos9iyYxWTz91MdiMenQNUaLM925FntvaVvs2XuSxeLyrjlsFvfW/Ge1uDHh
-        KVD5iUuMFr9/AMW274p0EPCY3XCRxWPBplKPzSu0PDat6mTz2PRpErvHiRm/WTxebJ7J6DF1
-        dr3H5tPVHp83yQVwRXHZpKTmZJalFunbJXBl/LhxhbngMG/F+iutbA2M07m7GDk4JARMJKas
-        l+5i5OIQEljBKLHvxHs2COcLo8SrO/9Zuhg5gZzPjBJ778WC2CANp1Z9Y4EoWs4ocWTLT0YI
-        B6jozPSbUO1bGCX+/v3GCtLCIqAq0behjxVkH5uAlkRjJzuIKSKgIfFmixFIObPATWaJi7cn
-        MoOUCws4Sfye38AEYvMKmEs8vH0ayhaUODnzCdhFnEBXvFm5gRHiIiWJhs1nWCDsWom9zQfY
-        QYZKCOzmlHg7YzITRMJF4smTDnYIW1ji1fEtULaMxP+d86FqqiWe3vjNDNHcwijRv3M9GySQ
-        rCX6zuSA1DALZEicWd3FCBF2lHjazQFh8knceCsIUcEnMWnbdGaIMK9ER5sQxHA1idX33rBA
-        hGUkzn3im8CoNAvJX7OQjIewdSQW7P7ENguog1lAWmL5Pw4IU1Ni/S79BYysqxjFU0uLc9NT
-        iw3zUsv1ihNzi0vz0vWS83M3MQLT4el/xz/tYJz76qPeIUYmDsZDjBIczEoivLyV7ilCvCmJ
-        lVWpRfnxRaU5qcWHGKU5WJTEebVtTyYLCaQnlqRmp6YWpBbBZJk4OKUamLqjbhv1RQRvNfxZ
-        Ofdz7pdfIsbRuUz7tuvJBEZITj5/+ljptPIHefFCDoZx5+IX35uxYG2NfFTmI9N7P904ufmX
-        Xmp+VZ16tKtpJUOW3pYXN7jEc/hrODd81vxr4xJaOClXTGhHdPzcGxlflv8V/68cqNKwaJ1O
-        mYeOpI1J71Y1kffntvo/fiH/Ilq6RslVvXJdzNmbqWZd64xN3p73uXVSU87detXKo5WX1eMV
-        Ao9Kfz+k/czg9UcW34PpUyTFOg1lDqzftCfGLnHmkrNi5287vkyXDX4mVCy1PfNa8urn2/0S
-        zdz0/q30Y3udvV5Uaeq6r7Eaa3svZ3XrPWT1/fFvyY6n5ZFFVaoVTpkZSizFGYmGWsxFxYkA
-        lh6Iw/YDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrDIsWRmVeSWpSXmKPExsVy+t/xe7o3t7inGByezmsxZ/0aNovXhz8x
-        Wqy+uYbR4vITPos9iyYxWTz91MdiMenQNUaLM925FntvaVvs2XuSxeLyrjlsFvfW/Ge1uDHh
-        KVD5iUuMFr9/AMW274p0EPCY3XCRxWPBplKPzSu0PDat6mTz2PRpErvHiRm/WTxebJ7J6DF1
-        dr3H5tPVHp83yQVwRenZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZpKTm
-        ZJalFunbJehlzJ4uWNDMXfHo8FnGBsYPHF2MnBwSAiYSp1Z9Y+li5OIQEljKKHFz/2RGiISM
-        xMYvV1khbGGJP9e62CCKPjJKfN/2gx3C2cIocWDTFLAOFgFVib4NfUAdHBxsAloSjZ3sIKaI
-        gIbEmy1GIOXMAjeZJS7ensgMUi4s4CTxe34DE4jNK2Au8fD2aSaImRMZJb7134NKCEqcnPmE
-        BcRmFtCRWLD7ExvIUGYBaYnl/8A+4AT64M3KDVBHK0k0bD7DAmHXSnS+Os02gVF4FpJJs5BM
-        moUwaQEj8ypGkdTS4tz03GJDveLE3OLSvHS95PzcTYzAaN927OfmHYzzXn3UO8TIxMF4iFGC
-        g1lJhJe30j1FiDclsbIqtSg/vqg0J7X4EKMpMCQmMkuJJucD001eSbyhmYGpoYmZpYGppZmx
-        kjivZ0FHopBAemJJanZqakFqEUwfEwenVAPTzoR9s8tC7lw6lCf9LeB75a7fOgn/fGfWSSye
-        7H/ovKLE3nNn+zuXXe9qa5R6qMJxVER3Xf6R1as/rP2zI3JXwpLLN/07w2YcO66fVhVg7is7
-        52dP4/yCG1qTGH3/1KVYyz7xOryn46nV0q5Zk5gu6+1JnxOs7rCri/H620VaXd7J9xbNSAxM
-        3ddWENPxOEpYV3R3J8/PQnstg+fS6cXiE+uyGh9Pb315ifVCoTvnn121bx/VKVy/+uVF0Puc
-        x8el7k9+ma21/Wnhpcs/P4QLV5/4s0XUfaLbTPPtlr+rvu/cUOFnwcJn9bNVf4Z1ZlyRxxw2
-        Qesvm3UN1F6/VHSR7dmfFdrX82umSqrQd8kUJZbijERDLeai4kQAA3U0pX8DAAA=
-X-CMS-MailID: 20230425110913eucas1p22cf9d4c7401881999adb12134b985273
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----t5a.LUSxvZ8UNChTG7xN-7.3lkNPyOm_Ty_DrQaWPiPzU4rz=_ea8fb_"
-X-RootMTR: 20230425110913eucas1p22cf9d4c7401881999adb12134b985273
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230425110913eucas1p22cf9d4c7401881999adb12134b985273
-References: <20230421214400.2836131-1-mcgrof@kernel.org>
-        <20230421214400.2836131-3-mcgrof@kernel.org>
-        <ZEMRbcHSQqyek8Ov@casper.infradead.org>
-        <CGME20230425110913eucas1p22cf9d4c7401881999adb12134b985273@eucas1p2.samsung.com>
+In-Reply-To: <ZEegQCCZ96ij6mw5@linux.bj.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBnHbEAtUdk4hV8IA--.17578S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxuFy8tFW3JrW8CF1Dur4DJwb_yoW5Jw17pw
+        47G3WYya95tFn29a10g3Wagw40qa1kGry5W3yDWFy5Cr9rXrn2qF1j9rWDuF9rZF47Grs0
+        vrW5tryakw48u3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------t5a.LUSxvZ8UNChTG7xN-7.3lkNPyOm_Ty_DrQaWPiPzU4rz=_ea8fb_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+Hi,
 
-On Fri, Apr 21, 2023 at 11:42:53PM +0100, Matthew Wilcox wrote:
-> On Fri, Apr 21, 2023 at 02:43:54PM -0700, Luis Chamberlain wrote:
-> > The PageHWPoison() call can be converted over to the respective folio call
-> > folio_test_hwpoison(). This introduces no functional changes.
+在 2023/04/25 17:41, Tao Su 写道:
+> On Tue, Apr 25, 2023 at 04:09:34PM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2023/04/25 15:59, Tao Su 写道:
+>>> Kernel hang when poweroff or reboot, due to infinite restart in function
+>>> blkg_destroy_all. It will goto restart label when a batch of blkgs are
+>>> destroyed, but not remove blkg node in blkg_list. So the blkg_list is
+>>> same in every 'restart' and result in kernel hang.
+>>>
+>>> By adding list_del to remove blkg node after destroying, can solve this
+>>> kernel hang issue and satisfy the previous will to 'restart'.
+>>>
+>>> Reported-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+>>> Tested-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+>>> Tested-by: Farrah Chen <farrah.chen@intel.com>
+>>> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+>>> ---
+>>>    block/blk-cgroup.c | 1 +
+>>>    1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>>> index bd50b55bdb61..960eb538a704 100644
+>>> --- a/block/blk-cgroup.c
+>>> +++ b/block/blk-cgroup.c
+>>> @@ -530,6 +530,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+>>>    		spin_lock(&blkcg->lock);
+>>>    		blkg_destroy(blkg);
+>>> +		list_del(&blkg->q_node);
+>>
+>> blkg should stay on the queue list until blkg_free_workfn(), otherwise
+>> parent blkg can be freed before child, which will cause some known
+>> issue.
 > 
-> Um, no.  Nobody should use folio_test_hwpoison(), it's a nonsense.
+> Yes, directly removing blkg node is not appropriate, which I noticed some
+> comments in blkg_destroy(), thanks for pointing out this issue.
 > 
-> Individual pages are hwpoisoned.  You're only testing the head page
-> if you use folio_test_hwpoison().  There's folio_has_hwpoisoned() to
-> test if _any_ page in the folio is poisoned.  But blindly converting
-> PageHWPoison to folio_test_hwpoison() is wrong.
-
-I see a pattern in shmem.c where first the head is tested and for large
-folios, any of pages in the folio is tested for poison flag. Should we
-factor it out as a helper in shmem.c and use it here?
-
-static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
-...
-	if (folio_test_hwpoison(folio) ||
-	    (folio_test_large(folio) &&
-	     folio_test_has_hwpoisoned(folio))) {
-	..
+>>
+>> I think this hung happens when total blkg is greater than
+>> BLKG_DESTROY_BATCH_SIZE, right?
 > 
-> If anyone knows how to poison folio_test_hwpoison() to make it not
-> work, I'd appreciate it.
+> Yes, you are right.
+> 
+>>
+>> Can you try if following patch fix your problem?
+> 
+> This patch can also fix my problem, and indeed is a more secure way.
 
-IMO, I think it will be clear if folio_test_hwpoison checks if any of the
-page in the folio is poisoned and we should have a explicit helper such
-as folio_test_head_hwpoison if the callers want to only test if the head
-page is poisoned (although I am not sure if that is useful).
+Thanks for the test, for a better solution, I think 'blkcg_mutex' can
+be used to protect 'blkg->q_node' list instead of 'queue_lock', so that
+the 'restart' can be removed because softlockup can be avoided.
 
-------t5a.LUSxvZ8UNChTG7xN-7.3lkNPyOm_Ty_DrQaWPiPzU4rz=_ea8fb_
-Content-Type: text/plain; charset="utf-8"
+Thanks,
+Kuai
 
+> 
+> Thanks,
+> Tao
+> 
+>>
+>> index 1c1ebeb51003..0ecb4cce8af2 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -527,6 +527,9 @@ static void blkg_destroy_all(struct gendisk *disk)
+>>          list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
+>>                  struct blkcg *blkcg = blkg->blkcg;
+>>
+>> +               if (hlist_unhashed(&blkg->blkcg_node))
+>> +                       continue;
+>> +
+>>                  spin_lock(&blkcg->lock);
+>>                  blkg_destroy(blkg);
+>>                  spin_unlock(&blkcg->lock);
+>>
+>>>    		spin_unlock(&blkcg->lock);
+>>>    		/*
+>>>
+> 
+> .
+> 
 
-------t5a.LUSxvZ8UNChTG7xN-7.3lkNPyOm_Ty_DrQaWPiPzU4rz=_ea8fb_--
