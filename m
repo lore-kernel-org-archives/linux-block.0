@@ -2,160 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21386C77B7F
-	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 13:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E58D5C77B78
+	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 13:20:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241079AbjDZNJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Apr 2023 09:09:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43434 "EHLO
+        id S241119AbjDZNUG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Apr 2023 09:20:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241014AbjDZNJ3 (ORCPT
+        with ESMTP id S241117AbjDZNUF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2023 09:09:29 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27ED4219
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 06:09:25 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230426130922euoutp014ca27d058f6c2cdd4fcba6900eeda154~ZfhRywEoW1142511425euoutp01f
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 13:09:22 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230426130922euoutp014ca27d058f6c2cdd4fcba6900eeda154~ZfhRywEoW1142511425euoutp01f
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1682514562;
-        bh=hC8Egsn//5pKfzQNXUjSLdNqRLwtnUlIQyrXHxctICQ=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=cBYqWZmMXcchH17Eyn+QT7YdRVdpLw4LpuyLcprQb3h0lsNhL4S9HgXw96RYiHTTB
-         IX6Rfda+APow/ExY3ZeoNoTohJmw9AdRr4gkbKKRNw1bqI/psMKD0YyqeBo4iEkrty
-         1uoU27T5HB+3MLA5du0L4VL1mLmHthHTqAZ14Njw=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20230426130921eucas1p208bd40a0cac655a2b20580b52f54fdeb~ZfhRbsNVx1807918079eucas1p2-;
-        Wed, 26 Apr 2023 13:09:21 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 5F.D7.35386.18229446; Wed, 26
-        Apr 2023 14:09:21 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230426130921eucas1p279078812be7e8d50c1305e47cea53661~ZfhREv2kN1808518085eucas1p2j;
-        Wed, 26 Apr 2023 13:09:21 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230426130921eusmtrp166b0a11733c8dfdc952a32ae2728776d~ZfhRDcP_d0593705937eusmtrp1m;
-        Wed, 26 Apr 2023 13:09:21 +0000 (GMT)
-X-AuditID: cbfec7f4-cdfff70000028a3a-1f-6449228132ec
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id FC.EA.14344.18229446; Wed, 26
-        Apr 2023 14:09:21 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230426130921eusmtip1aa55278beda33ec5aa586b1123e22dda~ZfhQ40EO-0298802988eusmtip1x;
-        Wed, 26 Apr 2023 13:09:21 +0000 (GMT)
-Received: from localhost (106.110.32.140) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Wed, 26 Apr 2023 14:09:20 +0100
-Date:   Wed, 26 Apr 2023 15:00:33 +0200
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-nfs@vger.kernel.org>, <cluster-devel@redhat.com>,
-        <linux-xfs@vger.kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        David Howells <dhowells@redhat.com>, <linux-mm@kvack.org>,
-        <linux-fsdevel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        <linux-ext4@vger.kernel.org>, <ceph-devel@vger.kernel.org>,
-        <p.raghav@samsung.com>
-Subject: Re: [f2fs-dev] [PATCH 16/17] block: use iomap for writes to block
- devices
-Message-ID: <20230426130033.ps363bz472jwlgl6@localhost>
+        Wed, 26 Apr 2023 09:20:05 -0400
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AFE2A2;
+        Wed, 26 Apr 2023 06:20:02 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0Vh3W2.4_1682515198;
+Received: from 30.221.148.51(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0Vh3W2.4_1682515198)
+          by smtp.aliyun-inc.com;
+          Wed, 26 Apr 2023 21:19:59 +0800
+Message-ID: <24179a47-ab37-fa32-d177-1086668fbd3d@linux.alibaba.com>
+Date:   Wed, 26 Apr 2023 21:19:57 +0800
 MIME-Version: 1.0
-In-Reply-To: <20230424054926.26927-17-hch@lst.de>
-X-Originating-IP: [106.110.32.140]
-X-ClientProxiedBy: CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrLKsWRmVeSWpSXmKPExsWy7djPc7qNSp4pBp++qVnMWb+GzWL13X42
-        iw83JzFZnFz9mM3iXdNvFovLT/gsVq4+ymSx95a2xcx5d9gsLi1yt9iz9yRQatccNot7a/6z
-        Wlw4cJrVYtefHewWz3ZvZLb4/WMOm4Ogx+YVWh6Xz5Z6bFrVyeax6dMkdo8TM36zeOxe8JnJ
-        Y/fNBjaP9/uusnmsmHaRyePzJrkArigum5TUnMyy1CJ9uwSujJenLrMUzOOo+DntMlsD4wW2
-        LkZODgkBE4nl01aydzFycQgJrGCUOHdvIzNIQkjgC6PEi2tcEInPjBKzLk5hhuk4vXUrK0Ri
-        OaPE/y2TWOGqjly+wgbhbGGUmHR2NQtIC4uAqsTft5eBEhwcbAJaEo2d7CBhEQEliaevzjKC
-        1DML7GaRaDh9ECwhLBAi0bN9Flg9r4C5REt3FUiYV0BQ4uTMJ2AjOQUMJWatewN1kZJEw+Yz
-        LBB2rcTe5gNg/0gInOOUmPdjP9SjLhKt75tZIWxhiVfHt7BD2DISpyf3QDVXSzy98ZsZormF
-        UaJ/53qwIyQErCX6zuSA1DALZEj8vDsTao6jxKJjTcwQJXwSN94KQpTwSUzaNh0qzCvR0SYE
-        Ua0msfreGxaIsIzEuU98ExiVZiF5bBaS+RC2jsSC3Z/YZgF1MAtISyz/xwFhakqs36W/gJF1
-        FaN4amlxbnpqsVFearlecWJucWleul5yfu4mRmCKPP3v+JcdjMtffdQ7xMjEwXiIUYKDWUmE
-        l7fSPUWINyWxsiq1KD++qDQntfgQozQHi5I4r7btyWQhgfTEktTs1NSC1CKYLBMHp1QD05zy
-        FeGfFk7Z2PNfZ3GLZ/yqt91S15PYD263eK2fVKDim7UpI07dfb+U5b1fSm+830svCT62z/fy
-        aifJhfP2LHaU2ss6pU0y7Zo/x49yxx1ayzT6DTcVa36cFxXU8Cll06OOy45p1+yPTE3Nfzfz
-        569vexI3bYl807uk2Tvx1STNPVO2Ptmoe/alyUuVmGCdRVHpiqtFCo06FthUmleJ28jN0dWO
-        V7HLCjg63exGndcJy9jsiT6TYq6cuxe/Osep43Lz46lF+ptSf1tZ+nysKL7FmWj4YiVb67Zl
-        DnoOnHdYCv/f5ZV6IH30wVNlh9kRJXelvs1onfb2xKu6d7zPeM1Vv/VNzzJJXKvwk/1srhJL
-        cUaioRZzUXEiAHGPVigABAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsVy+t/xu7qNSp4pBmee8VnMWb+GzWL13X42
-        iw83JzFZnFz9mM3iXdNvFovLT/gsVq4+ymSx95a2xcx5d9gsLi1yt9iz9yRQatccNot7a/6z
-        Wlw4cJrVYtefHewWz3ZvZLb4/WMOm4Ogx+YVWh6Xz5Z6bFrVyeax6dMkdo8TM36zeOxe8JnJ
-        Y/fNBjaP9/uusnmsmHaRyePzJrkArig9m6L80pJUhYz84hJbpWhDCyM9Q0sLPSMTSz1DY/NY
-        KyNTJX07m5TUnMyy1CJ9uwS9jLn9DSwF91grLp08w9bAuJKli5GTQ0LAROL01q2sXYxcHEIC
-        SxklNv/7xwaRkJHY+OUqK4QtLPHnWhcbRNFHRokndxYwQjhbGCWezrwO1sEioCrx9+1lIJuD
-        g01AS6Kxkx0kLCKgJPH01VmwemaB3SwSK2c0MYMkhAVCJHq2zwKr5xUwl2jprgIJCwmESdzp
-        3ga2mFdAUOLkzCdglzIL6Egs2P0JrJxZQFpi+T8OkDCngKHErHVvmCHuVJJo2HwG6rFaic5X
-        p9kmMArPQjJpFpJJsxAmLWBkXsUoklpanJueW2ykV5yYW1yal66XnJ+7iREY/duO/dyyg3Hl
-        q496hxiZOBgPMUpwMCuJ8PJWuqcI8aYkVlalFuXHF5XmpBYfYjQFBsREZinR5Hxg+skriTc0
-        MzA1NDGzNDC1NDNWEuf1LOhIFBJITyxJzU5NLUgtgulj4uCUamDaXttiKlzVfHqHju2S6Rrv
-        bx2IusPDuPFD0hOBklvLd31/wNQdKtfzlN26OtVsb+DbOaqnu3r+vl6XuKoq+2S1/wIN/Yzu
-        rfPOW3Z4yYXqmLvf2RoQMH3xyYaOpbnTUvsfBkalJejJ2UfeTP9dpunZFx454VGZVe75/cFM
-        UgozeypmSbXeWfX/TafXztOplyOXPN9bfyXBJMN1nUvu89T2Z/a6fem9t/LOT5A9PIU/au/8
-        001GUY8ze+sCfotHyrLceXKrzpZ3g88UsdtPz/z7bfx69hyJQxe/CPLPWhzS7D11xeFsW+V3
-        ttv/54ukFvVLFcSwKvwM8jdZs1XkNrfBylTbhH5PRZ/TUpf4jyqxFGckGmoxFxUnAgAAg+8w
-        hwMAAA==
-X-CMS-MailID: 20230426130921eucas1p279078812be7e8d50c1305e47cea53661
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----0IIwcNA8CeD.s59tlljyDEq3yyVAinti4bQgYoqzE0B37Kwt=_fbc0e_"
-X-RootMTR: 20230426130921eucas1p279078812be7e8d50c1305e47cea53661
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230426130921eucas1p279078812be7e8d50c1305e47cea53661
-References: <20230424054926.26927-1-hch@lst.de>
-        <20230424054926.26927-17-hch@lst.de>
-        <CGME20230426130921eucas1p279078812be7e8d50c1305e47cea53661@eucas1p2.samsung.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.0
+Content-Language: en-US
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+To:     linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: another nvme pssthrough design based on nvme hardware queue file
+ abstraction
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------0IIwcNA8CeD.s59tlljyDEq3yyVAinti4bQgYoqzE0B37Kwt=_fbc0e_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+hi all,
 
-On Mon, Apr 24, 2023 at 07:49:25AM +0200, Christoph Hellwig wrote:
-> Use iomap in buffer_head compat mode to write to block devices.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/Kconfig |  1 +
->  block/fops.c  | 33 +++++++++++++++++++++++++++++----
->  2 files changed, 30 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 941b2dca70db73..672b08f0096ab4 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -5,6 +5,7 @@
->  menuconfig BLOCK
->         bool "Enable the block layer" if EXPERT
->         default y
-> +       select IOMAP
+Recently we start to test nvme passthrough feature, which is based on io_uring. Originally we
+thought its performance would be much better than normal polled nvme test, but test results
+show that it's not:
+$ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O0 -n1  -u1 /dev/ng1n1
+IOPS=891.49K, BW=435MiB/s, IOS/call=32/31
+IOPS=891.07K, BW=435MiB/s, IOS/call=31/31
 
-This needs to be FS_IOMAP.
+$ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O1 -n1 /dev/nvme1n1
+IOPS=807.81K, BW=394MiB/s, IOS/call=32/31
+IOPS=808.13K, BW=394MiB/s, IOS/call=32/32
 
->         select SBITMAP
->         help
->  	 Provide block layer support for the kernel.
+about 10% iops improvement, I'm not saying its not good, just had thought it should
+perform much better. After reading codes, I finds that this nvme passthrough feature
+is still based on blk-mq, use perf tool to analyse and there are some block layer
+overheads that seems somewhat big:
+1. 2.48%  io_uring  [kernel.vmlinux]  [k] blk_stat_add
+In our kernel config, no active ﻿q->stats->callbacks, but still has this overhead.
 
-------0IIwcNA8CeD.s59tlljyDEq3yyVAinti4bQgYoqzE0B37Kwt=_fbc0e_
-Content-Type: text/plain; charset="utf-8"
+2. 0.97%  io_uring  [kernel.vmlinux]  [k] bio_associate_blkg_from_css
+    0.85%  io_uring  [kernel.vmlinux]  [k] bio_associate_blkg
+    0.74%  io_uring  [kernel.vmlinux]  [k] blkg_lookup_create
+For nvme passthrough feature, it tries to dispatch nvme commands to nvme
+controller directly, so should get rid of these overheads.
 
+3. 3.19%  io_uring  [kernel.vmlinux]  [k] __rcu_read_unlock
+    2.65%  io_uring  [kernel.vmlinux]  [k] __rcu_read_lock
+Frequent rcu_read_lock/unlcok overheads, not sure whether we can improve a bit.
 
-------0IIwcNA8CeD.s59tlljyDEq3yyVAinti4bQgYoqzE0B37Kwt=_fbc0e_--
+4. 7.90%  io_uring  [nvme]            [k] nvme_poll
+    3.59%  io_uring  [nvme_core]       [k] nvme_ns_chr_uring_cmd_iopoll
+    2.63%  io_uring  [kernel.vmlinux]  [k] blk_mq_poll_classic
+    1.88%  io_uring  [nvme]            [k] nvme_poll_cq
+    1.74%  io_uring  [kernel.vmlinux]  [k] bio_poll
+    1.89%  io_uring  [kernel.vmlinux]  [k] xas_load
+    0.86%  io_uring  [kernel.vmlinux]  [k] xas_start
+    0.80%  io_uring  [kernel.vmlinux]  [k] xas_start
+Seems that the block poll operation call chain is somewhat deep, also
+not sure whether we can improve it a bit, and the xas overheads also
+looks big, it's introduced by https://lore.kernel.org/all/20220307064401.30056-7-ming.lei@redhat.com/
+which fixed one use-after-free bug.
+
+5. other blocker overhead I don't spend time to look into.
+
+Some of our clients are interested in nvme passthrough feature, they visit
+nvme devices by open(2) and read(2)/write(2) nvme device files directly, bypass
+filesystem, so they'd like to try nvme passthrough feature, to gain bigger iops, but
+currenty performance seems not that good. And they don't want to use spdk yet,
+still try to build fast storage based on linux kernel io stack for various reasons  :)
+
+So I'd like to propose a new nvme passthrough design here, which may improve
+performance a lot. Here are just rough design ideas here, not start to code yet.
+  1. There are three types of nvme hardware queues, "default", "write" and "poll",
+currently all these queues are visible to block layer, blk-mq will map these queues
+properly.  Here this new design will add two new nvme hardware queues, name them
+"user_irq" and "user_poll" queues, which will need to add two nvme module parameters,
+similar to current "write_queues" and "poll_queues".
+  2. "user_irq" and "user_poll" queues will not be visible to block layer, and will create
+corresponding char device file for them,  that means nvme hardware queues will be
+abstracted as linux file, not sure whether to support read_iter or write_iter, but
+uring_cmd() interface will be supported firstly. user_irq queue will still have irq, user_poll
+queue will support poll.
+  3. Finally the data flow will look like below in example of user_irq queue:
+io issue: io_uring  uring_cmd >> prep nvme command in its char device's uring_cmd() >> submit to nvme.
+io reap: find io_uring request by nvme command id, and call uring_cmd_done for it.
+Yeah, need to build association between io_uring request and nvme command id.
+
+Possible advantages:
+1. Bypass block layer thoroughly.
+2. Since now we have file abstraction, it can support mmap operation, we can mmap
+nvme hardware queue's cqes to user space, then we can implement a much efficient
+poll. We may run nvme_cqe_pending()'s logic in user space, only it shows there are nvme
+requests completed, can we enter kernel to reap them. As I said before, current
+kernel poll chain looks deep, with this method, we can eliminate much useless iopoll
+operation. In my t/io_uring tests, below bpftrace script shows that half of iopoll operations
+are useless:
+BEGIN
+{
+    @a = 0;
+    @b = 0;
+}
+
+kretprobe:nvme_poll
+{
+    if (retval == 0) {
+        @a++;
+    } else{
+        @b++;
+    }
+}
+
+3. With file based hardware queue abstraction, we may implement various qos
+strategy in user space based queue depth control, or more flexible control, user
+space apps can map cpu to hardware queue arbitrarily, not like current blk-mq,
+which has fixed map strategy.
+
+Finally, as I said before, current it's just rough ideas, and there will definitely be
+overlapping functionality with blk-mq, at least this new char device file needs
+to map user space add to pages, then nvme sgls or prps could be set properly.
+
+Any feedback are welcome, thanks.
+
+Regards,
+Xiaoguang Wang
