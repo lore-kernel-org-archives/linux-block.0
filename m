@@ -2,120 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 279F5C77B61
-	for <linux-block@archiver.kernel.org>; Tue, 25 Apr 2023 22:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0926C77B61
+	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 01:13:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234807AbjDYWrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 18:47:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57134 "EHLO
+        id S238474AbjDZBNQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Apr 2023 21:13:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231834AbjDYWri (ORCPT
+        with ESMTP id S238472AbjDZBNP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 18:47:38 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6951083FF;
-        Tue, 25 Apr 2023 15:47:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=87iK9xe7jEqj8FLY0xzpJ9YnRE4JGcq0drEI9hyBNkg=; b=4GfYCANTWjgXmoHN3XcHAVqKhO
-        Wm5QWX6++YtnjHBHGHTg60GjAXJv2MBHw1WsvoLZQiL4aS3HYRPL8o038Zyy//LYPN/RYVgeyVeQM
-        X6i7qDdmf+qoG5ZqIXTdD3rlXXv2jPXqw4g075XwfVDxzP3KdNKp6mh5iKdURhV0fWZfqvoVebtTK
-        XEdzUgPdfKi+1WkSFhz9VnapS1pwd6iQxOqpytTjH2F6h2JPQXoFKpKBlVqziSdShIbFjFi/DVJXW
-        MivQsut8Fi7nthd99bs6L4ydH/A6Eucfaj0zSPGiVhbBOGE0y1pHBncki098sN+u6OuPqW7q7irHu
-        BJGorXPQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1prRRU-002Lqt-2S;
-        Tue, 25 Apr 2023 22:47:24 +0000
-Date:   Tue, 25 Apr 2023 15:47:24 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Pankaj Raghav <p.raghav@samsung.com>, hughd@google.com,
-        willy@infradead.org
-Cc:     akpm@linux-foundation.org, brauner@kernel.org, djwong@kernel.org,
-        da.gomez@samsung.com, a.manzanares@samsung.com, dave@stgolabs.net,
-        yosryahmed@google.com, keescook@chromium.org, hare@suse.de,
-        kbusch@kernel.org, patches@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 2/8] shmem: convert to use folio_test_hwpoison()
-Message-ID: <ZEhYfHePaLpoUhbp@bombadil.infradead.org>
-References: <20230421214400.2836131-1-mcgrof@kernel.org>
- <20230421214400.2836131-3-mcgrof@kernel.org>
- <ZEMRbcHSQqyek8Ov@casper.infradead.org>
- <CGME20230425110913eucas1p22cf9d4c7401881999adb12134b985273@eucas1p2.samsung.com>
- <20230425110025.7tq5vdr2jfom2zdh@localhost>
+        Tue, 25 Apr 2023 21:13:15 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60F7B209;
+        Tue, 25 Apr 2023 18:13:13 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q5gpr6zJ6z4f4tZq;
+        Wed, 26 Apr 2023 09:13:08 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgBH_rGkekhknfmkIA--.45975S3;
+        Wed, 26 Apr 2023 09:13:10 +0800 (CST)
+Subject: Re: [PATCH] Remove blkg node after destroying blkg
+To:     Yu Kuai <yukuai1@huaweicloud.com>, Tao Su <tao1.su@linux.intel.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230425075911.839539-1-tao1.su@linux.intel.com>
+ <aa5de32c-c92b-d032-e9bb-83d2436ff72c@huawei.com>
+ <ZEegQCCZ96ij6mw5@linux.bj.intel.com>
+ <6d486f85-87ed-fa35-00cb-4c37fef17536@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9f5eeba2-fbc9-3b56-c7ed-d8ecc1c888b3@huaweicloud.com>
+Date:   Wed, 26 Apr 2023 09:13:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230425110025.7tq5vdr2jfom2zdh@localhost>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <6d486f85-87ed-fa35-00cb-4c37fef17536@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBH_rGkekhknfmkIA--.45975S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFWkKw4rXrW8KFy7XrW3trb_yoW8KryUpa
+        1xJ3WYyay5JFn29w1Iq3Wag348ta18J34UWw4UWFyrCr9FqryvqF129r1q9Fy7ZF4xGrs0
+        vr45Jrya9w1j9w7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 25, 2023 at 01:00:25PM +0200, Pankaj Raghav wrote:
-> On Fri, Apr 21, 2023 at 11:42:53PM +0100, Matthew Wilcox wrote:
-> > On Fri, Apr 21, 2023 at 02:43:54PM -0700, Luis Chamberlain wrote:
-> > > The PageHWPoison() call can be converted over to the respective folio call
-> > > folio_test_hwpoison(). This introduces no functional changes.
-> > 
-> > Um, no.  Nobody should use folio_test_hwpoison(), it's a nonsense.
-> > 
-> > Individual pages are hwpoisoned.  You're only testing the head page
-> > if you use folio_test_hwpoison().  There's folio_has_hwpoisoned() to
-> > test if _any_ page in the folio is poisoned.  But blindly converting
-> > PageHWPoison to folio_test_hwpoison() is wrong.
+Hi,
+
+在 2023/04/25 19:09, Yu Kuai 写道:
+> Hi,
 > 
-> I see a pattern in shmem.c where first the head is tested and for large
-> folios, any of pages in the folio is tested for poison flag. Should we
-> factor it out as a helper in shmem.c and use it here?
+> 在 2023/04/25 17:41, Tao Su 写道:
+>> On Tue, Apr 25, 2023 at 04:09:34PM +0800, Yu Kuai wrote:
+>>> Hi,
+>>>
+>>> 在 2023/04/25 15:59, Tao Su 写道:
+>>>> Kernel hang when poweroff or reboot, due to infinite restart in 
+>>>> function
+>>>> blkg_destroy_all. It will goto restart label when a batch of blkgs are
+>>>> destroyed, but not remove blkg node in blkg_list. So the blkg_list is
+>>>> same in every 'restart' and result in kernel hang.
+>>>>
+>>>> By adding list_del to remove blkg node after destroying, can solve this
+>>>> kernel hang issue and satisfy the previous will to 'restart'.
+>>>>
+>>>> Reported-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+>>>> Tested-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+>>>> Tested-by: Farrah Chen <farrah.chen@intel.com>
+>>>> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+>>>> ---
+>>>>    block/blk-cgroup.c | 1 +
+>>>>    1 file changed, 1 insertion(+)
+>>>>
+>>>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>>>> index bd50b55bdb61..960eb538a704 100644
+>>>> --- a/block/blk-cgroup.c
+>>>> +++ b/block/blk-cgroup.c
+>>>> @@ -530,6 +530,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+>>>>            spin_lock(&blkcg->lock);
+>>>>            blkg_destroy(blkg);
+>>>> +        list_del(&blkg->q_node);
+>>>
+>>> blkg should stay on the queue list until blkg_free_workfn(), otherwise
+>>> parent blkg can be freed before child, which will cause some known
+>>> issue.
+>>
+>> Yes, directly removing blkg node is not appropriate, which I noticed some
+>> comments in blkg_destroy(), thanks for pointing out this issue.
+>>
+>>>
+>>> I think this hung happens when total blkg is greater than
+>>> BLKG_DESTROY_BATCH_SIZE, right?
+>>
+>> Yes, you are right.
+>>
+>>>
+>>> Can you try if following patch fix your problem?
+>>
+>> This patch can also fix my problem, and indeed is a more secure way.
 > 
-> static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
-> ...
-> 	if (folio_test_hwpoison(folio) ||
-> 	    (folio_test_large(folio) &&
-> 	     folio_test_has_hwpoisoned(folio))) {
-> 	..
+> Thanks for the test, for a better solution, I think 'blkcg_mutex' can
+> be used to protect 'blkg->q_node' list instead of 'queue_lock', so that
+> the 'restart' can be removed because softlockup can be avoided.
+> 
 
-Hugh's commit 72887c976a7c9e ("shmem: minor fixes to splice-read
-implementation") is on point about this :
+I looked into this, and I found that this is not a easy thing to do.
 
-  "Perhaps that ugliness can be improved at the mm end later"
+Anyway, feel free to submit a new patch based on my orignial suggestion.
 
-So how about we put some lipstick on this guy now (notice right above it
-a similar compound page check for is_page_hwpoison()):
+Thanks,
+Kuai
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 1c68d67b832f..6a4a571dbe50 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -883,6 +883,13 @@ static inline bool is_page_hwpoison(struct page *page)
- 	return PageHuge(page) && PageHWPoison(compound_head(page));
- }
- 
-+static inline bool is_folio_hwpoison(struct folio *folio)
-+{
-+	if (folio_test_hwpoison(folio))
-+		return true;
-+	return folio_test_large(folio) && folio_test_has_hwpoisoned(folio);
-+}
-+
- /*
-  * For pages that are never mapped to userspace (and aren't PageSlab),
-  * page_type may be used.  Because it is initialised to -1, we invert the
-diff --git a/mm/shmem.c b/mm/shmem.c
-index ef7ad684f4fb..b7f47f6b75d5 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -3013,9 +3013,7 @@ static ssize_t shmem_file_splice_read(struct file *in, loff_t *ppos,
- 		if (folio) {
- 			folio_unlock(folio);
- 
--			if (folio_test_hwpoison(folio) ||
--			    (folio_test_large(folio) &&
--			     folio_test_has_hwpoisoned(folio))) {
-+			if (is_folio_hwpoison(folio)) {
- 				error = -EIO;
- 				break;
- 			}
