@@ -2,139 +2,188 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB092C77B60
-	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 03:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3762C7618E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 05:58:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239354AbjDZD5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Apr 2023 23:57:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58064 "EHLO
+        id S234101AbjDZF6C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Apr 2023 01:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233352AbjDZD5j (ORCPT
+        with ESMTP id S229379AbjDZF6C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Apr 2023 23:57:39 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C95D187;
-        Tue, 25 Apr 2023 20:57:38 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q5lSY0LR1z4f6Rdv;
-        Wed, 26 Apr 2023 11:57:33 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHvbAsoUhkg+SsIA--.31415S3;
-        Wed, 26 Apr 2023 11:57:34 +0800 (CST)
-Subject: Re: [PATCH -next v7 5/5] md: protect md_thread with rcu
-To:     Song Liu <song@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     logang@deltatee.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230425115256.3663932-1-yukuai1@huaweicloud.com>
- <20230425115256.3663932-6-yukuai1@huaweicloud.com>
- <CAPhsuW4_tDcmPZbo8Qs32LRxLAQfE6SNNTDys8bOoeHwx-1N=A@mail.gmail.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <059a8c6a-628f-ed18-0d5e-7ad3cad93813@huaweicloud.com>
-Date:   Wed, 26 Apr 2023 11:57:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 26 Apr 2023 01:58:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB3AA3
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 22:57:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682488632;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aoGTtVAlJv4wCX1i2eDa2D1HcfBB0jcK5ZhiKj43bU8=;
+        b=TL586CMP0xGVndnqPdnZc7R+7sSRbid8t4qOYgtZZgaw7MpvqeE168KVm9koJFKf5VmS6/
+        ZBkhqFVCHkj7P1AjxTnCj72mFi9JWt6+kIkKVou2pc2hUyq7e9twmSu3aeG0uQkW/flHfc
+        ou0aNOUaqHT6UapEPXJ1VRvbW2gHTG8=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-622-sSHL-qQKPAuE1L4BBkjJpw-1; Wed, 26 Apr 2023 01:57:10 -0400
+X-MC-Unique: sSHL-qQKPAuE1L4BBkjJpw-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-506991c6519so7456516a12.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 22:57:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682488627; x=1685080627;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aoGTtVAlJv4wCX1i2eDa2D1HcfBB0jcK5ZhiKj43bU8=;
+        b=bDVH9OMVT8DyGSUTFlJlOy1gkRAhV7f41bKCCoEhd8pocOlRR6omCOwRbMSYEwY0ho
+         lcYUQec/BNTYRlHXl4wlIrsZEvwNgEX5CA48bdVCuiItTSDa7If2i8pFHQRdT3ZgHyQk
+         fjm2k2k3rueTFuQMoGdElLcf/PgGtEBzr/tsfbTjIB0uY3ASu/5CqwCqleAQC/xqYFov
+         +TUnFwHWxmppsxvPEEqfschIXsfk00mO2Ysse1BNi8EeiAgCP47uRpCfPXmB6Z2Zk644
+         Ljmb0Ot5spcXCW1gf8u5UeNaqHswOrn7VwSHFc0p0rn/o+QWvun4+sYiTFYY6BQKX6A8
+         oM+Q==
+X-Gm-Message-State: AAQBX9fA8OTmbSbSBtXc5+axQNIwanJFr/m0lsp1lrYfgiYul7DRES8n
+        9By9BRzxLJ04J2mXEg9egU6U7jKBWrfbBN9FKJ5ElyzZUEVuqBQoqQ4Cz1GiVE2fbERbTkm6D96
+        D2QSqRR1bWmGywZj7Ds9wawWGRIdv1WLsXjlnMsvsqP085TCqEyGfntU=
+X-Received: by 2002:aa7:d90d:0:b0:506:77e5:d157 with SMTP id a13-20020aa7d90d000000b0050677e5d157mr18330563edr.19.1682488627696;
+        Tue, 25 Apr 2023 22:57:07 -0700 (PDT)
+X-Google-Smtp-Source: AKy350bIE1D9VJsATahSU3taHEXfy/mDMvRO5BS4jbFnITHStPFmR9hZer5YMsohPjmQQZNfciNE+oBC61Kc9lBOmDw=
+X-Received: by 2002:aa7:d90d:0:b0:506:77e5:d157 with SMTP id
+ a13-20020aa7d90d000000b0050677e5d157mr18330549edr.19.1682488627278; Tue, 25
+ Apr 2023 22:57:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAPhsuW4_tDcmPZbo8Qs32LRxLAQfE6SNNTDys8bOoeHwx-1N=A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHvbAsoUhkg+SsIA--.31415S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF1DJw45Kw47Zr1UJw1fJFb_yoW8tr43pa
-        yfJFW3uFyjkFsrurWaqa4Uua4Yyw4IqrWUKry3Z3yfJ34avryaqF4UWFykWFyDZFyfWr43
-        tr15tws5GFnYk3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <CAGVVp+XSpFsjfzSNxLiK9SFnLvLB-W7bPHk7tySkkX95BM5BoQ@mail.gmail.com>
+ <ZEdItaPqif8fp85H@ovpn-8-24.pek2.redhat.com>
+In-Reply-To: <ZEdItaPqif8fp85H@ovpn-8-24.pek2.redhat.com>
+From:   Changhui Zhong <czhong@redhat.com>
+Date:   Wed, 26 Apr 2023 13:56:55 +0800
+Message-ID: <CAGVVp+Wrhi0bWWR4nDVM5OXKp==RKbVKPSyt8pbuofUWVqQDGA@mail.gmail.com>
+Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address: 00000000000000fc
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Tue, Apr 25, 2023 at 11:27=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> On Tue, Apr 25, 2023 at 10:37:05AM +0800, Changhui Zhong wrote:
+> > Hello,
+> >
+> > Below issue was triggered in my test,it caused system panic ,please
+> > help check it.
+> > branch: for-6.4/block
+> > https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+> >
+> > mdadm -CR /dev/md0 -l 1 -n 2 /dev/sda /dev/sdb -e 1.0
+> > sgdisk -n 0:0:+100MiB /dev/md0
+> > cat /proc/partitions
+> > mdadm -S /dev/md0
+> > mdadm -A /dev/md0 /dev/sda /dev/sdb
+> > cat /proc/partitions
+> >
+> >
+> > [   34.219123] BUG: kernel NULL pointer dereference, address: 000000000=
+00000fc
+> > [   34.219507] #PF: supervisor read access in kernel mode
+> > [   34.219784] #PF: error_code(0x0000) - not-present page
+> > [   34.220039] PGD 0 P4D 0
+> > [   34.220176] Oops: 0000 [#1] PREEMPT SMP PTI
+> > [   34.220374] CPU: 8 PID: 1956 Comm: systemd-udevd Kdump: loaded Not
+> > tainted 6.3.0-rc2+ #1
+> > [   34.220787] Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360
+> > Gen9, BIOS P89 05/21/2018
+> > [   34.221188] RIP: 0010:blk_mq_sched_bio_merge+0x6d/0xf0
+>
+> Hi Changhui,
+>
+> Please try the following fix:
+>
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 850852fe4b78..fa2838ca2e6d 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -419,7 +419,11 @@ struct block_device *bdev_alloc(struct gendisk *disk=
+, u8 partno)
+>         bdev->bd_inode =3D inode;
+>         bdev->bd_queue =3D disk->queue;
+>         bdev->bd_stats =3D alloc_percpu(struct disk_stats);
+> -       bdev->bd_has_submit_bio =3D false;
+> +
+> +       if (partno)
+> +               bdev->bd_has_submit_bio =3D disk->part0->bd_has_submit_bi=
+o;
+> +       else
+> +               bdev->bd_has_submit_bio =3D false;
+>         if (!bdev->bd_stats) {
+>                 iput(inode);
+>                 return NULL;
+>
+> Fixes: 9f4107b07b17 ("block: store bdev->bd_disk->fops->submit_bio state =
+in bdev")
+>
 
-在 2023/04/26 11:20, Song Liu 写道:
-> On Tue, Apr 25, 2023 at 4:54 AM Yu Kuai <yukuai1@huaweicloud.com> wrote:
->>
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Our test reports a uaf for 'mddev->sync_thread':
->>
->> T1                      T2
->> md_start_sync
->>   md_register_thread
->>   // mddev->sync_thread is set
->>                          raid1d
->>                           md_check_recovery
->>                            md_reap_sync_thread
->>                             md_unregister_thread
->>                              kfree
->>
->>   md_wakeup_thread
->>    wake_up
->>    ->sync_thread was freed
->>
->> Root cause is that there is a small windown between register thread and
->> wake up thread, where the thread can be freed concurrently.
->>
->> Currently, a global spinlock 'pers_lock' is borrowed to protect
->> 'mddev->thread', this problem can be fixed likewise, however, there are
->> similar problems elsewhere, and use a global lock for all the cases is
->> not good.
->>
->> This patch protect all md_thread with rcu.
->>
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/blk-cgroup.c        |  3 ++
->>   drivers/md/md-bitmap.c    | 10 ++++--
->>   drivers/md/md-cluster.c   | 17 ++++++----
->>   drivers/md/md-multipath.c |  4 +--
->>   drivers/md/md.c           | 69 ++++++++++++++++++---------------------
->>   drivers/md/md.h           |  8 ++---
->>   drivers/md/raid1.c        |  7 ++--
->>   drivers/md/raid1.h        |  2 +-
->>   drivers/md/raid10.c       | 20 +++++++-----
->>   drivers/md/raid10.h       |  2 +-
->>   drivers/md/raid5-cache.c  | 22 ++++++++-----
->>   drivers/md/raid5.c        | 15 +++++----
->>   drivers/md/raid5.h        |  2 +-
->>   13 files changed, 100 insertions(+), 81 deletions(-)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 1c1ebeb51003..0ecb4cce8af2 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -527,6 +527,9 @@ static void blkg_destroy_all(struct gendisk *disk)
->>          list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
->>                  struct blkcg *blkcg = blkg->blkcg;
->>
->> +               if (hlist_unhashed(&blkg->blkcg_node))
->> +                       continue;
->> +
-> 
-> This change is not related, right?
+Hi,Ming
 
-Yes, it's not related. Sorry that I missed another fix patch into
-this...
+I retest the latest updated branch for-6.4/block
+(https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/log/=
+?h=3Dfor-6.4/block),
+which contain your fix patch "block: sync part's ->bd_has_submit_bio
+with disk's".
+the kernel panic  no longer happen, but the test will failed, the
+system will reread partition table on exclusively open device,
 
-> 
-> I don't think we can rush this change in the 6.4 merge window. Let's
-> test it more thoroughly and ship it in the next merge window.
+:: [ 01:50:05 ] :: [  BEGIN   ] :: Running 'mdadm -S /dev/md0'
+mdadm: stopped /dev/md0
+:: [ 01:50:06 ] :: [   PASS   ] :: Command 'mdadm -S /dev/md0'
+(Expected 0, got 0)
+:: [ 01:50:06 ] :: [  BEGIN   ] :: Running 'mdadm -A /dev/md0
+/dev/"$dev0" /dev/"$dev1"'
+mdadm: /dev/md0 has been started with 2 drives.
+:: [ 01:50:06 ] :: [   PASS   ] :: Command 'mdadm -A /dev/md0
+/dev/"$dev0" /dev/"$dev1"' (Expected 0, got 0)
+:: [ 01:50:09 ] :: [  BEGIN   ] :: Running 'lsblk'
+NAME                         MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINTS
+sda                            8:0    1 447.1G  0 disk
+=E2=94=9C=E2=94=80sda1                         8:1    1     1G  0 part  /bo=
+ot
+=E2=94=94=E2=94=80sda2                         8:2    1 446.1G  0 part
+  =E2=94=9C=E2=94=80rhel_storageqe--104-root 253:0    0    70G  0 lvm   /
+  =E2=94=9C=E2=94=80rhel_storageqe--104-swap 253:1    0   7.7G  0 lvm   [SW=
+AP]
+  =E2=94=94=E2=94=80rhel_storageqe--104-home 253:2    0 368.4G  0 lvm   /ho=
+me
+sdb                            8:16   1 447.1G  0 disk
+=E2=94=9C=E2=94=80sdb1                         8:17   1   100M  0 part
+=E2=94=94=E2=94=80md0                          9:0    0 447.1G  0 raid1
+  =E2=94=94=E2=94=80md0p1                    259:0    0   100M  0 part
+sdc                            8:32   1 447.1G  0 disk
+=E2=94=9C=E2=94=80sdc1                         8:33   1   100M  0 part
+=E2=94=94=E2=94=80md0                          9:0    0 447.1G  0 raid1
+  =E2=94=94=E2=94=80md0p1                    259:0    0   100M  0 part
+sdd                            8:48   1 447.1G  0 disk
+:: [ 01:50:09 ] :: [   PASS   ] :: Command 'lsblk' (Expected 0, got 0)
+:: [ 01:50:09 ] :: [  BEGIN   ] :: Running 'cat /proc/partitions'
+major minor  #blocks  name
 
-Of course.
+   8        0  468851544 sda
+   8        1    1048576 sda1
+   8        2  467801088 sda2
+   8       48  468851544 sdd
+   8       32  468851544 sdc
+   8       33     102400 sdc1
+   8       16  468851544 sdb
+   8       17     102400 sdb1
+ 253        0   73400320 dm-0
+ 253        1    8060928 dm-1
+ 253        2  386338816 dm-2
+   9        0  468851392 md0
+ 259        0     102400 md0p1
 
-Thanks,
-Kuai
+Thanks=EF=BC=8C
 
