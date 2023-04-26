@@ -2,78 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AE3C7EE21
-	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 20:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AED7C7618E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 23:12:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234109AbjDZUJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Apr 2023 16:09:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48094 "EHLO
+        id S234643AbjDZXMu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Apr 2023 19:12:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239009AbjDZUJr (ORCPT
+        with ESMTP id S233381AbjDZXMt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2023 16:09:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76E95C2
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 13:09:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1251563012
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 20:09:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 64BAAC4339B;
-        Wed, 26 Apr 2023 20:09:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682539785;
-        bh=tce/vICA2n9Na3Tc2MPzAM/bgCcv7GKhars7eMtZrVQ=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=rRzhsX6Fr7RdXac5J0jNoutuKROjgo1rKWgCyZNNkPaH5Ib7WVEVofppE8yj2/pih
-         Op2LC25uRFOFocFcNAkRgoAOMBKNfWC6hPyajYBsx/M7N1eJyKyXyVbPBUz41QU7XE
-         UaQwcVffVHKo08zqLJM5sN+T8k6J3jhYHDCzyfcvxiiSe48Ozrr/O0+qbATa/juAun
-         qQVoeyzuy9dRlWjIHA2OIy1I6+nnE+NbgjZpoUzgmUFWNDTOzyFabHOU5HO8dFpVDz
-         4L021ycysbdhf08Es8wNLVnLrNlelOIpMOwPeY7RHWBMhERiMhbvunViXN8fyD9Yvm
-         +ar2LYwClsFbA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4DC81C43158;
-        Wed, 26 Apr 2023 20:09:45 +0000 (UTC)
-Subject: Re: [git pull] device mapper changes for 6.4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ZEa3DOLC3GAX/MVx@redhat.com>
-References: <ZEa3DOLC3GAX/MVx@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ZEa3DOLC3GAX/MVx@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.4/dm-changes
-X-PR-Tracked-Commit-Id: 38d11da522aacaa05898c734a1cec86f1e611129
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 48dc810012a6b4f4ba94073d6b7edb4f76edeb72
-Message-Id: <168253978531.23673.1793015930816014970.pr-tracker-bot@kernel.org>
-Date:   Wed, 26 Apr 2023 20:09:45 +0000
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>,
-        Joe Thornber <ejt@redhat.com>,
-        Li Lingfeng <lilingfeng3@huawei.com>,
-        Michael =?iso-8859-1?Q?Wei=DF?= 
-        <michael.weiss@aisec.fraunhofer.de>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Tom Rix <trix@redhat.com>, Yangtao Li <frank.li@vivo.com>,
-        Yeongjin Gil <youngjin.gil@samsung.com>,
-        Yu Zhe <yuzhe@nfschina.com>
+        Wed, 26 Apr 2023 19:12:49 -0400
+Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 855EE358E;
+        Wed, 26 Apr 2023 16:12:45 -0700 (PDT)
+Date:   Thu, 27 Apr 2023 01:12:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+        s=mail; t=1682550763;
+        bh=PZpGk7rRCt4ehhsgRDpHyzzOzPQu1DqqumRtK7iBeaU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=o6cohrkryZuf2TEO3R1+ptwvr0tzx/Eruz4XzqF+/nOK+tLgT1+RZvdRwByxTaHkg
+         xdfNIY8ols2G3HgPepKW+dphh6lUzcS9zAhjx/0jaddQsgOXXyy7/EMLSRu9hHpFKd
+         jy1+G6JiX8uVeZlt6NUjISZTkOZK+dCIPUyo36ys=
+From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v3 0/3] blk-integrity: drop integrity_kobj from gendisk
+Message-ID: <862c1901-ee6e-44e5-8906-4bb1c3893372@t-8ch.de>
+References: <20230309-kobj_release-gendisk_integrity-v3-0-ceccb4493c46@weissschuh.net>
+ <yq1v8ivtzrn.fsf@ca-mkp.ca.oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <yq1v8ivtzrn.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Mon, 24 Apr 2023 13:06:20 -0400:
+Hi Martin, Christoph, Jens,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.4/dm-changes
+On 2023-03-20 07:56:58-0400, Martin K. Petersen wrote:
+> > The embedded member integrity_kobj member of struct gendisk violates
+> > the assumption of the driver core that only one struct kobject should
+> > be embedded into another object and then manages its lifetime.
+> >
+> > As the integrity_kobj is only used to hold a few sysfs attributes it
+> > can be replaced by direct device_attributes and removed.
+> 
+> Looks good to me and passed a quick test on a couple of systems. Thanks
+> for cleaning this up!
+> 
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/48dc810012a6b4f4ba94073d6b7edb4f76edeb72
+Am I getting some part of the process for block/ wrong?
 
-Thank you!
+It seems my patches for the block subsystem are having a hard time
+getting merged.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+* https://lore.kernel.org/all/20221110052438.2188-1-linux@weissschuh.net/
+* this series
+* https://lore.kernel.org/all/20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net/
+
+Thanks for any pointers,
+Thomas
