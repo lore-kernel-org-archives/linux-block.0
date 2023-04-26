@@ -2,82 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB40C77B60
-	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 06:24:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A63C7618E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 06:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239400AbjDZGYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Apr 2023 02:24:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44646 "EHLO
+        id S239379AbjDZGdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Apr 2023 02:33:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239396AbjDZGYJ (ORCPT
+        with ESMTP id S239024AbjDZGdW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2023 02:24:09 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0F682684
-        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 23:24:08 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Q5pjZ6VMYz4f3wLG
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 14:24:02 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHcLODw0hkrg+0IA--.52964S3;
-        Wed, 26 Apr 2023 14:24:04 +0800 (CST)
-Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address:
- 00000000000000fc
-To:     Changhui Zhong <czhong@redhat.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>
+        Wed, 26 Apr 2023 02:33:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F02752694
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 23:32:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682490755;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HA+d9poW4wgIjY/MKbtnI0DUGhkyl/r8x47jX1FJye4=;
+        b=ab2O7kAbBOtnmV47IeIfI/W0HqpP7P8zOx1eBJ0Ow5Y9WDhu2g1SUlDQ5HlraFAsm9Wuai
+        oS7vQw/hT6JlNFqCIFeN/ukK6rUVkM71Gpldp7DwW/uQweSV0mLwBWPIKOni9bV9MO9tCt
+        W4WzzjZqrOh9iMHXqC2JULGig1Xaut0=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-444-LDMn1V9pP7enYzlZjAhiKA-1; Wed, 26 Apr 2023 02:32:32 -0400
+X-MC-Unique: LDMn1V9pP7enYzlZjAhiKA-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-506a597d3c3so7784136a12.2
+        for <linux-block@vger.kernel.org>; Tue, 25 Apr 2023 23:32:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682490751; x=1685082751;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HA+d9poW4wgIjY/MKbtnI0DUGhkyl/r8x47jX1FJye4=;
+        b=A+81fqg7LvlUdKe3lSv0t4/Tu1H92qRYvQgJB7V9fNZmXJyuQxl8/xaxXyrjzSZXrE
+         +PszxI6Cr+vmPT/Y4UN40BhCubOEmDuFtjd3ovbUZrr3b0ZD5AWCyTxOyTUbAWtkzYK+
+         Slo8h7s3JE44fRv9tgUKlAFSOntbtBoXpnV/JtE1mAtciOxsnxeboF7DSFEqN8W0IcOc
+         kbI+CtR/7JQFD3Z5zLCX7593gYQ2YRRvpBcTCl561T/MM/ul3YeLXtS9KhXNZtsgID3x
+         lMiWD65pDyuDAbXazMbzM2ryTk9uqXDIXcdF3VLTGpkxs484ln9ECBWjRpEbJfg0Lrvf
+         isJw==
+X-Gm-Message-State: AAQBX9dsy3tjkmlEDjOq1mpURh4F16yWZcy9e4Oh8i1L2QMwBk020jiP
+        TOJ43BgD6r6Q2yU5FJF50KpzxFYcoLdqeShIZAF/OIvtNlEBFMiGOJVZ0yUDpbbz1frpnqsi/HZ
+        7ucj+9NpMfE6M17QD/+maOl/cu/1JIHcj93JU3MI=
+X-Received: by 2002:a05:6402:18c:b0:505:47a:7ae8 with SMTP id r12-20020a056402018c00b00505047a7ae8mr18027081edv.4.1682490751498;
+        Tue, 25 Apr 2023 23:32:31 -0700 (PDT)
+X-Google-Smtp-Source: AKy350aCX8No4b1VUu5bv8WGDwtAfQGmiKUyBt6dr3fV2Yfgs8ZX8z5X5LBZ4OB36WufNPZLoTcLP4AVGrQRdGHfTNA=
+X-Received: by 2002:a05:6402:18c:b0:505:47a:7ae8 with SMTP id
+ r12-20020a056402018c00b00505047a7ae8mr18027069edv.4.1682490751270; Tue, 25
+ Apr 2023 23:32:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAGVVp+XSpFsjfzSNxLiK9SFnLvLB-W7bPHk7tySkkX95BM5BoQ@mail.gmail.com>
+ <ZEdItaPqif8fp85H@ovpn-8-24.pek2.redhat.com> <CAGVVp+Wrhi0bWWR4nDVM5OXKp==RKbVKPSyt8pbuofUWVqQDGA@mail.gmail.com>
+ <f5d3b05b-33a6-818f-6476-c3993f9d4e87@huaweicloud.com> <CAGVVp+W9SnHaEyi7o2Pkh6XEJsWL1E7W7esHvyXfXed8DFjt8g@mail.gmail.com>
+ <c1277414-bc3c-b191-de9c-1620c5533aa0@huaweicloud.com>
+In-Reply-To: <c1277414-bc3c-b191-de9c-1620c5533aa0@huaweicloud.com>
+From:   Changhui Zhong <czhong@redhat.com>
+Date:   Wed, 26 Apr 2023 14:32:19 +0800
+Message-ID: <CAGVVp+WLSaf3AOShs7HrUxM0985zaWdPJh6LB2Oekjd+7o3h8A@mail.gmail.com>
+Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address: 00000000000000fc
+To:     Yu Kuai <yukuai1@huaweicloud.com>
 Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
         "yukuai (C)" <yukuai3@huawei.com>
-References: <CAGVVp+XSpFsjfzSNxLiK9SFnLvLB-W7bPHk7tySkkX95BM5BoQ@mail.gmail.com>
- <ZEdItaPqif8fp85H@ovpn-8-24.pek2.redhat.com>
- <CAGVVp+Wrhi0bWWR4nDVM5OXKp==RKbVKPSyt8pbuofUWVqQDGA@mail.gmail.com>
- <f5d3b05b-33a6-818f-6476-c3993f9d4e87@huaweicloud.com>
- <CAGVVp+W9SnHaEyi7o2Pkh6XEJsWL1E7W7esHvyXfXed8DFjt8g@mail.gmail.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c1277414-bc3c-b191-de9c-1620c5533aa0@huaweicloud.com>
-Date:   Wed, 26 Apr 2023 14:24:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAGVVp+W9SnHaEyi7o2Pkh6XEJsWL1E7W7esHvyXfXed8DFjt8g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHcLODw0hkrg+0IA--.52964S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYz7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0
-        xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-        1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-        14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-        IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY
-        6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-        73UjIFyTuYvjfU5WlkUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Wed, Apr 26, 2023 at 2:24=E2=80=AFPM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
+>
+> Hi,
+>
+> =E5=9C=A8 2023/04/26 14:20, Changhui Zhong =E5=86=99=E9=81=93:
+> >> Is this patch in the branch for-6.4/block?
+> >>
+> >> 3723091ea188 ("block: don't set GD_NEED_PART_SCAN if scan partition fa=
+iled")
+> >>>
+> >
+> > Hi, Yu Kuai
+> >
+> > this patch was not found in the for-6.4/block branch, and found it
+> > exist in the master branch
+> >
+>
+> Can you try to test with this patch?
+>
+> Thanks,
+> Kuai
+>
 
-在 2023/04/26 14:20, Changhui Zhong 写道:
->> Is this patch in the branch for-6.4/block?
->>
->> 3723091ea188 ("block: don't set GD_NEED_PART_SCAN if scan partition failed")
->>>
-> 
-> Hi, Yu Kuai
-> 
-> this patch was not found in the for-6.4/block branch, and found it
-> exist in the master branch
-> 
-
-Can you try to test with this patch?
+ok,I will retest with this patch,will feedback test result later
 
 Thanks,
-Kuai
 
