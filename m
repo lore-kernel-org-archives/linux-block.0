@@ -2,165 +2,196 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA17C77B60
-	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 10:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1E1C7618E
+	for <linux-block@archiver.kernel.org>; Wed, 26 Apr 2023 12:13:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240301AbjDZKGr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Apr 2023 06:06:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46014 "EHLO
+        id S240804AbjDZMN0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Apr 2023 08:13:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230023AbjDZKGq (ORCPT
+        with ESMTP id S231161AbjDZMNZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2023 06:06:46 -0400
-Received: from wnew4-smtp.messagingengine.com (wnew4-smtp.messagingengine.com [64.147.123.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E533344A6;
-        Wed, 26 Apr 2023 03:06:37 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.west.internal (Postfix) with ESMTP id 7DF2C2B06855;
-        Wed, 26 Apr 2023 06:06:34 -0400 (EDT)
+        Wed, 26 Apr 2023 08:13:25 -0400
+Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE3135AD
+        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 05:13:23 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 5C12D58233B;
+        Wed, 26 Apr 2023 08:13:21 -0400 (EDT)
 Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 26 Apr 2023 06:06:34 -0400
+  by compute4.internal (MEProxy); Wed, 26 Apr 2023 08:13:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        cc:cc:content-transfer-encoding:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm3; t=1682503594; x=
-        1682507194; bh=XS+A2EyuWt8WLj8nQhjcPl1FG93psrNw71yORB+BVXw=; b=a
-        Nom9mA9U0yfqPG2d1vraQJZPhYRMo7I2t2dUPQR37EUScaJmd+o+h17klyYOs3cy
-        jIkB73EMScNz4GHttsW27cLusuE7E/IXfZdNuAw2UC4dVodshrIoMvS1X7BjzRlG
-        dYtf+qOV3x8yndSXmOOM2HzQaWAiVcHG4SR2cKA0Ew9P1H1421CG42MrE5oepAvU
-        yerUsIrrt5mI4bxCsA7DPt0xCUiM72yfgAENrXoLdAL8TtlaUsShAchdlRGP3BNm
-        XybBxAfbx+tq7uO7cMYR26T9tiwPDDrhoa/LVdvUB1vqn7/GEvRIeZFBe86d8OBa
-        g1T2oeRf0ly0Z+TObhUcw==
+        cc:cc:content-transfer-encoding:content-type:content-type:date
+        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to; s=fm3; t=
+        1682511201; x=1682514801; bh=jHMnHL/zKY5eCRZKsgqOg1uachNO1mhyA1e
+        S591L7xY=; b=fLtHa2gDNxbCf8c7mn8v0H9jju/2xn1G24kZ/3SsDlschdg+J2/
+        D33fwpLc3Kbb2FZIPtl4PSMp2h0cRU5HTEHzSx1UrpkzcIYYVzC9kLR3CHMhl+PR
+        sJhi0KzWuaHqDN6xBAs22LMlg07e9q+ijgAYMjfnTCr3gaa4lfK6KLLSi4pZJSbW
+        QdyxZXywCO6fc6nGq2393MeWN+ncxmFA3AaSN3DU0WlgzvSzIvXXn/hfGC35iT9/
+        Hg1HFH2tkAHv4JxaKNnqxhYS9ZzWternR0R4eB3Tk/RkPZXFWB11mn7Qbz2z8jlA
+        Qzv4m2g2KqeDkoNV8Z5yHJqR9G4IkTmoG7g==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1682503594; x=
-        1682507194; bh=XS+A2EyuWt8WLj8nQhjcPl1FG93psrNw71yORB+BVXw=; b=J
-        lpXa71VHAGR4GOn1SC7xGJtIZx4KU/w+ZFi52qmTlUd5rliqnJ53HycnUYIzwh67
-        SsHvlx485ORSEJX1OeokC6IiqA/F8I9Me26eoLzYF+ZWERJ7sWG6EjHyYvjCZqb1
-        mn2+f+Sj5VoVg5B9fc0tYSiWWDtWo29AnrNm6ndgHoJ1pI6Wkw9WGACWk2oxJjJz
-        FkY0wmlsedPsjqijyMrCmcrjNW6HmJqD/q3VghDSBFwcdvnvEvPHldXi/T9GcXyY
-        /aISqBSP8l7hsn4ZY8fw3COfPVt7s96DoqLtb4t/EdXNyDhfDy91kcldfsyvSIqu
-        rWig/q5SkzzYhiSCOobMQ==
-X-ME-Sender: <xms:qfdIZFWzd89EiNhxEGF-SAUqA-wxeS67JsxZmLhK0nMdAU6XLWe5Ew>
-    <xme:qfdIZFnVZzE4Mvm_GQwXGR5cK5hR1noUGjiTzWLZt-w-WkG5bZmQUTpIRItqrmgck
-    tDyVbZnVn9oRxGyxFw>
-X-ME-Received: <xmr:qfdIZBYlUCbPLCQgMiLvpC9TNfrVSP9dFxChPSQ8XNw468_UUx6zkQtsfQnLkMnHqxWx4NmuXtu4APjeZvMnT0qe1finPAjRTY9QyqIF>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedugedgvdefucetufdoteggodetrfdotf
+        :content-type:content-type:date:date:feedback-id:feedback-id
+        :from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+        1682511201; x=1682514801; bh=jHMnHL/zKY5eCRZKsgqOg1uachNO1mhyA1e
+        S591L7xY=; b=hVZYzTkwkjVyVnFi5hMYrJF6RH6ghCC/oj7ghBklaZYtz9eEVuT
+        E6hos3qkE8GLbJ+ZCP3xIV5RHUsyHnuwIKmLVjcUlXyJasAl6VAS9Zf4zc7i8WWl
+        fmMWHdfha0PMBSxkiYaBcKUP9tw5eDiKXoCv1wHxb3N1lCZuRVIHMZd7UiG35ZXG
+        XXXI7l3o05Dph2lSRgWxKaRI7ul2C3CJrkO5bNZZl4P8Pr8UP3vTr8vZI73ytU+2
+        Jo58/ZHYcmHaINOdaww6v6j+rJNsaUX2HAQwRdelwJqwG2Xzc1Lr9ko3hqgsTu0C
+        W9G/wfSIZ3sEV39XiXGnQmsARuMNn8ihkwQ==
+X-ME-Sender: <xms:YBVJZBZmym39ZaHxDbi03oR7kW33DOgftCjtn333_xgZRIa888VtSA>
+    <xme:YBVJZIZXIw9dhLo0QHGG44HNIi4k3_4rV4z-eWhqPqKkruCcP8Tx4cnSmDWbMC8jW
+    UUPzj3zr-KzSIkqJyU>
+X-ME-Received: <xmr:YBVJZD8Alw3i6vp4YMKYdtaM4wF3CNVtiBfbBaWVnjJZk5XM7NiaqB9gp1Y2mVK0NgZdn_cs4b_QWm0K-ixcnA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfedugedggeekucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepufhhihhn
-    kdhitghhihhrohcumfgrfigrshgrkhhiuceoshhhihhnihgthhhirhhosehfrghsthhmrg
-    hilhdrtghomheqnecuggftrfgrthhtvghrnhepgffggeffjeegfeeuteegueekvdfhledu
-    hfehffdtiedthfetleeifeeihfeukeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshhhihhnihgthhhirhhosehfrghsthhmrghilhdrtgho
-    mh
-X-ME-Proxy: <xmx:qfdIZIX6nNpJjKGEoSYu7jM56MOnVrm4ppPLWkKYiqa-qu-OqbgHsg>
-    <xmx:qfdIZPnsyaLIKG-IyvkzafZBfwjC0bE5QlXL7g2WW0H1_rD1k8GFkA>
-    <xmx:qfdIZFc4VJ-Ta12N-TG8P8GQviB3jyCPy8LYFHNat7Mu2f_iwPMZHA>
-    <xmx:qvdIZNixFOwXiG3GdJ8tUN6L_rCCC_A0jcydPDuaa1eqqWSZBgGbY9XAj0I>
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkefstddttdejnecuhfhrohhmpefuhhhi
+    nhdkihgthhhirhhoucfmrgifrghsrghkihcuoehshhhinhhitghhihhrohesfhgrshhtmh
+    grihhlrdgtohhmqeenucggtffrrghtthgvrhhnpeeutefhheeulefgleegjefgiedthfef
+    keffgfdvvedufeekheejueejtdfhteetudenucffohhmrghinhepghhithhhuhgsrdgtoh
+    hmpdhgihhtlhgrsgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhep
+    mhgrihhlfhhrohhmpehshhhinhhitghhihhrohesfhgrshhtmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:YBVJZPoge5T2BQrc15xhbT_J0WXzfKzQu7wQ_dePm1YXwZa2t7qLLg>
+    <xmx:YBVJZMpqyUaxxgJZe-68lQYAr9iAsRbnik0DY31X5PFjzdica2zffQ>
+    <xmx:YBVJZFSQ0jj4eHUPQCk2sjjOXKPybkXV5dWCUA5uPiY8R8Os1wjudg>
+    <xmx:YRVJZJhD6D9RJISmFEnc-d2mtIxSbPUj_JhgH0XHqXa-OC8KTkckNg>
 Feedback-ID: ie1e949a3:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 26 Apr 2023 06:06:32 -0400 (EDT)
+ 26 Apr 2023 08:13:17 -0400 (EDT)
+Date:   Wed, 26 Apr 2023 21:13:14 +0900
 From:   Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v2 6/6] block/{001,002,027}: allow to run with built-in scsi_debug and sd_mod
-Date:   Wed, 26 Apr 2023 19:06:11 +0900
-Message-Id: <20230426100611.2120-1-shinichiro@fastmail.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230425114745.376322-1-shinichiro@fastmail.com>
-References: <20230425114745.376322-1-shinichiro@fastmail.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Mike Snitzer <snitzer@kernel.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "yangerkun@huawei.com" <yangerkun@huawei.com>,
+        "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "yukuai (C)" <yukuai3@huawei.com>,
+        Li Lingfeng <lilingfeng3@huawei.com>,
+        Joe Thornber <ejt@redhat.com>
+Subject: Re: [PATCH blktests] dm: add a regression test
+Message-ID: <s4h5gehehwrto4h4vzs3cgfbeibtvrusgo5u5zus7afs3qzaio@nyy4xmikwyyo>
+References: <20221230065424.19998-1-yukuai1@huaweicloud.com>
+ <20230112010554.qmjuqtjoai3qqaj7@shindev>
+ <6ccff2ec-b4bd-a1a6-5340-b9380adc1fff@huaweicloud.com>
+ <oklvotdaxnncrugr2v7yqadzyfa5vvzrumrfv46vrzowjw3njo@tlvhd4eo5spl>
+ <ZEgMuvNCud3fNdl4@redhat.com>
+ <a8f2ca5c-0ae8-47af-d6c8-f9430c19ff64@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <a8f2ca5c-0ae8-47af-d6c8-f9430c19ff64@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+On Apr 26, 2023 / 08:42, Chaitanya Kulkarni wrote:
+> On 4/25/23 10:24, Mike Snitzer wrote:
+> > On Tue, Apr 25 2023 at  8:15P -0400,
+> > Shin'ichiro Kawasaki <shinichiro@fastmail.com> wrote:
+> >
+> >> On Apr 25, 2023 / 16:22, Yu Kuai wrote:
+> >>> Hi,
+> >>>
+> >>> 在 2023/01/12 9:05, Shinichiro Kawasaki 写道:
+> >>>> Hello Yu, thanks for the patch. I think it is good to have this test case to
+> >>>> avoid repeating the same regression. Please find my comments in line.
+> >>>>
+> >>>> CC+: Mike, dm-devel,
+> >>>>
+> >>>> Mike, could you take a look in this new test case? It adds "dm" test group to
+> >>>> blktests. If you have thoughts on how to add device-mapper related test cases
+> >>>> to blktests, please share (Or we may be able to discuss later at LSF 2023).
+> >>> Can we add "dm" test group to blktests? I'll send a new version if we
+> >>> can.
+> >> I suggest to wait for LSF discussion in May, which could be a good chance to
+> >> hear opinions of dm experts. I think your new test case is valuable, so IMO it
+> >> should be added to the new "dm" group, or at least to the existing "block"
+> >> group. Let's decide the target group after LSF.
+> >>
+> > It's obviously fine to add a new "dm" test group to blktests.
 
-To allow the test cases run with build-in scsi_debug, replace
-'_have_module scsi_debug' with _have_scsi_debug, and replace
-_init_scsi_debug with _configure_scsi_debug.
+Mike, thanks for the positive comment. Now I know that there are various
+testsuites related to dm as you noted below. I think the new dm test group in
+blktests can have different coverage from other dm related testsuites: tests to
+confirm fixes for failures related to block layer and device-mapper. The new
+test Yu Kuai suggests will fit into it.
 
-Also to allow block/001 run with built-in sd_mod, replace
-'_have_module sd_mod' with '_have_kernel_option BLK_DEV_SD'. When sd_mod
-driver is built-in, /sys/module/sd_mod directory is not created. Then
-_have_driver() can not detect availability of the driver. Instead, refer
-the kernel config to check availability of the driver.
+Yu, could you post the new version of your patch? Let's add the dm group and the
+first test case.
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- tests/block/001 | 6 +++---
- tests/block/002 | 4 ++--
- tests/block/027 | 4 ++--
- 3 files changed, 7 insertions(+), 7 deletions(-)
+> >
+> > But just so others are aware: more elaborate dm testing is currently
+> > spread across multiple testsuites (e.g. lvm2, cryptsetup, mptest,
+> > device-mapper-test-suite, etc).
 
-diff --git a/tests/block/001 b/tests/block/001
-index 2ea3754..32dd22f 100755
---- a/tests/block/001
-+++ b/tests/block/001
-@@ -13,13 +13,13 @@ DESCRIPTION="stress device hotplugging"
- TIMED=1
- 
- requires() {
--	_have_module scsi_debug
--	_have_driver sd_mod
-+	_have_scsi_debug
-+	_have_kernel_option BLK_DEV_SD
- 	_have_driver sr_mod
- }
- 
- stress_scsi_debug() {
--	if ! _init_scsi_debug "$@"; then
-+	if ! _configure_scsi_debug "$@"; then
- 		return
- 	fi
- 
-diff --git a/tests/block/002 b/tests/block/002
-index a5f3ee5..b16d014 100755
---- a/tests/block/002
-+++ b/tests/block/002
-@@ -13,13 +13,13 @@ QUICK=1
- 
- requires() {
- 	_have_blktrace
--	_have_module scsi_debug
-+	_have_scsi_debug
- }
- 
- test() {
- 	echo "Running ${TEST_NAME}"
- 
--	if ! _init_scsi_debug delay=0; then
-+	if ! _configure_scsi_debug delay=0; then
- 		return 1
- 	fi
- 
-diff --git a/tests/block/027 b/tests/block/027
-index ab6369b..a79a115 100755
---- a/tests/block/027
-+++ b/tests/block/027
-@@ -20,12 +20,12 @@ CAN_BE_ZONED=1
- 
- requires() {
- 	_have_cgroup2_controller io
--	_have_module scsi_debug
-+	_have_scsi_debug
- 	_have_fio
- }
- 
- scsi_debug_stress_remove() {
--	if ! _init_scsi_debug "$@"; then
-+	if ! _configure_scsi_debug "$@"; then
- 		return
- 	fi
- 
--- 
-2.40.0
+Thanks. Good to know that dm test has wide varieties. I found the testsuites on
+the net. Will try to look into them.
 
+[1] lvm2: https://github.com/lvmteam/lvm2/tree/master/test
+[2] cryptsetup: https://gitlab.com/cryptsetup/cryptsetup/-/tree/main/tests
+[3] mptest: https://github.com/snitm/mptest
+[4] device-mapper-test-suite: https://github.com/jthornber/device-mapper-test-suite
+
+> >
+> > There is new effort to port device-mapper-test-suite tests (which use
+> > ruby) to a new python harness currently named "dmtest-python", Joe
+> > Thornber is leading this effort (with the assistance of
+> > ChatGPT.. apparently it has been wonderful in helping Joe glue python
+> > code together to accomplish anything he's needed):
+> > https://github.com/jthornber/dmtest-python
+> >
+> > (we've discussed renaming "dmtest-python" to "dmtests")
+> >
+> > I've also discussed with Joe the plan to wrap the other disparate
+> > testsuites with DM coverage in terms of the new dmtest-python.
+
+It sounds a valuable action to gather the various testsuites so that the dm
+maintainer or dm developers can run them all easily.
+
+I also think that the list of testsuites will help developers to tell what kind
+of test goes to which testsuite. When an developer adds a test case related to
+dm, the developer needs to choose which testsuite to add it. As an example, I
+wonder about dm-zoned. In case we would add test cases to exercise dm-zoned, is
+there any good testsuite to add them? (Can we set up dm-zoned with dmtest-
+python?)
+
+> > blktests can be made to be one of the testsuites we add support for
+> > (so that all blktests run on various types of DM targets).
+> >
+> > Really all we need is a means to:
+> > 1) list all tests in a testsuite
+> > 2) initiate running each test individually
+
+IIUC, the dmtest-python takes the role to prepare the various DM targets for
+test, and each testsuite runs test cases on the targets, right? From blktests
+point of view, the "block" group of blktests can be run with the various DM
+targets. Also the "zbd" group of blktests can be run with DM targets with
+DM_TARGET_ZONED_HM feature. Other test groups such as "nvme" or "scsi" won't
+run with DM targets. I think it is not difficult for dmtest-python to prepare
+blktests config files to specify DM targets and the block/zbd test group. If
+blktests side change is desired, we can discuss.
+
+> >
+> > Mike
+> 
+> Thanks Mike for the detailed information, we did talk about DM testcases
+> in last LSFMM, this is really important piece of blktest that is missing
+> and need to be discussed this year's LSFMM so we can integrate above
+> work in blktests as right now we are not able to establish complete
+> stability due to lack of of the dm tests as we are doing it for block
+> layer code or nvme for example.
+> 
+> -ck
+> 
+> 
