@@ -2,123 +2,168 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C05CC77B61
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 07:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B84C77B7E
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 07:33:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242963AbjD0H2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 03:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45800 "EHLO
+        id S242999AbjD0Hdv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 03:33:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243195AbjD0H2b (ORCPT
+        with ESMTP id S242667AbjD0Hdu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 03:28:31 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29BD440E7
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 00:28:08 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D6D9C1FDFA;
-        Thu, 27 Apr 2023 07:27:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1682580465; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type;
-        bh=gW4QUErGvAesybuMXXu5So0XZ/1kEjh78pRTMQqyBus=;
-        b=TyBX65E7nepGXfxpezeZyRNtvZBrhS4QNEzwBVcz+gLfCVTyHB6v6MJ0QO20elgrRkdRFv
-        NBQE8wjkHjk9zJMk6y6EqQMPtXzcbWR5vxKM/TeXxRatTl/gCWeWaz8qp2gn8hUvGG7IDd
-        9eag1LST/TKpPlZyxLGdqqflP+XJs20=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1682580465;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type;
-        bh=gW4QUErGvAesybuMXXu5So0XZ/1kEjh78pRTMQqyBus=;
-        b=5jv60hrPOjKNcztMjbJJmpUKCgEidfdlY2Y1Sy51opTEf9G9umsGR0uDZ/ndMBLawzjbHl
-        vd3+gDsXXfvOvXBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C88C513910;
-        Thu, 27 Apr 2023 07:27:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 66neMPEjSmTFKAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Thu, 27 Apr 2023 07:27:45 +0000
-Date:   Thu, 27 Apr 2023 09:27:45 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [LSF/MM/BPF TOPIC] nvme state machine refactoring
-Message-ID: <dkxas4hwmnzknde7csbnuxwtk6odsaptj34hj7ukz4kh54h45n@6aiz7ghuf7ej>
+        Thu, 27 Apr 2023 03:33:50 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F15419AC;
+        Thu, 27 Apr 2023 00:33:47 -0700 (PDT)
+Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Q6S6X2QkmzStFk;
+        Thu, 27 Apr 2023 15:29:24 +0800 (CST)
+Received: from [10.174.177.174] (10.174.177.174) by
+ dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 27 Apr 2023 15:33:42 +0800
+Message-ID: <321a58db-da64-fea4-64b2-1dd6ae5e4976@huawei.com>
+Date:   Thu, 27 Apr 2023 15:33:41 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+CC:     Theodore Ts'o <tytso@mit.edu>, <linux-ext4@vger.kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
+        yangerkun <yangerkun@huawei.com>,
+        Baokun Li <libaokun1@huawei.com>
+References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
+ <ZEny7Izr8iOc/23B@casper.infradead.org>
+ <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
+ <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
+From:   Baokun Li <libaokun1@huawei.com>
+In-Reply-To: <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.177.174]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml500021.china.huawei.com (7.185.36.21)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 2023/4/27 14:36, Baokun Li wrote:
+> On 2023/4/27 12:50, Ming Lei wrote:
+>> Hello Matthew,
+>>
+>> On Thu, Apr 27, 2023 at 04:58:36AM +0100, Matthew Wilcox wrote:
+>>> On Thu, Apr 27, 2023 at 10:20:28AM +0800, Ming Lei wrote:
+>>>> Hello Guys,
+>>>>
+>>>> I got one report in which buffered write IO hangs in 
+>>>> balance_dirty_pages,
+>>>> after one nvme block device is unplugged physically, then umount can't
+>>>> succeed.
+>>> That's a feature, not a bug ... the dd should continue indefinitely?
+>> Can you explain what the feature is? And not see such 'issue' or 
+>> 'feature'
+>> on xfs.
+>>
+>> The device has been gone, so IMO it is reasonable to see FS buffered 
+>> write IO
+>> failed. Actually dmesg has shown that 'EXT4-fs (nvme0n1): Remounting
+>> filesystem read-only'. Seems these things may confuse user.
+>
+>
+> The reason for this difference is that ext4 and xfs handle errors 
+> differently.
+>
+> ext4 remounts the filesystem as read-only or even just continues, 
+> vfs_write does not check for these.
+>
+> xfs shuts down the filesystem, so it returns a failure at 
+> xfs_file_write_iter when it finds an error.
+>
+>
+> ``` ext4
+> ksys_write
+>  vfs_write
+>   ext4_file_write_iter
+>    ext4_buffered_write_iter
+>     ext4_write_checks
+>      file_modified
+>       file_modified_flags
+>        __file_update_time
+>         inode_update_time
+>          generic_update_time
+>           __mark_inode_dirty
+>            ext4_dirty_inode ---> 2. void func, No propagating errors out
+>             __ext4_journal_start_sb
+>              ext4_journal_check_start ---> 1. Error found, remount-ro
+>     generic_perform_write ---> 3. No error sensed, continue
+>      balance_dirty_pages_ratelimited
+>       balance_dirty_pages_ratelimited_flags
+>        balance_dirty_pages
+>         // 4. Sleeping waiting for dirty pages to be freed
+>         __set_current_state(TASK_KILLABLE)
+>         io_schedule_timeout(pause);
+> ```
+>
+> ``` xfs
+> ksys_write
+>  vfs_write
+>   xfs_file_write_iter
+>    if (xfs_is_shutdown(ip->i_mount))
+>      return -EIO;    ---> dd fail
+> ```
+>>> balance_dirty_pages() is sleeping in KILLABLE state, so kill -9 of
+>>> the dd process should succeed.
+>> Yeah, dd can be killed, however it may be any application(s), :-)
+>>
+>> Fortunately it won't cause trouble during reboot/power off, given
+>> userspace will be killed at that time.
+>>
+>>
+>>
+>> Thanks,
+>> Ming
+>>
+> Don't worry about that, we always set the current thread to TASK_KILLABLE
+>
+> while waiting in balance_dirty_pages().
+>
+>
+On second thought, we can determine if the file system has become read-only
+when the ext4_file_write_iter() is called on a write file, even though 
+the fs was
+not read-only when the file was opened.
 
-I'd like to use the opportunity to align and discuss the nvme state machine
-refactoring work in person. I don't think we need a lot of time for this topic,
-so if we could just have the topic during a BOF it would be great.
+This would end the write process early and free up resources like xfs does.
+The patch is below, does anyone have any other thoughts?
 
-Sagi proposed following high level API:
 
-  ops.setup_transport(ctrl)
-  ops.alloc_admin_queue(ctrl)
-  ops.start_admin_queue(ctrl)
-  ops.stop_admin_queue(ctrl)
-  ops.free_admin_queue(ctrl)
-  ops.alloc_io_queues(ctrl)
-  ops.start_io_queues(ctrl)
-  ops.stop_io_queues(ctrl)
-  ops.free_io_queues(ctrl)
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index d101b3b0c7da..d2966268ee41 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -699,6 +699,8 @@ ext4_file_write_iter(struct kiocb *iocb, struct 
+iov_iter *from)
 
-Getting the queue functions done is fairly straight forward and I didn't run
-into any problems in my experiments.
+         if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
+                 return -EIO;
++       if (unlikely(sb_rdonly(inode->i_sb)))
++               return -EROFS;
 
-The more tricky part is the slight different behavior how the transports handle
-how many queues are allocated for IO and their placement. To keep it exactly as
-it is right now, I had to add a couple of additional callbacks aside to
-setup_transport():
+  #ifdef CONFIG_FS_DAX
+         if (IS_DAX(inode))
 
- - nr_io_queues(): limit the number of queues
- - set_io_queues(): map the queues to cpu
 
-The first one was mainly necessary for rdma but IIRC Keith has done some work
-there which could make the callback unnecessary. My question is should we try
-to unify this part as well?
-
-Also I haven't really checked what pci does here.
-
-The second callback should probably be replaced with something which is also
-executed during runtime, e.g. for CPU hotplug events. I don't think it is
-strictly necessary. At least it looks a bit suspicious that we only do the queue
-cpu mapping when (re)connecting. But maybe I am just missing something.
-
-There is also the question how to handle the flags set by the core and the one
-set the the transports. There are generic ones like NVME_TCP_Q_LIVE. These can
-be translated into generic ones, so fairly simple. Though here is one transport
-specific one in rdma: NVME_RDMA_Q_TR_READY. What to do here?
-
-In short, I don't think there are real blockers. The main question for me is, do
-we want to unify all transport so far that they act exactly the same?
-
-Required Attendees:
-  - Chaitanya Kulkarni
-  - Christoph Hellwig
-  - Hannes Reinecke
-  - James Smart
-  - Keith Busch
-  - Sagi Grimberg
-
-Anyway, I think it is necessary to have tests in blktests up front. Hence my
-current effort with enabling fc transport in blktests.
-
-Thanks,
-Daniel
-
-https://lore.kernel.org/linux-nvme/20230301082737.10021-1-dwagner@suse.de/
-https://lore.kernel.org/linux-nvme/20230306093244.20775-1-dwagner@suse.de/
+-- 
+With Best Regards,
+Baokun Li
+.
