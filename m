@@ -2,227 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 324F4C77B61
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 12:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80EF0C77B61
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 15:03:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243662AbjD0Mpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 08:45:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56812 "EHLO
+        id S243761AbjD0PDp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 11:03:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243650AbjD0Mpa (ORCPT
+        with ESMTP id S243520AbjD0PDo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 08:45:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7CED49CF
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 05:44:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682599490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EU/1ZmJlG2YNYj9Bm2/heLVqDeyFP/r0V2ix6bzUxXI=;
-        b=c30grteM7XdP4SnXf2Y7iyfWqCXvZ7nuwz7ofWhaUlvYUnqD/H4GnfKAak9z3vpWm1NEL5
-        qc03VIXRTYVeSclbDOAQZMSenHSWWlcwgaKUnSrPXcOzgxt9alpeyy6+qr/qzpyFcWrQZE
-        Rg1QxfTT6aBQclpOuQGaMkw+ThM31ag=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-225-krqkicsEPjqTXmTKRRansw-1; Thu, 27 Apr 2023 08:44:45 -0400
-X-MC-Unique: krqkicsEPjqTXmTKRRansw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 27 Apr 2023 11:03:44 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1956E1992;
+        Thu, 27 Apr 2023 08:03:43 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E4CA1066544;
-        Thu, 27 Apr 2023 12:44:44 +0000 (UTC)
-Received: from localhost (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 582D8C15BAD;
-        Thu, 27 Apr 2023 12:44:43 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Harris James R <james.r.harris@intel.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 7/7] ublk: support user copy
-Date:   Thu, 27 Apr 2023 20:44:14 +0800
-Message-Id: <20230427124414.319945-8-ming.lei@redhat.com>
-In-Reply-To: <20230427124414.319945-1-ming.lei@redhat.com>
-References: <20230427124414.319945-1-ming.lei@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A8FB663921;
+        Thu, 27 Apr 2023 15:03:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B03CAC433D2;
+        Thu, 27 Apr 2023 15:03:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682607822;
+        bh=xcd6XEBmruik18HKPh5fM0OLhLHBkJHfnUPr0koBNIU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rpqEvN1aXAHVdk71XXuC7NOzyMTs8Ls/CX3qrzIJmt5vJ04KOyTBa41CNXojTvNeD
+         exd61xkVd+E4g6l51CkQ5f3oDQCRPoznKPh82CCKxju8QEQIOrYsh4GiwODfqPJ2B1
+         Iod3XcgwjURdZhIDO92ZCge6UCWlcBVspgxuQmP/Sw9UuIzsHvFx+4CeDhs6XqeKQG
+         JFHHY56UKsoC6gppnerhI4QjQWBkeHgQMdRaOutIRBlxAq+CIH140+f/NfQ2RvsQ8g
+         JHUugzptbmH1tiYfrmmyNtCMriq2oVgRior4fyjs06NrpsLcudE8ONujcAOmyWXvVL
+         3IRHPiNI1FGuQ==
+Date:   Thu, 27 Apr 2023 09:03:39 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: another nvme pssthrough design based on nvme hardware queue file
+ abstraction
+Message-ID: <ZEqOy6oFp7tc06dH@kbusch-mbp.dhcp.thefacebook.com>
+References: <24179a47-ab37-fa32-d177-1086668fbd3d@linux.alibaba.com>
+ <ZEkxUG4AUcBQKfdr@kbusch-mbp.dhcp.thefacebook.com>
+ <3e04dbdc-335a-8cc1-f1e2-72e395700da6@linux.alibaba.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <3e04dbdc-335a-8cc1-f1e2-72e395700da6@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently copy between io request buffer(pages) and userspace buffer is
-done inside ublk_map_io() or ublk_unmap_io(). This way performs very
-well in case of pre-allocated userspace io buffer.
+On Thu, Apr 27, 2023 at 08:17:30PM +0800, Xiaoguang Wang wrote:
+> > On Wed, Apr 26, 2023 at 09:19:57PM +0800, Xiaoguang Wang wrote:
+> >> hi all,
+> >>
+> >> Recently we start to test nvme passthrough feature, which is based on io_uring. Originally we
+> >> thought its performance would be much better than normal polled nvme test, but test results
+> >> show that it's not:
+> >> $ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O0 -n1  -u1 /dev/ng1n1
+> >> IOPS=891.49K, BW=435MiB/s, IOS/call=32/31
+> >> IOPS=891.07K, BW=435MiB/s, IOS/call=31/31
+> >>
+> >> $ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O1 -n1 /dev/nvme1n1
+> >> IOPS=807.81K, BW=394MiB/s, IOS/call=32/31
+> >> IOPS=808.13K, BW=394MiB/s, IOS/call=32/32
+> >>
+> >> about 10% iops improvement, I'm not saying its not good, just had thought it should
+> >> perform much better.
+> > What did you think it should be? What is the maximum 512b read IOPs your device
+> > is capable of producing?
+> From the naming of this feature, I thought it would bypass blocker thoroughly, hence
+> would gain much higher performance, for myself, if this feature can improves 25% higher
+> or more, that would be much more attractive, and users would like to try it. Again, I'm
+> not saying this feature is not good, just thought it would perform much better for small io.
 
-For dynamically allocated or external userspace backend io buffer,
-UBLK_F_NEED_GET_DATA is added for ublk server to provide buffer by one
-extra command communication for WRITE request. For READ, userspace
-simply provides buffer, but can't know when the buffer is done[1].
+It does bypass the block layer. The driver just uses library functions provided
+by the block layer for things it doesn't want to duplicate. Reimplementing that
+functionality in driver isn't going to improve anything.
 
-Add UBLK_F_USER_COPY by moving io data copy out of kernel by providing
-read()/write() on /dev/ublkcN, and simply let ublk server do the io
-data copy. This way makes both side cleaner, the cost is that one extra
-syscall for copy io data between request and backend buffer.
+> >> In our kernel config, no active ﻿q->stats->callbacks, but still has this overhead.
+> >>
+> >> 2. 0.97%  io_uring  [kernel.vmlinux]  [k] bio_associate_blkg_from_css
+> >>     0.85%  io_uring  [kernel.vmlinux]  [k] bio_associate_blkg
+> >>     0.74%  io_uring  [kernel.vmlinux]  [k] blkg_lookup_create
+> >> For nvme passthrough feature, it tries to dispatch nvme commands to nvme
+> >> controller directly, so should get rid of these overheads.
+> >>
+> >> 3. 3.19%  io_uring  [kernel.vmlinux]  [k] __rcu_read_unlock
+> >>     2.65%  io_uring  [kernel.vmlinux]  [k] __rcu_read_lock
+> >> Frequent rcu_read_lock/unlcok overheads, not sure whether we can improve a bit.
+> >>
+> >> 4. 7.90%  io_uring  [nvme]            [k] nvme_poll
+> >>     3.59%  io_uring  [nvme_core]       [k] nvme_ns_chr_uring_cmd_iopoll
+> >>     2.63%  io_uring  [kernel.vmlinux]  [k] blk_mq_poll_classic
+> >>     1.88%  io_uring  [nvme]            [k] nvme_poll_cq
+> >>     1.74%  io_uring  [kernel.vmlinux]  [k] bio_poll
+> >>     1.89%  io_uring  [kernel.vmlinux]  [k] xas_load
+> >>     0.86%  io_uring  [kernel.vmlinux]  [k] xas_start
+> >>     0.80%  io_uring  [kernel.vmlinux]  [k] xas_start
+> >> Seems that the block poll operation call chain is somewhat deep, also
+> > It's not really that deep, though the xarray lookups are unfortunate.
+> >
+> > And if you were to remove block layer, it looks like you'd end up just shifting
+> > the CPU utilization to a different polling function without increasing IOPs.
+> > Your hardware doesn't look fast enough for this software overhead to be a
+> > concern.
+> No, I may not agree with you here, sorry. Real products(not like t/io_uring tools,
+> which just polls block layer when ios are issued) will have many other work
+> to run, such as network work. If we can cut the nvme passthrough overhead more,
+> saved cpu will use to do other useful work.
 
-With UBLK_F_USER_COPY, it actually becomes possible to run per-io zero
-copy now, such as, only do zero copy for big size IO, so it can be
-thought as one prep patch for supporting zero copy. Meantime zero copy
-still needs to expose read()/write() buffer for some corner case, such
-as passthrough IO.
+You initiated this thread with supposed underwhelming IOPs improvements from
+the io engine, but now you've shifted your criteria.
 
-[1] READ buffer in UBLK_F_NEED_GET_DATA
-https://lore.kernel.org/linux-block/116d8a56-0881-56d3-9bcc-78ff3e1dc4e5@linux.alibaba.com/T/#m23bd4b8634c0a054e6797063167b469949a247bb
-
-ublksrv loop usercopy code:
-
-	https://github.com/ming1/ubdsrv/commits/usercopy
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c      | 57 ++++++++++++++++++++++++++++-------
- include/uapi/linux/ublk_cmd.h |  3 ++
- 2 files changed, 49 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index ebe37bb23ec6..40e0de6479eb 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -55,7 +55,8 @@
- 		| UBLK_F_USER_RECOVERY \
- 		| UBLK_F_USER_RECOVERY_REISSUE \
- 		| UBLK_F_UNPRIVILEGED_DEV \
--		| UBLK_F_CMD_IOCTL_ENCODE)
-+		| UBLK_F_CMD_IOCTL_ENCODE \
-+		| UBLK_F_USER_COPY)
- 
- /* All UBLK_PARAM_TYPE_* should be included here */
- #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | \
-@@ -311,9 +312,18 @@ static int ublk_apply_params(struct ublk_device *ub)
- 	return 0;
- }
- 
-+static inline bool ublk_support_user_copy(const struct ublk_queue *ubq)
-+{
-+	return ubq->flags & UBLK_F_USER_COPY;
-+}
-+
- static inline bool ublk_need_req_ref(const struct ublk_queue *ubq)
- {
--	return false;
-+	/*
-+	 * read()/write() is involved in user copy, so request reference
-+	 * has to be grabbed
-+	 */
-+	return ublk_support_user_copy(ubq);
- }
- 
- static inline void ublk_init_req_ref(const struct ublk_queue *ubq,
-@@ -590,6 +600,9 @@ static int ublk_map_io(const struct ublk_queue *ubq, const struct request *req,
- {
- 	const unsigned int rq_bytes = blk_rq_bytes(req);
- 
-+	if (ublk_support_user_copy(ubq))
-+		return rq_bytes;
-+
- 	/*
- 	 * no zero copy, we delay copy WRITE request data into ublksrv
- 	 * context and the big benefit is that pinning pages in current
-@@ -614,6 +627,9 @@ static int ublk_unmap_io(const struct ublk_queue *ubq,
- {
- 	const unsigned int rq_bytes = blk_rq_bytes(req);
- 
-+	if (ublk_support_user_copy(ubq))
-+		return rq_bytes;
-+
- 	if (ublk_need_unmap_req(req)) {
- 		struct iov_iter iter;
- 		struct iovec iov;
-@@ -1372,6 +1388,11 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 			^ (_IOC_NR(cmd_op) == UBLK_IO_NEED_GET_DATA))
- 		goto out;
- 
-+	if (ublk_support_user_copy(ubq) && ub_cmd->addr) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
- 	ret = ublk_check_cmd_op(cmd_op);
- 	if (ret)
- 		goto out;
-@@ -1390,23 +1411,34 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
- 		 */
- 		if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
- 			goto out;
--		/* FETCH_RQ has to provide IO buffer if NEED GET DATA is not enabled */
--		if (!ub_cmd->addr && !ublk_need_get_data(ubq))
--			goto out;
-+
-+		if (!ublk_support_user_copy(ubq)) {
-+			/*
-+			 * FETCH_RQ has to provide IO buffer if NEED GET
-+			 * DATA is not enabled
-+			 */
-+			if (!ub_cmd->addr && !ublk_need_get_data(ubq))
-+				goto out;
-+		}
- 
- 		ublk_fill_io(io, cmd, ub_cmd->addr);
- 		ublk_mark_io_ready(ub, ubq);
- 		break;
- 	case UBLK_IO_COMMIT_AND_FETCH_REQ:
- 		req = blk_mq_tag_to_rq(ub->tag_set.tags[ub_cmd->q_id], tag);
--		/*
--		 * COMMIT_AND_FETCH_REQ has to provide IO buffer if NEED GET DATA is
--		 * not enabled or it is Read IO.
--		 */
--		if (!ub_cmd->addr && (!ublk_need_get_data(ubq) || req_op(req) == REQ_OP_READ))
--			goto out;
-+
- 		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
- 			goto out;
-+
-+		if (!ublk_support_user_copy(ubq)) {
-+			/*
-+			 * COMMIT_AND_FETCH_REQ has to provide IO buffer if
-+			 * NEED GET DATA is not enabled or it is Read IO.
-+			 */
-+			if (!ub_cmd->addr && (!ublk_need_get_data(ubq) ||
-+						req_op(req) == REQ_OP_READ))
-+				goto out;
-+		}
- 		ublk_fill_io(io, cmd, ub_cmd->addr);
- 		ublk_commit_completion(ub, ub_cmd);
- 		break;
-@@ -1966,6 +1998,9 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	ub->dev_info.flags |= UBLK_F_CMD_IOCTL_ENCODE |
- 		UBLK_F_URING_CMD_COMP_IN_TASK;
- 
-+	if (ub->dev_info.flags & UBLK_F_USER_COPY)
-+		ub->dev_info.flags &= ~UBLK_F_NEED_GET_DATA;
-+
- 	/* We are not ready to support zero copy */
- 	ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
- 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index a20ea079ca9b..e26ca0bdd7c5 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -165,6 +165,9 @@
- /* use ioctl encoding for uring command */
- #define UBLK_F_CMD_IOCTL_ENCODE	(1UL << 6)
- 
-+/* Copy between request and user buffer by pread()/pwrite() */
-+#define UBLK_F_USER_COPY	(1UL << 7)
-+
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
--- 
-2.40.0
-
+You can always turn off the kernel's stats and cgroups if you don't find them
+useful.
