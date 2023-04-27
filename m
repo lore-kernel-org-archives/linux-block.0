@@ -2,96 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B0BC77B7C
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 00:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0647C77B60
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 02:21:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242772AbjD0A0X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Apr 2023 20:26:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51274 "EHLO
+        id S242745AbjD0CVi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Apr 2023 22:21:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242689AbjD0A0V (ORCPT
+        with ESMTP id S242709AbjD0CVi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2023 20:26:21 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7E740F5
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 17:26:20 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1a6a50dd62cso10068775ad.1
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 17:26:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682555179; x=1685147179;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JTOkRfNYIcCyobGPmwTR41HZBXplh4O+VdZT8qkDAZs=;
-        b=SG/9x29S2i7UOgFAB9FBCxeDkY9UXuXY4AHfghZkPkuVh1BqDqug6ga/nRw2yuSZr1
-         OWKsZtymxEJJAZVRwQPl5w//p/ZCSTV7WlIss3X6FnvHVdhZihsl4TX4GP9tbn4MVHRu
-         Dop89EfFJqUvw6cq5UiqAWG+jVAUfM1UPZ8CXa0b38tIW5ieYECKsSzKm2fIDuDAdWrX
-         7ejR+BN96Sgfvfe3ALjEz153NNL0t7FG4XoyuTjd4hFVsdAoiwp1o1B2NNwxv53cp+DQ
-         8T/Q03QqC+N8/pFUW8XEXdVZInL1HFWP+a4r5XJF8uDw5LPlOpHmUTxn1lJ56h3+4k75
-         djsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682555179; x=1685147179;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JTOkRfNYIcCyobGPmwTR41HZBXplh4O+VdZT8qkDAZs=;
-        b=djFk3JfiThKbL3cf6TOiye+qlMOOi0oITTXzh6Be0f6MWJZB17Ae0DJE8RW9IQW2+u
-         6sCaUEyF8XnarkXJ9376mVDUEmzbO6BxTxtckEPtPOF3MrA5C+jqoB0rRAJNtgiMVF3z
-         pyorPZ5rrRIdf1UGxOLMqs/zgxVztXunS5ci3/+gvEPFLUNDyKkcsrxkW2vj9K9w2SaA
-         eETQFS8B2L69crk/k3nqmkyVEyLKPFvELxfoaVdPNdXOSXEPUuf13+EBD3BqjXeGIp/k
-         FpYC4rwlH7lRX5ZftzFPbPyQFYFX9kIAQtIk3gCJ2ARIVG8/ZdXQXSm7ns+S0AYvarYs
-         pBEg==
-X-Gm-Message-State: AC+VfDx/p1Y8vmsd0DR6bYqZK9xShWMRD7xRlUoF2i57Poo78JQnLQ68
-        7J2Pjdt3hZMvn33aU8M/u7uF8ObBNdijX6+QGZg=
-X-Google-Smtp-Source: ACHHUZ7q1W+ObQVu0dbQ+J+W3jj+iRhsLm6KT6rUgicarGzFDj0n8iSNF9dqH7imMUY1nISc44EC5w==
-X-Received: by 2002:a17:902:ea12:b0:1a9:4167:5db7 with SMTP id s18-20020a170902ea1200b001a941675db7mr8985693plg.4.1682555179437;
-        Wed, 26 Apr 2023 17:26:19 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id b5-20020a170902a9c500b001a6f6638595sm10403862plr.92.2023.04.26.17.26.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Apr 2023 17:26:19 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>
-In-Reply-To: <20230309-kobj_release-gendisk_integrity-v3-0-ceccb4493c46@weissschuh.net>
-References: <20230309-kobj_release-gendisk_integrity-v3-0-ceccb4493c46@weissschuh.net>
-Subject: Re: [PATCH v3 0/3] blk-integrity: drop integrity_kobj from gendisk
-Message-Id: <168255517853.49697.6615983265026536560.b4-ty@kernel.dk>
-Date:   Wed, 26 Apr 2023 18:26:18 -0600
+        Wed, 26 Apr 2023 22:21:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD433C16
+        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 19:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682562044;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=GCPcaFdJ9SvoZ93cdbG0lFwwi9Thl1ubA5vESylOj3g=;
+        b=XP42qjAwM3lzgyaYuWSOHp9o1lxcxWVCnK4zHL5ozhraMfCE3kEEhFu2FLnhY1mkJExG0g
+        g9Q8bs6cxwLeFZmJ1r84a/ty8TWOLpLwVwMDEM1AD5lCjVHo6WZ3Ey42z4m5SRZKuaiwKs
+        s0TZsrOtVsJfE/DOgx1LsyauQv8mNTQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-605-aRep1uVGPCu1PlVejb15nA-1; Wed, 26 Apr 2023 22:20:40 -0400
+X-MC-Unique: aRep1uVGPCu1PlVejb15nA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5842B29A9D28;
+        Thu, 27 Apr 2023 02:20:40 +0000 (UTC)
+Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C35681121314;
+        Thu, 27 Apr 2023 02:20:33 +0000 (UTC)
+Date:   Thu, 27 Apr 2023 10:20:28 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org
+Cc:     ming.lei@redhat.com, Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>
+Subject: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Message-ID: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.13-dev-00303
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello Guys,
 
-On Sat, 18 Mar 2023 17:36:22 +0000, Thomas Weißschuh wrote:
-> The embedded member integrity_kobj member of struct gendisk violates
-> the assumption of the driver core that only one struct kobject should be
-> embedded into another object and then manages its lifetime.
-> 
-> As the integrity_kobj is only used to hold a few sysfs attributes it can
-> be replaced by direct device_attributes and removed.
-> 
-> [...]
+I got one report in which buffered write IO hangs in balance_dirty_pages,
+after one nvme block device is unplugged physically, then umount can't
+succeed.
 
-Applied, thanks!
+Turns out it is one long-term issue, and it can be triggered at least
+since v5.14 until the latest v6.3.
 
-[1/3] blk-integrity: use sysfs_emit
-      commit: 3315e169b446249c1b61ff988d157238f4b2c5a0
-[2/3] blk-integrity: convert to struct device_attribute
-      commit: 76b8c319f02715e14abdbbbdd6508e83a1059bcc
-[3/3] blk-integrity: register sysfs attributes on struct device
-      commit: ff53cd52d9bdbf4074d2bbe9b591729997780bd3
+And the issue can be reproduced reliably in KVM guest:
 
-Best regards,
--- 
-Jens Axboe
+1) run the following script inside guest:
+
+mkfs.ext4 -F /dev/nvme0n1
+mount /dev/nvme0n1 /mnt
+dd if=/dev/zero of=/mnt/z.img&
+sleep 10
+echo 1 > /sys/block/nvme0n1/device/device/remove
+
+2) dd hang is observed and /dev/nvme0n1 is gone actually
+
+[root@ktest-09 ~]# ps -ax | grep dd
+   1348 pts/0    D      0:33 dd if=/dev/zero of=/mnt/z.img
+   1365 pts/0    S+     0:00 grep --color=auto dd
+
+[root@ktest-09 ~]# cat /proc/1348/stack
+[<0>] balance_dirty_pages+0x649/0x2500
+[<0>] balance_dirty_pages_ratelimited_flags+0x4c6/0x5d0
+[<0>] generic_perform_write+0x310/0x4c0
+[<0>] ext4_buffered_write_iter+0x130/0x2c0 [ext4]
+[<0>] new_sync_write+0x28e/0x4a0
+[<0>] vfs_write+0x62a/0x920
+[<0>] ksys_write+0xf9/0x1d0
+[<0>] do_syscall_64+0x59/0x90
+[<0>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
 
+[root@ktest-09 ~]# lsblk | grep nvme
+[root@ktest-09 ~]#
+
+BTW, my VM sets 2G ram, and the nvme disk size is 40GB.
+
+So far only observed on ext4 FS, not see it on XFS. I guess it isn't
+related with disk type, and not tried such test on other type of disks yet,
+but will do.
+
+Seems like dirty pages aren't cleaned after ext4 bio is failed in this
+situation?
+
+
+Thanks,
+Ming
 
