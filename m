@@ -2,164 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A93BC77B7F
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 12:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C91EC77B73
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 12:45:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243895AbjD0MRj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 08:17:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36724 "EHLO
+        id S243748AbjD0MpO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 08:45:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243885AbjD0MRg (ORCPT
+        with ESMTP id S243510AbjD0MpN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 08:17:36 -0400
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CED3E4F;
-        Thu, 27 Apr 2023 05:17:34 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0Vh7USU._1682597850;
-Received: from 30.221.148.223(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0Vh7USU._1682597850)
-          by smtp.aliyun-inc.com;
-          Thu, 27 Apr 2023 20:17:31 +0800
-Message-ID: <3e04dbdc-335a-8cc1-f1e2-72e395700da6@linux.alibaba.com>
-Date:   Thu, 27 Apr 2023 20:17:30 +0800
+        Thu, 27 Apr 2023 08:45:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05DE24233
+        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 05:44:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682599473;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dehvtx8JiMw1iS4HkfW+eV7Iijc2rl3zXXDIKkCePzc=;
+        b=apApMMoEjFcwV4RlChWHRCTLrfVIuBmQj7qKvLCf7q242IiGWNdHTn0K5fwguqw8oN/k/y
+        mhRGdVro9lF0RqZaXl83Bt1/38wNW4wAfMHf0ydJk8HPJ2uHbQ90Vl8Vrkbp++b77l1IGX
+        kruE6aTZTmyrYMOHVJ1ZELmToiZrkzo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-70-o1tqt8aHP5SNzeRZeaiLIA-1; Thu, 27 Apr 2023 08:44:27 -0400
+X-MC-Unique: o1tqt8aHP5SNzeRZeaiLIA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 261AF2A5955D;
+        Thu, 27 Apr 2023 12:44:27 +0000 (UTC)
+Received: from localhost (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5968240C2064;
+        Thu, 27 Apr 2023 12:44:26 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Harris James R <james.r.harris@intel.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 2/7] ublk: cleanup io cmd code path by adding ublk_fill_io()
+Date:   Thu, 27 Apr 2023 20:44:09 +0800
+Message-Id: <20230427124414.319945-3-ming.lei@redhat.com>
+In-Reply-To: <20230427124414.319945-1-ming.lei@redhat.com>
+References: <20230427124414.319945-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: another nvme pssthrough design based on nvme hardware queue file
- abstraction
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-References: <24179a47-ab37-fa32-d177-1086668fbd3d@linux.alibaba.com>
- <ZEkxUG4AUcBQKfdr@kbusch-mbp.dhcp.thefacebook.com>
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-In-Reply-To: <ZEkxUG4AUcBQKfdr@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hi,
+Add one small helper to cleanup io command hanlding code path.
 
-> On Wed, Apr 26, 2023 at 09:19:57PM +0800, Xiaoguang Wang wrote:
->> hi all,
->>
->> Recently we start to test nvme passthrough feature, which is based on io_uring. Originally we
->> thought its performance would be much better than normal polled nvme test, but test results
->> show that it's not:
->> $ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O0 -n1  -u1 /dev/ng1n1
->> IOPS=891.49K, BW=435MiB/s, IOS/call=32/31
->> IOPS=891.07K, BW=435MiB/s, IOS/call=31/31
->>
->> $ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O1 -n1 /dev/nvme1n1
->> IOPS=807.81K, BW=394MiB/s, IOS/call=32/31
->> IOPS=808.13K, BW=394MiB/s, IOS/call=32/32
->>
->> about 10% iops improvement, I'm not saying its not good, just had thought it should
->> perform much better.
-> What did you think it should be? What is the maximum 512b read IOPs your device
-> is capable of producing?
-From the naming of this feature, I thought it would bypass blocker thoroughly, hence
-would gain much higher performance, for myself, if this feature can improves 25% higher
-or more, that would be much more attractive, and users would like to try it. Again, I'm
-not saying this feature is not good, just thought it would perform much better for small io.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-My test environment has one intel p4510 nvme ssd and one intel p4800x nvme ssd.
-According to spec, p4510 's rand read iops is about 640000, and p4800x is 550000.
-To maximizing device performance, I'll do one discard before test, that is
-sudo blkdiscard /dev/nvme0n1 or /dev/nvme1n1.
-
-In 6.3.0-rc2, taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O0 -n1  -u1 /dev/ng1n1
-shows 890k iops. I modified codes a bit to get rid of blkcg overhead, iops will increase 920k.
-And if I benchmark /dev/ng0n1 and /dev/ng1n1 at the same time, total iops would be
-about 1150k, cannot utilize the maximum capacity of these two devices.
-
->
->> After reading codes, I finds that this nvme passthrough feature
->> is still based on blk-mq, use perf tool to analyse and there are some block layer
->> overheads that seems somewhat big:
->> 1. 2.48%  io_uring  [kernel.vmlinux]  [k] blk_stat_add
->> In our kernel config, no active ﻿q->stats->callbacks, but still has this overhead.
->>
->> 2. 0.97%  io_uring  [kernel.vmlinux]  [k] bio_associate_blkg_from_css
->>     0.85%  io_uring  [kernel.vmlinux]  [k] bio_associate_blkg
->>     0.74%  io_uring  [kernel.vmlinux]  [k] blkg_lookup_create
->> For nvme passthrough feature, it tries to dispatch nvme commands to nvme
->> controller directly, so should get rid of these overheads.
->>
->> 3. 3.19%  io_uring  [kernel.vmlinux]  [k] __rcu_read_unlock
->>     2.65%  io_uring  [kernel.vmlinux]  [k] __rcu_read_lock
->> Frequent rcu_read_lock/unlcok overheads, not sure whether we can improve a bit.
->>
->> 4. 7.90%  io_uring  [nvme]            [k] nvme_poll
->>     3.59%  io_uring  [nvme_core]       [k] nvme_ns_chr_uring_cmd_iopoll
->>     2.63%  io_uring  [kernel.vmlinux]  [k] blk_mq_poll_classic
->>     1.88%  io_uring  [nvme]            [k] nvme_poll_cq
->>     1.74%  io_uring  [kernel.vmlinux]  [k] bio_poll
->>     1.89%  io_uring  [kernel.vmlinux]  [k] xas_load
->>     0.86%  io_uring  [kernel.vmlinux]  [k] xas_start
->>     0.80%  io_uring  [kernel.vmlinux]  [k] xas_start
->> Seems that the block poll operation call chain is somewhat deep, also
-> It's not really that deep, though the xarray lookups are unfortunate.
->
-> And if you were to remove block layer, it looks like you'd end up just shifting
-> the CPU utilization to a different polling function without increasing IOPs.
-> Your hardware doesn't look fast enough for this software overhead to be a
-> concern.
-No, I may not agree with you here, sorry. Real products(not like t/io_uring tools,
-which just polls block layer when ios are issued) will have many other work
-to run, such as network work. If we can cut the nvme passthrough overhead more,
-saved cpu will use to do other useful work.
-
-For example, some produces would poll storage and network, if we can reduce
-poll storage quicker, we can poll network earlier, which may reduce network
-latency. As I said in below section, If we can map nvme cqes to user space, we
-may check whether io has been completed in user space, only do kernel block iopoll
-necessary.
-
->
->> not sure whether we can improve it a bit, and the xas overheads also
->> looks big, it's introduced by https://lore.kernel.org/all/20220307064401.30056-7-ming.lei@redhat.com/
->> which fixed one use-after-free bug.
->>
->> 5. other blocker overhead I don't spend time to look into.
->>
->> Some of our clients are interested in nvme passthrough feature, they visit
->> nvme devices by open(2) and read(2)/write(2) nvme device files directly, bypass
->> filesystem, so they'd like to try nvme passthrough feature, to gain bigger iops, but
->> currenty performance seems not that good. And they don't want to use spdk yet,
->> still try to build fast storage based on linux kernel io stack for various reasons  :)
->>
->> So I'd like to propose a new nvme passthrough design here, which may improve
->> performance a lot. Here are just rough design ideas here, not start to code yet.
->>   1. There are three types of nvme hardware queues, "default", "write" and "poll",
->> currently all these queues are visible to block layer, blk-mq will map these queues
->> properly.  Here this new design will add two new nvme hardware queues, name them
->> "user_irq" and "user_poll" queues, which will need to add two nvme module parameters,
->> similar to current "write_queues" and "poll_queues".
->>   2. "user_irq" and "user_poll" queues will not be visible to block layer, and will create
->> corresponding char device file for them,  that means nvme hardware queues will be
->> abstracted as linux file, not sure whether to support read_iter or write_iter, but
->> uring_cmd() interface will be supported firstly. user_irq queue will still have irq, user_poll
->> queue will support poll.
->>   3. Finally the data flow will look like below in example of user_irq queue:
->> io issue: io_uring  uring_cmd >> prep nvme command in its char device's uring_cmd() >> submit to nvme.
->> io reap: find io_uring request by nvme command id, and call uring_cmd_done for it.
->> Yeah, need to build association between io_uring request and nvme command id.
->>
->> Possible advantages:
->> 1. Bypass block layer thoroughly.
-> blk-mq has common solutions that we don't want to duplicate in driver. It
-> provides safe access to shared tags across multiple processes, ensures queue
-> live-ness during a controller reset, tracks commands for timeouts, among other
-> things.
-Yeah, I agree there will be some duplicate functionality with blk-mq,
-not start to do detailed design yet(will do later), but I think there maybe
-not much. I'd like to implement prototype firstly for you to review, to see
-what performance we can get. If performance data is really impressive, I
-think it maybe deserve the duplicate.
-
-Regards,
-Xiaoguang Wang
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 068d8b99605b..0980c9fec669 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1238,6 +1238,14 @@ static inline int ublk_check_cmd_op(u32 cmd_op)
+ 	return 0;
+ }
+ 
++static inline void ublk_fill_io(struct ublk_io *io, struct io_uring_cmd *cmd,
++		unsigned long buf_addr)
++{
++	io->cmd = cmd;
++	io->flags |= UBLK_IO_FLAG_ACTIVE;
++	io->addr = buf_addr;
++}
++
+ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			       unsigned int issue_flags,
+ 			       struct ublksrv_io_cmd *ub_cmd)
+@@ -1304,10 +1312,8 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 		/* FETCH_RQ has to provide IO buffer if NEED GET DATA is not enabled */
+ 		if (!ub_cmd->addr && !ublk_need_get_data(ubq))
+ 			goto out;
+-		io->cmd = cmd;
+-		io->flags |= UBLK_IO_FLAG_ACTIVE;
+-		io->addr = ub_cmd->addr;
+ 
++		ublk_fill_io(io, cmd, ub_cmd->addr);
+ 		ublk_mark_io_ready(ub, ubq);
+ 		break;
+ 	case UBLK_IO_COMMIT_AND_FETCH_REQ:
+@@ -1320,17 +1326,13 @@ static int __ublk_ch_uring_cmd(struct io_uring_cmd *cmd,
+ 			goto out;
+ 		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+ 			goto out;
+-		io->addr = ub_cmd->addr;
+-		io->flags |= UBLK_IO_FLAG_ACTIVE;
+-		io->cmd = cmd;
++		ublk_fill_io(io, cmd, ub_cmd->addr);
+ 		ublk_commit_completion(ub, ub_cmd);
+ 		break;
+ 	case UBLK_IO_NEED_GET_DATA:
+ 		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+ 			goto out;
+-		io->addr = ub_cmd->addr;
+-		io->cmd = cmd;
+-		io->flags |= UBLK_IO_FLAG_ACTIVE;
++		ublk_fill_io(io, cmd, ub_cmd->addr);
+ 		ublk_handle_need_get_data(ub, ub_cmd->q_id, ub_cmd->tag);
+ 		break;
+ 	default:
+-- 
+2.40.0
 
