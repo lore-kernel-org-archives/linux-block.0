@@ -2,177 +2,164 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8803DC77B61
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 11:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A93BC77B7F
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 12:17:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243741AbjD0L2I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 07:28:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39856 "EHLO
+        id S243895AbjD0MRj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 08:17:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243416AbjD0L2H (ORCPT
+        with ESMTP id S243885AbjD0MRg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 07:28:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC0F59EC
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 04:27:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682594843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GvY4p7P7cJsg0/C+DT6cOBtihMGDlSNrlTaMona+HC4=;
-        b=NRxpLZJFUadTKBbcn9lYHlbABDRQi9ZPef0oHMQybtCTewrHegyoFqKg8CBqtlWKGipcyg
-        CO00sXEsMwKYoTEP44ntB/STRdh0+czncL1l7ctMwRiq7RZX/3yNeR62oiecChjwnT68HG
-        fMd1diWatqlhiAWEhkJSeLqBMru04mw=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-471-i-P2r6DfNfq2gp1vlaW-_Q-1; Thu, 27 Apr 2023 07:27:17 -0400
-X-MC-Unique: i-P2r6DfNfq2gp1vlaW-_Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 169CA1C04190;
-        Thu, 27 Apr 2023 11:27:17 +0000 (UTC)
-Received: from ovpn-8-26.pek2.redhat.com (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6303F1121315;
-        Thu, 27 Apr 2023 11:27:08 +0000 (UTC)
-Date:   Thu, 27 Apr 2023 19:27:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Baokun Li <libaokun1@huawei.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
-        yangerkun <yangerkun@huawei.com>, ming.lei@redhat.com
-Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
-Message-ID: <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
-References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
- <ZEny7Izr8iOc/23B@casper.infradead.org>
- <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
- <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
- <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
- <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
+        Thu, 27 Apr 2023 08:17:36 -0400
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CED3E4F;
+        Thu, 27 Apr 2023 05:17:34 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0Vh7USU._1682597850;
+Received: from 30.221.148.223(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0Vh7USU._1682597850)
+          by smtp.aliyun-inc.com;
+          Thu, 27 Apr 2023 20:17:31 +0800
+Message-ID: <3e04dbdc-335a-8cc1-f1e2-72e395700da6@linux.alibaba.com>
+Date:   Thu, 27 Apr 2023 20:17:30 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.0
+Subject: Re: another nvme pssthrough design based on nvme hardware queue file
+ abstraction
+Content-Language: en-US
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+References: <24179a47-ab37-fa32-d177-1086668fbd3d@linux.alibaba.com>
+ <ZEkxUG4AUcBQKfdr@kbusch-mbp.dhcp.thefacebook.com>
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+In-Reply-To: <ZEkxUG4AUcBQKfdr@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 27, 2023 at 07:19:35PM +0800, Baokun Li wrote:
-> On 2023/4/27 18:01, Ming Lei wrote:
-> > On Thu, Apr 27, 2023 at 02:36:51PM +0800, Baokun Li wrote:
-> > > On 2023/4/27 12:50, Ming Lei wrote:
-> > > > Hello Matthew,
-> > > > 
-> > > > On Thu, Apr 27, 2023 at 04:58:36AM +0100, Matthew Wilcox wrote:
-> > > > > On Thu, Apr 27, 2023 at 10:20:28AM +0800, Ming Lei wrote:
-> > > > > > Hello Guys,
-> > > > > > 
-> > > > > > I got one report in which buffered write IO hangs in balance_dirty_pages,
-> > > > > > after one nvme block device is unplugged physically, then umount can't
-> > > > > > succeed.
-> > > > > That's a feature, not a bug ... the dd should continue indefinitely?
-> > > > Can you explain what the feature is? And not see such 'issue' or 'feature'
-> > > > on xfs.
-> > > > 
-> > > > The device has been gone, so IMO it is reasonable to see FS buffered write IO
-> > > > failed. Actually dmesg has shown that 'EXT4-fs (nvme0n1): Remounting
-> > > > filesystem read-only'. Seems these things may confuse user.
-> > > 
-> > > The reason for this difference is that ext4 and xfs handle errors
-> > > differently.
-> > > 
-> > > ext4 remounts the filesystem as read-only or even just continues, vfs_write
-> > > does not check for these.
-> > vfs_write may not find anything wrong, but ext4 remount could see that
-> > disk is gone, which might happen during or after remount, however.
-> > 
-> > > xfs shuts down the filesystem, so it returns a failure at
-> > > xfs_file_write_iter when it finds an error.
-> > > 
-> > > 
-> > > ``` ext4
-> > > ksys_write
-> > >   vfs_write
-> > >    ext4_file_write_iter
-> > >     ext4_buffered_write_iter
-> > >      ext4_write_checks
-> > >       file_modified
-> > >        file_modified_flags
-> > >         __file_update_time
-> > >          inode_update_time
-> > >           generic_update_time
-> > >            __mark_inode_dirty
-> > >             ext4_dirty_inode ---> 2. void func, No propagating errors out
-> > >              __ext4_journal_start_sb
-> > >               ext4_journal_check_start ---> 1. Error found, remount-ro
-> > >      generic_perform_write ---> 3. No error sensed, continue
-> > >       balance_dirty_pages_ratelimited
-> > >        balance_dirty_pages_ratelimited_flags
-> > >         balance_dirty_pages
-> > >          // 4. Sleeping waiting for dirty pages to be freed
-> > >          __set_current_state(TASK_KILLABLE)
-> > >          io_schedule_timeout(pause);
-> > > ```
-> > > 
-> > > ``` xfs
-> > > ksys_write
-> > >   vfs_write
-> > >    xfs_file_write_iter
-> > >     if (xfs_is_shutdown(ip->i_mount))
-> > >       return -EIO;    ---> dd fail
-> > > ```
-> > Thanks for the info which is really helpful for me to understand the
-> > problem.
-> > 
-> > > > > balance_dirty_pages() is sleeping in KILLABLE state, so kill -9 of
-> > > > > the dd process should succeed.
-> > > > Yeah, dd can be killed, however it may be any application(s), :-)
-> > > > 
-> > > > Fortunately it won't cause trouble during reboot/power off, given
-> > > > userspace will be killed at that time.
-> > > > 
-> > > > 
-> > > > 
-> > > > Thanks,
-> > > > Ming
-> > > > 
-> > > Don't worry about that, we always set the current thread to TASK_KILLABLE
-> > > 
-> > > while waiting in balance_dirty_pages().
-> > I have another concern, if 'dd' isn't killed, dirty pages won't be cleaned, and
-> > these (big amount)memory becomes not usable, and typical scenario could be USB HDD
-> > unplugged.
-> > 
-> > 
-> > thanks,
-> > Ming
-> Yes, it is unreasonable to continue writing data with the previously opened
-> fd after
-> the file system becomes read-only, resulting in dirty page accumulation.
-> 
-> I provided a patch in another reply.
-> Could you help test if it can solve your problem?
-> If it can indeed solve your problem, I will officially send it to the email
-> list.
+hi,
 
-OK, I will test it tomorrow.
+> On Wed, Apr 26, 2023 at 09:19:57PM +0800, Xiaoguang Wang wrote:
+>> hi all,
+>>
+>> Recently we start to test nvme passthrough feature, which is based on io_uring. Originally we
+>> thought its performance would be much better than normal polled nvme test, but test results
+>> show that it's not:
+>> $ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O0 -n1Â  -u1 /dev/ng1n1
+>> IOPS=891.49K, BW=435MiB/s, IOS/call=32/31
+>> IOPS=891.07K, BW=435MiB/s, IOS/call=31/31
+>>
+>> $ sudo taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O1 -n1 /dev/nvme1n1
+>> IOPS=807.81K, BW=394MiB/s, IOS/call=32/31
+>> IOPS=808.13K, BW=394MiB/s, IOS/call=32/32
+>>
+>> about 10% iops improvement, I'm not saying its not good, just had thought it should
+>> perform much better.
+> What did you think it should be? What is the maximum 512b read IOPs your device
+> is capable of producing?
+From the naming of this feature, I thought it would bypass blocker thoroughly, hence
+would gain much higher performance, for myself, if this feature can improves 25% higher
+or more, that would be much more attractive, and users would like to try it. Again, I'm
+not saying this feature is not good, just thought it would perform much better for small io.
 
-But I am afraid if it can avoid the issue completely because the
-old write task hang in balance_dirty_pages() may still write/dirty pages
-if it is one very big size write IO.
+My test environment has one intel p4510 nvme ssd and one intel p4800x nvme ssd.
+According to spec, p4510 's rand read iops is about 640000, and p4800x is 550000.
+To maximizing device performance, I'll do one discard before test, that is
+sudo blkdiscard /dev/nvme0n1 or /dev/nvme1n1.
 
-Thanks,
-Ming
+In 6.3.0-rc2, taskset -c 1 /home/feiman.wxg/fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O0 -n1Â  -u1 /dev/ng1n1
+shows 890k iops. I modified codes a bit to get rid of blkcg overhead, iops will increase 920k.
+And if I benchmark /dev/ng0n1 and /dev/ng1n1 at the same time, total iops would be
+about 1150k, cannot utilize the maximum capacity of these two devices.
+
+>
+>> After reading codes, I finds that this nvme passthrough feature
+>> is still based on blk-mq, use perf tool to analyse and there are some block layer
+>> overheads that seems somewhat big:
+>> 1. 2.48%Â  io_uringÂ  [kernel.vmlinux]Â  [k] blk_stat_add
+>> In our kernel config, no active ï»¿q->stats->callbacks, but still has this overhead.
+>>
+>> 2. 0.97%Â  io_uringÂ  [kernel.vmlinux]Â  [k] bio_associate_blkg_from_css
+>> Â Â Â  0.85%Â  io_uringÂ  [kernel.vmlinux]Â  [k] bio_associate_blkg
+>> Â Â Â  0.74%Â  io_uringÂ  [kernel.vmlinux]Â  [k] blkg_lookup_create
+>> For nvme passthrough feature, it tries to dispatch nvme commands to nvme
+>> controller directly, so should get rid of these overheads.
+>>
+>> 3. 3.19%Â  io_uringÂ  [kernel.vmlinux]Â  [k] __rcu_read_unlock
+>> Â Â Â  2.65%Â  io_uringÂ  [kernel.vmlinux]Â  [k] __rcu_read_lock
+>> Frequent rcu_read_lock/unlcok overheads, not sure whether we can improve a bit.
+>>
+>> 4. 7.90%Â  io_uringÂ  [nvme]Â Â Â Â Â Â Â Â Â Â Â  [k] nvme_poll
+>> Â Â Â  3.59%Â  io_uringÂ  [nvme_core]Â Â Â Â Â Â  [k] nvme_ns_chr_uring_cmd_iopoll
+>> Â Â Â  2.63%Â  io_uringÂ  [kernel.vmlinux]Â  [k] blk_mq_poll_classic
+>> Â Â Â  1.88%Â  io_uringÂ  [nvme]Â Â Â Â Â Â Â Â Â Â Â  [k] nvme_poll_cq
+>> Â Â Â  1.74%Â  io_uringÂ  [kernel.vmlinux]Â  [k] bio_poll
+>> Â Â Â  1.89%Â  io_uringÂ  [kernel.vmlinux]Â  [k] xas_load
+>> Â Â Â  0.86%Â  io_uringÂ  [kernel.vmlinux]Â  [k] xas_start
+>> Â Â Â  0.80%Â  io_uringÂ  [kernel.vmlinux]Â  [k] xas_start
+>> Seems that the block poll operation call chain is somewhat deep, also
+> It's not really that deep, though the xarray lookups are unfortunate.
+>
+> And if you were to remove block layer, it looks like you'd end up just shifting
+> the CPU utilization to a different polling function without increasing IOPs.
+> Your hardware doesn't look fast enough for this software overhead to be a
+> concern.
+No, I may not agree with you here, sorry. Real products(not like t/io_uring tools,
+which just polls block layer when ios are issued) will have many other work
+to run, such as network work. If we can cut the nvme passthrough overhead more,
+saved cpu will use to do other useful work.
+
+For example, some produces would poll storage and network, if we can reduce
+poll storage quicker, we can poll network earlier, which may reduce network
+latency. As I said in below section, If we can map nvme cqes to user space, we
+may check whether io has been completed in user space, only do kernel block iopoll
+necessary.
+
+>
+>> not sure whether we can improve it a bit, and the xas overheads also
+>> looks big, it's introduced by https://lore.kernel.org/all/20220307064401.30056-7-ming.lei@redhat.com/
+>> which fixed one use-after-free bug.
+>>
+>> 5. other blocker overhead I don't spend time to look into.
+>>
+>> Some of our clients are interested in nvme passthrough feature, they visit
+>> nvme devices by open(2) and read(2)/write(2) nvme device files directly, bypass
+>> filesystem, so they'd like to try nvme passthrough feature, to gain bigger iops, but
+>> currenty performance seems not that good. And they don't want to use spdk yet,
+>> still try to build fast storage based on linux kernel io stack for various reasonsÂ  :)
+>>
+>> So I'd like to propose a new nvme passthrough design here, which may improve
+>> performance a lot. Here are just rough design ideas here, not start to code yet.
+>> Â  1. There are three types of nvme hardware queues, "default", "write" and "poll",
+>> currently all these queues are visible to block layer, blk-mq will map these queues
+>> properly.Â  Here this new design will add two new nvme hardware queues, name them
+>> "user_irq" and "user_poll" queues, which will need to add two nvme module parameters,
+>> similar to current "write_queues" and "poll_queues".
+>> Â  2. "user_irq" and "user_poll" queues will not be visible to block layer, and will create
+>> corresponding char device file for them,Â  that means nvme hardware queues will be
+>> abstracted as linux file, not sure whether to support read_iter or write_iter, but
+>> uring_cmd() interface will be supported firstly. user_irq queue will still have irq, user_poll
+>> queue will support poll.
+>> Â  3. Finally the data flow will look like below in example of user_irq queue:
+>> io issue: io_uringÂ  uring_cmd >> prep nvme command in its char device's uring_cmd() >> submit to nvme.
+>> io reap: find io_uring request by nvme command id, and call uring_cmd_done for it.
+>> Yeah, need to build association between io_uring request and nvme command id.
+>>
+>> Possible advantages:
+>> 1. Bypass block layer thoroughly.
+> blk-mq has common solutions that we don't want to duplicate in driver. It
+> provides safe access to shared tags across multiple processes, ensures queue
+> live-ness during a controller reset, tracks commands for timeouts, among other
+> things.
+Yeah, I agree there will be some duplicate functionality with blk-mq,
+not start to do detailed design yet(will do later), but I think there maybe
+not much. I'd like to implement prototype firstly for you to review, to see
+what performance we can get. If performance data is really impressive, I
+think it maybe deserve the duplicate.
+
+Regards,
+Xiaoguang Wang
 
