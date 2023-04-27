@@ -2,98 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FDDC77B61
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 06:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4977DC77B73
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 06:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239435AbjD0GAW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 02:00:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56780 "EHLO
+        id S242691AbjD0GEi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 02:04:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233414AbjD0GAV (ORCPT
+        with ESMTP id S236396AbjD0GEh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 02:00:21 -0400
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE563585;
-        Wed, 26 Apr 2023 23:00:17 -0700 (PDT)
-Date:   Thu, 27 Apr 2023 08:00:13 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=t-8ch.de; s=mail;
-        t=1682575215; bh=7/SgwyqfcCoVi3b2qScazJ/eHD+6clxjAKvHj8rhJuQ=;
+        Thu, 27 Apr 2023 02:04:37 -0400
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DCD82718;
+        Wed, 26 Apr 2023 23:04:36 -0700 (PDT)
+Date:   Thu, 27 Apr 2023 08:04:32 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+        s=mail; t=1682575474;
+        bh=cyecpHnIeBWNjwg8xQ+JBS0N+v6dd3dFUm88xA+Uels=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=YO0bIyoEGNrkdh28YRhz4OA1aZ4Rqeh/eNvEDvwtKO/OTYS1T+HcBAxtx42tSAdhp
-         9LGUluUnDIOx0bvuNm9t/Inqi+rdeSAdvbL8p1PIttpfF2fEVgEFB4fVtme3hS5T1x
-         EexgjaHwqA8PYuQcO359GV45itRRuUMgJK/xRVVU=
-From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v3 0/3] blk-integrity: drop integrity_kobj from gendisk
-Message-ID: <43b18d93-442a-4735-9a5e-3c88a3912f8f@t-8ch.de>
-References: <20230309-kobj_release-gendisk_integrity-v3-0-ceccb4493c46@weissschuh.net>
- <yq1v8ivtzrn.fsf@ca-mkp.ca.oracle.com>
- <862c1901-ee6e-44e5-8906-4bb1c3893372@t-8ch.de>
- <0a57896e-3f61-7761-f03d-e47f0c21be7e@kernel.dk>
+        b=txX6NVbXb1wjkUb6eKuiG5cTqi+P8kEbA+NQRE/yk+lsmkCTBKMEjaq0PdLiFd8d1
+         YHz8dWYeKyT6jiarWAwjsymdjI/UoCvie5kG7+Yu+YwnTp4pbgHowqGPx60T4NIhrk
+         pXAnbqRrp+wIue2easFng2qDBnwVzWRoUXbgmnos=
+From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Cc:     linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] nbd: automatically load module on genl access
+Message-ID: <a71f01e8-8724-4c21-95b4-3a6be9f9dceb@t-8ch.de>
+References: <20221110052438.2188-1-linux@weissschuh.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0a57896e-3f61-7761-f03d-e47f0c21be7e@kernel.dk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221110052438.2188-1-linux@weissschuh.net>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-04-26 18:26:11-0600, Jens Axboe wrote:
-> On 4/26/23 5:12?PM, Thomas Wei?schuh wrote:
-> > Hi Martin, Christoph, Jens,
-> > 
-> > On 2023-03-20 07:56:58-0400, Martin K. Petersen wrote:
-> >>> The embedded member integrity_kobj member of struct gendisk violates
-> >>> the assumption of the driver core that only one struct kobject should
-> >>> be embedded into another object and then manages its lifetime.
-> >>>
-> >>> As the integrity_kobj is only used to hold a few sysfs attributes it
-> >>> can be replaced by direct device_attributes and removed.
-> >>
-> >> Looks good to me and passed a quick test on a couple of systems. Thanks
-> >> for cleaning this up!
-> >>
-> >> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> > 
-> > Am I getting some part of the process for block/ wrong?
-> 
-> Sorry, I missed this series. I'll queue it up for 6.4.
+Hi Josef,
 
-Thanks!
+could you take a look at this?
 
-> > It seems my patches for the block subsystem are having a hard time
-> > getting merged.
-> > 
-> > * https://lore.kernel.org/all/20221110052438.2188-1-linux@weissschuh.net/
-> 
-> This one is missing nbd review. It's unfortunately not uncommon to need
-> to re-ping on something like this, if you don't get a timely review.
-> This is not specific to this patch, just in general. Things get missed.
+... ping
 
-Will do.
-
-> > * this series
-> > * https://lore.kernel.org/all/20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net/
-> 
-> This one is just a week old, and coming into the merge window. Generally
-> takes longer at that time, as it's late for that merge window, and folks
-> are busy with getting things ready. If nothing happens on this one, I'd
-> suggest resending past -rc1 when folks are more ready to review and
-> queue things up for the next release.
-
-Indeed, it is only listed for completeness sake.
-
-I assumed that because all three series were like this, that I maybe
-missed some PATCH prefix for your filter, managed to end up in your
-killfile or mails from my privately managed mailservers don't get
-through.
-
-This is why I also wrote to Martin and Christoph, fearing that you don't
-see my mails.
-
-Thanks for the clarification,
+Thanks,
 Thomas
+
+On 2022-11-10 06:24:38+0100, Thomas Weißschuh wrote:
+> Instead of forcing the user to manually load the module do it
+> automatically.
+> 
+> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+> ---
+>  drivers/block/nbd.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5cffd96ef2d7..1c38a7ea9531 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -2328,6 +2328,7 @@ static struct genl_family nbd_genl_family __ro_after_init = {
+>  	.mcgrps		= nbd_mcast_grps,
+>  	.n_mcgrps	= ARRAY_SIZE(nbd_mcast_grps),
+>  };
+> +MODULE_ALIAS_GENL_FAMILY(NBD_GENL_FAMILY_NAME);
+>  
+>  static int populate_nbd_status(struct nbd_device *nbd, struct sk_buff *reply)
+>  {
+> 
+> base-commit: f67dd6ce0723ad013395f20a3f79d8a437d3f455
+> -- 
+> 2.38.1
+> 
