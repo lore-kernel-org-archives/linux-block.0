@@ -2,115 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86283C7EE23
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 00:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B0BC77B7C
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 00:26:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242742AbjD0A0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Apr 2023 20:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51120 "EHLO
+        id S242772AbjD0A0X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Apr 2023 20:26:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240740AbjD0A0Q (ORCPT
+        with ESMTP id S242689AbjD0A0V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Apr 2023 20:26:16 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D240710FC
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 17:26:13 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-24733b262fdso1098067a91.1
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 17:26:13 -0700 (PDT)
+        Wed, 26 Apr 2023 20:26:21 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7E740F5
+        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 17:26:20 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1a6a50dd62cso10068775ad.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 17:26:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682555173; x=1685147173;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pC2f2ABxJOBHxHgnHqmtKjhUQyVzc3KlW6W3GSz/0Gg=;
-        b=JvCktqP24nhhgrDUAxwg16uA1NBPZy3Mg0Cb5U3uDHaGUIg1ugG9k6j2L7lH6XONlg
-         n1aig0vjz6Xsix8DILe8SLqaGygX9Ad1MT+cEmrXlErk4iwVMfZYFYv2U8quUSq2miNJ
-         pzOCdjf6hLVIgAWxLU4LVBPSMGQ/UpiHQXRHiXPX1UwYjWO05gcYsMA0V3xhjRfipeOD
-         7DDhUV20tJMdehtYy/mRudeD92Z4A+HJRS00zhFe+rC9++Fzz94FVjkl3iCNrUh1FPGt
-         Wc2ISVsiTOJ0Pi+6FZYw3t30wJc7DuIWUeuJfkYcOoNfSnNtndrVOwntBtVTF+8Ba8QB
-         0eww==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682555179; x=1685147179;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JTOkRfNYIcCyobGPmwTR41HZBXplh4O+VdZT8qkDAZs=;
+        b=SG/9x29S2i7UOgFAB9FBCxeDkY9UXuXY4AHfghZkPkuVh1BqDqug6ga/nRw2yuSZr1
+         OWKsZtymxEJJAZVRwQPl5w//p/ZCSTV7WlIss3X6FnvHVdhZihsl4TX4GP9tbn4MVHRu
+         Dop89EfFJqUvw6cq5UiqAWG+jVAUfM1UPZ8CXa0b38tIW5ieYECKsSzKm2fIDuDAdWrX
+         7ejR+BN96Sgfvfe3ALjEz153NNL0t7FG4XoyuTjd4hFVsdAoiwp1o1B2NNwxv53cp+DQ
+         8T/Q03QqC+N8/pFUW8XEXdVZInL1HFWP+a4r5XJF8uDw5LPlOpHmUTxn1lJ56h3+4k75
+         djsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682555173; x=1685147173;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pC2f2ABxJOBHxHgnHqmtKjhUQyVzc3KlW6W3GSz/0Gg=;
-        b=gB3fpn4CQhoFugysXhkpBkd3YB1Yrc4alQ4d8SKlOq8O6xl8J/XXW9t/d2T8BMMq6x
-         9M6PLHnuwdnfoYKc1/pZGVJs7wHFPjCwKlvmRjDR9E75HhghaGLGgaMCFiR4yYShmWnU
-         Wwf5vdtuY9+ZhH1pzprq+RO/zPHE3jNytX3nzi6s1qD/pQeLSaSucGkWkj+BCDkUxGEK
-         OEGXxPZyL1Y6Ay/vL3id/P6NkG1Jii9CL2d9RDrbxSBQk1NCFQm1ZNuUHKdmimyjV8DS
-         VtcpjMbV1reaGuNSJGHZuuXybRE6Uxm/0VfsojEmvNQ4/kaS03iCDNwZ15nlY2rG01/u
-         I1ew==
-X-Gm-Message-State: AC+VfDzNJoXtY8mAbDe9jTGVweLZm+lUbysSCfq2W+f4H3qK26COHRyr
-        eqxaLWPEAnIUlCM6DR9R5G5inw==
-X-Google-Smtp-Source: ACHHUZ7w/ClANr9wDAfe00y57HJ/0zZxhfkQ8IjHDwnNXp9jcpHLmRdlpBDc/fXziYIoxdo2+12VuQ==
-X-Received: by 2002:a17:903:2304:b0:19a:a815:2877 with SMTP id d4-20020a170903230400b0019aa8152877mr669560plh.6.1682555173265;
-        Wed, 26 Apr 2023 17:26:13 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id bf9-20020a170902b90900b001a245b49731sm10433474plb.128.2023.04.26.17.26.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Apr 2023 17:26:12 -0700 (PDT)
-Message-ID: <0a57896e-3f61-7761-f03d-e47f0c21be7e@kernel.dk>
-Date:   Wed, 26 Apr 2023 18:26:11 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 0/3] blk-integrity: drop integrity_kobj from gendisk
-To:     =?UTF-8?Q?Thomas_Wei=c3=9fschuh?= <linux@weissschuh.net>,
+        d=1e100.net; s=20221208; t=1682555179; x=1685147179;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JTOkRfNYIcCyobGPmwTR41HZBXplh4O+VdZT8qkDAZs=;
+        b=djFk3JfiThKbL3cf6TOiye+qlMOOi0oITTXzh6Be0f6MWJZB17Ae0DJE8RW9IQW2+u
+         6sCaUEyF8XnarkXJ9376mVDUEmzbO6BxTxtckEPtPOF3MrA5C+jqoB0rRAJNtgiMVF3z
+         pyorPZ5rrRIdf1UGxOLMqs/zgxVztXunS5ci3/+gvEPFLUNDyKkcsrxkW2vj9K9w2SaA
+         eETQFS8B2L69crk/k3nqmkyVEyLKPFvELxfoaVdPNdXOSXEPUuf13+EBD3BqjXeGIp/k
+         FpYC4rwlH7lRX5ZftzFPbPyQFYFX9kIAQtIk3gCJ2ARIVG8/ZdXQXSm7ns+S0AYvarYs
+         pBEg==
+X-Gm-Message-State: AC+VfDx/p1Y8vmsd0DR6bYqZK9xShWMRD7xRlUoF2i57Poo78JQnLQ68
+        7J2Pjdt3hZMvn33aU8M/u7uF8ObBNdijX6+QGZg=
+X-Google-Smtp-Source: ACHHUZ7q1W+ObQVu0dbQ+J+W3jj+iRhsLm6KT6rUgicarGzFDj0n8iSNF9dqH7imMUY1nISc44EC5w==
+X-Received: by 2002:a17:902:ea12:b0:1a9:4167:5db7 with SMTP id s18-20020a170902ea1200b001a941675db7mr8985693plg.4.1682555179437;
+        Wed, 26 Apr 2023 17:26:19 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id b5-20020a170902a9c500b001a6f6638595sm10403862plr.92.2023.04.26.17.26.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Apr 2023 17:26:19 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+In-Reply-To: <20230309-kobj_release-gendisk_integrity-v3-0-ceccb4493c46@weissschuh.net>
 References: <20230309-kobj_release-gendisk_integrity-v3-0-ceccb4493c46@weissschuh.net>
- <yq1v8ivtzrn.fsf@ca-mkp.ca.oracle.com>
- <862c1901-ee6e-44e5-8906-4bb1c3893372@t-8ch.de>
-Content-Language: en-US
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <862c1901-ee6e-44e5-8906-4bb1c3893372@t-8ch.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v3 0/3] blk-integrity: drop integrity_kobj from gendisk
+Message-Id: <168255517853.49697.6615983265026536560.b4-ty@kernel.dk>
+Date:   Wed, 26 Apr 2023 18:26:18 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/26/23 5:12?PM, Thomas Wei?schuh wrote:
-> Hi Martin, Christoph, Jens,
+
+On Sat, 18 Mar 2023 17:36:22 +0000, Thomas Weißschuh wrote:
+> The embedded member integrity_kobj member of struct gendisk violates
+> the assumption of the driver core that only one struct kobject should be
+> embedded into another object and then manages its lifetime.
 > 
-> On 2023-03-20 07:56:58-0400, Martin K. Petersen wrote:
->>> The embedded member integrity_kobj member of struct gendisk violates
->>> the assumption of the driver core that only one struct kobject should
->>> be embedded into another object and then manages its lifetime.
->>>
->>> As the integrity_kobj is only used to hold a few sysfs attributes it
->>> can be replaced by direct device_attributes and removed.
->>
->> Looks good to me and passed a quick test on a couple of systems. Thanks
->> for cleaning this up!
->>
->> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> As the integrity_kobj is only used to hold a few sysfs attributes it can
+> be replaced by direct device_attributes and removed.
 > 
-> Am I getting some part of the process for block/ wrong?
+> [...]
 
-Sorry, I missed this series. I'll queue it up for 6.4.
+Applied, thanks!
 
-> It seems my patches for the block subsystem are having a hard time
-> getting merged.
-> 
-> * https://lore.kernel.org/all/20221110052438.2188-1-linux@weissschuh.net/
+[1/3] blk-integrity: use sysfs_emit
+      commit: 3315e169b446249c1b61ff988d157238f4b2c5a0
+[2/3] blk-integrity: convert to struct device_attribute
+      commit: 76b8c319f02715e14abdbbbdd6508e83a1059bcc
+[3/3] blk-integrity: register sysfs attributes on struct device
+      commit: ff53cd52d9bdbf4074d2bbe9b591729997780bd3
 
-This one is missing nbd review. It's unfortunately not uncommon to need
-to re-ping on something like this, if you don't get a timely review.
-This is not specific to this patch, just in general. Things get missed.
-
-> * this series
-> * https://lore.kernel.org/all/20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net/
-
-This one is just a week old, and coming into the merge window. Generally
-takes longer at that time, as it's late for that merge window, and folks
-are busy with getting things ready. If nothing happens on this one, I'd
-suggest resending past -rc1 when folks are more ready to review and
-queue things up for the next release.
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
