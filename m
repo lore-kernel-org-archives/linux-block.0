@@ -2,96 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FFEC77B61
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 04:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FDDC77B61
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 06:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242688AbjD0Evw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 00:51:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41298 "EHLO
+        id S239435AbjD0GAW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 02:00:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242668AbjD0Evv (ORCPT
+        with ESMTP id S233414AbjD0GAV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 00:51:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1119C3A87
-        for <linux-block@vger.kernel.org>; Wed, 26 Apr 2023 21:51:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682571064;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2s/RO9FptogVncj3HgpgSA6ipdhLtPAA7dorEW4s5iM=;
-        b=UjKK7EFOYFo4v7Eir1NqiptQvM4dLtsxR2ypzDw+CG+ijq9grJbkdRCvtS2Ck4ldBG0vk4
-        lZjGkYKt6Urlf6W+LsR8jZd8FFpHKvWTDvDJNEqoQ0YVtggpjQw+mHegbHCySF0zFbfhBG
-        HqJnM2GI4ScpI9hJb0l2wicappn/sWI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-255-07epsV5EOGqN665UvC9buQ-1; Thu, 27 Apr 2023 00:51:00 -0400
-X-MC-Unique: 07epsV5EOGqN665UvC9buQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 237DF2812940;
-        Thu, 27 Apr 2023 04:51:00 +0000 (UTC)
-Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 569C1C15BA0;
-        Thu, 27 Apr 2023 04:50:52 +0000 (UTC)
-Date:   Thu, 27 Apr 2023 12:50:48 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
-        ming.lei@redhat.com
-Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
-Message-ID: <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
-References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
- <ZEny7Izr8iOc/23B@casper.infradead.org>
+        Thu, 27 Apr 2023 02:00:21 -0400
+Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE563585;
+        Wed, 26 Apr 2023 23:00:17 -0700 (PDT)
+Date:   Thu, 27 Apr 2023 08:00:13 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=t-8ch.de; s=mail;
+        t=1682575215; bh=7/SgwyqfcCoVi3b2qScazJ/eHD+6clxjAKvHj8rhJuQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YO0bIyoEGNrkdh28YRhz4OA1aZ4Rqeh/eNvEDvwtKO/OTYS1T+HcBAxtx42tSAdhp
+         9LGUluUnDIOx0bvuNm9t/Inqi+rdeSAdvbL8p1PIttpfF2fEVgEFB4fVtme3hS5T1x
+         EexgjaHwqA8PYuQcO359GV45itRRuUMgJK/xRVVU=
+From:   Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH v3 0/3] blk-integrity: drop integrity_kobj from gendisk
+Message-ID: <43b18d93-442a-4735-9a5e-3c88a3912f8f@t-8ch.de>
+References: <20230309-kobj_release-gendisk_integrity-v3-0-ceccb4493c46@weissschuh.net>
+ <yq1v8ivtzrn.fsf@ca-mkp.ca.oracle.com>
+ <862c1901-ee6e-44e5-8906-4bb1c3893372@t-8ch.de>
+ <0a57896e-3f61-7761-f03d-e47f0c21be7e@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZEny7Izr8iOc/23B@casper.infradead.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <0a57896e-3f61-7761-f03d-e47f0c21be7e@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Matthew,
-
-On Thu, Apr 27, 2023 at 04:58:36AM +0100, Matthew Wilcox wrote:
-> On Thu, Apr 27, 2023 at 10:20:28AM +0800, Ming Lei wrote:
-> > Hello Guys,
+On 2023-04-26 18:26:11-0600, Jens Axboe wrote:
+> On 4/26/23 5:12?PM, Thomas Wei?schuh wrote:
+> > Hi Martin, Christoph, Jens,
 > > 
-> > I got one report in which buffered write IO hangs in balance_dirty_pages,
-> > after one nvme block device is unplugged physically, then umount can't
-> > succeed.
+> > On 2023-03-20 07:56:58-0400, Martin K. Petersen wrote:
+> >>> The embedded member integrity_kobj member of struct gendisk violates
+> >>> the assumption of the driver core that only one struct kobject should
+> >>> be embedded into another object and then manages its lifetime.
+> >>>
+> >>> As the integrity_kobj is only used to hold a few sysfs attributes it
+> >>> can be replaced by direct device_attributes and removed.
+> >>
+> >> Looks good to me and passed a quick test on a couple of systems. Thanks
+> >> for cleaning this up!
+> >>
+> >> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> > 
+> > Am I getting some part of the process for block/ wrong?
 > 
-> That's a feature, not a bug ... the dd should continue indefinitely?
+> Sorry, I missed this series. I'll queue it up for 6.4.
 
-Can you explain what the feature is? And not see such 'issue' or 'feature'
-on xfs.
+Thanks!
 
-The device has been gone, so IMO it is reasonable to see FS buffered write IO
-failed. Actually dmesg has shown that 'EXT4-fs (nvme0n1): Remounting
-filesystem read-only'. Seems these things may confuse user.
-
+> > It seems my patches for the block subsystem are having a hard time
+> > getting merged.
+> > 
+> > * https://lore.kernel.org/all/20221110052438.2188-1-linux@weissschuh.net/
 > 
-> balance_dirty_pages() is sleeping in KILLABLE state, so kill -9 of
-> the dd process should succeed.
+> This one is missing nbd review. It's unfortunately not uncommon to need
+> to re-ping on something like this, if you don't get a timely review.
+> This is not specific to this patch, just in general. Things get missed.
 
-Yeah, dd can be killed, however it may be any application(s), :-)
+Will do.
 
-Fortunately it won't cause trouble during reboot/power off, given
-userspace will be killed at that time.
+> > * this series
+> > * https://lore.kernel.org/all/20230419-const-partition-v2-0-817b58f85cd1@weissschuh.net/
+> 
+> This one is just a week old, and coming into the merge window. Generally
+> takes longer at that time, as it's late for that merge window, and folks
+> are busy with getting things ready. If nothing happens on this one, I'd
+> suggest resending past -rc1 when folks are more ready to review and
+> queue things up for the next release.
 
+Indeed, it is only listed for completeness sake.
 
+I assumed that because all three series were like this, that I maybe
+missed some PATCH prefix for your filter, managed to end up in your
+killfile or mails from my privately managed mailservers don't get
+through.
 
-Thanks,
-Ming
+This is why I also wrote to Martin and Christoph, fearing that you don't
+see my mails.
 
+Thanks for the clarification,
+Thomas
