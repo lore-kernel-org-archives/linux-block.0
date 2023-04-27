@@ -2,403 +2,307 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA33DC77B73
-	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 10:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2A2C77B73
+	for <linux-block@archiver.kernel.org>; Thu, 27 Apr 2023 10:46:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243567AbjD0Kdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 06:33:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34352 "EHLO
+        id S243596AbjD0Kqw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 06:46:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243568AbjD0Kdy (ORCPT
+        with ESMTP id S243211AbjD0Kqs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 06:33:54 -0400
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C2C94EDC
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 03:33:52 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0Vh7PZyW_1682591628;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0Vh7PZyW_1682591628)
-          by smtp.aliyun-inc.com;
-          Thu, 27 Apr 2023 18:33:50 +0800
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-To:     shinichiro.kawasaki@wdc.com, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH blktests 2/2] tests: Add ublk tests
-Date:   Thu, 27 Apr 2023 18:32:42 +0800
-Message-Id: <20230427103242.31361-3-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230427103242.31361-1-ZiyangZhang@linux.alibaba.com>
+        Thu, 27 Apr 2023 06:46:48 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2081.outbound.protection.outlook.com [40.107.220.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FEE55AF
+        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 03:46:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HvpYCOyMO2i7UvaElvD6Bu40USOu9+THdzuymYhTATaGw2ysDsBOPH3sm/3rYaaj4rU4Kyf8tIk0wQMtfZezVRzLQvuyTyh1GPRhFWYtJsLwA5L7DobkSuCYBX1KnBZfUEuMAEpvWXyqYQ/acOhUxAK2//Jwo2NbxtrvIy8oOPqaMYrqhGnqb7+AKLAeTxjiAiw4Put1QAgHEE7zjCKhsOKHWhl92xT8xn4cc4Kh01g/m7Oy5TO8lZXx4AIccvlpUsv0TV6uzGAHYIJkWpO4oFDGpr/N1Rt4nCcsjhaWYFM4mB4yaZcKHFnYsI0Fl9N3WsPqip7xhZQaNmUeydvlyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dfE8iZdjMneell/Y//4LDHvzycMAV/+4LOey8/WFMoE=;
+ b=oDATK2U/3py5ALGqS0p0KgMFl+eUdvAMY9TIiW1AznclEg3Hm0U0cOSeoUHFfA8/h8RdKJr0v8BFha0sLRsHdIbsC+Not84mayGY+OJf+eX5adgqfdAMdBV636ip9+hjbe9QQKmI/D3sCklYq/pfWL8H3GVJMGScHMnVlvyRZnievHa36wildAZfdTJmiZCk5i4pNZgdZdNv8YuJHUmC3DZHEJ6BDS1OmMCmXHTTRtBCPkkB+n1LuaVAfha8Jlq4+RouVwFYZVxwIsuQpj/dNd7kZjIZXtAWguogHMJ8MMWJPF3yMqdXgmpTHulmHYPQHtlOA1rfqfJj+bYKXjLwkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dfE8iZdjMneell/Y//4LDHvzycMAV/+4LOey8/WFMoE=;
+ b=VcfjsypPruDlp4Ms7aCIP2Jn+wCoA6PUwNKr+u40wgp9ehBneGilG6WC739FFdx8DELbRxFKFXxIBUB6FSpeoiy/SqRwOh2ZeFJYneDebLep0dO6N2mUGLS4Pj1iEv8K812q3k17m58ZAOCXwqW4w6aT2ruklHFk4FaHW3aFw4VNV/yWc/sJXbVS19mHRrRMwIPAJ3ylzny4BMCkuIKcIpQ0Ck2Bp/oUW9wFdQXSyq1SKLAOLUTuxcfgJS8tVpioAWjkTU1kRVyDyMEbVycgfHvt0hTDrtHILh2K4m/K/4727dC9hzCY9waWdFZfzfO5e2bc8Aa1UvKnICDvfiT89w==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by PH7PR12MB7233.namprd12.prod.outlook.com (2603:10b6:510:204::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.21; Thu, 27 Apr
+ 2023 10:46:29 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6922:cae7:b3cc:4c2a]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6922:cae7:b3cc:4c2a%6]) with mapi id 15.20.6340.021; Thu, 27 Apr 2023
+ 10:46:29 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests 1/2] src/miniublk: add user recovery
+Thread-Topic: [PATCH blktests 1/2] src/miniublk: add user recovery
+Thread-Index: AQHZePPF8nf+KG4qd0mPXmnWwHMffa8++SIA
+Date:   Thu, 27 Apr 2023 10:46:29 +0000
+Message-ID: <70c3ef26-8f3e-89dd-84ab-ca53181459a0@nvidia.com>
 References: <20230427103242.31361-1-ZiyangZhang@linux.alibaba.com>
+ <20230427103242.31361-2-ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20230427103242.31361-2-ZiyangZhang@linux.alibaba.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|PH7PR12MB7233:EE_
+x-ms-office365-filtering-correlation-id: 444c619c-85ae-42a5-0806-08db470ca85b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: gO8YH681ug4ULZs/3LA96olru4x5HfbHE1YlRyEkZOfGUYdb++fFyn3gJfXJ9uGlzq34EyKvKIcIHRJwsAhbRYF6y9S4oBxdu3FYU8p7wz/7BQxw3G29etCxq1QRId/ecdgUsw2JnoIxWhzsLcBpHqv0uw7u2nP7ZIABtmBLvqqaj5s/bkJA/nMMXpwUPXqptcHlk4r1rcNlTDUuWAwPNKMZUpme7zxbmklnUmLUW72c7cdfld6MPmD7ZV3jbh9fXG4ddiqUWxld3L8k1geIADXj7DtlsS6y5LDKOj2VQVM47VR8U2TLKx35Q2wZUOgt1lQ07EgE//GqhBhMTDvF15i5yLnzA1XvM9gvuL+YLwv8mlDEhCbbLvogWmv98nH4AOTBC0nn3dqXDiB9nl/9R/987qebKyIMaOEugbEUaASfKCl9kCWVPkZimBhz+WFB/p+mCDxt+/PODuZRmT+imKTSqZWYMBlP4bQBwJkTFL4GviQ/MUhcrY0eCcUpOQsCn7XBBuNGEX78czcXgc8UVJdu88ZsvvKFhuwg9aSUd5CqdBzFoFTuJA15HZqbzrWV+G+mTXqsvKo7ZgrBIyLjnTXGFoOfs42TC0zLfwkpSgLsnS27flQvV+Ni7r7bfD+orEqjgT8OOXYWHutS3JTDLopaHDlU5gw5CpH5vrMUBPUQ0JAzx9xGbS5i1bigfYzH
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(396003)(346002)(376002)(39860400002)(451199021)(64756008)(478600001)(91956017)(66946007)(76116006)(66476007)(66556008)(66446008)(41300700001)(110136005)(4326008)(8676002)(8936002)(38100700002)(316002)(122000001)(5660300002)(6486002)(186003)(53546011)(2616005)(83380400001)(71200400001)(6506007)(6512007)(31696002)(36756003)(38070700005)(86362001)(2906002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZkZWSkIvRll5L1Y5dVBFM1RZeTRpOHJYSjAvcHVnaHEvY2dnVi9RZG9PUUZ4?=
+ =?utf-8?B?RE5aYzNCZzZDeHdDT2JJMjdVTlp2NjJVU3Fyb2JvMjUxcFBQSFpLZmV0SDJW?=
+ =?utf-8?B?SktZMzRLd09vL3RCa21Vb0Y1M3RTK3lZbVNpTmx5NmUxRnNKUUkzVGN2WkRO?=
+ =?utf-8?B?Z0pRaEJta0pkTUV0WHFuamR1STFRd0YxQytaenpvQi9RanRzazE3T2psVysv?=
+ =?utf-8?B?dExEMnFTR1llWVFMSys0aWZzRHQ2TS8vUjJwNjZFZVdERU1DdzhrbXdDaita?=
+ =?utf-8?B?MWtLN1Zvd3lDVGZJNUxKREVCOXdEazliUENxWEtCVWR5K0VsQ1I1cHVoZ2s2?=
+ =?utf-8?B?M1QrWlNidVhxVGFaUWV2dmI0dkNOcisvWWl4azludWZidGRwNDRUTHd1SUpZ?=
+ =?utf-8?B?aXBFamhXM1puRDRENUpCOUR4Zzk0bFAwQi9jbWgwOHc2d1BNMVBvVWhXaHdH?=
+ =?utf-8?B?a3V2aERMYjRGTUhiaER5ZWlEbkZ4akZTMi9XM2V5ckFQdm1HcDZob0duNGVI?=
+ =?utf-8?B?bEhJTXZYRC9LWTJnOVdEMEJHcjdqUUJBUU1jL05zQzhLVlNoWUEwYitSMzJR?=
+ =?utf-8?B?OWJEdENQZ2FjTEQrSW0xZmVydDM0Zk50elhEZzBpb241NWJmL0swKzBTamhG?=
+ =?utf-8?B?ZEw1NW5nUFoxRXAweVVQdy9zUEtGWjJPK2NJYkdwRThla0xkWHFqdXVycEtz?=
+ =?utf-8?B?NnoxUzVDQ0xYYiswT0ZlMGg3dlZpUGp1dW9FL3FxM1JhRkw3cVZ6eVZ3d3d1?=
+ =?utf-8?B?Q0p6VHdENWhYa04wZmI5cEgzQXAxcklTSFZZK2tKMHJoZ3l2ZWk3SWNoL0Vy?=
+ =?utf-8?B?VGR4bVF1M3ZkWGIvMFovRHdHM1RpYXNtTHpSUmVlbEFPZW5PMnZJT0Ura0dX?=
+ =?utf-8?B?ZDFvZmZieXFrT1BkR0lQYlFENEVCNy9SSzE1elkvMFo0dEhvZWJIeTgxQUlv?=
+ =?utf-8?B?Z1N4RkNuckVHeUhlVzVkSXNQemJYSW9YdzNPMktudlBoUFk2Vk1TaVVRS1pB?=
+ =?utf-8?B?WkZOd0tSeTZPbVJZRFY5d21MNXVEYzdmK1NEM3JaWHVUOHloR2pKV2pqWU1U?=
+ =?utf-8?B?ellHc2dqREZKQm05bWp1STVjcHYrUmxnREJaaTlyby9raFlmUlpyc0lKNnFy?=
+ =?utf-8?B?K1J0bGs0aVJIYjJuZ0hnQVVOYTNJUGgxQ2EwWFJxNjhZdGwwcEhZRzdkUVhL?=
+ =?utf-8?B?MkF4aE1PMDlFN0ZhL05ES0FLZnk2WnlzdlJhZTc5ZmtGTzV3d052RDFGTC83?=
+ =?utf-8?B?WFV2MU4vOVEyTGZpSDc2Ny8yZitGalpTeVpoRFVCMFdNZ2UxVHdzYnQvaUcz?=
+ =?utf-8?B?ZmVkRy8rVWhzY0VhcHVLK0tXZFNjdGlQaDFmWUsvQWw0VVczdGF0VFV5dm8w?=
+ =?utf-8?B?NDBnSzNhYzJzdEtVYlB3Z2l6UlY0MytmKytEb0xDODBodC9iQkJCalhHMUJS?=
+ =?utf-8?B?YXNQdWpONVU4VWJxYUZFT1FFblJDN09DOFlaL1AzZExybnBuT1QwN21yN3pK?=
+ =?utf-8?B?c3JJZWVOUjNpdTRPQUNwdFJWRlhMZ0U5alQxMDExM04yKzhUenZ1ODJDS1Mv?=
+ =?utf-8?B?OWx6b3hKYXA4SDVaSUpUM1RlZ1BkKzFXTnZkL3RkWnBWem45TUxwcm01SE9u?=
+ =?utf-8?B?a2xRS2RSRXNhK3NaU2FUR3FkRlhKcTdvMEFLVnNqWlE2c3ZNNmJLRmZOdG5T?=
+ =?utf-8?B?WVlhdkRwT25QMlZWbElUZXBuUUIwcXV5T2hIRWMxWXVWZEFFaEhaRnYzNis4?=
+ =?utf-8?B?cERvMDdhcXlKcVhwMm5kU3ptNDdDTUxJZjFXSjMrd0NMVHB2VU9EeTFDQlVU?=
+ =?utf-8?B?WjBkOEJFajI3SXBNa3VaUUxub21rZ0RHeE5hTktzUndGbDBTL2lYQ1hORi9n?=
+ =?utf-8?B?Q3FFUjIvWUp2TS83RitTa2hXNDBUc3NNZmEwZVVBM0dlVnRiTjZXMTFOb0Nt?=
+ =?utf-8?B?Q3dpWlYrWko3QzdlYS9Va0lGY1VYbkFWS01ybHpUZHZjb0QwSHRERHRWWWxs?=
+ =?utf-8?B?Vm1IRkY2cnUvNEQxTmgxUlZTaTlTV0NTNVJjYkZLbDBRbGdSQUFXRlc0MGVC?=
+ =?utf-8?B?ZkYwaGdoaWFZOFo5TUdBZlFnNUJ5UVp1Q0Nrclo2bDhNOFFTVHR1cERDQktT?=
+ =?utf-8?B?VW5sbkpXd2pYZHlOSm1qaXZTZ1BMUlZObW1xemxvbkpHUXlUdFJmUGd5TUdv?=
+ =?utf-8?Q?9am6sU3wBqV3LifiMqVQciXC6oMF7+k6q50rlFKuAzxa?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DAF76812B0CA2944A360092AFAD20590@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 444c619c-85ae-42a5-0806-08db470ca85b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Apr 2023 10:46:29.2543
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zutMNVDfg7BKaoTBQMN+Q3sYYQCr2KFb/sn8sgGeSiTWFFURNTFoK0qGEMu22rATimDLIm4QVoso93IR2hk1FA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7233
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It is very important to test ublk crash handling since the userspace
-part is not reliable. Especially we should test removing device, killing
-ublk daemons and user recovery feature.
-
-Add five new test for ublk to cover these cases.
-
-Signed-off-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
----
- tests/ublk/001     | 39 +++++++++++++++++++++++++++
- tests/ublk/001.out |  2 ++
- tests/ublk/002     | 53 +++++++++++++++++++++++++++++++++++++
- tests/ublk/002.out |  2 ++
- tests/ublk/003     | 43 ++++++++++++++++++++++++++++++
- tests/ublk/003.out |  2 ++
- tests/ublk/004     | 63 +++++++++++++++++++++++++++++++++++++++++++
- tests/ublk/004.out |  2 ++
- tests/ublk/005     | 66 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/ublk/005.out |  2 ++
- 10 files changed, 274 insertions(+)
- create mode 100644 tests/ublk/001
- create mode 100644 tests/ublk/001.out
- create mode 100644 tests/ublk/002
- create mode 100644 tests/ublk/002.out
- create mode 100644 tests/ublk/003
- create mode 100644 tests/ublk/003.out
- create mode 100644 tests/ublk/004
- create mode 100644 tests/ublk/004.out
- create mode 100644 tests/ublk/005
- create mode 100644 tests/ublk/005.out
-
-diff --git a/tests/ublk/001 b/tests/ublk/001
-new file mode 100644
-index 0000000..fe158ba
---- /dev/null
-+++ b/tests/ublk/001
-@@ -0,0 +1,39 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk by deleting ublk device while running fio
-+
-+. tests/block/rc
-+. common/ublk
-+
-+DESCRIPTION="test ublk deletion"
-+QUICK=1
-+
-+requires() {
-+	_have_ublk
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	${ublk_prog} add -t null -n 0 > "$FULL"
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-+
-+        ${ublk_prog} del -n 0 >> "$FULL"
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/001.out b/tests/ublk/001.out
-new file mode 100644
-index 0000000..0d070b3
---- /dev/null
-+++ b/tests/ublk/001.out
-@@ -0,0 +1,2 @@
-+Running ublk/001
-+Test complete
-diff --git a/tests/ublk/002 b/tests/ublk/002
-new file mode 100644
-index 0000000..25cad13
---- /dev/null
-+++ b/tests/ublk/002
-@@ -0,0 +1,53 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk by killing ublk daemon while running fio
-+# Delete the device after it is dead
-+
-+. tests/block/rc
-+. common/ublk
-+
-+DESCRIPTION="test ublk crash(1)"
-+QUICK=1
-+
-+requires() {
-+	_have_ublk
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	${ublk_prog} add -t null -n 0 > "$FULL"
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-+
-+        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-+        kill -9 $pid
-+
-+        sleep 2
-+        secs=0
-+        while [ $secs -lt 10 ]; do
-+                state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-+                [ "$state" == "DEAD" ] && break
-+		sleep 1
-+		let secs++
-+        done
-+        [ "$state" != "DEAD" ] && echo "device isn't dead after killing queue daemon"
-+
-+        ${ublk_prog} del -n 0 >> "$FULL"
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/002.out b/tests/ublk/002.out
-new file mode 100644
-index 0000000..93039b7
---- /dev/null
-+++ b/tests/ublk/002.out
-@@ -0,0 +1,2 @@
-+Running ublk/002
-+Test complete
-diff --git a/tests/ublk/003 b/tests/ublk/003
-new file mode 100644
-index 0000000..34bce74
---- /dev/null
-+++ b/tests/ublk/003
-@@ -0,0 +1,43 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk by killing ublk daemon while running fio
-+# Delete the device immediately
-+
-+. tests/block/rc
-+. common/ublk
-+
-+DESCRIPTION="test ublk crash(2)"
-+QUICK=1
-+
-+requires() {
-+	_have_ublk
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	${ublk_prog} add -t null -n 0 > "$FULL"
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-+
-+        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-+        kill -9 $pid
-+
-+        ${ublk_prog} del -n 0 >> "$FULL"
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/003.out b/tests/ublk/003.out
-new file mode 100644
-index 0000000..90a3bfa
---- /dev/null
-+++ b/tests/ublk/003.out
-@@ -0,0 +1,2 @@
-+Running ublk/003
-+Test complete
-diff --git a/tests/ublk/004 b/tests/ublk/004
-new file mode 100644
-index 0000000..c5d0694
---- /dev/null
-+++ b/tests/ublk/004
-@@ -0,0 +1,63 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk user recovery by run fio with dev recovery:
-+# (1)kill all ubq_deamon, (2)recover with new ubq_daemon,
-+# (3)delete dev
-+
-+. tests/block/rc
-+. common/ublk
-+
-+DESCRIPTION="test ublk recovery(1)"
-+QUICK=1
-+
-+requires() {
-+	_have_ublk
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	${ublk_prog} add -t null -n 0 -r 1 > "$FULL"
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-+        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-+        kill -9 $pid
-+
-+        sleep 2
-+        secs=0
-+        while [ $secs -lt 10 ]; do
-+                state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-+                [ "$state" == "QUIESCED" ] && break
-+		sleep 1
-+		let secs++
-+        done
-+        [ "$state" != "QUIESCED" ] && echo "device isn't quiesced after killing queue daemon"
-+ 
-+        secs=0
-+        while [ $secs -lt 10 ]; do
-+                ${ublk_prog} recover -t null -n 0 >> "$FULL"
-+                [ $? -eq 0 ] && break 
-+                sleep 1
-+                let secs++
-+        done
-+        state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-+        [ "$state" == "QUIESCED" ] && echo "failed to recover dev"
-+
-+        ${ublk_prog} del -n 0 >> "$FULL"
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/004.out b/tests/ublk/004.out
-new file mode 100644
-index 0000000..a92cd50
---- /dev/null
-+++ b/tests/ublk/004.out
-@@ -0,0 +1,2 @@
-+Running ublk/004
-+Test complete
-diff --git a/tests/ublk/005 b/tests/ublk/005
-new file mode 100644
-index 0000000..23c0555
---- /dev/null
-+++ b/tests/ublk/005
-@@ -0,0 +1,66 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk user recovery by run fio with dev recovery:
-+# (1)kill all ubq_deamon, (2)recover with new ubq_daemon,
-+# (3)kill all ubq_deamon, (4)delete dev
-+
-+. tests/block/rc
-+. common/ublk
-+
-+DESCRIPTION="test ublk recovery(2)"
-+QUICK=1
-+
-+requires() {
-+	_have_ublk
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	${ublk_prog} add -t null -n 0 -r 1 > "$FULL"
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-+        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-+        kill -9 $pid
-+
-+        sleep 2
-+        secs=0
-+        while [ $secs -lt 10 ]; do
-+                state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-+                [ "$state" == "QUIESCED" ] && break
-+		sleep 1
-+		let secs++
-+        done
-+        [ "$state" != "QUIESCED" ] && echo "device isn't quiesced after killing queue daemon"
-+
-+        secs=0
-+        while [ $secs -lt 10 ]; do
-+                ${ublk_prog} recover -t null -n 0 >> "$FULL"
-+                [ $? -eq 0 ] && break 
-+                sleep 1
-+                let secs++
-+        done
-+        state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-+        [ "$state" == "QUIESCED" ] && echo "failed to recover dev"
-+
-+        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-+        kill -9 $pid
-+
-+        ${ublk_prog} del -n 0 >> "$FULL"
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/005.out b/tests/ublk/005.out
-new file mode 100644
-index 0000000..20d7b38
---- /dev/null
-+++ b/tests/ublk/005.out
-@@ -0,0 +1,2 @@
-+Running ublk/005
-+Test complete
--- 
-2.31.1
-
+T24gNC8yNy8yMyAwMzozMiwgWml5YW5nIFpoYW5nIHdyb3RlOg0KPiBXZSBhcmUgZ29pbmcgdG8g
+dGVzdCB1YmxrJ3MgdXNlciByZWNvdmVyeSBmZWF0dXJlIHNvIGFkZCBzdXBwb3J0IGluDQo+IG1p
+bml1YmxrLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBaaXlhbmcgWmhhbmcgPFppeWFuZ1poYW5nQGxp
+bnV4LmFsaWJhYmEuY29tPg0KPiAtLS0NCj4gICBzcmMvbWluaXVibGsuYyB8IDIwNyArKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tDQo+ICAgMSBmaWxlIGNo
+YW5nZWQsIDE5OCBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0
+IGEvc3JjL21pbml1YmxrLmMgYi9zcmMvbWluaXVibGsuYw0KPiBpbmRleCBmZTEwMjkxLi41NThi
+YjdiIDEwMDY0NA0KPiAtLS0gYS9zcmMvbWluaXVibGsuYw0KPiArKysgYi9zcmMvbWluaXVibGsu
+Yw0KPiBAQCAtNzQsNiArNzQsNyBAQCBzdHJ1Y3QgdWJsa190Z3Rfb3BzIHsNCj4gICAJaW50ICgq
+cXVldWVfaW8pKHN0cnVjdCB1YmxrX3F1ZXVlICosIGludCB0YWcpOw0KPiAgIAl2b2lkICgqdGd0
+X2lvX2RvbmUpKHN0cnVjdCB1YmxrX3F1ZXVlICosDQo+ICAgCQkJaW50IHRhZywgY29uc3Qgc3Ry
+dWN0IGlvX3VyaW5nX2NxZSAqKTsNCj4gKwlpbnQgKCpyZWNvdmVyX3RndCkoc3RydWN0IHVibGtf
+ZGV2ICopOw0KPiAgIH07DQo+ICAgDQo+ICAgc3RydWN0IHVibGtfdGd0IHsNCj4gQEAgLTM3Miw2
+ICszNzMsMjkgQEAgc3RhdGljIGludCB1YmxrX2N0cmxfZ2V0X3BhcmFtcyhzdHJ1Y3QgdWJsa19k
+ZXYgKmRldiwNCj4gICAJcmV0dXJuIF9fdWJsa19jdHJsX2NtZChkZXYsICZkYXRhKTsNCj4gICB9
+DQo+ICAgDQo+ICtzdGF0aWMgaW50IHVibGtfY3RybF9zdGFydF91c2VyX3JlY292ZXIoc3RydWN0
+IHVibGtfZGV2ICpkZXYpDQo+ICt7DQo+ICsJc3RydWN0IHVibGtfY3RybF9jbWRfZGF0YSBkYXRh
+ID0gew0KPiArCQkuY21kX29wCT0gVUJMS19DTURfU1RBUlRfVVNFUl9SRUNPVkVSWSwNCj4gKwkJ
+LmZsYWdzCT0gMCwNCj4gKwl9Ow0KPiArDQo+ICsJcmV0dXJuIF9fdWJsa19jdHJsX2NtZChkZXYs
+ICZkYXRhKTsNCj4gK30NCj4gKw0KPiArc3RhdGljIGludCB1YmxrX2N0cmxfZW5kX3VzZXJfcmVj
+b3ZlcihzdHJ1Y3QgdWJsa19kZXYgKmRldiwNCj4gKwkJaW50IGRhZW1vbl9waWQpDQo+ICt7DQo+
+ICsJc3RydWN0IHVibGtfY3RybF9jbWRfZGF0YSBkYXRhID0gew0KPiArCQkuY21kX29wCT0gVUJM
+S19DTURfRU5EX1VTRVJfUkVDT1ZFUlksDQo+ICsJCS5mbGFncwk9IENUUkxfQ01EX0hBU19EQVRB
+LA0KPiArCX07DQo+ICsNCj4gKwlkZXYtPmRldl9pbmZvLnVibGtzcnZfcGlkID0gZGF0YS5kYXRh
+WzBdID0gZGFlbW9uX3BpZDsNCj4gKw0KPiArCXJldHVybiBfX3VibGtfY3RybF9jbWQoZGV2LCAm
+ZGF0YSk7DQo+ICt9DQo+ICsNCj4gICBzdGF0aWMgY29uc3QgY2hhciAqdWJsa19kZXZfc3RhdGVf
+ZGVzYyhzdHJ1Y3QgdWJsa19kZXYgKmRldikNCj4gICB7DQo+ICAgCXN3aXRjaCAoZGV2LT5kZXZf
+aW5mby5zdGF0ZSkgew0KPiBAQCAtMzc5LDYgKzQwMyw4IEBAIHN0YXRpYyBjb25zdCBjaGFyICp1
+YmxrX2Rldl9zdGF0ZV9kZXNjKHN0cnVjdCB1YmxrX2RldiAqZGV2KQ0KPiAgIAkJcmV0dXJuICJE
+RUFEIjsNCj4gICAJY2FzZSBVQkxLX1NfREVWX0xJVkU6DQo+ICAgCQlyZXR1cm4gIkxJVkUiOw0K
+PiArCWNhc2UgVUJMS19TX0RFVl9RVUlFU0NFRDoNCj4gKwkJcmV0dXJuICJRVUlFU0NFRCI7DQo+
+ICAgCWRlZmF1bHQ6DQo+ICAgCQlyZXR1cm4gIlVOS05PV04iOw0KPiAgIAl9Ow0KPiBAQCAtNTUw
+LDkgKzU3NiwxMiBAQCBzdGF0aWMgaW50IHVibGtfZGV2X3ByZXAoc3RydWN0IHVibGtfZGV2ICpk
+ZXYpDQo+ICAgCQlnb3RvIGZhaWw7DQo+ICAgCX0NCj4gICANCj4gLQlpZiAoZGV2LT50Z3Qub3Bz
+LT5pbml0X3RndCkNCj4gKwlpZiAoZGV2LT5kZXZfaW5mby5zdGF0ZSAhPSBVQkxLX1NfREVWX1FV
+SUVTQ0VEICYmIGRldi0+dGd0Lm9wcy0+aW5pdF90Z3QpDQo+ICAgCQlyZXQgPSBkZXYtPnRndC5v
+cHMtPmluaXRfdGd0KGRldik7DQo+ICAgDQo+ICsJZWxzZSBpZiAoZGV2LT5kZXZfaW5mby5zdGF0
+ZSA9PSBVQkxLX1NfREVWX1FVSUVTQ0VEICYmIGRldi0+dGd0Lm9wcy0+cmVjb3Zlcl90Z3QpDQo+
+ICsJCXJldCA9IGRldi0+dGd0Lm9wcy0+cmVjb3Zlcl90Z3QoZGV2KTsNCj4gKw0KPiAgIAlyZXR1
+cm4gcmV0Ow0KPiAgIGZhaWw6DQo+ICAgCWNsb3NlKGRldi0+ZmRzWzBdKTsNCj4gQEAgLTgzMSw3
+ICs4NjAsNyBAQCBzdGF0aWMgdm9pZCB1YmxrX3NldF9wYXJhbWV0ZXJzKHN0cnVjdCB1YmxrX2Rl
+diAqZGV2KQ0KPiAgIAkJCQlkZXYtPmRldl9pbmZvLmRldl9pZCwgcmV0KTsNCj4gICB9DQo+ICAg
+DQo+IC1zdGF0aWMgaW50IHVibGtfc3RhcnRfZGFlbW9uKHN0cnVjdCB1YmxrX2RldiAqZGV2KQ0K
+PiArc3RhdGljIGludCB1YmxrX3N0YXJ0X2RhZW1vbihzdHJ1Y3QgdWJsa19kZXYgKmRldiwgYm9v
+bCByZWNvdmVyeSkNCj4gICB7DQo+ICAgCWludCByZXQsIGk7DQo+ICAgCXZvaWQgKnRocmVhZF9y
+ZXQ7DQo+IEBAIC04NTMsMTIgKzg4MiwyMiBAQCBzdGF0aWMgaW50IHVibGtfc3RhcnRfZGFlbW9u
+KHN0cnVjdCB1YmxrX2RldiAqZGV2KQ0KPiAgIAkJCQkmZGV2LT5xW2ldKTsNCj4gICAJfQ0KPiAg
+IA0KPiAtCXVibGtfc2V0X3BhcmFtZXRlcnMoZGV2KTsNCj4gICANCj4gICAJLyogZXZlcnl0aGlu
+ZyBpcyBmaW5lIG5vdywgc3RhcnQgdXMgKi8NCj4gLQlyZXQgPSB1YmxrX2N0cmxfc3RhcnRfZGV2
+KGRldiwgZ2V0cGlkKCkpOw0KPiAtCWlmIChyZXQgPCAwKQ0KPiAtCQlnb3RvIGZhaWw7DQo+ICsJ
+aWYgKHJlY292ZXJ5KSB7DQo+ICsJCXJldCA9IHVibGtfY3RybF9lbmRfdXNlcl9yZWNvdmVyKGRl
+diwgZ2V0cGlkKCkpOw0KPiArCQlpZiAocmV0IDwgMCkgew0KPiArCQkJdWJsa19lcnIoIiVzOiB1
+YmxrX2N0cmxfZW5kX3VzZXJfcmVjb3ZlciBmYWlsZWQ6ICVkXG4iLCBfX2Z1bmNfXywgcmV0KTsN
+Cj4gKwkJCWdvdG8gZmFpbDsNCj4gKwkJfQ0KPiArCX0gZWxzZSB7DQo+ICsJCXVibGtfc2V0X3Bh
+cmFtZXRlcnMoZGV2KTsNCj4gKwkJcmV0ID0gdWJsa19jdHJsX3N0YXJ0X2RldihkZXYsIGdldHBp
+ZCgpKTsNCj4gKwkJaWYgKHJldCA8IDApIHsNCj4gKwkJCXVibGtfZXJyKCIlczogdWJsa19jdHJs
+X3N0YXJ0X2RldiBmYWlsZWQ6ICVkXG4iLCBfX2Z1bmNfXywgcmV0KTsNCj4gKwkJCWdvdG8gZmFp
+bDsNCj4gKwkJfQ0KPiArCX0NCj4gICANCj4gICAJdWJsa19jdHJsX2dldF9pbmZvKGRldik7DQo+
+ICAgCXVibGtfY3RybF9kdW1wKGRldiwgdHJ1ZSk7DQo+IEBAIC04ODAsNiArOTE5LDcgQEAgc3Rh
+dGljIGludCBjbWRfZGV2X2FkZChpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KPiAgIAkJeyAibnVt
+YmVyIiwJCTEsCU5VTEwsICduJyB9LA0KPiAgIAkJeyAicXVldWVzIiwJCTEsCU5VTEwsICdxJyB9
+LA0KPiAgIAkJeyAiZGVwdGgiLAkJMSwJTlVMTCwgJ2QnIH0sDQo+ICsJCXsgInJlY292ZXJ5IiwJ
+CTEsCU5VTEwsICdyJyB9LA0KPiAgIAkJeyAiZGVidWdfbWFzayIsCTEsCU5VTEwsIDB9LA0KPiAg
+IAkJeyAicXVpZXQiLAkwLAlOVUxMLCAwfSwNCj4gICAJCXsgTlVMTCB9DQo+IEBAIC04OTEsOCAr
+OTMxLDkgQEAgc3RhdGljIGludCBjbWRfZGV2X2FkZChpbnQgYXJnYywgY2hhciAqYXJndltdKQ0K
+PiAgIAljb25zdCBjaGFyICp0Z3RfdHlwZSA9IE5VTEw7DQo+ICAgCWludCBkZXZfaWQgPSAtMTsN
+Cj4gICAJdW5zaWduZWQgbnJfcXVldWVzID0gMiwgZGVwdGggPSBVQkxLX1FVRVVFX0RFUFRIOw0K
+PiArCWludCB1c2VyX3JlY292ZXJ5ID0gMDsNCj4gICANCj4gLQl3aGlsZSAoKG9wdCA9IGdldG9w
+dF9sb25nKGFyZ2MsIGFyZ3YsICItOnQ6bjpkOnE6IiwNCj4gKwl3aGlsZSAoKG9wdCA9IGdldG9w
+dF9sb25nKGFyZ2MsIGFyZ3YsICItOnQ6bjpkOnE6cjoiLA0KPiAgIAkJCQkgIGxvbmdvcHRzLCAm
+b3B0aW9uX2lkeCkpICE9IC0xKSB7DQo+ICAgCQlzd2l0Y2ggKG9wdCkgew0KPiAgIAkJY2FzZSAn
+bic6DQo+IEBAIC05MDcsNiArOTQ4LDkgQEAgc3RhdGljIGludCBjbWRfZGV2X2FkZChpbnQgYXJn
+YywgY2hhciAqYXJndltdKQ0KPiAgIAkJY2FzZSAnZCc6DQo+ICAgCQkJZGVwdGggPSBzdHJ0b2wo
+b3B0YXJnLCBOVUxMLCAxMCk7DQo+ICAgCQkJYnJlYWs7DQo+ICsJCWNhc2UgJ3InOg0KPiArCQkJ
+dXNlcl9yZWNvdmVyeSA9IHN0cnRvbChvcHRhcmcsIE5VTEwsIDEwKTsNCg0KdXNlcl9yZWNvdmVy
+eSBpcyBpbnQgc3RydG9sIHJldHVybnMgbG9uZyA/DQoNCj4gKwkJCWJyZWFrOw0KPiAgIAkJY2Fz
+ZSAwOg0KPiAgIAkJCWlmICghc3RyY21wKGxvbmdvcHRzW29wdGlvbl9pZHhdLm5hbWUsICJkZWJ1
+Z19tYXNrIikpDQo+ICAgCQkJCXVibGtfZGJnX21hc2sgPSBzdHJ0b2wob3B0YXJnLCBOVUxMLCAx
+Nik7DQo+IEBAIC05NDIsNiArOTg2LDggQEAgc3RhdGljIGludCBjbWRfZGV2X2FkZChpbnQgYXJn
+YywgY2hhciAqYXJndltdKQ0KPiAgIAlpbmZvLT5kZXZfaWQgPSBkZXZfaWQ7DQo+ICAgICAgICAg
+ICBpbmZvLT5ucl9od19xdWV1ZXMgPSBucl9xdWV1ZXM7DQo+ICAgICAgICAgICBpbmZvLT5xdWV1
+ZV9kZXB0aCA9IGRlcHRoOw0KPiArCWlmICh1c2VyX3JlY292ZXJ5KQ0KPiArCQlpbmZvLT5mbGFn
+cyB8PSBVQkxLX0ZfVVNFUl9SRUNPVkVSWTsNCj4gICAJZGV2LT50Z3Qub3BzID0gb3BzOw0KPiAg
+IAlkZXYtPnRndC5hcmdjID0gYXJnYzsNCj4gICAJZGV2LT50Z3QuYXJndiA9IGFyZ3Y7DQo+IEBA
+IC05NTMsNyArOTk5LDk1IEBAIHN0YXRpYyBpbnQgY21kX2Rldl9hZGQoaW50IGFyZ2MsIGNoYXIg
+KmFyZ3ZbXSkNCj4gICAJCWdvdG8gZmFpbDsNCj4gICAJfQ0KPiAgIA0KPiAtCXJldCA9IHVibGtf
+c3RhcnRfZGFlbW9uKGRldik7DQo+ICsJcmV0ID0gdWJsa19zdGFydF9kYWVtb24oZGV2LCBmYWxz
+ZSk7DQo+ICsJaWYgKHJldCA8IDApIHsNCj4gKwkJdWJsa19lcnIoIiVzOiBjYW4ndCBzdGFydCBk
+YWVtb24gaWQgJWQsIHR5cGUgJXNcbiIsDQo+ICsJCQkJX19mdW5jX18sIGRldl9pZCwgdGd0X3R5
+cGUpOw0KPiArCQlnb3RvIGZhaWxfZGVsOw0KPiArCX0NCj4gKw0KPiArZmFpbF9kZWw6DQo+ICsJ
+dWJsa19jdHJsX2RlbF9kZXYoZGV2KTsNCj4gK2ZhaWw6DQo+ICsJdWJsa19jdHJsX2RlaW5pdChk
+ZXYpOw0KPiArCXJldHVybiByZXQ7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBpbnQgY21kX2Rldl9y
+ZWNvdmVyKGludCBhcmdjLCBjaGFyICphcmd2W10pDQo+ICt7DQo+ICsJc3RhdGljIGNvbnN0IHN0
+cnVjdCBvcHRpb24gbG9uZ29wdHNbXSA9IHsNCj4gKwkJeyAidHlwZSIsCQkxLAlOVUxMLCAndCcg
+fSwNCj4gKwkJeyAibnVtYmVyIiwJCTEsCU5VTEwsICduJyB9LA0KPiArCQl7ICJkZWJ1Z19tYXNr
+IiwJMSwJTlVMTCwgMH0sDQo+ICsJCXsgInF1aWV0IiwJMCwJTlVMTCwgMH0sDQo+ICsJCXsgTlVM
+TCB9DQo+ICsJfTsNCj4gKwljb25zdCBzdHJ1Y3QgdWJsa190Z3Rfb3BzICpvcHM7DQo+ICsJc3Ry
+dWN0IHVibGtzcnZfY3RybF9kZXZfaW5mbyAqaW5mbzsNCj4gKwlzdHJ1Y3QgdWJsa19kZXYgKmRl
+djsNCj4gKwlpbnQgcmV0LCBvcHRpb25faWR4LCBvcHQ7DQo+ICsJY29uc3QgY2hhciAqdGd0X3R5
+cGUgPSBOVUxMOw0KPiArCWludCBkZXZfaWQgPSAtMTsNCj4gKw0KPiArCXdoaWxlICgob3B0ID0g
+Z2V0b3B0X2xvbmcoYXJnYywgYXJndiwgIi06dDpuOmQ6cToiLA0KPiArCQkJCSAgbG9uZ29wdHMs
+ICZvcHRpb25faWR4KSkgIT0gLTEpIHsNCj4gKwkJc3dpdGNoIChvcHQpIHsNCj4gKwkJY2FzZSAn
+bic6DQo+ICsJCQlkZXZfaWQgPSBzdHJ0b2wob3B0YXJnLCBOVUxMLCAxMCk7DQo+ICsJCQlicmVh
+azsNCj4gKwkJY2FzZSAndCc6DQo+ICsJCQl0Z3RfdHlwZSA9IG9wdGFyZzsNCj4gKwkJCWJyZWFr
+Ow0KPiArCQljYXNlIDA6DQo+ICsJCQlpZiAoIXN0cmNtcChsb25nb3B0c1tvcHRpb25faWR4XS5u
+YW1lLCAiZGVidWdfbWFzayIpKQ0KPiArCQkJCXVibGtfZGJnX21hc2sgPSBzdHJ0b2wob3B0YXJn
+LCBOVUxMLCAxNik7DQo+ICsJCQlpZiAoIXN0cmNtcChsb25nb3B0c1tvcHRpb25faWR4XS5uYW1l
+LCAicXVpZXQiKSkNCj4gKwkJCQl1YmxrX2RiZ19tYXNrID0gMDsNCj4gKwkJCWJyZWFrOw0KPiAr
+CQl9DQo+ICsJfQ0KPiArDQo+ICsJb3B0aW5kID0gMDsNCj4gKw0KPiArCW9wcyA9IHVibGtfZmlu
+ZF90Z3QodGd0X3R5cGUpOw0KPiArCWlmICghb3BzKSB7DQo+ICsJCXVibGtfZXJyKCIlczogbm8g
+c3VjaCB0Z3QgdHlwZSwgdHlwZSAlc1xuIiwNCj4gKwkJCQlfX2Z1bmNfXywgdGd0X3R5cGUpOw0K
+PiArCQlyZXR1cm4gLUVOT0RFVjsNCj4gKwl9DQo+ICsNCj4gKwlkZXYgPSB1YmxrX2N0cmxfaW5p
+dCgpOw0KPiArCWlmICghZGV2KSB7DQo+ICsJCXVibGtfZXJyKCIlczogY2FuJ3QgYWxsb2MgZGV2
+IGlkICVkLCB0eXBlICVzXG4iLA0KPiArCQkJCV9fZnVuY19fLCBkZXZfaWQsIHRndF90eXBlKTsN
+Cj4gKwkJcmV0dXJuIC1FTk9NRU07DQo+ICsJfQ0KPiArDQo+ICsJaW5mbyA9ICZkZXYtPmRldl9p
+bmZvOw0KPiArCWluZm8tPmRldl9pZCA9IGRldl9pZDsNCj4gKwlyZXQgPSB1YmxrX2N0cmxfZ2V0
+X2luZm8oZGV2KTsNCj4gKwlpZiAocmV0IDwgMCkgew0KPiArCQl1YmxrX2VycigiJXM6IGNhbid0
+IGdldCBkZXYgaW5mbyBmcm9tICVkXG4iLCBfX2Z1bmNfXywgZGV2X2lkKTsNCj4gKwkJZ290byBm
+YWlsOw0KPiArCX0NCj4gKw0KPiArCXJldCA9IHVibGtfY3RybF9nZXRfcGFyYW1zKGRldiwgJmRl
+di0+dGd0LnBhcmFtcyk7DQo+ICsJaWYgKHJldCkgew0KPiArCQl1YmxrX2VycigiZGV2ICVkIHNl
+dCBiYXNpYyBwYXJhbWV0ZXIgZmFpbGVkICVkXG4iLA0KPiArCQkJCWRldi0+ZGV2X2luZm8uZGV2
+X2lkLCByZXQpOw0KPiArCQlnb3RvIGZhaWw7DQo+ICsJfQ0KPiArDQo+ICsJZGV2LT50Z3Qub3Bz
+ID0gb3BzOw0KPiArCWRldi0+dGd0LmFyZ2MgPSBhcmdjOw0KPiArCWRldi0+dGd0LmFyZ3YgPSBh
+cmd2Ow0KPiArCXJldCA9IHVibGtfY3RybF9zdGFydF91c2VyX3JlY292ZXIoZGV2KTsNCj4gKwlp
+ZiAocmV0IDwgMCkgew0KPiArCQl1YmxrX2VycigiJXM6IGNhbid0IHN0YXJ0IHJlY292ZXJ5IGZv
+ciAlZFxuIiwgX19mdW5jX18sIGRldl9pZCk7DQo+ICsJCWdvdG8gZmFpbDsNCj4gKwl9DQo+ICsN
+Cj4gKwlyZXQgPSB1YmxrX3N0YXJ0X2RhZW1vbihkZXYsIHRydWUpOw0KPiAgIAlpZiAocmV0IDwg
+MCkgew0KPiAgIAkJdWJsa19lcnIoIiVzOiBjYW4ndCBzdGFydCBkYWVtb24gaWQgJWQsIHR5cGUg
+JXNcbiIsDQo+ICAgCQkJCV9fZnVuY19fLCBkZXZfaWQsIHRndF90eXBlKTsNCj4gQEAgLTExMjUs
+NyArMTI1OSwxMCBAQCBzdGF0aWMgaW50IGNtZF9kZXZfaGVscChpbnQgYXJnYywgY2hhciAqYXJn
+dltdKQ0KPiAgIAlwcmludGYoIlx0IC1hIGRlbGV0ZSBhbGwgZGV2aWNlcyAtbiBkZWxldGUgc3Bl
+Y2lmaWVkIGRldmljZVxuIik7DQo+ICAgCXByaW50ZigiJXMgbGlzdCBbLW4gZGV2X2lkXSAtYSBc
+biIsIGFyZ3ZbMF0pOw0KPiAgIAlwcmludGYoIlx0IC1hIGxpc3QgYWxsIGRldmljZXMsIC1uIGxp
+c3Qgc3BlY2lmaWVkIGRldmljZSwgZGVmYXVsdCAtYSBcbiIpOw0KPiAtDQo+ICsJcHJpbnRmKCIl
+cyByZWNvdmVyIC10IHtudWxsfGxvb3B9IFstbiBkZXZfaWRdIFxuIiwNCj4gKwkJCWFyZ3ZbMF0p
+Ow0KPiArCXByaW50ZigiXHQgLXQgbG9vcCAtZiBiYWNraW5nX2ZpbGUgXG4iKTsNCj4gKwlwcmlu
+dGYoIlx0IC10IG51bGxcbiIpOw0KPiAgIAlyZXR1cm4gMDsNCj4gICB9DQo+ICAgDQo+IEBAIC0x
+MTUwLDYgKzEyODcsMTIgQEAgc3RhdGljIGludCB1YmxrX251bGxfdGd0X2luaXQoc3RydWN0IHVi
+bGtfZGV2ICpkZXYpDQo+ICAgCXJldHVybiAwOw0KPiAgIH0NCj4gICANCj4gK3N0YXRpYyBpbnQg
+dWJsa19udWxsX3RndF9yZWNvdmVyKHN0cnVjdCB1YmxrX2RldiAqZGV2KQ0KPiArew0KPiArCWRl
+di0+dGd0LmRldl9zaXplID0gZGV2LT50Z3QucGFyYW1zLmJhc2ljLmRldl9zZWN0b3JzIDw8IDk7
+DQo+ICsJcmV0dXJuIDA7DQo+ICt9DQo+ICsNCj4gICBzdGF0aWMgaW50IHVibGtfbnVsbF9xdWV1
+ZV9pbyhzdHJ1Y3QgdWJsa19xdWV1ZSAqcSwgaW50IHRhZykNCj4gICB7DQo+ICAgCWNvbnN0IHN0
+cnVjdCB1Ymxrc3J2X2lvX2Rlc2MgKmlvZCA9IHVibGtfZ2V0X2lvZChxLCB0YWcpOw0KPiBAQCAt
+MTMxMywxMSArMTQ1Niw1NCBAQCBzdGF0aWMgaW50IHVibGtfbG9vcF90Z3RfaW5pdChzdHJ1Y3Qg
+dWJsa19kZXYgKmRldikNCj4gICAJcmV0dXJuIDA7DQo+ICAgfQ0KPiAgIA0KPiArc3RhdGljIGlu
+dCB1YmxrX2xvb3BfdGd0X3JlY292ZXIoc3RydWN0IHVibGtfZGV2ICpkZXYpDQo+ICt7DQo+ICsJ
+c3RhdGljIGNvbnN0IHN0cnVjdCBvcHRpb24gbG9fbG9uZ29wdHNbXSA9IHsNCj4gKwkJeyAiZmls
+ZSIsCQkxLAlOVUxMLCAnZicgfSwNCj4gKwkJeyBOVUxMIH0NCj4gKwl9Ow0KPiArCWNoYXIgKiph
+cmd2ID0gZGV2LT50Z3QuYXJndjsNCj4gKwlpbnQgYXJnYyA9IGRldi0+dGd0LmFyZ2M7DQo+ICsJ
+Y2hhciAqZmlsZSA9IE5VTEw7DQo+ICsJaW50IGZkLCBvcHQ7DQo+ICsNCj4gKwl3aGlsZSAoKG9w
+dCA9IGdldG9wdF9sb25nKGFyZ2MsIGFyZ3YsICItOmY6IiwNCj4gKwkJCQkgIGxvX2xvbmdvcHRz
+LCBOVUxMKSkgIT0gLTEpIHsNCj4gKwkJc3dpdGNoIChvcHQpIHsNCj4gKwkJY2FzZSAnZic6DQo+
+ICsJCQlmaWxlID0gc3RyZHVwKG9wdGFyZyk7DQo+ICsJCQlicmVhazsNCj4gKwkJfQ0KPiArCX0N
+Cj4gKw0KPiArCXVibGtfZGJnKFVCTEtfREJHX0RFViwgIiVzOiBmaWxlICVzXG4iLCBfX2Z1bmNf
+XywgZmlsZSk7DQoNCndoeSBwcmludCBmaWxlIGFib3ZlIGJlZm9yZSBjaGVja2luZyBmb3IgTlVM
+TCBiZWxvdz8NCg0KPiArDQo+ICsJaWYgKCFmaWxlKQ0KPiArCQlyZXR1cm4gLUVJTlZBTDsNCj4g
+Kw0KPiArCWZkID0gb3BlbihmaWxlLCBPX1JEV1IpOw0KPiArCWlmIChmZCA8IDApIHsNCj4gKwkJ
+dWJsa19lcnIoICIlczogYmFja2luZyBmaWxlICVzIGNhbid0IGJlIG9wZW5lZFxuIiwNCj4gKwkJ
+CQlfX2Z1bmNfXywgZmlsZSk7DQoNCmZvciBzeXN0ZW0gY2FsbCByZWxhdGVkIGVycm9ycyBwcmlu
+dGluZyBlcnJvci1ubyBzdHJpbmcgaXMgYWx3YXlzIHVzZWZ1bC4NCg0KPiArCQlyZXR1cm4gLUVC
+QURGOw0KPiArCX0NCj4gKw0KPiArCWlmIChmY250bChmZCwgRl9TRVRGTCwgT19ESVJFQ1QpKQ0K
+PiArCQl1YmxrX2xvZygiJXM6IHVibGstbG9vcCBmYWxsYmFjayB0byBidWZmZXJlZCBJT1xuIiwg
+X19mdW5jX18pOw0KDQpzYW1lIGhlcmUgLi4uDQoNCj4gKw0KPiArCWRldi0+dGd0LmRldl9zaXpl
+ID0gZGV2LT50Z3QucGFyYW1zLmJhc2ljLmRldl9zZWN0b3JzIDw8IDk7DQo+ICsJZGV2LT5mZHNb
+MV0gPSBmZDsNCj4gKwlkZXYtPm5yX2ZkcyArPSAxOw0KPiArDQo+ICsJcmV0dXJuIDA7DQo+ICt9
+DQo+ICsNCj4gICBjb25zdCBzdHJ1Y3QgdWJsa190Z3Rfb3BzIHRndF9vcHNfbGlzdFtdID0gew0K
+PiAgIAl7DQo+ICAgCQkubmFtZSA9ICJudWxsIiwNCj4gICAJCS5pbml0X3RndCA9IHVibGtfbnVs
+bF90Z3RfaW5pdCwNCj4gICAJCS5xdWV1ZV9pbyA9IHVibGtfbnVsbF9xdWV1ZV9pbywNCj4gKwkJ
+LnJlY292ZXJfdGd0ID0gdWJsa19udWxsX3RndF9yZWNvdmVyLA0KPiAgIAl9LA0KPiAgIA0KPiAg
+IAl7DQo+IEBAIC0xMzI2LDYgKzE1MTIsNyBAQCBjb25zdCBzdHJ1Y3QgdWJsa190Z3Rfb3BzIHRn
+dF9vcHNfbGlzdFtdID0gew0KPiAgIAkJLmRlaW5pdF90Z3QgPSB1YmxrX2xvb3BfdGd0X2RlaW5p
+dCwNCj4gICAJCS5xdWV1ZV9pbyA9IHVibGtfbG9vcF9xdWV1ZV9pbywNCj4gICAJCS50Z3RfaW9f
+ZG9uZSA9IHVibGtfbG9vcF9pb19kb25lLA0KPiArCQkucmVjb3Zlcl90Z3QgPSB1YmxrX2xvb3Bf
+dGd0X3JlY292ZXIsDQo+ICAgCX0sDQo+ICAgfTsNCj4gICANCj4gQEAgLTEzNTksNiArMTU0Niw4
+IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQo+ICAgCQlyZXQgPSBjbWRfZGV2
+X2xpc3QoYXJnYywgYXJndik7DQo+ICAgCWVsc2UgaWYgKCFzdHJjbXAoY21kLCAiaGVscCIpKQ0K
+PiAgIAkJcmV0ID0gY21kX2Rldl9oZWxwKGFyZ2MsIGFyZ3YpOw0KPiArCWVsc2UgaWYgKCFzdHJj
+bXAoY21kLCAicmVjb3ZlciIpKQ0KPiArCQlyZXQgPSBjbWRfZGV2X3JlY292ZXIoYXJnYywgYXJn
+dik7DQo+ICAgb3V0Og0KPiAgIAlpZiAocmV0KQ0KPiAgIAkJY21kX2Rldl9oZWxwKGFyZ2MsIGFy
+Z3YpOw0KDQo=
