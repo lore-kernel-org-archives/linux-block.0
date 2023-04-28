@@ -2,154 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FC7C7EE21
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 07:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A83DC77B61
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 08:51:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345449AbjD1HgW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Apr 2023 03:36:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43614 "EHLO
+        id S1345296AbjD1Ivx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 04:51:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345179AbjD1HgV (ORCPT
+        with ESMTP id S1345599AbjD1Iva (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2023 03:36:21 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD5822701;
-        Fri, 28 Apr 2023 00:36:19 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1a677dffb37so77547445ad.2;
-        Fri, 28 Apr 2023 00:36:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682667379; x=1685259379;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r4T9X6ORTgiJIhVcjeFoQF4kfGQPAh+aPhJ9TCOLtx4=;
-        b=gTkMq43ck648y6RXcRGmriNhxjIOInPfKt5o9jPe9LMJ3iz00MefD9rJqTbBvvgyoE
-         n+YGdtHh9a37pUY7eFw4CB/nD1D3437E2uZD/SRcEaKHSghT3u7OufYEJmPsnIlmBVHb
-         p6VDeiJIpWJ6f37+X2fopxRBcna17GK/b+ymsPcLVyv7yZ2cAfOmnC6VHLvfZ/6XebZY
-         hQ0zkF8NMjv+pmrpO6wx+qAS/A0tvdSo8SrZMcOiZxZaF6FGxDBXxzSUfBBxfN4MvuHC
-         D5KmyFkVJHu07yYZwCnG36VzBr4mK+BQogBKOP8A4lm3amFn6dwayw9KhWFDrGn5SUh5
-         x3QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682667379; x=1685259379;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r4T9X6ORTgiJIhVcjeFoQF4kfGQPAh+aPhJ9TCOLtx4=;
-        b=jY1iSrUKJOStacwZZfQG8yCTYCIdV06QOJhWbJpdlqNi2S5fEfe0/azZ8qVfdDBAE6
-         Z2+VyZXFYpzbXNx9TWZD3oP7wXKL3CMdG4iu7t3df1hZ9G5rdxCf2AKbXd5dzg0lzEIn
-         sJwxIw7VIMF1WG8vxFIeW/9hqKvuLfUR1E3y1n7E9J+iw0C3P7u8M1kqCPP45z/1FNIN
-         69HCbP5PqgvJ3pyRKoQUmTCzStklv1do/nw/meaq2j9mzICMFg72ICDO45W7v4BXs+dX
-         fSDlfREdGJvpMlna25NhyWZ2QxWIWlor6mtGvgHTRxqV9ziRtAD2zhY94i1wgKXuKqcs
-         QwEw==
-X-Gm-Message-State: AC+VfDwgdr/TgJobfe3ZR+y7jdFX/SEDqKy+1cXSVsOkdjKmojRWrkgv
-        ZzkKKsvTDmMs82uMxQ4jUO0=
-X-Google-Smtp-Source: ACHHUZ60fKWLEIqyAWAnKeWdOP4G0oY86AfBkmNu1uZtkYt7SeEF7oCuxi56kt2NKqeyahklw8TmVw==
-X-Received: by 2002:a17:902:e849:b0:1a9:5674:282e with SMTP id t9-20020a170902e84900b001a95674282emr4744876plg.14.1682667379021;
-        Fri, 28 Apr 2023 00:36:19 -0700 (PDT)
-Received: from [192.168.43.80] (subs02-180-214-232-82.three.co.id. [180.214.232.82])
-        by smtp.gmail.com with ESMTPSA id t5-20020a170902a5c500b001a4fecf79e4sm12713524plq.49.2023.04.28.00.36.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Apr 2023 00:36:18 -0700 (PDT)
-Message-ID: <ab90dcf6-5861-48dc-f261-d6851e150863@gmail.com>
-Date:   Fri, 28 Apr 2023 14:36:13 +0700
+        Fri, 28 Apr 2023 04:51:30 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B4FE59;
+        Fri, 28 Apr 2023 01:51:23 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q75tb3Ty6z4f3pCS;
+        Fri, 28 Apr 2023 16:51:19 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgD3rLAGiUtkh9RFIQ--.49176S6;
+        Fri, 28 Apr 2023 16:51:20 +0800 (CST)
+From:   linan666@huaweicloud.com
+To:     axboe@kernel.dk, vishal.l.verma@intel.com, dan.j.williams@intel.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linan122@huawei.com, yukuai3@huawei.com, yi.zhang@huawei.com,
+        houtao1@huawei.com, yangerkun@huawei.com
+Subject: [PATCH 02/10] block/badblocks: fix badblocks loss when badblocks combine
+Date:   Fri, 28 Apr 2023 16:50:12 +0800
+Message-Id: <20230428085020.2283981-3-linan666@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20230428085020.2283981-1-linan666@huaweicloud.com>
+References: <20230428085020.2283981-1-linan666@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v4] blk-ioprio: Introduce promote-to-rt policy
-To:     Hou Tao <houtao@huaweicloud.com>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
-        Chaitanya Kulkarni <kch@nvidia.com>, cgroups@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, houtao1@huawei.com
-References: <20230428074404.280532-1-houtao@huaweicloud.com>
-Content-Language: en-US
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <20230428074404.280532-1-houtao@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgD3rLAGiUtkh9RFIQ--.49176S6
+X-Coremail-Antispam: 1UD129KBjvJXoWxJrW8urW3AryDWw17Kry3urg_yoW8XrW5pw
+        1fZwnIgr1IgFyv9F4UX3WDGF1Sg3Z7JF45Ga1Yqa48uFyDAw1xKF4vq3WYvrW0gF4xXF90
+        va1rWryDZFyfG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPEb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXw
+        A2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+        w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+        WxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+        GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64
+        xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j
+        6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2
+        kIc2xKxwAKzVCY07xG64k0F24l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+        Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17
+        CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0
+        I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I
+        8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73
+        UjIFyTuYvjxUc-txDUUUU
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/28/23 14:44, Hou Tao wrote:
-> diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-> index f67c0829350b..7544ce00e0cb 100644
-> --- a/Documentation/admin-guide/cgroup-v2.rst
-> +++ b/Documentation/admin-guide/cgroup-v2.rst
-> @@ -2024,31 +2024,33 @@ that attribute:
->    no-change
->  	Do not modify the I/O priority class.
->  
-> -  none-to-rt
-> -	For requests that do not have an I/O priority class (NONE),
-> -	change the I/O priority class into RT. Do not modify
-> -	the I/O priority class of other requests.
-> +  promote-to-rt
-> +	For requests that have a non-RT I/O priority class, change it into RT.
-> +	Also change the priority level of these requests to 4. Do not modify
-> +	the I/O priority of requests that have priority class RT.
->  
->    restrict-to-be
->  	For requests that do not have an I/O priority class or that have I/O
-> -	priority class RT, change it into BE. Do not modify the I/O priority
-> -	class of requests that have priority class IDLE.
-> +	priority class RT, change it into BE. Also change the priority level
-> +	of these requests to 0. Do not modify the I/O priority class of
-> +	requests that have priority class IDLE.
->  
->    idle
->  	Change the I/O priority class of all requests into IDLE, the lowest
->  	I/O priority class.
->  
-> +  none-to-rt
-> +	Deprecated. Just an alias for promote-to-rt.
-> +
->  The following numerical values are associated with the I/O priority policies:
->  
-> -+-------------+---+
-> -| no-change   | 0 |
-> -+-------------+---+
-> -| none-to-rt  | 1 |
-> -+-------------+---+
-> -| rt-to-be    | 2 |
-> -+-------------+---+
-> -| all-to-idle | 3 |
-> -+-------------+---+
-> ++----------------+---+
-> +| no-change      | 0 |
-> ++----------------+---+
-> +| rt-to-be       | 2 |
-> ++----------------+---+
-> +| all-to-idle    | 3 |
-> ++----------------+---+
->  
->  The numerical value that corresponds to each I/O priority class is as follows:
->  
-> @@ -2064,9 +2066,13 @@ The numerical value that corresponds to each I/O priority class is as follows:
->  
->  The algorithm to set the I/O priority class for a request is as follows:
->  
-> -- Translate the I/O priority class policy into a number.
-> -- Change the request I/O priority class into the maximum of the I/O priority
-> -  class policy number and the numerical I/O priority class.
-> +- If I/O priority class policy is promote-to-rt, change the request I/O
-> +  priority class to IOPRIO_CLASS_RT and change the request I/O priority
-> +  level to 4.
-> +- If I/O priorityt class is not promote-to-rt, translate the I/O priority
-> +  class policy into a number, then change the request I/O priority class
-> +  into the maximum of the I/O priority class policy number and the numerical
-> +  I/O priority class.
->  
->  PID
->  ---
+From: Li Nan <linan122@huawei.com>
 
-The doc LGTM, thanks!
+badblocks will loss if we set it as below:
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+  # echo 1 1 > bad_blocks
+  # echo 3 1 > bad_blocks
+  # echo 1 5 > bad_blocks
+  # cat bad_blocks
+    1 3
 
+In badblocks_set(), if there is an intersection between p[lo] and p[hi],
+we will combine them. The end of new badblocks is p[hi]'s end now. but
+p[lo] may cross p[hi] and new end should be the larger of p[lo] and p[hi].
+
+Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/badblocks.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/block/badblocks.c b/block/badblocks.c
+index 7e6ebe2ac12c..2c2ef8284a3f 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -267,16 +267,14 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 	if (sectors == 0 && hi < bb->count) {
+ 		/* we might be able to combine lo and hi */
+ 		/* Note: 's' is at the end of 'lo' */
+-		sector_t a = BB_OFFSET(p[hi]);
+-		int lolen = BB_LEN(p[lo]);
+-		int hilen = BB_LEN(p[hi]);
+-		int newlen = lolen + hilen - (s - a);
++		sector_t a = BB_OFFSET(p[lo]);
++		int newlen = max(s, BB_OFFSET(p[hi]) + BB_LEN(p[hi])) - a;
+ 
+-		if (s >= a && newlen < BB_MAX_LEN) {
++		if (s >= BB_OFFSET(p[hi]) && newlen < BB_MAX_LEN) {
+ 			/* yes, we can combine them */
+ 			int ack = BB_ACK(p[lo]) && BB_ACK(p[hi]);
+ 
+-			p[lo] = BB_MAKE(BB_OFFSET(p[lo]), newlen, ack);
++			p[lo] = BB_MAKE(a, newlen, ack);
+ 			memmove(p + hi, p + hi + 1,
+ 				(bb->count - hi - 1) * 8);
+ 			bb->count--;
 -- 
-An old man doll... just what I always wanted! - Clara
+2.31.1
 
