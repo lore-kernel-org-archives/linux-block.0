@@ -2,131 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7862C77B61
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 05:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C359C77B60
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 05:54:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345048AbjD1FvW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Apr 2023 01:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56834 "EHLO
+        id S229768AbjD1Fyt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 01:54:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345304AbjD1FvS (ORCPT
+        with ESMTP id S229645AbjD1Fys (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2023 01:51:18 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C10A35B0
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 22:51:15 -0700 (PDT)
-Received: from letrec.thunk.org ([76.150.80.181])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 33S5lMlM026990
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Apr 2023 01:47:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1682660846; bh=n45cV6emPGhOhWVrM3aPDXulvuQpgauHWb0nGls0bOE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=HdOr1NcmCK3MvPO2flI/Eva8KXzuIVfF5D3UOs5MkdFFBoUxAslYlHnX2IUEEGUmg
-         dcw7Zved6ZgTRwJw3fO/GEQBxgRKwQy986GY+v3jl6XgEpqrsNHyH3e18DjI3gTBpM
-         4J3jqLQAJ3gnOgxeweK4gZbDact/GWtxUHMpOciVtFAcv6mSTup4dQRkrDyrVY8vXY
-         5UNs20kH3oBnNCJljcpMWHSw5NgJ82Xp2aqUF7Hoh5MdUZBY1LfxHtHhe7slW6iAYM
-         0nHIgyBJogWvJ3XbAhzJy5SkWAqswP/A+yi7Q0GGJxoB5KuJg0v+5rx6W4hmZxrWcK
-         AEfZtOOyql9zA==
-Received: by letrec.thunk.org (Postfix, from userid 15806)
-        id 0C1D48C0208; Fri, 28 Apr 2023 01:47:22 -0400 (EDT)
-Date:   Fri, 28 Apr 2023 01:47:22 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Baokun Li <libaokun1@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-ext4@vger.kernel.org,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
-        yangerkun <yangerkun@huawei.com>
-Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
-Message-ID: <ZEtd6qZOgRxYnNq9@mit.edu>
-References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
- <ZEny7Izr8iOc/23B@casper.infradead.org>
- <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
- <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
- <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
- <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
- <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
- <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
- <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com>
+        Fri, 28 Apr 2023 01:54:48 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE85213A
+        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 22:54:47 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id D770C68D0A; Fri, 28 Apr 2023 07:54:43 +0200 (CEST)
+Date:   Fri, 28 Apr 2023 07:54:43 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v3 8/9] block: mq-deadline: Handle requeued requests
+ correctly
+Message-ID: <20230428055443.GI8549@lst.de>
+References: <20230424203329.2369688-1-bvanassche@acm.org> <20230424203329.2369688-9-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com>
+In-Reply-To: <20230424203329.2369688-9-bvanassche@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 28, 2023 at 11:47:26AM +0800, Baokun Li wrote:
-> Ext4 just detects I/O Error and remounts it as read-only, it doesn't know
-> if the current disk is dead or not.
+On Mon, Apr 24, 2023 at 01:33:28PM -0700, Bart Van Assche wrote:
+> Start dispatching from the start of a zone instead of from the starting
+> position of the most recently dispatched request.
 > 
-> I asked Yu Kuai and he said that disk_live() can be used to determine
-> whether
-> a disk has been removed based on the status of the inode corresponding to
-> the block device, but this is generally not done in file systems.
+> If a zoned write is requeued with an LBA that is lower than already
+> inserted zoned writes, make sure that it is submitted first.
+> 
+> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/mq-deadline.c | 25 +++++++++++++++++++++++--
+>  1 file changed, 23 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index bf1dfe9fe9c9..2de6c63190d8 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -156,13 +156,23 @@ deadline_latter_request(struct request *rq)
+>  	return NULL;
+>  }
+>  
+> -/* Return the first request for which blk_rq_pos() >= pos. */
+> +/*
+> + * Return the first request for which blk_rq_pos() >= @pos. For zoned devices,
+> + * return the first request after the highest zone start <= @pos.
+> + */
+>  static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
+>  				enum dd_data_dir data_dir, sector_t pos)
+>  {
+>  	struct rb_node *node = per_prio->sort_list[data_dir].rb_node;
+>  	struct request *rq, *res = NULL;
+>  
+> +	if (!node)
+> +		return NULL;
+> +
+> +	rq = rb_entry_rq(node);
+> +	if (blk_rq_is_seq_zoned_write(rq))
+> +		pos -= bdev_offset_from_zone_start(rq->q->disk->part0, pos);
 
-What really needs to happen is that del_gendisk() needs to inform file
-systems that the disk is gone, so that the file system can shutdown
-the file system and tear everything down.
+This looks a bit odd.  I'd write this as:
 
-disk_live() is relatively new; it was added in August 2021.  Back in
-2015, I had added the following in fs/ext4/super.c:
+	if (blk_rq_is_seq_zoned_write(rq))
+		pos = round_down(pos, rq->q->limits.chunk_sectors);
 
-/*
- * The del_gendisk() function uninitializes the disk-specific data
- * structures, including the bdi structure, without telling anyone
- * else.  Once this happens, any attempt to call mark_buffer_dirty()
- * (for example, by ext4_commit_super), will cause a kernel OOPS.
- * This is a kludge to prevent these oops until we can put in a proper
- * hook in del_gendisk() to inform the VFS and file system layers.
- */
-static int block_device_ejected(struct super_block *sb)
-{
-	struct inode *bd_inode = sb->s_bdev->bd_inode;
-	struct backing_dev_info *bdi = inode_to_bdi(bd_inode);
+> @@ -821,7 +833,16 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  		 * set expire time and add to fifo list
+>  		 */
+>  		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
+> -		list_add_tail(&rq->queuelist, &per_prio->fifo_list[data_dir]);
+> +		insert_before = &per_prio->fifo_list[data_dir];
+> +#ifdef CONFIG_BLK_DEV_ZONED
+> +		if (blk_rq_is_seq_zoned_write(rq)) {
+> +			struct request *rq2 = deadline_latter_request(rq);
+> +
+> +			if (rq2 && blk_rq_zone_no(rq2) == blk_rq_zone_no(rq))
+> +				insert_before = &rq2->queuelist;
+> +		}
+> +#endif
 
-	return bdi->dev == NULL;
-}
+Why does this need an ifdef?
 
-As the comment states, it's rather awkward to have the file system
-check to see if the block device is dead in various places; the real
-problem is that the block device shouldn't just *vanish*, with the
-block device structures egetting partially de-initialized, without the
-block layer being polite enough to let the file system know.
+Also can you please always add comments for these special cases?
+Same for the one above.
 
-> Those dirty pages that are already there are piling up and can't be
-> written back, which I think is a real problem. Can the block layer
-> clear those dirty pages when it detects that the disk is deleted?
-
-Well, the dirty pages belong to the file system, and so it needs to be
-up to the file system to clear out the dirty pages.  But I'll also
-what the right thing to do when a disk gets removed is not necessarily
-obvious.
-
-For example, suppose some process has a file mmap'ed into its address
-space, and that file is on the disk which the user has rudely yanked
-out from their laptop; what is the right thing to do?  Do we kill the
-process?  Do we let the process write to the mmap'ed region, and
-silently let the modified data go *poof* when the process exits?  What
-if there is an executable file on the removable disk, and there are
-one or more processes running that executable when the device
-disappears?  Do we kill the process?  Do we let the process run unti
-it tries to access a page which hasn't been paged in and then kill the
-process?
-
-We should design a proper solution for What Should Happen when a
-removable disk gets removed unceremoniously without unmounting the
-file system first.  It's not just a matter of making some tests go
-green....
-
-						- Ted
-						
+> +		list_add_tail(&rq->queuelist, insert_before);
+>  	}
+>  }
+>  
+---end quoted text---
