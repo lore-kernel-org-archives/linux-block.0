@@ -2,116 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8AFFC77B61
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 06:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86458C77B60
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 06:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbjD1GMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Apr 2023 02:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35666 "EHLO
+        id S230071AbjD1Gvi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 02:51:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbjD1GMQ (ORCPT
+        with ESMTP id S1345285AbjD1Gvh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2023 02:12:16 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BEE51710;
-        Thu, 27 Apr 2023 23:12:15 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q72Ly5m5Kz4f3mVv;
-        Fri, 28 Apr 2023 14:12:10 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgC3YiC2Y0tk65qRHg--.3612S3;
-        Fri, 28 Apr 2023 14:12:08 +0800 (CST)
+        Fri, 28 Apr 2023 02:51:37 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA2D30E8;
+        Thu, 27 Apr 2023 23:51:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682664693; x=1714200693;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=aB2YsP1K3RdhXZS8cylTDflNzVA0nU4HK1q9q5xhY3s=;
+  b=KoQKVBPpfgizayAK6YpfB0D9GZGS5gBSbkpXj6PtvEE7O/GDKTvXbRd9
+   dKmdQuiPS5FCtcjmhZ/yqwpmj+5iiw04twk65XdJfEf03jkmXf1S/YsZt
+   Sza5kEWPGIYbd66QaVPsX/2rO221V2pW0FySdIe/CRIbaWFoT2K4Bf2rZ
+   Ip0cR6tUT1GNyUrs98hU0MrkVHexexQ0u8YlRFqCeKdwNCQJPJxvJrwIK
+   eayNzUyq7NC/ymYfY9b83CVAXCtrq36cupeiZzlT8gPPEC+DHdvCR4r2O
+   YwmrFCmMb3z7LAo+qzr2OmKP4GwCoZXOYV7WJDTKOD7730y+KsR2GDtfs
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="347694937"
+X-IronPort-AV: E=Sophos;i="5.99,233,1677571200"; 
+   d="scan'208";a="347694937"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2023 23:51:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="644999650"
+X-IronPort-AV: E=Sophos;i="5.99,233,1677571200"; 
+   d="scan'208";a="644999650"
+Received: from linux.bj.intel.com ([10.238.156.127])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2023 23:51:30 -0700
+Date:   Fri, 28 Apr 2023 14:49:53 +0800
+From:   Tao Su <tao1.su@linux.intel.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        "yukuai (C)" <yukuai3@huawei.com>
 Subject: Re: [PATCH v2] block: Skip destroyed blkg when restart in
  blkg_destroy_all()
-To:     Tao Su <tao1.su@linux.intel.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai1@huaweicloud.com, "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <ZEtskeNOTKeqW2rS@linux.bj.intel.com>
 References: <20230428045149.1310073-1-tao1.su@linux.intel.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c007f189-8573-8390-4338-ae4c281ffbee@huaweicloud.com>
-Date:   Fri, 28 Apr 2023 14:12:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <c007f189-8573-8390-4338-ae4c281ffbee@huaweicloud.com>
 MIME-Version: 1.0
-In-Reply-To: <20230428045149.1310073-1-tao1.su@linux.intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgC3YiC2Y0tk65qRHg--.3612S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw48JrWUKFy3CF4kCrW3ZFb_yoW8AFWfp3
-        9rGw1Ykr9YkFn29a17W3W7uryFga1rXr1rW3y3W34Ykr17XrZ2v3W09w1DJFyxAF1fGrWr
-        Ar1UtryFkws5u37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
-        UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+In-Reply-To: <c007f189-8573-8390-4338-ae4c281ffbee@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-ÔÚ 2023/04/28 12:51, Tao Su Ð´µÀ:
-> Kernel hang in blkg_destroy_all() when total blkg greater than
-> BLKG_DESTROY_BATCH_SIZE, because of not removing destroyed blkg in
-> blkg_list. So the size of blkg_list is same after destroying a
-> batch of blkg, and the infinite 'restart' occurs.
+On Fri, Apr 28, 2023 at 02:12:06PM +0800, Yu Kuai wrote:
+> Hi,
 > 
-> Since blkg should stay on the queue list until blkg_free_workfn(),
-> skip destroyed blkg when restart a new round, which will solve this
-> kernel hang issue and satisfy the previous will to restart.
-
-Please add a fix tag:
-
-Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from 
-blkg_free_workfn() and blkcg_deactivate_policy()")
+> åœ¨ 2023/04/28 12:51, Tao Su å†™é“:
+> > Kernel hang in blkg_destroy_all() when total blkg greater than
+> > BLKG_DESTROY_BATCH_SIZE, because of not removing destroyed blkg in
+> > blkg_list. So the size of blkg_list is same after destroying a
+> > batch of blkg, and the infinite 'restart' occurs.
+> > 
+> > Since blkg should stay on the queue list until blkg_free_workfn(),
+> > skip destroyed blkg when restart a new round, which will solve this
+> > kernel hang issue and satisfy the previous will to restart.
 > 
-> Reported-by: Xiangfei Ma <xiangfeix.ma@intel.com>
-> Tested-by: Xiangfei Ma <xiangfeix.ma@intel.com>
-> Tested-by: Farrah Chen <farrah.chen@intel.com>
-> Signed-off-by: Yu Kuai <yukuai1@huaweicloud.com>
-
-You can remove this tag, and feel free to add:
-
-Suggested-and-reviewed-by: Yu Kuai <yukuai3@huawei.com>
-
-Thanks,
-Kuai
-> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
-> ---
-> v2:
-> - change 'directly remove destroyed blkg' to 'skip destroyed blkg'
+> Please add a fix tag:
 > 
-> v1:
-> - https://lore.kernel.org/all/20230425075911.839539-1-tao1.su@linux.intel.com/
+> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from
+> blkg_free_workfn() and blkcg_deactivate_policy()")
+> > 
+> > Reported-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+> > Tested-by: Xiangfei Ma <xiangfeix.ma@intel.com>
+> > Tested-by: Farrah Chen <farrah.chen@intel.com>
+> > Signed-off-by: Yu Kuai <yukuai1@huaweicloud.com>
 > 
->   block/blk-cgroup.c | 3 +++
->   1 file changed, 3 insertions(+)
+> You can remove this tag, and feel free to add:
 > 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index bd50b55bdb61..75bad5d60c9f 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -528,6 +528,9 @@ static void blkg_destroy_all(struct gendisk *disk)
->   	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
->   		struct blkcg *blkcg = blkg->blkcg;
->   
-> +		if (hlist_unhashed(&blkg->blkcg_node))
-> +			continue;
-> +
->   		spin_lock(&blkcg->lock);
->   		blkg_destroy(blkg);
->   		spin_unlock(&blkcg->lock);
-> 
+> Suggested-and-reviewed-by: Yu Kuai <yukuai3@huawei.com>
 
+Got it, thanks!
+
+Tao
+
+> 
+> Thanks,
+> Kuai
+> > Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+> > ---
+> > v2:
+> > - change 'directly remove destroyed blkg' to 'skip destroyed blkg'
+> > 
+> > v1:
+> > - https://lore.kernel.org/all/20230425075911.839539-1-tao1.su@linux.intel.com/
+> > 
+> >   block/blk-cgroup.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> > index bd50b55bdb61..75bad5d60c9f 100644
+> > --- a/block/blk-cgroup.c
+> > +++ b/block/blk-cgroup.c
+> > @@ -528,6 +528,9 @@ static void blkg_destroy_all(struct gendisk *disk)
+> >   	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
+> >   		struct blkcg *blkcg = blkg->blkcg;
+> > +		if (hlist_unhashed(&blkg->blkcg_node))
+> > +			continue;
+> > +
+> >   		spin_lock(&blkcg->lock);
+> >   		blkg_destroy(blkg);
+> >   		spin_unlock(&blkcg->lock);
+> > 
+> 
