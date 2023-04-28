@@ -2,216 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A18BC77B61
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 19:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F396C77B60
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 19:46:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjD1TFO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Apr 2023 15:05:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45184 "EHLO
+        id S230265AbjD1TqL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 15:46:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229882AbjD1TFO (ORCPT
+        with ESMTP id S229578AbjD1TqL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2023 15:05:14 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65C72D67
-        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 12:05:12 -0700 (PDT)
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id A8CA03F202
-        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 19:05:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1682708710;
-        bh=5xdGcBrePTmDfHc6Jzw3JTLHbSAztKlpGArx8vpNt2k=;
-        h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-         Content-Type:In-Reply-To;
-        b=rU3GquilWoTt+E66nkoXnDUfQpugdh42eX9qLk43mWrbcLE23a4kXk4GhJjPtiE2+
-         OaUZ70g0ZpTIMmqyWhOik/GpIpfGeHAEyDAu5Dbe8wxTtkBSXAX/o3y5DZblYSAfBO
-         A/CDMv9FMuq4+Y7iDq94d5NxUWMyCEkHWEegxBArMhblt1+mZvnqUt+BP+HHp3nZyj
-         14N4wGPAxCUy4Q5qpoWeVRSYzb1O7tGFaGXK+ys3blTZmTA32aEGC0fjVWdhjv6SBr
-         SA7PNFM3OGGXr7zUtEL6wDa248WYURapdfzYEjWe2eNlxOHXFNV9XAHmrivQfeHnZ3
-         vw4p1wAkH18JQ==
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-50a1f981105so46590a12.3
-        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 12:05:10 -0700 (PDT)
+        Fri, 28 Apr 2023 15:46:11 -0400
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E2465275
+        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 12:46:09 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1a6762fd23cso3000765ad.3
+        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 12:46:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682708710; x=1685300710;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5xdGcBrePTmDfHc6Jzw3JTLHbSAztKlpGArx8vpNt2k=;
-        b=RY52ZNg2aYQ7Z7sva313hJQJAuS63kJuAF8wuuhBfk78d9aoq8vXYYCuvCcEdGQpH/
-         ydwE3LBksV9KEQnjQEy+DWlbbWSJ1Xaw01UTWoxwYUzHI6Mko5ckcGHYs4QroFJ7nxh+
-         kOwjf+UneDWOQfXbxMWpLaM9yRDYHtu3/Vn9iuTtTnt2iGeNM8xgpZtmTpA3tFlirJ03
-         Ji8IVbOZNSIZvyyMDn/8+yQ7k6ZyxrIvpmzsTzQubq7X2DZEg3a8KF9rdNFx2iNdh2J/
-         JdD5kvgAF6ttaHC3FjGReNLS04omLmuswonvQIpjHQedjiKnsEhIBv4sZGOIV4qebg8x
-         CD6w==
-X-Gm-Message-State: AC+VfDyzJfUrVQXxlG3gFmokyZHNZGOT2Y3Bji7nz3sj2EgdcRAaNnnK
-        viMSHcnHb1oDOOVpDTx4eQfHJKNWBlAo74kUops3ebaJiKiGMqIJqHDC1eYPMk1CpOOSH1F4wfY
-        un1pqZYvljfxn22y2YqHN9FehMRtzvdfwR/cq7bI+
-X-Received: by 2002:a17:907:16aa:b0:94f:9f76:c74f with SMTP id hc42-20020a17090716aa00b0094f9f76c74fmr7738588ejc.52.1682708710275;
-        Fri, 28 Apr 2023 12:05:10 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7Pi57scEQWERlmKMoLu2PGjbl7zecivIyoR8ReiRJEuRABO1ah119lQPAYBiWFcA3rwjRQeg==
-X-Received: by 2002:a17:907:16aa:b0:94f:9f76:c74f with SMTP id hc42-20020a17090716aa00b0094f9f76c74fmr7738571ejc.52.1682708709893;
-        Fri, 28 Apr 2023 12:05:09 -0700 (PDT)
-Received: from localhost (host-87-1-129-21.retail.telecomitalia.it. [87.1.129.21])
-        by smtp.gmail.com with ESMTPSA id wy12-20020a170906fe0c00b0095f07223918sm4265757ejb.138.2023.04.28.12.05.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Apr 2023 12:05:09 -0700 (PDT)
-Date:   Fri, 28 Apr 2023 21:05:08 +0200
-From:   Andrea Righi <andrea.righi@canonical.com>
-To:     Jinke Han <hanjinke.666@bytedance.com>
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] blk-throttle: Fix io statistics for cgroup v1
-Message-ID: <ZEwY5Oo+5inO9UFf@righiandr-XPS-13-7390>
-References: <20230401094708.77631-1-hanjinke.666@bytedance.com>
+        d=1e100.net; s=20221208; t=1682711169; x=1685303169;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MIeV8pQWpAxQ3ouf/ab4YbeUpSGk9VHna3mD3BjRzHQ=;
+        b=GvsLOdFnWbKVaknzf1mSM09urfIWbZl2k8Oco9BWOfeeKyDwyO0N46mEuAvxvVNMMS
+         3DT6VjU1Nrt3YkHVEFiK3bzXC8X8kTbA6IsNOCELQ78YkKvGp0b5rnRxcpHqYzX/9XN0
+         mj2ZR1FGArttIpWs4bb9Ry20FJrfdVGbyFDuUibeGcgPoSRQoVnqa0gig4rRYSKqK8aw
+         rzB+RomfjZCNdPlnIm1kyVdAZCadKGTxYsyWjKLJ37O+inz3dUwr3UHZLzb64JPzZWs+
+         /XcayCZrk8qyNij/F4mWVjFjFhQDdsLjQe6Q4L2yU8lw8DlxSRa3E8a7Eq202/Rg3J1A
+         6tlw==
+X-Gm-Message-State: AC+VfDwshb5NGItD43zz8YHnWYL2dxXK4/oHj25fgbjH7fH3uSIykSLW
+        imfZKFo9v6xd7XL8phJeO7Q=
+X-Google-Smtp-Source: ACHHUZ7VNC/t3IhsyKLjVtLESTacTGljYH5kNJSiCKETvHaL1DXIQN7wgr6M2lExkvbA05lgEgVvfg==
+X-Received: by 2002:a17:902:c44c:b0:1a6:a7ac:2ab5 with SMTP id m12-20020a170902c44c00b001a6a7ac2ab5mr5305513plm.45.1682711168660;
+        Fri, 28 Apr 2023 12:46:08 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id iz1-20020a170902ef8100b001a987c4d3b9sm6903515plb.290.2023.04.28.12.46.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Apr 2023 12:46:07 -0700 (PDT)
+Message-ID: <1c28f0b9-14f1-5fc1-4e15-52c4f6c2c91c@acm.org>
+Date:   Fri, 28 Apr 2023 12:46:06 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230401094708.77631-1-hanjinke.666@bytedance.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v3 2/9] block: Micro-optimize
+ blk_req_needs_zone_write_lock()
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20230424203329.2369688-1-bvanassche@acm.org>
+ <20230424203329.2369688-3-bvanassche@acm.org> <20230428054446.GC8549@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230428054446.GC8549@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 01, 2023 at 05:47:08PM +0800, Jinke Han wrote:
-> From: Jinke Han <hanjinke.666@bytedance.com>
+On 4/27/23 22:44, Christoph Hellwig wrote:
+> On Mon, Apr 24, 2023 at 01:33:22PM -0700, Bart Van Assche wrote:
+>> @@ -367,8 +367,9 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>>   static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+>>   {
+>>   	/* Zoned block device write operation case: do not plug the BIO */
+>> -	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
+>> -	    bdev_op_is_zoned_write(bio->bi_bdev, bio_op(bio)))
+>> +	if ((bio_op(bio) == REQ_OP_WRITE ||
+>> +	     bio_op(bio) == REQ_OP_WRITE_ZEROES) &&
+>> +	    disk_zone_is_seq(bio->bi_bdev->bd_disk, bio->bi_iter.bi_sector))
+>>   		return NULL;
 > 
-> After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
-> blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
-> the only stable io stats interface of cgroup v1, and these statistics
-> are done in the blk-throttle code. But the current code only counts the
-> bios that are actually throttled. When the user does not add the throttle
-> limit, the io stats for cgroup v1 has nothing. I fix it according to the
-> statistical method of v2, and made it count all ios accurately.
+> I find this a bit hard to hard to read.  Why not:
 > 
-> Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
-> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
+> 	if (disk_zone_is_seq(bio->bi_bdev->bd_disk, bio->bi_iter.bi_sector)) {
+> 	  	/*
+> 		 * Do not plug for writes that require zone locking.
+> 		 */
+> 		if (bio_op(bio) == REQ_OP_WRITE ||
+> 		    bio_op(bio) == REQ_OP_WRITE_ZEROES)
+> 			return NULL;
+> 	}
 
-Thanks for fixing this!
+In the above alternative the expensive check happens before a check that is not
+expensive at all. Do you really want me to call disk_zone_is_seq() before checking
+the operation type?
 
-The code looks correct to me, but this seems to report io statistics
-only if at least one throttling limit is defined. IIRC with cgroup v1 it
-was possible to see the io statistics inside a cgroup also with no
-throttling limits configured.
-
-Basically to restore the old behavior we would need to drop the
-cgroup_subsys_on_dfl() check, something like the following (on top of
-your patch).
-
-But I'm not sure if we're breaking other behaviors in this way...
-opinions?
-
- block/blk-cgroup.c   |  3 ---
- block/blk-throttle.h | 12 +++++-------
- 2 files changed, 5 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 79138bfc6001..43af86db7cf3 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -2045,9 +2045,6 @@ void blk_cgroup_bio_start(struct bio *bio)
- 	struct blkg_iostat_set *bis;
- 	unsigned long flags;
- 
--	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
--		return;
--
- 	/* Root-level stats are sourced from system-wide IO stats */
- 	if (!cgroup_parent(blkcg->css.cgroup))
- 		return;
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index d1ccbfe9f797..bcb40ee2eeba 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -185,14 +185,12 @@ static inline bool blk_should_throtl(struct bio *bio)
- 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
- 	int rw = bio_data_dir(bio);
- 
--	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
--		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
--			bio_set_flag(bio, BIO_CGROUP_ACCT);
--			blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
--					bio->bi_iter.bi_size);
--		}
--		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
-+	if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
-+		bio_set_flag(bio, BIO_CGROUP_ACCT);
-+		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
-+				bio->bi_iter.bi_size);
- 	}
-+	blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
- 
- 	/* iops limit is always counted */
- 	if (tg->has_rules_iops[rw])
-
-> ---
->  block/blk-cgroup.c   | 6 ++++--
->  block/blk-throttle.c | 6 ------
->  block/blk-throttle.h | 9 +++++++++
->  3 files changed, 13 insertions(+), 8 deletions(-)
+>>   bool blk_req_needs_zone_write_lock(struct request *rq)
+>>   {
+>> -	if (!rq->q->disk->seq_zones_wlock)
+>> -		return false;
+>> -
+>> -	if (bdev_op_is_zoned_write(rq->q->disk->part0, req_op(rq)))
+>> -		return blk_rq_zone_is_seq(rq);
+>> -
+>> -	return false;
+>> +	return rq->q->disk->seq_zones_wlock &&
+>> +		(req_op(rq) == REQ_OP_WRITE ||
+>> +		 req_op(rq) == REQ_OP_WRITE_ZEROES) &&
+>> +		blk_rq_zone_is_seq(rq);
 > 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index bd50b55bdb61..33263d0d0e0f 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -2033,6 +2033,9 @@ void blk_cgroup_bio_start(struct bio *bio)
->  	struct blkg_iostat_set *bis;
->  	unsigned long flags;
->  
-> +	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
-> +		return;
-> +
->  	/* Root-level stats are sourced from system-wide IO stats */
->  	if (!cgroup_parent(blkcg->css.cgroup))
->  		return;
-> @@ -2064,8 +2067,7 @@ void blk_cgroup_bio_start(struct bio *bio)
->  	}
->  
->  	u64_stats_update_end_irqrestore(&bis->sync, flags);
-> -	if (cgroup_subsys_on_dfl(io_cgrp_subsys))
-> -		cgroup_rstat_updated(blkcg->css.cgroup, cpu);
-> +	cgroup_rstat_updated(blkcg->css.cgroup, cpu);
->  	put_cpu();
->  }
->  
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 47e9d8be68f3..2be66e9430f7 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -2174,12 +2174,6 @@ bool __blk_throtl_bio(struct bio *bio)
->  
->  	rcu_read_lock();
->  
-> -	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-> -		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
-> -				bio->bi_iter.bi_size);
-> -		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
-> -	}
-> -
->  	spin_lock_irq(&q->queue_lock);
->  
->  	throtl_update_latency_buckets(td);
-> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-> index ef4b7a4de987..d1ccbfe9f797 100644
-> --- a/block/blk-throttle.h
-> +++ b/block/blk-throttle.h
-> @@ -185,6 +185,15 @@ static inline bool blk_should_throtl(struct bio *bio)
->  	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
->  	int rw = bio_data_dir(bio);
->  
-> +	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-> +		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
-> +			bio_set_flag(bio, BIO_CGROUP_ACCT);
-> +			blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
-> +					bio->bi_iter.bi_size);
-> +		}
-> +		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
-> +	}
-> +
->  	/* iops limit is always counted */
->  	if (tg->has_rules_iops[rw])
->  		return true;
-> -- 
-> 2.20.1
+> Similaly here.  The old version did flow much better, so I'd prefer
+> something like:
+> 
+> 
+> 	if (!rq->q->disk->seq_zones_wlock || !blk_rq_zone_is_seq(rq))
+> 		return false;
+> 	return req_op(rq) == REQ_OP_WRITE || req_op(rq) == REQ_OP_WRITE_ZEROES);
+> 
+> I also wonder if the check that and op is write or write zeroes, that
+> is needs zone locking would be useful instead of dupliating it all
+> over.  That is instead of removing bdev_op_is_zoned_write
+> keep a op_is_zoned_write without the bdev_is_zoned check.
+
+I will introduce an op_is_zoned_write() helper function.
+
+Thanks,
+
+Bart.
