@@ -2,53 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8C7C77B60
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 08:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC52C77B61
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 08:52:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345379AbjD1Iv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Apr 2023 04:51:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58882 "EHLO
+        id S1345439AbjD1Iv6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 04:51:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345616AbjD1Ivb (ORCPT
+        with ESMTP id S1345613AbjD1Ivb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 28 Apr 2023 04:51:31 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A814C10;
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2268D3A9D;
         Fri, 28 Apr 2023 01:51:26 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Q75tZ5Nqlz4f3vdR;
-        Fri, 28 Apr 2023 16:51:18 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Q75tc2nj3z4f3mJx;
+        Fri, 28 Apr 2023 16:51:20 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rLAGiUtkh9RFIQ--.49176S4;
-        Fri, 28 Apr 2023 16:51:19 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgD3rLAGiUtkh9RFIQ--.49176S9;
+        Fri, 28 Apr 2023 16:51:22 +0800 (CST)
 From:   linan666@huaweicloud.com
 To:     axboe@kernel.dk, vishal.l.verma@intel.com, dan.j.williams@intel.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linan122@huawei.com, yukuai3@huawei.com, yi.zhang@huawei.com,
         houtao1@huawei.com, yangerkun@huawei.com
-Subject: [PATCH 00/10] block/badblocks: fix badblocks setting error
-Date:   Fri, 28 Apr 2023 16:50:10 +0800
-Message-Id: <20230428085020.2283981-1-linan666@huaweicloud.com>
+Subject: [PATCH 05/10] block/badblocks: fix ack set fail in badblocks_set
+Date:   Fri, 28 Apr 2023 16:50:15 +0800
+Message-Id: <20230428085020.2283981-6-linan666@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20230428085020.2283981-1-linan666@huaweicloud.com>
+References: <20230428085020.2283981-1-linan666@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rLAGiUtkh9RFIQ--.49176S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gr4DJFWfJFWftr4xCF47CFg_yoWfZFX_Aa
-        4vyF95JFsYv3W5AayayF1UtrZ3KF4UCr1jka4UArs7Xr17ta1DZw45Jr4UXrn8WFyUZwsx
-        Zr95Xr1rXw1xtjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3xYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAq
-        x4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14
-        v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02
-        628vn2kIc2xKxwAKzVCY07xG64k0F24l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-        AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvf
-        C2KfnxnUUI43ZEXa7IU1kpnJUUUUU==
+X-CM-TRANSID: gCh0CgD3rLAGiUtkh9RFIQ--.49176S9
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF4xtrWrWrW8tF17JFWUArb_yoWkXrg_J3
+        WFyFZ5Xrn5CFs8Cr1Yy3W0qrsY9F45Cr4kCw12qrn7XrsrtF1DJws8tr93Wrn5CFZrC390
+        v34rXr9Iva4IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbkAYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
+        0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+        Y2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+        v26F4UJVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
+        xVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F4
+        0EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_
+        Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8c
+        xan2IY04v7M4kE6xkIj40Ew7xC0wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
+        JVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67
+        kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY
+        6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42
+        IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIev
+        Ja73UjIFyTuYvjxUwZ2-UUUUU
 X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -57,25 +60,43 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Li Nan <linan122@huawei.com>
 
-The patch series fix the bug of setting badblocks, which may not match
-expectations in complex scenarios. Optimize the code to make it more
-readable at the same time.
+If we try to set ack for a BB_MAX_LEN badblocks, it will return
+0(success) but did not set ack at all in badblocks_set(). Check ack
+before setting to fix it, and do not set badblocks already exist.
 
-Li Nan (10):
-  block/badblocks: only set bb->changed when badblocks changes
-  block/badblocks: fix badblocks loss when badblocks combine
-  block/badblocks: fix badblocks overlap
-  block/badblocks: fix the bug of reverse order
-  block/badblocks: fix ack set fail in badblocks_set
-  block/badblocks: check bb->count instead of 'hi > lo'
-  block/badblocks: factor out a helper to merge badblocks
-  block/badblocks: factor out a helper to combine badblocks
-  block/badblocks: factor out a helper to create badblocks
-  block/badblocks: try to merge badblocks as much as possible
+Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
+Signed-off-by: Li Nan <linan122@huawei.com>
+---
+ block/badblocks.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
- block/badblocks.c | 300 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 187 insertions(+), 113 deletions(-)
-
+diff --git a/block/badblocks.c b/block/badblocks.c
+index 11e3a3ae2c72..c11eb869f2f3 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -219,18 +219,18 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 			if (e < s + sectors)
+ 				e = s + sectors;
+ 			if (e - a <= BB_MAX_LEN) {
+-				p[lo] = BB_MAKE(a, e-a, ack);
+ 				s = e;
+ 			} else {
+ 				/* does not all fit in one range,
+ 				 * make p[lo] maximal
+ 				 */
+-				if (BB_LEN(p[lo]) != BB_MAX_LEN)
+-					p[lo] = BB_MAKE(a, BB_MAX_LEN, ack);
+ 				s = a + BB_MAX_LEN;
+ 			}
++			if (s - a != BB_LEN(p[lo]) || ack != BB_ACK(p[lo])) {
++				p[lo] = BB_MAKE(a, s - a, ack);
++				changed = true;
++			}
+ 			sectors = e - s;
+-			changed = true;
+ 		}
+ 	}
+ 	if (sectors && hi < bb->count) {
 -- 
 2.31.1
 
