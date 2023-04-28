@@ -2,78 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F7CC77B61
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 02:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E65C77B7F
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 02:54:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344722AbjD1Coy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 22:44:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41306 "EHLO
+        id S1344285AbjD1Cy3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 22:54:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344379AbjD1Cov (ORCPT
+        with ESMTP id S1344379AbjD1Cy2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 22:44:51 -0400
+        Thu, 27 Apr 2023 22:54:28 -0400
 Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1588E26A6;
-        Thu, 27 Apr 2023 19:44:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 483A430E7;
+        Thu, 27 Apr 2023 19:54:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1682649889; x=1714185889;
+  t=1682650464; x=1714186464;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=clet2xTYEDpvlTUG2zPKaT9zUsdpv2vHUkSz9vAXSts=;
-  b=piDnszNFw74OfuReTlvSXU6GkKhdC+Itx8cqFOY6AfVFXnYlL4ZSLcbI
-   NUPwuVWWmOhGL2du8ARptCLNqRs7vFKs5syFlHp5AyK9xDwMsftwzchj9
-   3mjHdG9IpfjTg126b+iAyuyJLkc1bmmJLjz9i5jYOwJ5E/CcAlv59mwWj
-   mMKo104SpFkL7IqPm6Qd4UZ3kDENpi19LRRP6s2qU6NlZB8aDp7ZpkuVn
-   FaWR+EzW6UNF7VD7UTsIOHX3MR12ldUUapHmMGewccvr/qdQJeWdhxDga
-   wpaD+dXYGgRIwU2Wt3w8LRhYnCHpvKDUvgunkmgEQeUQZ/qZPfpON5qWZ
-   g==;
+  bh=CVOQHoFQ77n/2N5KZv2EkwBl+aLwbzUh0zHXED9n8zc=;
+  b=mKgz9WxCEy1h38A+QXevoGXav7ji0IVOKsu0Q1VMDDVgE7AoxA5liHse
+   b6OXkIHbOAsieEcWWjEpaE2s93jZtMBlcxC8BntbU/i1QFZHJpyNYwQYm
+   1/CRaCv1hmSShxHcV3lnxljYMJMd4Sgg44Qj4eZcmt87V9CsiFzwqqiBW
+   vcJtwBb54d6t4j2TAym/8U+NRmFZn52wl/VtJoPfQ6tASL1Lt/htELOrT
+   4vhY4CiNWE2KfGE8je30NHKfJy9CtSY8QotWy1ImbzFQ5MG1ydsF7peEm
+   bKnJbWghm9M+BWAT+UCes146gxzcFOuAnSKbJ0ceFO0jeJVgR7ZId/56x
+   A==;
 X-IronPort-AV: E=Sophos;i="5.99,233,1677513600"; 
-   d="scan'208";a="333891764"
-Received: from mail-dm6nam10lp2106.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.106])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2023 10:44:48 +0800
+   d="scan'208";a="333892399"
+Received: from mail-bn8nam12lp2176.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.176])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2023 10:54:21 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OQ8ZWdT5drhxzn5OEk/hRneSGSpkqtvTsJFkBjWjmDTTWtpYAumOpD+Fpr+VQb6MITMHlixF+kEDZseRsSXDsmZZOzFJgDH8oVQzuiDltxOFq6ZwAWU6pxqpJkmwbJS+Y1kCYwROVZE86AVQ9e+XSCBVvNfJLD6WcmNDplvMryij6OBcImwwOkYQjsXV6gXcNuMm86nJnx2DclMhiZaM4SnxSImJKdcM4dFWhynjTerqsLFhJ6/JdbQubGiEdJ21M199o7RogIiDua/RfzX3fXZvzrrVSRe3u+KYv67pczfiRjeBc9nG8fqoDakoXkyjjQlSCnK05JI8pPZZoLRrhw==
+ b=H5fVGVcoAxhvh9DvuVquPv4HXe4SrDVcMgy+pnEDmQpURHZLYQwFpa8dEJNkSWiR6qqm09jMNI4H59NJ1lsccQl1e6eFu48ljmjAeQ9HJNn+uG8FcIy3a354PbAJdCdKxX8JsxbWXIHAhzpK5uNkNwwci41gIt9SD0DLSHNEgod0gzeWdqqOOVg7STjCU2uHaEEZJUq31DX8pgOBXTnlLhqDNkLuZl3I+4y5CuJDqCuSmyFz5KfPSnjDUlj7s0KWavhtIZtcX373MwCgRQqtrp3tor3038ySao6sgDX/djNx6O+7xEgu9A0CETfrPTbSYdoQ0083/5Z47I71znvdFg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H8TruTWn7wBMfmy2nRjrUdsmOOvbotIXQp7OI6aoFQI=;
- b=V+Ok53aBglWLkPuvtaBJXBfQ80LJ9tt/Qn/Ie9Xvyaq9RAFsBGe+pDs/Mqu8TWFNQGqh21GSAlRQG2qwBtnZ/07ZgrJSaQKuyb5yHjCpKMmEXIKfZXyE/QV7WbZsdWcXKCBDfFs4qzovaswaPj/+thEkE0O3rqIW8++NsFu69uCKXTDdJOaQ+q5TmweYWG3EFgtiKQqTG+81qBe6Ec/zncw4DdSKUo6ee0Tsp4gOua47HL6dr5DVPWHCi9N1P/TOEq6xMa8Jx8sGA6XYFn3t4mHPg9HjzNcz7t8hpaWKFynHTO1yLQtQH0SNYO4Ol9O2JXCte+UhLvtwtqX7HEpgCg==
+ bh=ePgn3PfOEq1MpA3r1VfjFaTxUsUoK6hJwlfWCswFrns=;
+ b=HLeTHO5Ui95v3i4fQ5bhas1Oca+9/tFGYmpMt0NIHFf299XYrMSNQx4oDvPRQOxBi4BzDL6mjSk0bV3lf/rN9yesQzg54mYnZ29Tq2p0Yg9C8blVoWCZmvM8zSK9descyZ1hUNxFWS4q8fROurL4E8YyQu1kHYuyPy2qbMb684i8AiuBlLXUSUNtSPlaXKuWH/IBMOPagQn65Exr93xyQpuuIoeaJ7i5RvMk+rgrMEiG7jf8DaPDkilRTGlkCgCOA6XpGcQyjIFhwP9+TNtxG8gxATjEUzn5nuWWnAVTzUpR6v0/TDVNM0K+42FGka9bCT+zDmyLEaxcaxqmaGPq3A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H8TruTWn7wBMfmy2nRjrUdsmOOvbotIXQp7OI6aoFQI=;
- b=HlxJVXwgLNKTt0PNZs/9wjL/z9F6cS17ZQSA12/+j+eaQrKL64RW4tsxNnKIPqOrKVqC7fSWGA+/z6oif0ofmlKRp2JcaOR7Hxu53qCQpdzUtwkFV8gpDtTC5CWsdnEAwn9oL2b4dg0sGFxifrN57F2kSsL7HFF+Vb3KqBDZSFc=
+ bh=ePgn3PfOEq1MpA3r1VfjFaTxUsUoK6hJwlfWCswFrns=;
+ b=zN3vj7jgggCo6R3LZIhBU6jCF+gbUT6NADhxOwBH2G2Rjo+qSTmLKLxmI+75rpzSXtIbzKZGwEVOD/HlDaPVwwqiyG+nm1x1h7aHWA9HIrqr75chXA+myphgJmpWSJt8Yt0GyEn8QMnyr/xAphwxnxCLorfJ1mxDps7XzyhFRng=
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- MN2PR04MB7085.namprd04.prod.outlook.com (2603:10b6:208:1e6::21) with
+ BN0PR04MB7949.namprd04.prod.outlook.com (2603:10b6:408:154::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.22; Fri, 28 Apr
- 2023 02:44:45 +0000
+ 2023 02:54:19 +0000
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::eb0e:1bef:f266:eceb]) by DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::eb0e:1bef:f266:eceb%9]) with mapi id 15.20.6340.022; Fri, 28 Apr 2023
- 02:44:44 +0000
+ 02:54:19 +0000
 From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     Daniel Wagner <dwagner@suse.de>
-CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+CC:     Hannes Reinecke <hare@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-Subject: Re: [PATCH REPOST blktests v2 2/9] nvme: Do not hard code device size
- for dd test
-Thread-Topic: [PATCH REPOST blktests v2 2/9] nvme: Do not hard code device
- size for dd test
-Thread-Index: AQHZeXtj0ucpszBCTUighHxPq+oc+g==
-Date:   Fri, 28 Apr 2023 02:44:44 +0000
-Message-ID: <z3lbxnnewuwnozrme27okchaxytt7zegj4emgpt4gmewsvcr5k@aordfdu7tai4>
+Subject: Re: [PATCH REPOST blktests v2 3/9] common-xfs: Make size argument
+ optional for _xfs_run_fio_verify_io
+Thread-Topic: [PATCH REPOST blktests v2 3/9] common-xfs: Make size argument
+ optional for _xfs_run_fio_verify_io
+Thread-Index: AQHZeXy68rG2HytVkkq4pAqFsLjcxA==
+Date:   Fri, 28 Apr 2023 02:54:19 +0000
+Message-ID: <6odezvt3uwnc3c6353qlvqdxadmn5giihsj77xvwi6h4655la4@ezvpevwxfsan>
 References: <20230421060505.10132-1-dwagner@suse.de>
- <20230421060505.10132-3-dwagner@suse.de>
-In-Reply-To: <20230421060505.10132-3-dwagner@suse.de>
+ <20230421060505.10132-4-dwagner@suse.de>
+ <1089a043-a40c-6b49-f0a0-38ca3bcd8f91@suse.de>
+ <s4xicrnevbwapdwvw5wl2z4bpm6vv6q62lcgimy6wcqnbf6tbo@u7alfvt4bmen>
+In-Reply-To: <s4xicrnevbwapdwvw5wl2z4bpm6vv6q62lcgimy6wcqnbf6tbo@u7alfvt4bmen>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -81,141 +84,109 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|MN2PR04MB7085:EE_
-x-ms-office365-filtering-correlation-id: 29a77779-a67d-4542-c093-08db47928664
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BN0PR04MB7949:EE_
+x-ms-office365-filtering-correlation-id: ec575215-3a5e-46dd-1d9d-08db4793dcd6
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9HKMrJD89avFjBHJn0YEK00RFV4ffbz6EyxKThk2O/S8ds5KeMaaFiP6Cr1b7ceib4EQevL8RfBYPSBlg4IlJF3DvNK/EL92QN0elfZRnqGQEbSx/9yj7pGoHg6bL3R7G836/GVyOLGGkdzmbPV6xQj05al7l6fpxudHF8HMg+biZC+hMd4SC9tfXb1pNmK47i1E1xXhKoFb8kdiGHemgdsahYsQkv3MtievGuw09lB7uGyiwclS9kV75e4jKcoLP/UXAGFbrIUubxb+kX+ZYtFfY0IjqFtdLUhgFpl3GDGhzLOEZyrGkXtYnq8cTZFm2W5WHh0fmMysXyfENfLXqYGdHWWO4E3kIHHlQ4eQoOip9jHOYBCEHqsabekYVHxpER+JHS+zPuopeGUs8eSGBFdthm91Vh/G3wD6Dmq4fhRz4cuetZINDCc9OBKR096YkxwgYZ+fjf68RWaYT4Pi/jd67c0+meH39L9ysDxDMrW1aD1GGLpIL6eAu5KoIuBqzSMgIJfxrNkRcEdM9wZuCz5Pt24bVn+846rH+J0KyU1s+s97tg0rB2eyQQ9EWaOKlRwiVsIZYC5i2Nj6l8/qYkz4JCpQj1YNjH/CeLsFeZNGSya/zPfF4l2CJ8bRBMWN
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(346002)(136003)(366004)(376002)(39860400002)(396003)(451199021)(316002)(4326008)(54906003)(6916009)(91956017)(66946007)(66556008)(66476007)(66446008)(64756008)(76116006)(186003)(6506007)(9686003)(6512007)(26005)(122000001)(38100700002)(83380400001)(86362001)(5660300002)(8676002)(8936002)(41300700001)(478600001)(33716001)(6486002)(71200400001)(38070700005)(2906002)(82960400001)(44832011);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: yInjjJO+nzdzmEVBbSgqqD8HuV3FFSfpYWzHVd3osbtBX/LrYLsPFz2xGiDvlGo+K9XGTLsljMvZuX9lSfH5m/Jm0qPgdmBCIvtoFDueJJRm2SL9vhKYPP6sZonAi8YsqZ01iOsi8ZUl4Uw1gfT3gC9Sutkx61On/BrgR2/aqdoWPi8dVkQd9Hc/kaVV85L8bw2fXcLI/Op2nZoJWukHHecMj74ap4JzjGE2PrQShZlfT9MPROUq3rzighTy8bvKXMMwnHiOTQi03VvyTkfnbqeBQT6Z8ANTPc8bjXHr72KggqAtonaZAsfNnLMK4WZRY8SWd1qgcW8+SeaEiYOYJKwLmwHi3zt+m96bmGoLikrHMiJ2Bl4NtCByWn6UReWDjJI7orlDwCQTQcWrs4/0tUA8BzVI+nwkL/cz+X6xxptIof0ltY2lOqanXZWnSc3nRgo88VmuL+EnH95cBnh/Y/HRXciNwNO2tMxscpJfH6GC+pCy82eZfzufvXK3j2bkm7HoZjnTbsoT5mJ3/0ZoOavi2fQrP5cEw0zTdr8j+/RMxKnKn2gXcEnKVkJyZabSj1gxx6xiHSkBKI60xr+3Xcwn5+7a9nuUwgZZIJbFuuy+KfL2TDopionr8x2gIRKvVmHDPuY4qD/uvJwV7G0x1Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(376002)(366004)(396003)(136003)(39860400002)(346002)(451199021)(8936002)(8676002)(44832011)(41300700001)(4326008)(316002)(91956017)(6916009)(66556008)(76116006)(66476007)(64756008)(66446008)(66946007)(2906002)(54906003)(5660300002)(6486002)(478600001)(71200400001)(6506007)(9686003)(6512007)(26005)(53546011)(83380400001)(186003)(122000001)(33716001)(38070700005)(86362001)(82960400001)(38100700002)(27246005);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pIL1mTc37EcsYUUNUkbBKX0vPY2Niism9dP2ftx/NzRQvaKgQVAxhFJ9bbyg?=
- =?us-ascii?Q?QZ0TDixTJI7jqJA5gvtJGSW6wk6QHreIJK21RwE/YVbOL6RfYjRUooVtcoao?=
- =?us-ascii?Q?BxGiDL8l9af6ZyiBOsLfUGtk4alPdEM3ZCjfhQPeHg7QSbgt4trJACB0u9Y3?=
- =?us-ascii?Q?YVLez2i+Emvugzbqk2OxWpkCHjf90LAIqB9MFmBJlxhZXQzGY7o8XK407xSn?=
- =?us-ascii?Q?+pdiFv5ixHO5/GCZXOoZ6buM7TFPBhdFrd1nuZQCz0SvZDufZYuOct5E3KoU?=
- =?us-ascii?Q?FxvpCDCajV285HldBOqRJin9LfGVDMxJPw3SwBXSr87RKxJkuN/OPq5qeljN?=
- =?us-ascii?Q?kEp8haPxp5iOLy6E8/kJNOjtyTQ8xBc9tjN0MKD90HyFfV3jYPnDCBD9AxD9?=
- =?us-ascii?Q?Aq6g0fZHm8TVDZJh83tXv2iOXegaROcFYVpxl/+xAr9EGb+jwXwqw6TM2O9C?=
- =?us-ascii?Q?vj59txY34yDsgoKJbCfzATtzV89phP8NMff42Erk0nKOQZ280VVjewaAeBgP?=
- =?us-ascii?Q?dlcVg70i9illS3+bnTMvT2zfxWqiWwc+UFwRTCS7oXe5NEQLWvM8qU68jAa+?=
- =?us-ascii?Q?GuAs1ama2SR/SAEFqNxOX4dAFgrOEmOWB7sn4STPQbSxr5G3+pL51x9xmhDw?=
- =?us-ascii?Q?yLykhJNGkqVp8nC58kWOBwV3Vs304oeLrzp+vP9n25g6XHtJAeM4rJ3J5fu7?=
- =?us-ascii?Q?C7+V85BjKAxXYnXO1w7vy0P+etTA02gfykf++zumf9H3yclDPGFsSb+M+7ai?=
- =?us-ascii?Q?xtU0tafJpMnVzNrBwLvew6WoV+RwCdWIajIUSbqIc/6VWfTyfrOn2olnlThe?=
- =?us-ascii?Q?LNboFJqHoa0zUWCF2S/SUUy59EXe4jiCWL/Y6CyzdKoodAUsstwIax13GAE+?=
- =?us-ascii?Q?DVbn4RBRxBwL/gYCxw3Dk3OgL6ZcBDDuv8hkEv1JhTx1BoHh6dwiIB3cihMo?=
- =?us-ascii?Q?gvMjT3oVSD4dteDb7JlMTrsBlaX79EBN+jiLEoJeSOhSBESCwJ95vChaq4B/?=
- =?us-ascii?Q?45FPnItSap+E/gC13NBFDp7+vqVqnGsRWP+0IipDyrR6Fi/5d0N3wWWi21tI?=
- =?us-ascii?Q?IAm5NRIjtW503NieNuh8VDxzoDtKEQFg36A6yfoslKilsYGAMMFTyBM28Y15?=
- =?us-ascii?Q?ABjH1O+93yWKuFWdNn6TgJVL3DJ2Tx28/XM0jHGPWeZGHx0fIGzY4w9xVouR?=
- =?us-ascii?Q?713c7kpAIvhpXDwakELuvGienVoNHxO0DSv37U0IbhA1PfJzliRaw9RoQakX?=
- =?us-ascii?Q?SwFaVYbx8sYvcD2C5dtkDmpX8HmnRqFjpH/DDydVuTq9gBA8YaUCika2XNYZ?=
- =?us-ascii?Q?alrcFspjRJNgysWsbdVC+IeBiSkXBybD58v+mqW4PdQtJdCTHPPk17lg+5KD?=
- =?us-ascii?Q?RA8pV+OfmV8PrURRMRvLctVJZmYzd8Q9tYCrfi/Da29c4SKP8XpzOkxyhDL7?=
- =?us-ascii?Q?KLUZzhi4sfR0RHYhvJVLm4a4H7aEXNs8M0NqhW4wnKzXG3oLDwxcRP6/2BwX?=
- =?us-ascii?Q?oRFb4U6VZwjEA0SEKceS/4JV7P4PzNpEHLXN7BArqdZHtfjZD5irVtTY2tPh?=
- =?us-ascii?Q?oHacxLGpxjgY03wYQeTfMhsZtcSGsdq+zPqtdJdxh9pLaIFgBmqDICjaMSlc?=
- =?us-ascii?Q?1FtoFDEnZH4DV74CsxFw/LE=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?j8FS/wuXzVjt7CMMJcbUJhckBWmb+KUXt2b3HNBNO+KgGxITvAZQIBgXLeUm?=
+ =?us-ascii?Q?Tt7KmkpFDqMG1pu8oFFXH6rr1G+wQo3po2FuFc8zFLfQ2/J4iPsLN05ZSdoC?=
+ =?us-ascii?Q?1+7lDt7eMzQmGZQTTgNOn8E7O2S/CjFr07g6iqD3H41uq3LmLBmbBpSHAc2M?=
+ =?us-ascii?Q?Eujm22+F5t5lPd4vl0jBAgVZM6zcMiYJmC14SrpvS27JlrbgqFBxKOm9KIiS?=
+ =?us-ascii?Q?BdDvGEeiyMtJ0wyU7JvO4i7KproCHbTVAI+Oh6T3Cg+QStb507iYdTGQfziR?=
+ =?us-ascii?Q?M0B2Kg7WgyLjA3PltfBe+2UYoyvfV74gNLemsaKabeyhy2XF05tfv8ktzjea?=
+ =?us-ascii?Q?8ljk6dCjaKxnu1rx7dBaaggCr1cT5Aka6Gv5ys0ZuiOm/r9X/nYL2lb34mah?=
+ =?us-ascii?Q?TkwwvEXIowiJJiZlJsGOvHcLj680ddsMq8h0x0IG77Wn5OzSh4bgyzCt6n11?=
+ =?us-ascii?Q?A3BgD4CVnYHkUydc9yi29wrDOUwG53pDdcwDK9BWGHLL+9B1kMhX539OT5DO?=
+ =?us-ascii?Q?ytgaJkvi3nf8xpxQHREJsMwrQ7KVA58D+5huTGrhZd6AQI8ljMF0abygEvdD?=
+ =?us-ascii?Q?k6zvN7FaGXyCYFb9eO91heqH+dqFr/MD0wuQNEAGQmyBbp2JjvVTFxE7Iess?=
+ =?us-ascii?Q?EObLNHkDGfWQe6o7WAnndTQTYQI+GknU86uiLjpQNxfKIvwgiybowIaQMtUu?=
+ =?us-ascii?Q?cGsFUirTFTAh2IIJoCcIo162pd7Xuuf4O5e9L1ao1yBSzQ75gKfVBw0/nOIy?=
+ =?us-ascii?Q?RQlaz3gdDc5GgKjg2ExOCn2n6uPNm3p1pHp0P8gNfo8C+CbYeCeUuNh9If3/?=
+ =?us-ascii?Q?BEjyVHmI1i237m9IhozmcJrG4Q2y0hVb5AlqkrwGmWB35tHbNWxyrXaVnU6a?=
+ =?us-ascii?Q?jL9Hh7bagwh7rz6f5Pm21/YrwteO/FZdwuMJ0K10Cy9glnRyFy5+ocju5Umo?=
+ =?us-ascii?Q?Sv8nvqbfmbtgStGc9EqMRTUDgya8G7hJCIWLXZsK5I8iS4aPGdLwQkZ3eWkq?=
+ =?us-ascii?Q?zKqjJXdNwVrDxSnp1WDwkAxcbpwHwpISzz6C6xn/8PKMU1EBRFNi6V1otpJQ?=
+ =?us-ascii?Q?kuh0rZ52f+vmvpNB/FJcMDC7gerUIBTQGjkjbn0GE0VIBeIjVhz9FzoOfHSn?=
+ =?us-ascii?Q?FyyHRuPH30XzMHm448bzCl1pVY2gIRviq7c+6dJmu8Cm7UFtEEPL/VLm9sdW?=
+ =?us-ascii?Q?7xnYua+8raFvjTEvljBmrcM4GTH3FzCm1KbkdCBYwFxcWWieTVLB3Q6DPFKn?=
+ =?us-ascii?Q?k1KqYiPLgjxTMgAomHG078Man/m0q4lnifs2UW8nHXujFSe7Wv081Hxvfr+J?=
+ =?us-ascii?Q?UVI5/1pxMEQrYplww1m5AXh1/6xof78rHTsY402GScZhszXLv9zUqAMhHVxc?=
+ =?us-ascii?Q?cpdanILukHYkEL4/OAj3FnGhqqu4DDp95UPl2Wocn/x3IfSMeYnIkuJtcjIz?=
+ =?us-ascii?Q?nSLSHb6qnpO7KjPkqMaphLhtKMCH0nOrEKrwI6oMwLHuElskyVH01F0lXP9Q?=
+ =?us-ascii?Q?2sorTkAxERYjZX5FbsXtH7x8DKiUIgowHXA+6CPLD7bCHSXT07su+2uk7eJW?=
+ =?us-ascii?Q?KXcJWwCLcb40E2rejFp0SBaGSe+SxVDpjAx5t1qreFlKSNyGwMDjLXwenHjB?=
+ =?us-ascii?Q?ptI0A82PREh0x/FQ9zWmjp0=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <DE8A500D00366E4A8EE5C93DF3C147D6@namprd04.prod.outlook.com>
+Content-ID: <918C1595D5EEDE4DA3B5161645E8D8B6@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 1u39ZYHd3lAxlkFfXx+J89zO06ns2dsf4p1g+noL+k5YO2juuQyiL98TzAfr/SKNR79eUbTkINBG8YJ4L5CEQ9+h1c8zPgxoSlLvhZmEMz6795kuwqCrmakkMrM1yvqJ6vVKuX3qMVmbMX0hu9pcHNrBgWaGH8Vuyd5S+dT/oYZ7DMYBXOcDaxOXwGWmL5c/4TmJyzEQajkv13G9/8PXYhHGINpC+OOnJc08yySw3dywPg1v6NdFqiYOZRx1eFTZzizHYvUt4K2z/Pw/aI8T0rU3wLroIvlyEo47lSiR3wTSe1Pz/0LYsytRUOTCFbnR41b9Cb8Rw8KF2/D+Y1VSXPMSSD46MRyXD9c/CJm3wYVy/3U/XaKUwlN1B/+gmg5IrjB3vm2BHegzrMugGuEQmDPJoheLjPklb0vpdVw1iVXv5cV5Du6Ume4+xIsXFQiUvtMtTiN5XiOpLcZQncg6nllkhPPV9UVkn1ENL5GkUNBlLlp9eS8yqgAb79NpUl+cRC3Ez7tDcbw1A5vt/MxEiBStvtFBpA8Irh9NiSV/amPBCTB8ag7K2fIRriFRQ2Ym0z7L2T1Ctaj15RGjCS3J0m4VeWbdMvJdI9AjdztDUW27LmYtwmVbxG0+TNIjg9Ztl45tAVYn3HySK70V+jXiWgshaAqpZbzdd9QCOqZYz5ieMZ5fxbH3bUagU/K6jZP68WGPTxYDKPC8OUdZ4p7o97X6vDHQrkvOBGIUnKZVZeSexpSxacHoLT+qTO+x9ZFdDRxtm4sTkwMxffwYeaVMFfGWkS9ZZHuwx2nd6mGqJovPgoIcKx/zwexrErr8VVY4nTUb+SfxVyJjioBuWWT89go12QyoLf1bZTZsbSIZ63ySeLn5CcR8nITP7E0bsp7J+QMA4UZVZgDqar/+pXuvj3ugSiaXqwMeSsao0d/TQLM=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: fFZl5Bv8I6uQzSQt4L5ghAGnywQGqCi+nuDrdJu6ee74b7OISzcTUWgjhejcx0ybqNW/peYTL3fBGqIZxjg2zATUWQIebHKdSRFfLr4kewvqhXNr4JD7O6d+3ZK9/Bla5xU7AhuYMPGXkv4VmFl6n51W77P11DTeiRCJgGN9BlRZ9ZmJr6nvenalBdHl15sbn+bInOdy+rpdNGdmvi626esPX2DcSU6XwOqd/bgj2soniczqN14YwvGz1kI4aRjSoS4l2poCcCr+yIjoWlrBZylLVI01w1HlzXkCtbzzJCFTGAjusqjRZl9EtANyKMTfQOitY8F4+Vii3oU7gBtuO96a3dFo5dZ8qQ4HqE5k0L/qBXgxJjXeMmxMJZGpzorlusCwwAldYdjzVk4J0ctOvLiFFL5bSaNF9kKQQY0X6ThghzHi51MroJcY6Obk5vT243iKuD8ykCM46CyrW0EW+mHs009miHLz95xlVJqrqU+5vhQ4oF/vuRup+/lsxHapmYPKA4mTf2s7xPx/U8031b5DlDCWPIhtKClFTBZronmv+OXwf4cDLp5EStjRLHfS65rCBzt7QTgFQ6+fj3S2Kwm1+Qo1sgmdMzE7dEOmmShBgAMDxfScm1nynljLpSlPLOka+JpODhIdf2RGCyJ6O6EIWaftG16lpE/843tXOXT/lwGCNZ+mE9Oz/Lf2Y40l0YnldWM/KEYGVXHMuWiYoblEsxwlAh4HCUnYvrFBhv3xbH1JWqdEI4i94tdgzogpRjUmHXeFZqtwn5joBhjTFMqahx5zTVUF94nAFQ4ZRoalj3VHaLoSh9ckkZs6SEFboBXqgGKqnGu49WfZhceTlLf0ClXsLetQd4jpukSqmgaFRxnj1twqkcP2+HEaLknPQvuFgEBziIuVoxupuZovdDc6KDh4so3v8T1IVaRQoxw=
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 29a77779-a67d-4542-c093-08db47928664
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 02:44:44.8585
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec575215-3a5e-46dd-1d9d-08db4793dcd6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 02:54:19.3220
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: C5dwsjCarSvt5Vd5yuRDFtMtCS4OMwCHqrAzpZz15qYU6AFBsp/qT0LTQNCi7DV6c8vwe4UVTmJHYEDPyCfu62Ry0bUj6zH1QOX6Z2JNrP0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB7085
+X-MS-Exchange-CrossTenant-userprincipalname: uLG/1M+Jcj1qfvY35n4X7baxot5wcPokPZ3S4VEocOJY1uQKw0Y4zCnVpNauQT7AzcjjUMSgfqtujzt8QudRKBcMXKUkCkDWWJKkuN+rsSw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR04MB7949
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 21, 2023 / 08:04, Daniel Wagner wrote:
-> Read the block device sizes instead hard coding them.
-
-I suggest to add this to clarify the purpose of this commit:
-  ".., so that the device size can be configurable in future."
-
+On Apr 21, 2023 / 08:54, Daniel Wagner wrote:
+> On Fri, Apr 21, 2023 at 08:27:35AM +0200, Hannes Reinecke wrote:
+> > On 4/21/23 08:04, Daniel Wagner wrote:
+> > > Make the size argument optional by reading the filesystem info. The
+> > > caller doesn't have to guess (or calculate) how big the max IO size.
+> > > The log data structure of XFS is reducing the capacity.
+> > >=20
+> > > Signed-off-by: Daniel Wagner <dwagner@suse.de>
+> > > ---
+> > >   common/xfs     | 6 ++++++
+> > >   tests/nvme/012 | 2 +-
+> > >   tests/nvme/013 | 2 +-
+> > >   tests/nvme/035 | 2 +-
+> > >   4 files changed, 9 insertions(+), 3 deletions(-)
+> > >=20
+> > > diff --git a/common/xfs b/common/xfs
+> > > index 2c5d96164ac1..ec35599e017b 100644
+> > > --- a/common/xfs
+> > > +++ b/common/xfs
+> > > @@ -27,6 +27,12 @@ _xfs_run_fio_verify_io() {
+> > >   	_xfs_mkfs_and_mount "${bdev}" "${mount_dir}" >> "${FULL}" 2>&1
+> > > +	if [[ -z "${sz}" ]]; then
+> > > +		local avail
+> > > +		avail=3D"$(df --output=3Davail "${mount_dir}" | awk 'NR=3D=3D2 {pr=
+int $1}')"
+> >=20
+> > df --output=3Davail "${mount_dir}" | tail -1
 >=20
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
->  tests/nvme/014 | 10 +++++++++-
->  tests/nvme/015 | 10 +++++++++-
->  2 files changed, 18 insertions(+), 2 deletions(-)
+> Sure, don't think it matters.
 >=20
-> diff --git a/tests/nvme/014 b/tests/nvme/014
-> index d13cff7921da..28913641ae40 100755
-> --- a/tests/nvme/014
-> +++ b/tests/nvme/014
-> @@ -23,6 +23,9 @@ test() {
->  	local port
->  	local nvmedev
->  	local loop_dev
-> +	local size
-> +	local bs
-> +	local count
->  	local file_path=3D"$TMPDIR/img"
->  	local subsys_name=3D"blktests-subsystem-1"
-> =20
-> @@ -41,7 +44,12 @@ test() {
->  	cat "/sys/block/${nvmedev}n1/uuid"
->  	cat "/sys/block/${nvmedev}n1/wwid"
-> =20
-> -	dd if=3D/dev/urandom of=3D"/dev/${nvmedev}n1" count=3D128000 bs=3D4k st=
-atus=3Dnone
-> +	size=3D"$(blockdev --getsize64 "/dev/${nvmedev}n1")"
-> +	bs=3D"$(blockdev --getbsz "/dev/${nvmedev}n1")"
-> +	count=3D$((size / bs - 1))
+> > > +		sz=3D"$(printf "%d" $((avail / 1024 - 1 )))m"
+> >=20
+> > sz=3D$((avail / 1024 - 1))
+>=20
+> I tried this but the devision is likely to return a floating point which =
+fio
+> doesn't like. Is there a way to tell bash to do a pure integer devision?
 
-Do we need -1?
+Hmm, AFAIK, bash arithmetic supports integer only. I tried below, and bash =
+did
+not return floating value...
 
-> +
-> +	dd if=3D/dev/urandom of=3D"/dev/${nvmedev}n1" \
-> +		count=3D"${count}" bs=3D"${bs}" status=3Dnone
-> =20
->  	nvme flush "/dev/${nvmedev}" -n 1
-> =20
-> diff --git a/tests/nvme/015 b/tests/nvme/015
-> index bb52ba2598db..2f7957caac88 100755
-> --- a/tests/nvme/015
-> +++ b/tests/nvme/015
-> @@ -22,6 +22,9 @@ test() {
-> =20
->  	local port
->  	local nvmedev
-> +	local size
-> +	local bs
-> +	local count
->  	local file_path=3D"$TMPDIR/img"
->  	local subsys_name=3D"blktests-subsystem-1"
-> =20
-> @@ -38,7 +41,12 @@ test() {
->  	cat "/sys/block/${nvmedev}n1/uuid"
->  	cat "/sys/block/${nvmedev}n1/wwid"
-> =20
-> -	dd if=3D/dev/urandom of=3D"/dev/${nvmedev}n1" count=3D128000 bs=3D4k st=
-atus=3Dnone
-> +	size=3D"$(blockdev --getsize64 "/dev/${nvmedev}n1")"
-> +	bs=3D"$(blockdev --getbsz "/dev/${nvmedev}n1")"
-> +	count=3D$((size / bs - 1))
+  $ avail=3D90000; echo $((avail/1024))
+  87
 
-Same here.
-
-> +
-> +	dd if=3D/dev/urandom of=3D"/dev/${nvmedev}n1" \
-> +		count=3D"${count}" bs=3D"${bs}" status=3Dnone
-> =20
->  	nvme flush "/dev/${nvmedev}n1" -n 1
-> =20
-> --=20
-> 2.40.0
-> =
+Assuming bash arithmetic supports integer only, -1 will not be required in =
+the
+calculation.=
