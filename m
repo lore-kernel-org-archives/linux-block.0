@@ -2,61 +2,60 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 484C4C77B73
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 02:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F2BC77B61
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 03:08:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230151AbjD1C7I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 22:59:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45928 "EHLO
+        id S1345081AbjD1DIn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 23:08:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbjD1C7H (ORCPT
+        with ESMTP id S1345010AbjD1DIQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 22:59:07 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0717D2703;
-        Thu, 27 Apr 2023 19:59:05 -0700 (PDT)
+        Thu, 27 Apr 2023 23:08:16 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E7340F8;
+        Thu, 27 Apr 2023 20:08:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1682650746; x=1714186746;
+  t=1682651293; x=1714187293;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=Zd5P1262aFscnwKM9EX8uzW3GyP276vMqUHk4F7bppM=;
-  b=ZXKgL/Gyw1bXhDEsK9TDhOocXcaJmtPyBtpMmBjJZLxjNivkqxyGPbnn
-   BlQ4I1D9uEqtCUUCI0R0kr+s9tX7xkTtf9Z/ptbfd+zTJoWPYZGarByZt
-   RpOuWfOPEb+FztoOtN+1MHWS1U0+VdHzyTL5pnz+hWveDBk0suVDxr7tw
-   nloLYwIBW7+4fC60jUCMxw+NlUHCCbYc82y4ZIkFrAvqrY4yuCYH2eSiK
-   k+MwU2rv9XQPgJbcPt1LearbNbhXhf9jOUimVWHvM4MbDOSrWjI0QHv5B
-   3Rjag8ey1gTQvrj62N2lQrMMyH12zL10vTu6fINaL+siAq4JpyXHWMMfc
-   g==;
+  bh=1xlKycH5skREuVwlUJhIILg2pwQKMeRk9/oH7Ft/3f4=;
+  b=Y3y9zIRMGwhgp80H66t8GNdPHiyKVUPZBqYjZdiztLwVWUjjlZJv2NIF
+   fP129fga6U2u+Sktm/SrlPjt47xMHwtKyV9L7iZv5E3tzKFMpyarWqFGM
+   Qx6jXhS380snuBeecKCbE1+BiThMDWOWDnLY+GLZZesGYOA0sagFgEexl
+   /Z/l9Qzfwuso8+NTZLYn90ZK8jng3RYRhSXrrKWVFQrESPLX98uArMbM6
+   mm6QshhNlFOmkI0N85UZXMz25tS5fD2JMPBDhrlcfNU5T3kuesRc6RhW7
+   UFj1LCPKkc7Xt3nVghDNtG1/FWrag9gpznixyuIoyIcAMksmgIonQpy2h
+   A==;
 X-IronPort-AV: E=Sophos;i="5.99,233,1677513600"; 
-   d="scan'208";a="229362350"
-Received: from mail-bn8nam12lp2175.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.175])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2023 10:59:04 +0800
+   d="scan'208";a="234439783"
+Received: from mail-dm6nam11lp2172.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.172])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2023 11:08:12 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ocuEQ7LgT03NSSwgUl0YMuYL35y/Earm9EQeCCOJq+KkppQbyqNyH6x+cP1DP8ZyM78QTn3QJAw0/P2QWJH+kNns8ygllhn2pjJESew8jBLTRpwNaGpV2g62tYdbyon3MpagKwQDmrw5WuvSNcIB1r2LbxSzvCC/ynK3HXQEJ4NwMQy6ngYUSQgtCJ9bF05YKnMpjklEyOcjG+JMwtos9VIBUw68u2V/Y5qgbrlHhtdo3gYeOHjC3uFan4iiD8j77AfEWU9hFajFMHfhnBQj2MT022UQ4XJXXa5ZzZi41fVy6Zh7DTPGCIJQyCuHx8WcvHmWCrQb2F4+hvThn9FSTw==
+ b=WRhYtg4oKVnur0+QxzpKkpFg6YxtsBVzyvwVjDGTnGkRGIdrqc6KqM9Pl0D2+JEW9m3/2qCW50//7hujdrY3Iqm9YjKaoh05AifriaKjYk09cY73/lT2jYEF5QDPcuiFqTgsdx7VDBQgGmIHkHiPOhqBDdFcDvp6P/T0zL1sfC9ej/8YAw7vstBwLtSOM1DTW+xs+wP6K7nbctAtQ9I2EY/lShCm9Ns8zDYuRocreu1rdYmPAjIf5sZFll8F4RG+XJ98PlhqJSEN1s6R1FzBsMpXvgkKRYJqYGE8aCEWRp1wjx6dKfRS99/f22IVCH2Egrq3HdY3qJxo8b1lVqG46Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=63oPQ8ci3M75rCTDztYSaccc84JiOTlDxFoKhgn7mZM=;
- b=D6RP9JjV4o5tnXMVCKLxMglqhxeGM3RswOw9Z1yWdHtrRYZ1xH0HQwPgn+C3QMYmEB1qYxs99BjkZrXomj9vpyclfNSdLztIEVb7KzFWSA4171nLS2E3B9jF+oqZgK8gdGxC5g2G+z9m+ws8k+u43co12CZX/wBr/pVdZLtq2qwxjVfd6ZpyNSJhOXK2xqLmCHJl+tGvnNvO2DWf3D8Pp/B/8MBfm5k5KCIDAv7/wE3xyd73upEHhaQbNgXRijeHMWy+0iNDT9JmVhy2e21vX4PgvzkuRJDg9ry94eygE0Ey+eMW2E2Rmo4UzvIt49liP8lChJoCv3Vxz3n9e3u0Ow==
+ bh=7ZRjkcvDEmqnifEn7cXXn/1+OXs1PsAQ1VLtLEgyx/Y=;
+ b=CumsDMlxyPpR2NO4WAcc2KhF5zpXcA0Am5FuJpNQkZLfJ1Iwb/rDfJlc5NzG3mZ6OYvhslJhXGY1uMdANJJLSvNtPTRaiGrOEKU6mSDDupoiEAdI45KFMPy4wPiFHxpEG/eNJRYzVueN7WxXk4h+6w1tpZWfdglTqb/p6eviBqnQ4DCcxDmzi9VrAbO+rZZ8tJ8yrV3IJNKvf4naAXFhqfxyt53Ir656QQjtJcfjcd3GTGDYuVCJSL8WgI3+pzjtXkinrMPkv6+s/ac8vzzN29ApwX8EzcXYALGqr0kt7UXpvDT9ddawIA0xNFyQZAUFoAC3e1UcxLHeXjFATzkEmg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=63oPQ8ci3M75rCTDztYSaccc84JiOTlDxFoKhgn7mZM=;
- b=v7J4Ck14bbCXBiU21bFNtzVr8OurwG30ZNMXM7f2qGvZMsbfVQd/UuYJYDM7cNQcTebMnQHUvtjW/KaDHobMAPZN8+Z3qAnTmWyl9OgLyImQTrTE/RIMLV2pMYQT/Es8A+3KaPHvX1I9kAqIeiVEfIod0gdSqdB+g9B5bn3qM3I=
+ bh=7ZRjkcvDEmqnifEn7cXXn/1+OXs1PsAQ1VLtLEgyx/Y=;
+ b=Ua6H80ggFcZl0VWv/F15LcUfNxcEqYrGBsRBL6kgnsE/68+TncmEW8FejWjASJNz1AF9zegPOtBCt1ow/gDa/aKe5MqoeMT0tl9bTS9l92GyVlirL7FWBDYICCL90vcXn3+S8ItHy51nMQw3Oc4N15Dm4NKSIJVbROMpyhbNfVk=
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BN0PR04MB7949.namprd04.prod.outlook.com (2603:10b6:408:154::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6340.22; Fri, 28 Apr
- 2023 02:59:03 +0000
+ DM6PR04MB6636.namprd04.prod.outlook.com (2603:10b6:5:24e::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6340.22; Fri, 28 Apr 2023 03:08:10 +0000
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::eb0e:1bef:f266:eceb]) by DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::eb0e:1bef:f266:eceb%9]) with mapi id 15.20.6340.022; Fri, 28 Apr 2023
- 02:59:02 +0000
+ 03:08:10 +0000
 From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     Daniel Wagner <dwagner@suse.de>
 CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
@@ -64,16 +63,16 @@ CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-Subject: Re: [PATCH REPOST blktests v2 3/9] common-xfs: Make size argument
- optional for _xfs_run_fio_verify_io
-Thread-Topic: [PATCH REPOST blktests v2 3/9] common-xfs: Make size argument
- optional for _xfs_run_fio_verify_io
-Thread-Index: AQHZeX1i8rG2HytVkkq4pAqFsLjcxA==
-Date:   Fri, 28 Apr 2023 02:59:02 +0000
-Message-ID: <le6qqxhkbdaacsifz4b3mody53gllg4rzhowm2j62y56y56y6k@pmlukhvwjw24>
+Subject: Re: [PATCH REPOST blktests v2 5/9] nvme: Make test image size
+ configurable
+Thread-Topic: [PATCH REPOST blktests v2 5/9] nvme: Make test image size
+ configurable
+Thread-Index: AQHZeX6p/nGatdyTKEOrLGWRWqbWOw==
+Date:   Fri, 28 Apr 2023 03:08:10 +0000
+Message-ID: <4bajt3jkx4llds5vqbjjn2huhznv6pwhuzgi76w5wvk2c6pjk2@2227iivksmvk>
 References: <20230421060505.10132-1-dwagner@suse.de>
- <20230421060505.10132-4-dwagner@suse.de>
-In-Reply-To: <20230421060505.10132-4-dwagner@suse.de>
+ <20230421060505.10132-6-dwagner@suse.de>
+In-Reply-To: <20230421060505.10132-6-dwagner@suse.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -81,144 +80,672 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BN0PR04MB7949:EE_
-x-ms-office365-filtering-correlation-id: 9289a538-6ed2-4138-b90c-08db479485d4
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|DM6PR04MB6636:EE_
+x-ms-office365-filtering-correlation-id: f9f75ace-04d7-4734-5515-08db4795cc2c
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rwsjLM+6ctV0i+GR3yFYkUolgaL30MhjtuVQRIDyrQShRlZ/15giLe0LavSqVrpy6FecY7cGlNMdT8rN0jVEpCafoxLk+JGhYC+nPyrZuarGv7j6OZ6O/TiOy5ZhCQPznlgEV3dm68G/VKM/gM0lwdfyzwHWJ86HvjSuHSMowTi1g3ISPZesNRIh+b2RpNEwCLA5QEVY8kbTOJ6aEJ0AncaOsqXcLgIKWRcbWhhx8XhGaHGPQqXHLR9LA24Kdo4d0SwssuEyo2L4C0Alg/xuL8CYLpEIUkR3RaSgi96kcfDYxDbvRNnEafDZiXUfYydT3F/bbtrcT5+7l2XGmfVJzfFke5ZmJrqwHp0as25BM24FBesrNKBczgZMPkuGiw1ote72syIa9WGsx5+D02urzLqV+53Z0Q0hsPC7g53AcPy1lB3HUIXZhNuwdwrk8xRTlS0ddH3zvlHgczaTZNfgD/0lki4IutaNVlxmy+OFA888AsudM70aQ5/E55QuFG8a7YlRAHRWsMfpOSXgfaM7lKsMFd5j7OUFMSbPnARidgqRlb3A1KhRxGu0acRVlEOqp6iAAM4DpG/KHHzIurUi8tHJodo0E9VhV+D9fwTSXwmBs8/b906GkUJGW24IIsEk
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(376002)(366004)(396003)(136003)(39860400002)(346002)(451199021)(8936002)(8676002)(44832011)(41300700001)(4326008)(316002)(91956017)(6916009)(66556008)(76116006)(66476007)(64756008)(66446008)(66946007)(2906002)(54906003)(5660300002)(6486002)(478600001)(71200400001)(6506007)(9686003)(6512007)(26005)(83380400001)(186003)(122000001)(33716001)(38070700005)(86362001)(82960400001)(38100700002);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: oq39Pjv68W1PeIp+1YRsNlT9wrtEz1/1rwN2SBt4sAAtocJR5sJk2Nr3YyqH6El9zb5OD/phlNVZn3S0lCQBPCwoN/AEcxknuz9h+DcQ2loaebck0m7Eq4iMKi6D2fRuOJZSiELJdSoLvTq322ycMtmBsToxCcWHW0onXxOVAcJNLuW3uSsz6w9eX4W/M9rlOGYYigIV53Qvpp/kVOUl+Oxl+d4B7Pc3nXL7HWrjywaRf4DXLtEyvFpTRwIK2G6ZP7eLMz17Yi6tOpW1YkHb6LKd/15wdmw1dZKAc9uT7kDJwtT871xqhDT17ZXchU8uZeH9ZVjEVDjQW7L+aTgqzQQzaSGSD/NET09hG90HJs1MEznlD1tC1IuxMcoAp1do9yIesKgLgq0nXXUKK0IJ45btlxgqz5pxVZGvz7FjbKSqTYwzLWpZjxF0iZScxwkpGdObZRYKfiW+3rnuLopGi9aFk2vdB6OgXHXxgT9yj0zREol7d3gqiQ2dEu6c4/6obVif+SNQsjHC8LJkEQeR5cpRgL1ZvL5OHez5xdu+eMLf48j8lKK1/UUHwTRnP1n33+9dZD+SXlrIm1+9HrUXWdXREQnMQzQA5ZuXR2enfyMzLjKVcpgblI4aoj1wb8pa
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(346002)(39860400002)(366004)(136003)(396003)(376002)(451199021)(6512007)(478600001)(82960400001)(91956017)(122000001)(54906003)(26005)(186003)(33716001)(9686003)(6506007)(6486002)(71200400001)(83380400001)(30864003)(2906002)(40140700001)(66446008)(76116006)(316002)(5660300002)(38070700005)(66946007)(66476007)(6916009)(44832011)(86362001)(38100700002)(66556008)(4326008)(64756008)(8676002)(8936002)(41300700001)(579004);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?QZB7VQkZZE5rYqZuOqeHAXUNnnxPLsyH4j9sPxqiGpgJwNaWx2pG7gGw4T27?=
- =?us-ascii?Q?m38FIf+KvpaF46f9aUCuJQV0101R9zNhg2sZPM7JdoxdGOwrv5jKPLA/0G2P?=
- =?us-ascii?Q?08KRRttunaMLDYMVEI0qqCbuBoUxBbyMf1Fl2rpOAhrUzbHej99+0LmyBcvO?=
- =?us-ascii?Q?M/J+Z69hFxQHL0bwNtqew8/nZ/LFqB8mebpv5FcGN7auNFDSwBnBmnJzphXZ?=
- =?us-ascii?Q?WAI2u4RwaxxzT64BlJ1PaKSAX0QiH1yRZ9wBndfQ6BlgRakf9CEMfVcjajac?=
- =?us-ascii?Q?U1Ga8KtCWY6n8Q9Xpf30gW2ZLt98YU3jZ/13ezsQOMYeur3hr3Y/PqykK13V?=
- =?us-ascii?Q?woMGHOcKoGIp/+qDZNRnSDz/us32Ma4WG7+aNbQfzw1Nz3Fc1RmmsrnNljKS?=
- =?us-ascii?Q?Kr+RZBZI4MzjmJNW2AbvBNqytPaYnZUPbKxtQZN0J/xl5bcKpVoZtk/5rCTp?=
- =?us-ascii?Q?veang15LYTVIt2n1CDNEfLfbaLJ/cIzWmMK23ypgiw9yEDUQ5SjqJ8Giqd7B?=
- =?us-ascii?Q?BnqtSsNQWkTlls51IjenZCrF83HS1eHK06+xHNFYfRfPY8wcRuslZ4/VBykT?=
- =?us-ascii?Q?zkkjHVGUIxlp6NM8e0NgHAFR4gVu/OOYBUiZt03yTMmu0MuopUlLPiRbEaLZ?=
- =?us-ascii?Q?xq8DgIUR4rAFx6N+nRCCJovZoGWSoLHPOE9C3Y295pSxzIDzvK4uAQNaXm9y?=
- =?us-ascii?Q?Q8kznHynOTIKTpPGeJ8zzqZBae6qajVYSbSoEeynFJpsdY8DLVJXV1/3z3ky?=
- =?us-ascii?Q?mbrD3iCcOQ21b/0nZj+hcKlkuC0PxsijChcyKm5hK+p+fR4yFLyYuDW+WokD?=
- =?us-ascii?Q?ZMzPtAyQK0mt8lzYnWTXrnhQxCb5lT3XcyZ32xrIKPnMLq3pgj8oJzIoJv39?=
- =?us-ascii?Q?/H+mQOg5JPzdlAYyfBCoXl9dL8ltGBYmScipmTRbHIjyBXRQSRTu5Zltge0i?=
- =?us-ascii?Q?sRtk6J+gfNbOL9QT4Vcm/v/2UkRIXEmv59JBAzDurvRq1VNSAfdOjHI3jzy1?=
- =?us-ascii?Q?Am5Wjs+aEjJawmDIZ9ItK/oifjsXNLYJ40X0hyWgUno9uHzRcWMxtxBcjvfV?=
- =?us-ascii?Q?EFIRi55y+k8eT1q8BM5b+sV3IjoP6w5p33dREN0HXJ0W4Yzxw1OF6k0PX6xK?=
- =?us-ascii?Q?ndqVMxowWG9l2YVf+x05+NfrI63Lszw8RxKJjBOkgvkM+IHx9T8H6zRsELN1?=
- =?us-ascii?Q?xtP8PJLRD5FHRzUVPVH9ZwM+jsmWnoT+bVJATypHLx6FELz2s9gkcJhOKvMM?=
- =?us-ascii?Q?yIC0056kMewhekxAnyiIh71hLE0o++jLFJO5skh11+8pJs3u37eDY5vpA39i?=
- =?us-ascii?Q?e4RFyFn9ROdcYdJBCi6bd93DizZl6CQ9CW5pumHPTpNiEI1Bf6NFonqrtyrg?=
- =?us-ascii?Q?Es1/Ze43LeIt24qQk+62Mw7CebJIw4Jvh9Stl0vgQIfMlhXucGqKQiGYD4w5?=
- =?us-ascii?Q?wEdWnOFLZSB/6kVaJI+CHBL/9MbhQTzZvVbXKOjsLCRRuDf2OJiUqxouQtad?=
- =?us-ascii?Q?g7mj7mSCDXMq28eJdNJ5NrTzDltKFEOI5eERHxNTiQyVmuQdzNHjL7/i8PpZ?=
- =?us-ascii?Q?2dJntbmZMLnUmR9fTQI6AaOo9znYgPqZxxuhzuWrgJm3IpcOIB73AWVUN1gE?=
- =?us-ascii?Q?fpCBxlWOCFuHgEf/klmBKG8=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?WHtEgUJRozbm78fJ9OMFyBjkM7UC1qUf15Yz/cg2PUNT0eDoZDyiLLnvfqDV?=
+ =?us-ascii?Q?W9A/u0CJGClmgUWjkcjYHt/65V5w7q/vdEqTDaN/DSeksONPYafDM2Sq/DXU?=
+ =?us-ascii?Q?fY/eXMeIgfCECWwlTk19LWl4YzSfWFPwYMKbNY+qo7Icr4GTMbXAu6BTpB9k?=
+ =?us-ascii?Q?tkY3ueITyXRKwNRDAs1s3/u7wo7ai48zsdQ8CE9yQbj63lzTCQ0b1Uee3BOU?=
+ =?us-ascii?Q?MMGwob9Lbuva5zYnT+bYuWUW9QUkk4AuX3npNBz9TCYLkB12QTsmiyqh5y6L?=
+ =?us-ascii?Q?w8sik9aZAXFgLN16Wwitb9rC3SWPcWEkriPzFCiH1+Fffy1yVt9opr1CrdJ8?=
+ =?us-ascii?Q?jvQoUvDaz/FBFhUyr/7eDSVAMZIbGwMCzyPnF+M5cLTJJtuMQ+qDzyBYRTsv?=
+ =?us-ascii?Q?OB18VrzskihNDegYqaY3viwqT8WQfJOa2kLOhAa83/xCYZSVBztULXNoAqnz?=
+ =?us-ascii?Q?LeTz47H8NYgUnto07FiEvkLUZDhZmfOaDNRq7efj+Q5Izz0YgBZKgZeN1pvl?=
+ =?us-ascii?Q?7UBU/hZF+//vgv93w09Ja9LKzhPxomFAidn5PCfg1im2Gqu575G1K92lKHKK?=
+ =?us-ascii?Q?H2SG0poZWc9ufVuFTvtlcJGTFsaW/C2z64DHuS5V+axdGUKVqJUHa+dhn9PL?=
+ =?us-ascii?Q?8f28vvvfGlA3wGzzYDow48tvsLCNOYTNbu1Bzs+0Q9lok+hPSMky1yVkHYOY?=
+ =?us-ascii?Q?MacHat6+7pvEN+znLuAQg4geOncoLAdn6pMWqRFn7w/JyLnPDmPnXwHBYYKE?=
+ =?us-ascii?Q?9OUlIqCBImMczqVi3AcNr0caeIs9LC6CXGl1ezcMwTKKCUY/JGS3vZI8dtGQ?=
+ =?us-ascii?Q?HIqC6+1QgIE9pEGoNACgjZc+2aSWcUnbPP1y1x1cS3dH7tuuSnh2FRk3xMNe?=
+ =?us-ascii?Q?T7AKhaOpf2w2blizny8RoZqJYEhyhDZ+PPBbXdG4JwnVmNtnxNpm/CVoWaAb?=
+ =?us-ascii?Q?9GUQTj+YmrOj6b4Vm+W8DWK4brQw5DkM4DxjovK0OxgKlCYYoe5ce4G6QmdD?=
+ =?us-ascii?Q?HdSMWtbVojyZv41lxFVxtpV5OEuc8nsEJpagAN0oOwr2Ea956qxsW+nCHlQT?=
+ =?us-ascii?Q?jgBpzo3cA6GxJ6r0286uOpSGXU0DIuY9nHowtKHNUgiMHxO0fFtBLxZlPXnd?=
+ =?us-ascii?Q?G4qIpZySQWnWqth1H3Nxwkuals5hThGXfSvlSyM8SCxI+7mZW6isdXejp5OV?=
+ =?us-ascii?Q?S50NM5cEbbzYQSMKoyhg5O2rfxxtQDVRD3HA94Rt5oWZKbFU227fVzQIzKoo?=
+ =?us-ascii?Q?kirF2rSUZHFA5/DBltHKh7Z8U6Y//k31Nj2FBEc3KpBUix2rR4PN38tDWOJb?=
+ =?us-ascii?Q?0VCs1tfZSv+P7ulplr01RrURH8chQ9VutTX5RkPpARz5JlsKVzA9GuVFO7ss?=
+ =?us-ascii?Q?An2hcxQ0RhhblgiXFs9X113MY6xevGc1VXM504Ysea9gEMhlfQNBrabV+1Fk?=
+ =?us-ascii?Q?MXeVLkqHvvSqHz9t3LKiYOGdMvdwFopH2gaMIxiMQwu3LPEMTkYizA6BxsF8?=
+ =?us-ascii?Q?3G1rKboEhMv1XFl/Y2jtOjwZeo/pvlWwTJrdyLa9uzOLZ2SqUE65MTpNWFYm?=
+ =?us-ascii?Q?hczI5jo/Lbxu7iWMd9S5TShe7BpRNI918JAUrlB/X+lwmJb4pHzk6SEKGVYO?=
+ =?us-ascii?Q?361auEABVhGYfHM+LW82KoY=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <B966ED1A4E698D40B54CA8DC8853AA46@namprd04.prod.outlook.com>
+Content-ID: <36F2D1CB6E716346AEF4D5FC48F8E692@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: IyfeStA59d1HgX1z+5SnFtxIoy1Yl5STVDsZ8Lv1olAdvJDLaVzuccHZmMZZ+MmwjqrRal7449D3lVNpyzVPPO1wUEDmXXXjbWHLTX96ufkfGzson/A14By6r5CK8pNPpYkQe1EzU7AnIzSz+bB8+1r7suegugw0joLUNKKyMpBu5NoHsSeIDmUhCNGU6UudXFNea2R148PYWo/TepkOo03qCcFERdTPWepSxkSVKkgngxtYk3ryXff7CmVk9n93rqjTKdbmojSz8P2rA0FXYOqYjJ2lWDPzQYdtDSycPa6J2CHLTWqDorF3ZZ4fNJtmqojkxAJUDfFceeLuyKh+NRgCzTriUbSMnj14S9d36zw4bPisMWTO/U4PvQWj68R8qhp34X833fq4FN+HSNloOEdthr8exb/UW5HvOHX6IJOWVnT05PcgQQLnjLhx+YL4v9Gpq+z1GKVfsRGQ9A5UMprOXzrNhT5rN0++lZmtdMcRirhUmlcYLklKLrpHPQz/CdwHhAsRwX2JPymh1JtEWX5NCBbplObqePfHcO70okUY1kNavSCNqENaFJrL6V/P5JCMledTiXjGiisCMdASR1L+9HAJfytIvDzr119XQ6V3Qy13fmFXpDqxysQZdgXuSU/raUgsUJ0KfKZfvirWzDukYw/ViTbtTJKhoUEArYMilA3ovT4u3/46RlW1sRePvWlTdw1jIxL9qsPSbIapnAgxhrk8ZIxbcdlWSBW3gSR6Ki5ZHPfgn2+h+OlhxbXIDfLrPYX6AyVREae3dIkNb/XlBDLiu0wJbJH1W6da+pVS6GbR3alxSME9P46NyNqHxW8B4y89urpFIo3ZUTGX9GTwIenWzroPQNVXTtJuMoAnO8Vk53vsiax+nSAeMfQEJxL00q1t7awQN6G0pJuu0Ogh4BZ5plRIqdrCRrTHlpw=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: l/nxk6vNDcf81Q+X8akxweFfW0Rt+paNlbACksBxjFmPeK8/Xl/4eIebonetQy80o+7XiHsPpDHB3jWqfblS8K3o3Rli9pvUQbf9nOBC7Ib60AT4FAyhBJmVdoowbJAmvxDf/E3EPR7GjiEc+Zj17tqE8Czktwabe2LNopm3mmQSuVBC/YBZmS19kAo77vCHst1AR/CHu8ivLds5qSArhxV5bEvur9J9jj19tOAOX6JoiyRiWUMsAWAT6wc0BbTdZ4wEVSoPdyxZ9Rldwm2caPHljfReDPS6f/Hslu8ma/SUPTQkZTPxBHld9BpTHT+dkXrrxmlhDWI7+EUfeos8Cl4rHj2aLgcFy3JcFeElspfWUXJIu5NYMpbuqr3ocqcKVSdDSvkNzOh8e1UK7Uce6tXr4D9tZEo9/G+g10y4oo7nt8N9//c4clCCQkHl4s/ZiU7EnPeeYj0daOT5jaREOH0X3V/EdanAvkkQ346/pgV14XlqeOjQidIXauWbcBx9DY8oUAnQ8k3/C/PIbbM3eqHVmvHMnxAKKG1a8vgV7U4lqbKMvwulDB6HCuQEsL1myWDp8vSblXRX377QfNbyS1RNDCRggkL2BjBj63zwVWDqf1XIEGCl4F3GZ7auUdB4Tw0PIoKNJ9bHN/fTmg98JxZQDm+F9GzDzobMr5dsfBYR9j8mxANwa2RLtehw28sbFIq7dPv/n3lq3Y+zkuPx0bXZ8zVNAmkteepvKkCsmdzSvx7LadeC361g6VrpUYO/RY05untgLomUOt66t9VK44oJGZuR1Ro6YfkWt6YXQ9BEClzrRGIWtjp1Ubl8a+bI9+peJHaZBtpERSfrjEre8cEFwbW56e+eRhMZOwZXla2Yhg9ZT4N8T2q9XF7ygOFo8exFKHHV1BUrFzPoDSFy2twmDG2+paXYr21LEN4cDSA=
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9289a538-6ed2-4138-b90c-08db479485d4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 02:59:02.8595
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9f75ace-04d7-4734-5515-08db4795cc2c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 03:08:10.4134
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hLH8wZVwZqwP1u2DxjfAwujvEu4qgNUU0IPREv4uPAx0MrjMe3nxIWe+med8CZMJlkNT2VIJAt2SImEApRxWAa20etFB99VXUC9Gb6FaM3A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR04MB7949
+X-MS-Exchange-CrossTenant-userprincipalname: Pdsa/Na1kmWpSWHbuKFlgCAzLDCKRI9LsBRyQso9iZ9g/LnnM9rFpvuZxQVzk+w9TwG1iNhWTtG301vVFzSsI5jfGxR8mP2yUWEaeQuKBwY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6636
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 21, 2023 / 08:04, Daniel Wagner wrote:
-> Make the size argument optional by reading the filesystem info. The
-> caller doesn't have to guess (or calculate) how big the max IO size.
-> The log data structure of XFS is reducing the capacity.
+On Apr 21, 2023 / 08:05, Daniel Wagner wrote:
+> The reduce the overall runtime of the testsuite by making the default
+> size of the test image small. For verification jobs, the default can be
+> overwriten via the newly introduced nvme_img_size environment variable.
+
+Could you add descripion of nvme_img_size in Documentation/runnning-test.md=
+?
+
+   I've noticed that tcp and fc of nvme_trtype are not described, but this =
+is a
+   different topic :)
+
+>=20
+> The default size of 350M is the minimum requirement of nvme/012 and
+> nvme/013. These tests rely on an xfs filesystem which requires this
+> minimum size.
+
+I read back discurrions on the v1 series, and I'm not sure if it is agreed =
+to
+decrease the default size from 1G to smaller value. My understanding is tha=
+t
+Chaitanya's points are:
+
+- Let's keep 1GB default size for consistency for blktests users.
+- Introduce nvme_img_size so that those who needs faster test run can
+  set smaller size.
+
 >=20
 > Signed-off-by: Daniel Wagner <dwagner@suse.de>
 > ---
->  common/xfs     | 6 ++++++
+>  tests/nvme/004 | 2 +-
+>  tests/nvme/005 | 2 +-
+>  tests/nvme/006 | 2 +-
+>  tests/nvme/007 | 2 +-
+>  tests/nvme/008 | 2 +-
+>  tests/nvme/009 | 2 +-
+>  tests/nvme/010 | 5 +++--
+>  tests/nvme/011 | 5 +++--
 >  tests/nvme/012 | 2 +-
 >  tests/nvme/013 | 2 +-
+>  tests/nvme/014 | 2 +-
+>  tests/nvme/015 | 2 +-
+>  tests/nvme/017 | 2 +-
+>  tests/nvme/018 | 2 +-
+>  tests/nvme/019 | 2 +-
+>  tests/nvme/020 | 2 +-
+>  tests/nvme/021 | 2 +-
+>  tests/nvme/022 | 2 +-
+>  tests/nvme/023 | 2 +-
+>  tests/nvme/024 | 2 +-
+>  tests/nvme/025 | 2 +-
+>  tests/nvme/026 | 2 +-
+>  tests/nvme/027 | 2 +-
+>  tests/nvme/028 | 2 +-
+>  tests/nvme/029 | 3 ++-
+>  tests/nvme/031 | 2 +-
+>  tests/nvme/032 | 2 +-
+>  tests/nvme/034 | 2 +-
 >  tests/nvme/035 | 2 +-
->  4 files changed, 9 insertions(+), 3 deletions(-)
+>  tests/nvme/040 | 4 ++--
+>  tests/nvme/041 | 2 +-
+>  tests/nvme/042 | 2 +-
+>  tests/nvme/043 | 2 +-
+>  tests/nvme/044 | 2 +-
+>  tests/nvme/045 | 2 +-
+>  tests/nvme/047 | 2 +-
+>  tests/nvme/048 | 2 +-
+>  tests/nvme/rc  | 1 +
+>  38 files changed, 44 insertions(+), 40 deletions(-)
 >=20
-> diff --git a/common/xfs b/common/xfs
-> index 2c5d96164ac1..ec35599e017b 100644
-> --- a/common/xfs
-> +++ b/common/xfs
-> @@ -27,6 +27,12 @@ _xfs_run_fio_verify_io() {
+> diff --git a/tests/nvme/004 b/tests/nvme/004
+> index 9dda538b1ac0..cab98ff44326 100755
+> --- a/tests/nvme/004
+> +++ b/tests/nvme/004
+> @@ -25,7 +25,7 @@ test() {
+>  	local port
+>  	port=3D"$(_create_nvmet_port "${nvme_trtype}")"
 > =20
->  	_xfs_mkfs_and_mount "${bdev}" "${mount_dir}" >> "${FULL}" 2>&1
+> -	truncate -s 1G "$TMPDIR/img"
+> +	truncate -s "${nvme_img_size}" "$TMPDIR/img"
 > =20
-> +	if [[ -z "${sz}" ]]; then
-> +		local avail
-> +		avail=3D"$(df --output=3Davail "${mount_dir}" | awk 'NR=3D=3D2 {print =
-$1}')"
-> +		sz=3D"$(printf "%d" $((avail / 1024 - 1 )))m"
-> +	fi
-> +
->  	_run_fio_verify_io --size=3D"$sz" --directory=3D"${mount_dir}/"
+>  	local loop_dev
+>  	loop_dev=3D"$(losetup -f --show "$TMPDIR/img")"
+> diff --git a/tests/nvme/005 b/tests/nvme/005
+> index de567a74a891..8e15a13f3794 100755
+> --- a/tests/nvme/005
+> +++ b/tests/nvme/005
+> @@ -24,7 +24,7 @@ test() {
+>  	local port
+>  	port=3D"$(_create_nvmet_port "${nvme_trtype}")"
 > =20
->  	umount "${mount_dir}" >> "${FULL}" 2>&1
+> -	truncate -s 1G "$TMPDIR/img"
+> +	truncate -s "${nvme_img_size}" "$TMPDIR/img"
+> =20
+>  	local loop_dev
+>  	loop_dev=3D"$(losetup -f --show "$TMPDIR/img")"
+> diff --git a/tests/nvme/006 b/tests/nvme/006
+> index d993861c06ba..ea0db93791a7 100755
+> --- a/tests/nvme/006
+> +++ b/tests/nvme/006
+> @@ -24,7 +24,7 @@ test() {
+> =20
+>  	_setup_nvmet
+> =20
+> -	truncate -s 1G "$TMPDIR/img"
+> +	truncate -s "${nvme_img_size}" "$TMPDIR/img"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "$TMPDIR/img")"
+> =20
+> diff --git a/tests/nvme/007 b/tests/nvme/007
+> index d53100f3ff7b..243a79f5a254 100755
+> --- a/tests/nvme/007
+> +++ b/tests/nvme/007
+> @@ -25,7 +25,7 @@ test() {
+> =20
+>  	file_path=3D"${TMPDIR}/img"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/008 b/tests/nvme/008
+> index 5568fe46e463..5abc4240ca46 100755
+> --- a/tests/nvme/008
+> +++ b/tests/nvme/008
+> @@ -26,7 +26,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
+> =20
+> diff --git a/tests/nvme/009 b/tests/nvme/009
+> index 2814c79164ee..491d3c809ab0 100755
+> --- a/tests/nvme/009
+> +++ b/tests/nvme/009
+> @@ -24,7 +24,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/010 b/tests/nvme/010
+> index b7b1d5188e9b..805f80d40620 100755
+> --- a/tests/nvme/010
+> +++ b/tests/nvme/010
+> @@ -26,7 +26,7 @@ test() {
+>  	local file_path=3D"${TMPDIR}/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
+> =20
+> @@ -41,7 +41,8 @@ test() {
+>  	cat "/sys/block/${nvmedev}n1/uuid"
+>  	cat "/sys/block/${nvmedev}n1/wwid"
+> =20
+> -	_run_fio_verify_io --size=3D950m --filename=3D"/dev/${nvmedev}n1"
+> +	_run_fio_verify_io --size=3D${nvme_img_size} \
+> +		--filename=3D"/dev/${nvmedev}n1"
+> =20
+>  	_nvme_disconnect_subsys "${subsys_name}"
+> =20
+> diff --git a/tests/nvme/011 b/tests/nvme/011
+> index 4bfe9af084e4..da8cbac11124 100755
+> --- a/tests/nvme/011
+> +++ b/tests/nvme/011
+> @@ -26,7 +26,7 @@ test() {
+>  	local file_path=3D"${TMPDIR}/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> @@ -39,7 +39,8 @@ test() {
+>  	cat "/sys/block/${nvmedev}n1/uuid"
+>  	cat "/sys/block/${nvmedev}n1/wwid"
+> =20
+> -	_run_fio_verify_io --size=3D950m --filename=3D"/dev/${nvmedev}n1"
+> +	_run_fio_verify_io --size=3D"${nvme_img_size}" \
+> +		--filename=3D"/dev/${nvmedev}n1"
+> =20
+>  	_nvme_disconnect_subsys "${subsys_name}"
+> =20
 > diff --git a/tests/nvme/012 b/tests/nvme/012
-> index e60082c2e751..c9d24388306d 100755
+> index c9d24388306d..ecf44fcb5a51 100755
 > --- a/tests/nvme/012
 > +++ b/tests/nvme/012
-> @@ -44,7 +44,7 @@ test() {
->  	cat "/sys/block/${nvmedev}n1/uuid"
->  	cat "/sys/block/${nvmedev}n1/wwid"
+> @@ -29,7 +29,7 @@ test() {
+>  	local file_path=3D"${TMPDIR}/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
 > =20
-> -	_xfs_run_fio_verify_io "/dev/${nvmedev}n1" "900m"
-> +	_xfs_run_fio_verify_io "/dev/${nvmedev}n1"
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
 > =20
->  	_nvme_disconnect_subsys "${subsys_name}"
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
 > =20
 > diff --git a/tests/nvme/013 b/tests/nvme/013
-> index 9d60a7df4577..265b6968fd34 100755
+> index 265b6968fd34..e249add46295 100755
 > --- a/tests/nvme/013
 > +++ b/tests/nvme/013
-> @@ -41,7 +41,7 @@ test() {
->  	cat "/sys/block/${nvmedev}n1/uuid"
->  	cat "/sys/block/${nvmedev}n1/wwid"
+> @@ -28,7 +28,7 @@ test() {
 > =20
-> -	_xfs_run_fio_verify_io "/dev/${nvmedev}n1" "900m"
-> +	_xfs_run_fio_verify_io "/dev/${nvmedev}n1"
+>  	local subsys_name=3D"blktests-subsystem-1"
 > =20
->  	_nvme_disconnect_subsys "${subsys_name}"
->
-
-As for nvme/012 and nvme/013, I observed the I/O size changes from 900m to =
-920m
-with this patch. This condition looks better for testing point of view. Goo=
-d.
-
-> diff --git a/tests/nvme/035 b/tests/nvme/035
-> index eb1024edddbf..8b485bc8e682 100755
-> --- a/tests/nvme/035
-> +++ b/tests/nvme/035
-> @@ -32,7 +32,7 @@ test_device() {
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/014 b/tests/nvme/014
+> index 28913641ae40..2d00ed392ea8 100755
+> --- a/tests/nvme/014
+> +++ b/tests/nvme/014
+> @@ -29,7 +29,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
+> =20
+> diff --git a/tests/nvme/015 b/tests/nvme/015
+> index 2f7957caac88..3755cdee00c9 100755
+> --- a/tests/nvme/015
+> +++ b/tests/nvme/015
+> @@ -28,7 +28,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		 "91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/017 b/tests/nvme/017
+> index f2a95cf276cb..0248aee9bc41 100755
+> --- a/tests/nvme/017
+> +++ b/tests/nvme/017
+> @@ -25,7 +25,7 @@ test() {
+> =20
+>  	file_path=3D"${TMPDIR}/img"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/018 b/tests/nvme/018
+> index 315e79534348..78e9b2bb94d8 100755
+> --- a/tests/nvme/018
+> +++ b/tests/nvme/018
+> @@ -26,7 +26,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		 "91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/019 b/tests/nvme/019
+> index 4cb3509a12b2..9fff8ccaac9c 100755
+> --- a/tests/nvme/019
+> +++ b/tests/nvme/019
+> @@ -28,7 +28,7 @@ test() {
+>  	local nblk_range=3D"10,10,10,10,10,10,10,10,10,10"
+>  	local sblk_range=3D"100,200,300,400,500,600,700,800,900,1000"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
+> =20
+> diff --git a/tests/nvme/020 b/tests/nvme/020
+> index 16fdfcc94918..1966d5925213 100755
+> --- a/tests/nvme/020
+> +++ b/tests/nvme/020
+> @@ -26,7 +26,7 @@ test() {
+>  	local nblk_range=3D"10,10,10,10,10,10,10,10,10,10"
+>  	local sblk_range=3D"100,200,300,400,500,600,700,800,900,1000"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/021 b/tests/nvme/021
+> index 6ee0af1fe158..1fefc0fbca00 100755
+> --- a/tests/nvme/021
+> +++ b/tests/nvme/021
+> @@ -25,7 +25,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/022 b/tests/nvme/022
+> index 1d76ffa44178..1ff915786f86 100755
+> --- a/tests/nvme/022
+> +++ b/tests/nvme/022
+> @@ -25,7 +25,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/023 b/tests/nvme/023
+> index b65be07edc38..90316230a3d7 100755
+> --- a/tests/nvme/023
+> +++ b/tests/nvme/023
+> @@ -26,7 +26,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
+> =20
+> diff --git a/tests/nvme/024 b/tests/nvme/024
+> index f756797d6f29..384a8266e741 100755
+> --- a/tests/nvme/024
+> +++ b/tests/nvme/024
+> @@ -25,7 +25,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/025 b/tests/nvme/025
+> index 941bf36f67fb..815223d1c28d 100755
+> --- a/tests/nvme/025
+> +++ b/tests/nvme/025
+> @@ -25,7 +25,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/026 b/tests/nvme/026
+> index c3f06c2a377c..d2203f19f026 100755
+> --- a/tests/nvme/026
+> +++ b/tests/nvme/026
+> @@ -25,7 +25,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/027 b/tests/nvme/027
+> index 0ad663ace811..97fe70e78344 100755
+> --- a/tests/nvme/027
+> +++ b/tests/nvme/027
+> @@ -25,7 +25,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/028 b/tests/nvme/028
+> index 7de977a81213..c539620bee28 100755
+> --- a/tests/nvme/028
+> +++ b/tests/nvme/028
+> @@ -25,7 +25,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"91fdba0d-f87b-4c25-b80f-db7be1418b9e"
+> diff --git a/tests/nvme/029 b/tests/nvme/029
+> index f8b4cbbb9156..1808b7b0edf1 100755
+> --- a/tests/nvme/029
+> +++ b/tests/nvme/029
+> @@ -14,6 +14,7 @@ requires() {
+>  	_nvme_requires
+>  	_have_loop
+>  	_require_nvme_trtype_is_fabrics
+> +	_require_test_dev_size 1M
+>  }
+> =20
+>  test_user_io()
+> @@ -59,7 +60,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 1G "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
+> =20
+> diff --git a/tests/nvme/031 b/tests/nvme/031
+> index 4e1798246db1..e70898819a86 100755
+> --- a/tests/nvme/031
+> +++ b/tests/nvme/031
+> @@ -33,7 +33,7 @@ test() {
+> =20
+>  	_setup_nvmet
+> =20
+> -	truncate -s 1G "$TMPDIR/img"
+> +	truncate -s "${nvme_img_size}" "$TMPDIR/img"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "$TMPDIR/img")"
+> =20
+> diff --git a/tests/nvme/032 b/tests/nvme/032
+> index 81e074cc11bc..9f9756b0f959 100755
+> --- a/tests/nvme/032
+> +++ b/tests/nvme/032
+> @@ -38,7 +38,7 @@ test_device() {
+>  	sysfs=3D"/sys/bus/pci/devices/${pdev}"
+> =20
+>  	# start fio job
+> -	_run_fio_rand_io --filename=3D"$TEST_DEV" --size=3D1g \
+> +	_run_fio_rand_io --filename=3D"$TEST_DEV" --size=3D"${nvme_img_size}" \
+>  		--group_reporting --time_based --runtime=3D1m &> /dev/null &
+> =20
+>  	sleep 5
+> diff --git a/tests/nvme/034 b/tests/nvme/034
+> index f92e5e20865b..e0ede717c373 100755
+> --- a/tests/nvme/034
+> +++ b/tests/nvme/034
+> @@ -26,7 +26,7 @@ test_device() {
 >  	port=3D$(_nvmet_passthru_target_setup "${subsys}")
 >  	nsdev=3D$(_nvmet_passthru_target_connect "${nvme_trtype}" "${subsys}")
 > =20
-> -	_xfs_run_fio_verify_io "${nsdev}" "900m"
-> +	_xfs_run_fio_verify_io "${nsdev}"
-
-On the other hand, this change for nvme/035 does not look good. It runs the
-test on TEST_DEV, which may take very long time without TIMEOUT config.
-
+> -	_run_fio_verify_io --size=3D950m --filename=3D"${nsdev}"
+> +	_run_fio_verify_io --size=3D"${nvme_img_size}" --filename=3D"${nsdev}"
 > =20
 >  	_nvme_disconnect_subsys "${subsys}"
 >  	_nvmet_passthru_target_cleanup "${port}" "${subsys}"
+> diff --git a/tests/nvme/035 b/tests/nvme/035
+> index 8b485bc8e682..2c4a25f82937 100755
+> --- a/tests/nvme/035
+> +++ b/tests/nvme/035
+> @@ -17,7 +17,7 @@ requires() {
+>  }
+> =20
+>  device_requires() {
+> -	_require_test_dev_size 1024m
+> +	_require_test_dev_size "${nvme_img_size}"
+>  }
+>
+
+This change looks weird for me. The required size of TEST_DEV can vary depe=
+nding
+on user's configuration. I think nvme_img_size specify the device size that=
+ each
+test case prepares, isn't it?
+
+>  test_device() {
+> diff --git a/tests/nvme/040 b/tests/nvme/040
+> index 8d29f905adb5..31b7cafef4be 100755
+> --- a/tests/nvme/040
+> +++ b/tests/nvme/040
+> @@ -25,7 +25,7 @@ test() {
+>  	echo "Running ${TEST_NAME}"
+> =20
+>  	_setup_nvmet
+> -	truncate -s 1G "$TMPDIR/img"
+> +	truncate -s "${nvme_img_size}" "$TMPDIR/img"
+>  	loop_dev=3D"$(losetup -f --show "$TMPDIR/img")"
+> =20
+>  	port=3D"$(_create_nvmet_port "${nvme_trtype}")"
+> @@ -37,7 +37,7 @@ test() {
+> =20
+>  	# start fio job
+>  	echo "starting background fio"
+> -	_run_fio_rand_io --filename=3D"/dev/${nvmedev}n1" --size=3D1g \
+> +	_run_fio_rand_io --filename=3D"/dev/${nvmedev}n1" --size=3D"${nvme_img_=
+size}" \
+>  		--group_reporting --ramp_time=3D5 \
+>  		--time_based --runtime=3D1m &> /dev/null &
+>  	sleep 5
+> diff --git a/tests/nvme/041 b/tests/nvme/041
+> index 03e2dab25918..308655dd6090 100755
+> --- a/tests/nvme/041
+> +++ b/tests/nvme/041
+> @@ -44,7 +44,7 @@ test() {
+> =20
+>  	_setup_nvmet
+> =20
+> -	truncate -s 512M "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"b92842df-a394-44b1-84a4-92ae7d112861"
+> diff --git a/tests/nvme/042 b/tests/nvme/042
+> index 4ad726f72f5a..fed2efead013 100755
+> --- a/tests/nvme/042
+> +++ b/tests/nvme/042
+> @@ -41,7 +41,7 @@ test() {
+> =20
+>  	_setup_nvmet
+> =20
+> -	truncate -s 512M "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
+>  	port=3D"$(_create_nvmet_port "${nvme_trtype}")"
+> diff --git a/tests/nvme/043 b/tests/nvme/043
+> index c031cecf34a5..a030884aa4ed 100755
+> --- a/tests/nvme/043
+> +++ b/tests/nvme/043
+> @@ -42,7 +42,7 @@ test() {
+> =20
+>  	_setup_nvmet
+> =20
+> -	truncate -s 512M "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
+>  	port=3D"$(_create_nvmet_port "${nvme_trtype}")"
+> diff --git a/tests/nvme/044 b/tests/nvme/044
+> index f2406ecadf7d..9928bcc55397 100755
+> --- a/tests/nvme/044
+> +++ b/tests/nvme/044
+> @@ -53,7 +53,7 @@ test() {
+> =20
+>  	_setup_nvmet
+> =20
+> -	truncate -s 512M "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
+>  	port=3D"$(_create_nvmet_port "${nvme_trtype}")"
+> diff --git a/tests/nvme/045 b/tests/nvme/045
+> index 612e5f168e3c..7c51da27b5f1 100755
+> --- a/tests/nvme/045
+> +++ b/tests/nvme/045
+> @@ -55,7 +55,7 @@ test() {
+> =20
+>  	_setup_nvmet
+> =20
+> -	truncate -s 512M "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}"
+>  	port=3D"$(_create_nvmet_port "${nvme_trtype}")"
+> diff --git a/tests/nvme/047 b/tests/nvme/047
+> index d56d3be185b0..b5a8d469a983 100755
+> --- a/tests/nvme/047
+> +++ b/tests/nvme/047
+> @@ -28,7 +28,7 @@ test() {
+>  	local file_path=3D"$TMPDIR/img"
+>  	local subsys_name=3D"blktests-subsystem-1"
+> =20
+> -	truncate -s 512M "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	loop_dev=3D"$(losetup -f --show "${file_path}")"
+> =20
+> diff --git a/tests/nvme/048 b/tests/nvme/048
+> index b4ee7371eb68..08fdee16c811 100755
+> --- a/tests/nvme/048
+> +++ b/tests/nvme/048
+> @@ -84,7 +84,7 @@ test() {
+>  	fi
+>  	hostnqn=3D"nqn.2014-08.org.nvmexpress:uuid:${hostid}"
+> =20
+> -	truncate -s 512M "${file_path}"
+> +	truncate -s "${nvme_img_size}" "${file_path}"
+> =20
+>  	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
+>  		"b92842df-a394-44b1-84a4-92ae7d112861"
+> diff --git a/tests/nvme/rc b/tests/nvme/rc
+> index 41f196b037d6..e5ba9a6d5f54 100644
+> --- a/tests/nvme/rc
+> +++ b/tests/nvme/rc
+> @@ -17,6 +17,7 @@ def_local_wwpn=3D"0x20001100aa000002"
+>  def_hostnqn=3D"$(cat /etc/nvme/hostnqn 2> /dev/null)"
+>  def_hostid=3D"$(cat /etc/nvme/hostid 2> /dev/null)"
+>  nvme_trtype=3D${nvme_trtype:-"loop"}
+> +nvme_img_size=3D${nvme_img_size:-"350M"}
+> =20
+>  _nvme_requires() {
+>  	_have_program nvme
 > --=20
 > 2.40.0
 > =
