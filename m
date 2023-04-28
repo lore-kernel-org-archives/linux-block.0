@@ -2,462 +2,224 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A847C77B61
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 03:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB70AC7EE21
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 03:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230036AbjD1DMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 23:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48556 "EHLO
+        id S1344707AbjD1Drd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 23:47:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344841AbjD1DLt (ORCPT
+        with ESMTP id S230002AbjD1Drc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 23:11:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240DC468F
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 20:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682651455;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jyIhVxRaOBSkPCzGKFD1FqY9N89AuxAfNW4ZchoPZeU=;
-        b=ODgkd6LzV3/gTPMn3Qto+qNBSJNnx5kf/14k7YiTf2fgNikZO7W3vGe+x/nvGOKRWrq6n1
-        BeQ63je4vmsjpmJUYwUXxCrm+HKHg9ewfcsj9KryMz7KinH0XRT0Ec45G9v2mzk3XmLzqh
-        wdc4Kknw3QqwFD7tJWNybJG3iSL90WQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-588-epA2HTb1OSG3X6gvK4ViTw-1; Thu, 27 Apr 2023 23:10:49 -0400
-X-MC-Unique: epA2HTb1OSG3X6gvK4ViTw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A3D2280AA25;
-        Fri, 28 Apr 2023 03:10:49 +0000 (UTC)
-Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B451B492C13;
-        Fri, 28 Apr 2023 03:10:45 +0000 (UTC)
-Date:   Fri, 28 Apr 2023 11:10:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org,
-        ming.lei@redhat.com
-Subject: Re: [PATCH blktests 2/2] tests: Add ublk tests
-Message-ID: <ZEs5MDBYUHk+8pO0@ovpn-8-24.pek2.redhat.com>
-References: <20230427103242.31361-1-ZiyangZhang@linux.alibaba.com>
- <20230427103242.31361-3-ZiyangZhang@linux.alibaba.com>
+        Thu, 27 Apr 2023 23:47:32 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6418A269D;
+        Thu, 27 Apr 2023 20:47:29 -0700 (PDT)
+Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Q6z3R4R2vzpTMg;
+        Fri, 28 Apr 2023 11:43:31 +0800 (CST)
+Received: from [10.174.177.174] (10.174.177.174) by
+ dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Fri, 28 Apr 2023 11:47:26 +0800
+Message-ID: <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com>
+Date:   Fri, 28 Apr 2023 11:47:26 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230427103242.31361-3-ZiyangZhang@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Matthew Wilcox <willy@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>, <linux-ext4@vger.kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        <linux-block@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
+        yangerkun <yangerkun@huawei.com>,
+        Baokun Li <libaokun1@huawei.com>
+References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
+ <ZEny7Izr8iOc/23B@casper.infradead.org>
+ <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
+ <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
+ <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
+ <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
+ <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
+ <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
+From:   Baokun Li <libaokun1@huawei.com>
+In-Reply-To: <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.177.174]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500021.china.huawei.com (7.185.36.21)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 27, 2023 at 06:32:42PM +0800, Ziyang Zhang wrote:
-> It is very important to test ublk crash handling since the userspace
-> part is not reliable. Especially we should test removing device, killing
-> ublk daemons and user recovery feature.
+On 2023/4/28 9:41, Ming Lei wrote:
+> On Thu, Apr 27, 2023 at 07:27:04PM +0800, Ming Lei wrote:
+>> On Thu, Apr 27, 2023 at 07:19:35PM +0800, Baokun Li wrote:
+>>> On 2023/4/27 18:01, Ming Lei wrote:
+>>>> On Thu, Apr 27, 2023 at 02:36:51PM +0800, Baokun Li wrote:
+>>>>> On 2023/4/27 12:50, Ming Lei wrote:
+>>>>>> Hello Matthew,
+>>>>>>
+>>>>>> On Thu, Apr 27, 2023 at 04:58:36AM +0100, Matthew Wilcox wrote:
+>>>>>>> On Thu, Apr 27, 2023 at 10:20:28AM +0800, Ming Lei wrote:
+>>>>>>>> Hello Guys,
+>>>>>>>>
+>>>>>>>> I got one report in which buffered write IO hangs in balance_dirty_pages,
+>>>>>>>> after one nvme block device is unplugged physically, then umount can't
+>>>>>>>> succeed.
+>>>>>>> That's a feature, not a bug ... the dd should continue indefinitely?
+>>>>>> Can you explain what the feature is? And not see such 'issue' or 'feature'
+>>>>>> on xfs.
+>>>>>>
+>>>>>> The device has been gone, so IMO it is reasonable to see FS buffered write IO
+>>>>>> failed. Actually dmesg has shown that 'EXT4-fs (nvme0n1): Remounting
+>>>>>> filesystem read-only'. Seems these things may confuse user.
+>>>>> The reason for this difference is that ext4 and xfs handle errors
+>>>>> differently.
+>>>>>
+>>>>> ext4 remounts the filesystem as read-only or even just continues, vfs_write
+>>>>> does not check for these.
+>>>> vfs_write may not find anything wrong, but ext4 remount could see that
+>>>> disk is gone, which might happen during or after remount, however.
+>>>>
+>>>>> xfs shuts down the filesystem, so it returns a failure at
+>>>>> xfs_file_write_iter when it finds an error.
+>>>>>
+>>>>>
+>>>>> ``` ext4
+>>>>> ksys_write
+>>>>>    vfs_write
+>>>>>     ext4_file_write_iter
+>>>>>      ext4_buffered_write_iter
+>>>>>       ext4_write_checks
+>>>>>        file_modified
+>>>>>         file_modified_flags
+>>>>>          __file_update_time
+>>>>>           inode_update_time
+>>>>>            generic_update_time
+>>>>>             __mark_inode_dirty
+>>>>>              ext4_dirty_inode ---> 2. void func, No propagating errors out
+>>>>>               __ext4_journal_start_sb
+>>>>>                ext4_journal_check_start ---> 1. Error found, remount-ro
+>>>>>       generic_perform_write ---> 3. No error sensed, continue
+>>>>>        balance_dirty_pages_ratelimited
+>>>>>         balance_dirty_pages_ratelimited_flags
+>>>>>          balance_dirty_pages
+>>>>>           // 4. Sleeping waiting for dirty pages to be freed
+>>>>>           __set_current_state(TASK_KILLABLE)
+>>>>>           io_schedule_timeout(pause);
+>>>>> ```
+>>>>>
+>>>>> ``` xfs
+>>>>> ksys_write
+>>>>>    vfs_write
+>>>>>     xfs_file_write_iter
+>>>>>      if (xfs_is_shutdown(ip->i_mount))
+>>>>>        return -EIO;    ---> dd fail
+>>>>> ```
+>>>> Thanks for the info which is really helpful for me to understand the
+>>>> problem.
+>>>>
+>>>>>>> balance_dirty_pages() is sleeping in KILLABLE state, so kill -9 of
+>>>>>>> the dd process should succeed.
+>>>>>> Yeah, dd can be killed, however it may be any application(s), :-)
+>>>>>>
+>>>>>> Fortunately it won't cause trouble during reboot/power off, given
+>>>>>> userspace will be killed at that time.
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> Thanks,
+>>>>>> Ming
+>>>>>>
+>>>>> Don't worry about that, we always set the current thread to TASK_KILLABLE
+>>>>>
+>>>>> while waiting in balance_dirty_pages().
+>>>> I have another concern, if 'dd' isn't killed, dirty pages won't be cleaned, and
+>>>> these (big amount)memory becomes not usable, and typical scenario could be USB HDD
+>>>> unplugged.
+>>>>
+>>>>
+>>>> thanks,
+>>>> Ming
+>>> Yes, it is unreasonable to continue writing data with the previously opened
+>>> fd after
+>>> the file system becomes read-only, resulting in dirty page accumulation.
+>>>
+>>> I provided a patch in another reply.
+>>> Could you help test if it can solve your problem?
+>>> If it can indeed solve your problem, I will officially send it to the email
+>>> list.
+>> OK, I will test it tomorrow.
+> Your patch can avoid dd hang when bs is 512 at default, but if bs is
+> increased to 1G and more 'dd' tasks are started, the dd hang issue
+> still can be observed.
 
-Indeed, good job!
+Thank you for your testing!
 
-> 
-> Add five new test for ublk to cover these cases.
-> 
-> Signed-off-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-> ---
->  tests/ublk/001     | 39 +++++++++++++++++++++++++++
->  tests/ublk/001.out |  2 ++
->  tests/ublk/002     | 53 +++++++++++++++++++++++++++++++++++++
->  tests/ublk/002.out |  2 ++
->  tests/ublk/003     | 43 ++++++++++++++++++++++++++++++
->  tests/ublk/003.out |  2 ++
->  tests/ublk/004     | 63 +++++++++++++++++++++++++++++++++++++++++++
->  tests/ublk/004.out |  2 ++
->  tests/ublk/005     | 66 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/ublk/005.out |  2 ++
->  10 files changed, 274 insertions(+)
->  create mode 100644 tests/ublk/001
->  create mode 100644 tests/ublk/001.out
->  create mode 100644 tests/ublk/002
->  create mode 100644 tests/ublk/002.out
->  create mode 100644 tests/ublk/003
->  create mode 100644 tests/ublk/003.out
->  create mode 100644 tests/ublk/004
->  create mode 100644 tests/ublk/004.out
->  create mode 100644 tests/ublk/005
->  create mode 100644 tests/ublk/005.out
+Yes, my patch only prevents the adding of new dirty pages, but it 
+doesn't clear
+the dirty pages that already exist. The reason why it doesn't work after 
+bs grows
+is that there are already enough dirty pages to trigger 
+balance_dirty_pages().
+Executing drop_caches at this point may make dd fail and exit. But the 
+dirty pages
+are still not cleared, nor is the shutdown implemented by ext4. These 
+dirty pages
+will not be cleared until the filesystem is unmounted.
 
-Please run 'make check' and fix the following warning:
+This is the result of my test at bs=512:
 
-tests/ublk/002:35:13: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/002:36:17: note: Double quote to prevent globbing and word splitting. [SC2086]
-tests/ublk/002:41:23: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/002:44:3: note: Instead of 'let expr', prefer (( expr )) . [SC2219]
-tests/ublk/003:35:13: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/003:36:17: note: Double quote to prevent globbing and word splitting. [SC2086]
-tests/ublk/004:35:13: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/004:36:17: note: Double quote to prevent globbing and word splitting. [SC2086]
-tests/ublk/004:41:23: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/004:44:3: note: Instead of 'let expr', prefer (( expr )) . [SC2219]
-tests/ublk/004:51:19: note: Check exit code directly with e.g. 'if mycmd;', not indirectly with $?. [SC2181]
-tests/ublk/004:53:17: note: Instead of 'let expr', prefer (( expr )) . [SC2219]
-tests/ublk/004:55:15: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/005:35:13: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/005:36:17: note: Double quote to prevent globbing and word splitting. [SC2086]
-tests/ublk/005:41:23: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/005:44:3: note: Instead of 'let expr', prefer (( expr )) . [SC2219]
-tests/ublk/005:51:19: note: Check exit code directly with e.g. 'if mycmd;', not indirectly with $?. [SC2181]
-tests/ublk/005:53:17: note: Instead of 'let expr', prefer (( expr )) . [SC2219]
-tests/ublk/005:55:15: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/005:58:13: note: Use $(...) notation instead of legacy backticks `...`. [SC2006]
-tests/ublk/005:59:17: note: Double quote to prevent globbing and word splitting. [SC2086]
+ext4 -- remount read-only
+OBJS ACTIVE  USE OBJ SIZE  SLABS OBJ/SLAB CACHE SIZE NAME
+313872 313872 100%    0.10K   8048   39 32192K buffer_head   ---> wait 
+to max
+82602  82465  99%     0.10K   2118   39  8472K buffer_head   ---> kill 
+dd && drop_caches
+897    741    82%     0.10K     23   39    92K buffer_head   ---> umount
 
-> 
-> diff --git a/tests/ublk/001 b/tests/ublk/001
-> new file mode 100644
-> index 0000000..fe158ba
-> --- /dev/null
-> +++ b/tests/ublk/001
-> @@ -0,0 +1,39 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2023 Ziyang Zhang
-> +#
-> +# Test ublk by deleting ublk device while running fio
-> +
-> +. tests/block/rc
-> +. common/ublk
-> +
-> +DESCRIPTION="test ublk deletion"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_ublk
-> +}
-> +
-> +test() {
-> +	local ublk_prog="src/miniublk"
-> +
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	if ! _init_ublk; then
-> +		return 1
-> +	fi
-> +
-> +	${ublk_prog} add -t null -n 0 > "$FULL"
-> +	udevadm settle
-> +	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-> +		echo "fail to list dev"
-> +	fi
-> +
-> +	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-> +
-> +        ${ublk_prog} del -n 0 >> "$FULL"
+patched:
+25233  25051  99%    0.10K    647     39     2588K buffer_head
+>
+> The reason should be the next paragraph I posted.
+>
+> Another thing is that if remount read-only makes sense on one dead
+> disk? Yeah, block layer doesn't export such interface for querying
+> if bdev is dead. However, I think it is reasonable to export such
+> interface if FS needs that.
+Ext4 just detects I/O Error and remounts it as read-only, it doesn't know
+if the current disk is dead or not.
 
-Indent.
-
-Also probably, add one small delay before deleting device, then we can
-make sure there are enough in-flight IOs before starting to delete.
-
-> +
-> +	_exit_ublk
-> +
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/ublk/001.out b/tests/ublk/001.out
-> new file mode 100644
-> index 0000000..0d070b3
-> --- /dev/null
-> +++ b/tests/ublk/001.out
-> @@ -0,0 +1,2 @@
-> +Running ublk/001
-> +Test complete
-> diff --git a/tests/ublk/002 b/tests/ublk/002
-> new file mode 100644
-> index 0000000..25cad13
-> --- /dev/null
-> +++ b/tests/ublk/002
-> @@ -0,0 +1,53 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2023 Ziyang Zhang
-> +#
-> +# Test ublk by killing ublk daemon while running fio
-> +# Delete the device after it is dead
-> +
-> +. tests/block/rc
-> +. common/ublk
-> +
-> +DESCRIPTION="test ublk crash(1)"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_ublk
-> +}
-> +
-> +test() {
-> +	local ublk_prog="src/miniublk"
-> +
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	if ! _init_ublk; then
-> +		return 1
-> +	fi
-> +
-> +	${ublk_prog} add -t null -n 0 > "$FULL"
-> +	udevadm settle
-> +	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-> +		echo "fail to list dev"
-> +	fi
-> +
-> +	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-> +
-> +        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-> +        kill -9 $pid
-> +
-> +        sleep 2
-> +        secs=0
-> +        while [ $secs -lt 10 ]; do
-> +                state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-
-It could be cleaner to add one function for retrieving ublk state, given
-the func is needed in many tests.
-
-> +                [ "$state" == "DEAD" ] && break
-> +		sleep 1
-> +		let secs++
-> +        done
-
-Indent.
-
-> +        [ "$state" != "DEAD" ] && echo "device isn't dead after killing queue daemon"
-> +
-> +        ${ublk_prog} del -n 0 >> "$FULL"
-> +
-> +	_exit_ublk
-> +
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/ublk/002.out b/tests/ublk/002.out
-> new file mode 100644
-> index 0000000..93039b7
-> --- /dev/null
-> +++ b/tests/ublk/002.out
-> @@ -0,0 +1,2 @@
-> +Running ublk/002
-> +Test complete
-> diff --git a/tests/ublk/003 b/tests/ublk/003
-> new file mode 100644
-> index 0000000..34bce74
-> --- /dev/null
-> +++ b/tests/ublk/003
-> @@ -0,0 +1,43 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2023 Ziyang Zhang
-> +#
-> +# Test ublk by killing ublk daemon while running fio
-> +# Delete the device immediately
-> +
-> +. tests/block/rc
-> +. common/ublk
-> +
-> +DESCRIPTION="test ublk crash(2)"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_ublk
-> +}
-> +
-> +test() {
-> +	local ublk_prog="src/miniublk"
-> +
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	if ! _init_ublk; then
-> +		return 1
-> +	fi
-> +
-> +	${ublk_prog} add -t null -n 0 > "$FULL"
-> +	udevadm settle
-> +	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-> +		echo "fail to list dev"
-> +	fi
-> +
-> +	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-> +
-> +        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-> +        kill -9 $pid
-> +
-> +        ${ublk_prog} del -n 0 >> "$FULL"
-
-Indent.
-
-> +
-> +	_exit_ublk
-> +
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/ublk/003.out b/tests/ublk/003.out
-> new file mode 100644
-> index 0000000..90a3bfa
-> --- /dev/null
-> +++ b/tests/ublk/003.out
-> @@ -0,0 +1,2 @@
-> +Running ublk/003
-> +Test complete
-> diff --git a/tests/ublk/004 b/tests/ublk/004
-> new file mode 100644
-> index 0000000..c5d0694
-> --- /dev/null
-> +++ b/tests/ublk/004
-> @@ -0,0 +1,63 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2023 Ziyang Zhang
-> +#
-> +# Test ublk user recovery by run fio with dev recovery:
-> +# (1)kill all ubq_deamon, (2)recover with new ubq_daemon,
-> +# (3)delete dev
-> +
-> +. tests/block/rc
-> +. common/ublk
-> +
-> +DESCRIPTION="test ublk recovery(1)"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_ublk
-> +}
-> +
-> +test() {
-> +	local ublk_prog="src/miniublk"
-> +
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	if ! _init_ublk; then
-> +		return 1
-> +	fi
-> +
-> +	${ublk_prog} add -t null -n 0 -r 1 > "$FULL"
-> +	udevadm settle
-> +	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-> +		echo "fail to list dev"
-> +	fi
-> +
-> +	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-> +        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-> +        kill -9 $pid
-> +
-> +        sleep 2
-> +        secs=0
-> +        while [ $secs -lt 10 ]; do
-> +                state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-> +                [ "$state" == "QUIESCED" ] && break
-> +		sleep 1
-> +		let secs++
-> +        done
-
-Indent.
-
-> +        [ "$state" != "QUIESCED" ] && echo "device isn't quiesced after killing queue daemon"
-> + 
-> +        secs=0
-> +        while [ $secs -lt 10 ]; do
-> +                ${ublk_prog} recover -t null -n 0 >> "$FULL"
-> +                [ $? -eq 0 ] && break 
-> +                sleep 1
-> +                let secs++
-> +        done
-
-Do we need to send multiple recover commands?
-
-> +        state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-> +        [ "$state" == "QUIESCED" ] && echo "failed to recover dev"
-> +
-> +        ${ublk_prog} del -n 0 >> "$FULL"
-> +
-> +	_exit_ublk
-> +
-> +	echo "Test complete"
-> +}
-> diff --git a/tests/ublk/004.out b/tests/ublk/004.out
-> new file mode 100644
-> index 0000000..a92cd50
-> --- /dev/null
-> +++ b/tests/ublk/004.out
-> @@ -0,0 +1,2 @@
-> +Running ublk/004
-> +Test complete
-> diff --git a/tests/ublk/005 b/tests/ublk/005
-> new file mode 100644
-> index 0000000..23c0555
-> --- /dev/null
-> +++ b/tests/ublk/005
-> @@ -0,0 +1,66 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2023 Ziyang Zhang
-> +#
-> +# Test ublk user recovery by run fio with dev recovery:
-> +# (1)kill all ubq_deamon, (2)recover with new ubq_daemon,
-> +# (3)kill all ubq_deamon, (4)delete dev
-> +
-> +. tests/block/rc
-> +. common/ublk
-> +
-> +DESCRIPTION="test ublk recovery(2)"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_ublk
-> +}
-> +
-> +test() {
-> +	local ublk_prog="src/miniublk"
-> +
-> +	echo "Running ${TEST_NAME}"
-> +
-> +	if ! _init_ublk; then
-> +		return 1
-> +	fi
-> +
-> +	${ublk_prog} add -t null -n 0 -r 1 > "$FULL"
-> +	udevadm settle
-> +	if ! ${ublk_prog} list -n 0 >> "$FULL"; then
-> +		echo "fail to list dev"
-> +	fi
-> +
-> +	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 > /dev/null 2>&1 &
-> +        pid=`${ublk_prog} list -n 0 | grep "pid" | awk '{print $7}'`
-> +        kill -9 $pid
-> +
-> +        sleep 2
-> +        secs=0
-> +        while [ $secs -lt 10 ]; do
-> +                state=`${ublk_prog} list -n 0 | grep "state" | awk '{print $11}'`
-> +                [ "$state" == "QUIESCED" ] && break
-> +		sleep 1
-> +		let secs++
-> +        done
-> +        [ "$state" != "QUIESCED" ] && echo "device isn't quiesced after killing queue daemon"
-
-Indent.
-
-> +
-> +        secs=0
-> +        while [ $secs -lt 10 ]; do
-> +                ${ublk_prog} recover -t null -n 0 >> "$FULL"
-> +                [ $? -eq 0 ] && break 
-> +                sleep 1
-> +                let secs++
-> +        done
-
-Same question with above.
+I asked Yu Kuai and he said that disk_live() can be used to determine 
+whether
+a disk has been removed based on the status of the inode corresponding to
+the block device, but this is generally not done in file systems.
+>
+>> But I am afraid if it can avoid the issue completely because the
+>> old write task hang in balance_dirty_pages() may still write/dirty pages
+>> if it is one very big size write IO.
+>
+> thanks,
+> Ming
+>
+Those dirty pages that are already there are piling up and can't be 
+written back,
+which I think is a real problem. Can the block layer clear those dirty 
+pages when
+it detects that the disk is deleted?
 
 
-Thanks, 
-Ming
-
+-- 
+With Best Regards,
+Baokun Li
+.
