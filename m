@@ -2,98 +2,192 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13985C77B61
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 01:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FCBC77B73
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 01:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344303AbjD1BPd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 21:15:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49532 "EHLO
+        id S230100AbjD1BmV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Apr 2023 21:42:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229965AbjD1BPb (ORCPT
+        with ESMTP id S230076AbjD1BmU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 21:15:31 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC7FC26A2
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 18:15:29 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-63b8b927f62so1901890b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 18:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1682644529; x=1685236529;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KdAMIiYmqSQz1GbWDTNHZpSZR6NUQD27x8IVMPn6Rlk=;
-        b=sa+18BQfIXdO34J2oBZ5fSNZDw2+/e2xdxFJ6iVqaxb1QxklxwVdWMI6yAs6m/RXcG
-         hfCvJZzISTfabi+tC/OLXZyJxmQaWFrefjil/FlgPAPMdVKcCqbLhRn+h8eIWvXlS8iJ
-         /I/b9TjLaNJB9EVoYkWPxoRdY4h6oGKU7HwGje2SXoKok/o3pDz+eEsBMclToXbyGCZG
-         mFWMsHrQiSG51MpgLF6Vm4jULI7sg02cU6J3SmaHgwSwUU0fEn/C0JuSqoGjF2+SJ95c
-         LdX+qb1fRPWe/Sy/EGOigwFdj+uTAUfnCPj7I+qWoFvYbU7FOqL4/hDVkR0bpJetnn2J
-         DT4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682644529; x=1685236529;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KdAMIiYmqSQz1GbWDTNHZpSZR6NUQD27x8IVMPn6Rlk=;
-        b=eYJbrShcqoYtqRQJ4kYDy502UrfFq4pIyNfeLUaygtkDpFUbH3rquC043xFCeiVfy7
-         7cK12qHeB7l8S2aHFR40znvuPKE/b2w2RNCY/mHAycIsgGJKD3NCd8ZDFqv+ejGi00hs
-         C0KsTSdgd2Ky/B/1w1ar6Bgnh5KdnB1XSoJLRySEiNIHQTnbGI/6HkeGsS+X9n33f54a
-         4IyplbBBcjk5+gkE6RHEC18yfqU0RF66MX2ttK16BI/pz95qvd9X61is9y14bzaiFanY
-         1UBj0QQS3K9+8fEuNhvWIGDnh1I7lK38pVsABIBxZWnI9oQ9OgRg0EFjDRoMYpQG2uIP
-         fUSg==
-X-Gm-Message-State: AC+VfDxCTV5KXGh36RzX2JYCu0eYdSNHAhCgPdmEQ+5WbThOk05HV5pm
-        57PcNFEsMJIdOgY9GKkx4NYn9w==
-X-Google-Smtp-Source: ACHHUZ7X+opn2Ubw1AwkQMzsSBun7dBZmvM343LIKmA46Kxphf9kLViwUZGrEMzvdhctRRtKV/mFeQ==
-X-Received: by 2002:a05:6a20:7f99:b0:f6:d60d:dbc8 with SMTP id d25-20020a056a207f9900b000f6d60ddbc8mr3325695pzj.2.1682644529298;
-        Thu, 27 Apr 2023 18:15:29 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id om12-20020a17090b3a8c00b002405d3bbe42sm13893828pjb.0.2023.04.27.18.15.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Apr 2023 18:15:28 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     josef@toxicpanda.com, linux-block@vger.kernel.org,
-        nbd@other.debian.org, Eric Blake <eblake@redhat.com>
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, corbet@lwn.net,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20230410180611.1051618-1-eblake@redhat.com>
-References: <20230410180611.1051618-1-eblake@redhat.com>
-Subject: Re: [PATCH v3 0/4] nbd: s/handle/cookie/
-Message-Id: <168264452819.133910.16210912670607469975.b4-ty@kernel.dk>
-Date:   Thu, 27 Apr 2023 19:15:28 -0600
+        Thu, 27 Apr 2023 21:42:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512DC1FC0
+        for <linux-block@vger.kernel.org>; Thu, 27 Apr 2023 18:41:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682646093;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DAggdfiCq2i+jGMt/hx+W9dG2SinJfHBtiVgLfXz2w8=;
+        b=T6zvQBbkcAApoP0CFATrNewbzvWTVo2+bSM89NGazNHqbIp//PwkT80I1ezHSgKfKzOmcf
+        B/b7HsjWm8iX2dfo6+74/0AueOgWLXPZywSjygFnsy/Q/L2L0ZhoUDc/gM8AJRY3UB5WAD
+        gMaPOVQQo+s4KBOwMATdn0DYqxiFYJs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-115-X7zBevW-NnOvO2-CBXNroA-1; Thu, 27 Apr 2023 21:41:29 -0400
+X-MC-Unique: X7zBevW-NnOvO2-CBXNroA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A9C6529A9D40;
+        Fri, 28 Apr 2023 01:41:28 +0000 (UTC)
+Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CBB96492C3E;
+        Fri, 28 Apr 2023 01:41:20 +0000 (UTC)
+Date:   Fri, 28 Apr 2023 09:41:15 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Baokun Li <libaokun1@huawei.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
+        yangerkun <yangerkun@huawei.com>, ming.lei@redhat.com
+Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Message-ID: <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
+References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
+ <ZEny7Izr8iOc/23B@casper.infradead.org>
+ <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
+ <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
+ <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
+ <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
+ <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Mon, 10 Apr 2023 13:06:07 -0500, Eric Blake wrote:
-> v2 was here: https://lkml.org/lkml/2023/3/17/1107
-> since then:
-> - squash patch 2/5 and 3/5 into 3/4 [Ming]
-> - add Josef's R-b
-> - tweak commit messages to match commits in userspace NBD (code itself
->   is unchanged, modulo the patch squash)
+On Thu, Apr 27, 2023 at 07:27:04PM +0800, Ming Lei wrote:
+> On Thu, Apr 27, 2023 at 07:19:35PM +0800, Baokun Li wrote:
+> > On 2023/4/27 18:01, Ming Lei wrote:
+> > > On Thu, Apr 27, 2023 at 02:36:51PM +0800, Baokun Li wrote:
+> > > > On 2023/4/27 12:50, Ming Lei wrote:
+> > > > > Hello Matthew,
+> > > > > 
+> > > > > On Thu, Apr 27, 2023 at 04:58:36AM +0100, Matthew Wilcox wrote:
+> > > > > > On Thu, Apr 27, 2023 at 10:20:28AM +0800, Ming Lei wrote:
+> > > > > > > Hello Guys,
+> > > > > > > 
+> > > > > > > I got one report in which buffered write IO hangs in balance_dirty_pages,
+> > > > > > > after one nvme block device is unplugged physically, then umount can't
+> > > > > > > succeed.
+> > > > > > That's a feature, not a bug ... the dd should continue indefinitely?
+> > > > > Can you explain what the feature is? And not see such 'issue' or 'feature'
+> > > > > on xfs.
+> > > > > 
+> > > > > The device has been gone, so IMO it is reasonable to see FS buffered write IO
+> > > > > failed. Actually dmesg has shown that 'EXT4-fs (nvme0n1): Remounting
+> > > > > filesystem read-only'. Seems these things may confuse user.
+> > > > 
+> > > > The reason for this difference is that ext4 and xfs handle errors
+> > > > differently.
+> > > > 
+> > > > ext4 remounts the filesystem as read-only or even just continues, vfs_write
+> > > > does not check for these.
+> > > vfs_write may not find anything wrong, but ext4 remount could see that
+> > > disk is gone, which might happen during or after remount, however.
+> > > 
+> > > > xfs shuts down the filesystem, so it returns a failure at
+> > > > xfs_file_write_iter when it finds an error.
+> > > > 
+> > > > 
+> > > > ``` ext4
+> > > > ksys_write
+> > > >   vfs_write
+> > > >    ext4_file_write_iter
+> > > >     ext4_buffered_write_iter
+> > > >      ext4_write_checks
+> > > >       file_modified
+> > > >        file_modified_flags
+> > > >         __file_update_time
+> > > >          inode_update_time
+> > > >           generic_update_time
+> > > >            __mark_inode_dirty
+> > > >             ext4_dirty_inode ---> 2. void func, No propagating errors out
+> > > >              __ext4_journal_start_sb
+> > > >               ext4_journal_check_start ---> 1. Error found, remount-ro
+> > > >      generic_perform_write ---> 3. No error sensed, continue
+> > > >       balance_dirty_pages_ratelimited
+> > > >        balance_dirty_pages_ratelimited_flags
+> > > >         balance_dirty_pages
+> > > >          // 4. Sleeping waiting for dirty pages to be freed
+> > > >          __set_current_state(TASK_KILLABLE)
+> > > >          io_schedule_timeout(pause);
+> > > > ```
+> > > > 
+> > > > ``` xfs
+> > > > ksys_write
+> > > >   vfs_write
+> > > >    xfs_file_write_iter
+> > > >     if (xfs_is_shutdown(ip->i_mount))
+> > > >       return -EIO;    ---> dd fail
+> > > > ```
+> > > Thanks for the info which is really helpful for me to understand the
+> > > problem.
+> > > 
+> > > > > > balance_dirty_pages() is sleeping in KILLABLE state, so kill -9 of
+> > > > > > the dd process should succeed.
+> > > > > Yeah, dd can be killed, however it may be any application(s), :-)
+> > > > > 
+> > > > > Fortunately it won't cause trouble during reboot/power off, given
+> > > > > userspace will be killed at that time.
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > Thanks,
+> > > > > Ming
+> > > > > 
+> > > > Don't worry about that, we always set the current thread to TASK_KILLABLE
+> > > > 
+> > > > while waiting in balance_dirty_pages().
+> > > I have another concern, if 'dd' isn't killed, dirty pages won't be cleaned, and
+> > > these (big amount)memory becomes not usable, and typical scenario could be USB HDD
+> > > unplugged.
+> > > 
+> > > 
+> > > thanks,
+> > > Ming
+> > Yes, it is unreasonable to continue writing data with the previously opened
+> > fd after
+> > the file system becomes read-only, resulting in dirty page accumulation.
+> > 
+> > I provided a patch in another reply.
+> > Could you help test if it can solve your problem?
+> > If it can indeed solve your problem, I will officially send it to the email
+> > list.
 > 
-> [...]
+> OK, I will test it tomorrow.
 
-Applied, thanks!
+Your patch can avoid dd hang when bs is 512 at default, but if bs is
+increased to 1G and more 'dd' tasks are started, the dd hang issue
+still can be observed.
 
-[1/4] uapi nbd: improve doc links to userspace spec
-      commit: daf376a366fd2d469d66ab83dfdc074777462bab
-[2/4] uapi nbd: add cookie alias to handle
-      commit: 2686eb845da7762ee98b17e578b0c081aafb77b9
-[3/4] block nbd: use req.cookie instead of req.handle
-      commit: bd9e9916c32fd4b4fb4e879e05bd1568ee02ec93
-[4/4] docs nbd: userspace NBD now favors github over sourceforge
-      commit: 952aa344bf4305ab6fa0d9962ef8c2caa2afef4c
+The reason should be the next paragraph I posted.
 
-Best regards,
--- 
-Jens Axboe
+Another thing is that if remount read-only makes sense on one dead
+disk? Yeah, block layer doesn't export such interface for querying
+if bdev is dead. However, I think it is reasonable to export such
+interface if FS needs that.
+
+> 
+> But I am afraid if it can avoid the issue completely because the
+> old write task hang in balance_dirty_pages() may still write/dirty pages
+> if it is one very big size write IO.
 
 
+thanks,
+Ming
 
