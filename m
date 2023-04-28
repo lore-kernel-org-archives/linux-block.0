@@ -2,64 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 438A3C77B61
-	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 03:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A4BC77B60
+	for <linux-block@archiver.kernel.org>; Fri, 28 Apr 2023 04:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344947AbjD1D5Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Apr 2023 23:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60290 "EHLO
+        id S229748AbjD1EBB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 00:01:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbjD1D5X (ORCPT
+        with ESMTP id S229686AbjD1EA7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Apr 2023 23:57:23 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87B1126A6;
-        Thu, 27 Apr 2023 20:57:16 -0700 (PDT)
+        Fri, 28 Apr 2023 00:00:59 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268382736;
+        Thu, 27 Apr 2023 21:00:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1682654236; x=1714190236;
+  t=1682654458; x=1714190458;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=wYMc2WM7L96K7uSIpybTGY8cITCoYwXUH+K7kGWjDYk=;
-  b=Hd7AC1fsfZnLLT9XISGDgmpEtgT1g01i5JKZk1gvyDxrf7+RKQFaX/iY
-   5b/NmPHXN6AYU3I3Uc/orZboDlrO9Ifc9tlHMrL2Gl8iawNLkpZGgna0S
-   HeiBCeHBlP1kJrCNqAoCvASoUqSQtKyg6IGoP+NAPt7xcRGjTu0FRzugS
-   veU8++fRFiZwUQH8rlBw7tRSOJyOSP/yoq1uD8Rxf631WmnxZq8LML2oQ
-   a6EVrc35cpM+t75wLhbEyZrHGZnHePHxYkLyo9nuWwiY3lTNV+9+hQCk3
-   8gzPBMNmtN4U/5doktkLr2sPdo5Sq9fa2IC8mKVb5oDAw38A1GIDrRqxt
-   A==;
+  bh=Wyg0a64o8hBTQy2qWu1NwvXQJg6OyMmzkz2g8V1RInU=;
+  b=TH8KhRSoifVvB4wWaPUg9AZn275SvLDkPuYt/rlZ31E3M/sZi6kB/Ctu
+   nQxdyuHjntQqnp8QUlPAzfWVq91xne/7UY1RQJmwEC+1bMP6egx44yVpZ
+   dQb/qwxD2+3n/WjO0QHMIk+PY3tCn5g2G6bZlKeoA2I18Gy95MUWFr4UI
+   sAdqjy1/ErKTLgHYpw5jIXrlhI+3dY4hS/u4XUoYU4W344zqJejccvEEy
+   F7sCYQNnzAU6jK+pnsejxJ1UYW0Fpg/erQI0F2vSoE3rAlUST+fPvZI10
+   OUSM1gSuUe8y5JHeWqyct2zgiBsT12zAa5Rl5h0AIg76WTBhEKIMyiORT
+   w==;
 X-IronPort-AV: E=Sophos;i="5.99,233,1677513600"; 
-   d="scan'208";a="227687024"
-Received: from mail-dm6nam12lp2177.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.177])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2023 11:57:13 +0800
+   d="scan'208";a="341513244"
+Received: from mail-bn8nam11lp2169.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.169])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2023 12:00:56 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QJeSfhkrLwB5XpDSRQ4mvkaOpPgVzQxMvgTCmSpgHUf7gjJTmfYpFRqVONPosML4jA+OMMIPOsWV9fGSL3NEdEGKDHamOwV+8Awgwh/79MzrfZXviqVGGYMyRrWmckN8zML4x/3Z/y26hO0FpZND2SikUAnvxETO8gBCZ7sY4vz8LfmLLX/j8bOh1ukxPrNrw6S/V3tpGU25/93i8R3ZOHKo4x6BAD359u3tZ51UQZ1P2Sk9m11XAhpeJTxcD9qEDRezWZ+mNu5Oi4kemNlNV+ffl9gIjdzKgll55rwhsW7Bl0MgJ7ig9bLayGxaZ0xF1QUDol7EJAa3oW6VVPGFuA==
+ b=nqLwHFqm4OyZ+s7s4QFoUg3zoxkHgo74dobI8O2D3XP1ZnlDC0Y+93HJU5I/3aSY7GXLBRgy40s5rWTNVDgBqnTdLxKcnLmM7B86Z/Z6xVTBg3+R9Yt16c42ilVSt9f9ahe1vJlmy9qN1lH0xjgrthllQVWfbhncMwQ1R027qWr1rzp5DqoqBqR/hwEFO5HbXA7rPSEOzyllchszbpjlcHQjwqE7rwUps1yEjcgP7LDGjNXu/qzKkr9MaXLEsfxSf5skqtexdjx081R0feadbTAoUJ/reu24qeXy+X8LjuyY3MAAbPocHyjTgI6sEUCCn8SSmejlOkANR8Fd6i8ohQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e9o4a4SISIR0HdH4RZhi7aLDRPkHfk8eh5yFigxWTVA=;
- b=B4INbjJU3GBnV/DlmQ31Ji0ZEBk/2R9/TYiwNtC2qlY84wykrscKW9i5XYgo16H+iM1ZII80tLxy9J3xEK2giUjNeDxS87CHO+OmKJiy+zHGtFEW0818YI66xfyqMEpJvUgxnUl471f54AJwbHj5IVlE/3hTJr9TEk9hcJGGMrH4F2FR5LmBx6i8p2lOzttUehCMjfFuvlHe+FXWqasAf6lkMXRTQrucvB7Ic2hbBt3D8uFyoFMhw723pjmXlAh7OdARvhDyV9ZQwDfTSKY6NeQfN0WRv+B1d8HfWA1puJJmw+RKjOJbr5lZeV+rnfE8LnPzF/vebFUXb23yFNhzuA==
+ bh=Wyg0a64o8hBTQy2qWu1NwvXQJg6OyMmzkz2g8V1RInU=;
+ b=PJ6u+n0z5CevQlf3id+vsuYHbOkPMUBgqiFyd6veRq1rdd3kinXCrqeXEA7yB5w/j2pVaiHYNQ2GGsiDyZAFQonrD45kyKieG0s/4xethQgYgcJ+7bX2hPL7NwAjLus/UcZmY+ereZLekSTFh5/Wk3Fh8ME6NUv0//8jhQ2xl3rR/cN8VMdxJGgHxZTD7uiQsIobZRiH8gLkAOD12WMIZWuGNNsJ5YAIbE7xIXq++cI3ZEoKermtL3hhS2Iwjp8u0y7DMXMR7kKX5I70EhBjZfsL5b3WMVe9wBeT4cqBB2l0UiCO+RjWSS78dit8NO2699A4jn4xWj7fa7Nn+VSl9Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e9o4a4SISIR0HdH4RZhi7aLDRPkHfk8eh5yFigxWTVA=;
- b=eiq+cpRoZFoZGTxA0J4oYHc1QdSfZgOjZrPCxb9C962V6cn4HbVMNoBL0DMFbP9p7R6LPYDEJ3IiP/1rBoEasQ9gwub9QfxutXp26hKL8eh5VqaJBH1js3dNAz4Q2QWlEtFZE7lnNpgBLh70ho2gbjxcnjaLOWBcHs9BGAzQ32w=
+ bh=Wyg0a64o8hBTQy2qWu1NwvXQJg6OyMmzkz2g8V1RInU=;
+ b=E1pDycvJx/oUoC6pocpRwCzF/yMYIvmwuTL79Al4J1rXAkXT256aIPfwCxdQslW2/d6424EhofljvYkc6+F4Ptd2yeTlgFYvLkZKio7bEgAYna+1fw3YmINuortvTNjwvRhGu/AjGExDIqD+cISJ6vi40hzuq8A/mWwu7RbUxng=
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
  SJ0PR04MB8375.namprd04.prod.outlook.com (2603:10b6:a03:3d6::8) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6340.21; Fri, 28 Apr 2023 03:57:12 +0000
+ 15.20.6340.21; Fri, 28 Apr 2023 04:00:54 +0000
 Received: from DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::eb0e:1bef:f266:eceb]) by DM8PR04MB8037.namprd04.prod.outlook.com
  ([fe80::eb0e:1bef:f266:eceb%9]) with mapi id 15.20.6340.022; Fri, 28 Apr 2023
- 03:57:12 +0000
+ 04:00:54 +0000
 From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     Daniel Wagner <dwagner@suse.de>
-CC:     Hannes Reinecke <hare@suse.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Chaitanya Kulkarni <kch@nvidia.com>,
@@ -68,14 +67,12 @@ Subject: Re: [PATCH REPOST blktests v2 7/9] nvme-rc: Calculate IO size for fio
  jobs
 Thread-Topic: [PATCH REPOST blktests v2 7/9] nvme-rc: Calculate IO size for
  fio jobs
-Thread-Index: AQHZeYWCsLKktkO0eEaJ0SLd6XY4VA==
-Date:   Fri, 28 Apr 2023 03:57:12 +0000
-Message-ID: <l5uvjenah7oso6batcdgvkrzpgw362c55hwxxvkscriy5xj225@o2qtmbvyg52s>
+Thread-Index: AQHZeYYHsLKktkO0eEaJ0SLd6XY4VA==
+Date:   Fri, 28 Apr 2023 04:00:54 +0000
+Message-ID: <sbkboyc3tcad4g5zjdtko6ardhythnaotwp3njchbotnabhlun@mhhvxut6q2av>
 References: <20230421060505.10132-1-dwagner@suse.de>
  <20230421060505.10132-8-dwagner@suse.de>
- <6aa42bc9-e04e-cfc6-32cf-f1739944070b@suse.de>
- <7qew4jvwfgvpsqlci6dh6r6vjmzrzaphbqzzxqvvpdfadkj3ab@vxvbvh26bvji>
-In-Reply-To: <7qew4jvwfgvpsqlci6dh6r6vjmzrzaphbqzzxqvvpdfadkj3ab@vxvbvh26bvji>
+In-Reply-To: <20230421060505.10132-8-dwagner@suse.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -84,98 +81,81 @@ authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
 x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB8375:EE_
-x-ms-office365-filtering-correlation-id: d2799ee1-0ad5-43ad-e862-08db479ca586
+x-ms-office365-filtering-correlation-id: 14d13f80-91cc-4106-a97f-08db479d2a42
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: TWnksli5U5+IKQqi8Uo6T4Hf4yqPnaRLEKTiKhU31pqQc0BMn2daghLNozdtfCq0Jmx/0QhvV/yGGLyP/YL4z26t65t9+YWr3iL0xr94Dk0Fpo3mFhJQemfL0lVp5Xxe/fjEQTZFXEAI0gVfG84g5d+y8P8zxLvakvj+YcQvN3xxWpZK6v2XUfIswYVkUt5lVmeon+HyUn+f/3+tyEeFyFINVDu4dOMY9IaHwv9vq7HDMj6Dge2uUF318PYc+30OrVFoDdEK/wV4oc7UVqSSuxPcEUvo+M9fdiKWySerNvf3wZXHLOekiddRzOmaRMaaOdXx/oskEHfSzr/K9O7VZFcN72HLq6QG2i5icxQJTzynoKnIEfYwjSuAzRFBkVCzBvUWUD7gOpeTltiiXAjutWK+dROxULhy8v9bpZj8/cZOAL4EqO1KO1pKQTh1DXGzmKfNHqQJGL9joIBqvzWbob09astTHpUfpmeaYS8g+xAzg7wHS/vsq5FvEgT2VgGbA/DprM1EFqFNNozTgxz9TXrTNczPq7DEIPlluEoVzq0HZz2HsKmzNJT7vTCA10alT8CInU0SRxJSBE5VuIBl7g7pOAndDAYQKZyWjYd/a2Y=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(39860400002)(136003)(376002)(346002)(366004)(396003)(451199021)(86362001)(33716001)(54906003)(478600001)(71200400001)(6486002)(66946007)(76116006)(8936002)(38100700002)(8676002)(41300700001)(122000001)(66446008)(66556008)(91956017)(82960400001)(316002)(6916009)(4326008)(186003)(83380400001)(64756008)(66476007)(26005)(9686003)(2906002)(6506007)(38070700005)(6512007)(44832011)(5660300002);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: f5qHl4VYq6eJcz34ane7av5Xp5MkgBoiWbU8D3ZCZD1cc9RZtszqsOxLenD1yYPa1LhMxH68IblxnCSF3C6dutx6X2QVBd2wkQ51axZpA/EPSEiOmJIbXtALN5sRcLFxicv5+Bou4vEjYRPH34+aB0aGWVI/Sk3hA9VXPgBxWP84N4dKwLVVXLENK8eIWsHIGL83FD5YIPEMxkA9vVPMIZfWdEv3ovo2FYIoDgxyWC9ga13i6Ez7MDhFRCU8gbaydAz8Rk3juOK64MwOJnanopCYy8VClQBAUuWoMT+xKgtt08RM1XrMO4gi9/dVIu/4+fWBWgIlyqP/EcVGxJRrnv/RyP7hJH+TWkSbER7TPjF8ViU9DIMH3Ec9Bt7nuG2cTXHv4K+nHtuG4HikXJRQzYiwQMAsqQN22DkneZSwt8Eet52pKkmw8qVE9tJMjdyOy2g/x7Qsavh7RkiHtB69v8ysfZi4KTMjwaXJsHje16i+tS6N8QgTHC7pcddh3P92dDWmP1/SFxMp7O/AuDGNCh88ZBgs86igzVrviS6ySTTwrtV06nfg+OHjlTV3eBtmNZ4drhswijTeYxmeIduo0Aje6R1/L5ZoxNdGAu2RQiprXv8D0i6uQ4Quyv3KNYFh
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(39860400002)(136003)(376002)(346002)(366004)(396003)(451199021)(86362001)(33716001)(54906003)(478600001)(71200400001)(6486002)(66946007)(76116006)(8936002)(38100700002)(8676002)(41300700001)(122000001)(66446008)(66556008)(91956017)(82960400001)(316002)(6916009)(4326008)(186003)(83380400001)(64756008)(66476007)(26005)(9686003)(4744005)(2906002)(6506007)(38070700005)(6512007)(44832011)(5660300002);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+uwzLvbmM5S3po29WBW6b8eCqx1SlTxNTavYMlvhYMFOobORGmmf0A5vkhkk?=
- =?us-ascii?Q?5HnLgOOyZ+Am9FYKdyqrnX2XB4ndkXyus3mlVQkQ7nYAaq8TNIVB4umnfF7h?=
- =?us-ascii?Q?jJxt0AtZQGH2wNm8zz29fHokEul7pB3x4cCZVSfK4zRm2qKlHnzDVrp5w6Hi?=
- =?us-ascii?Q?p3kjHlQmyUnzZXT0SpkIAi8uyiDO4FYNgUc0Rq6EDLze6fXHYg4EpwmTMlTJ?=
- =?us-ascii?Q?pk/T/Upp7ajScGQOCzV/xYX7y2Z0oR5sD6sn3gLbk88GmKDV10BDdaWMhu5s?=
- =?us-ascii?Q?WiZ/MzVtiSDbIpPzXtcTIlyiTC4o0B5XiG9vSYOjAmbBstM35bcpUxYK3Jby?=
- =?us-ascii?Q?3gzdyrbNDNuzP5QUrHKDwpTX/d17F7hlr+W6L4G9pa2Hf04O6Xk2Yx1ed/aU?=
- =?us-ascii?Q?SogLgUK6lXv9hRbSjf6SEYNnmtW8N0/Su1a8S6nQkuwQEAvY+zadhpKSsSX6?=
- =?us-ascii?Q?OZXghJL1eY2cy6bj8kvfJ8zxcJ6GzzK4SO0FdMLqVW+KbG88HEoZctTWLXKm?=
- =?us-ascii?Q?BjufXB9XOzObdZMckMhJBTFVT4t0jbg5qP3LRvjYgQoDCRCYSFlFtG6rj9dU?=
- =?us-ascii?Q?1Nwmu4ai5WfpaobrSgwCOx3JALf5bGlpQJIAasFePezJBchIXS9CKBfhn7U4?=
- =?us-ascii?Q?Z5UDZle9CPykL5+F74q4yRxGihIPHJPFJbFpp0DltocshsRwpIb1AighObJ2?=
- =?us-ascii?Q?vAmEMeK2snhfNsnOrCabMGbnvx1RmHa9wjIRQ51H2Uyp0wHdEo2tLPwdPSUm?=
- =?us-ascii?Q?02f1pyXlMEXEwiFQZZVd0H2lA+pnuSjPcFCy5g9M+g5zRtfn/CFfQ7jbBp3w?=
- =?us-ascii?Q?ytGUvmprRFXDqQnzMKNfIoFBl85TkoTJe5I/7vXS/Hm85zRoMQPiMjRKyVX/?=
- =?us-ascii?Q?XuA9kgxnA/eEvDU3UccGpQRm9ciPGtNR9Nxd0ERCTcFQydDaS7EhCtNylPtt?=
- =?us-ascii?Q?ZJtdDXOIsvQT2Tl2gM732fVY4w7azKJL99Mi/u3C2oxbI3iAfMugQQ84lwte?=
- =?us-ascii?Q?bIz8QcZj89XLIIwxsmh6W+9EedCHLpc0UzMZ10TMFU0KVicQS4rDTMDw0qN3?=
- =?us-ascii?Q?YyCSCMW0Wm+3Lzr4fjGkEsEfYlvdbq9kilYq3lWPDXj/qw65zc5uAHVF69AI?=
- =?us-ascii?Q?PQivRd1u+pGc1tQD32LzVV0++0+3VjbngmFbfthdu/eMTHgeKioFKH9evX/6?=
- =?us-ascii?Q?AayiJk5vVVTQMsdKMJd2u9TefC1pme0MtWyLsKHU0j6p2MvOInjs9J980bLb?=
- =?us-ascii?Q?keFFy2OuiTW06Eab37CEI7ODzYBfJwo5Hb74O+e2GoKu8QUnm7tDvU0pXyug?=
- =?us-ascii?Q?n9D3NlQ6EzS4FA2TEd9Svc9WpiWhnmPsO326BxwUdicGP8h502lV/+4Iq4aS?=
- =?us-ascii?Q?6Dgov3qcYF8m9lxzWcUvOAtfeduMZILnfXag8ML15DeJtp3aiwke1gWILLNP?=
- =?us-ascii?Q?M+GRjdD/QcQgyPicN7qFEI0h6bHvnmz3VuAMqFO1IyyyXr4WFwTjeXzs/04g?=
- =?us-ascii?Q?TJy9kMrRsrvb14arKFDVL7sQojkaxugvb8CWJBZ4pv+VCyKw9PHqSCeaOxTD?=
- =?us-ascii?Q?7P+agXVv4PZfVUk2f1C6NgQEyUnQXxqNi5Y0sGsvJF3CoT2IdOgKDVkJG9et?=
- =?us-ascii?Q?GEceAmA0haOZmy4ovBu2ABU=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?eJYHD01yp1it9irOlJRL+6kAjom8wfJgfYNXJd7FgKTVl122wxDKBfEljQLt?=
+ =?us-ascii?Q?tBPX3/ajqB+TgHW/nyCrRtgb/WcYt40gkwjFiH1uoOUhAWPcwK/A6iKK03F+?=
+ =?us-ascii?Q?+E84u5I5D5jN5xLX2h3EpWSoJFrdE1Ned/81RtGHNj3gYdtSAY2DLipg9j8A?=
+ =?us-ascii?Q?MqaGuDnkjximDAngtszwdE1lgalLYDDGgBCXLFW0+feJe6Ha0+qBq4qVufk4?=
+ =?us-ascii?Q?RIbCBHYO48Hgy/NS4S1pChLqbjaBT11sACSGpBmq3niwgi395vytn1QBrzce?=
+ =?us-ascii?Q?DS2Z+YgJfZfAXOzRsd2mkez3MgpzKL8f/Qbtvj927TlDuj79GyXBId7VjY+C?=
+ =?us-ascii?Q?UM+J6ubac1jd14Xr+YcNTejMPm99B4AtZS+A/EXZoFiZTzWrGNU/RQYsd07n?=
+ =?us-ascii?Q?HeAy52oWNMZqqdmAHjNM5OGps9TVxz5xRxUsZgDSr+R5q25dRl7n7UduzO6n?=
+ =?us-ascii?Q?f2eWb6FBfUj8lBwCFOyIcPd4v8vpsHYmTNFhmOhbdjvT4sR4cYsMtwM9uo7j?=
+ =?us-ascii?Q?Sg5S7y7UAartWUZpiEu8/RbHRyFZSn+PeDpzysCOZzf6zOVk1rDIwzMbqjHY?=
+ =?us-ascii?Q?BTqX6HKk8sHeZHd3N8tWztkFLUzoJRmOgCsDeAP05CXOogYnhUfiykDnifjF?=
+ =?us-ascii?Q?Ih/KLC7jgomacVpki8OhOnesnvZzyxVMnfpIQACqQekVq2z66XyQ9CMlJY++?=
+ =?us-ascii?Q?76pN/ogab8Tmh4sW+RXz9Js6CZww/NUwJW8ghxxiBqwKiYgeIfpR/DPFl3On?=
+ =?us-ascii?Q?oSi7aCbK7oUjZp+QB0zobSMwSFMZiv2f8/i273T0QL2SiL5fftSomJXj7Jk5?=
+ =?us-ascii?Q?lIMihF5tv9skFY5XJl0l9hL4uDSK/mN7PBDpqq0Gec/SRDynbHeVBG8KVPgm?=
+ =?us-ascii?Q?zha7/YXRZjcjMqZi6jOU2ZBsmxDPu+Ip9gr9gItYcx8ZYArAlxPMSsQHHzJq?=
+ =?us-ascii?Q?kTkDkXbbqQh5RX1J/YJFcDn536YA9CE++ZvAJQJs5aIsUZ27CDUzvja7XaBH?=
+ =?us-ascii?Q?AZToMvSD53V+eH/CkcSXZNQapiMk3iTqBk48AJg3cSns0UHdBE5RismFJfZ5?=
+ =?us-ascii?Q?7Ech0eG0fQ295mUuPpnqC16oCB+JMWROc3yr3GgvdVB9fkxF1ianT3AK5Nfc?=
+ =?us-ascii?Q?aAD2Okv9MMdYEhfg0yjOIrZLQm1rwdTZCXqfg9fdu0vmqWYxwEVy0lI9SIL8?=
+ =?us-ascii?Q?6xX6n6rZaqVmtfSJYpWpLaFgbYd+f1tIqxPNMht/6Qu55dsXuW/b2jJufdAK?=
+ =?us-ascii?Q?58A9R0x4TYQNpUoE1fZD7Qwyr02rtoQXvlIy4EMjXPvUtIw3duaud/dRV353?=
+ =?us-ascii?Q?wSHs4FBItY9ynTp0jmSv4Xw7513mj5kW4/+wCY+OYClcG4pxOj/aPzDRL424?=
+ =?us-ascii?Q?fqE8G1SKZZQ8Ay4a1Iuir4ta19JR/pAHV68imYCx962F3Mi48dubTOECumOK?=
+ =?us-ascii?Q?LLV3uAL3Nf7yNrq0O5Xtv2+oguoXnuud54nzhkCS45J6hfj60bYx41Y04Tfk?=
+ =?us-ascii?Q?RmimihT/1/ARBsFrOPx5CsEFkSQcS7xaM2IA1XKeffcqFfGBlF8G8boEd7TH?=
+ =?us-ascii?Q?2YW8mzl2Sqj68KL/g/jFNvJCFZ1gpcETbb635glcZeuixDXoa4oYCrC8tgZr?=
+ =?us-ascii?Q?Lx/BkIq2Ap1eF/kJqH7L+VM=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <843E63E576B76E47B19E7FF7BEB36A0D@namprd04.prod.outlook.com>
+Content-ID: <A8FEADCC1FC2874F8074997279D920E8@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: B+1O4Zzy7qR40ksxO1reLu7cOgFB0yBEgN+TTssRz4iqL8MGJY71mo3uOcXe1ru5pMZwrQGY/9ZKzF6KQw2tfeeSvGrcZfyR25v/W0CAyR0wndiEP9HOsyNsZGVnZxO9AUvor+jjk6ilODdkGqHQWcOR2uCLbb1gPqST8g6f3AdQsU8uEfCg2ObJqFcAwxMDTKjh2qhjOc9yOJEq0E+N9ZQ3cGVeFtgoQve67yk1q/zneUHRPA2axDR9Eg5XWMAcJaRTQ6R8IJxwrm4x+cWQXkZ2TIWmTZ4VOoANaO6IJ0jTb2zvMcHMFXFVyZKQBjmmsl8IOkozmL0vpiMZRkthzgI3eMoKKzD8vVe3YuSpK0nbckUkTbvx6tGW/wgxhoyLkeF/6CldBv7dR8PWxuCybFBB2GSCAbuTlTQaW2FyZcDshjAtdWdRCOwucP8oNyfPtzvgWVw3vo1pv9BU61ib2FhS7SUeMXFN4x/SVFOqwVFpscXngXcaBJMFoU/hQKkkKFhkY6Bh79V+8pVeiXrNX+x5vluSiK9/k6oPxiRY/YV49Uv7fT+vNnM2qJgl4VWKDSYZiYomt92E71UaQSapEZW8jl193bvC5Tr+vOeY3sN2iTQ/NAgydADJLVw661iy7Ogm0q75cQ6YykBy/Yh2+mn/HdENe1jBG3V68flazkdrNReIk2P91LipHBFpCe62xayzlomZMpq36spA58Tmm2NKTLXhL+lvuleUIBfuvtaBPRICz3zhdyNf7keu+TxwhtIW9QwTnn7xLAOvWTZGusbxh4PzTrLL5R3UbZvkDLS/46hyCspKEr7cmbQMDQKttP08aQrNbXqo16FAa8gXP/i/cuXo/YAnun6SLQ/LYWLAvqP4Oo0jJxGnrrUy5N+cKGLv/knbkA7v8E7eFRw5Zmq5FLBBwhD9icEjmnciCjo=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: LuPp0khW2lh6nEzOY5Ac6+EnOVdO9qYZqwKUB76gOVAhJgMsBT3ysZ3N3mZcWNY2QKGolV3DO1pv7pYSGrG1IjF1PUjUvZTNrUnDDaLiJgAwmwRGKvIQ1OY9koYMSVNXMItVPYQS03esBXJuGKxwSo0+TCnCv/7eSeueZrKqRL1PRR8SZN1sZtQkJlEf3CSy4/AFrPyE3v7mnAyoaqdbp0mUh+3sV+oepV4dNLHWHIhMzg7kxbRyf4hDIzPx71ysOqDwlQH51ZKsuc7sVBbNwjslsFshXBtinOJQU8bgzAVe/7FA1YQdlyw3dRxQlsXNWxVs0IQaqog2nt+yYJ3eZmdcwb6ZfOy/NDGhR6ibSenXgki/naTtFvTbAfTHTiwwSe+BF2mTy8rpRmGNcvP/tAMwUirYrS1ZV2nlgjuZiFu3P7Q4VfBD+3rBpYYWJCipQrGZgdpk0r9DYEZa0QbZEb7DYio8Lw1n/vEaL0NfproR4ta5eclJoAJCR0AhEMp8dRFWMZ7kS53oNG3KzwUYU4lwmmP9y1LQDMJyei5ij6dSKE3zxebGO+enKbI/dCt89Ngj1l2fTkByNzmk2NiMulGojjjDHLg8vhkwrHsii4eo9PVxf5OQrneFiS8czq+8a7x+wc6FFrMFl1XhVD0KxtbhWw0BzfHeyj4DNq6ldhp/+ri/91uPYNfigJrO/IFTgB48kHxg0f4lcbX615vSyvLFPUpji5x3OopyfhosTGRl7BCgAY8AnuwUXzW9cp/Fu5mfs5jqn9d/mKUyda49Bbm7OOYs+MjTaI9FkZbPIcFOuLHDMd8TjUlvBE7wXLx6ZEjOdy47m2hdEJzNTnJskfz6Zyxk68eC+/1DHLhxEmILINNCuXG1xqTh7B/WIaBfv0KPJXNqDIekWmcWaJjgaxzO9l/1+FVqjFEFRumkGss=
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2799ee1-0ad5-43ad-e862-08db479ca586
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 03:57:12.0455
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14d13f80-91cc-4106-a97f-08db479d2a42
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2023 04:00:54.7242
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zD8bTBKqJeMxSQSleVi4MudW0N1EkOLzyTMe4FeIy7DZcchX9DgAitCMWGONCdAiCHmZhOcqZ7chplA3URZ8V+yb49oTR08TqoWLaHf1nWY=
+X-MS-Exchange-CrossTenant-userprincipalname: mqdB7J+k8re1fa0c4NavSmYAzcSSsPKA3M1hHzG0R+H+3GXqfWhrf2q8SXEvPdiGinvHqC8P8gMb8iyXiiOa2OBo5G+ZBdtWgVt0Rqh5LVk=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB8375
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Apr 21, 2023 / 09:03, Daniel Wagner wrote:
-> On Fri, Apr 21, 2023 at 08:33:46AM +0200, Hannes Reinecke wrote:
->  > +_nvme_calc_rand_io_size() {
-> > > +	local img_size_mb
-> > > +	local io_size_mb
-> > > +
-> > > +	img_size_mb=3D"$(convert_to_mb "$1")"
-> > > +	io_size_mb=3D"$(printf "%d" $((((img_size_mb * 1024 * 1024) / $(npr=
-oc) - 1) / 1024)))"
-> > > +
-> >=20
-> > ... ending with ridiculous small io sizes on machines with lots of CPUs=
-.
-> > Please cap nproc by something sane like 32.
+On Apr 21, 2023 / 08:05, Daniel Wagner wrote:
+> Introduce two new function to calculate the IO size for fio jobs.
 >=20
-> Yeah, propably not really good long time strategy. I was wondering if we =
-should
-> make run_fio() variants smarter and do the size callculation there and no=
-t by
-> the callee. If we do this, we could make the number of jobs dependend on =
-CPUs
-> and image size a bit nicer.
+> _nvme_calc_io_size() returns the jobs size for _run_fio_verify_io()
+> function. Reduce the max size of the job by one megabyte to make the
+> test more robust not to run out of space by accident. Note these fio
+> calls run with just one jobs.
 
-The usage of _run_fio_rand_io() look different for each test case. nvme/032
-kills the fio process when it is no longer required. Then IO size reduction=
- with
-_nvme_calc_io_size() will not reduce runtime of nvme/032. I think nvme/040 =
-has
-same story, since _nvme_delete_ctrl will stop the fio process with I/O erro=
-r.
+It is not clear for me what kind of issue happens without the 1MB decrement=
+.
+Could you share failure symptoms you observed?
 
-On the other hand, nvme/045 and nvme/047 may have different usage. I'm not =
-sure
-if these test case needs I/O with all CPUs. It would be better to have othe=
-r
-run_fio() variant as Daniel mentioned, so that their runtime will not depen=
-d on
-number of CPUs.=
+>=20
+> _nvme_calc_run_io_size() returns the jobs size for _run_fio_rand_io()
+> function. Again, the jobs size is not maxing out the space and most
+> important it takes the number of jobs into account which are
+> created (number of CPUs).
+
+This patch has two purposes, similar but different. It would be the better =
+to
+separate them.=
