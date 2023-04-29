@@ -2,101 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54CDBC77B60
-	for <linux-block@archiver.kernel.org>; Sat, 29 Apr 2023 01:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C44C8C77B60
+	for <linux-block@archiver.kernel.org>; Sat, 29 Apr 2023 02:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347235AbjD2BUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Apr 2023 21:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36972 "EHLO
+        id S1347088AbjD2CUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 22:20:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347049AbjD2BUm (ORCPT
+        with ESMTP id S1347078AbjD2CT7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2023 21:20:42 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5754F3584;
-        Fri, 28 Apr 2023 18:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BaIEj2paZYE/uU2XkcW2I8y0R+043vPSdJ9uniAsh0U=; b=Fu1HC8bUG02gPzRUECQ6ysoDOs
-        TKxxmHyyETr+yycfGwhDUSeMV9sMGtard9Y9x6iKaNQrEjTizdLrKfJqajF9FFqYC0FcARAJBzYa7
-        QmDsQyBNdOb1YuUCNd0jOstr5EUUo+rkNCx68RH6ucdm2kUyF+oMxXeeKPlKwzVpW0Vs2hPKvplhl
-        zBtm35j8R0bVRMTrCVHq8C/RgnPDcuECqaH7jXz7zqz1yCjsGcZrjUCYWzP4bIZvk1TGoHdLj7G7Z
-        Cb6pFJcswSczJFWlK1VT+VeMjZesZ6hXXpaiKMKi4EFId/Pr54k+/0BaupArt2vjbPiYkfYlfTNsz
-        jgLrdWuA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1psZG6-0059h2-19; Sat, 29 Apr 2023 01:20:18 +0000
-Date:   Sat, 29 Apr 2023 02:20:17 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Daniel Gomez <da.gomez@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 17/17] fs: add CONFIG_BUFFER_HEAD
-Message-ID: <ZExw0eW52lYj2R1m@casper.infradead.org>
-References: <20230424054926.26927-1-hch@lst.de>
- <20230424054926.26927-18-hch@lst.de>
- <ZExgzbBCbdC1y9Wk@bombadil.infradead.org>
+        Fri, 28 Apr 2023 22:19:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0462139
+        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 19:19:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682734743;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=bMurEh3aXJmDffGcx2DdPyzoHd2PXqMBG8UnbQY3qTE=;
+        b=LB+jy++xBEGsPy9KMNjGyaNUHqOzXS12XKE1140wbaUCyvYnfwF/B6qsXIVO3/jFG5+clS
+        u8d4l5aLuDd/Ke23DllZYLg3ylkaHie4cSKBPQFJPUsYkPRd+D8LM6uQDuFRTi5Kn0L86n
+        jr/Z47sPnW75wMscXqYamU3eZxOonvA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-322-zp_TC5w7P_2No_7sSNkuxA-1; Fri, 28 Apr 2023 22:18:59 -0400
+X-MC-Unique: zp_TC5w7P_2No_7sSNkuxA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07970185A790;
+        Sat, 29 Apr 2023 02:18:59 +0000 (UTC)
+Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BB5AB440BC;
+        Sat, 29 Apr 2023 02:18:52 +0000 (UTC)
+Date:   Sat, 29 Apr 2023 10:18:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        Bernd Schubert <bschubert@ddn.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Cc:     ming.lei@redhat.com, lsf-pc@lists.linux-foundation.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [LSF/MM/BPF TOPIC] ublk & io_uring: ublk zero copy support
+Message-ID: <ZEx+h/iFf46XiWG1@ovpn-8-24.pek2.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZExgzbBCbdC1y9Wk@bombadil.infradead.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 28, 2023 at 05:11:57PM -0700, Luis Chamberlain wrote:
-> [   11.245248] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [   11.254581] #PF: supervisor read access in kernel mode
-> [   11.257387] #PF: error_code(0x0000) - not-present page
-> [   11.260921] PGD 0 P4D 0
-> [   11.262600] Oops: 0000 [#1] PREEMPT SMP PTI
-> [   11.264993] CPU: 7 PID: 198 Comm: (udev-worker) Not tainted 6.3.0-large-block-20230426 #2
-> [   11.269385] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-debian-1.16.0-5 04/01/2014
-> [   11.275054] RIP: 0010:iomap_page_create.isra.0+0xc/0xd0
-> [   11.277924] Code: 41 5e 41 5f c3 cc cc cc cc 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 41 54 55 48 89 f5 53 <48> 8b 06 48 c1 e8 0d 89 c6 83 e6 01 0f 84 a1 00 00 00 4c 8b 65 28
-> [   11.287293] RSP: 0018:ffffb0f0805ef9d8 EFLAGS: 00010293
-> [   11.289964] RAX: ffff9de3c1fa8388 RBX: ffffb0f0805efa78 RCX: 000000037ffe0000
-> [   11.293212] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000000000d
-> [   11.296485] RBP: 0000000000000000 R08: 0000000000021000 R09: ffffffff9c733b20
-> [   11.299724] R10: 0000000000000001 R11: 000000000000c000 R12: 0000000000000000
-> [   11.302974] R13: ffffffff9be96260 R14: ffffb0f0805efa58 R15: 0000000000000000
+Hello,
 
-RSI is argument 2, which is folio.
+ublk zero copy is observed to improve big chunk(64KB+) sequential IO performance a
+lot, such as, IOPS of ublk-loop over tmpfs is increased by 1~2X[1], Jens also observed
+that IOPS of ublk-qcow2 can be increased by ~1X[2]. Meantime it saves memory bandwidth.
 
-Code starting with the faulting instruction
-===========================================
-   0:	48 8b 06             	mov    (%rsi),%rax
-   3:	48 c1 e8 0d          	shr    $0xd,%rax
+So this is one important performance improvement.
 
-Looks to me like a NULL folio was passed into iomap_page_create().
+So far there are three proposal:
 
-> [   11.306206] FS:  00007f03ea8368c0(0000) GS:ffff9de43bdc0000(0000) knlGS:0000000000000000
-> [   11.309949] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   11.312464] CR2: 0000000000000000 CR3: 0000000117ec6006 CR4: 0000000000770ee0
-> [   11.315442] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> [   11.318310] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> [   11.321010] PKRU: 55555554
-> [   11.322212] Call Trace:
-> [   11.323224]  <TASK>
-> [   11.324146]  iomap_readpage_iter+0x96/0x300
-> [   11.325694]  iomap_readahead+0x174/0x2d0
-> [   11.327129]  read_pages+0x69/0x1f0
-> [   11.329751]  page_cache_ra_unbounded+0x187/0x1d0
+1) splice based
 
-... that shouldn't be possible.  read_pages() allocates pages, puts them
-in the page cache and tells the filesystem to fill them in.
+- spliced page from ->splice_read() can't be written
 
-In your patches, did you call mapping_set_large_folios() anywhere?
+ublk READ request can't be handled because spliced page can't be written
+to, and extending splice for ublk zero copy isn't one good solution[3]
+
+- it is very hard to meet above requirements  wrt. request buffer lifetime
+
+splice/pipe focuses on page reference lifetime, but ublk zero copy pays more
+attention to ublk request buffer lifetime. If is very inefficient to respect
+request buffer lifetime by using all pipe buffer's ->release() which requires
+all pipe buffers and pipe to be kept when ublk server handles IO. That means
+one single dedicated ``pipe_inode_info`` has to be allocated runtime for each
+provided buffer, and the pipe needs to be populated with pages in ublk request
+buffer.
+
+IMO, it isn't one good way to take splice from both correctness and performance
+viewpoint.
+
+2) io_uring register buffer based
+
+- the main idea is to register one runtime buffer in fast io path, and
+  unregister it after the buffer is used by the following OPs
+
+- the main problem is that bad performance caused by io_uring link model
+
+registering buffer has to be one OP, same with unregistering buffer; the
+following normal OPs(such as FS IO) have to depend on the registering
+buffer OP, then io_uring link has to be used.
+
+It is normal to see more than one normal OPs which depend on the registering
+buffer OP, so all these OPs(registering buffer, normal (FS IO) OPs and
+unregistering buffer) have to be linked together, then normal(FS IO) OPs
+have to be submitted one by one, and this way is slow, because there is
+often no dependency among all these normal FS OPs. Basically io_uring
+link model does not support this kind of 1:N dependency.
+
+No one posted code for showing this approach yet.
+
+3) io_uring fused command[1]
+
+- fused command extend current io_uring usage by allowing submitting following
+FS OPs(called secondary OPs) after the primary command provides buffer, and
+primary command won't be completed until all secondary OPs are done.
+
+This way solves the problem in 2), and meantime avoids the buffer register cost in
+both submission and completion IO fast code path because the primary command won't
+be completed until all secondary OPs are done, so no need to write/read the
+buffer into per-context global data structure.
+
+Meantime buffer lifetime problem is addressed simply, so correctness gets guaranteed,
+and performance is pretty good, and even IOPS of 4k IO gets a little
+improved in some workloads, or at least no perf regression is observed
+for small size IO.
+
+fused command can be thought as one single request logically, just it has more
+than one SQE(all share same link flag), that is why is named as fused command.
+
+- the only concern is that fused command starts one use usage of io_uring, but
+still not see comments wrt. what/why is bad with this kind of new usage/interface.
+
+I propose this topic and want to discuss about how to move on with this
+feature.
+
+
+[1] https://lore.kernel.org/linux-block/20230330113630.1388860-1-ming.lei@redhat.com/
+[2] https://lore.kernel.org/linux-block/b3fc9991-4c53-9218-a8cc-5b4dd3952108@kernel.dk/
+[3] https://lore.kernel.org/linux-block/CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com/
+
+
+Thanks,
+Ming
 
