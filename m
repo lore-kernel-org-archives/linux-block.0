@@ -2,110 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B567C7EE22
-	for <linux-block@archiver.kernel.org>; Sat, 29 Apr 2023 05:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A617C77B7E
+	for <linux-block@archiver.kernel.org>; Sat, 29 Apr 2023 07:11:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230011AbjD2FL5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Apr 2023 01:11:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33864 "EHLO
+        id S229563AbjD2HLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Apr 2023 03:11:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229839AbjD2FL4 (ORCPT
+        with ESMTP id S229501AbjD2HLx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Apr 2023 01:11:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BC122709
-        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 22:11:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682745068;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2hAEIix55mQqheQ/XmVIMx3hso9fuBFFY9y7DgUUBM8=;
-        b=aWhgZgQsXpZ1sbwGWOidtFtqcOfsiUxEXutGUAfyu5kJymFytXPSLiwmw/jgnf+Spq9xvD
-        L68eeXFuB4KtDvpgYU/OX/JEIaR9X7gAx8/ovJuSZjsvEYy9O35SCI3FJfVy1c/E+j67FC
-        zLOj4iHsnD8OV1haQU0dBtNDEjnD4gE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-352-R6yLz9NvNsCULUVy6I_V-g-1; Sat, 29 Apr 2023 01:11:04 -0400
-X-MC-Unique: R6yLz9NvNsCULUVy6I_V-g-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6741F85A5B1;
-        Sat, 29 Apr 2023 05:11:02 +0000 (UTC)
-Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B6EE5400F4D;
-        Sat, 29 Apr 2023 05:10:54 +0000 (UTC)
-Date:   Sat, 29 Apr 2023 13:10:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Theodore Ts'o <tytso@mit.edu>, Baokun Li <libaokun1@huawei.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-ext4@vger.kernel.org,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Zhang Yi <yi.zhang@redhat.com>,
-        yangerkun <yangerkun@huawei.com>, ming.lei@redhat.com
-Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
-Message-ID: <ZEym2Yf1Ud1p+L3R@ovpn-8-24.pek2.redhat.com>
-References: <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
- <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
- <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
- <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
- <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
- <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
- <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com>
- <ZEtd6qZOgRxYnNq9@mit.edu>
- <ZEyL/sjVeW88XpIn@ovpn-8-24.pek2.redhat.com>
- <20230429044038.GA7561@lst.de>
+        Sat, 29 Apr 2023 03:11:53 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6F62D47;
+        Sat, 29 Apr 2023 00:11:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682752312; x=1714288312;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SFPEDZnozEBQlUD9/3iEWO9nIAGT61b+OuTn4t84e38=;
+  b=ZF17TsT0zEhegJhaRjs1+6Gkp5Cc07ehayIO8nu+i62ZwBG60Ivbrt0l
+   rn2pz50G9Y/EWyavTM7OxFWbBwAQvcDOBSlrBSRn8KB/CPVo30V5hNr+x
+   xa+BhNZiKmdDoe/sGbJBe88SA0K5FxQki+AUNEoptVl3leaBFjislX2s6
+   eux+BoyqFgefm5dTSYMQXcnzLIyE0tL4xgbgZXLgVnSjs6GJoHOmJSEN1
+   xz6F7i1SpXwVFHpw1sRP5xGIytcwVGkGAOi8MQwA+WhxdiaoGqSbzhl22
+   o7J2+Bvs5ePmZHqTKDTpNPYAj/EGUO1H3KYmWUCOeiY7iRprIT7edPXop
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="434212135"
+X-IronPort-AV: E=Sophos;i="5.99,236,1677571200"; 
+   d="scan'208";a="434212135"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2023 00:11:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="819296869"
+X-IronPort-AV: E=Sophos;i="5.99,236,1677571200"; 
+   d="scan'208";a="819296869"
+Received: from linux.bj.intel.com ([10.238.156.127])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2023 00:11:49 -0700
+Date:   Sat, 29 Apr 2023 15:10:12 +0800
+From:   Tao Su <tao1.su@linux.intel.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tj@kernel.org, josef@toxicpanda.com, yukuai1@huaweicloud.com
+Subject: Re: [PATCH v2] block: Skip destroyed blkg when restart in
+ blkg_destroy_all()
+Message-ID: <ZEzC1BAX7e7t8Jaj@linux.bj.intel.com>
+References: <20230428045149.1310073-1-tao1.su@linux.intel.com>
+ <168270266088.259022.9566325777722187933.b4-ty@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230429044038.GA7561@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+In-Reply-To: <168270266088.259022.9566325777722187933.b4-ty@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 29, 2023 at 06:40:38AM +0200, Christoph Hellwig wrote:
-> On Sat, Apr 29, 2023 at 11:16:14AM +0800, Ming Lei wrote:
-> > OK, looks both Dave and you have same suggestion, and IMO, it isn't hard to
-> > add one interface for notifying FS, and it can be either one s_ops->shutdown()
-> > or shutdown_filesystem(struct super_block *sb).
+On Fri, Apr 28, 2023 at 11:24:20AM -0600, Jens Axboe wrote:
 > 
-> It's not that simple.  You need to be able to do that for any device used
-> by a file system, not just s_bdev.  This means it needs go into ops
-> passed by the bdev owner, which is also needed to propagate this through
-> stackable devices.
+> On Fri, 28 Apr 2023 12:51:49 +0800, Tao Su wrote:
+> > Kernel hang in blkg_destroy_all() when total blkg greater than
+> > BLKG_DESTROY_BATCH_SIZE, because of not removing destroyed blkg in
+> > blkg_list. So the size of blkg_list is same after destroying a
+> > batch of blkg, and the infinite 'restart' occurs.
+> > 
+> > Since blkg should stay on the queue list until blkg_free_workfn(),
+> > skip destroyed blkg when restart a new round, which will solve this
+> > kernel hang issue and satisfy the previous will to restart.
+> > 
+> > [...]
+> 
+> Applied, thanks!
 
-Not sure if it is needed for non s_bdev , because FS is over stackable device
-directly. Stackable device has its own logic for handling underlying disks dead
-or deleted, then decide if its own disk needs to be deleted, such as, it is
-fine for raid1 to work from user viewpoint if one underlying disk is deleted.
+Axboe, thanks!
+
+Tao
 
 > 
-> I have some work on that, but the way how blkdev_get is called in the
-> generic mount helpers is a such a mess that I've not been happy with
-> the result yet.  Let me see if spending extra time with it will allow
-> me to come up with something that doesn't suck.
+> [1/1] block: Skip destroyed blkg when restart in blkg_destroy_all()
+>       commit: 8176080d59e6d4ff9fc97ae534063073b4f7a715
 > 
-> > But the main job should be how this interface is implemented in FS/VFS side,
-> > so it looks one more FS job, and block layer can call shutdown_filesystem()
-> > from del_gendisk() simply.
+> Best regards,
+> -- 
+> Jens Axboe
 > 
-> This needs to be called from blk_mark_disk_dead for drivers using that,
-> and from del_gendisk only if GD_DEAD isn't set yet.
-
-OK, looks you mean the API needs to be called before GD_DEAD is set,
-but I am wondering if it makes a difference, given device is already
-dead.
-
-
-Thanks,
-Ming
-
+> 
+> 
