@@ -2,140 +2,176 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C44C8C77B60
-	for <linux-block@archiver.kernel.org>; Sat, 29 Apr 2023 02:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C692CC77B61
+	for <linux-block@archiver.kernel.org>; Sat, 29 Apr 2023 03:17:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347088AbjD2CUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Apr 2023 22:20:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58902 "EHLO
+        id S1347134AbjD2DR1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Apr 2023 23:17:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347078AbjD2CT7 (ORCPT
+        with ESMTP id S230010AbjD2DRY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Apr 2023 22:19:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0462139
-        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 19:19:08 -0700 (PDT)
+        Fri, 28 Apr 2023 23:17:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD3D03C05
+        for <linux-block@vger.kernel.org>; Fri, 28 Apr 2023 20:16:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682734743;
+        s=mimecast20190719; t=1682738192;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=bMurEh3aXJmDffGcx2DdPyzoHd2PXqMBG8UnbQY3qTE=;
-        b=LB+jy++xBEGsPy9KMNjGyaNUHqOzXS12XKE1140wbaUCyvYnfwF/B6qsXIVO3/jFG5+clS
-        u8d4l5aLuDd/Ke23DllZYLg3ylkaHie4cSKBPQFJPUsYkPRd+D8LM6uQDuFRTi5Kn0L86n
-        jr/Z47sPnW75wMscXqYamU3eZxOonvA=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y8HvWUV5hy/kWDmDmtLLm7pt+PnVWNujp0CYMU9jQ6c=;
+        b=TFH4dBTr2UVR/J6/Cpj5SU95YBQG3+4Z1Z7Oaa4GGIPGC/rj1pZMr6r8OOePag734P2ms+
+        8cQ3h0Cr0mUDKFborkVU2S6itPjaPrLJpeuxfc9UYEetJuF5KmMPQ6gs/ZVAIzk/jyZr1W
+        XO4zlvFp/i5tzrR2T+qE2KOdivSWZoc=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-322-zp_TC5w7P_2No_7sSNkuxA-1; Fri, 28 Apr 2023 22:18:59 -0400
-X-MC-Unique: zp_TC5w7P_2No_7sSNkuxA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-571-ssp8t18XOjSZ-rjNIW5Xcw-1; Fri, 28 Apr 2023 23:16:28 -0400
+X-MC-Unique: ssp8t18XOjSZ-rjNIW5Xcw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07970185A790;
-        Sat, 29 Apr 2023 02:18:59 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C78AC811E7E;
+        Sat, 29 Apr 2023 03:16:27 +0000 (UTC)
 Received: from ovpn-8-24.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BB5AB440BC;
-        Sat, 29 Apr 2023 02:18:52 +0000 (UTC)
-Date:   Sat, 29 Apr 2023 10:18:47 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05C6D40F177;
+        Sat, 29 Apr 2023 03:16:19 +0000 (UTC)
+Date:   Sat, 29 Apr 2023 11:16:14 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Bernd Schubert <bschubert@ddn.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Cc:     ming.lei@redhat.com, lsf-pc@lists.linux-foundation.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [LSF/MM/BPF TOPIC] ublk & io_uring: ublk zero copy support
-Message-ID: <ZEx+h/iFf46XiWG1@ovpn-8-24.pek2.redhat.com>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Baokun Li <libaokun1@huawei.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-ext4@vger.kernel.org,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
+        yangerkun <yangerkun@huawei.com>, ming.lei@redhat.com
+Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Message-ID: <ZEyL/sjVeW88XpIn@ovpn-8-24.pek2.redhat.com>
+References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
+ <ZEny7Izr8iOc/23B@casper.infradead.org>
+ <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
+ <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
+ <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
+ <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
+ <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
+ <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
+ <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com>
+ <ZEtd6qZOgRxYnNq9@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+In-Reply-To: <ZEtd6qZOgRxYnNq9@mit.edu>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Fri, Apr 28, 2023 at 01:47:22AM -0400, Theodore Ts'o wrote:
+> On Fri, Apr 28, 2023 at 11:47:26AM +0800, Baokun Li wrote:
+> > Ext4 just detects I/O Error and remounts it as read-only, it doesn't know
+> > if the current disk is dead or not.
+> > 
+> > I asked Yu Kuai and he said that disk_live() can be used to determine
+> > whether
+> > a disk has been removed based on the status of the inode corresponding to
+> > the block device, but this is generally not done in file systems.
+> 
+> What really needs to happen is that del_gendisk() needs to inform file
+> systems that the disk is gone, so that the file system can shutdown
+> the file system and tear everything down.
 
-ublk zero copy is observed to improve big chunk(64KB+) sequential IO performance a
-lot, such as, IOPS of ublk-loop over tmpfs is increased by 1~2X[1], Jens also observed
-that IOPS of ublk-qcow2 can be increased by ~1X[2]. Meantime it saves memory bandwidth.
+OK, looks both Dave and you have same suggestion, and IMO, it isn't hard to
+add one interface for notifying FS, and it can be either one s_ops->shutdown()
+or shutdown_filesystem(struct super_block *sb).
 
-So this is one important performance improvement.
+But the main job should be how this interface is implemented in FS/VFS side,
+so it looks one more FS job, and block layer can call shutdown_filesystem()
+from del_gendisk() simply.
 
-So far there are three proposal:
+> 
+> disk_live() is relatively new; it was added in August 2021.  Back in
 
-1) splice based
+IO failure plus checking disk_live() could be one way for handling the
+failure, but this kind of interface isn't friendly.
 
-- spliced page from ->splice_read() can't be written
+> 2015, I had added the following in fs/ext4/super.c:
+> 
+> /*
+>  * The del_gendisk() function uninitializes the disk-specific data
+>  * structures, including the bdi structure, without telling anyone
+>  * else.  Once this happens, any attempt to call mark_buffer_dirty()
+>  * (for example, by ext4_commit_super), will cause a kernel OOPS.
+>  * This is a kludge to prevent these oops until we can put in a proper
+>  * hook in del_gendisk() to inform the VFS and file system layers.
+>  */
+> static int block_device_ejected(struct super_block *sb)
+> {
+> 	struct inode *bd_inode = sb->s_bdev->bd_inode;
+> 	struct backing_dev_info *bdi = inode_to_bdi(bd_inode);
+> 
+> 	return bdi->dev == NULL;
+> }
+> 
+> As the comment states, it's rather awkward to have the file system
+> check to see if the block device is dead in various places; the real
 
-ublk READ request can't be handled because spliced page can't be written
-to, and extending splice for ublk zero copy isn't one good solution[3]
+I can understand the awkward, :-(
 
-- it is very hard to meet above requirements  wrt. request buffer lifetime
+bdi_unregister() is called in del_gendisk(), since bdi_register() has
+to be called in add_disk() where major/minor is figured out.
 
-splice/pipe focuses on page reference lifetime, but ublk zero copy pays more
-attention to ublk request buffer lifetime. If is very inefficient to respect
-request buffer lifetime by using all pipe buffer's ->release() which requires
-all pipe buffers and pipe to be kept when ublk server handles IO. That means
-one single dedicated ``pipe_inode_info`` has to be allocated runtime for each
-provided buffer, and the pipe needs to be populated with pages in ublk request
-buffer.
+> problem is that the block device shouldn't just *vanish*, with the
 
-IMO, it isn't one good way to take splice from both correctness and performance
-viewpoint.
+That looks not realistic, removable disk can be gone any time, and device
+driver error handler often deletes disk as the last straw, and it shouldn't
+be hard to observe such error.
 
-2) io_uring register buffer based
+Also it is not realistic to wait until all openers closes the bdev, given
+it may wait forever.
 
-- the main idea is to register one runtime buffer in fast io path, and
-  unregister it after the buffer is used by the following OPs
+> block device structures egetting partially de-initialized, without the
+> block layer being polite enough to let the file system know.
 
-- the main problem is that bad performance caused by io_uring link model
+Block device & gendisk instance won't be gone if the bdev is opened, and
+I guess it is just few fields deinitialized, such as bdi->dev, bdi could be
+the only one used by FS code. 
 
-registering buffer has to be one OP, same with unregistering buffer; the
-following normal OPs(such as FS IO) have to depend on the registering
-buffer OP, then io_uring link has to be used.
+> 
+> > Those dirty pages that are already there are piling up and can't be
+> > written back, which I think is a real problem. Can the block layer
+> > clear those dirty pages when it detects that the disk is deleted?
+> 
+> Well, the dirty pages belong to the file system, and so it needs to be
+> up to the file system to clear out the dirty pages.  But I'll also
+> what the right thing to do when a disk gets removed is not necessarily
+> obvious.
 
-It is normal to see more than one normal OPs which depend on the registering
-buffer OP, so all these OPs(registering buffer, normal (FS IO) OPs and
-unregistering buffer) have to be linked together, then normal(FS IO) OPs
-have to be submitted one by one, and this way is slow, because there is
-often no dependency among all these normal FS OPs. Basically io_uring
-link model does not support this kind of 1:N dependency.
+Yeah, clearing dirty pages doesn't belong to block layer.
 
-No one posted code for showing this approach yet.
+> 
+> For example, suppose some process has a file mmap'ed into its address
+> space, and that file is on the disk which the user has rudely yanked
+> out from their laptop; what is the right thing to do?  Do we kill the
+> process?  Do we let the process write to the mmap'ed region, and
+> silently let the modified data go *poof* when the process exits?  What
+> if there is an executable file on the removable disk, and there are
+> one or more processes running that executable when the device
+> disappears?  Do we kill the process?  Do we let the process run unti
+> it tries to access a page which hasn't been paged in and then kill the
+> process?
+> 
+> We should design a proper solution for What Should Happen when a
+> removable disk gets removed unceremoniously without unmounting the
+> file system first.  It's not just a matter of making some tests go
+> green....
 
-3) io_uring fused command[1]
-
-- fused command extend current io_uring usage by allowing submitting following
-FS OPs(called secondary OPs) after the primary command provides buffer, and
-primary command won't be completed until all secondary OPs are done.
-
-This way solves the problem in 2), and meantime avoids the buffer register cost in
-both submission and completion IO fast code path because the primary command won't
-be completed until all secondary OPs are done, so no need to write/read the
-buffer into per-context global data structure.
-
-Meantime buffer lifetime problem is addressed simply, so correctness gets guaranteed,
-and performance is pretty good, and even IOPS of 4k IO gets a little
-improved in some workloads, or at least no perf regression is observed
-for small size IO.
-
-fused command can be thought as one single request logically, just it has more
-than one SQE(all share same link flag), that is why is named as fused command.
-
-- the only concern is that fused command starts one use usage of io_uring, but
-still not see comments wrt. what/why is bad with this kind of new usage/interface.
-
-I propose this topic and want to discuss about how to move on with this
-feature.
-
-
-[1] https://lore.kernel.org/linux-block/20230330113630.1388860-1-ming.lei@redhat.com/
-[2] https://lore.kernel.org/linux-block/b3fc9991-4c53-9218-a8cc-5b4dd3952108@kernel.dk/
-[3] https://lore.kernel.org/linux-block/CAHk-=wgJsi7t7YYpuo6ewXGnHz2nmj67iWR6KPGoz5TBu34mWQ@mail.gmail.com/
+Agree, the trouble is actually in how FS to handle the disk removal.
 
 
 Thanks,
