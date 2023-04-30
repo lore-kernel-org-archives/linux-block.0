@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F91C7EE21
-	for <linux-block@archiver.kernel.org>; Sun, 30 Apr 2023 14:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE2DC7EE26
+	for <linux-block@archiver.kernel.org>; Sun, 30 Apr 2023 14:36:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230167AbjD3OgL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Apr 2023 10:36:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45230 "EHLO
+        id S231166AbjD3OgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Apr 2023 10:36:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbjD3OgJ (ORCPT
+        with ESMTP id S231132AbjD3OgM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Apr 2023 10:36:09 -0400
+        Sun, 30 Apr 2023 10:36:12 -0400
 Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 322651BFF;
-        Sun, 30 Apr 2023 07:36:08 -0700 (PDT)
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-3f18335a870so8749075e9.0;
-        Sun, 30 Apr 2023 07:36:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CDCF30D7;
+        Sun, 30 Apr 2023 07:36:10 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-3f178da21afso9172355e9.1;
+        Sun, 30 Apr 2023 07:36:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682865366; x=1685457366;
+        d=1e100.net; s=20221208; t=1682865369; x=1685457369;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oWLOTplCTb15+ItkKDvIHTfyfj/21ATI17iwvK3v1Xg=;
-        b=ZcZOzGbkJXF5LW5q/EHlZ8fh89OGtTO7wulkA7CQqXwSKGUhfLtY5ESMCIO5I7ifFH
-         CcarFJkAT/EsvvPv62YeGTpCUNaBz1UyPHTt4mUxOGHr3FVnxn+G7Q+Xy53Jsb/nyneO
-         7nKjlxgwh1dRZtZIcsnNbPtWL740ZVOGMqSxO46Snd2HoCOOVhYMk8Mafia85JUJNdVB
-         snO9RpH1K6w+mIajBzhg8sVQH+nu640kT8/UVKJzoUyYplf3r6RNGYNYwjFdMS05Y19Q
-         3kX+RoE1dl09FBRPUi2tYT7ozAOGMXB3X+kYL6DLpKtwiem1JxV4dnAa5ZSSZlm3LLZr
-         G0GQ==
-X-Gm-Message-State: AC+VfDwgUZxKM6BHcx7co/0sDJeAp4S/tC3QrvTBFfVDUtkYcFthD+X6
-        sVTEdrBoK4c4rudaS2rzSqDhARe7yubXTQ==
-X-Google-Smtp-Source: ACHHUZ7nz6XoczydLlqmjutbUaDJZ83dYTS13ttqaBxRyVpkSJ5FOOZ5iNuc4pfoojqvCXwlaHRW7w==
-X-Received: by 2002:a5d:6a91:0:b0:2ff:460e:bb49 with SMTP id s17-20020a5d6a91000000b002ff460ebb49mr9833275wru.24.1682865365870;
-        Sun, 30 Apr 2023 07:36:05 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-020.fbsv.net. [2a03:2880:31ff:14::face:b00c])
-        by smtp.gmail.com with ESMTPSA id h7-20020a5d6e07000000b003048084a57asm16459222wrz.79.2023.04.30.07.36.05
+        bh=xYztlqpoEVeIHrKJhvcjUMJ8ItqPkXoCxbhVy1uECD8=;
+        b=FQI35MwBpoaVia+4InoU7iFGH9MbjnMNh19HXUIUbjQgPTNdh+/PCigiQnJytUH7Z+
+         JwOLkQHS+9EDDRBX/65+5ikKxwSW5ZN0MnT5UjG/LBJJGRrnMbzokVM7iH9B1Cgl5dkj
+         69uYXqNfkgJgSgPyN9UnOsVf/tEpQBTGGjT6u8HjhSYynIlh1t5Fucj6feb9gbDOhmd0
+         sBLo6UuU/6X4oi7LEBpaXKRAPV25G0fmAlugb20ZIBqhMlDIiw79Po2XxE2wSf5aglcE
+         9mN19nCqWSoDh1phrCcqbMJBKIHO4R7MxAs8z9PSvH1llCaFGsBu80qTAMx5U2GaAsUI
+         OEuQ==
+X-Gm-Message-State: AC+VfDzngnDd7RM/Kjwbo7mYWppmKC9R3l47+DtVW0T5AKQTPZF9KOYb
+        uOcyu8xoOPzxw76TS3xyB/kRrzrK3369nA==
+X-Google-Smtp-Source: ACHHUZ5664eOiLW3ZPACCqiNPyzg5aNNsS92B900veDjENR7znnwEFn7Tk4ea/zKV8HHvuHnyLT7PQ==
+X-Received: by 2002:a05:600c:3797:b0:3f2:5a60:a03e with SMTP id o23-20020a05600c379700b003f25a60a03emr8721130wmr.14.1682865368556;
+        Sun, 30 Apr 2023 07:36:08 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-026.fbsv.net. [2a03:2880:31ff:1a::face:b00c])
+        by smtp.gmail.com with ESMTPSA id g10-20020a7bc4ca000000b003f171234a08sm29747037wmk.20.2023.04.30.07.36.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Apr 2023 07:36:05 -0700 (PDT)
+        Sun, 30 Apr 2023 07:36:07 -0700 (PDT)
 From:   Breno Leitao <leitao@debian.org>
 To:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
         asml.silence@gmail.com, axboe@kernel.dk, ming.lei@redhat.com
 Cc:     leit@fb.com, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org, sagi@grimberg.me, joshi.k@samsung.com,
         hch@lst.de, kbusch@kernel.org
-Subject: [PATCH v3 1/4] io_uring: Create a helper to return the SQE size
-Date:   Sun, 30 Apr 2023 07:35:29 -0700
-Message-Id: <20230430143532.605367-2-leitao@debian.org>
+Subject: [PATCH v3 3/4] io_uring: Remove unnecessary BUILD_BUG_ON
+Date:   Sun, 30 Apr 2023 07:35:31 -0700
+Message-Id: <20230430143532.605367-4-leitao@debian.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230430143532.605367-1-leitao@debian.org>
 References: <20230430143532.605367-1-leitao@debian.org>
@@ -56,36 +56,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Create a simple helper that returns the size of the SQE. The SQE could
-have two size, depending of the flags.
+In the io_uring_cmd_prep_async() there is an unnecessary compilation time
+check to check if cmd is correctly placed at field 48 of the SQE.
 
-If IO_URING_SETUP_SQE128 flag is set, then return a double SQE,
-otherwise returns the sizeof of io_uring_sqe (64 bytes).
+This is unnecessary, since this check is already in place at
+io_uring_init():
+
+          BUILD_BUG_SQE_ELEM(48, __u64,  addr3);
+
+Remove it and the uring_cmd_pdu_size() function, which is not used
+anymore.
+
+Keith started a discussion about this topic in the following thread:
+Link: https://lore.kernel.org/lkml/ZDBmQOhbyU0iLhMw@kbusch-mbp.dhcp.thefacebook.com/
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- io_uring/io_uring.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ io_uring/uring_cmd.c | 3 ---
+ io_uring/uring_cmd.h | 8 --------
+ 2 files changed, 11 deletions(-)
 
-diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
-index 25515d69d205..259bf798a390 100644
---- a/io_uring/io_uring.h
-+++ b/io_uring/io_uring.h
-@@ -394,4 +394,14 @@ static inline void io_req_queue_tw_complete(struct io_kiocb *req, s32 res)
- 	io_req_task_work_add(req);
- }
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index a1be746cd009..743d1496431b 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -71,9 +71,6 @@ int io_uring_cmd_prep_async(struct io_kiocb *req)
+ 	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+ 	size_t size = uring_sqe_size(req->ctx);
  
-+/*
-+ * IORING_SETUP_SQE128 contexts allocate twice the normal SQE size for each
-+ * slot.
-+ */
-+static inline size_t uring_sqe_size(struct io_ring_ctx *ctx)
-+{
-+	if (ctx->flags & IORING_SETUP_SQE128)
-+		return 2 * sizeof(struct io_uring_sqe);
-+	return sizeof(struct io_uring_sqe);
-+}
- #endif
+-	BUILD_BUG_ON(uring_cmd_pdu_size(0) != 16);
+-	BUILD_BUG_ON(uring_cmd_pdu_size(1) != 80);
+-
+ 	memcpy(req->async_data, ioucmd->sqe, size);
+ 	ioucmd->sqe = req->async_data;
+ 	return 0;
+diff --git a/io_uring/uring_cmd.h b/io_uring/uring_cmd.h
+index 7c6697d13cb2..8117684ec3ca 100644
+--- a/io_uring/uring_cmd.h
++++ b/io_uring/uring_cmd.h
+@@ -3,11 +3,3 @@
+ int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags);
+ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
+ int io_uring_cmd_prep_async(struct io_kiocb *req);
+-
+-/*
+- * The URING_CMD payload starts at 'cmd' in the first sqe, and continues into
+- * the following sqe if SQE128 is used.
+- */
+-#define uring_cmd_pdu_size(is_sqe128)				\
+-	((1 + !!(is_sqe128)) * sizeof(struct io_uring_sqe) -	\
+-		offsetof(struct io_uring_sqe, cmd))
 -- 
 2.34.1
 
