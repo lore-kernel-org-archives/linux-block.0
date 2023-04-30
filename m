@@ -2,87 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CDDC7EE21
-	for <linux-block@archiver.kernel.org>; Sun, 30 Apr 2023 14:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E347C77B73
+	for <linux-block@archiver.kernel.org>; Sun, 30 Apr 2023 21:47:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbjD3OjQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Apr 2023 10:39:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48368 "EHLO
+        id S231829AbjD3VrM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Apr 2023 17:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjD3OjQ (ORCPT
+        with ESMTP id S230501AbjD3VrL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Apr 2023 10:39:16 -0400
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3E78101;
-        Sun, 30 Apr 2023 07:39:14 -0700 (PDT)
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-2f95231618aso895659f8f.1;
-        Sun, 30 Apr 2023 07:39:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682865553; x=1685457553;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        Sun, 30 Apr 2023 17:47:11 -0400
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45EC1E51
+        for <linux-block@vger.kernel.org>; Sun, 30 Apr 2023 14:47:08 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-54fc94476e2so25318797b3.1
+        for <linux-block@vger.kernel.org>; Sun, 30 Apr 2023 14:47:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1682891227; x=1685483227;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bysX9DvlsnqvSlQ+lvvjW3IO/Dqv4OjYEOFaq+KP4D8=;
-        b=Sb0L0kEqSpAHXhwPpscznp5A+Q+GcM6h2D0X4eg7VM3rmaMiTzpjTBRm5TKNiaSDFy
-         57mZspyPgoq33ZLef2hx7KZmqZ2hiWtTcg/rAePyWlUEdyb7mccOonuLbSJwxE0IsBkh
-         voxaI5j7PWxk80qj56TC+OFoxzL0UfcKZIGX8MgxsTqGPIFRNjGFn0B0gXJPwCgzdP5U
-         wD83dGykPELgx2trxK7FTcSV5TWkIctekvPilZiHzbiZitJNl6efL7B2By2bqi5hl7dr
-         ZBmj6LLyImZjSSahUrQUQe4ApRu8uYnTW0cTJzZclM6eMXJpQC1l/Vyl5F1go5ShaTdW
-         SeQg==
-X-Gm-Message-State: AC+VfDw7QxAa3Ackom6fpiN62ZfBUni2zpJRNQnUWMxie/S1COXAiAfV
-        aMIg1SPwmhhhLiMGRV/wkmc=
-X-Google-Smtp-Source: ACHHUZ5e0OtY5poBCehPnKMc5JRRNVd8ObeMJIGKcedG4iBnL2UBvGjYpiHz/JTGG1hUh7v+tsBQFA==
-X-Received: by 2002:adf:ec09:0:b0:2d5:39d:514f with SMTP id x9-20020adfec09000000b002d5039d514fmr8504393wrn.65.1682865553131;
-        Sun, 30 Apr 2023 07:39:13 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-004.fbsv.net. [2a03:2880:31ff:4::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d15-20020adfe84f000000b002fb60c7995esm26272127wrn.8.2023.04.30.07.39.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Apr 2023 07:39:12 -0700 (PDT)
-Date:   Sun, 30 Apr 2023 07:39:10 -0700
-From:   Breno Leitao <leitao@debian.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        asml.silence@gmail.com, leit@fb.com, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, sagi@grimberg.me, hch@lst.de,
-        kbusch@kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH v2 0/3] io_uring: Pass the whole sqe to commands
-Message-ID: <ZE59jseq/BwR7Ac5@gmail.com>
-References: <20230421114440.3343473-1-leitao@debian.org>
- <678232fa-fd02-37b7-3048-a124c4ffdc71@kernel.dk>
+        bh=3CCBo9acX629wUTWbYgO6PJPSdCs1aVlP/Jra4BC8lc=;
+        b=R+x/59M9qp8UonQFB6yAJM9fzbeBnIqbkZs3BiwzW+izc3wrD+66D3BSwauSYZj7s2
+         y98b78TC+/YzvW4g0sl7IWQO1GHyn+bzNn7OfaSNjDTVd7bdVjVY2NPV0R4zfoQn0I/S
+         FRcp8Uh1n+i+Ycr8zPmu9oXPBGNcTSW1r5b0aVlpt+Y5nAKfH8q4nnS78XIJJfofgsaB
+         yZiGFXuO2EvWOGQDl53MiiqKlZUGP34PXRrVnI0vSxQXKJyMH3dvLFnvLPBEpmRt7F1b
+         GlQbS05GxIgml0nPQmZ985G1VMQ7KklWFdJ6k4Y0V/1Cu3Ra1C4yFBJeF9WKO3MsbRR0
+         U4sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682891227; x=1685483227;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3CCBo9acX629wUTWbYgO6PJPSdCs1aVlP/Jra4BC8lc=;
+        b=hk5BR4wl5FJNxbMMnTVtGgDEbeX6wFGX7cMMVKFLxEUeXGEWWZXDklBxUILJOnn/ix
+         Nx1Alb01H2QAVlEBjXWHvdH75mRtgs5wEgF4rpWss3JzN61aXtiXmtWR7/tJgvpSK3j+
+         94fGlBbvLLXnDgntfrKm/qs4lBjp7VrD4U25I3s9V6wfpAggm0Jvo96M3jf4AjaB7yvH
+         n1iD91hnQRsBGy2Xe9z6nyW9PS1sh4iSLSmVjGHQun+vMxAFi1yeNG2SbyejuP9KfnvE
+         mkbnrA1PmynEUAfD2ibnfsNlSck1DWO4PuXpsHDKK6LYe7Hqg1DNGAbcytbA6iFq7JE2
+         MTgA==
+X-Gm-Message-State: AC+VfDw/TkZpwsUP1Rpxw/MSA4Ou3UTfkc04xc/rRQ+Ui0mztwzSOkIH
+        2yD+My7CoSvhgVgSmtxhnEAroyJE5estaUEbyBol
+X-Google-Smtp-Source: ACHHUZ7uG2q6MlFL1epYc1uO3KRpPD/VQJENnlUkGD9/HYCl3XiTRI1mhAKhCBQdAnHp74YqVuFqNRo399rfVfEO47c=
+X-Received: by 2002:a81:498b:0:b0:555:da78:c3e3 with SMTP id
+ w133-20020a81498b000000b00555da78c3e3mr12125307ywa.29.1682891227314; Sun, 30
+ Apr 2023 14:47:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <678232fa-fd02-37b7-3048-a124c4ffdc71@kernel.dk>
+References: <20230420215331.88326-1-junxiao.bi@oracle.com> <20230420215331.88326-2-junxiao.bi@oracle.com>
+ <05b3eebd-7a3f-13d5-1fe9-8f4ab3080521@oracle.com> <30ab7555-8f36-cfb7-9101-0ebb92af3c2f@kernel.dk>
+ <6300a33a-9d3d-42a2-d332-81e02d52d310@oracle.com> <CAHC9VhT2uCc5ePi+ung+rLaDiLCCCF=fjq8G+D3FJf0i4E8_hQ@mail.gmail.com>
+ <f016d747-c01a-c46e-59a7-13d0d6306827@oracle.com>
+In-Reply-To: <f016d747-c01a-c46e-59a7-13d0d6306827@oracle.com>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Sun, 30 Apr 2023 17:46:56 -0400
+Message-ID: <CAHC9VhSCjuJZ122EqdDxzJTU1tGq5nU_3+11WGKZ-WHjzU2FBw@mail.gmail.com>
+Subject: Re: [PATCH V4 2/2] blktrace: allow access trace file in lockdown mode
+To:     Junxiao Bi <junxiao.bi@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-block@vger.kernel.org,
+        nathanl@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
+        konrad.wilk@oracle.com, joe.jin@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Jens,
+On Fri, Apr 28, 2023 at 6:41=E2=80=AFPM Junxiao Bi <junxiao.bi@oracle.com> =
+wrote:
+> On 4/28/23 2:26 PM, Paul Moore wrote:
+> > On Wed, Apr 26, 2023 at 12:33=E2=80=AFPM Junxiao Bi <junxiao.bi@oracle.=
+com> wrote:
+> >> Paul,  do you have any other concerns regarding blktrace? As Jens
+> >> mentioned, blktrace just exported IO metadata to Userspace, those were
+> >> not security sensitive information.
+> > I think this version of the patchset is much better, thanks for your
+> > patience.  I don't have any further concerns, and since the lockdown
+> > LSM doesn't have a dedicated maintainer I think you should be all set
+> > from my perspective.
+>
+> Thanks a lot for the review.
+>
+> > Since there are no changes under security/, I'm assuming this will go
+> > in via the tracing tree?
+>
+> Should I notify some specific maintainer or mail list for merging?
 
-On Fri, Apr 28, 2023 at 11:28:14AM -0600, Jens Axboe wrote:
-> On 4/21/23 5:44?AM, Breno Leitao wrote:
-> > These three patches prepare for the sock support in the io_uring cmd, as
-> > described in the following RFC:
-> > 
-> > 	https://lore.kernel.org/lkml/20230406144330.1932798-1-leitao@debian.org/
-> > 
-> > Since the support linked above depends on other refactors, such as the sock
-> > ioctl() sock refactor[1], I would like to start integrating patches that have
-> > consensus and can bring value right now.  This will also reduce the patchset
-> > size later.
-> > 
-> > Regarding to these three patches, they are simple changes that turn
-> > io_uring cmd subsystem more flexible (by passing the whole SQE to the
-> > command), and cleaning up an unnecessary compile check.
-> > 
-> > These patches were tested by creating a file system and mounting an NVME disk
-> > using ubdsrv/ublkb0.
-> 
-> Looks mostly good to me, do agree with Christoph's comments on the two
-> patches. Can you spin a v3? Would be annoying to miss 6.4 with this, as
-> other things will be built on top of it.
+When in doubt, the scripts/get_maintainer.pl tool in the kernel
+sources can be helpful.
 
-Sure. I've just sent V3 with all the fixes discussed in this email
-thread.
+The results for the debugfs and relay files are fairly generic, but if
+you look at the results for the blktrace.c file you get a more
+reasonable list of maintainers and mailing lists.  I believe Jens has
+already commented on your patches at least once, I don't recall if the
+others have or not.  I see you've already CC'd the block mailing list,
+so that might be enough.
 
-Here is the link: https://lkml.org/lkml/2023/4/30/91
+Keep in mind that we are in the middle of a merge window so it is very
+possible this patch might not be merged in a working/next/etc. branch
+until after the merge window closes (every maintainer is a little bit
+different in this regard).
+
+--=20
+paul-moore.com
