@@ -2,89 +2,141 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F93DC77B61
-	for <linux-block@archiver.kernel.org>; Mon,  1 May 2023 16:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F5EC77B73
+	for <linux-block@archiver.kernel.org>; Mon,  1 May 2023 19:04:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232181AbjEAQiV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 May 2023 12:38:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54524 "EHLO
+        id S232434AbjEATEk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 May 2023 15:04:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232255AbjEAQiU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 12:38:20 -0400
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED41910D1
-        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 09:38:10 -0700 (PDT)
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1a6762fd23cso21996715ad.3
-        for <linux-block@vger.kernel.org>; Mon, 01 May 2023 09:38:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682959090; x=1685551090;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5gvDwSskIrgGYH9XtUvqkKfmxbJ3M2d9b3BcMuOD1CE=;
-        b=PbslFtULy2mJp/sYS3kXEJmaMTnpfnDTU7qEe1uD1i8wW/wZtsQjunhhABB5ZrKZ6x
-         fmM2uVOQGnc1qM+VHl4/Z0GrvP7FI+p3oc3S5zeAwvCdtshHrtYIVOS1N+k6LC8fXSs4
-         tRskYP62EkHCQYD2AWmtNRiBC6RlRR+cTi/b0K6CfGv8hYCHxeu7eiaRfUgOEVwAL5Rc
-         xxLw6aApBNwRrjopsLmKtcOAJX1iJ8LBIfl57XTKBq4weV/BSGHuyOBh0+L+CgGL9jWz
-         YRVa+DnRXaO+MWABcBTqSQ1CP4dKltKsXDYjDdfngTPPcvI83jECj/HzaXKWdZxfRX92
-         WBsw==
-X-Gm-Message-State: AC+VfDznosrvtCMy6MKJY4Cjg/UdNcBJmMiIDIpQ6Zdtd8QOUSOc++Rp
-        2ifPDygO0nj5m7xZOamwOOKbmWFqlwg=
-X-Google-Smtp-Source: ACHHUZ4KMKazWk2BOvnSSkTg98M3TDMBDLUBySoq/GUE0j9i4itb8ZQg6TWVMQthBFZgUm5v2zaexA==
-X-Received: by 2002:a17:902:f54d:b0:1a1:e01e:7279 with SMTP id h13-20020a170902f54d00b001a1e01e7279mr16795909plf.4.1682959090290;
-        Mon, 01 May 2023 09:38:10 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:eba5:79b2:92dd:67e? ([2620:15c:211:201:eba5:79b2:92dd:67e])
-        by smtp.gmail.com with ESMTPSA id g13-20020a170902868d00b001a221d14179sm18033074plo.302.2023.05.01.09.38.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 May 2023 09:38:09 -0700 (PDT)
-Message-ID: <a8064311-1e5a-936f-8517-e84a23a8876e@acm.org>
-Date:   Mon, 1 May 2023 09:38:07 -0700
+        with ESMTP id S231397AbjEATEi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 15:04:38 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C534A1706
+        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 12:04:33 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230501190429epoutp01289018920b54a421ace2152ea91d1a9d~bGlxGBjBT0882508825epoutp013
+        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 19:04:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230501190429epoutp01289018920b54a421ace2152ea91d1a9d~bGlxGBjBT0882508825epoutp013
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1682967869;
+        bh=id3BHKuHqvLmovPHVR4+pTpMJckMkvKSwTgE1pWDsCw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=vdmFdlS2npqemW6XHJSAaelT+MehotTXd72oQNFx/CiCwVSN6mJdR3fTW0xknmg9n
+         DH0zOo2m+qdrGsw6lGheb2s6Bq9HZ3JLuKSuDe57wJHd03m8g8UB3JsawTVN2n+y6a
+         PzGE4U4X1Vui+qBciRcFF/7J1Gj93u0seDP0xAl4=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230501190428epcas5p3d768e318498c96b1246d3de4a7f2c1df~bGlwjjZIm2511425114epcas5p30;
+        Mon,  1 May 2023 19:04:28 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.182]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4Q9CLg3zlhz4x9Pq; Mon,  1 May
+        2023 19:04:27 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        14.A4.55646.B3D00546; Tue,  2 May 2023 04:04:27 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230501190427epcas5p20862d47d222f96f3945f05b0b05df490~bGlu-Ir3y1543115431epcas5p2m;
+        Mon,  1 May 2023 19:04:27 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230501190427epsmtrp2ed8ddb5f30f76986cb908b2bcb2805b9~bGlu_cs600276002760epsmtrp2f;
+        Mon,  1 May 2023 19:04:27 +0000 (GMT)
+X-AuditID: b6c32a4b-913ff7000001d95e-3d-64500d3bd599
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DD.03.28392.A3D00546; Tue,  2 May 2023 04:04:26 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230501190425epsmtip10390f01e40d5ecd369858828a534d34b~bGltp-Rg30863008630epsmtip16;
+        Mon,  1 May 2023 19:04:25 +0000 (GMT)
+Date:   Tue, 2 May 2023 00:31:28 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Keith Busch <kbusch@meta.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de, xiaoguang.wang@linux.alibaba.com,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [RFC 0/3] nvme uring passthrough diet
+Message-ID: <20230501190109.GA14341@green245>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH blktests] common/rc: fix kernel version parse failure
-Content-Language: en-US
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-References: <20230501041415.49939-1-shinichiro.kawasaki@wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230501041415.49939-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20230501153306.537124-1-kbusch@meta.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEJsWRmVeSWpSXmKPExsWy7bCmuq41b0CKwf8FMhar7/azWaxcfZTJ
+        YtKha4wWZ64uZLHYe0vbYv6yp+wWm/6eZHJg97h8ttRj06pONo+dDy09Ni+p99h9s4HN49zF
+        Co/Pm+QC2KOybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTd
+        MnOAblFSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFJgU6BUn5haX5qXr5aWWWBka
+        GBiZAhUmZGc0T7zPVvCTs2Li9cUsDYx7OLoYOTgkBEwkLu+o6GLk4hAS2M0ocePDalYI5xOj
+        xNK3U1kgnM+MEosOXmLuYuQE62hc/R2qahejxIKz2xghnGeMEj3/fzKBVLEIqEhMmvGWHWQH
+        m4CmxIXJpSBhEQFFifPAQACpZxZYzCjR8W4uK0hCWMBI4mTDHmaQel4BXYm33fYgYV4BQYmT
+        M5+wgNicAmYSXf3/wY4QFVCWOLDtOBPIHAmBRg6JiX93sEH84yKxe4YbxKHCEq+Ob2GHsKUk
+        Pr/bywZhJ0tcmnmOCcIukXi85yCUbS/ReqofbD6zQIbEy8O9UDafRO/vJ0wQ43klOtqEIMoV
+        Je5NesoKYYtLPJyxBMr2kNh3YzM7JEg6GSWOPfrNNoFRbhaSd2YhWQFhW0l0fmhinQW0gllA
+        WmL5Pw4IU1Ni/S79BYysqxglUwuKc9NTi00LjPNSy+FRnJyfu4kRnDi1vHcwPnrwQe8QIxMH
+        4yFGCQ5mJRHeD4V+KUK8KYmVValF+fFFpTmpxYcYTYGxM5FZSjQ5H5i680riDU0sDUzMzMxM
+        LI3NDJXEedVtTyYLCaQnlqRmp6YWpBbB9DFxcEo1MG2w09msx7j11/GjtmGld/SWTfZIKl0e
+        xaCiPa3m06H2x1/mXVuiW/hTRfn82do32vvnR0dfaVPIiFKosbh/7XLcuSbuMNEIzjsry5tY
+        1mwv/FaR5vh4f1bcnj4tjfmN6mw9MvfnxktbhH77yP5q2yfvdwfVPi/4u0cjt9fZ+LFO4IqU
+        iBM9nnsW1C7M8+lUqNY5+bzfm+eOnGN4oE81R9jGe3O7Z/2I1bRRkTui8iDT/cuec/+5Alpv
+        edZYW6jbvJNIZzE/dohvTUes8K/PR96lp79dwtZRX/Nj78TjGWKLxXa4frmRUv1gs6n/aaFp
+        2RrPfB7NOLzkcZ7QJ8b+/1e6j1ZcunEuZfokm7rfekosxRmJhlrMRcWJAGS3uYMlBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrILMWRmVeSWpSXmKPExsWy7bCSnK4Vb0CKQfc+G4vVd/vZLFauPspk
+        MenQNUaLM1cXsljsvaVtMX/ZU3aLTX9PMjmwe1w+W+qxaVUnm8fOh5Yem5fUe+y+2cDmce5i
+        hcfnTXIB7FFcNimpOZllqUX6dglcGRM3/mUrWM1e8fXkFNYGxg62LkZODgkBE4nG1d9ZQWwh
+        gR2MEve2FkHExSWar/1gh7CFJVb+ew5kcwHVPGGUuH/1GgtIgkVARWLSjLdACQ4ONgFNiQuT
+        S0HCIgKKEueBDgGpZxZYzCixsfMvI0hCWMBI4mTDHmaQel4BXYm33fYQMzsZJW5uWws2k1dA
+        UOLkzCdgNrOAmcS8zQ/B6pkFpCWW/+MACXMChbv6/zOD2KICyhIHth1nmsAoOAtJ9ywk3bMQ
+        uhcwMq9ilEwtKM5Nzy02LDDKSy3XK07MLS7NS9dLzs/dxAiOBS2tHYx7Vn3QO8TIxMF4iFGC
+        g1lJhPdDoV+KEG9KYmVValF+fFFpTmrxIUZpDhYlcd4LXSfjhQTSE0tSs1NTC1KLYLJMHJxS
+        DUxGK4+/zHG/c/OPwlRzVsm6+wbrDM65PmWNql92Ty5s3Xe/jK0rqiQZF3d6GM9UXKy3hvv6
+        kX5l3wVKhocEipfxcO0Q+/mrK1XEJen67VvS3dMkmZKOcC720DOWSXbcLqjJJnnM1+CzYuGR
+        3zzii8NPsrM88MiRFJ/5uXhF6LmK/tAI9vAjlxpSckPaYudum3Ozwr+h4q2r/5WFATxXuYw2
+        8wl01Mtxz/15nIFpW6Ezz279ZfJc+eEzptub8S2b8uz65e2b2j7t3rGH5bht2w6JggkLtmQp
+        vzW7wL3ItVv7S3RYeXRmobBGSC1fKZM+Z9tUmQMFE+Q32q8WX5cpYNvfttcsuF5P/KBr7V9j
+        JZbijERDLeai4kQARLdsdvQCAAA=
+X-CMS-MailID: 20230501190427epcas5p20862d47d222f96f3945f05b0b05df490
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b357_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230501154403epcas5p388c607114ad6f9d20dfd3ec958d88947
+References: <CGME20230501154403epcas5p388c607114ad6f9d20dfd3ec958d88947@epcas5p3.samsung.com>
+        <20230501153306.537124-1-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/30/23 21:14, Shin'ichiro Kawasaki wrote:
-> When kernel version numbers have postfix letters, _have_fio_ver fail to
-> parse the version. For example, uname -r returns "6.3.0+", it handles
-> "0+" as a number and fails to parse. Fix it by dropping all letters
-> other than numbers or period.
-> 
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->   common/rc | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/common/rc b/common/rc
-> index af4c0b1..525867c 100644
-> --- a/common/rc
-> +++ b/common/rc
-> @@ -207,7 +207,7 @@ _have_kernel_option() {
->   _have_kver() {
->   	local d=$1 e=$2 f=$3
->   
-> -	IFS='.' read -r a b c < <(uname -r | sed 's/-.*//')
-> +	IFS='.' read -r a b c < <(uname -r | sed 's/-.*//' | sed 's/[^.0-9]//')
->   	if [ $((a * 65536 + b * 256 + c)) -lt $((d * 65536 + e * 256 + f)) ];
->   	then
->   		SKIP_REASONS+=("Kernel version too old")
+------PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b357_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Please combine the two sed statements into a single sed statement, e.g. as
-follows:
+On Mon, May 01, 2023 at 08:33:03AM -0700, Keith Busch wrote:
+>From: Keith Busch <kbusch@kernel.org>
+>
+>When you disable all the optional features in your kernel config and
+>request queue, it looks like the normal request dispatching is just as
+>fast as any attempts to bypass it. 
 
-sed 's/-.*//;s/[^.0-9]//'
+Did a quick run, and it is not the case.
+For that workload [1], this one moves to 3.4M from 3M.
+While pure bypass moved to 5M from 3M. Maybe it could have gone higher
+than 5M (which was the HW limit); have not checked that part yet.
 
-Thanks,
+[1]
+# t/io_uring -b512 -d64 -c2 -s2 -p1 -F1 -B1 -O0 -n1 -u1 -r4 -k0 /dev/ng0n1
+submitter=0, tid=2935, file=/dev/ng0n1, node=-1
+polled=1, fixedbufs=1/0, register_files=1, buffered=1, register_queues=0 QD=64
+Engine=io_uring, sq_ring=64, cq_ring=64
+IOPS=3.31M, BW=1616MiB/s, IOS/call=2/1
+IOPS=3.36M, BW=1642MiB/s, IOS/call=2/2
+IOPS=3.40M, BW=1661MiB/s, IOS/call=2/1
+Exiting on timeout
+Maximum IOPS=3.40M
 
-Bart.
+------PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b357_
+Content-Type: text/plain; charset="utf-8"
+
+
+------PdhGkLDwNmEstpipWwkisvJIpjwP47YWkcBE-d9KzOb1cur7=_5b357_--
