@@ -2,47 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E732DC77B73
-	for <linux-block@archiver.kernel.org>; Mon,  1 May 2023 04:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23ADDC77B73
+	for <linux-block@archiver.kernel.org>; Mon,  1 May 2023 04:47:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230361AbjEAEhq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 May 2023 00:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36888 "EHLO
+        id S229921AbjEAEru (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 May 2023 00:47:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229909AbjEAEhp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 00:37:45 -0400
+        with ESMTP id S229482AbjEAErt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 00:47:49 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B4CC10C4
-        for <linux-block@vger.kernel.org>; Sun, 30 Apr 2023 21:37:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A58BDE;
+        Sun, 30 Apr 2023 21:47:48 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8B61268B05; Mon,  1 May 2023 06:37:40 +0200 (CEST)
-Date:   Mon, 1 May 2023 06:37:40 +0200
+        id D5EBC68B05; Mon,  1 May 2023 06:47:44 +0200 (CEST)
+Date:   Mon, 1 May 2023 06:47:44 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH v3 8/9] block: mq-deadline: Handle requeued requests
- correctly
-Message-ID: <20230501043740.GC19847@lst.de>
-References: <20230424203329.2369688-1-bvanassche@acm.org> <20230424203329.2369688-9-bvanassche@acm.org> <20230428055443.GI8549@lst.de> <05a7d0cb-44c9-cb2f-12c2-957123e031d5@acm.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+        Baokun Li <libaokun1@huawei.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-ext4@vger.kernel.org,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Zhang Yi <yi.zhang@redhat.com>,
+        yangerkun <yangerkun@huawei.com>
+Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Message-ID: <20230501044744.GA20056@lst.de>
+References: <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com> <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com> <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com> <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com> <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com> <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com> <ZEtd6qZOgRxYnNq9@mit.edu> <ZEyL/sjVeW88XpIn@ovpn-8-24.pek2.redhat.com> <20230429044038.GA7561@lst.de> <ZEym2Yf1Ud1p+L3R@ovpn-8-24.pek2.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <05a7d0cb-44c9-cb2f-12c2-957123e031d5@acm.org>
+In-Reply-To: <ZEym2Yf1Ud1p+L3R@ovpn-8-24.pek2.redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 28, 2023 at 10:03:45AM -0700, Bart Van Assche wrote:
-> Because the blk_rq_zone_no() definition is surrounded with #ifdef 
-> CONFIG_BLK_DEV_ZONED / #endif. Without the #ifdef the above code would 
-> trigger a compilation error with CONFIG_BLK_DEV_ZONED=n. I have considered 
-> to add a definition of blk_rq_zone_no() for CONFIG_BLK_DEV_ZONED=n. I 
-> prefer not to do this because I think it's better to cause a compiler error 
-> if blk_rq_zone_no() is used in code that is also used for the 
-> CONFIG_BLK_DEV_ZONED=n case.
+On Sat, Apr 29, 2023 at 01:10:49PM +0800, Ming Lei wrote:
+> Not sure if it is needed for non s_bdev
 
-Ok.
+So you don't want to work this at all for btrfs?  Or the XFS log device,
+or ..
+
+> , because FS is over stackable device
+> directly. Stackable device has its own logic for handling underlying disks dead
+> or deleted, then decide if its own disk needs to be deleted, such as, it is
+> fine for raid1 to work from user viewpoint if one underlying disk is deleted.
+
+We still need to propagate the even that device has been removed upwards.
+Right now some file systems (especially XFS) are good at just propagating
+it from an I/O error.  And explicity call would be much better.
