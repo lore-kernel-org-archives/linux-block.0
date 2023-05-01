@@ -2,117 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D3AC77B7C
-	for <linux-block@archiver.kernel.org>; Mon,  1 May 2023 15:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E626EC77B73
+	for <linux-block@archiver.kernel.org>; Mon,  1 May 2023 15:46:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232570AbjEAPdb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 May 2023 11:33:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56196 "EHLO
+        id S232822AbjEAPq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 May 2023 11:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232556AbjEAPda (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 11:33:30 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD7910E9
-        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 08:33:25 -0700 (PDT)
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34146sFn005201
-        for <linux-block@vger.kernel.org>; Mon, 1 May 2023 08:33:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=zN8/BtsC/plhymDR0YrBtDqGFWFnMyTPOQP4TEUp75M=;
- b=S6ViWi9cUN+4SgBa2tW65yG8O+QQIE2M56i9br1p8gVXJgHHoJHN3aUBlL2PQ7aAPPP6
- mT7ZGljVKdOn9WibudbrkVZCkaQxyY8EAyDMNA42wy1uyArfFc3aJvsIoIodSMqITQh8
- IKYDAhYwvvIhHpBjJuZhPL1ftTboUiBFMHv7LqnNzRxS8w/8MwUBwvfeG1FHTwWV9F71
- Z+9KcCFMZPAAvFbvxLzYl1MlFjmqPkHa0ElSrgiwXPf2T/UnolqDbyfz3mWg84WlPYHQ
- QGDpoLGLuR0au6iEb7zKgZrIbIXPT6vhqoLtEqURZPvYZe6kA4Pq2bUOJf2gO6yOSwV7 uQ== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3q923huhsd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 01 May 2023 08:33:24 -0700
-Received: from twshared25760.37.frc1.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:82::d) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Mon, 1 May 2023 08:33:23 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 46DA71777ADBD; Mon,  1 May 2023 08:33:07 -0700 (PDT)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <joshi.k@samsung.com>, <axboe@kernel.dk>, <hch@lst.de>,
-        <xiaoguang.wang@linux.alibaba.com>
-CC:     Keith Busch <kbusch@kernel.org>
-Subject: [RFC 1/3] nvme: skip block cgroups for passthrough commands
-Date:   Mon, 1 May 2023 08:33:04 -0700
-Message-ID: <20230501153306.537124-2-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230501153306.537124-1-kbusch@meta.com>
-References: <20230501153306.537124-1-kbusch@meta.com>
+        with ESMTP id S232060AbjEAPq1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 11:46:27 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94A53BC;
+        Mon,  1 May 2023 08:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=1MUFWRQzN2U7B9NovRPIUdnOItgaF2BM1nA/v8zJpK0=; b=ZaYHCOGzMIq2mcPn5wQKmGHwqc
+        dEaQSi8ys2wSEWQrqILZhJ2E3A5yM+ZBDgUmG4S1N/wj6Iqje0McnUMuERPO4Cm38WIS/MBxM3rwh
+        I8qJ2kkdbPvv/cgRTjGc/qugwfraL2/bDWcH697S80ypbfipuIuTB4vHRmbpbSJ/0h1rlcZ0n6Oga
+        f78qWjBf+nRjYL+b87AUjZ88xZZSzlYC+e+nEJYVSzyI3caXusPZt8MNxLpC34ZSXYjRTYEVBiqIH
+        yHgXirJrykwoZHkRDNMuK1Q2zhGhTljIDoMOrmEL+wFzEVnpwKbugMpon2NXMzkmZMpdG/f7BkzP2
+        DsjSuXIw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ptVj9-007SZI-Oz; Mon, 01 May 2023 15:46:11 +0000
+Date:   Mon, 1 May 2023 16:46:11 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Daniel Gomez <da.gomez@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 17/17] fs: add CONFIG_BUFFER_HEAD
+Message-ID: <ZE/ew1VpU/a1gqQP@casper.infradead.org>
+References: <20230424054926.26927-1-hch@lst.de>
+ <20230424054926.26927-18-hch@lst.de>
+ <ZExgzbBCbdC1y9Wk@bombadil.infradead.org>
+ <ZExw0eW52lYj2R1m@casper.infradead.org>
+ <ZE8ue9Mx6n2T0yn6@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: qJV3Dw-GEZvqyhy7HA0wpv6y3yLiTHk6
-X-Proofpoint-ORIG-GUID: qJV3Dw-GEZvqyhy7HA0wpv6y3yLiTHk6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-01_08,2023-04-27_01,2023-02-09_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZE8ue9Mx6n2T0yn6@bombadil.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On Sun, Apr 30, 2023 at 08:14:03PM -0700, Luis Chamberlain wrote:
+> On Sat, Apr 29, 2023 at 02:20:17AM +0100, Matthew Wilcox wrote:
+> > > [   11.322212] Call Trace:
+> > > [   11.323224]  <TASK>
+> > > [   11.324146]  iomap_readpage_iter+0x96/0x300
+> > > [   11.325694]  iomap_readahead+0x174/0x2d0
+> > > [   11.327129]  read_pages+0x69/0x1f0
+> > > [   11.329751]  page_cache_ra_unbounded+0x187/0x1d0
+> > 
+> > ... that shouldn't be possible.  read_pages() allocates pages, puts them
+> > in the page cache and tells the filesystem to fill them in.
+> > 
+> > In your patches, did you call mapping_set_large_folios() anywhere?
+> 
+> No but the only place to add that would be in the block cache. Adding
+> that alone to the block cache doesn't fix the issue. The below patch
+> however does get us by.
 
-Passthrough requests don't go through the submit_bio() path, so all the
-overhead of setting up the bio's cgroup is wasted cycles. Provide a path
-to skip this setup.
+That's "working around the error", not fixing it ... probably the same
+root cause as your other errors; at least I'm not diving into them until
+the obvious one is fixed.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/nvme/host/ioctl.c | 2 +-
- include/linux/bio.h       | 7 ++++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+> >From my readings it does't seem like readahead_folio() should always
+> return non-NULL, and also I couldn't easily verify the math is right.
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index d24ea2e051564..3804e5205b42b 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -192,7 +192,7 @@ static int nvme_map_user_request(struct request *req,=
- u64 ubuffer,
- 		goto out;
- 	bio =3D req->bio;
- 	if (bdev)
--		bio_set_dev(bio, bdev);
-+		__bio_set_dev(bio, bdev);
-=20
- 	if (bdev && meta_buffer && meta_len) {
- 		meta =3D nvme_add_user_metadata(req, meta_buffer, meta_len,
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d766be7152e15..bf003412653dc 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -509,12 +509,17 @@ static inline void bio_clone_blkg_association(struc=
-t bio *dst,
- 					      struct bio *src) { }
- #endif	/* CONFIG_BLK_CGROUP */
-=20
--static inline void bio_set_dev(struct bio *bio, struct block_device *bde=
-v)
-+static inline void __bio_set_dev(struct bio *bio, struct block_device *b=
-dev)
- {
- 	bio_clear_flag(bio, BIO_REMAPPED);
- 	if (bio->bi_bdev !=3D bdev)
- 		bio_clear_flag(bio, BIO_BPS_THROTTLED);
- 	bio->bi_bdev =3D bdev;
-+}
-+
-+static inline void bio_set_dev(struct bio *bio, struct block_device *bde=
-v)
-+{
-+	__bio_set_dev(bio, bdev);
- 	bio_associate_blkg(bio);
- }
-=20
---=20
-2.34.1
+readahead_folio() always returns non-NULL.  That's guaranteed by how
+page_cache_ra_unbounded() and page_cache_ra_order() work.  It allocates
+folios, until it can't (already-present folio, ENOMEM, EOF, max batch
+size) and then calls the filesystem to make those folios uptodate,
+telling it how many folios it put in the page cache, where they start.
 
+Hm.  The fact that it's coming from page_cache_ra_unbounded() makes
+me wonder if you updated this line:
+
+                folio = filemap_alloc_folio(gfp_mask, 0);
+
+without updating this line:
+
+                ractl->_nr_pages++;
+
+This is actually number of pages, not number of folios, so needs to be
+		ractl->_nr_pages += 1 << order;
+
+various other parts of page_cache_ra_unbounded() need to be examined
+carefully for assumptions of order-0; it's never been used for that
+before.  all the large folio work has concentrated on
+page_cache_ra_order()
