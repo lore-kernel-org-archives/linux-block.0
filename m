@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1084C77B7E
-	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 15:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F05ACC77B7E
+	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 16:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234470AbjEBP76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 May 2023 11:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
+        id S230332AbjEBQ0C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 May 2023 12:26:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234693AbjEBP7u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 11:59:50 -0400
+        with ESMTP id S233992AbjEBQ0B (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 12:26:01 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE941997;
-        Tue,  2 May 2023 08:59:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F49E45;
+        Tue,  2 May 2023 09:25:59 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D98061FD72;
-        Tue,  2 May 2023 15:59:47 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 651991FD81;
+        Tue,  2 May 2023 16:25:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683043187; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1683044758; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=K1utLzmHsMkc77b/rZG5l9bAIP83HIHK1q56lBCBh68=;
-        b=q4JE4PMVUMYIh9YxHKlcJ0852aU/Y8LMfQK9tqHPT6u+KcUYZEuYTd3DTSsp0OCw+6S8he
-        qijqwFwvn5FTZfRoDfumxWOBdyhZ/cuNVBeYLMjwzJwOI5H1VTWNg8ERp4DqtEn5XmOqdi
-        rB77lSfgvjxaPdWE59gSyph61eNfeLQ=
+        bh=Vb0KgKixe92s8BQWHemnh1NGhiatOTvEhvbYfP3HRkQ=;
+        b=MXrHN+ce07FTeyxXglGyD//OK1qa1dBWw51d02TISaosK3NzQGXwiOzCr58kQ7R0pQ7iOo
+        wXspw/vZGdkdImkA9gZOZvPX4DYvH0VQyvO+kip/KyRuuOaLNnMzG9kjyjY4JpEvnl1up/
+        bgGcpARDwBd+kCG+la0010xN2xnasbU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683043187;
+        s=susede2_ed25519; t=1683044758;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=K1utLzmHsMkc77b/rZG5l9bAIP83HIHK1q56lBCBh68=;
-        b=ZBH8RB3YLCd8fdbO+LsXEvmiV5vdSBFLaWAhS9tcSvUJ9B5BEUBmC/qeXDg/Sf8j+YDr1t
-        vvhaMgzhFH0nZEAQ==
+        bh=Vb0KgKixe92s8BQWHemnh1NGhiatOTvEhvbYfP3HRkQ=;
+        b=X8xiyT4DM4Fd3D2yMTjRY+IMI/To176f3KySmAywuLccMV9+k9HkeoVuNDsFxgAgTF6Cgf
+        fjWqnZJM7Mx4ejDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CA5C5134FB;
-        Tue,  2 May 2023 15:59:47 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 57055139C3;
+        Tue,  2 May 2023 16:25:58 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id fQ1kMXMzUWSvMgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Tue, 02 May 2023 15:59:47 +0000
-Date:   Tue, 2 May 2023 17:59:47 +0200
+        id 8qcNFZY5UWReQAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 02 May 2023 16:25:58 +0000
+Date:   Tue, 2 May 2023 18:25:57 +0200
 From:   Daniel Wagner <dwagner@suse.de>
 To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
@@ -54,31 +54,51 @@ Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-Subject: Re: [PATCH REPOST blktests v2 9/9] nvme: Make the number iterations
- configurable
-Message-ID: <iephcaynceoq5gpcvpcjzqngyjdefockihh23fxqez3yme3syr@avykw2xnyyyy>
+Subject: Re: [PATCH REPOST blktests v2 7/9] nvme-rc: Calculate IO size for
+ fio jobs
+Message-ID: <tl2sdficjgijtdqojuvqz4rwv6afelne6nndycqggob33vsejl@7saidsxqclfv>
 References: <20230421060505.10132-1-dwagner@suse.de>
- <20230421060505.10132-10-dwagner@suse.de>
- <yuwidfmwcg2iue2fm4wqyd2p3vmzo34t6hqr7rvf3d3rkh3ag3@wvpu4f3aqhly>
+ <20230421060505.10132-8-dwagner@suse.de>
+ <sbkboyc3tcad4g5zjdtko6ardhythnaotwp3njchbotnabhlun@mhhvxut6q2av>
+ <k54c3p47ot3aj7srqyx5ayrjawmdqj47hvtwcxyps67gfq533b@ftj2ugr4lalm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <yuwidfmwcg2iue2fm4wqyd2p3vmzo34t6hqr7rvf3d3rkh3ag3@wvpu4f3aqhly>
+In-Reply-To: <k54c3p47ot3aj7srqyx5ayrjawmdqj47hvtwcxyps67gfq533b@ftj2ugr4lalm>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 28, 2023 at 04:12:06AM +0000, Shinichiro Kawasaki wrote:
-> >  nvme_img_size=${nvme_img_size:-"350M"}
-> > +nvme_num_iter=${nvme_num_iter:-"100"}
+On Tue, May 02, 2023 at 05:45:46PM +0200, Daniel Wagner wrote:
+> On Fri, Apr 28, 2023 at 04:00:54AM +0000, Shinichiro Kawasaki wrote:
+> > On Apr 21, 2023 / 08:05, Daniel Wagner wrote:
+> > > Introduce two new function to calculate the IO size for fio jobs.
+> > > 
+> > > _nvme_calc_io_size() returns the jobs size for _run_fio_verify_io()
+> > > function. Reduce the max size of the job by one megabyte to make the
+> > > test more robust not to run out of space by accident. Note these fio
+> > > calls run with just one jobs.
+> > 
+> > It is not clear for me what kind of issue happens without the 1MB decrement.
+> > Could you share failure symptoms you observed?
 > 
-> The commit log of tests/nvme/002 says that "Test nvme discovery with many (1000)
-> subsystems so the discovery log page exceeds 4k.". Can we fulfill this test
-> purpose with the default value 100?
+> As I said, this is just to make the test more robust as this the size limits
+> are not the main objective of these tests. I don't care about this too
+> much, I'll just drop it then.
 
-I am going to drop the nvme/002 change in this case and set the default of
-nvme_num_iter to 1000.
+BTW, this is how it would look like if the disk is too small:
 
-> Also, nvme_num_iter will need description in Documentation/running-tests.md.
-
-Sure.
+nvme/035 => nvme0n1 (run mkfs and data verification fio job on an NVMeOF passthru controller) [failed]
+    runtime  2.383s  ...  51.954s
+    --- tests/nvme/035.out      2023-04-18 17:43:18.163745956 +0200
+    +++ /home/wagi/work/blktests/results/nvme0n1/nvme/035.out.bad       2023-05-02 18:21:09.442382196 +0200
+    @@ -1,3 +1,20 @@
+     Running nvme/035
+    +fio: io_u error on file /mnt/blktests//verify.0.0: No space left on device: write offset=925274112, buflen=4096
+    +fio: io_u error on file /mnt/blktests//verify.0.0: No space left on device: write offset=406040576, buflen=4096
+    +fio: io_u error on file /mnt/blktests//verify.0.0: No space left on device: write offset=498868224, buflen=4096
+    +fio: io_u error on file /mnt/blktests//verify.0.0: No space left on device: write offset=217063424, buflen=4096
+    +fio: io_u error on file /mnt/blktests//verify.0.0: No space left on device: write offset=1049411584, buflen=4096
+    +fio: io_u error on file /mnt/blktests//verify.0.0: No space left on device: write offset=348282880, buflen=4096
+    ...
+    (Run 'diff -u tests/nvme/035.out /home/wagi/work/blktests/results/nvme0n1/nvme/035.out.bad' to see the entire diff)
