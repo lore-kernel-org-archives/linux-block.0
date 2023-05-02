@@ -2,82 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE54C77B7E
-	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 09:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DEDC77B7E
+	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 09:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232117AbjEBJQR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 May 2023 05:16:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36150 "EHLO
+        id S233412AbjEBJ3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 May 2023 05:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjEBJQQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 05:16:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FEC54237
-        for <linux-block@vger.kernel.org>; Tue,  2 May 2023 02:16:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B7DF615A2
-        for <linux-block@vger.kernel.org>; Tue,  2 May 2023 09:16:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A058C4339B
-        for <linux-block@vger.kernel.org>; Tue,  2 May 2023 09:16:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683018974;
-        bh=dqx/wjcFq2JhnEZiDCxKAYmE5VX7jiGXDMMs95Jgst4=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=qFen1Ffkcux4jHaPHkxPgfoA7hZd9inMbYtO7x71G8a0mWrPPhHVxJK2tvDpsMBJ1
-         jcuKm6Lp7jbRt8XW+cHCfQ2AW2mJuYZdItu0sra3xtSiUnExmLihD8Ma3OmnClzdCt
-         mNWi+MdYQqINxwW6SDVtN0hkwF4s69ON/hzljlIvhixX1o3PvC2sI2Vb+JPQ46M057
-         /qgr84pgk7n1FfIQi6L9kLdMOGyYSAIxup7S0AN6hav04bvqTnl2yHEKSOB/0CzNce
-         e5KFbPhc4fH3vAqbGTTj7EY5RKgLcWVQMLEdACQbA+d6Es2+9lP0qEUYpH9F0BK5y/
-         zf1NVibxsdfRw==
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4404c9d9fceso1207893e0c.2
-        for <linux-block@vger.kernel.org>; Tue, 02 May 2023 02:16:14 -0700 (PDT)
-X-Gm-Message-State: AC+VfDzm3HlWg6mmfgGwU4W0fUsoWn2EEqqyfaDtYsNUad30Yc/443ip
-        B5Uvj21ysFAaYzIBeZFwP0xsNzMM9yT8zdHxkOc=
-X-Google-Smtp-Source: ACHHUZ4HrGEmyMng7rujh2owvb22nzURl9p2YCD3GaaUiW2403z50b1S9NCWXmTELxfwOe/78olkX9aOkgrtfiS48K0=
-X-Received: by 2002:a1f:3f02:0:b0:440:19fe:1790 with SMTP id
- m2-20020a1f3f02000000b0044019fe1790mr5527396vka.1.1683018973372; Tue, 02 May
- 2023 02:16:13 -0700 (PDT)
+        with ESMTP id S229863AbjEBJ3k (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 05:29:40 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC4149FF
+        for <linux-block@vger.kernel.org>; Tue,  2 May 2023 02:29:38 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3f19afc4fbfso34654155e9.2
+        for <linux-block@vger.kernel.org>; Tue, 02 May 2023 02:29:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20221208.gappssmtp.com; s=20221208; t=1683019777; x=1685611777;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=r+KWoq0ZrMb5+AWkT4Fb5UOL/QpDrPZJUKENZjHUHx8=;
+        b=C2p+Yz00KsTo+nI4wF0SRGz2RcT7vAedjVPyzEzLIkLHIJRDmYu16UNqY6917P2lNs
+         UjlYzDt1CXTFRoKCOsQLHemBW2QPi9eDfWGzUYmMwCnr4SjSYxo4hvCR923/ZNjz8S5d
+         QJ7DPNil9kuPtPFpvGvWzSaj/u/69OHljxcXcLc9KP4UZ4kpyQqvAJMtWRPXu0VtYLGn
+         nCS+0ygFwTmvszZzt6Ucz1FlKoaHAi6+X1I3azrRjKoYTzUVvtnmMWmNC+CjWoSjAZcJ
+         2CofMomdKGhSLdr8iJLylMktriVqY+VM7yyt/A/6MohiBVbO/XBHzLq7RvVw39ec1ta5
+         Uozg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683019777; x=1685611777;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r+KWoq0ZrMb5+AWkT4Fb5UOL/QpDrPZJUKENZjHUHx8=;
+        b=BHiCzJ+JVhZjcnXuQOR3ADtVYgwl1687LK3jC46uDWug8y46QS87k0bkeoq0Yj0e5D
+         VbRorMaf//gJsZWtcsT8Jxss1xveoyD2NV2Wse8TS9RKdV6Eqk2JzJUUiyinXC1y3zHw
+         Q4GqNHDAeeF2qDDmnmdL11lOoRjKcVTTYXk2VvvOQP0LEO5/2nRpi7K0IYgIiJpx2ZPk
+         nqPsIH3x9qeg2fW6G64kyfv9hV45X1WGIGv3k6W/PykMr4nHH0zhu8zK9H9yA7F0kDKm
+         kmd4dojdEbQzKKRa9TOCPOfnt/izIDBVhVGe0ogLuiJMYncMRwJjmqy7LDDdiSNpk5X4
+         Am8Q==
+X-Gm-Message-State: AC+VfDz5IlLfw2jAAEK8itTFQS1isdGXZx60X1eCmsgKxdqbvo9q9sCA
+        a7UtEcvEDO8RKSFXonJsjNZ3qg==
+X-Google-Smtp-Source: ACHHUZ7SuacCVSmCD9PvjtcPmUjV2mI9SUWTFnUsRGGmGxW/Nfhw+xvmfP0amNQIS8V/TJpEGEhyXA==
+X-Received: by 2002:adf:f58a:0:b0:2f9:cee4:b7d with SMTP id f10-20020adff58a000000b002f9cee40b7dmr10637377wro.70.1683019777365;
+        Tue, 02 May 2023 02:29:37 -0700 (PDT)
+Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id d14-20020a5d538e000000b002efac42ff35sm30481138wrv.37.2023.05.02.02.29.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 May 2023 02:29:36 -0700 (PDT)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Thomas Voegtle <tv@lio96.de>
+Subject: [PATCH] drbd: do not set REQ_PREFLUSH when submitting barrier
+Date:   Tue,  2 May 2023 11:29:22 +0200
+Message-Id: <20230502092922.175857-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <20230502090018.169275-1-mcgrof@kernel.org> <3b2d04b8-e7ac-81a1-1751-f63403713a27@suse.de>
-In-Reply-To: <3b2d04b8-e7ac-81a1-1751-f63403713a27@suse.de>
-From:   Luis Chamberlain <mcgrof@kernel.org>
-Date:   Tue, 2 May 2023 02:16:02 -0700
-X-Gmail-Original-Message-ID: <CAB=NE6Vi5JcWVqe1A9fRgVM1wg17FbSLfbdhuvz_uBsBqe+UoA@mail.gmail.com>
-Message-ID: <CAB=NE6Vi5JcWVqe1A9fRgVM1wg17FbSLfbdhuvz_uBsBqe+UoA@mail.gmail.com>
-Subject: Re: [RFC] block: dio: immediately fail when count < logical block size
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     linux-block@vger.kernel.org, kbusch@kernel.org,
-        willy@infradead.org, p.raghav@samsung.com, da.gomez@samsung.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 2, 2023 at 2:11=E2=80=AFAM Hannes Reinecke <hare@suse.de> wrote=
-:
->
-> On 5/2/23 11:00, Luis Chamberlain wrote:
-> > When using direct IO of say 4k on a 32k physical block size device
-> > we crash. The amount of data requested must match the minimum IO suppor=
-ted
-> > by the device but instead we take it for a ride right now and try to fa=
-il
-> > later after checking alignments.
->
-> Something is askew with that reasoning.
-> If the above were true, we would also crash if we were attempting a 512
-> byte direct I/O write on a 4k drive.
+When we receive a flush command (or "barrier" in DRBD), we currently use
+a REQ_OP_FLUSH with the REQ_PREFLUSH flag set.
 
-We do fail, the question is if the math with iov_iter_revert() is
-right for the failed return value when unaligned.
+REQ_OP_FLUSH is supposed to be an empty bio with the sole purpose of
+flushing the disk. REQ_PREFLUSH is used for REQ_OP_WRITE bios to
+additionally signal that a flush should be issued, so it is redundant
+here.
 
-> And I'm reasonably sure that we don't.
->
-> So where's the difference?
+Since commit b4a6bb3a67aa ("block: add a sanity check for non-write
+flush/fua bios"), this triggers a warning in the block layer.
+So remove the REQ_PREFLUSH flag when allocating the bio.
 
-I think a different return value used which busts iov_iter_revert().
+Fixes: f9ff0da56437 ("drbd: allow parallel flushes for multi-volume resources")
+Reported-by: Thomas Voegtle <tv@lio96.de>
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+---
+ drivers/block/drbd/drbd_receiver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  Luis
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index e54404c632e7..f2479c29197a 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -1283,7 +1283,7 @@ static void one_flush_endio(struct bio *bio)
+ static void submit_one_flush(struct drbd_device *device, struct issue_flush_context *ctx)
+ {
+ 	struct bio *bio = bio_alloc(device->ldev->backing_bdev, 0,
+-				    REQ_OP_FLUSH | REQ_PREFLUSH, GFP_NOIO);
++				    REQ_OP_FLUSH, GFP_NOIO);
+ 	struct one_flush_context *octx = kmalloc(sizeof(*octx), GFP_NOIO);
+ 
+ 	if (!octx) {
+-- 
+2.39.2
+
