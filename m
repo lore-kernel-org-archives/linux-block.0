@@ -2,146 +2,131 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E88C77B73
-	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 02:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B20EC77B73
+	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 03:04:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230484AbjEBCn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 May 2023 22:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51868 "EHLO
+        id S232267AbjEBDEC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 May 2023 23:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229822AbjEBCn2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 22:43:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FC935AE
-        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 19:42:41 -0700 (PDT)
+        with ESMTP id S232958AbjEBDD7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 23:03:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99BD23AB3
+        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 20:03:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1682995360;
+        s=mimecast20190719; t=1682996591;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=DTK1+JN8SQ/DDzzOxqF2XHU53fm6EaNRk4arOaJaguY=;
-        b=WFCrsYFnmg2/QPb+NPSk3OMx+RedaL7GlTVitSvq2pRjvQkHDLwhLK1T+AYfPQMRr/L461
-        wseJjpAM7AwP7GfbPcFtq73UVC9UyWa1MYp/SCY9HLNFpZDzTY23zEFiLjTyzL+tMzdkiN
-        06MwQKEHZxrsQjsJwyKo8dc1HRMGq34=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uBHdtbr5R5aE+/BDH3yA5uUokIjUDLmAGDFarLNOBCI=;
+        b=OTFcmjFqpDWYMgDg5zoVd40EsE6mJHd6hiCftHm0qIICUB/g6eETCNl70ckIis1G+auyDu
+        f7i33UuVrJ3eOaUZAhCpkCkF+DGxC+1CVDdRwXjkCIJ5y4HXewxCUevUOxEUpUxIo7hXqN
+        LLOKcEbNGWtCyYf65r8gpC0WsLxRSlM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-56-34tPFbFFOEe7yRN-QtERQQ-1; Mon, 01 May 2023 22:42:37 -0400
-X-MC-Unique: 34tPFbFFOEe7yRN-QtERQQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-407-tDBkuZFvPhScyupDgUob9w-1; Mon, 01 May 2023 23:03:02 -0400
+X-MC-Unique: tDBkuZFvPhScyupDgUob9w-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2E88F858F09;
-        Tue,  2 May 2023 02:42:37 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 649502166B29;
-        Tue,  2 May 2023 02:42:36 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D63C299E742;
+        Tue,  2 May 2023 03:03:02 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D6CE40F169;
+        Tue,  2 May 2023 03:02:53 +0000 (UTC)
+Date:   Tue, 2 May 2023 11:02:49 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2] ublk: add timeout handler
-Date:   Tue,  2 May 2023 10:42:31 +0800
-Message-Id: <20230502024231.888498-1-ming.lei@redhat.com>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Baokun Li <libaokun1@huawei.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-ext4@vger.kernel.org,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>,
+        yangerkun <yangerkun@huawei.com>, ming.lei@redhat.com
+Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Message-ID: <ZFB9WaRmy28zYWE4@ovpn-8-16.pek2.redhat.com>
+References: <ZEn/KB0fZj8S1NTK@ovpn-8-24.pek2.redhat.com>
+ <dbb8d8a7-3a80-34cc-5033-18d25e545ed1@huawei.com>
+ <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
+ <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
+ <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
+ <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
+ <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com>
+ <ZEtd6qZOgRxYnNq9@mit.edu>
+ <ZEyL/sjVeW88XpIn@ovpn-8-24.pek2.redhat.com>
+ <ZEyjY0W+8zafPAoh@mit.edu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZEyjY0W+8zafPAoh@mit.edu>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add timeout handler, so that we can provide forward progress guarantee for
-unprivileged ublk, which can't be trusted.
+On Sat, Apr 29, 2023 at 12:56:03AM -0400, Theodore Ts'o wrote:
+> On Sat, Apr 29, 2023 at 11:16:14AM +0800, Ming Lei wrote:
+> > 
+> > bdi_unregister() is called in del_gendisk(), since bdi_register() has
+> > to be called in add_disk() where major/minor is figured out.
+> > 
+> > > problem is that the block device shouldn't just *vanish*, with the
+> > 
+> > That looks not realistic, removable disk can be gone any time, and device
+> > driver error handler often deletes disk as the last straw, and it shouldn't
+> > be hard to observe such error.
+> 
+> It's not realistic to think that the file system can write back any
+> dirty pages, sure.  At this point, the user has already yanked out the
+> thumb drive, and the physical device is gone.  However, various fields
+> like bdi->dev shouldn't get deinitialized until after the
+> s_ops->shutdown() function has returned.
 
-One thing is that sync() calls sync_bdevs(wait) for all block devices after
-running sync_bdevs(no_wait), and if one device can't move on, the sync() won't
-return any more.
+Yeah, it makes sense.
 
-Add timeout for unprivileged ublk to avoid such affect for other users which call
-sync() syscall.
+> 
+> We need to give the file system a chance to shutdown any pending
+> writebacks; otherwise, we could be racing with writeback happening in
+> some other kernel thread, and while the I/O is certainly not going to
+> suceed, it would be nice if attempts to write to the block device
+> return an error, intead potentially causing the kernel to crash.
+> 
+> The shutdown function might need to sleep while it waits for
+> workqueues or kernel threads to exit, or while it iterates over all
+> inodes and clears all of the dirty bits and/or drop all of the pages
+> associated with the file system on the disconnected block device.  So
+> while this happens, I/O should just fail, and not result in a kernel
+> BUG or oops.
+> 
+> Once the s_ops->shutdown() has returned, then del_gendisk can shutdown
+> and/or deallocate anything it wants, and if the file system tries to
+> use the bdi after s_ops->shutdown() has returned, well, it deserves
+> anything it gets.
+> 
+> (Well, it would be nice if things didn't bug/oops in fs/buffer.c if
+> there is no s_ops->shutdown() function, since there are a lot of
+> legacy file systems that use the buffer cache and until we can add
+> some kind of generic shutdown function to fs/libfs.c and make sure
 
-Meantime clear UBLK_F_USER_RECOVERY_REISSUE for unprivileged ublk since
-that feature may cause IO hang too.
+One generic shutdown API is pretty nice, such as sb_force_shutdown() posted by Dave.
 
-Fixes: 4093cb5a0634 ("ublk_drv: add mechanism for supporting unprivileged ublk device")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- clear UBLK_F_USER_RECOVERY* which can't provide forward progress
-	  now
+> that all of the legacy file systems that are likely to be used on a
+> USB thumb drive are fixed, it would be nice if they were protected.
+> At the very least, we should make that things are no worse than they
+> currently are.)
 
- drivers/block/ublk_drv.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+Yeah, things won't be worse than now for legacy FS, given the generic
+FS API could cover more generic FS cleanup, and block layer always calls
+it before removing one disk.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index afbef182820b..6c61f77f49d2 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -129,6 +129,7 @@ struct ublk_queue {
- 	unsigned long io_addr;	/* mapped vm address */
- 	unsigned int max_io_sz;
- 	bool force_abort;
-+	bool timeout;
- 	unsigned short nr_io_ready;	/* how many ios setup */
- 	struct ublk_device *dev;
- 	struct ublk_io ios[];
-@@ -898,6 +899,22 @@ static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
- 	}
- }
- 
-+static enum blk_eh_timer_return ublk_timeout(struct request *rq)
-+{
-+	struct ublk_queue *ubq = rq->mq_hctx->driver_data;
-+
-+	if (ubq->flags & UBLK_F_UNPRIVILEGED_DEV) {
-+		if (!ubq->timeout) {
-+			send_sig(SIGKILL, ubq->ubq_daemon, 0);
-+			ubq->timeout = true;
-+		}
-+
-+		return BLK_EH_DONE;
-+	}
-+
-+	return BLK_EH_RESET_TIMER;
-+}
-+
- static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		const struct blk_mq_queue_data *bd)
- {
-@@ -957,6 +974,7 @@ static const struct blk_mq_ops ublk_mq_ops = {
- 	.queue_rq       = ublk_queue_rq,
- 	.init_hctx	= ublk_init_hctx,
- 	.init_request   = ublk_init_rq,
-+	.timeout	= ublk_timeout,
- };
- 
- static int ublk_ch_open(struct inode *inode, struct file *filp)
-@@ -1737,6 +1755,18 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	else if (!(info.flags & UBLK_F_UNPRIVILEGED_DEV))
- 		return -EPERM;
- 
-+	/*
-+	 * unprivileged device can't be trusted, but RECOVERY and
-+	 * RECOVERY_REISSUE still may hang error handling, so can't
-+	 * support recovery features for unprivileged ublk now
-+	 *
-+	 * TODO: provide forward progress for RECOVERY handler, so that
-+	 * unprivileged device can benefit from it
-+	 */
-+	if (info.flags & UBLK_F_UNPRIVILEGED_DEV)
-+		info.flags &= ~(UBLK_F_USER_RECOVERY_REISSUE |
-+				UBLK_F_USER_RECOVERY);
-+
- 	/* the created device is always owned by current user */
- 	ublk_store_owner_uid_gid(&info.owner_uid, &info.owner_gid);
- 
-@@ -2007,6 +2037,7 @@ static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
- 	put_task_struct(ubq->ubq_daemon);
- 	/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
- 	ubq->ubq_daemon = NULL;
-+	ubq->timeout = false;
- 
- 	for (i = 0; i < ubq->q_depth; i++) {
- 		struct ublk_io *io = &ubq->ios[i];
--- 
-2.38.1
+
+Thanks, 
+Ming
 
