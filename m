@@ -2,104 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DEDC77B7E
-	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 09:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AE6C7EE24
+	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 10:20:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233412AbjEBJ3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 May 2023 05:29:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38630 "EHLO
+        id S233657AbjEBKUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 May 2023 06:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbjEBJ3k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 05:29:40 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC4149FF
-        for <linux-block@vger.kernel.org>; Tue,  2 May 2023 02:29:38 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3f19afc4fbfso34654155e9.2
-        for <linux-block@vger.kernel.org>; Tue, 02 May 2023 02:29:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20221208.gappssmtp.com; s=20221208; t=1683019777; x=1685611777;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=r+KWoq0ZrMb5+AWkT4Fb5UOL/QpDrPZJUKENZjHUHx8=;
-        b=C2p+Yz00KsTo+nI4wF0SRGz2RcT7vAedjVPyzEzLIkLHIJRDmYu16UNqY6917P2lNs
-         UjlYzDt1CXTFRoKCOsQLHemBW2QPi9eDfWGzUYmMwCnr4SjSYxo4hvCR923/ZNjz8S5d
-         QJ7DPNil9kuPtPFpvGvWzSaj/u/69OHljxcXcLc9KP4UZ4kpyQqvAJMtWRPXu0VtYLGn
-         nCS+0ygFwTmvszZzt6Ucz1FlKoaHAi6+X1I3azrRjKoYTzUVvtnmMWmNC+CjWoSjAZcJ
-         2CofMomdKGhSLdr8iJLylMktriVqY+VM7yyt/A/6MohiBVbO/XBHzLq7RvVw39ec1ta5
-         Uozg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683019777; x=1685611777;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r+KWoq0ZrMb5+AWkT4Fb5UOL/QpDrPZJUKENZjHUHx8=;
-        b=BHiCzJ+JVhZjcnXuQOR3ADtVYgwl1687LK3jC46uDWug8y46QS87k0bkeoq0Yj0e5D
-         VbRorMaf//gJsZWtcsT8Jxss1xveoyD2NV2Wse8TS9RKdV6Eqk2JzJUUiyinXC1y3zHw
-         Q4GqNHDAeeF2qDDmnmdL11lOoRjKcVTTYXk2VvvOQP0LEO5/2nRpi7K0IYgIiJpx2ZPk
-         nqPsIH3x9qeg2fW6G64kyfv9hV45X1WGIGv3k6W/PykMr4nHH0zhu8zK9H9yA7F0kDKm
-         kmd4dojdEbQzKKRa9TOCPOfnt/izIDBVhVGe0ogLuiJMYncMRwJjmqy7LDDdiSNpk5X4
-         Am8Q==
-X-Gm-Message-State: AC+VfDz5IlLfw2jAAEK8itTFQS1isdGXZx60X1eCmsgKxdqbvo9q9sCA
-        a7UtEcvEDO8RKSFXonJsjNZ3qg==
-X-Google-Smtp-Source: ACHHUZ7SuacCVSmCD9PvjtcPmUjV2mI9SUWTFnUsRGGmGxW/Nfhw+xvmfP0amNQIS8V/TJpEGEhyXA==
-X-Received: by 2002:adf:f58a:0:b0:2f9:cee4:b7d with SMTP id f10-20020adff58a000000b002f9cee40b7dmr10637377wro.70.1683019777365;
-        Tue, 02 May 2023 02:29:37 -0700 (PDT)
-Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id d14-20020a5d538e000000b002efac42ff35sm30481138wrv.37.2023.05.02.02.29.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 02:29:36 -0700 (PDT)
-From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        linux-block@vger.kernel.org,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Thomas Voegtle <tv@lio96.de>
-Subject: [PATCH] drbd: do not set REQ_PREFLUSH when submitting barrier
-Date:   Tue,  2 May 2023 11:29:22 +0200
-Message-Id: <20230502092922.175857-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S233120AbjEBKUh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 06:20:37 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 371BD30C6;
+        Tue,  2 May 2023 03:20:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1683022836; x=1714558836;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jN2uhwv5m+CE8gDQC4BYKQ6UTcUdO1Yo6AhgEOdVjMw=;
+  b=Eg84E3NU39Afjdnd27RxgOENtV+YCj/rLO2pyaPKJPnzx8DlGQWSo04x
+   ibysIn8ANCOiF4WKNQhVpKO4iaMreMk2BJLMGUZSw9p+Omv8hlP+K5mlG
+   KjBhjevvIyhClXyCDAvecXg89DY2tNhpnEPlYc7hLIvPoWGTWZAsmEF6v
+   APHGlusu1JzkKk7ExTAxV0jJk6jdkTqboBOxTHjDSUvK0K1drWIPufS/T
+   3fes27YLyWPDgzI7d5O1U9v+C+RIPtwsC0Z6AxyoOZ5wYe1GzXft71zp7
+   CDLkfNDyR02l/gGfvkczY6nMtNDJXSyuC9JjDd/4FWqeEZHxGb/f81B3c
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.99,243,1677513600"; 
+   d="scan'208";a="234672809"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 02 May 2023 18:20:35 +0800
+IronPort-SDR: mjaCeZrG+vlN0sCoF3MgUfscrMMD2KJWBcGS+mn4WzcT8Nbp+M/QI9d9/LveE1gEy9MOly8id4
+ wT3KPzQiThe6AMaa0p5j5fBy3p1LxvsG3YarHpvc3lhKg9/+WAmc5IyhNDuOB91mBQLpSoz4nf
+ Ua2DgDUj0v3hPWyv4Wpk1FN/viKLmJFS5+8pQV4gpaSIQakZwgkuFjC+szBwWwt52WnSXje7cu
+ 49tsTLU6LKrNzSwtf/6/8EKTRuv2NChXaYAIwaRbuGOZoW3AC2IAs5EjEekhjkXSJCXPv+q9w2
+ Qn8=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 May 2023 02:30:23 -0700
+IronPort-SDR: II0VPVGqsVVzFv+CDBgRTuszrP/jrhnqWD28hz4KmIk0OWZ9iuuunBJznbIJJEWysUomM83PbW
+ tHpIqF+Wkzt60j425jkVHSTfRN97pvpj4qRJGP1XK/rYUtVFMFwW07KYIR+NBQHS3CcgY7qgcQ
+ QoPqPucc39VmFll8EWhRke9TeNwUD/RetNk6TeKPQdBhijuGDl8aTzuwdYvSvt9Rua9BZLT2+I
+ uqumhMLeAhgcuUfutHNKva+v42l5kJ3gIfcZswnraO/ApNiUR1Ze30swYPZMzn8zkEyKLhcsrU
+ NTE=
+WDCIronportException: Internal
+Received: from myd008205.ad.shared (HELO localhost.localdomain) ([10.225.1.100])
+  by uls-op-cesaip02.wdc.com with ESMTP; 02 May 2023 03:20:32 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     "axboe @ kernel . dk" <axboe@kernel.dk>
+Cc:     agruenba@redhat.com, cluster-devel@redhat.com,
+        damien.lemoal@wdc.com, dm-devel@redhat.com, hare@suse.de,
+        hch@lst.de, jfs-discussion@lists.sourceforge.net, kch@nvidia.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-raid@vger.kernel.org,
+        ming.lei@redhat.com, rpeterso@redhat.com, shaggy@kernel.org,
+        snitzer@kernel.org, song@kernel.org, willy@infradead.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v5 00/20] bio: check return values of bio_add_page
+Date:   Tue,  2 May 2023 12:19:14 +0200
+Message-Id: <20230502101934.24901-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When we receive a flush command (or "barrier" in DRBD), we currently use
-a REQ_OP_FLUSH with the REQ_PREFLUSH flag set.
+We have two functions for adding a page to a bio, __bio_add_page() which is
+used to add a single page to a freshly created bio and bio_add_page() which is
+used to add a page to an existing bio.
 
-REQ_OP_FLUSH is supposed to be an empty bio with the sole purpose of
-flushing the disk. REQ_PREFLUSH is used for REQ_OP_WRITE bios to
-additionally signal that a flush should be issued, so it is redundant
-here.
+While __bio_add_page() is expected to succeed, bio_add_page() can fail.
 
-Since commit b4a6bb3a67aa ("block: add a sanity check for non-write
-flush/fua bios"), this triggers a warning in the block layer.
-So remove the REQ_PREFLUSH flag when allocating the bio.
+This series converts the callers of bio_add_page() which can easily use
+__bio_add_page() to using it and checks the return of bio_add_page() for
+callers that don't work on a freshly created bio.
 
-Fixes: f9ff0da56437 ("drbd: allow parallel flushes for multi-volume resources")
-Reported-by: Thomas Voegtle <tv@lio96.de>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
----
- drivers/block/drbd/drbd_receiver.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Lastly it marks bio_add_page() as __must_check so we don't have to go again
+and audit all callers.
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index e54404c632e7..f2479c29197a 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -1283,7 +1283,7 @@ static void one_flush_endio(struct bio *bio)
- static void submit_one_flush(struct drbd_device *device, struct issue_flush_context *ctx)
- {
- 	struct bio *bio = bio_alloc(device->ldev->backing_bdev, 0,
--				    REQ_OP_FLUSH | REQ_PREFLUSH, GFP_NOIO);
-+				    REQ_OP_FLUSH, GFP_NOIO);
- 	struct one_flush_context *octx = kmalloc(sizeof(*octx), GFP_NOIO);
- 
- 	if (!octx) {
+Changes to v4:
+- Rebased onto latest Linus' master
+- Dropped already merged patches
+- Added Sergey's Reviewed-by
+
+Changes to v3:
+- Added __bio_add_folio and use it in iomap (Willy)
+- Mark bio_add_folio must check (Willy)
+- s/GFS/GFS2/ (Andreas)
+
+Changes to v2:
+- Removed 'wont fail' comments pointed out by Song
+
+Changes to v1:
+- Removed pointless comment pointed out by Willy
+- Changed commit messages pointed out by Damien
+- Colledted Damien's Reviews and Acks
+
+
+Johannes Thumshirn (20):
+  swap: use __bio_add_page to add page to bio
+  drbd: use __bio_add_page to add page to bio
+  dm: dm-zoned: use __bio_add_page for adding single metadata page
+  fs: buffer: use __bio_add_page to add single page to bio
+  md: use __bio_add_page to add single page
+  md: raid5-log: use __bio_add_page to add single page
+  md: raid5: use __bio_add_page to add single page to new bio
+  jfs: logmgr: use __bio_add_page to add single page to bio
+  gfs2: use __bio_add_page for adding single page to bio
+  zonefs: use __bio_add_page for adding single page to bio
+  zram: use __bio_add_page for adding single page to bio
+  floppy: use __bio_add_page for adding single page to bio
+  md: check for failure when adding pages in alloc_behind_master_bio
+  md: raid1: use __bio_add_page for adding single page to bio
+  md: raid1: check if adding pages to resync bio fails
+  dm-crypt: check if adding pages to clone bio fails
+  block: mark bio_add_page as __must_check
+  block: add __bio_add_folio
+  fs: iomap: use __bio_add_folio where possible
+  block: mark bio_add_folio as __must_check
+
+ block/bio.c                      |  8 ++++++++
+ drivers/block/drbd/drbd_bitmap.c |  4 +---
+ drivers/block/floppy.c           |  2 +-
+ drivers/block/zram/zram_drv.c    |  2 +-
+ drivers/md/dm-crypt.c            |  9 ++++++++-
+ drivers/md/dm-zoned-metadata.c   |  6 +++---
+ drivers/md/md.c                  |  4 ++--
+ drivers/md/raid1-10.c            | 11 ++++++-----
+ drivers/md/raid1.c               |  7 +++++--
+ drivers/md/raid10.c              | 20 ++++++++++----------
+ drivers/md/raid5-cache.c         |  2 +-
+ drivers/md/raid5-ppl.c           |  4 ++--
+ fs/buffer.c                      |  2 +-
+ fs/gfs2/ops_fstype.c             |  2 +-
+ fs/iomap/buffered-io.c           |  6 +++---
+ fs/jfs/jfs_logmgr.c              |  4 ++--
+ fs/zonefs/super.c                |  2 +-
+ include/linux/bio.h              |  5 +++--
+ mm/page_io.c                     |  8 ++++----
+ 19 files changed, 63 insertions(+), 45 deletions(-)
+
+
+base-commit: 865fdb08197e657c59e74a35fa32362b12397f58
 -- 
-2.39.2
+2.40.0
 
