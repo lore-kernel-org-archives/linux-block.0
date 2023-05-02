@@ -2,80 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E225C77B73
-	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 12:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC400C77B7E
+	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 13:19:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233972AbjEBMzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 May 2023 08:55:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38904 "EHLO
+        id S233724AbjEBNTa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 May 2023 09:19:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234300AbjEBMyz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 08:54:55 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C7E526B;
-        Tue,  2 May 2023 05:54:54 -0700 (PDT)
+        with ESMTP id S229457AbjEBNT3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 May 2023 09:19:29 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEFA5B87;
+        Tue,  2 May 2023 06:19:28 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C75D81F8D6;
-        Tue,  2 May 2023 12:54:52 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 3CC2B1F8C4;
+        Tue,  2 May 2023 13:19:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683032092; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1683033567; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=KbeXHGKWj2YyZ1B4O+LLJ0cAowHX1KL4MZ0ye5IodE0=;
-        b=agtIXfyiT/A60NnvYLWabSU43bc+veyerxOHpQdJC/Nx8hJZsVnRQALybNg0BKE3chUKb8
-        AvudVQ3Qp6zlEBK6dN8EQzfp0jq104A5DIjFWmMm5CkvP63GQ2doPWvUqGL9aCCzkdgwgN
-        CWpyj18S8I0y4CdDcnmtbG6G7ElShnA=
+        bh=X6pmLXaIP92O+42lHElbilcuYtyXI0aaCgcPWEIGhNs=;
+        b=lChvKPHqaLxkunCNmmwMvq/Vkym78EMnsImduafFgSNkhQ8p+/x79wmSpYUdLrfeE/PSny
+        7z3zm7/L+EbvQGLa4muacIEeNa9d/rK0S0zR5ZU0o/cTaekuqmExVr/h0AjaPEx2GSGKeV
+        uTDbdm0dcS+YXwPz176/qE2vENUwTOQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683032092;
+        s=susede2_ed25519; t=1683033567;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=KbeXHGKWj2YyZ1B4O+LLJ0cAowHX1KL4MZ0ye5IodE0=;
-        b=NU92dZ2HIKWCyjU+aPZkQuFndzCN85HxRWzQL6ZGDZ9r2jmNrpOywKjDNCGG2K8K/SU1v/
-        UtMoZRj69Ia0emDA==
+        bh=X6pmLXaIP92O+42lHElbilcuYtyXI0aaCgcPWEIGhNs=;
+        b=/o1fQ6Bn2kXO2MZVvv6jlMBG087zAk+KyUBzIUmXFGEXu1Wx06aA85WFRDL9NPjxSZtcZM
+        QGYDD0gxUYc8LfAw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B9C2F134FB;
-        Tue,  2 May 2023 12:54:52 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2D320134FB;
+        Tue,  2 May 2023 13:19:27 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id GxJWLRwIUWQDSQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Tue, 02 May 2023 12:54:52 +0000
-Date:   Tue, 2 May 2023 14:54:52 +0200
+        id 6buhCt8NUWQEVwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Tue, 02 May 2023 13:19:27 +0000
+Date:   Tue, 2 May 2023 15:19:26 +0200
 From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>
-Subject: Re: [PATCH REPOST blktests v2 2/9] nvme: Do not hard code device
- size for dd test
-Message-ID: <p5eminun5jsblyb3k5nycsrefpzlzqlrihozlz3ezh65hcsfnu@pxhvomc3qwmn>
+Subject: Re: [PATCH REPOST blktests v2 3/9] common-xfs: Make size argument
+ optional for _xfs_run_fio_verify_io
+Message-ID: <pjzkjnq7gv574bcnfmuf5n3ehgygqp2b2ybuburc7rty5iwhwf@dc6fkxg3wt5h>
 References: <20230421060505.10132-1-dwagner@suse.de>
- <20230421060505.10132-3-dwagner@suse.de>
- <z3lbxnnewuwnozrme27okchaxytt7zegj4emgpt4gmewsvcr5k@aordfdu7tai4>
+ <20230421060505.10132-4-dwagner@suse.de>
+ <1089a043-a40c-6b49-f0a0-38ca3bcd8f91@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <z3lbxnnewuwnozrme27okchaxytt7zegj4emgpt4gmewsvcr5k@aordfdu7tai4>
+In-Reply-To: <1089a043-a40c-6b49-f0a0-38ca3bcd8f91@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> > -	dd if=/dev/urandom of="/dev/${nvmedev}n1" count=128000 bs=4k status=none
-> > +	size="$(blockdev --getsize64 "/dev/${nvmedev}n1")"
-> > +	bs="$(blockdev --getbsz "/dev/${nvmedev}n1")"
-> > +	count=$((size / bs - 1))
+On Fri, Apr 21, 2023 at 08:27:35AM +0200, Hannes Reinecke wrote:
+> > +		avail="$(df --output=avail "${mount_dir}" | awk 'NR==2 {print $1}')"
 > 
-> Do we need -1?
+> df --output=avail "${mount_dir}" | tail -1
 
-Not really. My aim was to just to make it test case a bit more
-reliable. The original test didn't fill up the disk either.
+ok.
 
-I am going to drop it.
+> > +		sz="$(printf "%d" $((avail / 1024 - 1 )))m"
+> 
+> sz=$((avail / 1024 - 1))
+> 
+> > +	fi
+> > +
+> >   	_run_fio_verify_io --size="$sz" --directory="${mount_dir}/"
+> 
+> _run_fio_verify_io --size="${sz}m" --directory="${mount_dir}/"
+
+$sz might already contain the 'm', so can't do this here.
