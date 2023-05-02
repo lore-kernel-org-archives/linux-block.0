@@ -2,65 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BF5C77B7C
-	for <linux-block@archiver.kernel.org>; Mon,  1 May 2023 19:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121A5C77B7C
+	for <linux-block@archiver.kernel.org>; Tue,  2 May 2023 00:58:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbjEATfn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 May 2023 15:35:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33864 "EHLO
+        id S230391AbjEBA6i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 May 2023 20:58:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233826AbjEATeq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 15:34:46 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1354355A1
-        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 12:31:54 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S231610AbjEBA6h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 May 2023 20:58:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0107430FD
+        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 17:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1682989070;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ee9kbmLrY2Y7aS+ZkEL+0QK6onncfphaK4NZ0iubdi0=;
+        b=UuLJJH+uMWz5brHja81cVtK5Bo+Yt87q6S32bVsygxww5K5fDwhgBLJMShFkauLLAe8m4o
+        EO+RAhBgIpjGyzgKb8MBFLy7+HRt6Qw0RZLbfMBpmX7T/DNO0ixZWclmjn+PyDdMALztu0
+        iKuuoCJCDKVSxjDuM/ojOnFDa7Sjw1k=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-547-s2Q55i0OMv6b0B-q6gLVuQ-1; Mon, 01 May 2023 20:57:46 -0400
+X-MC-Unique: s2Q55i0OMv6b0B-q6gLVuQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 428B461EF9
-        for <linux-block@vger.kernel.org>; Mon,  1 May 2023 19:31:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28DD0C433D2;
-        Mon,  1 May 2023 19:31:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682969471;
-        bh=yZTPkgjXn8jZDNAxbqseiaFvxDc8hw1TPYB6hr1/1W4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Fs8YrZ3oyy/mVoTB9xKjEfrgOYfZHaQAc6HZx/q4sQOy9x6LY0lLYKJKSQNsKhe6y
-         cIr1FcvDQXxqO6QMlh8B69OT37kuCUg+EMKN4i9nYGaekayb3+4mXkuzbWWYQRy/XJ
-         nIWIsevVbH5UunltqXjbbk/4goElO2s54vzir7lpdld8S24b3YfXTrTddE9+T0Q+vD
-         2fWDr1nRfmnaXX3+nzAz/5G92oYbipvG79k6m+KCVPaMDOknG6PyspW5X2xgNhofqp
-         UQrVTV76TT1EvVb9IgWpf0NqiBy5NMMOdj3Y0H8J541UIeYgGC5OxwuO/xPtwruV5x
-         rDv1iD2mxlVrA==
-Date:   Mon, 1 May 2023 13:31:08 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     Keith Busch <kbusch@meta.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        xiaoguang.wang@linux.alibaba.com
-Subject: Re: [RFC 0/3] nvme uring passthrough diet
-Message-ID: <ZFATfIe1wDjSzAgq@kbusch-mbp.dhcp.thefacebook.com>
-References: <CGME20230501154403epcas5p388c607114ad6f9d20dfd3ec958d88947@epcas5p3.samsung.com>
- <20230501153306.537124-1-kbusch@meta.com>
- <20230501190109.GA14341@green245>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 58E6E101A531;
+        Tue,  2 May 2023 00:57:45 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A9082400F4D;
+        Tue,  2 May 2023 00:57:37 +0000 (UTC)
+Date:   Tue, 2 May 2023 08:57:32 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Theodore Ts'o <tytso@mit.edu>, Baokun Li <libaokun1@huawei.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-ext4@vger.kernel.org,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Zhang Yi <yi.zhang@redhat.com>,
+        yangerkun <yangerkun@huawei.com>, ming.lei@redhat.com
+Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
+Message-ID: <ZFBf/CXN2ktVYL/N@ovpn-8-16.pek2.redhat.com>
+References: <ZEpH+GEj33aUGoAD@ovpn-8-26.pek2.redhat.com>
+ <663b10eb-4b61-c445-c07c-90c99f629c74@huawei.com>
+ <ZEpcCOCNDhdMHQyY@ovpn-8-26.pek2.redhat.com>
+ <ZEskO8md8FjFqQhv@ovpn-8-24.pek2.redhat.com>
+ <fb127775-bbe4-eb50-4b9d-45a8e0e26ae7@huawei.com>
+ <ZEtd6qZOgRxYnNq9@mit.edu>
+ <ZEyL/sjVeW88XpIn@ovpn-8-24.pek2.redhat.com>
+ <20230429044038.GA7561@lst.de>
+ <ZEym2Yf1Ud1p+L3R@ovpn-8-24.pek2.redhat.com>
+ <20230501044744.GA20056@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230501190109.GA14341@green245>
+In-Reply-To: <20230501044744.GA20056@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 02, 2023 at 12:31:28AM +0530, Kanchan Joshi wrote:
-> On Mon, May 01, 2023 at 08:33:03AM -0700, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > When you disable all the optional features in your kernel config and
-> > request queue, it looks like the normal request dispatching is just as
-> > fast as any attempts to bypass it.
+On Mon, May 01, 2023 at 06:47:44AM +0200, Christoph Hellwig wrote:
+> On Sat, Apr 29, 2023 at 01:10:49PM +0800, Ming Lei wrote:
+> > Not sure if it is needed for non s_bdev
 > 
-> Did a quick run, and it is not the case.
-> For that workload [1], this one moves to 3.4M from 3M.
+> So you don't want to work this at all for btrfs?  Or the XFS log device,
+> or ..
 
-There's more to trim, more work to do. I was running not quite as
-heavy a kernel config as I needed, but I've got something more
-appropriate to experiment with now.
+Basically FS can provide one generic API of shutdown_filesystem() which
+shutdown FS generically, meantime calls each fs's ->shutdown() for
+dealing with fs specific shutdown.
+
+If there isn't superblock attached for one bdev, can you explain a bit what
+filesystem code can do? Same with block layer bdev.
+
+The current bio->bi_status together disk_live()(maybe bdev_live() is
+needed) should be enough for FS code to handle non s_bdev.
+
+> 
+> > , because FS is over stackable device
+> > directly. Stackable device has its own logic for handling underlying disks dead
+> > or deleted, then decide if its own disk needs to be deleted, such as, it is
+> > fine for raid1 to work from user viewpoint if one underlying disk is deleted.
+> 
+> We still need to propagate the even that device has been removed upwards.
+> Right now some file systems (especially XFS) are good at just propagating
+> it from an I/O error.  And explicity call would be much better.
+
+It depends on the above question about how FS code handle non s_bdev
+deletion/dead.
+
+
+Thanks,
+Ming
+
