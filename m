@@ -2,144 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E331AC77B75
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 22:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDD0C77B78
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 22:52:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229721AbjECWR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 18:17:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33806 "EHLO
+        id S229558AbjECWwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 18:52:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbjECWR4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 18:17:56 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F457D8E
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 15:17:53 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1ab13da70a3so22415185ad.1
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 15:17:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1683152273; x=1685744273;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZlTdG04TqTF7+/hzp5sSJRuB5EmsmvAFGgc3K+3F0Y=;
-        b=39WVkULqHXRDJ4WUYe73OzFA/R2wak2Byvue6BmOkCk/OUZ7TIFexiujMgqDtXjhoJ
-         vY8UhclcPr7rl4Zv2wbm/zdzS0ni41dpAUltS0ZIuTMSWKNEFldMe8omTChgh7JjGHw9
-         rVsx1Yw28FjKmAmsO5frsdqvSKA4ZJrGU5Gp+Q9w3fCsWnJVySoTDQBrKpXRB+VVwMsd
-         2mP535YsEeeVtqm0f04weAqu0Ix/cKqOgjAhn6wHaEI53Xkx+scS9ruET4oev/lz/RR9
-         HuYeHautziBafZRfpxfmTZFWObUFN65QoOJpAc8Hd0Mv9bIad3zclXTZRNBKp80hSzAf
-         fzBg==
+        with ESMTP id S229498AbjECWwP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 18:52:15 -0400
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1969F44B6
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 15:52:14 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1aaf21bb427so31963225ad.1
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 15:52:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683152273; x=1685744273;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SZlTdG04TqTF7+/hzp5sSJRuB5EmsmvAFGgc3K+3F0Y=;
-        b=IMQllDBzrkPGxTxiqP6MXZREk2x9Y+oKnEY1EWGLVX99vdOokkZmZri63s01uiNJV+
-         erLrtWpKMk5jNDXGyyaX2lsb4c2qH3Tu74jhWzB4bj2d+amKPlAZSOxYJAFo9yDh2otM
-         TG1cdxEXD1w5OfssEF8tuREmKbBDWpAcZMBgtszGL44zQpVgDxmo1bRerMtc932MlN7n
-         1jlHEwRhRFs7A+2Xz27L7iP5xsAvyCxi17j+6XRGvXByudkTLbnUwRhnrr7sNwCebHIB
-         mvWGGMNGT7ksPHh2dWAO6I3/A88UFejF+1sAdOp5i5i/tSR59Y7qFjs/6Ssp5mzkJQfa
-         EnSQ==
-X-Gm-Message-State: AC+VfDzQBFs/mfdP5R2w91FtXCvZgwQyQfSimhnj3CysaLGvWvcqwu5H
-        FIYHtzOczDLBSxnW6uHPBG1uRQ==
-X-Google-Smtp-Source: ACHHUZ6w6FNkuZBKWIHG+izk4/mp1lXBQ8ap+jb9gyt4ryTRiawSHwELQjohp4JJfay700Tr/2IfyQ==
-X-Received: by 2002:a17:902:be08:b0:1a6:d8a3:3346 with SMTP id r8-20020a170902be0800b001a6d8a33346mr1422648pls.31.1683152272764;
-        Wed, 03 May 2023 15:17:52 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-88-204.pa.nsw.optusnet.com.au. [49.181.88.204])
-        by smtp.gmail.com with ESMTPSA id q7-20020a170902bd8700b001a6ff7bd4d9sm22112696pls.15.2023.05.03.15.17.51
+        d=1e100.net; s=20221208; t=1683154333; x=1685746333;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vDcymp3JnX1nkbupbRK2c50ONFnxz7pe2P6XHkvRwtg=;
+        b=gmpdEK6sfTkOAAAJYM+btD+7eXeYVecBW7hVlhrdlQFji1Wg1/nXR0txS+ncKcwird
+         QEHBHtBGNbufBM7GkCCzfDO8LsqwfmAZUvHcAOQ0j8vMor8Vud20flgPQMfd3BDzEZRK
+         z4h11NEzEABm0HPeQMbwRTU5en+DipYtqUHurZKz1TtYgWFLfV7PoyrRyVzOyxpDQadh
+         kekRTpDuHOjjvUnPOLlwcz0pEN44WZr9qQ81OAQmNlIkFDAksts4Gd0/vnW6z7AuPd8/
+         WcURUPnr+l0OLaPY1NtAdWLSYpQqqDWt6XIRLayTrkmdEP/Gf7nQaEM/ul+VwrNrVoMY
+         i9Wg==
+X-Gm-Message-State: AC+VfDzpW+2haDGHUS/x96EiYztnNZ3jNCpSo+/tmfaoTs0Qg7nUp5Ue
+        cqml+72bR3l//9kGWJNEPlSrs4NpzAY=
+X-Google-Smtp-Source: ACHHUZ4n65rwztRq7VKYunaO0TuSKJEPdb955WHdhYWc5xMW9r18X4VR/wd46QgIs7CwObrygUfiLA==
+X-Received: by 2002:a17:902:e883:b0:1ab:a30:c89d with SMTP id w3-20020a170902e88300b001ab0a30c89dmr1967947plg.51.1683154333315;
+        Wed, 03 May 2023 15:52:13 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:2c3b:81e:ce21:2437])
+        by smtp.gmail.com with ESMTPSA id e3-20020a170902744300b001aad4be4503sm227085plt.2.2023.05.03.15.52.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 May 2023 15:17:51 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1puKnF-00B0ur-4U; Thu, 04 May 2023 08:17:49 +1000
-Date:   Thu, 4 May 2023 08:17:49 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     John Garry <john.g.garry@oracle.com>
-Cc:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        martin.petersen@oracle.com, djwong@kernel.org,
-        viro@zeniv.linux.org.uk, brauner@kernel.org, dchinner@redhat.com,
-        jejb@linux.ibm.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        linux-security-module@vger.kernel.org, paul@paul-moore.com,
-        jmorris@namei.org, serge@hallyn.com
-Subject: Re: [PATCH RFC 03/16] xfs: Support atomic write for statx
-Message-ID: <20230503221749.GF3223426@dread.disaster.area>
-References: <20230503183821.1473305-1-john.g.garry@oracle.com>
- <20230503183821.1473305-4-john.g.garry@oracle.com>
+        Wed, 03 May 2023 15:52:12 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v4 00/11] mq-deadline: Improve support for zoned block devices
+Date:   Wed,  3 May 2023 15:51:57 -0700
+Message-ID: <20230503225208.2439206-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230503183821.1473305-4-john.g.garry@oracle.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 03, 2023 at 06:38:08PM +0000, John Garry wrote:
-> Support providing info on atomic write unit min and max.
-> 
-> Darrick Wong originally authored this change.
-> 
-> Signed-off-by: John Garry <john.g.garry@oracle.com>
-> ---
->  fs/xfs/xfs_iops.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
-> index 24718adb3c16..e542077704aa 100644
-> --- a/fs/xfs/xfs_iops.c
-> +++ b/fs/xfs/xfs_iops.c
-> @@ -614,6 +614,16 @@ xfs_vn_getattr(
->  			stat->dio_mem_align = bdev_dma_alignment(bdev) + 1;
->  			stat->dio_offset_align = bdev_logical_block_size(bdev);
->  		}
-> +		if (request_mask & STATX_WRITE_ATOMIC) {
-> +			struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
-> +			struct block_device	*bdev = target->bt_bdev;
-> +
-> +			stat->atomic_write_unit_min = queue_atomic_write_unit_min(bdev->bd_queue);
-> +			stat->atomic_write_unit_max = queue_atomic_write_unit_max(bdev->bd_queue);
+Hi Jens,
 
-I'm not sure this is right.
+This patch series improves support for zoned block devices in the mq-deadline
+scheduler by preserving the order of requeued writes (REQ_OP_WRITE*).
 
-Given that we may have a 4kB physical sector device, XFS will not
-allow IOs smaller than physical sector size. The initial values of
-queue_atomic_write_unit_min/max() will be (1 << SECTOR_SIZE) which
-is 512 bytes. IOs done with 4kB sector size devices will fail in
-this case.
+Please consider this patch series for the next merge window.
 
-Further, XFS has a software sector size - it can define the sector
-size for the filesystem to be 4KB on a 512 byte sector device. And
-in that case, the filesystem will reject 512 byte sized/aligned IOs
-as they are smaller than the filesystem sector size (i.e. a config
-that prevents sub-physical sector IO for 512 logical/4kB physical
-devices).
+Thank you,
 
-There may other filesystem constraints - realtime devices have fixed
-minimum allocation sizes which may be larger than atomic write
-limits, which means that IO completion needs to split extents into
-multiple unwritten/written extents, extent size hints might be in
-use meaning we have different allocation alignment constraints to
-atomic write constraints, stripe alignment of extent allocation may
-through out atomic write alignment, etc.
+Bart.
 
-These are all solvable, but we need to make sure here that the
-filesystem constraints are taken into account here, not just the
-block device limits.
+Changes compared to v3:
+- Addressed Christoph's review feedback.
+- Dropped patch "block: Micro-optimize blk_req_needs_zone_write_lock()".
+- Added three new patches:
+  * block: Fix the type of the second bdev_op_is_zoned_write() argument
+  * block: Introduce op_is_zoned_write()
+  * block: mq-deadline: Reduce lock contention
 
-As such, it is probably better to query these limits at filesystem
-mount time and add them to the xfs buftarg (same as we do for
-logical and physical sector sizes) and then use the xfs buftarg
-values rather than having to go all the way to the device queue
-here. That way we can ensure at mount time that atomic write limits
-don't conflict with logical/physical IO limits, and we can further
-constrain atomic limits during mount without always having to
-recalculate those limits from first principles on every stat()
-call...
+Changes compared to v2:
+- In the patch that micro-optimizes blk_req_needs_zone_write_lock(), inline
+  bdev_op_is_zoned_write() instead of modifying it.
+- In patch "block: Introduce blk_rq_is_seq_zoned_write()", converted "case
+  REQ_OP_ZONE_APPEND" into a source code comment.
+- Reworked deadline_skip_seq_writes() as suggested by Christoph.
+- Dropped the patch that disabled head insertion for zoned writes.
+- Dropped patch "mq-deadline: Fix a race condition related to zoned writes".
+- Reworked handling of requeued requests: the 'next_rq' pointer has been
+  removed and instead the position of the most recently dispatched request is
+  tracked.
+- Dropped the patches for tracking zone capacity and for restricting the number
+  of active zones.
 
-Cheers,
+Changes compared to v1:
+- Left out the patches related to request insertion and requeuing since
+  Christoph is busy with reworking these patches.
+- Added a patch for enforcing the active zone limit.
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Bart Van Assche (11):
+  block: Simplify blk_req_needs_zone_write_lock()
+  block: Fix the type of the second bdev_op_is_zoned_write() argument
+  block: Introduce op_is_zoned_write()
+  block: Introduce blk_rq_is_seq_zoned_write()
+  block: mq-deadline: Clean up deadline_check_fifo()
+  block: mq-deadline: Simplify deadline_skip_seq_writes()
+  block: mq-deadline: Improve deadline_skip_seq_writes()
+  block: mq-deadline: Reduce lock contention
+  block: mq-deadline: Track the dispatch position
+  block: mq-deadline: Handle requeued requests correctly
+  block: mq-deadline: Fix handling of at-head zoned writes
+
+ block/blk-zoned.c      |  20 +++++---
+ block/mq-deadline.c    | 114 +++++++++++++++++++++++++++++------------
+ include/linux/blk-mq.h |   6 +++
+ include/linux/blkdev.h |  13 +++--
+ 4 files changed, 107 insertions(+), 46 deletions(-)
+
