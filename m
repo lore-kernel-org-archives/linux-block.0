@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BBFC77B78
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 22:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDCAC77B78
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 22:52:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbjECWw2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 18:52:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46804 "EHLO
+        id S229734AbjECWwc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 18:52:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbjECWw0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 18:52:26 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735437D9B
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 15:52:25 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1aaef97652fso32958725ad.0
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 15:52:25 -0700 (PDT)
+        with ESMTP id S229738AbjECWwa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 18:52:30 -0400
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4EC44B6
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 15:52:26 -0700 (PDT)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-51b4ef5378bso5043872a12.1
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 15:52:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683154345; x=1685746345;
+        d=1e100.net; s=20221208; t=1683154346; x=1685746346;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9PNHTA2TJaiV8MHw8Xe7x5V35kk/xVBm629j778VyPY=;
-        b=g2Fjg4SJyEp/ooQHnssLvSwbpvdXjQcGPls5BdLCZ0XUXxa4/F9lGU7xCwkH2aHxu/
-         LOywQ9sVnqdISyUPpKsgyr8dLxG/9MjmDFyPynvWX765IB7EaYgta0+yQ84w4ueGW7Rg
-         anBp3czSgQfl0a2SOccsQ2EhRz3iAuw1Nrv5sbRRwl4yZoE6pylHX+xXQ2N5WxdCPH7W
-         ITLyp1JLytMqDDAHNTxnRY1ky1Csbji2nBvG1BdrtJVsVeNxF0jw35dzdyMfBh55C7yy
-         A/fYJVVeYxgdCVpEXFa4fo8jDik/JVMTpW7mUB0et4AppfKA9yPoKfejvOptZ4zjiU0P
-         bjzA==
-X-Gm-Message-State: AC+VfDyxfNPaR/SzSUS+4giVZd5GaMIeSTbSueUxjiUh6KmhbrZW0GAn
-        D+b5h/1P5O3tKV3IthT96XSWizhDvtc=
-X-Google-Smtp-Source: ACHHUZ6gQo6ZPpRPAL590tgnBJOst89kupWyKKz478CniZzF4cEKbt9ZDfu5qsumtOOTTN/lk9gUrw==
-X-Received: by 2002:a17:902:bd86:b0:1ab:ef3:73e5 with SMTP id q6-20020a170902bd8600b001ab0ef373e5mr1523818pls.61.1683154344693;
-        Wed, 03 May 2023 15:52:24 -0700 (PDT)
+        bh=rvyV5nB3Z6rJkKiErzOVe3S6el5xPZ52sQ/N5pFxNtQ=;
+        b=g7Xkm6s/XWaZka/99S9T4kPGERCip1berzdeBDtA68A5V0V9F42EOi3ILuSdR/v4A6
+         iy2wK70l0/lxFTc1FC1xDrNti3j1N6ZWngOQ3mUlogRYnHjhhuxAgRmseaVVPrtqgsEW
+         zyGrVpuBz8TtkVfC08POakbdckHiwXpRl9gO0QQ+UPDSIRZTNyHV818F+UO7TcXDEitf
+         SoiJFz7veK+1OxD3a2yVDaRbTg7oGY3mAIQ3bhmoiIAyrrGeocqgIQkbNGDYei4WIZzr
+         Y6u/+BOJXNN/IT8EpO3hlW0ypwV8QNYKK7b+L7qWA5ZOVEMjndWJAE7VWcGieRDIo/j0
+         f9zg==
+X-Gm-Message-State: AC+VfDxS2mW7iCXarOaSHBy1ayJjtcn8+bgk5HjaQoB+MOqKdlYhtK5d
+        tMEKLiFvx+ulFYCbHMmo6Ao=
+X-Google-Smtp-Source: ACHHUZ4qQqGGS1cxJ/0ZSvOzeRK3J/TuIL0p77uNW4z+tbW4N64EhDKknZA4vk0Xz64AyXTKWC1PKg==
+X-Received: by 2002:a17:902:968e:b0:1a1:bff4:49e9 with SMTP id n14-20020a170902968e00b001a1bff449e9mr1473286plp.23.1683154346021;
+        Wed, 03 May 2023 15:52:26 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:2c3b:81e:ce21:2437])
-        by smtp.gmail.com with ESMTPSA id e3-20020a170902744300b001aad4be4503sm227085plt.2.2023.05.03.15.52.23
+        by smtp.gmail.com with ESMTPSA id e3-20020a170902744300b001aad4be4503sm227085plt.2.2023.05.03.15.52.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 May 2023 15:52:24 -0700 (PDT)
+        Wed, 03 May 2023 15:52:25 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
@@ -44,9 +44,9 @@ Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v4 09/11] block: mq-deadline: Track the dispatch position
-Date:   Wed,  3 May 2023 15:52:06 -0700
-Message-ID: <20230503225208.2439206-10-bvanassche@acm.org>
+Subject: [PATCH v4 10/11] block: mq-deadline: Handle requeued requests correctly
+Date:   Wed,  3 May 2023 15:52:07 -0700
+Message-ID: <20230503225208.2439206-11-bvanassche@acm.org>
 X-Mailer: git-send-email 2.40.1.495.gc816e09b53d-goog
 In-Reply-To: <20230503225208.2439206-1-bvanassche@acm.org>
 References: <20230503225208.2439206-1-bvanassche@acm.org>
@@ -56,132 +56,82 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Track the position (sector_t) of the most recently dispatched request
-instead of tracking a pointer to the next request to dispatch. This
-patch is the basis for patch "Handle requeued requests correctly".
-Without this patch it would be significantly more complicated to make
-sure that zoned writes are dispatched in LBA order per zone.
+Start dispatching from the start of a zone instead of from the starting
+position of the most recently dispatched request.
+
+If a zoned write is requeued with an LBA that is lower than already
+inserted zoned writes, make sure that it is submitted first.
 
 Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 45 +++++++++++++++++++++++++++++++--------------
- 1 file changed, 31 insertions(+), 14 deletions(-)
+ block/mq-deadline.c | 34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 56cc29953e15..b482b707cb37 100644
+index b482b707cb37..6c196182f86c 100644
 --- a/block/mq-deadline.c
 +++ b/block/mq-deadline.c
-@@ -74,8 +74,8 @@ struct dd_per_prio {
- 	struct list_head dispatch;
- 	struct rb_root sort_list[DD_DIR_COUNT];
- 	struct list_head fifo_list[DD_DIR_COUNT];
--	/* Next request in FIFO order. Read, write or both are NULL. */
--	struct request *next_rq[DD_DIR_COUNT];
-+	/* Position of the most recently dispatched request. */
-+	sector_t latest_pos[DD_DIR_COUNT];
- 	struct io_stats_per_prio stats;
- };
- 
-@@ -156,6 +156,25 @@ deadline_latter_request(struct request *rq)
+@@ -156,13 +156,28 @@ deadline_latter_request(struct request *rq)
  	return NULL;
  }
  
-+/* Return the first request for which blk_rq_pos() >= pos. */
-+static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
-+				enum dd_data_dir data_dir, sector_t pos)
-+{
-+	struct rb_node *node = per_prio->sort_list[data_dir].rb_node;
-+	struct request *rq, *res = NULL;
+-/* Return the first request for which blk_rq_pos() >= pos. */
++/*
++ * Return the first request for which blk_rq_pos() >= @pos. For zoned devices,
++ * return the first request after the highest zone start <= @pos.
++ */
+ static inline struct request *deadline_from_pos(struct dd_per_prio *per_prio,
+ 				enum dd_data_dir data_dir, sector_t pos)
+ {
+ 	struct rb_node *node = per_prio->sort_list[data_dir].rb_node;
+ 	struct request *rq, *res = NULL;
+ 
++	if (!node)
++		return NULL;
 +
-+	while (node) {
-+		rq = rb_entry_rq(node);
-+		if (blk_rq_pos(rq) >= pos) {
-+			res = rq;
-+			node = node->rb_left;
-+		} else {
-+			node = node->rb_right;
++	rq = rb_entry_rq(node);
++	/*
++	 * A zoned write may have been requeued with a starting position that
++	 * is below that of the most recently dispatched request. Hence, for
++	 * zoned writes, start searching from the start of a zone.
++	 */
++	if (blk_rq_is_seq_zoned_write(rq))
++		pos -= round_down(pos, rq->q->limits.chunk_sectors);
++
+ 	while (node) {
+ 		rq = rb_entry_rq(node);
+ 		if (blk_rq_pos(rq) >= pos) {
+@@ -812,6 +827,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 		list_add(&rq->queuelist, &per_prio->dispatch);
+ 		rq->fifo_time = jiffies;
+ 	} else {
++		struct list_head *insert_before;
++
+ 		deadline_add_rq_rb(per_prio, rq);
+ 
+ 		if (rq_mergeable(rq)) {
+@@ -824,7 +841,20 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 		 * set expire time and add to fifo list
+ 		 */
+ 		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
+-		list_add_tail(&rq->queuelist, &per_prio->fifo_list[data_dir]);
++		insert_before = &per_prio->fifo_list[data_dir];
++#ifdef CONFIG_BLK_DEV_ZONED
++		/*
++		 * Insert zoned writes such that requests are sorted by
++		 * position per zone.
++		 */
++		if (blk_rq_is_seq_zoned_write(rq)) {
++			struct request *rq2 = deadline_latter_request(rq);
++
++			if (rq2 && blk_rq_zone_no(rq2) == blk_rq_zone_no(rq))
++				insert_before = &rq2->queuelist;
 +		}
-+	}
-+	return res;
-+}
-+
- static void
- deadline_add_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
- {
-@@ -167,11 +186,6 @@ deadline_add_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
- static inline void
- deadline_del_rq_rb(struct dd_per_prio *per_prio, struct request *rq)
- {
--	const enum dd_data_dir data_dir = rq_data_dir(rq);
--
--	if (per_prio->next_rq[data_dir] == rq)
--		per_prio->next_rq[data_dir] = deadline_latter_request(rq);
--
- 	elv_rb_del(deadline_rb_root(per_prio, rq), rq);
++#endif
++		list_add_tail(&rq->queuelist, insert_before);
+ 	}
  }
  
-@@ -251,10 +265,6 @@ static void
- deadline_move_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 		      struct request *rq)
- {
--	const enum dd_data_dir data_dir = rq_data_dir(rq);
--
--	per_prio->next_rq[data_dir] = deadline_latter_request(rq);
--
- 	/*
- 	 * take it off the sort and fifo list
- 	 */
-@@ -363,7 +373,8 @@ deadline_next_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 	struct request *rq;
- 	unsigned long flags;
- 
--	rq = per_prio->next_rq[data_dir];
-+	rq = deadline_from_pos(per_prio, data_dir,
-+			       per_prio->latest_pos[data_dir]);
- 	if (!rq)
- 		return NULL;
- 
-@@ -426,6 +437,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
- 		if (started_after(dd, rq, latest_start))
- 			return NULL;
- 		list_del_init(&rq->queuelist);
-+		data_dir = rq_data_dir(rq);
- 		goto done;
- 	}
- 
-@@ -433,9 +445,11 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
- 	 * batches are currently reads XOR writes
- 	 */
- 	rq = deadline_next_request(dd, per_prio, dd->last_dir);
--	if (rq && dd->batching < dd->fifo_batch)
-+	if (rq && dd->batching < dd->fifo_batch) {
- 		/* we have a next request are still entitled to batch */
-+		data_dir = rq_data_dir(rq);
- 		goto dispatch_request;
-+	}
- 
- 	/*
- 	 * at this point we are not running a batch. select the appropriate
-@@ -513,6 +527,7 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
- done:
- 	ioprio_class = dd_rq_ioclass(rq);
- 	prio = ioprio_class_to_prio[ioprio_class];
-+	dd->per_prio[prio].latest_pos[data_dir] = blk_rq_pos(rq);
- 	dd->per_prio[prio].stats.dispatched++;
- 	/*
- 	 * If the request needs its target zone locked, do it.
-@@ -1029,8 +1044,10 @@ static int deadline_##name##_next_rq_show(void *data,			\
- 	struct request_queue *q = data;					\
- 	struct deadline_data *dd = q->elevator->elevator_data;		\
- 	struct dd_per_prio *per_prio = &dd->per_prio[prio];		\
--	struct request *rq = per_prio->next_rq[data_dir];		\
-+	struct request *rq;						\
- 									\
-+	rq = deadline_from_pos(per_prio, data_dir,			\
-+			       per_prio->latest_pos[data_dir]);		\
- 	if (rq)								\
- 		__blk_mq_debugfs_rq_show(m, rq);			\
- 	return 0;							\
