@@ -2,210 +2,335 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEE3C7EE22
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 08:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE9EC77B75
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 09:07:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230120AbjECIkH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 04:40:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54772 "EHLO
+        id S229865AbjECJH0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 05:07:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229765AbjECIje (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 04:39:34 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5018E4EE8;
-        Wed,  3 May 2023 01:39:11 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 118CC21E2D;
-        Wed,  3 May 2023 08:38:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683103099; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=xSSkXVe1t4+y8aarOchJvEGbB8BgCUoCkb7YG1lURIU=;
-        b=VpEQY5CfEMc3+JhWpnWPZ2aUtGmR2UTr2NTOjznUJI1Y2CFed3lXxt2Kt8HMjhdALSDq3t
-        KJ8QJzuWKDzQRgL5gmSH8Tejpapgup+x3nIGUj3AUiWsI829n+NoKtcWErGSiz44E3n0Ve
-        PAKdL5kORLfx+Z2qJXWgSjRlREQvNAQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683103099;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=xSSkXVe1t4+y8aarOchJvEGbB8BgCUoCkb7YG1lURIU=;
-        b=4I7KDceQZa/IOuVyeAF5u+CTeA4jviHAlt+N8asTEIt9Yg6q7N72JL94neFsFblFNpxglG
-        Vqm/5DEQ+nCIRyAw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F2612139F8;
-        Wed,  3 May 2023 08:38:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 2mcnO3odUmSudQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 03 May 2023 08:38:18 +0000
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>, Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v3 0/2] nvme_trtype=fc fixes
-Date:   Wed,  3 May 2023 10:38:14 +0200
-Message-Id: <20230503083816.18792-1-dwagner@suse.de>
+        with ESMTP id S229660AbjECJHX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 05:07:23 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCACB40FD
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 02:07:18 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3063433fa66so1615289f8f.3
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 02:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683104837; x=1685696837;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eyybpekGpHGVvvaVewFrSrZRoEZZ/l3dGyzewmhKKwg=;
+        b=Hpob7q1r0p4V0caXE2crEE/51FttP5ZNpxWPBnl62DekIdsJcpMiZqQ+U+0jmvfFhs
+         BuAsztkxherqbyie+iWYnyQMMPYONBuj/oH4n3bIkTFCW6YxZ1Qzi8QEu4wrtQeU4R3m
+         7pVC6wXg8s6dc6fWLdUSxUdlxle+M8WZmsl6xw4ADtWTPKY3Cr+OeVC1eL/tZD3HUO9D
+         q8HSTwHe/phJrkywr0Cj2YrKfBXdA8V3FvuTAJaBlWK+ou8a65EmklXozWcnoVqQl1Nt
+         SaOHMzoSKIqGjhbX5y3I97bbfDs7YJsYXztcWuw71U7QjlCUZXS0UIkgwyYoGaNAdEA8
+         IrdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683104837; x=1685696837;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eyybpekGpHGVvvaVewFrSrZRoEZZ/l3dGyzewmhKKwg=;
+        b=FVwAvdUNJrmiOU9/2i6fMogBLKvl+TGQsVuwaRelkug3/8Ou0ukFrBVodYJbL3gYx+
+         HVKkG3fQUmnxJDix5OS62ii5nEI3wyQbCwcWZkvwfkItnUrhrMkJSc82sQ67vYt7jbVO
+         WGGkORKhlAAZAVmjktyUIXcsT4YBb9Fe/MC/t/iA1KzXEs+abx7Klt/8sQgWplMjmOaP
+         xM46m3DPJ4uGs0gR3HsHUEUQfFh/erXKrChR3JNdLzS/BOj/4iyWYmmhMCVk9V6RsBR4
+         aIVCGTw817yIB7nAAqobd0Xkffr98N3By2S1rE/cniU+XQJmSGoq+jVajNX1XiWZX4C/
+         IcWw==
+X-Gm-Message-State: AC+VfDw/TeaL5iNqrxcR7OU3TSYQd/378BMf8UhJwJyYmJuoFjGFax1Y
+        bpBh4Zvk5QNSZL3w94qUOpcegg==
+X-Google-Smtp-Source: ACHHUZ4c7pdGYmFDE+EObHEdf29jnpXn/rtwlDJWATkEBCQ9LPR+y1yLX/HtD1fPIL1dXO2oFBe9Lg==
+X-Received: by 2002:a5d:54d1:0:b0:306:2ff6:5cbf with SMTP id x17-20020a5d54d1000000b003062ff65cbfmr6873320wrv.24.1683104837081;
+        Wed, 03 May 2023 02:07:17 -0700 (PDT)
+Received: from localhost ([147.161.155.99])
+        by smtp.gmail.com with ESMTPSA id e2-20020a056000120200b00306281cfa59sm9741741wrx.47.2023.05.03.02.07.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 May 2023 02:07:16 -0700 (PDT)
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     Andreas Hindborg <a.hindborg@samsung.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        Andreas Hindborg <nmi@metaspace.dk>,
+        linux-kernel@vger.kernel.org (open list), gost.dev@samsung.com
+Subject: [RFC PATCH 01/11] rust: add radix tree abstraction
+Date:   Wed,  3 May 2023 11:06:58 +0200
+Message-Id: <20230503090708.2524310-2-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230503090708.2524310-1-nmi@metaspace.dk>
+References: <20230503090708.2524310-1-nmi@metaspace.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I've dropped the unrelated rdma change from v2. With the kernel patches
+From: Andreas Hindborg <a.hindborg@samsung.com>
 
-  https://lore.kernel.org/linux-nvme/20230418130159.11075-1-dwagner@suse.de/
+Add abstractions for the C radix_tree. This abstraction allows Rust code to use
+the radix_tree as a map from `u64` keys to `ForeignOwnable` values.
 
-I get this here:
+Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
+---
+ rust/bindings/bindings_helper.h |   2 +
+ rust/bindings/lib.rs            |   1 +
+ rust/helpers.c                  |  22 +++++
+ rust/kernel/lib.rs              |   1 +
+ rust/kernel/radix_tree.rs       | 156 ++++++++++++++++++++++++++++++++
+ 5 files changed, 182 insertions(+)
+ create mode 100644 rust/kernel/radix_tree.rs
 
-# nvme_img_size=16M nvme_num_iter=10 nvme_trtype=fc ./check nvme
-nvme/002 (create many subsystems and test discovery)         [not run]
-    nvme_trtype=fc is not supported in this test
-nvme/003 (test if we're sending keep-alives to a discovery controller) [passed]
-    runtime  10.252s  ...  10.259s
-nvme/004 (test nvme and nvmet UUID NS descriptors)           [passed]
-    runtime  1.662s  ...  1.810s
-nvme/005 (reset local loopback target)                       [passed]
-    runtime  1.905s  ...  1.925s
-nvme/006 (create an NVMeOF target with a block device-backed ns) [passed]
-    runtime  0.161s  ...  0.149s
-nvme/007 (create an NVMeOF target with a file-backed ns)     [passed]
-    runtime  0.132s  ...  0.098s
-nvme/008 (create an NVMeOF host with a block device-backed ns) [passed]
-    runtime  1.776s  ...  1.760s
-nvme/009 (create an NVMeOF host with a file-backed ns)       [passed]
-    runtime  1.665s  ...  1.738s
-nvme/010 (run data verification fio job on NVMeOF block device-backed ns) [passed]
-    runtime  2.693s  ...  2.744s
-nvme/011 (run data verification fio job on NVMeOF file-backed ns) [passed]
-    runtime  2.981s  ...  3.066s
-nvme/012 (run mkfs and data verification fio job on NVMeOF block device-backed ns) [not run]
-    nvme_img_size must be at least 350m
-nvme/013 (run mkfs and data verification fio job on NVMeOF file-backed ns) [not run]
-    nvme_img_size must be at least 350m
-nvme/014 (flush a NVMeOF block device-backed ns)             [passed]
-    runtime  1.976s  ...  1.963s
-nvme/015 (unit test for NVMe flush for file backed ns)       [passed]
-    runtime  1.945s  ...  1.787s
-nvme/016 (create/delete many NVMeOF block device-backed ns and test discovery) [not run]
-    nvme_trtype=fc is not supported in this test
-nvme/017 (create/delete many file-ns and test discovery)     [not run]
-    nvme_trtype=fc is not supported in this test
-nvme/018 (unit test NVMe-oF out of range access on a file backend) [passed]
-    runtime  1.773s  ...  1.779s
-nvme/019 (test NVMe DSM Discard command on NVMeOF block-device ns) [passed]
-    runtime  1.738s  ...  1.806s
-nvme/020 (test NVMe DSM Discard command on NVMeOF file-backed ns) [passed]
-    runtime  1.600s  ...  1.596s
-nvme/021 (test NVMe list command on NVMeOF file-backed ns)   [passed]
-    runtime  1.698s  ...  1.735s
-nvme/022 (test NVMe reset command on NVMeOF file-backed ns)  [passed]
-    runtime  1.831s  ...  1.853s
-nvme/023 (test NVMe smart-log command on NVMeOF block-device ns) [passed]
-    runtime  1.762s  ...  1.800s
-nvme/024 (test NVMe smart-log command on NVMeOF file-backed ns) [passed]
-    runtime  1.722s  ...  1.747s
-nvme/025 (test NVMe effects-log command on NVMeOF file-backed ns) [passed]
-    runtime  1.713s  ...  1.725s
-nvme/026 (test NVMe ns-descs command on NVMeOF file-backed ns) [passed]
-    runtime  1.672s  ...  1.731s
-nvme/027 (test NVMe ns-rescan command on NVMeOF file-backed ns) [passed]
-    runtime  1.719s  ...  1.764s
-nvme/028 (test NVMe list-subsys command on NVMeOF file-backed ns) [passed]
-    runtime  1.702s  ...  1.701s
-nvme/029 (test userspace IO via nvme-cli read/write interface) [passed]
-    runtime  2.053s  ...  2.180s
-nvme/030 (ensure the discovery generation counter is updated appropriately) [passed]
-    runtime  0.683s  ...  0.631s
-nvme/031 (test deletion of NVMeOF controllers immediately after setup) [passed]
-    runtime  3.438s  ...  3.770s
-nvme/038 (test deletion of NVMeOF subsystem without enabling) [passed]
-    runtime  0.053s  ...  0.057s
-nvme/040 (test nvme fabrics controller reset/disconnect operation during I/O)
-nvme/040 (test nvme fabrics controller reset/disconnect operation during I/O) [passed]
-    runtime  7.737s  ...  7.819srk/blktests/results/tmpdir.nvme.040.5O2': Directory not empty
-nvme/041 (Create authenticated connections)                 
-    runtime  0.275s  ...
-WARNING: Test did not clean up fc device: nvme1
-nvme/041 (Create authenticated connections)                  [failed]
-    runtime  0.275s  ...  0.384s
-    --- tests/nvme/041.out      2023-04-18 17:43:18.167745976 +0200
-    +++ /home/wagi/work/blktests/results/nodev/nvme/041.out.bad 2023-05-03 10:28:09.639741275 +0200
-    @@ -1,6 +1,8 @@
-     Running nvme/041
-     Test unauthenticated connection (should fail)
-    +failed to lookup subsystem for controller nvme1
-     NQN:blktests-subsystem-1 disconnected 0 controller(s)
-     Test authenticated connection
-    -NQN:blktests-subsystem-1 disconnected 1 controller(s)
-    +failed to lookup subsystem for controller nvme1
-    ...
-    (Run 'diff -u tests/nvme/041.out /home/wagi/work/blktests/results/nodev/nvme/041.out.bad' to see the entire diff)
-nvme/042 (Test dhchap key types for authenticated connections) [passed]
-    runtime  4.377s  ...  4.613s
-nvme/043 (Test hash and DH group variations for authenticated connections) [passed]
-    runtime  2.895s  ...  2.736s
-nvme/044 (Test bi-directional authentication)               
-    runtime  1.125s  ...
-WARNING: Test did not clean up fc device: nvme1
-nvme/044 (Test bi-directional authentication)                [failed]
-    runtime  1.125s  ...  1.133s
-    --- tests/nvme/044.out      2023-04-18 17:43:18.167745976 +0200
-    +++ /home/wagi/work/blktests/results/nodev/nvme/044.out.bad 2023-05-03 10:28:20.343798581 +0200
-    @@ -2,9 +2,12 @@
-     Test host authentication
-     NQN:blktests-subsystem-1 disconnected 1 controller(s)
-     Test invalid ctrl authentication (should fail)
-    +failed to lookup subsystem for controller nvme1
-     NQN:blktests-subsystem-1 disconnected 0 controller(s)
-     Test valid ctrl authentication
-    -NQN:blktests-subsystem-1 disconnected 1 controller(s)
-    ...
-    (Run 'diff -u tests/nvme/044.out /home/wagi/work/blktests/results/nodev/nvme/044.out.bad' to see the entire diff)
-nvme/045 (Test re-authentication)                            [passed]
-    runtime  5.689s  ...  5.835s
-nvme/047 (test different queue types for fabric transports)  [not run]
-    nvme_trtype=fc is not supported in this test
-nvme/048 (Test queue count changes on reconnect)             [failed]
-    runtime  16.271s  ...  15.564s
-    --- tests/nvme/048.out      2023-04-18 17:43:18.171745996 +0200
-    +++ /home/wagi/work/blktests/results/nodev/nvme/048.out.bad 2023-05-03 10:28:43.931924866 +0200
-    @@ -1,3 +1,7 @@
-     Running nvme/048
-    +expected state "connecting" not  reached within 5 seconds
-    +FAIL
-    +expected state "connecting" not  reached within 5 seconds
-    +FAIL
-     NQN:blktests-subsystem-1 disconnected 1 controller(s)
-     Test complete
-
-changes:
-v3:
- - changed subject prefix
- - drop the rdma cleanup reordering part
-
-v2:
-  - release fc resource in reverse order
-  - https://lore.kernel.org/linux-nvme/20230419084757.24846-1-dwagner@suse.de/
-v1:
-  - https://lore.kernel.org/linux-nvme/20230418123252.3725-1-dwagner@suse.de/
-
-Daniel Wagner (2):
-  nvme/rc: Cleanup fc ports in reverse order
-  nvme/rc: Cleanup fc resource before module unloading
-
- tests/nvme/rc | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
-
+diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
+index 50e7a76d5455..52834962b94d 100644
+--- a/rust/bindings/bindings_helper.h
++++ b/rust/bindings/bindings_helper.h
+@@ -10,7 +10,9 @@
+ #include <linux/refcount.h>
+ #include <linux/wait.h>
+ #include <linux/sched.h>
++#include <linux/radix-tree.h>
+ 
+ /* `bindgen` gets confused at certain things. */
+ const gfp_t BINDINGS_GFP_KERNEL = GFP_KERNEL;
++const gfp_t BINDINGS_GFP_ATOMIC = GFP_ATOMIC;
+ const gfp_t BINDINGS___GFP_ZERO = __GFP_ZERO;
+diff --git a/rust/bindings/lib.rs b/rust/bindings/lib.rs
+index 7b246454e009..62f36a9eb1f4 100644
+--- a/rust/bindings/lib.rs
++++ b/rust/bindings/lib.rs
+@@ -51,4 +51,5 @@ mod bindings_helper {
+ pub use bindings_raw::*;
+ 
+ pub const GFP_KERNEL: gfp_t = BINDINGS_GFP_KERNEL;
++pub const GFP_ATOMIC: gfp_t = BINDINGS_GFP_ATOMIC;
+ pub const __GFP_ZERO: gfp_t = BINDINGS___GFP_ZERO;
+diff --git a/rust/helpers.c b/rust/helpers.c
+index 81e80261d597..5dd5e325b7cc 100644
+--- a/rust/helpers.c
++++ b/rust/helpers.c
+@@ -26,6 +26,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/sched/signal.h>
+ #include <linux/wait.h>
++#include <linux/radix-tree.h>
+ 
+ __noreturn void rust_helper_BUG(void)
+ {
+@@ -128,6 +129,27 @@ void rust_helper_put_task_struct(struct task_struct *t)
+ }
+ EXPORT_SYMBOL_GPL(rust_helper_put_task_struct);
+ 
++void rust_helper_init_radix_tree(struct xarray *tree, gfp_t gfp_mask)
++{
++	INIT_RADIX_TREE(tree, gfp_mask);
++}
++EXPORT_SYMBOL_GPL(rust_helper_init_radix_tree);
++
++void **rust_helper_radix_tree_iter_init(struct radix_tree_iter *iter,
++					unsigned long start)
++{
++	return radix_tree_iter_init(iter, start);
++}
++EXPORT_SYMBOL_GPL(rust_helper_radix_tree_iter_init);
++
++void **rust_helper_radix_tree_next_slot(void **slot,
++					struct radix_tree_iter *iter,
++					unsigned flags)
++{
++	return radix_tree_next_slot(slot, iter, flags);
++}
++EXPORT_SYMBOL_GPL(rust_helper_radix_tree_next_slot);
++
+ /*
+  * We use `bindgen`'s `--size_t-is-usize` option to bind the C `size_t` type
+  * as the Rust `usize` type, so we can use it in contexts where Rust
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 676995d4e460..a85cb6aae8d6 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -40,6 +40,7 @@ pub mod init;
+ pub mod ioctl;
+ pub mod prelude;
+ pub mod print;
++pub mod radix_tree;
+ mod static_assert;
+ #[doc(hidden)]
+ pub mod std_vendor;
+diff --git a/rust/kernel/radix_tree.rs b/rust/kernel/radix_tree.rs
+new file mode 100644
+index 000000000000..f659ab8b017c
+--- /dev/null
++++ b/rust/kernel/radix_tree.rs
+@@ -0,0 +1,156 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! RadixTree abstraction.
++//!
++//! C header: [`include/linux/radix_tree.h`](../../include/linux/radix_tree.h)
++
++use crate::error::to_result;
++use crate::error::Result;
++use crate::types::ForeignOwnable;
++use crate::types::Opaque;
++use crate::types::ScopeGuard;
++use alloc::boxed::Box;
++use core::marker::PhantomData;
++use core::pin::Pin;
++
++type Key = u64;
++
++/// A map of `u64` to `ForeignOwnable`
++///
++/// # Invariants
++///
++/// - `tree` always points to a valid and initialized `struct radix_tree`.
++/// - Pointers stored in the tree are created by a call to `ForignOwnable::into_foreign()`
++pub struct RadixTree<V: ForeignOwnable> {
++    tree: Pin<Box<Opaque<bindings::xarray>>>,
++    _marker: PhantomData<V>,
++}
++
++impl<V: ForeignOwnable> RadixTree<V> {
++    /// Create a new radix tree
++    ///
++    /// Note: This function allocates memory with `GFP_ATOMIC`.
++    pub fn new() -> Result<Self> {
++        let tree = Pin::from(Box::try_new(Opaque::uninit())?);
++
++        // SAFETY: `tree` points to allocated but not initialized memory. This
++        // call will initialize the memory.
++        unsafe { bindings::init_radix_tree(tree.get(), bindings::GFP_ATOMIC) };
++
++        Ok(Self {
++            tree,
++            _marker: PhantomData,
++        })
++    }
++
++    /// Try to insert a value into the tree
++    pub fn try_insert(&mut self, key: Key, value: V) -> Result<()> {
++        // SAFETY: `self.tree` points to a valid and initialized `struct radix_tree`
++        let ret =
++            unsafe { bindings::radix_tree_insert(self.tree.get(), key, value.into_foreign() as _) };
++        to_result(ret)
++    }
++
++    /// Search for `key` in the map. Returns a reference to the associated
++    /// value if found.
++    pub fn get(&self, key: Key) -> Option<V::Borrowed<'_>> {
++        // SAFETY: `self.tree` points to a valid and initialized `struct radix_tree`
++        let item =
++            core::ptr::NonNull::new(unsafe { bindings::radix_tree_lookup(self.tree.get(), key) })?;
++
++        // SAFETY: `item` was created by a call to
++        // `ForeignOwnable::into_foreign()`. As `get_mut()` and `remove()` takes
++        // a `&mut self`, no mutable borrows for `item` can exist and
++        // `ForeignOwnable::from_foreign()` cannot be called until this borrow
++        // is dropped.
++        Some(unsafe { V::borrow(item.as_ptr()) })
++    }
++
++    /// Search for `key` in the map. Return a mutable reference to the
++    /// associated value if found.
++    pub fn get_mut(&mut self, key: Key) -> Option<MutBorrow<'_, V>> {
++        let item =
++            core::ptr::NonNull::new(unsafe { bindings::radix_tree_lookup(self.tree.get(), key) })?;
++
++        // SAFETY: `item` was created by a call to
++        // `ForeignOwnable::into_foreign()`. As `get()` takes a `&self` and
++        // `remove()` takes a `&mut self`, no borrows for `item` can exist and
++        // `ForeignOwnable::from_foreign()` cannot be called until this borrow
++        // is dropped.
++        Some(MutBorrow {
++            guard: unsafe { V::borrow_mut(item.as_ptr()) },
++            _marker: core::marker::PhantomData,
++        })
++    }
++
++    /// Search for `key` in the map. If `key` is found, the key and value is
++    /// removed from the map and the value is returned.
++    pub fn remove(&mut self, key: Key) -> Option<V> {
++        // SAFETY: `self.tree` points to a valid and initialized `struct radix_tree`
++        let item =
++            core::ptr::NonNull::new(unsafe { bindings::radix_tree_delete(self.tree.get(), key) })?;
++
++        // SAFETY: `item` was created by a call to
++        // `ForeignOwnable::into_foreign()` and no borrows to `item` can exist
++        // because this function takes a `&mut self`.
++        Some(unsafe { ForeignOwnable::from_foreign(item.as_ptr()) })
++    }
++}
++
++impl<V: ForeignOwnable> Drop for RadixTree<V> {
++    fn drop(&mut self) {
++        let mut iter = bindings::radix_tree_iter {
++            index: 0,
++            next_index: 0,
++            tags: 0,
++            node: core::ptr::null_mut(),
++        };
++
++        // SAFETY: Iter is valid as we allocated it on the stack above
++        let mut slot = unsafe { bindings::radix_tree_iter_init(&mut iter, 0) };
++        loop {
++            if slot.is_null() {
++                // SAFETY: Both `self.tree` and `iter` are valid
++                slot = unsafe { bindings::radix_tree_next_chunk(self.tree.get(), &mut iter, 0) };
++            }
++
++            if slot.is_null() {
++                break;
++            }
++
++            // SAFETY: `self.tree` is valid and iter is managed by
++            // `radix_tree_next_chunk()` and `radix_tree_next_slot()`
++            let item = unsafe { bindings::radix_tree_delete(self.tree.get(), iter.index) };
++            assert!(!item.is_null());
++
++            // SAFETY: All items in the tree are created by a call to
++            // `ForeignOwnable::into_foreign()`.
++            let _ = unsafe { V::from_foreign(item) };
++
++            // SAFETY: `self.tree` is valid and iter is managed by
++            // `radix_tree_next_chunk()` and `radix_tree_next_slot()`. Slot is
++            // not null.
++            slot = unsafe { bindings::radix_tree_next_slot(slot, &mut iter, 0) };
++        }
++    }
++}
++
++/// A mutable borrow of an object owned by a `RadixTree`
++pub struct MutBorrow<'a, V: ForeignOwnable> {
++    guard: ScopeGuard<V, fn(V)>,
++    _marker: core::marker::PhantomData<&'a mut V>,
++}
++
++impl<'a, V: ForeignOwnable> core::ops::Deref for MutBorrow<'a, V> {
++    type Target = ScopeGuard<V, fn(V)>;
++
++    fn deref(&self) -> &Self::Target {
++        &self.guard
++    }
++}
++
++impl<'a, V: ForeignOwnable> core::ops::DerefMut for MutBorrow<'a, V> {
++    fn deref_mut(&mut self) -> &mut Self::Target {
++        &mut self.guard
++    }
++}
 -- 
 2.40.0
 
