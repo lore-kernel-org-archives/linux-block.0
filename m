@@ -2,51 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F56CC77B78
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 10:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C190C77B75
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 10:25:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbjECKXS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 06:23:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39874 "EHLO
+        id S229595AbjECKZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 06:25:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjECKXR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 06:23:17 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A62E43
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 03:23:16 -0700 (PDT)
+        with ESMTP id S229552AbjECKZs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 06:25:48 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF86F35A6
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 03:25:45 -0700 (PDT)
 Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230503102315epoutp03226d078cc8d6d7a737a3e6519536ad93~bmxPZ-FA-2815228152epoutp03C
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 10:23:15 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230503102315epoutp03226d078cc8d6d7a737a3e6519536ad93~bmxPZ-FA-2815228152epoutp03C
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230503102544epoutp01ef714706a49815b25f1d41575097e60a~bmzaHO_wR2995129951epoutp01P
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 10:25:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230503102544epoutp01ef714706a49815b25f1d41575097e60a~bmzaHO_wR2995129951epoutp01P
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1683109395;
-        bh=ZM+sCSOwfR6BMhP2ycEflPofWbLGNzFKU7U4qcknaW8=;
+        s=mail20170921; t=1683109544;
+        bh=Qu9Yx8AHfpqjx58Hv8uRZKjzvr/nHdB5F0/a51oGkO8=;
         h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
-        b=uMFqmCmiUEeBZWiL9Sb6hAb6ydvxZNtemId5ZGobtPPI38INS2yHBf7GouLIc64fs
-         h6Drg74VaNZ+cxboIWBKtVNNWF4p8w1ibL5/51gB+zzJpnhvIhGu5g2S+IoWERpepA
-         bh43MtBAgOcGu/i+QYkUtfJoBagWscsr7doiCb5w=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-        20230503102314epcas2p47f783c917b77e312bf1314b109badd5d~bmxOoSSjZ1780817808epcas2p4J;
-        Wed,  3 May 2023 10:23:14 +0000 (GMT)
-Received: from epsmges2p4.samsung.com (unknown [182.195.36.88]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4QBChK6q5Lz4x9Px; Wed,  3 May
-        2023 10:23:13 +0000 (GMT)
-X-AuditID: b6c32a48-6d3fa70000005998-5b-645236115133
-Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
-        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        73.DF.22936.11632546; Wed,  3 May 2023 19:23:13 +0900 (KST)
+        b=MsXLWRzSWTXLUHxXqBeStKoWzjkGL85pXYRwZ6bTcsezk1Lwlk04RJfZcSpj76Oa5
+         CoFZ4hrb8sVi/9cZHNo02L3lummecQv1Od8Shdnkxn2AhGV5JrYnwLn9cdxScmOFlg
+         ljaG5uQukl8GbPks/Ug+CrtV5HhPxHAPhQZz27dU=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+        20230503102543epcas2p2ca5917ded82f913c41eaf6e72457d945~bmzZgxulP0035600356epcas2p2h;
+        Wed,  3 May 2023 10:25:43 +0000 (GMT)
+Received: from epsmges2p2.samsung.com (unknown [182.195.36.90]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4QBClB6HYFz4x9Q5; Wed,  3 May
+        2023 10:25:42 +0000 (GMT)
+X-AuditID: b6c32a46-8b7ff7000001438d-29-645236a6590e
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        D9.88.17293.6A632546; Wed,  3 May 2023 19:25:42 +0900 (KST)
 Mime-Version: 1.0
-Subject: [PATCH 12/15] nvme: rdma: change how to find the number of
- integrity of request
+Subject: [PATCH 13/15] block: add helper function for iteration of bip's
+ bvec
 Reply-To: j-young.choi@samsung.com
 Sender: Jinyoung CHOI <j-young.choi@samsung.com>
 From:   Jinyoung CHOI <j-young.choi@samsung.com>
 To:     Jinyoung CHOI <j-young.choi@samsung.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
         "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "kch@nvidia.com" <kch@nvidia.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "willy@infradead.org" <willy@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 X-Priority: 3
@@ -57,65 +58,87 @@ X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20230503102313epcms2p52eb54df61b367ae233c4dfe7c6594918@epcms2p5>
-Date:   Wed, 03 May 2023 19:23:13 +0900
-X-CMS-MailID: 20230503102313epcms2p52eb54df61b367ae233c4dfe7c6594918
+Message-ID: <20230503102542epcms2p371143d5975c9fa4e4a081b96f6bfc2c0@epcms2p3>
+Date:   Wed, 03 May 2023 19:25:42 +0900
+X-CMS-MailID: 20230503102542epcms2p371143d5975c9fa4e4a081b96f6bfc2c0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 X-CPGSPASS: Y
 X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprMJsWRmVeSWpSXmKPExsWy7bCmha6gWVCKwft7Jhar7/azWbw8pGmx
-        cvVRJove/q1sFpMOXWO02HtL2+LyrjlsFsuP/2OyWPf6PYsDp8f5extZPC6fLfXYtKqTzWP3
-        zQY2j49Pb7F49G1ZxejxeZNcAHtUtk1GamJKapFCal5yfkpmXrqtkndwvHO8qZmBoa6hpYW5
-        kkJeYm6qrZKLT4CuW2YO0F1KCmWJOaVAoYDE4mIlfTubovzSklSFjPziElul1IKUnALzAr3i
-        xNzi0rx0vbzUEitDAwMjU6DChOyMXZ82MxbsYa/o3jmHsYFxFVsXIyeHhICJRMOX+exdjFwc
-        QgI7GCUaemcDJTg4eAUEJf7uEAapERaIkphzYjUTiC0koCRxbs0sRpASYQEDiVu95iBhNgE9
-        iZ9LZoCNFBH4yySx80U+xHheiRntT1kgbGmJ7cu3MoLYnAJ+Eo833GKEiGtI/FjWywxhi0rc
-        XP2WHcZ+f2w+VI2IROu9s1A1ghIPfu6GiktKHDr0FexiCYF8iQ0HAiHCNRJvlx+AKtGXuNax
-        EewEXgFfiWcz/oLZLAKqEv/mX4aqcZHoXP8DbC2zgLzE9rdzmEFGMgtoSqzfpQ8xXVniyC0W
-        iAo+iY7Df9lhHmzY+Bsre8e8J0wQrWoSi5qMIMIyEl8Pz2efwKg0CxHIs5CsnYWwdgEj8ypG
-        sdSC4tz01GKjAhN4vCbn525iBKdOLY8djLPfftA7xMjEwXiIUYKDWUmE90OhX4oQb0piZVVq
-        UX58UWlOavEhRlOghycyS4km5wOTd15JvKGJpYGJmZmhuZGpgbmSOO/HDuUUIYH0xJLU7NTU
-        gtQimD4mDk6pBqY+qSD51z6didP3dxdsaNos//e/2NujIRdFq269/eXo0PLppqPvkhC7ze8P
-        /+ANiev94eu6deFGlW3eyU+0U2uOsmf8b5W6t/+YffPLo/PW2Zzme7X6XVN1r9A81bWySv83
-        zTvPkfT48CFV3VIzCaHFjPe43icbm8+8UKf3sOS94r41hQVfl/BvMHYVZ66r8jbMrmd4u6JR
-        Ovbo7UtFexItxdOyevguOJ/TPHzk5bZD7y6uC34x/yvnbTvH3vpWy9867IsfVYSL2ji0b9Se
-        cWCjmtQ0XTbtDoGvzL0pE25kVyQJmrf0r2JQvvgj8kZnFVPD7iuT/3bfvpjcP+3Kko61YcFu
-        01M359vYNR3TF1NiKc5INNRiLipOBACEuYZEJgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprLJsWRmVeSWpSXmKPExsWy7bCmue4ys6AUg94OI4vVd/vZLF4e0rRY
+        ufook0Vv/1Y2i79d95gsnl6dxWSx95a2xeVdc9gslh//x2Tx+8ccNgcuj80rtDwuny312H2z
+        gc2jt/kdm8fHp7dYPPq2rGL0+LxJzqP9QDdTAEdUtk1GamJKapFCal5yfkpmXrqtkndwvHO8
+        qZmBoa6hpYW5kkJeYm6qrZKLT4CuW2YO0IFKCmWJOaVAoYDE4mIlfTubovzSklSFjPziElul
+        1IKUnALzAr3ixNzi0rx0vbzUEitDAwMjU6DChOyMBT+2sBU84q2Y1d7I3sC4mruLkZNDQsBE
+        Yt2u6cxdjFwcQgI7GCVunNgM5HBw8AoISvzdIQxSIyzgL9G+9x87iC0koCRxbs0sRpASYQED
+        iVu95iBhNgE9iZ9LZrCBjBER2MUs8fXcRiaI+bwSM9qfskDY0hLbl29lBLE5BfwkHm+4xQgR
+        15D4sayXGcIWlbi5+i07jP3+2HyoGhGJ1ntnoWoEJR783A0Vl5Q4dOgrG8g9EgL5EhsOBEKE
+        ayTeLj8AVaIvca1jI9gJvAK+Ege+HmEFsVkEVCWuz2mBGukisWfFVLA4s4C8xPa3c8ChwCyg
+        KbF+lz7EdGWJI7dYICr4JDoO/2WHebBh42+s7B3znjBBtKpJLGoyggjLSHw9PJ99AqPSLEQo
+        z0KydhbC2gWMzKsYxVILinPTU4uNCozgEZucn7uJEZxOtdx2ME55+0HvECMTB+MhRgkOZiUR
+        3g+FfilCvCmJlVWpRfnxRaU5qcWHGE2BHp7ILCWanA9M6Hkl8YYmlgYmZmaG5kamBuZK4rzS
+        tieThQTSE0tSs1NTC1KLYPqYODilGphij/3gmCJr/2jC07abSUw7XgnlXCt5FyzczPjqb7z/
+        +mLFWxxWU88fU9mmcZ/R5+e1wv6VqfETFp291h3nWrrs3PZF9kf1m2dxp6seWpwVmfp5qbvX
+        +lKXp3uWFbSoJ8vt4azK5mab8v9492qzqRNLOCYyfGNkaY31Tdrz5Jt62qnOaMavnkzrIh0L
+        I6rnnD+6bX0EY8WLgOZXG56+23Ts0ZIZC51T2IynL+atCI/T9zyllPv71I9+Xf/a1qXiPesi
+        g/7fYXPZ8Di0Xo5b2P39j1ixp9cD/vUFy/RwmJZ90i/MXexVf2ujDd/D5u3JwptZfW/GRL4o
+        W3K+J9YnQuhSflNFfG/WtWy+5v3dlkosxRmJhlrMRcWJAB06peUwBAAA
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323
 References: <20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323@epcms2p4>
-        <CGME20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323@epcms2p5>
+        <CGME20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323@epcms2p3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since the request has the number of integrity segments, change to use
-the relevant api.
+bip_for_each_vec() performs the iteration in a page unit.
+
+Since a bio_vec of bip is composed of multi-page in the block, a macro
+that can be carried out in multi-page units has been added.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 
 Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
 ---
- drivers/nvme/host/rdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/bio.h  | 4 ++++
+ include/linux/bvec.h | 6 ++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 0eb79696fb73..237d81ad54af 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -1507,7 +1507,7 @@ static int nvme_rdma_dma_map_req(struct ib_device *ibdev, struct request *rq,
- 		req->metadata_sgl->sg_table.sgl =
- 			(struct scatterlist *)(req->metadata_sgl + 1);
- 		ret = sg_alloc_table_chained(&req->metadata_sgl->sg_table,
--				blk_rq_count_integrity_sg(rq->q, rq->bio),
-+				blk_rq_nr_integrity_segments(rq),
- 				req->metadata_sgl->sg_table.sgl,
- 				NVME_INLINE_METADATA_SG_CNT);
- 		if (unlikely(ret)) {
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index b53a595b519a..e3e437ce694c 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -695,6 +695,10 @@ static inline bool bioset_initialized(struct bio_set *bs)
+ 
+ #if defined(CONFIG_BLK_DEV_INTEGRITY)
+ 
++/* iterate over multi-page bvec for integrity */
++#define bip_for_each_mp_bvec(bvl, bip, iter)				\
++	for_each_mp_bvec(bvl, (bip)->bip_vec, iter, (bip)->bip_iter)
++
+ #define bip_for_each_vec(bvl, bip, iter)				\
+ 	for_each_bvec(bvl, (bip)->bip_vec, iter, (bip)->bip_iter)
+ 
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 555aae5448ae..9364c258513e 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -184,6 +184,12 @@ static inline void bvec_iter_advance_single(const struct bio_vec *bv,
+ 		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
+ 	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
+ 
++#define for_each_mp_bvec(bvl, bio_vec, iter, start)			\
++	for (iter = (start);						\
++	     (iter).bi_size &&						\
++		((bvl = mp_bvec_iter_bvec((bio_vec), (iter))), 1);	\
++	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
++
+ /* for iterating one bio from start to end */
+ #define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
+ {									\
 -- 
 2.34.1
