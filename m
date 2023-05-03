@@ -2,34 +2,35 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8B3C7EE23
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 12:32:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E283C77B75
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 12:38:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbjECMcA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 08:32:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44224 "EHLO
+        id S229688AbjECMik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 08:38:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbjECMb7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 08:31:59 -0400
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EF565598
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 05:31:54 -0700 (PDT)
-Date:   Wed, 03 May 2023 12:31:43 +0000
+        with ESMTP id S229632AbjECMij (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 08:38:39 -0400
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437964224;
+        Wed,  3 May 2023 05:38:34 -0700 (PDT)
+Date:   Wed, 03 May 2023 12:38:14 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-        s=protonmail; t=1683117108; x=1683376308;
-        bh=H/Cq7pFaigX2dUKEq8WTB0frQmt8n3yAg0FsAZllXZw=;
+        s=protonmail; t=1683117511; x=1683376711;
+        bh=y5GsLDkv+seeh4vnGPqOR3n2rVIFisoH/G0vmDt1tLQ=;
         h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
          Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
          Message-ID:BIMI-Selector;
-        b=Qr2Fc62o5IXOSSTJXhbKWa7+sgdGsObhwRAn/Qe3ln7HwupE9okoCS8K5SY8LzC0q
-         BMmEb6JaXKKnEQ1J+9CE7HD1dZRXDmNasXE3USEk8pYR47FwzYIbCZZz5k1Wj1+NBa
-         glFkdDqmCm6ZPjRiDpd3l4ffxj0ne92Koy/V8/p/y5GE5kJ/rIgyYDI89zHyZv8/Rz
-         Lfz4bLhBS/EeIXJDTvYPCBhrV1eOCm5ca6e0MkCg55VGEjSklcE5c2kdh/9idCBaMx
-         sIkWln+xFPP0FfM0FlEdgFMy5cSoqgFS6KF4Kxdycsnuhfl/gAEVGo/2SmEu8fwu1N
-         f2127SINa9BJg==
-To:     Andreas Hindborg <nmi@metaspace.dk>
+        b=LdJES8UkVI1ckkqj+7B5LMGE7OfXXSVpy1P/xs/y0A1SM6x5+KTPi8EYveSWM6Ibu
+         OD0G7zymU+zIZdP02AJ6jTK8LttVTWZdiVcwrpGSCZi19a+2KQTdQY9DNIXMLLqqTP
+         5wzEk4BruW177CB45tf/eDZ93z+PddBoJm7GV5t+t5cjmVIkRo3N3MGq6BVeuMcW61
+         ztZd0k0jRTRTVhxBaB5ydWEBPcOrlyw3znfsumcoKqkca+jaNG2+w/0fvNvscdaNVT
+         lVJ8f6sCEN0hclggvaKoRPyQv7tTnZgrB4UB1BNb7XW+PF3c5Sv4oWhrpbO0LUGKa+
+         mMtNmfi/5Pv6g==
+To:     Benno Lossin <benno.lossin@proton.me>
 From:   Benno Lossin <benno.lossin@proton.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+Cc:     Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
         Keith Busch <kbusch@kernel.org>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
         Hannes Reinecke <hare@suse.de>,
@@ -44,9 +45,9 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
         linux-kernel@vger.kernel.org, gost.dev@samsung.com
 Subject: Re: [RFC PATCH 02/11] rust: add `pages` module for handling page allocation
-Message-ID: <LENFIdWyfQLEP0OtqLWgW9LAr7dW5BruyHO-G8RurzAJCEDkVkQgds9_pzJ5I98qpnrunvFixdiHQtSwa04CgxEBFlISAHz8_q-C28j_f6o=@proton.me>
-In-Reply-To: <20230503090708.2524310-3-nmi@metaspace.dk>
-References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-3-nmi@metaspace.dk>
+Message-ID: <LDtgXi9Js_rS954DPc4jHhcMzBbAvl4GfdC8w3QE_OYv7KvdZ0Miyn4Qxj-tclIHwpS924DyXpSLEZUK9KAOulD-dzRIO0krtrttnky1orU=@proton.me>
+In-Reply-To: <LENFIdWyfQLEP0OtqLWgW9LAr7dW5BruyHO-G8RurzAJCEDkVkQgds9_pzJ5I98qpnrunvFixdiHQtSwa04CgxEBFlISAHz8_q-C28j_f6o=@proton.me>
+References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-3-nmi@metaspace.dk> <LENFIdWyfQLEP0OtqLWgW9LAr7dW5BruyHO-G8RurzAJCEDkVkQgds9_pzJ5I98qpnrunvFixdiHQtSwa04CgxEBFlISAHz8_q-C28j_f6o=@proton.me>
 Feedback-ID: 71780778:user:proton
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -55,22 +56,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Sorry, forgot to replace `> #@` with nothing. Fixed here:
+
 On 03.05.23 11:06, Andreas Hindborg wrote:
 > From: Andreas Hindborg <a.hindborg@samsung.com>
->=20
+>
 > This patch adds support for working with pages of order 0. Support for pa=
 ges
 > with higher order is deferred. Page allocation flags are fixed in this pa=
 tch.
 > Future work might allow the user to specify allocation flags.
->=20
+>
 > This patch is a heavily modified version of code available in the rust tr=
 ee [1],
 > primarily adding support for multiple page mapping strategies.
->=20
+>
 > [1] https://github.com/rust-for-Linux/linux/tree/bc22545f38d74473cfef3e9f=
 d65432733435b79f/rust/kernel/pages.rs
->=20
+>
 > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 > ---
 >  rust/helpers.c       |  31 +++++
@@ -78,7 +81,7 @@ d65432733435b79f/rust/kernel/pages.rs
 >  rust/kernel/pages.rs | 284 +++++++++++++++++++++++++++++++++++++++++++
 >  3 files changed, 321 insertions(+)
 >  create mode 100644 rust/kernel/pages.rs
->=20
+>
 > diff --git a/rust/helpers.c b/rust/helpers.c
 > index 5dd5e325b7cc..9bd9d95da951 100644
 > --- a/rust/helpers.c
@@ -88,13 +91,13 @@ d65432733435b79f/rust/kernel/pages.rs
 >  #include <linux/wait.h>
 >  #include <linux/radix-tree.h>
 > +#include <linux/highmem.h>
->=20
+>
 >  __noreturn void rust_helper_BUG(void)
 >  {
 > @@ -150,6 +151,36 @@ void **rust_helper_radix_tree_next_slot(void **slot,
 >  }
 >  EXPORT_SYMBOL_GPL(rust_helper_radix_tree_next_slot);
->=20
+>
 > +void *rust_helper_kmap(struct page *page)
 > +{
 > +=09return kmap(page);
@@ -144,22 +147,22 @@ type
 > @@ -57,6 +58,11 @@ pub use uapi;
 >  #[doc(hidden)]
 >  pub use build_error::build_error;
->=20
+>
 > +/// Page size defined in terms of the `PAGE_SHIFT` macro from C.
-> #@
-> #@ `PAGE_SHIFT` is not using a doc-link.
-> #@
+
+`PAGE_SHIFT` is not using a doc-link.
+
 > +///
 > +/// [`PAGE_SHIFT`]: ../../../include/asm-generic/page.h
 > +pub const PAGE_SIZE: u32 =3D 1 << bindings::PAGE_SHIFT;
-> #@
-> #@ This should be of type `usize`.
-> #@
+
+This should be of type `usize`.
+
 > +
 >  /// Prefix to appear before log messages printed from within the `kernel=
 ` crate.
 >  const __LOG_PREFIX: &[u8] =3D b"rust_kernel\0";
->=20
+>
 > diff --git a/rust/kernel/pages.rs b/rust/kernel/pages.rs
 > new file mode 100644
 > index 000000000000..ed51b053dd5d
@@ -182,17 +185,17 @@ type
 > +/// `Pages` holds a reference to a set of pages of order `ORDER`. Having=
  the order as a generic
 > +/// const allows the struct to have the same size as a pointer.
-> #@
-> #@ I would remove the 'Having the order as a...' sentence. Since that is
-> #@ just implementation detail.
-> #@
+
+I would remove the 'Having the order as a...' sentence. Since that is
+just implementation detail.
+
 > +///
 > +/// # Invariants
 > +///
 > +/// The pointer `Pages::pages` is valid and points to 2^ORDER pages.
-> #@
-> #@ `Pages::pages` -> `pages`.
-> #@
+
+`Pages::pages` -> `pages`.
+
 > +pub struct Pages<const ORDER: u32> {
 > +    pub(crate) pages: *mut bindings::page,
 > +}
@@ -207,9 +210,9 @@ ___GFP_HIGHMEM,
 > +                ORDER,
 > +            )
 > +        };
-> #@
-> #@ Missing `SAFETY` comment.
-> #@
+
+Missing `SAFETY` comment.
+
 > +        if pages.is_null() {
 > +            return Err(ENOMEM);
 > +        }
@@ -232,10 +235,10 @@ reed
 > +
 > +impl Pages<0> {
 > +    #[inline(always)]
-> #@
-> #@ Is this really needed? I think this function should be inlined
-> #@ automatically.
-> #@
+
+Is this really needed? I think this function should be inlined
+automatically.
+
 > +    fn check_offset_and_map<I: MappingInfo>(
 > +        &self,
 > +        offset: usize,
@@ -243,38 +246,36 @@ reed
 > +    ) -> Result<PageMapping<'_, I>>
 > +    where
 > +        Pages<0>: MappingActions<I>,
-> #@
-> #@ Why not use `Self: MappingActions<I>`?
-> #@
+
+Why not use `Self: MappingActions<I>`?
+
 > +    {
 > +        let end =3D offset.checked_add(len).ok_or(EINVAL)?;
 > +        if end as u32 > PAGE_SIZE {
-> #@
-> #@ Remove the `as u32`, since `PAGE_SIZE` should be of type `usize`.
-> #@
+
+Remove the `as u32`, since `PAGE_SIZE` should be of type `usize`.
+
 > +            return Err(EINVAL);
-> #@
-> #@ I think it would make sense to create a more descriptive Rust error wi=
-th
-> #@ a `From` impl to turn it into an `Error`. It always is better to know =
-from
-> #@ the signature what exactly can go wrong when calling a function.
-> #@
+
+I think it would make sense to create a more descriptive Rust error with
+a `From` impl to turn it into an `Error`. It always is better to know from
+the signature what exactly can go wrong when calling a function.
+
 > +        }
 > +
 > +        let mapping =3D <Self as MappingActions<I>>::map(self);
 > +
 > +        Ok(mapping)
-> #@
-> #@ I would merge these lines.
-> #@
+
+I would merge these lines.
+
 > +    }
 > +
 > +    #[inline(always)]
 > +    unsafe fn read_internal<I: MappingInfo>(
-> #@
-> #@ Missing `# Safety` section.
-> #@
+
+Missing `# Safety` section.
+
 > +        &self,
 > +        dest: *mut u8,
 > +        offset: usize,
@@ -287,9 +288,9 @@ from
 > +
 > +        unsafe { ptr::copy_nonoverlapping((mapping.ptr as *mut u8).add(o=
 ffset), dest, len) };
-> #@
-> #@ Missing `SAFETY` comment. Replace `as *mut u8` with `.cast::<u8>()`.
-> #@
+
+Missing `SAFETY` comment. Replace `as *mut u8` with `.cast::<u8>()`.
+
 > +        Ok(())
 > +    }
 > +
@@ -305,19 +306,19 @@ ffset), dest, len) };
 > +    /// [`crate::io_buffer::ReadableFromBytes`] has more details about i=
 t.
 > +    /// `dest` may not point to the source page.
-> #@
-> #@ - `dest` is valid for writes for `len`.
-> #@ - What is meant by 'the raw buffer is intended to be recast'?
-> #@ - `io_buffer` does not yet exist in `rust-next`.
-> #@
+
+- `dest` is valid for writes for `len`.
+- What is meant by 'the raw buffer is intended to be recast'?
+- `io_buffer` does not yet exist in `rust-next`.
+
 > +    #[inline(always)]
 > +    pub unsafe fn read(&self, dest: *mut u8, offset: usize, len: usize) =
 -> Result {
 > +        unsafe { self.read_internal::<NormalMappingInfo>(dest, offset, l=
 en) }
-> #@
-> #@ Missing `SAFETY` comment.
-> #@
+
+Missing `SAFETY` comment.
+
 > +    }
 > +
 > +    /// Maps the pages and reads from them into the given buffer. The pa=
@@ -339,16 +340,16 @@ t.
 usize) -> Result {
 > +        unsafe { self.read_internal::<AtomicMappingInfo>(dest, offset, l=
 en) }
-> #@
-> #@ Missing `SAFETY` comment.
-> #@
+
+Missing `SAFETY` comment.
+
 > +    }
 > +
 > +    #[inline(always)]
 > +    unsafe fn write_internal<I: MappingInfo>(
-> #@
-> #@ Missing `# Safety` section.
-> #@
+
+Missing `# Safety` section.
+
 > +        &self,
 > +        src: *const u8,
 > +        offset: usize,
@@ -361,9 +362,9 @@ en) }
 > +
 > +        unsafe { ptr::copy_nonoverlapping(src, (mapping.ptr as *mut u8).=
 add(offset), len) };
-> #@
-> #@ Missing `SAFETY` comment.
-> #@
+
+Missing `SAFETY` comment.
+
 > +        Ok(())
 > +    }
 > +
@@ -380,9 +381,9 @@ ast from
 > +    /// another type; [`crate::io_buffer::WritableToBytes`] has more det=
 ails
 > +    /// about it. `src` must not point to the destination page.
-> #@
-> #@ `src` is valid for reads for `len`.
-> #@
+
+`src` is valid for reads for `len`.
+
 > +    #[inline(always)]
 > +    pub unsafe fn write(&self, src: *const u8, offset: usize, len: usize=
 ) -> Result {
@@ -416,9 +417,9 @@ en) }
 > +    #[inline(always)]
 > +    pub fn kmap(&self) -> PageMapping<'_, NormalMappingInfo> {
 > +        let ptr =3D unsafe { bindings::kmap(self.pages) };
-> #@
-> #@ Missing `SAFETY` comment.
-> #@
+
+Missing `SAFETY` comment.
+
 > +
 > +        PageMapping {
 > +            page: self.pages,
@@ -432,9 +433,9 @@ en) }
 > +    #[inline(always)]
 > +    pub fn kmap_atomic(&self) -> PageMapping<'_, AtomicMappingInfo> {
 > +        let ptr =3D unsafe { bindings::kmap_atomic(self.pages) };
-> #@
-> #@ Missing `SAFETY` comment.
-> #@
+
+Missing `SAFETY` comment.
+
 > +
 > +        PageMapping {
 > +            page: self.pages,
@@ -462,9 +463,9 @@ ed with the given order.
 > +    Pages<0>: MappingActions<I>,
 > +{
 > +    /// Map a page into the kernel address scpace
-> #@
-> #@ Typo.
-> #@
+
+Typo.
+
 > +    fn map(pages: &Pages<0>) -> PageMapping<'_, I>;
 > +
 > +    /// Unmap a page specified by `mapping`
@@ -512,12 +513,11 @@ ap` succeeded for the given
 > +        unsafe { bindings::kunmap(mapping.page) };
 > +    }
 > +}
-> #@
-> #@ I am not sure if this is the best implementation, why do the `kmap` an=
-d
-> #@ `kmap_atomic` functions exist? Would it not make sense to implement
-> #@ them entirely in `MappingActions::map`?
-> #@
+
+I am not sure if this is the best implementation, why do the `kmap` and
+`kmap_atomic` functions exist? Would it not make sense to implement
+them entirely in `MappingActions::map`?
+
 > +
 > +/// An owned page mapping. When this struct is dropped, the page is unma=
 pped.
