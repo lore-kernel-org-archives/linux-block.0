@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78052C7EE2C
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 09:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA381C7EE26
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 09:07:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229947AbjECJHb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 05:07:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45364 "EHLO
+        id S229972AbjECJHj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 05:07:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229878AbjECJH0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 05:07:26 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4714C02
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 02:07:21 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-30639daee76so1168172f8f.1
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 02:07:21 -0700 (PDT)
+        with ESMTP id S229748AbjECJH3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 05:07:29 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E226840FD
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 02:07:23 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3f19afc4fbfso48655195e9.2
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 02:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683104840; x=1685696840;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683104842; x=1685696842;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8Hg9EF+CTDGGAsWt0N5WyI6rk7QsJ8yExmPcN8MX0qQ=;
-        b=d+lWf2ETGwZ6l0kF5yoMkucYwDf2kDuSHvqzafoL6LSaWDyChZFeb/y3Ask+uZL3ub
-         Crm1FWg7HSXUUHQu4aZsOctpyLqbz0tvhgPgilALIxNAKTgLG9YZ5O7UUoSFUznFtAd7
-         8OtJqUv7m3XxiwrPol077Wc7De84xWLwlJ9zH1FgVk7LrKu7kj7KMolcbNdrGquUbXHA
-         gx1o+RI6ewKReUGP7O57duA5S2sDgZdoARg8MtGBlJBT45+yVJtwMrDiwgD1CJt2xVPz
-         ns0renNS1R/Xu68zuPNBQGUcpB38HrRkV/8/C94FuyxzQvT6lrnKR7AKdmaNVmf1WOts
-         FeSw==
+        bh=5cH5GZPThZX1LLdPnjlMEvQzzaSHQbdfYQa3aafCtFw=;
+        b=Hgz+JsybFVjncw15HasJvie2Dl4VadDcEYJtGAk4kb/RQguZRxQO+WUSHbBzCchQfK
+         4fR/4HHzFj7feyZ/Ey1XOlfTNiuid/oK5BCfCTwEDhAS24mdDiPOWkT4Xnon05qvrKsI
+         9DROCY4yYimdZfsorqum1Kgn1FKSyFiupk9F01cUByEOnAhbB/Zk8PwTZ8IQQh3Ysld8
+         EQ/BMmUi7pFY1YFHuqo9s0suNHftuZROm2snpKuc0maQI6BsY8e6/z20fLheOG/FOaSj
+         ck2bzsszlaJfYe3wOeCcoVvxNqXt9pxyYKS7bIBfx+nUkWsDba1tg8Zs6sA0UfeBQnJ9
+         LT3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683104840; x=1685696840;
+        d=1e100.net; s=20221208; t=1683104842; x=1685696842;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8Hg9EF+CTDGGAsWt0N5WyI6rk7QsJ8yExmPcN8MX0qQ=;
-        b=Gl6rJ08OYUmKE5dAlOKvOaHk9oL7gp8c+n6eK/rUfc0a6UJTfyOBtWKnuwpdSjzwk0
-         bsq/oXSd7P8LclYE+Jvhhww6IzcJa8dXPckg0QMb3dwr7fK/8bVMe1Qw6X55UzOxEG/B
-         2PKoPxkvGtXAx/zT9btmIoD4ky6EtnrKpqfeSZfpuGYjmIBFDKhOlPFwzqzMdul9Oq5R
-         QboJhb44Gi+o/0Ng8APadHL6fqkOiTbg4WmMYX7nmgNTHPBEPb3JaZZqb0Nq6NWr1JZ8
-         7ndNHi3sU7niKI/6byssIzquda+8mdqT0e1OTxeMbXYsG5+arWgw3Efc8Em5X5Od6XB3
-         /Bfg==
-X-Gm-Message-State: AC+VfDzfloFq+QpcyhCTy/SRPXlVvwELmuJNTlz6K2CZzcTHW2c+NGkB
-        LqHYKLj8X9M23SGuuE1tZwdlTA==
-X-Google-Smtp-Source: ACHHUZ6T2y7vjejoAr+gXXz7fkMQ4wlDgEasl/1jBzVe1iLoMPS+zptIdaYP9DejgMdUNDfXGrvBNg==
-X-Received: by 2002:adf:e484:0:b0:306:320b:5dbd with SMTP id i4-20020adfe484000000b00306320b5dbdmr5824254wrm.71.1683104840210;
-        Wed, 03 May 2023 02:07:20 -0700 (PDT)
+        bh=5cH5GZPThZX1LLdPnjlMEvQzzaSHQbdfYQa3aafCtFw=;
+        b=BDvjaTRQ5mosclalkOiVQF9J/64rVgw0/hp2J6wb9cX4eWQ81S98gG2ZOATPEk0KmS
+         21chYIfWMTZDdG1anw8APKJdEyF6SdyrSvrbzjL9kLpeayTg94N0Ofa8VI6vEAp1REf6
+         UkTngsHgI4OZlusnvdW9nQfjcu8+ubSQ5Rxs6GrXCts5mTAdzs7hqPCjELwm/uX9Boh4
+         hxq8PAtPs6BTtjkQcn3Keq3Tges3DJP2OUKyBlGvvIPtQWRoI/AsTL8GzfM2pB/YBddI
+         wyA8MLPYtlUFM6acw9eM3rt8SF/0gJnDaSy2w9pyfr9CEte9FH+QaWRhUfq3/3jPcjs2
+         T4Ug==
+X-Gm-Message-State: AC+VfDwA3lSFzMbeZQ4OIHxD4pEkDOSHnuZXsOcxGHvHCQkmdLOA4KiA
+        yMZHYEaUstMtcb8GFwcTn4u0BQ==
+X-Google-Smtp-Source: ACHHUZ4EBxDh+2FdUjZNnlPIs7Z43merWOWOdSZYBzuMbtFHhqsjGSgkNu/agPTqqGu/gJ3ZmsuWWw==
+X-Received: by 2002:a7b:cb85:0:b0:3f1:7136:dd45 with SMTP id m5-20020a7bcb85000000b003f17136dd45mr14187268wmi.30.1683104842308;
+        Wed, 03 May 2023 02:07:22 -0700 (PDT)
 Received: from localhost ([147.161.155.99])
-        by smtp.gmail.com with ESMTPSA id v12-20020adfe28c000000b0030497b3224bsm20046305wri.64.2023.05.03.02.07.19
+        by smtp.gmail.com with ESMTPSA id n15-20020a1c720f000000b003f339b2d06fsm1271659wmc.4.2023.05.03.02.07.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 May 2023 02:07:19 -0700 (PDT)
+        Wed, 03 May 2023 02:07:22 -0700 (PDT)
 From:   Andreas Hindborg <nmi@metaspace.dk>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Keith Busch <kbusch@kernel.org>,
@@ -66,9 +66,9 @@ Cc:     Andreas Hindborg <a.hindborg@samsung.com>,
         Benno Lossin <benno.lossin@proton.me>,
         Andreas Hindborg <nmi@metaspace.dk>,
         linux-kernel@vger.kernel.org (open list), gost.dev@samsung.com
-Subject: [RFC PATCH 04/11] rust: block: introduce `kernel::block::bio` module
-Date:   Wed,  3 May 2023 11:07:01 +0200
-Message-Id: <20230503090708.2524310-5-nmi@metaspace.dk>
+Subject: [RFC PATCH 06/11] rust: apply cache line padding for `SpinLock`
+Date:   Wed,  3 May 2023 11:07:03 +0200
+Message-Id: <20230503090708.2524310-7-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230503090708.2524310-1-nmi@metaspace.dk>
 References: <20230503090708.2524310-1-nmi@metaspace.dk>
@@ -80,348 +80,171 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
-Add abstractions for working with `struct bio`.
+The kernel `struct spinlock` is 4 bytes on x86 when lockdep is not enabled. The
+structure is not padded to fit a cache line. The effect of this for `SpinLock`
+is that the lock variable and the value protected by the lock will share a cache
+line, depending on the alignment requirements of the protected value. Aligning
+the lock variable and the protected value to a cache line yields a 20%
+performance increase for the Rust null block driver for sequential reads to
+memory backed devices at 6 concurrent readers.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 ---
- rust/kernel/block.rs            |   1 +
- rust/kernel/block/bio.rs        |  93 ++++++++++++++++
- rust/kernel/block/bio/vec.rs    | 181 ++++++++++++++++++++++++++++++++
- rust/kernel/block/mq/request.rs |  16 +++
- 4 files changed, 291 insertions(+)
- create mode 100644 rust/kernel/block/bio.rs
- create mode 100644 rust/kernel/block/bio/vec.rs
+ rust/kernel/cache_padded.rs       | 33 +++++++++++++++++++++++++++++++
+ rust/kernel/lib.rs                |  2 ++
+ rust/kernel/sync/lock.rs          |  9 ++++++---
+ rust/kernel/sync/lock/spinlock.rs | 13 ++++++++----
+ 4 files changed, 50 insertions(+), 7 deletions(-)
+ create mode 100644 rust/kernel/cache_padded.rs
 
-diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
-index 4c93317a568a..1797859551fd 100644
---- a/rust/kernel/block.rs
-+++ b/rust/kernel/block.rs
-@@ -2,4 +2,5 @@
- 
- //! Types for working with the block layer
- 
-+pub mod bio;
- pub mod mq;
-diff --git a/rust/kernel/block/bio.rs b/rust/kernel/block/bio.rs
+diff --git a/rust/kernel/cache_padded.rs b/rust/kernel/cache_padded.rs
 new file mode 100644
-index 000000000000..6e93e4420105
+index 000000000000..758678e71f50
 --- /dev/null
-+++ b/rust/kernel/block/bio.rs
-@@ -0,0 +1,93 @@
++++ b/rust/kernel/cache_padded.rs
+@@ -0,0 +1,33 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+//! Types for working with the bio layer.
-+//!
-+//! C header: [`include/linux/blk_types.h`](../../include/linux/blk_types.h)
++#[repr(align(64))]
++pub struct CachePadded<T: ?Sized> {
++    value: T,
++}
 +
-+use core::fmt;
-+use core::ptr::NonNull;
++unsafe impl<T: Send> Send for CachePadded<T> {}
++unsafe impl<T: Sync> Sync for CachePadded<T> {}
 +
-+mod vec;
-+
-+pub use vec::BioSegmentIterator;
-+pub use vec::Segment;
-+
-+/// A wrapper around a `struct bio` pointer
-+///
-+/// # Invariants
-+///
-+/// First field must alwyas be a valid pointer to a valid `struct bio`.
-+pub struct Bio<'a>(
-+    NonNull<crate::bindings::bio>,
-+    core::marker::PhantomData<&'a ()>,
-+);
-+
-+impl<'a> Bio<'a> {
-+    /// Returns an iterator over segments in this `Bio`. Does not consider
-+    /// segments of other bios in this bio chain.
++impl<T> CachePadded<T> {
++    /// Pads and aligns a value to 64 bytes.
 +    #[inline(always)]
-+    pub fn segment_iter(&'a self) -> BioSegmentIterator<'a> {
-+        BioSegmentIterator::new(self)
-+    }
-+
-+    /// Get a pointer to the `bio_vec` off this bio
-+    #[inline(always)]
-+    fn io_vec(&self) -> *const bindings::bio_vec {
-+        // SAFETY: By type invariant, get_raw() returns a valid pointer to a
-+        // valid `struct bio`
-+        unsafe { (*self.get_raw()).bi_io_vec }
-+    }
-+
-+    /// Return a copy of the `bvec_iter` for this `Bio`
-+    #[inline(always)]
-+    fn iter(&self) -> bindings::bvec_iter {
-+        // SAFETY: self.0 is always a valid pointer
-+        unsafe { (*self.get_raw()).bi_iter }
-+    }
-+
-+    /// Get the next `Bio` in the chain
-+    #[inline(always)]
-+    fn next(&self) -> Option<Bio<'a>> {
-+        // SAFETY: self.0 is always a valid pointer
-+        let next = unsafe { (*self.get_raw()).bi_next };
-+        Some(Self(NonNull::new(next)?, core::marker::PhantomData))
-+    }
-+
-+    /// Return the raw pointer of the wrapped `struct bio`
-+    #[inline(always)]
-+    fn get_raw(&self) -> *const bindings::bio {
-+        self.0.as_ptr()
-+    }
-+
-+    /// Create an instance of `Bio` from a raw pointer. Does check that the
-+    /// pointer is not null.
-+    #[inline(always)]
-+    pub(crate) unsafe fn from_raw(ptr: *mut bindings::bio) -> Option<Bio<'a>> {
-+        Some(Self(NonNull::new(ptr)?, core::marker::PhantomData))
++    pub(crate) const fn new(t: T) -> CachePadded<T> {
++        CachePadded::<T> { value: t }
 +    }
 +}
 +
-+impl core::fmt::Display for Bio<'_> {
-+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-+        write!(f, "Bio {:?}", self.0.as_ptr())
-+    }
-+}
-+
-+/// An iterator over `Bio`
-+pub struct BioIterator<'a> {
-+    pub(crate) bio: Option<Bio<'a>>,
-+}
-+
-+impl<'a> core::iter::Iterator for BioIterator<'a> {
-+    type Item = Bio<'a>;
++impl<T: ?Sized> core::ops::Deref for CachePadded<T> {
++    type Target = T;
 +
 +    #[inline(always)]
-+    fn next(&mut self) -> Option<Bio<'a>> {
-+        if let Some(current) = self.bio.take() {
-+            self.bio = current.next();
-+            Some(current)
-+        } else {
-+            None
-+        }
++    fn deref(&self) -> &T {
++        &self.value
 +    }
 +}
-diff --git a/rust/kernel/block/bio/vec.rs b/rust/kernel/block/bio/vec.rs
-new file mode 100644
-index 000000000000..acd328a6fe54
---- /dev/null
-+++ b/rust/kernel/block/bio/vec.rs
-@@ -0,0 +1,181 @@
-+// SPDX-License-Identifier: GPL-2.0
 +
-+//! Types for working with `struct bio_vec` IO vectors
-+//!
-+//! C header: [`include/linux/bvec.h`](../../include/linux/bvec.h)
-+
-+use super::Bio;
-+use crate::error::Result;
-+use crate::pages::Pages;
-+use core::fmt;
-+use core::mem::ManuallyDrop;
-+
-+#[inline(always)]
-+fn mp_bvec_iter_offset(bvec: *const bindings::bio_vec, iter: &bindings::bvec_iter) -> u32 {
-+    (unsafe { (*bvec_iter_bvec(bvec, iter)).bv_offset }) + iter.bi_bvec_done
-+}
-+
-+#[inline(always)]
-+fn mp_bvec_iter_page(
-+    bvec: *const bindings::bio_vec,
-+    iter: &bindings::bvec_iter,
-+) -> *mut bindings::page {
-+    unsafe { (*bvec_iter_bvec(bvec, iter)).bv_page }
-+}
-+
-+#[inline(always)]
-+fn mp_bvec_iter_page_idx(bvec: *const bindings::bio_vec, iter: &bindings::bvec_iter) -> usize {
-+    (mp_bvec_iter_offset(bvec, iter) / crate::PAGE_SIZE) as usize
-+}
-+
-+#[inline(always)]
-+fn mp_bvec_iter_len(bvec: *const bindings::bio_vec, iter: &bindings::bvec_iter) -> u32 {
-+    iter.bi_size
-+        .min(unsafe { (*bvec_iter_bvec(bvec, iter)).bv_len } - iter.bi_bvec_done)
-+}
-+
-+#[inline(always)]
-+fn bvec_iter_bvec(
-+    bvec: *const bindings::bio_vec,
-+    iter: &bindings::bvec_iter,
-+) -> *const bindings::bio_vec {
-+    unsafe { bvec.add(iter.bi_idx as usize) }
-+}
-+
-+#[inline(always)]
-+fn bvec_iter_page(
-+    bvec: *const bindings::bio_vec,
-+    iter: &bindings::bvec_iter,
-+) -> *mut bindings::page {
-+    unsafe { mp_bvec_iter_page(bvec, iter).add(mp_bvec_iter_page_idx(bvec, iter)) }
-+}
-+
-+#[inline(always)]
-+fn bvec_iter_len(bvec: *const bindings::bio_vec, iter: &bindings::bvec_iter) -> u32 {
-+    mp_bvec_iter_len(bvec, iter).min(crate::PAGE_SIZE - bvec_iter_offset(bvec, iter))
-+}
-+
-+#[inline(always)]
-+fn bvec_iter_offset(bvec: *const bindings::bio_vec, iter: &bindings::bvec_iter) -> u32 {
-+    mp_bvec_iter_offset(bvec, iter) % crate::PAGE_SIZE
-+}
-+
-+/// A wrapper around a `strutct bio_vec` - a contiguous range of physical memory addresses
-+///
-+/// # Invariants
-+///
-+/// `bio_vec` must always be initialized and valid
-+pub struct Segment<'a> {
-+    bio_vec: bindings::bio_vec,
-+    _marker: core::marker::PhantomData<&'a ()>,
-+}
-+
-+impl Segment<'_> {
-+    /// Get he lenght of the segment in bytes
++impl<T: ?Sized> core::ops::DerefMut for CachePadded<T> {
 +    #[inline(always)]
-+    pub fn len(&self) -> usize {
-+        self.bio_vec.bv_len as usize
-+    }
-+
-+    /// Returns true if the length of the segment is 0
-+    #[inline(always)]
-+    pub fn is_empty(&self) -> bool {
-+        self.len() == 0
-+    }
-+
-+    /// Get the offset field of the `bio_vec`
-+    #[inline(always)]
-+    pub fn offset(&self) -> usize {
-+        self.bio_vec.bv_offset as usize
-+    }
-+
-+    /// Copy data of this segment into `page`.
-+    #[inline(always)]
-+    pub fn copy_to_page_atomic(&self, page: &mut Pages<0>) -> Result {
-+        // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
-+        // pointer to a `struct page`. We do not own the page, but we prevent
-+        // drop by wrapping the `Pages` in `ManuallyDrop`.
-+        let our_page = ManuallyDrop::new(unsafe { Pages::<0>::from_raw(self.bio_vec.bv_page) });
-+        let our_map = our_page.kmap_atomic();
-+
-+        // TODO: Checck offset is within page - what guarantees does `bio_vec` provide?
-+        let ptr = unsafe { (our_map.get_ptr() as *const u8).add(self.offset()) };
-+
-+        unsafe { page.write_atomic(ptr, self.offset(), self.len()) }
-+    }
-+
-+    /// Copy data from `page` into this segment
-+    #[inline(always)]
-+    pub fn copy_from_page_atomic(&mut self, page: &Pages<0>) -> Result {
-+        // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
-+        // pointer to a `struct page`. We do not own the page, but we prevent
-+        // drop by wrapping the `Pages` in `ManuallyDrop`.
-+        let our_page = ManuallyDrop::new(unsafe { Pages::<0>::from_raw(self.bio_vec.bv_page) });
-+        let our_map = our_page.kmap_atomic();
-+
-+        // TODO: Checck offset is within page
-+        let ptr = unsafe { (our_map.get_ptr() as *mut u8).add(self.offset()) };
-+
-+        unsafe { page.read_atomic(ptr, self.offset(), self.len()) }
++    fn deref_mut(&mut self) -> &mut T {
++        &mut self.value
 +    }
 +}
-+
-+impl core::fmt::Display for Segment<'_> {
-+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-+        write!(
-+            f,
-+            "Segment {:?} len: {}",
-+            self.bio_vec.bv_page, self.bio_vec.bv_len
-+        )
-+    }
-+}
-+
-+/// An iterator over `Segment`
-+pub struct BioSegmentIterator<'a> {
-+    bio: &'a Bio<'a>,
-+    iter: bindings::bvec_iter,
-+}
-+
-+impl<'a> BioSegmentIterator<'a> {
-+    #[inline(always)]
-+    pub(crate) fn new(bio: &'a Bio<'a>) -> BioSegmentIterator<'_> {
-+        Self {
-+            bio,
-+            iter: bio.iter(),
-+        }
-+    }
-+}
-+
-+impl<'a> core::iter::Iterator for BioSegmentIterator<'a> {
-+    type Item = Segment<'a>;
-+
-+    #[inline(always)]
-+    fn next(&mut self) -> Option<Self::Item> {
-+        if self.iter.bi_size == 0 {
-+            return None;
-+        }
-+
-+        // Macro
-+        // bio_vec = bio_iter_iovec(bio, self.iter)
-+        // bio_vec = bvec_iter_bvec(bio.bi_io_vec, self.iter);
-+        let bio_vec_ret = bindings::bio_vec {
-+            bv_page: bvec_iter_page(self.bio.io_vec(), &self.iter),
-+            bv_len: bvec_iter_len(self.bio.io_vec(), &self.iter),
-+            bv_offset: bvec_iter_offset(self.bio.io_vec(), &self.iter),
-+        };
-+
-+        // Static C function
-+        unsafe {
-+            bindings::bio_advance_iter_single(
-+                self.bio.get_raw(),
-+                &mut self.iter as *mut bindings::bvec_iter,
-+                bio_vec_ret.bv_len,
-+            )
-+        };
-+
-+        Some(Segment {
-+            bio_vec: bio_vec_ret,
-+            _marker: core::marker::PhantomData,
-+        })
-+    }
-+}
-diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-index e95ae3fd71ad..ccb1033b64b6 100644
---- a/rust/kernel/block/mq/request.rs
-+++ b/rust/kernel/block/mq/request.rs
-@@ -11,6 +11,9 @@ use crate::{
- };
- use core::marker::PhantomData;
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index a0bd0b0e2aef..426e2dea0da6 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -37,6 +37,7 @@ extern crate self as kernel;
+ mod allocator;
+ pub mod block;
+ mod build_assert;
++mod cache_padded;
+ pub mod error;
+ pub mod init;
+ pub mod ioctl;
+@@ -56,6 +57,7 @@ pub mod types;
  
-+use crate::block::bio::Bio;
-+use crate::block::bio::BioIterator;
+ #[doc(hidden)]
+ pub use bindings;
++pub(crate) use cache_padded::CachePadded;
+ pub use macros;
+ pub use uapi;
+ 
+diff --git a/rust/kernel/sync/lock.rs b/rust/kernel/sync/lock.rs
+index a2216325632d..1c584b1df30d 100644
+--- a/rust/kernel/sync/lock.rs
++++ b/rust/kernel/sync/lock.rs
+@@ -6,7 +6,9 @@
+ //! spinlocks, raw spinlocks) to be provided with minimal effort.
+ 
+ use super::LockClassKey;
+-use crate::{bindings, init::PinInit, pin_init, str::CStr, types::Opaque, types::ScopeGuard};
++use crate::{
++    bindings, init::PinInit, pin_init, str::CStr, types::Opaque, types::ScopeGuard, CachePadded,
++};
+ use core::{cell::UnsafeCell, marker::PhantomData, marker::PhantomPinned};
+ use macros::pin_data;
+ 
+@@ -87,7 +89,7 @@ pub struct Lock<T: ?Sized, B: Backend> {
+     _pin: PhantomPinned,
+ 
+     /// The data protected by the lock.
+-    pub(crate) data: UnsafeCell<T>,
++    pub(crate) data: CachePadded<UnsafeCell<T>>,
+ }
+ 
+ // SAFETY: `Lock` can be transferred across thread boundaries iff the data it protects can.
+@@ -102,7 +104,7 @@ impl<T, B: Backend> Lock<T, B> {
+     #[allow(clippy::new_ret_no_self)]
+     pub fn new(t: T, name: &'static CStr, key: &'static LockClassKey) -> impl PinInit<Self> {
+         pin_init!(Self {
+-            data: UnsafeCell::new(t),
++            data: CachePadded::new(UnsafeCell::new(t)),
+             _pin: PhantomPinned,
+             // SAFETY: `slot` is valid while the closure is called and both `name` and `key` have
+             // static lifetimes so they live indefinitely.
+@@ -115,6 +117,7 @@ impl<T, B: Backend> Lock<T, B> {
+ 
+ impl<T: ?Sized, B: Backend> Lock<T, B> {
+     /// Acquires the lock and gives the caller access to the data protected by it.
++    #[inline(always)]
+     pub fn lock(&self) -> Guard<'_, T, B> {
+         // SAFETY: The constructor of the type calls `init`, so the existence of the object proves
+         // that `init` was called.
+diff --git a/rust/kernel/sync/lock/spinlock.rs b/rust/kernel/sync/lock/spinlock.rs
+index 979b56464a4e..e39142a8148c 100644
+--- a/rust/kernel/sync/lock/spinlock.rs
++++ b/rust/kernel/sync/lock/spinlock.rs
+@@ -4,7 +4,10 @@
+ //!
+ //! This module allows Rust code to use the kernel's `spinlock_t`.
+ 
++use core::ops::DerefMut;
 +
- /// A wrapper around a blk-mq `struct request`. This represents an IO request.
- pub struct Request<T: Operations> {
-     ptr: *mut bindings::request,
-@@ -63,6 +66,19 @@ impl<T: Operations> Request<T> {
-         }
+ use crate::bindings;
++use crate::CachePadded;
+ 
+ /// Creates a [`SpinLock`] initialiser with the given name and a newly-created lock class.
+ ///
+@@ -90,7 +93,7 @@ pub struct SpinLockBackend;
+ // SAFETY: The underlying kernel `spinlock_t` object ensures mutual exclusion. `relock` uses the
+ // default implementation that always calls the same locking method.
+ unsafe impl super::Backend for SpinLockBackend {
+-    type State = bindings::spinlock_t;
++    type State = CachePadded<bindings::spinlock_t>;
+     type GuardState = ();
+ 
+     unsafe fn init(
+@@ -100,18 +103,20 @@ unsafe impl super::Backend for SpinLockBackend {
+     ) {
+         // SAFETY: The safety requirements ensure that `ptr` is valid for writes, and `name` and
+         // `key` are valid for read indefinitely.
+-        unsafe { bindings::__spin_lock_init(ptr, name, key) }
++        unsafe { bindings::__spin_lock_init((&mut *ptr).deref_mut(), name, key) }
      }
  
-+    /// Get a wrapper for the first Bio in this request
 +    #[inline(always)]
-+    pub fn bio(&self) -> Option<Bio<'_>> {
-+        let ptr = unsafe { (*self.ptr).bio };
-+        unsafe { Bio::from_raw(ptr) }
-+    }
-+
-+    /// Get an iterator over all bio structurs in this request
+     unsafe fn lock(ptr: *mut Self::State) -> Self::GuardState {
+         // SAFETY: The safety requirements of this function ensure that `ptr` points to valid
+         // memory, and that it has been initialised before.
+-        unsafe { bindings::spin_lock(ptr) }
++        unsafe { bindings::spin_lock((&mut *ptr).deref_mut()) }
+     }
+ 
 +    #[inline(always)]
-+    pub fn bio_iter(&self) -> BioIterator<'_> {
-+        BioIterator { bio: self.bio() }
-+    }
-+
-     /// Get the target sector for the request
-     #[inline(always)]
-     pub fn sector(&self) -> usize {
+     unsafe fn unlock(ptr: *mut Self::State, _guard_state: &Self::GuardState) {
+         // SAFETY: The safety requirements of this function ensure that `ptr` is valid and that the
+         // caller is the owner of the mutex.
+-        unsafe { bindings::spin_unlock(ptr) }
++        unsafe { bindings::spin_unlock((&mut *ptr).deref_mut()) }
+     }
+ }
 -- 
 2.40.0
 
