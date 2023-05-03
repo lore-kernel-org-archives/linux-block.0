@@ -2,53 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F6DC77B7F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AACE8C7EE2A
 	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 09:07:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbjECJH0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 05:07:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45308 "EHLO
+        id S229924AbjECJH2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 05:07:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbjECJHY (ORCPT
+        with ESMTP id S229748AbjECJHY (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 05:07:24 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D28D444A1
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 02:07:19 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-2fddb442d47so4548896f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 02:07:19 -0700 (PDT)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2AB11FCF
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 02:07:16 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-3063afa2372so1356460f8f.0
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 02:07:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683104838; x=1685696838;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s2OF8cEuaV6eZXvZ8+TxAkEcAWTLOcEvP8M1z8Cu3eg=;
-        b=gxwZbpfudAGlkc9suPmtflL1jblQr4MK2hN1E3gaOGf/Plu3em+uZBGDw0rNUr7SUW
-         EFB1a9htiLdSYQkjbn0JwIhIuQzJvNeRrzMlV0eXOLXXzIMN08VTuR5LYMKTn7m05OvH
-         9LHtC/oRDhdH3ACVUabMlgXW9Ewt8dD9XDI4Ez+21QfYADeNMEfiUmJzzu0XcckSKJuW
-         Nj3Eh8mnhKzN9/T17uqbvi142/KhX1PBU6Qk/kU/ro0xuE5e8kN3AfwwdKqZvdZVSRvp
-         4qO3v7fHN7bd8dDrEFaz1iXrwav7RAETaSSc1oLICAvTlYivVQel8jdUiGT3J45aYlDO
-         jWSQ==
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683104835; x=1685696835;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LQKppYVwf0SeSaMl9IKE/WZzNB7GDromyqxTafCG8fo=;
+        b=M1w5GyuqmVVKXv2c8Jk8HydKYSHf++D2z0s0Td6pzIpnFDFE0DJAmUXUwzEz5tuOM3
+         LEnsj1GusJ8DbKoMRoVVx0gORrompfxC+qx/Uzf1juvw5Z5f3D6jUpg9rq3gruzjNGjk
+         Ywjm11lr7fMEGz7D2B1HzRFkOHfqEKDIAUUPJD1zz+Pxnoxx3dLvYqHSAfdsJINZTRyW
+         CMWtAAZl171NljNk37xw5uWw2jK9LZQJFR1nx2jivXfEJSqtphTfEvqyBo5iNnKN/jcQ
+         A+efKm11tUBku32haJ1k2ee3V6CfkqMI11+0FcKWNekMZvZmvVpUOkktEleA+KSUwZ7e
+         /OLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683104838; x=1685696838;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s2OF8cEuaV6eZXvZ8+TxAkEcAWTLOcEvP8M1z8Cu3eg=;
-        b=ZhIIcTSo7+MtO4qnCQHGY6XSlqo8tn1+pKvLHUBxz2RFGjeZ2cPSk7ii3C8XTpKOv4
-         cP1+5F+aQEk0vXRpKVCOsQRlTT2Rg03fb+gKRwA0ru/XqwNMwf92KSniUu67spE/NRwf
-         t9QR4yxjEhVRqexyv/IhcTXH21+Nl+q6QfFR1WQ8vGCgoTEDAkGqeqVB5WoI9vNaecjs
-         O32gAICJW1KntyOxgw4Umh1sqkN5OnQ8vRxutquJrpIFUWMITmh8H7ymo7cYnKzy81vo
-         CJ9TLNHJgIMAyYFpAB6JEyeX9vy52Qne/KT3UMXfgsa9OgQInySApIeZzr6CW/OUQFJT
-         qJUw==
-X-Gm-Message-State: AC+VfDy4YDcZ1CgPEZcIEOsqBED2QCC6iDWIx8pKLlQLz9oapMmNgyeH
-        7jnXU/Bf+ThcWbDphNB+BHkapw==
-X-Google-Smtp-Source: ACHHUZ7yrDB5gpNUkKE0X5q8MEbvZmkfVFN8rXKsdmGE0Vy4CSxFk+RB6D8+DyE/dyNCU1ItHJSB8g==
-X-Received: by 2002:a05:6000:1145:b0:306:2cf5:79dc with SMTP id d5-20020a056000114500b003062cf579dcmr6255554wrx.35.1683104838080;
-        Wed, 03 May 2023 02:07:18 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1683104835; x=1685696835;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LQKppYVwf0SeSaMl9IKE/WZzNB7GDromyqxTafCG8fo=;
+        b=Q6SrGaGDTCKQd6D8qRL61/R2AoLyXf8ZlKMxpE55PjGRHCl+cXkm/p93Re1JLoP65A
+         Q8xM/yL7Lxqrw5BN9V0Ad0sdxG6D3Wcak1K34FQMCTZ5jce1S1QzySJy3uWCYNm6eUJR
+         9JF88ns8s1J0vvHT0N/BMaBo49SD+1G0QKqlPQ1+H9HXr2GczQftb9NiNRVbXMmitXQw
+         7zokJsdK4AtKgsyyGBRVkKbfo7JhDO4kw9plRAc3m1o5qDwByt7/wTJhVQKUVBDjfQJb
+         uR6d9et10g6+aSTlAoakL5czZEWnwbcJU3rqYMD/XOinAwFEkhjrLwcyZuFSvpuENzkv
+         C5hQ==
+X-Gm-Message-State: AC+VfDxXoQEdxtVRAtybhodKlDw7t8u091vJLHumLEeAoNC9xLDjc6qW
+        H9E+TBSZubZVTZPKlVLfpOOEgg==
+X-Google-Smtp-Source: ACHHUZ6uB5Dhr8F+TRTCy2n35DQqOTOw290JmpRGN9zDp1UFaHs/YXs+RcAVSePF8gkQv2nKJfbqjw==
+X-Received: by 2002:adf:eb0a:0:b0:306:3ded:2bf1 with SMTP id s10-20020adfeb0a000000b003063ded2bf1mr1720747wrn.60.1683104835021;
+        Wed, 03 May 2023 02:07:15 -0700 (PDT)
 Received: from localhost ([147.161.155.99])
-        by smtp.gmail.com with ESMTPSA id t15-20020adfe44f000000b002f00793bd7asm33035982wrm.27.2023.05.03.02.07.17
+        by smtp.gmail.com with ESMTPSA id c10-20020adffb0a000000b00306344eaebfsm4798159wrr.28.2023.05.03.02.07.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 May 2023 02:07:17 -0700 (PDT)
+        Wed, 03 May 2023 02:07:14 -0700 (PDT)
 From:   Andreas Hindborg <nmi@metaspace.dk>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Keith Busch <kbusch@kernel.org>,
@@ -66,12 +65,10 @@ Cc:     Andreas Hindborg <a.hindborg@samsung.com>,
         Benno Lossin <benno.lossin@proton.me>,
         Andreas Hindborg <nmi@metaspace.dk>,
         linux-kernel@vger.kernel.org (open list), gost.dev@samsung.com
-Subject: [RFC PATCH 02/11] rust: add `pages` module for handling page allocation
-Date:   Wed,  3 May 2023 11:06:59 +0200
-Message-Id: <20230503090708.2524310-3-nmi@metaspace.dk>
+Subject: [RFC PATCH 00/11] Rust null block driver
+Date:   Wed,  3 May 2023 11:06:57 +0200
+Message-Id: <20230503090708.2524310-1-nmi@metaspace.dk>
 X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230503090708.2524310-1-nmi@metaspace.dk>
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -80,386 +77,333 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Andreas Hindborg <a.hindborg@samsung.com>
 
-This patch adds support for working with pages of order 0. Support for pages
-with higher order is deferred. Page allocation flags are fixed in this patch.
-Future work might allow the user to specify allocation flags.
+Hi All!
 
-This patch is a heavily modified version of code available in the rust tree [1],
-primarily adding support for multiple page mapping strategies.
+This is an early preview of a null block driver written in Rust. It is a follow
+up to my LSF topic proposal [1]. I send this series with intention of collecting
+feedback and comments at LSF/MM/BPF.
 
-[1] https://github.com/rust-for-Linux/linux/tree/bc22545f38d74473cfef3e9fd65432733435b79f/rust/kernel/pages.rs
+The patches apply on top of the `rust-next` tree (rust-6.4
+ea76e08f4d901a450619831a255e9e0a4c0ed162) [4].
 
-Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
----
- rust/helpers.c       |  31 +++++
- rust/kernel/lib.rs   |   6 +
- rust/kernel/pages.rs | 284 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 321 insertions(+)
+A null block driver is a good opportunity to evaluate Rust bindings for the
+block layer. It is a small and simple driver and thus should be simple to reason
+about. Further, the null block driver is not usually deployed in production
+environments. Thus, it should be fairly straight forward to review, and any
+potential issues are not going to bring down any production workloads.
+
+Being small and simple, the null block driver is a good place to introduce the
+Linux kernel storage community to Rust. This will help prepare the community for
+future Rust projects and facilitate a better maintenance process for these
+projects.
+
+The statistics presented in my previous message [1] show that the C null block
+driver has had a significant amount of memory safety related problems in the
+past. 41% of fixes merged for the C null block driver are fixes for memory
+safety issues. This makes the null block driver a good candidate for rewriting
+in Rust.
+
+Patches in this series prefixed with capitalized RUST are code taken from the
+R4L `rust` tree [2]. This code is not yet in mainline Linux and has not yet been
+submitted as patches for inclusion in Linux. I am not the original author of
+these patches, except for small changes required to include them in this series.
+
+The driver performs similarly to the C driver for the implemented features, see
+table below [5].
+
+In this table each cell shows the relative performance of the Rust
+driver to the C driver with the throughput of the C driver in parenthesis:
+`rel_read rel_write (read_miops write_miops)`. Ex: the Rust driver performs 4.74
+percent better than the C driver for fio randread with 2 jobs at 16 KiB
+block size.
+
+Over the 432 benchmark configurations, the relative performance of the Rust
+driver to the C driver (in terms of IOPS) is between 6.8 and -11.8 percent with
+an average of 0.2 percent better for reads. For writes the span is 16.8 to -4.5
+percent with an average of 0.9 percent better.
+
+For each measurement the drivers are loaded, a drive is configured with memory
+backing and a size of 4 GiB. C null_blk is configured to match the implemented
+modes of the Rust driver: `blocksize` is set to 4 KiB, `completion_nsec` to 0,
+`irqmode` to 0 (IRQ_NONE), `queue_mode` to 2 (MQ), `hw_queue_depth` to 256 and
+`memory_backed` to 1. For both the drivers, the queue scheduler is set to
+`none`. These measurements are made using 30 second runs of `fio` with the
+`PSYNC` IO engine with workers pinned to separate CPU cores. The measurements
+are done inside a virtual machine (qemu/kvm) on an Intel Alder Lake workstation
+(i5-12600).
+
+Given the relatively large spread in these numbers, it is possible that there is
+quite a bit of noise in the results. If anybody is able to dedicate some CPU
+time to run benchmarks in a more controlled and standardized environment, I
+would appreciate it.
+
+The feature list of the driver is relatively short for now:
+
+ - `blk-mq` support
+ - Direct completion of IO
+ - Read and write requests
+ - Optional memory backing
+
+Features available in the C null_blk driver that are currently not implemented
+in this work:
+
+ - Bio-based submission
+ - NUMA support
+ - Block size configuration
+ - Multiple devices
+ - Dynamic device creation/destruction
+ - Soft-IRQ and timer mode
+ - Queue depth configuration
+ - Queue count configuration
+ - Discard operation support
+ - Cache emulation
+ - Bandwidth throttling
+ - Per node hctx
+ - IO scheduler configuration
+ - Blocking submission mode
+ - Shared tags configuration (for >1 device)
+ - Zoned storage support
+ - Bad block simulation
+ - Poll queues
+
+The driver is implemented entirely in safe Rust, with all unsafe code fully
+contained in wrappers for C APIs.
+
+Patches 07/11 and 08/11 that enable the equivalent of the C
+`spin_lock_irqsave()` did appear on the Rust list [6,3] but was not applied to
+`rust-next` tree yet [4]. I am not the author of these patches, but I include
+them here for convenience. Please defer any discussion of these patches to their
+original posts.
+
+The null block driver is provided in patch 10/11. Patches 03/11 and 04/11
+introduce Rust abstractions for the block C APIs required by the driver.
+
+
+[1] https://lore.kernel.org/all/87y1ofj5tt.fsf@metaspace.dk/
+[2] https://github.com/Rust-for-Linux/linux/tree/rust
+[3] https://lore.kernel.org/all/20230411054543.21278-7-wedsonaf@gmail.com/
+[4] https://github.com/Rust-for-Linux/linux/tree/rust-next
+[6] https://lore.kernel.org/all/20230411054543.21278-6-wedsonaf@gmail.com/
+
+[5]:
++---------+-----------+-------------------------------+-----------------------------+-------------------------------+
+| jobs/bs |  workload |               1               |              2              |               3               |
++---------+-----------+-------------------------------+-----------------------------+-------------------------------+
+|    4k   |  randread |      1.54 0.00 (0.7,0.0)      |     0.35 0.00 (1.3,0.0)     |      -0.52 0.00 (1.3,0.0)     |
+|    8k   |  randread |      3.30 0.00 (0.57,0.0)     |     6.79 0.00 (0.92,0.0)    |      0.24 0.00 (0.97,0.0)     |
+|   16k   |  randread |      0.89 0.00 (0.42,0.0)     |     4.74 0.00 (0.64,0.0)    |      3.98 0.00 (0.65,0.0)     |
+|   32k   |  randread |      2.04 0.00 (0.27,0.0)     |     3.26 0.00 (0.37,0.0)    |      1.41 0.00 (0.37,0.0)     |
+|   64k   |  randread |      1.35 0.00 (0.16,0.0)     |     0.71 0.00 (0.21,0.0)    |      0.66 0.00 (0.22,0.0)     |
+|   128k  |  randread |      0.59 0.00 (0.09,0.0)     |     0.13 0.00 (0.1,0.0)     |     -6.47 0.00 (0.11,0.0)     |
+|   256k  |  randread |     0.13 0.00 (0.048,0.0)     |    1.00 0.00 (0.055,0.0)    |     0.03 0.00 (0.059,0.0)     |
+|   512k  |  randread |     1.16 0.00 (0.023,0.0)     |    -1.82 0.00 (0.027,0.0)   |     -0.90 0.00 (0.028,0.0)    |
+|  1024k  |  randread |     0.14 0.00 (0.011,0.0)     |    0.58 0.00 (0.012,0.0)    |     -1.14 0.00 (0.013,0.0)    |
+|  2048k  |  randread |     2.02 0.00 (0.005,0.0)     |    0.13 0.00 (0.0062,0.0)   |    -0.37 0.00 (0.0062,0.0)    |
+|  4096k  |  randread |     1.21 0.00 (0.0026,0.0)    |   -5.68 0.00 (0.0031,0.0)   |    -2.39 0.00 (0.0029,0.0)    |
+|  8192k  |  randread |    -1.02 0.00 (0.0013,0.0)    |    0.66 0.00 (0.0013,0.0)   |    -1.72 0.00 (0.0013,0.0)    |
+|    4k   |   randrw  |     2.82 2.82 (0.25,0.25)     |     2.94 2.94 (0.3,0.3)     |     3.19 3.20 (0.34,0.34)     |
+|    8k   |   randrw  |     2.80 2.82 (0.21,0.21)     |    2.32 2.32 (0.25,0.25)    |     1.95 1.96 (0.28,0.28)     |
+|   16k   |   randrw  |     4.54 4.52 (0.16,0.16)     |     2.29 2.29 (0.2,0.2)     |     2.27 2.30 (0.21,0.21)     |
+|   32k   |   randrw  |     3.51 3.51 (0.11,0.11)     |    2.43 2.40 (0.13,0.13)    |     1.38 1.38 (0.14,0.14)     |
+|   64k   |   randrw  |    2.40 2.42 (0.069,0.069)    |    1.98 1.99 (0.08,0.08)    |    0.51 0.51 (0.082,0.082)    |
+|   128k  |   randrw  |    1.50 1.49 (0.039,0.039)    |   1.28 1.27 (0.042,0.042)   |    0.83 0.84 (0.043,0.043)    |
+|   256k  |   randrw  |    2.02 2.06 (0.021,0.021)    |   0.92 0.91 (0.022,0.022)   |    0.70 0.75 (0.022,0.022)    |
+|   512k  |   randrw  |    0.82 0.82 (0.011,0.011)    |   0.69 0.70 (0.011,0.011)   |    0.97 0.98 (0.011,0.011)    |
+|  1024k  |   randrw  |   3.78 3.84 (0.0046,0.0046)   |  0.98 0.98 (0.0053,0.0053)  |   1.30 1.29 (0.0054,0.0054)   |
+|  2048k  |   randrw  |   1.60 1.54 (0.0023,0.0023)   |  1.76 1.69 (0.0026,0.0026)  |   1.23 0.92 (0.0026,0.0026)   |
+|  4096k  |   randrw  |   1.18 1.10 (0.0011,0.0012)   |  1.32 1.20 (0.0014,0.0014)  |   1.49 1.41 (0.0013,0.0013)   |
+|  8192k  |   randrw  | -2.01 -1.89 (0.00057,0.00057) | 1.20 1.14 (0.00061,0.00061) |  -0.74 -0.61 (0.0006,0.00062) |
+|    4k   | randwrite |      0.00 2.48 (0.0,0.41)     |     0.00 3.61 (0.0,0.39)    |      0.00 3.93 (0.0,0.44)     |
+|    8k   | randwrite |      0.00 3.46 (0.0,0.35)     |     0.00 1.90 (0.0,0.34)    |      0.00 2.20 (0.0,0.37)     |
+|   16k   | randwrite |      0.00 3.01 (0.0,0.28)     |     0.00 2.86 (0.0,0.27)    |      0.00 2.25 (0.0,0.29)     |
+|   32k   | randwrite |      0.00 3.02 (0.0,0.19)     |     0.00 2.68 (0.0,0.19)    |      0.00 2.20 (0.0,0.21)     |
+|   64k   | randwrite |      0.00 3.39 (0.0,0.12)     |     0.00 3.75 (0.0,0.12)    |     0.00 -0.79 (0.0,0.14)     |
+|   128k  | randwrite |     0.00 3.81 (0.0,0.069)     |    0.00 1.10 (0.0,0.072)    |     0.00 5.48 (0.0,0.078)     |
+|   256k  | randwrite |     0.00 4.28 (0.0,0.038)     |    0.00 1.27 (0.0,0.037)    |     0.00 -0.10 (0.0,0.041)    |
+|   512k  | randwrite |     0.00 2.71 (0.0,0.019)     |    0.00 0.46 (0.0,0.017)    |     0.00 2.96 (0.0,0.019)     |
+|  1024k  | randwrite |     0.00 2.67 (0.0,0.0082)    |    0.00 2.54 (0.0,0.0087)   |     0.00 0.20 (0.0,0.0093)    |
+|  2048k  | randwrite |     0.00 2.40 (0.0,0.0041)    |    0.00 1.90 (0.0,0.0041)   |     0.00 3.44 (0.0,0.0043)    |
+|  4096k  | randwrite |     0.00 3.38 (0.0,0.002)     |    0.00 1.69 (0.0,0.0025)   |     0.00 6.00 (0.0,0.0025)    |
+|  8192k  | randwrite |    0.00 3.09 (0.0,0.00098)    |    0.00 1.10 (0.0,0.0012)   |     0.00 0.45 (0.0,0.0012)    |
+|    4k   |    read   |      1.26 0.00 (1.0,0.0)      |     1.65 0.00 (2.0,0.0)     |      -9.94 0.00 (2.8,0.0)     |
+|    8k   |    read   |      1.86 0.00 (0.78,0.0)     |     4.60 0.00 (1.5,0.0)     |      0.47 0.00 (1.7,0.0)      |
+|   16k   |    read   |      1.13 0.00 (0.54,0.0)     |     4.00 0.00 (0.95,0.0)    |     -10.28 0.00 (0.97,0.0)    |
+|   32k   |    read   |      0.64 0.00 (0.32,0.0)     |     5.54 0.00 (0.46,0.0)    |     -0.67 0.00 (0.47,0.0)     |
+|   64k   |    read   |      0.29 0.00 (0.18,0.0)     |    -0.08 0.00 (0.25,0.0)    |     -0.82 0.00 (0.25,0.0)     |
+|   128k  |    read   |     0.11 0.00 (0.095,0.0)     |     0.12 0.00 (0.11,0.0)    |     -4.99 0.00 (0.12,0.0)     |
+|   256k  |    read   |      1.66 0.00 (0.05,0.0)     |    -0.41 0.00 (0.058,0.0)   |     -0.30 0.00 (0.061,0.0)    |
+|   512k  |    read   |     1.06 0.00 (0.024,0.0)     |    -1.77 0.00 (0.029,0.0)   |     0.81 0.00 (0.029,0.0)     |
+|  1024k  |    read   |     0.41 0.00 (0.011,0.0)     |    -2.28 0.00 (0.013,0.0)   |     -0.33 0.00 (0.013,0.0)    |
+|  2048k  |    read   |    -1.18 0.00 (0.0053,0.0)    |    1.41 0.00 (0.0063,0.0)   |    -0.86 0.00 (0.0063,0.0)    |
+|  4096k  |    read   |    -0.54 0.00 (0.0027,0.0)    |   -11.77 0.00 (0.0031,0.0)  |     0.02 0.00 (0.003,0.0)     |
+|  8192k  |    read   |    -1.60 0.00 (0.0013,0.0)    |   -4.25 0.00 (0.0013,0.0)   |    -1.64 0.00 (0.0013,0.0)    |
+|    4k   | readwrite |     1.01 1.01 (0.34,0.34)     |    1.00 1.00 (0.42,0.42)    |     1.30 1.29 (0.45,0.44)     |
+|    8k   | readwrite |     1.54 1.54 (0.28,0.28)     |    1.65 1.66 (0.32,0.32)    |     1.18 1.18 (0.36,0.36)     |
+|   16k   | readwrite |      1.07 1.08 (0.2,0.2)      |    2.82 2.81 (0.24,0.24)    |     0.40 0.39 (0.26,0.26)     |
+|   32k   | readwrite |     0.56 0.56 (0.13,0.13)     |   -1.31 -1.30 (0.16,0.16)   |     0.09 0.09 (0.16,0.16)     |
+|   64k   | readwrite |    1.82 1.83 (0.077,0.077)    |  -0.96 -0.96 (0.091,0.091)  |   -0.99 -0.97 (0.092,0.092)   |
+|   128k  | readwrite |    2.09 2.10 (0.041,0.041)    |   1.07 1.06 (0.045,0.045)   |    0.28 0.29 (0.045,0.045)    |
+|   256k  | readwrite |    2.06 2.05 (0.022,0.022)    |   1.84 1.85 (0.023,0.023)   |    0.66 0.59 (0.023,0.023)    |
+|   512k  | readwrite |     5.90 5.84 (0.01,0.01)     |   1.20 1.17 (0.011,0.011)   |    1.18 1.21 (0.011,0.011)    |
+|  1024k  | readwrite |   1.94 1.89 (0.0047,0.0047)   |  2.43 2.48 (0.0053,0.0053)  |   2.18 2.21 (0.0054,0.0054)   |
+|  2048k  | readwrite |  -0.47 -0.47 (0.0023,0.0023)  |  2.45 2.38 (0.0026,0.0026)  |   1.76 1.78 (0.0026,0.0026)   |
+|  4096k  | readwrite |   1.88 1.77 (0.0011,0.0012)   |  1.37 1.17 (0.0014,0.0014)  |   1.80 1.90 (0.0013,0.0013)   |
+|  8192k  | readwrite |  1.27 1.42 (0.00057,0.00057)  | 0.86 0.73 (0.00061,0.00062) | -0.99 -1.28 (0.00061,0.00062) |
+|    4k   |   write   |      0.00 1.53 (0.0,0.51)     |     0.00 0.35 (0.0,0.51)    |      0.00 0.92 (0.0,0.52)     |
+|    8k   |   write   |      0.00 1.04 (0.0,0.42)     |     0.00 1.01 (0.0,0.4)     |      0.00 2.90 (0.0,0.44)     |
+|   16k   |   write   |      0.00 0.86 (0.0,0.32)     |     0.00 1.89 (0.0,0.35)    |     0.00 -1.38 (0.0,0.36)     |
+|   32k   |   write   |      0.00 0.47 (0.0,0.21)     |    0.00 -0.52 (0.0,0.26)    |     0.00 -1.40 (0.0,0.24)     |
+|   64k   |   write   |      0.00 0.30 (0.0,0.13)     |    0.00 13.34 (0.0,0.14)    |      0.00 2.01 (0.0,0.15)     |
+|   128k  |   write   |     0.00 2.24 (0.0,0.073)     |    0.00 16.77 (0.0,0.076)   |     0.00 -0.36 (0.0,0.085)    |
+|   256k  |   write   |     0.00 3.49 (0.0,0.039)     |    0.00 9.76 (0.0,0.039)    |     0.00 -4.52 (0.0,0.043)    |
+|   512k  |   write   |      0.00 4.08 (0.0,0.02)     |    0.00 1.03 (0.0,0.017)    |     0.00 1.05 (0.0,0.019)     |
+|  1024k  |   write   |     0.00 2.72 (0.0,0.0083)    |    0.00 2.89 (0.0,0.0086)   |     0.00 2.98 (0.0,0.0095)    |
+|  2048k  |   write   |     0.00 2.14 (0.0,0.0041)    |    0.00 3.12 (0.0,0.0041)   |     0.00 1.84 (0.0,0.0044)    |
+|  4096k  |   write   |     0.00 1.76 (0.0,0.002)     |    0.00 1.80 (0.0,0.0026)   |     0.00 6.01 (0.0,0.0025)    |
+|  8192k  |   write   |    0.00 1.41 (0.0,0.00099)    |    0.00 0.98 (0.0,0.0012)   |     0.00 0.13 (0.0,0.0012)    |
++---------+-----------+-------------------------------+-----------------------------+-------------------------------+
+
++---------+-----------+-------------------------------+------------------------------+-------------------------------+
+| jobs/bs |  workload |               4               |              5               |               6               |
++---------+-----------+-------------------------------+------------------------------+-------------------------------+
+|    4k   |  randread |      1.66 0.00 (1.3,0.0)      |     -0.81 0.00 (1.3,0.0)     |      -0.50 0.00 (1.2,0.0)     |
+|    8k   |  randread |      2.52 0.00 (0.98,0.0)     |     2.54 0.00 (0.95,0.0)     |      2.52 0.00 (0.92,0.0)     |
+|   16k   |  randread |      0.68 0.00 (0.65,0.0)     |     3.43 0.00 (0.64,0.0)     |      5.84 0.00 (0.63,0.0)     |
+|   32k   |  randread |      1.88 0.00 (0.38,0.0)     |     0.46 0.00 (0.38,0.0)     |      2.33 0.00 (0.37,0.0)     |
+|   64k   |  randread |      1.28 0.00 (0.21,0.0)     |     0.64 0.00 (0.21,0.0)     |     -0.26 0.00 (0.21,0.0)     |
+|   128k  |  randread |     -0.05 0.00 (0.11,0.0)     |     0.10 0.00 (0.11,0.0)     |      0.09 0.00 (0.11,0.0)     |
+|   256k  |  randread |     -0.01 0.00 (0.059,0.0)    |    -1.01 0.00 (0.059,0.0)    |     -0.39 0.00 (0.059,0.0)    |
+|   512k  |  randread |     -1.17 0.00 (0.029,0.0)    |    0.39 0.00 (0.028,0.0)     |     -0.33 0.00 (0.028,0.0)    |
+|  1024k  |  randread |     -0.20 0.00 (0.013,0.0)    |    -0.85 0.00 (0.013,0.0)    |     -0.57 0.00 (0.013,0.0)    |
+|  2048k  |  randread |    -0.07 0.00 (0.0062,0.0)    |   -0.26 0.00 (0.0061,0.0)    |     -0.15 0.00 (0.006,0.0)    |
+|  4096k  |  randread |    -0.25 0.00 (0.0027,0.0)    |   -2.70 0.00 (0.0027,0.0)    |    -2.35 0.00 (0.0026,0.0)    |
+|  8192k  |  randread |    -2.94 0.00 (0.0013,0.0)    |   -3.01 0.00 (0.0012,0.0)    |    -2.09 0.00 (0.0012,0.0)    |
+|    4k   |   randrw  |     2.83 2.84 (0.36,0.36)     |    2.24 2.23 (0.37,0.37)     |     3.49 3.50 (0.38,0.38)     |
+|    8k   |   randrw  |     1.31 1.32 (0.29,0.29)     |     2.01 2.01 (0.3,0.3)      |      2.09 2.09 (0.3,0.3)      |
+|   16k   |   randrw  |     1.96 1.95 (0.22,0.22)     |    1.61 1.61 (0.22,0.22)     |     1.99 2.00 (0.22,0.22)     |
+|   32k   |   randrw  |     1.01 1.03 (0.14,0.14)     |    0.58 0.59 (0.14,0.14)     |    -0.04 -0.05 (0.14,0.14)    |
+|   64k   |   randrw  |   -0.19 -0.18 (0.081,0.081)   |  -0.72 -0.72 (0.081,0.081)   |   -0.50 -0.50 (0.081,0.081)   |
+|   128k  |   randrw  |    0.42 0.42 (0.043,0.043)    |  -0.33 -0.36 (0.043,0.043)   |   -0.62 -0.59 (0.043,0.043)   |
+|   256k  |   randrw  |    0.38 0.41 (0.022,0.022)    |  -0.35 -0.35 (0.022,0.022)   |    0.37 0.31 (0.022,0.022)    |
+|   512k  |   randrw  |    0.40 0.41 (0.011,0.011)    |  -0.29 -0.26 (0.011,0.011)   |     2.76 2.48 (0.01,0.01)     |
+|  1024k  |   randrw  |   1.16 1.01 (0.0052,0.0052)   |  0.74 0.72 (0.0051,0.0051)   |    1.72 1.77 (0.005,0.005)    |
+|  2048k  |   randrw  |   1.09 0.96 (0.0026,0.0026)   |  1.19 1.57 (0.0026,0.0026)   |   1.49 1.21 (0.0025,0.0025)   |
+|  4096k  |   randrw  |   -0.13 0.06 (0.0013,0.0013)  |  0.69 0.77 (0.0013,0.0013)   |  -0.20 -0.13 (0.0012,0.0012)  |
+|  8192k  |   randrw  | -0.71 -1.27 (0.00059,0.00061) | -1.78 -2.02 (0.00059,0.0006) | -1.60 -1.25 (0.00058,0.00059) |
+|    4k   | randwrite |      0.00 2.17 (0.0,0.44)     |     0.00 4.08 (0.0,0.45)     |      0.00 5.47 (0.0,0.46)     |
+|    8k   | randwrite |      0.00 0.98 (0.0,0.38)     |     0.00 2.39 (0.0,0.39)     |      0.00 2.30 (0.0,0.4)      |
+|   16k   | randwrite |      0.00 2.02 (0.0,0.3)      |     0.00 2.63 (0.0,0.3)      |      0.00 3.17 (0.0,0.3)      |
+|   32k   | randwrite |      0.00 1.82 (0.0,0.21)     |     0.00 1.12 (0.0,0.22)     |      0.00 1.40 (0.0,0.21)     |
+|   64k   | randwrite |      0.00 1.41 (0.0,0.14)     |     0.00 1.92 (0.0,0.13)     |      0.00 1.76 (0.0,0.13)     |
+|   128k  | randwrite |     0.00 2.32 (0.0,0.075)     |    0.00 4.61 (0.0,0.074)     |     0.00 2.31 (0.0,0.074)     |
+|   256k  | randwrite |     0.00 -0.77 (0.0,0.038)    |    0.00 2.61 (0.0,0.036)     |     0.00 2.48 (0.0,0.036)     |
+|   512k  | randwrite |     0.00 1.83 (0.0,0.019)     |    0.00 1.68 (0.0,0.018)     |     0.00 2.80 (0.0,0.018)     |
+|  1024k  | randwrite |     0.00 3.32 (0.0,0.0086)    |    0.00 1.20 (0.0,0.0087)    |     0.00 0.92 (0.0,0.0081)    |
+|  2048k  | randwrite |     0.00 0.92 (0.0,0.0043)    |    0.00 2.95 (0.0,0.0042)    |     0.00 3.15 (0.0,0.0042)    |
+|  4096k  | randwrite |     0.00 3.22 (0.0,0.0025)    |    0.00 0.50 (0.0,0.0024)    |     0.00 0.40 (0.0,0.0024)    |
+|  8192k  | randwrite |    0.00 -0.57 (0.0,0.0012)    |   0.00 -0.41 (0.0,0.0011)    |    0.00 -0.36 (0.0,0.0011)    |
+|    4k   |    read   |      4.34 0.00 (2.5,0.0)      |     -0.40 0.00 (2.6,0.0)     |      -8.45 0.00 (2.6,0.0)     |
+|    8k   |    read   |      -1.43 0.00 (1.7,0.0)     |     0.01 0.00 (1.7,0.0)      |      -3.89 0.00 (1.7,0.0)     |
+|   16k   |    read   |      1.68 0.00 (0.96,0.0)     |    -0.38 0.00 (0.94,0.0)     |      0.47 0.00 (0.91,0.0)     |
+|   32k   |    read   |     -0.98 0.00 (0.48,0.0)     |    -0.09 0.00 (0.47,0.0)     |     -1.24 0.00 (0.47,0.0)     |
+|   64k   |    read   |     -0.42 0.00 (0.25,0.0)     |    -0.26 0.00 (0.25,0.0)     |     -0.94 0.00 (0.25,0.0)     |
+|   128k  |    read   |     -0.49 0.00 (0.12,0.0)     |     0.06 0.00 (0.12,0.0)     |     -0.59 0.00 (0.12,0.0)     |
+|   256k  |    read   |     -0.89 0.00 (0.062,0.0)    |    -0.11 0.00 (0.062,0.0)    |     -0.77 0.00 (0.062,0.0)    |
+|   512k  |    read   |     -0.64 0.00 (0.03,0.0)     |    -0.11 0.00 (0.03,0.0)     |      0.08 0.00 (0.03,0.0)     |
+|  1024k  |    read   |     0.00 0.00 (0.013,0.0)     |    -0.05 0.00 (0.013,0.0)    |     0.42 0.00 (0.013,0.0)     |
+|  2048k  |    read   |    -0.69 0.00 (0.0063,0.0)    |   -0.36 0.00 (0.0063,0.0)    |     1.12 0.00 (0.006,0.0)     |
+|  4096k  |    read   |    -2.69 0.00 (0.0029,0.0)    |   -1.85 0.00 (0.0027,0.0)    |    -1.13 0.00 (0.0026,0.0)    |
+|  8192k  |    read   |    -2.15 0.00 (0.0013,0.0)    |   -1.66 0.00 (0.0013,0.0)    |    -2.90 0.00 (0.0012,0.0)    |
+|    4k   | readwrite |     0.32 0.32 (0.46,0.46)     |    0.68 0.69 (0.47,0.47)     |     -0.26 -0.26 (0.5,0.5)     |
+|    8k   | readwrite |     0.18 0.18 (0.37,0.37)     |    0.77 0.76 (0.38,0.38)     |    -0.47 -0.48 (0.39,0.39)    |
+|   16k   | readwrite |     0.24 0.25 (0.27,0.27)     |   -0.17 -0.15 (0.27,0.27)    |    -0.51 -0.52 (0.27,0.27)    |
+|   32k   | readwrite |    -0.91 -0.91 (0.17,0.17)    |   -1.40 -1.37 (0.17,0.17)    |    -1.67 -1.70 (0.17,0.17)    |
+|   64k   | readwrite |    -1.22 -1.21 (0.09,0.09)    |   -1.33 -1.30 (0.09,0.09)    |   -2.49 -2.50 (0.091,0.091)   |
+|   128k  | readwrite |   -0.67 -0.69 (0.045,0.045)   |  -1.23 -1.24 (0.045,0.045)   |   -1.01 -0.96 (0.045,0.045)   |
+|   256k  | readwrite |   -0.31 -0.35 (0.023,0.023)   |  -0.28 -0.28 (0.023,0.023)   |    0.25 0.08 (0.022,0.023)    |
+|   512k  | readwrite |    0.77 0.72 (0.011,0.011)    |   0.96 0.96 (0.011,0.011)    |    0.62 1.16 (0.011,0.011)    |
+|  1024k  | readwrite |   0.93 0.91 (0.0053,0.0053)   |  0.72 0.78 (0.0051,0.0051)   |  -0.48 -0.10 (0.0051,0.0051)  |
+|  2048k  | readwrite |   1.84 1.77 (0.0026,0.0026)   |  0.86 0.71 (0.0026,0.0026)   |   0.31 1.37 (0.0026,0.0026)   |
+|  4096k  | readwrite |   2.71 2.43 (0.0013,0.0013)   |  1.54 1.73 (0.0013,0.0013)   |  -1.18 -0.79 (0.0012,0.0013)  |
+|  8192k  | readwrite |  -2.61 -1.52 (0.0006,0.00061) | -1.83 -1.27 (0.00059,0.0006) | -2.25 -1.53 (0.00059,0.00059) |
+|    4k   |   write   |     0.00 -2.94 (0.0,0.53)     |    0.00 -2.23 (0.0,0.57)     |      0.00 0.93 (0.0,0.56)     |
+|    8k   |   write   |     0.00 -1.78 (0.0,0.45)     |    0.00 -1.14 (0.0,0.47)     |      0.00 0.47 (0.0,0.47)     |
+|   16k   |   write   |     0.00 -1.46 (0.0,0.35)     |    0.00 -1.46 (0.0,0.36)     |      0.00 0.25 (0.0,0.36)     |
+|   32k   |   write   |     0.00 -1.05 (0.0,0.24)     |    0.00 -1.53 (0.0,0.24)     |     0.00 -0.74 (0.0,0.24)     |
+|   64k   |   write   |     0.00 -2.78 (0.0,0.15)     |     0.00 1.39 (0.0,0.15)     |     0.00 -2.42 (0.0,0.15)     |
+|   128k  |   write   |     0.00 -0.03 (0.0,0.082)    |    0.00 0.32 (0.0,0.081)     |     0.00 2.76 (0.0,0.079)     |
+|   256k  |   write   |     0.00 -0.33 (0.0,0.039)    |    0.00 -0.32 (0.0,0.038)    |     0.00 -2.37 (0.0,0.038)    |
+|   512k  |   write   |     0.00 4.00 (0.0,0.019)     |     0.00 6.45 (0.0,0.02)     |     0.00 2.94 (0.0,0.019)     |
+|  1024k  |   write   |     0.00 1.22 (0.0,0.0088)    |    0.00 1.57 (0.0,0.0088)    |    0.00 -3.98 (0.0,0.0087)    |
+|  2048k  |   write   |     0.00 0.05 (0.0,0.0043)    |    0.00 3.33 (0.0,0.0044)    |     0.00 8.69 (0.0,0.0044)    |
+|  4096k  |   write   |     0.00 2.36 (0.0,0.0025)    |    0.00 1.52 (0.0,0.0024)    |     0.00 0.44 (0.0,0.0024)    |
+|  8192k  |   write   |    0.00 -0.35 (0.0,0.0012)    |   0.00 -0.45 (0.0,0.0011)    |    0.00 -0.73 (0.0,0.0011)    |
++---------+-----------+-------------------------------+------------------------------+-------------------------------+
+
+
+Andreas Hindborg (9):
+  rust: add radix tree abstraction
+  rust: add `pages` module for handling page allocation
+  rust: block: introduce `kernel::block::mq` module
+  rust: block: introduce `kernel::block::bio` module
+  RUST: add `module_params` macro
+  rust: apply cache line padding for `SpinLock`
+  RUST: implement `ForeignOwnable` for `Pin`
+  rust: add null block driver
+  rust: inline a number of short functions
+
+Wedson Almeida Filho (2):
+  rust: lock: add support for `Lock::lock_irqsave`
+  rust: lock: implement `IrqSaveBackend` for `SpinLock`
+
+ drivers/block/Kconfig              |   4 +
+ drivers/block/Makefile             |   4 +
+ drivers/block/rnull-helpers.c      |  60 ++++
+ drivers/block/rnull.rs             | 177 ++++++++++
+ rust/bindings/bindings_helper.h    |   4 +
+ rust/bindings/lib.rs               |   1 +
+ rust/helpers.c                     |  91 ++++++
+ rust/kernel/block.rs               |   6 +
+ rust/kernel/block/bio.rs           |  93 ++++++
+ rust/kernel/block/bio/vec.rs       | 181 +++++++++++
+ rust/kernel/block/mq.rs            |  15 +
+ rust/kernel/block/mq/gen_disk.rs   | 133 ++++++++
+ rust/kernel/block/mq/operations.rs | 260 +++++++++++++++
+ rust/kernel/block/mq/raw_writer.rs |  30 ++
+ rust/kernel/block/mq/request.rs    |  87 +++++
+ rust/kernel/block/mq/tag_set.rs    |  92 ++++++
+ rust/kernel/cache_padded.rs        |  33 ++
+ rust/kernel/error.rs               |   4 +
+ rust/kernel/lib.rs                 |  13 +
+ rust/kernel/module_param.rs        | 501 +++++++++++++++++++++++++++++
+ rust/kernel/pages.rs               | 284 ++++++++++++++++
+ rust/kernel/radix_tree.rs          | 156 +++++++++
+ rust/kernel/sync/lock.rs           |  49 ++-
+ rust/kernel/sync/lock/mutex.rs     |   2 +
+ rust/kernel/sync/lock/spinlock.rs  |  50 ++-
+ rust/kernel/types.rs               |  30 ++
+ rust/macros/helpers.rs             |  46 ++-
+ rust/macros/module.rs              | 402 +++++++++++++++++++++--
+ scripts/Makefile.build             |   2 +-
+ 29 files changed, 2766 insertions(+), 44 deletions(-)
+ create mode 100644 drivers/block/rnull-helpers.c
+ create mode 100644 drivers/block/rnull.rs
+ create mode 100644 rust/kernel/block.rs
+ create mode 100644 rust/kernel/block/bio.rs
+ create mode 100644 rust/kernel/block/bio/vec.rs
+ create mode 100644 rust/kernel/block/mq.rs
+ create mode 100644 rust/kernel/block/mq/gen_disk.rs
+ create mode 100644 rust/kernel/block/mq/operations.rs
+ create mode 100644 rust/kernel/block/mq/raw_writer.rs
+ create mode 100644 rust/kernel/block/mq/request.rs
+ create mode 100644 rust/kernel/block/mq/tag_set.rs
+ create mode 100644 rust/kernel/cache_padded.rs
+ create mode 100644 rust/kernel/module_param.rs
  create mode 100644 rust/kernel/pages.rs
+ create mode 100644 rust/kernel/radix_tree.rs
 
-diff --git a/rust/helpers.c b/rust/helpers.c
-index 5dd5e325b7cc..9bd9d95da951 100644
---- a/rust/helpers.c
-+++ b/rust/helpers.c
-@@ -27,6 +27,7 @@
- #include <linux/sched/signal.h>
- #include <linux/wait.h>
- #include <linux/radix-tree.h>
-+#include <linux/highmem.h>
- 
- __noreturn void rust_helper_BUG(void)
- {
-@@ -150,6 +151,36 @@ void **rust_helper_radix_tree_next_slot(void **slot,
- }
- EXPORT_SYMBOL_GPL(rust_helper_radix_tree_next_slot);
- 
-+void *rust_helper_kmap(struct page *page)
-+{
-+	return kmap(page);
-+}
-+EXPORT_SYMBOL_GPL(rust_helper_kmap);
-+
-+void rust_helper_kunmap(struct page *page)
-+{
-+	return kunmap(page);
-+}
-+EXPORT_SYMBOL_GPL(rust_helper_kunmap);
-+
-+void *rust_helper_kmap_atomic(struct page *page)
-+{
-+	return kmap_atomic(page);
-+}
-+EXPORT_SYMBOL_GPL(rust_helper_kmap_atomic);
-+
-+void rust_helper_kunmap_atomic(void *address)
-+{
-+	kunmap_atomic(address);
-+}
-+EXPORT_SYMBOL_GPL(rust_helper_kunmap_atomic);
-+
-+struct page *rust_helper_alloc_pages(gfp_t gfp_mask, unsigned int order)
-+{
-+	return alloc_pages(gfp_mask, order);
-+}
-+EXPORT_SYMBOL_GPL(rust_helper_alloc_pages);
-+
- /*
-  * We use `bindgen`'s `--size_t-is-usize` option to bind the C `size_t` type
-  * as the Rust `usize` type, so we can use it in contexts where Rust
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index a85cb6aae8d6..8bef6686504b 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -38,6 +38,7 @@ mod build_assert;
- pub mod error;
- pub mod init;
- pub mod ioctl;
-+pub mod pages;
- pub mod prelude;
- pub mod print;
- pub mod radix_tree;
-@@ -57,6 +58,11 @@ pub use uapi;
- #[doc(hidden)]
- pub use build_error::build_error;
- 
-+/// Page size defined in terms of the `PAGE_SHIFT` macro from C.
-+///
-+/// [`PAGE_SHIFT`]: ../../../include/asm-generic/page.h
-+pub const PAGE_SIZE: u32 = 1 << bindings::PAGE_SHIFT;
-+
- /// Prefix to appear before log messages printed from within the `kernel` crate.
- const __LOG_PREFIX: &[u8] = b"rust_kernel\0";
- 
-diff --git a/rust/kernel/pages.rs b/rust/kernel/pages.rs
-new file mode 100644
-index 000000000000..ed51b053dd5d
---- /dev/null
-+++ b/rust/kernel/pages.rs
-@@ -0,0 +1,284 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Kernel page allocation and management.
-+//!
-+//! This module currently provides limited support. It supports pages of order 0
-+//! for most operations. Page allocation flags are fixed.
-+
-+use crate::{bindings, error::code::*, error::Result, PAGE_SIZE};
-+use core::{marker::PhantomData, ptr};
-+
-+/// A set of physical pages.
-+///
-+/// `Pages` holds a reference to a set of pages of order `ORDER`. Having the order as a generic
-+/// const allows the struct to have the same size as a pointer.
-+///
-+/// # Invariants
-+///
-+/// The pointer `Pages::pages` is valid and points to 2^ORDER pages.
-+pub struct Pages<const ORDER: u32> {
-+    pub(crate) pages: *mut bindings::page,
-+}
-+
-+impl<const ORDER: u32> Pages<ORDER> {
-+    /// Allocates a new set of contiguous pages.
-+    pub fn new() -> Result<Self> {
-+        let pages = unsafe {
-+            bindings::alloc_pages(
-+                bindings::GFP_KERNEL | bindings::__GFP_ZERO | bindings::___GFP_HIGHMEM,
-+                ORDER,
-+            )
-+        };
-+        if pages.is_null() {
-+            return Err(ENOMEM);
-+        }
-+        // INVARIANTS: We checked that the allocation above succeeded.
-+        // SAFETY: We allocated pages above
-+        Ok(unsafe { Self::from_raw(pages) })
-+    }
-+
-+    /// Create a `Pages` from a raw `struct page` pointer
-+    ///
-+    /// # Safety
-+    ///
-+    /// Caller must own the pages pointed to by `ptr` as these will be freed
-+    /// when the returned `Pages` is dropped.
-+    pub unsafe fn from_raw(ptr: *mut bindings::page) -> Self {
-+        Self { pages: ptr }
-+    }
-+}
-+
-+impl Pages<0> {
-+    #[inline(always)]
-+    fn check_offset_and_map<I: MappingInfo>(
-+        &self,
-+        offset: usize,
-+        len: usize,
-+    ) -> Result<PageMapping<'_, I>>
-+    where
-+        Pages<0>: MappingActions<I>,
-+    {
-+        let end = offset.checked_add(len).ok_or(EINVAL)?;
-+        if end as u32 > PAGE_SIZE {
-+            return Err(EINVAL);
-+        }
-+
-+        let mapping = <Self as MappingActions<I>>::map(self);
-+
-+        Ok(mapping)
-+    }
-+
-+    #[inline(always)]
-+    unsafe fn read_internal<I: MappingInfo>(
-+        &self,
-+        dest: *mut u8,
-+        offset: usize,
-+        len: usize,
-+    ) -> Result
-+    where
-+        Pages<0>: MappingActions<I>,
-+    {
-+        let mapping = self.check_offset_and_map::<I>(offset, len)?;
-+
-+        unsafe { ptr::copy_nonoverlapping((mapping.ptr as *mut u8).add(offset), dest, len) };
-+        Ok(())
-+    }
-+
-+    /// Maps the pages and reads from them into the given buffer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Callers must ensure that the destination buffer is valid for the given
-+    /// length. Additionally, if the raw buffer is intended to be recast, they
-+    /// must ensure that the data can be safely cast;
-+    /// [`crate::io_buffer::ReadableFromBytes`] has more details about it.
-+    /// `dest` may not point to the source page.
-+    #[inline(always)]
-+    pub unsafe fn read(&self, dest: *mut u8, offset: usize, len: usize) -> Result {
-+        unsafe { self.read_internal::<NormalMappingInfo>(dest, offset, len) }
-+    }
-+
-+    /// Maps the pages and reads from them into the given buffer. The page is
-+    /// mapped atomically.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Callers must ensure that the destination buffer is valid for the given
-+    /// length. Additionally, if the raw buffer is intended to be recast, they
-+    /// must ensure that the data can be safely cast;
-+    /// [`crate::io_buffer::ReadableFromBytes`] has more details about it.
-+    /// `dest` may not point to the source page.
-+    #[inline(always)]
-+    pub unsafe fn read_atomic(&self, dest: *mut u8, offset: usize, len: usize) -> Result {
-+        unsafe { self.read_internal::<AtomicMappingInfo>(dest, offset, len) }
-+    }
-+
-+    #[inline(always)]
-+    unsafe fn write_internal<I: MappingInfo>(
-+        &self,
-+        src: *const u8,
-+        offset: usize,
-+        len: usize,
-+    ) -> Result
-+    where
-+        Pages<0>: MappingActions<I>,
-+    {
-+        let mapping = self.check_offset_and_map::<I>(offset, len)?;
-+
-+        unsafe { ptr::copy_nonoverlapping(src, (mapping.ptr as *mut u8).add(offset), len) };
-+        Ok(())
-+    }
-+
-+    /// Maps the pages and writes into them from the given buffer.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Callers must ensure that the buffer is valid for the given length.
-+    /// Additionally, if the page is (or will be) mapped by userspace, they must
-+    /// ensure that no kernel data is leaked through padding if it was cast from
-+    /// another type; [`crate::io_buffer::WritableToBytes`] has more details
-+    /// about it. `src` must not point to the destination page.
-+    #[inline(always)]
-+    pub unsafe fn write(&self, src: *const u8, offset: usize, len: usize) -> Result {
-+        unsafe { self.write_internal::<NormalMappingInfo>(src, offset, len) }
-+    }
-+
-+    /// Maps the pages and writes into them from the given buffer. The page is
-+    /// mapped atomically.
-+    ///
-+    /// # Safety
-+    ///
-+    /// Callers must ensure that the buffer is valid for the given length.
-+    /// Additionally, if the page is (or will be) mapped by userspace, they must
-+    /// ensure that no kernel data is leaked through padding if it was cast from
-+    /// another type; [`crate::io_buffer::WritableToBytes`] has more details
-+    /// about it. `src` must not point to the destination page.
-+    #[inline(always)]
-+    pub unsafe fn write_atomic(&self, src: *const u8, offset: usize, len: usize) -> Result {
-+        unsafe { self.write_internal::<AtomicMappingInfo>(src, offset, len) }
-+    }
-+
-+    /// Maps the page at index 0.
-+    #[inline(always)]
-+    pub fn kmap(&self) -> PageMapping<'_, NormalMappingInfo> {
-+        let ptr = unsafe { bindings::kmap(self.pages) };
-+
-+        PageMapping {
-+            page: self.pages,
-+            ptr,
-+            _phantom: PhantomData,
-+            _phantom2: PhantomData,
-+        }
-+    }
-+
-+    /// Atomically Maps the page at index 0.
-+    #[inline(always)]
-+    pub fn kmap_atomic(&self) -> PageMapping<'_, AtomicMappingInfo> {
-+        let ptr = unsafe { bindings::kmap_atomic(self.pages) };
-+
-+        PageMapping {
-+            page: self.pages,
-+            ptr,
-+            _phantom: PhantomData,
-+            _phantom2: PhantomData,
-+        }
-+    }
-+}
-+
-+impl<const ORDER: u32> Drop for Pages<ORDER> {
-+    fn drop(&mut self) {
-+        // SAFETY: By the type invariants, we know the pages are allocated with the given order.
-+        unsafe { bindings::__free_pages(self.pages, ORDER) };
-+    }
-+}
-+
-+/// Specifies the type of page mapping
-+pub trait MappingInfo {}
-+
-+/// Encapsulates methods to map and unmap pages
-+pub trait MappingActions<I: MappingInfo>
-+where
-+    Pages<0>: MappingActions<I>,
-+{
-+    /// Map a page into the kernel address scpace
-+    fn map(pages: &Pages<0>) -> PageMapping<'_, I>;
-+
-+    /// Unmap a page specified by `mapping`
-+    ///
-+    /// # Safety
-+    ///
-+    /// Must only be called by `PageMapping::drop()`.
-+    unsafe fn unmap(mapping: &PageMapping<'_, I>);
-+}
-+
-+/// A type state indicating that pages were mapped atomically
-+pub struct AtomicMappingInfo;
-+impl MappingInfo for AtomicMappingInfo {}
-+
-+/// A type state indicating that pages were not mapped atomically
-+pub struct NormalMappingInfo;
-+impl MappingInfo for NormalMappingInfo {}
-+
-+impl MappingActions<AtomicMappingInfo> for Pages<0> {
-+    #[inline(always)]
-+    fn map(pages: &Pages<0>) -> PageMapping<'_, AtomicMappingInfo> {
-+        pages.kmap_atomic()
-+    }
-+
-+    #[inline(always)]
-+    unsafe fn unmap(mapping: &PageMapping<'_, AtomicMappingInfo>) {
-+        // SAFETY: An instance of `PageMapping` is created only when `kmap` succeeded for the given
-+        // page, so it is safe to unmap it here.
-+        unsafe { bindings::kunmap_atomic(mapping.ptr) };
-+    }
-+}
-+
-+impl MappingActions<NormalMappingInfo> for Pages<0> {
-+    #[inline(always)]
-+    fn map(pages: &Pages<0>) -> PageMapping<'_, NormalMappingInfo> {
-+        pages.kmap()
-+    }
-+
-+    #[inline(always)]
-+    unsafe fn unmap(mapping: &PageMapping<'_, NormalMappingInfo>) {
-+        // SAFETY: An instance of `PageMapping` is created only when `kmap` succeeded for the given
-+        // page, so it is safe to unmap it here.
-+        unsafe { bindings::kunmap(mapping.page) };
-+    }
-+}
-+
-+/// An owned page mapping. When this struct is dropped, the page is unmapped.
-+pub struct PageMapping<'a, I: MappingInfo>
-+where
-+    Pages<0>: MappingActions<I>,
-+{
-+    page: *mut bindings::page,
-+    ptr: *mut core::ffi::c_void,
-+    _phantom: PhantomData<&'a i32>,
-+    _phantom2: PhantomData<I>,
-+}
-+
-+impl<'a, I: MappingInfo> PageMapping<'a, I>
-+where
-+    Pages<0>: MappingActions<I>,
-+{
-+    /// Return a pointer to the wrapped `struct page`
-+    #[inline(always)]
-+    pub fn get_ptr(&self) -> *mut core::ffi::c_void {
-+        self.ptr
-+    }
-+}
-+
-+// Because we do not have Drop specialization, we have to do this dance. Life
-+// would be much more simple if we could have `impl Drop for PageMapping<'_,
-+// Atomic>` and `impl Drop for PageMapping<'_, NotAtomic>`
-+impl<I: MappingInfo> Drop for PageMapping<'_, I>
-+where
-+    Pages<0>: MappingActions<I>,
-+{
-+    #[inline(always)]
-+    fn drop(&mut self) {
-+        // SAFETY: We are OK to call this because we are `PageMapping::drop()`
-+        unsafe { <Pages<0> as MappingActions<I>>::unmap(self) }
-+    }
-+}
+
+base-commit: ea76e08f4d901a450619831a255e9e0a4c0ed162
 -- 
 2.40.0
 
