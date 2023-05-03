@@ -2,573 +2,164 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E283C77B75
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 12:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF92C77B78
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 12:55:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbjECMik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 08:38:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48258 "EHLO
+        id S229802AbjECMzr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 08:55:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjECMij (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 08:38:39 -0400
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437964224;
-        Wed,  3 May 2023 05:38:34 -0700 (PDT)
-Date:   Wed, 03 May 2023 12:38:14 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-        s=protonmail; t=1683117511; x=1683376711;
-        bh=y5GsLDkv+seeh4vnGPqOR3n2rVIFisoH/G0vmDt1tLQ=;
-        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-         Message-ID:BIMI-Selector;
-        b=LdJES8UkVI1ckkqj+7B5LMGE7OfXXSVpy1P/xs/y0A1SM6x5+KTPi8EYveSWM6Ibu
-         OD0G7zymU+zIZdP02AJ6jTK8LttVTWZdiVcwrpGSCZi19a+2KQTdQY9DNIXMLLqqTP
-         5wzEk4BruW177CB45tf/eDZ93z+PddBoJm7GV5t+t5cjmVIkRo3N3MGq6BVeuMcW61
-         ztZd0k0jRTRTVhxBaB5ydWEBPcOrlyw3znfsumcoKqkca+jaNG2+w/0fvNvscdaNVT
-         lVJ8f6sCEN0hclggvaKoRPyQv7tTnZgrB4UB1BNb7XW+PF3c5Sv4oWhrpbO0LUGKa+
-         mMtNmfi/5Pv6g==
-To:     Benno Lossin <benno.lossin@proton.me>
-From:   Benno Lossin <benno.lossin@proton.me>
-Cc:     Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
+        with ESMTP id S229626AbjECMzq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 08:55:46 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F33759E5
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 05:55:33 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-50bd37ca954so6461175a12.0
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 05:55:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683118532; x=1685710532;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=6kYxRlCY3DiRAUyVahK0tkAYUy3+IuQkjxYPl95xXCw=;
+        b=3bTv7UUYES7MGkQlWXBOyzgXFfa/J6rURe5VYP8MZCJsdrfyzUca2vQPf9Y26c3hRE
+         UndVtBcYacShlr3CJmDlqC2oXWlRoeiDmi1RrY2TENoqvXNt1paR7eIdZtlICxLCV1vx
+         CTfbeEIHDeXi+kuEtrDU9Ar3WdEULJuTWdJSNqdUoNYJBBQnNIAtTP6fdtVQIfj2XORD
+         ODd0ENUr47svLvtxzLKHsH7d2jHeh+2RKLJQ4mIQmQW2d8VbdBZP1S5HxEnTlSwQRnpu
+         a2P5Spkb3FlI4ybbqHcazvdANQ6hCpVCmUFzxgbj8x5ifPbcgACclIKsB1bUmSBhdf6B
+         SuRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683118532; x=1685710532;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6kYxRlCY3DiRAUyVahK0tkAYUy3+IuQkjxYPl95xXCw=;
+        b=Gw8ysCA0URRScxsbZi4ilYRGgikZxZ4w0VXa/ppEf+mcb95jx4uo78Acp/gvGPr5lO
+         tJlQA+6tpctrnhzzR0Z66Exk6MBAZJ9Ahr8YMWJpN88uHEa9EOZhArE1T4iD6tkpPunR
+         s9+hup5v5oxpr7J5gA8FaQOrOfq7Vg+jdxP0LOHvvI8sQe1JSpBsbClnaes3drwlgZAZ
+         ypUQbUIr6H6SPmHsppBkOfFGsjhRm+8Ta7yrOntxKd1kgC7KcCFvwMUoEzVPahF6iHc7
+         QL7/irC+BmW/J+WF75unYMJ2J6O2e7Y3evbLF2yWfjNdQ/LVzdd4DVzxrL3AHnRYzaUX
+         bYHQ==
+X-Gm-Message-State: AC+VfDz6JX2tddBEW0/PZ8cO/EHb3vi3NxSl79RoLBFXmrRZfUl5rovc
+        HYPZjYIDq0Eds88gD0B7A1boNw==
+X-Google-Smtp-Source: ACHHUZ6M5whg5AQa7qA0Gb4FW+Z6M8VCHzQ4fzfLNRXh7lWyA7OgoKzaE2LRblCb+VFVh86YkxFY7A==
+X-Received: by 2002:a17:907:6e0f:b0:953:7f08:a9ee with SMTP id sd15-20020a1709076e0f00b009537f08a9eemr1787966ejc.1.1683118531888;
+        Wed, 03 May 2023 05:55:31 -0700 (PDT)
+Received: from localhost ([79.142.230.34])
+        by smtp.gmail.com with ESMTPSA id w1-20020a170906480100b0094f0f0de1bcsm17350222ejq.200.2023.05.03.05.55.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 May 2023 05:55:31 -0700 (PDT)
+References: <20230503090708.2524310-1-nmi@metaspace.dk>
+ <ZFJGWwlRbSS3zFnc@x1-carbon>
+User-agent: mu4e 1.10.3; emacs 28.2.50
+From:   Andreas Hindborg <nmi@metaspace.dk>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Keith Busch <kbusch@kernel.org>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
         Hannes Reinecke <hare@suse.de>,
-        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Andreas Hindborg <a.hindborg@samsung.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Matthew Wilcox <willy@infradead.org>,
         Miguel Ojeda <ojeda@kernel.org>,
         Alex Gaynor <alex.gaynor@gmail.com>,
         Wedson Almeida Filho <wedsonaf@gmail.com>,
         Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        linux-kernel@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 02/11] rust: add `pages` module for handling page allocation
-Message-ID: <LDtgXi9Js_rS954DPc4jHhcMzBbAvl4GfdC8w3QE_OYv7KvdZ0Miyn4Qxj-tclIHwpS924DyXpSLEZUK9KAOulD-dzRIO0krtrttnky1orU=@proton.me>
-In-Reply-To: <LENFIdWyfQLEP0OtqLWgW9LAr7dW5BruyHO-G8RurzAJCEDkVkQgds9_pzJ5I98qpnrunvFixdiHQtSwa04CgxEBFlISAHz8_q-C28j_f6o=@proton.me>
-References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-3-nmi@metaspace.dk> <LENFIdWyfQLEP0OtqLWgW9LAr7dW5BruyHO-G8RurzAJCEDkVkQgds9_pzJ5I98qpnrunvFixdiHQtSwa04CgxEBFlISAHz8_q-C28j_f6o=@proton.me>
-Feedback-ID: 71780778:user:proton
+        =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        open list <linux-kernel@vger.kernel.org>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>
+Subject: Re: [RFC PATCH 00/11] Rust null block driver
+Date:   Wed, 03 May 2023 14:29:08 +0200
+In-reply-to: <ZFJGWwlRbSS3zFnc@x1-carbon>
+Message-ID: <87mt2l4lrw.fsf@metaspace.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sorry, forgot to replace `> #@` with nothing. Fixed here:
 
-On 03.05.23 11:06, Andreas Hindborg wrote:
-> From: Andreas Hindborg <a.hindborg@samsung.com>
+Hi Niklas,
+
+Niklas Cassel <Niklas.Cassel@wdc.com> writes:
+
+> On Wed, May 03, 2023 at 11:06:57AM +0200, Andreas Hindborg wrote:
+>> From: Andreas Hindborg <a.hindborg@samsung.com>
+>> 
 >
-> This patch adds support for working with pages of order 0. Support for pa=
-ges
-> with higher order is deferred. Page allocation flags are fixed in this pa=
-tch.
-> Future work might allow the user to specify allocation flags.
+> (cut)
 >
-> This patch is a heavily modified version of code available in the rust tr=
-ee [1],
-> primarily adding support for multiple page mapping strategies.
+>> 
+>> For each measurement the drivers are loaded, a drive is configured with memory
+>> backing and a size of 4 GiB. C null_blk is configured to match the implemented
+>> modes of the Rust driver: `blocksize` is set to 4 KiB, `completion_nsec` to 0,
+>> `irqmode` to 0 (IRQ_NONE), `queue_mode` to 2 (MQ), `hw_queue_depth` to 256 and
+>> `memory_backed` to 1. For both the drivers, the queue scheduler is set to
+>> `none`. These measurements are made using 30 second runs of `fio` with the
+>> `PSYNC` IO engine with workers pinned to separate CPU cores. The measurements
+>> are done inside a virtual machine (qemu/kvm) on an Intel Alder Lake workstation
+>> (i5-12600).
 >
-> [1] https://github.com/rust-for-Linux/linux/tree/bc22545f38d74473cfef3e9f=
-d65432733435b79f/rust/kernel/pages.rs
+> Hello Andreas,
 >
-> Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
-> ---
->  rust/helpers.c       |  31 +++++
->  rust/kernel/lib.rs   |   6 +
->  rust/kernel/pages.rs | 284 +++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 321 insertions(+)
->  create mode 100644 rust/kernel/pages.rs
+> I'm curious why you used psync ioengine for the benchmarks.
 >
-> diff --git a/rust/helpers.c b/rust/helpers.c
-> index 5dd5e325b7cc..9bd9d95da951 100644
-> --- a/rust/helpers.c
-> +++ b/rust/helpers.c
-> @@ -27,6 +27,7 @@
->  #include <linux/sched/signal.h>
->  #include <linux/wait.h>
->  #include <linux/radix-tree.h>
-> +#include <linux/highmem.h>
+> As psync is a sync ioengine, it means queue depth == 1.
 >
->  __noreturn void rust_helper_BUG(void)
->  {
-> @@ -150,6 +151,36 @@ void **rust_helper_radix_tree_next_slot(void **slot,
->  }
->  EXPORT_SYMBOL_GPL(rust_helper_radix_tree_next_slot);
+> Wouldn't it have been more interesting to see an async ioengine,
+> together with different queue depths?
+
+That would also be interesting. I was a bit constrained on CPU cycles so
+I had to choose. I intend to produce the numbers you ask for. For now
+here is two runs of random read using io_uring with queue depth 128
+(same table style):
+
+
+For iodepth_batch_submit=1, iodepth_batch_complete=1:
++---------+----------+---------------------+---------------------+
+| jobs/bs | workload |          1          |          6          |
++---------+----------+---------------------+---------------------+
+|    4k   | randread | 2.97 0.00 (0.9,0.0) | 4.06 0.00 (1.8,0.0) |
++---------+----------+---------------------+---------------------+
+
+For iodepth_batch_submit=16, iodepth_batch_complete=16:
++---------+----------+---------------------+---------------------+
+| jobs/bs | workload |          1          |          6          |
++---------+----------+---------------------+---------------------+
+|    4k   | randread | 4.40 0.00 (1.1,0.0) | 4.87 0.00 (1.8,0.0) |
++---------+----------+---------------------+---------------------+
+
+Above numbers are 60 second runs on bare metal, so not entirely
+comparable with the ones in the cover letter.
+
+> You might want to explain your table a bit more.
+
+I understand that the table can be difficult to read. It is not easy to
+convey all this information in ASCII email. The numbers in parenthesis
+in the cells _are_ IOPS x 10e6 (read,write). Referring to he second
+table above, for 1 job at 4k bs the Rust driver performed 4.8 percent
+more IOPS than the C driver. The C driver did 1.1M IOPS. I hope this
+clarifies the table, otherwise let me know!
+
+> It might be nice to see IOPS and average latencies.
+
+I did collect latency info as well, including completion latency
+percentiles. It's just difficult to fit all that data in an email. I
+have the fio json output, let me know if you want it and I will find a
+way to get it to you. I am considering setting up some kind of CI that
+will publish the performance results online automatically so that it
+will be a link instead of an inline table.
+
 >
-> +void *rust_helper_kmap(struct page *page)
-> +{
-> +=09return kmap(page);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_kmap);
-> +
-> +void rust_helper_kunmap(struct page *page)
-> +{
-> +=09return kunmap(page);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_kunmap);
-> +
-> +void *rust_helper_kmap_atomic(struct page *page)
-> +{
-> +=09return kmap_atomic(page);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_kmap_atomic);
-> +
-> +void rust_helper_kunmap_atomic(void *address)
-> +{
-> +=09kunmap_atomic(address);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_kunmap_atomic);
-> +
-> +struct page *rust_helper_alloc_pages(gfp_t gfp_mask, unsigned int order)
-> +{
-> +=09return alloc_pages(gfp_mask, order);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_alloc_pages);
-> +
->  /*
->   * We use `bindgen`'s `--size_t-is-usize` option to bind the C `size_t` =
-type
->   * as the Rust `usize` type, so we can use it in contexts where Rust
-> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> index a85cb6aae8d6..8bef6686504b 100644
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@ -38,6 +38,7 @@ mod build_assert;
->  pub mod error;
->  pub mod init;
->  pub mod ioctl;
-> +pub mod pages;
->  pub mod prelude;
->  pub mod print;
->  pub mod radix_tree;
-> @@ -57,6 +58,11 @@ pub use uapi;
->  #[doc(hidden)]
->  pub use build_error::build_error;
->
-> +/// Page size defined in terms of the `PAGE_SHIFT` macro from C.
+> As an example of a table that I find easier to interpret,
+> see e.g. the table on page 29 in the SPDK performance report:
+> https://ci.spdk.io/download/performance-reports/SPDK_nvme_bdev_perf_report_2301.pdf
 
-`PAGE_SHIFT` is not using a doc-link.
+Thanks for the input, I will be sure to reference that next time. Just
+for clarity, as you mentioned there is only one queue depth in play for
+the numbers in the cover letter.
 
-> +///
-> +/// [`PAGE_SHIFT`]: ../../../include/asm-generic/page.h
-> +pub const PAGE_SIZE: u32 =3D 1 << bindings::PAGE_SHIFT;
-
-This should be of type `usize`.
-
-> +
->  /// Prefix to appear before log messages printed from within the `kernel=
-` crate.
->  const __LOG_PREFIX: &[u8] =3D b"rust_kernel\0";
->
-> diff --git a/rust/kernel/pages.rs b/rust/kernel/pages.rs
-> new file mode 100644
-> index 000000000000..ed51b053dd5d
-> --- /dev/null
-> +++ b/rust/kernel/pages.rs
-> @@ -0,0 +1,284 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! Kernel page allocation and management.
-> +//!
-> +//! This module currently provides limited support. It supports pages of=
- order 0
-> +//! for most operations. Page allocation flags are fixed.
-> +
-> +use crate::{bindings, error::code::*, error::Result, PAGE_SIZE};
-> +use core::{marker::PhantomData, ptr};
-> +
-> +/// A set of physical pages.
-> +///
-> +/// `Pages` holds a reference to a set of pages of order `ORDER`. Having=
- the order as a generic
-> +/// const allows the struct to have the same size as a pointer.
-
-I would remove the 'Having the order as a...' sentence. Since that is
-just implementation detail.
-
-> +///
-> +/// # Invariants
-> +///
-> +/// The pointer `Pages::pages` is valid and points to 2^ORDER pages.
-
-`Pages::pages` -> `pages`.
-
-> +pub struct Pages<const ORDER: u32> {
-> +    pub(crate) pages: *mut bindings::page,
-> +}
-> +
-> +impl<const ORDER: u32> Pages<ORDER> {
-> +    /// Allocates a new set of contiguous pages.
-> +    pub fn new() -> Result<Self> {
-> +        let pages =3D unsafe {
-> +            bindings::alloc_pages(
-> +                bindings::GFP_KERNEL | bindings::__GFP_ZERO | bindings::=
-___GFP_HIGHMEM,
-> +                ORDER,
-> +            )
-> +        };
-
-Missing `SAFETY` comment.
-
-> +        if pages.is_null() {
-> +            return Err(ENOMEM);
-> +        }
-> +        // INVARIANTS: We checked that the allocation above succeeded.
-> +        // SAFETY: We allocated pages above
-> +        Ok(unsafe { Self::from_raw(pages) })
-> +    }
-> +
-> +    /// Create a `Pages` from a raw `struct page` pointer
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// Caller must own the pages pointed to by `ptr` as these will be f=
-reed
-> +    /// when the returned `Pages` is dropped.
-> +    pub unsafe fn from_raw(ptr: *mut bindings::page) -> Self {
-> +        Self { pages: ptr }
-> +    }
-> +}
-> +
-> +impl Pages<0> {
-> +    #[inline(always)]
-
-Is this really needed? I think this function should be inlined
-automatically.
-
-> +    fn check_offset_and_map<I: MappingInfo>(
-> +        &self,
-> +        offset: usize,
-> +        len: usize,
-> +    ) -> Result<PageMapping<'_, I>>
-> +    where
-> +        Pages<0>: MappingActions<I>,
-
-Why not use `Self: MappingActions<I>`?
-
-> +    {
-> +        let end =3D offset.checked_add(len).ok_or(EINVAL)?;
-> +        if end as u32 > PAGE_SIZE {
-
-Remove the `as u32`, since `PAGE_SIZE` should be of type `usize`.
-
-> +            return Err(EINVAL);
-
-I think it would make sense to create a more descriptive Rust error with
-a `From` impl to turn it into an `Error`. It always is better to know from
-the signature what exactly can go wrong when calling a function.
-
-> +        }
-> +
-> +        let mapping =3D <Self as MappingActions<I>>::map(self);
-> +
-> +        Ok(mapping)
-
-I would merge these lines.
-
-> +    }
-> +
-> +    #[inline(always)]
-> +    unsafe fn read_internal<I: MappingInfo>(
-
-Missing `# Safety` section.
-
-> +        &self,
-> +        dest: *mut u8,
-> +        offset: usize,
-> +        len: usize,
-> +    ) -> Result
-> +    where
-> +        Pages<0>: MappingActions<I>,
-> +    {
-> +        let mapping =3D self.check_offset_and_map::<I>(offset, len)?;
-> +
-> +        unsafe { ptr::copy_nonoverlapping((mapping.ptr as *mut u8).add(o=
-ffset), dest, len) };
-
-Missing `SAFETY` comment. Replace `as *mut u8` with `.cast::<u8>()`.
-
-> +        Ok(())
-> +    }
-> +
-> +    /// Maps the pages and reads from them into the given buffer.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// Callers must ensure that the destination buffer is valid for the=
- given
-> +    /// length. Additionally, if the raw buffer is intended to be recast=
-, they
-> +    /// must ensure that the data can be safely cast;
-> +    /// [`crate::io_buffer::ReadableFromBytes`] has more details about i=
-t.
-> +    /// `dest` may not point to the source page.
-
-- `dest` is valid for writes for `len`.
-- What is meant by 'the raw buffer is intended to be recast'?
-- `io_buffer` does not yet exist in `rust-next`.
-
-> +    #[inline(always)]
-> +    pub unsafe fn read(&self, dest: *mut u8, offset: usize, len: usize) =
--> Result {
-> +        unsafe { self.read_internal::<NormalMappingInfo>(dest, offset, l=
-en) }
-
-Missing `SAFETY` comment.
-
-> +    }
-> +
-> +    /// Maps the pages and reads from them into the given buffer. The pa=
-ge is
-> +    /// mapped atomically.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// Callers must ensure that the destination buffer is valid for the=
- given
-> +    /// length. Additionally, if the raw buffer is intended to be recast=
-, they
-> +    /// must ensure that the data can be safely cast;
-> +    /// [`crate::io_buffer::ReadableFromBytes`] has more details about i=
-t.
-> +    /// `dest` may not point to the source page.
-> +    #[inline(always)]
-> +    pub unsafe fn read_atomic(&self, dest: *mut u8, offset: usize, len: =
-usize) -> Result {
-> +        unsafe { self.read_internal::<AtomicMappingInfo>(dest, offset, l=
-en) }
-
-Missing `SAFETY` comment.
-
-> +    }
-> +
-> +    #[inline(always)]
-> +    unsafe fn write_internal<I: MappingInfo>(
-
-Missing `# Safety` section.
-
-> +        &self,
-> +        src: *const u8,
-> +        offset: usize,
-> +        len: usize,
-> +    ) -> Result
-> +    where
-> +        Pages<0>: MappingActions<I>,
-> +    {
-> +        let mapping =3D self.check_offset_and_map::<I>(offset, len)?;
-> +
-> +        unsafe { ptr::copy_nonoverlapping(src, (mapping.ptr as *mut u8).=
-add(offset), len) };
-
-Missing `SAFETY` comment.
-
-> +        Ok(())
-> +    }
-> +
-> +    /// Maps the pages and writes into them from the given buffer.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// Callers must ensure that the buffer is valid for the given lengt=
-h.
-> +    /// Additionally, if the page is (or will be) mapped by userspace, t=
-hey must
-> +    /// ensure that no kernel data is leaked through padding if it was c=
-ast from
-> +    /// another type; [`crate::io_buffer::WritableToBytes`] has more det=
-ails
-> +    /// about it. `src` must not point to the destination page.
-
-`src` is valid for reads for `len`.
-
-> +    #[inline(always)]
-> +    pub unsafe fn write(&self, src: *const u8, offset: usize, len: usize=
-) -> Result {
-> +        unsafe { self.write_internal::<NormalMappingInfo>(src, offset, l=
-en) }
-> +    }
-> +
-> +    /// Maps the pages and writes into them from the given buffer. The p=
-age is
-> +    /// mapped atomically.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// Callers must ensure that the buffer is valid for the given lengt=
-h.
-> +    /// Additionally, if the page is (or will be) mapped by userspace, t=
-hey must
-> +    /// ensure that no kernel data is leaked through padding if it was c=
-ast from
-> +    /// another type; [`crate::io_buffer::WritableToBytes`] has more det=
-ails
-> +    /// about it. `src` must not point to the destination page.
-> +    #[inline(always)]
-> +    pub unsafe fn write_atomic(&self, src: *const u8, offset: usize, len=
-: usize) -> Result {
-> +        unsafe { self.write_internal::<AtomicMappingInfo>(src, offset, l=
-en) }
-> +    }
-> +
-> +    /// Maps the page at index 0.
-> +    #[inline(always)]
-> +    pub fn kmap(&self) -> PageMapping<'_, NormalMappingInfo> {
-> +        let ptr =3D unsafe { bindings::kmap(self.pages) };
-
-Missing `SAFETY` comment.
-
-> +
-> +        PageMapping {
-> +            page: self.pages,
-> +            ptr,
-> +            _phantom: PhantomData,
-> +            _phantom2: PhantomData,
-> +        }
-> +    }
-> +
-> +    /// Atomically Maps the page at index 0.
-> +    #[inline(always)]
-> +    pub fn kmap_atomic(&self) -> PageMapping<'_, AtomicMappingInfo> {
-> +        let ptr =3D unsafe { bindings::kmap_atomic(self.pages) };
-
-Missing `SAFETY` comment.
-
-> +
-> +        PageMapping {
-> +            page: self.pages,
-> +            ptr,
-> +            _phantom: PhantomData,
-> +            _phantom2: PhantomData,
-> +        }
-> +    }
-> +}
-> +
-> +impl<const ORDER: u32> Drop for Pages<ORDER> {
-> +    fn drop(&mut self) {
-> +        // SAFETY: By the type invariants, we know the pages are allocat=
-ed with the given order.
-> +        unsafe { bindings::__free_pages(self.pages, ORDER) };
-> +    }
-> +}
-> +
-> +/// Specifies the type of page mapping
-> +pub trait MappingInfo {}
-> +
-> +/// Encapsulates methods to map and unmap pages
-> +pub trait MappingActions<I: MappingInfo>
-> +where
-> +    Pages<0>: MappingActions<I>,
-> +{
-> +    /// Map a page into the kernel address scpace
-
-Typo.
-
-> +    fn map(pages: &Pages<0>) -> PageMapping<'_, I>;
-> +
-> +    /// Unmap a page specified by `mapping`
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// Must only be called by `PageMapping::drop()`.
-> +    unsafe fn unmap(mapping: &PageMapping<'_, I>);
-> +}
-> +
-> +/// A type state indicating that pages were mapped atomically
-> +pub struct AtomicMappingInfo;
-> +impl MappingInfo for AtomicMappingInfo {}
-> +
-> +/// A type state indicating that pages were not mapped atomically
-> +pub struct NormalMappingInfo;
-> +impl MappingInfo for NormalMappingInfo {}
-> +
-> +impl MappingActions<AtomicMappingInfo> for Pages<0> {
-> +    #[inline(always)]
-> +    fn map(pages: &Pages<0>) -> PageMapping<'_, AtomicMappingInfo> {
-> +        pages.kmap_atomic()
-> +    }
-> +
-> +    #[inline(always)]
-> +    unsafe fn unmap(mapping: &PageMapping<'_, AtomicMappingInfo>) {
-> +        // SAFETY: An instance of `PageMapping` is created only when `km=
-ap` succeeded for the given
-> +        // page, so it is safe to unmap it here.
-> +        unsafe { bindings::kunmap_atomic(mapping.ptr) };
-> +    }
-> +}
-> +
-> +impl MappingActions<NormalMappingInfo> for Pages<0> {
-> +    #[inline(always)]
-> +    fn map(pages: &Pages<0>) -> PageMapping<'_, NormalMappingInfo> {
-> +        pages.kmap()
-> +    }
-> +
-> +    #[inline(always)]
-> +    unsafe fn unmap(mapping: &PageMapping<'_, NormalMappingInfo>) {
-> +        // SAFETY: An instance of `PageMapping` is created only when `km=
-ap` succeeded for the given
-> +        // page, so it is safe to unmap it here.
-> +        unsafe { bindings::kunmap(mapping.page) };
-> +    }
-> +}
-
-I am not sure if this is the best implementation, why do the `kmap` and
-`kmap_atomic` functions exist? Would it not make sense to implement
-them entirely in `MappingActions::map`?
-
-> +
-> +/// An owned page mapping. When this struct is dropped, the page is unma=
-pped.
-> +pub struct PageMapping<'a, I: MappingInfo>
-> +where
-> +    Pages<0>: MappingActions<I>,
-> +{
-> +    page: *mut bindings::page,
-> +    ptr: *mut core::ffi::c_void,
-> +    _phantom: PhantomData<&'a i32>,
-> +    _phantom2: PhantomData<I>,
-> +}
-> +
-> +impl<'a, I: MappingInfo> PageMapping<'a, I>
-> +where
-> +    Pages<0>: MappingActions<I>,
-> +{
-> +    /// Return a pointer to the wrapped `struct page`
-> +    #[inline(always)]
-> +    pub fn get_ptr(&self) -> *mut core::ffi::c_void {
-> +        self.ptr
-> +    }
-> +}
-> +
-> +// Because we do not have Drop specialization, we have to do this dance.=
- Life
-> +// would be much more simple if we could have `impl Drop for PageMapping=
-<'_,
-> +// Atomic>` and `impl Drop for PageMapping<'_, NotAtomic>`
-> +impl<I: MappingInfo> Drop for PageMapping<'_, I>
-> +where
-> +    Pages<0>: MappingActions<I>,
-> +{
-> +    #[inline(always)]
-> +    fn drop(&mut self) {
-> +        // SAFETY: We are OK to call this because we are `PageMapping::d=
-rop()`
-> +        unsafe { <Pages<0> as MappingActions<I>>::unmap(self) }
-> +    }
-> +}
-> --
-> 2.40.0
-
-Here are some more general things:
-- I think we could use this as an opportunity to add more docs about how
-  paging works, or at least add some links to the C documentation.
-- Can we improve the paging API? I have not given it any thought yet, but
-  the current API looks very primitive.
-- Documentation comments should form complete sentences (so end with `.`).
-
---
-Cheers,
-Benno
-
+Best regards
+Andreas
