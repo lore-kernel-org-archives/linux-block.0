@@ -2,83 +2,131 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8F2C77B78
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 16:48:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8D2C77B78
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 17:24:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbjECQrq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 12:47:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36180 "EHLO
+        id S229700AbjECRYe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 13:24:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229826AbjECQrc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 12:47:32 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2E159DD;
-        Wed,  3 May 2023 09:47:29 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1aaef97652fso30184645ad.0;
-        Wed, 03 May 2023 09:47:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683132449; x=1685724449;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=umgEn3cqi31k8FAoc6eHggscu0a8wyQqY+YT1k4FgE4=;
-        b=M4mwG7mL+dUSl3I2W3utKmlZWAheVeiFt2NuVhDdST8u3xvtQcfEw4u/V/LyEyNSpb
-         KAH5XOOP0vrGhsdtW2Tp2FkUeq1S1wmZsfsdhl95U6PCj3M0CHlvyf0pdGCqyQ5FbWzN
-         ZcYAiyiDzD7so7lYpj2ltcIErcBXi5q8FCK72ETNR4idwL+OWAbCGbZAIrdGa59TbGBq
-         QLzm7t/GBk0CfzlOzP8paMIrSoVHjyJaetLWqtrkuq6ftmHnGgadadXE7/E9xZX0rXHZ
-         xQFEvZYFJy/7hdMDCZj/u7LxKrGRnaAlHt2jvwdZUkgaXSYK6x/864UY2PQRg/FK3ijL
-         kEQQ==
-X-Gm-Message-State: AC+VfDxC5uTRBdWyugVQx0VW5MDZjJX13CzgEyvDJGhSQY9r9zTC4ffG
-        HzHRxGbwGLLA02QUflSVqYM=
-X-Google-Smtp-Source: ACHHUZ4pRU+8JVmqhik5EA6Xabeqqj93jGvFii5MsVXC+4XabS4MDDjGwO+ipEKbgomNvIjNIpwc5Q==
-X-Received: by 2002:a17:903:1cd:b0:1a9:581e:d809 with SMTP id e13-20020a17090301cd00b001a9581ed809mr902959plh.7.1683132448605;
-        Wed, 03 May 2023 09:47:28 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:c683:a90b:5f41:5878? ([2620:15c:211:201:c683:a90b:5f41:5878])
-        by smtp.gmail.com with ESMTPSA id t4-20020a170902b20400b001a96496f250sm18247374plr.34.2023.05.03.09.47.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 May 2023 09:47:28 -0700 (PDT)
-Message-ID: <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
-Date:   Wed, 3 May 2023 09:47:25 -0700
+        with ESMTP id S229571AbjECRYd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 13:24:33 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38EFF5BAB;
+        Wed,  3 May 2023 10:24:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683134671; x=1714670671;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hcKCVFXhx3yMViZSecHcsu0Oh2KFBf8Ahfru86Q4miE=;
+  b=cpDDkIRFbEJuyEWvOOuRkSKwqeP6Eo2tGqX548FSQosEvldD9iLeiUPA
+   pTWcpKXXZosQ++hhh6gQHk1UY+6aRCiexpEub8FA7C8JpYEEcihpAp24U
+   jQSX2EHkHzsSXQEtGEOLWHNzJcCKNN7YXdLkjYTSWYq9hitVI25cWAOrH
+   07eaD42IQEl2NhAcL4p7h25FeX7GeJ2TwbfvGiRTDx9vwigyw4HgmzS1G
+   ZVaY1B9dQKrsMmaybWxMij9W9nj0t818jGow9AenXHYnhCgqJ+hVNaU7d
+   pa8t/2Pa7A2E3gOV/CZ2sYV20FStb8fbRyHCJf+VIUCd/By6f75q66/ZH
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="328337466"
+X-IronPort-AV: E=Sophos;i="5.99,247,1677571200"; 
+   d="scan'208";a="328337466"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2023 10:24:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="808353884"
+X-IronPort-AV: E=Sophos;i="5.99,247,1677571200"; 
+   d="scan'208";a="808353884"
+Received: from lkp-server01.sh.intel.com (HELO e3434d64424d) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 03 May 2023 10:24:26 -0700
+Received: from kbuild by e3434d64424d with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1puGDJ-0002AK-1e;
+        Wed, 03 May 2023 17:24:25 +0000
+Date:   Thu, 4 May 2023 01:23:45 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Jinyoung CHOI <j-young.choi@samsung.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH 05/15] block: fix not to apply bip information in
+ blk_rq_bio_prep()
+Message-ID: <202305040157.ZWiorthB-lkp@intel.com>
+References: <20230503101048epcms2p61d61df1431955d9517c9939999ee3478@epcms2p6>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [RFC PATCH 00/11] Rust null block driver
-To:     Andreas Hindborg <nmi@metaspace.dk>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Andreas Hindborg <a.hindborg@samsung.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?UTF-8?Q?Bj=c3=b6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
-Content-Language: en-US
-In-Reply-To: <20230503090708.2524310-1-nmi@metaspace.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230503101048epcms2p61d61df1431955d9517c9939999ee3478@epcms2p6>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/3/23 02:06, Andreas Hindborg wrote:
-> This is an early preview of a null block driver written in Rust.
+Hi Jinyoung,
 
-It is not clear to me why this effort was started? As far as I know the 
-null_blk driver is only used by kernel developers for testing kernel 
-changes so end users are not affected by bugs in this driver. 
-Additionally, performance of this driver is critical since this driver 
-is used to measure block layer performance. Does this mean that C is a 
-better choice than Rust for this driver?
+kernel test robot noticed the following build errors:
 
-Thanks,
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on mkp-scsi/for-next jejb-scsi/for-next linus/master v6.3 next-20230428]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Bart.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jinyoung-CHOI/block-blk-integiry-add-helper-functions-for-bio_integrity_add_page/20230503-183015
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230503101048epcms2p61d61df1431955d9517c9939999ee3478%40epcms2p6
+patch subject: [PATCH 05/15] block: fix not to apply bip information in blk_rq_bio_prep()
+config: riscv-randconfig-r042-20230503 (https://download.01.org/0day-ci/archive/20230504/202305040157.ZWiorthB-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project b1465cd49efcbc114a75220b153f5a055ce7911f)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install riscv cross compiling tool for clang build
+        # apt-get install binutils-riscv64-linux-gnu
+        # https://github.com/intel-lab-lkp/linux/commit/584edc6ae9cb23e8a778ee73d711b9143038a047
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jinyoung-CHOI/block-blk-integiry-add-helper-functions-for-bio_integrity_add_page/20230503-183015
+        git checkout 584edc6ae9cb23e8a778ee73d711b9143038a047
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash block/ drivers/mtd/ubi/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202305040157.ZWiorthB-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from block/bdev.c:15:
+   In file included from include/linux/blk-integrity.h:5:
+>> include/linux/blk-mq.h:972:7: error: no member named 'nr_integrity_segments' in 'struct request'
+                   rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
+                   ~~  ^
+>> include/linux/blk-mq.h:972:49: error: member reference base type 'void' is not a structure or union
+                   rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
+                                               ~~~~~~~~~~~~~~~~~~^ ~~~~~~~~
+   2 errors generated.
+
+
+vim +972 include/linux/blk-mq.h
+
+   962	
+   963	static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
+   964			unsigned int nr_segs)
+   965	{
+   966		rq->nr_phys_segments = nr_segs;
+   967		rq->__data_len = bio->bi_iter.bi_size;
+   968		rq->bio = rq->biotail = bio;
+   969		rq->ioprio = bio_prio(bio);
+   970	
+   971		if (bio_integrity(bio)) {
+ > 972			rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
+   973			rq->cmd_flags |= REQ_INTEGRITY;
+   974		}
+   975	}
+   976	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
