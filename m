@@ -2,164 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF92C77B78
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 12:55:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA3FDC77B78
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 12:57:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjECMzr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 08:55:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56136 "EHLO
+        id S229954AbjECM5W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 08:57:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbjECMzq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 08:55:46 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F33759E5
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 05:55:33 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-50bd37ca954so6461175a12.0
-        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 05:55:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683118532; x=1685710532;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=6kYxRlCY3DiRAUyVahK0tkAYUy3+IuQkjxYPl95xXCw=;
-        b=3bTv7UUYES7MGkQlWXBOyzgXFfa/J6rURe5VYP8MZCJsdrfyzUca2vQPf9Y26c3hRE
-         UndVtBcYacShlr3CJmDlqC2oXWlRoeiDmi1RrY2TENoqvXNt1paR7eIdZtlICxLCV1vx
-         CTfbeEIHDeXi+kuEtrDU9Ar3WdEULJuTWdJSNqdUoNYJBBQnNIAtTP6fdtVQIfj2XORD
-         ODd0ENUr47svLvtxzLKHsH7d2jHeh+2RKLJQ4mIQmQW2d8VbdBZP1S5HxEnTlSwQRnpu
-         a2P5Spkb3FlI4ybbqHcazvdANQ6hCpVCmUFzxgbj8x5ifPbcgACclIKsB1bUmSBhdf6B
-         SuRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683118532; x=1685710532;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6kYxRlCY3DiRAUyVahK0tkAYUy3+IuQkjxYPl95xXCw=;
-        b=Gw8ysCA0URRScxsbZi4ilYRGgikZxZ4w0VXa/ppEf+mcb95jx4uo78Acp/gvGPr5lO
-         tJlQA+6tpctrnhzzR0Z66Exk6MBAZJ9Ahr8YMWJpN88uHEa9EOZhArE1T4iD6tkpPunR
-         s9+hup5v5oxpr7J5gA8FaQOrOfq7Vg+jdxP0LOHvvI8sQe1JSpBsbClnaes3drwlgZAZ
-         ypUQbUIr6H6SPmHsppBkOfFGsjhRm+8Ta7yrOntxKd1kgC7KcCFvwMUoEzVPahF6iHc7
-         QL7/irC+BmW/J+WF75unYMJ2J6O2e7Y3evbLF2yWfjNdQ/LVzdd4DVzxrL3AHnRYzaUX
-         bYHQ==
-X-Gm-Message-State: AC+VfDz6JX2tddBEW0/PZ8cO/EHb3vi3NxSl79RoLBFXmrRZfUl5rovc
-        HYPZjYIDq0Eds88gD0B7A1boNw==
-X-Google-Smtp-Source: ACHHUZ6M5whg5AQa7qA0Gb4FW+Z6M8VCHzQ4fzfLNRXh7lWyA7OgoKzaE2LRblCb+VFVh86YkxFY7A==
-X-Received: by 2002:a17:907:6e0f:b0:953:7f08:a9ee with SMTP id sd15-20020a1709076e0f00b009537f08a9eemr1787966ejc.1.1683118531888;
-        Wed, 03 May 2023 05:55:31 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id w1-20020a170906480100b0094f0f0de1bcsm17350222ejq.200.2023.05.03.05.55.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 May 2023 05:55:31 -0700 (PDT)
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <ZFJGWwlRbSS3zFnc@x1-carbon>
-User-agent: mu4e 1.10.3; emacs 28.2.50
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "rust-for-linux@vger.kernel.org" <rust-for-linux@vger.kernel.org>,
+        with ESMTP id S229675AbjECM5V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 08:57:21 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD2A5262;
+        Wed,  3 May 2023 05:57:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683118640; x=1714654640;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NXY93xhwaopT17+l0/EjS3Gx663sl7IzwqUBhRClEhQ=;
+  b=niq7nSFYAexaS4quCt4tFqhcsXNKUfNeJw7kgrQoOSu5CBlWNkN0VHaY
+   FRpp0E+tFSpd7OtCdXxviunL6Uln2hXw1E0PvJeOBPrlJYwV+Qg/DTsbC
+   bV+CY4KxdZzmAp5KoM4cHqsFyQqgyyKU8cWAz4QJJ+RUtcg6Qf30CfUz5
+   y5C/HklawLCDAsZYX5dgK8M5GBFmfDLTVwY83E+aOhEjSNArsQiXhhVH9
+   J/gOjGswCvkHp2O/wWL9/A17iWeCZojZ+HkuU8+VjakXe5j2eHA/jLjre
+   WH6DHKbA/qc3Svs1TBqxShZswvoNaj12LmOJiUwe88xd57SFoQ0+l8/lY
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10698"; a="350723207"
+X-IronPort-AV: E=Sophos;i="5.99,247,1677571200"; 
+   d="scan'208";a="350723207"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2023 05:57:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10698"; a="1026491301"
+X-IronPort-AV: E=Sophos;i="5.99,247,1677571200"; 
+   d="scan'208";a="1026491301"
+Received: from lkp-server01.sh.intel.com (HELO e3434d64424d) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 03 May 2023 05:57:18 -0700
+Received: from kbuild by e3434d64424d with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1puC2n-000212-0g;
+        Wed, 03 May 2023 12:57:17 +0000
+Date:   Wed, 3 May 2023 20:56:52 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Jinyoung CHOI <j-young.choi@samsung.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?utf-8?Q?Bj=C3=B6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        open list <linux-kernel@vger.kernel.org>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>
-Subject: Re: [RFC PATCH 00/11] Rust null block driver
-Date:   Wed, 03 May 2023 14:29:08 +0200
-In-reply-to: <ZFJGWwlRbSS3zFnc@x1-carbon>
-Message-ID: <87mt2l4lrw.fsf@metaspace.dk>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH 05/15] block: fix not to apply bip information in
+ blk_rq_bio_prep()
+Message-ID: <202305032008.NxgqlW9X-lkp@intel.com>
+References: <20230503101048epcms2p61d61df1431955d9517c9939999ee3478@epcms2p6>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230503101048epcms2p61d61df1431955d9517c9939999ee3478@epcms2p6>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Jinyoung,
 
-Hi Niklas,
+kernel test robot noticed the following build errors:
 
-Niklas Cassel <Niklas.Cassel@wdc.com> writes:
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on mkp-scsi/for-next jejb-scsi/for-next linus/master v6.3 next-20230428]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> On Wed, May 03, 2023 at 11:06:57AM +0200, Andreas Hindborg wrote:
->> From: Andreas Hindborg <a.hindborg@samsung.com>
->> 
->
-> (cut)
->
->> 
->> For each measurement the drivers are loaded, a drive is configured with memory
->> backing and a size of 4 GiB. C null_blk is configured to match the implemented
->> modes of the Rust driver: `blocksize` is set to 4 KiB, `completion_nsec` to 0,
->> `irqmode` to 0 (IRQ_NONE), `queue_mode` to 2 (MQ), `hw_queue_depth` to 256 and
->> `memory_backed` to 1. For both the drivers, the queue scheduler is set to
->> `none`. These measurements are made using 30 second runs of `fio` with the
->> `PSYNC` IO engine with workers pinned to separate CPU cores. The measurements
->> are done inside a virtual machine (qemu/kvm) on an Intel Alder Lake workstation
->> (i5-12600).
->
-> Hello Andreas,
->
-> I'm curious why you used psync ioengine for the benchmarks.
->
-> As psync is a sync ioengine, it means queue depth == 1.
->
-> Wouldn't it have been more interesting to see an async ioengine,
-> together with different queue depths?
+url:    https://github.com/intel-lab-lkp/linux/commits/Jinyoung-CHOI/block-blk-integiry-add-helper-functions-for-bio_integrity_add_page/20230503-183015
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230503101048epcms2p61d61df1431955d9517c9939999ee3478%40epcms2p6
+patch subject: [PATCH 05/15] block: fix not to apply bip information in blk_rq_bio_prep()
+config: um-i386_defconfig (https://download.01.org/0day-ci/archive/20230503/202305032008.NxgqlW9X-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/584edc6ae9cb23e8a778ee73d711b9143038a047
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jinyoung-CHOI/block-blk-integiry-add-helper-functions-for-bio_integrity_add_page/20230503-183015
+        git checkout 584edc6ae9cb23e8a778ee73d711b9143038a047
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=um SUBARCH=i386 olddefconfig
+        make W=1 O=build_dir ARCH=um SUBARCH=i386 SHELL=/bin/bash arch/um/drivers/ block/
 
-That would also be interesting. I was a bit constrained on CPU cycles so
-I had to choose. I intend to produce the numbers you ask for. For now
-here is two runs of random read using io_uring with queue depth 128
-(same table style):
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202305032008.NxgqlW9X-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   In file included from arch/um/drivers/ubd_kern.c:27:
+   include/linux/blk-mq.h: In function 'blk_rq_bio_prep':
+>> include/linux/blk-mq.h:972:19: error: 'struct request' has no member named 'nr_integrity_segments'
+     972 |                 rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
+         |                   ^~
+>> include/linux/blk-mq.h:972:63: warning: dereferencing 'void *' pointer
+     972 |                 rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
+         |                                                               ^~
+>> include/linux/blk-mq.h:972:63: error: request for member 'bip_vcnt' in something not a structure or union
 
 
-For iodepth_batch_submit=1, iodepth_batch_complete=1:
-+---------+----------+---------------------+---------------------+
-| jobs/bs | workload |          1          |          6          |
-+---------+----------+---------------------+---------------------+
-|    4k   | randread | 2.97 0.00 (0.9,0.0) | 4.06 0.00 (1.8,0.0) |
-+---------+----------+---------------------+---------------------+
+vim +972 include/linux/blk-mq.h
 
-For iodepth_batch_submit=16, iodepth_batch_complete=16:
-+---------+----------+---------------------+---------------------+
-| jobs/bs | workload |          1          |          6          |
-+---------+----------+---------------------+---------------------+
-|    4k   | randread | 4.40 0.00 (1.1,0.0) | 4.87 0.00 (1.8,0.0) |
-+---------+----------+---------------------+---------------------+
+   962	
+   963	static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
+   964			unsigned int nr_segs)
+   965	{
+   966		rq->nr_phys_segments = nr_segs;
+   967		rq->__data_len = bio->bi_iter.bi_size;
+   968		rq->bio = rq->biotail = bio;
+   969		rq->ioprio = bio_prio(bio);
+   970	
+   971		if (bio_integrity(bio)) {
+ > 972			rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
+   973			rq->cmd_flags |= REQ_INTEGRITY;
+   974		}
+   975	}
+   976	
 
-Above numbers are 60 second runs on bare metal, so not entirely
-comparable with the ones in the cover letter.
-
-> You might want to explain your table a bit more.
-
-I understand that the table can be difficult to read. It is not easy to
-convey all this information in ASCII email. The numbers in parenthesis
-in the cells _are_ IOPS x 10e6 (read,write). Referring to he second
-table above, for 1 job at 4k bs the Rust driver performed 4.8 percent
-more IOPS than the C driver. The C driver did 1.1M IOPS. I hope this
-clarifies the table, otherwise let me know!
-
-> It might be nice to see IOPS and average latencies.
-
-I did collect latency info as well, including completion latency
-percentiles. It's just difficult to fit all that data in an email. I
-have the fio json output, let me know if you want it and I will find a
-way to get it to you. I am considering setting up some kind of CI that
-will publish the performance results online automatically so that it
-will be a link instead of an inline table.
-
->
-> As an example of a table that I find easier to interpret,
-> see e.g. the table on page 29 in the SPDK performance report:
-> https://ci.spdk.io/download/performance-reports/SPDK_nvme_bdev_perf_report_2301.pdf
-
-Thanks for the input, I will be sure to reference that next time. Just
-for clarity, as you mentioned there is only one queue depth in play for
-the numbers in the cover letter.
-
-Best regards
-Andreas
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
