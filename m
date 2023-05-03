@@ -2,90 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E4FC77B7F
-	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 11:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3D9C77B78
+	for <linux-block@archiver.kernel.org>; Wed,  3 May 2023 11:06:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229541AbjECLB6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 May 2023 07:01:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60072 "EHLO
+        id S229707AbjECLGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 May 2023 07:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbjECLBw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 07:01:52 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB97D4EEC;
-        Wed,  3 May 2023 04:01:26 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 57D2E2026F;
-        Wed,  3 May 2023 11:01:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683111685; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=giRbGlJ7BtkMEI2nBL5riFwP8VXDM1hYxyICWNGQcyM=;
-        b=SC5qFogIbsLugdAIrv4hGxyeN3T2YqLS9zASugfAgtpyJ01F/oTNgVLMtcpsHotcQVyxk5
-        x9l95/yUuejIdovQRC0wLRjr1kxdiUE/VGbq8N2wE9xXP0bv1TZSdpg8yS9NfJDyFZ1fIQ
-        ZT4+dRTJx8AJF0FUADr9BaIJp3z1AH8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683111685;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=giRbGlJ7BtkMEI2nBL5riFwP8VXDM1hYxyICWNGQcyM=;
-        b=joH9aa7l4k8xl5k6sZVzBoaCUNoVdvP2ciAkdZMazpiVVakMp+sWyzJ5HW6JTH3kfEu/Sx
-        W3OuEb/Qft3nOpCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4703B13584;
-        Wed,  3 May 2023 11:01:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id d3ouEQU/UmRCSgAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 03 May 2023 11:01:25 +0000
-Date:   Wed, 3 May 2023 13:01:24 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests v3 09/12] common/fio: Limit number of random jobs
-Message-ID: <2ercejt6r2qjkbpaoueh66nred4ooqb5wskx5m3xn2slb5kasw@zwssje3pm4mu>
-References: <20230503080258.14525-1-dwagner@suse.de>
- <20230503080258.14525-10-dwagner@suse.de>
- <99a6cc5f-31b2-787c-f448-53239a351ddd@nvidia.com>
+        with ESMTP id S229673AbjECLGD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 May 2023 07:06:03 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB5E43C14
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 04:06:00 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3063433fa66so1721093f8f.3
+        for <linux-block@vger.kernel.org>; Wed, 03 May 2023 04:06:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20221208.gappssmtp.com; s=20221208; t=1683111959; x=1685703959;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zC1Gta3a1KlJpbjr0dHCub5GbkSXMMiO3N0auJSFEi4=;
+        b=5WhYU1zjMzb3TRHB1ZMk7kLTS0gKNrQH6Y+bzmvOp+q02IjV9kk6xvjBSHRbTeiBU8
+         9C9b40A8nGaZpu2kkWZINs88/ff/9yp228wkRX/6hdH3/mwpUMV10573pUulpY5gv7FA
+         Xngnq88/iEOCk/UJA/wG0paP+7OyXCfo6DnTpibkGHznrTuCvdpgd1pOuDxkT8KkmOgq
+         wK1Jxilbjc7JXsXzsTMDBAxC/SAG0N5epLX/RGX+H9VnewcAQiusg7zsjvxTN8o//g9s
+         JTGRX2Hv0PF2oN5CkRkOyFGt95YQw0e96Gi5jnY7FQzfRE+iG1P4csBYqMzx1kqubBWe
+         2kgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683111959; x=1685703959;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zC1Gta3a1KlJpbjr0dHCub5GbkSXMMiO3N0auJSFEi4=;
+        b=UW24rtj92Y/s7+chMcGJK1/X5Dw8wfwXdSUvNmaGQizvNsN8aTp2a2bgz2c0ARSh90
+         T456cXEq9tY2tU6w5ZuqEkORrAcUuG51wnd0TZYQ/MReLC9esdgZFnhCBKAUPpGOg24w
+         LGF1Umnyp/C9CAkCpXyNNvjf6VSAJFl8Go+k2ziN/FXo2gJ9QPwMRPkEyRCzYg86RLBI
+         9Qp4XQoIXj75uevk59SG1SxPPAWIz8UvxHboenmDEa2ZpCGz9Ble4H1GMbqI2fGzq2WP
+         sKhSHHZh/ZS8i2o4gpLjTnK8aZfKXsD6TSzds+e5VnsMNkP0zPP/Gc+jiar0RwHIRmq+
+         wQiQ==
+X-Gm-Message-State: AC+VfDxBxjpid7xq7uksD8SY8QQOtcd/7mEZ9qoa7sruI+rCtOdoQJ3m
+        gpUyc/GBPAQxV1IU78u63zj5Vg==
+X-Google-Smtp-Source: ACHHUZ7zkhTIpzWubzYVvlBwUFu5dNo6evewdVN6u2chVe57/nTRHxWkzD+fPR2/AIMcjUnNBk+8cQ==
+X-Received: by 2002:adf:e2cc:0:b0:305:ed26:8576 with SMTP id d12-20020adfe2cc000000b00305ed268576mr9968284wrj.9.1683111959225;
+        Wed, 03 May 2023 04:05:59 -0700 (PDT)
+Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id o2-20020a5d58c2000000b002fe522117fdsm33440960wrf.36.2023.05.03.04.05.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 May 2023 04:05:58 -0700 (PDT)
+Message-ID: <b1568ca5-4daf-f6b5-7861-4881aa46e578@linbit.com>
+Date:   Wed, 3 May 2023 13:05:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <99a6cc5f-31b2-787c-f448-53239a351ddd@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH] drbd: do not set REQ_PREFLUSH when submitting barrier
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
+        linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org, Thomas Voegtle <tv@lio96.de>
+References: <20230502092922.175857-1-christoph.boehmwalder@linbit.com>
+ <ZFHgefWofVt24tRl@infradead.org>
+Content-Language: en-US
+From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+In-Reply-To: <ZFHgefWofVt24tRl@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 03, 2023 at 09:41:37AM +0000, Chaitanya Kulkarni wrote:
-> On 5/3/23 01:02, Daniel Wagner wrote:
-> > Limit the number of random threads to 32 for big machines. This still
-> > gives enough randomness but limits the resource usage.
-> >
-> > Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> > ---
+Am 03.05.23 um 06:18 schrieb Christoph Hellwig:
+> On Tue, May 02, 2023 at 11:29:22AM +0200, Christoph Böhmwalder wrote:
+>>  	struct bio *bio = bio_alloc(device->ldev->backing_bdev, 0,
+>> -				    REQ_OP_FLUSH | REQ_PREFLUSH, GFP_NOIO);
+>> +				    REQ_OP_FLUSH, GFP_NOIO);
 > 
-> I don't think we should change this, the point of all the tests is
-> to not limit the resources but use threads at least equal to
-> $(nproc), see recent patches from lenovo they have 448 cores,
-> limiting 32 is < 10% CPUs and that is really small number for
-> a large machine if we decide to run tests on that machine ...
+> This isn't going to work.  flush bios are (somewhat confusingly)
 
-I just wonder how handle the limits for the job size. Hannes asked to limit it
-to 32 CPUs so that the job size doesn't get small, e.g. nvme_img_size=16M job
-size per job with 448 CPUs is roughly 36kB. Is this good, bad or does it even
-make sense? I don't know.
+Indeed...
 
-My question is what should the policy be? Should we reject configuration which
-try to run too small jobs sizes? Reject anything below 1M for example? Or is
-there a metric which we could as base for a limit calculation (disk geometry)?
+> implemented as writes with no data and the preflush flag.  So this
+> should be:
+> 
+> 	REQ_OP_WRITE | REQ_PREFLUSH.
+> 
+> and it looks like whatever flushing this does hasn't wroked for a long
+> time.
+
+Thanks for the hint. I'll prepare a v2 today.
+
+-- 
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
