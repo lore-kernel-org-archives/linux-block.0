@@ -2,139 +2,158 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83252C77B78
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 20:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B154DC77B78
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 20:32:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230117AbjEDUTG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 16:19:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54332 "EHLO
+        id S231192AbjEDUce (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 16:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230084AbjEDUSf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 16:18:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E6152380A;
-        Thu,  4 May 2023 13:04:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EDACF615B8;
-        Thu,  4 May 2023 19:47:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00A36C433EF;
-        Thu,  4 May 2023 19:47:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229677;
-        bh=YkokPFE5KvOTpPGF2duWfbScuTIsrd/YG+iKLSu/mRQ=;
+        with ESMTP id S229893AbjEDUcT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 16:32:19 -0400
+Received: from smtpout.efficios.com (unknown [IPv6:2607:5300:203:b2ee::31e5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094031156B;
+        Thu,  4 May 2023 13:21:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
+        s=smtpout1; t=1683230734;
+        bh=QcIbf0/W/0tjmDJfN3K1x8lHrFbEPUWzJFa8s3c9fPA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DNo1i68YKDbWuA9vLf19OxijifdUtwJ2yNAwRnket4uqGvBLgeAPeHniVjYVlJ/d8
-         fxItOkG5rcSLLmfS3DpCR++cNivx9f22AvKC2V+xxCfw6+Z+TR8T/nvl854d/ujZFi
-         mItiwgayt3Wnay2CEgYRpCyMpnjI7sHJ28eHpCFj9l/afCl/smmp7ZtZRhsme0MxPC
-         15TySAXYNaCxYhX0SHUK5Y06Y34X+sFbpELJI3HemQi9ncv0ty816sikf+0wW+cVvE
-         yV6+EiWK51VBUZSrYGpkQFlLHAu3Q0x5A1iMpJPLRiTfcv5lfSsJTKzUqc+DB/oaEL
-         fcuyLnK9GySCQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        johannes.thumshirn@wdc.com, vincent.fu@samsung.com,
-        akinobu.mita@gmail.com, shinichiro.kawasaki@wdc.com,
+        b=al4b3prNPOgFLIry5QRsiV7BMrgdJB5bp4bmx7Pos2w5P+YZsuggLjjbLG62RauMe
+         RKuV7lps9ytKmdR7YJFSU0zi1AzzhbJ1BhCVHXCp3PLa+JCVK9SCFV+fHAcfb77EsW
+         BMX3wqtdhQ2BybtmbZAHGLkMJv3aTFNUoeVukyGNmRl726XcDfprt7Hp5G+vXNzt2s
+         xKJudcCUTE3Zcdr70kARY9RRTvDPV+H2pZtTIo48xW3VgUUEb3BoYJzqPcYJwPupZ+
+         AfsvwbTpjT0+oIZ4cEIvbxW3htx/Vux+3hxP18amRC5bEI/vi9t/3x9Y0ZAGlyZ/3b
+         /RhxNuB7YQnkA==
+Received: from localhost.localdomain (192-222-143-198.qc.cable.ebox.net [192.222.143.198])
+        by smtpout.efficios.com (Postfix) with ESMTPSA id 4QC4Yp64TWz11jK;
+        Thu,  4 May 2023 16:05:34 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 35/49] null_blk: Always check queue mode setting from configfs
-Date:   Thu,  4 May 2023 15:46:12 -0400
-Message-Id: <20230504194626.3807438-35-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230504194626.3807438-1-sashal@kernel.org>
-References: <20230504194626.3807438-1-sashal@kernel.org>
+Subject: [RFC PATCH 13/13] bio.h: Fix parentheses around macro parameter use
+Date:   Thu,  4 May 2023 16:05:27 -0400
+Message-Id: <20230504200527.1935944-14-mathieu.desnoyers@efficios.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230504200527.1935944-1-mathieu.desnoyers@efficios.com>
+References: <20230504200527.1935944-1-mathieu.desnoyers@efficios.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chaitanya Kulkarni <kch@nvidia.com>
+Add missing parentheses around macro parameter use in the following
+patterns to ensure operator precedence behaves as expected:
 
-[ Upstream commit 63f8793ee60513a09f110ea460a6ff2c33811cdb ]
+- "x++" is changed for "(x)++",
+- x->member is changed for (x)->member,
+- &x is changed for &(x).
+- "x = y" is changed for "x = (y)", because "y" can be an expression
+  containing a comma if it is the result of the expansion of a macro such
+  as #define eval(...) __VA_ARGS__, which would cause unexpected operator
+  precedence. This use-case is far-fetched, but we have to choose one
+  way or the other (with or without parentheses) for consistency.
 
-Make sure to check device queue mode in the null_validate_conf() and
-return error for NULL_Q_RQ as we don't allow legacy I/O path, without
-this patch we get OOPs when queue mode is set to 1 from configfs,
-following are repro steps :-
+Remove useless parentheses in the following macro argument usage
+patterns:
 
-modprobe null_blk nr_devices=0
-mkdir config/nullb/nullb0
-echo 1 > config/nullb/nullb0/memory_backed
-echo 4096 > config/nullb/nullb0/blocksize
-echo 20480 > config/nullb/nullb0/size
-echo 1 > config/nullb/nullb0/queue_mode
-echo 1 > config/nullb/nullb0/power
+- m((x)) is changed for m(x),
+- m((x), y) is changed for m(x, y) because comma has lowest operator
+  precedence, making the extra parentheses useless,
 
-Entering kdb (current=0xffff88810acdd080, pid 2372) on processor 42 Oops: (null)
-due to oops @ 0xffffffffc041c329
-CPU: 42 PID: 2372 Comm: sh Tainted: G           O     N 6.3.0-rc5lblk+ #5
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-RIP: 0010:null_add_dev.part.0+0xd9/0x720 [null_blk]
-Code: 01 00 00 85 d2 0f 85 a1 03 00 00 48 83 bb 08 01 00 00 00 0f 85 f7 03 00 00 80 bb 62 01 00 00 00 48 8b 75 20 0f 85 6d 02 00 00 <48> 89 6e 60 48 8b 75 20 bf 06 00 00 00 e8 f5 37 2c c1 48 8b 75 20
-RSP: 0018:ffffc900052cbde0 EFLAGS: 00010246
-RAX: 0000000000000001 RBX: ffff88811084d800 RCX: 0000000000000001
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff888100042e00
-RBP: ffff8881053d8200 R08: ffffc900052cbd68 R09: ffff888105db2000
-R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000002
-R13: ffff888104765200 R14: ffff88810eec1748 R15: ffff88810eec1740
-FS:  00007fd445fd1740(0000) GS:ffff8897dfc80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000060 CR3: 0000000166a00000 CR4: 0000000000350ee0
-DR0: ffffffff8437a488 DR1: ffffffff8437a489 DR2: ffffffff8437a48a
-DR3: ffffffff8437a48b DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- nullb_device_power_store+0xd1/0x120 [null_blk]
- configfs_write_iter+0xb4/0x120
- vfs_write+0x2ba/0x3c0
- ksys_write+0x5f/0xe0
- do_syscall_64+0x3b/0x90
- entry_SYSCALL_64_after_hwframe+0x72/0xdc
-RIP: 0033:0x7fd4460c57a7
-Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-RSP: 002b:00007ffd3792a4a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007fd4460c57a7
-RDX: 0000000000000002 RSI: 000055b43c02e4c0 RDI: 0000000000000001
-RBP: 000055b43c02e4c0 R08: 000000000000000a R09: 00007fd44615b4e0
-R10: 00007fd44615b3e0 R11: 0000000000000246 R12: 0000000000000002
-R13: 00007fd446198520 R14: 0000000000000002 R15: 00007fd446198700
- </TASK>
-
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
-Link: https://lore.kernel.org/r/20230416220339.43845-1-kch@nvidia.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: linux-block@vger.kernel.org
 ---
- drivers/block/null_blk/main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/linux/bio.h | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index af419af9a0f4a..c45d09a9a9421 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1945,6 +1945,11 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index b3e7529ff55e..f09aea290511 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -20,7 +20,7 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
+ }
  
- static int null_validate_conf(struct nullb_device *dev)
+ #define bio_prio(bio)			(bio)->bi_ioprio
+-#define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
++#define bio_set_prio(bio, prio)		((bio)->bi_ioprio = (prio))
+ 
+ #define bio_iter_iovec(bio, iter)				\
+ 	bvec_iter_bvec((bio)->bi_io_vec, (iter))
+@@ -37,7 +37,7 @@ static inline unsigned int bio_max_segs(unsigned int nr_segs)
+ #define bio_iovec(bio)		bio_iter_iovec((bio), (bio)->bi_iter)
+ 
+ #define bvec_iter_sectors(iter)	((iter).bi_size >> 9)
+-#define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors((iter)))
++#define bvec_iter_end_sector(iter) ((iter).bi_sector + bvec_iter_sectors(iter))
+ 
+ #define bio_sectors(bio)	bvec_iter_sectors((bio)->bi_iter)
+ #define bio_end_sector(bio)	bvec_iter_end_sector((bio)->bi_iter)
+@@ -93,7 +93,7 @@ static inline bool bio_next_segment(const struct bio *bio,
+  * before it got to the driver and the driver won't own all of it
+  */
+ #define bio_for_each_segment_all(bvl, bio, iter) \
+-	for (bvl = bvec_init_iter_all(&iter); bio_next_segment((bio), &iter); )
++	for (bvl = bvec_init_iter_all(&(iter)); bio_next_segment(bio, &(iter)); )
+ 
+ static inline void bio_advance_iter(const struct bio *bio,
+ 				    struct bvec_iter *iter, unsigned int bytes)
+@@ -145,17 +145,17 @@ static inline void bio_advance(struct bio *bio, unsigned int nbytes)
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+-		((bvl = bio_iter_iovec((bio), (iter))), 1);		\
+-	     bio_advance_iter_single((bio), &(iter), (bvl).bv_len))
++		((bvl = bio_iter_iovec(bio, iter)), 1);			\
++	     bio_advance_iter_single(bio, &(iter), (bvl).bv_len))
+ 
+ #define bio_for_each_segment(bvl, bio, iter)				\
+ 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+ 
+-#define __bio_for_each_bvec(bvl, bio, iter, start)		\
++#define __bio_for_each_bvec(bvl, bio, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+-		((bvl = mp_bvec_iter_bvec((bio)->bi_io_vec, (iter))), 1); \
+-	     bio_advance_iter_single((bio), &(iter), (bvl).bv_len))
++		((bvl = mp_bvec_iter_bvec((bio)->bi_io_vec, iter)), 1);	\
++	     bio_advance_iter_single(bio, &(iter), (bvl).bv_len))
+ 
+ /* iterate over multi-page bvec */
+ #define bio_for_each_bvec(bvl, bio, iter)			\
+@@ -167,7 +167,7 @@ static inline void bio_advance(struct bio *bio, unsigned int nbytes)
+  */
+ #define bio_for_each_bvec_all(bvl, bio, i)		\
+ 	for (i = 0, bvl = bio_first_bvec_all(bio);	\
+-	     i < (bio)->bi_vcnt; i++, bvl++)
++	     i < (bio)->bi_vcnt; (i)++, (bvl)++)
+ 
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+@@ -548,7 +548,7 @@ static inline void bio_list_init(struct bio_list *bl)
+ #define BIO_EMPTY_LIST	{ NULL, NULL }
+ 
+ #define bio_list_for_each(bio, bl) \
+-	for (bio = (bl)->head; bio; bio = bio->bi_next)
++	for (bio = (bl)->head; bio; bio = (bio)->bi_next)
+ 
+ static inline unsigned bio_list_size(const struct bio_list *bl)
  {
-+	if (dev->queue_mode == NULL_Q_RQ) {
-+		pr_err("legacy IO path is no longer available\n");
-+		return -EINVAL;
-+	}
-+
- 	dev->blocksize = round_down(dev->blocksize, 512);
- 	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
+@@ -702,7 +702,7 @@ static inline bool bioset_initialized(struct bio_set *bs)
  
+ #define bio_for_each_integrity_vec(_bvl, _bio, _iter)			\
+ 	for_each_bio(_bio)						\
+-		bip_for_each_vec(_bvl, _bio->bi_integrity, _iter)
++		bip_for_each_vec(_bvl, (_bio)->bi_integrity, _iter)
+ 
+ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, unsigned int);
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
 -- 
-2.39.2
+2.25.1
 
