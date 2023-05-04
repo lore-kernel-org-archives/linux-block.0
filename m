@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 147B6C7EE22
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 20:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD2AC7EE25
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 20:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232478AbjEDUD3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 16:03:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51186 "EHLO
+        id S232620AbjEDUGI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 16:06:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232533AbjEDUCY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 16:02:24 -0400
+        with ESMTP id S233009AbjEDUFl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 16:05:41 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21BE14369;
-        Thu,  4 May 2023 12:51:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C48F519925;
+        Thu,  4 May 2023 12:53:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C3F5C6382C;
-        Thu,  4 May 2023 19:50:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3108C433D2;
-        Thu,  4 May 2023 19:50:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6BEDA63899;
+        Thu,  4 May 2023 19:52:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDF67C433EF;
+        Thu,  4 May 2023 19:52:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229828;
-        bh=SV7t7SkZKavclLUki4z6I4ES14b8SM3+NCFJ0vXHuoc=;
+        s=k20201202; t=1683229953;
+        bh=HIskSI5/26AxnyRWmrGkaPUF4mHYJscsMvsbDYG59lw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nW06vDSfZkG+A4UxD1Ypq3z2MqH84//0N2fMngEwGXGRDsJ8oGj1TTtsDJ0LZ/TGe
-         1LE6nh4dRhb5JhLUFGMYmjoxBSIB1KdfRS+bLBqb3tSplW2HDSMkjR6nijyNWXMxH1
-         vtUdLbrbI5QU6nGWuDv3BR5Qo84xndVOkiWWWfMS1tsXTLEWJRltj5YSMJ5iCxPyf4
-         ofTILAnpS9gCYXUh8lsZB+ff+grw55oLc+fZhlFelh/8ELOPwmz0XKcKN6Oozf7ISy
-         a0tqoWOVohXQ+7FHP8zNW8LjsC3D+H2AxKIVLpotclvJBzpiDKcyo9aXqz/C96hS0c
-         zbsD4r3cwFSCA==
+        b=Kpkvu4MU0SX+bM89RG9ZuW96ojSxl0BXxRjSY7Ncl65IcvnNiTusLScXnXqrEZZZY
+         OjN720EileXwja65831f88ItBifaqFfI1MdAiQijG+ZT0RhMz9tZloLFvjnbiA62hZ
+         WR0231eNYfMOl0TTKkgq9r9aBBE2Z8Nwnzkf1+0YMWAz2vGYZwES0X9pbta9bw7lxw
+         cF8s+Hkh/3vPsHMe3NTkOzU09MSSGjmhrWrVUSKlUpFmmq35vCUTF70fhqRIMLF3zy
+         TiwvvylKhsIF0jFgVzgPU0lgTVYk4Z2EnDsKihFho0df+OUjSM4hR1Q4JVB51VKhOm
+         qo+WASSiATzqQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
@@ -38,16 +38,13 @@ Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
         Ming Lei <ming.lei@redhat.com>,
         Nitesh Shetty <nj.shetty@samsung.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        johannes.thumshirn@wdc.com, vincent.fu@samsung.com,
-        john.garry@huawei.com, akinobu.mita@gmail.com,
-        shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 19/24] null_blk: Always check queue mode setting from configfs
-Date:   Thu,  4 May 2023 15:49:32 -0400
-Message-Id: <20230504194937.3808414-19-sashal@kernel.org>
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 11/13] null_blk: Always check queue mode setting from configfs
+Date:   Thu,  4 May 2023 15:52:03 -0400
+Message-Id: <20230504195207.3809116-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230504194937.3808414-1-sashal@kernel.org>
-References: <20230504194937.3808414-1-sashal@kernel.org>
+In-Reply-To: <20230504195207.3809116-1-sashal@kernel.org>
+References: <20230504195207.3809116-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -116,16 +113,16 @@ Link: https://lore.kernel.org/r/20230416220339.43845-1-kch@nvidia.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/null_blk/main.c | 5 +++++
+ drivers/block/null_blk.c | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 25db095e943b7..35b390a785dd4 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1738,6 +1738,11 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+diff --git a/drivers/block/null_blk.c b/drivers/block/null_blk.c
+index b499e72b2847e..38660b5cfb73c 100644
+--- a/drivers/block/null_blk.c
++++ b/drivers/block/null_blk.c
+@@ -1780,6 +1780,11 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
  
- static int null_validate_conf(struct nullb_device *dev)
+ static void null_validate_conf(struct nullb_device *dev)
  {
 +	if (dev->queue_mode == NULL_Q_RQ) {
 +		pr_err("legacy IO path is no longer available\n");
@@ -134,7 +131,7 @@ index 25db095e943b7..35b390a785dd4 100644
 +
  	dev->blocksize = round_down(dev->blocksize, 512);
  	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
- 
+ 	if (dev->use_lightnvm && dev->blocksize != 4096)
 -- 
 2.39.2
 
