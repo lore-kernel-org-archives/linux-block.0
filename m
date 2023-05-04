@@ -2,88 +2,272 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E184C7EE21
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 16:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BB1C77B7C
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 16:24:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229706AbjEDQVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 12:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47348 "EHLO
+        id S229722AbjEDQYn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 12:24:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjEDQVa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 12:21:30 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC84359D;
-        Thu,  4 May 2023 09:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xNrzahxisfy2D9GpQQsapIsOxx/6hZf8YuSTxd9nEBY=; b=J7o12dUjGzezKJVUFDeEK+Nek0
-        4w32+t1wCykosSCQC6rewjDWwiIgAg5Qh0Nd31+tuHIhLO1gpKusbtv1rE/441rV0fTLMIguJZPqo
-        Iw+gTf3HFt35Vd8FErSCxs4nNyq9Vl1HbUCMKefkQQLy9wy/95/uDVmarQlH6d/2EQ+HPWpEmNnx7
-        xLbJEFS2WdmXvL45AESlq1++dKlG/A282LMCjOtk0v7esTFbfuU9w8iUdHvFs/MU8vH77vv02/V3o
-        GMpongEetngPUmWTBGa73s15SfqNBYOaMWXfBGUbCgUHbOafCbfHoLceQ1Ml8jwI0ZlkUWCPQbCfC
-        59WsA6ig==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pubhq-00Akte-9Y; Thu, 04 May 2023 16:21:22 +0000
-Date:   Thu, 4 May 2023 17:21:22 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
-        linux-ext4@vger.kernel.org,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>
-Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
-Message-ID: <ZFPbgn4r7fX6liko@casper.infradead.org>
-References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
- <ZFPWeOg5xJ7CbCD0@kbusch-mbp.dhcp.thefacebook.com>
+        with ESMTP id S229607AbjEDQYm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 12:24:42 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CFD8118
+        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 09:24:39 -0700 (PDT)
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 344DUQHl004507
+        for <linux-block@vger.kernel.org>; Thu, 4 May 2023 09:24:39 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=AaYuBOaYpT66nE1D2HqpGq7fb6dTESrUtz4Epo1lLdc=;
+ b=NLTO6OY+Xpa4/jvCOT9NbpNZoaoWvkUTqnZ5ZJmmsncTqF4GDleh87uzuuqWg2OSb6zr
+ KWABcOBArAfU6HESkHPOjhp/NigChDqaYQaKYidL0AuzQqmXO/fX/DNRQpw9rn9HLcln
+ W+ZMQl+n9IsOgFm+6nj/+XrVPlzeewGi2a7085DGuhd1KGjAtP/QW7rsBHQf5XS2WuE2
+ UVC+hiauIuTlKRQ08uoVQI73OkCO/JV3SuPiBPQ9ApzbJ32LKARdl3JPexL5crFTtFEf
+ rvrnm5SVIvV2SftK2zBNkQ9giK74tFgth/tVPqj0l9jRBaHFttmkYKl2eTgNtkPBatQL Ug== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3qbvxxyf7u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 04 May 2023 09:24:38 -0700
+Received: from twshared52232.38.frc1.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 4 May 2023 09:24:37 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 1CF7A17BB4F6A; Thu,  4 May 2023 09:24:28 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <axboe@kernel.dk>, <asml.silence@gmail.com>,
+        <io-uring@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     Keith Busch <kbusch@kernel.org>
+Subject: [PATCH] io_uring: set plug tags for same file
+Date:   Thu, 4 May 2023 09:24:27 -0700
+Message-ID: <20230504162427.1099469-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZFPWeOg5xJ7CbCD0@kbusch-mbp.dhcp.thefacebook.com>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: KNyMNUjel2DOmLvjYBNOYXjjR0-Tmt-f
+X-Proofpoint-GUID: KNyMNUjel2DOmLvjYBNOYXjjR0-Tmt-f
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-04_10,2023-05-04_01,2023-02-09_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 04, 2023 at 09:59:52AM -0600, Keith Busch wrote:
-> On Thu, Apr 27, 2023 at 10:20:28AM +0800, Ming Lei wrote:
-> > Hello Guys,
-> > 
-> > I got one report in which buffered write IO hangs in balance_dirty_pages,
-> > after one nvme block device is unplugged physically, then umount can't
-> > succeed.
-> > 
-> > Turns out it is one long-term issue, and it can be triggered at least
-> > since v5.14 until the latest v6.3.
-> > 
-> > And the issue can be reproduced reliably in KVM guest:
-> > 
-> > 1) run the following script inside guest:
-> > 
-> > mkfs.ext4 -F /dev/nvme0n1
-> > mount /dev/nvme0n1 /mnt
-> > dd if=/dev/zero of=/mnt/z.img&
-> > sleep 10
-> > echo 1 > /sys/block/nvme0n1/device/device/remove
-> > 
-> > 2) dd hang is observed and /dev/nvme0n1 is gone actually
-> 
-> Sorry to jump in so late.
-> 
-> For an ungraceful nvme removal, like a surpirse hot unplug, the driver
-> sets the capacity to 0 and that effectively ends all dirty page writers
-> that could stall forward progress on the removal. And that 0 capacity
-> should also cause 'dd' to exit.
-> 
-> But this is not an ungraceful removal, so we're not getting that forced
-> behavior. Could we use the same capacity trick here after flushing any
-> outstanding dirty pages?
+From: Keith Busch <kbusch@kernel.org>
 
-There's a filesystem mounted on that block device, though.  I don't
-think the filesystem is going to notice the underlying block device
-capacity change and break out of any of these functions.
+io_uring tries to optimize allocating tags by hinting to the plug how
+many it expects to need for a batch instead of allocating each tag
+individually. But io_uring submission queueus may have a mix of many
+devices for io, so the number of io's counted may be overestimated. This
+can lead to allocating too many tags, which adds overhead to finding
+that many contiguous tags, freeing up the ones we didn't use, and may
+starve out other users that can actually use them.
+
+When starting a new batch of uring commands, count only commands that
+match the file descriptor of the first seen for this optimization.
+
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-core.c               | 49 +++++++++++++++-------------------
+ include/linux/blkdev.h         |  6 -----
+ include/linux/io_uring_types.h |  1 +
+ io_uring/io_uring.c            | 24 ++++++++++++++---
+ 4 files changed, 43 insertions(+), 37 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 00c74330fa92c..28f1755f37901 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1039,32 +1039,6 @@ int kblockd_mod_delayed_work_on(int cpu, struct de=
+layed_work *dwork,
+ }
+ EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
+=20
+-void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
+-{
+-	struct task_struct *tsk =3D current;
+-
+-	/*
+-	 * If this is a nested plug, don't actually assign it.
+-	 */
+-	if (tsk->plug)
+-		return;
+-
+-	plug->mq_list =3D NULL;
+-	plug->cached_rq =3D NULL;
+-	plug->nr_ios =3D min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
+-	plug->rq_count =3D 0;
+-	plug->multiple_queues =3D false;
+-	plug->has_elevator =3D false;
+-	plug->nowait =3D false;
+-	INIT_LIST_HEAD(&plug->cb_list);
+-
+-	/*
+-	 * Store ordering should not be needed here, since a potential
+-	 * preempt will imply a full memory barrier
+-	 */
+-	tsk->plug =3D plug;
+-}
+-
+ /**
+  * blk_start_plug - initialize blk_plug and track it inside the task_str=
+uct
+  * @plug:	The &struct blk_plug that needs to be initialized
+@@ -1090,7 +1064,28 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, =
+unsigned short nr_ios)
+  */
+ void blk_start_plug(struct blk_plug *plug)
+ {
+-	blk_start_plug_nr_ios(plug, 1);
++	struct task_struct *tsk =3D current;
++
++	/*
++	 * If this is a nested plug, don't actually assign it.
++	 */
++	if (tsk->plug)
++		return;
++
++	plug->mq_list =3D NULL;
++	plug->cached_rq =3D NULL;
++	plug->nr_ios =3D 1;
++	plug->rq_count =3D 0;
++	plug->multiple_queues =3D false;
++	plug->has_elevator =3D false;
++	plug->nowait =3D false;
++	INIT_LIST_HEAD(&plug->cb_list);
++
++	/*
++	 * Store ordering should not be needed here, since a potential
++	 * preempt will imply a full memory barrier
++	 */
++	tsk->plug =3D plug;
+ }
+ EXPORT_SYMBOL(blk_start_plug);
+=20
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e3242e67a8e3d..1e7cb26e04cb1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -995,7 +995,6 @@ struct blk_plug_cb {
+ extern struct blk_plug_cb *blk_check_plugged(blk_plug_cb_fn unplug,
+ 					     void *data, int size);
+ extern void blk_start_plug(struct blk_plug *);
+-extern void blk_start_plug_nr_ios(struct blk_plug *, unsigned short);
+ extern void blk_finish_plug(struct blk_plug *);
+=20
+ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule);
+@@ -1011,11 +1010,6 @@ long nr_blockdev_pages(void);
+ struct blk_plug {
+ };
+=20
+-static inline void blk_start_plug_nr_ios(struct blk_plug *plug,
+-					 unsigned short nr_ios)
+-{
+-}
+-
+ static inline void blk_start_plug(struct blk_plug *plug)
+ {
+ }
+diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_type=
+s.h
+index 1b2a20a42413a..dd2fe648b6392 100644
+--- a/include/linux/io_uring_types.h
++++ b/include/linux/io_uring_types.h
+@@ -175,6 +175,7 @@ struct io_submit_state {
+ 	bool			need_plug;
+ 	unsigned short		submit_nr;
+ 	unsigned int		cqes_count;
++	int			fd;
+ 	struct blk_plug		plug;
+ 	struct io_uring_cqe	cqes[16];
+ };
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index 3bca7a79efda4..ff60342a8f43b 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -2276,7 +2276,11 @@ static int io_init_req(struct io_ring_ctx *ctx, st=
+ruct io_kiocb *req,
+ 		if (state->need_plug && def->plug) {
+ 			state->plug_started =3D true;
+ 			state->need_plug =3D false;
+-			blk_start_plug_nr_ios(&state->plug, state->submit_nr);
++			state->fd =3D req->cqe.fd;
++			blk_start_plug(&state->plug);
++		} else if (state->plug_started && req->cqe.fd =3D=3D state->fd &&
++			   !ctx->submit_state.link.head) {
++			state->plug.nr_ios++;
+ 		}
+ 	}
+=20
+@@ -2337,7 +2341,8 @@ static __cold int io_submit_fail_init(const struct =
+io_uring_sqe *sqe,
+ }
+=20
+ static inline int io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb=
+ *req,
+-			 const struct io_uring_sqe *sqe)
++			 const struct io_uring_sqe *sqe,
++			 struct io_wq_work_list *req_list)
+ 	__must_hold(&ctx->uring_lock)
+ {
+ 	struct io_submit_link *link =3D &ctx->submit_state.link;
+@@ -2385,7 +2390,7 @@ static inline int io_submit_sqe(struct io_ring_ctx =
+*ctx, struct io_kiocb *req,
+ 		return 0;
+ 	}
+=20
+-	io_queue_sqe(req);
++	wq_list_add_tail(&req->comp_list, req_list);
+ 	return 0;
+ }
+=20
+@@ -2470,6 +2475,7 @@ int io_submit_sqes(struct io_ring_ctx *ctx, unsigne=
+d int nr)
+ 	__must_hold(&ctx->uring_lock)
+ {
+ 	unsigned int entries =3D io_sqring_entries(ctx);
++	struct io_wq_work_list req_list;
+ 	unsigned int left;
+ 	int ret;
+=20
+@@ -2480,6 +2486,7 @@ int io_submit_sqes(struct io_ring_ctx *ctx, unsigne=
+d int nr)
+ 	io_get_task_refs(left);
+ 	io_submit_state_start(&ctx->submit_state, left);
+=20
++	INIT_WQ_LIST(&req_list);
+ 	do {
+ 		const struct io_uring_sqe *sqe;
+ 		struct io_kiocb *req;
+@@ -2495,13 +2502,22 @@ int io_submit_sqes(struct io_ring_ctx *ctx, unsig=
+ned int nr)
+ 		 * Continue submitting even for sqe failure if the
+ 		 * ring was setup with IORING_SETUP_SUBMIT_ALL
+ 		 */
+-		if (unlikely(io_submit_sqe(ctx, req, sqe)) &&
++		if (unlikely(io_submit_sqe(ctx, req, sqe, &req_list)) &&
+ 		    !(ctx->flags & IORING_SETUP_SUBMIT_ALL)) {
+ 			left--;
+ 			break;
+ 		}
+ 	} while (--left);
+=20
++	while (req_list.first) {
++		struct io_kiocb *req;
++
++		req =3D container_of(req_list.first, struct io_kiocb, comp_list);
++		req_list.first =3D req->comp_list.next;
++
++		io_queue_sqe(req);
++	}
++
+ 	if (unlikely(left)) {
+ 		ret -=3D left;
+ 		/* try again if it submitted nothing and can't allocate a req */
+--=20
+2.34.1
+
