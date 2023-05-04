@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CABC77B78
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 12:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 072DDC7EE29
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 12:50:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230464AbjEDMt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230468AbjEDMt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 4 May 2023 08:49:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36480 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230331AbjEDMtv (ORCPT
+        with ESMTP id S230329AbjEDMtv (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 08:49:51 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 929A26A7E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D116A7D;
         Thu,  4 May 2023 05:49:43 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QBttn0tW5z4f3v51;
-        Thu,  4 May 2023 20:49:37 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QBttq1GYTz4f3kkN;
+        Thu,  4 May 2023 20:49:39 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBnHbHdqVNkzuf5Ig--.27873S10;
-        Thu, 04 May 2023 20:49:38 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbHdqVNkzuf5Ig--.27873S15;
+        Thu, 04 May 2023 20:49:40 +0800 (CST)
 From:   linan666@huaweicloud.com
 To:     axboe@kernel.dk, linan122@huawei.com, vishal.l.verma@intel.com,
         dan.j.williams@intel.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH v2 06/11] block/badblocks: fix ack set fail in badblocks_set
-Date:   Thu,  4 May 2023 20:48:23 +0800
-Message-Id: <20230504124828.679770-7-linan666@huaweicloud.com>
+Subject: [PATCH v2 11/11] block/badblocks: try to merge badblocks as much as possible
+Date:   Thu,  4 May 2023 20:48:28 +0800
+Message-Id: <20230504124828.679770-12-linan666@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230504124828.679770-1-linan666@huaweicloud.com>
 References: <20230504124828.679770-1-linan666@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnHbHdqVNkzuf5Ig--.27873S10
-X-Coremail-Antispam: 1UD129KBjvdXoWrZF4xtrWrWrW8tF17JFWUArb_yoWkXrg_J3
-        WFyFZ5Xrn5CFs8Cr1Yy3W0qrsY9F45Cr4kCw12qrn7XrsrtF1DJws8tr93Wrn5CFZrC390
-        v34rXr9Iva4IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbvxYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
-        0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-        Y2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-        v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAF
-        wI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4
-        xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v2
-        6r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x0262
-        8vn2kIc2xKxwAKzVCY07xG64k0F24l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
-        Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1V
-        AY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAI
-        cVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIx
-        AIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVF
-        xhVjvjDU0xZFpf9x07UMa0PUUUUU=
+X-CM-TRANSID: gCh0CgBnHbHdqVNkzuf5Ig--.27873S15
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww48tFW5WF4UKF43Cr1xZrb_yoW8Cry7pF
+        n0y3WfKry2gr17W3W5X3W8Kr10g34fJF4UCF43Xw1jkFyxGwn3tF1kZw4FqFyjgF43Wrs0
+        v3Wruryjva4kCa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUmab4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+        Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+        rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+        AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
+        14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I
+        8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
+        xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxV
+        A2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
+        6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
+        CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF
+        0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
+        CI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsG
+        vfC2KfnxnUUI43ZEXa7IU1lksDUUUUU==
 X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,43 +60,67 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Li Nan <linan122@huawei.com>
 
-If we try to set ack for a BB_MAX_LEN badblocks, it will return
-0(success) but did not set ack at all in badblocks_set(). Check ack
-before setting to fix it, and do not set badblocks already exist.
+If we set a new badblocks, we first merge it with existing region, then
+try to combine lo and hi. If there are still badblocks need to be set,
+create it. It is a bad way when setting a laget number of badblocks. for
+example, it will become chaotic if we set as below:
+
+  # echo 1 1 > bad_blocks
+  # echo 512 1 > bad_blocks
+  # echo 0 513 > bad_blocks
+  # cat bad_blocks
+    0 512
+    512 1
+    512 1
+
+Fix it by trying to merge as much as possible. If we have merged any
+badblocks, retry to merge next sectors. Do not check sectors while
+combining, we should combine lo and hi each sycle.
 
 Fixes: 9e0e252a048b ("badblocks: Add core badblock management code")
 Signed-off-by: Li Nan <linan122@huawei.com>
 ---
- block/badblocks.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/badblocks.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/block/badblocks.c b/block/badblocks.c
-index 11e3a3ae2c72..c11eb869f2f3 100644
+index bb0324b66f57..7e6fce10c82d 100644
 --- a/block/badblocks.c
 +++ b/block/badblocks.c
-@@ -219,18 +219,18 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
- 			if (e < s + sectors)
- 				e = s + sectors;
- 			if (e - a <= BB_MAX_LEN) {
--				p[lo] = BB_MAKE(a, e-a, ack);
- 				s = e;
- 			} else {
- 				/* does not all fit in one range,
- 				 * make p[lo] maximal
- 				 */
--				if (BB_LEN(p[lo]) != BB_MAX_LEN)
--					p[lo] = BB_MAKE(a, BB_MAX_LEN, ack);
- 				s = a + BB_MAX_LEN;
- 			}
-+			if (s - a != BB_LEN(p[lo]) || ack != BB_ACK(p[lo])) {
-+				p[lo] = BB_MAKE(a, s - a, ack);
-+				changed = true;
-+			}
- 			sectors = e - s;
--			changed = true;
+@@ -347,8 +347,6 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 	lo = 0;
+ 	hi = bb->count;
+ 	if (bb->count) {
+-		int merged_sectors;
+-
+ 		/* Find the last range that starts at-or-before 's' */
+ 		while (hi - lo > 1) {
+ 			int mid = (lo + hi) / 2;
+@@ -360,12 +358,19 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 				hi = mid;
  		}
+ 
+-		merged_sectors = badblocks_merge(bb, s, sectors, acknowledged,
+-						 &lo, &hi, &changed);
+-		s += merged_sectors;
+-		sectors -= merged_sectors;
+-		if (sectors == 0)
++		while (sectors) {
++			int merged_sectors;
++
++			merged_sectors = badblocks_merge(bb, s, sectors, acknowledged,
++							 &lo, &hi, &changed);
++			/* can't merge, break to create */
++			if (!merged_sectors)
++				break;
++
++			s += merged_sectors;
++			sectors -= merged_sectors;
+ 			badblocks_combine(bb, lo);
++		}
  	}
- 	if (sectors && hi < bb->count) {
+ 	rv = badblocks_create(bb, s, sectors, hi, acknowledged, &changed);
+ 
 -- 
 2.31.1
 
