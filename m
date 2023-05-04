@@ -2,100 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BE2C77B7C
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 14:16:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CC5C7EE21
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 14:30:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230477AbjEDOQt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 10:16:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54900 "EHLO
+        id S231236AbjEDOaM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 10:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230424AbjEDOQs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 10:16:48 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 400118687;
-        Thu,  4 May 2023 07:16:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8Hnl7RKx0Q6XGEhYYTUEZyfjo56ovfMM3HhYaGLUEew=; b=juJfjc0Yf5CWyCFAP2JWhWBuJ+
-        RNQBQPJiNd6LgJNn7t9nBYHhSutlYwsNJbdjur9XymvEny7X+wSvNkwxDwT+2VGva/2A6JozpfEG+
-        tkUKLUTVx30Gr9jI43sgPNdZJucPICfOWUhUVcF6HhgND8ZsnBPYFR1r4Ksn9HKD6CAyVgDySDubL
-        sEnS5tY6vbfV4/Na52UHzcQ8aPBK8tPIrOocU8avbJ62u4J1wO9CBUZ5UO8pnvwIdBs/MbERlT1Ix
-        NNZuyBwO2xEiCwIuMrOzg7ILjjn31107foZ2A3EsQywPR7EPCHm5rHYV9xosLa4YE9RRtuTF/UUe7
-        PCbgbN1Q==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1puZl9-00AfJJ-68; Thu, 04 May 2023 14:16:39 +0000
-Date:   Thu, 4 May 2023 15:16:39 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ilya Dryomov <idryomov@gmail.com>, Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] mm: always respect QUEUE_FLAG_STABLE_WRITES on the block
- device
-Message-ID: <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
-References: <20230504105624.9789-1-idryomov@gmail.com>
- <20230504135515.GA17048@lst.de>
+        with ESMTP id S230264AbjEDOaK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 10:30:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40BB1FDA
+        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 07:29:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683210565;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2oqt9w9se5xqD0xq3HO1YVubTWdxt3SKIiZ823pUMhM=;
+        b=irX0wxQesxx67GX+wgxOuhkqkYnTsD694+7DQPWh9Zf5DYzLzwD8HVjHkQdt3CjwtwzBSP
+        Lafh4Q6waqOl6nLu9SBkjwWV4TBeLJqbKXUdUESboHowo7Xy1cG2w5hlrFUCID7D2wmgcD
+        2GSCFuC89AhIjdocWTX9jmzVpnYowdE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-621-A0_kp1gJPtGgj9ECZFr1Qw-1; Thu, 04 May 2023 10:29:22 -0400
+X-MC-Unique: A0_kp1gJPtGgj9ECZFr1Qw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F22685C6E2;
+        Thu,  4 May 2023 14:29:21 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D29801121331;
+        Thu,  4 May 2023 14:29:14 +0000 (UTC)
+Date:   Thu, 4 May 2023 22:29:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Breno Leitao <leitao@debian.org>
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        asml.silence@gmail.com, hch@lst.de, axboe@kernel.dk, leit@fb.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        sagi@grimberg.me, joshi.k@samsung.com, kbusch@kernel.org
+Subject: Re: [PATCH v4 2/3] io_uring: Pass whole sqe to commands
+Message-ID: <ZFPBNWx6ZqYxiqB/@ovpn-8-16.pek2.redhat.com>
+References: <20230504121856.904491-1-leitao@debian.org>
+ <20230504121856.904491-3-leitao@debian.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230504135515.GA17048@lst.de>
+In-Reply-To: <20230504121856.904491-3-leitao@debian.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 04, 2023 at 03:55:15PM +0200, Christoph Hellwig wrote:
-> On Thu, May 04, 2023 at 12:56:24PM +0200, Ilya Dryomov wrote:
-> > Commit 1cb039f3dc16 ("bdi: replace BDI_CAP_STABLE_WRITES with a queue
-> > and a sb flag") introduced a regression for the raw block device use
-> > case.  Capturing QUEUE_FLAG_STABLE_WRITES flag in set_bdev_super() has
-> > the effect of respecting it only when there is a filesystem mounted on
-> > top of the block device.  If a filesystem is not mounted, block devices
-> > that do integrity checking return sporadic checksum errors.
+On Thu, May 04, 2023 at 05:18:55AM -0700, Breno Leitao wrote:
+> Currently uring CMD operation relies on having large SQEs, but future
+> operations might want to use normal SQE.
 > 
-> With "If a file system is not mounted" you want to say "when accessing
-> a block device directly" here, right?  The two are not exclusive..
-> 
-> > Additionally, this commit made the corresponding sysfs knob writeable
-> > for debugging purposes.  However, because QUEUE_FLAG_STABLE_WRITES flag
-> > is captured when the filesystem is mounted and isn't consulted after
-> > that anywhere outside of swap code, changing it doesn't take immediate
-> > effect even though dumping the knob shows the new value.  With no way
-> > to dump SB_I_STABLE_WRITES flag, this is needlessly confusing.
-> 
-> But very much intentional.  s_bdev often is not the only device
-> in a file system, and we should never reference if from core
-> helpers.
-> 
-> So I think we should go with something like this:
-> 
-> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-> index db794399900734..aa36cc2a4530c1 100644
-> --- a/mm/page-writeback.c
-> +++ b/mm/page-writeback.c
-> @@ -3129,7 +3129,11 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable);
->   */
->  void folio_wait_stable(struct folio *folio)
->  {
-> -	if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
-> +	struct inode *inode = folio_inode(folio);
-> +	struct super_block *sb = inode->i_sb;
-> +
-> +	if ((sb->s_iflags & SB_I_STABLE_WRITES) ||
-> +	    (sb_is_blkdev_sb(sb) && bdev_stable_writes(I_BDEV(inode))))
->  		folio_wait_writeback(folio);
->  }
->  EXPORT_SYMBOL_GPL(folio_wait_stable);
+> The io_uring_cmd currently only saves the payload (cmd) part of the SQE,
+> but, for commands that use normal SQE size, it might be necessary to
+> access the initial SQE fields outside of the payload/cmd block.  So,
 
-I hate both of these patches ;-)  What we should do is add
-AS_STABLE_WRITES, have the appropriate places call
-mapping_set_stable_writes() and then folio_wait_stable() becomes
+Looks fine,
 
-	if (mapping_test_stable_writes(folio->mapping))
-		folio_wait_writeback(folio);
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-and we remove all the dereferences (mapping->host->i_sb->s_iflags, plus
-whatever else is going on there)
+BTW, there might be risk[1] when accessing SQE fields which were read by
+io_uring core code, and I'd suggest to document it in future.
+
+[1] https://lore.kernel.org/io-uring/ZDlcXd4K+a2iGbnv@ovpn-8-21.pek2.redhat.com/
+
+Thanks,
+Ming
+
