@@ -2,139 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F42C7EE23
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 15:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AC2C77B78
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 15:09:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230492AbjEDPH0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 11:07:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
+        id S231274AbjEDPJl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 11:09:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230495AbjEDPHZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:07:25 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1394110D8;
-        Thu,  4 May 2023 08:07:24 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-50bd37ca954so18305342a12.0;
-        Thu, 04 May 2023 08:07:23 -0700 (PDT)
+        with ESMTP id S231402AbjEDPJ3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:09:29 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEB234209
+        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 08:08:59 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-64382139ebaso462285b3a.2
+        for <linux-block@vger.kernel.org>; Thu, 04 May 2023 08:08:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683212842; x=1685804842;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=bytedance.com; s=google; t=1683212939; x=1685804939;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9WFS1x47blclBXskP77nCF58D51Rpg9+wJAmzlYQmRk=;
-        b=iOENyJgHIcqMP2+ca+2v80DT2ibR3iO9OVec9sAfKp7iLNAEq9mujvSiuMFX0BeHxf
-         FXeeGNJEllsKwvy5a7JoPvL5PkZDu7W3NmC/C+73rZwfW4xKcrl2OUlXbzgVBx9jb5s5
-         3zmGR16y/wilEY8jd7r7+vccxMYIjQq9Gr8pKGIXxn+nE11U6nj5XCsdwj97PPQkmqYt
-         F8RnwS5MsdoCAwdzSCN2vL5FoakB8av51upu1FZinjJDEwDrPYO0+Wzm/oJWGSjScrVQ
-         QptWn+fjuB0LzpTlL4bdxjJ9Vm9todUZ0BCPONAUOiMTsuJBDn82A34/N137dRuh+b6F
-         Mawg==
+        bh=OFa1D5Tpf/QrQJM5h3CrUwGz4UKarPH+tDSx3KZiqW0=;
+        b=DNqvvH4fVrTxxmy3uWocPqMrVQzGrvn1bKV/DBRhuLaJP6xVuRfHqmbHfrevd1owR/
+         jiCrzjiOJ6WKw3SidjtKGTAo3Kw6pc6zVNOe6oEJ3Q7NwivVlUyL5fyWvqWOdTYm67kg
+         bB8EjQA5ooh95ZqFlEOhksFT0f1AAMr4Zq0N5VHLOQUfiSYQ2Jc4c9mMxf5zpl9GlztJ
+         79At54zrwpPkmPzu2hgVlWkTkzYQtfrDyMp6XW8rtYcSI5MAQsYKVXYMVqd667juw5MI
+         6RoawcuDBmVVXahW627FRVPS71JWh8CGrpk9MFh7Dh0Tq7PtZCP2VYWXY72KPg5byozj
+         1LIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683212842; x=1685804842;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9WFS1x47blclBXskP77nCF58D51Rpg9+wJAmzlYQmRk=;
-        b=fZ65Y5OEbsFJMwzGVqWwsyFY5M/I5F/dQ4DT2AktfFu3BVmH6M2+Kt2jp0cUNMbXY7
-         /2xl/maGhb49/Yyjm2le/6V3eFLxr7L+HPdlSvdx8Z014j6AtkoX4vJN6ZWbQ3VJOb/5
-         62ZC6BqxwGcKdX6DoYNQbbTUDTG8Z3AW7bcfmeB2I4unBbGYFnXzeg43uuqjlK1N2hiq
-         8aCmBzt9gUVv65R4RU11hObHnm+D6Vuou6PQSE1uNTxCpDEPifgMtdrA3UP9TZZOcJ/v
-         fHTDZ7U16h6BHegsn3H43G+UI0BUNWT6GRlPj94edLiQw31yfCsHbI85SkW+vk+ADlJP
-         2kDw==
-X-Gm-Message-State: AC+VfDxxiqgA0PxKKrRqpuMUaLLCVRadcrhrHmy6WY3PrCT9CdYI6K+i
-        oaf3OQ2OPS9pH9ovj8oUaTtQcUZ5dIK76Kg8q5U=
-X-Google-Smtp-Source: ACHHUZ4EZmZqjOJWc+m9y3XiZVF1YH6IrfUtVWGSTRu5Mvda+qI8kMR4AtvmrTycSugn84PacQcC4fD2dgIHHkhmutU=
-X-Received: by 2002:a17:906:9746:b0:960:ddba:e5bf with SMTP id
- o6-20020a170906974600b00960ddbae5bfmr5322943ejy.0.1683212842404; Thu, 04 May
- 2023 08:07:22 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1683212939; x=1685804939;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OFa1D5Tpf/QrQJM5h3CrUwGz4UKarPH+tDSx3KZiqW0=;
+        b=WWfzSUDrg6YGTpE1r3hn8/hqkUexPrC6T/skn2u93cx5xZWNwV0aQCOH1DUcLQ1w4E
+         jKcDUFbQYfeyUq/iwYhH8glGB89D8kMVMN9QjIvdnWtmAlVbOv0wEM1W/sA+cz0CuBEt
+         58TJSSg5/cMzoZYU7MMVQBhcCOJ82PO/cCmSd0hBfNomeH91YTiLLjzc8kAVjU0i7gv4
+         16/IM1tay3BMzx6KxPXHSKtCw8B9B8+P6DfhfU4CmlRbbyltiVK+ZHQMJGQ4Uhiar1d0
+         0LW9l/EyTC4J6GKxadGgVkipZxRXpqclCfz8HZblLRVIxU3T+UANYMoXqDJXYRSvJjNL
+         3WHg==
+X-Gm-Message-State: AC+VfDxr5UtheSNeqNeLhFY2mQ1If6oLuRKn60Ve8zVtnt3b14ogDSbJ
+        ddDt2cnpJW2QOkxCBwgOruVFDQ==
+X-Google-Smtp-Source: ACHHUZ7b8yMStegf41qN6JKvTRQVyQ3nCGCRxb9QEu/dI4w/6IChTI343PJi8jI6S37UwLLoQfMuuQ==
+X-Received: by 2002:a05:6a00:23d1:b0:63d:311a:a16b with SMTP id g17-20020a056a0023d100b0063d311aa16bmr2998351pfc.23.1683212939365;
+        Thu, 04 May 2023 08:08:59 -0700 (PDT)
+Received: from [10.255.14.217] ([139.177.225.234])
+        by smtp.gmail.com with ESMTPSA id u21-20020aa78495000000b0063d24fcc2besm1753144pfn.125.2023.05.04.08.08.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 May 2023 08:08:58 -0700 (PDT)
+Message-ID: <eb2eeb6b-07da-4e98-142c-da1e7ea35c2b@bytedance.com>
+Date:   Thu, 4 May 2023 23:08:53 +0800
 MIME-Version: 1.0
-References: <20230504105624.9789-1-idryomov@gmail.com> <20230504135515.GA17048@lst.de>
- <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
-In-Reply-To: <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Thu, 4 May 2023 17:07:10 +0200
-Message-ID: <CAOi1vP_sEab6A3hsdZbVjvOXzWgFBJzrBZ4o9zNr7TT6fivTQg@mail.gmail.com>
-Subject: Re: [PATCH] mm: always respect QUEUE_FLAG_STABLE_WRITES on the block device
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.0
+Subject: Re: [External] Re: [PATCH v2] blk-throttle: Fix io statistics for
+ cgroup v1
+To:     Andrea Righi <andrea.righi@canonical.com>
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20230401094708.77631-1-hanjinke.666@bytedance.com>
+ <ZEwY5Oo+5inO9UFf@righiandr-XPS-13-7390>
+From:   hanjinke <hanjinke.666@bytedance.com>
+In-Reply-To: <ZEwY5Oo+5inO9UFf@righiandr-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 4, 2023 at 4:16=E2=80=AFPM Matthew Wilcox <willy@infradead.org>=
- wrote:
->
-> On Thu, May 04, 2023 at 03:55:15PM +0200, Christoph Hellwig wrote:
-> > On Thu, May 04, 2023 at 12:56:24PM +0200, Ilya Dryomov wrote:
-> > > Commit 1cb039f3dc16 ("bdi: replace BDI_CAP_STABLE_WRITES with a queue
-> > > and a sb flag") introduced a regression for the raw block device use
-> > > case.  Capturing QUEUE_FLAG_STABLE_WRITES flag in set_bdev_super() ha=
-s
-> > > the effect of respecting it only when there is a filesystem mounted o=
-n
-> > > top of the block device.  If a filesystem is not mounted, block devic=
-es
-> > > that do integrity checking return sporadic checksum errors.
-> >
-> > With "If a file system is not mounted" you want to say "when accessing
-> > a block device directly" here, right?  The two are not exclusive..
-> >
-> > > Additionally, this commit made the corresponding sysfs knob writeable
-> > > for debugging purposes.  However, because QUEUE_FLAG_STABLE_WRITES fl=
-ag
-> > > is captured when the filesystem is mounted and isn't consulted after
-> > > that anywhere outside of swap code, changing it doesn't take immediat=
-e
-> > > effect even though dumping the knob shows the new value.  With no way
-> > > to dump SB_I_STABLE_WRITES flag, this is needlessly confusing.
-> >
-> > But very much intentional.  s_bdev often is not the only device
-> > in a file system, and we should never reference if from core
-> > helpers.
-> >
-> > So I think we should go with something like this:
-> >
-> > diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-> > index db794399900734..aa36cc2a4530c1 100644
-> > --- a/mm/page-writeback.c
-> > +++ b/mm/page-writeback.c
-> > @@ -3129,7 +3129,11 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable)=
-;
-> >   */
-> >  void folio_wait_stable(struct folio *folio)
-> >  {
-> > -     if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
-> > +     struct inode *inode =3D folio_inode(folio);
-> > +     struct super_block *sb =3D inode->i_sb;
-> > +
-> > +     if ((sb->s_iflags & SB_I_STABLE_WRITES) ||
-> > +         (sb_is_blkdev_sb(sb) && bdev_stable_writes(I_BDEV(inode))))
-> >               folio_wait_writeback(folio);
-> >  }
-> >  EXPORT_SYMBOL_GPL(folio_wait_stable);
->
-> I hate both of these patches ;-)  What we should do is add
-> AS_STABLE_WRITES, have the appropriate places call
-> mapping_set_stable_writes() and then folio_wait_stable() becomes
->
->         if (mapping_test_stable_writes(folio->mapping))
->                 folio_wait_writeback(folio);
->
-> and we remove all the dereferences (mapping->host->i_sb->s_iflags, plus
-> whatever else is going on there)
+Hi
 
-Hi Matthew,
+Sorry for delay（Chinese Labor Day holiday).
 
-We would still need something resembling Christoph's suggestion for
-5.10 and 5.15 (at least).  Since this fixes a regression, would you
-support merging the "ugly" version to facilitate backports or would
-you rather see the AS/mapping-based refactor first?
+在 2023/4/29 上午3:05, Andrea Righi 写道:
+> On Sat, Apr 01, 2023 at 05:47:08PM +0800, Jinke Han wrote:
+>> From: Jinke Han <hanjinke.666@bytedance.com>
+>>
+>> After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
+>> blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
+>> the only stable io stats interface of cgroup v1, and these statistics
+>> are done in the blk-throttle code. But the current code only counts the
+>> bios that are actually throttled. When the user does not add the throttle
+>> limit, the io stats for cgroup v1 has nothing. I fix it according to the
+>> statistical method of v2, and made it count all ios accurately.
+>>
+>> Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
+>> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
+> 
+> Thanks for fixing this!
+> 
+> The code looks correct to me, but this seems to report io statistics
+> only if at least one throttling limit is defined. IIRC with cgroup v1 it
+> was possible to see the io statistics inside a cgroup also with no
+> throttling limits configured.
+> 
+> Basically to restore the old behavior we would need to drop the
+> cgroup_subsys_on_dfl() check, something like the following (on top of
+> your patch).
+> 
+> But I'm not sure if we're breaking other behaviors in this way...
+> opinions?
+> 
+>   block/blk-cgroup.c   |  3 ---
+>   block/blk-throttle.h | 12 +++++-------
+>   2 files changed, 5 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 79138bfc6001..43af86db7cf3 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -2045,9 +2045,6 @@ void blk_cgroup_bio_start(struct bio *bio)
+>   	struct blkg_iostat_set *bis;
+>   	unsigned long flags;
+>   
+> -	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
+> -		return;
+> -
+>   	/* Root-level stats are sourced from system-wide IO stats */
+>   	if (!cgroup_parent(blkcg->css.cgroup))
+>   		return;
+> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+> index d1ccbfe9f797..bcb40ee2eeba 100644
+> --- a/block/blk-throttle.h
+> +++ b/block/blk-throttle.h
+> @@ -185,14 +185,12 @@ static inline bool blk_should_throtl(struct bio *bio)
+>   	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
+>   	int rw = bio_data_dir(bio);
+>   
+> -	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+> -		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
+> -			bio_set_flag(bio, BIO_CGROUP_ACCT);
+> -			blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
+> -					bio->bi_iter.bi_size);
+> -		}
+> -		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
+> +	if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
+> +		bio_set_flag(bio, BIO_CGROUP_ACCT);
+> +		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
+> +				bio->bi_iter.bi_size);
+>   	}
+> +	blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
 
-Thanks,
+It seems that statistics have been carried out in both v1 and v2，we can 
+get the statistics of v2 from io.stat, is it necessary to count v2 here?
 
-                Ilya
+
