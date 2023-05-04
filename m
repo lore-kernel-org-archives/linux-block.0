@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D061C7EE21
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C03D9C7EE26
 	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 12:49:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230458AbjEDMt5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 08:49:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36492 "EHLO
+        id S230463AbjEDMt6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 08:49:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230432AbjEDMtv (ORCPT
+        with ESMTP id S229846AbjEDMtv (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 08:49:51 -0400
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDACA46BC;
-        Thu,  4 May 2023 05:49:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AAD6A66;
+        Thu,  4 May 2023 05:49:42 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QBttn30SKz4f3tDr;
-        Thu,  4 May 2023 20:49:37 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QBttp22fCz4f3v6h;
+        Thu,  4 May 2023 20:49:38 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBnHbHdqVNkzuf5Ig--.27873S12;
-        Thu, 04 May 2023 20:49:39 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbHdqVNkzuf5Ig--.27873S14;
+        Thu, 04 May 2023 20:49:40 +0800 (CST)
 From:   linan666@huaweicloud.com
 To:     axboe@kernel.dk, linan122@huawei.com, vishal.l.verma@intel.com,
         dan.j.williams@intel.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH v2 08/11] block/badblocks: factor out a helper to merge badblocks
-Date:   Thu,  4 May 2023 20:48:25 +0800
-Message-Id: <20230504124828.679770-9-linan666@huaweicloud.com>
+Subject: [PATCH v2 10/11] block/badblocks: factor out a helper to create badblocks
+Date:   Thu,  4 May 2023 20:48:27 +0800
+Message-Id: <20230504124828.679770-11-linan666@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230504124828.679770-1-linan666@huaweicloud.com>
 References: <20230504124828.679770-1-linan666@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnHbHdqVNkzuf5Ig--.27873S12
-X-Coremail-Antispam: 1UD129KBjvJXoWxCF45WFyUZFW8uw1UuFykXwb_yoWrXFyxpr
-        1ay3WS9FyUXF47W3Z8JF4DKr1rKayfXr4UAFWfA3ykuF18CrZIqF1v9ryruFy09rZxWFn0
-        q3WYgry29as8C3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUmIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+X-CM-TRANSID: gCh0CgBnHbHdqVNkzuf5Ig--.27873S14
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw4UCrW7tFW8WrWxZF48tFb_yoW8tr43pr
+        sIy3Zagry7Ww1xXanxX3ZrKr1rK3yfZF1UGr47Aw1UGFyxCwnrtFn2vryfuFyj9Fy3Jr4q
+        q3WYgryY9asrC37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUmab4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
         6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
         Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
         rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
@@ -48,10 +48,10 @@ X-Coremail-Antispam: 1UD129KBjvJXoWxCF45WFyUZFW8uw1UuFykXwb_yoWrXFyxpr
         xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxV
         A2Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
         6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17
-        CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF
-        0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMI
-        IF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnI
-        WIevJa73UjIFyTuYvjxUwZ2-UUUUU
+        CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF
+        0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCw
+        CI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsG
+        vfC2KfnxnUUI43ZEXa7IU1lksDUUUUU==
 X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,182 +60,97 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Li Nan <linan122@huawei.com>
 
-Add a helper badblocks_merge() to merge badblocks, it makes code more
+Add a helper badblocks_create() to create badblocks, it makes code more
 readable. No functional change.
 
 Signed-off-by: Li Nan <linan122@huawei.com>
 ---
- block/badblocks.c | 143 +++++++++++++++++++++++++---------------------
- 1 file changed, 79 insertions(+), 64 deletions(-)
+ block/badblocks.c | 65 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 41 insertions(+), 24 deletions(-)
 
 diff --git a/block/badblocks.c b/block/badblocks.c
-index 3cb8513cbd7f..f498fae201a1 100644
+index c87c68d4bcac..bb0324b66f57 100644
 --- a/block/badblocks.c
 +++ b/block/badblocks.c
-@@ -144,6 +144,80 @@ static void badblocks_update_acked(struct badblocks *bb)
- 		bb->unacked_exist = false;
+@@ -263,6 +263,46 @@ static void badblocks_combine(struct badblocks *bb, int lo)
+ 	}
  }
  
 +/*
-+ * try to merge new range with lo and hi.
-+ * if s is within lo, merge with lo.
-+ * if s + sectors > start of hi, merge with hi.
++ * creat new badblocks if it can't merge with existing region
 + *
 + * Return:
-+ *  Number of merged sectors
++ *  0: success
++ *  1: failed to set badblocks (out of space)
 + */
-+static int badblocks_merge(struct badblocks *bb, sector_t s, int sectors,
-+			int acknowledged, int *lo, int *hi, bool *changed)
++static int badblocks_create(struct badblocks *bb, sector_t s, sector_t sectors,
++			int hi, int acknowledged, bool *changed)
 +{
 +	u64 *p = bb->page;
-+	sector_t a = BB_OFFSET(p[*lo]);
-+	sector_t e = a + BB_LEN(p[*lo]);
-+	int merged_sectors = 0, ack = acknowledged;
++	int rv = 0;
 +
-+	if (a > s) {
-+		*hi = *lo;
-+	} else if (e >= s) {
-+		/* we can merge with a previous range */
-+		if (s > a || s + sectors < e)
-+			ack = ack && BB_ACK(p[*lo]);
++	while (sectors) {
++		int this_sectors = sectors;
 +
-+		if (e < s + sectors)
-+			e = s + sectors;
-+		if (e - a <= BB_MAX_LEN) {
-+			s = e;
-+		} else {
-+			/*
-+			 * does not all fit in one range,
-+			 * make p[lo] maximal
-+			 */
-+			s = a + BB_MAX_LEN;
-+		}
-+		if (s - a != BB_LEN(p[*lo]) || ack != BB_ACK(p[*lo])) {
-+			p[*lo] = BB_MAKE(a, s - a, ack);
-+			*changed = true;
-+		}
-+		merged_sectors += sectors - e + s;
-+		sectors = e - s;
-+	}
-+	if (sectors && *hi < bb->count) {
-+		/*
-+		 * 'hi' points to the first range that starts after 's'.
-+		 * Maybe we can merge with the start of that range
++		/* didn't merge (it all).
++		 * Need to add a range just before 'hi'
 +		 */
-+		a = BB_OFFSET(p[*hi]);
-+		e = a + BB_LEN(p[*hi]);
-+		ack = acknowledged;
-+
-+		if (a <= s + sectors) {
-+			/* merging is possible */
-+			if (e <= s + sectors) {
-+				/* full overlap */
-+				e = s + sectors;
-+			} else
-+				ack = ack && BB_ACK(p[*hi]);
-+
-+			a = s;
-+			if (e - a <= BB_MAX_LEN)
-+				s = e;
-+			else
-+				s = a + BB_MAX_LEN;
-+			p[*hi] = BB_MAKE(a, s-a, ack);
-+
-+			merged_sectors += sectors - e + s;
-+			*changed = true;
-+			*lo = *hi;
-+			*hi += 1;
++		if (bb->count >= MAX_BADBLOCKS) {
++			/* No room for more */
++			rv = 1;
++			break;
 +		}
++
++		memmove(p + hi + 1, p + hi,
++			(bb->count - hi) * 8);
++		bb->count++;
++
++		if (this_sectors > BB_MAX_LEN)
++			this_sectors = BB_MAX_LEN;
++		p[hi] = BB_MAKE(s, this_sectors, acknowledged);
++		sectors -= this_sectors;
++		s += this_sectors;
++		hi++;
++		*changed = true;
 +	}
-+	return merged_sectors;
++	return rv;
 +}
 +
  /**
   * badblocks_set() - Add a range of bad blocks to the table.
   * @bb:		the badblocks structure that holds all badblock information
-@@ -191,6 +265,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
- 		sector_t a;
- 		sector_t e;
- 		int ack;
-+		int merged_sectors;
- 
- 		/* Find the last range that starts at-or-before 's' */
- 		while (hi - lo > 1) {
-@@ -203,70 +278,10 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
- 				hi = mid;
- 		}
- 
--		/* we found a range that might merge with the start
--		 * of our new range
+@@ -327,30 +367,7 @@ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 		if (sectors == 0)
+ 			badblocks_combine(bb, lo);
+ 	}
+-	while (sectors) {
+-		/* didn't merge (it all).
+-		 * Need to add a range just before 'hi'
 -		 */
--		a = BB_OFFSET(p[lo]);
--		e = a + BB_LEN(p[lo]);
--		ack = BB_ACK(p[lo]);
+-		if (bb->count >= MAX_BADBLOCKS) {
+-			/* No room for more */
+-			rv = 1;
+-			break;
+-		} else {
+-			int this_sectors = sectors;
 -
--		if (a > s) {
--			hi = lo;
--		} else if (e >= s) {
--			/* Yes, we can merge with a previous range */
--			if (s == a && s + sectors >= e)
--				/* new range covers old */
--				ack = acknowledged;
--			else
--				ack = ack && acknowledged;
+-			memmove(p + hi + 1, p + hi,
+-				(bb->count - hi) * 8);
+-			bb->count++;
 -
--			if (e < s + sectors)
--				e = s + sectors;
--			if (e - a <= BB_MAX_LEN) {
--				s = e;
--			} else {
--				/* does not all fit in one range,
--				 * make p[lo] maximal
--				 */
--				s = a + BB_MAX_LEN;
--			}
--			if (s - a != BB_LEN(p[lo]) || ack != BB_ACK(p[lo])) {
--				p[lo] = BB_MAKE(a, s - a, ack);
--				changed = true;
--			}
--			sectors = e - s;
+-			if (this_sectors > BB_MAX_LEN)
+-				this_sectors = BB_MAX_LEN;
+-			p[hi] = BB_MAKE(s, this_sectors, acknowledged);
+-			sectors -= this_sectors;
+-			s += this_sectors;
+-			hi++;
+-			changed = true;
 -		}
--		if (sectors && hi < bb->count) {
--			/* 'hi' points to the first range that starts after 's'.
--			 * Maybe we can merge with the start of that range
--			 */
--			a = BB_OFFSET(p[hi]);
--			e = a + BB_LEN(p[hi]);
--			ack = BB_ACK(p[hi]);
--
--			if (a <= s + sectors) {
--				/* merging is possible */
--				if (e <= s + sectors) {
--					/* full overlap */
--					e = s + sectors;
--					ack = acknowledged;
--				} else
--					ack = ack && acknowledged;
--
--				a = s;
--				if (e - a <= BB_MAX_LEN) {
--					p[hi] = BB_MAKE(a, e-a, ack);
--					s = e;
--				} else {
--					p[hi] = BB_MAKE(a, BB_MAX_LEN, ack);
--					s = a + BB_MAX_LEN;
--				}
--				sectors = e - s;
--				lo = hi;
--				hi++;
--				changed = true;
--			}
--		}
-+		merged_sectors = badblocks_merge(bb, s, sectors, acknowledged,
-+						 &lo, &hi, &changed);
-+		s += merged_sectors;
-+		sectors -= merged_sectors;
- 		if (sectors == 0 && hi < bb->count) {
- 			/* we might be able to combine lo and hi */
- 			/* Note: 's' is at the end of 'lo' */
+-	}
++	rv = badblocks_create(bb, s, sectors, hi, acknowledged, &changed);
+ 
+ 	if (changed) {
+ 		bb->changed = changed;
 -- 
 2.31.1
 
