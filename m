@@ -2,57 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A009DC77B7C
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 18:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DCAC77B7C
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 18:36:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229901AbjEDS1S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 14:27:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33964 "EHLO
+        id S229721AbjEDSgG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 14:36:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjEDS1R (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 14:27:17 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8E676AC
-        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 11:27:14 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-956ff2399b1so155242766b.3
-        for <linux-block@vger.kernel.org>; Thu, 04 May 2023 11:27:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683224833; x=1685816833;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=VIMgKLx654jhHRx4qIRTthK1ysjXXrrNqdoOVgSmOeE=;
-        b=qU+Ug89ilc6WN9TDAJzjO2f/60V8+1eXF/EYEp3lE+kxcCO8muY745qsFg4YsxdLhM
-         GFFdVNRZ2FzIT711c0qNXBZAs2ZsygMEjKETMcJC0wwNakwNctVl1INHAPzh7fC1LrMM
-         tsyDEWeNJvvUTUwdmwd0RVxd1f1JvD/Wjz4SlJ6JL3WtA3sYNzVrm6pWpQ0q70dMNaR/
-         HtvRLiiprdATGWlPxlk8i1r7DAaOmkgXfgl0Kk5tQAK1q5oMK7JWE4mGTEHSf7dh8bFa
-         8z7Eq1g2UFrwsaFNvu+DQNyVcJCNQnRbbFq6u8q1J6YbU3wb/U047orn+37qTQXJfP60
-         fMGg==
+        with ESMTP id S229563AbjEDSgF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 14:36:05 -0400
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D8555A8;
+        Thu,  4 May 2023 11:36:04 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-642f5394651so816854b3a.3;
+        Thu, 04 May 2023 11:36:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683224833; x=1685816833;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VIMgKLx654jhHRx4qIRTthK1ysjXXrrNqdoOVgSmOeE=;
-        b=RshogjvW67qWfHRKHKhwSJlz55qz+gd+SvUL37Eh0bw0gsDO1GSUVlQgjSuU/Zd/7a
-         MSM4mwzln7KCgLf3mgHEh2nhhekwEOoIISUyJ6GMZu7TQ/WZ4t0NjdwOcvJfAugCx7BH
-         eyyCKBskPZcBtUhBkcWI1Jv1bLrNd/yROgua/mbBm5Wue7n2kmwAVZxWAUkdS9F3vZ/L
-         IZRpLY14LdsZO290vki+nfDq0mf+IA8cSUP+AILApjzf0zNzyUDx2jlIXnS4Zkby4UMm
-         sgAebK0FS4yElyj7Gr6lBVYf3gdUaIju58Sb+eS5/93BA2B4Zx1T2fsVWHzRDqjCEMlL
-         3ihw==
-X-Gm-Message-State: AC+VfDzmg8kFYo/gkHihO4guK9LU/SM6Mkq6zLEFCST/pqG34OhV1UEW
-        BcGv6E87Vsjjtgje/rabwgteBw==
-X-Google-Smtp-Source: ACHHUZ5dFQ2scibNXes6IJDnR0tdDuJuLNmlk0EA0qORzsVLoMVrcrrTq8YUAiE1JBAp9pWLKJIeyg==
-X-Received: by 2002:a17:907:62aa:b0:961:a67:29c with SMTP id nd42-20020a17090762aa00b009610a67029cmr6647365ejc.70.1683224832922;
-        Thu, 04 May 2023 11:27:12 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id li14-20020a170907198e00b009572db67bf2sm17304971ejc.89.2023.05.04.11.27.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 May 2023 11:27:12 -0700 (PDT)
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
-User-agent: mu4e 1.10.3; emacs 28.2.50
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     Bart Van Assche <bvanassche@acm.org>
+        d=1e100.net; s=20221208; t=1683225364; x=1685817364;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6B4ouYpBn9E1mbPykalpiRSmus+k+IipP6/ASzDCUrc=;
+        b=laUaItWBDO/uoSXWGET70Pzk7p1krjmoEBJymOxJab73aym65Clug6q4CAEkQsNJS9
+         FruC0bZbYgiE+SMKFcjrkUT3GkhrjvtWT7QZZO5fI+MI7QPE8YVr5iosrTsk4qIK/X3M
+         wuWWMUzIKyhA2/aB+FYzxHJqOueIhzy8B41klAw0bupJtrdZ8smZ542novn+6gU2x0C6
+         ZBxYhst9fE4gr679BNscEjOmec8F67aOQtvJrUi4u2dDqFVI1ABxNNb6+m/GvF3sOLoS
+         0aEz9ytDVIJ+ANAIjy6JDelABA1PkfSfrWUZfqKlCsEabUmtvh8fcpZp65RxnYZyYd9t
+         30PA==
+X-Gm-Message-State: AC+VfDxPwxcyi7cP/WH3vhcLRS6BpDT1/NdUwVPeDd6MuiNzFqn2+aug
+        8sHIQPT1smva0qmX0NRzdM4=
+X-Google-Smtp-Source: ACHHUZ6JtC2DBf9wDNkfuXcg/fqrTrOGPH7OjEZei26kTEMoq0zWE/lY9ODsleAMVxJhuq/t97e2Gw==
+X-Received: by 2002:a05:6a00:2352:b0:63f:158a:6e7b with SMTP id j18-20020a056a00235200b0063f158a6e7bmr4363302pfj.6.1683225364012;
+        Thu, 04 May 2023 11:36:04 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:2c3b:81e:ce21:2437? ([2620:15c:211:201:2c3b:81e:ce21:2437])
+        by smtp.gmail.com with ESMTPSA id m22-20020aa78a16000000b0063d3d776910sm15737pfa.138.2023.05.04.11.36.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 May 2023 11:36:03 -0700 (PDT)
+Message-ID: <b9a1c1b2-3baa-2cad-31ae-8b14e4ee5709@acm.org>
+Date:   Thu, 4 May 2023 11:36:01 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [RFC PATCH 00/11] Rust null block driver
+Content-Language: en-US
+To:     Andreas Hindborg <nmi@metaspace.dk>
 Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Keith Busch <kbusch@kernel.org>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
@@ -63,59 +55,29 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Alex Gaynor <alex.gaynor@gmail.com>,
         Wedson Almeida Filho <wedsonaf@gmail.com>,
         Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?utf-8?Q?Bj?= =?utf-8?Q?=C3=B6rn?= Roy Baron 
-        <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>,
+        =?UTF-8?Q?Bj=c3=b6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
         open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 00/11] Rust null block driver
-Date:   Thu, 04 May 2023 20:15:23 +0200
-In-reply-to: <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
-Message-ID: <87jzxot0jk.fsf@metaspace.dk>
-MIME-Version: 1.0
-Content-Type: text/plain
+References: <20230503090708.2524310-1-nmi@metaspace.dk>
+ <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org> <87jzxot0jk.fsf@metaspace.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <87jzxot0jk.fsf@metaspace.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 5/4/23 11:15, Andreas Hindborg wrote:
+> If it is still unclear to you why this effort was started, please do let
+> me know and I shall try to clarify further :)
 
-Hi Bart,
+It seems like I was too polite in my previous email. What I meant is that
+rewriting code is useful if it provides a clear advantage to the users of
+a driver. For null_blk, the users are kernel developers. The code that has
+been posted is the start of a rewrite of the null_blk driver. The benefits
+of this rewrite (making low-level memory errors less likely) do not outweigh
+the risks that this effort will introduce functional or performance regressions.
 
-Bart Van Assche <bvanassche@acm.org> writes:
+Bart.
 
-> On 5/3/23 02:06, Andreas Hindborg wrote:
->> This is an early preview of a null block driver written in Rust.
->
-> It is not clear to me why this effort was started? As far as I know the null_blk
-> driver is only used by kernel developers for testing kernel changes so end users
-> are not affected by bugs in this driver. Additionally, performance of this
-> driver is critical since this driver is used to measure block layer performance.
-> Does this mean that C is a better choice than Rust for this driver?
-
-I take it you did not read the rest of the cover letter. Let me quote
-some of it here:
-
-> A null block driver is a good opportunity to evaluate Rust bindings for the
-> block layer. It is a small and simple driver and thus should be simple to reason
-> about. Further, the null block driver is not usually deployed in production
-> environments. Thus, it should be fairly straight forward to review, and any
-> potential issues are not going to bring down any production workloads.
->
-> Being small and simple, the null block driver is a good place to introduce the
-> Linux kernel storage community to Rust. This will help prepare the community for
-> future Rust projects and facilitate a better maintenance process for these
-> projects.
->
-> The statistics presented in my previous message [1] show that the C null block
-> driver has had a significant amount of memory safety related problems in the
-> past. 41% of fixes merged for the C null block driver are fixes for memory
-> safety issues. This makes the null block driver a good candidate for rewriting
-> in Rust.
-
-In relation to performance, it turns out that there is not much of a
-difference. For memory safety bugs - I think we are better off without
-them, no matter if we are user facing or not.
-
-If it is still unclear to you why this effort was started, please do let
-me know and I shall try to clarify further :)
-
-Best regards,
-Andreas
