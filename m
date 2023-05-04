@@ -2,80 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98177C77B7C
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 14:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EE1C77B78
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 15:03:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjEDOlP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 10:41:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38584 "EHLO
+        id S229681AbjEDPD4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 11:03:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230364AbjEDOlN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 10:41:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59ECE118
-        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 07:40:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683211230;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uvHjox96ToDS6v8WQFCM85pSp37qrGwYc/dcWxuXOUk=;
-        b=CTBf2F0LpnnANcefb2yk6M1zMSwsRrx4s8eHwFfXNcRJL/LkTs0twd2qKvJCc89GGoFA/N
-        KJHk8odocohtx/MWkjrWultZxdr0A+8Ca+TmzRcEiR/vGG+meFD8wZtDKnVxhglpOl16lx
-        1vZY0F0DAO15LhMuP1BmBwYqAT9yMR0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-673-K-Hn359RNia3YVI7sMxXKg-1; Thu, 04 May 2023 10:40:29 -0400
-X-MC-Unique: K-Hn359RNia3YVI7sMxXKg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7B42588B7AC;
-        Thu,  4 May 2023 14:40:28 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 62B0040BC799;
-        Thu,  4 May 2023 14:40:22 +0000 (UTC)
-Date:   Thu, 4 May 2023 22:40:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Breno Leitao <leitao@debian.org>
-Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        asml.silence@gmail.com, hch@lst.de, axboe@kernel.dk, leit@fb.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        sagi@grimberg.me, joshi.k@samsung.com, kbusch@kernel.org
-Subject: Re: [PATCH v4 3/3] io_uring: Remove unnecessary BUILD_BUG_ON
-Message-ID: <ZFPD0c2dxQT2N9+f@ovpn-8-16.pek2.redhat.com>
-References: <20230504121856.904491-1-leitao@debian.org>
- <20230504121856.904491-4-leitao@debian.org>
+        with ESMTP id S230007AbjEDPDz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:03:55 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63802212D;
+        Thu,  4 May 2023 08:03:53 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-965cc5170bdso15742466b.2;
+        Thu, 04 May 2023 08:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683212632; x=1685804632;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PZPwucIW5GqDao1eoawq4R9XIujOBKLVJb6Au+5ZDSc=;
+        b=gMEnOLVhFevCkTaFlzLDRn9DF2WZ755pRUNhY+AQ3DVxSPSeHj3FKAHKoLHcEX9u51
+         npPKzWX1r3ElINBDxyLofVS37AKuZgSA6P77vFZSjLiEOGOUZ9fGPFBRGUcRTDXBe5ex
+         kjKs9i5zQvyy96wdlgTg2cgU3egROci/oom5qnaScJavK92TfjiK1bsEYn79zr8nBu64
+         PJj8dAYaFLE3LtxEleo2p++bg5zr3kCnTx4u3/YcQRlYMG9IeOD2RXsgpjklKs+uTXXk
+         aMgLrwfdU/j1PPMHV/cKKvchslR3O6D3g7+fQiIB+M5hNGgnMvUujt3nIF6CmbKGF4gJ
+         ZB/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683212632; x=1685804632;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PZPwucIW5GqDao1eoawq4R9XIujOBKLVJb6Au+5ZDSc=;
+        b=XADHHZXDOnwOoZ2EJTU7P2RfEJ6+GkO2151ROcFT9E9L34bvVFLyDl/PPcwhZb8rDp
+         Yab05SMB6xxQ+ZgHsKNXE0JOtNI/xT+TtUI/xnXHciUwn+f2a9EsT9EBPbn5er1YnHb7
+         G3kT9uOS76Lg4ZeTMkFFZfr57fxYTXi4dULHPAgmki02DzvhEjj8Gmoz/X8jEx8+HnVP
+         c0GIosJ/2XnyE1IQJLzLDgwhr7YI6MDuz08yXNV45s2N4/P4rVafa3t4ScCeOm8r1Ml0
+         FUvUT6h6/6RTyp+Kx4tlZtZzaQ0Glc5SinOZnmXP5ttyt1JVfgZ87POEAdSgCtFMfdSS
+         5weQ==
+X-Gm-Message-State: AC+VfDwZ+IVRluW8vvAxPhhPmfOzAzzj6fmA8IPiLM+OqmLKaUd7DfBA
+        IhTArYechL/OxM+BFMQoyfpRdehhs5zq9BSUtNXer+KGqDc=
+X-Google-Smtp-Source: ACHHUZ6+pFPSVk8eLdnfGAvJL57sEpRld3od1iv76xPflK+h+u0BJpwACepLkSUNo9C5c6y1Hgi4AkoWAVSpfuLaeSQ=
+X-Received: by 2002:a17:907:60d3:b0:956:f4f8:23b6 with SMTP id
+ hv19-20020a17090760d300b00956f4f823b6mr8070180ejc.43.1683212631746; Thu, 04
+ May 2023 08:03:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230504121856.904491-4-leitao@debian.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+References: <20230504105624.9789-1-idryomov@gmail.com> <20230504135515.GA17048@lst.de>
+In-Reply-To: <20230504135515.GA17048@lst.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Thu, 4 May 2023 17:03:39 +0200
+Message-ID: <CAOi1vP9Zit-A9rRk9jy+d1itaBzUSBzFBuhXE+EDfBtF-Mf0og@mail.gmail.com>
+Subject: Re: [PATCH] mm: always respect QUEUE_FLAG_STABLE_WRITES on the block device
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 04, 2023 at 05:18:56AM -0700, Breno Leitao wrote:
-> In the io_uring_cmd_prep_async() there is an unnecessary compilation time
-> check to check if cmd is correctly placed at field 48 of the SQE.
-> 
-> This is unnecessary, since this check is already in place at
-> io_uring_init():
-> 
->           BUILD_BUG_SQE_ELEM(48, __u64,  addr3);
-> 
-> Remove it and the uring_cmd_pdu_size() function, which is not used
-> anymore.
-> 
-> Keith started a discussion about this topic in the following thread:
-> Link: https://lore.kernel.org/lkml/ZDBmQOhbyU0iLhMw@kbusch-mbp.dhcp.thefacebook.com/
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+On Thu, May 4, 2023 at 3:55=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrote=
+:
+>
+> On Thu, May 04, 2023 at 12:56:24PM +0200, Ilya Dryomov wrote:
+> > Commit 1cb039f3dc16 ("bdi: replace BDI_CAP_STABLE_WRITES with a queue
+> > and a sb flag") introduced a regression for the raw block device use
+> > case.  Capturing QUEUE_FLAG_STABLE_WRITES flag in set_bdev_super() has
+> > the effect of respecting it only when there is a filesystem mounted on
+> > top of the block device.  If a filesystem is not mounted, block devices
+> > that do integrity checking return sporadic checksum errors.
+>
+> With "If a file system is not mounted" you want to say "when accessing
+> a block device directly" here, right?  The two are not exclusive..
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Hi Christoph,
+
+Right, I meant to say "when accessing a block device directly".
+
+>
+> > Additionally, this commit made the corresponding sysfs knob writeable
+> > for debugging purposes.  However, because QUEUE_FLAG_STABLE_WRITES flag
+> > is captured when the filesystem is mounted and isn't consulted after
+> > that anywhere outside of swap code, changing it doesn't take immediate
+> > effect even though dumping the knob shows the new value.  With no way
+> > to dump SB_I_STABLE_WRITES flag, this is needlessly confusing.
+>
+> But very much intentional.  s_bdev often is not the only device
+> in a file system, and we should never reference if from core
+> helpers.
+>
+> So I think we should go with something like this:
+>
+> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> index db794399900734..aa36cc2a4530c1 100644
+> --- a/mm/page-writeback.c
+> +++ b/mm/page-writeback.c
+> @@ -3129,7 +3129,11 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable);
+>   */
+>  void folio_wait_stable(struct folio *folio)
+>  {
+> -       if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
+> +       struct inode *inode =3D folio_inode(folio);
+> +       struct super_block *sb =3D inode->i_sb;
+> +
+> +       if ((sb->s_iflags & SB_I_STABLE_WRITES) ||
+> +           (sb_is_blkdev_sb(sb) && bdev_stable_writes(I_BDEV(inode))))
+>                 folio_wait_writeback(folio);
+
+Heh, this is almost exactly what I came up with initially (|| arms were
+swapped in that version), but decided to improve upon after noticing the
+writeable thing.
 
 Thanks,
-Ming
 
+                Ilya
