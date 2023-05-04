@@ -2,46 +2,46 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6046AC7EE25
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 19:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F04C7EE29
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 19:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231627AbjEDTv1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 15:51:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59320 "EHLO
+        id S231651AbjEDT4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 15:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231675AbjEDTuY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 15:50:24 -0400
+        with ESMTP id S232331AbjEDTzr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 15:55:47 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FD01150C9;
-        Thu,  4 May 2023 12:46:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF84C1CFE2;
+        Thu,  4 May 2023 12:49:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 704F063760;
-        Thu,  4 May 2023 19:45:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19900C4339C;
-        Thu,  4 May 2023 19:45:47 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A8D7637CB;
+        Thu,  4 May 2023 19:47:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10D2AC433D2;
+        Thu,  4 May 2023 19:47:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229547;
-        bh=axbYXRAUk+poSDWHixDsyOe2w46J3APLkOG+w5P8uVg=;
+        s=k20201202; t=1683229667;
+        bh=4y7pOBGCYDjIbIf9y/Y4h8+y9QfTW9ujHRZ0qgN4S/k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nU0XIv1VzsG+kcn0ulFgWtxhxeqQGptHV1zASYYrzBQOwPkbXl9il7JgnM22RSd5B
-         Jj1mBxUMeowhLBWTBBR0+hTXmzbLlzTVWBd5ff0ESlSoJOCg1bG+kcRnFBQat93Iv0
-         ZZBRO/1VlXb1wPHRMkRnaTy+BkPtx1DmqcMoGmh/Hh9q4Heh93UT5ZLVlS3kBukQOP
-         jdr8InAbpI3PH3rdD+uhyKDWegzY7EbvpVywdIuTmft2BhobBd+adQ7dCQcupLLx6u
-         cXkFLs5XRfSWvrZ34VnWmnZe0wQqV9lyRHlGCyKEHOU6MHUVPv7EDeVXJmupXkhEIY
-         MF8KHvgz7sflw==
+        b=iK3Up/gnNn/pCHA0NkimwnR7kr1pdrWO7jB2JHXpvJOiasaOfTd3E6OPQ3LdN9lrK
+         BP0kGBbLpO0sfW5OqIIXeAkuEL39Fhtf/gLUnFzFC/wyO4BT7v3fWks53Fq1ofy4L5
+         PD2UMStNGGmBHEZsujbsSSMx1r+/0CQkD+JykGez4iYfWtlVcsxriITw6jVz523Aez
+         rVeqUeSS1NAO7j3MIHiKjikPmQcg7fmwZ12MXmVCVVkIxVrDEa2cusvo2AeqLQdmFX
+         0X656v6+MGvobeWq1tdhQDkE/h/dTwVkyE0bqEYAUbm1EIL84Iox10mjWILDbXK/+N
+         C6LlWGox84Awg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Colin Ian King <colin.i.king@gmail.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         paolo.valente@linaro.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.2 35/53] block, bfq: Fix division by zero error on zero wsum
-Date:   Thu,  4 May 2023 15:43:55 -0400
-Message-Id: <20230504194413.3806354-35-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 32/49] block, bfq: Fix division by zero error on zero wsum
+Date:   Thu,  4 May 2023 15:46:09 -0400
+Message-Id: <20230504194626.3807438-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230504194413.3806354-1-sashal@kernel.org>
-References: <20230504194413.3806354-1-sashal@kernel.org>
+In-Reply-To: <20230504194626.3807438-1-sashal@kernel.org>
+References: <20230504194626.3807438-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -112,7 +112,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 380e9bda2e57c..8a12a874bde8e 100644
+index ff9d238894157..52eb79d60a3f3 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
 @@ -637,6 +637,8 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
