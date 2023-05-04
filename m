@@ -2,86 +2,62 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA64C77B7C
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 16:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1757EC7EE21
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 16:17:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230039AbjEDQAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 12:00:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35872 "EHLO
+        id S229530AbjEDQQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 12:16:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbjEDP77 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:59:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A7DB468B;
-        Thu,  4 May 2023 08:59:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C34A4626FF;
-        Thu,  4 May 2023 15:59:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F61EC433D2;
-        Thu,  4 May 2023 15:59:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683215995;
-        bh=FBaesmDueThgzce1AGXwzBYeheoMfDTnfkfXOq6hmkQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=O6vIlkM6jH9hdIbBTD5WahjazhJLSIoImfHG90DvPIb2qNO7tn3CEfHYd1ASraeUQ
-         ce3sWdSjQD2NlVAbqsoR7rlRMggbeKTLJf2WDHZaR6Am3yx8MMYYBG+S4PW/jgc3ZS
-         HVqT/jsnKTSn0bHsF3phyZEtsJKFTm9WgAxHbmvs7KywT1FMXYDJ6JHEL2SrDdvLXH
-         642WKkofFkrUhxEF0NrcttDNFOrw0mW6DhiA2981Urtt2/8eyshs3hpQayzVG0PTGC
-         3+I+YOdb4QTWf1tzorXtLSO0O2Y5u6i/3WVLxe4OvyBDFoFOS3tAmiD0zAqiSf2gj0
-         BxEyBBQrUflOA==
-Date:   Thu, 4 May 2023 09:59:52 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
+        with ESMTP id S229564AbjEDQQ6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 12:16:58 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C84981FC3;
+        Thu,  4 May 2023 09:16:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zFZTZFGHSAaSaRqnlF9L7Mtetmpu66yO8W+jO7gZ4I8=; b=j9+9AV0iknIZd5Bxy8jMMN7joo
+        KgIOfrpe2djpey8XRz8Eb3d3iK4yT0wVCClkbuOK/N5PBQrKLEHoZabloBoe7IzblwMeik9NylOl4
+        06FlUKctHO5+LU9jWJOHJolNiRBJx1oWezv7u9WvXW2eqCvtEBVwjga8j/oh7a/ZtmfOutpjP2Eia
+        xqUnK5byNVUUH2iVpxBg7ORKCYWZUm+zyWJiFdE2x9AxfblMmMSyPFOk63OWz1PE6lL3io2wHK2UF
+        sT9PQjNjCR60MlYbGjiBfceJ+YnxuOP1f8Dff1k8Q2b9VA88H3R9MCTbN6QsvAmVeV5iP8qW/vffd
+        +PfS0YdQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pubdQ-00Akfm-Hg; Thu, 04 May 2023 16:16:48 +0000
+Date:   Thu, 4 May 2023 17:16:48 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Ilya Dryomov <idryomov@gmail.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Zhang Yi <yi.zhang@redhat.com>
-Subject: Re: [ext4 io hang] buffered write io hang in balance_dirty_pages
-Message-ID: <ZFPWeOg5xJ7CbCD0@kbusch-mbp.dhcp.thefacebook.com>
-References: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mm: always respect QUEUE_FLAG_STABLE_WRITES on the block
+ device
+Message-ID: <ZFPacOW6XMq+o4YU@casper.infradead.org>
+References: <20230504105624.9789-1-idryomov@gmail.com>
+ <20230504135515.GA17048@lst.de>
+ <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
+ <20230504155556.t6byee6shgb27pw5@quack3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZEnb7KuOWmu5P+V9@ovpn-8-24.pek2.redhat.com>
+In-Reply-To: <20230504155556.t6byee6shgb27pw5@quack3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 27, 2023 at 10:20:28AM +0800, Ming Lei wrote:
-> Hello Guys,
-> 
-> I got one report in which buffered write IO hangs in balance_dirty_pages,
-> after one nvme block device is unplugged physically, then umount can't
-> succeed.
-> 
-> Turns out it is one long-term issue, and it can be triggered at least
-> since v5.14 until the latest v6.3.
-> 
-> And the issue can be reproduced reliably in KVM guest:
-> 
-> 1) run the following script inside guest:
-> 
-> mkfs.ext4 -F /dev/nvme0n1
-> mount /dev/nvme0n1 /mnt
-> dd if=/dev/zero of=/mnt/z.img&
-> sleep 10
-> echo 1 > /sys/block/nvme0n1/device/device/remove
-> 
-> 2) dd hang is observed and /dev/nvme0n1 is gone actually
+On Thu, May 04, 2023 at 05:55:56PM +0200, Jan Kara wrote:
+> For bdev address_space that's easy but what Ilya also mentioned is a
+> problem when 'stable_write' flag gets toggled on the device and in that
+> case having to propagate the flag update to all the address_space
+> structures is a nightmare...
 
-Sorry to jump in so late.
-
-For an ungraceful nvme removal, like a surpirse hot unplug, the driver
-sets the capacity to 0 and that effectively ends all dirty page writers
-that could stall forward progress on the removal. And that 0 capacity
-should also cause 'dd' to exit.
-
-But this is not an ungraceful removal, so we're not getting that forced
-behavior. Could we use the same capacity trick here after flushing any
-outstanding dirty pages?
+We have a number of flags which don't take effect when modified on a
+block device with a mounted filesystem on it.  For example, modifying
+the readahead settings do not change existing files, only new ones.
+Since this flag is only modifiable for debugging purposes, I think I'm
+OK with it not affecting already-mounted filesystems.  It feels like a
+decision that reasonable people could disagree on, though.
