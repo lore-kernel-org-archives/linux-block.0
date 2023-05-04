@@ -2,59 +2,60 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EE1C77B78
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 15:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F42C7EE23
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 15:07:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjEDPD4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 11:03:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57866 "EHLO
+        id S230492AbjEDPH0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 11:07:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230007AbjEDPDz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:03:55 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63802212D;
-        Thu,  4 May 2023 08:03:53 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-965cc5170bdso15742466b.2;
-        Thu, 04 May 2023 08:03:53 -0700 (PDT)
+        with ESMTP id S230495AbjEDPHZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:07:25 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1394110D8;
+        Thu,  4 May 2023 08:07:24 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-50bd37ca954so18305342a12.0;
+        Thu, 04 May 2023 08:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683212632; x=1685804632;
+        d=gmail.com; s=20221208; t=1683212842; x=1685804842;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PZPwucIW5GqDao1eoawq4R9XIujOBKLVJb6Au+5ZDSc=;
-        b=gMEnOLVhFevCkTaFlzLDRn9DF2WZ755pRUNhY+AQ3DVxSPSeHj3FKAHKoLHcEX9u51
-         npPKzWX1r3ElINBDxyLofVS37AKuZgSA6P77vFZSjLiEOGOUZ9fGPFBRGUcRTDXBe5ex
-         kjKs9i5zQvyy96wdlgTg2cgU3egROci/oom5qnaScJavK92TfjiK1bsEYn79zr8nBu64
-         PJj8dAYaFLE3LtxEleo2p++bg5zr3kCnTx4u3/YcQRlYMG9IeOD2RXsgpjklKs+uTXXk
-         aMgLrwfdU/j1PPMHV/cKKvchslR3O6D3g7+fQiIB+M5hNGgnMvUujt3nIF6CmbKGF4gJ
-         ZB/g==
+        bh=9WFS1x47blclBXskP77nCF58D51Rpg9+wJAmzlYQmRk=;
+        b=iOENyJgHIcqMP2+ca+2v80DT2ibR3iO9OVec9sAfKp7iLNAEq9mujvSiuMFX0BeHxf
+         FXeeGNJEllsKwvy5a7JoPvL5PkZDu7W3NmC/C+73rZwfW4xKcrl2OUlXbzgVBx9jb5s5
+         3zmGR16y/wilEY8jd7r7+vccxMYIjQq9Gr8pKGIXxn+nE11U6nj5XCsdwj97PPQkmqYt
+         F8RnwS5MsdoCAwdzSCN2vL5FoakB8av51upu1FZinjJDEwDrPYO0+Wzm/oJWGSjScrVQ
+         QptWn+fjuB0LzpTlL4bdxjJ9Vm9todUZ0BCPONAUOiMTsuJBDn82A34/N137dRuh+b6F
+         Mawg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683212632; x=1685804632;
+        d=1e100.net; s=20221208; t=1683212842; x=1685804842;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PZPwucIW5GqDao1eoawq4R9XIujOBKLVJb6Au+5ZDSc=;
-        b=XADHHZXDOnwOoZ2EJTU7P2RfEJ6+GkO2151ROcFT9E9L34bvVFLyDl/PPcwhZb8rDp
-         Yab05SMB6xxQ+ZgHsKNXE0JOtNI/xT+TtUI/xnXHciUwn+f2a9EsT9EBPbn5er1YnHb7
-         G3kT9uOS76Lg4ZeTMkFFZfr57fxYTXi4dULHPAgmki02DzvhEjj8Gmoz/X8jEx8+HnVP
-         c0GIosJ/2XnyE1IQJLzLDgwhr7YI6MDuz08yXNV45s2N4/P4rVafa3t4ScCeOm8r1Ml0
-         FUvUT6h6/6RTyp+Kx4tlZtZzaQ0Glc5SinOZnmXP5ttyt1JVfgZ87POEAdSgCtFMfdSS
-         5weQ==
-X-Gm-Message-State: AC+VfDwZ+IVRluW8vvAxPhhPmfOzAzzj6fmA8IPiLM+OqmLKaUd7DfBA
-        IhTArYechL/OxM+BFMQoyfpRdehhs5zq9BSUtNXer+KGqDc=
-X-Google-Smtp-Source: ACHHUZ6+pFPSVk8eLdnfGAvJL57sEpRld3od1iv76xPflK+h+u0BJpwACepLkSUNo9C5c6y1Hgi4AkoWAVSpfuLaeSQ=
-X-Received: by 2002:a17:907:60d3:b0:956:f4f8:23b6 with SMTP id
- hv19-20020a17090760d300b00956f4f823b6mr8070180ejc.43.1683212631746; Thu, 04
- May 2023 08:03:51 -0700 (PDT)
+        bh=9WFS1x47blclBXskP77nCF58D51Rpg9+wJAmzlYQmRk=;
+        b=fZ65Y5OEbsFJMwzGVqWwsyFY5M/I5F/dQ4DT2AktfFu3BVmH6M2+Kt2jp0cUNMbXY7
+         /2xl/maGhb49/Yyjm2le/6V3eFLxr7L+HPdlSvdx8Z014j6AtkoX4vJN6ZWbQ3VJOb/5
+         62ZC6BqxwGcKdX6DoYNQbbTUDTG8Z3AW7bcfmeB2I4unBbGYFnXzeg43uuqjlK1N2hiq
+         8aCmBzt9gUVv65R4RU11hObHnm+D6Vuou6PQSE1uNTxCpDEPifgMtdrA3UP9TZZOcJ/v
+         fHTDZ7U16h6BHegsn3H43G+UI0BUNWT6GRlPj94edLiQw31yfCsHbI85SkW+vk+ADlJP
+         2kDw==
+X-Gm-Message-State: AC+VfDxxiqgA0PxKKrRqpuMUaLLCVRadcrhrHmy6WY3PrCT9CdYI6K+i
+        oaf3OQ2OPS9pH9ovj8oUaTtQcUZ5dIK76Kg8q5U=
+X-Google-Smtp-Source: ACHHUZ4EZmZqjOJWc+m9y3XiZVF1YH6IrfUtVWGSTRu5Mvda+qI8kMR4AtvmrTycSugn84PacQcC4fD2dgIHHkhmutU=
+X-Received: by 2002:a17:906:9746:b0:960:ddba:e5bf with SMTP id
+ o6-20020a170906974600b00960ddbae5bfmr5322943ejy.0.1683212842404; Thu, 04 May
+ 2023 08:07:22 -0700 (PDT)
 MIME-Version: 1.0
 References: <20230504105624.9789-1-idryomov@gmail.com> <20230504135515.GA17048@lst.de>
-In-Reply-To: <20230504135515.GA17048@lst.de>
+ <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
+In-Reply-To: <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
 From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Thu, 4 May 2023 17:03:39 +0200
-Message-ID: <CAOi1vP9Zit-A9rRk9jy+d1itaBzUSBzFBuhXE+EDfBtF-Mf0og@mail.gmail.com>
+Date:   Thu, 4 May 2023 17:07:10 +0200
+Message-ID: <CAOi1vP_sEab6A3hsdZbVjvOXzWgFBJzrBZ4o9zNr7TT6fivTQg@mail.gmail.com>
 Subject: Re: [PATCH] mm: always respect QUEUE_FLAG_STABLE_WRITES on the block device
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>,
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
@@ -65,57 +66,74 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 4, 2023 at 3:55=E2=80=AFPM Christoph Hellwig <hch@lst.de> wrote=
-:
+On Thu, May 4, 2023 at 4:16=E2=80=AFPM Matthew Wilcox <willy@infradead.org>=
+ wrote:
 >
-> On Thu, May 04, 2023 at 12:56:24PM +0200, Ilya Dryomov wrote:
-> > Commit 1cb039f3dc16 ("bdi: replace BDI_CAP_STABLE_WRITES with a queue
-> > and a sb flag") introduced a regression for the raw block device use
-> > case.  Capturing QUEUE_FLAG_STABLE_WRITES flag in set_bdev_super() has
-> > the effect of respecting it only when there is a filesystem mounted on
-> > top of the block device.  If a filesystem is not mounted, block devices
-> > that do integrity checking return sporadic checksum errors.
+> On Thu, May 04, 2023 at 03:55:15PM +0200, Christoph Hellwig wrote:
+> > On Thu, May 04, 2023 at 12:56:24PM +0200, Ilya Dryomov wrote:
+> > > Commit 1cb039f3dc16 ("bdi: replace BDI_CAP_STABLE_WRITES with a queue
+> > > and a sb flag") introduced a regression for the raw block device use
+> > > case.  Capturing QUEUE_FLAG_STABLE_WRITES flag in set_bdev_super() ha=
+s
+> > > the effect of respecting it only when there is a filesystem mounted o=
+n
+> > > top of the block device.  If a filesystem is not mounted, block devic=
+es
+> > > that do integrity checking return sporadic checksum errors.
+> >
+> > With "If a file system is not mounted" you want to say "when accessing
+> > a block device directly" here, right?  The two are not exclusive..
+> >
+> > > Additionally, this commit made the corresponding sysfs knob writeable
+> > > for debugging purposes.  However, because QUEUE_FLAG_STABLE_WRITES fl=
+ag
+> > > is captured when the filesystem is mounted and isn't consulted after
+> > > that anywhere outside of swap code, changing it doesn't take immediat=
+e
+> > > effect even though dumping the knob shows the new value.  With no way
+> > > to dump SB_I_STABLE_WRITES flag, this is needlessly confusing.
+> >
+> > But very much intentional.  s_bdev often is not the only device
+> > in a file system, and we should never reference if from core
+> > helpers.
+> >
+> > So I think we should go with something like this:
+> >
+> > diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> > index db794399900734..aa36cc2a4530c1 100644
+> > --- a/mm/page-writeback.c
+> > +++ b/mm/page-writeback.c
+> > @@ -3129,7 +3129,11 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable)=
+;
+> >   */
+> >  void folio_wait_stable(struct folio *folio)
+> >  {
+> > -     if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
+> > +     struct inode *inode =3D folio_inode(folio);
+> > +     struct super_block *sb =3D inode->i_sb;
+> > +
+> > +     if ((sb->s_iflags & SB_I_STABLE_WRITES) ||
+> > +         (sb_is_blkdev_sb(sb) && bdev_stable_writes(I_BDEV(inode))))
+> >               folio_wait_writeback(folio);
+> >  }
+> >  EXPORT_SYMBOL_GPL(folio_wait_stable);
 >
-> With "If a file system is not mounted" you want to say "when accessing
-> a block device directly" here, right?  The two are not exclusive..
-
-Hi Christoph,
-
-Right, I meant to say "when accessing a block device directly".
-
+> I hate both of these patches ;-)  What we should do is add
+> AS_STABLE_WRITES, have the appropriate places call
+> mapping_set_stable_writes() and then folio_wait_stable() becomes
 >
-> > Additionally, this commit made the corresponding sysfs knob writeable
-> > for debugging purposes.  However, because QUEUE_FLAG_STABLE_WRITES flag
-> > is captured when the filesystem is mounted and isn't consulted after
-> > that anywhere outside of swap code, changing it doesn't take immediate
-> > effect even though dumping the knob shows the new value.  With no way
-> > to dump SB_I_STABLE_WRITES flag, this is needlessly confusing.
->
-> But very much intentional.  s_bdev often is not the only device
-> in a file system, and we should never reference if from core
-> helpers.
->
-> So I think we should go with something like this:
->
-> diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-> index db794399900734..aa36cc2a4530c1 100644
-> --- a/mm/page-writeback.c
-> +++ b/mm/page-writeback.c
-> @@ -3129,7 +3129,11 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable);
->   */
->  void folio_wait_stable(struct folio *folio)
->  {
-> -       if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
-> +       struct inode *inode =3D folio_inode(folio);
-> +       struct super_block *sb =3D inode->i_sb;
-> +
-> +       if ((sb->s_iflags & SB_I_STABLE_WRITES) ||
-> +           (sb_is_blkdev_sb(sb) && bdev_stable_writes(I_BDEV(inode))))
+>         if (mapping_test_stable_writes(folio->mapping))
 >                 folio_wait_writeback(folio);
+>
+> and we remove all the dereferences (mapping->host->i_sb->s_iflags, plus
+> whatever else is going on there)
 
-Heh, this is almost exactly what I came up with initially (|| arms were
-swapped in that version), but decided to improve upon after noticing the
-writeable thing.
+Hi Matthew,
+
+We would still need something resembling Christoph's suggestion for
+5.10 and 5.15 (at least).  Since this fixes a regression, would you
+support merging the "ugly" version to facilitate backports or would
+you rather see the AS/mapping-based refactor first?
 
 Thanks,
 
