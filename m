@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D987C77B7C
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 06:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F44C7EE21
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 06:25:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229463AbjEDGKs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 02:10:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35500 "EHLO
+        id S229741AbjEDGZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 02:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbjEDGKq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 02:10:46 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CD8199E
-        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 23:10:42 -0700 (PDT)
-Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230504061038epoutp0470ae0f9b7444d7345102a02cf75f3610~b299tDt1w1422114221epoutp04X
-        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 06:10:38 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230504061038epoutp0470ae0f9b7444d7345102a02cf75f3610~b299tDt1w1422114221epoutp04X
+        with ESMTP id S229659AbjEDGZj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 02:25:39 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57532702
+        for <linux-block@vger.kernel.org>; Wed,  3 May 2023 23:25:30 -0700 (PDT)
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230504062527epoutp01f7b43e803a6ce2460245d4eb6b9f2803~b3K5yRpbh0653106531epoutp010
+        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 06:25:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230504062527epoutp01f7b43e803a6ce2460245d4eb6b9f2803~b3K5yRpbh0653106531epoutp010
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1683180638;
-        bh=QCvAmyCOO0yQekvWMKoMa/dRCsFci6z3u0mMgFz9QSE=;
+        s=mail20170921; t=1683181527;
+        bh=CkrMcGl++5RN8VR33y1VxUdx45B7GEdN0Z3RKYEynTU=;
         h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=P/unouWOkggE6I/4srB/L7vRXXG3wjhiPjefGyo5FytFoEl9huT5mfl9kPqH5o8ei
-         X1TyhpOWMm9o/dLaNw3FOeOjnF6FGhpIbADF+Pq0ITTBZJfVrnu94RRGwWpRhZEyAI
-         G96tG0O8O/RLSI7MDAtKa9BDpzGq/PPqDxzoi9UI=
+        b=Jy83nE5+QIGi7vsGveFVD18Jv3ywqhFVU5c5iIr5KZHsJE19Wgo01aXFHO5hkv1gK
+         pZFVFFcBQepfvW19sttbY4pa8TlG9CpgaZlvY52hFFsIfUqy97DB0ME+vm/d7qrqvR
+         PTWiVDCHkLN6yrk6kJVj9J+2SIlARi9mx6w/N3AA=
 Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20230504061038epcas2p1ce1663023e6822612fbf2a20e83f0a41~b299fm-cH1736417364epcas2p1K;
-        Thu,  4 May 2023 06:10:38 +0000 (GMT)
-Received: from epsmges2p1.samsung.com (unknown [182.195.36.70]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4QBk2P60zpz4x9QB; Thu,  4 May
-        2023 06:10:37 +0000 (GMT)
-X-AuditID: b6c32a45-6d1fd70000020cc1-76-64534c5cd5b5
-Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
-        epsmges2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        69.10.03265.C5C43546; Thu,  4 May 2023 15:10:36 +0900 (KST)
+        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
+        20230504062527epcas2p3409cd3a1ded723ed3294dc8616d34093~b3K5jqSLK3146031460epcas2p3j;
+        Thu,  4 May 2023 06:25:27 +0000 (GMT)
+Received: from epsmges2p4.samsung.com (unknown [182.195.36.90]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4QBkMV6vGlz4x9Px; Thu,  4 May
+        2023 06:25:26 +0000 (GMT)
+X-AuditID: b6c32a48-475ff70000005998-da-64534fd571e8
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        07.79.22936.5DF43546; Thu,  4 May 2023 15:25:25 +0900 (KST)
 Mime-Version: 1.0
-Subject: RE:(2) [PATCH 05/15] block: fix not to apply bip information in
- blk_rq_bio_prep()
+Subject: RE:(2) [PATCH 01/15] block: bio: rename page_is_mergeable to
+ bio_page_is_mergeable and make non-static
 Reply-To: j-young.choi@samsung.com
 Sender: Jinyoung CHOI <j-young.choi@samsung.com>
 From:   Jinyoung CHOI <j-young.choi@samsung.com>
@@ -49,58 +49,58 @@ CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 X-Priority: 3
 X-Content-Kind-Code: NORMAL
-In-Reply-To: <20230503155745.GD31700@lst.de>
+In-Reply-To: <20230503155238.GA31700@lst.de>
 X-CPGS-Detection: blocking_info_exchange
 X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20230504061036epcms2p105ced86705b4b0dc2cf62c6b0d7115a0@epcms2p1>
-Date:   Thu, 04 May 2023 15:10:36 +0900
-X-CMS-MailID: 20230504061036epcms2p105ced86705b4b0dc2cf62c6b0d7115a0
+Message-ID: <20230504062424epcms2p2c32b61597200ed673f528dece82966b7@epcms2p2>
+Date:   Thu, 04 May 2023 15:24:24 +0900
+X-CMS-MailID: 20230504062424epcms2p2c32b61597200ed673f528dece82966b7
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 X-CPGSPASS: Y
 X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrJKsWRmVeSWpSXmKPExsWy7bCmqW6sT3CKwZYYi9V3+9ksXh7StFi5
-        +iiTxd5b2haXd81hs1h+/B+TA5vH5bOlHrtvNrB5fHx6i8Wjb8sqRo/Pm+QCWKOybTJSE1NS
-        ixRS85LzUzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTdMnOAtisplCXmlAKFAhKL
-        i5X07WyK8ktLUhUy8otLbJVSC1JyCswL9IoTc4tL89L18lJLrAwNDIxMgQoTsjN+969nKrjK
-        WtHU+Yy9gXEtaxcjJ4eEgIlEf+8qpi5GLg4hgR2MEhP2HWDrYuTg4BUQlPi7QxikRlggRuLR
-        6QdMILaQgJLEuTWzGEFKhAUMJG71moOE2QT0JH4umQHWKSIgK3FlRT3IRGaBJ4wSm1fOZ4NY
-        xSsxo/0pC4QtLbF9+VZGEJtTQEfi6c5dzBBxDYkfy3qhbFGJm6vfssPY74/NZ4SwRSRa752F
-        qhGUePBzN1RcUuLQoa9gN0gI5EtsOBAIEa6ReLv8AFSJvsS1jo1gJ/AK+Er8+jUP7CsWAVWJ
-        c8e+QkPEReL6rbVgcWYBbYllC18zg4xkFtCUWL9LH2K6ssSRWywQFXwSHYf/ssM82LDxN1b2
-        jnlPmCBa1SQWNRlNYFSehQjkWUhWzUJYtYCReRWjWGpBcW56arFRgSE8XpPzczcxgtOglusO
-        xslvP+gdYmTiYDzEKMHBrCTC+6HQL0WINyWxsiq1KD++qDQntfgQoynQkxOZpUST84GJOK8k
-        3tDE0sDEzMzQ3MjUwFxJnFfa9mSykEB6YklqdmpqQWoRTB8TB6dUAxP/rNWsWn+NUi9Lp3w4
-        f0J+/q6Lf6fv068//YQ5Yv7MbPPzNlsrpnz4Xr1qo4S6ywoOZTWjB1G7GQ5M5ctfNV86WPO5
-        ZKQtn4L2wd8vBb4sSlqxr0Z49e0366uaIyMDbqYrZWgzHC94/Wzp/8sSJTJ/Jacv3pKxTuhc
-        gthCxgjumtgZtpYJNgY/RBpimOwMjfaZ+17N3HY3rNa/97npNUW3uHcs0yfeEYl6xr8s7Nqk
-        oKNSM36zXzjecE491Kex48iMOr4DousKDsWmvMn1vT5V3/5Qy0ROjW0SO8V3vTfIPVt9Y9sZ
-        TY64s3GJJg9n8Fns2aea++q8doKUZ9z+X08WLz7mF3TdXcuZ4cdr+V1KLMUZiYZazEXFiQDl
-        ZaYcDAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrBKsWRmVeSWpSXmKPExsWy7bCmue5V/+AUgy23rS1W3+1ns3h5SNNi
+        5eqjTBZ7b2lbXN41h81i+fF/TA5sHpfPlnrsvtnA5vHx6S0Wj74tqxg9Pm+SC2CNyrbJSE1M
+        SS1SSM1Lzk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQdcvMAVqvpFCWmFMKFApI
+        LC5W0rezKcovLUlVyMgvLrFVSi1IySkwL9ArTswtLs1L18tLLbEyNDAwMgUqTMjOWNAgUXCB
+        rWLTiWnMDYwb2LoYOTkkBEwkzhw5x9LFyMUhJLCDUeLops2MXYwcHLwCghJ/dwiD1AgLFEpM
+        /dLOCGILCShJnFszC6xEWMBA4lavOUiYTUBP4ueSGWwgYREBWYkrK+pBJjILPGGU2LxyPtQq
+        XokZ7U9ZIGxpie3Lt4KN5BTQkbg5+QEzRFxD4seyXihbVOLm6rfsMPb7Y/MZIWwRidZ7Z6Fq
+        BCUe/NwNFZeUOHToK9gNEgL5EhsOBEKEayTeLj8AVaIvca1jI9gJvAK+ErfXPAE7jUVAVWL2
+        3U3sEK0uEl+2aoCEmQW0JZYtfM0MEmYW0JRYv0sfokJZ4sgtFogKPomOw3/ZYf5r2PgbK3vH
+        vCdMEK1qEouajCYwKs9ChPEsJKtmIaxawMi8ilEstaA4Nz212KjABB6ryfm5mxjBSVDLYwfj
+        7Lcf9A4xMnEwHmKU4GBWEuH9UOiXIsSbklhZlVqUH19UmpNafIjRFOjHicxSosn5wDScVxJv
+        aGJpYGJmZmhuZGpgriTO+7FDOUVIID2xJDU7NbUgtQimj4mDU6qBaf4TXdU9ycyH7y2Y/bWg
+        0cU4xu/ynodT5GZ15Djz/vcRr57zgT1novVOwxCV+1Hn1b8HVUwtDNKRPvrDKOnAE52On3P6
+        XhjrP7jxacMq5eXZc8I4Hu9+tilyveOH+fNfR508t+THitccheaRtU8dim9tcHg6a6ET1y/L
+        U6ZPO34z1TxduFCAd+U5Fb5r0tE8IcGSX0pqP14R0Ws6teDnuzUOn5euvXblrMR97QsxCobL
+        PGzmH2Nedjwq9+Xj+5dWix10eFHx6HnVjBRlNtOZ2Zaz9gVy/Ao6JeqwXClG0OZN+XadlvRZ
+        3WvOOfpcOhFsUiJtLTR9reX7aj3W5Us8WBWigh9MqXr81k395XXXZmUlluKMREMt5qLiRABx
+        70QVCwQAAA==
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323
-References: <20230503155745.GD31700@lst.de>
+References: <20230503155238.GA31700@lst.de>
         <20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323@epcms2p4>
-        <20230503101048epcms2p61d61df1431955d9517c9939999ee3478@epcms2p6>
-        <CGME20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323@epcms2p1>
+        <20230503100049epcms2p2c830ebb7b50beaa2663abd0cd274293c@epcms2p2>
+        <CGME20230503094912epcms2p4bef206eab1c41a92eba2583a69c74323@epcms2p2>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> When a request is initialized through the bio, bio's integrity
->> information is not reflected in the request.
->
->Uuh. =C2=A0This=20looks=20like=20a=20pretty=20grave=20bug=20unless=20I'm=
-=20missing=20something.=0D=0A>Can=20you:=0D=0A>=0D=0A>=20-=20submit=20this=
-=20as=20a=20fix=20for=206.3=20and=20-stable?=0D=0A>=20-=20maybe=20find=20wh=
-at=20broke=20this=20and=20add=20a=20fixes=20tag?=0D=0A=0D=0AThanks=20for=20=
-your=20review.=0D=0A=0D=0AOK,=20I=20will=20check=20it=20and=20proceed.=0D=
-=0A=0D=0AI=20didn't=20confirm=20that=20I=20turned=20off=20the=20config=20an=
-d=20compiled=20it.=0D=0AI=20will=20check=20it=20and=20upload=20in=20the=20n=
-ext=20patch.=20sorry.=0D=0A=0D=0ABest=20Regards,=0D=0AJinyoung.
+>> +bool bio_page_is_mergeable(const struct bio_vec *bv, struct page *page,
+>> + =C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20unsigned=20int=20len,=20uns=
+igned=20int=20off,=0D=0A>>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
+bool=20*same_page)=0D=0A>=0D=0A>No=20bio=20involved=20here,=20just=20a=20bv=
+ec.=20=C2=A0But=20I=20don't=20really=20see=20the=20need=0D=0A>to=20rename=
+=20it,=20just=20declare=20it=20in=20block/blk.h=20where=20f2fs=20has=20no=
+=20chance=0D=0A>of=20ever=20seeing=20it.=0D=0A=0D=0AOh.=20You=20are=20right=
+.=0D=0AI=20will=20declare=20where=20you=20mentioned=20without=20changing=20=
+the=20name.=0D=0AIt's=20better.=0D=0A=0D=0ABest=20Regards,=0D=0AJinyoung
