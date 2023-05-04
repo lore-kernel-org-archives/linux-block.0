@@ -2,48 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11896C77B78
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 20:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83252C77B78
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 20:19:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232915AbjEDUIp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 16:08:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34442 "EHLO
+        id S230117AbjEDUTG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 16:19:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232706AbjEDUHA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 16:07:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE1E214E69;
-        Thu,  4 May 2023 12:54:11 -0700 (PDT)
+        with ESMTP id S230084AbjEDUSf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 16:18:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E6152380A;
+        Thu,  4 May 2023 13:04:37 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 147606373D;
-        Thu,  4 May 2023 19:43:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73138C433AF;
-        Thu,  4 May 2023 19:43:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EDACF615B8;
+        Thu,  4 May 2023 19:47:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00A36C433EF;
+        Thu,  4 May 2023 19:47:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229434;
-        bh=8PAcPdtGigjTmyNmB4KjebzR1n76DZ7lYtf9FipWSvY=;
+        s=k20201202; t=1683229677;
+        bh=YkokPFE5KvOTpPGF2duWfbScuTIsrd/YG+iKLSu/mRQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fIZxB6jyBc6JoKyvemSZgi7QjQ7MABUu2SdSgvey1hq9WXXVh4V0Gmxo7T1t9AoG/
-         /veeLLtWPA2xvWG4cUm5WnFkHiLvmqFIOR++nzF9Hq02hfqzIN9FS/f9KrK00BmoRM
-         YzvKm6Rk7c+uVsjYa/szpQwaZlPYc6wDIBFI+i+qGC9wLUk8S7fe7IcHug75cNmPYj
-         ZlNMExTzMo62V54Gw3UPJlGV3yJ1cGN3ZmlRVAEy7NzPPeAb/IJXPNuFHSqvqjNcCy
-         WthEs/AshgDojqi7yrpx9vR7ow9CwKgzQfdOmyWPYP/POQQRRMUZbq38LcnJt66eRt
-         e2qYPQcMZw0GA==
+        b=DNo1i68YKDbWuA9vLf19OxijifdUtwJ2yNAwRnket4uqGvBLgeAPeHniVjYVlJ/d8
+         fxItOkG5rcSLLmfS3DpCR++cNivx9f22AvKC2V+xxCfw6+Z+TR8T/nvl854d/ujZFi
+         mItiwgayt3Wnay2CEgYRpCyMpnjI7sHJ28eHpCFj9l/afCl/smmp7ZtZRhsme0MxPC
+         15TySAXYNaCxYhX0SHUK5Y06Y34X+sFbpELJI3HemQi9ncv0ty816sikf+0wW+cVvE
+         yV6+EiWK51VBUZSrYGpkQFlLHAu3Q0x5A1iMpJPLRiTfcv5lfSsJTKzUqc+DB/oaEL
+         fcuyLnK9GySCQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Zhong Jinghua <zhongjinghua@huawei.com>,
-        Yu Kuai <yukuai3@huawei.com>,
-        Josef Bacik <josef@toxicpanda.com>,
+Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 6.3 48/59] nbd: fix incomplete validation of ioctl arg
-Date:   Thu,  4 May 2023 15:41:31 -0400
-Message-Id: <20230504194142.3805425-48-sashal@kernel.org>
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
+        johannes.thumshirn@wdc.com, vincent.fu@samsung.com,
+        akinobu.mita@gmail.com, shinichiro.kawasaki@wdc.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 35/49] null_blk: Always check queue mode setting from configfs
+Date:   Thu,  4 May 2023 15:46:12 -0400
+Message-Id: <20230504194626.3807438-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230504194142.3805425-1-sashal@kernel.org>
-References: <20230504194142.3805425-1-sashal@kernel.org>
+In-Reply-To: <20230504194626.3807438-1-sashal@kernel.org>
+References: <20230504194626.3807438-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,80 +56,85 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhong Jinghua <zhongjinghua@huawei.com>
+From: Chaitanya Kulkarni <kch@nvidia.com>
 
-[ Upstream commit 55793ea54d77719a071b1ccc05a05056e3b5e009 ]
+[ Upstream commit 63f8793ee60513a09f110ea460a6ff2c33811cdb ]
 
-We tested and found an alarm caused by nbd_ioctl arg without verification.
-The UBSAN warning calltrace like below:
+Make sure to check device queue mode in the null_validate_conf() and
+return error for NULL_Q_RQ as we don't allow legacy I/O path, without
+this patch we get OOPs when queue mode is set to 1 from configfs,
+following are repro steps :-
 
-UBSAN: Undefined behaviour in fs/buffer.c:1709:35
-signed integer overflow:
--9223372036854775808 - 1 cannot be represented in type 'long long int'
-CPU: 3 PID: 2523 Comm: syz-executor.0 Not tainted 4.19.90 #1
-Hardware name: linux,dummy-virt (DT)
-Call trace:
- dump_backtrace+0x0/0x3f0 arch/arm64/kernel/time.c:78
- show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x170/0x1dc lib/dump_stack.c:118
- ubsan_epilogue+0x18/0xb4 lib/ubsan.c:161
- handle_overflow+0x188/0x1dc lib/ubsan.c:192
- __ubsan_handle_sub_overflow+0x34/0x44 lib/ubsan.c:206
- __block_write_full_page+0x94c/0xa20 fs/buffer.c:1709
- block_write_full_page+0x1f0/0x280 fs/buffer.c:2934
- blkdev_writepage+0x34/0x40 fs/block_dev.c:607
- __writepage+0x68/0xe8 mm/page-writeback.c:2305
- write_cache_pages+0x44c/0xc70 mm/page-writeback.c:2240
- generic_writepages+0xdc/0x148 mm/page-writeback.c:2329
- blkdev_writepages+0x2c/0x38 fs/block_dev.c:2114
- do_writepages+0xd4/0x250 mm/page-writeback.c:2344
+modprobe null_blk nr_devices=0
+mkdir config/nullb/nullb0
+echo 1 > config/nullb/nullb0/memory_backed
+echo 4096 > config/nullb/nullb0/blocksize
+echo 20480 > config/nullb/nullb0/size
+echo 1 > config/nullb/nullb0/queue_mode
+echo 1 > config/nullb/nullb0/power
 
-The reason for triggering this warning is __block_write_full_page()
--> i_size_read(inode) - 1 overflow.
-inode->i_size is assigned in __nbd_ioctl() -> nbd_set_size() -> bytesize.
-We think it is necessary to limit the size of arg to prevent errors.
+Entering kdb (current=0xffff88810acdd080, pid 2372) on processor 42 Oops: (null)
+due to oops @ 0xffffffffc041c329
+CPU: 42 PID: 2372 Comm: sh Tainted: G           O     N 6.3.0-rc5lblk+ #5
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+RIP: 0010:null_add_dev.part.0+0xd9/0x720 [null_blk]
+Code: 01 00 00 85 d2 0f 85 a1 03 00 00 48 83 bb 08 01 00 00 00 0f 85 f7 03 00 00 80 bb 62 01 00 00 00 48 8b 75 20 0f 85 6d 02 00 00 <48> 89 6e 60 48 8b 75 20 bf 06 00 00 00 e8 f5 37 2c c1 48 8b 75 20
+RSP: 0018:ffffc900052cbde0 EFLAGS: 00010246
+RAX: 0000000000000001 RBX: ffff88811084d800 RCX: 0000000000000001
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff888100042e00
+RBP: ffff8881053d8200 R08: ffffc900052cbd68 R09: ffff888105db2000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000002
+R13: ffff888104765200 R14: ffff88810eec1748 R15: ffff88810eec1740
+FS:  00007fd445fd1740(0000) GS:ffff8897dfc80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000060 CR3: 0000000166a00000 CR4: 0000000000350ee0
+DR0: ffffffff8437a488 DR1: ffffffff8437a489 DR2: ffffffff8437a48a
+DR3: ffffffff8437a48b DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ nullb_device_power_store+0xd1/0x120 [null_blk]
+ configfs_write_iter+0xb4/0x120
+ vfs_write+0x2ba/0x3c0
+ ksys_write+0x5f/0xe0
+ do_syscall_64+0x3b/0x90
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
+RIP: 0033:0x7fd4460c57a7
+Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+RSP: 002b:00007ffd3792a4a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007fd4460c57a7
+RDX: 0000000000000002 RSI: 000055b43c02e4c0 RDI: 0000000000000001
+RBP: 000055b43c02e4c0 R08: 000000000000000a R09: 00007fd44615b4e0
+R10: 00007fd44615b3e0 R11: 0000000000000246 R12: 0000000000000002
+R13: 00007fd446198520 R14: 0000000000000002 R15: 00007fd446198700
+ </TASK>
 
-Moreover, __nbd_ioctl() -> nbd_add_socket(), arg will be cast to int.
-Assuming the value of arg is 0x80000000000000001) (on a 64-bit machine),
-it will become 1 after the coercion, which will return unexpected results.
-
-Fix it by adding checks to prevent passing in too large numbers.
-
-Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Link: https://lore.kernel.org/r/20230206145805.2645671-1-zhongjinghua@huawei.com
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+Link: https://lore.kernel.org/r/20230416220339.43845-1-kch@nvidia.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/nbd.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/block/null_blk/main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 592cfa8b765a5..e1c954094b6c0 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -325,6 +325,9 @@ static int nbd_set_size(struct nbd_device *nbd, loff_t bytesize,
- 	if (blk_validate_block_size(blksize))
- 		return -EINVAL;
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index af419af9a0f4a..c45d09a9a9421 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1945,6 +1945,11 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
  
-+	if (bytesize < 0)
+ static int null_validate_conf(struct nullb_device *dev)
+ {
++	if (dev->queue_mode == NULL_Q_RQ) {
++		pr_err("legacy IO path is no longer available\n");
 +		return -EINVAL;
++	}
 +
- 	nbd->config->bytesize = bytesize;
- 	nbd->config->blksize_bits = __ffs(blksize);
+ 	dev->blocksize = round_down(dev->blocksize, 512);
+ 	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
  
-@@ -1111,6 +1114,9 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 	struct nbd_sock *nsock;
- 	int err;
- 
-+	/* Arg will be cast to int, check it to avoid overflow */
-+	if (arg > INT_MAX)
-+		return -EINVAL;
- 	sock = nbd_get_socket(nbd, arg, &err);
- 	if (!sock)
- 		return err;
 -- 
 2.39.2
 
