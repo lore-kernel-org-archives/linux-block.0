@@ -2,75 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183E8C7EE23
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 15:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D1AC7EE23
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 15:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229905AbjEDPhN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 11:37:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51096 "EHLO
+        id S231147AbjEDP4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 11:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230204AbjEDPhM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:37:12 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D28D6271C;
-        Thu,  4 May 2023 08:37:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=Z5IJ8FitUNE2QS2yiRa5LLKouEb3BUu8Rhl1OJu2hKU=; b=MSdkdD0qO3wkiTc43I6g/CK525
-        NThglTciRNY0CbdtLzYc0+HZeFwB0/O4H8/cgVgu2Vwlw51PqdXUmwek3jo/t1skKYvZc1IPp/ktH
-        sjSW9KL09POnrtGCs5kLSvHAGLjpjfB4OBwQnXLorcP2+XQnOf4Be34bkTpXMqP/qm2jdteh11d7i
-        IilJHox0DblPQ0oLOTL2RYqwQHrF/FII5beIIuWK5o85k6zGXYG635uSSE5sNYBOwVu7gIPKdlM4q
-        /mDAAZVNLCVEZfcpGppVu56tKUqP1ikHDF12r7bKFcZQElUiF0nRVpHdBBR0Xd18shtd+bwWqrzhE
-        AfCUFQ3g==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pub10-00Aiya-8C; Thu, 04 May 2023 15:37:06 +0000
-Date:   Thu, 4 May 2023 16:37:06 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Ilya Dryomov <idryomov@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        with ESMTP id S230039AbjEDPz7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 11:55:59 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E8A349CF;
+        Thu,  4 May 2023 08:55:58 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1BF7D1FD7E;
+        Thu,  4 May 2023 15:55:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1683215757; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hs+BLfN/0kNjEK2oUqlUv453FE71ldsqaBdWU5OoWZo=;
+        b=IULcFMzhZk2/u3IGIBLKjmfecbiZdNWFBMDe21BltjDT2hKk2qpnRs+9+Z2i50HzOG3uWY
+        rIvlC54YVJaa5/G9wtDByFpEctWCEmOkiHzbUxK+fwxid4hJmwFcm1wS8hyRRh/O3GJAz9
+        mcvGKcqtv+zjLI+tOZmzXQnOqUWkmnk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1683215757;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hs+BLfN/0kNjEK2oUqlUv453FE71ldsqaBdWU5OoWZo=;
+        b=PJBKliX3YTxaHWg2wjYFrF5cfHLpLkaeDlTEYUJakGRbqJW16QM61U/JfUF6Fdm6xoQ6Df
+        Tqs1ezMWlP87uTDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0D44813444;
+        Thu,  4 May 2023 15:55:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id f3YpA43VU2RHMgAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 04 May 2023 15:55:57 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 5E8FFA0722; Thu,  4 May 2023 17:55:56 +0200 (CEST)
+Date:   Thu, 4 May 2023 17:55:56 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Ilya Dryomov <idryomov@gmail.com>,
+        Jan Kara <jack@suse.cz>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] mm: always respect QUEUE_FLAG_STABLE_WRITES on the block
  device
-Message-ID: <ZFPRIq/4T6GPN07T@casper.infradead.org>
+Message-ID: <20230504155556.t6byee6shgb27pw5@quack3>
 References: <20230504105624.9789-1-idryomov@gmail.com>
  <20230504135515.GA17048@lst.de>
  <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
- <CAOi1vP_sEab6A3hsdZbVjvOXzWgFBJzrBZ4o9zNr7TT6fivTQg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOi1vP_sEab6A3hsdZbVjvOXzWgFBJzrBZ4o9zNr7TT6fivTQg@mail.gmail.com>
+In-Reply-To: <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 04, 2023 at 05:07:10PM +0200, Ilya Dryomov wrote:
-> On Thu, May 4, 2023 at 4:16 PM Matthew Wilcox <willy@infradead.org> wrote:
-> > I hate both of these patches ;-)  What we should do is add
-> > AS_STABLE_WRITES, have the appropriate places call
-> > mapping_set_stable_writes() and then folio_wait_stable() becomes
-> >
-> >         if (mapping_test_stable_writes(folio->mapping))
-> >                 folio_wait_writeback(folio);
-> >
-> > and we remove all the dereferences (mapping->host->i_sb->s_iflags, plus
-> > whatever else is going on there)
+On Thu 04-05-23 15:16:39, Matthew Wilcox wrote:
+> On Thu, May 04, 2023 at 03:55:15PM +0200, Christoph Hellwig wrote:
+> > On Thu, May 04, 2023 at 12:56:24PM +0200, Ilya Dryomov wrote:
+> > > Commit 1cb039f3dc16 ("bdi: replace BDI_CAP_STABLE_WRITES with a queue
+> > > and a sb flag") introduced a regression for the raw block device use
+> > > case.  Capturing QUEUE_FLAG_STABLE_WRITES flag in set_bdev_super() has
+> > > the effect of respecting it only when there is a filesystem mounted on
+> > > top of the block device.  If a filesystem is not mounted, block devices
+> > > that do integrity checking return sporadic checksum errors.
+> > 
+> > With "If a file system is not mounted" you want to say "when accessing
+> > a block device directly" here, right?  The two are not exclusive..
+> > 
+> > > Additionally, this commit made the corresponding sysfs knob writeable
+> > > for debugging purposes.  However, because QUEUE_FLAG_STABLE_WRITES flag
+> > > is captured when the filesystem is mounted and isn't consulted after
+> > > that anywhere outside of swap code, changing it doesn't take immediate
+> > > effect even though dumping the knob shows the new value.  With no way
+> > > to dump SB_I_STABLE_WRITES flag, this is needlessly confusing.
+> > 
+> > But very much intentional.  s_bdev often is not the only device
+> > in a file system, and we should never reference if from core
+> > helpers.
+> > 
+> > So I think we should go with something like this:
+> > 
+> > diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+> > index db794399900734..aa36cc2a4530c1 100644
+> > --- a/mm/page-writeback.c
+> > +++ b/mm/page-writeback.c
+> > @@ -3129,7 +3129,11 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable);
+> >   */
+> >  void folio_wait_stable(struct folio *folio)
+> >  {
+> > -	if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
+> > +	struct inode *inode = folio_inode(folio);
+> > +	struct super_block *sb = inode->i_sb;
+> > +
+> > +	if ((sb->s_iflags & SB_I_STABLE_WRITES) ||
+> > +	    (sb_is_blkdev_sb(sb) && bdev_stable_writes(I_BDEV(inode))))
+> >  		folio_wait_writeback(folio);
+> >  }
+> >  EXPORT_SYMBOL_GPL(folio_wait_stable);
 > 
-> Hi Matthew,
+> I hate both of these patches ;-)  What we should do is add
+> AS_STABLE_WRITES, have the appropriate places call
+> mapping_set_stable_writes() and then folio_wait_stable() becomes
 > 
-> We would still need something resembling Christoph's suggestion for
-> 5.10 and 5.15 (at least).  Since this fixes a regression, would you
-> support merging the "ugly" version to facilitate backports or would
-> you rather see the AS/mapping-based refactor first?
+> 	if (mapping_test_stable_writes(folio->mapping))
+> 		folio_wait_writeback(folio);
+> 
+> and we remove all the dereferences (mapping->host->i_sb->s_iflags, plus
+> whatever else is going on there)
 
-That's a terrible way of developing for Linux.  First, do it the right
-way for mainline.  Then, see how easy the patch is to backport to relevant
-kernel versions; if it's too ugly to cherry-pick, do something equivalent.
-But never start out with the premise "This must be backported, so do it
-as simply as possible first".
+For bdev address_space that's easy but what Ilya also mentioned is a
+problem when 'stable_write' flag gets toggled on the device and in that
+case having to propagate the flag update to all the address_space
+structures is a nightmare...
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
