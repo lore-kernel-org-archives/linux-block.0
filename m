@@ -2,180 +2,174 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB7C5C7EE22
-	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 20:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B018FC7EE22
+	for <linux-block@archiver.kernel.org>; Thu,  4 May 2023 21:02:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229678AbjEDU4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 16:56:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50378 "EHLO
+        id S230382AbjEDVCr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 17:02:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231239AbjEDU4L (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 16:56:11 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 678984209
-        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 13:55:47 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id ca18e2360f4ac-769a4e76f30so6098239f.1
-        for <linux-block@vger.kernel.org>; Thu, 04 May 2023 13:55:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683233703; x=1685825703;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bThyd74S2N2oDbSREWHnOPdDMJwRG45ERj16N72kBRg=;
-        b=l2MTxWxNlVB/WH2xrF+MJxUilczB+f0fvA8IBB+e0MLl8sHDt+x4/HFy0JufcYeNUx
-         +BMWjNk0rbbSE4J/vY8xZM0pMwGgIPawCARddCAvotHyy0zv3ybrLKNy9MjZ0vYq6jlJ
-         16SC8312n4xRHBq6G17UdTuhXNKLW/SMaJ786ff4tzsWybuEH669rsf2hfoF2gZoDtQH
-         JCfEjt28J93UJByu4Gmt1Hr6sdW98GSR068ASK4qxZZ4axoW5ahi7wf9jqIYTbvevt92
-         UX0oyVeBIMqz5OyKynfZqxPT29aa4yzDM8Z0lm0ASD6WhylXP+/UunRN8nVByLIimbcV
-         notA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683233703; x=1685825703;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bThyd74S2N2oDbSREWHnOPdDMJwRG45ERj16N72kBRg=;
-        b=giSVzUUn+/tWYYYRdNwNgMzOERCoshfEuoNdptOZ0Oanb+GD5CkV1FStmqeWcXx++3
-         kqQhxL8NwXyY0a2U49SpC0PIS5G8gih1rRK4yQvKen9Snt7DpPY6Uyru4v3B5wUFDDXw
-         798iqQVttWSTkPirmo6JZmw+QJhNhYFCHM8+LvT7tfxGqyq4O1C4JZMwGqZgv6x529er
-         LFDwk+/jqQMdA6VJN51zRUp8V7cGL5oXq4iWVydTO6OoxFZRfBFSiQ7uFqA1SrcN00wi
-         Mk5lqQg0d/taTb0IWVe43zORK/RGPl0UzqzKzjQ8VtgKw4Wl93J6JSiZOUc9Xxbf/hDz
-         JCQw==
-X-Gm-Message-State: AC+VfDzVu5bqviCPVC9w6giZY/9LF+UbbLDCJxGrL8TyaaqpcMuP7P1W
-        l71SoA8i28LUcvWYUY8a2f1L/w==
-X-Google-Smtp-Source: ACHHUZ7u7Z7zBx8+bpJiQvwVPo4kxTVGqAu7lbDiXlxkNkLQGAk8ObS2SwEGUuw9qE6EXFWmlyZu1g==
-X-Received: by 2002:a92:c246:0:b0:32f:1232:f5d5 with SMTP id k6-20020a92c246000000b0032f1232f5d5mr13163499ilo.2.1683233703530;
-        Thu, 04 May 2023 13:55:03 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id t11-20020a92c90b000000b0032aef6b60adsm13757ilp.34.2023.05.04.13.55.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 May 2023 13:55:02 -0700 (PDT)
-Message-ID: <0adf4086-c624-1587-d490-9e6bb517afe0@kernel.dk>
-Date:   Thu, 4 May 2023 14:55:01 -0600
+        with ESMTP id S230090AbjEDVCO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 17:02:14 -0400
+Received: from smtpout.efficios.com (smtpout.efficios.com [167.114.26.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2EE1734;
+        Thu,  4 May 2023 14:01:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
+        s=smtpout1; t=1683230734;
+        bh=1jfyZJuK4k9g5CEpe8gCUedeSdOIfbCNOZJDVvTtWOk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=tc4yMe+dNevzwFlfwp6HT3GKbEIZ6zDHUt7WxxxM2l5wvdmhFhE9c2ghavf7lfuXS
+         yUOE9TorFjIilwout/zxZzthJA7GU5yXGedxPlWJ74oWHfbnpweJw+vaj+pn/56sDb
+         KH+wazgLGkoJ6Bg/zeJ3vxNWomkPYz6NRNSMYWI5B1Kdo8/SUQmylzqb9EmiiuxKak
+         Sq8X+1DXrgbHEkZ7qYTavuig7dN1ZoNTYXWb14q1N8jptcqJRQL0IFUP4+a5u/TXdw
+         uPh0Bi7AIGDnVvnBt+jv2S25RvMgLq99tCBREknHhixsLetxD70RhzKQhrelXcsDQE
+         Z535jfxloZg1w==
+Received: from localhost.localdomain (192-222-143-198.qc.cable.ebox.net [192.222.143.198])
+        by smtpout.efficios.com (Postfix) with ESMTPSA id 4QC4Yp4cDXz11wl;
+        Thu,  4 May 2023 16:05:34 -0400 (EDT)
+From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [RFC PATCH 12/13] blk-mq.h: Fix parentheses around macro parameter use
+Date:   Thu,  4 May 2023 16:05:26 -0400
+Message-Id: <20230504200527.1935944-13-mathieu.desnoyers@efficios.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230504200527.1935944-1-mathieu.desnoyers@efficios.com>
+References: <20230504200527.1935944-1-mathieu.desnoyers@efficios.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC PATCH 00/11] Rust null block driver
-Content-Language: en-US
-To:     Andreas Hindborg <nmi@metaspace.dk>
-Cc:     Keith Busch <kbusch@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
-        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?UTF-8?Q?Bj=c3=b6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org> <87jzxot0jk.fsf@metaspace.dk>
- <b9a1c1b2-3baa-2cad-31ae-8b14e4ee5709@acm.org>
- <ZFP+8apHunCCMmOZ@kbusch-mbp.dhcp.thefacebook.com>
- <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
- <875y97u92z.fsf@metaspace.dk>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <875y97u92z.fsf@metaspace.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/4/23 1:59?PM, Andreas Hindborg wrote:
-> 
-> Jens Axboe <axboe@kernel.dk> writes:
-> 
->> On 5/4/23 12:52?PM, Keith Busch wrote:
->>> On Thu, May 04, 2023 at 11:36:01AM -0700, Bart Van Assche wrote:
->>>> On 5/4/23 11:15, Andreas Hindborg wrote:
->>>>> If it is still unclear to you why this effort was started, please do let
->>>>> me know and I shall try to clarify further :)
->>>>
->>>> It seems like I was too polite in my previous email. What I meant is that
->>>> rewriting code is useful if it provides a clear advantage to the users of
->>>> a driver. For null_blk, the users are kernel developers. The code that has
->>>> been posted is the start of a rewrite of the null_blk driver. The benefits
->>>> of this rewrite (making low-level memory errors less likely) do not outweigh
->>>> the risks that this effort will introduce functional or performance regressions.
->>>
->>> Instead of replacing, would co-existing be okay? Of course as long as
->>> there's no requirement to maintain feature parity between the two.
->>> Actually, just call it "rust_blk" and declare it has no relationship to
->>> null_blk, despite their functional similarities: it's a developer
->>> reference implementation for a rust block driver.
->>
->> To me, the big discussion point isn't really whether we're doing
->> null_blk or not, it's more if we want to go down this path of
->> maintaining rust bindings for the block code in general. If the answer
->> to that is yes, then doing null_blk seems like a great choice as it's
->> not a critical piece of infrastructure. It might even be a good idea to
->> be able to run both, for performance purposes, as the bindings or core
->> changes.
->>
->> But back to the real question... This is obviously extra burden on
->> maintainers, and that needs to be sorted out first. Block drivers in
->> general are not super security sensitive, as it's mostly privileged code
->> and there's not a whole lot of user visibile API. And the stuff we do
->> have is reasonably basic. So what's the long term win of having rust
->> bindings? This is a legitimate question. I can see a lot of other more
->> user exposed subsystems being of higher interest here.
-> 
-> Even though the block layer is not usually exposed in the same way
-> that something like the USB stack is, absence of memory safety bugs is
-> a very useful property. If this is attainable without sacrificing
-> performance, it seems like a nice option to offer future block device
-> driver developers. Some would argue that it is worth offering even in
-> the face of performance regression.
-> 
-> While memory safety is the primary feature that Rust brings to the
-> table, it does come with other nice features as well. The type system,
-> language support stackless coroutines and error handling language
-> support are all very useful.
+Fix the following macro parameter usage patterns in blk-mq.h for
+consistency, ensuring that operator precedence is respected:
 
-We're in violent agreement on this part, I don't think anyone sane would
-argue that memory safety with the same performance [1] isn't something
-you'd want. And the error handling with rust is so much better than the
-C stuff drivers do now that I can't see anyone disagreeing on that being
-a great thing as well.
+Added parentheses:
 
-The discussion point here is the price being paid in terms of people
-time.
+- x->member is changed for (x)->member,
+- x.member is changed for (x).member,
+- flags >> BLK_MQ_F_ALLOC_POLICY_START_BIT is changed for
+  (flags) >> BLK_MQ_F_ALLOC_POLICY_START_BIT.
+- "x = y" is changed for "x = (y)", because "y" can be an expression
+  containing a comma if it is the result of the expansion of a macro such
+  as #define eval(...) __VA_ARGS__, which would cause unexpected operator
+  precedence. This use-case is far-fetched, but we have to choose one
+  way or the other (with or without parentheses) for consistency.
 
-> Regarding maintenance of the bindings, it _is_ an amount extra work. But
-> there is more than one way to structure that work. If Rust is accepted
-> into the block layer at some point, maintenance could be structured in
-> such a way that it does not get in the way of existing C maintenance
-> work. A "rust keeps up or it breaks" model. That could work for a while.
+Removed parentheses:
 
-That potentially works for null_blk, but it would not work for anything
-that people actually depend on. In other words, anything that isn't
-null_blk. And I don't believe we'd be actively discussing these bindings
-if just doing null_blk is the end goal, because that isn't useful by
-itself, and at that point we'd all just be wasting our time. In the real
-world, once we have just one actual driver using it, then we'd be
-looking at "this driver regressed because of change X/Y/Z and that needs
-to get sorted before the next release". And THAT is the real issue for
-me. So a "rust keeps up or it breaks" model is a bit naive in my
-opinion, it's just not a viable approach. In fact, even for null_blk,
-this doesn't really fly as we rely on blktests to continually vet the
-sanity of the IO stack, and null_blk is an integral part of that.
+- m((x)) is changed for m(x) (the extra parentheses are useless),
+- m(x, (y), (z)) is changed for m(x, y, z), because comma is the lowest
+  priority operator, and thus the extra parentheses are useless,
+- v[(x)] is changed for v[x], because the extra parentheses are useless
+  given that [] already surrounds an expression,
+- "(i) = 0" is changed for "i = 0", because "i" is an lvalue, which
+  makes the extra parentheses useless.
 
-So I really don't think there's much to debate between "rust people vs
-jens" here, as we agree on the benefits, but my end of the table has to
-stomach the cons. And like I mentioned in an earlier email, that's not
-just on me, there are other regular contributors and reviewers that are
-relevant to this discussion. This is something we need to discuss.
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+---
+ include/linux/blk-mq.h | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-[1] We obviously need to do real numbers here, the ones posted I don't
-consider stable enough to be useful in saying "yeah it's fully on part".
-If you have an updated rust nvme driver that uses these bindings I'd
-be happy to run some testing that will definitively tell us if there's a
-performance win, loss, or parity, and how much.
-
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 06caacd77ed6..4de6ad92530c 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -223,13 +223,13 @@ static inline unsigned short req_get_ioprio(struct request *req)
+ 
+ #define rq_list_add(listptr, rq)	do {		\
+ 	(rq)->rq_next = *(listptr);			\
+-	*(listptr) = rq;				\
++	*(listptr) = (rq);				\
+ } while (0)
+ 
+ #define rq_list_add_tail(lastpptr, rq)	do {		\
+ 	(rq)->rq_next = NULL;				\
+-	**(lastpptr) = rq;				\
+-	*(lastpptr) = &rq->rq_next;			\
++	**(lastpptr) = (rq);				\
++	*(lastpptr) = &(rq)->rq_next;			\
+ } while (0)
+ 
+ #define rq_list_pop(listptr)				\
+@@ -251,11 +251,11 @@ static inline unsigned short req_get_ioprio(struct request *req)
+ })
+ 
+ #define rq_list_for_each(listptr, pos)			\
+-	for (pos = rq_list_peek((listptr)); pos; pos = rq_list_next(pos))
++	for (pos = rq_list_peek(listptr); pos; pos = rq_list_next(pos))
+ 
+ #define rq_list_for_each_safe(listptr, pos, nxt)			\
+-	for (pos = rq_list_peek((listptr)), nxt = rq_list_next(pos);	\
+-		pos; pos = nxt, nxt = pos ? rq_list_next(pos) : NULL)
++	for (pos = rq_list_peek(listptr), nxt = rq_list_next(pos);	\
++		pos; pos = (nxt), nxt = (pos) ? rq_list_next(pos) : NULL)
+ 
+ #define rq_list_next(rq)	(rq)->rq_next
+ #define rq_list_empty(list)	((list) == (struct request *) NULL)
+@@ -692,10 +692,10 @@ enum {
+ 	BLK_MQ_CPU_WORK_BATCH	= 8,
+ };
+ #define BLK_MQ_FLAG_TO_ALLOC_POLICY(flags) \
+-	((flags >> BLK_MQ_F_ALLOC_POLICY_START_BIT) & \
++	(((flags) >> BLK_MQ_F_ALLOC_POLICY_START_BIT) & \
+ 		((1 << BLK_MQ_F_ALLOC_POLICY_BITS) - 1))
+ #define BLK_ALLOC_POLICY_TO_MQ_FLAG(policy) \
+-	((policy & ((1 << BLK_MQ_F_ALLOC_POLICY_BITS) - 1)) \
++	(((policy) & ((1 << BLK_MQ_F_ALLOC_POLICY_BITS) - 1)) \
+ 		<< BLK_MQ_F_ALLOC_POLICY_START_BIT)
+ 
+ #define BLK_MQ_NO_HCTX_IDX	(-1U)
+@@ -948,11 +948,11 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
+ }
+ 
+ #define queue_for_each_hw_ctx(q, hctx, i)				\
+-	xa_for_each(&(q)->hctx_table, (i), (hctx))
++	xa_for_each(&(q)->hctx_table, i, hctx)
+ 
+ #define hctx_for_each_ctx(hctx, ctx, i)					\
+-	for ((i) = 0; (i) < (hctx)->nr_ctx &&				\
+-	     ({ ctx = (hctx)->ctxs[(i)]; 1; }); (i)++)
++	for (i = 0; (i) < (hctx)->nr_ctx &&				\
++	     ({ ctx = (hctx)->ctxs[i]; 1; }); (i)++)
+ 
+ static inline void blk_mq_cleanup_rq(struct request *rq)
+ {
+@@ -1013,20 +1013,20 @@ struct req_iterator {
+ };
+ 
+ #define __rq_for_each_bio(_bio, rq)	\
+-	if ((rq->bio))			\
+-		for (_bio = (rq)->bio; _bio; _bio = _bio->bi_next)
++	if ((rq)->bio)			\
++		for (_bio = (rq)->bio; _bio; _bio = (_bio)->bi_next)
+ 
+ #define rq_for_each_segment(bvl, _rq, _iter)			\
+-	__rq_for_each_bio(_iter.bio, _rq)			\
+-		bio_for_each_segment(bvl, _iter.bio, _iter.iter)
++	__rq_for_each_bio((_iter).bio, _rq)			\
++		bio_for_each_segment(bvl, (_iter).bio, (_iter).iter)
+ 
+ #define rq_for_each_bvec(bvl, _rq, _iter)			\
+-	__rq_for_each_bio(_iter.bio, _rq)			\
+-		bio_for_each_bvec(bvl, _iter.bio, _iter.iter)
++	__rq_for_each_bio((_iter).bio, _rq)			\
++		bio_for_each_bvec(bvl, (_iter).bio, (_iter).iter)
+ 
+ #define rq_iter_last(bvec, _iter)				\
+-		(_iter.bio->bi_next == NULL &&			\
+-		 bio_iter_last(bvec, _iter.iter))
++		((_iter).bio->bi_next == NULL &&		\
++		 bio_iter_last(bvec, (_iter).iter))
+ 
+ /*
+  * blk_rq_pos()			: the current sector
 -- 
-Jens Axboe
+2.25.1
 
