@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43F48C77B7C
-	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 05:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFB8C77B75
+	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 05:29:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229893AbjEEF2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 May 2023 01:28:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57442 "EHLO
+        id S230179AbjEEF32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 May 2023 01:29:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbjEEF2X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 01:28:23 -0400
+        with ESMTP id S229601AbjEEF30 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 01:29:26 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B8311623;
-        Thu,  4 May 2023 22:28:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B3CA5C8;
+        Thu,  4 May 2023 22:29:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=3Ssm+pIX9YCKQZ/c1PpYxJ+8HNAswjWjxy5lFzztysA=; b=fZXbEvrS+vEDWxt4U3MRxo3LHT
-        WaxYNHaJAc96HKrfswX/fCumBI7Ru9SSckoMu4booL7ZGDgoAGaL+A31oneasr64X5zzWg6lmrlD3
-        iqIZy7KDMUaIaVciDMJnMb459bFN65MaK/YPY05JwyKwCMaRiQKAp19j01qEWgE+daK2NjhFdSm0T
-        GQTh9uu4g+LjAYJXE5ZMwfO0s0oFJ1vMuGNCkMeCdxJM4xylu/RZlpCGoqkPcwrA1NiAhMKd5jznQ
-        G9a6Vn5GLH06y4RU2kRSkixk3JR8MVVfK7RGnE6Zt9EFaTAgmYpevUmUbPsgelTmCdVME7F5AWd5h
-        zzcfAzyg==;
+        bh=LQA4GbnUf0oYoIkNnpkgzYq4G7BremfMrzKcIO5uhSU=; b=WTkLoGwYgeTEav6wxaGuDNJQE+
+        eFWyclwUrUJtrmHDy3DKLjTSKlh2OJWFXvwrDa1/e5Ex8y+NVlnGpktMz5H9E6cPSrAa85ADuPtHs
+        Lqxenv+UZG3U2crlGQ2gSmV4VACixDb0luXKoQXG4JT+KopxH4WZ5WlO772CWplY28bBKM9TU/i4j
+        F3oiu8ddOtvd48FJfWd4JeMSo/dhTpjCSGTIWJviNbFleqvHBLqKdJrIM650Ag/Nm3GYARpr7Ytu4
+        X/DmBMNHko1g7Aq5CLalf3IapC42jOdmNlonr1eh8p1VTpo6DKRA00M7NcEHcN0ph+KyewE2HuflE
+        96cFoorQ==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1punzA-00BFoZ-BC; Fri, 05 May 2023 05:28:04 +0000
-Date:   Fri, 5 May 2023 06:28:04 +0100
+        id 1puo0N-00BFr5-9p; Fri, 05 May 2023 05:29:19 +0000
+Date:   Fri, 5 May 2023 06:29:19 +0100
 From:   Matthew Wilcox <willy@infradead.org>
 To:     Andreas Hindborg <nmi@metaspace.dk>
 Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
@@ -41,37 +41,43 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         =?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
         Benno Lossin <benno.lossin@proton.me>,
         open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 01/11] rust: add radix tree abstraction
-Message-ID: <ZFST5HAr6IQAhpjx@casper.infradead.org>
+Subject: Re: [RFC PATCH 02/11] rust: add `pages` module for handling page
+ allocation
+Message-ID: <ZFSUL41P5t1NQPes@casper.infradead.org>
 References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <20230503090708.2524310-2-nmi@metaspace.dk>
- <ZFSATHV0gY8raccj@casper.infradead.org>
- <87wn1ns7kt.fsf@metaspace.dk>
+ <20230503090708.2524310-3-nmi@metaspace.dk>
+ <ZFSBkFuvJOiz600W@casper.infradead.org>
+ <871qjvtmb5.fsf@metaspace.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87wn1ns7kt.fsf@metaspace.dk>
+In-Reply-To: <871qjvtmb5.fsf@metaspace.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 05, 2023 at 06:49:49AM +0200, Andreas Hindborg wrote:
+On Fri, May 05, 2023 at 06:42:02AM +0200, Andreas Hindborg wrote:
 > 
 > Matthew Wilcox <willy@infradead.org> writes:
 > 
-> > On Wed, May 03, 2023 at 11:06:58AM +0200, Andreas Hindborg wrote:
+> > On Wed, May 03, 2023 at 11:06:59AM +0200, Andreas Hindborg wrote:
 > >> From: Andreas Hindborg <a.hindborg@samsung.com>
 > >> 
-> >> Add abstractions for the C radix_tree. This abstraction allows Rust code to use
-> >> the radix_tree as a map from `u64` keys to `ForeignOwnable` values.
+> >> This patch adds support for working with pages of order 0. Support for pages
+> >> with higher order is deferred. Page allocation flags are fixed in this patch.
+> >> Future work might allow the user to specify allocation flags.
+> >> 
+> >> This patch is a heavily modified version of code available in the rust tree [1],
+> >> primarily adding support for multiple page mapping strategies.
 > >
-> > Please, no.  The XArray interface is the preferred one; the radix tree
-> > is legacy.  Don't make Rust code use the radix tree.  It has the GFP
-> > arguments in the wrong place, for one thing.
+> > This also seems misaligned with the direction of Linux development.
+> > Folios are the future, pages are legacy.  Please, ask about what's
+> > going on before wasting time on the past.
 > 
-> I have a similar argument to not using xarrray as to not using folios,
-> see my other response. But the Rust xarray API is in the works [1].
+> I see, thanks for the heads up! In this case I wanted to do an
+> apples-apples comparison to the C null_blk driver. Since that is using
+> kmap I wanted to have that. But let's bind to the folio_* APIs in the
+> future, that would make sense.
 
-But the radix tree API is simply a different (and worse) API to the
-exact same data structure as the XArray.  Using the XArray instead of
-the radix tree is still an apples-to-apples comparison.
+Well, kmap() is essentially a no-op on 64-bit systems, so it's not
+terribly relevant to doing a comparison.
