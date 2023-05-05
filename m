@@ -2,111 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D2BC77B7C
-	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 10:49:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53687C77B7C
+	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 10:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbjEEKtK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 May 2023 06:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47696 "EHLO
+        id S231298AbjEEKx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 May 2023 06:53:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230411AbjEEKtI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 06:49:08 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D388F4;
-        Fri,  5 May 2023 03:49:07 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 4C45F1F8C1;
-        Fri,  5 May 2023 10:49:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1683283745; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XbyxKS0XVSbntMZRS7J/xfGZnAu0J6KaI4py7lxlOio=;
-        b=pWQqIpLR5XTtiUEC6LYXykGJJkoqkbvackC0HRSM1h3uxZqW6FgW6PLD6sCe4SLJ2rkCzZ
-        TaXMcgUZn7sLUoncyKoEunmPvi3y5IxIvT447P+1Za23OfvZ3tXia8PBKMtfCFS96EgYc+
-        FCSPCuXGLeiHiUT7ocQ3nmZogtvzdLw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1683283745;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XbyxKS0XVSbntMZRS7J/xfGZnAu0J6KaI4py7lxlOio=;
-        b=+h8135oZgzMg52mRmcDCnaa52Uir/Rmj30Oa7s+58C2sEKwS3DdGycTxFaiqE5sG+xqt4E
-        9zkXQIppTHDgCdDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3E20A13488;
-        Fri,  5 May 2023 10:49:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 4rokDyHfVGSmBAAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 05 May 2023 10:49:05 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id BA638A0729; Fri,  5 May 2023 12:49:04 +0200 (CEST)
-Date:   Fri, 5 May 2023 12:49:04 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@lst.de>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] mm: always respect QUEUE_FLAG_STABLE_WRITES on the block
- device
-Message-ID: <20230505104904.2zr4escdxvoekr2k@quack3>
-References: <20230504105624.9789-1-idryomov@gmail.com>
- <20230504135515.GA17048@lst.de>
- <ZFO+R0Ud6Yx546Tc@casper.infradead.org>
- <20230504155556.t6byee6shgb27pw5@quack3>
- <ZFPacOW6XMq+o4YU@casper.infradead.org>
- <20230504230736.GA2651828@dread.disaster.area>
+        with ESMTP id S229717AbjEEKxz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 06:53:55 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0822C18DEF;
+        Fri,  5 May 2023 03:53:53 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-b9a6eec8611so13274126276.0;
+        Fri, 05 May 2023 03:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683284032; x=1685876032;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QgaBKeEIlxAuYAP7cdMu1VdHHIFJCXTzQ7O6ZwAYCqE=;
+        b=s3pJv8phz4dcw/96mqO39Pu3tK+YbrwOtXJVou33ycR8vmYxCXLQC/YEJvQ9zA3kMt
+         Ekg9Nut3sqVhf3wQLuaeewXuP8M5PXc6cOjYB77jqgS0K27wq70pD5Nss5Lf69SZmEd/
+         HvHhjiU2TUv5M6r1dsUc/I08StmvCi74BoNwzxW1fQ8u5XvQ0vDBG21zfooscBMGU7au
+         CfPCMsAUGAXuj3oX/cCCRTBzxMLg6TJwpr03asJ33tyRsVwCE4MdqS85wGZXc8fdh3MN
+         vtQU5Eq8nh5YAq+wpHIk5TygGi/ep7R+y9Hm41l29oqNeLbtNA7ls41OYud0S+FmuCuz
+         488w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683284032; x=1685876032;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QgaBKeEIlxAuYAP7cdMu1VdHHIFJCXTzQ7O6ZwAYCqE=;
+        b=KmJtspgCotmlIahDryS4fjvHSKmA2nijQnf4E/PQZKQwaeycRBLGWvVJQaOBkgdSAJ
+         4nnyQl067Y0+83AEQUQMz7abOU35iGhN62FVnI0JHY9NVkqekRpMq2ZE1mWUkCJHq2p1
+         o0h5yewplBLU4J54n+tSIMqiqYCaDqqDVl+/aNYSdopYXj2maRkZnkPAbke2OvBL/UOK
+         Ew3pLAr6VYyEJa6UpjUV9xlOFvYdAsXH76MprB86rtJunkHsXCBnE7qNEoG2h1JByb43
+         JWNMiOhuwSmu4sD7l3HJ3nYNF754tI/PLL3mRrl0hfjJaelfaDFWaptDUa5mghjqr0tw
+         Hq4w==
+X-Gm-Message-State: AC+VfDxSgGfLD81Dmxpkdip/Sej0S6q8DKqXP6nMKFYYIY/sraSKRvFT
+        P1ToBe539Ku1p37xqG7exS3cqpstxu8lytOg3v8=
+X-Google-Smtp-Source: ACHHUZ7hJdO+nwsRv/rDJf2nGSyHPLvHPOluSAFe/tzWxJV9t4hvlk4iI83oot0NAp+ExTHfErnivZj0KMddbnmc/E0=
+X-Received: by 2002:a05:6902:729:b0:b9e:6c09:2d96 with SMTP id
+ l9-20020a056902072900b00b9e6c092d96mr1409374ybt.12.1683284032199; Fri, 05 May
+ 2023 03:53:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230504230736.GA2651828@dread.disaster.area>
+References: <20230503090708.2524310-1-nmi@metaspace.dk> <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
+ <87jzxot0jk.fsf@metaspace.dk> <b9a1c1b2-3baa-2cad-31ae-8b14e4ee5709@acm.org>
+ <ZFP+8apHunCCMmOZ@kbusch-mbp.dhcp.thefacebook.com> <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
+ <CANiq72nAMH1SfGmPTEjGHfevbb9tMLN4W7gJ3nBpJcvkCEsZ4g@mail.gmail.com> <80ed2c0e-54db-777a-175b-1aa3ff776724@kernel.dk>
+In-Reply-To: <80ed2c0e-54db-777a-175b-1aa3ff776724@kernel.dk>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Fri, 5 May 2023 12:53:41 +0200
+Message-ID: <CANiq72=3kGRy-3Lq5oxUEhu5d-377QrhuzhvoKRL+_QvbnJE7A@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/11] Rust null block driver
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Andreas Hindborg <nmi@metaspace.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
+        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
+        Daniel Vetter <daniel@ffwll.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 05-05-23 09:07:36, Dave Chinner wrote:
-> On Thu, May 04, 2023 at 05:16:48PM +0100, Matthew Wilcox wrote:
-> > On Thu, May 04, 2023 at 05:55:56PM +0200, Jan Kara wrote:
-> > > For bdev address_space that's easy but what Ilya also mentioned is a
-> > > problem when 'stable_write' flag gets toggled on the device and in that
-> > > case having to propagate the flag update to all the address_space
-> > > structures is a nightmare...
-> > 
-> > We have a number of flags which don't take effect when modified on a
-> > block device with a mounted filesystem on it.  For example, modifying
-> > the readahead settings do not change existing files, only new ones.
-> > Since this flag is only modifiable for debugging purposes, I think I'm
-> > OK with it not affecting already-mounted filesystems.  It feels like a
-> > decision that reasonable people could disagree on, though.
-> 
-> I think an address space flag makes sense, because then we don't
-> even have to care about the special bdev sb/inode thing -
-> folio->mapping will already point at the bdev mapping and so do the
-> right thing.
-> 
-> That is, if the bdev changes stable_write state, it can toggle the
-> AS_STABLE_WRITE flag on it's inode->i_mapping straight away and all
-> the folios and files pointing to the bdev mapping will change
-> behaviour immediately.  Everything else retains the same behaviour
-> we have now - the stable_write state is persistent on the superblock
-> until the filesystem mount is cycled.
+On Thu, May 4, 2023 at 10:22=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Right, but that doesn't really solve the problem when the rust bindings
+> get in the way of changes that you are currently making. Or if you break
+> them inadvertently. I do see benefits to that approach, but it's no
+> panacea.
+>
+> This seems to assume that time is plentiful and we can just add more to
+> our plate, which isn't always true. While I'd love to do more rust and
+> get more familiar with it, the time still has to be there for that. I'm
+> actually typing this on a laptop with a rust gpu driver :-)
+>
+> And this isn't just on me, there are other regular contributors and
+> reviewers that would need to be onboard with this.
 
-Yeah, I'm fine with this behavior. I just wasn't sure whether Ilya didn't
-need the sysfs change to be visible in the filesystem so that was why I
-pointed that out. But apparently he doesn't need it.
+Indeed -- I didn't mean to imply it wouldn't be time consuming, only
+that it might be an alternative approach compared to having existing
+maintainers do it. Of course, it depends on the dynamics of the
+subsystem, how busy the subsystem is, whether there is good rapport,
+etc.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> Each case is different though, different people and different schedules
+> and priorities. So while the above is promising, it's also just
+> annecdotal and doesn't necessarily apply to our case.
+
+Definitely, in the end subsystems know best if there is enough time
+available (from everybody) to pull it off. I only meant to say that
+the security angle is not the only benefit.
+
+For instance, like you said, the error handling, plus a bunch more
+that people usually enjoy: stricter typing, more information on
+signatures, sum types, pattern matching, privacy, closures, generics,
+etc.
+
+Cheers,
+Miguel
