@@ -2,140 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85217C77B75
-	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 13:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C68C77B7F
+	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 14:12:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232098AbjEEN4k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 May 2023 09:56:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39830 "EHLO
+        id S232425AbjEEOMD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 May 2023 10:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232024AbjEEN4j (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 09:56:39 -0400
-Received: from smtpout.efficios.com (smtpout.efficios.com [167.114.26.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65ACA173A;
-        Fri,  5 May 2023 06:56:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
-        s=smtpout1; t=1683294997;
-        bh=5M9k0bwdHPjNHyq3O6a+ixC/79M0N+oL/NNP1rCMNhA=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=QzML2CJCDJtpNDL7aCQiroYEnfxHuhTq1zlGVsB0pQqYSnrAKaux0BkX6/PgieYge
-         0IasiXzaSXA3201HxcQenQY9HO5niHFnV2hmqa2YNQ3uZVReUo2J+eoTGPpqnT9MJz
-         q9v0alUkhHxLf6xpKJ/ss3RxXGQ2iHmf+fdvj/6aWvGqgOaE45j+Xz/vPT83Agypy8
-         FmoSSpwmpl9XCol4/o/wg5ZXexLmWIbGFjdk+0qe6uSy984U4LsVHn8yKtcmbns6rH
-         TONatvpYJnP9gVfG4NjLBIrZMtMIWCrJmYPlJhC0sR7UIrIH2ZiZ+pbIRMkjsEhdD2
-         yfVoLK3C9yJFw==
-Received: from [172.16.0.99] (192-222-143-198.qc.cable.ebox.net [192.222.143.198])
-        by smtpout.efficios.com (Postfix) with ESMTPSA id 4QCXKd4f08z120s;
-        Fri,  5 May 2023 09:56:37 -0400 (EDT)
-Message-ID: <3b017a9f-220d-4da8-2cf6-7f0d6175b30c@efficios.com>
-Date:   Fri, 5 May 2023 09:56:41 -0400
+        with ESMTP id S232059AbjEEOMA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 10:12:00 -0400
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5384AD06
+        for <linux-block@vger.kernel.org>; Fri,  5 May 2023 07:11:55 -0700 (PDT)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-55a202d44e6so2122207b3.0
+        for <linux-block@vger.kernel.org>; Fri, 05 May 2023 07:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683295915; x=1685887915;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lYPB3stPQmWSExnYMshDYbYhsfa2W+OlQjJxEpndWnM=;
+        b=qq9k4CHhMcGwgjJP+XM1athe5OHlLq0D26Ch4Y7iLMqhrY6QdPYKg1AtxVumk1ffcg
+         RpfIYS8xAG6L5x7Tb30DAUHqZ9JIwJtrklJT5Xx8ObnVzeY9gSzPiW/toPtuXaGux6eQ
+         /ZT2nMq+AtMMIpZmEcvQLLIsHsiY7R8AjFY8UNrKUp7ru2uqEl4XNnPRIw/lYncqAdXh
+         86+ECEijeVraFzpt3bV587DuKIeREe4VKB6ECv4H52ADB5Q6EAVlhlJ7+Yx1b7HcS+9y
+         6+4ve2FZ3mHqxFYatqkm+vN4DsB5xLgcdPhoqy7i9rNsyYc997kMMoXNsZl/kNyeyH5F
+         mtYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683295915; x=1685887915;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lYPB3stPQmWSExnYMshDYbYhsfa2W+OlQjJxEpndWnM=;
+        b=VYBJjDI4xtBgnPHYKAqZperaE2Z6mOn99WXR7xo8OPf75OzbVurcYKtw3jieHnbEZ9
+         YFCk8luS9UpQ4qvy4RUvrsAVIkcex8GoDmc0XQ9ojoJSftATpDchhtTtZJ33TQX+A0TY
+         N1jvIzmQYHZpYUEWF6njtAXj3lAVG8le6Whf6CYMdEhKOX5ORpqme9ajZWN07jt9Qlic
+         AJWJXTM0ZyZ4pBPeO59wX3fKg7V1JBAC88DSjuBk7fW18tcponaiMNtjJ5fQnnZU15NT
+         +NLGV1+fMJ3sOBVnzBWtlUQ+b825xqVwV6hXfID/BSZ7cbvrhC4wa71NLfemF/g/PyIy
+         KjTQ==
+X-Gm-Message-State: AC+VfDytweBJb0GBiRc2ARw0P+U/opWbf8uAxGBrNx1GWxQplyKXylgS
+        lsRfJrW0LaQ8L1zukkMP9Xe9tQ==
+X-Google-Smtp-Source: ACHHUZ6qoOI/+PGpkkPitfDFrwnR+RSgPJAmgOvbSJFeS3wnUhPPJunQJdt8ejTtUoT1u+x3g04+yQ==
+X-Received: by 2002:a81:5d6:0:b0:55a:9e2f:933d with SMTP id 205-20020a8105d6000000b0055a9e2f933dmr1748012ywf.1.1683295914848;
+        Fri, 05 May 2023 07:11:54 -0700 (PDT)
+Received: from [172.20.2.186] ([12.153.103.3])
+        by smtp.gmail.com with ESMTPSA id x8-20020a814a08000000b0054f56baf3f2sm264788ywa.122.2023.05.05.07.11.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 May 2023 07:11:53 -0700 (PDT)
+Message-ID: <e56b4f96-a379-f97b-168f-d03f170744b2@kernel.dk>
+Date:   Fri, 5 May 2023 08:11:52 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [RFC PATCH 12/13] blk-mq.h: Fix parentheses around macro
- parameter use
+Subject: Re: [PATCH v5 00/20] bio: check return values of bio_add_page
 Content-Language: en-US
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-References: <20230504200527.1935944-1-mathieu.desnoyers@efficios.com>
- <20230504200527.1935944-13-mathieu.desnoyers@efficios.com>
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-In-Reply-To: <20230504200527.1935944-13-mathieu.desnoyers@efficios.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     "agruenba@redhat.com" <agruenba@redhat.com>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "hare@suse.de" <hare@suse.de>, "hch@lst.de" <hch@lst.de>,
+        "jfs-discussion@lists.sourceforge.net" 
+        <jfs-discussion@lists.sourceforge.net>,
+        "kch@nvidia.com" <kch@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "rpeterso@redhat.com" <rpeterso@redhat.com>,
+        "shaggy@kernel.org" <shaggy@kernel.org>,
+        "snitzer@kernel.org" <snitzer@kernel.org>,
+        "song@kernel.org" <song@kernel.org>,
+        "willy@infradead.org" <willy@infradead.org>
+References: <20230502101934.24901-1-johannes.thumshirn@wdc.com>
+ <1ac1fc5e-3c32-9d62-65bf-5ccbb82c37cc@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <1ac1fc5e-3c32-9d62-65bf-5ccbb82c37cc@wdc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023-05-04 16:05, Mathieu Desnoyers wrote:
-> Fix the following macro parameter usage patterns in blk-mq.h for
-> consistency, ensuring that operator precedence is respected:
+On 5/5/23 2:09?AM, Johannes Thumshirn wrote:
+> On 02.05.23 12:20, Johannes Thumshirn wrote:
+>> We have two functions for adding a page to a bio, __bio_add_page() which is
+>> used to add a single page to a freshly created bio and bio_add_page() which is
+>> used to add a page to an existing bio.
+>>
+>> While __bio_add_page() is expected to succeed, bio_add_page() can fail.
+>>
+>> This series converts the callers of bio_add_page() which can easily use
+>> __bio_add_page() to using it and checks the return of bio_add_page() for
+>> callers that don't work on a freshly created bio.
+>>
+>> Lastly it marks bio_add_page() as __must_check so we don't have to go again
+>> and audit all callers.
+>>
+>> Changes to v4:
+>> - Rebased onto latest Linus' master
+>> - Dropped already merged patches
+>> - Added Sergey's Reviewed-by
+>>
+>> Changes to v3:
+>> - Added __bio_add_folio and use it in iomap (Willy)
+>> - Mark bio_add_folio must check (Willy)
+>> - s/GFS/GFS2/ (Andreas)
+>>
+>> Changes to v2:
+>> - Removed 'wont fail' comments pointed out by Song
+>>
+>> Changes to v1:
+>> - Removed pointless comment pointed out by Willy
+>> - Changed commit messages pointed out by Damien
+>> - Colledted Damien's Reviews and Acks
 > 
-> Added parentheses:
-[...]
-> - "x = y" is changed for "x = (y)", because "y" can be an expression
->    containing a comma if it is the result of the expansion of a macro such
->    as #define eval(...) __VA_ARGS__, which would cause unexpected operator
->    precedence. This use-case is far-fetched, but we have to choose one
->    way or the other (with or without parentheses) for consistency.
+> Jens any comments on this?
 
-[...]
-
->   include/linux/blk-mq.h | 38 +++++++++++++++++++-------------------
->   1 file changed, 19 insertions(+), 19 deletions(-)
-> 
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 06caacd77ed6..4de6ad92530c 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -223,13 +223,13 @@ static inline unsigned short req_get_ioprio(struct request *req)
->   
->   #define rq_list_add(listptr, rq)	do {		\
->   	(rq)->rq_next = *(listptr);			\
-> -	*(listptr) = rq;				\
-> +	*(listptr) = (rq);				\
->   } while (0)
-> 
-
-Linus,
-
-Which way do we want to go with respect to the rvalue of the assignment 
-operator "=" in a macro ? (with or without parentheses)
-
-In short:
-
-#define m(x) do { z = (x); } while (0)
-
-or
-
-#define m(x) do { z = x; } while (0)
-
-?
-
-Given that "=" has the lowest operator precedence just above comma, and 
-its associativity is right-to-left, I suspect the only use that would 
-break it without the extra parentheses around "x" is:
-
-#define eval(...) __VA_ARGS__
-#define m(x) do { z = x; } while (0)
-
-m(eval(1, abc))
-
-Which generates the following C code after preprocessing:
-
-do { z = 1, abc; } while (0)
-
-which ends up expanding the comma within the rvalue. But this use-case 
-is a bit far-fetched, so I don't know if we want to require the 
-parentheses or not.
-
-And if we decide that we do want to require the parentheses around the 
-"x" parameter in the "=" rvalue, then this means we have to consider 
-whether we want to require parentheses around the macro arguments used 
-as function/macro arguments, e.g.:
-
-#define eval(...) __VA_ARGS__
-#define m(x)    f(x)
-
-m(eval(1, abc));
-
-Which generates the following C code after preprocessing:
-
-f(1, abc);
-
-If we want to be consistent, I suspect we want to require the same for 
-both use-cases ("=" rvalue and function/macro parameters).
-
-Thanks,
-
-Mathieu
-
-
+I'll take a look post -rc1.
 
 -- 
-Mathieu Desnoyers
-EfficiOS Inc.
-https://www.efficios.com
+Jens Axboe
 
