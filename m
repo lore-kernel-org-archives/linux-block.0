@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5282C77B7F
-	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 19:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BADCC7EE2D
+	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 19:42:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233200AbjEETmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S233282AbjEETmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 5 May 2023 15:42:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34550 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232137AbjEETmQ (ORCPT
+        with ESMTP id S232549AbjEETmQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 15:42:16 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EF72E68;
-        Fri,  5 May 2023 12:42:14 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 345JOo0I032074;
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127291BE4;
+        Fri,  5 May 2023 12:42:15 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 345JcmLO026399;
         Fri, 5 May 2023 19:42:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=WmW5M4ibPZMS2bwVC5UNFf4vPtQxENZ32A6cAQDe5OE=;
- b=Sn58JtQOVQ/eUCph7wo/FCNUVfu/2vax3y65yd6vQGLk6IM++3gYNRonzz6EnGDLqfSF
- 5OPdORDcqB+pPkUgAacTIwqSy6NkXGXnQicz1Oc7hjaU7Q838G1ZV5yCog6YTRf/AWR6
- CD3Buzz/pOWR3QY8rC/Zow16q7rleVPEYF1iwJ/pxhduaDM9o3R5Dpd6SdUbodQnNyEe
- 2ZvZCIXaBdF2Ni6V+xLYWlzY3d8haWRaOiC2RFMUEEOTZT38OGgGszWZhzdvRQsAHzOz
- qu1ubBe5tCyEJmEENAg3b3/NBWnQjQeCQNTY6CHPnCfRctmI3lDUoOvyQJYoJdBnn/Qq Nw== 
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qd7scrtcq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 May 2023 19:42:00 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 345HFTFT003793;
-        Fri, 5 May 2023 19:41:59 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([9.208.129.113])
-        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3q8tv887f5-1
+ bh=UrkXztJs4up8OoP4VgwErPUXYorlb1pBypAFlNLJZXg=;
+ b=YPji9VtJ5Y/9j91XAIrNTz/7ouEhRc461F2WqiL7PciaqjZoTh93aD3TuJeRjeIz/o7Y
+ ARydMf3fcBB+7g41S8obMi58w9uMntEYnxCzfzTsn2t1UaC25LSrkAqg0AV0QrRNQQo8
+ QkL28zggw+sJtazJKozrExQVoN4CcnRM8eVbD2vD21VKgTtxfmXKiPcjfxM+L03zegwH
+ OxP3db9qURNfGRkVEAAPw86R7mRm3VaGw2OYfj8Y5OfGegB0y0AYDN7M5vx9GgVPQoq4
+ 7IBg/DCjV0jfkUaCgY/TLgmfpmW6mQLWBfH0GCDXzS4kEyWKFq3Lld/YU46mGTqtxGi3 Fw== 
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qd78vsemk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 05 May 2023 19:41:59 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 345JfwIF64160184
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 345Gs2v9025333;
         Fri, 5 May 2023 19:41:58 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
+        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3q8tv888hg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 May 2023 19:41:58 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 345JfuND36307698
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 May 2023 19:41:57 GMT
 Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4396258051;
-        Fri,  5 May 2023 19:41:58 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E24CF5805A;
+        by IMSVA (Postfix) with ESMTP id B71065805E;
         Fri,  5 May 2023 19:41:56 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6245F5805A;
+        Fri,  5 May 2023 19:41:55 +0000 (GMT)
 Received: from rhel-laptop.ibm.com.com (unknown [9.160.1.159])
         by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  5 May 2023 19:41:56 +0000 (GMT)
+        Fri,  5 May 2023 19:41:55 +0000 (GMT)
 From:   gjoyce@linux.vnet.ibm.com
 To:     linux-block@vger.kernel.org
 Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
@@ -57,172 +57,160 @@ Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
         axboe@kernel.dk, akpm@linux-foundation.org,
         gjoyce@linux.vnet.ibm.com, linux-efi@vger.kernel.org,
         keyrings@vger.kernel.org, me@benboeckel.net, elliott@hpe.com
-Subject: [PATCH v4 2/3] block: sed-opal: Implement IOC_OPAL_REVERT_LSP
-Date:   Fri,  5 May 2023 14:41:50 -0500
-Message-Id: <20230505194151.2078678-3-gjoyce@linux.vnet.ibm.com>
+Subject: [PATCH v4 1/3] block: sed-opal: Implement IOC_OPAL_DISCOVERY
+Date:   Fri,  5 May 2023 14:41:49 -0500
+Message-Id: <20230505194151.2078678-2-gjoyce@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230505194151.2078678-1-gjoyce@linux.vnet.ibm.com>
 References: <20230505194151.2078678-1-gjoyce@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: L9SItRXMsyd-s6iz-2FUqUXtlSSHlleQ
-X-Proofpoint-GUID: L9SItRXMsyd-s6iz-2FUqUXtlSSHlleQ
+X-Proofpoint-GUID: -Fq7JpJZGvHD6ARVVBwHYGA0tEF0yPN-
+X-Proofpoint-ORIG-GUID: -Fq7JpJZGvHD6ARVVBwHYGA0tEF0yPN-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-05_25,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 mlxlogscore=999 clxscore=1015
- spamscore=0 suspectscore=0 impostorscore=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2305050156
+ definitions=2023-05-05_26,2023-05-05_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 phishscore=0 malwarescore=0 suspectscore=0 adultscore=0
+ mlxscore=0 impostorscore=0 priorityscore=1501 clxscore=1015 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2305050160
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
 
-This is used in conjunction with IOC_OPAL_REVERT_TPR to return a drive to
-Original Factory State without erasing the data. If IOC_OPAL_REVERT_LSP
-is called with opal_revert_lsp.options bit OPAL_PRESERVE set prior
-to calling IOC_OPAL_REVERT_TPR, the drive global locking range will not
-be erased.
+Add IOC_OPAL_DISCOVERY ioctl to return raw discovery data to a SED Opal
+application. This allows the application to display drive capabilities
+and state.
 
 Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
 ---
- block/opal_proto.h            |  4 ++++
- block/sed-opal.c              | 40 +++++++++++++++++++++++++++++++++++
+ block/sed-opal.c              | 38 ++++++++++++++++++++++++++++++++---
  include/linux/sed-opal.h      |  1 +
- include/uapi/linux/sed-opal.h | 11 ++++++++++
- 4 files changed, 56 insertions(+)
+ include/uapi/linux/sed-opal.h |  6 ++++++
+ 3 files changed, 42 insertions(+), 3 deletions(-)
 
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index 7152aa1f1a49..c3b5bff0b9e4 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -215,6 +215,10 @@ enum opal_parameter {
- 	OPAL_SUM_SET_LIST = 0x060000,
- };
- 
-+enum opal_revertlsp {
-+	OPAL_KEEP_GLOBAL_RANGE_KEY = 0x060000,
-+};
-+
- /* Packets derived from:
-  * TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
-  * Secion: 3.2.3 ComPackets, Packets & Subpackets
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index b55a8eb29f5b..5b277eaabbc7 100644
+index c320093c14f1..b55a8eb29f5b 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -1634,6 +1634,26 @@ static int internal_activate_user(struct opal_dev *dev, void *data)
- 	return finalize_and_send(dev, parse_and_check_status);
+@@ -457,8 +457,11 @@ static int execute_steps(struct opal_dev *dev,
+ 	return error;
  }
  
-+static int revert_lsp(struct opal_dev *dev, void *data)
-+{
-+	struct opal_revert_lsp *rev = data;
-+	int err;
+-static int opal_discovery0_end(struct opal_dev *dev)
++static int opal_discovery0_end(struct opal_dev *dev, void *data)
+ {
++	struct opal_discovery *discv_out = data; /* may be NULL */
++	u8 __user *buf_out;
++	u64 len_out;
+ 	bool found_com_id = false, supported = true, single_user = false;
+ 	const struct d0_header *hdr = (struct d0_header *)dev->resp;
+ 	const u8 *epos = dev->resp, *cpos = dev->resp;
+@@ -474,6 +477,15 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 		return -EFAULT;
+ 	}
+ 
++	if (discv_out) {
++		buf_out = (u8 __user *)(uintptr_t)discv_out->data;
++		len_out = min_t(u64, discv_out->size, hlen);
++		if (buf_out && copy_to_user(buf_out, dev->resp, len_out))
++			return -EFAULT;
 +
-+	err = cmd_start(dev, opaluid[OPAL_THISSP_UID],
-+			opalmethod[OPAL_REVERTSP]);
-+	add_token_u8(&err, dev, OPAL_STARTNAME);
-+	add_token_u64(&err, dev, OPAL_KEEP_GLOBAL_RANGE_KEY);
-+	add_token_u8(&err, dev, (rev->options & OPAL_PRESERVE) ?
-+			OPAL_TRUE : OPAL_FALSE);
-+	add_token_u8(&err, dev, OPAL_ENDNAME);
-+	if (err) {
-+		pr_debug("Error building REVERT SP command.\n");
-+		return err;
++		discv_out->size = hlen; /* actual size of data */
 +	}
 +
-+	return finalize_and_send(dev, parse_and_check_status);
-+}
-+
- static int erase_locking_range(struct opal_dev *dev, void *data)
- {
- 	struct opal_session_info *session = data;
-@@ -2275,6 +2295,23 @@ static int opal_get_discv(struct opal_dev *dev, struct opal_discovery *discv)
- 	return discv->size; /* modified to actual length of data */
+ 	epos += hlen; /* end of buffer */
+ 	cpos += sizeof(*hdr); /* current position on buffer */
+ 
+@@ -559,13 +571,13 @@ static int opal_discovery0(struct opal_dev *dev, void *data)
+ 	if (ret)
+ 		return ret;
+ 
+-	return opal_discovery0_end(dev);
++	return opal_discovery0_end(dev, data);
  }
  
-+static int opal_revertlsp(struct opal_dev *dev, struct opal_revert_lsp *rev)
+ static int opal_discovery0_step(struct opal_dev *dev)
+ {
+ 	const struct opal_step discovery0_step = {
+-		opal_discovery0,
++		opal_discovery0, NULL
+ 	};
+ 
+ 	return execute_step(dev, &discovery0_step, 0);
+@@ -2247,6 +2259,22 @@ static int opal_secure_erase_locking_range(struct opal_dev *dev,
+ 	return ret;
+ }
+ 
++static int opal_get_discv(struct opal_dev *dev, struct opal_discovery *discv)
 +{
-+	/* controller will terminate session */
-+	const struct opal_step steps[] = {
-+		{ start_admin1LSP_opal_session, &rev->key },
-+		{ revert_lsp, rev }
++	const struct opal_step discovery0_step = {
++		opal_discovery0, discv
 +	};
-+	int ret;
++	int ret = 0;
 +
 +	mutex_lock(&dev->dev_lock);
 +	setup_opal_dev(dev);
-+	ret = execute_steps(dev, steps, ARRAY_SIZE(steps));
++	ret = execute_step(dev, &discovery0_step, 0);
 +	mutex_unlock(&dev->dev_lock);
-+
-+	return ret;
++	if (ret)
++		return ret;
++	return discv->size; /* modified to actual length of data */
 +}
 +
  static int opal_erase_locking_range(struct opal_dev *dev,
  				    struct opal_session_info *opal_session)
  {
-@@ -2842,6 +2879,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+@@ -2814,6 +2842,10 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
  	case IOC_OPAL_GET_STATUS:
  		ret = opal_get_status(dev, arg);
  		break;
-+	case IOC_OPAL_REVERT_LSP:
-+		ret = opal_revertlsp(dev, p);
++	case IOC_OPAL_DISCOVERY:
++		ret = opal_get_discv(dev, p);
 +		break;
- 	case IOC_OPAL_DISCOVERY:
- 		ret = opal_get_discv(dev, p);
++
+ 	default:
  		break;
+ 	}
 diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 8e824ab908e9..bf2f9d7e11eb 100644
+index 31ac562a17d7..8e824ab908e9 100644
 --- a/include/linux/sed-opal.h
 +++ b/include/linux/sed-opal.h
-@@ -46,6 +46,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+@@ -45,6 +45,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_WRITE_SHADOW_MBR:
  	case IOC_OPAL_GENERIC_TABLE_RW:
  	case IOC_OPAL_GET_STATUS:
- 	case IOC_OPAL_DISCOVERY:
-+	case IOC_OPAL_REVERT_LSP:
++	case IOC_OPAL_DISCOVERY:
  		return true;
  	}
  	return false;
 diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 98f216cf2241..720725f1c42a 100644
+index d7a1524023db..98f216cf2241 100644
 --- a/include/uapi/linux/sed-opal.h
 +++ b/include/uapi/linux/sed-opal.h
-@@ -56,6 +56,10 @@ struct opal_key {
- 	__u8 key[OPAL_KEY_MAX];
+@@ -151,6 +151,11 @@ struct opal_status {
+ 	__u32 reserved;
  };
  
-+enum opal_revert_lsp_opts {
-+	OPAL_PRESERVE = 0x01,
-+};
-+
- struct opal_lr_act {
- 	struct opal_key key;
- 	__u32 sum;
-@@ -156,6 +160,12 @@ struct opal_discovery {
- 	__u64 size;
- };
- 
-+struct opal_revert_lsp {
-+	struct opal_key key;
-+	__u32 options;
-+	__u32 __pad;
++struct opal_discovery {
++	__u64 data;
++	__u64 size;
 +};
 +
  #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
  #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
  #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
-@@ -174,5 +184,6 @@ struct opal_discovery {
+@@ -168,5 +173,6 @@ struct opal_status {
+ #define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 234, struct opal_shadow_mbr)
  #define IOC_OPAL_GENERIC_TABLE_RW   _IOW('p', 235, struct opal_read_write_table)
  #define IOC_OPAL_GET_STATUS         _IOR('p', 236, struct opal_status)
- #define IOC_OPAL_DISCOVERY          _IOW('p', 237, struct opal_discovery)
-+#define IOC_OPAL_REVERT_LSP         _IOW('p', 238, struct opal_revert_lsp)
++#define IOC_OPAL_DISCOVERY          _IOW('p', 237, struct opal_discovery)
  
  #endif /* _UAPI_SED_OPAL_H */
 -- 
