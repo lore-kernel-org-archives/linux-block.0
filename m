@@ -2,573 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C77CC7EE2A
-	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 03:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71642C77B75
+	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 03:52:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbjEED2j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 May 2023 23:28:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52160 "EHLO
+        id S230105AbjEEDwa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 May 2023 23:52:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230034AbjEED2i (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 23:28:38 -0400
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70A2869A
-        for <linux-block@vger.kernel.org>; Thu,  4 May 2023 20:28:35 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VhnGAf0_1683257310;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VhnGAf0_1683257310)
-          by smtp.aliyun-inc.com;
-          Fri, 05 May 2023 11:28:33 +0800
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-To:     shinichiro.kawasaki@wdc.com, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V2 blktests 2/2] tests: Add ublk tests
-Date:   Fri,  5 May 2023 11:28:08 +0800
-Message-Id: <20230505032808.356768-3-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230505032808.356768-1-ZiyangZhang@linux.alibaba.com>
-References: <20230505032808.356768-1-ZiyangZhang@linux.alibaba.com>
+        with ESMTP id S230072AbjEEDwX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 May 2023 23:52:23 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF47D11572;
+        Thu,  4 May 2023 20:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=GAX3xUURHmNrkqo48U3apChUo8nPnawKi2Wp+78HVCE=; b=oe8Fd59RI3I0udKddZe67tmtWu
+        26Z6CrfGkbKBTyULCmFyjGbF350CBZXF60nLAxLmejJgwjGeOdaXtumY4liwrk8k4sCOQfHC0WWMr
+        b3XoA8krZlnoxINZdJa79wPOGg9dKhNYKcYBptxkOuShmxxQNTkGCT7qDdy2ZSZW1sMQ5sJJY9+ix
+        vKij9ozHGnjb8MNDk3BC1WtulxGIVYmDuW6AJkc+k0eDyCOTEBSMWlmXTuGKnMCW0cxR83XQx3pD0
+        +y5ohfzHT7Hzg1HGAy0n13SelXE98QeNBxU4UcIY7NncRRPDguTcyMmVkdDm+DEwIuxj4xiylss6Z
+        6JCa8Pyw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pumUF-009eOy-1o;
+        Fri, 05 May 2023 03:52:03 +0000
+Date:   Thu, 4 May 2023 20:52:03 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Andreas Hindborg <nmi@metaspace.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
+        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com
+Subject: Re: [RFC PATCH 00/11] Rust null block driver
+Message-ID: <ZFR9Y12sSRGHvUZK@infradead.org>
+References: <20230503090708.2524310-1-nmi@metaspace.dk>
+ <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
+ <87jzxot0jk.fsf@metaspace.dk>
+ <b9a1c1b2-3baa-2cad-31ae-8b14e4ee5709@acm.org>
+ <ZFP+8apHunCCMmOZ@kbusch-mbp.dhcp.thefacebook.com>
+ <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It is very important to test ublk crash handling since the userspace
-part is not reliable. Especially we should test removing device, killing
-ublk daemons and user recovery feature.
+On Thu, May 04, 2023 at 01:02:19PM -0600, Jens Axboe wrote:
+> null_blk or not, it's more if we want to go down this path of
+> maintaining rust bindings for the block code in general. If the answer
+> to that is yes, then doing null_blk seems like a great choice as it's
+> not a critical piece of infrastructure. It might even be a good idea to
+> be able to run both, for performance purposes, as the bindings or core
+> changes.
 
-Add five new tests for ublk to cover these cases.
-
-Signed-off-by: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
----
- common/ublk        | 10 +++++-
- tests/ublk/001     | 48 +++++++++++++++++++++++++++
- tests/ublk/001.out |  2 ++
- tests/ublk/002     | 63 +++++++++++++++++++++++++++++++++++
- tests/ublk/002.out |  2 ++
- tests/ublk/003     | 48 +++++++++++++++++++++++++++
- tests/ublk/003.out |  2 ++
- tests/ublk/004     | 50 ++++++++++++++++++++++++++++
- tests/ublk/004.out |  2 ++
- tests/ublk/005     | 79 +++++++++++++++++++++++++++++++++++++++++++
- tests/ublk/005.out |  2 ++
- tests/ublk/006     | 83 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/ublk/006.out |  2 ++
- tests/ublk/rc      | 15 +++++++++
- 14 files changed, 407 insertions(+), 1 deletion(-)
- create mode 100755 tests/ublk/001
- create mode 100644 tests/ublk/001.out
- create mode 100755 tests/ublk/002
- create mode 100644 tests/ublk/002.out
- create mode 100755 tests/ublk/003
- create mode 100644 tests/ublk/003.out
- create mode 100755 tests/ublk/004
- create mode 100644 tests/ublk/004.out
- create mode 100755 tests/ublk/005
- create mode 100644 tests/ublk/005.out
- create mode 100755 tests/ublk/006
- create mode 100644 tests/ublk/006.out
- create mode 100644 tests/ublk/rc
-
-diff --git a/common/ublk b/common/ublk
-index 932c534..7a951eb 100644
---- a/common/ublk
-+++ b/common/ublk
-@@ -15,8 +15,16 @@ _remove_ublk_devices() {
- 	src/miniublk del -a
- }
- 
-+__get_ublk_dev_state() {
-+	src/miniublk list -n "$1" | grep "state" | awk '{print $11}'
-+}
-+
-+__get_ublk_daemon_pid() {
-+	src/miniublk list -n "$1" | grep "pid" | awk '{print $7}'
-+}
-+
- _init_ublk() {
--	_remove_ublk_devices
-+	_remove_ublk_devices > /dev/null 2>&1
- 
- 	modprobe -rq ublk_drv
- 	if ! modprobe ublk_drv; then
-diff --git a/tests/ublk/001 b/tests/ublk/001
-new file mode 100755
-index 0000000..36a43d7
---- /dev/null
-+++ b/tests/ublk/001
-@@ -0,0 +1,48 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk delete
-+
-+. tests/ublk/rc
-+
-+DESCRIPTION="test ublk delete"
-+
-+__run() {
-+	local type=$1
-+
-+	if [ "$type" == "null" ]; then
-+		${ublk_prog} add -t null -n 0 > "$FULL" 2>&1
-+	else
-+		truncate -s 1G "$TMPDIR/img"
-+		${ublk_prog} add -t loop -f "$TMPDIR/img" -n 0 > "$FULL" 2>&1
-+	fi
-+
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL" 2>&1; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 >> "$FULL" 2>&1 &
-+	sleep 2
-+
-+	${ublk_prog} del -n 0 >> "$FULL" 2>&1
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	for type in "null" "loop"; do
-+		__run "$type"
-+	done
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/001.out b/tests/ublk/001.out
-new file mode 100644
-index 0000000..0d070b3
---- /dev/null
-+++ b/tests/ublk/001.out
-@@ -0,0 +1,2 @@
-+Running ublk/001
-+Test complete
-diff --git a/tests/ublk/002 b/tests/ublk/002
-new file mode 100755
-index 0000000..e36589e
---- /dev/null
-+++ b/tests/ublk/002
-@@ -0,0 +1,63 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk crash with delete after dead confirmation
-+
-+. tests/ublk/rc
-+
-+DESCRIPTION="test ublk crash with delete after dead confirmation"
-+
-+__run() {
-+	local type=$1
-+
-+	if [ "$type" == "null" ]; then
-+		${ublk_prog} add -t null -n 0 > "$FULL" 2>&1
-+	else
-+		truncate -s 1G "$TMPDIR/img"
-+		${ublk_prog} add -t loop -f "$TMPDIR/img" -n 0 > "$FULL" 2>&1
-+	fi
-+
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL" 2>&1; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 >> "$FULL" 2>&1 &
-+	sleep 2
-+
-+	kill -9 "$(__get_ublk_daemon_pid 0)"
-+	sleep 2
-+
-+	local secs=0
-+	local state=""
-+	while [ $secs -lt 20 ]; do
-+		state="$(__get_ublk_dev_state 0)"
-+		[  "$state" == "DEAD" ] && break
-+		sleep 1
-+		(( secs++ ))
-+	done
-+
-+	state="$(__get_ublk_dev_state 0)"
-+	[  "$state" != "DEAD" ] && echo "device is $state after killing queue daemon"
-+
-+	${ublk_prog} del -n 0 >> "$FULL" 2>&1
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	for type in "null" "loop"; do
-+		__run "$type"
-+	done
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/002.out b/tests/ublk/002.out
-new file mode 100644
-index 0000000..93039b7
---- /dev/null
-+++ b/tests/ublk/002.out
-@@ -0,0 +1,2 @@
-+Running ublk/002
-+Test complete
-diff --git a/tests/ublk/003 b/tests/ublk/003
-new file mode 100755
-index 0000000..b256b09
---- /dev/null
-+++ b/tests/ublk/003
-@@ -0,0 +1,48 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test mounting block device exported by ublk
-+
-+. tests/ublk/rc
-+
-+DESCRIPTION="test mounting block device exported by ublk"
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+	local ROOT_FSTYPE="$(findmnt -l -o FSTYPE -n /)"
-+	local mnt="$TMPDIR/mnt"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	truncate -s 1G "$TMPDIR/img"
-+	${ublk_prog} add -t loop -f  "$TMPDIR/img" -n 0 > "$FULL" 2>&1
-+
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL" 2>&1; then
-+		echo "fail to list dev"
-+	fi
-+
-+	wipefs -a /dev/ublkb0 >> "$FULL" 2>&1
-+	mkfs.${ROOT_FSTYPE} /dev/ublkb0 >> "$FULL" 2>&1
-+	mkdir -p "$mnt"
-+	mount /dev/ublkb0 "$mnt" >> "$FULL" 2>&1
-+
-+	local UBLK_FSTYPE="$(findmnt -l -o FSTYPE -n $mnt)"
-+	if [ "$UBLK_FSTYPE" != "$ROOT_FSTYPE" ]; then
-+		echo "got $UBLK_FSTYPE, should be $ROOT_FSTYPE"
-+	fi
-+	umount "$mnt" > /dev/null 2>&1
-+
-+	${ublk_prog} del -n 0 >> "$FULL" 2>&1
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-+
-+
-diff --git a/tests/ublk/003.out b/tests/ublk/003.out
-new file mode 100644
-index 0000000..90a3bfa
---- /dev/null
-+++ b/tests/ublk/003.out
-@@ -0,0 +1,2 @@
-+Running ublk/003
-+Test complete
-diff --git a/tests/ublk/004 b/tests/ublk/004
-new file mode 100755
-index 0000000..84e01d1
---- /dev/null
-+++ b/tests/ublk/004
-@@ -0,0 +1,50 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk crash with delete just after daemon kill
-+
-+. tests/ublk/rc
-+
-+DESCRIPTION="test ublk crash with delete just after daemon kill"
-+
-+__run() {
-+	local type=$1
-+
-+	if [ "$type" == "null" ]; then
-+		${ublk_prog} add -t null -n 0 > "$FULL" 2>&1
-+	else
-+		truncate -s 1G "$TMPDIR/img"
-+		${ublk_prog} add -t loop -f "$TMPDIR/img" -n 0 > "$FULL" 2>&1
-+	fi
-+
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL" 2>&1; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 >> "$FULL" 2>&1 &
-+	sleep 2
-+
-+	kill -9 "$(__get_ublk_daemon_pid 0)"
-+
-+	${ublk_prog} del -n 0 >> "$FULL" 2>&1
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	for type in "null" "loop"; do
-+		__run "$type"
-+	done
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/004.out b/tests/ublk/004.out
-new file mode 100644
-index 0000000..a92cd50
---- /dev/null
-+++ b/tests/ublk/004.out
-@@ -0,0 +1,2 @@
-+Running ublk/004
-+Test complete
-diff --git a/tests/ublk/005 b/tests/ublk/005
-new file mode 100755
-index 0000000..f365fd6
---- /dev/null
-+++ b/tests/ublk/005
-@@ -0,0 +1,79 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk recovery with one time daemon kill:
-+# (1)kill all ubq_deamon, (2)recover with new ubq_daemon,
-+# (3)delete dev
-+
-+. tests/ublk/rc
-+
-+DESCRIPTION="test ublk recovery with one time daemon kill"
-+
-+__run() {
-+	local type=$1
-+
-+	if [ "$type" == "null" ]; then
-+		${ublk_prog} add -t null -n 0 -r > "$FULL" 2>&1
-+	else
-+		truncate -s 1G "$TMPDIR/img"
-+		${ublk_prog} add -t loop -f "$TMPDIR/img" -n 0 -r > "$FULL" 2>&1
-+	fi
-+
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL" 2>&1; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 >> "$FULL" 2>&1 &
-+	sleep 2
-+
-+	kill -9 "$(__get_ublk_daemon_pid 0)"
-+	sleep 2
-+
-+	local secs=0
-+	local state=""
-+	while [ $secs -lt 20 ]; do
-+		state="$(__get_ublk_dev_state 0)"
-+		[ "$state" == "QUIESCED" ] && break
-+		sleep 1
-+		(( secs++ ))
-+	done
-+
-+	state="$(__get_ublk_dev_state 0)"
-+	[ "$state" != "QUIESCED" ] && echo "device is $state after killing queue daemon"
-+
-+	if [ "$type" == "null" ]; then
-+		${ublk_prog} recover -t null -n 0 >> "$FULL" 2>&1
-+	else
-+		${ublk_prog} recover -t loop -f "$TMPDIR/img" -n 0 >> "$FULL" 2>&1
-+	fi
-+
-+	while [ $secs -lt 20 ]; do
-+		state="$(__get_ublk_dev_state 0)"
-+		[ "$state" == "LIVE" ] && break
-+		sleep 1
-+		(( secs++ ))
-+	done
-+	[ "$state" != "LIVE" ] && echo "device is $state after recovery"
-+
-+	${ublk_prog} del -n 0 >> "$FULL" 2>&1
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	for type in "null" "loop"; do
-+		__run "$type"
-+	done
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/ublk/005.out b/tests/ublk/005.out
-new file mode 100644
-index 0000000..20d7b38
---- /dev/null
-+++ b/tests/ublk/005.out
-@@ -0,0 +1,2 @@
-+Running ublk/005
-+Test complete
-diff --git a/tests/ublk/006 b/tests/ublk/006
-new file mode 100755
-index 0000000..0848939
---- /dev/null
-+++ b/tests/ublk/006
-@@ -0,0 +1,83 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# Test ublk recovery with two times daemon kill:
-+# (1)kill all ubq_deamon, (2)recover with new ubq_daemon,
-+# (3)kill all ubq_deamon, (4)delete dev
-+
-+. tests/ublk/rc
-+
-+DESCRIPTION="test ublk recovery with two times daemon kill"
-+
-+__run() {
-+	local type=$1
-+
-+	if [ "$type" == "null" ]; then
-+		${ublk_prog} add -t null -n 0 -r > "$FULL" 2>&1
-+	else
-+		truncate -s 1G "$TMPDIR/img"
-+		${ublk_prog} add -t loop -f "$TMPDIR/img" -n 0 -r > "$FULL" 2>&1
-+	fi
-+
-+	udevadm settle
-+	if ! ${ublk_prog} list -n 0 >> "$FULL" 2>&1; then
-+		echo "fail to list dev"
-+	fi
-+
-+	_run_fio_rand_io --filename=/dev/ublkb0 --time_based --runtime=30 >> "$FULL" 2>&1 &
-+	sleep 2
-+
-+	kill -9 "$(__get_ublk_daemon_pid 0)"
-+	sleep 2
-+
-+	local secs=0
-+	local state=""
-+	while [ $secs -lt 20 ]; do
-+		state="$(__get_ublk_dev_state 0)"
-+		[ "$state" == "QUIESCED" ] && break
-+		sleep 1
-+		(( secs++ ))
-+	done
-+
-+	state="$(__get_ublk_dev_state 0)"
-+	[ "$state" != "QUIESCED" ] && echo "device is $state after killing queue daemon"
-+
-+	if [ "$type" == "null" ]; then
-+		${ublk_prog} recover -t null -n 0 >> "$FULL" 2>&1
-+	else
-+		${ublk_prog} recover -t loop -f "$TMPDIR/img" -n 0 >> "$FULL" 2>&1
-+	fi
-+
-+	secs=0
-+	while [ $secs -lt 20 ]; do
-+		state="$(__get_ublk_dev_state 0)"
-+		[ "$state" == "LIVE" ] && break
-+		sleep 1
-+		(( secs++ ))
-+	done
-+	[ "$state" != "LIVE" ] && echo "device is $state after recovery"
-+
-+	kill -9 "$(__get_ublk_daemon_pid 0)"
-+
-+	${ublk_prog} del -n 0 >> "$FULL" 2>&1
-+}
-+
-+test() {
-+	local ublk_prog="src/miniublk"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! _init_ublk; then
-+		return 1
-+	fi
-+
-+	for type in "null" "loop"; do
-+		__run "$type"
-+	done
-+
-+	_exit_ublk
-+
-+	echo "Test complete"
-+}
-+
-diff --git a/tests/ublk/006.out b/tests/ublk/006.out
-new file mode 100644
-index 0000000..6d2a530
---- /dev/null
-+++ b/tests/ublk/006.out
-@@ -0,0 +1,2 @@
-+Running ublk/006
-+Test complete
-diff --git a/tests/ublk/rc b/tests/ublk/rc
-new file mode 100644
-index 0000000..8cbc757
---- /dev/null
-+++ b/tests/ublk/rc
-@@ -0,0 +1,15 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2023 Ziyang Zhang
-+#
-+# ublk tests.
-+
-+. common/rc
-+. common/ublk
-+. common/fio
-+
-+group_requires() {
-+	_have_root
-+	_have_ublk
-+	_have_fio
-+}
--- 
-2.31.1
-
+Yes.  And I'm not in favor of it, especially right now.  There is
+so much work we need to do that requires changes all over (e.g.
+sorting out the request_queue vs gendisk, and making the bio_vec
+folio or even better physical address based), and the last thing I
+need is a binding to a another language, one that happens to have
+nice features but that also is really ugly.
