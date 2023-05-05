@@ -2,145 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE045C7EE2A
-	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 19:49:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC26C77B75
+	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 19:55:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233184AbjEETt1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 May 2023 15:49:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38386 "EHLO
+        id S231636AbjEETzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 May 2023 15:55:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232137AbjEETt0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 15:49:26 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 912A210C;
-        Fri,  5 May 2023 12:49:25 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 345JguoK003476;
-        Fri, 5 May 2023 19:44:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=gzm1CwDyIKYU3piQM3kkGq3B9mytpWsfDxW9dYi+7no=;
- b=KI0D3czRM2SyMifk3CHdthqqPo4AynnfVa+MHziZGkd2O87vpG5Xf++lgGazZwqiGDHs
- bR7bkwj/x+pdbZtYfoLj6WFJyF95dz9GdNMhvBNdL56uJzey0BnznlzQkdd1Vjyvrklz
- 1+XII5LgxwA9c3ymRyiivX29JRJy080ChGLM2pP/Gxy2VqppIXQetuwQwXNr3cotO5Qs
- SFlN/vqbM7TCna/OOqtnRTuKxZRNDoZOQzfHjhUedRW6XbxYIwByQ996qtYfCOUd8pRR
- Ygyv5eCMEDAkA2EYR3EBz2hgKEPFpR3idkYaMKkyR15AkQXxfyy7/pRD2zAgMTUtmec+ tg== 
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qd86qr0va-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 May 2023 19:44:07 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 345Hef7K011923;
-        Fri, 5 May 2023 19:44:06 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
-        by ppma01wdc.us.ibm.com (PPS) with ESMTPS id 3q8tv8878a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 May 2023 19:44:06 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 345Ji50635258698
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 May 2023 19:44:05 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 509915805D;
-        Fri,  5 May 2023 19:44:05 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CA0C658043;
-        Fri,  5 May 2023 19:44:03 +0000 (GMT)
-Received: from rhel-laptop.ibm.com.com (unknown [9.160.1.159])
-        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  5 May 2023 19:44:03 +0000 (GMT)
-From:   gjoyce@linux.vnet.ibm.com
-To:     linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        axboe@kernel.dk, akpm@linux-foundation.org,
-        gjoyce@linux.vnet.ibm.com, linux-efi@vger.kernel.org,
-        keyrings@vger.kernel.org, me@benboeckel.net, elliott@hpe.com,
-        andonnel@au1.ibm.com
-Subject: [PATCH v5 0/4] generic and PowerPC SED Opal keystore
-Date:   Fri,  5 May 2023 14:43:58 -0500
-Message-Id: <20230505194402.2079010-1-gjoyce@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.31.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: FrMG7DCN-O5YZdGaCf56YF8C-VnelcnQ
-X-Proofpoint-ORIG-GUID: FrMG7DCN-O5YZdGaCf56YF8C-VnelcnQ
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S231580AbjEETzB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 15:55:01 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD91101
+        for <linux-block@vger.kernel.org>; Fri,  5 May 2023 12:55:00 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-50bc4b88998so3873834a12.3
+        for <linux-block@vger.kernel.org>; Fri, 05 May 2023 12:55:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1683316499; x=1685908499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nv8lvk1AbBLvhkSN9QZ33lzvEycfnFaITAOJMUFaHQA=;
+        b=Hyx+9ZwETWFNgFL2zFcgjp8ZA+6ONl6SfOea54n7JwJeC61ZnZuI2l9VEgChaG2yvq
+         eiJRlEXBbkjCD824CDMHW4PbA8N54d12CwnMi1O/79MLRj50vNwCxaiJUxpJi10WHoxJ
+         JLUa5PPRZptR1nH/RVIRQuIGx1Lz41SQI2T68=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683316499; x=1685908499;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nv8lvk1AbBLvhkSN9QZ33lzvEycfnFaITAOJMUFaHQA=;
+        b=c2zEjBbOFlWAKSqRQyF1Wwv4HRqc80iqj2Ibo1zEpPlYlo00vbnU2MCyEf0KY/elio
+         zY48SUSIDIHLyz/mRPkiP/VmV4EiAKBKgCrNu637dqpi7c53L1noov/cEISma3ishS1z
+         Rf0zRL/kQ6Bc2qDmX5uwK3+JYEqgmmkV2D3zMcqnr1H37m3URsZzxEySsCzuwgWhbDLd
+         tINYT4wc+BEjnp31W4bSsGC1EnPKmhp95GN5D0TryhHvfjxuKYkgkcEtyZRO9weZzuC9
+         zzPwJeE79Il7bofV7fi31MxOKHKo/1r0z8NQmw5Jd4lNR75M7+MZSJJs8TiafbN4VYee
+         ty4Q==
+X-Gm-Message-State: AC+VfDxe3rkpTnU3iqFJ6S229PeoVQa74bdgGhowFrQSzYmAAYGnz3iI
+        BezyzYgHDGTJ99LTE8SSEw6Cl8w0JqPAijO3wHkFWQ==
+X-Google-Smtp-Source: ACHHUZ79MY/+FX66LwvaEzCWXPtFtRollGB3BTU3aIx7j8kFND0miClEdv9jCJpLnnYIEiTc+Pp+zA==
+X-Received: by 2002:a17:907:96a1:b0:95f:f573:bf7e with SMTP id hd33-20020a17090796a100b0095ff573bf7emr2439542ejc.0.1683316498986;
+        Fri, 05 May 2023 12:54:58 -0700 (PDT)
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com. [209.85.218.43])
+        by smtp.gmail.com with ESMTPSA id y25-20020a1709063a9900b0094f257e3e05sm1289958ejd.168.2023.05.05.12.54.57
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 May 2023 12:54:58 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-94a34a14a54so432706266b.1
+        for <linux-block@vger.kernel.org>; Fri, 05 May 2023 12:54:57 -0700 (PDT)
+X-Received: by 2002:a17:907:e8e:b0:94f:969e:c52b with SMTP id
+ ho14-20020a1709070e8e00b0094f969ec52bmr2399020ejc.74.1683316497433; Fri, 05
+ May 2023 12:54:57 -0700 (PDT)
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-05_26,2023-05-05_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 bulkscore=0 phishscore=0 spamscore=0 adultscore=0
- clxscore=1015 mlxlogscore=917 mlxscore=0 suspectscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2305050160
+References: <20230504200527.1935944-1-mathieu.desnoyers@efficios.com>
+ <20230504200527.1935944-13-mathieu.desnoyers@efficios.com>
+ <3b017a9f-220d-4da8-2cf6-7f0d6175b30c@efficios.com> <CAHk-=wjzpHjqhybyEhkTzGgTdBP3LZ1FmOw8=1MMXr=-j5OPxQ@mail.gmail.com>
+ <3cc72a67-d648-0040-6f60-37663797e360@efficios.com>
+In-Reply-To: <3cc72a67-d648-0040-6f60-37663797e360@efficios.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 5 May 2023 12:54:40 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wh-x1PL=UUGD__Dv6kd+kyCHjNF-TCHGG9ayLnysf-PdQ@mail.gmail.com>
+Message-ID: <CAHk-=wh-x1PL=UUGD__Dv6kd+kyCHjNF-TCHGG9ayLnysf-PdQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 12/13] blk-mq.h: Fix parentheses around macro
+ parameter use
+To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+On Fri, May 5, 2023 at 11:49=E2=80=AFAM Mathieu Desnoyers
+<mathieu.desnoyers@efficios.com> wrote:
+>
+> I would add to this list of exceptions cases where the argument is used
+> as an expression within brackets, e.g.
+>
+> #define m(x) myvar[x]
 
-Generic functions have been defined for accessing SED Opal keys.
-The generic functions are defined as weak so that they may be superseded
-by keystore specific versions.
+Yeah, that makes sense not because of any operator precedence rules,
+but simply because brackets end up syntactically nesting just like
+parentheses themselves do.
 
-PowerPC/pseries versions of these functions provide read/write access
-to SED Opal keys in the PLPKS keystore.
+IOW, while you can mess up that nesting by having non-nested brackets
+in the argument, that's equally true of any added parentheses too.
 
-The SED block driver has been modified to read the SED Opal
-keystore to populate a key in the SED Opal keyring. Changes to the
-SED Opal key will be written to the SED Opal keystore.
+> The other exception I would add is when a parameter is used as an
+> lvalue, as:
+>
+> #define m(x) do { x =3D 2; } while (0)
 
-Patch 3 "keystore access for SED Opal keys" is dependent on:
-        https://lore.kernel.org/keyrings/20220818143045.680972-4-gjoyce@linux.vnet.ibm.com/T/#u
+I really don't understand why you think '=3D' is so special. It's very
+much not special.
 
-Changelog
-v5:	- updated to reflect changes in PLPKS API
+It happens to have the lowest precedence, sure, but the keyword is "happens=
+".
 
-v4:
-        - scope reduced to cover just SED Opal keys
-        - base SED Opal keystore is now in SED block driver
-        - removed use of enum to indicate type
-        - refactored common code into common function that read and
-          write use
-        - removed cast to void
-        - added use of SED Opal keystore functions to SED block driver
+I think you are confused by the non-C languages that make assignment
+be not an expression operator, but a statement.
 
-v3:
-        - No code changes, but per reviewer requests, adding additional
-          mailing lists(keyring, EFI) for wider review.
+So I think you are technically correct in that the parentheses aren't
+_needed_, but the above is still the same case that in many other
+situations parentheses aren't technically *needed*, but not having to
+think about it is better than having to do so.
 
-v2:
-        - Include feedback from Gregory Joyce, Eric Richter and
-          Murilo Opsfelder Araujo.
-        - Include suggestions from Michael Ellerman.
-        - Moved a dependency from generic SED code to this patchset.
-          This patchset now builds of its own.
-
-
-
-Greg Joyce (4):
-  block:sed-opal: SED Opal keystore
-  powerpc/pseries: PLPKS SED Opal keystore support
-  block: sed-opal: keystore access for SED Opal keys
-  powerpc/pseries: update SED for PLPKS api changes
-
- arch/powerpc/platforms/pseries/Kconfig        |   6 +
- arch/powerpc/platforms/pseries/Makefile       |   1 +
- .../powerpc/platforms/pseries/plpks_sed_ops.c | 114 ++++++++++++++++++
- block/Kconfig                                 |   1 +
- block/Makefile                                |   2 +-
- block/sed-opal-key.c                          |  24 ++++
- block/sed-opal.c                              |  18 ++-
- include/linux/sed-opal-key.h                  |  15 +++
- 8 files changed, 178 insertions(+), 3 deletions(-)
- create mode 100644 arch/powerpc/platforms/pseries/plpks_sed_ops.c
- create mode 100644 block/sed-opal-key.c
- create mode 100644 include/linux/sed-opal-key.h
-
-
-base-commit: 6a8f57ae2eb07ab39a6f0ccad60c760743051026
--- 
-gjoyce@linux.vnet.ibm.com
-
+           Linus
