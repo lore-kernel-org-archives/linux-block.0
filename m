@@ -2,99 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2E9C77B7F
-	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 16:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A21C77B75
+	for <linux-block@archiver.kernel.org>; Fri,  5 May 2023 17:52:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbjEEQRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 May 2023 12:17:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52578 "EHLO
+        id S233220AbjEERwx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 May 2023 13:52:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230055AbjEEQRB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 12:17:01 -0400
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB7F1814D
-        for <linux-block@vger.kernel.org>; Fri,  5 May 2023 09:16:53 -0700 (PDT)
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1ab01bf474aso14522635ad.1
-        for <linux-block@vger.kernel.org>; Fri, 05 May 2023 09:16:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683303412; x=1685895412;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iowBHYHqsWhvZro/2jzYxDq+P9jtf4FaTWKQwnfBfMY=;
-        b=bWULWN6s44yNc6i4OPjw0dggFyY45HWm5r5ARBV4PBzWRke/HePk6ZWYOLMpMBZXJH
-         oXHWbUTbKJw3dCJ8wuH2EqfU98MiUJBRHGZzC3tm5f0wRB0IAs0/pbKRMBtCH8GzWFNQ
-         qRGAhxz3A5P1FJH9D+3B1MkJWtLImowhhnyBbVwzZ5ctJLP/2/os1kmH1X3NjmmL+1DV
-         kwguhVcVfUmw7rr+CC+TSahZe/43yy3m15eGn4KilHB0AA4H4/jzVGlq964AJaalxNJH
-         oJo/5JsBROheKFqjUFAckd19FxEJvc6c5NK3qVAeWgV0TAwDvDkZS2EsR7bXx6VsU9Xy
-         Cy2g==
-X-Gm-Message-State: AC+VfDxR2JL1G6hbTwtEtdYyM3V4jifHXSmAb/njVp8NTe5RJOrN0YBJ
-        cuj9MLZjIktYY4vIXCx+xxY=
-X-Google-Smtp-Source: ACHHUZ4CjBOl9jjuoBrX5PGCakqL3ZPxScv1s2XqfJjUxNPs0gYDFax5Z592sSYvqptjJTBc3LWK9g==
-X-Received: by 2002:a17:902:a501:b0:1a1:e01e:7279 with SMTP id s1-20020a170902a50100b001a1e01e7279mr1980740plq.4.1683303412562;
-        Fri, 05 May 2023 09:16:52 -0700 (PDT)
-Received: from [100.125.242.89] ([136.226.64.124])
-        by smtp.gmail.com with ESMTPSA id r9-20020a1709028bc900b001a4fecf79e4sm1974840plo.49.2023.05.05.09.16.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 May 2023 09:16:52 -0700 (PDT)
-Message-ID: <0b68d517-ac3d-3893-7449-143662c130be@acm.org>
-Date:   Fri, 5 May 2023 09:16:50 -0700
+        with ESMTP id S233205AbjEERwt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 13:52:49 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B397F1F4BF;
+        Fri,  5 May 2023 10:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=ifMkRij8nI82A7W3OrolnA1MZaZFLCyCuCFDtjFdqjg=; b=MHYRypZnxHGI6bvB89Ag3pPZ8M
+        yHXC3IpteaKJGX/ZHiNjV698TU13wfd4xYcTnl7o4i55gGyms5+VTsaXdWGoCthKvx0DMFNjkyDuO
+        h8w3+IaDhgXuqI8CLHkt8MQoc+BkSYhHp9eNQbHdfjhVyNEs3tVaS3v9XqR1fYoEAZrgeym6DiGX4
+        4xu5ffXD+GhRcTs5mG1jfCRI0F/qO4Te6GAD3kXwXjk5haXFyQv189iDmOJKqRlJcdwW/dW/NqVlv
+        +sGjWUa5Ez3B1/lKvxyTZJaA6QYiQEwPsMb3IR/wF9jskxppePnf/YiAFV7NRQXEF3zjxJhEE8Y9H
+        zPm9Ev5A==;
+Received: from 66-46-223-221.dedicated.allstream.net ([66.46.223.221] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1puzao-00BSwG-0H;
+        Fri, 05 May 2023 17:51:42 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: introduce bdev holder ops and a file system shutdown method
+Date:   Fri,  5 May 2023 13:51:23 -0400
+Message-Id: <20230505175132.2236632-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v4 08/11] block: mq-deadline: Reduce lock contention
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230503225208.2439206-1-bvanassche@acm.org>
- <20230503225208.2439206-9-bvanassche@acm.org> <20230505055626.GD11748@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230505055626.GD11748@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/4/23 22:56, Christoph Hellwig wrote:
-> On Wed, May 03, 2023 at 03:52:05PM -0700, Bart Van Assche wrote:
->> blk_mq_free_requests() calls dd_finish_request() indirectly. Prevent
->> nested locking of dd->lock and dd->zone_lock by unlocking dd->lock
->> before calling blk_mq_free_requests().
-> 
-> Do you have a reproducer for this that we could wire up in blktests?
-> Also please add a Fixes tag and move it to the beginning of the series.
+Hi all,
 
-Hi Christoph,
+this series fixes the long standing problem that we never had a good way
+to communicate block device events to the user of the block device.
 
-I think the nested locking is triggered during every run of blktests.
-Additionally, I don't think that nested locking of spinlocks is a bug
-so I'm surprised to see a request to add a Fixes: tag?
+It fixes this by introducing a new set of holder ops registered at
+blkdev_get_by_* time for the exclusive holder, and then wire that up
+to a shutdown super operation to report the block device remove to the
+file systems.
 
->>   static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->>   			      blk_insert_t flags)
->> +	__must_hold(dd->lock)
->>   {
->>   	struct request_queue *q = hctx->queue;
->>   	struct deadline_data *dd = q->elevator->elevator_data;
->> @@ -784,7 +785,9 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->>   	}
->>   
->>   	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
->> +		spin_unlock(&dd->lock);
->>   		blk_mq_free_requests(&free);
->> +		spin_lock(&dd->lock);
->>   		return;
-> 
-> Fiven that free is a list, why don't we declare the free list in
-> dd_insert_requests and just pass it to dd_insert_request and then do
-> one single blk_mq_free_requests call after the loop?
-
-That sounds like an interesting approach to me. I will make this change.
-
-Thanks,
-
-Bart.
+Diffstat:
+ block/bdev.c                        |  106 ++++++++++++++++++++----------------
+ block/fops.c                        |    2 
+ block/genhd.c                       |   57 +++++++++++++------
+ block/ioctl.c                       |    3 -
+ drivers/block/drbd/drbd_nl.c        |    3 -
+ drivers/block/pktcdvd.c             |    5 +
+ drivers/block/rnbd/rnbd-srv.c       |    2 
+ drivers/block/xen-blkback/xenbus.c  |    2 
+ drivers/block/zram/zram_drv.c       |    2 
+ drivers/md/bcache/super.c           |    2 
+ drivers/md/dm.c                     |    2 
+ drivers/md/md.c                     |    2 
+ drivers/mtd/devices/block2mtd.c     |    4 -
+ drivers/nvme/target/io-cmd-bdev.c   |    2 
+ drivers/s390/block/dasd_genhd.c     |    2 
+ drivers/target/target_core_iblock.c |    2 
+ drivers/target/target_core_pscsi.c  |    3 -
+ fs/btrfs/dev-replace.c              |    2 
+ fs/btrfs/volumes.c                  |    6 +-
+ fs/erofs/super.c                    |    2 
+ fs/ext4/super.c                     |    3 -
+ fs/f2fs/super.c                     |    4 -
+ fs/jfs/jfs_logmgr.c                 |    2 
+ fs/nfs/blocklayout/dev.c            |    5 +
+ fs/nilfs2/super.c                   |    2 
+ fs/ocfs2/cluster/heartbeat.c        |    2 
+ fs/reiserfs/journal.c               |    5 +
+ fs/super.c                          |   21 ++++++-
+ fs/xfs/xfs_fsops.c                  |    3 +
+ fs/xfs/xfs_mount.h                  |    1 
+ fs/xfs/xfs_super.c                  |   21 ++++++-
+ include/linux/blk_types.h           |    2 
+ include/linux/blkdev.h              |    9 ++-
+ include/linux/fs.h                  |    1 
+ kernel/power/swap.c                 |    4 -
+ mm/swapfile.c                       |    3 -
+ 36 files changed, 196 insertions(+), 103 deletions(-)
