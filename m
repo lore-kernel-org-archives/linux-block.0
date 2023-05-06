@@ -2,86 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CD6C77B75
-	for <linux-block@archiver.kernel.org>; Sat,  6 May 2023 01:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8326BC7EE26
+	for <linux-block@archiver.kernel.org>; Sat,  6 May 2023 05:55:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232505AbjEFBjR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 May 2023 21:39:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59296 "EHLO
+        id S230238AbjEFFzy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 May 2023 01:55:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232519AbjEFBjO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 May 2023 21:39:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA2E644AD
-        for <linux-block@vger.kernel.org>; Fri,  5 May 2023 18:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683337111;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mAqtXf2OpHZh/aPmso1gikHVJkWfhblGK7GUt1MWQkc=;
-        b=b8EQ9oitH9i56SbDKdOo5R1AqZDMxq9mv7u8vwicABgDyedJ8Uq/p9u6FtVlQrD30y8KCj
-        rIIBrNzdqbIYVExJX/ZR/fsn03QwL1q8b5IOTuQvyj8Y0oNF3O/ltX0w5F6ychtXOG/8gC
-        mH4x4BUdxiIdRzxpn8LUt7vNoKKaAwo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-75-BPpM903FMwiyv21hONGl9A-1; Fri, 05 May 2023 21:38:29 -0400
-X-MC-Unique: BPpM903FMwiyv21hONGl9A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EBB3185A78B;
-        Sat,  6 May 2023 01:38:29 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F0A63492B00;
-        Sat,  6 May 2023 01:38:22 +0000 (UTC)
-Date:   Sat, 6 May 2023 09:38:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bernd Schubert <bschubert@ddn.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Miklos Szeredi <mszeredi@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [LSF/MM/BPF TOPIC] ublk & io_uring: ublk zero copy support
-Message-ID: <ZFWviQb7eKn/eBi9@ovpn-8-16.pek2.redhat.com>
-References: <ZEx+h/iFf46XiWG1@ovpn-8-24.pek2.redhat.com>
- <41cfb9c2-9774-e9e1-d8e7-4999a710f2e7@ddn.com>
+        with ESMTP id S230221AbjEFFzx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 May 2023 01:55:53 -0400
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24384C00;
+        Fri,  5 May 2023 22:55:52 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id 167295C019A;
+        Sat,  6 May 2023 01:55:52 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Sat, 06 May 2023 01:55:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1683352552; x=1683438952; bh=Xy
+        YyidwFBJooKcRwuNAyEiGZndfQ4uAFMEUJTuQOeVA=; b=qpeZCQ0K+20gwyiaU2
+        2BQ5Iaiz2dmVVZVBIzYkeIiyR4y7bRtH2oCTZF+HJqQ1Rwe8gyrDrRnMziEqZZwf
+        PxzomCbSBxZRIWY1ClVsCPWwSRh0wc0pqh2zxIH2Z8xoom3mU50OzN45TQX5I2q6
+        XLE7OMkRuu39cYutdNBk0u7kjENsjKpWvac99Vv3bjmeFBiGyHZr7ohilrRywtwE
+        KGi6+4fS27RZAu0JQc2J6MqOMFtOMkag+DOLf6olgUcTNoNjFsotbkNeLv+Fmbdt
+        LWlFpB2MzLHHtt7Etv4YoTtRajkw7kgVBoP/lLZ2QghRwwZ+1kVXXptWk8W2bJ8M
+        taTg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm3; t=1683352552; x=1683438952; bh=XyYyidwFBJooK
+        cRwuNAyEiGZndfQ4uAFMEUJTuQOeVA=; b=AiOnHrKn9/dVMLH1MM1HQ7LqTcBGa
+        kbCEjmHOpRr6bumKb0lR8EjgFz7tHJhJvp1qyb4Pjv8tia7J26OfPMazRQnCvEqi
+        gBtISk4QccDs7Ufjx8ZmT72NkD09QaWBZMAdAfoyiR2asEV1ObB6aQfX7jZi/bEu
+        XwTaVbVGIbFNaGNws8RzAwxhfTCBCTCWFlbkoyCZPf98Xl+xJB9YyDHVm1ukwYTO
+        /MBrNMqfa3wBSZWEg3gy9HmcDlsRk15P9iNmTkewaYtRo/LqW7N5n6Ff/kFTkIn7
+        v7rgouDBkEKrMLHzhtWYEMf6y987uBbf1ccxLhXBv1XyVBUYH16x7EerQ==
+X-ME-Sender: <xms:5-tVZCwQQRNkT0IiYo-C38stsreb3dVji-PtLd0NJcEBbqql4wHEjA>
+    <xme:5-tVZOSGwf9SYB_XhPgPD8OJXct0mKeL8PtAXz47zfhXP4ACgD7p6A1ACoAMvXhUZ
+    SyoFEpuJUBw9g>
+X-ME-Received: <xmr:5-tVZEWfJ87lakacVZIe7T8GoMgZhTK2exyY4zDbepQtqUCb84nBiVe6JsDjgg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeeffedguddtvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgv
+    ghcumffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehge
+    dvvedvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhu
+    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhroh
+    grhhdrtghomh
+X-ME-Proxy: <xmx:5-tVZIg6dk6uwodSRkMfmbJyGV2ywJ5Fn8amGmzf_pN5EieTNq_ClA>
+    <xmx:5-tVZEDgkMJqd2X_G-0pjq7ODPYXrXqv-793dSdKv0-xUM47LTQU5w>
+    <xmx:5-tVZJKXD739QDqfFHpUvv5L6lvKOcrGji71XtRnyOodbK2WXHx-BQ>
+    <xmx:6OtVZH_7F25cRA_Rt99CiwMjKq0xdHtCvIQNBrieKJIuxuj_9jENpQ>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 6 May 2023 01:55:50 -0400 (EDT)
+Date:   Sat, 6 May 2023 11:06:43 +0900
+From:   Greg KH <greg@kroah.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     stable@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 6.1 0/7] blk-crypto fixes for 6.1
+Message-ID: <2023050630-graveyard-paving-3e94@gregkh>
+References: <20230504035417.61435-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <41cfb9c2-9774-e9e1-d8e7-4999a710f2e7@ddn.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+In-Reply-To: <20230504035417.61435-1-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 05, 2023 at 09:57:47PM +0000, Bernd Schubert wrote:
-> Hi Ming,
-> 
-> On 4/29/23 04:18, Ming Lei wrote:
-> > Hello,
-> > 
-> > ublk zero copy is observed to improve big chunk(64KB+) sequential IO performance a
-> > lot, such as, IOPS of ublk-loop over tmpfs is increased by 1~2X[1], Jens also observed
-> > that IOPS of ublk-qcow2 can be increased by ~1X[2]. Meantime it saves memory bandwidth.
-> > 
-> > So this is one important performance improvement.
-> > 
-> > So far there are three proposal:
-> 
-> looks like there is no dedicated session. Could we still have a 
-> discussion in a free slot, if possible?
+On Wed, May 03, 2023 at 08:54:10PM -0700, Eric Biggers wrote:
+> This series backports a couple blk-crypto fixes and their prerequisites
+> to 6.1-stable.  All are clean cherry-picks, but I'm sending this out
+> explicitly since the prerequisites might not have been obvious.
 
-Sure, and we can invite Pavel to the talk too if he is in this lsfmm.
+Thanks for these, that helped out a lot, all now queued up!
 
-
-thanks,
-Ming
-
+greg k-h
