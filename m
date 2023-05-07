@@ -2,148 +2,170 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB376C77B75
-	for <linux-block@archiver.kernel.org>; Sun,  7 May 2023 17:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B462C77B75
+	for <linux-block@archiver.kernel.org>; Sun,  7 May 2023 18:26:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231290AbjEGRHb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 May 2023 13:07:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53510 "EHLO
+        id S229619AbjEGS0M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 May 2023 14:26:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230231AbjEGRHa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 May 2023 13:07:30 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43EAAD01
-        for <linux-block@vger.kernel.org>; Sun,  7 May 2023 10:07:28 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-64115eef620so29532401b3a.1
-        for <linux-block@vger.kernel.org>; Sun, 07 May 2023 10:07:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1683479248; x=1686071248;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GwSoQAc7RbQrYw6wtZrAMpWLXHB/By9Q7OuDr1RV12Y=;
-        b=PHn3HatrrXTilibhO/B32WQZfXLxtuQRjz3v3L2ZfTB9+VVfks2XHVrwDw8QEDzc34
-         nRzUlgMxNktS121uu7zypH1Rp/S3fBwUJqtWRT1wB17zDGnc1bsbLAoWowu4t2QAb293
-         UDM2cCdAcdgO7PF9CmnXJl8XDJCaL7J0alieJUM3hyb+3l1TloGpfuq82/xDVa8DWLn7
-         IBnroT+IA39zWwwC3YexhUD/iQBhTujVWyEmuN2sORnYQ4/zxRtOhmcVZJZorD5X8D4t
-         ZxyRhJMgR2J7/mpg2D/S9x79GzL4iSHtI8KbysR0Wx5//OGYvrcMTUUUjgP/5Ivs6OZD
-         fEBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683479248; x=1686071248;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GwSoQAc7RbQrYw6wtZrAMpWLXHB/By9Q7OuDr1RV12Y=;
-        b=OJzPqTLyvnFz8B887FlEu8JNjF/rlgFwgxeuF3OJs43XxOu8oD1ayRyHmJWNMW+f+Q
-         W5o7z1kGbXMiOt8AwSu6i4vJKLA6AjiUyVlCaRZ6KFP3hBlNoLq1flwB5qZ7WPkePkfJ
-         TsOpyxlMG3/4ZyHDyluh78GPi9eAW9bhRof+BloM+EVT+2PjtyRn2vHwIvEN0MMJoPiX
-         TTmqMUVy1D71gt6axo4Bm2AOccNd+be+arEudaTYUQ+JAWl9byKSz69NGaTwH3aXvTj+
-         ZH0XHAF3uovMHsVxUfzhthrZFCxY/mM69prn8GAU9KE+Vc6xCjvHCatNwn9uEri7jHnA
-         zArA==
-X-Gm-Message-State: AC+VfDxbP2gBQmAGiy8+vX63wF/ir4+QhFIzHoNJFYgGdc3YYWVzStGc
-        uCB/FDGQMIn/IDrsjtLbayocOg==
-X-Google-Smtp-Source: ACHHUZ4GU5TWfGVWE8k1nBxNf8YxRbDK2NY9T2SMPy8Wb+TEaDqAqicYl6XGzMZJrXx3j0So6AviYw==
-X-Received: by 2002:a17:902:f54f:b0:1ac:750e:33d6 with SMTP id h15-20020a170902f54f00b001ac750e33d6mr1358228plf.23.1683479248261;
-        Sun, 07 May 2023 10:07:28 -0700 (PDT)
-Received: from localhost.localdomain ([139.177.225.232])
-        by smtp.gmail.com with ESMTPSA id az8-20020a170902a58800b001ab0159ba3esm4374546plb.13.2023.05.07.10.07.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 May 2023 10:07:27 -0700 (PDT)
-From:   Jinke Han <hanjinke.666@bytedance.com>
-X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, songmuchun@bytedance.com,
-        andrea.righi@canonical.com, Jinke Han <hanjinke.666@bytedance.com>
-Subject: [PATCH v3] blk-throttle: Fix io statistics for cgroup v1
-Date:   Mon,  8 May 2023 01:06:31 +0800
-Message-Id: <20230507170631.89607-1-hanjinke.666@bytedance.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
+        with ESMTP id S230099AbjEGS0L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 May 2023 14:26:11 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3569D83DE;
+        Sun,  7 May 2023 11:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=rjFO1Lqn1x0xYjMf0ILF6MLtATeOnoQcHm1en6+Aq34=; b=EVEE6s760hOjO25mtyEk9/Y7Ks
+        SeMR6ZOnyQwVwLTYkyPhNiqL6H5AeP6fZtRDASraitSurY4kbrqRyLAoRoU6rQsspMjshByV83eHU
+        nVkZipKjQKTf16s+DHDGnirYutnV/bfIMBjcomBbCvShClgimml2PKH/uP2zelVZdzZFx6wTAAn7g
+        1uKVxt2idqzIKBsyV14PCO+vyYWPs+rlvYct5fDy5HLOqiJqRbY8MCfogmSt1t3lJbJumb58auhKD
+        0y2fVFY77IkxdHXFVKW2RIux48ICHX7gzJ4dUbouCFG4EErsArONNkjyWyMVBDlv2HZm/sk/UPxrX
+        op9hbZuQ==;
+Received: from [2601:1c2:980:9ec0:e65e:37ff:febd:ee53] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pvj5D-00GXmV-1m;
+        Sun, 07 May 2023 18:26:07 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        linux-doc@vger.kernel.org
+Subject: [PATCH] Documentation/block: drop the request.rst file
+Date:   Sun,  7 May 2023 11:26:06 -0700
+Message-Id: <20230507182606.12647-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jinke Han <hanjinke.666@bytedance.com>
+Documentation/block/request.rst is outdated and should be removed.
+Also delete its entry in the block/index.rst file.
 
-After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
-blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
-the only stable io stats interface of cgroup v1, and these statistics
-are done in the blk-throttle code. But the current code only counts the
-bios that are actually throttled. When the user does not add the throttle
-limit, the io stats for cgroup v1 has nothing. I fix it according to the
-statistical method of v2, and made it count all ios accurately.
-
-Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
-Tested-by: Andrea Righi <andrea.righi@canonical.com>
-Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: linux-doc@vger.kernel.org
 ---
- block/blk-cgroup.c   | 6 ++++--
- block/blk-throttle.c | 6 ------
- block/blk-throttle.h | 9 +++++++++
- 3 files changed, 13 insertions(+), 8 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 0ce64dd73cfe..5b29912a0ee2 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -2048,6 +2048,9 @@ void blk_cgroup_bio_start(struct bio *bio)
- 	struct blkg_iostat_set *bis;
- 	unsigned long flags;
- 
-+	if (!cgroup_subsys_on_dfl(io_cgrp_subsys))
-+		return;
-+
- 	/* Root-level stats are sourced from system-wide IO stats */
- 	if (!cgroup_parent(blkcg->css.cgroup))
- 		return;
-@@ -2079,8 +2082,7 @@ void blk_cgroup_bio_start(struct bio *bio)
- 	}
- 
- 	u64_stats_update_end_irqrestore(&bis->sync, flags);
--	if (cgroup_subsys_on_dfl(io_cgrp_subsys))
--		cgroup_rstat_updated(blkcg->css.cgroup, cpu);
-+	cgroup_rstat_updated(blkcg->css.cgroup, cpu);
- 	put_cpu();
- }
- 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 9d010d867fbf..7397ff199d66 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2178,12 +2178,6 @@ bool __blk_throtl_bio(struct bio *bio)
- 
- 	rcu_read_lock();
- 
--	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
--		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
--				bio->bi_iter.bi_size);
--		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
--	}
+diff --git a/Documentation/block/index.rst b/Documentation/block/index.rst
+index 102953166429..9fea696f9daa 100644
+--- a/Documentation/block/index.rst
++++ b/Documentation/block/index.rst
+@@ -18,7 +18,6 @@ Block
+    kyber-iosched
+    null_blk
+    pr
+-   request
+    stat
+    switching-sched
+    writeback_cache_control
+diff --git a/Documentation/block/request.rst b/Documentation/block/request.rst
+deleted file mode 100644
+index 747021e1ffdb..000000000000
+--- a/Documentation/block/request.rst
++++ /dev/null
+@@ -1,99 +0,0 @@
+-============================
+-struct request documentation
+-============================
 -
- 	spin_lock_irq(&q->queue_lock);
- 
- 	throtl_update_latency_buckets(td);
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index ef4b7a4de987..d1ccbfe9f797 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -185,6 +185,15 @@ static inline bool blk_should_throtl(struct bio *bio)
- 	struct throtl_grp *tg = blkg_to_tg(bio->bi_blkg);
- 	int rw = bio_data_dir(bio);
- 
-+	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
-+		if (!bio_flagged(bio, BIO_CGROUP_ACCT)) {
-+			bio_set_flag(bio, BIO_CGROUP_ACCT);
-+			blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
-+					bio->bi_iter.bi_size);
-+		}
-+		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
-+	}
-+
- 	/* iops limit is always counted */
- 	if (tg->has_rules_iops[rw])
- 		return true;
--- 
-2.20.1
-
+-Jens Axboe <jens.axboe@oracle.com> 27/05/02
+-
+-
+-.. FIXME:
+-   No idea about what does mean - seems just some noise, so comment it
+-
+-   1.0
+-   Index
+-
+-   2.0 Struct request members classification
+-
+-       2.1 struct request members explanation
+-
+-   3.0
+-
+-
+-   2.0
+-
+-
+-
+-Short explanation of request members
+-====================================
+-
+-Classification flags:
+-
+-	=	====================
+-	D	driver member
+-	B	block layer member
+-	I	I/O scheduler member
+-	=	====================
+-
+-Unless an entry contains a D classification, a device driver must not access
+-this member. Some members may contain D classifications, but should only be
+-access through certain macros or functions (eg ->flags).
+-
+-<linux/blkdev.h>
+-
+-=============================== ======= =======================================
+-Member				Flag	Comment
+-=============================== ======= =======================================
+-struct list_head queuelist	BI	Organization on various internal
+-					queues
+-
+-``void *elevator_private``	I	I/O scheduler private data
+-
+-unsigned char cmd[16]		D	Driver can use this for setting up
+-					a cdb before execution, see
+-					blk_queue_prep_rq
+-
+-unsigned long flags		DBI	Contains info about data direction,
+-					request type, etc.
+-
+-int rq_status			D	Request status bits
+-
+-kdev_t rq_dev			DBI	Target device
+-
+-int errors			DB	Error counts
+-
+-sector_t sector			DBI	Target location
+-
+-unsigned long hard_nr_sectors	B	Used to keep sector sane
+-
+-unsigned long nr_sectors	DBI	Total number of sectors in request
+-
+-unsigned long hard_nr_sectors	B	Used to keep nr_sectors sane
+-
+-unsigned short nr_phys_segments	DB	Number of physical scatter gather
+-					segments in a request
+-
+-unsigned short nr_hw_segments	DB	Number of hardware scatter gather
+-					segments in a request
+-
+-unsigned int current_nr_sectors	DB	Number of sectors in first segment
+-					of request
+-
+-unsigned int hard_cur_sectors	B	Used to keep current_nr_sectors sane
+-
+-int tag				DB	TCQ tag, if assigned
+-
+-``void *special``		D	Free to be used by driver
+-
+-``char *buffer``		D	Map of first segment, also see
+-					section on bouncing SECTION
+-
+-``struct completion *waiting``	D	Can be used by driver to get signalled
+-					on request completion
+-
+-``struct bio *bio``		DBI	First bio in request
+-
+-``struct bio *biotail``		DBI	Last bio in request
+-
+-``struct request_queue *q``	DB	Request queue this request belongs to
+-
+-``struct request_list *rl``	B	Request list this request came from
+-=============================== ======= =======================================
