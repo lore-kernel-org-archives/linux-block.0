@@ -2,88 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F99C7EE22
-	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 14:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20D1C77B7F
+	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 14:44:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234257AbjEHO26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 May 2023 10:28:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35888 "EHLO
+        id S232571AbjEHOoN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 May 2023 10:44:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234247AbjEHO24 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2023 10:28:56 -0400
-Received: from smtpout.efficios.com (smtpout.efficios.com [167.114.26.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEA9C2129;
-        Mon,  8 May 2023 07:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
-        s=smtpout1; t=1683556134;
-        bh=x/r/GkBuy7Dt3JR/ZxirbXy8mCQ1jBvYhr8UrWAG4jg=;
-        h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-        b=bkkEqtTvS6agfeG4WKqHNKhvRlBqIo2FussbcNHbOwMU+Xja2iME/yZxuTNLei5Yc
-         fhveRJhpOltVgcYaZWLkfkdc5/DvCH82dlvYiKboQG3Ze1lHTByTYJ7OJc48qOKFEH
-         aLAQG8l02nCcQmyfw3Q9XktyFPTggnSgavLTtI4+aqoOXn4xy2c0DIpcAxaEoTlCJJ
-         vH89bWmJRl5OR8fIr54txHcOQp65IqGqmsEJ3NfDM1HScVJ3EVgrYgJcjIjcCtETlG
-         NgsUHSsllVHT5RfIfZq2COkSosBBP1VXkFcSa6GXX7hmctYIghv8Aocq9QCV83fXtn
-         ZwTlc9qP0MuZQ==
-Received: from [172.16.0.99] (192-222-143-198.qc.cable.ebox.net [192.222.143.198])
-        by smtpout.efficios.com (Postfix) with ESMTPSA id 4QFNvV0mvdz12H6;
-        Mon,  8 May 2023 10:28:54 -0400 (EDT)
-Message-ID: <f9137c32-796f-a6c7-c85b-f53f64b214c7@efficios.com>
-Date:   Mon, 8 May 2023 10:28:58 -0400
+        with ESMTP id S233783AbjEHOoJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2023 10:44:09 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 724A826AD;
+        Mon,  8 May 2023 07:44:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=4kuu4gBwsJnGnwZXLqP9nf/S9Djc87/bItwQ4iUImwo=; b=QZyfqMk4eQEDtPi9vCHi7Ag4qx
+        Xp1ecG+OCrFaBVyEGKLsKvuUbwL/VMgPYvCj+gNC/as92GM6zBw5+UMWnvDPwqxODeE33TrEGYS1w
+        xOb1C7OgriKJQvze/2rnb39kyMEXCMISkAKg87W+0QJVBETqwHxoAVdozoFBN0gEf2WRh8SQoT1qK
+        DtPCXMGjXAiB/KUIYaDxCQav6xZGFtRhnP9+Eq+IX2Ug6rRmwAXkT/kLnnH+PrIUlEruhSe3QJPpk
+        wjp8w59qZgbkBytZSVw5Z+qwZfRVkx7oPnxX3kwZSnMVX0tVa/GhdGIWHR0sxkdfo3QRLNqlzG651
+        g5fCVuuw==;
+Received: from [208.98.210.70] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pw25t-000n0F-30;
+        Mon, 08 May 2023 14:44:06 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     dhowells@redhat.com, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH] fs: remove the special !CONFIG_BLOCK def_blk_fops
+Date:   Mon,  8 May 2023 07:44:05 -0700
+Message-Id: <20230508144405.41792-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC PATCH 12/13] blk-mq.h: Fix parentheses around macro
- parameter use
-Content-Language: en-US
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-References: <20230504200527.1935944-1-mathieu.desnoyers@efficios.com>
- <20230504200527.1935944-13-mathieu.desnoyers@efficios.com>
- <3b017a9f-220d-4da8-2cf6-7f0d6175b30c@efficios.com>
- <CAHk-=wjzpHjqhybyEhkTzGgTdBP3LZ1FmOw8=1MMXr=-j5OPxQ@mail.gmail.com>
- <3cc72a67-d648-0040-6f60-37663797e360@efficios.com>
- <CAHk-=wh-x1PL=UUGD__Dv6kd+kyCHjNF-TCHGG9ayLnysf-PdQ@mail.gmail.com>
- <d8dfd1af-5b82-ddd8-24f5-fa9dfbb4b1fb@efficios.com>
- <CAHk-=wg27iiFZWYmjKmULxwkXisOHuAXq=vbiazBabgh9M1rqg@mail.gmail.com>
- <322d22f5-7ab0-adbd-45a0-879364d79ce8@efficios.com>
-In-Reply-To: <322d22f5-7ab0-adbd-45a0-879364d79ce8@efficios.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I've attempted to capture the resulting rules based on our discussion to add this to
-coding-style.rst. Please let me know if anything is wrong:
+def_blk_fops always returns -ENODEV, which dosn't match the return value
+of a non-existing block device with CONFIG_BLOCK, which is -ENXIO.
+Just remove the extra implementation and fall back to the default
+no_open_fops that always returns -ENXIO.
 
-(to be added in section 12) Macros, Enums and RTL)
+Fixes: 9361401eb761 ("[PATCH] BLOCK: Make it possible to disable the block layer [try #6]")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/Makefile   | 10 ++--------
+ fs/inode.c    |  3 ++-
+ fs/no-block.c | 19 -------------------
+ 3 files changed, 4 insertions(+), 28 deletions(-)
+ delete mode 100644 fs/no-block.c
 
-Always use parentheses around macro arguments, except when:
-
-- they are used as a full expression:
-   - as an initializer,
-   - as an expression statement,
-   - as the controlling expression of a selection statement (``if`` or ``switch``),
-   - as the controlling expression of a ``while`` or ``do`` statement,
-   - as any of the expressions of a ``for`` statement,
-   - as the expression in a return statement,
-- they are used as expression within an array subscript operator "[]",
-- they are used as arguments to functions or other macros,
-- there is some syntax reason why adding the parentheses would not work.
-
-(note: I'm unsure about requiring or not the parentheses around initializers.
-Based on C11 section "6.8 Statement and blocks", initializers that are not part of
-a compound literal are full expressions, which makes the extra parentheses useless.)
-
-Thanks,
-
-Mathieu
-
+diff --git a/fs/Makefile b/fs/Makefile
+index 834f1c3dba4642..4709eba1303c60 100644
+--- a/fs/Makefile
++++ b/fs/Makefile
+@@ -17,14 +17,8 @@ obj-y :=	open.o read_write.o file_table.o super.o \
+ 		fs_types.o fs_context.o fs_parser.o fsopen.o init.o \
+ 		kernel_read_file.o mnt_idmapping.o remap_range.o
+ 
+-ifeq ($(CONFIG_BLOCK),y)
+-obj-y +=	buffer.o mpage.o
+-else
+-obj-y +=	no-block.o
+-endif
+-
+-obj-$(CONFIG_PROC_FS) += proc_namespace.o
+-
++obj-$(CONFIG_BLOCK)		+= buffer.o mpage.o
++obj-$(CONFIG_PROC_FS)		+= proc_namespace.o
+ obj-$(CONFIG_LEGACY_DIRECT_IO)	+= direct-io.o
+ obj-y				+= notify/
+ obj-$(CONFIG_EPOLL)		+= eventpoll.o
+diff --git a/fs/inode.c b/fs/inode.c
+index 577799b7855f6f..4d6a1544e95b7f 100644
+--- a/fs/inode.c
++++ b/fs/inode.c
+@@ -2264,7 +2264,8 @@ void init_special_inode(struct inode *inode, umode_t mode, dev_t rdev)
+ 		inode->i_fop = &def_chr_fops;
+ 		inode->i_rdev = rdev;
+ 	} else if (S_ISBLK(mode)) {
+-		inode->i_fop = &def_blk_fops;
++		if (IS_ENABLED(CONFIG_BLOCK))
++			inode->i_fop = &def_blk_fops;
+ 		inode->i_rdev = rdev;
+ 	} else if (S_ISFIFO(mode))
+ 		inode->i_fop = &pipefifo_fops;
+diff --git a/fs/no-block.c b/fs/no-block.c
+deleted file mode 100644
+index 481c0f0ab4bd2c..00000000000000
+--- a/fs/no-block.c
++++ /dev/null
+@@ -1,19 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/* no-block.c: implementation of routines required for non-BLOCK configuration
+- *
+- * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
+- * Written by David Howells (dhowells@redhat.com)
+- */
+-
+-#include <linux/kernel.h>
+-#include <linux/fs.h>
+-
+-static int no_blkdev_open(struct inode * inode, struct file * filp)
+-{
+-	return -ENODEV;
+-}
+-
+-const struct file_operations def_blk_fops = {
+-	.open		= no_blkdev_open,
+-	.llseek		= noop_llseek,
+-};
 -- 
-Mathieu Desnoyers
-EfficiOS Inc.
-https://www.efficios.com
+2.39.2
 
