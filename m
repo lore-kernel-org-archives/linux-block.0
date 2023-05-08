@@ -2,103 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9150CC77B73
-	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 04:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C566C77B75
+	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 10:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231857AbjEHEhZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 May 2023 00:37:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38038 "EHLO
+        id S234360AbjEHKSD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 May 2023 06:18:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbjEHEhY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2023 00:37:24 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1A4A5D7;
-        Sun,  7 May 2023 21:37:20 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-50bc394919cso6121208a12.2;
-        Sun, 07 May 2023 21:37:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683520639; x=1686112639;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/8czNSQMs5ZE09eqckQj59m+BAk70EHKVeIQzqF9EK4=;
-        b=OrX7cXFngrppVRComppBE4UToSOKhTOtvHKt1JD1uvVdSq9/l9srY8ZZltdGPrFdOT
-         BuoNw8RhtaHq8RBY6biHGkjWXPQX/l5ewR7rqEFcsqPt37kD+uZrwmHhHIVJ2RuSMEZ1
-         OR+3J6TnSua4CiADomxzYfV1OYNGsBTCnaysAV1FcdNYy9vB8R7k/OT3Bu+2q+cmViuk
-         x9ar4lXL6Sw+GhfvBrRwLVFTiGC5cu0GAk5D0p9YIMjim1BszyEA/XV6oK3StMZndeQN
-         ekQthcD2Hr/V7lrZ37d+mzkDJZSe/LQQmGlHN0hsCFcbRFnlECnXzzz4/YCgvNes3EXd
-         xOYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683520639; x=1686112639;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/8czNSQMs5ZE09eqckQj59m+BAk70EHKVeIQzqF9EK4=;
-        b=HnWTBOQkz2LXv834JHO8D+oB8zRzsnUmvJEvNeX84qaOvKKgHkuhCpe1FOHjCYxoZl
-         n1RZHC13NS6giaIaiz+cniF+nOtxeld/7o4/WJgxCCoSc4z/lCuiUarYmeXzPZF7Wdld
-         wR/wpj+V7wnQQ61OLYm7S1V/YdDNpCrHfaOhbF23Mgj/eC236jgNDZvAK+z7IwTsU/Pq
-         EQj9L0j4jrbTdc24Y9GYouMpeLd6LFVidEF/Ronka5lbDiqaGAyKXbPZJzFZWNrNGRhF
-         +IFk8ZY+i4t8rRH//DjXfgV5N26Qhk79rakFmqYXlXyQOiXim1nuQnY+O+M9fnqOzNt3
-         5FCA==
-X-Gm-Message-State: AC+VfDxudWmicaNeBYdTa4LuW+vdiOESQN1bVuNq7ngb8c3CIwwR/OpX
-        0aPeBRum7SUjPb1+QJlqw7OB3bns5KYj5WAdmRroIbuiuMg=
-X-Google-Smtp-Source: ACHHUZ7AU6ziTxSqRyS3fPV30ECK7IKc3B+wOVDvdBbi2PalD9CZLNYONUaHrqBYisqSGynttE+LHcSoj6PtX5Rl1+o=
-X-Received: by 2002:a17:907:70e:b0:965:6b9e:7ded with SMTP id
- xb14-20020a170907070e00b009656b9e7dedmr6705510ejb.42.1683520638939; Sun, 07
- May 2023 21:37:18 -0700 (PDT)
+        with ESMTP id S234373AbjEHKRx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2023 06:17:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 516DED2F9;
+        Mon,  8 May 2023 03:17:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 31A7C624A0;
+        Mon,  8 May 2023 10:17:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB9FC433EF;
+        Mon,  8 May 2023 10:17:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1683541066;
+        bh=3g1ezkSeNovKyNA/mYRnkKvsFp4NaVHgDIm4yL0ohA8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=nH9cQ5102anxDuDoNNzcs1IoG+7edNzXyKetIcXZkn58VZhjC/8vBZH0pOD1NjCzI
+         EzuTJ1KRo2se7XX1NFRJ5Hqts8Sd6fLlaoHh7sjJUFMGENeNinmHMwcOBtHViTWcog
+         C+zC2COBbnyMkrdFrKGo5uwnNiQEa7XCrx2YjSDc=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev, Martin Liska <mliska@suse.cz>,
+        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+Subject: [PATCH 6.1 604/611] block/blk-iocost (gcc13): keep large values in a new enum
+Date:   Mon,  8 May 2023 11:47:26 +0200
+Message-Id: <20230508094441.528448895@linuxfoundation.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230508094421.513073170@linuxfoundation.org>
+References: <20230508094421.513073170@linuxfoundation.org>
+User-Agent: quilt/0.67
 MIME-Version: 1.0
-From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Date:   Mon, 8 May 2023 06:37:01 +0200
-Message-ID: <CAKXUXMzfKq_J9nKHGyr5P5rvUETY4B-fxoQD4sO+NYjFOfVtZA@mail.gmail.com>
-Subject: Situation of CONFIG_BLK_WBT_MQ after commit b11d31ae01e6 ("blk-wbt:
- remove unnecessary check in wbt_enable_default()")
-To:     Yu Kuai <yukuai3@huawei.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dear Yu Kuai, dear Christoph, dear Jens,
+From: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+
+commit ff1cc97b1f4c10db224f276d9615b22835b8c424 upstream.
+
+Since gcc13, each member of an enum has the same type as the enum [1]. And
+that is inherited from its members. Provided:
+  VTIME_PER_SEC_SHIFT     = 37,
+  VTIME_PER_SEC           = 1LLU << VTIME_PER_SEC_SHIFT,
+  ...
+  AUTOP_CYCLE_NSEC        = 10LLU * NSEC_PER_SEC,
+the named type is unsigned long.
+
+This generates warnings with gcc-13:
+  block/blk-iocost.c: In function 'ioc_weight_prfill':
+  block/blk-iocost.c:3037:37: error: format '%u' expects argument of type 'unsigned int', but argument 4 has type 'long unsigned int'
+
+  block/blk-iocost.c: In function 'ioc_weight_show':
+  block/blk-iocost.c:3047:34: error: format '%u' expects argument of type 'unsigned int', but argument 3 has type 'long unsigned int'
+
+So split the anonymous enum with large values to a separate enum, so
+that they don't affect other members.
+
+[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36113
+
+Cc: Martin Liska <mliska@suse.cz>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: cgroups@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+Link: https://lore.kernel.org/r/20221213120826.17446-1-jirislaby@kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ block/blk-iocost.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -232,7 +232,9 @@ enum {
+ 
+ 	/* 1/64k is granular enough and can easily be handled w/ u32 */
+ 	WEIGHT_ONE		= 1 << 16,
++};
+ 
++enum {
+ 	/*
+ 	 * As vtime is used to calculate the cost of each IO, it needs to
+ 	 * be fairly high precision.  For example, it should be able to
 
 
-The commit b11d31ae01e6 ("blk-wbt: remove unnecessary check in
-wbt_enable_default()") removes the only reference to the config
-BLK_WBT_MQ in the kernel tree.
-
-The commit comes with the statement "If CONFIG_BLK_WBT_MQ is disabled,
-wbt_init() won't do anything.". The statement "If CONFIG_BLK_WBT is
-disabled, wbt_init() won't do anything." (note: CONFIG_BLK_WBT vs.
-CONFIG_BLK_WBT_MQ) is certainly true, but I do not see that "If
-CONFIG_BLK_WBT_MQ is disabled, wbt_init() won't do anything.", but I
-believe it would simply do what wbt_init() does with CONFIG_BLK_WBT
-being enabled.
-
-Now, it seems that with this commit applied, the intended switch of
-the config BLK_WBT_MQ is gone, and the config really now has no effect
-at all.
-
-So, I am a bit puzzled:
-
-1. Either the config BLK_WBT_MQ does have an effect somewhere, but one
-cannot find its reference with 'git grep -i "BLK_WBT_MQ" .' --- so, my
-investigation is just incomplete or wrong, or
-
-2. We really do not need this further build config BLK_WBT_MQ beyond
-the other configs already there --- then this config should just be
-removed, or
-
-3. the commit unintentionally broke the purpose of the config
-BLK_WBT_MQ --- then this commit above should be reverted.
-
-I would be happy if you could provide some guidance on what is the
-situation with config BLK_WBT_MQ.
-
-Currently, I am guessing it is option 2 and the config BLK_WBT_MQ
-simply can be deleted, but I am really unsure. Probably, this build
-option is not used by many people and its effect is hardly noticed, if
-one does not specifically check for that in the running system.
-
-
-Best regards,
-
-Lukas
