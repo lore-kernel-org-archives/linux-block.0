@@ -2,101 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06319C7EE24
-	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 02:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9150CC77B73
+	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 04:37:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230114AbjEHCWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 May 2023 22:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59184 "EHLO
+        id S231857AbjEHEhZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 May 2023 00:37:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjEHCWO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 May 2023 22:22:14 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6274B2695;
-        Sun,  7 May 2023 19:22:13 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3f37a36b713so40581885e9.1;
-        Sun, 07 May 2023 19:22:13 -0700 (PDT)
+        with ESMTP id S229540AbjEHEhY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2023 00:37:24 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1A4A5D7;
+        Sun,  7 May 2023 21:37:20 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-50bc394919cso6121208a12.2;
+        Sun, 07 May 2023 21:37:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683512532; x=1686104532;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8BqRI8xckUuiTetI+oWbedIhDWXvMt/WNoJrYRkwROY=;
-        b=kNV+iSNaYwjLPsnYaNwpAPejOLI83QKH9x4VUqExG6LQJbOC7nmV1CkbcOWpuQOEZh
-         pJZ4GwTLTXl4Sj7TaIgv6K2qzE7CCW5XreRAqfU8oufV+gBjwE5MLPvvTSFso31gd0WM
-         DVtbHtTMCHcrFpNYSzHV+04ISA9eJdMYf3UaNobFJB39PObKQ7nhLX/TmcVosSE31IE/
-         vimWGY3OKaKLQtTXrPok6UZ1sg0g16RPYk7kMjgsV9b5Y+EbPWTiaPCpVwc82G4yafwo
-         i2ccDOq8i7JJ2mrWrSVnSwue3BM5GXYZXnUXqw0Hzyvhwya9uQWJGCKdT4G9s1zGHTmr
-         Wt1g==
+        d=gmail.com; s=20221208; t=1683520639; x=1686112639;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/8czNSQMs5ZE09eqckQj59m+BAk70EHKVeIQzqF9EK4=;
+        b=OrX7cXFngrppVRComppBE4UToSOKhTOtvHKt1JD1uvVdSq9/l9srY8ZZltdGPrFdOT
+         BuoNw8RhtaHq8RBY6biHGkjWXPQX/l5ewR7rqEFcsqPt37kD+uZrwmHhHIVJ2RuSMEZ1
+         OR+3J6TnSua4CiADomxzYfV1OYNGsBTCnaysAV1FcdNYy9vB8R7k/OT3Bu+2q+cmViuk
+         x9ar4lXL6Sw+GhfvBrRwLVFTiGC5cu0GAk5D0p9YIMjim1BszyEA/XV6oK3StMZndeQN
+         ekQthcD2Hr/V7lrZ37d+mzkDJZSe/LQQmGlHN0hsCFcbRFnlECnXzzz4/YCgvNes3EXd
+         xOYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683512532; x=1686104532;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8BqRI8xckUuiTetI+oWbedIhDWXvMt/WNoJrYRkwROY=;
-        b=Ur/MxhEWWUXhz6eBtWdxlN1InGl0s0Ij9k3AEyRVo+CTumCUXPxzvOLq3U2c3GEFUp
-         YzjR8kIfhxiqZsHRRZQM1OtsmqpQLkrpBMgG0apjOdEz3MhCdxPlWSE0uKTuoXcuwKFZ
-         RC/E55C1jB/JTUVVshpAG8ywZiYB/CXGwODiX3i8eHUnRcqx5xLzuNaZtw3Rawyfxk7F
-         KZqCifELgcpL79UO2oxmfzxe7O18fqqE37PS8UtzYFZ589/0cXMis56Tui9wYQFuucIB
-         Rl0z7FdgMXCIDfToX5xUKrLl4BnvpTDn8qQj20ZqBswF22bQepNbPER0k+0aWTqkdCNe
-         U0vA==
-X-Gm-Message-State: AC+VfDx+dTlY0unZfaYv0CVZQYsuBbMb1AlTB6NORsWCVO0FftCy6kcC
-        adLQXiQVXQZwsmUZDIXZie4=
-X-Google-Smtp-Source: ACHHUZ5QGWjbfDj0vSBgRk8qSRZJleSs23j6grx5VOgIcaGcGKs23aWJO03b0x1fBf5Saq4A8YO+Dg==
-X-Received: by 2002:adf:fdcc:0:b0:307:7e68:3a47 with SMTP id i12-20020adffdcc000000b003077e683a47mr6037837wrs.37.1683512531565;
-        Sun, 07 May 2023 19:22:11 -0700 (PDT)
-Received: from [192.168.8.100] (188.30.86.13.threembb.co.uk. [188.30.86.13])
-        by smtp.gmail.com with ESMTPSA id e1-20020a5d4e81000000b003062765bf1dsm9757750wru.33.2023.05.07.19.22.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 May 2023 19:22:11 -0700 (PDT)
-Message-ID: <b5139d5a-c41c-48f6-2468-ae70a728a213@gmail.com>
-Date:   Mon, 8 May 2023 03:16:10 +0100
+        d=1e100.net; s=20221208; t=1683520639; x=1686112639;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/8czNSQMs5ZE09eqckQj59m+BAk70EHKVeIQzqF9EK4=;
+        b=HnWTBOQkz2LXv834JHO8D+oB8zRzsnUmvJEvNeX84qaOvKKgHkuhCpe1FOHjCYxoZl
+         n1RZHC13NS6giaIaiz+cniF+nOtxeld/7o4/WJgxCCoSc4z/lCuiUarYmeXzPZF7Wdld
+         wR/wpj+V7wnQQ61OLYm7S1V/YdDNpCrHfaOhbF23Mgj/eC236jgNDZvAK+z7IwTsU/Pq
+         EQj9L0j4jrbTdc24Y9GYouMpeLd6LFVidEF/Ronka5lbDiqaGAyKXbPZJzFZWNrNGRhF
+         +IFk8ZY+i4t8rRH//DjXfgV5N26Qhk79rakFmqYXlXyQOiXim1nuQnY+O+M9fnqOzNt3
+         5FCA==
+X-Gm-Message-State: AC+VfDxudWmicaNeBYdTa4LuW+vdiOESQN1bVuNq7ngb8c3CIwwR/OpX
+        0aPeBRum7SUjPb1+QJlqw7OB3bns5KYj5WAdmRroIbuiuMg=
+X-Google-Smtp-Source: ACHHUZ7AU6ziTxSqRyS3fPV30ECK7IKc3B+wOVDvdBbi2PalD9CZLNYONUaHrqBYisqSGynttE+LHcSoj6PtX5Rl1+o=
+X-Received: by 2002:a17:907:70e:b0:965:6b9e:7ded with SMTP id
+ xb14-20020a170907070e00b009656b9e7dedmr6705510ejb.42.1683520638939; Sun, 07
+ May 2023 21:37:18 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [LSF/MM/BPF TOPIC] ublk & io_uring: ublk zero copy support
-To:     Ming Lei <ming.lei@redhat.com>, Bernd Schubert <bschubert@ddn.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Miklos Szeredi <mszeredi@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <ZEx+h/iFf46XiWG1@ovpn-8-24.pek2.redhat.com>
- <41cfb9c2-9774-e9e1-d8e7-4999a710f2e7@ddn.com>
- <ZFWviQb7eKn/eBi9@ovpn-8-16.pek2.redhat.com>
-Content-Language: en-US
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZFWviQb7eKn/eBi9@ovpn-8-16.pek2.redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Date:   Mon, 8 May 2023 06:37:01 +0200
+Message-ID: <CAKXUXMzfKq_J9nKHGyr5P5rvUETY4B-fxoQD4sO+NYjFOfVtZA@mail.gmail.com>
+Subject: Situation of CONFIG_BLK_WBT_MQ after commit b11d31ae01e6 ("blk-wbt:
+ remove unnecessary check in wbt_enable_default()")
+To:     Yu Kuai <yukuai3@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/6/23 02:38, Ming Lei wrote:
-> On Fri, May 05, 2023 at 09:57:47PM +0000, Bernd Schubert wrote:
->> Hi Ming,
->>
->> On 4/29/23 04:18, Ming Lei wrote:
->>> Hello,
->>>
->>> ublk zero copy is observed to improve big chunk(64KB+) sequential IO performance a
->>> lot, such as, IOPS of ublk-loop over tmpfs is increased by 1~2X[1], Jens also observed
->>> that IOPS of ublk-qcow2 can be increased by ~1X[2]. Meantime it saves memory bandwidth.
->>>
->>> So this is one important performance improvement.
->>>
->>> So far there are three proposal:
->>
->> looks like there is no dedicated session. Could we still have a
->> discussion in a free slot, if possible?
-> 
-> Sure, and we can invite Pavel to the talk too if he is in this lsfmm.
+Dear Yu Kuai, dear Christoph, dear Jens,
 
-I'd love to go but regretfully can't make it
 
--- 
-Pavel Begunkov
+The commit b11d31ae01e6 ("blk-wbt: remove unnecessary check in
+wbt_enable_default()") removes the only reference to the config
+BLK_WBT_MQ in the kernel tree.
+
+The commit comes with the statement "If CONFIG_BLK_WBT_MQ is disabled,
+wbt_init() won't do anything.". The statement "If CONFIG_BLK_WBT is
+disabled, wbt_init() won't do anything." (note: CONFIG_BLK_WBT vs.
+CONFIG_BLK_WBT_MQ) is certainly true, but I do not see that "If
+CONFIG_BLK_WBT_MQ is disabled, wbt_init() won't do anything.", but I
+believe it would simply do what wbt_init() does with CONFIG_BLK_WBT
+being enabled.
+
+Now, it seems that with this commit applied, the intended switch of
+the config BLK_WBT_MQ is gone, and the config really now has no effect
+at all.
+
+So, I am a bit puzzled:
+
+1. Either the config BLK_WBT_MQ does have an effect somewhere, but one
+cannot find its reference with 'git grep -i "BLK_WBT_MQ" .' --- so, my
+investigation is just incomplete or wrong, or
+
+2. We really do not need this further build config BLK_WBT_MQ beyond
+the other configs already there --- then this config should just be
+removed, or
+
+3. the commit unintentionally broke the purpose of the config
+BLK_WBT_MQ --- then this commit above should be reverted.
+
+I would be happy if you could provide some guidance on what is the
+situation with config BLK_WBT_MQ.
+
+Currently, I am guessing it is option 2 and the config BLK_WBT_MQ
+simply can be deleted, but I am really unsure. Probably, this build
+option is not used by many people and its effect is hardly noticed, if
+one does not specifically check for that in the running system.
+
+
+Best regards,
+
+Lukas
