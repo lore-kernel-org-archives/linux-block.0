@@ -2,121 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF2DEC7EE26
-	for <linux-block@archiver.kernel.org>; Sun,  7 May 2023 23:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06319C7EE24
+	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 02:22:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230415AbjEGX6A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 May 2023 19:58:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60924 "EHLO
+        id S230114AbjEHCWQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 May 2023 22:22:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229662AbjEGX57 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 May 2023 19:57:59 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAB353C13
-        for <linux-block@vger.kernel.org>; Sun,  7 May 2023 16:57:56 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2ad89c7a84fso11441071fa.2
-        for <linux-block@vger.kernel.org>; Sun, 07 May 2023 16:57:56 -0700 (PDT)
+        with ESMTP id S229744AbjEHCWO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 May 2023 22:22:14 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6274B2695;
+        Sun,  7 May 2023 19:22:13 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3f37a36b713so40581885e9.1;
+        Sun, 07 May 2023 19:22:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1683503875; x=1686095875;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=heWdWnuVsDgy3YSrIEI7KZvF6zrJpOnz1cwOgPMljgY=;
-        b=GzRn0fYn5L+kd6X0Fe48aiNfUfW6wkqLabswGuWW5mgWqR/2GjUF84ljLns2d+o1sg
-         a6vuGpW1z3TO+tfiggPQdcXC+NEPg8Gh+PNIyfpCncjeBL1vTkaxKrMTeCu23pZd3yit
-         6CGMwxzuMtyjwtR5iJ0TuEsqd/d/2ICCNAm4Cn4ajDtiHfe8Ianjb+FNkEzlklqzN2QL
-         jkIr4lE+mJBktzp3KrpGdeIFLkglGatWFaYxPDWX00GYxlYGVOTsBpq/x6aGVc/tklVC
-         ZeZZVQrSP2pHCxqWHvyGLCe+VZwLSj97UPEe64VFJlxifThdQuL0WWJMJ6f1a+LGsuXU
-         6Zaw==
+        d=gmail.com; s=20221208; t=1683512532; x=1686104532;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8BqRI8xckUuiTetI+oWbedIhDWXvMt/WNoJrYRkwROY=;
+        b=kNV+iSNaYwjLPsnYaNwpAPejOLI83QKH9x4VUqExG6LQJbOC7nmV1CkbcOWpuQOEZh
+         pJZ4GwTLTXl4Sj7TaIgv6K2qzE7CCW5XreRAqfU8oufV+gBjwE5MLPvvTSFso31gd0WM
+         DVtbHtTMCHcrFpNYSzHV+04ISA9eJdMYf3UaNobFJB39PObKQ7nhLX/TmcVosSE31IE/
+         vimWGY3OKaKLQtTXrPok6UZ1sg0g16RPYk7kMjgsV9b5Y+EbPWTiaPCpVwc82G4yafwo
+         i2ccDOq8i7JJ2mrWrSVnSwue3BM5GXYZXnUXqw0Hzyvhwya9uQWJGCKdT4G9s1zGHTmr
+         Wt1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683503875; x=1686095875;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=heWdWnuVsDgy3YSrIEI7KZvF6zrJpOnz1cwOgPMljgY=;
-        b=f6PMQxNtJpLRTadUjyp2fM2s0hjxdT9PeukqzHpWIatFmnhT4nBHcvvtriYCmBNNbK
-         XKuXKmMpGCmAKPF6tDG/9nRFeoiA0J+OP2kT0QMoyr7s/ejL5LO849pU5VWRetJWXULb
-         5uxjLhhkFGPir58kr+A/tW4ynpRK6NVJjkKenSTVDpi1vy86XFaHwVhMnR9AABZjCDHr
-         IGCZrQJIBY7OqqQEreCVt/V2WIDl1Q38lLOueLfBBCoqvNgsz5j5bGoVDPF2nsiACLP6
-         JJhTd0FhZUJ9O5GOnmgvAYGOugKGCqK8DdbCkeDMswqDkmVrNt/Oq04/afzz0MWtzG49
-         iXvw==
-X-Gm-Message-State: AC+VfDzZirVp7OZ653yRRtsbyOHCRRAF/bYtrxPfxmHru1fFodYsWsy9
-        k/0qylRtbGWOuuVy2bMgH31jLg==
-X-Google-Smtp-Source: ACHHUZ5KDAewVtMMEUBKPDOXSl6kc4Kl99MUiOwLSnK0jQvpZ9OmWx9CGYgRWJyoQRHGvIlZiklKYQ==
-X-Received: by 2002:a2e:9bcb:0:b0:2ac:8090:630e with SMTP id w11-20020a2e9bcb000000b002ac8090630emr2346480ljj.28.1683503875097;
-        Sun, 07 May 2023 16:57:55 -0700 (PDT)
-Received: from localhost (77.241.128.113.mobile.3.dk. [77.241.128.113])
-        by smtp.gmail.com with ESMTPSA id s15-20020ac25fef000000b004f01ae1e63esm1086678lfg.272.2023.05.07.16.57.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 May 2023 16:57:54 -0700 (PDT)
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <ZFg0xPy0dbd1b0rP@bombadil.infradead.org>
-User-agent: mu4e 1.10.3; emacs 28.2.50
-From:   Andreas Hindborg <nmi@metaspace.dk>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        lsf-pc@lists.linux-foundation.org, rust-for-linux@vger.kernel.org,
-        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?utf-8?Q?Bj?= =?utf-8?Q?=C3=B6rn?= Roy Baron 
-        <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>,
-        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 00/11] Rust null block driver
-Date:   Mon, 08 May 2023 01:37:19 +0200
-In-reply-to: <ZFg0xPy0dbd1b0rP@bombadil.infradead.org>
-Message-ID: <87mt2fae4i.fsf@metaspace.dk>
+        d=1e100.net; s=20221208; t=1683512532; x=1686104532;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8BqRI8xckUuiTetI+oWbedIhDWXvMt/WNoJrYRkwROY=;
+        b=Ur/MxhEWWUXhz6eBtWdxlN1InGl0s0Ij9k3AEyRVo+CTumCUXPxzvOLq3U2c3GEFUp
+         YzjR8kIfhxiqZsHRRZQM1OtsmqpQLkrpBMgG0apjOdEz3MhCdxPlWSE0uKTuoXcuwKFZ
+         RC/E55C1jB/JTUVVshpAG8ywZiYB/CXGwODiX3i8eHUnRcqx5xLzuNaZtw3Rawyfxk7F
+         KZqCifELgcpL79UO2oxmfzxe7O18fqqE37PS8UtzYFZ589/0cXMis56Tui9wYQFuucIB
+         Rl0z7FdgMXCIDfToX5xUKrLl4BnvpTDn8qQj20ZqBswF22bQepNbPER0k+0aWTqkdCNe
+         U0vA==
+X-Gm-Message-State: AC+VfDx+dTlY0unZfaYv0CVZQYsuBbMb1AlTB6NORsWCVO0FftCy6kcC
+        adLQXiQVXQZwsmUZDIXZie4=
+X-Google-Smtp-Source: ACHHUZ5QGWjbfDj0vSBgRk8qSRZJleSs23j6grx5VOgIcaGcGKs23aWJO03b0x1fBf5Saq4A8YO+Dg==
+X-Received: by 2002:adf:fdcc:0:b0:307:7e68:3a47 with SMTP id i12-20020adffdcc000000b003077e683a47mr6037837wrs.37.1683512531565;
+        Sun, 07 May 2023 19:22:11 -0700 (PDT)
+Received: from [192.168.8.100] (188.30.86.13.threembb.co.uk. [188.30.86.13])
+        by smtp.gmail.com with ESMTPSA id e1-20020a5d4e81000000b003062765bf1dsm9757750wru.33.2023.05.07.19.22.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 07 May 2023 19:22:11 -0700 (PDT)
+Message-ID: <b5139d5a-c41c-48f6-2468-ae70a728a213@gmail.com>
+Date:   Mon, 8 May 2023 03:16:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [LSF/MM/BPF TOPIC] ublk & io_uring: ublk zero copy support
+To:     Ming Lei <ming.lei@redhat.com>, Bernd Schubert <bschubert@ddn.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Miklos Szeredi <mszeredi@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <ZEx+h/iFf46XiWG1@ovpn-8-24.pek2.redhat.com>
+ <41cfb9c2-9774-e9e1-d8e7-4999a710f2e7@ddn.com>
+ <ZFWviQb7eKn/eBi9@ovpn-8-16.pek2.redhat.com>
+Content-Language: en-US
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZFWviQb7eKn/eBi9@ovpn-8-16.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 5/6/23 02:38, Ming Lei wrote:
+> On Fri, May 05, 2023 at 09:57:47PM +0000, Bernd Schubert wrote:
+>> Hi Ming,
+>>
+>> On 4/29/23 04:18, Ming Lei wrote:
+>>> Hello,
+>>>
+>>> ublk zero copy is observed to improve big chunk(64KB+) sequential IO performance a
+>>> lot, such as, IOPS of ublk-loop over tmpfs is increased by 1~2X[1], Jens also observed
+>>> that IOPS of ublk-qcow2 can be increased by ~1X[2]. Meantime it saves memory bandwidth.
+>>>
+>>> So this is one important performance improvement.
+>>>
+>>> So far there are three proposal:
+>>
+>> looks like there is no dedicated session. Could we still have a
+>> discussion in a free slot, if possible?
+> 
+> Sure, and we can invite Pavel to the talk too if he is in this lsfmm.
 
-Luis Chamberlain <mcgrof@kernel.org> writes:
+I'd love to go but regretfully can't make it
 
-> On Wed, May 03, 2023 at 11:06:57AM +0200, Andreas Hindborg wrote:
->> The statistics presented in my previous message [1] show that the C null block
->> driver has had a significant amount of memory safety related problems in the
->> past. 41% of fixes merged for the C null block driver are fixes for memory
->> safety issues. This makes the null block driver a good candidate for rewriting
->> in Rust.
->
-> Curious, how long does it take to do an analysis like this? Are there efforts
-> to automate this a bit more? We have efforts to use machine learning to
-> evaluate stable candidate patches, we probably should be able to qualify
-> commits as fixing "memory safety", I figure.
->
-> Because what I'd love to see is if we can could easily obtain similar
-> statistics for arbitrary parts of the kernel. The easiest way to break
-> this down might be by kconfig symbol for instance, and then based on
-> that gather more information about subsystems.
->
-
-I spent around 4 hours with a spreadsheet and git. It would be cool if
-that work could be automated. It's not always clear from the commit
-heading that a commit is a fix. When it is clear that it is a fix, it
-might not be clear what is fixed. I had to look at the diff quite a few
-commits.
-
-There is some work mentioning the ratio of memory safety issues fixed in
-the kernel, but none of them go into details for specific subsystems as
-far as I know. 20% of bugs fixed in stable Linux Kernel branches for
-drivers are memory safety issues [1]. 65% of recent Linux kernel
-vulnerabilities are memory safety issues [2]
-
-> Then the rationale for considerating adopting rust bindings for certain areas
-> of the kernel becomes a bit clearer.
-
-As mentioned elsewhere in this thread there are other benefits from
-deploying Rust than provable absence of memory safety issues.
-
-Best regards
-Andreas
-
-[1] http://dx.doi.org/10.15514/ISPRAS-2018-30(6)-8
-[2] https://lssna19.sched.com/event/RHaT/writing-linux-kernel-modules-in-safe-rust-geoffrey-thomas-two-sigma-investments-alex-gaynor-alloy
+-- 
+Pavel Begunkov
