@@ -2,31 +2,32 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE6BC77B75
-	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 12:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF8DC77B73
+	for <linux-block@archiver.kernel.org>; Mon,  8 May 2023 12:59:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232408AbjEHM35 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 May 2023 08:29:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58808 "EHLO
+        id S233844AbjEHM7H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 May 2023 08:59:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234229AbjEHM3e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2023 08:29:34 -0400
-Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2003DE8E
-        for <linux-block@vger.kernel.org>; Mon,  8 May 2023 05:29:21 -0700 (PDT)
-Date:   Mon, 08 May 2023 12:29:08 +0000
+        with ESMTP id S233165AbjEHM7G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 May 2023 08:59:06 -0400
+X-Greylist: delayed 1780 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 08 May 2023 05:58:59 PDT
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA65035D9A;
+        Mon,  8 May 2023 05:58:59 -0700 (PDT)
+Date:   Mon, 08 May 2023 12:58:45 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-        s=protonmail; t=1683548955; x=1683808155;
-        bh=2o+QhLEI39Ivg9mw6YMEs+As5D9Y3PgvTGz97q5/fpQ=;
+        s=protonmail; t=1683550737; x=1683809937;
+        bh=BluAfUkptjoDzZo7Eg121LZmkzey8cfOy9NzYMZPt0Y=;
         h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
          Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
          Message-ID:BIMI-Selector;
-        b=lMIPvhJJVjkedVkpCbyoZ6ZrjxSIqOnubXVOnj1uRUkn8s9+d2UhZBgAJqxs5Wvmm
-         HZKPFjxHu87wcifX82m5MLRRnf0mOeEuba9GqzkVhM/19DaeJpKt9wC/Ot08OZhpoZ
-         j0QWE2IbsaE+BO/R5TZE0mH4SBAmT3C+SiD5aaYlrmyPTAI09PH72OMa737jCS6tU+
-         b41dXFpnwWf74ksfPEQ2OjklTfI/X1/cQx9bb/zHnLgl2Ls0pD+p6cysEW3b5xb7vG
-         NKfbB1envtkZuZNq/LzcCHpzmJzgLNlwt5efpkzc4tGO51lI5mgPFg7x1gJqo4Fw+g
-         Sq7Y0wQ0/gS9g==
+        b=AguKqKWk3fxm4RzGwpxqYJ+Elbe6zzaVADUvFphs4BnVGIEnorHv45D15DtU2wU7K
+         ffRj0FWuoy30ty9KrVj/YD1FZwSIToCmgnNoaQOT1R47wAKrpyRL8cbOwzdVpDBbP5
+         BoM6KRAcc1Mh/xR8yP+REaG96lfhIhv412sB8ULr1sMz/LTj9L4IM4fOyTpam81f/0
+         MX8tsJaibZwgGocdooxfp1PGi5HU5/rw9Kxh1oSkzupSt2kKzgDtYo4+R9QzNeqCmM
+         q8rQ2EvRtCAz7JvUDWWYFbBKgVy/tYeSVFVw5mqfOBxM+LOjYCXq8YrTjCC4ewb2H+
+         fycvF92iaOzGw==
 To:     Andreas Hindborg <nmi@metaspace.dk>
 From:   Benno Lossin <benno.lossin@proton.me>
 Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
@@ -43,10 +44,10 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
         =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
         linux-kernel@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [RFC PATCH 03/11] rust: block: introduce `kernel::block::mq` module
-Message-ID: <iL2M45BoRlK6yS9y8uo0A5yUXcZWMkdk3vtH3LRFSWXfvPVagVZ-0YC7taIKOBFUcjJYA_2xNNFPoC4WL-_ulCHOLkbqvsZlIshE_LEeYtU=@proton.me>
-In-Reply-To: <20230503090708.2524310-4-nmi@metaspace.dk>
-References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-4-nmi@metaspace.dk>
+Subject: Re: [RFC PATCH 04/11] rust: block: introduce `kernel::block::bio` module
+Message-ID: <-SiJ5paRDIUkH1WEWhGhEjhIgFbSo5PJAvac53bTnBZ5o41DR-kNWZEQBsnKeW1FRJh35siVFRrx54L0M6ebSzl0rzecgcDjqZFGRa9uypE=@proton.me>
+In-Reply-To: <20230503090708.2524310-5-nmi@metaspace.dk>
+References: <20230503090708.2524310-1-nmi@metaspace.dk> <20230503090708.2524310-5-nmi@metaspace.dk>
 Feedback-ID: 71780778:user:proton
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -55,934 +56,417 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I have left some comments below. Some of them are not really
-suggestions, but rather I would like to know the rationale of the
-design, as I am not familiar at all with the C side and have mostly
-no idea what the called functions do.
-
 On Wednesday, May 3rd, 2023 at 11:07, Andreas Hindborg <nmi@metaspace.dk> w=
 rote:
 > From: Andreas Hindborg <a.hindborg@samsung.com>
 >=20
-> Add initial abstractions for working with blk-mq.
+> Add abstractions for working with `struct bio`.
 >=20
-> This patch is a maintained, refactored subset of code originally publishe=
-d by
-> Wedson Almeida Filho <wedsonaf@gmail.com> [1].
->=20
-> [1] https://github.com/wedsonaf/linux/tree/f2cfd2fe0e2ca4e90994f96afe268b=
-bd4382a891/rust/kernel/blk/mq.rs
->=20
-> Cc: Wedson Almeida Filho <wedsonaf@gmail.com>
 > Signed-off-by: Andreas Hindborg <a.hindborg@samsung.com>
 > ---
->  rust/bindings/bindings_helper.h    |   2 +
->  rust/helpers.c                     |  22 +++
->  rust/kernel/block.rs               |   5 +
->  rust/kernel/block/mq.rs            |  15 ++
->  rust/kernel/block/mq/gen_disk.rs   | 133 +++++++++++++++
->  rust/kernel/block/mq/operations.rs | 260 +++++++++++++++++++++++++++++
->  rust/kernel/block/mq/raw_writer.rs |  30 ++++
->  rust/kernel/block/mq/request.rs    |  71 ++++++++
->  rust/kernel/block/mq/tag_set.rs    |  92 ++++++++++
->  rust/kernel/error.rs               |   4 +
->  rust/kernel/lib.rs                 |   1 +
->  11 files changed, 635 insertions(+)
->  create mode 100644 rust/kernel/block.rs
->  create mode 100644 rust/kernel/block/mq.rs
->  create mode 100644 rust/kernel/block/mq/gen_disk.rs
->  create mode 100644 rust/kernel/block/mq/operations.rs
->  create mode 100644 rust/kernel/block/mq/raw_writer.rs
->  create mode 100644 rust/kernel/block/mq/request.rs
->  create mode 100644 rust/kernel/block/mq/tag_set.rs
+>  rust/kernel/block.rs            |   1 +
+>  rust/kernel/block/bio.rs        |  93 ++++++++++++++++
+>  rust/kernel/block/bio/vec.rs    | 181 ++++++++++++++++++++++++++++++++
+>  rust/kernel/block/mq/request.rs |  16 +++
+>  4 files changed, 291 insertions(+)
+>  create mode 100644 rust/kernel/block/bio.rs
+>  create mode 100644 rust/kernel/block/bio/vec.rs
 >=20
-> diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_hel=
-per.h
-> index 52834962b94d..86c07eeb1ba1 100644
-> --- a/rust/bindings/bindings_helper.h
-> +++ b/rust/bindings/bindings_helper.h
-> @@ -11,6 +11,8 @@
->  #include <linux/wait.h>
->  #include <linux/sched.h>
->  #include <linux/radix-tree.h>
-> +#include <linux/blk_types.h>
-> +#include <linux/blk-mq.h>
->=20
->  /* `bindgen` gets confused at certain things. */
->  const gfp_t BINDINGS_GFP_KERNEL =3D GFP_KERNEL;
-> diff --git a/rust/helpers.c b/rust/helpers.c
-> index 9bd9d95da951..a59341084774 100644
-> --- a/rust/helpers.c
-> +++ b/rust/helpers.c
-> @@ -18,6 +18,7 @@
->   * accidentally exposed.
->   */
->=20
-> +#include <linux/bio.h>
->  #include <linux/bug.h>
->  #include <linux/build_bug.h>
->  #include <linux/err.h>
-> @@ -28,6 +29,8 @@
->  #include <linux/wait.h>
->  #include <linux/radix-tree.h>
->  #include <linux/highmem.h>
-> +#include <linux/blk-mq.h>
-> +#include <linux/blkdev.h>
->=20
->  __noreturn void rust_helper_BUG(void)
->  {
-> @@ -130,6 +133,25 @@ void rust_helper_put_task_struct(struct task_struct =
-*t)
->  }
->  EXPORT_SYMBOL_GPL(rust_helper_put_task_struct);
->=20
-> +struct bio_vec rust_helper_req_bvec(struct request *rq)
-> +{
-> +=09return req_bvec(rq);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_req_bvec);
-> +
-> +void *rust_helper_blk_mq_rq_to_pdu(struct request *rq)
-> +{
-> +=09return blk_mq_rq_to_pdu(rq);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_blk_mq_rq_to_pdu);
-> +
-> +void rust_helper_bio_advance_iter_single(const struct bio *bio,
-> +                                         struct bvec_iter *iter,
-> +                                         unsigned int bytes) {
-> +  bio_advance_iter_single(bio, iter, bytes);
-> +}
-> +EXPORT_SYMBOL_GPL(rust_helper_bio_advance_iter_single);
-> +
->  void rust_helper_init_radix_tree(struct xarray *tree, gfp_t gfp_mask)
->  {
->  =09INIT_RADIX_TREE(tree, gfp_mask);
 > diff --git a/rust/kernel/block.rs b/rust/kernel/block.rs
-> new file mode 100644
-> index 000000000000..4c93317a568a
-> --- /dev/null
+> index 4c93317a568a..1797859551fd 100644
+> --- a/rust/kernel/block.rs
 > +++ b/rust/kernel/block.rs
-> @@ -0,0 +1,5 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! Types for working with the block layer
-> +
-> +pub mod mq;
-> diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+> @@ -2,4 +2,5 @@
+>=20
+>  //! Types for working with the block layer
+>=20
+> +pub mod bio;
+>  pub mod mq;
+> diff --git a/rust/kernel/block/bio.rs b/rust/kernel/block/bio.rs
 > new file mode 100644
-> index 000000000000..5b40f6a73c0f
+> index 000000000000..6e93e4420105
 > --- /dev/null
-> +++ b/rust/kernel/block/mq.rs
-> @@ -0,0 +1,15 @@
+> +++ b/rust/kernel/block/bio.rs
+> @@ -0,0 +1,93 @@
 > +// SPDX-License-Identifier: GPL-2.0
 > +
-> +//! This module provides types for implementing drivers that interface t=
-he
-> +//! blk-mq subsystem
-> +
-> +mod gen_disk;
-> +mod operations;
-> +mod raw_writer;
-> +mod request;
-> +mod tag_set;
-> +
-> +pub use gen_disk::GenDisk;
-> +pub use operations::Operations;
-> +pub use request::Request;
-> +pub use tag_set::TagSet;
-> diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_=
-disk.rs
-> new file mode 100644
-> index 000000000000..50496af15bbf
-> --- /dev/null
-> +++ b/rust/kernel/block/mq/gen_disk.rs
-> @@ -0,0 +1,133 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! GenDisk abstraction
+> +//! Types for working with the bio layer.
 > +//!
-> +//! C header: [`include/linux/blkdev.h`](../../include/linux/blkdev.h)
-> +//! C header: [`include/linux/blk_mq.h`](../../include/linux/blk_mq.h)
+> +//! C header: [`include/linux/blk_types.h`](../../include/linux/blk_type=
+s.h)
 > +
-> +use crate::block::mq::{raw_writer::RawWriter, Operations, TagSet};
-> +use crate::{
-> +    bindings, error::from_err_ptr, error::Result, sync::Arc, types::Fore=
-ignOwnable,
-> +    types::ScopeGuard,
-> +};
-> +use core::fmt::{self, Write};
+> +use core::fmt;
+> +use core::ptr::NonNull;
 > +
-> +/// A generic block device
+> +mod vec;
+> +
+> +pub use vec::BioSegmentIterator;
+> +pub use vec::Segment;
+> +
+> +/// A wrapper around a `struct bio` pointer
 > +///
 > +/// # Invariants
 > +///
-> +///  - `gendisk` must always point to an initialized and valid `struct g=
-endisk`.
-> +pub struct GenDisk<T: Operations> {
-> +    _tagset: Arc<TagSet<T>>,
-> +    gendisk: *mut bindings::gendisk,
+> +/// First field must alwyas be a valid pointer to a valid `struct bio`.
+> +pub struct Bio<'a>(
+> +    NonNull<crate::bindings::bio>,
+> +    core::marker::PhantomData<&'a ()>,
 
-Why are these two fields not embedded? Shouldn't the user decide where
-to allocate?
+Please make this a struct with named fields. Also this is rather a
+`BioRef`, right? Why can't `&Bio` be used and `Bio` embeds
+`bindings::bio`?
 
-> +}
+> +);
 > +
-> +// SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `A=
-rc` to a
-> +// `TagSet` It is safe to send this to other threads as long as T is Sen=
-d.
-> +unsafe impl<T: Operations + Send> Send for GenDisk<T> {}
-> +
-> +impl<T: Operations> GenDisk<T> {
-> +    /// Try to create a new `GenDisk`
-> +    pub fn try_new(tagset: Arc<TagSet<T>>, queue_data: T::QueueData) -> =
-Result<Self> {
-> +        let data =3D queue_data.into_foreign();
-> +        let recover_data =3D ScopeGuard::new(|| {
-> +            // SAFETY: T::QueueData was created by the call to `into_for=
-eign()` above
-> +            unsafe { T::QueueData::from_foreign(data) };
-> +        });
-> +
-> +        let lock_class_key =3D crate::sync::LockClassKey::new();
-> +
-> +        // SAFETY: `tagset.raw_tag_set()` points to a valid and initiali=
-zed tag set
-> +        let gendisk =3D from_err_ptr(unsafe {
-> +            bindings::__blk_mq_alloc_disk(tagset.raw_tag_set(), data as =
-_, lock_class_key.as_ptr())
+> +impl<'a> Bio<'a> {
+> +    /// Returns an iterator over segments in this `Bio`. Does not consid=
+er
+> +    /// segments of other bios in this bio chain.
+> +    #[inline(always)]
 
-Avoid `as _` casts.
+Why are these `inline(always)`? The compiler should inline them
+automatically?
 
-> +        })?;
-> +
-> +        const TABLE: bindings::block_device_operations =3D bindings::blo=
-ck_device_operations {
-> +            submit_bio: None,
-> +            open: None,
-> +            release: None,
-> +            ioctl: None,
-> +            compat_ioctl: None,
-> +            check_events: None,
-> +            unlock_native_capacity: None,
-> +            getgeo: None,
-> +            set_read_only: None,
-> +            swap_slot_free_notify: None,
-> +            report_zones: None,
-> +            devnode: None,
-> +            alternative_gpt_sector: None,
-> +            get_unique_id: None,
-> +            owner: core::ptr::null_mut(),
-> +            pr_ops: core::ptr::null_mut(),
-> +            free_disk: None,
-> +            poll_bio: None,
-> +        };
-> +
-> +        // SAFETY: gendisk is a valid pointer as we initialized it above
-> +        unsafe { (*gendisk).fops =3D &TABLE };
-> +
-> +        recover_data.dismiss();
-> +        Ok(Self {
-> +            _tagset: tagset,
-> +            gendisk,
-> +        })
+> +    pub fn segment_iter(&'a self) -> BioSegmentIterator<'a> {
+> +        BioSegmentIterator::new(self)
 > +    }
 > +
-> +    /// Set the name of the device
-> +    pub fn set_name(&self, args: fmt::Arguments<'_>) -> Result {
-> +        let mut raw_writer =3D RawWriter::from_array(unsafe { &mut (*sel=
-f.gendisk).disk_name });
-
-Missing `SAFETY` also see below.
-
-> +        raw_writer.write_fmt(args)?;
-> +        raw_writer.write_char('\0')?;
-> +        Ok(())
+> +    /// Get a pointer to the `bio_vec` off this bio
+> +    #[inline(always)]
+> +    fn io_vec(&self) -> *const bindings::bio_vec {
+> +        // SAFETY: By type invariant, get_raw() returns a valid pointer =
+to a
+> +        // valid `struct bio`
+> +        unsafe { (*self.get_raw()).bi_io_vec }
 > +    }
 > +
-> +    /// Register the device with the kernel. When this function return, =
+> +    /// Return a copy of the `bvec_iter` for this `Bio`
+> +    #[inline(always)]
+> +    fn iter(&self) -> bindings::bvec_iter {
+
+Why does this return the bindings iter? Maybe rename to `raw_iter`?
+
+> +        // SAFETY: self.0 is always a valid pointer
+> +        unsafe { (*self.get_raw()).bi_iter }
+> +    }
+> +
+> +    /// Get the next `Bio` in the chain
+> +    #[inline(always)]
+> +    fn next(&self) -> Option<Bio<'a>> {
+> +        // SAFETY: self.0 is always a valid pointer
+> +        let next =3D unsafe { (*self.get_raw()).bi_next };
+> +        Some(Self(NonNull::new(next)?, core::marker::PhantomData))
+
+Missing `INVARIANT` explaining why `next` is valid or null. Also why not
+use `Self::from_raw` here?
+
+> +    }
+> +
+> +    /// Return the raw pointer of the wrapped `struct bio`
+> +    #[inline(always)]
+> +    fn get_raw(&self) -> *const bindings::bio {
+> +        self.0.as_ptr()
+> +    }
+> +
+> +    /// Create an instance of `Bio` from a raw pointer. Does check that =
 the
-> +    /// device is accessible from VFS. The kernel may issue reads to the=
- device
-> +    /// during registration to discover partition infomation.
-> +    pub fn add(&self) -> Result {
-> +        crate::error::to_result(unsafe {
-> +            bindings::device_add_disk(core::ptr::null_mut(), self.gendis=
-k, core::ptr::null_mut())
-> +        })
+> +    /// pointer is not null.
+> +    #[inline(always)]
+> +    pub(crate) unsafe fn from_raw(ptr: *mut bindings::bio) -> Option<Bio=
+<'a>> {
+> +        Some(Self(NonNull::new(ptr)?, core::marker::PhantomData))
 > +    }
+> +}
 > +
-> +    /// Call to tell the block layer the capcacity of the device
-> +    pub fn set_capacity(&self, sectors: u64) {
-> +        unsafe { bindings::set_capacity(self.gendisk, sectors) };
-> +    }
-> +
-> +    /// Set the logical block size of the device
-> +    pub fn set_queue_logical_block_size(&self, size: u32) {
-> +        unsafe { bindings::blk_queue_logical_block_size((*self.gendisk).=
-queue, size) };
-> +    }
-> +
-> +    /// Set the physical block size of the device
+> +impl core::fmt::Display for Bio<'_> {
+> +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+> +        write!(f, "Bio {:?}", self.0.as_ptr())
 
-What does this *do*? I do not think the doc string gives any meaningful
-information not present in the function name (this might just be,
-because I have no idea of what this is and anyone with just a little
-more knowledge would know, but I still wanted to mention it).
+this will display as `Bio 0x7ff0654..` I think there should be some
+symbol wrapping the pointer like `Bio(0x7ff0654)` or `Bio { ptr: 0x7ff0654 =
+}`.
 
-> +    pub fn set_queue_physical_block_size(&self, size: u32) {
-> +        unsafe { bindings::blk_queue_physical_block_size((*self.gendisk)=
-.queue, size) };
 > +    }
+> +}
 > +
-> +    /// Set the rotational media attribute for the device
-> +    pub fn set_rotational(&self, rotational: bool) {
-> +        if !rotational {
-> +            unsafe {
-> +                bindings::blk_queue_flag_set(bindings::QUEUE_FLAG_NONROT=
-, (*self.gendisk).queue)
-> +            };
+> +/// An iterator over `Bio`
+> +pub struct BioIterator<'a> {
+> +    pub(crate) bio: Option<Bio<'a>>,
+> +}
+> +
+> +impl<'a> core::iter::Iterator for BioIterator<'a> {
+> +    type Item =3D Bio<'a>;
+> +
+> +    #[inline(always)]
+> +    fn next(&mut self) -> Option<Bio<'a>> {
+> +        if let Some(current) =3D self.bio.take() {
+> +            self.bio =3D current.next();
+> +            Some(current)
 > +        } else {
-> +            unsafe {
-> +                bindings::blk_queue_flag_clear(bindings::QUEUE_FLAG_NONR=
-OT, (*self.gendisk).queue)
-> +            };
+> +            None
 > +        }
+
+Can be rewritten as:
+    let current =3D self.bio.take()?;
+    self.bio =3D current.next();
+    Some(cur)
+
 > +    }
 > +}
-> +
-> +impl<T: Operations> Drop for GenDisk<T> {
-> +    fn drop(&mut self) {
-> +        let queue_data =3D unsafe { (*(*self.gendisk).queue).queuedata }=
-;
-> +
-> +        unsafe { bindings::del_gendisk(self.gendisk) };
-> +
-> +        // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()`=
- with a
-> +        // call to `ForeignOwnable::into_pointer()` to create `queuedata=
-`.
-> +        // `ForeignOwnable::from_foreign()` is only called here.
-> +        let _queue_data =3D unsafe { T::QueueData::from_foreign(queue_da=
-ta) };
-> +    }
-> +}
-> diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/op=
-erations.rs
+> diff --git a/rust/kernel/block/bio/vec.rs b/rust/kernel/block/bio/vec.rs
 > new file mode 100644
-> index 000000000000..fb1ab707d1f0
+> index 000000000000..acd328a6fe54
 > --- /dev/null
-> +++ b/rust/kernel/block/mq/operations.rs
-> @@ -0,0 +1,260 @@
+> +++ b/rust/kernel/block/bio/vec.rs
+> @@ -0,0 +1,181 @@
 > +// SPDX-License-Identifier: GPL-2.0
 > +
-> +//! This module provides an interface for blk-mq drivers to implement.
+> +//! Types for working with `struct bio_vec` IO vectors
 > +//!
-> +//! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
+> +//! C header: [`include/linux/bvec.h`](../../include/linux/bvec.h)
 > +
-> +use crate::{
-> +    bindings,
-> +    block::mq::{tag_set::TagSetRef, Request},
-> +    error::{from_result, Result},
-> +    types::ForeignOwnable,
-> +};
-> +use core::{marker::PhantomData, pin::Pin};
+> +use super::Bio;
+> +use crate::error::Result;
+> +use crate::pages::Pages;
+> +use core::fmt;
+> +use core::mem::ManuallyDrop;
 > +
-> +/// Implement this trait to interface blk-mq as block devices
-> +#[macros::vtable]
-> +pub trait Operations: Sized {
-
-Is this trait really safe? Are there **no** requirements for e.g.
-`QueueData`? So could I use `Box<()>`?
-
-> +    /// Data associated with a request. This data is located next to the=
- request
-> +    /// structure.
-> +    type RequestData;
-> +
-> +    /// Data associated with the `struct request_queue` that is allocate=
-d for
-> +    /// the `GenDisk` associated with this `Operations` implementation.
-> +    type QueueData: ForeignOwnable;
-> +
-> +    /// Data associated with a dispatch queue. This is stored as a point=
-er in
-> +    /// `struct blk_mq_hw_ctx`.
-> +    type HwData: ForeignOwnable;
-> +
-> +    /// Data associated with a tag set. This is stored as a pointer in `=
-struct
-> +    /// blk_mq_tag_set`.
-> +    type TagSetData: ForeignOwnable;
-> +
-> +    /// Called by the kernel to allocate a new `RequestData`. The struct=
-ure will
-> +    /// eventually be pinned, so defer initialization to `init_request_d=
-ata()`
-> +    fn new_request_data(
-> +        _tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>=
-,
-> +    ) -> Result<Self::RequestData>;
-> +
-> +    /// Called by the kernel to initialize a previously allocated `Reque=
-stData`
-> +    fn init_request_data(
-> +        _tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>=
-,
-> +        _data: Pin<&mut Self::RequestData>,
-> +    ) -> Result {
-> +        Ok(())
-> +    }
-> +
-> +    /// Called by the kernel to queue a request with the driver. If `is_=
-last` is
-> +    /// `false`, the driver is allowed to defer commiting the request.
-> +    fn queue_rq(
-> +        hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>,
-> +        queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<'_>,
-> +        rq: &Request<Self>,
-> +        is_last: bool,
-> +    ) -> Result;
-> +
-> +    /// Called by the kernel to indicate that queued requests should be =
-submitted
-> +    fn commit_rqs(
-> +        hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>,
-> +        queue_data: <Self::QueueData as ForeignOwnable>::Borrowed<'_>,
-> +    );
-> +
-> +    /// Called by the kernel when the request is completed
-> +    fn complete(_rq: &Request<Self>);
-> +
-> +    /// Called by the kernel to allocate and initialize a driver specifi=
-c hardware context data
-> +    fn init_hctx(
-> +        tagset_data: <Self::TagSetData as ForeignOwnable>::Borrowed<'_>,
-> +        hctx_idx: u32,
-> +    ) -> Result<Self::HwData>;
-> +
-> +    /// Called by the kernel to poll the device for completed requests. =
-Only used for poll queues.
-> +    fn poll(_hw_data: <Self::HwData as ForeignOwnable>::Borrowed<'_>) ->=
- i32 {
-> +        unreachable!()
-
-Why are these implemented this way? Should this really panic? Maybe
-return an error? Why `i32` as the return type? If it can error it should
-be `Result<u32>`.
-
-> +    }
-> +
-> +    /// Called by the kernel to map submission queues to CPU cores.
-> +    fn map_queues(_tag_set: &TagSetRef) {
-> +        unreachable!()
-> +    }
-> +
-> +    // There is no need for exit_request() because `drop` will be called=
-.
+> +#[inline(always)]
+> +fn mp_bvec_iter_offset(bvec: *const bindings::bio_vec, iter: &bindings::=
+bvec_iter) -> u32 {
+> +    (unsafe { (*bvec_iter_bvec(bvec, iter)).bv_offset }) + iter.bi_bvec_=
+done
 > +}
 > +
-> +pub(crate) struct OperationsVtable<T: Operations>(PhantomData<T>);
+> +#[inline(always)]
+> +fn mp_bvec_iter_page(
+> +    bvec: *const bindings::bio_vec,
+> +    iter: &bindings::bvec_iter,
+> +) -> *mut bindings::page {
+> +    unsafe { (*bvec_iter_bvec(bvec, iter)).bv_page }
+> +}
 > +
-> +impl<T: Operations> OperationsVtable<T> {
-> +    // # Safety
-> +    //
-> +    // The caller of this function must ensure that `hctx` and `bd` are =
-valid
-> +    // and initialized. The pointees must outlive this function. Further
-> +    // `hctx->driver_data` must be a pointer created by a call to
-> +    // `Self::init_hctx_callback()` and the pointee must outlive this fu=
-nction.
-> +    // This function must not be called with a `hctx` for which
-> +    // `Self::exit_hctx_callback()` has been called.
-> +    unsafe extern "C" fn queue_rq_callback(
-> +        hctx: *mut bindings::blk_mq_hw_ctx,
-> +        bd: *const bindings::blk_mq_queue_data,
-> +    ) -> bindings::blk_status_t {
-> +        // SAFETY: `bd` is valid as required by the safety requirement f=
-or this function.
-> +        let rq =3D unsafe { (*bd).rq };
+> +#[inline(always)]
+> +fn mp_bvec_iter_page_idx(bvec: *const bindings::bio_vec, iter: &bindings=
+::bvec_iter) -> usize {
+> +    (mp_bvec_iter_offset(bvec, iter) / crate::PAGE_SIZE) as usize
+> +}
 > +
-> +        // SAFETY: The safety requirement for this function ensure that
-> +        // `(*hctx).driver_data` was returned by a call to
-> +        // `Self::init_hctx_callback()`. That function uses
-> +        // `PointerWrapper::into_pointer()` to create `driver_data`. Fur=
-ther,
-> +        // the returned value does not outlive this function and
-> +        // `from_foreign()` is not called until `Self::exit_hctx_callbac=
-k()` is
-> +        // called. By the safety requirement of this function and contra=
-ct with
-> +        // the `blk-mq` API, `queue_rq_callback()` will not be called af=
-ter that
-> +        // point.
+> +#[inline(always)]
+> +fn mp_bvec_iter_len(bvec: *const bindings::bio_vec, iter: &bindings::bve=
+c_iter) -> u32 {
+> +    iter.bi_size
+> +        .min(unsafe { (*bvec_iter_bvec(bvec, iter)).bv_len } - iter.bi_b=
+vec_done)
+> +}
+> +
+> +#[inline(always)]
+> +fn bvec_iter_bvec(
+> +    bvec: *const bindings::bio_vec,
+> +    iter: &bindings::bvec_iter,
+> +) -> *const bindings::bio_vec {
+> +    unsafe { bvec.add(iter.bi_idx as usize) }
+> +}
+> +
+> +#[inline(always)]
+> +fn bvec_iter_page(
+> +    bvec: *const bindings::bio_vec,
+> +    iter: &bindings::bvec_iter,
+> +) -> *mut bindings::page {
+> +    unsafe { mp_bvec_iter_page(bvec, iter).add(mp_bvec_iter_page_idx(bve=
+c, iter)) }
+> +}
+> +
+> +#[inline(always)]
+> +fn bvec_iter_len(bvec: *const bindings::bio_vec, iter: &bindings::bvec_i=
+ter) -> u32 {
+> +    mp_bvec_iter_len(bvec, iter).min(crate::PAGE_SIZE - bvec_iter_offset=
+(bvec, iter))
+> +}
+> +
+> +#[inline(always)]
+> +fn bvec_iter_offset(bvec: *const bindings::bio_vec, iter: &bindings::bve=
+c_iter) -> u32 {
+> +    mp_bvec_iter_offset(bvec, iter) % crate::PAGE_SIZE
+> +}
 
-This safety section and the others here are rather long and mostly
-repeat themselves. Is it possible to put this in its own module and
-explain the safety invariants in that module and then in these safety
-sections just refer to some labels from that section?
+Why are these functions:
+- not marked as `unsafe`?
+- undocumented,
+- free functions.
 
-I think we should discuss this in our next meeting.
+Can't these be directly implemented on `Segment<'_>`? If not,
+I think we should find some better way or make them `unsafe`.
 
-> +        let hw_data =3D unsafe { T::HwData::borrow((*hctx).driver_data) =
-};
 > +
-> +        // SAFETY: `hctx` is valid as required by this function.
-> +        let queue_data =3D unsafe { (*(*hctx).queue).queuedata };
+> +/// A wrapper around a `strutct bio_vec` - a contiguous range of physica=
+l memory addresses
+> +///
+> +/// # Invariants
+> +///
+> +/// `bio_vec` must always be initialized and valid
+> +pub struct Segment<'a> {
+> +    bio_vec: bindings::bio_vec,
+> +    _marker: core::marker::PhantomData<&'a ()>,
+> +}
 > +
-> +        // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()`=
- with a
-> +        // call to `ForeignOwnable::into_pointer()` to create `queuedata=
-`.
-> +        // `ForeignOwnable::from_foreign()` is only called when the tags=
-et is
-> +        // dropped, which happens after we are dropped.
-> +        let queue_data =3D unsafe { T::QueueData::borrow(queue_data) };
+> +impl Segment<'_> {
+> +    /// Get he lenght of the segment in bytes
+> +    #[inline(always)]
+> +    pub fn len(&self) -> usize {
+> +        self.bio_vec.bv_len as usize
+> +    }
 > +
-> +        // SAFETY: `bd` is valid as required by the safety requirement f=
-or this function.
-> +        let ret =3D T::queue_rq(
-> +            hw_data,
-> +            queue_data,
-> +            &unsafe { Request::from_ptr(rq) },
-> +            unsafe { (*bd).last },
-> +        );
-> +        if let Err(e) =3D ret {
-> +            e.to_blk_status()
-> +        } else {
-> +            bindings::BLK_STS_OK as _
+> +    /// Returns true if the length of the segment is 0
+> +    #[inline(always)]
+> +    pub fn is_empty(&self) -> bool {
+> +        self.len() =3D=3D 0
+> +    }
+> +
+> +    /// Get the offset field of the `bio_vec`
+> +    #[inline(always)]
+> +    pub fn offset(&self) -> usize {
+> +        self.bio_vec.bv_offset as usize
+> +    }
+> +
+> +    /// Copy data of this segment into `page`.
+> +    #[inline(always)]
+> +    pub fn copy_to_page_atomic(&self, page: &mut Pages<0>) -> Result {
+> +        // SAFETY: self.bio_vec is valid and thus bv_page must be a vali=
+d
+> +        // pointer to a `struct page`. We do not own the page, but we pr=
+event
+> +        // drop by wrapping the `Pages` in `ManuallyDrop`.
+> +        let our_page =3D ManuallyDrop::new(unsafe { Pages::<0>::from_raw=
+(self.bio_vec.bv_page) });
+> +        let our_map =3D our_page.kmap_atomic();
+> +
+> +        // TODO: Checck offset is within page - what guarantees does `bi=
+o_vec` provide?
+> +        let ptr =3D unsafe { (our_map.get_ptr() as *const u8).add(self.o=
+ffset()) };
+> +
+> +        unsafe { page.write_atomic(ptr, self.offset(), self.len()) }
+> +    }
+> +
+> +    /// Copy data from `page` into this segment
+> +    #[inline(always)]
+> +    pub fn copy_from_page_atomic(&mut self, page: &Pages<0>) -> Result {
+> +        // SAFETY: self.bio_vec is valid and thus bv_page must be a vali=
+d
+> +        // pointer to a `struct page`. We do not own the page, but we pr=
+event
+> +        // drop by wrapping the `Pages` in `ManuallyDrop`.
+> +        let our_page =3D ManuallyDrop::new(unsafe { Pages::<0>::from_raw=
+(self.bio_vec.bv_page) });
+> +        let our_map =3D our_page.kmap_atomic();
+> +
+> +        // TODO: Checck offset is within page
+> +        let ptr =3D unsafe { (our_map.get_ptr() as *mut u8).add(self.off=
+set()) };
+> +
+> +        unsafe { page.read_atomic(ptr, self.offset(), self.len()) }
+> +    }
+> +}
+> +
+> +impl core::fmt::Display for Segment<'_> {
+> +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+> +        write!(
+> +            f,
+> +            "Segment {:?} len: {}",
+> +            self.bio_vec.bv_page, self.bio_vec.bv_len
+> +        )
+> +    }
+> +}
+> +
+> +/// An iterator over `Segment`
+> +pub struct BioSegmentIterator<'a> {
+> +    bio: &'a Bio<'a>,
+> +    iter: bindings::bvec_iter,
+> +}
+> +
+> +impl<'a> BioSegmentIterator<'a> {
+> +    #[inline(always)]
+> +    pub(crate) fn new(bio: &'a Bio<'a>) -> BioSegmentIterator<'_> {
+> +        Self {
+> +            bio,
+> +            iter: bio.iter(),
 > +        }
 > +    }
-> +
-> +    unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq=
-_hw_ctx) {
-> +        let hw_data =3D unsafe { T::HwData::borrow((*hctx).driver_data) =
-};
-> +
-> +        // SAFETY: `hctx` is valid as required by this function.
-> +        let queue_data =3D unsafe { (*(*hctx).queue).queuedata };
-> +
-> +        // SAFETY: `queue.queuedata` was created by `GenDisk::try_new()`=
- with a
-> +        // call to `ForeignOwnable::into_pointer()` to create `queuedata=
-`.
-> +        // `ForeignOwnable::from_foreign()` is only called when the tags=
-et is
-> +        // dropped, which happens after we are dropped.
-> +        let queue_data =3D unsafe { T::QueueData::borrow(queue_data) };
-> +        T::commit_rqs(hw_data, queue_data)
-> +    }
-> +
-> +    unsafe extern "C" fn complete_callback(rq: *mut bindings::request) {
-> +        T::complete(&unsafe { Request::from_ptr(rq) });
-> +    }
-> +
-> +    unsafe extern "C" fn poll_callback(
-> +        hctx: *mut bindings::blk_mq_hw_ctx,
-> +        _iob: *mut bindings::io_comp_batch,
-> +    ) -> core::ffi::c_int {
-> +        let hw_data =3D unsafe { T::HwData::borrow((*hctx).driver_data) =
-};
-> +        T::poll(hw_data)
-> +    }
-> +
-> +    unsafe extern "C" fn init_hctx_callback(
-> +        hctx: *mut bindings::blk_mq_hw_ctx,
-> +        tagset_data: *mut core::ffi::c_void,
-> +        hctx_idx: core::ffi::c_uint,
-> +    ) -> core::ffi::c_int {
-> +        from_result(|| {
-> +            let tagset_data =3D unsafe { T::TagSetData::borrow(tagset_da=
-ta) };
-> +            let data =3D T::init_hctx(tagset_data, hctx_idx)?;
-> +            unsafe { (*hctx).driver_data =3D data.into_foreign() as _ };
-> +            Ok(0)
-> +        })
-> +    }
-> +
-> +    unsafe extern "C" fn exit_hctx_callback(
-> +        hctx: *mut bindings::blk_mq_hw_ctx,
-> +        _hctx_idx: core::ffi::c_uint,
-> +    ) {
-> +        let ptr =3D unsafe { (*hctx).driver_data };
-> +        unsafe { T::HwData::from_foreign(ptr) };
-> +    }
-> +
-> +    unsafe extern "C" fn init_request_callback(
-> +        set: *mut bindings::blk_mq_tag_set,
-> +        rq: *mut bindings::request,
-> +        _hctx_idx: core::ffi::c_uint,
-> +        _numa_node: core::ffi::c_uint,
-> +    ) -> core::ffi::c_int {
-> +        from_result(|| {
-> +            // SAFETY: The tagset invariants guarantee that all requests=
- are allocated with extra memory
-> +            // for the request data.
-> +            let pdu =3D unsafe { bindings::blk_mq_rq_to_pdu(rq) } as *mu=
-t T::RequestData;
-> +            let tagset_data =3D unsafe { T::TagSetData::borrow((*set).dr=
-iver_data) };
-> +
-> +            let v =3D T::new_request_data(tagset_data)?;
-> +
-> +            // SAFETY: `pdu` memory is valid, as it was allocated by the=
- caller.
-> +            unsafe { pdu.write(v) };
-> +
-> +            let tagset_data =3D unsafe { T::TagSetData::borrow((*set).dr=
-iver_data) };
-> +            // SAFETY: `pdu` memory is valid and properly initialised.
-> +            T::init_request_data(tagset_data, unsafe { Pin::new_unchecke=
-d(&mut *pdu) })?;
-> +
-> +            Ok(0)
-> +        })
-> +    }
-> +
-> +    unsafe extern "C" fn exit_request_callback(
-> +        _set: *mut bindings::blk_mq_tag_set,
-> +        rq: *mut bindings::request,
-> +        _hctx_idx: core::ffi::c_uint,
-> +    ) {
-> +        // SAFETY: The tagset invariants guarantee that all requests are=
- allocated with extra memory
-> +        // for the request data.
-> +        let pdu =3D unsafe { bindings::blk_mq_rq_to_pdu(rq) } as *mut T:=
-:RequestData;
-> +
-> +        // SAFETY: `pdu` is valid for read and write and is properly ini=
-tialised.
-> +        unsafe { core::ptr::drop_in_place(pdu) };
-> +    }
-> +
-> +    unsafe extern "C" fn map_queues_callback(tag_set_ptr: *mut bindings:=
-:blk_mq_tag_set) {
-> +        let tag_set =3D unsafe { TagSetRef::from_ptr(tag_set_ptr) };
-> +        T::map_queues(&tag_set);
-> +    }
-> +
-> +    const VTABLE: bindings::blk_mq_ops =3D bindings::blk_mq_ops {
-> +        queue_rq: Some(Self::queue_rq_callback),
-> +        queue_rqs: None,
-> +        commit_rqs: Some(Self::commit_rqs_callback),
-> +        get_budget: None,
-> +        put_budget: None,
-> +        set_rq_budget_token: None,
-> +        get_rq_budget_token: None,
-> +        timeout: None,
-> +        poll: if T::HAS_POLL {
-> +            Some(Self::poll_callback)
-> +        } else {
-> +            None
-> +        },
-> +        complete: Some(Self::complete_callback),
-> +        init_hctx: Some(Self::init_hctx_callback),
-> +        exit_hctx: Some(Self::exit_hctx_callback),
-> +        init_request: Some(Self::init_request_callback),
-> +        exit_request: Some(Self::exit_request_callback),
-> +        cleanup_rq: None,
-> +        busy: None,
-> +        map_queues: if T::HAS_MAP_QUEUES {
-> +            Some(Self::map_queues_callback)
-> +        } else {
-> +            None
-> +        },
-> +        #[cfg(CONFIG_BLK_DEBUG_FS)]
-> +        show_rq: None,
-> +    };
-> +
-> +    pub(crate) const unsafe fn build() -> &'static bindings::blk_mq_ops =
-{
-> +        &Self::VTABLE
-> +    }
-
-Why is this function `unsafe`?
-
-> +}
-
-Some `# Safety` and `SAFETY` missing in this hunk.
-
-> diff --git a/rust/kernel/block/mq/raw_writer.rs b/rust/kernel/block/mq/ra=
-w_writer.rs
-> new file mode 100644
-> index 000000000000..25c16ee0b1f7
-> --- /dev/null
-> +++ b/rust/kernel/block/mq/raw_writer.rs
-> @@ -0,0 +1,30 @@
-> +use core::fmt::{self, Write};
-> +
-> +pub(crate) struct RawWriter {
-> +    ptr: *mut u8,
-> +    len: usize,
 > +}
 > +
-> +impl RawWriter {
-> +    unsafe fn new(ptr: *mut u8, len: usize) -> Self {
-> +        Self { ptr, len }
-> +    }
+> +impl<'a> core::iter::Iterator for BioSegmentIterator<'a> {
+> +    type Item =3D Segment<'a>;
 > +
-> +    pub(crate) fn from_array<const N: usize>(a: &mut [core::ffi::c_char;=
- N]) -> Self {
-> +        unsafe { Self::new(&mut a[0] as *mut _ as _, N) }
-> +    }
-
-This function needs to be `unsafe`, because it never captures the
-lifetime of `a`. I can write:
-    let mut a =3D Box::new([0; 10]);
-    let mut writer =3D RawWriter::from_array(&mut *a);
-    drop(a);
-    writer.write_str("Abc"); // UAF
-Alternatively add a lifetime to `RawWriter`.
-
-> +}
-> +
-> +impl Write for RawWriter {
-> +    fn write_str(&mut self, s: &str) -> fmt::Result {
-> +        let bytes =3D s.as_bytes();
-> +        let len =3D bytes.len();
-> +        if len > self.len {
-> +            return Err(fmt::Error);
+> +    #[inline(always)]
+> +    fn next(&mut self) -> Option<Self::Item> {
+> +        if self.iter.bi_size =3D=3D 0 {
+> +            return None;
 > +        }
-> +        unsafe { core::ptr::copy_nonoverlapping(&bytes[0], self.ptr, len=
-) };
-> +        self.ptr =3D unsafe { self.ptr.add(len) };
-> +        self.len -=3D len;
-> +        Ok(())
+> +
+> +        // Macro
+> +        // bio_vec =3D bio_iter_iovec(bio, self.iter)
+> +        // bio_vec =3D bvec_iter_bvec(bio.bi_io_vec, self.iter);
+
+Weird comment?
+
+> +        let bio_vec_ret =3D bindings::bio_vec {
+> +            bv_page: bvec_iter_page(self.bio.io_vec(), &self.iter),
+> +            bv_len: bvec_iter_len(self.bio.io_vec(), &self.iter),
+> +            bv_offset: bvec_iter_offset(self.bio.io_vec(), &self.iter),
+> +        };
+> +
+> +        // Static C function
+> +        unsafe {
+> +            bindings::bio_advance_iter_single(
+> +                self.bio.get_raw(),
+> +                &mut self.iter as *mut bindings::bvec_iter,
+> +                bio_vec_ret.bv_len,
+> +            )
+> +        };
+> +
+> +        Some(Segment {
+> +            bio_vec: bio_vec_ret,
+> +            _marker: core::marker::PhantomData,
+> +        })
 > +    }
 > +}
 > diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/reque=
 st.rs
-> new file mode 100644
-> index 000000000000..e95ae3fd71ad
-> --- /dev/null
+> index e95ae3fd71ad..ccb1033b64b6 100644
+> --- a/rust/kernel/block/mq/request.rs
 > +++ b/rust/kernel/block/mq/request.rs
-> @@ -0,0 +1,71 @@
-> +// SPDX-License-Identifier: GPL-2.0
+> @@ -11,6 +11,9 @@ use crate::{
+>  };
+>  use core::marker::PhantomData;
+>=20
+> +use crate::block::bio::Bio;
+> +use crate::block::bio::BioIterator;
 > +
-> +//! This module provides a wrapper for the C `struct request` type.
-> +//!
-> +//! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
-> +
-> +use crate::{
-> +    bindings,
-> +    block::mq::Operations,
-> +    error::{Error, Result},
-> +};
-> +use core::marker::PhantomData;
-> +
-> +/// A wrapper around a blk-mq `struct request`. This represents an IO re=
+>  /// A wrapper around a blk-mq `struct request`. This represents an IO re=
 quest.
-> +pub struct Request<T: Operations> {
-> +    ptr: *mut bindings::request,
-
-Why is this not embedded?
-
-> +    _p: PhantomData<T>,
-> +}
-> +
-> +impl<T: Operations> Request<T> {
-> +    pub(crate) unsafe fn from_ptr(ptr: *mut bindings::request) -> Self {
-> +        Self {
-> +            ptr,
-> +            _p: PhantomData,
-> +        }
-> +    }
-> +
-> +    /// Get the command identifier for the request
-> +    pub fn command(&self) -> u32 {
-> +        unsafe { (*self.ptr).cmd_flags & ((1 << bindings::REQ_OP_BITS) -=
- 1) }
-> +    }
-> +
-> +    /// Call this to indicate to the kernel that the request has been is=
-sued by the driver
-> +    pub fn start(&self) {
-> +        unsafe { bindings::blk_mq_start_request(self.ptr) };
-> +    }
-> +
-> +    /// Call this to indicate to the kernel that the request has been co=
-mpleted without errors
-> +    // TODO: Consume rq so that we can't use it after ending it?
-> +    pub fn end_ok(&self) {
-> +        unsafe { bindings::blk_mq_end_request(self.ptr, bindings::BLK_ST=
-S_OK as _) };
-> +    }
-> +
-> +    /// Call this to indicate to the kernel that the request completed w=
-ith an error
-> +    pub fn end_err(&self, err: Error) {
-> +        unsafe { bindings::blk_mq_end_request(self.ptr, err.to_blk_statu=
-s()) };
-> +    }
-> +
-> +    /// Call this to indicate that the request completed with the status=
- indicated by `status`
-> +    pub fn end(&self, status: Result) {
-> +        if let Err(e) =3D status {
-> +            self.end_err(e);
-> +        } else {
-> +            self.end_ok();
-> +        }
-> +    }
-> +
-> +    /// Call this to schedule defered completion of the request
-> +    // TODO: Consume rq so that we can't use it after completing it?
-> +    pub fn complete(&self) {
-> +        if !unsafe { bindings::blk_mq_complete_request_remote(self.ptr) =
-} {
-> +            T::complete(&unsafe { Self::from_ptr(self.ptr) });
-> +        }
-> +    }
-> +
-> +    /// Get the target sector for the request
-> +    #[inline(always)]
-
-Why is this `inline(always)`?
-
-> +    pub fn sector(&self) -> usize {
-> +        unsafe { (*self.ptr).__sector as usize }
-> +    }
-> +}
-> diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_s=
-et.rs
-> new file mode 100644
-> index 000000000000..d122db7f6d0e
-> --- /dev/null
-> +++ b/rust/kernel/block/mq/tag_set.rs
-> @@ -0,0 +1,92 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! This module provides the `TagSet` struct to wrap the C `struct blk_m=
-q_tag_set`.
-> +//!
-> +//! C header: [`include/linux/blk-mq.h`](../../include/linux/blk-mq.h)
-> +
-> +use crate::{
-> +    bindings,
-> +    block::mq::{operations::OperationsVtable, Operations},
-> +    error::{Error, Result},
-> +    sync::Arc,
-> +    types::ForeignOwnable,
-> +};
-> +use core::{cell::UnsafeCell, convert::TryInto, marker::PhantomData};
-> +
-> +/// A wrapper for the C `struct blk_mq_tag_set`
-> +pub struct TagSet<T: Operations> {
-> +    inner: UnsafeCell<bindings::blk_mq_tag_set>,
-> +    _p: PhantomData<T>,
-> +}
-> +
-> +impl<T: Operations> TagSet<T> {
-> +    /// Try to create a new tag set
-> +    pub fn try_new(
-> +        nr_hw_queues: u32,
-> +        tagset_data: T::TagSetData,
-> +        num_tags: u32,
-> +        num_maps: u32,
-> +    ) -> Result<Arc<Self>> {
-
-Why force the users to use `Arc`?
-
-> +        let tagset =3D Arc::try_new(Self {
-> +            inner: UnsafeCell::new(bindings::blk_mq_tag_set::default()),
-> +            _p: PhantomData,
-> +        })?;
-> +
-> +        // SAFETY: We just allocated `tagset`, we know this is the only =
-reference to it.
-> +        let inner =3D unsafe { &mut *tagset.inner.get() };
-> +
-> +        inner.ops =3D unsafe { OperationsVtable::<T>::build() };
-> +        inner.nr_hw_queues =3D nr_hw_queues;
-> +        inner.timeout =3D 0; // 0 means default which is 30 * HZ in C
-> +        inner.numa_node =3D bindings::NUMA_NO_NODE;
-> +        inner.queue_depth =3D num_tags;
-> +        inner.cmd_size =3D core::mem::size_of::<T::RequestData>().try_in=
-to()?;
-> +        inner.flags =3D bindings::BLK_MQ_F_SHOULD_MERGE;
-> +        inner.driver_data =3D tagset_data.into_foreign() as _;
-> +        inner.nr_maps =3D num_maps;
-> +
-> +        // SAFETY: `inner` points to valid and initialised memory.
-> +        let ret =3D unsafe { bindings::blk_mq_alloc_tag_set(inner) };
-> +        if ret < 0 {
-> +            // SAFETY: We created `driver_data` above with `into_foreign=
-`
-> +            unsafe { T::TagSetData::from_foreign(inner.driver_data) };
-> +            return Err(Error::from_errno(ret));
-> +        }
-> +
-> +        Ok(tagset)
-> +    }
-> +
-> +    /// Return the pointer to the wrapped `struct blk_mq_tag_set`
-> +    pub(crate) fn raw_tag_set(&self) -> *mut bindings::blk_mq_tag_set {
-> +        self.inner.get()
-> +    }
-> +}
-> +
-> +impl<T: Operations> Drop for TagSet<T> {
-> +    fn drop(&mut self) {
-> +        let tagset_data =3D unsafe { (*self.inner.get()).driver_data };
-> +
-> +        // SAFETY: `inner` is valid and has been properly initialised du=
-ring construction.
-> +        unsafe { bindings::blk_mq_free_tag_set(self.inner.get()) };
-> +
-> +        // SAFETY: `tagset_data` was created by a call to
-> +        // `ForeignOwnable::into_foreign` in `TagSet::try_new()`
-> +        unsafe { T::TagSetData::from_foreign(tagset_data) };
-> +    }
-> +}
-> +
-> +/// A tag set reference. Used to control lifetime and prevent drop of Ta=
-gSet references passed to
-> +/// `Operations::map_queues()`
-> +pub struct TagSetRef {
-> +    ptr: *mut bindings::blk_mq_tag_set,
-> +}
-> +
-> +impl TagSetRef {
-> +    pub(crate) unsafe fn from_ptr(tagset: *mut bindings::blk_mq_tag_set)=
- -> Self {
-> +        Self { ptr: tagset }
-> +    }
-> +
-> +    pub fn ptr(&self) -> *mut bindings::blk_mq_tag_set {
-> +        self.ptr
-> +    }
-> +}
-
-This is a **very** thin abstraction, why is it needed?
-
-> diff --git a/rust/kernel/error.rs b/rust/kernel/error.rs
-> index 5f4114b30b94..421fef677321 100644
-> --- a/rust/kernel/error.rs
-> +++ b/rust/kernel/error.rs
-> @@ -107,6 +107,10 @@ impl Error {
->          self.0
+>  pub struct Request<T: Operations> {
+>      ptr: *mut bindings::request,
+> @@ -63,6 +66,19 @@ impl<T: Operations> Request<T> {
+>          }
 >      }
 >=20
-> +    pub(crate) fn to_blk_status(self) -> bindings::blk_status_t {
-> +        unsafe { bindings::errno_to_blk_status(self.0) }
+> +    /// Get a wrapper for the first Bio in this request
+> +    #[inline(always)]
+> +    pub fn bio(&self) -> Option<Bio<'_>> {
+> +        let ptr =3D unsafe { (*self.ptr).bio };
+> +        unsafe { Bio::from_raw(ptr) }
 > +    }
 > +
->      /// Returns the error encoded as a pointer.
->      #[allow(dead_code)]
->      pub(crate) fn to_ptr<T>(self) -> *mut T {
-> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-> index 8bef6686504b..cd798d12d97c 100644
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@ -34,6 +34,7 @@ extern crate self as kernel;
->  #[cfg(not(test))]
->  #[cfg(not(testlib))]
->  mod allocator;
-> +pub mod block;
->  mod build_assert;
->  pub mod error;
->  pub mod init;
+> +    /// Get an iterator over all bio structurs in this request
+> +    #[inline(always)]
+> +    pub fn bio_iter(&self) -> BioIterator<'_> {
+> +        BioIterator { bio: self.bio() }
+> +    }
+> +
+>      /// Get the target sector for the request
+>      #[inline(always)]
+>      pub fn sector(&self) -> usize {
 > --
 > 2.40.0
 >=20
