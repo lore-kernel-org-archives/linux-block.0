@@ -2,120 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DF6C7EE24
-	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 21:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A59C77B75
+	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 22:20:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235848AbjEIVfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 17:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60530 "EHLO
+        id S235609AbjEIWUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 18:20:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235689AbjEIVf2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 17:35:28 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 747E16EA1;
-        Tue,  9 May 2023 14:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683668102; x=1715204102;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LxfhN7twkbsXW4buKGDFp0m82yxZW5uwWpLzdxIpSC8=;
-  b=WMuC4KjgMwxqwDvM/1pmoDjSgK/AtbZSwQbn7LVelF7qFebmNviFT70p
-   NY3+qHW/g36bDFNLACWkv9tpKaAQZTQNd0yI4OT38bx2JV8Z88XnDj7hL
-   nNFsT93Y7pTjFhSI3gOPfBueZx7kzInnPR+8FMQc08ODxTVl0FY+D8jTo
-   gKcmxnO20xz+myJj4hN2UkiapwNj15XOdVcklVft9dQa9EgkJRB84iSvO
-   UOZuSkt4lr8Y1qOQ4rKpzxghAqkJw2B3wVEGfDc7LE2PypcWY77pBa5ga
-   17MlM221rksGc1F+0UqdN667wmHzbVjFXIhCGalKV6zhf1BEau4xL4h25
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="330421325"
-X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
-   d="scan'208";a="330421325"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 14:33:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="729693392"
-X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
-   d="scan'208";a="729693392"
-Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 09 May 2023 14:33:52 -0700
-Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pwUxz-0002WE-0b;
-        Tue, 09 May 2023 21:33:51 +0000
-Date:   Wed, 10 May 2023 05:33:31 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk
-Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
-        martin.petersen@oracle.com, bvanassche@acm.org,
-        stanley.chu@mediatek.com, peter.wang@mediatek.com,
-        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
-        powen.kao@mediatek.com, naomi.chu@mediatek.com,
-        wsd_upstream@mediatek.com, Ed Tsai <ed.tsai@mediatek.com>
-Subject: Re: [PATCH 1/2] block: make the fair sharing of tag configurable
-Message-ID: <202305100557.gdIvlzRS-lkp@intel.com>
-References: <20230509065230.32552-2-ed.tsai@mediatek.com>
+        with ESMTP id S235302AbjEIWUF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 18:20:05 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87183B3
+        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 15:20:02 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1ab0c697c84so49496465ad.3
+        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 15:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1683670802; x=1686262802;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lpFfG6C/woeEh3xAVWVSW4QDIRY2LcuRr67NeZrYhZk=;
+        b=x4wnhtf2e/5Ls0/pD9obIHjGGbGyC2TZ1yPp9j0M0gpWdvOKZY1vS0QUNfd3huTH3X
+         D1WBE2UUfwRm6IRjV7rztd+1U8bjj+OJ6HetiHxsseo0wxuA7Mmu9FI4AuEL7mHRw0T7
+         dYG/Ha1X6UyzBTojilPQeX5BBtQ/lwjbh952fhmGyoUxngQ/oumQjwc/7o4xGP/MmBf3
+         6Vr7dzf4w5c34jwu0r1wN0a7NQ23j/p4A1KmmPehy4jqOvVU/3HATmsL8oo6QBnkazn6
+         yRJtVSs+2vsQYPQs7TNtruZyFSrbUHe0bj8dK2YJlondW5w3OfJytTXrkk9VzdaUKLiq
+         ltVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683670802; x=1686262802;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lpFfG6C/woeEh3xAVWVSW4QDIRY2LcuRr67NeZrYhZk=;
+        b=YNWbmz20QVt3CODJbHhyteud6DPOqld09ArjaQ/HL7rWBqi/mpdEimUZ8B8JoRQFLL
+         8uUfZWBcL64JUUix9c8It00dYz4Y9MJg/tN5i8nT/9wgryU+LlhTU4XRARulra1Vco3g
+         PE/cgltPRUCB8CqjUMhGgeyWbFh+/AEqcSOvGVknpdvhIlPpX4fqxqPFpHWp6cxtNjRT
+         PLDMvbH7qasJoHGZK3rWJ5LpEhWdBrEZ69dwL1eUIROkmah1L98U0QFU6cVUo9kP4EYZ
+         19EmBA+2YnsNUhjml/InpIInzVHoBDuQwUA3u148seTzXwuvvB0m0JyY2eFi2PDFGTdN
+         e8dQ==
+X-Gm-Message-State: AC+VfDzaHiEaXdOS8qslpMOngdLP/CllxYHL9x21Fa2ll5SB2Ty3fKsf
+        0N21jyAFQ1rdAzcxuWwkrRB22f7HdJKu8PAoeMU=
+X-Google-Smtp-Source: ACHHUZ45kM8YGiof/dP3yzhXFIIdPd9DEDG9hSY5vXQotAlNRS3qz0nIW+ex68IDbiRDaO4ei/A3bg==
+X-Received: by 2002:a17:902:d504:b0:1a9:98ae:5970 with SMTP id b4-20020a170902d50400b001a998ae5970mr20929374plg.23.1683670802017;
+        Tue, 09 May 2023 15:20:02 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-88-204.pa.nsw.optusnet.com.au. [49.181.88.204])
+        by smtp.gmail.com with ESMTPSA id r9-20020a17090a690900b0024e06a71ef5sm12045144pjj.56.2023.05.09.15.20.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 May 2023 15:20:01 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1pwVgc-00DNjc-Ew; Wed, 10 May 2023 08:19:58 +1000
+Date:   Wed, 10 May 2023 08:19:58 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 5/9] block: introduce holder ops
+Message-ID: <20230509221958.GV3223426@dread.disaster.area>
+References: <20230505175132.2236632-1-hch@lst.de>
+ <20230505175132.2236632-6-hch@lst.de>
+ <20230505185119.GI15394@frogsfrogsfrogs>
+ <20230509133501.GD841@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230509065230.32552-2-ed.tsai@mediatek.com>
+In-Reply-To: <20230509133501.GD841@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ed,
+On Tue, May 09, 2023 at 03:35:01PM +0200, Christoph Hellwig wrote:
+> On Fri, May 05, 2023 at 11:51:19AM -0700, Darrick J. Wong wrote:
+> > Fun question: What happens when the swap disk falls off the bus?
+> 
+> Your system is toast.
+> 
+> > > -	if (IS_ERR(blkdev_get_by_dev(bdev->bd_dev, mode | FMODE_EXCL, &bdev)))
+> > > +	if (IS_ERR(blkdev_get_by_dev(bdev->bd_dev, mode | FMODE_EXCL, &bdev,
+> > > +			NULL)))
+> > >  		return -EBUSY;
+> > >  	ret = set_blocksize(bdev, n);
+> > >  	blkdev_put(bdev, mode | FMODE_EXCL);
+> > 
+> > Somewhat related question: Should we allow userspace to initiate a fs
+> > shutdown through the block device?  Let's say you're preparing to yank
+> > /dev/sda and want to kill anything attached to it or its partitions?
+> > Without having to walk through however many mount namespaces there are
+> > to find the mountpoints?
+> 
+> That's kinda what we're doing here.  Or do you mean even more advanced
+> notice by having another callout before stopping I/O so that we could
+> write out all log buffers?  It's probably doable, but I'm not convinced
+> that this use case is worth maintaining and testing the kernel code for
+> it.
 
-kernel test robot noticed the following build warnings:
+The userspace shutdown code already does this by default - it
+actually calls freeze_bdev() to cause the filesystem to be made
+consistent on the block device before it executes the shutdown.
+So, in effect, we already have the "shutdown before turning off
+block device" paths in the filesystems and extremely well tested.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on jejb-scsi/for-next mkp-scsi/for-next linus/master v6.4-rc1 next-20230509]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Indeed, if the device is being removed, why not call freeze_bdev()
+before doing anything else? It guarantees that applications will be
+quiesced and the filesystem will stabilise and not try to change
+anything until the shutdown occurs when the device is pulled...
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ed-Tsai/block-make-the-fair-sharing-of-tag-configurable/20230509-145439
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20230509065230.32552-2-ed.tsai%40mediatek.com
-patch subject: [PATCH 1/2] block: make the fair sharing of tag configurable
-config: openrisc-randconfig-r022-20230509 (https://download.01.org/0day-ci/archive/20230510/202305100557.gdIvlzRS-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/b1081024bc6d1cdaf5b39994b19040cd8e6099ec
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Ed-Tsai/block-make-the-fair-sharing-of-tag-configurable/20230509-145439
-        git checkout b1081024bc6d1cdaf5b39994b19040cd8e6099ec
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=openrisc olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=openrisc SHELL=/bin/bash
+Cheers,
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202305100557.gdIvlzRS-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from block/blk-mq.c:12:
-   block/blk-mq.c: In function 'blk_mq_init_allocated_queue':
->> include/linux/blkdev.h:569:39: warning: left shift count >= width of type [-Wshift-count-overflow]
-     569 |                                  (1UL << QUEUE_FLAG_FAIR_TAG_SHARING))
-         |                                       ^~
-   block/blk-mq.c:4232:27: note: in expansion of macro 'QUEUE_FLAG_MQ_DEFAULT'
-    4232 |         q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
-         |                           ^~~~~~~~~~~~~~~~~~~~~
-
-
-vim +569 include/linux/blkdev.h
-
-   565	
-   566	#define QUEUE_FLAG_MQ_DEFAULT	((1UL << QUEUE_FLAG_IO_STAT) |		\
-   567					 (1UL << QUEUE_FLAG_SAME_COMP) |	\
-   568					 (1UL << QUEUE_FLAG_NOWAIT) |		\
- > 569					 (1UL << QUEUE_FLAG_FAIR_TAG_SHARING))
-   570	
-
+Dave.
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Dave Chinner
+david@fromorbit.com
