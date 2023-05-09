@@ -2,257 +2,120 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D5BC77B75
-	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 17:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DF6C7EE24
+	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 21:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235346AbjEIRDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 13:03:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43912 "EHLO
+        id S235848AbjEIVfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 17:35:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235284AbjEIRDQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 13:03:16 -0400
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6C42D6A
-        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 09:59:44 -0700 (PDT)
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7575ff76964so180379485a.2
-        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 09:59:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683651532; x=1686243532;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZNfiDYylpHckBsTJBtckQjf+FcPfo0wjhkF9b1/i4T8=;
-        b=GR+zySE9lJWAIPWWCDwPrv5bN20FnB89dDfkQvN4SAjvLHuKBs7gPZJMW2ri7T83aN
-         oyDFVGK9yD+/dSxA7NNOAnmmPi4airVXaCt1G9O1P1fWxPGrPOsvuN1Pz4Quu7qhryLQ
-         ZVDp81c1bHvdsCjH7fKvnMITcPuIUfGpDQCRApc1OREfUf73QW0L9iGjAmmlEpodjnnW
-         QXz0H7c/8fNNqLe/TT4k8MeykEhS7vtoosbKEZ5nc7rfqGSXNHyoTTr67tGRvLFhHtNa
-         EGyYPeCKmqLZr+MXrj5Hfwyoq+Do8D13Rq/msra6X27PK+LZCDVKD+/vLiY103msndJY
-         h4lQ==
-X-Gm-Message-State: AC+VfDwT2sCajchc4bp3AxK4+tvzfOL6qmsdoNw/GTOEubMc1YMfVX3W
-        wscc3CaUi9ZVHNFDDO7B+0Dm
-X-Google-Smtp-Source: ACHHUZ6uxzUunep6oGxrhGEI8fJWpdH9biEaIAPK8tnW9no4oBDOuhDxrDrorqXw1bgEv5VB07afuQ==
-X-Received: by 2002:a05:6214:528b:b0:621:44ee:7065 with SMTP id kj11-20020a056214528b00b0062144ee7065mr1016696qvb.9.1683651532284;
-        Tue, 09 May 2023 09:58:52 -0700 (PDT)
-Received: from localhost ([217.138.208.150])
-        by smtp.gmail.com with ESMTPSA id pp16-20020a056214139000b006168277998csm896786qvb.58.2023.05.09.09.58.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 09:58:51 -0700 (PDT)
-Date:   Tue, 9 May 2023 12:58:50 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Brian Foster <bfoster@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v6 4/5] dm-thin: Add REQ_OP_PROVISION support
-Message-ID: <ZFp7ykxGFUbPG1ON@redhat.com>
-References: <20230420004850.297045-1-sarthakkukreti@chromium.org>
- <20230506062909.74601-1-sarthakkukreti@chromium.org>
- <20230506062909.74601-5-sarthakkukreti@chromium.org>
+        with ESMTP id S235689AbjEIVf2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 17:35:28 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 747E16EA1;
+        Tue,  9 May 2023 14:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683668102; x=1715204102;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LxfhN7twkbsXW4buKGDFp0m82yxZW5uwWpLzdxIpSC8=;
+  b=WMuC4KjgMwxqwDvM/1pmoDjSgK/AtbZSwQbn7LVelF7qFebmNviFT70p
+   NY3+qHW/g36bDFNLACWkv9tpKaAQZTQNd0yI4OT38bx2JV8Z88XnDj7hL
+   nNFsT93Y7pTjFhSI3gOPfBueZx7kzInnPR+8FMQc08ODxTVl0FY+D8jTo
+   gKcmxnO20xz+myJj4hN2UkiapwNj15XOdVcklVft9dQa9EgkJRB84iSvO
+   UOZuSkt4lr8Y1qOQ4rKpzxghAqkJw2B3wVEGfDc7LE2PypcWY77pBa5ga
+   17MlM221rksGc1F+0UqdN667wmHzbVjFXIhCGalKV6zhf1BEau4xL4h25
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="330421325"
+X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
+   d="scan'208";a="330421325"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2023 14:33:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="729693392"
+X-IronPort-AV: E=Sophos;i="5.99,262,1677571200"; 
+   d="scan'208";a="729693392"
+Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 09 May 2023 14:33:52 -0700
+Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pwUxz-0002WE-0b;
+        Tue, 09 May 2023 21:33:51 +0000
+Date:   Wed, 10 May 2023 05:33:31 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk
+Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        martin.petersen@oracle.com, bvanassche@acm.org,
+        stanley.chu@mediatek.com, peter.wang@mediatek.com,
+        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
+        powen.kao@mediatek.com, naomi.chu@mediatek.com,
+        wsd_upstream@mediatek.com, Ed Tsai <ed.tsai@mediatek.com>
+Subject: Re: [PATCH 1/2] block: make the fair sharing of tag configurable
+Message-ID: <202305100557.gdIvlzRS-lkp@intel.com>
+References: <20230509065230.32552-2-ed.tsai@mediatek.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230506062909.74601-5-sarthakkukreti@chromium.org>
+In-Reply-To: <20230509065230.32552-2-ed.tsai@mediatek.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 06 2023 at  2:29P -0400,
-Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
+Hi Ed,
 
-> dm-thinpool uses the provision request to provision
-> blocks for a dm-thin device. dm-thinpool currently does not
-> pass through REQ_OP_PROVISION to underlying devices.
-> 
-> For shared blocks, provision requests will break sharing and copy the
-> contents of the entire block. Additionally, if 'skip_block_zeroing'
-> is not set, dm-thin will opt to zero out the entire range as a part
-> of provisioning.
-> 
-> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> ---
->  drivers/md/dm-thin.c | 70 +++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 66 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-> index 2b13c949bd72..3f94f53ac956 100644
-> --- a/drivers/md/dm-thin.c
-> +++ b/drivers/md/dm-thin.c
-> @@ -274,6 +274,7 @@ struct pool {
->  
->  	process_bio_fn process_bio;
->  	process_bio_fn process_discard;
-> +	process_bio_fn process_provision;
->  
->  	process_cell_fn process_cell;
->  	process_cell_fn process_discard_cell;
-> @@ -913,7 +914,8 @@ static void __inc_remap_and_issue_cell(void *context,
->  	struct bio *bio;
->  
->  	while ((bio = bio_list_pop(&cell->bios))) {
-> -		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD)
-> +		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
-> +		    bio_op(bio) == REQ_OP_PROVISION)
->  			bio_list_add(&info->defer_bios, bio);
->  		else {
->  			inc_all_io_entry(info->tc->pool, bio);
-> @@ -1245,8 +1247,8 @@ static int io_overlaps_block(struct pool *pool, struct bio *bio)
->  
->  static int io_overwrites_block(struct pool *pool, struct bio *bio)
->  {
-> -	return (bio_data_dir(bio) == WRITE) &&
-> -		io_overlaps_block(pool, bio);
-> +	return (bio_data_dir(bio) == WRITE) && io_overlaps_block(pool, bio) &&
-> +	       bio_op(bio) != REQ_OP_PROVISION;
->  }
->  
->  static void save_and_set_endio(struct bio *bio, bio_end_io_t **save,
-> @@ -1953,6 +1955,51 @@ static void provision_block(struct thin_c *tc, struct bio *bio, dm_block_t block
->  	}
->  }
->  
-> +static void process_provision_bio(struct thin_c *tc, struct bio *bio)
-> +{
-> +	int r;
-> +	struct pool *pool = tc->pool;
-> +	dm_block_t block = get_bio_block(tc, bio);
-> +	struct dm_bio_prison_cell *cell;
-> +	struct dm_cell_key key;
-> +	struct dm_thin_lookup_result lookup_result;
-> +
-> +	/*
-> +	 * If cell is already occupied, then the block is already
-> +	 * being provisioned so we have nothing further to do here.
-> +	 */
-> +	build_virtual_key(tc->td, block, &key);
-> +	if (bio_detain(pool, &key, bio, &cell))
-> +		return;
-> +
-> +	if (tc->requeue_mode) {
-> +		cell_requeue(pool, cell);
-> +		return;
-> +	}
-> +
-> +	r = dm_thin_find_block(tc->td, block, 1, &lookup_result);
-> +	switch (r) {
-> +	case 0:
-> +		if (lookup_result.shared) {
-> +			process_shared_bio(tc, bio, block, &lookup_result, cell);
-> +		} else {
-> +			bio_endio(bio);
-> +			cell_defer_no_holder(tc, cell);
-> +		}
-> +		break;
-> +	case -ENODATA:
-> +		provision_block(tc, bio, block, cell);
-> +		break;
-> +
-> +	default:
-> +		DMERR_LIMIT("%s: dm_thin_find_block() failed: error = %d",
-> +			    __func__, r);
-> +		cell_defer_no_holder(tc, cell);
-> +		bio_io_error(bio);
-> +		break;
-> +	}
-> +}
-> +
->  static void process_cell(struct thin_c *tc, struct dm_bio_prison_cell *cell)
->  {
->  	int r;
-> @@ -2228,6 +2275,8 @@ static void process_thin_deferred_bios(struct thin_c *tc)
->  
->  		if (bio_op(bio) == REQ_OP_DISCARD)
->  			pool->process_discard(tc, bio);
-> +		else if (bio_op(bio) == REQ_OP_PROVISION)
-> +			pool->process_provision(tc, bio);
->  		else
->  			pool->process_bio(tc, bio);
->  
-> @@ -2579,6 +2628,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
->  		dm_pool_metadata_read_only(pool->pmd);
->  		pool->process_bio = process_bio_fail;
->  		pool->process_discard = process_bio_fail;
-> +		pool->process_provision = process_bio_fail;
->  		pool->process_cell = process_cell_fail;
->  		pool->process_discard_cell = process_cell_fail;
->  		pool->process_prepared_mapping = process_prepared_mapping_fail;
-> @@ -2592,6 +2642,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
->  		dm_pool_metadata_read_only(pool->pmd);
->  		pool->process_bio = process_bio_read_only;
->  		pool->process_discard = process_bio_success;
-> +		pool->process_provision = process_bio_fail;
->  		pool->process_cell = process_cell_read_only;
->  		pool->process_discard_cell = process_cell_success;
->  		pool->process_prepared_mapping = process_prepared_mapping_fail;
-> @@ -2612,6 +2663,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
->  		pool->out_of_data_space = true;
->  		pool->process_bio = process_bio_read_only;
->  		pool->process_discard = process_discard_bio;
-> +		pool->process_provision = process_bio_fail;
->  		pool->process_cell = process_cell_read_only;
->  		pool->process_prepared_mapping = process_prepared_mapping;
->  		set_discard_callbacks(pool);
-> @@ -2628,6 +2680,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
->  		dm_pool_metadata_read_write(pool->pmd);
->  		pool->process_bio = process_bio;
->  		pool->process_discard = process_discard_bio;
-> +		pool->process_provision = process_provision_bio;
->  		pool->process_cell = process_cell;
->  		pool->process_prepared_mapping = process_prepared_mapping;
->  		set_discard_callbacks(pool);
-> @@ -2749,7 +2802,8 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
->  		return DM_MAPIO_SUBMITTED;
->  	}
->  
-> -	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD) {
-> +	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
-> +	    bio_op(bio) == REQ_OP_PROVISION) {
->  		thin_defer_bio_with_throttle(tc, bio);
->  		return DM_MAPIO_SUBMITTED;
->  	}
-> @@ -3396,6 +3450,9 @@ static int pool_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  	pt->adjusted_pf = pt->requested_pf = pf;
->  	ti->num_flush_bios = 1;
->  	ti->limit_swap_bios = true;
-> +	ti->num_provision_bios = 1;
-> +	ti->provision_supported = true;
-> +	ti->max_provision_granularity = true;
->  
->  	/*
->  	 * Only need to enable discards if the pool should pass
-> @@ -4114,6 +4171,8 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
->  	 * The pool uses the same discard limits as the underlying data
->  	 * device.  DM core has already set this up.
->  	 */
-> +
-> +	limits->max_provision_sectors = pool->sectors_per_block;
->  }
->  
->  static struct target_type pool_target = {
-> @@ -4288,6 +4347,9 @@ static int thin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  		ti->max_discard_granularity = true;
->  	}
->  
-> +	ti->num_provision_bios = 1;
-> +	ti->provision_supported = true;
-> +
+kernel test robot noticed the following build warnings:
 
-We need this in thin_ctr: ti->max_provision_granularity = true;
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on jejb-scsi/for-next mkp-scsi/for-next linus/master v6.4-rc1 next-20230509]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-More needed in the thin target than thin-pool; otherwise provision bio
-issued to thin devices won't be split appropriately.  But I do think
-its fine to set in both thin_ctr and pool_ctr.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ed-Tsai/block-make-the-fair-sharing-of-tag-configurable/20230509-145439
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230509065230.32552-2-ed.tsai%40mediatek.com
+patch subject: [PATCH 1/2] block: make the fair sharing of tag configurable
+config: openrisc-randconfig-r022-20230509 (https://download.01.org/0day-ci/archive/20230510/202305100557.gdIvlzRS-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/b1081024bc6d1cdaf5b39994b19040cd8e6099ec
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Ed-Tsai/block-make-the-fair-sharing-of-tag-configurable/20230509-145439
+        git checkout b1081024bc6d1cdaf5b39994b19040cd8e6099ec
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=openrisc olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=openrisc SHELL=/bin/bash
 
-Otherwise, looks good.
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202305100557.gdIvlzRS-lkp@intel.com/
 
-Thanks,
-Mike
+All warnings (new ones prefixed by >>):
+
+   In file included from block/blk-mq.c:12:
+   block/blk-mq.c: In function 'blk_mq_init_allocated_queue':
+>> include/linux/blkdev.h:569:39: warning: left shift count >= width of type [-Wshift-count-overflow]
+     569 |                                  (1UL << QUEUE_FLAG_FAIR_TAG_SHARING))
+         |                                       ^~
+   block/blk-mq.c:4232:27: note: in expansion of macro 'QUEUE_FLAG_MQ_DEFAULT'
+    4232 |         q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+         |                           ^~~~~~~~~~~~~~~~~~~~~
+
+
+vim +569 include/linux/blkdev.h
+
+   565	
+   566	#define QUEUE_FLAG_MQ_DEFAULT	((1UL << QUEUE_FLAG_IO_STAT) |		\
+   567					 (1UL << QUEUE_FLAG_SAME_COMP) |	\
+   568					 (1UL << QUEUE_FLAG_NOWAIT) |		\
+ > 569					 (1UL << QUEUE_FLAG_FAIR_TAG_SHARING))
+   570	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
