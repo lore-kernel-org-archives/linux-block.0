@@ -2,46 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42136C7EE22
-	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 13:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0D1C7EE24
+	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 14:04:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234094AbjEINft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 09:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56878 "EHLO
+        id S235231AbjEIOEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 10:04:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234575AbjEINfs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 09:35:48 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2073E61;
-        Tue,  9 May 2023 06:35:47 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id B2C446732A; Tue,  9 May 2023 15:35:44 +0200 (CEST)
-Date:   Tue, 9 May 2023 15:35:44 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 1/9] block: consolidate the shutdown logic in
- blk_mark_disk_dead and del_gendisk
-Message-ID: <20230509133544.GE841@lst.de>
-References: <20230505175132.2236632-1-hch@lst.de> <20230505175132.2236632-2-hch@lst.de> <20230507190811.qbll5r3jsx35curi@quack3>
+        with ESMTP id S233731AbjEIOEc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 10:04:32 -0400
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9035D4EE4;
+        Tue,  9 May 2023 07:04:17 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6439d505274so3311094b3a.0;
+        Tue, 09 May 2023 07:04:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683641047; x=1686233047;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9iYEfFTtNREDQTvxRbwhudL5byolCTLR+oROEUU0XWk=;
+        b=cXaFOb3TYm5YAVgKvsnr+fUF4OGMyXeTAB54Q6bGl/cDQHuldc8pgDLD5HROtP1/1T
+         LEG0iT1eOCymhxVDu+868sJeLalHO5o0v0KS6ROjhOtBL/iaDlo+V5Rdovvsf4oKqJkG
+         bScaGifYEM+1JuGB2IFe4AAFrWWm0WvjV7xIZdTbFVy1WOihBauaxNhLppjipfjQ2Sc5
+         anvlw1jI3zSNGHwuO1P2/J/1qvrBaTkGulZWnTBU3ttms9LjvE2nY2Ldu5BXr4aAupY0
+         zZLlBqbU9sgqPFNf0TSDUMQiveGVJ9tQIwDwNzoPWu45JSrg9x0bTjS8QG6LvhVnlMl4
+         DRjw==
+X-Gm-Message-State: AC+VfDzJT2kpZ10Fqd4ReBCshqxheXefKT1gZV52twwNcR5OWWXR8s/3
+        EyJ3lDmxjrdPeR+s+B8BXXw=
+X-Google-Smtp-Source: ACHHUZ7bmLHWSD/owi64qe/gcPVVP1QwblzeAhOQrZYE11UgsG7VHYh36OLy+DLbg3Mw0K08Knb3Iw==
+X-Received: by 2002:a05:6a20:244a:b0:100:5222:7c0d with SMTP id t10-20020a056a20244a00b0010052227c0dmr10023694pzc.52.1683641047080;
+        Tue, 09 May 2023 07:04:07 -0700 (PDT)
+Received: from [172.20.11.151] ([173.214.130.133])
+        by smtp.gmail.com with ESMTPSA id f23-20020aa782d7000000b0063d63d48215sm1842392pfn.3.2023.05.09.07.04.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 May 2023 07:04:06 -0700 (PDT)
+Message-ID: <dcfae203-005f-928b-37d6-7ee5bb4e2971@acm.org>
+Date:   Tue, 9 May 2023 07:04:06 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230507190811.qbll5r3jsx35curi@quack3>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+Content-Language: en-US
+To:     Avri Altman <Avri.Altman@wdc.com>, Ed Tsai <ed.tsai@mediatek.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "stanley.chu@mediatek.com" <stanley.chu@mediatek.com>,
+        "peter.wang@mediatek.com" <peter.wang@mediatek.com>,
+        "chun-hung.wu@mediatek.com" <chun-hung.wu@mediatek.com>,
+        "alice.chao@mediatek.com" <alice.chao@mediatek.com>,
+        "powen.kao@mediatek.com" <powen.kao@mediatek.com>,
+        "naomi.chu@mediatek.com" <naomi.chu@mediatek.com>,
+        "wsd_upstream@mediatek.com" <wsd_upstream@mediatek.com>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <DM6PR04MB6575753742F933DE192E7325FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <DM6PR04MB6575753742F933DE192E7325FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, May 07, 2023 at 09:08:11PM +0200, Jan Kara wrote:
-> I'm somewhat wondering about the lost notification from
-> blk_mark_disk_dead(). E.g. DM uses blk_mark_disk_dead() so if some udev
-> script depends on the event when DM device gets destroyed, we would break
-> it?
+On 5/9/23 01:03, Avri Altman wrote:
+> However, I think the decision of that should be of the platform owner,
+> And not in the core driver.
 
-Maybe.  We'll probably find out..
+Hi Avri,
 
+I don't see any use case in which performance of a UFS device would be improved
+by leaving QUEUE_FLAG_FAIR_TAG_SHARING enabled. Are you perhaps aware of such a
+use case?
+
+Thanks,
+
+Bart.
