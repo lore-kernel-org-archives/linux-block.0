@@ -2,82 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0D1C7EE24
-	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 14:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C93C77B7C
+	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 15:19:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235231AbjEIOEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 10:04:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
+        id S235412AbjEIPTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 11:19:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233731AbjEIOEc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 10:04:32 -0400
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9035D4EE4;
-        Tue,  9 May 2023 07:04:17 -0700 (PDT)
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6439d505274so3311094b3a.0;
-        Tue, 09 May 2023 07:04:17 -0700 (PDT)
+        with ESMTP id S229477AbjEIPTR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 11:19:17 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00E149D3
+        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 08:19:16 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-763970c9a9eso21004039f.1
+        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 08:19:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683645556; x=1686237556;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r/jkxiCP4JthB71tD2UnyEZpZa4CleF0O3E0hHUUj2s=;
+        b=J6MxwIbuqm1FKPUVMo9wqx01RiXxThePQKhHVy9j81JKUdegB1fL4DBWREmXRH+rZ4
+         qZv7P7RINWlFaZ9Cz2qLfTP+9QGOotFhAcP7QnL/KU4QbjumB5po5OqR0GoygqKGuKwI
+         RoKETRjpu8bcVE3sGs+IFxNkdLn7MCCl0Tr8Nvhdl+zLaxgboAdYFeozzfYSosKLTwd+
+         /3rbddUSD0rRtgtrW9G+Rzh1nKJOIgE3BVmWzJnTXWrrNtj2Na2rkwJhm3kYupLgJWyB
+         5RdTqpFXpXCg0swOFL0t3sOa7xXLTcFEUV/F43oTl/uTDNmqYjL8NLdBl4re/AS8bXL9
+         vR1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683641047; x=1686233047;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9iYEfFTtNREDQTvxRbwhudL5byolCTLR+oROEUU0XWk=;
-        b=cXaFOb3TYm5YAVgKvsnr+fUF4OGMyXeTAB54Q6bGl/cDQHuldc8pgDLD5HROtP1/1T
-         LEG0iT1eOCymhxVDu+868sJeLalHO5o0v0KS6ROjhOtBL/iaDlo+V5Rdovvsf4oKqJkG
-         bScaGifYEM+1JuGB2IFe4AAFrWWm0WvjV7xIZdTbFVy1WOihBauaxNhLppjipfjQ2Sc5
-         anvlw1jI3zSNGHwuO1P2/J/1qvrBaTkGulZWnTBU3ttms9LjvE2nY2Ldu5BXr4aAupY0
-         zZLlBqbU9sgqPFNf0TSDUMQiveGVJ9tQIwDwNzoPWu45JSrg9x0bTjS8QG6LvhVnlMl4
-         DRjw==
-X-Gm-Message-State: AC+VfDzJT2kpZ10Fqd4ReBCshqxheXefKT1gZV52twwNcR5OWWXR8s/3
-        EyJ3lDmxjrdPeR+s+B8BXXw=
-X-Google-Smtp-Source: ACHHUZ7bmLHWSD/owi64qe/gcPVVP1QwblzeAhOQrZYE11UgsG7VHYh36OLy+DLbg3Mw0K08Knb3Iw==
-X-Received: by 2002:a05:6a20:244a:b0:100:5222:7c0d with SMTP id t10-20020a056a20244a00b0010052227c0dmr10023694pzc.52.1683641047080;
-        Tue, 09 May 2023 07:04:07 -0700 (PDT)
-Received: from [172.20.11.151] ([173.214.130.133])
-        by smtp.gmail.com with ESMTPSA id f23-20020aa782d7000000b0063d63d48215sm1842392pfn.3.2023.05.09.07.04.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 May 2023 07:04:06 -0700 (PDT)
-Message-ID: <dcfae203-005f-928b-37d6-7ee5bb4e2971@acm.org>
-Date:   Tue, 9 May 2023 07:04:06 -0700
+        d=1e100.net; s=20221208; t=1683645556; x=1686237556;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r/jkxiCP4JthB71tD2UnyEZpZa4CleF0O3E0hHUUj2s=;
+        b=HJL/tHPqWxUq+oIlPryXhayEODtg+xaADtnDHBkAI8j2mD8YLVoqVQcEqHL7MZ6lAi
+         YBYxRBYIaOWvCVPTLHmzqwBjWo0mpJBc/szI/r0SQj49dT7MZecWJcLMsiUO1axEh5IZ
+         90oJ0gu7Mp+YJfhDlZBV0zasnm3u0w8wRTjbS7SitgiCAW8YWf68DYR4yLrjnKGlqYWb
+         viYfHx5fHutd99+0L5I8j3YDdBiMTLkCNR1rsEMoq0eG1wWUCbX/xxoi+SHppoYYG36d
+         mLWWV5RmCL/ec8iK4V3gs3Mcaz+LSNYAEuQ+EHk5zSCrLURe55CUa18Itrl+rwpCS0/e
+         beOQ==
+X-Gm-Message-State: AC+VfDzItyknajEinypKdR00S9QUws1vNSh4h+NiQc6rl149sxgiHdyv
+        miPhrgEFsmehrUrGtioUjCY37A==
+X-Google-Smtp-Source: ACHHUZ42L5EZpZexHnQ9E+vXfaofOXLtZIeIku+36oDtyPUueapg5a63UVr1ieq5fEbsZx2fBD0DhQ==
+X-Received: by 2002:a6b:5f09:0:b0:760:f7e4:7941 with SMTP id t9-20020a6b5f09000000b00760f7e47941mr6891056iob.0.1683645556246;
+        Tue, 09 May 2023 08:19:16 -0700 (PDT)
+Received: from localhost.localdomain ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id z1-20020a056638240100b0041659b1e2afsm677390jat.14.2023.05.09.08.19.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 May 2023 08:19:15 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     io-uring@vger.kernel.org
+Cc:     torvalds@linux-foundation.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: [PATCH 2/3] block: mark bdev files as FMODE_NOWAIT if underlying device supports it
+Date:   Tue,  9 May 2023 09:19:09 -0600
+Message-Id: <20230509151910.183637-3-axboe@kernel.dk>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230509151910.183637-1-axboe@kernel.dk>
+References: <20230509151910.183637-1-axboe@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
-Content-Language: en-US
-To:     Avri Altman <Avri.Altman@wdc.com>, Ed Tsai <ed.tsai@mediatek.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "stanley.chu@mediatek.com" <stanley.chu@mediatek.com>,
-        "peter.wang@mediatek.com" <peter.wang@mediatek.com>,
-        "chun-hung.wu@mediatek.com" <chun-hung.wu@mediatek.com>,
-        "alice.chao@mediatek.com" <alice.chao@mediatek.com>,
-        "powen.kao@mediatek.com" <powen.kao@mediatek.com>,
-        "naomi.chu@mediatek.com" <naomi.chu@mediatek.com>,
-        "wsd_upstream@mediatek.com" <wsd_upstream@mediatek.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <DM6PR04MB6575753742F933DE192E7325FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <DM6PR04MB6575753742F933DE192E7325FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/9/23 01:03, Avri Altman wrote:
-> However, I think the decision of that should be of the platform owner,
-> And not in the core driver.
+We set this unconditionally, but it really should be dependent on if
+the underlying device is nowait compliant.
 
-Hi Avri,
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/fops.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-I don't see any use case in which performance of a UFS device would be improved
-by leaving QUEUE_FLAG_FAIR_TAG_SHARING enabled. Are you perhaps aware of such a
-use case?
+diff --git a/block/fops.c b/block/fops.c
+index d2e6be4e3d1c..ab750e8a040f 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -481,7 +481,7 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+ 	 * during an unstable branch.
+ 	 */
+ 	filp->f_flags |= O_LARGEFILE;
+-	filp->f_mode |= FMODE_NOWAIT | FMODE_BUF_RASYNC;
++	filp->f_mode |= FMODE_BUF_RASYNC;
+ 
+ 	if (filp->f_flags & O_NDELAY)
+ 		filp->f_mode |= FMODE_NDELAY;
+@@ -494,6 +494,9 @@ static int blkdev_open(struct inode *inode, struct file *filp)
+ 	if (IS_ERR(bdev))
+ 		return PTR_ERR(bdev);
+ 
++	if (bdev_nowait(bdev))
++		filp->f_mode |= FMODE_NOWAIT;
++
+ 	filp->private_data = bdev;
+ 	filp->f_mapping = bdev->bd_inode->i_mapping;
+ 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
+-- 
+2.39.2
 
-Thanks,
-
-Bart.
