@@ -2,101 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C93C77B7C
-	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 15:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E468EC77B75
+	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 15:41:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235412AbjEIPTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 11:19:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43744 "EHLO
+        id S235412AbjEIPlP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 11:41:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjEIPTR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 11:19:17 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00E149D3
-        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 08:19:16 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-763970c9a9eso21004039f.1
-        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 08:19:16 -0700 (PDT)
+        with ESMTP id S235388AbjEIPlO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 11:41:14 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759374690;
+        Tue,  9 May 2023 08:41:13 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-52160f75920so4071819a12.2;
+        Tue, 09 May 2023 08:41:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683645556; x=1686237556;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r/jkxiCP4JthB71tD2UnyEZpZa4CleF0O3E0hHUUj2s=;
-        b=J6MxwIbuqm1FKPUVMo9wqx01RiXxThePQKhHVy9j81JKUdegB1fL4DBWREmXRH+rZ4
-         qZv7P7RINWlFaZ9Cz2qLfTP+9QGOotFhAcP7QnL/KU4QbjumB5po5OqR0GoygqKGuKwI
-         RoKETRjpu8bcVE3sGs+IFxNkdLn7MCCl0Tr8Nvhdl+zLaxgboAdYFeozzfYSosKLTwd+
-         /3rbddUSD0rRtgtrW9G+Rzh1nKJOIgE3BVmWzJnTXWrrNtj2Na2rkwJhm3kYupLgJWyB
-         5RdTqpFXpXCg0swOFL0t3sOa7xXLTcFEUV/F43oTl/uTDNmqYjL8NLdBl4re/AS8bXL9
-         vR1Q==
+        d=gmail.com; s=20221208; t=1683646873; x=1686238873;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xoUKheuGGoabhTr4uxkvUyDn3oFM2xkZ0jYUH3Rrng4=;
+        b=Ow/qrEULGpmS7Za4OSRrLz2ncagpT+asShIr6m0nwant11xFKyXBYpO+RwQf/W1mFu
+         +NuKlfWc6F9T4yG/FCmVwB5ot7NGpmeLXck1fRW6X9+XMWYA2A1gHdjnQsxUQo56c5DJ
+         J4oJBFuhlH4gf7g+c8fWNLF1NkO1pFxdsWN+21zuDPsBBuPAthKw9sZ1KkkczZB4TMWQ
+         1qVOjubqM22LbqJFkW0IMkes2JgbA6O+F73KA8W7r788B/qIawJKANWGmTGhuqD3gp2J
+         P8FoTbiMzDUziR3gxWvUjhCUYbL8F1zJM2WjCj/FCEuhwBVEMSiT8hdHi53i8Umq9ZGG
+         OAbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683645556; x=1686237556;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1683646873; x=1686238873;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r/jkxiCP4JthB71tD2UnyEZpZa4CleF0O3E0hHUUj2s=;
-        b=HJL/tHPqWxUq+oIlPryXhayEODtg+xaADtnDHBkAI8j2mD8YLVoqVQcEqHL7MZ6lAi
-         YBYxRBYIaOWvCVPTLHmzqwBjWo0mpJBc/szI/r0SQj49dT7MZecWJcLMsiUO1axEh5IZ
-         90oJ0gu7Mp+YJfhDlZBV0zasnm3u0w8wRTjbS7SitgiCAW8YWf68DYR4yLrjnKGlqYWb
-         viYfHx5fHutd99+0L5I8j3YDdBiMTLkCNR1rsEMoq0eG1wWUCbX/xxoi+SHppoYYG36d
-         mLWWV5RmCL/ec8iK4V3gs3Mcaz+LSNYAEuQ+EHk5zSCrLURe55CUa18Itrl+rwpCS0/e
-         beOQ==
-X-Gm-Message-State: AC+VfDzItyknajEinypKdR00S9QUws1vNSh4h+NiQc6rl149sxgiHdyv
-        miPhrgEFsmehrUrGtioUjCY37A==
-X-Google-Smtp-Source: ACHHUZ42L5EZpZexHnQ9E+vXfaofOXLtZIeIku+36oDtyPUueapg5a63UVr1ieq5fEbsZx2fBD0DhQ==
-X-Received: by 2002:a6b:5f09:0:b0:760:f7e4:7941 with SMTP id t9-20020a6b5f09000000b00760f7e47941mr6891056iob.0.1683645556246;
-        Tue, 09 May 2023 08:19:16 -0700 (PDT)
-Received: from localhost.localdomain ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id z1-20020a056638240100b0041659b1e2afsm677390jat.14.2023.05.09.08.19.15
+        bh=xoUKheuGGoabhTr4uxkvUyDn3oFM2xkZ0jYUH3Rrng4=;
+        b=lNr/lYB1NsxK36L1+QbKKGt0Nv0qyizhhl5KHn++rrx1l9CtZ9KTZ4O4t/zKA8eMTj
+         15Ig+ZpuJDZU27zET0DbtBPYvXpK92Qyr5XSStoWo2N9EmL2qSksIVQxdDcKzDcm2Vzf
+         j40BhdiOzT4co0JmCL8JgwUH8Ss4zpub85qj6yAW1gR9oI3vR6v495JAVnbpyNu0rxtZ
+         G7J6szDFW9bH4Z2X9JnMgYaGitw0OCze1zBLhcWVQwx9KshSvFQkfkZv8m5AznQj+yVH
+         ddbYi8+vgQF8Mt0ncfKHJk+G2eMdElfXgKgasDbB27DIcBtkaBKLHCdJPsQiMUJHD6+7
+         wEkw==
+X-Gm-Message-State: AC+VfDyuTTIo2G3xWr5kEfMrxlv0vbdWJtpN647QhPpyom1WHQXFwTxb
+        rcDD2kbJiDqsiJNTc792E4s=
+X-Google-Smtp-Source: ACHHUZ4Fqr0Yi2yKnYAexDwzj4yewtWHFgjUvGEpqADdTb7034mlfs1EJaas9ZncJH/1DOJgAx7Qpg==
+X-Received: by 2002:a17:90a:c283:b0:23b:3422:e78a with SMTP id f3-20020a17090ac28300b0023b3422e78amr14392965pjt.6.1683646872703;
+        Tue, 09 May 2023 08:41:12 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id gz5-20020a17090b0ec500b0024c1f1cdf98sm11831916pjb.13.2023.05.09.08.41.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 08:19:15 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     io-uring@vger.kernel.org
-Cc:     torvalds@linux-foundation.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: [PATCH 2/3] block: mark bdev files as FMODE_NOWAIT if underlying device supports it
-Date:   Tue,  9 May 2023 09:19:09 -0600
-Message-Id: <20230509151910.183637-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230509151910.183637-1-axboe@kernel.dk>
-References: <20230509151910.183637-1-axboe@kernel.dk>
+        Tue, 09 May 2023 08:41:12 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 9 May 2023 05:41:11 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jinke Han <hanjinke.666@bytedance.com>
+Cc:     josef@toxicpanda.com, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        songmuchun@bytedance.com, andrea.righi@canonical.com
+Subject: Re: [PATCH v3] blk-throttle: Fix io statistics for cgroup v1
+Message-ID: <ZFppl9jJNqM_GCzS@slm.duckdns.org>
+References: <20230507170631.89607-1-hanjinke.666@bytedance.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230507170631.89607-1-hanjinke.666@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We set this unconditionally, but it really should be dependent on if
-the underlying device is nowait compliant.
+On Mon, May 08, 2023 at 01:06:31AM +0800, Jinke Han wrote:
+> From: Jinke Han <hanjinke.666@bytedance.com>
+> 
+> After commit f382fb0bcef4 ("block: remove legacy IO schedulers"),
+> blkio.throttle.io_serviced and blkio.throttle.io_service_bytes become
+> the only stable io stats interface of cgroup v1, and these statistics
+> are done in the blk-throttle code. But the current code only counts the
+> bios that are actually throttled. When the user does not add the throttle
+> limit, the io stats for cgroup v1 has nothing. I fix it according to the
+> statistical method of v2, and made it count all ios accurately.
+> 
+> Fixes: a7b36ee6ba29 ("block: move blk-throtl fast path inline")
+> Tested-by: Andrea Righi <andrea.righi@canonical.com>
+> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
 
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/fops.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/block/fops.c b/block/fops.c
-index d2e6be4e3d1c..ab750e8a040f 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -481,7 +481,7 @@ static int blkdev_open(struct inode *inode, struct file *filp)
- 	 * during an unstable branch.
- 	 */
- 	filp->f_flags |= O_LARGEFILE;
--	filp->f_mode |= FMODE_NOWAIT | FMODE_BUF_RASYNC;
-+	filp->f_mode |= FMODE_BUF_RASYNC;
- 
- 	if (filp->f_flags & O_NDELAY)
- 		filp->f_mode |= FMODE_NDELAY;
-@@ -494,6 +494,9 @@ static int blkdev_open(struct inode *inode, struct file *filp)
- 	if (IS_ERR(bdev))
- 		return PTR_ERR(bdev);
- 
-+	if (bdev_nowait(bdev))
-+		filp->f_mode |= FMODE_NOWAIT;
-+
- 	filp->private_data = bdev;
- 	filp->f_mapping = bdev->bd_inode->i_mapping;
- 	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
+Thanks.
+
 -- 
-2.39.2
-
+tejun
