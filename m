@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03CF0C77B7C
-	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 16:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AAAFC7EE23
+	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 16:54:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234757AbjEIQxU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 12:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35206 "EHLO
+        id S234640AbjEIQyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 12:54:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234658AbjEIQxH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 12:53:07 -0400
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7FA230FB
-        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 09:52:18 -0700 (PDT)
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7576516c81fso353332585a.1
-        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 09:52:18 -0700 (PDT)
+        with ESMTP id S233043AbjEIQx6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 12:53:58 -0400
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B940059E3
+        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 09:52:55 -0700 (PDT)
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-3f39600f9b8so7321231cf.3
+        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 09:52:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683651137; x=1686243137;
+        d=1e100.net; s=20221208; t=1683651175; x=1686243175;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9NlCnOkM/MgxA+OhUODaj0DcPdY66ABvKJcAkS48+rQ=;
-        b=bRGjMCqi1i6PgJrZujmNN9BJPOqON+sLd2ePh7wiwsFHO9AUXwfo17ex81Cxs3WEnF
-         koZZZwNFnPWeZ+mYPjyhfxKMGLvox93LljI19blLgHMe5XmBgBLujHxV3SL/u6HX1YXm
-         RW7XOscHMDy9N1CZgNZffOBc9P4x73zkKRwNYkb4eHZ/aNS8TWIeBEWrOagamzjjTViV
-         xZGWk0ahqkUenSbl5rxxLvLuSoB2x0H/l1P0/L71vKVv8AkmIDFrmJ1iS9Oes/YTZjuj
-         V+1RB0Ssba4AGgUWNckF3BcjwSFBBwT+V+IsO/BTC9gIBWROSwNL4EtGFE8cTvlpQt1n
-         OLOw==
-X-Gm-Message-State: AC+VfDxFDz3yDPgpC2arOMngYiPJ4CVNUPbAWZmDkx5dg19ujiWmPR6g
-        0lUJsf6+VT1HDP5Ym9vy0YUJ
-X-Google-Smtp-Source: ACHHUZ6sqdNZ2jTWBpQoQUne2HxU2x6SkHvDsQePL/EB6aWKWGfiLRP7QOvsu0TXIL8IYmrE41X/oQ==
-X-Received: by 2002:ad4:5ba2:0:b0:61b:6872:1459 with SMTP id 2-20020ad45ba2000000b0061b68721459mr18704881qvq.49.1683651137572;
-        Tue, 09 May 2023 09:52:17 -0700 (PDT)
+        bh=HGP12yp4f/zdeMyz6FmQhXwVLGe13YEnm2DiLQWOfHc=;
+        b=fQjZ+LXK0PEucMeHBFmEOAPQDnWZnJo5vX8d1Tn87t87WNTSUDQReK4Foo5avkLV/5
+         Xa25uKGfGNc6BUD/ki4haDLkzQVDK7pqF/9RBGurGFMmFQ1cNETc1cr/rrgW+HDVT8rL
+         1a4sUPpkSHOlW4pjVp3T2qxA2uyYj0jG2qvT9Avl1LXVB/cmNHAUygyrv99XnSmRWWHe
+         YYllVaMnzDTkWwHT0UpSxAVqCJQ9M5ayMpO+UfkmLyhdq3jy7BIkIocuzK8EOkLzmbfM
+         cPNR0g0RByc2Z0syHNvvN8sTVRyx/9EnkxQsrg64Ibk+t2CO2qskciSEiduKBASrs6S6
+         +sVg==
+X-Gm-Message-State: AC+VfDw1+DAfiRzSf9b7XmnwTNTMeDP221X5pPkk5wTomE30vtSm9gnt
+        70zhpHoJlkq0xtQe1a/GSTX8
+X-Google-Smtp-Source: ACHHUZ60YxoIH2gyoAjnbydVA2DQU48zJWQIwW/0Dh9DydhZKu2onIPJxWL7YRFQz348oUBbEBXSUQ==
+X-Received: by 2002:a05:622a:148a:b0:3f2:a8db:3d57 with SMTP id t10-20020a05622a148a00b003f2a8db3d57mr23188660qtx.3.1683651174740;
+        Tue, 09 May 2023 09:52:54 -0700 (PDT)
 Received: from localhost ([217.138.208.150])
-        by smtp.gmail.com with ESMTPSA id ew8-20020a05622a514800b003e635f80e72sm633574qtb.48.2023.05.09.09.52.16
+        by smtp.gmail.com with ESMTPSA id o4-20020ac80244000000b003f38f55e71asm632547qtg.47.2023.05.09.09.52.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 09:52:17 -0700 (PDT)
-Date:   Tue, 9 May 2023 12:52:16 -0400
+        Tue, 09 May 2023 09:52:54 -0700 (PDT)
+Date:   Tue, 9 May 2023 12:52:53 -0400
 From:   Mike Snitzer <snitzer@kernel.org>
 To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
@@ -53,15 +53,15 @@ Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Brian Foster <bfoster@redhat.com>,
         Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v6 2/5] block: Introduce provisioning primitives
-Message-ID: <ZFp6QDkSm296+Qm6@redhat.com>
+Subject: Re: [PATCH v6 3/5] dm: Add block provisioning support
+Message-ID: <ZFp6ZSwzqk2CIKwu@redhat.com>
 References: <20230420004850.297045-1-sarthakkukreti@chromium.org>
  <20230506062909.74601-1-sarthakkukreti@chromium.org>
- <20230506062909.74601-3-sarthakkukreti@chromium.org>
+ <20230506062909.74601-4-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230506062909.74601-3-sarthakkukreti@chromium.org>
+In-Reply-To: <20230506062909.74601-4-sarthakkukreti@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -69,14 +69,10 @@ X-Mailing-List: linux-block@vger.kernel.org
 On Sat, May 06 2023 at  2:29P -0400,
 Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
 
-> Introduce block request REQ_OP_PROVISION. The intent of this request
-> is to request underlying storage to preallocate disk space for the given
-> block range. Block devices that support this capability will export
-> a provision limit within their request queues.
-> 
-> This patch also adds the capability to call fallocate() in mode 0
-> on block devices, which will send REQ_OP_PROVISION to the block
-> device for the specified range,
+> Add block provisioning support for device-mapper targets.
+> dm-crypt, dm-snap and dm-linear will, by default, passthrough
+> REQ_OP_PROVISION requests to the underlying device, if
+> supported.
 > 
 > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
 
