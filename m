@@ -2,47 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75453C7EE22
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9EDC77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:47:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236358AbjEJIoQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 04:44:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33506 "EHLO
+        id S236631AbjEJIrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 04:47:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231124AbjEJIoP (ORCPT
+        with ESMTP id S229804AbjEJIrD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 04:44:15 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A12412B
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:44:12 -0700 (PDT)
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230510084409epoutp018857ea23a45cdf066d3ad6085323accd~du7tkyxdu0734607346epoutp01H
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:44:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230510084409epoutp018857ea23a45cdf066d3ad6085323accd~du7tkyxdu0734607346epoutp01H
+        Wed, 10 May 2023 04:47:03 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B387E72
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:47:02 -0700 (PDT)
+Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230510084659epoutp02877fcf2efd052231c9289cadcc7521bd~du_MHU0d62841528415epoutp02D
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:46:59 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230510084659epoutp02877fcf2efd052231c9289cadcc7521bd~du_MHU0d62841528415epoutp02D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1683708249;
-        bh=tAUq+j8EFp9wNJLVYSWcrdn/ApjcBvFZlh9RLdWUG7I=;
-        h=Subject:Reply-To:From:To:Date:References:From;
-        b=MWMgaVYlXihfT/rwPOIiiOoLM/ut/4PfVguwspKk73ohVg0BsNladBI+o8whRzE8u
-         cE536U/QmGmBg+s8Px+GUFp2rDqs37h/KYGNrLPjEnap53x7v1SQASe7oqTVxUG2hM
-         r2VDGK6cqubpzoz/y95LGgLZ5+aVi136ap2xEwac=
+        s=mail20170921; t=1683708419;
+        bh=10R6BCaaEqGyGL0MgOrzq5i+lOe75yKt/yscCIlKzXQ=;
+        h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
+        b=kjPo5RgI9b97q13fvO9lOvxgeZaXd9IhaDZDX98t7W/lbPw2sSRVFHTnTQkSv+fJ/
+         ethYx/0GM+YJewT5Qi3HbVXUEqErBALoiYREWkbwjCSyByEpNt5HyMQbnIISEQjr3Y
+         cjoK0SS/8yDqh+8QDPIXsSto7/4YrWi3MBebViy8=
 Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
         epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20230510084408epcas2p13848402d1760f70a20b32a4ef2aca3e9~du7tBLdKB0623706237epcas2p1z;
-        Wed, 10 May 2023 08:44:08 +0000 (GMT)
-Received: from epsmges2p4.samsung.com (unknown [182.195.36.90]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4QGT8m0wdvz4x9Q1; Wed, 10 May
-        2023 08:44:08 +0000 (GMT)
-X-AuditID: b6c32a48-475ff70000005998-5b-645b5957ce54
+        20230510084658epcas2p1e0dd52b73331be2c655a782cc2f8c05d~du_LkEh-T1606116061epcas2p1Z;
+        Wed, 10 May 2023 08:46:58 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.36.102]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4QGTD20lk4z4x9Px; Wed, 10 May
+        2023 08:46:58 +0000 (GMT)
+X-AuditID: b6c32a47-e99fd70000002007-7d-645b5a01987d
 Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C3.15.22936.7595B546; Wed, 10 May 2023 17:44:08 +0900 (KST)
+        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        60.F3.08199.10A5B546; Wed, 10 May 2023 17:46:58 +0900 (KST)
 Mime-Version: 1.0
-Subject: [PATCH v2 00/14] Change the integrity configuration method in block
+Subject: [PATCH v2 01/14] block: bio: separation to reuse a part of the
+ function
 Reply-To: j-young.choi@samsung.com
 Sender: Jinyoung CHOI <j-young.choi@samsung.com>
 From:   Jinyoung CHOI <j-young.choi@samsung.com>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+To:     Jinyoung CHOI <j-young.choi@samsung.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
         "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
         "sagi@grimberg.me" <sagi@grimberg.me>,
         "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
@@ -54,135 +56,149 @@ To:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 X-Priority: 3
 X-Content-Kind-Code: NORMAL
+In-Reply-To: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
 X-CPGS-Detection: blocking_info_exchange
 X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
-Date:   Wed, 10 May 2023 17:44:07 +0900
-X-CMS-MailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
+Message-ID: <20230510084657epcms2p69b0c426899251151a5cc7d84cedeacc7@epcms2p6>
+Date:   Wed, 10 May 2023 17:46:57 +0900
+X-CMS-MailID: 20230510084657epcms2p69b0c426899251151a5cc7d84cedeacc7
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 X-CPGSPASS: Y
 X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNJsWRmVeSWpSXmKPExsWy7bCmuW5EZHSKwc2bzBar7/azWbw8pGmx
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrBJsWRmVeSWpSXmKPExsWy7bCmuS5TVHSKwbnVzBar7/azWbw8pGmx
         cvVRJove/q1sFotubGOy+Nt1j8li0qFrjBZPr85isth7S9vi8q45bBbLj/9jslj3+j2Lxe8f
         c9gceD3O39vI4rF5hZbH5bOlHptWdbJ5TFh0gNFj980GNo/e5ndsHh+f3mLx6NuyitHj8yY5
         j/YD3UwB3FHZNhmpiSmpRQqpecn5KZl56bZK3sHxzvGmZgaGuoaWFuZKCnmJuam2Si4+Abpu
         mTlA5ysplCXmlAKFAhKLi5X07WyK8ktLUhUy8otLbJVSC1JyCswL9IoTc4tL89L18lJLrAwN
-        DIxMgQoTsjMW/HzOUtAoV3Fu0zvGBsaz4l2MnBwSAiYS3Ud2s3YxcnEICexglJi96xBjFyMH
-        B6+AoMTfHcIgNcICPhJ/9q1lA7GFBJQkzq2ZBVYiLGAgcavXHCTMJqAn8XPJDDaQMSICvSwS
-        d06fZ4GYzysxo/0plC0tsX35VkYIW0Pix7JeZghbVOLm6rfsMPb7Y/OhakQkWu+dhaoRlHjw
-        czdUXFLi0KGvbCA3SAjkS2w4EAgRrpF4u/wAVIm+xLWOjWBreQV8JQ7//Q42nkVAVeLo9tlQ
-        I10kvk39BmYzC8hLbH87hxlkJLOApsT6XfoQ05Uljtxigajgk+g4/Jcd5qmGjb+xsnfMe8IE
-        0aomsajJCCIsI/H18HyoEg+J93dWMk1gVJyFCOVZSE6YhXDCAkbmVYxiqQXFuempxUYFJvCI
-        Tc7P3cQITsVaHjsYZ7/9oHeIkYmD8RCjBAezkgivd2hUihBvSmJlVWpRfnxRaU5q8SFGU6Dn
-        JzJLiSbnA7NBXkm8oYmlgYmZmaG5kamBuZI478cO5RQhgfTEktTs1NSC1CKYPiYOTqkGpvXz
-        Axjzl50UnHCu///1K7UGX7wa9/O8qt40YdH1CWaMcXcOZzyNFFr2xbjambXpBVO+0nrvHr7q
-        nW0br1j9nOU09+iZ3zGyEVO7Ur8tcU1+rT/lYBFfWqHUppf/DRyYX2kfTZE+PKO/2iqadaWM
-        hK2D8Ry+x4vfJlseyOKWX189L2rOgu8Cb+c3sh2/HvrZZyprOoPjBS09K1uFXxGHTZ/fW+rk
-        fya1Z2HDfiPFZvnt/ubxz1o3PRLoyVF1q3e9yqMotezeJ+mnHMZf7a89n3h7h0/gjH8ln+eX
-        273P32F65YdsgtLajXeXravxrmDnmCffzXLL8FltT0Gy29P1F+pbQx4rPH2zpSdV5YvpBiWW
-        4oxEQy3mouJEAEBWb41OBAAA
+        DIxMgQoTsjOW91kULJOsOPjMqoFxhkgXIyeHhICJxL/n/1m6GLk4hAR2MErs3DaZtYuRg4NX
+        QFDi7w5hkBphgSCJCT9nsoLYQgJKEufWzGIEKREWMJC41WsOEmYT0JP4uWQGG8gYEYGdLBLf
+        7x9lhJjPKzGj/SkLhC0tsX35VrBeTgE/idbHlhBhDYkfy3qZIWxRiZur37LD2O+PzYcaIyLR
+        eu8sVI2gxIOfu6HikhKHDn1lAxkpIZAvseFAIES4RuLt8gNQJfoS1zo2gl3AK+ArcW/nHrA4
+        i4CqxPG/LawQNS4Sc7fvBFvLLCAvsf3tHGaQkcwCmhLrd+lDTFeWOHKLBaKCT6Lj8F92mP8a
+        Nv7Gyt4x7wkTRKuaxKImI4iwjMTXw/PZJzAqzUIE8iwka2chrF3AyLyKUSy1oDg3PbXYqMAY
+        HqvJ+bmbGMFJWMt9B+OMtx/0DjEycTAeYpTgYFYS4fUOjUoR4k1JrKxKLcqPLyrNSS0+xGgK
+        9PBEZinR5HxgHsgriTc0sTQwMTMzNDcyNTBXEueVtj2ZLCSQnliSmp2aWpBaBNPHxMEp1cBU
+        3q4sEHqrmXXFz+LXMQnm/Z/7f8zcUmPU1j87/kFW5smlZydvuFidwZ24N8DSfc17TTe7ow0b
+        e/fr9V0svvr42N+uYsMMkwmPDl+O/t3Zdll9zaUXErvf+NZ9CrzI3vGsZSbL1AXaNZY/Jz+0
+        7npRnJHwYlnUj4ht7JoZalOvX3E3nv2ycrXOOrX3y96dFfUsdO0tDKtsy0h2v7XyoLeWleTs
+        0Oc73vfqvlsqmLTyfu+UIyk6zy2Knj6XLLkee6C0hP+d2y/ZgF9fvItZW65pHYrLXvn+9gu2
+        +3JphSGbDJc/iN2pPT/j07xtzdwT7pp9aZ5fzuJWt+zd1QTun8UHnTXPhdx1NP9Rcu71dsaJ
+        SizFGYmGWsxFxYkAmMa9d0sEAAA=
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
-References: <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
+References: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
+        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p6>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the case of NVMe, it has an integrity payload consisting of one segment.
-So, rather than configuring SG_LIST, it was changed by direct DMA mapping.
+__bio_try_merge_page(), which is called by the general page-add functions
+and the function considering the constraints of hw, was separated.
 
-The page-merge is not performed for the struct bio_vec when creating 
-a integrity payload in block.
-As a result, when creating an integrity paylaod beyond one page, each 
-struct bio_vec is generated, and its bv_len does not exceed the PAGESIZE.
+Condition tests for general page-add functions were performed in
+bio_try_merge_page(). And when the parameters of __bio_try_merge_page()
+were changed, there were fewer functions affected by this.
 
-To solve it, bio_integrity_add_page() should just add to the existing 
-bvec, similar to bio_add_page() and friends. 
-As the bip configuration changed, the code related to sg_list was
-also modified.
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
 
-(ref: https://lore.kernel.org/linux-nvme/yq18rewbmay.fsf@ca-mkp.ca.oracle.com/T/#t)
+Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
+---
+ block/bio.c | 49 ++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 19 deletions(-)
 
-
-Tested like this:
-
-- Format (support pi)
-$ sudo nvme format /dev/nvme2n1 --force -n 1 -i 1 -p 0 -m 0 -l 1 -r
-
-- Run FIO
-[global]
-ioengine=libaio
-group_reporting
-
-[job]
-bs=512k
-iodepth=256
-rw=write
-numjobs=8
-direct=1
-runtime=10s
-filename=/dev/nvme2n1
-
-- Result
-...
-[   93.496218] nvme2n1: I/O Cmd(0x1) @ LBA 62464, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
-[   93.496227] protection error, dev nvme2n1, sector 62464 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
-[   93.538788] nvme2n1: I/O Cmd(0x1) @ LBA 6144, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
-[   93.538798] protection error, dev nvme2n1, sector 6144 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
-[   93.566231] nvme2n1: I/O Cmd(0x1) @ LBA 124928, 1024 blocks, I/O Error (sct 0x0 / sc 0x4)
-[   93.566241] I/O error, dev nvme2n1, sector 124928 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
-[   93.694147] nvme2n1: I/O Cmd(0x1) @ LBA 64512, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
-[   93.694155] protection error, dev nvme2n1, sector 64512 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
-[   93.694299] nvme2n1: I/O Cmd(0x1) @ LBA 5120, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
-[   93.694305] protection error, dev nvme2n1, sector 5120 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
-...
-
-
-Changes to v1:
-- Add tag to fix patches 
-- Unification of the page merge process of data and integrity
-- Solve the build failure when CONFIG_BLK_DEV_INTEGRITY is disabled
-
-
-Jinyoung Choi (14):
-  block: bio: separation to reuse a part of the function
-  block: bio-integrity: modify bio_integrity_add_page()
-  block: bio-integiry: cleanup bio_integrity_prep
-  block: fix not to apply bip information in blk_rq_bio_prep()
-  block: blk-merge: fix to add the number of integrity segments to the
-    request twice
-  block: blk-merge: fix merging two requests in ll_merge_requests_fn
-  block: add helper function to get the number of integrity segments
-  scsi: add scsi_alloc_integrity_sgtables() for integrity process
-  scsi: change to use blk_rq_nr_integrity_segments() instead of
-    blk_rq_count_integrity_sg()
-  block: blk-integrity: change how to find the number of integrity of
-    bio
-  nvme: rdma: change how to find the number of integrity of request
-  block: add helper function for iteration of bip's bvec
-  block: blk-integrity: change sg-table configuration method for
-    integrity
-  block: blk-integrity: remove blk_rq_count_integrity_sg()
-
- block/bio-integrity.c         |  73 +++++++++++++------
- block/bio.c                   |  87 ++++++++++++++--------
- block/blk-integrity.c         | 132 +++++++++-------------------------
- block/blk-merge.c             |  68 ++++++++++++++++--
- block/blk.h                   |  20 ++++++
- drivers/nvme/host/rdma.c      |   2 +-
- drivers/scsi/scsi_lib.c       |  67 ++++++++---------
- include/linux/bio.h           |   4 ++
- include/linux/blk-integrity.h |  10 ++-
- include/linux/blk-mq.h        |   5 ++
- include/linux/bvec.h          |   6 ++
- 11 files changed, 284 insertions(+), 190 deletions(-)
-
+diff --git a/block/bio.c b/block/bio.c
+index fd11614bba4d..1be17dea603a 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -926,8 +926,28 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
+ 	return (bv->bv_page + bv_end / PAGE_SIZE) == (page + off / PAGE_SIZE);
+ }
+ 
++static bool __bio_try_merge_page(struct bio *bio, struct page *page,
++				 unsigned int len, unsigned int off,
++				 bool *same_page)
++{
++	struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
++
++	if (!page_is_mergeable(bv, page, len, off, same_page))
++		return false;
++
++	if (bio->bi_iter.bi_size > UINT_MAX - len) {
++		*same_page = false;
++		return false;
++	}
++
++	bv->bv_len += len;
++	bio->bi_iter.bi_size += len;
++
++	return true;
++}
++
+ /**
+- * __bio_try_merge_page - try appending data to an existing bvec.
++ * bio_try_merge_page - try appending data to an existing bvec.
+  * @bio: destination bio
+  * @page: start page to add
+  * @len: length of the data to add
+@@ -942,26 +962,17 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
+  *
+  * Return %true on success or %false on failure.
+  */
+-static bool __bio_try_merge_page(struct bio *bio, struct page *page,
+-		unsigned int len, unsigned int off, bool *same_page)
++static bool bio_try_merge_page(struct bio *bio, struct page *page,
++			       unsigned int len, unsigned int off,
++			       bool *same_page)
+ {
+ 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
+ 		return false;
+ 
+-	if (bio->bi_vcnt > 0) {
+-		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+-
+-		if (page_is_mergeable(bv, page, len, off, same_page)) {
+-			if (bio->bi_iter.bi_size > UINT_MAX - len) {
+-				*same_page = false;
+-				return false;
+-			}
+-			bv->bv_len += len;
+-			bio->bi_iter.bi_size += len;
+-			return true;
+-		}
+-	}
+-	return false;
++	if (!bio->bi_vcnt)
++		return false;
++
++	return __bio_try_merge_page(bio, page, len, off, same_page);
+ }
+ 
+ /*
+@@ -1129,7 +1140,7 @@ int bio_add_page(struct bio *bio, struct page *page,
+ {
+ 	bool same_page = false;
+ 
+-	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
++	if (!bio_try_merge_page(bio, page, len, offset, &same_page)) {
+ 		if (bio_full(bio, len))
+ 			return 0;
+ 		__bio_add_page(bio, page, len, offset);
+@@ -1199,7 +1210,7 @@ static int bio_iov_add_page(struct bio *bio, struct page *page,
+ {
+ 	bool same_page = false;
+ 
+-	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
++	if (!bio_try_merge_page(bio, page, len, offset, &same_page)) {
+ 		__bio_add_page(bio, page, len, offset);
+ 		return 0;
+ 	}
 -- 
 2.34.1
