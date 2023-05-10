@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4AFC7EE22
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5E9C77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:58:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236832AbjEJI44 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 04:56:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
+        id S236269AbjEJI61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 04:58:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236859AbjEJI4x (ORCPT
+        with ESMTP id S235541AbjEJI6Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 04:56:53 -0400
+        Wed, 10 May 2023 04:58:25 -0400
 Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB2C1BEA
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:56:51 -0700 (PDT)
-Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230510085650epoutp03b6cb7e81de356263a43f4a48139cead6~dvGyI_zLd1834518345epoutp03i
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:56:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230510085650epoutp03b6cb7e81de356263a43f4a48139cead6~dvGyI_zLd1834518345epoutp03i
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4674EF7
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:58:24 -0700 (PDT)
+Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230510085822epoutp03aca3ce9369e4f46ddcc3a70d00b5c325~dvIIgBcqp2222422224epoutp034
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:58:22 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230510085822epoutp03aca3ce9369e4f46ddcc3a70d00b5c325~dvIIgBcqp2222422224epoutp034
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1683709010;
-        bh=J1DOTjK8gn87giwmABoGcvRXxfDSssG6aRXYYY56duk=;
+        s=mail20170921; t=1683709102;
+        bh=ZfhC85BvKxKIuur1CoeZsaWeIlAnBRlkMNE/o0TIGEU=;
         h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
-        b=umFmWPI1h3xq6KWOn9ccYpx2SqYTYAq7IrFm01qWBs0DnJb6VIAcqq380Z18jZwUt
-         Mo4gncJbmeFyniWZnn1BpwsDkFHl/XBNyFkDADGSeg59ERpzbK85JP5+gpfvdnlWvw
-         F3vros25MA8PC1aMcPRRA1NLFjZR05yTA1S/csZ0=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20230510085649epcas2p2753e134660d5d8874f0a72088df2d640~dvGxmnF2f1277712777epcas2p2o;
-        Wed, 10 May 2023 08:56:49 +0000 (GMT)
-Received: from epsmges2p3.samsung.com (unknown [182.195.36.100]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4QGTRN6M9zz4x9Py; Wed, 10 May
-        2023 08:56:48 +0000 (GMT)
-X-AuditID: b6c32a47-e99fd70000002007-6d-645b5c50b6c2
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+        b=BNuUSbKPs0guXiN6nW9GD9PbT17ucuEwPrqtqZ9w0U/OLfg9Gjf37ZJVDiLVlju9F
+         4Yu0KzlCNiRZ+d4Hh6ztEUy0UynxgXh4n/LSDotMqV4AnvKiFEVCn2LlZKnOXq3Ra/
+         09i07CPwT9nF6WpxVxaSE2Up7tKZg1Im/CiG5R1w=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20230510085822epcas2p12468ee6a15f4aa3e73bbe3afef6270ba~dvIIGsWkw2929929299epcas2p18;
+        Wed, 10 May 2023 08:58:22 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.36.68]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4QGTT95Bp6z4x9Q3; Wed, 10 May
+        2023 08:58:21 +0000 (GMT)
+X-AuditID: b6c32a47-e99fd70000002007-40-645b5cadb711
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
         epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        69.69.08199.05C5B546; Wed, 10 May 2023 17:56:48 +0900 (KST)
+        FA.5A.08199.DAC5B546; Wed, 10 May 2023 17:58:21 +0900 (KST)
 Mime-Version: 1.0
-Subject: [PATCH v2 09/14] scsi: change to use blk_rq_nr_integrity_segments()
- instead of blk_rq_count_integrity_sg()
+Subject: [PATCH v2 10/14] block: blk-integrity: change how to find the
+ number of integrity of bio
 Reply-To: j-young.choi@samsung.com
 Sender: Jinyoung CHOI <j-young.choi@samsung.com>
 From:   Jinyoung CHOI <j-young.choi@samsung.com>
@@ -62,34 +62,34 @@ X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20230510085648epcms2p8f7a9095b798cab8746c39ea25d7f3bec@epcms2p8>
-Date:   Wed, 10 May 2023 17:56:48 +0900
-X-CMS-MailID: 20230510085648epcms2p8f7a9095b798cab8746c39ea25d7f3bec
+Message-ID: <20230510085820epcms2p899d5cfca9a0aca4bd6654d9d0189b6f8@epcms2p8>
+Date:   Wed, 10 May 2023 17:58:20 +0900
+X-CMS-MailID: 20230510085820epcms2p899d5cfca9a0aca4bd6654d9d0189b6f8
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 X-CPGSPASS: Y
 X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrJJsWRmVeSWpSXmKPExsWy7bCmuW5ATHSKQfcSE4vVd/vZLF4e0rRY
-        ufook0Vv/1Y2i0U3tjFZ/O26x2Qx6dA1RounV2cxWey9pW1xedccNovlx/8xWax7/Z7F4veP
-        OWwOvB7n721k8di8Qsvj8tlSj02rOtk8Jiw6wOix+2YDm0dv8zs2j49Pb7F49G1ZxejxeZOc
-        R/uBbqYA7qhsm4zUxJTUIoXUvOT8lMy8dFsl7+B453hTMwNDXUNLC3MlhbzE3FRbJRefAF23
-        zByg85UUyhJzSoFCAYnFxUr6djZF+aUlqQoZ+cUltkqpBSk5BeYFesWJucWleel6eaklVoYG
-        BkamQIUJ2Rl7N81nKtjEVzFx1Tb2BsaJPF2MnBwSAiYS9488Yu9i5OIQEtjBKPHh9ibmLkYO
-        Dl4BQYm/O4RBTGGBUomNBzNAyoUElCTOrZnFCBE2kLjVaw4SZhPQk/i5ZAYbyBQRgZ0sEt/v
-        H2WEGM8rMaP9KQuELS2xfflWsF5OAT+J1seWEGENiR/LepkhbFGJm6vfssPY74/NhxojItF6
-        7yxUjaDEg5+7oeKSEocOfWUDGSkhkC+x4UAgRLhG4u3yA1Al+hLXOjaCXcAr4Ctx7PcqJhCb
-        RUBVYunE86wQNS4Sc79uBoszC8hLbH87BxwGzAKaEut36UNMV5Y4cosFooJPouPwX3aY/xo2
-        /sbK3jHvCRNEq5rEoiYjiLCMxNfD89knMCrNQoTxLCRrZyGsXcDIvIpRLLWgODc9tdiowBge
-        rcn5uZsYwWlYy30H44y3H/QOMTJxMB5ilOBgVhLh9Q6NShHiTUmsrEotyo8vKs1JLT7EaAr0
-        8ERmKdHkfGAmyCuJNzSxNDAxMzM0NzI1MFcS55W2PZksJJCeWJKanZpakFoE08fEwSnVwFTB
-        vdj1pNrdux4zzT98OH7IP0fs8FyjyMKwJbYfvuQLM6f1Czj8mNYj/qeY4+WyRdmTXEo1NRlO
-        vV+ivPHGsWKVgoZts7SLOiXqjJQVKxaUnPzGd7f5E6ukqNikrGeZJjLr7zlN4j9+M741TEPp
-        R1hFZ4/+jB0pKhueyFq7nGb/NcFs3iX+1zFXFt5afNTPVv+rGv+5n+8Xt2fIzE7/NWn5x0vB
-        Jx87/JwvcT5kacsn7XXGh13Vt7Bt8Nz48Zjzr8QLtbdrN606tKGvR3rm5PZ3/d3H7035Ea5V
-        v1mT9U5pWEnqE4vjmZb6/k/7tiw9Ye2xvCb2QPOfuKajp81PyUvIp7fp/1q6TCHs75nr7+Yp
-        sRRnJBpqMRcVJwIA9QaM7UwEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFJsWRmVeSWpSXmKPExsWy7bCmhe7amOgUg+ePNSxW3+1ns3h5SNNi
+        5eqjTBa9/VvZLBbd2MZk8bfrHpPFpEPXGC2eXp3FZLH3lrbF5V1z2CyWH//HZLHu9XsWi98/
+        5rA58Hqcv7eRxWPzCi2Py2dLPTat6mTzmLDoAKPH7psNbB69ze/YPD4+vcXi0bdlFaPH501y
+        Hu0HupkCuKOybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTd
+        MnOAzldSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFJgX6BUn5haX5qXr5aWWWBka
+        GBiZAhUmZGdcnXOdtWADZ0Xn6lvMDYzP2LsYOTkkBEwkrh99w9rFyMUhJLCDUWLj+5NACQ4O
+        XgFBib87hEFqhAWSJWbP/MoEYgsJKEmcWzOLEaREWMBA4lavOUiYTUBP4ueSGWwgY0QEdrJI
+        fL9/lBFiPq/EjPanLBC2tMT25VvBejkF/CRaH1tChDUkfizrZYawRSVurn7LDmO/PzYfaoyI
+        ROu9s1A1ghIPfu6GiktKHDr0lQ1kpIRAvsSGA4EQ4RqJt8sPQJXoS1zr2Ah2Aa+Ar8TbKVPB
+        xrMIqEq0r2uAWuUiseLJM1YQm1lAXmL72znMICOZBTQl1u/Sh5iuLHHkFgtEBZ9Ex+G/7DD/
+        NWz8jZW9Y94TJohWNYlFTUYQYRmJr4fns09gVJqFCORZSNbOQli7gJF5FaNYakFxbnpqsVGB
+        MTxek/NzNzGCE7GW+w7GGW8/6B1iZOJgPMQowcGsJMLrHRqVIsSbklhZlVqUH19UmpNafIjR
+        FOjhicxSosn5wFyQVxJvaGJpYGJmZmhuZGpgriTOK217MllIID2xJDU7NbUgtQimj4mDU6qB
+        SYh1w+eev8+CP0/KzI2/9L3IRVjGjmNuNd8TXbFfr461B51fu37L3MtHj1vc37roQrrvlk/Z
+        t1enzvywhSlxPh+XTytLo0hC+fUHJvO/rxd7vkworVOwTP7u1pr8O/XBx/0/lRUu80qc/Fvg
+        9OKs4iu+4vybK1SFpyrb9kxLZDGfIbfUTmOezRZOm69nY05MClu25dCf7PB19t6ma06cLrj6
+        /cDe3zmqhfuOf3N7m7xsz+NTZ29yacvJes3xDBZe48ZwYtvkp85nZJRMJor/sd5g5fpv1c1W
+        3v1xCjpes58/efD1IuvFl9MCPka/KHCWrGl2WeuV1ftW98MZyc6bU9cdzHzvc1Op+3z2mrKn
+        T1cosRRnJBpqMRcVJwIAz4+I5E0EAAA=
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
@@ -99,55 +99,39 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the block layer, the number of segments is recorded in the request.
-It is already divided into separate segments based on hw information.
-Therefore, there is no need to count again.
+The method of constructing a bip has been changed, the number of
+segments can be obtained through bip_vcnt.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 
 Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
 ---
- drivers/scsi/scsi_lib.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ block/blk-integrity.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 89cf21345e1a..5d67b6f6854e 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1006,8 +1006,9 @@ static inline bool scsi_cmd_needs_dma_drain(struct scsi_device *sdev,
- static blk_status_t scsi_alloc_integrity_sgtables(struct scsi_cmnd *cmd)
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index f97b7e8a6d4d..64407b412947 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -217,7 +217,6 @@ bool blk_integrity_merge_bio(struct request_queue *q, struct request *req,
+ 			     struct bio *bio)
  {
- 	struct request *rq = scsi_cmd_to_rq(cmd);
-+	unsigned short nr_integrity_segs = blk_rq_nr_integrity_segments(rq);
- 	struct scsi_data_buffer *prot_sdb = cmd->prot_sdb;
--	int count, ivecs;
-+	int count;
+ 	int nr_integrity_segs;
+-	struct bio *next = bio->bi_next;
  
- 	if (WARN_ON_ONCE(!prot_sdb)) {
- 		/*
-@@ -1018,9 +1019,7 @@ static blk_status_t scsi_alloc_integrity_sgtables(struct scsi_cmnd *cmd)
- 		return BLK_STS_IOERR;
- 	}
+ 	if (blk_integrity_bypass_check(req, bio))
+ 		return true;
+@@ -225,9 +224,7 @@ bool blk_integrity_merge_bio(struct request_queue *q, struct request *req,
+ 	if (!__blk_integrity_mergeable(q, req, bio))
+ 		return false;
  
--	ivecs = blk_rq_count_integrity_sg(rq->q, rq->bio);
--
--	if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
-+	if (sg_alloc_table_chained(&prot_sdb->table, nr_integrity_segs,
- 				   prot_sdb->table.sgl,
- 				   SCSI_INLINE_PROT_SG_CNT)) {
- 		return BLK_STS_RESOURCE;
-@@ -1028,10 +1027,7 @@ static blk_status_t scsi_alloc_integrity_sgtables(struct scsi_cmnd *cmd)
+-	bio->bi_next = NULL;
+-	nr_integrity_segs = blk_rq_count_integrity_sg(q, bio);
+-	bio->bi_next = next;
++	nr_integrity_segs = bio_integrity(bio)->bip_vcnt;
  
- 	count = blk_rq_map_integrity_sg(rq->q, rq->bio, prot_sdb->table.sgl);
- 
--	BUG_ON(count > ivecs);
--	BUG_ON(count > queue_max_integrity_segments(rq->q));
--
--	cmd->prot_sdb = prot_sdb;
-+	BUG_ON(count > prot_sdb->table.nents);
- 	cmd->prot_sdb->table.nents = count;
- 
- 	return BLK_STS_OK;
+ 	if (req->nr_integrity_segments + nr_integrity_segs >
+ 	    q->limits.max_integrity_segments)
 -- 
 2.34.1
