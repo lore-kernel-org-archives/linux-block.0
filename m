@@ -2,118 +2,148 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC76C77B7D
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 07:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCBEC77B7D
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 07:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236104AbjEJHmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 03:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36256 "EHLO
+        id S236477AbjEJH4Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 03:56:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236130AbjEJHmi (ORCPT
+        with ESMTP id S236496AbjEJH4W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 03:42:38 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96DB430DD
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 00:42:36 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f42d937d2eso8046565e9.2
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 00:42:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683704555; x=1686296555;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7jBo/0gaqOcpWDn9v+f25CR/FvK3dzqVxHQDA11D/+A=;
-        b=ck17UrgCHcvsEeF7v2HDWMksbJ4b5Z3kbk9Z/GvhbVQUwsv9NGdNo+1Btunoalycth
-         A0MYshPsLsdc0vdvmdJFr/E4MzNTgae2WinZwlz10VG5fT/6WQZqoyzNWgOj4i/SH32H
-         v57jywQfNVNpwAMLfdxjNn9XXT6eQ0OX/FFEzwJ5f8Py+tLFWmsbKb9ttG2/+Fke94tl
-         JD/qBO5qpUFZxyuxyJUjaRNelqvpzhhTMZ+ZVa5+e3/PVvlAytq04ATgC08aFl40d7wm
-         iNm6Fg10vQvY5wctGpSbUA30hVzLAoxtI+6w/9ZLgUStU+rnr34UyAe6CTk/g5WJ9f4f
-         xxSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683704555; x=1686296555;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7jBo/0gaqOcpWDn9v+f25CR/FvK3dzqVxHQDA11D/+A=;
-        b=BR1J9MbYkiqV4DLTgnvQ6RLq0jsNevKFDkVC/Xh7GFbYPpUB9NnUSsauYsIwnBvSgm
-         5391HTlb7j/FmhECugJxwbjgKsL0ei5qZy1UMbKlRzeuF3XCQ9Qr/XI5pyYROVJekTyt
-         nicRK1PaMrQlC+Nhi2LD/ptv8EvvRhtzqRBg6RfkRLa/jDhP1gPd0UUPjoXYFka4QwLz
-         cHsgnyD/btmf/ArnJoff9/2XB9mESVQbPS6jU7duNI82Ayw863q7HaHhWM2panQXTI2K
-         aEUwIzGHrplTG5fc4j0lmWx0qT2w+0p67fMn92wtQ/yS+T+DCGNNmGzKsj4rBcI7PF+o
-         cEEw==
-X-Gm-Message-State: AC+VfDz8tOX69fhuIcLvw6l1jGZeQ4FrL81U/z1zLsMZWtXo2p5V85Gp
-        sOZfDRBlFo6WtHBm1G+reL6v2irK/dvxNmqdi+Ebzw==
-X-Google-Smtp-Source: ACHHUZ5KXZLxkupb7Woo0uDJlVcJPoJ8THFYvgVyj56TSq4effvtNlIl5JLyozmztq2xypAhmrTFUQ==
-X-Received: by 2002:a5d:5003:0:b0:306:37d9:201c with SMTP id e3-20020a5d5003000000b0030637d9201cmr11124020wrt.17.1683704554944;
-        Wed, 10 May 2023 00:42:34 -0700 (PDT)
-Received: from loic-ThinkPad-T470p.. ([2a01:e0a:82c:5f0:28c8:5790:aa30:6a9d])
-        by smtp.gmail.com with ESMTPSA id f5-20020adff985000000b002fda1b12a0bsm16680692wrr.2.2023.05.10.00.42.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 May 2023 00:42:34 -0700 (PDT)
-From:   Loic Poulain <loic.poulain@linaro.org>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH] block: Deny writable memory mapping if block is read-only
-Date:   Wed, 10 May 2023 09:42:23 +0200
-Message-Id: <20230510074223.991297-1-loic.poulain@linaro.org>
-X-Mailer: git-send-email 2.34.1
+        Wed, 10 May 2023 03:56:22 -0400
+X-Greylist: delayed 64 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 10 May 2023 00:56:13 PDT
+Received: from esa5.fujitsucc.c3s2.iphmx.com (esa5.fujitsucc.c3s2.iphmx.com [68.232.159.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93E01BF4
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 00:56:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj1;
+  t=1683705373; x=1715241373;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=avg6RKekqe/Gd4vqUuMlfkxVYQtW5lgZKeWIzplMLV8=;
+  b=t96I9Yd9GKvW5ik1bw+2GKoV4hJ0iFXTNj6QGTLS4jxy+dhBFHLgJmhd
+   QBHPM3r66q9/jTYj/FhRpZYevK9d20XZAMELrzgZ0EQWpaeNOnECrsJ9o
+   UbHhSGHrIlXG+FKq+10+urdiu/iqSuTaOKOkSnGD+9j8uMMWc1/bdcTzS
+   RUWkcYU9YHJOyieTF7oaIDnRuvzzwHp/NDOB/zoCdvhsmd45B4bioeo5W
+   6+TpQjeCCCnO0FQdfYMyAHLu084WhZdyJsWwQ+H08bQXhwG9toAWxYJrb
+   yIYsq7XGdR4NQASGVCbtEKKLIDR9xYhNY2yl+SoBjuZaStchKi8Sv9wwn
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10705"; a="84248444"
+X-IronPort-AV: E=Sophos;i="5.99,264,1677510000"; 
+   d="scan'208";a="84248444"
+Received: from mail-tycjpn01lp2169.outbound.protection.outlook.com (HELO JPN01-TYC-obe.outbound.protection.outlook.com) ([104.47.23.169])
+  by ob1.fujitsucc.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2023 16:55:06 +0900
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JMpyECGnj56XEeHTCe50w6uyXnOICwKCqRdgpOLQzG4P3N1w8498qeNE2KvLp0/6Dk48KUD4mHTnazwJ7xToNH213PEfr9L/Xd9NaX7iLzKlc6WHjaPVIvUGxkUvzsLchSOvlszHAhxPFvShDcxU8B8qzuFBHmLF/Kz3LSVhkqA4CdQB2gHzjMtk/TpKZgyB73oglCXQ7j+PyA/Jkoj0RCUGkNLyNuoOGXdgSTFPhTYFH05q8U+FqvZsxZ/4JBI3SfQdOXxoR6dp78xdpYSzb+mpgAgeE1au1EhbV18LdieRDIyRRxRjjVD09qmf5L/+vB5C/0IXXAyjMZFqUqdtDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=avg6RKekqe/Gd4vqUuMlfkxVYQtW5lgZKeWIzplMLV8=;
+ b=L1AjO6ZAK0lQ8f1Y2+UZqF5MdI05DTbtjezBxCpWzU0WwL3pL0TjUuiav3WMPZ0j+sORKuxueMwrPAqcL/k0UEi/5EP+eCjzD4b6Ip6Jsl8OGDJsozB4su/zbS5y9Uv+eGHMSFqnI9wDo/1qHjlRBYSoDwAn82adxgmqq2srNcfSk5mZETVjhnCN07Plp70ZWVHVvhBzhEjJ+4obTV5lzwz89dA3CMpBchsQi22YU1W3AW+QzyL+tSFs1LdCK1IduqJCgaldDMI3zUD2yTu2i3kQzSfrFpLjmpgxCARH/bbZfhcN8GqkVbzpzRDIAVSxki4RQQnJZiTC0OGgXqcmiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
+ dkim=pass header.d=fujitsu.com; arc=none
+Received: from OS3PR01MB9499.jpnprd01.prod.outlook.com (2603:1096:604:1c8::5)
+ by OS3PR01MB10357.jpnprd01.prod.outlook.com (2603:1096:604:1f8::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.18; Wed, 10 May
+ 2023 07:55:03 +0000
+Received: from OS3PR01MB9499.jpnprd01.prod.outlook.com
+ ([fe80::a883:7aee:71d:b4a1]) by OS3PR01MB9499.jpnprd01.prod.outlook.com
+ ([fe80::a883:7aee:71d:b4a1%3]) with mapi id 15.20.6387.018; Wed, 10 May 2023
+ 07:55:03 +0000
+From:   "Xiao Yang (Fujitsu)" <yangx.jy@fujitsu.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
+CC:     Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH blktests] common: Replace _have_module() with
+ _have_driver()
+Thread-Topic: [PATCH blktests] common: Replace _have_module() with
+ _have_driver()
+Thread-Index: AQHZgw1y7RgZnDRyM0uHcXHHUvTGz69THeoAgAAFZYA=
+Date:   Wed, 10 May 2023 07:55:03 +0000
+Message-ID: <1f2061f8-de32-15cc-818b-56ca0024c5da@fujitsu.com>
+References: <20230510070207.1501-1-yangx.jy@fujitsu.com>
+ <9ac0b861-01a0-9dce-3d2c-5ff9e265c994@nvidia.com>
+In-Reply-To: <9ac0b861-01a0-9dce-3d2c-5ff9e265c994@nvidia.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fujitsu.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: OS3PR01MB9499:EE_|OS3PR01MB10357:EE_
+x-ms-office365-filtering-correlation-id: 91b2bc01-aecf-4ec9-b2a2-08db512bdd18
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pCuVK8qfTMQbKbRqDH0hD/0OanpA89aW7w/z6dN6HGvaUFTjv5jto6a+yGHHfqL5EAR5OEhsGZYUK1MNfB7jI+yKe5Y6NSQTsISo5pSYRrV2jJJwP6kh/uMJxyxiBlaxayZnKIuIA3HKBRvvl+eQXW2t/6oDDiOXdeOXzG8L/JfOkaM1tLmtfTSrJADJW/LsFq+yf87rpoC5vowLqKVGoGmk3ZwBYP7VlVgJXsWJNpkou67Wu4+lyxQmj+f3KOKFuOcG2h4oVTxBPV+Su16VzkSqJMgiaZUhIQeLe6udFviYg7IBkupf6odIb13Gp8Jv/a5M0aVwFxRDDJMGFsUpxpzcd5i5dcJittkxTAbS/dyIq3SCDqEOdlCC6YFcnfpnfg30PckdWLFIXA4hoke9rYTyk93e2RzLu68H2ikRGSSoF4FZBZJxjTQX1BtdyTk7zrzuFUtM95xzIT7x6/CkgyruCtfJKtX9eL/fXQUZHnhGeboeZbjesiZqn0CVOUE7Gi9ix7e/vqPVTNN5Fc/eMF9Hl8WGDmF3CAWAt+GSPTzWQZB++c1TdNkIaoc8AcFUnUjGlcIHhwKdh4K8wpYOoRXg9lxHkPGDutUf+8sWU4D4SggZ9M9dRoiw9mdxMEGBjLkH/OWcGIWzNNW+R/vg6EswFm31Zb89+w4+I7NUEc0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3PR01MB9499.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(366004)(376002)(346002)(39860400002)(1590799018)(451199021)(186003)(2616005)(1580799015)(2906002)(38100700002)(85182001)(36756003)(38070700005)(31696002)(558084003)(86362001)(82960400001)(122000001)(6486002)(8676002)(316002)(8936002)(41300700001)(71200400001)(5660300002)(478600001)(31686004)(110136005)(76116006)(66946007)(66476007)(66446008)(64756008)(66556008)(91956017)(4326008)(53546011)(26005)(6512007)(6506007)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?aE0xNkxpaUJ5b2I5T2RhVVQ2MzJSMXNScGF1SnMrRVMzK0NEVkIvZlJJU0xT?=
+ =?utf-8?B?QndrV2ttTmdQeS93YUNUZVM5aGpTcG5oNUdmdzl2TTNqenhWOEE0Z0NZTGxY?=
+ =?utf-8?B?L1dDSGdSMXg2NWFieEtWME5YaStJTEdsdjB6UWI5Tkx2dUNCcU83Z3lCb3FM?=
+ =?utf-8?B?aWVCdHFPQURaRk1lMG8vd2xzVCswdUR1U3RsSEFVLzZSN2pTMFNhcXhkVGdr?=
+ =?utf-8?B?M2FnR1RXN2hnb1Y3djVHeW94elhGUm4rRmxpNFdHb0tadFZzQ3R5RkFtdEo2?=
+ =?utf-8?B?Wm1Vd3diT0tiS3RuVlBxUE9mNGdJL2xhckROSXp4WDFOWktKbmY4UzhjbDI2?=
+ =?utf-8?B?ZkV1bXlJTDVnd1l0dkI3dGMxRnV0ZXZtNHUyTzhNdk5scDNwMHpPOUdodnFV?=
+ =?utf-8?B?QjdrNkRCb213ekdsY1F1UDJDemh2WUlOT3dyV2xxaW9ua2ZTYU5mYU9nVzFr?=
+ =?utf-8?B?T1JXbTd5aFJLWlc1QzlUT1E4SnM0dnJEK09ybm5hV1R0bCtxdlFhSmQwejF1?=
+ =?utf-8?B?c3M1VXg5RnQycEZMcGFHUU1GN2x2Z1JSaHFBRXpjOVpwQmJ3UVFnbTR0M0RG?=
+ =?utf-8?B?enZjd0lIVzBRYlc0Ymh5WXRxSXdDQmJVUkxQUzViRmRUVGVGdlVSTWViUk5J?=
+ =?utf-8?B?UGFITVhqYmpTN0VzTjRsL3g1QUliV2pqNTN4K0cvazBBZzhtU2VCQUsxTktn?=
+ =?utf-8?B?SmFYM2lkd0J6V05TN1lKYmpGR1k4Smx0aUpJWkJUemhHKzRhRmxaVmQ1TWwz?=
+ =?utf-8?B?RFdISEtlVFBDcitSenpLS0JZZUxTZXpIdDI2SG9aN0ZQTk5SVXZpdURCRThR?=
+ =?utf-8?B?Y2p1QkZrUkM1WkUrZkZxSnNtQTQxZUZXYkdYdExsL1B4NW5VbWYyQzFtdjhC?=
+ =?utf-8?B?OTZvSFRKSW14amgwa1dzVkZnN3plcUVuVWdoRy9TVDJmTWhHa0VSWWJTdUV1?=
+ =?utf-8?B?ZFcxbTNXYVpjYzZEa29XODBoTVJDN1d4QXpLMEQvd2pNNnY5KzZsOWp0a3lG?=
+ =?utf-8?B?WVk1eFhIN3VkNXBKZFdaTWtrQngwYmtPMkRPdmpLZllOR05XWUdUNUdZZUx2?=
+ =?utf-8?B?cCtrZTRZVFR0NEF1OUptd3hEbWFyd3Q2c2Q1MnljWjVvalpONGFPa3NCdGVi?=
+ =?utf-8?B?MHFWM2llai8vVXpHdk9OWkpPTmluMXZoaXljQ0hKZnJucHJGc1VIRGdYTHdq?=
+ =?utf-8?B?eVNydXhXMzFwL1l1SXJzOVlUOE9RTytLZVJPZUw1MFAzNnJURHg2dnQ5MmN0?=
+ =?utf-8?B?WGljZWw4YXdjaGVBYmhkbDhFVDlWTllPckJMZjlrZnBTWmlTUDBjNjd3YjNj?=
+ =?utf-8?B?Zk5lRTFFSGNoU2syckduSGZaK3JtWlNCSk5Tc2NzcFpDR1ZnK3RYY3AyQnpF?=
+ =?utf-8?B?UlNtbXM0OS9IVjY2djRzZTdYQWZtK2RXV0VyenVzQzI2bTk4MlVRdVl6dnhj?=
+ =?utf-8?B?cDFEY1BGNXBEc09yMEVMbDVEQkpUL2tzVW5STHh5UWN5UTRheG9qMVZHcWNi?=
+ =?utf-8?B?anIrR01pWFYzWlRRRWtDNTlCY0ZjOGlDS2dCUmZ2bTkvRGUvdlNpeTY2VnJw?=
+ =?utf-8?B?OHNDeGhSY3F2UXhTcndRTEtLQUdoSGozR2s5c3ltQXgwdS9jcW84bXZKYzJt?=
+ =?utf-8?B?cExabU1STjBBdWYvTmZCTUY2WFlEVDQ5Q1gwTXl3MlBnSytsZ2FkK0dQeHJo?=
+ =?utf-8?B?UmpQalNoeEpoeklOcXhzL0ZXYW05THNhM1ZPbHd2Ukhmd3dYejBNcmFrTm91?=
+ =?utf-8?B?dDNuMWpXRFVCRER6bHI4bXFrWUJJVXorS1ZoUXVlS3RiRTFZbUFSS3A0VlVo?=
+ =?utf-8?B?L0sweWo4N2lKZytKY2xnOVZXK2E0bHVqMjA4emdoaE16U1c4ekVsWUlPVkc1?=
+ =?utf-8?B?c0JueGhJZUtFbUJSL21nODJLbU1aWXA4djFvK05PbGFtT2x4aG9yWndRMEY3?=
+ =?utf-8?B?NFNrWVpIVkFPV3ZMN1h3d2FycndVMWlYWm5VRlo1YjZJSmdncm9uVmErN0Er?=
+ =?utf-8?B?S2NKQmhWYjk0d3hlbjY2NWIzcGl3V1JZU1B0RDBuVHlQQjkrMTBacVlPdVVL?=
+ =?utf-8?B?cTYxM0R2Q1JZMzZkRkkwcEo5MmRScjNWTkZsMlEvMWFrQkQ0eFRDTWFjdC9B?=
+ =?utf-8?Q?Xku2IPlMDsVPDaKXKdorQydFv?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <012913AAC9B2984596A1206E4B0E7B32@jpnprd01.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: L4PBZHo4ettFeROuXVwWV88/h5dFcnMnLfhu6n5N2kZeyMRYQVRV7we94/9hx1t1AWokD9JyqZikmIzSt9OMjlZc0dZrpvnuOLjYtjloOcU33CNcKl7S8wDdgXTwUVio6gLeMM8ph90TKbyopne2RMMN3qEwy0gUdMTCyjgQvrVKl08a6TcW/ziSczLvnzHixK8ioeyyqkJLsLfU231ET5c9Y/n9KEpolzvYjGJdI6Dhjq5yW5cnQcKqVIMgCHciWncLjMYjaI1pLvGnlZmCUkzLBpcseXLuk7l2RCxBU9eTsc437mYLKvTwbXSWx27fgN3KwV7eIVZn3BF7TMJ2sQlpprQdwDk68lr2kfzzZojyYaNgM/fkGXI2Y2wiVAUW26XBBCgX6jCEkTcinbCK54aGeb6wieMYPxw2I6IXQT4mtbXszMCTo4Qa7iKdmYvwPxyhT89K0a5iRIR49lokXQ9oJjcsW6wQL+GAbn1Cu+FX0GijGcWTGbmORqbUk7mR3M4LVBNU+ZaSoCm5CrHt77AIX3V/C35mne62/fOA+PkeLQ1/8/BdroZ9PnqQg/cMGtQUjDVYdS60Td1CTP2AxY7WLoezKg1IHzthpm/+ESIZqVZDc8azzgSTSS6WnC0IVUlszTxBfeuBTZuC5RH/fWuk20KihSjtMNdtT+R9ap7+wa2E4GhnTibYYk0mz+bwgYrSEl+qId+TMchWSlT4Jeuk8ajjvTwpmvoUfizYA+1nqUUvJVL2NrLH+drmCKJWeqbc2Y+qXXlFktov+PVuihddqeCwY/DsBU6SsyEXrAhum+HC/Zp5lnaLDq3gW9H4v210Jfxa1AaM+M8WRbODiw==
+X-OriginatorOrg: fujitsu.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: OS3PR01MB9499.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91b2bc01-aecf-4ec9-b2a2-08db512bdd18
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 May 2023 07:55:03.7628
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eelOVIlWqddruBegBc8aJSZU0W/duRZS6jgoXtYxE+VdputWlYul45YvKO4npGQZrdrR1VEcjoXbbny47UCSjA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS3PR01MB10357
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-User should not be able to write block device if it is read-only at
-block level (e.g force_ro attribute). This is ensured in the regular
-fops write operation (blkdev_write_iter) but not when writing via
-user mapping (mmap), allowing user to actually write a read-only
-block device via a PROT_WRITE mapping.
-
-Example: This can lead to integrity issue of eMMC boot partition
-(e.g mmcblk0boot0) which is read-only by default.
-
-To fix this issue, simply deny shared writable mapping if the block
-is readonly.
-
-Note: Block remains writable if switch to read-only is performed
-after the initial mapping, but this is expected behavior according
-to commit a32e236eb93e ("Partially revert "block: fail op_is_write()
-requests to read-only partitions"")'.
-
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
----
- block/fops.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/block/fops.c b/block/fops.c
-index d2e6be4e3d1c..58d0aebc7313 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -678,6 +678,16 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 	return error;
- }
- 
-+static int blkdev_mmap(struct file *file, struct vm_area_struct *vma)
-+{
-+	struct inode *bd_inode = bdev_file_inode(file);
-+
-+	if (bdev_read_only(I_BDEV(bd_inode)))
-+		return generic_file_readonly_mmap(file, vma);
-+
-+	return generic_file_mmap(file, vma);
-+}
-+
- const struct file_operations def_blk_fops = {
- 	.open		= blkdev_open,
- 	.release	= blkdev_close,
-@@ -685,7 +695,7 @@ const struct file_operations def_blk_fops = {
- 	.read_iter	= blkdev_read_iter,
- 	.write_iter	= blkdev_write_iter,
- 	.iopoll		= iocb_bio_iopoll,
--	.mmap		= generic_file_mmap,
-+	.mmap		= blkdev_mmap,
- 	.fsync		= blkdev_fsync,
- 	.unlocked_ioctl	= blkdev_ioctl,
- #ifdef CONFIG_COMPAT
--- 
-2.34.1
-
+T24gMjAyMy81LzEwIDE1OjM1LCBDaGFpdGFueWEgS3Vsa2Fybmkgd3JvdGU6DQo+IHdlIG1pZ2h0
+IHJlbW92ZSBudm1lb2YtbXAsIHNvIG5vdCBzdXJlIGlmIHRoYXQgcGFydCBpcw0KPiBuZWVkZWQs
+IGxldCdzIHdhaXQgZm9yIG90aGVycyB0byByZXBseSAuLg0KDQpIaSBDSywNCg0KVGhhbmtzIGZv
+ciB5b3VyIGZlZWRiYWNrLg0KQ291bGQgeW91IHRlbGwgbWUgd2h5IG52bWVvZi1tcCB3aWxsIGJl
+IHJlbW92ZWQ/IElzIHRoZXJlIGFueSBVUkwgYWJvdXQgDQp0aGUgZGVjaXNpb24/DQoNCkJlc3Qg
+UmVnYXJkcywNClhpYW8gWWFuZw==
