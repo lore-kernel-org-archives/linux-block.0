@@ -2,43 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 946E0C77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E82C7EE22
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:51:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236732AbjEJIu0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 04:50:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39426 "EHLO
+        id S236824AbjEJIvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 04:51:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236726AbjEJIuX (ORCPT
+        with ESMTP id S236839AbjEJIvf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 04:50:23 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84C6E72
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:50:21 -0700 (PDT)
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230510085020epoutp04c4798841ce8e6c6e61120c3176cf687b~dvBHHfSBW2825928259epoutp04N
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:50:20 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230510085020epoutp04c4798841ce8e6c6e61120c3176cf687b~dvBHHfSBW2825928259epoutp04N
+        Wed, 10 May 2023 04:51:35 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32C47EEA
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:51:14 -0700 (PDT)
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230510085113epoutp02913f6eb6149ce1f03c704fb5968c0226~dvB4rEHAJ0104101041epoutp02Y
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:51:13 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230510085113epoutp02913f6eb6149ce1f03c704fb5968c0226~dvB4rEHAJ0104101041epoutp02Y
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1683708620;
-        bh=2uIhNIvaUDqD62d3MZOJy319yIzbYqTLMuJPQ32qIts=;
+        s=mail20170921; t=1683708673;
+        bh=SMZ7aaeVPcRwQ18QiSqKaop+raZWNO8lsaDIbQ+02HA=;
         h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
-        b=HI58pAC3T92fLBNh14/TrCp6S4sYxewN8NaQ5IjE1qp9pRn8N1+ywN3qcn55q6IMh
-         qt9P/uVbTOlqgcxAtCO1s1jq4DiK3zKnPG9nk34PpvAzXD4Pp7QWzoFp0lxWBGHhsl
-         rxb5Xjo3dCPxplkaCmRi2SIuEHPmikRoQhX6deOw=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20230510085019epcas2p2a3e50c925ac64ea08544707ad1f82bc2~dvBGjVMiL2936129361epcas2p2G;
-        Wed, 10 May 2023 08:50:19 +0000 (GMT)
-Received: from epsmges2p3.samsung.com (unknown [182.195.36.100]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4QGTHv0bMRz4x9Pv; Wed, 10 May
-        2023 08:50:19 +0000 (GMT)
-X-AuditID: b6c32a47-c29ff70000002007-32-645b5acac020
-Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
+        b=TWcJKNXImvYJvCzWTvitvOs5oXmTxT7WU4sVw38I28KIFR5u0mXaChDuIGC5YVNA2
+         ZRZ8sEkjyfrfkQtrWLd33NWtBza9VGTrhMXjZ8WSWlmNPpLec3fbLymM5SoSNHWF0j
+         3ZRJBURmSkAT6aoBv+wAvDwKsnA9TM8lDVDyqUm8=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
+        20230510085112epcas2p3c8db972028412c72bfa8006f836edd58~dvB33_zG80654406544epcas2p3z;
+        Wed, 10 May 2023 08:51:12 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.36.89]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4QGTJw046Cz4x9Q7; Wed, 10 May
+        2023 08:51:12 +0000 (GMT)
+X-AuditID: b6c32a47-c29ff70000002007-20-645b5affbfbf
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
         epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        E0.95.08199.ACA5B546; Wed, 10 May 2023 17:50:19 +0900 (KST)
+        A9.F5.08199.FFA5B546; Wed, 10 May 2023 17:51:11 +0900 (KST)
 Mime-Version: 1.0
-Subject: [PATCH v2 03/14] block: bio-integrity: cleanup bio_integrity_prep
+Subject: [PATCH v2 04/14] block: fix not to apply bip information in
+ blk_rq_bio_prep()
 Reply-To: j-young.choi@samsung.com
 Sender: Jinyoung CHOI <j-young.choi@samsung.com>
 From:   Jinyoung CHOI <j-young.choi@samsung.com>
@@ -61,102 +62,75 @@ X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20230510085018epcms2p5a3830e37b13e9a6799298050abdc77dc@epcms2p5>
-Date:   Wed, 10 May 2023 17:50:18 +0900
-X-CMS-MailID: 20230510085018epcms2p5a3830e37b13e9a6799298050abdc77dc
+Message-ID: <20230510085111epcms2p7022e97fd97c1a32c59f935d72f8dda94@epcms2p7>
+Date:   Wed, 10 May 2023 17:51:11 +0900
+X-CMS-MailID: 20230510085111epcms2p7022e97fd97c1a32c59f935d72f8dda94
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 X-CPGSPASS: Y
 X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrGJsWRmVeSWpSXmKPExsWy7bCmqe7pqOgUg9tZFqvv9rNZvDykabFy
-        9VEmi97+rWwWi25sY7L423WPyWLSoWuMFk+vzmKy2HtL2+LyrjlsFsuP/2OyWPf6PYvF7x9z
-        2Bx4Pc7f28jisXmFlsfls6Uem1Z1snlMWHSA0WP3zQY2j97md2weH5/eYvHo27KK0ePzJjmP
-        9gPdTAHcUdk2GamJKalFCql5yfkpmXnptkrewfHO8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6Z
-        OUDXKymUJeaUAoUCEouLlfTtbIryS0tSFTLyi0tslVILUnIKzAv0ihNzi0vz0vXyUkusDA0M
-        jEyBChOyMz4tWc1ecJKv4uqxGywNjA+4uxg5OCQETCSOXGPtYuTkEBLYwSixcbIkSJhXQFDi
-        7w5hEFNYwEuiYZ4SRIWSxLk1sxghwgYSt3rNQcJsAnoSP5fMYOti5OIQEdjJIvH9/lFGkISE
-        AK/EjPanLBC2tMT25VvBejkF/CRaH1tChDUkfizrZYawRSVurn7LDmO/PzYfaoyIROu9s1A1
-        ghIPfu6GiktKHDr0lQ3ij3yJDQcCIcI1Em+XH4Aq0Ze41rER7AJeAV+Jh+dWsIHYLAKqEhvX
-        bIK6zEWie8kqsPHMAvIS29/OYQYZySygKbF+lz7EdGWJI7dYICr4JDoO/2WH+a9h42+s7B3z
-        njBBtKpJLGoyggjLSHw9PJ99AqPSLEQYz0KydhbC2gWMzKsYxVILinPTU4uNCozhkZqcn7uJ
-        EZyAtdx3MM54+0HvECMTB+MhRgkOZiURXu/QqBQh3pTEyqrUovz4otKc1OJDjKZAD09klhJN
-        zgfmgLySeEMTSwMTMzNDcyNTA3MlcV5p25PJQgLpiSWp2ampBalFMH1MHJxSDUw8915FzQjf
-        ZZTvqPxt/t75hjks68/o/pVYu31L13cbgRMp+8pzHxUfMPI78oVlMcP8fWfzZswJmV3fvEws
-        QbYuo9DifrBhpZUTyxfbqbLhZ9p75vv+qF6pcj/CTHixxd2O2dZ+ivs3B3hrb0tkmexWkFw3
-        e42SmOJjr86QyrMX926s2xezmePTkdpck4NSawW5/n3a0FVb+Wc+80yF9Sa8krUz2jnYBU5z
-        M0Q/zhM0M1kyifU/B895sQDOuq8eZp36LWdWG8tZm00K0ZgbIMgQoMAlsV3pXkGQ1H9/lcf7
-        KkpO2Mu+4S/wUDhuqZA68/GB3QK5j9ScNPRYKz75pjszHCtYpm6bzyfzqvWlEktxRqKhFnNR
-        cSIAP0C7YEkEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrBJsWRmVeSWpSXmKPExsWy7bCmue7/qOgUgwkXLS1W3+1ns3h5SNNi
+        5eqjTBa9/VvZLBbd2MZk8bfrHpPFpEPXGC2eXp3FZLH3lrbF5V1z2CyWH//HZLHu9XsWi98/
+        5rA58Hqcv7eRxWPzCi2Py2dLPTat6mTzmLDoAKPH7psNbB69ze/YPD4+vcXi0bdlFaPH501y
+        Hu0HupkCuKOybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTd
+        MnOAzldSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFJgX6BUn5haX5qXr5aWWWBka
+        GBiZAhUmZGes3PmauaCVq2Lv8ybGBsadHF2MnBwSAiYSxw6uZuti5OIQEtjBKDHj6SvGLkYO
+        Dl4BQYm/O4RBTGGBCInTO0VByoUElCTOrZnFCBE2kLjVaw4SZhPQk/i5ZAbYFBGBnSwS3+8f
+        ZYQYzysxo/0pC4QtLbF9+VawXk4BP4nWx5YQYQ2JH8t6mSFsUYmbq9+yw9jvj82HGiMi0Xrv
+        LFSNoMSDn7uh4pIShw59ZQMZKSGQL7HhQCBEuEbi7fIDUCX6Etc6NoJdwCvgK/Fz0VYmkHIW
+        AVWJbfukIEpcJK7MWsgKYjMLyEtsfzuHGaSEWUBTYv0ufYjhyhJHbrFAVPBJdBz+yw7zXsPG
+        31jZO+Y9YYJoVZNY1GQEEZaR+Hp4PvsERqVZiCCehWTtLIS1CxiZVzGKpRYU56anFhsVGMNj
+        NTk/dxMjOAlrue9gnPH2g94hRiYOxkOMEhzMSiK83qFRKUK8KYmVValF+fFFpTmpxYcYTYH+
+        ncgsJZqcD8wDeSXxhiaWBiZmZobmRqYG5krivNK2J5OFBNITS1KzU1MLUotg+pg4OKUamHo6
+        prKLZkW5pU0J2xZ64pzGpuYLzw2WOBT7bFzt8/TFbK5FF55qpcxW4Gzeu7eIqcMm2DKj/3f8
+        oSYbdufpyZOW+1bLXd9ok+iyMICXIShbbsUxj7TKL4dTjfY/65jygUvw7Mm3vHeWnzp6l79m
+        0yp5y9WKvNrHrjn4nTaQ4L/bEbFq+/uXd1caR7Dsay5RcW9ePatp9+PAl/tT9X4U6H1Nz93T
+        Gtf99/mumb2PKnzuHZro8fVCmVf5sZbj1QmFoWKFvUUaf1c3LJau2n9Qql0wcO7u5KnhvA1z
+        /j/Y9ZbXOGJt+k75bUx3J8bfLV0q5eQ+J0hxxsNlzzIEbJMP5py4PLmxsWzicu6Zp7edeKzE
+        UpyRaKjFXFScCAAYywQtSwQAAA==
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
 References: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
-        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p5>
+        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p7>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If a problem occurs in the process of creating an integrity payload, the
-status of bio is always BLK_STS_RESOURCE.
+When a request is initialized through the bio, bio's integrity
+information is not reflected in the request. It seems to be missing
+when the codes associated with 'nr_integrity_segment' were added.
+
+the lld such as scsi does not refer to this variable. It uses
+integrity's bevc to calculate the number of segments for sg-list. So
+there seems to be no problem related to this.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Fixes: 13f05c8d8e98 ("block/scsi: Provide a limit on the number of integrity segments")
 Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
 ---
- block/bio-integrity.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ include/linux/blk-mq.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/block/bio-integrity.c b/block/bio-integrity.c
-index 20444ec447cb..c49deed67bb2 100644
---- a/block/bio-integrity.c
-+++ b/block/bio-integrity.c
-@@ -245,7 +245,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	unsigned int len, nr_pages;
- 	unsigned int bytes, offset, i;
- 	unsigned int intervals;
--	blk_status_t status;
- 
- 	if (!bi)
- 		return true;
-@@ -274,7 +273,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	/* Allocate kernel buffer for protection data */
- 	len = intervals * bi->tuple_size;
- 	buf = kmalloc(len, GFP_NOIO);
--	status = BLK_STS_RESOURCE;
- 	if (unlikely(buf == NULL)) {
- 		printk(KERN_ERR "could not allocate integrity buffer\n");
- 		goto err_end_io;
-@@ -289,7 +287,6 @@ bool bio_integrity_prep(struct bio *bio)
- 	if (IS_ERR(bip)) {
- 		printk(KERN_ERR "could not allocate data integrity bioset\n");
- 		kfree(buf);
--		status = BLK_STS_RESOURCE;
- 		goto err_end_io;
- 	}
- 
-@@ -313,7 +310,6 @@ bool bio_integrity_prep(struct bio *bio)
- 		if (bio_integrity_add_page(bio, virt_to_page(buf),
- 					   bytes, offset) < bytes) {
- 			printk(KERN_ERR "could not attach integrity payload\n");
--			status = BLK_STS_RESOURCE;
- 			goto err_end_io;
- 		}
- 
-@@ -332,10 +328,9 @@ bool bio_integrity_prep(struct bio *bio)
- 	return true;
- 
- err_end_io:
--	bio->bi_status = status;
-+	bio->bi_status = BLK_STS_RESOURCE;
- 	bio_endio(bio);
- 	return false;
--
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 1dacb2c81fdd..9310c94577c7 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -961,6 +961,11 @@ static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
+ 	rq->__data_len = bio->bi_iter.bi_size;
+ 	rq->bio = rq->biotail = bio;
+ 	rq->ioprio = bio_prio(bio);
++
++#if defined(CONFIG_BLK_DEV_INTEGRITY)
++	if (bio_integrity(bio))
++		rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
++#endif
  }
- EXPORT_SYMBOL(bio_integrity_prep);
  
+ void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
 -- 
 2.34.1
