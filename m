@@ -2,138 +2,187 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F61C77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75453C7EE22
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236202AbjEJIAT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 04:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52098 "EHLO
+        id S236358AbjEJIoQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 04:44:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235999AbjEJIAS (ORCPT
+        with ESMTP id S231124AbjEJIoP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 04:00:18 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E8BDE
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:00:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fAsKEKkrpSV5LQteX82Rcfa7D4mvROA+rBh/o5UCKNuLzGQaeOo/ZasJmvB20BYKCB3JgnLNVPK8gyyM6RRE5LH+cu/9lTEr1C3AEisbB1JjA+/OB3P60BOzLjymgxooiXQKh4xD+LWTzVFZxHvMGcE8nXumRbd51fmqMalZrHx9P3q/1q8PMzjAcugYR02a8n+yJ9OdYcdHjb/Z9Dd/uN65fjoVF05djOf4LrlkfHVLg4CO4TXb6mwuyIDYjZ8vKxMo4pedYxu/4RBSQUuuA7c9ssuT3hA+FbgAf7nu22OLF0JJ/T9R4Ma7qq9pGumbQnGOdl0Fyb+YLC3UwFqYYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zAtlO91TxrPe2d5D+QlgvY3dg32lcLQsKiHbY8sw8QE=;
- b=MR7tx8vNCgfut8iNq1+dbs12iD/DY4oQBsOWs4M/IDWFRcn1iw+OUXeKqJNt9cIb+uHLTkNkoxshhtokTR+JyCyboRfdDnP1bX3QPL+CD/8tvXdKVRZw7XznR+dby0ZzT49VGy2NZP+75S0YIckDRS7/65lUxahk+X3fsr7nLsTXoc4B/PToPLiuVYf1BsMVbrF1+Ge+S4d3JWgQW3e08HK74xWAgr7OZol+fgqUYpC7BWVttOeZuBr9dsTvreL4j6eOoHVJb868LzKVMRHC/t4cJLYivpHQd8L1otABn8YilaW7di1YhKzfLvUvPitCi4lgAyJyVrDI94xL45h5XQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zAtlO91TxrPe2d5D+QlgvY3dg32lcLQsKiHbY8sw8QE=;
- b=tDb7dL7U99BEp1iax2I1IWj8EJOwYIs1xfTIUWzTcXjY0cziULdOhLdBrkM6EOppJicIN/oHRe5eWfn/oZ0I4qqdi+GWQQuaBlO5roIiffdYaM/t8kaPoR0jUIg2N//BBFXihs5Gcn6B6RjGXH7pIygGK8oi3jWJl4D+EiG7ewOjAwLHfSs/2G1f2yLRG/hHHNXcpYvPuydkkFlUVKjriJd+V0pOKBps8v1AUTRMO1T9068gkqhN4ZtluBa2dlWh54r0uKt8r+2bTQ7xznVto/gsuLOt6kj/VGlDvYaikXF3aup1Z5frGoT+dt8L/j/ALARQxU2AIjVK3ERC5WfV0Q==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by MW4PR12MB6899.namprd12.prod.outlook.com (2603:10b6:303:208::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.18; Wed, 10 May
- 2023 08:00:12 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::7326:8083:5e17:2f90]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::7326:8083:5e17:2f90%4]) with mapi id 15.20.6363.032; Wed, 10 May 2023
- 08:00:12 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     "Xiao Yang (Fujitsu)" <yangx.jy@fujitsu.com>,
+        Wed, 10 May 2023 04:44:15 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A12412B
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:44:12 -0700 (PDT)
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230510084409epoutp018857ea23a45cdf066d3ad6085323accd~du7tkyxdu0734607346epoutp01H
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:44:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230510084409epoutp018857ea23a45cdf066d3ad6085323accd~du7tkyxdu0734607346epoutp01H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1683708249;
+        bh=tAUq+j8EFp9wNJLVYSWcrdn/ApjcBvFZlh9RLdWUG7I=;
+        h=Subject:Reply-To:From:To:Date:References:From;
+        b=MWMgaVYlXihfT/rwPOIiiOoLM/ut/4PfVguwspKk73ohVg0BsNladBI+o8whRzE8u
+         cE536U/QmGmBg+s8Px+GUFp2rDqs37h/KYGNrLPjEnap53x7v1SQASe7oqTVxUG2hM
+         r2VDGK6cqubpzoz/y95LGgLZ5+aVi136ap2xEwac=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20230510084408epcas2p13848402d1760f70a20b32a4ef2aca3e9~du7tBLdKB0623706237epcas2p1z;
+        Wed, 10 May 2023 08:44:08 +0000 (GMT)
+Received: from epsmges2p4.samsung.com (unknown [182.195.36.90]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4QGT8m0wdvz4x9Q1; Wed, 10 May
+        2023 08:44:08 +0000 (GMT)
+X-AuditID: b6c32a48-475ff70000005998-5b-645b5957ce54
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        C3.15.22936.7595B546; Wed, 10 May 2023 17:44:08 +0900 (KST)
+Mime-Version: 1.0
+Subject: [PATCH v2 00/14] Change the integrity configuration method in block
+Reply-To: j-young.choi@samsung.com
+Sender: Jinyoung CHOI <j-young.choi@samsung.com>
+From:   Jinyoung CHOI <j-young.choi@samsung.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "kch@nvidia.com" <kch@nvidia.com>,
+        "willy@infradead.org" <willy@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
-CC:     Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests] common: Replace _have_module() with
- _have_driver()
-Thread-Topic: [PATCH blktests] common: Replace _have_module() with
- _have_driver()
-Thread-Index: AQHZgw1ghYeKHCF/j0i/E537kPbdBK9THegAgAAFcYCAAAFuAA==
-Date:   Wed, 10 May 2023 08:00:12 +0000
-Message-ID: <14ca2b51-6ccf-d3f7-c61a-ad2e8c384448@nvidia.com>
-References: <20230510070207.1501-1-yangx.jy@fujitsu.com>
- <9ac0b861-01a0-9dce-3d2c-5ff9e265c994@nvidia.com>
- <1f2061f8-de32-15cc-818b-56ca0024c5da@fujitsu.com>
-In-Reply-To: <1f2061f8-de32-15cc-818b-56ca0024c5da@fujitsu.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|MW4PR12MB6899:EE_
-x-ms-office365-filtering-correlation-id: 64fc08a3-f19b-43a2-9ec1-08db512c94f1
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: t3TqDFXfK2Wfh9Z6izj8xAsy9/tAm/QMMMbK/zE41l4IrV2byCiWGXwAQChcKmPSh2L/T6tG1in3CjayDduCJ9LJnOeGB+dsVargw6Oss8RYQklwr8uV1/sHRX+XKMMQtR7W1llAMA0C4nTT3nDy7kGPutGDKG/7NnOE0V7LWdEZnp3cqEK0YZdkWQHHpH5bTILWmGwnI5PXsqnafHrCXjRH25KLRSNXhrerg7sa1OfSJZWrSln5bSDKUlHEMl2xntraRM+TW/tR4oB8dcXLAGwOUCRCsLrl3BZz5hPHqktfF9EgXg9ndFBrbo0Ii/oeM693eXLkiuFGve1GfzEgPoJAujy8wbVy2hxLdla4khE+hYuIW4uQR7RduzgVI9UB4JDEXVt/Cdmk7DAST7M9jV8YZVGvWbfC7SbFS25m2vZWEwG3WPW/IaxkmeRJzqDkfuZC26QkZXAkZ2/jGHkFQRCDT85Z1HKG88uHHCJ/EPJzSfQK/dL2q6Lx7iqWZc/ARq1hOW2F4FmGBWD1zzYL2H0FWXMslzUR3mezXXcAVyrWBMQNfNTQn60ySH9jBXLW/35Xphe9ifYQqGllG5VZUF7G2QD3IqitkZ0XppNbqJDsBcK4d7g+4NqSDuHjHDcL+zqxU7Y/DzNo+GWixOgix/4rvzHu8AF4C0itIAEb4UA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(39860400002)(376002)(396003)(366004)(136003)(451199021)(2616005)(4744005)(2906002)(478600001)(186003)(36756003)(6486002)(71200400001)(38070700005)(6512007)(6506007)(41300700001)(53546011)(316002)(122000001)(38100700002)(31686004)(110136005)(4326008)(66476007)(66556008)(66446008)(66946007)(64756008)(76116006)(91956017)(86362001)(8676002)(8936002)(31696002)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?N2o0SXhNTllsU01wUVlUQUhPK2k0eDhVZTlnT1M2SktFNHlyWGNGZk5sck90?=
- =?utf-8?B?ekNXa2l0V2UySDNCMHUrNkpkMlhyaG5DUFEzVzA1WHJpVVp5b00zYXM0SFlu?=
- =?utf-8?B?ZGF0SnVwb0luRWNTbkFpVW5keTM0dzlPRnl2cFpkNU4rUlo0WlFaNWZkOWNo?=
- =?utf-8?B?cFVaVW5wNU1WRjE3eHNHdUlDUmY4aGNiWTk3R3djcmgvNTRDODRqSWo5Tm94?=
- =?utf-8?B?dzFyZCtzenZBbnVhQ1k0SEgwMHc3TUcrSDJrajVZRmlIYy83RUErS3ZtRHRH?=
- =?utf-8?B?M3hRMWR2b0N4TUdjaG45Y2tPaDd1WlRKL2hsYlBZb050TzBqRXppUE5JZUVn?=
- =?utf-8?B?U0hFYmY3TlJGMEJaelhVYkdLRFVBVnhaTVhDQURKbFEreVVQUnh4K3EzYzFN?=
- =?utf-8?B?MEJPd0NTZURkcm1WcE9lMW9rSGMwSFVXRG1jSkJ0YXdBOHUvb2JweUlUVmNQ?=
- =?utf-8?B?M0MyVjFsVUdaNFVibXFVTm9XbUR3dXdFNzZ4Z0FkdVBvTjBrMlFXejN2UE5Z?=
- =?utf-8?B?ZUg3SUJtNGNmVjdCbndRZDlubG1tdHo1TzBYa04yYnNyQVh5U2NLT0tvUTBI?=
- =?utf-8?B?cDVTYzFweTY1bjB6QnpwS004cFM0dUhkRUNqWlpadmt5OEp1cXRmbmQ5dDE2?=
- =?utf-8?B?b1lhQks4N0lpQjUwczg1bzJDMldBNTdpYzBBYk9WSENKdi9VSDF6Yi9rOUI3?=
- =?utf-8?B?WXpvMmNpYjl3TkszWnRHMkdrVXZtRXFxT2VDa0REV254Vm1uTzF2M0x4S1VW?=
- =?utf-8?B?M2NXMUE1cThGQ0JPcnFLQzAvVmxQZ0VlaEtPZE1ZdEQ1aEtjd2x3WkFwQ0RX?=
- =?utf-8?B?M3czckxkNlYyUW5tVmRQOUI2VEM4elhkcXFxYk9Ccmkwc2FianF1WGtWb09k?=
- =?utf-8?B?dnlPdDFLdUlZeElwTXZER3p0dVFQSDUwaEhTRmQ5YkFXV3hRNmNxNmwrdXhH?=
- =?utf-8?B?LzRRWE5CTndnY2ZBeTF6cHNnOHdRU1ViditFWnloRFc4V0pkeWFPcUZLdFRF?=
- =?utf-8?B?QmFnYkgzMmE2MURuaEJQZlU5TmgzRjFYU2hIQU4wTGZaQ1MyNWw3ay8vVTZT?=
- =?utf-8?B?cUU0RmVwdWZQVGVMNGIvYVN6SGFPanZMRUpzaFNaVFR6VnF2azlIS2lqS2Yw?=
- =?utf-8?B?Mm1kdThKRlBQaVlWVWQvdWkvR3cyanVhY2VQTGV1TjMydWhFRjhSaEpYK1ZX?=
- =?utf-8?B?aHZEeXFJTEFPYmdrWnBOMTU3ekRwcGJINlRvVU50TmM4Unh2K2tZVHdqdkV4?=
- =?utf-8?B?VHZwQjZZU0lwNFVsWWVGdFVyRzU5aGlLUmlDV2prd3pKY1pZWmFiTENWd1k3?=
- =?utf-8?B?QVlESDNTU1ptWTd2TE9PMjZZU0NURXc5VmVOZHZjUW1DUGh2ZlNkZXJEbC9L?=
- =?utf-8?B?SXBTSUtlVlIzL0MrOWZmNjUwajk2TG8vcFNjZENqUkZoZ0hOSDBtOGtJWHE2?=
- =?utf-8?B?dEVIeG9wTDRJcyszcDZrOCtjU3JVb3RTajZ4Yi84TURxSitadkYwSjFyYno5?=
- =?utf-8?B?RjRqUnRrMzNHU0lzT0l4TUREOFB5RTNrUHoxdmwvLzhaYWNEd3FaVFFOMzZp?=
- =?utf-8?B?QjRPMjVtdVRaUHIrVkszbmx6NEI3UUU3empoaTVOUE1GKythSzM1STYvNWVI?=
- =?utf-8?B?YmtmblVjUkZ1UTRUejR0MTFLRjB5dHYxYlA2bkd1cW1JQ2NQcFhHZTFVNEZj?=
- =?utf-8?B?MHMwQ3hqcXBEb05QaGZYMzIvRmFQOE56VWJVT3FmRmJySkJYSGV5cUgvaU8x?=
- =?utf-8?B?MVMrd2pXN0J1R3gxWURnSXBHakd3bm1yUWVia2l3ZVJQc04yZFQ2bmUwL2ZU?=
- =?utf-8?B?a3N6MzFoUWNwZDIrTm1FOU5ZU1QyUFYwc3c5TkRZM0txajc0bE9nbTdrVzV0?=
- =?utf-8?B?VHg5RGhkT1kwb01UTnZXUHRNWGVOdUdHbHNCQ1ZOdFFNdk5MUTZsam01RFpP?=
- =?utf-8?B?VWlhNFc1TDJHVlBaWVdhbTQzc1hTejNNTk5MOGFKOG5uUmJORGhBSmxvOXRJ?=
- =?utf-8?B?aExKZUFZWFFYc1NZVjlOMEZIZlFQWnlzckg5eURvaUxneU9PQ1RBODVEb29n?=
- =?utf-8?B?K3NiYVZvdGJxUTNwRU9aTHRyS0czQk5DUzVhTnJ3MDRLeHpPc0U5WkVQS3hn?=
- =?utf-8?B?RzFnOXp1YWsvdDlvOTBGZWlwUmhvWGU5SE10RnlzNXUyVDl0ZmUxMGdXazJI?=
- =?utf-8?Q?15c4ellU1q0/xmjylV0nIfqrxi0MB0qrKUD/HXJFeSP3?=
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
+Date:   Wed, 10 May 2023 17:44:07 +0900
+X-CMS-MailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
+Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
-Content-ID: <16371DC0EFDA39488B51B778229B33F8@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64fc08a3-f19b-43a2-9ec1-08db512c94f1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 May 2023 08:00:12.1821
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9bYHwAlMGrIoCQu+Jx5v0FOIGBsdLsgnAI/I2yyDiGAV69/XMHzGP8EZyTRFVRxnZSnx4lxLtF0PPgwpzTxumA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6899
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrNJsWRmVeSWpSXmKPExsWy7bCmuW5EZHSKwc2bzBar7/azWbw8pGmx
+        cvVRJove/q1sFotubGOy+Nt1j8li0qFrjBZPr85isth7S9vi8q45bBbLj/9jslj3+j2Lxe8f
+        c9gceD3O39vI4rF5hZbH5bOlHptWdbJ5TFh0gNFj980GNo/e5ndsHh+f3mLx6NuyitHj8yY5
+        j/YD3UwB3FHZNhmpiSmpRQqpecn5KZl56bZK3sHxzvGmZgaGuoaWFuZKCnmJuam2Si4+Abpu
+        mTlA5ysplCXmlAKFAhKLi5X07WyK8ktLUhUy8otLbJVSC1JyCswL9IoTc4tL89L18lJLrAwN
+        DIxMgQoTsjMW/HzOUtAoV3Fu0zvGBsaz4l2MnBwSAiYS3Ud2s3YxcnEICexglJi96xBjFyMH
+        B6+AoMTfHcIgNcICPhJ/9q1lA7GFBJQkzq2ZBVYiLGAgcavXHCTMJqAn8XPJDDaQMSICvSwS
+        d06fZ4GYzysxo/0plC0tsX35VkYIW0Pix7JeZghbVOLm6rfsMPb7Y/OhakQkWu+dhaoRlHjw
+        czdUXFLi0KGvbCA3SAjkS2w4EAgRrpF4u/wAVIm+xLWOjWBreQV8JQ7//Q42nkVAVeLo9tlQ
+        I10kvk39BmYzC8hLbH87hxlkJLOApsT6XfoQ05Uljtxigajgk+g4/Jcd5qmGjb+xsnfMe8IE
+        0aomsajJCCIsI/H18HyoEg+J93dWMk1gVJyFCOVZSE6YhXDCAkbmVYxiqQXFuempxUYFJvCI
+        Tc7P3cQITsVaHjsYZ7/9oHeIkYmD8RCjBAezkgivd2hUihBvSmJlVWpRfnxRaU5q8SFGU6Dn
+        JzJLiSbnA7NBXkm8oYmlgYmZmaG5kamBuZI478cO5RQhgfTEktTs1NSC1CKYPiYOTqkGpvXz
+        Axjzl50UnHCu///1K7UGX7wa9/O8qt40YdH1CWaMcXcOZzyNFFr2xbjambXpBVO+0nrvHr7q
+        nW0br1j9nOU09+iZ3zGyEVO7Ur8tcU1+rT/lYBFfWqHUppf/DRyYX2kfTZE+PKO/2iqadaWM
+        hK2D8Ry+x4vfJlseyOKWX189L2rOgu8Cb+c3sh2/HvrZZyprOoPjBS09K1uFXxGHTZ/fW+rk
+        fya1Z2HDfiPFZvnt/ubxz1o3PRLoyVF1q3e9yqMotezeJ+mnHMZf7a89n3h7h0/gjH8ln+eX
+        273P32F65YdsgtLajXeXravxrmDnmCffzXLL8FltT0Gy29P1F+pbQx4rPH2zpSdV5YvpBiWW
+        4oxEQy3mouJEAEBWb41OBAAA
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
+References: <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNS8xMC8yMyAwMDo1NSwgWGlhbyBZYW5nIChGdWppdHN1KSB3cm90ZToNCj4gT24gMjAyMy81
-LzEwIDE1OjM1LCBDaGFpdGFueWEgS3Vsa2Fybmkgd3JvdGU6DQo+PiB3ZSBtaWdodCByZW1vdmUg
-bnZtZW9mLW1wLCBzbyBub3Qgc3VyZSBpZiB0aGF0IHBhcnQgaXMNCj4+IG5lZWRlZCwgbGV0J3Mg
-d2FpdCBmb3Igb3RoZXJzIHRvIHJlcGx5IC4uDQo+IEhpIENLLA0KPg0KPiBUaGFua3MgZm9yIHlv
-dXIgZmVlZGJhY2suDQo+IENvdWxkIHlvdSB0ZWxsIG1lIHdoeSBudm1lb2YtbXAgd2lsbCBiZSBy
-ZW1vdmVkPyBJcyB0aGVyZSBhbnkgVVJMIGFib3V0DQo+IHRoZSBkZWNpc2lvbj8NCj4NCj4gQmVz
-dCBSZWdhcmRzLA0KPiBYaWFvIFlhbmcNCg0KV2UgdGFsa2VkIGFib3V0IHRoaXMgaW4gdGhlIExT
-Rk1NLCBJIGhvcGUgdG8gc2VlIGx3biBhcnRpY2xlIGNvdmVyaW5nDQpibGt0ZXN0cyBzZXNzaW9u
-IC4uDQoNCi1jaw0KDQoNCg==
+In the case of NVMe, it has an integrity payload consisting of one segment.
+So, rather than configuring SG_LIST, it was changed by direct DMA mapping.
+
+The page-merge is not performed for the struct bio_vec when creating 
+a integrity payload in block.
+As a result, when creating an integrity paylaod beyond one page, each 
+struct bio_vec is generated, and its bv_len does not exceed the PAGESIZE.
+
+To solve it, bio_integrity_add_page() should just add to the existing 
+bvec, similar to bio_add_page() and friends. 
+As the bip configuration changed, the code related to sg_list was
+also modified.
+
+(ref: https://lore.kernel.org/linux-nvme/yq18rewbmay.fsf@ca-mkp.ca.oracle.com/T/#t)
+
+
+Tested like this:
+
+- Format (support pi)
+$ sudo nvme format /dev/nvme2n1 --force -n 1 -i 1 -p 0 -m 0 -l 1 -r
+
+- Run FIO
+[global]
+ioengine=libaio
+group_reporting
+
+[job]
+bs=512k
+iodepth=256
+rw=write
+numjobs=8
+direct=1
+runtime=10s
+filename=/dev/nvme2n1
+
+- Result
+...
+[   93.496218] nvme2n1: I/O Cmd(0x1) @ LBA 62464, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.496227] protection error, dev nvme2n1, sector 62464 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.538788] nvme2n1: I/O Cmd(0x1) @ LBA 6144, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.538798] protection error, dev nvme2n1, sector 6144 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.566231] nvme2n1: I/O Cmd(0x1) @ LBA 124928, 1024 blocks, I/O Error (sct 0x0 / sc 0x4)
+[   93.566241] I/O error, dev nvme2n1, sector 124928 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.694147] nvme2n1: I/O Cmd(0x1) @ LBA 64512, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.694155] protection error, dev nvme2n1, sector 64512 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+[   93.694299] nvme2n1: I/O Cmd(0x1) @ LBA 5120, 1024 blocks, I/O Error (sct 0x2 / sc 0x82) MORE
+[   93.694305] protection error, dev nvme2n1, sector 5120 op 0x1:(WRITE) flags 0x18800 phys_seg 3 prio class 2
+...
+
+
+Changes to v1:
+- Add tag to fix patches 
+- Unification of the page merge process of data and integrity
+- Solve the build failure when CONFIG_BLK_DEV_INTEGRITY is disabled
+
+
+Jinyoung Choi (14):
+  block: bio: separation to reuse a part of the function
+  block: bio-integrity: modify bio_integrity_add_page()
+  block: bio-integiry: cleanup bio_integrity_prep
+  block: fix not to apply bip information in blk_rq_bio_prep()
+  block: blk-merge: fix to add the number of integrity segments to the
+    request twice
+  block: blk-merge: fix merging two requests in ll_merge_requests_fn
+  block: add helper function to get the number of integrity segments
+  scsi: add scsi_alloc_integrity_sgtables() for integrity process
+  scsi: change to use blk_rq_nr_integrity_segments() instead of
+    blk_rq_count_integrity_sg()
+  block: blk-integrity: change how to find the number of integrity of
+    bio
+  nvme: rdma: change how to find the number of integrity of request
+  block: add helper function for iteration of bip's bvec
+  block: blk-integrity: change sg-table configuration method for
+    integrity
+  block: blk-integrity: remove blk_rq_count_integrity_sg()
+
+ block/bio-integrity.c         |  73 +++++++++++++------
+ block/bio.c                   |  87 ++++++++++++++--------
+ block/blk-integrity.c         | 132 +++++++++-------------------------
+ block/blk-merge.c             |  68 ++++++++++++++++--
+ block/blk.h                   |  20 ++++++
+ drivers/nvme/host/rdma.c      |   2 +-
+ drivers/scsi/scsi_lib.c       |  67 ++++++++---------
+ include/linux/bio.h           |   4 ++
+ include/linux/blk-integrity.h |  10 ++-
+ include/linux/blk-mq.h        |   5 ++
+ include/linux/bvec.h          |   6 ++
+ 11 files changed, 284 insertions(+), 190 deletions(-)
+
+-- 
+2.34.1
