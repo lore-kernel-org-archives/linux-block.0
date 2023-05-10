@@ -2,112 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9D0C7EE23
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 03:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D32C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 03:27:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235734AbjEJDWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 23:22:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60576 "EHLO
+        id S235623AbjEJD1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 23:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235502AbjEJDWB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 23:22:01 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C672B3C27;
-        Tue,  9 May 2023 20:20:53 -0700 (PDT)
+        with ESMTP id S235634AbjEJD1E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 23:27:04 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BB110EC;
+        Tue,  9 May 2023 20:24:59 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QGKzh2xb6z4f3jMc;
-        Wed, 10 May 2023 11:20:48 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QGL4Q56JCz4f3l8M;
+        Wed, 10 May 2023 11:24:54 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgBH9CGODVtkcqmYIQ--.28977S3;
-        Wed, 10 May 2023 11:20:48 +0800 (CST)
-Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address:
- 0000000000000048
-To:     Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai1@huaweicloud.com>,
-        Guangwu Zhang <guazhang@redhat.com>,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, Ming Lei <ming.lei@redhat.com>,
-        Jan Kara <jack@suse.cz>,
-        Paolo Valente <paolo.valente@linaro.org>,
+        by APP3 (Coremail) with SMTP id _Ch0CgBH9CGHDltkLdqYIQ--.29139S3;
+        Wed, 10 May 2023 11:24:56 +0800 (CST)
+Subject: Re: Situation of CONFIG_BLK_WBT_MQ after commit b11d31ae01e6
+ ("blk-wbt: remove unnecessary check in wbt_enable_default()")
+To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "yukuai (C)" <yukuai3@huawei.com>
-References: <CAGS2=YosaYaUTEMU3uaf+y=8MqSrhL7sYsJn8EwbaM=76p_4Qg@mail.gmail.com>
- <ecb54b0d-a90e-a2c9-dfe5-f5cec70be928@huaweicloud.com>
- <cde5d326-4dcb-5b9c-9d58-fb1ef4b7f7a8@huaweicloud.com>
- <007af59f-4f4c-f779-a1b6-aaa81ff640b3@huaweicloud.com>
- <1155743b-2073-b778-1ec5-906300e0570a@kernel.dk>
+References: <CAKXUXMzfKq_J9nKHGyr5P5rvUETY4B-fxoQD4sO+NYjFOfVtZA@mail.gmail.com>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <7def2fca-c854-f88e-3a77-98a999f7b120@huaweicloud.com>
-Date:   Wed, 10 May 2023 11:20:46 +0800
+Message-ID: <8a86ba08-cde4-97a4-d7e2-dc340609381c@huaweicloud.com>
+Date:   Wed, 10 May 2023 11:24:55 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1155743b-2073-b778-1ec5-906300e0570a@kernel.dk>
+In-Reply-To: <CAKXUXMzfKq_J9nKHGyr5P5rvUETY4B-fxoQD4sO+NYjFOfVtZA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgBH9CGODVtkcqmYIQ--.28977S3
-X-Coremail-Antispam: 1UD129KBjvJXoWrury8WFWDGr4UWr48tryrWFg_yoW8Jryxpr
-        Z29a9xKrs5Jr18tw18Kw1UZw1FvrZ8uF1agr1UJ34UZr95trnFv3s3XanF9rZrKw40kF4j
-        kw45tFZ3t34kA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-TRANSID: _Ch0CgBH9CGHDltkLdqYIQ--.29139S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF1fAr1rAF4fWryDCFyrXrb_yoW8Crykp3
+        4UJr17t3WvgFs7Kr4xZ34UKayFyFZ7K347Gryruw1UXrn8Aw4xZr4F9F1avFyqvr4vqw43
+        t3ySqr9akry5Za7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUbPEf5UUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
+Hi,
 
-在 2023/05/10 10:17, Jens Axboe 写道:
-> On 5/9/23 8:00?PM, Yu Kuai wrote:
->> Hi,
->>
->> ? 2023/05/10 9:49, Yu Kuai ??:
->>> Hi,
->>>
->>> ? 2023/05/10 9:29, Yu Kuai ??:
->>>> Hi,
->>>>
->>>> ? 2023/05/10 8:49, Guangwu Zhang ??:
->>>>> Hi,
->>>>>
->>>>> We found this kernel NULL pointer issue with latest
->>>>> linux-block/for-next, please check it.
->>>>>
->>>>> Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
->>>>>
->>>>>
->>>>> [  112.483804] BUG: kernel NULL pointer dereference, address: 0000000000000048
->>>
->>> Base on this offset, 0x48 match bio->bi_blkg, so I guess this is because
->>> bio is NULL, so the problem is that passthrough request insert into
->>> elevator.
->>>
->> Sorry that attached patch has some problem, please try this one.
+在 2023/05/08 12:37, Lukas Bulwahn 写道:
+> Dear Yu Kuai, dear Christoph, dear Jens,
 > 
-> Let's please fix this in bfq, this isn't a core issue and it's not a
-> good idea to work around it there.
 > 
+> The commit b11d31ae01e6 ("blk-wbt: remove unnecessary check in
+> wbt_enable_default()") removes the only reference to the config
+> BLK_WBT_MQ in the kernel tree.
+> 
+> The commit comes with the statement "If CONFIG_BLK_WBT_MQ is disabled,
+> wbt_init() won't do anything.". The statement "If CONFIG_BLK_WBT is
+> disabled, wbt_init() won't do anything." (note: CONFIG_BLK_WBT vs.
+> CONFIG_BLK_WBT_MQ) is certainly true, but I do not see that "If
+> CONFIG_BLK_WBT_MQ is disabled, wbt_init() won't do anything.", but I
+> believe it would simply do what wbt_init() does with CONFIG_BLK_WBT
+> being enabled.
+> 
+> Now, it seems that with this commit applied, the intended switch of
+> the config BLK_WBT_MQ is gone, and the config really now has no effect
+> at all.
+> 
+> So, I am a bit puzzled:
+> 
+> 1. Either the config BLK_WBT_MQ does have an effect somewhere, but one
+> cannot find its reference with 'git grep -i "BLK_WBT_MQ" .' --- so, my
+> investigation is just incomplete or wrong, or
+> 
+> 2. We really do not need this further build config BLK_WBT_MQ beyond
+> the other configs already there --- then this config should just be
+> removed, or
+> 
+> 3. the commit unintentionally broke the purpose of the config
+> BLK_WBT_MQ --- then this commit above should be reverted.
 
-I can do that, but I'm not sure because it seems passthrough rq is not
-supposed to insert into elevator.
+Thanks for the report, it's the above case and it's my mistake.
+I will fix this.
 
-Bfq always expect that bio is not NULL, and before this commit
-a327c341dc65 ("blk-mq: fix passthrough plugging"), passthrough rq can
-never insert into plug, and therefor passthrough rq can never insert
-into elevator.
-
-Thanks,
 Kuai
-
+> 
+> I would be happy if you could provide some guidance on what is the
+> situation with config BLK_WBT_MQ.
+> 
+> Currently, I am guessing it is option 2 and the config BLK_WBT_MQ
+> simply can be deleted, but I am really unsure. Probably, this build
+> option is not used by many people and its effect is hardly noticed, if
+> one does not specifically check for that in the running system.
+> 
+> 
+> Best regards,
+> 
+> Lukas
+> .
+> 
 
