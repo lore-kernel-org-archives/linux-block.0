@@ -2,117 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A59C77B75
-	for <linux-block@archiver.kernel.org>; Tue,  9 May 2023 22:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 541F9C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 00:49:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235609AbjEIWUH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 May 2023 18:20:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58108 "EHLO
+        id S234876AbjEJAs7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 May 2023 20:48:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235302AbjEIWUF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 18:20:05 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87183B3
-        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 15:20:02 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1ab0c697c84so49496465ad.3
-        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 15:20:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1683670802; x=1686262802;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lpFfG6C/woeEh3xAVWVSW4QDIRY2LcuRr67NeZrYhZk=;
-        b=x4wnhtf2e/5Ls0/pD9obIHjGGbGyC2TZ1yPp9j0M0gpWdvOKZY1vS0QUNfd3huTH3X
-         D1WBE2UUfwRm6IRjV7rztd+1U8bjj+OJ6HetiHxsseo0wxuA7Mmu9FI4AuEL7mHRw0T7
-         dYG/Ha1X6UyzBTojilPQeX5BBtQ/lwjbh952fhmGyoUxngQ/oumQjwc/7o4xGP/MmBf3
-         6Vr7dzf4w5c34jwu0r1wN0a7NQ23j/p4A1KmmPehy4jqOvVU/3HATmsL8oo6QBnkazn6
-         yRJtVSs+2vsQYPQs7TNtruZyFSrbUHe0bj8dK2YJlondW5w3OfJytTXrkk9VzdaUKLiq
-         ltVw==
+        with ESMTP id S229741AbjEJAs6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 May 2023 20:48:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EDF240CA
+        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 17:48:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683679692;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=DpVMeblzWLLNSO+KpVvlFMBDTVbc6pLPgEIf+DHTaPE=;
+        b=RfvVmmDhshd72mPWBmxIW9T5nW0DPlgGS3Fyj+VPIM7ClbjAUCwtwkKHmks6pyhE0cybQS
+        oSD3uXSRSBRAH2vjSOfM0eRHRb93+yRBc/Mk57nUeKqsfirSvcmh39gHG+UEznM9IZOy2w
+        02cYkdOj1+tgWyjAmvdKku6jir3lemY=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-198-YwBE15QaN8ecfmDGA2fBkA-1; Tue, 09 May 2023 20:48:11 -0400
+X-MC-Unique: YwBE15QaN8ecfmDGA2fBkA-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-24e0d569a01so3579155a91.2
+        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 17:48:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683670802; x=1686262802;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lpFfG6C/woeEh3xAVWVSW4QDIRY2LcuRr67NeZrYhZk=;
-        b=YNWbmz20QVt3CODJbHhyteud6DPOqld09ArjaQ/HL7rWBqi/mpdEimUZ8B8JoRQFLL
-         8uUfZWBcL64JUUix9c8It00dYz4Y9MJg/tN5i8nT/9wgryU+LlhTU4XRARulra1Vco3g
-         PE/cgltPRUCB8CqjUMhGgeyWbFh+/AEqcSOvGVknpdvhIlPpX4fqxqPFpHWp6cxtNjRT
-         PLDMvbH7qasJoHGZK3rWJ5LpEhWdBrEZ69dwL1eUIROkmah1L98U0QFU6cVUo9kP4EYZ
-         19EmBA+2YnsNUhjml/InpIInzVHoBDuQwUA3u148seTzXwuvvB0m0JyY2eFi2PDFGTdN
-         e8dQ==
-X-Gm-Message-State: AC+VfDzaHiEaXdOS8qslpMOngdLP/CllxYHL9x21Fa2ll5SB2Ty3fKsf
-        0N21jyAFQ1rdAzcxuWwkrRB22f7HdJKu8PAoeMU=
-X-Google-Smtp-Source: ACHHUZ45kM8YGiof/dP3yzhXFIIdPd9DEDG9hSY5vXQotAlNRS3qz0nIW+ex68IDbiRDaO4ei/A3bg==
-X-Received: by 2002:a17:902:d504:b0:1a9:98ae:5970 with SMTP id b4-20020a170902d50400b001a998ae5970mr20929374plg.23.1683670802017;
-        Tue, 09 May 2023 15:20:02 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-88-204.pa.nsw.optusnet.com.au. [49.181.88.204])
-        by smtp.gmail.com with ESMTPSA id r9-20020a17090a690900b0024e06a71ef5sm12045144pjj.56.2023.05.09.15.20.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 15:20:01 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1pwVgc-00DNjc-Ew; Wed, 10 May 2023 08:19:58 +1000
-Date:   Wed, 10 May 2023 08:19:58 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 5/9] block: introduce holder ops
-Message-ID: <20230509221958.GV3223426@dread.disaster.area>
-References: <20230505175132.2236632-1-hch@lst.de>
- <20230505175132.2236632-6-hch@lst.de>
- <20230505185119.GI15394@frogsfrogsfrogs>
- <20230509133501.GD841@lst.de>
+        d=1e100.net; s=20221208; t=1683679690; x=1686271690;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DpVMeblzWLLNSO+KpVvlFMBDTVbc6pLPgEIf+DHTaPE=;
+        b=geNWDiAEpsqyrXqnTg20h2fJisa7u81xteulO9pul3iztTVxJsGp7b9EeIZjXFgMso
+         biIplHIxjag5mhmWZL9i4QUTrk5VdB+vI+Uqjy2XlyrgZqg7gVxUI9p/wsMM+buyBTtl
+         PyuA5GFGUH8E1DnhVQq72EGKSxtEauCJ8/FrWsxgXl+JHCtkyHoeTqhTrP7Q8oPcQGWL
+         k6CGiodDlnt0fL8U/we50KjBTGPSTo2U6jItroviQEkAZdulA5k53a0R5tphqPSkX1TX
+         94qlWf7SEdubMY12jXCazzZvuxf6PxvWOjj16HRb+UnWr6Ox2/QwAyhmhki4UU8X3E0I
+         1MKg==
+X-Gm-Message-State: AC+VfDxlrbiEwNS0T9ARhPSh8LNi7HYbKJNRztNuBsM/AWZ8j43l7dJ7
+        Moa0aL6ZoSvXXkqscjhCxpuMeimrLOzXH9BeRrRzL190n+PypTnak//PryLcWS7I60kR5bn4BDd
+        dVDTUSJYYkVI93QqKiseUM/JEmc6+NqYaO56p6uEqne7tLNVwnN8y
+X-Received: by 2002:a17:90a:a681:b0:23f:582d:f45f with SMTP id d1-20020a17090aa68100b0023f582df45fmr15486707pjq.1.1683679689837;
+        Tue, 09 May 2023 17:48:09 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ561Owgx5sEPjjOJq4ynZWpS6299R2MFKmfzOgmFOfGCK72En1Y6azFAWthRxybFxkzHwPBXKBTya4dSePxr3Y=
+X-Received: by 2002:a17:90a:a681:b0:23f:582d:f45f with SMTP id
+ d1-20020a17090aa68100b0023f582df45fmr15486694pjq.1.1683679689490; Tue, 09 May
+ 2023 17:48:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230509133501.GD841@lst.de>
+From:   Guangwu Zhang <guazhang@redhat.com>
+Date:   Wed, 10 May 2023 08:49:15 +0800
+Message-ID: <CAGS2=YosaYaUTEMU3uaf+y=8MqSrhL7sYsJn8EwbaM=76p_4Qg@mail.gmail.com>
+Subject: [bug report] BUG: kernel NULL pointer dereference, address: 0000000000000048
+To:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 09, 2023 at 03:35:01PM +0200, Christoph Hellwig wrote:
-> On Fri, May 05, 2023 at 11:51:19AM -0700, Darrick J. Wong wrote:
-> > Fun question: What happens when the swap disk falls off the bus?
-> 
-> Your system is toast.
-> 
-> > > -	if (IS_ERR(blkdev_get_by_dev(bdev->bd_dev, mode | FMODE_EXCL, &bdev)))
-> > > +	if (IS_ERR(blkdev_get_by_dev(bdev->bd_dev, mode | FMODE_EXCL, &bdev,
-> > > +			NULL)))
-> > >  		return -EBUSY;
-> > >  	ret = set_blocksize(bdev, n);
-> > >  	blkdev_put(bdev, mode | FMODE_EXCL);
-> > 
-> > Somewhat related question: Should we allow userspace to initiate a fs
-> > shutdown through the block device?  Let's say you're preparing to yank
-> > /dev/sda and want to kill anything attached to it or its partitions?
-> > Without having to walk through however many mount namespaces there are
-> > to find the mountpoints?
-> 
-> That's kinda what we're doing here.  Or do you mean even more advanced
-> notice by having another callout before stopping I/O so that we could
-> write out all log buffers?  It's probably doable, but I'm not convinced
-> that this use case is worth maintaining and testing the kernel code for
-> it.
+Hi,
 
-The userspace shutdown code already does this by default - it
-actually calls freeze_bdev() to cause the filesystem to be made
-consistent on the block device before it executes the shutdown.
-So, in effect, we already have the "shutdown before turning off
-block device" paths in the filesystems and extremely well tested.
+We found this kernel NULL pointer issue with latest
+linux-block/for-next, please check it.
 
-Indeed, if the device is being removed, why not call freeze_bdev()
-before doing anything else? It guarantees that applications will be
-quiesced and the filesystem will stabilise and not try to change
-anything until the shutdown occurs when the device is pulled...
+Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
 
-Cheers,
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+[  112.483804] BUG: kernel NULL pointer dereference, address: 0000000000000048
+[  112.490809] #PF: supervisor read access in kernel mode
+[  112.495976] #PF: error_code(0x0000) - not-present page
+[  112.501141] PGD 800000044d20c067 P4D 800000044d20c067 PUD 4734d5067 PMD 0
+[  112.508057] Oops: 0000 [#1] PREEMPT SMP PTI
+[  112.512265] CPU: 24 PID: 7767 Comm: user-data Kdump: loaded Not
+tainted 6.4.0-rc1+ #1
+[  112.520141] Hardware name: HPE ProLiant DL380 Gen10/ProLiant DL380
+Gen10, BIOS U30 06/20/2018
+[  112.528713] RIP: 0010:bfq_bio_bfqg+0x8/0x80
+[  112.532925] Code: 6b 70 48 89 43 60 5b 5d c3 cc cc cc cc 0f 1f 44
+00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00
+41 54 53 <48> 8b 46 48 48 89 fb 48 89 f7 48 85 c0 74 26 48 63 15 72 40
+6b 01
+[  112.551805] RSP: 0018:ffffaed687ef3b30 EFLAGS: 00010096
+[  112.557058] RAX: ffff9a90f2600000 RBX: ffff9a90f2600000 RCX: 0000000000000001
+[  112.564232] RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffff9a90f2600000
+[  112.571408] RBP: ffff9a90c508d500 R08: ffff9a90e2b8a688 R09: ffff9a90e2b8a688
+[  112.578581] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+[  112.585756] R13: ffff9a90c508d500 R14: 0000000000000000 R15: 0000000000000000
+[  112.592930] FS:  00007fe41b0f0880(0000) GS:ffff9a94afc00000(0000)
+knlGS:0000000000000000
+[  112.601065] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  112.606842] CR2: 0000000000000048 CR3: 000000046346e005 CR4: 00000000007706e0
+[  112.614016] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[  112.621189] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[  112.628362] PKRU: 55555554
+[  112.631082] Call Trace:
+[  112.633539]  <TASK>
+[  112.635650]  bfq_bic_update_cgroup+0x2c/0x240
+[  112.640033]  bfq_init_rq+0xdd/0x670
+[  112.643545]  ? blk_rq_map_user_iov+0xc5/0x2f0
+[  112.647931]  bfq_insert_request.isra.0+0x5d/0x250
+[  112.652663]  bfq_insert_requests+0x59/0x80
+[  112.656782]  blk_mq_flush_plug_list+0x172/0x570
+[  112.661342]  blk_add_rq_to_plug+0x45/0x150
+[  112.665462]  nvme_uring_cmd_io+0x242/0x390 [nvme_core]
+[  112.670652]  io_uring_cmd+0x95/0x120
+[  112.674250]  io_issue_sqe+0x199/0x3d0
+[  112.677932]  io_submit_sqes+0x119/0x3d0
+[  112.681788]  __do_sys_io_uring_enter+0x2c2/0x470
+[  112.686433]  do_syscall_64+0x59/0x90
+[  112.690031]  ? exc_page_fault+0x65/0x150
+[  112.693977]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[  112.699057] RIP: 0033:0x7fe41ae3ee5d
+[  112.702651] Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e
+fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24
+08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 93 af 1b 00 f7 d8 64 89
+01 48
+[  112.721530] RSP: 002b:00007ffc6fdebc28 EFLAGS: 00000206 ORIG_RAX:
+00000000000001aa
+[  112.729143] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fe41ae3ee5d
+[  112.736317] RDX: 0000000000000001 RSI: 0000000000000080 RDI: 0000000000000005
+[  112.743492] RBP: 00007ffc6fdec730 R08: 0000000000000000 R09: 0000000000000080
+[  112.750666] R10: 0000000000000001 R11: 0000000000000206 R12: 00007ffc6fdec848
+[  112.757841] R13: 0000000000401346 R14: 0000000000403de8 R15: 00007fe41b32c000
+[  112.765019]  </TASK>
+
