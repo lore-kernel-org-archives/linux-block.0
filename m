@@ -2,165 +2,118 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA46AC77B7D
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 05:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B04AC77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 05:41:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbjEJFVp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 01:21:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35168 "EHLO
+        id S235709AbjEJFlJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 01:41:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjEJFVo (ORCPT
+        with ESMTP id S235873AbjEJFlH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 01:21:44 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D842716;
-        Tue,  9 May 2023 22:21:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1683696099; x=1715232099;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=YCjEIZ00O0zpTCBguK7sESmEcUkiAfMFQ6A1i/nNrfg=;
-  b=SzBJU26WEl2AaBDH7OdtVfcxUfvTwWm1AllCCPgK8t7CO90yO4KLpcv2
-   eW4O9Y5phiWTp7ptMviXNxc/cMhy8jrjVL9m+752SU7Iz47LY3ByDn0Qm
-   Rd1/OrlCx2Wqyv8v+gvhmtKZewQ8vpv565m9jefv5vcB0+7Mp22Yqq7zt
-   K0YXnsYKwdRsf+A7ncrjbzD5NmgEEwS2j/ajuypXf78040wlO//AQTSLN
-   ZSoaQMJZNtyfmbXKUAI8DG2rI0Tm+EmDmRpWrq5VeH1twCqJZ2yl3hzwi
-   yHlbXrZC2trMlemDtu7ldrIcxMfEp0du3O8RNLjtSDdDskI8x0Chf+7gx
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.99,263,1677513600"; 
-   d="scan'208";a="235298589"
-Received: from mail-bn8nam11lp2168.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.168])
-  by ob1.hgst.iphmx.com with ESMTP; 10 May 2023 13:21:37 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fezFTNn1K6DrsPUbMeI2nwizEiQgBnBZ+PmU1qBXHTnLiNAETYsly8pCGK3AiK7wfOV1RNd1kzaH4zlknvID360pTzL0CIKlk5IHXQjuQ3eX8VyJz0TSNQ9BjsihIDvFnlULJNjlg5Rf+p5wfLIAemeRxymM3ErGSU4ybgihWMyH7Lv0QrgQBWVLZFmQCG7rYf3TffvQzIBMf4jxNBXWpkjvfatJCBnGF+hTssbjK3OiG/JKTQkb3wUU6HJ58Y1Hgt3yo/4wwLLhfavW7TrVmMY+MPdRgQNnuNtaqCfrKTJ0I/gWfGHgVPiBl/vInscJh5G5MatIUOGQ8DVQRYwj+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YCjEIZ00O0zpTCBguK7sESmEcUkiAfMFQ6A1i/nNrfg=;
- b=ZUO441Rn3RJNWxFt9U4siQPQpPdRbDxH4WVAxVlF2sF4tvf9a1ScVN6JHtbVc3ED60ZPtZkaYDg8YhoWmYAwIXfupEj9PkH/SuGWwmRgfKi6sLPDKtM8T46eblEyDr9uRv6oypRbr3pfOEAfHvSiWvU0IE+0INHsGtL/yKfgAKwaJBb5F+JXZ3zC3GpaOjwcghiZaSZHZ9V5M8GP4epTQE+fM6izB0sidf1C6YxfnnKEFZCGWnKwfb19+Ti17F23AEwyxNR1/QaKtkdqMfYlCTIyULxCbfL5CtDVQQIX4u5oVqni0oidYz26lrcyYob7FTTTv42v9Djb7SQH1HlnTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Wed, 10 May 2023 01:41:07 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F9B2729;
+        Tue,  9 May 2023 22:41:00 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-50b8d2eed3dso10396645a12.0;
+        Tue, 09 May 2023 22:41:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YCjEIZ00O0zpTCBguK7sESmEcUkiAfMFQ6A1i/nNrfg=;
- b=fX9HDxjx4nS7gaIK6j7xAqLOjaLaVPL2dEXCuzAgJv3bEU6vuenyIApzX9AgQOpJKR1cg3xfcaPyqXHOwTAfR73t3WXoY/5UE/AEtplPyquL7nb8SVKKTcFBdZRGGuKkOanOxMlS3SNc+NsPsko+skIENhOVWWnjZNyz8GHLtyg=
-Received: from BL0PR04MB6564.namprd04.prod.outlook.com (2603:10b6:208:17d::11)
- by SN7PR04MB8768.namprd04.prod.outlook.com (2603:10b6:806:2e4::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.33; Wed, 10 May
- 2023 05:21:35 +0000
-Received: from BL0PR04MB6564.namprd04.prod.outlook.com
- ([fe80::d80a:f0c:f3ed:a5a7]) by BL0PR04MB6564.namprd04.prod.outlook.com
- ([fe80::d80a:f0c:f3ed:a5a7%3]) with mapi id 15.20.6363.033; Wed, 10 May 2023
- 05:21:35 +0000
-From:   Avri Altman <Avri.Altman@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ed Tsai <ed.tsai@mediatek.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "stanley.chu@mediatek.com" <stanley.chu@mediatek.com>,
-        "peter.wang@mediatek.com" <peter.wang@mediatek.com>,
-        "chun-hung.wu@mediatek.com" <chun-hung.wu@mediatek.com>,
-        "alice.chao@mediatek.com" <alice.chao@mediatek.com>,
-        "powen.kao@mediatek.com" <powen.kao@mediatek.com>,
-        "naomi.chu@mediatek.com" <naomi.chu@mediatek.com>,
-        "wsd_upstream@mediatek.com" <wsd_upstream@mediatek.com>
-Subject: RE: [PATCH 2/2] ufs: don't use the fair tag sharings
-Thread-Topic: [PATCH 2/2] ufs: don't use the fair tag sharings
-Thread-Index: AQHZgkMMEfz/mkmxPE2tTXnep9Miz69RlGFwgABlVACAACPsMIAABRyAgADUEGA=
-Date:   Wed, 10 May 2023 05:21:35 +0000
-Message-ID: <BL0PR04MB6564242D93EE6826CF1F6747FC779@BL0PR04MB6564.namprd04.prod.outlook.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <DM6PR04MB6575753742F933DE192E7325FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
- <dcfae203-005f-928b-37d6-7ee5bb4e2971@acm.org>
- <DM6PR04MB6575F344EF2D962103888A56FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
- <6192fa07-ec6f-0464-deb6-c3e9f69f6ebf@acm.org>
-In-Reply-To: <6192fa07-ec6f-0464-deb6-c3e9f69f6ebf@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR04MB6564:EE_|SN7PR04MB8768:EE_
-x-ms-office365-filtering-correlation-id: 62435ed2-0292-4e47-7edf-08db51166c5a
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: l6ngE7wA6OzkSSvOnL70j9ASfE4eaX41WokI08v6TlRx11AVij2xXHOKB5LnMWtCJ8EqBM/mK8K1fji+E8/8Jx21EjkY5fLzqbBCCdwh6OG2iQ//3GjZOQnIKGDYl6h/faljALG7gZMro5RCxyF2UI4iP/yXdSS03Tyqj82Jui0CgTQOQKlI9/d20kBxI5HD/SbijFPO10zSutASq4pWWTMstU9L3pyT7YjnD4k8KiKNg9aVFrd5E7Wta/9yKBgwTF4lZDm6fCTfnt8ceZftOzrfSgWp7/QtAJJoXgpk1aAG2LRX0OnxcCofsIMs7lRNu/F6/K5fTjfAQm4Hn4uXU/Rj9IasnuZ18qEfjplI0z9NcpMKLmD51ghf1FGJnlmW35QAgHvUl2BSenicNaDu2EYGBLQ/nsD2tBavoC0muIhn7d45+JjHLynCpi+TC2AZOkIOzrAwqlP1dsPhVpBsFRdfZhw3cbu3xx3Zu9S8WFpVBCMwiHfbeKQs9mHS7yAoDBEDD8Puwp2mScVeTBcExfkrsETZJsW+65OZphZEoa9cFLN4tJvsJNTRZfLQ23l2A+Tl6ZUp78NNY3/aKuR6jg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6564.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(396003)(39860400002)(376002)(366004)(451199021)(82960400001)(55016003)(122000001)(38100700002)(54906003)(33656002)(86362001)(38070700005)(7696005)(8936002)(52536014)(110136005)(8676002)(4326008)(76116006)(7416002)(966005)(5660300002)(66946007)(2906002)(9686003)(6506007)(53546011)(186003)(83380400001)(26005)(64756008)(316002)(66476007)(66446008)(41300700001)(66556008)(71200400001)(478600001)(4744005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Wmp0SmtSTkgyZzBxUjkrOEQ0NW1LLzVSamlTbUlGVE9vK085RThJUW9xc1Ez?=
- =?utf-8?B?ZTE0UUpSejdGRDhRYWxDc3Q3MkM4emtjQzZtTXM5TDJVcXMwNWczRnhLa0pH?=
- =?utf-8?B?MjU4d0lwamtJTk8zQUVtVXhTTXRERzl5cjFFREhOajllc3JVQWdUMTJhZXdo?=
- =?utf-8?B?MHppV3FZYmNMK3FsdXYxQXNWMDhZc3A5VXZFRkxpa1orRGl0L3F5Zmc1SUNT?=
- =?utf-8?B?V2lOQWV5bVNpMFoxZ1RIWU95RFVxOExNUmVWbGN2OExnMlgyN0JxN2pWZm9B?=
- =?utf-8?B?L1EyaUlkcFBIVUhlVEdQZnNvQy9HUjZIb0Nhb09vb2Jhd1pIOW5NYU80emVz?=
- =?utf-8?B?VElvTzJZOFNEYklSZVhoQzFhd1N1NmJFYzluVzd5Yi9zNWxIQWpCekhyTlVl?=
- =?utf-8?B?Qi9rVnVJSU1vcGdwcE5BNWZKaHYzTTN5ZEtJMktiYW9MUVNHOU1rVmI3NTV5?=
- =?utf-8?B?V3hwVnFDNGRneHp2QUNwNTQwR2I4Y2o3cW5xRzhVQXg2dGJKejFTYld3eHpF?=
- =?utf-8?B?Y3JDbDVLQUpNQ0VwQ0tFYWpPNXVKNWd0ZThFOFVrMjRFbUhYMFRlWVlXZzY3?=
- =?utf-8?B?NDJBdStZM3QwWG13ejBkUFZ5SHQxNHBmNmx0RGFUMkZoQzhoUEtpTk9ZaVI4?=
- =?utf-8?B?UWoxNnAvSTYwclI2MDFaMkNyeUx3cWlrdGFlZCs0eSttUml2M3JSV3ZzSk1v?=
- =?utf-8?B?cWF1RG5Nbm9jZGo0VlNhOWlGQm5kN0E5Q2psSkdsMGJKaHJBS3kyeXRzNEVI?=
- =?utf-8?B?Um45cFFKc3p0MlVEWHpTOHlOQ3BOQnZnWmVHc3MyQ3VkcysyZGNyMGdEMEpT?=
- =?utf-8?B?N0hjTlQ3K1B1amNHT293RUhwOUJOTnQ1STlWQkdlYVVlNjl1OU13YktSQW9V?=
- =?utf-8?B?OWdtWGloSS9ZeEJ1NkJxSVRCaDlyN2h4c1lnaEY1U2t4aC9EQWdIOGJYamUx?=
- =?utf-8?B?ZHJsajN5OXNXNmVkOCtOZ245T2JyMldCc1pBM1lDSHhMSFM2N25aV1hweEx4?=
- =?utf-8?B?cWJBbytJZGpXelRUZ2FyUmxlcWtEUEVTMkU2ZDFtYzdvbVdQSW5hR1REQi9Q?=
- =?utf-8?B?Z3FwTTFtOFhJS3Azd1lhRDRoWHk4UUFTOThDRTA3Z1RQa0NaUUZiOXFCS2gv?=
- =?utf-8?B?NisyaXNiWDgvbjZnaHc0RldKT0lldWlNSSt1a3ZTZ0tueE5QYkxmUHpHZHNT?=
- =?utf-8?B?RUpIeXZrOTEzbWZoaktjQWlwb2ZIUFpod201VjdBZlZOS0pvblNkWkQ1Tmxt?=
- =?utf-8?B?V0JaNFpWbS9SUGNpdzBHZjhXSkFnQ2dUS2I3a243djJ4aHVORndVRDFJdEpu?=
- =?utf-8?B?TXU2bWo3S2QrSjVOeTJ6bHRhNzRWWFlEMlJUTjgwSGVWR2tNeVYwVXhHakRK?=
- =?utf-8?B?L1pkc0hUWUYzNDF1VlczeEtpQTZqVy9uT21uRGp5R2JsM3N4L0hFSThPaDBx?=
- =?utf-8?B?Z2x1aklXZ1F0aHF2NHYyYWhzQ2dSWkV6M2w0MnhWY3cxWDNDWUlldlNBVWlN?=
- =?utf-8?B?eEpnMlVUWVpRSkhza3pROHZQNWpyZE5JOUZvUVlqT2hnZC82SEhYQVJpK0tP?=
- =?utf-8?B?MHRlSFgwNDRwYkwzSjdCd1VLKzAvbUtmVzRuNTBtc2pGR2Z1cUxVaktRNmYw?=
- =?utf-8?B?Wkl2RDRmR3o5U3RDaW1xYUI2MFVzaGVkaU5ubFRqZ2VYMitiR1pzUHJCVm04?=
- =?utf-8?B?L0JaVWNlZUk1TDVSOG53STc3dTNQdjlKUHNqTEl6d1ZkY3NGT1BqMFp3b2ZX?=
- =?utf-8?B?RDZYWFc3T1U1Lzl6ZnZEZ1Ribys5alJ4SU9xN0xLWlAzMk52UTIyQXNhdURD?=
- =?utf-8?B?RWNUdEs2U3lTRDNBbHl6UXk4K3Mvb3E2T0o0L3N6bkRySWIvTGNqZXI1TEpY?=
- =?utf-8?B?cXl2UTJhRGZtSFJLalpZNk56OG1nV3RRYWdLRzRoVVVlZE9KcGx0UEd3SGZ2?=
- =?utf-8?B?K1NDd0pjdVNvVm1TZzJUV0hvRGE4Uk5WYlF3SmVXY3U2bkczcVZERWdXL1pv?=
- =?utf-8?B?MU16U09qd2t4MFBaK3JlOEFWVTIxdS9qN0gyN1ZwVEwzZ3krWEw2ckM5ZEF0?=
- =?utf-8?B?SHV3MDRBZHVWZ3N2NjFRMTgwS2FQbDc4L3M1OVVoYVZIclpwY0h1ZHE3ajZn?=
- =?utf-8?Q?RppFa/NuSIHEBUrU1xPiwcKh8?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        d=gmail.com; s=20221208; t=1683697259; x=1686289259;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S0TOZqVZCmU3qht+tB0NKfPhexCOFDcSX69LsbtA6KE=;
+        b=i1koqZrstKqgNMiiJbwGFTgImnTzEEjYTUpDbJIpxyLRJi8JhEyDSZPif143pwZ4pk
+         Xp004b1ESph+dD2hFxscs2axiZHWI1Qh9QdFIbLZSkq5nOSnFZjQbSlAVoOc+2moqsfS
+         k2KDhERxh8kgL2yOgDiaK9nOkyYMk8J+WfZrjZ02oOe70Re18OHshxuUIpM7bDdOnJXC
+         6CkaiNDRzxsQCa9Bbe1n7veGAsewzfi5/LM/qOaZq2pcg8N+o5dirjFZ50yChkjDtD1J
+         urEz53R3FAbTzLg+Ni+lcRrsX7DUqeYMfUVNU0jlmAMhqG3ChSEjhbCSWTty5qzQVMMo
+         LykQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683697259; x=1686289259;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S0TOZqVZCmU3qht+tB0NKfPhexCOFDcSX69LsbtA6KE=;
+        b=MkyAOWXZHF9VuHuX1iyYUU8kT0WfFCBeRYkcnkiFB07vKwIMMGmyhIapN7JeAo0n/l
+         ii/VaMpEwCJSF3mp+BxgqMJ7UMpOS+yVXFZuYYKWYlE+k8NmKp3+ipUvECuq5LErX5B6
+         FjENc7IKnqunBreHVHHOCxZTGViKDgQJ8bhxG9f5itp/D/fwJJXK6ahJychkxzvO2oKl
+         pBupe+K7phID2g3cXBcFmYk2S6ix1TVQy7FZwFdsAUohp3i/7bBoxnlhlpT5iRFd4tMw
+         X6TM652uLrKkM2bphnxm0vbGZCXkXEQN8XE9bUyCAwMq86N11KLnvINGZbn0qv0+M4qj
+         m+9w==
+X-Gm-Message-State: AC+VfDyXVLzcr3G9rPVAb6j4A5sfyNjUkyIEBxiZwpP8lq+To+knNJ/b
+        1kETipxQXpuIoJqPJLM07rMpOtf4L0mRj2Da+nY=
+X-Google-Smtp-Source: ACHHUZ6wHLIoOT7ozikyRiJNHvf5T2+cCkXiiaWiU4DPZmfEUnVuxApD/WHdkBAvuy074Pcq9iXJm8gxh+5xg4rZlzc=
+X-Received: by 2002:a17:907:a0c:b0:962:582d:89c8 with SMTP id
+ bb12-20020a1709070a0c00b00962582d89c8mr14755282ejc.45.1683697258658; Tue, 09
+ May 2023 22:40:58 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: JKCYqTF9zzFf3eo3b4j7yTI4kL27A/FoI+asHneTLxD48c4JoIfI+dL/ZXskJSB16xnilwW5BYUYKuSgu7sCVSBcjV2Ov0eAHP7XhWO292LP6TuahTWrvCRuCZ0vMjvfbYp4r0Xh/C5gwNmtU7JQn7yUo/tiCuniD9VxcZhoPp75DbBwLr2BO0c8wbSPceLb0RZGPrzIsVdkrGd5Ur++Vt/AJfzdX92FR2nBx06qFpj4k/JqL7gG/2Sxy5zCRT2OC/6V6K3g5VevDWJX2lF3dlyjuWssnwNkOtQbtv+qA2GiZCZdlCXOxMN9FQGeFSARp/s/Jvj3h4Nh4NOHeJ2bx2ELBG+pyGreAOH1zByGPOuCo1Cop2CcGXTYbYVvdJmzz/F9kZiuqS+dYVAdx4K9zTzGcP9dhwKBkxvPRHxFU/mIno417GE49MFxRk5rg6QfGbZycWfaeEv+4ibSz47ToogbRr5M59LvVm5eCsDbF30mq8RO7NfWr6+EcOQJZ1aAmH4pJcejRFWO50kfPWD+ZdtZgHC0CCgloAAJukA6i2+pEl8WQ0G2WWOxqHgdl/ax5y61cn1XA+WUG/YECIHKIDirG+CWksiweyTwovRnvYbkKN3iLKQbRclCX8pZXCij2lQCRp3UiK08cfTQi2INMfSz4UuC2RGG8SPAobGh7TmZdnK58dMfr4O7Pwru08HcYW1ZLN8wxIatAbzenRBK0+Z6G2dFx9JroqBczzGoxOmvyxH0pAlXOR5xrSj6+VWJXuA+my4zGYhCX75uA8btgCH5S8h8VfG5j/XJCfmAMIJvcXzfRh17EIEhA2K6sdTTMoO55bG0IIYWyJabK+k5qVzCpsUSRKQtqmPfi1ux1mZD3wJVR2eKXPKZsN9Gdr5WhgrIq3KM4+ArkL2W9h98+g==
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6564.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 62435ed2-0292-4e47-7edf-08db51166c5a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 May 2023 05:21:35.2019
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: w3ZSgQzQBOXDSLi2wbzj1QQPHEyiJDopY2PuIuMKnGtBnUCeb+2oTcPYjvz+QTomM1Rm4vbF/BCcDnDLH8wTFQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR04MB8768
+References: <CAKXUXMzfKq_J9nKHGyr5P5rvUETY4B-fxoQD4sO+NYjFOfVtZA@mail.gmail.com>
+ <8a86ba08-cde4-97a4-d7e2-dc340609381c@huaweicloud.com>
+In-Reply-To: <8a86ba08-cde4-97a4-d7e2-dc340609381c@huaweicloud.com>
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Date:   Wed, 10 May 2023 07:40:47 +0200
+Message-ID: <CAKXUXMzA8GfJaWmdaszhrTtjMy5987oZ8AaBcoT6hNVvgCiZ-w@mail.gmail.com>
+Subject: Re: Situation of CONFIG_BLK_WBT_MQ after commit b11d31ae01e6
+ ("blk-wbt: remove unnecessary check in wbt_enable_default()")
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "yukuai (C)" <yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiANCj4gT24gNS85LzIzIDA5OjE5LCBBdnJpIEFsdG1hbiB3cm90ZToNCj4gPiBGb2xsb3dpbmcg
-eW91ciBhcmd1bWVudCwgdGhlbiB3aHkgZmFpciBhbGxvY2F0aW9uIGV4aXN0cyBpbiB0aGUgZmly
-c3QgcGxhY2U/DQo+IA0KPiBEb2VzIHRoaXMgcGF0Y2ggYW5zd2VyIHlvdXIgcXVlc3Rpb24/DQo+
-IA0KPiBbUEFUQ0ggdjJdIGJsb2NrOiBJbXByb3ZlIHNoYXJlZCB0YWcgc2V0IHBlcmZvcm1hbmNl
-DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LWJsb2NrLzIwMjMwMTAzMTk1MzM3LjE1
-ODYyNS0xLQ0KPiBidmFuYXNzY2hlQGFjbS5vcmcvDQpPSy4NCg0KV2h5IGl0IHdhcyBuZWVkZWQg
-dG8gaW52ZW50IGEgbmV3IGZsYWcgaW5zdGVhZCBvZiAganVzdCBjbGVhciBCTEtfTVFfRl9UQUdf
-UVVFVUVfU0hBUkVEPw0KDQpUaGFua3MsDQpBdnJpDQoNCj4gDQo+IFRoYW5rcywNCj4gDQo+IEJh
-cnQuDQoNCg==
+On Wed, May 10, 2023 at 5:24=E2=80=AFAM Yu Kuai <yukuai1@huaweicloud.com> w=
+rote:
+>
+> Hi,
+>
+> =E5=9C=A8 2023/05/08 12:37, Lukas Bulwahn =E5=86=99=E9=81=93:
+> > Dear Yu Kuai, dear Christoph, dear Jens,
+> >
+> >
+> > The commit b11d31ae01e6 ("blk-wbt: remove unnecessary check in
+> > wbt_enable_default()") removes the only reference to the config
+> > BLK_WBT_MQ in the kernel tree.
+> >
+> > The commit comes with the statement "If CONFIG_BLK_WBT_MQ is disabled,
+> > wbt_init() won't do anything.". The statement "If CONFIG_BLK_WBT is
+> > disabled, wbt_init() won't do anything." (note: CONFIG_BLK_WBT vs.
+> > CONFIG_BLK_WBT_MQ) is certainly true, but I do not see that "If
+> > CONFIG_BLK_WBT_MQ is disabled, wbt_init() won't do anything.", but I
+> > believe it would simply do what wbt_init() does with CONFIG_BLK_WBT
+> > being enabled.
+> >
+> > Now, it seems that with this commit applied, the intended switch of
+> > the config BLK_WBT_MQ is gone, and the config really now has no effect
+> > at all.
+> >
+> > So, I am a bit puzzled:
+> >
+> > 1. Either the config BLK_WBT_MQ does have an effect somewhere, but one
+> > cannot find its reference with 'git grep -i "BLK_WBT_MQ" .' --- so, my
+> > investigation is just incomplete or wrong, or
+> >
+> > 2. We really do not need this further build config BLK_WBT_MQ beyond
+> > the other configs already there --- then this config should just be
+> > removed, or
+> >
+> > 3. the commit unintentionally broke the purpose of the config
+> > BLK_WBT_MQ --- then this commit above should be reverted.
+>
+> Thanks for the report, it's the above case and it's my mistake.
+> I will fix this.
+>
+
+Kuai, thanks for letting me know. Feel free to add a "Reported-by:
+Lukas Bulwahn <lukas.bulwahn@gmail.com>" tag, and to include in the
+list of recipients when you send out the fix to the mailing list.
+
+I am glad to see that my investigation of kernel code is finding some
+issues that we can fix.
+
+Lukas
