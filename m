@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E82C7EE22
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3111EC7EE25
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:53:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236824AbjEJIvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 04:51:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41058 "EHLO
+        id S236800AbjEJIxC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 04:53:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236839AbjEJIvf (ORCPT
+        with ESMTP id S236874AbjEJIwm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 04:51:35 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32C47EEA
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:51:14 -0700 (PDT)
+        Wed, 10 May 2023 04:52:42 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB27C1FFE
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:52:17 -0700 (PDT)
 Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230510085113epoutp02913f6eb6149ce1f03c704fb5968c0226~dvB4rEHAJ0104101041epoutp02Y
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:51:13 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230510085113epoutp02913f6eb6149ce1f03c704fb5968c0226~dvB4rEHAJ0104101041epoutp02Y
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230510085210epoutp0474f95b523286e3c25f4d6acd2adc5231~dvCuF8R4g2784227842epoutp04c
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:52:10 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230510085210epoutp0474f95b523286e3c25f4d6acd2adc5231~dvCuF8R4g2784227842epoutp04c
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1683708673;
-        bh=SMZ7aaeVPcRwQ18QiSqKaop+raZWNO8lsaDIbQ+02HA=;
+        s=mail20170921; t=1683708730;
+        bh=g79vP8DDxL631oXd9xY9r2nKOWI/ZL7l+cinRRVML/o=;
         h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
-        b=TWcJKNXImvYJvCzWTvitvOs5oXmTxT7WU4sVw38I28KIFR5u0mXaChDuIGC5YVNA2
-         ZRZ8sEkjyfrfkQtrWLd33NWtBza9VGTrhMXjZ8WSWlmNPpLec3fbLymM5SoSNHWF0j
-         3ZRJBURmSkAT6aoBv+wAvDwKsnA9TM8lDVDyqUm8=
+        b=igJTqMmMYgBixf1/e8+PAgF87edmcv2CPfNsrFD1sGpzaotmR9fF2OXmRQ9fDyFXq
+         94FEPzH6grfjG94kwxpbWyxN5TzqRX+CpzfgAsSBNDiFdimJYpcMazoZM1LfMsqjHf
+         EMRci5gZ7X+52vAY2RqbadMgCCQ6D1N/Ch1JiwJE=
 Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
-        20230510085112epcas2p3c8db972028412c72bfa8006f836edd58~dvB33_zG80654406544epcas2p3z;
-        Wed, 10 May 2023 08:51:12 +0000 (GMT)
-Received: from epsmges2p3.samsung.com (unknown [182.195.36.89]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4QGTJw046Cz4x9Q7; Wed, 10 May
-        2023 08:51:12 +0000 (GMT)
-X-AuditID: b6c32a47-c29ff70000002007-20-645b5affbfbf
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+        20230510085210epcas2p2f37d467174700937f1d7d24aafd8c897~dvCtcMs_T0839608396epcas2p29;
+        Wed, 10 May 2023 08:52:10 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.36.101]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4QGTL1448mz4x9Q2; Wed, 10 May
+        2023 08:52:09 +0000 (GMT)
+X-AuditID: b6c32a47-e99fd70000002007-31-645b5b396bbe
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
         epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A9.F5.08199.FFA5B546; Wed, 10 May 2023 17:51:11 +0900 (KST)
+        4E.86.08199.93B5B546; Wed, 10 May 2023 17:52:09 +0900 (KST)
 Mime-Version: 1.0
-Subject: [PATCH v2 04/14] block: fix not to apply bip information in
- blk_rq_bio_prep()
+Subject: [PATCH v2 05/14] block: blk-merge: fix to add the number of
+ integrity segments to the request twice
 Reply-To: j-young.choi@samsung.com
 Sender: Jinyoung CHOI <j-young.choi@samsung.com>
 From:   Jinyoung CHOI <j-young.choi@samsung.com>
@@ -62,75 +62,187 @@ X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20230510085111epcms2p7022e97fd97c1a32c59f935d72f8dda94@epcms2p7>
-Date:   Wed, 10 May 2023 17:51:11 +0900
-X-CMS-MailID: 20230510085111epcms2p7022e97fd97c1a32c59f935d72f8dda94
+Message-ID: <20230510085208epcms2p52a6dec8da80152ec2101f11ce2ea5321@epcms2p5>
+Date:   Wed, 10 May 2023 17:52:08 +0900
+X-CMS-MailID: 20230510085208epcms2p52a6dec8da80152ec2101f11ce2ea5321
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 X-CPGSPASS: Y
 X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrBJsWRmVeSWpSXmKPExsWy7bCmue7/qOgUgwkXLS1W3+1ns3h5SNNi
-        5eqjTBa9/VvZLBbd2MZk8bfrHpPFpEPXGC2eXp3FZLH3lrbF5V1z2CyWH//HZLHu9XsWi98/
-        5rA58Hqcv7eRxWPzCi2Py2dLPTat6mTzmLDoAKPH7psNbB69ze/YPD4+vcXi0bdlFaPH501y
-        Hu0HupkCuKOybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTd
-        MnOAzldSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFJgX6BUn5haX5qXr5aWWWBka
-        GBiZAhUmZGes3PmauaCVq2Lv8ybGBsadHF2MnBwSAiYSxw6uZuti5OIQEtjBKDHj6SvGLkYO
-        Dl4BQYm/O4RBTGGBCInTO0VByoUElCTOrZnFCBE2kLjVaw4SZhPQk/i5ZAbYFBGBnSwS3+8f
-        ZYQYzysxo/0pC4QtLbF9+VawXk4BP4nWx5YQYQ2JH8t6mSFsUYmbq9+yw9jvj82HGiMi0Xrv
-        LFSNoMSDn7uh4pIShw59ZQMZKSGQL7HhQCBEuEbi7fIDUCX6Etc6NoJdwCvgK/Fz0VYmkHIW
-        AVWJbfukIEpcJK7MWsgKYjMLyEtsfzuHGaSEWUBTYv0ufYjhyhJHbrFAVPBJdBz+yw7zXsPG
-        31jZO+Y9YYJoVZNY1GQEEZaR+Hp4PvsERqVZiCCehWTtLIS1CxiZVzGKpRYU56anFhsVGMNj
-        NTk/dxMjOAlrue9gnPH2g94hRiYOxkOMEhzMSiK83qFRKUK8KYmVValF+fFFpTmpxYcYTYH+
-        ncgsJZqcD8wDeSXxhiaWBiZmZobmRqYG5krivNK2J5OFBNITS1KzU1MLUotg+pg4OKUamHo6
-        prKLZkW5pU0J2xZ64pzGpuYLzw2WOBT7bFzt8/TFbK5FF55qpcxW4Gzeu7eIqcMm2DKj/3f8
-        oSYbdufpyZOW+1bLXd9ok+iyMICXIShbbsUxj7TKL4dTjfY/65jygUvw7Mm3vHeWnzp6l79m
-        0yp5y9WKvNrHrjn4nTaQ4L/bEbFq+/uXd1caR7Dsay5RcW9ePatp9+PAl/tT9X4U6H1Nz93T
-        Gtf99/mumb2PKnzuHZro8fVCmVf5sZbj1QmFoWKFvUUaf1c3LJau2n9Qql0wcO7u5KnhvA1z
-        /j/Y9ZbXOGJt+k75bUx3J8bfLV0q5eQ+J0hxxsNlzzIEbJMP5py4PLmxsWzicu6Zp7edeKzE
-        UpyRaKjFXFScCAAYywQtSwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFJsWRmVeSWpSXmKPExsWy7bCmha5ldHSKwZep8har7/azWbw8pGmx
+        cvVRJove/q1sFotubGOy+Nt1j8li0qFrjBZPr85isth7S9vi8q45bBbLj/9jslj3+j2Lxe8f
+        c9gceD3O39vI4rF5hZbH5bOlHptWdbJ5TFh0gNFj980GNo/e5ndsHh+f3mLx6NuyitHj8yY5
+        j/YD3UwB3FHZNhmpiSmpRQqpecn5KZl56bZK3sHxzvGmZgaGuoaWFuZKCnmJuam2Si4+Abpu
+        mTlA5ysplCXmlAKFAhKLi5X07WyK8ktLUhUy8otLbJVSC1JyCswL9IoTc4tL89L18lJLrAwN
+        DIxMgQoTsjO2TN7JWDBdvWLC5S72BsYf8l2MnBwSAiYSy6YeZe1i5OIQEtjBKPH+1jPmLkYO
+        Dl4BQYm/O4RBaoQF8iQmP5zKBGILCShJnFszixGkRFjAQOJWrzlImE1AT+LnkhlsIGNEBHay
+        SHy/f5QRYj6vxIz2pywQtrTE9uVbwXo5BfwkWh9bQoQ1JH4s62WGsEUlbq5+yw5jvz82H2qM
+        iETrvbNQNYISD37uhopLShw69JUNZKSEQL7EhgOBEOEaibfLD0CV6Etc69gIdgGvgK/E452/
+        wD5hEVCVmLDiCRtEjYvEl/sPwMYzC8hLbH87BxwIzAKaEut36UNMV5Y4cosFooJPouPwX3aY
+        /xo2/sbK3jHvCRNEq5rEoiYjiLCMxNfD89knMCrNQgTyLCRrZyGsXcDIvIpRLLWgODc9tdio
+        wBger8n5uZsYwYlYy30H44y3H/QOMTJxMB5ilOBgVhLh9Q6NShHiTUmsrEotyo8vKs1JLT7E
+        aAr08ERmKdHkfGAuyCuJNzSxNDAxMzM0NzI1MFcS55W2PZksJJCeWJKanZpakFoE08fEwSnV
+        wLR+TW1occmm0BVCGW1tlz9tyjwjH1CQGRnQeXCF1+ov4U2r8mJklGsTvpqvPxIecmNxqumi
+        OtdjD8QCVJRld7fV1JzfrtAXXjrlTMwnQ89nv/1q307mPMqqULC4I2WPyJ2wQq6wCxMEllgs
+        1coP8vz4YSWD5Y4/Sl0W+Vtjfu5O2uRfwnWNmZOF+VnGitD1b+5dXqV5/xLv8ZffH2evquia
+        UDRTWzU3zLi3TXRiR1Oy7G7ZzHO6e7QijDsE9i35utch9lluftzkHXw5j+bP28k4U6zG/ub+
+        vHaX5K6jfIF72JUiNy6+aiSyYuGs2s8veZrt3u+alvrsDXPwknkhjzbH1Wm0bDTUZsw4cqm0
+        UYmlOCPRUIu5qDgRALPluVdNBAAA
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
 References: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
-        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p7>
+        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p5>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a request is initialized through the bio, bio's integrity
-information is not reflected in the request. It seems to be missing
-when the codes associated with 'nr_integrity_segment' were added.
+blk_integrity_merge_bio() not only performs conditional tests, but also
+updates the integrity segment information of request.
+It can be called twice when merging the bio into an existing request.
 
-the lld such as scsi does not refer to this variable. It uses
-integrity's bevc to calculate the number of segments for sg-list. So
-there seems to be no problem related to this.
+bio_attempt_bio_merge() or blk_mq_sched_try_merge()
+  blk_rq_merge_ok()
+    blk_integrity_merge_bio()  -  1
+  bio_attemp_{back|front}_merge()
+    ll_{back|front}_merge_fn()
+      ll_new_hw_segments()
+        blk_integrity_merge_bio()  -  2
+
+The part of checking the conditions and the code to update the
+information of the actual request were separated. At this time, the
+ll_back_merge_fn was called by passth-path, so the condition check was
+called by all the separated functions.
+
+And after success in blk_integrity_merge_bio(), the information of the
+request may be wrong if it is impossible to merge due to other
+conditional tests. Thus, it was changed to be called immediately before
+merging the bio's segments.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 
-Fixes: 13f05c8d8e98 ("block/scsi: Provide a limit on the number of integrity segments")
+Fixes: 4eaf99beadce ("block: Don't merge requests if integrity flags differ")
 Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
 ---
- include/linux/blk-mq.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/blk-integrity.c | 34 +++++++++++++++++++++++++++++-----
+ block/blk-merge.c     |  9 +++++----
+ block/blk.h           |  7 +++++++
+ 3 files changed, 41 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 1dacb2c81fdd..9310c94577c7 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -961,6 +961,11 @@ static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
- 	rq->__data_len = bio->bi_iter.bi_size;
- 	rq->bio = rq->biotail = bio;
- 	rq->ioprio = bio_prio(bio);
-+
-+#if defined(CONFIG_BLK_DEV_INTEGRITY)
-+	if (bio_integrity(bio))
-+		rq->nr_integrity_segments = bio_integrity(bio)->bip_vcnt;
-+#endif
+diff --git a/block/blk-integrity.c b/block/blk-integrity.c
+index d4e9b4556d14..03a85e1f6d2e 100644
+--- a/block/blk-integrity.c
++++ b/block/blk-integrity.c
+@@ -184,19 +184,43 @@ bool blk_integrity_merge_rq(struct request_queue *q, struct request *req,
+ 	return true;
  }
  
- void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
++static inline bool blk_integrity_bypass_check(struct request *req,
++					      struct bio *bio)
++{
++	return blk_integrity_rq(req) == 0 && bio_integrity(bio) == NULL;
++}
++
++static bool __blk_integrity_mergeable(struct request_queue *q,
++				      struct request *req, struct bio *bio)
++{
++	if (blk_integrity_rq(req) == 0 || bio_integrity(bio) == NULL)
++		return false;
++
++	if (bio_integrity(req->bio)->bip_flags != bio_integrity(bio)->bip_flags)
++		return false;
++
++	return true;
++}
++
++bool blk_integrity_mergeable(struct request_queue *q, struct request *req,
++			     struct bio *bio)
++{
++	if (blk_integrity_bypass_check(req, bio))
++		return true;
++
++	return __blk_integrity_mergeable(q, req, bio);
++}
++
+ bool blk_integrity_merge_bio(struct request_queue *q, struct request *req,
+ 			     struct bio *bio)
+ {
+ 	int nr_integrity_segs;
+ 	struct bio *next = bio->bi_next;
+ 
+-	if (blk_integrity_rq(req) == 0 && bio_integrity(bio) == NULL)
++	if (blk_integrity_bypass_check(req, bio))
+ 		return true;
+ 
+-	if (blk_integrity_rq(req) == 0 || bio_integrity(bio) == NULL)
+-		return false;
+-
+-	if (bio_integrity(req->bio)->bip_flags != bio_integrity(bio)->bip_flags)
++	if (!__blk_integrity_mergeable(q, req, bio))
+ 		return false;
+ 
+ 	bio->bi_next = NULL;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 65e75efa9bd3..8509f468d6d4 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -611,9 +611,6 @@ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
+ 	if (!blk_cgroup_mergeable(req, bio))
+ 		goto no_merge;
+ 
+-	if (blk_integrity_merge_bio(req->q, req, bio) == false)
+-		goto no_merge;
+-
+ 	/* discard request merge won't add new segment */
+ 	if (req_op(req) == REQ_OP_DISCARD)
+ 		return 1;
+@@ -621,6 +618,10 @@ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
+ 	if (req->nr_phys_segments + nr_phys_segs > blk_rq_get_max_segments(req))
+ 		goto no_merge;
+ 
++	/* This will merge integrity segments */
++	if (!blk_integrity_merge_bio(req->q, req, bio))
++		goto no_merge;
++
+ 	/*
+ 	 * This will form the start of a new hw segment.  Bump both
+ 	 * counters.
+@@ -934,7 +935,7 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 		return false;
+ 
+ 	/* only merge integrity protected bio into ditto rq */
+-	if (blk_integrity_merge_bio(rq->q, rq, bio) == false)
++	if (!blk_integrity_mergeable(rq->q, rq, bio))
+ 		return false;
+ 
+ 	/* Only merge if the crypt contexts are compatible */
+diff --git a/block/blk.h b/block/blk.h
+index dd7cbb57ce43..b7677a5bdff1 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -202,6 +202,8 @@ static inline bool bio_integrity_endio(struct bio *bio)
+ 
+ bool blk_integrity_merge_rq(struct request_queue *, struct request *,
+ 		struct request *);
++bool blk_integrity_mergeable(struct request_queue *rq, struct request *r,
++		struct bio *b);
+ bool blk_integrity_merge_bio(struct request_queue *, struct request *,
+ 		struct bio *);
+ 
+@@ -234,6 +236,11 @@ static inline bool blk_integrity_merge_rq(struct request_queue *rq,
+ {
+ 	return true;
+ }
++static inline bool blk_integrity_mergeable(struct request_queue *rq,
++		struct request *r, struct bio *b)
++{
++	return true;
++}
+ static inline bool blk_integrity_merge_bio(struct request_queue *rq,
+ 		struct request *r, struct bio *b)
+ {
 -- 
 2.34.1
