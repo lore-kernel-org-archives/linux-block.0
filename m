@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E90EEC77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 17:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDEBC7EE22
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 17:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236605AbjEJRO7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 13:14:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
+        id S235134AbjEJRYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 13:24:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236657AbjEJROt (ORCPT
+        with ESMTP id S235609AbjEJRYO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 13:14:49 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E397F4203;
-        Wed, 10 May 2023 10:14:27 -0700 (PDT)
+        Wed, 10 May 2023 13:24:14 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D03455276;
+        Wed, 10 May 2023 10:24:13 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D5A581F747;
-        Wed, 10 May 2023 17:14:24 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8F6DE1F8B4;
+        Wed, 10 May 2023 17:24:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683738864; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1683739452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+2RPcnuD/B5/jpEGRvPjSZU9zdchad+gheYdPhvKsik=;
-        b=CDhVusS9912eGykAiQg6jDXMItwGdq4OE7PYs9GVcisKsjLU9Ik0z5HcqXvw98UMJmZNUh
-        RhZ+NcOiLFCSKWbpVFHP1Zwad+oTKc0Oh4kGJY1gEjR5EYnBLS7bsllaSZQ0sF5Z4BKS8v
-        dLXHCyJthyPPYg7i+ssI+LGL80Z109E=
+        bh=kuetgIzwwu+7VqT/P0y7E9p5TtmeuKVCGagj0//uNXg=;
+        b=YWD7wPAXrRp/wAp70Aa1nMiD75z2StfVsG9Y8R+nU0bqMuMoAr5bAEaUSEwT/kKxbx+ESo
+        GNaaPHcFEEAievvqbVFjfWk174vWnNruT9gyxsZgbdyYUyTFKHJ8MEl3fwExMGzVNG5SE9
+        tdntxfynuUo2gNbA/Abvbel7xUJBfmQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683738864;
+        s=susede2_ed25519; t=1683739452;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+2RPcnuD/B5/jpEGRvPjSZU9zdchad+gheYdPhvKsik=;
-        b=+MV2TCiVhwrQVmQhz0kE4dKRD3/8Sq2ueROZPM78U8lF9yXdmTnCmGdTfBimjYWSFH/H82
-        ckOAlFD5+0bsLJDg==
+        bh=kuetgIzwwu+7VqT/P0y7E9p5TtmeuKVCGagj0//uNXg=;
+        b=VMHcJ3ee1DpYaK0F65tjcDA8Jto+NLO6Hki7H5ikt768MwZWsEh38WEqMcvyEyJDDQlaDd
+        iv7zegohShT4ASDg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 37BE413519;
-        Wed, 10 May 2023 17:14:23 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 00F2213519;
+        Wed, 10 May 2023 17:24:11 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id eGEpOe/QW2SZCAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 10 May 2023 17:14:23 +0000
-Date:   Wed, 10 May 2023 19:14:21 +0200
+        id hTFHLTvTW2SWDQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 10 May 2023 17:24:11 +0000
+Date:   Wed, 10 May 2023 19:24:09 +0200
 From:   Daniel Wagner <dwagner@suse.de>
 To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
@@ -56,31 +56,30 @@ Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
         Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests v3 10/12] nvme/rc: Calculate IO size for random
- fio jobs
-Message-ID: <vlq7hqrweo527daqh7m5iidcvlhujxsc3hwmeqm2oen4dbucsa@3yo2lm3d6aap>
+Subject: Re: [PATCH blktests v3 11/12] nvme/rc: Move discovery generation
+ counter code to rc
+Message-ID: <5mizvgs3mwoxbkgb3axuhgkmjjxa6svi4laksdccg3oue5fwf7@4mqtz2dm6phj>
 References: <20230503080258.14525-1-dwagner@suse.de>
- <20230503080258.14525-11-dwagner@suse.de>
- <xqdnjtl5m6idy7kecwpc6nho74twnvcslkvxnyto6aflz54y5p@6rqao2i3ro2r>
+ <20230503080258.14525-12-dwagner@suse.de>
+ <4zt5oysmqw72l4xzfja2oer72hryisz6zzbboz7dmhhzfypuwx@yrf2utjkv66b>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <xqdnjtl5m6idy7kecwpc6nho74twnvcslkvxnyto6aflz54y5p@6rqao2i3ro2r>
+In-Reply-To: <4zt5oysmqw72l4xzfja2oer72hryisz6zzbboz7dmhhzfypuwx@yrf2utjkv66b>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, May 07, 2023 at 11:31:10PM +0000, Shinichiro Kawasaki wrote:
- > -	_xfs_run_fio_verify_io /dev/"${nvmedev}n1" "1m" || echo FAIL
-> > +	rand_io_size="$(_nvme_calc_rand_io_size 4M)"
-> > +	_run_fio_rand_io --filename="/dev/${nvmedev}n1" --size="${rand_io_size}"
+On Sun, May 07, 2023 at 11:34:51PM +0000, Shinichiro Kawasaki wrote:
+> On May 03, 2023 / 10:02, Daniel Wagner wrote:
+> > Move the discovery generation counter code to rc so that we can reuse
+> > it in 002.
 > 
-> Here, _xfs_run_fio_verify_io is replaced with _run_fio_rand_io. May I confirm
-> that this replacement does not affect this test case? Same question for the hunk
-> below.
+> The last #12 patch no longer touches nvme/002, then I'm not so sure this patch
+> is valuable. IMO, the lengthy 002.out has the role to check all of the 1000
+> times discoveries are successful. So it looks the better to keep current
+> nvme/002 as is.
 
-This is on purpose. The test just wants only verify that IO is still working.
-Because _xfs_run_fio_verify_io has the minimum requirement of 350M for
-nvme_img_size. When I wrote the test I didn't know this and thus this change.
-
-I'll update the commit message to include this info.
+While we don't update the counter anymore, I still think it's worthwhile to
+do some cleanup. We have two tests which do the same thing so why not use common
+code?
