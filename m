@@ -2,89 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D8CC7EE22
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 16:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E90EEC77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 17:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231189AbjEJQfv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 12:35:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57202 "EHLO
+        id S236605AbjEJRO7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 13:14:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235979AbjEJQfk (ORCPT
+        with ESMTP id S236657AbjEJROt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 12:35:40 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B76278A7D
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 09:35:30 -0700 (PDT)
+        Wed, 10 May 2023 13:14:49 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E397F4203;
+        Wed, 10 May 2023 10:14:27 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 3D66721880;
-        Wed, 10 May 2023 16:35:28 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D5A581F747;
+        Wed, 10 May 2023 17:14:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1683736528; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1683738864; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=DhBu6g76QnmGqBUmh2ZHMKFNbeqyPQPo2InP7zXoVuM=;
-        b=LOsOAP7vn9S8nVqdNyABY3ZP8MGfpbLAxeLfMjqUeIrh9IZk50VHd/YFnoMJ497AIWJcua
-        F1oXjWnz0ws6gHh98DXUSrZjVf2Y0B6xUGLvA2bZnBTerH8Bs4wBUNtfIiEUDgpdLB64HS
-        pCGI+qh9ujCJvTUueL9c8TcXIO4QCh4=
+        bh=+2RPcnuD/B5/jpEGRvPjSZU9zdchad+gheYdPhvKsik=;
+        b=CDhVusS9912eGykAiQg6jDXMItwGdq4OE7PYs9GVcisKsjLU9Ik0z5HcqXvw98UMJmZNUh
+        RhZ+NcOiLFCSKWbpVFHP1Zwad+oTKc0Oh4kGJY1gEjR5EYnBLS7bsllaSZQ0sF5Z4BKS8v
+        dLXHCyJthyPPYg7i+ssI+LGL80Z109E=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1683736528;
+        s=susede2_ed25519; t=1683738864;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=DhBu6g76QnmGqBUmh2ZHMKFNbeqyPQPo2InP7zXoVuM=;
-        b=YceLkpaqlujt+A8eHfEX0XywwaapyNkm2XsmukydcwZGNiRQ2imumcrZwuf9P5FBVWFBb5
-        sIGDP7AgBTE5yLBw==
+        bh=+2RPcnuD/B5/jpEGRvPjSZU9zdchad+gheYdPhvKsik=;
+        b=+MV2TCiVhwrQVmQhz0kE4dKRD3/8Sq2ueROZPM78U8lF9yXdmTnCmGdTfBimjYWSFH/H82
+        ckOAlFD5+0bsLJDg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9FDB1138E5;
-        Wed, 10 May 2023 16:35:27 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 37BE413519;
+        Wed, 10 May 2023 17:14:23 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id OkWrGs/HW2RjdAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 10 May 2023 16:35:27 +0000
-Date:   Wed, 10 May 2023 18:35:25 +0200
+        id eGEpOe/QW2SZCAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 10 May 2023 17:14:23 +0000
+Date:   Wed, 10 May 2023 19:14:21 +0200
 From:   Daniel Wagner <dwagner@suse.de>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     "Xiao Yang (Fujitsu)" <yangx.jy@fujitsu.com>,
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
         Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests] common: Replace _have_module() with
- _have_driver()
-Message-ID: <cpnmpplrcos4mocwilkwqo4sxuoqw2mimb42p65b7pkn6e6yc6@wvxrnmd6b5cx>
-References: <20230510070207.1501-1-yangx.jy@fujitsu.com>
- <9ac0b861-01a0-9dce-3d2c-5ff9e265c994@nvidia.com>
- <1f2061f8-de32-15cc-818b-56ca0024c5da@fujitsu.com>
- <14ca2b51-6ccf-d3f7-c61a-ad2e8c384448@nvidia.com>
+Subject: Re: [PATCH blktests v3 10/12] nvme/rc: Calculate IO size for random
+ fio jobs
+Message-ID: <vlq7hqrweo527daqh7m5iidcvlhujxsc3hwmeqm2oen4dbucsa@3yo2lm3d6aap>
+References: <20230503080258.14525-1-dwagner@suse.de>
+ <20230503080258.14525-11-dwagner@suse.de>
+ <xqdnjtl5m6idy7kecwpc6nho74twnvcslkvxnyto6aflz54y5p@6rqao2i3ro2r>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <14ca2b51-6ccf-d3f7-c61a-ad2e8c384448@nvidia.com>
+In-Reply-To: <xqdnjtl5m6idy7kecwpc6nho74twnvcslkvxnyto6aflz54y5p@6rqao2i3ro2r>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 10, 2023 at 08:00:12AM +0000, Chaitanya Kulkarni wrote:
-> On 5/10/23 00:55, Xiao Yang (Fujitsu) wrote:
-> > On 2023/5/10 15:35, Chaitanya Kulkarni wrote:
-> >> we might remove nvmeof-mp, so not sure if that part is
-> >> needed, let's wait for others to reply ..
-> > Hi CK,
-> >
-> > Thanks for your feedback.
-> > Could you tell me why nvmeof-mp will be removed? Is there any URL about
-> > the decision?
-> >
-> > Best Regards,
-> > Xiao Yang
+On Sun, May 07, 2023 at 11:31:10PM +0000, Shinichiro Kawasaki wrote:
+ > -	_xfs_run_fio_verify_io /dev/"${nvmedev}n1" "1m" || echo FAIL
+> > +	rand_io_size="$(_nvme_calc_rand_io_size 4M)"
+> > +	_run_fio_rand_io --filename="/dev/${nvmedev}n1" --size="${rand_io_size}"
 > 
-> We talked about this in the LSFMM, I hope to see lwn article covering
-> blktests session ..
+> Here, _xfs_run_fio_verify_io is replaced with _run_fio_rand_io. May I confirm
+> that this replacement does not affect this test case? Same question for the hunk
+> below.
 
-I think a couple of those test might make sense to be migrated to the nvme
-suite. I am thinking about the test with simulate_network_failure_loop.
+This is on purpose. The test just wants only verify that IO is still working.
+Because _xfs_run_fio_verify_io has the minimum requirement of 350M for
+nvme_img_size. When I wrote the test I didn't know this and thus this change.
+
+I'll update the commit message to include this info.
