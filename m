@@ -2,145 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C0BDC7EE25
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 22:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3ECC7EE22
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 22:56:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231313AbjEJWuZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 18:50:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49574 "EHLO
+        id S236662AbjEJW4a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 18:56:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230520AbjEJWuX (ORCPT
+        with ESMTP id S236594AbjEJW4Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 18:50:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A29F9558F;
-        Wed, 10 May 2023 15:50:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C1D26409F;
-        Wed, 10 May 2023 22:50:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEDE8C433EF;
-        Wed, 10 May 2023 22:50:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683759015;
-        bh=YD/Or+PbwlMw5nLqLwUs8WIz+6qSKOgfzTEXUu+LUaU=;
-        h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-        b=pxMp9v6SeSm35itTUPF90uIEd3/BmkfcgaF7ldUflRCq89EerSR6GUhBiP9OF6r2b
-         Nj/YTlv2HZ9KdE/ssh2GDQ7cn//wWyN+6niR+iggR3x3wBBEKZH56B2SZAoNvGUPXU
-         HVQ4k6OdU+ADi8Lr/a3p/D4vAUN5VT7UANyi16+uBSNE70OEMiExBFFk5MyZWgxvF8
-         fNsBAhkaqjnKzoxAEZpQLqsI0n5fk00X7yrX5FYP5x0S4YDqYSIT2pBVK5JGPWZJE8
-         cAhH7cmhL8xrWtHp2kvheEW5NN1GUtUqlRyEke+aqUHDqhqULfN4wCfLt9JUCJ4J0I
-         5m5jYq0OlF4aA==
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Thu, 11 May 2023 01:50:10 +0300
-Message-Id: <CSIYR76Z8U02.30IIQJ49LMY05@suppilovahvero>
-Cc:     <linuxppc-dev@lists.ozlabs.org>, <jonathan.derrick@linux.dev>,
-        <brking@linux.vnet.ibm.com>, <msuchanek@suse.de>,
-        <mpe@ellerman.id.au>, <axboe@kernel.dk>,
-        <akpm@linux-foundation.org>, <linux-efi@vger.kernel.org>,
-        <keyrings@vger.kernel.org>, <me@benboeckel.net>, <elliott@hpe.com>,
-        <andonnel@au1.ibm.com>
-Subject: Re: [PATCH 1/4] block:sed-opal: SED Opal keystore
-From:   "Jarkko Sakkinen" <jarkko@kernel.org>
-To:     <gjoyce@linux.vnet.ibm.com>, <linux-block@vger.kernel.org>
-X-Mailer: aerc 0.14.0
-References: <20230505194402.2079010-1-gjoyce@linux.vnet.ibm.com>
- <20230505194402.2079010-2-gjoyce@linux.vnet.ibm.com>
-In-Reply-To: <20230505194402.2079010-2-gjoyce@linux.vnet.ibm.com>
+        Wed, 10 May 2023 18:56:16 -0400
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39BE07EF4;
+        Wed, 10 May 2023 15:56:06 -0700 (PDT)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-24df161f84bso5574536a91.3;
+        Wed, 10 May 2023 15:56:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683759365; x=1686351365;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nisiLdB8YvztSzgK+xwlknRcIDe1797ySbT6V+jwQCk=;
+        b=gPU8tf+Jr8+mJeEggLF0IBYh3XCDryTh2BK+48GuAnxn4F6Cj8Yiv6WMr2qXQbuw2U
+         Qk9tGHqXPykbFhV1oUxeM+KdjTp4QoOEtrBFnaYCUxccJSuDT8oEIbGZWmsnxOPkDxHD
+         zTjSIu/YE+WSs6yEfOMPI4ZnKv2MPJ527Xppy17cFWiT4DgBTpPjdQ+aYthh0lKZMPua
+         27N6fjU/9Dw8fzKhxHDPg+VWRvbGlRYGL98tNPR9JCJ8VR3SBny7hP6kOwe2qCRJRjlB
+         7hhicTrxfx83JkJeVr7Q03HvSM9plDA2YXlftYEh9YGHjignTpBTCD406iZahvEDFss/
+         bBmw==
+X-Gm-Message-State: AC+VfDw4kSUdQJr46kscHhtZovJbvd0YLOgo5NvGyrMj5RyMWyD79qlk
+        /bHCftaDiASTWiCS9LtDY+w=
+X-Google-Smtp-Source: ACHHUZ5setZPdY2I/a8GzOPENYkm6C4TcWEQbx0V5J9Ab+xSrae8W8bQIiOlbvRXXOpqvaFSKCejrA==
+X-Received: by 2002:a17:90b:198c:b0:244:9385:807f with SMTP id mv12-20020a17090b198c00b002449385807fmr18503926pjb.44.1683759365396;
+        Wed, 10 May 2023 15:56:05 -0700 (PDT)
+Received: from ?IPV6:2001:4958:15a0:30:63c6:648e:7352:e65e? ([2001:4958:15a0:30:63c6:648e:7352:e65e])
+        by smtp.gmail.com with ESMTPSA id g24-20020a17090a579800b0024dee5cbe29sm18658135pji.27.2023.05.10.15.56.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 May 2023 15:56:04 -0700 (PDT)
+Message-ID: <8947b1be-3dfb-4c9f-469f-d1c31d1ec994@acm.org>
+Date:   Wed, 10 May 2023 15:56:02 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 0/2] block: improve the share tag set performance
+Content-Language: en-US
+To:     axboe@kernel.dk
+Cc:     Ed Tsai <ed.tsai@mediatek.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        martin.petersen@oracle.com, stanley.chu@mediatek.com,
+        peter.wang@mediatek.com, chun-hung.wu@mediatek.com,
+        alice.chao@mediatek.com, powen.kao@mediatek.com,
+        naomi.chu@mediatek.com, wsd_upstream@mediatek.com
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230509065230.32552-1-ed.tsai@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri May 5, 2023 at 10:43 PM EEST,  wrote:
-> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
->
-> Add read and write functions that allow SED Opal keys to stored
-> in a permanent keystore.
+On 5/8/23 23:52, Ed Tsai wrote:
+> The tag allocation is limited by the number of active queues and a
+> queue is marked as inactive by the queue timeout worker after up to 30Hz
+> by default.
+> 
+> UFS devices have multiple logical units, and they can limit the depth of
+> data LUNs by the fair tag sharing algorithm. Make the fair tag sharing
+> configurable and improve the performance for UFS devices.
+> 
+> See also https://lore.kernel.org/all/20230103195337.158625-1-bvanassche@acm.org
 
-Please be more verbose starting from "Self-Encrypting Drive (SED)",
-instead of just "SED", and take time to explain what these keys are.
+Hi Jens,
 
->
-> Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
-> ---
->  block/Makefile               |  2 +-
->  block/sed-opal-key.c         | 24 ++++++++++++++++++++++++
->  include/linux/sed-opal-key.h | 15 +++++++++++++++
->  3 files changed, 40 insertions(+), 1 deletion(-)
->  create mode 100644 block/sed-opal-key.c
->  create mode 100644 include/linux/sed-opal-key.h
->
-> diff --git a/block/Makefile b/block/Makefile
-> index 4e01bb71ad6e..464a9f209552 100644
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -35,7 +35,7 @@ obj-$(CONFIG_BLK_DEV_ZONED)	+=3D blk-zoned.o
->  obj-$(CONFIG_BLK_WBT)		+=3D blk-wbt.o
->  obj-$(CONFIG_BLK_DEBUG_FS)	+=3D blk-mq-debugfs.o
->  obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+=3D blk-mq-debugfs-zoned.o
-> -obj-$(CONFIG_BLK_SED_OPAL)	+=3D sed-opal.o
-> +obj-$(CONFIG_BLK_SED_OPAL)	+=3D sed-opal.o sed-opal-key.o
->  obj-$(CONFIG_BLK_PM)		+=3D blk-pm.o
->  obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+=3D blk-crypto.o blk-crypto-profile=
-.o \
->  					   blk-crypto-sysfs.o
-> diff --git a/block/sed-opal-key.c b/block/sed-opal-key.c
-> new file mode 100644
-> index 000000000000..16f380164c44
-> --- /dev/null
-> +++ b/block/sed-opal-key.c
-> @@ -0,0 +1,24 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * SED key operations.
-> + *
-> + * Copyright (C) 2022 IBM Corporation
-> + *
-> + * These are the accessor functions (read/write) for SED Opal
-> + * keys. Specific keystores can provide overrides.
-> + *
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/errno.h>
-> +#include <linux/sed-opal-key.h>
-> +
-> +int __weak sed_read_key(char *keyname, char *key, u_int *keylen)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +int __weak sed_write_key(char *keyname, char *key, u_int keylen)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> diff --git a/include/linux/sed-opal-key.h b/include/linux/sed-opal-key.h
-> new file mode 100644
-> index 000000000000..c9b1447986d8
-> --- /dev/null
-> +++ b/include/linux/sed-opal-key.h
-> @@ -0,0 +1,15 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * SED key operations.
-> + *
-> + * Copyright (C) 2022 IBM Corporation
-> + *
-> + * These are the accessor functions (read/write) for SED Opal
-> + * keys. Specific keystores can provide overrides.
-> + *
-> + */
-> +
-> +#include <linux/kernel.h>
-> +
-> +int sed_read_key(char *keyname, char *key, u_int *keylen);
-> +int sed_write_key(char *keyname, char *key, u_int keylen);
-> --=20
-> gjoyce@linux.vnet.ibm.com
+This patch series is slightly more complicated than the patch that I 
+posted in January. Do you prefer the approach of this patch series or 
+rather the approach of the patch that I posted in January?
+
+Thank you,
+
+Bart.
 
 
-BR, Jarkko
