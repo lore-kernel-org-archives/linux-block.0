@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8771C7EE24
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACCFC77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 08:56:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236802AbjEJIyZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 04:54:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44580 "EHLO
+        id S236872AbjEJI4U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 04:56:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236778AbjEJIyX (ORCPT
+        with ESMTP id S236846AbjEJI4P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 04:54:23 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3079FE54
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:54:03 -0700 (PDT)
-Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230510085401epoutp04e9f062986e2ab6c6943a84852dcf0c75~dvEVTGQCr3073230732epoutp04l
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:54:01 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230510085401epoutp04e9f062986e2ab6c6943a84852dcf0c75~dvEVTGQCr3073230732epoutp04l
+        Wed, 10 May 2023 04:56:15 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 781897EC5
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 01:56:11 -0700 (PDT)
+Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230510085609epoutp01fea915d187e9da96a17471a6ca0a515e~dvGMxclEK1575915759epoutp01W
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 08:56:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230510085609epoutp01fea915d187e9da96a17471a6ca0a515e~dvGMxclEK1575915759epoutp01W
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1683708841;
-        bh=dsClYh4QK7KsYkk+2+MP7q9EBU8OpMqvWeVl/PtqLS8=;
+        s=mail20170921; t=1683708969;
+        bh=v5aifcuvT4v06m1yAYerf8h0h01yE8oqVL3cCIFGtC8=;
         h=Subject:Reply-To:From:To:In-Reply-To:Date:References:From;
-        b=nHbZ8YUCOc/bj9xs1OdEEqEwoUOBBGETC9B4hiFEBrQaYD2POIkx8oSOv0LGdH720
-         D9yLZhAMIMeMsxU6rbK+iDDdxUlYT1fgoHUrcing7B3L4Nr/zKAZDSe7J7c5k7RqWL
-         a7Jfpe5ikASZ704ubrw7HJr0iK6anb69/iq8g/n8=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        b=QeisWYDH+pcUIb/jjZqmWj9kjOeqOborClEn2r1kgCkny2ZD12tzuTCUrkOFPgoFR
+         vWVed2KbkcSKLifspcau6Oq85O4v+e+sA9oB9ZqWFohzOm2snELr9l/unXmCbBzrRU
+         dZCwaCFHMwgNC6j0FrAH7YNO3zQ2I51EjoThIh40=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
         epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20230510085401epcas2p1ee8ea140a9d25a916316bc676335698a~dvEUuwE-00054500545epcas2p1e;
-        Wed, 10 May 2023 08:54:01 +0000 (GMT)
-Received: from epsmges2p2.samsung.com (unknown [182.195.36.69]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4QGTN82Gbyz4x9Q7; Wed, 10 May
-        2023 08:54:00 +0000 (GMT)
-X-AuditID: b6c32a46-8b7ff7000001438d-bf-645b5ba85d8f
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        5F.06.17293.8AB5B546; Wed, 10 May 2023 17:54:00 +0900 (KST)
+        20230510085608epcas2p1febf27b02dec1003268c5c8056bb5682~dvGL35aQq1806718067epcas2p15;
+        Wed, 10 May 2023 08:56:08 +0000 (GMT)
+Received: from epsmges2p3.samsung.com (unknown [182.195.36.92]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4QGTQc2M0Rz4x9QB; Wed, 10 May
+        2023 08:56:08 +0000 (GMT)
+X-AuditID: b6c32a47-e99fd70000002007-9c-645b5c28f5cc
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        79.09.08199.82C5B546; Wed, 10 May 2023 17:56:08 +0900 (KST)
 Mime-Version: 1.0
-Subject: [PATCH v2 07/14] block: add helper function to get the number of
- integrity segments
+Subject: [PATCH v2 08/14] scsi: add scsi_alloc_integrity_sgtables() for
+ integrity process
 Reply-To: j-young.choi@samsung.com
 Sender: Jinyoung CHOI <j-young.choi@samsung.com>
 From:   Jinyoung CHOI <j-young.choi@samsung.com>
@@ -62,81 +62,151 @@ X-Drm-Type: N,general
 X-Msg-Generator: Mail
 X-Msg-Type: PERSONAL
 X-Reply-Demand: N
-Message-ID: <20230510085359epcms2p5a8e36cf9c7147054e024669f5811c782@epcms2p5>
-Date:   Wed, 10 May 2023 17:53:59 +0900
-X-CMS-MailID: 20230510085359epcms2p5a8e36cf9c7147054e024669f5811c782
+Message-ID: <20230510085607epcms2p3d2b2dfc5db42f77c41f570c361a41c6a@epcms2p3>
+Date:   Wed, 10 May 2023 17:56:07 +0900
+X-CMS-MailID: 20230510085607epcms2p3d2b2dfc5db42f77c41f570c361a41c6a
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 X-CPGSPASS: Y
 X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFJsWRmVeSWpSXmKPExsWy7bCmue6K6OgUg69b+C1W3+1ns3h5SNNi
-        5eqjTBa9/VvZLBbd2MZk8bfrHpPFpEPXGC2eXp3FZLH3lrbF5V1z2CyWH//HZLHu9XsWi98/
-        5rA58Hqcv7eRxWPzCi2Py2dLPTat6mTzmLDoAKPH7psNbB69ze/YPD4+vcXi0bdlFaPH501y
-        Hu0HupkCuKOybTJSE1NSixRS85LzUzLz0m2VvIPjneNNzQwMdQ0tLcyVFPISc1NtlVx8AnTd
-        MnOAzldSKEvMKQUKBSQWFyvp29kU5ZeWpCpk5BeX2CqlFqTkFJgX6BUn5haX5qXr5aWWWBka
-        GBiZAhUmZGdMfnOJseA9V8WU67+YGxi7OLsYOTkkBEwkbn74xtbFyMUhJLCDUaJh/hQgh4OD
-        V0BQ4u8OYZAaYYE4iQuH9rOD2EICShLn1sxiBCkRFjCQuNVrDhJmE9CT+LlkBtgYEYGdLBLf
-        7x9lhJjPKzGj/SkLhC0tsX35VrBeTgE/idbHlhBhDYkfy3qZIWxRiZur37LD2O+PzYcaIyLR
-        eu8sVI2gxIOfu6HikhKHDn0Fu1hCIF9iw4FAiHCNxNvlB6BK9CWudWwEu4BXwFei7+ZDJhCb
-        RUBV4vjna1A1LhJtr56B1TALyEtsfzuHGWQks4CmxPpd+hDTlSWO3IKq4JPoOPyXHea/ho2/
-        sbJ3zHvCBNGqJrGoyQgiLCPx9fB89gmMSrMQgTwLydpZCGsXMDKvYhRLLSjOTU8tNiowgsdr
-        cn7uJkZwItZy28E45e0HvUOMTByMhxglOJiVRHi9Q6NShHhTEiurUovy44tKc1KLDzGaAj08
-        kVlKNDkfmAvySuINTSwNTMzMDM2NTA3MlcR5pW1PJgsJpCeWpGanphakFsH0MXFwSjUwHRPL
-        5A3I/SbLVRyifqNm4q37t3ZNybn2r7r/47euVL3VXbdV5L8Z23VMXO1TO7sryUti47raIKMr
-        qbrlX7a4nnl5Z++Ekwmzri/q+HRTtK1LVOl5rJXzup1P4tRfbIzq/FlTHGm0+nPHr/AH2e9f
-        azHOvBlndmV7mHWRk65L4Iuljqomiz3iFRhZK+JnZXK5l7JNfLFlVmL+zN4jSQtXsB/PrNl/
-        yd/kafvku9XJP1/fnum9QWCfb9iMj52LY/OTMnZbhugqeR65f0nE5+K04EdZB6bKXVZoXDT9
-        w9HLm488vtzq2Pxu3/4L4g7V79u3eAg7yZyV0p7AkHLmu81Mji9dbq8j6tcrt/3h3LCiVYml
-        OCPRUIu5qDgRADTtrYRNBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrFJsWRmVeSWpSXmKPExsWy7bCmha5GTHSKwfHn/Bar7/azWbw8pGmx
+        cvVRJove/q1sFotubGOy+Nt1j8li0qFrjBZPr85isth7S9vi8q45bBbLj/9jslj3+j2Lxe8f
+        c9gceD3O39vI4rF5hZbH5bOlHptWdbJ5TFh0gNFj980GNo/e5ndsHh+f3mLx6NuyitHj8yY5
+        j/YD3UwB3FHZNhmpiSmpRQqpecn5KZl56bZK3sHxzvGmZgaGuoaWFuZKCnmJuam2Si4+Abpu
+        mTlA5ysplCXmlAKFAhKLi5X07WyK8ktLUhUy8otLbJVSC1JyCswL9IoTc4tL89L18lJLrAwN
+        DIxMgQoTsjN+9r5iK/goWbHp5DHGBsZJol2MnBwSAiYSs7/8Y+li5OIQEtjBKLH/4wGmLkYO
+        Dl4BQYm/O4RBaoQFoiV27j3BDmILCShJnFszixGkRFjAQOJWrzlImE1AT+LnkhlsIGNEBHay
+        SHy/f5QRYj6vxIz2pywQtrTE9uVbwXo5BfwkWh9bQoQ1JH4s62WGsEUlbq5+yw5jvz82H2qM
+        iETrvbNQNYISD37uhopLShw69JUNZKSEQL7EhgOBEOEaibfLD0CV6Etc69gIdgGvgK/E8WML
+        WEFsFgFViQPbf7NC1LhIzG/eCmYzC8hLbH87hxlkJLOApsT6XfoQ05Uljtxigajgk+g4/Jcd
+        5r+Gjb+xsnfMe8IE0aomsajJCCIsI/H18Hz2CYxKsxCBPAvJ2lkIaxcwMq9iFEstKM5NTy02
+        KjCGx2tyfu4mRnAi1nLfwTjj7Qe9Q4xMHIyHGCU4mJVEeL1Do1KEeFMSK6tSi/Lji0pzUosP
+        MZoCPTyRWUo0OR+YC/JK4g1NLA1MzMwMzY1MDcyVxHmlbU8mCwmkJ5akZqemFqQWwfQxcXBK
+        NTBNcq6b8SvAYMql6jCDuNS+7A1H+lXjdBR29tlsEPSY3ZoXp2ba5rPjxM6DZVM35W4ovyL8
+        K4Uj+EbWnVL/A5pXvy3MPfj81LdlD/mj/E9dcCr+N4Vn6yf/kJxd8z40PrUPfxkg9Ox9f1Tn
+        JrVlXYY9hjub0pY1iysFbPv8VCGWPaUn/Hvkg5aYDRGF+pomSbvYxBczP/abv23Xb07+NYI8
+        CXwKMz7ZOoY6pPfkLAh8IhsueeO6UC6XwtNjx+yunVcQmJDpVfhk693ZVc3yz1+0KnK807ve
+        eUZfccm2qEtXvs0Jmug1O5d3a1rYGe5v34QvnzNYs2tzwKTtVSaO2RxP4uTWG9rXSYQ3Rs35
+        /lmJpTgj0VCLuag4EQD4eukiTQQAAA==
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
 X-CMS-RootMailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
 References: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
-        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p5>
+        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since request always has the number of integrity segments in the process
-of generating and merging, a function for simply obtained this has been
-added.
+Separate the integrity mapping process of scsi_alloc_sgtables() into a
+new function for readability.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 
 Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
 ---
- include/linux/blk-integrity.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/scsi/scsi_lib.c | 71 ++++++++++++++++++++++-------------------
+ 1 file changed, 38 insertions(+), 33 deletions(-)
 
-diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.h
-index 378b2459efe2..45b9fde1fee1 100644
---- a/include/linux/blk-integrity.h
-+++ b/include/linux/blk-integrity.h
-@@ -43,6 +43,11 @@ int blk_rq_map_integrity_sg(struct request_queue *, struct bio *,
- 				   struct scatterlist *);
- int blk_rq_count_integrity_sg(struct request_queue *, struct bio *);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index b7c569a42aa4..89cf21345e1a 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1003,6 +1003,40 @@ static inline bool scsi_cmd_needs_dma_drain(struct scsi_device *sdev,
+ 	       sdev->host->hostt->dma_need_drain(rq);
+ }
  
-+static inline unsigned short blk_rq_nr_integrity_segments(struct request *rq)
++static blk_status_t scsi_alloc_integrity_sgtables(struct scsi_cmnd *cmd)
 +{
-+	return rq->nr_integrity_segments;
++	struct request *rq = scsi_cmd_to_rq(cmd);
++	struct scsi_data_buffer *prot_sdb = cmd->prot_sdb;
++	int count, ivecs;
++
++	if (WARN_ON_ONCE(!prot_sdb)) {
++		/*
++		 * This can happen if someone (e.g. multipath)
++		 * queues a command to a device on an adapter
++		 * that does not support DIX.
++		 */
++		return BLK_STS_IOERR;
++	}
++
++	ivecs = blk_rq_count_integrity_sg(rq->q, rq->bio);
++
++	if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
++				   prot_sdb->table.sgl,
++				   SCSI_INLINE_PROT_SG_CNT)) {
++		return BLK_STS_RESOURCE;
++	}
++
++	count = blk_rq_map_integrity_sg(rq->q, rq->bio, prot_sdb->table.sgl);
++
++	BUG_ON(count > ivecs);
++	BUG_ON(count > queue_max_integrity_segments(rq->q));
++
++	cmd->prot_sdb = prot_sdb;
++	cmd->prot_sdb->table.nents = count;
++
++	return BLK_STS_OK;
 +}
 +
- static inline struct blk_integrity *blk_get_integrity(struct gendisk *disk)
- {
- 	struct blk_integrity *bi = &disk->queue->integrity;
-@@ -120,6 +125,10 @@ static inline int blk_rq_count_integrity_sg(struct request_queue *q,
- {
- 	return 0;
+ /**
+  * scsi_alloc_sgtables - Allocate and initialize data and integrity scatterlists
+  * @cmd: SCSI command data structure to initialize.
+@@ -1021,7 +1055,7 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *cmd)
+ 	struct request *rq = scsi_cmd_to_rq(cmd);
+ 	unsigned short nr_segs = blk_rq_nr_phys_segments(rq);
+ 	struct scatterlist *last_sg = NULL;
+-	blk_status_t ret;
++	blk_status_t ret = BLK_STS_OK;
+ 	bool need_drain = scsi_cmd_needs_dma_drain(sdev, rq);
+ 	int count;
+ 
+@@ -1071,40 +1105,11 @@ blk_status_t scsi_alloc_sgtables(struct scsi_cmnd *cmd)
+ 	cmd->sdb.length = blk_rq_payload_bytes(rq);
+ 
+ 	if (blk_integrity_rq(rq)) {
+-		struct scsi_data_buffer *prot_sdb = cmd->prot_sdb;
+-		int ivecs;
+-
+-		if (WARN_ON_ONCE(!prot_sdb)) {
+-			/*
+-			 * This can happen if someone (e.g. multipath)
+-			 * queues a command to a device on an adapter
+-			 * that does not support DIX.
+-			 */
+-			ret = BLK_STS_IOERR;
+-			goto out_free_sgtables;
+-		}
+-
+-		ivecs = blk_rq_count_integrity_sg(rq->q, rq->bio);
+-
+-		if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
+-				prot_sdb->table.sgl,
+-				SCSI_INLINE_PROT_SG_CNT)) {
+-			ret = BLK_STS_RESOURCE;
+-			goto out_free_sgtables;
+-		}
+-
+-		count = blk_rq_map_integrity_sg(rq->q, rq->bio,
+-						prot_sdb->table.sgl);
+-		BUG_ON(count > ivecs);
+-		BUG_ON(count > queue_max_integrity_segments(rq->q));
+-
+-		cmd->prot_sdb = prot_sdb;
+-		cmd->prot_sdb->table.nents = count;
++		ret = scsi_alloc_integrity_sgtables(cmd);
++		if (ret != BLK_STS_OK)
++			scsi_free_sgtables(cmd);
+ 	}
+ 
+-	return BLK_STS_OK;
+-out_free_sgtables:
+-	scsi_free_sgtables(cmd);
+ 	return ret;
  }
-+static inline unsigned short blk_rq_nr_integrity_segments(struct request *rq)
-+{
-+	return 0;
-+}
- static inline int blk_rq_map_integrity_sg(struct request_queue *q,
- 					  struct bio *b,
- 					  struct scatterlist *s)
+ EXPORT_SYMBOL(scsi_alloc_sgtables);
 -- 
 2.34.1
