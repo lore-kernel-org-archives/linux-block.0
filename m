@@ -2,88 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CBAC77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 15:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D8CC7EE22
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 16:35:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237284AbjEJP4U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 11:56:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35580 "EHLO
+        id S231189AbjEJQfv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 12:35:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237192AbjEJP4T (ORCPT
+        with ESMTP id S235979AbjEJQfk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 11:56:19 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6FF36EA1;
-        Wed, 10 May 2023 08:56:18 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-643a1656b79so5010738b3a.3;
-        Wed, 10 May 2023 08:56:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683734178; x=1686326178;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XXBPb0T0axiCTL0oMtUP2eFXZZ+7E7iyDGsMoIo5xLg=;
-        b=Z1KMFY+Uy2ParN7MmgohHDniiIX7Z7SrJ0E9sldzA+kDt34hT1GgwTqn5nplQTppO5
-         hyuOgEuWaecDCWoz/C44IShtSIkAii/b1A7yH+oKg9rF3h4p2eUT94ntZH2aq2Zpwzaz
-         C1fcPQ+W3+OvwhdDL2uTltSJ1JQpWgbykfZjgZsQmxbp1kkEeny7aoIMpBf+JHb5lGBt
-         NXigEirO0x/89y8pxGB1h9vT9H1DFX7ArBJujBe+NDzEzt8p4givboeEJM5RwfW7Cv9u
-         v6RdPLMCAOFJx2cdTBqyMdFI4mOchBrAYGqKuwH8WXAR/CGZHu59nGnOmF/Qcd7xLs6G
-         mYeQ==
-X-Gm-Message-State: AC+VfDwi1EDFZvWfUiirz4Ssxyrr4r81uZMnhZQ95jjiC9zZxECsqXvw
-        KP9XpQiVPhTcGMvhgmyU0Fs=
-X-Google-Smtp-Source: ACHHUZ4jAmb3ZAKDgW/JSwT3hbLErDK8VFH/SqJrjFHj7Uk+rZBbni5StqhaUujw2nmb2aTyt4kfDA==
-X-Received: by 2002:a05:6a20:432a:b0:100:5a09:4524 with SMTP id h42-20020a056a20432a00b001005a094524mr13881691pzk.31.1683734177883;
-        Wed, 10 May 2023 08:56:17 -0700 (PDT)
-Received: from ?IPV6:2001:4958:15a0:30:5242:f5e6:864f:4fb2? ([2001:4958:15a0:30:5242:f5e6:864f:4fb2])
-        by smtp.gmail.com with ESMTPSA id n1-20020aa78a41000000b0064550f76efesm3741316pfa.29.2023.05.10.08.56.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 May 2023 08:56:17 -0700 (PDT)
-Message-ID: <31af3339-d90e-f0bd-4c9e-0da9f8728ce4@acm.org>
-Date:   Wed, 10 May 2023 08:56:16 -0700
+        Wed, 10 May 2023 12:35:40 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B76278A7D
+        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 09:35:30 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 3D66721880;
+        Wed, 10 May 2023 16:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1683736528; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DhBu6g76QnmGqBUmh2ZHMKFNbeqyPQPo2InP7zXoVuM=;
+        b=LOsOAP7vn9S8nVqdNyABY3ZP8MGfpbLAxeLfMjqUeIrh9IZk50VHd/YFnoMJ497AIWJcua
+        F1oXjWnz0ws6gHh98DXUSrZjVf2Y0B6xUGLvA2bZnBTerH8Bs4wBUNtfIiEUDgpdLB64HS
+        pCGI+qh9ujCJvTUueL9c8TcXIO4QCh4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1683736528;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DhBu6g76QnmGqBUmh2ZHMKFNbeqyPQPo2InP7zXoVuM=;
+        b=YceLkpaqlujt+A8eHfEX0XywwaapyNkm2XsmukydcwZGNiRQ2imumcrZwuf9P5FBVWFBb5
+        sIGDP7AgBTE5yLBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9FDB1138E5;
+        Wed, 10 May 2023 16:35:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id OkWrGs/HW2RjdAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Wed, 10 May 2023 16:35:27 +0000
+Date:   Wed, 10 May 2023 18:35:25 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "Xiao Yang (Fujitsu)" <yangx.jy@fujitsu.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH blktests] common: Replace _have_module() with
+ _have_driver()
+Message-ID: <cpnmpplrcos4mocwilkwqo4sxuoqw2mimb42p65b7pkn6e6yc6@wvxrnmd6b5cx>
+References: <20230510070207.1501-1-yangx.jy@fujitsu.com>
+ <9ac0b861-01a0-9dce-3d2c-5ff9e265c994@nvidia.com>
+ <1f2061f8-de32-15cc-818b-56ca0024c5da@fujitsu.com>
+ <14ca2b51-6ccf-d3f7-c61a-ad2e8c384448@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
-Content-Language: en-US
-To:     Avri Altman <Avri.Altman@wdc.com>, Ed Tsai <ed.tsai@mediatek.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "stanley.chu@mediatek.com" <stanley.chu@mediatek.com>,
-        "peter.wang@mediatek.com" <peter.wang@mediatek.com>,
-        "chun-hung.wu@mediatek.com" <chun-hung.wu@mediatek.com>,
-        "alice.chao@mediatek.com" <alice.chao@mediatek.com>,
-        "powen.kao@mediatek.com" <powen.kao@mediatek.com>,
-        "naomi.chu@mediatek.com" <naomi.chu@mediatek.com>,
-        "wsd_upstream@mediatek.com" <wsd_upstream@mediatek.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <DM6PR04MB6575753742F933DE192E7325FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
- <dcfae203-005f-928b-37d6-7ee5bb4e2971@acm.org>
- <DM6PR04MB6575F344EF2D962103888A56FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
- <6192fa07-ec6f-0464-deb6-c3e9f69f6ebf@acm.org>
- <BL0PR04MB6564242D93EE6826CF1F6747FC779@BL0PR04MB6564.namprd04.prod.outlook.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <BL0PR04MB6564242D93EE6826CF1F6747FC779@BL0PR04MB6564.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <14ca2b51-6ccf-d3f7-c61a-ad2e8c384448@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/9/23 22:21, Avri Altman wrote:
-> Why it was needed to invent a new flag instead of  just clear 
-> BLK_MQ_F_TAG_QUEUE_SHARED?
+On Wed, May 10, 2023 at 08:00:12AM +0000, Chaitanya Kulkarni wrote:
+> On 5/10/23 00:55, Xiao Yang (Fujitsu) wrote:
+> > On 2023/5/10 15:35, Chaitanya Kulkarni wrote:
+> >> we might remove nvmeof-mp, so not sure if that part is
+> >> needed, let's wait for others to reply ..
+> > Hi CK,
+> >
+> > Thanks for your feedback.
+> > Could you tell me why nvmeof-mp will be removed? Is there any URL about
+> > the decision?
+> >
+> > Best Regards,
+> > Xiao Yang
+> 
+> We talked about this in the LSFMM, I hope to see lwn article covering
+> blktests session ..
 
-Hi Avri,
-
-The meaning of BLK_MQ_F_TAG_QUEUE_SHARED is "the tag set is shared
-across multiple request queues". Clearing BLK_MQ_F_TAG_QUEUE_SHARED if
-the tag set is shared would be wrong: it would break all the code
-outside the tag allocation code that tests this flag.
-
-Thanks,
-
-Bart.
+I think a couple of those test might make sense to be migrated to the nvme
+suite. I am thinking about the test with simulate_network_failure_loop.
