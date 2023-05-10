@@ -2,181 +2,165 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 816FBC77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 04:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA46AC77B7D
+	for <linux-block@archiver.kernel.org>; Wed, 10 May 2023 05:21:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230197AbjEJEwa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 00:52:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49688 "EHLO
+        id S229741AbjEJFVp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 01:21:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjEJEw2 (ORCPT
+        with ESMTP id S229595AbjEJFVo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 00:52:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1325BFB
-        for <linux-block@vger.kernel.org>; Tue,  9 May 2023 21:51:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683694305;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yxgPKDke8VbkrzDJvNKbVrSGQeJEQn3ljaxNNYZGTb8=;
-        b=GWDe9EvciAWg7+PK13AfyBL+UHwnJh99YyAwoQSgzLniLztp5Ccql0fjiNQVDPR8pchfHs
-        kuYHqmCUo5Kxn0dZT/1j9a9DFRQxgyVA7vqAbC833KNv7NVTxbZzicnUTCjbh1J/YSscEg
-        yxCcU6zoxo9a13nejdtcnIDSoVQYmn8=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-548-sgJ6dHB6MWujqxiszHYMJA-1; Wed, 10 May 2023 00:51:43 -0400
-X-MC-Unique: sgJ6dHB6MWujqxiszHYMJA-1
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1aaf6ef3580so38176385ad.3
-        for <linux-block@vger.kernel.org>; Tue, 09 May 2023 21:51:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683694302; x=1686286302;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yxgPKDke8VbkrzDJvNKbVrSGQeJEQn3ljaxNNYZGTb8=;
-        b=IIpjoVkTrexe59pqvlGRFM3CAyZCeabz1i5ldBqnJhahGHRt6WXrq1QfIati3we5yr
-         dV0NIy9LUrK6SRhdZO1ijygHje/+H7TRTrzvzfHLy6HVH7uevp/vjbabYRjiuY9E4WkV
-         8l08lLQnLcty68DQ6jZ/q4PlyP6WhrPGglSIoHa8KXTCJG/oxsZaQ7u1A48iae41lNWn
-         eAEvStYeqyQmATZ3ZEUFStD8Lh3jt1n+BX13NqEcl2ZJbMHS4HIz5kICy8kM+7zsWteZ
-         gQIVC4Jkii0iOwZXtyYtYUFAcvQzHGN4yym7mXQmwWN/TM7zverGvWtoBN2jDDmxuz51
-         hk/w==
-X-Gm-Message-State: AC+VfDwfFxBRfWNkDIZZbabx6mVVXfN7BrLhRt20TbPNjcpi9nzDXKAw
-        miCZqqy1VWggRNAPgYC7hohP+vjYReK/WSYUaDAe7QUYgaPy/4narAuJUxRn8frKgLepf79Apwx
-        lr7x3joSIL++oxpwhEFfp5JGIOdzEHSSWWdhk8mw=
-X-Received: by 2002:a17:902:c947:b0:1ab:2659:b533 with SMTP id i7-20020a170902c94700b001ab2659b533mr19976690pla.3.1683694302507;
-        Tue, 09 May 2023 21:51:42 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7Zx2Yb51KLvW7LHZObOBRGQvmmaP1UCzS7sj1BfersOCkBquDwqiymi9u4/BYB3zQn1JLKZrgZ6fszv6+hGBQ=
-X-Received: by 2002:a17:902:c947:b0:1ab:2659:b533 with SMTP id
- i7-20020a170902c94700b001ab2659b533mr19976675pla.3.1683694302194; Tue, 09 May
- 2023 21:51:42 -0700 (PDT)
+        Wed, 10 May 2023 01:21:44 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D842716;
+        Tue,  9 May 2023 22:21:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1683696099; x=1715232099;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YCjEIZ00O0zpTCBguK7sESmEcUkiAfMFQ6A1i/nNrfg=;
+  b=SzBJU26WEl2AaBDH7OdtVfcxUfvTwWm1AllCCPgK8t7CO90yO4KLpcv2
+   eW4O9Y5phiWTp7ptMviXNxc/cMhy8jrjVL9m+752SU7Iz47LY3ByDn0Qm
+   Rd1/OrlCx2Wqyv8v+gvhmtKZewQ8vpv565m9jefv5vcB0+7Mp22Yqq7zt
+   K0YXnsYKwdRsf+A7ncrjbzD5NmgEEwS2j/ajuypXf78040wlO//AQTSLN
+   ZSoaQMJZNtyfmbXKUAI8DG2rI0Tm+EmDmRpWrq5VeH1twCqJZ2yl3hzwi
+   yHlbXrZC2trMlemDtu7ldrIcxMfEp0du3O8RNLjtSDdDskI8x0Chf+7gx
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.99,263,1677513600"; 
+   d="scan'208";a="235298589"
+Received: from mail-bn8nam11lp2168.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.168])
+  by ob1.hgst.iphmx.com with ESMTP; 10 May 2023 13:21:37 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fezFTNn1K6DrsPUbMeI2nwizEiQgBnBZ+PmU1qBXHTnLiNAETYsly8pCGK3AiK7wfOV1RNd1kzaH4zlknvID360pTzL0CIKlk5IHXQjuQ3eX8VyJz0TSNQ9BjsihIDvFnlULJNjlg5Rf+p5wfLIAemeRxymM3ErGSU4ybgihWMyH7Lv0QrgQBWVLZFmQCG7rYf3TffvQzIBMf4jxNBXWpkjvfatJCBnGF+hTssbjK3OiG/JKTQkb3wUU6HJ58Y1Hgt3yo/4wwLLhfavW7TrVmMY+MPdRgQNnuNtaqCfrKTJ0I/gWfGHgVPiBl/vInscJh5G5MatIUOGQ8DVQRYwj+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YCjEIZ00O0zpTCBguK7sESmEcUkiAfMFQ6A1i/nNrfg=;
+ b=ZUO441Rn3RJNWxFt9U4siQPQpPdRbDxH4WVAxVlF2sF4tvf9a1ScVN6JHtbVc3ED60ZPtZkaYDg8YhoWmYAwIXfupEj9PkH/SuGWwmRgfKi6sLPDKtM8T46eblEyDr9uRv6oypRbr3pfOEAfHvSiWvU0IE+0INHsGtL/yKfgAKwaJBb5F+JXZ3zC3GpaOjwcghiZaSZHZ9V5M8GP4epTQE+fM6izB0sidf1C6YxfnnKEFZCGWnKwfb19+Ti17F23AEwyxNR1/QaKtkdqMfYlCTIyULxCbfL5CtDVQQIX4u5oVqni0oidYz26lrcyYob7FTTTv42v9Djb7SQH1HlnTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YCjEIZ00O0zpTCBguK7sESmEcUkiAfMFQ6A1i/nNrfg=;
+ b=fX9HDxjx4nS7gaIK6j7xAqLOjaLaVPL2dEXCuzAgJv3bEU6vuenyIApzX9AgQOpJKR1cg3xfcaPyqXHOwTAfR73t3WXoY/5UE/AEtplPyquL7nb8SVKKTcFBdZRGGuKkOanOxMlS3SNc+NsPsko+skIENhOVWWnjZNyz8GHLtyg=
+Received: from BL0PR04MB6564.namprd04.prod.outlook.com (2603:10b6:208:17d::11)
+ by SN7PR04MB8768.namprd04.prod.outlook.com (2603:10b6:806:2e4::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.33; Wed, 10 May
+ 2023 05:21:35 +0000
+Received: from BL0PR04MB6564.namprd04.prod.outlook.com
+ ([fe80::d80a:f0c:f3ed:a5a7]) by BL0PR04MB6564.namprd04.prod.outlook.com
+ ([fe80::d80a:f0c:f3ed:a5a7%3]) with mapi id 15.20.6363.033; Wed, 10 May 2023
+ 05:21:35 +0000
+From:   Avri Altman <Avri.Altman@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Ed Tsai <ed.tsai@mediatek.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "stanley.chu@mediatek.com" <stanley.chu@mediatek.com>,
+        "peter.wang@mediatek.com" <peter.wang@mediatek.com>,
+        "chun-hung.wu@mediatek.com" <chun-hung.wu@mediatek.com>,
+        "alice.chao@mediatek.com" <alice.chao@mediatek.com>,
+        "powen.kao@mediatek.com" <powen.kao@mediatek.com>,
+        "naomi.chu@mediatek.com" <naomi.chu@mediatek.com>,
+        "wsd_upstream@mediatek.com" <wsd_upstream@mediatek.com>
+Subject: RE: [PATCH 2/2] ufs: don't use the fair tag sharings
+Thread-Topic: [PATCH 2/2] ufs: don't use the fair tag sharings
+Thread-Index: AQHZgkMMEfz/mkmxPE2tTXnep9Miz69RlGFwgABlVACAACPsMIAABRyAgADUEGA=
+Date:   Wed, 10 May 2023 05:21:35 +0000
+Message-ID: <BL0PR04MB6564242D93EE6826CF1F6747FC779@BL0PR04MB6564.namprd04.prod.outlook.com>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <DM6PR04MB6575753742F933DE192E7325FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
+ <dcfae203-005f-928b-37d6-7ee5bb4e2971@acm.org>
+ <DM6PR04MB6575F344EF2D962103888A56FC769@DM6PR04MB6575.namprd04.prod.outlook.com>
+ <6192fa07-ec6f-0464-deb6-c3e9f69f6ebf@acm.org>
+In-Reply-To: <6192fa07-ec6f-0464-deb6-c3e9f69f6ebf@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR04MB6564:EE_|SN7PR04MB8768:EE_
+x-ms-office365-filtering-correlation-id: 62435ed2-0292-4e47-7edf-08db51166c5a
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: l6ngE7wA6OzkSSvOnL70j9ASfE4eaX41WokI08v6TlRx11AVij2xXHOKB5LnMWtCJ8EqBM/mK8K1fji+E8/8Jx21EjkY5fLzqbBCCdwh6OG2iQ//3GjZOQnIKGDYl6h/faljALG7gZMro5RCxyF2UI4iP/yXdSS03Tyqj82Jui0CgTQOQKlI9/d20kBxI5HD/SbijFPO10zSutASq4pWWTMstU9L3pyT7YjnD4k8KiKNg9aVFrd5E7Wta/9yKBgwTF4lZDm6fCTfnt8ceZftOzrfSgWp7/QtAJJoXgpk1aAG2LRX0OnxcCofsIMs7lRNu/F6/K5fTjfAQm4Hn4uXU/Rj9IasnuZ18qEfjplI0z9NcpMKLmD51ghf1FGJnlmW35QAgHvUl2BSenicNaDu2EYGBLQ/nsD2tBavoC0muIhn7d45+JjHLynCpi+TC2AZOkIOzrAwqlP1dsPhVpBsFRdfZhw3cbu3xx3Zu9S8WFpVBCMwiHfbeKQs9mHS7yAoDBEDD8Puwp2mScVeTBcExfkrsETZJsW+65OZphZEoa9cFLN4tJvsJNTRZfLQ23l2A+Tl6ZUp78NNY3/aKuR6jg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6564.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(396003)(39860400002)(376002)(366004)(451199021)(82960400001)(55016003)(122000001)(38100700002)(54906003)(33656002)(86362001)(38070700005)(7696005)(8936002)(52536014)(110136005)(8676002)(4326008)(76116006)(7416002)(966005)(5660300002)(66946007)(2906002)(9686003)(6506007)(53546011)(186003)(83380400001)(26005)(64756008)(316002)(66476007)(66446008)(41300700001)(66556008)(71200400001)(478600001)(4744005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Wmp0SmtSTkgyZzBxUjkrOEQ0NW1LLzVSamlTbUlGVE9vK085RThJUW9xc1Ez?=
+ =?utf-8?B?ZTE0UUpSejdGRDhRYWxDc3Q3MkM4emtjQzZtTXM5TDJVcXMwNWczRnhLa0pH?=
+ =?utf-8?B?MjU4d0lwamtJTk8zQUVtVXhTTXRERzl5cjFFREhOajllc3JVQWdUMTJhZXdo?=
+ =?utf-8?B?MHppV3FZYmNMK3FsdXYxQXNWMDhZc3A5VXZFRkxpa1orRGl0L3F5Zmc1SUNT?=
+ =?utf-8?B?V2lOQWV5bVNpMFoxZ1RIWU95RFVxOExNUmVWbGN2OExnMlgyN0JxN2pWZm9B?=
+ =?utf-8?B?L1EyaUlkcFBIVUhlVEdQZnNvQy9HUjZIb0Nhb09vb2Jhd1pIOW5NYU80emVz?=
+ =?utf-8?B?VElvTzJZOFNEYklSZVhoQzFhd1N1NmJFYzluVzd5Yi9zNWxIQWpCekhyTlVl?=
+ =?utf-8?B?Qi9rVnVJSU1vcGdwcE5BNWZKaHYzTTN5ZEtJMktiYW9MUVNHOU1rVmI3NTV5?=
+ =?utf-8?B?V3hwVnFDNGRneHp2QUNwNTQwR2I4Y2o3cW5xRzhVQXg2dGJKejFTYld3eHpF?=
+ =?utf-8?B?Y3JDbDVLQUpNQ0VwQ0tFYWpPNXVKNWd0ZThFOFVrMjRFbUhYMFRlWVlXZzY3?=
+ =?utf-8?B?NDJBdStZM3QwWG13ejBkUFZ5SHQxNHBmNmx0RGFUMkZoQzhoUEtpTk9ZaVI4?=
+ =?utf-8?B?UWoxNnAvSTYwclI2MDFaMkNyeUx3cWlrdGFlZCs0eSttUml2M3JSV3ZzSk1v?=
+ =?utf-8?B?cWF1RG5Nbm9jZGo0VlNhOWlGQm5kN0E5Q2psSkdsMGJKaHJBS3kyeXRzNEVI?=
+ =?utf-8?B?Um45cFFKc3p0MlVEWHpTOHlOQ3BOQnZnWmVHc3MyQ3VkcysyZGNyMGdEMEpT?=
+ =?utf-8?B?N0hjTlQ3K1B1amNHT293RUhwOUJOTnQ1STlWQkdlYVVlNjl1OU13YktSQW9V?=
+ =?utf-8?B?OWdtWGloSS9ZeEJ1NkJxSVRCaDlyN2h4c1lnaEY1U2t4aC9EQWdIOGJYamUx?=
+ =?utf-8?B?ZHJsajN5OXNXNmVkOCtOZ245T2JyMldCc1pBM1lDSHhMSFM2N25aV1hweEx4?=
+ =?utf-8?B?cWJBbytJZGpXelRUZ2FyUmxlcWtEUEVTMkU2ZDFtYzdvbVdQSW5hR1REQi9Q?=
+ =?utf-8?B?Z3FwTTFtOFhJS3Azd1lhRDRoWHk4UUFTOThDRTA3Z1RQa0NaUUZiOXFCS2gv?=
+ =?utf-8?B?NisyaXNiWDgvbjZnaHc0RldKT0lldWlNSSt1a3ZTZ0tueE5QYkxmUHpHZHNT?=
+ =?utf-8?B?RUpIeXZrOTEzbWZoaktjQWlwb2ZIUFpod201VjdBZlZOS0pvblNkWkQ1Tmxt?=
+ =?utf-8?B?V0JaNFpWbS9SUGNpdzBHZjhXSkFnQ2dUS2I3a243djJ4aHVORndVRDFJdEpu?=
+ =?utf-8?B?TXU2bWo3S2QrSjVOeTJ6bHRhNzRWWFlEMlJUTjgwSGVWR2tNeVYwVXhHakRK?=
+ =?utf-8?B?L1pkc0hUWUYzNDF1VlczeEtpQTZqVy9uT21uRGp5R2JsM3N4L0hFSThPaDBx?=
+ =?utf-8?B?Z2x1aklXZ1F0aHF2NHYyYWhzQ2dSWkV6M2w0MnhWY3cxWDNDWUlldlNBVWlN?=
+ =?utf-8?B?eEpnMlVUWVpRSkhza3pROHZQNWpyZE5JOUZvUVlqT2hnZC82SEhYQVJpK0tP?=
+ =?utf-8?B?MHRlSFgwNDRwYkwzSjdCd1VLKzAvbUtmVzRuNTBtc2pGR2Z1cUxVaktRNmYw?=
+ =?utf-8?B?Wkl2RDRmR3o5U3RDaW1xYUI2MFVzaGVkaU5ubFRqZ2VYMitiR1pzUHJCVm04?=
+ =?utf-8?B?L0JaVWNlZUk1TDVSOG53STc3dTNQdjlKUHNqTEl6d1ZkY3NGT1BqMFp3b2ZX?=
+ =?utf-8?B?RDZYWFc3T1U1Lzl6ZnZEZ1Ribys5alJ4SU9xN0xLWlAzMk52UTIyQXNhdURD?=
+ =?utf-8?B?RWNUdEs2U3lTRDNBbHl6UXk4K3Mvb3E2T0o0L3N6bkRySWIvTGNqZXI1TEpY?=
+ =?utf-8?B?cXl2UTJhRGZtSFJLalpZNk56OG1nV3RRYWdLRzRoVVVlZE9KcGx0UEd3SGZ2?=
+ =?utf-8?B?K1NDd0pjdVNvVm1TZzJUV0hvRGE4Uk5WYlF3SmVXY3U2bkczcVZERWdXL1pv?=
+ =?utf-8?B?MU16U09qd2t4MFBaK3JlOEFWVTIxdS9qN0gyN1ZwVEwzZ3krWEw2ckM5ZEF0?=
+ =?utf-8?B?SHV3MDRBZHVWZ3N2NjFRMTgwS2FQbDc4L3M1OVVoYVZIclpwY0h1ZHE3ajZn?=
+ =?utf-8?Q?RppFa/NuSIHEBUrU1xPiwcKh8?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <CAGS2=YosaYaUTEMU3uaf+y=8MqSrhL7sYsJn8EwbaM=76p_4Qg@mail.gmail.com>
- <ecb54b0d-a90e-a2c9-dfe5-f5cec70be928@huaweicloud.com> <cde5d326-4dcb-5b9c-9d58-fb1ef4b7f7a8@huaweicloud.com>
- <007af59f-4f4c-f779-a1b6-aaa81ff640b3@huaweicloud.com>
-In-Reply-To: <007af59f-4f4c-f779-a1b6-aaa81ff640b3@huaweicloud.com>
-From:   Guangwu Zhang <guazhang@redhat.com>
-Date:   Wed, 10 May 2023 12:52:47 +0800
-Message-ID: <CAGS2=Yob_Ud9A-aTu5hQt8+kW4cyrLX12hNJTrRkJYigFT-AmA@mail.gmail.com>
-Subject: Re: [bug report] BUG: kernel NULL pointer dereference, address: 0000000000000048
-To:     Yu Kuai <yukuai1@huaweicloud.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, Ming Lei <ming.lei@redhat.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: JKCYqTF9zzFf3eo3b4j7yTI4kL27A/FoI+asHneTLxD48c4JoIfI+dL/ZXskJSB16xnilwW5BYUYKuSgu7sCVSBcjV2Ov0eAHP7XhWO292LP6TuahTWrvCRuCZ0vMjvfbYp4r0Xh/C5gwNmtU7JQn7yUo/tiCuniD9VxcZhoPp75DbBwLr2BO0c8wbSPceLb0RZGPrzIsVdkrGd5Ur++Vt/AJfzdX92FR2nBx06qFpj4k/JqL7gG/2Sxy5zCRT2OC/6V6K3g5VevDWJX2lF3dlyjuWssnwNkOtQbtv+qA2GiZCZdlCXOxMN9FQGeFSARp/s/Jvj3h4Nh4NOHeJ2bx2ELBG+pyGreAOH1zByGPOuCo1Cop2CcGXTYbYVvdJmzz/F9kZiuqS+dYVAdx4K9zTzGcP9dhwKBkxvPRHxFU/mIno417GE49MFxRk5rg6QfGbZycWfaeEv+4ibSz47ToogbRr5M59LvVm5eCsDbF30mq8RO7NfWr6+EcOQJZ1aAmH4pJcejRFWO50kfPWD+ZdtZgHC0CCgloAAJukA6i2+pEl8WQ0G2WWOxqHgdl/ax5y61cn1XA+WUG/YECIHKIDirG+CWksiweyTwovRnvYbkKN3iLKQbRclCX8pZXCij2lQCRp3UiK08cfTQi2INMfSz4UuC2RGG8SPAobGh7TmZdnK58dMfr4O7Pwru08HcYW1ZLN8wxIatAbzenRBK0+Z6G2dFx9JroqBczzGoxOmvyxH0pAlXOR5xrSj6+VWJXuA+my4zGYhCX75uA8btgCH5S8h8VfG5j/XJCfmAMIJvcXzfRh17EIEhA2K6sdTTMoO55bG0IIYWyJabK+k5qVzCpsUSRKQtqmPfi1ux1mZD3wJVR2eKXPKZsN9Gdr5WhgrIq3KM4+ArkL2W9h98+g==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6564.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62435ed2-0292-4e47-7edf-08db51166c5a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 May 2023 05:21:35.2019
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: w3ZSgQzQBOXDSLi2wbzj1QQPHEyiJDopY2PuIuMKnGtBnUCeb+2oTcPYjvz+QTomM1Rm4vbF/BCcDnDLH8wTFQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR04MB8768
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-HI,
-after applying your patch[1], the system will panic after reboot.
-
-  OK  ] Finished Coldplug All udev Devices.
-[  OK  ] Reached target Network.
-         Starting dracut initqueue hook...
-[    4.675720] list_add double add: new=ffff90b056320a48,
-prev=ffffa4f685f43a70, next=ffff90b056320a48.
-[    4.684931] ------------[ cut here ]------------
-[    4.689578] kernel BUG at lib/list_debug.c:33!
-[    4.694053] invalid opcode: 0000 [#1] PREEMPT SMP PTI
-[    4.699134] CPU: 14 PID: 706 Comm: systemd-udevd Not tainted 6.4.0-rc1+ #2
-[    4.706049] Hardware name: HPE ProLiant DL380 Gen10/ProLiant DL380
-Gen10, BIOS U30 06/20/2018
-[    4.714621] RIP: 0010:__list_add_valid+0x8b/0x90
-[    4.719271] Code: d1 4c 89 c6 4c 89 ca 48 c7 c7 78 d1 bb 99 e8 cc
-56 b6 ff 0f 0b 48 89 f2 4c 89 c1 48 89 fe 48 c7 c7 d0 d1 bb 99 e8 b5
-56 b6 ff <0f> 0b 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-90 48
-[    4.738150] RSP: 0018:ffffa4f685f43a48 EFLAGS: 00010246
-[    4.743405] RAX: 0000000000000058 RBX: ffff90b056320a00 RCX: 0000000000000000
-[    4.750578] RDX: 0000000000000000 RSI: ffff90b76fb9f840 RDI: ffff90b76fb9f840
-[    4.757752] RBP: ffffa4f685f43a68 R08: 0000000000000000 R09: 00000000ffff7fff
-[    4.764925] R10: ffffa4f685f43900 R11: ffffffff9a1e6888 R12: ffffa4f685f43b78
-[    4.772100] R13: ffffa4f685f43a70 R14: ffff90b38a035800 R15: ffff90b056320a48
-[    4.779275] FS:  00007fea88741540(0000) GS:ffff90b76fb80000(0000)
-knlGS:0000000000000000
-[    4.787411] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    4.793189] CR2: 00007fff014ba608 CR3: 0000000449ed4006 CR4: 00000000007706e0
-[    4.800362] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[    4.807536] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[    4.814710] PKRU: 55555554
-[    4.817429] Call Trace:
-[    4.819887]  <TASK>
-[    4.821995]  blk_mq_dispatch_plug_list+0x112/0x320
-[    4.826820]  blk_mq_flush_plug_list+0x43/0x190
-[    4.831289]  __blk_flush_plug+0x102/0x160
-[    4.835325]  blk_finish_plug+0x25/0x40
-[    4.839095]  read_pages+0x19a/0x220
-[    4.842606]  page_cache_ra_unbounded+0x137/0x180
-[    4.847250]  force_page_cache_ra+0xc5/0xf0
-[    4.851369]  filemap_get_pages+0xf9/0x360
-[    4.855406]  filemap_read+0xc5/0x320
-[    4.859001]  ? generic_fillattr+0x45/0xf0
-[    4.863036]  ? _copy_to_user+0x20/0x40
-[    4.866808]  ? cp_new_stat+0x150/0x180
-[    4.870579]  blkdev_read_iter+0xaf/0x170
-[    4.874524]  vfs_read+0x1b5/0x2d0
-[    4.877860]  ksys_read+0x5f/0xe0
-[    4.881107]  do_syscall_64+0x59/0x90
-[    4.884706]  ? exc_page_fault+0x65/0x150
-[    4.888653]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[    4.893737] RIP: 0033:0x7fea8934eaf2
-
-[1] https://lore.kernel.org/linux-block/007af59f-4f4c-f779-a1b6-aaa81ff640b3@huaweicloud.com/
-
-
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index f6dad0886a2f..bd94d8a5416f 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2712,6 +2712,7 @@ static void blk_mq_dispatch_plug_list(struct
-> blk_plug *plug, bool from_sched)
->          struct request **requeue_lastp = &requeue_list;
->          unsigned int depth = 0;
->          LIST_HEAD(list);
-> +       LIST_HEAD(passthrough_list);
->
->          do {
->                  struct request *rq = rq_list_pop(&plug->mq_list);
-> @@ -2723,7 +2724,10 @@ static void blk_mq_dispatch_plug_list(struct
-> blk_plug *plug, bool from_sched)
->                          rq_list_add_tail(&requeue_lastp, rq);
->                          continue;
->                  }
-> -               list_add(&rq->queuelist, &list);
-> +               if (blk_rq_is_passthrough(rq))
-> +                       list_add(&rq->queuelist, &passthrough_list);
-> +               else
-> +                       list_add(&rq->queuelist, &list);
->                  depth++;
->          } while (!rq_list_empty(plug->mq_list));
->
-> @@ -2731,6 +2735,9 @@ static void blk_mq_dispatch_plug_list(struct
-> blk_plug *plug, bool from_sched)
->          trace_block_unplug(this_hctx->queue, depth, !from_sched);
->
->          percpu_ref_get(&this_hctx->queue->q_usage_counter);
-> +       if (!list_empty(&passthrough_list))
-> +               blk_mq_insert_requests(this_hctx, this_ctx,
-> &passthrough_list,
-> +                                      from_sched);
->          if (this_hctx->queue->elevator) {
->
-> this_hctx->queue->elevator->type->ops.insert_requests(this_hctx,
->                                  &list, 0);
->
-> Thanks,
-> Kuai
->
-
-
--- 
-
-Guangwu Zhang, RHCE, ISTQB, ITIL
-
-Quality Engineer, Kernel Storage QE
-
-Red Hat
-
+PiANCj4gT24gNS85LzIzIDA5OjE5LCBBdnJpIEFsdG1hbiB3cm90ZToNCj4gPiBGb2xsb3dpbmcg
+eW91ciBhcmd1bWVudCwgdGhlbiB3aHkgZmFpciBhbGxvY2F0aW9uIGV4aXN0cyBpbiB0aGUgZmly
+c3QgcGxhY2U/DQo+IA0KPiBEb2VzIHRoaXMgcGF0Y2ggYW5zd2VyIHlvdXIgcXVlc3Rpb24/DQo+
+IA0KPiBbUEFUQ0ggdjJdIGJsb2NrOiBJbXByb3ZlIHNoYXJlZCB0YWcgc2V0IHBlcmZvcm1hbmNl
+DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LWJsb2NrLzIwMjMwMTAzMTk1MzM3LjE1
+ODYyNS0xLQ0KPiBidmFuYXNzY2hlQGFjbS5vcmcvDQpPSy4NCg0KV2h5IGl0IHdhcyBuZWVkZWQg
+dG8gaW52ZW50IGEgbmV3IGZsYWcgaW5zdGVhZCBvZiAganVzdCBjbGVhciBCTEtfTVFfRl9UQUdf
+UVVFVUVfU0hBUkVEPw0KDQpUaGFua3MsDQpBdnJpDQoNCj4gDQo+IFRoYW5rcywNCj4gDQo+IEJh
+cnQuDQoNCg==
