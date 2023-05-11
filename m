@@ -2,223 +2,300 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D0BC7EE22
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 17:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26770C7EE22
+	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 20:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238738AbjEKRGs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 May 2023 13:06:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44884 "EHLO
+        id S238811AbjEKUDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 May 2023 16:03:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbjEKRGr (ORCPT
+        with ESMTP id S239600AbjEKUDi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 May 2023 13:06:47 -0400
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84932FA;
-        Thu, 11 May 2023 10:06:45 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id CD5CB32008C3;
-        Thu, 11 May 2023 13:06:44 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute5.internal (MEProxy); Thu, 11 May 2023 13:06:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:content-type:content-type:date:date:from
-        :from:in-reply-to:message-id:mime-version:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1683824804; x=1683911204; bh=A5
-        jTFtJOtctoZaxC3gTjHWmQRsjq8+d+7S7Z9ZyMZY8=; b=kUR9vThFK6NnPQWCgv
-        si0KhvA4LvM7qfHTBtgyuOzVLZusvKggoSM9/8Ox6o6FKe6/USSgZbTvQK/t/Rgr
-        Vd04+To7BxOPY38DNyOTEWCBa/bUh2tRgaiIIG5VBUjQsvZgLWryXq5BqJCdtSPT
-        KAmyQWxxiBWX/jOcr7LSToHUENfGpXyZcdDzoGkBEyh32UNNHbmRhg2WN4UaiCRc
-        sRMHjvmnFsHX/5cfWZw/lzXbEXHtRGgJBITNLf/GI/gBh4dCE7KElGAZQTH4NZPg
-        S6ye08GV4py0G29GmkVBzn4RNodABb2qfpSCVtf/TjJHJgHYuCS/iQrbvtUa9Oky
-        JNMg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:message-id
-        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-        1683824804; x=1683911204; bh=A5jTFtJOtctoZaxC3gTjHWmQRsjq8+d+7S7
-        Z9ZyMZY8=; b=hSCBN13IeyVjF6iIdaRrgVfQnSHE1/Wi2jmQqFsgNTJzgtlvc3U
-        5BRIDE8TineOa0odDSb7JQFhOpcziJiUI2HrhKRqI+OBFcBtMgxw923JRnhSMqSZ
-        kbxOS7zdolEGp2oL8QBg6WvAwEZ7t0UUdqk1MAFnFwMWknYqjvBYXnQJkQxVNYJ/
-        04hv5Vtp7sCU2gIe5ETRWGNTltS4/wE5IJG0Qh7bSreRyAM932CuV6Vsa8Ah0LrY
-        f1KmILe8Qq6LHYnwzMto1bAcVibqWIlL2DU9b9oDwxtjQW7v3mFlBQd3rUAzgn64
-        Yn0yyQgbzSyl9RlUfVDz4Go3WPVArSzXWGA==
-X-ME-Sender: <xms:pCBdZFa9NvYswapJocfqu6ZX0M5Sn1E8FtTlD6GH9I35l20B3yGmFw>
-    <xme:pCBdZMb9p2o_zmkgl7nxPI2k9KLD8O0iaoBhzgEdpRBvyjg2dkJ_3lotP7kcze7F8
-    gx9mhRqYfVy9fJ4syM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeegkedguddutdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfffhffvufgtsehttdertderredtnecuhfhrohhmpedfvehhrhhi
-    shcuofhurhhphhihfdcuoehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtohhmqe
-    enucggtffrrghtthgvrhhnpeeffeeltdejheefudetjedvleffvdevieegueegffdvffev
-    ffevkeeivdfhkeeikeenucffohhmrghinheprhgvughhrghtrdgtohhmnecuvehluhhsth
-    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheplhhishhtshestgholhho
-    rhhrvghmvgguihgvshdrtghomh
-X-ME-Proxy: <xmx:pCBdZH9Jb_UrRPk52bHxznXhJWps41v-UwZ64qxfgfCL1CvAlWEnLw>
-    <xmx:pCBdZDrRYaQxyUjA5k3ZppLZ4_tgKoED3f0XPEbjNVDxUcUZUPDLBQ>
-    <xmx:pCBdZAr2W0l6UpCdY_wLSqocw7QhLa_naA8K1UprNXJyx1TGlDRWTA>
-    <xmx:pCBdZNAJSFBppXG1Z50bsRltM2fxuHkXaUY529LMuRXf4uoJU6-3Ng>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id F42061700168; Thu, 11 May 2023 13:06:43 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-415-gf2b17fe6c3-fm-20230503.001-gf2b17fe6
-Mime-Version: 1.0
-Message-Id: <715c18c5-ee46-41e1-a115-203c88335e50@app.fastmail.com>
-Date:   Thu, 11 May 2023 13:06:22 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        "Linux Devel" <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        Linux-RAID <linux-raid@vger.kernel.org>
-Subject: 6.2 series regression, transient stalls during write intensive workloads
-Content-Type: text/plain
+        Thu, 11 May 2023 16:03:38 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FEA25FE9
+        for <linux-block@vger.kernel.org>; Thu, 11 May 2023 13:03:36 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-965cc5170bdso1352455566b.2
+        for <linux-block@vger.kernel.org>; Thu, 11 May 2023 13:03:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1683835414; x=1686427414;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U8xH7zGQzzRbqK6D4Oqhm3xKHhC25ViGnrUjwC/gsSw=;
+        b=MW5xkfBKg7R27pQpq6VOVNVFJBGddm5iGtOfa0k1cfyLC9VX049iC1rmEI6Fl/GVrk
+         7KKp7M8jRu3u4zh+yk6X15HS11ERm6dMK4kr50yDNyZFYvNqTYalyzCbsc1AAdQimZEp
+         nSfhnGrqTLLb7MBOSSUVZ5FhH2Rqs6nIRmhZ8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683835414; x=1686427414;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U8xH7zGQzzRbqK6D4Oqhm3xKHhC25ViGnrUjwC/gsSw=;
+        b=Rv3+qqcQeUKEOFP4mxWJ45H6Yhogb0dJjYrz81266iPELzd97UQ1mbr36NrrO614uy
+         bne1w/v4kDgCJ7TgI5aGdqoLpPDjw+1f1mCbrd8UyxSEjROh61vL244UkbgI+iLLVTx7
+         W3tEdczvCDhYmv/rLNdTw8/f60B3j0CJgltQ1NPVFRObj3a2nS66y4N+7Nbg3zJt4dVK
+         DUBg1kW+DpmElt43ymv6ZHcYMiw1xq3VZR46tPbJ0Wn2VxfBGp8ZXCKRp/XnMw1XnFgY
+         Uzw0q7rCGbRW2hR9TqUDgBkpO2Rh8P6oic6rsypIIbFb/iaZBA3VKdvG5sjTKgG4kd6P
+         A0nA==
+X-Gm-Message-State: AC+VfDzJxZBHyxzAel4vX1Pn+vczze+FY/whI8V3ez6Z4z9UFkvCbVWx
+        Ifuhe1fOWbfjggZlaTYB0xdhVT/jrNdtUsU4kRThyWnckVdlSgtd
+X-Google-Smtp-Source: ACHHUZ79IojXfbkX6DfE2MLOr1tErOiC5hf30sNWjiHWJExQyVXKxDUaQO3ACK/0ZNMxUV3252rL9e3+SLQj4skO4N0=
+X-Received: by 2002:a17:907:9694:b0:969:ba95:a3a0 with SMTP id
+ hd20-20020a170907969400b00969ba95a3a0mr12334138ejc.23.1683835414423; Thu, 11
+ May 2023 13:03:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230420004850.297045-1-sarthakkukreti@chromium.org>
+ <20230506062909.74601-1-sarthakkukreti@chromium.org> <20230506062909.74601-5-sarthakkukreti@chromium.org>
+ <ZFp7ykxGFUbPG1ON@redhat.com>
+In-Reply-To: <ZFp7ykxGFUbPG1ON@redhat.com>
+From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date:   Thu, 11 May 2023 13:03:23 -0700
+Message-ID: <CAG9=OMOMrFcy6UdL8-3wZGwOr1nqLm1bpvL+G1g2dvBhJWU2Kw@mail.gmail.com>
+Subject: Re: [PATCH v6 4/5] dm-thin: Add REQ_OP_PROVISION support
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Brian Foster <bfoster@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-kernel 6.2.14-300.fc38.x86_64
+On Tue, May 9, 2023 at 9:58=E2=80=AFAM Mike Snitzer <snitzer@kernel.org> wr=
+ote:
+>
+> On Sat, May 06 2023 at  2:29P -0400,
+> Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
+>
+> > dm-thinpool uses the provision request to provision
+> > blocks for a dm-thin device. dm-thinpool currently does not
+> > pass through REQ_OP_PROVISION to underlying devices.
+> >
+> > For shared blocks, provision requests will break sharing and copy the
+> > contents of the entire block. Additionally, if 'skip_block_zeroing'
+> > is not set, dm-thin will opt to zero out the entire range as a part
+> > of provisioning.
+> >
+> > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> > ---
+> >  drivers/md/dm-thin.c | 70 +++++++++++++++++++++++++++++++++++++++++---
+> >  1 file changed, 66 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+> > index 2b13c949bd72..3f94f53ac956 100644
+> > --- a/drivers/md/dm-thin.c
+> > +++ b/drivers/md/dm-thin.c
+> > @@ -274,6 +274,7 @@ struct pool {
+> >
+> >       process_bio_fn process_bio;
+> >       process_bio_fn process_discard;
+> > +     process_bio_fn process_provision;
+> >
+> >       process_cell_fn process_cell;
+> >       process_cell_fn process_discard_cell;
+> > @@ -913,7 +914,8 @@ static void __inc_remap_and_issue_cell(void *contex=
+t,
+> >       struct bio *bio;
+> >
+> >       while ((bio =3D bio_list_pop(&cell->bios))) {
+> > -             if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP=
+_DISCARD)
+> > +             if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP=
+_DISCARD ||
+> > +                 bio_op(bio) =3D=3D REQ_OP_PROVISION)
+> >                       bio_list_add(&info->defer_bios, bio);
+> >               else {
+> >                       inc_all_io_entry(info->tc->pool, bio);
+> > @@ -1245,8 +1247,8 @@ static int io_overlaps_block(struct pool *pool, s=
+truct bio *bio)
+> >
+> >  static int io_overwrites_block(struct pool *pool, struct bio *bio)
+> >  {
+> > -     return (bio_data_dir(bio) =3D=3D WRITE) &&
+> > -             io_overlaps_block(pool, bio);
+> > +     return (bio_data_dir(bio) =3D=3D WRITE) && io_overlaps_block(pool=
+, bio) &&
+> > +            bio_op(bio) !=3D REQ_OP_PROVISION;
+> >  }
+> >
+> >  static void save_and_set_endio(struct bio *bio, bio_end_io_t **save,
+> > @@ -1953,6 +1955,51 @@ static void provision_block(struct thin_c *tc, s=
+truct bio *bio, dm_block_t block
+> >       }
+> >  }
+> >
+> > +static void process_provision_bio(struct thin_c *tc, struct bio *bio)
+> > +{
+> > +     int r;
+> > +     struct pool *pool =3D tc->pool;
+> > +     dm_block_t block =3D get_bio_block(tc, bio);
+> > +     struct dm_bio_prison_cell *cell;
+> > +     struct dm_cell_key key;
+> > +     struct dm_thin_lookup_result lookup_result;
+> > +
+> > +     /*
+> > +      * If cell is already occupied, then the block is already
+> > +      * being provisioned so we have nothing further to do here.
+> > +      */
+> > +     build_virtual_key(tc->td, block, &key);
+> > +     if (bio_detain(pool, &key, bio, &cell))
+> > +             return;
+> > +
+> > +     if (tc->requeue_mode) {
+> > +             cell_requeue(pool, cell);
+> > +             return;
+> > +     }
+> > +
+> > +     r =3D dm_thin_find_block(tc->td, block, 1, &lookup_result);
+> > +     switch (r) {
+> > +     case 0:
+> > +             if (lookup_result.shared) {
+> > +                     process_shared_bio(tc, bio, block, &lookup_result=
+, cell);
+> > +             } else {
+> > +                     bio_endio(bio);
+> > +                     cell_defer_no_holder(tc, cell);
+> > +             }
+> > +             break;
+> > +     case -ENODATA:
+> > +             provision_block(tc, bio, block, cell);
+> > +             break;
+> > +
+> > +     default:
+> > +             DMERR_LIMIT("%s: dm_thin_find_block() failed: error =3D %=
+d",
+> > +                         __func__, r);
+> > +             cell_defer_no_holder(tc, cell);
+> > +             bio_io_error(bio);
+> > +             break;
+> > +     }
+> > +}
+> > +
+> >  static void process_cell(struct thin_c *tc, struct dm_bio_prison_cell =
+*cell)
+> >  {
+> >       int r;
+> > @@ -2228,6 +2275,8 @@ static void process_thin_deferred_bios(struct thi=
+n_c *tc)
+> >
+> >               if (bio_op(bio) =3D=3D REQ_OP_DISCARD)
+> >                       pool->process_discard(tc, bio);
+> > +             else if (bio_op(bio) =3D=3D REQ_OP_PROVISION)
+> > +                     pool->process_provision(tc, bio);
+> >               else
+> >                       pool->process_bio(tc, bio);
+> >
+> > @@ -2579,6 +2628,7 @@ static void set_pool_mode(struct pool *pool, enum=
+ pool_mode new_mode)
+> >               dm_pool_metadata_read_only(pool->pmd);
+> >               pool->process_bio =3D process_bio_fail;
+> >               pool->process_discard =3D process_bio_fail;
+> > +             pool->process_provision =3D process_bio_fail;
+> >               pool->process_cell =3D process_cell_fail;
+> >               pool->process_discard_cell =3D process_cell_fail;
+> >               pool->process_prepared_mapping =3D process_prepared_mappi=
+ng_fail;
+> > @@ -2592,6 +2642,7 @@ static void set_pool_mode(struct pool *pool, enum=
+ pool_mode new_mode)
+> >               dm_pool_metadata_read_only(pool->pmd);
+> >               pool->process_bio =3D process_bio_read_only;
+> >               pool->process_discard =3D process_bio_success;
+> > +             pool->process_provision =3D process_bio_fail;
+> >               pool->process_cell =3D process_cell_read_only;
+> >               pool->process_discard_cell =3D process_cell_success;
+> >               pool->process_prepared_mapping =3D process_prepared_mappi=
+ng_fail;
+> > @@ -2612,6 +2663,7 @@ static void set_pool_mode(struct pool *pool, enum=
+ pool_mode new_mode)
+> >               pool->out_of_data_space =3D true;
+> >               pool->process_bio =3D process_bio_read_only;
+> >               pool->process_discard =3D process_discard_bio;
+> > +             pool->process_provision =3D process_bio_fail;
+> >               pool->process_cell =3D process_cell_read_only;
+> >               pool->process_prepared_mapping =3D process_prepared_mappi=
+ng;
+> >               set_discard_callbacks(pool);
+> > @@ -2628,6 +2680,7 @@ static void set_pool_mode(struct pool *pool, enum=
+ pool_mode new_mode)
+> >               dm_pool_metadata_read_write(pool->pmd);
+> >               pool->process_bio =3D process_bio;
+> >               pool->process_discard =3D process_discard_bio;
+> > +             pool->process_provision =3D process_provision_bio;
+> >               pool->process_cell =3D process_cell;
+> >               pool->process_prepared_mapping =3D process_prepared_mappi=
+ng;
+> >               set_discard_callbacks(pool);
+> > @@ -2749,7 +2802,8 @@ static int thin_bio_map(struct dm_target *ti, str=
+uct bio *bio)
+> >               return DM_MAPIO_SUBMITTED;
+> >       }
+> >
+> > -     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DISCARD=
+) {
+> > +     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DISCARD=
+ ||
+> > +         bio_op(bio) =3D=3D REQ_OP_PROVISION) {
+> >               thin_defer_bio_with_throttle(tc, bio);
+> >               return DM_MAPIO_SUBMITTED;
+> >       }
+> > @@ -3396,6 +3450,9 @@ static int pool_ctr(struct dm_target *ti, unsigne=
+d int argc, char **argv)
+> >       pt->adjusted_pf =3D pt->requested_pf =3D pf;
+> >       ti->num_flush_bios =3D 1;
+> >       ti->limit_swap_bios =3D true;
+> > +     ti->num_provision_bios =3D 1;
+> > +     ti->provision_supported =3D true;
+> > +     ti->max_provision_granularity =3D true;
+> >
+> >       /*
+> >        * Only need to enable discards if the pool should pass
+> > @@ -4114,6 +4171,8 @@ static void pool_io_hints(struct dm_target *ti, s=
+truct queue_limits *limits)
+> >        * The pool uses the same discard limits as the underlying data
+> >        * device.  DM core has already set this up.
+> >        */
+> > +
+> > +     limits->max_provision_sectors =3D pool->sectors_per_block;
+> >  }
+> >
+> >  static struct target_type pool_target =3D {
+> > @@ -4288,6 +4347,9 @@ static int thin_ctr(struct dm_target *ti, unsigne=
+d int argc, char **argv)
+> >               ti->max_discard_granularity =3D true;
+> >       }
+> >
+> > +     ti->num_provision_bios =3D 1;
+> > +     ti->provision_supported =3D true;
+> > +
+>
+> We need this in thin_ctr: ti->max_provision_granularity =3D true;
+>
+> More needed in the thin target than thin-pool; otherwise provision bio
+> issued to thin devices won't be split appropriately.  But I do think
+> its fine to set in both thin_ctr and pool_ctr.
+>
+> Otherwise, looks good.
+>
+Thanks! I'll add it to the next iteration (in addition to any other
+feedback that's added to v6).
 
-Summary: User with LSI MegaRAID SAS 2108 in raid5 with Btrfs is reporting transient (but reproducible) stalls about 10s at a time, during which time the system UI is unresponsive both CLI and GUI. PSI reports no memory or CPU pressure, but light IO pressure ~10%. Some blocked tasks are captured with sysrq+w. The IO scheduler is BFQ, changing to mq-deadline might relieve some of the stalls but is inconclusive because the problem still happens. The problem does not occur with kernel 6.1.18.
+Given that this series covers multiple subsystems, would there be a
+preferred way of queueing this for merge?
 
-Downstream bug report:
-regression - transient stalls during write-intensive workload (edit) 
-https://bugzilla.redhat.com/show_bug.cgi?id=2193259
+Best
+Sarthak
 
-Attachment, output from "(cd /sys/kernel/debug/block/sda && find . -type f -exec grep -aH . {} \;)"
-https://bugzilla-attachments.redhat.com/attachment.cgi?id=1962546
-
-sysrq+w excerpt:
-
-[21672.537148] sysrq: Show Blocked State
-[21672.537553] task:worker          state:D stack:0     pid:9723  ppid:1      flags:0x00004002
-[21672.537562] Call Trace:
-[21672.537565]  <TASK>
-[21672.537570]  __schedule+0x3cc/0x13e0
-[21672.537585]  schedule+0x5d/0xe0
-[21672.537590]  io_schedule+0x42/0x70
-[21672.537595]  folio_wait_bit_common+0x13d/0x370
-[21672.537605]  ? __pfx_wake_page_function+0x10/0x10
-[21672.537611]  folio_wait_writeback+0x28/0x80
-[21672.537618]  extent_write_cache_pages+0x3ac/0x540
-[21672.537628]  extent_writepages+0x5a/0x120
-[21672.537633]  ? __pfx_end_bio_extent_writepage+0x10/0x10
-[21672.537637]  do_writepages+0xc0/0x1d0
-[21672.537644]  ? hrtimer_cancel+0x11/0x20
-[21672.537650]  filemap_fdatawrite_wbc+0x5f/0x80
-[21672.537654]  __filemap_fdatawrite_range+0x58/0x80
-[21672.537662]  start_ordered_ops.constprop.0+0x73/0xd0
-[21672.537668]  btrfs_sync_file+0xbc/0x580
-[21672.537672]  ? __seccomp_filter+0x333/0x500
-[21672.537681]  __x64_sys_fdatasync+0x4b/0x90
-[21672.537689]  do_syscall_64+0x5c/0x90
-[21672.537696]  ? syscall_exit_to_user_mode+0x17/0x40
-[21672.537701]  ? do_syscall_64+0x68/0x90
-[21672.537704]  ? syscall_exit_to_user_mode+0x17/0x40
-[21672.537708]  ? do_syscall_64+0x68/0x90
-[21672.537712]  ? syscall_exit_to_user_mode+0x17/0x40
-[21672.537715]  ? do_syscall_64+0x68/0x90
-[21672.537718]  ? do_syscall_64+0x68/0x90
-[21672.537722]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[21672.537729] RIP: 0033:0x7f899579ae9c
-[21672.537749] RSP: 002b:00007f78a57f9650 EFLAGS: 00000293 ORIG_RAX: 000000000000004b
-[21672.537754] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f899579ae9c
-[21672.537757] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000010
-[21672.537759] RBP: 00007f78a57f9660 R08: 0000000000000000 R09: 0000000000000001
-[21672.537761] R10: 0000000000000000 R11: 0000000000000293 R12: 000055d1291be230
-[21672.537764] R13: 000055d128f6f1b0 R14: 000055d1287843d8 R15: 000055d128f6f218
-[21672.537771]  </TASK>
-[21699.524273] sysrq: Show Blocked State
-[21715.167298] sysrq: Show Blocked State
-[21715.167633] task:worker          state:D stack:0     pid:9723  ppid:1      flags:0x00004002
-[21715.167639] Call Trace:
-[21715.167642]  <TASK>
-[21715.167647]  __schedule+0x3cc/0x13e0
-[21715.167657]  ? __schedule+0x3d4/0x13e0
-[21715.167662]  schedule+0x5d/0xe0
-[21715.167665]  io_schedule+0x42/0x70
-[21715.167668]  folio_wait_bit_common+0x13d/0x370
-[21715.167676]  ? __pfx_wake_page_function+0x10/0x10
-[21715.167680]  folio_wait_writeback+0x28/0x80
-[21715.167685]  extent_write_cache_pages+0x3ac/0x540
-[21715.167692]  extent_writepages+0x5a/0x120
-[21715.167694]  ? ttwu_queue_wakelist+0xbf/0x110
-[21715.167700]  ? __pfx_end_bio_extent_writepage+0x10/0x10
-[21715.167703]  do_writepages+0xc0/0x1d0
-[21715.167707]  ? __remove_hrtimer+0x39/0x90
-[21715.167711]  filemap_fdatawrite_wbc+0x5f/0x80
-[21715.167714]  __filemap_fdatawrite_range+0x58/0x80
-[21715.167719]  start_ordered_ops.constprop.0+0x73/0xd0
-[21715.167723]  btrfs_sync_file+0xbc/0x580
-[21715.167726]  ? __seccomp_filter+0x333/0x500
-[21715.167732]  __x64_sys_fdatasync+0x4b/0x90
-[21715.167738]  do_syscall_64+0x5c/0x90
-[21715.167743]  ? syscall_exit_to_user_mode+0x17/0x40
-[21715.167747]  ? do_syscall_64+0x68/0x90
-[21715.167749]  ? syscall_exit_to_user_mode+0x17/0x40
-[21715.167751]  ? do_syscall_64+0x68/0x90
-[21715.167753]  ? syscall_exit_to_user_mode+0x17/0x40
-[21715.167755]  ? do_syscall_64+0x68/0x90
-[21715.167757]  ? do_syscall_64+0x68/0x90
-[21715.167760]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[21715.167765] RIP: 0033:0x7f899579ae9c
-[21715.167782] RSP: 002b:00007f78a57f9650 EFLAGS: 00000293 ORIG_RAX: 000000000000004b
-[21715.167785] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f899579ae9c
-[21715.167787] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000010
-[21715.167789] RBP: 00007f78a57f9660 R08: 0000000000000000 R09: 0000000000000001
-[21715.167790] R10: 0000000000000000 R11: 0000000000000293 R12: 000055d1291be230
-[21715.167792] R13: 000055d128f6f1b0 R14: 000055d1287843d8 R15: 000055d128f6f218
-[21715.167797]  </TASK>
-[21715.167822] task:kworker/u48:5   state:D stack:0     pid:9080  ppid:2      flags:0x00004000
-[21715.167826] Workqueue: writeback wb_workfn (flush-btrfs-1)
-[21715.167830] Call Trace:
-[21715.167832]  <TASK>
-[21715.167833]  __schedule+0x3cc/0x13e0
-[21715.167839]  schedule+0x5d/0xe0
-[21715.167842]  io_schedule+0x42/0x70
-[21715.167845]  blk_mq_get_tag+0x11a/0x2a0
-[21715.167850]  ? __pfx_autoremove_wake_function+0x10/0x10
-[21715.167855]  __blk_mq_alloc_requests+0x18e/0x2e0
-[21715.167861]  blk_mq_submit_bio+0x2fb/0x5f0
-[21715.167867]  __submit_bio+0xf5/0x180
-[21715.167872]  submit_bio_noacct_nocheck+0x32e/0x370
-[21715.167876]  ? submit_bio_noacct+0x71/0x4e0
-[21715.167880]  btrfs_submit_bio+0x247/0x270
-[21715.167887]  submit_one_bio+0xfa/0x120
-[21715.167893]  submit_extent_page+0x15f/0x500
-[21715.167898]  ? __pfx_page_mkclean_one+0x10/0x10
-[21715.167905]  ? __pfx_invalid_mkclean_vma+0x10/0x10
-[21715.167909]  __extent_writepage_io.constprop.0+0x273/0x590
-[21715.167914]  ? writepage_delalloc+0x20/0x180
-[21715.167918]  __extent_writepage+0x124/0x440
-[21715.167922]  extent_write_cache_pages+0x15f/0x540
-[21715.167927]  extent_writepages+0x5a/0x120
-[21715.167930]  ? __pfx_end_bio_extent_writepage+0x10/0x10
-[21715.167933]  do_writepages+0xc0/0x1d0
-[21715.167936]  ? __pfx_stack_trace_consume_entry+0x10/0x10
-[21715.167942]  __writeback_single_inode+0x3d/0x360
-[21715.167945]  ? _raw_spin_lock+0x13/0x40
-[21715.167950]  writeback_sb_inodes+0x1ed/0x4b0
-[21715.167955]  __writeback_inodes_wb+0x4c/0xf0
-[21715.167958]  wb_writeback+0x172/0x2f0
-[21715.167962]  wb_workfn+0x357/0x510
-[21715.167964]  ? __schedule+0x3d4/0x13e0
-[21715.167969]  process_one_work+0x1c7/0x3d0
-[21715.167974]  worker_thread+0x4d/0x380
-[21715.167978]  ? __pfx_worker_thread+0x10/0x10
-[21715.167981]  kthread+0xe9/0x110
-[21715.167985]  ? __pfx_kthread+0x10/0x10
-[21715.167988]  ret_from_fork+0x2c/0x50
-[21715.167996]  </TASK>
-
-full dmesg attachment
-https://bugzilla-attachments.redhat.com/attachment.cgi?id=1962385
-
-
-Thanks,
-
-
-
---
-Chris Murphy
+> Thanks,
+> Mike
