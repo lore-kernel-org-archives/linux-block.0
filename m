@@ -2,59 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31387C77B7C
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 15:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D4BC77B7F
+	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 15:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238621AbjEKPgA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 May 2023 11:36:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58340 "EHLO
+        id S238639AbjEKPiI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 May 2023 11:38:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238331AbjEKPf7 (ORCPT
+        with ESMTP id S237708AbjEKPiH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 May 2023 11:35:59 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05DCE55BE;
-        Thu, 11 May 2023 08:35:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=MHscP8JO9a977ifuFmAms77FPjymkVYX028FcGoGDPI=; b=TC8tH+i3jJ9ACSqpipFxuZrJ6j
-        6rEraOVNsToWwPk8JihVWkQgJTLx9Ijn8VYLqr2l3z/p8GG9tpZ2ln891Z4ya1vx2VPYUK7uEjMWb
-        NzKFFSnrCVnZqbmt7QmXik/3/ZTqMf0qE8LQXa5qOeUz+dFphnqyG5WtnT/mB7klrCCND+SQL77Dr
-        uyrqf+2HFbo9BHgQVgFBNaVeD84Beo8SpM5rt+XI3giRUGRZo0GdJOgc3UriyautGBw8wEJ9AUjYZ
-        G5iXDH5VmL7RE27rOqm3HApVG9w9dy4YeLA3SZep3w7p7yo10iXtCOlS94GicuEIlMpZYP6+ctjM0
-        5uhKqOjQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1px8Kj-009E8e-0V;
-        Thu, 11 May 2023 15:35:57 +0000
-Date:   Thu, 11 May 2023 08:35:57 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Christian =?iso-8859-1?Q?G=F6ttsche?= <cgzones@googlemail.com>
-Cc:     selinux@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Alistair Delva <adelva@google.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Serge Hallyn <serge@hallyn.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v4 4/9] block: use new capable_any functionality
-Message-ID: <ZF0LXRWZb+xL+pTS@infradead.org>
-References: <20230511142535.732324-1-cgzones@googlemail.com>
- <20230511142535.732324-4-cgzones@googlemail.com>
+        Thu, 11 May 2023 11:38:07 -0400
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 643674C38;
+        Thu, 11 May 2023 08:38:06 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6439f186366so5435871b3a.2;
+        Thu, 11 May 2023 08:38:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683819486; x=1686411486;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EZSuUDNZroiyxm8tSJ9/WgOQoub/MYxlf8xCitRpuzE=;
+        b=E3cXAISAw9Bot++cvZ0EXW1inQ7B/pPWva41TqvasvmiaRY3nQTg70JGfGFkhbTCJU
+         N9VFXdvDw3+M0nHQv8Ct+Vi8Yo20EcsEAnquARCSWAeTR10GPS1X6OjMpd+AtsdJ53N6
+         VS/Wn/R2Q11gRh2ao5alul6MU1NDIw3LpQiqumjzZML55D/zKtQyIKZelktSOBndPYx8
+         5ayZbzKtCWRMpgRlXUFbd6F1qaMimR6gRZdBEd4Ul4U1OBXljZeVLZjrvHJLgBcc/YaY
+         Us36MTQ93BhG1zPDyD14okjZ0Z/zr68z07t+gw5Sp5HEQBEa/3VWShS+Pe+CkleUYTQx
+         8n1A==
+X-Gm-Message-State: AC+VfDw3x2sH7JXnskBzStiKoEDJv+H47UuflvFcnWd7VjM078zPTgsG
+        k8ZOckdLtGGZcX1jIWpV8BWS66AvQJk=
+X-Google-Smtp-Source: ACHHUZ4yVECYtD+qVm4EPWXQ7n+M0L0oJ8Y1QiJhaT60VoEzwjnc6YrVie/FMwn3rdeYFmeiM417FQ==
+X-Received: by 2002:a05:6a00:14d0:b0:63d:2f13:1f3 with SMTP id w16-20020a056a0014d000b0063d2f1301f3mr29540905pfu.33.1683819485772;
+        Thu, 11 May 2023 08:38:05 -0700 (PDT)
+Received: from [172.20.11.151] ([173.214.130.133])
+        by smtp.gmail.com with ESMTPSA id n1-20020aa78a41000000b0064550f76efesm5499494pfa.29.2023.05.11.08.38.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 May 2023 08:38:05 -0700 (PDT)
+Message-ID: <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
+Date:   Thu, 11 May 2023 08:38:04 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230511142535.732324-4-cgzones@googlemail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>,
+        Ed Tsai <ed.tsai@mediatek.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        martin.petersen@oracle.com, stanley.chu@mediatek.com,
+        peter.wang@mediatek.com, chun-hung.wu@mediatek.com,
+        alice.chao@mediatek.com, powen.kao@mediatek.com,
+        naomi.chu@mediatek.com, wsd_upstream@mediatek.com
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <ZF0K7A6G2cYBjSgn@infradead.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZF0K7A6G2cYBjSgn@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 11, 2023 at 04:25:27PM +0200, Christian Göttsche wrote:
-> Use the new added capable_any function in appropriate cases, where a
-> task is required to have any of two capabilities.
+On 5/11/23 08:34, Christoph Hellwig wrote:
+> On Tue, May 09, 2023 at 02:52:30PM +0800, Ed Tsai wrote:
+>> The tags allocation is limited by the fair sharing algorithm. It hurts
+>> the performance for UFS devices, because the queue depth of general I/O
+>> is reduced by half once the UFS send a control command.
+> 
+> But it is there for a reason.  You completely fail to explain why you
+> think your change is safe, and also why you did not try to even explain
+> where the overhead is and how else you tried to mitigate it.
 
-What is this new function and why should we using it?
+Hi Christoph,
 
-Your also forgot to Cc the block list on the entire series, making this
-page completely unreviewable.
+For which devices is the fair sharing algorithm useful? As far as I know 
+the legacy block layer did not have an equivalent of the fair sharing 
+algorithm and I'm not aware of any complaints about the legacy block 
+layer regarding to fairness. This is why I proposed in January to remove 
+the fair sharing code entirely. See also 
+https://lore.kernel.org/linux-block/20230103195337.158625-1-bvanassche@acm.org/.
+
+Thanks,
+
+Bart.
