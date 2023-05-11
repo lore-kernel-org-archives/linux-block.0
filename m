@@ -2,99 +2,223 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 151BDC77B7C
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 16:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D0BC7EE22
+	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 17:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238563AbjEKQxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 May 2023 12:53:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34972 "EHLO
+        id S238738AbjEKRGs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 May 2023 13:06:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238516AbjEKQxY (ORCPT
+        with ESMTP id S229756AbjEKRGr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 May 2023 12:53:24 -0400
-Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AEC59DC;
-        Thu, 11 May 2023 09:53:22 -0700 (PDT)
-Received: by mail-ua1-x92f.google.com with SMTP id a1e0cc1a2514c-77e80c37af1so2479561241.0;
-        Thu, 11 May 2023 09:53:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1683824001; x=1686416001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D7CyuNeO1bKn8cJ+nOjq+BFfHo7Ts+ohomPRgom/d1k=;
-        b=nHXKHuXToMZIHYv6zpwAqjgg+hlwgncxBpc2kvB0Tr3VCMpfOqH3tri9226u988h+8
-         NeMpTHcryTDzBrxA6SE7OB2GbvwKt057XjBUcbVFrcPHHJCZDWCUseBd96ELRwRALuUZ
-         DVBPCyJusx5/PWrDIEd1Pq3D+h0y+/z2kNghXtqdQT5oxlJvGymkELEP27R1mhKJ3CB3
-         KqNbOdH6YK4wkJinlV+x9AJ7m08Oj7AIT4GY8Erm1XJR3dkLxqZfJ1Gfe0cErlfwOOOh
-         45bhNiynGXqEzhgHHJXm3K9V0ppqOiRFGc/crJZSzAaULz1tKDmgY2ORhftvOA6FzqKD
-         uc/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683824001; x=1686416001;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D7CyuNeO1bKn8cJ+nOjq+BFfHo7Ts+ohomPRgom/d1k=;
-        b=BucIJmEFmCSRhRuSp1W8hJD7NDFYU8b6eIDomKHS46ncgCg+RgvgdF5NQ7hgluRid1
-         2+MXnXpxs60jGH2BtVzCq6dFh7kUU8KaS8ixnqiL3hhYV2Ma1XBPlMywvR572SbEj4Ow
-         n57uZLHdYek9bZfqeOXiLt0LxDM4GIily0nzNbKN1KM/7/pg16sZrmlwt9ujToMFl5qQ
-         xPlnr0z9acfbQo/JM/853KUFKQGSh7WS3RfF7sbC0bXc07wGp0mkXKIrUKjE+PJwwOwi
-         ZTfiLgdtpJQw7fiSQv0SqQfTpEYTmhR/Mytsiq+FnYCmbAKH/JB+NYyHvR5ArJKa6NOg
-         orSA==
-X-Gm-Message-State: AC+VfDy82IifM5t2pRAbfag2W8qW3qHaCq8NpoSP3/Rmeker0w8LWaXD
-        5/eDLULUIhfdcI8BYup6/nCPVtpQSwPMa8QdkYw=
-X-Google-Smtp-Source: ACHHUZ4aUqksIqw7q6XK5aUmktWWI15AwBlyuT3gm+Nn55vbT17csRXZOgyZLke+iIdzRgKnsrxWb86Ob0pUeZMwOAs=
-X-Received: by 2002:a67:e242:0:b0:436:bef:1eac with SMTP id
- w2-20020a67e242000000b004360bef1eacmr5228663vse.29.1683824001262; Thu, 11 May
- 2023 09:53:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230511142535.732324-1-cgzones@googlemail.com>
- <20230511142535.732324-4-cgzones@googlemail.com> <ZF0LXRWZb+xL+pTS@infradead.org>
-In-Reply-To: <ZF0LXRWZb+xL+pTS@infradead.org>
-From:   =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>
-Date:   Thu, 11 May 2023 18:53:10 +0200
-Message-ID: <CAJ2a_DdwSZciKNtbbK14sOt5BqbATpmvqMVpR3tJvhMZitHxDw@mail.gmail.com>
-Subject: Re: [PATCH v4 4/9] block: use new capable_any functionality
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     selinux@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Alistair Delva <adelva@google.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Serge Hallyn <serge@hallyn.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 11 May 2023 13:06:47 -0400
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84932FA;
+        Thu, 11 May 2023 10:06:45 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.west.internal (Postfix) with ESMTP id CD5CB32008C3;
+        Thu, 11 May 2023 13:06:44 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute5.internal (MEProxy); Thu, 11 May 2023 13:06:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        colorremedies.com; h=cc:content-type:content-type:date:date:from
+        :from:in-reply-to:message-id:mime-version:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1683824804; x=1683911204; bh=A5
+        jTFtJOtctoZaxC3gTjHWmQRsjq8+d+7S7Z9ZyMZY8=; b=kUR9vThFK6NnPQWCgv
+        si0KhvA4LvM7qfHTBtgyuOzVLZusvKggoSM9/8Ox6o6FKe6/USSgZbTvQK/t/Rgr
+        Vd04+To7BxOPY38DNyOTEWCBa/bUh2tRgaiIIG5VBUjQsvZgLWryXq5BqJCdtSPT
+        KAmyQWxxiBWX/jOcr7LSToHUENfGpXyZcdDzoGkBEyh32UNNHbmRhg2WN4UaiCRc
+        sRMHjvmnFsHX/5cfWZw/lzXbEXHtRGgJBITNLf/GI/gBh4dCE7KElGAZQTH4NZPg
+        S6ye08GV4py0G29GmkVBzn4RNodABb2qfpSCVtf/TjJHJgHYuCS/iQrbvtUa9Oky
+        JNMg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+        1683824804; x=1683911204; bh=A5jTFtJOtctoZaxC3gTjHWmQRsjq8+d+7S7
+        Z9ZyMZY8=; b=hSCBN13IeyVjF6iIdaRrgVfQnSHE1/Wi2jmQqFsgNTJzgtlvc3U
+        5BRIDE8TineOa0odDSb7JQFhOpcziJiUI2HrhKRqI+OBFcBtMgxw923JRnhSMqSZ
+        kbxOS7zdolEGp2oL8QBg6WvAwEZ7t0UUdqk1MAFnFwMWknYqjvBYXnQJkQxVNYJ/
+        04hv5Vtp7sCU2gIe5ETRWGNTltS4/wE5IJG0Qh7bSreRyAM932CuV6Vsa8Ah0LrY
+        f1KmILe8Qq6LHYnwzMto1bAcVibqWIlL2DU9b9oDwxtjQW7v3mFlBQd3rUAzgn64
+        Yn0yyQgbzSyl9RlUfVDz4Go3WPVArSzXWGA==
+X-ME-Sender: <xms:pCBdZFa9NvYswapJocfqu6ZX0M5Sn1E8FtTlD6GH9I35l20B3yGmFw>
+    <xme:pCBdZMb9p2o_zmkgl7nxPI2k9KLD8O0iaoBhzgEdpRBvyjg2dkJ_3lotP7kcze7F8
+    gx9mhRqYfVy9fJ4syM>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeegkedguddutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfffhffvufgtsehttdertderredtnecuhfhrohhmpedfvehhrhhi
+    shcuofhurhhphhihfdcuoehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtohhmqe
+    enucggtffrrghtthgvrhhnpeeffeeltdejheefudetjedvleffvdevieegueegffdvffev
+    ffevkeeivdfhkeeikeenucffohhmrghinheprhgvughhrghtrdgtohhmnecuvehluhhsth
+    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheplhhishhtshestgholhho
+    rhhrvghmvgguihgvshdrtghomh
+X-ME-Proxy: <xmx:pCBdZH9Jb_UrRPk52bHxznXhJWps41v-UwZ64qxfgfCL1CvAlWEnLw>
+    <xmx:pCBdZDrRYaQxyUjA5k3ZppLZ4_tgKoED3f0XPEbjNVDxUcUZUPDLBQ>
+    <xmx:pCBdZAr2W0l6UpCdY_wLSqocw7QhLa_naA8K1UprNXJyx1TGlDRWTA>
+    <xmx:pCBdZNAJSFBppXG1Z50bsRltM2fxuHkXaUY529LMuRXf4uoJU6-3Ng>
+Feedback-ID: i06494636:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id F42061700168; Thu, 11 May 2023 13:06:43 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-415-gf2b17fe6c3-fm-20230503.001-gf2b17fe6
+Mime-Version: 1.0
+Message-Id: <715c18c5-ee46-41e1-a115-203c88335e50@app.fastmail.com>
+Date:   Thu, 11 May 2023 13:06:22 -0400
+From:   "Chris Murphy" <lists@colorremedies.com>
+To:     "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
+        "Linux Devel" <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Linux-RAID <linux-raid@vger.kernel.org>
+Subject: 6.2 series regression, transient stalls during write intensive workloads
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 11 May 2023 at 17:35, Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Thu, May 11, 2023 at 04:25:27PM +0200, Christian G=C3=B6ttsche wrote:
-> > Use the new added capable_any function in appropriate cases, where a
-> > task is required to have any of two capabilities.
->
-> What is this new function and why should we using it?
+kernel 6.2.14-300.fc38.x86_64
 
-Quoting the description from
-https://lore.kernel.org/all/20230511142535.732324-10-cgzones@googlemail.com=
-/
-:
+Summary: User with LSI MegaRAID SAS 2108 in raid5 with Btrfs is reporting transient (but reproducible) stalls about 10s at a time, during which time the system UI is unresponsive both CLI and GUI. PSI reports no memory or CPU pressure, but light IO pressure ~10%. Some blocked tasks are captured with sysrq+w. The IO scheduler is BFQ, changing to mq-deadline might relieve some of the stalls but is inconclusive because the problem still happens. The problem does not occur with kernel 6.1.18.
 
-Add the interfaces `capable_any()` and `ns_capable_any()` as an
-alternative to multiple `capable()`/`ns_capable()` calls, like
-`capable_any(CAP_SYS_NICE, CAP_SYS_ADMIN)` instead of
-`capable(CAP_SYS_NICE) || capable(CAP_SYS_ADMIN)`.
+Downstream bug report:
+regression - transient stalls during write-intensive workload (edit) 
+https://bugzilla.redhat.com/show_bug.cgi?id=2193259
 
-`capable_any()`/`ns_capable_any()` will in particular generate exactly
-one audit message, either for the left most capability in effect or, if
-the task has none, the first one.
+Attachment, output from "(cd /sys/kernel/debug/block/sda && find . -type f -exec grep -aH . {} \;)"
+https://bugzilla-attachments.redhat.com/attachment.cgi?id=1962546
 
-This is especially helpful with regard to SELinux, where each audit
-message about a not allowed capability request will create a denial
-message.  Using this new wrapper with the least invasive capability as
-left most argument (e.g. CAP_SYS_NICE before CAP_SYS_ADMIN) enables
-policy writers to only grant the least invasive one for the particular
-subject instead of both.
+sysrq+w excerpt:
 
-> Your also forgot to Cc the block list on the entire series, making this
-> page completely unreviewable.
+[21672.537148] sysrq: Show Blocked State
+[21672.537553] task:worker          state:D stack:0     pid:9723  ppid:1      flags:0x00004002
+[21672.537562] Call Trace:
+[21672.537565]  <TASK>
+[21672.537570]  __schedule+0x3cc/0x13e0
+[21672.537585]  schedule+0x5d/0xe0
+[21672.537590]  io_schedule+0x42/0x70
+[21672.537595]  folio_wait_bit_common+0x13d/0x370
+[21672.537605]  ? __pfx_wake_page_function+0x10/0x10
+[21672.537611]  folio_wait_writeback+0x28/0x80
+[21672.537618]  extent_write_cache_pages+0x3ac/0x540
+[21672.537628]  extent_writepages+0x5a/0x120
+[21672.537633]  ? __pfx_end_bio_extent_writepage+0x10/0x10
+[21672.537637]  do_writepages+0xc0/0x1d0
+[21672.537644]  ? hrtimer_cancel+0x11/0x20
+[21672.537650]  filemap_fdatawrite_wbc+0x5f/0x80
+[21672.537654]  __filemap_fdatawrite_range+0x58/0x80
+[21672.537662]  start_ordered_ops.constprop.0+0x73/0xd0
+[21672.537668]  btrfs_sync_file+0xbc/0x580
+[21672.537672]  ? __seccomp_filter+0x333/0x500
+[21672.537681]  __x64_sys_fdatasync+0x4b/0x90
+[21672.537689]  do_syscall_64+0x5c/0x90
+[21672.537696]  ? syscall_exit_to_user_mode+0x17/0x40
+[21672.537701]  ? do_syscall_64+0x68/0x90
+[21672.537704]  ? syscall_exit_to_user_mode+0x17/0x40
+[21672.537708]  ? do_syscall_64+0x68/0x90
+[21672.537712]  ? syscall_exit_to_user_mode+0x17/0x40
+[21672.537715]  ? do_syscall_64+0x68/0x90
+[21672.537718]  ? do_syscall_64+0x68/0x90
+[21672.537722]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[21672.537729] RIP: 0033:0x7f899579ae9c
+[21672.537749] RSP: 002b:00007f78a57f9650 EFLAGS: 00000293 ORIG_RAX: 000000000000004b
+[21672.537754] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f899579ae9c
+[21672.537757] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000010
+[21672.537759] RBP: 00007f78a57f9660 R08: 0000000000000000 R09: 0000000000000001
+[21672.537761] R10: 0000000000000000 R11: 0000000000000293 R12: 000055d1291be230
+[21672.537764] R13: 000055d128f6f1b0 R14: 000055d1287843d8 R15: 000055d128f6f218
+[21672.537771]  </TASK>
+[21699.524273] sysrq: Show Blocked State
+[21715.167298] sysrq: Show Blocked State
+[21715.167633] task:worker          state:D stack:0     pid:9723  ppid:1      flags:0x00004002
+[21715.167639] Call Trace:
+[21715.167642]  <TASK>
+[21715.167647]  __schedule+0x3cc/0x13e0
+[21715.167657]  ? __schedule+0x3d4/0x13e0
+[21715.167662]  schedule+0x5d/0xe0
+[21715.167665]  io_schedule+0x42/0x70
+[21715.167668]  folio_wait_bit_common+0x13d/0x370
+[21715.167676]  ? __pfx_wake_page_function+0x10/0x10
+[21715.167680]  folio_wait_writeback+0x28/0x80
+[21715.167685]  extent_write_cache_pages+0x3ac/0x540
+[21715.167692]  extent_writepages+0x5a/0x120
+[21715.167694]  ? ttwu_queue_wakelist+0xbf/0x110
+[21715.167700]  ? __pfx_end_bio_extent_writepage+0x10/0x10
+[21715.167703]  do_writepages+0xc0/0x1d0
+[21715.167707]  ? __remove_hrtimer+0x39/0x90
+[21715.167711]  filemap_fdatawrite_wbc+0x5f/0x80
+[21715.167714]  __filemap_fdatawrite_range+0x58/0x80
+[21715.167719]  start_ordered_ops.constprop.0+0x73/0xd0
+[21715.167723]  btrfs_sync_file+0xbc/0x580
+[21715.167726]  ? __seccomp_filter+0x333/0x500
+[21715.167732]  __x64_sys_fdatasync+0x4b/0x90
+[21715.167738]  do_syscall_64+0x5c/0x90
+[21715.167743]  ? syscall_exit_to_user_mode+0x17/0x40
+[21715.167747]  ? do_syscall_64+0x68/0x90
+[21715.167749]  ? syscall_exit_to_user_mode+0x17/0x40
+[21715.167751]  ? do_syscall_64+0x68/0x90
+[21715.167753]  ? syscall_exit_to_user_mode+0x17/0x40
+[21715.167755]  ? do_syscall_64+0x68/0x90
+[21715.167757]  ? do_syscall_64+0x68/0x90
+[21715.167760]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[21715.167765] RIP: 0033:0x7f899579ae9c
+[21715.167782] RSP: 002b:00007f78a57f9650 EFLAGS: 00000293 ORIG_RAX: 000000000000004b
+[21715.167785] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f899579ae9c
+[21715.167787] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000010
+[21715.167789] RBP: 00007f78a57f9660 R08: 0000000000000000 R09: 0000000000000001
+[21715.167790] R10: 0000000000000000 R11: 0000000000000293 R12: 000055d1291be230
+[21715.167792] R13: 000055d128f6f1b0 R14: 000055d1287843d8 R15: 000055d128f6f218
+[21715.167797]  </TASK>
+[21715.167822] task:kworker/u48:5   state:D stack:0     pid:9080  ppid:2      flags:0x00004000
+[21715.167826] Workqueue: writeback wb_workfn (flush-btrfs-1)
+[21715.167830] Call Trace:
+[21715.167832]  <TASK>
+[21715.167833]  __schedule+0x3cc/0x13e0
+[21715.167839]  schedule+0x5d/0xe0
+[21715.167842]  io_schedule+0x42/0x70
+[21715.167845]  blk_mq_get_tag+0x11a/0x2a0
+[21715.167850]  ? __pfx_autoremove_wake_function+0x10/0x10
+[21715.167855]  __blk_mq_alloc_requests+0x18e/0x2e0
+[21715.167861]  blk_mq_submit_bio+0x2fb/0x5f0
+[21715.167867]  __submit_bio+0xf5/0x180
+[21715.167872]  submit_bio_noacct_nocheck+0x32e/0x370
+[21715.167876]  ? submit_bio_noacct+0x71/0x4e0
+[21715.167880]  btrfs_submit_bio+0x247/0x270
+[21715.167887]  submit_one_bio+0xfa/0x120
+[21715.167893]  submit_extent_page+0x15f/0x500
+[21715.167898]  ? __pfx_page_mkclean_one+0x10/0x10
+[21715.167905]  ? __pfx_invalid_mkclean_vma+0x10/0x10
+[21715.167909]  __extent_writepage_io.constprop.0+0x273/0x590
+[21715.167914]  ? writepage_delalloc+0x20/0x180
+[21715.167918]  __extent_writepage+0x124/0x440
+[21715.167922]  extent_write_cache_pages+0x15f/0x540
+[21715.167927]  extent_writepages+0x5a/0x120
+[21715.167930]  ? __pfx_end_bio_extent_writepage+0x10/0x10
+[21715.167933]  do_writepages+0xc0/0x1d0
+[21715.167936]  ? __pfx_stack_trace_consume_entry+0x10/0x10
+[21715.167942]  __writeback_single_inode+0x3d/0x360
+[21715.167945]  ? _raw_spin_lock+0x13/0x40
+[21715.167950]  writeback_sb_inodes+0x1ed/0x4b0
+[21715.167955]  __writeback_inodes_wb+0x4c/0xf0
+[21715.167958]  wb_writeback+0x172/0x2f0
+[21715.167962]  wb_workfn+0x357/0x510
+[21715.167964]  ? __schedule+0x3d4/0x13e0
+[21715.167969]  process_one_work+0x1c7/0x3d0
+[21715.167974]  worker_thread+0x4d/0x380
+[21715.167978]  ? __pfx_worker_thread+0x10/0x10
+[21715.167981]  kthread+0xe9/0x110
+[21715.167985]  ? __pfx_kthread+0x10/0x10
+[21715.167988]  ret_from_fork+0x2c/0x50
+[21715.167996]  </TASK>
+
+full dmesg attachment
+https://bugzilla-attachments.redhat.com/attachment.cgi?id=1962385
+
+
+Thanks,
+
+
+
+--
+Chris Murphy
