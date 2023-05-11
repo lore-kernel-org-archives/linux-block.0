@@ -2,108 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D88C7EE30
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 14:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5A6C7EE22
+	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 14:29:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238458AbjEKO1B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 May 2023 10:27:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46098 "EHLO
+        id S238521AbjEKO3W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 May 2023 10:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238045AbjEKO0r (ORCPT
+        with ESMTP id S238526AbjEKO2y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 May 2023 10:26:47 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E4AC1161A;
-        Thu, 11 May 2023 07:26:35 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-50bc1612940so15770603a12.2;
-        Thu, 11 May 2023 07:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1683815194; x=1686407194;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4MLvCJECEpiR/gI61O4GG27R/3uA2bLpDgI5SluFLTA=;
-        b=N68pkqzbvbgbZoltAtubUv7rw9JDXyqdkHGdeKmUKjGpn+E5r4zpUDvVnJnAQ8q/TY
-         nswT/PA0t6FiilhbAjs2ZA920mxwXyD7SPZTe7HZNbzTny4MzUzAmNvhHHV66wy8snLx
-         133de9nuoDoyUqThzedi9BsiMhYhtTdzwgVSciKF5qTuT6oJJsuGF27/VMHe0X56VIIk
-         TwicLhuN0EsOIppLFg+9pJM4liuIKAxwv8n5eVI+mkQNQ2mlq7LvRyBDbf8JRgmqTfO7
-         lcYKKtolCRyYdFmOIAklkRShS3Ku0tT6icHA08d77cjRjtZaOJjtu2NwGCVMoJJKg9E7
-         ZhHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683815194; x=1686407194;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4MLvCJECEpiR/gI61O4GG27R/3uA2bLpDgI5SluFLTA=;
-        b=bQeLQbs/hGeQuIf7/9PVgM2IAje2zH8TKSITp0UdE3zE2DwvMRneblejwZCsnzu28w
-         MHBhYxbaIcwl2Lgs88dHu9i62qmVlYznHhEi3Wf+02h13ragHeNq8zl0Z4weEpyzpLn5
-         5kg+kOpv64Gh1srARmIXiQKmrfcZksGpgnHxuaPsOMhx4bSRmilFx320OcacfrTWxST4
-         ap8IZ80kxHl6Wr0XmZXd02p6Hd5Y1niYMj/XSu/gyxJx9NjRUqI4d3BXYUzi1QGd31fa
-         f8eXJuJUamhquCnPwmHxvoNpTCFfBGwtw/Xd1XQwhvQih97HwUJTbtrbIqT91ssWJhwK
-         bn+A==
-X-Gm-Message-State: AC+VfDyGMDGgV5k9ee9OajuoUKh/xQTtC3PNDLcfuGr3pgx5N/VTuGkO
-        tYuaJDnDg4GMjEHFcnYtw3d9ZY2VqnXmhw==
-X-Google-Smtp-Source: ACHHUZ46hOkfDQhmJnGL2G54E94Gis8MlvJwgbU2cj9cJ39h0TTPpvN63Du9gpl7pzhrlXMK+ihZEg==
-X-Received: by 2002:a17:907:868b:b0:961:57fb:10c1 with SMTP id qa11-20020a170907868b00b0096157fb10c1mr19859592ejc.63.1683815193736;
-        Thu, 11 May 2023 07:26:33 -0700 (PDT)
-Received: from debianHome.localdomain (dynamic-077-008-180-228.77.8.pool.telefonica.de. [77.8.180.228])
-        by smtp.gmail.com with ESMTPSA id hf15-20020a1709072c4f00b0094f58a85bc5sm4056647ejc.180.2023.05.11.07.26.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 07:26:33 -0700 (PDT)
-From:   =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
-To:     selinux@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Alistair Delva <adelva@google.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Serge Hallyn <serge@hallyn.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: [PATCH v4 4/9] block: use new capable_any functionality
-Date:   Thu, 11 May 2023 16:25:27 +0200
-Message-Id: <20230511142535.732324-4-cgzones@googlemail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230511142535.732324-1-cgzones@googlemail.com>
-References: <20230511142535.732324-1-cgzones@googlemail.com>
+        Thu, 11 May 2023 10:28:54 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EDF62711
+        for <linux-block@vger.kernel.org>; Thu, 11 May 2023 07:27:57 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 527DE1FF1B;
+        Thu, 11 May 2023 14:27:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1683815242; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=svB6XG/iJfvKnmgn0AFHWzp41AFmGZq01kVHd7lYh3c=;
+        b=xnh8taAgJv4CWhXHUvxGjgNC+4Ft5q8z4qF1SqThRcP4BQnAE5tF0UW+JCa272NgP1rU5A
+        fRkd29QneefEwg3KW/Fy9vkTPRVYb/y/tEZjZelrgLz3qL8nCVwyomuLff6liEdjrpq+dS
+        1EB8kpneoL2hV/z9HQ1g3YhZWe5NnWQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1683815242;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=svB6XG/iJfvKnmgn0AFHWzp41AFmGZq01kVHd7lYh3c=;
+        b=hkhBgM+xtqTafXGpYGHNhSDp/BE6UkrrmXUpr12h8cT2WbE8i/aRWHYs7mkJySdi2SxpFl
+        ssvAE+SvUhkIlZAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EFC94134B2;
+        Thu, 11 May 2023 14:27:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vpyUMUj7XGQDSgAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 11 May 2023 14:27:20 +0000
+Message-ID: <a66c9620-2da9-99f4-5041-6be31bac1aab@suse.de>
+Date:   Thu, 11 May 2023 16:27:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.1
+Subject: Re: [PATCH] brd: use XArray instead of radix-tree to index backing
+ pages
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk
+Cc:     gost.dev@samsung.com, linux-block@vger.kernel.org, hch@lst.de,
+        willy@infradead.org
+References: <CGME20230511121547eucas1p17acca480b5e1d0e04c6595b70c1c92a1@eucas1p1.samsung.com>
+ <20230511121544.111648-1-p.raghav@samsung.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230511121544.111648-1-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the new added capable_any function in appropriate cases, where a
-task is required to have any of two capabilities.
+On 5/11/23 14:15, Pankaj Raghav wrote:
+> XArray was introduced to hold large array of pointers with a simple API.
+> XArray API also provides array semantics which simplifies the way we store
+> and access the backing pages, and the code becomes significantly easier
+> to understand.
+> 
+> No performance difference was noticed between the two implementation
+> using fio with direct=1 [1].
+> 
+> [1] Performance in KIOPS:
+> 
+>            |  radix-tree |    XArray  |   Diff
+>            |             |            |
+> write     |    315      |     313    |   -0.6%
+> randwrite |    286      |     290    |   +1.3%
+> read      |    330      |     335    |   +1.5%
+> randread  |    309      |     312    |   +0.9%
+> 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> ---
+> @willy: I noticed later that you sent a similar patch in 2019[1]. Let me
+> know if you need your signoff in the patch as well.
+>                                                                                                                                                                                                                                                                                         
+> [1] https://lore.kernel.org/linux-block/20190318194821.3470-9-willy@infradead.org/
+> 
+>   drivers/block/brd.c | 93 ++++++++++++---------------------------------
+>   1 file changed, 24 insertions(+), 69 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Reorder CAP_SYS_ADMIN last.
+Cheers,
 
-Fixes: 94c4b4fd25e6 ("block: Check ADMIN before NICE for IOPRIO_CLASS_RT")
-
-Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
----
-v3:
-   rename to capable_any()
----
- block/ioprio.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
-
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 32a456b45804..0a7df88bf6d9 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -37,14 +37,7 @@ int ioprio_check_cap(int ioprio)
- 
- 	switch (class) {
- 		case IOPRIO_CLASS_RT:
--			/*
--			 * Originally this only checked for CAP_SYS_ADMIN,
--			 * which was implicitly allowed for pid 0 by security
--			 * modules such as SELinux. Make sure we check
--			 * CAP_SYS_ADMIN first to avoid a denial/avc for
--			 * possibly missing CAP_SYS_NICE permission.
--			 */
--			if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
-+			if (!capable_any(CAP_SYS_NICE, CAP_SYS_ADMIN))
- 				return -EPERM;
- 			fallthrough;
- 			/* rt has prio field too */
+Hannes
 -- 
-2.40.1
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
