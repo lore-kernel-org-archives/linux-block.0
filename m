@@ -2,149 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81476C77B7C
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 07:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EF5C7EE22
+	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 07:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231610AbjEKHAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 May 2023 03:00:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33550 "EHLO
+        id S229589AbjEKHAq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 May 2023 03:00:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237348AbjEKHAJ (ORCPT
+        with ESMTP id S237161AbjEKHAV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 May 2023 03:00:09 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C66A61B4
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 23:59:24 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-76c27782e30so419129139f.3
-        for <linux-block@vger.kernel.org>; Wed, 10 May 2023 23:59:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683788319; x=1686380319;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FDmGzb0EAcK7O5vcmkwcvazowRZw0i6s484o3OBJttQ=;
-        b=D7RcDTRAU217QGeLOwFax1KRN9caaXZ1fIlL0XfG4KC1Xv9/uq0rx+4ogDd89XsNmt
-         dstELQCaThmyim/yTpD2L6z+jy01r85UZz0U9yh5PtllmZagl/LD9wWynOahXQ5yX8WZ
-         h6NcwxDg+wcWNYG4WKpzuWzJ+t/Ng5zVIpSlTBgwqRrvx6bwoNDcMW7y6mdvomtzyqz2
-         gTC5QIKUIEtMRn253wxytgccx/byNiWKPmDgF6pEz54FKzeCdQ32gIzh8KmLWh5wlG2S
-         URqZUapxBDfbDxYxGB3T93IGDEZIf+8UqLMOvE091R9JlnVaWjjLMr2hBoFJVYOtrPkb
-         8/YA==
-X-Gm-Message-State: AC+VfDw+x1KhkJf72uWUTNA5VoFNGDyHNV2ogLCeslrWF+xtXGd5OQ08
-        EDZBmNdn8K68QHPGhzhX8xea2gBy9FE0AgNnEqazPjArWsSz
-X-Google-Smtp-Source: ACHHUZ7hwuBx0DrAwQF3mb7msJLh363FZDYdEVQJZY1eQ7z+xJ4zU18vqCq8f3C6lBGIzI/dywqo1SJ8456Jojs1CbU3IB+xGBEC
+        Thu, 11 May 2023 03:00:21 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D38277AA1;
+        Wed, 10 May 2023 23:59:39 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QH2n84qzqz4f3vdV;
+        Thu, 11 May 2023 14:59:08 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgD3rLA7klxkxW3WJA--.19279S4;
+        Thu, 11 May 2023 14:59:09 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH -next] block: fix blktrace debugfs entries leak
+Date:   Thu, 11 May 2023 14:56:33 +0800
+Message-Id: <20230511065633.710045-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-Received: by 2002:a6b:7104:0:b0:76c:552c:1c64 with SMTP id
- q4-20020a6b7104000000b0076c552c1c64mr4195105iog.4.1683788319325; Wed, 10 May
- 2023 23:58:39 -0700 (PDT)
-Date:   Wed, 10 May 2023 23:58:39 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a686ca05fb6584ea@google.com>
-Subject: [syzbot] upstream boot error: KMSAN: uninit-value in strlcat
-From:   syzbot <syzbot+26836cb949db3d40c992@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgD3rLA7klxkxW3WJA--.19279S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7uw4fWFyxGF1fury7Cr1rJFb_yoW8Cr4xpa
+        9Iqr4Ykr1jvr4qqa4UCw17XayxKayrCFyrGFZakrySqF13GryavFZ2va9FqrWrGrsa9rZ0
+        qr15KrZ7XrW8X3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+From: Yu Kuai <yukuai3@huawei.com>
 
-syzbot found the following issue on:
+Commit 99d055b4fd4b ("block: remove per-disk debugfs files in
+blk_unregister_queue") moves blk_trace_shutdown() from
+blk_release_queue() to blk_unregister_queue(), this is safe if blktrace
+is created through sysfs, however, there are some regression in corner
+cases:
 
-HEAD commit:    16a8829130ca nfs: fix another case of NULL/IS_ERR confusio..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10811e34280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a7a1059074b7bdce
-dashboard link: https://syzkaller.appspot.com/bug?extid=26836cb949db3d40c992
-compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
+1) for scsi, passthrough io can still be issued after del_gendisk, and
+   blktrace debugfs entries will be removed immediately after
+   del_gendisk(), therefor passthrough io can't be tracked and blktrace
+   will complain:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d4c6da24829a/disk-16a88291.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7b2a0fc666c9/vmlinux-16a88291.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/710105c78106/bzImage-16a88291.xz
+   failed read of /sys/kernel/debug/block/sdb/trace0: 5/Input/output error
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+26836cb949db3d40c992@syzkaller.appspotmail.com
+2) blktrace can still be enabled after del_gendisk() through ioctl if the
+   disk is opened before del_gendisk(), and if blktrace is not shutdown
+   through ioctl before closing the disk, debugfs entries will be
+   leaked.
 
-sd 0:0:1:0: [sda] 4194304 512-byte logical blocks: (2.15 GB/2.00 GiB)
-sd 0:0:1:0: [sda] 4096-byte physical blocks
-sd 0:0:1:0: [sda] Write Protect is off
-sd 0:0:1:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
-=====================================================
-BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
-BUG: KMSAN: uninit-value in strlcat+0x67/0x160 lib/string.c:252
- strlen lib/string.c:418 [inline]
- strlcat+0x67/0x160 lib/string.c:252
- msdos_partition+0x366d/0x46a0 block/partitions/msdos.c:696
- check_partition block/partitions/core.c:138 [inline]
- blk_add_partitions block/partitions/core.c:594 [inline]
- bdev_disk_changed+0xab5/0x2070 block/partitions/core.c:680
- blkdev_get_whole+0x633/0x6c0 block/bdev.c:619
- blkdev_get_by_dev+0x50f/0x1200 block/bdev.c:756
- disk_scan_partitions+0x2d8/0x3d0 block/genhd.c:379
- device_add_disk+0x16d9/0x17b0 block/genhd.c:519
- sd_probe+0x132e/0x1710 drivers/scsi/sd.c:3587
- really_probe+0x506/0xf40 drivers/base/dd.c:658
- __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
- driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
- __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
- bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
- __device_attach_async_helper+0x208/0x2b0 drivers/base/dd.c:987
- async_run_entry_fn+0x97/0x420 kernel/async.c:127
- process_one_work+0xb0d/0x1410 kernel/workqueue.c:2405
- worker_thread+0x107e/0x1d60 kernel/workqueue.c:2552
- kthread+0x3e8/0x540 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+It seems 1) is not important, while 2) needs to be fixed apparently.
 
-Uninit was created at:
- __alloc_pages+0x9a4/0xe00 mm/page_alloc.c:4791
- alloc_pages+0xd01/0x1040
- __get_free_pages+0x34/0xc0 mm/page_alloc.c:4818
- check_partition block/partitions/core.c:122 [inline]
- blk_add_partitions block/partitions/core.c:594 [inline]
- bdev_disk_changed+0x63c/0x2070 block/partitions/core.c:680
- blkdev_get_whole+0x633/0x6c0 block/bdev.c:619
- blkdev_get_by_dev+0x50f/0x1200 block/bdev.c:756
- disk_scan_partitions+0x2d8/0x3d0 block/genhd.c:379
- device_add_disk+0x16d9/0x17b0 block/genhd.c:519
- sd_probe+0x132e/0x1710 drivers/scsi/sd.c:3587
- really_probe+0x506/0xf40 drivers/base/dd.c:658
- __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
- driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
- __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
- bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
- __device_attach_async_helper+0x208/0x2b0 drivers/base/dd.c:987
- async_run_entry_fn+0x97/0x420 kernel/async.c:127
- process_one_work+0xb0d/0x1410 kernel/workqueue.c:2405
- worker_thread+0x107e/0x1d60 kernel/workqueue.c:2552
- kthread+0x3e8/0x540 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+Fix this problem by shutdown blktrace in blk_free_queue(),
+disk_release() is not used because scsi sg support blktrace without
+gendisk, and this is safe because queue is not freed yet, and
+blk_trace_shutdown() is reentrant.
 
-CPU: 1 PID: 1018 Comm: kworker/u4:5 Not tainted 6.4.0-rc1-syzkaller-00012-g16a8829130ca #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/14/2023
-Workqueue: events_unbound async_run_entry_fn
-
-=====================================================
-
-
+Fixes: 99d055b4fd4b ("block: remove per-disk debugfs files in blk_unregister_queue")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ block/blk-core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 00c74330fa92..a0c949533a5d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -263,6 +263,10 @@ static void blk_free_queue_rcu(struct rcu_head *rcu_head)
+ 
+ static void blk_free_queue(struct request_queue *q)
+ {
++	mutex_lock(&q->debugfs_mutex);
++	blk_trace_shutdown(q);
++	mutex_unlock(&q->debugfs_mutex);
++
+ 	blk_free_queue_stats(q->stats);
+ 	if (queue_is_mq(q))
+ 		blk_mq_release(q);
+-- 
+2.39.2
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
