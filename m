@@ -2,106 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EF5C7EE22
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 07:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 772ABC7EE24
+	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 07:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229589AbjEKHAq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 May 2023 03:00:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33730 "EHLO
+        id S237350AbjEKHGN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 May 2023 03:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237161AbjEKHAV (ORCPT
+        with ESMTP id S237229AbjEKHF7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 May 2023 03:00:21 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D38277AA1;
-        Wed, 10 May 2023 23:59:39 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QH2n84qzqz4f3vdV;
-        Thu, 11 May 2023 14:59:08 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rLA7klxkxW3WJA--.19279S4;
-        Thu, 11 May 2023 14:59:09 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, ming.lei@redhat.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH -next] block: fix blktrace debugfs entries leak
-Date:   Thu, 11 May 2023 14:56:33 +0800
-Message-Id: <20230511065633.710045-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        Thu, 11 May 2023 03:05:59 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 830DC5FF2;
+        Thu, 11 May 2023 00:05:29 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0ViJZHzM_1683788724;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0ViJZHzM_1683788724)
+          by smtp.aliyun-inc.com;
+          Thu, 11 May 2023 15:05:25 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Serge Hallyn <serge@hallyn.com>, Paul Moore <paul@paul-moore.com>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Eric Paris <eparis@parisplace.org>,
+        Frederick Lawler <fred@cloudflare.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH 0/2] capability: Introduce CAP_BLOCK_ADMIN
+Date:   Thu, 11 May 2023 15:05:18 +0800
+Message-Id: <20230511070520.72939-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rLA7klxkxW3WJA--.19279S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw4fWFyxGF1fury7Cr1rJFb_yoW8Cr4xpa
-        9Iqr4Ykr1jvr4qqa4UCw17XayxKayrCFyrGFZakrySqF13GryavFZ2va9FqrWrGrsa9rZ0
-        qr15KrZ7XrW8X3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
-        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
-        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+Separated fine-grained capability CAP_BLOCK_ADMIN from CAP_SYS_ADMIN.
+For backward compatibility, the CAP_BLOCK_ADMIN capability is included
+within CAP_SYS_ADMIN.
 
-Commit 99d055b4fd4b ("block: remove per-disk debugfs files in
-blk_unregister_queue") moves blk_trace_shutdown() from
-blk_release_queue() to blk_unregister_queue(), this is safe if blktrace
-is created through sysfs, however, there are some regression in corner
-cases:
+Some database products rely on shared storage to complete the
+write-once-read-multiple and write-multiple-read-multiple functions.
+When HA occurs, they rely on the PR (Persistent Reservations) protocol
+provided by the storage layer to manage block device permissions to
+ensure data correctness.
 
-1) for scsi, passthrough io can still be issued after del_gendisk, and
-   blktrace debugfs entries will be removed immediately after
-   del_gendisk(), therefor passthrough io can't be tracked and blktrace
-   will complain:
+CAP_SYS_ADMIN is required in the PR protocol implementation of existing
+block devices in the Linux kernel, which has too many sensitive
+permissions, which may lead to risks such as container escape. The
+kernel needs to provide more fine-grained permission management like
+CAP_NET_ADMIN to avoid online products directly relying on root to run.
 
-   failed read of /sys/kernel/debug/block/sdb/trace0: 5/Input/output error
+CAP_BLOCK_ADMIN can also provide support for other block device
+operations that require CAP_SYS_ADMIN capabilities in the future,
+ensuring that applications run with least privilege.
 
-2) blktrace can still be enabled after del_gendisk() through ioctl if the
-   disk is opened before del_gendisk(), and if blktrace is not shutdown
-   through ioctl before closing the disk, debugfs entries will be
-   leaked.
+Tianjia Zhang (2):
+  capability: Introduce CAP_BLOCK_ADMIN
+  block: use block_admin_capable() for Persistent Reservations
 
-It seems 1) is not important, while 2) needs to be fixed apparently.
+ block/ioctl.c                       | 10 +++++-----
+ include/linux/capability.h          |  5 +++++
+ include/uapi/linux/capability.h     |  7 ++++++-
+ security/selinux/include/classmap.h |  4 ++--
+ 4 files changed, 18 insertions(+), 8 deletions(-)
 
-Fix this problem by shutdown blktrace in blk_free_queue(),
-disk_release() is not used because scsi sg support blktrace without
-gendisk, and this is safe because queue is not freed yet, and
-blk_trace_shutdown() is reentrant.
-
-Fixes: 99d055b4fd4b ("block: remove per-disk debugfs files in blk_unregister_queue")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-core.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 00c74330fa92..a0c949533a5d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -263,6 +263,10 @@ static void blk_free_queue_rcu(struct rcu_head *rcu_head)
- 
- static void blk_free_queue(struct request_queue *q)
- {
-+	mutex_lock(&q->debugfs_mutex);
-+	blk_trace_shutdown(q);
-+	mutex_unlock(&q->debugfs_mutex);
-+
- 	blk_free_queue_stats(q->stats);
- 	if (queue_is_mq(q))
- 		blk_mq_release(q);
 -- 
-2.39.2
+2.24.3 (Apple Git-128)
 
