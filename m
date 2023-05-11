@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26550C7EE23
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 01:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 525FFC7EE22
+	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 01:48:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237090AbjEKBsB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 May 2023 21:48:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37984 "EHLO
+        id S231465AbjEKBr6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 May 2023 21:47:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237024AbjEKBry (ORCPT
+        with ESMTP id S237016AbjEKBrx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 May 2023 21:47:54 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096EC6A49;
-        Wed, 10 May 2023 18:47:52 -0700 (PDT)
+        Wed, 10 May 2023 21:47:53 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BE375BA9;
+        Wed, 10 May 2023 18:47:51 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QGvsw1Srtz4f3jqK;
-        Thu, 11 May 2023 09:47:48 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QGvst2lPxz4f3l2X;
+        Thu, 11 May 2023 09:47:46 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP2 (Coremail) with SMTP id Syh0CgA33eo_SVxkrgJdJA--.7260S10;
-        Thu, 11 May 2023 09:47:49 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgA33eo_SVxkrgJdJA--.7260S7;
+        Thu, 11 May 2023 09:47:48 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
         yukuai3@huawei.com
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
         yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH -next 6/6] blk-iocost: move wbt_enable/disable_default() out of spinlock
-Date:   Thu, 11 May 2023 09:45:09 +0800
-Message-Id: <20230511014509.679482-7-yukuai1@huaweicloud.com>
+Subject: [PATCH -next 3/6] blk-wbt: don't enable wbt for bio based device
+Date:   Thu, 11 May 2023 09:45:06 +0800
+Message-Id: <20230511014509.679482-4-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230511014509.679482-1-yukuai1@huaweicloud.com>
 References: <20230511014509.679482-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgA33eo_SVxkrgJdJA--.7260S10
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zw1fXr1xtry7urW7WrWrAFb_yoW8Cry3pF
-        W3CrsFya4IvFs2vr47GanFqw15Ga1kGryxAwn3Gw1aqw17C3s2qa1vkrW09F1kZFZ3Ar45
-        Xr48KF4UZa1vy3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
-        UUUUU
+X-CM-TRANSID: Syh0CgA33eo_SVxkrgJdJA--.7260S7
+X-Coremail-Antispam: 1UD129KBjvdXoWrKFyfXw43GrWUZF1rKF4UJwb_yoW3Jrg_uF
+        1kur1Iqrn3AFn29r4ayr4FqFZ5G3s5XFWUWFWkJ347ZFn8J3Z3Gws7Xrs8Wr47uFWxKFWr
+        ur17W34xJrWIgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb6AFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY02
+        0Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
+        v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_
+        Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x
+        0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8
+        JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIx
+        AIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbJ73DUUUUU=
+        =
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -61,56 +61,28 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-There are following smatch warning:
+Because rq_qos only make sense for rq based device. Instead of fail
+from sysfs configuration, make wbt sysfs dentry invisible directly.
 
-block/blk-wbt.c:843 wbt_init() warn: sleeping in atomic context
-ioc_qos_write() <- disables preempt
--> wbt_enable_default()
-   -> wbt_init()
-
-wbt_init() will be called from wbt_enable_default() if wbt is not
-initialized, currently this is only possible in blk_register_queue(), hence
-wbt_init() will never be called from iocost and this warning is false
-positive.
-
-However, we might support rq_qos destruction dynamically in the future,
-and it's better to prevent that, hence move wbt_enable_default() outside
-'ioc->lock'. This is safe because queue is still freezed.
-
-Reported-by: Dan Carpenter <error27@gmail.com>
-Link: https://lore.kernel.org/lkml/Y+Ja5SRs886CEz7a@kadam/
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-iocost.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ block/blk-sysfs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 285ced3467ab..eb57e7e4f2db 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -3300,11 +3300,9 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 		blk_stat_enable_accounting(disk->queue);
- 		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
- 		ioc->enabled = true;
--		wbt_disable_default(disk);
- 	} else {
- 		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
- 		ioc->enabled = false;
--		wbt_enable_default(disk);
- 	}
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 6c1c4ba66bc0..c8e1f1462422 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -686,6 +686,10 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
+ 	    !blk_queue_is_zoned(q))
+ 		return 0;
  
- 	if (user) {
-@@ -3317,6 +3315,11 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
- 	ioc_refresh_params(ioc, true);
- 	spin_unlock_irq(&ioc->lock);
- 
-+	if (enable)
-+		wbt_disable_default(disk);
-+	else
-+		wbt_enable_default(disk);
-+
- 	blk_mq_unquiesce_queue(disk->queue);
- 	blk_mq_unfreeze_queue(disk->queue);
++#ifdef CONFIG_BLK_WBT
++	if (attr == &queue_wb_lat_entry.attr && !queue_is_mq(q))
++		return 0;
++#endif
+ 	return attr->mode;
+ }
  
 -- 
 2.39.2
