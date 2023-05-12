@@ -2,112 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8744AC77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 18:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33780C77B7F
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 18:30:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238353AbjELSMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 14:12:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
+        id S238689AbjELSaj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 14:30:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbjELSMn (ORCPT
+        with ESMTP id S238860AbjELSad (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 14:12:43 -0400
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA6202105;
-        Fri, 12 May 2023 11:12:42 -0700 (PDT)
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-643aad3bc41so9427842b3a.0;
-        Fri, 12 May 2023 11:12:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683915162; x=1686507162;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bQfYCthLnyaujnup9YmDJTbvBFRzuX2vx8uShEoIOJM=;
-        b=i7HQew0MTTsc4aHI2jX5mC8nDSTikm8gvaj8bb9M1GnlhwE2AOJedl4Jjqx4x1LMxy
-         /qZ0RhATMipqDMxi5tB1UpMSHA4rmC4CwP4cdbQaMSI9Ev0/O/7V5Ik6TfmIpBha4e5y
-         DjWpIzy7g1vWakItho3/4AZ+/tCyNJlAMJgOXYReoJ/hDs16f4QinROb15DmwjvqsZxY
-         kr2S8vvnlieIDjYjnmhRnlbodo2zCIrjF1DDPXs2fGwFYU9Nv38Zkth4qnYcQvgm3yaB
-         WHz7kWGd5gSR6/AR6GivOd1StUYrfprkd87tsp7E6Xm7Es3W4btduLOkwwh27bpxyKx1
-         qx2A==
-X-Gm-Message-State: AC+VfDy9xJbmLvK7Ni4tRB5HDPlvFR6ZLKVMSA+Ae+g+FpJQH3VoomOx
-        GADjkB3buOxxQK+MFOMQ58lNfZ9+xHTvLA==
-X-Google-Smtp-Source: ACHHUZ6ZU0gVSt6zpLxhCV9TDGL5kLhwmuSyj16MwTybO75Mae0F0hxqlgR7UKzaERM141Y0Q6ViMA==
-X-Received: by 2002:a05:6a00:2183:b0:634:7ba3:d140 with SMTP id h3-20020a056a00218300b006347ba3d140mr31644745pfi.15.1683915162110;
-        Fri, 12 May 2023 11:12:42 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id w4-20020aa78584000000b0063a04905379sm7352532pfn.137.2023.05.12.11.12.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 May 2023 11:12:41 -0700 (PDT)
-Message-ID: <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
-Date:   Fri, 12 May 2023 11:12:40 -0700
+        Fri, 12 May 2023 14:30:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD2D59E4;
+        Fri, 12 May 2023 11:29:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 33B2D657E4;
+        Fri, 12 May 2023 18:28:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88631C433EF;
+        Fri, 12 May 2023 18:28:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1683916111;
+        bh=oFn6kTrQB5X+BdUNZ09gyWmaepLu3LinttkMwo7NC9M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bGKKspqhQTtaA0BwgEBc4s+CHOK2W8+I60ncCpAoA0oP3wi0GmY5bouKvT19n0Yql
+         Usf/OHDj8qnBNO6gXE8kRv49KORT6rNQRbdQf49Nsl08CqX6bBr3yCIWFADOKfIMVm
+         Ju0aV3wESe6qeWkXZLPGZWnKiojw5JgNy706asoDezBT1P+vR0C60vyZrPJqeo8zki
+         f7PegWFlrjV4ACTWr528Nxz2AHjx/UDBnCKW44lMDqWA70aA8EBv3X1M7T2+JR2f9d
+         TNN1JJYDr2QWBOwot1i+cgaBLLmbHpAwgbDMmp+uxhmYfgDD8KvlaM9YPI2hcu0J7p
+         korFm5yaF5dig==
+Date:   Fri, 12 May 2023 11:28:31 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>
+Subject: Re: [PATCH v6 0/5] Introduce block provisioning primitives
+Message-ID: <20230512182831.GC858791@frogsfrogsfrogs>
+References: <20230420004850.297045-1-sarthakkukreti@chromium.org>
+ <20230506062909.74601-1-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        stanley.chu@mediatek.com, peter.wang@mediatek.com,
-        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
-        powen.kao@mediatek.com, naomi.chu@mediatek.com,
-        wsd_upstream@mediatek.com
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <ZF0K7A6G2cYBjSgn@infradead.org>
- <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
- <ZF5G5ztMng8Xbd1W@infradead.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <ZF5G5ztMng8Xbd1W@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230506062909.74601-1-sarthakkukreti@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/23 07:02, Christoph Hellwig wrote:
-> On Thu, May 11, 2023 at 08:38:04AM -0700, Bart Van Assche wrote:
->> For which devices is the fair sharing algorithm useful? As far as I know the
->> legacy block layer did not have an equivalent of the fair sharing algorithm
->> and I'm not aware of any complaints about the legacy block layer regarding
->> to fairness. This is why I proposed in January to remove the fair sharing
->> code entirely. See also https://lore.kernel.org/linux-block/20230103195337.158625-1-bvanassche@acm.org/.
+On Fri, May 05, 2023 at 11:29:04PM -0700, Sarthak Kukreti wrote:
+> Hi,
 > 
-> Because the old code did not do tag allocation itself?  Either way I
-> don't think a "I'll opt out for a random driver" is the proper approach
-> when you think it's not needed.  Especially not without any data
-> explaining why just that driver is a special snowflake.
+> This patch series covers iteration 6 of adding support for block
+> provisioning requests.
 
-Hi Christoph,
+I didn't even notice there was a v6.  Could you start a fresh thread
+when you bump the revision count, please?
 
-I'm still wondering whether there are any drivers that benefit from the 
-fair tag sharing algorithm. If the number of tags is large enough 
-(NVMe), the number of tags exceeds the number of requests in flight and 
-hence the fair tag sharing algorithm is not necessary.
+--D
 
-The fair tag sharing algorithm has a negative impact on all SCSI devices 
-with multiple logical units. This is because logical units are 
-considered active until (request timeout) seconds have elapsed after the 
-logical unit stopped being used (see also the blk_mq_tag_idle() call in 
-blk_mq_timeout_work()). UFS users are hit by this because UFS 3.0 
-devices have a limited queue depth (32) and because power management 
-commands are submitted to a logical unit (WLUN). Hence, it happens often 
-that the block layer "active queue" counter is equal to 2 while only one 
-logical unit is being used actively (a logical unit backed by NAND 
-flash). The performance difference between queue depths 16 and 32 for 
-UFS devices is significant.
-
-Is my understanding correct that in the legacy block layer 
-implementation blk_queue_start_tag() had to be called to assign a tag to 
-a request? I haven't found any code in the Linux kernel v4.20 
-implementation of blk_queue_start_tag() that implements fairness in case 
-a request tag map (struct blk_queue_tag) is shared across request queues 
-(one request queue per logical unit in case of SCSI). Do you agree with 
-my conclusion that from the point of view of the SCSI core in general 
-and the UFS driver in particular the fair tag sharing algorithm in the 
-blk-mq code introduced a performance regression?
-
-Thanks,
-
-Bart.
+> Changes from v5:
+> - Remove explicit supports_provision from dm devices.
+> - Move provision sectors io hint to pool_io_hint. Other devices
+>   will derive the provisioning limits from the stack.
+> - Remove artifact from v4 to omit cell_defer_no_holder for
+>   REQ_OP_PROVISION.
+> - Fix blkdev_fallocate() called with invalid fallocate
+>   modes to propagate errors correctly.
+> 
+> Sarthak Kukreti (5):
+>   block: Don't invalidate pagecache for invalid falloc modes
+>   block: Introduce provisioning primitives
+>   dm: Add block provisioning support
+>   dm-thin: Add REQ_OP_PROVISION support
+>   loop: Add support for provision requests
+> 
+>  block/blk-core.c              |  5 +++
+>  block/blk-lib.c               | 53 ++++++++++++++++++++++++++
+>  block/blk-merge.c             | 18 +++++++++
+>  block/blk-settings.c          | 19 ++++++++++
+>  block/blk-sysfs.c             |  9 +++++
+>  block/bounce.c                |  1 +
+>  block/fops.c                  | 31 +++++++++++++---
+>  drivers/block/loop.c          | 42 +++++++++++++++++++++
+>  drivers/md/dm-crypt.c         |  4 +-
+>  drivers/md/dm-linear.c        |  1 +
+>  drivers/md/dm-snap.c          |  7 ++++
+>  drivers/md/dm-table.c         | 23 ++++++++++++
+>  drivers/md/dm-thin.c          | 70 +++++++++++++++++++++++++++++++++--
+>  drivers/md/dm.c               |  6 +++
+>  include/linux/bio.h           |  6 ++-
+>  include/linux/blk_types.h     |  5 ++-
+>  include/linux/blkdev.h        | 16 ++++++++
+>  include/linux/device-mapper.h | 17 +++++++++
+>  18 files changed, 319 insertions(+), 14 deletions(-)
+> 
+> -- 
+> 2.40.1.521.gf1e218fcd8-goog
+> 
