@@ -2,351 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD012C77B7F
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 08:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F55C77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 08:17:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239911AbjELIKM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 04:10:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37104 "EHLO
+        id S239984AbjELIRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 04:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239902AbjELIJa (ORCPT
+        with ESMTP id S239803AbjELIRt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 04:09:30 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061e.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5b::61e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2DA10E52;
-        Fri, 12 May 2023 01:08:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f+HTBXeObu0fOJ4k4+LK61g18sUsL7H9H3YU7YDfipM1lL+VKRQ5cDMAaAuup3FElg7m0WpdD3iw6VtV+6jZM4dDWRAVLZntWmRSINOaGdL1R2c+o58zCEXZY9gRbXlF+ULfbG1Lsa2fa75svRLErSO+wGBp3/z8Y+5f+35CJ8YskNsDEB1VqcVc6CxWZrA6pG5TMJ+rWaUY6b3PIfZg91+xKdja8NRbGOLzIKXHlhZUCxMxtdYhFOQ9RYyjPuhKKsVfBoHWdKoHsb80MrqK3l7FQyhfG/C+zcHvqXOnJytpmyhrHqWTAUkSwUQTV8WJYyvv71kIfZbyjzZqh7tGbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BWZon/QtQeQxIm2xALI9b/xp6IIc8xxX26Bp46PTpAY=;
- b=aKS/+wLYequvB4Nuj+9uY9Y1KKjWMOKQ8raz+t1GA/+nadzhs43Pq1mJBIf1vmt18MpS8FWSUbHMralnlk8sT3BBT+jaRwgNcg4Qs+9+AshFMn+6pMYp7LdjKSBLhvmPjfO3e37eab9wmJjEo/4TV3jEUbI9HJfbm5C13bnjt1xIDUfP9hbmzTuTUaLdqUbIXdGSkeTbOg1wHkpBND7akG77nDtMNBXjCQEqP3pDD5bYbKt2UiXmnPRtXKe7aa20dbAQzJsOf3ikzlYnWZJ+BqRET/9DTfRRywRIQvWvj2BnKPAb2x0u2bkzZH2U1c4vDAWoecbZ+v1ORVPtTkgu2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BWZon/QtQeQxIm2xALI9b/xp6IIc8xxX26Bp46PTpAY=;
- b=lFGsvvnK4QEDEs55VOfXEvJ0HWXJT4f5xOYxYEMqaJiqbCGt9EoQRN+xjbCXl8gIqYRhvf62uldrYQJDzt62NI/PjE59gMC2iy02J+mk3sjJZJh2oBc37RxGkFFyh5bRUOCOs6J+xxY2BVJQ9ZJ2Wb7zpsTYiJoMkld41ypvKVlQGr53ZSYNusw/4vNNhMB5Y9upJStWSk1s7yjfxkKGjatbvCWBqP+VXSDEuQ95uUtr29Mw9PvlQXVT3h0HYmXqeTZIocz/xOTxwxGjIrehD5ysGcrVxfR+b6gr+5G8FZSSNpVdVh19Ou3B3pb7bUTnRoei7Ns4/t0PQXU2FA1+qw==
-Received: from BN9PR03CA0427.namprd03.prod.outlook.com (2603:10b6:408:113::12)
- by IA1PR12MB8264.namprd12.prod.outlook.com (2603:10b6:208:3f5::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.22; Fri, 12 May
- 2023 08:08:25 +0000
-Received: from BN8NAM11FT038.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:113:cafe::32) by BN9PR03CA0427.outlook.office365.com
- (2603:10b6:408:113::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.25 via Frontend
- Transport; Fri, 12 May 2023 08:08:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT038.mail.protection.outlook.com (10.13.176.246) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6387.24 via Frontend Transport; Fri, 12 May 2023 08:08:25 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Fri, 12 May 2023
- 01:08:13 -0700
-Received: from dev.nvidia.com (10.126.230.37) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Fri, 12 May
- 2023 01:08:12 -0700
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>, <linux-bcache@vger.kernel.org>,
-        <linux-raid@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <linux-scsi@vger.kernel.org>, <target-devel@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <colyli@suse.de>, <kent.overstreet@gmail.com>,
-        <agk@redhat.com>, <snitzer@kernel.org>, <dm-devel@redhat.com>,
-        <song@kernel.org>, <hch@lst.de>, <sagi@grimberg.me>,
-        <kch@nvidia.com>, <martin.petersen@oracle.com>
-Subject: [RFC PATCH] block: add meaningful macro for flush op flags
-Date:   Fri, 12 May 2023 01:07:57 -0700
-Message-ID: <20230512080757.387523-1-kch@nvidia.com>
-X-Mailer: git-send-email 2.40.0
+        Fri, 12 May 2023 04:17:49 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7D81FC8
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 01:17:46 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230512081743euoutp017c1dfaeeb4ca62d2798afd1759bbdfb1~eV3Ni4AP_0984009840euoutp01R
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:17:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230512081743euoutp017c1dfaeeb4ca62d2798afd1759bbdfb1~eV3Ni4AP_0984009840euoutp01R
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1683879463;
+        bh=qdEYDvt7a7O08va7W/8/l97RTjJar3JXBPRXdk1W0m0=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=Kz3W+T4ljBHiNRWXUJ60n1fCmCAbYLRQXa7qi7ziDUKlwqYfPvjX2I0U5sjSISZON
+         1zIILP7z1/Ue0oa5Dm7XsxFWIYa5Gq0zL4KIdjJiYdolgeb4Ix4VRRfG1Usd/hrKiF
+         viS0XHESdkiYEPQxhq4stwhmRYoLGp2XCVNjfcIo=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230512081743eucas1p170350da54a3cbe32ac27371f58086dbf~eV3NIvfxG0257302573eucas1p13;
+        Fri, 12 May 2023 08:17:43 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 79.BE.35386.726FD546; Fri, 12
+        May 2023 09:17:43 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230512081743eucas1p14510c36baa35aead4a1b28802d730a91~eV3M7EOJH0466604666eucas1p1N;
+        Fri, 12 May 2023 08:17:43 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230512081743eusmtrp1b839435ff34d8948cfefb044caa010f9~eV3M6kwZD2864228642eusmtrp1Y;
+        Fri, 12 May 2023 08:17:43 +0000 (GMT)
+X-AuditID: cbfec7f4-cc9ff70000028a3a-e4-645df6274a6f
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 31.74.14344.626FD546; Fri, 12
+        May 2023 09:17:42 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230512081742eusmtip22f43223edff327c2d2b854d3ed4da3fc~eV3Mu7WWH2606726067eusmtip2V;
+        Fri, 12 May 2023 08:17:42 +0000 (GMT)
+Received: from [192.168.8.209] (106.210.248.191) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 12 May 2023 09:17:42 +0100
+Message-ID: <b45b3578-857d-a13b-6fdc-6ceb178ddb84@samsung.com>
+Date:   Fri, 12 May 2023 10:17:41 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.37]
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT038:EE_|IA1PR12MB8264:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22f4c5b9-c067-4230-9145-08db52c00fb8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tGr7I95rCI7umabVb/j9/7l3jrhXJyPIOk2/fYjACFX0msZcOHs47HpuscArmNecGBfG78CWJIpHhtqWA0+aPK3rO7TC79zw0Lt5xKmFJwmcMid4QOsRsdN9DijvlDmP3BgrWWqYzzR1YgQb303j4tbnBCNkFi9lll65NF4rfeKirXaBiOrR7o6qW6eXKH8m0m5/VfM47E6fjBig4XetgAYNGY5M30MuDsDe0FyhXVHH5JTRkwLaqQ5AL055kCNwAN+stgYFnJlp7CB612EPHRjBVXLx0Gfkw+l9EL87tpEgy1JCtVnXw7MRz+3IJlImEopxbgeT0lH7ib1wzYxB9tanSGMKjtSniOiFAJum9M8AutwhZwLuWlG65HHp4xcLUQMXqunRckNsVsjVExX9p95N623oR1R7d603yvoSLPKr+f6y5H04Y+/wfsplNfiXTd6uo9EhdNz0DJVFY7aapsA4PAmYOJG6JMRlu4Lel805oRHmi0GhgiKORuqk9EEtpj+oMq0JOGknziP6ectxJ0Evkh12hhcNY6GxBOPjSuWdSP/XERk5pNzVVa2Ydh8FA7kHu4ucGX7W3N6GzRYagDMR1u3nk5a5En0r9xbQbfKS0mBAFF2kIzX1VC7s+DgcEw3iVbQ2SQQc8NuSDAuuUCVaP0tKSd+WzSriltq3iVd+YPcSuVy616ivBKkwnz8So+X/busG9d70bdq/EvCdcNPBsRKbLY5liSFN664yUXfwvYfllHWW22/MLgbZPDgHlCqlzqyuc3A/YGIqevPdPJOTainzo5L9hOf1UMTbhHA=
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(136003)(376002)(39860400002)(451199021)(40470700004)(36840700001)(46966006)(70586007)(82310400005)(2906002)(7416002)(8936002)(5660300002)(8676002)(316002)(478600001)(41300700001)(70206006)(4326008)(110136005)(47076005)(54906003)(40460700003)(7696005)(966005)(6666004)(1076003)(26005)(356005)(7636003)(82740400003)(186003)(16526019)(336012)(426003)(2616005)(36756003)(40480700001)(83380400001)(36860700001)(2101003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2023 08:08:25.2134
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22f4c5b9-c067-4230-9145-08db52c00fb8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT038.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8264
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+        Thunderbird/102.10.0
+Subject: Re: [PATCH] brd: use XArray instead of radix-tree to index backing
+ pages
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Content-Language: en-US
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <bf2daf76-ebfd-8ca2-0e40-362bcaecfc3f@nvidia.com>
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.191]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAKsWRmVeSWpSXmKPExsWy7djPc7rq32JTDKZ1ClmsvtvPZvH+4GNW
+        i5WrjzJZ7L2lbfH7xxw2B1aPzSu0PC6fLfXYfbOBzaO3+R2bx+dNcgGsUVw2Kak5mWWpRfp2
+        CVwZ1/vWsBbMYq+48qimgfEJSxcjB4eEgInEoZVKXYxcHEICKxglpszZzQ7hfGGUaG8+wAbh
+        fGaUWNR/AcjhBOtY9X87VGI5o0Tfhr/McFX3lj+D6t/NKDF53mx2kBZeATuJq9sns4DYLAKq
+        Ek1rr7JCxAUlTs58AhYXFYiWWLxvCpgtLBAscW/VASYQW0RAT+LqrRtgQ5kFHjJKfP22mREk
+        wSwgLnHryXwmkC/YBLQkGjvBdnEC7bo8ezU7RIm8xPa3c5ghzlaWmDz5P9QLtRKnttxiApkp
+        IfCEQ2Lj3G3sEAkXicUfVzJC2MISr45vgYrLSJye3MMCYVdLPL3xmxmiuYVRon/nejZIUFpL
+        9J3JATGZBTQl1u/Shyh3lLi+8QU7RAWfxI23ghCn8UlM2jadeQKj6iykkJiF5LFZSD6YhTB0
+        ASPLKkbx1NLi3PTUYqO81HK94sTc4tK8dL3k/NxNjMBEc/rf8S87GJe/+qh3iJGJg/EQowQH
+        s5II79sl0SlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEebVtTyYLCaQnlqRmp6YWpBbBZJk4OKUa
+        mDSsjzgzHSi9fiI67rgV0zWXXsUtam5dwkl7W+q54lPu7rtjunrmG7fdZUc+KZZrdkxITd8h
+        dOOy2LRLW7leqBlJCXA2NJjdD76yyOutr8U/3l8vnPQLlH/rch/h9Fg+uZnpwPYj/LkHGgSO
+        ds24xlHTpzvn9+q5x5SX1z74MEmR47nQwcMi7IpbpG66WFsxbFyjpnyhembw7akXj/psu/Zj
+        PVPyXzUfK4W1i4N0bGfK65r+/nVi39X3N/eu/LJtvuL6K1eTNT6/fbBYvs5IV/XY7SilHbvc
+        A4/fXByyw/E999z5M/IZ7pQ89frw2sxN70w/w/sfPpctdMrsb7VrRPy6Ljh/auezt1v+yd/M
+        6ZytxFKckWioxVxUnAgAanLyM6MDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrOIsWRmVeSWpSXmKPExsVy+t/xe7rq32JTDJ5aWqy+289m8f7gY1aL
+        lauPMlnsvaVt8fvHHDYHVo/NK7Q8Lp8t9dh9s4HNo7f5HZvH501yAaxRejZF+aUlqQoZ+cUl
+        tkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehnX+9awFsxir7jyqKaB8QlL
+        FyMnh4SAicSq/9vZuhi5OIQEljJKLDzdxgSRkJHY+OUqK4QtLPHnWhdU0UdGib0zNrJAOLsZ
+        JZbc3A02ilfATuLq9slgNouAqkTTWohuXgFBiZMzIdaJCkRL3Fj+DWyDsECwxL1VB8BsEQE9
+        iau3brCDDGUWeMgo8fXbZkaIDYcYJeZMfwdWxSwgLnHryXwgm4ODTUBLorGTHSTMCbT48uzV
+        7BAlmhKt239D2fIS29/OYYZ4QVli8uT/bBB2rcTnv88YJzCKzkJy3ywkG2YhGTULyagFjCyr
+        GEVSS4tz03OLjfSKE3OLS/PS9ZLzczcxAmN027GfW3Ywrnz1Ue8QIxMHI9DpHMxKIrxvl0Sn
+        CPGmJFZWpRblxxeV5qQWH2I0BQbSRGYp0eR8YJLIK4k3NDMwNTQxszQwtTQzVhLn9SzoSBQS
+        SE8sSc1OTS1ILYLpY+LglGpgir31Jdk0rM9Bz6b/aFrY5bWbzH9EK014VBG1/4/Dyh3f0kJ5
+        HpTtrSpfLFTHualsGcfcIp3nH90j698Kic3YLn2phlffuiX4wadVynLt0j+zWf9eWyZ4cd7B
+        7ROldv+w2ux5LTnrA1Pl22aRLStkfYvcA27+bpR6kxAY3RDdz+0lsIT15wuu487z1ePWL9B7
+        dDyM6/Mr4zkXmadaZNTO4XOW1H6+6NdFnttHHt9T+uFrN9337Y8zW5mZhKccPPR7eq/tF+d9
+        jqde1lpFxDfk7z3nEd7x+M6lVfMvTDb6Y82wOHPVLJm6pc+cjtjar/2zv/7SjrOR8zkeyTCk
+        Zx7vLrvg4tYwm+lUkkK+NEffYiWW4oxEQy3mouJEALWpz8laAwAA
+X-CMS-MailID: 20230512081743eucas1p14510c36baa35aead4a1b28802d730a91
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20230511121547eucas1p17acca480b5e1d0e04c6595b70c1c92a1
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230511121547eucas1p17acca480b5e1d0e04c6595b70c1c92a1
+References: <CGME20230511121547eucas1p17acca480b5e1d0e04c6595b70c1c92a1@eucas1p1.samsung.com>
+        <20230511121544.111648-1-p.raghav@samsung.com>
+        <bf2daf76-ebfd-8ca2-0e40-362bcaecfc3f@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Flush requests are implemented as REQ_OP_WRITE + REQ_OP_PREFLUSH
-combination and not REQ_OP_FLUSH + REQ_PREFLUSH combination.
+>> [1] Performance in KIOPS:
+>>
+>>            |  radix-tree |    XArray  |   Diff
+>>            |             |            |
+>> write     |    315      |     313    |   -0.6%
+>> randwrite |    286      |     290    |   +1.3%
+>> read      |    330      |     335    |   +1.5%
+>> randread  |    309      |     312    |   +0.9%
+>>
+> 
+> I've few concerns, can you please share the fio jobs that
+> have used to gather this data ? I want to test it on my
+> setup in order to provide tested-by tag.
+> 
 
-This unclear nature has lead to the confusion and bugs in the code for
-block drivers causing more work for testing, reviews and fixes :-
+That would be great. This is my fio job:
 
-1. https://lore.kernel.org/all/ZFHgefWofVt24tRl@infradead.org/
-2. https://marc.info/?l=linux-block&m=168386364026498&w=2
+$ modprobe brd rd_size=10485760 rd_nr=1
+$ fio --name=brd  --rw=<type>  --size=10G --io_size=100G --cpus_allowed=1 --filename=/dev/ram0
+--direct=1 --iodepth=64 --ioengine=io_uring --loop=8
 
-Add a macro (name can me more meaningful) with a meaningful comment
-clearing the confusion and replace the REQ_OP_WRITE | REQ_PREFLUSH with
-the new macro name that also saves code repetation.
-
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- block/blk-flush.c                   | 2 +-
- drivers/md/bcache/request.c         | 3 +--
- drivers/md/dm-bufio.c               | 2 +-
- drivers/md/dm-integrity.c           | 2 +-
- drivers/md/dm-log.c                 | 2 +-
- drivers/md/dm-raid1.c               | 2 +-
- drivers/md/dm-snap-persistent.c     | 5 ++---
- drivers/md/dm-writecache.c          | 2 +-
- drivers/md/dm.c                     | 2 +-
- drivers/md/md.c                     | 3 +--
- drivers/md/raid5-cache.c            | 3 +--
- drivers/md/raid5-ppl.c              | 3 +--
- drivers/nvme/target/io-cmd-bdev.c   | 2 +-
- drivers/target/target_core_iblock.c | 3 +--
- include/linux/blk_types.h           | 7 +++++++
- 15 files changed, 22 insertions(+), 21 deletions(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 04698ed9bcd4..376f00257100 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -460,7 +460,7 @@ int blkdev_issue_flush(struct block_device *bdev)
- {
- 	struct bio bio;
- 
--	bio_init(&bio, bdev, NULL, 0, REQ_OP_WRITE | REQ_PREFLUSH);
-+	bio_init(&bio, bdev, NULL, 0, REQ_FLUSH_OPF);
- 	return submit_bio_wait(&bio);
- }
- EXPORT_SYMBOL(blkdev_issue_flush);
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 67a2e29e0b40..ab89897a36a2 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -1023,8 +1023,7 @@ static void cached_dev_write(struct cached_dev *dc, struct search *s)
- 			 */
- 			struct bio *flush;
- 
--			flush = bio_alloc_bioset(bio->bi_bdev, 0,
--						 REQ_OP_WRITE | REQ_PREFLUSH,
-+			flush = bio_alloc_bioset(bio->bi_bdev, 0, REQ_FLUSH_OPF,
- 						 GFP_NOIO, &dc->disk.bio_split);
- 			if (!flush) {
- 				s->iop.status = BLK_STS_RESOURCE;
-diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
-index eea977662e81..da815325842b 100644
---- a/drivers/md/dm-bufio.c
-+++ b/drivers/md/dm-bufio.c
-@@ -2133,7 +2133,7 @@ EXPORT_SYMBOL_GPL(dm_bufio_write_dirty_buffers);
- int dm_bufio_issue_flush(struct dm_bufio_client *c)
- {
- 	struct dm_io_request io_req = {
--		.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC,
-+		.bi_opf = REQ_FLUSH_OPF | REQ_SYNC,
- 		.mem.type = DM_IO_KMEM,
- 		.mem.ptr.addr = NULL,
- 		.client = c->dm_io,
-diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-index 31838b13ea54..2d90f8ad1ae5 100644
---- a/drivers/md/dm-integrity.c
-+++ b/drivers/md/dm-integrity.c
-@@ -1533,7 +1533,7 @@ static void dm_integrity_flush_buffers(struct dm_integrity_c *ic, bool flush_dat
- 	if (!ic->meta_dev)
- 		flush_data = false;
- 	if (flush_data) {
--		fr.io_req.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC,
-+		fr.io_req.bi_opf = REQ_FLUSH_OPF | REQ_SYNC,
- 		fr.io_req.mem.type = DM_IO_KMEM,
- 		fr.io_req.mem.ptr.addr = NULL,
- 		fr.io_req.notify.fn = flush_notify,
-diff --git a/drivers/md/dm-log.c b/drivers/md/dm-log.c
-index f9f84236dfcd..2c40f865ef16 100644
---- a/drivers/md/dm-log.c
-+++ b/drivers/md/dm-log.c
-@@ -311,7 +311,7 @@ static int flush_header(struct log_c *lc)
- 		.count = 0,
- 	};
- 
--	lc->io_req.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
-+	lc->io_req.bi_opf = REQ_FLUSH_OPF;
- 
- 	return dm_io(&lc->io_req, 1, &null_location, NULL);
- }
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index ddcb2bc4a617..7acb9a390b38 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -265,7 +265,7 @@ static int mirror_flush(struct dm_target *ti)
- 	struct dm_io_region io[MAX_NR_MIRRORS];
- 	struct mirror *m;
- 	struct dm_io_request io_req = {
--		.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC,
-+		.bi_opf = REQ_FLUSH_OPF | REQ_SYNC,
- 		.mem.type = DM_IO_KMEM,
- 		.mem.ptr.addr = NULL,
- 		.client = ms->io_client,
-diff --git a/drivers/md/dm-snap-persistent.c b/drivers/md/dm-snap-persistent.c
-index 15649921f2a9..cfb7f1b92c5e 100644
---- a/drivers/md/dm-snap-persistent.c
-+++ b/drivers/md/dm-snap-persistent.c
-@@ -739,8 +739,7 @@ static void persistent_commit_exception(struct dm_exception_store *store,
- 	/*
- 	 * Commit exceptions to disk.
- 	 */
--	if (ps->valid && area_io(ps, REQ_OP_WRITE | REQ_PREFLUSH | REQ_FUA |
--				 REQ_SYNC))
-+	if (ps->valid && area_io(ps, REQ_FLUSH_OPF | REQ_FUA | REQ_SYNC))
- 		ps->valid = 0;
- 
- 	/*
-@@ -817,7 +816,7 @@ static int persistent_commit_merge(struct dm_exception_store *store,
- 	for (i = 0; i < nr_merged; i++)
- 		clear_exception(ps, ps->current_committed - 1 - i);
- 
--	r = area_io(ps, REQ_OP_WRITE | REQ_PREFLUSH | REQ_FUA);
-+	r = area_io(ps, REQ_FLUSH_OPF | REQ_FUA);
- 	if (r < 0)
- 		return r;
- 
-diff --git a/drivers/md/dm-writecache.c b/drivers/md/dm-writecache.c
-index 074cb785eafc..538f74114d13 100644
---- a/drivers/md/dm-writecache.c
-+++ b/drivers/md/dm-writecache.c
-@@ -590,7 +590,7 @@ static void writecache_disk_flush(struct dm_writecache *wc, struct dm_dev *dev)
- 	region.bdev = dev->bdev;
- 	region.sector = 0;
- 	region.count = 0;
--	req.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
-+	req.bi_opf = REQ_FLUSH_OPF;
- 	req.mem.type = DM_IO_KMEM;
- 	req.mem.ptr.addr = NULL;
- 	req.client = wc->dm_io;
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 3b694ba3a106..a570024a747d 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1555,7 +1555,7 @@ static void __send_empty_flush(struct clone_info *ci)
- 	 * the basis for the clone(s).
- 	 */
- 	bio_init(&flush_bio, ci->io->md->disk->part0, NULL, 0,
--		 REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC);
-+		 REQ_FLUSH_OPF | REQ_SYNC);
- 
- 	ci->bio = &flush_bio;
- 	ci->sector_count = 0;
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 8e344b4b3444..5f72a693dc1c 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -533,8 +533,7 @@ static void submit_flushes(struct work_struct *ws)
- 			atomic_inc(&rdev->nr_pending);
- 			atomic_inc(&rdev->nr_pending);
- 			rcu_read_unlock();
--			bi = bio_alloc_bioset(rdev->bdev, 0,
--					      REQ_OP_WRITE | REQ_PREFLUSH,
-+			bi = bio_alloc_bioset(rdev->bdev, 0, REQ_FLUSH_OPF,
- 					      GFP_NOIO, &mddev->bio_set);
- 			bi->bi_end_io = md_end_flush;
- 			bi->bi_private = rdev;
-diff --git a/drivers/md/raid5-cache.c b/drivers/md/raid5-cache.c
-index 46182b955aef..692c3ed33b1f 100644
---- a/drivers/md/raid5-cache.c
-+++ b/drivers/md/raid5-cache.c
-@@ -1303,8 +1303,7 @@ void r5l_flush_stripe_to_raid(struct r5l_log *log)
- 
- 	if (!do_flush)
- 		return;
--	bio_init(&log->flush_bio, log->rdev->bdev, NULL, 0,
--		  REQ_OP_WRITE | REQ_PREFLUSH);
-+	bio_init(&log->flush_bio, log->rdev->bdev, NULL, 0, REQ_FLUSH_OPF);
- 	log->flush_bio.bi_end_io = r5l_log_flush_endio;
- 	submit_bio(&log->flush_bio);
- }
-diff --git a/drivers/md/raid5-ppl.c b/drivers/md/raid5-ppl.c
-index e495939bb3e0..da2012744b0d 100644
---- a/drivers/md/raid5-ppl.c
-+++ b/drivers/md/raid5-ppl.c
-@@ -629,8 +629,7 @@ static void ppl_do_flush(struct ppl_io_unit *io)
- 		if (bdev) {
- 			struct bio *bio;
- 
--			bio = bio_alloc_bioset(bdev, 0,
--					       REQ_OP_WRITE | REQ_PREFLUSH,
-+			bio = bio_alloc_bioset(bdev, 0, REQ_FLUSH_OPF,
- 					       GFP_NOIO, &ppl_conf->flush_bs);
- 			bio->bi_private = io;
- 			bio->bi_end_io = ppl_flush_endio;
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index c2d6cea0236b..2717b64cb02f 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -342,7 +342,7 @@ static void nvmet_bdev_execute_flush(struct nvmet_req *req)
- 		return;
- 
- 	bio_init(bio, req->ns->bdev, req->inline_bvec,
--		 ARRAY_SIZE(req->inline_bvec), REQ_OP_WRITE | REQ_PREFLUSH);
-+		 ARRAY_SIZE(req->inline_bvec), REQ_FLUSH_OPF);
- 	bio->bi_private = req;
- 	bio->bi_end_io = nvmet_bio_done;
- 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index cc838ffd1294..01984d07ff9c 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -419,8 +419,7 @@ iblock_execute_sync_cache(struct se_cmd *cmd)
- 	if (immed)
- 		target_complete_cmd(cmd, SAM_STAT_GOOD);
- 
--	bio = bio_alloc(ib_dev->ibd_bd, 0, REQ_OP_WRITE | REQ_PREFLUSH,
--			GFP_KERNEL);
-+	bio = bio_alloc(ib_dev->ibd_bd, 0, REQ_FLUSH_OPF, GFP_KERNEL);
- 	bio->bi_end_io = iblock_end_io_flush;
- 	if (!immed)
- 		bio->bi_private = cmd;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 740afe80f297..f3afdbb3f239 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -455,6 +455,13 @@ enum req_flag_bits {
- #define REQ_NOMERGE_FLAGS \
- 	(REQ_NOMERGE | REQ_PREFLUSH | REQ_FUA)
- 
-+/*
-+ * Flush requests are implemented as REQ_OP_WRITE + REQ_OP_PREFLUSH combination
-+ * and not REQ_OP_FLUSH + REQ_PREFLUSH combination.
-+ */
-+
-+#define REQ_FLUSH_OPF (REQ_OP_WRITE | REQ_PREFLUSH)
-+
- enum stat_group {
- 	STAT_READ,
- 	STAT_WRITE,
--- 
-2.40.0
+I ran the above job four times and averaged it as I noticed some variance. I ran the test in QEMU
+as we were using a block device where the backing storage lives in RAM.
 
