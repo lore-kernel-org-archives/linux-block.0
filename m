@@ -2,55 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA59C77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 13:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C479C77B75
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 14:02:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240719AbjELNyR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 09:54:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32890 "EHLO
+        id S240663AbjELOCZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 10:02:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240690AbjELNyP (ORCPT
+        with ESMTP id S241363AbjELOCU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 09:54:15 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA3FE4A;
-        Fri, 12 May 2023 06:54:15 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id D450668AA6; Fri, 12 May 2023 15:54:10 +0200 (CEST)
-Date:   Fri, 12 May 2023 15:54:10 +0200
-From:   "hch@lst.de" <hch@lst.de>
-To:     Jinyoung CHOI <j-young.choi@samsung.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
-        "kch@nvidia.com" <kch@nvidia.com>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 12/14] block: add helper function for iteration of
- bip's bvec
-Message-ID: <20230512135410.GF32242@lst.de>
-References: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1> <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p8> <20230510085941epcms2p8ad574939bc3edbd65b8f208c80a85911@epcms2p8>
+        Fri, 12 May 2023 10:02:20 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 322AF19B2;
+        Fri, 12 May 2023 07:02:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=o42bYRiGDYv0oiaZby38uYs2JfHiCSTG+EB2+ilcPVk=; b=Map3vAxfT7tsVfbMF/gNeenRuo
+        KLBR5Nzp0laRWmmdiRmjCrUlwA2qAl2I9ItANArxroeXiXYWVIQKCXqA1zKVKZIHbFCa2jdB2eoOd
+        7NPmfhfqDnrBzTmDZVBK0b7kTX+Qr5X1wq/bOjeTsvgleSOBxSD6XyINFlYfsMmt/g1nEac2cRso2
+        IrnQVXP1ccbFFx+1s5K2CZWW7IZ1uH17gFTL5Fxd4TQeXKVTK5wUaDeiBo47CboZmU19YBfNgGUKM
+        CSmE1z8PhialJ38FDh3KbtUju36Wft/LvaFTf52a4CRl9uo1nIuxkjpR6h4T4ByriElFSaL6RyP6f
+        DSL5qX3w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pxTLb-00C6TY-1i;
+        Fri, 12 May 2023 14:02:15 +0000
+Date:   Fri, 12 May 2023 07:02:15 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        stanley.chu@mediatek.com, peter.wang@mediatek.com,
+        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
+        powen.kao@mediatek.com, naomi.chu@mediatek.com,
+        wsd_upstream@mediatek.com
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+Message-ID: <ZF5G5ztMng8Xbd1W@infradead.org>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <ZF0K7A6G2cYBjSgn@infradead.org>
+ <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230510085941epcms2p8ad574939bc3edbd65b8f208c80a85911@epcms2p8>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 10, 2023 at 05:59:41PM +0900, Jinyoung CHOI wrote:
-> bip_for_each_vec() performs the iteration in a page unit.
-> 
-> Since a bio_vec of bip is composed of multi-page in the block, a macro
-> that can be carried out in multi-page units has been added.
+On Thu, May 11, 2023 at 08:38:04AM -0700, Bart Van Assche wrote:
+> For which devices is the fair sharing algorithm useful? As far as I know the
+> legacy block layer did not have an equivalent of the fair sharing algorithm
+> and I'm not aware of any complaints about the legacy block layer regarding
+> to fairness. This is why I proposed in January to remove the fair sharing
+> code entirely. See also https://lore.kernel.org/linux-block/20230103195337.158625-1-bvanassche@acm.org/.
 
-The naming here is a bit confused.  The rest of the block layers uses
-_segment for the per-page iterators and _vec for the one that doesn't
-break up.  I'd suggest we follow this naming scheme here.  And also
-skip the extra for_each_mp_bvec level, just like we don't have that
-intermediate level for bio_for_each_vec
+Because the old code did not do tag allocation itself?  Either way I
+don't think a "I'll opt out for a random driver" is the proper approach
+when you think it's not needed.  Especially not without any data
+explaining why just that driver is a special snowflake.
