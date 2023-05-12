@@ -2,160 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBD1C77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 15:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC9EC77B7F
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 15:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241680AbjELPBa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 11:01:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
+        id S241143AbjELPHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 11:07:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241684AbjELPB0 (ORCPT
+        with ESMTP id S241231AbjELPHL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 11:01:26 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44FCD10E6D
-        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:01:12 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-760b6765f36so35502739f.0
-        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:01:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683903670; x=1686495670;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RLakCHeOGL3BTNkuhVC5tzE0mMDF0pgQvcM5N/M1Q2w=;
-        b=q56dH0t0F4mVLwbIa36nRH+cVgEhZhZ9WruCY0PXl17/I/dKs8t4GC0KCRNIWfP0tO
-         h+jGwj8sUehha8hP871X8MJywqho6LSmr9rcsPGa6jTVFty+BcZMJAaXgCdvuD2HCSps
-         38tMD0GSeCcUrdPJEfgWST4iSFNL8WPn4abEI8LTI1+f++WTYcKlwo5kyG7yhORjA/9f
-         TR4N7zVZEi4bumda1Pfvm/QpuIbj37L2ySzYOQ+j9ffL8sA4uD6Q0aB0+NAH7eJWL9+Y
-         aOOz9NBnFv2sw/zNxIUR9oSR1Ya+517FiLTeRmfrEf3fyYZ6PRm7H479NTXHmlT1h8Ob
-         8mpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683903670; x=1686495670;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RLakCHeOGL3BTNkuhVC5tzE0mMDF0pgQvcM5N/M1Q2w=;
-        b=jYZd/bifiMTaRSoHla/5fJJjNwHKTQiCNNGCnUyCYApqNr3OYunoxjA5Py40opu1iZ
-         OZDaheO24ULj3oBwoqQOVcvDVN5+T6hS4WUnCbNoUcSsz4x4iRWsNx7NxfmaiPz/drfo
-         okG+46dJXOPVEHYTdQSBzV0kKaCtX08iTSN1kU0/kDZSDhsaFWLLbI6EYUf1iN2gLDHB
-         SU8+e+nHNQieKAyql+UJE+/tJx6xzSFCSQ+GFbtW/yNp8205u3t0ZxgPCc4nyzrIdweL
-         j7BDV+SIqN0WbI4LM87D1RpIN2nRBln7V5mWSaa9fEMPWZMYwyvfQ6tO3iKNlghTI8sn
-         5Eig==
-X-Gm-Message-State: AC+VfDwytV361SDJM0BoVzH2wKaM38HpBfPEpoRuCc33BSV10lUT6W3E
-        hM18QFkDkVzEai6KiLIV0EgkHg==
-X-Google-Smtp-Source: ACHHUZ7xHlFjVPoGXyuKWZldv47ynrF8n0i7/CKSn3rmFx2lk5ht8GcPs2bvxnnKEQVthSsUZkW0GA==
-X-Received: by 2002:a6b:b4ce:0:b0:76c:6fa4:4df4 with SMTP id d197-20020a6bb4ce000000b0076c6fa44df4mr4396467iof.2.1683903670350;
-        Fri, 12 May 2023 08:01:10 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id cc6-20020a056602424600b0076c3189a8d9sm4480811iob.38.2023.05.12.08.01.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 May 2023 08:01:09 -0700 (PDT)
-Message-ID: <1c9a152e-fac1-ac9e-c871-bbec5f176bda@kernel.dk>
-Date:   Fri, 12 May 2023 09:01:08 -0600
+        Fri, 12 May 2023 11:07:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039E11FC7
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:06:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1683903991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=3tzsnv4sZBdT54STtzEztQmvQ7FmzobkD/NnhEhEZgw=;
+        b=Ue1x75YmGrOmZ84xggYR8YjHWiTafc4+jCYpJlLgd+7A2tzXncPy9zPzZhU3396Fl+3383
+        ni4CDigbhKlTQEFAry1d5sbIvHEABRgigTwyrM+HDO8P8M0RZxthQt+A4n9mdJCYW0pV0D
+        Y7b55CXJdvHjlC9FmT9AhMpl1lNXDUQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-70-1Zc5zByRM0Wd4o4XBL92TA-1; Fri, 12 May 2023 11:06:28 -0400
+X-MC-Unique: 1Zc5zByRM0Wd4o4XBL92TA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AEAF01C06901;
+        Fri, 12 May 2023 15:06:27 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9AF9020268C4;
+        Fri, 12 May 2023 15:06:26 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Guangwu Zhang <guazhang@redhat.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Subject: [PATCH] blk-mq: don't queue passthrough request into scheduler
+Date:   Fri, 12 May 2023 23:03:28 +0800
+Message-Id: <20230512150328.192908-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC PATCH 1/2] blk-mq: Convert request->csd to
- call_single_data_t and reposition it
-Content-Language: en-US
-To:     Leonardo Bras <leobras@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Valentin Schneider <vschneid@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Yury Norov <yury.norov@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230511085836.579679-1-leobras@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230511085836.579679-1-leobras@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/11/23 2:58?AM, Leonardo Bras wrote:
-> Currently, request->csd has type struct __call_single_data.
-> 
-> call_single_data_t is defined in include/linux/smp.h :
-> 
-> /* Use __aligned() to avoid to use 2 cache lines for 1 csd */
-> typedef struct __call_single_data call_single_data_t
-> 	__aligned(sizeof(struct __call_single_data));
-> 
-> As the comment above the typedef suggests, having this struct split between
-> 2 cachelines causes the need to fetch / invalidate / bounce 2 cachelines
-> instead of 1 when the cpu receiving the request gets to run the requested
-> function. This is usually bad for performance, due to one extra memory
-> access and 1 extra cacheline usage.
-> 
-> Changing request->csd was previously attempted in commit
-> 966a967116e6 ("smp: Avoid using two cache lines for struct call_single_data")
-> but at the time the union that contains csd was positioned near the top of
-> struct request, only below a struct list_head, and this caused the issue of
-> holes summing up 24 extra bytes in struct request.
-> 
-> The struct size was restored back to normal by
-> commit 4ccafe032005 ("block: unalign call_single_data in struct request")
-> but it caused the csd to be possibly split in 2 cachelines again.
-> 
-> As an example with a 64-bit machine with
-> CONFIG_BLK_RQ_ALLOC_TIME=y
-> CONFIG_BLK_WBT=y
-> CONFIG_BLK_DEV_INTEGRITY=y
-> CONFIG_BLK_INLINE_ENCRYPTION=y
-> 
-> Will output pahole with:
-> struct request {
-> [...]
-> 	union {
-> 		struct __call_single_data csd;           /*   240    32 */
-> 		u64                fifo_time;            /*   240     8 */
-> 	};                                               /*   240    32 */
-> [...]
-> }
-> 
-> At this config, and any cacheline size between 32 and 256, will cause csd
-> to be split between 2 cachelines: csd->node (16 bytes) in the first
-> cacheline, and csd->func (8 bytes) & csd->info (8 bytes) in the second.
-> 
-> During blk_mq_complete_send_ipi(), csd->func and csd->info are getting
-> changed, and when it calls __smp_call_single_queue() csd->node will get
-> changed.
-> 
-> On the cpu which got the request, csd->func and csd->info get read by
-> __flush_smp_call_function_queue() and csd->node gets changed by
-> csd_unlock(), meaning the two cachelines containing csd will get accessed.
-> 
-> To avoid this, it would be necessary to change request->csd back to
-> csd_single_data_t, which may end up increasing the struct size.
-> (In above example, it increased from 288 to 320 -> 32 bytes).
-> 
-> In order to keep the csd_single_data_t and avoid the struct's size
-> increase, move request->csd to the end of the struct.
-> The rationale of this strategy is that for cachelines >= 32 bytes, there
-> will never be used an extra cacheline for struct request:
-> 
-> - If request->csd is 32-byte aligned, there is no change in the object.
-> - If request->csd is not 32-byte aligned, and part of it is in a different
->   cacheline, the whole csd is moved to that cacheline.
-> - If request->csd is not 32-byte aligned, but it's all contained in the
->   same cacheline (> 32 bytes), aligning it to 32 will just put it a few
->   bytes forward in this cacheline.
-> 
-> (In above example, the change kept the struct's size in 288 bytes).
-> 
-> Convert request->csd to csd_single_data_t and move it to the end of
-> struct request, so csd is never split between cachelines and don't use any
-> extra cachelines.
+Passthrough(pt) request shouldn't be queued to scheduler, especially some
+schedulers(such as bfq) supposes that req->bio is always available and
+blk-cgroup can be retrieved via bio.
 
-This is going the wrong way imho. It'd be nice to get struct request
-down to 256 bytes at some point, and then this would get in the way. The
-patch is also attempting to do two things at once, which is a bad idea.
+Sometimes pt request could be part of error handling, so it is better to always
+queue it into hctx->dispatch directly.
 
-Why not just rearrange it a bit so that we don't split a cacheline with
-the csd?
+Fix this issue by queuing pt request from plug list to hctx->dispatch
+directly.
 
+Reported-by: Guangwu Zhang <guazhang@redhat.com>
+Investigated-by: Yu Kuai <yukuai1@huaweicloud.com>
+Fixes: 1c2d2fff6dc0 ("block: wire-up support for passthrough plugging")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+Guang Wu, please test this patch and provide us the result.
+
+ block/blk-mq.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f6dad0886a2f..11efaefa26c3 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2711,6 +2711,7 @@ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
+ 	struct request *requeue_list = NULL;
+ 	struct request **requeue_lastp = &requeue_list;
+ 	unsigned int depth = 0;
++	bool pt = false;
+ 	LIST_HEAD(list);
+ 
+ 	do {
+@@ -2719,7 +2720,9 @@ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
+ 		if (!this_hctx) {
+ 			this_hctx = rq->mq_hctx;
+ 			this_ctx = rq->mq_ctx;
+-		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx) {
++			pt = blk_rq_is_passthrough(rq);
++		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx ||
++				pt != blk_rq_is_passthrough(rq)) {
+ 			rq_list_add_tail(&requeue_lastp, rq);
+ 			continue;
+ 		}
+@@ -2731,10 +2734,15 @@ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
+ 	trace_block_unplug(this_hctx->queue, depth, !from_sched);
+ 
+ 	percpu_ref_get(&this_hctx->queue->q_usage_counter);
+-	if (this_hctx->queue->elevator) {
++	if (this_hctx->queue->elevator && !pt) {
+ 		this_hctx->queue->elevator->type->ops.insert_requests(this_hctx,
+ 				&list, 0);
+ 		blk_mq_run_hw_queue(this_hctx, from_sched);
++	} else if (pt) {
++		spin_lock(&this_hctx->lock);
++		list_splice_tail_init(&list, &this_hctx->dispatch);
++		spin_unlock(&this_hctx->lock);
++		blk_mq_run_hw_queue(this_hctx, from_sched);
+ 	} else {
+ 		blk_mq_insert_requests(this_hctx, this_ctx, &list, from_sched);
+ 	}
 -- 
-Jens Axboe
+2.38.1
 
