@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66E5C77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 07:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EDBC77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 07:26:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240175AbjELHRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 03:17:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57696 "EHLO
+        id S240020AbjELH0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 03:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240286AbjELHQM (ORCPT
+        with ESMTP id S239935AbjELH0j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 03:16:12 -0400
+        Fri, 12 May 2023 03:26:39 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DD23599;
-        Fri, 12 May 2023 00:14:27 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QHg4H6YWPz4f3jJB;
-        Fri, 12 May 2023 15:14:23 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 129D61AC;
+        Fri, 12 May 2023 00:26:38 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QHftl0rTBz4f3vfM;
+        Fri, 12 May 2023 15:06:07 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHvbBP511kfk0dJQ--.30340S3;
-        Fri, 12 May 2023 15:14:25 +0800 (CST)
-Subject: Re: [PATCH -next] block: fix blktrace debugfs entries leak
+        by APP3 (Coremail) with SMTP id _Ch0CgA35CFf5V1kW88lIg--.19910S3;
+        Fri, 12 May 2023 15:06:08 +0800 (CST)
+Subject: Re: [PATCH -next 3/6] blk-wbt: don't enable wbt for bio based device
 To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     ming.lei@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
         yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230511065633.710045-1-yukuai1@huaweicloud.com>
- <20230511152808.GA8641@lst.de>
+References: <20230511014509.679482-1-yukuai1@huaweicloud.com>
+ <20230511014509.679482-4-yukuai1@huaweicloud.com>
+ <20230511152123.GC7880@lst.de>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <18db3894-d128-7857-4c11-25b59d82ff54@huaweicloud.com>
-Date:   Fri, 12 May 2023 15:14:23 +0800
+Message-ID: <4d736700-6baa-4aab-2ff0-85752b543d81@huaweicloud.com>
+Date:   Fri, 12 May 2023 15:06:07 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20230511152808.GA8641@lst.de>
+In-Reply-To: <20230511152123.GC7880@lst.de>
 Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHvbBP511kfk0dJQ--.30340S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFWxZr17ZrW7XryUCw1fCrg_yoW8tF17pa
-        ySqan0kr1qyrsYva47Zw4UXaySg3s5ArWrJF9ag34S9F15Jr1agFW7AwsYva13XrsI9r90
-        q3WYvrW7Jry8XF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-        JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUp6w
-        ZUUUUU=
+X-CM-TRANSID: _Ch0CgA35CFf5V1kW88lIg--.19910S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYg7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
+        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
+        rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
+        1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+        67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+        8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+        wI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+        AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU1a9aPUUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -62,54 +62,24 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-在 2023/05/11 23:28, Christoph Hellwig 写道:
-> On Thu, May 11, 2023 at 02:56:33PM +0800, Yu Kuai wrote:
+在 2023/05/11 23:21, Christoph Hellwig 写道:
+> On Thu, May 11, 2023 at 09:45:06AM +0800, Yu Kuai wrote:
 >> From: Yu Kuai <yukuai3@huawei.com>
 >>
->> Commit 99d055b4fd4b ("block: remove per-disk debugfs files in
->> blk_unregister_queue") moves blk_trace_shutdown() from
->> blk_release_queue() to blk_unregister_queue(), this is safe if blktrace
->> is created through sysfs, however, there are some regression in corner
->> cases:
->>
->> 1) for scsi, passthrough io can still be issued after del_gendisk, and
->>     blktrace debugfs entries will be removed immediately after
->>     del_gendisk(), therefor passthrough io can't be tracked and blktrace
->>     will complain:
->>
->>     failed read of /sys/kernel/debug/block/sdb/trace0: 5/Input/output error
+>> Because rq_qos only make sense for rq based device. Instead of fail
+>> from sysfs configuration, make wbt sysfs dentry invisible directly.
 > 
-> But that is the right thing.  The only thing that has a name is the
-> gendisk and it is gone at this point.  Leaking the debugfs entries
-> that are named after, and ultimatively associated with the gendisk
-> (even if the code is still a bit confused about this) will create a lot
-> of trouble for us.
+> This looks ok, bt I would be better to just have a separate attr
+> group just for blk-mq based devices?
 > 
->> 2) blktrace can still be enabled after del_gendisk() through ioctl if the
->>     disk is opened before del_gendisk(), and if blktrace is not shutdown
->>     through ioctl before closing the disk, debugfs entries will be
->>     leaked.
-> 
-> Yes.
-> 
->> It seems 1) is not important, while 2) needs to be fixed apparently.
->>
->> Fix this problem by shutdown blktrace in blk_free_queue(),
->> disk_release() is not used because scsi sg support blktrace without
->> gendisk, and this is safe because queue is not freed yet, and
->> blk_trace_shutdown() is reentrant.
-> 
-> I think disk_release is the right place for "normal" blktrace.  The
-> odd cdev based blktrace for /dev/sg will need separate handling.
-> To be honest I'm not even sure how /dev/sg based passthrough is
-> even supposed to work in practice, but I'll need to spend some more
-> time to familarize myself with it.
 
-I'm not sure how to specail hanlde /dev/sg* for now, however,
-If we don't care about blktrace for passthrough io after del_gendisk(),
-and /dev/sg* has separate handling, I think it's better just to check
-QUEUE_FLAG_REGISTERED in blk_trace_setup(), and don't enable blktrace
-in the first place.
+Sounds good, I'll add a new attr_group that is only visible for rq based
+device, I think following attr can be moved to this new group:
+
+nr_requests,
+rq_affinity,
+scheduler,
+wbt_lat_usec
 
 Thanks,
 Kuai
