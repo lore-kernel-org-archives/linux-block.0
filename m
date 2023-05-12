@@ -2,91 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A280C77B75
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 15:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0200AC77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 15:09:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241733AbjELPJb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 11:09:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56320 "EHLO
+        id S241738AbjELPJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 11:09:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241740AbjELPJ3 (ORCPT
+        with ESMTP id S241725AbjELPJg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 11:09:29 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CA40D064
-        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:09:26 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id ca18e2360f4ac-760dff4b701so59895339f.0
-        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:09:26 -0700 (PDT)
+        Fri, 12 May 2023 11:09:36 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B97D1FC7
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:09:36 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-76c6ba5fafaso18798739f.1
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 08:09:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683904165; x=1686496165;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G6Kb7yZjmJ5yxlvZEPRG52JYAHhDFh9h2lYypPPkqcw=;
-        b=Sq3IszFbAfr0dBcFeQc+ndjqWUOfTGuPgRYKpnCQs2Ej8nCJamegrISypbevzvBgwk
-         lGzrg5Wc+JXqST9u0gqSmlUWPSy8m185ntWd1ZskhZWfmG7fm22e+LFmAnVmJZ+EaWBN
-         yYCis/m7n9G6CXW+R99sSg0nvFM9QK6LKVoqEIuQIInkOdMZgztt43nZfAqelN1HQ8JN
-         0Z7D+o4dUFlj2LCZK5FZ1Ug2ehwR9lj+MhCVIxOnn/PYrfEF83UqJLsM4OQCtiSzoVfX
-         TGLPEUpWBF4xwdvSrWgTn7Nl/H/LzPOXaCIzv47rkIc7hBieME+ezWv9J/G7shyqidcD
-         CY2Q==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683904175; x=1686496175;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gCibvLLxmrwwjTg8tqAHybrQHxUO9Q8BGBSAxnFXhiw=;
+        b=uQb+J4jzLKUfp8gagw5cGFiAeUpcv8jZJp1GHPpWmpH5ipBA16smx4xIf5dXo0kFt+
+         8GFco37b1QZVTDLsrUc59o0pmGTqqi+/Qpf+QglCqnMTKQ7ve0Au+qGHWiu40eqcmuXq
+         tRZZ+RomkmcHetSB4F4Ten7NhzlmLnvX+ZH5m5DO/LRzSGQqwgNL/qweq2O67gzIGqjc
+         MiJgfs9oBjCHf6V3c9KE9H5PsHE6lUMNVV2lUxN9lnfahQMHEBGRb3KV40k7a+9VIaC+
+         B+AiDPgnY2JO6kEjuOgTgw3z+ikAybLXCLo3kEg3OrtP/hEreqnZzhzWQbgqssBrkyKF
+         0/xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683904165; x=1686496165;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G6Kb7yZjmJ5yxlvZEPRG52JYAHhDFh9h2lYypPPkqcw=;
-        b=R3EALmzdX2zOdjPjiq4e1eFBi6h+ojFFbSiAOJWYz6tsm823WpNZH7oI+mL42X3MsY
-         jnF/alYGzGRDT+S1iGD+kFkBIjfnh13KJ1h+G41q4EUKY8gQgz0GXIoo7k0xChsIqXS9
-         hFCS2Rkf+gdixxY/LHBmUUkxGhYTEIuT03Ge2+0N9HAej430QQCAvikmjfA/GXPJRlTv
-         TPjxXeJoFoXIpkP9nZ4R81A+/2FKXYe7V6N7hF7p7Db5gPkfSkMEmPhRayOQxM3d7l0+
-         F5rYIGSTDMmqDAzgF3mhUKoym5VfoQUiYMXEJreIcE49Fw/WPXvNyCF+WIfYQB4qpVlB
-         JcxQ==
-X-Gm-Message-State: AC+VfDyoBzt51004IfXU6jAwlIJ0+M+5sr0wxDM9R5/knyQsFdt/E0DE
-        wbwlAik5OEyekaUgQRKpiA29mPeXkOLHXMN8v2U=
-X-Google-Smtp-Source: ACHHUZ4x4vXbEvwWgfGkuxZPgkMn3LPgJyyo2QBsDQXxbTfDLlHy3ulcwmflfg6x8m61ywuMl/i+Lg==
-X-Received: by 2002:a6b:8d8c:0:b0:76c:77b9:b82e with SMTP id p134-20020a6b8d8c000000b0076c77b9b82emr3485929iod.0.1683904165527;
-        Fri, 12 May 2023 08:09:25 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id k26-20020a02c65a000000b0040fd1340997sm5076921jan.140.2023.05.12.08.09.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 May 2023 08:09:24 -0700 (PDT)
-Message-ID: <4f862845-5321-4559-3d0f-20fb618894ef@kernel.dk>
-Date:   Fri, 12 May 2023 09:09:24 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] ublk: fix command op code check
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org
-References: <20230505153142.1258336-1-ming.lei@redhat.com>
- <ZF5Wb7L3I8YLqaaJ@ovpn-8-16.pek2.redhat.com>
+        d=1e100.net; s=20221208; t=1683904175; x=1686496175;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gCibvLLxmrwwjTg8tqAHybrQHxUO9Q8BGBSAxnFXhiw=;
+        b=Q4bwwAo7fEY7LuwNYUXQqvLQrK0xFUIlBICatqwWTMTyBNY5V3YzEdyrMYTNcrR0B3
+         dSqg3MEqAgZOEFY0cFuL0SbAjbrnvrWQiKpuwppwSVfYUqFsaI1LPrn3rW+JwbvAmHkR
+         IEL+pmM06XyzjNpytsV4FwYE9A1+6qmC5AOWjjelpbBiIAWSEMpNGmExXYAA+MjfA+tx
+         hxrT90uNvaf7P+1cXXyI06DLftv9iIsISJOVEKRgiXHq6p9925Y/emDfQGHaqFIPRsM3
+         l7shBVK1QwStYdC/E6y3fK21OhNLDdkKUJZ60kVZD6TbIpMQznn/r//cZTsW1Z/hcPEZ
+         yHuw==
+X-Gm-Message-State: AC+VfDyTGR7E36NW0fS6ocaQ/+lCRB8h2SRXdwLz1cER1xhekrnwSPKU
+        agOiqbjtCiZj1dKmH1ojn9W7Wg==
+X-Google-Smtp-Source: ACHHUZ4C6nUSwzXyYsE0c9Gh7gS2xy8BK1Q/t0KdbEpeZZJd9wlQic8dUm6KTp4fKwUEmUvC3d6cQQ==
+X-Received: by 2002:a05:6602:2b93:b0:76c:8a4c:ad79 with SMTP id r19-20020a0566022b9300b0076c8a4cad79mr2715877iov.1.1683904175386;
+        Fri, 12 May 2023 08:09:35 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id u21-20020a6be315000000b0076c6f5b8db5sm1685542ioc.16.2023.05.12.08.09.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 May 2023 08:09:34 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZF5Wb7L3I8YLqaaJ@ovpn-8-16.pek2.redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     josef@toxicpanda.com, Ivan Orlov <ivan.orlov0322@gmail.com>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+        himadrispandya@gmail.com,
+        linux-kernel-mentees@lists.linuxfoundation.org
+In-Reply-To: <20230512130533.98709-1-ivan.orlov0322@gmail.com>
+References: <20230512130533.98709-1-ivan.orlov0322@gmail.com>
+Subject: Re: [PATCH] nbd: Fix debugfs_create_dir error checking
+Message-Id: <168390417460.869582.2878039069012872149.b4-ty@kernel.dk>
+Date:   Fri, 12 May 2023 09:09:34 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/23 9:08 AM, Ming Lei wrote:
-> On Fri, May 05, 2023 at 11:31:42PM +0800, Ming Lei wrote:
->> In case of CONFIG_BLKDEV_UBLK_LEGACY_OPCODES, type of cmd opcode could
->> be 0 or 'u'; and type can only be 'u' if CONFIG_BLKDEV_UBLK_LEGACY_OPCODES
->> isn't set.
->>
->> So fix the wrong check.
->>
->> Fixes: 2d786e66c966 ("block: ublk: switch to ioctl command encoding")
->> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> 
-> Hello Jens,
-> 
-> Can you queue this fix for 6.3?
 
-Done, for 6.4 though.
+On Fri, 12 May 2023 17:05:32 +0400, Ivan Orlov wrote:
+> The debugfs_create_dir function returns ERR_PTR in case of error, and the
+> only correct way to check if an error occurred is 'IS_ERR' inline function.
+> This patch will replace the null-comparison with IS_ERR.
+> 
+> 
 
+Applied, thanks!
+
+[1/1] nbd: Fix debugfs_create_dir error checking
+      commit: 4913cfcf014c95f0437db2df1734472fd3e15098
+
+Best regards,
 -- 
 Jens Axboe
+
 
 
