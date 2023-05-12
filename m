@@ -2,90 +2,134 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30076C77B75
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 14:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9D4C77B75
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 14:35:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240646AbjELOe3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 10:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59530 "EHLO
+        id S241252AbjELOfX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 10:35:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241039AbjELOe2 (ORCPT
+        with ESMTP id S241039AbjELOfU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 10:34:28 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67E4A10C6
-        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 07:34:27 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-3357ea1681fso1967665ab.1
-        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 07:34:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683902066; x=1686494066;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9l7M5qD0qh1ILTM02sp3n8gbFLZNlyZml6SWGnHetDI=;
-        b=QcsRP46byFy+tULrJHYUbzjbPKBxJFbSV6gWkdbqiKZeONcrVs+ppc7YougOVZWo5E
-         6rijDxOUH4oFmspicrX+RZXWoaYU0ArKSELDcVsYsM50fGM+YM0EHkASNSoBc7Tlp6FH
-         5GED/3gELxXVzdFwJ3574SRnFvDMEcZilj/cYHgzwBtvPV52YQpHmywpfGP5uhnEZDoc
-         wYQiin2CNYI4dXafz90TyvURbdKcRN3V1yWumS+alLoXHX4qp6LR040582hQ5SjOkGT7
-         3MQ9cfjWJTsLvasRE61Lw1g3plBAZoQ3wupXBdSKWIrLAfvkJsRymResp3fgPd1x9G89
-         3/rA==
+        Fri, 12 May 2023 10:35:20 -0400
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2AE1733
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 07:34:34 -0700 (PDT)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-3f38b7ca98aso57244611cf.1
+        for <linux-block@vger.kernel.org>; Fri, 12 May 2023 07:34:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683902066; x=1686494066;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1683902073; x=1686494073;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9l7M5qD0qh1ILTM02sp3n8gbFLZNlyZml6SWGnHetDI=;
-        b=imeDK9xJ0Rzmqhlh2B9si2r6+f/G3zbRmX7qFA2a5g+kQDqHVuMz+PFqDIz6SpBT0A
-         w5k577ZEqv3Q/OYXHHiooBtbnOW+0ThuxUELEqjQIZj7gnjbB/dFW03BJPlaKbMv/ESg
-         KR0XbanXrcwSlRwEma2foRf7bQCUQr7W/uAKWWiUEJ2TA/GjqBU7GBX+Rw8HK8kAqCkc
-         jKVNNlgQJ6kX8XWwgGpKvg8pB7RKJvvjEJ8tWuXKJIBu2mWOEimOw33dwjGkQdSDTaJe
-         3rluEFITmj15oAUVaKejuCp3wIvPgToKaASAgxMb0UD/jnSXRB00a+opu3db4XPPQOTo
-         m1yg==
-X-Gm-Message-State: AC+VfDx429AUfwblkcPMY8SLyLpzLFMwUsQ6XPfMIN5E5x5lOL16G0aK
-        cgrY9jUGkV1cqndtfNaTgBHBng==
-X-Google-Smtp-Source: ACHHUZ75zYODGwgsRmH72O/kFoyvffqG/+jQ2xADOSDf78tH9zO+9QU+656bJW9zO4+4XBi4crKiXA==
-X-Received: by 2002:a05:6e02:178f:b0:325:f635:26c5 with SMTP id y15-20020a056e02178f00b00325f63526c5mr13737036ilu.3.1683902066649;
-        Fri, 12 May 2023 07:34:26 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id g47-20020a02272f000000b004165d7d6711sm4732434jaa.71.2023.05.12.07.34.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 May 2023 07:34:25 -0700 (PDT)
-Message-ID: <8a661736-2c79-9330-1371-b6f539a9a695@kernel.dk>
-Date:   Fri, 12 May 2023 08:34:25 -0600
+        bh=3NI8PblGX09aXcegfRrsRbp5Rk8EB7aSb1Q3zVJjhig=;
+        b=GzHr/GokcxQd+6VYLNA40KXHOnoUvYwGP/qJLJiiDoNRQEZJJcfilGsOhWDt1yPn74
+         aynLJMFIW5amQpF6jonjTW77g0OYA71eohuCV/7pr96CyZlt5tGK6hEqR13m9xxeQDgY
+         ptzukvWATRxkT6/h0syrtowiFglTsJXEFbqM9pgj4oezbtk/+uVCSyCv6oCSXFZAoFv6
+         hFneIGmjpdU7eyEyVwZX72007aVcdt5Jr3cmz59R7v9B+V30Sw/qtZXGZJcKXudM+tji
+         w56SkzZPQqQFJP0NJ2ijLlEqnSF6Bj+G6TFD2TUOXMEzXolMefwKXI2BXr3jrQN1V0gC
+         wwPQ==
+X-Gm-Message-State: AC+VfDwRJlapAb6OzIFesvQzrpPfYM9+aJvedp6/qGsrNOgg3GHrwosA
+        AZQLSd9FNLN30RonWgTHanI0
+X-Google-Smtp-Source: ACHHUZ4M++aZz9x/idwKRxoZtFqzxE+KBfxysydbhwDNajJOH3TAbWPaBDcqWbbuEGec9dZSQIGwHA==
+X-Received: by 2002:ac8:5787:0:b0:3f3:91bd:a46d with SMTP id v7-20020ac85787000000b003f391bda46dmr24764787qta.8.1683902073426;
+        Fri, 12 May 2023 07:34:33 -0700 (PDT)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id f8-20020ae9ea08000000b0074d3233487dsm5387535qkg.114.2023.05.12.07.34.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 May 2023 07:34:32 -0700 (PDT)
+Date:   Fri, 12 May 2023 10:34:31 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Brian Foster <bfoster@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, Andreas Dilger <adilger.kernel@dilger.ca>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v6 4/5] dm-thin: Add REQ_OP_PROVISION support
+Message-ID: <ZF5Od6GY4rsq82qM@redhat.com>
+References: <20230420004850.297045-1-sarthakkukreti@chromium.org>
+ <20230506062909.74601-1-sarthakkukreti@chromium.org>
+ <20230506062909.74601-5-sarthakkukreti@chromium.org>
+ <ZFp7ykxGFUbPG1ON@redhat.com>
+ <CAG9=OMOMrFcy6UdL8-3wZGwOr1nqLm1bpvL+G1g2dvBhJWU2Kw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 1/3] zram: allow user to set QUEUE_FLAG_NOWAIT
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     minchan@kernel.org, senozhatsky@chromium.org,
-        linux-block@vger.kernel.org
-References: <20230512082958.6550-1-kch@nvidia.com>
- <20230512082958.6550-2-kch@nvidia.com> <ZF5NssjIVNUU9oIA@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZF5NssjIVNUU9oIA@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG9=OMOMrFcy6UdL8-3wZGwOr1nqLm1bpvL+G1g2dvBhJWU2Kw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/23 8:31 AM, Christoph Hellwig wrote:
-> On Fri, May 12, 2023 at 01:29:56AM -0700, Chaitanya Kulkarni wrote:
->> Allow user to set the QUEUE_FLAG_NOWAIT optionally using module
->> parameter to retain the default behaviour. Also, update respective
->> allocation flags in the write path. Following are the performance
->> numbers with io_uring fio engine for random read, note that device has
->> been populated fully with randwrite workload before taking these
->> numbers :-
-> 
-> Why would you add a module option, except to make everyones life hell?
+On Thu, May 11 2023 at  4:03P -0400,
+Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
 
-Yeah that makes no sense. Either the driver is nowait compatible and
-it should just set the flag, or it's not.
+> On Tue, May 9, 2023 at 9:58 AM Mike Snitzer <snitzer@kernel.org> wrote:
+> >
+> > On Sat, May 06 2023 at  2:29P -0400,
+> > Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
+> >
+> > > dm-thinpool uses the provision request to provision
+> > > blocks for a dm-thin device. dm-thinpool currently does not
+> > > pass through REQ_OP_PROVISION to underlying devices.
+> > >
+> > > For shared blocks, provision requests will break sharing and copy the
+> > > contents of the entire block. Additionally, if 'skip_block_zeroing'
+> > > is not set, dm-thin will opt to zero out the entire range as a part
+> > > of provisioning.
+> > >
+> > > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> > > ---
+> > >  drivers/md/dm-thin.c | 70 +++++++++++++++++++++++++++++++++++++++++---
+> > >  1 file changed, 66 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+> > > index 2b13c949bd72..3f94f53ac956 100644
+> > > --- a/drivers/md/dm-thin.c
+> > > +++ b/drivers/md/dm-thin.c
+> > > @@ -4288,6 +4347,9 @@ static int thin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+> > >               ti->max_discard_granularity = true;
+> > >       }
+> > >
+> > > +     ti->num_provision_bios = 1;
+> > > +     ti->provision_supported = true;
+> > > +
+> >
+> > We need this in thin_ctr: ti->max_provision_granularity = true;
+> >
+> > More needed in the thin target than thin-pool; otherwise provision bio
+> > issued to thin devices won't be split appropriately.  But I do think
+> > its fine to set in both thin_ctr and pool_ctr.
+> >
+> > Otherwise, looks good.
+> >
+> Thanks! I'll add it to the next iteration (in addition to any other
+> feedback that's added to v6).
 
--- 
-Jens Axboe
+OK. I'll begin basing dm-thinp's WRITE_ZEROES support ontop of this
+series.
+ 
+> Given that this series covers multiple subsystems, would there be a
+> preferred way of queueing this for merge?
 
+I think it'd be OK for Jens to pick this series up and I'll rebase
+my corresponding DM tree once he does.
 
+In addition to Jens; Brian, Darrick and/or others: any chance you
+could review the block core changes in this series to ensure you're
+cool with them?
+
+Would be nice to get Sarthak review feedback so that hopefully his v7
+can be the final revision.
+
+Thanks,
+Mike
