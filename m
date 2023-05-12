@@ -2,300 +2,147 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26770C7EE22
-	for <linux-block@archiver.kernel.org>; Thu, 11 May 2023 20:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7B3C7EE22
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 01:19:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238811AbjEKUDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 May 2023 16:03:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
+        id S233931AbjELBTl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 May 2023 21:19:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239600AbjEKUDi (ORCPT
+        with ESMTP id S230257AbjELBTk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 May 2023 16:03:38 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FEA25FE9
-        for <linux-block@vger.kernel.org>; Thu, 11 May 2023 13:03:36 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-965cc5170bdso1352455566b.2
-        for <linux-block@vger.kernel.org>; Thu, 11 May 2023 13:03:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1683835414; x=1686427414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U8xH7zGQzzRbqK6D4Oqhm3xKHhC25ViGnrUjwC/gsSw=;
-        b=MW5xkfBKg7R27pQpq6VOVNVFJBGddm5iGtOfa0k1cfyLC9VX049iC1rmEI6Fl/GVrk
-         7KKp7M8jRu3u4zh+yk6X15HS11ERm6dMK4kr50yDNyZFYvNqTYalyzCbsc1AAdQimZEp
-         nSfhnGrqTLLb7MBOSSUVZ5FhH2Rqs6nIRmhZ8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683835414; x=1686427414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U8xH7zGQzzRbqK6D4Oqhm3xKHhC25ViGnrUjwC/gsSw=;
-        b=Rv3+qqcQeUKEOFP4mxWJ45H6Yhogb0dJjYrz81266iPELzd97UQ1mbr36NrrO614uy
-         bne1w/v4kDgCJ7TgI5aGdqoLpPDjw+1f1mCbrd8UyxSEjROh61vL244UkbgI+iLLVTx7
-         W3tEdczvCDhYmv/rLNdTw8/f60B3j0CJgltQ1NPVFRObj3a2nS66y4N+7Nbg3zJt4dVK
-         DUBg1kW+DpmElt43ymv6ZHcYMiw1xq3VZR46tPbJ0Wn2VxfBGp8ZXCKRp/XnMw1XnFgY
-         Uzw0q7rCGbRW2hR9TqUDgBkpO2Rh8P6oic6rsypIIbFb/iaZBA3VKdvG5sjTKgG4kd6P
-         A0nA==
-X-Gm-Message-State: AC+VfDzJxZBHyxzAel4vX1Pn+vczze+FY/whI8V3ez6Z4z9UFkvCbVWx
-        Ifuhe1fOWbfjggZlaTYB0xdhVT/jrNdtUsU4kRThyWnckVdlSgtd
-X-Google-Smtp-Source: ACHHUZ79IojXfbkX6DfE2MLOr1tErOiC5hf30sNWjiHWJExQyVXKxDUaQO3ACK/0ZNMxUV3252rL9e3+SLQj4skO4N0=
-X-Received: by 2002:a17:907:9694:b0:969:ba95:a3a0 with SMTP id
- hd20-20020a170907969400b00969ba95a3a0mr12334138ejc.23.1683835414423; Thu, 11
- May 2023 13:03:34 -0700 (PDT)
+        Thu, 11 May 2023 21:19:40 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2057.outbound.protection.outlook.com [40.107.244.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C01D59F1
+        for <linux-block@vger.kernel.org>; Thu, 11 May 2023 18:19:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NKqTezCyER36xO2KMAUie6JyUgogUwPAvWY4SeXlkK9GNFE8Lnkld8fcnzR8D24r40S6Q7j8EnGp0JdcFzh8xmOhLAKbhJRcyYCcIw3/gXGC5q8NI3VCd7fINfqNqVW6rqsCwIT94Y4lk5MRFn3v1nr8xTboBW8XjYeWLCuchDm9HHirsf2URsF8j/Qh2X+MZy7kiNHyx5303ss5cJuIprRj6iSLD4HRVa1UKOJTGQuG76LMKG4/wEKPkJEciBbEDrk1BTxBEA57yhOdiXO4hv4gnwPaPNGrOwgmwbxLvtEu67+jTBHaTO98+JIDKYTws6zIseL7cGMOfyJZJbqPow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DluW6xjprWqr45J77tSDT+PcfNlANsvificjwtuheIo=;
+ b=PidYR91e4lfBaqIWI7HvgqKw8bE15QMpd1ycnpRspgLzL2dd6Eem5eVPE3Wzv/vPteVwX8WlyA70xMLlWA/2c0j4NjkJ8lejb9PoP6ry9e/QvqHbSnTWyiV9zm3HWwpGq9uuV+/nkT6cqn9kLornKFsgLfs/brLt4RKG4nNNz/Xora0TFlIJs7DX041AjN8e4u9KdSN+PRIYIDHglVUKFhkuBhU5NIisSJlkQLmmKBtVblipxybUtqMs/j5D4f9JApBZCFm4cy7t/zNLRXjB16jH5Nko0gcYDFHzuCE169TzYuLYBK8VUhTBcKTrmbLmnNCL9IWsvjiNgKdVvdnPbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DluW6xjprWqr45J77tSDT+PcfNlANsvificjwtuheIo=;
+ b=sxe+ay7FNVZu/AVBWPkUXKWlmnTyZ/sJEReOGKqrYLwYy58MFWJEDVdCCUNLYqZ1Uw8tu/HtiKBM/AO4kS97RupleW25/MPfO4SvzBYUoygfSFHPZKqKrq76rEvQwiuZGWvtTjuc7x3i761TgPnfLZ6Prl+X3nR5ighAB70Ap9ELGMD9zZVR27XFkfay6Ooh3I+t4wtg2iPtKMk5DkDypQvTMmbbrBdzmO0MDnUahZhxzp1OL5SFh+SDf88XUtXeTKMp1c2CbRGX5OwB34P5QWBVVs39gCg/MHI9W7q8JqVAJjP32yozxwS8p7RjdSVvf3Z/OVHrJETzRyuE34Q11g==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by IA0PR12MB8256.namprd12.prod.outlook.com (2603:10b6:208:407::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.22; Fri, 12 May
+ 2023 01:19:35 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::92c6:4b21:586d:dabc]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::92c6:4b21:586d:dabc%4]) with mapi id 15.20.6387.021; Fri, 12 May 2023
+ 01:19:34 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>,
+        "willy@infradead.org" <willy@infradead.org>
+Subject: Re: [PATCH] brd: use XArray instead of radix-tree to index backing
+ pages
+Thread-Topic: [PATCH] brd: use XArray instead of radix-tree to index backing
+ pages
+Thread-Index: AQHZhAM6arOvckiW302hDIuLZU+lkq9V15gA
+Date:   Fri, 12 May 2023 01:19:34 +0000
+Message-ID: <bf2daf76-ebfd-8ca2-0e40-362bcaecfc3f@nvidia.com>
+References: <CGME20230511121547eucas1p17acca480b5e1d0e04c6595b70c1c92a1@eucas1p1.samsung.com>
+ <20230511121544.111648-1-p.raghav@samsung.com>
+In-Reply-To: <20230511121544.111648-1-p.raghav@samsung.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|IA0PR12MB8256:EE_
+x-ms-office365-filtering-correlation-id: 1bb8c577-36c1-4d2d-352c-08db5286f25e
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 6nGB3nd5VoTvrDgGUvIvdwZQSyjmibUIHp41BauRQoJlmX/Dwq45d1WNv4Soslx0ZA96xgefX4bNnXXcAzdmia0dj3x/uVM/Ai0Jev/pA+RK9iHiCUB60WwqJjFap56pasD6HZaytpwbuoQA9XwUWo929AGkqur1v0wgxeqTrg1sLn7ykezAQQ2bszUFf7FzfD1AvHDwrQlwIL/SCs1TlgIKUhWrJjkMNk8O/HPHDcwnuNQJEPUXSVAvLYFOjmZ3KEDL3IIIevTIaH+vhWIGiFbW47MfDTvQ/5lsYf0XkBy5NRb2glvqsipGhoNuwT30IERo6wmrsu8acv7NLZ+TQywHn6e5kqlafP5N3S2Ipfwk5dluodia5O6eZQF/qEWCj0viJnlE/m5TAI4Wa9Y1RYRec2EtZIthxFlObmMqcSa5dJtZJT2z9ba/uqXfoLwHOqJR+XMSrs4862Sc+JTUfMQjiHFTaFQ/KfW583RyCpvnutlbqMNBfK3SxgslFgF1vtTzD6laZH90AHsDpIRqulI7t6JFUIbcmMx3tx9WzWmHluam94oSmRBHwc5FNxTC3AqY6/qyeb6rPD211LgTf5PWae9mGeMk5cyEO5cPVui+gpd2pznPLHSXdL3jnJY+L5hyic4+bNzKvw2u5ga6Iyas/WNzva6leH4xt/lSEDn6SfdSiStNDGNNN54i6sYZ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(136003)(39860400002)(376002)(366004)(396003)(451199021)(4326008)(66476007)(66556008)(66446008)(76116006)(66946007)(91956017)(6486002)(54906003)(110136005)(478600001)(8936002)(8676002)(316002)(41300700001)(38070700005)(31686004)(31696002)(64756008)(86362001)(36756003)(38100700002)(122000001)(2616005)(6512007)(6506007)(186003)(83380400001)(53546011)(5660300002)(71200400001)(4744005)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?b09GUUkzaEhaanZJeTN1Sldlc1QrUFppY0dIK1J5VWhQcGRhR3h0bytKQnpk?=
+ =?utf-8?B?c2xnWThwQWlWTVVLUWRVKy9BdzdsNS9zbFpxWExKaVJSTDhva29JcUI3SzFo?=
+ =?utf-8?B?WG13M1ZmdnIzNDFqbGdRa0JKUUNBcWplblg5eTJoNXUrS2VhMnBVQ3d3ekVp?=
+ =?utf-8?B?TUpONy9KR0ZZYjFEVkVENEZzTGVBWlhHTjB3YjFQL21sL2F1NHgrUUsyaVQ4?=
+ =?utf-8?B?SW9RemJmbk0rRHVLVTRrdFJvMWpPaTZod3Z1TTFRaU9nZ05oYTJDZVJ5bjhJ?=
+ =?utf-8?B?WTZQTEJQei9hNVZtaFVsTWdBWFVuQTVHNGE1dWpNOE4vRlZGQ0xmZ1hzQmxw?=
+ =?utf-8?B?aUw0a1U3ZllWRFZ2cjlNQWU5KzI3QkFWOTd3MmJwUS9HdVNxcENPVm9hT2pS?=
+ =?utf-8?B?R1JySCtsbEcyaGZwMlJ0MGpwVXdPdE1PWlVqT1VubnpGTmovWnMrd1pmbE9R?=
+ =?utf-8?B?MXV2UzBXV0lleEJoclQzbzNScHFDVEdvVzFkcklhSnhnU01uNkVxUkJBVEZx?=
+ =?utf-8?B?bXd5M2JtNFZvZ255cEUvK2xhWkhOdzlUZVdBZlgrdHd2L3B6cTZicmtycGto?=
+ =?utf-8?B?UjJCRThQNXRzNjJFalR3QUhTcjVNMnVSYW9tMXhCSkw1RERua1g5RGQvSUJW?=
+ =?utf-8?B?ZmthZTlKd2N1cWp5eE16SmV5N0ZDVmJCbTRva0xiRjdHRmN1TnAxWkJ3MVYw?=
+ =?utf-8?B?TGppV2lGMWlNTHgrYVdqRCs1dnZJUWJIdTB5RHV1b09NTW9nQWpYNTFnRnNi?=
+ =?utf-8?B?bkdXMmJYSitnNElxN0NJTklaNFZpV1dFdkRsT0N6a21OSHA3UnBVVjZ5R1lj?=
+ =?utf-8?B?KzFPK1NBc0duUXdiN3Jvd1pzaHF6d3JBTlhQOHpUdlNJdGdNbk8zbkdHc3kr?=
+ =?utf-8?B?bkJKU0YzeDBnK29IS2ZwOVJYSUFMSzV4eWh4c3JRbGs2VHlvSWRPMTdqM3cz?=
+ =?utf-8?B?RUNmVUxISGVnSGNsUWlHcFBiTzh3VVdHVFJhNXdweWIrbjRPNm1YMXE1Nm50?=
+ =?utf-8?B?bE42dlBudWFORXpDMUVOWk55SEs5akd2aGVTZ2VzcFQ0NzVLOEI0cmNwdkxx?=
+ =?utf-8?B?M3ljdm9rbmRkbldDWjIrZEZjbkQ4SS9rQzU0ZEIrYXIvNnh3MnpkU2dBNWJv?=
+ =?utf-8?B?MklyVlc4RkU1T1NSSC8yR0cwVVF5Und5UXI2SDNtbEd5Wk5nVzZHbCtDS2lY?=
+ =?utf-8?B?cnN6QmhNcWxQdGtSSUdUbVovUUk0eWljWXZxWnFEYVJoQjNLSy9iTzJPVFlQ?=
+ =?utf-8?B?a1FVSFNqbGFaNHM1RVpnWWYxVCtnN3Q0anpoSStrZEZRNXRFQjYzNXI1U1hM?=
+ =?utf-8?B?c3NmYTVwR1BRQmdVZjBSRFZvZE5jZzVYSDFBaU94aWd2RVZicUhYZkVuM1Ja?=
+ =?utf-8?B?bkp5Y3ZFMFEwYjFxakpkaDdBRFpMdWE3V0VUSCtXaEFMa05iWUk0YlJhZzQ2?=
+ =?utf-8?B?KzljV0RPd0dYb2lYb0pnTnhEUVRjT04wOXBjcTA5VkM4S0J5bUo5UG1EYXBB?=
+ =?utf-8?B?SUxxQXducWloSWxjNkY2KzFIT1VsRlZKVVNqanovYkhhbnZuczNQM0UveTF1?=
+ =?utf-8?B?QUhPY2NlQ09naEp3aTZwME9oK1F4TEEyUHVFTUpsMWRlOFJSWVJPamFyZDE5?=
+ =?utf-8?B?N00yL2JkRGNpS3hJT01XSEpLVE4rU0pzRWpMdDFqdFJWS0R2aWxleHlGMnJp?=
+ =?utf-8?B?b243V1hleU4rRXZjMUpuUzZYcnE5NDZtNG1XUy9icmQ2dlZpMkVIUVlRTUFV?=
+ =?utf-8?B?VXlOQ1hLU1A3N1AzeHUwWDFWMnJtaThuOVdYbUxadE03Q0RyS1pQdnJMSllC?=
+ =?utf-8?B?VUhrYjMwWks0dFZSNXhmeGs3SXd2UmdubzdlWEpieFBVeFNHSkpMMnZkNnVI?=
+ =?utf-8?B?cnRsR25QSkFSdzhpSXI0UGVJZlBCb1FYTDYrMzRZNXF1V2hqWXZPSWQrU1NM?=
+ =?utf-8?B?L2o0LzNTekR0MVFOTU1xNG82QUdaK3VRWFI5ZDNMdWExUkZyVzR4Z2g4dTVx?=
+ =?utf-8?B?SGZmcnNGNEsxSGkzRVNNWmhWclh0WlRMTEVMUXRwajRrUEtmZUZkRW91a2Nn?=
+ =?utf-8?B?Q2pxVDRzVk0rNSt6YmJWUDdSMFVlSmxHclZmMEdPekRiamc0YTJrZ3ZMc0Ni?=
+ =?utf-8?B?b2llWk00cXQ0Z1ViVytJS1lDM0RSd29ITmI3dmFrclNIajh4M01mTHdFaUJN?=
+ =?utf-8?Q?EWQdHNiEe6PTxpIMnYk6GWGoPkTxZ2d9gnCYv4DP+TcK?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <09D1901836C2B640AAE97518153B4B61@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230420004850.297045-1-sarthakkukreti@chromium.org>
- <20230506062909.74601-1-sarthakkukreti@chromium.org> <20230506062909.74601-5-sarthakkukreti@chromium.org>
- <ZFp7ykxGFUbPG1ON@redhat.com>
-In-Reply-To: <ZFp7ykxGFUbPG1ON@redhat.com>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Thu, 11 May 2023 13:03:23 -0700
-Message-ID: <CAG9=OMOMrFcy6UdL8-3wZGwOr1nqLm1bpvL+G1g2dvBhJWU2Kw@mail.gmail.com>
-Subject: Re: [PATCH v6 4/5] dm-thin: Add REQ_OP_PROVISION support
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Brian Foster <bfoster@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1bb8c577-36c1-4d2d-352c-08db5286f25e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 May 2023 01:19:34.8065
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RUf2/F1p7Y9u7/q7tZV2yre6aENR70X/obce/5hHJLQdVcgzI73r5F7+/YIvS5W/iL5pmy3AWRd0s03R+Ye49w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8256
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 9, 2023 at 9:58=E2=80=AFAM Mike Snitzer <snitzer@kernel.org> wr=
-ote:
->
-> On Sat, May 06 2023 at  2:29P -0400,
-> Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
->
-> > dm-thinpool uses the provision request to provision
-> > blocks for a dm-thin device. dm-thinpool currently does not
-> > pass through REQ_OP_PROVISION to underlying devices.
-> >
-> > For shared blocks, provision requests will break sharing and copy the
-> > contents of the entire block. Additionally, if 'skip_block_zeroing'
-> > is not set, dm-thin will opt to zero out the entire range as a part
-> > of provisioning.
-> >
-> > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > ---
-> >  drivers/md/dm-thin.c | 70 +++++++++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 66 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-> > index 2b13c949bd72..3f94f53ac956 100644
-> > --- a/drivers/md/dm-thin.c
-> > +++ b/drivers/md/dm-thin.c
-> > @@ -274,6 +274,7 @@ struct pool {
-> >
-> >       process_bio_fn process_bio;
-> >       process_bio_fn process_discard;
-> > +     process_bio_fn process_provision;
-> >
-> >       process_cell_fn process_cell;
-> >       process_cell_fn process_discard_cell;
-> > @@ -913,7 +914,8 @@ static void __inc_remap_and_issue_cell(void *contex=
-t,
-> >       struct bio *bio;
-> >
-> >       while ((bio =3D bio_list_pop(&cell->bios))) {
-> > -             if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP=
-_DISCARD)
-> > +             if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP=
-_DISCARD ||
-> > +                 bio_op(bio) =3D=3D REQ_OP_PROVISION)
-> >                       bio_list_add(&info->defer_bios, bio);
-> >               else {
-> >                       inc_all_io_entry(info->tc->pool, bio);
-> > @@ -1245,8 +1247,8 @@ static int io_overlaps_block(struct pool *pool, s=
-truct bio *bio)
-> >
-> >  static int io_overwrites_block(struct pool *pool, struct bio *bio)
-> >  {
-> > -     return (bio_data_dir(bio) =3D=3D WRITE) &&
-> > -             io_overlaps_block(pool, bio);
-> > +     return (bio_data_dir(bio) =3D=3D WRITE) && io_overlaps_block(pool=
-, bio) &&
-> > +            bio_op(bio) !=3D REQ_OP_PROVISION;
-> >  }
-> >
-> >  static void save_and_set_endio(struct bio *bio, bio_end_io_t **save,
-> > @@ -1953,6 +1955,51 @@ static void provision_block(struct thin_c *tc, s=
-truct bio *bio, dm_block_t block
-> >       }
-> >  }
-> >
-> > +static void process_provision_bio(struct thin_c *tc, struct bio *bio)
-> > +{
-> > +     int r;
-> > +     struct pool *pool =3D tc->pool;
-> > +     dm_block_t block =3D get_bio_block(tc, bio);
-> > +     struct dm_bio_prison_cell *cell;
-> > +     struct dm_cell_key key;
-> > +     struct dm_thin_lookup_result lookup_result;
-> > +
-> > +     /*
-> > +      * If cell is already occupied, then the block is already
-> > +      * being provisioned so we have nothing further to do here.
-> > +      */
-> > +     build_virtual_key(tc->td, block, &key);
-> > +     if (bio_detain(pool, &key, bio, &cell))
-> > +             return;
-> > +
-> > +     if (tc->requeue_mode) {
-> > +             cell_requeue(pool, cell);
-> > +             return;
-> > +     }
-> > +
-> > +     r =3D dm_thin_find_block(tc->td, block, 1, &lookup_result);
-> > +     switch (r) {
-> > +     case 0:
-> > +             if (lookup_result.shared) {
-> > +                     process_shared_bio(tc, bio, block, &lookup_result=
-, cell);
-> > +             } else {
-> > +                     bio_endio(bio);
-> > +                     cell_defer_no_holder(tc, cell);
-> > +             }
-> > +             break;
-> > +     case -ENODATA:
-> > +             provision_block(tc, bio, block, cell);
-> > +             break;
-> > +
-> > +     default:
-> > +             DMERR_LIMIT("%s: dm_thin_find_block() failed: error =3D %=
-d",
-> > +                         __func__, r);
-> > +             cell_defer_no_holder(tc, cell);
-> > +             bio_io_error(bio);
-> > +             break;
-> > +     }
-> > +}
-> > +
-> >  static void process_cell(struct thin_c *tc, struct dm_bio_prison_cell =
-*cell)
-> >  {
-> >       int r;
-> > @@ -2228,6 +2275,8 @@ static void process_thin_deferred_bios(struct thi=
-n_c *tc)
-> >
-> >               if (bio_op(bio) =3D=3D REQ_OP_DISCARD)
-> >                       pool->process_discard(tc, bio);
-> > +             else if (bio_op(bio) =3D=3D REQ_OP_PROVISION)
-> > +                     pool->process_provision(tc, bio);
-> >               else
-> >                       pool->process_bio(tc, bio);
-> >
-> > @@ -2579,6 +2628,7 @@ static void set_pool_mode(struct pool *pool, enum=
- pool_mode new_mode)
-> >               dm_pool_metadata_read_only(pool->pmd);
-> >               pool->process_bio =3D process_bio_fail;
-> >               pool->process_discard =3D process_bio_fail;
-> > +             pool->process_provision =3D process_bio_fail;
-> >               pool->process_cell =3D process_cell_fail;
-> >               pool->process_discard_cell =3D process_cell_fail;
-> >               pool->process_prepared_mapping =3D process_prepared_mappi=
-ng_fail;
-> > @@ -2592,6 +2642,7 @@ static void set_pool_mode(struct pool *pool, enum=
- pool_mode new_mode)
-> >               dm_pool_metadata_read_only(pool->pmd);
-> >               pool->process_bio =3D process_bio_read_only;
-> >               pool->process_discard =3D process_bio_success;
-> > +             pool->process_provision =3D process_bio_fail;
-> >               pool->process_cell =3D process_cell_read_only;
-> >               pool->process_discard_cell =3D process_cell_success;
-> >               pool->process_prepared_mapping =3D process_prepared_mappi=
-ng_fail;
-> > @@ -2612,6 +2663,7 @@ static void set_pool_mode(struct pool *pool, enum=
- pool_mode new_mode)
-> >               pool->out_of_data_space =3D true;
-> >               pool->process_bio =3D process_bio_read_only;
-> >               pool->process_discard =3D process_discard_bio;
-> > +             pool->process_provision =3D process_bio_fail;
-> >               pool->process_cell =3D process_cell_read_only;
-> >               pool->process_prepared_mapping =3D process_prepared_mappi=
-ng;
-> >               set_discard_callbacks(pool);
-> > @@ -2628,6 +2680,7 @@ static void set_pool_mode(struct pool *pool, enum=
- pool_mode new_mode)
-> >               dm_pool_metadata_read_write(pool->pmd);
-> >               pool->process_bio =3D process_bio;
-> >               pool->process_discard =3D process_discard_bio;
-> > +             pool->process_provision =3D process_provision_bio;
-> >               pool->process_cell =3D process_cell;
-> >               pool->process_prepared_mapping =3D process_prepared_mappi=
-ng;
-> >               set_discard_callbacks(pool);
-> > @@ -2749,7 +2802,8 @@ static int thin_bio_map(struct dm_target *ti, str=
-uct bio *bio)
-> >               return DM_MAPIO_SUBMITTED;
-> >       }
-> >
-> > -     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DISCARD=
-) {
-> > +     if (op_is_flush(bio->bi_opf) || bio_op(bio) =3D=3D REQ_OP_DISCARD=
- ||
-> > +         bio_op(bio) =3D=3D REQ_OP_PROVISION) {
-> >               thin_defer_bio_with_throttle(tc, bio);
-> >               return DM_MAPIO_SUBMITTED;
-> >       }
-> > @@ -3396,6 +3450,9 @@ static int pool_ctr(struct dm_target *ti, unsigne=
-d int argc, char **argv)
-> >       pt->adjusted_pf =3D pt->requested_pf =3D pf;
-> >       ti->num_flush_bios =3D 1;
-> >       ti->limit_swap_bios =3D true;
-> > +     ti->num_provision_bios =3D 1;
-> > +     ti->provision_supported =3D true;
-> > +     ti->max_provision_granularity =3D true;
-> >
-> >       /*
-> >        * Only need to enable discards if the pool should pass
-> > @@ -4114,6 +4171,8 @@ static void pool_io_hints(struct dm_target *ti, s=
-truct queue_limits *limits)
-> >        * The pool uses the same discard limits as the underlying data
-> >        * device.  DM core has already set this up.
-> >        */
-> > +
-> > +     limits->max_provision_sectors =3D pool->sectors_per_block;
-> >  }
-> >
-> >  static struct target_type pool_target =3D {
-> > @@ -4288,6 +4347,9 @@ static int thin_ctr(struct dm_target *ti, unsigne=
-d int argc, char **argv)
-> >               ti->max_discard_granularity =3D true;
-> >       }
-> >
-> > +     ti->num_provision_bios =3D 1;
-> > +     ti->provision_supported =3D true;
-> > +
->
-> We need this in thin_ctr: ti->max_provision_granularity =3D true;
->
-> More needed in the thin target than thin-pool; otherwise provision bio
-> issued to thin devices won't be split appropriately.  But I do think
-> its fine to set in both thin_ctr and pool_ctr.
->
-> Otherwise, looks good.
->
-Thanks! I'll add it to the next iteration (in addition to any other
-feedback that's added to v6).
-
-Given that this series covers multiple subsystems, would there be a
-preferred way of queueing this for merge?
-
-Best
-Sarthak
-
-> Thanks,
-> Mike
+T24gNS8xMS8yMyAwNToxNSwgUGFua2FqIFJhZ2hhdiB3cm90ZToNCj4gWEFycmF5IHdhcyBpbnRy
+b2R1Y2VkIHRvIGhvbGQgbGFyZ2UgYXJyYXkgb2YgcG9pbnRlcnMgd2l0aCBhIHNpbXBsZSBBUEku
+DQo+IFhBcnJheSBBUEkgYWxzbyBwcm92aWRlcyBhcnJheSBzZW1hbnRpY3Mgd2hpY2ggc2ltcGxp
+ZmllcyB0aGUgd2F5IHdlIHN0b3JlDQo+IGFuZCBhY2Nlc3MgdGhlIGJhY2tpbmcgcGFnZXMsIGFu
+ZCB0aGUgY29kZSBiZWNvbWVzIHNpZ25pZmljYW50bHkgZWFzaWVyDQo+IHRvIHVuZGVyc3RhbmQu
+DQo+DQo+IE5vIHBlcmZvcm1hbmNlIGRpZmZlcmVuY2Ugd2FzIG5vdGljZWQgYmV0d2VlbiB0aGUg
+dHdvIGltcGxlbWVudGF0aW9uDQo+IHVzaW5nIGZpbyB3aXRoIGRpcmVjdD0xIFsxXS4NCj4NCj4g
+WzFdIFBlcmZvcm1hbmNlIGluIEtJT1BTOg0KPg0KPiAgICAgICAgICAgIHwgIHJhZGl4LXRyZWUg
+fCAgICBYQXJyYXkgIHwgICBEaWZmDQo+ICAgICAgICAgICAgfCAgICAgICAgICAgICB8ICAgICAg
+ICAgICAgfA0KPiB3cml0ZSAgICAgfCAgICAzMTUgICAgICB8ICAgICAzMTMgICAgfCAgIC0wLjYl
+DQo+IHJhbmR3cml0ZSB8ICAgIDI4NiAgICAgIHwgICAgIDI5MCAgICB8ICAgKzEuMyUNCj4gcmVh
+ZCAgICAgIHwgICAgMzMwICAgICAgfCAgICAgMzM1ICAgIHwgICArMS41JQ0KPiByYW5kcmVhZCAg
+fCAgICAzMDkgICAgICB8ICAgICAzMTIgICAgfCAgICswLjklDQo+DQoNCkkndmUgZmV3IGNvbmNl
+cm5zLCBjYW4geW91IHBsZWFzZSBzaGFyZSB0aGUgZmlvIGpvYnMgdGhhdA0KaGF2ZSB1c2VkIHRv
+IGdhdGhlciB0aGlzIGRhdGEgPyBJIHdhbnQgdG8gdGVzdCBpdCBvbiBteQ0Kc2V0dXAgaW4gb3Jk
+ZXIgdG8gcHJvdmlkZSB0ZXN0ZWQtYnkgdGFnLg0KDQphbHNvLCBwbGVhc2Ugd2FpdCB1bnRpbCBJ
+IGZpbmlzaCBteSB0ZXN0aW5nIHRvIGFwcGx5IHRoaXMNCnBhdGNoIC4uDQoNCi1jaw0KDQoNCg==
