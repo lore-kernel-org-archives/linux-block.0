@@ -2,22 +2,22 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5F3C77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 13:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA59C77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 12 May 2023 13:54:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241217AbjELNw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 09:52:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59960 "EHLO
+        id S240719AbjELNyR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 May 2023 09:54:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241310AbjELNw2 (ORCPT
+        with ESMTP id S240690AbjELNyP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 09:52:28 -0400
+        Fri, 12 May 2023 09:54:15 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D25E835A9;
-        Fri, 12 May 2023 06:52:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA3FE4A;
+        Fri, 12 May 2023 06:54:15 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 307E268AFE; Fri, 12 May 2023 15:52:25 +0200 (CEST)
-Date:   Fri, 12 May 2023 15:52:24 +0200
+        id D450668AA6; Fri, 12 May 2023 15:54:10 +0200 (CEST)
+Date:   Fri, 12 May 2023 15:54:10 +0200
 From:   "hch@lst.de" <hch@lst.de>
 To:     Jinyoung CHOI <j-young.choi@samsung.com>
 Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
@@ -30,27 +30,27 @@ Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "willy@infradead.org" <willy@infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 08/14] scsi: add scsi_alloc_integrity_sgtables() for
- integrity process
-Message-ID: <20230512135224.GE32242@lst.de>
-References: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1> <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p3> <20230510085607epcms2p3d2b2dfc5db42f77c41f570c361a41c6a@epcms2p3>
+Subject: Re: [PATCH v2 12/14] block: add helper function for iteration of
+ bip's bvec
+Message-ID: <20230512135410.GF32242@lst.de>
+References: <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1> <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p8> <20230510085941epcms2p8ad574939bc3edbd65b8f208c80a85911@epcms2p8>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230510085607epcms2p3d2b2dfc5db42f77c41f570c361a41c6a@epcms2p3>
+In-Reply-To: <20230510085941epcms2p8ad574939bc3edbd65b8f208c80a85911@epcms2p8>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 10, 2023 at 05:56:07PM +0900, Jinyoung CHOI wrote:
-> +	if (WARN_ON_ONCE(!prot_sdb)) {
-> +		/*
-> +		 * This can happen if someone (e.g. multipath)
-> +		 * queues a command to a device on an adapter
-> +		 * that does not support DIX.
-> +		 */
-> +		return BLK_STS_IOERR;
+On Wed, May 10, 2023 at 05:59:41PM +0900, Jinyoung CHOI wrote:
+> bip_for_each_vec() performs the iteration in a page unit.
+> 
+> Since a bio_vec of bip is composed of multi-page in the block, a macro
+> that can be carried out in multi-page units has been added.
 
-Nit: expand the comment to take up all 80 characters now that you've
-unindented it.
+The naming here is a bit confused.  The rest of the block layers uses
+_segment for the per-page iterators and _vec for the one that doesn't
+break up.  I'd suggest we follow this naming scheme here.  And also
+skip the extra for_each_mp_bvec level, just like we don't have that
+intermediate level for bio_for_each_vec
