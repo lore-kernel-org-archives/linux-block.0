@@ -2,102 +2,137 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D7D2C77B7C
-	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 03:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC84CC77B7D
+	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 10:27:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241726AbjEMDJk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 May 2023 23:09:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57676 "EHLO
+        id S237339AbjEMK1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 May 2023 06:27:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjEMDJj (ORCPT
+        with ESMTP id S229653AbjEMK1R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 May 2023 23:09:39 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD794C10;
-        Fri, 12 May 2023 20:09:37 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QJ9bJ1p0gz4f3jHT;
-        Sat, 13 May 2023 11:09:32 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBn0LNs_15ksKZXJQ--.9810S3;
-        Sat, 13 May 2023 11:09:33 +0800 (CST)
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        stanley.chu@mediatek.com, peter.wang@mediatek.com,
-        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
-        powen.kao@mediatek.com, naomi.chu@mediatek.com,
-        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <ZF0K7A6G2cYBjSgn@infradead.org>
- <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
- <ZF5G5ztMng8Xbd1W@infradead.org>
- <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
-Date:   Sat, 13 May 2023 11:09:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sat, 13 May 2023 06:27:17 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2065.outbound.protection.outlook.com [40.107.237.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E84A2707;
+        Sat, 13 May 2023 03:27:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TTC6npGeGTg8J8WPRv4dXs2xrPYWsh8rCiqMOBEQWRNy8DtLwCFD5VSxflswhxI8HEqKy1ewuw3LHGfqwPLVYTVWwtnn+Toy02QsTHsY9F3LcSsog/SVv6OZHIqP1TVkcIsM1C0aF8W9+kg7IOCcBJFQIDpORm6BcMUU4efuyGbL8nrHxSCOujb4IFdz+5QHiSMgPA2OBmfOpm8SYAU61YzqtfoJc0Hnj18qhzU2gtNo3yFjAQs+YzKrfBeeBT+90o+9TAUDiarQ0YjjEFj9uzSePSPWGuUbMt3ZmYcSOjaTOkICCk+o+aBXZ72V9fyC3ZnZ11MFGresjocSdc2ROg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eJnrdhMxKqyLuxRcLrXAxzpbSeL3hOmdj2AKDL65fwE=;
+ b=fnpzQ6m6Qdn7GDv4Qoxb76RviKQSvoBHRX6vy3nFi0/wLLjZuNjcg9tChvaaIw4IY35Giyv7lO8I2hccVfCouehgbO0OIx0BGL0OLWTUCtWniA2fjJnWVX76oz2VpAckQKEcNuKO4zeo2eycOtNvzIfv9NeMJRWP83Nu7b5VO8IlnLd+HWuVYYNNxXB1NGtsRy507tEY7hXw6O907I2UqixSId3VTIlHeetWKaWoRTMXcfiufXMAIbLrZYbV3+uw2v2gxjsR39IsWRha4Ot7JME/YmasR595IkF4sazyoshCTJ8uZrzTvGp/2Ad85IzyZua/49kJtwHNaOq9dLVMmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eJnrdhMxKqyLuxRcLrXAxzpbSeL3hOmdj2AKDL65fwE=;
+ b=kPG/4+ghiSZGvsUFn5Lpica4Ytsb3ABL4MA5c+5eC1/dw2W+bDP63qivmbUM+7odJPf57FLRbQ08vqexG+V0w6V6cuQaWu0nBwZI0wRi8oYi7otW3VgIwh/WUVU5tYeqtoSW0oAi+9rLUHMTpBvOVFWEpYPRpl0Ky7DjwwiBaJAkHD1pHL+FVfPxmTxKqmiW8ARa/bS1MBugdYNxFN14zG/pX6h2vdU8w9dMkC1Y4PTMVl18QZuFqvrqFzdDOwdUwEV983eY8lf3OU7TsY+usprLREjuHWRFAQUh6hBSOppmW8cCM7Ktjbil7a8y1U3nLh3ZGY5CbpnJIskztWI2ug==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by SJ0PR12MB5502.namprd12.prod.outlook.com (2603:10b6:a03:300::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.24; Sat, 13 May
+ 2023 10:27:12 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::92c6:4b21:586d:dabc]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::92c6:4b21:586d:dabc%4]) with mapi id 15.20.6387.021; Sat, 13 May 2023
+ 10:27:12 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Daniel Wagner <dwagner@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH blktests v4 10/11] nvme{002,030}: Move discovery
+ generation counter code to rc
+Thread-Topic: [PATCH blktests v4 10/11] nvme{002,030}: Move discovery
+ generation counter code to rc
+Thread-Index: AQHZhBJVmrYCeJQRJUGAPqu3bNa3C69YAsiA
+Date:   Sat, 13 May 2023 10:27:11 +0000
+Message-ID: <5c8dbd74-4bd0-a864-98eb-8866bb11fbcb@nvidia.com>
+References: <20230511140953.17609-1-dwagner@suse.de>
+ <20230511140953.17609-11-dwagner@suse.de>
+In-Reply-To: <20230511140953.17609-11-dwagner@suse.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|SJ0PR12MB5502:EE_
+x-ms-office365-filtering-correlation-id: 30979252-8efc-4ab3-d852-08db539c9d24
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /BXP8F5SxzIFB4MbVIvlAJL/4xNpbJ3ylLihVYV410yh2N9/61AXqDH44OHYUZsqMlRxl7Y+b2ANcEAjuc4LahLyY89kqyJp1K+NJXS+ihmGmt34h3JjOqx6OXt7d9CzzGbmikVtWPhISETgOrivH/8T5frAOqWJQw51jzQdVtliawItWsR4TAH7ueILOa3VJMOyaAQ5PWsZ1AMTk8/I1W6Yve1fh8FhXhXPt0yghrs6UG+NBnmTvM42EVhCsbicU0u+cb9EInSCHtWlJICoz1kg+90D00agBnlzu9MTReLn5VUDC3Ls4DOjzosaAkO5+eKZPuaiRI6iwtbe19ouDd3L3A03xNYvjbMqy228YcgvHzD5uQ3eKgCWbYgaxBaJsD7F088IXNowARxPirpW0wDN3+7rKP4vCPFywBW56Tga4emMzrB6mnr7pH1xh0NcSoZwVQvcSet9xsCKYIMOhXNjo30oOHKpil6roDZ90DYBcXnR16YASA6gH3oXcc8/dDPY2A6F/i7w1u92wFv+w/PwPGDiFG1Hf4FK1OKub/mcUrosh6zgBCFvAd1k4nO6y9TrGHBryXoa4h3PzJWiqma6EYhKI6GQXqXr4cD5Fy6DsFLnFH4B/ckNI1+k3FvdJlO9rssn8T9dDheRfdDqKXDII8le7ooNfrqy/Uvzrlv3d0+cztE0EMheDuYJy0JU
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(39860400002)(376002)(136003)(396003)(451199021)(2616005)(186003)(2906002)(36756003)(38100700002)(31696002)(558084003)(86362001)(38070700005)(122000001)(316002)(66946007)(76116006)(64756008)(66476007)(66446008)(66556008)(4326008)(91956017)(54906003)(6486002)(71200400001)(41300700001)(5660300002)(8936002)(8676002)(53546011)(6506007)(6512007)(110136005)(478600001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cjFHUzNtZWNrcTQ3b0l4RDl1d0pldjNtdHBya0FoQitBaitwZDNjQ3k5Q3pt?=
+ =?utf-8?B?STdvS0tvcGg2SnB5dGFrNmtSOHBTRHR0VjJBVXN5bUxNRHdoUHJ4eCsxL09v?=
+ =?utf-8?B?Z1V4Lysva2xGUWcrQlVVZm1zOUx2TEQ2VVFvYmM2TXpNQm9JT3l6OEZlWisv?=
+ =?utf-8?B?RFpBc0VMY0xGMy9pamRMemx5OUhua2RhaXRiU2ZaZ1VrS004TzJiSjN5b3NP?=
+ =?utf-8?B?QzBDRTNlSUZuVDRBekRNWWVOQk01em1BMlBqa1g4N29CbThQclU3SldxWXpR?=
+ =?utf-8?B?RERieHEzclg4dU10WXFOU0doRlJlMmNUNXdHRGdKV0FISWozNysvZ2s0aUp3?=
+ =?utf-8?B?TTlxNnFBL25FQTRjMFlaN3QrcGdnUlV3T0ZnaTMzS0Zha280L28xN0s1ZEpR?=
+ =?utf-8?B?YXhqaTA1di90ajFQeWJJM1h2a1BzeUNPK2RpM3B0M1JLck1DVnRJbEd1MmFF?=
+ =?utf-8?B?Y3pOZ1BqSS82OG9tMml0RnJ0bEtiUDk2d1d6U1NJME8zVkZ1V0VWaWdIN3lh?=
+ =?utf-8?B?UjVQYi9NaHNpZzdQM3A1c3ZycCtZbmtQWDMvZy9MWXE0Uk5yTlpKL0NIRnNE?=
+ =?utf-8?B?bThNQTk4cldlZzhxRXB2aFJZa1NJY3RkVFQ5LzczWUJ5QUxIV1JGVnduR0Jq?=
+ =?utf-8?B?NzFZblRkTG1MZjlqZC8ybXltTmtjQjlNMDlqeWZlaGk4RWI3WnF0T3BoNUxQ?=
+ =?utf-8?B?V2pxRWJPY3NMZTc0REJiTjFuYmd3V1BLUWlDYm1sRWtrcUJENmRrL1lRakQx?=
+ =?utf-8?B?L2hmUnB6NGF3RmVjSlkyZmxaNmF3TVA2L3VqZUswc0FqcDRzUXFiQUFXR2FE?=
+ =?utf-8?B?eU4wQW1FZ3Z6ZGY3OUI3a0I3Slc2WGY4algwd2xac3draEdYV2VpUUQvei9N?=
+ =?utf-8?B?MXVHY1d6d1BCalZ2Y2dDUndta0FTM2ZnU1lsSHpmWVFvbXpSMUJnNGJxNTdU?=
+ =?utf-8?B?bmFiT0hQVUx2eE5GRnUxeTJ2dEtadzcrT0IzdGFlN1k2bXdJQ3ZhTkpJSExS?=
+ =?utf-8?B?TEpSeG9WRjBuVWVsUFdjRUVlemtqU2tSZGpGV0JFZE14b3F2Q2loNGt2eE12?=
+ =?utf-8?B?QWhlUk8xT3R3Sm1xaVc0TXZwWXM3WGRlRHhqNVBRellRdDc5TVM0b3pNVlNa?=
+ =?utf-8?B?U3lrRUxYejNrMlI0UDY0OWxqOWlxVW5nZlBEOUIzL2JKd0dDdmlVYVJld0c2?=
+ =?utf-8?B?ajBaejZ4ZUt1bE1uczVqMVhxemt3UERHbUJMbkM4NldndTBhR0F3TVdJem1P?=
+ =?utf-8?B?WmN4cHJvZDZ6TnRJTERqKzJBUjM1cW44MVVDR3BoYmNVR2dSRkxsS28wZTY2?=
+ =?utf-8?B?eUwrUHdxZFBnd2x5SkYzNk9ybUtuOEVyUU9qNVJtMVRwd0Nrc01JTlRjK2cv?=
+ =?utf-8?B?UTFxT3FXMlNubHhDc1gyS2x3OVNQMlp3QzM2dGNlQ0lwRDhpdnltZW1aRlBS?=
+ =?utf-8?B?WERzZnRqTTM5TDVES3NtMGxiL0NsYmVBcEhLZUIwOENHRVlad1pvM3NBVFJm?=
+ =?utf-8?B?cjFlSVVUcXc4QVRBUWEzNVlwZVQvQnExTnlWTUV6WGk1N2RiYTZMQW0zK2Vp?=
+ =?utf-8?B?bmlGVUk5VHBUVTVyM3Z4b09nSGFzY1NuWUIwdUd1TCtRV3RJWXhWbU1ycGp0?=
+ =?utf-8?B?Rm5ZbHNGRlZOZ0dnMmlKN1k5azJjdWxJSUZtZDhCd2ZjcTV5cnU0cGRRL21T?=
+ =?utf-8?B?V3puTUx2Sk5LVjdZVHdFL1hqRlJWa2JGMUV0dUQyQ09UUG5zTGNEeUUyQWJW?=
+ =?utf-8?B?djE1a3FMUFJFRVRPNnVnbXArSHhrdGFpRU1KSjc4bE9VbC90Y21qczAxdytR?=
+ =?utf-8?B?NjRsanZib3VtRnU1UWV3SkFmbmhnSVdZOENuM2V5RThZMVdyUnBraXpiYy8v?=
+ =?utf-8?B?em1pb0ZPRHZRV285SnFsZ0hxRTg5anh4dHBtRVpoZ0RlWkVtZnhwT3dwN2VI?=
+ =?utf-8?B?dFlpVEI5OE9VSVFuU05Vdm5VQzl3b3JxVUhWSXNoRFJiaHoxZlhTeE1GcmZM?=
+ =?utf-8?B?VGhRQUo4b21INEtrMEd6MjZ4MlJDY0YzQ1VsQVg5VGc1UEtCaDFZYVJQSXYv?=
+ =?utf-8?B?a2xmejA1S3NvTldMRC9PREFsMWpvMTQ5RlN3RnY3ZC9Ra1JZVWg5R2NrNXM1?=
+ =?utf-8?B?NWJ0enJtZkg2Y1RhdjBhNVNIb3RiSUs5WUpWcUdKRTBUWHBWNGE2cElycnZ5?=
+ =?utf-8?Q?fJpBKxEsw5dCU25sr47HDvAF3vrO//4Aw9neI7rxFNRN?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7CABD7FC21C46D4E8CBAC3FD1A6A7BD3@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBn0LNs_15ksKZXJQ--.9810S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zw13uFW8KF1kWry5uFykKrg_yoW8GF4kpF
-        ZYyF15Gws8Ja4Y9a92kw4SgF1fJr95Aay7JF13Z34Ik39xArWkZr17JrW5Za45CFs5Jw10
-        g397XrykAFyrZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a
-        6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv
-        67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
-        uYvjxUFDGOUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30979252-8efc-4ab3-d852-08db539c9d24
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 May 2023 10:27:11.9299
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KaQxo8Ue+HYVTdClQYyKksSQ7z74l4pkScP0KNa6vnuF4tW0bcC+HRtuptMLUlZAHhmJlFoQ5VepPv1oAuX/Fg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5502
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-在 2023/05/13 2:12, Bart Van Assche 写道:
-> The fair tag sharing algorithm has a negative impact on all SCSI devices 
-> with multiple logical units. This is because logical units are 
-> considered active until (request timeout) seconds have elapsed after the 
-> logical unit stopped being used (see also the blk_mq_tag_idle() call in 
-> blk_mq_timeout_work()). UFS users are hit by this because UFS 3.0 
-> devices have a limited queue depth (32) and because power management 
-> commands are submitted to a logical unit (WLUN). Hence, it happens often 
-> that the block layer "active queue" counter is equal to 2 while only one 
-> logical unit is being used actively (a logical unit backed by NAND 
-> flash). The performance difference between queue depths 16 and 32 for 
-> UFS devices is significant.
-
-We meet similiar problem before, but I think remove tag fair sharing
-might cause some problems, because get tag is not fair currently, for
-example 2 devices share 32 tag, while device a issue large amount of
-io concurrently, and device b only issue one io, in this case, if fair
-tag sharing is removed, device b can get bad io latency.
-
-By the way, I tried to propose a way to workaround this by following:
-
-1) disable fair tag sharing untill get tag found no tag is avaiable;
-2) enable fair tag sharing again if the disk donesn't faild to get tag
-for a period of time;
-
-Can this approch be considered?
-
-Thanks,
-Kuai
-
+T24gNS8xMS8yMyAwNzowOSwgRGFuaWVsIFdhZ25lciB3cm90ZToNCj4gTW92ZSB0aGUgZGlzY292
+ZXJ5IGdlbmVyYXRpb24gY291bnRlciBjb2RlIHRvIHJjIHNvIHRoYXQgd2UgY2FuIHJldXNlDQo+
+IGl0IGluIDAwMi4NCj4NCj4gUmV2aWV3ZWQtYnk6IEhhbm5lcyBSZWluZWNrZSA8aGFyZUBzdXNl
+LmRlPg0KPiBTaWduZWQtb2ZmLWJ5OiBEYW5pZWwgV2FnbmVyIDxkd2FnbmVyQHN1c2UuZGU+DQo+
+IC0tLQ0KPg0KDQpMb29rcyBnb29kLg0KDQpSZXZpZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5p
+IDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNrDQoNCg0K
