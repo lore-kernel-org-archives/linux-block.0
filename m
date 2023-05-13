@@ -2,103 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C35D0C77B7C
-	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 11:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CEFC77B7F
+	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 13:39:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235208AbjEMLQ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 13 May 2023 07:16:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49434 "EHLO
+        id S233685AbjEMNjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 May 2023 09:39:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231736AbjEMLQ5 (ORCPT
+        with ESMTP id S230149AbjEMNjE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 May 2023 07:16:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D065930C3
-        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 04:16:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1683976570;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=w4oHIAntagjYY/VHqqmX6YeWOrSv4b+f5QuOMVnBBrU=;
-        b=Ez0AzqK6SkYJHnqOYHXxMMX0TXcHD7LKjqsdKvt44HI5PiI+r8msK8fDpInxTzmFXMPAAE
-        dK2d31sF367JAh+7FD/bFIgBJw1Cjp2k0yQ8JVbyfxntcgHen6b3HA0SeK4y+dgdAK+BLw
-        jLPJV/kptxa5GlwVYLNGtI23lnBMJb4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-111-MXFPCJS4NLq1XQXc7MvWIA-1; Sat, 13 May 2023 07:16:07 -0400
-X-MC-Unique: MXFPCJS4NLq1XQXc7MvWIA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 195FA85A588;
-        Sat, 13 May 2023 11:16:07 +0000 (UTC)
-Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C377940C2076;
-        Sat, 13 May 2023 11:16:02 +0000 (UTC)
-Date:   Sat, 13 May 2023 19:15:57 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Guangwu Zhang <guazhang@redhat.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>, ming.lei@redhat.com
-Subject: Re: [PATCH] blk-mq: don't queue passthrough request into scheduler
-Message-ID: <ZF9xbZ3pwqEEcCRE@ovpn-8-17.pek2.redhat.com>
-References: <20230512150328.192908-1-ming.lei@redhat.com>
- <70478f95-2852-9bf1-f8f7-630c74641c0f@kernel.dk>
- <ZF6ff2l7SKiCrTt0@infradead.org>
+        Sat, 13 May 2023 09:39:04 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1310E1736
+        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 06:39:03 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-645cfeead3cso1494633b3a.1
+        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 06:39:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683985142; x=1686577142;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OWxs4Dd3MgDKSErZGVe9jdi74y0iCFpfmQB+mTw5exU=;
+        b=KblBr8b8khEkcYY5gL9K/oEZrULHyAffyQsyRpkhEEUbq1G8pHX+iYxifcZMa6NSxm
+         5OLerVdTivjhTiSV88yYU52GtjCF7JkovHQ3RHd302vXPjGqCYZym6sf9nApyhjDXOvl
+         OqEq6Vs/5YtlQ2e6v3G9Z1zsmOxSTJo9A+7cV4uNYgckRozXqzI3y+qnMMm749gUWkts
+         h4uuLyvsrF3f4xXepks/q2itqDhLffpRqMbPYBrkZlq2E7jNDvgAvwtxavnbtzHWcd5P
+         XmYQmryWzT2n5a60jPO6hEe3Tgag1I2DHIBzMAoUd10Eu99b6rumQQiS+PDBo0sqoLNc
+         j+YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683985142; x=1686577142;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OWxs4Dd3MgDKSErZGVe9jdi74y0iCFpfmQB+mTw5exU=;
+        b=AkJl2R00WeIznjDP0nLk5HBACiGs63BilYlxOHWBNAgGwceirrTrdZ2nhxiQAavmor
+         LWgEZGEDhUVUvWj11exc4t/fDdam8wmainO/dnTNUkSazFGiAEf8iV6lKYGudDHVvOw2
+         r7gwpYicKHY/bBoRpbDH1YGVkzpGFsuyEMFufpOAy7mN2RzgRijrT0/MYMmeMQwCyi7I
+         VudGGSY4tU6TYbNHo7dd+yRJ9HDOt7VtebOcJCPSbMCV8MDeUzl8iNOblAMF0LYHNd1F
+         aXCZuaFBu5sQ4FHzqz1Nz9EadQPjacaVnfDXLAkyNefiR1IVX0WSoHXfDoyOyto2Pzgg
+         K/Gw==
+X-Gm-Message-State: AC+VfDxOpKme/eYyxV/CpQGg/y5ifMXOU4kU1LDTEr77m2I7cjZwsUkZ
+        JsH+/RV+SnjGEAFz1s8PQin/svU5ZZeAC7PEvsc=
+X-Google-Smtp-Source: ACHHUZ6JBoL+VCqS4hnZeFs4ZKH1H90g0HpbGoc0+TgXXOiJrWJwHITsmVhFG+ZXev74thyTZ4akLg==
+X-Received: by 2002:a05:6a00:13a3:b0:638:abf4:d49c with SMTP id t35-20020a056a0013a300b00638abf4d49cmr38475980pfg.3.1683985142505;
+        Sat, 13 May 2023 06:39:02 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id y24-20020aa78058000000b00640d80c8a2bsm8684467pfm.50.2023.05.13.06.39.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 13 May 2023 06:39:01 -0700 (PDT)
+Message-ID: <c27ed42c-50d1-ac5c-bace-ca98c8d598be@kernel.dk>
+Date:   Sat, 13 May 2023 07:39:00 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZF6ff2l7SKiCrTt0@infradead.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.4-rc2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 12, 2023 at 01:20:15PM -0700, Christoph Hellwig wrote:
-> On Fri, May 12, 2023 at 09:08:54AM -0600, Jens Axboe wrote:
-> > On 5/12/23 9:03?AM, Ming Lei wrote:
-> > > Passthrough(pt) request shouldn't be queued to scheduler, especially some
-> > > schedulers(such as bfq) supposes that req->bio is always available and
-> > > blk-cgroup can be retrieved via bio.
-> > > 
-> > > Sometimes pt request could be part of error handling, so it is better to always
-> > > queue it into hctx->dispatch directly.
-> > > 
-> > > Fix this issue by queuing pt request from plug list to hctx->dispatch
-> > > directly.
-> > 
-> > Why not just add the check to the BFQ insertion? That would be a lot
-> > more trivial and would not be poluting the core with this stuff.
-> 
-> Because we really need to keep the passthrough code separate.  The
-> fact that a passthrough request can leak into common code in various
-> places is really a bit of a problem.  We have most of these nicely
-> separate with two exceptions:
-> 
->  - the plug list
->  - the requeue list
-> 
-> The higher level and the more obvious we special case the passthrough
-> request there, the better for debuggability and maintainability.
+Hi Linus,
 
-Agree, and there could be more things involved:
-
-1) pt request shares same tags, so scheduler tags is used for allocating pt
-request
-
-2) RQF_ELV is set for pt request, and e->type->ops.requeue_request()/
-e->type->ops.completed_request() still might be called for pt request.
-
-Probably long-term one dedicated request queue(BLK_MQ_F_TAG_QUEUE_SHARED/
-BLK_MQ_F_NO_SCHED) could be used for handling passthrough only if the device
-exposes pt interface. Then I guess core code may be cleaned a bit and
-becomes easier to improve both two paths, but plug handling still have
-to cover both.
+Just a few minor fixes for drivers, and a deletion of a file that is
+woefully out-of-date these days. Please pull!
 
 
-thanks,
-Ming
+The following changes since commit ac9a78681b921877518763ba0e89202254349d1b:
+
+  Linux 6.4-rc1 (2023-05-07 13:34:35 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.4-2023-05-13
+
+for you to fetch changes up to 56cdea92ed915f8eb37575331fb4a269991e8026:
+
+  Documentation/block: drop the request.rst file (2023-05-12 11:04:58 -0600)
+
+----------------------------------------------------------------
+block-6.4-2023-05-13
+
+----------------------------------------------------------------
+Guoqing Jiang (1):
+      block/rnbd: replace REQ_OP_FLUSH with REQ_OP_WRITE
+
+Ivan Orlov (1):
+      nbd: Fix debugfs_create_dir error checking
+
+Ming Lei (1):
+      ublk: fix command op code check
+
+Randy Dunlap (1):
+      Documentation/block: drop the request.rst file
+
+ Documentation/block/index.rst   |  1 -
+ Documentation/block/request.rst | 99 -----------------------------------------
+ drivers/block/nbd.c             |  4 +-
+ drivers/block/rnbd/rnbd-proto.h |  2 +-
+ drivers/block/ublk_drv.c        |  2 +-
+ 5 files changed, 4 insertions(+), 104 deletions(-)
+ delete mode 100644 Documentation/block/request.rst
+
+-- 
+Jens Axboe
 
