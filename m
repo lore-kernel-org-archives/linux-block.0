@@ -2,112 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CEFC77B7F
-	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 13:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E12C77B7D
+	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 14:12:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233685AbjEMNjF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 13 May 2023 09:39:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35486 "EHLO
+        id S231736AbjEMOMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 May 2023 10:12:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230149AbjEMNjE (ORCPT
+        with ESMTP id S238993AbjEMOMx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 May 2023 09:39:04 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1310E1736
-        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 06:39:03 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-645cfeead3cso1494633b3a.1
-        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 06:39:03 -0700 (PDT)
+        Sat, 13 May 2023 10:12:53 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05EA230C0
+        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 07:12:52 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-3f389c21fe8so39453331cf.3
+        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 07:12:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683985142; x=1686577142;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OWxs4Dd3MgDKSErZGVe9jdi74y0iCFpfmQB+mTw5exU=;
-        b=KblBr8b8khEkcYY5gL9K/oEZrULHyAffyQsyRpkhEEUbq1G8pHX+iYxifcZMa6NSxm
-         5OLerVdTivjhTiSV88yYU52GtjCF7JkovHQ3RHd302vXPjGqCYZym6sf9nApyhjDXOvl
-         OqEq6Vs/5YtlQ2e6v3G9Z1zsmOxSTJo9A+7cV4uNYgckRozXqzI3y+qnMMm749gUWkts
-         h4uuLyvsrF3f4xXepks/q2itqDhLffpRqMbPYBrkZlq2E7jNDvgAvwtxavnbtzHWcd5P
-         XmYQmryWzT2n5a60jPO6hEe3Tgag1I2DHIBzMAoUd10Eu99b6rumQQiS+PDBo0sqoLNc
-         j+YQ==
+        d=gmail.com; s=20221208; t=1683987171; x=1686579171;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mA6DdBwaCGj/+RZQvUf+gresNy3xMkdlzHnsTxDq2Eo=;
+        b=imHyEZ08OxVy4dYc5daSWrtXJYiH3rp5LJyyUk2Li0pdKi6R0fUBIELqpjMFXJvYEk
+         tfMMqYiY9+y0CuMhVyLgkEia2rDem1IJ/0/MX9zdNYsWEUbY/1g17QvAlyroS9OWXfOb
+         fQUDQZUufjotEubcRYglsNfLYQrgsO2SSzG5E7eQvKHNt2sXLjK8OoTEqcVfeG1ntF+i
+         tSIEYjeAw/krSz72d+fqMtqWKJUHEKd8Jnd6cLJirVkcDSvSCqeNghKs6/cxwWw6tYGT
+         t/CxCY/gsuvDkS7Hmr985elMTr43i9ZaCU2epDOLPFxMInM+OTp0jvXcYbgzPkYBBcqV
+         TVrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683985142; x=1686577142;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OWxs4Dd3MgDKSErZGVe9jdi74y0iCFpfmQB+mTw5exU=;
-        b=AkJl2R00WeIznjDP0nLk5HBACiGs63BilYlxOHWBNAgGwceirrTrdZ2nhxiQAavmor
-         LWgEZGEDhUVUvWj11exc4t/fDdam8wmainO/dnTNUkSazFGiAEf8iV6lKYGudDHVvOw2
-         r7gwpYicKHY/bBoRpbDH1YGVkzpGFsuyEMFufpOAy7mN2RzgRijrT0/MYMmeMQwCyi7I
-         VudGGSY4tU6TYbNHo7dd+yRJ9HDOt7VtebOcJCPSbMCV8MDeUzl8iNOblAMF0LYHNd1F
-         aXCZuaFBu5sQ4FHzqz1Nz9EadQPjacaVnfDXLAkyNefiR1IVX0WSoHXfDoyOyto2Pzgg
-         K/Gw==
-X-Gm-Message-State: AC+VfDxOpKme/eYyxV/CpQGg/y5ifMXOU4kU1LDTEr77m2I7cjZwsUkZ
-        JsH+/RV+SnjGEAFz1s8PQin/svU5ZZeAC7PEvsc=
-X-Google-Smtp-Source: ACHHUZ6JBoL+VCqS4hnZeFs4ZKH1H90g0HpbGoc0+TgXXOiJrWJwHITsmVhFG+ZXev74thyTZ4akLg==
-X-Received: by 2002:a05:6a00:13a3:b0:638:abf4:d49c with SMTP id t35-20020a056a0013a300b00638abf4d49cmr38475980pfg.3.1683985142505;
-        Sat, 13 May 2023 06:39:02 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id y24-20020aa78058000000b00640d80c8a2bsm8684467pfm.50.2023.05.13.06.39.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 May 2023 06:39:01 -0700 (PDT)
-Message-ID: <c27ed42c-50d1-ac5c-bace-ca98c8d598be@kernel.dk>
-Date:   Sat, 13 May 2023 07:39:00 -0600
+        d=1e100.net; s=20221208; t=1683987171; x=1686579171;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mA6DdBwaCGj/+RZQvUf+gresNy3xMkdlzHnsTxDq2Eo=;
+        b=O0E3hbZAN47xrWNlgU3n5nQr4SpfZ/xblhcUKOqFtaC9VeK22wUmCvoQjN0lSukU9O
+         TreKVSsjQc4FwjsulL1rqCHtJyD7TICG3QMCRhgbLgMJ5LGHpM3srWCaEGNPAfzpdyLL
+         jAH/j2TlBNKzkDePMVpyAQZ4ol6W/73WqFxHkQXo4Wokr31lyFJNXpy3OugYn0H1OV7J
+         tdinun4R6BM609nZdvl0VJzdS6OaB+x+deI7D9bdgQS0G8BMMKXN6MnyxImhwLmqII5a
+         BImZFAgB97j3expnaQD3wwelqaqA/Mfnqc59JilX9rl+p9DlpRghZv1U2KZswPi+xHar
+         F1lg==
+X-Gm-Message-State: AC+VfDyz5XMxqy+xPV7Ak3VvLRF5iWAnRVNtWSzDvRtF33nF0z+kX/FN
+        6mpt3qyCAz3lO86Em+WhQWOaZPKORMU=
+X-Google-Smtp-Source: ACHHUZ5/8tEkur9GPqsG8uPhvAv+fDvYzCaqYEOysLvqBcImQKFRmqw7iCQjnDEAWZvPASBOSpDVaA==
+X-Received: by 2002:a05:622a:1807:b0:3f4:dc79:1a6e with SMTP id t7-20020a05622a180700b003f4dc791a6emr21553015qtc.19.1683987171028;
+        Sat, 13 May 2023 07:12:51 -0700 (PDT)
+Received: from tian-Alienware-15-R4.fios-router.home (pool-173-77-254-84.nycmny.fios.verizon.net. [173.77.254.84])
+        by smtp.gmail.com with ESMTPSA id pc8-20020a05620a840800b0074de8d07052sm2617qkn.47.2023.05.13.07.12.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 May 2023 07:12:50 -0700 (PDT)
+From:   Tian Lan <tilan7663@gmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org
+Cc:     Tian Lan <tian.lan@twosigma.com>
+Subject: [PATCH 1/1] blk-mq: fix blk_mq_hw_ctx active request accounting
+Date:   Sat, 13 May 2023 10:12:34 -0400
+Message-Id: <20230513141234.8395-1-tilan7663@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.4-rc2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+From: Tian Lan <tian.lan@twosigma.com>
 
-Just a few minor fixes for drivers, and a deletion of a file that is
-woefully out-of-date these days. Please pull!
+The nr_active counter continues to increase over time which causes the
+blk_mq_get_tag to hang until the thread is rescheduled to a different
+core despite there are still tags available.
 
+kernel-stack
 
-The following changes since commit ac9a78681b921877518763ba0e89202254349d1b:
+  INFO: task inboundIOReacto:3014879 blocked for more than 2 seconds
+  Not tainted 6.1.15-amd64 #1 Debian 6.1.15~debian11
+  "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+  task:inboundIOReacto state:D stack:0  pid:3014879 ppid:4557 flags:0x00000000
+    Call Trace:
+    <TASK>
+    __schedule+0x351/0xa20
+    scheduler+0x5d/0xe0
+    io_schedule+0x42/0x70
+    blk_mq_get_tag+0x11a/0x2a0
+    ? dequeue_task_stop+0x70/0x70
+    __blk_mq_alloc_requests+0x191/0x2e0
 
-  Linux 6.4-rc1 (2023-05-07 13:34:35 -0700)
+kprobe output showing RQF_MQ_INFLIGHT bit is not cleared before
+__blk_mq_free_request being called.
 
-are available in the Git repository at:
+  320    320  kworker/29:1H __blk_mq_free_request rq_flags 0x220c0 in-flight 1
+         b'__blk_mq_free_request+0x1 [kernel]'
+         b'bt_iter+0x50 [kernel]'
+         b'blk_mq_queue_tag_busy_iter+0x318 [kernel]'
+         b'blk_mq_timeout_work+0x7c [kernel]'
+         b'process_one_work+0x1c4 [kernel]'
+         b'worker_thread+0x4d [kernel]'
+         b'kthread+0xe6 [kernel]'
+         b'ret_from_fork+0x1f [kernel]'
 
-  git://git.kernel.dk/linux.git tags/block-6.4-2023-05-13
+Signed-off-by: Tian Lan <tian.lan@twosigma.com>
+---
+ block/blk-mq.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-for you to fetch changes up to 56cdea92ed915f8eb37575331fb4a269991e8026:
-
-  Documentation/block: drop the request.rst file (2023-05-12 11:04:58 -0600)
-
-----------------------------------------------------------------
-block-6.4-2023-05-13
-
-----------------------------------------------------------------
-Guoqing Jiang (1):
-      block/rnbd: replace REQ_OP_FLUSH with REQ_OP_WRITE
-
-Ivan Orlov (1):
-      nbd: Fix debugfs_create_dir error checking
-
-Ming Lei (1):
-      ublk: fix command op code check
-
-Randy Dunlap (1):
-      Documentation/block: drop the request.rst file
-
- Documentation/block/index.rst   |  1 -
- Documentation/block/request.rst | 99 -----------------------------------------
- drivers/block/nbd.c             |  4 +-
- drivers/block/rnbd/rnbd-proto.h |  2 +-
- drivers/block/ublk_drv.c        |  2 +-
- 5 files changed, 4 insertions(+), 104 deletions(-)
- delete mode 100644 Documentation/block/request.rst
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 9c8dc70020bc..5b374fab169c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1593,6 +1593,9 @@ void blk_mq_put_rq_ref(struct request *rq)
+ 		if (rq->end_io(rq, 0) == RQ_END_IO_FREE)
+ 			blk_mq_free_request(rq);
+ 	} else if (req_ref_put_and_test(rq)) {
++		if (rq->rq_flags & RQF_MQ_INFLIGHT)
++			__blk_mq_dec_active_requests(rq->mq_hctx)
++
+ 		__blk_mq_free_request(rq);
+ 	}
+ }
 -- 
-Jens Axboe
+2.34.1
 
