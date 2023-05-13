@@ -2,148 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE74C77B7D
-	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 16:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F56AC7EE2A
+	for <linux-block@archiver.kernel.org>; Sat, 13 May 2023 16:52:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbjEMQuk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 13 May 2023 12:50:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46022 "EHLO
+        id S229603AbjEMQwk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 May 2023 12:52:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjEMQuj (ORCPT
+        with ESMTP id S230085AbjEMQwj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 May 2023 12:50:39 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7842D74
-        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 09:50:38 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-6439e53ed82so1842352b3a.1
-        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 09:50:38 -0700 (PDT)
+        Sat, 13 May 2023 12:52:39 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6577A30C6
+        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 09:52:38 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-645c4a0079dso1531155b3a.1
+        for <linux-block@vger.kernel.org>; Sat, 13 May 2023 09:52:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683996638; x=1686588638;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1683996758; x=1686588758;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wxAGGC0CXjrRtgK9Vd04Ig3pDpNjzIDQMWhUjOkb3Ss=;
-        b=cV9/C7THh4MhyKI5jPjGCq8IIu4IPmXbLCbzOn59x8t4hVWAq/eHzQNriCvgyoNHtM
-         ziHLSoUXVtMABJS8XrZB8ZweQjTEdKMexEBSRAtqCnmvSg6oV1OyE6U0z8RQEgZYka4H
-         V7PG4sDj3n1Xk9lFNvbRxjnvTneGm6TCTNSEpfX0GfdsRTnEZhznsYSvOMZWjQ5AwKWx
-         K3F66iOJv67Hcv+MzhMiCIBtuNW4UXMU7X5G/sxcP3TUHlu1UNRtATaTe+fxkYtyqI6R
-         iR//Zf3fyM+xMX+w3mXqe5TIe34GY8vZBl4kBOGgR0dSwcFJmMX/m0Rb9tDHEYIr7F8w
-         gDXA==
+        bh=DhwLwTECiV1/entSMoRz9GUGcPg/2oAHETdHa2sY66c=;
+        b=nLAUlfOViq4DUhb/u9Up/r0Z/Xno6UZmf4VCXFDGADL96tgYFAaSsXGrPPtfOE0juY
+         yRhd2fwbdke3H39MQn0CnIFRBwgBS7Dq/G4FZhQ9r9T4XLDVYSlUPteePqXi93gB7arl
+         dh7zjVe3uyOdTbcWxJhd7Ifif0yRc0mn8B3IMyBfhkqHY1ni7jqx5aqLtx74HYILxDHt
+         p1Cg7H25V/17V9ATXU/QArQLxdyQb/xhjIPA6r4NWIxTGvzmpEYXBMJHE3nuG/N/zORU
+         k4LA76Aec3juyS6plSG2p+APxzjpvsVBYz4FoxXbVZQGskIZz8/wUPMe0EdZEJ7ZAcZO
+         F+pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683996638; x=1686588638;
+        d=1e100.net; s=20221208; t=1683996758; x=1686588758;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wxAGGC0CXjrRtgK9Vd04Ig3pDpNjzIDQMWhUjOkb3Ss=;
-        b=YH9m2SwZhkzz9Atnw/MD8IP+FM4U4mQ+ramHhD1KPeaEYh3G0T/mNvo5dlL2hfayKw
-         ASITvq0tDa2URlt+oceBYGq6UTZood626OPCPWis5E7SCMRz+WMvsHFKqrUe0yDpb/CX
-         ZuE88yeh8n737GZUmVM0ayL091GK4yHLee83IZAl2v+cUz8p7P+Zu9ICC+x0OmS4yRvJ
-         ul8EojdDB3IYBcVFOhiK+jEY+LuVXB+iKd3UugUCkCwMITLfrNbZUYOMock26bZEmHH6
-         fuV3vTvwnJD0WGh3XCq56BX9a2czJspeVNx1BYDC5XRxiLBTItUtALX6szeEP26m3flY
-         cWWA==
-X-Gm-Message-State: AC+VfDzz/p2IlNQU1ykZAFpkWiO8KX+1Q+nKNdvSNUEpjObklRkF5nrP
-        vJVUapFuK2E+uPuICXCDPalEvTc2A6oeenJTIw0=
-X-Google-Smtp-Source: ACHHUZ7LdcVoSVZ1V1WKNMAPsBBquFQoMXGQJhJyC1vvWNB5d6Tnxj7gwvNkP/QSkXKbwVRDz/FVug==
-X-Received: by 2002:a05:6a20:12ce:b0:105:66d3:854d with SMTP id v14-20020a056a2012ce00b0010566d3854dmr1159775pzg.6.1683996638147;
-        Sat, 13 May 2023 09:50:38 -0700 (PDT)
+        bh=DhwLwTECiV1/entSMoRz9GUGcPg/2oAHETdHa2sY66c=;
+        b=G0RzzjQRYfBNivhRhVB4GTXVzLsTrHZl19vmYILO38DwFaVMnTR0bIIMSlJQJwYQIl
+         x5YAC7sJgVnF2WdLdXKZDG3Adc2Yt+b10nh8aBRmWXlULHNeWpZzGgGEak1vYCaQ+u1p
+         65nIxDU35JFgGEYnaYdF9anOvB1NoRIcDOEna4DHplOSae89hE761lWoPv7amDg6aTvy
+         SJm5DwLSuyTp3+u4hzmLxU6a8g9bmAmkimijHzuRJgc2Rq9ea6c4lXYlkt21hJtCsJ20
+         pTxYE3PgKoak0KBAWYhEi4BaEMnFO3ZeWvxGx51sPbS86p9TeYDE6Lw0Vu5qv2Gy/eZe
+         mvmw==
+X-Gm-Message-State: AC+VfDx2K+W1RAr0NR2GBHOD7BuOOn8B26a6gc6KEgLKRLpEcXPZuOKa
+        E4FXzHFsaN0bQqKyLQxz7lryjw==
+X-Google-Smtp-Source: ACHHUZ5m7hR0zAceJJQ8HXs9bvju15JXUqYxEE0xigXem2ZL1C541twvCV0VQbs86r3ugzUR7VINTw==
+X-Received: by 2002:a05:6a00:1d0e:b0:643:a903:f1b8 with SMTP id a14-20020a056a001d0e00b00643a903f1b8mr27052490pfx.1.1683996757822;
+        Sat, 13 May 2023 09:52:37 -0700 (PDT)
 Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c19-20020a62e813000000b0063b806b111csm8839035pfi.169.2023.05.13.09.50.36
+        by smtp.gmail.com with ESMTPSA id y24-20020aa78058000000b00640d80c8a2bsm8883642pfm.50.2023.05.13.09.52.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 May 2023 09:50:37 -0700 (PDT)
-Message-ID: <0f3a4400-a6ce-1127-34bc-9d1b9b0b766d@kernel.dk>
-Date:   Sat, 13 May 2023 10:50:36 -0600
+        Sat, 13 May 2023 09:52:37 -0700 (PDT)
+Message-ID: <28f559f9-3954-bdb9-8956-8a688aa62b0f@kernel.dk>
+Date:   Sat, 13 May 2023 10:52:36 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH] blk-mq: don't queue passthrough request into scheduler
+Subject: Re: [PATCH 1/1] blk-mq: fix blk_mq_hw_ctx active request accounting
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Guangwu Zhang <guazhang@redhat.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-References: <20230512150328.192908-1-ming.lei@redhat.com>
+To:     Tian Lan <tilan7663@gmail.com>, linux-block@vger.kernel.org
+Cc:     Tian Lan <tian.lan@twosigma.com>
+References: <20230513141234.8395-1-tilan7663@gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230512150328.192908-1-ming.lei@redhat.com>
+In-Reply-To: <20230513141234.8395-1-tilan7663@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/23 9:03?AM, Ming Lei wrote:
-> Passthrough(pt) request shouldn't be queued to scheduler, especially some
-> schedulers(such as bfq) supposes that req->bio is always available and
-> blk-cgroup can be retrieved via bio.
+On 5/13/23 8:12 AM, Tian Lan wrote:
+> From: Tian Lan <tian.lan@twosigma.com>
 > 
-> Sometimes pt request could be part of error handling, so it is better to always
-> queue it into hctx->dispatch directly.
+> The nr_active counter continues to increase over time which causes the
+> blk_mq_get_tag to hang until the thread is rescheduled to a different
+> core despite there are still tags available.
 > 
-> Fix this issue by queuing pt request from plug list to hctx->dispatch
-> directly.
+> kernel-stack
 > 
-> Reported-by: Guangwu Zhang <guazhang@redhat.com>
-> Investigated-by: Yu Kuai <yukuai1@huaweicloud.com>
-> Fixes: 1c2d2fff6dc0 ("block: wire-up support for passthrough plugging")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>   INFO: task inboundIOReacto:3014879 blocked for more than 2 seconds
+>   Not tainted 6.1.15-amd64 #1 Debian 6.1.15~debian11
+>   "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+>   task:inboundIOReacto state:D stack:0  pid:3014879 ppid:4557 flags:0x00000000
+>     Call Trace:
+>     <TASK>
+>     __schedule+0x351/0xa20
+>     scheduler+0x5d/0xe0
+>     io_schedule+0x42/0x70
+>     blk_mq_get_tag+0x11a/0x2a0
+>     ? dequeue_task_stop+0x70/0x70
+>     __blk_mq_alloc_requests+0x191/0x2e0
+> 
+> kprobe output showing RQF_MQ_INFLIGHT bit is not cleared before
+> __blk_mq_free_request being called.
+> 
+>   320    320  kworker/29:1H __blk_mq_free_request rq_flags 0x220c0 in-flight 1
+>          b'__blk_mq_free_request+0x1 [kernel]'
+>          b'bt_iter+0x50 [kernel]'
+>          b'blk_mq_queue_tag_busy_iter+0x318 [kernel]'
+>          b'blk_mq_timeout_work+0x7c [kernel]'
+>          b'process_one_work+0x1c4 [kernel]'
+>          b'worker_thread+0x4d [kernel]'
+>          b'kthread+0xe6 [kernel]'
+>          b'ret_from_fork+0x1f [kernel]'
+> 
+> Signed-off-by: Tian Lan <tian.lan@twosigma.com>
 > ---
-> Guang Wu, please test this patch and provide us the result.
-> 
->  block/blk-mq.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+>  block/blk-mq.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index f6dad0886a2f..11efaefa26c3 100644
+> index 9c8dc70020bc..5b374fab169c 100644
 > --- a/block/blk-mq.c
 > +++ b/block/blk-mq.c
-> @@ -2711,6 +2711,7 @@ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
->  	struct request *requeue_list = NULL;
->  	struct request **requeue_lastp = &requeue_list;
->  	unsigned int depth = 0;
-> +	bool pt = false;
->  	LIST_HEAD(list);
->  
->  	do {
-> @@ -2719,7 +2720,9 @@ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
->  		if (!this_hctx) {
->  			this_hctx = rq->mq_hctx;
->  			this_ctx = rq->mq_ctx;
-> -		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx) {
-> +			pt = blk_rq_is_passthrough(rq);
-> +		} else if (this_hctx != rq->mq_hctx || this_ctx != rq->mq_ctx ||
-> +				pt != blk_rq_is_passthrough(rq)) {
->  			rq_list_add_tail(&requeue_lastp, rq);
->  			continue;
->  		}
-> @@ -2731,10 +2734,15 @@ static void blk_mq_dispatch_plug_list(struct blk_plug *plug, bool from_sched)
->  	trace_block_unplug(this_hctx->queue, depth, !from_sched);
->  
->  	percpu_ref_get(&this_hctx->queue->q_usage_counter);
-> -	if (this_hctx->queue->elevator) {
-> +	if (this_hctx->queue->elevator && !pt) {
->  		this_hctx->queue->elevator->type->ops.insert_requests(this_hctx,
->  				&list, 0);
->  		blk_mq_run_hw_queue(this_hctx, from_sched);
-> +	} else if (pt) {
-> +		spin_lock(&this_hctx->lock);
-> +		list_splice_tail_init(&list, &this_hctx->dispatch);
-> +		spin_unlock(&this_hctx->lock);
-> +		blk_mq_run_hw_queue(this_hctx, from_sched);
->  	} else {
->  		blk_mq_insert_requests(this_hctx, this_ctx, &list, from_sched);
+> @@ -1593,6 +1593,9 @@ void blk_mq_put_rq_ref(struct request *rq)
+>  		if (rq->end_io(rq, 0) == RQ_END_IO_FREE)
+>  			blk_mq_free_request(rq);
+>  	} else if (req_ref_put_and_test(rq)) {
+> +		if (rq->rq_flags & RQF_MQ_INFLIGHT)
+> +			__blk_mq_dec_active_requests(rq->mq_hctx)
+> +
+>  		__blk_mq_free_request(rq);
 >  	}
+>  }
 
-I think this would look at lot better as:
-
-	if (pt) {
-		...
-	} else if (this_hctx->queue->elevator) {
-		...
-	} else {
-		...
-	}
-
-and add a comment above that first if condition on why this distinction
-is being made.
+The fact that you didn't even compile this not withstanding, why
+not just move the existing check from blk_mq_free_request() to
+__blk_mq_free_request()?
 
 -- 
 Jens Axboe
+
 
