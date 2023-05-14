@@ -2,152 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3431EC77B7F
-	for <linux-block@archiver.kernel.org>; Sun, 14 May 2023 14:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 424B0C7EE22
+	for <linux-block@archiver.kernel.org>; Sun, 14 May 2023 14:13:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230123AbjENOLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 May 2023 10:11:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56414 "EHLO
+        id S237874AbjENONs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 May 2023 10:13:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbjENOLI (ORCPT
+        with ESMTP id S237522AbjENONf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 May 2023 10:11:08 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12olkn2065.outbound.protection.outlook.com [40.92.21.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD961FD3;
-        Sun, 14 May 2023 07:11:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hjSRlrpGcUG1nWxDA6f2lPk9wjKjun5Edb93qyfN4BVzEXN/v58uO3WRGgQvfdf2IVKsshr2HYBlqqL2YKfovU4cN7+FdL7e5VOiXI0pZde4vx9TK2OuN27ze6NhOHUkDNyy4KZ/HJlb9DHcFntogDqQY//W629zY1k5wNieO1In+HN/bw+vI2Mnha9T0t+EVNszhhuSJunugxtHSQgN5kS4wMkfhhEpkNCiUQ86/eEY4X7BfZaQpkFoOHQmrgy5+a36jj3irYWDKQXqPfTxDuvPWvd62y0SXA/tbhWVxGYAK4dVM3Z2ZORsDjeS7J2nAfhiy6NPqARtkGTVbw6X2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AEURXn2MUSTOfF6V8QS0pnLZ4pDAzgStc64V4iyDi/o=;
- b=cN637mmTLwmLA8hJCTfnwiTU1bRAxTOaahsgMYXE/Ko9k6etHUy3S5Kyf1KLrYdgTtnyN1jF5vU2C659XhdPPylH6eatabPySlct9eg1T60+InmSP7yP0cC3vJDzzuB1nuCd4gsN8WA+h3yNbjb0A/POHqVH6xNVqFF5IbJYDEGa2r7GAMAwPGITVnBYYZGYp3URVczi2HqvZ9vZgGSyjtR7HpCJgrlYBvDqnli1jEByb0NsI99XD9dC2FLCbUMcF+hBNPi5bMo5DCsP3kINjN8LN5bz9Rhhb9KZq0rXXDsiYHH0KP4eqP6BbpO4SayYld2ZHvsX3XdqlB6+8ZqKpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AEURXn2MUSTOfF6V8QS0pnLZ4pDAzgStc64V4iyDi/o=;
- b=IQ35wsrke/fM1q7strJK1hETQOxLOfePRrGPc4YKH+7E2qH+bDckK7ptbHBLSIGE52zq2B0WrCqG0+CvSqbzwNDNNM6WQMC79YA+KMHPaRhds1a7WyEc2o54NslthINnn3lR2heWy1+uFkecUgk8mmp3oh5xzqLiM3VM0D6KKrwfVfLaM1mRDPv1eW6IGsa1qrrwd2CoO3XIocF5yeL2xQU0qy+R2NHyJoSkBiUZVT2iIMPqrEMBPEyHynzq9R1xaDamTrxfI5wY3lKYbykTamLDBxqKLBzli7k2FRMgR7VrTpSDcJujFEgPbEViKQDEWAOaTzvgHXdAAqWkl+gW3g==
-Received: from CY5PR12MB6455.namprd12.prod.outlook.com (2603:10b6:930:35::10)
- by MN0PR12MB5954.namprd12.prod.outlook.com (2603:10b6:208:37d::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6387.29; Sun, 14 May
- 2023 14:11:04 +0000
-Received: from CY5PR12MB6455.namprd12.prod.outlook.com
- ([fe80::eece:c2b8:c7ea:a6]) by CY5PR12MB6455.namprd12.prod.outlook.com
- ([fe80::eece:c2b8:c7ea:a6%5]) with mapi id 15.20.6387.029; Sun, 14 May 2023
- 14:11:04 +0000
-From:   mirimmad@outlook.com
-Cc:     axboe@kernel.dk, christoph.boehmwalder@linbit.com,
-        drbd-dev@lists.linbit.com, lars.ellenberg@linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mirimmad17@gmail.com, philipp.reisner@linbit.com,
-        skhan@linuxfoundation.org
-Subject: [PATCH v2] drdb: fix debugfs_create_dir and debugfs_create_symlink error handling
-Date:   Sun, 14 May 2023 19:40:33 +0530
-Message-ID: <CY5PR12MB64558DB2E8ACBD592F26E61AC67B9@CY5PR12MB6455.namprd12.prod.outlook.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <CY5PR12MB64555F99E4FEF60569050F1FC67B9@CY5PR12MB6455.namprd12.prod.outlook.com>
-References: <CY5PR12MB64555F99E4FEF60569050F1FC67B9@CY5PR12MB6455.namprd12.prod.outlook.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN:  [mPiGp7NSzqAnqy2xDuqy70YZ+6LqbMoYoeIU3kCKUChCI6yypO1ZEK9XzfurKdza]
-X-ClientProxiedBy: PN3PR01CA0148.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:c8::10) To CY5PR12MB6455.namprd12.prod.outlook.com
- (2603:10b6:930:35::10)
-X-Microsoft-Original-Message-ID: <20230514141033.190225-1-mirimmad@outlook.com>
+        Sun, 14 May 2023 10:13:35 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC7846AC
+        for <linux-block@vger.kernel.org>; Sun, 14 May 2023 07:12:58 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-7591797c638so174844985a.1
+        for <linux-block@vger.kernel.org>; Sun, 14 May 2023 07:12:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684073576; x=1686665576;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gH7nIMsPMfvbcBQe1FKo7W07N3vaxNPLcY75FzAAvRI=;
+        b=TxPYKjYpYeX0PWM+HXPOGTqM3+zAoSwgMccqP/rlxpK7GpNTj7HjNw4fTDw1KPHaaQ
+         1oX9HhpMzJ+sDa0G9KNXEKraZ3tXHz/UGmjxJih5+HcomNfCU7ie9qwvNly5ogI2kxZN
+         nI/zquQdjKHsw6nF5GfBpb1g3BAiWPW8OS5iF8Bja2BN0srXTsu/egxY5rIRnTsBrQ52
+         N4GCSd1MP4M16nQx63ySaVV/ePjgS+dH2jfjbcErcsXseWCWA95RnT7ZI/tCbdValipP
+         YCI1bZjliU/c9wi/zPcFYgh5pY7HEBcfWqcnKWjGYDoh4eX4N7hQFhPxVDvuZ6xnWDK8
+         kDrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684073576; x=1686665576;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gH7nIMsPMfvbcBQe1FKo7W07N3vaxNPLcY75FzAAvRI=;
+        b=EvM758agVJqs/LivtP9x+C3Dnxtuia3x68vTdaIpNW3rGcSbUs2iOfdU8RhrfESPJ1
+         SP1Df1kPM86i0nHp4uXyMYItCgcmRtObu7C1YY30euzVOdD063WUTMKrvSbP7XXWdu0I
+         PGqduoZ6Ge1cSaqe0RVOMBHOVQPI0CU8HMdIqbLdBs+j5PrJebnPozD9C8OwJBi0zHgc
+         jq1w1bQJa/fpeXtak1JENpJZWDTC4rxr/ijg1EWyEzkQ+7wMxZquPQmhp7EAzl6MtJKK
+         QNms86hkd4+p9oBasOsoL5Y51SXP1JB2PeEegftatD8hx1MZJ+k7daVgwtY/o7Vq+4GX
+         JrOg==
+X-Gm-Message-State: AC+VfDwWUKYkx5i5uJ46nKaocrdD6H+ok8tR61M0qbMvfPN8sOGVKEg5
+        UFqOHeEyJL9S4hYCdQGQa5k=
+X-Google-Smtp-Source: ACHHUZ6O43fvm2gMbSD3fGWK7+wgkcYLJVfHvO5PgUqJl/aibtjQhBxoZFBHII06xa87r4frh8MwQw==
+X-Received: by 2002:a05:6214:1250:b0:5e3:d150:3163 with SMTP id r16-20020a056214125000b005e3d1503163mr56459925qvv.20.1684073576006;
+        Sun, 14 May 2023 07:12:56 -0700 (PDT)
+Received: from tian-Alienware-15-R4.fios-router.home (pool-173-77-254-84.nycmny.fios.verizon.net. [173.77.254.84])
+        by smtp.gmail.com with ESMTPSA id fe14-20020a0562140b8e00b005dd8b9345besm4305227qvb.86.2023.05.14.07.12.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 May 2023 07:12:55 -0700 (PDT)
+From:   Tian Lan <tilan7663@gmail.com>
+To:     ming.lei@redhat.com
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, lkp@intel.com,
+        llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        tian.lan@twosigma.com, tilan7663@gmail.com
+Subject: Re: [PATCH 1/1] blk-mq: fix blk_mq_hw_ctx active request accounting
+Date:   Sun, 14 May 2023 10:12:54 -0400
+Message-Id: <20230514141254.595099-1-tilan7663@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <ZGDPLEtUiDeIrCyl@ovpn-8-17.pek2.redhat.com>
+References: <ZGDPLEtUiDeIrCyl@ovpn-8-17.pek2.redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6455:EE_|MN0PR12MB5954:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3976f6a6-5f8e-4795-e61a-08db54850d97
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: M06tUm13rjHg3UWqCCywsj8bXnitzZLkvNChTb11yS+8hMjZf2Sf/nlFqBEtGqWz8xsSguoUWfeP1XH0ZpOIbjMDtcMvAttYmXariObAN6A9KHEh8uYKiDpMU8iV/zuTbVnBQOYmCc3H9B/ni9kjQgvHunGPeEQ7Uw3V4tsxViZ3ON6UpWqxnkyT7f6zLxfXRUDdrylVL82SHvrK5GdQBLchUCqnqDQEhmddpjeJJlvwtThh1dTfNxua5pHZyHRwJYcC/e2nNpMehiJRPoW4YYvztpF6nmTpN65StVOb5ORynaDh7Kld9q9TtekvzhMh6ojncP9qLDU23QQamCR1K/2Y7UjJkQCONf5K5IVFtxZP4DYtXyIOqizBtKQ8qEUCoxzDfKxJ914mzUQpVkQgIU+Ff0Xj+f4CPFmCw4mAM/pFSSm/wv5JZY308frtK27uQ7A5CNN7k61de3gJDtH5mINDMhK4Z52Dt1IqhZ9GFjZKw/mWtrO+4nSm9UsUUiH4rWD+9EecoVogcPaEmPuSt6OTy5fChsPgKllLwZoZp6nM++OohOGHNT4ED1Cl4Vw7
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3VqGW3rF1zmn6O6FtMiQqTVmxNwcg+vGeD9kM3ONTf+REfRX9Rq8zAqM3bsI?=
- =?us-ascii?Q?+3F5TNtH8qMaYeyDIRoTDg38TBV++ZGLxqv9RI6XEmwOJfwAmBUYJs1i8toj?=
- =?us-ascii?Q?p062ejyt+o+Fkji1IAMI4/hq+dgkyppuhuRPsLL9ZE9x4pWo0RtvOVdrpD5B?=
- =?us-ascii?Q?oopX7+2tvRIJtxUSdMKEsbMhfc5CLEiKpgBfS+Cp/BW6/lvyntgxcP9hIy8b?=
- =?us-ascii?Q?ujyn6qQ0zklhzA1WJHdaFMnSMF50kX8aQsfEFIL3XDEuam2O+CcORdn3VK7C?=
- =?us-ascii?Q?Hm3uwE+ngW1zNz9UGe+6/ZTTwZXgNbEk3+lqqXmk9vM2DWZOmIKnUpKCp86u?=
- =?us-ascii?Q?G4Gw9yXtId8u8BC2JGh8mfoSv3S1B9JYpmLtY1viuKIopZb179PILkQa73EV?=
- =?us-ascii?Q?u2JnCDe5ovsYb2KrfgYXRWftc0i9nAzovjQ1eOVJy/CVI28K2mfObLwJBJT4?=
- =?us-ascii?Q?U1kcigjSLgRiOaWnYyhQ4aulYsaNPZzey7lFcMyHav1R0HTeuCBMbgJC3Xfe?=
- =?us-ascii?Q?Alp/eY+AKcjTXcyFyBYkrJ0Jksqa0gBZUzZl+WJddY4vrbSKVwmnu/YMtkLJ?=
- =?us-ascii?Q?t7uMpBaWeL6EGln9NHKQOfxUS0E+DEeACJUdTxLhSMmvkBSzQKmNemyXbtkH?=
- =?us-ascii?Q?OzTZVBEtftC76eVdaBt4gY8WzNvwAYc0BnFUg10Ckt9KpP5Qki0Dx4fAuYUI?=
- =?us-ascii?Q?6etvBoFXwCr1dX7Vmf84nOq3CVIU/aB/sQifs1TGQxZxucR6XF18faOv6q0I?=
- =?us-ascii?Q?mFqz0P/HIqwjyke6qwZJoEmbAHHgVs7z4N8NGxJDvdWLmBcbMwLX5soDwMcz?=
- =?us-ascii?Q?GJwEJdX6WFRuy/COFJQPQ+HJpr6yPFgaIz62rQqLzgLKgrSXSJXjHVzc+op5?=
- =?us-ascii?Q?7qKBFha+e07AKMTKQx/3M2Nc3UKGLBy7wXKtTG2gGx0VZJQLFfDuhPTHHyK5?=
- =?us-ascii?Q?XN/N1PpBt8he2V5WSzOB/ITMB0zBkgkLjttLMAECeIq/YubmEwZ100jqjeSV?=
- =?us-ascii?Q?SGAzb1HgD5CZZFd6etcT9O1ReMjdxEsew+9IlsMuDSKWLMHayKh+zO2vxtRN?=
- =?us-ascii?Q?VbF7DK55koFYb8PVyuX6O6Ry4Mwj1KsKkS3PoXeACCMBXNsJ0m3v6MDBpVwT?=
- =?us-ascii?Q?Mz7wnVkbiXfP0MvI9Yl05nTYgPnQGCBgDNFil/A+dr/0X6ikDx4tHXZLopGO?=
- =?us-ascii?Q?dKuvWtML2uTR4Ad2VmEvP48cNQ52k2KkZcTMFHB9ubbg1OWF5Y2SP5kkMlU4?=
- =?us-ascii?Q?h8nU7DtsI0LaPj+O1kzD2tsRVTRrcxGAQA3PnliuGQ=3D=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3976f6a6-5f8e-4795-e61a-08db54850d97
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6455.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2023 14:11:04.1449
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5954
-To:     unlisted-recipients:; (no To-header on input)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Immad Mir <mirimmad17@gmail.com>
+Hi Ming,
 
-debugfs_create_dir and debugfs_create_symlink return ERR_PTR incase of
-a failure which must be checked with the inline function IS_ERR. This
-patch attempts to do the same.
+> > kprobe output showing RQF_MQ_INFLIGHT bit is not cleared before
+> > __blk_mq_free_request being called.
 
-Signed-off-by: Immad Mir <mirimmad17@gmail.com>
----
-Changes in v2:
-    - Fix indentation
-    - Fix potential memory leak
+> RQF_MQ_INFLIGHT won't be cleared when the request is freed normally
+> from blk_mq_free_request().
 
- drivers/block/drbd/drbd_debugfs.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Yes you are correct, maybe I should capture both rq->rq_flags and 
+rq->state so we know for sure if either of blk_mq_free_request or 
+__blk_mq_put_driver_tag was being called before hitting __blk_mq_free_request.
 
-diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
-index 12460b584..ab431a3f2 100644
---- a/drivers/block/drbd/drbd_debugfs.c
-+++ b/drivers/block/drbd/drbd_debugfs.c
-@@ -781,6 +781,7 @@ void drbd_debugfs_device_add(struct drbd_device *device)
 
- 	snprintf(vnr_buf, sizeof(vnr_buf), "%u", device->vnr);
- 	dentry = debugfs_create_dir(vnr_buf, vols_dir);
-+    if (IS_ERR(dentry)) goto fail;
- 	device->debugfs_vol = dentry;
+> >          b'__blk_mq_free_request+0x1 [kernel]'
+> >          b'bt_iter+0x50 [kernel]'
+> >          b'blk_mq_queue_tag_busy_iter+0x318 [kernel]'
+> >          b'blk_mq_timeout_work+0x7c [kernel]'
+> >          b'process_one_work+0x1c4 [kernel]'
+> >          b'worker_thread+0x4d [kernel]'
+> >          b'kthread+0xe6 [kernel]'
+> >          b'ret_from_fork+0x1f [kernel]'
 
- 	snprintf(minor_buf, sizeof(minor_buf), "%u", device->minor);
-@@ -789,9 +790,15 @@ void drbd_debugfs_device_add(struct drbd_device *device)
- 	if (!slink_name)
- 		goto fail;
- 	dentry = debugfs_create_symlink(minor_buf, drbd_debugfs_minors, slink_name);
--	device->debugfs_minor = dentry;
--	kfree(slink_name);
--	slink_name = NULL;
-+    if (!IS_ERR(dentry)) {
-+        device->debugfs_minor = dentry;
-+        kfree(slink_name);
-+        slink_name = NULL;
-+    } else {
-+        kfree(slink_name);
-+        slink_name = NULL;
-+        goto fail;
-+    }
+> If __blk_mq_free_request() is called from timeout, that means this
+> request has been freed by blk_mq_free_request() already, so __blk_mq_dec_active_requests
+> should have been run.
 
- #define DCF(name)	do {					\
- 	dentry = debugfs_create_file(#name, 0440,	\
---
-2.40.0
+We are also seeing a different call stack that could also potentially by-pass 
+__blk_mq_dec_active_requests. Do you think they could be caused by the same 
+underlying issue.
 
+1976    2000    collectd    __blk_mq_free_request rq_flags 0x620c0 in-flight 1
+        b'__blk_mq_free_request+0x1 [kernel]'
+        b'bt_iter+0x50 [kernel]'
+        b'blk_mq_queue_tag_busy_iter+0x318 [kernel]'
+        b'blk_mq_in_flight+0x35 [kernel]'
+        b'diskstats_show+0x205 [kernel]'
+        b'seq_read_iter+0x11f [kernel]'
+        b'proc_req_read_iter+0x4a [kernel]'
+        b'vfs_read+0x239 [kernel]'
+        b'ksys_read+0xb [kernel]'
+        b'do_syscall_64+0x58 [kernel]'
+        b'entry_SYSCALL_64_after_hwframe+0x63 [kernel]'
+
+
+> However, one case is that __blk_mq_dec_active_requests isn't called in
+> blk_mq_end_request_batch, so maybe your driver is nvme with multiple
+> NSs, so can you try the following patch?
+
+Yes, we are using nvme driver with multiple NSs. 
+
+I can test this patch and will update you on the results. I'm just curious 
+shouldn't the counter be subtracted via __blk_mq_sub_active_requests when 
+blk_mq_flush_tag_batch is invoked in that case. Then this would result in 
+double counting, is that correct.
+
+
+Thanks,
+Tian
