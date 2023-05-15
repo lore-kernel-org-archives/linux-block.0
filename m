@@ -2,88 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B4E4C7EE2D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C52C7EE26
 	for <linux-block@archiver.kernel.org>; Mon, 15 May 2023 12:58:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241960AbjEOM6H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 May 2023 08:58:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46048 "EHLO
+        id S241771AbjEOM6G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 May 2023 08:58:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242085AbjEOM5v (ORCPT
+        with ESMTP id S242088AbjEOM5v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 15 May 2023 08:57:51 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F060D19BC;
-        Mon, 15 May 2023 05:57:39 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-965fc25f009so2060995366b.3;
-        Mon, 15 May 2023 05:57:39 -0700 (PDT)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11FA61BEF;
+        Mon, 15 May 2023 05:57:41 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-965fc25f009so2060999066b.3;
+        Mon, 15 May 2023 05:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684155458; x=1686747458;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=c/WsGoeYdsta1UG6dgZw3dmI3fN5/OIDDolXmg/WRRc=;
-        b=YU4eezWDd4O8MqB2M3V8utHWot7vHfTtP2uaqLS8d8wnxLQAU21hnJqPw7DOSQXoGS
-         Bj3ryWBSX23baVEAbWvm27PTEdtODNMMXOb+rcJSLg6VAR/dwZr9sceBWMvIKwu24wWi
-         vjSBiayGlYXtaSTGriB2o7b7yKpvFA2C5Hphe9C4xvSU5fGJh+VXKxEZxHGzYs1cfiov
-         1dQyVezaNuVQhSLgzaUx2ZYWMZfQockOKQOtTRx0KTJ81RgkReS01eT+DBKUB1db8kH3
-         LTPe7fqBXTL//cvJ75olUmcU0Feiz6kwgYNWKwwPYod2J7NkycnD5vcePClf/qzck4Y0
-         u8DA==
+        d=gmail.com; s=20221208; t=1684155459; x=1686747459;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A48EUvATFnZh9D6jBlZ8QJ+HRRU2GPVKxJ6T/ClswYY=;
+        b=B94E+rYQEFtywvHsGIgQ9mmQaaFbdMyn2sKZp5SXzSvrHpndqya34/Wg256icZ6H/d
+         C6i4TBNb/nm9LFRrnldiL5RDBY0qQYgteR/qWCNp3ePZaI9bS+aDrBVGH86FuarHNLh/
+         qOdS7lhDJzCWsyL6E4cUVM5SBRoc4A4oZDsG+e/KSeQ8LNU1PasU71B7rd+TFN1kaXlc
+         kHu+DujDp3gALaNiGffHF6f52CccQqkVN104W3Adg3ay1TBfsI2XomQ3y22dzIa9Hwji
+         RsTMTDVKIRBWhune2y1mIWFfkoxRJqNJhrF7WQpPSYNAzLzVeSUCCkxLtGjCo11EGGUY
+         ZVcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684155458; x=1686747458;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c/WsGoeYdsta1UG6dgZw3dmI3fN5/OIDDolXmg/WRRc=;
-        b=EOQeLAWr0ZaVpl2SwARR1YhlYo6IQDvUxukKVt0wQ9icMoeyRZ/RgvufchZuwKkpAq
-         MgyvjvbId/Stv+TXWpgW0SreYyaHnAZN1v/O1cdq8l/ZB1kLLuDmgHyUK1MySM+WtAH0
-         xDsY1zdN2RHpcooQlSwhMdNGTrPZqUsBh8g8HzNCcIz5MBsGcb+sJ1EH59+LVi984W+a
-         wzbkdms4AetVpMnLZNFYfEE/JmHGws+eGIC5041gXKgaJcxCaFniAsETCmUz4Q28Mo75
-         wq6bkf9wzuxvafVwXsmqlKYSP88W3Z7xPR83zpqYDY7u/9kmFpdA3RJkbQgtFfwMSIDg
-         vibQ==
-X-Gm-Message-State: AC+VfDw39RfbEpYrdNdu0Glzec6w93cTjbAxEtUr3RmRP8fcSpT5sWqZ
-        VH9LaDsJKlFq3DLHy70u0iiKNPwrdxo=
-X-Google-Smtp-Source: ACHHUZ4TEnFDdtXxeZc6ughmF/ZD5RUK/PID1KZQLAzF4qZ5PJ3lyI+mF6zlYitrqJDanrOFDFYZdQ==
-X-Received: by 2002:a17:907:3f25:b0:969:edf8:f73b with SMTP id hq37-20020a1709073f2500b00969edf8f73bmr23011931ejc.60.1684155458207;
-        Mon, 15 May 2023 05:57:38 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684155459; x=1686747459;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A48EUvATFnZh9D6jBlZ8QJ+HRRU2GPVKxJ6T/ClswYY=;
+        b=jXmeilTyZYCSuipXun1SzzeTwNPE0rOctspL8kUGzf8BhtZR16jRc9MAQ4EdQ6m89g
+         dYvOd91fIXLBp/+TLvIjLQtjQyeYOleGCJbrxnh11i1xhHwSA1IwO5YBfVmGLmDQmJB9
+         By2pgBEfm5J3M95EFYNBWSfdFWh9ezSm1p4dBrvY2qDwwAjMuraSp9FEjcJss1whmNbp
+         7t9elhDl8Meg87t/+NWM524NJVMR7qK47kRSgYndgmSVggVcS0JCFn0y0j2Aa4WTfYND
+         iQTwwz9G2rCtdqR4aRArNjZXZoOYa1WMq/9hl8uipP1fBfKVYYW+OhQXnRLgiEzV1fpE
+         jNSw==
+X-Gm-Message-State: AC+VfDyWDWSkhtY9VE/Fi5J0UBfQ+2qyokTIiDjSsvxqprGO0CfI04sZ
+        HXBZUllu8NYeqVUE+PPrID0=
+X-Google-Smtp-Source: ACHHUZ7Ng0cIhxR4lpY4sfifZqKzwQl+W7KvOkOYDWeQBODzPtjKkf8J4RxdtSlK5nvP0gOSrg9eQw==
+X-Received: by 2002:a17:907:6088:b0:949:cb6a:b6f7 with SMTP id ht8-20020a170907608800b00949cb6ab6f7mr32952390ejc.56.1684155459464;
+        Mon, 15 May 2023 05:57:39 -0700 (PDT)
 Received: from 127.com ([2620:10d:c092:600::2:6366])
-        by smtp.gmail.com with ESMTPSA id m13-20020a17090672cd00b0096ace7ae086sm4003685ejl.174.2023.05.15.05.57.37
+        by smtp.gmail.com with ESMTPSA id m13-20020a17090672cd00b0096ace7ae086sm4003685ejl.174.2023.05.15.05.57.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 May 2023 05:57:37 -0700 (PDT)
+        Mon, 15 May 2023 05:57:39 -0700 (PDT)
 From:   Pavel Begunkov <asml.silence@gmail.com>
 To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         io-uring@vger.kernel.org, axboe@kernel.dk
 Cc:     kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
         joshi.k@samsung.com, Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH for-next 0/2] Enable IOU_F_TWQ_LAZY_WAKE for passthrough
-Date:   Mon, 15 May 2023 13:54:41 +0100
-Message-Id: <cover.1684154817.git.asml.silence@gmail.com>
+Subject: [PATCH for-next 2/2] nvme: optimise io_uring passthrough completion
+Date:   Mon, 15 May 2023 13:54:43 +0100
+Message-Id: <ecdfacd0967a22d88b7779e2efd09e040825d0f8.1684154817.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <cover.1684154817.git.asml.silence@gmail.com>
+References: <cover.1684154817.git.asml.silence@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Let cmds to use IOU_F_TWQ_LAZY_WAKE and enable it for nvme passthrough.
+Use IOU_F_TWQ_LAZY_WAKE via iou_cmd_exec_in_task_lazy() for passthrough
+commands completion. It further delays the execution of task_work for
+DEFER_TASKRUN until there are enough of task_work items queued to meet
+the waiting criteria, which reduces the number of wake ups we issue.
 
-The result should be same as in test to the original IOU_F_TWQ_LAZY_WAKE [1]
-patchset, but for a quick test I took fio/t/io_uring with 4 threads each
-reading their own drive and all pinned to the same CPU to make it CPU
-bound and got +10% throughput improvement.
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ drivers/nvme/host/ioctl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-[1] https://lore.kernel.org/all/cover.1680782016.git.asml.silence@gmail.com/
-
-Pavel Begunkov (2):
-  io_uring/cmd: add cmd lazy tw wake helper
-  nvme: optimise io_uring passthrough completion
-
- drivers/nvme/host/ioctl.c |  4 ++--
- include/linux/io_uring.h  | 18 ++++++++++++++++--
- io_uring/uring_cmd.c      | 16 ++++++++++++----
- 3 files changed, 30 insertions(+), 8 deletions(-)
-
-
-base-commit: 9a48d604672220545d209e9996c2a1edbb5637f6
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index 81c5c9e38477..52ed1094ccbb 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -521,7 +521,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+ 	if (cookie != NULL && blk_rq_is_poll(req))
+ 		nvme_uring_task_cb(ioucmd, IO_URING_F_UNLOCKED);
+ 	else
+-		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
++		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
+ 
+ 	return RQ_END_IO_FREE;
+ }
+@@ -543,7 +543,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
+ 	if (cookie != NULL && blk_rq_is_poll(req))
+ 		nvme_uring_task_meta_cb(ioucmd, IO_URING_F_UNLOCKED);
+ 	else
+-		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
++		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_meta_cb);
+ 
+ 	return RQ_END_IO_NONE;
+ }
 -- 
 2.40.0
 
