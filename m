@@ -2,99 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59184C7EE22
-	for <linux-block@archiver.kernel.org>; Mon, 15 May 2023 22:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D6DC77B7D
+	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 00:08:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243399AbjEOW6q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 May 2023 18:58:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52264 "EHLO
+        id S230170AbjEPAIe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 May 2023 20:08:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbjEOW6q (ORCPT
+        with ESMTP id S242711AbjEPAIb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 May 2023 18:58:46 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7AAD851;
-        Mon, 15 May 2023 15:58:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BE546623D9;
-        Mon, 15 May 2023 22:58:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C953C433EF;
-        Mon, 15 May 2023 22:58:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684191524;
-        bh=HNeutJ4JFpQQ4wKNKhCHw5j5tW44s9XT4QS3pN3QQ3U=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=uVWCWHUDQMXHIzEGeQK3A1SvYdwy5f6ucoNTg5I53bFXyTZgdm3y8Wb091oRjtWfN
-         oyQDVRsAP5EQxGYZjlAr39yxd5i4eDugAbfzdBcsTjMd55FgP1V+PNSMGR8CvEu5TS
-         JKUDflPezPfBefye4IhU4e45kTjV1dgdHaKTAZFq3KrBm/dbg16xvt8f7GyqXA9X2h
-         V60ik6AtV/B1LtcubhE2Elt2GTS7TCsLhjtg1Jx4qaZtx6vFGzj2DzNw6udi9NuRJg
-         /oVV8O8fY0ubEXQzF5N3d7WBQJKKHMUDDlwTySwfVV13OTEHaL/lcLgg5EmRaM308n
-         NXO86OtGXpzeQ==
-Message-ID: <ae2385ae-1b56-4d14-ab90-7d7ae94b9dc0@kernel.org>
-Date:   Tue, 16 May 2023 07:58:42 +0900
+        Mon, 15 May 2023 20:08:31 -0400
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C5998A57
+        for <linux-block@vger.kernel.org>; Mon, 15 May 2023 17:08:29 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-64a9335a8e7so1620572b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 15 May 2023 17:08:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684195709; x=1686787709;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OLsNjH7omrsR35+IpX+9TXNAmxcXHqm/WeNdcaaPTto=;
+        b=igmNyynER5aYVQIRlBR5b/dCs3Cbxm9H7FBe8zb6TvyOJ1jZRummSq54kUvennQ/4v
+         jQMpvIyAkWahiAvathk2GXwgaoyTQ7qlxpvrySgkAeAjRpzXs/ZRYeEQfSRKJ68KbOW5
+         /VlvBH4HKPMzSEWGJFKlqrz38SdxYzHaBmlPAc0zXsf6ZbSwmkdZ+2ue2Ndl6uiU+RKD
+         hWcGSz65Zw7br39oajHthIJemCJ7kFK3pa31exQk5fL7/FUs80kYuoJXBRSXhjkkzfqa
+         Z/vMpJodSQT05FlJmrfJYcV3wa3exxYwXZ6bYjiWWN0KELy2rUWqsFWfwjCfD/gyIhN5
+         VuRA==
+X-Gm-Message-State: AC+VfDzilyJHvteWphNBXsZS2KxsP0n7D3SfpAGcgcAvgMexzEVzgxVw
+        0m8DFGtrCpbdSEgkGkNFPSQ=
+X-Google-Smtp-Source: ACHHUZ4yRtVX5SjfXZ38SWU/wuwueHfOtVgGXKKsL01///h+Ki874E+LqqtkxOYsGLtL6XncsvewVg==
+X-Received: by 2002:a17:90a:7e13:b0:252:89bc:1cd9 with SMTP id i19-20020a17090a7e1300b0025289bc1cd9mr19295551pjl.20.1684195708975;
+        Mon, 15 May 2023 17:08:28 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id oa10-20020a17090b1bca00b0023b3d80c76csm197201pjb.4.2023.05.15.17.08.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 May 2023 17:08:28 -0700 (PDT)
+Message-ID: <2dca2b99-612e-97f7-32de-9713ac1891f4@acm.org>
+Date:   Mon, 15 May 2023 17:08:27 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH v7 00/19] Add Command Duration Limits support
-To:     Niklas Cassel <nks@flawful.org>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230511011356.227789-1-nks@flawful.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: RFC: less special casing for flush requests
 Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230511011356.227789-1-nks@flawful.org>
-Content-Type: text/plain; charset=UTF-8
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+References: <20230416200930.29542-1-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230416200930.29542-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/05/11 10:13, Niklas Cassel wrote:
-> From: Niklas Cassel <niklas.cassel@wdc.com>
+On 4/16/23 13:09, Christoph Hellwig wrote:
+> inspired by Barts quest for less reording during requeues, this series
+> aims to limit the scope of requeues.  This is mostly done by simply
+> sending down more than we currently do down the normal submission path
+> with the help of Bart's patch to allow requests that are in the flush
+> state machine to still be seen by the I/O schedulers.
 
-[...]
+Hi Christoph,
 
-> Damien Le Moal (13):
->   ioprio: cleanup interface definition
->   block: introduce ioprio hints
->   block: introduce BLK_STS_DURATION_LIMIT
+Do you have the time to continue the work on this patch series? Please 
+let me know in case you would prefer that I continue the work on this 
+patch series. I just found and fixed a bug in my patch "block: Send FUA 
+requests to the I/O scheduler" (not included in this series).
 
-Jens,
+Thanks,
 
-We really need your review / Ack (if appropriate) of the first 3 patches of this
-series. Can you please do that as soon as possible so that Martin can queue the
-series through the scsi tree ?
-
-Thank you.
-
->   scsi: support retrieving sub-pages of mode pages
->   scsi: support service action in scsi_report_opcode()
->   scsi: detect support for command duration limits
->   scsi: allow enabling and disabling command duration limits
->   scsi: sd: set read/write commands CDL index
->   ata: libata: detect support for command duration limits
->   ata: libata-scsi: handle CDL bits in ata_scsiop_maint_in()
->   ata: libata-scsi: add support for CDL pages mode sense
->   ata: libata: add ATA feature control sub-page translation
->   ata: libata: set read/write commands CDL index
-> 
-> Niklas Cassel (6):
->   scsi: core: allow libata to complete successful commands via EH
->   scsi: rename and move get_scsi_ml_byte()
->   scsi: sd: handle read/write CDL timeout failures
->   ata: libata-scsi: remove unnecessary !cmd checks
->   ata: libata: change ata_eh_request_sense() to not set CHECK_CONDITION
->   ata: libata: handle completion of CDL commands using policy 0xD
-
-
--- 
-Damien Le Moal
-Western Digital Research
+Bart.
 
