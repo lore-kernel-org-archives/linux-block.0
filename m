@@ -2,149 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0051BC77B7A
-	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 13:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63073C77B7F
+	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 14:36:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232619AbjEPNYb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 May 2023 09:24:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37968 "EHLO
+        id S233740AbjEPOga (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 May 2023 10:36:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232603AbjEPNYa (ORCPT
+        with ESMTP id S232958AbjEPOga (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 May 2023 09:24:30 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BC65B98
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 06:24:17 -0700 (PDT)
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20230516132414epoutp0369b6ee8b84c40dc6b6d96585865431a7~fon_Wpgwe0983509835epoutp030
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 13:24:14 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20230516132414epoutp0369b6ee8b84c40dc6b6d96585865431a7~fon_Wpgwe0983509835epoutp030
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1684243454;
-        bh=cg4C7x99d6gMeddzSh0dDTiOK7SmEUwxAYZsbOtNGmc=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=RHduGJ+mox1uwvkL9CrWTwdjQY64J+OI+raGGaQy72CRRpH3JriElZYia6c1jwp9F
-         9GaQB7xwDbxZZFrvZUNIDHUOxobum8hoo1gdK+NuhwiZs5GnJ0VneDKXfQXK23tUQa
-         vyA9Gvbug2YRGMkMPXIu1CgTzFBi96BnyqXjbMSc=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20230516132413epcas2p15f78b10667e670c1546ca1dd981b3745~fon91tdyG0107401074epcas2p1h;
-        Tue, 16 May 2023 13:24:13 +0000 (GMT)
-Received: from epsmges2p4.samsung.com (unknown [182.195.36.100]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4QLH5935Ddz4x9Px; Tue, 16 May
-        2023 13:24:13 +0000 (GMT)
-X-AuditID: b6c32a48-475ff70000005998-c3-646383fdb5d3
-Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
-        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        E4.7C.22936.DF383646; Tue, 16 May 2023 22:24:13 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE:(2) [PATCH v2 05/14] block: blk-merge: fix to add the number of
- integrity segments to the request twice
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung CHOI <j-young.choi@samsung.com>
-From:   Jinyoung CHOI <j-young.choi@samsung.com>
-To:     "hch@lst.de" <hch@lst.de>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
-        "kch@nvidia.com" <kch@nvidia.com>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20230512135136.GD32242@lst.de>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20230516132412epcms2p2549c58f92db9919002c7e05ed044bcc8@epcms2p2>
-Date:   Tue, 16 May 2023 22:24:12 +0900
-X-CMS-MailID: 20230516132412epcms2p2549c58f92db9919002c7e05ed044bcc8
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMJsWRmVeSWpSXmKPExsWy7bCmqe7f5uQUg6+nxSxW3+1ns3h5SNNi
-        5eqjTBaLbmxjsvjbdY/JYtKha4wWT6/OYrLYe0vb4vKuOWwWy4//Y7JY9/o9i8XvH3PYHHg8
-        zt/byOKxeYWWx+WzpR6bVnWyeUxYdIDRY/fNBjaP3uZ3bB4fn95i8ejbsorR4/MmOY/2A91M
-        AdxR2TYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5QJcr
-        KZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgrMC/SKE3OLS/PS9fJSS6wMDQyMTIEK
-        E7IzZlxvZSw4L1GxpWEtewPjCfEuRk4OCQETiakLvrF2MXJxCAnsYJSY+KOJpYuRg4NXQFDi
-        7w5hkBphgVKJm5M+soPYQgJKEufWzGIEKREWMJC41WsOEmYT0JP4uWQGG0hYREBW4sqKepAw
-        s8AnZon/7wwgNvFKzGh/ygJhS0tsX74VbAqngI7Ehz4fiLCGxI9lvcwQtqjEzdVv2WHs98fm
-        M0LYIhKt985C1QhKPPi5GyouKXHo0FewCyQE8iU2HAiECNdIvF1+AKpEX+Jax0awC3gFfCVO
-        rXnCBmKzCKhK/Lu5HGqVi8TCvy8YIa7Xlli28DUzyEhmAU2J9bv0IaYrSxy5xQJRwSfRcfgv
-        O8x/DRt/Y2XvmPeECaJVTWJRk9EERuVZiCCehWTVLIRVCxiZVzGKpRYU56anFhsVmMBjNTk/
-        dxMjOPVqeexgnP32g94hRiYOxkOMEhzMSiK87TPjU4R4UxIrq1KL8uOLSnNSiw8xmgI9OZFZ
-        SjQ5H5j880riDU0sDUzMzAzNjUwNzJXEeT92KKcICaQnlqRmp6YWpBbB9DFxcEo1MPXJuW9z
-        lwqabuCRYypkeOvGIxXPr9VmvTJ3ClI+VU689mPCubMZpyLaOmvDpYtKqj0uFgVeW1lnvmdv
-        afiBUOPF2XcON3xUD13/4J5RfQWf4sK0r4k91UZ57LfOA5NQpbiltFHzqh/5lzNXv/klkVMm
-        LqQ1j69yS86bjUY6bVmb9uwuLGeuurzYhv2e46mK65N1PNMeplgZ9F/caxZYMlPL4qvEOsey
-        0jD3pDVGEp5rlVYf+lfFsiRwVbTXptj8RwXpWqdq3yq+fpy+8UCM1v/Y0ik3Ltx51/p6x6ug
-        /u03nJmUCw7dFDkV8er+NjFfhx1q+Qel79itOdwdu9S/adnayP+TzE4V5gY7bhVVYinOSDTU
-        Yi4qTgQAsFJUy0YEAAA=
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684
-References: <20230512135136.GD32242@lst.de>
-        <20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p1>
-        <20230510085208epcms2p52a6dec8da80152ec2101f11ce2ea5321@epcms2p5>
-        <CGME20230510084407epcms2p123f17696d3c30c749897eeaf2c4de684@epcms2p2>
+        Tue, 16 May 2023 10:36:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6460410FE;
+        Tue, 16 May 2023 07:36:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DA23B63A1C;
+        Tue, 16 May 2023 14:36:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F00C433D2;
+        Tue, 16 May 2023 14:36:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684247787;
+        bh=NbAYA5uVLLGOJWQJLPZTaFRC8mTWkQpGj37nw/WtjrU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WV3cox9MdBLTEQsgQ01yaiFqdmMAINbBUfb/X2PE4HUD4Dq6F9BeUIObDNx/Bhigf
+         ZKbfhRKHP9pHaYnuQtbpOf/2EP6eIX8GRNNKjpqOZHOVdl2uGePgbm3Wfu4TYGvQ6f
+         lEdOmYxBmZRZIsGT2CnQOuJslc+Nv4eS7KTAcftmGjhQqtZgnb1pHcEDxZAoiKKcbD
+         5b5nPegOv3lWd/GN1qUwDjVzleaVPW2MlUJdZDDILIOK7VgmDqawyil874wW5xgUbH
+         OQOTl2UQuq2bP0FtQbBTmp+COfrS9VlHfgrlV18vWEaGEJ7vrrzgvr93DboNR0WI6l
+         eCJ4smGBqsQnA==
+Date:   Tue, 16 May 2023 07:36:26 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 5/9] block: introduce holder ops
+Message-ID: <20230516143626.GO858815@frogsfrogsfrogs>
+References: <20230505175132.2236632-1-hch@lst.de>
+ <20230505175132.2236632-6-hch@lst.de>
+ <ZGNixzo3WShiInI1@ovpn-8-19.pek2.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZGNixzo3WShiInI1@ovpn-8-19.pek2.redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->The subject looks a bit odd, I think you're trying to say:
->
->=22do not add the number of integrity segments to the request twice=22
->
->based on the actual patch, is this correct?
->
+On Tue, May 16, 2023 at 07:02:31PM +0800, Ming Lei wrote:
+> On Fri, May 05, 2023 at 01:51:28PM -0400, Christoph Hellwig wrote:
+> > Add a new blk_holder_ops structure, which is passed to blkdev_get_by_* and
+> > installed in the block_device for exclusive claims.  It will be used to
+> > allow the block layer to call back into the user of the block device for
+> > thing like notification of a removed device or a device resize.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> 
+> ...
+> 
+> > @@ -542,7 +543,8 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
+> >   * Finish exclusive open of a block device. Mark the device as exlusively
+> >   * open by the holder and wake up all waiters for exclusive open to finish.
+> >   */
+> > -static void bd_finish_claiming(struct block_device *bdev, void *holder)
+> > +static void bd_finish_claiming(struct block_device *bdev, void *holder,
+> > +		const struct blk_holder_ops *hops)
+> >  {
+> >  	struct block_device *whole = bdev_whole(bdev);
+> >  
+> > @@ -555,7 +557,10 @@ static void bd_finish_claiming(struct block_device *bdev, void *holder)
+> >  	whole->bd_holders++;
+> >  	whole->bd_holder = bd_may_claim;
+> >  	bdev->bd_holders++;
+> > +	mutex_lock(&bdev->bd_holder_lock);
+> >  	bdev->bd_holder = holder;
+> > +	bdev->bd_holder_ops = hops;
+> > +	mutex_unlock(&bdev->bd_holder_lock);
+> >  	bd_clear_claiming(whole, holder);
+> >  	mutex_unlock(&bdev_lock);
+> >  }
+> 
+> I guess the holder ops may be override in case of multiple claim, can
+> this be one problem from the holder ops user viewpoint? Or
+> warn_on_once(bdev->bd_holder_ops && bdev->bd_holder_ops != hops) is needed here?
 
-Yes. I will fix it.
+<shrug> I'd have thought bd_may_claim would suffice for detecting
+multiple claims based on its "bd_holder != NULL" test?
 
->> +static inline bool blk_integrity_bypass_check(struct request *req,
->> + =C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0struct=20bio=20=
-*bio)=0D=0A>>=20+=7B=0D=0A>>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0return=
-=20blk_integrity_rq(req)=20=3D=3D=200=20&&=20bio_integrity(bio)=20=3D=3D=20=
-NULL;=0D=0A>>=20+=7D=0D=0A>=0D=0A>No=20need=20for=20the=20explicit=20compar=
-isms,=20this=20could=20just=20be:=0D=0A>=0D=0A>=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0return=20=21blk_integrity_rq(req)=20&&=20=21bio_integrity(bio);=0D=
-=0A>=0D=0A>and=20given=20that=20it=20just=20has=20two=20callers=20I'm=20not=
-=20sure=20the=20helper=20is=0D=0A>all=20that=20useful=20to=20start=20with.=
-=0D=0A=0D=0AThere=20are=20many=20conditional=20sentences=20like=20that,=20s=
-o=20I=20left=20them=20for=20unity,=0D=0AIf=20it's=20okay=20to=20change,=20I=
-'ll=20do=20so.=0D=0A=0D=0A>>=20+static=20bool=20__blk_integrity_mergeable(s=
-truct=20request_queue=20*q,=0D=0A>>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=
-=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0struct=20reques=
-t=20*req,=20struct=20bio=20*bio)=0D=0A>>=20+=7B=0D=0A>>=20+=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0if=20(blk_integrity_rq(req)=20=3D=3D=200=20=7C=7C=20bi=
-o_integrity(bio)=20=3D=3D=20NULL)=0D=0A>>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0return=20false;=0D=0A>>=20+=0D=0A=
->>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0if=20(bio_integrity(req->bio)->bi=
-p_flags=20=21=3D=20bio_integrity(bio)->bip_flags)=0D=0A>>=20+=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0return=20false;=
-=0D=0A>>=20+=0D=0A>>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0return=20true;=
-=0D=0A>>=20+=7D=0D=0A>>=20+=0D=0A>>=20+bool=20blk_integrity_mergeable(struc=
-t=20request_queue=20*q,=20struct=20request=20*req,=0D=0A>>=20+=20=C2=A0=20=
-=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20struct=20bio=20*bio)=0D=0A>>=20+=
-=7B=0D=0A>>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0if=20(blk_integrity_bypa=
-ss_check(req,=20bio))=0D=0A>>=20+=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=A0=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0return=20true;=0D=0A>>=20+=0D=0A>>=20+=20=C2=
-=A0=20=C2=A0=20=C2=A0=20=C2=A0return=20__blk_integrity_mergeable(q,=20req,=
-=20bio);=0D=0A>>=20+=7D=0D=0A>=0D=0A>Similarly=20here,=20I'm=20not=20even=
-=20sure=20we=20need=20all=20these=20helpers.=20=C2=A0I=20supect=0D=0A>the=
-=20code=20would=20become=20more=20readable=20by=20dropping=20these=20helper=
-s=20and=20just=0D=0A>making=20the=20checks=20explicitl=E1=BA=8F=0D=0A=0D=0A=
-OK.=20I=20will=20drop=20this.=0D=0A=0D=0ABest=20Regards,=0D=0AJinyoung.
+Though I suppose an explicit test for bd_holder_ops != NULL would
+prevent multiple claims if all the claims had NULL holders.
+
+--D
+
+> 
+> Thanks,
+> Ming
+> 
