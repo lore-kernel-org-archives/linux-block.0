@@ -2,68 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 490A3C77B7A
-	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 16:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5E4C7EE2A
+	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 16:17:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234309AbjEPQAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 May 2023 12:00:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54722 "EHLO
+        id S229530AbjEPQRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 May 2023 12:17:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234044AbjEPQAM (ORCPT
+        with ESMTP id S229449AbjEPQRl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 May 2023 12:00:12 -0400
+        Tue, 16 May 2023 12:17:41 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4E8B55A6;
-        Tue, 16 May 2023 09:00:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 834735596;
+        Tue, 16 May 2023 09:17:40 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 69249633B5;
-        Tue, 16 May 2023 16:00:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BF87C433D2;
-        Tue, 16 May 2023 16:00:07 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B11C63558;
+        Tue, 16 May 2023 16:17:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B764C433EF;
+        Tue, 16 May 2023 16:17:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684252809;
-        bh=uJj8Ytes18zQpjDajAthUUiDgcG/rn69GAIJBpkQwfg=;
+        s=k20201202; t=1684253859;
+        bh=OqIhC9v/aw7ef1NCuaqC6x3nL6C6Dtwug2I6ADMpdHY=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PdfocuoUZfOEDA94Q7wiblgas2RVggIOCtwPuY/YlzdSNFf8HVme6vy4wza4DAkoC
-         xog4tKAzVV/NfKdS7FAoOR9XchtrPlRKLbYRiKantCDQJlsd+CkN8CI6C9A5XXyA2X
-         /h1+UUtMyuUurSy7w1EFSDHh9uVOyBm/0piKznnsud+OyVKnnwc/TAPpqd/pG6valQ
-         aW8VgW0Vh/RYRoKbbmIYmWdtrauLU/8ds+iPwo+h1HifVc+5f1kd03SUXrAllPKko8
-         UMzoxAuRRrOkccAoz8d9DvbEDAx98/sgP7UWYS71P1QRc0Im2Eqmvmmxe+S6ULprvO
-         C0tP+IsMqweoA==
-Date:   Tue, 16 May 2023 18:00:05 +0200
+        b=Uke+d3OgToR8BjN8FiEdNB6ggKq9FhwB5lmwhW5YxyZMFRXU5tgeT3exbSYdI17X2
+         giJqiU0clnU/0NtIJTgxTs1v7mFo+y2gAQt+x86azSJZpZraMZWKpsbQLRfJQLQcI9
+         FQgA8dFoZVf87w5zrHpdzEO3EDLVBKIm9poe5h+HqPsPvkcUegeErFEycK/piJUFdJ
+         ACj+B2K96RKyqYNQyRuaLfqChDBbIyXjERElXtewILaNP6nUyylaVHSY77IDzF2/0I
+         CLYklgn3Qyuuk3Z2zEPoPy0COstaZUEJXlMu+pvye9uBHav+LvcsiNHzfUwzu+a5oq
+         oTOLrwEtJuuUA==
+Date:   Tue, 16 May 2023 18:17:33 +0200
 From:   Christian Brauner <brauner@kernel.org>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 5/9] block: introduce holder ops
-Message-ID: <20230516-kommode-weizen-4c410968c1f6@brauner>
+Subject: Re: [PATCH 6/9] block: add a mark_dead holder operation
+Message-ID: <20230516-deeskalation-glasur-3f9700216475@brauner>
 References: <20230505175132.2236632-1-hch@lst.de>
- <20230505175132.2236632-6-hch@lst.de>
+ <20230505175132.2236632-7-hch@lst.de>
+ <20230507191946.lwndaj75bxpldeab@quack3>
+ <20230509133209.GC841@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230505175132.2236632-6-hch@lst.de>
+In-Reply-To: <20230509133209.GC841@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 05, 2023 at 01:51:28PM -0400, Christoph Hellwig wrote:
-> Add a new blk_holder_ops structure, which is passed to blkdev_get_by_* and
-> installed in the block_device for exclusive claims.  It will be used to
-> allow the block layer to call back into the user of the block device for
-> thing like notification of a removed device or a device resize.
+On Tue, May 09, 2023 at 03:32:09PM +0200, Christoph Hellwig wrote:
+> On Sun, May 07, 2023 at 09:19:46PM +0200, Jan Kara wrote:
+> > > @@ -602,6 +624,8 @@ void blk_mark_disk_dead(struct gendisk *disk)
+> > >  	 * Prevent new I/O from crossing bio_queue_enter().
+> > >  	 */
+> > >  	blk_queue_start_drain(disk->queue);
+> > > +
+> > > +	blk_report_disk_dead(disk);
+> > 
+> > Hum, but this gets called from del_gendisk() after blk_drop_partitions()
+> > happens. So how is this going to be able to iterate anything?
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+> It isn't, and doesn't work for partitions right now.  I guess del_gendisk
+> needs a bit of refacoring that we do two pases over the inode and/or
+> move the ->mark_deal call for partitions into blk_drop_partitions.
 
-Looks good to me,
-Reviewed-by: Christian Brauner <brauner@kernel.org>
-
-Looking at this code reminds me that we'll need a block dev lookup
-function that takes a diskseq argument so we can lookup a block device
-and check it against the diskseq number we provided so we can detect
-"media" changes (images on a loop device etc). Idea being to pass
-diskseq numbers via fsconfig().
+Might be worth a comment. Otherwise looks good to me,
+Acked-by: Christian Brauner <brauner@kernel.org>
