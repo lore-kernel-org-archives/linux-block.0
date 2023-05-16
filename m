@@ -2,93 +2,116 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29228C7EE2C
-	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 15:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7DA3C7EE25
+	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 15:12:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233119AbjEPPF0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 May 2023 11:05:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
+        id S233744AbjEPPMY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 May 2023 11:12:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233394AbjEPPFZ (ORCPT
+        with ESMTP id S233481AbjEPPMY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 May 2023 11:05:25 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BA545B80
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 08:05:24 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-76c63acb667so34168739f.0
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 08:05:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684249523; x=1686841523;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EphCi21jn2aDXvfJbO6qrmW15qoNJsLoh6JuSR7o6W8=;
-        b=Z2Bimm+BRXobn2JlbDof2EaD1LgBdbuC07iSsxWro32COoyjBgoFqag9ydoMpQP0Xy
-         yHbDlYzyEixG1jyVCSU9c9YVeLpJNGGeGoWegjPjNsXLbQ3aKCJPff0mjB7Twk/5mAgr
-         bC8fnYefxTFFF9umi9R6nazonq9KLE7gbs/kKS/W/obqrjQrQ6CfEI11rTSXB42nzukE
-         z6OOVlVvvmRoYgGwjrgL4vMPNNwX9JZ81XEDeaZ/HkUBcsybtmXce3c1NgKuIVTE7SJe
-         CpmPUVw1fjoorSuwdI4sW3625ZjYqGM7hxvYgCjj4WjzwHUIZ8tzDfcSWyGaiK8a9akO
-         I9Uw==
+        Tue, 16 May 2023 11:12:24 -0400
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F6AF3A98;
+        Tue, 16 May 2023 08:12:22 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1ab267e3528so102406055ad.0;
+        Tue, 16 May 2023 08:12:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684249523; x=1686841523;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EphCi21jn2aDXvfJbO6qrmW15qoNJsLoh6JuSR7o6W8=;
-        b=A+RXc+MbyrVMdeh5Csr2p10O85DQZp2Lwyfq59Rmfc1OFaRFyS4P1Xzj/aAzRMR8J9
-         V8DIhgQgbX5soF29syRdKUxSA8E3X00hpRi70Kl4i5DMtcPhFpajz4ecPpA2FjqkX26x
-         Ngm/EUIX7f3iEmKj5El/V5VLvkn2xK7otDkxP5Bc6wihgnE3xjCt0hetk76hunnNfQVx
-         3qcI1JcAyFwboM+jKB85hXXl9qLFAS9/ygyk0UiSC0SMyJxP9YkKbl6ePvJp9uHqeSNA
-         mdT/DpG45OSFioLZb11gVPsEil/WPAI0erQSWJBLayKAKH8XLQOoFtUU3n+iZ+OzlYcf
-         KXcQ==
-X-Gm-Message-State: AC+VfDym4air4W5C6VhfR5JvhCeKtQ5ESDcmk34aODJdF4cCErvNNK/N
-        OcXYojBpIR8dELPMGtQbL8J10A==
-X-Google-Smtp-Source: ACHHUZ5cDHVmYhErun+AI9wJ5MatHtlF7oLQoDJqvO1OTRg8l0TgTCNRb48Eqch7GxvXQ5Wzu+hT7w==
-X-Received: by 2002:a92:c569:0:b0:334:f9f4:903 with SMTP id b9-20020a92c569000000b00334f9f40903mr22896ilj.0.1684249523551;
-        Tue, 16 May 2023 08:05:23 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id p39-20020a056638192700b0040fc56ad9fasm7622470jal.9.2023.05.16.08.05.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 May 2023 08:05:22 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     gost.dev@samsung.com, linux-block@vger.kernel.org, hch@lst.de,
-        willy@infradead.org
-In-Reply-To: <20230511121544.111648-1-p.raghav@samsung.com>
-References: <CGME20230511121547eucas1p17acca480b5e1d0e04c6595b70c1c92a1@eucas1p1.samsung.com>
- <20230511121544.111648-1-p.raghav@samsung.com>
-Subject: Re: [PATCH] brd: use XArray instead of radix-tree to index backing
- pages
-Message-Id: <168424952263.1748830.1319947207415920184.b4-ty@kernel.dk>
-Date:   Tue, 16 May 2023 09:05:22 -0600
+        d=1e100.net; s=20221208; t=1684249942; x=1686841942;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZX1f8Bzw327HwH/5x2zhY/BAkrcZat0nUszLiZ8Dn9c=;
+        b=YCv/cmlnDuLOxFk0qXdkAjZ69RG+XcSXx46fRJjEVQwfoU04J2y+VwUo/T1ldsxsgO
+         4Du4usQzBoSuRVZ03XB4ySqmSNXJ/NKlLnPshLwyA9wmOvgKUO1bSS8Wy4GCXK4T5GUT
+         ScERdoM44E9BWpeQ6PuIzH8DYgz509ndkrKsySDC+d6Jl3LD+3huWX3y3zCWucVQDkS7
+         ALN5Tl/n7HOJv2IfBFM30MHjwgU+GyF5MJD7QmTFhKfBggoFSUz4FjrsHjoLqEGthMaw
+         LNGTTv7YSUDXEHxifZ62+yh3BHgTnONOgmesqTQ6YTjbvmxxDGN/6uLMgfPL/GqqG+ou
+         Xzkg==
+X-Gm-Message-State: AC+VfDwCcJLreMBqQSYVcjNVYZBlf4/lRHFftqryizGIz/uUJrpTAAsz
+        neHxXofPYr0WhocBbs6OXhA=
+X-Google-Smtp-Source: ACHHUZ4q/GrA5JQKmbrPvawP8TTFNdoAM3+i1CgNAtug+vtc9Cf2K8M5RYMoX3E9HE7pHn1bXDt7pg==
+X-Received: by 2002:a17:903:41d0:b0:1ad:55e6:16fe with SMTP id u16-20020a17090341d000b001ad55e616femr26890381ple.15.1684249941858;
+        Tue, 16 May 2023 08:12:21 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id m17-20020a170902bb9100b001aaef9d0102sm15597698pls.197.2023.05.16.08.12.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 May 2023 08:12:21 -0700 (PDT)
+Message-ID: <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
+Date:   Tue, 16 May 2023 08:12:19 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        stanley.chu@mediatek.com, peter.wang@mediatek.com,
+        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
+        powen.kao@mediatek.com, naomi.chu@mediatek.com,
+        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <ZF0K7A6G2cYBjSgn@infradead.org>
+ <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
+ <ZF5G5ztMng8Xbd1W@infradead.org>
+ <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
+ <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Thu, 11 May 2023 14:15:44 +0200, Pankaj Raghav wrote:
-> XArray was introduced to hold large array of pointers with a simple API.
-> XArray API also provides array semantics which simplifies the way we store
-> and access the backing pages, and the code becomes significantly easier
-> to understand.
+On 5/12/23 20:09, Yu Kuai wrote:
+> 在 2023/05/13 2:12, Bart Van Assche 写道:
+>> The fair tag sharing algorithm has a negative impact on all SCSI 
+>> devices with multiple logical units. This is because logical units are 
+>> considered active until (request timeout) seconds have elapsed after 
+>> the logical unit stopped being used (see also the blk_mq_tag_idle() 
+>> call in blk_mq_timeout_work()). UFS users are hit by this because UFS 
+>> 3.0 devices have a limited queue depth (32) and because power 
+>> management commands are submitted to a logical unit (WLUN). Hence, it 
+>> happens often that the block layer "active queue" counter is equal to 
+>> 2 while only one logical unit is being used actively (a logical unit 
+>> backed by NAND flash). The performance difference between queue depths 
+>> 16 and 32 for UFS devices is significant.
 > 
-> No performance difference was noticed between the two implementation
-> using fio with direct=1 [1].
+> We meet similiar problem before, but I think remove tag fair sharing
+> might cause some problems, because get tag is not fair currently, for
+> example 2 devices share 32 tag, while device a issue large amount of
+> io concurrently, and device b only issue one io, in this case, if fair
+> tag sharing is removed, device b can get bad io latency.
 > 
-> [...]
+> By the way, I tried to propose a way to workaround this by following:
+> 
+> 1) disable fair tag sharing untill get tag found no tag is avaiable;
+> 2) enable fair tag sharing again if the disk donesn't faild to get tag
+> for a period of time;
+> 
+> Can this approch be considered?
 
-Applied, thanks!
+I'm afraid that this approach won't help for the UFS driver since it is 
+likely that all tags are in use by a single logical unit during an IOPS 
+test. Hence, fair sharing would be enabled even when we don't want it to 
+be enabled.
 
-[1/1] brd: use XArray instead of radix-tree to index backing pages
-      commit: 786bb02458819df7a833361c6c7448a4925a89ce
+I propose that we switch to one of these two approaches:
+* Either remove the fair tag sharing code entirely and rely on the 
+fairness mechanism provided by the sbitmap code. I'm referring to how 
+__sbitmap_queue_wake_up() uses the wake_index member variable.
+* Or make the behavior of the fairness algorithm configurable from user 
+space. One possible approach is to make the proportion of tags for a 
+logical unit / NVMe namespace configurable via sysfs. This will allow to 
+reduce the number of tags for the WLUN of UFS devices.
 
-Best regards,
--- 
-Jens Axboe
+Thanks,
 
-
+Bart.
 
