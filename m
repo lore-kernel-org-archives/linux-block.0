@@ -2,100 +2,150 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8DCC7EE23
-	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 11:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4954DC77B7F
+	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 11:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232848AbjEPLMY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 May 2023 07:12:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59862 "EHLO
+        id S233026AbjEPLms (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 May 2023 07:42:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232852AbjEPLLu (ORCPT
+        with ESMTP id S232415AbjEPLms (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 May 2023 07:11:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5D626B1
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 04:09:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684235340;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bm37UOLdBp2l5tU1ZMMqW99I666vOnuPt5uI8uOrDaY=;
-        b=bUFZOCeeGvKTxFHnKQW0lC0l0/255AgTaaS2rMASVHB6SJz7kmN6Mw+cDYNNpVUY04SiNS
-        TGZEgNS10Jz5CA3rkhVXj/zNouCmo28XTIkUNaD+nCUHOhuFxFhBT1M1E+QsMavwfUFIpO
-        60Fx9Ej5JuomT+wKu/Bi+l2LpdHa3+I=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-6egxe9Y7PQS_n7OjNZcLVg-1; Tue, 16 May 2023 07:02:42 -0400
-X-MC-Unique: 6egxe9Y7PQS_n7OjNZcLVg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7368381D1E1;
-        Tue, 16 May 2023 11:02:41 +0000 (UTC)
-Received: from ovpn-8-19.pek2.redhat.com (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 074374078906;
-        Tue, 16 May 2023 11:02:36 +0000 (UTC)
-Date:   Tue, 16 May 2023 19:02:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        ming.lei@redhat.com
-Subject: Re: [PATCH 5/9] block: introduce holder ops
-Message-ID: <ZGNixzo3WShiInI1@ovpn-8-19.pek2.redhat.com>
-References: <20230505175132.2236632-1-hch@lst.de>
- <20230505175132.2236632-6-hch@lst.de>
+        Tue, 16 May 2023 07:42:48 -0400
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2FF14C34;
+        Tue, 16 May 2023 04:42:46 -0700 (PDT)
+Received: by mail-vk1-xa2a.google.com with SMTP id 71dfb90a1353d-4501ac903d6so7577656e0c.1;
+        Tue, 16 May 2023 04:42:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684237366; x=1686829366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KVawbQRzJyzIOZpz7W6tsAHPXn8J+K2I2Vy2kuKD+TY=;
+        b=GE+1XfGpRhmsxgdP9CBWijSHCOfxDy+doCCPTlEKkqVSE4W7e7ym5oHwAm0T6+TULn
+         K5jRZLV7LOArn+gRtVVmdJWK2YL9k3XEclQRTezVCI2efKXmF9NIWdXTjgKW8x7hXwBq
+         DQHUPDq+dqRMMhc7WzHqV9kr4RNzn0b8YHcnUceeaN6XLg+O/q8/1kTKfh7SKjFzJV0l
+         lsp0QrhezU1FNPHoCydO8vrKir1LbISk2SGyZ59fNUNtAySYrM3NCqKIvwv+z6bYO59U
+         1THPcm9pMKgjzcJadSpbFwR55/xvACyfVS874ZtDShqA3avbmusDCGaV5U/CDzUglI8i
+         1zKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684237366; x=1686829366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KVawbQRzJyzIOZpz7W6tsAHPXn8J+K2I2Vy2kuKD+TY=;
+        b=CCjcl5bqDhGdDS3l4hNkmXZClxzRN1pYvu0rDd9fyybHW6O1XwTh09KOTnQmVyNSlw
+         cJAj0nOtllzESDbMv3VcqCssFQyWT6gLrrOhLSSJ1SBK1F6Z+LIPOO+gkxjdYS3Aq+sV
+         fBPEAYMTGs2SLSczTNMobWDDZ4mn4vevd9N05XyDzmX3zk3mVyX4xVTQAKv7ow7wH30F
+         ehQ14EvkKd2hkEOUtJBhtCx4KWUYqbWNyzql68OPSqXiUBITym76a2psd02d2ZsAzj9N
+         RAzWyAIwSr8WPh4PUmQQSMmsxHc5tTZmMoWVYYoKv3DYYQwnQ2D10pn/e8pRBNRB3eLg
+         Aalw==
+X-Gm-Message-State: AC+VfDzfUA47UatQdqdWlQigilnDeMZlbdmA7CP63HxmMbxhl40JxOWa
+        l7s3ja6nxAD4J6hK88njtM1UW2FMRs5yg4ph2w==
+X-Google-Smtp-Source: ACHHUZ5kGng/vXSFDLNoSG/RfpGoOQuOl75CpGICyD3XF5aV6Lo94+7eB9YCkzKQYcog+GOpakZ5PSHUdlxMbtIng6Y=
+X-Received: by 2002:a1f:54c1:0:b0:456:5823:92c1 with SMTP id
+ i184-20020a1f54c1000000b00456582392c1mr3304272vkb.9.1684237365669; Tue, 16
+ May 2023 04:42:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230505175132.2236632-6-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+References: <cover.1684154817.git.asml.silence@gmail.com>
+In-Reply-To: <cover.1684154817.git.asml.silence@gmail.com>
+From:   Anuj gupta <anuj1072538@gmail.com>
+Date:   Tue, 16 May 2023 17:12:08 +0530
+Message-ID: <CACzX3Av9yOkAK16QRJ7npQUVAiTjA-nqLR2Doob9p6nYYYkyOg@mail.gmail.com>
+Subject: Re: [PATCH for-next 0/2] Enable IOU_F_TWQ_LAZY_WAKE for passthrough
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, axboe@kernel.dk, kbusch@kernel.org,
+        hch@lst.de, sagi@grimberg.me, joshi.k@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 05, 2023 at 01:51:28PM -0400, Christoph Hellwig wrote:
-> Add a new blk_holder_ops structure, which is passed to blkdev_get_by_* and
-> installed in the block_device for exclusive claims.  It will be used to
-> allow the block layer to call back into the user of the block device for
-> thing like notification of a removed device or a device resize.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+On Mon, May 15, 2023 at 6:29=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> Let cmds to use IOU_F_TWQ_LAZY_WAKE and enable it for nvme passthrough.
+>
+> The result should be same as in test to the original IOU_F_TWQ_LAZY_WAKE =
+[1]
+> patchset, but for a quick test I took fio/t/io_uring with 4 threads each
+> reading their own drive and all pinned to the same CPU to make it CPU
+> bound and got +10% throughput improvement.
+>
+> [1] https://lore.kernel.org/all/cover.1680782016.git.asml.silence@gmail.c=
+om/
+>
+> Pavel Begunkov (2):
+>   io_uring/cmd: add cmd lazy tw wake helper
+>   nvme: optimise io_uring passthrough completion
+>
+>  drivers/nvme/host/ioctl.c |  4 ++--
+>  include/linux/io_uring.h  | 18 ++++++++++++++++--
+>  io_uring/uring_cmd.c      | 16 ++++++++++++----
+>  3 files changed, 30 insertions(+), 8 deletions(-)
+>
+>
+> base-commit: 9a48d604672220545d209e9996c2a1edbb5637f6
+> --
+> 2.40.0
+>
 
-...
+I tried to run a few workloads on my setup with your patches applied. Howev=
+er, I
+couldn't see any difference in io passthrough performance. I might have mis=
+sed
+something. Can you share the workload that you ran which gave you the perf
+improvement. Here is the workload that I ran -
 
-> @@ -542,7 +543,8 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
->   * Finish exclusive open of a block device. Mark the device as exlusively
->   * open by the holder and wake up all waiters for exclusive open to finish.
->   */
-> -static void bd_finish_claiming(struct block_device *bdev, void *holder)
-> +static void bd_finish_claiming(struct block_device *bdev, void *holder,
-> +		const struct blk_holder_ops *hops)
->  {
->  	struct block_device *whole = bdev_whole(bdev);
->  
-> @@ -555,7 +557,10 @@ static void bd_finish_claiming(struct block_device *bdev, void *holder)
->  	whole->bd_holders++;
->  	whole->bd_holder = bd_may_claim;
->  	bdev->bd_holders++;
-> +	mutex_lock(&bdev->bd_holder_lock);
->  	bdev->bd_holder = holder;
-> +	bdev->bd_holder_ops = hops;
-> +	mutex_unlock(&bdev->bd_holder_lock);
->  	bd_clear_claiming(whole, holder);
->  	mutex_unlock(&bdev_lock);
->  }
+Without your patches applied -
 
-I guess the holder ops may be override in case of multiple claim, can
-this be one problem from the holder ops user viewpoint? Or
-warn_on_once(bdev->bd_holder_ops && bdev->bd_holder_ops != hops) is needed here?
+# taskset -c 0 t/io_uring -r4 -b512 -d64 -c16 -s16 -p0 -F1 -B1 -P0 -O0
+-u1 -n1 /dev/ng0n1
+submitter=3D0, tid=3D2049, file=3D/dev/ng0n1, node=3D-1
+polled=3D0, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D64
+Engine=3Dio_uring, sq_ring=3D64, cq_ring=3D64
+IOPS=3D2.83M, BW=3D1382MiB/s, IOS/call=3D16/15
+IOPS=3D2.82M, BW=3D1379MiB/s, IOS/call=3D16/16
+IOPS=3D2.84M, BW=3D1388MiB/s, IOS/call=3D16/15
+Exiting on timeout
+Maximum IOPS=3D2.84M
 
+# taskset -c 0,3 t/io_uring -r4 -b512 -d64 -c16 -s16 -p0 -F1 -B1 -P0
+-O0 -u1 -n2 /dev/ng0n1 /dev/ng1n1
+submitter=3D0, tid=3D2046, file=3D/dev/ng0n1, node=3D-1
+submitter=3D1, tid=3D2047, file=3D/dev/ng1n1, node=3D-1
+polled=3D0, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D64
+Engine=3Dio_uring, sq_ring=3D64, cq_ring=3D64
+IOPS=3D5.72M, BW=3D2.79GiB/s, IOS/call=3D16/15
+IOPS=3D5.71M, BW=3D2.79GiB/s, IOS/call=3D16/16
+IOPS=3D5.70M, BW=3D2.78GiB/s, IOS/call=3D16/15
+Exiting on timeout Maximum IOPS=3D5.72M
 
-Thanks,
-Ming
+With your patches applied -
 
+# taskset -c 0 t/io_uring -r4 -b512 -d64 -c16 -s16 -p0 -F1 -B1 -P0 -O0
+-u1 -n1 /dev/ng0n1
+submitter=3D0, tid=3D2032, file=3D/dev/ng0n1, node=3D-1
+polled=3D0, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D64
+Engine=3Dio_uring, sq_ring=3D64, cq_ring=3D64
+IOPS=3D2.83M, BW=3D1381MiB/s, IOS/call=3D16/15
+IOPS=3D2.83M, BW=3D1379MiB/s, IOS/call=3D16/15
+IOPS=3D2.83M, BW=3D1383MiB/s, IOS/call=3D15/15
+Exiting on timeout Maximum IOPS=3D2.83M
+
+# taskset -c 0,3 t/io_uring -r4 -b512 -d64 -c16 -s16 -p0 -F1 -B1 -P0
+-O0 -u1 -n2 /dev/ng0n1 /dev/ng1n1
+submitter=3D1, tid=3D2037, file=3D/dev/ng1n1, node=3D-1
+submitter=3D0, tid=3D2036, file=3D/dev/ng0n1, node=3D-1
+polled=3D0, fixedbufs=3D1/0, register_files=3D1, buffered=3D1, QD=3D64
+Engine=3Dio_uring, sq_ring=3D64, cq_ring=3D64
+IOPS=3D5.64M, BW=3D2.75GiB/s, IOS/call=3D15/15
+IOPS=3D5.62M, BW=3D2.75GiB/s, IOS/call=3D16/16
+IOPS=3D5.62M, BW=3D2.74GiB/s, IOS/call=3D16/16
+Exiting on timeout Maximum IOPS=3D5.64M
+
+--
+Anuj Gupta
