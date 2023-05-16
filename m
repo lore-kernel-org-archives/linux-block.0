@@ -2,98 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6D5C77B75
-	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 22:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 150AEC77B7F
+	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 22:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230204AbjEPWdv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 May 2023 18:33:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56138 "EHLO
+        id S229572AbjEPWjE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 May 2023 18:39:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbjEPWdu (ORCPT
+        with ESMTP id S230486AbjEPWjA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 May 2023 18:33:50 -0400
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6418C7292
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:33:42 -0700 (PDT)
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1aaea3909d1so1850175ad.2
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:33:42 -0700 (PDT)
+        Tue, 16 May 2023 18:39:00 -0400
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02C06199
+        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:38:59 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1aaf70676b6so1296705ad.3
+        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:38:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684276422; x=1686868422;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6JBGozQfRMCbQ5kzLOjh8kmaOBJhZb4ciuk6Ot10DUo=;
-        b=ZgCZv7AE7ejLhWKzfiCFiaHP8TzoGcPSBdhc8RiIBIMUcRoBmCGlDmW3wnbNvp5g0G
-         TwKDbBNW0XIf5uG6tcgmgJ5152LjLHG+XGq9N9F8GV2XyVh8oT1x7tYvKyTXbXrC9Ij6
-         fY8+mRRjiWMsNJ9Zji2S7Z3ff7uRD/fwvEDFv16yPzrAJtFIvkiBBiVBNJXpT8Ajdw5Y
-         GL62j1fPSRj+IYkiDbVds92xoUcjpVQQidS4tFx0w5GpVKI7XeXgTix2OluyY932OBaR
-         fGr87PWG0Y3dcdfMNjzHrjpTiACo0Le3TQkLqq+DYPBAIA7XOpiiE2nr132BvYUM9ddN
-         8t/w==
-X-Gm-Message-State: AC+VfDxnsSTkd3U9+WjCrDA8scc5HvwqJuaMb/dPklN/HaBdbWnOzZM/
-        JcGNCq5Fqxr9eKAVWiFLwoQTOyb44jc=
-X-Google-Smtp-Source: ACHHUZ7HnHYHqLvH0JkIOA3a49YoCkFBS8sxEPeoT9ZkkpPJXPpeYt+kxt0Zion7apkfqpfVDuiTYg==
-X-Received: by 2002:a17:903:234e:b0:1ac:a9c1:b61d with SMTP id c14-20020a170903234e00b001aca9c1b61dmr32287226plh.11.1684276421769;
-        Tue, 16 May 2023 15:33:41 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684276739; x=1686868739;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nbTl2fwmxxba7nVg2C7zBSYx8NZ8xgbjj9t9Aqkh8Fs=;
+        b=fdBk4YJSEt1pZZpA/qrk5zcCxxAeuiyUp/fE3fcpG/KswwnrK4QtXItqzgmvZo8rnN
+         zDnhuP532EJc5IRYYMfxAGxyQYoaHV5tjkDq6pQ/V6E5vgL5K/9Lh0Ik9tDrwg0MD8xf
+         BCNMlP+5bcpJ688gg00TE+E1TGxODzW/qwbkY02qQfF9UOgii44QFiw0R6nhNR+gFm6o
+         e5F4Cnwkb284bKq74PsUoSzxNleZ1vl4n1URzZxbTvrMwWr8Dc1/dVuWvmgvGwfaPM5g
+         f1Ts5mP33oJVSN3PCsEXImsOxwdkOop4DU9A5c97SPrRVHj7KVRZ4R0uj9CYi3xurzme
+         b+Cg==
+X-Gm-Message-State: AC+VfDxkijpNZU0bMcQjlgATTus73JTaVyv47hhXxKtSWzAhqG3yNA4I
+        XLiQaRzkzEmmC7+5PF8hwaU=
+X-Google-Smtp-Source: ACHHUZ5/Hh9X78Mquwqwb1/dUmqKiP3wBGmT8lwk4Kh/mjs+HruND8TPlxEX+nWlsR7yZ4iU67hIRw==
+X-Received: by 2002:a17:902:b7cc:b0:1ac:3ddf:2299 with SMTP id v12-20020a170902b7cc00b001ac3ddf2299mr39030768plz.44.1684276739374;
+        Tue, 16 May 2023 15:38:59 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:baed:ee38:35e4:f97d])
-        by smtp.gmail.com with ESMTPSA id d8-20020a170902654800b001ae48d441desm839255pln.148.2023.05.16.15.33.40
+        by smtp.gmail.com with ESMTPSA id fu11-20020a17090ad18b00b0024df400a9e6sm86725pjb.37.2023.05.16.15.38.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 May 2023 15:33:41 -0700 (PDT)
+        Tue, 16 May 2023 15:38:58 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 11/11] block: mq-deadline: Fix handling of at-head zoned writes
-Date:   Tue, 16 May 2023 15:33:20 -0700
-Message-ID: <20230516223323.1383342-12-bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Jan Kara <jack@suse.cz>, Yu Kuai <yukuai3@huawei.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH] block: BFQ: Add several invariant checks
+Date:   Tue, 16 May 2023 15:38:53 -0700
+Message-ID: <20230516223853.1385255-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
-In-Reply-To: <20230516223323.1383342-1-bvanassche@acm.org>
-References: <20230516223323.1383342-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Before dispatching a zoned write from the FIFO list, check whether there
-are any zoned writes in the RB-tree with a lower LBA for the same zone.
-This patch ensures that zoned writes happen in order even if at_head is
-set for some writes for a zone and not for others.
+If anything goes wrong with the counters that track the number of
+requests, I/O locks up. Make such scenarios easier to debug by adding
+invariant checks for the request counters. Additionally, check that
+BFQ queues are empty before these are freed.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Yu Kuai <yukuai3@huawei.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ block/bfq-iosched.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 059727fa4b98..67989f8d29a5 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -346,7 +346,7 @@ static struct request *
- deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 		      enum dd_data_dir data_dir)
- {
--	struct request *rq;
-+	struct request *rq, *rb_rq, *next;
- 	unsigned long flags;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 3164e3177965..c5727afad159 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5403,6 +5403,9 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 	if (bfqq->bfqd->last_completed_rq_bfqq == bfqq)
+ 		bfqq->bfqd->last_completed_rq_bfqq = NULL;
  
- 	if (list_empty(&per_prio->fifo_list[data_dir]))
-@@ -364,7 +364,12 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 	 * zones and these zones are unlocked.
- 	 */
- 	spin_lock_irqsave(&dd->zone_lock, flags);
--	list_for_each_entry(rq, &per_prio->fifo_list[DD_WRITE], queuelist) {
-+	list_for_each_entry_safe(rq, next, &per_prio->fifo_list[DD_WRITE],
-+				 queuelist) {
-+		/* Check whether a prior request exists for the same zone. */
-+		rb_rq = deadline_from_pos(per_prio, data_dir, blk_rq_pos(rq));
-+		if (rb_rq && blk_rq_pos(rb_rq) < blk_rq_pos(rq))
-+			rq = rb_rq;
- 		if (blk_req_can_dispatch_to_zone(rq) &&
- 		    (blk_queue_nonrot(rq->q) ||
- 		     !deadline_is_seq_write(dd, rq)))
++	WARN_ON_ONCE(!list_empty(&bfqq->fifo));
++	WARN_ON_ONCE(!RB_EMPTY_ROOT(&bfqq->sort_list));
++
+ 	kmem_cache_free(bfq_pool, bfqq);
+ 	bfqg_and_blkg_put(bfqg);
+ }
+@@ -7135,6 +7138,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+ {
+ 	struct bfq_data *bfqd = e->elevator_data;
+ 	struct bfq_queue *bfqq, *n;
++	unsigned int actuator;
+ 
+ 	hrtimer_cancel(&bfqd->idle_slice_timer);
+ 
+@@ -7143,6 +7147,11 @@ static void bfq_exit_queue(struct elevator_queue *e)
+ 		bfq_deactivate_bfqq(bfqd, bfqq, false, false);
+ 	spin_unlock_irq(&bfqd->lock);
+ 
++	for (actuator = 0; actuator < bfqd->num_actuators; actuator++)
++		WARN_ON_ONCE(bfqd->rq_in_driver[actuator]);
++	WARN_ON_ONCE(bfqd->tot_rq_in_driver);
++	WARN_ON_ONCE(bfqq->dispatched);
++
+ 	hrtimer_cancel(&bfqd->idle_slice_timer);
+ 
+ 	/* release oom-queue reference to root group */
