@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FEE1C77B75
-	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 22:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AD2C7EE24
+	for <linux-block@archiver.kernel.org>; Tue, 16 May 2023 22:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230056AbjEPWdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229818AbjEPWdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 16 May 2023 18:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229966AbjEPWdf (ORCPT
+        with ESMTP id S230179AbjEPWdh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 May 2023 18:33:35 -0400
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA9815FDC
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:33:34 -0700 (PDT)
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1aaebed5bd6so1491295ad.1
-        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:33:34 -0700 (PDT)
+        Tue, 16 May 2023 18:33:37 -0400
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2210D6189
+        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:33:36 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1ab032d9266so2292405ad.0
+        for <linux-block@vger.kernel.org>; Tue, 16 May 2023 15:33:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684276414; x=1686868414;
+        d=1e100.net; s=20221208; t=1684276415; x=1686868415;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CxsjF6/Njb1CBZYlUphCM+L4dP+Khele8WXLzm2lN6Q=;
-        b=CanYD2rQalR1i8cFCwQde3MMawsfJkGeKjwyn0rbJESQZ01ullwM0JjSvl37qNiTxI
-         1g//0vTbwOjM5vtb0RXylKxJNUqzV6ZcXY9cCpxN2RXsWRpHObNTyOb4OkswBUiEYjq8
-         sI7CdPIMfLgRK1DpjSmLxfWbTqZUBIMUY/veB1urztSwVOEr0FQi0ryURIPJx4kxoxcZ
-         Oh4ooiFpOSYDQKJjYRJwq07P1iCxIfTlKDrUFsBWQwLjFB6r8cNiBGlYIE2H8AMYToyo
-         IFvO1cIlqcMlw81gAJCwiSKdzfO1aA+oAJTIjTw+dPbTxwR8vVqHo59hDCN6MCPbGwTi
-         6vQA==
-X-Gm-Message-State: AC+VfDzzd29bZiEHJDmO11/oEY8FesJVwmYp5REdXmSFpHGCx4mpEsu9
-        9HK9jZz0OzGM0Eax0vGVsOo=
-X-Google-Smtp-Source: ACHHUZ6IlttNXldUScllloZbVUb7cI+R/A5xHacTilsnUQXqkg0HOe26htG0vBqd8i0Uftn2vRNY5w==
-X-Received: by 2002:a17:903:1c6:b0:1ac:946e:468e with SMTP id e6-20020a17090301c600b001ac946e468emr36070226plh.57.1684276414207;
-        Tue, 16 May 2023 15:33:34 -0700 (PDT)
+        bh=kfH3fddu0PSG0m6djX24rpBRUBdl5uuwI2SQRIjlZ2k=;
+        b=Xmf5ofrIco0KKsjkG2yefYzOerQASaG47gHeGKYc8ZpAe5JeJ4jIhg3i5GAlCepUaN
+         mu0T1m6ZJ7nfHSTdgHTabR030bhKwLQQZnx9ATWfgnyiCijkAEeBxJ4Gi7wC2k7lKTtA
+         HELIxL14tLjHzpEFKx6ad7LEPhMmJDAuI5eDrv0pDfTAiN6iGnLYAL2xI6OJ1JyrvV5y
+         CXU6gx6zMVBKTapjzTxjBVmYJchJEu++V8Bb/IFHUloYsDTPGSpl8Z2e7sq9XINuYb12
+         QaDL573iocFhXcls/EYKzcrBMxUEqCMo/VANQ/omQgskO0sGlj/wBo52u1fxdyrFQiw6
+         w4Hw==
+X-Gm-Message-State: AC+VfDxJI4+w4LgysDJol5Ms49DpRWF+PusrZ0X9w3n3doQp6F1id685
+        FYtvxL/rU01OWrS8tG3e9j0=
+X-Google-Smtp-Source: ACHHUZ5QorBj7rU2QW5rUVVaQ0p2J7tzMTV6Wi/agny+qZG85hBR1Oogf9aKlW1oz4SQ58Z2VpDg1Q==
+X-Received: by 2002:a17:902:da84:b0:1ac:5b6b:df4c with SMTP id j4-20020a170902da8400b001ac5b6bdf4cmr45287312plx.69.1684276415510;
+        Tue, 16 May 2023 15:33:35 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:baed:ee38:35e4:f97d])
-        by smtp.gmail.com with ESMTPSA id d8-20020a170902654800b001ae48d441desm839255pln.148.2023.05.16.15.33.33
+        by smtp.gmail.com with ESMTPSA id d8-20020a170902654800b001ae48d441desm839255pln.148.2023.05.16.15.33.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 May 2023 15:33:33 -0700 (PDT)
+        Tue, 16 May 2023 15:33:35 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
         Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Damien Le Moal <dlemoal@kernel.org>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v5 05/11] block: mq-deadline: Clean up deadline_check_fifo()
-Date:   Tue, 16 May 2023 15:33:14 -0700
-Message-ID: <20230516223323.1383342-6-bvanassche@acm.org>
+Subject: [PATCH v5 06/11] block: mq-deadline: Simplify deadline_skip_seq_writes()
+Date:   Tue, 16 May 2023 15:33:15 -0700
+Message-ID: <20230516223323.1383342-7-bvanassche@acm.org>
 X-Mailer: git-send-email 2.40.1.606.ga4b1b128d6-goog
 In-Reply-To: <20230516223323.1383342-1-bvanassche@acm.org>
 References: <20230516223323.1383342-1-bvanassche@acm.org>
@@ -57,46 +57,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Change the return type of deadline_check_fifo() from 'int' into 'bool'.
-Use time_is_before_eq_jiffies() instead of time_after_eq(). No
-functionality has been changed.
+Make the deadline_skip_seq_writes() code shorter without changing its
+functionality.
 
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/mq-deadline.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ block/mq-deadline.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 5839a027e0f0..a016cafa54b3 100644
+index a016cafa54b3..6276afede9cd 100644
 --- a/block/mq-deadline.c
 +++ b/block/mq-deadline.c
-@@ -272,21 +272,15 @@ static u32 dd_queued(struct deadline_data *dd, enum dd_prio prio)
- }
- 
- /*
-- * deadline_check_fifo returns 0 if there are no expired requests on the fifo,
-- * 1 otherwise. Requires !list_empty(&dd->fifo_list[data_dir])
-+ * deadline_check_fifo returns true if and only if there are expired requests
-+ * in the FIFO list. Requires !list_empty(&dd->fifo_list[data_dir]).
-  */
--static inline int deadline_check_fifo(struct dd_per_prio *per_prio,
--				      enum dd_data_dir data_dir)
-+static inline bool deadline_check_fifo(struct dd_per_prio *per_prio,
-+				       enum dd_data_dir data_dir)
+@@ -304,14 +304,11 @@ static struct request *deadline_skip_seq_writes(struct deadline_data *dd,
+ 						struct request *rq)
  {
- 	struct request *rq = rq_entry_fifo(per_prio->fifo_list[data_dir].next);
+ 	sector_t pos = blk_rq_pos(rq);
+-	sector_t skipped_sectors = 0;
  
--	/*
--	 * rq is expired!
--	 */
--	if (time_after_eq(jiffies, (unsigned long)rq->fifo_time))
--		return 1;
--
--	return 0;
-+	return time_is_before_eq_jiffies((unsigned long)rq->fifo_time);
+-	while (rq) {
+-		if (blk_rq_pos(rq) != pos + skipped_sectors)
+-			break;
+-		skipped_sectors += blk_rq_sectors(rq);
++	do {
++		pos += blk_rq_sectors(rq);
+ 		rq = deadline_latter_request(rq);
+-	}
++	} while (rq && blk_rq_pos(rq) == pos);
+ 
+ 	return rq;
  }
- 
- /*
