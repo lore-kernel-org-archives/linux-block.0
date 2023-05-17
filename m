@@ -2,105 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B832C77B75
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 13:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 773A4C77B7A
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 13:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231582AbjEQNgE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 09:36:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45194 "EHLO
+        id S230459AbjEQNxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 09:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231408AbjEQNgD (ORCPT
+        with ESMTP id S230205AbjEQNxs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 09:36:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F41476AC
-        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 06:34:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684330464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=CbtW5Jmmv8Jo8I0xBOm+uh+DaT37Ll16E7lpSUKbIP8=;
-        b=KtnOHYiKGJ99GbWBRX1HP6qO8OcIEuJhjTzpjc9iIh1ghksBNC0sGGGoiAPuAuAOKAUXdW
-        YIUJGe5ODoDUzX1Su1cP9yYdCmCv2LlRICR4rFagIC6UKThE2d9cCaJ+ggd20D7+mXN9bo
-        Ik1tToJu9t9QXfGma2vTiKsieJXR2rI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-586-CmwUPwyINjKKhcOT1ijZuQ-1; Wed, 17 May 2023 09:34:20 -0400
-X-MC-Unique: CmwUPwyINjKKhcOT1ijZuQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D6ADA3C10EC0;
-        Wed, 17 May 2023 13:34:19 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B9DB9492B00;
-        Wed, 17 May 2023 13:34:18 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH] ublk: fix AB-BA lockdep warning
-Date:   Wed, 17 May 2023 21:34:08 +0800
-Message-Id: <20230517133408.210944-1-ming.lei@redhat.com>
+        Wed, 17 May 2023 09:53:48 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDCB098;
+        Wed, 17 May 2023 06:53:47 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2EF0968BEB; Wed, 17 May 2023 15:53:44 +0200 (CEST)
+Date:   Wed, 17 May 2023 15:53:44 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        axboe@kernel.dk, kbusch@kernel.org, sagi@grimberg.me,
+        joshi.k@samsung.com
+Subject: Re: [PATCH for-next 2/2] nvme: optimise io_uring passthrough
+ completion
+Message-ID: <20230517135344.GA26147@lst.de>
+References: <cover.1684154817.git.asml.silence@gmail.com> <ecdfacd0967a22d88b7779e2efd09e040825d0f8.1684154817.git.asml.silence@gmail.com> <20230517072314.GC27026@lst.de> <9367cc09-c8b4-a56c-a61a-d2c776c05a1c@gmail.com> <20230517123921.GA19835@lst.de> <61787b53-3c16-8cdb-eaad-6c724315435b@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <61787b53-3c16-8cdb-eaad-6c724315435b@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When handling UBLK_IO_FETCH_REQ, ctx->uring_lock is grabbed first, then
-ub->mutex is acquired.
+On Wed, May 17, 2023 at 02:30:47PM +0100, Pavel Begunkov wrote:
+> Aside that you decided to ignore the third point, that's a
+> generic interface, not nvme specific, there are patches for
+> net cmds, someone even tried to use it for drm. How do you
+> think new users are supposed to appear if the only helper
+> doing the job can hang the userspace for their use case?
+> Well, then maybe it'll remain nvme/ublk specific with such
+> an approach.
 
-When handling UBLK_CMD_STOP_DEV or UBLK_CMD_DEL_DEV, ub->mutex is
-grabbed first, then calling io_uring_cmd_done() for canceling uring
-command, in which ctx->uring_lock may be required.
-
-Real deadlock only happens when all the above commands are issued from
-same uring context, and in reality different uring contexts are often used
-for handing control command and IO command.
-
-Fix the issue by using io_uring_cmd_complete_in_task() to cancel command
-in ublk_cancel_dev(ublk_cancel_queue).
-
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Closes: https://lore.kernel.org/linux-block/becol2g7sawl4rsjq2dztsbc7mqypfqko6wzsyoyazqydoasml@rcxarzwidrhk
-Cc: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c7ed5d69e9ee..33d3298a0da1 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1120,6 +1120,11 @@ static inline bool ublk_queue_ready(struct ublk_queue *ubq)
- 	return ubq->nr_io_ready == ubq->q_depth;
- }
- 
-+static void ublk_cmd_cancel_cb(struct io_uring_cmd *cmd, unsigned issue_flags)
-+{
-+	io_uring_cmd_done(cmd, UBLK_IO_RES_ABORT, 0, issue_flags);
-+}
-+
- static void ublk_cancel_queue(struct ublk_queue *ubq)
- {
- 	int i;
-@@ -1131,8 +1136,8 @@ static void ublk_cancel_queue(struct ublk_queue *ubq)
- 		struct ublk_io *io = &ubq->ios[i];
- 
- 		if (io->flags & UBLK_IO_FLAG_ACTIVE)
--			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0,
--						IO_URING_F_UNLOCKED);
-+			io_uring_cmd_complete_in_task(io->cmd,
-+						      ublk_cmd_cancel_cb);
- 	}
- 
- 	/* all io commands are canceled */
--- 
-2.38.1
-
+New users can add new code when it's actualy needed.  We don't
+bloat the kernel for maybe in the future crap as a policy.
