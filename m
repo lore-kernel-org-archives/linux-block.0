@@ -2,135 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF6AC77B75
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 08:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC13DC77B75
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 09:05:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230194AbjEQI6Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 04:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44298 "EHLO
+        id S229452AbjEQJFU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 05:05:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230143AbjEQI6W (ORCPT
+        with ESMTP id S229529AbjEQJFS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 04:58:22 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B78421E;
-        Wed, 17 May 2023 01:58:16 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QLn7m04wQz4f3p19;
-        Wed, 17 May 2023 16:58:12 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBn0LMjl2RkdWB+Jg--.10715S3;
-        Wed, 17 May 2023 16:58:13 +0800 (CST)
-Subject: Re: [PATCH V1] block: Fix null pointer dereference issue on struct
- io_cq
-To:     Pradeep P V K <quic_pragalla@quicinc.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230517084434.18932-1-quic_pragalla@quicinc.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <07b8b870-a464-25a9-c0a6-c123fad05ff5@huaweicloud.com>
-Date:   Wed, 17 May 2023 16:58:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 17 May 2023 05:05:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E3C4225
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 02:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684314269;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fnZcYD5YdV/j9w+Jg7dMu/BG2OatXrnf+id8ztkvyZ4=;
+        b=PnqVYCt60qX1N4lF928TDiJZJNu7xHbttNlM4cO67+jn1ir0fdgUiPPdtk5nVBajxhxv/K
+        +oAQPdQEmXKcgcjg2kLavmGCyUSvHVH0fmI3FcnG8XliZ19tYKFpwSWJWZLwuQhO+6vtvO
+        1+aDhCQ+6CJn2AuIFfkOg56T47WVfTY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-664-5mArMIwnO8Ox9o_6xSAfug-1; Wed, 17 May 2023 05:04:24 -0400
+X-MC-Unique: 5mArMIwnO8Ox9o_6xSAfug-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 019F0185A7A4;
+        Wed, 17 May 2023 09:04:24 +0000 (UTC)
+Received: from ovpn-8-19.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C2BC4078909;
+        Wed, 17 May 2023 09:02:57 +0000 (UTC)
+Date:   Wed, 17 May 2023 16:58:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+Subject: Re: [PATCH V2 2/2] blk-mq: make sure elevator callbacks aren't
+ called for passthrough request
+Message-ID: <ZGSXUTA5odBi2Jr0@ovpn-8-19.pek2.redhat.com>
+References: <20230515144601.52811-1-ming.lei@redhat.com>
+ <20230515144601.52811-3-ming.lei@redhat.com>
+ <c0c4fc86-29ff-5a70-1f32-dca9af4602d5@acm.org>
+ <ZGKUehOEnKThjFpR@kbusch-mbp>
+ <ZGLad5yYUDJBleBQ@ovpn-8-19.pek2.redhat.com>
+ <20230516062409.GB7325@lst.de>
+ <ZGNBKSaULn/gpsL0@ovpn-8-19.pek2.redhat.com>
+ <20230517072218.GB27026@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20230517084434.18932-1-quic_pragalla@quicinc.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBn0LMjl2RkdWB+Jg--.10715S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ar48Cr4rWrW7uw43KF1Utrb_yoW5JFykpr
-        4DXFZ0kr48JryIvanrtayv9F18X3WqgF17C393G3yfGr9xZr9xtF4DCr1aqF90qrs7CrWj
-        gayrG390kr1DC3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UE-erUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230517072218.GB27026@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Wed, May 17, 2023 at 09:22:18AM +0200, Christoph Hellwig wrote:
+> On Tue, May 16, 2023 at 04:39:05PM +0800, Ming Lei wrote:
+> > I can understand the point, but it may not be done by single flag,
+> 
+> Can you explain why?  Note that we also already have RQF_ELVPRIV for
+> any request that has elevator private data.  I don't really think we
+> need a third flag.
 
-ÔÚ 2023/05/17 16:44, Pradeep P V K Ð´µÀ:
-> There is a potential race between ioc_clear_fn() and
-> exit_io_context() as shown below, due to which below
-> crash is observed. It can also result into use-after-free
-> issue.
-> 
-> context#1:                           context#2:
-> ioc_release_fn()                     do_exit();
-> ->spin_lock(&ioc->lock);             ->exit_io_context();
-> ->ioc_destroy_icq(icq);              ->ioc_exit_icqs();
->   ->list_del_init(&icq->q_node);       ->spin_lock_irq(&ioc->lock);
->   ->call_rcu(&icq->__rcu_head,
->       icq_free_icq_rcu);
-> ->spin_unlock(&ioc->lock);
->                                        ->ioc_exit_icq(); gets the same icq
-I don't understand how is this possible, the list is protected by
-'ioc->lock', both hlist_del_init and hlist_for_each_entry are called
-inside the lock.
+RQF_ELVPRIV isn't same with RQF_ELV, and follows the two's relationship:
 
-Thanks,
-Kuai
-> 				       ->bfq_exit_icq();
->                                    This results into below crash as bic
-> 				  is NULL as it is derived from icq.
-> 				  There is a chance that icq could be
-> 				  free'd as well.
-> 
-> [33.245722][ T8666] Unable to handle kernel NULL pointer dereference
-> at virtual address 0000000000000018.
-> ...
-> Call trace:
-> [33.325782][ T8666]  bfq_exit_icq+0x28/0xa8
-> [33.325785][ T8666]  exit_io_context+0xcc/0x100
-> [33.325786][ T8666]  do_exit+0x764/0xa58
-> [33.325791][ T8666]  do_group_exit+0x0/0xa0
-> [33.325793][ T8666]  invoke_syscall+0x48/0x114
-> [33.325802][ T8666]  el0_svc_common+0xcc/0x118
-> [33.325805][ T8666]  do_el0_svc+0x34/0xd0
-> [33.325807][ T8666]  el0_svc+0x38/0xd0
-> [33.325812][ T8666]  el0t_64_sync_handler+0x8c/0xfc
-> [33.325813][ T8666]  el0t_64_sync+0x1a0/0x1a4
-> 
-> Fix this by checking with ICQ_DESTROYED flags in ioc_exit_icqs().
-> Also, ensure ioc_exit_icq() is accessing icq within rcu_read_lock/unlock
-> so that icq doesn't get free'd up while it is still using it.
-> 
-> Signed-off-by: Pradeep P V K <quic_pragalla@quicinc.com>
-> ---
->   block/blk-ioc.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index 63fc02042408..1aa34fd46ac8 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -60,10 +60,14 @@ static void ioc_exit_icqs(struct io_context *ioc)
->   {
->   	struct io_cq *icq;
->   
-> +	rcu_read_lock();
->   	spin_lock_irq(&ioc->lock);
-> -	hlist_for_each_entry(icq, &ioc->icq_list, ioc_node)
-> -		ioc_exit_icq(icq);
-> +	hlist_for_each_entry(icq, &ioc->icq_list, ioc_node) {
-> +		if (!(icq->flags & ICQ_DESTROYED))
-> +			ioc_exit_icq(icq);
-> +	}
->   	spin_unlock_irq(&ioc->lock);
-> +	rcu_read_unlock();
->   }
->   
->   /*
-> 
+	RQF_ELVPRIV == (RQF_ELV && non_flush_pt_req && !e->type->ops.prepare_request)
+
+RQF_ELVPRIV can be replaced with the above expression to save one flag.
+
+RQF_ELV isn't same with RQF_SCHED_TAGS too, RQF_ELV should be used for
+checking if elevator callback is needed, and RQF_SCHED_TAGS is for allocating
+req/tag and dealing with tags busy things.
+
+In case of q->elevator, RQF_SCHED_TAGS is always set, but
+
+- for pt/flush request, RQF_ELV is cleared.
+- for other request, RQF_ELV are set
+
+Then we can avoid any elevator callback for pt/flush request.
+
+
+thanks, 
+Ming
 
