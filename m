@@ -2,92 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76027C77B75
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 11:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C63AFC7EE2A
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 12:06:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230451AbjEQLaZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 07:30:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47676 "EHLO
+        id S231234AbjEQMGl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 08:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231208AbjEQLaY (ORCPT
+        with ESMTP id S230093AbjEQMGN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 07:30:24 -0400
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7B44205;
-        Wed, 17 May 2023 04:30:12 -0700 (PDT)
-From:   =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-        s=mail; t=1684323010;
-        bh=tX5B9YR0enKjdo8Rk63Z+5SJMwlE6xq8HQ4kgSM4ylU=;
-        h=From:Date:Subject:To:Cc:From;
-        b=hJwrVwFQukiU4UMcCJrA5lzxgA8pOX1JdgG5wrs409bquq+cCFhPJaPpOvhUTKiQ6
-         gAmlRrXeNYLhk4wqqunpw/JNawwyVx+jcl/Yr4AVbIxITF+R7cH4NEwCBko8caCqns
-         db6bMl9bj0XldY4OxYVYl+8dWzQMV/35+rpLtAZE=
-Date:   Wed, 17 May 2023 13:30:05 +0200
-Subject: [PATCH v2] nbd: automatically load module on genl access
+        Wed, 17 May 2023 08:06:13 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C27883D2;
+        Wed, 17 May 2023 05:03:29 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 963E168C4E; Wed, 17 May 2023 14:02:59 +0200 (CEST)
+Date:   Wed, 17 May 2023 14:02:59 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 5/9] block: introduce holder ops
+Message-ID: <20230517120259.GA16915@lst.de>
+References: <20230505175132.2236632-1-hch@lst.de> <20230505175132.2236632-6-hch@lst.de> <20230516-kommode-weizen-4c410968c1f6@brauner> <20230517073031.GF27026@lst.de> <20230517-einreden-dermatologisch-9c6a3327a689@brauner> <20230517080613.GA31383@lst.de> <20230517-erhoffen-degradieren-d0aa039f0e1d@brauner>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20230223-b4-nbd-genl-v2-1-64585d9ce4b9@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIALy6ZGQC/zWNQQrCMBBFr1KydkoyqTW48h7iIkmnTSBOJWm1U
- Hp3g+DyfXjv76JQjlTEtdlFpncsceYKeGqED5YngjhUFihRS0QNrgN2A0zECbS9dN722vSmF9V
- wthC4bNmH6vCaUh1fmca4/S7uj8pjnp+whEz2H0allJRn7LRpURkDClLkdbt9KJZSfFhDy7SI4
- /gC2AiDba8AAAA=
-To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, Wouter Verhelst <w@uter.be>,
-        "Richard W.M. Jones" <rjones@redhat.com>,
-        Josh Triplett <josh@joshtriplett.org>,
-        =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1684323007; l=1278;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=tX5B9YR0enKjdo8Rk63Z+5SJMwlE6xq8HQ4kgSM4ylU=;
- b=RTZfwn/ytq5xcFdHDR6ZfgqLHr4gAH0UxLUokOjS5rbCOF9JIRK0Cd8dGjOiYbvJOZYg2yayr
- kkMaoHJCcGmBEw2CS2M5jS/gbBTUajZjw3sB464zeEyofqm7L9U3Cjv
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230517-erhoffen-degradieren-d0aa039f0e1d@brauner>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of forcing the user to manually load the module do it
-automatically.
+On Wed, May 17, 2023 at 10:42:01AM +0200, Christian Brauner wrote:
+> So with an O_PATH fd the device wouldn't really be opened at all we'd
+> just hold a reference to a struct file with f->f_op set to empty_fops.
+> (See the FMODE_PATH code in fs/open.c:do_dentry_open().)
+>
+> So blkdev_open() is never called for O_PATH fds. Consequently an O_PATH
+> fd to a block device would only be useful if the intention is to later
+> lookup the block device based on inode->i_rdev.
 
-For example this avoids the following error when using nbd-client:
+Yes.  That's pretty much the definition of O_PATH..
 
-$ nbd-client localhost 10809 /dev/nbd0
-...
-Error: Couldn't resolve the nbd netlink family, make sure the nbd module is loaded and your nbd driver supports the netlink interface.
+> So my earlier question should have been why there's no method to lookup
+> a block device purely by non-O_PATH fd since that way you do actually
+> pin the block device which is probably what you almost always want to do.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
-Changes in v2:
-- Expand Cc list to get some reviews
-- Add concrete commit example to commit message
-- Link to v1: https://lore.kernel.org/lkml/20221110052438.2188-1-linux@weissschuh.net/
----
- drivers/block/nbd.c | 1 +
- 1 file changed, 1 insertion(+)
+Why would we want to pin it?  That just means the device is open and
+you're have a non-O_PATH mount.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 65ecde3e2a5b..8632dbacd2ef 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2335,6 +2335,7 @@ static struct genl_family nbd_genl_family __ro_after_init = {
- 	.mcgrps		= nbd_mcast_grps,
- 	.n_mcgrps	= ARRAY_SIZE(nbd_mcast_grps),
- };
-+MODULE_ALIAS_GENL_FAMILY(NBD_GENL_FAMILY_NAME);
- 
- static int populate_nbd_status(struct nbd_device *nbd, struct sk_buff *reply)
- {
+> I'm asking because it would be nice if we could allow callers to specify
+> the source of a filesystem mount as an fd and not just as a string as
+> the mount api currently does. That's probably not super straightforward
+> but might be really worth it.
 
----
-base-commit: f1fcbaa18b28dec10281551dfe6ed3a3ed80e3d6
-change-id: 20230223-b4-nbd-genl-3a74ca638686
-
-Best regards,
--- 
-Thomas Weißschuh <linux@weissschuh.net>
-
+What you seem to want is a way to convert an O_PATH fs into a non-O_PATH
+one.  Which seems generally useful, but isn't really anything block
+device specific.
