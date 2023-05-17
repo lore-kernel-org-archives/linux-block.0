@@ -2,81 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36BFAC77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 17:13:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32612C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 17:45:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229449AbjEQRNp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 13:13:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56516 "EHLO
+        id S229445AbjEQRpa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 13:45:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbjEQRNp (ORCPT
+        with ESMTP id S229473AbjEQRp2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 13:13:45 -0400
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51C9C26B6
-        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 10:13:44 -0700 (PDT)
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1aaebed5bd6so8491305ad.1
-        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 10:13:44 -0700 (PDT)
+        Wed, 17 May 2023 13:45:28 -0400
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2BBFD2E8
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 10:44:55 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6439f186366so778982b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 10:44:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684343624; x=1686935624;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VGmTcj4ykc79Twt9vli6YhP3YckglO6BZN5orHIct+s=;
-        b=ibsFjH8WhmuweqQbEAO/kkCaNVMVuRjsOD9KGfkBXVEi4d36sRrtqeLKI0RbGMD1/n
-         rahn6skJccRw+3zPw10R84x4tSyeO4Oa/+1Xr0xkMeRO9yo4U8EOXmv0TK/dM7bobtj4
-         CdK6fCEKvyIA+7ROGuHGM7IMMM6+oBX3x0GtP+Z+53wRFanM9+orR/5corK14gPr89Gs
-         NN4msiUbjROAXdRc6md4s/vK5aHZAxLusIevooI3kIgXccIXzylI3PqFqpzKYsXAl4ze
-         x/u6+f+Xox+PMJuT2gMrx5dFGiCEfkQmcn78VtqU3SStK5vLZ824OQ0JawVSxCe7jRfJ
-         wHEw==
-X-Gm-Message-State: AC+VfDw6jeSXlA9PlFyC20+oJfi+lb5JJmrf6LMyxINSYL9QtZHjrD5x
-        YTC+dnqv+G+sqKKeQMZBm58=
-X-Google-Smtp-Source: ACHHUZ7iUBhvaPvx/LOwWqrn2qqpMBiR5YJJ+B9SBRrCrP/cphrzsubcD4znzQtkmnfkTeQ+jF0Tkw==
-X-Received: by 2002:a17:902:c115:b0:1a0:4ebd:15d5 with SMTP id 21-20020a170902c11500b001a04ebd15d5mr42182391pli.67.1684343623660;
-        Wed, 17 May 2023 10:13:43 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id k2-20020a170902c40200b001ae365072ccsm3777007plk.122.2023.05.17.10.13.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 May 2023 10:13:43 -0700 (PDT)
-Message-ID: <ebc44c14-eea8-7ef9-d28d-9002e4caf5ca@acm.org>
-Date:   Wed, 17 May 2023 10:13:42 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v5 11/11] block: mq-deadline: Fix handling of at-head
- zoned writes
-Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230516223323.1383342-1-bvanassche@acm.org>
- <20230516223323.1383342-12-bvanassche@acm.org>
- <4a037c7b-ba78-0db1-936b-85e112df00fa@suse.de>
+        d=1e100.net; s=20221208; t=1684345469; x=1686937469;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4RtwH1xCJoRLi015w+Kr7vT1skML2DMyjxgN46fU0mQ=;
+        b=F97hiJ56rEGLgpL6/NYhL5T3+wlWI+6q3frxmZByi7xTAI+08c6W1AbzoMbbhP7VhB
+         eYyvJ/rd9973k1Le4VvFApzpwP+hSF3GiKeCDOYfP0A1+0wo7C28bfeKTuG27Pj9gBMy
+         O0NR+emueM/KCmhAPcabr2m+huQ+KgarBLMxBrwm8u7dFUHbGrba3YkN/pmzTettiHo2
+         GWbzBz/hNkHeZYF3v7S373Xy32hRlbJPVU+h1dFogrplaywzTap7cfjiLRVPUhcDGNVX
+         CbQ5cQrym0Xv5UpbjZv5QN5E750qsUQ0OAlVytOF/aTU7PFngrAz0i8UGvh/51XSHk5A
+         RdeQ==
+X-Gm-Message-State: AC+VfDx5jKU7gzavioXYmvir+r32B1rASJfICfiSRv0FwkDvlBDGRU3R
+        Rg3iALCooIn5ogOMyWpc40Q=
+X-Google-Smtp-Source: ACHHUZ5rpvt5ocwKUiV43HlUzWBT91AuVukWndkVVBzSKNBfVOvkyP480g3K6udkGBVw65LQbxLnuQ==
+X-Received: by 2002:a05:6a00:992:b0:643:440b:1af5 with SMTP id u18-20020a056a00099200b00643440b1af5mr699413pfg.16.1684345469281;
+        Wed, 17 May 2023 10:44:29 -0700 (PDT)
+Received: from bvanassche-glaptop2.roam.corp.google.com ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id d22-20020aa78e56000000b00646e7d2b5a7sm15334410pfr.112.2023.05.17.10.42.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 May 2023 10:44:27 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <4a037c7b-ba78-0db1-936b-85e112df00fa@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v6 00/11] mq-deadline: Improve support for zoned block devices
+Date:   Wed, 17 May 2023 10:42:18 -0700
+Message-ID: <20230517174230.897144-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/23 00:47, Hannes Reinecke wrote:
-> Similar concern here; we'll have to traverse the entire tree here.
-> But if that's of no concern...
+Hi Jens,
 
-Hi Hannes,
+This patch series improves support for zoned block devices in the mq-deadline
+scheduler by preserving the order of requeued writes (REQ_OP_WRITE and
+REQ_OP_WRITE_ZEROES).
 
-If I measure IOPS for a null_blk device instance then I see the 
-following performance results for a single CPU core:
-* No I/O scheduler:                       690 K IOPS.
-* mq-deadline, without this patch series: 147 K IOPS.
-* mq-deadline, with this patch series:    146 K IOPS.
-
-In other words, the performance impact of this patch series on the 
-mq-deadline scheduler is small.
+Please consider this patch series for the next merge window.
 
 Thanks,
 
 Bart.
+
+Changes compared to v5:
+- Added a patch with a grammar fix for a source code comment.
+- Renamed op_is_zoned_write() into op_needs_zoned_write_locking().
+- Dropped patch "block: mq-deadline: Improve deadline_skip_seq_writes()".
+
+Changes compared to v4:
+- Changed blk_rq_is_seq_zoned_write() into an inline function.
+- Reworked patch "Reduce lock contention" such that all merged requests are
+  freed at once.
+
+Changes compared to v3:
+- Addressed Christoph's review feedback.
+- Dropped patch "block: Micro-optimize blk_req_needs_zone_write_lock()".
+- Added three new patches:
+  * block: Fix the type of the second bdev_op_is_zoned_write() argument
+  * block: Introduce op_is_zoned_write()
+  * block: mq-deadline: Reduce lock contention
+
+Changes compared to v2:
+- In the patch that micro-optimizes blk_req_needs_zone_write_lock(), inline
+  bdev_op_is_zoned_write() instead of modifying it.
+- In patch "block: Introduce blk_rq_is_seq_zoned_write()", converted "case
+  REQ_OP_ZONE_APPEND" into a source code comment.
+- Reworked deadline_skip_seq_writes() as suggested by Christoph.
+- Dropped the patch that disabled head insertion for zoned writes.
+- Dropped patch "mq-deadline: Fix a race condition related to zoned writes".
+- Reworked handling of requeued requests: the 'next_rq' pointer has been
+  removed and instead the position of the most recently dispatched request is
+  tracked.
+- Dropped the patches for tracking zone capacity and for restricting the number
+  of active zones.
+
+Changes compared to v1:
+- Left out the patches related to request insertion and requeuing since
+  Christoph is busy with reworking these patches.
+- Added a patch for enforcing the active zone limit.
+
+Bart Van Assche (11):
+  block: mq-deadline: Add a word in a source code comment
+  block: Simplify blk_req_needs_zone_write_lock()
+  block: Fix the type of the second bdev_op_is_zoned_write() argument
+  block: Introduce op_needs_zoned_write_locking()
+  block: Introduce blk_rq_is_seq_zoned_write()
+  block: mq-deadline: Clean up deadline_check_fifo()
+  block: mq-deadline: Simplify deadline_skip_seq_writes()
+  block: mq-deadline: Reduce lock contention
+  block: mq-deadline: Track the dispatch position
+  block: mq-deadline: Handle requeued requests correctly
+  block: mq-deadline: Fix handling of at-head zoned writes
+
+ block/blk-zoned.c      |   8 +--
+ block/mq-deadline.c    | 125 +++++++++++++++++++++++++++--------------
+ include/linux/blk-mq.h |  17 ++++++
+ include/linux/blkdev.h |  13 +++--
+ 4 files changed, 110 insertions(+), 53 deletions(-)
+
