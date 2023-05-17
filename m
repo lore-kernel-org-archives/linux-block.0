@@ -2,137 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FD9C77B7F
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 07:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 993A4C77B7A
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 07:54:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230211AbjEQHtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 03:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46070 "EHLO
+        id S230189AbjEQHyF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 03:54:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbjEQHte (ORCPT
+        with ESMTP id S230301AbjEQHyD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 03:49:34 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5302D5591;
-        Wed, 17 May 2023 00:49:21 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QLlcD4YTxz4f3jpp;
-        Wed, 17 May 2023 15:49:16 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgD31QP7hmRkFY5qIw--.45129S3;
-        Wed, 17 May 2023 15:49:17 +0800 (CST)
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        stanley.chu@mediatek.com, peter.wang@mediatek.com,
-        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
-        powen.kao@mediatek.com, naomi.chu@mediatek.com,
-        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <ZF0K7A6G2cYBjSgn@infradead.org>
- <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
- <ZF5G5ztMng8Xbd1W@infradead.org>
- <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
- <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
- <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
-Date:   Wed, 17 May 2023 15:49:15 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 17 May 2023 03:54:03 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2DE93C0A
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 00:53:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4027F637A7
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 07:53:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E13E1C433EF;
+        Wed, 17 May 2023 07:53:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684310034;
+        bh=Atqjt76rgKkc3XUpurss4xCb5z8JjwKRufe8I/s1McM=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=EdHNhHgIMFNW46xMtd/ied8akmiu9lT1bXvM4HIo9lnaYz5J3WP8XW3HciV7UMVNd
+         4W4XMOO23YQ99Nx/1hE20JJK80S0oSQpZUSSJggX8NXvlT6btYcchXGnKou6oKJYFp
+         rhk1dA7bYAwBDhX+GctsiFTVvvLNfi4+oRpRftlrBiZcllH0g3EH8YOSp0qzrsnZs7
+         pJeLUSUVAoikmd1U/Eebqst5krawdwnWZHePtwnfI1N+hW4HcSSGiRax6oXLgy0lSq
+         wu+JZQKfKYHcHOtSmUcmLdALT91WfomNFoPbhqlQKVKohdFhZGTtgv8DFmSrg1lVjx
+         tvqmTIorQlS8Q==
+Message-ID: <70b2d482-6259-0d69-e7c2-8a70f2d3e534@kernel.org>
+Date:   Wed, 17 May 2023 16:53:52 +0900
 MIME-Version: 1.0
-In-Reply-To: <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgD31QP7hmRkFY5qIw--.45129S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFyrWw17AF4rZw48Zr4ktFb_yoW5JFW7pF
-        Z3tF45Cw4kJ34jka1kZr4IgF1rt393JFWUJrnxAry0k398Ars7Zr17G3yY9FyrAw4kCF1j
-        yrWFqrykXFy8ZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbQVy7UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v5 11/11] block: mq-deadline: Fix handling of at-head
+ zoned writes
+To:     Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+References: <20230516223323.1383342-1-bvanassche@acm.org>
+ <20230516223323.1383342-12-bvanassche@acm.org>
+ <4a037c7b-ba78-0db1-936b-85e112df00fa@suse.de>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <4a037c7b-ba78-0db1-936b-85e112df00fa@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-在 2023/05/16 23:12, Bart Van Assche 写道:
-> On 5/12/23 20:09, Yu Kuai wrote:
->> 在 2023/05/13 2:12, Bart Van Assche 写道:
->>> The fair tag sharing algorithm has a negative impact on all SCSI 
->>> devices with multiple logical units. This is because logical units 
->>> are considered active until (request timeout) seconds have elapsed 
->>> after the logical unit stopped being used (see also the 
->>> blk_mq_tag_idle() call in blk_mq_timeout_work()). UFS users are hit 
->>> by this because UFS 3.0 devices have a limited queue depth (32) and 
->>> because power management commands are submitted to a logical unit 
->>> (WLUN). Hence, it happens often that the block layer "active queue" 
->>> counter is equal to 2 while only one logical unit is being used 
->>> actively (a logical unit backed by NAND flash). The performance 
->>> difference between queue depths 16 and 32 for UFS devices is 
->>> significant.
+On 5/17/23 16:47, Hannes Reinecke wrote:
+> On 5/17/23 00:33, Bart Van Assche wrote:
+>> Before dispatching a zoned write from the FIFO list, check whether there
+>> are any zoned writes in the RB-tree with a lower LBA for the same zone.
+>> This patch ensures that zoned writes happen in order even if at_head is
+>> set for some writes for a zone and not for others.
 >>
->> We meet similiar problem before, but I think remove tag fair sharing
->> might cause some problems, because get tag is not fair currently, for
->> example 2 devices share 32 tag, while device a issue large amount of
->> io concurrently, and device b only issue one io, in this case, if fair
->> tag sharing is removed, device b can get bad io latency.
+>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+>> Cc: Ming Lei <ming.lei@redhat.com>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>> ---
+>>   block/mq-deadline.c | 9 +++++++--
+>>   1 file changed, 7 insertions(+), 2 deletions(-)
 >>
->> By the way, I tried to propose a way to workaround this by following:
->>
->> 1) disable fair tag sharing untill get tag found no tag is avaiable;
->> 2) enable fair tag sharing again if the disk donesn't faild to get tag
->> for a period of time;
->>
->> Can this approch be considered?
+>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+>> index 059727fa4b98..67989f8d29a5 100644
+>> --- a/block/mq-deadline.c
+>> +++ b/block/mq-deadline.c
+>> @@ -346,7 +346,7 @@ static struct request *
+>>   deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>>   		      enum dd_data_dir data_dir)
+>>   {
+>> -	struct request *rq;
+>> +	struct request *rq, *rb_rq, *next;
+>>   	unsigned long flags;
+>>   
+>>   	if (list_empty(&per_prio->fifo_list[data_dir]))
+>> @@ -364,7 +364,12 @@ deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>>   	 * zones and these zones are unlocked.
+>>   	 */
+>>   	spin_lock_irqsave(&dd->zone_lock, flags);
+>> -	list_for_each_entry(rq, &per_prio->fifo_list[DD_WRITE], queuelist) {
+>> +	list_for_each_entry_safe(rq, next, &per_prio->fifo_list[DD_WRITE],
+>> +				 queuelist) {
+>> +		/* Check whether a prior request exists for the same zone. */
+>> +		rb_rq = deadline_from_pos(per_prio, data_dir, blk_rq_pos(rq));
+>> +		if (rb_rq && blk_rq_pos(rb_rq) < blk_rq_pos(rq))
+>> +			rq = rb_rq;
+>>   		if (blk_req_can_dispatch_to_zone(rq) &&
+>>   		    (blk_queue_nonrot(rq->q) ||
+>>   		     !deadline_is_seq_write(dd, rq)))
 > 
-> I'm afraid that this approach won't help for the UFS driver since it is 
-> likely that all tags are in use by a single logical unit during an IOPS 
-> test. Hence, fair sharing would be enabled even when we don't want it to 
-> be enabled.
+> Similar concern here; we'll have to traverse the entire tree here.
+> But if that's of no concern...
 
-It's right my original method is not flexible.
+Should be fine for HDDs. Not so sure about much faster UFS devices.
+And for NVMe ZNS, using a scheduler in itself already halve the max perf you can
+get...
 
 > 
-> I propose that we switch to one of these two approaches:
+> Cheers,
+> 
+> Hannes
 
-How about a smoothing method that the device with more io will share
-more tag, and each device will get at least one tag?
-
-Thanks,
-Kuai
-
-> * Either remove the fair tag sharing code entirely and rely on the 
-> fairness mechanism provided by the sbitmap code. I'm referring to how 
-> __sbitmap_queue_wake_up() uses the wake_index member variable.
-> * Or make the behavior of the fairness algorithm configurable from user 
-> space. One possible approach is to make the proportion of tags for a 
-> logical unit / NVMe namespace configurable via sysfs. This will allow to 
-> reduce the number of tags for the WLUN of UFS devices.
-> 
-> Thanks,
-> 
-> Bart.
-> 
-> 
-> .
-> 
+-- 
+Damien Le Moal
+Western Digital Research
 
