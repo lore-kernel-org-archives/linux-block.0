@@ -2,103 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55AFCC7EE23
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 20:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1727C77B75
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 22:05:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229566AbjEQUQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 16:16:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49102 "EHLO
+        id S229772AbjEQWFm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 18:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbjEQUQc (ORCPT
+        with ESMTP id S229850AbjEQWFj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 16:16:32 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 743C62D55;
-        Wed, 17 May 2023 13:16:31 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-3063433fa66so805269f8f.3;
-        Wed, 17 May 2023 13:16:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684354590; x=1686946590;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c86qGK32nsVnfDBPzlK095zL52GuJJiCp8X2BQjYCGc=;
-        b=oqWa+B8kyAPsW4QlrTWMBcnQ6qkKfyZxb5J3HvGcGebHHd+vNY2EihBHc4ILA6LgDu
-         0ArlwQwQLtzk0wpNADCyH+akhsJqxocIQ0Agr6IgmSGMql2O9O6/gbK2eRqs2hIDy+Nr
-         NXHS8rM1Z4TUlhIPw4456fbpBwDnjjak0XYrlwioSBnQmL6/i2/ECjf/Imqfa+mbRkDD
-         Wa2518d6D5x885Dy3INmBmHpi4pUmwjxIOrU0XAO+alj4JNf/kEUROiFadVsaJQo1Y7a
-         NRs5Sf0Zao8aNFwS21uCHcSWYVNVpvhGwuR6zzjzCdDNlUhot9fz+0ij3fxJ4/2ZszJp
-         9vkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684354590; x=1686946590;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c86qGK32nsVnfDBPzlK095zL52GuJJiCp8X2BQjYCGc=;
-        b=hw/UN6XRyWdpNq1F9dXZeq8UG5BrwZkhiLsfwYj6MOstEOog20jx0NtHtOSNbQpMLd
-         Bq4EyljpzljDdWkZXaPjXGoA1ED+LTZdPg/PjY/XP+p/mH34b/VWr9AUieJbppvvol/3
-         o6BQe93geS758UcDzBqrLzA7k+FLyR6ratr8UcZsW7FofyiTO/9SMgJ5AdS16x91g1aY
-         c8gD3OPFWjgG7SR1gKdLPI+Qzb/4MwYm/WZbQFKnZjstxg/IRiUREG631EYm1FDDx0rr
-         8pT0qW+d4L9CzdlFW2qAVQO27xJzn5py1RhC01mKPIQPTJOuzIWkU5xO58GxvudzCp8U
-         xvUA==
-X-Gm-Message-State: AC+VfDybyzHeU8K8bpjwxvKsTqGLkyaRPAV30B5oJuOfUXdME4uP4W+n
-        Ur6TYW/KE4BMDTOQVHENS58=
-X-Google-Smtp-Source: ACHHUZ4KIAlW/zpvww/YX9ZRyQer1/jw0BjA72Duf6MXqTA5icpc5wNDFZ2Dj7eyKkkedJ9UQ0itRA==
-X-Received: by 2002:adf:db4e:0:b0:309:4123:4968 with SMTP id f14-20020adfdb4e000000b0030941234968mr1415027wrj.13.1684354589699;
-        Wed, 17 May 2023 13:16:29 -0700 (PDT)
-Received: from [192.168.8.100] ([85.255.236.195])
-        by smtp.gmail.com with ESMTPSA id h14-20020adffd4e000000b00304aba2cfcbsm3762683wrs.7.2023.05.17.13.16.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 May 2023 13:16:29 -0700 (PDT)
-Message-ID: <b28c60cb-a923-967c-887a-71a6590363f1@gmail.com>
-Date:   Wed, 17 May 2023 21:11:55 +0100
+        Wed, 17 May 2023 18:05:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D886E9A
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 15:05:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8992E64B37
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 22:05:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06AF9C433EF;
+        Wed, 17 May 2023 22:05:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684361121;
+        bh=9Tz/h0QZnnXwCqZCf+i+PnwV6YBTeZ0KAIp3cAmrN+s=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=US2gex97FVzFYFeIJ4DH/PRxgo7laem/GIdcCqv5Xm5o3pqEjNLFHLwxqiE1qeZiB
+         XD+YV/DhpT0KCsEUKy+15jfoFwgrfCf39v5ulVzHguWh/UbxscN/7zNSm+h/Ns2O7v
+         ugbfzXiBLeSKaUua9cNgpwBjV2R7n4FcRaZTMJR2/o07/A1ZfTIno+qGiUQwwOa9Yk
+         5R4d2j97XYuyMt3lYPyqQbUx/3NDrKG3PWarYv+WfgLgoiq6jhWx17v5m4jaGE6wHW
+         +nseU0mIVs61mQXWftLfJuouE/ULjylMmljw93tmG2QLm6aLVInX0GuPniDDU3FsaM
+         V9+EDom4qonBQ==
+Message-ID: <b2b0e324-f5f5-0227-1274-ed58e871ce0f@kernel.org>
+Date:   Thu, 18 May 2023 07:05:19 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH for-next 2/2] nvme: optimise io_uring passthrough
- completion
+Subject: Re: [PATCH v5 10/11] block: mq-deadline: Handle requeued requests
+ correctly
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+References: <20230516223323.1383342-1-bvanassche@acm.org>
+ <20230516223323.1383342-11-bvanassche@acm.org>
+ <bdaa4854-7320-f5ec-ff13-489516149c2a@kernel.org>
+ <734963d6-48aa-ffa0-91e7-34a5fb576a7e@acm.org>
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, axboe@kernel.dk, kbusch@kernel.org,
-        sagi@grimberg.me, joshi.k@samsung.com
-References: <cover.1684154817.git.asml.silence@gmail.com>
- <ecdfacd0967a22d88b7779e2efd09e040825d0f8.1684154817.git.asml.silence@gmail.com>
- <20230517072314.GC27026@lst.de>
- <9367cc09-c8b4-a56c-a61a-d2c776c05a1c@gmail.com>
- <20230517123921.GA19835@lst.de>
- <61787b53-3c16-8cdb-eaad-6c724315435b@gmail.com>
- <20230517135344.GA26147@lst.de>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20230517135344.GA26147@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <734963d6-48aa-ffa0-91e7-34a5fb576a7e@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/23 14:53, Christoph Hellwig wrote:
-> On Wed, May 17, 2023 at 02:30:47PM +0100, Pavel Begunkov wrote:
->> Aside that you decided to ignore the third point, that's a
->> generic interface, not nvme specific, there are patches for
->> net cmds, someone even tried to use it for drm. How do you
->> think new users are supposed to appear if the only helper
->> doing the job can hang the userspace for their use case?
->> Well, then maybe it'll remain nvme/ublk specific with such
->> an approach.
+On 5/18/23 01:28, Bart Van Assche wrote:
+> On 5/16/23 18:22, Damien Le Moal wrote:
+>> On 5/17/23 07:33, Bart Van Assche wrote:
+>>> -/* Return the first request for which blk_rq_pos() >= pos. */
+>>> +/*
+>>> + * Return the first request for which blk_rq_pos() >= @pos. For zoned devices,
+>>> + * return the first request after the highest zone start <= @pos.
+>>
+>> This comment is strange. What about:
+>>
+>> For zoned devices, return the first request after the start of the zone
+>> containing @pos.
 > 
-> New users can add new code when it's actualy needed.  We don't
-> bloat the kernel for maybe in the future crap as a policy.
+> I will make this change.
+> 
+>>> @@ -818,7 +835,20 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>>>   		 * set expire time and add to fifo list
+>>>   		 */
+>>>   		rq->fifo_time = jiffies + dd->fifo_expire[data_dir];
+>>> -		list_add_tail(&rq->queuelist, &per_prio->fifo_list[data_dir]);
+>>> +		insert_before = &per_prio->fifo_list[data_dir];
+>>> +#ifdef CONFIG_BLK_DEV_ZONED
+>>> +		/*
+>>> +		 * Insert zoned writes such that requests are sorted by
+>>> +		 * position per zone.
+>>> +		 */
+>>> +		if (blk_rq_is_seq_zoned_write(rq)) {
+>>> +			struct request *rq2 = deadline_latter_request(rq);
+>>> +
+>>> +			if (rq2 && blk_rq_zone_no(rq2) == blk_rq_zone_no(rq))
+>>> +				insert_before = &rq2->queuelist;
+>>> +		}
+>>> +#endif
+>>> +		list_add_tail(&rq->queuelist, insert_before);
+>>
+>> Why not:
+>>
+>> 		insert_before = &per_prio->fifo_list[data_dir];
+>> 		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) 	
+>> 		    && blk_rq_is_seq_zoned_write(rq)) {
+>> 			/*
+>> 			 * Insert zoned writes such that requests are sorted by
+>> 			 * position per zone.
+>> 		 	*/
+>> 			struct request *rq2 = deadline_latter_request(rq);
+>>
+>> 			if (rq2 && blk_rq_zone_no(rq2) == blk_rq_zone_no(rq))
+>> 				insert_before = &rq2->queuelist;
+>> 		}
+>> 		list_add_tail(&rq->queuelist, insert_before);
+>>
+>> to avoid the ugly #ifdef ?
+> 
+> I think the above code won't build because no blk_rq_zone_no() 
+> definition is available if CONFIG_BLK_DEV_ZONED=n. I prefer it this way 
+> because my view is that using blk_rq_zone_no() if CONFIG_BLK_DEV_ZONED=n 
+> is wrong.
 
-Let me put it for you this way, it's an absolutely horrendous
-idea to leave the old innocently looking name, i.e.
-io_uring_cmd_complete_in_task(), and add there a bunch of
-restrictions no new user would care about, that's called
-shooting yourself in the leg.
+The compiler should drop the entire if block for CONFIG_BLK_DEV_ZONED=n case.
+Worth trying to check as the code is much nicer without the #ifdef.
+I will test this series today and check.
 
-So, we need to rename the function, which, again, for absolutely
-no reason adds dependency on ublk. Why doing that instead of
-waiting until ublk is converted? That's a big mystery.
+> 
+> Thanks,
+> 
+> Bart.
+> 
 
 -- 
-Pavel Begunkov
+Damien Le Moal
+Western Digital Research
+
