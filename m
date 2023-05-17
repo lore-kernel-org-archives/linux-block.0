@@ -2,55 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1019C77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 14:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3860AC77B7D
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 15:04:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbjEQO0Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 10:26:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50164 "EHLO
+        id S231389AbjEQPEL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 11:04:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231609AbjEQO0P (ORCPT
+        with ESMTP id S231450AbjEQPD5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 10:26:15 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 288B17A93;
-        Wed, 17 May 2023 07:26:13 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id E164168BEB; Wed, 17 May 2023 16:26:09 +0200 (CEST)
-Date:   Wed, 17 May 2023 16:26:09 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 5/9] block: introduce holder ops
-Message-ID: <20230517142609.GA28898@lst.de>
-References: <20230505175132.2236632-1-hch@lst.de> <20230505175132.2236632-6-hch@lst.de> <20230516-kommode-weizen-4c410968c1f6@brauner> <20230517073031.GF27026@lst.de> <20230517-einreden-dermatologisch-9c6a3327a689@brauner> <20230517080613.GA31383@lst.de> <20230517-erhoffen-degradieren-d0aa039f0e1d@brauner> <20230517120259.GA16915@lst.de> <20230517-holzfiguren-anbot-490e5a7f74fe@brauner>
+        Wed, 17 May 2023 11:03:57 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72FEFA5D1
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 08:03:37 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64388cf3263so621826b3a.3
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 08:03:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684335696; x=1686927696;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q71Ay2k2vTd9rtHHMbnW9Uc2a1BML8xqjdYGd16kh6w=;
+        b=lMVu9XGHE5MWAHlnjk73ljrYQEuTPSNlgnBagV/4VKJxndi1s1oFkfaOOjKQObmbyk
+         5N7fYXrrx8IObBufZE3KQUZBtepzE2rKazB1+pZ8WYAbBM1w0sDPTXXVhyumTjnNt8wk
+         dKzZXOTQqqqHedPef8+CIqX9MtBt4qfqz0GKeq9RFM7wW7FoFClh8Se5OPG8ZkEPWLy7
+         yQfOBP1fTag+MV5zlq/u8R2VC6+SlznsU45SbhbjESlDrGOpglBtWkfqtlYCREPHAutu
+         T6rGCDgBRWGHpTFNoJIpg/XN9+l6HeMLGr2vu/b493V4cHwE0v2AShMyQzv+bThzAMNC
+         KBqA==
+X-Gm-Message-State: AC+VfDxsjXsrciwNA+HypsqHTkMT5Fiycla53ky6XN8AUcXSdbjDW0Rc
+        KG2I4cMwJwFd4aDImo71tK8=
+X-Google-Smtp-Source: ACHHUZ4ZpbUmwZyXFRd6iEMPFT2XLnVg5DDTze5FJaefh9P8W0BaplCPUO8IbRZof3Rw4Bz7LWUoTQ==
+X-Received: by 2002:aa7:88d0:0:b0:646:663a:9d60 with SMTP id k16-20020aa788d0000000b00646663a9d60mr1644234pff.10.1684335696245;
+        Wed, 17 May 2023 08:01:36 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id h23-20020a632117000000b00528da88275bsm15498394pgh.47.2023.05.17.08.01.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 May 2023 08:01:35 -0700 (PDT)
+Message-ID: <44be286c-37ff-cda5-6aa1-b9e8ff3e194b@acm.org>
+Date:   Wed, 17 May 2023 08:01:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230517-holzfiguren-anbot-490e5a7f74fe@brauner>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v5 05/11] block: mq-deadline: Clean up
+ deadline_check_fifo()
+Content-Language: en-US
+To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+References: <20230516223323.1383342-1-bvanassche@acm.org>
+ <20230516223323.1383342-6-bvanassche@acm.org>
+ <c46b14b0-56e3-ace9-91f7-15434ae93c2e@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <c46b14b0-56e3-ace9-91f7-15434ae93c2e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 17, 2023 at 03:14:40PM +0200, Christian Brauner wrote:
-> > Why would we want to pin it?  That just means the device is open and
-> > you're have a non-O_PATH mount.
+On 5/16/23 18:02, Damien Le Moal wrote:
+> On 5/17/23 07:33, Bart Van Assche wrote:
+>> -	if (time_after_eq(jiffies, (unsigned long)rq->fifo_time))
+>> -		return 1;
+>> -
+>> -	return 0;
+>> +	return time_is_before_eq_jiffies((unsigned long)rq->fifo_time);
 > 
-> I think we're talking past each other. Both an O_PATH fd and a regular
-> fd would work. But its often desirable to pass a regular fd. If
-> userspace uses an O_PATH fd then the block device could be looked up
-> later during mounting via blkdev_open().
+> This looks wrong: isn't this reversing the return value ?
+> Shouldn't this be:
 > 
-> But when you use a regular fd blkdev_open() will be called and the
-> device resolved right at open time and we'll hold a reference to it.
+> 	return time_after_eq(jiffies, (unsigned long)rq->fifo_time));
 > 
-> So that way userspace can immediately know whether the device can be
-> opened/found. That's usually preferable. That's all I meant to say.
+> To return true if the first request in fifo list *expired* as indicated by the
+> function kdoc comment.
 
-I know what you mean.  But based on the concept of how O_PATH and
-block devices work it really doesn't make any sense to have a block
-device handle for an O_PATH fd, except for the actual fd itself.
+Hi Damien,
+
+ From include/linux/jiffies.h:
+
+#define time_is_before_eq_jiffies(a) time_after_eq(jiffies, a)
+
+Hence, time_is_before_eq_jiffies((unsigned long)rq->fifo_time) is 
+equivalent to time_after_eq(jiffies, (unsigned long)rq->fifo_time). Both 
+expressions check whether or not rq->fifo_time is in the past.
+
+Bart.
