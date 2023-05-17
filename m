@@ -2,152 +2,260 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225A1C77B7F
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 10:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF934C77B7F
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 10:38:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229836AbjEQKCy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 06:02:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37270 "EHLO
+        id S230162AbjEQKhI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 06:37:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbjEQKCx (ORCPT
+        with ESMTP id S230083AbjEQKhH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 06:02:53 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9084F2738
-        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 03:02:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1684317772; x=1715853772;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
-  b=mwTIrGB97+oVTWTPf0wHE5nB2zSEhu1al427AvcfANI1cXOOIkFeuvcC
-   eSIb622Rt0rmvCN2f/cfbU7x8c4a3C+VTmKzFkUtIgyt9zXKEko1xL6l7
-   p8kNc4bYbDtqPsNW8nf0ZD7qlFy2X7JQor1JHtpZmIpVJY7tQRkslOPZK
-   tPEUJJewl4CKueyh+X1NGRY3E4TN90fbi+fT2nhOMq+XT4QaXgXWB13H3
-   iokUiCRvI0zbag4Ab8nMgmuVEIwERbL/iMZJYs0QP7YDDZxaR3vdq7NtJ
-   uSLj+e9pO+YZBV6IfSdw0UBneeh4glcOOX2N8KLT3Tr85eNe8C9FXBQXa
-   A==;
-X-IronPort-AV: E=Sophos;i="5.99,281,1677513600"; 
-   d="scan'208";a="230910875"
-Received: from mail-dm6nam04lp2046.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.46])
-  by ob1.hgst.iphmx.com with ESMTP; 17 May 2023 18:02:51 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oCsmTWj5aQkL++OtVjaaixkpDyM1LN+t6kInK7kTimEuAAE4NpegLDalpjTsJeLVOeZeSjvLhWWu1PzvgqK0cuGC0HWY/7JgdayME/l+Uov4Bpp6iHGHbnyV/Eggqmw4OJOKav6P8Q8l3GVwQiGh+F4S83m7kVMNToBnInHPp0dS7lHbXNIkt1IOEu9xEpcogKkl5vHIO+/RerP+Ca5C9uFgO0VrM3zfwgRvZGjvwcxdrZS/AEQFVriewgyNHOUSVUWWgc00bw6OX3eIfAXT3IuYq6xJHHGOxYznlkwd1DKryZN+ScvRofLNfEQ3DFZn9RztyJ2TjGglIelo0hpIdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=J0hHBAhPbociE+kLQpjCYMKxLOnXv/lgQAgq6EOShPyPEiGHPGzy0hfHhpdnoakKs+0aFgMjQwp5/Zebwmhf34xB2CapZkYsyuzfPMLXAh+V89gScMfmsbEnrMofyGXKBGeUU3k9OpqaVMZHYQGexdkipiGI2sVyNvXDkke7uMqHjuHNlSvL/4tXygyQaqm6g+uhkWnCX1ZP/yCnupz5bL4EnE75l5KkbDcl1BeJbFauYAbI123AjuPS3jycN6ZXP8XgOQewIisL/CcITgodkv5ky1O+3YBoscv7pKLkjuH2nWvs6WLHToOoFq3k1Mdojit92eGMd/fNaIFO5R/rzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=joufdrNO2/FLdgGzlnaieoHfZ28FYCwNXGhrZ08f24E=;
- b=mlHbsWbWIn3CjSyvalT/ThfWB/skn7ZrpJ/oYRdsDfHOErSpRqbFFMBz0HntKwz478G5AVvii30sJVqmG+YxTqhdA63oznR6ePs4d4yRvm0ZI2Lm1SSF3MEHHBMPt9FT8duE/675Gz0VXo01zuFjn9DY/Afz5Y+dbF2ZLW7Us1w=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by BY5PR04MB6851.namprd04.prod.outlook.com (2603:10b6:a03:220::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.17; Wed, 17 May
- 2023 10:02:46 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::8c4d:6283:7b41:ed6f]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::8c4d:6283:7b41:ed6f%7]) with mapi id 15.20.6387.030; Wed, 17 May 2023
- 10:02:46 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH v5 04/11] block: Introduce blk_rq_is_seq_zoned_write()
-Thread-Topic: [PATCH v5 04/11] block: Introduce blk_rq_is_seq_zoned_write()
-Thread-Index: AQHZiEZ+RVuskXXAMEq9UXh/TgQAYq9ePOaA
-Date:   Wed, 17 May 2023 10:02:46 +0000
-Message-ID: <620bba4f-29ec-1d1f-7ea2-09d19f4297ab@wdc.com>
-References: <20230516223323.1383342-1-bvanassche@acm.org>
- <20230516223323.1383342-5-bvanassche@acm.org>
-In-Reply-To: <20230516223323.1383342-5-bvanassche@acm.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR04MB7416:EE_|BY5PR04MB6851:EE_
-x-ms-office365-filtering-correlation-id: 2517da36-2ca6-4b45-14d3-08db56bddd4e
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8rC0nS22c2qhDpErl4WqIdevzPPM5G7JmLXSDwGCImx4GbhfLndSB7ZW0bPM2TxoOj1/oT4TVmRjb4y5OkjJiiBGv1LL4pjZgvEUOgTQ58/WU3mugjFialY/sul17ZTy6W1Zx9t8/Ly/frDmg1I/eMmhHl6llF6jTO3lZV0Ry+DuVKvbCm5JJuBMPiPDGK/LrR6eab9KB6La5wQ1ItBJNpbn9XPSeWY68wOFAsL4dB6VJ0/AUEPITwfFLXWTHnZeg7xdIT4uUunBnTiaDV/OPe9Mpa4mie/tMKKRqrzdmaOk/3V0SJ2X0c7+9q7+bg5TLPHzyxUjnjv/UxDXM1VagPdgMRmKF4I88QhgGrlDA4IJqS8ynuK9vjfs9VDlq1r/w+DWK0/tI/ykf96LlJdLN+KcOJmmWX+55SZCbjgv6bcMuL69v5UXTmdq8O9N/DgT1jEHDScPnmsInQUXFLxXMK9hn2gWZWMDool4BeqoFMDx8jxsg75/nCE2VVkvkfoVPzwQZWUjHT/6gjHRDnR1IK/KeoVk6w350l6EUF2dFJ2pujitczTpiid90gEP+ZfgofGnvuMo1jRiUTRd9r7Wlb0e8HhuFBacBjA2PI/rrY9U8FpJe9VedLqcWU7nynmWB/+WRH65M+16ZhOQrNHbwIiY/A3pnQRh2+Gx0Uol0hJMjA75Tk+w8PAvM3pGAhNJ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(396003)(136003)(39860400002)(376002)(451199021)(31686004)(122000001)(82960400001)(558084003)(41300700001)(8676002)(2906002)(8936002)(36756003)(5660300002)(31696002)(86362001)(316002)(38070700005)(38100700002)(4326008)(66446008)(66476007)(66556008)(66946007)(64756008)(76116006)(91956017)(4270600006)(6512007)(6506007)(186003)(19618925003)(478600001)(2616005)(54906003)(6486002)(71200400001)(110136005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?K2JZQWFTcy9KTExSTS9KT2VHYUdsaUdxcEVTWEFvSU0wdlBGd2ZGNnJCaEZH?=
- =?utf-8?B?aGliYTl5Mkc0L25Ka2F1Z1RQbkV3b0YxbldQWVFyeUhOUG1IZ3FJU0dGODZk?=
- =?utf-8?B?b29KeUtkTVk2azZUR1lPWlFYVVBGRVY1TitVUWNyNHFBTHkwQ2J0Q3d6L3dZ?=
- =?utf-8?B?eTVYVnc2YnBHVDhBZXVLZW56N2x5L25hZUNQNE04bVdmK2NjeGFHejdnekxB?=
- =?utf-8?B?T2cxaEZUNkhwWE9PcjRWZFo1RFNTUi9VRHUwdUt6d2VkQVUwdHpGSldRZlgx?=
- =?utf-8?B?Kzl3RzVKMHRaNlRFeElNNVIyblNHYjd4blhkR1A3OHljWTZ4NWdtYzRuQzdX?=
- =?utf-8?B?VWgzbU9HOHRqREIyd1JuaFAxQzRmMDk5U3ZDWG14QW9qNktEVzhRQXI5Rkg5?=
- =?utf-8?B?SEhpVSsyeGxrL2tGVHFXZ01Jem45UHlSaUdWeW93dklSV3pRQSsrZFAwRlFw?=
- =?utf-8?B?OHVqckNDRmlRa0h4VU1aclhQTDFjNEg5ZkdNRW9tYTNsalhJNHJXUmxvaURG?=
- =?utf-8?B?K2R0QVZERTBGWXJGVWd4cDVNVnhkWHVNcEk0Y0FXRVcvNURCQVpLdzVWeHZO?=
- =?utf-8?B?RU4wd0ZjT2lzWC85clU4QVBuZGUzMENEYzkxMDZHbmRxelB6Q2IxSzc0dC9Z?=
- =?utf-8?B?RzlUR0kvSkppek1HVCtHZUZpd1ZUZncxTWtpUXFDbGpHN0c4VE9HNkI4UUkx?=
- =?utf-8?B?NDNqNXNpb1BOS093ZGpLV0xWdndqZjB3QWN3bTVFVFNENVhCdnZwbGdsbE5W?=
- =?utf-8?B?bGRrNS81aURtb20wcW05RE5vK1FhK20yS0M4L1NuM2JBWkRUa3Vrb0Z3U1hX?=
- =?utf-8?B?Q0RlU1FvMkozeTlFc0grQ2dDVGZEaVZLbndKVXlVM1hBWmZyam9GS2VDMDdM?=
- =?utf-8?B?TndSenJGUnViZHkwOXNJME15Qy8rN2RWV2Vpa0NhdWd3VFcxOTM5OCt6WVJK?=
- =?utf-8?B?MXc5Y08xME5xa0hQdzJQcmJaYjhjZnF4VHJpVjFwT05nN2Ezbm9YTnFSR2ds?=
- =?utf-8?B?RXdjMFNXM2d2SEdZUTJKalRZeExjSUx2N21CWm01bXpaUUxXZ3lKSlFQWTRk?=
- =?utf-8?B?ZlV2VncxZUZnRzUrMllNTVEwckdyR2h4S0tMVnFDZklxdHlwT2xhMTdKS284?=
- =?utf-8?B?QXpjelBRd2JFNWN1SkNpcEVaakVxa2ZURDJmaHN3djFiYW9RWFpINGZBc2VI?=
- =?utf-8?B?a0NKU1hqVTkwR0dpa3kwVkM0SXd6aXZrNjM1YkZpQWhjcnZvUVNqdXNwUDZp?=
- =?utf-8?B?WVA3MmR6eVhKV0NzMllQZ3BtRWtKVm1aSnl3VDRPS0J2QTUrVkt0dDVia1li?=
- =?utf-8?B?dlFRVVBOanlXUlQxYVc2Z3BDTHJOeVZBbWtZMmN5c0x4eFZhTVl3NnBFL0ky?=
- =?utf-8?B?Ui9wczIwZk53aEFPM0xFakEyMFZoSzM3cjJpVHB6TUI2V1BNL21rMC92NzNB?=
- =?utf-8?B?YURhOVNmN3ZqaHF2bGY2cnA4STFFYjVkRWJkdHo4dm5XWnc5TE5oNHVBeGRF?=
- =?utf-8?B?UnpLeERvRjZMeEljRDRWTkViZEtodFd4Z29IUTk1bm1ISnZRanJBRldabHVP?=
- =?utf-8?B?VDUzVlBzKzZ3T1gxNmdQNUREd0RnNCtEMmFUalhTMWYyZGVzZW9kb3ZlajJE?=
- =?utf-8?B?bEZMM0dlNGJhbXFXejFyOVJQNC9vNWlQNTMvK2RVQ0RoU3BlZy9VcFJLZWs1?=
- =?utf-8?B?eEhLbzdMSVFWcG1JYk9UM1d0NHM3YVhSOFFEeURPYjV3SHkxeWd4RTJQN1lZ?=
- =?utf-8?B?Z29uZ0J0bkpDUWxVYVZHMkZna3hwSWFRQUZiajBWVVlXV1g0Q1Z0TTRaRlRi?=
- =?utf-8?B?Q2RtYXpxaWRXdGhLcnBsSG1nV2NZQ2k1REJjejBOL3pKVG84MktmNjVtQzVq?=
- =?utf-8?B?SHRiVWY2M1BWcjlEbi9rN3UwMVhtaHJGM0IvUHB1QkpOS2pZL3RhWlFzeGw0?=
- =?utf-8?B?YVFac2QvUHVDZkswenZIc1hxYTdPbThob05CY2cyRmxJVWJsaDA3L2Jhc1FJ?=
- =?utf-8?B?MHJIOHlZMkdaZFVYZzY4OEF2UVEvTndHeGZMd1kwTWpSSzkzZ1czZDU5NEZi?=
- =?utf-8?B?VG5nMGVjTUFlQVF0cG9TeE4wQ1ZzSDY2blpvdUgvRytBU0JRQUxHZ2lYQ3Ur?=
- =?utf-8?B?RkZlangyNCtWN2ZHTzl1VXlSWnRzOG1iRTFvNEI4OWR4RnJOd1RhbEE5VmE4?=
- =?utf-8?B?YXg1czRkMHg5b2VOUVU1R003bnRWamswMWlhQUMyckgyU3REQmhtVkFuTXRI?=
- =?utf-8?B?QVo1cHBxbXhVU1lSZU54V2ppaDNnPT0=?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6A257E4131F3A247B29A09D8DBB0BB94@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 17 May 2023 06:37:07 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532DA3AB0
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 03:37:04 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230517103700epoutp01459d30f0e1dd5ed63d72233512126ef5~f5-PTLC8C2729627296epoutp01W
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 10:37:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230517103700epoutp01459d30f0e1dd5ed63d72233512126ef5~f5-PTLC8C2729627296epoutp01W
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1684319820;
+        bh=EMMsT4WvkgqIKI0pmzWb/0/zW50yz6q81OjErKncAjw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=k6zElb8dvoXux5zzLuFmNelJoeXo5qToI1wdnL0V2ppFKjkr+Rp3qpYcfXdU1U6Sp
+         /mSortXMVkm2cjyFIgtxE8OdAXUQ3RCAXvBqHEsvcAjW5maDWZKqcFXv7eY1NaFvoC
+         ZuL+xaEefK11ZJ6iDg4Z2QEBi/yoH90jphf2/UNI=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230517103659epcas5p2c9c27720008b171356498475eab77328~f5-O5WTfR0808408084epcas5p2j;
+        Wed, 17 May 2023 10:36:59 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4QLqKk2Jmgz4x9Pp; Wed, 17 May
+        2023 10:36:58 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        90.22.54880.A4EA4646; Wed, 17 May 2023 19:36:58 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20230517103657epcas5p34671066feb44ca15179e3e3fd25aeba4~f5-NML9JS2644026440epcas5p3B;
+        Wed, 17 May 2023 10:36:57 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230517103657epsmtrp2f4cddec5d09ff77dcc4346072e1cf3d6~f5-NLhKbL3074730747epsmtrp2y;
+        Wed, 17 May 2023 10:36:57 +0000 (GMT)
+X-AuditID: b6c32a49-b21fa7000001d660-f4-6464ae4ae4e4
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DE.7D.28392.94EA4646; Wed, 17 May 2023 19:36:57 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230517103656epsmtip1504e7582bd8dfbe16a6b64c7247a8b48~f5-L_l-Am2953429534epsmtip1E;
+        Wed, 17 May 2023 10:36:56 +0000 (GMT)
+Date:   Wed, 17 May 2023 16:03:56 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, axboe@kernel.dk, kbusch@kernel.org,
+        hch@lst.de, sagi@grimberg.me
+Subject: Re: [PATCH for-next 1/2] io_uring/cmd: add cmd lazy tw wake helper
+Message-ID: <20230517103346.GA15743@green245>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: lb9wDDnOOHdYCpFcneHlqRF8U80CXuuL7MUGBP6ddycSlYOqWDnyiA5nTi9dUoYTHzH187cT86aXzk8V2SKvjHnr2ed0TGRD7iUfdbXuCJtLsmAfbI/ONpkKZawqbdFt7NNDthvT6ssgEmTqP1gxJt5mCT9DILtY+QDwEZcoe+j4/FptGaV5+/Ak5DWLMkq+60KuDpYK8eSt5KpzSlvS1r/8okwLlArTkbrlx9XY6iftUH0WAeSdENIUoavTFjnUkZI2h3kb1NZxETHjR9p7YwrJvr+xtPBhiMgrGTXL7sQUeFmo0lvsUZZsjK+VpGG/eDPlLz9+KCCAMkjqN0ivHjsJ8zp+zxetaP18wcg1yFtixGd9hjHi3e+z2v7I5UJsgCQ4sPALsMAIVQXTqDp74Hbwx7+bZ/ChMUHofga/ofTF/QqNeEW8LOhscTPh8sEEQs1U1z4jsGSgc4We/HN/K6cKftAxNAM29VBvL2qk4PBVhQKvLM/utbQJHJuxr2yVwSFG5OZxnwIw4NNpoVcZUz3S1IzoHLwxHH6h7MYnsFtufMsGb9wnxPnYvSOqJsOjh2qfQWZAa4FS5y2rjMbfysS97hjr0meAebGtIPfyNes9pRUgHFQAQmBpPunNEoTP93g5Nhn84800FxYR0etF5U/Lx9pZrrOREj+Ay1EEq766ES2gsPMRzxBZ7fs1gqP8EM2p3unmhPAlMpPjUxFVhlSOVHEiourg1kyd6ZcqQXClgZ7kiNO9bJ4dd2ULN0i6BQaqYGQgBicI4/X/p2DyFY7yV094T5rFXjBBFF/V+Kf47MnS7868ZyBoW9JjMEb5748vCZk2lQfWSrWQVMBtWSl6iz2a8Oa9Bl/6kObqf/eknAlmymookzSwc91PKInb2v7Z262yePmlcd3+RNYIew==
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2517da36-2ca6-4b45-14d3-08db56bddd4e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2023 10:02:46.4197
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: o2ndDbQdpd7q91xwSbzMgSbWfvOfy0qeGNvQLqgqFSMpNYhEq2ylGChVVoKzTDPS89oAs7P7mplXKdHOBjdAVjFyrgLRxjUYE4qLFp8ja9U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6851
+In-Reply-To: <65514f94-ac70-08df-a866-fe73f95037fd@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKJsWRmVeSWpSXmKPExsWy7bCmhq7XupQUg45Wbos5q7YxWqy+289m
+        sXL1USaLd63nWCwmHbrGaLH3lrbF/GVP2S3WvX7P4sDhsXPWXXaP8/c2snhcPlvqsWlVJ5vH
+        5iX1HrtvNrB5fN4kF8AelW2TkZqYklqkkJqXnJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ib
+        aqvk4hOg65aZA3SSkkJZYk4pUCggsbhYSd/Opii/tCRVISO/uMRWKbUgJafApECvODG3uDQv
+        XS8vtcTK0MDAyBSoMCE7o73vAnNBg2FFa8dT5gbGJu0uRk4OCQETiUtdW1i7GLk4hAR2M0qs
+        vXGMHcL5xCjxet4JZgjnM6PE7pkPGWFaXj/YxQpiCwnsYpSYvdcUougZo8SMnWfYQBIsAqoS
+        L77PYepi5OBgE9CUuDC5FCQsIqAt8fr6IXYQm1lgPqPE6cfcILawgLfEo8svmEFsXgFdifvX
+        F7BB2IISJ2c+YQGxOQVsJXb82QJmiwooSxzYdpwJZK+EwFIOiVMNL1kgjnORWPdiLtShwhKv
+        jm9hh7ClJD6/28sGYSdLXJp5jgnCLpF4vOcglG0v0XqqnxniuAyJO3O3M0LYfBK9v5+A/SIh
+        wCvR0SYEUa4ocW/SU1YIW1zi4YwlrBAlHhK7VvJBgmQ7k8TLmVsYJzDKzULyziwkGyBsK4nO
+        D02sELa8RPPW2cyzgEYxC0hLLP/HAWFqSqzfpb+AkW0Vo2RqQXFuemqxaYFhXmo5PLqT83M3
+        MYLTq5bnDsa7Dz7oHWJk4mA8xCjBwawkwhvYl5wixJuSWFmVWpQfX1Sak1p8iNEUGFMTmaVE
+        k/OBCT6vJN7QxNLAxMzMzMTS2MxQSZxX3fZkspBAemJJanZqakFqEUwfEwenVAMTh+kZpja9
+        FdM95LLvvfBeHnSx7v7JYzFZAooztXrdDlXOlGDcv2zvoWvZF6WF1vxdJLaEe+rEzOMKvL6r
+        F1idZYg3Wv1DKHSGQnxwiZ2rEkP6p/aghta553euNJ0TtVC0lXtCbXNYkVjwx2cx+/t2eC/M
+        f6TC+Vr/8Yaoj4ckdxY/UV9nz/2+NUHsw5m5EhXZaw9oZWvuXawjLP6++oFHkk/d9AfeEY9F
+        pi3NMZ6w2/iXCNvClLPrXF4f1wt8bHpx+bGr35fmX5Q/cVZJJvG6OmfIr59Fh8uitz2xvVP+
+        UGDygYhly6bE7272PnVk36mSE43aBzbq91TM0FmvNFHDcsOXefc3Xrh9j01Qevfjz0osxRmJ
+        hlrMRcWJAIsP5tc4BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpikeLIzCtJLcpLzFFi42LZdlhJTtdzXUqKQesiTYs5q7YxWqy+289m
+        sXL1USaLd63nWCwmHbrGaLH3lrbF/GVP2S3WvX7P4sDhsXPWXXaP8/c2snhcPlvqsWlVJ5vH
+        5iX1HrtvNrB5fN4kF8AexWWTkpqTWZZapG+XwJXRvOMha8FEvYrd07ezNjBu0Ohi5OSQEDCR
+        eP1gF2sXIxeHkMAORonLB96wQSTEJZqv/WCHsIUlVv57zg5R9IRR4u7cCUwgCRYBVYkX3+cA
+        2RwcbAKaEhcml4KERQS0JV5fPwRWzywwn1Hi5ZfbrCAJYQFviUeXXzCD2LwCuhL3ry9ggxi6
+        nUli0qtd7BAJQYmTM5+wgNjMAmYS8zY/ZAZZwCwgLbH8HwdEWF6ieetssDmcArYSO/5sASsX
+        FVCWOLDtONMERqFZSCbNQjJpFsKkWUgmLWBkWcUomVpQnJueW2xYYJSXWq5XnJhbXJqXrpec
+        n7uJERxNWlo7GPes+qB3iJGJg/EQowQHs5IIb2BfcooQb0piZVVqUX58UWlOavEhRmkOFiVx
+        3gtdJ+OFBNITS1KzU1MLUotgskwcnFINTP2FnjwN5d6113hnhC4rmiJ6LjeK+X1M4aHYGy3x
+        Mo8/6DP6f4xTdmN7Nm91NK/fpyMRU4J/3XxaIpyx1aNh4b9483xzOxnuuZ46ko2r3n/S8nt3
+        8fnDfTqrajvPzKmt97PsiK9YLLKpa47VgYVyt++++Z2ls+Nr4OnTzHa3Kyf7ymzdYLn2/i+9
+        K0smbn+z54TI9xU7ttxaPV/byNDf6O8j1egNmxVyzifErz7OdPDwQf+FeRwcaz8oL9iXpvB3
+        7u+wlvZHruGMz6dWfTJf8aYk36rguujtE6Xq+112S7PkO7nnzm4Q++5SL/5uA0PbnTs78rjO
+        cqptnvPnTxkLt/35xT83RDv/mhZ5lTGSQVyJpTgj0VCLuag4EQBS+TngFQMAAA==
+X-CMS-MailID: 20230517103657epcas5p34671066feb44ca15179e3e3fd25aeba4
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_9bb1a_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230515125841epcas5p3e3cba6545755e95739e1561222b00b4a
+References: <cover.1684154817.git.asml.silence@gmail.com>
+        <CGME20230515125841epcas5p3e3cba6545755e95739e1561222b00b4a@epcas5p3.samsung.com>
+        <5b9f6716006df7e817f18bd555aee2f8f9c8b0c3.1684154817.git.asml.silence@gmail.com>
+        <20230516100000.GA26860@green245>
+        <65514f94-ac70-08df-a866-fe73f95037fd@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-TG9va3MgZ29vZCwNClJldmlld2VkLWJ5OiBKb2hhbm5lcyBUaHVtc2hpcm4gPGpvaGFubmVzLnRo
-dW1zaGlybkB3ZGMuY29tPg0K
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_9bb1a_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+
+On Tue, May 16, 2023 at 07:52:23PM +0100, Pavel Begunkov wrote:
+>On 5/16/23 11:00, Kanchan Joshi wrote:
+>>On Mon, May 15, 2023 at 01:54:42PM +0100, Pavel Begunkov wrote:
+>>>We want to use IOU_F_TWQ_LAZY_WAKE in commands. First, introduce a new
+>>>cmd tw helper accepting TWQ flags, and then add
+>>>io_uring_cmd_do_in_task_laz() that will pass IOU_F_TWQ_LAZY_WAKE and
+>>>imply the "lazy" semantics, i.e. it posts no more than 1 CQE and
+>>>delaying execution of this tw should not prevent forward progress.
+>>>
+>>>Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>>>---
+>>>include/linux/io_uring.h | 18 ++++++++++++++++--
+>>>io_uring/uring_cmd.c     | 16 ++++++++++++----
+>>>2 files changed, 28 insertions(+), 6 deletions(-)
+>>>
+>>>diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+>>>index 7fe31b2cd02f..bb9c666bd584 100644
+>>>--- a/include/linux/io_uring.h
+>>>+++ b/include/linux/io_uring.h
+>>>@@ -46,13 +46,23 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+>>>                  struct iov_iter *iter, void *ioucmd);
+>>>void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2,
+>>>            unsigned issue_flags);
+>>>-void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>>>-            void (*task_work_cb)(struct io_uring_cmd *, unsigned));
+>>>struct sock *io_uring_get_socket(struct file *file);
+>>>void __io_uring_cancel(bool cancel_all);
+>>>void __io_uring_free(struct task_struct *tsk);
+>>>void io_uring_unreg_ringfd(void);
+>>>const char *io_uring_get_opcode(u8 opcode);
+>>>+void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+>>>+                void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+>>>+                unsigned flags);
+>>>+/* users should follow semantics of IOU_F_TWQ_LAZY_WAKE */
+>>
+>>Should this also translate to some warn_on anywhere?
+>
+>Would love to but don't see how. We can only check it doesn't
+>produce more than 1 CQE, but that would need
+>
+>nr_cqes_before = cqes_ready();
+>tw_item->run();
+>WARN_ON(cqes_ready() >= nr_cqes_before + 1);
+>
+>but that's just too ugly
+>
+>
+>>>+void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+>>>+            void (*task_work_cb)(struct io_uring_cmd *, unsigned));
+>>>+
+>>>+static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>>>+            void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>>>+{
+>>>+    __io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
+>>>+}
+>>>
+>>>static inline void io_uring_files_cancel(void)
+>>>{
+>>>@@ -85,6 +95,10 @@ static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>>>            void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>>>{
+>>>}
+>>>+static inline void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+>>>+            void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>>>+{
+>>>+}
+>>>static inline struct sock *io_uring_get_socket(struct file *file)
+>>>{
+>>>    return NULL;
+>>>diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+>>>index 5e32db48696d..476c7877ce58 100644
+>>>--- a/io_uring/uring_cmd.c
+>>>+++ b/io_uring/uring_cmd.c
+>>>@@ -20,16 +20,24 @@ static void io_uring_cmd_work(struct io_kiocb *req, struct io_tw_state *ts)
+>>>    ioucmd->task_work_cb(ioucmd, issue_flags);
+>>>}
+>>>
+>>>-void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>>>-            void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>>>+void __io_uring_cmd_do_in_task(struct io_uring_cmd *ioucmd,
+>>>+            void (*task_work_cb)(struct io_uring_cmd *, unsigned),
+>>>+            unsigned flags)
+>>>{
+>>>    struct io_kiocb *req = cmd_to_io_kiocb(ioucmd);
+>>>
+>>>    ioucmd->task_work_cb = task_work_cb;
+>>>    req->io_task_work.func = io_uring_cmd_work;
+>>>-    io_req_task_work_add(req);
+>>>+    __io_req_task_work_add(req, flags);
+>>>+}
+>>>+EXPORT_SYMBOL_GPL(__io_uring_cmd_do_in_task);
+>
+>--- a/include/linux/io_uring.h
+>+++ b/include/linux/io_uring.h
+>
+>+static inline void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
+>+			void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>+{
+>+	__io_uring_cmd_do_in_task(ioucmd, task_work_cb, 0);
+>+}
+>
+>That should fail for nvme unless exported.
+
+But it does not. Give it a try.
+
+>>Any reason to export this? No one is using this at the moment.
+>>>+void io_uring_cmd_do_in_task_lazy(struct io_uring_cmd *ioucmd,
+>>>+            void (*task_work_cb)(struct io_uring_cmd *, unsigned))
+>>>+{
+>>>+    __io_uring_cmd_do_in_task(ioucmd, task_work_cb, IOU_F_TWQ_LAZY_WAKE);
+>>>}
+>>>-EXPORT_SYMBOL_GPL(io_uring_cmd_complete_in_task);
+>>>+EXPORT_SYMBOL_GPL(io_uring_cmd_do_in_task_lazy);
+>>
+>>Seems you did not want callers to pass the the new flag (LAZY_WAKE) and
+>>therefore this helper.
+>
+>Yep, I wouldn't mind exposing just *LAZY_WAKE but don't want
+>to let it use whatever flags there might be in the future.
+>
+>Initially I wanted to just make io_uring_cmd_complete_in_task and
+>io_uring_cmd_do_in_task_lazy static inline, but that would need
+>some code shuffling to make it clean.
+>
+>>And if you did not want callers to know about this flag (internal
+>>details of io_uring), it would be better to have two exported helpers
+>>io_uring_cmd_do_in_task_lazy() and io_uring_cmd_complete_in_task().
+>>Both will use the internal helper __io_uring_cmd_do_in_task with
+>>different flag.
+>
+>That's how it should be in this patch
+
+Nah, in this patch __io_uring_cmd_do_in_task is exported helper. And
+io_uring_cmd_complete_in_task has been changed too (explicit export to
+header based one). Seems like bit more shuffling than what is necessary.
+
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_9bb1a_
+Content-Type: text/plain; charset="utf-8"
+
+
+------6TPaBgSVJHTP5aYW_KCyJfD-AyyqAIDIArT8HI0pnVcs47o3=_9bb1a_--
