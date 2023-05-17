@@ -2,53 +2,51 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BB1C77B7F
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 17:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B50DC77B75
+	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 17:45:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbjEQRpg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229812AbjEQRpg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 17 May 2023 13:45:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53888 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbjEQRpc (ORCPT
+        with ESMTP id S229551AbjEQRpd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 13:45:32 -0400
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B47AD32
+        Wed, 17 May 2023 13:45:33 -0400
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68251D069
         for <linux-block@vger.kernel.org>; Wed, 17 May 2023 10:45:01 -0700 (PDT)
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-643465067d1so835480b3a.0
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-643557840e4so1118723b3a.2
         for <linux-block@vger.kernel.org>; Wed, 17 May 2023 10:45:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684345472; x=1686937472;
+        d=1e100.net; s=20221208; t=1684345480; x=1686937480;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=O3LBuBNIBav3dorAz0aTtKrVDkeCIbggzsfXX9pDkGI=;
-        b=SN18Xo4dZzS4di4QjhjZgJeuEN78tqdRXI0znMkEgHZgDtBNZlO9/U1Nu2+Gm3dy9Q
-         U7ZdmZ8hh1/ASIVQahntj7gctRBE/5xKPrIPBS0ON32JSYMuxQZl1Dfw1t6nv5b8K6uq
-         RZQF6+YMZjiMgD1DvAR7YYQPW3pIjz+dH8AYmPMcZ7J6bzgOcXl4ieLp6yJqhCiAMDTS
-         zSILaB8c7KSZzO3L3sa52jMx2TrrVvpJr38qlzJwf4aHQehIB8pE/ItukggWgtrPdRFL
-         fuN4flMDZHvvwyM17CtlD1vp+F2kOai9/opzzqXfwgJPNwTVxJgKB3EiA8aRAR+cQ67j
-         4xAA==
-X-Gm-Message-State: AC+VfDxpxEvxNLTBMev//AGHc9UXAt+m0ugL8YbaykXAYG1tBcbBtCqY
-        im3x1+XDELgDT9Xgyg88+ec=
-X-Google-Smtp-Source: ACHHUZ7lIMa/tihI4ODOWbQDaIGekQ1wf8tLslyCeJPJJyKQv7a+SFfdmyb3XkqrWa1EFpECgeyUrw==
-X-Received: by 2002:a05:6a00:1943:b0:63d:3981:313d with SMTP id s3-20020a056a00194300b0063d3981313dmr624829pfk.10.1684345472380;
-        Wed, 17 May 2023 10:44:32 -0700 (PDT)
+        bh=aDnGikLOYG1t6apzhUnxcr96a3tR4AhATdhtBeyLLBM=;
+        b=cRVPa2Uv1ICZsHSL1nw3pU08r4aSrtsZVxOC6N4OjDpsUf0LqwrdxF436l8az5b/mV
+         Rglqj43yWtoUSVi+vs6uZMJvq86ecRlXN69p6kaV6pMKGBK4pSngjO8hQds+6RiKnJu2
+         fPhpcPnZyH3lTkvNIGLDesnZYzeE72n5b4SIm9Fqdfn8T1hwYkVWSypwQ6PpPoY7DMLt
+         ve6M2Qqbm8vz5txyfz+Jo1obUFGUPrSlQmY+7Q/yRTOGl+78x2miLeeR9DIfbWfkixK6
+         +MOsfd/X1yqtRl7S0QbIzS9KuUDDXCrCfR2WV0aRf6MOCONF8QVnUElbLphzrPJsaAxe
+         PqdQ==
+X-Gm-Message-State: AC+VfDz1evNwpz97g6K0gnn+X4WaM7auloOcaE2e9Q2OclitfS6WJre0
+        9+tUkPsmBf0cyfa34xHWg3c=
+X-Google-Smtp-Source: ACHHUZ71Yh2gf5KlY7qdUaaDvSPaWfp7f6W1Nl4kXB8zp5P1K+fqUs37Ow0Mybx6UcgVZxu6YEiogw==
+X-Received: by 2002:a05:6a00:1a89:b0:62d:d045:392 with SMTP id e9-20020a056a001a8900b0062dd0450392mr498191pfv.32.1684345480348;
+        Wed, 17 May 2023 10:44:40 -0700 (PDT)
 Received: from bvanassche-glaptop2.roam.corp.google.com ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id d22-20020aa78e56000000b00646e7d2b5a7sm15334410pfr.112.2023.05.17.10.44.31
+        by smtp.gmail.com with ESMTPSA id d22-20020aa78e56000000b00646e7d2b5a7sm15334410pfr.112.2023.05.17.10.44.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 May 2023 10:44:31 -0700 (PDT)
+        Wed, 17 May 2023 10:44:39 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
         Damien Le Moal <dlemoal@kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v6 02/11] block: Simplify blk_req_needs_zone_write_lock()
-Date:   Wed, 17 May 2023 10:42:20 -0700
-Message-ID: <20230517174230.897144-3-bvanassche@acm.org>
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v6 07/11] block: mq-deadline: Simplify deadline_skip_seq_writes()
+Date:   Wed, 17 May 2023 10:42:25 -0700
+Message-ID: <20230517174230.897144-8-bvanassche@acm.org>
 X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
 In-Reply-To: <20230517174230.897144-1-bvanassche@acm.org>
 References: <20230517174230.897144-1-bvanassche@acm.org>
@@ -58,31 +56,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the blk_rq_is_passthrough() check because it is redundant:
-blk_req_needs_zone_write_lock() also calls bdev_op_is_zoned_write()
-and the latter function returns false for pass-through requests.
+Make the deadline_skip_seq_writes() code shorter without changing its
+functionality.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Cc: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-zoned.c | 3 ---
- 1 file changed, 3 deletions(-)
+ block/mq-deadline.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index fce9082384d6..835d9e937d4d 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -57,9 +57,6 @@ EXPORT_SYMBOL_GPL(blk_zone_cond_str);
-  */
- bool blk_req_needs_zone_write_lock(struct request *rq)
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index cea91ba4a6ea..56782ee93522 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -304,14 +304,11 @@ static struct request *deadline_skip_seq_writes(struct deadline_data *dd,
+ 						struct request *rq)
  {
--	if (blk_rq_is_passthrough(rq))
--		return false;
--
- 	if (!rq->q->disk->seq_zones_wlock)
- 		return false;
+ 	sector_t pos = blk_rq_pos(rq);
+-	sector_t skipped_sectors = 0;
  
+-	while (rq) {
+-		if (blk_rq_pos(rq) != pos + skipped_sectors)
+-			break;
+-		skipped_sectors += blk_rq_sectors(rq);
++	do {
++		pos += blk_rq_sectors(rq);
+ 		rq = deadline_latter_request(rq);
+-	}
++	} while (rq && blk_rq_pos(rq) == pos);
+ 
+ 	return rq;
+ }
