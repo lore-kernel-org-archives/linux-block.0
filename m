@@ -2,72 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFDDAC7EE23
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 18:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89AA1C7EE2D
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 20:55:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230045AbjERSsi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 14:48:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36402 "EHLO
+        id S230499AbjERUzy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 16:55:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbjERSsi (ORCPT
+        with ESMTP id S230494AbjERUzx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 14:48:38 -0400
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92519E4A
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 11:48:37 -0700 (PDT)
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-64ab2a37812so14245545b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 11:48:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684435717; x=1687027717;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FoLMxU2AiA8K3biCj8siCU8Ywa2niccHNWDQzYwRfBI=;
-        b=ker5CWBRbiquLgIT97md4W84wWF2gCimDl2vCYBarlp24kCO0w1b6G+g+ZvnY9CNf0
-         zGW8GvkSWULgWEpL0TOTxEQAgLbKryCekllvU3gSmyAeiLXg7yVD6NFa8HwnIlAcBAD3
-         pqMKwjoFx+Bkfe14COgJFqAU6O6C7UAvVew2vpU6YIvYcmcXuE8eskS6zbRSJbPbeqIE
-         D77/ILi1KFV4KV1VqrCtphxLUAiYksqQaEVhkgQd2vCmc5hp1988zKFaznVmsvpK3TnW
-         Cu/p178jDFpJAUU8vbjiinNNMn7T8vY1PNlhvqZ7hLdUdc4h8hZBxOL04EJsiRcbWwg5
-         rMSA==
-X-Gm-Message-State: AC+VfDx5+bK7Tr6XrD/V1+WHooBFG+9//4gw3dw30ufT9iGwFwGPA/Qb
-        Acpn4byAXCaDQtP/l9GdHLY=
-X-Google-Smtp-Source: ACHHUZ5jtOv/LSIyvajTYHVQZHSeyh6zv6L3YJiVsZPy4YlWE3HAF7wLxtr307q/NjhFBnXTJu6AXQ==
-X-Received: by 2002:a17:903:1d1:b0:1ad:bccc:af77 with SMTP id e17-20020a17090301d100b001adbcccaf77mr4276041plh.18.1684435716922;
-        Thu, 18 May 2023 11:48:36 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id j6-20020a170902c08600b001ae365072cfsm1758352pld.219.2023.05.18.11.48.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 May 2023 11:48:36 -0700 (PDT)
-Message-ID: <ebe0037c-7ab7-afb0-f4a4-79e8815ef588@acm.org>
-Date:   Thu, 18 May 2023 11:48:35 -0700
+        Thu, 18 May 2023 16:55:53 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361D1F7;
+        Thu, 18 May 2023 13:55:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=YPhP6BC+IEsfoXB2aA0bVLzSVsaUv9891PdK+C1Dx8g=; b=tt6ENj/lVkKUJKiCYXjfjkcAgl
+        E1CE5UrauzZwRVEElGcCTmu8epF1a4mGfMbBfAkXKwjH5q2F1eGd9tVyROLDRXDSxDuYOD7kFuo9J
+        QClvD48BhsS7IcENKjAOSAlShtPujeLos50tHDAYM0XQvweiKi7RTBQZNcKeBnr+OHDzzE+bj9iLj
+        wgWwyDZPDIM+md6dmmZ66Mu9UZ4dzSbkUYmTs3XEW3hUdN2tf26kYUqB3Xs8I19yOjW/qHeQDxWX7
+        v9180P287Yh/woZlzZVheCx3vYqiqTPaDO+wn5Qa5HppftycV9NrqXqPdeC3+XMtkI7rQyeI6jFTh
+        4a0LBx+Q==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pzkf6-00EAQG-0R;
+        Thu, 18 May 2023 20:55:48 +0000
+Date:   Thu, 18 May 2023 13:55:48 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     corbet@lwn.net, jake@lwn.net, hch@infradead.org, djwong@kernel.org,
+        dchinner@redhat.com, ritesh.list@gmail.com, rgoldwyn@suse.com,
+        jack@suse.cz, linux-doc@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        p.raghav@samsung.com, da.gomez@samsung.com, rohan.puri@samsung.com
+Subject: Re: [PATCH v2] Documentation: add initial iomap kdoc
+Message-ID: <ZGaQ1KzKGuuPIpTb@bombadil.infradead.org>
+References: <20230518150105.3160445-1-mcgrof@kernel.org>
+ <707b28de-2449-5cf3-9360-b2faec0481c7@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v5 07/11] block: mq-deadline: Improve
- deadline_skip_seq_writes()
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230516223323.1383342-1-bvanassche@acm.org>
- <20230516223323.1383342-8-bvanassche@acm.org>
- <37120c5c-120f-3ff3-fcbf-1a52f389fe3e@kernel.org>
- <06e87316-4b22-b275-4223-775192e5ccac@acm.org>
- <5829b5a0-d411-9485-2fa0-7c723377abf1@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <5829b5a0-d411-9485-2fa0-7c723377abf1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <707b28de-2449-5cf3-9360-b2faec0481c7@infradead.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/23 15:15, Damien Le Moal wrote:
-> Hmmm... mq-deadline is not supposed to mix up reads and writes in the same
-> scheduling batch, and there is one sort_list (rbtree) per data direction. So we
-> should not be seeing different data directions in this loop, no ?
+On Thu, May 18, 2023 at 08:49:26AM -0700, Randy Dunlap wrote:
+> On 5/18/23 08:01, Luis Chamberlain wrote:
+> >   * use 80 char length as if we're in the 1980's
+> 
+> Well, like Jon said, long lines are difficult to read, even on printed paper.
+> That's (at least one reason) why newspapers(!) have narrow columns of print.
 
-Right, we don't need this patch. I will drop it.
+Makes sense!
 
-Bart.
+> Anyway, thanks for doing it.
 
+Heh yeah, I just trying to follow the convention, but I didn't know it was
+a special-case for bumping up to 100 only, and that it was definitely
+not good for docs. It's easy to loose it though, we have one for commit log,
+one for length on code with an exception, and we have a clear perference
+for docs. Makes me wonder if editors pick up on project specific requirements
+somehow? 
+
+So for instance I used to have incorrectly;
+
+set textwidth=100
+autocmd FileType gitcommit set textwidth=72
+set colorcolumn=+1
+
+Cleary that 100 is wrong now and I've now updated it bacak to 80.
+Could one be used for FileType for rst and ascii files?
+
+If we shared something on the top level which lets developers
+optionally pick up on project specific guideline it would be a less
+common problem to ping back / forth about this. Curious how many
+patches "length" is the reason introduces a latency for patches getting
+upstream. You figured this would be a simple fix in year 2023 :P
+
+Thanks for the fix recommendations! I'll wait and see if others find
+others!
+
+  Luis
