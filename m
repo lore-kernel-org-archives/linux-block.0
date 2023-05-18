@@ -2,90 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 194EAC77B7F
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 02:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA09BC77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 03:00:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbjERCXn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 22:23:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
+        id S229690AbjERDAL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 23:00:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbjERCXi (ORCPT
+        with ESMTP id S229453AbjERDAK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 22:23:38 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDE633C26;
-        Wed, 17 May 2023 19:23:23 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ae50da739dso10847985ad.1;
-        Wed, 17 May 2023 19:23:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684376603; x=1686968603;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A0HO+zrjQx0EnGmBwSxKYED9w5RWjcQswIihNrV1+/s=;
-        b=Zf9NCC82DJeZNg02XdyvqXmBF684gctyWcQQKNwhZMh17HIJqYx/ZGyfz9BBLuBQKy
-         AQjAuUWs5qoObQJkj9o0yuMLXj+4YeDL6D6SFK4akpzFJRNiSlfrE2FzzcAsxVhWksd6
-         O/+bO9sM0oebqBoTgE97ooA+yYsyhUHWGbGd7ryB2emK4gRLEPCiH6EU5R4FL0v/MPZi
-         ZMmEwgu8wbAxL+QUYyIraYfmMxoKvdQP1r9q+OD2eDhXAgVbyyPBh2EkvhdDng6kfnlA
-         jnpGuAOXYSlbBU7je3PVZA/w0/ZaoswpajWfYwpK6SXINon2DMlzO1DXUkIj1/bhjym2
-         WuLQ==
-X-Gm-Message-State: AC+VfDw3wjxm1bpU3HQOWT+OjB7GpQj9Mv7CHHF4U9BqzOgGInmH8DDI
-        D/ZUPCwPixlVIOWEcGyBlXKpKGOCbQ8=
-X-Google-Smtp-Source: ACHHUZ5v65/veJm9sVIzAkJDP7o32IKI922Z1/Q9bxhyqCvGbAvUdzZp8moIlHPKev+trVh+zhXN6g==
-X-Received: by 2002:a17:902:d48c:b0:1a6:ebc1:c54c with SMTP id c12-20020a170902d48c00b001a6ebc1c54cmr1275890plg.1.1684376603188;
-        Wed, 17 May 2023 19:23:23 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id q3-20020a170902dac300b001ac2c3e436asm69404plx.186.2023.05.17.19.23.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 May 2023 19:23:22 -0700 (PDT)
-Message-ID: <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
-Date:   Wed, 17 May 2023 19:23:20 -0700
+        Wed, 17 May 2023 23:00:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C991BC
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 19:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684378762;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IMAu6twEmtswYA8qITtMS+FLR6ODJ0Jw07dSOREZSbc=;
+        b=iBk6va/4gF0v3cAiD48d4KB1e9sCvL7PThzbLBaH/3hFzVOg7g3n/CNhlTc6e6xCSXvQtU
+        i0uYDyL1YBBeT6OXBH7eHy6pe4Tys1gk8HVueErl0J+h+rMtJ532EWhzekBTHgwyIfA6o2
+        vnL3ICFH3uMor3jWOrXHpZpk4rn1aZI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-115-KmfCUeypMa-yn3li6xcKMg-1; Wed, 17 May 2023 22:59:19 -0400
+X-MC-Unique: KmfCUeypMa-yn3li6xcKMg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 28AE385A5A3;
+        Thu, 18 May 2023 02:59:19 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 63A701427AE4;
+        Thu, 18 May 2023 02:59:14 +0000 (UTC)
+Date:   Thu, 18 May 2023 10:59:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [PATCH] ublk: fix AB-BA lockdep warning
+Message-ID: <ZGWUfv+g6EOw/pI2@ovpn-8-16.pek2.redhat.com>
+References: <20230517133408.210944-1-ming.lei@redhat.com>
+ <a57cn4zqgxm5hds2ekgg2y5jbfd4bgwoujimit7enm6eh5wo56@hftyn26mv3aq>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        stanley.chu@mediatek.com, peter.wang@mediatek.com,
-        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
-        powen.kao@mediatek.com, naomi.chu@mediatek.com,
-        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <ZF0K7A6G2cYBjSgn@infradead.org>
- <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
- <ZF5G5ztMng8Xbd1W@infradead.org>
- <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
- <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
- <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
- <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
- <097caed2-10b3-7cd1-7c06-90f983e5c720@acm.org>
- <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a57cn4zqgxm5hds2ekgg2y5jbfd4bgwoujimit7enm6eh5wo56@hftyn26mv3aq>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/23 18:49, Yu Kuai wrote:
-> Currently, fair share from hctx_may_queue() requires two
-> atomic_read(active_queues and active_requests), I think this smoothing
-> method can be placed into get_tag fail path, for example, the more times
-> a disk failed to get tag in a period of time, the more tag this disk can
-> get, and all the information can be updated here(perhaps directly
-> record how many tags a disk can get, then hctx_may_queue() still only
-> require 2 atomic_read()).
+On Thu, May 18, 2023 at 02:01:17AM +0000, Shinichiro Kawasaki wrote:
+> On May 17, 2023 / 21:34, Ming Lei wrote:
+> > When handling UBLK_IO_FETCH_REQ, ctx->uring_lock is grabbed first, then
+> > ub->mutex is acquired.
+> > 
+> > When handling UBLK_CMD_STOP_DEV or UBLK_CMD_DEL_DEV, ub->mutex is
+> > grabbed first, then calling io_uring_cmd_done() for canceling uring
+> > command, in which ctx->uring_lock may be required.
+> > 
+> > Real deadlock only happens when all the above commands are issued from
+> > same uring context, and in reality different uring contexts are often used
+> > for handing control command and IO command.
+> > 
+> > Fix the issue by using io_uring_cmd_complete_in_task() to cancel command
+> > in ublk_cancel_dev(ublk_cancel_queue).
+> > 
+> > Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> > Closes: https://lore.kernel.org/linux-block/becol2g7sawl4rsjq2dztsbc7mqypfqko6wzsyoyazqydoasml@rcxarzwidrhk
+> > Cc: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> Using Ziyang's new blktests test cases, I confirmed this patch avoids the
+> failure I reported. Thanks.
+> 
+> Tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-That sounds interesting to me. Do you perhaps plan to implement this 
-approach and to post it as a patch?
+Shinichiro, Thanks for the test!
 
-Thanks,
-
-Bart.
+-- 
+Ming
 
