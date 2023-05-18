@@ -2,73 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F47C7EE25
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 13:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3811DC77B7D
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 13:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231152AbjERN4K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 09:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38764 "EHLO
+        id S231411AbjERN7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 09:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230339AbjERN4K (ORCPT
+        with ESMTP id S230122AbjERN7T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 09:56:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4428710D5;
-        Thu, 18 May 2023 06:56:09 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CC7F96410A;
-        Thu, 18 May 2023 13:56:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FEB3C4339B;
-        Thu, 18 May 2023 13:56:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684418168;
-        bh=hHyuhDMjdrGvdqZgER2nh0JzKbT7a7ZLHIcfi0F4Ds0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dsloX7t6KQCKsExTq09JdNRt4DRwUADPhd104IQM8lXR3JQCYdP+zIytegAbnCRMT
-         jgvy89L2iCP+Sslpz4GaGLrPfHo7HlXtl1+3FKK7BaTZ8kXOdFhq0EDMHMjFonm3Z3
-         eNXnJPLDpwTWqQveTTDpXLwU7tdC2ZCgQp6ngSBLzbq8XlCNlJdfesp80aNWQk/HUD
-         YVh910VanHRvrXq3u0T+th3WafPEUwjt38uVLv6nU2gv6+gWNOm1ZYMsf2AZG0gllr
-         oDn0CKndio/khJxd/pxBEVOD1/JvMWgDsL2+MdpjurYaLbM1gwW40SQvYhlSMf6/Ra
-         SUQuGhpwlMqkA==
-Date:   Thu, 18 May 2023 15:56:03 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 5/9] block: introduce holder ops
-Message-ID: <20230518-erdkruste-unteilbar-cb91c62511c9@brauner>
-References: <20230516-kommode-weizen-4c410968c1f6@brauner>
- <20230517073031.GF27026@lst.de>
- <20230517-einreden-dermatologisch-9c6a3327a689@brauner>
- <20230517080613.GA31383@lst.de>
- <20230517-erhoffen-degradieren-d0aa039f0e1d@brauner>
- <20230517120259.GA16915@lst.de>
- <20230517-holzfiguren-anbot-490e5a7f74fe@brauner>
- <20230517142609.GA28898@lst.de>
- <20230518-teekanne-knifflig-a4ea8c3c885a@brauner>
- <20230518131216.GA32076@lst.de>
+        Thu, 18 May 2023 09:59:19 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4194DE5C
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 06:59:18 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id ca18e2360f4ac-76c63acb667so9231039f.0
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 06:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684418357; x=1687010357;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c7g1I597iIp4NAkbt20b5F7NYBEkAibhPCMLzk3nUp8=;
+        b=s9pLK79eCSvZh2y0LBypPG09p0xKjw09TMQyHeMPmh86jbQS+QXHNfBQDlIhafiD9e
+         av61kKEkxHbtuNRMPSFRiRhzKab/M2qnjcluNXMSffJxbItsS5wVEj9D0lo2HEAqS5Uy
+         JHOyYusaHYdT2BtJNGj5lXgE7C60Alyt7o9R6f+1jupTXGlrZBuzp6P5reBB5ZSa2r5A
+         YcAt5+6jaIV/YDWw2Ao+WmBhOqhpRmocPJHsyXItJFI+HaFBv9l/GLdweRvPjLnm7J/o
+         N+LkLNXGEHvPVT3ZxXtsNjA+B6niOihNd4EOJ+nds4qK6aMPnAgfUD/KZ4Dne26ujm/u
+         GreQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684418357; x=1687010357;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c7g1I597iIp4NAkbt20b5F7NYBEkAibhPCMLzk3nUp8=;
+        b=fyaFbdzPVaum1jLJhaMqjJi3ggeoHGCB5sw/ggsoK3UtyXN76RgyUaCHm2NtHkOLG2
+         mzU2p2FuspSkNbWjGOv0w+FSHeKGjOcJ+JCAdzc/ebHHw801a2uYToNY7kW7Q+cpPGNG
+         FJ9MjoA4psaNxWNmy3tHBN8a1Al4RA0G7BESANFrtf/WGLzK6MoYheOxxv5Snx/1xvNo
+         4i9ISvZQPULd3qw6NY1vyOJzJslIfwTzZSOvEMKnldr6NoEvg90oVVCa3g7yiGlquNgW
+         MQqXjIgJ/WTDsJOxg3Ivt8BlMFZhuisMyy7InMmIUzym1Qq74jDx3g9KIavFsq2pxnBf
+         kIiQ==
+X-Gm-Message-State: AC+VfDxKdYTcTksdeI4pIhhAoyELfRspSEMS9Kzqpi+vlDhTPXbFwBxO
+        XO7YWawXluywtiI+IFELDxosJw==
+X-Google-Smtp-Source: ACHHUZ7pwHmaqi0Qff8eqyTHfyvERE7Dt0ZNtZ95xa899On9c6M7Zuj8xn98RK/+qbB+6GGX0pKuoQ==
+X-Received: by 2002:a05:6602:2d13:b0:76c:883c:60a2 with SMTP id c19-20020a0566022d1300b0076c883c60a2mr4443328iow.0.1684418357635;
+        Thu, 18 May 2023 06:59:17 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id f61-20020a0284c3000000b0040fa75e5a3fsm445429jai.132.2023.05.18.06.59.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 May 2023 06:59:16 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20230517133408.210944-1-ming.lei@redhat.com>
+References: <20230517133408.210944-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] ublk: fix AB-BA lockdep warning
+Message-Id: <168441835654.2212592.3758370917789453249.b4-ty@kernel.dk>
+Date:   Thu, 18 May 2023 07:59:16 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230518131216.GA32076@lst.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18, 2023 at 03:12:16PM +0200, Christoph Hellwig wrote:
-> On Thu, May 18, 2023 at 10:13:04AM +0200, Christian Brauner wrote:
-> > Fwiw, I didn't mean to have a special device handler for an O_PATH fd.
-> > I really just tried to figure out whether it would make sense to have an
-> > fd-based block device lookup function because right now we only have
-> > blkdev_get_by_path() and we'd be passing blkdev fds through the mount
-> > api. But I understand now how I'd likely do it. So now just finding time
-> > to actually implement it.
-> 
-> What's wrong with blkdev_get_by_dev(file_inode(file)->i_rdev) after
-> the sanity checks from lookup_bdev (S_ISBLK and may_open_dev)?
 
-Yeah, that's what I realized could work fine. I just need to check all
-fses how they currently do this and how to do this cleanly.
+On Wed, 17 May 2023 21:34:08 +0800, Ming Lei wrote:
+> When handling UBLK_IO_FETCH_REQ, ctx->uring_lock is grabbed first, then
+> ub->mutex is acquired.
+> 
+> When handling UBLK_CMD_STOP_DEV or UBLK_CMD_DEL_DEV, ub->mutex is
+> grabbed first, then calling io_uring_cmd_done() for canceling uring
+> command, in which ctx->uring_lock may be required.
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] ublk: fix AB-BA lockdep warning
+      commit: ac5902f84bb546c64aea02c439c2579cbf40318f
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
