@@ -2,87 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89AA1C7EE2D
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 20:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB0DC77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 22:27:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230499AbjERUzy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 16:55:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
+        id S229498AbjERW1P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 18:27:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230494AbjERUzx (ORCPT
+        with ESMTP id S229493AbjERW1P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 16:55:53 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361D1F7;
-        Thu, 18 May 2023 13:55:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YPhP6BC+IEsfoXB2aA0bVLzSVsaUv9891PdK+C1Dx8g=; b=tt6ENj/lVkKUJKiCYXjfjkcAgl
-        E1CE5UrauzZwRVEElGcCTmu8epF1a4mGfMbBfAkXKwjH5q2F1eGd9tVyROLDRXDSxDuYOD7kFuo9J
-        QClvD48BhsS7IcENKjAOSAlShtPujeLos50tHDAYM0XQvweiKi7RTBQZNcKeBnr+OHDzzE+bj9iLj
-        wgWwyDZPDIM+md6dmmZ66Mu9UZ4dzSbkUYmTs3XEW3hUdN2tf26kYUqB3Xs8I19yOjW/qHeQDxWX7
-        v9180P287Yh/woZlzZVheCx3vYqiqTPaDO+wn5Qa5HppftycV9NrqXqPdeC3+XMtkI7rQyeI6jFTh
-        4a0LBx+Q==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pzkf6-00EAQG-0R;
-        Thu, 18 May 2023 20:55:48 +0000
-Date:   Thu, 18 May 2023 13:55:48 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     corbet@lwn.net, jake@lwn.net, hch@infradead.org, djwong@kernel.org,
-        dchinner@redhat.com, ritesh.list@gmail.com, rgoldwyn@suse.com,
-        jack@suse.cz, linux-doc@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        p.raghav@samsung.com, da.gomez@samsung.com, rohan.puri@samsung.com
-Subject: Re: [PATCH v2] Documentation: add initial iomap kdoc
-Message-ID: <ZGaQ1KzKGuuPIpTb@bombadil.infradead.org>
-References: <20230518150105.3160445-1-mcgrof@kernel.org>
- <707b28de-2449-5cf3-9360-b2faec0481c7@infradead.org>
+        Thu, 18 May 2023 18:27:15 -0400
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A673DB3
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 15:27:14 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-64d2981e3abso579199b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 15:27:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684448834; x=1687040834;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ib63+Eee57H7hh2+fAjlZJzLjd4Hscoz4E3CWJVEZ/o=;
+        b=XrhN/QMfqBbUkquQzK4Le5hgT9lvuXoS/q+K+0rKAzERhmlz0cy/ffPGqHg4Hp69Z+
+         bnJGjFRBmKXQAZlvfibb5lyDqg9831GXWvmmTbZbKoc7vHHXrVldC/JHkkGPqhtH1e6n
+         tuOTXH9iGOXP0WH3IhdCSl8r/kG8n2NATV2QrCqNXvtZtejFe8Qu48dv5t/1cRF9MjE2
+         cHsqhnztEeZbX+FjjjYybMjKXKBMeTNMtb03OUarLVIM3+RqCTiC0IsqURLqDErN6GSv
+         mmuecFbZ727+hLvCrz26HbulAoY6FIH6NJ+apCZYlfpRX2e6dciH9pZ7gk4PikP8Wyft
+         Gpyg==
+X-Gm-Message-State: AC+VfDxYpXWnlh3B2Muhrlia5mEzkQsl4aLvBy/amgBMLwGut+Zx8L16
+        i/57Rfy9C3CgHIszejKbiuj/FktosEc=
+X-Google-Smtp-Source: ACHHUZ5DfjqBl/Ml9/5N0gzf50x78Ls+r2ppDMkZQR6P2ChRD3rHoRWU+AgyI14F87gD106UkD8H4Q==
+X-Received: by 2002:a17:903:2287:b0:1ad:b5f4:dfd5 with SMTP id b7-20020a170903228700b001adb5f4dfd5mr713640plh.32.1684448834016;
+        Thu, 18 May 2023 15:27:14 -0700 (PDT)
+Received: from bvanassche-glaptop2.roam.corp.google.com ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id a9-20020a170902ecc900b001a260b5319bsm1976242plh.91.2023.05.18.15.27.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 May 2023 15:27:13 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH v2] block: Decode all flag names in the debugfs output
+Date:   Thu, 18 May 2023 15:27:08 -0700
+Message-ID: <20230518222708.1190867-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <707b28de-2449-5cf3-9360-b2faec0481c7@infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18, 2023 at 08:49:26AM -0700, Randy Dunlap wrote:
-> On 5/18/23 08:01, Luis Chamberlain wrote:
-> >   * use 80 char length as if we're in the 1980's
-> 
-> Well, like Jon said, long lines are difficult to read, even on printed paper.
-> That's (at least one reason) why newspapers(!) have narrow columns of print.
+See also:
+* Commit 4d337cebcb1c ("blk-mq: avoid to touch q->elevator without any protection").
+* Commit 414dd48e882c ("blk-mq: add tagset quiesce interface").
 
-Makes sense!
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Damien Le Moal <dlemoal@kernel.org>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Chaitanya Kulkarni <kch@nvidia.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
 
-> Anyway, thanks for doing it.
+Changes compared to v1: also decode QUEUE_FLAG_SYNCHRONOUS.
 
-Heh yeah, I just trying to follow the convention, but I didn't know it was
-a special-case for bumping up to 100 only, and that it was definitely
-not good for docs. It's easy to loose it though, we have one for commit log,
-one for length on code with an exception, and we have a clear perference
-for docs. Makes me wonder if editors pick up on project specific requirements
-somehow? 
+ block/blk-mq-debugfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-So for instance I used to have incorrectly;
-
-set textwidth=100
-autocmd FileType gitcommit set textwidth=72
-set colorcolumn=+1
-
-Cleary that 100 is wrong now and I've now updated it bacak to 80.
-Could one be used for FileType for rst and ascii files?
-
-If we shared something on the top level which lets developers
-optionally pick up on project specific guideline it would be a less
-common problem to ping back / forth about this. Curious how many
-patches "length" is the reason introduces a latency for patches getting
-upstream. You figured this would be a simple fix in year 2023 :P
-
-Thanks for the fix recommendations! I'll wait and see if others find
-others!
-
-  Luis
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index d23a8554ec4a..f89865a90dba 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -88,6 +88,7 @@ static const char *const blk_queue_flag_name[] = {
+ 	QUEUE_FLAG_NAME(IO_STAT),
+ 	QUEUE_FLAG_NAME(NOXMERGES),
+ 	QUEUE_FLAG_NAME(ADD_RANDOM),
++	QUEUE_FLAG_NAME(SYNCHRONOUS),
+ 	QUEUE_FLAG_NAME(SAME_FORCE),
+ 	QUEUE_FLAG_NAME(INIT_DONE),
+ 	QUEUE_FLAG_NAME(STABLE_WRITES),
+@@ -103,6 +104,8 @@ static const char *const blk_queue_flag_name[] = {
+ 	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
+ 	QUEUE_FLAG_NAME(HCTX_ACTIVE),
+ 	QUEUE_FLAG_NAME(NOWAIT),
++	QUEUE_FLAG_NAME(SQ_SCHED),
++	QUEUE_FLAG_NAME(SKIP_TAGSET_QUIESCE),
+ };
+ #undef QUEUE_FLAG_NAME
+ 
