@@ -2,51 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B21C77B7D
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 13:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F25C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 13:13:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230200AbjERNGl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 09:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
+        id S231364AbjERNNo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 09:13:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229985AbjERNGk (ORCPT
+        with ESMTP id S231366AbjERNNT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 09:06:40 -0400
+        Thu, 18 May 2023 09:13:19 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00913170B
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 06:06:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C743F198E;
+        Thu, 18 May 2023 06:12:48 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id A2E6968C7B; Thu, 18 May 2023 15:06:32 +0200 (CEST)
-Date:   Thu, 18 May 2023 15:06:32 +0200
+        id 4333668C7B; Thu, 18 May 2023 15:12:17 +0200 (CEST)
+Date:   Thu, 18 May 2023 15:12:16 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
+To:     Christian Brauner <brauner@kernel.org>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/3] blk-mq: remove RQF_ELVPRIV
-Message-ID: <20230518130632.GA31791@lst.de>
-References: <20230518053101.760632-1-hch@lst.de> <20230518053101.760632-3-hch@lst.de> <ZGXPkFOWOuoLWglR@ovpn-8-21.pek2.redhat.com>
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 5/9] block: introduce holder ops
+Message-ID: <20230518131216.GA32076@lst.de>
+References: <20230505175132.2236632-6-hch@lst.de> <20230516-kommode-weizen-4c410968c1f6@brauner> <20230517073031.GF27026@lst.de> <20230517-einreden-dermatologisch-9c6a3327a689@brauner> <20230517080613.GA31383@lst.de> <20230517-erhoffen-degradieren-d0aa039f0e1d@brauner> <20230517120259.GA16915@lst.de> <20230517-holzfiguren-anbot-490e5a7f74fe@brauner> <20230517142609.GA28898@lst.de> <20230518-teekanne-knifflig-a4ea8c3c885a@brauner>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZGXPkFOWOuoLWglR@ovpn-8-21.pek2.redhat.com>
+In-Reply-To: <20230518-teekanne-knifflig-a4ea8c3c885a@brauner>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18, 2023 at 03:11:12PM +0800, Ming Lei wrote:
-> > -		if ((rq->rq_flags & RQF_ELVPRIV) && e->type->ops.requeue_request)
-> > +		if (e->type->ops.requeue_request)
-> >  			e->type->ops.requeue_request(rq);
-> 
-> The above actually changes current behavior since RQF_ELVPRIV is only set
-> iff the following condition is true:
-> 
-> 	(rq->rq_flags & RQF_ELV) && !op_is_flush(rq->cmd_flags) &&
-> 		e->type->ops.prepare_request.
+On Thu, May 18, 2023 at 10:13:04AM +0200, Christian Brauner wrote:
+> Fwiw, I didn't mean to have a special device handler for an O_PATH fd.
+> I really just tried to figure out whether it would make sense to have an
+> fd-based block device lookup function because right now we only have
+> blkdev_get_by_path() and we'd be passing blkdev fds through the mount
+> api. But I understand now how I'd likely do it. So now just finding time
+> to actually implement it.
 
-It would require an I/O scheduler that implements .requeue_request but
-not .prepare_request, which doesn't exist and also is rather pointless as
-this .requeue_request method would never get called in the current code.
-
-So no, no behavior change in practice.
+What's wrong with blkdev_get_by_dev(file_inode(file)->i_rdev) after
+the sanity checks from lookup_bdev (S_ISBLK and may_open_dev)?
