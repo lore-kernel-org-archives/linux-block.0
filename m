@@ -2,89 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DD1C7EE23
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 17:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7153C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 17:52:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229493AbjERRvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 13:51:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43042 "EHLO
+        id S229498AbjERRwe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 13:52:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjERRvP (ORCPT
+        with ESMTP id S229627AbjERRwd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 13:51:15 -0400
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14ED4ED
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 10:50:52 -0700 (PDT)
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1aaea43def7so17437695ad.2
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 10:50:52 -0700 (PDT)
+        Thu, 18 May 2023 13:52:33 -0400
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C629F131
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 10:52:27 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1ae6dce19f7so5991155ad.3
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 10:52:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684432251; x=1687024251;
+        d=1e100.net; s=20221208; t=1684432347; x=1687024347;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wRsmI3n5nU8K3OWhL7xS+cowC4C0InozBxvqV/VrSSY=;
-        b=NvkSNHQXnidwLWyECbB1B/nystBdjI/FMxiC1G6Pw04eQe6iI//AUxp4B4lMqPBOCK
-         WYn2s+dd45Z9ZJLUVZRFUxkES91AfWdFVKvJhVBmipjmLNFq7rfFBsm/WOkwDoMqunAB
-         27HTdM2xvqSrG7mKyIY+ruSYk/nZdjnAk+wju3ktreilc7Kzv35SXyRO3W1SJ+hz8wR/
-         r+55bEKSZmTnwSO5bxS7KS4FIedWBpgnptxlEwaSM+lM/gtCDQ32tEmtWqp3lZY099oa
-         TqUNg92dhKYxRsrL2vq6IYEAYfxiNeMtq6NYzfSTA2S48EOonEECBEaL2hpFizDohwKY
-         k3Dw==
-X-Gm-Message-State: AC+VfDy6x6VfwxXt7b3RHcnC0c/v6x4Uu6iq8kekODSjofeXUX5zB4aw
-        rZK2Prx/mS9AntBCbvfo7SE=
-X-Google-Smtp-Source: ACHHUZ4ZazJOzYIM/uAXv3ooYR04KKPtIoPgCGWjSXtVizaiGpuQQ+nc4BbXEHiuzSP2+GvCYcEdiw==
-X-Received: by 2002:a17:902:e74f:b0:1ad:df75:45e0 with SMTP id p15-20020a170902e74f00b001addf7545e0mr3865114plf.39.1684432251394;
-        Thu, 18 May 2023 10:50:51 -0700 (PDT)
+        bh=t48M6GXKCfAs9Mw7rWI62G/DfMc58hyveP8cja75zGQ=;
+        b=OWGz/ME8BudjFDyvo/dSfdD7Rtke6Gep0wboNfVt50nG21y1x5ElH8VbnUaBZvZfF5
+         cv9Kl56Ia1KZCkAurmse9st2CuztF3MWwKjYp1+JBK8x8M95Weusksv6F7nFphIQnGHa
+         BJSqePSgQy9xgwCisLJos3L4ghuBMsVWyKKzHjlEsO6kVznPBuuGHexGcq7f116crnW7
+         QDI4kLV7qPWN8od2nzXP6qIUoRaIkKkhGK/1YVwoNMFMSjVR/XHs6xfNyr+GLZOpvp2G
+         kM4ArPm1fF7KlnC6CDs1ULVrkHDYK9nOfgVx13en/mf4Rqlq1mtvZzFZqKzqMahXAo1V
+         Ah7Q==
+X-Gm-Message-State: AC+VfDws15i+bRc/m1erR/nPGag7rTbFkxK/vId+wtMRaiWsGr+T/GD1
+        lrpB2Zovxn+Ce4C0G7ylnYQ=
+X-Google-Smtp-Source: ACHHUZ7MZdKJWjJNg0kMIPKAIZzZLO8DNqDBDYtYx3JuwmbmpABMbq+5UNqZSHfRdMu3pQFIBq9osw==
+X-Received: by 2002:a17:902:b707:b0:1ad:fcdc:2a9f with SMTP id d7-20020a170902b70700b001adfcdc2a9fmr2954383pls.51.1684432346852;
+        Thu, 18 May 2023 10:52:26 -0700 (PDT)
 Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id h7-20020a170902f7c700b001ae5d21e95csm1736956plw.117.2023.05.18.10.50.49
+        by smtp.gmail.com with ESMTPSA id h5-20020a170902680500b001a245b49731sm1748451plk.128.2023.05.18.10.52.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 May 2023 10:50:50 -0700 (PDT)
-Message-ID: <091dd83f-14e9-ab63-6a35-4d4daba75e9e@acm.org>
-Date:   Thu, 18 May 2023 10:50:49 -0700
+        Thu, 18 May 2023 10:52:26 -0700 (PDT)
+Message-ID: <9275b563-c0e2-e003-6566-de06af46ed35@acm.org>
+Date:   Thu, 18 May 2023 10:52:25 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH 1/3] blk-mq: don't queue plugged passthrough requests into
- scheduler
+Subject: Re: [PATCH 2/3] blk-mq: remove RQF_ELVPRIV
 Content-Language: en-US
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Guangwu Zhang <guazhang@redhat.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org
 References: <20230518053101.760632-1-hch@lst.de>
- <20230518053101.760632-2-hch@lst.de>
+ <20230518053101.760632-3-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230518053101.760632-2-hch@lst.de>
+In-Reply-To: <20230518053101.760632-3-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/17/23 22:30, Christoph Hellwig wrote:
-> Passthrough) request should never be queued to the I/O scheduler,
+On 5/17/23 22:31, Christoph Hellwig wrote:
+> RQF_ELVPRIV is set for all non-flush requests that have RQF_ELV set.
+> Expand this condition in the two users of the flag and remove it.
 
-Passthrough) request -> Passthrough requests
-
-> as scheduling these opaque requests doens't make sense, and I/O
-
-doens't -> doesn't
-
-> schedulers might required req->bio to be always valid.
-
-required -> require
-
-> We never let passthrough request cross scheduler before commit
-
-request -> requests
-
-> 1c2d2fff6dc0 ("block: wire-up support for passthrough plugging"),
-> restored this behavior even for passthrough requests issued under
-> a plug.
-
-The above sentence needs to be edited for clarity.
-
-Otherwise this patch looks good to me.
-
-Thanks,
-
-Bart.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
