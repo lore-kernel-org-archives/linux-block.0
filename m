@@ -2,84 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB960C77B7D
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 07:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953ACC77B7D
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 07:55:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229876AbjERHwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 03:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40936 "EHLO
+        id S229904AbjERHzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 03:55:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbjERHwP (ORCPT
+        with ESMTP id S229779AbjERHzl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 03:52:15 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9512699;
-        Thu, 18 May 2023 00:52:14 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 199CF22618;
-        Thu, 18 May 2023 07:52:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1684396332; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=35wFhivmcYCWnVrRWAiYgC66ZHYrppThfjDiaL7jSDs=;
-        b=gNaF4FEF4sCEAoxMytxwRr24GdjT8ysJtK4mZVMdB6U7mOAaNy9+e/8ROl4bTWmVE5p2kl
-        ooY4Tybp8d+N0Zie0mPzgBkdlsvfONKgCMPjMyzpz1gUj3RknDCfNKrjI3JTVeS6zUHnpB
-        4yVehVoifvGbZDr8er2poJBS5RZ3/HI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1684396332;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=35wFhivmcYCWnVrRWAiYgC66ZHYrppThfjDiaL7jSDs=;
-        b=mMuwCITDzTnnCtb0M9rvVEUBnsoij5qy+Bez40xgUbr1ldcfQWzVPwim0FVUDQ2efW9cQO
-        V0qP84RymdNjyrBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 08CAE1390B;
-        Thu, 18 May 2023 07:52:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id iU/FASzZZWRpKQAAMHmgww
-        (envelope-from <dwagner@suse.de>); Thu, 18 May 2023 07:52:12 +0000
-Date:   Thu, 18 May 2023 09:52:11 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests v4 05/11] nvme{032,040}: Use runtime fio
- background jobs
-Message-ID: <eykbvi7lzhnbd6ft6cva6qu4lp5ryn3ha2fgigmao2553qm4bu@227ey5mv5ls5>
-References: <20230511140953.17609-1-dwagner@suse.de>
- <20230511140953.17609-6-dwagner@suse.de>
- <50c50cda-23f5-b55d-a902-ce34de8498e1@nvidia.com>
+        Thu, 18 May 2023 03:55:41 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40EC62691;
+        Thu, 18 May 2023 00:55:40 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QMMj40xYGz4f3nTp;
+        Thu, 18 May 2023 15:55:36 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgDX0R_32WVkiB2sIw--.13756S3;
+        Thu, 18 May 2023 15:55:37 +0800 (CST)
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        stanley.chu@mediatek.com, peter.wang@mediatek.com,
+        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
+        powen.kao@mediatek.com, naomi.chu@mediatek.com,
+        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <ZF0K7A6G2cYBjSgn@infradead.org>
+ <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
+ <ZF5G5ztMng8Xbd1W@infradead.org>
+ <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
+ <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
+ <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
+ <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
+ <097caed2-10b3-7cd1-7c06-90f983e5c720@acm.org>
+ <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
+ <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <bef8340e-f051-db63-5c2f-a2bc94c678ac@huaweicloud.com>
+Date:   Thu, 18 May 2023 15:55:35 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50c50cda-23f5-b55d-a902-ce34de8498e1@nvidia.com>
+In-Reply-To: <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDX0R_32WVkiB2sIw--.13756S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xr48Zw43XF48ury5CF1kuFg_yoW3JrXEgw
+        4DWas2gw42gry7Kayjkr4SvFWqqay7Z3WUXFW0qFWay3s5KrW3Krn09rn5Wa1fXw4xtrn0
+        9r15X34Yv3yIvjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3AFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
+        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+        nIWIevJa73UjIFyTuYvjfUOmhFUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 17, 2023 at 04:40:52AM +0000, Chaitanya Kulkarni wrote:
-> On 5/11/23 07:09, Daniel Wagner wrote:
-> > The fio jobs are supposed to run long in background during the test.
-> > Instead relying on a job size use explicit runtime for this.
-> >
-> > Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> 
-> Is there any issue with the exiting approach for this change ?
+Hi,
 
-The expectation of the test here is that there is a background job running.
-Depending on the job size is an indirect way to express run at least for x
-seconds. This gives a variable runtime as it depends the how fast fio jobs gets
-executed. Explicitly telling the runtime is my opinion more robust and documents
-the indention better.
+在 2023/05/18 10:23, Bart Van Assche 写道:
+> On 5/17/23 18:49, Yu Kuai wrote:
+>> Currently, fair share from hctx_may_queue() requires two
+>> atomic_read(active_queues and active_requests), I think this smoothing
+>> method can be placed into get_tag fail path, for example, the more times
+>> a disk failed to get tag in a period of time, the more tag this disk can
+>> get, and all the information can be updated here(perhaps directly
+>> record how many tags a disk can get, then hctx_may_queue() still only
+>> require 2 atomic_read()).
+> 
+> That sounds interesting to me. Do you perhaps plan to implement this 
+> approach and to post it as a patch?
+
+Of course, I'll try to send a RFC patch.
+
+Thanks,
+Kuai
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> 
+> .
+> 
+
