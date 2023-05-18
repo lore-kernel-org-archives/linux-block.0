@@ -2,269 +2,174 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E03C77B73
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 22:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B01DC7EE29
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 23:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231238AbjERWea (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 18:34:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46862 "EHLO
+        id S229761AbjERXJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 19:09:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230480AbjERWeH (ORCPT
+        with ESMTP id S229522AbjERXJG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 18:34:07 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8126B1716
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 15:33:58 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-64ab2a37812so142431b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 15:33:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1684449238; x=1687041238;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o0RjYl/m1xYKkWDD1lX4N49WRpVnJJ8wbKxnpktlyn8=;
-        b=lU2Z98AVSCgdcM0/aMT/tYZ4d9YuthlRR0I0JpCnxQmD7LS6B//t6CkdxVppfoIxZj
-         jGmarxCXKmU886bWSV2hjLAJTLP8j6tKiO63WZxawmzHuieTa2vbil4oQkUagUzGp9rS
-         g/G7CpzZoTy7r0BXfdrJv0rl20/K0MNTJNJmA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684449238; x=1687041238;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o0RjYl/m1xYKkWDD1lX4N49WRpVnJJ8wbKxnpktlyn8=;
-        b=EppQ1GVAxRodJhY+s6CK7KcGOfYayJrvpHt2MsLAOrSm5BnbSqh066xLkFDZYiaYI2
-         /19OVaH7B+Uao4YTaIy2AOhficRWTsl83Lc4ob7RU/xAjtMXmEfANkSlTaUJJTWNvAg0
-         Cy8A5Osuyd8YcZxou57VmlIzMSJwaQiVAg+S5nrMrfRLGujHZlO3N9lPmLfEUB57c/yb
-         PAHK6AVh9DlyVOk00MfN3knfPhQIgWM4IKnxYthbpIyMzayBoWmCsYcYMtM4cnoR+nT7
-         G4qAIlJcF0p6m12+xunAAzoRp82IM7ii6mq2VHoNNFnPP2BK0bFjBVp1ejZqKERqtxEA
-         ujcw==
-X-Gm-Message-State: AC+VfDxaWNsUBT99zeKvDPJXlDNCSSYyfx7Fd62DEg0r9yck0rtw43Sv
-        1lc+lbLhaTDzGSpDc4Ao6xCj0A==
-X-Google-Smtp-Source: ACHHUZ41Mt0LdJYehtesv6pKDnJiDtvVDpBOIv2PtermPkwVmgzJ8wQgFh4PWlilf6vPStsuMKVTig==
-X-Received: by 2002:a17:903:2287:b0:1ad:ea13:1914 with SMTP id b7-20020a170903228700b001adea131914mr4578158plh.30.1684449237781;
-        Thu, 18 May 2023 15:33:57 -0700 (PDT)
-Received: from sarthakkukreti-glaptop.corp.google.com ([100.107.238.113])
-        by smtp.gmail.com with ESMTPSA id q4-20020a170902b10400b001aafb802efbsm1996502plr.12.2023.05.18.15.33.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 15:33:57 -0700 (PDT)
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Subject: [PATCH v7 4/5] dm-thin: Add REQ_OP_PROVISION support
-Date:   Thu, 18 May 2023 15:33:25 -0700
-Message-ID: <20230518223326.18744-5-sarthakkukreti@chromium.org>
-X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
-In-Reply-To: <20230518223326.18744-1-sarthakkukreti@chromium.org>
-References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
+        Thu, 18 May 2023 19:09:06 -0400
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40BE218D;
+        Thu, 18 May 2023 16:09:04 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::5f6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id AA2BC6E3;
+        Thu, 18 May 2023 23:09:03 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net AA2BC6E3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1684451343; bh=1M5d91X9MObXWb0pgAgYuQeNohJxmU2Ps8GnVyUg/3w=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=jepeY1C96EP+fR9RyG121qTdDSV3QXN1Z5+jxxnfiNNGC7DCKW5gw7xDz4PnbrzMI
+         ww2ex1Yym24pC7VvTol2CGQ092poGEmeRSgxIUy4n+dJ4tC/B5FC4l9xMsyFa7PEu6
+         M7ab1tT7uvDSQOQiEjBavSbzeQVDUA5zmPCzSdgvNcVEd84dEsgiGEEukl8H2y1xM5
+         y9RDqDAjiJdBcKjMZEYllzN5Pq3bIdR6s7KQhrv3K30nhvKppaEKaW3P9Owls4aOR9
+         yABduy2xRUq2Nd4S0vVNc9Hx5RsYpuZVTQ9cjTSLpW9UdxtOYiw1K1h2HyFRgEzN3a
+         KrSDco9sso3zg==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Luis Chamberlain <mcgrof@kernel.org>, jake@lwn.net,
+        hch@infradead.org, djwong@kernel.org, dchinner@redhat.com
+Cc:     ritesh.list@gmail.com, rgoldwyn@suse.com, jack@suse.cz,
+        linux-doc@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        p.raghav@samsung.com, da.gomez@samsung.com, rohan.puri@samsung.com,
+        mcgrof@kernel.org
+Subject: Re: [PATCH v2] Documentation: add initial iomap kdoc
+In-Reply-To: <20230518150105.3160445-1-mcgrof@kernel.org>
+References: <20230518150105.3160445-1-mcgrof@kernel.org>
+Date:   Thu, 18 May 2023 17:09:02 -0600
+Message-ID: <87zg61p78x.fsf@meer.lwn.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-dm-thinpool uses the provision request to provision
-blocks for a dm-thin device. dm-thinpool currently does not
-pass through REQ_OP_PROVISION to underlying devices.
+Luis Chamberlain <mcgrof@kernel.org> writes:
 
-For shared blocks, provision requests will break sharing and copy the
-contents of the entire block. Additionally, if 'skip_block_zeroing'
-is not set, dm-thin will opt to zero out the entire range as a part
-of provisioning.
+> To help with iomap adoption / porting I set out the goal to try to
+> help improve the iomap documentation and get general guidance for
+> filesystem conversions over from buffer-head in time for this year's
+> LSFMM. The end results thanks to the review of Darrick, Christoph and
+> others is on the kernelnewbies wiki [0].
+>
+> This brings this forward a relevant subset of that documentation to
+> the kernel in kdoc format and also kdoc'ifies the existing documentation
+> on iomap.h.
 
-Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
----
- drivers/md/dm-thin.c | 74 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 70 insertions(+), 4 deletions(-)
+OK, I've had a read through it.  Thanks again for doing it, we
+definitely need this.  There are typos and such that Randy has already
+pointed out, so I won't bother with those.  My main comment is mainly a
+high level one, along with a handful of nits.
 
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index 2b13c949bd72..f1b68b558cf0 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -274,6 +274,7 @@ struct pool {
- 
- 	process_bio_fn process_bio;
- 	process_bio_fn process_discard;
-+	process_bio_fn process_provision;
- 
- 	process_cell_fn process_cell;
- 	process_cell_fn process_discard_cell;
-@@ -913,7 +914,8 @@ static void __inc_remap_and_issue_cell(void *context,
- 	struct bio *bio;
- 
- 	while ((bio = bio_list_pop(&cell->bios))) {
--		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD)
-+		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
-+		    bio_op(bio) == REQ_OP_PROVISION)
- 			bio_list_add(&info->defer_bios, bio);
- 		else {
- 			inc_all_io_entry(info->tc->pool, bio);
-@@ -1245,8 +1247,8 @@ static int io_overlaps_block(struct pool *pool, struct bio *bio)
- 
- static int io_overwrites_block(struct pool *pool, struct bio *bio)
- {
--	return (bio_data_dir(bio) == WRITE) &&
--		io_overlaps_block(pool, bio);
-+	return (bio_data_dir(bio) == WRITE) && io_overlaps_block(pool, bio) &&
-+	       bio_op(bio) != REQ_OP_PROVISION;
- }
- 
- static void save_and_set_endio(struct bio *bio, bio_end_io_t **save,
-@@ -1394,6 +1396,9 @@ static void schedule_zero(struct thin_c *tc, dm_block_t virt_block,
- 	m->data_block = data_block;
- 	m->cell = cell;
- 
-+	if (bio && bio_op(bio) == REQ_OP_PROVISION)
-+		m->bio = bio;
-+
- 	/*
- 	 * If the whole block of data is being overwritten or we are not
- 	 * zeroing pre-existing data, we can issue the bio immediately.
-@@ -1953,6 +1958,51 @@ static void provision_block(struct thin_c *tc, struct bio *bio, dm_block_t block
- 	}
- }
- 
-+static void process_provision_bio(struct thin_c *tc, struct bio *bio)
-+{
-+	int r;
-+	struct pool *pool = tc->pool;
-+	dm_block_t block = get_bio_block(tc, bio);
-+	struct dm_bio_prison_cell *cell;
-+	struct dm_cell_key key;
-+	struct dm_thin_lookup_result lookup_result;
-+
-+	/*
-+	 * If cell is already occupied, then the block is already
-+	 * being provisioned so we have nothing further to do here.
-+	 */
-+	build_virtual_key(tc->td, block, &key);
-+	if (bio_detain(pool, &key, bio, &cell))
-+		return;
-+
-+	if (tc->requeue_mode) {
-+		cell_requeue(pool, cell);
-+		return;
-+	}
-+
-+	r = dm_thin_find_block(tc->td, block, 1, &lookup_result);
-+	switch (r) {
-+	case 0:
-+		if (lookup_result.shared) {
-+			process_shared_bio(tc, bio, block, &lookup_result, cell);
-+		} else {
-+			bio_endio(bio);
-+			cell_defer_no_holder(tc, cell);
-+		}
-+		break;
-+	case -ENODATA:
-+		provision_block(tc, bio, block, cell);
-+		break;
-+
-+	default:
-+		DMERR_LIMIT("%s: dm_thin_find_block() failed: error = %d",
-+			    __func__, r);
-+		cell_defer_no_holder(tc, cell);
-+		bio_io_error(bio);
-+		break;
-+	}
-+}
-+
- static void process_cell(struct thin_c *tc, struct dm_bio_prison_cell *cell)
- {
- 	int r;
-@@ -2228,6 +2278,8 @@ static void process_thin_deferred_bios(struct thin_c *tc)
- 
- 		if (bio_op(bio) == REQ_OP_DISCARD)
- 			pool->process_discard(tc, bio);
-+		else if (bio_op(bio) == REQ_OP_PROVISION)
-+			pool->process_provision(tc, bio);
- 		else
- 			pool->process_bio(tc, bio);
- 
-@@ -2579,6 +2631,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
- 		dm_pool_metadata_read_only(pool->pmd);
- 		pool->process_bio = process_bio_fail;
- 		pool->process_discard = process_bio_fail;
-+		pool->process_provision = process_bio_fail;
- 		pool->process_cell = process_cell_fail;
- 		pool->process_discard_cell = process_cell_fail;
- 		pool->process_prepared_mapping = process_prepared_mapping_fail;
-@@ -2592,6 +2645,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
- 		dm_pool_metadata_read_only(pool->pmd);
- 		pool->process_bio = process_bio_read_only;
- 		pool->process_discard = process_bio_success;
-+		pool->process_provision = process_bio_fail;
- 		pool->process_cell = process_cell_read_only;
- 		pool->process_discard_cell = process_cell_success;
- 		pool->process_prepared_mapping = process_prepared_mapping_fail;
-@@ -2612,6 +2666,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
- 		pool->out_of_data_space = true;
- 		pool->process_bio = process_bio_read_only;
- 		pool->process_discard = process_discard_bio;
-+		pool->process_provision = process_bio_fail;
- 		pool->process_cell = process_cell_read_only;
- 		pool->process_prepared_mapping = process_prepared_mapping;
- 		set_discard_callbacks(pool);
-@@ -2628,6 +2683,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
- 		dm_pool_metadata_read_write(pool->pmd);
- 		pool->process_bio = process_bio;
- 		pool->process_discard = process_discard_bio;
-+		pool->process_provision = process_provision_bio;
- 		pool->process_cell = process_cell;
- 		pool->process_prepared_mapping = process_prepared_mapping;
- 		set_discard_callbacks(pool);
-@@ -2749,7 +2805,8 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
- 		return DM_MAPIO_SUBMITTED;
- 	}
- 
--	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD) {
-+	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
-+	    bio_op(bio) == REQ_OP_PROVISION) {
- 		thin_defer_bio_with_throttle(tc, bio);
- 		return DM_MAPIO_SUBMITTED;
- 	}
-@@ -3396,6 +3453,9 @@ static int pool_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 	pt->adjusted_pf = pt->requested_pf = pf;
- 	ti->num_flush_bios = 1;
- 	ti->limit_swap_bios = true;
-+	ti->num_provision_bios = 1;
-+	ti->provision_supported = true;
-+	ti->max_provision_granularity = true;
- 
- 	/*
- 	 * Only need to enable discards if the pool should pass
-@@ -4094,6 +4154,8 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
- 		blk_limits_io_opt(limits, pool->sectors_per_block << SECTOR_SHIFT);
- 	}
- 
-+	limits->max_provision_sectors = pool->sectors_per_block;
-+
- 	/*
- 	 * pt->adjusted_pf is a staging area for the actual features to use.
- 	 * They get transferred to the live pool in bind_control_target()
-@@ -4288,6 +4350,10 @@ static int thin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		ti->max_discard_granularity = true;
- 	}
- 
-+	ti->num_provision_bios = 1;
-+	ti->provision_supported = true;
-+	ti->max_provision_granularity = true;
-+
- 	mutex_unlock(&dm_thin_pool_table.mutex);
- 
- 	spin_lock_irq(&tc->pool->lock);
--- 
-2.40.1.698.g37aff9b760-goog
+My high-level question is: who is the audience for this document?  I'm
+guessing it's filesystem developers?  Whoever it is, the document could
+benefit from an introductory section, aimed at that audience, saying how
+to get *started* with iomap.  What include files do I need?  How do I
+provide a set of iomap callbacks and make them visible to the VFS?
+Without that sort of stuff, it makes for a rough jumping-in experience.
 
+The nits:
+
+> diff --git a/Documentation/filesystems/iomap.rst b/Documentation/filesystems/iomap.rst
+> new file mode 100644
+> index 000000000000..be487030fcff
+> --- /dev/null
+> +++ b/Documentation/filesystems/iomap.rst
+> @@ -0,0 +1,253 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +.. _iomap:
+
+I don't think you use this label anywhere, so it doesn't need to be here.
+
+> +..
+> +        Mapping of heading styles within this document:
+> +        Heading 1 uses "====" above and below
+> +        Heading 2 uses "===="
+> +        Heading 3 uses "----"
+> +        Heading 4 uses "````"
+> +        Heading 5 uses "^^^^"
+> +        Heading 6 uses "~~~~"
+> +        Heading 7 uses "...."
+
+We have a set of conventions for section headings, nicely documented in
+Documentation/doc-guide/sphinx.rst.  This hierarchy doesn't quite match
+it, but you don't get far enough into it to hit the differences.  I'd
+just take this out.
+
+> +
+> +        Sections are manually numbered because apparently that's what everyone
+> +        does in the kernel.
+
+The sections are *not* manually numbered, which I think is entirely
+fine.  But that makes this comment a bit weird.
+
+> +.. contents:: Table of Contents
+> +   :local:
+> +
+> +=====
+> +iomap
+> +=====
+> +
+> +.. kernel-doc:: include/linux/iomap.h
+> +
+> +A modern block abstraction
+> +==========================
+> +
+> +**iomap** allows filesystems to query storage media for data using *byte
+> +ranges*. Since block mapping are provided for a *byte ranges* for cache data in
+> +memory, in the page cache, naturally this implies operations on block ranges
+> +will also deal with *multipage* operations in the page cache. **Folios** are
+> +used to help provide *multipage* operations in memory for the *byte ranges*
+> +being worked on.
+
+This text (and the document as a whole) is a bit heavy on the markup.
+I'd consider taking some of it out to improve the plain-text readability.
+
+[...]
+
+> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+> index e2b836c2e119..ee4b026995ac 100644
+> --- a/include/linux/iomap.h
+> +++ b/include/linux/iomap.h
+> @@ -10,6 +10,30 @@
+>  #include <linux/mm_types.h>
+>  #include <linux/blkdev.h>
+>  
+> +/**
+> + * DOC: Introduction
+> + *
+> + * iomap allows filesystems to sequentially iterate over byte addressable block
+> + * ranges on an inode and apply operations to it.
+> + *
+> + * iomap grew out of the need to provide a modern block mapping abstraction for
+> + * filesystems with the different IO access methods they support and assisting
+> + * the VFS with manipulating files into the page cache. iomap helpers are
+> + * provided for each of these mechanisms. However, block mapping is just one of
+> + * the features of iomap, given iomap supports DAX IO for filesystems and also
+> + * supports such the ``lseek``/``llseek`` ``SEEK_DATA``/``SEEK_HOLE``
+> + * interfaces.
+> + *
+> + * Block mapping provides a mapping between data cached in memory and the
+> + * location on persistent storage where that data lives. `LWN has an great
+> + * review of the old buffer-heads block-mapping and why they are inefficient
+> + * <https://lwn.net/Articles/930173/>`, since the inception of Linux.  Since
+> + * **buffer-heads** work on a 512-byte block based paradigm, it creates an
+> + * overhead for modern storage media which no longer necessarily works only on
+> + * 512-blocks. iomap is flexible providing block ranges in *bytes*. iomap, with
+> + * the support of folios, provides a modern replacement for **buffer-heads**.
+
+As much as I love to see LWN references embedded in as many kernel files
+as possible, I'm honestly not sure that the iomap documentation needs to
+talk about buffer heads at all - except maybe for help in replacing
+them.  In particular, I don't think that the documentation needs to
+justify iomap's existence; we can look at the commit logs if we need to
+remind ourselves of that.
+
+Thanks,
+
+jon
