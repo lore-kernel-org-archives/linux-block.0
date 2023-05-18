@@ -2,110 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B795C77B7A
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 02:16:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 194EAC77B7F
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 02:23:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbjERCQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 22:16:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55636 "EHLO
+        id S229723AbjERCXn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 22:23:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjERCQm (ORCPT
+        with ESMTP id S229549AbjERCXi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 22:16:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD703210C
-        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 19:15:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684376157;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K4DhnB/Mb2qNxRJ3dsE4nmeKE6kddWJ9OIHGaovDSrY=;
-        b=NlQ8DjSUjkPG+Am2Sij0OlFmSJyM9Y3kJYT7IxXMUZbhhLwLjs/pyWXCK9vs5SPe3xRcRr
-        mdoNIGtF9Qafdy25x89WFPeOKC+ccofDrQmYM6IBb2+DnoPEqJH5aFap7UhiJi6XCK6cZo
-        7pJLjZ9GioF9GfFzxfc8YxqkeWVFZA0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-260-iKt4YJhNO2qHogQuhPRxig-1; Wed, 17 May 2023 22:15:54 -0400
-X-MC-Unique: iKt4YJhNO2qHogQuhPRxig-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D2D2E185A79C;
-        Thu, 18 May 2023 02:15:53 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EDDEC16024;
-        Thu, 18 May 2023 02:15:47 +0000 (UTC)
-Date:   Thu, 18 May 2023 10:15:42 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        kbusch@kernel.org, sagi@grimberg.me, joshi.k@samsung.com,
-        ming.lei@redhat.com
-Subject: Re: [PATCH for-next 2/2] nvme: optimise io_uring passthrough
- completion
-Message-ID: <ZGWKTpRLIJ0NBPIt@ovpn-8-16.pek2.redhat.com>
-References: <cover.1684154817.git.asml.silence@gmail.com>
- <ecdfacd0967a22d88b7779e2efd09e040825d0f8.1684154817.git.asml.silence@gmail.com>
- <20230517072314.GC27026@lst.de>
- <9367cc09-c8b4-a56c-a61a-d2c776c05a1c@gmail.com>
- <84e1ce69-d6d5-5509-4665-2d153e294fc8@kernel.dk>
+        Wed, 17 May 2023 22:23:38 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDE633C26;
+        Wed, 17 May 2023 19:23:23 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1ae50da739dso10847985ad.1;
+        Wed, 17 May 2023 19:23:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684376603; x=1686968603;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A0HO+zrjQx0EnGmBwSxKYED9w5RWjcQswIihNrV1+/s=;
+        b=Zf9NCC82DJeZNg02XdyvqXmBF684gctyWcQQKNwhZMh17HIJqYx/ZGyfz9BBLuBQKy
+         AQjAuUWs5qoObQJkj9o0yuMLXj+4YeDL6D6SFK4akpzFJRNiSlfrE2FzzcAsxVhWksd6
+         O/+bO9sM0oebqBoTgE97ooA+yYsyhUHWGbGd7ryB2emK4gRLEPCiH6EU5R4FL0v/MPZi
+         ZMmEwgu8wbAxL+QUYyIraYfmMxoKvdQP1r9q+OD2eDhXAgVbyyPBh2EkvhdDng6kfnlA
+         jnpGuAOXYSlbBU7je3PVZA/w0/ZaoswpajWfYwpK6SXINon2DMlzO1DXUkIj1/bhjym2
+         WuLQ==
+X-Gm-Message-State: AC+VfDw3wjxm1bpU3HQOWT+OjB7GpQj9Mv7CHHF4U9BqzOgGInmH8DDI
+        D/ZUPCwPixlVIOWEcGyBlXKpKGOCbQ8=
+X-Google-Smtp-Source: ACHHUZ5v65/veJm9sVIzAkJDP7o32IKI922Z1/Q9bxhyqCvGbAvUdzZp8moIlHPKev+trVh+zhXN6g==
+X-Received: by 2002:a17:902:d48c:b0:1a6:ebc1:c54c with SMTP id c12-20020a170902d48c00b001a6ebc1c54cmr1275890plg.1.1684376603188;
+        Wed, 17 May 2023 19:23:23 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id q3-20020a170902dac300b001ac2c3e436asm69404plx.186.2023.05.17.19.23.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 May 2023 19:23:22 -0700 (PDT)
+Message-ID: <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
+Date:   Wed, 17 May 2023 19:23:20 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <84e1ce69-d6d5-5509-4665-2d153e294fc8@kernel.dk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        stanley.chu@mediatek.com, peter.wang@mediatek.com,
+        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
+        powen.kao@mediatek.com, naomi.chu@mediatek.com,
+        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <ZF0K7A6G2cYBjSgn@infradead.org>
+ <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
+ <ZF5G5ztMng8Xbd1W@infradead.org>
+ <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
+ <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
+ <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
+ <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
+ <097caed2-10b3-7cd1-7c06-90f983e5c720@acm.org>
+ <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 17, 2023 at 01:31:00PM -0600, Jens Axboe wrote:
-> On 5/17/23 6:32 AM, Pavel Begunkov wrote:
-> > On 5/17/23 08:23, Christoph Hellwig wrote:
-> >> On Mon, May 15, 2023 at 01:54:43PM +0100, Pavel Begunkov wrote:
-> >>> Use IOU_F_TWQ_LAZY_WAKE via iou_cmd_exec_in_task_lazy() for passthrough
-> >>> commands completion. It further delays the execution of task_work for
-> >>> DEFER_TASKRUN until there are enough of task_work items queued to meet
-> >>> the waiting criteria, which reduces the number of wake ups we issue.
-> >>
-> >> Why wouldn't you just do that unconditionally for
-> >> io_uring_cmd_complete_in_task?
-> > 
-> > 1) ublk does secondary batching and so may produce multiple cqes,
-> > that's not supported. I believe Ming sent patches removing it,
-> > but I'd rather not deal with conflicts for now.
-> 
-> Ming, what's the status of those patches? Looks like we'll end up
-> with a dependency regardless of the ordering of these. Since these
-> patches are here now, sanest approach seems to move forward with
-> this series and defer the conflict resolving to the ublk side.
+On 5/17/23 18:49, Yu Kuai wrote:
+> Currently, fair share from hctx_may_queue() requires two
+> atomic_read(active_queues and active_requests), I think this smoothing
+> method can be placed into get_tag fail path, for example, the more times
+> a disk failed to get tag in a period of time, the more tag this disk can
+> get, and all the information can be updated here(perhaps directly
+> record how many tags a disk can get, then hctx_may_queue() still only
+> require 2 atomic_read()).
 
-I didn't send patch to remove the batch in ublk, such as, the following
-line code:
+That sounds interesting to me. Do you perhaps plan to implement this 
+approach and to post it as a patch?
 
-ublk_queue_cmd():
-	...
-	if (!llist_add(&data->node, &ubq->io_cmds))
-		return;
-	...
+Thanks,
 
-But I did want to kill it given __io_req_task_work_add() can do batching
-process, but we have to re-order request in this list, so can't remove it
-now simply, see commit:
-
-	7d4a93176e01 ("ublk_drv: don't forward io commands in reserve order")
-
-Pavel must have misunderstood the following one as the batch removal:
-
-https://lore.kernel.org/linux-block/20230427124414.319945-2-ming.lei@redhat.com/
-
-	
-
-thanks,
-Ming
+Bart.
 
