@@ -2,75 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75609C77B7D
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 13:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F47C7EE25
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 13:56:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231197AbjERNYa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 09:24:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52692 "EHLO
+        id S231152AbjERN4K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 09:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230140AbjERNY3 (ORCPT
+        with ESMTP id S230339AbjERN4K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 09:24:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D74EEDA
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 06:23:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684416221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zAzxyQS9/nbdlkkYn4hDeXF4AMB4pc3WOtt86xOXrNk=;
-        b=ZU6wLuh16BnVQpjPt5uAb3h8KlMmqJlO96aYvRXDHyuAOMMwJ1CM6fv6DPViScUYmOxoj0
-        gmPnYYpJDJexkRfUmPV6hk4xugIgctcCmTjsBro9EKkGER98Waeh+mrCTs3JhrNvB/OibV
-        fRzsUoweVzVhO5EQXq5G8RPErhAJ1VA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-30-a-VuL3lPNdWhYKEFkuuZlw-1; Thu, 18 May 2023 09:23:37 -0400
-X-MC-Unique: a-VuL3lPNdWhYKEFkuuZlw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 18 May 2023 09:56:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4428710D5;
+        Thu, 18 May 2023 06:56:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 449AF185A79C;
-        Thu, 18 May 2023 13:23:37 +0000 (UTC)
-Received: from ovpn-8-21.pek2.redhat.com (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EA572166B31;
-        Thu, 18 May 2023 13:23:34 +0000 (UTC)
-Date:   Thu, 18 May 2023 21:23:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CC7F96410A;
+        Thu, 18 May 2023 13:56:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FEB3C4339B;
+        Thu, 18 May 2023 13:56:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684418168;
+        bh=hHyuhDMjdrGvdqZgER2nh0JzKbT7a7ZLHIcfi0F4Ds0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dsloX7t6KQCKsExTq09JdNRt4DRwUADPhd104IQM8lXR3JQCYdP+zIytegAbnCRMT
+         jgvy89L2iCP+Sslpz4GaGLrPfHo7HlXtl1+3FKK7BaTZ8kXOdFhq0EDMHMjFonm3Z3
+         eNXnJPLDpwTWqQveTTDpXLwU7tdC2ZCgQp6ngSBLzbq8XlCNlJdfesp80aNWQk/HUD
+         YVh910VanHRvrXq3u0T+th3WafPEUwjt38uVLv6nU2gv6+gWNOm1ZYMsf2AZG0gllr
+         oDn0CKndio/khJxd/pxBEVOD1/JvMWgDsL2+MdpjurYaLbM1gwW40SQvYhlSMf6/Ra
+         SUQuGhpwlMqkA==
+Date:   Thu, 18 May 2023 15:56:03 +0200
+From:   Christian Brauner <brauner@kernel.org>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] blk-mq: make sure elevator callbacks aren't called
- for passthrough request
-Message-ID: <ZGYm0KT9UG/OqVIW@ovpn-8-21.pek2.redhat.com>
-References: <20230518053101.760632-1-hch@lst.de>
- <20230518053101.760632-4-hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 5/9] block: introduce holder ops
+Message-ID: <20230518-erdkruste-unteilbar-cb91c62511c9@brauner>
+References: <20230516-kommode-weizen-4c410968c1f6@brauner>
+ <20230517073031.GF27026@lst.de>
+ <20230517-einreden-dermatologisch-9c6a3327a689@brauner>
+ <20230517080613.GA31383@lst.de>
+ <20230517-erhoffen-degradieren-d0aa039f0e1d@brauner>
+ <20230517120259.GA16915@lst.de>
+ <20230517-holzfiguren-anbot-490e5a7f74fe@brauner>
+ <20230517142609.GA28898@lst.de>
+ <20230518-teekanne-knifflig-a4ea8c3c885a@brauner>
+ <20230518131216.GA32076@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230518053101.760632-4-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+In-Reply-To: <20230518131216.GA32076@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18, 2023 at 07:31:01AM +0200, Christoph Hellwig wrote:
-> In case of q->elevator, passthrought request can still be marked as
-> RQF_ELV, so some elevator callbacks will be called for them.
+On Thu, May 18, 2023 at 03:12:16PM +0200, Christoph Hellwig wrote:
+> On Thu, May 18, 2023 at 10:13:04AM +0200, Christian Brauner wrote:
+> > Fwiw, I didn't mean to have a special device handler for an O_PATH fd.
+> > I really just tried to figure out whether it would make sense to have an
+> > fd-based block device lookup function because right now we only have
+> > blkdev_get_by_path() and we'd be passing blkdev fds through the mount
+> > api. But I understand now how I'd likely do it. So now just finding time
+> > to actually implement it.
 > 
-> Fix this by splitting RQF_SCHED_TAGS, which is set for all requests that
-> are issued on a queue that uses an I/O scheduler, and RQF_USE_SCHED for
-> non-flush, non-passthrough requests on such a queue.
-> 
-> Roughly based on two different patches from
-> Ming Lei <ming.lei@redhat.com>.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+> What's wrong with blkdev_get_by_dev(file_inode(file)->i_rdev) after
+> the sanity checks from lookup_bdev (S_ISBLK and may_open_dev)?
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-Thanks,
-Ming
-
+Yeah, that's what I realized could work fine. I just need to check all
+fses how they currently do this and how to do this cleanly.
