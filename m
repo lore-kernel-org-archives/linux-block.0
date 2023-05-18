@@ -2,119 +2,82 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EE8C77B7D
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 09:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19678C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 11:53:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230144AbjERJ0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 05:26:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
+        id S231359AbjERLxd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 07:53:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbjERJ0s (ORCPT
+        with ESMTP id S231279AbjERLxc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 05:26:48 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D1CFC3;
-        Thu, 18 May 2023 02:26:47 -0700 (PDT)
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34I8iWYk017337;
-        Thu, 18 May 2023 09:26:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=qcppdkim1;
- bh=l4eWh7+rn5/X+0JGaPIW3uUeEg7Fa2SZlqeEZEpEiks=;
- b=LEAD5wwSE9HQJ9AycMMftYTnwwtmawYiXqE85eGs4AgcRF7WbnUd2KBnpBlTCSXkCfUf
- ytXqLUtq9CRohao6lhKF0k2HkjLEsSEgGgLIbj/Zhh+GFd0l8gCNS2bSqjPxVyxgYt0/
- XPllS0UVuGtQRTHSW6b9WmH2dLss3CLFYhx2X/pcFoiwwQwHUtjTj8rQTrynzuiy8fDo
- RdkHgsib7kZj3QOa3vr1S/yf5CGXe1gJCsp1Drj9ALCHI2nP6cCNDFQjN8zmmEj7XgcR
- /eT/gQkmwW7TXw/HUkfKWenW2Vc7QNhnhsHoVSoGRabQXtMGmEvSvLluZSUGrqpanxu+ 6w== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3qn73us21x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 May 2023 09:26:21 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 34I9PqFa006447
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 May 2023 09:25:52 GMT
-Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Thu, 18 May 2023 02:25:52 -0700
-Received: from nalasex01a.na.qualcomm.com ([fe80::5cb1:e5a2:c713:5b68]) by
- nalasex01a.na.qualcomm.com ([fe80::5cb1:e5a2:c713:5b68%4]) with mapi id
- 15.02.0986.042; Thu, 18 May 2023 02:25:52 -0700
-From:   "Pradeep Pragallapati (QUIC)" <quic_pragalla@quicinc.com>
-To:     Damien Le Moal <dlemoal@kernel.org>
-CC:     Yu Kuai <yukuai1@huaweicloud.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Thu, 18 May 2023 07:53:32 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D77B9EC
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 04:53:26 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 850B92246F;
+        Thu, 18 May 2023 11:53:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1684410805; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UvUoZmXWOm01lb3OknH6FVaEQiNMr/3ebtGqSmceOsc=;
+        b=xwusYAVtAtn33LD3ZklGIjgQjU5G9V9jGjyyJmhOaDwio4lAv0OQN3+NhXyZF6yZ31eem5
+        FTrLxc5xCHUDkTDM2EY3txh30VYZPvijJI6q/eHetBqdivdzsQKueoTXx9c/nkUIxdvTwK
+        9f/oPMN2FC+45PTSrb3F+I0oj5KGkqs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1684410805;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UvUoZmXWOm01lb3OknH6FVaEQiNMr/3ebtGqSmceOsc=;
+        b=fwesQHnaRKFMTkifRyaoG1z3D12aVpYsNG5Z1WJm0y64wqWWR2AodVQHzUWdBhFKrdJmug
+        QXv7KIIez+OUFADw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 745F7138F5;
+        Thu, 18 May 2023 11:53:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id zGUlHLURZmQiGAAAMHmgww
+        (envelope-from <dwagner@suse.de>); Thu, 18 May 2023 11:53:25 +0000
+Date:   Thu, 18 May 2023 13:53:24 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "Xiao Yang (Fujitsu)" <yangx.jy@fujitsu.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "yukuai (C)" <yukuai3@huawei.com>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: RE: [PATCH V1] block: Fix null pointer dereference issue on struct
- io_cq
-Thread-Topic: [PATCH V1] block: Fix null pointer dereference issue on struct
- io_cq
-Thread-Index: AQHZiJvu5joNBe/ZIUyNvEQWRViGA69en4qAgAAGL4CAAABcAIAAAuMAgAD7kXA=
-Date:   Thu, 18 May 2023 09:25:52 +0000
-Message-ID: <7e32c001d222483394327c5802a6c985@quicinc.com>
-References: <20230517084434.18932-1-quic_pragalla@quicinc.com>
- <07b8b870-a464-25a9-c0a6-c123fad05ff5@huaweicloud.com>
- <a2f86cd7-776c-d7ed-8815-62683a14ba36@kernel.org>
- <ZGScoCeOILHpc8c1@infradead.org>
- <344bfde9-5f7e-80a2-038f-3bfc387ea678@kernel.org>
-In-Reply-To: <344bfde9-5f7e-80a2-038f-3bfc387ea678@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.217.217.238]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH blktests] common: Replace _have_module() with
+ _have_driver()
+Message-ID: <5xaebvsrxe7gxh2y4425mme22kwpyu2ngnrjx2oqmvbegme6h2@nh5a3xxzcqn7>
+References: <20230510070207.1501-1-yangx.jy@fujitsu.com>
+ <9ac0b861-01a0-9dce-3d2c-5ff9e265c994@nvidia.com>
+ <1f2061f8-de32-15cc-818b-56ca0024c5da@fujitsu.com>
+ <14ca2b51-6ccf-d3f7-c61a-ad2e8c384448@nvidia.com>
+ <cpnmpplrcos4mocwilkwqo4sxuoqw2mimb42p65b7pkn6e6yc6@wvxrnmd6b5cx>
+ <ecrelgmx2fmya57dsc5i6jvwaybnjiw4olllfujkhhjz7wpnni@vtdrlloshkvi>
 MIME-Version: 1.0
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 8jhhghv1qUXGe0RYN3HCsKAQqt7O2nCV
-X-Proofpoint-GUID: 8jhhghv1qUXGe0RYN3HCsKAQqt7O2nCV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-18_07,2023-05-17_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=454 malwarescore=0
- impostorscore=0 bulkscore=0 mlxscore=0 clxscore=1011 adultscore=0
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2305180071
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ecrelgmx2fmya57dsc5i6jvwaybnjiw4olllfujkhhjz7wpnni@vtdrlloshkvi>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGksDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBEYW1pZW4gTGUgTW9hbCA8
-ZGxlbW9hbEBrZXJuZWwub3JnPiANClNlbnQ6IFdlZG5lc2RheSwgTWF5IDE3LCAyMDIzIDM6MDIg
-UE0NClRvOiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGluZnJhZGVhZC5vcmc+DQpDYzogWXUgS3Vh
-aSA8eXVrdWFpMUBodWF3ZWljbG91ZC5jb20+OyBQcmFkZWVwIFByYWdhbGxhcGF0aSAoUVVJQykg
-PHF1aWNfcHJhZ2FsbGFAcXVpY2luYy5jb20+OyBheGJvZUBrZXJuZWwuZGs7IGxpbnV4LWJsb2Nr
-QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgeXVrdWFpIChD
-KSA8eXVrdWFpM0BodWF3ZWkuY29tPg0KU3ViamVjdDogUmU6IFtQQVRDSCBWMV0gYmxvY2s6IEZp
-eCBudWxsIHBvaW50ZXIgZGVyZWZlcmVuY2UgaXNzdWUgb24gc3RydWN0IGlvX2NxDQoNCk9uIDUv
-MTcvMjMgMTg6MjEsIENocmlzdG9waCBIZWxsd2lnIHdyb3RlOg0KPiBPbiBXZWQsIE1heSAxNywg
-MjAyMyBhdCAwNjoyMDoxOVBNICswOTAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToNCj4+IHR3aWNl
-IGZvciB0aGUgc2FtZSBpY3EuIFRoZSBtaXNzaW5nIHJjdSBsb2NrIGluIGlvY19leGl0X2ljcXMo
-KSANCj4+IGFscmVhZHkgd2FzIGluIGl0c2VsZiBhIGJ1ZywgYW5kIHRoZSBtaXNzaW5nIGZsYWcg
-Y2hlY2sgaXMgYW5vdGhlci4NCj4gDQo+IHNwaW5sb2NrcyBpbXBseSBhIHJjdSBjcml0aWNhbCBz
-ZWN0aW9uLCBubyBuZWVkIHRvIGR1cGxpY2F0ZSBpdC4NCg0KUmlnaHQuIEFuZCBJIG1pc3JlYWQg
-dGhlIGNvZGUuIEFzIFl1IHNhaWQsIGdpdmVuIHRoYXQgaW9jX2V4aXRfaWNxcygpIGl0ZXJhdGVz
-IHRoZSBsaXN0IG9mIGljcXMgdW5kZXIgaW9jLT5sb2NrIGFuZCB0aGUgaW9jIGlzIHJlbW92ZWQg
-ZnJvbSB0aGF0IGxpc3QgdW5kZXIgdGhlIHNhbWUgbG9jaywgaW9jX2V4aXRfaWNxcygpIHNob3Vs
-ZCBuZXZlciBzZWUgYW4gaWNxIHRoYXQgd2VudCB0aHJvdWdoIGlvY19kZXN0cm95X2ljcSgpLi4u
-DQpWZXJ5IHdlaXJkLg0KDQpUaGlzIHdlaXJkIGNhbiBiZSBwb3NzaWJsZSANCjEuIHVwZGF0aW5n
-IGljcV9oaW50IHdoaWNoIGlzIGFubm90YXRlZCBhcyBfX3JjdSB0eXBlIHdpdGhvdXQgUkNVLXBy
-b3RlY3RlZCBjb250ZXh0IGluIGlvY19kZXN0cm95X2ljcSgpLg0KTW9yZW92ZXIsIHRoaXMgd2Fz
-IHRha2VuIGNhcmUgaW4gZWxzZSBwYXJ0IG9mIGlvY19yZWxlYXNlX2ZuKCkgYnkgcmN1X3JlYWRf
-bG9jay91bmxvY2soKSBidXQgbWlzc2VkIGluIGlmIHN0YXRlbWVudCB3aGljaCBjYW4gbGVhZCB0
-byB0aGlzIHdlaXJkLg0KDQoyLiBleHRyYWN0aW5nIGljcSBmcm9tIGhsaXN0L2xpc3QgZWxlbWVu
-dHMgYXJlIGRvbmUgdXNpbmcgcmN1IGxvY2tzIHByb3RlY3RlZCBpbiBpb2NfY2xlYXJfcXVldWUo
-KSBidXQgc2FtZSB3YXMgbm90IGF0IGlvY19leGl0X2ljcXMoKS4NCg0KU28sIGZhciB3ZSBoYXZl
-IHNlZW4gMTArIGluc3RhbmNlcyBvZiB0aGlzIGNyYXNoIG9uIDYuMSBrZXJuZWwgZHVyaW5nIHN0
-YWJpbGl0eSB0ZXN0aW5nIChJbnZvbHZlcyBJTywgcmVib290cywgZGV2aWNlIHN1c3BlbmQvcmVz
-dW1lLCBhbmQgZmV3IG1vcmUpLg0KV2l0aCB0aGUgVjEgcGF0Y2gsIHdlIGRpZG4ndCBvYnNlcnZl
-IHRoZSBpc3N1ZSBmb3IgYXQgbGVhc3QgNDhocnMrIG9mIHN0YWJpbGl0eSB0ZXN0aW5nLg0KDQoN
-Ci0tDQpEYW1pZW4gTGUgTW9hbA0KV2VzdGVybiBEaWdpdGFsIFJlc2VhcmNoDQoNCg==
+On Thu, May 18, 2023 at 04:13:51AM +0000, Shinichiro Kawasaki wrote:
+> > I think a couple of those test might make sense to be migrated to the nvme
+> > suite. I am thinking about the test with simulate_network_failure_loop.
+> 
+> It does not sound reasonable to keep dm-multipath tests in nvme group. I guess
+> you mean to reuse the simulate_network_failure_loop not to test dm-multipath
+> but to test nvme fabrics transports, right?
+
+Correct. I think it would be good to carry over the network failure testing for
+the fabrics transport test in the nvme group. I can look into this next week.
