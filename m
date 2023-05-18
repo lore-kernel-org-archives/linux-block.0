@@ -2,82 +2,209 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19678C77B7A
-	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 11:53:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCDCC77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 12:16:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231359AbjERLxd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 07:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46712 "EHLO
+        id S231241AbjERMQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 08:16:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231279AbjERLxc (ORCPT
+        with ESMTP id S231361AbjERMQy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 07:53:32 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D77B9EC
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 04:53:26 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 850B92246F;
-        Thu, 18 May 2023 11:53:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1684410805; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UvUoZmXWOm01lb3OknH6FVaEQiNMr/3ebtGqSmceOsc=;
-        b=xwusYAVtAtn33LD3ZklGIjgQjU5G9V9jGjyyJmhOaDwio4lAv0OQN3+NhXyZF6yZ31eem5
-        FTrLxc5xCHUDkTDM2EY3txh30VYZPvijJI6q/eHetBqdivdzsQKueoTXx9c/nkUIxdvTwK
-        9f/oPMN2FC+45PTSrb3F+I0oj5KGkqs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1684410805;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UvUoZmXWOm01lb3OknH6FVaEQiNMr/3ebtGqSmceOsc=;
-        b=fwesQHnaRKFMTkifRyaoG1z3D12aVpYsNG5Z1WJm0y64wqWWR2AodVQHzUWdBhFKrdJmug
-        QXv7KIIez+OUFADw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 745F7138F5;
-        Thu, 18 May 2023 11:53:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id zGUlHLURZmQiGAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Thu, 18 May 2023 11:53:25 +0000
-Date:   Thu, 18 May 2023 13:53:24 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "Xiao Yang (Fujitsu)" <yangx.jy@fujitsu.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH blktests] common: Replace _have_module() with
- _have_driver()
-Message-ID: <5xaebvsrxe7gxh2y4425mme22kwpyu2ngnrjx2oqmvbegme6h2@nh5a3xxzcqn7>
-References: <20230510070207.1501-1-yangx.jy@fujitsu.com>
- <9ac0b861-01a0-9dce-3d2c-5ff9e265c994@nvidia.com>
- <1f2061f8-de32-15cc-818b-56ca0024c5da@fujitsu.com>
- <14ca2b51-6ccf-d3f7-c61a-ad2e8c384448@nvidia.com>
- <cpnmpplrcos4mocwilkwqo4sxuoqw2mimb42p65b7pkn6e6yc6@wvxrnmd6b5cx>
- <ecrelgmx2fmya57dsc5i6jvwaybnjiw4olllfujkhhjz7wpnni@vtdrlloshkvi>
+        Thu, 18 May 2023 08:16:54 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B1661BD;
+        Thu, 18 May 2023 05:16:52 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QMTVR4wjvz4f3kpD;
+        Thu, 18 May 2023 20:16:47 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgC3mAYvF2Zk__y3Iw--.49396S3;
+        Thu, 18 May 2023 20:16:48 +0800 (CST)
+Subject: Re: [PATCH V1] block: Fix null pointer dereference issue on struct
+ io_cq
+To:     Yu Kuai <yukuai1@huaweicloud.com>,
+        Pradeep P V K <quic_pragalla@quicinc.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230517084434.18932-1-quic_pragalla@quicinc.com>
+ <07b8b870-a464-25a9-c0a6-c123fad05ff5@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <a29dcfa5-bb6a-d3b9-9fb7-cce87a8f8620@huaweicloud.com>
+Date:   Thu, 18 May 2023 20:16:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ecrelgmx2fmya57dsc5i6jvwaybnjiw4olllfujkhhjz7wpnni@vtdrlloshkvi>
+In-Reply-To: <07b8b870-a464-25a9-c0a6-c123fad05ff5@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgC3mAYvF2Zk__y3Iw--.49396S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxuw1rJF43WFW8GF48ArWkWFg_yoW7AryDpr
+        1kXr98CryUJryIkr4UJw1qvry8GF1UKw1UJryrGay8Ar17ArnFqF1UZr1Ygry5Xr4xAr4j
+        qr18G390vr1UC3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18, 2023 at 04:13:51AM +0000, Shinichiro Kawasaki wrote:
-> > I think a couple of those test might make sense to be migrated to the nvme
-> > suite. I am thinking about the test with simulate_network_failure_loop.
-> 
-> It does not sound reasonable to keep dm-multipath tests in nvme group. I guess
-> you mean to reuse the simulate_network_failure_loop not to test dm-multipath
-> but to test nvme fabrics transports, right?
+Hi,
 
-Correct. I think it would be good to carry over the network failure testing for
-the fabrics transport test in the nvme group. I can look into this next week.
+在 2023/05/17 16:58, Yu Kuai 写道:
+> Hi,
+> 
+> 在 2023/05/17 16:44, Pradeep P V K 写道:
+>> There is a potential race between ioc_clear_fn() and
+>> exit_io_context() as shown below, due to which below
+>> crash is observed. It can also result into use-after-free
+>> issue.
+>>
+>> context#1:                           context#2:
+>> ioc_release_fn()                     do_exit();
+>> ->spin_lock(&ioc->lock);             ->exit_io_context();
+>> ->ioc_destroy_icq(icq);              ->ioc_exit_icqs();
+>>   ->list_del_init(&icq->q_node);       ->spin_lock_irq(&ioc->lock);
+>>   ->call_rcu(&icq->__rcu_head,
+>>       icq_free_icq_rcu);
+>> ->spin_unlock(&ioc->lock);
+
+I think above concurrent scenario is not possible as well.
+
+exit_io_context() doesn't release ioc refcount before ioc_exit_icqs() is
+done, so that ioc_release_fn() can never concurrent with
+ioc_exit_icqs().
+
+do_exit
+  exit_io_context
+   ioc_exit_icqs
+   put_io_context -> ioc_release_fn won't be called before this
+
+>>                                        ->ioc_exit_icq(); gets the same 
+>> icq
+> I don't understand how is this possible, the list is protected by
+> 'ioc->lock', both hlist_del_init and hlist_for_each_entry are called
+> inside the lock.
+> 
+> Thanks,
+> Kuai
+>>                        ->bfq_exit_icq();
+>>                                    This results into below crash as bic
+>>                   is NULL as it is derived from icq.
+>>                   There is a chance that icq could be
+>>                   free'd as well.
+>>
+>> [33.245722][ T8666] Unable to handle kernel NULL pointer dereference
+>> at virtual address 0000000000000018.
+>> ...
+>> Call trace:
+>> [33.325782][ T8666]  bfq_exit_icq+0x28/0xa8
+>> [33.325785][ T8666]  exit_io_context+0xcc/0x100
+>> [33.325786][ T8666]  do_exit+0x764/0xa58
+>> [33.325791][ T8666]  do_group_exit+0x0/0xa0
+>> [33.325793][ T8666]  invoke_syscall+0x48/0x114
+>> [33.325802][ T8666]  el0_svc_common+0xcc/0x118
+>> [33.325805][ T8666]  do_el0_svc+0x34/0xd0
+>> [33.325807][ T8666]  el0_svc+0x38/0xd0
+>> [33.325812][ T8666]  el0t_64_sync_handler+0x8c/0xfc
+>> [33.325813][ T8666]  el0t_64_sync+0x1a0/0x1a4
+>>
+>> Fix this by checking with ICQ_DESTROYED flags in ioc_exit_icqs().
+>> Also, ensure ioc_exit_icq() is accessing icq within rcu_read_lock/unlock
+>> so that icq doesn't get free'd up while it is still using it.
+>>
+>> Signed-off-by: Pradeep P V K <quic_pragalla@quicinc.com>
+>> ---
+>>   block/blk-ioc.c | 8 ++++++--
+>>   1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+>> index 63fc02042408..1aa34fd46ac8 100644
+>> --- a/block/blk-ioc.c
+>> +++ b/block/blk-ioc.c
+>> @@ -60,10 +60,14 @@ static void ioc_exit_icqs(struct io_context *ioc)
+>>   {
+>>       struct io_cq *icq;
+>> +    rcu_read_lock();
+>>       spin_lock_irq(&ioc->lock);
+>> -    hlist_for_each_entry(icq, &ioc->icq_list, ioc_node)
+>> -        ioc_exit_icq(icq);
+>> +    hlist_for_each_entry(icq, &ioc->icq_list, ioc_node) {
+>> +        if (!(icq->flags & ICQ_DESTROYED))
+By the way, above change doesn't make sense to me as well.
+ioc_exit_icq() is called before setting ICQ_DESTROYED, hence if
+ICQ_DESTROYED is set, then ICQ_EXITED is set as well, in this case
+ioc_exit_icq() won't do anything.
+
+>> +            ioc_exit_icq(icq);
+>> +    }
+>>       spin_unlock_irq(&ioc->lock);
+>> +    rcu_read_unlock();
+>>   }
+>>   /*
+
+I think I do found a problem, but I'm not sure it's the same in your
+case, can you try the following patch?
+
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index 63fc02042408..37a56f2bb040 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -78,6 +78,9 @@ static void ioc_destroy_icq(struct io_cq *icq)
+
+         lockdep_assert_held(&ioc->lock);
+
++       if (icq->flags & ICQ_DESTROYED)
++               return;
++
+         radix_tree_delete(&ioc->icq_tree, icq->q->id);
+         hlist_del_init(&icq->ioc_node);
+         list_del_init(&icq->q_node);
+@@ -128,12 +131,7 @@ static void ioc_release_fn(struct work_struct *work)
+                         spin_lock(&q->queue_lock);
+                         spin_lock(&ioc->lock);
+
+-                       /*
+-                        * The icq may have been destroyed when the ioc lock
+-                        * was released.
+-                        */
+-                       if (!(icq->flags & ICQ_DESTROYED))
+-                               ioc_destroy_icq(icq);
++                       ioc_destroy_icq(icq);
+
+                         spin_unlock(&q->queue_lock);
+                         rcu_read_unlock();
+@@ -173,18 +171,17 @@ void ioc_clear_queue(struct request_queue *q)
+  {
+         LIST_HEAD(icq_list);
+
++       rcu_read_lock();
+         spin_lock_irq(&q->queue_lock);
+         list_splice_init(&q->icq_list, &icq_list);
+         spin_unlock_irq(&q->queue_lock);
+
+-       rcu_read_lock();
+         while (!list_empty(&icq_list)) {
+                 struct io_cq *icq =
+                         list_entry(icq_list.next, struct io_cq, q_node);
+
+                 spin_lock_irq(&icq->ioc->lock);
+-               if (!(icq->flags & ICQ_DESTROYED))
+-                       ioc_destroy_icq(icq);
++               ioc_destroy_icq(icq);
+                 spin_unlock_irq(&icq->ioc->lock);
+         }
+         rcu_read_unlock();
+
