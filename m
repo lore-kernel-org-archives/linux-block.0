@@ -2,109 +2,164 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8479FC77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 17 May 2023 22:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58594C7EE23
+	for <linux-block@archiver.kernel.org>; Thu, 18 May 2023 00:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229638AbjEQWPK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 May 2023 18:15:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57192 "EHLO
+        id S229700AbjERACA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 May 2023 20:02:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbjEQWPJ (ORCPT
+        with ESMTP id S229703AbjERAB5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 May 2023 18:15:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7EA35A9
-        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 15:15:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EC95264B4C
-        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 22:15:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95CBDC433EF;
-        Wed, 17 May 2023 22:15:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684361704;
-        bh=XYAg82ZallMK4BfwV5q/+LTZFKkXsTUCpOEkAjOKnL8=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=iwZgGKg1COqm6GhME0Vt996b6P2TM5qI6vJdHIfdjoy6XCXtxQ+opmTEYWJjOGwUL
-         aw8971ykMvvHIUhyMosB4D0Sr5m3fSJCaiu0wvT9LokSllucwaN38aPkfxoTMTfpEN
-         OXuW2073avv9c//XP3+gJAdQggavik5DiqC3GFAxpqrYNtyiMzerzqyvh/CiGNl2T8
-         gJnkv4fsaH8YO4+nAyibmGZohHQPoFqunQzxFB4lDIgRZ1NKJJxkOcXK++wLSefyYZ
-         vFolHMqxgUDTYhmcRbfflPYRHVzCNxo2gkGX+gdTwFmhiaQu6tIPQbLGiTrJLPWMqo
-         H4bluTbTg4T7g==
-Message-ID: <5829b5a0-d411-9485-2fa0-7c723377abf1@kernel.org>
-Date:   Thu, 18 May 2023 07:15:02 +0900
+        Wed, 17 May 2023 20:01:57 -0400
+Received: from sonic311-31.consmr.mail.ne1.yahoo.com (sonic311-31.consmr.mail.ne1.yahoo.com [66.163.188.212])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29263E2
+        for <linux-block@vger.kernel.org>; Wed, 17 May 2023 17:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1684368115; bh=lBk328IPZrZb1JzxFoVLsw1vpStQSw63jKeqdVarP0g=; h=Date:Subject:To:References:From:In-Reply-To:From:Subject:Reply-To; b=Z4lERBcSZKc3IoI0cbHF5m70xrrkV1eIzlYBu3nzCe4X00Wj7D9tjuYi+yIpW7NUWMWtjODXgoxFmrQRj9P6O4rZnXvzsJKxLs10XPeZLMvGRW0KYBGEzBe3h5K4zk7jfIpx6f5PlzVCgKoHQ6UyiwF0rvtCk9iw0f35ed7UIVhacGu5UjZ4YGk+Ijbh1BQ8TVpQNJbCwOC90Z3QhQCjw98IcWyMaNU6KitZ5V8FM+yOmesouWjCIuluR8/4GCMCHEED+XuzfYUJDAYgXGGss6St9W+lLiG1uQruJZYPsEfhSScfMZ+RLQx/0cmkjiMlaoDJsU/FVDVQuEzIWQuqEg==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1684368115; bh=tKxxBvYAm1vIB2MFG6Appq4dxPfufd/i7w4JUESKsTh=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=ZV+mzCVXd7gpk1sAWM93UohkwWZB4dND/kC7Z1BeTE0ZxHTtOlG8Ck+Qpjv1NbwV7Nd1zMxYd/RswfwosxBBviIUIb1WpFAVFRaFfJYMS0CZDdvCU7aliB0QXIZPizbLHJ6jhDJiDJXryz6A6uIk+/Yx+TKjkhpCPDsEWbCSKF5NAh27XwKVXnNlsr1F9c9XK3X7cA/EYvcE+SGmenjSxTKOjtzohe/hBLnk+RM7tHDPIzbGM5+f3mjGHiCcuIA4GEu2gvVfSTwVI/UY6XIyQ58fP7KwvWv3klkKyAkaSjRaoEr6hicBQmwJlk6SsVPWa1shB5cohf16SP0u+Mgp7Q==
+X-YMail-OSG: 0aavYDoVM1l7yhUSEhNFZPCxEwiBF4WpxcJ6iLCW3qpbM4e_FTEgE8cB.yKlaLX
+ CY8EKcE99TELwLCMcJkWiGowzQblulM.ycaMY._hH7hsufkoyROIoVT2f4lrrI1nyyKApYK2yU7H
+ dbxpx6nauptdIYzjck.nOAEsWIvHZ6K5zNgZhCtMUDX.dETXtAWEosXNhNsxQUutui7Ta7YnoQKR
+ bg9M0djMT4fXRxgsmQINxRaUnHRkY08t8LzFpGuXDLzfGcQaV0FjaQVflpUlxuCGSdiW5hCv9khY
+ F7Do_NB0qWiFcBXaleeN7ZuamCz3kUidCHttKJyXRhbDNpnXIWb0HrtPrlf47ZsnRXDEw4WpSU5y
+ 67hyHTIWU0hhUJA_zcWwGlChuaqJp6gM8gMJO21JR5dLXFycpBz1hSUQ2sIP.nzvJ9ZR3Ip9ttEq
+ _lNokE004ebwnG0zwTyE_Ebx0gaR48RBUPLeWCHcoRkVz688x8SXg8XjXw3GYi8MDnj6TwOCzZ1e
+ eiofWuJGDgQSEmV4GDLzCtMOiZzgxVuKTQZUaWoKr6SuJKc2Vv2354ZSuecp.6rFNYbJX8Yz94Cd
+ YuFwbFPAvfkCXn8B0Jx.Gto0nI9PDHOA2eAdw9P_WxIiu6yP7UTKBPqxWjylHZso2jx9LFBnL33.
+ UNrlEtfeY8Ws2o6TYFr_xceK88.4mXedtbb9wyZN7o64DN.QjslqiMq0YCqKfOjCFW1wdioSnLgF
+ H.bISKuKrDCuE1ecmc9w_NcgP9QJ7iOvo.OK1KesAjWboZEbrWN2wHaC5dNINegxkh5eD8Sk0.2V
+ CYqeKvnRji7V4ufeNF7fN4jCzz2bMAmmHLVCXitsRRQFlb_uyZ9Glnoyn78KGvhlGGV382FRESpC
+ qNStH36y1_ISl5376pWkPZNCPADIn8K2uuRRRCAtjRDs5iVCdEgX3U2kg3UNQGKv9IpRC9abdDwF
+ LrxApOsyMaDwibAsQ5sXkDEHfMqkhBwMHD3FquB5hpIlpFwmskaEti5Z_ilSccCzInEKXeBWb.Sc
+ .9NuwGE511.F3lcKy0dVIQy8BjWJUdBdaYxwHVTl5qnvUavyvSj6VGOQxTaw8TUHBKkHFlhTMZcB
+ ru64Kd0WCAiM2GCI.MWYOksFqdQEpkOK41kG9o8_vZV14_iH29G73uSXt1xFTrJ4FDXWOP2igSJ.
+ kKGKZ5.W0zf70rR.paSmBBf_nEblpJPqtgsYozDiZNt2J3j9keTtsgrPFmIoAQsCGC7u2WnAUzSc
+ Da8PFjDpbPVQw1UV4k6b4kpkC1GPWRNW_pz_FwOWAqEPfXwZ9buuptO22tjXevGtvcSBV38tu.9p
+ Frg622DCu05ei9OtW8wrhiftjVJZXgqwfvBnduL9HezEN1fDQZ2Ynr6LOwiyf_NtxSEMUItMXEu5
+ SbBKd.OZXIUQK6V2tG2XG9AT1cGEQ0G4pwyNvp4TXXnytT_OcHI0NGAhHDuoWos0JByq9F_WB_GN
+ DxnVaKu4HIQ1Co60uh5ZUMZvS3WU23ULxoC9on3YF6Xg6iM.FyLEiqzB1NwLM8kQnI8OjPudLmh_
+ yQI92co7rXRwzz4oqAQ.bayxvUwTnxJFJ0A_lv7UEMh5OVvPlUtgdj_LxyjZbuxnB9jgtGMSB.50
+ h3qNAf3bgP8pEWTjkcztklLh3bhlq.eEU1t1ypsgm6EMZki2mby3tyvgQI0hA06biwfVBjKF824b
+ RPaZftkPbQk.tE2j7t.q4fc8JFpnL16ldoxOXZ5013Z1lFHKTohNlTkvPqnqyt.HaG9LKIGIF1eO
+ fztfr6M0qfBDz_xaDksuk9wQfnoiWuZLEeIe9zjv7XD2dlOA8FOYTjs5qaXLcpx9POgbE.k_kqrD
+ 6Lw0eLuiU0LkrIKz1qbjgE1YNV0ct5l1BXAc3.UmfTPfV4DpNV7edtyWo4aYtxUIfkkJwv8a4LsL
+ XqfScdufhmIrNrNMkl3CcXgXoi1VjyaxOfFbaM0zQEVNjhMA18xP6zhQOkzmkYEkFkppl.UljSNd
+ uL5jVi2.u97RXsOebv5i3ytFKpeEEeSUr0Wkhi81akSvCqFdMX6_4g2v3Fvgf6255Ysr4GiyiL9O
+ .MXU39mR5mtLZKfhiaydOYCl9W20AhUb3L3f7F29pwEX0_GIX5WMezFK7KreEfgYRzZNM3vvjRpr
+ Az_8DjkOQIXN.eEQPwxy5mkLoCQr5UBiMWWy0DbGswBNWirynbuQ7FS9W.glSI2GPHp.TuF2g2DR
+ Sq0CKfW2smKybrKDrvLAt2lb5g1odjBrmHzKispfpq8GC0T6qXO8i1goeEjkrmVyWqaiK8c_uPnh
+ RYzqppA--
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 1e866130-6ed4-4a67-b91d-5b6148f7a9b7
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic311.consmr.mail.ne1.yahoo.com with HTTP; Thu, 18 May 2023 00:01:55 +0000
+Received: by hermes--production-gq1-6db989bfb-ppvpv (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 367ad1d75e8e842bd35c1c2b18c48fb0;
+          Thu, 18 May 2023 00:01:53 +0000 (UTC)
+Message-ID: <bcf4df59-3915-6df3-027b-8cb35b310650@schaufler-ca.com>
+Date:   Wed, 17 May 2023 17:01:51 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v5 07/11] block: mq-deadline: Improve
- deadline_skip_seq_writes()
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/2] capability: Introduce CAP_BLOCK_ADMIN
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-References: <20230516223323.1383342-1-bvanassche@acm.org>
- <20230516223323.1383342-8-bvanassche@acm.org>
- <37120c5c-120f-3ff3-fcbf-1a52f389fe3e@kernel.org>
- <06e87316-4b22-b275-4223-775192e5ccac@acm.org>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <06e87316-4b22-b275-4223-775192e5ccac@acm.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Serge Hallyn <serge@hallyn.com>,
+        Paul Moore <paul@paul-moore.com>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Eric Paris <eparis@parisplace.org>,
+        Frederick Lawler <fred@cloudflare.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        louxiao.lx@alibaba-inc.com,
+        Casey Schaufler <casey@schaufler-ca.com>
+References: <20230511070520.72939-1-tianjia.zhang@linux.alibaba.com>
+ <b645e195-7875-9fc3-a8de-6676dfe800b8@schaufler-ca.com>
+ <e1242268-e7b6-d77c-a94f-edd913845ca7@linux.alibaba.com>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <e1242268-e7b6-d77c-a94f-edd913845ca7@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.21471 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/23 01:30, Bart Van Assche wrote:
-> On 5/16/23 18:06, Damien Le Moal wrote:
->> On 5/17/23 07:33, Bart Van Assche wrote:
->>> Make deadline_skip_seq_writes() do what its name suggests, namely to
->>> skip sequential writes.
+On 5/16/2023 5:05 AM, Tianjia Zhang wrote:
+> Hi Casey,
+>
+> On 5/12/23 12:17 AM, Casey Schaufler wrote:
+>> On 5/11/2023 12:05 AM, Tianjia Zhang wrote:
+>>> Separated fine-grained capability CAP_BLOCK_ADMIN from CAP_SYS_ADMIN.
+>>> For backward compatibility, the CAP_BLOCK_ADMIN capability is included
+>>> within CAP_SYS_ADMIN.
 >>>
->>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
->>> Cc: Ming Lei <ming.lei@redhat.com>
->>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
->>> ---
->>>   block/mq-deadline.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>> Some database products rely on shared storage to complete the
+>>> write-once-read-multiple and write-multiple-read-multiple functions.
+>>> When HA occurs, they rely on the PR (Persistent Reservations) protocol
+>>> provided by the storage layer to manage block device permissions to
+>>> ensure data correctness.
 >>>
->>> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
->>> index 6276afede9cd..dbc0feca963e 100644
->>> --- a/block/mq-deadline.c
->>> +++ b/block/mq-deadline.c
->>> @@ -308,7 +308,7 @@ static struct request *deadline_skip_seq_writes(struct deadline_data *dd,
->>>   	do {
->>>   		pos += blk_rq_sectors(rq);
->>>   		rq = deadline_latter_request(rq);
->>> -	} while (rq && blk_rq_pos(rq) == pos);
->>> +	} while (rq && blk_rq_pos(rq) == pos && blk_rq_is_seq_zoned_write(rq));
+>>> CAP_SYS_ADMIN is required in the PR protocol implementation of existing
+>>> block devices in the Linux kernel, which has too many sensitive
+>>> permissions, which may lead to risks such as container escape. The
+>>> kernel needs to provide more fine-grained permission management like
+>>> CAP_NET_ADMIN to avoid online products directly relying on root to run.
+>>>
+>>> CAP_BLOCK_ADMIN can also provide support for other block device
+>>> operations that require CAP_SYS_ADMIN capabilities in the future,
+>>> ensuring that applications run with least privilege.
 >>
->> No ! The "seq write" skip here is to skip writes that are contiguous/sequential
->> to ensure that we keep issuing contiguous/sequential writes belonging to
->> different zones, regardless of the target zone type.
+>> Can you demonstrate that there are cases where a program that needs
+>> CAP_BLOCK_ADMIN does not also require CAP_SYS_ADMIN for other
+>> operations?
+>> How much of what's allowed by CAP_SYS_ADMIN would be allowed by
+>> CAP_BLOCK_ADMIN? If use of a new capability is rare it's difficult to
+>> justify.
 >>
->> So drop this change please.
-> 
-> Hi Damien,
-> 
-> I'm fine with dropping this patch. I came up with this patch because it 
-> surprised me to see that deadline_skip_seq_writes() does not check the 
-> type of the requests that it is skipping. If e.g. a WRITE is followed by 
-> two contiguous READs, all three requests are skipped. Is this intentional?
+>
+> For the previous non-container scenarios, the block device is a shared
+> device, because the business-system generally operates the file system
+> on the block. Therefore, directly operating the block device has a high
+> probability of affecting other processes on the same host, and it is a
+> reasonable requirement to need the CAP_SYS_ADMIN capability.
+>
+> But for a database running in a container scenario, especially a
+> container scenario on the cloud, it is likely that a container
+> exclusively occupies a block device. That is to say, for a container,
+> its access to the block device will not affect other process, there is
+> no need to obtain a higher CAP_SYS_ADMIN capability.
 
-Hmmm... mq-deadline is not supposed to mix up reads and writes in the same
-scheduling batch, and there is one sort_list (rbtree) per data direction. So we
-should not be seeing different data directions in this loop, no ?
+If I understand correctly, you're saying that the process that requires
+CAP_BLOCK_ADMIN in the container won't also require CAP_SYS_ADMIN for
+other operations.
 
-> 
-> Thanks,
-> 
-> Bart.
-> 
+That's good, but it isn't clear how a process on bare metal would
+require CAP_SYS_ADMIN while the same process in a container wouldn't.
 
--- 
-Damien Le Moal
-Western Digital Research
+>
+> For a file system similar to distributed write-once-read-many, it is
+> necessary to ensure the correctness of recovery, then when recovery
+> occurs, it is necessary to ensure that no inflighting-io is completed
+> after recovery.
+>
+> This can be guaranteed by performing operations such as SCSI/NVME
+> Persistent Reservations on block devices on the distributed file system.
 
+Does your cloud based system always run "real" devices? My
+understanding is that cloud based deployment usually uses
+virtual machines and virtio or other simulated devices.
+A container deployment in the cloud seems unlikely to be able
+to take advantage of block administration. But I can't say
+I know the specifics of your environment.
+
+> Therefore, at present, it is only necessary to have the relevant
+> permission support of the control command of such container-exclusive
+> block devices.
+
+This looks like an extremely special case in which breaking out
+block management would make sense. 
+
+>
+> Kind regards,
+> Tianjia
