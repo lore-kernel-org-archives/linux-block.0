@@ -2,63 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB80C7EE2C
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 04:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEF5C77B75
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 04:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229701AbjESELp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 00:11:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44198 "EHLO
+        id S231192AbjESETO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 00:19:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbjESELl (ORCPT
+        with ESMTP id S230486AbjESESy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 00:11:41 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319C010CF;
-        Thu, 18 May 2023 21:11:40 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BAD3468C4E; Fri, 19 May 2023 06:11:36 +0200 (CEST)
-Date:   Fri, 19 May 2023 06:11:36 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org
-Subject: Re: introduce bdev holder ops and a file system shutdown method v2
-Message-ID: <20230519041136.GA10931@lst.de>
-References: <20230518042323.663189-1-hch@lst.de> <ZGbYLK0lOqYqPf9O@mit.edu>
+        Fri, 19 May 2023 00:18:54 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2949F19B3;
+        Thu, 18 May 2023 21:18:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rDSIqaFZxcxQMOhGyvjFM+Hjpz800Tt09CN9DXr5F48=; b=UW2XwbNI1St2kLWA0y8xeY3J/i
+        ax22+ddoCMJxSYjFbOUuBKGcw07SCzngzA24pcBDGH+N3Gvge7p+blNL7LHopOwWsPfEZKdvy5Jzn
+        JABycF1fY5HXy7EfgntPydynNyg2FYsLe/intqaP2JAXXLVBjQepRpVT8j8PRR+ZiweOBZ1MgjdAe
+        GrYiZqmDAYvWcevydKm31tFoHU+JLGahZnNm8vUZlqnbShaT2IfMJVBZ5xxnFowN/kNFYffG7OBr6
+        F9scGYwDgmYsajG6w9DqFaS9pc+5aZZLD9YYXQBVSYOlB83SaGk54wTjn0K9oPGIyNfTF71XaXT41
+        xDzeVDcw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1pzrZP-00F2W6-1G;
+        Fri, 19 May 2023 04:18:23 +0000
+Date:   Thu, 18 May 2023 21:18:23 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v7 2/5] block: Introduce provisioning primitives
+Message-ID: <ZGb4j3sjrIIKr82y@infradead.org>
+References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
+ <20230518223326.18744-3-sarthakkukreti@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZGbYLK0lOqYqPf9O@mit.edu>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20230518223326.18744-3-sarthakkukreti@chromium.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18, 2023 at 10:00:12PM -0400, Theodore Ts'o wrote:
-> On Thu, May 18, 2023 at 06:23:09AM +0200, Christoph Hellwig wrote:
-> > Hi all,
-> > 
-> > this series fixes the long standing problem that we never had a good way
-> > to communicate block device events to the user of the block device.
-> > 
-> > It fixes this by introducing a new set of holder ops registered at
-> > blkdev_get_by_* time for the exclusive holder, and then wire that up
-> > to a shutdown super operation to report the block device remove to the
-> > file systems.
-> 
-> Thanks for working on this!  Is there going to be an fstest which
-> simulates a device removal while we're running fsstress or some such,
-> so we can exercise full device removal path?
+On Thu, May 18, 2023 at 03:33:23PM -0700, Sarthak Kukreti wrote:
+> +EXPORT_SYMBOL(blkdev_issue_provision);
 
-
-So the problem with xfstests is that there isn't really any generic
-way to remove a block device, and even less so to put it back.
-
-xfstests has some scsi_debug based tests, maybe I can cook something up
-for that.  My testing has been with nvme, so another option would be
-to add nvme-loop support to xfstests and use that.  I'll see what I can
-do.
+IFF this gets in in some form, please make sure all exports for new
+block layer functionality are EXPORT_SYMBOL_GPL, thanks.
