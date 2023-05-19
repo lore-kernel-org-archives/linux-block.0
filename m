@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B30C77B7F
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB60AC77B7F
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:42:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230487AbjESHmP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 03:42:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59174 "EHLO
+        id S230387AbjESHmY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 03:42:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230282AbjESHmM (ORCPT
+        with ESMTP id S229998AbjESHmM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 19 May 2023 03:42:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCADB19F
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:41:25 -0700 (PDT)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5D9810EC
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:41:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684482084;
+        s=mimecast20190719; t=1684482079;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ChgLSgSgCciGGEj2txPdAcXunor0ElTQJtr+fuEaFtA=;
-        b=bLMgAMpIsVYMz8TJBPhEXzAnq2HPR8IS/mb78WVND7HX4uzTMCL9cyazAj6p1CXnYAZ/Iw
-        RvMAQCGklDEu2euc32X5nYHjDH63BP4NG34+RLK9lbjdQc3f+lFqUTEmS/ilIc/tbumZrC
-        6+WscMEpCfY/i8yA3RRIamjXmJG5B60=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HJSls9joKnzamhDgZoRi/AKfts16br7tyBuA30GIBac=;
+        b=DlFqQKGO/XEjkNkiVx/EHcYCGcIhOygqcPQ2Wqkn1SRshCtEFJVyzachK89pTO5gE/4DV+
+        syOxf71a46xpKRc3IPCg2rHPI69e2bbf1m+Tcz/vWReBNbdU49iTuHZZTBEZnbYiTa4LQO
+        7xGAk4GACCZfYg1p4dgGZC369gGgZ/w=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-673-2UnIjJkHPT6ZoSIApCo6vg-1; Fri, 19 May 2023 03:41:20 -0400
-X-MC-Unique: 2UnIjJkHPT6ZoSIApCo6vg-1
+ us-mta-662-unilBiGRMYCJnhOgY90jPw-1; Fri, 19 May 2023 03:41:13 -0400
+X-MC-Unique: unilBiGRMYCJnhOgY90jPw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3C96E101A58B;
-        Fri, 19 May 2023 07:41:19 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B0BCD29AB3E8;
+        Fri, 19 May 2023 07:41:12 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D833E2166B27;
-        Fri, 19 May 2023 07:41:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 894042166B28;
+        Fri, 19 May 2023 07:41:10 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,11 +52,10 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>, linux-erofs@lists.ozlabs.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: [PATCH v20 05/32] splice: Make splice from a DAX file use direct_splice_read()
-Date:   Fri, 19 May 2023 08:40:20 +0100
-Message-Id: <20230519074047.1739879-6-dhowells@redhat.com>
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v20 03/32] splice: Make direct_read_splice() limit to eof where appropriate
+Date:   Fri, 19 May 2023 08:40:18 +0100
+Message-Id: <20230519074047.1739879-4-dhowells@redhat.com>
 In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -66,41 +65,46 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make a read splice from a DAX file go directly to direct_splice_read() to
-do the reading as filemap_splice_read() is unlikely to find any pagecache
-to splice.
+Make direct_read_splice() limit the read to the end of the file for regular
+files and block devices, thereby reducing the amount of allocation it will
+do in such a case.
 
-I think this affects only erofs, Ext2, Ext4, fuse and XFS.
+This means that the blockdev code doesn't require any special handling as
+filemap_read_splice() also limits to i_size.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: linux-erofs@lists.ozlabs.org
-cc: linux-ext4@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-xfs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/splice.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/splice.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/fs/splice.c b/fs/splice.c
-index 1e0b7c7038b5..7b818b5b18d4 100644
+index 4db3eee49423..89c8516554d1 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
-@@ -421,6 +421,11 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
- 	struct kiocb kiocb;
- 	int ret;
+@@ -315,6 +315,19 @@ ssize_t direct_splice_read(struct file *in, loff_t *ppos,
+ 	size_t used, npages, chunk, remain, keep = 0;
+ 	int i;
  
-+#ifdef CONFIG_FS_DAX
-+	if (IS_DAX(in->f_mapping->host))
-+		return direct_splice_read(in, ppos, pipe, len, flags);
-+#endif
++	if (!len)
++		return 0;
 +
- 	iov_iter_pipe(&to, ITER_DEST, pipe, len);
- 	init_sync_kiocb(&kiocb, in);
- 	kiocb.ki_pos = *ppos;
++	if (S_ISREG(file_inode(in)->i_mode) ||
++	    S_ISBLK(file_inode(in)->i_mode)) {
++		loff_t i_size = i_size_read(in->f_mapping->host);
++
++		if (*ppos >= i_size)
++			return 0;
++		if (len > i_size - *ppos)
++			len = i_size - *ppos;
++	}
++
+ 	/* Work out how much data we can actually add into the pipe */
+ 	used = pipe_occupancy(pipe->head, pipe->tail);
+ 	npages = max_t(ssize_t, pipe->max_usage - used, 0);
 
