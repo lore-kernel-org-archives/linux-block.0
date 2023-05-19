@@ -2,89 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 515EAC77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 02:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8BFC77B73
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 02:27:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbjESCU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 22:20:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45040 "EHLO
+        id S229522AbjESC1v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 22:27:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjESCU5 (ORCPT
+        with ESMTP id S229493AbjESC1v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 22:20:57 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80ADFE4A
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 19:20:56 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-645c4a0079dso495085b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 19:20:56 -0700 (PDT)
+        Thu, 18 May 2023 22:27:51 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C1C186
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 19:27:50 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-64d28c9696cso219116b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 19:27:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684462856; x=1687054856;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AyZR3CXk9eblx3Piiqf00V5N9zRwPHTLyxqFqmAiBwo=;
-        b=yWrkzEFZ2obKBPa1U3mmOKMs46LgyDtr9h0vYzZ8X98Jp4WLoji5Kg61xga7sMdC7J
-         JsmEBAdC80h2jbARvjRDHLHKNtT0Ry2LTI+PNA8l91ScKNFJ58inarsiqACT6m4S4L9C
-         ydom16KybCkVnlLEsygxejurmVcqQyWoRr54RcSSJkKpN0r4+b51njsKS7DCyL6HmrY9
-         jFGjpVIscdW/lyTDF7McP6JZAv/iydOUsBKl16W1xcGe50b0/Y32BQrGpkngKl4IEP5Z
-         RCdseRVfzFUSiPa/fOQrahfNWzztcxIzFJTCNyhGemxGb+yyoSWe8hOagrw79mxzMgBC
-         gT1Q==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684463269; x=1687055269;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Bi4CaIiTRmDOwJi9Ptec+oZcPqUeCGJR0VjniBUQwWg=;
+        b=Uf8CoVi382Dr7NiBQz/N1kxQU5eIPe/QxQoHUlHVUNbwpgkIGAtRl2nEEMUmCViwL/
+         URD5EmU+oKzAln6Xh5Qr4VyIdwmuGrUpz9QUG2iECNRBTetCJo52YeD4O5vCUKsJuMSc
+         2QhP0xM9BJitcp0LOhXeufW+HjRLMul08GH/wb6Z2us6lhzGEJlUyKTSpLqOPqDO630i
+         kkHIFCWgCT4M6DK7z/l8u8b2ZsqorJraw841kM1KNaA8Xsye9LXO6MVwLi654geXxV9S
+         CtmMHU4xvCm4bJGSyP+wj+TBuAkUgjbkxdg2tKgG7hDRLIPyJafLJvsISto9XxRRvu8J
+         fDwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684462856; x=1687054856;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AyZR3CXk9eblx3Piiqf00V5N9zRwPHTLyxqFqmAiBwo=;
-        b=XOxOWU/79NQxPh+gx6+EyuGnpbOkgfqsIlDRo+p7VvDEa1fvscaIypea5DbR+EoIlO
-         uRWrVUsCE1NRK5UhK7zKpBjyttLKdjZJQ2xhoIHtpz8moz9IhufIazHJOJWtTf9fKb5Y
-         n0wPmyC0tgd14479ia9tGtyZ+dpgl7xlYUYy+CU7NB0XvSSIb8UCLXuxA5i12T+yQCRG
-         hXILKDD56107dX0ce15lYEfIn/xCSx+qk1KQ1RSwNcp22tUfvo0CdKvlWQ4KVZDPcqgT
-         0K78Yp3YnzgH04+MIymg8kHvs/VgeDvecsWzBV6fR5fnRa5NXFFOrLpCHrnuJe4lZL0A
-         h3hA==
-X-Gm-Message-State: AC+VfDz9NMqdy7OrMqay2ozA221jY+F6dYPTO9UV7Gx1/l39SAbMC3oB
-        gGHBdzIoFcw8NVYuHRA8tTBNt6Eld+ZUHyDKvkY=
-X-Google-Smtp-Source: ACHHUZ5sn8B6/p4Eo+T2WpnPnEBZzEKfyptbiJp+VsZZCXnDz+jazBXlnxk4bIAZs92a2Te+fk6dQQ==
-X-Received: by 2002:a05:6a00:319d:b0:643:9bc3:422a with SMTP id bj29-20020a056a00319d00b006439bc3422amr957628pfb.3.1684462855989;
-        Thu, 18 May 2023 19:20:55 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id n26-20020a62e51a000000b006460751222asm1967259pff.38.2023.05.18.19.20.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 May 2023 19:20:55 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>,
-        Yu Kuai <yukuai3@huawei.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20230516223853.1385255-1-bvanassche@acm.org>
-References: <20230516223853.1385255-1-bvanassche@acm.org>
-Subject: Re: [PATCH] block: BFQ: Add several invariant checks
-Message-Id: <168446285481.154282.1950812675230012642.b4-ty@kernel.dk>
-Date:   Thu, 18 May 2023 20:20:54 -0600
+        d=1e100.net; s=20221208; t=1684463269; x=1687055269;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bi4CaIiTRmDOwJi9Ptec+oZcPqUeCGJR0VjniBUQwWg=;
+        b=LeqYzjr07LvBR2+t2wrbhPiaUwL1c/rl7Tuv/JRCpoEVFKdYCa/CLTp5PGKqqVNR6d
+         HndDSZ5HN/CmbkoDfD2Fiozj+3KLyYGAgLpVVx9Ma7HcktU0ImZXtlvkhUccJSOayVCw
+         Ues+4aC5txZm0BnTEt7cYGoNJryW9wbzgW7F6JgMi3+q3xhR5RyaBYqBnKEFgAhqmtkG
+         Huq2EHdcTDY8EdIlBj1ntYuUybJHIb0B5GmJLfNNcnwdHmL34KeMM3HeBnwkvwjDNCnQ
+         Ag+drdTY9GG8WjEOlNYQNcZNL1fhYVLuJvPlnosOHJpCjltyiEdaEsvuJ0z0AsrBv2dB
+         YLBg==
+X-Gm-Message-State: AC+VfDzACYanIFvEcpTry0/Z7AXeUx46PfTE0sfJbP2NmImCl4gJLzyv
+        lZLDqfc0MQis8oLMWHsQyX4VEQ==
+X-Google-Smtp-Source: ACHHUZ4JP5imTCUXblgyFujCoTTjoFD5B5oxWyW3GmXnLuBhBzlQb065maM018D/wGWOZ3BeXaowug==
+X-Received: by 2002:a05:6a20:7fa3:b0:106:4e09:153b with SMTP id d35-20020a056a207fa300b001064e09153bmr484904pzj.6.1684463269649;
+        Thu, 18 May 2023 19:27:49 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id x23-20020aa784d7000000b0064867dc8719sm566487pfn.118.2023.05.18.19.27.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 May 2023 19:27:48 -0700 (PDT)
+Message-ID: <16569acf-8822-3bc7-f242-f9cf4e992c83@kernel.dk>
+Date:   Thu, 18 May 2023 20:27:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: rationalize the flow in bio_add_page and friends
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jinyoung Choi <j-young.choi@samsung.com>,
+        linux-block@vger.kernel.org
+References: <20230512133901.1053543-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230512133901.1053543-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Tue, 16 May 2023 15:38:53 -0700, Bart Van Assche wrote:
-> If anything goes wrong with the counters that track the number of
-> requests, I/O locks up. Make such scenarios easier to debug by adding
-> invariant checks for the request counters. Additionally, check that
-> BFQ queues are empty before these are freed.
+On 5/12/23 7:38 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
+> when reviewing v2 of Jinyoung's "Change the integrity configuration
+> method in block" series I noticed that someone made a complete mess of
+> the bio_add_page flow, so this untangles this to make the code better
+> reusable for adding integrity payloads.  (I'll also have a word with
+> younger me when I get the chance about this..)
 > 
+> Diffstat:
+>  bio.c |  123 ++++++++++++++++++++++++++++--------------------------------------
+>  1 file changed, 53 insertions(+), 70 deletions(-)
 
-Applied, thanks!
+Nice cleanups and generated code reduction too.
 
-[1/1] block: BFQ: Add several invariant checks
-      commit: 3e49c1e4a6152b6ad758a28ecce8fb470f46f6ed
-
-Best regards,
 -- 
 Jens Axboe
-
 
 
