@@ -2,55 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BFEC77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 19:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD35C7EE26
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 19:42:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231236AbjESTig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 15:38:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39912 "EHLO
+        id S229559AbjESTmc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 15:42:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbjESTif (ORCPT
+        with ESMTP id S229522AbjESTmb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 15:38:35 -0400
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0B93F7
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 12:38:34 -0700 (PDT)
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-51b33c72686so2496956a12.1
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 12:38:34 -0700 (PDT)
+        Fri, 19 May 2023 15:42:31 -0400
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E48186
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 12:42:30 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-64d30ab1f89so844967b3a.3
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 12:42:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684525114; x=1687117114;
+        d=1e100.net; s=20221208; t=1684525350; x=1687117350;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Y7YSUEnrjEt3BX0ZrJXNknVjVCA266WB1ET7lLuq3s=;
-        b=fgJLHQlJzCCoEts7iF3aKrlHmTdw4iw5toCVEwHs52P5Ja6Og8YtHWzXXUqMFnWx8e
-         FSqBWqPluWWMwmOEmLJZL8HkX3Flnh6H71sdzN6p//K8mDSbY/lAloNDM7ZSgnUZmvSg
-         ao6bFPzEx4ZRlv51g0hDE2b6gXusxIk72tAzOfUVBS7YXHMI3BD5TvZ2yeQkD3FfnEGQ
-         pZJ/Rq3ZQxyxvgtOFRzBiaGcytHzNhQoUKOZKBFvcyQMfmokTa2xciiNG0t7GlZrLyvq
-         nW56rGY0mckB+Zn98bw6ohC3r49SeDIrqfoDk+5QKi4cRD8iz8SqD5bKwwOiSAR2wwWh
-         xz5A==
-X-Gm-Message-State: AC+VfDyTxcQfNT60KbxNEsmkgrv4fc46Z/sx9YISuz4RPsGvPOShGzR/
-        PtSCwtnVW3xlBaTrPjCA+pIlJ27fI/s=
-X-Google-Smtp-Source: ACHHUZ6FB9PxDXV7LYrUR3x0lK1U1LwnnbDd5arjV6XWICv/ga8l0JbjI7rlSvWx+rNLo1nwV6CK/g==
-X-Received: by 2002:a17:902:c40b:b0:1a9:9d00:8c92 with SMTP id k11-20020a170902c40b00b001a99d008c92mr4315002plk.42.1684525114175;
-        Fri, 19 May 2023 12:38:34 -0700 (PDT)
+        bh=rqbYxAZvfHGYCedJFHOtCZSCOuObkcNB1k9Xi/oaJAs=;
+        b=SNDtcE75TwuEwlpVTnOXprgo+cjj6eOUrihPTdy7bjTOZDp6Bbxn3Uxh9fedLJnEZX
+         nsTQboGzsx29fPr+PbIvIL46hvd8qFE5EZGGZfAVIbCQDU7MvcQ6D12ATKhm3CBBSyDb
+         iofHu9N/L2cwmh6A+mlC0EhCckpNymel4BuBScgtd4/kGjDiVHS487Hgp7PJvGVfDOVF
+         a7N1HKRX9GyR7Fz854fgs3vQJz9kJEyHKRGlYGb6ghTj9xoDG1kfINpQOR04Tw4psiqG
+         1EFeRYE4kz1bIpB4YLaa6YASGqWJrwkNPKjerUiXCgkvgAknquRuIB79AEHI5StOLE3O
+         vbxw==
+X-Gm-Message-State: AC+VfDxkDWRm8E2+jT/5tXcntcNkY0k51upxU3yrceMlncSH+Xci/Use
+        j9RMAK7kcfBdqHOcICCjWAZApjbuawI=
+X-Google-Smtp-Source: ACHHUZ5znyhBP2zoK+UmGWHhEFKrowFfkzGgEf3FHGQH6QwsW/vFtIxKTRx0gp0rNunQVQtxGjW5SQ==
+X-Received: by 2002:a05:6a00:804:b0:63b:8423:9e31 with SMTP id m4-20020a056a00080400b0063b84239e31mr4277668pfk.11.1684525349942;
+        Fri, 19 May 2023 12:42:29 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:102a:f960:4ec2:663d? ([2620:15c:211:201:102a:f960:4ec2:663d])
-        by smtp.gmail.com with ESMTPSA id d6-20020a170902c18600b001addf547a6esm24508pld.17.2023.05.19.12.38.32
+        by smtp.gmail.com with ESMTPSA id 23-20020a630017000000b0052863112065sm100561pga.35.2023.05.19.12.42.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 May 2023 12:38:33 -0700 (PDT)
-Message-ID: <5641e563-6873-4b7a-eda2-58f56b498020@acm.org>
-Date:   Fri, 19 May 2023 12:38:31 -0700
+        Fri, 19 May 2023 12:42:29 -0700 (PDT)
+Message-ID: <c8d56cc8-aa8f-7076-672d-6b6586729a1e@acm.org>
+Date:   Fri, 19 May 2023 12:42:27 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH 2/7] blk-mq: reflow blk_insert_flush
+Subject: Re: [PATCH 5/7] blk-mq: defer to the normal submission path for
+ post-flush requests
 Content-Language: en-US
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
 References: <20230519044050.107790-1-hch@lst.de>
- <20230519044050.107790-3-hch@lst.de>
+ <20230519044050.107790-6-hch@lst.de>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230519044050.107790-3-hch@lst.de>
+In-Reply-To: <20230519044050.107790-6-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -58,36 +59,10 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 5/18/23 21:40, Christoph Hellwig wrote:
-> diff --git a/block/blk-flush.c b/block/blk-flush.c
-> index ed37d272f787eb..d8144f1f6fb12f 100644
-> --- a/block/blk-flush.c
-> +++ b/block/blk-flush.c
-> @@ -402,6 +402,9 @@ void blk_insert_flush(struct request *rq)
->   	struct blk_flush_queue *fq = blk_get_flush_queue(q, rq->mq_ctx);
->   	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
->   
-> +	/* FLUSH/FUA request must never be merged */
-> +	WARN_ON_ONCE(rq->bio != rq->biotail);
-
-request -> requests?
-
-> -	/*
-> -	 * If there's data but flush is not necessary, the request can be
-> -	 * processed directly without going through flush machinery.  Queue
-> -	 * for normal execution.
-> -	 */
-> -	if ((policy & REQ_FSEQ_DATA) &&
-> -	    !(policy & (REQ_FSEQ_PREFLUSH | REQ_FSEQ_POSTFLUSH))) {
-> +	case REQ_FSEQ_DATA:
-> +		/*
-> +		 * If there's data, but no flush is necessary, the request can
-> +		 * be processed directly without going through flush machinery.
-> +		 * Queue for normal execution.
-> +		 */
-
-there's -> there is. "there's" is a contraction of "there has". See also
-https://dictionary.cambridge.org/dictionary/english/there-s.
-
-Otherwise this patch looks good to me. Hence:
+> Requests with the FUA bit on hardware without FUA support need a post
+> flush before returning to the caller, but they can still be sent using
+> the normal I/O path after initializing the flush-related fields and
+> end I/O handler.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+
