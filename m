@@ -2,89 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8BFC77B73
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 02:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E29F1C77B73
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 03:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbjESC1v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 22:27:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45874 "EHLO
+        id S229579AbjESDQI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 23:16:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjESC1v (ORCPT
+        with ESMTP id S229497AbjESDQG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 22:27:51 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C1C186
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 19:27:50 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-64d28c9696cso219116b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 19:27:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684463269; x=1687055269;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Bi4CaIiTRmDOwJi9Ptec+oZcPqUeCGJR0VjniBUQwWg=;
-        b=Uf8CoVi382Dr7NiBQz/N1kxQU5eIPe/QxQoHUlHVUNbwpgkIGAtRl2nEEMUmCViwL/
-         URD5EmU+oKzAln6Xh5Qr4VyIdwmuGrUpz9QUG2iECNRBTetCJo52YeD4O5vCUKsJuMSc
-         2QhP0xM9BJitcp0LOhXeufW+HjRLMul08GH/wb6Z2us6lhzGEJlUyKTSpLqOPqDO630i
-         kkHIFCWgCT4M6DK7z/l8u8b2ZsqorJraw841kM1KNaA8Xsye9LXO6MVwLi654geXxV9S
-         CtmMHU4xvCm4bJGSyP+wj+TBuAkUgjbkxdg2tKgG7hDRLIPyJafLJvsISto9XxRRvu8J
-         fDwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684463269; x=1687055269;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bi4CaIiTRmDOwJi9Ptec+oZcPqUeCGJR0VjniBUQwWg=;
-        b=LeqYzjr07LvBR2+t2wrbhPiaUwL1c/rl7Tuv/JRCpoEVFKdYCa/CLTp5PGKqqVNR6d
-         HndDSZ5HN/CmbkoDfD2Fiozj+3KLyYGAgLpVVx9Ma7HcktU0ImZXtlvkhUccJSOayVCw
-         Ues+4aC5txZm0BnTEt7cYGoNJryW9wbzgW7F6JgMi3+q3xhR5RyaBYqBnKEFgAhqmtkG
-         Huq2EHdcTDY8EdIlBj1ntYuUybJHIb0B5GmJLfNNcnwdHmL34KeMM3HeBnwkvwjDNCnQ
-         Ag+drdTY9GG8WjEOlNYQNcZNL1fhYVLuJvPlnosOHJpCjltyiEdaEsvuJ0z0AsrBv2dB
-         YLBg==
-X-Gm-Message-State: AC+VfDzACYanIFvEcpTry0/Z7AXeUx46PfTE0sfJbP2NmImCl4gJLzyv
-        lZLDqfc0MQis8oLMWHsQyX4VEQ==
-X-Google-Smtp-Source: ACHHUZ4JP5imTCUXblgyFujCoTTjoFD5B5oxWyW3GmXnLuBhBzlQb065maM018D/wGWOZ3BeXaowug==
-X-Received: by 2002:a05:6a20:7fa3:b0:106:4e09:153b with SMTP id d35-20020a056a207fa300b001064e09153bmr484904pzj.6.1684463269649;
-        Thu, 18 May 2023 19:27:49 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x23-20020aa784d7000000b0064867dc8719sm566487pfn.118.2023.05.18.19.27.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 May 2023 19:27:48 -0700 (PDT)
-Message-ID: <16569acf-8822-3bc7-f242-f9cf4e992c83@kernel.dk>
-Date:   Thu, 18 May 2023 20:27:47 -0600
+        Thu, 18 May 2023 23:16:06 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D14A6
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 20:16:01 -0700 (PDT)
+Received: from letrec.thunk.org (c-73-212-78-46.hsd1.md.comcast.net [73.212.78.46])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 34J3FOqn029941
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 May 2023 23:15:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1684466129; bh=jwhdipxRwt17VHbkfp65xNv4jLc8Jh1vnKtY8iZIs10=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=kzCtQPMt8l1BwbiAE9yr4l8nYcawVAQ1Zz4TYBxHBJWw5P/THc92BWQfvAn9g0Ss3
+         QS17GFNOM49utdmWCO0YbsW5EbM2QQ+vU4T1CfVNhwhKT1ZyvAg/4yU5SqQr8JsC2L
+         ahId2PBad1g0pWY5MEqCvA4rbOa9bEXCv5joGiZYYsYC104CYf7zb97W2n0k2Crg33
+         K3/VbZS+Vfqc+B0CDBL4rf1sjv0iaOXMumEQ8dQHbOgzLUU8PuF+1A0CuAWSzR+UWn
+         l0aLKcioCLKN+qC5IWci+bIZar6hek3GzdmjttpkVAqI/Rg82UcOcK1YetiQ8V5eOY
+         7NIHC2wkVAqyw==
+Received: by letrec.thunk.org (Postfix, from userid 15806)
+        id 358158C02F5; Thu, 18 May 2023 23:15:24 -0400 (EDT)
+Date:   Thu, 18 May 2023 23:15:24 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, corbet@lwn.net, jake@lwn.net,
+        djwong@kernel.org, dchinner@redhat.com, ritesh.list@gmail.com,
+        rgoldwyn@suse.com, jack@suse.cz, linux-doc@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, p.raghav@samsung.com,
+        da.gomez@samsung.com, rohan.puri@samsung.com
+Subject: Re: [PATCH] Documentation: add initial iomap kdoc
+Message-ID: <ZGbpzBIZHBqgmTbz@mit.edu>
+References: <20230518144037.3149361-1-mcgrof@kernel.org>
+ <ZGY61jQfExQc2j71@infradead.org>
+ <ZGY7G8gIvWCi0ONT@bombadil.infradead.org>
+ <ZGY7aumgDgU0jIK0@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: rationalize the flow in bio_add_page and friends
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jinyoung Choi <j-young.choi@samsung.com>,
-        linux-block@vger.kernel.org
-References: <20230512133901.1053543-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230512133901.1053543-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZGY7aumgDgU0jIK0@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/23 7:38 AM, Christoph Hellwig wrote:
-> Hi Jens,
+On Thu, May 18, 2023 at 07:51:22AM -0700, Christoph Hellwig wrote:
+> On Thu, May 18, 2023 at 07:50:03AM -0700, Luis Chamberlain wrote:
+> > On Thu, May 18, 2023 at 07:48:54AM -0700, Christoph Hellwig wrote:
+> > > > +**iomap** allows filesystems to query storage media for data using *byte ranges*. Since block
+> > > > +mapping are provided for a *byte ranges* for cache data in memory, in the page cache, naturally
+> > > 
+> > > Without fixing your line length I can't even read this mess..
+> > 
+> > I thought we are at 100?
 > 
-> when reviewing v2 of Jinyoung's "Change the integrity configuration
-> method in block" series I noticed that someone made a complete mess of
-> the bio_add_page flow, so this untangles this to make the code better
-> reusable for adding integrity payloads.  (I'll also have a word with
-> younger me when I get the chance about this..)
-> 
-> Diffstat:
->  bio.c |  123 ++++++++++++++++++++++++++++--------------------------------------
->  1 file changed, 53 insertions(+), 70 deletions(-)
+> Ony for individual lines and when it improves readability (whatever
+> that means).  But multiple to long lines, especially full of text
+> are completely unreadable in a terminal.
 
-Nice cleanups and generated code reduction too.
+For C code, if you have really deeply nested code, sometimes it's
+better to have some lines which are longer than to have gratuitous
+line break just to keep everything under 72-76 characters.
 
--- 
-Jens Axboe
+But if you are writing a block of text, and you are expecting people
+to read it in a terminal window, I think it is adviseable to wrap at
+72 characters.  In fact, some will advise wrapping earlier than that,
+to better aid comprehension.  For example:
 
+   "Optimal line length or column width for body text is 40–70
+   characters.  When people read, their eyes jump across a line of
+   text, pausing momentarily to take in groups of three or four
+   words. Studies have shown that readers can make only three or four
+   of these jumps (or saccades) per line before reading becomes
+   tiring.
 
+   Too long lines with too many words also make it harder for the eyes
+   to find the correct spot when they sweep back to the left to pick
+   up the next line of text. To maintain readability, it is imperative
+   to use moderate line lengths within the range of 40–70 characters.
+
+   Do not set normally sized body text in a single column across a 8.5
+   by 11 inch page. If you do that, the result will greatly exceed 70
+   characters, reading efficiency will be significantly reduced, and
+   your readers’ attention will be easily lost.
+
+   Two column layouts are the best solution for achieving optimal body
+   text column widths on American letter size paper. If that is not
+   practical and using only one column is necessary, then be sure to
+   use large side margins in order to bring the line length as close
+   as possible to 70 characters or less."
+
+   -- https://winterpm.com/
+
+Cheers,
+
+						- Ted
