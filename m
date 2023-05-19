@@ -2,82 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D64EAC77B75
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 22:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D09C77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 22:28:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbjESWEJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 18:04:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42096 "EHLO
+        id S230172AbjESW2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 18:28:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229693AbjESWEI (ORCPT
+        with ESMTP id S229533AbjESW2k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 18:04:08 -0400
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34257114
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 15:03:59 -0700 (PDT)
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-64d2c865e4eso1316271b3a.0
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 15:03:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684533838; x=1687125838;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FG9P6kp8DT2pC5HrNxWKUyP2fErJ5WR60bhX+XGSqE0=;
-        b=WQVYzWdcqv1OjMCMifRp7HyTddT1yob1K3vyrrfhKd/deKOH0Yr6V591jPpFQaMDMC
-         iw0FkiWV5WRpZ2VdGXQ6QRHdqX539383ZXghXYESpGuRvqMluvflxJB5F4rSfUzqyrB/
-         HPAGSGwmd0ie6rqP0DRQi8wDFWry4/K2JVvPXWKNPkjVRIz9+U0Zc62B76L13dKbSF5A
-         J9tIcLC5bTQwoLt5bAj5dhU4AZ6Z4YGfgviu54ymF5uf4e/4DPrXnTKbPDF729PVU/qD
-         MKtr+EScvnZ33gkPHmJBxS/9JVs5BWKrteJC4kBxGtYtIhIjEYv3BZemT7YklWoOgfax
-         KqBw==
-X-Gm-Message-State: AC+VfDw5znHVIuxZzNyUVs6kjTwuc+GMw8R22yC3yY6yuNNafkeGjfWA
-        sjmhnqGD+6cdveTLh7Hh4GY=
-X-Google-Smtp-Source: ACHHUZ5LP62I6e9aS81Gk2c+pTe12jDuIHij2zz/OboXCZNIS1OId8IzMV4lgZ0nE7lblWvUjN4CgA==
-X-Received: by 2002:a05:6a00:2282:b0:643:b263:404 with SMTP id f2-20020a056a00228200b00643b2630404mr5144471pfe.33.1684533838451;
-        Fri, 19 May 2023 15:03:58 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:102a:f960:4ec2:663d])
-        by smtp.gmail.com with ESMTPSA id y24-20020aa78558000000b0064d32771fa8sm142114pfn.134.2023.05.19.15.03.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 May 2023 15:03:57 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH] block: BFQ: Move an invariant check
-Date:   Fri, 19 May 2023 15:03:46 -0700
-Message-ID: <20230519220347.3643295-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
+        Fri, 19 May 2023 18:28:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EEF1BD
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 15:27:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684535278;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N8SCLY3o4J6b9Y2pJlg3hyrvURsXqrxf9JlUVv4zhn4=;
+        b=eSyPXosWjeUmdw8dXNjSQdSQ/wQ+jhVfPca2v+6G8znUAuXMWsWLEJ5d4AAsEHSTMuDPYM
+        PIhFRE0nNzV+FWc42PTV2K2JNKYQSWCX+HH35OcNqIqSfz58sr/9PMr3PJVPxePA3q66k9
+        gG6CzPGLYGB95xRowNwaf+lveLVcyrI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-626-CHpRL3_TMzyLAsNxrRHseg-1; Fri, 19 May 2023 18:27:54 -0400
+X-MC-Unique: CHpRL3_TMzyLAsNxrRHseg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 124DF2A59551;
+        Fri, 19 May 2023 22:27:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C7BB5492B0A;
+        Fri, 19 May 2023 22:27:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZGc3vUU/bUpt+3Tm@infradead.org>
+References: <ZGc3vUU/bUpt+3Tm@infradead.org> <ZGcusJQfz68H1s7S@infradead.org> <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-4-dhowells@redhat.com> <1742093.1684485814@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v20 03/32] splice: Make direct_read_splice() limit to eof where appropriate
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2154517.1684535271.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 19 May 2023 23:27:51 +0100
+Message-ID: <2154518.1684535271@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Check bfqq->dispatched for each BFQ queue instead of checking it for an
-invalid bfqq pointer.
+Okay.  Let's go with that.  So I have to put the handling in vfs_splice_re=
+ad():
 
-Fixes: 3e49c1e4a615 ("block: BFQ: Add several invariant checks")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/bfq-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+	long vfs_splice_read(struct file *in, loff_t *ppos,
+			     struct pipe_inode_info *pipe, size_t len,
+			     unsigned int flags)
+	{
+	...
+		if (unlikely(!in->f_op->splice_read))
+			return warn_unsupported(in, "read");
+		/*
+		 * O_DIRECT and DAX don't deal with the pagecache, so we
+		 * allocate a buffer, copy into it and splice that into the pipe.
+		 */
+		if ((in->f_flags & O_DIRECT) || IS_DAX(in->f_mapping->host))
+			return copy_splice_read(in, ppos, pipe, len, flags);
+		return in->f_op->splice_read(in, ppos, pipe, len, flags);
+	}
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c5727afad159..09bbbcf9e049 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5405,6 +5405,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
- 
- 	WARN_ON_ONCE(!list_empty(&bfqq->fifo));
- 	WARN_ON_ONCE(!RB_EMPTY_ROOT(&bfqq->sort_list));
-+	WARN_ON_ONCE(bfqq->dispatched);
- 
- 	kmem_cache_free(bfq_pool, bfqq);
- 	bfqg_and_blkg_put(bfqg);
-@@ -7150,7 +7151,6 @@ static void bfq_exit_queue(struct elevator_queue *e)
- 	for (actuator = 0; actuator < bfqd->num_actuators; actuator++)
- 		WARN_ON_ONCE(bfqd->rq_in_driver[actuator]);
- 	WARN_ON_ONCE(bfqd->tot_rq_in_driver);
--	WARN_ON_ONCE(bfqq->dispatched);
- 
- 	hrtimer_cancel(&bfqd->idle_slice_timer);
- 
+which leaves very little in generic_file_splice_read:
+
+	ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
+					 struct pipe_inode_info *pipe, size_t len,
+					 unsigned int flags)
+	{
+		if (unlikely(*ppos >=3D in->f_mapping->host->i_sb->s_maxbytes))
+			return 0;
+		if (unlikely(!len))
+			return 0;
+		return filemap_splice_read(in, ppos, pipe, len, flags);
+	}
+
+so I wonder if the tests in generic_file_splice_read() can be folded into
+vfs_splice_read(), pointers to generic_file_splice_read() be replaced with
+pointers to filemap_splice_read() and generic_file_splice_read() just be
+removed.
+
+I suspect we can't quite do this because of the *ppos check - but I wonder=
+ if
+that's actually necessary since filemap_splice_read() checks against
+i_size... or if the check can be moved there if we definitely want to do i=
+t.
+
+Certainly, the zero-length check can be done in vfs_splice_read().
+
+David
+
