@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DCFDC77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A77CC7EE2C
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbjESHnp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 03:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59680 "EHLO
+        id S231318AbjESHnr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 03:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231317AbjESHm5 (ORCPT
+        with ESMTP id S231321AbjESHm5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 19 May 2023 03:42:57 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B43E71703
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55D41A5
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684482127;
+        s=mimecast20190719; t=1684482120;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MIKgygGFPP04jCWudTIx6Exr1BpE2idki489iWC06JA=;
-        b=GwonXPTsIjNL6ST9N7KjvQNkLzaC9PsyNZaVHr2/47/7YYKOI3JQRbPF6Zz/IOnGWP4yL9
-        SHwrbM+2vna17KwI5xj0OdziuOmhh+LGbpLYGExccjc7iK6TLVOiyWZvcckRwEp2oq+8vu
-        gw+meKovOrSLGmGpgZNGfI71uUZYZj8=
+        bh=VhlnyEb6mYomF+UXhy/zVZBJsDbPWQmGyqF6ugPT8o4=;
+        b=eFyyZB8pZAkw5fePCUgvPB0f3OXOH4Md9TYGmc9slIR/O925/AORCxapw8IKxL2JqoI3pb
+        Vln7uuHBMMfTWRzJ+chnC0lrkjYsXy2BNBr1jCs3untHCNgPz2LxBPFlYvdDwNF1kSnHPY
+        OETd+OYU2MBLhkcGEO4T6JByAAAJy8w=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-76-BiSEfFWJO5ihxPcX24ACRw-1; Fri, 19 May 2023 03:42:03 -0400
-X-MC-Unique: BiSEfFWJO5ihxPcX24ACRw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-290-tq44QnmUO9KmQ-WGEl3PcA-1; Fri, 19 May 2023 03:41:53 -0400
+X-MC-Unique: tq44QnmUO9KmQ-WGEl3PcA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ADED48027F5;
-        Fri, 19 May 2023 07:42:02 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7B949800B2A;
+        Fri, 19 May 2023 07:41:52 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BEDF40CFD45;
-        Fri, 19 May 2023 07:41:59 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B8AEB4F2DE0;
+        Fri, 19 May 2023 07:41:49 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,88 +53,68 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        ntfs3@lists.linux.dev
-Subject: [PATCH v20 18/32] ntfs3: Provide a splice-read stub
-Date:   Fri, 19 May 2023 08:40:33 +0100
-Message-Id: <20230519074047.1739879-19-dhowells@redhat.com>
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-ext4@vger.kernel.org
+Subject: [PATCH v20 15/32] ext4: Provide a splice-read stub
+Date:   Fri, 19 May 2023 08:40:30 +0100
+Message-Id: <20230519074047.1739879-16-dhowells@redhat.com>
 In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read stub for NTFS3 to perform various checks before
-allowing the operation to proceed.
+Provide a splice_read stub for Ext4.  This does the inode shutdown check
+before proceeding.  Splicing from DAX files is handled by
+generic_file_splice_read().
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-cc: ntfs3@lists.linux.dev
+cc: "Theodore Ts'o" <tytso@mit.edu>
+cc: Andreas Dilger <adilger.kernel@dilger.ca>
+cc: linux-ext4@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/ntfs3/file.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ fs/ext4/file.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/fs/ntfs3/file.c b/fs/ntfs3/file.c
-index 9a3d55c367d9..c27814946aa3 100644
---- a/fs/ntfs3/file.c
-+++ b/fs/ntfs3/file.c
-@@ -744,6 +744,40 @@ static ssize_t ntfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 	return generic_file_read_iter(iocb, iter);
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index d101b3b0c7da..9f8bbd9d131c 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -147,6 +147,17 @@ static ssize_t ext4_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	return generic_file_read_iter(iocb, to);
  }
  
-+static ssize_t ntfs_file_splice_read(struct file *in, loff_t *ppos,
++static ssize_t ext4_file_splice_read(struct file *in, loff_t *ppos,
 +				     struct pipe_inode_info *pipe,
 +				     size_t len, unsigned int flags)
 +{
-+	struct inode *inode = in->f_mapping->host;
-+	struct ntfs_inode *ni = ntfs_i(inode);
++	struct inode *inode = file_inode(in);
 +
-+	if (is_encrypted(ni)) {
-+		ntfs_inode_warn(inode, "encrypted i/o not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (is_compressed(ni) && (in->f_flags & O_DIRECT)) {
-+		ntfs_inode_warn(inode, "direct i/o + compressed not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+#ifndef CONFIG_NTFS3_LZX_XPRESS
-+	if (ni->ni_flags & NI_FLAG_COMPRESSED_MASK) {
-+		ntfs_inode_warn(
-+			inode,
-+			"activate CONFIG_NTFS3_LZX_XPRESS to read external compressed files");
-+		return -EOPNOTSUPP;
-+	}
-+#endif
-+
-+	if (is_dedup(ni)) {
-+		ntfs_inode_warn(inode, "read deduplicated not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
++	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
++		return -EIO;
 +	return generic_file_splice_read(in, ppos, pipe, len, flags);
 +}
 +
  /*
-  * ntfs_get_frame_pages
-  *
-@@ -1159,7 +1193,7 @@ const struct file_operations ntfs_file_operations = {
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= ntfs_compat_ioctl,
- #endif
+  * Called when an inode is released. Note that this is different
+  * from ext4_file_open: open gets called at every open, but release
+@@ -957,7 +968,7 @@ const struct file_operations ext4_file_operations = {
+ 	.release	= ext4_release_file,
+ 	.fsync		= ext4_sync_file,
+ 	.get_unmapped_area = thp_get_unmapped_area,
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= ntfs_file_splice_read,
- 	.mmap		= ntfs_file_mmap,
- 	.open		= ntfs_file_open,
- 	.fsync		= generic_file_fsync,
++	.splice_read	= ext4_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= ext4_fallocate,
+ };
 
