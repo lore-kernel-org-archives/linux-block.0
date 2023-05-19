@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F90BC77B7F
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26FADC7EE2C
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:45:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231468AbjESHpB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 03:45:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59942 "EHLO
+        id S231516AbjESHpC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 03:45:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231466AbjESHoN (ORCPT
+        with ESMTP id S230364AbjESHoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 03:44:13 -0400
+        Fri, 19 May 2023 03:44:16 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC111FD5
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3D71FE2
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684482143;
+        s=mimecast20190719; t=1684482145;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mbYjI1mFg3thAEdOWfyRBtPSF9SFp7VqzA4DBX9XOaM=;
-        b=WCrcyP08WfHWAkoqyq8aqaP5sLteQR/xHraMnZxvpd3pherzrYPc2rfTvWryXhRAio9PyP
-        u/k+BCPSoui+qPnsghnWr7hu/g0uI0EY3jQ+UKN3c4k4cccWxhsP7wFKhNEeavvUrCAphf
-        /3Nbs9JmzyAuXBf1DQSilWxP2A9UpWw=
+        bh=KIPsbdoO43iq3tUvemirM6xG5g+su+9PgNJxpKHBcQ0=;
+        b=NeZIYNh4xGDAluvXgKXWCmEjmZqKt74LWOnOB4OWf8BZF7FIXGfkn3ydptCkhwpROYXKSn
+        vosWrMsCZuvH3p2WvsAa7K3Jy+RvF92b/5BGSYuz8jL/9Chg5Cdz3CRP1c59opl3vb7HC1
+        K7vPYGNR7bVVxmuof3IJ+b0hI0yJhf4=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-633-8jk5gKwVNnagZwC444Xzmg-1; Fri, 19 May 2023 03:42:19 -0400
-X-MC-Unique: 8jk5gKwVNnagZwC444Xzmg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-581-aSvtV5ZQOk2ZrLbIVY_T4A-1; Fri, 19 May 2023 03:42:23 -0400
+X-MC-Unique: aSvtV5ZQOk2ZrLbIVY_T4A-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DF47D800C81;
-        Fri, 19 May 2023 07:42:18 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80C8380013A;
+        Fri, 19 May 2023 07:42:22 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 759107AE4;
-        Fri, 19 May 2023 07:42:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CE32492B0A;
+        Fri, 19 May 2023 07:42:20 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,53 +53,94 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        linux-trace-kernel@vger.kernel.org
-Subject: [PATCH v20 23/32] splice: Convert trace/seq to use direct_splice_read()
-Date:   Fri, 19 May 2023 08:40:38 +0100
-Message-Id: <20230519074047.1739879-24-dhowells@redhat.com>
+        Steve French <smfrench@gmail.com>,
+        John Hubbard <jhubbard@nvidia.com>, linux-cifs@vger.kernel.org
+Subject: [PATCH v20 24/32] splice: Do splice read from a file without using ITER_PIPE
+Date:   Fri, 19 May 2023 08:40:39 +0100
+Message-Id: <20230519074047.1739879-25-dhowells@redhat.com>
 In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For the splice from the trace seq buffer, just use direct_splice_read().
+Make generic_file_splice_read() use filemap_splice_read() and
+direct_splice_read() rather than using an ITER_PIPE and call_read_iter().
 
-In the future, something better can probably be done by gifting pages from
-seq->buf into the pipe, but that would require changing seq->buf into a
-vmap over an array of pages.
+With this, ITER_PIPE is no longer used.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Al Viro <viro@zeniv.linux.org.uk>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Steven Rostedt <rostedt@goodmis.org>
-cc: Masami Hiramatsu <mhiramat@kernel.org>
-cc: linux-kernel@vger.kernel.org
-cc: linux-trace-kernel@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-block@vger.kernel.org
+cc: Steve French <smfrench@gmail.com>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: David Hildenbrand <david@redhat.com>
+cc: John Hubbard <jhubbard@nvidia.com>
 cc: linux-mm@kvack.org
+cc: linux-block@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 ---
- kernel/trace/trace.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index ebc59781456a..b664020efcb7 100644
---- a/kernel/trace/trace.c
-+++ b/kernel/trace/trace.c
-@@ -5171,7 +5171,7 @@ static const struct file_operations tracing_fops = {
- 	.open		= tracing_open,
- 	.read		= seq_read,
- 	.read_iter	= seq_read_iter,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= direct_splice_read,
- 	.write		= tracing_write_stub,
- 	.llseek		= tracing_lseek,
- 	.release	= tracing_release,
+Notes:
+    ver #20)
+     - Use s_maxbytes from the backing store (in->f_mapping), not the front
+       inode (especially for a blockdev).
+    
+    ver #18)
+     - Split out the change to cifs to make it use generic_file_splice_read().
+     - Split out the unexport of filemap_splice_read() (still needed by cifs).
+
+ fs/splice.c | 31 +++++++------------------------
+ 1 file changed, 7 insertions(+), 24 deletions(-)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 7b818b5b18d4..56d9802729d0 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -417,34 +417,17 @@ ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
+ 				 struct pipe_inode_info *pipe, size_t len,
+ 				 unsigned int flags)
+ {
+-	struct iov_iter to;
+-	struct kiocb kiocb;
+-	int ret;
+-
++	if (unlikely(*ppos >= in->f_mapping->host->i_sb->s_maxbytes))
++		return 0;
++	if (unlikely(!len))
++		return 0;
+ #ifdef CONFIG_FS_DAX
+ 	if (IS_DAX(in->f_mapping->host))
+ 		return direct_splice_read(in, ppos, pipe, len, flags);
+ #endif
+-
+-	iov_iter_pipe(&to, ITER_DEST, pipe, len);
+-	init_sync_kiocb(&kiocb, in);
+-	kiocb.ki_pos = *ppos;
+-	ret = call_read_iter(in, &kiocb, &to);
+-	if (ret > 0) {
+-		*ppos = kiocb.ki_pos;
+-		file_accessed(in);
+-	} else if (ret < 0) {
+-		/* free what was emitted */
+-		pipe_discard_from(pipe, to.start_head);
+-		/*
+-		 * callers of ->splice_read() expect -EAGAIN on
+-		 * "can't put anything in there", rather than -EFAULT.
+-		 */
+-		if (ret == -EFAULT)
+-			ret = -EAGAIN;
+-	}
+-
+-	return ret;
++	if ((in->f_flags & O_DIRECT))
++		return direct_splice_read(in, ppos, pipe, len, flags);
++	return filemap_splice_read(in, ppos, pipe, len, flags);
+ }
+ EXPORT_SYMBOL(generic_file_splice_read);
+ 
 
