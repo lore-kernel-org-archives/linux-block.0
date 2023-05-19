@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0876CC77B7F
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA74DC77B7F
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:47:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231611AbjESHri (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 03:47:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60294 "EHLO
+        id S231285AbjESHrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 03:47:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231552AbjESHqt (ORCPT
+        with ESMTP id S229852AbjESHqx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 03:46:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58FA32D55
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:43:55 -0700 (PDT)
+        Fri, 19 May 2023 03:46:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9022D65
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:43:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684482173;
+        s=mimecast20190719; t=1684482159;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0UdxcT7QYPFwRvPO4h85pE794/0OGizygn6UovNdu60=;
-        b=WA61LC5FMyw7ew43Djepar4734Jp7dZtYmeXdk5cRfLY4+KoVVx0D04PeTxiekiKE899gs
-        ufg60WcFip43dPESZfV0lDnZMVySVv2rUkGSnCoG35O+oLe9YnZ1NV842TqWOiFuTNmnDP
-        3r9UzK6ke3VNKPLiwtjuQxxRflQAIw0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=edStQDA/gh3f03KMzWRlpjb2e/gxKf5/7u3ht9bl6/4=;
+        b=gdaDYS6FFkw6F3YB4HIVdAp/+jefoPf8tqBAHV/C8htfAr9q5M+KM6bKv0co2bIWb7pbLI
+        upNJ8chTvAjZKFqp0SWDbXFTfVQmhP/QypT9rkGwLs8/0dyV2CJfPNe8WeSo/M6p6/tehb
+        kXt5bnM8W0zhbFfyqncLr/OQtwJi/vg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-437-iVklZYPOP7qgZhTLOyp__w-1; Fri, 19 May 2023 03:42:47 -0400
-X-MC-Unique: iVklZYPOP7qgZhTLOyp__w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-558-Zn02uDUqNWychxCT98RFHQ-1; Fri, 19 May 2023 03:42:36 -0400
+X-MC-Unique: Zn02uDUqNWychxCT98RFHQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C287E38035AD;
-        Fri, 19 May 2023 07:42:46 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 654BA101A531;
+        Fri, 19 May 2023 07:42:35 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A83937C2A;
-        Fri, 19 May 2023 07:42:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 468A240CFD46;
+        Fri, 19 May 2023 07:42:33 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -54,109 +54,76 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
         John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v20 32/32] block: convert bio_map_user_iov to use iov_iter_extract_pages
-Date:   Fri, 19 May 2023 08:40:47 +0100
-Message-Id: <20230519074047.1739879-33-dhowells@redhat.com>
+Subject: [PATCH v20 28/32] block: Fix bio_flagged() so that gcc can better optimise it
+Date:   Fri, 19 May 2023 08:40:43 +0100
+Message-Id: <20230519074047.1739879-29-dhowells@redhat.com>
 In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This will pin pages or leave them unaltered rather than getting a ref on
-them as appropriate to the iterator.
+Fix bio_flagged() so that multiple instances of it, such as:
 
-The pages need to be pinned for DIO rather than having refs taken on them
-to prevent VM copy-on-write from malfunctioning during a concurrent fork()
-(the result of the I/O could otherwise end up being visible to/affected by
-the child process).
+	if (bio_flagged(bio, BIO_PAGE_REFFED) ||
+	    bio_flagged(bio, BIO_PAGE_PINNED))
+
+can be combined by the gcc optimiser into a single test in assembly
+(arguably, this is a compiler optimisation issue[1]).
+
+The missed optimisation stems from bio_flagged() comparing the result of
+the bitwise-AND to zero.  This results in an out-of-line bio_release_page()
+being compiled to something like:
+
+   <+0>:     mov    0x14(%rdi),%eax
+   <+3>:     test   $0x1,%al
+   <+5>:     jne    0xffffffff816dac53 <bio_release_pages+11>
+   <+7>:     test   $0x2,%al
+   <+9>:     je     0xffffffff816dac5c <bio_release_pages+20>
+   <+11>:    movzbl %sil,%esi
+   <+15>:    jmp    0xffffffff816daba1 <__bio_release_pages>
+   <+20>:    jmp    0xffffffff81d0b800 <__x86_return_thunk>
+
+However, the test is superfluous as the return type is bool.  Removing it
+results in:
+
+   <+0>:     testb  $0x3,0x14(%rdi)
+   <+4>:     je     0xffffffff816e4af4 <bio_release_pages+15>
+   <+6>:     movzbl %sil,%esi
+   <+10>:    jmp    0xffffffff816dab7c <__bio_release_pages>
+   <+15>:    jmp    0xffffffff81d0b7c0 <__x86_return_thunk>
+
+instead.
+
+Also, the MOVZBL instruction looks unnecessary[2] - I think it's just
+'re-booling' the mark_dirty parameter.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Jan Kara <jack@suse.cz>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Logan Gunthorpe <logang@deltatee.com>
 cc: linux-block@vger.kernel.org
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108370 [1]
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108371 [2]
+Link: https://lore.kernel.org/r/167391056756.2311931.356007731815807265.stgit@warthog.procyon.org.uk/ # v6
 ---
+ include/linux/bio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Notes:
-    ver #10)
-     - Drop bio_set_cleanup_mode(), open coding it instead.
-    
-    ver #8)
-     - Split the patch up a bit [hch].
-     - We should only be using pinned/non-pinned pages and not ref'd pages,
-       so adjust the comments appropriately.
-    
-    ver #7)
-     - Don't treat BIO_PAGE_REFFED/PINNED as being the same as FOLL_GET/PIN.
-    
-    ver #5)
-     - Transcribe the FOLL_* flags returned by iov_iter_extract_pages() to
-       BIO_* flags and got rid of bi_cleanup_mode.
-     - Replaced BIO_NO_PAGE_REF to BIO_PAGE_REFFED in the preceding patch.
-
- block/blk-map.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 33d9f6e89ba6..3551c3ff17cf 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -281,22 +281,21 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index b3e7529ff55e..7f53be035cf0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -229,7 +229,7 @@ static inline void bio_cnt_set(struct bio *bio, unsigned int count)
  
- 	if (blk_queue_pci_p2pdma(rq->q))
- 		extraction_flags |= ITER_ALLOW_P2PDMA;
-+	if (iov_iter_extract_will_pin(iter))
-+		bio_set_flag(bio, BIO_PAGE_PINNED);
+ static inline bool bio_flagged(struct bio *bio, unsigned int bit)
+ {
+-	return (bio->bi_flags & (1U << bit)) != 0;
++	return bio->bi_flags & (1U << bit);
+ }
  
--	bio_set_flag(bio, BIO_PAGE_REFFED);
- 	while (iov_iter_count(iter)) {
--		struct page **pages, *stack_pages[UIO_FASTIOV];
-+		struct page *stack_pages[UIO_FASTIOV];
-+		struct page **pages = stack_pages;
- 		ssize_t bytes;
- 		size_t offs;
- 		int npages;
- 
--		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
--			pages = stack_pages;
--			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
--						   nr_vecs, &offs, extraction_flags);
--		} else {
--			bytes = iov_iter_get_pages_alloc(iter, &pages,
--						LONG_MAX, &offs, extraction_flags);
--		}
-+		if (nr_vecs > ARRAY_SIZE(stack_pages))
-+			pages = NULL;
-+
-+		bytes = iov_iter_extract_pages(iter, &pages, LONG_MAX,
-+					       nr_vecs, extraction_flags, &offs);
- 		if (unlikely(bytes <= 0)) {
- 			ret = bytes ? bytes : -EFAULT;
- 			goto out_unmap;
-@@ -318,7 +317,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
- 						     max_sectors, &same_page)) {
- 					if (same_page)
--						put_page(page);
-+						bio_release_page(bio, page);
- 					break;
- 				}
- 
-@@ -330,7 +329,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 		 * release the pages we didn't map into the bio, if any
- 		 */
- 		while (j < npages)
--			put_page(pages[j++]);
-+			bio_release_page(bio, pages[j++]);
- 		if (pages != stack_pages)
- 			kvfree(pages);
- 		/* couldn't stuff something into bio? */
+ static inline void bio_set_flag(struct bio *bio, unsigned int bit)
 
