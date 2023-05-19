@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B79A1C7EE2F
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE84C77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231321AbjESHnr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 03:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59642 "EHLO
+        id S231382AbjESHoY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 03:44:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbjESHm7 (ORCPT
+        with ESMTP id S231300AbjESHnc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 03:42:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D5D510F9
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:06 -0700 (PDT)
+        Fri, 19 May 2023 03:43:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D6A19B2
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684482125;
+        s=mimecast20190719; t=1684482135;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NhBgu+YPWWuhiMuhxeBoG/WfhrSyIDZx4YN21OB8Xyg=;
-        b=dNpGYW5z/Q57Q9CJhIMdt7Hj6B9lnbtlUfPePR8Nom2EoMqnbPYXszl1gYQYg7Pw1BXypl
-        ld+s0VkG5LQc3+POG+4JnuFh9pyHAmio+SeHpTb/X+/GMfxoWiXOxCOSjxVNKUzV0UMceT
-        3E/dGBXjd1TUw2eBK44kkCENyNckpCs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=uuCSAVZVpWhK4klEEqx7Ct2l0SGs5ZJdbhyX0+gkImI=;
+        b=fFJp2AgtD/x/Xe3ZDzDn75u/INN2zK7+io3gd3b6jSfes/aYqEkcyzV+PVnkhGtRPFtyd6
+        0tGu5bncFqckAgTvoVWwSXF8rSwRfeIoPF04t+uKoZ+GWCE2sXsZA5ZG+mb1lu2IA8Y3xd
+        rfTRagyDhC4uwQQfPZ/JWu+is8uRdY4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-675-eDOVwGWEMCmaAhO0IYU1iA-1; Fri, 19 May 2023 03:41:59 -0400
-X-MC-Unique: eDOVwGWEMCmaAhO0IYU1iA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-570-9WYmFVhKPfigCOXLKK6NJQ-1; Fri, 19 May 2023 03:42:10 -0400
+X-MC-Unique: 9WYmFVhKPfigCOXLKK6NJQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EABBE3C01D8C;
-        Fri, 19 May 2023 07:41:58 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 43746101A53B;
+        Fri, 19 May 2023 07:42:09 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5AC6F2166B28;
-        Fri, 19 May 2023 07:41:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A998E40D1B60;
+        Fri, 19 May 2023 07:42:06 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,108 +53,84 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>, linux-nfs@vger.kernel.org
-Subject: [PATCH v20 17/32] nfs: Provide a splice-read stub
-Date:   Fri, 19 May 2023 08:40:32 +0100
-Message-Id: <20230519074047.1739879-18-dhowells@redhat.com>
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>,
+        devel@lists.orangefs.org
+Subject: [PATCH v20 20/32] orangefs: Provide a splice-read stub
+Date:   Fri, 19 May 2023 08:40:35 +0100
+Message-Id: <20230519074047.1739879-21-dhowells@redhat.com>
 In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read stub for NFS.  This locks the inode around
-filemap_splice_read() and revalidates the mapping.  It cannot do this
-around direct_splice_read() as that calls ->read_iter().
+Provide a splice_read stub for ocfs2.  This increments the read stats and
+then locks the inode across the call to filemap_splice_read() and a
+revalidation of the mapping.
+
+The lock must not be held across the call to direct_splice_read() as this
+calls ->read_iter(); this might also mean that the stat increment doesn't
+need to be done in DIO mode.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-cc: Anna Schumaker <anna@kernel.org>
-cc: linux-nfs@vger.kernel.org
+cc: Mike Marshall <hubcap@omnibond.com>
+cc: Martin Brandenburg <martin@omnibond.com>
+cc: devel@lists.orangefs.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/nfs/file.c     | 26 +++++++++++++++++++++++++-
- fs/nfs/internal.h |  2 ++
- fs/nfs/nfs4file.c |  2 +-
- 3 files changed, 28 insertions(+), 2 deletions(-)
+ fs/orangefs/file.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-index f0edf5a36237..91fe48b47f3c 100644
---- a/fs/nfs/file.c
-+++ b/fs/nfs/file.c
-@@ -178,6 +178,30 @@ nfs_file_read(struct kiocb *iocb, struct iov_iter *to)
+diff --git a/fs/orangefs/file.c b/fs/orangefs/file.c
+index 1a4301a38aa7..c1eae145e4a8 100644
+--- a/fs/orangefs/file.c
++++ b/fs/orangefs/file.c
+@@ -337,6 +337,29 @@ static ssize_t orangefs_file_read_iter(struct kiocb *iocb,
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(nfs_file_read);
  
-+ssize_t
-+nfs_file_splice_read(struct file *in, loff_t *ppos, struct pipe_inode_info *pipe,
-+		     size_t len, unsigned int flags)
++static ssize_t orangefs_file_splice_read(struct file *in, loff_t *ppos,
++					 struct pipe_inode_info *pipe,
++					 size_t len, unsigned int flags)
 +{
 +	struct inode *inode = file_inode(in);
-+	ssize_t result;
++	ssize_t ret;
++
++	orangefs_stats.reads++;
 +
 +	if (in->f_flags & O_DIRECT)
 +		return direct_splice_read(in, ppos, pipe, len, flags);
 +
-+	dprintk("NFS: splice_read(%pD2, %zu@%lu)\n", in, len, *pos);
++	down_read(&inode->i_rwsem);
++	ret = orangefs_revalidate_mapping(inode);
++	if (ret)
++		goto out;
 +
-+	nfs_start_io_read(inode);
-+	result = nfs_revalidate_mapping(inode, in->f_mapping);
-+	if (!result) {
-+		result = filemap_splice_read(in, ppos, pipe, len, flags);
-+		if (result > 0)
-+			nfs_add_stats(inode, NFSIOS_NORMALREADBYTES, result);
-+	}
-+	nfs_end_io_read(inode);
-+	return result;
++	ret = filemap_splice_read(in, ppos, pipe, len, flags);
++out:
++	up_read(&inode->i_rwsem);
++	return ret;
 +}
-+EXPORT_SYMBOL_GPL(nfs_file_splice_read);
 +
- int
- nfs_file_mmap(struct file * file, struct vm_area_struct * vma)
+ static ssize_t orangefs_file_write_iter(struct kiocb *iocb,
+     struct iov_iter *iter)
  {
-@@ -879,7 +903,7 @@ const struct file_operations nfs_file_operations = {
- 	.fsync		= nfs_file_fsync,
- 	.lock		= nfs_lock,
- 	.flock		= nfs_flock,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= nfs_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.check_flags	= nfs_check_flags,
- 	.setlease	= simple_nosetlease,
-diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
-index 3cc027d3bd58..b5f21d35d30e 100644
---- a/fs/nfs/internal.h
-+++ b/fs/nfs/internal.h
-@@ -416,6 +416,8 @@ static inline __u32 nfs_access_xattr_mask(const struct nfs_server *server)
- int nfs_file_fsync(struct file *file, loff_t start, loff_t end, int datasync);
- loff_t nfs_file_llseek(struct file *, loff_t, int);
- ssize_t nfs_file_read(struct kiocb *, struct iov_iter *);
-+ssize_t nfs_file_splice_read(struct file *in, loff_t *ppos, struct pipe_inode_info *pipe,
-+			     size_t len, unsigned int flags);
- int nfs_file_mmap(struct file *, struct vm_area_struct *);
- ssize_t nfs_file_write(struct kiocb *, struct iov_iter *);
- int nfs_file_release(struct inode *, struct file *);
-diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
-index 2563ed8580f3..4aeadd6e1a6d 100644
---- a/fs/nfs/nfs4file.c
-+++ b/fs/nfs/nfs4file.c
-@@ -454,7 +454,7 @@ const struct file_operations nfs4_file_operations = {
- 	.fsync		= nfs_file_fsync,
- 	.lock		= nfs_lock,
- 	.flock		= nfs_flock,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= nfs_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.check_flags	= nfs_check_flags,
- 	.setlease	= nfs4_setlease,
+@@ -556,7 +579,7 @@ const struct file_operations orangefs_file_operations = {
+ 	.lock		= orangefs_lock,
+ 	.mmap		= orangefs_file_mmap,
+ 	.open		= generic_file_open,
+-	.splice_read    = generic_file_splice_read,
++	.splice_read    = orangefs_file_splice_read,
+ 	.splice_write   = iter_file_splice_write,
+ 	.flush		= orangefs_flush,
+ 	.release	= orangefs_file_release,
 
