@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE44C7EE2D
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:43:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DCFDC77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:43:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbjESHn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 03:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59604 "EHLO
+        id S231426AbjESHnp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 03:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231303AbjESHm4 (ORCPT
+        with ESMTP id S231317AbjESHm5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 03:42:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFCF2198B
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:41:53 -0700 (PDT)
+        Fri, 19 May 2023 03:42:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B43E71703
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684482113;
+        s=mimecast20190719; t=1684482127;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/4iKO0WOSo1UJaMQGu6hpLFM8tphuArX0rBWtTeeSuo=;
-        b=K9o80uaup8/jTx31Q7eRAjBkysMAnUFzY0ZcePKMGhaRs4FQaOKvXkO3gMgWoJuZdWP2E/
-        lpvpib534GtunAgJ+7438LECHGBxJBtkPwWL8iTIKzOPWPckuyTiUqtNjiQ8lTLFc+fETS
-        Abrzzpz2RjEALmo9PIlR2m7ZH5SK7Qo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=MIKgygGFPP04jCWudTIx6Exr1BpE2idki489iWC06JA=;
+        b=GwonXPTsIjNL6ST9N7KjvQNkLzaC9PsyNZaVHr2/47/7YYKOI3JQRbPF6Zz/IOnGWP4yL9
+        SHwrbM+2vna17KwI5xj0OdziuOmhh+LGbpLYGExccjc7iK6TLVOiyWZvcckRwEp2oq+8vu
+        gw+meKovOrSLGmGpgZNGfI71uUZYZj8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-187-6zZLhNJbPDyDHIrP4_P9AQ-1; Fri, 19 May 2023 03:41:50 -0400
-X-MC-Unique: 6zZLhNJbPDyDHIrP4_P9AQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+ us-mta-76-BiSEfFWJO5ihxPcX24ACRw-1; Fri, 19 May 2023 03:42:03 -0400
+X-MC-Unique: BiSEfFWJO5ihxPcX24ACRw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1A33D29AB3F0;
-        Fri, 19 May 2023 07:41:49 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ADED48027F5;
+        Fri, 19 May 2023 07:42:02 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 767167C2A;
-        Fri, 19 May 2023 07:41:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BEDF40CFD45;
+        Fri, 19 May 2023 07:41:59 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,77 +52,89 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>, Tyler Hicks <code@tyhicks.com>,
-        ecryptfs@vger.kernel.org
-Subject: [PATCH v20 14/32] ecryptfs: Provide a splice-read stub
-Date:   Fri, 19 May 2023 08:40:29 +0100
-Message-Id: <20230519074047.1739879-15-dhowells@redhat.com>
+        Christoph Hellwig <hch@lst.de>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        ntfs3@lists.linux.dev
+Subject: [PATCH v20 18/32] ntfs3: Provide a splice-read stub
+Date:   Fri, 19 May 2023 08:40:33 +0100
+Message-Id: <20230519074047.1739879-19-dhowells@redhat.com>
 In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read stub for ecryptfs to update the access time on the
-lower file after the operation.
+Provide a splice_read stub for NTFS3 to perform various checks before
+allowing the operation to proceed.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Tyler Hicks <code@tyhicks.com>
-cc: ecryptfs@vger.kernel.org
+cc: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+cc: ntfs3@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/ecryptfs/file.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ fs/ntfs3/file.c | 36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/fs/ecryptfs/file.c b/fs/ecryptfs/file.c
-index 268b74499c28..284395587be0 100644
---- a/fs/ecryptfs/file.c
-+++ b/fs/ecryptfs/file.c
-@@ -44,6 +44,31 @@ static ssize_t ecryptfs_read_update_atime(struct kiocb *iocb,
- 	return rc;
+diff --git a/fs/ntfs3/file.c b/fs/ntfs3/file.c
+index 9a3d55c367d9..c27814946aa3 100644
+--- a/fs/ntfs3/file.c
++++ b/fs/ntfs3/file.c
+@@ -744,6 +744,40 @@ static ssize_t ntfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 	return generic_file_read_iter(iocb, iter);
  }
  
-+/*
-+ * ecryptfs_splice_read_update_atime
-+ *
-+ * generic_file_splice_read updates the atime of upper layer inode.  But, it
-+ * doesn't give us a chance to update the atime of the lower layer inode.  This
-+ * function is a wrapper to generic_file_read.  It updates the atime of the
-+ * lower level inode if generic_file_read returns without any errors. This is
-+ * to be used only for file reads.  The function to be used for directory reads
-+ * is ecryptfs_read.
-+ */
-+static ssize_t ecryptfs_splice_read_update_atime(struct file *in, loff_t *ppos,
-+						 struct pipe_inode_info *pipe,
-+						 size_t len, unsigned int flags)
++static ssize_t ntfs_file_splice_read(struct file *in, loff_t *ppos,
++				     struct pipe_inode_info *pipe,
++				     size_t len, unsigned int flags)
 +{
-+	ssize_t rc;
-+	const struct path *path;
++	struct inode *inode = in->f_mapping->host;
++	struct ntfs_inode *ni = ntfs_i(inode);
 +
-+	rc = generic_file_splice_read(in, ppos, pipe, len, flags);
-+	if (rc >= 0) {
-+		path = ecryptfs_dentry_to_lower_path(in->f_path.dentry);
-+		touch_atime(path);
++	if (is_encrypted(ni)) {
++		ntfs_inode_warn(inode, "encrypted i/o not supported");
++		return -EOPNOTSUPP;
 +	}
-+	return rc;
++
++	if (is_compressed(ni) && (in->f_flags & O_DIRECT)) {
++		ntfs_inode_warn(inode, "direct i/o + compressed not supported");
++		return -EOPNOTSUPP;
++	}
++
++#ifndef CONFIG_NTFS3_LZX_XPRESS
++	if (ni->ni_flags & NI_FLAG_COMPRESSED_MASK) {
++		ntfs_inode_warn(
++			inode,
++			"activate CONFIG_NTFS3_LZX_XPRESS to read external compressed files");
++		return -EOPNOTSUPP;
++	}
++#endif
++
++	if (is_dedup(ni)) {
++		ntfs_inode_warn(inode, "read deduplicated not supported");
++		return -EOPNOTSUPP;
++	}
++
++	return generic_file_splice_read(in, ppos, pipe, len, flags);
 +}
 +
- struct ecryptfs_getdents_callback {
- 	struct dir_context ctx;
- 	struct dir_context *caller;
-@@ -414,5 +439,5 @@ const struct file_operations ecryptfs_main_fops = {
- 	.release = ecryptfs_release,
- 	.fsync = ecryptfs_fsync,
- 	.fasync = ecryptfs_fasync,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = ecryptfs_splice_read_update_atime,
- };
+ /*
+  * ntfs_get_frame_pages
+  *
+@@ -1159,7 +1193,7 @@ const struct file_operations ntfs_file_operations = {
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= ntfs_compat_ioctl,
+ #endif
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= ntfs_file_splice_read,
+ 	.mmap		= ntfs_file_mmap,
+ 	.open		= ntfs_file_open,
+ 	.fsync		= generic_file_fsync,
 
