@@ -2,69 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8120C77B75
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 16:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EBE7C77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 16:32:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230384AbjESQW6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 12:22:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50322 "EHLO
+        id S231147AbjESQcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 12:32:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230387AbjESQWw (ORCPT
+        with ESMTP id S231166AbjESQcE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 12:22:52 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E2CA10D2
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 09:22:43 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-51144dddd4cso1307945a12.1
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 09:22:43 -0700 (PDT)
+        Fri, 19 May 2023 12:32:04 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5891CE52
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 09:31:37 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-965b5f3b9ffso213417966b.0
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 09:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1684513361; x=1687105361;
+        d=linux-foundation.org; s=google; t=1684513895; x=1687105895;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kK1ZTkygyrBiweN68dKEUcpOojpjbump5mMSvci/Nuk=;
-        b=O1ry9Qs17DnpstX9SnQyPz37GUS8m7sJbF3M4QmL3o/8nTwdBkJYrSXOZtU4foiTZs
-         CIlEHqqBaL4/CafCnMR4s12l0bPpwO7KJiNvPh83XRtsDgl8bnP/RZ3c93A2ZTYHOfY0
-         bmL9cCqczCBR1hTCZXzi78fOb2aNxHvfaJJeU=
+        bh=afFaOwVkDQVoLtMd5ERUW5Y+E5Lld4ra+zl50KIIzto=;
+        b=YzrWcDld4RTJchGelZsjKIflSPDXxiN983phPQf+kkueJ++VbeVCYYGAIi9K+eB62u
+         pvnn8G2ZHozyAGv0C9JWxXUEJFs028oh1ByD36OWtKKdm/xJ3b1kImHNWzYbpdVNtFHS
+         IVwUNWaLdUfhR5yMO2njMd1b8YV9G1S0wfjeE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684513361; x=1687105361;
+        d=1e100.net; s=20221208; t=1684513895; x=1687105895;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kK1ZTkygyrBiweN68dKEUcpOojpjbump5mMSvci/Nuk=;
-        b=MVuNSISn1J2AHTSdUSf26o+okK1DfppuO+pDo6CD84n0XNL44o1ZACbyX/ZISIKyr5
-         JuzmgYXs680xntYixemycsc1+chTnWhHTxHjIB1/4UqSZozmnXqZgUmnohf7Dj72VY+r
-         dVL5Slc55yk3pHes+f9h0KwniryUwMD5I/ujq1/GRlROny7i6flPRdeOoOW7hLd1UH6+
-         m0VbsKLvFSiz3UxedRjcHG9DSdfrET3pvihBm7uexI4WeDUU4nZhG2dLQi6pn9K9xkPC
-         1XlGJYChqOypeEWKhpbXiRMgVAUmMAU5nagLcaUBgaJ4xO3n/yyqJfc3DrfMCHCmaqdE
-         efVQ==
-X-Gm-Message-State: AC+VfDzIEdF3qbOKR4tDp/+bJmT9SPJAkz+2CMSM5bjDCsrtEiJEZgKr
-        VhKCKgs/US6EWnkvjt7A2NR0Ly6WhVNfZlt2Pi8/TzcK
-X-Google-Smtp-Source: ACHHUZ6fpdFQMBQqPR/Ir18Mp1e5gxO834HeL7Ty6ipMwPW0a7A6OxsiSefC01Cj+oQZxq5Uo0KkVw==
-X-Received: by 2002:a17:907:2ce1:b0:961:800b:3f57 with SMTP id hz1-20020a1709072ce100b00961800b3f57mr2294589ejc.77.1684513361460;
-        Fri, 19 May 2023 09:22:41 -0700 (PDT)
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com. [209.85.208.53])
-        by smtp.gmail.com with ESMTPSA id s23-20020a1709066c9700b0094f4d2d81d9sm2448223ejr.94.2023.05.19.09.22.39
+        bh=afFaOwVkDQVoLtMd5ERUW5Y+E5Lld4ra+zl50KIIzto=;
+        b=CKN0QpU/OGTAyYDn1YgVt0/OC9RymBVQm6RfXEZ945w7VuOgpvx71u7jX6nZBWSLpX
+         ZNcQyR0TNdmnWM9yPLDT6jckmMnMc8YEtIVcQAnxaG25Zvj/Fp81OfIN3/zr68xLzfTz
+         k22U3f1XvT0E5MDmeNjgt2TIdFOQ3iEAL8GTmc/oJxjcje7NlkDYiV73V/rR6Cc6vyfw
+         ZFKYKvG0RWX7knrYabFr98yOSF5BCYtD3djRT2Ls83BrYaFF3rYOzqgLF809vkr0vVGp
+         XcWFTQlkC04ZXbEEW6+JXsZr6Uy9eFC5H+LPS4+/eyWAp/zQ5fW+w41FhxMo4+Syp/Zv
+         12RA==
+X-Gm-Message-State: AC+VfDypOUQ/IuEeVGJQTywDF4hiwK1p/VXugzrwuZYUgm/fJT438Ko4
+        v99rhQ+dfoXcbuTCvGFYH5kkRQmDu6bekkc26wCev0sU
+X-Google-Smtp-Source: ACHHUZ7Z1FUMpYnere81VViihlOpYBbA36hhH4N3c6+8/8dCGrW2mZzJ5TID4sw5iVGhgbKVMcXgig==
+X-Received: by 2002:a17:907:7da7:b0:96a:316f:8aaa with SMTP id oz39-20020a1709077da700b0096a316f8aaamr2324080ejc.37.1684513895743;
+        Fri, 19 May 2023 09:31:35 -0700 (PDT)
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com. [209.85.208.47])
+        by smtp.gmail.com with ESMTPSA id j13-20020a1709062a0d00b009659fed3612sm2452354eje.24.2023.05.19.09.31.34
         for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 May 2023 09:22:40 -0700 (PDT)
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-510db954476so4232617a12.0
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 09:22:39 -0700 (PDT)
-X-Received: by 2002:a05:6402:2d5:b0:510:f6e0:7d9f with SMTP id
- b21-20020a05640202d500b00510f6e07d9fmr2254674edx.13.1684513359285; Fri, 19
- May 2023 09:22:39 -0700 (PDT)
+        Fri, 19 May 2023 09:31:35 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-510d9218506so2103451a12.1
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 09:31:34 -0700 (PDT)
+X-Received: by 2002:aa7:d7cd:0:b0:512:698d:34ac with SMTP id
+ e13-20020aa7d7cd000000b00512698d34acmr65349eds.12.1684513894474; Fri, 19 May
+ 2023 09:31:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-10-dhowells@redhat.com>
- <ZGcvfLWAqmOLrnLj@infradead.org>
-In-Reply-To: <ZGcvfLWAqmOLrnLj@infradead.org>
+References: <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-4-dhowells@redhat.com>
+In-Reply-To: <20230519074047.1739879-4-dhowells@redhat.com>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 19 May 2023 09:22:22 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgzSLXt38J_B2=QWCDi7A1c5B0_cJ3XYRj9rYn+YXbjQA@mail.gmail.com>
-Message-ID: <CAHk-=wgzSLXt38J_B2=QWCDi7A1c5B0_cJ3XYRj9rYn+YXbjQA@mail.gmail.com>
-Subject: Re: [PATCH v20 09/32] tty, proc, kernfs, random: Use direct_splice_read()
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+Date:   Fri, 19 May 2023 09:31:17 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whX+mAESz01NJZssoLMsgEpFjx7LDLO1_uW1qaDY2Jidw@mail.gmail.com>
+Message-ID: <CAHk-=whX+mAESz01NJZssoLMsgEpFjx7LDLO1_uW1qaDY2Jidw@mail.gmail.com>
+Subject: Re: [PATCH v20 03/32] splice: Make direct_read_splice() limit to eof
+ where appropriate
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
@@ -74,34 +74,35 @@ Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Christian Brauner <brauner@kernel.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Arnd Bergmann <arnd@arndb.de>
+        Christoph Hellwig <hch@lst.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 19, 2023 at 1:12=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
-g> wrote:
+On Fri, May 19, 2023 at 12:41=E2=80=AFAM David Howells <dhowells@redhat.com=
+> wrote:
 >
-> Pinging Al (and maybe Linus): is there any good reason to not simply
-> default to direct_splice_read if ->read_iter is implemented and
-> ->splice_read is not once you remove ITER_PIPE?
+> +
+> +       if (S_ISREG(file_inode(in)->i_mode) ||
+> +           S_ISBLK(file_inode(in)->i_mode)) {
 
-For me, the reason isn't so much technical as "historical pain".
+This really feels fundamentally wrong to me.
 
-We've had *so* many problems with splice on random file descriptors
-that I at some point decided "no splice by default".
+If block and regular files have this limit, they should have their own
+splice_read() function that implements that limit.
 
-Now, admittedly most of the problems were due to the whole set_fs()
-ambiguity, which you fixed and no longer exists. So maybe we could go
-back to "implement splice by default".
+Not make everybody else check it.
 
-I agree that as long as the default implementation is obviously safe,
-it should be ok, and maybe direct_splice_read is that obvious..
+IOW, this should be a separate function ("block_splice_read()" or
+whatever), not inside a generic function that other users use.
 
-           Linus
+The zero size checking looks fine, although I wondered about that too.
+Some special files do traditionally have special meanings for
+zero-sized reads (as in "packet boundary"). But I suspect that isn't
+an issue for splice, and perhaps more importantly, I think the same
+rule should be in place: special files that want special rules
+shouldn't be using this generic function directly then.
+
+                 Linus
