@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DAD1C7EE2A
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 08:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE7AC7EE26
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 08:18:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230232AbjESINC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 04:13:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51378 "EHLO
+        id S229643AbjESISm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 04:18:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230231AbjESIM7 (ORCPT
+        with ESMTP id S229492AbjESISl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 04:12:59 -0400
+        Fri, 19 May 2023 04:18:41 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9ECA12C;
-        Fri, 19 May 2023 01:12:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB8EE6;
+        Fri, 19 May 2023 01:18:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=uXfl52cQSZRcJnVzUsCXWUNzcDZE3EsN1WwOwGRya88=; b=bTG1MIwMskxn7o3TpI9T21HZo0
-        x+2ECxKLocV3YID+i8Ap3pdpikQl1Pu3MwIFYPx9IywDmsvnxyNbIfCw5oBpP0CJwwl+AEreP8ByT
-        VUUpR6srOk1ow+MMeZp1ZMfIW9RrmJ06oF9WTIEBSkZjifPAimxus5iR4eL2imIRlwSxh+h0LUyFO
-        VBUUINYPvlm3IOwMN2rLgd2X3n7UjLslvRoy/MKjSTBRBFhxRIrSW4WKKHK6ZdonjpmlSUjWbg+uT
-        yJayBsH0fwqibNE7Pf5RcupMcCJJYrFOyItkPhuIBQcSnYcqgLh4YBmrNo0Rr5QkdK3x9lz5RM3em
-        PfZOe5Ag==;
+        bh=BFzUO2iOYxpQ+ci9kXmcQJ5nhyqRwqFMh5f27RJ2EnE=; b=hAZn1zDXW7SqV0VvUeQLCcPL6v
+        SJ4rnXkGFdB45EfWLQXqLoXg705MMv+K9t6/IsJkyy8ZfPK8c174f10qmVNS18l4pOHI8L0Q2Ff7C
+        xIoqvT5vA6xz+H5LBIEJE9dnvKbXgUbY/awctaAgG5AOxX+IseDCX0fbwXcSAGKuQFwlJ5JogZ8rb
+        lxYq/GlXj3p8vCDDuUnBbr8rI7CV61kwR6MSO+1kFcJlB2fKfS70gPiJt16Hp7W6ykWLSjjW4+pBd
+        Ac7PVxciNnaTn3uSZTYtbojxi7QSObPYDCy7kNqzIjxf2YGxvSmbFBJrpvQfxGK7UKsFZIZ2rPWsh
+        QWBNMBrw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1pzvEC-00FTsc-2P;
-        Fri, 19 May 2023 08:12:44 +0000
-Date:   Fri, 19 May 2023 01:12:44 -0700
+        id 1pzvJl-00FV3Z-1w;
+        Fri, 19 May 2023 08:18:29 +0000
+Date:   Fri, 19 May 2023 01:18:29 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
@@ -42,35 +42,29 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christian Brauner <brauner@kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v20 09/32] tty, proc, kernfs, random: Use
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH] iov_iter: Add automatic-alloc for ITER_BVEC and use in
  direct_splice_read()
-Message-ID: <ZGcvfLWAqmOLrnLj@infradead.org>
+Message-ID: <ZGcw1T9tLX7tZor0@infradead.org>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
- <20230519074047.1739879-10-dhowells@redhat.com>
+ <1740264.1684482558@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230519074047.1739879-10-dhowells@redhat.com>
+In-Reply-To: <1740264.1684482558@warthog.procyon.org.uk>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 19, 2023 at 08:40:24AM +0100, David Howells wrote:
->  	.fasync = random_fasync,
->  	.llseek = noop_llseek,
-> -	.splice_read = generic_file_splice_read,
-> +	.splice_read = direct_splice_read,
+On Fri, May 19, 2023 at 08:49:18AM +0100, David Howells wrote:
+> direct_splice_read() is then modified to make use of this.  This is less
+> efficient if we know in advance that we want to allocate the full buffer as
+> we can't so easily use bulk allocation, but it does mean in cases where we
+> might not want the full buffer (say we hit a hole in DIO), we don't have to
+> allocate it.
 
-Pinging Al (and maybe Linus): is there any good reason to not simply
-default to direct_splice_read if ->read_iter is implemented and
-->splice_read is not once you remove ITER_PIPE?  As long as we
-assure direct_splice_read is simply a ->read_iter into newly
-allocated pages I can't think of anything that would go wrong there.
+Can you eplain the workloads we're trying to optimize for here?
 
+To me splice on O_DIRECT is more of a historic accident than an actually
+good use case..
