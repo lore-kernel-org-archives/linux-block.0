@@ -2,99 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4C6C77B7D
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 01:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F83C77B73
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 01:39:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbjESBjI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 May 2023 21:39:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33632 "EHLO
+        id S229543AbjESBjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 May 2023 21:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230001AbjESBjH (ORCPT
+        with ESMTP id S229458AbjESBjm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 May 2023 21:39:07 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 965EF10C9
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 18:39:06 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-645c4a0079dso489894b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 18:39:06 -0700 (PDT)
+        Thu, 18 May 2023 21:39:42 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD9AE51
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 18:39:41 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-25377d67da9so120077a91.0
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 18:39:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684460346; x=1687052346;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684460380; x=1687052380;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0AstTdSss7uTC7xTDJQXdjEIFD/XVNNNA3JlwFJduD8=;
-        b=2iRZPcTHcIovt72UKZz+HDO9ay3ISPX54EwtVjxAdlKxtBU84FydtTnMSwvf/sokGQ
-         OxldRoZFqkFqkHup7Bvf7VEtYtqECNv28Kn3NlGWc7N94XkdHq5L8qR96olA5tvqHxrH
-         Av3saKg7zmwLaD+21k/1vPPrCh9pxzKa/fkBi57XO8iZ1H94d9Z5xUk5NObrhhuiXs+F
-         Gg/bQVtYxA9zcZALFmnEVOZ8uoKSlTTNseUaboLyNW5r7bjT0NjPdJNexbZaS/xLWS4u
-         dIIazIGV4bkUTVNith64xclctTG077CeRoRY6tYuIgc/JGmKRqtXmzBN0rQ4EPuZjL92
-         sfgQ==
+        bh=DbBjjtXl49jT7JYIkFgCnFOcFlWqhv9TYhPqRtuvhfM=;
+        b=aBkHHl51hhFsEVrqfyCJcHH7xdHUnJHewgCtu4vN5s4lL3qFGf+pwSUm2gQKMCaOmW
+         W5wAGpVOWrW/sDqbArkwDVATxCRuAnwaHZ7K0pQoglqpJwTk8l7kmvR90QJEsBgsePqB
+         DRw1TI52jjDUnF4HUXDPFRJATG+0djxeviKHoZ3tkGqC+MezugkjS/EGlv8qHtROFw+J
+         CjzVLLJcJtppuFp1J71QacrYgZeX0dVBocblOB9VJoVB+m40zixTrLyEkO/DVa5W0fVk
+         5qVP7CYHHpNI+8oj9lZ/FUhEooQNKrDNazMQ3Rn+Ijls7rT8zPXszdL2PAVtne/kJokw
+         yBCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684460346; x=1687052346;
+        d=1e100.net; s=20221208; t=1684460380; x=1687052380;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0AstTdSss7uTC7xTDJQXdjEIFD/XVNNNA3JlwFJduD8=;
-        b=S8133eJ+zLyK6VqjhygRtX0aZS94KGloC+xeMwu0M0L3IEUPaLKI+p0CiAIFHYwrNv
-         YEjbEgdTuQgh3aCY9h0pe8m/eQWWQlh8ZhjsmHVaj73vH00sFDQKk6Pl5ALqTtrVs3CO
-         4sHzrmixj//fLrFcI+BZjBldSIsxF0+g0vEQWj1UcllM1Z3cC+RfRTAjqcLYiR+XkdBe
-         902ysRHWTUWpI+wwzBlJzMLnLw3J+9gDpG/tVUalIJMUxwgzXzhC3l1YXIw2gyr3BDp+
-         1xmbUhDlRcjGhMDlvesU/nEzfEz5+AutIVVs4Zr0m96lkHJuwMVXP2Z/0MbDXgYBTHlW
-         FapA==
-X-Gm-Message-State: AC+VfDzBqACMAW7bw6rW3QuYjlarFZ2tPvMbGC1w3tINB7ZB6fYzArcc
-        WupIpf9fsE6mm1bxf0ZYriqUQg==
-X-Google-Smtp-Source: ACHHUZ6TIcp1rWuPnVXCq7AkIIrZOmUC0d120UohbM6rURTx7xEA4E/oobHrQUIbI5E02SZYXmwciA==
-X-Received: by 2002:a05:6a21:339a:b0:f6:7bb8:c8d5 with SMTP id yy26-20020a056a21339a00b000f67bb8c8d5mr371116pzb.4.1684460346088;
-        Thu, 18 May 2023 18:39:06 -0700 (PDT)
+        bh=DbBjjtXl49jT7JYIkFgCnFOcFlWqhv9TYhPqRtuvhfM=;
+        b=emv7c7paCfG/x2iVrRTunh+8C5jZMxEv/0JnxhdtURI+K7EXdTxErAPPWnOOXJafNV
+         NMh3hsmeCZJvaDmN9bngg06rqlaSkVXF5NuzDsCdMveb36n+pH4qNU9jPON7iFEpab1q
+         eBdG4DbElVBRvAa+FXs0sgSt8vi5kiSJcrHpvv8JVsPN5GRVHogrEBlTAIXrPPs6Fq+a
+         Q8DoSlEtl+7JUhnuFe+7/QUym5xoh0dRDoJcrJymUsq2xK+u0W3qlZfLnsGpqfM/0AUv
+         +ZD680k7JybPeFlXXL+PA6pnhbdfKnXUdQ0yHPJ/14Y/Cs8KnNWlzv2/8v7eIZltxItc
+         wf0w==
+X-Gm-Message-State: AC+VfDzrFsUWI7Ky/Muf+YPF5rjddAjOChRI7kHStBlGDzLgGBPUdYE3
+        6B7jaD4I4BPzzzsmxHmSx2ywWw==
+X-Google-Smtp-Source: ACHHUZ7xjYvMzZhr/5598m5XzG3FjFXkCnDRnXgO8VCDUB0xWEu5oJCON4XrTdGS5fWe7u7jU/a04A==
+X-Received: by 2002:a17:902:f54a:b0:1a9:71d3:2b60 with SMTP id h10-20020a170902f54a00b001a971d32b60mr1264952plf.0.1684460380585;
+        Thu, 18 May 2023 18:39:40 -0700 (PDT)
 Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 10-20020a63114a000000b00519c3475f21sm1848402pgr.46.2023.05.18.18.39.05
+        by smtp.gmail.com with ESMTPSA id q31-20020a17090a1b2200b002508f0ac3edsm317834pjq.53.2023.05.18.18.39.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 May 2023 18:39:05 -0700 (PDT)
-Message-ID: <a849d530-a975-9b63-702a-6c29c8f54bee@kernel.dk>
-Date:   Thu, 18 May 2023 19:39:04 -0600
+        Thu, 18 May 2023 18:39:39 -0700 (PDT)
+Message-ID: <5d769f74-7da0-3ea8-53c8-635fabadac39@kernel.dk>
+Date:   Thu, 18 May 2023 19:39:39 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.10.0
-Subject: Re: [PATCH 2/3] blk-mq: remove RQF_ELVPRIV
+Subject: Re: keep passthrough request out of the I/O schedulers
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
 Cc:     linux-block@vger.kernel.org
 References: <20230518053101.760632-1-hch@lst.de>
- <20230518053101.760632-3-hch@lst.de>
- <ZGXPkFOWOuoLWglR@ovpn-8-21.pek2.redhat.com> <20230518130632.GA31791@lst.de>
- <ZGYmK/y/TXuYk3tN@ovpn-8-21.pek2.redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZGYmK/y/TXuYk3tN@ovpn-8-21.pek2.redhat.com>
+In-Reply-To: <20230518053101.760632-1-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/23 7:20 AM, Ming Lei wrote:
-> On Thu, May 18, 2023 at 03:06:32PM +0200, Christoph Hellwig wrote:
->> On Thu, May 18, 2023 at 03:11:12PM +0800, Ming Lei wrote:
->>>> -		if ((rq->rq_flags & RQF_ELVPRIV) && e->type->ops.requeue_request)
->>>> +		if (e->type->ops.requeue_request)
->>>>  			e->type->ops.requeue_request(rq);
->>>
->>> The above actually changes current behavior since RQF_ELVPRIV is only set
->>> iff the following condition is true:
->>>
->>> 	(rq->rq_flags & RQF_ELV) && !op_is_flush(rq->cmd_flags) &&
->>> 		e->type->ops.prepare_request.
->>
->> It would require an I/O scheduler that implements .requeue_request but
->> not .prepare_request, which doesn't exist and also is rather pointless as
->> this .requeue_request method would never get called in the current code.
->>
->> So no, no behavior change in practice.
+On 5/17/23 11:30 PM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> Fair enough, just found that all three schedulers have implemented
-> e->type->ops.prepare_request.
+> this is my respin of Ming's "blk-mq: handle passthrough request as really
+> passthrough" series.  The first patch is a slightly tweaked version of
+> Ming's first patch, while the 2 others are new based on the discussion.
+> 
+> This isn't meant to shut down the discussion on wether to use scheduler
+> tags for passthrough or not, but I'd like to see the bug fixed (and
+> a series I have that needs it unblocked).
 
-We should probably make this requirement explicit though, seems
-very fragile to depend on it just because it's the status quo.
+I think the series stands fine on its own.
 
 -- 
 Jens Axboe
