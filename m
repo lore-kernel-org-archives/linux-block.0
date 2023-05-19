@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 794FAC7EE2E
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F90BC77B7F
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 07:45:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231483AbjESHo0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 03:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59160 "EHLO
+        id S231468AbjESHpB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 03:45:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231415AbjESHni (ORCPT
+        with ESMTP id S231466AbjESHoN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 03:43:38 -0400
+        Fri, 19 May 2023 03:44:13 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012981BC5
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC111FD5
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 00:42:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684482136;
+        s=mimecast20190719; t=1684482143;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gBG1rbAQ+/pvrFxoUU2GMJeglrqrT3cq++hcE5SQo7w=;
-        b=isULdRdZ5A8Vh41OscA8cV8RG+Qah0NQQm4uY37zr+D81Of0I/IEhSS7okoyt8tQ+xDLnt
-        NQV/85LAC5ILAioT8SPnZxNoSVvqPbi1Smh/g2HyFOmiWiUdBz8BUVeR7n4+g/R/34cpLF
-        pKRspjSKKUbPcTxxqbCDyysJygaKurc=
+        bh=mbYjI1mFg3thAEdOWfyRBtPSF9SFp7VqzA4DBX9XOaM=;
+        b=WCrcyP08WfHWAkoqyq8aqaP5sLteQR/xHraMnZxvpd3pherzrYPc2rfTvWryXhRAio9PyP
+        u/k+BCPSoui+qPnsghnWr7hu/g0uI0EY3jQ+UKN3c4k4cccWxhsP7wFKhNEeavvUrCAphf
+        /3Nbs9JmzyAuXBf1DQSilWxP2A9UpWw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-465-_MfV9O_bPYGXDbkMXz1GRA-1; Fri, 19 May 2023 03:42:06 -0400
-X-MC-Unique: _MfV9O_bPYGXDbkMXz1GRA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-633-8jk5gKwVNnagZwC444Xzmg-1; Fri, 19 May 2023 03:42:19 -0400
+X-MC-Unique: 8jk5gKwVNnagZwC444Xzmg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F0AF585A5BA;
-        Fri, 19 May 2023 07:42:05 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DF47D800C81;
+        Fri, 19 May 2023 07:42:18 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 505E5C0004B;
-        Fri, 19 May 2023 07:42:03 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 759107AE4;
+        Fri, 19 May 2023 07:42:16 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,123 +52,54 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>, Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        ocfs2-devel@oss.oracle.com
-Subject: [PATCH v20 19/32] ocfs2: Provide a splice-read stub
-Date:   Fri, 19 May 2023 08:40:34 +0100
-Message-Id: <20230519074047.1739879-20-dhowells@redhat.com>
+        Christoph Hellwig <hch@lst.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        linux-trace-kernel@vger.kernel.org
+Subject: [PATCH v20 23/32] splice: Convert trace/seq to use direct_splice_read()
+Date:   Fri, 19 May 2023 08:40:38 +0100
+Message-Id: <20230519074047.1739879-24-dhowells@redhat.com>
 In-Reply-To: <20230519074047.1739879-1-dhowells@redhat.com>
 References: <20230519074047.1739879-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read stub for ocfs2.  This emits trace lines and does an
-atime lock/update before calling filemap_splice_read().  It doesn't do this
-for around direct_splice_read() as that will call ->read_iter().
+For the splice from the trace seq buffer, just use direct_splice_read().
 
-A couple of new tracepoints are added for this purpose.
+In the future, something better can probably be done by gifting pages from
+seq->buf into the pipe, but that would require changing seq->buf into a
+vmap over an array of pages.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Mark Fasheh <mark@fasheh.com>
-cc: Joel Becker <jlbec@evilplan.org>
-cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-cc: ocfs2-devel@oss.oracle.com
+cc: Steven Rostedt <rostedt@goodmis.org>
+cc: Masami Hiramatsu <mhiramat@kernel.org>
+cc: linux-kernel@vger.kernel.org
+cc: linux-trace-kernel@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/ocfs2/file.c        | 42 +++++++++++++++++++++++++++++++++++++++++-
- fs/ocfs2/ocfs2_trace.h |  3 +++
- 2 files changed, 44 insertions(+), 1 deletion(-)
+ kernel/trace/trace.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/ocfs2/file.c b/fs/ocfs2/file.c
-index efb09de4343d..27c54a71ec57 100644
---- a/fs/ocfs2/file.c
-+++ b/fs/ocfs2/file.c
-@@ -2581,6 +2581,46 @@ static ssize_t ocfs2_file_read_iter(struct kiocb *iocb,
- 	return ret;
- }
- 
-+static ssize_t ocfs2_file_splice_read(struct file *in, loff_t *ppos,
-+				      struct pipe_inode_info *pipe,
-+				      size_t len, unsigned int flags)
-+{
-+	struct inode *inode = file_inode(in);
-+	ssize_t ret = 0;
-+	int lock_level = 0;
-+
-+	trace_ocfs2_file_splice_read(inode, in, in->f_path.dentry,
-+				     (unsigned long long)OCFS2_I(inode)->ip_blkno,
-+				     in->f_path.dentry->d_name.len,
-+				     in->f_path.dentry->d_name.name,
-+				     0);
-+
-+	if (in->f_flags & O_DIRECT)
-+		return direct_splice_read(in, ppos, pipe, len, flags);
-+
-+	/*
-+	 * We're fine letting folks race truncates and extending writes with
-+	 * read across the cluster, just like they can locally.  Hence no
-+	 * rw_lock during read.
-+	 *
-+	 * Take and drop the meta data lock to update inode fields like i_size.
-+	 * This allows the checks down below generic_file_splice_read() a
-+	 * chance of actually working.
-+	 */
-+	ret = ocfs2_inode_lock_atime(inode, in->f_path.mnt, &lock_level, true);
-+	if (ret < 0) {
-+		if (ret != -EAGAIN)
-+			mlog_errno(ret);
-+		goto bail;
-+	}
-+	ocfs2_inode_unlock(inode, lock_level);
-+
-+	ret = filemap_splice_read(in, ppos, pipe, len, flags);
-+	trace_filemap_splice_read_ret(ret);
-+bail:
-+	return ret;
-+}
-+
- /* Refer generic_file_llseek_unlocked() */
- static loff_t ocfs2_file_llseek(struct file *file, loff_t offset, int whence)
- {
-@@ -2744,7 +2784,7 @@ const struct file_operations ocfs2_fops = {
- #endif
- 	.lock		= ocfs2_lock,
- 	.flock		= ocfs2_flock,
+diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+index ebc59781456a..b664020efcb7 100644
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -5171,7 +5171,7 @@ static const struct file_operations tracing_fops = {
+ 	.open		= tracing_open,
+ 	.read		= seq_read,
+ 	.read_iter	= seq_read_iter,
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= ocfs2_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ocfs2_fallocate,
- 	.remap_file_range = ocfs2_remap_file_range,
-diff --git a/fs/ocfs2/ocfs2_trace.h b/fs/ocfs2/ocfs2_trace.h
-index dc4bce1649c1..b8c3d1702076 100644
---- a/fs/ocfs2/ocfs2_trace.h
-+++ b/fs/ocfs2/ocfs2_trace.h
-@@ -1319,6 +1319,8 @@ DEFINE_OCFS2_FILE_OPS(ocfs2_file_splice_write);
- 
- DEFINE_OCFS2_FILE_OPS(ocfs2_file_read_iter);
- 
-+DEFINE_OCFS2_FILE_OPS(ocfs2_file_splice_read);
-+
- DEFINE_OCFS2_ULL_ULL_ULL_EVENT(ocfs2_truncate_file);
- 
- DEFINE_OCFS2_ULL_ULL_EVENT(ocfs2_truncate_file_error);
-@@ -1470,6 +1472,7 @@ TRACE_EVENT(ocfs2_prepare_inode_for_write,
- );
- 
- DEFINE_OCFS2_INT_EVENT(generic_file_read_iter_ret);
-+DEFINE_OCFS2_INT_EVENT(filemap_splice_read_ret);
- 
- /* End of trace events for fs/ocfs2/file.c. */
- 
++	.splice_read	= direct_splice_read,
+ 	.write		= tracing_write_stub,
+ 	.llseek		= tracing_lseek,
+ 	.release	= tracing_release,
 
