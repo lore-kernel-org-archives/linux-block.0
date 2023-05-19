@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBC5C7EE30
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 08:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A9AC7EE26
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 09:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229912AbjESItx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 04:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38700 "EHLO
+        id S231405AbjESJNK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 05:13:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231164AbjESItt (ORCPT
+        with ESMTP id S231397AbjESJNI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 04:49:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D20610D9
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 01:48:55 -0700 (PDT)
+        Fri, 19 May 2023 05:13:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5CB6E43
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 02:11:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684486135;
+        s=mimecast20190719; t=1684487479;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NFfz1Qefawb0lyg57CVn7ptvHTdohZyit/vKaHZw8LE=;
-        b=GQOJc/91WIiP2p5sn6uHG6wy0zEY35fAuX26arFBIe5Gn071/G/cbljjV4Xi4LmF9vuEva
-        +zA5PX6S7Y3oyn2B6VqZ5Okk5rNRTTI6/mRire0aq9k1ugi1e3c4X5dOen7noTJFHOaEbV
-        fo+/Di+5Dbvp2BxwZelRxK6isgN8Zqo=
+        bh=PCesx1f1Kkzq5Nsvw/sAXia132RTyPCKbP3kHUNcvUk=;
+        b=eshFaJrQb85XEeM40tqDoKgRnGFySX8bOwu2R9pJZNyprBXoB3JlLKcu2RC/T41GLnPVEc
+        hL8vFDc0xjueR6YTutsq2Dx00OTQIXteJ0F5lV62IUdpIAX8vJFTjH55Mt4HzKOPbUh+Gs
+        7525xc51B1Ay11JqG9eBKIsJ+oe+ycw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-176-PtzYX2HQN1GxCR941SWFpg-1; Fri, 19 May 2023 04:48:51 -0400
-X-MC-Unique: PtzYX2HQN1GxCR941SWFpg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-225-A3b6K_yYMKSsyPSyag3TOQ-1; Fri, 19 May 2023 05:11:13 -0400
+X-MC-Unique: A3b6K_yYMKSsyPSyag3TOQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 485DC80120A;
-        Fri, 19 May 2023 08:48:50 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A735A185A791;
+        Fri, 19 May 2023 09:11:12 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E8842026D49;
-        Fri, 19 May 2023 08:48:47 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04420492B0B;
+        Fri, 19 May 2023 09:11:09 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZGcu6GVxOgYfy8x9@infradead.org>
-References: <ZGcu6GVxOgYfy8x9@infradead.org> <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-6-dhowells@redhat.com>
+In-Reply-To: <ZGcuHrOvlM3yJ0dy@infradead.org>
+References: <ZGcuHrOvlM3yJ0dy@infradead.org> <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-2-dhowells@redhat.com>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
         Al Viro <viro@zeniv.linux.org.uk>,
@@ -57,35 +57,27 @@ Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>, linux-erofs@lists.ozlabs.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v20 05/32] splice: Make splice from a DAX file use direct_splice_read()
+        Steve French <stfrench@microsoft.com>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v20 01/32] splice: Fix filemap of a blockdev
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1742242.1684486127.1@warthog.procyon.org.uk>
-Date:   Fri, 19 May 2023 09:48:47 +0100
-Message-ID: <1742243.1684486127@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-ID: <1743090.1684487469.1@warthog.procyon.org.uk>
+Date:   Fri, 19 May 2023 10:11:09 +0100
+Message-ID: <1743091.1684487469@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Christoph Hellwig <hch@infradead.org> wrote:
 
-> On Fri, May 19, 2023 at 08:40:20AM +0100, David Howells wrote:
-> > +#ifdef CONFIG_FS_DAX
-> > +	if (IS_DAX(in->f_mapping->host))
 > 
-> No need for the ifdef.  IS_DAX is compile-time false if CONFIG_FS_DAX
-> is not set.
+> But this really needs to be sent standalone so that it can get picked
+> up for 6.4 and -stable.
 
-Ah - it's not that IS_DAX() is conditionalised, it's that S_DAX is.  There's a
-bunch of places that use CONFIG_FS_DAX blocks, but I guess that's because they
-include calls to functions that are conditionalised out.
-
-I wonder if the dax_iomap_rw() declaration in the header can have a non-DAX
-fallback that returns an error and then we can get rid of some of the other
-conditionalisation.
+Note that only cifs is actually using that code at the moment.
 
 David
 
