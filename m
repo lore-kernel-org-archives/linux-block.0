@@ -2,119 +2,161 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D09C77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 22:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D28EC77B75
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 23:07:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230172AbjESW2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 18:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50116 "EHLO
+        id S231176AbjESXHy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 19:07:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbjESW2k (ORCPT
+        with ESMTP id S229945AbjESXHx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 18:28:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EEF1BD
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 15:27:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684535278;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N8SCLY3o4J6b9Y2pJlg3hyrvURsXqrxf9JlUVv4zhn4=;
-        b=eSyPXosWjeUmdw8dXNjSQdSQ/wQ+jhVfPca2v+6G8znUAuXMWsWLEJ5d4AAsEHSTMuDPYM
-        PIhFRE0nNzV+FWc42PTV2K2JNKYQSWCX+HH35OcNqIqSfz58sr/9PMr3PJVPxePA3q66k9
-        gG6CzPGLYGB95xRowNwaf+lveLVcyrI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-626-CHpRL3_TMzyLAsNxrRHseg-1; Fri, 19 May 2023 18:27:54 -0400
-X-MC-Unique: CHpRL3_TMzyLAsNxrRHseg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 124DF2A59551;
-        Fri, 19 May 2023 22:27:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C7BB5492B0A;
-        Fri, 19 May 2023 22:27:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZGc3vUU/bUpt+3Tm@infradead.org>
-References: <ZGc3vUU/bUpt+3Tm@infradead.org> <ZGcusJQfz68H1s7S@infradead.org> <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-4-dhowells@redhat.com> <1742093.1684485814@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v20 03/32] splice: Make direct_read_splice() limit to eof where appropriate
+        Fri, 19 May 2023 19:07:53 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B81501B7
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 16:07:50 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-64d293746e0so2315247b3a.2
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 16:07:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1684537670; x=1687129670;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vej0HUXiqshmcvqs7VBZTGkCXU+JddJuVreKpbmYuhw=;
+        b=M7M+fUzZKYFhCed62ckEM75i49Kzi0Sy+mNCDiHsZpcNM/HQImrznTrkS4Wi9NL1Qt
+         OpBue7B/lTyS4Ky8m0UYNNuyU32olEvqU9kMDgIsurTQS74yymOzmc8h+RSkAmjSqxOP
+         woaJGiEwnE03YgfMS1q3jv3TV55P4eda89l5rEF9YibVhRMXrAoasmZaFgYrpCbUd+oE
+         XkNqBx9FFYqUpTZUSUyJJeWE0IiZORfli0QtnpbJ5rpT7PGgf7LZiQ+NCEMRM7WFfN1T
+         vkwBHodfbKEBqQNapAiloS/SU1gESn6ZDbM8KRw093WyP1wcSNUWGyK7A0I+ybuXSTVQ
+         2JuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684537670; x=1687129670;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vej0HUXiqshmcvqs7VBZTGkCXU+JddJuVreKpbmYuhw=;
+        b=kRDR8hGGqCFcwMCBGXA7fsAy/qJT2AuJwSwKssAwZKyIgcTPJQWFeVoZ9JWP/idX+m
+         Bk6Hcn+pLJ8vntx9u9AE05r8TDMyYPpy6Sln9WNRCocJBDURmJfP+keJ52u368VlFscx
+         5L9rWPChOacn17S8o3aWVboU7UzK52APfEW/72bEon0SMwX5En1Z4hIKExvjb6opHOPG
+         TRFunfdeyI2jozAvaoSUyu5zMKduOCGwa+619FopQuunYCQUe6UE5oNQMRFG+7d6LBz7
+         IjZVP+LzNFWstWn5cwPCFE44lczzmvlDQj5ax+kBkNFl/TCzSO/MsgTV6myMlC9yNEO3
+         spLw==
+X-Gm-Message-State: AC+VfDwhhdgzUAubgL/B0EcuzmKAMm23rw7WJZyi3mTOMIflMMqArUeu
+        En8edLf4Et7b1n6jP82cQTs4yg==
+X-Google-Smtp-Source: ACHHUZ44Ml1ojpiPU8i/+mCvFac8UKDWss2kgW+R+G0QKFHgCdmutJq5p5DRKhkFYnyqqBTN1Dtx1w==
+X-Received: by 2002:a05:6a00:1896:b0:63b:854c:e0f6 with SMTP id x22-20020a056a00189600b0063b854ce0f6mr5344668pfh.21.1684537670148;
+        Fri, 19 May 2023 16:07:50 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
+        by smtp.gmail.com with ESMTPSA id i6-20020aa78d86000000b006414289ab69sm204704pfr.52.2023.05.19.16.07.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 May 2023 16:07:49 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q09CM-001WVR-2G;
+        Sat, 20 May 2023 09:07:46 +1000
+Date:   Sat, 20 May 2023 09:07:46 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Brian Foster <bfoster@redhat.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZGgBQhsbU9b0RiT1@dread.disaster.area>
+References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
+ <ZGb2Xi6O3i2pLam8@infradead.org>
+ <ZGeKm+jcBxzkMXQs@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2154517.1684535271.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 19 May 2023 23:27:51 +0100
-Message-ID: <2154518.1684535271@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZGeKm+jcBxzkMXQs@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Okay.  Let's go with that.  So I have to put the handling in vfs_splice_re=
-ad():
+On Fri, May 19, 2023 at 10:41:31AM -0400, Mike Snitzer wrote:
+> On Fri, May 19 2023 at 12:09P -0400,
+> Christoph Hellwig <hch@infradead.org> wrote:
+> 
+> > FYI, I really don't think this primitive is a good idea.  In the
+> > concept of non-overwritable storage (NAND, SMR drives) the entire
+> > concept of a one-shoot 'provisioning' that will guarantee later writes
+> > are always possible is simply bogus.
+> 
+> Valid point for sure, such storage shouldn't advertise support (and
+> will return -EOPNOTSUPP).
+> 
+> But the primitive still has utility for other classes of storage.
 
-	long vfs_splice_read(struct file *in, loff_t *ppos,
-			     struct pipe_inode_info *pipe, size_t len,
-			     unsigned int flags)
-	{
-	...
-		if (unlikely(!in->f_op->splice_read))
-			return warn_unsupported(in, "read");
-		/*
-		 * O_DIRECT and DAX don't deal with the pagecache, so we
-		 * allocate a buffer, copy into it and splice that into the pipe.
-		 */
-		if ((in->f_flags & O_DIRECT) || IS_DAX(in->f_mapping->host))
-			return copy_splice_read(in, ppos, pipe, len, flags);
-		return in->f_op->splice_read(in, ppos, pipe, len, flags);
-	}
+Yet the thing people are wanting to us filesystem developers to use
+this with is thinly provisioned storage that has snapshot
+capability. That, by definition, is non-overwritable storage. These
+are the use cases people are asking filesystes to gracefully handle
+and report errors when the sparse backing store runs out of space.
 
-which leaves very little in generic_file_splice_read:
+e.g. journal writes after a snapshot is taken on a busy filesystem
+are always an overwrite and this requires more space in the storage
+device for the write to succeed. ENOSPC from the backing device for
+journal IO is a -fatal error-. Hence if REQ_PROVISION doesn't
+guarantee space for overwrites after snapshots, then it's not
+actually useful for solving the real world use cases we actually
+need device-level provisioning to solve.
 
-	ssize_t generic_file_splice_read(struct file *in, loff_t *ppos,
-					 struct pipe_inode_info *pipe, size_t len,
-					 unsigned int flags)
-	{
-		if (unlikely(*ppos >=3D in->f_mapping->host->i_sb->s_maxbytes))
-			return 0;
-		if (unlikely(!len))
-			return 0;
-		return filemap_splice_read(in, ppos, pipe, len, flags);
-	}
+It is not viable for filesystems to have to reprovision space for
+in-place metadata overwrites after every snapshot - the filesystem
+may not even know a snapshot has been taken! And it's not feasible
+for filesystems to provision on demand before they modify metadata
+because we don't know what metadata is going to need to be modified
+before we start modifying metadata in transactions. If we get ENOSPC
+from provisioning in the middle of a dirty transcation, it's all
+over just the same as if we get ENOSPC during metadata writeback...
 
-so I wonder if the tests in generic_file_splice_read() can be folded into
-vfs_splice_read(), pointers to generic_file_splice_read() be replaced with
-pointers to filemap_splice_read() and generic_file_splice_read() just be
-removed.
+Hence what filesystems actually need is device provisioned space to
+be -always over-writable- without ENOSPC occurring.  Ideally, if we
+provision a range of the block device, the block device *must*
+guarantee all future writes to that LBA range succeeds. That
+guarantee needs to stand until we discard or unmap the LBA range,
+and for however many writes we do to that LBA range.
 
-I suspect we can't quite do this because of the *ppos check - but I wonder=
- if
-that's actually necessary since filemap_splice_read() checks against
-i_size... or if the check can be moved there if we definitely want to do i=
-t.
+e.g. If the device takes a snapshot, it needs to reprovision the
+potential COW ranges that overlap with the provisioned LBA range at
+snapshot time. e.g. by re-reserving the space from the backing pool
+for the provisioned space so if a COW occurs there is space
+guaranteed for it to succeed.  If there isn't space in the backing
+pool for the reprovisioning, then whatever operation that triggers
+the COW behaviour should fail with ENOSPC before doing anything
+else....
 
-Certainly, the zero-length check can be done in vfs_splice_read().
+Software devices like dm-thin/snapshot should really only need to
+keep a persistent map of the provisioned space and refresh space
+reservations for used space within that map whenever something that
+triggers COW behaviour occurs. i.e. a snapshot needs to reset the
+provisioned ranges back to "all ranges are freshly provisioned"
+before the snapshot is started. If that space is not available in
+the backing pool, then the snapshot attempt gets ENOSPC....
 
-David
+That means filesystems only need to provision space for journals and
+fixed metadata at mkfs time, and they only need issue a
+REQ_PROVISION bio when they first allocate over-write in place
+metadata. We already have online discard and/or fstrim for releasing
+provisioned space via discards.
 
+This will require some mods to filesystems like ext4 and XFS to
+issue REQ_PROVISION and fail gracefully during metadata allocation.
+However, doing so means that we can actually harden filesystems
+against sparse block device ENOSPC errors by ensuring they will
+never occur in critical filesystem structures....
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
