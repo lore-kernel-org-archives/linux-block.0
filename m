@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B2EC77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 04:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA8BC77B75
+	for <linux-block@archiver.kernel.org>; Fri, 19 May 2023 04:41:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbjESElK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 00:41:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50590 "EHLO
+        id S229449AbjESElN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 00:41:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbjESElJ (ORCPT
+        with ESMTP id S229691AbjESElM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 00:41:09 -0400
+        Fri, 19 May 2023 00:41:12 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C760910F0
-        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 21:41:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA6AE10E0
+        for <linux-block@vger.kernel.org>; Thu, 18 May 2023 21:41:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=zkFHrgMBKG3Lg2cEUpNdLBdgYFqJN3EbR5nFpx3gwEU=; b=SIu39xLnUEiSK1f6ruJjxE6ND2
-        FHXHvv6gAnz7uUqQazGYm39XOYLvtd39EmJ7kmxDdnTIfDc8f4+SYDZzvmmYDT/DoAZoodraZ+BZX
-        CkPwMOj2etb81c5NFEdVJTGc3JVYZTvuPX+0xtcrR5+1VGZO9tf4/BnLyh+0aE1sn67bI+o75R6hp
-        SUp8x0By/jgfVp3iKTSo2yN3A6gd/viiEq1vd7ZyLPDTedM8Vgc/xHMO62bHdLZ5BbS2GTs5BtdH3
-        JH+++ydrvPNVzWcNSVi0/SgkA/pBo0eXUWwlIIt84JWDb0P8wbTxX+qfLduODRNaZ/zTmswGPH+3e
-        tkyGz5pA==;
+        bh=EsOEomkX55SFfNb3cCrwA/PnbVTP+rm0OlgzDlFUVX4=; b=zpS9dDWHcpUm2yy4SWfIYhMBWl
+        S6YCXoiFqw8HUe49nxePrfeR6J4HPOhby8TICFFuJwsCKB2VVpsBbvrFi5YSOFRLWsK9cJW97bbXO
+        +k+HCShqDmn6LHrWPtjYmq6PMAnR82nc+4S1hbwq7ynl3BGpi1ic1JjEj8TGsAIglQrTe0nQUf3EM
+        Tho/Cc3w3Bu3CyiIQ24Gt3VV5p6yn7EBS2ecfNP5i3H1m57jWpZmCN4U8EtITHByhqsLw9Oc86mIP
+        X9qypuuHoI9CtQcEKBwQWhVCi2LJJCUTQILiGuhaX67UOs3eh2uB4le7MWasKpiEOm73Iy6gn4Epd
+        bTyX8YxQ==;
 Received: from [2001:4bb8:188:3dd5:8711:951c:9ab6:1400] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pzrvN-00F4YL-0f;
-        Fri, 19 May 2023 04:41:05 +0000
+        id 1pzrvQ-00F4Yw-0x;
+        Fri, 19 May 2023 04:41:08 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Bart Van Assche <bvanassche@acm.org>,
         Damien Le Moal <dlemoal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH 4/7] blk-mq: use the I/O scheduler for writes from the flush state machine
-Date:   Fri, 19 May 2023 06:40:47 +0200
-Message-Id: <20230519044050.107790-5-hch@lst.de>
+Subject: [PATCH 5/7] blk-mq: defer to the normal submission path for post-flush requests
+Date:   Fri, 19 May 2023 06:40:48 +0200
+Message-Id: <20230519044050.107790-6-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230519044050.107790-1-hch@lst.de>
 References: <20230519044050.107790-1-hch@lst.de>
@@ -47,91 +47,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bart Van Assche <bvanassche@acm.org>
+Requests with the FUA bit on hardware without FUA support need a post
+flush before returning to the caller, but they can still be sent using
+the normal I/O path after initializing the flush-related fields and
+end I/O handler.
 
-Send write requests issued by the flush state machine through the normal
-I/O submission path including the I/O scheduler (if present) so that I/O
-scheduler policies are applied to writes with the FUA flag set.
-
-Separate the I/O scheduler members from the flush members in struct
-request since now a request may pass through both an I/O scheduler
-and the flush machinery.
-
-Note that the actual flush requests, which have no bio attached to the
-request still bypass the I/O schedulers.
-
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-[hch: rebased]
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- block/blk-mq.c         |  4 ++--
- include/linux/blk-mq.h | 27 +++++++++++----------------
- 2 files changed, 13 insertions(+), 18 deletions(-)
+ block/blk-flush.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c0b394096b6b6b..aac67bc3d3680c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -458,7 +458,7 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
- 		 * Flush/passthrough requests are special and go directly to the
- 		 * dispatch list.
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 6fb9cf2d38184b..7121f9ad0762f8 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -432,6 +432,17 @@ bool blk_insert_flush(struct request *rq)
+ 		 * Queue for normal execution.
  		 */
--		if (!op_is_flush(data->cmd_flags) &&
-+		if ((data->cmd_flags & REQ_OP_MASK) != REQ_OP_FLUSH &&
- 		    !blk_op_is_passthrough(data->cmd_flags)) {
- 			struct elevator_mq_ops *ops = &q->elevator->type->ops;
- 
-@@ -2497,7 +2497,7 @@ static void blk_mq_insert_request(struct request *rq, blk_insert_t flags)
- 		 * dispatch it given we prioritize requests in hctx->dispatch.
- 		 */
- 		blk_mq_request_bypass_insert(rq, flags);
--	} else if (rq->rq_flags & RQF_FLUSH_SEQ) {
-+	} else if (req_op(rq) == REQ_OP_FLUSH) {
+ 		return false;
++	case REQ_FSEQ_DATA | REQ_FSEQ_POSTFLUSH:
++		/*
++		 * Initialize the flush fields and completion handler to trigger
++		 * the post flush, and then just pass the command on.
++		 */
++		blk_rq_init_flush(rq);
++		rq->flush.seq |= REQ_FSEQ_POSTFLUSH;
++		spin_lock_irq(&fq->mq_flush_lock);
++		list_move_tail(&rq->flush.list, &fq->flush_data_in_flight);
++		spin_unlock_irq(&fq->mq_flush_lock);
++		return false;
+ 	default:
  		/*
- 		 * Firstly normal IO request is inserted to scheduler queue or
- 		 * sw queue, meantime we add flush request to dispatch queue(
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 49d14b1acfa5df..935201c8974371 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -169,25 +169,20 @@ struct request {
- 		void *completion_data;
- 	};
- 
--
- 	/*
- 	 * Three pointers are available for the IO schedulers, if they need
--	 * more they have to dynamically allocate it.  Flush requests are
--	 * never put on the IO scheduler. So let the flush fields share
--	 * space with the elevator data.
-+	 * more they have to dynamically allocate it.
- 	 */
--	union {
--		struct {
--			struct io_cq		*icq;
--			void			*priv[2];
--		} elv;
--
--		struct {
--			unsigned int		seq;
--			struct list_head	list;
--			rq_end_io_fn		*saved_end_io;
--		} flush;
--	};
-+	struct {
-+		struct io_cq		*icq;
-+		void			*priv[2];
-+	} elv;
-+
-+	struct {
-+		unsigned int		seq;
-+		struct list_head	list;
-+		rq_end_io_fn		*saved_end_io;
-+	} flush;
- 
- 	union {
- 		struct __call_single_data csd;
+ 		 * Mark the request as part of a flush sequence and submit it
 -- 
 2.39.2
 
