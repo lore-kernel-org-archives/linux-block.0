@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7449AC7EE30
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B773C7EE2D
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbjETADh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 20:03:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52046 "EHLO
+        id S231172AbjETADm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 20:03:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230403AbjETAD3 (ORCPT
+        with ESMTP id S230502AbjETADa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 20:03:29 -0400
+        Fri, 19 May 2023 20:03:30 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A4810FA
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:01:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 676B9171F
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:01:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684540896;
+        s=mimecast20190719; t=1684540912;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bxp9/2gLZL2I594j4SxMybgCNb+qE9Rj6mhPK/7tAtY=;
-        b=brXALOt1n6LUGE2m0psZNGifg4NixnGeGdnZ0d9xnS/LM3NY5zNX57qRY1GaJPb/YFWSRu
-        hKYltR6BWm6x5VYyc3VSA3FCLbs+acck2kbaUGfLGMA2Owg9+bZ/Ape+4HRazCyjVPMiJ1
-        PrvSAO3KlzBKXm5N9CSkwH+VJg9Xy3g=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=zZb+7DwI4egZIrF5pxcV1ZQbliPAo6greLJudpvGjhA=;
+        b=IpyLMx7vXnGdD0L9DZc568zv4blahMptjpuvQZgDY8D+L5ZuliYaKJQ/+Plq3/cAswkBu2
+        /RaWfebc+6yGC6Aq/dJqK20K1UbsPCGj2Ez1hWPPuIHRt97skXkRnJx3kXld0XRF2Y0+qZ
+        vTvI3Wc5zhK+aLab1UtySxIDkeJCJVw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-157-iOPimXDiOB6Q5UeXc2v1dQ-1; Fri, 19 May 2023 20:01:31 -0400
-X-MC-Unique: iOPimXDiOB6Q5UeXc2v1dQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-513-G93-k9ToPbKP465srY7iiw-1; Fri, 19 May 2023 20:01:48 -0400
+X-MC-Unique: G93-k9ToPbKP465srY7iiw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CBF973C01DBD;
-        Sat, 20 May 2023 00:01:30 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F2AC85A5A8;
+        Sat, 20 May 2023 00:01:47 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 855312166B25;
-        Sat, 20 May 2023 00:01:27 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 00F7E4F2DE0;
+        Sat, 20 May 2023 00:01:44 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,171 +52,78 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v21 12/30] tty, proc, kernfs, random: Use copy_splice_read()
-Date:   Sat, 20 May 2023 01:00:31 +0100
-Message-Id: <20230520000049.2226926-13-dhowells@redhat.com>
+        Christoph Hellwig <hch@lst.de>, Tyler Hicks <code@tyhicks.com>,
+        ecryptfs@vger.kernel.org
+Subject: [PATCH v21 17/30] ecryptfs: Provide a splice-read stub
+Date:   Sat, 20 May 2023 01:00:36 +0100
+Message-Id: <20230520000049.2226926-18-dhowells@redhat.com>
 In-Reply-To: <20230520000049.2226926-1-dhowells@redhat.com>
 References: <20230520000049.2226926-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use copy_splice_read() for tty, procfs, kernfs and random files rather
-than going through generic_file_splice_read() as they just copy the file
-into the output buffer and don't splice pages.  This avoids the need for
-them to have a ->read_folio() to satisfy filemap_splice_read().
+Provide a splice_read stub for ecryptfs to update the access time on the
+lower file after the operation.  Splicing from a direct I/O fd will update
+the access time when ->read_iter() is called.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 cc: Christoph Hellwig <hch@lst.de>
-cc: Jens Axboe <axboe@kernel.dk>
 cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: David Hildenbrand <david@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Miklos Szeredi <miklos@szeredi.hu>
-cc: Arnd Bergmann <arnd@arndb.de>
-cc: linux-block@vger.kernel.org
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Tyler Hicks <code@tyhicks.com>
+cc: ecryptfs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
+cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- drivers/char/random.c | 4 ++--
- drivers/tty/tty_io.c  | 4 ++--
- fs/kernfs/file.c      | 2 +-
- fs/proc/inode.c       | 4 ++--
- fs/proc/proc_sysctl.c | 2 +-
- fs/proc_namespace.c   | 6 +++---
- 6 files changed, 11 insertions(+), 11 deletions(-)
+ fs/ecryptfs/file.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 253f2ddb8913..3cb37760dfec 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1546,7 +1546,7 @@ const struct file_operations random_fops = {
- 	.compat_ioctl = compat_ptr_ioctl,
- 	.fasync = random_fasync,
- 	.llseek = noop_llseek,
+diff --git a/fs/ecryptfs/file.c b/fs/ecryptfs/file.c
+index 268b74499c28..284395587be0 100644
+--- a/fs/ecryptfs/file.c
++++ b/fs/ecryptfs/file.c
+@@ -44,6 +44,31 @@ static ssize_t ecryptfs_read_update_atime(struct kiocb *iocb,
+ 	return rc;
+ }
+ 
++/*
++ * ecryptfs_splice_read_update_atime
++ *
++ * generic_file_splice_read updates the atime of upper layer inode.  But, it
++ * doesn't give us a chance to update the atime of the lower layer inode.  This
++ * function is a wrapper to generic_file_read.  It updates the atime of the
++ * lower level inode if generic_file_read returns without any errors. This is
++ * to be used only for file reads.  The function to be used for directory reads
++ * is ecryptfs_read.
++ */
++static ssize_t ecryptfs_splice_read_update_atime(struct file *in, loff_t *ppos,
++						 struct pipe_inode_info *pipe,
++						 size_t len, unsigned int flags)
++{
++	ssize_t rc;
++	const struct path *path;
++
++	rc = generic_file_splice_read(in, ppos, pipe, len, flags);
++	if (rc >= 0) {
++		path = ecryptfs_dentry_to_lower_path(in->f_path.dentry);
++		touch_atime(path);
++	}
++	return rc;
++}
++
+ struct ecryptfs_getdents_callback {
+ 	struct dir_context ctx;
+ 	struct dir_context *caller;
+@@ -414,5 +439,5 @@ const struct file_operations ecryptfs_main_fops = {
+ 	.release = ecryptfs_release,
+ 	.fsync = ecryptfs_fsync,
+ 	.fasync = ecryptfs_fasync,
 -	.splice_read = generic_file_splice_read,
-+	.splice_read = copy_splice_read,
- 	.splice_write = iter_file_splice_write,
- };
- 
-@@ -1557,7 +1557,7 @@ const struct file_operations urandom_fops = {
- 	.compat_ioctl = compat_ptr_ioctl,
- 	.fasync = random_fasync,
- 	.llseek = noop_llseek,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = copy_splice_read,
- 	.splice_write = iter_file_splice_write,
- };
- 
-diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-index c84be40fb8df..4737a8f92c2e 100644
---- a/drivers/tty/tty_io.c
-+++ b/drivers/tty/tty_io.c
-@@ -466,7 +466,7 @@ static const struct file_operations tty_fops = {
- 	.llseek		= no_llseek,
- 	.read_iter	= tty_read,
- 	.write_iter	= tty_write,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.poll		= tty_poll,
- 	.unlocked_ioctl	= tty_ioctl,
-@@ -481,7 +481,7 @@ static const struct file_operations console_fops = {
- 	.llseek		= no_llseek,
- 	.read_iter	= tty_read,
- 	.write_iter	= redirected_tty_write,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.poll		= tty_poll,
- 	.unlocked_ioctl	= tty_ioctl,
-diff --git a/fs/kernfs/file.c b/fs/kernfs/file.c
-index 40c4661f15b7..180906c36f51 100644
---- a/fs/kernfs/file.c
-+++ b/fs/kernfs/file.c
-@@ -1011,7 +1011,7 @@ const struct file_operations kernfs_file_fops = {
- 	.release	= kernfs_fop_release,
- 	.poll		= kernfs_fop_poll,
- 	.fsync		= noop_fsync,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.splice_write	= iter_file_splice_write,
- };
- 
-diff --git a/fs/proc/inode.c b/fs/proc/inode.c
-index f495fdb39151..67b09a1d9433 100644
---- a/fs/proc/inode.c
-+++ b/fs/proc/inode.c
-@@ -591,7 +591,7 @@ static const struct file_operations proc_iter_file_ops = {
- 	.llseek		= proc_reg_llseek,
- 	.read_iter	= proc_reg_read_iter,
- 	.write		= proc_reg_write,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.poll		= proc_reg_poll,
- 	.unlocked_ioctl	= proc_reg_unlocked_ioctl,
- 	.mmap		= proc_reg_mmap,
-@@ -617,7 +617,7 @@ static const struct file_operations proc_reg_file_ops_compat = {
- static const struct file_operations proc_iter_file_ops_compat = {
- 	.llseek		= proc_reg_llseek,
- 	.read_iter	= proc_reg_read_iter,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.write		= proc_reg_write,
- 	.poll		= proc_reg_poll,
- 	.unlocked_ioctl	= proc_reg_unlocked_ioctl,
-diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-index 8038833ff5b0..ae832e982003 100644
---- a/fs/proc/proc_sysctl.c
-+++ b/fs/proc/proc_sysctl.c
-@@ -868,7 +868,7 @@ static const struct file_operations proc_sys_file_operations = {
- 	.poll		= proc_sys_poll,
- 	.read_iter	= proc_sys_read,
- 	.write_iter	= proc_sys_write,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.llseek		= default_llseek,
- };
-diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
-index 846f9455ae22..250eb5bf7b52 100644
---- a/fs/proc_namespace.c
-+++ b/fs/proc_namespace.c
-@@ -324,7 +324,7 @@ static int mountstats_open(struct inode *inode, struct file *file)
- const struct file_operations proc_mounts_operations = {
- 	.open		= mounts_open,
- 	.read_iter	= seq_read_iter,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.llseek		= seq_lseek,
- 	.release	= mounts_release,
- 	.poll		= mounts_poll,
-@@ -333,7 +333,7 @@ const struct file_operations proc_mounts_operations = {
- const struct file_operations proc_mountinfo_operations = {
- 	.open		= mountinfo_open,
- 	.read_iter	= seq_read_iter,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.llseek		= seq_lseek,
- 	.release	= mounts_release,
- 	.poll		= mounts_poll,
-@@ -342,7 +342,7 @@ const struct file_operations proc_mountinfo_operations = {
- const struct file_operations proc_mountstats_operations = {
- 	.open		= mountstats_open,
- 	.read_iter	= seq_read_iter,
--	.splice_read	= generic_file_splice_read,
-+	.splice_read	= copy_splice_read,
- 	.llseek		= seq_lseek,
- 	.release	= mounts_release,
++	.splice_read = ecryptfs_splice_read_update_atime,
  };
 
