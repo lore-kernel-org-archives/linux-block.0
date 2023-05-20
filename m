@@ -2,81 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 050E3C77B7F
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 15:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C6E6C7EE23
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 18:21:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231716AbjETPMg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 May 2023 11:12:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
+        id S231738AbjETSVo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 May 2023 14:21:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbjETPMf (ORCPT
+        with ESMTP id S231731AbjETSVl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 May 2023 11:12:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC18EE
-        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 08:11:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684595508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=NcFayYwwQD+mu8+fru3CrVrepvfa+QmvwNXxfXB0i5Y=;
-        b=F41GaOWEcjoyBMKNpN+8rgjyVRtHLOX76uRF0hkleJ19LmDRk+o2D6hzkt9Nf84HpwFE/L
-        7wH2EE0sdMpWknHQ79Z8AZkcKoRKp4uzR2ThTfqK7C8XpN57seKuYH4oiLCuRHlbn5rHAg
-        K8Qno/ZqMfmq/plesep6z+L6kSCiubg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-662-w6dsjjRsM5mcoKWLvIqzDg-1; Sat, 20 May 2023 11:11:45 -0400
-X-MC-Unique: w6dsjjRsM5mcoKWLvIqzDg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Sat, 20 May 2023 14:21:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EEF1E5D;
+        Sat, 20 May 2023 11:21:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1E79800B2A;
-        Sat, 20 May 2023 15:11:44 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CFA07B7C;
-        Sat, 20 May 2023 15:11:43 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        kernel test robot <lkp@intel.com>,
-        Julia Lawall <julia.lawall@inria.fr>
-Subject: [PATCH] ublk: fix build warning on iov_iter_get_pages2
-Date:   Sat, 20 May 2023 23:11:34 +0800
-Message-Id: <20230520151134.459679-1-ming.lei@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BFC8860B9B;
+        Sat, 20 May 2023 18:20:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530FAC433EF;
+        Sat, 20 May 2023 18:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684606830;
+        bh=vL3jw7INaz/0KCVn4cp6sGW+dLmmD1G1Qt8/Gaj9bXw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=HwJ2immkYDypFYQGIodfRKs7e+UE8/T2e9MrVcgiqUqlv/X5Jd6fzWKsYFDgnjczU
+         AZR/M19fpIqDGv68GLvMjgoDdmb5mwM5hbtWMGge5nrlRxbxN8hUemOASEv+Vz/BBX
+         bEu9wT5XTTK5CzyM17EmmJBoRdJPp6GAmS6NSxc8xp6M65RDsbhmGUPkCp+HCSXJAM
+         x3zAXZ4V1+LwoRUu7O2i5KGcCXZjMWMfKu2l2E59xFyMNgIyiUaXQUGuFFAQfqwvPL
+         vhK//NIEGSJbPtXyiYbtrKxj+zxSEuWhfSxpv3KsvFnPw1qbBnD1neUwZtTKj2OuJw
+         uryRy87KwdoNA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ivan Orlov <ivan.orlov0322@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        josef@toxicpanda.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: [PATCH AUTOSEL 6.3 17/18] nbd: Fix debugfs_create_dir error checking
+Date:   Sat, 20 May 2023 14:17:49 -0400
+Message-Id: <20230520181750.823365-17-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230520181750.823365-1-sashal@kernel.org>
+References: <20230520181750.823365-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Return type of iov_iter_get_pages2() is ssize_t instead of size_t, so
-fix it.
+From: Ivan Orlov <ivan.orlov0322@gmail.com>
 
-Fixes: 981f95a571e3 ("ublk: cleanup ublk_copy_user_pages")
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Julia Lawall <julia.lawall@inria.fr>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+[ Upstream commit 4913cfcf014c95f0437db2df1734472fd3e15098 ]
+
+The debugfs_create_dir function returns ERR_PTR in case of error, and the
+only correct way to check if an error occurred is 'IS_ERR' inline function.
+This patch will replace the null-comparison with IS_ERR.
+
+Signed-off-by: Ivan Orlov <ivan.orlov0322@gmail.com>
+Link: https://lore.kernel.org/r/20230512130533.98709-1-ivan.orlov0322@gmail.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/ublk_drv.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/block/nbd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index e00733b6fea8..539eada32861 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -564,7 +564,8 @@ static size_t ublk_copy_user_pages(const struct request *req,
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 592cfa8b765a5..d6050715e6139 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1660,7 +1660,7 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
+ 		return -EIO;
  
- 	while (iov_iter_count(uiter) && iter.bio) {
- 		unsigned nr_pages;
--		size_t len, off;
-+		ssize_t len;
-+		size_t off;
- 		int i;
+ 	dir = debugfs_create_dir(nbd_name(nbd), nbd_dbg_dir);
+-	if (!dir) {
++	if (IS_ERR(dir)) {
+ 		dev_err(nbd_to_dev(nbd), "Failed to create debugfs dir for '%s'\n",
+ 			nbd_name(nbd));
+ 		return -EIO;
+@@ -1686,7 +1686,7 @@ static int nbd_dbg_init(void)
+ 	struct dentry *dbg_dir;
  
- 		len = iov_iter_get_pages2(uiter, iter.pages,
+ 	dbg_dir = debugfs_create_dir("nbd", NULL);
+-	if (!dbg_dir)
++	if (IS_ERR(dbg_dir))
+ 		return -EIO;
+ 
+ 	nbd_dbg_dir = dbg_dir;
 -- 
-2.38.1
+2.39.2
 
