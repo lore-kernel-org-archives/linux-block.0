@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E715C77B7A
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BA7C77B7F
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:03:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231646AbjETADo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230446AbjETADo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 19 May 2023 20:03:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230446AbjETAD3 (ORCPT
+        with ESMTP id S230430AbjETAD3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 19 May 2023 20:03:29 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B25BE50
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:01:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62BF61BD
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:01:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684540903;
+        s=mimecast20190719; t=1684540901;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=L0untNcr1icklU0hwhU0ty94Xf23B/VjszjVy/DS5Ow=;
-        b=c8QJFDuy5MYbgzbTt6diemFHS40briWr/q8WQ9sNyEW3tK6WA0cV3ech6dozvi8y814/hX
-        U8Vj4ZVB+WDtvUS4m/V0M4Dfs1hnZqTkAU3ZsiUWilp+kIAI7Z11vne3SiWuI3vE6iXtqt
-        j5Ph1MK9us8BMwFpssTLnv7XDRc1zg4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=gRzUovfXnw170GzVg3YWYDNx7Fcy6r2PjCbmCvJAFKQ=;
+        b=Fdbc2ui+KllNx4e9GXg0aKqs7aON44yUBL3SQ/TIOyznrFFpdcv42NZjVjPSCh+77URvoX
+        jB/WPFF/csB2X0VJ/RAv2xOQy9Jt/8P6VBFPJOQcyUzFUt/fgUj+hsBtI1rqEv8EbhgFBB
+        Ula65Ro4wknP/fTI6AcHK7/A0ew2CEI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-144-ZoV9UQXCOsyihBFlh8yZBw-1; Fri, 19 May 2023 20:01:39 -0400
-X-MC-Unique: ZoV9UQXCOsyihBFlh8yZBw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-672-1JhP-Y78PWKPthfxNC2xdQ-1; Fri, 19 May 2023 20:01:35 -0400
+X-MC-Unique: 1JhP-Y78PWKPthfxNC2xdQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C79A38032FA;
-        Sat, 20 May 2023 00:01:37 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F0872492B0A;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4596E1C041B8;
         Sat, 20 May 2023 00:01:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B4E3740CFD48;
+        Sat, 20 May 2023 00:01:31 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,93 +52,53 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Eric Van Hensbergen <ericvh@kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Christian Schoenebeck <linux_oss@crudebyte.com>,
-        v9fs@lists.linux.dev
-Subject: [PATCH v21 14/30] 9p:  Add splice_read stub
-Date:   Sat, 20 May 2023 01:00:33 +0100
-Message-Id: <20230520000049.2226926-15-dhowells@redhat.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, netdev@vger.kernel.org
+Subject: [PATCH v21 13/30] net: Make sock_splice_read() use copy_splice_read() by default
+Date:   Sat, 20 May 2023 01:00:32 +0100
+Message-Id: <20230520000049.2226926-14-dhowells@redhat.com>
 In-Reply-To: <20230520000049.2226926-1-dhowells@redhat.com>
 References: <20230520000049.2226926-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a splice_read stub for 9p.  We should use copy_splice_read() if
-9PL_DIRECT is set and filemap_splice_read() otherwise.  Note that this
-doesn't seem to be particularly related to O_DIRECT.
+Make sock_splice_read() use copy_splice_read() by default as
+file_splice_read() will return immediately with 0 as a socket has no
+pagecache and is a zero-size file.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: v9fs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
+cc: netdev@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/9p/vfs_file.c | 26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ net/socket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
-index 6c31b8c8112d..2996fb00387f 100644
---- a/fs/9p/vfs_file.c
-+++ b/fs/9p/vfs_file.c
-@@ -374,6 +374,28 @@ v9fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	return ret;
- }
+diff --git a/net/socket.c b/net/socket.c
+index b7e01d0fe082..401778380195 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -1093,7 +1093,7 @@ static ssize_t sock_splice_read(struct file *file, loff_t *ppos,
+ 	struct socket *sock = file->private_data;
  
-+/*
-+ * v9fs_file_splice_read - splice-read from a file
-+ * @in: The 9p file to read from
-+ * @ppos: Where to find/update the file position
-+ * @pipe: The pipe to splice into
-+ * @len: The maximum amount of data to splice
-+ * @flags: SPLICE_F_* flags
-+ */
-+static ssize_t v9fs_file_splice_read(struct file *in, loff_t *ppos,
-+				     struct pipe_inode_info *pipe,
-+				     size_t len, unsigned int flags)
-+{
-+	struct p9_fid *fid = in->private_data;
-+
-+	p9_debug(P9_DEBUG_VFS, "fid %d count %zu offset %lld\n",
-+		 fid->fid, len, *ppos);
-+
-+	if (fid->mode & P9L_DIRECT)
-+		return copy_splice_read(in, ppos, pipe, len, flags);
-+	return filemap_splice_read(in, ppos, pipe, len, flags);
-+}
-+
- /**
-  * v9fs_file_write_iter - write to a file
-  * @iocb: The operation parameters
-@@ -569,7 +591,7 @@ const struct file_operations v9fs_file_operations = {
- 	.release = v9fs_dir_release,
- 	.lock = v9fs_file_lock,
- 	.mmap = generic_file_readonly_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = v9fs_file_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.fsync = v9fs_file_fsync,
- };
-@@ -583,7 +605,7 @@ const struct file_operations v9fs_file_operations_dotl = {
- 	.lock = v9fs_file_lock_dotl,
- 	.flock = v9fs_file_flock_dotl,
- 	.mmap = v9fs_file_mmap,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = v9fs_file_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.fsync = v9fs_file_fsync_dotl,
- };
+ 	if (unlikely(!sock->ops->splice_read))
+-		return generic_file_splice_read(file, ppos, pipe, len, flags);
++		return copy_splice_read(file, ppos, pipe, len, flags);
+ 
+ 	return sock->ops->splice_read(sock, ppos, pipe, len, flags);
+ }
 
