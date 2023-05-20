@@ -2,148 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE75FC77B7A
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 12:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 050E3C77B7F
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 15:12:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231483AbjETMDR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 May 2023 08:03:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47976 "EHLO
+        id S231716AbjETPMg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 May 2023 11:12:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbjETMDR (ORCPT
+        with ESMTP id S229737AbjETPMf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 May 2023 08:03:17 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5E718F
-        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 05:03:15 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-25377d67da9so456927a91.0
-        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 05:03:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684584195; x=1687176195;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a9TwJkiD/D4r+xz97xXnN2ZniBpU1ye0ahbgrL0eGQg=;
-        b=E+N5le+7bQ/tbJ8yt3LPCem+a2af071Me7Tui/ACtUhZ0j9ozmfZiDyWKq3PnhRwgI
-         ZT7KfOQh7djpkPkBpPugkc2il7d9ZecSiCbab5aZDgPBak3furBCFRqRkp95XRl175SL
-         i3AFdMnpkQgz5v6My6Zs+Nj5kDNTGQhTjcNm1kQsgfrg1edbTcdNJQXzlXZ6heJwGJMH
-         bazd400VRaenNJKB2xLtHrz6FF8zAAzY3INZvzoVXregwUYz848/xuQrkV0ezHE1RMC2
-         J3Mz+WOgzRWKBenqJcwzZ/M1zQx0fL4VF01qGfkBOacAmM8h/lOu51k0kX54CqXk56Oo
-         0TQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684584195; x=1687176195;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=a9TwJkiD/D4r+xz97xXnN2ZniBpU1ye0ahbgrL0eGQg=;
-        b=VbHA8DymxjFTIp0jwVzosXpqO35624NuVRppTrgy96srCb60brsbjML+AnQfIpaUKd
-         oJz64QpJGapmOE5MDUqGKbqKll3Tsl22Y07o+lW9StPZFhq7unG3YYN4gxoJDCiw38zE
-         ZZ6Qvs2+aPCzl0UYJ2blVu1rEFGB4bxAUlMraAW8Pu8C1AmA1lCNvdNUJYnmHiOBWi92
-         tMs6T6Gkm/d38VLuVPChWTmPaTuvnHEdsOjZ4n62UT1k84AZO/vHIhf5nYkXgGFvkJCi
-         v+QE/92TU9sZWiMnPyWuTw2vcW+USESw3LWYWAVZUIFSUwtO0uTuKVmrHR4L0MhjXce2
-         +eiA==
-X-Gm-Message-State: AC+VfDx+A+HSRSTBGV2owZcEy2uNU19Kau1ucweXc7mKsyCeuq3oO/WP
-        GEpLnk0ZqoCGtqmzipEXrZFfOyRBSrunBd+v190=
-X-Google-Smtp-Source: ACHHUZ7jHDpvP07T6f0Zd7ZwG92pYYR5NovO1BhOLAp+KYnmTRbHBi/myRd9UuCeFT23wjQIH/y/0A==
-X-Received: by 2002:a17:90b:4d8a:b0:250:d8e1:d326 with SMTP id oj10-20020a17090b4d8a00b00250d8e1d326mr6038629pjb.0.1684584195006;
-        Sat, 20 May 2023 05:03:15 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id a12-20020a17090ad80c00b0024b9e62c1d9sm1102243pjv.41.2023.05.20.05.03.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 May 2023 05:03:14 -0700 (PDT)
-Message-ID: <26d11955-8978-1be6-628d-4b8ecda5f6a8@kernel.dk>
-Date:   Sat, 20 May 2023 06:03:13 -0600
+        Sat, 20 May 2023 11:12:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC18EE
+        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 08:11:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684595508;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NcFayYwwQD+mu8+fru3CrVrepvfa+QmvwNXxfXB0i5Y=;
+        b=F41GaOWEcjoyBMKNpN+8rgjyVRtHLOX76uRF0hkleJ19LmDRk+o2D6hzkt9Nf84HpwFE/L
+        7wH2EE0sdMpWknHQ79Z8AZkcKoRKp4uzR2ThTfqK7C8XpN57seKuYH4oiLCuRHlbn5rHAg
+        K8Qno/ZqMfmq/plesep6z+L6kSCiubg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-662-w6dsjjRsM5mcoKWLvIqzDg-1; Sat, 20 May 2023 11:11:45 -0400
+X-MC-Unique: w6dsjjRsM5mcoKWLvIqzDg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1E79800B2A;
+        Sat, 20 May 2023 15:11:44 +0000 (UTC)
+Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CFA07B7C;
+        Sat, 20 May 2023 15:11:43 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        kernel test robot <lkp@intel.com>,
+        Julia Lawall <julia.lawall@inria.fr>
+Subject: [PATCH] ublk: fix build warning on iov_iter_get_pages2
+Date:   Sat, 20 May 2023 23:11:34 +0800
+Message-Id: <20230520151134.459679-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.4-rc3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Return type of iov_iter_get_pages2() is ssize_t instead of size_t, so
+fix it.
 
-Set of fixes for the 6.4-rc3 kernel:
+Fixes: 981f95a571e3 ("ublk: cleanup ublk_copy_user_pages")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Julia Lawall <julia.lawall@inria.fr>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-- NVMe pull request via Keith
-	- More device quirks (Sagi, Hristo, Adrian, Daniel)
-	- Controller delete race (Maurizo)
-	- Multipath cleanup fix (Christoph)
-
-- Deny writeable mmap mapping on a readonly block device (Loic)
-
-- Kill unused define that got introduced by accident (Christoph)
-
-- Error handling fix for s390 dasd (Stefan)
-
-- ublk locking fix (Ming)
-
-Please pull!
-
-
-The following changes since commit 56cdea92ed915f8eb37575331fb4a269991e8026:
-
-  Documentation/block: drop the request.rst file (2023-05-12 11:04:58 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.4-2023-05-20
-
-for you to fetch changes up to e3afec91aad23c52dfe426c7d7128e4839c3eed8:
-
-  block: remove NFL4_UFLG_MASK (2023-05-20 05:38:01 -0600)
-
-----------------------------------------------------------------
-block-6.4-2023-05-20
-
-----------------------------------------------------------------
-Adrian Huang (1):
-      nvme-pci: clamp max_hw_sectors based on DMA optimized limitation
-
-Christoph Hellwig (2):
-      nvme-multipath: don't call blk_mark_disk_dead in nvme_mpath_remove_disk
-      block: remove NFL4_UFLG_MASK
-
-Daniel Smith (1):
-      nvme-pci: Add quirk for Teamgroup MP33 SSD
-
-Hristo Venev (1):
-      nvme-pci: add quirk for missing secondary temperature thresholds
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.4-2023-05-18' of git://git.infradead.org/nvme into block-6.4
-
-Loic Poulain (1):
-      block: Deny writable memory mapping if block is read-only
-
-Maurizio Lombardi (1):
-      nvme: do not let the user delete a ctrl before a complete initialization
-
-Ming Lei (1):
-      ublk: fix AB-BA lockdep warning
-
-Sagi Grimberg (1):
-      nvme-pci: add NVME_QUIRK_BOGUS_NID for HS-SSD-FUTURE 2048G
-
-Stefan Haberland (1):
-      s390/dasd: fix command reject error on ESE devices
-
- block/fops.c                   | 12 +++++++++++-
- drivers/block/ublk_drv.c       |  9 +++++++--
- drivers/nvme/host/core.c       |  6 +++++-
- drivers/nvme/host/hwmon.c      |  4 +++-
- drivers/nvme/host/multipath.c  |  1 -
- drivers/nvme/host/nvme.h       |  5 +++++
- drivers/nvme/host/pci.c        |  8 +++++++-
- drivers/s390/block/dasd_eckd.c | 33 +++++++++++++++++++++++++++++++--
- include/linux/blkdev.h         |  2 --
- 9 files changed, 69 insertions(+), 11 deletions(-)
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index e00733b6fea8..539eada32861 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -564,7 +564,8 @@ static size_t ublk_copy_user_pages(const struct request *req,
+ 
+ 	while (iov_iter_count(uiter) && iter.bio) {
+ 		unsigned nr_pages;
+-		size_t len, off;
++		ssize_t len;
++		size_t off;
+ 		int i;
+ 
+ 		len = iov_iter_get_pages2(uiter, iter.pages,
 -- 
-Jens Axboe
+2.38.1
 
