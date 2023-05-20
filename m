@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 356D4C77B7F
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EDCC77B7A
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231708AbjETAEg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 20:04:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52684 "EHLO
+        id S231220AbjETAEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 20:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbjETADz (ORCPT
+        with ESMTP id S230161AbjETADy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 20:03:55 -0400
+        Fri, 19 May 2023 20:03:54 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2040319B0
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:02:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76FEC1BC0
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:02:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684540925;
+        s=mimecast20190719; t=1684540932;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CaLAYOqJ2Anmir2KAA5gHQHUMXRYNU8ZFt/DqT/DIIs=;
-        b=Nmq4+4pPjTe9jBRNdoDrN2641Y7aYlSgxiUqzluDv8z8XrNvv6Ic4IiLG7vWEWgm6lEpXt
-        kl1LafeflJONaz00VUUSqHGIQ/6npyxSDY7qgyXKH3ILz5KMPgcNUiLLfD1BPWyaJWmm5M
-        8eDqf7DVy0KzztSG2ZLiNyv81CXWd2E=
+        bh=xweayQ6b4+yKTogEWKPvOcFVzWq2Z7yytw9vgW43n8c=;
+        b=fqGiAR5LxDOn7Oyq0CHvwKYEtcuqzcspw/TDWa8KIk2iEx+q/JcvEGd+eaHpHq4qq/3Uex
+        5lCBPUW6Z4sImfUDPiFPtMXlOIHO6iWQguQb7zuHFHGEacX4tRtWDzDYtAjTwrOltc2io8
+        sJmBer7Cos42mYkvebdfEPxsf5AxTsk=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-403-eV0FIEGwNWuHo-kvCpFXaA-1; Fri, 19 May 2023 20:01:54 -0400
-X-MC-Unique: eV0FIEGwNWuHo-kvCpFXaA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-241-5lqrDGK7M6yCYGGKczU41Q-1; Fri, 19 May 2023 20:02:09 -0400
+X-MC-Unique: 5lqrDGK7M6yCYGGKczU41Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5D6021C05AE3;
-        Sat, 20 May 2023 00:01:53 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 72A7438035AA;
+        Sat, 20 May 2023 00:02:08 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1DFDE2026D49;
-        Sat, 20 May 2023 00:01:51 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 43E827C52;
+        Sat, 20 May 2023 00:02:06 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,129 +53,104 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        linux-f2fs-devel@lists.sourceforge.net
-Subject: [PATCH v21 19/30] f2fs: Provide a splice-read stub
-Date:   Sat, 20 May 2023 01:00:38 +0100
-Message-Id: <20230520000049.2226926-20-dhowells@redhat.com>
+        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
+Subject: [PATCH v21 24/30] xfs: Provide a splice-read stub
+Date:   Sat, 20 May 2023 01:00:43 +0100
+Message-Id: <20230520000049.2226926-25-dhowells@redhat.com>
 In-Reply-To: <20230520000049.2226926-1-dhowells@redhat.com>
 References: <20230520000049.2226926-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read stub for f2fs.  This does some checks and tracing
-before calling filemap_splice_read() and will update the iostats
-afterwards.  Direct I/O is handled by the caller.
+Provide a splice_read stub for XFS.  This does a stat count and a shutdown
+check before proceeding, then emits a new trace line and locks the inode
+across the call to filemap_splice_read() and adds to the stats afterwards.
+Splicing from direct I/O or DAX is handled by the caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Jaegeuk Kim <jaegeuk@kernel.org>
-cc: Chao Yu <chao@kernel.org>
-cc: linux-f2fs-devel@lists.sourceforge.net
+cc: Darrick J. Wong <djwong@kernel.org>
+cc: linux-xfs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/f2fs/file.c | 43 +++++++++++++++++++++++++++++++++++--------
- 1 file changed, 35 insertions(+), 8 deletions(-)
+ fs/xfs/xfs_file.c  | 30 +++++++++++++++++++++++++++++-
+ fs/xfs/xfs_trace.h |  2 +-
+ 2 files changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-index 5ac53d2627d2..3fce122997ca 100644
---- a/fs/f2fs/file.c
-+++ b/fs/f2fs/file.c
-@@ -4367,22 +4367,23 @@ static ssize_t f2fs_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index aede746541f8..08d632668e94 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -306,6 +306,34 @@ xfs_file_read_iter(
  	return ret;
  }
  
--static void f2fs_trace_rw_file_path(struct kiocb *iocb, size_t count, int rw)
-+static void f2fs_trace_rw_file_path(struct file *file, loff_t pos, size_t count,
-+				    int rw)
- {
--	struct inode *inode = file_inode(iocb->ki_filp);
-+	struct inode *inode = file_inode(file);
- 	char *buf, *path;
- 
- 	buf = f2fs_getname(F2FS_I_SB(inode));
- 	if (!buf)
- 		return;
--	path = dentry_path_raw(file_dentry(iocb->ki_filp), buf, PATH_MAX);
-+	path = dentry_path_raw(file_dentry(file), buf, PATH_MAX);
- 	if (IS_ERR(path))
- 		goto free_buf;
- 	if (rw == WRITE)
--		trace_f2fs_datawrite_start(inode, iocb->ki_pos, count,
-+		trace_f2fs_datawrite_start(inode, pos, count,
- 				current->pid, path, current->comm);
- 	else
--		trace_f2fs_dataread_start(inode, iocb->ki_pos, count,
-+		trace_f2fs_dataread_start(inode, pos, count,
- 				current->pid, path, current->comm);
- free_buf:
- 	f2fs_putname(buf);
-@@ -4398,7 +4399,8 @@ static ssize_t f2fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 		return -EOPNOTSUPP;
- 
- 	if (trace_f2fs_dataread_start_enabled())
--		f2fs_trace_rw_file_path(iocb, iov_iter_count(to), READ);
-+		f2fs_trace_rw_file_path(iocb->ki_filp, iocb->ki_pos,
-+					iov_iter_count(to), READ);
- 
- 	if (f2fs_should_use_dio(inode, iocb, to)) {
- 		ret = f2fs_dio_read_iter(iocb, to);
-@@ -4413,6 +4415,30 @@ static ssize_t f2fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	return ret;
- }
- 
-+static ssize_t f2fs_file_splice_read(struct file *in, loff_t *ppos,
-+				     struct pipe_inode_info *pipe,
-+				     size_t len, unsigned int flags)
++STATIC ssize_t
++xfs_file_splice_read(
++	struct file		*in,
++	loff_t			*ppos,
++	struct pipe_inode_info	*pipe,
++	size_t			len,
++	unsigned int		flags)
 +{
-+	struct inode *inode = file_inode(in);
-+	const loff_t pos = *ppos;
-+	ssize_t ret;
++	struct inode		*inode = file_inode(in);
++	struct xfs_inode	*ip = XFS_I(inode);
++	struct xfs_mount	*mp = ip->i_mount;
++	ssize_t			ret = 0;
 +
-+	if (!f2fs_is_compress_backend_ready(inode))
-+		return -EOPNOTSUPP;
++	XFS_STATS_INC(mp, xs_read_calls);
 +
-+	if (trace_f2fs_dataread_start_enabled())
-+		f2fs_trace_rw_file_path(in, pos, len, READ);
++	if (xfs_is_shutdown(mp))
++		return -EIO;
 +
++	trace_xfs_file_splice_read(ip, *ppos, len);
++
++	xfs_ilock(ip, XFS_IOLOCK_SHARED);
 +	ret = filemap_splice_read(in, ppos, pipe, len, flags);
++	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
 +	if (ret > 0)
-+		f2fs_update_iostat(F2FS_I_SB(inode), inode,
-+				   APP_BUFFERED_READ_IO, ret);
-+
-+	if (trace_f2fs_dataread_end_enabled())
-+		trace_f2fs_dataread_end(inode, pos, ret);
++		XFS_STATS_ADD(mp, xs_read_bytes, ret);
 +	return ret;
 +}
 +
- static ssize_t f2fs_write_checks(struct kiocb *iocb, struct iov_iter *from)
- {
- 	struct file *file = iocb->ki_filp;
-@@ -4714,7 +4740,8 @@ static ssize_t f2fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		ret = preallocated;
- 	} else {
- 		if (trace_f2fs_datawrite_start_enabled())
--			f2fs_trace_rw_file_path(iocb, orig_count, WRITE);
-+			f2fs_trace_rw_file_path(iocb->ki_filp, iocb->ki_pos,
-+						orig_count, WRITE);
- 
- 		/* Do the actual write. */
- 		ret = dio ?
-@@ -4919,7 +4946,7 @@ const struct file_operations f2fs_file_operations = {
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= f2fs_compat_ioctl,
- #endif
+ /*
+  * Common pre-write limit and setup checks.
+  *
+@@ -1423,7 +1451,7 @@ const struct file_operations xfs_file_operations = {
+ 	.llseek		= xfs_file_llseek,
+ 	.read_iter	= xfs_file_read_iter,
+ 	.write_iter	= xfs_file_write_iter,
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= f2fs_file_splice_read,
++	.splice_read	= xfs_file_splice_read,
  	.splice_write	= iter_file_splice_write,
- 	.fadvise	= f2fs_file_fadvise,
- };
+ 	.iopoll		= iocb_bio_iopoll,
+ 	.unlocked_ioctl	= xfs_file_ioctl,
+diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
+index cd4ca5b1fcb0..4db669203149 100644
+--- a/fs/xfs/xfs_trace.h
++++ b/fs/xfs/xfs_trace.h
+@@ -1445,7 +1445,6 @@ DEFINE_RW_EVENT(xfs_file_direct_write);
+ DEFINE_RW_EVENT(xfs_file_dax_write);
+ DEFINE_RW_EVENT(xfs_reflink_bounce_dio_write);
+ 
+-
+ DECLARE_EVENT_CLASS(xfs_imap_class,
+ 	TP_PROTO(struct xfs_inode *ip, xfs_off_t offset, ssize_t count,
+ 		 int whichfork, struct xfs_bmbt_irec *irec),
+@@ -1535,6 +1534,7 @@ DEFINE_SIMPLE_IO_EVENT(xfs_zero_eof);
+ DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write);
+ DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write_unwritten);
+ DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write_append);
++DEFINE_SIMPLE_IO_EVENT(xfs_file_splice_read);
+ 
+ DECLARE_EVENT_CLASS(xfs_itrunc_class,
+ 	TP_PROTO(struct xfs_inode *ip, xfs_fsize_t new_size),
 
