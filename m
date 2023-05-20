@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53543C7EE2F
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D99C77B7A
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:03:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229807AbjETADS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 20:03:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51984 "EHLO
+        id S231186AbjETADe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 20:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230261AbjETADR (ORCPT
+        with ESMTP id S230312AbjETADT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 20:03:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F9F10DE
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:01:24 -0700 (PDT)
+        Fri, 19 May 2023 20:03:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D342A10F8
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:01:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684540883;
+        s=mimecast20190719; t=1684540891;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zbFi31jMxWzghDu9RJeKpwLNk82XZBGuvfsvQFuMAZA=;
-        b=YAmVD1ESEiekjfILaBpaFI2UshIVzSH6kMj6ES8zjH2P8KfsiwTPy6IbhO/aW02mxQkoAa
-        3mshb7B+V0D2xo5FDMTBKCuEmp9oB+4x9FJbiI0NzFoVuB4T29p4Yqa2J2NF6JEQS7JiY2
-        llmJ7OvMIv5KFY0tFxdlIzdRbN+RweI=
+        bh=Mo6NWBR6hkfydtMnZeO+F5U5GhN+vbQRFCzRyccP/1I=;
+        b=O7QusIUq3W8UYyrixwG0ZFXCZ+mU3A9bRBq+T89xJcz2k6Lyqrhy3OYHCgkJL+Q4lszxgU
+        oxgtYg5o5db8tziZIPGyEtlw0V9odsCOkPhCJ1C/Azchpj5b5ZtKj+XNNcx0Ur8G8/AZJ+
+        iise5jBcQ5i2dcK5Mbf8dwx8nGrRvzc=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-498-boGls4mfOPmRYAKfMNAYJA-1; Fri, 19 May 2023 20:01:18 -0400
-X-MC-Unique: boGls4mfOPmRYAKfMNAYJA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-269-SoJDvSKvN3ST1yDutl5l3g-1; Fri, 19 May 2023 20:01:28 -0400
+X-MC-Unique: SoJDvSKvN3ST1yDutl5l3g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6A57D3C01DB4;
-        Sat, 20 May 2023 00:01:17 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CCE281C041A2;
+        Sat, 20 May 2023 00:01:26 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BE5F40CFD46;
-        Sat, 20 May 2023 00:01:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 21827C154D1;
+        Sat, 20 May 2023 00:01:24 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,62 +52,99 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>, linux-erofs@lists.ozlabs.org,
-        linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: [PATCH v21 08/30] splice: Make splice from a DAX file use copy_splice_read()
-Date:   Sat, 20 May 2023 01:00:27 +0100
-Message-Id: <20230520000049.2226926-9-dhowells@redhat.com>
+        Jan Harkes <jaharkes@cs.cmu.edu>,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>, coda@cs.cmu.edu,
+        codalist@coda.cs.cmu.edu, linux-unionfs@vger.kernel.org
+Subject: [PATCH v21 11/30] coda: Implement splice-read
+Date:   Sat, 20 May 2023 01:00:30 +0100
+Message-Id: <20230520000049.2226926-12-dhowells@redhat.com>
 In-Reply-To: <20230520000049.2226926-1-dhowells@redhat.com>
 References: <20230520000049.2226926-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make a read splice from a DAX file go directly to copy_splice_read() to do
-the reading as filemap_splice_read() is unlikely to find any pagecache to
-splice.
-
-I think this affects only erofs, Ext2, Ext4, fuse and XFS.
+Implement splice-read for coda by passing the request down a layer rather
+than going through generic_file_splice_read() which is going to be changed
+to assume that ->read_folio() is present on buffered files.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Jan Harkes <jaharkes@cs.cmu.edu>
 cc: Christoph Hellwig <hch@lst.de>
-cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: linux-erofs@lists.ozlabs.org
-cc: linux-ext4@vger.kernel.org
-cc: linux-xfs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: David Hildenbrand <david@redhat.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: coda@cs.cmu.edu
+cc: codalist@coda.cs.cmu.edu
+cc: linux-unionfs@vger.kernel.org
 cc: linux-block@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
 
 Notes:
-    ver #21)
-     - Don't need #ifdef CONFIG_FS_DAX as IS_DAX() is false if !CONFIG_FS_DAX.
-     - Needs to be in vfs_splice_read(), not generic_file_splice_read().
+    ver #17)
+     - Use vfs_splice_read() helper rather than open-coding checks.
 
- fs/splice.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/coda/file.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/fs/splice.c b/fs/splice.c
-index 76126b1aafcb..8268248df3a9 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -908,10 +908,10 @@ long vfs_splice_read(struct file *in, loff_t *ppos,
- 	if (unlikely(!in->f_op->splice_read))
- 		return warn_unsupported(in, "read");
- 	/*
--	 * O_DIRECT doesn't deal with the pagecache, so we allocate a buffer,
--	 * copy into it and splice that into the pipe.
-+	 * O_DIRECT and DAX don't deal with the pagecache, so we allocate a
-+	 * buffer, copy into it and splice that into the pipe.
- 	 */
--	if ((in->f_flags & O_DIRECT))
-+	if ((in->f_flags & O_DIRECT) || IS_DAX(in->f_mapping->host))
- 		return copy_splice_read(in, ppos, pipe, len, flags);
- 	return in->f_op->splice_read(in, ppos, pipe, len, flags);
+diff --git a/fs/coda/file.c b/fs/coda/file.c
+index 3f3c81e6b1ab..12b26bd13564 100644
+--- a/fs/coda/file.c
++++ b/fs/coda/file.c
+@@ -23,6 +23,7 @@
+ #include <linux/slab.h>
+ #include <linux/uaccess.h>
+ #include <linux/uio.h>
++#include <linux/splice.h>
+ 
+ #include <linux/coda.h>
+ #include "coda_psdev.h"
+@@ -94,6 +95,32 @@ coda_file_write_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	return ret;
  }
+ 
++static ssize_t
++coda_file_splice_read(struct file *coda_file, loff_t *ppos,
++		      struct pipe_inode_info *pipe,
++		      size_t len, unsigned int flags)
++{
++	struct inode *coda_inode = file_inode(coda_file);
++	struct coda_file_info *cfi = coda_ftoc(coda_file);
++	struct file *in = cfi->cfi_container;
++	loff_t ki_pos = *ppos;
++	ssize_t ret;
++
++	ret = venus_access_intent(coda_inode->i_sb, coda_i2f(coda_inode),
++				  &cfi->cfi_access_intent,
++				  len, ki_pos, CODA_ACCESS_TYPE_READ);
++	if (ret)
++		goto finish_read;
++
++	ret = vfs_splice_read(in, ppos, pipe, len, flags);
++
++finish_read:
++	venus_access_intent(coda_inode->i_sb, coda_i2f(coda_inode),
++			    &cfi->cfi_access_intent,
++			    len, ki_pos, CODA_ACCESS_TYPE_READ_FINISH);
++	return ret;
++}
++
+ static void
+ coda_vm_open(struct vm_area_struct *vma)
+ {
+@@ -302,5 +329,5 @@ const struct file_operations coda_file_operations = {
+ 	.open		= coda_open,
+ 	.release	= coda_release,
+ 	.fsync		= coda_fsync,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= coda_file_splice_read,
+ };
 
