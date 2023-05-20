@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0640FC7EE2D
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 18:27:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FEA2C7EE2D
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 18:28:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232062AbjETS1r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 May 2023 14:27:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49092 "EHLO
+        id S232123AbjETS2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 May 2023 14:28:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232171AbjETS1O (ORCPT
+        with ESMTP id S231807AbjETS1Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 May 2023 14:27:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB27F1BD4;
-        Sat, 20 May 2023 11:26:35 -0700 (PDT)
+        Sat, 20 May 2023 14:27:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39748199A;
+        Sat, 20 May 2023 11:26:52 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EE03C616DD;
-        Sat, 20 May 2023 18:23:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 972D4C433D2;
-        Sat, 20 May 2023 18:23:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BB2CA616F1;
+        Sat, 20 May 2023 18:24:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 605BCC4339B;
+        Sat, 20 May 2023 18:24:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684607024;
-        bh=sFCQ4KYq+xqXpRBzo2EOBj2+f/Qf46ErrZESno4vpSk=;
+        s=k20201202; t=1684607069;
+        bh=GBeSLJIX8UIkYb9sZu6S8yqG1JK98fV0232YBA07j4c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nG8gP6XikrDvizEQL1R5f96oyREa8QrGfJYVKxDcPXYbqQotsNhU7/gaTWVP4Uq0w
-         99Q9lTt8mqb+OYYMb7oSxsVzXK6VU9W/ylEFd8UabhOhsCF0eZIxmEAi99XctPh88e
-         6TY2xY8E3nK5gN6RHReEXvVLlEpZ+vX6sj+ZwaaAg2Kz70iygvHVtDrkMimfauiHJ2
-         6RLlPgfmrClu7IiN7IxFOz6Z9AdCbDMH4BDeAsiKScDXGTLQ5SQWeATMAp5mOLTNbo
-         kjgmTHW8+lP5I3FSUtvzPygXmA3jcoRVJtqlqlalqJN2aJ5wksbSqP5g139A4tQprg
-         jJqzac4+TvWoA==
+        b=EFh/Kbszm96xgUdbRDHFw5OGvgsvg4pgz8iGNJsF0nezdld224cc276XqeUcNxUC/
+         E3nHLQoV2imDh3BaD4TBnlH3UMO9ELzSWnc7ryHlCW/Yez7Libw0DbPBUbO720JtRh
+         Jo1/IqRBPCuVYAhAcXr2p3Y72n8hPv8qtP/89DR6M7uyp2hhRjN+BxlN00eumymJZ0
+         4A8tvkziVW4KxQU6HjZLGAukDIvI7l/gmguc+A0Fe0XSstl74HO4citXH1+FD8NKrZ
+         +Cgzqpp15wfk60YFn0Lx01y6Vg0j5d0x15HHOW72qGl+KDJ+8qibh0o1ldDXRFcVik
+         ArZDyiI0ko/wQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ivan Orlov <ivan.orlov0322@gmail.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         josef@toxicpanda.com, linux-block@vger.kernel.org,
         nbd@other.debian.org
-Subject: [PATCH AUTOSEL 5.10 7/8] nbd: Fix debugfs_create_dir error checking
-Date:   Sat, 20 May 2023 14:23:11 -0400
-Message-Id: <20230520182312.851751-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 5/5] nbd: Fix debugfs_create_dir error checking
+Date:   Sat, 20 May 2023 14:24:09 -0400
+Message-Id: <20230520182412.860973-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230520182312.851751-1-sashal@kernel.org>
-References: <20230520182312.851751-1-sashal@kernel.org>
+In-Reply-To: <20230520182412.860973-1-sashal@kernel.org>
+References: <20230520182412.860973-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -69,10 +69,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index dbcd903ba128f..b6940f0a9c905 100644
+index cc66983e8b6ab..28024248a7b53 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1624,7 +1624,7 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
+@@ -1547,7 +1547,7 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
  		return -EIO;
  
  	dir = debugfs_create_dir(nbd_name(nbd), nbd_dbg_dir);
@@ -81,7 +81,7 @@ index dbcd903ba128f..b6940f0a9c905 100644
  		dev_err(nbd_to_dev(nbd), "Failed to create debugfs dir for '%s'\n",
  			nbd_name(nbd));
  		return -EIO;
-@@ -1650,7 +1650,7 @@ static int nbd_dbg_init(void)
+@@ -1573,7 +1573,7 @@ static int nbd_dbg_init(void)
  	struct dentry *dbg_dir;
  
  	dbg_dir = debugfs_create_dir("nbd", NULL);
