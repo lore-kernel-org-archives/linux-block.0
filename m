@@ -2,144 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F7CC77B7F
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 08:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3776DC7EE26
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 08:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbjETIlm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 May 2023 04:41:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33168 "EHLO
+        id S231255AbjETIl5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 May 2023 04:41:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbjETIll (ORCPT
+        with ESMTP id S231240AbjETIlz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 May 2023 04:41:41 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CF61BB;
-        Sat, 20 May 2023 01:41:40 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5289cf35eeaso1192199a12.1;
-        Sat, 20 May 2023 01:41:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684572100; x=1687164100;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vzxA/hUX8foGgVXJvxnvVqkQ7/8Ii0zngzDlNRrcVao=;
-        b=osT526hGGFNfKga9XAnWB+RDp+UhUagqtAwio/C3iMrelWVrgJXT8tcECs0j58hc9r
-         eHOcf0fdKdjp9mCUCLlor+yreygqZEDV+w9MDCikIWCT6t4VsPakWKG6IEc+MBUZEjH9
-         79NkwpUdViEUpZX8ypoemxgt4bVRp7rp7Tim+ixB2AiSX7T3QxkVoFuU40GT3m3gt7d3
-         VKFenLKZeV3n8mot8juuGmpC55fdhHi74uDGIz7GlbO9VRvDRXUd+V/x5BeGzHcM9M9w
-         LChOcWa4BaRYfqBSJDb1KSSSq0ZYxfRB+4kKYZXUrl+LejEfByoDNhwxfukVEGKF8HBN
-         IacA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684572100; x=1687164100;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vzxA/hUX8foGgVXJvxnvVqkQ7/8Ii0zngzDlNRrcVao=;
-        b=bvbbOQr5KAs4FQCAg1si03sPa6RCaQASB3Vi6kwqMJTaOZdxwCaq5QVYRI51UiLUa0
-         54rCqNVAQkj2uQaj79D9l1yv0uqIJ/gBSo3eiG4GJ0Rf1ipzvihHHb50EI6Nj9hnizPO
-         eB1yqeQMNXdHJrXkE1gzc8UO6byWU77pHkhierWO4OpGFygS1ahwDhv6ybpIN+gXLU9n
-         zUbYHZOkHOKK0TiLVN0ci3gvMfVF/wKZL6M6oRepn4njQHF0RTrTI4IiG6zEStGzeyiV
-         oA1/hoSIaNJIYQPpvo4UzSqCCOUjXSsgS8hzBDH5GZYyw+mi0pAVSP3qI8MbaG1VHKrw
-         aG1w==
-X-Gm-Message-State: AC+VfDy0c1XsOFKCpMX4SBiHyvb1kYKge/m7En5mzxRLzAh0K35LvWec
-        BP6HZ6HIN3a9TJyjNGPzl5PP35Ohx10RSg==
-X-Google-Smtp-Source: ACHHUZ4STBzVjUEyLV4bd91LOoHt7wSc+I3MFY6emKyPItNgIZ+xPE+O862akqN5mtxn1XnQqCFwBw==
-X-Received: by 2002:a17:90b:f84:b0:247:14ac:4d3a with SMTP id ft4-20020a17090b0f8400b0024714ac4d3amr5385444pjb.20.1684572099886;
-        Sat, 20 May 2023 01:41:39 -0700 (PDT)
-Received: from localhost.localdomain ([43.132.141.9])
-        by smtp.gmail.com with ESMTPSA id d61-20020a17090a6f4300b0024dfbac9e2fsm2810726pjk.21.2023.05.20.01.41.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 May 2023 01:41:39 -0700 (PDT)
-From:   Hengqi Chen <hengqi.chen@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
-        bpf@vger.kernel.org, yhs@meta.com, hengqi.chen@gmail.com,
-        Francis Laniel <flaniel@linux.microsoft.com>
-Subject: [PATCH] block: introduce block_io_start/block_io_done tracepoints
-Date:   Sat, 20 May 2023 08:40:57 +0000
-Message-Id: <20230520084057.1467003-1-hengqi.chen@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Sat, 20 May 2023 04:41:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F4219A
+        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 01:41:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684572068;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZfsN9u3tZvTje8ugz3SqEzdJkX9NnPmdfbSTVEwM6F0=;
+        b=LUIbjA5jvwGp1zEOjJL6xbMN1jKYzWrpZZqIoNVUFU6TAaBDE7gaNajCXdxzgobIjpBd1x
+        BxVs5Z53Rns6pvcAZnS+ueU0r9B8BZ6jPlp8f11XI4jlEqzzG9XNoPf+ixj2acyU1mhLr4
+        SEM+KWznELPcudie2fI5wz1D/WYWJDE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-551-CYBqTh54MsOJt7lOdtj2Og-1; Sat, 20 May 2023 04:41:04 -0400
+X-MC-Unique: CYBqTh54MsOJt7lOdtj2Og-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 180A7101A52C;
+        Sat, 20 May 2023 08:41:03 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 90E2DC53524;
+        Sat, 20 May 2023 08:41:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZGghr0/lFRKmaoAX@moria.home.lan>
+References: <ZGghr0/lFRKmaoAX@moria.home.lan> <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-30-dhowells@redhat.com>
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v20 29/32] block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted logic
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2292307.1684572059.1@warthog.procyon.org.uk>
+Date:   Sat, 20 May 2023 09:40:59 +0100
+Message-ID: <2292308.1684572059@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, several BCC ([0]) tools (biosnoop/biostacks/biotop) use
-kprobes to blk_account_io_start/blk_account_io_done to implement
-their functionalities. This is fragile because the target kernel
-functions may be renamed ([1]) or inlined ([2]). So introduces two
-new tracepoints for such use cases.
+Kent Overstreet <kent.overstreet@linux.dev> wrote:
 
-  [0]: https://github.com/iovisor/bcc
-  [1]: https://github.com/iovisor/bcc/issues/3954
-  [2]: https://github.com/iovisor/bcc/issues/4261
+> > Replace BIO_NO_PAGE_REF with a BIO_PAGE_REFFED flag that has the inverted
+> > meaning is only set when a page reference has been acquired that needs to
+> > be released by bio_release_pages().
+> 
+> What was the motivation for this patch?
 
-Tested-by: Francis Laniel <flaniel@linux.microsoft.com>
-Signed-off-by: Hengqi Chen <hengqi.chen@gmail.com>
----
- block/blk-mq.c               |  4 ++++
- include/trace/events/block.h | 26 ++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+We need to move to using FOLL_PIN for buffers derived from direct I/O to avoid
+the fork vs async-DIO race.  Further, we shouldn't be taking a ref or a pin on
+pages derived from internal kernel iterators such as KVEC or BVEC as the page
+refcount might not be a valid way to control the lifetime of the data/buffers
+in those pages (slab, for instance).  Rather, for internal kernel I/O, we need
+to rely on the caller to hold onto the memory until we tell them we've
+finished.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f6dad0886a2f..faa1c7992876 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -957,6 +957,8 @@ EXPORT_SYMBOL_GPL(blk_update_request);
- 
- static inline void blk_account_io_done(struct request *req, u64 now)
- {
-+	trace_block_io_done(req);
-+
- 	/*
- 	 * Account IO completion.  flush_rq isn't accounted as a
- 	 * normal IO on queueing nor completion.  Accounting the
-@@ -976,6 +978,8 @@ static inline void blk_account_io_done(struct request *req, u64 now)
- 
- static inline void blk_account_io_start(struct request *req)
- {
-+	trace_block_io_start(req);
-+
- 	if (blk_do_io_stat(req)) {
- 		/*
- 		 * All non-passthrough requests are created from a bio with one
-diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 7f4dfbdf12a6..40e60c33cc6f 100644
---- a/include/trace/events/block.h
-+++ b/include/trace/events/block.h
-@@ -245,6 +245,32 @@ DEFINE_EVENT(block_rq, block_rq_merge,
- 	TP_ARGS(rq)
- );
- 
-+/**
-+ * block_io_start - insert a request for execution
-+ * @rq: block IO operation request
-+ *
-+ * Called when block operation request @rq is queued for execution
-+ */
-+DEFINE_EVENT(block_rq, block_io_start,
-+
-+	TP_PROTO(struct request *rq),
-+
-+	TP_ARGS(rq)
-+);
-+
-+/**
-+ * block_io_done - block IO operation request completed
-+ * @rq: block IO operation request
-+ *
-+ * Called when block operation request @rq is completed
-+ */
-+DEFINE_EVENT(block_rq, block_io_done,
-+
-+	TP_PROTO(struct request *rq),
-+
-+	TP_ARGS(rq)
-+);
-+
- /**
-  * block_bio_complete - completed all work on the block operation
-  * @q: queue holding the block operation
--- 
-2.34.1
+So we flip the polarity of the page-is-ref'd flag and then add a
+page-is-pinned flag.  The intention is to ultimately drop the page-is-ref'd
+flag - but we still need to keep the page-is-pinned flag.  This makes it
+easier to take a stepwise approach - and having both flags working the same
+way makes the logic easier to follow.
+
+See iov_iter_extract_pages() and iov_iter_extract_will_pin().
+
+David
 
