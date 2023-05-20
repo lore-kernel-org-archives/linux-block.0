@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E2BC7EE2D
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43912C77B7A
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 00:04:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231871AbjETAEq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 May 2023 20:04:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52572 "EHLO
+        id S232094AbjETAEr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 May 2023 20:04:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231823AbjETAD5 (ORCPT
+        with ESMTP id S231866AbjETAD7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 May 2023 20:03:57 -0400
+        Fri, 19 May 2023 20:03:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0027F1BC8
-        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:02:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887FC19B3
+        for <linux-block@vger.kernel.org>; Fri, 19 May 2023 17:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684540936;
+        s=mimecast20190719; t=1684540925;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fg25eeUYeYYdZ/6VEaLafGCYFAO2kBY9m762euh7YIo=;
-        b=FgFJdm4D9SpqyRjnmjgTY5OcVklfs/nEkmCwS6tm6K8t8b0YekSk2uFGTHNlOANdRqv5Jr
-        M+nCyVBMraeFVkny/Ab3SLDHHLED/xxRhi+Xj0zrrpoU+52U55QeQoseIqgj7khLgZFsmj
-        OJhJbZzT+UPfKxdmDSH5BziRdlwX3vA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=6eCSJNH8vHFST21uMhvhB9UZGjvTsMZCtNRoglPFw+I=;
+        b=XJvHoBPixtMQdg66N2WuvXN/ChT98LtUCG8SZlhOC+amCioUam3Mmy9U1srRl8Va3Hapag
+        N1pHBV892a/ldjAK9+41k9bZ0BNlZpd8dtRn9Bz3GhtzcfJ5ck/WlOMvyccobYVK+5s/p1
+        xPFastMLok1IK+mIFahaD9OBROpn+6k=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-54-C8zFKqYaNZCOViPhzBCcFA-1; Fri, 19 May 2023 20:02:12 -0400
-X-MC-Unique: C8zFKqYaNZCOViPhzBCcFA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-518-Vi3VpzDTNn22brcNxkPP8Q-1; Fri, 19 May 2023 20:02:00 -0400
+X-MC-Unique: Vi3VpzDTNn22brcNxkPP8Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 368B3800969;
-        Sat, 20 May 2023 00:02:11 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A4411C05AEB;
+        Sat, 20 May 2023 00:01:59 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.42.28.221])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 142E040CFD46;
-        Sat, 20 May 2023 00:02:08 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C7A94F2DE2;
+        Sat, 20 May 2023 00:01:56 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,93 +53,83 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
-Subject: [PATCH v21 25/30] zonefs: Provide a splice-read stub
-Date:   Sat, 20 May 2023 01:00:44 +0100
-Message-Id: <20230520000049.2226926-26-dhowells@redhat.com>
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        ntfs3@lists.linux.dev
+Subject: [PATCH v21 21/30] ntfs3: Provide a splice-read stub
+Date:   Sat, 20 May 2023 01:00:40 +0100
+Message-Id: <20230520000049.2226926-22-dhowells@redhat.com>
 In-Reply-To: <20230520000049.2226926-1-dhowells@redhat.com>
 References: <20230520000049.2226926-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read stub for zonefs.  This does some checks before
-proceeding and locks the inode across the call to filemap_splice_read() and
-a size check in case of truncation.  Splicing from direct I/O is handled by
-the caller.
+Provide a splice_read stub for NTFS3 to perform various checks before
+allowing the operation to proceed.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Darrick J. Wong <djwong@kernel.org>
-cc: linux-xfs@vger.kernel.org
+cc: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+cc: ntfs3@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/zonefs/file.c | 40 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+ fs/ntfs3/file.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/fs/zonefs/file.c b/fs/zonefs/file.c
-index 132f01d3461f..65d4c4fe6364 100644
---- a/fs/zonefs/file.c
-+++ b/fs/zonefs/file.c
-@@ -752,6 +752,44 @@ static ssize_t zonefs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	return ret;
+diff --git a/fs/ntfs3/file.c b/fs/ntfs3/file.c
+index 9a3d55c367d9..667c9dc68b58 100644
+--- a/fs/ntfs3/file.c
++++ b/fs/ntfs3/file.c
+@@ -744,6 +744,35 @@ static ssize_t ntfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 	return generic_file_read_iter(iocb, iter);
  }
  
-+static ssize_t zonefs_file_splice_read(struct file *in, loff_t *ppos,
-+				       struct pipe_inode_info *pipe,
-+				       size_t len, unsigned int flags)
++static ssize_t ntfs_file_splice_read(struct file *in, loff_t *ppos,
++				     struct pipe_inode_info *pipe,
++				     size_t len, unsigned int flags)
 +{
-+	struct inode *inode = file_inode(in);
-+	struct zonefs_inode_info *zi = ZONEFS_I(inode);
-+	struct zonefs_zone *z = zonefs_inode_zone(inode);
-+	loff_t isize;
-+	ssize_t ret = 0;
++	struct inode *inode = in->f_mapping->host;
++	struct ntfs_inode *ni = ntfs_i(inode);
 +
-+	/* Offline zones cannot be read */
-+	if (unlikely(IS_IMMUTABLE(inode) && !(inode->i_mode & 0777)))
-+		return -EPERM;
-+
-+	if (*ppos >= z->z_capacity)
-+		return 0;
-+
-+	inode_lock_shared(inode);
-+
-+	/* Limit read operations to written data */
-+	mutex_lock(&zi->i_truncate_mutex);
-+	isize = i_size_read(inode);
-+	if (*ppos >= isize)
-+		len = 0;
-+	else
-+		len = min_t(loff_t, len, isize - *ppos);
-+	mutex_unlock(&zi->i_truncate_mutex);
-+
-+	if (len > 0) {
-+		ret = filemap_splice_read(in, ppos, pipe, len, flags);
-+		if (ret == -EIO)
-+			zonefs_io_error(inode, false);
++	if (is_encrypted(ni)) {
++		ntfs_inode_warn(inode, "encrypted i/o not supported");
++		return -EOPNOTSUPP;
 +	}
 +
-+	inode_unlock_shared(inode);
-+	return ret;
++#ifndef CONFIG_NTFS3_LZX_XPRESS
++	if (ni->ni_flags & NI_FLAG_COMPRESSED_MASK) {
++		ntfs_inode_warn(
++			inode,
++			"activate CONFIG_NTFS3_LZX_XPRESS to read external compressed files");
++		return -EOPNOTSUPP;
++	}
++#endif
++
++	if (is_dedup(ni)) {
++		ntfs_inode_warn(inode, "read deduplicated not supported");
++		return -EOPNOTSUPP;
++	}
++
++	return generic_file_splice_read(in, ppos, pipe, len, flags);
 +}
 +
  /*
-  * Write open accounting is done only for sequential files.
-  */
-@@ -896,7 +934,7 @@ const struct file_operations zonefs_file_operations = {
- 	.llseek		= zonefs_file_llseek,
- 	.read_iter	= zonefs_file_read_iter,
- 	.write_iter	= zonefs_file_write_iter,
+  * ntfs_get_frame_pages
+  *
+@@ -1159,7 +1188,7 @@ const struct file_operations ntfs_file_operations = {
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= ntfs_compat_ioctl,
+ #endif
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= zonefs_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.iopoll		= iocb_bio_iopoll,
- };
++	.splice_read	= ntfs_file_splice_read,
+ 	.mmap		= ntfs_file_mmap,
+ 	.open		= ntfs_file_open,
+ 	.fsync		= generic_file_fsync,
 
