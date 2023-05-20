@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB63C7EE23
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 18:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7CCC77B7F
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 18:27:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232221AbjETSZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 May 2023 14:25:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
+        id S232268AbjETS1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 May 2023 14:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232224AbjETSZh (ORCPT
+        with ESMTP id S232090AbjETS1P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 May 2023 14:25:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6991709;
-        Sat, 20 May 2023 11:24:46 -0700 (PDT)
+        Sat, 20 May 2023 14:27:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1F31BD3;
+        Sat, 20 May 2023 11:26:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 57182601D6;
-        Sat, 20 May 2023 18:23:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5B58C433D2;
-        Sat, 20 May 2023 18:23:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9F5B2616E8;
+        Sat, 20 May 2023 18:23:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02813C4339C;
+        Sat, 20 May 2023 18:23:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684606990;
-        bh=ANgRJ7ub0peL9/r3P+lPVfLhYchmVfojVvwGuHpSkhw=;
+        s=k20201202; t=1684607026;
+        bh=xh7iFClTNrBmUWKlMC42PsRuhE+xIlxos9/fPlQff7Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ITYqcyIYveZci9XPCKrS3q3z7+DilZCMnjzXryhgR5IbTQO1tNpdZbZsWoPuYmyRt
-         MdUMQqeWCgX/UOKIL9IF+Lm8ggegymyNYyDhx6oNFV4h2QMEQmhOG6yv1WbQPmSY3y
-         O5z0WuxFTn5BCUHRfwPhuRcF640iLrp62KxSK/PjDdIxT+LYlIT47ceEaMPOQZZOBJ
-         dizOING3E7pKPa4+CGbpneJXF/dEO9HIOKZ7DwrVOseZvPc9RHFeJrdOl640Q4ocD8
-         w6BX+QojellV/bt6lm1g2iXDZqoXAGiy5f9+wGem5g0izoqBxOeAGAFXz8sOyscdx+
-         Ng78FZfIdH+Qw==
+        b=A3Ps8pI/qL3EKiL6QiACca5CKA7vR6JMgLpnIz1pqtV5YZgyhx65HRlM0fz7CHoiK
+         6jwIWw/jyyRMTEZTSlEpO04wVvY3usaWuBNFEJ+ZAjw0PAOp+CFPiWTOKUNlFyLALi
+         9jZlIRDYHLEKmQ5InaovpOX6qPPSKUqNe3tK+Z/2JMOCnb8tLz0NWOl7m4WwoqVIch
+         1ZGUxA5juDPwkOWV6y/mL5ivy4DN9GVlxEcDIKrSBv3+g+7UaW7tE4RH8ag+CPdAJx
+         ObTAW4flMgTiblJKHXhWrKNsRYxGrib5Zo7NiDL8pLtcYVkzbGHM/WOsfaV1quFZPn
+         7U8pPdeMHd+5A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Guoqing Jiang <guoqing.jiang@linux.dev>,
@@ -40,12 +40,12 @@ Cc:     Guoqing Jiang <guoqing.jiang@linux.dev>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         haris.iqbal@ionos.com, jinpu.wang@ionos.com,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 11/11] block/rnbd: replace REQ_OP_FLUSH with REQ_OP_WRITE
-Date:   Sat, 20 May 2023 14:22:14 -0400
-Message-Id: <20230520182215.845131-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 8/8] block/rnbd: replace REQ_OP_FLUSH with REQ_OP_WRITE
+Date:   Sat, 20 May 2023 14:23:12 -0400
+Message-Id: <20230520182312.851751-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230520182215.845131-1-sashal@kernel.org>
-References: <20230520182215.845131-1-sashal@kernel.org>
+In-Reply-To: <20230520182312.851751-1-sashal@kernel.org>
+References: <20230520182312.851751-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -106,10 +106,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-proto.h
-index c1bc5c0fef71d..e0fe0a9aa3708 100644
+index ca166241452c2..cb11855455dde 100644
 --- a/drivers/block/rnbd/rnbd-proto.h
 +++ b/drivers/block/rnbd/rnbd-proto.h
-@@ -241,7 +241,7 @@ static inline u32 rnbd_to_bio_flags(u32 rnbd_opf)
+@@ -234,7 +234,7 @@ static inline u32 rnbd_to_bio_flags(u32 rnbd_opf)
  		bio_opf = REQ_OP_WRITE;
  		break;
  	case RNBD_OP_FLUSH:
