@@ -2,50 +2,40 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 932D8C7EE2A
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 09:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF5BC7EE23
+	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 09:57:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbjETJwv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 May 2023 05:52:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48292 "EHLO
+        id S231495AbjETJ47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 May 2023 05:56:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231430AbjETJwu (ORCPT
+        with ESMTP id S231304AbjETJ46 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 May 2023 05:52:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C8DE42
-        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 02:52:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684576322;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=i3MXR5vwAlfKtddPj9gA3/q/baC/SH/wWtpYvDWrk3w=;
-        b=C66zvypRsGY88sNnx7TaBMGIBZYoYWRRMW1e1nCm5CG7kN1oL9BBee0ETC5x8xTx2zqRtj
-        ITpGUehS4wmaBJMu6IlLr3bkRKhI0IsupOManQ3rlIaTYXsF4RTBWGLuC8NFJ+EjhCMWQm
-        skdHmQz50TIbHEwyKBXYLVyTExjQHPE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-414-KL2kr8WWOnKAxXEfx7zgIA-1; Sat, 20 May 2023 05:51:58 -0400
-X-MC-Unique: KL2kr8WWOnKAxXEfx7zgIA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Sat, 20 May 2023 05:56:58 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79FAFE4B;
+        Sat, 20 May 2023 02:56:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8C0DE1C05B18;
-        Sat, 20 May 2023 09:51:57 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B7D887C52;
-        Sat, 20 May 2023 09:51:54 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-In-Reply-To: <20230520-sekunde-vorteil-f2d588e40b68@brauner>
-References: <20230520-sekunde-vorteil-f2d588e40b68@brauner> <20230520000049.2226926-1-dhowells@redhat.com> <20230520000049.2226926-4-dhowells@redhat.com>
-To:     Christian Brauner <brauner@kernel.org>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 12FA361216;
+        Sat, 20 May 2023 09:56:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49690C433D2;
+        Sat, 20 May 2023 09:56:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684576616;
+        bh=R+IUlwfsEDigEEuSuAI8xzMd6xiNbhVZfGfTlrvqt7U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=EeqidhNNRRUeIuHgx1VHNmuJlYffUcAUAmybhmTnBF6woRKd8lTiZ0rHCm472lApD
+         +dujFnS9iRdI9+vX3+sg2zNR638y3LeBEidqPYTqHSIm+yclc8YiPZafSQOK3rB1fI
+         +wh06FsQP10GRIvUpL7sT+gdsFj7G/OsZhcbOsemnIUqAY3M4jLUGMSdKcb+Ji056X
+         EdZoLKWrJXHDGxaF9MT9tlwqNLZxdQVNWhChKFt3AjVQUFlo+wMuE2mS1ri7DP8EHp
+         lQAvUOqnUHAXhY233Lmu7rzs9CPXZ/k/Z1Gwjw5AHhUtY7Rp50DckH2n/eaWFjE20P
+         wSk56yEfFEK2g==
+Date:   Sat, 20 May 2023 11:56:49 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
@@ -57,26 +47,33 @@ Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v21 03/30] splice: Rename direct_splice_read() to copy_splice_read()
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v21 28/30] splice: Use filemap_splice_read() instead of
+ generic_file_splice_read()
+Message-ID: <20230520-ortsgemeinde-rente-e7c4fb923937@brauner>
+References: <20230520000049.2226926-1-dhowells@redhat.com>
+ <20230520000049.2226926-29-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2294856.1684576277.1@warthog.procyon.org.uk>
-From:   David Howells <dhowells@redhat.com>
-Date:   Sat, 20 May 2023 10:51:54 +0100
-Message-ID: <2294949.1684576314@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230520000049.2226926-29-dhowells@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christian Brauner <brauner@kernel.org> wrote:
+On Sat, May 20, 2023 at 01:00:47AM +0100, David Howells wrote:
+> Replace pointers to generic_file_splice_read() with calls to
+> filemap_splice_read().
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: David Hildenbrand <david@redhat.com>
+> cc: John Hubbard <jhubbard@nvidia.com>
+> cc: linux-mm@kvack.org
+> cc: linux-block@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> ---
 
-> For the future it'd be nice if exported functions would always get
-> proper kernel doc,
-
-Good point.  It wasn't meant to remain exported originally.  I'll add a patch
-to add that.
-
-David
-
+Reviewed-by: Christian Brauner <brauner@kernel.org>
