@@ -2,68 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 264A5C77B7F
-	for <linux-block@archiver.kernel.org>; Sat, 20 May 2023 18:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48EC9C7EE23
+	for <linux-block@archiver.kernel.org>; Sun, 21 May 2023 00:27:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232197AbjETSdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 May 2023 14:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54088 "EHLO
+        id S229648AbjEUA1b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 May 2023 20:27:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232198AbjETSda (ORCPT
+        with ESMTP id S229480AbjEUA1a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 May 2023 14:33:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E7F91712
-        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 11:33:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EA5AE612A4
-        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 18:31:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 57A50C433D2;
-        Sat, 20 May 2023 18:31:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684607495;
-        bh=W6+ahIKr+DysNSSOzpT+7TFm2KysklrZeARYWExrBX0=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=oYDSv2MhSywdy+UaF4NaWlKKgoBaPD6IVz/suHgp2E/ulm6bg9gRDtOHqHyQILRK7
-         lrPUd9xYG7qYWyga/yzzTMgdz3Y9M585Komu2ZzPXl7p2ycsOdNDJJp/cE/YznFvSd
-         OjOdLFCwWThDrIihphAyl7IcZ5B3KhwT3CSjuMhyA8mOypdUN7BS/xKgVySZLHVfH7
-         HJebpa9VA5498dq1cZ8YaMwvGw0qjVXTLvlyLvS3XANtanWP9HlYJite+TpkU3fKgA
-         Gu2khFS3pAHIa1/Ybqe06v6rjmPR8JuWYVJpslb0Pk/+ID3ws79Dj6ISSqIJToW0XJ
-         bh2T4aF7gEFLQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43D6CC73FE0;
-        Sat, 20 May 2023 18:31:35 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.4-rc3
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <26d11955-8978-1be6-628d-4b8ecda5f6a8@kernel.dk>
-References: <26d11955-8978-1be6-628d-4b8ecda5f6a8@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <26d11955-8978-1be6-628d-4b8ecda5f6a8@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.4-2023-05-20
-X-PR-Tracked-Commit-Id: e3afec91aad23c52dfe426c7d7128e4839c3eed8
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 98be58a6e9310fbfa757d438b0b51f857ce17ee4
-Message-Id: <168460749525.29791.8330925647482406935.pr-tracker-bot@kernel.org>
-Date:   Sat, 20 May 2023 18:31:35 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Sat, 20 May 2023 20:27:30 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B0E11F
+        for <linux-block@vger.kernel.org>; Sat, 20 May 2023 17:27:26 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-120-46.bstnma.fios.verizon.net [173.48.120.46])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 34L0QXY5025308
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 20 May 2023 20:26:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1684628801; bh=9eqcIzS90vnBQyM2ULk0Xad6DIwhxJd9pXvwxDT5agA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=A7s9yjjs1TBgqn+gjf9Hj7xacMo4w4aYV4pZ4boAwBJMKMvQWe+RMxIaZ5voydTo9
+         fzuTP9lDyOjxHdCtB5SC3OFBwx9XCJ9hGZrF99bBo8YVUDZWxn0sBQ2JpVM+dJFMnX
+         cnu27yYekG/5ZGpiTVtRgYH40kySbm4j1uBx5FoupvHx0eqEWSK3UnVlERqM4DJJq3
+         QcJWADWsI+eON5HwrDf7uUa3hXhp/maoPNGhjV17IvT3oCrs8BdIcsj06okrcGNFMq
+         8ePkbEFz+t3D2MhcKaiZGmk9Ff9skg/gyyQxbAqpXlQkwLTgcdgcMGniG7jyULMiNM
+         ZQmCn3Cjb/Btg==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 9EFD915C02EE; Sat, 20 May 2023 20:26:33 -0400 (EDT)
+Date:   Sat, 20 May 2023 20:26:33 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-ext4@vger.kernel.org
+Subject: Re: [PATCH v21 18/30] ext4: Provide a splice-read stub
+Message-ID: <20230521002633.GA207046@mit.edu>
+References: <ZGhIpbrgQaPRPC3c@infradead.org>
+ <20230520000049.2226926-1-dhowells@redhat.com>
+ <20230520000049.2226926-19-dhowells@redhat.com>
+ <2233565.1684567304@warthog.procyon.org.uk>
+ <ZGiMewK8CW7DB4sl@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZGiMewK8CW7DB4sl@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sat, 20 May 2023 06:03:13 -0600:
+On Sat, May 20, 2023 at 02:01:47AM -0700, Christoph Hellwig wrote:
+> On Sat, May 20, 2023 at 08:21:44AM +0100, David Howells wrote:
+> > Christoph Hellwig <hch@infradead.org> wrote:
+> > 
+> > > Not sure I'd call this a stub, but then again I'm not a native speaker.
+> > 
+> > "Wrapper"?
+> 
+> That's what I'd call it, yes.
 
-> git://git.kernel.dk/linux.git tags/block-6.4-2023-05-20
+Agreed, "wrapper" is a better term.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/98be58a6e9310fbfa757d438b0b51f857ce17ee4
+Other than that,
 
-Thank you!
+Acked-by: Theodore Ts'o <tytso@mit.edu>
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+
