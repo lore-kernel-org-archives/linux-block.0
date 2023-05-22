@@ -2,169 +2,157 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C99C7EE2F
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 12:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0BEBC77B75
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:47:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233700AbjEVMxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 08:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53652 "EHLO
+        id S233624AbjEVNrz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:47:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233835AbjEVMxs (ORCPT
+        with ESMTP id S231231AbjEVNry (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 08:53:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5070AC;
-        Mon, 22 May 2023 05:53:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 521B76182C;
-        Mon, 22 May 2023 12:53:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452FFC433EF;
-        Mon, 22 May 2023 12:53:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684760023;
-        bh=ImInocG/5tz/0H3zPAKjnZJKUJJ7f7gU8sP1cCYTc4M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WoCejcijL504amG1JWhHwZTY9ANeFzKIntYQLP07J5uj6is7A9fQS3E45NEVz8wk6
-         ijfRl5PO3lTu/TTTIv32g7R7yLRypfiWOTi3Uj/0KvpuFrOTVcMel9+d2wSGIkyYdu
-         vUWYxwspLqeF3kuLLovyI+OOPx0h36hOwidawlUZUg9fAT5m8b6iSCy+1CpVnsDVp7
-         WsqlRyT5zrYfRVFyupWZadvSK20ofoJ9ED4LN+qqMECRszCrYQYsWxjuqjJ6xikft9
-         Dj+RJ+BTQGXrekuYCaTiR3iKGCv67tOqqWySpi7M8dOONCCzlP1x8letugsbywO8H1
-         ygjRrnqit//Zw==
-Date:   Mon, 22 May 2023 14:53:31 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v21 03/30] splice: Rename direct_splice_read() to
- copy_splice_read()
-Message-ID: <20230522-pfund-ferngeblieben-53fad9c0e527@brauner>
-References: <20230520-sekunde-vorteil-f2d588e40b68@brauner>
- <20230520000049.2226926-1-dhowells@redhat.com>
- <20230520000049.2226926-4-dhowells@redhat.com>
- <2468127.1684742114@warthog.procyon.org.uk>
+        Mon, 22 May 2023 09:47:54 -0400
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 677A7ED
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:47:53 -0700 (PDT)
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-333eb36e510so45725705ab.1
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:47:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684763272; x=1687355272;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q4aast/ekNya0wedXkzIO8MimHmpqr/ODo7xmBUijHc=;
+        b=j2/pZRNRBN/cWSjV2LG26jQp/uqimZPaQRiyOcwulcrRvCU8IrUYnuAhAlPjiUNmBR
+         Dg5BrlxtrVOveRhxVGEm/g0XmCBo5GcrvhE/pEASSDyKf4E2ipyaW/Gu6kzjVyCd6IH6
+         KT8XBkOCeubInwmjaWdPPt/OfWDwgWjwHhpnI28L2FnnbLBGT4AwfiR9iCmFNv3D7+ld
+         jk6zoumGY2NbaeUFhpyTTOLuuyq0sbAfqEZPpP0gce2oLAL9amr11ixbSFvrjizPfmiY
+         78rK6zJlIIoQeXi21l69kiK9iO+92hzJN6u7zYdLBQqgzj5zRumoKyb/PTq3Js/cQbVm
+         dkug==
+X-Gm-Message-State: AC+VfDyWhKhfiluWzAVsjArZcvnvVcGW9u1cDMKdNKpr6ETppE9MUoUb
+        RbQFSWkk2PU4awL4JlWJW5mIBVety8lCgCL2HoeH7mI+T4JR
+X-Google-Smtp-Source: ACHHUZ5d9veiq+OYSSIG/pl6NIZgDVfTHjzhhrjqq2b7HOWq1idHmo3KxazSnPnuYVHi8HTTWGX+zaUKMXiHW+K0B03DQcG4hUCP
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2468127.1684742114@warthog.procyon.org.uk>
+X-Received: by 2002:a92:d8cb:0:b0:331:12ac:f633 with SMTP id
+ l11-20020a92d8cb000000b0033112acf633mr5565248ilo.0.1684763272715; Mon, 22 May
+ 2023 06:47:52 -0700 (PDT)
+Date:   Mon, 22 May 2023 06:47:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000066a94205fc488445@google.com>
+Subject: [syzbot] [block?] [reiserfs?] KASAN: user-memory-access Write in zram_slot_lock
+From:   syzbot <syzbot+b8d61a58b7c7ebd2c8e0@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        minchan@kernel.org, reiserfs-devel@vger.kernel.org,
+        senozhatsky@chromium.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 22, 2023 at 08:55:14AM +0100, David Howells wrote:
-> > For the future it'd be nice if exported functions would always get
-> > proper kernel doc,
-> 
-> Something like the attached?
-> 
-> David
-> ---
-> commit 0362042ba0751fc5457b0548fb9006f9d7dfbeca
-> Author: David Howells <dhowells@redhat.com>
-> Date:   Mon May 22 08:34:24 2023 +0100
-> 
->     splice: kdoc for filemap_splice_read() and copy_splice_read()
->     
->     Provide kerneldoc comments for filemap_splice_read() and
->     copy_splice_read().
->     
->     Signed-off-by: David Howells <dhowells@redhat.com>
->     cc: Christian Brauner <brauner@kernel.org>
->     cc: Christoph Hellwig <hch@lst.de>
->     cc: Jens Axboe <axboe@kernel.dk>
->     cc: Steve French <smfrench@gmail.com>
->     cc: Al Viro <viro@zeniv.linux.org.uk>
->     cc: linux-mm@kvack.org
->     cc: linux-block@vger.kernel.org
->     cc: linux-cifs@vger.kernel.org
->     cc: linux-fsdevel@vger.kernel.org
-> 
-> diff --git a/fs/splice.c b/fs/splice.c
-> index 9be4cb3b9879..5292a8fa929d 100644
-> --- a/fs/splice.c
-> +++ b/fs/splice.c
-> @@ -299,8 +299,25 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
->  	kfree(spd->partial);
->  }
->  
-> -/*
-> - * Copy data from a file into pages and then splice those into the output pipe.
-> +/**
-> + * copy_splice_read -  Copy data from a file and splice the copy into a pipe
-> + * @in: The file to read from
-> + * @ppos: Pointer to the file position to read from
-> + * @pipe: The pipe to splice into
-> + * @len: The amount to splice
-> + * @flags: The SPLICE_F_* flags
-> + *
-> + * This function allocates a bunch of pages sufficient to hold the requested
-> + * amount of data (but limited by the remaining pipe capacity), passes it to
-> + * the file's ->read_iter() to read into and then splices the used pages into
-> + * the pipe.
-> + *
-> + * On success, the number of bytes read will be returned and *@ppos will be
-> + * updated if appropriate; 0 will be returned if there is no more data to be
-> + * read; -EAGAIN will be returned if the pipe had no space, and some other
-> + * negative error code will be returned on error.  A short read may occur if
-> + * the pipe has insufficient space, we reach the end of the data or we hit a
-> + * hole.
->   */
+Hello,
 
-I think kdoc expects:
+syzbot found the following issue on:
 
-* Return: On success, the number of bytes read will be returned and *@ppos will be
-* updated if appropriate; 0 will be returned if there is no more data to be
-* read; -EAGAIN will be returned if the pipe had no space, and some other
-* negative error code will be returned on error.  A short read may occur if
-* the pipe has insufficient space, we reach the end of the data or we hit a
-* hole.
+HEAD commit:    44c026a73be8 Linux 6.4-rc3
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=10741fe9280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7d8067683055e3f5
+dashboard link: https://syzkaller.appspot.com/bug?extid=b8d61a58b7c7ebd2c8e0
+compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1223f7d9280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1245326a280000
 
-and similar for filemap_splice_read() other than that this looks good!
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/51c970de1750/disk-44c026a7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/799aacdbebeb/vmlinux-44c026a7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0afc45e7f608/bzImage-44c026a7.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/fd3a214bd6ba/mount_0.gz
 
->  ssize_t copy_splice_read(struct file *in, loff_t *ppos,
->  			 struct pipe_inode_info *pipe,
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index 603b562d69b1..1f235a6430fd 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -2871,9 +2871,24 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
->  	return spliced;
->  }
->  
-> -/*
-> - * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-> - * a pipe.
-> +/**
-> + * filemap_splice_read -  Splice data from a file's pagecache into a pipe
-> + * @in: The file to read from
-> + * @ppos: Pointer to the file position to read from
-> + * @pipe: The pipe to splice into
-> + * @len: The amount to splice
-> + * @flags: The SPLICE_F_* flags
-> + *
-> + * This function gets folios from a file's pagecache and splices them into the
-> + * pipe.  Readahead will be called as necessary to fill more folios.  This may
-> + * be used for blockdevs also.
-> + *
-> + * On success, the number of bytes read will be returned and *@ppos will be
-> + * updated if appropriate; 0 will be returned if there is no more data to be
-> + * read; -EAGAIN will be returned if the pipe had no space, and some other
-> + * negative error code will be returned on error.  A short read may occur if
-> + * the pipe has insufficient space, we reach the end of the data or we hit a
-> + * hole.
->   */
->  ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
->  			    struct pipe_inode_info *pipe,
-> 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b8d61a58b7c7ebd2c8e0@syzkaller.appspotmail.com
+
+loop0: detected capacity change from 0 to 8192
+REISERFS warning:  read_super_block: reiserfs filesystem is deprecated and scheduled to be removed from the kernel in 2025
+REISERFS (device loop0): found reiserfs format "3.5" with non-standard journal
+REISERFS (device loop0): using ordered data mode
+reiserfs: using flush barriers
+==================================================================
+BUG: KASAN: user-memory-access in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+BUG: KASAN: user-memory-access in test_and_set_bit_lock include/asm-generic/bitops/instrumented-lock.h:57 [inline]
+BUG: KASAN: user-memory-access in bit_spin_lock include/linux/bit_spinlock.h:27 [inline]
+BUG: KASAN: user-memory-access in zram_slot_lock+0x57/0x150 drivers/block/zram/zram_drv.c:67
+Write of size 8 at addr 0000000000004128 by task syz-executor326/4993
+
+CPU: 1 PID: 4993 Comm: syz-executor326 Not tainted 6.4.0-rc3-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/28/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
+ print_report+0xe6/0x540 mm/kasan/report.c:465
+ kasan_report+0x176/0x1b0 mm/kasan/report.c:572
+ kasan_check_range+0x283/0x290 mm/kasan/generic.c:187
+ instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+ test_and_set_bit_lock include/asm-generic/bitops/instrumented-lock.h:57 [inline]
+ bit_spin_lock include/linux/bit_spinlock.h:27 [inline]
+ zram_slot_lock+0x57/0x150 drivers/block/zram/zram_drv.c:67
+ zram_read_page drivers/block/zram/zram_drv.c:1362 [inline]
+ zram_bvec_read drivers/block/zram/zram_drv.c:1409 [inline]
+ zram_bio_read drivers/block/zram/zram_drv.c:1883 [inline]
+ zram_submit_bio+0x18bc/0x26d0 drivers/block/zram/zram_drv.c:1933
+ __submit_bio+0x205/0x2e0 block/blk-core.c:598
+ __submit_bio_noacct block/blk-core.c:641 [inline]
+ submit_bio_noacct_nocheck+0x467/0xc60 block/blk-core.c:704
+ submit_bh fs/buffer.c:2782 [inline]
+ __bread_slow fs/buffer.c:1226 [inline]
+ __bread_gfp+0x1ec/0x380 fs/buffer.c:1419
+ __bread include/linux/buffer_head.h:471 [inline]
+ journal_init+0xf61/0x24b0 fs/reiserfs/journal.c:2788
+ reiserfs_fill_super+0x1039/0x2620 fs/reiserfs/super.c:2022
+ mount_bdev+0x274/0x3a0 fs/super.c:1380
+ legacy_get_tree+0xef/0x190 fs/fs_context.c:610
+ vfs_get_tree+0x8c/0x270 fs/super.c:1510
+ do_new_mount+0x28f/0xae0 fs/namespace.c:3039
+ do_mount fs/namespace.c:3382 [inline]
+ __do_sys_mount fs/namespace.c:3591 [inline]
+ __se_sys_mount+0x2d9/0x3c0 fs/namespace.c:3568
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f185eef5b0a
+Code: 83 c4 08 5b 5d c3 66 2e 0f 1f 84 00 00 00 00 00 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe122853a8 EFLAGS: 00000286 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f185eef5b0a
+RDX: 0000000020000080 RSI: 0000000020000140 RDI: 00007ffe122853b0
+RBP: 00007ffe122853b0 R08: 00007ffe122853f0 R09: 0000000000001121
+R10: 000000000120c083 R11: 0000000000000286 R12: 0000000000000004
+R13: 00005555570882c0 R14: 00007ffe122853f0 R15: 0000000000000000
+ </TASK>
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
