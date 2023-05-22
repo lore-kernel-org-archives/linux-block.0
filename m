@@ -2,150 +2,130 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B85BBC77B75
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EDDC7EE23
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 14:19:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234438AbjEVN5f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:57:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
+        id S233705AbjEVOTz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 10:19:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234372AbjEVN5N (ORCPT
+        with ESMTP id S231916AbjEVOTy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:57:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE1C1FF9
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:53:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763552;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1dW3gfal+wiqS1BsUQ7v1POUMzsncK8bE2BxQUdT+Fw=;
-        b=L/6Z6BaSmmQfKM22z4Sxr5NQthAxzTFL5Esdvdt9KCWtoArSyVAc9FgWFBBtdglzNxET/d
-        m5XYujG9H4P7rOQ+DVUAQprkvQizQ5jUsjOGK/xOcVAYwB9mV55j+zzUPb0r7yEXyL/1g/
-        a2pCPf7nBWggsE3+TZ9kf4tDipDSXVk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-401-O78IS1gQNUW2bLyo8CEsOA-1; Mon, 22 May 2023 09:52:26 -0400
-X-MC-Unique: O78IS1gQNUW2bLyo8CEsOA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 213773C025AD;
-        Mon, 22 May 2023 13:52:25 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6AEE4140E95D;
-        Mon, 22 May 2023 13:52:22 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
-Subject: [PATCH v22 31/31] splice: kdoc for filemap_splice_read() and copy_splice_read()
-Date:   Mon, 22 May 2023 14:50:18 +0100
-Message-Id: <20230522135018.2742245-32-dhowells@redhat.com>
-In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
-References: <20230522135018.2742245-1-dhowells@redhat.com>
+        Mon, 22 May 2023 10:19:54 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9C0D2
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 07:19:51 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-510d6e1f1b2so10745861a12.3
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 07:19:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google; t=1684765190; x=1687357190;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=VSL7mwwp7mP3i/A2Ha5ZWYNP2l8nV9xWCZ9dDdVJyrE=;
+        b=bW3JxzSWL903VRTFCHvbgK/kSmmhNGzjPmv2oTgKuUeY/4UGuj+rpVpSRqU0fLX71Z
+         9x0WYxajpqEHWpasb3FMt2QPMwFvEXG1qzy09fFvoatRiySxfHmtlreAhXwdf72AH0EA
+         uaD7yDQ7ocfBWwGajHKOT7vpFDgho5apenxJE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684765190; x=1687357190;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VSL7mwwp7mP3i/A2Ha5ZWYNP2l8nV9xWCZ9dDdVJyrE=;
+        b=emGx1FXurRpg3VGLvLeR/VkXC0eKYBA5Ajehx3X6oA7+IDZunF0mjSlvdosQpn9+Ln
+         dU9Tm0byNZYbhk1D62wgIeTySbtX/fuy/ufE3+5VQJ5f7i1OEGbYUBeTnb2iuDnNBcNV
+         5WA1F1QoY5dp+n9G/qLUffeoikNn+37ePgQe/eApHO5NRZXSfdnTM8T8liYZNsqOmscL
+         /+TCfzUG4GHWyhZ85XgzMhMchWZiNWYAkCxhlBNPcNV0QzPU6xUWsSIWEMJZX/RZX+cW
+         YAJ32B8wiU2/TTs4zldIRAle13veFxm958CC4xPnnHsON8HN/Facfb01fPvnZdCXU4aG
+         CYpg==
+X-Gm-Message-State: AC+VfDyPn2k6GdU91Coj7n0EWGT8F4ADEwndNcox0ns9TzhbguFB31wN
+        eUWly9WNwxjVFJNRqUjLtRL7rGAogxTEtyy1AC+HnQ==
+X-Google-Smtp-Source: ACHHUZ5pTZpoagrq7BPdRNACytZjcbnwwAzdd4/4F4mMBgFIR5olByJvr8DzGqhjgDPmmSOeMIBmAwCLlQut/WuHsuo=
+X-Received: by 2002:a17:907:25c2:b0:969:edf8:f73b with SMTP id
+ ae2-20020a17090725c200b00969edf8f73bmr9314077ejc.60.1684765189889; Mon, 22
+ May 2023 07:19:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+References: <20230519093521.133226-1-hch@lst.de> <20230519093521.133226-11-hch@lst.de>
+In-Reply-To: <20230519093521.133226-11-hch@lst.de>
+From:   Miklos Szeredi <miklos@szeredi.hu>
+Date:   Mon, 22 May 2023 16:19:38 +0200
+Message-ID: <CAJfpegtHb4pA=1NBRzQJSub7B0HZqnvqsMNQmYYM-8L7PTQfvw@mail.gmail.com>
+Subject: Re: [PATCH 10/13] fs: factor out a direct_write_fallback helper
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Chao Yu <chao@kernel.org>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        "open list:F2FS FILE SYSTEM" <linux-f2fs-devel@lists.sourceforge.net>,
+        cluster-devel@redhat.com, linux-xfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide kerneldoc comments for filemap_splice_read() and
-copy_splice_read().
+On Fri, 19 May 2023 at 11:36, Christoph Hellwig <hch@lst.de> wrote:
+>
+> Add a helper dealing with handling the syncing of a buffered write fallback
+> for direct I/O.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/libfs.c         | 36 ++++++++++++++++++++++++++++
+>  include/linux/fs.h |  2 ++
+>  mm/filemap.c       | 59 ++++++++++------------------------------------
+>  3 files changed, 50 insertions(+), 47 deletions(-)
+>
+> diff --git a/fs/libfs.c b/fs/libfs.c
+> index 89cf614a327158..9f3791fc6e0715 100644
+> --- a/fs/libfs.c
+> +++ b/fs/libfs.c
+> @@ -1613,3 +1613,39 @@ u64 inode_query_iversion(struct inode *inode)
+>         return cur >> I_VERSION_QUERIED_SHIFT;
+>  }
+>  EXPORT_SYMBOL(inode_query_iversion);
+> +
+> +ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
+> +               ssize_t direct_written, ssize_t buffered_written)
+> +{
+> +       struct address_space *mapping = iocb->ki_filp->f_mapping;
+> +       loff_t pos = iocb->ki_pos, end;
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Steve French <smfrench@gmail.com>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: linux-mm@kvack.org
-cc: linux-block@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
----
- fs/splice.c  | 21 +++++++++++++++++++--
- mm/filemap.c | 21 ++++++++++++++++++---
- 2 files changed, 37 insertions(+), 5 deletions(-)
+At this point pos will point after the end of the buffered write (as
+per earlier patches), yes?
 
-diff --git a/fs/splice.c b/fs/splice.c
-index 9be4cb3b9879..2420ead610a7 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -299,8 +299,25 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
- 	kfree(spd->partial);
- }
- 
--/*
-- * Copy data from a file into pages and then splice those into the output pipe.
-+/**
-+ * copy_splice_read -  Copy data from a file and splice the copy into a pipe
-+ * @in: The file to read from
-+ * @ppos: Pointer to the file position to read from
-+ * @pipe: The pipe to splice into
-+ * @len: The amount to splice
-+ * @flags: The SPLICE_F_* flags
-+ *
-+ * This function allocates a bunch of pages sufficient to hold the requested
-+ * amount of data (but limited by the remaining pipe capacity), passes it to
-+ * the file's ->read_iter() to read into and then splices the used pages into
-+ * the pipe.
-+ *
-+ * Return: On success, the number of bytes read will be returned and *@ppos
-+ * will be updated if appropriate; 0 will be returned if there is no more data
-+ * to be read; -EAGAIN will be returned if the pipe had no space, and some
-+ * other negative error code will be returned on error.  A short read may occur
-+ * if the pipe has insufficient space, we reach the end of the data or we hit a
-+ * hole.
-  */
- ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- 			 struct pipe_inode_info *pipe,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 603b562d69b1..f87e2ad8cff1 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2871,9 +2871,24 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
- 	return spliced;
- }
- 
--/*
-- * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
-- * a pipe.
-+/**
-+ * filemap_splice_read -  Splice data from a file's pagecache into a pipe
-+ * @in: The file to read from
-+ * @ppos: Pointer to the file position to read from
-+ * @pipe: The pipe to splice into
-+ * @len: The amount to splice
-+ * @flags: The SPLICE_F_* flags
-+ *
-+ * This function gets folios from a file's pagecache and splices them into the
-+ * pipe.  Readahead will be called as necessary to fill more folios.  This may
-+ * be used for blockdevs also.
-+ *
-+ * Return: On success, the number of bytes read will be returned and *@ppos
-+ * will be updated if appropriate; 0 will be returned if there is no more data
-+ * to be read; -EAGAIN will be returned if the pipe had no space, and some
-+ * other negative error code will be returned on error.  A short read may occur
-+ * if the pipe has insufficient space, we reach the end of the data or we hit a
-+ * hole.
-  */
- ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
- 			    struct pipe_inode_info *pipe,
+> +       int err;
+> +
+> +       /*
+> +        * If the buffered write fallback returned an error, we want to return
+> +        * the number of bytes which were written by direct I/O, or the error
+> +        * code if that was zero.
+> +        *
+> +        * Note that this differs from normal direct-io semantics, which will
+> +        * return -EFOO even if some bytes were written.
+> +        */
+> +       if (unlikely(buffered_written < 0))
+> +               return buffered_written;
+> +
+> +       /*
+> +        * We need to ensure that the page cache pages are written to disk and
+> +        * invalidated to preserve the expected O_DIRECT semantics.
+> +        */
+> +       end = pos + buffered_written - 1;
 
+So this calculation is wrong.
+
+AFAICS this affects later patches as well.
+
+Thanks,
+Miklos
