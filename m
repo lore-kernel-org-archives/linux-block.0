@@ -2,107 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 085B7C77B73
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 17:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7385EC7EE2D
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 18:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229767AbjEVRus (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 13:50:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53236 "EHLO
+        id S233602AbjEVS2t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 14:28:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232413AbjEVRur (ORCPT
+        with ESMTP id S233298AbjEVS2s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 13:50:47 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A33DFF
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 10:50:45 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4f3a611b3ddso4803217e87.0
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 10:50:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1684777843; x=1687369843;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v0vGfy2nsZav2HY5i+tp/Nl3rfKXvicFLnxzClJPsL0=;
-        b=bmpPa9zjlUzyjbeZlqxzu2zabV3bl9Mm+UYqg4JG6Ok1Tv+s0hgvqO6u15FubxI+su
-         jWSD+MNvgdoYp80pJmKsynVPfeLe3AArwDF5HvAlS3TXL8Jsy5j6yf/wkFgyJsgNsSrB
-         2CFm0tX49r98zxmjmEP/UgvkK1lnk1EOIYEcY=
+        Mon, 22 May 2023 14:28:48 -0400
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DE189D
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 11:28:00 -0700 (PDT)
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-75b1219506fso72584485a.1
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 11:28:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684777843; x=1687369843;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v0vGfy2nsZav2HY5i+tp/Nl3rfKXvicFLnxzClJPsL0=;
-        b=YRkfYQ81vGGr/TsPtDPiUXCG0+KPB/KKq95k1eTFhfKtjNZU5qyZHFWPnKpXXCnFSL
-         sUPxKOsHcKWef9QXjBbyFakmtof504Kq7Wbue+FKzKEX68c8Kh1GeLCim79FoU6QRbGf
-         qW67KkO5yl6RVBYogN2jKANkgl/k/mdH2yV2U4lZljxDIzbQ0Qf4yIpbzVW3rptysg+l
-         ozVEATaHpP+VD78Su9ScbEasTRdVcHBZ9chjn9B3wTzvYpEz1kFCP1R1mMBKV6uk5VrP
-         eZu9Gb/vztFxMUQtzQ67JG3oJLnBGj31JOJVkfz3zTMwpPoVwK4UPm7lmh/XseP2Jzlz
-         d1XQ==
-X-Gm-Message-State: AC+VfDxI9sIGa6IUAF29APk1JHK1jeKvLpzh+GQEU7mw+qCcwpx0DsP3
-        fsCsTXZU1twz6D7i44zfR8LUzeXiwCo+kCbntVJ1Nieg
-X-Google-Smtp-Source: ACHHUZ7tubMztUOrbbglvs2vvPu6KY8CkCGBbsgUJxwMEr2oYn6XUNBK7cCGpEwo3E0AYHhagw9l5Q==
-X-Received: by 2002:a19:f613:0:b0:4f3:77f9:2bbe with SMTP id x19-20020a19f613000000b004f377f92bbemr3763341lfe.3.1684777843331;
-        Mon, 22 May 2023 10:50:43 -0700 (PDT)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com. [209.85.167.44])
-        by smtp.gmail.com with ESMTPSA id o1-20020a056512050100b004e843d6244csm1051736lfb.99.2023.05.22.10.50.42
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 May 2023 10:50:43 -0700 (PDT)
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-4f3a611b3ddso4803199e87.0
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 10:50:42 -0700 (PDT)
-X-Received: by 2002:a17:907:1688:b0:965:d7c7:24db with SMTP id
- hc8-20020a170907168800b00965d7c724dbmr9757222ejc.32.1684777349281; Mon, 22
- May 2023 10:42:29 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684780080; x=1687372080;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p7GzxNEPB5RrqIL7H106LwNVqNBV2sg10P6y5N7WaSk=;
+        b=Z2Afm9jsPQBNfDcWslS0NTmytrbD+0SSpxbyKB99rWTPTy2hTI0jYAS6vJGNmSszez
+         Laf6Fn6gRsDn+qQVwlDPwwDsKQjKWPm0q1fPo/nXyghTbCvo6d4Q7csMnoQXYFSIEkE2
+         9Sn3sBSnrPTLNAa01L9YQa3GxLwnhsctY2CNkp5nw37drtXqyaGZxZr2xAsLRFWGTAWi
+         HgcCIuxy7oT4I+PhLmdt7x0PSmOkpWDdQEv2ymLJ2ItJmOKzVNpiINxYGw48peukKjZy
+         SnboPqs8lYj+ZIZNr8p/RnJhXOitGt8pm40LNrNCFPXKMS7a3sWrWrcywtDREonzOrk9
+         S2rg==
+X-Gm-Message-State: AC+VfDyfHpDbp/+QGxm9KBup8fjdzfq8i13+6+Xy9SBqb3CjTd5jalz4
+        P3dgZSdSVv0IHMss34JtZIRk
+X-Google-Smtp-Source: ACHHUZ5cNHDfNJtYuuNT8G4J5JsInsTlSg1wDbr/+6XLCC/c6hq9pMKzuHMG58VXqxmVmQvtSAcUtw==
+X-Received: by 2002:a05:6214:f22:b0:625:833e:8825 with SMTP id iw2-20020a0562140f2200b00625833e8825mr5440304qvb.4.1684780079641;
+        Mon, 22 May 2023 11:27:59 -0700 (PDT)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id u12-20020a0ced2c000000b0061b5c45f970sm2137700qvq.74.2023.05.22.11.27.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 May 2023 11:27:59 -0700 (PDT)
+Date:   Mon, 22 May 2023 14:27:57 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Dave Chinner <david@fromorbit.com>, Joe Thornber <ejt@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Brian Foster <bfoster@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZGu0LaQfREvOQO4h@redhat.com>
+References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
+ <ZGb2Xi6O3i2pLam8@infradead.org>
+ <ZGeKm+jcBxzkMXQs@redhat.com>
+ <ZGgBQhsbU9b0RiT1@dread.disaster.area>
 MIME-Version: 1.0
-References: <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-24-dhowells@redhat.com>
- <20230522102920.0528d821@rorschach.local.home> <2812412.1684767005@warthog.procyon.org.uk>
-In-Reply-To: <2812412.1684767005@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 22 May 2023 10:42:12 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgg4iDEuSN4K6S6ohAm4zd_V5h4tXGn6-2-cfOuJPFDZQ@mail.gmail.com>
-Message-ID: <CAHk-=wgg4iDEuSN4K6S6ohAm4zd_V5h4tXGn6-2-cfOuJPFDZQ@mail.gmail.com>
-Subject: Re: [PATCH v20 23/32] splice: Convert trace/seq to use direct_splice_read()
-To:     David Howells <dhowells@redhat.com>
-Cc:     Steven Rostedt <rostedt@goodmis.org>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZGgBQhsbU9b0RiT1@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 22, 2023 at 7:50=E2=80=AFAM David Howells <dhowells@redhat.com>=
- wrote:
->
-> We could implement seq_splice_read().  What we would need to do is to cha=
-nge
-> how the seq buffer is allocated: bulk allocate a bunch of arbitrary pages
-> which we then vmap().  When we need to splice, we read into the buffer, d=
-o a
-> vunmap() and then splice the pages holding the data we used into the pipe=
-.
+On Fri, May 19 2023 at  7:07P -0400,
+Dave Chinner <david@fromorbit.com> wrote:
 
-Please don't use vmap as a way to do zero-copy.
+> On Fri, May 19, 2023 at 10:41:31AM -0400, Mike Snitzer wrote:
+> > On Fri, May 19 2023 at 12:09P -0400,
+> > Christoph Hellwig <hch@infradead.org> wrote:
+> > 
+> > > FYI, I really don't think this primitive is a good idea.  In the
+> > > concept of non-overwritable storage (NAND, SMR drives) the entire
+> > > concept of a one-shoot 'provisioning' that will guarantee later writes
+> > > are always possible is simply bogus.
+> > 
+> > Valid point for sure, such storage shouldn't advertise support (and
+> > will return -EOPNOTSUPP).
+> > 
+> > But the primitive still has utility for other classes of storage.
+> 
+> Yet the thing people are wanting to us filesystem developers to use
+> this with is thinly provisioned storage that has snapshot
+> capability. That, by definition, is non-overwritable storage. These
+> are the use cases people are asking filesystes to gracefully handle
+> and report errors when the sparse backing store runs out of space.
 
-The virtual mapping games are more expensive than a small copy from
-some random seq file.
+DM thinp falls into this category but as you detailed it can be made
+to work reliably. To carry that forward we need to first establish
+the REQ_PROVISION primitive (with this series).
 
-Yes, yes, seq_file currently uses "kvmalloc()", which does fall back
-to vmalloc too. But the keyword there is "falls back". Most of the
-time it's just a regular boring kmalloc, and most of the time a
-seq-file is tiny.
+Follow-on associated dm-thinp enhancements can then serve as reference
+for how to take advantage of XFS's ability to operate reliably of
+thinly provisioned storage.
+ 
+> e.g. journal writes after a snapshot is taken on a busy filesystem
+> are always an overwrite and this requires more space in the storage
+> device for the write to succeed. ENOSPC from the backing device for
+> journal IO is a -fatal error-. Hence if REQ_PROVISION doesn't
+> guarantee space for overwrites after snapshots, then it's not
+> actually useful for solving the real world use cases we actually
+> need device-level provisioning to solve.
+> 
+> It is not viable for filesystems to have to reprovision space for
+> in-place metadata overwrites after every snapshot - the filesystem
+> may not even know a snapshot has been taken! And it's not feasible
+> for filesystems to provision on demand before they modify metadata
+> because we don't know what metadata is going to need to be modified
+> before we start modifying metadata in transactions. If we get ENOSPC
+> from provisioning in the middle of a dirty transcation, it's all
+> over just the same as if we get ENOSPC during metadata writeback...
+> 
+> Hence what filesystems actually need is device provisioned space to
+> be -always over-writable- without ENOSPC occurring.  Ideally, if we
+> provision a range of the block device, the block device *must*
+> guarantee all future writes to that LBA range succeeds. That
+> guarantee needs to stand until we discard or unmap the LBA range,
+> and for however many writes we do to that LBA range.
+> 
+> e.g. If the device takes a snapshot, it needs to reprovision the
+> potential COW ranges that overlap with the provisioned LBA range at
+> snapshot time. e.g. by re-reserving the space from the backing pool
+> for the provisioned space so if a COW occurs there is space
+> guaranteed for it to succeed.  If there isn't space in the backing
+> pool for the reprovisioning, then whatever operation that triggers
+> the COW behaviour should fail with ENOSPC before doing anything
+> else....
 
-                      Linus
+Happy to implement this in dm-thinp.  Each thin block will need a bit
+to say if the block must be REQ_PROVISION'd at time of snapshot (and
+the resulting block will need the same bit set).
+
+Walking all blocks of a thin device and triggering REQ_PROVISION for
+each will obviously make thin snapshot creation take more time.
+
+I think this approach is better than having a dedicated bitmap hooked
+off each thin device's metadata (with bitmap being copied and walked
+at the time of snapshot). But we'll see... I'll get with Joe to
+discuss further.
+
+> Software devices like dm-thin/snapshot should really only need to
+> keep a persistent map of the provisioned space and refresh space
+> reservations for used space within that map whenever something that
+> triggers COW behaviour occurs. i.e. a snapshot needs to reset the
+> provisioned ranges back to "all ranges are freshly provisioned"
+> before the snapshot is started. If that space is not available in
+> the backing pool, then the snapshot attempt gets ENOSPC....
+> 
+> That means filesystems only need to provision space for journals and
+> fixed metadata at mkfs time, and they only need issue a
+> REQ_PROVISION bio when they first allocate over-write in place
+> metadata. We already have online discard and/or fstrim for releasing
+> provisioned space via discards.
+> 
+> This will require some mods to filesystems like ext4 and XFS to
+> issue REQ_PROVISION and fail gracefully during metadata allocation.
+> However, doing so means that we can actually harden filesystems
+> against sparse block device ENOSPC errors by ensuring they will
+> never occur in critical filesystem structures....
+
+Yes, let's finally _do_ this! ;)
+
+Mike
