@@ -2,122 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B581C77B73
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 02:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 819E8C77B73
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 02:12:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbjEVCH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 May 2023 22:07:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55006 "EHLO
+        id S229761AbjEVCMq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 May 2023 22:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231551AbjEVCH2 (ORCPT
+        with ESMTP id S229707AbjEVCMp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 May 2023 22:07:28 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED573EA
-        for <linux-block@vger.kernel.org>; Sun, 21 May 2023 19:07:26 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-64d2f3dd990so354954b3a.0
-        for <linux-block@vger.kernel.org>; Sun, 21 May 2023 19:07:26 -0700 (PDT)
+        Sun, 21 May 2023 22:12:45 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19098B7
+        for <linux-block@vger.kernel.org>; Sun, 21 May 2023 19:12:45 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-62576fa52b4so3669696d6.0
+        for <linux-block@vger.kernel.org>; Sun, 21 May 2023 19:12:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684721246; x=1687313246;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TIvjJ9k7RGzxUzRxHmV1AICYtqmfJoyTp6is0V2D0eg=;
-        b=5qeMdcQj96UF8uDG2SkOHpn/2lI81svkq43d+Hz3BwFQybPixy51r1B+u3dzBnROKq
-         mVhRjiJ4tSn0AZ3/fzVXuztA7/KhUw9Tfz7IpKWJXPPRy8qOeRd3qWmz0dYJWVhQC/jI
-         PMvexGN/LZgSFlcRJM0dFodg3r7rM2c3mxebSGLlnyF4NOOs/ku5W/EY2G1btohM6YMO
-         UHNhKbExoVNv28XI1LlL0GZELXE7VnMe4cFoVZuWO5GR/CIJ07PEHlEslmz45OtRTZs/
-         Yzk221Zhn6VyVw9B7yR0n1QRI6ijj4D3xYgC8/o5sEDeJmhA6es/UZwQ2/bNyWMioMr2
-         IWgQ==
+        d=gmail.com; s=20221208; t=1684721564; x=1687313564;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YWVPS1dR1tLDehmVs/fNxZ8sQHHZQ7oHzKE5CJkZueo=;
+        b=Cqi8GtpVz9sGl4mGsf9iup84QAZ/1cqDpu0JLeEReQoQ+/KhJO4zxVIbcNg4TWgnpJ
+         Szm/3GwICgIGZw/eEcnn1TpXDOILnFRTWVDZnSM5JRsS1E0KVV7x2nTOdxIhM/JiPafp
+         l2LZ6kGrptpuMoa7tPGpvcKNGjcJATLI395nLI5sPLX+4EgjFdb+4dejMhVI3mijMtKl
+         42nsZU/pQIizjWZGZXASF0eNAR7phn/X/V1szggdQ5PYYzVBMhUWSQnB+vd8z58FCTvI
+         4FVIrykV7kVxk1W6QdQY2fLxxTUCvd9Qx8egjc2LY64KVZBuwF2dtYumjpEpE7KTgLSN
+         XXeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684721246; x=1687313246;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TIvjJ9k7RGzxUzRxHmV1AICYtqmfJoyTp6is0V2D0eg=;
-        b=jQwlnZZAuN8ida1mvRJWzxYyKnVFBjuIM7g1YMI1iEmdfBMIFyHeyU89xzJlXpTOIB
-         TP9AHIRmvzXIZnz9a3QxGS4pwFkcLxpMjgjF+lAPz9Schtlqd77IyIaA1Wx1LgJwKffC
-         uZ5BbIAxLEpug7aZ9fKVpbWghZiGiI1sCT2gH6fzwgRkZ0Yap7/KvHlrk0vv0NB5+jxf
-         YKiB2HjArf3oDrcmWjQ+MkRnzDwCDwmSHPrCo/JxBNWfxQbpbNaSdkxUx7U2i04PmboI
-         LwUIxtL56zFnqkCnIigF40tAgqc89wMPhJ0yeyjWMAlNFkj1PC5CcpY0t84CeXqbJGG4
-         z5PQ==
-X-Gm-Message-State: AC+VfDyW1EV0qrMLsdtZYXphvQsEA8Mqei0YcNVNYbuUy+hZEyyQLwl0
-        9aKb/mq6CEGcgg7rvVGERIDJEiT+7+LFr1mWhto=
-X-Google-Smtp-Source: ACHHUZ6u79ZeAGbFmUZvFwphejs9VcoymOR8RqgVz6RZPt2hNRR3Htdq5zhdmDgK/5tUtMvVRt4Ykg==
-X-Received: by 2002:a05:6a20:440d:b0:106:dfc8:6f3d with SMTP id ce13-20020a056a20440d00b00106dfc86f3dmr10443417pzb.3.1684721246363;
-        Sun, 21 May 2023 19:07:26 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f18-20020a63dc52000000b005307501cfe4sm3349003pgj.44.2023.05.21.19.07.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 May 2023 19:07:25 -0700 (PDT)
-Message-ID: <41bdbb09-4a05-1624-6433-49c7cbc6ff48@kernel.dk>
-Date:   Sun, 21 May 2023 20:07:24 -0600
+        d=1e100.net; s=20221208; t=1684721564; x=1687313564;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YWVPS1dR1tLDehmVs/fNxZ8sQHHZQ7oHzKE5CJkZueo=;
+        b=VcX4ilI6NqACUR07pBS/dDsD3E9aQefQcMI9B7svvfJiCc2E9p6BXOC0CrA5qgB9ip
+         IK1IfVpogycb0zcCYviZ9vMB5giOeOXhgywn13I7mOJpdjUbL3AIkfPN+zOveLq4Sc7d
+         tkEjA7vjySaajVWCvNDUFRTzwvbSygtjzq/eFRjKItCzeJAls4lSO+Ab5n0R7+Eqb8jS
+         yiXdH5LklQVHLNa/KrhRAdlvP3pZLfDbZVcBYy/72UzQRWBBY7trVAR0uVMjPORw7iLw
+         jKMeRXr6z/UDm/qwKHgrFr69IJntG2PswN54PsJfsZb57rN9ESY9Ltx/a6hUVhXRhjYk
+         74Dw==
+X-Gm-Message-State: AC+VfDzeaGEODN9zWzAUh8CpGqmpsDh/5MBpNy/7f92gX7ztDbz6Ycmd
+        D17BiPxf8H1Vawnqdou0kWM=
+X-Google-Smtp-Source: ACHHUZ5fE09QYanHXlbwKITtL2Q4vyzCf8cP7c8x/y3SmBGAVWqFeZhE5Ryf/l8DKleh1/Gh9YO12w==
+X-Received: by 2002:a05:6214:27c5:b0:5f1:31eb:1eff with SMTP id ge5-20020a05621427c500b005f131eb1effmr15674033qvb.2.1684721564060;
+        Sun, 21 May 2023 19:12:44 -0700 (PDT)
+Received: from tian-Alienware-15-R4.fios-router.home (pool-173-77-254-84.nycmny.fios.verizon.net. [173.77.254.84])
+        by smtp.gmail.com with ESMTPSA id ea15-20020ad458af000000b0062075f40f61sm1623056qvb.73.2023.05.21.19.12.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 May 2023 19:12:43 -0700 (PDT)
+From:   Tian Lan <tilan7663@gmail.com>
+To:     ming.lei@redhat.com
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        liusong@linux.alibaba.com, tian.lan@twosigma.com,
+        tilan7663@gmail.com
+Subject: [PATCH 1/1] blk-mq: fix race condition in active queue accounting
+Date:   Sun, 21 May 2023 22:12:14 -0400
+Message-Id: <20230522021214.783024-1-tilan7663@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CAFj5m9LfZ=CATGUz-KFE3YFd04XV2Zmu7kPMdbbyXLg-KnsPeg@mail.gmail.com>
+References: <CAFj5m9LfZ=CATGUz-KFE3YFd04XV2Zmu7kPMdbbyXLg-KnsPeg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 1/1] blk-mq: fix race condition in active queue accounting
-Content-Language: en-US
-To:     Damien Le Moal <dlemoal@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Cc:     Tian Lan <tilan7663@gmail.com>, linux-block@vger.kernel.org,
-        Tian Lan <tian.lan@twosigma.com>
-References: <20230522004328.760024-1-tilan7663@gmail.com>
- <694813ca-690d-4852-0066-cee6833ad8c4@kernel.org>
- <ZGrEJRrZcjYtlMpV@ovpn-8-16.pek2.redhat.com>
- <c8d2e8dc-285d-9675-d915-be3b5b6d6248@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <c8d2e8dc-285d-9675-d915-be3b5b6d6248@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/21/23 7:29?PM, Damien Le Moal wrote:
-> On 5/22/23 10:23, Ming Lei wrote:
->> On Mon, May 22, 2023 at 10:15:22AM +0900, Damien Le Moal wrote:
->>> On 5/22/23 09:43, Tian Lan wrote:
->>>> From: Tian Lan <tian.lan@twosigma.com>
->>>>
->>>> If multiple CPUs are sharing the same hardware queue, it can
->>>> cause leak in the active queue counter tracking when __blk_mq_tag_busy()
->>>> is executed simultaneously.
->>>>
->>>> Fixes: ee78ec1077d3 ("blk-mq: blk_mq_tag_busy is no need to return a value")
->>>> Signed-off-by: Tian Lan <tian.lan@twosigma.com>
->>>> ---
->>>>  block/blk-mq-tag.c | 10 ++++++----
->>>>  1 file changed, 6 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>>> index d6af9d431dc6..07372032238a 100644
->>>> --- a/block/blk-mq-tag.c
->>>> +++ b/block/blk-mq-tag.c
->>>> @@ -42,13 +42,15 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
->>>>  	if (blk_mq_is_shared_tags(hctx->flags)) {
->>>>  		struct request_queue *q = hctx->queue;
->>>>  
->>>> -		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
->>>> +		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
->>>> +		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags)) {
->>>
->>> This is weird. test_and_set_bit() returns the bit old value, so shouldn't this be:
->>>
->>> 		if (test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
->>> 			return;
->>>
->>> ?
->>
->> It is one micro optimization since test_and_set_bit is much heavier than
->> test_bit, so test_and_set_bit() is just needed in the 1st time.
-> 
-> But having the 2 calls test_bit + test_and_set_bit creates a race,
-> doesn't it ? What if another cpu clears the bit between these 2 calls
-> ?
+From: Tian Lan <tian.lan@twosigma.com>
 
-How so? If the bit is already set or you're racing with it being set or
-cleared, that race already exists before. This simply prevent
-unnecessary dirtying of that cacheline.
+If multiple CPUs are sharing the same hardware queue, it can
+cause leak in the active queue counter tracking when __blk_mq_tag_busy()
+is executed simultaneously.
 
+Fixes: ee78ec1077d3 ("blk-mq: blk_mq_tag_busy is no need to return a value")
+Signed-off-by: Tian Lan <tian.lan@twosigma.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-tag.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index d6af9d431dc6..0db6c31d3f4a 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -42,13 +42,13 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 	if (blk_mq_is_shared_tags(hctx->flags)) {
+ 		struct request_queue *q = hctx->queue;
+ 
+-		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
++		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
++		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+ 			return;
+-		set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags);
+ 	} else {
+-		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
++		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 			return;
+-		set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state);
+ 	}
+ 
+ 	users = atomic_inc_return(&hctx->tags->active_queues);
 -- 
-Jens Axboe
+2.25.1
 
