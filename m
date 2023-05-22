@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C40CC77B73
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC55FC7EE29
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234111AbjEVNzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:55:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59336 "EHLO
+        id S234424AbjEVNzo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:55:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234409AbjEVNy5 (ORCPT
+        with ESMTP id S233559AbjEVNzJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:54:57 -0400
+        Mon, 22 May 2023 09:55:09 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB0010DC
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:52:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE5D1A7
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:52:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763524;
+        s=mimecast20190719; t=1684763531;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bTH/u0/6vAI7mUHy6uOE6ZiziK/p6ayAtCwTfEo/gpA=;
-        b=chn1O62A9/etJzHK1sK8HQG14+rxMfUGu2WgJzWIfarKTn9cuvn07lbZv7qyg6hv6gZL9d
-        QrlioIuT4d08ymgLMnAa9UrVEMYP1tKBKMYloxIBlyz6FoiQ1PxYpjUNgXxwH/8QsYuljD
-        HY4SeI/8hhg2oGh83v3PrcH9OFmDN5o=
+        bh=HfMcLqK7SdZvPGZvy5b2RGzipVUrB/qFQK+4kiqdRos=;
+        b=M3vixxSSgb0iQ/6frdFHzwwdhj6liruvkjJwfhRFB3tR9RgHxLx1bqw9Y/pv/YDlrIXpyq
+        wiCm1MOmqvqtaWvRRy3JBzJ+Sj1Vrx9TVTb4atcm04IMZcVMlormiWrgChJ0AxqzG3JKSg
+        oVk6g8r+R+xjOkQ6VX85PKD42umamVs=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-390-LkkvV9wzPveIVTI4AlkknA-1; Mon, 22 May 2023 09:52:00 -0400
-X-MC-Unique: LkkvV9wzPveIVTI4AlkknA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-652-P98tTMU2PTmMkmG9xXy80A-1; Mon, 22 May 2023 09:52:08 -0400
+X-MC-Unique: P98tTMU2PTmMkmG9xXy80A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9EEC81C01512;
-        Mon, 22 May 2023 13:51:59 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8E383C0BE2D;
+        Mon, 22 May 2023 13:52:06 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E87EA20296C6;
-        Mon, 22 May 2023 13:51:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 13CC640C6CD6;
+        Mon, 22 May 2023 13:52:03 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,104 +53,53 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
-Subject: [PATCH v22 24/31] xfs: Provide a splice-read wrapper
-Date:   Mon, 22 May 2023 14:50:11 +0100
-Message-Id: <20230522135018.2742245-25-dhowells@redhat.com>
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        linux-trace-kernel@vger.kernel.org
+Subject: [PATCH v22 26/31] trace: Convert trace/seq to use copy_splice_read()
+Date:   Mon, 22 May 2023 14:50:13 +0100
+Message-Id: <20230522135018.2742245-27-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read wrapper for XFS.  This does a stat count and a
-shutdown check before proceeding, then emits a new trace line and locks the
-inode across the call to filemap_splice_read() and adds to the stats
-afterwards.  Splicing from direct I/O or DAX is handled by the caller.
+For the splice from the trace seq buffer, just use copy_splice_read().
+
+In the future, something better can probably be done by gifting pages from
+seq->buf into the pipe, but that would require changing seq->buf into a
+vmap over an array of pages.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Darrick J. Wong <djwong@kernel.org>
-cc: linux-xfs@vger.kernel.org
+cc: Steven Rostedt <rostedt@goodmis.org>
+cc: Masami Hiramatsu <mhiramat@kernel.org>
+cc: linux-kernel@vger.kernel.org
+cc: linux-trace-kernel@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/xfs/xfs_file.c  | 30 +++++++++++++++++++++++++++++-
- fs/xfs/xfs_trace.h |  2 +-
- 2 files changed, 30 insertions(+), 2 deletions(-)
+ kernel/trace/trace.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index aede746541f8..08d632668e94 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -306,6 +306,34 @@ xfs_file_read_iter(
- 	return ret;
- }
- 
-+STATIC ssize_t
-+xfs_file_splice_read(
-+	struct file		*in,
-+	loff_t			*ppos,
-+	struct pipe_inode_info	*pipe,
-+	size_t			len,
-+	unsigned int		flags)
-+{
-+	struct inode		*inode = file_inode(in);
-+	struct xfs_inode	*ip = XFS_I(inode);
-+	struct xfs_mount	*mp = ip->i_mount;
-+	ssize_t			ret = 0;
-+
-+	XFS_STATS_INC(mp, xs_read_calls);
-+
-+	if (xfs_is_shutdown(mp))
-+		return -EIO;
-+
-+	trace_xfs_file_splice_read(ip, *ppos, len);
-+
-+	xfs_ilock(ip, XFS_IOLOCK_SHARED);
-+	ret = filemap_splice_read(in, ppos, pipe, len, flags);
-+	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
-+	if (ret > 0)
-+		XFS_STATS_ADD(mp, xs_read_bytes, ret);
-+	return ret;
-+}
-+
- /*
-  * Common pre-write limit and setup checks.
-  *
-@@ -1423,7 +1451,7 @@ const struct file_operations xfs_file_operations = {
- 	.llseek		= xfs_file_llseek,
- 	.read_iter	= xfs_file_read_iter,
- 	.write_iter	= xfs_file_write_iter,
+diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+index ebc59781456a..c210d02fac97 100644
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -5171,7 +5171,7 @@ static const struct file_operations tracing_fops = {
+ 	.open		= tracing_open,
+ 	.read		= seq_read,
+ 	.read_iter	= seq_read_iter,
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= xfs_file_splice_read,
- 	.splice_write	= iter_file_splice_write,
- 	.iopoll		= iocb_bio_iopoll,
- 	.unlocked_ioctl	= xfs_file_ioctl,
-diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
-index cd4ca5b1fcb0..4db669203149 100644
---- a/fs/xfs/xfs_trace.h
-+++ b/fs/xfs/xfs_trace.h
-@@ -1445,7 +1445,6 @@ DEFINE_RW_EVENT(xfs_file_direct_write);
- DEFINE_RW_EVENT(xfs_file_dax_write);
- DEFINE_RW_EVENT(xfs_reflink_bounce_dio_write);
- 
--
- DECLARE_EVENT_CLASS(xfs_imap_class,
- 	TP_PROTO(struct xfs_inode *ip, xfs_off_t offset, ssize_t count,
- 		 int whichfork, struct xfs_bmbt_irec *irec),
-@@ -1535,6 +1534,7 @@ DEFINE_SIMPLE_IO_EVENT(xfs_zero_eof);
- DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write);
- DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write_unwritten);
- DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write_append);
-+DEFINE_SIMPLE_IO_EVENT(xfs_file_splice_read);
- 
- DECLARE_EVENT_CLASS(xfs_itrunc_class,
- 	TP_PROTO(struct xfs_inode *ip, xfs_fsize_t new_size),
++	.splice_read	= copy_splice_read,
+ 	.write		= tracing_write_stub,
+ 	.llseek		= tracing_lseek,
+ 	.release	= tracing_release,
 
