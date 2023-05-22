@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E14A4C77B75
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B267DC7EE2D
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:53:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234021AbjEVNxA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:53:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59032 "EHLO
+        id S231418AbjEVNxI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:53:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234019AbjEVNwU (ORCPT
+        with ESMTP id S234032AbjEVNw3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:52:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5143E52
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:51:02 -0700 (PDT)
+        Mon, 22 May 2023 09:52:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FBC6115
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763462;
+        s=mimecast20190719; t=1684763479;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9C/VFkhLRxHq1Y6ot9RmxNuYhTHdz11f1qiRk1qH2g0=;
-        b=FBduurpmvEvzjEo9cCdSOWcxsg5Zz75aTinPNK86OehzivEtmg4w5HZYJJmhEuTD5BWbSI
-        w/AlAKZY2/2+tmXxP3LWdchEJUlgHvLv0cFqONnn0vYDT4r4cLXgJfG/ZWM0y22s6sw6gK
-        K5epBUiWFvoRjg22V6Nfe0BQzN3+dIE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=gRzUovfXnw170GzVg3YWYDNx7Fcy6r2PjCbmCvJAFKQ=;
+        b=X0+h+++xXbBY50vsaTLGuvEIf5iYnEReNP33aziLZcT3HpusEtltsKVigmmpbd4SAc8N5k
+        n/pIre5RaSrU9yIkGIUcbscile70B4c6zdZ9Uinnpmi9JcEIG0gxg+47O1jm2o+dD6V/QB
+        +170JgI4yB7KM+B5hfGblGwuSiZZaWc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-628-yJ4lna96OoqIQQett0IxRw-1; Mon, 22 May 2023 09:50:58 -0400
-X-MC-Unique: yJ4lna96OoqIQQett0IxRw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-301-_owDkNb6PgOmvE0Khp3Vtg-1; Mon, 22 May 2023 09:51:17 -0400
+X-MC-Unique: _owDkNb6PgOmvE0Khp3Vtg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA9502812946;
-        Mon, 22 May 2023 13:50:56 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A99E8007D9;
+        Mon, 22 May 2023 13:51:16 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C7CF20296C6;
-        Mon, 22 May 2023 13:50:52 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 88FCC40CFD45;
+        Mon, 22 May 2023 13:51:13 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,67 +52,53 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-        Gao Xiang <hsiangkao@linux.alibaba.com>,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org
-Subject: [PATCH v22 08/31] splice: Make splice from a DAX file use copy_splice_read()
-Date:   Mon, 22 May 2023 14:49:55 +0100
-Message-Id: <20230522135018.2742245-9-dhowells@redhat.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, netdev@vger.kernel.org
+Subject: [PATCH v22 13/31] net: Make sock_splice_read() use copy_splice_read() by default
+Date:   Mon, 22 May 2023 14:50:00 +0100
+Message-Id: <20230522135018.2742245-14-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make a read splice from a DAX file go directly to copy_splice_read() to do
-the reading as filemap_splice_read() is unlikely to find any pagecache to
-splice.
-
-I think this affects only erofs, Ext2, Ext4, fuse and XFS.
+Make sock_splice_read() use copy_splice_read() by default as
+file_splice_read() will return immediately with 0 as a socket has no
+pagecache and is a zero-size file.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
-Reviewed-by: Theodore Ts'o <tytso@mit.edu>
-Reviewed-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: linux-erofs@lists.ozlabs.org
-cc: linux-ext4@vger.kernel.org
-cc: linux-xfs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
+cc: netdev@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
+ net/socket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Notes:
-    ver #21)
-     - Don't need #ifdef CONFIG_FS_DAX as IS_DAX() is false if !CONFIG_FS_DAX.
-     - Needs to be in vfs_splice_read(), not generic_file_splice_read().
-
- fs/splice.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/splice.c b/fs/splice.c
-index 76126b1aafcb..8268248df3a9 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -908,10 +908,10 @@ long vfs_splice_read(struct file *in, loff_t *ppos,
- 	if (unlikely(!in->f_op->splice_read))
- 		return warn_unsupported(in, "read");
- 	/*
--	 * O_DIRECT doesn't deal with the pagecache, so we allocate a buffer,
--	 * copy into it and splice that into the pipe.
-+	 * O_DIRECT and DAX don't deal with the pagecache, so we allocate a
-+	 * buffer, copy into it and splice that into the pipe.
- 	 */
--	if ((in->f_flags & O_DIRECT))
-+	if ((in->f_flags & O_DIRECT) || IS_DAX(in->f_mapping->host))
- 		return copy_splice_read(in, ppos, pipe, len, flags);
- 	return in->f_op->splice_read(in, ppos, pipe, len, flags);
+diff --git a/net/socket.c b/net/socket.c
+index b7e01d0fe082..401778380195 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -1093,7 +1093,7 @@ static ssize_t sock_splice_read(struct file *file, loff_t *ppos,
+ 	struct socket *sock = file->private_data;
+ 
+ 	if (unlikely(!sock->ops->splice_read))
+-		return generic_file_splice_read(file, ppos, pipe, len, flags);
++		return copy_splice_read(file, ppos, pipe, len, flags);
+ 
+ 	return sock->ops->splice_read(sock, ppos, pipe, len, flags);
  }
 
