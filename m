@@ -2,76 +2,55 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 224A6C7EE30
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 23:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DF0C77B73
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 00:24:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232342AbjEVXMc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 19:12:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
+        id S235192AbjEWAYi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 20:24:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232262AbjEVXMb (ORCPT
+        with ESMTP id S235183AbjEVXaH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 19:12:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A465EA7;
-        Mon, 22 May 2023 16:12:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 397C762CA5;
-        Mon, 22 May 2023 23:12:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B2B6C433D2;
-        Mon, 22 May 2023 23:12:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684797149;
-        bh=99kPGD3M7DQzlajQDUrP8KoLC8rGnM1kR91USoH29aw=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=g6YvxGgM1XECOca1RBlSuAMOQBCyvnnMhoT0ulF9OStij6dDQWuk87L6KvKX3Aw//
-         Je3MDR71outThUTIA0kwih/RioU5SxL+15TZw2cl2pJBgIqUFDyf/XBc7dQdfVcS/q
-         BbjRSyiFEtTOrbTn5jSENaUVpGdsdFEJy7miP1iA6rIiydBlY1ynKBJs9qd67juW4j
-         vSjbkjmk6h3IMbdGtPZCC99byFri2CMoNBcnlhjGb9hKZMKmTa53TIuqZv5GIsZMSy
-         dprucPPyxHJu/Tw37hH+1hWvRBwIWDRHcn+QItu8Pk2dbDQzJwlwrvc2KOh/I/WXw5
-         F7Bt+rDOagnzA==
-Message-ID: <dfbe04fc-7884-7cee-70ad-5fadac18a575@kernel.org>
-Date:   Tue, 23 May 2023 08:12:27 +0900
+        Mon, 22 May 2023 19:30:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B55C188
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 16:26:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l4hnCLyKzpkMhMF68lsLPXuEeiW+0JkAbyWRy482BlI=; b=VsF50jYw70MpJdcbLudTsvGWfH
+        iRIDdbxAMCl7If65ru+SlVNiUECnX7XSf6WLz8W2gLdhq4DZHVwY1fYmCblCXreG0opTu07F5Yn9U
+        bekirVl1zIfAVAyX2NxY+CANfhlYW0tnJRDkA4lRL47myo+z6GlIqpDDrTsf63C2JpUpCS5rcvjN6
+        HjR3GFaYmV/L8qlvOZ9G2Cqzj4VM8ZBHeJIeyCfN13E4r8qDRp0Ft1nNlrAR/FGGVt4N4TcvfHsS8
+        A0VxLIfYOLdGPASSuzhCIi/HuHLoZYLdu2KRYmhxYt/BJgWh7aymcCG1Kr1b2mJLgj4ttgciTyRS+
+        6p+3mAyw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q1EvY-008Lgw-0A;
+        Mon, 22 May 2023 23:26:56 +0000
+Date:   Mon, 22 May 2023 16:26:56 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, jyescas@google.com,
+        Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v5 2/9] block: Prepare for supporting sub-page limits
+Message-ID: <ZGv6QPii5j6Cfb3J@bombadil.infradead.org>
+References: <20230522222554.525229-1-bvanassche@acm.org>
+ <20230522222554.525229-3-bvanassche@acm.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v7 00/19] Add Command Duration Limits support
-Content-Language: en-US
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Niklas Cassel <nks@flawful.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-References: <20230511011356.227789-1-nks@flawful.org>
- <yq1h6s4nix8.fsf@ca-mkp.ca.oracle.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <yq1h6s4nix8.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230522222554.525229-3-bvanassche@acm.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/23/23 06:41, Martin K. Petersen wrote:
-> 
-> Niklas,
-> 
->> This series adds support for Command Duration Limits.
-> 
-> Applied to 6.5/scsi-staging, thanks!
-> 
+On Mon, May 22, 2023 at 03:25:34PM -0700, Bart Van Assche wrote:
+> Introduce variables that represent the lower configuration bounds. This
+> patch does not change any functionality.
 
-Thanks Martin !
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 
-
--- 
-Damien Le Moal
-Western Digital Research
-
+  Luis
