@@ -2,111 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84EA8C7EE26
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 12:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C99C7EE2F
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 12:53:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233453AbjEVMlE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 08:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44818 "EHLO
+        id S233700AbjEVMxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 08:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233072AbjEVMk7 (ORCPT
+        with ESMTP id S233835AbjEVMxs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 08:40:59 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CFD137;
-        Mon, 22 May 2023 05:40:48 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QPxQn67Lxz4f3jXM;
-        Mon, 22 May 2023 20:22:09 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgBnHbFvXmtk96_lJw--.60238S4;
-        Mon, 22 May 2023 20:22:08 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     regressions@leemhuis.info, chengming.zhou@linux.dev, hch@lst.de,
-        axboe@kernel.dk, yukuai3@huawei.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH RESEND] blk-wbt: fix that wbt can't be disabled by default
-Date:   Mon, 22 May 2023 20:18:54 +0800
-Message-Id: <20230522121854.2928880-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        Mon, 22 May 2023 08:53:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5070AC;
+        Mon, 22 May 2023 05:53:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 521B76182C;
+        Mon, 22 May 2023 12:53:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452FFC433EF;
+        Mon, 22 May 2023 12:53:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684760023;
+        bh=ImInocG/5tz/0H3zPAKjnZJKUJJ7f7gU8sP1cCYTc4M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WoCejcijL504amG1JWhHwZTY9ANeFzKIntYQLP07J5uj6is7A9fQS3E45NEVz8wk6
+         ijfRl5PO3lTu/TTTIv32g7R7yLRypfiWOTi3Uj/0KvpuFrOTVcMel9+d2wSGIkyYdu
+         vUWYxwspLqeF3kuLLovyI+OOPx0h36hOwidawlUZUg9fAT5m8b6iSCy+1CpVnsDVp7
+         WsqlRyT5zrYfRVFyupWZadvSK20ofoJ9ED4LN+qqMECRszCrYQYsWxjuqjJ6xikft9
+         Dj+RJ+BTQGXrekuYCaTiR3iKGCv67tOqqWySpi7M8dOONCCzlP1x8letugsbywO8H1
+         ygjRrnqit//Zw==
+Date:   Mon, 22 May 2023 14:53:31 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH v21 03/30] splice: Rename direct_splice_read() to
+ copy_splice_read()
+Message-ID: <20230522-pfund-ferngeblieben-53fad9c0e527@brauner>
+References: <20230520-sekunde-vorteil-f2d588e40b68@brauner>
+ <20230520000049.2226926-1-dhowells@redhat.com>
+ <20230520000049.2226926-4-dhowells@redhat.com>
+ <2468127.1684742114@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnHbFvXmtk96_lJw--.60238S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1kXr43Xw15Ww48Kw1fXrb_yoW8Cw1rp3
-        WrGryIkF92qrWIvF13KF1UJw4fGF4vqr1xCrZakw1Sq3WUCr9avay8KFyFvF1jvFs3Ganx
-        Zw13XFZrZFyUX37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
-        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-        fUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2468127.1684742114@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Mon, May 22, 2023 at 08:55:14AM +0100, David Howells wrote:
+> > For the future it'd be nice if exported functions would always get
+> > proper kernel doc,
+> 
+> Something like the attached?
+> 
+> David
+> ---
+> commit 0362042ba0751fc5457b0548fb9006f9d7dfbeca
+> Author: David Howells <dhowells@redhat.com>
+> Date:   Mon May 22 08:34:24 2023 +0100
+> 
+>     splice: kdoc for filemap_splice_read() and copy_splice_read()
+>     
+>     Provide kerneldoc comments for filemap_splice_read() and
+>     copy_splice_read().
+>     
+>     Signed-off-by: David Howells <dhowells@redhat.com>
+>     cc: Christian Brauner <brauner@kernel.org>
+>     cc: Christoph Hellwig <hch@lst.de>
+>     cc: Jens Axboe <axboe@kernel.dk>
+>     cc: Steve French <smfrench@gmail.com>
+>     cc: Al Viro <viro@zeniv.linux.org.uk>
+>     cc: linux-mm@kvack.org
+>     cc: linux-block@vger.kernel.org
+>     cc: linux-cifs@vger.kernel.org
+>     cc: linux-fsdevel@vger.kernel.org
+> 
+> diff --git a/fs/splice.c b/fs/splice.c
+> index 9be4cb3b9879..5292a8fa929d 100644
+> --- a/fs/splice.c
+> +++ b/fs/splice.c
+> @@ -299,8 +299,25 @@ void splice_shrink_spd(struct splice_pipe_desc *spd)
+>  	kfree(spd->partial);
+>  }
+>  
+> -/*
+> - * Copy data from a file into pages and then splice those into the output pipe.
+> +/**
+> + * copy_splice_read -  Copy data from a file and splice the copy into a pipe
+> + * @in: The file to read from
+> + * @ppos: Pointer to the file position to read from
+> + * @pipe: The pipe to splice into
+> + * @len: The amount to splice
+> + * @flags: The SPLICE_F_* flags
+> + *
+> + * This function allocates a bunch of pages sufficient to hold the requested
+> + * amount of data (but limited by the remaining pipe capacity), passes it to
+> + * the file's ->read_iter() to read into and then splices the used pages into
+> + * the pipe.
+> + *
+> + * On success, the number of bytes read will be returned and *@ppos will be
+> + * updated if appropriate; 0 will be returned if there is no more data to be
+> + * read; -EAGAIN will be returned if the pipe had no space, and some other
+> + * negative error code will be returned on error.  A short read may occur if
+> + * the pipe has insufficient space, we reach the end of the data or we hit a
+> + * hole.
+>   */
 
-commit b11d31ae01e6 ("blk-wbt: remove unnecessary check in
-wbt_enable_default()") removes the checking of CONFIG_BLK_WBT_MQ by
-mistake, which is used to control enable or disable wbt by default.
+I think kdoc expects:
 
-Fix the problem by adding back the checking. This patch also do a litter
-cleanup to make related code more readable.
+* Return: On success, the number of bytes read will be returned and *@ppos will be
+* updated if appropriate; 0 will be returned if there is no more data to be
+* read; -EAGAIN will be returned if the pipe had no space, and some other
+* negative error code will be returned on error.  A short read may occur if
+* the pipe has insufficient space, we reach the end of the data or we hit a
+* hole.
 
-Fixes: b11d31ae01e6 ("blk-wbt: remove unnecessary check in wbt_enable_default()")
-Reported-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Link: https://lore.kernel.org/lkml/CAKXUXMzfKq_J9nKHGyr5P5rvUETY4B-fxoQD4sO+NYjFOfVtZA@mail.gmail.com/t/
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-wbt.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+and similar for filemap_splice_read() other than that this looks good!
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index e49a48684532..9ec2a2f1eda3 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -730,14 +730,16 @@ void wbt_enable_default(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
- 	struct rq_qos *rqos;
--	bool disable_flag = q->elevator &&
--		    test_bit(ELEVATOR_FLAG_DISABLE_WBT, &q->elevator->flags);
-+	bool enable = IS_ENABLED(CONFIG_BLK_WBT_MQ);
-+
-+	if (q->elevator &&
-+	    test_bit(ELEVATOR_FLAG_DISABLE_WBT, &q->elevator->flags))
-+		enable = false;
- 
- 	/* Throttling already enabled? */
- 	rqos = wbt_rq_qos(q);
- 	if (rqos) {
--		if (!disable_flag &&
--		    RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
-+		if (enable && RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
- 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
- 		return;
- 	}
-@@ -746,7 +748,7 @@ void wbt_enable_default(struct gendisk *disk)
- 	if (!blk_queue_registered(q))
- 		return;
- 
--	if (queue_is_mq(q) && !disable_flag)
-+	if (queue_is_mq(q) && enable)
- 		wbt_init(disk);
- }
- EXPORT_SYMBOL_GPL(wbt_enable_default);
--- 
-2.39.2
-
+>  ssize_t copy_splice_read(struct file *in, loff_t *ppos,
+>  			 struct pipe_inode_info *pipe,
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index 603b562d69b1..1f235a6430fd 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -2871,9 +2871,24 @@ size_t splice_folio_into_pipe(struct pipe_inode_info *pipe,
+>  	return spliced;
+>  }
+>  
+> -/*
+> - * Splice folios from the pagecache of a buffered (ie. non-O_DIRECT) file into
+> - * a pipe.
+> +/**
+> + * filemap_splice_read -  Splice data from a file's pagecache into a pipe
+> + * @in: The file to read from
+> + * @ppos: Pointer to the file position to read from
+> + * @pipe: The pipe to splice into
+> + * @len: The amount to splice
+> + * @flags: The SPLICE_F_* flags
+> + *
+> + * This function gets folios from a file's pagecache and splices them into the
+> + * pipe.  Readahead will be called as necessary to fill more folios.  This may
+> + * be used for blockdevs also.
+> + *
+> + * On success, the number of bytes read will be returned and *@ppos will be
+> + * updated if appropriate; 0 will be returned if there is no more data to be
+> + * read; -EAGAIN will be returned if the pipe had no space, and some other
+> + * negative error code will be returned on error.  A short read may occur if
+> + * the pipe has insufficient space, we reach the end of the data or we hit a
+> + * hole.
+>   */
+>  ssize_t filemap_splice_read(struct file *in, loff_t *ppos,
+>  			    struct pipe_inode_info *pipe,
+> 
