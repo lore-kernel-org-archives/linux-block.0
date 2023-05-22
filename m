@@ -2,30 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8772BC77B75
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 14:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1BEAC7EE23
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 14:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233029AbjEVO3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 10:29:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55000 "EHLO
+        id S232778AbjEVOvB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 10:51:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232856AbjEVO3a (ORCPT
+        with ESMTP id S229741AbjEVOvA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 10:29:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4046AAF;
-        Mon, 22 May 2023 07:29:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 22 May 2023 10:51:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6291CCA
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 07:50:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684767015;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JYtoaiOBfTiLctYxaMtqzFI78VjutRXpKlguOTW1tdA=;
+        b=R9pUIg+Hec1YUf0kkQey5Lqkw/sAl5YbGSX619Bz8SDs4U2vtarITGb8JIL0AO7l7T9vgS
+        SUl3u374paArNN7UV0iphOelTMB9pxO6ZVlE0el8qcj5eoYrzGRzxWA4+Sb3mrfZq3eu8A
+        j2ZHABs2djVTPjYNK3V1Rcy91DBqPDU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-612-vN46sNt1Pr-bP0jWnEdEQw-1; Mon, 22 May 2023 10:50:09 -0400
+X-MC-Unique: vN46sNt1Pr-bP0jWnEdEQw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AF03561DC1;
-        Mon, 22 May 2023 14:29:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996E4C433D2;
-        Mon, 22 May 2023 14:29:22 +0000 (UTC)
-Date:   Mon, 22 May 2023 10:29:20 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 95F5A800BFF;
+        Mon, 22 May 2023 14:50:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BA1DC1121314;
+        Mon, 22 May 2023 14:50:05 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20230522102920.0528d821@rorschach.local.home>
+References: <20230522102920.0528d821@rorschach.local.home> <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-24-dhowells@redhat.com>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
@@ -40,64 +62,60 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@lst.de>,
         Masami Hiramatsu <mhiramat@kernel.org>,
         linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v20 23/32] splice: Convert trace/seq to use
- direct_splice_read()
-Message-ID: <20230522102920.0528d821@rorschach.local.home>
-In-Reply-To: <20230519074047.1739879-24-dhowells@redhat.com>
-References: <20230519074047.1739879-1-dhowells@redhat.com>
-        <20230519074047.1739879-24-dhowells@redhat.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+Subject: Re: [PATCH v20 23/32] splice: Convert trace/seq to use direct_splice_read()
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2812411.1684767005.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 22 May 2023 15:50:05 +0100
+Message-ID: <2812412.1684767005@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 19 May 2023 08:40:38 +0100
-David Howells <dhowells@redhat.com> wrote:
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-> For the splice from the trace seq buffer, just use direct_splice_read().
-> 
-> In the future, something better can probably be done by gifting pages from
-> seq->buf into the pipe, but that would require changing seq->buf into a
-> vmap over an array of pages.
+> > In the future, something better can probably be done by gifting pages =
+from
+> > seq->buf into the pipe, but that would require changing seq->buf into =
+a
+> > vmap over an array of pages.
+> =
 
-If you can give me a POC of what needs to be done, I could possibly
-implement it.
+> If you can give me a POC of what needs to be done, I could possibly
+> implement it.
 
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Christoph Hellwig <hch@lst.de>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Steven Rostedt <rostedt@goodmis.org>
-> cc: Masami Hiramatsu <mhiramat@kernel.org>
-> cc: linux-kernel@vger.kernel.org
-> cc: linux-trace-kernel@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-block@vger.kernel.org
-> cc: linux-mm@kvack.org
-> ---
->  kernel/trace/trace.c | 2 +-
+I wrote my idea up here for Masami[*]:
 
-Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+We could implement seq_splice_read().  What we would need to do is to chan=
+ge
+how the seq buffer is allocated: bulk allocate a bunch of arbitrary pages
+which we then vmap().  When we need to splice, we read into the buffer, do=
+ a
+vunmap() and then splice the pages holding the data we used into the pipe.
 
--- Steve
+If we don't manage to splice all the data, we can continue splicing from t=
+he
+pages we have left next time.  If a read() comes along to view partially
+spliced data, we would need to copy from the individual pages.
 
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-> index ebc59781456a..b664020efcb7 100644
-> --- a/kernel/trace/trace.c
-> +++ b/kernel/trace/trace.c
-> @@ -5171,7 +5171,7 @@ static const struct file_operations tracing_fops = {
->  	.open		= tracing_open,
->  	.read		= seq_read,
->  	.read_iter	= seq_read_iter,
-> -	.splice_read	= generic_file_splice_read,
-> +	.splice_read	= direct_splice_read,
->  	.write		= tracing_write_stub,
->  	.llseek		= tracing_lseek,
->  	.release	= tracing_release,
+When we use up all the data, we discard all the pages we might have splice=
+d
+from and shuffle down the other pages, call the bulk allocator to replenis=
+h
+the buffer and then vmap() it again.
+
+Any pages we've spliced from must be discarded and replaced and not rewrit=
+ten.
+
+If a read() comes without the buffer having been spliced from, it can do a=
+s it
+does now.
+
+David
+---
+
+[*] https://lore.kernel.org/linux-fsdevel/20230522-pfund-ferngeblieben-53f=
+ad9c0e527@brauner/T/#mc03959454c76cc3f29024b092c62d88c90f7c071
 
