@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 987D1C7EE2E
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7EA0C7EE2E
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:54:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234112AbjEVNyM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:54:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59378 "EHLO
+        id S234331AbjEVNyX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:54:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234130AbjEVNwv (ORCPT
+        with ESMTP id S234181AbjEVNwy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:52:51 -0400
+        Mon, 22 May 2023 09:52:54 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01FE01A1
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:51:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CCA310DE
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:51:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763494;
+        s=mimecast20190719; t=1684763503;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z3sOA+Wd5tRsdYNhOEn4oLwEz6sO/UZ9O0VL/asQvAk=;
-        b=OUUNaMKwQmA8qg8mjTmFPm5OWEIiIaGZOOoVq+D/9d0KqaOnZ5o/KPpOtDpkrG5p9dYJqN
-        yUvDqSQShmzOLKBu7jikKXBrxLwdD0luMXMG2chYjmxLkml/Qo3z1nwSjPUGUHpfp6LMq7
-        0EZ1247IH1eP1VmfU2O3sTcbDAYzQNk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=k/c+R+8s2k3pMmNtZ3aOuXJCBbwfObn3G1z9h41bJkI=;
+        b=YU+X2bxHX11aVtXtj0m7fCDzF84JE32bqpfw5f/rlCrR4vXOy3gB7mJrgK7JHW6RmdY2Ue
+        kcfHtowUcS06zvNz10o9QCeOeJaVebnZNzXzrZk6agCqPXgHyjpULhD+I3kDgvwCU/lXLq
+        fq/3e6bOQUHWiy/GmOkEB95EpZ26loE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-589-15acLePuPo-nRv91oSUclQ-1; Mon, 22 May 2023 09:51:28 -0400
-X-MC-Unique: 15acLePuPo-nRv91oSUclQ-1
+ us-mta-423-NgNsZyJqPjue_3wdjfNq9A-1; Mon, 22 May 2023 09:51:37 -0400
+X-MC-Unique: NgNsZyJqPjue_3wdjfNq9A-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC505185A78E;
-        Mon, 22 May 2023 13:51:27 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86DD7281294A;
+        Mon, 22 May 2023 13:51:36 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 03D3540CFD45;
-        Mon, 22 May 2023 13:51:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B290540CFD47;
+        Mon, 22 May 2023 13:51:33 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,11 +52,12 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Xiubo Li <xiubli@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Ilya Dryomov <idryomov@gmail.com>, ceph-devel@vger.kernel.org
-Subject: [PATCH v22 16/31] ceph: Provide a splice-read wrapper
-Date:   Mon, 22 May 2023 14:50:03 +0100
-Message-Id: <20230522135018.2742245-17-dhowells@redhat.com>
+        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-ext4@vger.kernel.org
+Subject: [PATCH v22 18/31] ext4: Provide a splice-read wrapper
+Date:   Mon, 22 May 2023 14:50:05 +0100
+Message-Id: <20230522135018.2742245-19-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
@@ -66,116 +67,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read wrapper for Ceph.  This does the inode shutdown check
-before proceeding and jumps to copy_splice_read() if the file has inline
-data or is a synchronous file.
-
-We try and get FILE_RD and either FILE_CACHE and/or FILE_LAZYIO caps and
-hold them across filemap_splice_read().  If we fail to get FILE_CACHE or
-FILE_LAZYIO capabilities, we use copy_splice_read() instead.
+Provide a splice_read wrapper for Ext4.  This does the inode shutdown check
+before proceeding.  Splicing from DAX files and O_DIRECT fds is handled by
+the caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Xiubo Li <xiubli@redhat.com>
-cc: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Theodore Ts'o <tytso@mit.edu>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Ilya Dryomov <idryomov@gmail.com>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: ceph-devel@vger.kernel.org
+cc: Andreas Dilger <adilger.kernel@dilger.ca>
+cc: linux-ext4@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
+ fs/ext4/file.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-Notes:
-    ver #21)
-     - Need to drop the caps ref.
-     - O_DIRECT is handled by the caller.
-
- fs/ceph/file.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 64 insertions(+), 1 deletion(-)
-
-diff --git a/fs/ceph/file.c b/fs/ceph/file.c
-index f4d8bf7dec88..4285f6cb5d3b 100644
---- a/fs/ceph/file.c
-+++ b/fs/ceph/file.c
-@@ -1745,6 +1745,69 @@ static ssize_t ceph_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	return ret;
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index d101b3b0c7da..9f8bbd9d131c 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -147,6 +147,17 @@ static ssize_t ext4_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	return generic_file_read_iter(iocb, to);
  }
  
-+/*
-+ * Wrap filemap_splice_read with checks for cap bits on the inode.
-+ * Atomically grab references, so that those bits are not released
-+ * back to the MDS mid-read.
-+ */
-+static ssize_t ceph_splice_read(struct file *in, loff_t *ppos,
-+				struct pipe_inode_info *pipe,
-+				size_t len, unsigned int flags)
++static ssize_t ext4_file_splice_read(struct file *in, loff_t *ppos,
++				     struct pipe_inode_info *pipe,
++				     size_t len, unsigned int flags)
 +{
-+	struct ceph_file_info *fi = in->private_data;
 +	struct inode *inode = file_inode(in);
-+	struct ceph_inode_info *ci = ceph_inode(inode);
-+	ssize_t ret;
-+	int want = 0, got = 0;
-+	CEPH_DEFINE_RW_CONTEXT(rw_ctx, 0);
 +
-+	dout("splice_read %p %llx.%llx %llu~%zu trying to get caps on %p\n",
-+	     inode, ceph_vinop(inode), *ppos, len, inode);
-+
-+	if (ceph_inode_is_shutdown(inode))
-+		return -ESTALE;
-+
-+	if (ceph_has_inline_data(ci) ||
-+	    (fi->flags & CEPH_F_SYNC))
-+		return copy_splice_read(in, ppos, pipe, len, flags);
-+
-+	ceph_start_io_read(inode);
-+
-+	want = CEPH_CAP_FILE_CACHE;
-+	if (fi->fmode & CEPH_FILE_MODE_LAZY)
-+		want |= CEPH_CAP_FILE_LAZYIO;
-+
-+	ret = ceph_get_caps(in, CEPH_CAP_FILE_RD, want, -1, &got);
-+	if (ret < 0)
-+		goto out_end;
-+
-+	if ((got & (CEPH_CAP_FILE_CACHE | CEPH_CAP_FILE_LAZYIO)) == 0) {
-+		dout("splice_read/sync %p %llx.%llx %llu~%zu got cap refs on %s\n",
-+		     inode, ceph_vinop(inode), *ppos, len,
-+		     ceph_cap_string(got));
-+
-+		ceph_put_cap_refs(ci, got);
-+		ceph_end_io_read(inode);
-+		return copy_splice_read(in, ppos, pipe, len, flags);
-+	}
-+
-+	dout("splice_read %p %llx.%llx %llu~%zu got cap refs on %s\n",
-+	     inode, ceph_vinop(inode), *ppos, len, ceph_cap_string(got));
-+
-+	rw_ctx.caps = got;
-+	ceph_add_rw_context(fi, &rw_ctx);
-+	ret = filemap_splice_read(in, ppos, pipe, len, flags);
-+	ceph_del_rw_context(fi, &rw_ctx);
-+
-+	dout("splice_read %p %llx.%llx dropping cap refs on %s = %zd\n",
-+	     inode, ceph_vinop(inode), ceph_cap_string(got), ret);
-+
-+	ceph_put_cap_refs(ci, got);
-+out_end:
-+	ceph_end_io_read(inode);
-+	return ret;
++	if (unlikely(ext4_forced_shutdown(EXT4_SB(inode->i_sb))))
++		return -EIO;
++	return generic_file_splice_read(in, ppos, pipe, len, flags);
 +}
 +
  /*
-  * Take cap references to avoid releasing caps to MDS mid-write.
-  *
-@@ -2593,7 +2656,7 @@ const struct file_operations ceph_file_fops = {
- 	.lock = ceph_lock,
- 	.setlease = simple_nosetlease,
- 	.flock = ceph_flock,
--	.splice_read = generic_file_splice_read,
-+	.splice_read = ceph_splice_read,
- 	.splice_write = iter_file_splice_write,
- 	.unlocked_ioctl = ceph_ioctl,
- 	.compat_ioctl = compat_ptr_ioctl,
+  * Called when an inode is released. Note that this is different
+  * from ext4_file_open: open gets called at every open, but release
+@@ -957,7 +968,7 @@ const struct file_operations ext4_file_operations = {
+ 	.release	= ext4_release_file,
+ 	.fsync		= ext4_sync_file,
+ 	.get_unmapped_area = thp_get_unmapped_area,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= ext4_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.fallocate	= ext4_fallocate,
+ };
 
