@@ -2,178 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D1FC7EE23
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 16:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 085B7C77B73
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 17:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231705AbjEVQhP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 12:37:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45216 "EHLO
+        id S229767AbjEVRus (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 13:50:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232364AbjEVQhO (ORCPT
+        with ESMTP id S232413AbjEVRur (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 12:37:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFD78BF;
-        Mon, 22 May 2023 09:37:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5E09F61B6C;
-        Mon, 22 May 2023 16:37:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD5BFC433EF;
-        Mon, 22 May 2023 16:37:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684773430;
-        bh=2He6U7qRXsvcUhtzbRqViBFgVaT+dg2a2JQ7qWLAX9c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VZXeWVIh07NmnTCmgVxAUdNEN/GFI7px1Szk/0gj+mTlwADll5GDq8yMtIGHk/2/v
-         5/+XsBtb4u/VtVnJCxv2Sz6CQpBonzMUKJNOvIBr4pzz33dCTT7DITwfmBrI3x/7ow
-         wneGx6y9vdwA1JWQdHS2EFKj8jFdUnvBvenc3AXYljvXlM0gnZsSatAQ4vddWrPcq1
-         ipIFtaHJQwicwfbn2dQwYqVu2ptWjeA3D01NbL1SID8nnUDpR0Vp6Ix4LyV+8cq4Xd
-         RIhoQfcwi+TmdEyL1rA6Rkr3+y8L8gZJEQ7KuNfIkwe4F2GP5K8mdm0jBcUkdLgBnK
-         xOXyAXGzdSmmw==
-Date:   Mon, 22 May 2023 09:37:10 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Brian Foster <bfoster@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [dm-devel] [PATCH v7 5/5] loop: Add support for provision
- requests
-Message-ID: <20230522163710.GA11607@frogsfrogsfrogs>
-References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
- <20230518223326.18744-6-sarthakkukreti@chromium.org>
+        Mon, 22 May 2023 13:50:47 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A33DFF
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 10:50:45 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4f3a611b3ddso4803217e87.0
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 10:50:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1684777843; x=1687369843;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v0vGfy2nsZav2HY5i+tp/Nl3rfKXvicFLnxzClJPsL0=;
+        b=bmpPa9zjlUzyjbeZlqxzu2zabV3bl9Mm+UYqg4JG6Ok1Tv+s0hgvqO6u15FubxI+su
+         jWSD+MNvgdoYp80pJmKsynVPfeLe3AArwDF5HvAlS3TXL8Jsy5j6yf/wkFgyJsgNsSrB
+         2CFm0tX49r98zxmjmEP/UgvkK1lnk1EOIYEcY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684777843; x=1687369843;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v0vGfy2nsZav2HY5i+tp/Nl3rfKXvicFLnxzClJPsL0=;
+        b=YRkfYQ81vGGr/TsPtDPiUXCG0+KPB/KKq95k1eTFhfKtjNZU5qyZHFWPnKpXXCnFSL
+         sUPxKOsHcKWef9QXjBbyFakmtof504Kq7Wbue+FKzKEX68c8Kh1GeLCim79FoU6QRbGf
+         qW67KkO5yl6RVBYogN2jKANkgl/k/mdH2yV2U4lZljxDIzbQ0Qf4yIpbzVW3rptysg+l
+         ozVEATaHpP+VD78Su9ScbEasTRdVcHBZ9chjn9B3wTzvYpEz1kFCP1R1mMBKV6uk5VrP
+         eZu9Gb/vztFxMUQtzQ67JG3oJLnBGj31JOJVkfz3zTMwpPoVwK4UPm7lmh/XseP2Jzlz
+         d1XQ==
+X-Gm-Message-State: AC+VfDxI9sIGa6IUAF29APk1JHK1jeKvLpzh+GQEU7mw+qCcwpx0DsP3
+        fsCsTXZU1twz6D7i44zfR8LUzeXiwCo+kCbntVJ1Nieg
+X-Google-Smtp-Source: ACHHUZ7tubMztUOrbbglvs2vvPu6KY8CkCGBbsgUJxwMEr2oYn6XUNBK7cCGpEwo3E0AYHhagw9l5Q==
+X-Received: by 2002:a19:f613:0:b0:4f3:77f9:2bbe with SMTP id x19-20020a19f613000000b004f377f92bbemr3763341lfe.3.1684777843331;
+        Mon, 22 May 2023 10:50:43 -0700 (PDT)
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com. [209.85.167.44])
+        by smtp.gmail.com with ESMTPSA id o1-20020a056512050100b004e843d6244csm1051736lfb.99.2023.05.22.10.50.42
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 May 2023 10:50:43 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-4f3a611b3ddso4803199e87.0
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 10:50:42 -0700 (PDT)
+X-Received: by 2002:a17:907:1688:b0:965:d7c7:24db with SMTP id
+ hc8-20020a170907168800b00965d7c724dbmr9757222ejc.32.1684777349281; Mon, 22
+ May 2023 10:42:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230518223326.18744-6-sarthakkukreti@chromium.org>
+References: <20230519074047.1739879-1-dhowells@redhat.com> <20230519074047.1739879-24-dhowells@redhat.com>
+ <20230522102920.0528d821@rorschach.local.home> <2812412.1684767005@warthog.procyon.org.uk>
+In-Reply-To: <2812412.1684767005@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 22 May 2023 10:42:12 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgg4iDEuSN4K6S6ohAm4zd_V5h4tXGn6-2-cfOuJPFDZQ@mail.gmail.com>
+Message-ID: <CAHk-=wgg4iDEuSN4K6S6ohAm4zd_V5h4tXGn6-2-cfOuJPFDZQ@mail.gmail.com>
+Subject: Re: [PATCH v20 23/32] splice: Convert trace/seq to use direct_splice_read()
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steven Rostedt <rostedt@goodmis.org>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18, 2023 at 03:33:26PM -0700, Sarthak Kukreti wrote:
-> Add support for provision requests to loopback devices.
-> Loop devices will configure provision support based on
-> whether the underlying block device/file can support
-> the provision request and upon receiving a provision bio,
-> will map it to the backing device/storage. For loop devices
-> over files, a REQ_OP_PROVISION request will translate to
-> an fallocate mode 0 call on the backing file.
-> 
-> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> ---
->  drivers/block/loop.c | 34 +++++++++++++++++++++++++++++++---
->  1 file changed, 31 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index bc31bb7072a2..7fe1a6629754 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -311,16 +311,20 @@ static int lo_fallocate(struct loop_device *lo, struct request *rq, loff_t pos,
->  {
->  	/*
->  	 * We use fallocate to manipulate the space mappings used by the image
-> -	 * a.k.a. discard/zerorange.
-> +	 * a.k.a. discard/provision/zerorange.
->  	 */
->  	struct file *file = lo->lo_backing_file;
->  	int ret;
->  
-> -	mode |= FALLOC_FL_KEEP_SIZE;
-> +	if (mode & (FALLOC_FL_PUNCH_HOLE | FALLOC_FL_ZERO_RANGE) &&
-> +	    !bdev_max_discard_sectors(lo->lo_device))
-> +		return -EOPNOTSUPP;
->  
-> -	if (!bdev_max_discard_sectors(lo->lo_device))
-> +	if (mode == 0 && !bdev_max_provision_sectors(lo->lo_device))
->  		return -EOPNOTSUPP;
->  
-> +	mode |= FALLOC_FL_KEEP_SIZE;
-> +
->  	ret = file->f_op->fallocate(file, mode, pos, blk_rq_bytes(rq));
->  	if (unlikely(ret && ret != -EINVAL && ret != -EOPNOTSUPP))
->  		return -EIO;
-> @@ -488,6 +492,8 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
->  				FALLOC_FL_PUNCH_HOLE);
->  	case REQ_OP_DISCARD:
->  		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
-> +	case REQ_OP_PROVISION:
-> +		return lo_fallocate(lo, rq, pos, 0);
+On Mon, May 22, 2023 at 7:50=E2=80=AFAM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+> We could implement seq_splice_read().  What we would need to do is to cha=
+nge
+> how the seq buffer is allocated: bulk allocate a bunch of arbitrary pages
+> which we then vmap().  When we need to splice, we read into the buffer, d=
+o a
+> vunmap() and then splice the pages holding the data we used into the pipe=
+.
 
-If someone calls fallocate(UNSHARE_RANGE) on a loop bdev, shouldn't
-there be a way to pass that through to the fallocate call to the backing
-file?
+Please don't use vmap as a way to do zero-copy.
 
---D
+The virtual mapping games are more expensive than a small copy from
+some random seq file.
 
->  	case REQ_OP_WRITE:
->  		if (cmd->use_aio)
->  			return lo_rw_aio(lo, cmd, pos, ITER_SOURCE);
-> @@ -754,6 +760,25 @@ static void loop_sysfs_exit(struct loop_device *lo)
->  				   &loop_attribute_group);
->  }
->  
-> +static void loop_config_provision(struct loop_device *lo)
-> +{
-> +	struct file *file = lo->lo_backing_file;
-> +	struct inode *inode = file->f_mapping->host;
-> +
-> +	/*
-> +	 * If the backing device is a block device, mirror its provisioning
-> +	 * capability.
-> +	 */
-> +	if (S_ISBLK(inode->i_mode)) {
-> +		blk_queue_max_provision_sectors(lo->lo_queue,
-> +			bdev_max_provision_sectors(I_BDEV(inode)));
-> +	} else if (file->f_op->fallocate) {
-> +		blk_queue_max_provision_sectors(lo->lo_queue, UINT_MAX >> 9);
-> +	} else {
-> +		blk_queue_max_provision_sectors(lo->lo_queue, 0);
-> +	}
-> +}
-> +
->  static void loop_config_discard(struct loop_device *lo)
->  {
->  	struct file *file = lo->lo_backing_file;
-> @@ -1092,6 +1117,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
->  	blk_queue_io_min(lo->lo_queue, bsize);
->  
->  	loop_config_discard(lo);
-> +	loop_config_provision(lo);
->  	loop_update_rotational(lo);
->  	loop_update_dio(lo);
->  	loop_sysfs_init(lo);
-> @@ -1304,6 +1330,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  	}
->  
->  	loop_config_discard(lo);
-> +	loop_config_provision(lo);
->  
->  	/* update dio if lo_offset or transfer is changed */
->  	__loop_update_dio(lo, lo->use_dio);
-> @@ -1830,6 +1857,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
->  	case REQ_OP_FLUSH:
->  	case REQ_OP_DISCARD:
->  	case REQ_OP_WRITE_ZEROES:
-> +	case REQ_OP_PROVISION:
->  		cmd->use_aio = false;
->  		break;
->  	default:
-> -- 
-> 2.40.1.698.g37aff9b760-goog
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://listman.redhat.com/mailman/listinfo/dm-devel
-> 
+Yes, yes, seq_file currently uses "kvmalloc()", which does fall back
+to vmalloc too. But the keyword there is "falls back". Most of the
+time it's just a regular boring kmalloc, and most of the time a
+seq-file is tiny.
+
+                      Linus
