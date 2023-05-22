@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0586DC7EE30
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E772FC7EE2D
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:52:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233802AbjEVNwL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:52:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59058 "EHLO
+        id S233795AbjEVNwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:52:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233871AbjEVNwE (ORCPT
+        with ESMTP id S230362AbjEVNwH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:52:04 -0400
+        Mon, 22 May 2023 09:52:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B699D1A7
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:50:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9558918F
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:50:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763449;
+        s=mimecast20190719; t=1684763446;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pM2ysDzppt/NTb8ZyH27IEzbM3T0VU0XmStR2DOq6rE=;
-        b=SS7NsFASiIta7fo9ki72BUGPXIlM8RpvEJQsWk5fyELmuhKfz7tR3ipYp8FW0VGEcrGWXt
-        F2+Ex1YwLecY/ID53kxoCuJCZ6okzfrVlbnpdJs+2hRQjZKq9MEA+afIq56TVWj3sIstMR
-        Z/dy6IKe9SOlfiXUBSPfgpmEnvU7eEA=
+        bh=+QycUCk1EhV64OEFYi0Ywr/xSgjmAM7Sud1UY4yTKxE=;
+        b=irRwId0b7rmrkvFKJGDi5rMomGoLAcVNHD3gfrMJbmzxHoQFvXLan8va9T53clU+p7RTp+
+        bCfl/B3nF1FJhEnbooXWxUflQUHFBpDETU7lrOc4icWGlZc/+mrWt9BxfoldR/H4vAsbad
+        w1dGvn6OkRH7Ednh04r+CZOnrWbR7Hw=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-qL7E6ESWO2O9-esN8xS6hw-1; Mon, 22 May 2023 09:50:45 -0400
-X-MC-Unique: qL7E6ESWO2O9-esN8xS6hw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-31-5SDxrfwzNriOr4rM0S6JVg-1; Mon, 22 May 2023 09:50:41 -0400
+X-MC-Unique: 5SDxrfwzNriOr4rM0S6JVg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DBA44101AA74;
-        Mon, 22 May 2023 13:50:44 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C8CC9185A78E;
+        Mon, 22 May 2023 13:50:40 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 882EE40C6CD8;
-        Mon, 22 May 2023 13:50:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A3B22166B25;
+        Mon, 22 May 2023 13:50:38 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,116 +53,98 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        John Hubbard <jhubbard@nvidia.com>,
-        linux-unionfs@vger.kernel.org
-Subject: [PATCH v22 05/31] splice: Make do_splice_to() generic and export it
-Date:   Mon, 22 May 2023 14:49:52 +0100
-Message-Id: <20230522135018.2742245-6-dhowells@redhat.com>
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH v22 04/31] splice: Clean up copy_splice_read() a bit
+Date:   Mon, 22 May 2023 14:49:51 +0100
+Message-Id: <20230522135018.2742245-5-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Rename do_splice_to() to vfs_splice_read() and export it so that it can be
-used as a helper when calling down to a lower layer filesystem as it
-performs all the necessary checks[1].
+Do a couple of cleanups to copy_splice_read():
 
+ (1) Cast to struct page **, not void *.
+
+ (2) Simplify the calculation of the number of pages to keep/reclaim in
+     copy_splice_read().
+
+Suggested-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Christian Brauner <brauner@kernel.org>
-cc: Miklos Szeredi <miklos@szeredi.hu>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: John Hubbard <jhubbard@nvidia.com>
 cc: David Hildenbrand <david@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-unionfs@vger.kernel.org
+cc: John Hubbard <jhubbard@nvidia.com>
+cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
-Link: https://lore.kernel.org/r/CAJfpeguGksS3sCigmRi9hJdUec8qtM9f+_9jC1rJhsXT+dV01w@mail.gmail.com/ [1]
 ---
- fs/splice.c            | 27 ++++++++++++++++++++-------
- include/linux/splice.h |  3 +++
- 2 files changed, 23 insertions(+), 7 deletions(-)
+
+Notes:
+    ver #21)
+     - direct_splice_read() got renamed to copy_splice_read().
+
+ fs/splice.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
 diff --git a/fs/splice.c b/fs/splice.c
-index f9a9be797b0c..d815a69f6589 100644
+index 2478e065bc53..f9a9be797b0c 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
-@@ -867,12 +867,24 @@ static long do_splice_from(struct pipe_inode_info *pipe, struct file *out,
- 	return out->f_op->splice_write(pipe, out, ppos, len, flags);
- }
+@@ -311,7 +311,7 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
+ 	struct kiocb kiocb;
+ 	struct page **pages;
+ 	ssize_t ret;
+-	size_t used, npages, chunk, remain, reclaim;
++	size_t used, npages, chunk, remain, keep = 0;
+ 	int i;
  
--/*
-- * Attempt to initiate a splice from a file to a pipe.
-+/**
-+ * vfs_splice_read - Read data from a file and splice it into a pipe
-+ * @in:		File to splice from
-+ * @ppos:	Input file offset
-+ * @pipe:	Pipe to splice to
-+ * @len:	Number of bytes to splice
-+ * @flags:	Splice modifier flags (SPLICE_F_*)
-+ *
-+ * Splice the requested amount of data from the input file to the pipe.  This
-+ * is synchronous as the caller must hold the pipe lock across the entire
-+ * operation.
-+ *
-+ * If successful, it returns the amount of data spliced, 0 if it hit the EOF or
-+ * a hole and a negative error code otherwise.
-  */
--static long do_splice_to(struct file *in, loff_t *ppos,
--			 struct pipe_inode_info *pipe, size_t len,
--			 unsigned int flags)
-+long vfs_splice_read(struct file *in, loff_t *ppos,
-+		     struct pipe_inode_info *pipe, size_t len,
-+		     unsigned int flags)
- {
- 	unsigned int p_space;
- 	int ret;
-@@ -895,6 +907,7 @@ static long do_splice_to(struct file *in, loff_t *ppos,
- 		return warn_unsupported(in, "read");
- 	return in->f_op->splice_read(in, ppos, pipe, len, flags);
- }
-+EXPORT_SYMBOL_GPL(vfs_splice_read);
+ 	/* Work out how much data we can actually add into the pipe */
+@@ -325,7 +325,7 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
+ 	if (!bv)
+ 		return -ENOMEM;
  
- /**
-  * splice_direct_to_actor - splices data directly between two non-pipes
-@@ -964,7 +977,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 		size_t read_len;
- 		loff_t pos = sd->pos, prev_pos = pos;
+-	pages = (void *)(bv + npages);
++	pages = (struct page **)(bv + npages);
+ 	npages = alloc_pages_bulk_array(GFP_USER, npages, pages);
+ 	if (!npages) {
+ 		kfree(bv);
+@@ -348,11 +348,8 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
+ 	kiocb.ki_pos = *ppos;
+ 	ret = call_read_iter(in, &kiocb, &to);
  
--		ret = do_splice_to(in, &pos, pipe, len, flags);
-+		ret = vfs_splice_read(in, &pos, pipe, len, flags);
- 		if (unlikely(ret <= 0))
- 			goto out_release;
+-	reclaim = npages * PAGE_SIZE;
+-	remain = 0;
+ 	if (ret > 0) {
+-		reclaim -= ret;
+-		remain = ret;
++		keep = DIV_ROUND_UP(ret, PAGE_SIZE);
+ 		*ppos = kiocb.ki_pos;
+ 		file_accessed(in);
+ 	} else if (ret < 0) {
+@@ -365,14 +362,12 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
+ 	}
  
-@@ -1112,7 +1125,7 @@ long splice_file_to_pipe(struct file *in,
- 	pipe_lock(opipe);
- 	ret = wait_for_space(opipe, flags);
- 	if (!ret)
--		ret = do_splice_to(in, offset, opipe, len, flags);
-+		ret = vfs_splice_read(in, offset, opipe, len, flags);
- 	pipe_unlock(opipe);
- 	if (ret > 0)
- 		wakeup_pipe_readers(opipe);
-diff --git a/include/linux/splice.h b/include/linux/splice.h
-index a55179fd60fc..8f052c3dae95 100644
---- a/include/linux/splice.h
-+++ b/include/linux/splice.h
-@@ -76,6 +76,9 @@ extern ssize_t splice_to_pipe(struct pipe_inode_info *,
- 			      struct splice_pipe_desc *);
- extern ssize_t add_to_pipe(struct pipe_inode_info *,
- 			      struct pipe_buffer *);
-+long vfs_splice_read(struct file *in, loff_t *ppos,
-+		     struct pipe_inode_info *pipe, size_t len,
-+		     unsigned int flags);
- extern ssize_t splice_direct_to_actor(struct file *, struct splice_desc *,
- 				      splice_direct_actor *);
- extern long do_splice(struct file *in, loff_t *off_in,
+ 	/* Free any pages that didn't get touched at all. */
+-	reclaim /= PAGE_SIZE;
+-	if (reclaim) {
+-		npages -= reclaim;
+-		release_pages(pages + npages, reclaim);
+-	}
++	if (keep < npages)
++		release_pages(pages + keep, npages - keep);
+ 
+ 	/* Push the remaining pages into the pipe. */
+-	for (i = 0; i < npages; i++) {
++	remain = ret;
++	for (i = 0; i < keep; i++) {
+ 		struct pipe_buffer *buf = pipe_head_buf(pipe);
+ 
+ 		chunk = min_t(size_t, remain, PAGE_SIZE);
 
