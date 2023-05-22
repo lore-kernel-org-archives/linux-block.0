@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E772FC7EE2D
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BA5C77B73
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:52:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233795AbjEVNwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:52:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59034 "EHLO
+        id S233988AbjEVNws (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:52:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230362AbjEVNwH (ORCPT
+        with ESMTP id S234011AbjEVNwM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:52:07 -0400
+        Mon, 22 May 2023 09:52:12 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9558918F
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:50:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D192DE40
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763446;
+        s=mimecast20190719; t=1684763455;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+QycUCk1EhV64OEFYi0Ywr/xSgjmAM7Sud1UY4yTKxE=;
-        b=irRwId0b7rmrkvFKJGDi5rMomGoLAcVNHD3gfrMJbmzxHoQFvXLan8va9T53clU+p7RTp+
-        bCfl/B3nF1FJhEnbooXWxUflQUHFBpDETU7lrOc4icWGlZc/+mrWt9BxfoldR/H4vAsbad
-        w1dGvn6OkRH7Ednh04r+CZOnrWbR7Hw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=OAfj5fBZSZu8a/UyjUmcAHzT3o8yzjmkKwDwGprM6r0=;
+        b=gvdQeTHvvGiIFDS5lxNMpckA/C7S259eURZltxOEq83FKRGPKJd+6AUQKKv+l7tnsqjTWU
+        t8JwpZC9OkYMMPqBqbkNwvKqH0/Xjpf4cJotZAFvh0Pmi4IBQyfU1WzaO+yhFlPxgbzHf+
+        40LHZq4ZEP0b12aknb+s49x8h9ydYio=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-31-5SDxrfwzNriOr4rM0S6JVg-1; Mon, 22 May 2023 09:50:41 -0400
-X-MC-Unique: 5SDxrfwzNriOr4rM0S6JVg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-315-ESFFS34sPvibgfGTGCbRAQ-1; Mon, 22 May 2023 09:50:49 -0400
+X-MC-Unique: ESFFS34sPvibgfGTGCbRAQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C8CC9185A78E;
-        Mon, 22 May 2023 13:50:40 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 160012812947;
+        Mon, 22 May 2023 13:50:48 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A3B22166B25;
-        Mon, 22 May 2023 13:50:38 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A0BB8C1ED99;
+        Mon, 22 May 2023 13:50:45 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,99 +52,44 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v22 04/31] splice: Clean up copy_splice_read() a bit
-Date:   Mon, 22 May 2023 14:49:51 +0100
-Message-Id: <20230522135018.2742245-5-dhowells@redhat.com>
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v22 06/31] splice: Check for zero count in vfs_splice_read()
+Date:   Mon, 22 May 2023 14:49:53 +0100
+Message-Id: <20230522135018.2742245-7-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Do a couple of cleanups to copy_splice_read():
+Make vfs_splice_read() return immediately if the length is 0.
 
- (1) Cast to struct page **, not void *.
-
- (2) Simplify the calculation of the number of pages to keep/reclaim in
-     copy_splice_read().
-
-Suggested-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Christian Brauner <brauner@kernel.org>
 cc: Jens Axboe <axboe@kernel.dk>
 cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: linux-mm@kvack.org
 cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
 ---
-
-Notes:
-    ver #21)
-     - direct_splice_read() got renamed to copy_splice_read().
-
- fs/splice.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ fs/splice.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/fs/splice.c b/fs/splice.c
-index 2478e065bc53..f9a9be797b0c 100644
+index d815a69f6589..fe3309ffeb26 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
-@@ -311,7 +311,7 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- 	struct kiocb kiocb;
- 	struct page **pages;
- 	ssize_t ret;
--	size_t used, npages, chunk, remain, reclaim;
-+	size_t used, npages, chunk, remain, keep = 0;
- 	int i;
+@@ -891,6 +891,8 @@ long vfs_splice_read(struct file *in, loff_t *ppos,
  
- 	/* Work out how much data we can actually add into the pipe */
-@@ -325,7 +325,7 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- 	if (!bv)
- 		return -ENOMEM;
+ 	if (unlikely(!(in->f_mode & FMODE_READ)))
+ 		return -EBADF;
++	if (!len)
++		return 0;
  
--	pages = (void *)(bv + npages);
-+	pages = (struct page **)(bv + npages);
- 	npages = alloc_pages_bulk_array(GFP_USER, npages, pages);
- 	if (!npages) {
- 		kfree(bv);
-@@ -348,11 +348,8 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- 	kiocb.ki_pos = *ppos;
- 	ret = call_read_iter(in, &kiocb, &to);
- 
--	reclaim = npages * PAGE_SIZE;
--	remain = 0;
- 	if (ret > 0) {
--		reclaim -= ret;
--		remain = ret;
-+		keep = DIV_ROUND_UP(ret, PAGE_SIZE);
- 		*ppos = kiocb.ki_pos;
- 		file_accessed(in);
- 	} else if (ret < 0) {
-@@ -365,14 +362,12 @@ ssize_t copy_splice_read(struct file *in, loff_t *ppos,
- 	}
- 
- 	/* Free any pages that didn't get touched at all. */
--	reclaim /= PAGE_SIZE;
--	if (reclaim) {
--		npages -= reclaim;
--		release_pages(pages + npages, reclaim);
--	}
-+	if (keep < npages)
-+		release_pages(pages + keep, npages - keep);
- 
- 	/* Push the remaining pages into the pipe. */
--	for (i = 0; i < npages; i++) {
-+	remain = ret;
-+	for (i = 0; i < keep; i++) {
- 		struct pipe_buffer *buf = pipe_head_buf(pipe);
- 
- 		chunk = min_t(size_t, remain, PAGE_SIZE);
+ 	/* Don't try to read more the pipe has space for. */
+ 	p_space = pipe->max_usage - pipe_occupancy(pipe->head, pipe->tail);
 
