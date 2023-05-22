@@ -2,118 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC89C77B73
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 21:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EF5C7EE2A
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 21:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235434AbjEVVAM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 17:00:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58936 "EHLO
+        id S235145AbjEVVGH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 17:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235565AbjEVU7t (ORCPT
+        with ESMTP id S234653AbjEVVGG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 16:59:49 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6565120;
-        Mon, 22 May 2023 13:59:34 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-64d1e96c082so3535234b3a.1;
-        Mon, 22 May 2023 13:59:34 -0700 (PDT)
+        Mon, 22 May 2023 17:06:06 -0400
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4500DC1
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 14:06:05 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-74e4f839ae4so340769585a.0
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 14:06:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684789174; x=1687381174;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=REd5LAfz4pnrlWJeTXd7TNxPZb5If45Ls7fcUl4wW74=;
-        b=lRz3eawJzzyIYWWtoGkyPPVw4Nh3+OLy6jFJMU+raeIShsezJRKl644EXFjT8VXibp
-         HtJYoF9JEJBg1ClhPIoL6RiIcabDVfxMQPhGwQIHtkl7W0bHy7yjiwWYtoFH9LBHhYOU
-         JEiONdLbci65yJjPkYqVHntuJUL81Tsa0epXl5zHQ1Oe8SuyaMT1EvhdvIUB2HjHhQHl
-         Vs28CO3mP8kL3yjk9PfS8QV4l6+YVEYuPDyAMycXEGEcuUDzt+xC/uWjuHpt/UNCHrz/
-         BYyWPHtO5gNxmtmuteRhpakBhlwavqOtp7CZh4twewBcTdi8yL/m+ozPxlptx9Fyn0o1
-         tmQg==
+        d=gmail.com; s=20221208; t=1684789564; x=1687381564;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ljRC7JLVntpkTIClFzuOc4f+4gIqX3vdkFlSizRBCPo=;
+        b=Z826cv/HRmxaVIz3VcMDuTvqECUugIOeOpJ+SmysHESEc7jbjJd8DFfnSd6Uqq1DNA
+         5+Xpo5cDlYZmj2dRnGQw4xSss9lIhzqEXJIf0nk+08k2uXG6Z3tzV1c0e3NCwarZ9cdl
+         QKMRrSyAmlnfS6fKrub6OQ0oSst5yfJC7Bavps6Dl3v0Z6OqfJjwlbXGQinfrgRRISQK
+         XurQ1Bwf4rxCaj0Sn3WRaYKrc0KeuW4BrS9WioRKZkoEkga7nMai9FdB9qarIyKp1xHo
+         kRmiFmeXNYbZ09slRCHoQ14JflIWMhzmxWEkcep3g8IMo1rg6NIVLxq2HtAalaIMjaKR
+         rtsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684789174; x=1687381174;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1684789564; x=1687381564;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=REd5LAfz4pnrlWJeTXd7TNxPZb5If45Ls7fcUl4wW74=;
-        b=aS7Si1t31RxhxwtgA+ydLkgARGOQay8G3lZB4i3Mpx37mOk5sf8YZLOONiGoAoyumA
-         RliBDB5+Wuk1jocXc3Vl2UuRyzvMblR5O+XtXCUIeOjTnoCshkuTZlWlp1Im1/5IcPDG
-         T9SkUEUBWVD+ExL0ix+IzsUO69hv/LFpA5WHwHTNjNHLcB2Zp8UumvhW4iWVP8vlc1Ya
-         iXJqJuZ47T1NjHvu6SZPH3aawUGVLejB4IT1xXI/nXd+sDS8/TGDqTN2OfZ8AY8co+OE
-         fPzpbuuEDlnkXNMk8gRwlvY+Sy8/+aFKEjOEawHnBUMlk6qyImC+rXPsKMXOLEJhoo/V
-         +URA==
-X-Gm-Message-State: AC+VfDyGvWZWEDsCJcAx3SU/BQg3Fx728VNVpgK2UKGEI/TZ4pZWKTXT
-        ixyXFbQ85Zp3IChYiT/zcfzU8bYtT7c=
-X-Google-Smtp-Source: ACHHUZ62p+fet8YNvDAvQD8XHEQO/LJcmHtalvyR/EUUpdMx3CiCSyB2OzQAqQTfXGXwV3TSV2WBRg==
-X-Received: by 2002:a05:6a21:100e:b0:ec:d7cf:bcf7 with SMTP id nk14-20020a056a21100e00b000ecd7cfbcf7mr12191695pzb.17.1684789174047;
-        Mon, 22 May 2023 13:59:34 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:39c])
-        by smtp.gmail.com with ESMTPSA id i14-20020a63cd0e000000b005287a0560c9sm4835896pgg.1.2023.05.22.13.59.32
+        bh=ljRC7JLVntpkTIClFzuOc4f+4gIqX3vdkFlSizRBCPo=;
+        b=E3RITm46p7F7Y7AfeWYufSiMrxm0sYbg2ty7xbiTKX1D3q7bSDvJqskW3g97HXrWFa
+         OdPL5bxg24ZSWKdU69532+4ChyiTaicyEy7ARok/QVcpMxyz7CU6WAJbMWqFE1jeioq2
+         BjDKASQgANjKsaCB1JRxR5sbDIFhJNFOvhZJdqdvv6PjAgXvltEyOFVX6bS3/JU7NhQd
+         6PtChyEtnp1L/hVRfB7dRJRKB5CE9+0zcViJX/kqdG/iTEnvW2xzsmiIB+wsHA2NUEMt
+         tbDhTvcDk/9XcBKzottrMAvVge+5pJaOJY1a5qUlk9G7d+ocatnuM9VubhjmjyLSvUQC
+         0OYg==
+X-Gm-Message-State: AC+VfDyQCZBkHqGD626sWCi06wo/xNtnqDHtXBL9quWn41X5QwtJ/mTE
+        yZ8APGKslkVeP0eIkf78RhU=
+X-Google-Smtp-Source: ACHHUZ4QR9EIphGtjkflUmxx413f8p1HORqG3IOW9muqOJoCvxA9w7ITBN0oNTNYW6QTXCPOr/4xJQ==
+X-Received: by 2002:a05:6214:21e4:b0:621:6217:f528 with SMTP id p4-20020a05621421e400b006216217f528mr16504061qvj.30.1684789564248;
+        Mon, 22 May 2023 14:06:04 -0700 (PDT)
+Received: from tian-Alienware-15-R4.fios-router.home (pool-173-77-254-84.nycmny.fios.verizon.net. [173.77.254.84])
+        by smtp.gmail.com with ESMTPSA id h21-20020ac85155000000b003f3c975ba2fsm2332404qtn.86.2023.05.22.14.06.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 May 2023 13:59:33 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 22 May 2023 10:59:31 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, josef@toxicpanda.com, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH for-6.4/block] block/rq_qos: protect rq_qos apis with a
- new lock
-Message-ID: <ZGvXs8zmXcxsxL9D@slm.duckdns.org>
-References: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
+        Mon, 22 May 2023 14:06:03 -0700 (PDT)
+From:   Tian Lan <tilan7663@gmail.com>
+To:     john.g.garry@oracle.com
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        liusong@linux.alibaba.com, ming.lei@redhat.com,
+        tian.lan@twosigma.com, tilan7663@gmail.com
+Subject: [PATCH 1/1] blk-mq: fix race condition in active queue accounting
+Date:   Mon, 22 May 2023 17:05:55 -0400
+Message-Id: <20230522210555.794134-1-tilan7663@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <a11faa27-965e-3109-15e2-33f015262426@oracle.com>
+References: <a11faa27-965e-3109-15e2-33f015262426@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 14, 2023 at 04:40:08PM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> commit 50e34d78815e ("block: disable the elevator int del_gendisk")
-> move rq_qos_exit() from disk_release() to del_gendisk(), this will
-> introduce some problems:
-> 
-> 1) If rq_qos_add() is triggered by enabling iocost/iolatency through
->    cgroupfs, then it can concurrent with del_gendisk(), it's not safe to
->    write 'q->rq_qos' concurrently.
-> 
-> 2) Activate cgroup policy that is relied on rq_qos will call
->    rq_qos_add() and blkcg_activate_policy(), and if rq_qos_exit() is
->    called in the middle, null-ptr-dereference will be triggered in
->    blkcg_activate_policy().
-> 
-> 3) blkg_conf_open_bdev() can call blkdev_get_no_open() first to find the
->    disk, then if rq_qos_exit() from del_gendisk() is done before
->    rq_qos_add(), then memory will be leaked.
-> 
-> This patch add a new disk level mutex 'rq_qos_mutex':
-> 
-> 1) The lock will protect rq_qos_exit() directly.
-> 
-> 2) For wbt that doesn't relied on blk-cgroup, rq_qos_add() can only be
->    called from disk initialization for now because wbt can't be
->    destructed until rq_qos_exit(), so it's safe not to protect wbt for
->    now. Hoever, in case that rq_qos dynamically destruction is supported
->    in the furture, this patch also protect rq_qos_add() from wbt_init()
->    directly, this is enough because blk-sysfs already synchronize
->    writers with disk removal.
-> 
-> 3) For iocost and iolatency, in order to synchronize disk removal and
->    cgroup configuration, the lock is held after blkdev_get_no_open()
->    from blkg_conf_open_bdev(), and is released in blkg_conf_exit().
->    In order to fix the above memory leak, disk_live() is checked after
->    holding the new lock.
-> 
-> Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+From: Tian Lan <tian.lan@twosigma.com>
 
-Acked-by: Tejun Heo <tj@kernel.org>
+If multiple CPUs are sharing the same hardware queue, it can
+cause leak in the active queue counter tracking when __blk_mq_tag_busy()
+is executed simultaneously.
 
-Thanks.
+Fixes: ee78ec1077d3 ("blk-mq: blk_mq_tag_busy is no need to return a value")
+Signed-off-by: Tian Lan <tian.lan@twosigma.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-tag.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index d6af9d431dc6..dfd81cab5788 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -39,16 +39,20 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+ 	unsigned int users;
+ 
++	/*
++	 * calling test_bit() prior to test_and_set_bit() is intentional,
++	 * it avoids dirtying the cacheline if the queue is already active.
++	 */
+ 	if (blk_mq_is_shared_tags(hctx->flags)) {
+ 		struct request_queue *q = hctx->queue;
+ 
+-		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
++		if (test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags) ||
++		    test_and_set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+ 			return;
+-		set_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags);
+ 	} else {
+-		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
++		if (test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) ||
++		    test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 			return;
+-		set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state);
+ 	}
+ 
+ 	users = atomic_inc_return(&hctx->tags->active_queues);
 -- 
-tejun
+2.25.1
+
