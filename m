@@ -2,130 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EDDC7EE23
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 14:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8772BC77B75
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 14:29:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233705AbjEVOTz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 10:19:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47898 "EHLO
+        id S233029AbjEVO3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 10:29:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231916AbjEVOTy (ORCPT
+        with ESMTP id S232856AbjEVO3a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 10:19:54 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9C0D2
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 07:19:51 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-510d6e1f1b2so10745861a12.3
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 07:19:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1684765190; x=1687357190;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VSL7mwwp7mP3i/A2Ha5ZWYNP2l8nV9xWCZ9dDdVJyrE=;
-        b=bW3JxzSWL903VRTFCHvbgK/kSmmhNGzjPmv2oTgKuUeY/4UGuj+rpVpSRqU0fLX71Z
-         9x0WYxajpqEHWpasb3FMt2QPMwFvEXG1qzy09fFvoatRiySxfHmtlreAhXwdf72AH0EA
-         uaD7yDQ7ocfBWwGajHKOT7vpFDgho5apenxJE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684765190; x=1687357190;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VSL7mwwp7mP3i/A2Ha5ZWYNP2l8nV9xWCZ9dDdVJyrE=;
-        b=emGx1FXurRpg3VGLvLeR/VkXC0eKYBA5Ajehx3X6oA7+IDZunF0mjSlvdosQpn9+Ln
-         dU9Tm0byNZYbhk1D62wgIeTySbtX/fuy/ufE3+5VQJ5f7i1OEGbYUBeTnb2iuDnNBcNV
-         5WA1F1QoY5dp+n9G/qLUffeoikNn+37ePgQe/eApHO5NRZXSfdnTM8T8liYZNsqOmscL
-         /+TCfzUG4GHWyhZ85XgzMhMchWZiNWYAkCxhlBNPcNV0QzPU6xUWsSIWEMJZX/RZX+cW
-         YAJ32B8wiU2/TTs4zldIRAle13veFxm958CC4xPnnHsON8HN/Facfb01fPvnZdCXU4aG
-         CYpg==
-X-Gm-Message-State: AC+VfDyPn2k6GdU91Coj7n0EWGT8F4ADEwndNcox0ns9TzhbguFB31wN
-        eUWly9WNwxjVFJNRqUjLtRL7rGAogxTEtyy1AC+HnQ==
-X-Google-Smtp-Source: ACHHUZ5pTZpoagrq7BPdRNACytZjcbnwwAzdd4/4F4mMBgFIR5olByJvr8DzGqhjgDPmmSOeMIBmAwCLlQut/WuHsuo=
-X-Received: by 2002:a17:907:25c2:b0:969:edf8:f73b with SMTP id
- ae2-20020a17090725c200b00969edf8f73bmr9314077ejc.60.1684765189889; Mon, 22
- May 2023 07:19:49 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230519093521.133226-1-hch@lst.de> <20230519093521.133226-11-hch@lst.de>
-In-Reply-To: <20230519093521.133226-11-hch@lst.de>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Mon, 22 May 2023 16:19:38 +0200
-Message-ID: <CAJfpegtHb4pA=1NBRzQJSub7B0HZqnvqsMNQmYYM-8L7PTQfvw@mail.gmail.com>
-Subject: Re: [PATCH 10/13] fs: factor out a direct_write_fallback helper
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Mon, 22 May 2023 10:29:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4046AAF;
+        Mon, 22 May 2023 07:29:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF03561DC1;
+        Mon, 22 May 2023 14:29:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996E4C433D2;
+        Mon, 22 May 2023 14:29:22 +0000 (UTC)
+Date:   Mon, 22 May 2023 10:29:20 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
         Christian Brauner <brauner@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Chao Yu <chao@kernel.org>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        "open list:F2FS FILE SYSTEM" <linux-f2fs-devel@lists.sourceforge.net>,
-        cluster-devel@redhat.com, linux-xfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v20 23/32] splice: Convert trace/seq to use
+ direct_splice_read()
+Message-ID: <20230522102920.0528d821@rorschach.local.home>
+In-Reply-To: <20230519074047.1739879-24-dhowells@redhat.com>
+References: <20230519074047.1739879-1-dhowells@redhat.com>
+        <20230519074047.1739879-24-dhowells@redhat.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 19 May 2023 at 11:36, Christoph Hellwig <hch@lst.de> wrote:
->
-> Add a helper dealing with handling the syncing of a buffered write fallback
-> for direct I/O.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Fri, 19 May 2023 08:40:38 +0100
+David Howells <dhowells@redhat.com> wrote:
+
+> For the splice from the trace seq buffer, just use direct_splice_read().
+> 
+> In the future, something better can probably be done by gifting pages from
+> seq->buf into the pipe, but that would require changing seq->buf into a
+> vmap over an array of pages.
+
+If you can give me a POC of what needs to be done, I could possibly
+implement it.
+
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Steven Rostedt <rostedt@goodmis.org>
+> cc: Masami Hiramatsu <mhiramat@kernel.org>
+> cc: linux-kernel@vger.kernel.org
+> cc: linux-trace-kernel@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-block@vger.kernel.org
+> cc: linux-mm@kvack.org
 > ---
->  fs/libfs.c         | 36 ++++++++++++++++++++++++++++
->  include/linux/fs.h |  2 ++
->  mm/filemap.c       | 59 ++++++++++------------------------------------
->  3 files changed, 50 insertions(+), 47 deletions(-)
->
-> diff --git a/fs/libfs.c b/fs/libfs.c
-> index 89cf614a327158..9f3791fc6e0715 100644
-> --- a/fs/libfs.c
-> +++ b/fs/libfs.c
-> @@ -1613,3 +1613,39 @@ u64 inode_query_iversion(struct inode *inode)
->         return cur >> I_VERSION_QUERIED_SHIFT;
->  }
->  EXPORT_SYMBOL(inode_query_iversion);
-> +
-> +ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
-> +               ssize_t direct_written, ssize_t buffered_written)
-> +{
-> +       struct address_space *mapping = iocb->ki_filp->f_mapping;
-> +       loff_t pos = iocb->ki_pos, end;
+>  kernel/trace/trace.c | 2 +-
 
-At this point pos will point after the end of the buffered write (as
-per earlier patches), yes?
+Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-> +       int err;
-> +
-> +       /*
-> +        * If the buffered write fallback returned an error, we want to return
-> +        * the number of bytes which were written by direct I/O, or the error
-> +        * code if that was zero.
-> +        *
-> +        * Note that this differs from normal direct-io semantics, which will
-> +        * return -EFOO even if some bytes were written.
-> +        */
-> +       if (unlikely(buffered_written < 0))
-> +               return buffered_written;
-> +
-> +       /*
-> +        * We need to ensure that the page cache pages are written to disk and
-> +        * invalidated to preserve the expected O_DIRECT semantics.
-> +        */
-> +       end = pos + buffered_written - 1;
+-- Steve
 
-So this calculation is wrong.
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+> index ebc59781456a..b664020efcb7 100644
+> --- a/kernel/trace/trace.c
+> +++ b/kernel/trace/trace.c
+> @@ -5171,7 +5171,7 @@ static const struct file_operations tracing_fops = {
+>  	.open		= tracing_open,
+>  	.read		= seq_read,
+>  	.read_iter	= seq_read_iter,
+> -	.splice_read	= generic_file_splice_read,
+> +	.splice_read	= direct_splice_read,
+>  	.write		= tracing_write_stub,
+>  	.llseek		= tracing_lseek,
+>  	.release	= tracing_release,
 
-AFAICS this affects later patches as well.
-
-Thanks,
-Miklos
