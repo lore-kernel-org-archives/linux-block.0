@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A58FC7EE2D
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C40CC77B73
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:55:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233871AbjEVNzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:55:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59344 "EHLO
+        id S234111AbjEVNzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:55:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233452AbjEVNxz (ORCPT
+        with ESMTP id S234409AbjEVNy5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:53:55 -0400
+        Mon, 22 May 2023 09:54:57 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B077173C
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:51:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB0010DC
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:52:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763517;
+        s=mimecast20190719; t=1684763524;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WTfdYshb2SEJ7i+Rhr+GK9rq0gZ3nIJZ8Q96oyv400s=;
-        b=QMHnWkdwmwUVxtTZB25jYyJZKx1awXcN7jAmxLn71JU7e3UOpr4eF7v9uC7ngYXxzOTJJd
-        qr6o9hChgXuegRMsu6N2DN5DE3KBq/wVGjjUUClrh38h+G3mnaxeIP3HIKe1Pt6nOzTcxa
-        6aEk0Bs5RwfWUfFCEEuoTfQg4vuk97c=
+        bh=bTH/u0/6vAI7mUHy6uOE6ZiziK/p6ayAtCwTfEo/gpA=;
+        b=chn1O62A9/etJzHK1sK8HQG14+rxMfUGu2WgJzWIfarKTn9cuvn07lbZv7qyg6hv6gZL9d
+        QrlioIuT4d08ymgLMnAa9UrVEMYP1tKBKMYloxIBlyz6FoiQ1PxYpjUNgXxwH/8QsYuljD
+        HY4SeI/8hhg2oGh83v3PrcH9OFmDN5o=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-610-VqXNS97OMu6rkAXf15s6Mg-1; Mon, 22 May 2023 09:51:53 -0400
-X-MC-Unique: VqXNS97OMu6rkAXf15s6Mg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-390-LkkvV9wzPveIVTI4AlkknA-1; Mon, 22 May 2023 09:52:00 -0400
+X-MC-Unique: LkkvV9wzPveIVTI4AlkknA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 684713C025AD;
-        Mon, 22 May 2023 13:51:52 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9EEC81C01512;
+        Mon, 22 May 2023 13:51:59 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 43402400F17;
-        Mon, 22 May 2023 13:51:49 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E87EA20296C6;
+        Mon, 22 May 2023 13:51:56 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -52,135 +52,105 @@ Cc:     David Howells <dhowells@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        Christoph Hellwig <hch@lst.de>, Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>, ocfs2-devel@oss.oracle.com
-Subject: [PATCH v22 22/31] ocfs2: Provide a splice-read wrapper
-Date:   Mon, 22 May 2023 14:50:09 +0100
-Message-Id: <20230522135018.2742245-23-dhowells@redhat.com>
+        Christoph Hellwig <hch@lst.de>,
+        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
+Subject: [PATCH v22 24/31] xfs: Provide a splice-read wrapper
+Date:   Mon, 22 May 2023 14:50:11 +0100
+Message-Id: <20230522135018.2742245-25-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read wrapper for ocfs2.  This emits trace lines and does
-an atime lock/update before calling filemap_splice_read().  Splicing from
-direct I/O is handled by the caller.
-
-A couple of new tracepoints are added for this purpose.
+Provide a splice_read wrapper for XFS.  This does a stat count and a
+shutdown check before proceeding, then emits a new trace line and locks the
+inode across the call to filemap_splice_read() and adds to the stats
+afterwards.  Splicing from direct I/O or DAX is handled by the caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
-cc: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Mark Fasheh <mark@fasheh.com>
-cc: Joel Becker <jlbec@evilplan.org>
-cc: ocfs2-devel@oss.oracle.com
+cc: Darrick J. Wong <djwong@kernel.org>
+cc: linux-xfs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
+ fs/xfs/xfs_file.c  | 30 +++++++++++++++++++++++++++++-
+ fs/xfs/xfs_trace.h |  2 +-
+ 2 files changed, 30 insertions(+), 2 deletions(-)
 
-Notes:
-    ver #22:
-     - Adjust a couple of comments mentioning generic_file_splice_read().
-     - Pass 1 to ocfs2_inode_lock_atomic() rather than true.
-     - Pass the splice flags into the tracepoint.
-
- fs/ocfs2/file.c        | 41 +++++++++++++++++++++++++++++++++++++++--
- fs/ocfs2/ocfs2_trace.h |  3 +++
- 2 files changed, 42 insertions(+), 2 deletions(-)
-
-diff --git a/fs/ocfs2/file.c b/fs/ocfs2/file.c
-index efb09de4343d..86add13b5f23 100644
---- a/fs/ocfs2/file.c
-+++ b/fs/ocfs2/file.c
-@@ -2552,7 +2552,7 @@ static ssize_t ocfs2_file_read_iter(struct kiocb *iocb,
- 	 *
- 	 * Take and drop the meta data lock to update inode fields
- 	 * like i_size. This allows the checks down below
--	 * generic_file_read_iter() a chance of actually working.
-+	 * copy_splice_read() a chance of actually working.
- 	 */
- 	ret = ocfs2_inode_lock_atime(inode, filp->f_path.mnt, &lock_level,
- 				     !nowait);
-@@ -2581,6 +2581,43 @@ static ssize_t ocfs2_file_read_iter(struct kiocb *iocb,
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index aede746541f8..08d632668e94 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -306,6 +306,34 @@ xfs_file_read_iter(
  	return ret;
  }
  
-+static ssize_t ocfs2_file_splice_read(struct file *in, loff_t *ppos,
-+				      struct pipe_inode_info *pipe,
-+				      size_t len, unsigned int flags)
++STATIC ssize_t
++xfs_file_splice_read(
++	struct file		*in,
++	loff_t			*ppos,
++	struct pipe_inode_info	*pipe,
++	size_t			len,
++	unsigned int		flags)
 +{
-+	struct inode *inode = file_inode(in);
-+	ssize_t ret = 0;
-+	int lock_level = 0;
++	struct inode		*inode = file_inode(in);
++	struct xfs_inode	*ip = XFS_I(inode);
++	struct xfs_mount	*mp = ip->i_mount;
++	ssize_t			ret = 0;
 +
-+	trace_ocfs2_file_splice_read(inode, in, in->f_path.dentry,
-+				     (unsigned long long)OCFS2_I(inode)->ip_blkno,
-+				     in->f_path.dentry->d_name.len,
-+				     in->f_path.dentry->d_name.name,
-+				     flags);
++	XFS_STATS_INC(mp, xs_read_calls);
 +
-+	/*
-+	 * We're fine letting folks race truncates and extending writes with
-+	 * read across the cluster, just like they can locally.  Hence no
-+	 * rw_lock during read.
-+	 *
-+	 * Take and drop the meta data lock to update inode fields like i_size.
-+	 * This allows the checks down below filemap_splice_read() a chance of
-+	 * actually working.
-+	 */
-+	ret = ocfs2_inode_lock_atime(inode, in->f_path.mnt, &lock_level, 1);
-+	if (ret < 0) {
-+		if (ret != -EAGAIN)
-+			mlog_errno(ret);
-+		goto bail;
-+	}
-+	ocfs2_inode_unlock(inode, lock_level);
++	if (xfs_is_shutdown(mp))
++		return -EIO;
 +
++	trace_xfs_file_splice_read(ip, *ppos, len);
++
++	xfs_ilock(ip, XFS_IOLOCK_SHARED);
 +	ret = filemap_splice_read(in, ppos, pipe, len, flags);
-+	trace_filemap_splice_read_ret(ret);
-+bail:
++	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
++	if (ret > 0)
++		XFS_STATS_ADD(mp, xs_read_bytes, ret);
 +	return ret;
 +}
 +
- /* Refer generic_file_llseek_unlocked() */
- static loff_t ocfs2_file_llseek(struct file *file, loff_t offset, int whence)
- {
-@@ -2744,7 +2781,7 @@ const struct file_operations ocfs2_fops = {
- #endif
- 	.lock		= ocfs2_lock,
- 	.flock		= ocfs2_flock,
+ /*
+  * Common pre-write limit and setup checks.
+  *
+@@ -1423,7 +1451,7 @@ const struct file_operations xfs_file_operations = {
+ 	.llseek		= xfs_file_llseek,
+ 	.read_iter	= xfs_file_read_iter,
+ 	.write_iter	= xfs_file_write_iter,
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= ocfs2_file_splice_read,
++	.splice_read	= xfs_file_splice_read,
  	.splice_write	= iter_file_splice_write,
- 	.fallocate	= ocfs2_fallocate,
- 	.remap_file_range = ocfs2_remap_file_range,
-diff --git a/fs/ocfs2/ocfs2_trace.h b/fs/ocfs2/ocfs2_trace.h
-index dc4bce1649c1..b8c3d1702076 100644
---- a/fs/ocfs2/ocfs2_trace.h
-+++ b/fs/ocfs2/ocfs2_trace.h
-@@ -1319,6 +1319,8 @@ DEFINE_OCFS2_FILE_OPS(ocfs2_file_splice_write);
+ 	.iopoll		= iocb_bio_iopoll,
+ 	.unlocked_ioctl	= xfs_file_ioctl,
+diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
+index cd4ca5b1fcb0..4db669203149 100644
+--- a/fs/xfs/xfs_trace.h
++++ b/fs/xfs/xfs_trace.h
+@@ -1445,7 +1445,6 @@ DEFINE_RW_EVENT(xfs_file_direct_write);
+ DEFINE_RW_EVENT(xfs_file_dax_write);
+ DEFINE_RW_EVENT(xfs_reflink_bounce_dio_write);
  
- DEFINE_OCFS2_FILE_OPS(ocfs2_file_read_iter);
+-
+ DECLARE_EVENT_CLASS(xfs_imap_class,
+ 	TP_PROTO(struct xfs_inode *ip, xfs_off_t offset, ssize_t count,
+ 		 int whichfork, struct xfs_bmbt_irec *irec),
+@@ -1535,6 +1534,7 @@ DEFINE_SIMPLE_IO_EVENT(xfs_zero_eof);
+ DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write);
+ DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write_unwritten);
+ DEFINE_SIMPLE_IO_EVENT(xfs_end_io_direct_write_append);
++DEFINE_SIMPLE_IO_EVENT(xfs_file_splice_read);
  
-+DEFINE_OCFS2_FILE_OPS(ocfs2_file_splice_read);
-+
- DEFINE_OCFS2_ULL_ULL_ULL_EVENT(ocfs2_truncate_file);
- 
- DEFINE_OCFS2_ULL_ULL_EVENT(ocfs2_truncate_file_error);
-@@ -1470,6 +1472,7 @@ TRACE_EVENT(ocfs2_prepare_inode_for_write,
- );
- 
- DEFINE_OCFS2_INT_EVENT(generic_file_read_iter_ret);
-+DEFINE_OCFS2_INT_EVENT(filemap_splice_read_ret);
- 
- /* End of trace events for fs/ocfs2/file.c. */
- 
+ DECLARE_EVENT_CLASS(xfs_itrunc_class,
+ 	TP_PROTO(struct xfs_inode *ip, xfs_fsize_t new_size),
 
