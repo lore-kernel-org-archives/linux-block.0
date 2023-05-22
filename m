@@ -2,123 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 613BFC77B75
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 12:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84EA8C7EE26
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 12:41:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233589AbjEVMOc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 08:14:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46786 "EHLO
+        id S233453AbjEVMlE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 08:41:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233758AbjEVMNb (ORCPT
+        with ESMTP id S233072AbjEVMk7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 08:13:31 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8403FE4C;
-        Mon, 22 May 2023 05:12:58 -0700 (PDT)
+        Mon, 22 May 2023 08:40:59 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CFD137;
+        Mon, 22 May 2023 05:40:48 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QPxD62VW2z4f3mWB;
-        Mon, 22 May 2023 20:12:54 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCH77JCXGtk9jnlJw--.19223S3;
-        Mon, 22 May 2023 20:12:52 +0800 (CST)
-Subject: Re: [PATCH -next v2 0/6] blk-wbt: minor fix and cleanup
-To:     Linux regressions mailing list <regressions@lists.linux.dev>,
-        Jens Axboe <axboe@kernel.dk>,
-        Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, tj@kernel.org,
-        josef@toxicpanda.com
-Cc:     lukas.bulwahn@gmail.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230512093554.911753-1-yukuai1@huaweicloud.com>
- <2b18e6ed-bce0-44f5-5ec4-8903f3c85cfe@kernel.dk>
- <5d53e634-33c2-e040-3c34-6c36e32eed81@leemhuis.info>
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QPxQn67Lxz4f3jXM;
+        Mon, 22 May 2023 20:22:09 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbFvXmtk96_lJw--.60238S4;
+        Mon, 22 May 2023 20:22:08 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <957c8c91-3d7b-0227-f172-7208558b101f@huaweicloud.com>
-Date:   Mon, 22 May 2023 20:12:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To:     regressions@leemhuis.info, chengming.zhou@linux.dev, hch@lst.de,
+        axboe@kernel.dk, yukuai3@huawei.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH RESEND] blk-wbt: fix that wbt can't be disabled by default
+Date:   Mon, 22 May 2023 20:18:54 +0800
+Message-Id: <20230522121854.2928880-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-In-Reply-To: <5d53e634-33c2-e040-3c34-6c36e32eed81@leemhuis.info>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCH77JCXGtk9jnlJw--.19223S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFykuFy5WFW3Xw4rJr17trb_yoW8Zr43p3
-        yay3Wakw4qvr1fKrs3A3W2q34fAws5WryrArW7Kr1rJa4Yvr1Sqr4xKr109FykZrWIkw4a
-        gr1qqrn5Cw1DA3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID: gCh0CgBnHbFvXmtk96_lJw--.60238S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1kXr43Xw15Ww48Kw1fXrb_yoW8Cw1rp3
+        WrGryIkF92qrWIvF13KF1UJw4fGF4vqr1xCrZakw1Sq3WUCr9avay8KFyFvF1jvFs3Ganx
+        Zw13XFZrZFyUX37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
         1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
         JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
         CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
         2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
-        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-        BIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
+        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+        fUoOJ5UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Yu Kuai <yukuai3@huawei.com>
 
-在 2023/05/22 20:00, Linux regression tracking (Thorsten Leemhuis) 写道:
-> On 12.05.23 16:58, Jens Axboe wrote:
->> On 5/12/23 3:35 AM, Yu Kuai wrote:
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>
->>> Changes in v2:
->>>   - make the code more readable for patch 1
->>>   - add a new attr_group that is only visible for rq based device
->>>   - explain in detail for patch 4
->>>   - add review tag for patch 2,3,5
->>>
->>> Yu Kuai (6):
->>>    blk-wbt: fix that wbt can't be disabled by default
->>>    blk-wbt: don't create wbt sysfs entry if CONFIG_BLK_WBT is disabled
->>>    blk-wbt: remove dead code to handle wbt enable/disable with io
->>>      inflight
->>>    blk-wbt: cleanup rwb_enabled() and wbt_disabled()
->>>    blk-iocost: move wbt_enable/disable_default() out of spinlock
->>>    blk-sysfs: add a new attr_group for blk_mq
->>>
->>>   block/blk-iocost.c |   7 +-
->>>   block/blk-sysfs.c  | 181 ++++++++++++++++++++++++++-------------------
->>>   block/blk-wbt.c    |  33 +++------
->>>   block/blk-wbt.h    |  19 -----
->>>   4 files changed, 117 insertions(+), 123 deletions(-)
->>
->> We need a 6.4 version of the fix to get rid of the regression. If you
->> want to do cleanups on top of that, then that's fine and that can go into
->> 6.5. But don't mix them up.
-> 
-> Hmm, it seems nothing has happened here since ten days to fix this
-> regression that likely is still present in 6.3. Yu Kuai, did it fall
-> through the cracks, or is what Jens asked for more complicated than it
-> sounds?
+commit b11d31ae01e6 ("blk-wbt: remove unnecessary check in
+wbt_enable_default()") removes the checking of CONFIG_BLK_WBT_MQ by
+mistake, which is used to control enable or disable wbt by default.
 
-Sorry for the delay, I was waiting for the last patch to be reviewed.
-But the regression is only related to the first patch, I'll send it
-seperately.
+Fix the problem by adding back the checking. This patch also do a litter
+cleanup to make related code more readable.
 
-Thanks,
-Kuai
-> 
-> Or was progress made and I just missed it?
-> 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
-> 
-> #regzbot poke
-> 
-> .
-> 
+Fixes: b11d31ae01e6 ("blk-wbt: remove unnecessary check in wbt_enable_default()")
+Reported-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Link: https://lore.kernel.org/lkml/CAKXUXMzfKq_J9nKHGyr5P5rvUETY4B-fxoQD4sO+NYjFOfVtZA@mail.gmail.com/t/
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-wbt.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index e49a48684532..9ec2a2f1eda3 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -730,14 +730,16 @@ void wbt_enable_default(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	struct rq_qos *rqos;
+-	bool disable_flag = q->elevator &&
+-		    test_bit(ELEVATOR_FLAG_DISABLE_WBT, &q->elevator->flags);
++	bool enable = IS_ENABLED(CONFIG_BLK_WBT_MQ);
++
++	if (q->elevator &&
++	    test_bit(ELEVATOR_FLAG_DISABLE_WBT, &q->elevator->flags))
++		enable = false;
+ 
+ 	/* Throttling already enabled? */
+ 	rqos = wbt_rq_qos(q);
+ 	if (rqos) {
+-		if (!disable_flag &&
+-		    RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
++		if (enable && RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
+ 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
+ 		return;
+ 	}
+@@ -746,7 +748,7 @@ void wbt_enable_default(struct gendisk *disk)
+ 	if (!blk_queue_registered(q))
+ 		return;
+ 
+-	if (queue_is_mq(q) && !disable_flag)
++	if (queue_is_mq(q) && enable)
+ 		wbt_init(disk);
+ }
+ EXPORT_SYMBOL_GPL(wbt_enable_default);
+-- 
+2.39.2
 
