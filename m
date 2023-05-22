@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686ECC7EE29
-	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E42C7EE29
+	for <linux-block@archiver.kernel.org>; Mon, 22 May 2023 13:54:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234338AbjEVNyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 09:54:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59454 "EHLO
+        id S234350AbjEVNyt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 09:54:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234201AbjEVNxA (ORCPT
+        with ESMTP id S233971AbjEVNxa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 09:53:00 -0400
+        Mon, 22 May 2023 09:53:30 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5FA10F1
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:51:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75AFB10FD
+        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 06:51:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684763504;
+        s=mimecast20190719; t=1684763508;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8d8uJmrTh/75eqAaNN/foN1c757ttvO6v+jRBhlF56A=;
-        b=Nh2Yu8Q0DDg4teOHK6vIjL899q/4npKVK4So+5BT/LuDAkkd1GgIaxDbh10Cq+jDkF2S8V
-        gewyhifpFwwyn5MNM9kdEZZGEQW4XY0nHsVzSSrcBqHP/e8ccLrfjmzyzK3VPV+7IFjNZF
-        If5WOwSL8tUGBUzZuiBlVu7Y37p8pno=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QCSWlIyDBY1jtat2vRjBrfL6m1m2dv8ce4hoKBezm4c=;
+        b=X5lB7KA/gq4OTOSJANF9YpRYXKZIqdGTaFzKkH7IjIWg/iCmigZp5JHNrbm+DZp/NbpUTt
+        AZ/nUm06Tf8YwM59CxkdozKZEXC2hHBlGf/TQsywn7hU3W80h23qGsSkFpzSCeczkP8Fxb
+        377d/Qpb9TI238p1bKxjBXC9kIWFapg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-103-ZtUfXtY9PdeS9nRV65CuKw-1; Mon, 22 May 2023 09:51:41 -0400
-X-MC-Unique: ZtUfXtY9PdeS9nRV65CuKw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-543-ktvQdbIxMHSGBGqUdvd_JA-1; Mon, 22 May 2023 09:51:45 -0400
+X-MC-Unique: ktvQdbIxMHSGBGqUdvd_JA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 149CE185A797;
-        Mon, 22 May 2023 13:51:40 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F0793C025AD;
+        Mon, 22 May 2023 13:51:44 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 59064492B0A;
-        Mon, 22 May 2023 13:51:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D7EBC2166B29;
+        Mon, 22 May 2023 13:51:40 +0000 (UTC)
 From:   David Howells <dhowells@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>
@@ -53,129 +53,113 @@ Cc:     David Howells <dhowells@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        linux-f2fs-devel@lists.sourceforge.net
-Subject: [PATCH v22 19/31] f2fs: Provide a splice-read wrapper
-Date:   Mon, 22 May 2023 14:50:06 +0100
-Message-Id: <20230522135018.2742245-20-dhowells@redhat.com>
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>, linux-nfs@vger.kernel.org
+Subject: [PATCH v22 20/31] nfs: Provide a splice-read wrapper
+Date:   Mon, 22 May 2023 14:50:07 +0100
+Message-Id: <20230522135018.2742245-21-dhowells@redhat.com>
 In-Reply-To: <20230522135018.2742245-1-dhowells@redhat.com>
 References: <20230522135018.2742245-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide a splice_read wrapper for f2fs.  This does some checks and tracing
-before calling filemap_splice_read() and will update the iostats
-afterwards.  Direct I/O is handled by the caller.
+Provide a splice_read wrapper for NFS.  This locks the inode around
+filemap_splice_read() and revalidates the mapping.  Splicing from direct
+I/O is handled by the caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
 cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Jens Axboe <axboe@kernel.dk>
-cc: Jaegeuk Kim <jaegeuk@kernel.org>
-cc: Chao Yu <chao@kernel.org>
-cc: linux-f2fs-devel@lists.sourceforge.net
+cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+cc: Anna Schumaker <anna@kernel.org>
+cc: linux-nfs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-block@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- fs/f2fs/file.c | 43 +++++++++++++++++++++++++++++++++++--------
- 1 file changed, 35 insertions(+), 8 deletions(-)
 
-diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-index 5ac53d2627d2..3fce122997ca 100644
---- a/fs/f2fs/file.c
-+++ b/fs/f2fs/file.c
-@@ -4367,22 +4367,23 @@ static ssize_t f2fs_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	return ret;
+Notes:
+    ver #22)
+     - Fix format spec in dprintk() for *ppos.
+    
+    ver #21)
+     - Fix pos -> ppos in dprintk().
+
+ fs/nfs/file.c     | 23 ++++++++++++++++++++++-
+ fs/nfs/internal.h |  2 ++
+ fs/nfs/nfs4file.c |  2 +-
+ 3 files changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/fs/nfs/file.c b/fs/nfs/file.c
+index f0edf5a36237..3855f3ce8d2d 100644
+--- a/fs/nfs/file.c
++++ b/fs/nfs/file.c
+@@ -178,6 +178,27 @@ nfs_file_read(struct kiocb *iocb, struct iov_iter *to)
  }
+ EXPORT_SYMBOL_GPL(nfs_file_read);
  
--static void f2fs_trace_rw_file_path(struct kiocb *iocb, size_t count, int rw)
-+static void f2fs_trace_rw_file_path(struct file *file, loff_t pos, size_t count,
-+				    int rw)
- {
--	struct inode *inode = file_inode(iocb->ki_filp);
-+	struct inode *inode = file_inode(file);
- 	char *buf, *path;
- 
- 	buf = f2fs_getname(F2FS_I_SB(inode));
- 	if (!buf)
- 		return;
--	path = dentry_path_raw(file_dentry(iocb->ki_filp), buf, PATH_MAX);
-+	path = dentry_path_raw(file_dentry(file), buf, PATH_MAX);
- 	if (IS_ERR(path))
- 		goto free_buf;
- 	if (rw == WRITE)
--		trace_f2fs_datawrite_start(inode, iocb->ki_pos, count,
-+		trace_f2fs_datawrite_start(inode, pos, count,
- 				current->pid, path, current->comm);
- 	else
--		trace_f2fs_dataread_start(inode, iocb->ki_pos, count,
-+		trace_f2fs_dataread_start(inode, pos, count,
- 				current->pid, path, current->comm);
- free_buf:
- 	f2fs_putname(buf);
-@@ -4398,7 +4399,8 @@ static ssize_t f2fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 		return -EOPNOTSUPP;
- 
- 	if (trace_f2fs_dataread_start_enabled())
--		f2fs_trace_rw_file_path(iocb, iov_iter_count(to), READ);
-+		f2fs_trace_rw_file_path(iocb->ki_filp, iocb->ki_pos,
-+					iov_iter_count(to), READ);
- 
- 	if (f2fs_should_use_dio(inode, iocb, to)) {
- 		ret = f2fs_dio_read_iter(iocb, to);
-@@ -4413,6 +4415,30 @@ static ssize_t f2fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	return ret;
- }
- 
-+static ssize_t f2fs_file_splice_read(struct file *in, loff_t *ppos,
-+				     struct pipe_inode_info *pipe,
-+				     size_t len, unsigned int flags)
++ssize_t
++nfs_file_splice_read(struct file *in, loff_t *ppos, struct pipe_inode_info *pipe,
++		     size_t len, unsigned int flags)
 +{
 +	struct inode *inode = file_inode(in);
-+	const loff_t pos = *ppos;
-+	ssize_t ret;
++	ssize_t result;
 +
-+	if (!f2fs_is_compress_backend_ready(inode))
-+		return -EOPNOTSUPP;
++	dprintk("NFS: splice_read(%pD2, %zu@%llu)\n", in, len, *ppos);
 +
-+	if (trace_f2fs_dataread_start_enabled())
-+		f2fs_trace_rw_file_path(in, pos, len, READ);
-+
-+	ret = filemap_splice_read(in, ppos, pipe, len, flags);
-+	if (ret > 0)
-+		f2fs_update_iostat(F2FS_I_SB(inode), inode,
-+				   APP_BUFFERED_READ_IO, ret);
-+
-+	if (trace_f2fs_dataread_end_enabled())
-+		trace_f2fs_dataread_end(inode, pos, ret);
-+	return ret;
++	nfs_start_io_read(inode);
++	result = nfs_revalidate_mapping(inode, in->f_mapping);
++	if (!result) {
++		result = filemap_splice_read(in, ppos, pipe, len, flags);
++		if (result > 0)
++			nfs_add_stats(inode, NFSIOS_NORMALREADBYTES, result);
++	}
++	nfs_end_io_read(inode);
++	return result;
 +}
++EXPORT_SYMBOL_GPL(nfs_file_splice_read);
 +
- static ssize_t f2fs_write_checks(struct kiocb *iocb, struct iov_iter *from)
+ int
+ nfs_file_mmap(struct file * file, struct vm_area_struct * vma)
  {
- 	struct file *file = iocb->ki_filp;
-@@ -4714,7 +4740,8 @@ static ssize_t f2fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		ret = preallocated;
- 	} else {
- 		if (trace_f2fs_datawrite_start_enabled())
--			f2fs_trace_rw_file_path(iocb, orig_count, WRITE);
-+			f2fs_trace_rw_file_path(iocb->ki_filp, iocb->ki_pos,
-+						orig_count, WRITE);
- 
- 		/* Do the actual write. */
- 		ret = dio ?
-@@ -4919,7 +4946,7 @@ const struct file_operations f2fs_file_operations = {
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= f2fs_compat_ioctl,
- #endif
+@@ -879,7 +900,7 @@ const struct file_operations nfs_file_operations = {
+ 	.fsync		= nfs_file_fsync,
+ 	.lock		= nfs_lock,
+ 	.flock		= nfs_flock,
 -	.splice_read	= generic_file_splice_read,
-+	.splice_read	= f2fs_file_splice_read,
++	.splice_read	= nfs_file_splice_read,
  	.splice_write	= iter_file_splice_write,
- 	.fadvise	= f2fs_file_fadvise,
- };
+ 	.check_flags	= nfs_check_flags,
+ 	.setlease	= simple_nosetlease,
+diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
+index 3cc027d3bd58..b5f21d35d30e 100644
+--- a/fs/nfs/internal.h
++++ b/fs/nfs/internal.h
+@@ -416,6 +416,8 @@ static inline __u32 nfs_access_xattr_mask(const struct nfs_server *server)
+ int nfs_file_fsync(struct file *file, loff_t start, loff_t end, int datasync);
+ loff_t nfs_file_llseek(struct file *, loff_t, int);
+ ssize_t nfs_file_read(struct kiocb *, struct iov_iter *);
++ssize_t nfs_file_splice_read(struct file *in, loff_t *ppos, struct pipe_inode_info *pipe,
++			     size_t len, unsigned int flags);
+ int nfs_file_mmap(struct file *, struct vm_area_struct *);
+ ssize_t nfs_file_write(struct kiocb *, struct iov_iter *);
+ int nfs_file_release(struct inode *, struct file *);
+diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
+index 2563ed8580f3..4aeadd6e1a6d 100644
+--- a/fs/nfs/nfs4file.c
++++ b/fs/nfs/nfs4file.c
+@@ -454,7 +454,7 @@ const struct file_operations nfs4_file_operations = {
+ 	.fsync		= nfs_file_fsync,
+ 	.lock		= nfs_lock,
+ 	.flock		= nfs_flock,
+-	.splice_read	= generic_file_splice_read,
++	.splice_read	= nfs_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+ 	.check_flags	= nfs_check_flags,
+ 	.setlease	= nfs4_setlease,
 
