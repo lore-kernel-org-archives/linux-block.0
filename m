@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF75C7EE37
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F54BC7EE3A
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:46:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235572AbjEWHqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 03:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41662 "EHLO
+        id S235587AbjEWHqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 03:46:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232707AbjEWHqC (ORCPT
+        with ESMTP id S235184AbjEWHqD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 03:46:02 -0400
+        Tue, 23 May 2023 03:46:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15815FD;
-        Tue, 23 May 2023 00:46:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78870C5;
+        Tue, 23 May 2023 00:45:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=yNfxLrWSKMQ1L/coufSFF/AHaRvjvn5eGandAFcc5MM=; b=gNeHAhTpuwBzma+5J2gptdvAL+
-        X+mjBvIwpCNtK8mshwCsbgCLXylDOdYyqNxJ3ZIHA4Rw9uXlqgvX5QBtFp48zBVw1woLM6WwTVPw4
-        aPbNPk3jq7Kudwon+STFo3G+811fuw6EPiji7enynVj8+l5KoQjHu/g47iCly9TIlrNoSwQJsfMsJ
-        mB9PgzdzZm5ahAais8NTi0QAK1IdZQsniSyqgCs5FA5RT7UF1ID5HNngxg+zx0eQ1TmjWFlSwbDBd
-        Q1geRhKlO089vBZK5i7Fe9tDEBZ0Y8HAnActNdlz4KHIaltMSGWIjzkuI6T487Kd2X5MNQqTrlU4Z
-        cLD9ftWQ==;
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=b4caBsqRj9WgFDF1CdiyuIzyBrf32buPv15Igm1OGNU=; b=WhENlxHUIDOj4WfSHpZmeGSqbG
+        vUiinRR9sgFVzAa6AJUpClm6jiechzZRFCFoQOMBZgcgEyyNfTPkP91bAtG69iCrNEq/glQ/uJbNx
+        sAOQ62dPF9soTqb0kTrLOwvxuMSQt5oW6OzozXVmnZvgp/wauMKJRxyVsHuNGgJsCVYGzh7D01TWu
+        caWLwi0NXlp+j+GN8bktnbZRg2OcJyv/uKT1OuzU3MMn/gNrZttHEkMPnvMkbUA53UNwWPOcTb/hS
+        /FeK4JBZmKQY0mPDmXMOVZpL0vVDpadh2lV6EKfqVBTZSgXK5QlkE/1IVOY53AaWwoNvZ6GHaMTIg
+        oj91dTFQ==;
 Received: from [2001:4bb8:188:23b2:6ade:85c9:530f:6eb0] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q1MiQ-009GZc-0j;
-        Tue, 23 May 2023 07:45:54 +0000
+        id 1q1Mi9-009GTZ-27;
+        Tue, 23 May 2023 07:45:38 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -41,12 +41,10 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: [PATCH 06/24] init: rename mount_block_root to mount_root_generic
-Date:   Tue, 23 May 2023 09:45:17 +0200
-Message-Id: <20230523074535.249802-7-hch@lst.de>
+Subject: fix the name_to_dev_t mess
+Date:   Tue, 23 May 2023 09:45:11 +0200
+Message-Id: <20230523074535.249802-1-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230523074535.249802-1-hch@lst.de>
-References: <20230523074535.249802-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -54,73 +52,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-mount_block_root is also used to mount non-block file systems, so give
-it a better name.
+Hi all,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- init/do_mounts.c        | 6 +++---
- init/do_mounts.h        | 2 +-
- init/do_mounts_initrd.c | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+this series tries to sort out accumulated mess around the name_to_dev_t
+function.  This function is intended to allow looking up the dev_t of a
+block device based on a name string before the root file systems is
+mounted and thus the normal path based lookup is available.
 
-diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 2fe7901b5bcfaf..a2c0baace0992c 100644
---- a/init/do_mounts.c
-+++ b/init/do_mounts.c
-@@ -391,7 +391,7 @@ static int __init do_mount_root(const char *name, const char *fs,
- 	return ret;
- }
- 
--void __init mount_block_root(char *name, int flags)
-+void __init mount_root_generic(char *name, int flags)
- {
- 	struct page *page = alloc_page(GFP_KERNEL);
- 	char *fs_names = page_address(page);
-@@ -589,7 +589,7 @@ void __init mount_root(void)
- 
- 		if (err < 0)
- 			pr_emerg("Failed to create /dev/root: %d\n", err);
--		mount_block_root("/dev/root", root_mountflags);
-+		mount_root_generic("/dev/root", root_mountflags);
- 	}
- #endif
- }
-@@ -620,7 +620,7 @@ void __init prepare_namespace(void)
- 		root_device_name = saved_root_name;
- 		if (!strncmp(root_device_name, "mtd", 3) ||
- 		    !strncmp(root_device_name, "ubi", 3)) {
--			mount_block_root(root_device_name, root_mountflags);
-+			mount_root_generic(root_device_name, root_mountflags);
- 			goto out;
- 		}
- 		ROOT_DEV = name_to_dev_t(root_device_name);
-diff --git a/init/do_mounts.h b/init/do_mounts.h
-index 7a29ac3e427bab..33623025f6951a 100644
---- a/init/do_mounts.h
-+++ b/init/do_mounts.h
-@@ -10,7 +10,7 @@
- #include <linux/root_dev.h>
- #include <linux/init_syscalls.h>
- 
--void  mount_block_root(char *name, int flags);
-+void  mount_root_generic(char *name, int flags);
- void  mount_root(void);
- extern int root_mountflags;
- 
-diff --git a/init/do_mounts_initrd.c b/init/do_mounts_initrd.c
-index 34731241377d30..686d1ff3af4bb1 100644
---- a/init/do_mounts_initrd.c
-+++ b/init/do_mounts_initrd.c
-@@ -95,7 +95,7 @@ static void __init handle_initrd(void)
- 	real_root_dev = new_encode_dev(ROOT_DEV);
- 	create_dev("/dev/root.old", Root_RAM0);
- 	/* mount initrd on rootfs' /root */
--	mount_block_root("/dev/root.old", root_mountflags & ~MS_RDONLY);
-+	mount_root_generic("/dev/root.old", root_mountflags & ~MS_RDONLY);
- 	init_mkdir("/old", 0700);
- 	init_chdir("/old");
- 
--- 
-2.39.2
+Unfortunately a few years ago it managed to get exported and used in
+non-init contexts, leading to the something looking like a path name
+also beeing lookuped up by a different and potential dangerous
+algorithm.
 
+This series does a fair amount of refactoring and finally ends up with
+the renamed and improved name_to_dev_t only beeing available for the
+early init code again.
+
+The series is against Jens' for-6.5/block tree but probably applies
+against current mainline just fine as well.
+
+A git tree is also available here:
+
+    git://git.infradead.org/users/hch/block.git blk-init-cleanup
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-init-cleanup
+
+Diffstat:
+ Documentation/admin-guide/kernel-parameters.txt |    2 
+ arch/alpha/kernel/setup.c                       |    2 
+ arch/ia64/kernel/setup.c                        |    2 
+ arch/powerpc/platforms/powermac/setup.c         |    3 
+ block/Makefile                                  |    2 
+ block/early-lookup.c                            |  315 ++++++++++++++++++
+ block/genhd.c                                   |   92 -----
+ drivers/base/dd.c                               |    6 
+ drivers/md/dm-init.c                            |    4 
+ drivers/md/dm-snap.c                            |   14 
+ drivers/md/dm-table.c                           |   26 -
+ drivers/md/md-autodetect.c                      |    3 
+ drivers/mtd/devices/block2mtd.c                 |   62 ++-
+ fs/pstore/blk.c                                 |    4 
+ include/linux/blkdev.h                          |    6 
+ include/linux/device-mapper.h                   |    2 
+ include/linux/device/driver.h                   |    2 
+ include/linux/mount.h                           |    1 
+ include/linux/root_dev.h                        |    9 
+ init/do_mounts.c                                |  416 ++++++------------------
+ init/do_mounts.h                                |   14 
+ init/do_mounts_initrd.c                         |   11 
+ kernel/power/hibernate.c                        |  167 +++++----
+ kernel/power/power.h                            |    3 
+ kernel/power/swap.c                             |    2 
+ 25 files changed, 603 insertions(+), 567 deletions(-)
