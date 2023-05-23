@@ -2,173 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C971C7EE32
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:48:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F53EC7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:54:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235743AbjEWHsV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 03:48:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
+        id S235813AbjEWHyL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 03:54:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235814AbjEWHrp (ORCPT
+        with ESMTP id S235804AbjEWHyF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 03:47:45 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A391E5C;
-        Tue, 23 May 2023 00:46:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=9B9Q5RDcOkQVHhQcbSUKb6IuqOR/HrhtGX8DsjrEY38=; b=Np9j14NJ3gyLQvNx0tekwf7Ovf
-        uQnoq7NH4MC7d2AAqT1B+qQNaq73b06tsCSBmoNWRNfBW6F0BTzu5oePtSiUmH8+E3PWScBXuzlLS
-        M8kGgMKX6BxZmy5iUngyne92c3aF0Y5Dbm6S7XdV37mN1ihXYho4P4LCOELU/xbQU+eKlD/aFMQk8
-        jxn1CchGb8AgZSMCDZjfvL/NoOOrv0aLZQ3LDUPLSl6YOd30I5Phg/xONcm8hWqY/FWhUvx35IgjW
-        6Hb26MVfy3n+1S0oPfv03VjKucGProqJJrY3NcUzIBfp1Z80xEHEIXNWttkaz+L26SAMYKor/7QPN
-        ZVduL80Q==;
-Received: from [2001:4bb8:188:23b2:6ade:85c9:530f:6eb0] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q1MjF-009HS4-3A;
-        Tue, 23 May 2023 07:46:46 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Joern Engel <joern@lazybastard.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: [PATCH 24/24] block: mark early_lookup_bdev as __init
-Date:   Tue, 23 May 2023 09:45:35 +0200
-Message-Id: <20230523074535.249802-25-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230523074535.249802-1-hch@lst.de>
-References: <20230523074535.249802-1-hch@lst.de>
+        Tue, 23 May 2023 03:54:05 -0400
+Received: from out-32.mta0.migadu.com (out-32.mta0.migadu.com [IPv6:2001:41d0:1004:224b::20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D805E74
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 00:53:48 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1684828423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jznc2RAMnxsq5svyPaZcC7HHIc0Bh3Zogn1eiwDdPGI=;
+        b=M33w/BW3/1eDXNgDCustPpRPyyuKLt0FYIL2SW9INnDrkJ8r5zTNUX5N7lo+sSifpq9vVa
+        1JO6VigMmQN0KNb2JsHtUWr5knOnY6g0IezPwi1k+UOjAb3f3mIhWJ97CLYMA8Hw1gnZp6
+        hYD/vcPQPJlUkSO5fG6GJKylpXUikEc=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+To:     haris.iqbal@ionos.com, jinpu.wang@ionos.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 04/10] block/rnbd-srv: no need to check sess_dev
+Date:   Tue, 23 May 2023 15:53:25 +0800
+Message-Id: <20230523075331.32250-5-guoqing.jiang@linux.dev>
+In-Reply-To: <20230523075331.32250-1-guoqing.jiang@linux.dev>
+References: <20230523075331.32250-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-early_lookup_bdev is now only used during the early boot code as it
-should, so mark it __init to not waste run time memory on it.
+Check ret is enough since if sess_dev is NULL which also
+implies ret should be 0.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 ---
- block/early-lookup.c   | 19 +++++++++----------
- include/linux/blkdev.h |  2 +-
- 2 files changed, 10 insertions(+), 11 deletions(-)
+ drivers/block/rnbd/rnbd-srv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/early-lookup.c b/block/early-lookup.c
-index 6016e781b6a0e2..3ff0d2e4dcbfb8 100644
---- a/block/early-lookup.c
-+++ b/block/early-lookup.c
-@@ -1,7 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-  * Code for looking up block devices in the early boot code before mounting the
-- * root file system.  Unfortunately currently also abused in a few other places.
-+ * root file system.
-  */
- #include <linux/blkdev.h>
- #include <linux/ctype.h>
-@@ -18,7 +18,7 @@ struct uuidcmp {
-  *
-  * Returns 1 if the device matches, and 0 otherwise.
-  */
--static int match_dev_by_uuid(struct device *dev, const void *data)
-+static int __init match_dev_by_uuid(struct device *dev, const void *data)
- {
- 	struct block_device *bdev = dev_to_bdev(dev);
- 	const struct uuidcmp *cmp = data;
-@@ -42,7 +42,7 @@ static int match_dev_by_uuid(struct device *dev, const void *data)
-  *
-  * Returns the matching dev_t on success or 0 on failure.
-  */
--static int devt_from_partuuid(const char *uuid_str, dev_t *devt)
-+static int __init devt_from_partuuid(const char *uuid_str, dev_t *devt)
- {
- 	struct uuidcmp cmp;
- 	struct device *dev = NULL;
-@@ -98,7 +98,7 @@ static int devt_from_partuuid(const char *uuid_str, dev_t *devt)
-  *
-  * Returns 1 if the device matches, and 0 otherwise.
-  */
--static int match_dev_by_label(struct device *dev, const void *data)
-+static int __init match_dev_by_label(struct device *dev, const void *data)
- {
- 	struct block_device *bdev = dev_to_bdev(dev);
- 	const char *label = data;
-@@ -108,7 +108,7 @@ static int match_dev_by_label(struct device *dev, const void *data)
- 	return 1;
- }
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index e9ef6bd4b50c..c4122e65b36a 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -96,7 +96,7 @@ rnbd_get_sess_dev(int dev_id, struct rnbd_srv_session *srv_sess)
+ 		ret = kref_get_unless_zero(&sess_dev->kref);
+ 	rcu_read_unlock();
  
--static int devt_from_partlabel(const char *label, dev_t *devt)
-+static int __init devt_from_partlabel(const char *label, dev_t *devt)
- {
- 	struct device *dev;
+-	if (!sess_dev || !ret)
++	if (!ret)
+ 		return ERR_PTR(-ENXIO);
  
-@@ -120,7 +120,7 @@ static int devt_from_partlabel(const char *label, dev_t *devt)
- 	return 0;
- }
- 
--static dev_t blk_lookup_devt(const char *name, int partno)
-+static dev_t __init blk_lookup_devt(const char *name, int partno)
- {
- 	dev_t devt = MKDEV(0, 0);
- 	struct class_dev_iter iter;
-@@ -149,7 +149,7 @@ static dev_t blk_lookup_devt(const char *name, int partno)
- 	return devt;
- }
- 
--static int devt_from_devname(const char *name, dev_t *devt)
-+static int __init devt_from_devname(const char *name, dev_t *devt)
- {
- 	int part;
- 	char s[32];
-@@ -193,7 +193,7 @@ static int devt_from_devname(const char *name, dev_t *devt)
- 	return -EINVAL;
- }
- 
--static int devt_from_devnum(const char *name, dev_t *devt)
-+static int __init devt_from_devnum(const char *name, dev_t *devt)
- {
- 	unsigned maj, min, offset;
- 	char *p, dummy;
-@@ -240,7 +240,7 @@ static int devt_from_devnum(const char *name, dev_t *devt)
-  *	name contains slashes, the device name has them replaced with
-  *	bangs.
-  */
--int early_lookup_bdev(const char *name, dev_t *devt)
-+int __init early_lookup_bdev(const char *name, dev_t *devt)
- {
- 	if (strncmp(name, "PARTUUID=", 9) == 0)
- 		return devt_from_partuuid(name + 9, devt);
-@@ -250,7 +250,6 @@ int early_lookup_bdev(const char *name, dev_t *devt)
- 		return devt_from_devname(name + 5, devt);
- 	return devt_from_devnum(name, devt);
- }
--EXPORT_SYMBOL_GPL(early_lookup_bdev);
- 
- static char __init *bdevt_str(dev_t devt, char *buf)
- {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 361341aea82ce5..a07776e5b27940 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1493,7 +1493,7 @@ int sync_blockdev_nowait(struct block_device *bdev);
- void sync_bdevs(bool wait);
- void bdev_statx_dioalign(struct inode *inode, struct kstat *stat);
- void printk_all_partitions(void);
--int early_lookup_bdev(const char *pathname, dev_t *dev);
-+int __init early_lookup_bdev(const char *pathname, dev_t *dev);
- #else
- static inline void invalidate_bdev(struct block_device *bdev)
- {
+ 	return sess_dev;
 -- 
-2.39.2
+2.35.3
 
