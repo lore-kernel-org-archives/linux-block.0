@@ -2,159 +2,175 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E734CC7EE2D
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 02:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 383F0C7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 03:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234154AbjEWCsZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 22:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56448 "EHLO
+        id S229874AbjEWDFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 23:05:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233768AbjEWCsW (ORCPT
+        with ESMTP id S229448AbjEWDFr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 22:48:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BE86CA;
-        Mon, 22 May 2023 19:48:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 06CC062E36;
-        Tue, 23 May 2023 02:48:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06332C4339B;
-        Tue, 23 May 2023 02:48:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684810100;
-        bh=w3PG+wvDxKl0ccqPHuJb+taZwlEJrTezcF9g2TqXZ1g=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=C08IctqNP5/PmceTbld2x6Z+tyTSwkltOrcprZv2cE3Uo496FntDjRuVS7M+Gpm2K
-         U3cEe5vUgZ/7eUJhqG72NHK9lzGdtlP0BhZEzo4aOLxqWQOy2sSMMZWxhCG6Gfxmc7
-         RNc/9BRwtQMCgX2cvdE35U5dVrPXYWf22vm8KWmEnZP0Luge4ya7MjlSfuu9rbNnBa
-         8Ifj2kGXSoBEIod8Jpy7qPbz0/Bik3NHxxM106v7S+Yv14USfaHgu95Xz3kAOgUDNW
-         5e1OnDfiRNQrkotrhbtQj/7CWQ6wR24GZzTJgeS7gVP4kaz5vmXOJGP0a5bMhH9ALV
-         Neh/UjY9p1DXg==
-Message-ID: <12153db1-20af-040b-ded0-31286b5bafca@kernel.org>
-Date:   Tue, 23 May 2023 11:48:17 +0900
+        Mon, 22 May 2023 23:05:47 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ECF98F;
+        Mon, 22 May 2023 20:05:45 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VjIII9u_1684811140;
+Received: from 30.240.108.216(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VjIII9u_1684811140)
+          by smtp.aliyun-inc.com;
+          Tue, 23 May 2023 11:05:42 +0800
+Message-ID: <60f6f1f0-4918-5fea-9827-9bf9d1e496e3@linux.alibaba.com>
+Date:   Tue, 23 May 2023 11:05:38 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v22 25/31] zonefs: Provide a splice-read wrapper
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.10.0
+Subject: Re: [PATCH 0/2] capability: Introduce CAP_BLOCK_ADMIN
+To:     Casey Schaufler <casey@schaufler-ca.com>,
+        Serge Hallyn <serge@hallyn.com>,
+        Paul Moore <paul@paul-moore.com>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Eric Paris <eparis@parisplace.org>,
+        Frederick Lawler <fred@cloudflare.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        louxiao.lx@alibaba-inc.com
+References: <20230511070520.72939-1-tianjia.zhang@linux.alibaba.com>
+ <b645e195-7875-9fc3-a8de-6676dfe800b8@schaufler-ca.com>
+ <e1242268-e7b6-d77c-a94f-edd913845ca7@linux.alibaba.com>
+ <bcf4df59-3915-6df3-027b-8cb35b310650@schaufler-ca.com>
+ <345a7cdc-e55b-7aaa-43d4-59b3f911ef18@linux.alibaba.com>
+ <bcf38ded-f1da-2fe4-c6a5-195c9d46718b@schaufler-ca.com>
 Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
-References: <20230522135018.2742245-1-dhowells@redhat.com>
- <20230522135018.2742245-26-dhowells@redhat.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230522135018.2742245-26-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <bcf38ded-f1da-2fe4-c6a5-195c9d46718b@schaufler-ca.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/22/23 22:50, David Howells wrote:
-> Provide a splice_read wrapper for zonefs.  This does some checks before
-> proceeding and locks the inode across the call to filemap_splice_read() and
-> a size check in case of truncation.  Splicing from direct I/O is handled by
-> the caller.
+
+
+On 5/23/23 3:13 AM, Casey Schaufler wrote:
+> On 5/21/2023 7:53 PM, Tianjia Zhang wrote:
+>> Hi Casey,
+>>
+>> On 5/18/23 8:01 AM, Casey Schaufler wrote:
+>>> On 5/16/2023 5:05 AM, Tianjia Zhang wrote:
+>>>> Hi Casey,
+>>>>
+>>>> On 5/12/23 12:17 AM, Casey Schaufler wrote:
+>>>>> On 5/11/2023 12:05 AM, Tianjia Zhang wrote:
+>>>>>> Separated fine-grained capability CAP_BLOCK_ADMIN from CAP_SYS_ADMIN.
+>>>>>> For backward compatibility, the CAP_BLOCK_ADMIN capability is
+>>>>>> included
+>>>>>> within CAP_SYS_ADMIN.
+>>>>>>
+>>>>>> Some database products rely on shared storage to complete the
+>>>>>> write-once-read-multiple and write-multiple-read-multiple functions.
+>>>>>> When HA occurs, they rely on the PR (Persistent Reservations)
+>>>>>> protocol
+>>>>>> provided by the storage layer to manage block device permissions to
+>>>>>> ensure data correctness.
+>>>>>>
+>>>>>> CAP_SYS_ADMIN is required in the PR protocol implementation of
+>>>>>> existing
+>>>>>> block devices in the Linux kernel, which has too many sensitive
+>>>>>> permissions, which may lead to risks such as container escape. The
+>>>>>> kernel needs to provide more fine-grained permission management like
+>>>>>> CAP_NET_ADMIN to avoid online products directly relying on root to
+>>>>>> run.
+>>>>>>
+>>>>>> CAP_BLOCK_ADMIN can also provide support for other block device
+>>>>>> operations that require CAP_SYS_ADMIN capabilities in the future,
+>>>>>> ensuring that applications run with least privilege.
+>>>>>
+>>>>> Can you demonstrate that there are cases where a program that needs
+>>>>> CAP_BLOCK_ADMIN does not also require CAP_SYS_ADMIN for other
+>>>>> operations?
+>>>>> How much of what's allowed by CAP_SYS_ADMIN would be allowed by
+>>>>> CAP_BLOCK_ADMIN? If use of a new capability is rare it's difficult to
+>>>>> justify.
+>>>>>
+>>>>
+>>>> For the previous non-container scenarios, the block device is a shared
+>>>> device, because the business-system generally operates the file system
+>>>> on the block. Therefore, directly operating the block device has a high
+>>>> probability of affecting other processes on the same host, and it is a
+>>>> reasonable requirement to need the CAP_SYS_ADMIN capability.
+>>>>
+>>>> But for a database running in a container scenario, especially a
+>>>> container scenario on the cloud, it is likely that a container
+>>>> exclusively occupies a block device. That is to say, for a container,
+>>>> its access to the block device will not affect other process, there is
+>>>> no need to obtain a higher CAP_SYS_ADMIN capability.
+>>>
+>>> If I understand correctly, you're saying that the process that requires
+>>> CAP_BLOCK_ADMIN in the container won't also require CAP_SYS_ADMIN for
+>>> other operations.
+>>>
+>>> That's good, but it isn't clear how a process on bare metal would
+>>> require CAP_SYS_ADMIN while the same process in a container wouldn't.
+>>>
+>>>>
+>>>> For a file system similar to distributed write-once-read-many, it is
+>>>> necessary to ensure the correctness of recovery, then when recovery
+>>>> occurs, it is necessary to ensure that no inflighting-io is completed
+>>>> after recovery.
+>>>>
+>>>> This can be guaranteed by performing operations such as SCSI/NVME
+>>>> Persistent Reservations on block devices on the distributed file
+>>>> system.
+>>>
+>>> Does your cloud based system always run "real" devices? My
+>>> understanding is that cloud based deployment usually uses
+>>> virtual machines and virtio or other simulated devices.
+>>> A container deployment in the cloud seems unlikely to be able
+>>> to take advantage of block administration. But I can't say
+>>> I know the specifics of your environment.
+>>>
+>>>> Therefore, at present, it is only necessary to have the relevant
+>>>> permission support of the control command of such container-exclusive
+>>>> block devices.
+>>>
+>>> This looks like an extremely special case in which breaking out
+>>> block management would make sense.
+>>>
+>> Our scenario is like this. In simply terms, a distributed database has
+>> a read-write instance and one or more read-only instances. Each instance
+>> runs in an isolated container. All containers share the same block
+>> device.
+>>
+>> In addition to the database instance, there is also a control program
+>> running on the control plane in the container. The database ensures
+>> the correctness of the data through the PR (Persistent Reservations)
+>> of the block device. This operation is also the only operation in the
+>> container that requires CAP_SYS_ADMIN privileges.
+>>
+>> This system as a whole, whether it is running on VM or bare metal, the
+>> difference is not big.
+>>
+>> In order to support the PR of block devices, we need to grant
+>> CAP_SYS_ADMIN permissions to the container, which not only greatly
+>> increases the risk of container escape, but also makes us have to
+>> carefully configure the permissions of the container. Many container
+>> escapes that have occurred are also caused by these reasons.
+>>
+>> This is essentially a problem of permission isolation. We hope to
+>> share the smallest possible permissions from CAP_SYS_ADMIN to support
+>> necessary operations, and avoid providing CAP_SYS_ADMIN permissions
+>> to containers as much as possible.
 > 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Christoph Hellwig <hch@lst.de>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Darrick J. Wong <djwong@kernel.org>
-> cc: linux-xfs@vger.kernel.org
-> cc: linux-fsdevel@vger.kernel.org
-> cc: linux-block@vger.kernel.org
-> cc: linux-mm@kvack.org
-
-One comment below but otherwise looks OK.
-
-Acked-by: Damien Le Moal <dlemoal@kernel.org>
-
-> ---
->  fs/zonefs/file.c | 40 +++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 39 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/zonefs/file.c b/fs/zonefs/file.c
-> index 132f01d3461f..65d4c4fe6364 100644
-> --- a/fs/zonefs/file.c
-> +++ b/fs/zonefs/file.c
-> @@ -752,6 +752,44 @@ static ssize_t zonefs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
->  	return ret;
->  }
->  
-> +static ssize_t zonefs_file_splice_read(struct file *in, loff_t *ppos,
-> +				       struct pipe_inode_info *pipe,
-> +				       size_t len, unsigned int flags)
-> +{
-> +	struct inode *inode = file_inode(in);
-> +	struct zonefs_inode_info *zi = ZONEFS_I(inode);
-> +	struct zonefs_zone *z = zonefs_inode_zone(inode);
-> +	loff_t isize;
-> +	ssize_t ret = 0;
-> +
-> +	/* Offline zones cannot be read */
-> +	if (unlikely(IS_IMMUTABLE(inode) && !(inode->i_mode & 0777)))
-> +		return -EPERM;
-> +
-> +	if (*ppos >= z->z_capacity)
-> +		return 0;
-> +
-> +	inode_lock_shared(inode);
-> +
-> +	/* Limit read operations to written data */
-> +	mutex_lock(&zi->i_truncate_mutex);
-> +	isize = i_size_read(inode);
-> +	if (*ppos >= isize)
-> +		len = 0;
-> +	else
-> +		len = min_t(loff_t, len, isize - *ppos);
-> +	mutex_unlock(&zi->i_truncate_mutex);
-> +
-> +	if (len > 0) {
-> +		ret = filemap_splice_read(in, ppos, pipe, len, flags);
-> +		if (ret == -EIO)
-
-Is -EIO the only error that filemap_splice_read() may return ? There are other
-IO error codes that we could get from the block layer, e.g. -ETIMEDOUT etc. So
-"if (ret < 0)" may be better here ?
-
-> +			zonefs_io_error(inode, false);
-> +	}
-> +
-> +	inode_unlock_shared(inode);
-> +	return ret;
-> +}
-> +
->  /*
->   * Write open accounting is done only for sequential files.
->   */
-> @@ -896,7 +934,7 @@ const struct file_operations zonefs_file_operations = {
->  	.llseek		= zonefs_file_llseek,
->  	.read_iter	= zonefs_file_read_iter,
->  	.write_iter	= zonefs_file_write_iter,
-> -	.splice_read	= generic_file_splice_read,
-> +	.splice_read	= zonefs_file_splice_read,
->  	.splice_write	= iter_file_splice_write,
->  	.iopoll		= iocb_bio_iopoll,
->  };
+> Your use case is interesting, but not compelling. While you may have
+> come up with a specific case where you can completely break CAP_BLOCK_ADMIN
+> out from CAP_SYS_ADMIN, it's hardly general.
 > 
 
--- 
-Damien Le Moal
-Western Digital Research
+It sounds a pity, thanks for your reply, we try to provide support
+through self-developed patches first.
+
+Kind regards,
+Tianjia
 
