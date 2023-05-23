@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C796C7EE23
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2845C7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:31:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232466AbjEWJaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 05:30:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52350 "EHLO
+        id S230054AbjEWJbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 05:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230054AbjEWJaU (ORCPT
+        with ESMTP id S229943AbjEWJbE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 05:30:20 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4431294
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:30:19 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-510d6e1f1b2so1148500a12.3
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:30:19 -0700 (PDT)
+        Tue, 23 May 2023 05:31:04 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7DF94
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:31:03 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-96fdc081cb3so351824566b.2
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:31:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1684834214; x=1687426214;
+        d=ionos.com; s=google; t=1684834261; x=1687426261;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lE7Zyz9HNYfFLXNPnHTdc8FUA1/63qFYGKofo0jrisw=;
-        b=DKFF7sF54l4WyR56IiTfPLOeSZHAWZkKUKNTXAPshapBBMYeZSj8yM/Qy2xUdq5rWy
-         PQpc01vQnYxgKEceuBD6YtXGu2rezkSA8Ze0oOlxGEz2tYGuyOA+hSdG4btDwfq1f3+Y
-         lIdhK6t3DYH282lEVdgPjbKoIv1bICazhgi8NoDp121wEiSFAZr2PfIEdVTTteY+sGjW
-         QMQa6zIRCNO67iII865N9dorpQZdJVUdqOlauOlqXoP3Ctkb68a7dZ/OHo+5k2Bbe1/V
-         tVlylg+ACGHXHlFiOILAx58MOXpPD54b3IcBSxLB6qKIlbXFZHFmIXNODxaWN4mMWdn6
-         qWmw==
+        bh=kqephx2VJND73mFAxCRE2QU7Sh/HUprdV2dKCS1tbP0=;
+        b=NjTxQCtFOnvVf5hPEO9XDgsNlkoBRV8CbT/3yjliaIJbRKzpNgxYxnIViwHZpadQI6
+         smODJgDYri2v/nllMLzqCihELk7qEHbGBOntcFqbaDYKjNuXvM107feAiHJDcyTTV6Hf
+         EO4Z+9EpZmRMZWnKpBCH9ZLg+1TV/G+75utsh4ott9Vrd5Q6sN9LkhIIYhUjiMlwfeZU
+         BSIl/xXuBucbMpUrle6CgGByZYbCibseBWfw/ncWBOsbPQVB2MaC0kiU7Jr5wUsa2EYA
+         f5yTXHcQd7t3InyLS21YsuaxghDsB037/yrPuM0vJfOqCu0yS7itunj/Ocd7TXCvcPFE
+         ewoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684834214; x=1687426214;
+        d=1e100.net; s=20221208; t=1684834261; x=1687426261;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lE7Zyz9HNYfFLXNPnHTdc8FUA1/63qFYGKofo0jrisw=;
-        b=D/2yur0jAiCy9hNMMCnxzeKhfQfPI6Rghrrl4pKpGzKIxyiA5xPw1T/mE+o+oTFT+u
-         jtEwuDG/sNj1dfMG+Kaik8tvqHZEnpKfqT5X6uA0xPLXOWS0s9Ybla87qjq89UsPQejQ
-         Kz6fUMUsAucScInaEyz47DaLUsmIVhQQjChYA7zdzd4q4jb2N+bnNE/P5gdHZyBw7b76
-         YNq3q7D1BUDDjtd9OaOceBacSErbdIYVUmX64LzxEKrjoTNIZcz8tdArmSnY4GQj3FZF
-         hs8OJhoZZdT91sT/mb0oVTKdTkIPIB3TbuTyrKYPi5Keqq89xL0f9cYwFVL0GhYfrXl7
-         bpmg==
-X-Gm-Message-State: AC+VfDxcB74fSfuosGNqw3MAu0BZ4b9fJrhEbK/OY6TsuzpQM3aWAxY5
-        CUpJWYtCgtIiF9hsGd+HqEqgl5dn+dmZHzSFVnJwAQ==
-X-Google-Smtp-Source: ACHHUZ47VoXKGZ4mF0MJz4K4dyOMJXaaYIYawzmSy2708P4NxpO7lVFCIOynjqbIvQ3uFxcMY3Zb/Uf4+YaaaPELmR8=
-X-Received: by 2002:aa7:c1d8:0:b0:50b:b7f5:3128 with SMTP id
- d24-20020aa7c1d8000000b0050bb7f53128mr9820552edp.12.1684834214638; Tue, 23
- May 2023 02:30:14 -0700 (PDT)
+        bh=kqephx2VJND73mFAxCRE2QU7Sh/HUprdV2dKCS1tbP0=;
+        b=ExlxoSoSVh4GeqamNRoGKn608GtgF3Ucqf5fn6UJkOhQ9ttSMMstm6ARa9vGWru/Gn
+         xRLP3Kl9gyao5fEQVnnTZ8pczetTYVFWSpKv3OlXELrmVhg/A3EgMqNFUwueA7Qq/Rkr
+         L9EGRM3QVICwOdMGLsi9XEzqOv+xD2BvO8QBdB0ypTbtAHg/9ggGoAkq/7ugNam29s/D
+         ThGvw5yN/eRKkSP1OTynaRo6ki01jV1TO25DgJbCnV28aPhf03C/YnqTYj4STfbAVeqw
+         5RNlWpPfwmgVymnd5e28PFEHTdBCYoQUCiDVY8vFzDe6VXz0/NxG2z64R9P8lZ6eWs2A
+         353A==
+X-Gm-Message-State: AC+VfDx25iKYftFrgqt4oGfiVUGDLEYwUKZIIRsSBjgLeHPY4BCfkd8u
+        VmXuhl+e169ytXmrk7Uh//7Pweenq8gjtF8bC+Cy0F63Y6k6JTW9
+X-Google-Smtp-Source: ACHHUZ7CB7FbvHRcOMBNalEmU+2uoKwkhXlxnq/lfcSnmwpLyjmruaMTrpxmoJrvb4E2jJ6erlmO/3cPATMrAfv/VFM=
+X-Received: by 2002:a17:907:d0a:b0:96f:bd84:b8a0 with SMTP id
+ gn10-20020a1709070d0a00b0096fbd84b8a0mr8014797ejc.5.1684834261555; Tue, 23
+ May 2023 02:31:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230523075331.32250-1-guoqing.jiang@linux.dev> <20230523075331.32250-7-guoqing.jiang@linux.dev>
-In-Reply-To: <20230523075331.32250-7-guoqing.jiang@linux.dev>
+References: <20230523075331.32250-1-guoqing.jiang@linux.dev> <20230523075331.32250-8-guoqing.jiang@linux.dev>
+In-Reply-To: <20230523075331.32250-8-guoqing.jiang@linux.dev>
 From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Tue, 23 May 2023 11:30:04 +0200
-Message-ID: <CAMGffEkexApuKZmE6oiB2n1RDHXJkjc_RGYZPMnn5Zdn43YJMw@mail.gmail.com>
-Subject: Re: [PATCH 06/10] block/rnbd-srv: rename one member in rnbd_srv_dev
+Date:   Tue, 23 May 2023 11:30:50 +0200
+Message-ID: <CAMGffEkqJgE-g5Z9_6JZE37=arJpkE4nEs+bERaauVck3399uw@mail.gmail.com>
+Subject: Re: [PATCH 07/10] block/rnbd-srv: init ret with 0 instead of -EPERM
 To:     Guoqing Jiang <guoqing.jiang@linux.dev>
 Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -65,109 +65,65 @@ X-Mailing-List: linux-block@vger.kernel.org
 On Tue, May 23, 2023 at 9:53=E2=80=AFAM Guoqing Jiang <guoqing.jiang@linux.=
 dev> wrote:
 >
-> It actually represents the name of rnbd_srv_dev.
+> Let's always set errno after pr_err which is consistent with
+> default case.
 >
 > Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 Acked-by: Jack Wang <jinpu.wang@ionos.com>
 > ---
->  drivers/block/rnbd/rnbd-srv.c | 14 +++++++-------
->  drivers/block/rnbd/rnbd-srv.h |  2 +-
->  2 files changed, 8 insertions(+), 8 deletions(-)
+>  drivers/block/rnbd/rnbd-srv.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 >
 > diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.=
 c
-> index b4c880759a52..e51eb4b7f6e6 100644
+> index e51eb4b7f6e6..102831c302fc 100644
 > --- a/drivers/block/rnbd/rnbd-srv.c
 > +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -176,7 +176,7 @@ static void destroy_device(struct kref *kref)
+> @@ -463,34 +463,33 @@ static int rnbd_srv_check_update_open_perm(struct r=
+nbd_srv_dev *srv_dev,
+>                                             struct rnbd_srv_session *srv_=
+sess,
+>                                             enum rnbd_access_mode access_=
+mode)
+>  {
+> -       int ret =3D -EPERM;
+> +       int ret =3D 0;
 >
->         WARN_ONCE(!list_empty(&dev->sess_dev_list),
->                   "Device %s is being destroyed but still in use!\n",
-> -                 dev->id);
-> +                 dev->name);
+>         mutex_lock(&srv_dev->lock);
 >
->         spin_lock(&dev_lock);
->         list_del(&dev->list);
-> @@ -427,7 +427,7 @@ static struct rnbd_srv_dev *rnbd_srv_init_srv_dev(str=
-uct block_device *bdev)
->         if (!dev)
->                 return ERR_PTR(-ENOMEM);
->
-> -       snprintf(dev->id, sizeof(dev->id), "%pg", bdev);
-> +       snprintf(dev->name, sizeof(dev->name), "%pg", bdev);
->         kref_init(&dev->kref);
->         INIT_LIST_HEAD(&dev->sess_dev_list);
->         mutex_init(&dev->lock);
-> @@ -442,7 +442,7 @@ rnbd_srv_find_or_add_srv_dev(struct rnbd_srv_dev *new=
-_dev)
->
->         spin_lock(&dev_lock);
->         list_for_each_entry(dev, &dev_list, list) {
-> -               if (!strncmp(dev->id, new_dev->id, sizeof(dev->id))) {
-> +               if (!strncmp(dev->name, new_dev->name, sizeof(dev->name))=
-) {
->                         if (!kref_get_unless_zero(&dev->kref))
->                                 /*
->                                  * We lost the race, device is almost dea=
-d.
-> @@ -477,7 +477,7 @@ static int rnbd_srv_check_update_open_perm(struct rnb=
-d_srv_dev *srv_dev,
->                         ret =3D 0;
+>         switch (access_mode) {
+>         case RNBD_ACCESS_RO:
+> -               ret =3D 0;
+>                 break;
+>         case RNBD_ACCESS_RW:
+>                 if (srv_dev->open_write_cnt =3D=3D 0)  {
+>                         srv_dev->open_write_cnt++;
+> -                       ret =3D 0;
 >                 } else {
 >                         pr_err("Mapping device '%s' for session %s with R=
 W permissions failed. Device already opened as 'RW' by %d client(s), access=
  mode %s.\n",
-> -                              srv_dev->id, srv_sess->sessname,
-> +                              srv_dev->name, srv_sess->sessname,
+>                                srv_dev->name, srv_sess->sessname,
 >                                srv_dev->open_write_cnt,
 >                                rnbd_access_modes[access_mode].str);
+> +                       ret =3D -EPERM;
 >                 }
-> @@ -488,14 +488,14 @@ static int rnbd_srv_check_update_open_perm(struct r=
-nbd_srv_dev *srv_dev,
->                         ret =3D 0;
+>                 break;
+>         case RNBD_ACCESS_MIGRATION:
+>                 if (srv_dev->open_write_cnt < 2) {
+>                         srv_dev->open_write_cnt++;
+> -                       ret =3D 0;
 >                 } else {
 >                         pr_err("Mapping device '%s' for session %s with m=
 igration permissions failed. Device already opened as 'RW' by %d client(s),=
  access mode %s.\n",
-> -                              srv_dev->id, srv_sess->sessname,
-> +                              srv_dev->name, srv_sess->sessname,
+>                                srv_dev->name, srv_sess->sessname,
 >                                srv_dev->open_write_cnt,
 >                                rnbd_access_modes[access_mode].str);
+> +                       ret =3D -EPERM;
 >                 }
 >                 break;
 >         default:
->                 pr_err("Received mapping request for device '%s' on sessi=
-on %s with invalid access mode: %d\n",
-> -                      srv_dev->id, srv_sess->sessname, access_mode);
-> +                      srv_dev->name, srv_sess->sessname, access_mode);
->                 ret =3D -EINVAL;
->         }
->
-> @@ -770,7 +770,7 @@ static int process_msg_open(struct rnbd_srv_session *=
-srv_sess,
->         list_add(&srv_sess_dev->dev_list, &srv_dev->sess_dev_list);
->         mutex_unlock(&srv_dev->lock);
->
-> -       rnbd_srv_info(srv_sess_dev, "Opened device '%s'\n", srv_dev->id);
-> +       rnbd_srv_info(srv_sess_dev, "Opened device '%s'\n", srv_dev->name=
-);
->
->         kfree(full_path);
->
-> diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.=
-h
-> index f5962fd31d62..6b5e5ade18ae 100644
-> --- a/drivers/block/rnbd/rnbd-srv.h
-> +++ b/drivers/block/rnbd/rnbd-srv.h
-> @@ -35,7 +35,7 @@ struct rnbd_srv_dev {
->         struct kobject                  dev_kobj;
->         struct kobject                  *dev_sessions_kobj;
->         struct kref                     kref;
-> -       char                            id[NAME_MAX];
-> +       char                            name[NAME_MAX];
->         /* List of rnbd_srv_sess_dev structs */
->         struct list_head                sess_dev_list;
->         struct mutex                    lock;
 > --
 > 2.35.3
 >
