@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F447C7EE2A
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CB2C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:46:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235577AbjEWHqR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 03:46:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41680 "EHLO
+        id S235571AbjEWHqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 03:46:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235274AbjEWHqE (ORCPT
+        with ESMTP id S235164AbjEWHqD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 03:46:04 -0400
+        Tue, 23 May 2023 03:46:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BEFE0;
-        Tue, 23 May 2023 00:46:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FF6118;
+        Tue, 23 May 2023 00:46:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=4j+Tp8TcnUGqT/X9I2ry3tJxNtOyoD54dmfstpWfMBY=; b=g3WlkN9YuAgQfAWxcRvpyPoq0p
-        zKY+ZIdk1LTGPSfbB5SRkaZiK1ld98FMzxsHtMyBdfj8zkjp/lj/RovRidn7+j5E0K1MrkbpuTSWS
-        AzZ7A6V0vkAksP4mdxuQJ7PzCz+oY8bco+dEPScI0TXYwbtCpRdo2ruVlZdAxubdPqXYWjSDqduUZ
-        8J88omX94t2v5HRD0RKPU+zcPUDDZFbsAr7RSv+i6NBIdC5QcwyqdWc/U3rQHmA6+QkLk4lzC0fPr
-        QMNXJocjjbtveOUx8u6PIhwC7vAbKRu+04KdJi9x5quM6gIbi+lx1rtdQXf/cpIbee7h6XsvxK1bC
-        aqUL7s/w==;
+        bh=jZRF33U9/i0WwWhIXhCPDfpLuiH0EpaeKjfubU+/NSk=; b=dkBi+PBtwIHBctSBmpUW7XDd+E
+        SZnvGvAWk+dfSf4TqHZf6neGTK+SWpj/1rwAZ/uVDABZ51wxkIIOCagDjD7Wk2mN57Jd6czkFJczK
+        jI9At/MpPQIaTOhOp6y6bbjvNTtiOJw+hFlzMMOF5eXAqSCdw3yBhVvEiBI/jnSvSSrUlCvSJdU2O
+        WD8XEvIPyY+Er3vLaIcd++xXWU5fPpKpaFpEwJIuNxZRH6qkZeLIh5V2xdgF0M36L6i6mcZrFzNrh
+        huurPNkzH3UiIUIgv5RRefgXFJx8OJ6RYFQA+otrqgq7EUuMpCkgy/iIRwqwcVZ96KqY9LFT1AMzO
+        Jr7ztCNQ==;
 Received: from [2001:4bb8:188:23b2:6ade:85c9:530f:6eb0] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q1MiS-009Gce-39;
-        Tue, 23 May 2023 07:45:57 +0000
+        id 1q1MiK-009GWl-20;
+        Tue, 23 May 2023 07:45:49 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -41,9 +41,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: [PATCH 07/24] init: refactor mount_root
-Date:   Tue, 23 May 2023 09:45:18 +0200
-Message-Id: <20230523074535.249802-8-hch@lst.de>
+Subject: [PATCH 04/24] PM: hibernate: move finding the resume device out of software_resume
+Date:   Tue, 23 May 2023 09:45:15 +0200
+Message-Id: <20230523074535.249802-5-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230523074535.249802-1-hch@lst.de>
 References: <20230523074535.249802-1-hch@lst.de>
@@ -54,180 +54,141 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provide stubs for all the lower level mount helpers, and just switch
-on ROOT_DEV in the main function.
+software_resume can be called either from an init call in the boot code,
+or from sysfs once the system has finished booting, and the two
+invocation methods this can't race with each other.
+
+For the latter case we did just parse the suspend device manually, while
+the former might not have one.  Split software_resume so that the search
+only happens for the boot case, which also means the special lockdep
+nesting annotation can go away as the system transition mutex can be
+taken a little later and doesn't have the sysfs locking nest inside it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- init/do_mounts.c | 104 +++++++++++++++++++++++++----------------------
- 1 file changed, 56 insertions(+), 48 deletions(-)
+ kernel/power/hibernate.c | 80 ++++++++++++++++++++--------------------
+ 1 file changed, 39 insertions(+), 41 deletions(-)
 
-diff --git a/init/do_mounts.c b/init/do_mounts.c
-index a2c0baace0992c..e708b02d9d6566 100644
---- a/init/do_mounts.c
-+++ b/init/do_mounts.c
-@@ -453,15 +453,14 @@ void __init mount_root_generic(char *name, int flags)
- #define NFSROOT_TIMEOUT_MAX	30
- #define NFSROOT_RETRY_MAX	5
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index 78696aa04f5ca3..45e24b02cd50b6 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -907,7 +907,7 @@ int hibernate_quiet_exec(int (*func)(void *data), void *data)
+ }
+ EXPORT_SYMBOL_GPL(hibernate_quiet_exec);
  
--static int __init mount_nfs_root(void)
-+static void __init mount_nfs_root(void)
+-static int find_resume_device(void)
++static int __init find_resume_device(void)
  {
- 	char *root_dev, *root_data;
- 	unsigned int timeout;
--	int try, err;
-+	int try;
+ 	if (!strlen(resume_file))
+ 		return -ENOENT;
+@@ -942,53 +942,16 @@ static int find_resume_device(void)
+ 	return 0;
+ }
  
--	err = nfs_root_data(&root_dev, &root_data);
--	if (err != 0)
+-/**
+- * software_resume - Resume from a saved hibernation image.
+- *
+- * This routine is called as a late initcall, when all devices have been
+- * discovered and initialized already.
+- *
+- * The image reading code is called to see if there is a hibernation image
+- * available for reading.  If that is the case, devices are quiesced and the
+- * contents of memory is restored from the saved image.
+- *
+- * If this is successful, control reappears in the restored target kernel in
+- * hibernation_snapshot() which returns to hibernate().  Otherwise, the routine
+- * attempts to recover gracefully and make the kernel return to the normal mode
+- * of operation.
+- */
+ static int software_resume(void)
+ {
+ 	int error;
+ 
+-	/*
+-	 * If the user said "noresume".. bail out early.
+-	 */
+-	if (noresume || !hibernation_available())
 -		return 0;
-+	if (nfs_root_data(&root_dev, &root_data))
-+		goto fail;
- 
- 	/*
- 	 * The server or network may not be ready, so try several
-@@ -470,10 +469,8 @@ static int __init mount_nfs_root(void)
- 	 */
- 	timeout = NFSROOT_TIMEOUT_MIN;
- 	for (try = 1; ; try++) {
--		err = do_mount_root(root_dev, "nfs",
--					root_mountflags, root_data);
--		if (err == 0)
--			return 1;
-+		if (!do_mount_root(root_dev, "nfs", root_mountflags, root_data))
-+			return;
- 		if (try > NFSROOT_RETRY_MAX)
- 			break;
- 
-@@ -483,9 +480,14 @@ static int __init mount_nfs_root(void)
- 		if (timeout > NFSROOT_TIMEOUT_MAX)
- 			timeout = NFSROOT_TIMEOUT_MAX;
- 	}
--	return 0;
-+fail:
-+	pr_err("VFS: Unable to mount root fs via NFS.\n");
- }
--#endif
-+#else
-+static inline void mount_nfs_root(void)
-+{
-+}
-+#endif /* CONFIG_ROOT_NFS */
- 
- #ifdef CONFIG_CIFS_ROOT
- 
-@@ -495,22 +497,20 @@ extern int cifs_root_data(char **dev, char **opts);
- #define CIFSROOT_TIMEOUT_MAX	30
- #define CIFSROOT_RETRY_MAX	5
- 
--static int __init mount_cifs_root(void)
-+static void __init mount_cifs_root(void)
- {
- 	char *root_dev, *root_data;
- 	unsigned int timeout;
--	int try, err;
-+	int try;
- 
--	err = cifs_root_data(&root_dev, &root_data);
--	if (err != 0)
--		return 0;
-+	if (cifs_root_data(&root_dev, &root_data))
-+		goto fail;
- 
- 	timeout = CIFSROOT_TIMEOUT_MIN;
- 	for (try = 1; ; try++) {
--		err = do_mount_root(root_dev, "cifs", root_mountflags,
--				    root_data);
--		if (err == 0)
--			return 1;
-+		if (!do_mount_root(root_dev, "cifs", root_mountflags,
-+				   root_data))
-+			return;
- 		if (try > CIFSROOT_RETRY_MAX)
- 			break;
- 
-@@ -519,9 +519,14 @@ static int __init mount_cifs_root(void)
- 		if (timeout > CIFSROOT_TIMEOUT_MAX)
- 			timeout = CIFSROOT_TIMEOUT_MAX;
- 	}
--	return 0;
-+fail:
-+	pr_err("VFS: Unable to mount root fs via SMB.\n");
- }
--#endif
-+#else
-+static inline void mount_cifs_root(void)
-+{
-+}
-+#endif /* CONFIG_CIFS_ROOT */
- 
- static bool __init fs_is_nodev(char *fstype)
- {
-@@ -563,35 +568,38 @@ static int __init mount_nodev_root(void)
- 	return err;
- }
- 
--void __init mount_root(void)
--{
--#ifdef CONFIG_ROOT_NFS
--	if (ROOT_DEV == Root_NFS) {
--		if (!mount_nfs_root())
--			printk(KERN_ERR "VFS: Unable to mount root fs via NFS.\n");
--		return;
+-
+-	/*
+-	 * name_to_dev_t() below takes a sysfs buffer mutex when sysfs
+-	 * is configured into the kernel. Since the regular hibernate
+-	 * trigger path is via sysfs which takes a buffer mutex before
+-	 * calling hibernate functions (which take system_transition_mutex)
+-	 * this can cause lockdep to complain about a possible ABBA deadlock
+-	 * which cannot happen since we're in the boot code here and
+-	 * sysfs can't be invoked yet. Therefore, we use a subclass
+-	 * here to avoid lockdep complaining.
+-	 */
+-	mutex_lock_nested(&system_transition_mutex, SINGLE_DEPTH_NESTING);
+-
+-	if (!swsusp_resume_device) {
+-		error = find_resume_device();
+-		if (error)
+-			goto Unlock;
 -	}
--#endif
--#ifdef CONFIG_CIFS_ROOT
--	if (ROOT_DEV == Root_CIFS) {
--		if (!mount_cifs_root())
--			printk(KERN_ERR "VFS: Unable to mount root fs via SMB.\n");
--		return;
--	}
--#endif
--	if (ROOT_DEV == 0 && root_device_name && root_fs_names) {
--		if (mount_nodev_root() == 0)
--			return;
--	}
- #ifdef CONFIG_BLOCK
--	{
--		int err = create_dev("/dev/root", ROOT_DEV);
-+static void __init mount_block_root(void)
-+{
-+	int err = create_dev("/dev/root", ROOT_DEV);
+-
+ 	pm_pr_dbg("Hibernation image partition %d:%d present\n",
+ 		MAJOR(swsusp_resume_device), MINOR(swsusp_resume_device));
+ 
+ 	pm_pr_dbg("Looking for hibernation image.\n");
 +
-+	if (err < 0)
-+		pr_emerg("Failed to create /dev/root: %d\n", err);
-+	mount_root_generic("/dev/root", root_mountflags);
-+}
-+#else
-+static inline void mount_block_root(void)
-+{
-+}
-+#endif /* CONFIG_BLOCK */
- 
--		if (err < 0)
--			pr_emerg("Failed to create /dev/root: %d\n", err);
--		mount_root_generic("/dev/root", root_mountflags);
-+void __init mount_root(void)
-+{
-+	switch (ROOT_DEV) {
-+	case Root_NFS:
-+		mount_nfs_root();
-+		break;
-+	case Root_CIFS:
-+		mount_cifs_root();
-+		break;
-+	case 0:
-+		if (root_device_name && root_fs_names && mount_nodev_root() == 0)
-+			break;
-+		fallthrough;
-+	default:
-+		mount_block_root();
-+		break;
- 	}
--#endif
++	mutex_lock(&system_transition_mutex);
+ 	error = swsusp_check(false);
+ 	if (error)
+ 		goto Unlock;
+@@ -1035,7 +998,39 @@ static int software_resume(void)
+ 	goto Finish;
  }
  
- /*
+-late_initcall_sync(software_resume);
++/**
++ * software_resume_initcall - Resume from a saved hibernation image.
++ *
++ * This routine is called as a late initcall, when all devices have been
++ * discovered and initialized already.
++ *
++ * The image reading code is called to see if there is a hibernation image
++ * available for reading.  If that is the case, devices are quiesced and the
++ * contents of memory is restored from the saved image.
++ *
++ * If this is successful, control reappears in the restored target kernel in
++ * hibernation_snapshot() which returns to hibernate().  Otherwise, the routine
++ * attempts to recover gracefully and make the kernel return to the normal mode
++ * of operation.
++ */
++static int __init software_resume_initcall(void)
++{
++	/*
++	 * If the user said "noresume".. bail out early.
++	 */
++	if (noresume || !hibernation_available())
++		return 0;
++
++	if (!swsusp_resume_device) {
++		int error = find_resume_device();
++
++		if (error)
++			return error;
++	}
++
++	return software_resume();
++}
++late_initcall_sync(software_resume_initcall);
+ 
+ 
+ static const char * const hibernation_modes[] = {
+@@ -1176,6 +1171,9 @@ static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
+ 	char *name;
+ 	dev_t res;
+ 
++	if (!hibernation_available())
++		return 0;
++
+ 	if (len && buf[len-1] == '\n')
+ 		len--;
+ 	name = kstrndup(buf, len, GFP_KERNEL);
 -- 
 2.39.2
 
