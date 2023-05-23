@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CB2C77B75
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78578C7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235571AbjEWHqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 03:46:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41674 "EHLO
+        id S235608AbjEWHqT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 03:46:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235164AbjEWHqD (ORCPT
+        with ESMTP id S235484AbjEWHqK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 03:46:03 -0400
+        Tue, 23 May 2023 03:46:10 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FF6118;
-        Tue, 23 May 2023 00:46:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C8BFE;
+        Tue, 23 May 2023 00:46:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=jZRF33U9/i0WwWhIXhCPDfpLuiH0EpaeKjfubU+/NSk=; b=dkBi+PBtwIHBctSBmpUW7XDd+E
-        SZnvGvAWk+dfSf4TqHZf6neGTK+SWpj/1rwAZ/uVDABZ51wxkIIOCagDjD7Wk2mN57Jd6czkFJczK
-        jI9At/MpPQIaTOhOp6y6bbjvNTtiOJw+hFlzMMOF5eXAqSCdw3yBhVvEiBI/jnSvSSrUlCvSJdU2O
-        WD8XEvIPyY+Er3vLaIcd++xXWU5fPpKpaFpEwJIuNxZRH6qkZeLIh5V2xdgF0M36L6i6mcZrFzNrh
-        huurPNkzH3UiIUIgv5RRefgXFJx8OJ6RYFQA+otrqgq7EUuMpCkgy/iIRwqwcVZ96KqY9LFT1AMzO
-        Jr7ztCNQ==;
+        bh=eh/PVrjGJIQ4a72HDzdbyMZabhpy1YXWsgmI3PXld44=; b=qsWptni8Px2QKG+K24lIUC3KFf
+        jO4QMWHQU5cCmpzvN94lBN5jcbm3TUh7gTx1J67D5vFEkyMwedcV7iZT8DWSYsTX9kOlJRZiIo2i5
+        G79bt1DiC411aFTWXr+ZheY9HWtIcNLfrid1SBU4QgsT5Jp+XjLbiRJjEuHbp0AiZlOY76XzZDjVL
+        BWUrBnlzdkN+L10M5wMe7KvUllmOvLdNjCym6HawVDr0+oR/c3LoWca61khLUp4DMnlJsjbxywBnO
+        cCldTwBF47eS+ke7QiW1FVT5HKSUJGpJR0TG7fjTwpBIk2VH+D36+82mXU9ZvoH02/OnWdR9Fggzx
+        JTSceNow==;
 Received: from [2001:4bb8:188:23b2:6ade:85c9:530f:6eb0] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q1MiK-009GWl-20;
-        Tue, 23 May 2023 07:45:49 +0000
+        id 1q1MiY-009Ghn-18;
+        Tue, 23 May 2023 07:46:02 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -41,9 +41,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: [PATCH 04/24] PM: hibernate: move finding the resume device out of software_resume
-Date:   Tue, 23 May 2023 09:45:15 +0200
-Message-Id: <20230523074535.249802-5-hch@lst.de>
+Subject: [PATCH 09/24] init: don't remove the /dev/ prefix from error messages
+Date:   Tue, 23 May 2023 09:45:20 +0200
+Message-Id: <20230523074535.249802-10-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230523074535.249802-1-hch@lst.de>
 References: <20230523074535.249802-1-hch@lst.de>
@@ -54,141 +54,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-software_resume can be called either from an init call in the boot code,
-or from sysfs once the system has finished booting, and the two
-invocation methods this can't race with each other.
-
-For the latter case we did just parse the suspend device manually, while
-the former might not have one.  Split software_resume so that the search
-only happens for the boot case, which also means the special lockdep
-nesting annotation can go away as the system transition mutex can be
-taken a little later and doesn't have the sysfs locking nest inside it.
+Remove the code that drops the /dev/ prefix from root_device_name, which
+is only used for error messages when mounting the root device fails.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- kernel/power/hibernate.c | 80 ++++++++++++++++++++--------------------
- 1 file changed, 39 insertions(+), 41 deletions(-)
+ init/do_mounts.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-index 78696aa04f5ca3..45e24b02cd50b6 100644
---- a/kernel/power/hibernate.c
-+++ b/kernel/power/hibernate.c
-@@ -907,7 +907,7 @@ int hibernate_quiet_exec(int (*func)(void *data), void *data)
- }
- EXPORT_SYMBOL_GPL(hibernate_quiet_exec);
- 
--static int find_resume_device(void)
-+static int __init find_resume_device(void)
+diff --git a/init/do_mounts.c b/init/do_mounts.c
+index 1405ee7218bf00..74cc96bffbdd71 100644
+--- a/init/do_mounts.c
++++ b/init/do_mounts.c
+@@ -607,8 +607,6 @@ void __init mount_root(char *root_device_name)
+  */
+ void __init prepare_namespace(void)
  {
- 	if (!strlen(resume_file))
- 		return -ENOENT;
-@@ -942,53 +942,16 @@ static int find_resume_device(void)
- 	return 0;
- }
- 
--/**
-- * software_resume - Resume from a saved hibernation image.
-- *
-- * This routine is called as a late initcall, when all devices have been
-- * discovered and initialized already.
-- *
-- * The image reading code is called to see if there is a hibernation image
-- * available for reading.  If that is the case, devices are quiesced and the
-- * contents of memory is restored from the saved image.
-- *
-- * If this is successful, control reappears in the restored target kernel in
-- * hibernation_snapshot() which returns to hibernate().  Otherwise, the routine
-- * attempts to recover gracefully and make the kernel return to the normal mode
-- * of operation.
-- */
- static int software_resume(void)
- {
- 	int error;
- 
--	/*
--	 * If the user said "noresume".. bail out early.
--	 */
--	if (noresume || !hibernation_available())
--		return 0;
+-	char *root_device_name;
 -
--	/*
--	 * name_to_dev_t() below takes a sysfs buffer mutex when sysfs
--	 * is configured into the kernel. Since the regular hibernate
--	 * trigger path is via sysfs which takes a buffer mutex before
--	 * calling hibernate functions (which take system_transition_mutex)
--	 * this can cause lockdep to complain about a possible ABBA deadlock
--	 * which cannot happen since we're in the boot code here and
--	 * sysfs can't be invoked yet. Therefore, we use a subclass
--	 * here to avoid lockdep complaining.
--	 */
--	mutex_lock_nested(&system_transition_mutex, SINGLE_DEPTH_NESTING);
--
--	if (!swsusp_resume_device) {
--		error = find_resume_device();
--		if (error)
--			goto Unlock;
--	}
--
- 	pm_pr_dbg("Hibernation image partition %d:%d present\n",
- 		MAJOR(swsusp_resume_device), MINOR(swsusp_resume_device));
+ 	if (root_delay) {
+ 		printk(KERN_INFO "Waiting %d sec before mounting root device...\n",
+ 		       root_delay);
+@@ -627,19 +625,16 @@ void __init prepare_namespace(void)
+ 	md_run_setup();
  
- 	pm_pr_dbg("Looking for hibernation image.\n");
-+
-+	mutex_lock(&system_transition_mutex);
- 	error = swsusp_check(false);
- 	if (error)
- 		goto Unlock;
-@@ -1035,7 +998,39 @@ static int software_resume(void)
- 	goto Finish;
- }
+ 	if (saved_root_name[0]) {
+-		root_device_name = saved_root_name;
+-		if (!strncmp(root_device_name, "mtd", 3) ||
+-		    !strncmp(root_device_name, "ubi", 3)) {
+-			mount_root_generic(root_device_name, root_device_name,
++		if (!strncmp(saved_root_name, "mtd", 3) ||
++		    !strncmp(saved_root_name, "ubi", 3)) {
++			mount_root_generic(saved_root_name, saved_root_name,
+ 					   root_mountflags);
+ 			goto out;
+ 		}
+-		ROOT_DEV = name_to_dev_t(root_device_name);
+-		if (strncmp(root_device_name, "/dev/", 5) == 0)
+-			root_device_name += 5;
++		ROOT_DEV = name_to_dev_t(saved_root_name);
+ 	}
  
--late_initcall_sync(software_resume);
-+/**
-+ * software_resume_initcall - Resume from a saved hibernation image.
-+ *
-+ * This routine is called as a late initcall, when all devices have been
-+ * discovered and initialized already.
-+ *
-+ * The image reading code is called to see if there is a hibernation image
-+ * available for reading.  If that is the case, devices are quiesced and the
-+ * contents of memory is restored from the saved image.
-+ *
-+ * If this is successful, control reappears in the restored target kernel in
-+ * hibernation_snapshot() which returns to hibernate().  Otherwise, the routine
-+ * attempts to recover gracefully and make the kernel return to the normal mode
-+ * of operation.
-+ */
-+static int __init software_resume_initcall(void)
-+{
-+	/*
-+	 * If the user said "noresume".. bail out early.
-+	 */
-+	if (noresume || !hibernation_available())
-+		return 0;
-+
-+	if (!swsusp_resume_device) {
-+		int error = find_resume_device();
-+
-+		if (error)
-+			return error;
-+	}
-+
-+	return software_resume();
-+}
-+late_initcall_sync(software_resume_initcall);
+-	if (initrd_load(root_device_name))
++	if (initrd_load(saved_root_name))
+ 		goto out;
  
+ 	/* wait for any asynchronous scanning to complete */
+@@ -652,7 +647,7 @@ void __init prepare_namespace(void)
+ 		async_synchronize_full();
+ 	}
  
- static const char * const hibernation_modes[] = {
-@@ -1176,6 +1171,9 @@ static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
- 	char *name;
- 	dev_t res;
- 
-+	if (!hibernation_available())
-+		return 0;
-+
- 	if (len && buf[len-1] == '\n')
- 		len--;
- 	name = kstrndup(buf, len, GFP_KERNEL);
+-	mount_root(root_device_name);
++	mount_root(saved_root_name);
+ out:
+ 	devtmpfs_mount();
+ 	init_mount(".", "/", NULL, MS_MOVE, NULL);
 -- 
 2.39.2
 
