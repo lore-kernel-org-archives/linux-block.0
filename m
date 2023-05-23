@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 684B3C7EE23
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF813C7EE26
 	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:55:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235592AbjEWHzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 03:55:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49328 "EHLO
+        id S235013AbjEWHzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 03:55:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235885AbjEWHyf (ORCPT
+        with ESMTP id S235830AbjEWHyl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 03:54:35 -0400
-Received: from out-55.mta0.migadu.com (out-55.mta0.migadu.com [IPv6:2001:41d0:1004:224b::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 652EAE53
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 00:54:18 -0700 (PDT)
+        Tue, 23 May 2023 03:54:41 -0400
+Received: from out-26.mta0.migadu.com (out-26.mta0.migadu.com [IPv6:2001:41d0:1004:224b::1a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFB5EE58
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 00:54:21 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1684828419;
+        t=1684828424;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=d05xTiCU7Yz3Xd2o5GXv1m3iGY5f2vOzDgpL9GlrTVI=;
-        b=bQqSoRF+6KUcelHTNsIzTpfNiHGtHfP+dlKuMYNs+dEwmA5CEHevZqVHhlrdosJplrbzbc
-        orxhf1CdArAbVAsMFzCdATDpdbBaZIUYaFPXig7ihG2VSJAOr+PGoPVkNnSPpPraFnonby
-        cO0djGYQdiqiUwI4WX6BaRSgAM0pCVs=
+        bh=ZtyhHhDeMl2j5sMHk2TsBPm6jleixtsEtDUypy+r+NY=;
+        b=kArJwAxXky4x2dDZOkplmDtsdGgOJoJsTIVWmEddMKkDx4qnFuprFI9cGFneZpMiYAkwbY
+        HSSz6elttFd7UPJGcLgDOnFmOLjDc/nM+KpoJeHHsMCksyvhBeGlZ2TpzQtlR7ygZNg0aj
+        PlOeN3PPkh6vqyuqlyU9DbST1vQ9oI4=
 From:   Guoqing Jiang <guoqing.jiang@linux.dev>
 To:     haris.iqbal@ionos.com, jinpu.wang@ionos.com, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 01/10] block/rnbd: kill rnbd_flags_supported
-Date:   Tue, 23 May 2023 15:53:22 +0800
-Message-Id: <20230523075331.32250-2-guoqing.jiang@linux.dev>
+Subject: [PATCH 05/10] block/rnbd-srv: defer the allocation of rnbd_io_private
+Date:   Tue, 23 May 2023 15:53:26 +0800
+Message-Id: <20230523075331.32250-6-guoqing.jiang@linux.dev>
 In-Reply-To: <20230523075331.32250-1-guoqing.jiang@linux.dev>
 References: <20230523075331.32250-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
@@ -41,65 +41,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This routine is not called since added. Then the two flags
-(RNBD_OP_LAST and RNBD_F_ALL) can be removed too after kill
-rnbd_flags_supported.
+Only allocate priv after session is available.
 
 Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 ---
- drivers/block/rnbd/rnbd-proto.h | 22 ----------------------
- 1 file changed, 22 deletions(-)
+ drivers/block/rnbd/rnbd-srv.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-proto.h
-index da1d0542d7e2..84fd69844b7d 100644
---- a/drivers/block/rnbd/rnbd-proto.h
-+++ b/drivers/block/rnbd/rnbd-proto.h
-@@ -185,7 +185,6 @@ struct rnbd_msg_io {
- enum rnbd_io_flags {
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index c4122e65b36a..b4c880759a52 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -128,20 +128,17 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
  
- 	/* Operations */
--
- 	RNBD_OP_READ		= 0,
- 	RNBD_OP_WRITE		= 1,
- 	RNBD_OP_FLUSH		= 2,
-@@ -193,15 +192,9 @@ enum rnbd_io_flags {
- 	RNBD_OP_SECURE_ERASE	= 4,
- 	RNBD_OP_WRITE_SAME	= 5,
+ 	trace_process_rdma(srv_sess, msg, id, datalen, usrlen);
  
--	RNBD_OP_LAST,
+-	priv = kmalloc(sizeof(*priv), GFP_KERNEL);
+-	if (!priv)
+-		return -ENOMEM;
 -
- 	/* Flags */
+ 	dev_id = le32_to_cpu(msg->device_id);
 -
- 	RNBD_F_SYNC  = 1<<(RNBD_OP_BITS + 0),
- 	RNBD_F_FUA   = 1<<(RNBD_OP_BITS + 1),
--
--	RNBD_F_ALL   = (RNBD_F_SYNC | RNBD_F_FUA)
--
- };
+ 	sess_dev = rnbd_get_sess_dev(dev_id, srv_sess);
+ 	if (IS_ERR(sess_dev)) {
+ 		pr_err_ratelimited("Got I/O request on session %s for unknown device id %d\n",
+ 				   srv_sess->sessname, dev_id);
+-		err = -ENOTCONN;
+-		goto err;
++		return -ENOTCONN;
+ 	}
  
- static inline u32 rnbd_op(u32 flags)
-@@ -214,21 +207,6 @@ static inline u32 rnbd_flags(u32 flags)
- 	return flags & ~RNBD_OP_MASK;
++	priv = kmalloc(sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
+ 	priv->sess_dev = sess_dev;
+ 	priv->id = id;
+ 
+@@ -169,7 +166,6 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
+ bio_put:
+ 	bio_put(bio);
+ 	rnbd_put_sess_dev(sess_dev);
+-err:
+ 	kfree(priv);
+ 	return err;
  }
- 
--static inline bool rnbd_flags_supported(u32 flags)
--{
--	u32 op;
--
--	op = rnbd_op(flags);
--	flags = rnbd_flags(flags);
--
--	if (op >= RNBD_OP_LAST)
--		return false;
--	if (flags & ~RNBD_F_ALL)
--		return false;
--
--	return true;
--}
--
- static inline blk_opf_t rnbd_to_bio_flags(u32 rnbd_opf)
- {
- 	blk_opf_t bio_opf;
 -- 
 2.35.3
 
