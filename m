@@ -2,74 +2,159 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86020C7EE26
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 02:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E734CC7EE2D
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 02:48:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234755AbjEWCjP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 22:39:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50654 "EHLO
+        id S234154AbjEWCsZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 22:48:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233455AbjEWCjM (ORCPT
+        with ESMTP id S233768AbjEWCsW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 22:39:12 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1210CA;
-        Mon, 22 May 2023 19:38:46 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QQJR64fDnz4f3kjy;
-        Tue, 23 May 2023 10:38:42 +0800 (CST)
-Received: from [10.174.179.247] (unknown [10.174.179.247])
-        by APP4 (Coremail) with SMTP id gCh0CgAHvbAyJ2xk9nwPKA--.33442S3;
-        Tue, 23 May 2023 10:38:43 +0800 (CST)
-Message-ID: <daca108d-4dd3-ecbf-c630-69d4bc2b96c0@huaweicloud.com>
-Date:   Tue, 23 May 2023 10:38:41 +0800
+        Mon, 22 May 2023 22:48:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BE86CA;
+        Mon, 22 May 2023 19:48:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 06CC062E36;
+        Tue, 23 May 2023 02:48:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06332C4339B;
+        Tue, 23 May 2023 02:48:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684810100;
+        bh=w3PG+wvDxKl0ccqPHuJb+taZwlEJrTezcF9g2TqXZ1g=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=C08IctqNP5/PmceTbld2x6Z+tyTSwkltOrcprZv2cE3Uo496FntDjRuVS7M+Gpm2K
+         U3cEe5vUgZ/7eUJhqG72NHK9lzGdtlP0BhZEzo4aOLxqWQOy2sSMMZWxhCG6Gfxmc7
+         RNc/9BRwtQMCgX2cvdE35U5dVrPXYWf22vm8KWmEnZP0Luge4ya7MjlSfuu9rbNnBa
+         8Ifj2kGXSoBEIod8Jpy7qPbz0/Bik3NHxxM106v7S+Yv14USfaHgu95Xz3kAOgUDNW
+         5e1OnDfiRNQrkotrhbtQj/7CWQ6wR24GZzTJgeS7gVP4kaz5vmXOJGP0a5bMhH9ALV
+         Neh/UjY9p1DXg==
+Message-ID: <12153db1-20af-040b-ded0-31286b5bafca@kernel.org>
+Date:   Tue, 23 May 2023 11:48:17 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v6 0/7] badblocks improvement for multiple bad block
- ranges
-To:     Coly Li <colyli@suse.de>, linux-block@vger.kernel.org
-Cc:     nvdimm@lists.linux.dev, linux-raid@vger.kernel.org,
-        Dan Williams <dan.j.williams@intel.com>,
-        Geliang Tang <geliang.tang@suse.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        NeilBrown <neilb@suse.de>, Richard Fan <richard.fan@suse.com>,
-        Vishal L Verma <vishal.l.verma@intel.com>,
-        Wols Lists <antlists@youngman.org.uk>, Xiao Ni <xni@redhat.com>
-References: <20220721121152.4180-1-colyli@suse.de>
-From:   Li Nan <linan666@huaweicloud.com>
-In-Reply-To: <20220721121152.4180-1-colyli@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v22 25/31] zonefs: Provide a splice-read wrapper
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>,
+        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
+References: <20230522135018.2742245-1-dhowells@redhat.com>
+ <20230522135018.2742245-26-dhowells@redhat.com>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20230522135018.2742245-26-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: gCh0CgAHvbAyJ2xk9nwPKA--.33442S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYB7kC6x804xWl14x267AKxVW8JVW5JwAF
-        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
-        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY
-        6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr
-        0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxG
-        rwACI402YVCY1x02628vn2kIc2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7V
-        AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-        r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-        IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-        w20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-        kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFfHjUUUUU
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Coly Li,
+On 5/22/23 22:50, David Howells wrote:
+> Provide a splice_read wrapper for zonefs.  This does some checks before
+> proceeding and locks the inode across the call to filemap_splice_read() and
+> a size check in case of truncation.  Splicing from direct I/O is handled by
+> the caller.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Al Viro <viro@zeniv.linux.org.uk>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Darrick J. Wong <djwong@kernel.org>
+> cc: linux-xfs@vger.kernel.org
+> cc: linux-fsdevel@vger.kernel.org
+> cc: linux-block@vger.kernel.org
+> cc: linux-mm@kvack.org
 
-Recently, I have been trying to fix the bug of backblocks settings, and 
-I found that your patch series has already fixed the bug. This patch 
-series has not been applied to mainline at present, may I ask if you 
-still plan to continue working on it?
+One comment below but otherwise looks OK.
+
+Acked-by: Damien Le Moal <dlemoal@kernel.org>
+
+> ---
+>  fs/zonefs/file.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 39 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/zonefs/file.c b/fs/zonefs/file.c
+> index 132f01d3461f..65d4c4fe6364 100644
+> --- a/fs/zonefs/file.c
+> +++ b/fs/zonefs/file.c
+> @@ -752,6 +752,44 @@ static ssize_t zonefs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+>  	return ret;
+>  }
+>  
+> +static ssize_t zonefs_file_splice_read(struct file *in, loff_t *ppos,
+> +				       struct pipe_inode_info *pipe,
+> +				       size_t len, unsigned int flags)
+> +{
+> +	struct inode *inode = file_inode(in);
+> +	struct zonefs_inode_info *zi = ZONEFS_I(inode);
+> +	struct zonefs_zone *z = zonefs_inode_zone(inode);
+> +	loff_t isize;
+> +	ssize_t ret = 0;
+> +
+> +	/* Offline zones cannot be read */
+> +	if (unlikely(IS_IMMUTABLE(inode) && !(inode->i_mode & 0777)))
+> +		return -EPERM;
+> +
+> +	if (*ppos >= z->z_capacity)
+> +		return 0;
+> +
+> +	inode_lock_shared(inode);
+> +
+> +	/* Limit read operations to written data */
+> +	mutex_lock(&zi->i_truncate_mutex);
+> +	isize = i_size_read(inode);
+> +	if (*ppos >= isize)
+> +		len = 0;
+> +	else
+> +		len = min_t(loff_t, len, isize - *ppos);
+> +	mutex_unlock(&zi->i_truncate_mutex);
+> +
+> +	if (len > 0) {
+> +		ret = filemap_splice_read(in, ppos, pipe, len, flags);
+> +		if (ret == -EIO)
+
+Is -EIO the only error that filemap_splice_read() may return ? There are other
+IO error codes that we could get from the block layer, e.g. -ETIMEDOUT etc. So
+"if (ret < 0)" may be better here ?
+
+> +			zonefs_io_error(inode, false);
+> +	}
+> +
+> +	inode_unlock_shared(inode);
+> +	return ret;
+> +}
+> +
+>  /*
+>   * Write open accounting is done only for sequential files.
+>   */
+> @@ -896,7 +934,7 @@ const struct file_operations zonefs_file_operations = {
+>  	.llseek		= zonefs_file_llseek,
+>  	.read_iter	= zonefs_file_read_iter,
+>  	.write_iter	= zonefs_file_write_iter,
+> -	.splice_read	= generic_file_splice_read,
+> +	.splice_read	= zonefs_file_splice_read,
+>  	.splice_write	= iter_file_splice_write,
+>  	.iopoll		= iocb_bio_iopoll,
+>  };
+> 
 
 -- 
-Thanks,
-Nan
+Damien Le Moal
+Western Digital Research
 
