@@ -2,85 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C324AC77B75
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 20:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD796C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 20:17:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237948AbjEWUP7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 16:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59312 "EHLO
+        id S234164AbjEWURB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 16:17:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234164AbjEWUP6 (ORCPT
+        with ESMTP id S233032AbjEWURA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 16:15:58 -0400
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3F2129
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 13:15:57 -0700 (PDT)
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-64d3491609fso163344b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 13:15:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684872957; x=1687464957;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6vgyaza8IL9Y7OcUGpcvD/9vTAqVyU3t/7HCGDygR3A=;
-        b=BiAR5cBw/OqllF+TgOUKx+hYpm0sbAlJRHMTSWXOJtZnHEKq0tlS1oXfvYeEyodgpa
-         JMz5PkEYg7xhyRhIe8+uVKuNoChGLC9bqUk4rYYst6/63EfarEthhFAJKtFl+cVLtmWl
-         2Njfh3+Nyrw/v+ZuxROvidblAgYdePAfdfvysNfNnsrvgMj16k+rmizu6nLC6GQNn1Tk
-         aUxaWl3+TnxoBRDghyZ/Ufs9abTRwS724qGNtTW2zOtDGZ4VfquWkE9NMsTnIo7vOO97
-         rHAcDd4ExK2H0wVBGJZvzf5cCCR83KXfzvJbCvlaWFjyhry0HTEdJQLYnIfQcHGxgy0+
-         gZHQ==
-X-Gm-Message-State: AC+VfDxnP3Gyqej03hYAxhmWsJc5DvCLDRgUWPwaZWhj9+8Dy3TCH0Qb
-        LFx0JFOogE59m2BB1oAiPtw=
-X-Google-Smtp-Source: ACHHUZ5tPSVI5tY1rGXW6UKxWpYOYnVtCPt9b69S1xESEHujhnfen/Lju6PDYFyZNGkjAUDRDm+aVw==
-X-Received: by 2002:a05:6a00:1503:b0:64e:c85:4457 with SMTP id q3-20020a056a00150300b0064e0c854457mr356251pfu.8.1684872957115;
-        Tue, 23 May 2023 13:15:57 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:24d2:69cd:ef9a:8f83? ([2620:15c:211:201:24d2:69cd:ef9a:8f83])
-        by smtp.gmail.com with ESMTPSA id k4-20020aa78204000000b006439b7f755bsm6332446pfi.98.2023.05.23.13.15.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 May 2023 13:15:56 -0700 (PDT)
-Message-ID: <8b1d876b-fd37-5a0c-1e9d-253bf96e718f@acm.org>
-Date:   Tue, 23 May 2023 13:15:55 -0700
+        Tue, 23 May 2023 16:17:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D911130
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 13:16:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684872979;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yBM2BC/T1ufxa3+rehpISkT4UVTxaMeNKJrdmGcTYHE=;
+        b=FZF2+7PmxesyVLocBcwttVDErpJT8dN6QzIyP3wf2P2HgR5wX1ofkRKoIfbaOp4S4++aPr
+        dDbzpY89OLMwM0g6zd1coJDbgRHNFJWLGs/nu4iGQDqiVPv5BR4nrV91YDH6c9ybCWOWfC
+        oJMxVCWQIYZ6PsETdOpOv90r7F2vYYI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-321-ZyBG9gwjMIOeTqnxB5ImZQ-1; Tue, 23 May 2023 16:16:16 -0400
+X-MC-Unique: ZyBG9gwjMIOeTqnxB5ImZQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 367763C0F660;
+        Tue, 23 May 2023 20:16:15 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D0E5B1121314;
+        Tue, 23 May 2023 20:16:11 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZGxfrOLZ4aN9/MvE@infradead.org>
+References: <ZGxfrOLZ4aN9/MvE@infradead.org> <20230522205744.2825689-1-dhowells@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Extending page pinning into fs/direct-io.c
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 3/7] block: Requeue requests if a CPU is unplugged
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20230522183845.354920-1-bvanassche@acm.org>
- <20230522183845.354920-4-bvanassche@acm.org>
- <CAFj5m9+dhpqYSOVBQ+H0tCb1Y2i1wpFqn_anbDsfs=mYCTqgCg@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAFj5m9+dhpqYSOVBQ+H0tCb1Y2i1wpFqn_anbDsfs=mYCTqgCg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3068544.1684872971.1@warthog.procyon.org.uk>
+Date:   Tue, 23 May 2023 21:16:11 +0100
+Message-ID: <3068545.1684872971@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/23/23 01:17, Ming Lei wrote:
-> On Tue, May 23, 2023 at 2:39 AM Bart Van Assche <bvanassche@acm.org> wrote:
->>
->> Requeue requests instead of sending these to the dispatch list if a CPU
->> is unplugged. This gives the I/O scheduler the chance to preserve the
->> order of zoned write requests.
-> 
-> But the affected code path is only for queue with none scheduler, do you
-> think none can maintain the order for write requests?
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Hi Ming,
+> But can you please also take care of the legacy direct I/O code?  I'd really
+> hate to leave yet another unfinished transition around.
 
-Doesn't blk_mq_insert_requests() insert requests in ctx->rq_lists[type] 
-whether or not an I/O scheduler is active?
+I've been poking at it this afternoon, but it doesn't look like it's going to
+be straightforward, unfortunately.  The mm folks have been withdrawing access
+to the pinning API behind the ramparts of the mm/ dir.  Further, the dio code
+will (I think), under some circumstances, arbitrarily insert the zero_page
+into a list of things that are maybe pinned or maybe unpinned, but I can (I
+think) also be given a pinned zero_page from the GUP code if the page tables
+point to one and a DIO-write is requested - so just doing if page == zero_page
+isn't sufficient.
 
-I haven't found any code in blk_mq_hctx_notify_dead() that makes this 
-function behave differently based on whether or not an I/O scheduler has 
-been associated with the request queue. Did I perhaps overlook something?
+What I'd like to do is to make the GUP code not take a ref on the zero_page
+if, say, FOLL_DONT_PIN_ZEROPAGE is passed in, and then make the bio cleanup
+code always ignore the zero_page.
 
-Thanks,
+Alternatively, I can drop the pin immediately if I get given one on the
+zero_page - it's not going anywhere, after all.
 
-Bart.
+I also need to be able to take an additional pin on a folio that gets split
+across multiple bio submissions to replace the get_page() that's there now.
+
+Alternatively to that, I can decide how much data I'm willing to read/write in
+one batch, call something like netfs_extract_user_iter() to decant that
+portion of the parameter iterator into an bvec[] and let that look up the
+overlapping page multiple times.  However, I'm not sure if this would work
+well for a couple of reasons: does a single bio have to refer to a contiguous
+range of disk blocks?  and we might expend time on getting pages we then have
+to give up because we hit a hole.
+
+Something that I noticed is that the dio code seems to wangle to page bits on
+the target pages for a DIO-read, which seems odd, but I'm not sure I fully
+understand the code yet.
+
+David
+
