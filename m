@@ -2,98 +2,184 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A617CC7EE26
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 22:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B37C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 22:27:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230512AbjEWWZF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 18:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57290 "EHLO
+        id S229884AbjEWW1U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 18:27:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbjEWWZE (ORCPT
+        with ESMTP id S229837AbjEWW1T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 18:25:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F33C1
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 15:25:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 141EC632D8
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 22:25:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F6CC433EF;
-        Tue, 23 May 2023 22:25:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684880702;
-        bh=uAMnDJ67sa3BN7aTRAukhdiO20l6XeeQhcQaTqTcj/4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=h8a7Klc57+vJgnOp3GN2ZQ/+IRgZjqtKD3TgzPTnoCRhWd5hlfz+klmWkuwAvFuvi
-         /0gk8uz6qtdglY5rAYJqHwfek/JiTL+ZtBd1Jy89gkJL7lpWm1f+Ls0qlTwZrkMHev
-         P2t6rYhB7GExY2XbEfaExh95ptqY151HY3fh3W4VdUuAuxD30uqgbHijyLbT+/pCdI
-         TZ29z11CCRcvPnF5Ut5D1XZKN95FNsOXGaQgAApUtsIqZ7y2jm+CfVsB20jx8j0gV0
-         cgRPut62QRJZaceI3lb2bKwlY7ymhVPqwHgkRKhbIX11jBGYIuhx3RGvTrjw3oziGX
-         lhRlPTTLRBUGg==
-Date:   Tue, 23 May 2023 22:25:01 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     corwin <corwin@redhat.com>
-Cc:     linux-block@vger.kernel.org, vdo-devel@redhat.com,
-        dm-devel@redhat.com
-Subject: Re: [dm-devel] [PATCH v2 02/39] Add the MurmurHash3 fast hashing
- algorithm.
-Message-ID: <20230523222501.GD888341@google.com>
-References: <20230523214539.226387-1-corwin@redhat.com>
- <20230523214539.226387-3-corwin@redhat.com>
- <20230523220618.GA888341@google.com>
- <0d3d1835-d945-9fa2-f3b7-6a60aae3d1df@redhat.com>
+        Tue, 23 May 2023 18:27:19 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34FE5BF
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 15:27:18 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-64d24136685so41845b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 15:27:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1684880837; x=1687472837;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o+Mu9QUDJUPxCQ+nxaGfODHItInO1Mx21+1cY8P0+ko=;
+        b=myd4lDfvuaaTHVDxIZueGM+k5E70olrh5Bi4kawJ2EqxlzdG3jx2hNsJKzBv1ExQrZ
+         aZIqungadEPCy/hk+arz6SCHAhumLQ2exHtv9ezxiuWyl92MWzYKy8HK8quRSz97EAMo
+         8HDOmtAd6fKra/CsSjrI/dK+pfZCIsI+1uCq1qHYsi0xHo3WYArXZwYWudExTIr6Fj27
+         3dDJ033Vg+M4TLAaJI5DgBCEbpaEmjNrP7x2LDAEYwxTkMPe/qI246iat844prVielH/
+         N1rZ8XOfFOa41MmZaZKsz9PVPHf7hGTl1NypGa83NrTRXoIwS26AGhLJnHwQKKez3ITY
+         DvPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684880837; x=1687472837;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o+Mu9QUDJUPxCQ+nxaGfODHItInO1Mx21+1cY8P0+ko=;
+        b=MlUQm+r4yo8snt25x2E0WpFN1/dzLD6hKUXYQz4greOq08DT54E02M2ocrpFWuS/qK
+         w5SkFy/xGmXn/xMUR5/vXXOJTltv3nDvy/CG80P+IPND5iN14Z8O50jOhuDTb6RWx32h
+         d7T6uj3pD/NwPmQUXWYwwfb+XOGagRwZY5Rifr5WEWwHEbvlJTQfht/dC5KdkHDPZznL
+         myfIRXo2phy/bOZTO5zEmDkI8e7uNXnOrdlVUDK9PrYi3Ec7Fa5RAb/bGek8VYIwdLDo
+         V4BHi3kUEWvgtNlyPsaqjEQHZRBQQblSB376olSfrHZKcNgILmvqHFTTXjyL6S6zlkpY
+         tYjg==
+X-Gm-Message-State: AC+VfDyuobkDylXtAWlZsjYD9PjCzGzk3xeXeCxfo7vpLXYtb/4QOc9I
+        UtiSIjCdk5A2Pz702dbJ+LjvMw==
+X-Google-Smtp-Source: ACHHUZ5+wDLkzWl5hqADeJv/K/pEdU5ftVoYvaXjN5yUsSSnEKzwjNvqAoa0WrZdkbq9aiPARCtcUw==
+X-Received: by 2002:a05:6a20:3c8d:b0:10c:d5dd:c223 with SMTP id b13-20020a056a203c8d00b0010cd5ddc223mr1532145pzj.15.1684880837655;
+        Tue, 23 May 2023 15:27:17 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
+        by smtp.gmail.com with ESMTPSA id d11-20020a63fd0b000000b005308b255502sm6443395pgh.68.2023.05.23.15.27.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 May 2023 15:27:16 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q1aTJ-0036Bu-2Z;
+        Wed, 24 May 2023 08:27:13 +1000
+Date:   Wed, 24 May 2023 08:27:13 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 16/17] block: use iomap for writes to block devices
+Message-ID: <ZG09wR4WOI8zDxJK@dread.disaster.area>
+References: <20230424054926.26927-1-hch@lst.de>
+ <20230424054926.26927-17-hch@lst.de>
+ <b96b397e-2f5e-7910-3bb3-7405d0e293a7@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0d3d1835-d945-9fa2-f3b7-6a60aae3d1df@redhat.com>
+In-Reply-To: <b96b397e-2f5e-7910-3bb3-7405d0e293a7@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 23, 2023 at 06:13:08PM -0400, corwin wrote:
-> On 5/23/23 6:06 PM, Eric Biggers wrote:
-> > On Tue, May 23, 2023 at 05:45:02PM -0400, J. corwin Coburn wrote:
-> > > MurmurHash3 is a fast, non-cryptographic, 128-bit hash. It was originally
-> > > written by Austin Appleby and placed in the public domain. This version has
-> > > been modified to produce the same result on both big endian and little
-> > > endian processors, making it suitable for use in portable persistent data.
-> > > 
-> > > Signed-off-by: J. corwin Coburn <corwin@redhat.com>
-> > > ---
-> > >   drivers/md/dm-vdo/murmurhash3.c | 175 ++++++++++++++++++++++++++++++++
-> > >   drivers/md/dm-vdo/murmurhash3.h |  15 +++
-> > >   2 files changed, 190 insertions(+)
-> > >   create mode 100644 drivers/md/dm-vdo/murmurhash3.c
-> > >   create mode 100644 drivers/md/dm-vdo/murmurhash3.h
+On Fri, May 19, 2023 at 04:22:01PM +0200, Hannes Reinecke wrote:
+> On 4/24/23 07:49, Christoph Hellwig wrote:
+> > Use iomap in buffer_head compat mode to write to block devices.
 > > 
-> > Do we really need yet another hash algorithm?
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >   block/Kconfig |  1 +
+> >   block/fops.c  | 33 +++++++++++++++++++++++++++++----
+> >   2 files changed, 30 insertions(+), 4 deletions(-)
 > > 
-> > xxHash is another very fast non-cryptographic hash algorithm that is already
-> > available in the kernel (lib/xxhash.c).
-> > 
-> > - Eric
+> > diff --git a/block/Kconfig b/block/Kconfig
+> > index 941b2dca70db73..672b08f0096ab4 100644
+> > --- a/block/Kconfig
+> > +++ b/block/Kconfig
+> > @@ -5,6 +5,7 @@
+> >   menuconfig BLOCK
+> >          bool "Enable the block layer" if EXPERT
+> >          default y
+> > +       select IOMAP
+> >          select SBITMAP
+> >          help
+> >   	 Provide block layer support for the kernel.
+> > diff --git a/block/fops.c b/block/fops.c
+> > index 318247832a7bcf..7910636f8df33b 100644
+> > --- a/block/fops.c
+> > +++ b/block/fops.c
+> > @@ -15,6 +15,7 @@
+> >   #include <linux/falloc.h>
+> >   #include <linux/suspend.h>
+> >   #include <linux/fs.h>
+> > +#include <linux/iomap.h>
+> >   #include <linux/module.h>
+> >   #include "blk.h"
+> > @@ -386,6 +387,27 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
+> >   	return __blkdev_direct_IO(iocb, iter, bio_max_segs(nr_pages));
+> >   }
+> > +static int blkdev_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
+> > +		unsigned int flags, struct iomap *iomap, struct iomap *srcmap)
+> > +{
+> > +	struct block_device *bdev = I_BDEV(inode);
+> > +	loff_t isize = i_size_read(inode);
+> > +
+> > +	iomap->bdev = bdev;
+> > +	iomap->offset = ALIGN_DOWN(offset, bdev_logical_block_size(bdev));
+> > +	if (WARN_ON_ONCE(iomap->offset >= isize))
+> > +		return -EIO;
 > 
-> The main reason why vdo uses Murmur3 and not xxHash is that vdo has been in
-> deployment since 2013, and, if I am reading correctly, xxHash did not have a
-> 128 bit variant until 2019.
+> I'm hitting this during booting:
+> [    5.016324]  <TASK>
+> [    5.030256]  iomap_iter+0x11a/0x350
+> [    5.030264]  iomap_readahead+0x1eb/0x2c0
+> [    5.030272]  read_pages+0x5d/0x220
+> [    5.030279]  page_cache_ra_unbounded+0x131/0x180
+> [    5.030284]  filemap_get_pages+0xff/0x5a0
 
-Why do you need a 128-bit non-cryptographic hash algorithm?  What problem are
-you trying to solve?
+Why is filemap_get_pages() using unbounded readahead? Surely
+readahead should be limited to reading within EOF....
 
+> [    5.030292]  filemap_read+0xca/0x320
+> [    5.030296]  ? aa_file_perm+0x126/0x500
+> [    5.040216]  ? touch_atime+0xc8/0x150
+> [    5.040224]  blkdev_read_iter+0xb0/0x150
+> [    5.040228]  vfs_read+0x226/0x2d0
+> [    5.040234]  ksys_read+0xa5/0xe0
+> [    5.040238]  do_syscall_64+0x5b/0x80
 > 
-> It would certainly be possible to switch vdo to xxHash, but it would be
-> problematic for existing users.
+> Maybe we should consider this patch:
 > 
+> diff --git a/block/fops.c b/block/fops.c
+> index 524b8a828aad..d202fb663f25 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -386,10 +386,13 @@ static int blkdev_iomap_begin(struct inode *inode,
+> loff_t offset, loff_t length,
+> 
+>         iomap->bdev = bdev;
+>         iomap->offset = ALIGN_DOWN(offset, bdev_logical_block_size(bdev));
+> -       if (WARN_ON_ONCE(iomap->offset >= isize))
+> -               return -EIO;
+> -       iomap->type = IOMAP_MAPPED;
+> -       iomap->addr = iomap->offset;
+> +       if (WARN_ON_ONCE(iomap->offset >= isize)) {
+> +               iomap->type = IOMAP_HOLE;
+> +               iomap->addr = IOMAP_NULL_ADDR;
+> +       } else {
+> +               iomap->type = IOMAP_MAPPED;
+> +               iomap->addr = iomap->offset;
+> +       }
 
-Well, this commit doesn't mention that the choice was forced for compatibility
-reasons.
+I think Christoph's code is correct. IMO, any attempt to read beyond
+the end of the device should throw out a warning and return an
+error, not silently return zeros.
 
-It sounds like the on-disk format (and presumably the UAPI, too?) for dm-vdo was
-already set in stone before it was ever sent out for review.
+If readahead is trying to read beyond the end of the device, then it
+really seems to me like the problem here is readahead, not the iomap
+code detecting the OOB read request....
 
-That takes away some motivation to bother reviewing it, since many review
-comments will be met with "we won't change this"...
+Cheers,
 
-- Eric
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
