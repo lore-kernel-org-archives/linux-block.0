@@ -2,66 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C4FC7EE32
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45138C7EE29
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:47:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238690AbjEWVqw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 17:46:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39712 "EHLO
+        id S238694AbjEWVq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 17:46:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238694AbjEWVqv (ORCPT
+        with ESMTP id S238699AbjEWVqw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 17:46:51 -0400
+        Tue, 23 May 2023 17:46:52 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 687F6E9
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7689130
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:45:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684878359;
+        s=mimecast20190719; t=1684878357;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IBMt3UiVlqNz0yD2X1JxfcSZndPe/NfksKeFaGLF/qk=;
-        b=izAitn65UdUm7ESoL4eQ6c27zC/h9V2+kolDxLK3Xafdj+2NpTKNIQTJfgMP4T7LD7UjsX
-        O/dm/xddRxaioUctgp310NglWgCtXXuvT0iMbQ1NoGuTfht7+KynUGncUnPQS3qcoQCexA
-        kUloBL2Wl5vIbeXde9fyquPo7UaAM1Q=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=CzbR298CfdSKUVwKeQL0xNe8nvopcbSbimpumNPumDU=;
+        b=QA9Y8CKm2eIitjAggUyv8BAFcOY2gG444ebiPZVYtejM0aYLiX4q9BpH7aNPvRI3Sysgoy
+        ksIIzf09d1tSmk9LbMtrGjegSP3WT+Kn7xIML4LXkoeUluwpuTymG3xGLmebNNS4QKMCoS
+        MJHppL87md+WrRZsJo4l3rXuRx+1hDM=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-F-ualIgEPeaDxbA5boXdDA-1; Tue, 23 May 2023 17:45:58 -0400
-X-MC-Unique: F-ualIgEPeaDxbA5boXdDA-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-75b2c4b3e02so28705885a.1
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:45:58 -0700 (PDT)
+ us-mta-37-a8lSmIyVObSydOref8YUoA-1; Tue, 23 May 2023 17:45:56 -0400
+X-MC-Unique: a8lSmIyVObSydOref8YUoA-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-75b131362e3so33448885a.0
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:45:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684878358; x=1687470358;
+        d=1e100.net; s=20221208; t=1684878356; x=1687470356;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IBMt3UiVlqNz0yD2X1JxfcSZndPe/NfksKeFaGLF/qk=;
-        b=g+x1gs9MpLb8RlxWMmTmnhajENIcAIurhEdweRpVw1mji4y6VowwFraoDcEQXWfpQs
-         Dz/j5HA1taXQFXv0mcNmYw08djoDQ/0d2YbQTNgcjMZX5fj7FRnIyZB7z5hng8+ljjKh
-         Ac8iSpteokKHOgOQfJRuh0uOibUo9YJLCQd6VyyBLvBZq14BPfXTMdyxUphHfGaolW1s
-         N+GrfN3zUV0GL9bPZeSF1W4ij6SfUNQOCVeRz86sLvsaMtPevp2+rHZMKehf03GHvKzM
-         jyX45lY/S0WBGex1kWWWV4JHoff/SGT81Uxvruk4wyUWCWErOQzd9vRjiX1LWN60DjOG
-         AIkQ==
-X-Gm-Message-State: AC+VfDxIf6Up10/hBdBU7lBvJbpiB60nFryIQdzl3NhhXnECuWnsOotV
-        c6ehAEgE6NFFevGpQn6F1BD7i6FMPokM1z5dZx/+9n0QA63Kkd55d4VrDdD46k3d+Sqb/HcXihG
-        yjntcJ1cwPcng7jmHtZRcwyw=
-X-Received: by 2002:a37:65d3:0:b0:75b:23a1:d8d1 with SMTP id z202-20020a3765d3000000b0075b23a1d8d1mr6092041qkb.21.1684878355958;
-        Tue, 23 May 2023 14:45:55 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7TGmGxuhEmvTpwAgJqirjMu7xzLQIWEzI/KQl4r4ne7C3efdebqJt2GZ8ABXbBU7Qt95CegA==
-X-Received: by 2002:a37:65d3:0:b0:75b:23a1:d8d1 with SMTP id z202-20020a3765d3000000b0075b23a1d8d1mr6091968qkb.21.1684878354539;
+        bh=CzbR298CfdSKUVwKeQL0xNe8nvopcbSbimpumNPumDU=;
+        b=DFl+a1vFRvCPnNnVqIt7f5gmnwl2KZ1YJVhS+89Au8EN6rgKYDNr3MnmrzBQSspTp9
+         3a8mRKtfNWBrGHv8l86EkfZI0U/ZZBZ7ub7ak+SgjLlK43o2vajTP2uaTcbwWb/PWDoY
+         HR4yzvlphb9Bbm7nKgd83LjXvCDgRNCJ1X5xAcWrtdxa/6TtC9H3Ur5tywTNOcZvpZ1E
+         bkr8RpXWZFtek64lIwebwsi+yIYippCpnjfTlH+q/AkfdjR+5mrviESJqp3VQahcZ8Ud
+         nk6fiHkYdhEdF3WABJu1IwPiudykwxLtwYi/Ag220j6g8Of4ZKswNWsQg4+iGVsRXdoz
+         RvJA==
+X-Gm-Message-State: AC+VfDxiPTgQkav6gXBBHy8HzqXdfUHtDxdC7Chs8X+Ym7M61uE86Nnk
+        /6Pu/KVZ+B8kvEf+0Rowslk62logCfRl9x8D8ikVHbUg7ZQNyJHYZVVMJ6+q3+O9r5RwOoaEiYy
+        Y+E+8+GjuxjET6mOXm5OOcF8=
+X-Received: by 2002:a37:e117:0:b0:75b:23a1:3f7 with SMTP id c23-20020a37e117000000b0075b23a103f7mr5455994qkm.13.1684878354856;
         Tue, 23 May 2023 14:45:54 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7QPY8xr/38+lg4SOoWNoNxzaC0xUqOLeMkXxzZMK9mM5dqfd4OOP56ZbrxN6T6fDI2dOjQ/A==
+X-Received: by 2002:a37:e117:0:b0:75b:23a1:3f7 with SMTP id c23-20020a37e117000000b0075b23a103f7mr5455952qkm.13.1684878353547;
+        Tue, 23 May 2023 14:45:53 -0700 (PDT)
 Received: from bf36-1.. (173-166-2-198-newengland.hfc.comcastbusiness.net. [173.166.2.198])
-        by smtp.gmail.com with ESMTPSA id s24-20020ae9f718000000b0074fafbea974sm2821592qkg.2.2023.05.23.14.45.53
+        by smtp.gmail.com with ESMTPSA id s24-20020ae9f718000000b0074fafbea974sm2821592qkg.2.2023.05.23.14.45.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 14:45:54 -0700 (PDT)
+        Tue, 23 May 2023 14:45:52 -0700 (PDT)
 From:   "J. corwin Coburn" <corwin@redhat.com>
 To:     dm-devel@redhat.com, linux-block@vger.kernel.org
 Cc:     vdo-devel@redhat.com, "J. corwin Coburn" <corwin@redhat.com>
-Subject: [PATCH v2 08/39] Add basic data structures.
-Date:   Tue, 23 May 2023 17:45:08 -0400
-Message-Id: <20230523214539.226387-9-corwin@redhat.com>
+Subject: [PATCH v2 07/39] Add specialized request queueing functionality.
+Date:   Tue, 23 May 2023 17:45:07 -0400
+Message-Id: <20230523214539.226387-8-corwin@redhat.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230523214539.226387-1-corwin@redhat.com>
 References: <20230523214539.226387-1-corwin@redhat.com>
@@ -71,1861 +71,1749 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds two hash maps, one keyed by integers, the other by
-pointers, and also a priority heap. The integer map is used for locking of
-logical and physical addresses. The pointer map is used for managing
-concurrent writes of the same data, ensuring that those writes are
-deduplicated. The priority heap is used to minimize the search time for
-free blocks.
+This patch adds funnel_queue, a mostly lock-free multi-producer,
+single-consumer queue. It also adds the request queue used by the dm-vdo
+deduplication index, and the work_queue used by the dm-vdo data store. Both
+of these are built on top of funnel queue and are intended to support the
+dispatching of many short-running tasks. The work_queue also supports
+priorities. Finally, this patch adds vdo_completion, the structure which is
+enqueued on work_queues.
 
 Signed-off-by: J. corwin Coburn <corwin@redhat.com>
 ---
- drivers/md/dm-vdo/int-map.c        | 710 +++++++++++++++++++++++++++++
- drivers/md/dm-vdo/int-map.h        |  40 ++
- drivers/md/dm-vdo/pointer-map.c    | 691 ++++++++++++++++++++++++++++
- drivers/md/dm-vdo/pointer-map.h    |  81 ++++
- drivers/md/dm-vdo/priority-table.c | 226 +++++++++
- drivers/md/dm-vdo/priority-table.h |  48 ++
- 6 files changed, 1796 insertions(+)
- create mode 100644 drivers/md/dm-vdo/int-map.c
- create mode 100644 drivers/md/dm-vdo/int-map.h
- create mode 100644 drivers/md/dm-vdo/pointer-map.c
- create mode 100644 drivers/md/dm-vdo/pointer-map.h
- create mode 100644 drivers/md/dm-vdo/priority-table.c
- create mode 100644 drivers/md/dm-vdo/priority-table.h
+ drivers/md/dm-vdo/completion.c    | 141 +++++++
+ drivers/md/dm-vdo/completion.h    | 155 +++++++
+ drivers/md/dm-vdo/cpu.h           |  58 +++
+ drivers/md/dm-vdo/funnel-queue.c  | 169 ++++++++
+ drivers/md/dm-vdo/funnel-queue.h  | 110 +++++
+ drivers/md/dm-vdo/request-queue.c | 284 +++++++++++++
+ drivers/md/dm-vdo/request-queue.h |  30 ++
+ drivers/md/dm-vdo/work-queue.c    | 659 ++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/work-queue.h    |  53 +++
+ 9 files changed, 1659 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/completion.c
+ create mode 100644 drivers/md/dm-vdo/completion.h
+ create mode 100644 drivers/md/dm-vdo/cpu.h
+ create mode 100644 drivers/md/dm-vdo/funnel-queue.c
+ create mode 100644 drivers/md/dm-vdo/funnel-queue.h
+ create mode 100644 drivers/md/dm-vdo/request-queue.c
+ create mode 100644 drivers/md/dm-vdo/request-queue.h
+ create mode 100644 drivers/md/dm-vdo/work-queue.c
+ create mode 100644 drivers/md/dm-vdo/work-queue.h
 
-diff --git a/drivers/md/dm-vdo/int-map.c b/drivers/md/dm-vdo/int-map.c
+diff --git a/drivers/md/dm-vdo/completion.c b/drivers/md/dm-vdo/completion.c
 new file mode 100644
-index 00000000000..9beb9642ae1
+index 00000000000..8feb9c05c19
 --- /dev/null
-+++ b/drivers/md/dm-vdo/int-map.c
-@@ -0,0 +1,710 @@
++++ b/drivers/md/dm-vdo/completion.c
+@@ -0,0 +1,141 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright Red Hat
 + */
 +
-+/**
-+ * DOC:
-+ *
-+ * Hash table implementation of a map from integers to pointers, implemented using the Hopscotch
-+ * Hashing algorithm by Herlihy, Shavit, and Tzafrir (see
-+ * http://en.wikipedia.org/wiki/Hopscotch_hashing). This implementation does not contain any of the
-+ * locking/concurrency features of the algorithm, just the collision resolution scheme.
-+ *
-+ * Hopscotch Hashing is based on hashing with open addressing and linear probing. All the entries
-+ * are stored in a fixed array of buckets, with no dynamic allocation for collisions. Unlike linear
-+ * probing, all the entries that hash to a given bucket are stored within a fixed neighborhood
-+ * starting at that bucket. Chaining is effectively represented as a bit vector relative to each
-+ * bucket instead of as pointers or explicit offsets.
-+ *
-+ * When an empty bucket cannot be found within a given neighborhood, subsequent neighborhoods are
-+ * searched, and one or more entries will "hop" into those neighborhoods. When this process works,
-+ * an empty bucket will move into the desired neighborhood, allowing the entry to be added. When
-+ * that process fails (typically when the buckets are around 90% full), the table must be resized
-+ * and the all entries rehashed and added to the expanded table.
-+ *
-+ * Unlike linear probing, the number of buckets that must be searched in the worst case has a fixed
-+ * upper bound (the size of the neighborhood). Those entries occupy a small number of memory cache
-+ * lines, leading to improved use of the cache (fewer misses on both successful and unsuccessful
-+ * searches). Hopscotch hashing outperforms linear probing at much higher load factors, so even
-+ * with the increased memory burden for maintaining the hop vectors, less memory is needed to
-+ * achieve that performance. Hopscotch is also immune to "contamination" from deleting entries
-+ * since entries are genuinely removed instead of being replaced by a placeholder.
-+ *
-+ * The published description of the algorithm used a bit vector, but the paper alludes to an offset
-+ * scheme which is used by this implementation. Since the entries in the neighborhood are within N
-+ * entries of the hash bucket at the start of the neighborhood, a pair of small offset fields each
-+ * log2(N) bits wide is all that's needed to maintain the hops as a linked list. In order to encode
-+ * "no next hop" (i.e. NULL) as the natural initial value of zero, the offsets are biased by one
-+ * (i.e. 0 => NULL, 1 => offset=0, 2 => offset=1, etc.) We can represent neighborhoods of up to 255
-+ * entries with just 8+8=16 bits per entry. The hop list is sorted by hop offset so the first entry
-+ * in the list is always the bucket closest to the start of the neighborhood.
-+ *
-+ * While individual accesses tend to be very fast, the table resize operations are very, very
-+ * expensive. If an upper bound on the latency of adding an entry to the table is needed, we either
-+ * need to ensure the table is pre-sized to be large enough so no resize is ever needed, or we'll
-+ * need to develop an approach to incrementally resize the table.
-+ */
++#include "completion.h"
 +
-+#include "int-map.h"
++#include <linux/kernel.h>
 +
-+#include <linux/minmax.h>
-+
-+#include "errors.h"
 +#include "logger.h"
-+#include "memory-alloc.h"
-+#include "numeric.h"
-+#include "permassert.h"
-+
-+enum {
-+	DEFAULT_CAPACITY = 16, /* the number of neighborhoods in a new table */
-+	NEIGHBORHOOD = 255,    /* the number of buckets in each neighborhood */
-+	MAX_PROBES = 1024,     /* limit on the number of probes for a free bucket */
-+	NULL_HOP_OFFSET = 0,   /* the hop offset value terminating the hop list */
-+	DEFAULT_LOAD = 75      /* a compromise between memory use and performance */
-+};
-+
-+/**
-+ * struct bucket - hash bucket
-+ *
-+ * Buckets are packed together to reduce memory usage and improve cache efficiency. It would be
-+ * tempting to encode the hop offsets separately and maintain alignment of key/value pairs, but
-+ * it's crucial to keep the hop fields near the buckets that they use them so they'll tend to share
-+ * cache lines.
-+ */
-+struct __packed bucket {
-+	/**
-+	 * @first_hop: The biased offset of the first entry in the hop list of the neighborhood
-+	 *             that hashes to this bucket.
-+	 */
-+	u8 first_hop;
-+	/** @next_hop: The biased offset of the next bucket in the hop list. */
-+	u8 next_hop;
-+	/** @key: The key stored in this bucket. */
-+	u64 key;
-+	/** @value: The value stored in this bucket (NULL if empty). */
-+	void *value;
-+};
-+
-+/**
-+ * struct int_map - The concrete definition of the opaque int_map type.
-+ *
-+ * To avoid having to wrap the neighborhoods of the last entries back around to the start of the
-+ * bucket array, we allocate a few more buckets at the end of the array instead, which is why
-+ * capacity and bucket_count are different.
-+ */
-+struct int_map {
-+	/** @size: The number of entries stored in the map. */
-+	size_t size;
-+	/** @capacity: The number of neighborhoods in the map. */
-+	size_t capacity;
-+	/* @bucket_count: The number of buckets in the bucket array. */
-+	size_t bucket_count;
-+	/** @buckets: The array of hash buckets. */
-+	struct bucket *buckets;
-+};
-+
-+/**
-+ * mix() - The Google CityHash 16-byte hash mixing function.
-+ * @input1: The first input value.
-+ * @input2: The second input value.
-+ *
-+ * Return: A hash of the two inputs.
-+ */
-+static u64 mix(u64 input1, u64 input2)
-+{
-+	static const u64 CITY_MULTIPLIER = 0x9ddfea08eb382d69ULL;
-+	u64 hash = (input1 ^ input2);
-+
-+	hash *= CITY_MULTIPLIER;
-+	hash ^= (hash >> 47);
-+	hash ^= input2;
-+	hash *= CITY_MULTIPLIER;
-+	hash ^= (hash >> 47);
-+	hash *= CITY_MULTIPLIER;
-+	return hash;
-+}
-+
-+/**
-+ * hash_key() - Calculate a 64-bit non-cryptographic hash value for the provided 64-bit integer
-+ *              key.
-+ * @key: The mapping key.
-+ *
-+ * The implementation is based on Google's CityHash, only handling the specific case of an 8-byte
-+ * input.
-+ *
-+ * Return: The hash of the mapping key.
-+ */
-+static u64 hash_key(u64 key)
-+{
-+	/*
-+	 * Aliasing restrictions forbid us from casting pointer types, so use a union to convert a
-+	 * single u64 to two u32 values.
-+	 */
-+	union {
-+		u64 u64;
-+		u32 u32[2];
-+	} pun = {.u64 = key};
-+
-+	return mix(sizeof(key) + (((u64) pun.u32[0]) << 3), pun.u32[1]);
-+}
-+
-+/**
-+ * allocate_buckets() - Initialize an int_map.
-+ * @map: The map to initialize.
-+ * @capacity: The initial capacity of the map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+static int allocate_buckets(struct int_map *map, size_t capacity)
-+{
-+	map->size = 0;
-+	map->capacity = capacity;
-+
-+	/*
-+	 * Allocate NEIGHBORHOOD - 1 extra buckets so the last bucket can have a full neighborhood
-+	 * without have to wrap back around to element zero.
-+	 */
-+	map->bucket_count = capacity + (NEIGHBORHOOD - 1);
-+	return UDS_ALLOCATE(map->bucket_count, struct bucket,
-+			    "struct int_map buckets", &map->buckets);
-+}
-+
-+/**
-+ * vdo_make_int_map() - Allocate and initialize an int_map.
-+ * @initial_capacity: The number of entries the map should initially be capable of holding (zero
-+ *                    tells the map to use its own small default).
-+ * @initial_load: The load factor of the map, expressed as an integer percentage (typically in the
-+ *                range 50 to 90, with zero telling the map to use its own default).
-+ * @map_ptr: Output, a pointer to hold the new int_map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_make_int_map(size_t initial_capacity, unsigned int initial_load, struct int_map **map_ptr)
-+{
-+	struct int_map *map;
-+	int result;
-+	size_t capacity;
-+
-+	/* Use the default initial load if the caller did not specify one. */
-+	if (initial_load == 0)
-+		initial_load = DEFAULT_LOAD;
-+	if (initial_load > 100)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	result = UDS_ALLOCATE(1, struct int_map, "struct int_map", &map);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	/* Use the default capacity if the caller did not specify one. */
-+	capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
-+
-+	/*
-+	 * Scale up the capacity by the specified initial load factor. (i.e to hold 1000 entries at
-+	 * 80% load we need a capacity of 1250)
-+	 */
-+	capacity = capacity * 100 / initial_load;
-+
-+	result = allocate_buckets(map, capacity);
-+	if (result != UDS_SUCCESS) {
-+		vdo_free_int_map(UDS_FORGET(map));
-+		return result;
-+	}
-+
-+	*map_ptr = map;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_free_int_map() - Free an int_map.
-+ * @map: The int_map to free.
-+ *
-+ * NOTE: The map does not own the pointer values stored in the map and they are not freed by this
-+ * call.
-+ */
-+void vdo_free_int_map(struct int_map *map)
-+{
-+	if (map == NULL)
-+		return;
-+
-+	UDS_FREE(UDS_FORGET(map->buckets));
-+	UDS_FREE(UDS_FORGET(map));
-+}
-+
-+/**
-+ * vdo_int_map_size() - Get the number of entries stored in an int_map.
-+ * @map: The int_map to query.
-+ *
-+ * Return: The number of entries in the map.
-+ */
-+size_t vdo_int_map_size(const struct int_map *map)
-+{
-+	return map->size;
-+}
-+
-+/**
-+ * dereference_hop() - Convert a biased hop offset within a neighborhood to a pointer to the bucket
-+ *                     it references.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @hop_offset: The biased hop offset to the desired bucket.
-+ *
-+ * Return: NULL if hop_offset is zero, otherwise a pointer to the bucket in the neighborhood at
-+ *         hop_offset - 1.
-+ */
-+static struct bucket *dereference_hop(struct bucket *neighborhood, unsigned int hop_offset)
-+{
-+	if (hop_offset == NULL_HOP_OFFSET)
-+		return NULL;
-+
-+	STATIC_ASSERT(NULL_HOP_OFFSET == 0);
-+	return &neighborhood[hop_offset - 1];
-+}
-+
-+/**
-+ * insert_in_hop_list() - Add a bucket into the hop list for the neighborhood.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @new_bucket: The bucket to add to the hop list.
-+ *
-+ * The bucket is inserted it into the list so the hop list remains sorted by hop offset.
-+ */
-+static void insert_in_hop_list(struct bucket *neighborhood, struct bucket *new_bucket)
-+{
-+	/* Zero indicates a NULL hop offset, so bias the hop offset by one. */
-+	int hop_offset = 1 + (new_bucket - neighborhood);
-+
-+	/* Handle the special case of adding a bucket at the start of the list. */
-+	int next_hop = neighborhood->first_hop;
-+
-+	if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+		new_bucket->next_hop = next_hop;
-+		neighborhood->first_hop = hop_offset;
-+		return;
-+	}
-+
-+	/* Search the hop list for the insertion point that maintains the sort order. */
-+	for (;;) {
-+		struct bucket *bucket = dereference_hop(neighborhood, next_hop);
-+
-+		next_hop = bucket->next_hop;
-+
-+		if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+			new_bucket->next_hop = next_hop;
-+			bucket->next_hop = hop_offset;
-+			return;
-+		}
-+	}
-+}
-+
-+/**
-+ * select_bucket() - Select and return the hash bucket for a given search key.
-+ * @map: The map to search.
-+ * @key: The mapping key.
-+ */
-+static struct bucket *select_bucket(const struct int_map *map, u64 key)
-+{
-+	/*
-+	 * Calculate a good hash value for the provided key. We want exactly 32 bits, so mask the
-+	 * result.
-+	 */
-+	u64 hash = hash_key(key) & 0xFFFFFFFF;
-+
-+	/*
-+	 * Scale the 32-bit hash to a bucket index by treating it as a binary fraction and
-+	 * multiplying that by the capacity. If the hash is uniformly distributed over [0 ..
-+	 * 2^32-1], then (hash * capacity / 2^32) should be uniformly distributed over [0 ..
-+	 * capacity-1]. The multiply and shift is much faster than a divide (modulus) on X86 CPUs.
-+	 */
-+	return &map->buckets[(hash * map->capacity) >> 32];
-+}
-+
-+/**
-+ * search_hop_list() - Search the hop list associated with given hash bucket for a given search
-+ *                     key.
-+ * @map: The map being searched.
-+ * @bucket: The map bucket to search for the key.
-+ * @key: The mapping key.
-+ * @previous_ptr: Output. if not NULL, a pointer in which to store the bucket in the list preceding
-+ *                the one that had the matching key
-+ *
-+ * If the key is found, returns a pointer to the entry (bucket or collision), otherwise returns
-+ * NULL.
-+ *
-+ * Return: An entry that matches the key, or NULL if not found.
-+ */
-+static struct bucket *search_hop_list(struct int_map *map __always_unused,
-+				      struct bucket *bucket,
-+				      u64 key,
-+				      struct bucket **previous_ptr)
-+{
-+	struct bucket *previous = NULL;
-+	unsigned int next_hop = bucket->first_hop;
-+
-+	while (next_hop != NULL_HOP_OFFSET) {
-+		/*
-+		 * Check the neighboring bucket indexed by the offset for the
-+		 * desired key.
-+		 */
-+		struct bucket *entry = dereference_hop(bucket, next_hop);
-+
-+		if ((key == entry->key) && (entry->value != NULL)) {
-+			if (previous_ptr != NULL)
-+				*previous_ptr = previous;
-+			return entry;
-+		}
-+		next_hop = entry->next_hop;
-+		previous = entry;
-+	}
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_int_map_get() - Retrieve the value associated with a given key from the int_map.
-+ * @map: The int_map to query.
-+ * @key: The key to look up.
-+ *
-+ * Return: The value associated with the given key, or NULL if the key is not mapped to any value.
-+ */
-+void *vdo_int_map_get(struct int_map *map, u64 key)
-+{
-+	struct bucket *match = search_hop_list(map, select_bucket(map, key), key, NULL);
-+
-+	return ((match != NULL) ? match->value : NULL);
-+}
-+
-+/**
-+ * resize_buckets() - Increase the number of hash buckets.
-+ * @map: The map to resize.
-+ *
-+ * Resizes and rehashes all the existing entries, storing them in the new buckets.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+static int resize_buckets(struct int_map *map)
-+{
-+	int result;
-+	size_t i;
-+
-+	/* Copy the top-level map data to the stack. */
-+	struct int_map old_map = *map;
-+
-+	/* Re-initialize the map to be empty and 50% larger. */
-+	size_t new_capacity = map->capacity / 2 * 3;
-+
-+	uds_log_info("%s: attempting resize from %zu to %zu, current size=%zu",
-+		     __func__, map->capacity, new_capacity, map->size);
-+	result = allocate_buckets(map, new_capacity);
-+	if (result != UDS_SUCCESS) {
-+		*map = old_map;
-+		return result;
-+	}
-+
-+	/* Populate the new hash table from the entries in the old bucket array. */
-+	for (i = 0; i < old_map.bucket_count; i++) {
-+		struct bucket *entry = &old_map.buckets[i];
-+
-+		if (entry->value == NULL)
-+			continue;
-+
-+		result = vdo_int_map_put(map, entry->key, entry->value, true, NULL);
-+		if (result != UDS_SUCCESS) {
-+			/* Destroy the new partial map and restore the map from the stack. */
-+			UDS_FREE(UDS_FORGET(map->buckets));
-+			*map = old_map;
-+			return result;
-+		}
-+	}
-+
-+	/* Destroy the old bucket array. */
-+	UDS_FREE(UDS_FORGET(old_map.buckets));
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * find_empty_bucket() - Probe the bucket array starting at the given bucket for the next empty
-+ *                       bucket, returning a pointer to it.
-+ * @map: The map containing the buckets to search.
-+ * @bucket: The bucket at which to start probing.
-+ * @max_probes: The maximum number of buckets to search.
-+ *
-+ * NULL will be returned if the search reaches the end of the bucket array or if the number of
-+ * linear probes exceeds a specified limit.
-+ *
-+ * Return: The next empty bucket, or NULL if the search failed.
-+ */
-+static struct bucket *
-+find_empty_bucket(struct int_map *map, struct bucket *bucket, unsigned int max_probes)
-+{
-+	/*
-+	 * Limit the search to either the nearer of the end of the bucket array or a fixed distance
-+	 * beyond the initial bucket.
-+	 */
-+	ptrdiff_t remaining = &map->buckets[map->bucket_count] - bucket;
-+	struct bucket *sentinel = &bucket[min_t(ptrdiff_t, remaining, max_probes)];
-+	struct bucket *entry;
-+
-+	for (entry = bucket; entry < sentinel; entry++)
-+		if (entry->value == NULL)
-+			return entry;
-+	return NULL;
-+}
-+
-+/**
-+ * move_empty_bucket() - Move an empty bucket closer to the start of the bucket array.
-+ * @map: The map containing the bucket.
-+ * @hole: The empty bucket to fill with an entry that precedes it in one of its enclosing
-+ *        neighborhoods.
-+ *
-+ * This searches the neighborhoods that contain the empty bucket for a non-empty bucket closer to
-+ * the start of the array. If such a bucket is found, this swaps the two buckets by moving the
-+ * entry to the empty bucket.
-+ *
-+ * Return: The bucket that was vacated by moving its entry to the provided hole, or NULL if no
-+ *         entry could be moved.
-+ */
-+static struct bucket *move_empty_bucket(struct int_map *map __always_unused, struct bucket *hole)
-+{
-+	/*
-+	 * Examine every neighborhood that the empty bucket is part of, starting with the one in
-+	 * which it is the last bucket. No boundary check is needed for the negative array
-+	 * arithmetic since this function is only called when hole is at least NEIGHBORHOOD cells
-+	 * deeper into the array than a valid bucket.
-+	 */
-+	struct bucket *bucket;
-+
-+	for (bucket = &hole[1 - NEIGHBORHOOD]; bucket < hole; bucket++) {
-+		/*
-+		 * Find the entry that is nearest to the bucket, which means it will be nearest to
-+		 * the hash bucket whose neighborhood is full.
-+		 */
-+		struct bucket *new_hole = dereference_hop(bucket, bucket->first_hop);
-+
-+		if (new_hole == NULL)
-+			/*
-+			 * There are no buckets in this neighborhood that are in use by this one
-+			 * (they must all be owned by overlapping neighborhoods).
-+			 */
-+			continue;
-+
-+		/*
-+		 * Skip this bucket if its first entry is actually further away than the hole that
-+		 * we're already trying to fill.
-+		 */
-+		if (hole < new_hole)
-+			continue;
-+
-+		/*
-+		 * We've found an entry in this neighborhood that we can "hop" further away, moving
-+		 * the hole closer to the hash bucket, if not all the way into its neighborhood.
-+		 */
-+
-+		/*
-+		 * The entry that will be the new hole is the first bucket in the list, so setting
-+		 * first_hop is all that's needed remove it from the list.
-+		 */
-+		bucket->first_hop = new_hole->next_hop;
-+		new_hole->next_hop = NULL_HOP_OFFSET;
-+
-+		/* Move the entry into the original hole. */
-+		hole->key = new_hole->key;
-+		hole->value = new_hole->value;
-+		new_hole->value = NULL;
-+
-+		/* Insert the filled hole into the hop list for the neighborhood. */
-+		insert_in_hop_list(bucket, hole);
-+		return new_hole;
-+	}
-+
-+	/* We couldn't find an entry to relocate to the hole. */
-+	return NULL;
-+}
-+
-+/**
-+ * update_mapping() - Find and update any existing mapping for a given key, returning the value
-+ *                    associated with the key in the provided pointer.
-+ * @map: The int_map to attempt to modify.
-+ * @neighborhood: The first bucket in the neighborhood that would contain the search key
-+ * @key: The key with which to associate the new value.
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: a pointer in which to store the old value (unmodified if no mapping was found)
-+ *
-+ * Return: true if the map contains a mapping for the key, false if it does not.
-+ */
-+static bool update_mapping(struct int_map *map,
-+			   struct bucket *neighborhood,
-+			   u64 key,
-+			   void *new_value,
-+			   bool update,
-+			   void **old_value_ptr)
-+{
-+	struct bucket *bucket = search_hop_list(map, neighborhood, key, NULL);
-+
-+	if (bucket == NULL)
-+		/* There is no bucket containing the key in the neighborhood. */
-+		return false;
-+
-+	/*
-+	 * Return the value of the current mapping (if desired) and update the mapping with the new
-+	 * value (if desired).
-+	 */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = bucket->value;
-+	if (update)
-+		bucket->value = new_value;
-+	return true;
-+}
-+
-+/**
-+ * find_or_make_vacancy() - Find an empty bucket.
-+ * @map: The int_map to search or modify.
-+ * @neighborhood: The first bucket in the neighborhood in which an empty bucket is needed for a new
-+ *                mapping.
-+ *
-+ * Find an empty bucket in a specified neighborhood for a new mapping or attempt to re-arrange
-+ * mappings so there is such a bucket. This operation may fail (returning NULL) if an empty bucket
-+ * is not available or could not be relocated to the neighborhood.
-+ *
-+ * Return: a pointer to an empty bucket in the desired neighborhood, or NULL if a vacancy could not
-+ *         be found or arranged.
-+ */
-+static struct bucket *find_or_make_vacancy(struct int_map *map, struct bucket *neighborhood)
-+{
-+	/* Probe within and beyond the neighborhood for the first empty bucket. */
-+	struct bucket *hole = find_empty_bucket(map, neighborhood, MAX_PROBES);
-+
-+	/*
-+	 * Keep trying until the empty bucket is in the bucket's neighborhood or we are unable to
-+	 * move it any closer by swapping it with a filled bucket.
-+	 */
-+	while (hole != NULL) {
-+		int distance = hole - neighborhood;
-+
-+		if (distance < NEIGHBORHOOD)
-+			/*
-+			 * We've found or relocated an empty bucket close enough to the initial
-+			 * hash bucket to be referenced by its hop vector.
-+			 */
-+			return hole;
-+
-+		/*
-+		 * The nearest empty bucket isn't within the neighborhood that must contain the new
-+		 * entry, so try to swap it with bucket that is closer.
-+		 */
-+		hole = move_empty_bucket(map, hole);
-+	}
-+
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_int_map_put() - Try to associate a value with an integer.
-+ * @map: The int_map to attempt to modify.
-+ * @key: The key with which to associate the new value.
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: A pointer in which to store either the old value (if the key was already mapped)
-+ *                 or NULL if the map did not contain the key; NULL may be provided if the caller
-+ *                 does not need to know the old value
-+ *
-+ * Try to associate a value (a pointer) with an integer in an int_map. If the map already contains
-+ * a mapping for the provided key, the old value is only replaced with the specified value if
-+ * update is true. In either case the old value is returned. If the map does not already contain a
-+ * value for the specified key, the new value is added regardless of the value of update.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_int_map_put(struct int_map *map, u64 key, void *new_value, bool update, void **old_value_ptr)
-+{
-+	struct bucket *neighborhood, *bucket;
-+
-+	if (new_value == NULL)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	/*
-+	 * Select the bucket at the start of the neighborhood that must contain any entry for the
-+	 * provided key.
-+	 */
-+	neighborhood = select_bucket(map, key);
-+
-+	/*
-+	 * Check whether the neighborhood already contains an entry for the key, in which case we
-+	 * optionally update it, returning the old value.
-+	 */
-+	if (update_mapping(map, neighborhood, key, new_value, update, old_value_ptr))
-+		return UDS_SUCCESS;
-+
-+	/*
-+	 * Find an empty bucket in the desired neighborhood for the new entry or re-arrange entries
-+	 * in the map so there is such a bucket. This operation will usually succeed; the loop body
-+	 * will only be executed on the rare occasions that we have to resize the map.
-+	 */
-+	while ((bucket = find_or_make_vacancy(map, neighborhood)) == NULL) {
-+		int result;
-+
-+		/*
-+		 * There is no empty bucket in which to put the new entry in the current map, so
-+		 * we're forced to allocate a new bucket array with a larger capacity, re-hash all
-+		 * the entries into those buckets, and try again (a very expensive operation for
-+		 * large maps).
-+		 */
-+		result = resize_buckets(map);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		/*
-+		 * Resizing the map invalidates all pointers to buckets, so recalculate the
-+		 * neighborhood pointer.
-+		 */
-+		neighborhood = select_bucket(map, key);
-+	}
-+
-+	/* Put the new entry in the empty bucket, adding it to the neighborhood. */
-+	bucket->key = key;
-+	bucket->value = new_value;
-+	insert_in_hop_list(neighborhood, bucket);
-+	map->size += 1;
-+
-+	/* There was no existing entry, so there was no old value to be returned. */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = NULL;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_int_map_remove() - Remove the mapping for a given key from the int_map.
-+ * @map: The int_map from which to remove the mapping.
-+ * @key: The key whose mapping is to be removed.
-+ *
-+ * Return: the value that was associated with the key, or NULL if it was not mapped.
-+ */
-+void *vdo_int_map_remove(struct int_map *map, u64 key)
-+{
-+	void *value;
-+
-+	/* Select the bucket to search and search it for an existing entry. */
-+	struct bucket *bucket = select_bucket(map, key);
-+	struct bucket *previous;
-+	struct bucket *victim = search_hop_list(map, bucket, key, &previous);
-+
-+	if (victim == NULL)
-+		/* There is no matching entry to remove. */
-+		return NULL;
-+
-+	/*
-+	 * We found an entry to remove. Save the mapped value to return later and empty the bucket.
-+	 */
-+	map->size -= 1;
-+	value = victim->value;
-+	victim->value = NULL;
-+	victim->key = 0;
-+
-+	/* The victim bucket is now empty, but it still needs to be spliced out of the hop list. */
-+	if (previous == NULL)
-+		/* The victim is the head of the list, so swing first_hop. */
-+		bucket->first_hop = victim->next_hop;
-+	else
-+		previous->next_hop = victim->next_hop;
-+	victim->next_hop = NULL_HOP_OFFSET;
-+
-+	return value;
-+}
-diff --git a/drivers/md/dm-vdo/int-map.h b/drivers/md/dm-vdo/int-map.h
-new file mode 100644
-index 00000000000..cced57c4016
---- /dev/null
-+++ b/drivers/md/dm-vdo/int-map.h
-@@ -0,0 +1,40 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#ifndef VDO_INT_MAP_H
-+#define VDO_INT_MAP_H
-+
-+#include <linux/compiler.h>
-+#include <linux/types.h>
-+
-+/**
-+ * DOC: int_map
-+ *
-+ * An int_map associates pointers (void *) with integer keys (u64). NULL pointer values are
-+ * not supported.
-+ *
-+ * The map is implemented as hash table, which should provide constant-time insert, query, and
-+ * remove operations, although the insert may occasionally grow the table, which is linear in the
-+ * number of entries in the map. The table will grow as needed to hold new entries, but will not
-+ * shrink as entries are removed.
-+ */
-+
-+struct int_map;
-+
-+int __must_check
-+vdo_make_int_map(size_t initial_capacity, unsigned int initial_load, struct int_map **map_ptr);
-+
-+void vdo_free_int_map(struct int_map *map);
-+
-+size_t vdo_int_map_size(const struct int_map *map);
-+
-+void *vdo_int_map_get(struct int_map *map, u64 key);
-+
-+int __must_check
-+vdo_int_map_put(struct int_map *map, u64 key, void *new_value, bool update, void **old_value_ptr);
-+
-+void *vdo_int_map_remove(struct int_map *map, u64 key);
-+
-+#endif /* VDO_INT_MAP_H */
-diff --git a/drivers/md/dm-vdo/pointer-map.c b/drivers/md/dm-vdo/pointer-map.c
-new file mode 100644
-index 00000000000..8511fef70ee
---- /dev/null
-+++ b/drivers/md/dm-vdo/pointer-map.c
-@@ -0,0 +1,691 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+/**
-+ * DOC:
-+ *
-+ * Hash table implementation of a map from integers to pointers, implemented using the Hopscotch
-+ * Hashing algorithm by Herlihy, Shavit, and Tzafrir (see
-+ * http://en.wikipedia.org/wiki/Hopscotch_hashing). This implementation does not contain any of the
-+ * locking/concurrency features of the algorithm, just the collision resolution scheme.
-+ *
-+ * Hopscotch Hashing is based on hashing with open addressing and linear probing. All the entries
-+ * are stored in a fixed array of buckets, with no dynamic allocation for collisions. Unlike linear
-+ * probing, all the entries that hash to a given bucket are stored within a fixed neighborhood
-+ * starting at that bucket. Chaining is effectively represented as a bit vector relative to each
-+ * bucket instead of as pointers or explicit offsets.
-+ *
-+ * When an empty bucket cannot be found within a given neighborhood, subsequent neighborhoods are
-+ * searched, and one or more entries will "hop" into those neighborhoods. When this process works,
-+ * an empty bucket will move into the desired neighborhood, allowing the entry to be added. When
-+ * that process fails (typically when the buckets are around 90% full), the table must be resized
-+ * and the all entries rehashed and added to the expanded table.
-+ *
-+ * Unlike linear probing, the number of buckets that must be searched in the worst case has a fixed
-+ * upper bound (the size of the neighborhood). Those entries occupy a small number of memory cache
-+ * lines, leading to improved use of the cache (fewer misses on both successful and unsuccessful
-+ * searches). Hopscotch hashing outperforms linear probing at much higher load factors, so even
-+ * with the increased memory burden for maintaining the hop vectors, less memory is needed to
-+ * achieve that performance. Hopscotch is also immune to "contamination" from deleting entries
-+ * since entries are genuinely removed instead of being replaced by a placeholder.
-+ *
-+ * The published description of the algorithm used a bit vector, but the paper alludes to an offset
-+ * scheme which is used by this implementation. Since the entries in the neighborhood are within N
-+ * entries of the hash bucket at the start of the neighborhood, a pair of small offset fields each
-+ * log2(N) bits wide is all that's needed to maintain the hops as a linked list. In order to encode
-+ * "no next hop" (i.e. NULL) as the natural initial value of zero, the offsets are biased by one
-+ * (i.e. 0 => NULL, 1 => offset=0, 2 => offset=1, etc.) We can represent neighborhoods of up to 255
-+ * entries with just 8+8=16 bits per entry. The hop list is sorted by hop offset so the first entry
-+ * in the list is always the bucket closest to the start of the neighborhood.
-+ *
-+ * While individual accesses tend to be very fast, the table resize operations are very, very
-+ * expensive. If an upper bound on the latency of adding an entry to the table is needed, we either
-+ * need to ensure the table is pre-sized to be large enough so no resize is ever needed, or we'll
-+ * need to develop an approach to incrementally resize the table.
-+ */
-+
-+#include "pointer-map.h"
-+
-+#include <linux/minmax.h>
-+
-+#include "errors.h"
-+#include "logger.h"
-+#include "memory-alloc.h"
-+#include "numeric.h"
-+#include "permassert.h"
-+
-+enum {
-+	DEFAULT_CAPACITY = 16, /* the number of neighborhoods in a new table */
-+	NEIGHBORHOOD = 255, /* the number of buckets in each neighborhood */
-+	MAX_PROBES = 1024, /* limit on the number of probes for a free bucket */
-+	NULL_HOP_OFFSET = 0, /* the hop offset value terminating the hop list */
-+	DEFAULT_LOAD = 75 /* a compromise between memory use and performance */
-+};
-+
-+/**
-+ * struct bucket - Hash buckets.
-+ *
-+ * Buckets are packed together to reduce memory usage and improve cache efficiency. It would be
-+ * tempting to encode the hop offsets separately and maintain alignment of key/value pairs, but
-+ * it's crucial to keep the hop fields near the buckets that they use them so they'll tend to share
-+ * cache lines.
-+ */
-+struct __packed bucket {
-+	/**
-+	 * @first_hop: The biased offset of the first entry in the hop list of the neighborhood
-+	 * that hashes to this bucket.
-+	 */
-+	u8 first_hop;
-+	/** @next_hop: the biased offset of the next bucket in the hop list. */
-+	u8 next_hop;
-+	/** @key: The key stored in this bucket. */
-+	const void *key;
-+	/** @value: The value stored in this bucket (NULL if empty). */
-+	void *value;
-+};
-+
-+/**
-+ * struct pointer_map - The concrete definition of the opaque pointer_map type.
-+ *
-+ * To avoid having to wrap the neighborhoods of the last entries back around to the start of the
-+ * bucket array, we allocate a few more buckets at the end of the array instead, which is why
-+ * capacity and bucket_count are different.
-+ */
-+struct pointer_map {
-+	/** @size: The number of entries stored in the map. */
-+	size_t size;
-+	/** @capacity: The number of neighborhoods in the map. */
-+	size_t capacity;
-+	/** @bucket_count: The number of buckets in the bucket array. */
-+	size_t bucket_count;
-+	/** @buckets: The array of hash buckets. */
-+	struct bucket *buckets;
-+	/** @comparator: The function for comparing keys for equality. */
-+	pointer_key_comparator *comparator;
-+	/** @hasher: The function for getting a hash code from a key. */
-+	pointer_key_hasher *hasher;
-+};
-+
-+/**
-+ * allocate_buckets() - Initialize a pointer_map.
-+ * @map: The map to initialize.
-+ * @capacity: The initial capacity of the map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+static int allocate_buckets(struct pointer_map *map, size_t capacity)
-+{
-+	map->size = 0;
-+	map->capacity = capacity;
-+
-+	/*
-+	 * Allocate NEIGHBORHOOD - 1 extra buckets so the last bucket can have a full neighborhood
-+	 * without have to wrap back around to element zero.
-+	 */
-+	map->bucket_count = capacity + (NEIGHBORHOOD - 1);
-+	return UDS_ALLOCATE(map->bucket_count,
-+			    struct bucket,
-+			    "pointer_map buckets",
-+			    &map->buckets);
-+}
-+
-+/**
-+ * vdo_make_pointer_map() - Allocate and initialize a pointer_map.
-+ * @initial_capacity: The number of entries the map should initially be capable of holding (zero
-+ *                    tells the map to use its own small default).
-+ * @initial_load: The load factor of the map, expressed as an integer percentage (typically in the
-+ * range 50 to 90, with zero telling the map to use its own default).
-+ * @comparator: The function to use to compare the referents of two pointer keys for equality.
-+ * @hasher: The function to use obtain the hash code associated with each pointer key
-+ * @map_ptr: A pointer to hold the new pointer_map.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_make_pointer_map(size_t initial_capacity,
-+			 unsigned int initial_load,
-+			 pointer_key_comparator comparator,
-+			 pointer_key_hasher hasher,
-+			 struct pointer_map **map_ptr)
-+{
-+	int result;
-+	struct pointer_map *map;
-+	size_t capacity;
-+
-+	/* Use the default initial load if the caller did not specify one. */
-+	if (initial_load == 0)
-+		initial_load = DEFAULT_LOAD;
-+	if (initial_load > 100)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	result = UDS_ALLOCATE(1, struct pointer_map, "pointer_map", &map);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	map->hasher = hasher;
-+	map->comparator = comparator;
-+
-+	/* Use the default capacity if the caller did not specify one. */
-+	capacity = (initial_capacity > 0) ? initial_capacity : DEFAULT_CAPACITY;
-+
-+	/*
-+	 * Scale up the capacity by the specified initial load factor. (i.e to hold 1000 entries at
-+	 * 80% load we need a capacity of 1250)
-+	 */
-+	capacity = capacity * 100 / initial_load;
-+
-+	result = allocate_buckets(map, capacity);
-+	if (result != UDS_SUCCESS) {
-+		vdo_free_pointer_map(UDS_FORGET(map));
-+		return result;
-+	}
-+
-+	*map_ptr = map;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_free_pointer_map() - Free a pointer_map.
-+ * @map: The pointer_map to free.
-+ *
-+ * The map does not own the pointer keys and values stored in the map and they are not freed by
-+ * this call.
-+ */
-+void vdo_free_pointer_map(struct pointer_map *map)
-+{
-+	if (map == NULL)
-+		return;
-+
-+	UDS_FREE(UDS_FORGET(map->buckets));
-+	UDS_FREE(UDS_FORGET(map));
-+}
-+
-+/**
-+ * vdo_pointer_map_size() - Get the number of entries stored in a pointer_map.
-+ * @map: The pointer_map to query.
-+ *
-+ * Return: The number of entries in the map.
-+ */
-+size_t vdo_pointer_map_size(const struct pointer_map *map)
-+{
-+	return map->size;
-+}
-+
-+/**
-+ * dereference_hop() - Convert a biased hop offset within a neighborhood to a pointer to the bucket
-+ *                     it references.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @hop_offset: The biased hop offset to the desired bucket.
-+ *
-+ * Return: NULL if hop_offset is zero, otherwise a pointer to the bucket in the neighborhood at
-+ *         hop_offset - 1.
-+ */
-+static struct bucket *dereference_hop(struct bucket *neighborhood, unsigned int hop_offset)
-+{
-+	if (hop_offset == NULL_HOP_OFFSET)
-+		return NULL;
-+
-+	STATIC_ASSERT(NULL_HOP_OFFSET == 0);
-+	return &neighborhood[hop_offset - 1];
-+}
-+
-+/**
-+ * insert_in_hop_list() - Add a bucket into the hop list for the neighborhood, inserting it into
-+ *                        the list so the hop list remains sorted by hop offset.
-+ * @neighborhood: The first bucket in the neighborhood.
-+ * @new_bucket: The bucket to add to the hop list.
-+ */
-+static void insert_in_hop_list(struct bucket *neighborhood, struct bucket *new_bucket)
-+{
-+	/* Zero indicates a NULL hop offset, so bias the hop offset by one. */
-+	int hop_offset = 1 + (new_bucket - neighborhood);
-+
-+	/* Handle the special case of adding a bucket at the start of the list. */
-+	int next_hop = neighborhood->first_hop;
-+
-+	if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+		new_bucket->next_hop = next_hop;
-+		neighborhood->first_hop = hop_offset;
-+		return;
-+	}
-+
-+	/* Search the hop list for the insertion point that maintains the sort order. */
-+	for (;;) {
-+		struct bucket *bucket = dereference_hop(neighborhood, next_hop);
-+
-+		next_hop = bucket->next_hop;
-+
-+		if ((next_hop == NULL_HOP_OFFSET) || (next_hop > hop_offset)) {
-+			new_bucket->next_hop = next_hop;
-+			bucket->next_hop = hop_offset;
-+			return;
-+		}
-+	}
-+}
-+
-+/**
-+ * select_bucket() - Select and return the hash bucket for a given search key.
-+ * @map: The map to search.
-+ * @key: The mapping key.
-+ */
-+static struct bucket *select_bucket(const struct pointer_map *map, const void *key)
-+{
-+	/*
-+	 * Scale the 32-bit hash to a bucket index by treating it as a binary fraction and
-+	 * multiplying that by the capacity. If the hash is uniformly distributed over [0 ..
-+	 * 2^32-1], then (hash * capacity / 2^32) should be uniformly distributed over [0 ..
-+	 * capacity-1]. The multiply and shift is much faster than a divide (modulus) on X86 CPUs.
-+	 */
-+	u64 hash = map->hasher(key);
-+
-+	return &map->buckets[(hash * map->capacity) >> 32];
-+}
-+
-+/**
-+ * search_hop_list() - Search the hop list.
-+ * @map: The map being searched.
-+ * @bucket: The map bucket to search for the key.
-+ * @key: The mapping key.
-+ * @previous_ptr: if not NULL, a pointer in which to store the bucket in the list preceding the one
-+ *                that had the matching key.
-+ *
-+ * Searches the hop list associated with given hash bucket for a given search key. If the key is
-+ * found, returns a pointer to the entry (bucket or collision), otherwise returns NULL.
-+ *
-+ * Return: an entry that matches the key, or NULL if not found.
-+ */
-+static struct bucket *search_hop_list(struct pointer_map *map,
-+				      struct bucket *bucket,
-+				      const void *key,
-+				      struct bucket **previous_ptr)
-+{
-+	struct bucket *previous = NULL;
-+	unsigned int next_hop = bucket->first_hop;
-+
-+	while (next_hop != NULL_HOP_OFFSET) {
-+		/* Check the neighboring bucket indexed by the offset for the desired key. */
-+		struct bucket *entry = dereference_hop(bucket, next_hop);
-+
-+		if ((entry->value != NULL) && map->comparator(key, entry->key)) {
-+			if (previous_ptr != NULL)
-+				*previous_ptr = previous;
-+			return entry;
-+		}
-+		next_hop = entry->next_hop;
-+		previous = entry;
-+	}
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_pointer_map_get() - Retrieve the value associated with a given key from the pointer_map.
-+ * @map: The pointer_map to query.
-+ * @key: The key to look up (may be NULL if the comparator and hasher functions support it).
-+ *
-+ * Return: the value associated with the given key, or NULL if the key is not mapped to any value.
-+ */
-+void *vdo_pointer_map_get(struct pointer_map *map, const void *key)
-+{
-+	struct bucket *match = search_hop_list(map, select_bucket(map, key), key, NULL);
-+
-+	return ((match != NULL) ? match->value : NULL);
-+}
-+
-+/**
-+ * resize_buckets() - Increase the number of hash buckets and rehash all the existing entries,
-+ *                    storing them in the new buckets.
-+ * @map: The map to resize.
-+ */
-+static int resize_buckets(struct pointer_map *map)
-+{
-+	int result;
-+	size_t i;
-+
-+	/* Copy the top-level map data to the stack. */
-+	struct pointer_map old_map = *map;
-+
-+	/* Re-initialize the map to be empty and 50% larger. */
-+	size_t new_capacity = map->capacity / 2 * 3;
-+
-+	uds_log_info("%s: attempting resize from %zu to %zu, current size=%zu",
-+		     __func__,
-+		     map->capacity,
-+		     new_capacity,
-+		     map->size);
-+	result = allocate_buckets(map, new_capacity);
-+	if (result != UDS_SUCCESS) {
-+		*map = old_map;
-+		return result;
-+	}
-+
-+	/* Populate the new hash table from the entries in the old bucket array. */
-+	for (i = 0; i < old_map.bucket_count; i++) {
-+		struct bucket *entry = &old_map.buckets[i];
-+
-+		if (entry->value == NULL)
-+			continue;
-+
-+		result = vdo_pointer_map_put(map, entry->key, entry->value, true, NULL);
-+		if (result != UDS_SUCCESS) {
-+			/* Destroy the new partial map and restore the map from the stack. */
-+			UDS_FREE(UDS_FORGET(map->buckets));
-+			*map = old_map;
-+			return result;
-+		}
-+	}
-+
-+	/* Destroy the old bucket array. */
-+	UDS_FREE(UDS_FORGET(old_map.buckets));
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * find_empty_bucket() - Probe the bucket array starting at the given bucket for the next empty
-+ *                       bucket, returning a pointer to it.
-+ * @map: The map containing the buckets to search.
-+ * @bucket: The bucket at which to start probing.
-+ * @max_probes: The maximum number of buckets to search.
-+ *
-+ * NULL will be returned if the search reaches the end of the bucket array or if the number of
-+ * linear probes exceeds a specified limit.
-+ *
-+ * Return: The next empty bucket, or NULL if the search failed.
-+ */
-+static struct bucket *
-+find_empty_bucket(struct pointer_map *map, struct bucket *bucket, unsigned int max_probes)
-+{
-+	/*
-+	 * Limit the search to either the nearer of the end of the bucket array or a fixed distance
-+	 * beyond the initial bucket.
-+	 */
-+	ptrdiff_t remaining = &map->buckets[map->bucket_count] - bucket;
-+	struct bucket *sentinel = &bucket[min_t(ptrdiff_t, remaining, max_probes)];
-+	struct bucket *entry;
-+
-+	for (entry = bucket; entry < sentinel; entry++)
-+		if (entry->value == NULL)
-+			return entry;
-+	return NULL;
-+}
-+
-+/**
-+ * move_empty_bucket() - Move an empty bucket closer to the start of the bucket array.
-+ * @map: The map containing the bucket.
-+
-+ * @hole: The empty bucket to fill with an entry that precedes it in one of its enclosing
-+ *        neighborhoods.
-+ *
-+ * This searches the neighborhoods that contain the empty bucket for a non-empty bucket closer to
-+ * the start of the array. If such a bucket is found, this swaps the two buckets by moving the
-+ * entry to the empty bucket.
-+ *
-+ * Return: The bucket that was vacated by moving its entry to the provided hole, or NULL if no
-+ *         entry could be moved.
-+ */
-+static struct bucket *
-+move_empty_bucket(struct pointer_map *map __always_unused, struct bucket *hole)
-+{
-+	/*
-+	 * Examine every neighborhood that the empty bucket is part of, starting with the one in
-+	 * which it is the last bucket. No boundary check is needed for the negative array
-+	 * arithmetic since this function is only called when hole is at least NEIGHBORHOOD cells
-+	 * deeper into the array than a valid bucket.
-+	 */
-+	struct bucket *bucket;
-+
-+	for (bucket = &hole[1 - NEIGHBORHOOD]; bucket < hole; bucket++) {
-+		/*
-+		 * Find the entry that is nearest to the bucket, which means it will be nearest to
-+		 * the hash bucket whose neighborhood is full.
-+		 */
-+		struct bucket *new_hole = dereference_hop(bucket, bucket->first_hop);
-+
-+		if (new_hole == NULL)
-+			/*
-+			 * There are no buckets in this neighborhood that are in use by this one
-+			 * (they must all be owned by overlapping neighborhoods).
-+			 */
-+			continue;
-+
-+		/*
-+		 * Skip this bucket if its first entry is actually further away than the hole that
-+		 * we're already trying to fill.
-+		 */
-+		if (hole < new_hole)
-+			continue;
-+
-+		/*
-+		 * We've found an entry in this neighborhood that we can "hop" further away, moving
-+		 * the hole closer to the hash bucket, if not all the way into its neighborhood.
-+		 */
-+
-+		/*
-+		 * The entry that will be the new hole is the first bucket in the list, so setting
-+		 * first_hop is all that's needed remove it from the list.
-+		 */
-+		bucket->first_hop = new_hole->next_hop;
-+		new_hole->next_hop = NULL_HOP_OFFSET;
-+
-+		/* Move the entry into the original hole. */
-+		hole->key = new_hole->key;
-+		hole->value = new_hole->value;
-+		new_hole->value = NULL;
-+
-+		/* Insert the filled hole into the hop list for the neighborhood. */
-+		insert_in_hop_list(bucket, hole);
-+		return new_hole;
-+	}
-+
-+	/* We couldn't find an entry to relocate to the hole. */
-+	return NULL;
-+}
-+
-+/**
-+ * update_mapping() - Find and update any existing mapping for a given key, returning the value
-+ *                    associated with the key in the provided pointer.
-+ * @map: The pointer_map to attempt to modify.
-+ * @neighborhood: The first bucket in the neighborhood that would contain the search key.
-+ * @key: The key with which to associate the new value.
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: A pointer in which to store the old value (unmodified if no mapping was found).
-+ *
-+ * Return: true if the map contains a mapping for the key, false if it does not.
-+ */
-+static bool update_mapping(struct pointer_map *map,
-+			   struct bucket *neighborhood,
-+			   const void *key,
-+			   void *new_value,
-+			   bool update,
-+			   void **old_value_ptr)
-+{
-+	struct bucket *bucket = search_hop_list(map, neighborhood, key, NULL);
-+
-+	if (bucket == NULL)
-+		/* There is no bucket containing the key in the neighborhood. */
-+		return false;
-+
-+	/*
-+	 * Return the value of the current mapping (if desired) and update the mapping with the new
-+	 * value (if desired).
-+	 */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = bucket->value;
-+	if (update) {
-+		/*
-+		 * We're dropping the old key pointer on the floor here, assuming it's a property
-+		 * of the value or that it's otherwise safe to just forget.
-+		 */
-+		bucket->key = key;
-+		bucket->value = new_value;
-+	}
-+	return true;
-+}
-+
-+/**
-+ * find_or_make_vacancy() - Find an empty bucket in a specified neighborhood for a new mapping or
-+ *                          attempt to re-arrange mappings so there is such a bucket.
-+ * @map: The pointer_map to search or modify.
-+ * @neighborhood: The first bucket in the neighborhood in which an empty bucket is needed for a new
-+ *                mapping.
-+ *
-+ * This operation may fail (returning NULL) if an empty bucket is not available or could not be
-+ * relocated to the neighborhood.
-+ *
-+ * Return: A pointer to an empty bucket in the desired neighborhood, or NULL if a vacancy could not
-+ *         be found or arranged.
-+ */
-+static struct bucket *find_or_make_vacancy(struct pointer_map *map, struct bucket *neighborhood)
-+{
-+	/* Probe within and beyond the neighborhood for the first empty bucket. */
-+	struct bucket *hole = find_empty_bucket(map, neighborhood, MAX_PROBES);
-+
-+	/*
-+	 * Keep trying until the empty bucket is in the bucket's neighborhood or we are unable to
-+	 * move it any closer by swapping it with a filled bucket.
-+	 */
-+	while (hole != NULL) {
-+		int distance = hole - neighborhood;
-+
-+		if (distance < NEIGHBORHOOD)
-+			/*
-+			 * We've found or relocated an empty bucket close enough to the initial
-+			 * hash bucket to be referenced by its hop vector.
-+			 */
-+			return hole;
-+
-+		/*
-+		 * The nearest empty bucket isn't within the neighborhood that must contain the new
-+		 * entry, so try to swap it with bucket that is closer.
-+		 */
-+		hole = move_empty_bucket(map, hole);
-+	}
-+
-+	return NULL;
-+}
-+
-+/**
-+ * vdo_pointer_map_put() - Try to associate a value (a pointer) with an integer in a pointer_map.
-+ * @map: The pointer_map to attempt to modify.
-+ * @key: The key with which to associate the new value (may be NULL if the comparator and hasher
-+ *       functions support it).
-+ * @new_value: The value to be associated with the key.
-+ * @update: Whether to overwrite an existing value.
-+ * @old_value_ptr: A pointer in which to store either the old value (if the key was already mapped)
-+ *                 or NULL if the map did not contain the key; NULL may be provided if the caller
-+ *                 does not need to know the old value.
-+ *
-+ * If the map already contains a mapping for the provided key, the old value is only replaced with
-+ * the specified value if update is true. In either case the old value is returned. If the map does
-+ * not already contain a value for the specified key, the new value is added regardless of the
-+ * value of update.
-+ *
-+ * If the value stored in the map is updated, then the key stored in the map will also be updated
-+ * with the key provided by this call. The old key will not be returned due to the memory
-+ * management assumptions described in the interface header comment.
-+ *
-+ * Return: UDS_SUCCESS or an error code.
-+ */
-+int vdo_pointer_map_put(struct pointer_map *map,
-+			const void *key,
-+			void *new_value,
-+			bool update,
-+			void **old_value_ptr)
-+{
-+	struct bucket *neighborhood, *bucket;
-+
-+	if (new_value == NULL)
-+		return UDS_INVALID_ARGUMENT;
-+
-+	/*
-+	 * Select the bucket at the start of the neighborhood that must contain any entry for the
-+	 * provided key.
-+	 */
-+	neighborhood = select_bucket(map, key);
-+
-+	/*
-+	 * Check whether the neighborhood already contains an entry for the key, in which case we
-+	 * optionally update it, returning the old value.
-+	 */
-+	if (update_mapping(map, neighborhood, key, new_value, update, old_value_ptr))
-+		return UDS_SUCCESS;
-+
-+	/*
-+	 * Find an empty bucket in the desired neighborhood for the new entry or re-arrange entries
-+	 * in the map so there is such a bucket. This operation will usually succeed; the loop body
-+	 * will only be executed on the rare occasions that we have to resize the map.
-+	 */
-+	while ((bucket = find_or_make_vacancy(map, neighborhood)) == NULL) {
-+		/*
-+		 * There is no empty bucket in which to put the new entry in the current map, so
-+		 * we're forced to allocate a new bucket array with a larger capacity, re-hash all
-+		 * the entries into those buckets, and try again (a very expensive operation for
-+		 * large maps).
-+		 */
-+		int result = resize_buckets(map);
-+
-+		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		/*
-+		 * Resizing the map invalidates all pointers to buckets, so
-+		 * recalculate the neighborhood pointer.
-+		 */
-+		neighborhood = select_bucket(map, key);
-+	}
-+
-+	/* Put the new entry in the empty bucket, adding it to the neighborhood. */
-+	bucket->key = key;
-+	bucket->value = new_value;
-+	insert_in_hop_list(neighborhood, bucket);
-+	map->size += 1;
-+
-+	/*
-+	 * There was no existing entry, so there was no old value to be
-+	 * returned.
-+	 */
-+	if (old_value_ptr != NULL)
-+		*old_value_ptr = NULL;
-+	return UDS_SUCCESS;
-+}
-+
-+/**
-+ * vdo_pointer_map_remove() - Remove the mapping for a given key from the pointer_map.
-+ * @map: The pointer_map from which to remove the mapping.
-+ * @key: The key whose mapping is to be removed (may be NULL if the comparator and hasher functions
-+ *       support it).
-+ *
-+ * Return: the value that was associated with the key, or NULL if it was not mapped.
-+ */
-+void *vdo_pointer_map_remove(struct pointer_map *map, const void *key)
-+{
-+	void *value;
-+
-+	/* Select the bucket to search and search it for an existing entry. */
-+	struct bucket *bucket = select_bucket(map, key);
-+	struct bucket *previous;
-+	struct bucket *victim = search_hop_list(map, bucket, key, &previous);
-+
-+	if (victim == NULL)
-+		/* There is no matching entry to remove. */
-+		return NULL;
-+
-+	/*
-+	 * We found an entry to remove. Save the mapped value to return later and empty the bucket.
-+	 */
-+	map->size -= 1;
-+	value = victim->value;
-+	victim->value = NULL;
-+	victim->key = 0;
-+
-+	/* The victim bucket is now empty, but it still needs to be spliced out of the hop list. */
-+	if (previous == NULL)
-+		/* The victim is the head of the list, so swing first_hop. */
-+		bucket->first_hop = victim->next_hop;
-+	else
-+		previous->next_hop = victim->next_hop;
-+	victim->next_hop = NULL_HOP_OFFSET;
-+
-+	return value;
-+}
-diff --git a/drivers/md/dm-vdo/pointer-map.h b/drivers/md/dm-vdo/pointer-map.h
-new file mode 100644
-index 00000000000..a3c5b3550b2
---- /dev/null
-+++ b/drivers/md/dm-vdo/pointer-map.h
-@@ -0,0 +1,81 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#ifndef VDO_POINTER_MAP_H
-+#define VDO_POINTER_MAP_H
-+
-+#include <linux/compiler.h>
-+#include <linux/types.h>
-+
-+/*
-+ * A pointer_map associates pointer values (<code>void *</code>) with the data referenced by
-+ * pointer keys (<code>void *</code>). <code>NULL</code> pointer values are not supported. A
-+ * <code>NULL</code> key value is supported when the instance's key comparator and hasher functions
-+ * support it.
-+ *
-+ * The map is implemented as hash table, which should provide constant-time insert, query, and
-+ * remove operations, although the insert may occasionally grow the table, which is linear in the
-+ * number of entries in the map. The table will grow as needed to hold new entries, but will not
-+ * shrink as entries are removed.
-+ *
-+ * The key and value pointers passed to the map are retained and used by the map, but are not owned
-+ * by the map. Freeing the map does not attempt to free the pointers. The client is entirely
-+ * responsible for the memory management of the keys and values. The current interface and
-+ * implementation assume that keys will be properties of the values, or that keys will not be
-+ * memory managed, or that keys will not need to be freed as a result of being replaced when a key
-+ * is re-mapped.
-+ */
-+
-+struct pointer_map;
-+
-+/**
-+ * typedef pointer_key_comparator - The prototype of functions that compare the referents of two
-+ *                                  pointer keys for equality.
-+ * @this_key: The first element to compare.
-+ * @that_key: The second element to compare.
-+ *
-+ * If two keys are equal, then both keys must have the same the hash code associated with them by
-+ * the hasher function defined below.
-+ *
-+ * Return: true if and only if the referents of the two key pointers are to be treated as the same
-+ *         key by the map.
-+ */
-+typedef bool pointer_key_comparator(const void *this_key, const void *that_key);
-+
-+/**
-+ * typedef pointer_key_hasher - The prototype of functions that get or calculate a hash code
-+ *                              associated with the referent of pointer key.
-+ * @key: The pointer key to hash.
-+ *
-+ * The hash code must be uniformly distributed over all u32 values. The hash code associated
-+ * with a given key must not change while the key is in the map. If the comparator function says
-+ * two keys are equal, then this function must return the same hash code for both keys. This
-+ * function may be called many times for a key while an entry is stored for it in the map.
-+ *
-+ * Return: The hash code for the key.
-+ */
-+typedef u32 pointer_key_hasher(const void *key);
-+
-+int __must_check vdo_make_pointer_map(size_t initial_capacity,
-+				      unsigned int initial_load,
-+				      pointer_key_comparator comparator,
-+				      pointer_key_hasher hasher,
-+				      struct pointer_map **map_ptr);
-+
-+void vdo_free_pointer_map(struct pointer_map *map);
-+
-+size_t vdo_pointer_map_size(const struct pointer_map *map);
-+
-+void *vdo_pointer_map_get(struct pointer_map *map, const void *key);
-+
-+int __must_check vdo_pointer_map_put(struct pointer_map *map,
-+				     const void *key,
-+				     void *new_value,
-+				     bool update,
-+				     void **old_value_ptr);
-+
-+void *vdo_pointer_map_remove(struct pointer_map *map, const void *key);
-+
-+#endif /* VDO_POINTER_MAP_H */
-diff --git a/drivers/md/dm-vdo/priority-table.c b/drivers/md/dm-vdo/priority-table.c
-new file mode 100644
-index 00000000000..d0fb949af87
---- /dev/null
-+++ b/drivers/md/dm-vdo/priority-table.c
-@@ -0,0 +1,226 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#include "priority-table.h"
-+
-+#include <linux/log2.h>
-+
-+#include "errors.h"
-+#include "memory-alloc.h"
 +#include "permassert.h"
 +
 +#include "status-codes.h"
-+
-+/* We use a single 64-bit search vector, so the maximum priority is 63 */
-+enum {
-+	MAX_PRIORITY = 63
-+};
-+
-+/*
-+ * All the entries with the same priority are queued in a circular list in a bucket for that
-+ * priority. The table is essentially an array of buckets.
-+ */
-+struct bucket {
-+	/*
-+	 * The head of a queue of table entries, all having the same priority
-+	 */
-+	struct list_head queue;
-+	/* The priority of all the entries in this bucket */
-+	unsigned int priority;
-+};
-+
-+/*
-+ * A priority table is an array of buckets, indexed by priority. New entries are added to the end
-+ * of the queue in the appropriate bucket. The dequeue operation finds the highest-priority
-+ * non-empty bucket by searching a bit vector represented as a single 8-byte word, which is very
-+ * fast with compiler and CPU support.
-+ */
-+struct priority_table {
-+	/* The maximum priority of entries that may be stored in this table */
-+	unsigned int max_priority;
-+	/* A bit vector flagging all buckets that are currently non-empty */
-+	u64 search_vector;
-+	/* The array of all buckets, indexed by priority */
-+	struct bucket buckets[];
-+};
++#include "types.h"
++#include "vio.h"
++#include "vdo.h"
 +
 +/**
-+ * vdo_make_priority_table() - Allocate and initialize a new priority_table.
-+ * @max_priority: The maximum priority value for table entries.
-+ * @table_ptr: A pointer to hold the new table.
++ * DOC: vdo completions.
 + *
-+ * Return: VDO_SUCCESS or an error code.
-+ */
-+int vdo_make_priority_table(unsigned int max_priority, struct priority_table **table_ptr)
++ * Most of vdo's data structures are lock free, each either belonging to a single "zone," or
++ * divided into a number of zones whose accesses to the structure do not overlap. During normal
++ * operation, at most one thread will be operating in any given zone. Each zone has a
++ * vdo_work_queue which holds vdo_completions that are to be run in that zone. A completion may
++ * only be enqueued on one queue or operating in a single zone at a time.
++ *
++ * At each step of a multi-threaded operation, the completion performing the operation is given a
++ * callback, error handler, and thread id for the next step. A completion is "run" when it is
++ * operating on the correct thread (as specified by its callback_thread_id). If the value of its
++ * "result" field is an error (i.e. not VDO_SUCCESS), the function in its "error_handler" will be
++ * invoked. If the error_handler is NULL, or there is no error, the function set as its "callback"
++ * will be invoked. Generally, a completion will not be run directly, but rather will be
++ * "launched." In this case, it will check whether it is operating on the correct thread. If it is,
++ * it will run immediately. Otherwise, it will be enqueue on the vdo_work_queue associated with the
++ * completion's "callback_thread_id". When it is dequeued, it will be on the correct thread, and
++ * will get run. In some cases, the completion should get queued instead of running immediately,
++ * even if it is being launched from the correct thread. This is usually in cases where there is a
++ * long chain of callbacks, all on the same thread, which could overflow the stack. In such cases,
++ * the completion's "requeue" field should be set to true. Doing so will skip the current thread
++ * check and simply enqueue the completion.
++ *
++ * A completion may be "finished," in which case its "complete" field will be set to true before it
++ * is next run. It is a bug to attempt to set the result or re-finish a finished completion.
++ * Because a completion's fields are not safe to examine from any thread other than the one on
++ * which the completion is currently operating, this field is used only to aid in detecting
++ * programming errors. It can not be used for cross-thread checking on the status of an operation.
++ * A completion must be "reset" before it can be reused after it has been finished. Resetting will
++ * also clear any error from the result field.
++ **/
++
++void vdo_initialize_completion(struct vdo_completion *completion,
++			       struct vdo *vdo,
++			       enum vdo_completion_type type)
 +{
-+	struct priority_table *table;
-+	int result;
-+	unsigned int priority;
++	memset(completion, 0, sizeof(*completion));
++	completion->vdo = vdo;
++	completion->type = type;
++	vdo_reset_completion(completion);
++}
 +
-+	if (max_priority > MAX_PRIORITY)
-+		return UDS_INVALID_ARGUMENT;
++static inline void assert_incomplete(struct vdo_completion *completion)
++{
++	ASSERT_LOG_ONLY(!completion->complete, "completion is not complete");
++}
 +
-+	result = UDS_ALLOCATE_EXTENDED(struct priority_table, max_priority + 1,
-+				       struct bucket, __func__, &table);
-+	if (result != VDO_SUCCESS)
-+		return result;
++/**
++ * vdo_set_completion_result() - Set the result of a completion.
++ *
++ * Older errors will not be masked.
++ */
++void vdo_set_completion_result(struct vdo_completion *completion, int result)
++{
++	assert_incomplete(completion);
++	if (completion->result == VDO_SUCCESS)
++		completion->result = result;
++}
 +
-+	for (priority = 0; priority <= max_priority; priority++) {
-+		struct bucket *bucket = &table->buckets[priority];
++/**
++ * vdo_launch_completion_with_priority() - Run or enqueue a completion.
++ * @priority: The priority at which to enqueue the completion.
++ *
++ * If called on the correct thread (i.e. the one specified in the completion's callback_thread_id
++ * field) and not marked for requeue, the completion will be run immediately. Otherwise, the
++ * completion will be enqueued on the specified thread.
++ */
++void vdo_launch_completion_with_priority(struct vdo_completion *completion,
++					 enum vdo_completion_priority priority)
++{
++	thread_id_t callback_thread = completion->callback_thread_id;
 +
-+		bucket->priority = priority;
-+		INIT_LIST_HEAD(&bucket->queue);
++	if (completion->requeue || (callback_thread != vdo_get_callback_thread_id())) {
++		vdo_enqueue_completion(completion, priority);
++		return;
 +	}
 +
-+	table->max_priority = max_priority;
-+	table->search_vector = 0;
++	vdo_run_completion(completion);
++}
 +
-+	*table_ptr = table;
-+	return VDO_SUCCESS;
++/** vdo_finish_completion() - Mark a completion as complete and then launch it. */
++void vdo_finish_completion(struct vdo_completion *completion)
++{
++	assert_incomplete(completion);
++	completion->complete = true;
++	if (completion->callback != NULL)
++		vdo_launch_completion(completion);
++}
++
++void vdo_enqueue_completion(struct vdo_completion *completion,
++			    enum vdo_completion_priority priority)
++{
++	struct vdo *vdo = completion->vdo;
++	thread_id_t thread_id = completion->callback_thread_id;
++
++	if (ASSERT(thread_id < vdo->thread_config.thread_count,
++		   "thread_id %u (completion type %d) is less than thread count %u",
++		   thread_id,
++		   completion->type,
++		   vdo->thread_config.thread_count) != UDS_SUCCESS)
++		BUG();
++
++	completion->requeue = false;
++	completion->priority = priority;
++	completion->my_queue = NULL;
++	vdo_enqueue_work_queue(vdo->threads[thread_id].queue, completion);
 +}
 +
 +/**
-+ * vdo_free_priority_table() - Free a priority_table.
-+ * @table: The table to free.
++ * vdo_requeue_completion_if_needed() - Requeue a completion if not called on the specified thread.
 + *
-+ * The table does not own the entries stored in it and they are not freed by this call.
++ * Return: True if the completion was requeued; callers may not access the completion in this case.
 + */
-+void vdo_free_priority_table(struct priority_table *table)
++bool vdo_requeue_completion_if_needed(struct vdo_completion *completion,
++				      thread_id_t callback_thread_id)
 +{
-+	if (table == NULL)
-+		return;
++	if (vdo_get_callback_thread_id() == callback_thread_id)
++		return false;
 +
-+	/*
-+	 * Unlink the buckets from any entries still in the table so the entries won't be left with
-+	 * dangling pointers to freed memory.
-+	 */
-+	vdo_reset_priority_table(table);
-+
-+	UDS_FREE(table);
++	completion->callback_thread_id = callback_thread_id;
++	vdo_enqueue_completion(completion, VDO_WORK_Q_DEFAULT_PRIORITY);
++	return true;
 +}
-+
-+/**
-+ * vdo_reset_priority_table() - Reset a priority table, leaving it in the same empty state as when
-+ *                          newly constructed.
-+ * @table: The table to reset.
-+ *
-+ * The table does not own the entries stored in it and they are not freed (or even unlinked from
-+ * each other) by this call.
-+ */
-+void vdo_reset_priority_table(struct priority_table *table)
-+{
-+	unsigned int priority;
-+
-+	table->search_vector = 0;
-+	for (priority = 0; priority <= table->max_priority; priority++)
-+		list_del_init(&table->buckets[priority].queue);
-+}
-+
-+/**
-+ * vdo_priority_table_enqueue() - Add a new entry to the priority table, appending it to the queue
-+ *                                for entries with the specified priority.
-+ * @table: The table in which to store the entry.
-+ * @priority: The priority of the entry.
-+ * @entry: The list_head embedded in the entry to store in the table (the caller must have
-+ *         initialized it).
-+ */
-+void vdo_priority_table_enqueue(struct priority_table *table,
-+				unsigned int priority,
-+				struct list_head *entry)
-+{
-+	ASSERT_LOG_ONLY((priority <= table->max_priority),
-+			"entry priority must be valid for the table");
-+
-+	/* Append the entry to the queue in the specified bucket. */
-+	list_move_tail(entry, &table->buckets[priority].queue);
-+
-+	/* Flag the bucket in the search vector since it must be non-empty. */
-+	table->search_vector |= (1ULL << priority);
-+}
-+
-+static inline void mark_bucket_empty(struct priority_table *table, struct bucket *bucket)
-+{
-+	table->search_vector &= ~(1ULL << bucket->priority);
-+}
-+
-+/**
-+ * vdo_priority_table_dequeue() - Find the highest-priority entry in the table, remove it from the
-+ *                                table, and return it.
-+ * @table: The priority table from which to remove an entry.
-+ *
-+ * If there are multiple entries with the same priority, the one that has been in the table with
-+ * that priority the longest will be returned.
-+ *
-+ * Return: The dequeued entry, or NULL if the table is currently empty.
-+ */
-+struct list_head *vdo_priority_table_dequeue(struct priority_table *table)
-+{
-+	struct bucket *bucket;
-+	struct list_head *entry;
-+	int top_priority;
-+
-+	if (table->search_vector == 0)
-+		/* All buckets are empty. */
-+		return NULL;
-+
-+	/*
-+	 * Find the highest priority non-empty bucket by finding the highest-order non-zero bit in
-+	 * the search vector.
-+	 */
-+	top_priority = ilog2(table->search_vector);
-+
-+	/* Dequeue the first entry in the bucket. */
-+	bucket = &table->buckets[top_priority];
-+	entry = bucket->queue.next;
-+	list_del_init(entry);
-+
-+	/* Clear the bit in the search vector if the bucket has been emptied. */
-+	if (list_empty(&bucket->queue))
-+		mark_bucket_empty(table, bucket);
-+
-+	return entry;
-+}
-+
-+/**
-+ * vdo_priority_table_remove() - Remove a specified entry from its priority table.
-+ * @table: The table from which to remove the entry.
-+ * @entry: The entry to remove from the table.
-+ */
-+void vdo_priority_table_remove(struct priority_table *table, struct list_head *entry)
-+{
-+	struct list_head *next_entry;
-+
-+	/*
-+	 * We can't guard against calls where the entry is on a list for a different table, but
-+	 * it's easy to deal with an entry not in any table or list.
-+	 */
-+	if (list_empty(entry))
-+		return;
-+
-+	/*
-+	 * Remove the entry from the bucket list, remembering a pointer to another entry in the
-+	 * ring.
-+	 */
-+	next_entry = entry->next;
-+	list_del_init(entry);
-+
-+	/*
-+	 * If the rest of the list is now empty, the next node must be the list head in the bucket
-+	 * and we can use it to update the search vector.
-+	 */
-+	if (list_empty(next_entry))
-+		mark_bucket_empty(table, list_entry(next_entry, struct bucket, queue));
-+}
-+
-+/**
-+ * vdo_is_priority_table_empty() - Return whether the priority table is empty.
-+ * @table: The table to check.
-+ *
-+ * Return: true if the table is empty.
-+ */
-+bool vdo_is_priority_table_empty(struct priority_table *table)
-+{
-+	return (table->search_vector == 0);
-+}
-diff --git a/drivers/md/dm-vdo/priority-table.h b/drivers/md/dm-vdo/priority-table.h
+diff --git a/drivers/md/dm-vdo/completion.h b/drivers/md/dm-vdo/completion.h
 new file mode 100644
-index 00000000000..7c5f689dc2a
+index 00000000000..03b2daa6546
 --- /dev/null
-+++ b/drivers/md/dm-vdo/priority-table.h
-@@ -0,0 +1,48 @@
++++ b/drivers/md/dm-vdo/completion.h
+@@ -0,0 +1,155 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright Red Hat
 + */
 +
-+#ifndef VDO_PRIORITY_TABLE_H
-+#define VDO_PRIORITY_TABLE_H
++#ifndef VDO_COMPLETION_H
++#define VDO_COMPLETION_H
 +
-+#include <linux/list.h>
++#include "permassert.h"
 +
++#include "status-codes.h"
++#include "types.h"
++
++/**
++ * vdo_run_completion() - Run a completion's callback or error handler on the current thread.
++ *
++ * Context: This function must be called from the correct callback thread.
++ */
++static inline void vdo_run_completion(struct vdo_completion *completion)
++{
++	if ((completion->result != VDO_SUCCESS) && (completion->error_handler != NULL)) {
++		completion->error_handler(completion);
++		return;
++	}
++
++	completion->callback(completion);
++}
++
++void vdo_set_completion_result(struct vdo_completion *completion, int result);
++
++void vdo_initialize_completion(struct vdo_completion *completion,
++			       struct vdo *vdo,
++			       enum vdo_completion_type type);
++
++/**
++ * vdo_reset_completion() - Reset a completion to a clean state, while keeping the type, vdo and
++ *                          parent information.
++ */
++static inline void vdo_reset_completion(struct vdo_completion *completion)
++{
++	completion->result = VDO_SUCCESS;
++	completion->complete = false;
++}
++
++void vdo_launch_completion_with_priority(struct vdo_completion *completion,
++					 enum vdo_completion_priority priority);
++
++/**
++ * vdo_launch_completion() - Launch a completion with default priority.
++ */
++static inline void vdo_launch_completion(struct vdo_completion *completion)
++{
++	vdo_launch_completion_with_priority(completion, VDO_WORK_Q_DEFAULT_PRIORITY);
++}
++
++/**
++ * vdo_continue_completion() - Continue processing a completion.
++ * @result: The current result (will not mask older errors).
++ *
++ * Continue processing a completion by setting the current result and calling
++ * vdo_launch_completion().
++ */
++static inline void vdo_continue_completion(struct vdo_completion *completion, int result)
++{
++	vdo_set_completion_result(completion, result);
++	vdo_launch_completion(completion);
++}
++
++void vdo_finish_completion(struct vdo_completion *completion);
++
++/**
++ * vdo_fail_completion() - Set the result of a completion if it does not already have an error,
++ *                         then finish it.
++ */
++static inline void vdo_fail_completion(struct vdo_completion *completion, int result)
++{
++	vdo_set_completion_result(completion, result);
++	vdo_finish_completion(completion);
++}
++
++/**
++ * vdo_assert_completion_type() - Assert that a completion is of the correct type.
++ *
++ * Return: VDO_SUCCESS or an error
++ */
++static inline int
++vdo_assert_completion_type(struct vdo_completion *completion, enum vdo_completion_type expected)
++{
++	return ASSERT(expected == completion->type,
++		      "completion type should be %u, not %u",
++		      expected,
++		      completion->type);
++}
++
++static inline void vdo_set_completion_callback(struct vdo_completion *completion,
++					       vdo_action *callback,
++					       thread_id_t callback_thread_id)
++{
++	completion->callback = callback;
++	completion->callback_thread_id = callback_thread_id;
++}
++
++/**
++ * vdo_launch_completion_callback() - Set the callback for a completion and launch it immediately.
++ */
++static inline void vdo_launch_completion_callback(struct vdo_completion *completion,
++						  vdo_action *callback,
++						  thread_id_t callback_thread_id)
++{
++	vdo_set_completion_callback(completion, callback, callback_thread_id);
++	vdo_launch_completion(completion);
++}
++
++/**
++ * vdo_prepare_completion() - Prepare a completion for launch.
++ *
++ * Resets the completion, and then sets its callback, error handler, callback thread, and parent.
++ */
++static inline void vdo_prepare_completion(struct vdo_completion *completion,
++					  vdo_action *callback,
++					  vdo_action *error_handler,
++					  thread_id_t callback_thread_id,
++					  void *parent)
++{
++	vdo_reset_completion(completion);
++	vdo_set_completion_callback(completion, callback, callback_thread_id);
++	completion->error_handler = error_handler;
++	completion->parent = parent;
++}
++
++/**
++ * vdo_prepare_completion_for_requeue() - Prepare a completion for launch ensuring that it will
++ *                                        always be requeued.
++ *
++ * Resets the completion, and then sets its callback, error handler, callback thread, and parent.
++ */
++static inline void
++vdo_prepare_completion_for_requeue(struct vdo_completion *completion,
++				   vdo_action *callback,
++				   vdo_action *error_handler,
++				   thread_id_t callback_thread_id,
++				   void *parent)
++{
++	vdo_prepare_completion(completion, callback, error_handler, callback_thread_id, parent);
++	completion->requeue = true;
++}
++
++void vdo_enqueue_completion(struct vdo_completion *completion,
++			    enum vdo_completion_priority priority);
++
++
++bool vdo_requeue_completion_if_needed(struct vdo_completion *completion,
++				      thread_id_t callback_thread_id);
++
++#endif /* VDO_COMPLETION_H */
+diff --git a/drivers/md/dm-vdo/cpu.h b/drivers/md/dm-vdo/cpu.h
+new file mode 100644
+index 00000000000..d2da22d9d60
+--- /dev/null
++++ b/drivers/md/dm-vdo/cpu.h
+@@ -0,0 +1,58 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * A priority_table is a simple implementation of a priority queue for entries with priorities that
-+ * are small non-negative integer values. It implements the obvious priority queue operations of
-+ * enqueuing an entry and dequeuing an entry with the maximum priority. It also supports removing
-+ * an arbitrary entry. The priority of an entry already in the table can be changed by removing it
-+ * and re-enqueuing it with a different priority. All operations have O(1) complexity.
-+ *
-+ * The links for the table entries must be embedded in the entries themselves. Lists are used to
-+ * link entries in the table and no wrapper type is declared, so an existing list entry in an
-+ * object can also be used to queue it in a priority_table, assuming the field is not used for
-+ * anything else while so queued.
-+ *
-+ * The table is implemented as an array of queues (circular lists) indexed by priority, along with
-+ * a hint for which queues are non-empty. Steven Skiena calls a very similar structure a "bounded
-+ * height priority queue", but given the resemblance to a hash table, "priority table" seems both
-+ * shorter and more apt, if somewhat novel.
++ * Copyright Red Hat
 + */
 +
-+struct priority_table;
++#ifndef UDS_CPU_H
++#define UDS_CPU_H
 +
-+int __must_check
-+vdo_make_priority_table(unsigned int max_priority, struct priority_table **table_ptr);
++#include <linux/cache.h>
 +
-+void vdo_free_priority_table(struct priority_table *table);
++/**
++ * uds_prefetch_address() - Minimize cache-miss latency by attempting to move data into a CPU cache
++ *                          before it is accessed.
++ *
++ * @address: the address to fetch (may be invalid)
++ * @for_write: must be constant at compile time--false if for reading, true if for writing
++ */
++static inline void uds_prefetch_address(const void *address, bool for_write)
++{
++	/*
++	 * for_write won't be a constant if we are compiled with optimization turned off, in which
++	 * case prefetching really doesn't matter. clang can't figure out that if for_write is a
++	 * constant, it can be passed as the second, mandatorily constant argument to prefetch(),
++	 * at least currently on llvm 12.
++	 */
++	if (__builtin_constant_p(for_write)) {
++		if (for_write)
++			__builtin_prefetch(address, true);
++		else
++			__builtin_prefetch(address, false);
++	}
++}
 +
-+void vdo_priority_table_enqueue(struct priority_table *table,
-+				unsigned int priority,
-+				struct list_head *entry);
++/**
++ * uds_prefetch_range() - Minimize cache-miss latency by attempting to move a range of addresses
++ *                        into a CPU cache before they are accessed.
++ *
++ * @start: the starting address to fetch (may be invalid)
++ * @size: the number of bytes in the address range
++ * @for_write: must be constant at compile time--false if for reading, true if for writing
++ */
++static inline void uds_prefetch_range(const void *start, unsigned int size, bool for_write)
++{
++	/*
++	 * Count the number of cache lines to fetch, allowing for the address range to span an
++	 * extra cache line boundary due to address alignment.
++	 */
++	const char *address = (const char *) start;
++	unsigned int offset = ((uintptr_t) address % L1_CACHE_BYTES);
++	unsigned int cache_lines = (1 + ((size + offset) / L1_CACHE_BYTES));
 +
-+void vdo_reset_priority_table(struct priority_table *table);
++	while (cache_lines-- > 0) {
++		uds_prefetch_address(address, for_write);
++		address += L1_CACHE_BYTES;
++	}
++}
 +
-+struct list_head * __must_check vdo_priority_table_dequeue(struct priority_table *table);
++#endif /* UDS_CPU_H */
+diff --git a/drivers/md/dm-vdo/funnel-queue.c b/drivers/md/dm-vdo/funnel-queue.c
+new file mode 100644
+index 00000000000..7e36153ec0a
+--- /dev/null
++++ b/drivers/md/dm-vdo/funnel-queue.c
+@@ -0,0 +1,169 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright Red Hat
++ */
 +
-+void vdo_priority_table_remove(struct priority_table *table, struct list_head *entry);
++#include "funnel-queue.h"
 +
-+bool __must_check vdo_is_priority_table_empty(struct priority_table *table);
++#include "cpu.h"
++#include "memory-alloc.h"
++#include "permassert.h"
++#include "uds.h"
 +
-+#endif /* VDO_PRIORITY_TABLE_H */
++int uds_make_funnel_queue(struct funnel_queue **queue_ptr)
++{
++	int result;
++	struct funnel_queue *queue;
++
++	result = UDS_ALLOCATE(1, struct funnel_queue, "funnel queue", &queue);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	/*
++	 * Initialize the stub entry and put it in the queue, establishing the invariant that
++	 * queue->newest and queue->oldest are never null.
++	 */
++	queue->stub.next = NULL;
++	queue->newest = &queue->stub;
++	queue->oldest = &queue->stub;
++
++	*queue_ptr = queue;
++	return UDS_SUCCESS;
++}
++
++void uds_free_funnel_queue(struct funnel_queue *queue)
++{
++	UDS_FREE(queue);
++}
++
++static struct funnel_queue_entry *get_oldest(struct funnel_queue *queue)
++{
++	/*
++	 * Barrier requirements: We need a read barrier between reading a "next" field pointer
++	 * value and reading anything it points to. There's an accompanying barrier in
++	 * uds_funnel_queue_put() between its caller setting up the entry and making it visible.
++	 */
++	struct funnel_queue_entry *oldest = queue->oldest;
++	struct funnel_queue_entry *next = READ_ONCE(oldest->next);
++
++	if (oldest == &queue->stub) {
++		/*
++		 * When the oldest entry is the stub and it has no successor, the queue is
++		 * logically empty.
++		 */
++		if (next == NULL)
++			return NULL;
++		/*
++		 * The stub entry has a successor, so the stub can be dequeued and ignored without
++		 * breaking the queue invariants.
++		 */
++		oldest = next;
++		queue->oldest = oldest;
++		next = READ_ONCE(oldest->next);
++	}
++
++	/*
++	 * We have a non-stub candidate to dequeue. If it lacks a successor, we'll need to put the
++	 * stub entry back on the queue first.
++	 */
++	if (next == NULL) {
++		struct funnel_queue_entry *newest = READ_ONCE(queue->newest);
++
++		if (oldest != newest)
++			/*
++			 * Another thread has already swung queue->newest atomically, but not yet
++			 * assigned previous->next. The queue is really still empty.
++			 */
++			return NULL;
++
++		/*
++		 * Put the stub entry back on the queue, ensuring a successor will eventually be
++		 * seen.
++		 */
++		uds_funnel_queue_put(queue, &queue->stub);
++
++		/* Check again for a successor. */
++		next = READ_ONCE(oldest->next);
++		if (next == NULL)
++			/*
++			 * We lost a race with a producer who swapped queue->newest before we did,
++			 * but who hasn't yet updated previous->next. Try again later.
++			 */
++			return NULL;
++	}
++
++	return oldest;
++}
++
++/*
++ * Poll a queue, removing the oldest entry if the queue is not empty. This function must only be
++ * called from a single consumer thread.
++ */
++struct funnel_queue_entry *uds_funnel_queue_poll(struct funnel_queue *queue)
++{
++	struct funnel_queue_entry *oldest = get_oldest(queue);
++
++	if (oldest == NULL)
++		return oldest;
++
++	/*
++	 * Dequeue the oldest entry and return it. Only one consumer thread may call this function,
++	 * so no locking, atomic operations, or fences are needed; queue->oldest is owned by the
++	 * consumer and oldest->next is never used by a producer thread after it is swung from NULL
++	 * to non-NULL.
++	 */
++	queue->oldest = READ_ONCE(oldest->next);
++	/*
++	 * Make sure the caller sees the proper stored data for this entry. Since we've already
++	 * fetched the entry pointer we stored in "queue->oldest", this also ensures that on entry
++	 * to the next call we'll properly see the dependent data.
++	 */
++	smp_rmb();
++	/*
++	 * If "oldest" is a very light-weight work item, we'll be looking for the next one very
++	 * soon, so prefetch it now.
++	 */
++	uds_prefetch_address(queue->oldest, true);
++	WRITE_ONCE(oldest->next, NULL);
++	return oldest;
++}
++
++/*
++ * Check whether the funnel queue is empty or not. If the queue is in a transition state with one
++ * or more entries being added such that the list view is incomplete, this function will report the
++ * queue as empty.
++ */
++bool uds_is_funnel_queue_empty(struct funnel_queue *queue)
++{
++	return get_oldest(queue) == NULL;
++}
++
++/*
++ * Check whether the funnel queue is idle or not. If the queue has entries available to be
++ * retrieved, it is not idle. If the queue is in a transition state with one or more entries being
++ * added such that the list view is incomplete, it may not be possible to retrieve an entry with
++ * the uds_funnel_queue_poll() function, but the queue will not be considered idle.
++ */
++bool uds_is_funnel_queue_idle(struct funnel_queue *queue)
++{
++	/*
++	 * Oldest is not the stub, so there's another entry, though if next is NULL we can't
++	 * retrieve it yet.
++	 */
++	if (queue->oldest != &queue->stub)
++		return false;
++
++	/*
++	 * Oldest is the stub, but newest has been updated by _put(); either there's another,
++	 * retrievable entry in the list, or the list is officially empty but in the intermediate
++	 * state of having an entry added.
++	 *
++	 * Whether anything is retrievable depends on whether stub.next has been updated and become
++	 * visible to us, but for idleness we don't care. And due to memory ordering in _put(), the
++	 * update to newest would be visible to us at the same time or sooner.
++	 */
++	if (READ_ONCE(queue->newest) != &queue->stub)
++		return false;
++
++	return true;
++}
+diff --git a/drivers/md/dm-vdo/funnel-queue.h b/drivers/md/dm-vdo/funnel-queue.h
+new file mode 100644
+index 00000000000..332acc579b6
+--- /dev/null
++++ b/drivers/md/dm-vdo/funnel-queue.h
+@@ -0,0 +1,110 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright Red Hat
++ */
++
++#ifndef UDS_FUNNEL_QUEUE_H
++#define UDS_FUNNEL_QUEUE_H
++
++#include <linux/atomic.h>
++#include <linux/cache.h>
++
++/*
++ * A funnel queue is a simple (almost) lock-free queue that accepts entries from multiple threads
++ * (multi-producer) and delivers them to a single thread (single-consumer). "Funnel" is an attempt
++ * to evoke the image of requests from more than one producer being "funneled down" to a single
++ * consumer.
++ *
++ * This is an unsynchronized but thread-safe data structure when used as intended. There is no
++ * mechanism to ensure that only one thread is consuming from the queue. If more than one thread
++ * attempts to consume from the queue, the resulting behavior is undefined. Clients must not
++ * directly access or manipulate the internals of the queue, which are only exposed for the purpose
++ * of allowing the very simple enqueue operation to be inlined.
++ *
++ * The implementation requires that a funnel_queue_entry structure (a link pointer) is embedded in
++ * the queue entries, and pointers to those structures are used exclusively by the queue. No macros
++ * are defined to template the queue, so the offset of the funnel_queue_entry in the records placed
++ * in the queue must all be the same so the client can derive their structure pointer from the
++ * entry pointer returned by uds_funnel_queue_poll().
++ *
++ * Callers are wholly responsible for allocating and freeing the entries. Entries may be freed as
++ * soon as they are returned since this queue is not susceptible to the "ABA problem" present in
++ * many lock-free data structures. The queue is dynamically allocated to ensure cache-line
++ * alignment, but no other dynamic allocation is used.
++ *
++ * The algorithm is not actually 100% lock-free. There is a single point in uds_funnel_queue_put()
++ * at which a preempted producer will prevent the consumers from seeing items added to the queue by
++ * later producers, and only if the queue is short enough or the consumer fast enough for it to
++ * reach what was the end of the queue at the time of the preemption.
++ *
++ * The consumer function, uds_funnel_queue_poll(), will return NULL when the queue is empty. To
++ * wait for data to consume, spin (if safe) or combine the queue with a struct event_count to
++ * signal the presence of new entries.
++ */
++
++/* This queue link structure must be embedded in client entries. */
++struct funnel_queue_entry {
++	/* The next (newer) entry in the queue. */
++	struct funnel_queue_entry *next;
++};
++
++/*
++ * The dynamically allocated queue structure, which is allocated on a cache line boundary so the
++ * producer and consumer fields in the structure will land on separate cache lines. This should be
++ * consider opaque but it is exposed here so uds_funnel_queue_put() can be inlined.
++ */
++struct __aligned(L1_CACHE_BYTES) funnel_queue {
++	/*
++	 * The producers' end of the queue, an atomically exchanged pointer that will never be
++	 * NULL.
++	 */
++	struct funnel_queue_entry *newest;
++
++	/* The consumer's end of the queue, which is owned by the consumer and never NULL. */
++	struct funnel_queue_entry *oldest __aligned(L1_CACHE_BYTES);
++
++	/* A dummy entry used to provide the non-NULL invariants above. */
++	struct funnel_queue_entry stub;
++};
++
++int __must_check uds_make_funnel_queue(struct funnel_queue **queue_ptr);
++
++void uds_free_funnel_queue(struct funnel_queue *queue);
++
++/*
++ * Put an entry on the end of the queue.
++ *
++ * The entry pointer must be to the struct funnel_queue_entry embedded in the caller's data
++ * structure. The caller must be able to derive the address of the start of their data structure
++ * from the pointer that passed in here, so every entry in the queue must have the struct
++ * funnel_queue_entry at the same offset within the client's structure.
++ */
++static inline void
++uds_funnel_queue_put(struct funnel_queue *queue, struct funnel_queue_entry *entry)
++{
++	struct funnel_queue_entry *previous;
++
++	/*
++	 * Barrier requirements: All stores relating to the entry ("next" pointer, containing data
++	 * structure fields) must happen before the previous->next store making it visible to the
++	 * consumer. Also, the entry's "next" field initialization to NULL must happen before any
++	 * other producer threads can see the entry (the xchg) and try to update the "next" field.
++	 *
++	 * xchg implements a full barrier.
++	 */
++	WRITE_ONCE(entry->next, NULL);
++	previous = xchg(&queue->newest, entry);
++	/*
++	 * Preemptions between these two statements hide the rest of the queue from the consumer,
++	 * preventing consumption until the following assignment runs.
++	 */
++	WRITE_ONCE(previous->next, entry);
++}
++
++struct funnel_queue_entry *__must_check uds_funnel_queue_poll(struct funnel_queue *queue);
++
++bool __must_check uds_is_funnel_queue_empty(struct funnel_queue *queue);
++
++bool __must_check uds_is_funnel_queue_idle(struct funnel_queue *queue);
++
++#endif /* UDS_FUNNEL_QUEUE_H */
+diff --git a/drivers/md/dm-vdo/request-queue.c b/drivers/md/dm-vdo/request-queue.c
+new file mode 100644
+index 00000000000..058422f44d9
+--- /dev/null
++++ b/drivers/md/dm-vdo/request-queue.c
+@@ -0,0 +1,284 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright Red Hat
++ */
++
++#include "request-queue.h"
++
++#include <linux/atomic.h>
++#include <linux/compiler.h>
++#include <linux/wait.h>
++
++#include "funnel-queue.h"
++#include "logger.h"
++#include "memory-alloc.h"
++#include "uds-threads.h"
++
++/*
++ * This queue will attempt to handle requests in reasonably sized batches instead of reacting
++ * immediately to each new request. The wait time between batches is dynamically adjusted up or
++ * down to try to balance responsiveness against wasted thread run time.
++ *
++ * If the wait time becomes long enough, the queue will become dormant and must be explicitly
++ * awoken when a new request is enqueued. The enqueue operation updates "newest" in the funnel
++ * queue via xchg (which is a memory barrier), and later checks "dormant" to decide whether to do a
++ * wakeup of the worker thread.
++ *
++ * When deciding to go to sleep, the worker thread sets "dormant" and then examines "newest" to
++ * decide if the funnel queue is idle. In dormant mode, the last examination of "newest" before
++ * going to sleep is done inside the wait_event_interruptible() macro, after a point where one or
++ * more memory barriers have been issued. (Preparing to sleep uses spin locks.) Even if the funnel
++ * queue's "next" field update isn't visible yet to make the entry accessible, its existence will
++ * kick the worker thread out of dormant mode and back into timer-based mode.
++ *
++ * Unbatched requests are used to communicate between different zone threads and will also cause
++ * the queue to awaken immediately.
++ */
++
++enum {
++	NANOSECOND = 1,
++	MICROSECOND = 1000 * NANOSECOND,
++	MILLISECOND = 1000 * MICROSECOND,
++	DEFAULT_WAIT_TIME = 20 * MICROSECOND,
++	MINIMUM_WAIT_TIME = DEFAULT_WAIT_TIME / 2,
++	MAXIMUM_WAIT_TIME = MILLISECOND,
++	MINIMUM_BATCH = 32,
++	MAXIMUM_BATCH = 64,
++};
++
++struct uds_request_queue {
++	/* Wait queue for synchronizing producers and consumer */
++	struct wait_queue_head wait_head;
++	/* Function to process a request */
++	uds_request_queue_processor_t *processor;
++	/* Queue of new incoming requests */
++	struct funnel_queue *main_queue;
++	/* Queue of old requests to retry */
++	struct funnel_queue *retry_queue;
++	/* The thread id of the worker thread */
++	struct thread *thread;
++	/* True if the worker was started */
++	bool started;
++	/* When true, requests can be enqueued */
++	bool running;
++	/* A flag set when the worker is waiting without a timeout */
++	atomic_t dormant;
++};
++
++static inline struct uds_request *poll_queues(struct uds_request_queue *queue)
++{
++	struct funnel_queue_entry *entry;
++
++	entry = uds_funnel_queue_poll(queue->retry_queue);
++	if (entry != NULL)
++		return container_of(entry, struct uds_request, queue_link);
++
++	entry = uds_funnel_queue_poll(queue->main_queue);
++	if (entry != NULL)
++		return container_of(entry, struct uds_request, queue_link);
++
++	return NULL;
++}
++
++static inline bool are_queues_idle(struct uds_request_queue *queue)
++{
++	return uds_is_funnel_queue_idle(queue->retry_queue) &&
++	       uds_is_funnel_queue_idle(queue->main_queue);
++}
++
++/*
++ * Determine if there is a next request to process, and return it if there is. Also return flags
++ * indicating whether the worker thread can sleep (for the use of wait_event() macros) and whether
++ * the thread did sleep before returning a new request.
++ */
++static inline bool dequeue_request(struct uds_request_queue *queue,
++				   struct uds_request **request_ptr,
++				   bool *waited_ptr)
++{
++	struct uds_request *request = poll_queues(queue);
++
++	if (request != NULL) {
++		*request_ptr = request;
++		return true;
++	}
++
++	if (!READ_ONCE(queue->running)) {
++		/* Wake the worker thread so it can exit. */
++		*request_ptr = NULL;
++		return true;
++	}
++
++	*request_ptr = NULL;
++	*waited_ptr = true;
++	return false;
++}
++
++static void wait_for_request(struct uds_request_queue *queue,
++			     bool dormant,
++			     unsigned long timeout,
++			     struct uds_request **request,
++			     bool *waited)
++{
++	if (dormant) {
++		wait_event_interruptible(queue->wait_head,
++					 (dequeue_request(queue, request, waited) ||
++					  !are_queues_idle(queue)));
++		return;
++	}
++
++	wait_event_interruptible_hrtimeout(queue->wait_head,
++					   dequeue_request(queue, request, waited),
++					   ns_to_ktime(timeout));
++}
++
++static void request_queue_worker(void *arg)
++{
++	struct uds_request_queue *queue = (struct uds_request_queue *) arg;
++	struct uds_request *request = NULL;
++	unsigned long time_batch = DEFAULT_WAIT_TIME;
++	bool dormant = atomic_read(&queue->dormant);
++	bool waited = false;
++	long current_batch = 0;
++
++	for (;;) {
++		wait_for_request(queue, dormant, time_batch, &request, &waited);
++		if (likely(request != NULL)) {
++			current_batch++;
++			queue->processor(request);
++		} else if (!READ_ONCE(queue->running)) {
++			break;
++		}
++
++		if (dormant) {
++			/*
++			 * The queue has been roused from dormancy. Clear the flag so enqueuers can
++			 * stop broadcasting. No fence is needed for this transition.
++			 */
++			atomic_set(&queue->dormant, false);
++			dormant = false;
++			time_batch = DEFAULT_WAIT_TIME;
++		} else if (waited) {
++			/*
++			 * We waited for this request to show up. Adjust the wait time to smooth
++			 * out the batch size.
++			 */
++			if (current_batch < MINIMUM_BATCH) {
++				/*
++				 * If the last batch of requests was too small, increase the wait
++				 * time.
++				 */
++				time_batch += time_batch / 4;
++				if (time_batch >= MAXIMUM_WAIT_TIME) {
++					atomic_set(&queue->dormant, true);
++					dormant = true;
++				}
++			} else if (current_batch > MAXIMUM_BATCH) {
++				/*
++				 * If the last batch of requests was too large, decrease the wait
++				 * time.
++				 */
++				time_batch -= time_batch / 4;
++				if (time_batch < MINIMUM_WAIT_TIME)
++					time_batch = MINIMUM_WAIT_TIME;
++			}
++			current_batch = 0;
++		}
++	}
++
++	/*
++	 * Ensure that we process any remaining requests that were enqueued before trying to shut
++	 * down. The corresponding write barrier is in uds_request_queue_finish().
++	 */
++	smp_rmb();
++	while ((request = poll_queues(queue)) != NULL)
++		queue->processor(request);
++}
++
++int uds_make_request_queue(const char *queue_name,
++			   uds_request_queue_processor_t *processor,
++			   struct uds_request_queue **queue_ptr)
++{
++	int result;
++	struct uds_request_queue *queue;
++
++	result = UDS_ALLOCATE(1, struct uds_request_queue, __func__, &queue);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	queue->processor = processor;
++	queue->running = true;
++	atomic_set(&queue->dormant, false);
++	init_waitqueue_head(&queue->wait_head);
++
++	result = uds_make_funnel_queue(&queue->main_queue);
++	if (result != UDS_SUCCESS) {
++		uds_request_queue_finish(queue);
++		return result;
++	}
++
++	result = uds_make_funnel_queue(&queue->retry_queue);
++	if (result != UDS_SUCCESS) {
++		uds_request_queue_finish(queue);
++		return result;
++	}
++
++	result = uds_create_thread(request_queue_worker, queue, queue_name, &queue->thread);
++	if (result != UDS_SUCCESS) {
++		uds_request_queue_finish(queue);
++		return result;
++	}
++
++	queue->started = true;
++	*queue_ptr = queue;
++	return UDS_SUCCESS;
++}
++
++static inline void wake_up_worker(struct uds_request_queue *queue)
++{
++	if (wq_has_sleeper(&queue->wait_head))
++		wake_up(&queue->wait_head);
++}
++
++void uds_request_queue_enqueue(struct uds_request_queue *queue, struct uds_request *request)
++{
++	struct funnel_queue *sub_queue;
++	bool unbatched = request->unbatched;
++
++	sub_queue = request->requeued ? queue->retry_queue : queue->main_queue;
++	uds_funnel_queue_put(sub_queue, &request->queue_link);
++
++	/*
++	 * We must wake the worker thread when it is dormant. A read fence isn't needed here since
++	 * we know the queue operation acts as one.
++	 */
++	if (atomic_read(&queue->dormant) || unbatched)
++		wake_up_worker(queue);
++}
++
++void uds_request_queue_finish(struct uds_request_queue *queue)
++{
++	int result;
++
++	if (queue == NULL)
++		return;
++
++	/*
++	 * This memory barrier ensures that any requests we queued will be seen. The point is that
++	 * when dequeue_request() sees the following update to the running flag, it will also be
++	 * able to see any change we made to a next field in the funnel queue entry. The
++	 * corresponding read barrier is in request_queue_worker().
++	 */
++	smp_wmb();
++	WRITE_ONCE(queue->running, false);
++
++	if (queue->started) {
++		wake_up_worker(queue);
++		result = uds_join_threads(queue->thread);
++		if (result != UDS_SUCCESS)
++			uds_log_warning_strerror(result, "Failed to join worker thread");
++	}
++
++	uds_free_funnel_queue(queue->main_queue);
++	uds_free_funnel_queue(queue->retry_queue);
++	UDS_FREE(queue);
++}
+diff --git a/drivers/md/dm-vdo/request-queue.h b/drivers/md/dm-vdo/request-queue.h
+new file mode 100644
+index 00000000000..e736072b35a
+--- /dev/null
++++ b/drivers/md/dm-vdo/request-queue.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright Red Hat
++ */
++
++#ifndef UDS_REQUEST_QUEUE_H
++#define UDS_REQUEST_QUEUE_H
++
++#include "uds.h"
++
++/*
++ * A simple request queue which will handle new requests in the order in which they are received,
++ * and will attempt to handle requeued requests before new ones. However, the nature of the
++ * implementation means that it cannot guarantee this ordering; the prioritization is merely a
++ * hint.
++ */
++
++struct uds_request_queue;
++
++typedef void uds_request_queue_processor_t(struct uds_request *);
++
++int __must_check uds_make_request_queue(const char *queue_name,
++					uds_request_queue_processor_t *processor,
++					struct uds_request_queue **queue_ptr);
++
++void uds_request_queue_enqueue(struct uds_request_queue *queue, struct uds_request *request);
++
++void uds_request_queue_finish(struct uds_request_queue *queue);
++
++#endif /* UDS_REQUEST_QUEUE_H */
+diff --git a/drivers/md/dm-vdo/work-queue.c b/drivers/md/dm-vdo/work-queue.c
+new file mode 100644
+index 00000000000..ecb0c345d4f
+--- /dev/null
++++ b/drivers/md/dm-vdo/work-queue.c
+@@ -0,0 +1,659 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright Red Hat
++ */
++
++#include "work-queue.h"
++
++#include <linux/atomic.h>
++#include <linux/cache.h>
++#include <linux/completion.h>
++#include <linux/err.h>
++#include <linux/kthread.h>
++#include <linux/percpu.h>
++
++#include "funnel-queue.h"
++#include "logger.h"
++#include "memory-alloc.h"
++#include "numeric.h"
++#include "permassert.h"
++#include "string-utils.h"
++
++#include "completion.h"
++#include "status-codes.h"
++
++static DEFINE_PER_CPU(unsigned int, service_queue_rotor);
++
++/**
++ * DOC: Work queue definition.
++ *
++ * There are two types of work queues: simple, with one worker thread, and round-robin, which uses
++ * a group of the former to do the work, and assigns work to them in round-robin fashion (roughly).
++ * Externally, both are represented via the same common sub-structure, though there's actually not
++ * a great deal of overlap between the two types internally.
++ */
++struct vdo_work_queue {
++	/* Name of just the work queue (e.g., "cpuQ12") */
++	char *name;
++	bool round_robin_mode;
++	struct vdo_thread *owner;
++	/* Life cycle functions, etc */
++	const struct vdo_work_queue_type *type;
++};
++
++struct simple_work_queue {
++	struct vdo_work_queue common;
++	struct funnel_queue *priority_lists[VDO_WORK_Q_MAX_PRIORITY + 1];
++	void *private;
++
++	/*
++	 * The fields above are unchanged after setup but often read, and are good candidates for
++	 * caching -- and if the max priority is 2, just fit in one x86-64 cache line if aligned.
++	 * The fields below are often modified as we sleep and wake, so we want a separate cache
++	 * line for performance.
++	 */
++
++	/* Any (0 or 1) worker threads waiting for new work to do */
++	wait_queue_head_t waiting_worker_threads ____cacheline_aligned;
++	/* Hack to reduce wakeup calls if the worker thread is running */
++	atomic_t idle;
++
++	/* These are infrequently used so in terms of performance we don't care where they land. */
++	struct task_struct *thread;
++	/* Notify creator once worker has initialized */
++	struct completion *started;
++};
++
++struct round_robin_work_queue {
++	struct vdo_work_queue common;
++	struct simple_work_queue **service_queues;
++	unsigned int num_service_queues;
++};
++
++static inline struct simple_work_queue *as_simple_work_queue(struct vdo_work_queue *queue)
++{
++	return ((queue == NULL) ? NULL : container_of(queue, struct simple_work_queue, common));
++}
++
++static inline struct round_robin_work_queue *
++as_round_robin_work_queue(struct vdo_work_queue *queue)
++{
++	return ((queue == NULL) ?
++		 NULL :
++		 container_of(queue, struct round_robin_work_queue, common));
++}
++
++/* Processing normal completions. */
++
++/*
++ * Dequeue and return the next waiting completion, if any.
++ *
++ * We scan the funnel queues from highest priority to lowest, once; there is therefore a race
++ * condition where a high-priority completion can be enqueued followed by a lower-priority one, and
++ * we'll grab the latter (but we'll catch the high-priority item on the next call). If strict
++ * enforcement of priorities becomes necessary, this function will need fixing.
++ */
++static struct vdo_completion *poll_for_completion(struct simple_work_queue *queue)
++{
++	int i;
++
++	for (i = queue->common.type->max_priority; i >= 0; i--) {
++		struct funnel_queue_entry *link = uds_funnel_queue_poll(queue->priority_lists[i]);
++
++		if (link != NULL)
++			return container_of(link, struct vdo_completion, work_queue_entry_link);
++	}
++
++	return NULL;
++}
++
++static void
++enqueue_work_queue_completion(struct simple_work_queue *queue, struct vdo_completion *completion)
++{
++	ASSERT_LOG_ONLY(completion->my_queue == NULL,
++			"completion %px (fn %px) to enqueue (%px) is not already queued (%px)",
++			completion,
++			completion->callback,
++			queue,
++			completion->my_queue);
++	if (completion->priority == VDO_WORK_Q_DEFAULT_PRIORITY)
++		completion->priority = queue->common.type->default_priority;
++
++	if (ASSERT(completion->priority <= queue->common.type->max_priority,
++		   "priority is in range for queue") != VDO_SUCCESS)
++		completion->priority = 0;
++
++	completion->my_queue = &queue->common;
++
++	/* Funnel queue handles the synchronization for the put. */
++	uds_funnel_queue_put(queue->priority_lists[completion->priority],
++			     &completion->work_queue_entry_link);
++
++	/*
++	 * Due to how funnel queue synchronization is handled (just atomic operations), the
++	 * simplest safe implementation here would be to wake-up any waiting threads after
++	 * enqueueing each item. Even if the funnel queue is not empty at the time of adding an
++	 * item to the queue, the consumer thread may not see this since it is not guaranteed to
++	 * have the same view of the queue as a producer thread.
++	 *
++	 * However, the above is wasteful so instead we attempt to minimize the number of thread
++	 * wakeups. Using an idle flag, and careful ordering using memory barriers, we should be
++	 * able to determine when the worker thread might be asleep or going to sleep. We use
++	 * cmpxchg to try to take ownership (vs other producer threads) of the responsibility for
++	 * waking the worker thread, so multiple wakeups aren't tried at once.
++	 *
++	 * This was tuned for some x86 boxes that were handy; it's untested whether doing the read
++	 * first is any better or worse for other platforms, even other x86 configurations.
++	 */
++	smp_mb();
++	if ((atomic_read(&queue->idle) != 1) || (atomic_cmpxchg(&queue->idle, 1, 0) != 1))
++		return;
++
++	/* There's a maximum of one thread in this list. */
++	wake_up(&queue->waiting_worker_threads);
++}
++
++static void run_start_hook(struct simple_work_queue *queue)
++{
++	if (queue->common.type->start != NULL)
++		queue->common.type->start(queue->private);
++}
++
++static void run_finish_hook(struct simple_work_queue *queue)
++{
++	if (queue->common.type->finish != NULL)
++		queue->common.type->finish(queue->private);
++}
++
++/*
++ * Wait for the next completion to process, or until kthread_should_stop indicates that it's time
++ * for us to shut down.
++ *
++ * If kthread_should_stop says it's time to stop but we have pending completions return a
++ * completion.
++ *
++ * Also update statistics relating to scheduler interactions.
++ */
++static struct vdo_completion *wait_for_next_completion(struct simple_work_queue *queue)
++{
++	struct vdo_completion *completion;
++	DEFINE_WAIT(wait);
++
++	while (true) {
++		prepare_to_wait(&queue->waiting_worker_threads, &wait, TASK_INTERRUPTIBLE);
++		/*
++		 * Don't set the idle flag until a wakeup will not be lost.
++		 *
++		 * Force synchronization between setting the idle flag and checking the funnel
++		 * queue; the producer side will do them in the reverse order. (There's still a
++		 * race condition we've chosen to allow, because we've got a timeout below that
++		 * unwedges us if we hit it, but this may narrow the window a little.)
++		 */
++		atomic_set(&queue->idle, 1);
++		smp_mb(); /* store-load barrier between "idle" and funnel queue */
++
++		completion = poll_for_completion(queue);
++		if (completion != NULL)
++			break;
++
++		/*
++		 * We need to check for thread-stop after setting TASK_INTERRUPTIBLE state up
++		 * above. Otherwise, schedule() will put the thread to sleep and might miss a
++		 * wakeup from kthread_stop() call in vdo_finish_work_queue().
++		 */
++		if (kthread_should_stop())
++			break;
++
++		schedule();
++
++		/*
++		 * Most of the time when we wake, it should be because there's work to do. If it
++		 * was a spurious wakeup, continue looping.
++		 */
++		completion = poll_for_completion(queue);
++		if (completion != NULL)
++			break;
++	}
++
++	finish_wait(&queue->waiting_worker_threads, &wait);
++	atomic_set(&queue->idle, 0);
++
++	return completion;
++}
++
++static void process_completion(struct simple_work_queue *queue, struct vdo_completion *completion)
++{
++	if (ASSERT(completion->my_queue == &queue->common,
++		   "completion %px from queue %px marked as being in this queue (%px)",
++		   completion,
++		   queue,
++		   completion->my_queue) == UDS_SUCCESS)
++		completion->my_queue = NULL;
++
++	vdo_run_completion(completion);
++}
++
++static void service_work_queue(struct simple_work_queue *queue)
++{
++	run_start_hook(queue);
++
++	while (true) {
++		struct vdo_completion *completion = poll_for_completion(queue);
++
++		if (completion == NULL)
++			completion = wait_for_next_completion(queue);
++
++		if (completion == NULL)
++			/* No completions but kthread_should_stop() was triggered. */
++			break;
++
++		process_completion(queue, completion);
++
++		/*
++		 * Be friendly to a CPU that has other work to do, if the kernel has told us to.
++		 * This speeds up some performance tests; that "other work" might include other VDO
++		 * threads.
++		 */
++		if (need_resched())
++			cond_resched();
++	}
++
++	run_finish_hook(queue);
++}
++
++static int work_queue_runner(void *ptr)
++{
++	struct simple_work_queue *queue = ptr;
++
++	complete(queue->started);
++	service_work_queue(queue);
++	return 0;
++}
++
++/* Creation & teardown */
++
++static void free_simple_work_queue(struct simple_work_queue *queue)
++{
++	unsigned int i;
++
++	for (i = 0; i <= VDO_WORK_Q_MAX_PRIORITY; i++)
++		uds_free_funnel_queue(queue->priority_lists[i]);
++	UDS_FREE(queue->common.name);
++	UDS_FREE(queue);
++}
++
++static void free_round_robin_work_queue(struct round_robin_work_queue *queue)
++{
++	struct simple_work_queue **queue_table = queue->service_queues;
++	unsigned int count = queue->num_service_queues;
++	unsigned int i;
++
++	queue->service_queues = NULL;
++
++	for (i = 0; i < count; i++)
++		free_simple_work_queue(queue_table[i]);
++	UDS_FREE(queue_table);
++	UDS_FREE(queue->common.name);
++	UDS_FREE(queue);
++}
++
++void vdo_free_work_queue(struct vdo_work_queue *queue)
++{
++	if (queue == NULL)
++		return;
++
++	vdo_finish_work_queue(queue);
++
++	if (queue->round_robin_mode)
++		free_round_robin_work_queue(as_round_robin_work_queue(queue));
++	else
++		free_simple_work_queue(as_simple_work_queue(queue));
++}
++
++static int make_simple_work_queue(const char *thread_name_prefix,
++				  const char *name,
++				  struct vdo_thread *owner,
++				  void *private,
++				  const struct vdo_work_queue_type *type,
++				  struct simple_work_queue **queue_ptr)
++{
++	DECLARE_COMPLETION_ONSTACK(started);
++	struct simple_work_queue *queue;
++	int i;
++	struct task_struct *thread = NULL;
++	int result;
++
++	ASSERT_LOG_ONLY((type->max_priority <= VDO_WORK_Q_MAX_PRIORITY),
++			"queue priority count %u within limit %u",
++			type->max_priority,
++			VDO_WORK_Q_MAX_PRIORITY);
++
++	result = UDS_ALLOCATE(1, struct simple_work_queue, "simple work queue", &queue);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	queue->private = private;
++	queue->started = &started;
++	queue->common.type = type;
++	queue->common.owner = owner;
++	init_waitqueue_head(&queue->waiting_worker_threads);
++
++	result = uds_duplicate_string(name, "queue name", &queue->common.name);
++	if (result != VDO_SUCCESS) {
++		UDS_FREE(queue);
++		return -ENOMEM;
++	}
++
++	for (i = 0; i <= type->max_priority; i++) {
++		result = uds_make_funnel_queue(&queue->priority_lists[i]);
++		if (result != UDS_SUCCESS) {
++			free_simple_work_queue(queue);
++			return result;
++		}
++	}
++
++	thread = kthread_run(work_queue_runner,
++			     queue,
++			     "%s:%s",
++			     thread_name_prefix,
++			     queue->common.name);
++	if (IS_ERR(thread)) {
++		free_simple_work_queue(queue);
++		return (int) PTR_ERR(thread);
++	}
++
++	queue->thread = thread;
++
++	/*
++	 * If we don't wait to ensure the thread is running VDO code, a quick kthread_stop (due to
++	 * errors elsewhere) could cause it to never get as far as running VDO, skipping the
++	 * cleanup code.
++	 *
++	 * Eventually we should just make that path safe too, and then we won't need this
++	 * synchronization.
++	 */
++	wait_for_completion(&started);
++
++	*queue_ptr = queue;
++	return UDS_SUCCESS;
++}
++
++/**
++ * vdo_make_work_queue() - Create a work queue; if multiple threads are requested, completions will
++ *                         be distributed to them in round-robin fashion.
++ *
++ * Each queue is associated with a struct vdo_thread which has a single vdo thread id. Regardless
++ * of the actual number of queues and threads allocated here, code outside of the queue
++ * implementation will treat this as a single zone.
++ */
++int vdo_make_work_queue(const char *thread_name_prefix,
++			const char *name,
++			struct vdo_thread *owner,
++			const struct vdo_work_queue_type *type,
++			unsigned int thread_count,
++			void *thread_privates[],
++			struct vdo_work_queue **queue_ptr)
++{
++	struct round_robin_work_queue *queue;
++	int result;
++	char thread_name[TASK_COMM_LEN];
++	unsigned int i;
++
++	if (thread_count == 1) {
++		struct simple_work_queue *simple_queue;
++		void *context = ((thread_privates != NULL) ? thread_privates[0] : NULL);
++
++		result = make_simple_work_queue(thread_name_prefix,
++						name,
++						owner,
++						context,
++						type,
++						&simple_queue);
++		if (result == VDO_SUCCESS)
++			*queue_ptr = &simple_queue->common;
++		return result;
++	}
++
++	result = UDS_ALLOCATE(1, struct round_robin_work_queue, "round-robin work queue", &queue);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(thread_count,
++			      struct simple_work_queue *,
++			      "subordinate work queues",
++			      &queue->service_queues);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(queue);
++		return result;
++	}
++
++	queue->num_service_queues = thread_count;
++	queue->common.round_robin_mode = true;
++	queue->common.owner = owner;
++
++	result = uds_duplicate_string(name, "queue name", &queue->common.name);
++	if (result != VDO_SUCCESS) {
++		UDS_FREE(queue->service_queues);
++		UDS_FREE(queue);
++		return -ENOMEM;
++	}
++
++	*queue_ptr = &queue->common;
++
++	for (i = 0; i < thread_count; i++) {
++		void *context = ((thread_privates != NULL) ? thread_privates[i] : NULL);
++
++		snprintf(thread_name, sizeof(thread_name), "%s%u", name, i);
++		result = make_simple_work_queue(thread_name_prefix,
++						thread_name,
++						owner,
++						context,
++						type,
++						&queue->service_queues[i]);
++		if (result != VDO_SUCCESS) {
++			queue->num_service_queues = i;
++			/* Destroy previously created subordinates. */
++			vdo_free_work_queue(UDS_FORGET(*queue_ptr));
++			return result;
++		}
++	}
++
++	return VDO_SUCCESS;
++}
++
++static void finish_simple_work_queue(struct simple_work_queue *queue)
++{
++	if (queue->thread == NULL)
++		return;
++
++	/* Tells the worker thread to shut down and waits for it to exit. */
++	kthread_stop(queue->thread);
++	queue->thread = NULL;
++}
++
++static void finish_round_robin_work_queue(struct round_robin_work_queue *queue)
++{
++	struct simple_work_queue **queue_table = queue->service_queues;
++	unsigned int count = queue->num_service_queues;
++	unsigned int i;
++
++	for (i = 0; i < count; i++)
++		finish_simple_work_queue(queue_table[i]);
++}
++
++/* No enqueueing of completions should be done once this function is called. */
++void vdo_finish_work_queue(struct vdo_work_queue *queue)
++{
++	if (queue == NULL)
++		return;
++
++	if (queue->round_robin_mode)
++		finish_round_robin_work_queue(as_round_robin_work_queue(queue));
++	else
++		finish_simple_work_queue(as_simple_work_queue(queue));
++}
++
++/* Debugging dumps */
++
++static void dump_simple_work_queue(struct simple_work_queue *queue)
++{
++	const char *thread_status = "no threads";
++	char task_state_report = '-';
++
++	if (queue->thread != NULL) {
++		task_state_report = task_state_to_char(queue->thread);
++		thread_status = atomic_read(&queue->idle) ? "idle" : "running";
++	}
++
++	uds_log_info("workQ %px (%s) %s (%c)",
++		     &queue->common,
++		     queue->common.name,
++		     thread_status,
++		     task_state_report);
++
++	/* ->waiting_worker_threads wait queue status? anyone waiting? */
++}
++
++/*
++ * Write to the buffer some info about the completion, for logging. Since the common use case is
++ * dumping info about a lot of completions to syslog all at once, the format favors brevity over
++ * readability.
++ */
++void vdo_dump_work_queue(struct vdo_work_queue *queue)
++{
++	if (queue->round_robin_mode) {
++		struct round_robin_work_queue *round_robin = as_round_robin_work_queue(queue);
++		unsigned int i;
++
++		for (i = 0; i < round_robin->num_service_queues; i++)
++			dump_simple_work_queue(round_robin->service_queues[i]);
++	} else {
++		dump_simple_work_queue(as_simple_work_queue(queue));
++	}
++}
++
++static void get_function_name(void *pointer, char *buffer, size_t buffer_length)
++{
++	if (pointer == NULL) {
++		/*
++		 * Format "%ps" logs a null pointer as "(null)" with a bunch of leading spaces. We
++		 * sometimes use this when logging lots of data; don't be so verbose.
++		 */
++		strncpy(buffer, "-", buffer_length);
++	} else {
++		/*
++		 * Use a pragma to defeat gcc's format checking, which doesn't understand that
++		 * "%ps" actually does support a precision spec in Linux kernel code.
++		 */
++		char *space;
++
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat"
++		snprintf(buffer, buffer_length, "%.*ps", buffer_length - 1, pointer);
++#pragma GCC diagnostic pop
++
++		space = strchr(buffer, ' ');
++		if (space != NULL)
++			*space = '\0';
++	}
++}
++
++void vdo_dump_completion_to_buffer(struct vdo_completion *completion, char *buffer, size_t length)
++{
++	size_t current_length =
++		scnprintf(buffer,
++			  length,
++			  "%.*s/",
++			  TASK_COMM_LEN,
++			  (completion->my_queue == NULL ? "-" : completion->my_queue->name));
++
++	if (current_length < length)
++		get_function_name((void *) completion->callback,
++				  buffer + current_length,
++				  length - current_length);
++}
++
++/* Completion submission */
++/*
++ * If the completion has a timeout that has already passed, the timeout handler function may be
++ * invoked by this function.
++ */
++void vdo_enqueue_work_queue(struct vdo_work_queue *queue, struct vdo_completion *completion)
++{
++	/*
++	 * Convert the provided generic vdo_work_queue to the simple_work_queue to actually queue
++	 * on.
++	 */
++	struct simple_work_queue *simple_queue = NULL;
++
++	if (!queue->round_robin_mode) {
++		simple_queue = as_simple_work_queue(queue);
++	} else {
++		struct round_robin_work_queue *round_robin = as_round_robin_work_queue(queue);
++
++		/*
++		 * It shouldn't be a big deal if the same rotor gets used for multiple work queues.
++		 * Any patterns that might develop are likely to be disrupted by random ordering of
++		 * multiple completions and migration between cores, unless the load is so light as
++		 * to be regular in ordering of tasks and the threads are confined to individual
++		 * cores; with a load that light we won't care.
++		 */
++		unsigned int rotor = this_cpu_inc_return(service_queue_rotor);
++		unsigned int index = rotor % round_robin->num_service_queues;
++
++		simple_queue = round_robin->service_queues[index];
++	}
++
++	enqueue_work_queue_completion(simple_queue, completion);
++}
++
++/* Misc */
++
++/*
++ * Return the work queue pointer recorded at initialization time in the work-queue stack handle
++ * initialized on the stack of the current thread, if any.
++ */
++static struct simple_work_queue *get_current_thread_work_queue(void)
++{
++	/*
++	 * In interrupt context, if a vdo thread is what got interrupted, the calls below will find
++	 * the queue for the thread which was interrupted. However, the interrupted thread may have
++	 * been processing a completion, in which case starting to process another would violate
++	 * our concurrency assumptions.
++	 */
++	if (in_interrupt())
++		return NULL;
++	if (kthread_func(current) != work_queue_runner)
++		/* Not a VDO work queue thread. */
++		return NULL;
++	return kthread_data(current);
++}
++
++struct vdo_work_queue *vdo_get_current_work_queue(void)
++{
++	struct simple_work_queue *queue = get_current_thread_work_queue();
++
++	return (queue == NULL) ? NULL : &queue->common;
++}
++
++struct vdo_thread *vdo_get_work_queue_owner(struct vdo_work_queue *queue)
++{
++	return queue->owner;
++}
++
++/**
++ * vdo_get_work_queue_private_data() - Returns the private data for the current thread's work
++ *                                     queue, or NULL if none or if the current thread is not a
++ *                                     work queue thread.
++ */
++void *vdo_get_work_queue_private_data(void)
++{
++	struct simple_work_queue *queue = get_current_thread_work_queue();
++
++	return (queue != NULL) ? queue->private : NULL;
++}
++
++bool vdo_work_queue_type_is(struct vdo_work_queue *queue, const struct vdo_work_queue_type *type)
++{
++	return (queue->type == type);
++}
+diff --git a/drivers/md/dm-vdo/work-queue.h b/drivers/md/dm-vdo/work-queue.h
+new file mode 100644
+index 00000000000..d1e05f8901d
+--- /dev/null
++++ b/drivers/md/dm-vdo/work-queue.h
+@@ -0,0 +1,53 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright Red Hat
++ */
++
++#ifndef VDO_WORK_QUEUE_H
++#define VDO_WORK_QUEUE_H
++
++#include <linux/sched.h> /* for TASK_COMM_LEN */
++
++#include "types.h"
++
++enum {
++	MAX_VDO_WORK_QUEUE_NAME_LEN = TASK_COMM_LEN,
++};
++
++struct vdo_work_queue_type {
++	void (*start)(void *context);
++	void (*finish)(void *context);
++	enum vdo_completion_priority max_priority;
++	enum vdo_completion_priority default_priority;
++};
++
++struct vdo_completion;
++struct vdo_thread;
++struct vdo_work_queue;
++
++int vdo_make_work_queue(const char *thread_name_prefix,
++			const char *name,
++			struct vdo_thread *owner,
++			const struct vdo_work_queue_type *type,
++			unsigned int thread_count,
++			void *thread_privates[],
++			struct vdo_work_queue **queue_ptr);
++
++void vdo_enqueue_work_queue(struct vdo_work_queue *queue, struct vdo_completion *completion);
++
++void vdo_finish_work_queue(struct vdo_work_queue *queue);
++
++void vdo_free_work_queue(struct vdo_work_queue *queue);
++
++void vdo_dump_work_queue(struct vdo_work_queue *queue);
++
++void vdo_dump_completion_to_buffer(struct vdo_completion *completion, char *buffer, size_t length);
++
++void *vdo_get_work_queue_private_data(void);
++struct vdo_work_queue *vdo_get_current_work_queue(void);
++struct vdo_thread *vdo_get_work_queue_owner(struct vdo_work_queue *queue);
++
++bool __must_check
++vdo_work_queue_type_is(struct vdo_work_queue *queue, const struct vdo_work_queue_type *type);
++
++#endif /* VDO_WORK_QUEUE_H */
 -- 
 2.40.1
 
