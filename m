@@ -2,55 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DF0C77B73
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 00:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66728C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 01:01:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235192AbjEWAYi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 May 2023 20:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33910 "EHLO
+        id S234320AbjEWBBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 May 2023 21:01:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235183AbjEVXaH (ORCPT
+        with ESMTP id S234114AbjEWBBB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 May 2023 19:30:07 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B55C188
-        for <linux-block@vger.kernel.org>; Mon, 22 May 2023 16:26:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l4hnCLyKzpkMhMF68lsLPXuEeiW+0JkAbyWRy482BlI=; b=VsF50jYw70MpJdcbLudTsvGWfH
-        iRIDdbxAMCl7If65ru+SlVNiUECnX7XSf6WLz8W2gLdhq4DZHVwY1fYmCblCXreG0opTu07F5Yn9U
-        bekirVl1zIfAVAyX2NxY+CANfhlYW0tnJRDkA4lRL47myo+z6GlIqpDDrTsf63C2JpUpCS5rcvjN6
-        HjR3GFaYmV/L8qlvOZ9G2Cqzj4VM8ZBHeJIeyCfN13E4r8qDRp0Ft1nNlrAR/FGGVt4N4TcvfHsS8
-        A0VxLIfYOLdGPASSuzhCIi/HuHLoZYLdu2KRYmhxYt/BJgWh7aymcCG1Kr1b2mJLgj4ttgciTyRS+
-        6p+3mAyw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q1EvY-008Lgw-0A;
-        Mon, 22 May 2023 23:26:56 +0000
-Date:   Mon, 22 May 2023 16:26:56 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, jyescas@google.com,
-        Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v5 2/9] block: Prepare for supporting sub-page limits
-Message-ID: <ZGv6QPii5j6Cfb3J@bombadil.infradead.org>
-References: <20230522222554.525229-1-bvanassche@acm.org>
- <20230522222554.525229-3-bvanassche@acm.org>
+        Mon, 22 May 2023 21:01:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21AE8E50;
+        Mon, 22 May 2023 17:59:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 95B0E62D48;
+        Tue, 23 May 2023 00:58:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF473C433EF;
+        Tue, 23 May 2023 00:58:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1684803502;
+        bh=Whm3F+BaEDtTHWv5CVbTMbR2wtAjinD7dfq3GQH8gJM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lwQB9AzQgK/gdEKKM3BjL9vPedjDik6d1UA3j5F/gUVmcA8wN4pK0FxwD8hrZBFpD
+         SKekKphgQHbZGR3BXCFtG+nRijmHWxf2ekR3a9OJBY1VFh2txnNztS6MMS6f49Wuvo
+         CxQzevNKCsppfZ1c80xdW0RYFoaB2y5SHyNoFlClxJ4Eeuyrz+7mHV/qqxFjkM0RGb
+         ivnpo6nJiWqvPGzFIVuc+ikjfgKVukjZUyE4prnm+QsEXzv2fPyX4yNxVd7KxYeLfu
+         yUyCJMYsmZOqzgauqffAjwSCZjl4Y/AgGzCG9UmYagDoPkwVW1t0uNbsZv3TXk4HIx
+         yw8TaJ+3FOq6g==
+Date:   Mon, 22 May 2023 17:58:21 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Theodore Ts'o <tytso@mit.edu>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: introduce bdev holder ops and a file system shutdown method v2
+Message-ID: <20230523005821.GF11620@frogsfrogsfrogs>
+References: <20230518042323.663189-1-hch@lst.de>
+ <ZGbYLK0lOqYqPf9O@mit.edu>
+ <20230519041136.GA10931@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230522222554.525229-3-bvanassche@acm.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20230519041136.GA10931@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 22, 2023 at 03:25:34PM -0700, Bart Van Assche wrote:
-> Introduce variables that represent the lower configuration bounds. This
-> patch does not change any functionality.
+On Fri, May 19, 2023 at 06:11:36AM +0200, Christoph Hellwig wrote:
+> On Thu, May 18, 2023 at 10:00:12PM -0400, Theodore Ts'o wrote:
+> > On Thu, May 18, 2023 at 06:23:09AM +0200, Christoph Hellwig wrote:
+> > > Hi all,
+> > > 
+> > > this series fixes the long standing problem that we never had a good way
+> > > to communicate block device events to the user of the block device.
+> > > 
+> > > It fixes this by introducing a new set of holder ops registered at
+> > > blkdev_get_by_* time for the exclusive holder, and then wire that up
+> > > to a shutdown super operation to report the block device remove to the
+> > > file systems.
+> > 
+> > Thanks for working on this!  Is there going to be an fstest which
+> > simulates a device removal while we're running fsstress or some such,
+> > so we can exercise full device removal path?
+> 
+> 
+> So the problem with xfstests is that there isn't really any generic
+> way to remove a block device, and even less so to put it back.
+> 
+> xfstests has some scsi_debug based tests, maybe I can cook something up
+> for that.  My testing has been with nvme, so another option would be
+> to add nvme-loop support to xfstests and use that.  I'll see what I can
+> do.
 
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+Could you make dm-error accept a 'message' telling it to invoke all
+these bdev removal actions?  There's already a bunch of helpers in
+fstests to make that less awful for test authors.
 
-  Luis
+--D
