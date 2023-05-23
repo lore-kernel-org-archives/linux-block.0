@@ -2,92 +2,71 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3321BC7EE26
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 04:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F42C7EE26
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 06:19:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbjEWEi2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 00:38:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56050 "EHLO
+        id S233034AbjEWGTH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 02:19:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjEWEi0 (ORCPT
+        with ESMTP id S234680AbjEWGS4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 00:38:26 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89620109;
-        Mon, 22 May 2023 21:38:22 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 2054E225C8;
-        Tue, 23 May 2023 04:38:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1684816701; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WAYA0NV+vOzsI9Gb5w4I9DHICOPBYPQ7rwX4WOVMFxY=;
-        b=orWFOsUaYIfAXAtwdmh1dofxwrDzPE+/r9LqNcJZ9RQEO1VAr4nUPQsFcu/fF5Lu2aiMD8
-        cWz6g/cQNZ9hyvd8UUA0o1svAHWbmwGi3zBHUjKKEHJmNiWwJodHmyMIAUCpiYzEISlhFX
-        aIwXn/VmKZhFCyoFnlj4uU6PQs7NGto=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1684816701;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WAYA0NV+vOzsI9Gb5w4I9DHICOPBYPQ7rwX4WOVMFxY=;
-        b=zdcwWRMBR8flLtp0EEW+xOHIRxsOwhWPys5qxxUiVRPeFFyqAc+nwnSlFm/2EvmvicxWxy
-        Ck2JXb4sMqlhv3CQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4F0C013588;
-        Tue, 23 May 2023 04:38:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id OKDABzpDbGSMZAAAMHmgww
-        (envelope-from <colyli@suse.de>); Tue, 23 May 2023 04:38:18 +0000
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
-Subject: Re: [PATCH v6 0/7] badblocks improvement for multiple bad block
- ranges
-From:   Coly Li <colyli@suse.de>
-In-Reply-To: <daca108d-4dd3-ecbf-c630-69d4bc2b96c0@huaweicloud.com>
-Date:   Tue, 23 May 2023 12:38:05 +0800
-Cc:     linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
-        linux-raid@vger.kernel.org,
-        Dan Williams <dan.j.williams@intel.com>,
-        Geliang Tang <geliang.tang@suse.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        NeilBrown <neilb@suse.de>, Richard Fan <richard.fan@suse.com>,
-        Vishal L Verma <vishal.l.verma@intel.com>,
-        Wols Lists <antlists@youngman.org.uk>, Xiao Ni <xni@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A43DF8F4-2DEF-4865-B4B4-4B5FBF834678@suse.de>
-References: <20220721121152.4180-1-colyli@suse.de>
- <daca108d-4dd3-ecbf-c630-69d4bc2b96c0@huaweicloud.com>
-To:     Li Nan <linan666@huaweicloud.com>
-X-Mailer: Apple Mail (2.3731.500.231)
+        Tue, 23 May 2023 02:18:56 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2119133;
+        Mon, 22 May 2023 23:18:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=75jy5j4PBNe+Q/HP75wXCzh0bnY+IGGowgZslWgr9Uc=; b=2rh1jdRSlFVWBkmVPPU5nQ1iq3
+        xbzs1IfEBOlhOuBi9W8ZzInbFFOwg1/AtcevFI0qOTS8GVmykhhJrFIQ+SAo//dd5icd+IlZkPk9I
+        /7jaVihTT8EAOamSlgsrnQ3aaQcM+l+j8Yl81taRluURoltYNPmgv/3FPlpONnXGJlHOFfVW4KXi3
+        TOI6G1VbDrXF8wod8vUz5zZ1CZgosjaMDQO/2793RP/H50AwwOHLqmEQZgbbKM9vNFukJNtENPWB2
+        lkXj5OnGM0FcFccweoZgI4SxFxKeas7ax7FNxWf2Du10ByKC7f7Xke6+4VoMDjFaG6gP/4vjfyVmw
+        +Z1Ix6HA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q1LM6-0093sT-0c;
+        Tue, 23 May 2023 06:18:46 +0000
+Date:   Mon, 22 May 2023 23:18:46 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     Serge Hallyn <serge@hallyn.com>, Paul Moore <paul@paul-moore.com>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Eric Paris <eparis@parisplace.org>,
+        Frederick Lawler <fred@cloudflare.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] capability: Introduce CAP_BLOCK_ADMIN
+Message-ID: <ZGxaxnOeadVwb2gR@infradead.org>
+References: <20230511070520.72939-1-tianjia.zhang@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230511070520.72939-1-tianjia.zhang@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, May 11, 2023 at 03:05:18PM +0800, Tianjia Zhang wrote:
+> Separated fine-grained capability CAP_BLOCK_ADMIN from CAP_SYS_ADMIN.
+> For backward compatibility, the CAP_BLOCK_ADMIN capability is included
+> within CAP_SYS_ADMIN.
 
+Splitting out capabilities tends to massivel break userspace.  Don't
+do it.
 
-> 2023=E5=B9=B45=E6=9C=8823=E6=97=A5 10:38=EF=BC=8CLi Nan =
-<linan666@huaweicloud.com> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Hi Coly Li,
->=20
-> Recently, I have been trying to fix the bug of backblocks settings, =
-and I found that your patch series has already fixed the bug. This patch =
-series has not been applied to mainline at present, may I ask if you =
-still plan to continue working on it?
+> CAP_SYS_ADMIN is required in the PR protocol implementation of existing
+> block devices in the Linux kernel, which has too many sensitive
+> permissions, which may lead to risks such as container escape. The
+> kernel needs to provide more fine-grained permission management like
+> CAP_NET_ADMIN to avoid online products directly relying on root to run.
 
-Sure, I will post an update version for your testing.
+I'm pretty sure the PR API can be keyed off just permissions on the
+block device node as nothing in it is fundamentally unsafe.
 
-Coly Li
+Please work on relaxing the permissions checks there.
 
