@@ -2,81 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75639C7EE26
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1A9C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:17:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235429AbjEWJEV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 05:04:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37180 "EHLO
+        id S230082AbjEWJRh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 05:17:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235343AbjEWJEU (ORCPT
+        with ESMTP id S231516AbjEWJRg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 05:04:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FDB8FF
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684832615;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=e1BBioVo29NATKIYtrkCfpyqpTQFfozpEKHQWKglz20=;
-        b=Lo07KydxMNg7mgKxHafpPGlCamtP0sczjr/tZ7ODfQqkTi/QRWDFjF6kkVoXbqEzZI0huj
-        5sNlRSRcxBZbJvoEfpfKk45/xaV5tfAPgA0/UTxDKXdj/0sclsPwddYYAHLdaguObzF+/g
-        H6Pe6SP/O2/kVkOgzHkwVWVonsGrbLU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-_xotZw9bOUut5Esaup4YoA-1; Tue, 23 May 2023 05:03:32 -0400
-X-MC-Unique: _xotZw9bOUut5Esaup4YoA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07D96802E58;
-        Tue, 23 May 2023 09:03:32 +0000 (UTC)
-Received: from ovpn-8-32.pek2.redhat.com (hp-dl380g10-01.lab.eng.pek2.redhat.com [10.73.196.69])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7122E20296C6;
-        Tue, 23 May 2023 09:03:26 +0000 (UTC)
-Date:   Tue, 23 May 2023 17:03:19 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>, ming.lei@redhat.com
-Subject: Re: [PATCH v3 2/7] block: Send requeued requests to the I/O scheduler
-Message-ID: <ZGyBV5W1WxVEzAED@ovpn-8-32.pek2.redhat.com>
-References: <20230522183845.354920-1-bvanassche@acm.org>
- <20230522183845.354920-3-bvanassche@acm.org>
+        Tue, 23 May 2023 05:17:36 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDCB11F
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:17:30 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-96f6a9131fdso659577466b.1
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:17:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=unimore.it; s=google; t=1684833449; x=1687425449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Evdstnt+fZo+xq0sG6n9jZlSoQpDRSGli1+1+HmpUO8=;
+        b=PnYOwJG1++jjnSRLyZ+XXt9gySJkJxjqebKiDUDHBOmCchnmXNB5a+RvVScIuwL967
+         bKh6xKW+Q5cvv1H1fQMTZMH1i+o3YXKmFqQqigbN7MomMz631Mm/0jkOceURgFj7rlIO
+         jNcaq99VWU2YxZVuFkRhYdQq+bbIX2RXbr6jM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684833449; x=1687425449;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Evdstnt+fZo+xq0sG6n9jZlSoQpDRSGli1+1+HmpUO8=;
+        b=RRcCUKPdjqw4yobYyaAeiylHDvVyuabkQdaEl9okkNUPnWm3j1oKlix+j/a9k0y1mK
+         GZ/9RCrWO8Fz3itN/zreZLaDV5YlLq5coRf8TKyBY/BjbGM2xcxPGXH6znsMAEWzEUP/
+         hA+KyglM09nHQUGj2pG2gnh4u9igiR6hwreLJDCEvxQp0eVtZcZWpCPgaqgNvDZqvCad
+         BATq77ADo502e4BusCwUOBfMqSnn5hEpXcssnURa9ZVk3D9v30axzKI7juKanxkQrBtw
+         1821EgFQRrIETa3tyIKViU9T4W1ve0LJVwOXTX46qXHnhEYrmhlJHCpAjOybZBLp1+Wf
+         CMqA==
+X-Gm-Message-State: AC+VfDxQwKrqiNzZmybeK4GuqNdGjEkYKFzR3W2bhJ/tplxsp6sKqDYi
+        8f8JHlGHPW8wmxzTMHAzoLKg
+X-Google-Smtp-Source: ACHHUZ4iT9f9F/0RNORNFfSPrn2dimqu5j+bYxzVynCCaK2bASqNb6PiChUoa5qPNoivkOVDQRPXDA==
+X-Received: by 2002:a17:906:da89:b0:94e:70bb:5f8a with SMTP id xh9-20020a170906da8900b0094e70bb5f8amr11721372ejb.66.1684833448729;
+        Tue, 23 May 2023 02:17:28 -0700 (PDT)
+Received: from MBP-di-Paolo.station (net-93-70-85-51.cust.vodafonedsl.it. [93.70.85.51])
+        by smtp.gmail.com with ESMTPSA id w9-20020aa7dcc9000000b0050bc13e5aa9sm3800762edu.63.2023.05.23.02.17.28
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 May 2023 02:17:28 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@unimore.it>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Paolo Valente <paolo.valente@unimore.it>
+Subject: [PATCH] block, bfq: update Paolo's address in maintainer list
+Date:   Tue, 23 May 2023 11:17:24 +0200
+Message-Id: <20230523091724.26636-1-paolo.valente@unimore.it>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230522183845.354920-3-bvanassche@acm.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 22, 2023 at 11:38:37AM -0700, Bart Van Assche wrote:
-> Send requeued requests to the I/O scheduler such that the I/O scheduler
-> can control the order in which requests are dispatched.
+From: Paolo Valente <paolo.valente@linaro.org>
 
-I guess you are addressing UFS zoned for REQ_OP_WRITE:
+Current email address of Paolo Valente is no longer valid, use a good one.
 
-https://lore.kernel.org/linux-block/8e88b22e-fdf2-5182-02fe-9876e8148947@acm.org/
+Signed-off-by: Paolo Valente <paolo.valente@unimore.it>
+---
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I am wondering how this way can maintain order for zoned write request.
-
-requeued WRITE may happen in any order, for example, req A and req B is
-in order, now req B is requeued first, then follows req A.
-
-So req B is requeued to scheduler first, and issued to LLD, then
-request A is requeued and issued to LLD later, then still re-order?
-
-Or sd_zbc can provide requeue order guarantee? 
-
-Thanks,
-Ming
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ebd26b3ca90e..0c8e6537d6e2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3542,7 +3542,7 @@ F:	Documentation/filesystems/befs.rst
+ F:	fs/befs/
+ 
+ BFQ I/O SCHEDULER
+-M:	Paolo Valente <paolo.valente@linaro.org>
++M:	Paolo Valente <paolo.valente@unimore.it>
+ M:	Jens Axboe <axboe@kernel.dk>
+ L:	linux-block@vger.kernel.org
+ S:	Maintained
+-- 
+2.20.1
 
