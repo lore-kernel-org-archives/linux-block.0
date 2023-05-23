@@ -2,66 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E3BC7EE2E
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D9DC7EE37
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:47:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238683AbjEWVrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 17:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39742 "EHLO
+        id S238682AbjEWVrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 17:47:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238696AbjEWVq7 (ORCPT
+        with ESMTP id S238684AbjEWVrG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 17:46:59 -0400
+        Tue, 23 May 2023 17:47:06 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2A9FA
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA151A6
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684878371;
+        s=mimecast20190719; t=1684878375;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fzAbTlRzB1J3jZ/djzQp4nVjLzXI4QKgpvLkpCG4kEA=;
-        b=MoBXqOLTKsvGBCuWpvTRp9thQMpIx6Sn1+owYaojt3FU033LHrWHCXcCV8eRszWQBxD/qk
-        D8QDq1MC/Y70qK9ImpkKezz9Jr1gOf9jwXjpoDfrAjVa9wRm3dmgfwaTGsKFgQhz2Ixvgt
-        14B0i9kQF/35wKjZcjrefo++blwZDG0=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=D0vmuzRoMzE2NGqd4llx2/H/Zo9s5C7yYyJ92B+xiRo=;
+        b=R8ycc/BMl6Z1XQ4PnVta5jRtJAKZFiccNYfLeMoRLsjcNM5QzBhKB9U0sig+Ss6o/nhppc
+        nNAFyITXavnFb/0p90u3GAximiil4Y53e09wL2oFPpevlwOLXu7zd5u9IbNy4rXkAjaVvO
+        GrdgMtQKnKt4tsu0k+rxbd25942MDvk=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-b1eLAxSdMaWCcrUXIvR-Tw-1; Tue, 23 May 2023 17:46:09 -0400
-X-MC-Unique: b1eLAxSdMaWCcrUXIvR-Tw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-751409cba6dso31316985a.3
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:09 -0700 (PDT)
+ us-mta-519-KjBwsOwZPJKvbK7jZZOW0A-1; Tue, 23 May 2023 17:46:14 -0400
+X-MC-Unique: KjBwsOwZPJKvbK7jZZOW0A-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-75aff1596d3so59557685a.2
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684878369; x=1687470369;
+        d=1e100.net; s=20221208; t=1684878373; x=1687470373;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fzAbTlRzB1J3jZ/djzQp4nVjLzXI4QKgpvLkpCG4kEA=;
-        b=i0S3b/NxWU8tusD0uCHVl8gr0ca+5nVpxBHm7QNsuUg1ZgtBaEDaf4KtPStcGCa+C/
-         cB2JrL7O3v3j4d897ZXL2hcZR3GkpaTBlioR+Zj3PqN/7I/pNjyTVoB4BU/mwAAf9du6
-         jzJbz7EdCkMwoSZKRGSoiiR+Q1J3JyKWT8vBxj7welB58jIy1JL5ydy8hSixpXDKzf9X
-         XYdhH+6jcd3FyTYJHJe/v05yREEyPCJj7YgRgMBQkc7FhUOag47+wrAnkTAVvcb808tS
-         GYJxhRgWI4Nm3M5bl4gTHpX3yjJ6Hs5JA+W1c2yuBLQDPrfyvetE0wgJSugaykwR9G3C
-         MNlQ==
-X-Gm-Message-State: AC+VfDyPbb4mcM0VM35EumvNvraI7ePhR+pIuAHH8Sxtwg7UOTQzTam/
-        14kKql8zObjAP1pDvXl7LUdE+8kTG7CqRpsTiyd3+OZq3ygxJe66ydaDWkbC/ESJS8qqCkunCR1
-        1q8PSBkl3BFYpT6p99NCTA6ZjbduqC/0=
-X-Received: by 2002:a37:654e:0:b0:75b:23a1:41b with SMTP id z75-20020a37654e000000b0075b23a1041bmr5478320qkb.49.1684878367472;
-        Tue, 23 May 2023 14:46:07 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6vJBgs57u2ybS9YETf1/p3peJ/yKlOVCIR7t5J8a85bus5FPMWQFCHfiZhn1cHokAHp/J/+w==
-X-Received: by 2002:a37:654e:0:b0:75b:23a1:41b with SMTP id z75-20020a37654e000000b0075b23a1041bmr5478279qkb.49.1684878366612;
-        Tue, 23 May 2023 14:46:06 -0700 (PDT)
+        bh=D0vmuzRoMzE2NGqd4llx2/H/Zo9s5C7yYyJ92B+xiRo=;
+        b=GV21RPwxkmVhZMcuT4CzRZrEaL8iG6Sdx7cZm9bLMC9k+7EW8dLT8vZycRijwbBJjx
+         9vlWDTHXTQiuhN03kEtNMpkR1DaXLVe6cEaxLC48TaICUbHZbze+4hniT+l1RcTzK/0W
+         JQGGkGn1ph6Uzz6hbJTLRshfq8cVXT6OoqJLbJXhR2KWUEF+nOtEdNkBIzm7WBcONX5l
+         EWnrGiLxhJFJnTidF+mdLFPbNXry/1fEMkfjs30VH+A71lGEONFsoYe0Il6K1o5FL40j
+         6iJSyKw+R9IAU5oXvWc1DEcOodd3AOjhutvVAP9HDePCDbttaTlnB6DvYR/tbVHsGJ/Q
+         FZOQ==
+X-Gm-Message-State: AC+VfDwyl819/dyf5tjeVoiV6PDk4D/lKHyB3j8I/EZEmAnyQGFVe+ed
+        RuYlybQvbcc1ZcfKCrczloD7J/SdFSpy0XFjMCh9+lu6tfcKhDOVlWubzFATcYX7WN++pdoO0Dh
+        xdtSclaaHtHeUCbHq4UjHsgmJKd8vN4A=
+X-Received: by 2002:a05:620a:8193:b0:75b:23a1:3637 with SMTP id ot19-20020a05620a819300b0075b23a13637mr5093116qkn.72.1684878372303;
+        Tue, 23 May 2023 14:46:12 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ63PIcPp3bOz2kb4uH3cCywnCVdtTMeYd6H0d+QtgnrPk7lOAH8fiXbYY6ugWQSVUxPGs7LwQ==
+X-Received: by 2002:a05:620a:8193:b0:75b:23a1:3637 with SMTP id ot19-20020a05620a819300b0075b23a13637mr5093071qkn.72.1684878371309;
+        Tue, 23 May 2023 14:46:11 -0700 (PDT)
 Received: from bf36-1.. (173-166-2-198-newengland.hfc.comcastbusiness.net. [173.166.2.198])
-        by smtp.gmail.com with ESMTPSA id x3-20020ae9e903000000b007592af6fce6sm2234465qkf.43.2023.05.23.14.46.05
+        by smtp.gmail.com with ESMTPSA id x3-20020ae9e903000000b007592af6fce6sm2234465qkf.43.2023.05.23.14.46.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 14:46:06 -0700 (PDT)
+        Tue, 23 May 2023 14:46:10 -0700 (PDT)
 From:   "J. corwin Coburn" <corwin@redhat.com>
 To:     dm-devel@redhat.com, linux-block@vger.kernel.org
 Cc:     vdo-devel@redhat.com, "J. corwin Coburn" <corwin@redhat.com>
-Subject: [PATCH v2 10/39] Add deduplication index storage interface.
-Date:   Tue, 23 May 2023 17:45:10 -0400
-Message-Id: <20230523214539.226387-11-corwin@redhat.com>
+Subject: [PATCH v2 15/39] Implement top-level deduplication index.
+Date:   Tue, 23 May 2023 17:45:15 -0400
+Message-Id: <20230523214539.226387-16-corwin@redhat.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230523214539.226387-1-corwin@redhat.com>
 References: <20230523214539.226387-1-corwin@redhat.com>
@@ -71,2480 +71,2183 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds infrastructure for managing reads and writes to the
-underlying storage layer for the deduplication index. The deduplication
-index uses dm-bufio for all of its reads and writes, so part of this
-infrastructure is managing the various dm-bufio clients required. It also
-adds the buffered reader and buffered writer abstractions, which simplify
-reading and writing metadata structures that span several blocks.
+The top-level deduplication index brings all the earlier components
+together. The top-level index creates the separate zone structures that
+enable the index to handle several requests in parallel, handles
+dispatching requests to the right zones and components, and coordinates
+metadata to ensure that it remain consistent. It also coordinates recovery
+in the event of an unexpected index failure.
 
-This patch also includes structures and utilities for encoding and decoding
-all of the deduplication index metadata, collectively called the index
-layout.
+If sparse caching is enabled, the top-level index also handles the
+coordination required by the sparse chapter index cache, which (unlike most
+index structures) is shared among all zones.
 
 Signed-off-by: J. corwin Coburn <corwin@redhat.com>
 ---
- drivers/md/dm-vdo/index-layout.c | 1775 ++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/index-layout.h |   42 +
- drivers/md/dm-vdo/io-factory.c   |  458 ++++++++
- drivers/md/dm-vdo/io-factory.h   |   66 ++
- drivers/md/dm-vdo/numeric.h      |   78 ++
- 5 files changed, 2419 insertions(+)
- create mode 100644 drivers/md/dm-vdo/index-layout.c
- create mode 100644 drivers/md/dm-vdo/index-layout.h
- create mode 100644 drivers/md/dm-vdo/io-factory.c
- create mode 100644 drivers/md/dm-vdo/io-factory.h
- create mode 100644 drivers/md/dm-vdo/numeric.h
+ drivers/md/dm-vdo/index.c        | 1403 ++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/index.h        |   83 ++
+ drivers/md/dm-vdo/sparse-cache.c |  595 +++++++++++++
+ drivers/md/dm-vdo/sparse-cache.h |   49 ++
+ 4 files changed, 2130 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/index.c
+ create mode 100644 drivers/md/dm-vdo/index.h
+ create mode 100644 drivers/md/dm-vdo/sparse-cache.c
+ create mode 100644 drivers/md/dm-vdo/sparse-cache.h
 
-diff --git a/drivers/md/dm-vdo/index-layout.c b/drivers/md/dm-vdo/index-layout.c
+diff --git a/drivers/md/dm-vdo/index.c b/drivers/md/dm-vdo/index.c
 new file mode 100644
-index 00000000000..df231c037ed
+index 00000000000..64442203d07
 --- /dev/null
-+++ b/drivers/md/dm-vdo/index-layout.c
-@@ -0,0 +1,1775 @@
++++ b/drivers/md/dm-vdo/index.c
+@@ -0,0 +1,1403 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright Red Hat
 + */
 +
-+#include "index-layout.h"
 +
-+#include <linux/random.h>
++#include "index.h"
 +
-+#include "config.h"
++#include "hash-utils.h"
 +#include "logger.h"
 +#include "memory-alloc.h"
-+#include "murmurhash3.h"
-+#include "numeric.h"
-+#include "open-chapter.h"
-+#include "time-utils.h"
-+#include "volume-index.h"
++#include "request-queue.h"
++#include "sparse-cache.h"
++
++static const u64 NO_LAST_SAVE = U64_MAX;
 +
 +/*
-+ * The UDS layout on storage media is divided into a number of fixed-size regions, the sizes of
-+ * which are computed when the index is created. Every header and region begins on 4K block
-+ * boundary. Save regions are further sub-divided into regions of their own.
++ * When searching for deduplication records, the index first searches the volume index, and then
++ * searches the chapter index for the relevant chapter. If the chapter has been fully committed to
++ * storage, the chapter pages are loaded into the page cache. If the chapter has not yet been
++ * committed (either the open chapter or a recently closed one), the index searches the in-memory
++ * representation of the chapter. Finally, if the volume index does not find a record and the index
++ * is sparse, the index will search the sparse cache.
 + *
-+ * Each region has a kind and an instance number. Some kinds only have one instance and therefore
-+ * use RL_SOLE_INSTANCE (-1) as the instance number. The RL_KIND_INDEX used to use instances to
-+ * represent sub-indices; now, however there is only ever one sub-index and therefore one instance.
-+ * The RL_KIND_VOLUME_INDEX uses instances to record which zone is being saved.
++ * The index send two kinds of messages to coordinate between zones: chapter close messages for the
++ * chapter writer, and sparse cache barrier messages for the sparse cache.
 + *
-+ * Every region header has a type and version.
++ * The chapter writer is responsible for committing chapters of records to storage. Since zones can
++ * get different numbers of records, some zones may fall behind others. Each time a zone fills up
++ * its available space in a chapter, it informs the chapter writer that the chapter is complete,
++ * and also informs all other zones that it has closed the chapter. Each other zone will then close
++ * the chapter immediately, regardless of how full it is, in order to minimize skew between zones.
++ * Once every zone has closed the chapter, the chapter writer will commit that chapter to storage.
 + *
-+ *     +-+-+---------+--------+--------+-+
-+ *     | | |   I N D E X  0   101, 0   | |
-+ *     |H|C+---------+--------+--------+S|
-+ *     |D|f| Volume  | Save   | Save   |e|
-+ *     |R|g| Region  | Region | Region |a|
-+ *     | | | 201, -1 | 202, 0 | 202, 1 |l|
-+ *     +-+-+--------+---------+--------+-+
++ * The last zone to close the chapter also removes the oldest chapter from the volume index.
++ * Although that chapter is invalid for zones that have moved on, the existence of the open chapter
++ * means that those zones will never ask the volume index about it. No zone is allowed to get more
++ * than one chapter ahead of any other. If a zone is so far ahead that it tries to close another
++ * chapter before the previous one has been closed by all zones, it is forced to wait.
 + *
-+ * The header contains the encoded region layout table as well as some index configuration data.
-+ * The sub-index region and its subdivisions are maintained in the same table.
++ * The sparse cache relies on having the same set of chapter indexes available to all zones. When a
++ * request wants to add a chapter to the sparse cache, it sends a barrier message to each zone
++ * during the triage stage that acts as a rendezvous. Once every zone has reached the barrier and
++ * paused its operations, the cache membership is changed and each zone is then informed that it
++ * can proceed. More details can be found in the sparse cache documentation.
 + *
-+ * There are two save regions to preserve the old state in case saving the new state is incomplete.
-+ * They are used in alternation. Each save region is further divided into sub-regions.
-+ *
-+ *     +-+-----+------+------+-----+-----+
-+ *     |H| IPM | MI   | MI   |     | OC  |
-+ *     |D|     | zone | zone | ... |     |
-+ *     |R| 301 | 302  | 302  |     | 303 |
-+ *     | | -1  |  0   |  1   |     | -1  |
-+ *     +-+-----+------+------+-----+-----+
-+ *
-+ * The header contains the encoded region layout table as well as index state data for that save.
-+ * Each save also has a unique nonce.
++ * If a sparse cache has only one zone, it will not create a triage queue, but it still needs the
++ * barrier message to change the sparse cache membership, so the index simulates the message by
++ * invoking the handler directly.
 + */
 +
-+enum {
-+	MAGIC_SIZE = 32,
-+	NONCE_INFO_SIZE = 32,
-+	MAX_SAVES = 2,
-+};
-+
-+enum region_kind {
-+	RL_KIND_EMPTY = 0,
-+	RL_KIND_HEADER = 1,
-+	RL_KIND_CONFIG = 100,
-+	RL_KIND_INDEX = 101,
-+	RL_KIND_SEAL = 102,
-+	RL_KIND_VOLUME = 201,
-+	RL_KIND_SAVE = 202,
-+	RL_KIND_INDEX_PAGE_MAP = 301,
-+	RL_KIND_VOLUME_INDEX = 302,
-+	RL_KIND_OPEN_CHAPTER = 303,
-+};
-+
-+/* Some region types are historical and are no longer used. */
-+enum region_type {
-+	RH_TYPE_FREE = 0, /* unused */
-+	RH_TYPE_SUPER = 1,
-+	RH_TYPE_SAVE = 2,
-+	RH_TYPE_CHECKPOINT = 3, /* unused */
-+	RH_TYPE_UNSAVED = 4,
-+};
-+
-+enum {
-+	RL_SOLE_INSTANCE = 65535,
-+};
-+
-+/*
-+ * Super block version 2 is the first released version.
-+ *
-+ * Super block version 3 is the normal version used from RHEL 8.2 onwards.
-+ *
-+ * Super block versions 4 through 6 were incremental development versions and
-+ * are not supported.
-+ *
-+ * Super block version 7 is used for volumes which have been reduced in size by one chapter in
-+ * order to make room to prepend LVM metadata to a volume originally created without lvm. This
-+ * allows the index to retain most its deduplication records.
-+ */
-+enum {
-+	SUPER_VERSION_MINIMUM = 3,
-+	SUPER_VERSION_CURRENT = 3,
-+	SUPER_VERSION_MAXIMUM = 7,
-+};
-+
-+static const u8 LAYOUT_MAGIC[MAGIC_SIZE] = "*ALBIREO*SINGLE*FILE*LAYOUT*001*";
-+static const u64 REGION_MAGIC = 0x416c6252676e3031; /* 'AlbRgn01' */
-+
-+struct region_header {
-+	u64 magic;
-+	u64 region_blocks;
-+	u16 type;
-+	/* Currently always version 1 */
-+	u16 version;
-+	u16 region_count;
-+	u16 payload;
-+};
-+
-+struct layout_region {
-+	u64 start_block;
-+	u64 block_count;
-+	u32 __unused;
-+	u16 kind;
-+	u16 instance;
-+};
-+
-+struct region_table {
-+	size_t encoded_size;
-+	struct region_header header;
-+	struct layout_region regions[];
-+};
-+
-+struct index_save_data {
-+	u64 timestamp;
-+	u64 nonce;
-+	/* Currently always version 1 */
-+	u32 version;
-+	u32 unused__;
-+};
-+
-+struct index_state_version {
-+	s32 signature;
-+	s32 version_id;
-+};
-+
-+static const struct index_state_version INDEX_STATE_VERSION_301 = {
-+	.signature  = -1,
-+	.version_id = 301,
-+};
-+
-+struct index_state_data301 {
-+	struct index_state_version version;
-+	u64 newest_chapter;
-+	u64 oldest_chapter;
-+	u64 last_save;
-+	u32 unused;
-+	u32 padding;
-+};
-+
-+struct index_save_layout {
-+	unsigned int zone_count;
-+	struct layout_region index_save;
-+	struct layout_region header;
-+	struct layout_region index_page_map;
-+	struct layout_region free_space;
-+	struct layout_region volume_index_zones[MAX_ZONES];
-+	struct layout_region open_chapter;
-+	struct index_save_data save_data;
-+	struct index_state_data301 state_data;
-+};
-+
-+struct sub_index_layout {
-+	u64 nonce;
-+	struct layout_region sub_index;
-+	struct layout_region volume;
-+	struct index_save_layout *saves;
-+};
-+
-+struct super_block_data {
-+	u8 magic_label[MAGIC_SIZE];
-+	u8 nonce_info[NONCE_INFO_SIZE];
-+	u64 nonce;
-+	u32 version;
-+	u32 block_size;
-+	u16 index_count;
-+	u16 max_saves;
-+	/* Padding reflects a blank field on permanent storage */
-+	u8 padding[4];
-+	u64 open_chapter_blocks;
-+	u64 page_map_blocks;
-+	u64 volume_offset;
-+	u64 start_offset;
-+};
-+
-+struct index_layout {
-+	struct io_factory *factory;
-+	size_t factory_size;
-+	off_t offset;
-+	struct super_block_data super;
-+	struct layout_region header;
-+	struct layout_region config;
-+	struct sub_index_layout index;
-+	struct layout_region seal;
-+	u64 total_blocks;
-+};
-+
-+struct save_layout_sizes {
-+	unsigned int save_count;
-+	size_t block_size;
-+	u64 volume_blocks;
-+	u64 volume_index_blocks;
-+	u64 page_map_blocks;
-+	u64 open_chapter_blocks;
-+	u64 save_blocks;
-+	u64 sub_index_blocks;
-+	u64 total_blocks;
-+	size_t total_size;
-+};
-+
-+static inline bool is_converted_super_block(struct super_block_data *super)
-+{
-+	return super->version == 7;
-+}
-+
-+static int __must_check compute_sizes(const struct configuration *config,
-+				      struct save_layout_sizes *sls)
-+{
++struct chapter_writer {
++	/* The index to which we belong */
++	struct uds_index *index;
++	/* The thread to do the writing */
++	struct thread *thread;
++	/* The lock protecting the following fields */
++	struct mutex mutex;
++	/* The condition signalled on state changes */
++	struct cond_var cond;
++	/* Set to true to stop the thread */
++	bool stop;
++	/* The result from the most recent write */
 +	int result;
-+	struct geometry *geometry = config->geometry;
++	/* The number of bytes allocated by the chapter writer */
++	size_t memory_size;
++	/* The number of zones which have submitted a chapter for writing */
++	unsigned int zones_to_write;
++	/* Open chapter index used by uds_close_open_chapter() */
++	struct open_chapter_index *open_chapter_index;
++	/* Collated records used by uds_close_open_chapter() */
++	struct uds_volume_record *collated_records;
++	/* The chapters to write (one per zone) */
++	struct open_chapter_zone *chapters[];
++};
 +
-+	memset(sls, 0, sizeof(*sls));
-+	sls->save_count = MAX_SAVES;
-+	sls->block_size = UDS_BLOCK_SIZE;
-+	sls->volume_blocks = geometry->bytes_per_volume / sls->block_size;
-+
-+	result = uds_compute_volume_index_save_blocks(config,
-+						      sls->block_size,
-+						      &sls->volume_index_blocks);
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result, "cannot compute index save size");
-+
-+	sls->page_map_blocks =
-+		DIV_ROUND_UP(uds_compute_index_page_map_save_size(geometry), sls->block_size);
-+	sls->open_chapter_blocks =
-+		DIV_ROUND_UP(uds_compute_saved_open_chapter_size(geometry), sls->block_size);
-+	sls->save_blocks =
-+		1 + (sls->volume_index_blocks + sls->page_map_blocks + sls->open_chapter_blocks);
-+	sls->sub_index_blocks = sls->volume_blocks + (sls->save_count * sls->save_blocks);
-+	sls->total_blocks = 3 + sls->sub_index_blocks;
-+	sls->total_size = sls->total_blocks * sls->block_size;
-+
-+	return UDS_SUCCESS;
-+}
-+
-+int uds_compute_index_size(const struct uds_parameters *parameters, u64 *index_size)
++static bool is_zone_chapter_sparse(const struct index_zone *zone, u64 virtual_chapter)
 +{
-+	int result;
-+	struct configuration *index_config;
-+	struct save_layout_sizes sizes;
-+
-+	if (index_size == NULL) {
-+		uds_log_error("Missing output size pointer");
-+		return -EINVAL;
-+	}
-+
-+	result = uds_make_configuration(parameters, &index_config);
-+	if (result != UDS_SUCCESS) {
-+		uds_log_error_strerror(result, "cannot compute index size");
-+		return uds_map_to_system_error(result);
-+	}
-+
-+	result = compute_sizes(index_config, &sizes);
-+	uds_free_configuration(index_config);
-+	if (result != UDS_SUCCESS)
-+		return uds_map_to_system_error(result);
-+
-+	*index_size = sizes.total_size;
-+	return UDS_SUCCESS;
-+}
-+
-+/* Create unique data using the current time and a pseudorandom number. */
-+static void create_unique_nonce_data(u8 *buffer)
-+{
-+	ktime_t now = current_time_ns(CLOCK_REALTIME);
-+	u32 rand;
-+	size_t offset = 0;
-+
-+	get_random_bytes(&rand, sizeof(u32));
-+	memcpy(buffer + offset, &now, sizeof(now));
-+	offset += sizeof(now);
-+	memcpy(buffer + offset, &rand, sizeof(rand));
-+	offset += sizeof(rand);
-+	while (offset < NONCE_INFO_SIZE) {
-+		size_t len = min(NONCE_INFO_SIZE - offset, offset);
-+
-+		memcpy(buffer + offset, buffer, len);
-+		offset += len;
-+	}
-+}
-+
-+static u64 hash_stuff(u64 start, const void *data, size_t len)
-+{
-+	u32 seed = start ^ (start >> 27);
-+	u8 hash_buffer[16];
-+
-+	murmurhash3_128(data, len, seed, hash_buffer);
-+	return get_unaligned_le64(hash_buffer + 4);
-+}
-+
-+/* Generate a primary nonce from the provided data. */
-+static u64 generate_primary_nonce(const void *data, size_t len)
-+{
-+	return hash_stuff(0xa1b1e0fc, data, len);
-+}
-+
-+/*
-+ * Deterministically generate a secondary nonce from an existing nonce and some arbitrary data by
-+ * hashing the original nonce and the data to produce a new nonce.
-+ */
-+static u64 generate_secondary_nonce(u64 nonce, const void *data, size_t len)
-+{
-+	return hash_stuff(nonce + 1, data, len);
-+}
-+
-+static int __must_check open_layout_reader(struct index_layout *layout,
-+					   struct layout_region *lr,
-+					   off_t offset,
-+					   struct buffered_reader **reader_ptr)
-+{
-+	return uds_make_buffered_reader(layout->factory,
-+					lr->start_block + offset,
-+					lr->block_count,
-+					reader_ptr);
-+}
-+
-+static int open_region_reader(struct index_layout *layout,
-+			      struct layout_region *region,
-+			      struct buffered_reader **reader_ptr)
-+{
-+	return open_layout_reader(layout, region, -layout->super.start_offset, reader_ptr);
-+}
-+
-+static int __must_check open_layout_writer(struct index_layout *layout,
-+					   struct layout_region *lr,
-+					   off_t offset,
-+					   struct buffered_writer **writer_ptr)
-+{
-+	return uds_make_buffered_writer(layout->factory,
-+					lr->start_block + offset,
-+					lr->block_count,
-+					writer_ptr);
-+}
-+
-+static int open_region_writer(struct index_layout *layout,
-+			      struct layout_region *region,
-+			      struct buffered_writer **writer_ptr)
-+{
-+	return open_layout_writer(layout, region, -layout->super.start_offset, writer_ptr);
-+}
-+
-+static void
-+generate_super_block_data(struct save_layout_sizes *sls, struct super_block_data *super)
-+{
-+	memset(super, 0, sizeof(*super));
-+	memcpy(super->magic_label, LAYOUT_MAGIC, MAGIC_SIZE);
-+	create_unique_nonce_data(super->nonce_info);
-+
-+	super->nonce = generate_primary_nonce(super->nonce_info, sizeof(super->nonce_info));
-+	super->version = SUPER_VERSION_CURRENT;
-+	super->block_size = sls->block_size;
-+	super->index_count = 1;
-+	super->max_saves = sls->save_count;
-+	super->open_chapter_blocks = sls->open_chapter_blocks;
-+	super->page_map_blocks = sls->page_map_blocks;
-+	super->volume_offset = 0;
-+	super->start_offset = 0;
-+}
-+
-+static void define_sub_index_nonce(struct index_layout *layout)
-+{
-+	struct sub_index_nonce_data {
-+		u64 offset;
-+		u16 index_id;
-+	};
-+	struct sub_index_layout *sil = &layout->index;
-+	u64 primary_nonce = layout->super.nonce;
-+	u8 buffer[sizeof(struct sub_index_nonce_data)] = { 0 };
-+	size_t offset = 0;
-+
-+	encode_u64_le(buffer, &offset, sil->sub_index.start_block);
-+	encode_u16_le(buffer, &offset, 0);
-+	sil->nonce = generate_secondary_nonce(primary_nonce, buffer, sizeof(buffer));
-+	if (sil->nonce == 0)
-+		sil->nonce = generate_secondary_nonce(~primary_nonce + 1, buffer, sizeof(buffer));
-+}
-+
-+static void
-+setup_sub_index(struct index_layout *layout, u64 start_block, struct save_layout_sizes *sls)
-+{
-+	struct sub_index_layout *sil = &layout->index;
-+	u64 next_block = start_block;
-+	unsigned int i;
-+
-+	sil->sub_index = (struct layout_region) {
-+		.start_block = start_block,
-+		.block_count = sls->sub_index_blocks,
-+		.kind = RL_KIND_INDEX,
-+		.instance = 0,
-+	};
-+
-+	sil->volume = (struct layout_region) {
-+		.start_block = next_block,
-+		.block_count = sls->volume_blocks,
-+		.kind = RL_KIND_VOLUME,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+
-+	next_block += sls->volume_blocks;
-+
-+	for (i = 0; i < sls->save_count; i++) {
-+		sil->saves[i].index_save = (struct layout_region) {
-+			.start_block = next_block,
-+			.block_count = sls->save_blocks,
-+			.kind = RL_KIND_SAVE,
-+			.instance = i,
-+		};
-+
-+		next_block += sls->save_blocks;
-+	}
-+
-+	define_sub_index_nonce(layout);
-+}
-+
-+static void initialize_layout(struct index_layout *layout, struct save_layout_sizes *sls)
-+{
-+	u64 next_block = layout->offset / sls->block_size;
-+
-+	layout->total_blocks = sls->total_blocks;
-+	generate_super_block_data(sls, &layout->super);
-+	layout->header = (struct layout_region) {
-+		.start_block = next_block++,
-+		.block_count = 1,
-+		.kind = RL_KIND_HEADER,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+
-+	layout->config = (struct layout_region) {
-+		.start_block = next_block++,
-+		.block_count = 1,
-+		.kind = RL_KIND_CONFIG,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+
-+	setup_sub_index(layout, next_block, sls);
-+	next_block += sls->sub_index_blocks;
-+
-+	layout->seal = (struct layout_region) {
-+		.start_block = next_block,
-+		.block_count = 1,
-+		.kind = RL_KIND_SEAL,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+}
-+
-+static int __must_check
-+make_index_save_region_table(struct index_save_layout *isl, struct region_table **table_ptr)
-+{
-+	int result;
-+	unsigned int z;
-+	struct region_table *table;
-+	struct layout_region *lr;
-+	u16 region_count;
-+	size_t payload;
-+	size_t type;
-+
-+	if (isl->zone_count > 0) {
-+		/*
-+		 * Normal save regions: header, page map, volume index zones,
-+		 * open chapter, and possibly free space.
-+		 */
-+		region_count = 3 + isl->zone_count;
-+		if (isl->free_space.block_count > 0)
-+			region_count++;
-+
-+		payload = sizeof(isl->save_data) + sizeof(isl->state_data);
-+		type = RH_TYPE_SAVE;
-+	} else {
-+		/* Empty save regions: header, page map, free space. */
-+		region_count = 3;
-+		payload = sizeof(isl->save_data);
-+		type = RH_TYPE_UNSAVED;
-+	}
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct region_table,
-+				       region_count,
-+				       struct layout_region,
-+				       "layout region table for ISL",
-+				       &table);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	lr = &table->regions[0];
-+	*lr++ = isl->header;
-+	*lr++ = isl->index_page_map;
-+	for (z = 0; z < isl->zone_count; z++)
-+		*lr++ = isl->volume_index_zones[z];
-+
-+	if (isl->zone_count > 0)
-+		*lr++ = isl->open_chapter;
-+
-+	if (isl->free_space.block_count > 0)
-+		*lr++ = isl->free_space;
-+
-+	table->header = (struct region_header) {
-+		.magic = REGION_MAGIC,
-+		.region_blocks = isl->index_save.block_count,
-+		.type = type,
-+		.version = 1,
-+		.region_count = region_count,
-+		.payload = payload,
-+	};
-+
-+	table->encoded_size = (sizeof(struct region_header) + payload +
-+			       region_count * sizeof(struct layout_region));
-+	*table_ptr = table;
-+	return UDS_SUCCESS;
-+}
-+
-+static void encode_region_table(u8 *buffer, size_t *offset, struct region_table *table)
-+{
-+	unsigned int i;
-+
-+	encode_u64_le(buffer, offset, REGION_MAGIC);
-+	encode_u64_le(buffer, offset, table->header.region_blocks);
-+	encode_u16_le(buffer, offset, table->header.type);
-+	encode_u16_le(buffer, offset, table->header.version);
-+	encode_u16_le(buffer, offset, table->header.region_count);
-+	encode_u16_le(buffer, offset, table->header.payload);
-+
-+	for (i = 0; i < table->header.region_count; i++) {
-+		encode_u64_le(buffer, offset, table->regions[i].start_block);
-+		encode_u64_le(buffer, offset, table->regions[i].block_count);
-+		encode_u32_le(buffer, offset, 0);
-+		encode_u16_le(buffer, offset, table->regions[i].kind);
-+		encode_u16_le(buffer, offset, table->regions[i].instance);
-+	}
-+}
-+
-+static int __must_check write_index_save_header(struct index_save_layout *isl,
-+						struct region_table *table,
-+						struct buffered_writer *writer)
-+{
-+	int result;
-+	u8 *buffer;
-+	size_t offset = 0;
-+
-+	result = UDS_ALLOCATE(table->encoded_size, u8, "index save data", &buffer);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	encode_region_table(buffer, &offset, table);
-+	encode_u64_le(buffer, &offset, isl->save_data.timestamp);
-+	encode_u64_le(buffer, &offset, isl->save_data.nonce);
-+	encode_u32_le(buffer, &offset, isl->save_data.version);
-+	encode_u32_le(buffer, &offset, 0);
-+	if (isl->zone_count > 0) {
-+		encode_u32_le(buffer, &offset, INDEX_STATE_VERSION_301.signature);
-+		encode_u32_le(buffer, &offset, INDEX_STATE_VERSION_301.version_id);
-+		encode_u64_le(buffer, &offset, isl->state_data.newest_chapter);
-+		encode_u64_le(buffer, &offset, isl->state_data.oldest_chapter);
-+		encode_u64_le(buffer, &offset, isl->state_data.last_save);
-+		encode_u64_le(buffer, &offset, 0);
-+	}
-+
-+	result = uds_write_to_buffered_writer(writer, buffer, offset);
-+	UDS_FREE(buffer);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	return uds_flush_buffered_writer(writer);
-+}
-+
-+static int write_index_save_layout(struct index_layout *layout, struct index_save_layout *isl)
-+{
-+	int result;
-+	struct region_table *table;
-+	struct buffered_writer *writer;
-+
-+	result = make_index_save_region_table(isl, &table);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = open_region_writer(layout, &isl->header, &writer);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(table);
-+		return result;
-+	}
-+
-+	result = write_index_save_header(isl, table, writer);
-+	UDS_FREE(table);
-+	uds_free_buffered_writer(writer);
-+
-+	return result;
-+}
-+
-+static void reset_index_save_layout(struct index_save_layout *isl, u64 page_map_blocks)
-+{
-+	u64 free_blocks;
-+	u64 next_block = isl->index_save.start_block;
-+
-+	isl->zone_count = 0;
-+	memset(&isl->save_data, 0, sizeof(isl->save_data));
-+
-+	isl->header = (struct layout_region) {
-+		.start_block = next_block++,
-+		.block_count = 1,
-+		.kind = RL_KIND_HEADER,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+
-+	isl->index_page_map = (struct layout_region) {
-+		.start_block = next_block,
-+		.block_count = page_map_blocks,
-+		.kind = RL_KIND_INDEX_PAGE_MAP,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+
-+	next_block += page_map_blocks;
-+
-+	free_blocks = isl->index_save.block_count - page_map_blocks - 1;
-+	isl->free_space = (struct layout_region) {
-+		.start_block = next_block,
-+		.block_count = free_blocks,
-+		.kind = RL_KIND_EMPTY,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+}
-+
-+static int __must_check
-+invalidate_old_save(struct index_layout *layout, struct index_save_layout *isl)
-+{
-+	reset_index_save_layout(isl, layout->super.page_map_blocks);
-+	return write_index_save_layout(layout, isl);
-+}
-+
-+static int discard_index_state_data(struct index_layout *layout)
-+{
-+	int result;
-+	int saved_result = UDS_SUCCESS;
-+	unsigned int i;
-+
-+	for (i = 0; i < layout->super.max_saves; i++) {
-+		result = invalidate_old_save(layout, &layout->index.saves[i]);
-+		if (result != UDS_SUCCESS)
-+			saved_result = result;
-+	}
-+
-+	if (saved_result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result,
-+					      "%s: cannot destroy all index saves",
-+					      __func__);
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check
-+make_layout_region_table(struct index_layout *layout, struct region_table **table_ptr)
-+{
-+	int result;
-+	unsigned int i;
-+	/* Regions: header, config, index, volume, saves, seal */
-+	u16 region_count = 5 + layout->super.max_saves;
-+	u16 payload;
-+	struct region_table *table;
-+	struct layout_region *lr;
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct region_table,
-+				       region_count,
-+				       struct layout_region,
-+				       "layout region table",
-+				       &table);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	lr = &table->regions[0];
-+	*lr++ = layout->header;
-+	*lr++ = layout->config;
-+	*lr++ = layout->index.sub_index;
-+	*lr++ = layout->index.volume;
-+
-+	for (i = 0; i < layout->super.max_saves; i++)
-+		*lr++ = layout->index.saves[i].index_save;
-+
-+	*lr++ = layout->seal;
-+
-+	if (is_converted_super_block(&layout->super))
-+		payload = sizeof(struct super_block_data);
-+	else
-+		payload = (sizeof(struct super_block_data) -
-+			   sizeof(layout->super.volume_offset) -
-+			   sizeof(layout->super.start_offset));
-+
-+	table->header = (struct region_header) {
-+		.magic = REGION_MAGIC,
-+		.region_blocks = layout->total_blocks,
-+		.type = RH_TYPE_SUPER,
-+		.version = 1,
-+		.region_count = region_count,
-+		.payload = payload,
-+	};
-+
-+	table->encoded_size = (sizeof(struct region_header) + payload +
-+			       region_count * sizeof(struct layout_region));
-+	*table_ptr = table;
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check write_layout_header(struct index_layout *layout,
-+					    struct region_table *table,
-+					    struct buffered_writer *writer)
-+{
-+	int result;
-+	u8 *buffer;
-+	size_t offset = 0;
-+
-+	result = UDS_ALLOCATE(table->encoded_size, u8, "layout data", &buffer);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	encode_region_table(buffer, &offset, table);
-+	memcpy(buffer + offset, &layout->super.magic_label, MAGIC_SIZE);
-+	offset += MAGIC_SIZE;
-+	memcpy(buffer + offset, &layout->super.nonce_info, NONCE_INFO_SIZE);
-+	offset += NONCE_INFO_SIZE;
-+	encode_u64_le(buffer, &offset, layout->super.nonce);
-+	encode_u32_le(buffer, &offset, layout->super.version);
-+	encode_u32_le(buffer, &offset, layout->super.block_size);
-+	encode_u16_le(buffer, &offset, layout->super.index_count);
-+	encode_u16_le(buffer, &offset, layout->super.max_saves);
-+	encode_u32_le(buffer, &offset, 0);
-+	encode_u64_le(buffer, &offset, layout->super.open_chapter_blocks);
-+	encode_u64_le(buffer, &offset, layout->super.page_map_blocks);
-+
-+	if (is_converted_super_block(&layout->super)) {
-+		encode_u64_le(buffer, &offset, layout->super.volume_offset);
-+		encode_u64_le(buffer, &offset, layout->super.start_offset);
-+	}
-+
-+	result = uds_write_to_buffered_writer(writer, buffer, offset);
-+	UDS_FREE(buffer);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	return uds_flush_buffered_writer(writer);
-+}
-+
-+static int __must_check write_uds_index_config(struct index_layout *layout,
-+					       struct configuration *config,
-+					       off_t offset)
-+{
-+	int result;
-+	struct buffered_writer *writer = NULL;
-+
-+	result = open_layout_writer(layout, &layout->config, offset, &writer);
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result, "failed to open config region");
-+
-+	result = uds_write_config_contents(writer, config, layout->super.version);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_buffered_writer(writer);
-+		return uds_log_error_strerror(result, "failed to write config region");
-+	}
-+
-+	result = uds_flush_buffered_writer(writer);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_buffered_writer(writer);
-+		return uds_log_error_strerror(result, "cannot flush config writer");
-+	}
-+
-+	uds_free_buffered_writer(writer);
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check save_layout(struct index_layout *layout, off_t offset)
-+{
-+	int result;
-+	struct buffered_writer *writer = NULL;
-+	struct region_table *table;
-+
-+	result = make_layout_region_table(layout, &table);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = open_layout_writer(layout, &layout->header, offset, &writer);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(table);
-+		return result;
-+	}
-+
-+	result = write_layout_header(layout, table, writer);
-+	UDS_FREE(table);
-+	uds_free_buffered_writer(writer);
-+
-+	return result;
-+}
-+
-+static int create_index_layout(struct index_layout *layout, struct configuration *config)
-+{
-+	int result;
-+	struct save_layout_sizes sizes;
-+
-+	result = compute_sizes(config, &sizes);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = UDS_ALLOCATE(sizes.save_count,
-+			      struct index_save_layout,
-+			      __func__,
-+			      &layout->index.saves);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	initialize_layout(layout, &sizes);
-+
-+	result = discard_index_state_data(layout);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = write_uds_index_config(layout, config, 0);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	return save_layout(layout, 0);
-+}
-+
-+static u64 generate_index_save_nonce(u64 volume_nonce, struct index_save_layout *isl)
-+{
-+	struct save_nonce_data {
-+		struct index_save_data data;
-+		u64 offset;
-+	} nonce_data;
-+	u8 buffer[sizeof(nonce_data)];
-+	size_t offset = 0;
-+
-+	encode_u64_le(buffer, &offset, isl->save_data.timestamp);
-+	encode_u64_le(buffer, &offset, 0);
-+	encode_u32_le(buffer, &offset, isl->save_data.version);
-+	encode_u32_le(buffer, &offset, 0U);
-+	encode_u64_le(buffer, &offset, isl->index_save.start_block);
-+	ASSERT_LOG_ONLY(offset == sizeof(nonce_data),
-+			"%zu bytes encoded of %zu expected",
-+			offset,
-+			sizeof(nonce_data));
-+	return generate_secondary_nonce(volume_nonce, buffer, sizeof(buffer));
-+}
-+
-+static u64 validate_index_save_layout(struct index_save_layout *isl, u64 volume_nonce)
-+{
-+	if ((isl->zone_count == 0) || (isl->save_data.timestamp == 0))
-+		return 0;
-+
-+	if (isl->save_data.nonce != generate_index_save_nonce(volume_nonce, isl))
-+		return 0;
-+
-+	return isl->save_data.timestamp;
++	return uds_is_chapter_sparse(zone->index->volume->geometry,
++				     zone->oldest_virtual_chapter,
++				     zone->newest_virtual_chapter,
++				     virtual_chapter);
 +}
 +
 +static int
-+find_latest_uds_index_save_slot(struct index_layout *layout, struct index_save_layout **isl_ptr)
++launch_zone_message(struct uds_zone_message message, unsigned int zone, struct uds_index *index)
 +{
-+	struct index_save_layout *latest = NULL;
-+	struct index_save_layout *isl;
-+	unsigned int i;
-+	u64 save_time = 0;
-+	u64 latest_time = 0;
++	int result;
++	struct uds_request *request;
 +
-+	for (i = 0; i < layout->super.max_saves; i++) {
-+		isl = &layout->index.saves[i];
-+		save_time = validate_index_save_layout(isl, layout->index.nonce);
-+		if (save_time > latest_time) {
-+			latest = isl;
-+			latest_time = save_time;
-+		}
-+	}
++	result = UDS_ALLOCATE(1, struct uds_request, __func__, &request);
++	if (result != UDS_SUCCESS)
++		return result;
 +
-+	if (latest == NULL) {
-+		uds_log_error("No valid index save found");
-+		return UDS_INDEX_NOT_SAVED_CLEANLY;
-+	}
++	request->index = index;
++	request->unbatched = true;
++	request->zone_number = zone;
++	request->zone_message = message;
 +
-+	*isl_ptr = latest;
++	uds_enqueue_request(request, STAGE_MESSAGE);
 +	return UDS_SUCCESS;
 +}
 +
-+int uds_discard_open_chapter(struct index_layout *layout)
++static void enqueue_barrier_messages(struct uds_index *index, u64 virtual_chapter)
 +{
-+	int result;
-+	struct index_save_layout *isl;
-+	struct buffered_writer *writer;
-+
-+	result = find_latest_uds_index_save_slot(layout, &isl);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = open_region_writer(layout, &isl->open_chapter, &writer);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = uds_write_to_buffered_writer(writer, NULL, UDS_BLOCK_SIZE);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_buffered_writer(writer);
-+		return result;
-+	}
-+
-+	result = uds_flush_buffered_writer(writer);
-+	uds_free_buffered_writer(writer);
-+	return result;
-+}
-+
-+int uds_load_index_state(struct index_layout *layout, struct uds_index *index)
-+{
-+	int result;
++	struct uds_zone_message message = {
++		.type = UDS_MESSAGE_SPARSE_CACHE_BARRIER,
++		.virtual_chapter = virtual_chapter,
++	};
 +	unsigned int zone;
-+	struct index_save_layout *isl;
-+	struct buffered_reader *readers[MAX_ZONES];
-+
-+	result = find_latest_uds_index_save_slot(layout, &isl);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	index->newest_virtual_chapter = isl->state_data.newest_chapter;
-+	index->oldest_virtual_chapter = isl->state_data.oldest_chapter;
-+	index->last_save = isl->state_data.last_save;
-+
-+	result = open_region_reader(layout, &isl->open_chapter, &readers[0]);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = uds_load_open_chapter(index, readers[0]);
-+	uds_free_buffered_reader(readers[0]);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	for (zone = 0; zone < isl->zone_count; zone++) {
-+		result = open_region_reader(layout,
-+					    &isl->volume_index_zones[zone],
-+					    &readers[zone]);
-+		if (result != UDS_SUCCESS) {
-+			for (; zone > 0; zone--)
-+				uds_free_buffered_reader(readers[zone - 1]);
-+
-+			return result;
-+		}
-+	}
-+
-+	result = uds_load_volume_index(index->volume_index, readers, isl->zone_count);
-+	for (zone = 0; zone < isl->zone_count; zone++)
-+		uds_free_buffered_reader(readers[zone]);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = open_region_reader(layout, &isl->index_page_map, &readers[0]);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = uds_read_index_page_map(index->volume->index_page_map, readers[0]);
-+	uds_free_buffered_reader(readers[0]);
-+
-+	return result;
-+}
-+
-+static struct index_save_layout *select_oldest_index_save_layout(struct index_layout *layout)
-+{
-+	struct index_save_layout *oldest = NULL;
-+	struct index_save_layout *isl;
-+	unsigned int i;
-+	u64 save_time = 0;
-+	u64 oldest_time = 0;
-+
-+	for (i = 0; i < layout->super.max_saves; i++) {
-+		isl = &layout->index.saves[i];
-+		save_time = validate_index_save_layout(isl, layout->index.nonce);
-+		if (oldest == NULL || save_time < oldest_time) {
-+			oldest = isl;
-+			oldest_time = save_time;
-+		}
-+	}
-+
-+	return oldest;
-+}
-+
-+static void instantiate_index_save_layout(struct index_save_layout *isl,
-+					  struct super_block_data *super,
-+					  u64 volume_nonce,
-+					  unsigned int zone_count)
-+{
-+	unsigned int z;
-+	u64 next_block;
-+	u64 free_blocks;
-+	u64 volume_index_blocks;
-+
-+	isl->zone_count = zone_count;
-+	memset(&isl->save_data, 0, sizeof(isl->save_data));
-+	isl->save_data.timestamp = ktime_to_ms(current_time_ns(CLOCK_REALTIME));
-+	isl->save_data.version = 1;
-+	isl->save_data.nonce = generate_index_save_nonce(volume_nonce, isl);
-+
-+	next_block = isl->index_save.start_block;
-+	isl->header = (struct layout_region) {
-+		.start_block = next_block++,
-+		.block_count = 1,
-+		.kind = RL_KIND_HEADER,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+
-+	isl->index_page_map = (struct layout_region) {
-+		.start_block = next_block,
-+		.block_count = super->page_map_blocks,
-+		.kind = RL_KIND_INDEX_PAGE_MAP,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+	next_block += super->page_map_blocks;
-+
-+	free_blocks = (isl->index_save.block_count - 1 -
-+		       super->page_map_blocks -
-+		       super->open_chapter_blocks);
-+	volume_index_blocks = free_blocks / isl->zone_count;
-+	for (z = 0; z < isl->zone_count; z++) {
-+		isl->volume_index_zones[z] = (struct layout_region) {
-+			.start_block = next_block,
-+			.block_count = volume_index_blocks,
-+			.kind = RL_KIND_VOLUME_INDEX,
-+			.instance = z,
-+		};
-+
-+		next_block += volume_index_blocks;
-+		free_blocks -= volume_index_blocks;
-+	}
-+
-+	isl->open_chapter = (struct layout_region) {
-+		.start_block = next_block,
-+		.block_count = super->open_chapter_blocks,
-+		.kind = RL_KIND_OPEN_CHAPTER,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+
-+	next_block += super->open_chapter_blocks;
-+
-+	isl->free_space = (struct layout_region) {
-+		.start_block = next_block,
-+		.block_count = free_blocks,
-+		.kind = RL_KIND_EMPTY,
-+		.instance = RL_SOLE_INSTANCE,
-+	};
-+}
-+
-+static int setup_uds_index_save_slot(struct index_layout *layout,
-+				     unsigned int zone_count,
-+				     struct index_save_layout **isl_ptr)
-+{
-+	int result;
-+	struct index_save_layout *isl;
-+
-+	isl = select_oldest_index_save_layout(layout);
-+	result = invalidate_old_save(layout, isl);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	instantiate_index_save_layout(isl, &layout->super, layout->index.nonce, zone_count);
-+
-+	*isl_ptr = isl;
-+	return UDS_SUCCESS;
-+}
-+
-+static void cancel_uds_index_save(struct index_save_layout *isl)
-+{
-+	memset(&isl->save_data, 0, sizeof(isl->save_data));
-+	memset(&isl->state_data, 0, sizeof(isl->state_data));
-+	isl->zone_count = 0;
-+}
-+
-+int uds_save_index_state(struct index_layout *layout, struct uds_index *index)
-+{
-+	int result;
-+	unsigned int zone;
-+	struct index_save_layout *isl;
-+	struct buffered_writer *writers[MAX_ZONES];
-+
-+	result = setup_uds_index_save_slot(layout, index->zone_count, &isl);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	isl->state_data	= (struct index_state_data301) {
-+		.newest_chapter = index->newest_virtual_chapter,
-+		.oldest_chapter = index->oldest_virtual_chapter,
-+		.last_save = index->last_save,
-+	};
-+
-+	result = open_region_writer(layout, &isl->open_chapter, &writers[0]);
-+	if (result != UDS_SUCCESS) {
-+		cancel_uds_index_save(isl);
-+		return result;
-+	}
-+
-+	result = uds_save_open_chapter(index, writers[0]);
-+	uds_free_buffered_writer(writers[0]);
-+	if (result != UDS_SUCCESS) {
-+		cancel_uds_index_save(isl);
-+		return result;
-+	}
 +
 +	for (zone = 0; zone < index->zone_count; zone++) {
-+		result = open_region_writer(layout,
-+					    &isl->volume_index_zones[zone],
-+					    &writers[zone]);
-+		if (result != UDS_SUCCESS) {
-+			for (; zone > 0; zone--)
-+				uds_free_buffered_writer(writers[zone - 1]);
++		int result = launch_zone_message(message, zone, index);
 +
-+			cancel_uds_index_save(isl);
-+			return result;
-+		}
++		ASSERT_LOG_ONLY((result == UDS_SUCCESS), "barrier message allocation");
 +	}
-+
-+	result = uds_save_volume_index(index->volume_index, writers, index->zone_count);
-+	for (zone = 0; zone < index->zone_count; zone++)
-+		uds_free_buffered_writer(writers[zone]);
-+	if (result != UDS_SUCCESS) {
-+		cancel_uds_index_save(isl);
-+		return result;
-+	}
-+
-+	result = open_region_writer(layout, &isl->index_page_map, &writers[0]);
-+	if (result != UDS_SUCCESS) {
-+		cancel_uds_index_save(isl);
-+		return result;
-+	}
-+
-+	result = uds_write_index_page_map(index->volume->index_page_map, writers[0]);
-+	uds_free_buffered_writer(writers[0]);
-+	if (result != UDS_SUCCESS) {
-+		cancel_uds_index_save(isl);
-+		return result;
-+	}
-+
-+	return write_index_save_layout(layout, isl);
 +}
 +
-+static int __must_check
-+load_region_table(struct buffered_reader *reader, struct region_table **table_ptr)
++/*
++ * Determine whether this request should trigger a sparse cache barrier message to change the
++ * membership of the sparse cache. If a change in membership is desired, the function returns the
++ * chapter number to add.
++ */
++static u64 triage_index_request(struct uds_index *index, struct uds_request *request)
 +{
-+	int result;
-+	unsigned int i;
-+	struct region_header header;
-+	struct region_table *table;
-+	u8 buffer[sizeof(struct region_header)];
-+	size_t offset = 0;
++	u64 virtual_chapter;
++	struct index_zone *zone;
 +
-+	result = uds_read_from_buffered_reader(reader, buffer, sizeof(buffer));
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result, "cannot read region table header");
++	virtual_chapter = uds_lookup_volume_index_name(index->volume_index, &request->record_name);
++	if (virtual_chapter == NO_CHAPTER)
++		return NO_CHAPTER;
 +
-+	decode_u64_le(buffer, &offset, &header.magic);
-+	decode_u64_le(buffer, &offset, &header.region_blocks);
-+	decode_u16_le(buffer, &offset, &header.type);
-+	decode_u16_le(buffer, &offset, &header.version);
-+	decode_u16_le(buffer, &offset, &header.region_count);
-+	decode_u16_le(buffer, &offset, &header.payload);
++	zone = index->zones[request->zone_number];
++	if (!is_zone_chapter_sparse(zone, virtual_chapter))
++		return NO_CHAPTER;
 +
-+	if (header.magic != REGION_MAGIC)
-+		return UDS_NO_INDEX;
++	/*
++	 * FIXME: Optimize for a common case by remembering the chapter from the most recent
++	 * barrier message and skipping this chapter if is it the same.
++	 */
 +
-+	if (header.version != 1)
-+		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
-+					      "unknown region table version %hu",
-+					      header.version);
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct region_table,
-+				       header.region_count,
-+				       struct layout_region,
-+				       "single file layout region table",
-+				       &table);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	table->header = header;
-+	for (i = 0; i < header.region_count; i++) {
-+		u8 region_buffer[sizeof(struct layout_region)];
-+
-+		offset = 0;
-+		result = uds_read_from_buffered_reader(reader,
-+						       region_buffer,
-+						       sizeof(region_buffer));
-+		if (result != UDS_SUCCESS) {
-+			UDS_FREE(table);
-+			return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+						      "cannot read region table layouts");
-+		}
-+
-+		decode_u64_le(region_buffer, &offset, &table->regions[i].start_block);
-+		decode_u64_le(region_buffer, &offset, &table->regions[i].block_count);
-+		offset += sizeof(u32);
-+		decode_u16_le(region_buffer, &offset, &table->regions[i].kind);
-+		decode_u16_le(region_buffer, &offset, &table->regions[i].instance);
-+	}
-+
-+	*table_ptr = table;
-+	return UDS_SUCCESS;
++	return virtual_chapter;
 +}
 +
-+static int __must_check read_super_block_data(struct buffered_reader *reader,
-+					      struct index_layout *layout,
-+					      size_t saved_size)
++/*
++ * Simulate a message to change the sparse cache membership for a single-zone sparse index. This
++ * allows us to forgo the complicated locking required by a multi-zone sparse index. Any other kind
++ * of index does nothing here.
++ */
++static int
++simulate_index_zone_barrier_message(struct index_zone *zone, struct uds_request *request)
 +{
-+	int result;
-+	struct super_block_data *super = &layout->super;
-+	u8 *buffer;
-+	size_t offset = 0;
++	u64 sparse_virtual_chapter;
 +
-+	result = UDS_ALLOCATE(saved_size, u8, "super block data", &buffer);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = uds_read_from_buffered_reader(reader, buffer, saved_size);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(buffer);
-+		return uds_log_error_strerror(result, "cannot read region table header");
-+	}
-+
-+	memcpy(&super->magic_label, buffer, MAGIC_SIZE);
-+	offset += MAGIC_SIZE;
-+	memcpy(&super->nonce_info, buffer + offset, NONCE_INFO_SIZE);
-+	offset += NONCE_INFO_SIZE;
-+	decode_u64_le(buffer, &offset, &super->nonce);
-+	decode_u32_le(buffer, &offset, &super->version);
-+	decode_u32_le(buffer, &offset, &super->block_size);
-+	decode_u16_le(buffer, &offset, &super->index_count);
-+	decode_u16_le(buffer, &offset, &super->max_saves);
-+	offset += sizeof(u32);
-+	decode_u64_le(buffer, &offset, &super->open_chapter_blocks);
-+	decode_u64_le(buffer, &offset, &super->page_map_blocks);
-+
-+	if (is_converted_super_block(super)) {
-+		decode_u64_le(buffer, &offset, &super->volume_offset);
-+		decode_u64_le(buffer, &offset, &super->start_offset);
-+	} else {
-+		super->volume_offset = 0;
-+		super->start_offset = 0;
-+	}
-+
-+	UDS_FREE(buffer);
-+
-+	if (memcmp(super->magic_label, LAYOUT_MAGIC, MAGIC_SIZE) != 0)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA, "unknown superblock magic label");
-+
-+	if ((super->version < SUPER_VERSION_MINIMUM) ||
-+	    (super->version == 4) ||
-+	    (super->version == 5) ||
-+	    (super->version == 6) ||
-+	    (super->version > SUPER_VERSION_MAXIMUM))
-+		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
-+					      "unknown superblock version number %u",
-+					      super->version);
-+
-+	if (super->volume_offset < super->start_offset)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "inconsistent offsets (start %llu, volume %llu)",
-+					      (unsigned long long) super->start_offset,
-+					      (unsigned long long) super->volume_offset);
-+
-+	/* Sub-indexes are no longer used but the layout retains this field. */
-+	if (super->index_count != 1)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "invalid subindex count %u",
-+					      super->index_count);
-+
-+	if (generate_primary_nonce(super->nonce_info, sizeof(super->nonce_info)) != super->nonce)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "inconsistent superblock nonce");
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check verify_region(struct layout_region *lr,
-+				      u64 start_block,
-+				      enum region_kind kind,
-+				      unsigned int instance)
-+{
-+	if (lr->start_block != start_block)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA, "incorrect layout region offset");
-+
-+	if (lr->kind != kind)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA, "incorrect layout region kind");
-+
-+	if (lr->instance != instance)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "incorrect layout region instance");
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check
-+verify_sub_index(struct index_layout *layout, u64 start_block, struct region_table *table)
-+{
-+	int result;
-+	unsigned int i;
-+	struct sub_index_layout *sil = &layout->index;
-+	u64 next_block = start_block;
-+
-+	sil->sub_index = table->regions[2];
-+	result = verify_region(&sil->sub_index, next_block, RL_KIND_INDEX, 0);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	define_sub_index_nonce(layout);
-+
-+	sil->volume = table->regions[3];
-+	result = verify_region(&sil->volume, next_block, RL_KIND_VOLUME, RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	next_block += sil->volume.block_count + layout->super.volume_offset;
-+
-+	for (i = 0; i < layout->super.max_saves; i++) {
-+		sil->saves[i].index_save = table->regions[i + 4];
-+		result = verify_region(&sil->saves[i].index_save, next_block, RL_KIND_SAVE, i);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		next_block += sil->saves[i].index_save.block_count;
-+	}
-+
-+	next_block -= layout->super.volume_offset;
-+	if (next_block != start_block + sil->sub_index.block_count)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "sub index region does not span all saves");
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check
-+reconstitute_layout(struct index_layout *layout, struct region_table *table, u64 first_block)
-+{
-+	int result;
-+	u64 next_block = first_block;
-+
-+	result = UDS_ALLOCATE(layout->super.max_saves,
-+			      struct index_save_layout,
-+			      __func__,
-+			      &layout->index.saves);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	layout->total_blocks = table->header.region_blocks;
-+
-+	layout->header = table->regions[0];
-+	result = verify_region(&layout->header, next_block++, RL_KIND_HEADER, RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	layout->config = table->regions[1];
-+	result = verify_region(&layout->config, next_block++, RL_KIND_CONFIG, RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = verify_sub_index(layout, next_block, table);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	next_block += layout->index.sub_index.block_count;
-+
-+	layout->seal = table->regions[table->header.region_count - 1];
-+	result = verify_region(&layout->seal,
-+			       next_block + layout->super.volume_offset,
-+			       RL_KIND_SEAL,
-+			       RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	if (++next_block != (first_block + layout->total_blocks))
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "layout table does not span total blocks");
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check load_super_block(struct index_layout *layout,
-+					 size_t block_size,
-+					 u64 first_block,
-+					 struct buffered_reader *reader)
-+{
-+	int result;
-+	struct region_table *table = NULL;
-+	struct super_block_data *super = &layout->super;
-+
-+	result = load_region_table(reader, &table);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	if (table->header.type != RH_TYPE_SUPER) {
-+		UDS_FREE(table);
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA, "not a superblock region table");
-+	}
-+
-+	result = read_super_block_data(reader, layout, table->header.payload);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(table);
-+		return uds_log_error_strerror(result, "unknown superblock format");
-+	}
-+
-+	if (super->block_size != block_size) {
-+		UDS_FREE(table);
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "superblock saved block_size %u differs from supplied block_size %zu",
-+					      super->block_size,
-+					      block_size);
-+	}
-+
-+	first_block -= (super->volume_offset - super->start_offset);
-+	result = reconstitute_layout(layout, table, first_block);
-+	UDS_FREE(table);
-+	return result;
-+}
-+
-+static int __must_check read_index_save_data(struct buffered_reader *reader,
-+					     struct index_save_layout *isl,
-+					     size_t saved_size)
-+{
-+	int result;
-+	struct index_state_version file_version;
-+	u8 buffer[sizeof(struct index_save_data) + sizeof(struct index_state_data301)];
-+	size_t offset = 0;
-+
-+	if (saved_size != sizeof(buffer))
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "unexpected index save data size %zu",
-+					      saved_size);
-+
-+	result = uds_read_from_buffered_reader(reader, buffer, sizeof(buffer));
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result, "cannot read index save data");
-+
-+	decode_u64_le(buffer, &offset, &isl->save_data.timestamp);
-+	decode_u64_le(buffer, &offset, &isl->save_data.nonce);
-+	decode_u32_le(buffer, &offset, &isl->save_data.version);
-+	offset += sizeof(u32);
-+
-+	if (isl->save_data.version > 1)
-+		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
-+					      "unknown index save version number %u",
-+					      isl->save_data.version);
-+
-+	decode_s32_le(buffer, &offset, &file_version.signature);
-+	decode_s32_le(buffer, &offset, &file_version.version_id);
-+
-+	if ((file_version.signature != INDEX_STATE_VERSION_301.signature) ||
-+	    (file_version.version_id != INDEX_STATE_VERSION_301.version_id))
-+		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
-+					      "index state version %d,%d is unsupported",
-+					      file_version.signature,
-+					      file_version.version_id);
-+
-+	decode_u64_le(buffer, &offset, &isl->state_data.newest_chapter);
-+	decode_u64_le(buffer, &offset, &isl->state_data.oldest_chapter);
-+	decode_u64_le(buffer, &offset, &isl->state_data.last_save);
-+	/* Skip past some historical fields that are now unused */
-+	offset += sizeof(u32) + sizeof(u32);
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check
-+reconstruct_index_save(struct index_save_layout *isl, struct region_table *table)
-+{
-+	int result;
-+	unsigned int z;
-+	struct layout_region *last_region;
-+	u64 next_block = isl->index_save.start_block;
-+	u64 last_block = next_block + isl->index_save.block_count;
-+
-+	isl->zone_count = table->header.region_count - 3;
-+
-+	last_region = &table->regions[table->header.region_count - 1];
-+	if (last_region->kind == RL_KIND_EMPTY) {
-+		isl->free_space = *last_region;
-+		isl->zone_count--;
-+	} else {
-+		isl->free_space = (struct layout_region) {
-+			.start_block = last_block,
-+			.block_count = 0,
-+			.kind = RL_KIND_EMPTY,
-+			.instance = RL_SOLE_INSTANCE,
-+		};
-+	}
-+
-+	isl->header = table->regions[0];
-+	result = verify_region(&isl->header, next_block++, RL_KIND_HEADER, RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	isl->index_page_map = table->regions[1];
-+	result = verify_region(&isl->index_page_map,
-+			       next_block,
-+			       RL_KIND_INDEX_PAGE_MAP,
-+			       RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	next_block += isl->index_page_map.block_count;
-+
-+	for (z = 0; z < isl->zone_count; z++) {
-+		isl->volume_index_zones[z] = table->regions[z + 2];
-+		result = verify_region(&isl->volume_index_zones[z],
-+				       next_block,
-+				       RL_KIND_VOLUME_INDEX,
-+				       z);
-+		if (result != UDS_SUCCESS)
-+			return result;
-+
-+		next_block += isl->volume_index_zones[z].block_count;
-+	}
-+
-+	isl->open_chapter = table->regions[isl->zone_count + 2];
-+	result = verify_region(&isl->open_chapter,
-+			       next_block,
-+			       RL_KIND_OPEN_CHAPTER,
-+			       RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	next_block += isl->open_chapter.block_count;
-+
-+	result = verify_region(&isl->free_space, next_block, RL_KIND_EMPTY, RL_SOLE_INSTANCE);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	next_block += isl->free_space.block_count;
-+	if (next_block != last_block)
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "index save layout table incomplete");
-+
-+	return UDS_SUCCESS;
-+}
-+
-+static int __must_check load_index_save(struct index_save_layout *isl,
-+					struct buffered_reader *reader,
-+					unsigned int instance)
-+{
-+	int result;
-+	struct region_table *table = NULL;
-+
-+	result = load_region_table(reader, &table);
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result,
-+					      "cannot read index save %u header",
-+					      instance);
-+
-+	if (table->header.region_blocks != isl->index_save.block_count) {
-+		u64 region_blocks = table->header.region_blocks;
-+
-+		UDS_FREE(table);
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "unexpected index save %u region block count %llu",
-+					      instance,
-+					      (unsigned long long) region_blocks);
-+	}
-+
-+	if (table->header.type == RH_TYPE_UNSAVED) {
-+		UDS_FREE(table);
-+		reset_index_save_layout(isl, 0);
++	if ((zone->index->zone_count > 1) ||
++	    !uds_is_sparse_geometry(zone->index->volume->geometry))
 +		return UDS_SUCCESS;
-+	}
 +
++	sparse_virtual_chapter = triage_index_request(zone->index, request);
++	if (sparse_virtual_chapter == NO_CHAPTER)
++		return UDS_SUCCESS;
 +
-+	if (table->header.type != RH_TYPE_SAVE) {
-+		UDS_FREE(table);
-+		return uds_log_error_strerror(UDS_CORRUPT_DATA,
-+					      "unexpected index save %u header type %u",
-+					      instance,
-+					      table->header.type);
-+	}
++	return uds_update_sparse_cache(zone, sparse_virtual_chapter);
++}
 +
-+	result = read_index_save_data(reader, isl, table->header.payload);
-+	if (result != UDS_SUCCESS) {
-+		UDS_FREE(table);
-+		return uds_log_error_strerror(result,
-+					      "unknown index save %u data format",
-+					      instance);
-+	}
++/* This is the request processing function for the triage queue. */
++static void triage_request(struct uds_request *request)
++{
++	struct uds_index *index = request->index;
++	u64 sparse_virtual_chapter = triage_index_request(index, request);
 +
-+	result = reconstruct_index_save(isl, table);
-+	UDS_FREE(table);
++	if (sparse_virtual_chapter != NO_CHAPTER)
++		enqueue_barrier_messages(index, sparse_virtual_chapter);
++
++	uds_enqueue_request(request, STAGE_INDEX);
++}
++
++static int finish_previous_chapter(struct uds_index *index, u64 current_chapter_number)
++{
++	int result;
++	struct chapter_writer *writer = index->chapter_writer;
++
++	uds_lock_mutex(&writer->mutex);
++	while (index->newest_virtual_chapter < current_chapter_number)
++		uds_wait_cond(&writer->cond, &writer->mutex);
++	result = writer->result;
++	uds_unlock_mutex(&writer->mutex);
++
 +	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result,
-+					      "cannot reconstruct index save %u",
-+					      instance);
++		return uds_log_error_strerror(result, "Writing of previous open chapter failed");
 +
 +	return UDS_SUCCESS;
 +}
 +
-+static int __must_check load_sub_index_regions(struct index_layout *layout)
++static int swap_open_chapter(struct index_zone *zone)
 +{
 +	int result;
-+	unsigned int j;
-+	struct index_save_layout *isl;
-+	struct buffered_reader *reader;
++	struct open_chapter_zone *temporary_chapter;
 +
-+	for (j = 0; j < layout->super.max_saves; ++j) {
-+		isl = &layout->index.saves[j];
-+		result = open_region_reader(layout, &isl->index_save, &reader);
++	result = finish_previous_chapter(zone->index, zone->newest_virtual_chapter);
++	if (result != UDS_SUCCESS)
++		return result;
 +
-+		if (result != UDS_SUCCESS) {
-+			uds_log_error_strerror(result, "cannot get reader for index 0 save %u", j);
-+			return result;
-+		}
++	temporary_chapter = zone->open_chapter;
++	zone->open_chapter = zone->writing_chapter;
++	zone->writing_chapter = temporary_chapter;
++	return UDS_SUCCESS;
++}
 +
-+		result = load_index_save(isl, reader, j);
-+		uds_free_buffered_reader(reader);
-+		if (result != UDS_SUCCESS) {
-+			/* Another save slot might be valid. */
-+			reset_index_save_layout(isl, 0);
++/*
++ * Inform the chapter writer that this zone is done with this chapter. The chapter won't start
++ * writing until all zones have closed it.
++ */
++static unsigned int start_closing_chapter(struct uds_index *index,
++					  unsigned int zone_number,
++					  struct open_chapter_zone *chapter)
++{
++	unsigned int finished_zones;
++	struct chapter_writer *writer = index->chapter_writer;
++
++	uds_lock_mutex(&writer->mutex);
++	finished_zones = ++writer->zones_to_write;
++	writer->chapters[zone_number] = chapter;
++	uds_broadcast_cond(&writer->cond);
++	uds_unlock_mutex(&writer->mutex);
++
++	return finished_zones;
++}
++
++static int announce_chapter_closed(struct index_zone *zone, u64 closed_chapter)
++{
++	int result;
++	unsigned int i;
++	struct uds_zone_message zone_message = {
++		.type = UDS_MESSAGE_ANNOUNCE_CHAPTER_CLOSED,
++		.virtual_chapter = closed_chapter,
++	};
++
++	for (i = 0; i < zone->index->zone_count; i++) {
++		if (zone->id == i)
 +			continue;
-+		}
++
++		result = launch_zone_message(zone_message, i, zone->index);
++		if (result != UDS_SUCCESS)
++			return result;
 +	}
 +
 +	return UDS_SUCCESS;
 +}
 +
-+static int __must_check
-+verify_uds_index_config(struct index_layout *layout, struct configuration *config)
++static int open_next_chapter(struct index_zone *zone)
 +{
 +	int result;
-+	struct buffered_reader *reader = NULL;
-+	u64 offset;
++	u64 closed_chapter;
++	u64 expiring;
++	unsigned int finished_zones;
++	u32 expire_chapters;
 +
-+	offset = layout->super.volume_offset - layout->super.start_offset;
-+	result = open_layout_reader(layout, &layout->config, offset, &reader);
++	uds_log_debug("closing chapter %llu of zone %u after %u entries (%u short)",
++		      (unsigned long long) zone->newest_virtual_chapter,
++		      zone->id,
++		      zone->open_chapter->size,
++		      zone->open_chapter->capacity - zone->open_chapter->size);
++
++	result = swap_open_chapter(zone);
 +	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result, "failed to open config reader");
++		return result;
 +
-+	result = uds_validate_config_contents(reader, config);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_buffered_reader(reader);
-+		return uds_log_error_strerror(result, "failed to read config region");
++	closed_chapter = zone->newest_virtual_chapter++;
++	uds_set_volume_index_zone_open_chapter(zone->index->volume_index,
++					       zone->id,
++					       zone->newest_virtual_chapter);
++	uds_reset_open_chapter(zone->open_chapter);
++
++	finished_zones = start_closing_chapter(zone->index, zone->id, zone->writing_chapter);
++	if ((finished_zones == 1) && (zone->index->zone_count > 1)) {
++		result = announce_chapter_closed(zone, closed_chapter);
++		if (result != UDS_SUCCESS)
++			return result;
 +	}
 +
-+	uds_free_buffered_reader(reader);
++	expiring = zone->oldest_virtual_chapter;
++	expire_chapters = uds_chapters_to_expire(zone->index->volume->geometry,
++						 zone->newest_virtual_chapter);
++	zone->oldest_virtual_chapter += expire_chapters;
++
++	if (finished_zones < zone->index->zone_count)
++		return UDS_SUCCESS;
++
++	while (expire_chapters-- > 0)
++		uds_forget_chapter(zone->index->volume, expiring++);
++
 +	return UDS_SUCCESS;
 +}
 +
-+static int load_index_layout(struct index_layout *layout, struct configuration *config)
++static int handle_chapter_closed(struct index_zone *zone, u64 virtual_chapter)
 +{
-+	int result;
-+	struct buffered_reader *reader;
++	if (zone->newest_virtual_chapter == virtual_chapter)
++		return open_next_chapter(zone);
 +
-+	result = uds_make_buffered_reader(layout->factory,
-+					  layout->offset / UDS_BLOCK_SIZE,
-+					  1,
-+					  &reader);
-+	if (result != UDS_SUCCESS)
-+		return uds_log_error_strerror(result, "unable to read superblock");
-+
-+	result = load_super_block(layout, UDS_BLOCK_SIZE, layout->offset / UDS_BLOCK_SIZE, reader);
-+	uds_free_buffered_reader(reader);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = verify_uds_index_config(layout, config);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	return load_sub_index_regions(layout);
-+}
-+
-+static int create_layout_factory(struct index_layout *layout, const struct configuration *config)
-+{
-+	int result;
-+	size_t writable_size;
-+	struct io_factory *factory = NULL;
-+
-+	result = uds_make_io_factory(config->name, &factory);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	writable_size = uds_get_writable_size(factory) & -UDS_BLOCK_SIZE;
-+	if (writable_size < config->size + config->offset) {
-+		uds_put_io_factory(factory);
-+		uds_log_error("index storage (%zu) is smaller than the requested size %zu",
-+			      writable_size,
-+			      config->size + config->offset);
-+		return -ENOSPC;
-+	}
-+
-+	layout->factory = factory;
-+	layout->factory_size = (config->size > 0) ? config->size : writable_size;
-+	layout->offset = config->offset;
 +	return UDS_SUCCESS;
 +}
 +
-+int uds_make_index_layout(struct configuration *config,
-+			  bool new_layout,
-+			  struct index_layout **layout_ptr)
++static int dispatch_index_zone_control_request(struct uds_request *request)
 +{
-+	int result;
-+	struct index_layout *layout = NULL;
-+	struct save_layout_sizes sizes;
++	struct uds_zone_message *message = &request->zone_message;
++	struct index_zone *zone = request->index->zones[request->zone_number];
 +
-+	result = compute_sizes(config, &sizes);
-+	if (result != UDS_SUCCESS)
-+		return result;
++	switch (message->type) {
++	case UDS_MESSAGE_SPARSE_CACHE_BARRIER:
++		return uds_update_sparse_cache(zone, message->virtual_chapter);
 +
-+	result = UDS_ALLOCATE(1, struct index_layout, __func__, &layout);
-+	if (result != UDS_SUCCESS)
-+		return result;
++	case UDS_MESSAGE_ANNOUNCE_CHAPTER_CLOSED:
++		return handle_chapter_closed(zone, message->virtual_chapter);
 +
-+	result = create_layout_factory(layout, config);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index_layout(layout);
-+		return result;
-+	}
-+
-+	if (layout->factory_size < sizes.total_size) {
-+		uds_log_error("index storage (%zu) is smaller than the required size %llu",
-+			      layout->factory_size,
-+			      (unsigned long long) sizes.total_size);
-+		uds_free_index_layout(layout);
-+		return -ENOSPC;
-+	}
-+
-+	if (new_layout)
-+		result = create_index_layout(layout, config);
-+	else
-+		result = load_index_layout(layout, config);
-+	if (result != UDS_SUCCESS) {
-+		uds_free_index_layout(layout);
-+		return result;
-+	}
-+
-+	*layout_ptr = layout;
-+	return UDS_SUCCESS;
-+}
-+
-+void uds_free_index_layout(struct index_layout *layout)
-+{
-+	if (layout == NULL)
-+		return;
-+
-+	UDS_FREE(layout->index.saves);
-+	if (layout->factory != NULL)
-+		uds_put_io_factory(layout->factory);
-+
-+	UDS_FREE(layout);
-+}
-+
-+int uds_replace_index_layout_storage(struct index_layout *layout, const char *name)
-+{
-+	return uds_replace_storage(layout->factory, name);
-+}
-+
-+/* Obtain a dm_bufio_client for the volume region. */
-+int uds_open_volume_bufio(struct index_layout *layout,
-+			  size_t block_size,
-+			  unsigned int reserved_buffers,
-+			  struct dm_bufio_client **client_ptr)
-+{
-+	off_t offset = (layout->index.volume.start_block +
-+			layout->super.volume_offset -
-+			layout->super.start_offset);
-+
-+	return uds_make_bufio(layout->factory, offset, block_size, reserved_buffers, client_ptr);
-+}
-+
-+u64 uds_get_volume_nonce(struct index_layout *layout)
-+{
-+	return layout->index.nonce;
-+}
-diff --git a/drivers/md/dm-vdo/index-layout.h b/drivers/md/dm-vdo/index-layout.h
-new file mode 100644
-index 00000000000..02e368c0331
---- /dev/null
-+++ b/drivers/md/dm-vdo/index-layout.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#ifndef UDS_INDEX_LAYOUT_H
-+#define UDS_INDEX_LAYOUT_H
-+
-+#include "config.h"
-+#include "io-factory.h"
-+#include "uds.h"
-+
-+/*
-+ * The index layout describes the format of the index on the underlying storage, and is responsible
-+ * for creating those structures when the index is first created. It also validates the index data
-+ * when loading a saved index, and updates it when saving the index.
-+ */
-+
-+struct index_layout;
-+
-+int __must_check uds_make_index_layout(struct configuration *config,
-+				       bool new_layout,
-+				       struct index_layout **layout_ptr);
-+
-+void uds_free_index_layout(struct index_layout *layout);
-+
-+int __must_check uds_replace_index_layout_storage(struct index_layout *layout, const char *name);
-+
-+int __must_check uds_load_index_state(struct index_layout *layout, struct uds_index *index);
-+
-+int __must_check uds_save_index_state(struct index_layout *layout, struct uds_index *index);
-+
-+int __must_check uds_discard_open_chapter(struct index_layout *layout);
-+
-+u64 __must_check uds_get_volume_nonce(struct index_layout *layout);
-+
-+int __must_check uds_open_volume_bufio(struct index_layout *layout,
-+				       size_t block_size,
-+				       unsigned int reserved_buffers,
-+				       struct dm_bufio_client **client_ptr);
-+
-+#endif /* UDS_INDEX_LAYOUT_H */
-diff --git a/drivers/md/dm-vdo/io-factory.c b/drivers/md/dm-vdo/io-factory.c
-new file mode 100644
-index 00000000000..d8c03e9ab43
---- /dev/null
-+++ b/drivers/md/dm-vdo/io-factory.c
-@@ -0,0 +1,458 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#include "io-factory.h"
-+
-+#include <linux/atomic.h>
-+#include <linux/blkdev.h>
-+#include <linux/err.h>
-+#include <linux/mount.h>
-+
-+#include "logger.h"
-+#include "memory-alloc.h"
-+#include "numeric.h"
-+
-+enum { BLK_FMODE = FMODE_READ | FMODE_WRITE };
-+
-+/*
-+ * The I/O factory object manages access to index storage, which is a contiguous range of blocks on
-+ * a block device.
-+ *
-+ * The factory holds the open device and is responsible for closing it. The factory has methods to
-+ * make helper structures that can be used to access sections of the index.
-+ */
-+struct io_factory {
-+	struct block_device *bdev;
-+	atomic_t ref_count;
-+};
-+
-+/* The buffered reader allows efficient I/O by reading page-sized segments into a buffer. */
-+struct buffered_reader {
-+	struct io_factory *factory;
-+	struct dm_bufio_client *client;
-+	struct dm_buffer *buffer;
-+	sector_t limit;
-+	sector_t block_number;
-+	u8 *start;
-+	u8 *end;
-+};
-+
-+enum { MAX_READ_AHEAD_BLOCKS = 4 };
-+
-+/*
-+ * The buffered writer allows efficient I/O by buffering writes and committing page-sized segments
-+ * to storage.
-+ */
-+struct buffered_writer {
-+	struct io_factory *factory;
-+	struct dm_bufio_client *client;
-+	struct dm_buffer *buffer;
-+	sector_t limit;
-+	sector_t block_number;
-+	u8 *start;
-+	u8 *end;
-+	int error;
-+};
-+
-+static void uds_get_io_factory(struct io_factory *factory)
-+{
-+	atomic_inc(&factory->ref_count);
-+}
-+
-+static int get_block_device_from_name(const char *name, struct block_device **bdev)
-+{
-+	dev_t device = name_to_dev_t(name);
-+
-+	if (device != 0)
-+		*bdev = blkdev_get_by_dev(device, BLK_FMODE, NULL);
-+	else
-+		*bdev = blkdev_get_by_path(name, BLK_FMODE, NULL);
-+	if (IS_ERR(*bdev)) {
-+		uds_log_error_strerror(-PTR_ERR(*bdev), "%s is not a block device", name);
++	default:
++		uds_log_error("invalid message type: %d", message->type);
 +		return UDS_INVALID_ARGUMENT;
 +	}
++}
++
++static void set_request_location(struct uds_request *request, enum uds_index_region new_location)
++{
++	request->location = new_location;
++	request->found = ((new_location == UDS_LOCATION_IN_OPEN_CHAPTER) ||
++			  (new_location == UDS_LOCATION_IN_DENSE) ||
++			  (new_location == UDS_LOCATION_IN_SPARSE));
++}
++
++static void set_chapter_location(struct uds_request *request,
++				 const struct index_zone *zone,
++				 u64 virtual_chapter)
++{
++	request->found = true;
++	if (virtual_chapter == zone->newest_virtual_chapter)
++		request->location = UDS_LOCATION_IN_OPEN_CHAPTER;
++	else if (is_zone_chapter_sparse(zone, virtual_chapter))
++		request->location = UDS_LOCATION_IN_SPARSE;
++	else
++		request->location = UDS_LOCATION_IN_DENSE;
++}
++
++static int search_sparse_cache_in_zone(struct index_zone *zone,
++				       struct uds_request *request,
++				       u64 virtual_chapter,
++				       bool *found)
++{
++	int result;
++	struct volume *volume;
++	u16 record_page_number;
++	u32 chapter;
++
++	result = uds_search_sparse_cache(zone,
++					 &request->record_name,
++					 &virtual_chapter,
++					 &record_page_number);
++	if ((result != UDS_SUCCESS) || (virtual_chapter == NO_CHAPTER))
++		return result;
++
++	request->virtual_chapter = virtual_chapter;
++	volume = zone->index->volume;
++	chapter = uds_map_to_physical_chapter(volume->geometry, virtual_chapter);
++	return uds_search_cached_record_page(volume, request, chapter, record_page_number, found);
++}
++
++static int get_record_from_zone(struct index_zone *zone, struct uds_request *request, bool *found)
++{
++	struct volume *volume;
++
++	if (request->location == UDS_LOCATION_RECORD_PAGE_LOOKUP) {
++		*found = true;
++		return UDS_SUCCESS;
++	} else if (request->location == UDS_LOCATION_UNAVAILABLE) {
++		*found = false;
++		return UDS_SUCCESS;
++	}
++
++	if (request->virtual_chapter == zone->newest_virtual_chapter) {
++		uds_search_open_chapter(zone->open_chapter,
++					&request->record_name,
++					&request->old_metadata,
++					found);
++		return UDS_SUCCESS;
++	}
++
++	if ((zone->newest_virtual_chapter > 0) &&
++	    (request->virtual_chapter == (zone->newest_virtual_chapter - 1)) &&
++	    (zone->writing_chapter->size > 0)) {
++		uds_search_open_chapter(zone->writing_chapter,
++					&request->record_name,
++					&request->old_metadata,
++					found);
++		return UDS_SUCCESS;
++	}
++
++	volume = zone->index->volume;
++	if (is_zone_chapter_sparse(zone, request->virtual_chapter) &&
++	    uds_sparse_cache_contains(volume->sparse_cache,
++				      request->virtual_chapter,
++				      request->zone_number))
++		return search_sparse_cache_in_zone(zone, request, request->virtual_chapter, found);
++
++	return uds_search_volume_page_cache(volume, request, found);
++}
++
++static int put_record_in_zone(struct index_zone *zone,
++			      struct uds_request *request,
++			      const struct uds_record_data *metadata)
++{
++	unsigned int remaining;
++
++	remaining = uds_put_open_chapter(zone->open_chapter, &request->record_name, metadata);
++	if (remaining == 0)
++		return open_next_chapter(zone);
 +
 +	return UDS_SUCCESS;
 +}
 +
-+int uds_make_io_factory(const char *path, struct io_factory **factory_ptr)
++static int search_index_zone(struct index_zone *zone, struct uds_request *request)
 +{
 +	int result;
-+	struct block_device *bdev;
-+	struct io_factory *factory;
++	struct volume_index_record record;
++	bool overflow_record, found = false;
++	struct uds_record_data *metadata;
++	u64 chapter;
 +
-+	result = get_block_device_from_name(path, &bdev);
++	result = uds_get_volume_index_record(zone->index->volume_index,
++					     &request->record_name,
++					     &record);
 +	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	result = UDS_ALLOCATE(1, struct io_factory, __func__, &factory);
-+	if (result != UDS_SUCCESS) {
-+		blkdev_put(bdev, BLK_FMODE);
-+		return result;
++	if (record.is_found) {
++		if (request->requeued && request->virtual_chapter != record.virtual_chapter)
++			set_request_location(request, UDS_LOCATION_UNKNOWN);
++
++		request->virtual_chapter = record.virtual_chapter;
++		result = get_record_from_zone(zone, request, &found);
++		if (result != UDS_SUCCESS)
++			return result;
 +	}
 +
-+	factory->bdev = bdev;
-+	atomic_set_release(&factory->ref_count, 1);
++	if (found)
++		set_chapter_location(request, zone, record.virtual_chapter);
 +
-+	*factory_ptr = factory;
-+	return UDS_SUCCESS;
-+}
++	/*
++	 * If a record has overflowed a chapter index in more than one chapter (or overflowed in
++	 * one chapter and collided with an existing record), it will exist as a collision record
++	 * in the volume index, but we won't find it in the volume. This case needs special
++	 * handling.
++	 */
++	overflow_record = (record.is_found && record.is_collision && !found);
++	chapter = zone->newest_virtual_chapter;
++	if (found || overflow_record) {
++		if ((request->type == UDS_QUERY_NO_UPDATE) ||
++		    ((request->type == UDS_QUERY) && overflow_record))
++			/* There is nothing left to do. */
++			return UDS_SUCCESS;
 +
-+int uds_replace_storage(struct io_factory *factory, const char *path)
-+{
-+	int result;
-+	struct block_device *bdev;
++		if (record.virtual_chapter != chapter)
++			/*
++			 * Update the volume index to reference the new chapter for the block. If
++			 * the record had been deleted or dropped from the chapter index, it will
++			 * be back.
++			 */
++			result = uds_set_volume_index_record_chapter(&record, chapter);
++		else if (request->type != UDS_UPDATE)
++			/* The record is already in the open chapter. */
++			return UDS_SUCCESS;
++	} else {
++		/*
++		 * The record wasn't in the volume index, so check whether the
++		 * name is in a cached sparse chapter. If we found the name on
++		 * a previous search, use that result instead.
++		 */
++		if (request->location == UDS_LOCATION_RECORD_PAGE_LOOKUP) {
++			found = true;
++		} else if (request->location == UDS_LOCATION_UNAVAILABLE) {
++			found = false;
++		} else if (uds_is_sparse_geometry(zone->index->volume->geometry) &&
++			   !uds_is_volume_index_sample(zone->index->volume_index,
++						       &request->record_name)) {
++			result = search_sparse_cache_in_zone(zone, request, NO_CHAPTER, &found);
++			if (result != UDS_SUCCESS)
++				return result;
++		}
 +
-+	result = get_block_device_from_name(path, &bdev);
-+	if (result != UDS_SUCCESS)
-+		return result;
++		if (found)
++			set_request_location(request, UDS_LOCATION_IN_SPARSE);
 +
-+	blkdev_put(factory->bdev, BLK_FMODE);
-+	factory->bdev = bdev;
-+	return UDS_SUCCESS;
-+}
++		if ((request->type == UDS_QUERY_NO_UPDATE) ||
++		    ((request->type == UDS_QUERY) && !found))
++			/* There is nothing left to do. */
++			return UDS_SUCCESS;
 +
-+/* Free an I/O factory once all references have been released. */
-+void uds_put_io_factory(struct io_factory *factory)
-+{
-+	if (atomic_add_return(-1, &factory->ref_count) <= 0) {
-+		blkdev_put(factory->bdev, BLK_FMODE);
-+		UDS_FREE(factory);
-+	}
-+}
-+
-+size_t uds_get_writable_size(struct io_factory *factory)
-+{
-+	return i_size_read(factory->bdev->bd_inode);
-+}
-+
-+/* Create a struct dm_bufio_client for an index region starting at offset. */
-+int uds_make_bufio(struct io_factory *factory,
-+		   off_t block_offset,
-+		   size_t block_size,
-+		   unsigned int reserved_buffers,
-+		   struct dm_bufio_client **client_ptr)
-+{
-+	struct dm_bufio_client *client;
-+
-+	client = dm_bufio_client_create(factory->bdev,
-+					block_size,
-+					reserved_buffers,
-+					0,
-+					NULL,
-+					NULL,
-+					0);
-+	if (IS_ERR(client))
-+		return -PTR_ERR(client);
-+
-+	dm_bufio_set_sector_offset(client, block_offset * SECTORS_PER_BLOCK);
-+	*client_ptr = client;
-+	return UDS_SUCCESS;
-+}
-+
-+static void read_ahead(struct buffered_reader *reader, sector_t block_number)
-+{
-+	if (block_number < reader->limit) {
-+		sector_t read_ahead =
-+			min((sector_t) MAX_READ_AHEAD_BLOCKS, reader->limit - block_number);
-+
-+		dm_bufio_prefetch(reader->client, block_number, read_ahead);
-+	}
-+}
-+
-+void uds_free_buffered_reader(struct buffered_reader *reader)
-+{
-+	if (reader == NULL)
-+		return;
-+
-+	if (reader->buffer != NULL)
-+		dm_bufio_release(reader->buffer);
-+
-+	dm_bufio_client_destroy(reader->client);
-+	uds_put_io_factory(reader->factory);
-+	UDS_FREE(reader);
-+}
-+
-+/* Create a buffered reader for an index region starting at offset. */
-+int uds_make_buffered_reader(struct io_factory *factory,
-+			     off_t offset,
-+			     u64 block_count,
-+			     struct buffered_reader **reader_ptr)
-+{
-+	int result;
-+	struct dm_bufio_client *client = NULL;
-+	struct buffered_reader *reader = NULL;
-+
-+	result = uds_make_bufio(factory, offset, UDS_BLOCK_SIZE, 1, &client);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	result = UDS_ALLOCATE(1, struct buffered_reader, "buffered reader", &reader);
-+	if (result != UDS_SUCCESS) {
-+		dm_bufio_client_destroy(client);
-+		return result;
++		/*
++		 * Add a new entry to the volume index referencing the open chapter. This needs to
++		 * be done both for new records, and for records from cached sparse chapters.
++		 */
++		result = uds_put_volume_index_record(&record, chapter);
 +	}
 +
-+	*reader = (struct buffered_reader) {
-+		.factory = factory,
-+		.client = client,
-+		.buffer = NULL,
-+		.limit = block_count,
-+		.block_number = 0,
-+		.start = NULL,
-+		.end = NULL,
-+	};
-+
-+	read_ahead(reader, 0);
-+	uds_get_io_factory(factory);
-+	*reader_ptr = reader;
-+	return UDS_SUCCESS;
-+}
-+
-+static int position_reader(struct buffered_reader *reader, sector_t block_number, off_t offset)
-+{
-+	struct dm_buffer *buffer = NULL;
-+	void *data;
-+
-+	if ((reader->end == NULL) || (block_number != reader->block_number)) {
-+		if (block_number >= reader->limit)
-+			return UDS_OUT_OF_RANGE;
-+
-+		if (reader->buffer != NULL)
-+			dm_bufio_release(UDS_FORGET(reader->buffer));
-+
-+		data = dm_bufio_read(reader->client, block_number, &buffer);
-+		if (IS_ERR(data))
-+			return -PTR_ERR(data);
-+
-+		reader->buffer = buffer;
-+		reader->start = data;
-+		if (block_number == reader->block_number + 1)
-+			read_ahead(reader, block_number + 1);
-+	}
-+
-+	reader->block_number = block_number;
-+	reader->end = reader->start + offset;
-+	return UDS_SUCCESS;
-+}
-+
-+static size_t bytes_remaining_in_read_buffer(struct buffered_reader *reader)
-+{
-+	return (reader->end == NULL) ? 0 : reader->start + UDS_BLOCK_SIZE - reader->end;
-+}
-+
-+static int reset_reader(struct buffered_reader *reader)
-+{
-+	sector_t block_number;
-+
-+	if (bytes_remaining_in_read_buffer(reader) > 0)
++	if (result == UDS_OVERFLOW)
++		/*
++		 * The volume index encountered a delta list overflow. The condition was already
++		 * logged. We will go on without adding the record to the open chapter.
++		 */
 +		return UDS_SUCCESS;
 +
-+	block_number = reader->block_number;
-+	if (reader->end != NULL)
-+		++block_number;
++	if (result != UDS_SUCCESS)
++		return result;
 +
-+	return position_reader(reader, block_number, 0);
++	if (!found || (request->type == UDS_UPDATE))
++		/* This is a new record or we're updating an existing record. */
++		metadata = &request->new_metadata;
++	else
++		/* Move the existing record to the open chapter. */
++		metadata = &request->old_metadata;
++
++	return put_record_in_zone(zone, request, metadata);
 +}
 +
-+int uds_read_from_buffered_reader(struct buffered_reader *reader, u8 *data, size_t length)
++static int remove_from_index_zone(struct index_zone *zone, struct uds_request *request)
 +{
-+	int result = UDS_SUCCESS;
-+	size_t chunk_size;
++	int result;
++	struct volume_index_record record;
 +
-+	while (length > 0) {
-+		result = reset_reader(reader);
++	result = uds_get_volume_index_record(zone->index->volume_index,
++					     &request->record_name,
++					     &record);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (!record.is_found)
++		return UDS_SUCCESS;
++
++	/* If the request was requeued, check whether the saved state is still valid. */
++
++	if (record.is_collision) {
++		set_chapter_location(request, zone, record.virtual_chapter);
++	} else {
++		/* Non-collision records are hints, so resolve the name in the chapter. */
++		bool found;
++
++		if (request->requeued && request->virtual_chapter != record.virtual_chapter)
++			set_request_location(request, UDS_LOCATION_UNKNOWN);
++
++		request->virtual_chapter = record.virtual_chapter;
++		result = get_record_from_zone(zone, request, &found);
 +		if (result != UDS_SUCCESS)
 +			return result;
 +
-+		chunk_size = min(length, bytes_remaining_in_read_buffer(reader));
-+		memcpy(data, reader->end, chunk_size);
-+		length -= chunk_size;
-+		data += chunk_size;
-+		reader->end += chunk_size;
++		if (!found)
++			/* There is no record to remove. */
++			return UDS_SUCCESS;
 +	}
++
++	set_chapter_location(request, zone, record.virtual_chapter);
++
++	/*
++	 * Delete the volume index entry for the named record only. Note that a later search might
++	 * later return stale advice if there is a colliding name in the same chapter, but it's a
++	 * very rare case (1 in 2^21).
++	 */
++	result = uds_remove_volume_index_record(&record);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	/*
++	 * If the record is in the open chapter, we must remove it or mark it deleted to avoid
++	 * trouble if the record is added again later.
++	 */
++	if (request->location == UDS_LOCATION_IN_OPEN_CHAPTER)
++		uds_remove_from_open_chapter(zone->open_chapter, &request->record_name);
 +
 +	return UDS_SUCCESS;
 +}
 +
-+/*
-+ * Verify that the next data on the reader matches the required value. If the value matches, the
-+ * matching contents are consumed. If the value does not match, the reader state is unchanged.
-+ */
-+int uds_verify_buffered_data(struct buffered_reader *reader, const u8 *value, size_t length)
++static int dispatch_index_request(struct uds_index *index, struct uds_request *request)
 +{
-+	int result = UDS_SUCCESS;
-+	size_t chunk_size;
-+	sector_t start_block_number = reader->block_number;
-+	int start_offset = reader->end - reader->start;
++	int result;
++	struct index_zone *zone = index->zones[request->zone_number];
 +
-+	while (length > 0) {
-+		result = reset_reader(reader);
-+		if (result != UDS_SUCCESS) {
-+			result = UDS_CORRUPT_DATA;
-+			break;
-+		}
-+
-+		chunk_size = min(length, bytes_remaining_in_read_buffer(reader));
-+		if (memcmp(value, reader->end, chunk_size) != 0) {
-+			result = UDS_CORRUPT_DATA;
-+			break;
-+		}
-+
-+		length -= chunk_size;
-+		value += chunk_size;
-+		reader->end += chunk_size;
++	if (!request->requeued) {
++		result = simulate_index_zone_barrier_message(zone, request);
++		if (result != UDS_SUCCESS)
++			return result;
 +	}
 +
-+	if (result != UDS_SUCCESS)
-+		position_reader(reader, start_block_number, start_offset);
++	switch (request->type) {
++	case UDS_POST:
++	case UDS_UPDATE:
++	case UDS_QUERY:
++	case UDS_QUERY_NO_UPDATE:
++		result = search_index_zone(zone, request);
++		break;
++
++	case UDS_DELETE:
++		result = remove_from_index_zone(zone, request);
++		break;
++
++	default:
++		result = uds_log_warning_strerror(UDS_INVALID_ARGUMENT,
++						  "invalid request type: %d",
++						  request->type);
++		break;
++	}
 +
 +	return result;
 +}
 +
-+/* Create a buffered writer for an index region starting at offset. */
-+int uds_make_buffered_writer(struct io_factory *factory,
-+			     off_t offset,
-+			     u64 block_count,
-+			     struct buffered_writer **writer_ptr)
++/* This is the request processing function invoked by each zone's thread. */
++static void execute_zone_request(struct uds_request *request)
 +{
 +	int result;
-+	struct dm_bufio_client *client = NULL;
-+	struct buffered_writer *writer;
++	struct uds_index *index = request->index;
 +
-+	result = uds_make_bufio(factory, offset, UDS_BLOCK_SIZE, 1, &client);
++	if (request->zone_message.type != UDS_MESSAGE_NONE) {
++		result = dispatch_index_zone_control_request(request);
++		if (result != UDS_SUCCESS)
++			uds_log_error_strerror(result,
++					       "error executing message: %d",
++					       request->zone_message.type);
++
++		/* Once the message is processed it can be freed. */
++		UDS_FREE(UDS_FORGET(request));
++		return;
++	}
++
++	index->need_to_save = true;
++	if (request->requeued && (request->status != UDS_SUCCESS)) {
++		set_request_location(request, UDS_LOCATION_UNAVAILABLE);
++		index->callback(request);
++		return;
++	}
++
++	result = dispatch_index_request(index, request);
++	if (result == UDS_QUEUED)
++		/* The request has been requeued so don't let it complete. */
++		return;
++
++	if (!request->found)
++		set_request_location(request, UDS_LOCATION_UNAVAILABLE);
++
++	request->status = result;
++	index->callback(request);
++}
++
++static int initialize_index_queues(struct uds_index *index, const struct geometry *geometry)
++{
++	int result;
++	unsigned int i;
++
++	for (i = 0; i < index->zone_count; i++) {
++		result = uds_make_request_queue("indexW",
++						&execute_zone_request,
++						&index->zone_queues[i]);
++		if (result != UDS_SUCCESS)
++			return result;
++	}
++
++	/* The triage queue is only needed for sparse multi-zone indexes. */
++	if ((index->zone_count > 1) && uds_is_sparse_geometry(geometry)) {
++		result = uds_make_request_queue("triageW", &triage_request, &index->triage_queue);
++		if (result != UDS_SUCCESS)
++			return result;
++	}
++
++	return UDS_SUCCESS;
++}
++
++/* This is the driver function for the chapter writer thread. */
++static void close_chapters(void *arg)
++{
++	int result;
++	struct chapter_writer *writer = arg;
++	struct uds_index *index = writer->index;
++
++	uds_log_debug("chapter writer starting");
++	uds_lock_mutex(&writer->mutex);
++	for (;;) {
++		while (writer->zones_to_write < index->zone_count) {
++			if (writer->stop && (writer->zones_to_write == 0)) {
++				/*
++				 * We've been told to stop, and all of the zones are in the same
++				 * open chapter, so we can exit now.
++				 */
++				uds_unlock_mutex(&writer->mutex);
++				uds_log_debug("chapter writer stopping");
++				return;
++			}
++			uds_wait_cond(&writer->cond, &writer->mutex);
++		}
++
++		/*
++		 * Release the lock while closing a chapter. We probably don't need to do this, but
++		 * it seems safer in principle. It's OK to access the chapter and chapter_number
++		 * fields without the lock since those aren't allowed to change until we're done.
++		 */
++		uds_unlock_mutex(&writer->mutex);
++
++		if (index->has_saved_open_chapter) {
++			/*
++			 * Remove the saved open chapter the first time we close an open chapter
++			 * after loading from a clean shutdown, or after doing a clean save. The
++			 * lack of the saved open chapter will indicate that a recovery is
++			 * necessary.
++			 */
++			index->has_saved_open_chapter = false;
++			result = uds_discard_open_chapter(index->layout);
++			if (result == UDS_SUCCESS)
++				uds_log_debug("Discarding saved open chapter");
++		}
++
++		result = uds_close_open_chapter(writer->chapters,
++						index->zone_count,
++						index->volume,
++						writer->open_chapter_index,
++						writer->collated_records,
++						index->newest_virtual_chapter);
++
++		uds_lock_mutex(&writer->mutex);
++		index->newest_virtual_chapter++;
++		index->oldest_virtual_chapter +=
++			uds_chapters_to_expire(index->volume->geometry,
++					       index->newest_virtual_chapter);
++		writer->result = result;
++		writer->zones_to_write = 0;
++		uds_broadcast_cond(&writer->cond);
++	}
++}
++
++static void stop_chapter_writer(struct chapter_writer *writer)
++{
++	struct thread *writer_thread = 0;
++
++	uds_lock_mutex(&writer->mutex);
++	if (writer->thread != 0) {
++		writer_thread = writer->thread;
++		writer->thread = 0;
++		writer->stop = true;
++		uds_broadcast_cond(&writer->cond);
++	}
++	uds_unlock_mutex(&writer->mutex);
++
++	if (writer_thread != 0)
++		uds_join_threads(writer_thread);
++}
++
++static void free_chapter_writer(struct chapter_writer *writer)
++{
++	if (writer == NULL)
++		return;
++
++	stop_chapter_writer(writer);
++	uds_destroy_mutex(&writer->mutex);
++	uds_destroy_cond(&writer->cond);
++	uds_free_open_chapter_index(writer->open_chapter_index);
++	UDS_FREE(writer->collated_records);
++	UDS_FREE(writer);
++}
++
++static int make_chapter_writer(struct uds_index *index, struct chapter_writer **writer_ptr)
++{
++	int result;
++	struct chapter_writer *writer;
++	size_t collated_records_size =
++		(sizeof(struct uds_volume_record) * index->volume->geometry->records_per_chapter);
++
++	result = UDS_ALLOCATE_EXTENDED(struct chapter_writer,
++				       index->zone_count,
++				       struct open_chapter_zone *,
++				       "Chapter Writer",
++				       &writer);
 +	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	result = UDS_ALLOCATE(1, struct buffered_writer, "buffered writer", &writer);
++	writer->index = index;
++	result = uds_init_mutex(&writer->mutex);
 +	if (result != UDS_SUCCESS) {
-+		dm_bufio_client_destroy(client);
++		UDS_FREE(writer);
 +		return result;
 +	}
 +
-+	*writer = (struct buffered_writer) {
-+		.factory = factory,
-+		.client = client,
-+		.buffer = NULL,
-+		.limit = block_count,
-+		.start = NULL,
-+		.end = NULL,
-+		.block_number = 0,
-+		.error = UDS_SUCCESS,
-+	};
++	result = uds_init_cond(&writer->cond);
++	if (result != UDS_SUCCESS) {
++		uds_destroy_mutex(&writer->mutex);
++		UDS_FREE(writer);
++		return result;
++	}
 +
-+	uds_get_io_factory(factory);
++	result = uds_allocate_cache_aligned(collated_records_size,
++					    "collated records",
++					    &writer->collated_records);
++	if (result != UDS_SUCCESS) {
++		free_chapter_writer(writer);
++		return result;
++	}
++
++	result = uds_make_open_chapter_index(&writer->open_chapter_index,
++					     index->volume->geometry,
++					     index->volume->nonce);
++	if (result != UDS_SUCCESS) {
++		free_chapter_writer(writer);
++		return result;
++	}
++
++	writer->memory_size = (sizeof(struct chapter_writer) +
++			       index->zone_count * sizeof(struct open_chapter_zone *) +
++			       collated_records_size +
++			       writer->open_chapter_index->memory_size);
++
++	result = uds_create_thread(close_chapters, writer, "writer", &writer->thread);
++	if (result != UDS_SUCCESS) {
++		free_chapter_writer(writer);
++		return result;
++	}
++
 +	*writer_ptr = writer;
 +	return UDS_SUCCESS;
 +}
 +
-+static size_t get_remaining_write_space(struct buffered_writer *writer)
++static int load_index(struct uds_index *index)
 +{
-+	return writer->start + UDS_BLOCK_SIZE - writer->end;
-+}
++	int result;
++	u64 last_save_chapter;
 +
-+static int __must_check prepare_next_buffer(struct buffered_writer *writer)
-+{
-+	struct dm_buffer *buffer = NULL;
-+	void *data;
++	result = uds_load_index_state(index->layout, index);
++	if (result != UDS_SUCCESS)
++		return UDS_INDEX_NOT_SAVED_CLEANLY;
 +
-+	if (writer->block_number >= writer->limit) {
-+		writer->error = UDS_OUT_OF_RANGE;
-+		return UDS_OUT_OF_RANGE;
-+	}
++	last_save_chapter = ((index->last_save != NO_LAST_SAVE) ? index->last_save : 0);
 +
-+	data = dm_bufio_new(writer->client, writer->block_number, &buffer);
-+	if (IS_ERR(data)) {
-+		writer->error = -PTR_ERR(data);
-+		return writer->error;
-+	}
++	uds_log_info("loaded index from chapter %llu through chapter %llu",
++		     (unsigned long long) index->oldest_virtual_chapter,
++		     (unsigned long long) last_save_chapter);
 +
-+	writer->buffer = buffer;
-+	writer->start = data;
-+	writer->end = data;
 +	return UDS_SUCCESS;
 +}
 +
-+static int flush_previous_buffer(struct buffered_writer *writer)
++static int rebuild_index_page_map(struct uds_index *index, u64 vcn)
 +{
-+	size_t available;
++	int result;
++	struct delta_index_page *chapter_index_page;
++	struct geometry *geometry = index->volume->geometry;
++	u32 chapter = uds_map_to_physical_chapter(geometry, vcn);
++	u32 expected_list_number = 0;
++	u32 index_page_number;
++	u32 lowest_delta_list;
++	u32 highest_delta_list;
 +
-+	if (writer->buffer == NULL)
-+		return writer->error;
++	for (index_page_number = 0;
++	     index_page_number < geometry->index_pages_per_chapter;
++	     index_page_number++) {
++		result = uds_get_volume_index_page(index->volume,
++						   chapter,
++						   index_page_number,
++						   &chapter_index_page);
++		if (result != UDS_SUCCESS)
++			return uds_log_error_strerror(result,
++						      "failed to read index page %u in chapter %u",
++						      index_page_number,
++						      chapter);
 +
-+	if (writer->error == UDS_SUCCESS) {
-+		available = get_remaining_write_space(writer);
++		lowest_delta_list = chapter_index_page->lowest_list_number;
++		highest_delta_list = chapter_index_page->highest_list_number;
++		if (lowest_delta_list != expected_list_number)
++			return uds_log_error_strerror(UDS_CORRUPT_DATA,
++						      "chapter %u index page %u is corrupt",
++						      chapter,
++						      index_page_number);
 +
-+		if (available > 0)
-+			memset(writer->end, 0, available);
-+
-+		dm_bufio_mark_buffer_dirty(writer->buffer);
++		uds_update_index_page_map(index->volume->index_page_map,
++					  vcn,
++					  chapter,
++					  index_page_number,
++					  highest_delta_list);
++		expected_list_number = highest_delta_list + 1;
 +	}
 +
-+	dm_bufio_release(writer->buffer);
-+	writer->buffer = NULL;
-+	writer->start = NULL;
-+	writer->end = NULL;
-+	writer->block_number++;
-+	return writer->error;
++	return UDS_SUCCESS;
 +}
 +
-+void uds_free_buffered_writer(struct buffered_writer *writer)
++static int replay_record(struct uds_index *index,
++			 const struct uds_record_name *name,
++			 u64 virtual_chapter,
++			 bool will_be_sparse_chapter)
++{
++	int result;
++	struct volume_index_record record;
++	bool update_record;
++
++	if (will_be_sparse_chapter && !uds_is_volume_index_sample(index->volume_index, name))
++		/*
++		 * This entry will be in a sparse chapter after the rebuild completes, and it is
++		 * not a sample, so just skip over it.
++		 */
++		return UDS_SUCCESS;
++
++	result = uds_get_volume_index_record(index->volume_index, name, &record);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (record.is_found) {
++		if (record.is_collision) {
++			if (record.virtual_chapter == virtual_chapter)
++				/* The record is already correct. */
++				return UDS_SUCCESS;
++
++			update_record = true;
++		} else if (record.virtual_chapter == virtual_chapter) {
++			/*
++			 * There is a volume index entry pointing to the current chapter, but we
++			 * don't know if it is for the same name as the one we are currently
++			 * working on or not. For now, we're just going to assume that it isn't.
++			 * This will create one extra collision record if there was a deleted
++			 * record in the current chapter.
++			 */
++			update_record = false;
++		} else {
++			/*
++			 * If we're rebuilding, we don't normally want to go to disk to see if the
++			 * record exists, since we will likely have just read the record from disk
++			 * (i.e. we know it's there). The exception to this is when we find an
++			 * entry in the volume index that has a different chapter. In this case, we
++			 * need to search that chapter to determine if the volume index entry was
++			 * for the same record or a different one.
++			 */
++			result = uds_search_volume_page_cache_for_rebuild(index->volume,
++									  name,
++									  record.virtual_chapter,
++									  &update_record);
++			if (result != UDS_SUCCESS)
++				return result;
++			}
++	} else {
++		update_record = false;
++	}
++
++	if (update_record)
++		/*
++		 * Update the volume index to reference the new chapter for the block. If the
++		 * record had been deleted or dropped from the chapter index, it will be back.
++		 */
++		result = uds_set_volume_index_record_chapter(&record, virtual_chapter);
++	else
++		/*
++		 * Add a new entry to the volume index referencing the open chapter. This should be
++		 * done regardless of whether we are a brand new record or a sparse record, i.e.
++		 * one that doesn't exist in the index but does on disk, since for a sparse record,
++		 * we would want to un-sparsify if it did exist.
++		 */
++		result = uds_put_volume_index_record(&record, virtual_chapter);
++
++	if ((result == UDS_DUPLICATE_NAME) || (result == UDS_OVERFLOW))
++		/* The rebuilt index will lose these records. */
++		return UDS_SUCCESS;
++
++	return result;
++}
++
++static bool check_for_suspend(struct uds_index *index)
++{
++	bool closing;
++
++	if (index->load_context == NULL)
++		return false;
++
++	uds_lock_mutex(&index->load_context->mutex);
++	if (index->load_context->status != INDEX_SUSPENDING) {
++		uds_unlock_mutex(&index->load_context->mutex);
++		return false;
++	}
++
++	/* Notify that we are suspended and wait for the resume. */
++	index->load_context->status = INDEX_SUSPENDED;
++	uds_broadcast_cond(&index->load_context->cond);
++
++	while ((index->load_context->status != INDEX_OPENING) &&
++	       (index->load_context->status != INDEX_FREEING))
++		uds_wait_cond(&index->load_context->cond, &index->load_context->mutex);
++
++	closing = (index->load_context->status == INDEX_FREEING);
++	uds_unlock_mutex(&index->load_context->mutex);
++	return closing;
++}
++
++static int replay_chapter(struct uds_index *index, u64 virtual, bool sparse)
++{
++	int result;
++	u32 i;
++	u32 j;
++	const struct geometry *geometry;
++	u32 physical_chapter;
++
++	if (check_for_suspend(index)) {
++		uds_log_info("Replay interrupted by index shutdown at chapter %llu",
++			     (unsigned long long) virtual);
++		return -EBUSY;
++	}
++
++	geometry = index->volume->geometry;
++	physical_chapter = uds_map_to_physical_chapter(geometry, virtual);
++	uds_prefetch_volume_chapter(index->volume, physical_chapter);
++	uds_set_volume_index_open_chapter(index->volume_index, virtual);
++
++	result = rebuild_index_page_map(index, virtual);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result,
++					      "could not rebuild index page map for chapter %u",
++					      physical_chapter);
++
++	for (i = 0; i < geometry->record_pages_per_chapter; i++) {
++		u8 *record_page;
++		u32 record_page_number;
++
++		record_page_number = geometry->index_pages_per_chapter + i;
++		result = uds_get_volume_record_page(index->volume,
++						    physical_chapter,
++						    record_page_number,
++						    &record_page);
++		if (result != UDS_SUCCESS)
++			return uds_log_error_strerror(result,
++						      "could not get page %d",
++						      record_page_number);
++
++		for (j = 0; j < geometry->records_per_page; j++) {
++			const u8 *name_bytes;
++			struct uds_record_name name;
++
++			name_bytes = record_page + (j * BYTES_PER_RECORD);
++			memcpy(&name.name, name_bytes, UDS_RECORD_NAME_SIZE);
++			result = replay_record(index, &name, virtual, sparse);
++			if (result != UDS_SUCCESS)
++				return result;
++		}
++	}
++
++	return UDS_SUCCESS;
++}
++
++static int replay_volume(struct uds_index *index)
++{
++	int result;
++	u64 old_map_update;
++	u64 new_map_update;
++	u64 virtual;
++	u64 from_virtual = index->oldest_virtual_chapter;
++	u64 upto_virtual = index->newest_virtual_chapter;
++	bool will_be_sparse;
++
++	uds_log_info("Replaying volume from chapter %llu through chapter %llu",
++		     (unsigned long long) from_virtual,
++		     (unsigned long long) upto_virtual);
++
++	/*
++	 * The index failed to load, so the volume index is empty. Add records to the volume index
++	 * in order, skipping non-hooks in chapters which will be sparse to save time.
++	 *
++	 * Go through each record page of each chapter and add the records back to the volume
++	 * index. This should not cause anything to be written to either the open chapter or the
++	 * on-disk volume. Also skip the on-disk chapter corresponding to upto_virtual, as this
++	 * would have already been purged from the volume index when the chapter was opened.
++	 *
++	 * Also, go through each index page for each chapter and rebuild the index page map.
++	 */
++	old_map_update = index->volume->index_page_map->last_update;
++	for (virtual = from_virtual; virtual < upto_virtual; ++virtual) {
++		will_be_sparse = uds_is_chapter_sparse(index->volume->geometry,
++						       from_virtual,
++						       upto_virtual,
++						       virtual);
++		result = replay_chapter(index, virtual, will_be_sparse);
++		if (result != UDS_SUCCESS)
++			return result;
++	}
++
++	/* Also reap the chapter being replaced by the open chapter. */
++	uds_set_volume_index_open_chapter(index->volume_index, upto_virtual);
++
++	new_map_update = index->volume->index_page_map->last_update;
++	if (new_map_update != old_map_update)
++		uds_log_info("replay changed index page map update from %llu to %llu",
++			     (unsigned long long) old_map_update,
++			     (unsigned long long) new_map_update);
++
++	return UDS_SUCCESS;
++}
++
++static int rebuild_index(struct uds_index *index)
++{
++	int result;
++	u64 lowest;
++	u64 highest;
++	bool is_empty = false;
++	u32 chapters_per_volume = index->volume->geometry->chapters_per_volume;
++
++	index->volume->lookup_mode = LOOKUP_FOR_REBUILD;
++	result = uds_find_volume_chapter_boundaries(index->volume, &lowest, &highest, &is_empty);
++	if (result != UDS_SUCCESS)
++		return uds_log_fatal_strerror(result,
++					      "cannot rebuild index: unknown volume chapter boundaries");
++
++	if (is_empty) {
++		index->newest_virtual_chapter = 0;
++		index->oldest_virtual_chapter = 0;
++		index->volume->lookup_mode = LOOKUP_NORMAL;
++		return UDS_SUCCESS;
++	}
++
++	index->newest_virtual_chapter = highest + 1;
++	index->oldest_virtual_chapter = lowest;
++	if (index->newest_virtual_chapter == (index->oldest_virtual_chapter + chapters_per_volume))
++		/* Skip the chapter shadowed by the open chapter. */
++		index->oldest_virtual_chapter++;
++
++	result = replay_volume(index);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	index->volume->lookup_mode = LOOKUP_NORMAL;
++	return UDS_SUCCESS;
++}
++
++static void free_index_zone(struct index_zone *zone)
++{
++	if (zone == NULL)
++		return;
++
++	uds_free_open_chapter(zone->open_chapter);
++	uds_free_open_chapter(zone->writing_chapter);
++	UDS_FREE(zone);
++}
++
++static int make_index_zone(struct uds_index *index, unsigned int zone_number)
++{
++	int result;
++	struct index_zone *zone;
++
++	result = UDS_ALLOCATE(1, struct index_zone, "index zone", &zone);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_make_open_chapter(index->volume->geometry,
++				       index->zone_count,
++				       &zone->open_chapter);
++	if (result != UDS_SUCCESS) {
++		free_index_zone(zone);
++		return result;
++	}
++
++	result = uds_make_open_chapter(index->volume->geometry,
++				       index->zone_count,
++				       &zone->writing_chapter);
++	if (result != UDS_SUCCESS) {
++		free_index_zone(zone);
++		return result;
++	}
++
++	zone->index = index;
++	zone->id = zone_number;
++	index->zones[zone_number] = zone;
++
++	return UDS_SUCCESS;
++}
++
++int uds_make_index(struct configuration *config,
++		   enum uds_open_index_type open_type,
++		   struct index_load_context *load_context,
++		   index_callback_t callback,
++		   struct uds_index **new_index)
++{
++	int result;
++	bool loaded = false;
++	bool new = (open_type == UDS_CREATE);
++	struct uds_index *index = NULL;
++	struct index_zone *zone;
++	u64 nonce;
++	unsigned int z;
++
++	result = UDS_ALLOCATE_EXTENDED(struct uds_index,
++				       config->zone_count,
++				       struct uds_request_queue *,
++				       "index",
++				       &index);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	index->zone_count = config->zone_count;
++
++	result = uds_make_index_layout(config, new, &index->layout);
++	if (result != UDS_SUCCESS) {
++		uds_free_index(index);
++		return result;
++	}
++
++	result = UDS_ALLOCATE(index->zone_count, struct index_zone *, "zones", &index->zones);
++	if (result != UDS_SUCCESS) {
++		uds_free_index(index);
++		return result;
++	}
++
++	result = uds_make_volume(config, index->layout, &index->volume);
++	if (result != UDS_SUCCESS) {
++		uds_free_index(index);
++		return result;
++	}
++
++	index->volume->lookup_mode = LOOKUP_NORMAL;
++	for (z = 0; z < index->zone_count; z++) {
++		result = make_index_zone(index, z);
++		if (result != UDS_SUCCESS) {
++			uds_free_index(index);
++			return uds_log_error_strerror(result, "Could not create index zone");
++		}
++	}
++
++	nonce = uds_get_volume_nonce(index->layout);
++	result = uds_make_volume_index(config, nonce, &index->volume_index);
++	if (result != UDS_SUCCESS) {
++		uds_free_index(index);
++		return uds_log_error_strerror(result, "could not make volume index");
++	}
++
++	index->load_context = load_context;
++	index->callback = callback;
++
++	result = initialize_index_queues(index, config->geometry);
++	if (result != UDS_SUCCESS) {
++		uds_free_index(index);
++		return result;
++	}
++
++	result = make_chapter_writer(index, &index->chapter_writer);
++	if (result != UDS_SUCCESS) {
++		uds_free_index(index);
++		return result;
++	}
++
++	if (!new) {
++		result = load_index(index);
++		switch (result) {
++		case UDS_SUCCESS:
++			loaded = true;
++			break;
++		case -ENOMEM:
++			/* We should not try a rebuild for this error. */
++			uds_log_error_strerror(result, "index could not be loaded");
++			break;
++		default:
++			uds_log_error_strerror(result, "index could not be loaded");
++			if (open_type == UDS_LOAD) {
++				result = rebuild_index(index);
++				if (result != UDS_SUCCESS)
++					uds_log_error_strerror(result,
++							       "index could not be rebuilt");
++			}
++			break;
++		}
++	}
++
++	if (result != UDS_SUCCESS) {
++		uds_free_index(index);
++		return uds_log_error_strerror(result, "fatal error in %s()", __func__);
++	}
++
++	for (z = 0; z < index->zone_count; z++) {
++		zone = index->zones[z];
++		zone->oldest_virtual_chapter = index->oldest_virtual_chapter;
++		zone->newest_virtual_chapter = index->newest_virtual_chapter;
++	}
++
++	if (index->load_context != NULL) {
++		uds_lock_mutex(&index->load_context->mutex);
++		index->load_context->status = INDEX_READY;
++		/*
++		 * If we get here, suspend is meaningless, but notify any thread trying to suspend
++		 * us so it doesn't hang.
++		 */
++		uds_broadcast_cond(&index->load_context->cond);
++		uds_unlock_mutex(&index->load_context->mutex);
++	}
++
++	index->has_saved_open_chapter = loaded;
++	index->need_to_save = !loaded;
++	*new_index = index;
++	return UDS_SUCCESS;
++}
++
++void uds_free_index(struct uds_index *index)
++{
++	unsigned int i;
++
++	if (index == NULL)
++		return;
++
++	uds_request_queue_finish(index->triage_queue);
++	for (i = 0; i < index->zone_count; i++)
++		uds_request_queue_finish(index->zone_queues[i]);
++
++	free_chapter_writer(index->chapter_writer);
++
++	uds_free_volume_index(index->volume_index);
++	if (index->zones != NULL) {
++		for (i = 0; i < index->zone_count; i++)
++			free_index_zone(index->zones[i]);
++		UDS_FREE(index->zones);
++	}
++
++	uds_free_volume(index->volume);
++	uds_free_index_layout(UDS_FORGET(index->layout));
++	UDS_FREE(index);
++}
++
++/* Wait for the chapter writer to complete any outstanding writes. */
++void uds_wait_for_idle_index(struct uds_index *index)
++{
++	struct chapter_writer *writer = index->chapter_writer;
++
++	uds_lock_mutex(&writer->mutex);
++	while (writer->zones_to_write > 0)
++		uds_wait_cond(&writer->cond, &writer->mutex);
++	uds_unlock_mutex(&writer->mutex);
++}
++
++/* This function assumes that all requests have been drained. */
++int uds_save_index(struct uds_index *index)
 +{
 +	int result;
 +
-+	if (writer == NULL)
-+		return;
++	if (!index->need_to_save)
++		return UDS_SUCCESS;
 +
-+	flush_previous_buffer(writer);
-+	result = -dm_bufio_write_dirty_buffers(writer->client);
-+	if (result != UDS_SUCCESS)
-+		uds_log_warning_strerror(result, "%s: failed to sync storage", __func__);
++	uds_wait_for_idle_index(index);
++	index->prev_save = index->last_save;
++	index->last_save = ((index->newest_virtual_chapter == 0) ?
++			    NO_LAST_SAVE :
++			    index->newest_virtual_chapter - 1);
++	uds_log_info("beginning save (vcn %llu)", (unsigned long long) index->last_save);
 +
-+	dm_bufio_client_destroy(writer->client);
-+	uds_put_io_factory(writer->factory);
-+	UDS_FREE(writer);
-+}
-+
-+/*
-+ * Append data to the buffer, writing as needed. If no data is provided, zeros are written instead.
-+ * If a write error occurs, it is recorded and returned on every subsequent write attempt.
-+ */
-+int uds_write_to_buffered_writer(struct buffered_writer *writer, const u8 *data, size_t length)
-+{
-+	int result = writer->error;
-+	size_t chunk_size;
-+
-+	while ((length > 0) && (result == UDS_SUCCESS)) {
-+		if (writer->buffer == NULL) {
-+			result = prepare_next_buffer(writer);
-+			continue;
-+		}
-+
-+		chunk_size = min(length, get_remaining_write_space(writer));
-+		if (data == NULL) {
-+			memset(writer->end, 0, chunk_size);
-+		} else {
-+			memcpy(writer->end, data, chunk_size);
-+			data += chunk_size;
-+		}
-+
-+		length -= chunk_size;
-+		writer->end += chunk_size;
-+
-+		if (get_remaining_write_space(writer) == 0)
-+			result = uds_flush_buffered_writer(writer);
++	result = uds_save_index_state(index->layout, index);
++	if (result != UDS_SUCCESS) {
++		uds_log_info("save index failed");
++		index->last_save = index->prev_save;
++	} else {
++		index->has_saved_open_chapter = true;
++		index->need_to_save = false;
++		uds_log_info("finished save (vcn %llu)", (unsigned long long) index->last_save);
 +	}
 +
 +	return result;
 +}
 +
-+int uds_flush_buffered_writer(struct buffered_writer *writer)
++int uds_replace_index_storage(struct uds_index *index, const char *path)
 +{
-+	if (writer->error != UDS_SUCCESS)
-+		return writer->error;
-+
-+	return flush_previous_buffer(writer);
++	return uds_replace_volume_storage(index->volume, index->layout, path);
 +}
-diff --git a/drivers/md/dm-vdo/io-factory.h b/drivers/md/dm-vdo/io-factory.h
++
++/* Accessing statistics should be safe from any thread. */
++void uds_get_index_stats(struct uds_index *index, struct uds_index_stats *counters)
++{
++	struct volume_index_stats stats;
++
++	uds_get_volume_index_stats(index->volume_index, &stats);
++	counters->entries_indexed = stats.record_count;
++	counters->collisions = stats.collision_count;
++	counters->entries_discarded = stats.discard_count;
++
++	counters->memory_used = (index->volume_index->memory_size +
++				 index->volume->cache_size +
++				 index->chapter_writer->memory_size);
++}
++
++void uds_enqueue_request(struct uds_request *request, enum request_stage stage)
++{
++	struct uds_index *index = request->index;
++	struct uds_request_queue *queue;
++
++	switch (stage) {
++	case STAGE_TRIAGE:
++		if (index->triage_queue != NULL) {
++			queue = index->triage_queue;
++			break;
++		}
++
++		fallthrough;
++
++	case STAGE_INDEX:
++		request->zone_number =
++			uds_get_volume_index_zone(index->volume_index, &request->record_name);
++		fallthrough;
++
++	case STAGE_MESSAGE:
++		queue = index->zone_queues[request->zone_number];
++		break;
++
++	default:
++		ASSERT_LOG_ONLY(false, "invalid index stage: %d", stage);
++		return;
++	}
++
++	uds_request_queue_enqueue(queue, request);
++}
+diff --git a/drivers/md/dm-vdo/index.h b/drivers/md/dm-vdo/index.h
 new file mode 100644
-index 00000000000..1aa5ded6204
+index 00000000000..9dfb2e1b85d
 --- /dev/null
-+++ b/drivers/md/dm-vdo/io-factory.h
-@@ -0,0 +1,66 @@
++++ b/drivers/md/dm-vdo/index.h
+@@ -0,0 +1,83 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright Red Hat
 + */
 +
-+#ifndef UDS_IO_FACTORY_H
-+#define UDS_IO_FACTORY_H
++#ifndef UDS_INDEX_H
++#define UDS_INDEX_H
 +
-+#include <linux/dm-bufio.h>
++#include "index-layout.h"
++#include "index-session.h"
++#include "open-chapter.h"
++#include "volume.h"
++#include "volume-index.h"
 +
 +/*
-+ * The I/O factory manages all low-level I/O operations to the underlying storage device. Its main
-+ * clients are the index layout and the volume. The buffered reader and buffered writer interfaces
-+ * are helpers for accessing data in a contiguous range of storage blocks.
++ * The index is a high-level structure which represents the totality of the UDS index. It manages
++ * the queues for incoming requests and dispatches them to the appropriate sub-components like the
++ * volume or the volume index. It also manages administrative tasks such as saving and loading the
++ * index.
++ *
++ * The index is divided into a number of independent zones and assigns each request to a zone based
++ * on its name. Most sub-components are similarly divided into zones as well so that requests in
++ * each zone usually operate without interference or coordination between zones.
 + */
 +
-+struct buffered_reader;
-+struct buffered_writer;
++typedef void (*index_callback_t)(struct uds_request *request);
 +
-+struct io_factory;
-+
-+enum {
-+	UDS_BLOCK_SIZE = 4096,
-+	SECTORS_PER_BLOCK = UDS_BLOCK_SIZE >> SECTOR_SHIFT,
++struct index_zone {
++	struct uds_index *index;
++	struct open_chapter_zone *open_chapter;
++	struct open_chapter_zone *writing_chapter;
++	u64 oldest_virtual_chapter;
++	u64 newest_virtual_chapter;
++	unsigned int id;
 +};
 +
-+int __must_check uds_make_io_factory(const char *path, struct io_factory **factory_ptr);
++struct uds_index {
++	bool has_saved_open_chapter;
++	bool need_to_save;
++	struct index_load_context *load_context;
++	struct index_layout *layout;
++	struct volume_index *volume_index;
++	struct volume *volume;
++	unsigned int zone_count;
++	struct index_zone **zones;
 +
-+int __must_check uds_replace_storage(struct io_factory *factory, const char *path);
++	u64 oldest_virtual_chapter;
++	u64 newest_virtual_chapter;
 +
-+void uds_put_io_factory(struct io_factory *factory);
++	u64 last_save;
++	u64 prev_save;
++	struct chapter_writer *chapter_writer;
 +
-+size_t __must_check uds_get_writable_size(struct io_factory *factory);
++	index_callback_t callback;
++	struct uds_request_queue *triage_queue;
++	struct uds_request_queue *zone_queues[];
++};
 +
-+int __must_check uds_make_bufio(struct io_factory *factory,
-+				off_t block_offset,
-+				size_t block_size,
-+				unsigned int reserved_buffers,
-+				struct dm_bufio_client **client_ptr);
++enum request_stage {
++	STAGE_TRIAGE,
++	STAGE_INDEX,
++	STAGE_MESSAGE,
++};
 +
-+int __must_check uds_make_buffered_reader(struct io_factory *factory,
-+					  off_t offset,
-+					  u64 block_count,
-+					  struct buffered_reader **reader_ptr);
++int __must_check uds_make_index(struct configuration *config,
++				enum uds_open_index_type open_type,
++				struct index_load_context *load_context,
++				index_callback_t callback,
++				struct uds_index **new_index);
 +
-+void uds_free_buffered_reader(struct buffered_reader *reader);
++int __must_check uds_save_index(struct uds_index *index);
 +
-+int __must_check
-+uds_read_from_buffered_reader(struct buffered_reader *reader, u8 *data, size_t length);
++void uds_free_index(struct uds_index *index);
 +
-+int __must_check
-+uds_verify_buffered_data(struct buffered_reader *reader, const u8 *value, size_t length);
++int __must_check uds_replace_index_storage(struct uds_index *index, const char *path);
 +
-+int __must_check uds_make_buffered_writer(struct io_factory *factory,
-+					  off_t offset,
-+					  u64 block_count,
-+					  struct buffered_writer **writer_ptr);
++void uds_get_index_stats(struct uds_index *index, struct uds_index_stats *counters);
 +
-+void uds_free_buffered_writer(struct buffered_writer *buffer);
++void uds_enqueue_request(struct uds_request *request, enum request_stage stage);
 +
-+int __must_check
-+uds_write_to_buffered_writer(struct buffered_writer *writer, const u8 *data, size_t length);
++void uds_wait_for_idle_index(struct uds_index *index);
 +
-+int __must_check uds_flush_buffered_writer(struct buffered_writer *writer);
-+
-+#endif /* UDS_IO_FACTORY_H */
-diff --git a/drivers/md/dm-vdo/numeric.h b/drivers/md/dm-vdo/numeric.h
++#endif /* UDS_INDEX_H */
+diff --git a/drivers/md/dm-vdo/sparse-cache.c b/drivers/md/dm-vdo/sparse-cache.c
 new file mode 100644
-index 00000000000..bd4ca019d1b
+index 00000000000..3a88392adca
 --- /dev/null
-+++ b/drivers/md/dm-vdo/numeric.h
-@@ -0,0 +1,78 @@
++++ b/drivers/md/dm-vdo/sparse-cache.c
+@@ -0,0 +1,595 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright Red Hat
++ */
++
++#include "sparse-cache.h"
++
++#include <linux/cache.h>
++#include <linux/dm-bufio.h>
++
++#include "chapter-index.h"
++#include "config.h"
++#include "index.h"
++#include "logger.h"
++#include "memory-alloc.h"
++#include "permassert.h"
++#include "uds-threads.h"
++
++/*
++ * Since the cache is small, it is implemented as a simple array of cache entries. Searching for a
++ * specific virtual chapter is implemented as a linear search. The cache replacement policy is
++ * least-recently-used (LRU). Again, the small size of the cache allows the LRU order to be
++ * maintained by shifting entries in an array list.
++ *
++ * Changing the contents of the cache requires the coordinated participation of all zone threads
++ * via the careful use of barrier messages sent to all the index zones by the triage queue worker
++ * thread. The critical invariant for coordination is that the cache membership must not change
++ * between updates, so that all calls to uds_sparse_cache_contains() from the zone threads must all
++ * receive the same results for every virtual chapter number. To ensure that critical invariant,
++ * state changes such as "that virtual chapter is no longer in the volume" and "skip searching that
++ * chapter because it has had too many cache misses" are represented separately from the cache
++ * membership information (the virtual chapter number).
++ *
++ * As a result of this invariant, we have the guarantee that every zone thread will call
++ * uds_update_sparse_cache() once and exactly once to request a chapter that is not in the cache,
++ * and the serialization of the barrier requests from the triage queue ensures they will all
++ * request the same chapter number. This means the only synchronization we need can be provided by
++ * a pair of thread barriers used only in the uds_update_sparse_cache() call, providing a critical
++ * section where a single zone thread can drive the cache update while all the other zone threads
++ * are known to be blocked, waiting in the second barrier. Outside that critical section, all the
++ * zone threads implicitly hold a shared lock. Inside it, the thread for zone zero holds an
++ * exclusive lock. No other threads may access or modify the cache entries.
++ *
++ * Chapter statistics must only be modified by a single thread, which is also the zone zero thread.
++ * All fields that might be frequently updated by that thread are kept in separate cache-aligned
++ * structures so they will not cause cache contention via "false sharing" with the fields that are
++ * frequently accessed by all of the zone threads.
++ *
++ * The LRU order is managed independently by each zone thread, and each zone uses its own list for
++ * searching and cache membership queries. The zone zero list is used to decide which chapter to
++ * evict when the cache is updated, and its search list is copied to the other threads at that
++ * time.
++ *
++ * The virtual chapter number field of the cache entry is the single field indicating whether a
++ * chapter is a member of the cache or not. The value NO_CHAPTER is used to represent a null or
++ * undefined chapter number. When present in the virtual chapter number field of a
++ * cached_chapter_index, it indicates that the cache entry is dead, and all the other fields of
++ * that entry (other than immutable pointers to cache memory) are undefined and irrelevant. Any
++ * cache entry that is not marked as dead is fully defined and a member of the cache, and
++ * uds_sparse_cache_contains() will always return true for any virtual chapter number that appears
++ * in any of the cache entries.
++ *
++ * A chapter index that is a member of the cache may be excluded from searches between calls to
++ * uds_update_sparse_cache() in two different ways. First, when a chapter falls off the end of the
++ * volume, its virtual chapter number will be less that the oldest virtual chapter number. Since
++ * that chapter is no longer part of the volume, there's no point in continuing to search that
++ * chapter index. Once invalidated, that virtual chapter will still be considered a member of the
++ * cache, but it will no longer be searched for matching names.
++ *
++ * The second mechanism is a heuristic based on keeping track of the number of consecutive search
++ * misses in a given chapter index. Once that count exceeds a threshold, the skip_search flag will
++ * be set to true, causing the chapter to be skipped when searching the entire cache, but still
++ * allowing it to be found when searching for a hook in that specific chapter. Finding a hook will
++ * clear the skip_search flag, once again allowing the non-hook searches to use that cache entry.
++ * Again, regardless of the state of the skip_search flag, the virtual chapter must still
++ * considered to be a member of the cache for uds_sparse_cache_contains().
++ */
++
++enum {
++	SKIP_SEARCH_THRESHOLD = 20000,
++	ZONE_ZERO = 0,
++};
++
++/*
++ * These counters are essentially fields of the struct cached_chapter_index, but are segregated
++ * into this structure because they are frequently modified. They are grouped and aligned to keep
++ * them on different cache lines from the chapter fields that are accessed far more often than they
++ * are updated.
++ */
++struct __aligned(L1_CACHE_BYTES) cached_index_counters {
++	u64 consecutive_misses;
++};
++
++struct __aligned(L1_CACHE_BYTES) cached_chapter_index {
++	/*
++	 * The virtual chapter number of the cached chapter index. NO_CHAPTER means this cache
++	 * entry is unused. This field must only be modified in the critical section in
++	 * uds_update_sparse_cache().
++	 */
++	u64 virtual_chapter;
++
++	u32 index_pages_count;
++
++	/*
++	 * These pointers are immutable during the life of the cache. The contents of the arrays
++	 * change when the cache entry is replaced.
++	 */
++	struct delta_index_page *index_pages;
++	struct dm_buffer **page_buffers;
++
++	/*
++	 * If set, skip the chapter when searching the entire cache. This flag is just a
++	 * performance optimization. This flag is mutable between cache updates, but it rarely
++	 * changes and is frequently accessed, so it groups with the immutable fields.
++	 */
++	bool skip_search;
++
++	/*
++	 * The cache-aligned counters change often and are placed at the end of the structure to
++	 * prevent false sharing with the more stable fields above.
++	 */
++	struct cached_index_counters counters;
++};
++
++/*
++ * A search_list represents an ordering of the sparse chapter index cache entry array, from most
++ * recently accessed to least recently accessed, which is the order in which the indexes should be
++ * searched and the reverse order in which they should be evicted from the cache.
++ *
++ * Cache entries that are dead or empty are kept at the end of the list, avoiding the need to even
++ * iterate over them to search, and ensuring that dead entries are replaced before any live entries
++ * are evicted.
++ *
++ * The search list is instantiated for each zone thread, avoiding any need for synchronization. The
++ * structure is allocated on a cache boundary to avoid false sharing of memory cache lines between
++ * zone threads.
++ */
++struct search_list {
++	u8 capacity;
++	u8 first_dead_entry;
++	struct cached_chapter_index *entries[];
++};
++
++struct sparse_cache {
++	const struct geometry *geometry;
++	unsigned int capacity;
++	unsigned int zone_count;
++
++	unsigned int skip_threshold;
++	struct search_list *search_lists[MAX_ZONES];
++	struct cached_chapter_index **scratch_entries;
++
++	struct barrier begin_update_barrier;
++	struct barrier end_update_barrier;
++
++	struct cached_chapter_index chapters[];
++};
++
++static int __must_check
++initialize_cached_chapter_index(struct cached_chapter_index *chapter,
++				const struct geometry *geometry)
++{
++	int result;
++
++	chapter->virtual_chapter = NO_CHAPTER;
++	chapter->index_pages_count = geometry->index_pages_per_chapter;
++
++	result = UDS_ALLOCATE(chapter->index_pages_count,
++			      struct delta_index_page,
++			      __func__,
++			      &chapter->index_pages);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return UDS_ALLOCATE(chapter->index_pages_count,
++			    struct dm_buffer *,
++			    "sparse index volume pages",
++			    &chapter->page_buffers);
++}
++
++static int __must_check make_search_list(struct sparse_cache *cache, struct search_list **list_ptr)
++{
++	struct search_list *list;
++	unsigned int bytes;
++	u8 i;
++	int result;
++
++	bytes = (sizeof(struct search_list) +
++		 (cache->capacity * sizeof(struct cached_chapter_index *)));
++	result = uds_allocate_cache_aligned(bytes, "search list", &list);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	list->capacity = cache->capacity;
++	list->first_dead_entry = 0;
++
++	for (i = 0; i < list->capacity; i++)
++		list->entries[i] = &cache->chapters[i];
++
++	*list_ptr = list;
++	return UDS_SUCCESS;
++}
++
++int uds_make_sparse_cache(const struct geometry *geometry,
++			  unsigned int capacity,
++			  unsigned int zone_count,
++			  struct sparse_cache **cache_ptr)
++{
++	int result;
++	unsigned int i;
++	struct sparse_cache *cache;
++	unsigned int bytes;
++
++	bytes = (sizeof(struct sparse_cache) + (capacity * sizeof(struct cached_chapter_index)));
++	result = uds_allocate_cache_aligned(bytes, "sparse cache", &cache);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	cache->geometry = geometry;
++	cache->capacity = capacity;
++	cache->zone_count = zone_count;
++
++	/*
++	 * Scale down the skip threshold since the cache only counts cache misses in zone zero, but
++	 * requests are being handled in all zones.
++	 */
++	cache->skip_threshold = (SKIP_SEARCH_THRESHOLD / zone_count);
++
++	result = uds_initialize_barrier(&cache->begin_update_barrier, zone_count);
++	if (result != UDS_SUCCESS) {
++		uds_free_sparse_cache(cache);
++		return result;
++	}
++
++	result = uds_initialize_barrier(&cache->end_update_barrier, zone_count);
++	if (result != UDS_SUCCESS) {
++		uds_free_sparse_cache(cache);
++		return result;
++	}
++
++	for (i = 0; i < capacity; i++) {
++		result = initialize_cached_chapter_index(&cache->chapters[i], geometry);
++		if (result != UDS_SUCCESS) {
++			uds_free_sparse_cache(cache);
++			return result;
++		}
++	}
++
++	for (i = 0; i < zone_count; i++) {
++		result = make_search_list(cache, &cache->search_lists[i]);
++		if (result != UDS_SUCCESS) {
++			uds_free_sparse_cache(cache);
++			return result;
++		}
++	}
++
++	/* purge_search_list() needs some temporary lists for sorting. */
++	result = UDS_ALLOCATE(capacity * 2,
++			      struct cached_chapter_index *,
++			      "scratch entries",
++			      &cache->scratch_entries);
++	if (result != UDS_SUCCESS) {
++		uds_free_sparse_cache(cache);
++		return result;
++	}
++
++	*cache_ptr = cache;
++	return UDS_SUCCESS;
++}
++
++static inline void set_skip_search(struct cached_chapter_index *chapter, bool skip_search)
++{
++	/* Check before setting to reduce cache line contention. */
++	if (READ_ONCE(chapter->skip_search) != skip_search)
++		WRITE_ONCE(chapter->skip_search, skip_search);
++}
++
++static void score_search_hit(struct cached_chapter_index *chapter)
++{
++	chapter->counters.consecutive_misses = 0;
++	set_skip_search(chapter, false);
++}
++
++static void score_search_miss(struct sparse_cache *cache, struct cached_chapter_index *chapter)
++{
++	chapter->counters.consecutive_misses++;
++	if (chapter->counters.consecutive_misses > cache->skip_threshold)
++		set_skip_search(chapter, true);
++}
++
++static void release_cached_chapter_index(struct cached_chapter_index *chapter)
++{
++	unsigned int i;
++
++	chapter->virtual_chapter = NO_CHAPTER;
++	if (chapter->page_buffers == NULL)
++		return;
++
++	for (i = 0; i < chapter->index_pages_count; i++)
++		if (chapter->page_buffers[i] != NULL)
++			dm_bufio_release(UDS_FORGET(chapter->page_buffers[i]));
++}
++
++void uds_free_sparse_cache(struct sparse_cache *cache)
++{
++	unsigned int i;
++
++	if (cache == NULL)
++		return;
++
++	UDS_FREE(cache->scratch_entries);
++
++	for (i = 0; i < cache->zone_count; i++)
++		UDS_FREE(cache->search_lists[i]);
++
++	for (i = 0; i < cache->capacity; i++) {
++		release_cached_chapter_index(&cache->chapters[i]);
++		UDS_FREE(cache->chapters[i].index_pages);
++		UDS_FREE(cache->chapters[i].page_buffers);
++	}
++
++	uds_destroy_barrier(&cache->begin_update_barrier);
++	uds_destroy_barrier(&cache->end_update_barrier);
++	UDS_FREE(cache);
++}
++
++/*
++ * Take the indicated element of the search list and move it to the start, pushing the pointers
++ * previously before it back down the list.
++ */
++static inline void set_newest_entry(struct search_list *search_list, u8 index)
++{
++	struct cached_chapter_index *newest;
++
++	if (index > 0) {
++		newest = search_list->entries[index];
++		memmove(&search_list->entries[1],
++			&search_list->entries[0],
++			index * sizeof(struct cached_chapter_index *));
++		search_list->entries[0] = newest;
++	}
++
++	/*
++	 * This function may have moved a dead chapter to the front of the list for reuse, in which
++	 * case the set of dead chapters becomes smaller.
++	 */
++	if (search_list->first_dead_entry <= index)
++		search_list->first_dead_entry++;
++}
++
++bool uds_sparse_cache_contains(struct sparse_cache *cache,
++			   u64 virtual_chapter,
++			   unsigned int zone_number)
++{
++	struct search_list *search_list;
++	struct cached_chapter_index *chapter;
++	u8 i;
++
++	/*
++	 * The correctness of the barriers depends on the invariant that between calls to
++	 * uds_update_sparse_cache(), the answers this function returns must never vary: the result
++	 * for a given chapter must be identical across zones. That invariant must be maintained
++	 * even if the chapter falls off the end of the volume, or if searching it is disabled
++	 * because of too many search misses.
++	 */
++	search_list = cache->search_lists[zone_number];
++	for (i = 0; i < search_list->first_dead_entry; i++) {
++		chapter = search_list->entries[i];
++
++		if (virtual_chapter == chapter->virtual_chapter) {
++			if (zone_number == ZONE_ZERO)
++				score_search_hit(chapter);
++
++			set_newest_entry(search_list, i);
++			return true;
++		}
++	}
++
++	return false;
++}
++
++/*
++ * Re-sort cache entries into three sets (active, skippable, and dead) while maintaining the LRU
++ * ordering that already existed. This operation must only be called during the critical section in
++ * uds_update_sparse_cache().
++ */
++static void purge_search_list(struct search_list *search_list,
++			      struct sparse_cache *cache,
++			      u64 oldest_virtual_chapter)
++{
++	struct cached_chapter_index **entries;
++	struct cached_chapter_index **skipped;
++	struct cached_chapter_index **dead;
++	struct cached_chapter_index *chapter;
++	unsigned int next_alive = 0;
++	unsigned int next_skipped = 0;
++	unsigned int next_dead = 0;
++	unsigned int i;
++
++	entries = &search_list->entries[0];
++	skipped = &cache->scratch_entries[0];
++	dead = &cache->scratch_entries[search_list->capacity];
++
++	for (i = 0; i < search_list->first_dead_entry; i++) {
++		chapter = search_list->entries[i];
++		if ((chapter->virtual_chapter < oldest_virtual_chapter) ||
++		    (chapter->virtual_chapter == NO_CHAPTER))
++			dead[next_dead++] = chapter;
++		else if (chapter->skip_search)
++			skipped[next_skipped++] = chapter;
++		else
++			entries[next_alive++] = chapter;
++	}
++
++	memcpy(&entries[next_alive],
++	       skipped,
++	       next_skipped * sizeof(struct cached_chapter_index *));
++	memcpy(&entries[next_alive + next_skipped],
++	       dead,
++	       next_dead * sizeof(struct cached_chapter_index *));
++	search_list->first_dead_entry = next_alive + next_skipped;
++}
++
++static int __must_check cache_chapter_index(struct cached_chapter_index *chapter,
++					    u64 virtual_chapter,
++					    const struct volume *volume)
++{
++	int result;
++
++	release_cached_chapter_index(chapter);
++
++	result = uds_read_chapter_index_from_volume(volume,
++						    virtual_chapter,
++						    chapter->page_buffers,
++						    chapter->index_pages);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	chapter->counters.consecutive_misses = 0;
++	chapter->virtual_chapter = virtual_chapter;
++	chapter->skip_search = false;
++
++	return UDS_SUCCESS;
++}
++
++static inline void copy_search_list(const struct search_list *source, struct search_list *target)
++{
++	*target = *source;
++	memcpy(target->entries,
++	       source->entries,
++	       source->capacity * sizeof(struct cached_chapter_index *));
++}
++
++/*
++ * Update the sparse cache to contain a chapter index. This function must be called by all the zone
++ * threads with the same chapter number to correctly enter the thread barriers used to synchronize
++ * the cache updates.
++ */
++int uds_update_sparse_cache(struct index_zone *zone, u64 virtual_chapter)
++{
++	int result = UDS_SUCCESS;
++	const struct uds_index *index = zone->index;
++	struct sparse_cache *cache = index->volume->sparse_cache;
++
++	if (uds_sparse_cache_contains(cache, virtual_chapter, zone->id))
++		return UDS_SUCCESS;
++
++	/*
++	 * Wait for every zone thread to reach its corresponding barrier request and invoke this
++	 * function before starting to modify the cache.
++	 */
++	uds_enter_barrier(&cache->begin_update_barrier);
++
++	/*
++	 * This is the start of the critical section: the zone zero thread is captain, effectively
++	 * holding an exclusive lock on the sparse cache. All the other zone threads must do
++	 * nothing between the two barriers. They will wait at the end_update_barrier again for the
++	 * captain to finish the update.
++	 */
++
++	if (zone->id == ZONE_ZERO) {
++		unsigned int z;
++		struct search_list *list = cache->search_lists[ZONE_ZERO];
++
++		purge_search_list(list, cache, zone->oldest_virtual_chapter);
++
++		if (virtual_chapter >= index->oldest_virtual_chapter) {
++			set_newest_entry(list, list->capacity - 1);
++			result = cache_chapter_index(list->entries[0],
++						     virtual_chapter,
++						     index->volume);
++		}
++
++		for (z = 1; z < cache->zone_count; z++)
++			copy_search_list(list, cache->search_lists[z]);
++	}
++
++	/*
++	 * This is the end of the critical section. All cache invariants must have been restored.
++	 */
++	uds_enter_barrier(&cache->end_update_barrier);
++	return result;
++}
++
++void uds_invalidate_sparse_cache(struct sparse_cache *cache)
++{
++	unsigned int i;
++
++	for (i = 0; i < cache->capacity; i++)
++		release_cached_chapter_index(&cache->chapters[i]);
++}
++
++static inline bool should_skip_chapter(struct cached_chapter_index *chapter,
++				       u64 oldest_chapter,
++				       u64 requested_chapter)
++{
++	if ((chapter->virtual_chapter == NO_CHAPTER) ||
++	    (chapter->virtual_chapter < oldest_chapter))
++		return true;
++
++	if (requested_chapter != NO_CHAPTER)
++		return requested_chapter != chapter->virtual_chapter;
++	else
++		return READ_ONCE(chapter->skip_search);
++}
++
++static int __must_check
++search_cached_chapter_index(struct cached_chapter_index *chapter,
++			    const struct geometry *geometry,
++			    const struct index_page_map *index_page_map,
++			    const struct uds_record_name *name,
++			    u16 *record_page_ptr)
++{
++	u32 physical_chapter = uds_map_to_physical_chapter(geometry, chapter->virtual_chapter);
++	u32 index_page_number = uds_find_index_page_number(index_page_map, name, physical_chapter);
++	struct delta_index_page *index_page = &chapter->index_pages[index_page_number];
++
++	return uds_search_chapter_index_page(index_page, geometry, name, record_page_ptr);
++}
++
++int uds_search_sparse_cache(struct index_zone *zone,
++			    const struct uds_record_name *name,
++			    u64 *virtual_chapter_ptr,
++			    u16 *record_page_ptr)
++{
++	int result;
++	struct volume *volume = zone->index->volume;
++	struct sparse_cache *cache = volume->sparse_cache;
++	struct cached_chapter_index *chapter;
++	struct search_list *search_list;
++	u8 i;
++	/* Search the entire cache unless a specific chapter was requested. */
++	bool search_one = (*virtual_chapter_ptr != NO_CHAPTER);
++
++	*record_page_ptr = NO_CHAPTER_INDEX_ENTRY;
++	search_list = cache->search_lists[zone->id];
++	for (i = 0; i < search_list->first_dead_entry; i++) {
++		chapter = search_list->entries[i];
++
++		if (should_skip_chapter(chapter,
++					zone->oldest_virtual_chapter,
++					*virtual_chapter_ptr))
++			continue;
++
++		result = search_cached_chapter_index(chapter,
++						     cache->geometry,
++						     volume->index_page_map,
++						     name,
++						     record_page_ptr);
++		if (result != UDS_SUCCESS)
++			return result;
++
++		if (*record_page_ptr != NO_CHAPTER_INDEX_ENTRY) {
++			/*
++			 * In theory, this might be a false match while a true match exists in
++			 * another chapter, but that's a very rare case and not worth the extra
++			 * search complexity.
++			 */
++			set_newest_entry(search_list, i);
++			if (zone->id == ZONE_ZERO)
++				score_search_hit(chapter);
++
++			*virtual_chapter_ptr = chapter->virtual_chapter;
++			return UDS_SUCCESS;
++		}
++
++		if (zone->id == ZONE_ZERO)
++			score_search_miss(cache, chapter);
++
++		if (search_one)
++			break;
++	}
++
++	return UDS_SUCCESS;
++}
+diff --git a/drivers/md/dm-vdo/sparse-cache.h b/drivers/md/dm-vdo/sparse-cache.h
+new file mode 100644
+index 00000000000..dd7ad462bb8
+--- /dev/null
++++ b/drivers/md/dm-vdo/sparse-cache.h
+@@ -0,0 +1,49 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright Red Hat
 + */
 +
-+#ifndef UDS_NUMERIC_H
-+#define UDS_NUMERIC_H
++#ifndef UDS_SPARSE_CACHE_H
++#define UDS_SPARSE_CACHE_H
 +
-+#include <asm/unaligned.h>
-+#include <linux/kernel.h>
-+#include <linux/types.h>
++#include "geometry.h"
++#include "uds.h"
 +
 +/*
-+ * These utilities encode or decode a number from an offset in a larger data buffer and then
-+ * advance the offset pointer to the next field in the buffer.
++ * The sparse cache is a cache of entire chapter indexes from sparse chapters used for searching
++ * for names after all other search paths have failed. It contains only complete chapter indexes;
++ * record pages from sparse chapters and single index pages used for resolving hooks are kept in
++ * the regular page cache in the volume.
++ *
++ * The most important property of this cache is the absence of synchronization for read operations.
++ * Safe concurrent access to the cache by the zone threads is controlled by the triage queue and
++ * the barrier requests it issues to the zone queues. The set of cached chapters does not and must
++ * not change between the carefully coordinated calls to uds_update_sparse_cache() from the zone
++ * threads. Outside of updates, every zone will get the same result when calling
++ * uds_sparse_cache_contains() as every other zone.
 + */
 +
-+static inline void decode_s64_le(const u8 *buffer, size_t *offset, s64 *decoded)
-+{
-+	*decoded = get_unaligned_le64(buffer + *offset);
-+	*offset += sizeof(s64);
-+}
++struct index_zone;
++struct sparse_cache;
 +
-+static inline void encode_s64_le(u8 *data, size_t *offset, s64 to_encode)
-+{
-+	put_unaligned_le64(to_encode, data + *offset);
-+	*offset += sizeof(s64);
-+}
++int __must_check uds_make_sparse_cache(const struct geometry *geometry,
++				       unsigned int capacity,
++				       unsigned int zone_count,
++				       struct sparse_cache **cache_ptr);
 +
-+static inline void decode_u64_le(const u8 *buffer, size_t *offset, u64 *decoded)
-+{
-+	*decoded = get_unaligned_le64(buffer + *offset);
-+	*offset += sizeof(u64);
-+}
++void uds_free_sparse_cache(struct sparse_cache *cache);
 +
-+static inline void encode_u64_le(u8 *data, size_t *offset, u64 to_encode)
-+{
-+	put_unaligned_le64(to_encode, data + *offset);
-+	*offset += sizeof(u64);
-+}
++bool uds_sparse_cache_contains(struct sparse_cache *cache,
++			       u64 virtual_chapter,
++			       unsigned int zone_number);
 +
-+static inline void decode_s32_le(const u8 *buffer, size_t *offset, s32 *decoded)
-+{
-+	*decoded = get_unaligned_le32(buffer + *offset);
-+	*offset += sizeof(s32);
-+}
++int __must_check uds_update_sparse_cache(struct index_zone *zone, u64 virtual_chapter);
 +
-+static inline void encode_s32_le(u8 *data, size_t *offset, s32 to_encode)
-+{
-+	put_unaligned_le32(to_encode, data + *offset);
-+	*offset += sizeof(s32);
-+}
++void uds_invalidate_sparse_cache(struct sparse_cache *cache);
 +
-+static inline void decode_u32_le(const u8 *buffer, size_t *offset, u32 *decoded)
-+{
-+	*decoded = get_unaligned_le32(buffer + *offset);
-+	*offset += sizeof(u32);
-+}
++int __must_check uds_search_sparse_cache(struct index_zone *zone,
++					 const struct uds_record_name *name,
++					 u64 *virtual_chapter_ptr,
++					 u16 *record_page_ptr);
 +
-+static inline void encode_u32_le(u8 *data, size_t *offset, u32 to_encode)
-+{
-+	put_unaligned_le32(to_encode, data + *offset);
-+	*offset += sizeof(u32);
-+}
-+
-+static inline void decode_u16_le(const u8 *buffer, size_t *offset, u16 *decoded)
-+{
-+	*decoded = get_unaligned_le16(buffer + *offset);
-+	*offset += sizeof(u16);
-+}
-+
-+static inline void encode_u16_le(u8 *data, size_t *offset, u16 to_encode)
-+{
-+	put_unaligned_le16(to_encode, data + *offset);
-+	*offset += sizeof(u16);
-+}
-+
-+#endif /* UDS_NUMERIC_H */
++#endif /* UDS_SPARSE_CACHE_H */
 -- 
 2.40.1
 
