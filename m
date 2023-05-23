@@ -2,101 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4FFC7EE26
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 20:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02056C7EE2F
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:38:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238388AbjEWUoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 16:44:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41130 "EHLO
+        id S237819AbjEWVig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 17:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238496AbjEWUoU (ORCPT
+        with ESMTP id S238617AbjEWVie (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 16:44:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 984491A1
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 13:43:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684874606;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2AXwrxmIeNRwbgPUcfTuA7DYIUBj+3M4SsEiMK2Pk9Y=;
-        b=gryA/E6iVO93VqJXxItJecioP1oupoN3tMuWbFEVi0UbxxZ7ylx61vqPUkSJC87aq5hMC8
-        oCFCEuE1eBNkvZN86oqTCCr7OKJlXOp4fovHTxKaMKslXJ1M4dfLutPVo9P+qwBaa1U6l8
-        j6GZwRf4Zi9BF8YgC+jVsk7h5JbE+eA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-19-l3glK4kQPEiT2-OmO-TScA-1; Tue, 23 May 2023 16:43:19 -0400
-X-MC-Unique: l3glK4kQPEiT2-OmO-TScA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 59C3B185A78B;
-        Tue, 23 May 2023 20:43:18 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6DC2A492B0A;
-        Tue, 23 May 2023 20:43:15 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <12153db1-20af-040b-ded0-31286b5bafca@kernel.org>
-References: <12153db1-20af-040b-ded0-31286b5bafca@kernel.org> <20230522135018.2742245-1-dhowells@redhat.com> <20230522135018.2742245-26-dhowells@redhat.com>
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+        Tue, 23 May 2023 17:38:34 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859E512B
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:38:33 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-64f48625615so58284b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:38:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684877913; x=1687469913;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y3hgiqpB5zVKDFFdyJMjJwHka3pMf+c6meTRxKFE5Y8=;
+        b=HV0x7zMa3YUbocqLk9aQXetrr9ryZrB2RfV/YHAmZdFJpj+J580kbNoVs4yJlfTFah
+         ckNKve4m5JHJM0d8z9nn7Yqv7jv5UBLUa+T+a8+ebv1Wsbais4D+qvWMEy2jRH4dil9G
+         tJ7wy8o9Lz273r80L/Z1B57YiCRZwsGm+tYwKZyFWJwnBZuZthVeTePg7VZl6oiN2XJ2
+         9GRQt0ScSnlnvSHgMNgKlnibVxl1CRc+bBWnxfS2cgidXqKhWTDIngNLnXI9LrKYMY1f
+         4TvQMgtsNSNAKpHzNi22AtmTavnbUWPICiuWaY95rxXfeRRuU53lRjLfUDp61LpRkgnr
+         H+Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684877913; x=1687469913;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y3hgiqpB5zVKDFFdyJMjJwHka3pMf+c6meTRxKFE5Y8=;
+        b=loN0lcGVLwf9zXK1olU9EbfUbUeGOUb5cm6F72RjDN/TfNetFa4rDxsgX4x0oyM841
+         N08VBgb6WOEqgGHT4R2Nr40WGR64uVclqM897Yy+pXXL6HRFJJcGG9eTHuCgyn3aJ0g+
+         6AuZVRi6GxRWtp3bNtoQvXZdFnge4z+FCwvxBJ4yp3FKeT0HByiaMaM6jrV94bZj0+O/
+         RrKbn9Q7BYEDiQ7Bv+5nu4kqbRL0FrH3TDYimOFst4RCLwlhd+StWumkS3dOd1oei6gK
+         h7BrA3vuL6g8+b7RQbK4uyRdq2E+ryg6jPdlWx/A4TzTQVKkFW8F/EqDGACDBQoj/aq1
+         GZJw==
+X-Gm-Message-State: AC+VfDyF6lGd/Fpu9SRJN0JhmloY8GALR1uyWhED+ADdbZKn/i3OHsUo
+        SUEoSWhdjK5O1bkiD8a4rK4ffQ==
+X-Google-Smtp-Source: ACHHUZ7ClhRNdRTJXLeQvAK7QipR6vjidsxzbsGyag+DC7WYvwlkS2VPbAibt93EUTxmMRNaSgC1/Q==
+X-Received: by 2002:a05:6a20:7da6:b0:100:eb1e:3939 with SMTP id v38-20020a056a207da600b00100eb1e3939mr15611360pzj.1.1684877912960;
+        Tue, 23 May 2023 14:38:32 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id j12-20020aa78dcc000000b0062de9ef6915sm6168473pfr.216.2023.05.23.14.38.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 May 2023 14:38:32 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Al Viro <viro@zeniv.linux.org.uk>,
         Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        David Howells <dhowells@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
         Jeff Layton <jlayton@kernel.org>,
         David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
         Hillf Danton <hdanton@sina.com>,
         Christian Brauner <brauner@kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Darrick J . Wong" <djwong@kernel.org>, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v22 25/31] zonefs: Provide a splice-read wrapper
+        Jason Gunthorpe <jgg@ziepe.ca>
+In-Reply-To: <20230522205744.2825689-1-dhowells@redhat.com>
+References: <20230522205744.2825689-1-dhowells@redhat.com>
+Subject: Re: [PATCH v21 0/6] block: Use page pinning
+Message-Id: <168487791137.449781.3170440352656135902.b4-ty@kernel.dk>
+Date:   Tue, 23 May 2023 15:38:31 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3071147.1684874594.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 23 May 2023 21:43:14 +0100
-Message-ID: <3071148.1684874594@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Damien Le Moal <dlemoal@kernel.org> wrote:
 
-> > +	if (len > 0) {
-> > +		ret =3D filemap_splice_read(in, ppos, pipe, len, flags);
-> > +		if (ret =3D=3D -EIO)
-> =
+On Mon, 22 May 2023 21:57:38 +0100, David Howells wrote:
+> This patchset rolls page-pinning out to the bio struct and the block layer,
+> using iov_iter_extract_pages() to get pages and noting with BIO_PAGE_PINNED
+> if the data pages attached to a bio are pinned.  If the data pages come
+> from a non-user-backed iterator, then the pages are left unpinned and
+> unref'd, relying on whoever set up the I/O to do the retaining.
+> 
+> This requires the splice-read patchset to have been applied first,
+> otherwise reversion of the ITER_PAGE iterator can race with truncate and
+> return pages to the allocator whilst they're still undergoing DMA[2].
+> 
+> [...]
 
-> Is -EIO the only error that filemap_splice_read() may return ? There are=
- other
-> IO error codes that we could get from the block layer, e.g. -ETIMEDOUT e=
-tc. So
-> "if (ret < 0)" may be better here ?
+Applied, thanks!
 
-It can return -ENOMEM, -EINTR and -EAGAIN at least, none of which really c=
-ount
-as I/O errors.  I based the splice function on what zonefs_file_read_iter(=
-)
-does:
+[1/6] iomap: Don't get an reference on ZERO_PAGE for direct I/O block zeroing
+      commit: 9e73bb36b189ec73c7062ec974e0ff287c1aa152
+[2/6] block: Fix bio_flagged() so that gcc can better optimise it
+      commit: b9cc607a7f722c374540b2a7c973382592196549
+[3/6] block: Replace BIO_NO_PAGE_REF with BIO_PAGE_REFFED with inverted logic
+      commit: 100ae68dac60a0688082dcaf3e436606ec0fd51f
+[4/6] block: Add BIO_PAGE_PINNED and associated infrastructure
+      commit: 84d9fe8b7ea6a53fd93506583ff33a408f95ac60
+[5/6] block: Convert bio_iov_iter_get_pages to use iov_iter_extract_pages
+      commit: b7c96963925fe08d4ef175b7d438c0017155807c
+[6/6] block: convert bio_map_user_iov to use iov_iter_extract_pages
+      commit: 36b61bb07963b13de4cc03a945aa25b9ffc7d003
 
-	} else {
-		ret =3D generic_file_read_iter(iocb, to);
-		if (ret =3D=3D -EIO)
-			zonefs_io_error(inode, false);
-	}
+Best regards,
+-- 
+Jens Axboe
 
-David
+
 
