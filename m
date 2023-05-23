@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E744C7EE2A
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB5AC7EE2E
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 07:47:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235591AbjEWHqr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 03:46:47 -0400
+        id S235049AbjEWHqu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 03:46:50 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235604AbjEWHqS (ORCPT
+        with ESMTP id S235680AbjEWHq2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 03:46:18 -0400
+        Tue, 23 May 2023 03:46:28 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 215D8119;
-        Tue, 23 May 2023 00:46:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6172196;
+        Tue, 23 May 2023 00:46:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=6jd70DMemk8ZckghMl9CiFecycutXCrZ5EOvBFmSYmY=; b=SlbXJ9ZjegvwC5j/ePHUyQlPMO
-        10fGoUAfAUa2294Yk8GJ/5hXIc8QkHAr8iH0CH9IfsltCmCAkRDyo0tkeYvtcN+sFFebcilXnZ04i
-        D8MSXRiSHOtUrnsk15xhBXZkUlim/0Dy2qHZ5lquLt+0gu2J93iXsnFMIveQ5eLIaREfT3xMalFtK
-        cpaDkDjm+tqNDuy2Zoj1oZg4zuMH0I39KBfwyIp4mMVLoS/MhnvBzVzkVFrzBTIhExJTAVRYNWFOG
-        eFOtxHK3Bw5bmENBrXUgt9Ds+KADqvDpzOxaPDU4J9T3ivnwTQagSZsAzzJtSs0mDB6NPPNdcsUwj
-        9vusgheQ==;
+        bh=sPtANn0zarNtlbKH0iiqTXeEp2bE0I2NjDJy6q2Trwk=; b=Ra4ecsNEkrfEkL80MtgTCjA0eS
+        /ngmvCOljqDF+RFRQEPsh/2/3ILzUw7tNw+14m13MAMjoB7Kb92ii7YY/QP38z7MoFQ+yhz+8a1hT
+        5t1RAFBpHM3gzv22Q3PX4ubCMlObn8JM7dTyTZevUox6NmWVO0BHq2VezglUD0FCF+OrmhlMZmWlJ
+        dPbkJUoYgB6GdiBl7KIE2utMueocmb62S/5dZduJUYKI33K2Q7b5MoyZZoH5w3BWBh8UqRXrSV2Si
+        ICtqNbTXvu9bSxZZctqZlh4TlSARrNwQdOWEdB8v8FK7N8g6yMkUj5icL1cqevUfySFviKSKk0UqZ
+        iBlAiyFg==;
 Received: from [2001:4bb8:188:23b2:6ade:85c9:530f:6eb0] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q1Mig-009Gou-1r;
-        Tue, 23 May 2023 07:46:11 +0000
+        id 1q1Mim-009GvU-0T;
+        Tue, 23 May 2023 07:46:16 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -41,9 +41,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: [PATCH 12/24] init: move the nfs/cifs/ram special cases out of name_to_dev_t
-Date:   Tue, 23 May 2023 09:45:23 +0200
-Message-Id: <20230523074535.249802-13-hch@lst.de>
+Subject: [PATCH 14/24] init: clear root_wait on all invalid root= strings
+Date:   Tue, 23 May 2023 09:45:25 +0200
+Message-Id: <20230523074535.249802-15-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230523074535.249802-1-hch@lst.de>
 References: <20230523074535.249802-1-hch@lst.de>
@@ -54,59 +54,72 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The nfs/cifs/ram special cass only need to be parsed once, and only in
-the boot code.  Move them out of name_to_dev_t and into
-prepare_namespace.
+Instead of only clearing root_wait in devt_from_partuuid when the UUID
+format was invalid, do that in parse_root_device for all strings that
+failed to parse.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- init/do_mounts.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ init/do_mounts.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index d5c06c1546e82c..86599faf2bf8a1 100644
+index f1953aeb321978..0b36a5f39ee8e2 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
-@@ -248,7 +248,6 @@ static dev_t devt_from_devnum(const char *name)
-  *
-  *	1) <hex_major><hex_minor> device number in hexadecimal represents itself
-  *         no leading 0x, for example b302.
-- *	2) /dev/nfs represents Root_NFS (0xff)
-  *	3) /dev/<disk_name> represents the device number of disk
-  *	4) /dev/<disk_name><decimal> represents the device number
-  *         of partition - device number of disk plus the partition number
-@@ -266,7 +265,6 @@ static dev_t devt_from_devnum(const char *name)
-  *	   a colon.
-  *	9) PARTLABEL=<name> with name being the GPT partition label.
-  *	   MSDOS partitions do not support labels!
-- *	10) /dev/cifs represents Root_CIFS (0xfe)
-  *
-  *	If name doesn't have fall into the categories above, we return (0,0).
-  *	block_class is used to check if something is a disk name. If the disk
-@@ -275,12 +273,6 @@ static dev_t devt_from_devnum(const char *name)
-  */
- dev_t name_to_dev_t(const char *name)
+@@ -112,14 +112,14 @@ static int devt_from_partuuid(const char *uuid_str, dev_t *devt)
+ 
+ 		/* Explicitly fail on poor PARTUUID syntax. */
+ 		if (sscanf(slash + 1, "PARTNROFF=%d%c", &offset, &c) != 1)
+-			goto clear_root_wait;
++			goto out_invalid;
+ 		cmp.len = slash - uuid_str;
+ 	} else {
+ 		cmp.len = strlen(uuid_str);
+ 	}
+ 
+ 	if (!cmp.len)
+-		goto clear_root_wait;
++		goto out_invalid;
+ 
+ 	dev = class_find_device(&block_class, NULL, &cmp, &match_dev_by_uuid);
+ 	if (!dev)
+@@ -139,12 +139,9 @@ static int devt_from_partuuid(const char *uuid_str, dev_t *devt)
+ 	put_device(dev);
+ 	return 0;
+ 
+-clear_root_wait:
++out_invalid:
+ 	pr_err("VFS: PARTUUID= is invalid.\n"
+ 	       "Expected PARTUUID=<valid-uuid-id>[/PARTNROFF=%%d]\n");
+-	if (root_wait)
+-		pr_err("Disabling rootwait; root= is invalid.\n");
+-	root_wait = 0;
+ 	return -EINVAL;
+ }
+ 
+@@ -611,6 +608,7 @@ static void __init wait_for_root(char *root_device_name)
+ 
+ static dev_t __init parse_root_device(char *root_device_name)
  {
--	if (strcmp(name, "/dev/nfs") == 0)
--		return Root_NFS;
--	if (strcmp(name, "/dev/cifs") == 0)
--		return Root_CIFS;
--	if (strcmp(name, "/dev/ram") == 0)
--		return Root_RAM0;
- #ifdef CONFIG_BLOCK
- 	if (strncmp(name, "PARTUUID=", 9) == 0)
- 		return devt_from_partuuid(name + 9);
-@@ -631,6 +623,12 @@ static dev_t __init parse_root_device(char *root_device_name)
++	int error;
+ 	dev_t dev;
+ 
  	if (!strncmp(root_device_name, "mtd", 3) ||
- 	    !strncmp(root_device_name, "ubi", 3))
- 		return Root_Generic;
-+	if (strcmp(root_device_name, "/dev/nfs") == 0)
-+		return Root_NFS;
-+	if (strcmp(root_device_name, "/dev/cifs") == 0)
-+		return Root_CIFS;
-+	if (strcmp(root_device_name, "/dev/ram") == 0)
-+		return Root_RAM0;
- 	return name_to_dev_t(root_device_name);
+@@ -623,8 +621,14 @@ static dev_t __init parse_root_device(char *root_device_name)
+ 	if (strcmp(root_device_name, "/dev/ram") == 0)
+ 		return Root_RAM0;
+ 
+-	if (early_lookup_bdev(root_device_name, &dev))
++	error = early_lookup_bdev(root_device_name, &dev);
++	if (error) {
++		if (error == -EINVAL && root_wait) {
++			pr_err("Disabling rootwait; root= is invalid.\n");
++			root_wait = 0;
++		}
+ 		return 0;
++	}
+ 	return dev;
  }
  
 -- 
