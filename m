@@ -2,66 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45138C7EE29
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E3BC7EE2E
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:47:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238694AbjEWVq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 17:46:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39676 "EHLO
+        id S238683AbjEWVrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 17:47:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238699AbjEWVqw (ORCPT
+        with ESMTP id S238696AbjEWVq7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 17:46:52 -0400
+        Tue, 23 May 2023 17:46:59 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7689130
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:45:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2A9FA
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684878357;
+        s=mimecast20190719; t=1684878371;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CzbR298CfdSKUVwKeQL0xNe8nvopcbSbimpumNPumDU=;
-        b=QA9Y8CKm2eIitjAggUyv8BAFcOY2gG444ebiPZVYtejM0aYLiX4q9BpH7aNPvRI3Sysgoy
-        ksIIzf09d1tSmk9LbMtrGjegSP3WT+Kn7xIML4LXkoeUluwpuTymG3xGLmebNNS4QKMCoS
-        MJHppL87md+WrRZsJo4l3rXuRx+1hDM=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=fzAbTlRzB1J3jZ/djzQp4nVjLzXI4QKgpvLkpCG4kEA=;
+        b=MoBXqOLTKsvGBCuWpvTRp9thQMpIx6Sn1+owYaojt3FU033LHrWHCXcCV8eRszWQBxD/qk
+        D8QDq1MC/Y70qK9ImpkKezz9Jr1gOf9jwXjpoDfrAjVa9wRm3dmgfwaTGsKFgQhz2Ixvgt
+        14B0i9kQF/35wKjZcjrefo++blwZDG0=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-37-a8lSmIyVObSydOref8YUoA-1; Tue, 23 May 2023 17:45:56 -0400
-X-MC-Unique: a8lSmIyVObSydOref8YUoA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-75b131362e3so33448885a.0
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:45:56 -0700 (PDT)
+ us-mta-507-b1eLAxSdMaWCcrUXIvR-Tw-1; Tue, 23 May 2023 17:46:09 -0400
+X-MC-Unique: b1eLAxSdMaWCcrUXIvR-Tw-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-751409cba6dso31316985a.3
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684878356; x=1687470356;
+        d=1e100.net; s=20221208; t=1684878369; x=1687470369;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CzbR298CfdSKUVwKeQL0xNe8nvopcbSbimpumNPumDU=;
-        b=DFl+a1vFRvCPnNnVqIt7f5gmnwl2KZ1YJVhS+89Au8EN6rgKYDNr3MnmrzBQSspTp9
-         3a8mRKtfNWBrGHv8l86EkfZI0U/ZZBZ7ub7ak+SgjLlK43o2vajTP2uaTcbwWb/PWDoY
-         HR4yzvlphb9Bbm7nKgd83LjXvCDgRNCJ1X5xAcWrtdxa/6TtC9H3Ur5tywTNOcZvpZ1E
-         bkr8RpXWZFtek64lIwebwsi+yIYippCpnjfTlH+q/AkfdjR+5mrviESJqp3VQahcZ8Ud
-         nk6fiHkYdhEdF3WABJu1IwPiudykwxLtwYi/Ag220j6g8Of4ZKswNWsQg4+iGVsRXdoz
-         RvJA==
-X-Gm-Message-State: AC+VfDxiPTgQkav6gXBBHy8HzqXdfUHtDxdC7Chs8X+Ym7M61uE86Nnk
-        /6Pu/KVZ+B8kvEf+0Rowslk62logCfRl9x8D8ikVHbUg7ZQNyJHYZVVMJ6+q3+O9r5RwOoaEiYy
-        Y+E+8+GjuxjET6mOXm5OOcF8=
-X-Received: by 2002:a37:e117:0:b0:75b:23a1:3f7 with SMTP id c23-20020a37e117000000b0075b23a103f7mr5455994qkm.13.1684878354856;
-        Tue, 23 May 2023 14:45:54 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7QPY8xr/38+lg4SOoWNoNxzaC0xUqOLeMkXxzZMK9mM5dqfd4OOP56ZbrxN6T6fDI2dOjQ/A==
-X-Received: by 2002:a37:e117:0:b0:75b:23a1:3f7 with SMTP id c23-20020a37e117000000b0075b23a103f7mr5455952qkm.13.1684878353547;
-        Tue, 23 May 2023 14:45:53 -0700 (PDT)
+        bh=fzAbTlRzB1J3jZ/djzQp4nVjLzXI4QKgpvLkpCG4kEA=;
+        b=i0S3b/NxWU8tusD0uCHVl8gr0ca+5nVpxBHm7QNsuUg1ZgtBaEDaf4KtPStcGCa+C/
+         cB2JrL7O3v3j4d897ZXL2hcZR3GkpaTBlioR+Zj3PqN/7I/pNjyTVoB4BU/mwAAf9du6
+         jzJbz7EdCkMwoSZKRGSoiiR+Q1J3JyKWT8vBxj7welB58jIy1JL5ydy8hSixpXDKzf9X
+         XYdhH+6jcd3FyTYJHJe/v05yREEyPCJj7YgRgMBQkc7FhUOag47+wrAnkTAVvcb808tS
+         GYJxhRgWI4Nm3M5bl4gTHpX3yjJ6Hs5JA+W1c2yuBLQDPrfyvetE0wgJSugaykwR9G3C
+         MNlQ==
+X-Gm-Message-State: AC+VfDyPbb4mcM0VM35EumvNvraI7ePhR+pIuAHH8Sxtwg7UOTQzTam/
+        14kKql8zObjAP1pDvXl7LUdE+8kTG7CqRpsTiyd3+OZq3ygxJe66ydaDWkbC/ESJS8qqCkunCR1
+        1q8PSBkl3BFYpT6p99NCTA6ZjbduqC/0=
+X-Received: by 2002:a37:654e:0:b0:75b:23a1:41b with SMTP id z75-20020a37654e000000b0075b23a1041bmr5478320qkb.49.1684878367472;
+        Tue, 23 May 2023 14:46:07 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6vJBgs57u2ybS9YETf1/p3peJ/yKlOVCIR7t5J8a85bus5FPMWQFCHfiZhn1cHokAHp/J/+w==
+X-Received: by 2002:a37:654e:0:b0:75b:23a1:41b with SMTP id z75-20020a37654e000000b0075b23a1041bmr5478279qkb.49.1684878366612;
+        Tue, 23 May 2023 14:46:06 -0700 (PDT)
 Received: from bf36-1.. (173-166-2-198-newengland.hfc.comcastbusiness.net. [173.166.2.198])
-        by smtp.gmail.com with ESMTPSA id s24-20020ae9f718000000b0074fafbea974sm2821592qkg.2.2023.05.23.14.45.52
+        by smtp.gmail.com with ESMTPSA id x3-20020ae9e903000000b007592af6fce6sm2234465qkf.43.2023.05.23.14.46.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 14:45:52 -0700 (PDT)
+        Tue, 23 May 2023 14:46:06 -0700 (PDT)
 From:   "J. corwin Coburn" <corwin@redhat.com>
 To:     dm-devel@redhat.com, linux-block@vger.kernel.org
 Cc:     vdo-devel@redhat.com, "J. corwin Coburn" <corwin@redhat.com>
-Subject: [PATCH v2 07/39] Add specialized request queueing functionality.
-Date:   Tue, 23 May 2023 17:45:07 -0400
-Message-Id: <20230523214539.226387-8-corwin@redhat.com>
+Subject: [PATCH v2 10/39] Add deduplication index storage interface.
+Date:   Tue, 23 May 2023 17:45:10 -0400
+Message-Id: <20230523214539.226387-11-corwin@redhat.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230523214539.226387-1-corwin@redhat.com>
 References: <20230523214539.226387-1-corwin@redhat.com>
@@ -71,1749 +71,2480 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds funnel_queue, a mostly lock-free multi-producer,
-single-consumer queue. It also adds the request queue used by the dm-vdo
-deduplication index, and the work_queue used by the dm-vdo data store. Both
-of these are built on top of funnel queue and are intended to support the
-dispatching of many short-running tasks. The work_queue also supports
-priorities. Finally, this patch adds vdo_completion, the structure which is
-enqueued on work_queues.
+This patch adds infrastructure for managing reads and writes to the
+underlying storage layer for the deduplication index. The deduplication
+index uses dm-bufio for all of its reads and writes, so part of this
+infrastructure is managing the various dm-bufio clients required. It also
+adds the buffered reader and buffered writer abstractions, which simplify
+reading and writing metadata structures that span several blocks.
+
+This patch also includes structures and utilities for encoding and decoding
+all of the deduplication index metadata, collectively called the index
+layout.
 
 Signed-off-by: J. corwin Coburn <corwin@redhat.com>
 ---
- drivers/md/dm-vdo/completion.c    | 141 +++++++
- drivers/md/dm-vdo/completion.h    | 155 +++++++
- drivers/md/dm-vdo/cpu.h           |  58 +++
- drivers/md/dm-vdo/funnel-queue.c  | 169 ++++++++
- drivers/md/dm-vdo/funnel-queue.h  | 110 +++++
- drivers/md/dm-vdo/request-queue.c | 284 +++++++++++++
- drivers/md/dm-vdo/request-queue.h |  30 ++
- drivers/md/dm-vdo/work-queue.c    | 659 ++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/work-queue.h    |  53 +++
- 9 files changed, 1659 insertions(+)
- create mode 100644 drivers/md/dm-vdo/completion.c
- create mode 100644 drivers/md/dm-vdo/completion.h
- create mode 100644 drivers/md/dm-vdo/cpu.h
- create mode 100644 drivers/md/dm-vdo/funnel-queue.c
- create mode 100644 drivers/md/dm-vdo/funnel-queue.h
- create mode 100644 drivers/md/dm-vdo/request-queue.c
- create mode 100644 drivers/md/dm-vdo/request-queue.h
- create mode 100644 drivers/md/dm-vdo/work-queue.c
- create mode 100644 drivers/md/dm-vdo/work-queue.h
+ drivers/md/dm-vdo/index-layout.c | 1775 ++++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/index-layout.h |   42 +
+ drivers/md/dm-vdo/io-factory.c   |  458 ++++++++
+ drivers/md/dm-vdo/io-factory.h   |   66 ++
+ drivers/md/dm-vdo/numeric.h      |   78 ++
+ 5 files changed, 2419 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/index-layout.c
+ create mode 100644 drivers/md/dm-vdo/index-layout.h
+ create mode 100644 drivers/md/dm-vdo/io-factory.c
+ create mode 100644 drivers/md/dm-vdo/io-factory.h
+ create mode 100644 drivers/md/dm-vdo/numeric.h
 
-diff --git a/drivers/md/dm-vdo/completion.c b/drivers/md/dm-vdo/completion.c
+diff --git a/drivers/md/dm-vdo/index-layout.c b/drivers/md/dm-vdo/index-layout.c
 new file mode 100644
-index 00000000000..8feb9c05c19
+index 00000000000..df231c037ed
 --- /dev/null
-+++ b/drivers/md/dm-vdo/completion.c
-@@ -0,0 +1,141 @@
++++ b/drivers/md/dm-vdo/index-layout.c
+@@ -0,0 +1,1775 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright Red Hat
 + */
 +
-+#include "completion.h"
++#include "index-layout.h"
 +
-+#include <linux/kernel.h>
++#include <linux/random.h>
 +
-+#include "logger.h"
-+#include "permassert.h"
-+
-+#include "status-codes.h"
-+#include "types.h"
-+#include "vio.h"
-+#include "vdo.h"
-+
-+/**
-+ * DOC: vdo completions.
-+ *
-+ * Most of vdo's data structures are lock free, each either belonging to a single "zone," or
-+ * divided into a number of zones whose accesses to the structure do not overlap. During normal
-+ * operation, at most one thread will be operating in any given zone. Each zone has a
-+ * vdo_work_queue which holds vdo_completions that are to be run in that zone. A completion may
-+ * only be enqueued on one queue or operating in a single zone at a time.
-+ *
-+ * At each step of a multi-threaded operation, the completion performing the operation is given a
-+ * callback, error handler, and thread id for the next step. A completion is "run" when it is
-+ * operating on the correct thread (as specified by its callback_thread_id). If the value of its
-+ * "result" field is an error (i.e. not VDO_SUCCESS), the function in its "error_handler" will be
-+ * invoked. If the error_handler is NULL, or there is no error, the function set as its "callback"
-+ * will be invoked. Generally, a completion will not be run directly, but rather will be
-+ * "launched." In this case, it will check whether it is operating on the correct thread. If it is,
-+ * it will run immediately. Otherwise, it will be enqueue on the vdo_work_queue associated with the
-+ * completion's "callback_thread_id". When it is dequeued, it will be on the correct thread, and
-+ * will get run. In some cases, the completion should get queued instead of running immediately,
-+ * even if it is being launched from the correct thread. This is usually in cases where there is a
-+ * long chain of callbacks, all on the same thread, which could overflow the stack. In such cases,
-+ * the completion's "requeue" field should be set to true. Doing so will skip the current thread
-+ * check and simply enqueue the completion.
-+ *
-+ * A completion may be "finished," in which case its "complete" field will be set to true before it
-+ * is next run. It is a bug to attempt to set the result or re-finish a finished completion.
-+ * Because a completion's fields are not safe to examine from any thread other than the one on
-+ * which the completion is currently operating, this field is used only to aid in detecting
-+ * programming errors. It can not be used for cross-thread checking on the status of an operation.
-+ * A completion must be "reset" before it can be reused after it has been finished. Resetting will
-+ * also clear any error from the result field.
-+ **/
-+
-+void vdo_initialize_completion(struct vdo_completion *completion,
-+			       struct vdo *vdo,
-+			       enum vdo_completion_type type)
-+{
-+	memset(completion, 0, sizeof(*completion));
-+	completion->vdo = vdo;
-+	completion->type = type;
-+	vdo_reset_completion(completion);
-+}
-+
-+static inline void assert_incomplete(struct vdo_completion *completion)
-+{
-+	ASSERT_LOG_ONLY(!completion->complete, "completion is not complete");
-+}
-+
-+/**
-+ * vdo_set_completion_result() - Set the result of a completion.
-+ *
-+ * Older errors will not be masked.
-+ */
-+void vdo_set_completion_result(struct vdo_completion *completion, int result)
-+{
-+	assert_incomplete(completion);
-+	if (completion->result == VDO_SUCCESS)
-+		completion->result = result;
-+}
-+
-+/**
-+ * vdo_launch_completion_with_priority() - Run or enqueue a completion.
-+ * @priority: The priority at which to enqueue the completion.
-+ *
-+ * If called on the correct thread (i.e. the one specified in the completion's callback_thread_id
-+ * field) and not marked for requeue, the completion will be run immediately. Otherwise, the
-+ * completion will be enqueued on the specified thread.
-+ */
-+void vdo_launch_completion_with_priority(struct vdo_completion *completion,
-+					 enum vdo_completion_priority priority)
-+{
-+	thread_id_t callback_thread = completion->callback_thread_id;
-+
-+	if (completion->requeue || (callback_thread != vdo_get_callback_thread_id())) {
-+		vdo_enqueue_completion(completion, priority);
-+		return;
-+	}
-+
-+	vdo_run_completion(completion);
-+}
-+
-+/** vdo_finish_completion() - Mark a completion as complete and then launch it. */
-+void vdo_finish_completion(struct vdo_completion *completion)
-+{
-+	assert_incomplete(completion);
-+	completion->complete = true;
-+	if (completion->callback != NULL)
-+		vdo_launch_completion(completion);
-+}
-+
-+void vdo_enqueue_completion(struct vdo_completion *completion,
-+			    enum vdo_completion_priority priority)
-+{
-+	struct vdo *vdo = completion->vdo;
-+	thread_id_t thread_id = completion->callback_thread_id;
-+
-+	if (ASSERT(thread_id < vdo->thread_config.thread_count,
-+		   "thread_id %u (completion type %d) is less than thread count %u",
-+		   thread_id,
-+		   completion->type,
-+		   vdo->thread_config.thread_count) != UDS_SUCCESS)
-+		BUG();
-+
-+	completion->requeue = false;
-+	completion->priority = priority;
-+	completion->my_queue = NULL;
-+	vdo_enqueue_work_queue(vdo->threads[thread_id].queue, completion);
-+}
-+
-+/**
-+ * vdo_requeue_completion_if_needed() - Requeue a completion if not called on the specified thread.
-+ *
-+ * Return: True if the completion was requeued; callers may not access the completion in this case.
-+ */
-+bool vdo_requeue_completion_if_needed(struct vdo_completion *completion,
-+				      thread_id_t callback_thread_id)
-+{
-+	if (vdo_get_callback_thread_id() == callback_thread_id)
-+		return false;
-+
-+	completion->callback_thread_id = callback_thread_id;
-+	vdo_enqueue_completion(completion, VDO_WORK_Q_DEFAULT_PRIORITY);
-+	return true;
-+}
-diff --git a/drivers/md/dm-vdo/completion.h b/drivers/md/dm-vdo/completion.h
-new file mode 100644
-index 00000000000..03b2daa6546
---- /dev/null
-+++ b/drivers/md/dm-vdo/completion.h
-@@ -0,0 +1,155 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#ifndef VDO_COMPLETION_H
-+#define VDO_COMPLETION_H
-+
-+#include "permassert.h"
-+
-+#include "status-codes.h"
-+#include "types.h"
-+
-+/**
-+ * vdo_run_completion() - Run a completion's callback or error handler on the current thread.
-+ *
-+ * Context: This function must be called from the correct callback thread.
-+ */
-+static inline void vdo_run_completion(struct vdo_completion *completion)
-+{
-+	if ((completion->result != VDO_SUCCESS) && (completion->error_handler != NULL)) {
-+		completion->error_handler(completion);
-+		return;
-+	}
-+
-+	completion->callback(completion);
-+}
-+
-+void vdo_set_completion_result(struct vdo_completion *completion, int result);
-+
-+void vdo_initialize_completion(struct vdo_completion *completion,
-+			       struct vdo *vdo,
-+			       enum vdo_completion_type type);
-+
-+/**
-+ * vdo_reset_completion() - Reset a completion to a clean state, while keeping the type, vdo and
-+ *                          parent information.
-+ */
-+static inline void vdo_reset_completion(struct vdo_completion *completion)
-+{
-+	completion->result = VDO_SUCCESS;
-+	completion->complete = false;
-+}
-+
-+void vdo_launch_completion_with_priority(struct vdo_completion *completion,
-+					 enum vdo_completion_priority priority);
-+
-+/**
-+ * vdo_launch_completion() - Launch a completion with default priority.
-+ */
-+static inline void vdo_launch_completion(struct vdo_completion *completion)
-+{
-+	vdo_launch_completion_with_priority(completion, VDO_WORK_Q_DEFAULT_PRIORITY);
-+}
-+
-+/**
-+ * vdo_continue_completion() - Continue processing a completion.
-+ * @result: The current result (will not mask older errors).
-+ *
-+ * Continue processing a completion by setting the current result and calling
-+ * vdo_launch_completion().
-+ */
-+static inline void vdo_continue_completion(struct vdo_completion *completion, int result)
-+{
-+	vdo_set_completion_result(completion, result);
-+	vdo_launch_completion(completion);
-+}
-+
-+void vdo_finish_completion(struct vdo_completion *completion);
-+
-+/**
-+ * vdo_fail_completion() - Set the result of a completion if it does not already have an error,
-+ *                         then finish it.
-+ */
-+static inline void vdo_fail_completion(struct vdo_completion *completion, int result)
-+{
-+	vdo_set_completion_result(completion, result);
-+	vdo_finish_completion(completion);
-+}
-+
-+/**
-+ * vdo_assert_completion_type() - Assert that a completion is of the correct type.
-+ *
-+ * Return: VDO_SUCCESS or an error
-+ */
-+static inline int
-+vdo_assert_completion_type(struct vdo_completion *completion, enum vdo_completion_type expected)
-+{
-+	return ASSERT(expected == completion->type,
-+		      "completion type should be %u, not %u",
-+		      expected,
-+		      completion->type);
-+}
-+
-+static inline void vdo_set_completion_callback(struct vdo_completion *completion,
-+					       vdo_action *callback,
-+					       thread_id_t callback_thread_id)
-+{
-+	completion->callback = callback;
-+	completion->callback_thread_id = callback_thread_id;
-+}
-+
-+/**
-+ * vdo_launch_completion_callback() - Set the callback for a completion and launch it immediately.
-+ */
-+static inline void vdo_launch_completion_callback(struct vdo_completion *completion,
-+						  vdo_action *callback,
-+						  thread_id_t callback_thread_id)
-+{
-+	vdo_set_completion_callback(completion, callback, callback_thread_id);
-+	vdo_launch_completion(completion);
-+}
-+
-+/**
-+ * vdo_prepare_completion() - Prepare a completion for launch.
-+ *
-+ * Resets the completion, and then sets its callback, error handler, callback thread, and parent.
-+ */
-+static inline void vdo_prepare_completion(struct vdo_completion *completion,
-+					  vdo_action *callback,
-+					  vdo_action *error_handler,
-+					  thread_id_t callback_thread_id,
-+					  void *parent)
-+{
-+	vdo_reset_completion(completion);
-+	vdo_set_completion_callback(completion, callback, callback_thread_id);
-+	completion->error_handler = error_handler;
-+	completion->parent = parent;
-+}
-+
-+/**
-+ * vdo_prepare_completion_for_requeue() - Prepare a completion for launch ensuring that it will
-+ *                                        always be requeued.
-+ *
-+ * Resets the completion, and then sets its callback, error handler, callback thread, and parent.
-+ */
-+static inline void
-+vdo_prepare_completion_for_requeue(struct vdo_completion *completion,
-+				   vdo_action *callback,
-+				   vdo_action *error_handler,
-+				   thread_id_t callback_thread_id,
-+				   void *parent)
-+{
-+	vdo_prepare_completion(completion, callback, error_handler, callback_thread_id, parent);
-+	completion->requeue = true;
-+}
-+
-+void vdo_enqueue_completion(struct vdo_completion *completion,
-+			    enum vdo_completion_priority priority);
-+
-+
-+bool vdo_requeue_completion_if_needed(struct vdo_completion *completion,
-+				      thread_id_t callback_thread_id);
-+
-+#endif /* VDO_COMPLETION_H */
-diff --git a/drivers/md/dm-vdo/cpu.h b/drivers/md/dm-vdo/cpu.h
-new file mode 100644
-index 00000000000..d2da22d9d60
---- /dev/null
-+++ b/drivers/md/dm-vdo/cpu.h
-@@ -0,0 +1,58 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#ifndef UDS_CPU_H
-+#define UDS_CPU_H
-+
-+#include <linux/cache.h>
-+
-+/**
-+ * uds_prefetch_address() - Minimize cache-miss latency by attempting to move data into a CPU cache
-+ *                          before it is accessed.
-+ *
-+ * @address: the address to fetch (may be invalid)
-+ * @for_write: must be constant at compile time--false if for reading, true if for writing
-+ */
-+static inline void uds_prefetch_address(const void *address, bool for_write)
-+{
-+	/*
-+	 * for_write won't be a constant if we are compiled with optimization turned off, in which
-+	 * case prefetching really doesn't matter. clang can't figure out that if for_write is a
-+	 * constant, it can be passed as the second, mandatorily constant argument to prefetch(),
-+	 * at least currently on llvm 12.
-+	 */
-+	if (__builtin_constant_p(for_write)) {
-+		if (for_write)
-+			__builtin_prefetch(address, true);
-+		else
-+			__builtin_prefetch(address, false);
-+	}
-+}
-+
-+/**
-+ * uds_prefetch_range() - Minimize cache-miss latency by attempting to move a range of addresses
-+ *                        into a CPU cache before they are accessed.
-+ *
-+ * @start: the starting address to fetch (may be invalid)
-+ * @size: the number of bytes in the address range
-+ * @for_write: must be constant at compile time--false if for reading, true if for writing
-+ */
-+static inline void uds_prefetch_range(const void *start, unsigned int size, bool for_write)
-+{
-+	/*
-+	 * Count the number of cache lines to fetch, allowing for the address range to span an
-+	 * extra cache line boundary due to address alignment.
-+	 */
-+	const char *address = (const char *) start;
-+	unsigned int offset = ((uintptr_t) address % L1_CACHE_BYTES);
-+	unsigned int cache_lines = (1 + ((size + offset) / L1_CACHE_BYTES));
-+
-+	while (cache_lines-- > 0) {
-+		uds_prefetch_address(address, for_write);
-+		address += L1_CACHE_BYTES;
-+	}
-+}
-+
-+#endif /* UDS_CPU_H */
-diff --git a/drivers/md/dm-vdo/funnel-queue.c b/drivers/md/dm-vdo/funnel-queue.c
-new file mode 100644
-index 00000000000..7e36153ec0a
---- /dev/null
-+++ b/drivers/md/dm-vdo/funnel-queue.c
-@@ -0,0 +1,169 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#include "funnel-queue.h"
-+
-+#include "cpu.h"
-+#include "memory-alloc.h"
-+#include "permassert.h"
-+#include "uds.h"
-+
-+int uds_make_funnel_queue(struct funnel_queue **queue_ptr)
-+{
-+	int result;
-+	struct funnel_queue *queue;
-+
-+	result = UDS_ALLOCATE(1, struct funnel_queue, "funnel queue", &queue);
-+	if (result != UDS_SUCCESS)
-+		return result;
-+
-+	/*
-+	 * Initialize the stub entry and put it in the queue, establishing the invariant that
-+	 * queue->newest and queue->oldest are never null.
-+	 */
-+	queue->stub.next = NULL;
-+	queue->newest = &queue->stub;
-+	queue->oldest = &queue->stub;
-+
-+	*queue_ptr = queue;
-+	return UDS_SUCCESS;
-+}
-+
-+void uds_free_funnel_queue(struct funnel_queue *queue)
-+{
-+	UDS_FREE(queue);
-+}
-+
-+static struct funnel_queue_entry *get_oldest(struct funnel_queue *queue)
-+{
-+	/*
-+	 * Barrier requirements: We need a read barrier between reading a "next" field pointer
-+	 * value and reading anything it points to. There's an accompanying barrier in
-+	 * uds_funnel_queue_put() between its caller setting up the entry and making it visible.
-+	 */
-+	struct funnel_queue_entry *oldest = queue->oldest;
-+	struct funnel_queue_entry *next = READ_ONCE(oldest->next);
-+
-+	if (oldest == &queue->stub) {
-+		/*
-+		 * When the oldest entry is the stub and it has no successor, the queue is
-+		 * logically empty.
-+		 */
-+		if (next == NULL)
-+			return NULL;
-+		/*
-+		 * The stub entry has a successor, so the stub can be dequeued and ignored without
-+		 * breaking the queue invariants.
-+		 */
-+		oldest = next;
-+		queue->oldest = oldest;
-+		next = READ_ONCE(oldest->next);
-+	}
-+
-+	/*
-+	 * We have a non-stub candidate to dequeue. If it lacks a successor, we'll need to put the
-+	 * stub entry back on the queue first.
-+	 */
-+	if (next == NULL) {
-+		struct funnel_queue_entry *newest = READ_ONCE(queue->newest);
-+
-+		if (oldest != newest)
-+			/*
-+			 * Another thread has already swung queue->newest atomically, but not yet
-+			 * assigned previous->next. The queue is really still empty.
-+			 */
-+			return NULL;
-+
-+		/*
-+		 * Put the stub entry back on the queue, ensuring a successor will eventually be
-+		 * seen.
-+		 */
-+		uds_funnel_queue_put(queue, &queue->stub);
-+
-+		/* Check again for a successor. */
-+		next = READ_ONCE(oldest->next);
-+		if (next == NULL)
-+			/*
-+			 * We lost a race with a producer who swapped queue->newest before we did,
-+			 * but who hasn't yet updated previous->next. Try again later.
-+			 */
-+			return NULL;
-+	}
-+
-+	return oldest;
-+}
-+
-+/*
-+ * Poll a queue, removing the oldest entry if the queue is not empty. This function must only be
-+ * called from a single consumer thread.
-+ */
-+struct funnel_queue_entry *uds_funnel_queue_poll(struct funnel_queue *queue)
-+{
-+	struct funnel_queue_entry *oldest = get_oldest(queue);
-+
-+	if (oldest == NULL)
-+		return oldest;
-+
-+	/*
-+	 * Dequeue the oldest entry and return it. Only one consumer thread may call this function,
-+	 * so no locking, atomic operations, or fences are needed; queue->oldest is owned by the
-+	 * consumer and oldest->next is never used by a producer thread after it is swung from NULL
-+	 * to non-NULL.
-+	 */
-+	queue->oldest = READ_ONCE(oldest->next);
-+	/*
-+	 * Make sure the caller sees the proper stored data for this entry. Since we've already
-+	 * fetched the entry pointer we stored in "queue->oldest", this also ensures that on entry
-+	 * to the next call we'll properly see the dependent data.
-+	 */
-+	smp_rmb();
-+	/*
-+	 * If "oldest" is a very light-weight work item, we'll be looking for the next one very
-+	 * soon, so prefetch it now.
-+	 */
-+	uds_prefetch_address(queue->oldest, true);
-+	WRITE_ONCE(oldest->next, NULL);
-+	return oldest;
-+}
-+
-+/*
-+ * Check whether the funnel queue is empty or not. If the queue is in a transition state with one
-+ * or more entries being added such that the list view is incomplete, this function will report the
-+ * queue as empty.
-+ */
-+bool uds_is_funnel_queue_empty(struct funnel_queue *queue)
-+{
-+	return get_oldest(queue) == NULL;
-+}
-+
-+/*
-+ * Check whether the funnel queue is idle or not. If the queue has entries available to be
-+ * retrieved, it is not idle. If the queue is in a transition state with one or more entries being
-+ * added such that the list view is incomplete, it may not be possible to retrieve an entry with
-+ * the uds_funnel_queue_poll() function, but the queue will not be considered idle.
-+ */
-+bool uds_is_funnel_queue_idle(struct funnel_queue *queue)
-+{
-+	/*
-+	 * Oldest is not the stub, so there's another entry, though if next is NULL we can't
-+	 * retrieve it yet.
-+	 */
-+	if (queue->oldest != &queue->stub)
-+		return false;
-+
-+	/*
-+	 * Oldest is the stub, but newest has been updated by _put(); either there's another,
-+	 * retrievable entry in the list, or the list is officially empty but in the intermediate
-+	 * state of having an entry added.
-+	 *
-+	 * Whether anything is retrievable depends on whether stub.next has been updated and become
-+	 * visible to us, but for idleness we don't care. And due to memory ordering in _put(), the
-+	 * update to newest would be visible to us at the same time or sooner.
-+	 */
-+	if (READ_ONCE(queue->newest) != &queue->stub)
-+		return false;
-+
-+	return true;
-+}
-diff --git a/drivers/md/dm-vdo/funnel-queue.h b/drivers/md/dm-vdo/funnel-queue.h
-new file mode 100644
-index 00000000000..332acc579b6
---- /dev/null
-+++ b/drivers/md/dm-vdo/funnel-queue.h
-@@ -0,0 +1,110 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#ifndef UDS_FUNNEL_QUEUE_H
-+#define UDS_FUNNEL_QUEUE_H
-+
-+#include <linux/atomic.h>
-+#include <linux/cache.h>
-+
-+/*
-+ * A funnel queue is a simple (almost) lock-free queue that accepts entries from multiple threads
-+ * (multi-producer) and delivers them to a single thread (single-consumer). "Funnel" is an attempt
-+ * to evoke the image of requests from more than one producer being "funneled down" to a single
-+ * consumer.
-+ *
-+ * This is an unsynchronized but thread-safe data structure when used as intended. There is no
-+ * mechanism to ensure that only one thread is consuming from the queue. If more than one thread
-+ * attempts to consume from the queue, the resulting behavior is undefined. Clients must not
-+ * directly access or manipulate the internals of the queue, which are only exposed for the purpose
-+ * of allowing the very simple enqueue operation to be inlined.
-+ *
-+ * The implementation requires that a funnel_queue_entry structure (a link pointer) is embedded in
-+ * the queue entries, and pointers to those structures are used exclusively by the queue. No macros
-+ * are defined to template the queue, so the offset of the funnel_queue_entry in the records placed
-+ * in the queue must all be the same so the client can derive their structure pointer from the
-+ * entry pointer returned by uds_funnel_queue_poll().
-+ *
-+ * Callers are wholly responsible for allocating and freeing the entries. Entries may be freed as
-+ * soon as they are returned since this queue is not susceptible to the "ABA problem" present in
-+ * many lock-free data structures. The queue is dynamically allocated to ensure cache-line
-+ * alignment, but no other dynamic allocation is used.
-+ *
-+ * The algorithm is not actually 100% lock-free. There is a single point in uds_funnel_queue_put()
-+ * at which a preempted producer will prevent the consumers from seeing items added to the queue by
-+ * later producers, and only if the queue is short enough or the consumer fast enough for it to
-+ * reach what was the end of the queue at the time of the preemption.
-+ *
-+ * The consumer function, uds_funnel_queue_poll(), will return NULL when the queue is empty. To
-+ * wait for data to consume, spin (if safe) or combine the queue with a struct event_count to
-+ * signal the presence of new entries.
-+ */
-+
-+/* This queue link structure must be embedded in client entries. */
-+struct funnel_queue_entry {
-+	/* The next (newer) entry in the queue. */
-+	struct funnel_queue_entry *next;
-+};
-+
-+/*
-+ * The dynamically allocated queue structure, which is allocated on a cache line boundary so the
-+ * producer and consumer fields in the structure will land on separate cache lines. This should be
-+ * consider opaque but it is exposed here so uds_funnel_queue_put() can be inlined.
-+ */
-+struct __aligned(L1_CACHE_BYTES) funnel_queue {
-+	/*
-+	 * The producers' end of the queue, an atomically exchanged pointer that will never be
-+	 * NULL.
-+	 */
-+	struct funnel_queue_entry *newest;
-+
-+	/* The consumer's end of the queue, which is owned by the consumer and never NULL. */
-+	struct funnel_queue_entry *oldest __aligned(L1_CACHE_BYTES);
-+
-+	/* A dummy entry used to provide the non-NULL invariants above. */
-+	struct funnel_queue_entry stub;
-+};
-+
-+int __must_check uds_make_funnel_queue(struct funnel_queue **queue_ptr);
-+
-+void uds_free_funnel_queue(struct funnel_queue *queue);
-+
-+/*
-+ * Put an entry on the end of the queue.
-+ *
-+ * The entry pointer must be to the struct funnel_queue_entry embedded in the caller's data
-+ * structure. The caller must be able to derive the address of the start of their data structure
-+ * from the pointer that passed in here, so every entry in the queue must have the struct
-+ * funnel_queue_entry at the same offset within the client's structure.
-+ */
-+static inline void
-+uds_funnel_queue_put(struct funnel_queue *queue, struct funnel_queue_entry *entry)
-+{
-+	struct funnel_queue_entry *previous;
-+
-+	/*
-+	 * Barrier requirements: All stores relating to the entry ("next" pointer, containing data
-+	 * structure fields) must happen before the previous->next store making it visible to the
-+	 * consumer. Also, the entry's "next" field initialization to NULL must happen before any
-+	 * other producer threads can see the entry (the xchg) and try to update the "next" field.
-+	 *
-+	 * xchg implements a full barrier.
-+	 */
-+	WRITE_ONCE(entry->next, NULL);
-+	previous = xchg(&queue->newest, entry);
-+	/*
-+	 * Preemptions between these two statements hide the rest of the queue from the consumer,
-+	 * preventing consumption until the following assignment runs.
-+	 */
-+	WRITE_ONCE(previous->next, entry);
-+}
-+
-+struct funnel_queue_entry *__must_check uds_funnel_queue_poll(struct funnel_queue *queue);
-+
-+bool __must_check uds_is_funnel_queue_empty(struct funnel_queue *queue);
-+
-+bool __must_check uds_is_funnel_queue_idle(struct funnel_queue *queue);
-+
-+#endif /* UDS_FUNNEL_QUEUE_H */
-diff --git a/drivers/md/dm-vdo/request-queue.c b/drivers/md/dm-vdo/request-queue.c
-new file mode 100644
-index 00000000000..058422f44d9
---- /dev/null
-+++ b/drivers/md/dm-vdo/request-queue.c
-@@ -0,0 +1,284 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#include "request-queue.h"
-+
-+#include <linux/atomic.h>
-+#include <linux/compiler.h>
-+#include <linux/wait.h>
-+
-+#include "funnel-queue.h"
++#include "config.h"
 +#include "logger.h"
 +#include "memory-alloc.h"
-+#include "uds-threads.h"
++#include "murmurhash3.h"
++#include "numeric.h"
++#include "open-chapter.h"
++#include "time-utils.h"
++#include "volume-index.h"
 +
 +/*
-+ * This queue will attempt to handle requests in reasonably sized batches instead of reacting
-+ * immediately to each new request. The wait time between batches is dynamically adjusted up or
-+ * down to try to balance responsiveness against wasted thread run time.
++ * The UDS layout on storage media is divided into a number of fixed-size regions, the sizes of
++ * which are computed when the index is created. Every header and region begins on 4K block
++ * boundary. Save regions are further sub-divided into regions of their own.
 + *
-+ * If the wait time becomes long enough, the queue will become dormant and must be explicitly
-+ * awoken when a new request is enqueued. The enqueue operation updates "newest" in the funnel
-+ * queue via xchg (which is a memory barrier), and later checks "dormant" to decide whether to do a
-+ * wakeup of the worker thread.
++ * Each region has a kind and an instance number. Some kinds only have one instance and therefore
++ * use RL_SOLE_INSTANCE (-1) as the instance number. The RL_KIND_INDEX used to use instances to
++ * represent sub-indices; now, however there is only ever one sub-index and therefore one instance.
++ * The RL_KIND_VOLUME_INDEX uses instances to record which zone is being saved.
 + *
-+ * When deciding to go to sleep, the worker thread sets "dormant" and then examines "newest" to
-+ * decide if the funnel queue is idle. In dormant mode, the last examination of "newest" before
-+ * going to sleep is done inside the wait_event_interruptible() macro, after a point where one or
-+ * more memory barriers have been issued. (Preparing to sleep uses spin locks.) Even if the funnel
-+ * queue's "next" field update isn't visible yet to make the entry accessible, its existence will
-+ * kick the worker thread out of dormant mode and back into timer-based mode.
++ * Every region header has a type and version.
 + *
-+ * Unbatched requests are used to communicate between different zone threads and will also cause
-+ * the queue to awaken immediately.
++ *     +-+-+---------+--------+--------+-+
++ *     | | |   I N D E X  0   101, 0   | |
++ *     |H|C+---------+--------+--------+S|
++ *     |D|f| Volume  | Save   | Save   |e|
++ *     |R|g| Region  | Region | Region |a|
++ *     | | | 201, -1 | 202, 0 | 202, 1 |l|
++ *     +-+-+--------+---------+--------+-+
++ *
++ * The header contains the encoded region layout table as well as some index configuration data.
++ * The sub-index region and its subdivisions are maintained in the same table.
++ *
++ * There are two save regions to preserve the old state in case saving the new state is incomplete.
++ * They are used in alternation. Each save region is further divided into sub-regions.
++ *
++ *     +-+-----+------+------+-----+-----+
++ *     |H| IPM | MI   | MI   |     | OC  |
++ *     |D|     | zone | zone | ... |     |
++ *     |R| 301 | 302  | 302  |     | 303 |
++ *     | | -1  |  0   |  1   |     | -1  |
++ *     +-+-----+------+------+-----+-----+
++ *
++ * The header contains the encoded region layout table as well as index state data for that save.
++ * Each save also has a unique nonce.
 + */
 +
 +enum {
-+	NANOSECOND = 1,
-+	MICROSECOND = 1000 * NANOSECOND,
-+	MILLISECOND = 1000 * MICROSECOND,
-+	DEFAULT_WAIT_TIME = 20 * MICROSECOND,
-+	MINIMUM_WAIT_TIME = DEFAULT_WAIT_TIME / 2,
-+	MAXIMUM_WAIT_TIME = MILLISECOND,
-+	MINIMUM_BATCH = 32,
-+	MAXIMUM_BATCH = 64,
++	MAGIC_SIZE = 32,
++	NONCE_INFO_SIZE = 32,
++	MAX_SAVES = 2,
 +};
 +
-+struct uds_request_queue {
-+	/* Wait queue for synchronizing producers and consumer */
-+	struct wait_queue_head wait_head;
-+	/* Function to process a request */
-+	uds_request_queue_processor_t *processor;
-+	/* Queue of new incoming requests */
-+	struct funnel_queue *main_queue;
-+	/* Queue of old requests to retry */
-+	struct funnel_queue *retry_queue;
-+	/* The thread id of the worker thread */
-+	struct thread *thread;
-+	/* True if the worker was started */
-+	bool started;
-+	/* When true, requests can be enqueued */
-+	bool running;
-+	/* A flag set when the worker is waiting without a timeout */
-+	atomic_t dormant;
++enum region_kind {
++	RL_KIND_EMPTY = 0,
++	RL_KIND_HEADER = 1,
++	RL_KIND_CONFIG = 100,
++	RL_KIND_INDEX = 101,
++	RL_KIND_SEAL = 102,
++	RL_KIND_VOLUME = 201,
++	RL_KIND_SAVE = 202,
++	RL_KIND_INDEX_PAGE_MAP = 301,
++	RL_KIND_VOLUME_INDEX = 302,
++	RL_KIND_OPEN_CHAPTER = 303,
 +};
 +
-+static inline struct uds_request *poll_queues(struct uds_request_queue *queue)
-+{
-+	struct funnel_queue_entry *entry;
++/* Some region types are historical and are no longer used. */
++enum region_type {
++	RH_TYPE_FREE = 0, /* unused */
++	RH_TYPE_SUPER = 1,
++	RH_TYPE_SAVE = 2,
++	RH_TYPE_CHECKPOINT = 3, /* unused */
++	RH_TYPE_UNSAVED = 4,
++};
 +
-+	entry = uds_funnel_queue_poll(queue->retry_queue);
-+	if (entry != NULL)
-+		return container_of(entry, struct uds_request, queue_link);
-+
-+	entry = uds_funnel_queue_poll(queue->main_queue);
-+	if (entry != NULL)
-+		return container_of(entry, struct uds_request, queue_link);
-+
-+	return NULL;
-+}
-+
-+static inline bool are_queues_idle(struct uds_request_queue *queue)
-+{
-+	return uds_is_funnel_queue_idle(queue->retry_queue) &&
-+	       uds_is_funnel_queue_idle(queue->main_queue);
-+}
++enum {
++	RL_SOLE_INSTANCE = 65535,
++};
 +
 +/*
-+ * Determine if there is a next request to process, and return it if there is. Also return flags
-+ * indicating whether the worker thread can sleep (for the use of wait_event() macros) and whether
-+ * the thread did sleep before returning a new request.
++ * Super block version 2 is the first released version.
++ *
++ * Super block version 3 is the normal version used from RHEL 8.2 onwards.
++ *
++ * Super block versions 4 through 6 were incremental development versions and
++ * are not supported.
++ *
++ * Super block version 7 is used for volumes which have been reduced in size by one chapter in
++ * order to make room to prepend LVM metadata to a volume originally created without lvm. This
++ * allows the index to retain most its deduplication records.
 + */
-+static inline bool dequeue_request(struct uds_request_queue *queue,
-+				   struct uds_request **request_ptr,
-+				   bool *waited_ptr)
++enum {
++	SUPER_VERSION_MINIMUM = 3,
++	SUPER_VERSION_CURRENT = 3,
++	SUPER_VERSION_MAXIMUM = 7,
++};
++
++static const u8 LAYOUT_MAGIC[MAGIC_SIZE] = "*ALBIREO*SINGLE*FILE*LAYOUT*001*";
++static const u64 REGION_MAGIC = 0x416c6252676e3031; /* 'AlbRgn01' */
++
++struct region_header {
++	u64 magic;
++	u64 region_blocks;
++	u16 type;
++	/* Currently always version 1 */
++	u16 version;
++	u16 region_count;
++	u16 payload;
++};
++
++struct layout_region {
++	u64 start_block;
++	u64 block_count;
++	u32 __unused;
++	u16 kind;
++	u16 instance;
++};
++
++struct region_table {
++	size_t encoded_size;
++	struct region_header header;
++	struct layout_region regions[];
++};
++
++struct index_save_data {
++	u64 timestamp;
++	u64 nonce;
++	/* Currently always version 1 */
++	u32 version;
++	u32 unused__;
++};
++
++struct index_state_version {
++	s32 signature;
++	s32 version_id;
++};
++
++static const struct index_state_version INDEX_STATE_VERSION_301 = {
++	.signature  = -1,
++	.version_id = 301,
++};
++
++struct index_state_data301 {
++	struct index_state_version version;
++	u64 newest_chapter;
++	u64 oldest_chapter;
++	u64 last_save;
++	u32 unused;
++	u32 padding;
++};
++
++struct index_save_layout {
++	unsigned int zone_count;
++	struct layout_region index_save;
++	struct layout_region header;
++	struct layout_region index_page_map;
++	struct layout_region free_space;
++	struct layout_region volume_index_zones[MAX_ZONES];
++	struct layout_region open_chapter;
++	struct index_save_data save_data;
++	struct index_state_data301 state_data;
++};
++
++struct sub_index_layout {
++	u64 nonce;
++	struct layout_region sub_index;
++	struct layout_region volume;
++	struct index_save_layout *saves;
++};
++
++struct super_block_data {
++	u8 magic_label[MAGIC_SIZE];
++	u8 nonce_info[NONCE_INFO_SIZE];
++	u64 nonce;
++	u32 version;
++	u32 block_size;
++	u16 index_count;
++	u16 max_saves;
++	/* Padding reflects a blank field on permanent storage */
++	u8 padding[4];
++	u64 open_chapter_blocks;
++	u64 page_map_blocks;
++	u64 volume_offset;
++	u64 start_offset;
++};
++
++struct index_layout {
++	struct io_factory *factory;
++	size_t factory_size;
++	off_t offset;
++	struct super_block_data super;
++	struct layout_region header;
++	struct layout_region config;
++	struct sub_index_layout index;
++	struct layout_region seal;
++	u64 total_blocks;
++};
++
++struct save_layout_sizes {
++	unsigned int save_count;
++	size_t block_size;
++	u64 volume_blocks;
++	u64 volume_index_blocks;
++	u64 page_map_blocks;
++	u64 open_chapter_blocks;
++	u64 save_blocks;
++	u64 sub_index_blocks;
++	u64 total_blocks;
++	size_t total_size;
++};
++
++static inline bool is_converted_super_block(struct super_block_data *super)
 +{
-+	struct uds_request *request = poll_queues(queue);
-+
-+	if (request != NULL) {
-+		*request_ptr = request;
-+		return true;
-+	}
-+
-+	if (!READ_ONCE(queue->running)) {
-+		/* Wake the worker thread so it can exit. */
-+		*request_ptr = NULL;
-+		return true;
-+	}
-+
-+	*request_ptr = NULL;
-+	*waited_ptr = true;
-+	return false;
++	return super->version == 7;
 +}
 +
-+static void wait_for_request(struct uds_request_queue *queue,
-+			     bool dormant,
-+			     unsigned long timeout,
-+			     struct uds_request **request,
-+			     bool *waited)
-+{
-+	if (dormant) {
-+		wait_event_interruptible(queue->wait_head,
-+					 (dequeue_request(queue, request, waited) ||
-+					  !are_queues_idle(queue)));
-+		return;
-+	}
-+
-+	wait_event_interruptible_hrtimeout(queue->wait_head,
-+					   dequeue_request(queue, request, waited),
-+					   ns_to_ktime(timeout));
-+}
-+
-+static void request_queue_worker(void *arg)
-+{
-+	struct uds_request_queue *queue = (struct uds_request_queue *) arg;
-+	struct uds_request *request = NULL;
-+	unsigned long time_batch = DEFAULT_WAIT_TIME;
-+	bool dormant = atomic_read(&queue->dormant);
-+	bool waited = false;
-+	long current_batch = 0;
-+
-+	for (;;) {
-+		wait_for_request(queue, dormant, time_batch, &request, &waited);
-+		if (likely(request != NULL)) {
-+			current_batch++;
-+			queue->processor(request);
-+		} else if (!READ_ONCE(queue->running)) {
-+			break;
-+		}
-+
-+		if (dormant) {
-+			/*
-+			 * The queue has been roused from dormancy. Clear the flag so enqueuers can
-+			 * stop broadcasting. No fence is needed for this transition.
-+			 */
-+			atomic_set(&queue->dormant, false);
-+			dormant = false;
-+			time_batch = DEFAULT_WAIT_TIME;
-+		} else if (waited) {
-+			/*
-+			 * We waited for this request to show up. Adjust the wait time to smooth
-+			 * out the batch size.
-+			 */
-+			if (current_batch < MINIMUM_BATCH) {
-+				/*
-+				 * If the last batch of requests was too small, increase the wait
-+				 * time.
-+				 */
-+				time_batch += time_batch / 4;
-+				if (time_batch >= MAXIMUM_WAIT_TIME) {
-+					atomic_set(&queue->dormant, true);
-+					dormant = true;
-+				}
-+			} else if (current_batch > MAXIMUM_BATCH) {
-+				/*
-+				 * If the last batch of requests was too large, decrease the wait
-+				 * time.
-+				 */
-+				time_batch -= time_batch / 4;
-+				if (time_batch < MINIMUM_WAIT_TIME)
-+					time_batch = MINIMUM_WAIT_TIME;
-+			}
-+			current_batch = 0;
-+		}
-+	}
-+
-+	/*
-+	 * Ensure that we process any remaining requests that were enqueued before trying to shut
-+	 * down. The corresponding write barrier is in uds_request_queue_finish().
-+	 */
-+	smp_rmb();
-+	while ((request = poll_queues(queue)) != NULL)
-+		queue->processor(request);
-+}
-+
-+int uds_make_request_queue(const char *queue_name,
-+			   uds_request_queue_processor_t *processor,
-+			   struct uds_request_queue **queue_ptr)
++static int __must_check compute_sizes(const struct configuration *config,
++				      struct save_layout_sizes *sls)
 +{
 +	int result;
-+	struct uds_request_queue *queue;
++	struct geometry *geometry = config->geometry;
 +
-+	result = UDS_ALLOCATE(1, struct uds_request_queue, __func__, &queue);
++	memset(sls, 0, sizeof(*sls));
++	sls->save_count = MAX_SAVES;
++	sls->block_size = UDS_BLOCK_SIZE;
++	sls->volume_blocks = geometry->bytes_per_volume / sls->block_size;
++
++	result = uds_compute_volume_index_save_blocks(config,
++						      sls->block_size,
++						      &sls->volume_index_blocks);
 +	if (result != UDS_SUCCESS)
-+		return result;
++		return uds_log_error_strerror(result, "cannot compute index save size");
 +
-+	queue->processor = processor;
-+	queue->running = true;
-+	atomic_set(&queue->dormant, false);
-+	init_waitqueue_head(&queue->wait_head);
++	sls->page_map_blocks =
++		DIV_ROUND_UP(uds_compute_index_page_map_save_size(geometry), sls->block_size);
++	sls->open_chapter_blocks =
++		DIV_ROUND_UP(uds_compute_saved_open_chapter_size(geometry), sls->block_size);
++	sls->save_blocks =
++		1 + (sls->volume_index_blocks + sls->page_map_blocks + sls->open_chapter_blocks);
++	sls->sub_index_blocks = sls->volume_blocks + (sls->save_count * sls->save_blocks);
++	sls->total_blocks = 3 + sls->sub_index_blocks;
++	sls->total_size = sls->total_blocks * sls->block_size;
 +
-+	result = uds_make_funnel_queue(&queue->main_queue);
-+	if (result != UDS_SUCCESS) {
-+		uds_request_queue_finish(queue);
-+		return result;
-+	}
-+
-+	result = uds_make_funnel_queue(&queue->retry_queue);
-+	if (result != UDS_SUCCESS) {
-+		uds_request_queue_finish(queue);
-+		return result;
-+	}
-+
-+	result = uds_create_thread(request_queue_worker, queue, queue_name, &queue->thread);
-+	if (result != UDS_SUCCESS) {
-+		uds_request_queue_finish(queue);
-+		return result;
-+	}
-+
-+	queue->started = true;
-+	*queue_ptr = queue;
 +	return UDS_SUCCESS;
 +}
 +
-+static inline void wake_up_worker(struct uds_request_queue *queue)
-+{
-+	if (wq_has_sleeper(&queue->wait_head))
-+		wake_up(&queue->wait_head);
-+}
-+
-+void uds_request_queue_enqueue(struct uds_request_queue *queue, struct uds_request *request)
-+{
-+	struct funnel_queue *sub_queue;
-+	bool unbatched = request->unbatched;
-+
-+	sub_queue = request->requeued ? queue->retry_queue : queue->main_queue;
-+	uds_funnel_queue_put(sub_queue, &request->queue_link);
-+
-+	/*
-+	 * We must wake the worker thread when it is dormant. A read fence isn't needed here since
-+	 * we know the queue operation acts as one.
-+	 */
-+	if (atomic_read(&queue->dormant) || unbatched)
-+		wake_up_worker(queue);
-+}
-+
-+void uds_request_queue_finish(struct uds_request_queue *queue)
++int uds_compute_index_size(const struct uds_parameters *parameters, u64 *index_size)
 +{
 +	int result;
++	struct configuration *index_config;
++	struct save_layout_sizes sizes;
 +
-+	if (queue == NULL)
-+		return;
-+
-+	/*
-+	 * This memory barrier ensures that any requests we queued will be seen. The point is that
-+	 * when dequeue_request() sees the following update to the running flag, it will also be
-+	 * able to see any change we made to a next field in the funnel queue entry. The
-+	 * corresponding read barrier is in request_queue_worker().
-+	 */
-+	smp_wmb();
-+	WRITE_ONCE(queue->running, false);
-+
-+	if (queue->started) {
-+		wake_up_worker(queue);
-+		result = uds_join_threads(queue->thread);
-+		if (result != UDS_SUCCESS)
-+			uds_log_warning_strerror(result, "Failed to join worker thread");
++	if (index_size == NULL) {
++		uds_log_error("Missing output size pointer");
++		return -EINVAL;
 +	}
 +
-+	uds_free_funnel_queue(queue->main_queue);
-+	uds_free_funnel_queue(queue->retry_queue);
-+	UDS_FREE(queue);
-+}
-diff --git a/drivers/md/dm-vdo/request-queue.h b/drivers/md/dm-vdo/request-queue.h
-new file mode 100644
-index 00000000000..e736072b35a
---- /dev/null
-+++ b/drivers/md/dm-vdo/request-queue.h
-@@ -0,0 +1,30 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#ifndef UDS_REQUEST_QUEUE_H
-+#define UDS_REQUEST_QUEUE_H
-+
-+#include "uds.h"
-+
-+/*
-+ * A simple request queue which will handle new requests in the order in which they are received,
-+ * and will attempt to handle requeued requests before new ones. However, the nature of the
-+ * implementation means that it cannot guarantee this ordering; the prioritization is merely a
-+ * hint.
-+ */
-+
-+struct uds_request_queue;
-+
-+typedef void uds_request_queue_processor_t(struct uds_request *);
-+
-+int __must_check uds_make_request_queue(const char *queue_name,
-+					uds_request_queue_processor_t *processor,
-+					struct uds_request_queue **queue_ptr);
-+
-+void uds_request_queue_enqueue(struct uds_request_queue *queue, struct uds_request *request);
-+
-+void uds_request_queue_finish(struct uds_request_queue *queue);
-+
-+#endif /* UDS_REQUEST_QUEUE_H */
-diff --git a/drivers/md/dm-vdo/work-queue.c b/drivers/md/dm-vdo/work-queue.c
-new file mode 100644
-index 00000000000..ecb0c345d4f
---- /dev/null
-+++ b/drivers/md/dm-vdo/work-queue.c
-@@ -0,0 +1,659 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright Red Hat
-+ */
-+
-+#include "work-queue.h"
-+
-+#include <linux/atomic.h>
-+#include <linux/cache.h>
-+#include <linux/completion.h>
-+#include <linux/err.h>
-+#include <linux/kthread.h>
-+#include <linux/percpu.h>
-+
-+#include "funnel-queue.h"
-+#include "logger.h"
-+#include "memory-alloc.h"
-+#include "numeric.h"
-+#include "permassert.h"
-+#include "string-utils.h"
-+
-+#include "completion.h"
-+#include "status-codes.h"
-+
-+static DEFINE_PER_CPU(unsigned int, service_queue_rotor);
-+
-+/**
-+ * DOC: Work queue definition.
-+ *
-+ * There are two types of work queues: simple, with one worker thread, and round-robin, which uses
-+ * a group of the former to do the work, and assigns work to them in round-robin fashion (roughly).
-+ * Externally, both are represented via the same common sub-structure, though there's actually not
-+ * a great deal of overlap between the two types internally.
-+ */
-+struct vdo_work_queue {
-+	/* Name of just the work queue (e.g., "cpuQ12") */
-+	char *name;
-+	bool round_robin_mode;
-+	struct vdo_thread *owner;
-+	/* Life cycle functions, etc */
-+	const struct vdo_work_queue_type *type;
-+};
-+
-+struct simple_work_queue {
-+	struct vdo_work_queue common;
-+	struct funnel_queue *priority_lists[VDO_WORK_Q_MAX_PRIORITY + 1];
-+	void *private;
-+
-+	/*
-+	 * The fields above are unchanged after setup but often read, and are good candidates for
-+	 * caching -- and if the max priority is 2, just fit in one x86-64 cache line if aligned.
-+	 * The fields below are often modified as we sleep and wake, so we want a separate cache
-+	 * line for performance.
-+	 */
-+
-+	/* Any (0 or 1) worker threads waiting for new work to do */
-+	wait_queue_head_t waiting_worker_threads ____cacheline_aligned;
-+	/* Hack to reduce wakeup calls if the worker thread is running */
-+	atomic_t idle;
-+
-+	/* These are infrequently used so in terms of performance we don't care where they land. */
-+	struct task_struct *thread;
-+	/* Notify creator once worker has initialized */
-+	struct completion *started;
-+};
-+
-+struct round_robin_work_queue {
-+	struct vdo_work_queue common;
-+	struct simple_work_queue **service_queues;
-+	unsigned int num_service_queues;
-+};
-+
-+static inline struct simple_work_queue *as_simple_work_queue(struct vdo_work_queue *queue)
-+{
-+	return ((queue == NULL) ? NULL : container_of(queue, struct simple_work_queue, common));
-+}
-+
-+static inline struct round_robin_work_queue *
-+as_round_robin_work_queue(struct vdo_work_queue *queue)
-+{
-+	return ((queue == NULL) ?
-+		 NULL :
-+		 container_of(queue, struct round_robin_work_queue, common));
-+}
-+
-+/* Processing normal completions. */
-+
-+/*
-+ * Dequeue and return the next waiting completion, if any.
-+ *
-+ * We scan the funnel queues from highest priority to lowest, once; there is therefore a race
-+ * condition where a high-priority completion can be enqueued followed by a lower-priority one, and
-+ * we'll grab the latter (but we'll catch the high-priority item on the next call). If strict
-+ * enforcement of priorities becomes necessary, this function will need fixing.
-+ */
-+static struct vdo_completion *poll_for_completion(struct simple_work_queue *queue)
-+{
-+	int i;
-+
-+	for (i = queue->common.type->max_priority; i >= 0; i--) {
-+		struct funnel_queue_entry *link = uds_funnel_queue_poll(queue->priority_lists[i]);
-+
-+		if (link != NULL)
-+			return container_of(link, struct vdo_completion, work_queue_entry_link);
++	result = uds_make_configuration(parameters, &index_config);
++	if (result != UDS_SUCCESS) {
++		uds_log_error_strerror(result, "cannot compute index size");
++		return uds_map_to_system_error(result);
 +	}
 +
-+	return NULL;
++	result = compute_sizes(index_config, &sizes);
++	uds_free_configuration(index_config);
++	if (result != UDS_SUCCESS)
++		return uds_map_to_system_error(result);
++
++	*index_size = sizes.total_size;
++	return UDS_SUCCESS;
++}
++
++/* Create unique data using the current time and a pseudorandom number. */
++static void create_unique_nonce_data(u8 *buffer)
++{
++	ktime_t now = current_time_ns(CLOCK_REALTIME);
++	u32 rand;
++	size_t offset = 0;
++
++	get_random_bytes(&rand, sizeof(u32));
++	memcpy(buffer + offset, &now, sizeof(now));
++	offset += sizeof(now);
++	memcpy(buffer + offset, &rand, sizeof(rand));
++	offset += sizeof(rand);
++	while (offset < NONCE_INFO_SIZE) {
++		size_t len = min(NONCE_INFO_SIZE - offset, offset);
++
++		memcpy(buffer + offset, buffer, len);
++		offset += len;
++	}
++}
++
++static u64 hash_stuff(u64 start, const void *data, size_t len)
++{
++	u32 seed = start ^ (start >> 27);
++	u8 hash_buffer[16];
++
++	murmurhash3_128(data, len, seed, hash_buffer);
++	return get_unaligned_le64(hash_buffer + 4);
++}
++
++/* Generate a primary nonce from the provided data. */
++static u64 generate_primary_nonce(const void *data, size_t len)
++{
++	return hash_stuff(0xa1b1e0fc, data, len);
++}
++
++/*
++ * Deterministically generate a secondary nonce from an existing nonce and some arbitrary data by
++ * hashing the original nonce and the data to produce a new nonce.
++ */
++static u64 generate_secondary_nonce(u64 nonce, const void *data, size_t len)
++{
++	return hash_stuff(nonce + 1, data, len);
++}
++
++static int __must_check open_layout_reader(struct index_layout *layout,
++					   struct layout_region *lr,
++					   off_t offset,
++					   struct buffered_reader **reader_ptr)
++{
++	return uds_make_buffered_reader(layout->factory,
++					lr->start_block + offset,
++					lr->block_count,
++					reader_ptr);
++}
++
++static int open_region_reader(struct index_layout *layout,
++			      struct layout_region *region,
++			      struct buffered_reader **reader_ptr)
++{
++	return open_layout_reader(layout, region, -layout->super.start_offset, reader_ptr);
++}
++
++static int __must_check open_layout_writer(struct index_layout *layout,
++					   struct layout_region *lr,
++					   off_t offset,
++					   struct buffered_writer **writer_ptr)
++{
++	return uds_make_buffered_writer(layout->factory,
++					lr->start_block + offset,
++					lr->block_count,
++					writer_ptr);
++}
++
++static int open_region_writer(struct index_layout *layout,
++			      struct layout_region *region,
++			      struct buffered_writer **writer_ptr)
++{
++	return open_layout_writer(layout, region, -layout->super.start_offset, writer_ptr);
 +}
 +
 +static void
-+enqueue_work_queue_completion(struct simple_work_queue *queue, struct vdo_completion *completion)
++generate_super_block_data(struct save_layout_sizes *sls, struct super_block_data *super)
 +{
-+	ASSERT_LOG_ONLY(completion->my_queue == NULL,
-+			"completion %px (fn %px) to enqueue (%px) is not already queued (%px)",
-+			completion,
-+			completion->callback,
-+			queue,
-+			completion->my_queue);
-+	if (completion->priority == VDO_WORK_Q_DEFAULT_PRIORITY)
-+		completion->priority = queue->common.type->default_priority;
++	memset(super, 0, sizeof(*super));
++	memcpy(super->magic_label, LAYOUT_MAGIC, MAGIC_SIZE);
++	create_unique_nonce_data(super->nonce_info);
 +
-+	if (ASSERT(completion->priority <= queue->common.type->max_priority,
-+		   "priority is in range for queue") != VDO_SUCCESS)
-+		completion->priority = 0;
-+
-+	completion->my_queue = &queue->common;
-+
-+	/* Funnel queue handles the synchronization for the put. */
-+	uds_funnel_queue_put(queue->priority_lists[completion->priority],
-+			     &completion->work_queue_entry_link);
-+
-+	/*
-+	 * Due to how funnel queue synchronization is handled (just atomic operations), the
-+	 * simplest safe implementation here would be to wake-up any waiting threads after
-+	 * enqueueing each item. Even if the funnel queue is not empty at the time of adding an
-+	 * item to the queue, the consumer thread may not see this since it is not guaranteed to
-+	 * have the same view of the queue as a producer thread.
-+	 *
-+	 * However, the above is wasteful so instead we attempt to minimize the number of thread
-+	 * wakeups. Using an idle flag, and careful ordering using memory barriers, we should be
-+	 * able to determine when the worker thread might be asleep or going to sleep. We use
-+	 * cmpxchg to try to take ownership (vs other producer threads) of the responsibility for
-+	 * waking the worker thread, so multiple wakeups aren't tried at once.
-+	 *
-+	 * This was tuned for some x86 boxes that were handy; it's untested whether doing the read
-+	 * first is any better or worse for other platforms, even other x86 configurations.
-+	 */
-+	smp_mb();
-+	if ((atomic_read(&queue->idle) != 1) || (atomic_cmpxchg(&queue->idle, 1, 0) != 1))
-+		return;
-+
-+	/* There's a maximum of one thread in this list. */
-+	wake_up(&queue->waiting_worker_threads);
++	super->nonce = generate_primary_nonce(super->nonce_info, sizeof(super->nonce_info));
++	super->version = SUPER_VERSION_CURRENT;
++	super->block_size = sls->block_size;
++	super->index_count = 1;
++	super->max_saves = sls->save_count;
++	super->open_chapter_blocks = sls->open_chapter_blocks;
++	super->page_map_blocks = sls->page_map_blocks;
++	super->volume_offset = 0;
++	super->start_offset = 0;
 +}
 +
-+static void run_start_hook(struct simple_work_queue *queue)
++static void define_sub_index_nonce(struct index_layout *layout)
 +{
-+	if (queue->common.type->start != NULL)
-+		queue->common.type->start(queue->private);
++	struct sub_index_nonce_data {
++		u64 offset;
++		u16 index_id;
++	};
++	struct sub_index_layout *sil = &layout->index;
++	u64 primary_nonce = layout->super.nonce;
++	u8 buffer[sizeof(struct sub_index_nonce_data)] = { 0 };
++	size_t offset = 0;
++
++	encode_u64_le(buffer, &offset, sil->sub_index.start_block);
++	encode_u16_le(buffer, &offset, 0);
++	sil->nonce = generate_secondary_nonce(primary_nonce, buffer, sizeof(buffer));
++	if (sil->nonce == 0)
++		sil->nonce = generate_secondary_nonce(~primary_nonce + 1, buffer, sizeof(buffer));
 +}
 +
-+static void run_finish_hook(struct simple_work_queue *queue)
++static void
++setup_sub_index(struct index_layout *layout, u64 start_block, struct save_layout_sizes *sls)
 +{
-+	if (queue->common.type->finish != NULL)
-+		queue->common.type->finish(queue->private);
-+}
-+
-+/*
-+ * Wait for the next completion to process, or until kthread_should_stop indicates that it's time
-+ * for us to shut down.
-+ *
-+ * If kthread_should_stop says it's time to stop but we have pending completions return a
-+ * completion.
-+ *
-+ * Also update statistics relating to scheduler interactions.
-+ */
-+static struct vdo_completion *wait_for_next_completion(struct simple_work_queue *queue)
-+{
-+	struct vdo_completion *completion;
-+	DEFINE_WAIT(wait);
-+
-+	while (true) {
-+		prepare_to_wait(&queue->waiting_worker_threads, &wait, TASK_INTERRUPTIBLE);
-+		/*
-+		 * Don't set the idle flag until a wakeup will not be lost.
-+		 *
-+		 * Force synchronization between setting the idle flag and checking the funnel
-+		 * queue; the producer side will do them in the reverse order. (There's still a
-+		 * race condition we've chosen to allow, because we've got a timeout below that
-+		 * unwedges us if we hit it, but this may narrow the window a little.)
-+		 */
-+		atomic_set(&queue->idle, 1);
-+		smp_mb(); /* store-load barrier between "idle" and funnel queue */
-+
-+		completion = poll_for_completion(queue);
-+		if (completion != NULL)
-+			break;
-+
-+		/*
-+		 * We need to check for thread-stop after setting TASK_INTERRUPTIBLE state up
-+		 * above. Otherwise, schedule() will put the thread to sleep and might miss a
-+		 * wakeup from kthread_stop() call in vdo_finish_work_queue().
-+		 */
-+		if (kthread_should_stop())
-+			break;
-+
-+		schedule();
-+
-+		/*
-+		 * Most of the time when we wake, it should be because there's work to do. If it
-+		 * was a spurious wakeup, continue looping.
-+		 */
-+		completion = poll_for_completion(queue);
-+		if (completion != NULL)
-+			break;
-+	}
-+
-+	finish_wait(&queue->waiting_worker_threads, &wait);
-+	atomic_set(&queue->idle, 0);
-+
-+	return completion;
-+}
-+
-+static void process_completion(struct simple_work_queue *queue, struct vdo_completion *completion)
-+{
-+	if (ASSERT(completion->my_queue == &queue->common,
-+		   "completion %px from queue %px marked as being in this queue (%px)",
-+		   completion,
-+		   queue,
-+		   completion->my_queue) == UDS_SUCCESS)
-+		completion->my_queue = NULL;
-+
-+	vdo_run_completion(completion);
-+}
-+
-+static void service_work_queue(struct simple_work_queue *queue)
-+{
-+	run_start_hook(queue);
-+
-+	while (true) {
-+		struct vdo_completion *completion = poll_for_completion(queue);
-+
-+		if (completion == NULL)
-+			completion = wait_for_next_completion(queue);
-+
-+		if (completion == NULL)
-+			/* No completions but kthread_should_stop() was triggered. */
-+			break;
-+
-+		process_completion(queue, completion);
-+
-+		/*
-+		 * Be friendly to a CPU that has other work to do, if the kernel has told us to.
-+		 * This speeds up some performance tests; that "other work" might include other VDO
-+		 * threads.
-+		 */
-+		if (need_resched())
-+			cond_resched();
-+	}
-+
-+	run_finish_hook(queue);
-+}
-+
-+static int work_queue_runner(void *ptr)
-+{
-+	struct simple_work_queue *queue = ptr;
-+
-+	complete(queue->started);
-+	service_work_queue(queue);
-+	return 0;
-+}
-+
-+/* Creation & teardown */
-+
-+static void free_simple_work_queue(struct simple_work_queue *queue)
-+{
++	struct sub_index_layout *sil = &layout->index;
++	u64 next_block = start_block;
 +	unsigned int i;
 +
-+	for (i = 0; i <= VDO_WORK_Q_MAX_PRIORITY; i++)
-+		uds_free_funnel_queue(queue->priority_lists[i]);
-+	UDS_FREE(queue->common.name);
-+	UDS_FREE(queue);
++	sil->sub_index = (struct layout_region) {
++		.start_block = start_block,
++		.block_count = sls->sub_index_blocks,
++		.kind = RL_KIND_INDEX,
++		.instance = 0,
++	};
++
++	sil->volume = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = sls->volume_blocks,
++		.kind = RL_KIND_VOLUME,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	next_block += sls->volume_blocks;
++
++	for (i = 0; i < sls->save_count; i++) {
++		sil->saves[i].index_save = (struct layout_region) {
++			.start_block = next_block,
++			.block_count = sls->save_blocks,
++			.kind = RL_KIND_SAVE,
++			.instance = i,
++		};
++
++		next_block += sls->save_blocks;
++	}
++
++	define_sub_index_nonce(layout);
 +}
 +
-+static void free_round_robin_work_queue(struct round_robin_work_queue *queue)
++static void initialize_layout(struct index_layout *layout, struct save_layout_sizes *sls)
 +{
-+	struct simple_work_queue **queue_table = queue->service_queues;
-+	unsigned int count = queue->num_service_queues;
-+	unsigned int i;
++	u64 next_block = layout->offset / sls->block_size;
 +
-+	queue->service_queues = NULL;
++	layout->total_blocks = sls->total_blocks;
++	generate_super_block_data(sls, &layout->super);
++	layout->header = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_HEADER,
++		.instance = RL_SOLE_INSTANCE,
++	};
 +
-+	for (i = 0; i < count; i++)
-+		free_simple_work_queue(queue_table[i]);
-+	UDS_FREE(queue_table);
-+	UDS_FREE(queue->common.name);
-+	UDS_FREE(queue);
++	layout->config = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_CONFIG,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	setup_sub_index(layout, next_block, sls);
++	next_block += sls->sub_index_blocks;
++
++	layout->seal = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = 1,
++		.kind = RL_KIND_SEAL,
++		.instance = RL_SOLE_INSTANCE,
++	};
 +}
 +
-+void vdo_free_work_queue(struct vdo_work_queue *queue)
++static int __must_check
++make_index_save_region_table(struct index_save_layout *isl, struct region_table **table_ptr)
 +{
-+	if (queue == NULL)
-+		return;
-+
-+	vdo_finish_work_queue(queue);
-+
-+	if (queue->round_robin_mode)
-+		free_round_robin_work_queue(as_round_robin_work_queue(queue));
-+	else
-+		free_simple_work_queue(as_simple_work_queue(queue));
-+}
-+
-+static int make_simple_work_queue(const char *thread_name_prefix,
-+				  const char *name,
-+				  struct vdo_thread *owner,
-+				  void *private,
-+				  const struct vdo_work_queue_type *type,
-+				  struct simple_work_queue **queue_ptr)
-+{
-+	DECLARE_COMPLETION_ONSTACK(started);
-+	struct simple_work_queue *queue;
-+	int i;
-+	struct task_struct *thread = NULL;
 +	int result;
++	unsigned int z;
++	struct region_table *table;
++	struct layout_region *lr;
++	u16 region_count;
++	size_t payload;
++	size_t type;
 +
-+	ASSERT_LOG_ONLY((type->max_priority <= VDO_WORK_Q_MAX_PRIORITY),
-+			"queue priority count %u within limit %u",
-+			type->max_priority,
-+			VDO_WORK_Q_MAX_PRIORITY);
++	if (isl->zone_count > 0) {
++		/*
++		 * Normal save regions: header, page map, volume index zones,
++		 * open chapter, and possibly free space.
++		 */
++		region_count = 3 + isl->zone_count;
++		if (isl->free_space.block_count > 0)
++			region_count++;
 +
-+	result = UDS_ALLOCATE(1, struct simple_work_queue, "simple work queue", &queue);
++		payload = sizeof(isl->save_data) + sizeof(isl->state_data);
++		type = RH_TYPE_SAVE;
++	} else {
++		/* Empty save regions: header, page map, free space. */
++		region_count = 3;
++		payload = sizeof(isl->save_data);
++		type = RH_TYPE_UNSAVED;
++	}
++
++	result = UDS_ALLOCATE_EXTENDED(struct region_table,
++				       region_count,
++				       struct layout_region,
++				       "layout region table for ISL",
++				       &table);
 +	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	queue->private = private;
-+	queue->started = &started;
-+	queue->common.type = type;
-+	queue->common.owner = owner;
-+	init_waitqueue_head(&queue->waiting_worker_threads);
++	lr = &table->regions[0];
++	*lr++ = isl->header;
++	*lr++ = isl->index_page_map;
++	for (z = 0; z < isl->zone_count; z++)
++		*lr++ = isl->volume_index_zones[z];
 +
-+	result = uds_duplicate_string(name, "queue name", &queue->common.name);
-+	if (result != VDO_SUCCESS) {
-+		UDS_FREE(queue);
-+		return -ENOMEM;
-+	}
++	if (isl->zone_count > 0)
++		*lr++ = isl->open_chapter;
 +
-+	for (i = 0; i <= type->max_priority; i++) {
-+		result = uds_make_funnel_queue(&queue->priority_lists[i]);
-+		if (result != UDS_SUCCESS) {
-+			free_simple_work_queue(queue);
-+			return result;
-+		}
-+	}
++	if (isl->free_space.block_count > 0)
++		*lr++ = isl->free_space;
 +
-+	thread = kthread_run(work_queue_runner,
-+			     queue,
-+			     "%s:%s",
-+			     thread_name_prefix,
-+			     queue->common.name);
-+	if (IS_ERR(thread)) {
-+		free_simple_work_queue(queue);
-+		return (int) PTR_ERR(thread);
-+	}
++	table->header = (struct region_header) {
++		.magic = REGION_MAGIC,
++		.region_blocks = isl->index_save.block_count,
++		.type = type,
++		.version = 1,
++		.region_count = region_count,
++		.payload = payload,
++	};
 +
-+	queue->thread = thread;
-+
-+	/*
-+	 * If we don't wait to ensure the thread is running VDO code, a quick kthread_stop (due to
-+	 * errors elsewhere) could cause it to never get as far as running VDO, skipping the
-+	 * cleanup code.
-+	 *
-+	 * Eventually we should just make that path safe too, and then we won't need this
-+	 * synchronization.
-+	 */
-+	wait_for_completion(&started);
-+
-+	*queue_ptr = queue;
++	table->encoded_size = (sizeof(struct region_header) + payload +
++			       region_count * sizeof(struct layout_region));
++	*table_ptr = table;
 +	return UDS_SUCCESS;
 +}
 +
-+/**
-+ * vdo_make_work_queue() - Create a work queue; if multiple threads are requested, completions will
-+ *                         be distributed to them in round-robin fashion.
-+ *
-+ * Each queue is associated with a struct vdo_thread which has a single vdo thread id. Regardless
-+ * of the actual number of queues and threads allocated here, code outside of the queue
-+ * implementation will treat this as a single zone.
-+ */
-+int vdo_make_work_queue(const char *thread_name_prefix,
-+			const char *name,
-+			struct vdo_thread *owner,
-+			const struct vdo_work_queue_type *type,
-+			unsigned int thread_count,
-+			void *thread_privates[],
-+			struct vdo_work_queue **queue_ptr)
++static void encode_region_table(u8 *buffer, size_t *offset, struct region_table *table)
 +{
-+	struct round_robin_work_queue *queue;
-+	int result;
-+	char thread_name[TASK_COMM_LEN];
 +	unsigned int i;
 +
-+	if (thread_count == 1) {
-+		struct simple_work_queue *simple_queue;
-+		void *context = ((thread_privates != NULL) ? thread_privates[0] : NULL);
++	encode_u64_le(buffer, offset, REGION_MAGIC);
++	encode_u64_le(buffer, offset, table->header.region_blocks);
++	encode_u16_le(buffer, offset, table->header.type);
++	encode_u16_le(buffer, offset, table->header.version);
++	encode_u16_le(buffer, offset, table->header.region_count);
++	encode_u16_le(buffer, offset, table->header.payload);
 +
-+		result = make_simple_work_queue(thread_name_prefix,
-+						name,
-+						owner,
-+						context,
-+						type,
-+						&simple_queue);
-+		if (result == VDO_SUCCESS)
-+			*queue_ptr = &simple_queue->common;
-+		return result;
++	for (i = 0; i < table->header.region_count; i++) {
++		encode_u64_le(buffer, offset, table->regions[i].start_block);
++		encode_u64_le(buffer, offset, table->regions[i].block_count);
++		encode_u32_le(buffer, offset, 0);
++		encode_u16_le(buffer, offset, table->regions[i].kind);
++		encode_u16_le(buffer, offset, table->regions[i].instance);
 +	}
++}
 +
-+	result = UDS_ALLOCATE(1, struct round_robin_work_queue, "round-robin work queue", &queue);
++static int __must_check write_index_save_header(struct index_save_layout *isl,
++						struct region_table *table,
++						struct buffered_writer *writer)
++{
++	int result;
++	u8 *buffer;
++	size_t offset = 0;
++
++	result = UDS_ALLOCATE(table->encoded_size, u8, "index save data", &buffer);
 +	if (result != UDS_SUCCESS)
 +		return result;
 +
-+	result = UDS_ALLOCATE(thread_count,
-+			      struct simple_work_queue *,
-+			      "subordinate work queues",
-+			      &queue->service_queues);
++	encode_region_table(buffer, &offset, table);
++	encode_u64_le(buffer, &offset, isl->save_data.timestamp);
++	encode_u64_le(buffer, &offset, isl->save_data.nonce);
++	encode_u32_le(buffer, &offset, isl->save_data.version);
++	encode_u32_le(buffer, &offset, 0);
++	if (isl->zone_count > 0) {
++		encode_u32_le(buffer, &offset, INDEX_STATE_VERSION_301.signature);
++		encode_u32_le(buffer, &offset, INDEX_STATE_VERSION_301.version_id);
++		encode_u64_le(buffer, &offset, isl->state_data.newest_chapter);
++		encode_u64_le(buffer, &offset, isl->state_data.oldest_chapter);
++		encode_u64_le(buffer, &offset, isl->state_data.last_save);
++		encode_u64_le(buffer, &offset, 0);
++	}
++
++	result = uds_write_to_buffered_writer(writer, buffer, offset);
++	UDS_FREE(buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return uds_flush_buffered_writer(writer);
++}
++
++static int write_index_save_layout(struct index_layout *layout, struct index_save_layout *isl)
++{
++	int result;
++	struct region_table *table;
++	struct buffered_writer *writer;
++
++	result = make_index_save_region_table(isl, &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_region_writer(layout, &isl->header, &writer);
 +	if (result != UDS_SUCCESS) {
-+		UDS_FREE(queue);
++		UDS_FREE(table);
 +		return result;
 +	}
 +
-+	queue->num_service_queues = thread_count;
-+	queue->common.round_robin_mode = true;
-+	queue->common.owner = owner;
++	result = write_index_save_header(isl, table, writer);
++	UDS_FREE(table);
++	uds_free_buffered_writer(writer);
 +
-+	result = uds_duplicate_string(name, "queue name", &queue->common.name);
-+	if (result != VDO_SUCCESS) {
-+		UDS_FREE(queue->service_queues);
-+		UDS_FREE(queue);
-+		return -ENOMEM;
++	return result;
++}
++
++static void reset_index_save_layout(struct index_save_layout *isl, u64 page_map_blocks)
++{
++	u64 free_blocks;
++	u64 next_block = isl->index_save.start_block;
++
++	isl->zone_count = 0;
++	memset(&isl->save_data, 0, sizeof(isl->save_data));
++
++	isl->header = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_HEADER,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	isl->index_page_map = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = page_map_blocks,
++		.kind = RL_KIND_INDEX_PAGE_MAP,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	next_block += page_map_blocks;
++
++	free_blocks = isl->index_save.block_count - page_map_blocks - 1;
++	isl->free_space = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = free_blocks,
++		.kind = RL_KIND_EMPTY,
++		.instance = RL_SOLE_INSTANCE,
++	};
++}
++
++static int __must_check
++invalidate_old_save(struct index_layout *layout, struct index_save_layout *isl)
++{
++	reset_index_save_layout(isl, layout->super.page_map_blocks);
++	return write_index_save_layout(layout, isl);
++}
++
++static int discard_index_state_data(struct index_layout *layout)
++{
++	int result;
++	int saved_result = UDS_SUCCESS;
++	unsigned int i;
++
++	for (i = 0; i < layout->super.max_saves; i++) {
++		result = invalidate_old_save(layout, &layout->index.saves[i]);
++		if (result != UDS_SUCCESS)
++			saved_result = result;
 +	}
 +
-+	*queue_ptr = &queue->common;
++	if (saved_result != UDS_SUCCESS)
++		return uds_log_error_strerror(result,
++					      "%s: cannot destroy all index saves",
++					      __func__);
 +
-+	for (i = 0; i < thread_count; i++) {
-+		void *context = ((thread_privates != NULL) ? thread_privates[i] : NULL);
++	return UDS_SUCCESS;
++}
 +
-+		snprintf(thread_name, sizeof(thread_name), "%s%u", name, i);
-+		result = make_simple_work_queue(thread_name_prefix,
-+						thread_name,
-+						owner,
-+						context,
-+						type,
-+						&queue->service_queues[i]);
-+		if (result != VDO_SUCCESS) {
-+			queue->num_service_queues = i;
-+			/* Destroy previously created subordinates. */
-+			vdo_free_work_queue(UDS_FORGET(*queue_ptr));
++static int __must_check
++make_layout_region_table(struct index_layout *layout, struct region_table **table_ptr)
++{
++	int result;
++	unsigned int i;
++	/* Regions: header, config, index, volume, saves, seal */
++	u16 region_count = 5 + layout->super.max_saves;
++	u16 payload;
++	struct region_table *table;
++	struct layout_region *lr;
++
++	result = UDS_ALLOCATE_EXTENDED(struct region_table,
++				       region_count,
++				       struct layout_region,
++				       "layout region table",
++				       &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	lr = &table->regions[0];
++	*lr++ = layout->header;
++	*lr++ = layout->config;
++	*lr++ = layout->index.sub_index;
++	*lr++ = layout->index.volume;
++
++	for (i = 0; i < layout->super.max_saves; i++)
++		*lr++ = layout->index.saves[i].index_save;
++
++	*lr++ = layout->seal;
++
++	if (is_converted_super_block(&layout->super))
++		payload = sizeof(struct super_block_data);
++	else
++		payload = (sizeof(struct super_block_data) -
++			   sizeof(layout->super.volume_offset) -
++			   sizeof(layout->super.start_offset));
++
++	table->header = (struct region_header) {
++		.magic = REGION_MAGIC,
++		.region_blocks = layout->total_blocks,
++		.type = RH_TYPE_SUPER,
++		.version = 1,
++		.region_count = region_count,
++		.payload = payload,
++	};
++
++	table->encoded_size = (sizeof(struct region_header) + payload +
++			       region_count * sizeof(struct layout_region));
++	*table_ptr = table;
++	return UDS_SUCCESS;
++}
++
++static int __must_check write_layout_header(struct index_layout *layout,
++					    struct region_table *table,
++					    struct buffered_writer *writer)
++{
++	int result;
++	u8 *buffer;
++	size_t offset = 0;
++
++	result = UDS_ALLOCATE(table->encoded_size, u8, "layout data", &buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	encode_region_table(buffer, &offset, table);
++	memcpy(buffer + offset, &layout->super.magic_label, MAGIC_SIZE);
++	offset += MAGIC_SIZE;
++	memcpy(buffer + offset, &layout->super.nonce_info, NONCE_INFO_SIZE);
++	offset += NONCE_INFO_SIZE;
++	encode_u64_le(buffer, &offset, layout->super.nonce);
++	encode_u32_le(buffer, &offset, layout->super.version);
++	encode_u32_le(buffer, &offset, layout->super.block_size);
++	encode_u16_le(buffer, &offset, layout->super.index_count);
++	encode_u16_le(buffer, &offset, layout->super.max_saves);
++	encode_u32_le(buffer, &offset, 0);
++	encode_u64_le(buffer, &offset, layout->super.open_chapter_blocks);
++	encode_u64_le(buffer, &offset, layout->super.page_map_blocks);
++
++	if (is_converted_super_block(&layout->super)) {
++		encode_u64_le(buffer, &offset, layout->super.volume_offset);
++		encode_u64_le(buffer, &offset, layout->super.start_offset);
++	}
++
++	result = uds_write_to_buffered_writer(writer, buffer, offset);
++	UDS_FREE(buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return uds_flush_buffered_writer(writer);
++}
++
++static int __must_check write_uds_index_config(struct index_layout *layout,
++					       struct configuration *config,
++					       off_t offset)
++{
++	int result;
++	struct buffered_writer *writer = NULL;
++
++	result = open_layout_writer(layout, &layout->config, offset, &writer);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "failed to open config region");
++
++	result = uds_write_config_contents(writer, config, layout->super.version);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_writer(writer);
++		return uds_log_error_strerror(result, "failed to write config region");
++	}
++
++	result = uds_flush_buffered_writer(writer);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_writer(writer);
++		return uds_log_error_strerror(result, "cannot flush config writer");
++	}
++
++	uds_free_buffered_writer(writer);
++	return UDS_SUCCESS;
++}
++
++static int __must_check save_layout(struct index_layout *layout, off_t offset)
++{
++	int result;
++	struct buffered_writer *writer = NULL;
++	struct region_table *table;
++
++	result = make_layout_region_table(layout, &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_layout_writer(layout, &layout->header, offset, &writer);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(table);
++		return result;
++	}
++
++	result = write_layout_header(layout, table, writer);
++	UDS_FREE(table);
++	uds_free_buffered_writer(writer);
++
++	return result;
++}
++
++static int create_index_layout(struct index_layout *layout, struct configuration *config)
++{
++	int result;
++	struct save_layout_sizes sizes;
++
++	result = compute_sizes(config, &sizes);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(sizes.save_count,
++			      struct index_save_layout,
++			      __func__,
++			      &layout->index.saves);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	initialize_layout(layout, &sizes);
++
++	result = discard_index_state_data(layout);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = write_uds_index_config(layout, config, 0);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return save_layout(layout, 0);
++}
++
++static u64 generate_index_save_nonce(u64 volume_nonce, struct index_save_layout *isl)
++{
++	struct save_nonce_data {
++		struct index_save_data data;
++		u64 offset;
++	} nonce_data;
++	u8 buffer[sizeof(nonce_data)];
++	size_t offset = 0;
++
++	encode_u64_le(buffer, &offset, isl->save_data.timestamp);
++	encode_u64_le(buffer, &offset, 0);
++	encode_u32_le(buffer, &offset, isl->save_data.version);
++	encode_u32_le(buffer, &offset, 0U);
++	encode_u64_le(buffer, &offset, isl->index_save.start_block);
++	ASSERT_LOG_ONLY(offset == sizeof(nonce_data),
++			"%zu bytes encoded of %zu expected",
++			offset,
++			sizeof(nonce_data));
++	return generate_secondary_nonce(volume_nonce, buffer, sizeof(buffer));
++}
++
++static u64 validate_index_save_layout(struct index_save_layout *isl, u64 volume_nonce)
++{
++	if ((isl->zone_count == 0) || (isl->save_data.timestamp == 0))
++		return 0;
++
++	if (isl->save_data.nonce != generate_index_save_nonce(volume_nonce, isl))
++		return 0;
++
++	return isl->save_data.timestamp;
++}
++
++static int
++find_latest_uds_index_save_slot(struct index_layout *layout, struct index_save_layout **isl_ptr)
++{
++	struct index_save_layout *latest = NULL;
++	struct index_save_layout *isl;
++	unsigned int i;
++	u64 save_time = 0;
++	u64 latest_time = 0;
++
++	for (i = 0; i < layout->super.max_saves; i++) {
++		isl = &layout->index.saves[i];
++		save_time = validate_index_save_layout(isl, layout->index.nonce);
++		if (save_time > latest_time) {
++			latest = isl;
++			latest_time = save_time;
++		}
++	}
++
++	if (latest == NULL) {
++		uds_log_error("No valid index save found");
++		return UDS_INDEX_NOT_SAVED_CLEANLY;
++	}
++
++	*isl_ptr = latest;
++	return UDS_SUCCESS;
++}
++
++int uds_discard_open_chapter(struct index_layout *layout)
++{
++	int result;
++	struct index_save_layout *isl;
++	struct buffered_writer *writer;
++
++	result = find_latest_uds_index_save_slot(layout, &isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_region_writer(layout, &isl->open_chapter, &writer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_write_to_buffered_writer(writer, NULL, UDS_BLOCK_SIZE);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_writer(writer);
++		return result;
++	}
++
++	result = uds_flush_buffered_writer(writer);
++	uds_free_buffered_writer(writer);
++	return result;
++}
++
++int uds_load_index_state(struct index_layout *layout, struct uds_index *index)
++{
++	int result;
++	unsigned int zone;
++	struct index_save_layout *isl;
++	struct buffered_reader *readers[MAX_ZONES];
++
++	result = find_latest_uds_index_save_slot(layout, &isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	index->newest_virtual_chapter = isl->state_data.newest_chapter;
++	index->oldest_virtual_chapter = isl->state_data.oldest_chapter;
++	index->last_save = isl->state_data.last_save;
++
++	result = open_region_reader(layout, &isl->open_chapter, &readers[0]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_load_open_chapter(index, readers[0]);
++	uds_free_buffered_reader(readers[0]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	for (zone = 0; zone < isl->zone_count; zone++) {
++		result = open_region_reader(layout,
++					    &isl->volume_index_zones[zone],
++					    &readers[zone]);
++		if (result != UDS_SUCCESS) {
++			for (; zone > 0; zone--)
++				uds_free_buffered_reader(readers[zone - 1]);
++
 +			return result;
 +		}
 +	}
 +
-+	return VDO_SUCCESS;
++	result = uds_load_volume_index(index->volume_index, readers, isl->zone_count);
++	for (zone = 0; zone < isl->zone_count; zone++)
++		uds_free_buffered_reader(readers[zone]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = open_region_reader(layout, &isl->index_page_map, &readers[0]);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_read_index_page_map(index->volume->index_page_map, readers[0]);
++	uds_free_buffered_reader(readers[0]);
++
++	return result;
 +}
 +
-+static void finish_simple_work_queue(struct simple_work_queue *queue)
++static struct index_save_layout *select_oldest_index_save_layout(struct index_layout *layout)
 +{
-+	if (queue->thread == NULL)
-+		return;
-+
-+	/* Tells the worker thread to shut down and waits for it to exit. */
-+	kthread_stop(queue->thread);
-+	queue->thread = NULL;
-+}
-+
-+static void finish_round_robin_work_queue(struct round_robin_work_queue *queue)
-+{
-+	struct simple_work_queue **queue_table = queue->service_queues;
-+	unsigned int count = queue->num_service_queues;
++	struct index_save_layout *oldest = NULL;
++	struct index_save_layout *isl;
 +	unsigned int i;
++	u64 save_time = 0;
++	u64 oldest_time = 0;
 +
-+	for (i = 0; i < count; i++)
-+		finish_simple_work_queue(queue_table[i]);
++	for (i = 0; i < layout->super.max_saves; i++) {
++		isl = &layout->index.saves[i];
++		save_time = validate_index_save_layout(isl, layout->index.nonce);
++		if (oldest == NULL || save_time < oldest_time) {
++			oldest = isl;
++			oldest_time = save_time;
++		}
++	}
++
++	return oldest;
 +}
 +
-+/* No enqueueing of completions should be done once this function is called. */
-+void vdo_finish_work_queue(struct vdo_work_queue *queue)
++static void instantiate_index_save_layout(struct index_save_layout *isl,
++					  struct super_block_data *super,
++					  u64 volume_nonce,
++					  unsigned int zone_count)
 +{
-+	if (queue == NULL)
++	unsigned int z;
++	u64 next_block;
++	u64 free_blocks;
++	u64 volume_index_blocks;
++
++	isl->zone_count = zone_count;
++	memset(&isl->save_data, 0, sizeof(isl->save_data));
++	isl->save_data.timestamp = ktime_to_ms(current_time_ns(CLOCK_REALTIME));
++	isl->save_data.version = 1;
++	isl->save_data.nonce = generate_index_save_nonce(volume_nonce, isl);
++
++	next_block = isl->index_save.start_block;
++	isl->header = (struct layout_region) {
++		.start_block = next_block++,
++		.block_count = 1,
++		.kind = RL_KIND_HEADER,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	isl->index_page_map = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = super->page_map_blocks,
++		.kind = RL_KIND_INDEX_PAGE_MAP,
++		.instance = RL_SOLE_INSTANCE,
++	};
++	next_block += super->page_map_blocks;
++
++	free_blocks = (isl->index_save.block_count - 1 -
++		       super->page_map_blocks -
++		       super->open_chapter_blocks);
++	volume_index_blocks = free_blocks / isl->zone_count;
++	for (z = 0; z < isl->zone_count; z++) {
++		isl->volume_index_zones[z] = (struct layout_region) {
++			.start_block = next_block,
++			.block_count = volume_index_blocks,
++			.kind = RL_KIND_VOLUME_INDEX,
++			.instance = z,
++		};
++
++		next_block += volume_index_blocks;
++		free_blocks -= volume_index_blocks;
++	}
++
++	isl->open_chapter = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = super->open_chapter_blocks,
++		.kind = RL_KIND_OPEN_CHAPTER,
++		.instance = RL_SOLE_INSTANCE,
++	};
++
++	next_block += super->open_chapter_blocks;
++
++	isl->free_space = (struct layout_region) {
++		.start_block = next_block,
++		.block_count = free_blocks,
++		.kind = RL_KIND_EMPTY,
++		.instance = RL_SOLE_INSTANCE,
++	};
++}
++
++static int setup_uds_index_save_slot(struct index_layout *layout,
++				     unsigned int zone_count,
++				     struct index_save_layout **isl_ptr)
++{
++	int result;
++	struct index_save_layout *isl;
++
++	isl = select_oldest_index_save_layout(layout);
++	result = invalidate_old_save(layout, isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	instantiate_index_save_layout(isl, &layout->super, layout->index.nonce, zone_count);
++
++	*isl_ptr = isl;
++	return UDS_SUCCESS;
++}
++
++static void cancel_uds_index_save(struct index_save_layout *isl)
++{
++	memset(&isl->save_data, 0, sizeof(isl->save_data));
++	memset(&isl->state_data, 0, sizeof(isl->state_data));
++	isl->zone_count = 0;
++}
++
++int uds_save_index_state(struct index_layout *layout, struct uds_index *index)
++{
++	int result;
++	unsigned int zone;
++	struct index_save_layout *isl;
++	struct buffered_writer *writers[MAX_ZONES];
++
++	result = setup_uds_index_save_slot(layout, index->zone_count, &isl);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	isl->state_data	= (struct index_state_data301) {
++		.newest_chapter = index->newest_virtual_chapter,
++		.oldest_chapter = index->oldest_virtual_chapter,
++		.last_save = index->last_save,
++	};
++
++	result = open_region_writer(layout, &isl->open_chapter, &writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	result = uds_save_open_chapter(index, writers[0]);
++	uds_free_buffered_writer(writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	for (zone = 0; zone < index->zone_count; zone++) {
++		result = open_region_writer(layout,
++					    &isl->volume_index_zones[zone],
++					    &writers[zone]);
++		if (result != UDS_SUCCESS) {
++			for (; zone > 0; zone--)
++				uds_free_buffered_writer(writers[zone - 1]);
++
++			cancel_uds_index_save(isl);
++			return result;
++		}
++	}
++
++	result = uds_save_volume_index(index->volume_index, writers, index->zone_count);
++	for (zone = 0; zone < index->zone_count; zone++)
++		uds_free_buffered_writer(writers[zone]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	result = open_region_writer(layout, &isl->index_page_map, &writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	result = uds_write_index_page_map(index->volume->index_page_map, writers[0]);
++	uds_free_buffered_writer(writers[0]);
++	if (result != UDS_SUCCESS) {
++		cancel_uds_index_save(isl);
++		return result;
++	}
++
++	return write_index_save_layout(layout, isl);
++}
++
++static int __must_check
++load_region_table(struct buffered_reader *reader, struct region_table **table_ptr)
++{
++	int result;
++	unsigned int i;
++	struct region_header header;
++	struct region_table *table;
++	u8 buffer[sizeof(struct region_header)];
++	size_t offset = 0;
++
++	result = uds_read_from_buffered_reader(reader, buffer, sizeof(buffer));
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "cannot read region table header");
++
++	decode_u64_le(buffer, &offset, &header.magic);
++	decode_u64_le(buffer, &offset, &header.region_blocks);
++	decode_u16_le(buffer, &offset, &header.type);
++	decode_u16_le(buffer, &offset, &header.version);
++	decode_u16_le(buffer, &offset, &header.region_count);
++	decode_u16_le(buffer, &offset, &header.payload);
++
++	if (header.magic != REGION_MAGIC)
++		return UDS_NO_INDEX;
++
++	if (header.version != 1)
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "unknown region table version %hu",
++					      header.version);
++
++	result = UDS_ALLOCATE_EXTENDED(struct region_table,
++				       header.region_count,
++				       struct layout_region,
++				       "single file layout region table",
++				       &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	table->header = header;
++	for (i = 0; i < header.region_count; i++) {
++		u8 region_buffer[sizeof(struct layout_region)];
++
++		offset = 0;
++		result = uds_read_from_buffered_reader(reader,
++						       region_buffer,
++						       sizeof(region_buffer));
++		if (result != UDS_SUCCESS) {
++			UDS_FREE(table);
++			return uds_log_error_strerror(UDS_CORRUPT_DATA,
++						      "cannot read region table layouts");
++		}
++
++		decode_u64_le(region_buffer, &offset, &table->regions[i].start_block);
++		decode_u64_le(region_buffer, &offset, &table->regions[i].block_count);
++		offset += sizeof(u32);
++		decode_u16_le(region_buffer, &offset, &table->regions[i].kind);
++		decode_u16_le(region_buffer, &offset, &table->regions[i].instance);
++	}
++
++	*table_ptr = table;
++	return UDS_SUCCESS;
++}
++
++static int __must_check read_super_block_data(struct buffered_reader *reader,
++					      struct index_layout *layout,
++					      size_t saved_size)
++{
++	int result;
++	struct super_block_data *super = &layout->super;
++	u8 *buffer;
++	size_t offset = 0;
++
++	result = UDS_ALLOCATE(saved_size, u8, "super block data", &buffer);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = uds_read_from_buffered_reader(reader, buffer, saved_size);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(buffer);
++		return uds_log_error_strerror(result, "cannot read region table header");
++	}
++
++	memcpy(&super->magic_label, buffer, MAGIC_SIZE);
++	offset += MAGIC_SIZE;
++	memcpy(&super->nonce_info, buffer + offset, NONCE_INFO_SIZE);
++	offset += NONCE_INFO_SIZE;
++	decode_u64_le(buffer, &offset, &super->nonce);
++	decode_u32_le(buffer, &offset, &super->version);
++	decode_u32_le(buffer, &offset, &super->block_size);
++	decode_u16_le(buffer, &offset, &super->index_count);
++	decode_u16_le(buffer, &offset, &super->max_saves);
++	offset += sizeof(u32);
++	decode_u64_le(buffer, &offset, &super->open_chapter_blocks);
++	decode_u64_le(buffer, &offset, &super->page_map_blocks);
++
++	if (is_converted_super_block(super)) {
++		decode_u64_le(buffer, &offset, &super->volume_offset);
++		decode_u64_le(buffer, &offset, &super->start_offset);
++	} else {
++		super->volume_offset = 0;
++		super->start_offset = 0;
++	}
++
++	UDS_FREE(buffer);
++
++	if (memcmp(super->magic_label, LAYOUT_MAGIC, MAGIC_SIZE) != 0)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "unknown superblock magic label");
++
++	if ((super->version < SUPER_VERSION_MINIMUM) ||
++	    (super->version == 4) ||
++	    (super->version == 5) ||
++	    (super->version == 6) ||
++	    (super->version > SUPER_VERSION_MAXIMUM))
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "unknown superblock version number %u",
++					      super->version);
++
++	if (super->volume_offset < super->start_offset)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "inconsistent offsets (start %llu, volume %llu)",
++					      (unsigned long long) super->start_offset,
++					      (unsigned long long) super->volume_offset);
++
++	/* Sub-indexes are no longer used but the layout retains this field. */
++	if (super->index_count != 1)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "invalid subindex count %u",
++					      super->index_count);
++
++	if (generate_primary_nonce(super->nonce_info, sizeof(super->nonce_info)) != super->nonce)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "inconsistent superblock nonce");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check verify_region(struct layout_region *lr,
++				      u64 start_block,
++				      enum region_kind kind,
++				      unsigned int instance)
++{
++	if (lr->start_block != start_block)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "incorrect layout region offset");
++
++	if (lr->kind != kind)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "incorrect layout region kind");
++
++	if (lr->instance != instance)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "incorrect layout region instance");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++verify_sub_index(struct index_layout *layout, u64 start_block, struct region_table *table)
++{
++	int result;
++	unsigned int i;
++	struct sub_index_layout *sil = &layout->index;
++	u64 next_block = start_block;
++
++	sil->sub_index = table->regions[2];
++	result = verify_region(&sil->sub_index, next_block, RL_KIND_INDEX, 0);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	define_sub_index_nonce(layout);
++
++	sil->volume = table->regions[3];
++	result = verify_region(&sil->volume, next_block, RL_KIND_VOLUME, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	next_block += sil->volume.block_count + layout->super.volume_offset;
++
++	for (i = 0; i < layout->super.max_saves; i++) {
++		sil->saves[i].index_save = table->regions[i + 4];
++		result = verify_region(&sil->saves[i].index_save, next_block, RL_KIND_SAVE, i);
++		if (result != UDS_SUCCESS)
++			return result;
++
++		next_block += sil->saves[i].index_save.block_count;
++	}
++
++	next_block -= layout->super.volume_offset;
++	if (next_block != start_block + sil->sub_index.block_count)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "sub index region does not span all saves");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++reconstitute_layout(struct index_layout *layout, struct region_table *table, u64 first_block)
++{
++	int result;
++	u64 next_block = first_block;
++
++	result = UDS_ALLOCATE(layout->super.max_saves,
++			      struct index_save_layout,
++			      __func__,
++			      &layout->index.saves);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	layout->total_blocks = table->header.region_blocks;
++
++	layout->header = table->regions[0];
++	result = verify_region(&layout->header, next_block++, RL_KIND_HEADER, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	layout->config = table->regions[1];
++	result = verify_region(&layout->config, next_block++, RL_KIND_CONFIG, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = verify_sub_index(layout, next_block, table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	next_block += layout->index.sub_index.block_count;
++
++	layout->seal = table->regions[table->header.region_count - 1];
++	result = verify_region(&layout->seal,
++			       next_block + layout->super.volume_offset,
++			       RL_KIND_SEAL,
++			       RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (++next_block != (first_block + layout->total_blocks))
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "layout table does not span total blocks");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check load_super_block(struct index_layout *layout,
++					 size_t block_size,
++					 u64 first_block,
++					 struct buffered_reader *reader)
++{
++	int result;
++	struct region_table *table = NULL;
++	struct super_block_data *super = &layout->super;
++
++	result = load_region_table(reader, &table);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	if (table->header.type != RH_TYPE_SUPER) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA, "not a superblock region table");
++	}
++
++	result = read_super_block_data(reader, layout, table->header.payload);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(result, "unknown superblock format");
++	}
++
++	if (super->block_size != block_size) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "superblock saved block_size %u differs from supplied block_size %zu",
++					      super->block_size,
++					      block_size);
++	}
++
++	first_block -= (super->volume_offset - super->start_offset);
++	result = reconstitute_layout(layout, table, first_block);
++	UDS_FREE(table);
++	return result;
++}
++
++static int __must_check read_index_save_data(struct buffered_reader *reader,
++					     struct index_save_layout *isl,
++					     size_t saved_size)
++{
++	int result;
++	struct index_state_version file_version;
++	u8 buffer[sizeof(struct index_save_data) + sizeof(struct index_state_data301)];
++	size_t offset = 0;
++
++	if (saved_size != sizeof(buffer))
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "unexpected index save data size %zu",
++					      saved_size);
++
++	result = uds_read_from_buffered_reader(reader, buffer, sizeof(buffer));
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "cannot read index save data");
++
++	decode_u64_le(buffer, &offset, &isl->save_data.timestamp);
++	decode_u64_le(buffer, &offset, &isl->save_data.nonce);
++	decode_u32_le(buffer, &offset, &isl->save_data.version);
++	offset += sizeof(u32);
++
++	if (isl->save_data.version > 1)
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "unknown index save version number %u",
++					      isl->save_data.version);
++
++	decode_s32_le(buffer, &offset, &file_version.signature);
++	decode_s32_le(buffer, &offset, &file_version.version_id);
++
++	if ((file_version.signature != INDEX_STATE_VERSION_301.signature) ||
++	    (file_version.version_id != INDEX_STATE_VERSION_301.version_id))
++		return uds_log_error_strerror(UDS_UNSUPPORTED_VERSION,
++					      "index state version %d,%d is unsupported",
++					      file_version.signature,
++					      file_version.version_id);
++
++	decode_u64_le(buffer, &offset, &isl->state_data.newest_chapter);
++	decode_u64_le(buffer, &offset, &isl->state_data.oldest_chapter);
++	decode_u64_le(buffer, &offset, &isl->state_data.last_save);
++	/* Skip past some historical fields that are now unused */
++	offset += sizeof(u32) + sizeof(u32);
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++reconstruct_index_save(struct index_save_layout *isl, struct region_table *table)
++{
++	int result;
++	unsigned int z;
++	struct layout_region *last_region;
++	u64 next_block = isl->index_save.start_block;
++	u64 last_block = next_block + isl->index_save.block_count;
++
++	isl->zone_count = table->header.region_count - 3;
++
++	last_region = &table->regions[table->header.region_count - 1];
++	if (last_region->kind == RL_KIND_EMPTY) {
++		isl->free_space = *last_region;
++		isl->zone_count--;
++	} else {
++		isl->free_space = (struct layout_region) {
++			.start_block = last_block,
++			.block_count = 0,
++			.kind = RL_KIND_EMPTY,
++			.instance = RL_SOLE_INSTANCE,
++		};
++	}
++
++	isl->header = table->regions[0];
++	result = verify_region(&isl->header, next_block++, RL_KIND_HEADER, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	isl->index_page_map = table->regions[1];
++	result = verify_region(&isl->index_page_map,
++			       next_block,
++			       RL_KIND_INDEX_PAGE_MAP,
++			       RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	next_block += isl->index_page_map.block_count;
++
++	for (z = 0; z < isl->zone_count; z++) {
++		isl->volume_index_zones[z] = table->regions[z + 2];
++		result = verify_region(&isl->volume_index_zones[z],
++				       next_block,
++				       RL_KIND_VOLUME_INDEX,
++				       z);
++		if (result != UDS_SUCCESS)
++			return result;
++
++		next_block += isl->volume_index_zones[z].block_count;
++	}
++
++	isl->open_chapter = table->regions[isl->zone_count + 2];
++	result = verify_region(&isl->open_chapter,
++			       next_block,
++			       RL_KIND_OPEN_CHAPTER,
++			       RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	next_block += isl->open_chapter.block_count;
++
++	result = verify_region(&isl->free_space, next_block, RL_KIND_EMPTY, RL_SOLE_INSTANCE);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	next_block += isl->free_space.block_count;
++	if (next_block != last_block)
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "index save layout table incomplete");
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check load_index_save(struct index_save_layout *isl,
++					struct buffered_reader *reader,
++					unsigned int instance)
++{
++	int result;
++	struct region_table *table = NULL;
++
++	result = load_region_table(reader, &table);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result,
++					      "cannot read index save %u header",
++					      instance);
++
++	if (table->header.region_blocks != isl->index_save.block_count) {
++		u64 region_blocks = table->header.region_blocks;
++
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "unexpected index save %u region block count %llu",
++					      instance,
++					      (unsigned long long) region_blocks);
++	}
++
++	if (table->header.type == RH_TYPE_UNSAVED) {
++		UDS_FREE(table);
++		reset_index_save_layout(isl, 0);
++		return UDS_SUCCESS;
++	}
++
++
++	if (table->header.type != RH_TYPE_SAVE) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(UDS_CORRUPT_DATA,
++					      "unexpected index save %u header type %u",
++					      instance,
++					      table->header.type);
++	}
++
++	result = read_index_save_data(reader, isl, table->header.payload);
++	if (result != UDS_SUCCESS) {
++		UDS_FREE(table);
++		return uds_log_error_strerror(result,
++					      "unknown index save %u data format",
++					      instance);
++	}
++
++	result = reconstruct_index_save(isl, table);
++	UDS_FREE(table);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result,
++					      "cannot reconstruct index save %u",
++					      instance);
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check load_sub_index_regions(struct index_layout *layout)
++{
++	int result;
++	unsigned int j;
++	struct index_save_layout *isl;
++	struct buffered_reader *reader;
++
++	for (j = 0; j < layout->super.max_saves; ++j) {
++		isl = &layout->index.saves[j];
++		result = open_region_reader(layout, &isl->index_save, &reader);
++
++		if (result != UDS_SUCCESS) {
++			uds_log_error_strerror(result, "cannot get reader for index 0 save %u", j);
++			return result;
++		}
++
++		result = load_index_save(isl, reader, j);
++		uds_free_buffered_reader(reader);
++		if (result != UDS_SUCCESS) {
++			/* Another save slot might be valid. */
++			reset_index_save_layout(isl, 0);
++			continue;
++		}
++	}
++
++	return UDS_SUCCESS;
++}
++
++static int __must_check
++verify_uds_index_config(struct index_layout *layout, struct configuration *config)
++{
++	int result;
++	struct buffered_reader *reader = NULL;
++	u64 offset;
++
++	offset = layout->super.volume_offset - layout->super.start_offset;
++	result = open_layout_reader(layout, &layout->config, offset, &reader);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "failed to open config reader");
++
++	result = uds_validate_config_contents(reader, config);
++	if (result != UDS_SUCCESS) {
++		uds_free_buffered_reader(reader);
++		return uds_log_error_strerror(result, "failed to read config region");
++	}
++
++	uds_free_buffered_reader(reader);
++	return UDS_SUCCESS;
++}
++
++static int load_index_layout(struct index_layout *layout, struct configuration *config)
++{
++	int result;
++	struct buffered_reader *reader;
++
++	result = uds_make_buffered_reader(layout->factory,
++					  layout->offset / UDS_BLOCK_SIZE,
++					  1,
++					  &reader);
++	if (result != UDS_SUCCESS)
++		return uds_log_error_strerror(result, "unable to read superblock");
++
++	result = load_super_block(layout, UDS_BLOCK_SIZE, layout->offset / UDS_BLOCK_SIZE, reader);
++	uds_free_buffered_reader(reader);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = verify_uds_index_config(layout, config);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	return load_sub_index_regions(layout);
++}
++
++static int create_layout_factory(struct index_layout *layout, const struct configuration *config)
++{
++	int result;
++	size_t writable_size;
++	struct io_factory *factory = NULL;
++
++	result = uds_make_io_factory(config->name, &factory);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	writable_size = uds_get_writable_size(factory) & -UDS_BLOCK_SIZE;
++	if (writable_size < config->size + config->offset) {
++		uds_put_io_factory(factory);
++		uds_log_error("index storage (%zu) is smaller than the requested size %zu",
++			      writable_size,
++			      config->size + config->offset);
++		return -ENOSPC;
++	}
++
++	layout->factory = factory;
++	layout->factory_size = (config->size > 0) ? config->size : writable_size;
++	layout->offset = config->offset;
++	return UDS_SUCCESS;
++}
++
++int uds_make_index_layout(struct configuration *config,
++			  bool new_layout,
++			  struct index_layout **layout_ptr)
++{
++	int result;
++	struct index_layout *layout = NULL;
++	struct save_layout_sizes sizes;
++
++	result = compute_sizes(config, &sizes);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct index_layout, __func__, &layout);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = create_layout_factory(layout, config);
++	if (result != UDS_SUCCESS) {
++		uds_free_index_layout(layout);
++		return result;
++	}
++
++	if (layout->factory_size < sizes.total_size) {
++		uds_log_error("index storage (%zu) is smaller than the required size %llu",
++			      layout->factory_size,
++			      (unsigned long long) sizes.total_size);
++		uds_free_index_layout(layout);
++		return -ENOSPC;
++	}
++
++	if (new_layout)
++		result = create_index_layout(layout, config);
++	else
++		result = load_index_layout(layout, config);
++	if (result != UDS_SUCCESS) {
++		uds_free_index_layout(layout);
++		return result;
++	}
++
++	*layout_ptr = layout;
++	return UDS_SUCCESS;
++}
++
++void uds_free_index_layout(struct index_layout *layout)
++{
++	if (layout == NULL)
 +		return;
 +
-+	if (queue->round_robin_mode)
-+		finish_round_robin_work_queue(as_round_robin_work_queue(queue));
-+	else
-+		finish_simple_work_queue(as_simple_work_queue(queue));
++	UDS_FREE(layout->index.saves);
++	if (layout->factory != NULL)
++		uds_put_io_factory(layout->factory);
++
++	UDS_FREE(layout);
 +}
 +
-+/* Debugging dumps */
-+
-+static void dump_simple_work_queue(struct simple_work_queue *queue)
++int uds_replace_index_layout_storage(struct index_layout *layout, const char *name)
 +{
-+	const char *thread_status = "no threads";
-+	char task_state_report = '-';
-+
-+	if (queue->thread != NULL) {
-+		task_state_report = task_state_to_char(queue->thread);
-+		thread_status = atomic_read(&queue->idle) ? "idle" : "running";
-+	}
-+
-+	uds_log_info("workQ %px (%s) %s (%c)",
-+		     &queue->common,
-+		     queue->common.name,
-+		     thread_status,
-+		     task_state_report);
-+
-+	/* ->waiting_worker_threads wait queue status? anyone waiting? */
++	return uds_replace_storage(layout->factory, name);
 +}
 +
-+/*
-+ * Write to the buffer some info about the completion, for logging. Since the common use case is
-+ * dumping info about a lot of completions to syslog all at once, the format favors brevity over
-+ * readability.
-+ */
-+void vdo_dump_work_queue(struct vdo_work_queue *queue)
++/* Obtain a dm_bufio_client for the volume region. */
++int uds_open_volume_bufio(struct index_layout *layout,
++			  size_t block_size,
++			  unsigned int reserved_buffers,
++			  struct dm_bufio_client **client_ptr)
 +{
-+	if (queue->round_robin_mode) {
-+		struct round_robin_work_queue *round_robin = as_round_robin_work_queue(queue);
-+		unsigned int i;
++	off_t offset = (layout->index.volume.start_block +
++			layout->super.volume_offset -
++			layout->super.start_offset);
 +
-+		for (i = 0; i < round_robin->num_service_queues; i++)
-+			dump_simple_work_queue(round_robin->service_queues[i]);
-+	} else {
-+		dump_simple_work_queue(as_simple_work_queue(queue));
-+	}
++	return uds_make_bufio(layout->factory, offset, block_size, reserved_buffers, client_ptr);
 +}
 +
-+static void get_function_name(void *pointer, char *buffer, size_t buffer_length)
++u64 uds_get_volume_nonce(struct index_layout *layout)
 +{
-+	if (pointer == NULL) {
-+		/*
-+		 * Format "%ps" logs a null pointer as "(null)" with a bunch of leading spaces. We
-+		 * sometimes use this when logging lots of data; don't be so verbose.
-+		 */
-+		strncpy(buffer, "-", buffer_length);
-+	} else {
-+		/*
-+		 * Use a pragma to defeat gcc's format checking, which doesn't understand that
-+		 * "%ps" actually does support a precision spec in Linux kernel code.
-+		 */
-+		char *space;
-+
-+#pragma GCC diagnostic push
-+#pragma GCC diagnostic ignored "-Wformat"
-+		snprintf(buffer, buffer_length, "%.*ps", buffer_length - 1, pointer);
-+#pragma GCC diagnostic pop
-+
-+		space = strchr(buffer, ' ');
-+		if (space != NULL)
-+			*space = '\0';
-+	}
++	return layout->index.nonce;
 +}
-+
-+void vdo_dump_completion_to_buffer(struct vdo_completion *completion, char *buffer, size_t length)
-+{
-+	size_t current_length =
-+		scnprintf(buffer,
-+			  length,
-+			  "%.*s/",
-+			  TASK_COMM_LEN,
-+			  (completion->my_queue == NULL ? "-" : completion->my_queue->name));
-+
-+	if (current_length < length)
-+		get_function_name((void *) completion->callback,
-+				  buffer + current_length,
-+				  length - current_length);
-+}
-+
-+/* Completion submission */
-+/*
-+ * If the completion has a timeout that has already passed, the timeout handler function may be
-+ * invoked by this function.
-+ */
-+void vdo_enqueue_work_queue(struct vdo_work_queue *queue, struct vdo_completion *completion)
-+{
-+	/*
-+	 * Convert the provided generic vdo_work_queue to the simple_work_queue to actually queue
-+	 * on.
-+	 */
-+	struct simple_work_queue *simple_queue = NULL;
-+
-+	if (!queue->round_robin_mode) {
-+		simple_queue = as_simple_work_queue(queue);
-+	} else {
-+		struct round_robin_work_queue *round_robin = as_round_robin_work_queue(queue);
-+
-+		/*
-+		 * It shouldn't be a big deal if the same rotor gets used for multiple work queues.
-+		 * Any patterns that might develop are likely to be disrupted by random ordering of
-+		 * multiple completions and migration between cores, unless the load is so light as
-+		 * to be regular in ordering of tasks and the threads are confined to individual
-+		 * cores; with a load that light we won't care.
-+		 */
-+		unsigned int rotor = this_cpu_inc_return(service_queue_rotor);
-+		unsigned int index = rotor % round_robin->num_service_queues;
-+
-+		simple_queue = round_robin->service_queues[index];
-+	}
-+
-+	enqueue_work_queue_completion(simple_queue, completion);
-+}
-+
-+/* Misc */
-+
-+/*
-+ * Return the work queue pointer recorded at initialization time in the work-queue stack handle
-+ * initialized on the stack of the current thread, if any.
-+ */
-+static struct simple_work_queue *get_current_thread_work_queue(void)
-+{
-+	/*
-+	 * In interrupt context, if a vdo thread is what got interrupted, the calls below will find
-+	 * the queue for the thread which was interrupted. However, the interrupted thread may have
-+	 * been processing a completion, in which case starting to process another would violate
-+	 * our concurrency assumptions.
-+	 */
-+	if (in_interrupt())
-+		return NULL;
-+	if (kthread_func(current) != work_queue_runner)
-+		/* Not a VDO work queue thread. */
-+		return NULL;
-+	return kthread_data(current);
-+}
-+
-+struct vdo_work_queue *vdo_get_current_work_queue(void)
-+{
-+	struct simple_work_queue *queue = get_current_thread_work_queue();
-+
-+	return (queue == NULL) ? NULL : &queue->common;
-+}
-+
-+struct vdo_thread *vdo_get_work_queue_owner(struct vdo_work_queue *queue)
-+{
-+	return queue->owner;
-+}
-+
-+/**
-+ * vdo_get_work_queue_private_data() - Returns the private data for the current thread's work
-+ *                                     queue, or NULL if none or if the current thread is not a
-+ *                                     work queue thread.
-+ */
-+void *vdo_get_work_queue_private_data(void)
-+{
-+	struct simple_work_queue *queue = get_current_thread_work_queue();
-+
-+	return (queue != NULL) ? queue->private : NULL;
-+}
-+
-+bool vdo_work_queue_type_is(struct vdo_work_queue *queue, const struct vdo_work_queue_type *type)
-+{
-+	return (queue->type == type);
-+}
-diff --git a/drivers/md/dm-vdo/work-queue.h b/drivers/md/dm-vdo/work-queue.h
+diff --git a/drivers/md/dm-vdo/index-layout.h b/drivers/md/dm-vdo/index-layout.h
 new file mode 100644
-index 00000000000..d1e05f8901d
+index 00000000000..02e368c0331
 --- /dev/null
-+++ b/drivers/md/dm-vdo/work-queue.h
-@@ -0,0 +1,53 @@
++++ b/drivers/md/dm-vdo/index-layout.h
+@@ -0,0 +1,42 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright Red Hat
 + */
 +
-+#ifndef VDO_WORK_QUEUE_H
-+#define VDO_WORK_QUEUE_H
++#ifndef UDS_INDEX_LAYOUT_H
++#define UDS_INDEX_LAYOUT_H
 +
-+#include <linux/sched.h> /* for TASK_COMM_LEN */
++#include "config.h"
++#include "io-factory.h"
++#include "uds.h"
 +
-+#include "types.h"
++/*
++ * The index layout describes the format of the index on the underlying storage, and is responsible
++ * for creating those structures when the index is first created. It also validates the index data
++ * when loading a saved index, and updates it when saving the index.
++ */
++
++struct index_layout;
++
++int __must_check uds_make_index_layout(struct configuration *config,
++				       bool new_layout,
++				       struct index_layout **layout_ptr);
++
++void uds_free_index_layout(struct index_layout *layout);
++
++int __must_check uds_replace_index_layout_storage(struct index_layout *layout, const char *name);
++
++int __must_check uds_load_index_state(struct index_layout *layout, struct uds_index *index);
++
++int __must_check uds_save_index_state(struct index_layout *layout, struct uds_index *index);
++
++int __must_check uds_discard_open_chapter(struct index_layout *layout);
++
++u64 __must_check uds_get_volume_nonce(struct index_layout *layout);
++
++int __must_check uds_open_volume_bufio(struct index_layout *layout,
++				       size_t block_size,
++				       unsigned int reserved_buffers,
++				       struct dm_bufio_client **client_ptr);
++
++#endif /* UDS_INDEX_LAYOUT_H */
+diff --git a/drivers/md/dm-vdo/io-factory.c b/drivers/md/dm-vdo/io-factory.c
+new file mode 100644
+index 00000000000..d8c03e9ab43
+--- /dev/null
++++ b/drivers/md/dm-vdo/io-factory.c
+@@ -0,0 +1,458 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright Red Hat
++ */
++
++#include "io-factory.h"
++
++#include <linux/atomic.h>
++#include <linux/blkdev.h>
++#include <linux/err.h>
++#include <linux/mount.h>
++
++#include "logger.h"
++#include "memory-alloc.h"
++#include "numeric.h"
++
++enum { BLK_FMODE = FMODE_READ | FMODE_WRITE };
++
++/*
++ * The I/O factory object manages access to index storage, which is a contiguous range of blocks on
++ * a block device.
++ *
++ * The factory holds the open device and is responsible for closing it. The factory has methods to
++ * make helper structures that can be used to access sections of the index.
++ */
++struct io_factory {
++	struct block_device *bdev;
++	atomic_t ref_count;
++};
++
++/* The buffered reader allows efficient I/O by reading page-sized segments into a buffer. */
++struct buffered_reader {
++	struct io_factory *factory;
++	struct dm_bufio_client *client;
++	struct dm_buffer *buffer;
++	sector_t limit;
++	sector_t block_number;
++	u8 *start;
++	u8 *end;
++};
++
++enum { MAX_READ_AHEAD_BLOCKS = 4 };
++
++/*
++ * The buffered writer allows efficient I/O by buffering writes and committing page-sized segments
++ * to storage.
++ */
++struct buffered_writer {
++	struct io_factory *factory;
++	struct dm_bufio_client *client;
++	struct dm_buffer *buffer;
++	sector_t limit;
++	sector_t block_number;
++	u8 *start;
++	u8 *end;
++	int error;
++};
++
++static void uds_get_io_factory(struct io_factory *factory)
++{
++	atomic_inc(&factory->ref_count);
++}
++
++static int get_block_device_from_name(const char *name, struct block_device **bdev)
++{
++	dev_t device = name_to_dev_t(name);
++
++	if (device != 0)
++		*bdev = blkdev_get_by_dev(device, BLK_FMODE, NULL);
++	else
++		*bdev = blkdev_get_by_path(name, BLK_FMODE, NULL);
++	if (IS_ERR(*bdev)) {
++		uds_log_error_strerror(-PTR_ERR(*bdev), "%s is not a block device", name);
++		return UDS_INVALID_ARGUMENT;
++	}
++
++	return UDS_SUCCESS;
++}
++
++int uds_make_io_factory(const char *path, struct io_factory **factory_ptr)
++{
++	int result;
++	struct block_device *bdev;
++	struct io_factory *factory;
++
++	result = get_block_device_from_name(path, &bdev);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct io_factory, __func__, &factory);
++	if (result != UDS_SUCCESS) {
++		blkdev_put(bdev, BLK_FMODE);
++		return result;
++	}
++
++	factory->bdev = bdev;
++	atomic_set_release(&factory->ref_count, 1);
++
++	*factory_ptr = factory;
++	return UDS_SUCCESS;
++}
++
++int uds_replace_storage(struct io_factory *factory, const char *path)
++{
++	int result;
++	struct block_device *bdev;
++
++	result = get_block_device_from_name(path, &bdev);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	blkdev_put(factory->bdev, BLK_FMODE);
++	factory->bdev = bdev;
++	return UDS_SUCCESS;
++}
++
++/* Free an I/O factory once all references have been released. */
++void uds_put_io_factory(struct io_factory *factory)
++{
++	if (atomic_add_return(-1, &factory->ref_count) <= 0) {
++		blkdev_put(factory->bdev, BLK_FMODE);
++		UDS_FREE(factory);
++	}
++}
++
++size_t uds_get_writable_size(struct io_factory *factory)
++{
++	return i_size_read(factory->bdev->bd_inode);
++}
++
++/* Create a struct dm_bufio_client for an index region starting at offset. */
++int uds_make_bufio(struct io_factory *factory,
++		   off_t block_offset,
++		   size_t block_size,
++		   unsigned int reserved_buffers,
++		   struct dm_bufio_client **client_ptr)
++{
++	struct dm_bufio_client *client;
++
++	client = dm_bufio_client_create(factory->bdev,
++					block_size,
++					reserved_buffers,
++					0,
++					NULL,
++					NULL,
++					0);
++	if (IS_ERR(client))
++		return -PTR_ERR(client);
++
++	dm_bufio_set_sector_offset(client, block_offset * SECTORS_PER_BLOCK);
++	*client_ptr = client;
++	return UDS_SUCCESS;
++}
++
++static void read_ahead(struct buffered_reader *reader, sector_t block_number)
++{
++	if (block_number < reader->limit) {
++		sector_t read_ahead =
++			min((sector_t) MAX_READ_AHEAD_BLOCKS, reader->limit - block_number);
++
++		dm_bufio_prefetch(reader->client, block_number, read_ahead);
++	}
++}
++
++void uds_free_buffered_reader(struct buffered_reader *reader)
++{
++	if (reader == NULL)
++		return;
++
++	if (reader->buffer != NULL)
++		dm_bufio_release(reader->buffer);
++
++	dm_bufio_client_destroy(reader->client);
++	uds_put_io_factory(reader->factory);
++	UDS_FREE(reader);
++}
++
++/* Create a buffered reader for an index region starting at offset. */
++int uds_make_buffered_reader(struct io_factory *factory,
++			     off_t offset,
++			     u64 block_count,
++			     struct buffered_reader **reader_ptr)
++{
++	int result;
++	struct dm_bufio_client *client = NULL;
++	struct buffered_reader *reader = NULL;
++
++	result = uds_make_bufio(factory, offset, UDS_BLOCK_SIZE, 1, &client);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct buffered_reader, "buffered reader", &reader);
++	if (result != UDS_SUCCESS) {
++		dm_bufio_client_destroy(client);
++		return result;
++	}
++
++	*reader = (struct buffered_reader) {
++		.factory = factory,
++		.client = client,
++		.buffer = NULL,
++		.limit = block_count,
++		.block_number = 0,
++		.start = NULL,
++		.end = NULL,
++	};
++
++	read_ahead(reader, 0);
++	uds_get_io_factory(factory);
++	*reader_ptr = reader;
++	return UDS_SUCCESS;
++}
++
++static int position_reader(struct buffered_reader *reader, sector_t block_number, off_t offset)
++{
++	struct dm_buffer *buffer = NULL;
++	void *data;
++
++	if ((reader->end == NULL) || (block_number != reader->block_number)) {
++		if (block_number >= reader->limit)
++			return UDS_OUT_OF_RANGE;
++
++		if (reader->buffer != NULL)
++			dm_bufio_release(UDS_FORGET(reader->buffer));
++
++		data = dm_bufio_read(reader->client, block_number, &buffer);
++		if (IS_ERR(data))
++			return -PTR_ERR(data);
++
++		reader->buffer = buffer;
++		reader->start = data;
++		if (block_number == reader->block_number + 1)
++			read_ahead(reader, block_number + 1);
++	}
++
++	reader->block_number = block_number;
++	reader->end = reader->start + offset;
++	return UDS_SUCCESS;
++}
++
++static size_t bytes_remaining_in_read_buffer(struct buffered_reader *reader)
++{
++	return (reader->end == NULL) ? 0 : reader->start + UDS_BLOCK_SIZE - reader->end;
++}
++
++static int reset_reader(struct buffered_reader *reader)
++{
++	sector_t block_number;
++
++	if (bytes_remaining_in_read_buffer(reader) > 0)
++		return UDS_SUCCESS;
++
++	block_number = reader->block_number;
++	if (reader->end != NULL)
++		++block_number;
++
++	return position_reader(reader, block_number, 0);
++}
++
++int uds_read_from_buffered_reader(struct buffered_reader *reader, u8 *data, size_t length)
++{
++	int result = UDS_SUCCESS;
++	size_t chunk_size;
++
++	while (length > 0) {
++		result = reset_reader(reader);
++		if (result != UDS_SUCCESS)
++			return result;
++
++		chunk_size = min(length, bytes_remaining_in_read_buffer(reader));
++		memcpy(data, reader->end, chunk_size);
++		length -= chunk_size;
++		data += chunk_size;
++		reader->end += chunk_size;
++	}
++
++	return UDS_SUCCESS;
++}
++
++/*
++ * Verify that the next data on the reader matches the required value. If the value matches, the
++ * matching contents are consumed. If the value does not match, the reader state is unchanged.
++ */
++int uds_verify_buffered_data(struct buffered_reader *reader, const u8 *value, size_t length)
++{
++	int result = UDS_SUCCESS;
++	size_t chunk_size;
++	sector_t start_block_number = reader->block_number;
++	int start_offset = reader->end - reader->start;
++
++	while (length > 0) {
++		result = reset_reader(reader);
++		if (result != UDS_SUCCESS) {
++			result = UDS_CORRUPT_DATA;
++			break;
++		}
++
++		chunk_size = min(length, bytes_remaining_in_read_buffer(reader));
++		if (memcmp(value, reader->end, chunk_size) != 0) {
++			result = UDS_CORRUPT_DATA;
++			break;
++		}
++
++		length -= chunk_size;
++		value += chunk_size;
++		reader->end += chunk_size;
++	}
++
++	if (result != UDS_SUCCESS)
++		position_reader(reader, start_block_number, start_offset);
++
++	return result;
++}
++
++/* Create a buffered writer for an index region starting at offset. */
++int uds_make_buffered_writer(struct io_factory *factory,
++			     off_t offset,
++			     u64 block_count,
++			     struct buffered_writer **writer_ptr)
++{
++	int result;
++	struct dm_bufio_client *client = NULL;
++	struct buffered_writer *writer;
++
++	result = uds_make_bufio(factory, offset, UDS_BLOCK_SIZE, 1, &client);
++	if (result != UDS_SUCCESS)
++		return result;
++
++	result = UDS_ALLOCATE(1, struct buffered_writer, "buffered writer", &writer);
++	if (result != UDS_SUCCESS) {
++		dm_bufio_client_destroy(client);
++		return result;
++	}
++
++	*writer = (struct buffered_writer) {
++		.factory = factory,
++		.client = client,
++		.buffer = NULL,
++		.limit = block_count,
++		.start = NULL,
++		.end = NULL,
++		.block_number = 0,
++		.error = UDS_SUCCESS,
++	};
++
++	uds_get_io_factory(factory);
++	*writer_ptr = writer;
++	return UDS_SUCCESS;
++}
++
++static size_t get_remaining_write_space(struct buffered_writer *writer)
++{
++	return writer->start + UDS_BLOCK_SIZE - writer->end;
++}
++
++static int __must_check prepare_next_buffer(struct buffered_writer *writer)
++{
++	struct dm_buffer *buffer = NULL;
++	void *data;
++
++	if (writer->block_number >= writer->limit) {
++		writer->error = UDS_OUT_OF_RANGE;
++		return UDS_OUT_OF_RANGE;
++	}
++
++	data = dm_bufio_new(writer->client, writer->block_number, &buffer);
++	if (IS_ERR(data)) {
++		writer->error = -PTR_ERR(data);
++		return writer->error;
++	}
++
++	writer->buffer = buffer;
++	writer->start = data;
++	writer->end = data;
++	return UDS_SUCCESS;
++}
++
++static int flush_previous_buffer(struct buffered_writer *writer)
++{
++	size_t available;
++
++	if (writer->buffer == NULL)
++		return writer->error;
++
++	if (writer->error == UDS_SUCCESS) {
++		available = get_remaining_write_space(writer);
++
++		if (available > 0)
++			memset(writer->end, 0, available);
++
++		dm_bufio_mark_buffer_dirty(writer->buffer);
++	}
++
++	dm_bufio_release(writer->buffer);
++	writer->buffer = NULL;
++	writer->start = NULL;
++	writer->end = NULL;
++	writer->block_number++;
++	return writer->error;
++}
++
++void uds_free_buffered_writer(struct buffered_writer *writer)
++{
++	int result;
++
++	if (writer == NULL)
++		return;
++
++	flush_previous_buffer(writer);
++	result = -dm_bufio_write_dirty_buffers(writer->client);
++	if (result != UDS_SUCCESS)
++		uds_log_warning_strerror(result, "%s: failed to sync storage", __func__);
++
++	dm_bufio_client_destroy(writer->client);
++	uds_put_io_factory(writer->factory);
++	UDS_FREE(writer);
++}
++
++/*
++ * Append data to the buffer, writing as needed. If no data is provided, zeros are written instead.
++ * If a write error occurs, it is recorded and returned on every subsequent write attempt.
++ */
++int uds_write_to_buffered_writer(struct buffered_writer *writer, const u8 *data, size_t length)
++{
++	int result = writer->error;
++	size_t chunk_size;
++
++	while ((length > 0) && (result == UDS_SUCCESS)) {
++		if (writer->buffer == NULL) {
++			result = prepare_next_buffer(writer);
++			continue;
++		}
++
++		chunk_size = min(length, get_remaining_write_space(writer));
++		if (data == NULL) {
++			memset(writer->end, 0, chunk_size);
++		} else {
++			memcpy(writer->end, data, chunk_size);
++			data += chunk_size;
++		}
++
++		length -= chunk_size;
++		writer->end += chunk_size;
++
++		if (get_remaining_write_space(writer) == 0)
++			result = uds_flush_buffered_writer(writer);
++	}
++
++	return result;
++}
++
++int uds_flush_buffered_writer(struct buffered_writer *writer)
++{
++	if (writer->error != UDS_SUCCESS)
++		return writer->error;
++
++	return flush_previous_buffer(writer);
++}
+diff --git a/drivers/md/dm-vdo/io-factory.h b/drivers/md/dm-vdo/io-factory.h
+new file mode 100644
+index 00000000000..1aa5ded6204
+--- /dev/null
++++ b/drivers/md/dm-vdo/io-factory.h
+@@ -0,0 +1,66 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright Red Hat
++ */
++
++#ifndef UDS_IO_FACTORY_H
++#define UDS_IO_FACTORY_H
++
++#include <linux/dm-bufio.h>
++
++/*
++ * The I/O factory manages all low-level I/O operations to the underlying storage device. Its main
++ * clients are the index layout and the volume. The buffered reader and buffered writer interfaces
++ * are helpers for accessing data in a contiguous range of storage blocks.
++ */
++
++struct buffered_reader;
++struct buffered_writer;
++
++struct io_factory;
 +
 +enum {
-+	MAX_VDO_WORK_QUEUE_NAME_LEN = TASK_COMM_LEN,
++	UDS_BLOCK_SIZE = 4096,
++	SECTORS_PER_BLOCK = UDS_BLOCK_SIZE >> SECTOR_SHIFT,
 +};
 +
-+struct vdo_work_queue_type {
-+	void (*start)(void *context);
-+	void (*finish)(void *context);
-+	enum vdo_completion_priority max_priority;
-+	enum vdo_completion_priority default_priority;
-+};
++int __must_check uds_make_io_factory(const char *path, struct io_factory **factory_ptr);
 +
-+struct vdo_completion;
-+struct vdo_thread;
-+struct vdo_work_queue;
++int __must_check uds_replace_storage(struct io_factory *factory, const char *path);
 +
-+int vdo_make_work_queue(const char *thread_name_prefix,
-+			const char *name,
-+			struct vdo_thread *owner,
-+			const struct vdo_work_queue_type *type,
-+			unsigned int thread_count,
-+			void *thread_privates[],
-+			struct vdo_work_queue **queue_ptr);
++void uds_put_io_factory(struct io_factory *factory);
 +
-+void vdo_enqueue_work_queue(struct vdo_work_queue *queue, struct vdo_completion *completion);
++size_t __must_check uds_get_writable_size(struct io_factory *factory);
 +
-+void vdo_finish_work_queue(struct vdo_work_queue *queue);
++int __must_check uds_make_bufio(struct io_factory *factory,
++				off_t block_offset,
++				size_t block_size,
++				unsigned int reserved_buffers,
++				struct dm_bufio_client **client_ptr);
 +
-+void vdo_free_work_queue(struct vdo_work_queue *queue);
++int __must_check uds_make_buffered_reader(struct io_factory *factory,
++					  off_t offset,
++					  u64 block_count,
++					  struct buffered_reader **reader_ptr);
 +
-+void vdo_dump_work_queue(struct vdo_work_queue *queue);
++void uds_free_buffered_reader(struct buffered_reader *reader);
 +
-+void vdo_dump_completion_to_buffer(struct vdo_completion *completion, char *buffer, size_t length);
++int __must_check
++uds_read_from_buffered_reader(struct buffered_reader *reader, u8 *data, size_t length);
 +
-+void *vdo_get_work_queue_private_data(void);
-+struct vdo_work_queue *vdo_get_current_work_queue(void);
-+struct vdo_thread *vdo_get_work_queue_owner(struct vdo_work_queue *queue);
++int __must_check
++uds_verify_buffered_data(struct buffered_reader *reader, const u8 *value, size_t length);
 +
-+bool __must_check
-+vdo_work_queue_type_is(struct vdo_work_queue *queue, const struct vdo_work_queue_type *type);
++int __must_check uds_make_buffered_writer(struct io_factory *factory,
++					  off_t offset,
++					  u64 block_count,
++					  struct buffered_writer **writer_ptr);
 +
-+#endif /* VDO_WORK_QUEUE_H */
++void uds_free_buffered_writer(struct buffered_writer *buffer);
++
++int __must_check
++uds_write_to_buffered_writer(struct buffered_writer *writer, const u8 *data, size_t length);
++
++int __must_check uds_flush_buffered_writer(struct buffered_writer *writer);
++
++#endif /* UDS_IO_FACTORY_H */
+diff --git a/drivers/md/dm-vdo/numeric.h b/drivers/md/dm-vdo/numeric.h
+new file mode 100644
+index 00000000000..bd4ca019d1b
+--- /dev/null
++++ b/drivers/md/dm-vdo/numeric.h
+@@ -0,0 +1,78 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright Red Hat
++ */
++
++#ifndef UDS_NUMERIC_H
++#define UDS_NUMERIC_H
++
++#include <asm/unaligned.h>
++#include <linux/kernel.h>
++#include <linux/types.h>
++
++/*
++ * These utilities encode or decode a number from an offset in a larger data buffer and then
++ * advance the offset pointer to the next field in the buffer.
++ */
++
++static inline void decode_s64_le(const u8 *buffer, size_t *offset, s64 *decoded)
++{
++	*decoded = get_unaligned_le64(buffer + *offset);
++	*offset += sizeof(s64);
++}
++
++static inline void encode_s64_le(u8 *data, size_t *offset, s64 to_encode)
++{
++	put_unaligned_le64(to_encode, data + *offset);
++	*offset += sizeof(s64);
++}
++
++static inline void decode_u64_le(const u8 *buffer, size_t *offset, u64 *decoded)
++{
++	*decoded = get_unaligned_le64(buffer + *offset);
++	*offset += sizeof(u64);
++}
++
++static inline void encode_u64_le(u8 *data, size_t *offset, u64 to_encode)
++{
++	put_unaligned_le64(to_encode, data + *offset);
++	*offset += sizeof(u64);
++}
++
++static inline void decode_s32_le(const u8 *buffer, size_t *offset, s32 *decoded)
++{
++	*decoded = get_unaligned_le32(buffer + *offset);
++	*offset += sizeof(s32);
++}
++
++static inline void encode_s32_le(u8 *data, size_t *offset, s32 to_encode)
++{
++	put_unaligned_le32(to_encode, data + *offset);
++	*offset += sizeof(s32);
++}
++
++static inline void decode_u32_le(const u8 *buffer, size_t *offset, u32 *decoded)
++{
++	*decoded = get_unaligned_le32(buffer + *offset);
++	*offset += sizeof(u32);
++}
++
++static inline void encode_u32_le(u8 *data, size_t *offset, u32 to_encode)
++{
++	put_unaligned_le32(to_encode, data + *offset);
++	*offset += sizeof(u32);
++}
++
++static inline void decode_u16_le(const u8 *buffer, size_t *offset, u16 *decoded)
++{
++	*decoded = get_unaligned_le16(buffer + *offset);
++	*offset += sizeof(u16);
++}
++
++static inline void encode_u16_le(u8 *data, size_t *offset, u16 to_encode)
++{
++	put_unaligned_le16(to_encode, data + *offset);
++	*offset += sizeof(u16);
++}
++
++#endif /* UDS_NUMERIC_H */
 -- 
 2.40.1
 
