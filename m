@@ -2,65 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A223C77B75
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 17:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39022C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 17:14:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237774AbjEWROJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 13:14:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
+        id S238069AbjEWROL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 13:14:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238039AbjEWROD (ORCPT
+        with ESMTP id S238049AbjEWROG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 13:14:03 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70192130
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 10:14:00 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id ca18e2360f4ac-7747f082d98so4739f.1
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 10:14:00 -0700 (PDT)
+        Tue, 23 May 2023 13:14:06 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 076CF18F
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 10:14:01 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-339fca7da2aso760765ab.0
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 10:14:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684862039; x=1687454039;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684862041; x=1687454041;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5k88qCVwcZa1f8fNaWmQwZNtP2UmSyRYMW1h4mnpwcI=;
-        b=rhdAfeRDbJmV0coNwwtLAWZdVXOofT1UdxJjGXcSRViQbRVuZ8FnUMRC76WPG/9T5Q
-         nVoomGNwKzzqo8FayjjsRBuNoPcfRmAuhz9DpozcRaL4sqLVc5TcNW7E6FJCho7w17rM
-         I50v4Q7AMpW+5sf5n0sTtGsA8qhmkUk230SGRSovk7kxhOhSws9/XO15Uy80VvpGNBz8
-         66FB1k+fZaAUTDB0E/ICHc05RIIbAmUh9ASqfD52HFxrtIbK8fROTXdNDEw3O8osrpJm
-         LlI6vzwTjqx6ZIozjW/QP+od+Wd7ybXAhUq+vJy69TttrXxTW2lr9DsK+rwsV5uGvMQl
-         ZO0A==
+        bh=qmWtJOzNztkpnf4UzHCczQhsDx+hgxiMe2XgRqYyHhI=;
+        b=rQvy6TSK+wfTlo0HdARvbSVdkvmZoky53LQfz6I/sHZSh/vam08zvcWX8BKFq35rPJ
+         FiOXal8syvG9pEP0WTv6iW7eSanhHy7ABqS8itvydZ8rH14nwiDgZz79SGNg3RH3bQj8
+         WTmLv9HJ2uOAsK7i88YATrsiJwt/hKCRYYVxQMA7/a3MuM4g4yafCnt36kQlOjL/VWPH
+         6o5dMj0POMwamomezMYNOxNy841T05ufNRwMDpAkAYeEwREsLkqobJ+hg8+fwPBm4nOe
+         u6quTE5qyRblQsMAa260HpGZ0iO2Y0Wue1iugiodj3bo6gNKl8rdK5sY8KOYxSKugSqK
+         REMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684862039; x=1687454039;
+        d=1e100.net; s=20221208; t=1684862041; x=1687454041;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5k88qCVwcZa1f8fNaWmQwZNtP2UmSyRYMW1h4mnpwcI=;
-        b=Zcfvwx0s+QrKi/WJP9AQwuCiaVoMgQNLk2/AfvSP1fB8xzbgDCU3Dh12Ou3+Ixxl56
-         olpasEIadxgVAEZ+RmtmOBnOO87vTQ1eyXOs9vARrooPHFDURx/5rGUtFbG/b/bExsZQ
-         kgPLYokpdYStkkmxc0m7UuVqVTDuytUb0EgdG63EfYagqMoK/RcEOJyWkSmaj+JD2a3e
-         N8PcjAcVdndQ8Th1f2AePEh4dHjeR2MzMUxP5JUaxhhc6UJbLZnRQZSqa3zJIF3NIsbT
-         orGBPBQwwEpx3PkYo9VLltKxuD3q9nFTmmhi8GKMrRGPDb9m6boMKr38jccuoMo+5kbu
-         LYUQ==
-X-Gm-Message-State: AC+VfDx+Aslgu4ZtBEcBu5qRwLhjNaOpKlpGYIDhxSot2ygy4AtWn6tr
-        VBH397u4IQODi2jyPimnZRUvp+S5L5KpS1+FoP4=
-X-Google-Smtp-Source: ACHHUZ5lI6ZJzmHP2RmyEmRkLyYJRDQQXAZ4tqrkSxq5mRlghLrc9YkfThO9dMuwV0hk2urNFdCKog==
-X-Received: by 2002:a6b:b20f:0:b0:774:8351:89ac with SMTP id b15-20020a6bb20f000000b00774835189acmr1406141iof.1.1684862039717;
-        Tue, 23 May 2023 10:13:59 -0700 (PDT)
+        bh=qmWtJOzNztkpnf4UzHCczQhsDx+hgxiMe2XgRqYyHhI=;
+        b=NgBLahgrmDw+Jnl3ufpi9Eqx50suLPaDlNXiucGY6LqUZ7ZgJLgvIWbBmnii4OhKUd
+         0bDO4Q8vKlbqCFpMDAk1yNtBrwPo77ZLIJ/D2VSbOb4w7f9bxaO6F1/7eucVXMyQMwL4
+         oDWSk9zlA7Kuad0DNBoJRslXIjLPUtGmeriA7475WTOBQqj7OeFvE7E5RXG2vbpZdMCD
+         Wg6ZVsBNoiJbHZfwqHGi9H9h95a+lCACgzMwehNLojg0nYtmAB9qYOsQPFmbeOnx1jAd
+         tha48RlN6Tea/ltHdUh1XgsgXrPOR4TXSmqXUTWbRf6fkLjWCClq10Yy7VXn5dxuD8lz
+         GmlQ==
+X-Gm-Message-State: AC+VfDyHY3ESQhUAOfa8ge3f2YLBkzb2E7UlDYxxYSWCGiVDHNW9HLI0
+        UZwRsd9DlceEJ+hiLztIJE+1EA==
+X-Google-Smtp-Source: ACHHUZ484Klt0h0DdDR9++SF2ilwYFPu1B4JHU4ETiLnEdiOPsAptOMMT7O5wPaxS3A/GWCCiNI72w==
+X-Received: by 2002:a6b:b70c:0:b0:774:80fc:11a9 with SMTP id h12-20020a6bb70c000000b0077480fc11a9mr1794870iof.1.1684862041070;
+        Tue, 23 May 2023 10:14:01 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id u7-20020a02aa87000000b00411a1373aa5sm2524580jai.155.2023.05.23.10.13.58
+        by smtp.gmail.com with ESMTPSA id u7-20020a02aa87000000b00411a1373aa5sm2524580jai.155.2023.05.23.10.13.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 10:13:59 -0700 (PDT)
+        Tue, 23 May 2023 10:14:00 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     hch@lst.de, Anuj Gupta <anuj20.g@samsung.com>
-Cc:     linux-block@vger.kernel.org, gost.dev@samsung.com,
-        anuj1072538@gmail.com, joshiiitr@gmail.com, stable@vger.kernel.org,
-        Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20230523111709.145676-1-anuj20.g@samsung.com>
-References: <CGME20230523112014epcas5p267f30562f3f2e3c6d58fbb76c0084e5b@epcas5p2.samsung.com>
- <20230523111709.145676-1-anuj20.g@samsung.com>
-Subject: Re: [PATCH] block: fix bio-cache for passthru IO
-Message-Id: <168486203851.398377.17993706922201051962.b4-ty@kernel.dk>
-Date:   Tue, 23 May 2023 11:13:58 -0600
+To:     tj@kernel.org, hch@lst.de, josef@toxicpanda.com,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
+References: <20230414084008.2085155-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH for-6.4/block] block/rq_qos: protect rq_qos apis with a
+ new lock
+Message-Id: <168486203985.398377.17593981162726402548.b4-ty@kernel.dk>
+Date:   Tue, 23 May 2023 11:13:59 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -70,23 +71,21 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Tue, 23 May 2023 16:47:09 +0530, Anuj Gupta wrote:
-> commit <8af870aa5b847> ("block: enable bio caching use for passthru IO")
-> introduced bio-cache for passthru IO. In case when nr_vecs are greater
-> than BIO_INLINE_VECS, bio and bvecs are allocated from mempool (instead
-> of percpu cache) and REQ_ALLOC_CACHE is cleared. This causes the side
-> effect of not freeing bio/bvecs into mempool on completion.
+On Fri, 14 Apr 2023 16:40:08 +0800, Yu Kuai wrote:
+> commit 50e34d78815e ("block: disable the elevator int del_gendisk")
+> move rq_qos_exit() from disk_release() to del_gendisk(), this will
+> introduce some problems:
 > 
-> This patch lets the passthru IO fallback to allocation using bio_kmalloc
-> when nr_vecs are greater than BIO_INLINE_VECS. The corresponding bio
-> is freed during call to blk_mq_map_bio_put during completion.
+> 1) If rq_qos_add() is triggered by enabling iocost/iolatency through
+>    cgroupfs, then it can concurrent with del_gendisk(), it's not safe to
+>    write 'q->rq_qos' concurrently.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: fix bio-cache for passthru IO
-      (no commit info)
+[1/1] block/rq_qos: protect rq_qos apis with a new lock
+      commit: a13bd91be22318768d55470cbc0b0f4488ef9edf
 
 Best regards,
 -- 
