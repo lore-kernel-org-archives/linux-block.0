@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2845C7EE23
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C01DC7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:32:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbjEWJbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 05:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52506 "EHLO
+        id S229943AbjEWJcG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 05:32:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbjEWJbE (ORCPT
+        with ESMTP id S232553AbjEWJcF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 05:31:04 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7DF94
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:31:03 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-96fdc081cb3so351824566b.2
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:31:03 -0700 (PDT)
+        Tue, 23 May 2023 05:32:05 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6977F102
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:32:04 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-96f6e83e12fso669845166b.1
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:32:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1684834261; x=1687426261;
+        d=ionos.com; s=google; t=1684834307; x=1687426307;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kqephx2VJND73mFAxCRE2QU7Sh/HUprdV2dKCS1tbP0=;
-        b=NjTxQCtFOnvVf5hPEO9XDgsNlkoBRV8CbT/3yjliaIJbRKzpNgxYxnIViwHZpadQI6
-         smODJgDYri2v/nllMLzqCihELk7qEHbGBOntcFqbaDYKjNuXvM107feAiHJDcyTTV6Hf
-         EO4Z+9EpZmRMZWnKpBCH9ZLg+1TV/G+75utsh4ott9Vrd5Q6sN9LkhIIYhUjiMlwfeZU
-         BSIl/xXuBucbMpUrle6CgGByZYbCibseBWfw/ncWBOsbPQVB2MaC0kiU7Jr5wUsa2EYA
-         f5yTXHcQd7t3InyLS21YsuaxghDsB037/yrPuM0vJfOqCu0yS7itunj/Ocd7TXCvcPFE
-         ewoA==
+        bh=GRHTMTxKgqhqtxlEyX96ixb2A6QEbaJZP1nHp8ykdQg=;
+        b=Ro62uBAb/x6ARNJLey8VOA+DKvzUtcMpSltlZscm3bBgNBkfkn6N8XbxSLiRlrBkDf
+         ZgoxechuUTPSoAadqdU8YTfk94azsHV8mz2Dj0/OdpYtCWdnjGWNukhCZ1F99z0GXvFS
+         yox4m5i53BMJje9ALR5LWbx2P/xdAPgHlLqNQRdrFtYgl4X/qsAMGIKo59BWWUXDQgfj
+         u4zcW2nDm6A3XipXIt2tK4/Oue6ZMPg2BE1SvrKP+6QmXqnHXERooa1dBtySjkAH1FfI
+         uvjg+4ak+0g8BxCIh4cyUsnNJN4XZKlwM1c4ZeuapZMiKLeUjpqtetZD5yhlT/19B8Dy
+         RJNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684834261; x=1687426261;
+        d=1e100.net; s=20221208; t=1684834307; x=1687426307;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kqephx2VJND73mFAxCRE2QU7Sh/HUprdV2dKCS1tbP0=;
-        b=ExlxoSoSVh4GeqamNRoGKn608GtgF3Ucqf5fn6UJkOhQ9ttSMMstm6ARa9vGWru/Gn
-         xRLP3Kl9gyao5fEQVnnTZ8pczetTYVFWSpKv3OlXELrmVhg/A3EgMqNFUwueA7Qq/Rkr
-         L9EGRM3QVICwOdMGLsi9XEzqOv+xD2BvO8QBdB0ypTbtAHg/9ggGoAkq/7ugNam29s/D
-         ThGvw5yN/eRKkSP1OTynaRo6ki01jV1TO25DgJbCnV28aPhf03C/YnqTYj4STfbAVeqw
-         5RNlWpPfwmgVymnd5e28PFEHTdBCYoQUCiDVY8vFzDe6VXz0/NxG2z64R9P8lZ6eWs2A
-         353A==
-X-Gm-Message-State: AC+VfDx25iKYftFrgqt4oGfiVUGDLEYwUKZIIRsSBjgLeHPY4BCfkd8u
-        VmXuhl+e169ytXmrk7Uh//7Pweenq8gjtF8bC+Cy0F63Y6k6JTW9
-X-Google-Smtp-Source: ACHHUZ7CB7FbvHRcOMBNalEmU+2uoKwkhXlxnq/lfcSnmwpLyjmruaMTrpxmoJrvb4E2jJ6erlmO/3cPATMrAfv/VFM=
-X-Received: by 2002:a17:907:d0a:b0:96f:bd84:b8a0 with SMTP id
- gn10-20020a1709070d0a00b0096fbd84b8a0mr8014797ejc.5.1684834261555; Tue, 23
- May 2023 02:31:01 -0700 (PDT)
+        bh=GRHTMTxKgqhqtxlEyX96ixb2A6QEbaJZP1nHp8ykdQg=;
+        b=AHF509d5RS7to2pEE7bV8Z0H4p8JiEebm+CsIAKHDJO9kZKPr4WiFZTtgrS9KtRVef
+         WmdF4wQc10L2BekUGhbL8mI61z2uS7ppvsjZh5QBmpqmL6hHkwAEStR6cDTqy2StfQwN
+         2J39Fev15gT/v7LGL3rj//2xYKj3BeDbA0gdFuofyGi+4T2MTcoKKJkissupjcP5JOSg
+         BxyaIVUPNUP93M00baQnYLbnFVatMsSNAXebbeoQHcO1992i55gRICqRdNZxecffBlbI
+         o2oyRmAfWbak2HiP3X4w0WwiKiUQDa5LXtPk63f1l/DgMGhPPmHmypCwUBGSTg9zAyuX
+         z/xw==
+X-Gm-Message-State: AC+VfDy5PUQ+7z4qKjx27wqy96oFwj6Nqd8/03uYwRXJV+byJkx6YkPD
+        w/sjegmPV8i1kzl1dO6Rd8nbaBSauVY9RiRzNAzIsg==
+X-Google-Smtp-Source: ACHHUZ7NKmP9GzonoV5jeMTkx1TGy9cFegEcKq2VKeSPejSBlsw1W4hEnAnGGjHW4WEAv94VihGo1msVifH/tX15gSM=
+X-Received: by 2002:a17:907:9449:b0:969:cbf4:98fa with SMTP id
+ dl9-20020a170907944900b00969cbf498famr12432997ejc.65.1684834307654; Tue, 23
+ May 2023 02:31:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230523075331.32250-1-guoqing.jiang@linux.dev> <20230523075331.32250-8-guoqing.jiang@linux.dev>
-In-Reply-To: <20230523075331.32250-8-guoqing.jiang@linux.dev>
+References: <20230523075331.32250-1-guoqing.jiang@linux.dev> <20230523075331.32250-9-guoqing.jiang@linux.dev>
+In-Reply-To: <20230523075331.32250-9-guoqing.jiang@linux.dev>
 From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Tue, 23 May 2023 11:30:50 +0200
-Message-ID: <CAMGffEkqJgE-g5Z9_6JZE37=arJpkE4nEs+bERaauVck3399uw@mail.gmail.com>
-Subject: Re: [PATCH 07/10] block/rnbd-srv: init ret with 0 instead of -EPERM
+Date:   Tue, 23 May 2023 11:31:37 +0200
+Message-ID: <CAMGffEmMNMjK_t0gOsKphKYwVJXKKabiLqWL-DZrcqrfKd++CQ@mail.gmail.com>
+Subject: Re: [PATCH 08/10] block/rnbd-srv: init err earlier in rnbd_srv_init_module
 To:     Guoqing Jiang <guoqing.jiang@linux.dev>
 Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -65,65 +65,50 @@ X-Mailing-List: linux-block@vger.kernel.org
 On Tue, May 23, 2023 at 9:53=E2=80=AFAM Guoqing Jiang <guoqing.jiang@linux.=
 dev> wrote:
 >
-> Let's always set errno after pr_err which is consistent with
-> default case.
+> With this, we can remove several lines of code.
 >
 > Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 Acked-by: Jack Wang <jinpu.wang@ionos.com>
 > ---
->  drivers/block/rnbd/rnbd-srv.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  drivers/block/rnbd/rnbd-srv.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 >
 > diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.=
 c
-> index e51eb4b7f6e6..102831c302fc 100644
+> index 102831c302fc..1fdf3366135a 100644
 > --- a/drivers/block/rnbd/rnbd-srv.c
 > +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -463,34 +463,33 @@ static int rnbd_srv_check_update_open_perm(struct r=
-nbd_srv_dev *srv_dev,
->                                             struct rnbd_srv_session *srv_=
-sess,
->                                             enum rnbd_access_mode access_=
-mode)
+> @@ -803,7 +803,7 @@ static struct rtrs_srv_ctx *rtrs_ctx;
+>  static struct rtrs_srv_ops rtrs_ops;
+>  static int __init rnbd_srv_init_module(void)
 >  {
-> -       int ret =3D -EPERM;
-> +       int ret =3D 0;
+> -       int err;
+> +       int err =3D 0;
 >
->         mutex_lock(&srv_dev->lock);
+>         BUILD_BUG_ON(sizeof(struct rnbd_msg_hdr) !=3D 4);
+>         BUILD_BUG_ON(sizeof(struct rnbd_msg_sess_info) !=3D 36);
+> @@ -817,19 +817,17 @@ static int __init rnbd_srv_init_module(void)
+>         };
+>         rtrs_ctx =3D rtrs_srv_open(&rtrs_ops, port_nr);
+>         if (IS_ERR(rtrs_ctx)) {
+> -               err =3D PTR_ERR(rtrs_ctx);
+>                 pr_err("rtrs_srv_open(), err: %d\n", err);
+> -               return err;
+> +               return PTR_ERR(rtrs_ctx);
+>         }
 >
->         switch (access_mode) {
->         case RNBD_ACCESS_RO:
-> -               ret =3D 0;
->                 break;
->         case RNBD_ACCESS_RW:
->                 if (srv_dev->open_write_cnt =3D=3D 0)  {
->                         srv_dev->open_write_cnt++;
-> -                       ret =3D 0;
->                 } else {
->                         pr_err("Mapping device '%s' for session %s with R=
-W permissions failed. Device already opened as 'RW' by %d client(s), access=
- mode %s.\n",
->                                srv_dev->name, srv_sess->sessname,
->                                srv_dev->open_write_cnt,
->                                rnbd_access_modes[access_mode].str);
-> +                       ret =3D -EPERM;
->                 }
->                 break;
->         case RNBD_ACCESS_MIGRATION:
->                 if (srv_dev->open_write_cnt < 2) {
->                         srv_dev->open_write_cnt++;
-> -                       ret =3D 0;
->                 } else {
->                         pr_err("Mapping device '%s' for session %s with m=
-igration permissions failed. Device already opened as 'RW' by %d client(s),=
- access mode %s.\n",
->                                srv_dev->name, srv_sess->sessname,
->                                srv_dev->open_write_cnt,
->                                rnbd_access_modes[access_mode].str);
-> +                       ret =3D -EPERM;
->                 }
->                 break;
->         default:
+>         err =3D rnbd_srv_create_sysfs_files();
+>         if (err) {
+>                 pr_err("rnbd_srv_create_sysfs_files(), err: %d\n", err);
+>                 rtrs_srv_close(rtrs_ctx);
+> -               return err;
+>         }
+>
+> -       return 0;
+> +       return err;
+>  }
+>
+>  static void __exit rnbd_srv_cleanup_module(void)
 > --
 > 2.35.3
 >
