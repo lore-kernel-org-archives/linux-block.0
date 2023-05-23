@@ -2,41 +2,68 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2804C7EE23
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 06:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E8F7C77B75
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 06:40:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235240AbjEWGUZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 02:20:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59788 "EHLO
+        id S234983AbjEWGkB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 02:40:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235207AbjEWGUU (ORCPT
+        with ESMTP id S229606AbjEWGkA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 02:20:20 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8131E192;
-        Mon, 22 May 2023 23:20:09 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 75CB967373; Tue, 23 May 2023 08:20:03 +0200 (CEST)
-Date:   Tue, 23 May 2023 08:20:02 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     regressions@leemhuis.info, chengming.zhou@linux.dev, hch@lst.de,
-        axboe@kernel.dk, yukuai3@huawei.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: Re: [PATCH RESEND] blk-wbt: fix that wbt can't be disabled by
- default
-Message-ID: <20230523062002.GA6413@lst.de>
-References: <20230522121854.2928880-1-yukuai1@huaweicloud.com>
+        Tue, 23 May 2023 02:40:00 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B30EC119;
+        Mon, 22 May 2023 23:39:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Mhb2D8wxaUdoso9990IdDeANdXYgpQ6YKPHN0xOlZJI=; b=VajJCGfSR+AMMCU+kW3mWkdTex
+        PDTINv6I14VakgdsK3oi8rd8/pOgiQyDnEKAdnmFM+rJfuD7iPd1MV5kBsEZFb89GTYSk/YBr8NwP
+        2sHVcrDi3gvQlOJU2b6PZ3pFE+ZUDnblCuhSvIN+P/vJcE0x/D3XUzYvAdw0xT8IY5B/gs9ILXKyM
+        e4lmExxZOQXK2uHpddjK8X0F0W+LYs6KCveZ8cnkiTgoIkHBOl/B8XoN+u5KD7777UVAuVnvLtjGk
+        DUseUSJC9jwdHO+SlOiMmPmFbRKnaLphaekqtwqKm3QXPfdYoLXgsj+NS69JNua4FhardcqypLLlI
+        pZB31X3A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q1LgK-0096BI-31;
+        Tue, 23 May 2023 06:39:40 +0000
+Date:   Mon, 22 May 2023 23:39:40 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v21 0/6] block: Use page pinning
+Message-ID: <ZGxfrOLZ4aN9/MvE@infradead.org>
+References: <20230522205744.2825689-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230522121854.2928880-1-yukuai1@huaweicloud.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20230522205744.2825689-1-dhowells@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Mon, May 22, 2023 at 09:57:38PM +0100, David Howells wrote:
+> Hi Jens, Al, Christoph,
+> 
+> This patchset rolls page-pinning out to the bio struct and the block layer,
+> using iov_iter_extract_pages() to get pages and noting with BIO_PAGE_PINNED
+> if the data pages attached to a bio are pinned.  If the data pages come
+> from a non-user-backed iterator, then the pages are left unpinned and
+> unref'd, relying on whoever set up the I/O to do the retaining.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I think I already review the patches, so nothing new here.  But can
+you please also take care of the legacy direct I/O code?  I'd really
+hate to leave yet another unfinished transition around.
