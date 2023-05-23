@@ -2,18 +2,18 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C226C7EE29
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA20C7EE26
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 21:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238695AbjEWVrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 17:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39738 "EHLO
+        id S238693AbjEWVrM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 17:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238699AbjEWVrL (ORCPT
+        with ESMTP id S238695AbjEWVrK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 17:47:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2522D1A8
+        Tue, 23 May 2023 17:47:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9954311D
         for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
         s=mimecast20190719; t=1684878376;
@@ -21,47 +21,47 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9rLm7uhUe0e7M80o45H78QPWG8f4bfD+U06FJPEuCqI=;
-        b=hzvMhgY0XPsQYK41RE2xytL5MzbWMcwm9jxBqapFDgFRPZi1CpQ4zaJk0/E/g9XIq5nlnX
-        AD23Ax0eFHHndj6S6QK67PtnCt+NAszqEQCiETFyGpfE0GtI9NlDVTErxktLFT3xp/alQD
-        Eu7ILVDRCmqjrjTXCZAcVplcHhPMuLg=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=TNH7S9lsCmLhmM3sgolQL8geWgRp2frkI4JxrwjTmog=;
+        b=hpSOf4kPO67pSAstdhQiY7u5Ff1WxCAs8buk4F5TA5/Opw79WTZcnl0/aRaG6WYkHK8KvO
+        CuAiA6yzjgF2Hici8WaIdIHPzWuI4lXNCLN90ezD1KkqsjY7pNY1YNeeIPCqU6LexZ6IzH
+        PaHbWdj0vTjArRyLYDYPSN3FdspDzII=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-nELppP7PMN6wPAmtN3dyFg-1; Tue, 23 May 2023 17:46:14 -0400
-X-MC-Unique: nELppP7PMN6wPAmtN3dyFg-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-75b17aa340fso53962485a.3
+ us-mta-563-jwGp23xJO-aGeOwBrQWa4Q-1; Tue, 23 May 2023 17:46:14 -0400
+X-MC-Unique: jwGp23xJO-aGeOwBrQWa4Q-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-75b06a31daaso57263485a.2
         for <linux-block@vger.kernel.org>; Tue, 23 May 2023 14:46:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1684878374; x=1687470374;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9rLm7uhUe0e7M80o45H78QPWG8f4bfD+U06FJPEuCqI=;
-        b=JFMJnqG1CM66bK5J8J1Lq3j+U9DvGIVclyztIk+aTSwOPk97ZwBvslWsLAybyDu/fK
-         +5b5S88N5wBSp5RCncfwXMCtnNQQzMboOU9zK2tTP4cOCR9FYFiCsF3RsvyhR21oJ2HV
-         WyIudeSTIQxKzRp9xXP/6o6DWmVSDAypaP0n3jyJ3nDAHGwYA30SKDYpjhFQ2IBeNxlH
-         cvB4ir9e+ejA8AkSOn2NEQ8GOEo0CnUb5jcto74prSUGgG4/bkq/DCy1sILqphdZ54K2
-         BElbXMifGqcZ6g6dOscvVFg/MJtK3RT46+aBdDMmhSuN52nw6sp/cQuQJ8N/TTV3oeUe
-         QDVQ==
-X-Gm-Message-State: AC+VfDxmx2s5X8x+cddjycIV2SIU57b/Nww6B+r7j76cZZgRRkquH+ki
-        Fp4MoNS974O+rawkbnR3aUa3Rtkw9kO1Be+n3fuXzYFNBR18iQ3rq3ir/SivPy/bR16dMMZCpyU
-        gQDArPuNcN14VWnF4qA2JnJg=
-X-Received: by 2002:a05:620a:2232:b0:75b:23a1:462 with SMTP id n18-20020a05620a223200b0075b23a10462mr5252560qkh.40.1684878373974;
+        bh=TNH7S9lsCmLhmM3sgolQL8geWgRp2frkI4JxrwjTmog=;
+        b=XVrgPXbCcq8U62hutaiVGO0mjENBnM1uI6w3VxsH6H/+hjSeh6MmBKrVWTjbBeEV3C
+         VXtSUnYyTFQ0wG7he47kytw9LU75U3P/K/Z6if4DwfCO1Phvk1sfBouZkBkaIN4lURPs
+         dbdQdW5OaYLnI8lD/vBz3PhJAKRIFSfvGNH8e0oF8sG/xrUYVxKtLYO+JpcNM/0OBJ7t
+         7iY9ki1LVXL/lDFUN49c9dafPO0pZtbHeBsODFgcRPgq82PX6fKWLs9OUui4RGn9AP8b
+         ULHQP7ZMFEZOeRJbKbsPIyGIJzPsICMIzOuyU+SrwCYvUkGHPZMAQcE9coXxg8WukxT3
+         2xcw==
+X-Gm-Message-State: AC+VfDzwHuEKgPXBPhwMsENqxhVR4MAxlRFSvry44t/NnRUVHA+gExAJ
+        ygivShuEqJk7z6HDTMxamY9hfQXRj5MFShpp//BUQSmNae/sCSFdzqtRKoLjvX3CYIHvhk3aYaJ
+        mVkvEr2y/a5vQaX+OZvf9iDw=
+X-Received: by 2002:a37:63d0:0:b0:75b:23a0:deba with SMTP id x199-20020a3763d0000000b0075b23a0debamr5465507qkb.56.1684878373555;
         Tue, 23 May 2023 14:46:13 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5cy9zG9K/9o20xXiE2X6VeDD2OU+zYJhbl1AGmBd0Awg+lx+KJ+qT227A5czyY2yrzs/f86g==
-X-Received: by 2002:a05:620a:2232:b0:75b:23a1:462 with SMTP id n18-20020a05620a223200b0075b23a10462mr5252542qkh.40.1684878373537;
-        Tue, 23 May 2023 14:46:13 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7WzA1FKfIvowSoWv9o/MpzfgTziZI0x2LqLa61bZH/OtddA/F1c7TIQSagqgzvGMrllSFTNA==
+X-Received: by 2002:a37:63d0:0:b0:75b:23a0:deba with SMTP id x199-20020a3763d0000000b0075b23a0debamr5465471qkb.56.1684878372816;
+        Tue, 23 May 2023 14:46:12 -0700 (PDT)
 Received: from bf36-1.. (173-166-2-198-newengland.hfc.comcastbusiness.net. [173.166.2.198])
         by smtp.gmail.com with ESMTPSA id x3-20020ae9e903000000b007592af6fce6sm2234465qkf.43.2023.05.23.14.46.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 14:46:13 -0700 (PDT)
+        Tue, 23 May 2023 14:46:12 -0700 (PDT)
 From:   "J. corwin Coburn" <corwin@redhat.com>
 To:     dm-devel@redhat.com, linux-block@vger.kernel.org
 Cc:     vdo-devel@redhat.com, "J. corwin Coburn" <corwin@redhat.com>
-Subject: [PATCH v2 18/39] Add vio, the request object for vdo metadata.
-Date:   Tue, 23 May 2023 17:45:18 -0400
-Message-Id: <20230523214539.226387-19-corwin@redhat.com>
+Subject: [PATCH v2 17/39] Add administrative state and scheduling for vdo.
+Date:   Tue, 23 May 2023 17:45:17 -0400
+Message-Id: <20230523214539.226387-18-corwin@redhat.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230523214539.226387-1-corwin@redhat.com>
 References: <20230523214539.226387-1-corwin@redhat.com>
@@ -71,772 +71,1266 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This patch adds the admin_state structures which are used to track the
+states of individual vdo components for handling of operations like suspend
+and resume. It also adds the action manager which is used to schedule and
+manage cross-thread administrative and internal operations.
+
 Signed-off-by: J. corwin Coburn <corwin@redhat.com>
 ---
- drivers/md/dm-vdo/vio.c | 525 ++++++++++++++++++++++++++++++++++++++++
- drivers/md/dm-vdo/vio.h | 221 +++++++++++++++++
- 2 files changed, 746 insertions(+)
- create mode 100644 drivers/md/dm-vdo/vio.c
- create mode 100644 drivers/md/dm-vdo/vio.h
+ drivers/md/dm-vdo/action-manager.c | 410 +++++++++++++++++++++++
+ drivers/md/dm-vdo/action-manager.h | 117 +++++++
+ drivers/md/dm-vdo/admin-state.c    | 512 +++++++++++++++++++++++++++++
+ drivers/md/dm-vdo/admin-state.h    | 180 ++++++++++
+ 4 files changed, 1219 insertions(+)
+ create mode 100644 drivers/md/dm-vdo/action-manager.c
+ create mode 100644 drivers/md/dm-vdo/action-manager.h
+ create mode 100644 drivers/md/dm-vdo/admin-state.c
+ create mode 100644 drivers/md/dm-vdo/admin-state.h
 
-diff --git a/drivers/md/dm-vdo/vio.c b/drivers/md/dm-vdo/vio.c
+diff --git a/drivers/md/dm-vdo/action-manager.c b/drivers/md/dm-vdo/action-manager.c
 new file mode 100644
-index 00000000000..8c3bb0d67b6
+index 00000000000..76880677aaf
 --- /dev/null
-+++ b/drivers/md/dm-vdo/vio.c
-@@ -0,0 +1,525 @@
++++ b/drivers/md/dm-vdo/action-manager.c
+@@ -0,0 +1,410 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright Red Hat
 + */
 +
-+#include "vio.h"
++#include "action-manager.h"
 +
-+#include <linux/bio.h>
-+#include <linux/blkdev.h>
-+#include <linux/kernel.h>
-+#include <linux/ratelimit.h>
-+
-+#include "logger.h"
 +#include "memory-alloc.h"
 +#include "permassert.h"
 +
-+#include "constants.h"
-+#include "io-submitter.h"
++#include "admin-state.h"
++#include "completion.h"
++#include "status-codes.h"
++#include "types.h"
 +#include "vdo.h"
 +
-+/* A vio_pool is a collection of preallocated vios. */
-+struct vio_pool {
-+	/** The number of objects managed by the pool */
-+	size_t size;
-+	/** The list of objects which are available */
-+	struct list_head available;
-+	/** The queue of requestors waiting for objects from the pool */
-+	struct wait_queue waiting;
-+	/** The number of objects currently in use */
-+	size_t busy_count;
-+	/** The list of objects which are in use */
-+	struct list_head busy;
-+	/** The ID of the thread on which this pool may be used */
-+	thread_id_t thread_id;
-+	/** The buffer backing the pool's vios */
-+	char *buffer;
-+	/** The pool entries */
-+	struct pooled_vio vios[];
++/**
++ * struct action - An action to be performed in each of a set of zones.
++ * @in_use: Whether this structure is in use.
++ * @operation: The admin operation associated with this action.
++ * @preamble: The method to run on the initiator thread before the action is applied to each zone.
++ * @zone_action: The action to be performed in each zone.
++ * @conclusion: The method to run on the initiator thread after the action is applied to each zone.
++ * @parent: The object to notify when the action is complete.
++ * @context: The action specific context.
++ * @next: The action to perform after this one.
++ */
++struct action {
++	bool in_use;
++	const struct admin_state_code *operation;
++	vdo_action_preamble *preamble;
++	vdo_zone_action *zone_action;
++	vdo_action_conclusion *conclusion;
++	struct vdo_completion *parent;
++	void *context;
++	struct action *next;
 +};
 +
-+physical_block_number_t pbn_from_vio_bio(struct bio *bio)
-+{
-+	struct vio *vio = bio->bi_private;
-+	struct vdo *vdo = vio->completion.vdo;
-+	physical_block_number_t pbn = bio->bi_iter.bi_sector / VDO_SECTORS_PER_BLOCK;
++/**
++ * struct action_manager - Definition of an action manager.
++ * @completion: The completion for performing actions.
++ * @state: The state of this action manager.
++ * @actions: The two action slots.
++ * @current_action: The current action slot.
++ * @zones: The number of zones in which an action is to be applied.
++ * @Scheduler: A function to schedule a default next action.
++ * @get_zone_thread_id: A function to get the id of the thread on which to apply an action to a
++ *                      zone.
++ * @initiator_thread_id: The ID of the thread on which actions may be initiated.
++ * @context: Opaque data associated with this action manager.
++ * @acting_zone: The zone currently being acted upon.
++ */
++struct action_manager {
++	struct vdo_completion completion;
++	struct admin_state state;
++	struct action actions[2];
++	struct action *current_action;
++	zone_count_t zones;
++	vdo_action_scheduler *scheduler;
++	vdo_zone_thread_getter *get_zone_thread_id;
++	thread_id_t initiator_thread_id;
++	void *context;
++	zone_count_t acting_zone;
++};
 +
-+	return ((pbn == VDO_GEOMETRY_BLOCK_LOCATION) ? pbn : pbn + vdo->geometry.bio_offset);
++static inline struct action_manager *as_action_manager(struct vdo_completion *completion)
++{
++	vdo_assert_completion_type(completion, VDO_ACTION_COMPLETION);
++	return container_of(completion, struct action_manager, completion);
 +}
 +
-+static int create_multi_block_bio(block_count_t size, struct bio **bio_ptr)
++/* Implements vdo_action_scheduler. */
++static bool no_default_action(void *context __always_unused)
 +{
-+	struct bio *bio = NULL;
-+	int result;
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct bio, size + 1, struct bio_vec, "bio", &bio);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	*bio_ptr = bio;
-+	return VDO_SUCCESS;
++	return false;
 +}
 +
-+int vdo_create_bio(struct bio **bio_ptr)
++/* Implements vdo_action_preamble. */
++static void no_preamble(void *context __always_unused,
++			struct vdo_completion *completion)
 +{
-+	return create_multi_block_bio(1, bio_ptr);
++	vdo_finish_completion(completion);
 +}
 +
-+void vdo_free_bio(struct bio *bio)
++/* Implements vdo_action_conclusion. */
++static int no_conclusion(void *context __always_unused)
 +{
-+	if (bio == NULL)
-+		return;
-+
-+	bio_uninit(bio);
-+	UDS_FREE(UDS_FORGET(bio));
-+}
-+
-+int allocate_vio_components(struct vdo *vdo,
-+			    enum vio_type vio_type,
-+			    enum vio_priority priority,
-+			    void *parent,
-+			    unsigned int block_count,
-+			    char *data,
-+			    struct vio *vio)
-+{
-+	struct bio *bio;
-+	int result;
-+
-+	result = ASSERT(block_count <= MAX_BLOCKS_PER_VIO,
-+			"block count %u does not exceed maximum %u",
-+			block_count,
-+			MAX_BLOCKS_PER_VIO);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	result = ASSERT(((vio_type != VIO_TYPE_UNINITIALIZED) && (vio_type != VIO_TYPE_DATA)),
-+			"%d is a metadata type",
-+			vio_type);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	result = create_multi_block_bio(block_count, &bio);
-+	if (result != VDO_SUCCESS)
-+		return result;
-+
-+	initialize_vio(vio, bio, block_count, vio_type, priority, vdo);
-+	vio->completion.parent = parent;
-+	vio->data = data;
 +	return VDO_SUCCESS;
 +}
 +
 +/**
-+ * create_multi_block_metadata_vio() - Create a vio.
-+ * @vdo: The vdo on which the vio will operate.
-+ * @vio_type: The type of vio to create.
-+ * @priority: The relative priority to assign to the vio.
-+ * @parent: The parent of the vio.
-+ * @block_count: The size of the vio in blocks.
-+ * @data: The buffer.
-+ * @vio_ptr: A pointer to hold the new vio.
++ * vdo_make_action_manager() - Make an action manager.
++ * @zones: The number of zones to which actions will be applied.
++ * @get_zone_thread_id: A function to get the thread id associated with a zone.
++ * @initiator_thread_id: The thread on which actions may initiated.
++ * @context: The object which holds the per-zone context for the action.
++ * @scheduler: A function to schedule a next action after an action concludes if there is no
++ *             pending action (may be NULL).
++ * @vdo: The vdo used to initialize completions.
++ * @manager_ptr: A pointer to hold the new action manager.
 + *
-+ * Return: VDO_SUCCESS or an error.
++ * Return: VDO_SUCCESS or an error code.
 + */
-+int create_multi_block_metadata_vio(struct vdo *vdo,
-+				    enum vio_type vio_type,
-+				    enum vio_priority priority,
-+				    void *parent,
-+				    unsigned int block_count,
-+				    char *data,
-+				    struct vio **vio_ptr)
++int vdo_make_action_manager(zone_count_t zones,
++			    vdo_zone_thread_getter *get_zone_thread_id,
++			    thread_id_t initiator_thread_id,
++			    void *context,
++			    vdo_action_scheduler *scheduler,
++			    struct vdo *vdo,
++			    struct action_manager **manager_ptr)
 +{
-+	struct vio *vio;
-+	int result;
++	struct action_manager *manager;
++	int result = UDS_ALLOCATE(1, struct action_manager, __func__, &manager);
 +
-+	/* If struct vio grows past 256 bytes, we'll lose benefits of VDOSTORY-176. */
-+	STATIC_ASSERT(sizeof(struct vio) <= 256);
-+
-+	/*
-+	 * Metadata vios should use direct allocation and not use the buffer pool, which is
-+	 * reserved for submissions from the linux block layer.
-+	 */
-+	result = UDS_ALLOCATE(1, struct vio, __func__, &vio);
-+	if (result != VDO_SUCCESS) {
-+		uds_log_error("metadata vio allocation failure %d", result);
-+		return result;
-+	}
-+
-+	result = allocate_vio_components(vdo, vio_type, priority, parent, block_count, data, vio);
-+	if (result != VDO_SUCCESS) {
-+		UDS_FREE(vio);
-+		return result;
-+	}
-+
-+	*vio_ptr  = vio;
-+	return VDO_SUCCESS;
-+}
-+
-+/**
-+ * free_vio_components() - Free the components of a vio embedded in a larger structure.
-+ * @vio: The vio to destroy
-+ */
-+void free_vio_components(struct vio *vio)
-+{
-+	if (vio == NULL)
-+		return;
-+
-+	BUG_ON(is_data_vio(vio));
-+	vdo_free_bio(UDS_FORGET(vio->bio));
-+}
-+
-+/**
-+ * free_vio() - Destroy a vio.
-+ * @vio: The vio to destroy.
-+ */
-+void free_vio(struct vio *vio)
-+{
-+	free_vio_components(vio);
-+	UDS_FREE(vio);
-+}
-+
-+/* Set bio properties for a VDO read or write. */
-+void vdo_set_bio_properties(struct bio *bio,
-+			    struct vio *vio,
-+			    bio_end_io_t callback,
-+			    unsigned int bi_opf,
-+			    physical_block_number_t pbn)
-+{
-+	struct vdo *vdo = vio->completion.vdo;
-+	struct device_config *config = vdo->device_config;
-+
-+	pbn -= vdo->geometry.bio_offset;
-+	vio->bio_zone = ((pbn / config->thread_counts.bio_rotation_interval) %
-+			 config->thread_counts.bio_threads);
-+
-+	bio->bi_private = vio;
-+	bio->bi_end_io = callback;
-+	bio->bi_opf = bi_opf;
-+	bio->bi_iter.bi_sector = pbn * VDO_SECTORS_PER_BLOCK;
-+}
-+
-+/*
-+ * Prepares the bio to perform IO with the specified buffer. May only be used on a VDO-allocated
-+ * bio, as it assumes the bio wraps a 4k buffer that is 4k aligned, but there does not have to be a
-+ * vio associated with the bio.
-+ */
-+int vio_reset_bio(struct vio *vio,
-+		  char *data,
-+		  bio_end_io_t callback,
-+		  unsigned int bi_opf,
-+		  physical_block_number_t pbn)
-+{
-+	int bvec_count, offset, len, i;
-+	struct bio *bio = vio->bio;
-+
-+	bio_reset(bio, bio->bi_bdev, bi_opf);
-+	vdo_set_bio_properties(bio, vio, callback, bi_opf, pbn);
-+	if (data == NULL)
-+		return VDO_SUCCESS;
-+
-+	bio->bi_io_vec = bio->bi_inline_vecs;
-+	bio->bi_max_vecs = vio->block_count + 1;
-+	len = VDO_BLOCK_SIZE * vio->block_count;
-+	offset = offset_in_page(data);
-+	bvec_count = DIV_ROUND_UP(offset + len, PAGE_SIZE);
-+
-+	/*
-+	 * If we knew that data was always on one page, or contiguous pages, we wouldn't need the
-+	 * loop. But if we're using vmalloc, it's not impossible that the data is in different
-+	 * pages that can't be merged in bio_add_page...
-+	 */
-+	for (i = 0; (i < bvec_count) && (len > 0); i++) {
-+		struct page *page;
-+		int bytes_added;
-+		int bytes = PAGE_SIZE - offset;
-+
-+		if (bytes > len)
-+			bytes = len;
-+
-+		page = is_vmalloc_addr(data) ? vmalloc_to_page(data) : virt_to_page(data);
-+		bytes_added = bio_add_page(bio, page, bytes, offset);
-+
-+		if (bytes_added != bytes)
-+			return uds_log_error_strerror(VDO_BIO_CREATION_FAILED,
-+						      "Could only add %i bytes to bio",
-+						       bytes_added);
-+
-+		data += bytes;
-+		len -= bytes;
-+		offset = 0;
-+	}
-+
-+	return VDO_SUCCESS;
-+}
-+
-+/**
-+ * update_vio_error_stats() - Update per-vio error stats and log the error.
-+ * @vio: The vio which got an error.
-+ * @format: The format of the message to log (a printf style format).
-+ */
-+void update_vio_error_stats(struct vio *vio, const char *format, ...)
-+{
-+	static DEFINE_RATELIMIT_STATE(error_limiter,
-+				      DEFAULT_RATELIMIT_INTERVAL,
-+				      DEFAULT_RATELIMIT_BURST);
-+	va_list args;
-+	int priority;
-+	struct vdo *vdo = vio->completion.vdo;
-+
-+	switch (vio->completion.result) {
-+	case VDO_READ_ONLY:
-+		atomic64_inc(&vdo->stats.read_only_error_count);
-+		return;
-+
-+	case VDO_NO_SPACE:
-+		atomic64_inc(&vdo->stats.no_space_error_count);
-+		priority = UDS_LOG_DEBUG;
-+		break;
-+
-+	default:
-+		priority = UDS_LOG_ERR;
-+	}
-+
-+	if (!__ratelimit(&error_limiter))
-+		return;
-+
-+	va_start(args, format);
-+	uds_vlog_strerror(priority, vio->completion.result, UDS_LOGGING_MODULE_NAME, format, args);
-+	va_end(args);
-+}
-+
-+void vio_record_metadata_io_error(struct vio *vio)
-+{
-+	const char *description;
-+	physical_block_number_t pbn = pbn_from_vio_bio(vio->bio);
-+
-+	if (bio_op(vio->bio) == REQ_OP_READ)
-+		description = "read";
-+	else if ((vio->bio->bi_opf & REQ_PREFLUSH) == REQ_PREFLUSH)
-+		description = (((vio->bio->bi_opf & REQ_FUA) == REQ_FUA) ?
-+			       "write+preflush+fua" :
-+			       "write+preflush");
-+	else if ((vio->bio->bi_opf & REQ_FUA) == REQ_FUA)
-+		description = "write+fua";
-+	else
-+		description = "write";
-+
-+	update_vio_error_stats(vio,
-+			       "Completing %s vio of type %u for physical block %llu with error",
-+			       description,
-+			       vio->type,
-+			       (unsigned long long) pbn);
-+}
-+
-+/**
-+ * make_vio_pool() - Create a new vio pool.
-+ * @vdo: The vdo.
-+ * @pool_size: The number of vios in the pool.
-+ * @thread_id: The ID of the thread using this pool.
-+ * @vio_type: The type of vios in the pool.
-+ * @priority: The priority with which vios from the pool should be enqueued.
-+ * @context: The context that each entry will have.
-+ * @pool_ptr: The resulting pool.
-+ *
-+ * Return: A success or error code.
-+ */
-+int make_vio_pool(struct vdo *vdo,
-+		  size_t pool_size,
-+		  thread_id_t thread_id,
-+		  enum vio_type vio_type,
-+		  enum vio_priority priority,
-+		  void *context,
-+		  struct vio_pool **pool_ptr)
-+{
-+	struct vio_pool *pool;
-+	char *ptr;
-+	int result;
-+
-+	result = UDS_ALLOCATE_EXTENDED(struct vio_pool,
-+				       pool_size,
-+				       struct pooled_vio,
-+				       __func__,
-+				       &pool);
 +	if (result != VDO_SUCCESS)
 +		return result;
 +
-+	pool->thread_id = thread_id;
-+	INIT_LIST_HEAD(&pool->available);
-+	INIT_LIST_HEAD(&pool->busy);
++	*manager = (struct action_manager) {
++		.zones = zones,
++		.scheduler =
++			((scheduler == NULL) ? no_default_action : scheduler),
++		.get_zone_thread_id = get_zone_thread_id,
++		.initiator_thread_id = initiator_thread_id,
++		.context = context,
++	};
 +
-+	result = UDS_ALLOCATE(pool_size * VDO_BLOCK_SIZE, char, "VIO pool buffer", &pool->buffer);
-+	if (result != VDO_SUCCESS) {
-+		free_vio_pool(pool);
-+		return result;
-+	}
-+
-+	ptr = pool->buffer;
-+	for (pool->size = 0; pool->size < pool_size; pool->size++, ptr += VDO_BLOCK_SIZE) {
-+		struct pooled_vio *pooled = &pool->vios[pool->size];
-+
-+		result = allocate_vio_components(vdo,
-+						 vio_type,
-+						 priority,
-+						 NULL,
-+						 1,
-+						 ptr,
-+						 &pooled->vio);
-+		if (result != VDO_SUCCESS) {
-+			free_vio_pool(pool);
-+			return result;
-+		}
-+
-+		pooled->context = context;
-+		list_add_tail(&pooled->pool_entry, &pool->available);
-+	}
-+
-+	*pool_ptr = pool;
++	manager->actions[0].next = &manager->actions[1];
++	manager->current_action = manager->actions[1].next =
++		&manager->actions[0];
++	vdo_set_admin_state_code(&manager->state,
++				 VDO_ADMIN_STATE_NORMAL_OPERATION);
++	vdo_initialize_completion(&manager->completion, vdo,
++				  VDO_ACTION_COMPLETION);
++	*manager_ptr = manager;
 +	return VDO_SUCCESS;
 +}
 +
-+/**
-+ * free_vio_pool() - Destroy a vio pool.
-+ * @pool: The pool to free.
-+ */
-+void free_vio_pool(struct vio_pool *pool)
++const struct admin_state_code *vdo_get_current_manager_operation(struct action_manager *manager)
 +{
-+	struct pooled_vio *pooled, *tmp;
-+
-+	if (pool == NULL)
-+		return;
-+
-+	/* Remove all available vios from the object pool. */
-+	ASSERT_LOG_ONLY(!vdo_has_waiters(&pool->waiting),
-+			"VIO pool must not have any waiters when being freed");
-+	ASSERT_LOG_ONLY((pool->busy_count == 0),
-+			"VIO pool must not have %zu busy entries when being freed",
-+			pool->busy_count);
-+	ASSERT_LOG_ONLY(list_empty(&pool->busy),
-+			"VIO pool must not have busy entries when being freed");
-+
-+	list_for_each_entry_safe(pooled, tmp, &pool->available, pool_entry) {
-+		list_del(&pooled->pool_entry);
-+		free_vio_components(&pooled->vio);
-+		pool->size--;
-+	}
-+
-+	ASSERT_LOG_ONLY(pool->size == 0,
-+			"VIO pool must not have missing entries when being freed");
-+
-+	UDS_FREE(UDS_FORGET(pool->buffer));
-+	UDS_FREE(pool);
++	return vdo_get_admin_state_code(&manager->state);
 +}
 +
-+/**
-+ * is_vio_pool_busy() - Check whether an vio pool has outstanding entries.
-+ *
-+ * Return: true if the pool is busy.
-+ */
-+bool is_vio_pool_busy(struct vio_pool *pool)
++void *vdo_get_current_action_context(struct action_manager *manager)
 +{
-+	return (pool->busy_count != 0);
++	return manager->current_action->in_use ? manager->current_action->context : NULL;
 +}
 +
-+/**
-+ * acquire_vio_from_pool() - Acquire a vio and buffer from the pool (asynchronous).
-+ * @pool: The vio pool.
-+ * @waiter: Object that is requesting a vio.
-+ */
-+void acquire_vio_from_pool(struct vio_pool *pool, struct waiter *waiter)
++static void finish_action_callback(struct vdo_completion *completion);
++static void apply_to_zone(struct vdo_completion *completion);
++
++static thread_id_t get_acting_zone_thread_id(struct action_manager *manager)
 +{
-+	struct pooled_vio *pooled;
-+
-+	ASSERT_LOG_ONLY((pool->thread_id == vdo_get_callback_thread_id()),
-+			"acquire from active vio_pool called from correct thread");
-+
-+	if (list_empty(&pool->available)) {
-+		vdo_enqueue_waiter(&pool->waiting, waiter);
-+		return;
-+	}
-+
-+	pooled = list_first_entry(&pool->available, struct pooled_vio, pool_entry);
-+	pool->busy_count++;
-+	list_move_tail(&pooled->pool_entry, &pool->busy);
-+	(*waiter->callback)(waiter, pooled);
++	return manager->get_zone_thread_id(manager->context, manager->acting_zone);
 +}
 +
-+/**
-+ * return_vio_to_pool() - Return a vio to the pool
-+ * @pool: The vio pool.
-+ * @vio: The pooled vio to return.
-+ */
-+void return_vio_to_pool(struct vio_pool *pool, struct pooled_vio *vio)
++static void preserve_error(struct vdo_completion *completion)
 +{
-+	ASSERT_LOG_ONLY((pool->thread_id == vdo_get_callback_thread_id()),
-+			"vio pool entry returned on same thread as it was acquired");
++	if (completion->parent != NULL)
++		vdo_set_completion_result(completion->parent, completion->result);
 +
-+	vio->vio.completion.error_handler = NULL;
-+	vio->vio.completion.parent = NULL;
-+	if (vdo_has_waiters(&pool->waiting)) {
-+		vdo_notify_next_waiter(&pool->waiting, NULL, vio);
-+		return;
-+	}
-+
-+	list_move_tail(&vio->pool_entry, &pool->available);
-+	--pool->busy_count;
++	vdo_reset_completion(completion);
++	vdo_run_completion(completion);
 +}
 +
-+/*
-+ * Various counting functions for statistics.
-+ * These are used for bios coming into VDO, as well as bios generated by VDO.
-+ */
-+void vdo_count_bios(struct atomic_bio_stats *bio_stats, struct bio *bio)
++static void prepare_for_next_zone(struct action_manager *manager)
 +{
-+	if (((bio->bi_opf & REQ_PREFLUSH) != 0) && (bio->bi_iter.bi_size == 0)) {
-+		atomic64_inc(&bio_stats->empty_flush);
-+		atomic64_inc(&bio_stats->flush);
-+		return;
-+	}
++	vdo_prepare_completion_for_requeue(&manager->completion,
++					   apply_to_zone,
++					   preserve_error,
++					   get_acting_zone_thread_id(manager),
++					   manager->current_action->parent);
++}
 +
-+	switch (bio_op(bio)) {
-+	case REQ_OP_WRITE:
-+		atomic64_inc(&bio_stats->write);
-+		break;
-+	case REQ_OP_READ:
-+		atomic64_inc(&bio_stats->read);
-+		break;
-+	case REQ_OP_DISCARD:
-+		atomic64_inc(&bio_stats->discard);
-+		break;
++static void prepare_for_conclusion(struct action_manager *manager)
++{
++	vdo_prepare_completion_for_requeue(&manager->completion,
++					   finish_action_callback,
++					   preserve_error,
++					   manager->initiator_thread_id,
++					   manager->current_action->parent);
++}
++
++static void apply_to_zone(struct vdo_completion *completion)
++{
++	zone_count_t zone;
++	struct action_manager *manager = as_action_manager(completion);
++
++	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() == get_acting_zone_thread_id(manager)),
++			"%s() called on acting zones's thread",
++			__func__);
++
++	zone = manager->acting_zone++;
++	if (manager->acting_zone == manager->zones)
 +		/*
-+		 * All other operations are filtered out in dmvdo.c, or not created by VDO, so
-+		 * shouldn't exist.
++		 * We are about to apply to the last zone. Once that is finished, we're done, so go
++		 * back to the initiator thread and finish up.
 +		 */
-+	default:
-+		ASSERT_LOG_ONLY(0, "Bio operation %d not a write, read, discard, or empty flush",
-+				bio_op(bio));
-+	}
++		prepare_for_conclusion(manager);
++	else
++		/* Prepare to come back on the next zone */
++		prepare_for_next_zone(manager);
 +
-+	if ((bio->bi_opf & REQ_PREFLUSH) != 0)
-+		atomic64_inc(&bio_stats->flush);
-+	if (bio->bi_opf & REQ_FUA)
-+		atomic64_inc(&bio_stats->fua);
++	manager->current_action->zone_action(manager->context, zone, completion);
 +}
 +
-+static void count_all_bios_completed(struct vio *vio, struct bio *bio)
++static void handle_preamble_error(struct vdo_completion *completion)
 +{
-+	struct atomic_statistics *stats = &vio->completion.vdo->stats;
++	/* Skip the zone actions since the preamble failed. */
++	completion->callback = finish_action_callback;
++	preserve_error(completion);
++}
 +
-+	if (is_data_vio(vio)) {
-+		vdo_count_bios(&stats->bios_out_completed, bio);
++static void launch_current_action(struct action_manager *manager)
++{
++	struct action *action = manager->current_action;
++	int result = vdo_start_operation(&manager->state, action->operation);
++
++	if (result != VDO_SUCCESS) {
++		if (action->parent != NULL)
++			vdo_set_completion_result(action->parent, result);
++
++		/* We aren't going to run the preamble, so don't run the conclusion */
++		action->conclusion = no_conclusion;
++		finish_action_callback(&manager->completion);
 +		return;
 +	}
 +
-+	vdo_count_bios(&stats->bios_meta_completed, bio);
-+	if (vio->type == VIO_TYPE_RECOVERY_JOURNAL)
-+		vdo_count_bios(&stats->bios_journal_completed, bio);
-+	else if (vio->type == VIO_TYPE_BLOCK_MAP)
-+		vdo_count_bios(&stats->bios_page_cache_completed, bio);
++	if (action->zone_action == NULL) {
++		prepare_for_conclusion(manager);
++	} else {
++		manager->acting_zone = 0;
++		vdo_prepare_completion_for_requeue(&manager->completion,
++						   apply_to_zone,
++						   handle_preamble_error,
++						   get_acting_zone_thread_id(manager),
++						   manager->current_action->parent);
++	}
++
++	action->preamble(manager->context, &manager->completion);
 +}
 +
-+void vdo_count_completed_bios(struct bio *bio)
++/**
++ * vdo_schedule_default_action() - Attempt to schedule the default action.
++ * @manager: The action manager.
++ *
++ * If the manager is not operating normally, the action will not be scheduled.
++ *
++ * Return: true if an action was scheduled.
++ */
++bool vdo_schedule_default_action(struct action_manager *manager)
 +{
-+	struct vio *vio = (struct vio *) bio->bi_private;
++	/* Don't schedule a default action if we are operating or not in normal operation. */
++	const struct admin_state_code *code = vdo_get_current_manager_operation(manager);
 +
-+	atomic64_inc(&vio->completion.vdo->stats.bios_completed);
-+	count_all_bios_completed(vio, bio);
++	return ((code == VDO_ADMIN_STATE_NORMAL_OPERATION) &&
++		manager->scheduler(manager->context));
 +}
-diff --git a/drivers/md/dm-vdo/vio.h b/drivers/md/dm-vdo/vio.h
++
++static void finish_action_callback(struct vdo_completion *completion)
++{
++	bool has_next_action;
++	int result;
++	struct action_manager *manager = as_action_manager(completion);
++	struct action action = *(manager->current_action);
++
++	manager->current_action->in_use = false;
++	manager->current_action = manager->current_action->next;
++
++	/*
++	 * We need to check this now to avoid use-after-free issues if running the conclusion or
++	 * notifying the parent results in the manager being freed.
++	 */
++	has_next_action =
++		(manager->current_action->in_use || vdo_schedule_default_action(manager));
++	result = action.conclusion(manager->context);
++	vdo_finish_operation(&manager->state, VDO_SUCCESS);
++	if (action.parent != NULL)
++		vdo_continue_completion(action.parent, result);
++
++	if (has_next_action)
++		launch_current_action(manager);
++}
++
++/**
++ * vdo_schedule_action() - Schedule an action to be applied to all zones.
++ * @manager: The action manager to schedule the action on.
++ * @preamble: A method to be invoked on the initiator thread once this action is started but before
++ *            applying to each zone; may be NULL.
++ * @action: The action to apply to each zone; may be NULL.
++ * @conclusion: A method to be invoked back on the initiator thread once the action has been
++ *              applied to all zones; may be NULL.
++ * @parent: The object to notify once the action is complete or if the action can not be scheduled;
++ *          may be NULL.
++ *
++ * The action will be launched immediately if there is no current action, or as soon as the current
++ * action completes. If there is already a pending action, this action will not be scheduled, and,
++ * if it has a parent, that parent will be notified. At least one of the preamble, action, or
++ * conclusion must not be NULL.
++ *
++ * Return: true if the action was scheduled.
++ */
++bool vdo_schedule_action(struct action_manager *manager,
++			 vdo_action_preamble *preamble,
++			 vdo_zone_action *action,
++			 vdo_action_conclusion *conclusion,
++			 struct vdo_completion *parent)
++{
++	return vdo_schedule_operation(manager,
++				      VDO_ADMIN_STATE_OPERATING,
++				      preamble,
++				      action,
++				      conclusion,
++				      parent);
++}
++
++/**
++ * vdo_schedule_operation() - Schedule an operation to be applied to all zones.
++ * @manager: The action manager to schedule the action on.
++ * @operation: The operation this action will perform
++ * @preamble: A method to be invoked on the initiator thread once this action is started but before
++ *            applying to each zone; may be NULL.
++ * @action: The action to apply to each zone; may be NULL.
++ * @conclusion: A method to be invoked back on the initiator thread once the action has been
++ *              applied to all zones; may be NULL.
++ * @parent: The object to notify once the action is complete or if the action can not be scheduled;
++ *          may be NULL.
++ *
++ * The operation's action will be launched immediately if there is no current action, or as soon as
++ * the current action completes. If there is already a pending action, this operation will not be
++ * scheduled, and, if it has a parent, that parent will be notified. At least one of the preamble,
++ * action, or conclusion must not be NULL.
++ *
++ * Return: true if the action was scheduled.
++ */
++bool vdo_schedule_operation(struct action_manager *manager,
++			    const struct admin_state_code *operation,
++			    vdo_action_preamble *preamble,
++			    vdo_zone_action *action,
++			    vdo_action_conclusion *conclusion,
++			    struct vdo_completion *parent)
++{
++	return vdo_schedule_operation_with_context(manager,
++						   operation,
++						   preamble,
++						   action,
++						   conclusion,
++						   NULL,
++						   parent);
++}
++
++/**
++ * vdo_schedule_operation_with_context() - Schedule an operation on all zones.
++ * @manager: The action manager to schedule the action on.
++ * @operation: The operation this action will perform.
++ * @preamble: A method to be invoked on the initiator thread once this action is started but before
++ *            applying to each zone; may be NULL.
++ * @action: The action to apply to each zone; may be NULL.
++ * @conclusion: A method to be invoked back on the initiator thread once the action has been
++ *              applied to all zones; may be NULL.
++ * @context: An action-specific context which may be retrieved via
++ *           vdo_get_current_action_context(); may be NULL.
++ * @parent: The object to notify once the action is complete or if the action can not be scheduled;
++ *          may be NULL.
++ *
++ * The operation's action will be launched immediately if there is no current action, or as soon as
++ * the current action completes. If there is already a pending action, this operation will not be
++ * scheduled, and, if it has a parent, that parent will be notified. At least one of the preamble,
++ * action, or conclusion must not be NULL.
++ *
++ * Return: true if the action was scheduled
++ */
++bool vdo_schedule_operation_with_context(struct action_manager *manager,
++					 const struct admin_state_code *operation,
++					 vdo_action_preamble *preamble,
++					 vdo_zone_action *action,
++					 vdo_action_conclusion *conclusion,
++					 void *context,
++					 struct vdo_completion *parent)
++{
++	struct action *current_action;
++
++	ASSERT_LOG_ONLY((vdo_get_callback_thread_id() == manager->initiator_thread_id),
++			"action initiated from correct thread");
++	if (!manager->current_action->in_use) {
++		current_action = manager->current_action;
++	} else if (!manager->current_action->next->in_use) {
++		current_action = manager->current_action->next;
++	} else {
++		if (parent != NULL)
++			vdo_continue_completion(parent, VDO_COMPONENT_BUSY);
++
++		return false;
++	}
++
++	*current_action = (struct action) {
++		.in_use = true,
++		.operation = operation,
++		.preamble = (preamble == NULL) ? no_preamble : preamble,
++		.zone_action = action,
++		.conclusion = (conclusion == NULL) ? no_conclusion : conclusion,
++		.context = context,
++		.parent = parent,
++		.next = current_action->next,
++	};
++
++	if (current_action == manager->current_action)
++		launch_current_action(manager);
++
++	return true;
++}
+diff --git a/drivers/md/dm-vdo/action-manager.h b/drivers/md/dm-vdo/action-manager.h
 new file mode 100644
-index 00000000000..f39f568834e
+index 00000000000..da731fa5ddb
 --- /dev/null
-+++ b/drivers/md/dm-vdo/vio.h
-@@ -0,0 +1,221 @@
++++ b/drivers/md/dm-vdo/action-manager.h
+@@ -0,0 +1,117 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
 + * Copyright Red Hat
 + */
 +
-+#ifndef VIO_H
-+#define VIO_H
++#ifndef VDO_ACTION_MANAGER_H
++#define VDO_ACTION_MANAGER_H
 +
-+#include <linux/bio.h>
-+#include <linux/blkdev.h>
-+#include <linux/compiler.h>
-+#include <linux/kernel.h>
-+#include <linux/list.h>
++#include "admin-state.h"
++#include "types.h"
++
++/*
++ * An action_manager provides a generic mechanism for applying actions to multi-zone entities (such
++ * as the block map or slab depot). Each action manager is tied to a specific context for which it
++ * manages actions. The manager ensures that only one action is active on that context at a time,
++ * and supports at most one pending action. Calls to schedule an action when there is already a
++ * pending action will result in VDO_COMPONENT_BUSY errors. Actions may only be submitted to the
++ * action manager from a single thread (which thread is determined when the action manager is
++ * constructed).
++ *
++ * A scheduled action consists of four components:
++ *
++ *   preamble
++ *     an optional method to be run on the initiator thread before applying the action to all zones
++ *   zone_action
++ *     an optional method to be applied to each of the zones
++ *   conclusion
++ *     an optional method to be run on the initiator thread once the per-zone method has been
++ *     applied to all zones
++ *   parent
++ *     an optional completion to be finished once the conclusion is done
++ *
++ * At least one of the three methods must be provided.
++ */
++
++/*
++ * A function which is to be applied asynchronously to a set of zones.
++ * @context: The object which holds the per-zone context for the action
++ * @zone_number: The number of zone to which the action is being applied
++ * @parent: The object to notify when the action is complete
++ */
++typedef void vdo_zone_action(void *context,
++			     zone_count_t zone_number,
++			     struct vdo_completion *parent);
++
++/*
++ * A function which is to be applied asynchronously on an action manager's initiator thread as the
++ * preamble of an action.
++ * @context: The object which holds the per-zone context for the action
++ * @parent: The object to notify when the action is complete
++ */
++typedef void vdo_action_preamble(void *context, struct vdo_completion *parent);
++
++/*
++ * A function which will run on the action manager's initiator thread as the conclusion of an
++ * action.
++ * @context: The object which holds the per-zone context for the action
++ *
++ * Return: VDO_SUCCESS or an error
++ */
++typedef int vdo_action_conclusion(void *context);
++
++/*
++ * A function to schedule an action.
++ * @context: The object which holds the per-zone context for the action
++ *
++ * Return: true if an action was scheduled
++ */
++typedef bool vdo_action_scheduler(void *context);
++
++/*
++ * A function to get the id of the thread associated with a given zone.
++ * @context: The action context
++ * @zone_number: The number of the zone for which the thread ID is desired
++ */
++typedef thread_id_t vdo_zone_thread_getter(void *context, zone_count_t zone_number);
++
++struct action_manager;
++
++int __must_check
++vdo_make_action_manager(zone_count_t zones,
++			vdo_zone_thread_getter *get_zone_thread_id,
++			thread_id_t initiator_thread_id,
++			void *context,
++			vdo_action_scheduler *scheduler,
++			struct vdo *vdo,
++			struct action_manager **manager_ptr);
++
++const struct admin_state_code *__must_check
++vdo_get_current_manager_operation(struct action_manager *manager);
++
++void * __must_check vdo_get_current_action_context(struct action_manager *manager);
++
++bool vdo_schedule_default_action(struct action_manager *manager);
++
++bool vdo_schedule_action(struct action_manager *manager,
++			 vdo_action_preamble *preamble,
++			 vdo_zone_action *action,
++			 vdo_action_conclusion *conclusion,
++			 struct vdo_completion *parent);
++
++bool vdo_schedule_operation(struct action_manager *manager,
++			    const struct admin_state_code *operation,
++			    vdo_action_preamble *preamble,
++			    vdo_zone_action *action,
++			    vdo_action_conclusion *conclusion,
++			    struct vdo_completion *parent);
++
++bool vdo_schedule_operation_with_context(struct action_manager *manager,
++					 const struct admin_state_code *operation,
++					 vdo_action_preamble *preamble,
++					 vdo_zone_action *action,
++					 vdo_action_conclusion *conclusion,
++					 void *context,
++					 struct vdo_completion *parent);
++
++#endif /* VDO_ACTION_MANAGER_H */
+diff --git a/drivers/md/dm-vdo/admin-state.c b/drivers/md/dm-vdo/admin-state.c
+new file mode 100644
+index 00000000000..87cb0e28369
+--- /dev/null
++++ b/drivers/md/dm-vdo/admin-state.c
+@@ -0,0 +1,512 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright Red Hat
++ */
++
++#include "admin-state.h"
++
++#include "logger.h"
++#include "memory-alloc.h"
++#include "permassert.h"
 +
 +#include "completion.h"
-+#include "constants.h"
 +#include "types.h"
-+#include "vdo.h"
 +
-+enum {
-+	MAX_BLOCKS_PER_VIO = (BIO_MAX_VECS << PAGE_SHIFT) / VDO_BLOCK_SIZE,
++static const struct admin_state_code VDO_CODE_NORMAL_OPERATION = {
++	.name = "VDO_ADMIN_STATE_NORMAL_OPERATION",
++	.normal = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_NORMAL_OPERATION = &VDO_CODE_NORMAL_OPERATION;
++static const struct admin_state_code VDO_CODE_OPERATING = {
++	.name = "VDO_ADMIN_STATE_OPERATING",
++	.normal = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_OPERATING = &VDO_CODE_OPERATING;
++static const struct admin_state_code VDO_CODE_FORMATTING = {
++	.name = "VDO_ADMIN_STATE_FORMATTING",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_FORMATTING = &VDO_CODE_FORMATTING;
++static const struct admin_state_code VDO_CODE_PRE_LOADING = {
++	.name = "VDO_ADMIN_STATE_PRE_LOADING",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADING = &VDO_CODE_PRE_LOADING;
++static const struct admin_state_code VDO_CODE_PRE_LOADED = {
++	.name = "VDO_ADMIN_STATE_PRE_LOADED",
++};
++const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADED = &VDO_CODE_PRE_LOADED;
++static const struct admin_state_code VDO_CODE_LOADING = {
++	.name = "VDO_ADMIN_STATE_LOADING",
++	.normal = true,
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_LOADING = &VDO_CODE_LOADING;
++static const struct admin_state_code VDO_CODE_LOADING_FOR_RECOVERY = {
++	.name = "VDO_ADMIN_STATE_LOADING_FOR_RECOVERY",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_RECOVERY =
++	&VDO_CODE_LOADING_FOR_RECOVERY;
++static const struct admin_state_code VDO_CODE_LOADING_FOR_REBUILD = {
++	.name = "VDO_ADMIN_STATE_LOADING_FOR_REBUILD",
++	.operating = true,
++	.loading = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_REBUILD = &VDO_CODE_LOADING_FOR_REBUILD;
++static const struct admin_state_code VDO_CODE_WAITING_FOR_RECOVERY = {
++	.name = "VDO_ADMIN_STATE_WAITING_FOR_RECOVERY",
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_WAITING_FOR_RECOVERY =
++	&VDO_CODE_WAITING_FOR_RECOVERY;
++static const struct admin_state_code VDO_CODE_NEW = {
++	.name = "VDO_ADMIN_STATE_NEW",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_NEW = &VDO_CODE_NEW;
++static const struct admin_state_code VDO_CODE_INITIALIZED = {
++	.name = "VDO_ADMIN_STATE_INITIALIZED",
++};
++const struct admin_state_code *VDO_ADMIN_STATE_INITIALIZED = &VDO_CODE_INITIALIZED;
++static const struct admin_state_code VDO_CODE_RECOVERING = {
++	.name = "VDO_ADMIN_STATE_RECOVERING",
++	.draining = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_RECOVERING = &VDO_CODE_RECOVERING;
++static const struct admin_state_code VDO_CODE_REBUILDING = {
++	.name = "VDO_ADMIN_STATE_REBUILDING",
++	.draining = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_REBUILDING = &VDO_CODE_REBUILDING;
++static const struct admin_state_code VDO_CODE_SAVING = {
++	.name = "VDO_ADMIN_STATE_SAVING",
++	.draining = true,
++	.quiescing = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SAVING = &VDO_CODE_SAVING;
++static const struct admin_state_code VDO_CODE_SAVED = {
++	.name = "VDO_ADMIN_STATE_SAVED",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SAVED = &VDO_CODE_SAVED;
++static const struct admin_state_code VDO_CODE_SCRUBBING = {
++	.name = "VDO_ADMIN_STATE_SCRUBBING",
++	.draining = true,
++	.loading = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SCRUBBING = &VDO_CODE_SCRUBBING;
++static const struct admin_state_code VDO_CODE_SAVE_FOR_SCRUBBING = {
++	.name = "VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING",
++	.draining = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING = &VDO_CODE_SAVE_FOR_SCRUBBING;
++static const struct admin_state_code VDO_CODE_STOPPING = {
++	.name = "VDO_ADMIN_STATE_STOPPING",
++	.draining = true,
++	.quiescing = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_STOPPING = &VDO_CODE_STOPPING;
++static const struct admin_state_code VDO_CODE_STOPPED = {
++	.name = "VDO_ADMIN_STATE_STOPPED",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_STOPPED = &VDO_CODE_STOPPED;
++static const struct admin_state_code VDO_CODE_SUSPENDING = {
++	.name = "VDO_ADMIN_STATE_SUSPENDING",
++	.draining = true,
++	.quiescing = true,
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDING = &VDO_CODE_SUSPENDING;
++static const struct admin_state_code VDO_CODE_SUSPENDED = {
++	.name = "VDO_ADMIN_STATE_SUSPENDED",
++	.quiescent = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED = &VDO_CODE_SUSPENDED;
++static const struct admin_state_code VDO_CODE_SUSPENDED_OPERATION = {
++	.name = "VDO_ADMIN_STATE_SUSPENDED_OPERATION",
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED_OPERATION = &VDO_CODE_SUSPENDED_OPERATION;
++static const struct admin_state_code VDO_CODE_RESUMING = {
++	.name = "VDO_ADMIN_STATE_RESUMING",
++	.operating = true,
++};
++const struct admin_state_code *VDO_ADMIN_STATE_RESUMING = &VDO_CODE_RESUMING;
++
++/**
++ * get_next_state() - Determine the state which should be set after a given operation completes
++ *                    based on the operation and the current state.
++ * @operation The operation to be started.
++ *
++ * Return: The state to set when the operation completes or NULL if the operation can not be
++ *         started in the current state.
++ */
++static const struct admin_state_code *
++get_next_state(const struct admin_state *state, const struct admin_state_code *operation)
++{
++	const struct admin_state_code *code = vdo_get_admin_state_code(state);
++
++	if (code->operating)
++		return NULL;
++
++	if (operation == VDO_ADMIN_STATE_SAVING)
++		return (code == VDO_ADMIN_STATE_NORMAL_OPERATION ? VDO_ADMIN_STATE_SAVED : NULL);
++
++	if (operation == VDO_ADMIN_STATE_SUSPENDING)
++		return (code == VDO_ADMIN_STATE_NORMAL_OPERATION
++			? VDO_ADMIN_STATE_SUSPENDED
++			: NULL);
++
++	if (operation == VDO_ADMIN_STATE_STOPPING)
++		return (code == VDO_ADMIN_STATE_NORMAL_OPERATION ? VDO_ADMIN_STATE_STOPPED : NULL);
++
++	if (operation == VDO_ADMIN_STATE_PRE_LOADING)
++		return (code == VDO_ADMIN_STATE_INITIALIZED ? VDO_ADMIN_STATE_PRE_LOADED : NULL);
++
++	if (operation == VDO_ADMIN_STATE_SUSPENDED_OPERATION)
++		return (((code == VDO_ADMIN_STATE_SUSPENDED) ||
++			 (code == VDO_ADMIN_STATE_SAVED)) ? code : NULL);
++
++	return VDO_ADMIN_STATE_NORMAL_OPERATION;
++}
++
++/**
++ * vdo_finish_operation() - Finish the current operation.
++ *
++ * Will notify the operation waiter if there is one. This method should be used for operations
++ * started with vdo_start_operation(). For operations which were started with vdo_start_draining(),
++ * use vdo_finish_draining() instead.
++ *
++ * Return: true if there was an operation to finish.
++ */
++bool vdo_finish_operation(struct admin_state *state, int result)
++{
++	if (!vdo_get_admin_state_code(state)->operating)
++		return false;
++
++	state->complete = state->starting;
++	if (state->waiter != NULL)
++		vdo_set_completion_result(state->waiter, result);
++
++	if (!state->starting) {
++		vdo_set_admin_state_code(state, state->next_state);
++		if (state->waiter != NULL)
++			vdo_launch_completion(UDS_FORGET(state->waiter));
++	}
++
++	return true;
++}
++
++/**
++ * begin_operation() - Begin an operation if it may be started given the current state.
++ * @waiter A completion to notify when the operation is complete; may be NULL.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: VDO_SUCCESS or an error.
++ */
++static int __must_check begin_operation(struct admin_state *state,
++					const struct admin_state_code *operation,
++					struct vdo_completion *waiter,
++					vdo_admin_initiator *initiator)
++{
++	int result;
++	const struct admin_state_code *next_state = get_next_state(state, operation);
++
++	if (next_state == NULL) {
++		result = uds_log_error_strerror(VDO_INVALID_ADMIN_STATE,
++						"Can't start %s from %s",
++						operation->name,
++						vdo_get_admin_state_code(state)->name);
++	} else if (state->waiter != NULL) {
++		result = uds_log_error_strerror(VDO_COMPONENT_BUSY,
++						"Can't start %s with extant waiter",
++						operation->name);
++	} else {
++		state->waiter = waiter;
++		state->next_state = next_state;
++		vdo_set_admin_state_code(state, operation);
++		if (initiator != NULL) {
++			state->starting = true;
++			initiator(state);
++			state->starting = false;
++			if (state->complete)
++				vdo_finish_operation(state, VDO_SUCCESS);
++		}
++
++		return VDO_SUCCESS;
++	}
++
++	if (waiter != NULL)
++		vdo_continue_completion(waiter, result);
++
++	return result;
++}
++
++/**
++ * start_operation() - Start an operation if it may be started given the current state.
++ * @waiter     A completion to notify when the operation is complete.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the operation was started.
++ */
++static inline bool __must_check start_operation(struct admin_state *state,
++						const struct admin_state_code *operation,
++						struct vdo_completion *waiter,
++						vdo_admin_initiator *initiator)
++{
++	return (begin_operation(state, operation, waiter, initiator) == VDO_SUCCESS);
++}
++
++/**
++ * check_code() - Check the result of a state validation.
++ * @valid true if the code is of an appropriate type.
++ * @code The code which failed to be of the correct type.
++ * @what What the code failed to be, for logging.
++ * @waiter The completion to notify of the error; may be NULL.
++ *
++ * If the result failed, log an invalid state error and, if there is a waiter, notify it.
++ *
++ * Return: The result of the check.
++ */
++static bool check_code(bool valid,
++		       const struct admin_state_code *code,
++		       const char *what,
++		       struct vdo_completion *waiter)
++{
++	int result;
++
++	if (valid)
++		return true;
++
++	result = uds_log_error_strerror(VDO_INVALID_ADMIN_STATE,
++					"%s is not a %s", code->name, what);
++	if (waiter != NULL)
++		vdo_continue_completion(waiter, result);
++
++	return false;
++}
++
++/**
++ * vdo_drain_operation() - Check that an operation is a drain.
++ * @waiter The completion to finish with an error if the operation is not a drain.
++ *
++ * Return: true if the specified operation is a drain.
++ */
++static bool __must_check
++assert_vdo_drain_operation(const struct admin_state_code *operation, struct vdo_completion *waiter)
++{
++	return check_code(operation->draining, operation, "drain operation", waiter);
++}
++
++/**
++ * vdo_start_draining() - Initiate a drain operation if the current state permits it.
++ * @operation The type of drain to initiate.
++ * @waiter The completion to notify when the drain is complete.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the drain was initiated, if not the waiter will be notified.
++ */
++bool vdo_start_draining(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator *initiator)
++{
++	const struct admin_state_code *code = vdo_get_admin_state_code(state);
++
++	if (!assert_vdo_drain_operation(operation, waiter))
++		return false;
++
++	if (code->quiescent) {
++		vdo_launch_completion(waiter);
++		return false;
++	}
++
++	if (!code->normal) {
++		uds_log_error_strerror(VDO_INVALID_ADMIN_STATE,
++				       "can't start %s from %s",
++				       operation->name,
++				       code->name);
++		vdo_continue_completion(waiter, VDO_INVALID_ADMIN_STATE);
++		return false;
++	}
++
++	return start_operation(state, operation, waiter, initiator);
++}
++
++/**
++ * vdo_finish_draining() - Finish a drain operation if one was in progress.
++ *
++ * Return: true if the state was draining; will notify the waiter if so.
++ */
++bool vdo_finish_draining(struct admin_state *state)
++{
++	return vdo_finish_draining_with_result(state, VDO_SUCCESS);
++}
++
++/**
++ * vdo_finish_draining_with_result() - Finish a drain operation with a status code.
++ *
++ * Return: true if the state was draining; will notify the waiter if so.
++ */
++bool vdo_finish_draining_with_result(struct admin_state *state, int result)
++{
++	return (vdo_is_state_draining(state) && vdo_finish_operation(state, result));
++}
++
++/**
++ * vdo_assert_load_operation() - Check that an operation is a load.
++ * @waiter The completion to finish with an error if the operation is not a load.
++ *
++ * Return: true if the specified operation is a load.
++ */
++bool vdo_assert_load_operation(const struct admin_state_code *operation,
++			       struct vdo_completion *waiter)
++{
++	return check_code(operation->loading, operation, "load operation", waiter);
++}
++
++/**
++ * vdo_start_loading() - Initiate a load operation if the current state permits it.
++ * @operation The type of load to initiate.
++ * @waiter The completion to notify when the load is complete (may be NULL).
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the load was initiated, if not the waiter will be notified.
++ */
++bool vdo_start_loading(struct admin_state *state,
++		       const struct admin_state_code *operation,
++		       struct vdo_completion *waiter,
++		       vdo_admin_initiator *initiator)
++{
++	return (vdo_assert_load_operation(operation, waiter) &&
++		start_operation(state, operation, waiter, initiator));
++}
++
++/**
++ * vdo_finish_loading() - Finish a load operation if one was in progress.
++ *
++ * Return: true if the state was loading; will notify the waiter if so.
++ */
++bool vdo_finish_loading(struct admin_state *state)
++{
++	return vdo_finish_loading_with_result(state, VDO_SUCCESS);
++}
++
++/**
++ * vdo_finish_loading_with_result() - Finish a load operation with a status code.
++ * @result The result of the load operation.
++ *
++ * Return: true if the state was loading; will notify the waiter if so.
++ */
++bool vdo_finish_loading_with_result(struct admin_state *state, int result)
++{
++	return (vdo_is_state_loading(state) && vdo_finish_operation(state, result));
++}
++
++/**
++ * assert_vdo_resume_operation() - Check whether an admin_state_code is a resume operation.
++ * @waiter The completion to notify if the operation is not a resume operation; may be NULL.
++ *
++ * Return: true if the code is a resume operation.
++ */
++static bool __must_check assert_vdo_resume_operation(const struct admin_state_code *operation,
++						     struct vdo_completion *waiter)
++{
++	return check_code(operation == VDO_ADMIN_STATE_RESUMING,
++			  operation,
++			  "resume operation",
++			  waiter);
++}
++
++/**
++ * vdo_start_resuming() - Initiate a resume operation if the current state permits it.
++ * @operation The type of resume to start.
++ * @waiter The completion to notify when the resume is complete (may be NULL).
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: true if the resume was initiated, if not the waiter will be notified.
++ */
++bool vdo_start_resuming(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator *initiator)
++{
++	return (assert_vdo_resume_operation(operation, waiter) &&
++		start_operation(state, operation, waiter, initiator));
++}
++
++/**
++ * vdo_finish_resuming() - Finish a resume operation if one was in progress.
++ *
++ * Return: true if the state was resuming; will notify the waiter if so.
++ */
++bool vdo_finish_resuming(struct admin_state *state)
++{
++	return vdo_finish_resuming_with_result(state, VDO_SUCCESS);
++}
++
++/**
++ * vdo_finish_resuming_with_result() - Finish a resume operation with a status code.
++ * @result The result of the resume operation.
++ *
++ * Return: true if the state was resuming; will notify the waiter if so.
++ */
++bool vdo_finish_resuming_with_result(struct admin_state *state, int result)
++{
++	return (vdo_is_state_resuming(state) && vdo_finish_operation(state, result));
++}
++
++/**
++ * vdo_resume_if_quiescent() - Change the state to normal operation if the current state is
++ *                             quiescent.
++ *
++ * Return: VDO_SUCCESS if the state resumed, VDO_INVALID_ADMIN_STATE otherwise.
++ */
++int vdo_resume_if_quiescent(struct admin_state *state)
++{
++	if (!vdo_is_state_quiescent(state))
++		return VDO_INVALID_ADMIN_STATE;
++
++	vdo_set_admin_state_code(state, VDO_ADMIN_STATE_NORMAL_OPERATION);
++	return VDO_SUCCESS;
++}
++
++/**
++ * vdo_start_operation() - Attempt to start an operation.
++ *
++ * Return: VDO_SUCCESS if the operation was started, VDO_INVALID_ADMIN_STATE if not
++ */
++int vdo_start_operation(struct admin_state *state, const struct admin_state_code *operation)
++{
++	return vdo_start_operation_with_waiter(state, operation, NULL, NULL);
++}
++
++/**
++ * vdo_start_operation_with_waiter() - Attempt to start an operation.
++ * @waiter the completion to notify when the operation completes or fails to start; may be NULL.
++ * @initiator The vdo_admin_initiator to call if the operation may begin; may be NULL.
++ *
++ * Return: VDO_SUCCESS if the operation was started, VDO_INVALID_ADMIN_STATE if not
++ */
++int vdo_start_operation_with_waiter(struct admin_state *state,
++				    const struct admin_state_code *operation,
++				    struct vdo_completion *waiter,
++				    vdo_admin_initiator *initiator)
++{
++	return (check_code(operation->operating, operation, "operation", waiter) ?
++		begin_operation(state, operation, waiter, initiator) :
++		VDO_INVALID_ADMIN_STATE);
++}
+diff --git a/drivers/md/dm-vdo/admin-state.h b/drivers/md/dm-vdo/admin-state.h
+new file mode 100644
+index 00000000000..925211a8a76
+--- /dev/null
++++ b/drivers/md/dm-vdo/admin-state.h
+@@ -0,0 +1,180 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright Red Hat
++ */
++
++#ifndef VDO_ADMIN_STATE_H
++#define VDO_ADMIN_STATE_H
++
++#include "completion.h"
++#include "types.h"
++
++struct admin_state_code {
++	const char *name;
++	/* Normal operation, data_vios may be active */
++	bool normal;
++	/* I/O is draining, new requests should not start */
++	bool draining;
++	/* This is a startup time operation */
++	bool loading;
++	/* The next state will be quiescent */
++	bool quiescing;
++	/* The VDO is quiescent, there should be no I/O */
++	bool quiescent;
++	/* Whether an operation is in progress and so no other operation may be started */
++	bool operating;
 +};
 +
-+struct pooled_vio {
-+	/* The underlying vio */
-+	struct vio vio;
-+	/* The list entry for chaining pooled vios together */
-+	struct list_head list_entry;
-+	/* The context set by the pool */
-+	void *context;
-+	/* The list entry used by the pool */
-+	struct list_head pool_entry;
++extern const struct admin_state_code *VDO_ADMIN_STATE_NORMAL_OPERATION;
++extern const struct admin_state_code *VDO_ADMIN_STATE_OPERATING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_FORMATTING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_PRE_LOADED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_LOADING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_RECOVERY;
++extern const struct admin_state_code *VDO_ADMIN_STATE_LOADING_FOR_REBUILD;
++extern const struct admin_state_code *VDO_ADMIN_STATE_WAITING_FOR_RECOVERY;
++extern const struct admin_state_code *VDO_ADMIN_STATE_NEW;
++extern const struct admin_state_code *VDO_ADMIN_STATE_INITIALIZED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_RECOVERING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_REBUILDING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SAVING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SAVED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SCRUBBING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SAVE_FOR_SCRUBBING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_STOPPING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_STOPPED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDING;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED;
++extern const struct admin_state_code *VDO_ADMIN_STATE_SUSPENDED_OPERATION;
++extern const struct admin_state_code *VDO_ADMIN_STATE_RESUMING;
++
++struct admin_state {
++	const struct admin_state_code *current_state;
++	/* The next administrative state (when the current operation finishes) */
++	const struct admin_state_code *next_state;
++	/* A completion waiting on a state change */
++	struct vdo_completion *waiter;
++	/* Whether an operation is being initiated */
++	bool starting;
++	/* Whether an operation has completed in the initiator */
++	bool complete;
 +};
 +
 +/**
-+ * as_vio() - Convert a generic vdo_completion to a vio.
-+ * @completion: The completion to convert.
++ * typedef vdo_admin_initiator - A method to be called once an admin operation may be initiated.
++ */
++typedef void vdo_admin_initiator(struct admin_state *state);
++
++static inline const struct admin_state_code * __must_check
++vdo_get_admin_state_code(const struct admin_state *state)
++{
++	return READ_ONCE(state->current_state);
++}
++
++/**
++ * vdo_set_admin_state_code() - Set the current admin state code.
 + *
-+ * Return: The completion as a vio.
++ * This function should be used primarily for initialization and by adminState internals. Most uses
++ * should go through the operation interfaces.
 + */
-+static inline struct vio *as_vio(struct vdo_completion *completion)
++static inline void
++vdo_set_admin_state_code(struct admin_state *state, const struct admin_state_code *code)
 +{
-+	vdo_assert_completion_type(completion, VIO_COMPLETION);
-+	return container_of(completion, struct vio, completion);
++	WRITE_ONCE(state->current_state, code);
 +}
 +
-+/**
-+ * get_vio_bio_zone_thread_id() - Get the thread id of the bio zone in which a vio should submit
-+ *                                its I/O.
-+ * @vio: The vio.
-+ *
-+ * Return: The id of the bio zone thread the vio should use.
-+ */
-+static inline thread_id_t __must_check get_vio_bio_zone_thread_id(struct vio *vio)
++static inline bool __must_check vdo_is_state_normal(const struct admin_state *state)
 +{
-+	return vio->completion.vdo->thread_config.bio_threads[vio->bio_zone];
++	return vdo_get_admin_state_code(state)->normal;
 +}
 +
-+physical_block_number_t __must_check pbn_from_vio_bio(struct bio *bio);
-+
-+/**
-+ * assert_vio_in_bio_zone() - Check that a vio is running on the correct thread for its bio zone.
-+ * @vio: The vio to check.
-+ */
-+static inline void assert_vio_in_bio_zone(struct vio *vio)
++static inline bool __must_check vdo_is_state_suspending(const struct admin_state *state)
 +{
-+	thread_id_t expected = get_vio_bio_zone_thread_id(vio);
-+	thread_id_t thread_id = vdo_get_callback_thread_id();
-+
-+	ASSERT_LOG_ONLY((expected == thread_id),
-+			"vio I/O for physical block %llu on thread %u, should be on bio zone thread %u",
-+			(unsigned long long) pbn_from_vio_bio(vio->bio),
-+			thread_id,
-+			expected);
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_SUSPENDING);
 +}
 +
-+int vdo_create_bio(struct bio **bio_ptr);
-+void vdo_free_bio(struct bio *bio);
-+int allocate_vio_components(struct vdo *vdo,
-+			    enum vio_type vio_type,
-+			    enum vio_priority priority,
-+			    void *parent,
-+			    unsigned int block_count,
-+			    char *data,
-+			    struct vio *vio);
-+int __must_check create_multi_block_metadata_vio(struct vdo *vdo,
-+						 enum vio_type vio_type,
-+						 enum vio_priority priority,
-+						 void *parent,
-+						 unsigned int block_count,
-+						 char *data,
-+						 struct vio **vio_ptr);
-+
-+static inline int __must_check
-+create_metadata_vio(struct vdo *vdo,
-+		    enum vio_type vio_type,
-+		    enum vio_priority priority,
-+		    void *parent,
-+		    char *data,
-+		    struct vio **vio_ptr)
++static inline bool __must_check vdo_is_state_saving(const struct admin_state *state)
 +{
-+	return create_multi_block_metadata_vio(vdo, vio_type, priority, parent, 1, data, vio_ptr);
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_SAVING);
 +}
 +
-+void free_vio_components(struct vio *vio);
-+void free_vio(struct vio *vio);
-+
-+/**
-+ * initialize_vio() - Initialize a vio.
-+ * @vio: The vio to initialize.
-+ * @bio: The bio this vio should use for its I/O.
-+ * @block_count: The size of this vio in vdo blocks.
-+ * @vio_type: The vio type.
-+ * @priority: The relative priority of the vio.
-+ * @vdo: The vdo for this vio.
-+ */
-+static inline void initialize_vio(struct vio *vio,
-+				  struct bio *bio,
-+				  unsigned int block_count,
-+				  enum vio_type vio_type,
-+				  enum vio_priority priority,
-+				  struct vdo *vdo)
++static inline bool __must_check vdo_is_state_saved(const struct admin_state *state)
 +{
-+	/* data_vio's may not span multiple blocks */
-+	BUG_ON((vio_type == VIO_TYPE_DATA) && (block_count != 1));
-+
-+	vio->bio = bio;
-+	vio->block_count = block_count;
-+	vio->type = vio_type;
-+	vio->priority = priority;
-+	vdo_initialize_completion(&vio->completion, vdo, VIO_COMPLETION);
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_SAVED);
 +}
 +
-+void vdo_set_bio_properties(struct bio *bio,
-+			    struct vio *vio,
-+			    bio_end_io_t callback,
-+			    unsigned int bi_opf,
-+			    physical_block_number_t pbn);
-+
-+int vio_reset_bio(struct vio *vio,
-+		  char *data,
-+		  bio_end_io_t callback,
-+		  unsigned int bi_opf,
-+		  physical_block_number_t pbn);
-+
-+void update_vio_error_stats(struct vio *vio, const char *format, ...)
-+	__printf(2, 3);
-+
-+/**
-+ * is_data_vio() - Check whether a vio is servicing an external data request.
-+ * @vio: The vio to check.
-+ */
-+static inline bool is_data_vio(struct vio *vio)
++static inline bool __must_check vdo_is_state_draining(const struct admin_state *state)
 +{
-+	return (vio->type == VIO_TYPE_DATA);
++	return vdo_get_admin_state_code(state)->draining;
 +}
 +
-+/**
-+ * get_metadata_priority() - Convert a vio's priority to a work item priority.
-+ * @vio: The vio.
-+ *
-+ * Return: The priority with which to submit the vio's bio.
-+ */
-+static inline enum vdo_completion_priority get_metadata_priority(struct vio *vio)
++static inline bool __must_check vdo_is_state_loading(const struct admin_state *state)
 +{
-+	return ((vio->priority == VIO_PRIORITY_HIGH) ?
-+		BIO_Q_HIGH_PRIORITY :
-+		BIO_Q_METADATA_PRIORITY);
++	return vdo_get_admin_state_code(state)->loading;
 +}
 +
-+/**
-+ * continue_vio() - Enqueue a vio to run its next callback.
-+ * @vio: The vio to continue.
-+ *
-+ * Return: The result of the current operation.
-+ */
-+static inline void continue_vio(struct vio *vio, int result)
++static inline bool __must_check vdo_is_state_resuming(const struct admin_state *state)
 +{
-+	if (unlikely(result != VDO_SUCCESS))
-+		vdo_set_completion_result(&vio->completion, result);
-+
-+	vdo_enqueue_completion(&vio->completion, VDO_WORK_Q_DEFAULT_PRIORITY);
++	return (vdo_get_admin_state_code(state) == VDO_ADMIN_STATE_RESUMING);
 +}
 +
-+void vdo_count_bios(struct atomic_bio_stats *bio_stats, struct bio *bio);
-+void vdo_count_completed_bios(struct bio *bio);
-+
-+/**
-+ * continue_vio_after_io() - Continue a vio now that its I/O has returned.
-+ */
-+static inline void continue_vio_after_io(struct vio *vio, vdo_action *callback, thread_id_t thread)
++static inline bool __must_check vdo_is_state_clean_load(const struct admin_state *state)
 +{
-+	vdo_count_completed_bios(vio->bio);
-+	vdo_set_completion_callback(&vio->completion, callback, thread);
-+	continue_vio(vio, blk_status_to_errno(vio->bio->bi_status));
++	const struct admin_state_code *code = vdo_get_admin_state_code(state);
++
++	return ((code == VDO_ADMIN_STATE_FORMATTING) || (code == VDO_ADMIN_STATE_LOADING));
 +}
 +
-+void vio_record_metadata_io_error(struct vio *vio);
-+
-+/* A vio_pool is a collection of preallocated vios used to write arbitrary metadata blocks. */
-+
-+static inline struct pooled_vio *vio_as_pooled_vio(struct vio *vio)
++static inline bool __must_check vdo_is_state_quiescing(const struct admin_state *state)
 +{
-+	return container_of(vio, struct pooled_vio, vio);
++	return vdo_get_admin_state_code(state)->quiescing;
 +}
 +
-+struct vio_pool;
++static inline bool __must_check vdo_is_state_quiescent(const struct admin_state *state)
++{
++	return vdo_get_admin_state_code(state)->quiescent;
++}
 +
-+int __must_check make_vio_pool(struct vdo *vdo,
-+			       size_t pool_size,
-+			       thread_id_t thread_id,
-+			       enum vio_type vio_type,
-+			       enum vio_priority priority,
-+			       void *context,
-+			       struct vio_pool **pool_ptr);
-+void free_vio_pool(struct vio_pool *pool);
-+bool __must_check is_vio_pool_busy(struct vio_pool *pool);
-+void acquire_vio_from_pool(struct vio_pool *pool, struct waiter *waiter);
-+void return_vio_to_pool(struct vio_pool *pool, struct pooled_vio *vio);
++bool vdo_start_draining(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator * initiator);
 +
-+#endif /* VIO_H */
++bool vdo_finish_draining(struct admin_state *state);
++
++bool vdo_finish_draining_with_result(struct admin_state *state, int result);
++
++bool __must_check
++vdo_assert_load_operation(const struct admin_state_code *operation, struct vdo_completion *waiter);
++
++bool vdo_start_loading(struct admin_state *state,
++		       const struct admin_state_code *operation,
++		       struct vdo_completion *waiter,
++		       vdo_admin_initiator *initiator);
++
++bool vdo_finish_loading(struct admin_state *state);
++
++bool vdo_finish_loading_with_result(struct admin_state *state, int result);
++
++bool vdo_start_resuming(struct admin_state *state,
++			const struct admin_state_code *operation,
++			struct vdo_completion *waiter,
++			vdo_admin_initiator *initiator);
++
++bool vdo_finish_resuming(struct admin_state *state);
++
++bool vdo_finish_resuming_with_result(struct admin_state *state, int result);
++
++int vdo_resume_if_quiescent(struct admin_state *state);
++
++int vdo_start_operation(struct admin_state *state, const struct admin_state_code *operation);
++
++int vdo_start_operation_with_waiter(struct admin_state *state,
++				    const struct admin_state_code *operation,
++				    struct vdo_completion *waiter,
++				    vdo_admin_initiator *initiator);
++
++bool vdo_finish_operation(struct admin_state *state, int result);
++
++#endif /* VDO_ADMIN_STATE_H */
 -- 
 2.40.1
 
