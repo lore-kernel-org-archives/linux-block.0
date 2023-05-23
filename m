@@ -2,119 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0187CC7EE26
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 18:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA01C7EE26
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 19:35:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238122AbjEWSho convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 14:37:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43070 "EHLO
+        id S237906AbjEWTfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 15:35:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237928AbjEWShf (ORCPT
+        with ESMTP id S238361AbjEWTfn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 14:37:35 -0400
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA13018B;
-        Tue, 23 May 2023 11:37:20 -0700 (PDT)
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-94f9cd65b1aso108858166b.0;
-        Tue, 23 May 2023 11:37:20 -0700 (PDT)
+        Tue, 23 May 2023 15:35:43 -0400
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D51AE42
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 12:35:20 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-64d24136685so194262b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 12:35:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684867022; x=1687459022;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FOckud4CsGpi42vHzY/iN1xEHfyZzu8tYLlnQmf3XXU=;
-        b=lPIgigwZ11iBv8vgKFH9/Ir3BNZpyjgySuC1i1WFp3quETnbhTdcsMvkIczDcTNYXs
-         Pd/Z8dqB3bXIgfzQEQ2gaCjus3zjd2VQpsCl3e28JeeWkdo2jchb8a3ch7rE1EVwV+Er
-         +mnJ9B4tkQA43cmK/bai/cAhBdGZvaBg82H3mUtr96fkuiW28UO2N8i6Vp6b+r09xNpe
-         9OJvJ6pUihSJAalsJ9NV5vCB+z4UPZ8H3dkRG1JHzjEG7MGk9n88r/BiFrzw5bz9fjs/
-         BSeEEf0KexWhWQYPpncR+Sxk+z026FBT8tq9RdQyg4GZpNXBAsddQPYlrcqAR89whnfV
-         K2Ag==
-X-Gm-Message-State: AC+VfDxukIGenn0F+ZJeCtjC39DSnGkh4hpB0K4wMr7pAMkiOkl3qwdV
-        OtfdQUgRPGCsKQ9egjDQ59DGRpmOYlloeHGjcaw=
-X-Google-Smtp-Source: ACHHUZ6nbFDPqkJycDJLopbKTUzhoYKAgpRsCSCy+ygpw6i+jItGXHdrxW/6BlRArGGvUIQ7qUgo8pqVVYhtrNaQv8U=
-X-Received: by 2002:a17:906:6495:b0:966:2210:4065 with SMTP id
- e21-20020a170906649500b0096622104065mr14890560ejm.4.1684867022285; Tue, 23
- May 2023 11:37:02 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1684870480; x=1687462480;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l56aD8/mdRLQCsrjMlRAQbntAbaQFCPQZG8LTFt9CKM=;
+        b=hP4+ZKGO9+n5dfz87iJmRx6sg2LZ4rt2RXLrdxOEqY88XX1UNE9YGctHUve45eP2bV
+         OmUrtNYVk5ajR9HD0b5yDkGcAC2oAbu9s6vA31syg9XJXM9q1hh5KT2jyVcFHHdFWyiM
+         88JKk/kKfwEvu/D9KNQzfDHgEAMDNXRGyYVQuGft/66swMYq+17Ke6t/dKI/Ff3UwB9D
+         ztEMLy8gYkj4DmFZ+77aFD5VknuLkK7ah+tp3jazN5IwXrdYt7qmAF46PO4jcnwwsEDU
+         T5N45I8Q2ARCuOG+3h9Cf4ZrncpaFjsr+5chuimYwvAg/hiiSUzImqWKi7JXdEmzhJXp
+         yttg==
+X-Gm-Message-State: AC+VfDw2Cr0bSuPhb9ABbrL9SleZ/9wZAVqJYHratXFcDuf5+8R6CgzB
+        JstR7fWh8MsIvPDA4uo7Gf8=
+X-Google-Smtp-Source: ACHHUZ7UPUZuvX3h97y1lfsHKbn4xiQw2Xs3hhS2dTZpMGB4g5j06Q80R48wmJOuIJ6Z/iYa9Ht3Zw==
+X-Received: by 2002:a05:6a00:4294:b0:64d:2a87:2596 with SMTP id bx20-20020a056a00429400b0064d2a872596mr75322pfb.10.1684870480359;
+        Tue, 23 May 2023 12:34:40 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:24d2:69cd:ef9a:8f83? ([2620:15c:211:201:24d2:69cd:ef9a:8f83])
+        by smtp.gmail.com with ESMTPSA id a20-20020aa780d4000000b005e0699464e3sm6119514pfn.206.2023.05.23.12.34.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 May 2023 12:34:39 -0700 (PDT)
+Message-ID: <41dd1a93-2491-a094-dc61-f424b51af6cb@acm.org>
+Date:   Tue, 23 May 2023 12:34:38 -0700
 MIME-Version: 1.0
-References: <20230523074535.249802-1-hch@lst.de> <20230523074535.249802-22-hch@lst.de>
-In-Reply-To: <20230523074535.249802-22-hch@lst.de>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Tue, 23 May 2023 20:36:51 +0200
-Message-ID: <CAJZ5v0grAY02dx__4=ezxT=HuPU=2gD6bErV2fYTQiv5mRL1yg@mail.gmail.com>
-Subject: Re: [PATCH 21/24] PM: hibernate: don't use early_lookup_bdev in resume_store
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v3 4/7] block: Make it easier to debug zoned write
+ reordering
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Mike Snitzer <snitzer@kernel.org>,
-        Joern Engel <joern@lazybastard.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Damien Le Moal <dlemoal@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20230522183845.354920-1-bvanassche@acm.org>
+ <20230522183845.354920-5-bvanassche@acm.org> <20230523071957.GD8758@lst.de>
+Content-Language: en-US
+In-Reply-To: <20230523071957.GD8758@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 23, 2023 at 9:46 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> resume_store is a sysfs attribute written during normal kernel runtime,
-> and it should not use the early_lookup_bdev API that bypasses all normal
-> path based permission checking, and might cause problems with certain
-> container environments renaming devices.
->
-> Switch to lookup_bdev, which does a normal path lookup instead, and fall
-> back to trying to parse a numeric dev_t just like early_lookup_bdev did.
->
-> Note that this strictly speaking changes the kernel ABI as the PARTUUID=
-> and PARTLABEL= style syntax is now not available during a running
-> systems.  They never were intended for that, but this breaks things
-> we'll have to figure out a way to make them available again.  But if
-> avoidable in any way I'd rather avoid that.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Fixes: 421a5fa1a6cf ("PM / hibernate: use name_to_dev_t to parse resume")
+On 5/23/23 00:19, Christoph Hellwig wrote:
+> On Mon, May 22, 2023 at 11:38:39AM -0700, Bart Van Assche wrote:
+>> @@ -2429,6 +2429,9 @@ static void blk_mq_request_bypass_insert(struct request *rq, blk_insert_t flags)
+>>   {
+>>   	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+>>   
+>> +	WARN_ON_ONCE(rq->rq_flags & RQF_USE_SCHED &&
+>> +		     blk_rq_is_seq_zoned_write(rq));
+>> +
+>>   	spin_lock(&hctx->lock);
+>>   	if (flags & BLK_MQ_INSERT_AT_HEAD)
+>>   		list_add(&rq->queuelist, &hctx->dispatch);
+>> @@ -2562,6 +2565,9 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>>   	};
+>>   	blk_status_t ret;
+>>   
+>> +	WARN_ON_ONCE(rq->rq_flags & RQF_USE_SCHED &&
+>> +		     blk_rq_is_seq_zoned_write(rq));
+> 
+> What makes sequential writes here special vs other requests that are
+> supposed to be using the scheduler and not a bypass?
 
-Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+Hi Christoph,
 
-> ---
->  kernel/power/hibernate.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
-> index c52dedb9f7c8e8..7ae95ec72f9902 100644
-> --- a/kernel/power/hibernate.c
-> +++ b/kernel/power/hibernate.c
-> @@ -1178,7 +1178,23 @@ static ssize_t resume_store(struct kobject *kobj, struct kobj_attribute *attr,
->         if (!name)
->                 return -ENOMEM;
->
-> -       error = early_lookup_bdev(name, &dev);
-> +       error = lookup_bdev(name, &dev);
-> +       if (error) {
-> +               unsigned maj, min, offset;
-> +               char *p, dummy;
-> +
-> +               if (sscanf(name, "%u:%u%c", &maj, &min, &dummy) == 2 ||
-> +                   sscanf(name, "%u:%u:%u:%c", &maj, &min, &offset,
-> +                               &dummy) == 3) {
-> +                       dev = MKDEV(maj, min);
-> +                       if (maj != MAJOR(dev) || min != MINOR(dev))
-> +                               error = -EINVAL;
-> +               } else {
-> +                       dev = new_decode_dev(simple_strtoul(name, &p, 16));
-> +                       if (*p)
-> +                               error = -EINVAL;
-> +               }
-> +       }
->         kfree(name);
->         if (error)
->                 return error;
-> --
-> 2.39.2
->
+If some REQ_OP_WRITE or REQ_OP_WRITE_ZEROES requests are submitted to 
+the I/O scheduler and others bypass the I/O scheduler this may lead to 
+reordering. Hence this patch that triggers a kernel warning if any 
+REQ_OP_WRITE or REQ_OP_WRITE_ZEROES requests bypass the I/O scheduler.
+
+Thanks,
+
+Bart.
