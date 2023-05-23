@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AE4C77B75
-	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC49C7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 23 May 2023 09:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235947AbjEWJUE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 05:20:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47772 "EHLO
+        id S235978AbjEWJUZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 05:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236397AbjEWJT6 (ORCPT
+        with ESMTP id S235892AbjEWJUX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 05:19:58 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 334E494
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:19:57 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-510dabb39aeso961857a12.2
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:19:57 -0700 (PDT)
+        Tue, 23 May 2023 05:20:23 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E10DF119
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:20:22 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-513fd8cc029so1128309a12.3
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 02:20:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1684833594; x=1687425594;
+        d=ionos.com; s=google; t=1684833621; x=1687425621;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=njheqMAnz+SnwPmcBRKc1PFPVJwj65Fa0AvgXdZcxWs=;
-        b=adTbGgwErcfrw1aZe4skLHB2SCE/6DklAZ7bF0dAODmzYIo95fxnNH7GACk1p7KYSD
-         xtdmV/B7R7szCKd/i4kg3sN7ASsyRII9XaO70doOKWNvtIMcUYUY6xWzUvbb5VH718LM
-         6o0X74iXxYWcG0XTeZywoGY0EitsdlIRDfUYiIn4+aAOTtDrZw75CAgBEOpijEEXlD5c
-         BEuytOEn167xGLVtyCQbRouzZrpT8Oii7U0UsSGKe4o4SVAjAv3M04GOyakZav/rMzOj
-         Wb0faBuLOIeLQf5CcSqbh6Hv0vgVMDtR4wHAdYlp9wPuYLBDAAhdkrcTc1YYkpK3pSvq
-         YWGA==
+        bh=9bK4TElReJ3YKJ3ZdWw6wZ85r+hNjfaIPn3ExnrZXFA=;
+        b=HcrEs5N9VzR3QYHKqiEHuv6poBMT9BltdU3QGGTSBeIm9lSDVOuGHMuZBrf0NSd2xk
+         ApRRo1bkbUU+hHgnaQBKzaFtoGDepm9uJlQBYC8tceaVDYGODSvz1BB8Stab1DrC9ogh
+         5dBw0MKs30+mqUP+4CeiIjZaE/o79IQub0etxIrDs9dabjBIjtlm05v2nsY+QtLYsPMc
+         VpsiQsjfgEdCqM6FfZ4UQ+V0gBPmlOHrj7IsC4GggfKoR9JhHomyG2pLYp2paC16pw0B
+         PyJ7BeCkh4TdpopOMgYhSi9WfgXuqdRbMUs8k5ieiI91HI0gIjCoj6sOUCfcswJuPJDh
+         pkJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684833594; x=1687425594;
+        d=1e100.net; s=20221208; t=1684833621; x=1687425621;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=njheqMAnz+SnwPmcBRKc1PFPVJwj65Fa0AvgXdZcxWs=;
-        b=CH1emBKeacN7992Z2UOWJQhTwSMPNaWM4jYQLaAzHuwUbU5b5SKwXTniU3vmar12T4
-         K2kWcVyuUYjBphqB7bUxr+0qjKLi2oPfmFmLONJ8aBP27zEeOjmw5qe2T8rWjAGxlTAk
-         DWiUYQpvRKUnMd636krbQKL3Nin6EpapUi4QS/4xpLHQA3qGd/hwJxYT7pWW0ejqz434
-         l4SfIA9bKQHc4V9VVkWzIVMbFmBq+fwEtUX9318cMGAFi8d7+wCgguXsa0hWIJztMki1
-         5+P4l+IaaifvovOx91RsXXWXM54J3uY8+W6yKCFJZfIDLULM/6C8DoUPdlW1lKrbcljh
-         bEiQ==
-X-Gm-Message-State: AC+VfDwo5uyR+bOGjPF2OipD2MSohf7NbXd2hEr5Lb5C/nJuVKI667OF
-        ieEV2UUXSXFZzR82BZsnNCTas+TQgFP66Ju9EqB8nw==
-X-Google-Smtp-Source: ACHHUZ4fat3E0b6plQXKtzhpf9RySfGD33/ADSaT2YOd2etoXN2WnEYMw/VEMvFaztA4m2nAqs4lcZ8FBUFltXt8eiE=
-X-Received: by 2002:aa7:ca5a:0:b0:50b:f72f:adf8 with SMTP id
- j26-20020aa7ca5a000000b0050bf72fadf8mr11323491edt.21.1684833594550; Tue, 23
- May 2023 02:19:54 -0700 (PDT)
+        bh=9bK4TElReJ3YKJ3ZdWw6wZ85r+hNjfaIPn3ExnrZXFA=;
+        b=VpDLOhf9Sb1UoHiSEGQsna89ZU2udy6NcADHFiX2FTdXgnUnwTnL0RRBcaDWmYuYe3
+         /wPqtE9JNDg0qzxUvmDWa6Zv0ws8JakAKGgWtxV9lxSP+kSc0lXuj70SzTH3xNg4XgPn
+         gMEMsCvvm2pL9cYWrDc2NsuOxoJ5ebnXbZk70J56eU9rGLd0Tz1BuxhqY7cV9DyD5F+r
+         Vkgn4jTIvme6080uHN0XAVfLfg+JWMmbXvTXml2ZpDi8/1du9W/TPa3l+drNl5JtciOh
+         AwucHQ4sffKZZvS00Saa8kiUU52b7+OkyS8sjx3ohT4aLt3nqcMN+jOrXVjQHXJ70lHy
+         CE1Q==
+X-Gm-Message-State: AC+VfDzINIFiJLS/QQmuVfFXbD1zBXNlChKr+cQpCpgC/dTdTUtktu5l
+        ekvIhPsCKSaNUqtAaVBwnCHNMQfRUpVIaz2+m0ayDjX3E+jscPBs
+X-Google-Smtp-Source: ACHHUZ6Rh0dfN05WJ55ibORHDPJxuFa1c41q79Xg/sJTIsULf5nyHdwGaApCxNKZPEyYUVpGdcpdTGEIKwKKwHIZCbc=
+X-Received: by 2002:aa7:dcd4:0:b0:50d:9f1b:db7c with SMTP id
+ w20-20020aa7dcd4000000b0050d9f1bdb7cmr11155660edu.0.1684833621299; Tue, 23
+ May 2023 02:20:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230523075331.32250-1-guoqing.jiang@linux.dev> <20230523075331.32250-2-guoqing.jiang@linux.dev>
-In-Reply-To: <20230523075331.32250-2-guoqing.jiang@linux.dev>
+References: <20230523075331.32250-1-guoqing.jiang@linux.dev> <20230523075331.32250-3-guoqing.jiang@linux.dev>
+In-Reply-To: <20230523075331.32250-3-guoqing.jiang@linux.dev>
 From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Tue, 23 May 2023 11:19:43 +0200
-Message-ID: <CAMGffEm-COASh5Tgrp2tjpOyDjtmf64WvvjvYPW+H-+88Cw+yA@mail.gmail.com>
-Subject: Re: [PATCH 01/10] block/rnbd: kill rnbd_flags_supported
+Date:   Tue, 23 May 2023 11:20:10 +0200
+Message-ID: <CAMGffEk4s4aY8pPaOMKYv3O6T=wixtuFBbvrvHh98H6XW23kng@mail.gmail.com>
+Subject: Re: [PATCH 02/10] block/rnbd-srv: remove unused header
 To:     Guoqing Jiang <guoqing.jiang@linux.dev>
 Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -65,67 +65,28 @@ X-Mailing-List: linux-block@vger.kernel.org
 On Tue, May 23, 2023 at 9:53=E2=80=AFAM Guoqing Jiang <guoqing.jiang@linux.=
 dev> wrote:
 >
-> This routine is not called since added. Then the two flags
-> (RNBD_OP_LAST and RNBD_F_ALL) can be removed too after kill
-> rnbd_flags_supported.
+> No need to include it since none of macros in limits.h are
+> used by rnbd-srv.
 >
 > Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 Acked-by: Jack Wang <jinpu.wang@ionos.com>
 > ---
->  drivers/block/rnbd/rnbd-proto.h | 22 ----------------------
->  1 file changed, 22 deletions(-)
+>  drivers/block/rnbd/rnbd-srv-sysfs.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-pr=
-oto.h
-> index da1d0542d7e2..84fd69844b7d 100644
-> --- a/drivers/block/rnbd/rnbd-proto.h
-> +++ b/drivers/block/rnbd/rnbd-proto.h
-> @@ -185,7 +185,6 @@ struct rnbd_msg_io {
->  enum rnbd_io_flags {
+> diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnb=
+d-srv-sysfs.c
+> index d5d9267e1fa5..9fe7d9e0ab63 100644
+> --- a/drivers/block/rnbd/rnbd-srv-sysfs.c
+> +++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
+> @@ -9,7 +9,6 @@
+>  #undef pr_fmt
+>  #define pr_fmt(fmt) KBUILD_MODNAME " L" __stringify(__LINE__) ": " fmt
 >
->         /* Operations */
-> -
->         RNBD_OP_READ            =3D 0,
->         RNBD_OP_WRITE           =3D 1,
->         RNBD_OP_FLUSH           =3D 2,
-> @@ -193,15 +192,9 @@ enum rnbd_io_flags {
->         RNBD_OP_SECURE_ERASE    =3D 4,
->         RNBD_OP_WRITE_SAME      =3D 5,
->
-> -       RNBD_OP_LAST,
-> -
->         /* Flags */
-> -
->         RNBD_F_SYNC  =3D 1<<(RNBD_OP_BITS + 0),
->         RNBD_F_FUA   =3D 1<<(RNBD_OP_BITS + 1),
-> -
-> -       RNBD_F_ALL   =3D (RNBD_F_SYNC | RNBD_F_FUA)
-> -
->  };
->
->  static inline u32 rnbd_op(u32 flags)
-> @@ -214,21 +207,6 @@ static inline u32 rnbd_flags(u32 flags)
->         return flags & ~RNBD_OP_MASK;
->  }
->
-> -static inline bool rnbd_flags_supported(u32 flags)
-> -{
-> -       u32 op;
-> -
-> -       op =3D rnbd_op(flags);
-> -       flags =3D rnbd_flags(flags);
-> -
-> -       if (op >=3D RNBD_OP_LAST)
-> -               return false;
-> -       if (flags & ~RNBD_F_ALL)
-> -               return false;
-> -
-> -       return true;
-> -}
-> -
->  static inline blk_opf_t rnbd_to_bio_flags(u32 rnbd_opf)
->  {
->         blk_opf_t bio_opf;
+> -#include <uapi/linux/limits.h>
+>  #include <linux/kobject.h>
+>  #include <linux/sysfs.h>
+>  #include <linux/stat.h>
 > --
 > 2.35.3
 >
