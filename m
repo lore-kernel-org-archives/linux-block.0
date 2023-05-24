@@ -2,84 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB85FC7EE32
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 07:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED627C77B7A
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 07:36:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239998AbjEXHMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 03:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49060 "EHLO
+        id S239494AbjEXHgw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 03:36:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239829AbjEXHLu (ORCPT
+        with ESMTP id S239972AbjEXHgv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 03:11:50 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4624C1700
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 00:09:26 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-96f50e26b8bso85925866b.2
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 00:09:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1684912157; x=1687504157;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=MB0PkgtOYu2DAciIYbJ/doyhq3ZdSDKw62DeZCSSPtg=;
-        b=FYCG0I0xG/KCzcPeRgfWGhFKBLQH8yo4Mb+b3h/3/MNGJYaOJxYFefWYzCbWzDOLJ5
-         GslHMTl4heaZuqXTEmqMZYV3JWjK8Zt4w+vYkPylVmw2imfly3Tp8dcGkm97OVZ15gac
-         hO02Kope0eh3dNS3sBBKR4sYeiW7mzVKy2JdY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684912157; x=1687504157;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MB0PkgtOYu2DAciIYbJ/doyhq3ZdSDKw62DeZCSSPtg=;
-        b=QMx6GNhoSdlamChAlji+kf3QqnAYR4tCMTTe0ZJRrpdw3YXSSZB9FKoxNd8BpwTVbp
-         xZNns0RbHI5Ja9PaWMfOEcewB2oDnQXwd+yGMniJBP0Uj4tNgpa6uELiAojtIWFAA3Os
-         v/f7RZYeZInUU1ulTOYRypSA+2UgwgqvVc8AIgx9JWG6ib0Gbb2bQmVPotITjlu+pccg
-         l5jkFRlot2OfsyYJEoJeHT7YYGgN7P0jG6WLAaqzDnD5ohLtJwuFcZ44pwZOrL+CrCJA
-         tLTu9YHo+JJm6+pM/+KdbHXY4IyStyUjlTLE6LeISyr1zS4hUPz/F2Rb7LbElIwonaui
-         CQHg==
-X-Gm-Message-State: AC+VfDwtmKhkRvBxKouAtjhaFS4iH2DpZdVGscgZoyJ3zeYXs6e+E5HU
-        JzVBVKpJaJp1A6TfZ790ee9C1wD6APJJYFQjYGwECQ==
-X-Google-Smtp-Source: ACHHUZ4OvyrYEQkEUfZSmUZD5S0dixYDveppalH3smz8YjXbgWTLCqDqGb6U6n7MopqEkuxUiQE5XNBE/E81YW5lpSg=
-X-Received: by 2002:a17:907:60cc:b0:96a:580e:bf0f with SMTP id
- hv12-20020a17090760cc00b0096a580ebf0fmr18686933ejc.14.1684912157630; Wed, 24
- May 2023 00:09:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230524063810.1595778-1-hch@lst.de> <20230524063810.1595778-12-hch@lst.de>
-In-Reply-To: <20230524063810.1595778-12-hch@lst.de>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Wed, 24 May 2023 09:09:06 +0200
-Message-ID: <CAJfpegtt2eD4Cw11f12cmcvHLe9VHhPLQdJWpwyAmeY-SrVuOA@mail.gmail.com>
-Subject: Re: [PATCH 11/11] fuse: drop redundant arguments to fuse_perform_write
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Wed, 24 May 2023 03:36:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD299D
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 00:35:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684913748;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vvK6Z2AVFSI9O3ecKj+peO5KkO7IQHk2/yqFJ3/8oK8=;
+        b=FQHD1ti0vGreod44fZiiC+q3FLAOHNK/OG5xa7XoMrnu5QPMRKM3tYXCiNBa+jd08p5iQy
+        zNqOllNBO/xArKf0aVz59L+Gl9b/65vPQLZsaxQKc/eshWLNdOuSuVfQgBBL4EC0H7Zc6X
+        gK9lQnfXSwP0bStCACcB6JQOLnQ/E0w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-388-49PEef-7NZij7YL6FX6QFA-1; Wed, 24 May 2023 03:35:43 -0400
+X-MC-Unique: 49PEef-7NZij7YL6FX6QFA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 38BCF80027F;
+        Wed, 24 May 2023 07:35:42 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BCF04492B0A;
+        Wed, 24 May 2023 07:35:39 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <ZG2mKMus29qquHia@infradead.org>
+References: <ZG2mKMus29qquHia@infradead.org> <20230522205744.2825689-1-dhowells@redhat.com> <168487791137.449781.3170440352656135902.b4-ty@kernel.dk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
         Christian Brauner <brauner@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Chao Yu <chao@kernel.org>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v21 0/6] block: Use page pinning
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3206938.1684913738.1@warthog.procyon.org.uk>
+Date:   Wed, 24 May 2023 08:35:39 +0100
+Message-ID: <3206939.1684913739@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 24 May 2023 at 08:38, Christoph Hellwig <hch@lst.de> wrote:
->
-> pos is always equal to iocb->ki_pos, and mapping is always equal to
-> iocb->ki_filp->f_mapping.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Acked-by: Miklos Szeredi <mszeredi@redhat.com>
+> > Applied, thanks!
+> 
+> This ended up on the for-6.5/block branch, but I think it needs to be
+> on the splice one, as that is pre-requisite unless I'm missing
+> something.
+
+Indeed.  As I noted in the cover note:
+
+    This requires the splice-read patchset to have been applied first,
+    otherwise reversion of the ITER_PAGE iterator can race with truncate and
+    return pages to the allocator whilst they're still undergoing DMA[2].
+
+David
+
