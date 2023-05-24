@@ -2,65 +2,41 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 106E1C7EE23
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 05:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC40C77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 05:53:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233663AbjEXFwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 01:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
+        id S233010AbjEXFxc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 01:53:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233554AbjEXFwy (ORCPT
+        with ESMTP id S232365AbjEXFxb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 01:52:54 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217A413E;
-        Tue, 23 May 2023 22:52:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=d7MoCPoMkvP5oxJ0+Yi2KmOwD9poIx2eN6JRQtb6+cE=; b=Phq0aK4u1ny6dIgTVa6MbcJnPw
-        X+odKdmcxVmjaAc1BNURyrCoOmyCeSUJAgfqHLd2RnztfJbUK22BU7jfEpE73VdYZZURPZ6LoxH5K
-        AvfxrmdlI/ILS0fZHFmS9Ky/oAjEox+akTMtfX5WbzbySyJkR/A6h6I/ztqKNscx7j8XIoQ5p7qp0
-        /cI4UvdjP6whgAzRR9/YxzkF8fkJ0uUMH9BBTVernGpcLkQqxVHj/uOc+Bbo4MEvK57Md5JCzc7E+
-        z0a8l0TYw2E3S+Zqv6YYLTupF3ZwFbrX78jFmO4pOaFzQSTvIMYdYqGrwDyfdULk4yHqiJt2lKVph
-        wzTUsyaA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q1hQO-00CRM1-0A;
-        Wed, 24 May 2023 05:52:40 +0000
-Date:   Tue, 23 May 2023 22:52:40 -0700
-From:   Christoph Hellwig <hch@infradead.org>
+        Wed, 24 May 2023 01:53:31 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0677B132
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 22:53:31 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 0484B68CFE; Wed, 24 May 2023 07:53:28 +0200 (CEST)
+Date:   Wed, 24 May 2023 07:53:27 +0200
+From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        David Howells <dhowells@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v21 0/6] block: Use page pinning
-Message-ID: <ZG2mKMus29qquHia@infradead.org>
-References: <20230522205744.2825689-1-dhowells@redhat.com>
- <168487791137.449781.3170440352656135902.b4-ty@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/7] blk-mq: use the I/O scheduler for writes from the
+ flush state machine
+Message-ID: <20230524055327.GA19543@lst.de>
+References: <20230519044050.107790-1-hch@lst.de> <20230519044050.107790-5-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <168487791137.449781.3170440352656135902.b4-ty@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20230519044050.107790-5-hch@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 23, 2023 at 03:38:31PM -0600, Jens Axboe wrote:
-> Applied, thanks!
-
-This ended up on the for-6.5/block branch, but I think it needs to be
-on the splice one, as that is pre-requisite unless I'm missing
-something.
+I turns out this causes some kind of hang I haven't been able to
+debug yet in blktests' hotplug test.   Can you drop this and the
+subsequent patches for now?
 
