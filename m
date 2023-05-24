@@ -2,55 +2,237 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB11C7EE23
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 01:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EED0C7EE2F
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 02:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234559AbjEXBvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 21:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43658 "EHLO
+        id S239074AbjEXCHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 22:07:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231588AbjEXBvU (ORCPT
+        with ESMTP id S231317AbjEXCHR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 21:51:20 -0400
-Received: from out-8.mta1.migadu.com (out-8.mta1.migadu.com [95.215.58.8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C41185
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 18:51:18 -0700 (PDT)
-Message-ID: <5874a6ea-e93b-c9f8-8e06-7ceae182e34f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1684893077;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eYauzNVLneYqRZlTEpN+2GETbsXYjr9b3Tuw3F3Z+rg=;
-        b=l/UcI+yQhsBQd++2UVnMV0OA8BKnq/AmV3zhsaBw6chFd/bo5bDj7GKst2nd+wd+kfA650
-        Cgs+j6vQd4j2BoK+iFt7qXzOPlLfH6jCfUZdRFHKJzS+XJ1mH3NVNWkR6weB49WzmkcJNq
-        BnInrDn0KmJwoHPQ9TTwGWKAUy6M7YY=
-Date:   Wed, 24 May 2023 09:51:14 +0800
+        Tue, 23 May 2023 22:07:17 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 002E9184
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 19:07:15 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-5112cae8d82so826965a12.2
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 19:07:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1684894034; x=1687486034;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d5dfPBvx6aG61cOeQLMS4GIwmjHbkXMXy0MM0cC9oLc=;
+        b=SPBe4uEiMI2jCR4eHyxy57SIWXSCKmjMRhgWthenPoHjHzpBejlAiDsDQd7XBehg9G
+         2D8suTsf58iU+5W1sQ8+9rWD8jnOtEI202+Cbur5SoY3b9v2rJVWLr6fLJmi6vQeCroy
+         Bh7aWdzGwI4tJmXQUSlF1ZZeZIXXqXFZJ4JVpuGAw3gW2JBDvvUSPY2AW/bQ2XgBJM7x
+         k6e7mBeqcXmpYuEqB4F5KmaED/uPuu3uQU3bv2WzHzkuB0PL625tsWPYqD0ZQzgs+Km/
+         3XTXX0bLWUdrJzxpaMNKlOxVltJuQyufcaO+ZgBwP0geilnrGkFY0fsjhLlY1oNoxto8
+         SKGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684894034; x=1687486034;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d5dfPBvx6aG61cOeQLMS4GIwmjHbkXMXy0MM0cC9oLc=;
+        b=h3Ce4mR9GCwWC9w2/iXqEe/BUp2RNNs0ggEMDgnw45fPSOhBLsDXGJeR2h3NxvV2+I
+         ejnJhTHbC+rYRzdfNrE19+5whyzVq8+EfPK+PugxoCKMOEn1k+NG67jdeBZ76UI20XAb
+         i3R1Y5UmISezpNHnGl6wwcridW4L6oUJiCrLHWECArx/tzgN2vjc1UAbLudgxTq0UFPc
+         +YNs0rtMTkveUb7yysHmBNjcme5bnRFV2JkZutezn5B+8sd3/qIxvdG4PXAkT5vME/7w
+         PJmjAGFtOdbOEtVrpk/dIwcFu4mzTXlHngGTXVI2zCq3DKL3hLrN8NTPuNdwbEGEcFPZ
+         luOA==
+X-Gm-Message-State: AC+VfDzQ94Ag2+djbZ5sNnkCGOgU0vMrfTt/oYHTwRiVpk1d3MHsCsgw
+        iw8Crq19URERgznsstaFJANmhWYdL8LoQH7gYid5/g==
+X-Google-Smtp-Source: ACHHUZ5Otych3q6h2UGWE4sOweDTcCjyfpqtgf2uKuIfsUHXcTvByotJN9SHYFyKqkzusZtmjvRIBCszRVALwzIYMis=
+X-Received: by 2002:a17:907:75fb:b0:968:c38f:5481 with SMTP id
+ jz27-20020a17090775fb00b00968c38f5481mr14112330ejc.51.1684894034316; Tue, 23
+ May 2023 19:07:14 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [PATCH 03/10] block/rnbd: introduce rnbd_access_modes
-Content-Language: en-US
-To:     Jinpu Wang <jinpu.wang@ionos.com>
-Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
-References: <20230523075331.32250-1-guoqing.jiang@linux.dev>
- <20230523075331.32250-4-guoqing.jiang@linux.dev>
- <CAMGffEnCKArKzc0KwAbWa-XnELSYybAKptXE+o7zfOGSwjmU2g@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Guoqing Jiang <guoqing.jiang@linux.dev>
-In-Reply-To: <CAMGffEnCKArKzc0KwAbWa-XnELSYybAKptXE+o7zfOGSwjmU2g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20230524011935.719659-1-ming.lei@redhat.com>
+In-Reply-To: <20230524011935.719659-1-ming.lei@redhat.com>
+From:   Yosry Ahmed <yosryahmed@google.com>
+Date:   Tue, 23 May 2023 19:06:38 -0700
+Message-ID: <CAJD7tkZkbro4H-QC=RJx_dfCdGQ5c=4NJhbFrcEmQSidaaMOmg@mail.gmail.com>
+Subject: Re: [PATCH] blk-cgroup: Flush stats before releasing blkcg_gq
+To:     Ming Lei <ming.lei@redhat.com>, Linux-MM <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Shakeel Butt <shakeelb@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Waiman Long <longman@redhat.com>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, mkoutny@suse.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ming,
+
+On Tue, May 23, 2023 at 6:21=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> As noted by Michal, the blkg_iostat_set's in the lockless list
+> hold reference to blkg's to protect against their removal. Those
+> blkg's hold reference to blkcg. When a cgroup is being destroyed,
+> cgroup_rstat_flush() is only called at css_release_work_fn() which
+> is called when the blkcg reference count reaches 0. This circular
+> dependency will prevent blkcg and some blkgs from being freed after
+> they are made offline.
+
+I am not at all familiar with blkcg, but does calling
+cgroup_rstat_flush() in offline_css() fix the problem? or can items be
+added to the lockless list(s) after the blkcg is offlined?
+
+>
+> It is less a problem if the cgroup to be destroyed also has other
+> controllers like memory that will call cgroup_rstat_flush() which will
+> clean up the reference count. If block is the only controller that uses
+> rstat, these offline blkcg and blkgs may never be freed leaking more
+> and more memory over time.
+>
+> To prevent this potential memory leak:
+>
+> - a new cgroup_rstat_css_cpu_flush() function is added to flush stats for
+> a given css and cpu. This new function will be called in __blkg_release()=
+.
+>
+> - don't grab bio->bi_blkg when adding the stats into blkcg's per-cpu
+> stat list, and this kind of handling is the most fragile part of
+> original patch
+>
+> Based on Waiman's patch:
+>
+> https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redha=
+t.com/
+>
+> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+> Cc: Waiman Long <longman@redhat.com>
+> Cc: cgroups@vger.kernel.org
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: mkoutny@suse.com
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-cgroup.c     | 15 +++++++++++++--
+>  include/linux/cgroup.h |  1 +
+>  kernel/cgroup/rstat.c  | 18 ++++++++++++++++++
+>  3 files changed, 32 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 0ce64dd73cfe..5437b6af3955 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -163,10 +163,23 @@ static void blkg_free(struct blkcg_gq *blkg)
+>  static void __blkg_release(struct rcu_head *rcu)
+>  {
+>         struct blkcg_gq *blkg =3D container_of(rcu, struct blkcg_gq, rcu_=
+head);
+> +       struct blkcg *blkcg =3D blkg->blkcg;
+> +       int cpu;
+>
+>  #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
+>         WARN_ON(!bio_list_empty(&blkg->async_bios));
+>  #endif
+> +       /*
+> +        * Flush all the non-empty percpu lockless lists before releasing
+> +        * us. Meantime no new bio can refer to this blkg any more given
+> +        * the refcnt is killed.
+> +        */
+> +       for_each_possible_cpu(cpu) {
+> +               struct llist_head *lhead =3D per_cpu_ptr(blkcg->lhead, cp=
+u);
+> +
+> +               if (!llist_empty(lhead))
+> +                       cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
+> +       }
+>
+>         /* release the blkcg and parent blkg refs this blkg has been hold=
+ing */
+>         css_put(&blkg->blkcg->css);
+> @@ -991,7 +1004,6 @@ static void blkcg_rstat_flush(struct cgroup_subsys_s=
+tate *css, int cpu)
+>                 if (parent && parent->parent)
+>                         blkcg_iostat_update(parent, &blkg->iostat.cur,
+>                                             &blkg->iostat.last);
+> -               percpu_ref_put(&blkg->refcnt);
+>         }
+>
+>  out:
+> @@ -2075,7 +2087,6 @@ void blk_cgroup_bio_start(struct bio *bio)
+>
+>                 llist_add(&bis->lnode, lhead);
+>                 WRITE_ONCE(bis->lqueued, true);
+> -               percpu_ref_get(&bis->blkg->refcnt);
+>         }
+>
+>         u64_stats_update_end_irqrestore(&bis->sync, flags);
+> diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+> index 885f5395fcd0..97d4764d8e6a 100644
+> --- a/include/linux/cgroup.h
+> +++ b/include/linux/cgroup.h
+> @@ -695,6 +695,7 @@ void cgroup_rstat_flush(struct cgroup *cgrp);
+>  void cgroup_rstat_flush_atomic(struct cgroup *cgrp);
+>  void cgroup_rstat_flush_hold(struct cgroup *cgrp);
+>  void cgroup_rstat_flush_release(void);
+> +void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu=
+);
+>
+>  /*
+>   * Basic resource stats.
+> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
+> index 9c4c55228567..96e7a4e6da72 100644
+> --- a/kernel/cgroup/rstat.c
+> +++ b/kernel/cgroup/rstat.c
+> @@ -281,6 +281,24 @@ void cgroup_rstat_flush_release(void)
+>         spin_unlock_irq(&cgroup_rstat_lock);
+>  }
+>
+> +/**
+> + * cgroup_rstat_css_cpu_flush - flush stats for the given css and cpu
+> + * @css: target css to be flush
+> + * @cpu: the cpu that holds the stats to be flush
+> + *
+> + * A lightweight rstat flush operation for a given css and cpu.
+> + * Only the cpu_lock is being held for mutual exclusion, the cgroup_rsta=
+t_lock
+> + * isn't used.
+
+(Adding linux-mm and memcg maintainers)
++Linux-MM +Michal Hocko +Shakeel Butt +Johannes Weiner +Roman Gushchin
++Muchun Song
+
+I don't think flushing the stats without holding cgroup_rstat_lock is
+safe for memcg stats flushing. mem_cgroup_css_rstat_flush() modifies
+some non-percpu data (e.g. memcg->vmstats->state,
+memcg->vmstats->state_pending).
+
+Perhaps have this be a separate callback than css_rstat_flush() (e.g.
+css_rstat_flush_cpu() or something), so that it's clear what
+subsystems support this? In this case, only blkcg would implement this
+callback.
+
+> + */
+> +void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu=
+)
+> +{
+> +       raw_spinlock_t *cpu_lock =3D per_cpu_ptr(&cgroup_rstat_cpu_lock, =
+cpu);
+> +
+> +       raw_spin_lock_irq(cpu_lock);
+> +       css->ss->css_rstat_flush(css, cpu);
+
+I think we need to check that css_rstat_flush() (or a new callback) is
+implemented before calling it here.
 
 
-On 5/23/23 17:23, Jinpu Wang wrote:
->> +       int             mode;
-> why not enum rnbd_access_mode?
-
-Will change it in next version, thanks for the review.
-
-Guoqing
+> +       raw_spin_unlock_irq(cpu_lock);
+> +}
+> +
+>  int cgroup_rstat_init(struct cgroup *cgrp)
+>  {
+>         int cpu;
+> --
+> 2.40.1
+>
