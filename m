@@ -2,431 +2,187 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD5EC7EE2D
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 15:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCDDC77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 15:46:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237485AbjEXPmz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 11:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38106 "EHLO
+        id S235414AbjEXPqo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 11:46:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237364AbjEXPmd (ORCPT
+        with ESMTP id S235966AbjEXPqn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 11:42:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E10A10C7;
-        Wed, 24 May 2023 08:41:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 24 May 2023 11:46:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B291A1
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 08:45:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1684943030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=go9RJx+lgX4qOrtsLx/9OhFpQNTZr1n8I6Ri6mX7g3A=;
+        b=OY7Ji2etzLebMoU0QM/1Q6JsBoiZsez7PNU4e1MKFrtTjGQb3W1JvA48PbE/fSNSQcx3Ga
+        4PEWqMbtntNiDkBL5TOWCcMP6D2mD3sV4YkHhZiab99ak/Q0tEMjTxcmHFk2OAL8ZaM5cO
+        fDkjO2EZt+NDoRgy2vWRp3i9a300oDo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-553-BDVEDZY2OeKAoesJqrJYuA-1; Wed, 24 May 2023 11:43:44 -0400
+X-MC-Unique: BDVEDZY2OeKAoesJqrJYuA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 33B5961737;
-        Wed, 24 May 2023 15:40:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86682C433EF;
-        Wed, 24 May 2023 15:40:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684942849;
-        bh=GnBtoU8AMWYWI0jmSKm6MAQYcMfd9WMfCQJci24HSso=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iumgZOlwMMVHnX3saoIbtTHjUshN63+XBubTBJi17C6veAJPuwlOHoFz6mD+N+CfC
-         DsRlkO8WESZ/IZ0psjH3pWnzMN80Oqa8umBBZXTH2orLwWEq7YdUz5N3CCN9HHmvK1
-         fuvB4Omj594/ClEQivNwooSDO1gQQO/aD6EcAiSqIhDHqiEGOI96j83oZK959IrrLa
-         cZedGhsGZ+NvTax50h/VT/us59Rc9YvONq7m662wirC1aQ6Lt+jKQvE0/hN9sw5FP6
-         iz0ApmoVCgbJDSp/Z541KCZSTqunVAUYL+Grd4H5txwgdTGNj+2Vr7IFjiSKdmVSmA
-         rRvccFrd1ygSw==
-Date:   Wed, 24 May 2023 08:40:49 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, linux-mm@kvack.org,
-        gost.dev@samsung.com, anuj20.g@samsung.com,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        ming.lei@redhat.com, James.Bottomley@hansenpartnership.com,
-        linux-fsdevel@vger.kernel.org, dlemoal@kernel.org,
-        joshi.k@samsung.com, nitheshshetty@gmail.com, bvanassche@acm.org
-Subject: Re: [dm-devel] [PATCH v11 2/9] block: Add copy offload support
- infrastructure
-Message-ID: <20230524154049.GD11607@frogsfrogsfrogs>
-References: <20230522104146.2856-1-nj.shetty@samsung.com>
- <CGME20230522104536epcas5p23dd8108dd267ec588e5c36e8f9eb9fe8@epcas5p2.samsung.com>
- <20230522104146.2856-3-nj.shetty@samsung.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 56CC7185A792;
+        Wed, 24 May 2023 15:43:44 +0000 (UTC)
+Received: from [10.22.17.224] (unknown [10.22.17.224])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C6E240C6EC4;
+        Wed, 24 May 2023 15:43:43 +0000 (UTC)
+Message-ID: <76a863b4-112e-82ae-59e4-6326fff48ffc@redhat.com>
+Date:   Wed, 24 May 2023 11:43:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230522104146.2856-3-nj.shetty@samsung.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH V2] blk-cgroup: Flush stats before releasing blkcg_gq
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>, mkoutny@suse.com,
+        Yosry Ahmed <yosryahmed@google.com>
+References: <20230524035150.727407-1-ming.lei@redhat.com>
+ <f2c10b18-8d83-91a5-bf22-03894bf3c910@redhat.com>
+ <ZG2R+jYuAZMpx49d@ovpn-8-17.pek2.redhat.com>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <ZG2R+jYuAZMpx49d@ovpn-8-17.pek2.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 22, 2023 at 04:11:33PM +0530, Nitesh Shetty wrote:
-> Introduce blkdev_issue_copy which takes similar arguments as
-> copy_file_range and performs copy offload between two bdevs.
-> Introduce REQ_COPY copy offload operation flag. Create a read-write
-> bio pair with a token as payload and submitted to the device in order.
-> Read request populates token with source specific information which
-> is then passed with write request.
-> This design is courtesy Mikulas Patocka's token based copy
-> 
-> Larger copy will be divided, based on max_copy_sectors limit.
-> 
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
-> ---
->  block/blk-lib.c           | 235 ++++++++++++++++++++++++++++++++++++++
->  block/blk.h               |   2 +
->  include/linux/blk_types.h |  25 ++++
->  include/linux/blkdev.h    |   3 +
->  4 files changed, 265 insertions(+)
-> 
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index e59c3069e835..ed089e703cb1 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -115,6 +115,241 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  }
->  EXPORT_SYMBOL(blkdev_issue_discard);
->  
-> +/*
-> + * For synchronous copy offload/emulation, wait and process all in-flight BIOs.
-> + * This must only be called once all bios have been issued so that the refcount
-> + * can only decrease. This just waits for all bios to make it through
-> + * blkdev_copy_write_endio.
-> + */
-> +static int blkdev_copy_wait_completion(struct cio *cio)
-> +{
-> +	int ret;
-> +
-> +	if (cio->endio)
-> +		return 0;
-> +
-> +	if (atomic_read(&cio->refcount)) {
-> +		__set_current_state(TASK_UNINTERRUPTIBLE);
-> +		blk_io_schedule();
-> +	}
-> +
-> +	ret = cio->comp_len;
-> +	kfree(cio);
-> +
-> +	return ret;
-> +}
-> +
-> +static void blkdev_copy_offload_write_endio(struct bio *bio)
-> +{
-> +	struct copy_ctx *ctx = bio->bi_private;
-> +	struct cio *cio = ctx->cio;
-> +	sector_t clen;
-> +
-> +	if (bio->bi_status) {
-> +		clen = (bio->bi_iter.bi_sector << SECTOR_SHIFT) - cio->pos_out;
-> +		cio->comp_len = min_t(sector_t, clen, cio->comp_len);
-> +	}
-> +	__free_page(bio->bi_io_vec[0].bv_page);
-> +	bio_put(bio);
-> +
-> +	kfree(ctx);
-> +	if (!atomic_dec_and_test(&cio->refcount))
-> +		return;
-> +	if (cio->endio) {
-> +		cio->endio(cio->private, cio->comp_len);
-> +		kfree(cio);
-> +	} else
-> +		blk_wake_io_task(cio->waiter);
-> +}
-> +
-> +static void blkdev_copy_offload_read_endio(struct bio *read_bio)
-> +{
-> +	struct copy_ctx *ctx = read_bio->bi_private;
-> +	struct cio *cio = ctx->cio;
-> +	sector_t clen;
-> +
-> +	if (read_bio->bi_status) {
-> +		clen = (read_bio->bi_iter.bi_sector << SECTOR_SHIFT)
-> +				- cio->pos_in;
-> +		cio->comp_len = min_t(sector_t, clen, cio->comp_len);
-> +		__free_page(read_bio->bi_io_vec[0].bv_page);
-> +		bio_put(ctx->write_bio);
-> +		bio_put(read_bio);
-> +		kfree(ctx);
-> +		if (atomic_dec_and_test(&cio->refcount)) {
-> +			if (cio->endio) {
-> +				cio->endio(cio->private, cio->comp_len);
-> +				kfree(cio);
-> +			} else
-> +				blk_wake_io_task(cio->waiter);
-> +		}
-> +		return;
-> +	}
-> +
-> +	schedule_work(&ctx->dispatch_work);
-> +	bio_put(read_bio);
-> +}
-> +
-> +static void blkdev_copy_dispatch_work(struct work_struct *work)
-> +{
-> +	struct copy_ctx *ctx = container_of(work, struct copy_ctx,
-> +			dispatch_work);
-> +
-> +	submit_bio(ctx->write_bio);
-> +}
-> +
-> +/*
-> + * __blkdev_copy_offload	- Use device's native copy offload feature.
-> + * we perform copy operation by sending 2 bio.
-> + * 1. First we send a read bio with REQ_COPY flag along with a token and source
-> + * and length. Once read bio reaches driver layer, device driver adds all the
-> + * source info to token and does a fake completion.
-> + * 2. Once read operation completes, we issue write with REQ_COPY flag with same
-> + * token. In driver layer, token info is used to form a copy offload command.
-> + *
-> + * Returns the length of bytes copied or error if encountered
-> + */
-> +static int __blkdev_copy_offload(struct block_device *bdev_in, loff_t pos_in,
-> +		struct block_device *bdev_out, loff_t pos_out, size_t len,
-> +		cio_iodone_t endio, void *private, gfp_t gfp_mask)
-> +{
-> +	struct cio *cio;
-> +	struct copy_ctx *ctx;
-> +	struct bio *read_bio, *write_bio;
-> +	struct page *token;
-> +	sector_t copy_len;
-> +	sector_t rem, max_copy_len;
-> +
-> +	cio = kzalloc(sizeof(struct cio), GFP_KERNEL);
-> +	if (!cio)
-> +		return -ENOMEM;
-> +	atomic_set(&cio->refcount, 0);
-> +	cio->waiter = current;
-> +	cio->endio = endio;
-> +	cio->private = private;
-> +
-> +	max_copy_len = min(bdev_max_copy_sectors(bdev_in),
-> +			bdev_max_copy_sectors(bdev_out)) << SECTOR_SHIFT;
-> +
-> +	cio->pos_in = pos_in;
-> +	cio->pos_out = pos_out;
-> +	/* If there is a error, comp_len will be set to least successfully
-> +	 * completed copied length
-> +	 */
-> +	cio->comp_len = len;
-> +	for (rem = len; rem > 0; rem -= copy_len) {
-> +		copy_len = min(rem, max_copy_len);
-> +
-> +		token = alloc_page(gfp_mask);
-> +		if (unlikely(!token))
-> +			goto err_token;
-> +
-> +		ctx = kzalloc(sizeof(struct copy_ctx), gfp_mask);
-> +		if (!ctx)
-> +			goto err_ctx;
-> +		read_bio = bio_alloc(bdev_in, 1, REQ_OP_READ | REQ_COPY
-> +			| REQ_SYNC | REQ_NOMERGE, gfp_mask);
-> +		if (!read_bio)
-> +			goto err_read_bio;
-> +		write_bio = bio_alloc(bdev_out, 1, REQ_OP_WRITE
-> +			| REQ_COPY | REQ_SYNC | REQ_NOMERGE, gfp_mask);
-> +		if (!write_bio)
-> +			goto err_write_bio;
-> +
-> +		ctx->cio = cio;
-> +		ctx->write_bio = write_bio;
-> +		INIT_WORK(&ctx->dispatch_work, blkdev_copy_dispatch_work);
-> +
-> +		__bio_add_page(read_bio, token, PAGE_SIZE, 0);
-> +		read_bio->bi_iter.bi_size = copy_len;
-> +		read_bio->bi_iter.bi_sector = pos_in >> SECTOR_SHIFT;
-> +		read_bio->bi_end_io = blkdev_copy_offload_read_endio;
-> +		read_bio->bi_private = ctx;
-> +
-> +		__bio_add_page(write_bio, token, PAGE_SIZE, 0);
-> +		write_bio->bi_iter.bi_size = copy_len;
-> +		write_bio->bi_end_io = blkdev_copy_offload_write_endio;
-> +		write_bio->bi_iter.bi_sector = pos_out >> SECTOR_SHIFT;
-> +		write_bio->bi_private = ctx;
-> +
-> +		atomic_inc(&cio->refcount);
-> +		submit_bio(read_bio);
-> +		pos_in += copy_len;
-> +		pos_out += copy_len;
-> +	}
-> +
-> +	/* Wait for completion of all IO's*/
-> +	return blkdev_copy_wait_completion(cio);
-> +
-> +err_write_bio:
-> +	bio_put(read_bio);
-> +err_read_bio:
-> +	kfree(ctx);
-> +err_ctx:
-> +	__free_page(token);
-> +err_token:
-> +	cio->comp_len = min_t(sector_t, cio->comp_len, (len - rem));
-> +	if (!atomic_read(&cio->refcount))
-> +		return -ENOMEM;
-> +	/* Wait for submitted IOs to complete */
-> +	return blkdev_copy_wait_completion(cio);
-> +}
-> +
-> +static inline int blkdev_copy_sanity_check(struct block_device *bdev_in,
-> +	loff_t pos_in, struct block_device *bdev_out, loff_t pos_out,
-> +	size_t len)
-> +{
-> +	unsigned int align = max(bdev_logical_block_size(bdev_out),
-> +					bdev_logical_block_size(bdev_in)) - 1;
-> +
-> +	if (bdev_read_only(bdev_out))
-> +		return -EPERM;
-> +
-> +	if ((pos_in & align) || (pos_out & align) || (len & align) || !len ||
-> +		len >= COPY_MAX_BYTES)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * @bdev_in:	source block device
-> + * @pos_in:	source offset
-> + * @bdev_out:	destination block device
-> + * @pos_out:	destination offset
-> + * @len:	length in bytes to be copied
-> + * @endio:	endio function to be called on completion of copy operation,
-> + *		for synchronous operation this should be NULL
-> + * @private:	endio function will be called with this private data, should be
-> + *		NULL, if operation is synchronous in nature
-> + * @gfp_mask:   memory allocation flags (for bio_alloc)
-> + *
-> + * Returns the length of bytes copied or error if encountered
-> + *
-> + * Description:
-> + *	Copy source offset from source block device to destination block
-> + *	device. Max total length of copy is limited to MAX_COPY_TOTAL_LENGTH
-> + */
-> +int blkdev_issue_copy(struct block_device *bdev_in, loff_t pos_in,
+On 5/24/23 00:26, Ming Lei wrote:
+> On Wed, May 24, 2023 at 12:19:57AM -0400, Waiman Long wrote:
+>> On 5/23/23 23:51, Ming Lei wrote:
+>>> As noted by Michal, the blkg_iostat_set's in the lockless list hold
+>>> reference to blkg's to protect against their removal. Those blkg's
+>>> hold reference to blkcg. When a cgroup is being destroyed,
+>>> cgroup_rstat_flush() is only called at css_release_work_fn() which
+>>> is called when the blkcg reference count reaches 0. This circular
+>>> dependency will prevent blkcg and some blkgs from being freed after
+>>> they are made offline.
+>>>
+>>> It is less a problem if the cgroup to be destroyed also has other
+>>> controllers like memory that will call cgroup_rstat_flush() which will
+>>> clean up the reference count. If block is the only controller that uses
+>>> rstat, these offline blkcg and blkgs may never be freed leaking more
+>>> and more memory over time.
+>>>
+>>> To prevent this potential memory leak:
+>>>
+>>> - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
+>>> can be added
+>>>
+>>> - don't grab bio->bi_blkg reference when adding the stats into blkcg's
+>>> per-cpu stat list since all stats are guaranteed to be consumed before
+>>> releasing blkg instance, and grabbing blkg reference for stats was the
+>>> most fragile part of original patch
+>>>
+>>> Based on Waiman's patch:
+>>>
+>>> https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
+>>>
+>>> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+>>> Cc: Waiman Long <longman@redhat.com>
+>>> Cc: Tejun Heo <tj@kernel.org>
+>>> Cc: mkoutny@suse.com
+>>> Cc: Yosry Ahmed <yosryahmed@google.com>
+>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>> ---
+>>> V2:
+>>> 	- remove kernel/cgroup change, and call blkcg_rstat_flush()
+>>> 	to flush stat directly
+>>>
+>>>    block/blk-cgroup.c | 29 +++++++++++++++++++++--------
+>>>    1 file changed, 21 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>>> index 0ce64dd73cfe..ed0eb8896972 100644
+>>> --- a/block/blk-cgroup.c
+>>> +++ b/block/blk-cgroup.c
+>>> @@ -34,6 +34,8 @@
+>>>    #include "blk-ioprio.h"
+>>>    #include "blk-throttle.h"
+>>> +static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu);
+>>> +
+>>>    /*
+>>>     * blkcg_pol_mutex protects blkcg_policy[] and policy [de]activation.
+>>>     * blkcg_pol_register_mutex nests outside of it and synchronizes entire
+>>> @@ -163,10 +165,21 @@ static void blkg_free(struct blkcg_gq *blkg)
+>>>    static void __blkg_release(struct rcu_head *rcu)
+>>>    {
+>>>    	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
+>>> +	struct blkcg *blkcg = blkg->blkcg;
+>>> +	int cpu;
+>>>    #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
+>>>    	WARN_ON(!bio_list_empty(&blkg->async_bios));
+>>>    #endif
+>>> +	/*
+>>> +	 * Flush all the non-empty percpu lockless lists before releasing
+>>> +	 * us, given these stat belongs to us.
+>>> +	 *
+>>> +	 * cgroup locks aren't needed here since __blkcg_rstat_flush just
+>>> +	 * propagates delta into blkg parent, which is live now.
+>>> +	 */
+>>> +	for_each_possible_cpu(cpu)
+>>> +		__blkcg_rstat_flush(blkcg, cpu);
+>>>    	/* release the blkcg and parent blkg refs this blkg has been holding */
+>>>    	css_put(&blkg->blkcg->css);
+>>> @@ -951,17 +964,12 @@ static void blkcg_iostat_update(struct blkcg_gq *blkg, struct blkg_iostat *cur,
+>>>    	u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
+>>>    }
+>>> -static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
+>>> +static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
+>>>    {
+>>> -	struct blkcg *blkcg = css_to_blkcg(css);
+>>>    	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
+>>>    	struct llist_node *lnode;
+>>>    	struct blkg_iostat_set *bisc, *next_bisc;
+>>> -	/* Root-level stats are sourced from system-wide IO stats */
+>>> -	if (!cgroup_parent(css->cgroup))
+>>> -		return;
+>>> -
+>>>    	rcu_read_lock();
+>>>    	lnode = llist_del_all(lhead);
+>>> @@ -991,13 +999,19 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
+>>>    		if (parent && parent->parent)
+>>>    			blkcg_iostat_update(parent, &blkg->iostat.cur,
+>>>    					    &blkg->iostat.last);
+>>> -		percpu_ref_put(&blkg->refcnt);
+>>>    	}
+>>>    out:
+>>>    	rcu_read_unlock();
+>>>    }
+>>> +static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
+>>> +{
+>>> +	/* Root-level stats are sourced from system-wide IO stats */
+>>> +	if (cgroup_parent(css->cgroup))
+>>> +		__blkcg_rstat_flush(css_to_blkcg(css), cpu);
+>>> +}
+>>> +
+>> I think it may not safe to call __blkcg_rstat_flus() directly without taking
+>> the cgroup_rstat_cpu_lock. That is why I added a helper to
+>> kernel/cgroup/rstat.c in my patch to meet the locking requirement.
+> All stats are removed from llist_del_all(), and the local list is
+> iterated, then each blkg & its parent is touched in __blkcg_rstat_flus(), so
+> can you explain it a bit why cgroup locks are needed? For protecting
+> what?
 
-I'd have thought you'd return ssize_t here.  If the two block devices
-are loopmounted xfs files, we can certainly reflink "copy" more than 2GB
-at a time.
+You are right. The llist_del_all() call in blkcg_rstat_flush() is 
+atomic, so it is safe for concurrent execution which is what the 
+cgroup_rstat_cpu_lock protects against. That may not be the case for 
+rstat callbacks of other controllers. So I will suggest you to add a 
+comment to clarify that point. Other than that, you patch looks good to me.
 
---D
+Reviewed: Waiman Long <longman@redhat.com>
 
-> +		      struct block_device *bdev_out, loff_t pos_out, size_t len,
-> +		      cio_iodone_t endio, void *private, gfp_t gfp_mask)
-> +{
-> +	struct request_queue *q_in = bdev_get_queue(bdev_in);
-> +	struct request_queue *q_out = bdev_get_queue(bdev_out);
-> +	int ret;
-> +
-> +	ret = blkdev_copy_sanity_check(bdev_in, pos_in, bdev_out, pos_out, len);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (blk_queue_copy(q_in) && blk_queue_copy(q_out))
-> +		ret = __blkdev_copy_offload(bdev_in, pos_in, bdev_out, pos_out,
-> +			   len, endio, private, gfp_mask);
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(blkdev_issue_copy);
-> +
->  static int __blkdev_issue_write_zeroes(struct block_device *bdev,
->  		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
->  		struct bio **biop, unsigned flags)
-> diff --git a/block/blk.h b/block/blk.h
-> index 45547bcf1119..ec48a237fe12 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -303,6 +303,8 @@ static inline bool bio_may_exceed_limits(struct bio *bio,
->  		break;
->  	}
->  
-> +	if (unlikely(op_is_copy(bio->bi_opf)))
-> +		return false;
->  	/*
->  	 * All drivers must accept single-segments bios that are <= PAGE_SIZE.
->  	 * This is a quick and dirty check that relies on the fact that
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index 740afe80f297..0117e33087e1 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -420,6 +420,7 @@ enum req_flag_bits {
->  	 */
->  	/* for REQ_OP_WRITE_ZEROES: */
->  	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
-> +	__REQ_COPY,		/* copy request */
->  
->  	__REQ_NR_BITS,		/* stops here */
->  };
-> @@ -444,6 +445,7 @@ enum req_flag_bits {
->  #define REQ_POLLED	(__force blk_opf_t)(1ULL << __REQ_POLLED)
->  #define REQ_ALLOC_CACHE	(__force blk_opf_t)(1ULL << __REQ_ALLOC_CACHE)
->  #define REQ_SWAP	(__force blk_opf_t)(1ULL << __REQ_SWAP)
-> +#define REQ_COPY	((__force blk_opf_t)(1ULL << __REQ_COPY))
->  #define REQ_DRV		(__force blk_opf_t)(1ULL << __REQ_DRV)
->  #define REQ_FS_PRIVATE	(__force blk_opf_t)(1ULL << __REQ_FS_PRIVATE)
->  
-> @@ -474,6 +476,11 @@ static inline bool op_is_write(blk_opf_t op)
->  	return !!(op & (__force blk_opf_t)1);
->  }
->  
-> +static inline bool op_is_copy(blk_opf_t op)
-> +{
-> +	return op & REQ_COPY;
-> +}
-> +
->  /*
->   * Check if the bio or request is one that needs special treatment in the
->   * flush state machine.
-> @@ -533,4 +540,22 @@ struct blk_rq_stat {
->  	u64 batch;
->  };
->  
-> +typedef void (cio_iodone_t)(void *private, int comp_len);
-> +
-> +struct cio {
-> +	struct task_struct *waiter;     /* waiting task (NULL if none) */
-> +	atomic_t refcount;
-> +	loff_t pos_in;
-> +	loff_t pos_out;
-> +	size_t comp_len;
-> +	cio_iodone_t *endio;		/* applicable for async operation */
-> +	void *private;			/* applicable for async operation */
-> +};
-> +
-> +struct copy_ctx {
-> +	struct cio *cio;
-> +	struct work_struct dispatch_work;
-> +	struct bio *write_bio;
-> +};
-> +
->  #endif /* __LINUX_BLK_TYPES_H */
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index c9bf11adccb3..6f2814ab4741 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1051,6 +1051,9 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop);
->  int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
->  		sector_t nr_sects, gfp_t gfp);
-> +int blkdev_issue_copy(struct block_device *bdev_in, loff_t pos_in,
-> +		      struct block_device *bdev_out, loff_t pos_out, size_t len,
-> +		      cio_iodone_t end_io, void *private, gfp_t gfp_mask);
->  
->  #define BLKDEV_ZERO_NOUNMAP	(1 << 0)  /* do not free blocks */
->  #define BLKDEV_ZERO_NOFALLBACK	(1 << 1)  /* don't write explicit zeroes */
-> -- 
-> 2.35.1.500.gb896f729e2
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://listman.redhat.com/mailman/listinfo/dm-devel
-> 
