@@ -2,97 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 742B0C77B73
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 13:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB690C77B7A
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 14:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234399AbjEXNdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 09:33:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59572 "EHLO
+        id S233605AbjEXOQS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 10:16:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230255AbjEXNdY (ORCPT
+        with ESMTP id S229919AbjEXOQR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 09:33:24 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47999A7;
-        Wed, 24 May 2023 06:33:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=PlI3NINuTp5y2t5Z+4wg7vfiTt8lvB4SyLbHC5tKASU=; b=eq1oO18nKmxdfx79+rZ3TTo5Q2
-        2/F3VHC9ngHsBakNRFv680ymTTyCK9hQMC/hF/6ByoTd1QX5Huc2qSnkfOtIpqNxg3U3KILlEnohH
-        tk1m/vJLtoK5KkcBjlU2kaBM3cLYnmqGoN2Zya9Htl2CZTaH4W94BgkzuYeaOzmShvPd+qb3ym5EL
-        yonGPZiSfd3yzH3hEQFRUsVsx849CuZTYjYDAClbFB7R6Y5PcboAB1JCCXjmLj8dakGubsyS8QwrS
-        jjlaR0JAq6BqcKNmdvnkHdN+wsZcZz5xjzhHDugGtoEqqn7cXDiJJ1Gi7vDVBHa/uqXa8DUbUI1v1
-        peQuoiEw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q1oc5-00BF3M-Tz; Wed, 24 May 2023 13:33:13 +0000
-Date:   Wed, 24 May 2023 14:33:13 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 16/17] block: use iomap for writes to block devices
-Message-ID: <ZG4SGYOogQtEZrll@casper.infradead.org>
-References: <20230424054926.26927-1-hch@lst.de>
- <20230424054926.26927-17-hch@lst.de>
- <b96b397e-2f5e-7910-3bb3-7405d0e293a7@suse.de>
- <ZG09wR4WOI8zDxJK@dread.disaster.area>
+        Wed, 24 May 2023 10:16:17 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3857D11D
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 07:16:17 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7747cc8bea0so4708339f.1
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 07:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684937776; x=1687529776;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uiOLRIi3DHfMDnXvxWOJoB40jJavD8Yydt2FXOwoBZU=;
+        b=e2DKdPlooJHrLrUxwNjplTsZN6eiBscHOUxA7JOdrqIcKIDUT9VeoqzPO+QP0HPGOy
+         BWsNw6abVGVIDqoHPIo+nONiMbUGW9of3+8al9q6OR+jpuTk9E0y6vUI2C5kMzijiuOn
+         lfo3/swYsXRKJfsoE3TQkA6orMYgDAS9YL1T18bF9i2VXhQ7sEWakkPPyv6bxz767uo4
+         hJo5YfEWUICWt2QyVqVegDSssRRTlv53Po8UqgOqgeNNVIcU+Z2Lol4HszqsvQ5Jhw4f
+         OvuRuhHrCtah/TDofElxtUBE+KWrQoFJrqjHHW1533sh23Gp2mq/HaOa1hqRhmXQyO1M
+         SgLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684937776; x=1687529776;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uiOLRIi3DHfMDnXvxWOJoB40jJavD8Yydt2FXOwoBZU=;
+        b=c60Hau4UfsjQAresxppwLwHchFvQIHv3qWgtpnZOaYpJixa5pUiNSNyXj2zbvLvPGo
+         HysqF0U0f4jd1/S5Itk8rW1fhQUJGJKG5zMXABB/f95r64Akfanu919rj34WJw6wJgM6
+         oYBsOBscCkf7FYa/bW5k93cF9m3SRROzad+9aEn1QDLL1BCRVwU2/n7z7JSRlTrB7Fu8
+         IUwMFjsZb29W8v2eVhZ4hyRisIuCC2C1OR+Jrf6gYxv0Opwk6Ps9LELcphM07bowIDPR
+         ax5ShY60rQdg6o1+17ejlmzGIv8QLODteGZHBInhdHLl7APn+vniFzhoKu40yMYqgMGv
+         CDnQ==
+X-Gm-Message-State: AC+VfDynK0Ib+tzclKP3J0cf9oi9DcJhM1Q0VldF78dcE7LGaTXWz02V
+        K8lzpDYzxFQMeXBJsRAElRXQYJp+gAVLx+EiKuQ=
+X-Google-Smtp-Source: ACHHUZ66QYZkD5ylIRgxYXw/SO2wyAzNV5OzKckqd/kMSgpVwCT6QKbIA50/dE+PvcxRh7gDiqgAXg==
+X-Received: by 2002:a6b:3b85:0:b0:774:8d63:449c with SMTP id i127-20020a6b3b85000000b007748d63449cmr1945566ioa.0.1684937776029;
+        Wed, 24 May 2023 07:16:16 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id k6-20020a02a706000000b0041cd0951a93sm16376jam.8.2023.05.24.07.16.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 May 2023 07:16:15 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, Hengqi Chen <hengqi.chen@gmail.com>
+Cc:     rostedt@goodmis.org, mhiramat@kernel.org, bpf@vger.kernel.org,
+        yhs@meta.com, Francis Laniel <flaniel@linux.microsoft.com>
+In-Reply-To: <20230520084057.1467003-1-hengqi.chen@gmail.com>
+References: <20230520084057.1467003-1-hengqi.chen@gmail.com>
+Subject: Re: [PATCH] block: introduce block_io_start/block_io_done
+ tracepoints
+Message-Id: <168493777523.545508.7296231125702799266.b4-ty@kernel.dk>
+Date:   Wed, 24 May 2023 08:16:15 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZG09wR4WOI8zDxJK@dread.disaster.area>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 24, 2023 at 08:27:13AM +1000, Dave Chinner wrote:
-> On Fri, May 19, 2023 at 04:22:01PM +0200, Hannes Reinecke wrote:
-> > I'm hitting this during booting:
-> > [    5.016324]  <TASK>
-> > [    5.030256]  iomap_iter+0x11a/0x350
-> > [    5.030264]  iomap_readahead+0x1eb/0x2c0
-> > [    5.030272]  read_pages+0x5d/0x220
-> > [    5.030279]  page_cache_ra_unbounded+0x131/0x180
-> > [    5.030284]  filemap_get_pages+0xff/0x5a0
-> 
-> Why is filemap_get_pages() using unbounded readahead? Surely
-> readahead should be limited to reading within EOF....
 
-It isn't using unbounded readahead; that's an artifact of this
-incomplete stack trace.  Actual call stack:
-
-page_cache_ra_unbounded
-do_page_cache_ra
-ondemand_readahead
-page_cache_sync_ra
-page_cache_sync_readahead
-filemap_get_pages
-
-As you can see, do_page_cache_ra() does limit readahead to i_size.
-Is ractl->mapping->host the correct way to find the inode?  I always
-get confused.
-
-> I think Christoph's code is correct. IMO, any attempt to read beyond
-> the end of the device should throw out a warning and return an
-> error, not silently return zeros.
+On Sat, 20 May 2023 08:40:57 +0000, Hengqi Chen wrote:
+> Currently, several BCC ([0]) tools (biosnoop/biostacks/biotop) use
+> kprobes to blk_account_io_start/blk_account_io_done to implement
+> their functionalities. This is fragile because the target kernel
+> functions may be renamed ([1]) or inlined ([2]). So introduces two
+> new tracepoints for such use cases.
 > 
-> If readahead is trying to read beyond the end of the device, then it
-> really seems to me like the problem here is readahead, not the iomap
-> code detecting the OOB read request....
+>   [0]: https://github.com/iovisor/bcc
+>   [1]: https://github.com/iovisor/bcc/issues/3954
+>   [2]: https://github.com/iovisor/bcc/issues/4261
 > 
-> Cheers,
-> 
-> Dave.
-> -- 
-> Dave Chinner
-> david@fromorbit.com
+> [...]
+
+Applied, thanks!
+
+[1/1] block: introduce block_io_start/block_io_done tracepoints
+      commit: 03fcc599757cd74dbcf1a5977f9c6497a6798587
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
