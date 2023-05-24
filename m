@@ -2,137 +2,133 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54ADCC77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 07:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3943C7EE31
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 07:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239788AbjEXHBi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 03:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44300 "EHLO
+        id S239786AbjEXHBh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 03:01:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239808AbjEXHBN (ORCPT
+        with ESMTP id S239727AbjEXHBN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 24 May 2023 03:01:13 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3713210D9
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 00:00:50 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-96fbc74fbf1so85957466b.1
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 00:00:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google; t=1684911648; x=1687503648;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fAJTLElGGZ3FPpd+hHW9swqi8LLYODpFepxDuukKj48=;
-        b=ELxBtF4o5IW55MyhAM6yTOMm6oDR+XkfJhvlX+7yzhV6yRAz+kRMFfkRCYja/6IwPZ
-         FTcVNAUIhnZWWI9RB/TvnQRG99/ujJn+7EvSVb8go10F5ziPp4CLpuOynZN7aDG2iiKN
-         FoJDD4skK5plrQNhXLERFN58xnfbYUu86ouco=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684911648; x=1687503648;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fAJTLElGGZ3FPpd+hHW9swqi8LLYODpFepxDuukKj48=;
-        b=JxxAWFHIJBP8/E2iWd5faqF1vkkGFgHqWbsYboSfqdaedB4mZ7gN1PTozZzcX1ri9/
-         AMHnJRU64a/LjwvfVIPt5dWK+rdkV3KPMw0OdzPad3l8IAGjqUq6FNBAojqBkDqUvPq7
-         DxqWLI5cthtlpw2jF6dxBnirUmFwWr2En3W1CNL2dLWGPaTNXLJ16/l3afndCqmnDga6
-         2vAMGvAdQzP7T6YcK30pLWh21/k8Fs3XurS7Hxa49qnlXISYFQtbC4cznSVGRCbE/dI/
-         JocXAGBkna6HiEw+PCxU5lumXzTvnf+OWPkwlS+62RF4VQlHqvEIlkcM0Rxva13bBc7s
-         ZH0w==
-X-Gm-Message-State: AC+VfDxzRiX7G/iq09SjDcXRdUnU8MIQ1grgGdN8w4ZUe2tfNNWLoILe
-        TXcrkNSZVndT/x9DzmVnXu9JmZr3IiNTztBBmrpqPA==
-X-Google-Smtp-Source: ACHHUZ7SlvMG5x2vt/jfLi6LwhlfmuAYckVadaRzR4fxt1kxZ/GcPnJE1sq8JdB2Ei2izIpvJDmtMpewdQCFFqShZGk=
-X-Received: by 2002:a17:907:5ca:b0:94f:704d:a486 with SMTP id
- wg10-20020a17090705ca00b0094f704da486mr16846446ejb.32.1684911648375; Wed, 24
- May 2023 00:00:48 -0700 (PDT)
+Received: from out-1.mta0.migadu.com (out-1.mta0.migadu.com [91.218.175.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B7DCE50
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 00:00:54 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1684911652;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IMVwxK0RJACIlEjojAlnevuE1fiuT8/ZvzYl4AVmfl8=;
+        b=KfDm+FPCBYMN/M/N8nzWzTSegeHbjx0US+0fPbeske+fmMZ42H8Idg+6TVMmonK4+Uo5ms
+        qPj7z6ONgv9pLvlSXf0IP+1jjR7Spo45x5NadDVypHDYpYY+iPa6SvP/2J9nMEKB/juNXE
+        4iKecvTfbMRoZjs30KnBMxeWslwG+PE=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+To:     haris.iqbal@ionos.com, jinpu.wang@ionos.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH V2 5/8] block/rnbd-srv: rename one member in rnbd_srv_dev
+Date:   Wed, 24 May 2023 15:00:23 +0800
+Message-Id: <20230524070026.2932-6-guoqing.jiang@linux.dev>
+In-Reply-To: <20230524070026.2932-1-guoqing.jiang@linux.dev>
+References: <20230524070026.2932-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
-References: <20230524063810.1595778-1-hch@lst.de> <20230524063810.1595778-10-hch@lst.de>
-In-Reply-To: <20230524063810.1595778-10-hch@lst.de>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Wed, 24 May 2023 09:00:36 +0200
-Message-ID: <CAJfpeguT-LjhS-XrZwMystZqkxyB=HaON1zo-BTNOC0L1zCa1Q@mail.gmail.com>
-Subject: Re: [PATCH 09/11] fs: factor out a direct_write_fallback helper
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-        Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Chao Yu <chao@kernel.org>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 24 May 2023 at 08:38, Christoph Hellwig <hch@lst.de> wrote:
->
-> Add a helper dealing with handling the syncing of a buffered write fallback
-> for direct I/O.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/libfs.c         | 36 +++++++++++++++++++++++++
->  include/linux/fs.h |  2 ++
->  mm/filemap.c       | 66 +++++++++++-----------------------------------
->  3 files changed, 53 insertions(+), 51 deletions(-)
->
-> diff --git a/fs/libfs.c b/fs/libfs.c
-> index 89cf614a327158..ad37a49e2ecfb7 100644
-> --- a/fs/libfs.c
-> +++ b/fs/libfs.c
-> @@ -1613,3 +1613,39 @@ u64 inode_query_iversion(struct inode *inode)
->         return cur >> I_VERSION_QUERIED_SHIFT;
->  }
->  EXPORT_SYMBOL(inode_query_iversion);
-> +
-> +ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
-> +               ssize_t direct_written, ssize_t buffered_written)
-> +{
-> +       struct address_space *mapping = iocb->ki_filp->f_mapping;
-> +       loff_t pos = iocb->ki_pos - buffered_written;
-> +       loff_t end = iocb->ki_pos - 1;
-> +       int err;
-> +
-> +       /*
-> +        * If the buffered write fallback returned an error, we want to return
-> +        * the number of bytes which were written by direct I/O, or the error
-> +        * code if that was zero.
-> +        *
-> +        * Note that this differs from normal direct-io semantics, which will
-> +        * return -EFOO even if some bytes were written.
-> +        */
-> +       if (unlikely(buffered_written < 0))
-> +               return buffered_written;
+It actually represents the name of rnbd_srv_dev.
 
-Comment/code mismatch.   The comment says:
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+---
+ drivers/block/rnbd/rnbd-srv.c | 14 +++++++-------
+ drivers/block/rnbd/rnbd-srv.h |  2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-if (buffered_written < 0)
-        return direct_written ?: buffered_written;
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index c4122e65b36a..ac2dc692bdc0 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -180,7 +180,7 @@ static void destroy_device(struct kref *kref)
+ 
+ 	WARN_ONCE(!list_empty(&dev->sess_dev_list),
+ 		  "Device %s is being destroyed but still in use!\n",
+-		  dev->id);
++		  dev->name);
+ 
+ 	spin_lock(&dev_lock);
+ 	list_del(&dev->list);
+@@ -431,7 +431,7 @@ static struct rnbd_srv_dev *rnbd_srv_init_srv_dev(struct block_device *bdev)
+ 	if (!dev)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	snprintf(dev->id, sizeof(dev->id), "%pg", bdev);
++	snprintf(dev->name, sizeof(dev->name), "%pg", bdev);
+ 	kref_init(&dev->kref);
+ 	INIT_LIST_HEAD(&dev->sess_dev_list);
+ 	mutex_init(&dev->lock);
+@@ -446,7 +446,7 @@ rnbd_srv_find_or_add_srv_dev(struct rnbd_srv_dev *new_dev)
+ 
+ 	spin_lock(&dev_lock);
+ 	list_for_each_entry(dev, &dev_list, list) {
+-		if (!strncmp(dev->id, new_dev->id, sizeof(dev->id))) {
++		if (!strncmp(dev->name, new_dev->name, sizeof(dev->name))) {
+ 			if (!kref_get_unless_zero(&dev->kref))
+ 				/*
+ 				 * We lost the race, device is almost dead.
+@@ -481,7 +481,7 @@ static int rnbd_srv_check_update_open_perm(struct rnbd_srv_dev *srv_dev,
+ 			ret = 0;
+ 		} else {
+ 			pr_err("Mapping device '%s' for session %s with RW permissions failed. Device already opened as 'RW' by %d client(s), access mode %s.\n",
+-			       srv_dev->id, srv_sess->sessname,
++			       srv_dev->name, srv_sess->sessname,
+ 			       srv_dev->open_write_cnt,
+ 			       rnbd_access_modes[access_mode].str);
+ 		}
+@@ -492,14 +492,14 @@ static int rnbd_srv_check_update_open_perm(struct rnbd_srv_dev *srv_dev,
+ 			ret = 0;
+ 		} else {
+ 			pr_err("Mapping device '%s' for session %s with migration permissions failed. Device already opened as 'RW' by %d client(s), access mode %s.\n",
+-			       srv_dev->id, srv_sess->sessname,
++			       srv_dev->name, srv_sess->sessname,
+ 			       srv_dev->open_write_cnt,
+ 			       rnbd_access_modes[access_mode].str);
+ 		}
+ 		break;
+ 	default:
+ 		pr_err("Received mapping request for device '%s' on session %s with invalid access mode: %d\n",
+-		       srv_dev->id, srv_sess->sessname, access_mode);
++		       srv_dev->name, srv_sess->sessname, access_mode);
+ 		ret = -EINVAL;
+ 	}
+ 
+@@ -774,7 +774,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+ 	list_add(&srv_sess_dev->dev_list, &srv_dev->sess_dev_list);
+ 	mutex_unlock(&srv_dev->lock);
+ 
+-	rnbd_srv_info(srv_sess_dev, "Opened device '%s'\n", srv_dev->id);
++	rnbd_srv_info(srv_sess_dev, "Opened device '%s'\n", srv_dev->name);
+ 
+ 	kfree(full_path);
+ 
+diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
+index f5962fd31d62..6b5e5ade18ae 100644
+--- a/drivers/block/rnbd/rnbd-srv.h
++++ b/drivers/block/rnbd/rnbd-srv.h
+@@ -35,7 +35,7 @@ struct rnbd_srv_dev {
+ 	struct kobject                  dev_kobj;
+ 	struct kobject                  *dev_sessions_kobj;
+ 	struct kref                     kref;
+-	char				id[NAME_MAX];
++	char				name[NAME_MAX];
+ 	/* List of rnbd_srv_sess_dev structs */
+ 	struct list_head		sess_dev_list;
+ 	struct mutex			lock;
+-- 
+2.35.3
 
-> +
-> +       /*
-> +        * We need to ensure that the page cache pages are written to disk and
-> +        * invalidated to preserve the expected O_DIRECT semantics.
-> +        */
-> +       err = filemap_write_and_wait_range(mapping, pos, end);
-> +       if (err < 0) {
-> +               /*
-> +                * We don't know how much we wrote, so just return the number of
-> +                * bytes which were direct-written
-> +                */
-> +               return err;
-
-Again comment/code mismatch.
-
-Thanks,
-Miklos
