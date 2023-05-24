@@ -2,135 +2,95 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 027ECC77B73
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 08:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66E39C7EE23
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 08:56:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235007AbjEXIsD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 04:48:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55550 "EHLO
+        id S236332AbjEXI4H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 04:56:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjEXIsC (ORCPT
+        with ESMTP id S239901AbjEXI4F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 04:48:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25ED3FC
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 01:47:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684918038;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CDhpK8+26Y4l0U6FHR/UwNa7pZESmpTlQt8dJppAy50=;
-        b=f3QBjphe7JJMJF8tO4FoM8AHv5fYSyVQ31mQbysMAkp6wfBc7vldohSMvsUJsik0jlJHEE
-        27gZ98TKN41/aHMRVNFYV3ds4VM8cVrPwOUFVZen6fnnDQF/wZV1RI4Be/hSwPUffkLZog
-        6E83gfqpBqoncWTJTt5090c1ZcNuf+M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-345-V0pDKK8rM169n3tqu65WWQ-1; Wed, 24 May 2023 04:47:14 -0400
-X-MC-Unique: V0pDKK8rM169n3tqu65WWQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 08EC385A5AA;
-        Wed, 24 May 2023 08:47:14 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CDA840CFD45;
-        Wed, 24 May 2023 08:47:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZG2m0PGztI2BZEn9@infradead.org>
-References: <ZG2m0PGztI2BZEn9@infradead.org> <ZGxfrOLZ4aN9/MvE@infradead.org> <20230522205744.2825689-1-dhowells@redhat.com> <3068545.1684872971@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: Extending page pinning into fs/direct-io.c
+        Wed, 24 May 2023 04:56:05 -0400
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D19A97
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 01:56:04 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VjNZ7Hc_1684918556;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VjNZ7Hc_1684918556)
+          by smtp.aliyun-inc.com;
+          Wed, 24 May 2023 16:56:01 +0800
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+To:     shinichiro.kawasaki@wdc.com, ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V3 blktests 0/2] blktests: Add ublk testcases
+Date:   Wed, 24 May 2023 16:55:39 +0800
+Message-Id: <20230524085541.20482-1-ZiyangZhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3215176.1684918030.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 24 May 2023 09:47:10 +0100
-Message-ID: <3215177.1684918030@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+Hi,
 
-> > What I'd like to do is to make the GUP code not take a ref on the zero=
-_page
-> > if, say, FOLL_DONT_PIN_ZEROPAGE is passed in, and then make the bio cl=
-eanup
-> > code always ignore the zero_page.
-> =
+ublk can passthrough I/O requests to userspce daemons. It is very important
+to test ublk crash handling since the userspace part is not reliable.
+Especially we should test removing device, killing ublk daemons and user
+recovery feature.
 
-> I don't think that'll work, as we can't mix different pin vs get types
-> in a bio.  And that's really a good thing.
+The first patch add user recovery support in miniublk.
 
-True - but I was thinking of just treating the zero_page specially and nev=
-er
-hold a pin or a ref on it.  It can be checked by address, e.g.:
+The second patch add five new tests for ublk to cover above cases.
 
-    static inline void bio_release_page(struct bio *bio, struct page *page=
-)
-    {
-	    if (page =3D=3D ZERO_PAGE(0))
-		    return;
-	    if (bio_flagged(bio, BIO_PAGE_PINNED))
-		    unpin_user_page(page);
-	    else if (bio_flagged(bio, BIO_PAGE_REFFED))
-		    put_page(page);
-    }
+V3:
+- run "make check" to avoid warnings
+- cleanup code
+- just choose ext4 to make ublk/003 more reliable
 
-I'm slightly concerned about the possibility of overflowing the refcount. =
- The
-problem is that it only takes about 2 million pins to do that (because the
-zero_page isn't a large folio) - which is within reach of userspace.  Crea=
-te
-an 8GiB anon mmap and do a bunch of async DIO writes from it.  You won't h=
-it
-ENOMEM because it will stick ~2 million pointers to zero_page into the pag=
-e
-tables.
+V2:
+- Check parameters in recovery
+- Add one small delay before deleting device
+- Write informative description
 
-> > Something that I noticed is that the dio code seems to wangle to page =
-bits on
-> > the target pages for a DIO-read, which seems odd, but I'm not sure I f=
-ully
-> > understand the code yet.
-> =
+Ziyang Zhang (2):
+  src/miniublk: add user recovery
+  tests: Add ublk tests
+Ziyang Zhang (2):
+  src/miniublk: add user recovery
+  tests: Add ublk tests
 
-> I don't understand this sentence.
+ common/ublk        |  10 +-
+ src/miniublk.c     | 269 ++++++++++++++++++++++++++++++++++++++++++---
+ tests/ublk/001     |  47 ++++++++
+ tests/ublk/001.out |   2 +
+ tests/ublk/002     |  62 +++++++++++
+ tests/ublk/002.out |   2 +
+ tests/ublk/003     |  52 +++++++++
+ tests/ublk/003.out |   2 +
+ tests/ublk/004     |  49 +++++++++
+ tests/ublk/004.out |   2 +
+ tests/ublk/005     |  77 +++++++++++++
+ tests/ublk/005.out |   2 +
+ tests/ublk/006     |  81 ++++++++++++++
+ tests/ublk/006.out |   2 +
+ tests/ublk/rc      |  17 +++
+ 15 files changed, 660 insertions(+), 16 deletions(-)
+ create mode 100755 tests/ublk/001
+ create mode 100644 tests/ublk/001.out
+ create mode 100755 tests/ublk/002
+ create mode 100644 tests/ublk/002.out
+ create mode 100755 tests/ublk/003
+ create mode 100644 tests/ublk/003.out
+ create mode 100755 tests/ublk/004
+ create mode 100644 tests/ublk/004.out
+ create mode 100755 tests/ublk/005
+ create mode 100644 tests/ublk/005.out
+ create mode 100755 tests/ublk/006
+ create mode 100644 tests/ublk/006.out
+ create mode 100644 tests/ublk/rc
 
-I was looking at this:
-
-    static inline void dio_bio_submit(struct dio *dio, struct dio_submit *=
-sdio)
-    {
-    ...
-	    if (dio->is_async && dio_op =3D=3D REQ_OP_READ && dio->should_dirty)
-		    bio_set_pages_dirty(bio);
-    ...
-    }
-
-but looking again, the lock is taken briefly and the dirty bit is set - wh=
-ich
-is reasonable.  However, should we be doing it before starting the I/O?
-
-David
+-- 
+2.31.1
 
