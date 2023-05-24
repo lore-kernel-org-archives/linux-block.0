@@ -2,181 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D00AFC77B7E
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 01:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0D7C7EE2E
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 01:35:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238927AbjEXBV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 May 2023 21:21:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59666 "EHLO
+        id S239014AbjEXBfN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 May 2023 21:35:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbjEXBVW (ORCPT
+        with ESMTP id S232881AbjEXBfN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 May 2023 21:21:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD62198
-        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 18:20:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684891231;
+        Tue, 23 May 2023 21:35:13 -0400
+X-Greylist: delayed 58450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 23 May 2023 18:35:11 PDT
+Received: from out-24.mta1.migadu.com (out-24.mta1.migadu.com [95.215.58.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783E4130
+        for <linux-block@vger.kernel.org>; Tue, 23 May 2023 18:35:11 -0700 (PDT)
+Message-ID: <fd208b16-c191-4d2d-34a9-74e97bb16a33@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1684892109;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=XWfrXzi1lE088cYfxUvQvd0txTe3HPtik/NVcknqft0=;
-        b=XBsPdpuVgkqPQlOwmorYapxrI2QeSbS8H0d4u7lS0D6y0VQHkjawZNDtmAP/1CFtg52XLD
-        RJHZpa5L/GfL1LOlkyY/jmVDV51M6yE2EvWeSaQrzK4YsFAC1ocWbFe7J5s8ZOqM4UvTIn
-        HSby1mcQ0Va1jpDB4YapobA3dqJE0eo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-64-89bFVIyvPKygxSK9TsjGJA-1; Tue, 23 May 2023 21:20:27 -0400
-X-MC-Unique: 89bFVIyvPKygxSK9TsjGJA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C81729AA38A;
-        Wed, 24 May 2023 01:20:27 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0EA140E95D;
-        Wed, 24 May 2023 01:20:25 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Waiman Long <longman@redhat.com>, cgroups@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>, mkoutny@suse.com
-Subject: [PATCH] blk-cgroup: Flush stats before releasing blkcg_gq
-Date:   Wed, 24 May 2023 09:19:35 +0800
-Message-Id: <20230524011935.719659-1-ming.lei@redhat.com>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=i761iZFwKwqHtc07peEjJ/qvFbYoc54lHLPk4d5Gw9g=;
+        b=fpTFPcxcbP+q7k96H5fTIPKd6BzYAoI2feC/5DeCzdADTH+grWRNwR5Y0sB2/u22k+h0Tt
+        uwAtsEvBwvkvJscWmJY6lNtjC4yhcAMByV7d1Sm3POUXlFnroVcOFlyyN/xvqTNUnb6Ahx
+        JDGWpI7Lolko19FC/VhFHBQSseG/osM=
+Date:   Wed, 24 May 2023 09:35:05 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 04/10] block/rnbd-srv: no need to check sess_dev
+To:     Jinpu Wang <jinpu.wang@ionos.com>
+Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
+References: <20230523075331.32250-1-guoqing.jiang@linux.dev>
+ <20230523075331.32250-5-guoqing.jiang@linux.dev>
+ <CAMGffEkw=A=WSSgW4ReCMV9h0TCOSWYLEqSUZPf3bfNgTXTp3g@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+In-Reply-To: <CAMGffEkw=A=WSSgW4ReCMV9h0TCOSWYLEqSUZPf3bfNgTXTp3g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As noted by Michal, the blkg_iostat_set's in the lockless list
-hold reference to blkg's to protect against their removal. Those
-blkg's hold reference to blkcg. When a cgroup is being destroyed,
-cgroup_rstat_flush() is only called at css_release_work_fn() which
-is called when the blkcg reference count reaches 0. This circular
-dependency will prevent blkcg and some blkgs from being freed after
-they are made offline.
 
-It is less a problem if the cgroup to be destroyed also has other
-controllers like memory that will call cgroup_rstat_flush() which will
-clean up the reference count. If block is the only controller that uses
-rstat, these offline blkcg and blkgs may never be freed leaking more
-and more memory over time.
 
-To prevent this potential memory leak:
+On 5/23/23 17:27, Jinpu Wang wrote:
+> On Tue, May 23, 2023 at 9:53 AM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
+>> Check ret is enough since if sess_dev is NULL which also
+>> implies ret should be 0.
+>>
+>> Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+>> ---
+>>   drivers/block/rnbd/rnbd-srv.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+>> index e9ef6bd4b50c..c4122e65b36a 100644
+>> --- a/drivers/block/rnbd/rnbd-srv.c
+>> +++ b/drivers/block/rnbd/rnbd-srv.c
+>> @@ -96,7 +96,7 @@ rnbd_get_sess_dev(int dev_id, struct rnbd_srv_session *srv_sess)
+>>                  ret = kref_get_unless_zero(&sess_dev->kref);
+>>          rcu_read_unlock();
+>>
+>> -       if (!sess_dev || !ret)
+>> +       if (!ret)
+>>                  return ERR_PTR(-ENXIO);
+>>
+>>          return sess_dev;
+>> --
+>> 2.35.3
+> This looks wrong, if you drop the check for !sess_dev, you have to
+> check it later with IS_ERR_OR_NULL when call rnbd_get_sess_dev
 
-- a new cgroup_rstat_css_cpu_flush() function is added to flush stats for
-a given css and cpu. This new function will be called in __blkg_release().
+How can it return NULL? Pls correct me if I am wrong.
 
-- don't grab bio->bi_blkg when adding the stats into blkcg's per-cpu
-stat list, and this kind of handling is the most fragile part of
-original patch
+1. If sess_dev is NULL then ret is 0, so it just returns ERR_PTR(-ENXIO).
+2. If sess_dev is not NULL, we still rely on the checking of ret.
 
-Based on Waiman's patch:
+But I can drop it as well if you think it is obscure.
 
-https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
-
-Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-Cc: Waiman Long <longman@redhat.com>
-Cc: cgroups@vger.kernel.org
-Cc: Tejun Heo <tj@kernel.org>
-Cc: mkoutny@suse.com
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-cgroup.c     | 15 +++++++++++++--
- include/linux/cgroup.h |  1 +
- kernel/cgroup/rstat.c  | 18 ++++++++++++++++++
- 3 files changed, 32 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 0ce64dd73cfe..5437b6af3955 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -163,10 +163,23 @@ static void blkg_free(struct blkcg_gq *blkg)
- static void __blkg_release(struct rcu_head *rcu)
- {
- 	struct blkcg_gq *blkg = container_of(rcu, struct blkcg_gq, rcu_head);
-+	struct blkcg *blkcg = blkg->blkcg;
-+	int cpu;
- 
- #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
- 	WARN_ON(!bio_list_empty(&blkg->async_bios));
- #endif
-+	/*
-+	 * Flush all the non-empty percpu lockless lists before releasing
-+	 * us. Meantime no new bio can refer to this blkg any more given
-+	 * the refcnt is killed.
-+	 */
-+	for_each_possible_cpu(cpu) {
-+		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-+
-+		if (!llist_empty(lhead))
-+			cgroup_rstat_css_cpu_flush(&blkcg->css, cpu);
-+	}
- 
- 	/* release the blkcg and parent blkg refs this blkg has been holding */
- 	css_put(&blkg->blkcg->css);
-@@ -991,7 +1004,6 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
- 		if (parent && parent->parent)
- 			blkcg_iostat_update(parent, &blkg->iostat.cur,
- 					    &blkg->iostat.last);
--		percpu_ref_put(&blkg->refcnt);
- 	}
- 
- out:
-@@ -2075,7 +2087,6 @@ void blk_cgroup_bio_start(struct bio *bio)
- 
- 		llist_add(&bis->lnode, lhead);
- 		WRITE_ONCE(bis->lqueued, true);
--		percpu_ref_get(&bis->blkg->refcnt);
- 	}
- 
- 	u64_stats_update_end_irqrestore(&bis->sync, flags);
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 885f5395fcd0..97d4764d8e6a 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -695,6 +695,7 @@ void cgroup_rstat_flush(struct cgroup *cgrp);
- void cgroup_rstat_flush_atomic(struct cgroup *cgrp);
- void cgroup_rstat_flush_hold(struct cgroup *cgrp);
- void cgroup_rstat_flush_release(void);
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu);
- 
- /*
-  * Basic resource stats.
-diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
-index 9c4c55228567..96e7a4e6da72 100644
---- a/kernel/cgroup/rstat.c
-+++ b/kernel/cgroup/rstat.c
-@@ -281,6 +281,24 @@ void cgroup_rstat_flush_release(void)
- 	spin_unlock_irq(&cgroup_rstat_lock);
- }
- 
-+/**
-+ * cgroup_rstat_css_cpu_flush - flush stats for the given css and cpu
-+ * @css: target css to be flush
-+ * @cpu: the cpu that holds the stats to be flush
-+ *
-+ * A lightweight rstat flush operation for a given css and cpu.
-+ * Only the cpu_lock is being held for mutual exclusion, the cgroup_rstat_lock
-+ * isn't used.
-+ */
-+void cgroup_rstat_css_cpu_flush(struct cgroup_subsys_state *css, int cpu)
-+{
-+	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
-+
-+	raw_spin_lock_irq(cpu_lock);
-+	css->ss->css_rstat_flush(css, cpu);
-+	raw_spin_unlock_irq(cpu_lock);
-+}
-+
- int cgroup_rstat_init(struct cgroup *cgrp)
- {
- 	int cpu;
--- 
-2.40.1
-
+Thanks,
+Guoqing
