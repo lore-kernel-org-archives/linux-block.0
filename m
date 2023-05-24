@@ -2,93 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12969C77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 14:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CFEC77B73
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 14:43:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234038AbjEXOTj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 10:19:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53700 "EHLO
+        id S234883AbjEXOnc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 10:43:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233176AbjEXOTj (ORCPT
+        with ESMTP id S233092AbjEXOnb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 10:19:39 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CA49119
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 07:19:38 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7747f082d98so7628639f.1
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 07:19:38 -0700 (PDT)
+        Wed, 24 May 2023 10:43:31 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5D112F
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 07:43:30 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-760dff4b701so7943039f.0
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 07:43:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684937977; x=1687529977;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=27nIvrrZcNL0ZJSKg+xlusXOw1Xbg3Vrq76XZmo3E9g=;
-        b=xTn6Y+kgaOtKE9m9CPxZVVhBj2HUWblUluxaGVpuKhn4acXmm/KCuwfVhENkne8uwT
-         wABnCvUvgzZE7RN73np59j7leulV6hIxcJmS+p/sBgM70g6bKVW15fvfLFRrKMdciun3
-         UJkm5BQHVc4FVyCixGB4u9hLoNZpDOO7C/sDDnEmXhqefnq0Mc+xjCpgU+G2IZpsMy/K
-         +W0cQ2TJA8rLHwJbX7WUBN2wvqvO8sSe/HGe6XFkf5NcY8T1uXMfvQJhwjaXqYbmk+te
-         CICFR+jHN24USA3+2lYX9+LdOZUHtpX0LGNW2UCfq5SojJ63nddBXwyNj0GAFiJ91TUZ
-         mrfg==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1684939409; x=1687531409;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IPXLDCSKwXBraRh8qU8X4kYe3FTw3OcmD0b0rwLV1YI=;
+        b=m48EBfWC4KuAg/PFZ/0kUI+QHNwJaQfIB+xzHweX9tEcZiaLYmKkAFrvooTQeD72mR
+         5nuIqn52bQsXOH+sDbEf2iilTBjDmzf5Vaug6zt+7NwPNUHqnF2YhFjnhAbi5jkuUDzR
+         7m+SmGTwfmjIdUhZdJqzT/9rqQlD2XBG3iLW1ma53pIxqASTEaEmzR8GeDn3e+oY0/Tb
+         EQY4e3uJbmu7K6DpzOYT+dvlXrh2ciUolwngPkZGHTcBmPtucatUj0435Ih4Cd11IoqE
+         AvcBuVbI3PnrGjxUZeHGtGMnQeL6zlgUeSkdNoMPcGy8RAUjK35BSKtBzNQwVhfkUwn5
+         Pydg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684937977; x=1687529977;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=27nIvrrZcNL0ZJSKg+xlusXOw1Xbg3Vrq76XZmo3E9g=;
-        b=h+j5a+U3SGzuKfcLJi+iok3V6g0VtzCHPJnDot6zPyspVb/DV45OxA+2MG7JLqh35v
-         NMGhLVaD3DJ9sPJ6+xRoLLN7C5LVIm+25ySD18XyZWncv/F/QAvc1L7w61ijbbBdGJv7
-         gbaqiPIsw84ednG1Sw8i77sdKIaW7R7j9PJMJjBtbts1EK7amIGvbrbDsApiPYGk2Ohl
-         7qwXV0I8wlaTui0oJVcAjebfAgNoW97ta2tNDkMHOkRK/cWEGutG50aVLCjfH/S1Wr76
-         buWZsjCWGIBBUa1CcoNqSHL/GaSk/D+Znc2YApFU0yQW8mQPeEOEYWtQ25AfFhxnqGuM
-         Sw7w==
-X-Gm-Message-State: AC+VfDwTWTFE+BeIAUOBuGwKCmeQjezP5LzD6JUSqFPiomwwA8QLDR2x
-        NxO+xSwaZvTrFOMZa/Y0WUI+ww==
-X-Google-Smtp-Source: ACHHUZ4veSmUBde9Z5UHqLEp9sSGgvjHXKfDUw0Nbt9o4ZFQhJxKxIvfDbWj0/1q1AvMOYGcmFajOw==
-X-Received: by 2002:a05:6e02:1608:b0:338:1467:208f with SMTP id t8-20020a056e02160800b003381467208fmr9586248ilu.2.1684937977599;
-        Wed, 24 May 2023 07:19:37 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id a20-20020a029f94000000b004040f9898ebsm3208714jam.148.2023.05.24.07.19.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 May 2023 07:19:37 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     minchan@kernel.org, senozhatsky@chromium.org,
-        linux-block@vger.kernel.org,
-        syzbot+b8d61a58b7c7ebd2c8e0@syzkaller.appspotmail.com
-In-Reply-To: <20230524060538.1593686-1-hch@lst.de>
-References: <20230524060538.1593686-1-hch@lst.de>
-Subject: Re: [PATCH] block: make bio_check_eod work for zero sized devices
-Message-Id: <168493797680.546524.7090533632380144712.b4-ty@kernel.dk>
-Date:   Wed, 24 May 2023 08:19:36 -0600
+        d=1e100.net; s=20221208; t=1684939409; x=1687531409;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IPXLDCSKwXBraRh8qU8X4kYe3FTw3OcmD0b0rwLV1YI=;
+        b=UG6/+b3ysFBRc4JqisBXLQmX/FWSGpicSBft+fRPCgROSaEKQUln1B7W3VVkXee2XX
+         WIhL9IgiHjyaAcgEE84H7YinoEPLhm8J00UGXbHcSiTYKHAesz6b6QCDxDPuSg1AAxvG
+         30/WnwuaBauhPKUeyaYrVdGRE9OAmTwIvnyD0yOxQZKmrwXIH8XYEC0AsEARvZ3GwZSt
+         ebRFSbn8fVUv2AkKdfjrgInW0d4HfzS9HyMe/+UlFPoDXVxGux98sLP89nch1XeK43b3
+         xV72yf/mKCom1fjC8Y3HS/WLpKKxARWQxKJhZ4cy6/ksl0ngae6JT4CSNHGhUIbFYO9O
+         JZwQ==
+X-Gm-Message-State: AC+VfDy4BauMSO6KhqA/EhahHOOLEwHdEycU8WaOW0Nx7DGCbiq4qzLZ
+        QBKG/+ydPRDTdSxD48pGDc7AbQ==
+X-Google-Smtp-Source: ACHHUZ4ttTueGCVRrRMUAUl7Mb54HKL0lLyB7DUkcn/PC4TPkkAQ6M3t/qFZ/WO5l9qruO96ONfCvg==
+X-Received: by 2002:a05:6e02:1608:b0:338:1467:208f with SMTP id t8-20020a056e02160800b003381467208fmr9620690ilu.2.1684939409547;
+        Wed, 24 May 2023 07:43:29 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id w34-20020a05663837a200b004168295d33esm3311241jal.47.2023.05.24.07.43.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 May 2023 07:43:28 -0700 (PDT)
+Message-ID: <90c73358-7c16-8918-50b3-b1e9101f7b21@kernel.dk>
+Date:   Wed, 24 May 2023 08:43:27 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v21 0/6] block: Use page pinning
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+References: <20230522205744.2825689-1-dhowells@redhat.com>
+ <168487791137.449781.3170440352656135902.b4-ty@kernel.dk>
+ <ZG2mKMus29qquHia@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZG2mKMus29qquHia@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Wed, 24 May 2023 08:05:38 +0200, Christoph Hellwig wrote:
-> Since the dawn of time bio_check_eod has a check for a non-zero size of
-> the device.  This doesn't really make any sense as we never want to send
-> I/O to a device that's been set to zero size, or never moved out of that.
+On 5/23/23 11:52 PM, Christoph Hellwig wrote:
+> On Tue, May 23, 2023 at 03:38:31PM -0600, Jens Axboe wrote:
+>> Applied, thanks!
 > 
-> I am a bit surprised we haven't caught this for a long time, but the
-> removal of the extra validation inside of zram caused syzbot to trip
-> over this issue recently.  I've added a Fixes tag for that commit, but
-> the issue really goes back way before git history.
-> 
-> [...]
+> This ended up on the for-6.5/block branch, but I think it needs to be
+> on the splice one, as that is pre-requisite unless I'm missing
+> something.
 
-Applied, thanks!
+Oops yes, that's my bad. I've reshuffled things now so that they should
+make more sense.
 
-[1/1] block: make bio_check_eod work for zero sized devices
-      commit: 3eb96946f0be6bf447cbdf219aba22bc42672f92
-
-Best regards,
 -- 
 Jens Axboe
-
 
 
