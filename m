@@ -2,88 +2,223 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FE6C77B73
-	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 18:25:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8B5C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 24 May 2023 20:03:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237188AbjEXSZa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 14:25:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54970 "EHLO
+        id S233142AbjEXUDo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 16:03:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235797AbjEXSZ3 (ORCPT
+        with ESMTP id S229912AbjEXUDl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 14:25:29 -0400
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05B64122
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 11:25:28 -0700 (PDT)
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5346d150972so573418a12.3
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 11:25:28 -0700 (PDT)
+        Wed, 24 May 2023 16:03:41 -0400
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7015D13A
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 13:02:52 -0700 (PDT)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-74e4f839ae4so11078585a.0
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 13:02:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684952727; x=1687544727;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1Ij/oyCEeKHYTId7OFc6lx3LGscqOvZMN9n8hZn/kc=;
-        b=Tae7A/yvyWs7wX2qGHtxN48uHpbGRnV1rqi2pa6Up3+UvtJt41SVoebtznzvMgKO7b
-         GChogUbVXiyH79cZW08wKs3cggtUt/7epR+Uzweq8KEzTww9TEFdXaByP77eJaal22gB
-         cZS4ffOwklzVIhGzmHQYU+70pC3vN/htLAFnwZi5Bn45veiWibLkGWcdzWNLxRk7jt7a
-         2oE7C0E2duw6iblRKnEVvUj33U6714WajRlAAxd+CEuBXrDnDZwMiOsTjZy2HlsECv5u
-         pZe7y7oGcqpwTJW04AZZE70QZ++Sflwt36XnkxvzYJW4KGHjQRmWQcrStIrE0zQpi7p1
-         8C8Q==
-X-Gm-Message-State: AC+VfDxTE5FiR54KG3FyA1OzcSmn3h/iTDMdYa/8wz0K06ebek966Q9c
-        CZRsQBIr4O/5hoq9M6BoXuM=
-X-Google-Smtp-Source: ACHHUZ4HiwYlWMOOv7Cb0pZ5Ya7U1zVCBKCtyzMABoLd6PqTaFhRJ3pktdDzmU9OGQMfEbF2teUGnA==
-X-Received: by 2002:a17:903:2343:b0:1ac:a9c1:b61d with SMTP id c3-20020a170903234300b001aca9c1b61dmr20795345plh.11.1684952727383;
-        Wed, 24 May 2023 11:25:27 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id y3-20020a17090322c300b001ab2a0733aasm9038314plg.39.2023.05.24.11.25.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 May 2023 11:25:27 -0700 (PDT)
-Message-ID: <356fff5c-9818-a62f-be91-5573e9f7f09b@acm.org>
-Date:   Wed, 24 May 2023 11:25:26 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v3 4/7] block: Make it easier to debug zoned write
- reordering
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
+        d=1e100.net; s=20221208; t=1684958571; x=1687550571;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wc0lEJ6PvCd/xSxo1AL44vYdysUGzpOXm110SXEKBVE=;
+        b=S3Oe1JVB7tZeC3JJ7lcl31iuWv5qDhsW9aHHz8kGWEC8wGRa1uC2EwBHQSH08V4tT3
+         +f5Fcko8/jBNrG5szaY3HQxK1/lYkk/4FveZeDrd2pUkxw8gCLf/dS4lrhp1BI1i/Ycp
+         ce9XHLitQCxnJJjoE+yJbadkZCZHugAxi5S2RZC8A709e6DZjs47N+oPqFfSxJxjjsuM
+         7fA/h5L03rE/wm8FuLfcCwVn/26JNqSQEYDLCbDhu/LOApIvj53vIBBYLGIVZb68XTF7
+         8xn+9mobaiwZDBfkY2wvfLHWJy/nA2/sZ5+/r+S/jzIpw1gk+A9vVHtA10KBRx9+Dq/n
+         vz+Q==
+X-Gm-Message-State: AC+VfDwqWkbcnRIufDmbplO8jVxj1EXgjkoPZA9bXOX6jxL/SlgfQPgI
+        Jg1+RFSntUGTJl3D9gsET7lX
+X-Google-Smtp-Source: ACHHUZ5Edu25T8oAO0AIn9AjhlUZ+gCHN9Nh8NKCZqGZXLB9J8KM/t5ZexjNCLqFmWACVt0TS1EBUg==
+X-Received: by 2002:ae9:d60e:0:b0:75b:23a1:3671 with SMTP id r14-20020ae9d60e000000b0075b23a13671mr9242472qkk.50.1684958571318;
+        Wed, 24 May 2023 13:02:51 -0700 (PDT)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id v20-20020a05620a123400b0074d60b697a6sm3496740qkj.12.2023.05.24.13.02.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 May 2023 13:02:50 -0700 (PDT)
+Date:   Wed, 24 May 2023 16:02:49 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Dave Chinner <david@fromorbit.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Mike Snitzer <snitzer@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20230522183845.354920-1-bvanassche@acm.org>
- <20230522183845.354920-5-bvanassche@acm.org> <20230523071957.GD8758@lst.de>
- <41dd1a93-2491-a094-dc61-f424b51af6cb@acm.org>
- <20230524061356.GE19611@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230524061356.GE19611@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Theodore Ts'o <tytso@mit.edu>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org, Joe Thornber <ejt@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZG5taYoXDRymo/e9@redhat.com>
+References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
+ <ZGb2Xi6O3i2pLam8@infradead.org>
+ <ZGeKm+jcBxzkMXQs@redhat.com>
+ <ZGgBQhsbU9b0RiT1@dread.disaster.area>
+ <ZGu0LaQfREvOQO4h@redhat.com>
+ <ZGzIJlCE2pcqQRFJ@bfoster>
+ <ZGzbGg35SqMrWfpr@redhat.com>
+ <ZG1dAtHmbQ53aOhA@dread.disaster.area>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZG1dAtHmbQ53aOhA@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/23/23 23:13, Christoph Hellwig wrote:
-> On Tue, May 23, 2023 at 12:34:38PM -0700, Bart Van Assche wrote:
->>> What makes sequential writes here special vs other requests that are
->>> supposed to be using the scheduler and not a bypass?
->>
->> Hi Christoph,
->>
->> If some REQ_OP_WRITE or REQ_OP_WRITE_ZEROES requests are submitted to the
->> I/O scheduler and others bypass the I/O scheduler this may lead to
->> reordering. Hence this patch that triggers a kernel warning if any
->> REQ_OP_WRITE or REQ_OP_WRITE_ZEROES requests bypass the I/O scheduler.
-> 
-> But why would we ever do a direct insert when using a scheduler for
-> write (an read for that matter) commands when not on a zoned device?
+On Tue, May 23 2023 at  8:40P -0400,
+Dave Chinner <david@fromorbit.com> wrote:
 
-Patch 2/7 of this series removes a blk_mq_request_bypass_insert() call 
-from blk_mq_requeue_work(). I think this shows that without this patch 
-series blk_mq_request_bypass_insert() could get called for REQ_OP_WRITE 
-/ REQ_OP_WRITE_ZEROES requests.
+> On Tue, May 23, 2023 at 11:26:18AM -0400, Mike Snitzer wrote:
+> > On Tue, May 23 2023 at 10:05P -0400, Brian Foster <bfoster@redhat.com> wrote:
+> > > On Mon, May 22, 2023 at 02:27:57PM -0400, Mike Snitzer wrote:
+> > > ... since I also happen to think there is a potentially interesting
+> > > development path to make this sort of reserve pool configurable in terms
+> > > of size and active/inactive state, which would allow the fs to use an
+> > > emergency pool scheme for managing metadata provisioning and not have to
+> > > track and provision individual metadata buffers at all (dealing with
+> > > user data is much easier to provision explicitly). So the space
+> > > inefficiency thing is potentially just a tradeoff for simplicity, and
+> > > filesystems that want more granularity for better behavior could achieve
+> > > that with more work. Filesystems that don't would be free to rely on the
+> > > simple/basic mechanism provided by dm-thin and still have basic -ENOSPC
+> > > protection with very minimal changes.
+> > > 
+> > > That's getting too far into the weeds on the future bits, though. This
+> > > is essentially 99% a dm-thin approach, so I'm mainly curious if there's
+> > > sufficient interest in this sort of "reserve mode" approach to try and
+> > > clean it up further and have dm guys look at it, or if you guys see any
+> > > obvious issues in what it does that makes it potentially problematic, or
+> > > if you would just prefer to go down the path described above...
+> > 
+> > The model that Dave detailed, which builds on REQ_PROVISION and is
+> > sticky (by provisioning same blocks for snapshot) seems more useful to
+> > me because it is quite precise.  That said, it doesn't account for
+> > hard requirements that _all_ blocks will always succeed.
+> 
+> Hmmm. Maybe I'm misunderstanding the "reserve pool" context here,
+> but I don't think we'd ever need a hard guarantee from the block
+> device that every write bio issued from the filesystem will succeed
+> without ENOSPC.
+> 
+> If the block device can provide a guarantee that a provisioned LBA
+> range is always writable, then everything else is a filesystem level
+> optimisation problem and we don't have to involve the block device
+> in any way. All we need is a flag we can ready out of the bdev at
+> mount time to determine if the filesystem should be operating with
+> LBA provisioning enabled...
+> 
+> e.g. If we need to "pre-provision" a chunk of the LBA space for
+> filesystem metadata, we can do that ahead of time and track the
+> pre-provisioned range(s) in the filesystem itself.
+> 
+> In XFS, That could be as simple as having small chunks of each AG
+> reserved to metadata (e.g. start with the first 100MB) and limiting
+> all metadata allocation free space searches to that specific block
+> range. When we run low on that space, we pre-provision another 100MB
+> chunk and then allocate all metadata out of that new range. If we
+> start getting ENOSPC to pre-provisioning, then we reduce the size of
+> the regions and log low space warnings to userspace. If we can't
+> pre-provision any space at all and we've completely run out, we
+> simply declare ENOSPC for all incoming operations that require
+> metadata allocation until pre-provisioning succeeds again.
+
+This is basically saying the same thing but:
+
+It could be that the LBA space is fragmented and so falling back to
+the smallest region size (that matches the thinp block size) would be
+the last resort?  Then if/when thinp cannot even service allocating a
+new free thin block, dm-thinp will transition to out-of-data-space
+mode.
+
+> This is built entirely on the premise that once proactive backing
+> device provisioning fails, the backing device is at ENOSPC and we
+> have to wait for that situation to go away before allowing new data
+> to be ingested. Hence the block device really doesn't need to know
+> anything about what the filesystem is doing and vice versa - The
+> block dev just says "yes" or "no" and the filesystem handles
+> everything else.
+
+Yes.
+
+> It's worth noting that XFS already has a coarse-grained
+> implementation of preferred regions for metadata storage. It will
+> currently not use those metadata-preferred regions for user data
+> unless all the remaining user data space is full.  Hence I'm pretty
+> sure that a pre-provisioning enhancment like this can be done
+> entirely in-memory without requiring any new on-disk state to be
+> added.
+> 
+> Sure, if we crash and remount, then we might chose a different LBA
+> region for pre-provisioning. But that's not really a huge deal as we
+> could also run an internal background post-mount fstrim operation to
+> remove any unused pre-provisioning that was left over from when the
+> system went down.
+
+This would be the FITRIM with extension you mention below?  Which is a
+filesystem interface detail? So dm-thinp would _not_ need to have new
+state that tracks "provisioned but unused" block?  Nor would the block
+layer need an extra discard flag for a new class of "provisioned"
+blocks.
+
+If XFS tracked this "provisioned but unused" state, dm-thinp could
+just discard the block like its told.  Would be nice to avoid dm-thinp
+needing to track "provisioned but unused".
+
+That said, dm-thinp does still need to know if a block was provisioned
+(given our previous designed discussion, to allow proper guarantees
+from this interface at snapshot time) so that XFS and other
+filesystems don't need to re-provision areas they already
+pre-provisioned.
+
+However, it may be that if thinp did track "provisioned but unused"
+it'd be useful to allow snapshots to share provisioned blocks that
+were never used.  Meaning, we could then avoid "breaking sharing" at
+snapshot-time for "provisioned but unused" blocks.  But allowing this
+"optimization" undercuts the gaurantee that XFS needs for thinp
+storage that allows snapshots... SO, I think I answered my own
+question: thinp doesnt need to track "provisioned but unused" blocks
+but we must always ensure snapshots inherit provisoned blocks ;)
+
+> Further, managing shared pool exhaustion doesn't require a
+> reservation pool in the backing device and for the filesystems to
+> request space from it. Filesystems already have their own reserve
+> pools via pre-provisioning. If we want the filesystems to be able to
+> release that space back to the shared pool (e.g. because the shared
+> backing pool is critically short on space) then all we need is an
+> extension to FITRIM to tell the filesystem to also release internal
+> pre-provisioned reserves.
+
+So by default FITRIM will _not_ discard provisioned blocks.  Only if
+a flag is used will it result in discarding provisioned blocks.
+
+My dwelling on this is just double-checking that the 
+ 
+> Then the backing pool admin (person or automated daemon!) can simply
+> issue a trim on all the filesystems in the pool and spce will be
+> returned. Then filesystems will ask for new pre-provisioned space
+> when they next need to ingest modifications, and the backing pool
+> can manage the new pre-provisioning space requests directly....
+>
+> Hence I think if we get the basic REQ_PROVISION overwrite-in-place
+> guarantees defined and implemented as previously outlined, then we
+> don't need any special coordination between the fs and block devices
+> to avoid fatal ENOSPC issues with sparse and/or snapshot capable
+> block devices...
+> 
+> As a bonus, if we can implement the guarantees in dm-thin/-snapshot
+> and have a filesystem make use of it, then we also have a reference
+> implementation to point at device vendors and standards
+> associations....
+
+Yeap.
 
 Thanks,
-
-Bart.
+Mike
