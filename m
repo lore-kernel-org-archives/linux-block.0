@@ -2,118 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5510EC77B7E
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 07:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF3EC77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 08:14:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233203AbjEYHWV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 03:22:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53474 "EHLO
+        id S239027AbjEYIO4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 04:14:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231877AbjEYHWU (ORCPT
+        with ESMTP id S239544AbjEYIOx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 03:22:20 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D02D9C;
-        Thu, 25 May 2023 00:22:19 -0700 (PDT)
-Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4QRfX85ZDNzqTPF;
-        Thu, 25 May 2023 15:17:44 +0800 (CST)
-Received: from localhost.localdomain (10.175.127.227) by
- kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Thu, 25 May 2023 15:22:15 +0800
-From:   Zhong Jinghua <zhongjinghua@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <zhongjinghua@huawei.com>, <yi.zhang@huawei.com>,
-        <yukuai3@huawei.com>
-Subject: [PATCH -next v2] block: Fix the partition start may overflow in add_partition()
-Date:   Thu, 25 May 2023 15:20:41 +0800
-Message-ID: <20230525072041.3701176-1-zhongjinghua@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Thu, 25 May 2023 04:14:53 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA2F2186
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 01:14:41 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1CEA868B05; Thu, 25 May 2023 10:14:38 +0200 (CEST)
+Date:   Thu, 25 May 2023 10:14:37 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/7] blk-mq: use the I/O scheduler for writes from the
+ flush state machine
+Message-ID: <20230525081437.GA22420@lst.de>
+References: <20230519044050.107790-1-hch@lst.de> <20230519044050.107790-5-hch@lst.de> <20230524055327.GA19543@lst.de> <f7a7595f-6fd6-5fdf-4c64-b4fff367239c@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600002.china.huawei.com (7.193.23.29)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7a7595f-6fd6-5fdf-4c64-b4fff367239c@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In the blkdev_ioctl, we can pass in the unsigned number 0x8000000000000000
-as an input parameter, like below:
+On Wed, May 24, 2023 at 11:07:41AM -0700, Bart Van Assche wrote:
+> On 5/23/23 22:53, Christoph Hellwig wrote:
+>> I turns out this causes some kind of hang I haven't been able to
+>> debug yet in blktests' hotplug test.   Can you drop this and the
+>> subsequent patches for now?
+>
+> Hi Christoph,
+>
+> I haven't seen this hang in my tests. If you can tell me how to run 
+> blktests I can help with root-causing this issue. This is how I run 
+> blktests:
 
-blkdev_ioctl
-  blkpg_ioctl
-    blkpg_do_ioctl
-      start = p.start >> SECTOR_SHIFT; // start = 0x8000000000000000 >> 9
-       bdev_add_partition
-         add_partition
-           p->start_sect = start; // start = 0xffc0000000000000
+This is a simple ./check run with this config, and most importantly
+modular scsi_debug (which is not my usual config, othewise I would
+have noticed it earlier):
 
-Then, there was an warning when submit bio:
+----- snip -----
+TEST_DEVS=(/dev/vdb)
+nvme_trtype=tcp
+----- snip -----
 
-submit_bio_noacct
-  submit_bio_checks
-    blk_partition_remap
-      bio->bi_iter.bi_sector += p->start_sect
-      // bio->bi_iter.bi_sector = 0xffc0000000000000 + 0xfc00
-..
-loop_process_work
- loop_handle_cmd
-  do_req_filebacked
-   pos = ((loff_t) blk_rq_pos(rq) << 9) + lo->lo_offset
-   // pos is 0xffc000000000fc00 << 9
-   lo_rw_aio
-     call_read_iter
-      ext4_dio_read_iter
-	ext4_dio_read_iter
-          iomap_dio_rw
-            __iomap_dio_rw
-	      iomap_iter
-		ext4_iomap_begin
-		  map.m_lblk = offset >> blkbits // (u32) map.m_lblk is 0xfc00
-		  ext4_set_iomap
-		    iomap->offset = (u64) map->m_lblk << blkbits
-		    // iomap->offset = 0xfc00
-		iomap_iter_done
-		  WARN_ON_ONCE(iter->iomap.offset > iter->pos);
-		  // iomap.offset = 0xfc00 and iter->pos < 0
+It hangs in block/001 when probing scsi_debug:
 
-This is unreasonable for start + length > disk->part0.nr_sects. There is
-already a similar check in blk_add_partition().
-Fix it by adding a check in blkpg_do_ioctl().
-
-Reported-by: Zhihao Cheng <chengzhihao1@huawei.com>
-Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
----
- v2: Modify the io stack in commit message.
- block/ioctl.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 9c5f637ff153..3223ea862523 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -33,9 +33,16 @@ static int blkpg_do_ioctl(struct block_device *bdev,
- 	if (op == BLKPG_DEL_PARTITION)
- 		return bdev_del_partition(disk, p.pno);
- 
-+	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
-+		return -EINVAL;
-+
- 	start = p.start >> SECTOR_SHIFT;
- 	length = p.length >> SECTOR_SHIFT;
- 
-+	/* length may be equal to 0 after right shift */
-+	if (!length || start + length > get_capacity(bdev->bd_disk))
-+		return -EINVAL;
-+
- 	switch (op) {
- 	case BLKPG_ADD_PARTITION:
- 		/* check if partition is aligned to blocksize */
--- 
-2.31.1
+[  242.790601] INFO: task modprobe:3702 blocked for more than 120 seconds.
+[  242.791572]       Not tainted 6.4.0-rc2+ #1179
+[  242.792201] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this
+message.
+[  242.793387] task:modprobe        state:D stack:0     pid:3702  ppid:3686
+flags:0x00004002
+[  242.794724] Call Trace:
+[  242.795121]  <TASK>
+[  242.795465]  __schedule+0x307/0x840
+[  242.796053]  ? call_usermodehelper_exec+0xee/0x180
+[  242.796812]  schedule+0x57/0xa0
+[  242.797316]  async_synchronize_full+0xa0/0x130
+[  242.798029]  ? destroy_sched_domains_rcu+0x20/0x20
+[  242.798803]  do_init_module+0x19f/0x200
+[  242.799657]  __do_sys_finit_module+0x9e/0xf0
+[  242.800324]  do_syscall_64+0x34/0x80
+[  242.800879]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
