@@ -2,92 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40092C77B7A
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 09:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A12C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 10:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232250AbjEYJwW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 05:52:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39100 "EHLO
+        id S240422AbjEYKGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 06:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240596AbjEYJwV (ORCPT
+        with ESMTP id S234068AbjEYKGJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 05:52:21 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7204F12E;
-        Thu, 25 May 2023 02:52:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=nTS/g9fJs1n3cdqbVQhwwN534SXRQ6PP71rBH26gs+o=; b=p6e1VERz8010nQ39lyNEHKlZBJ
-        u9uCZI7CPHvLK/QvHgpdsWDLzUhplfc6m6cEzj55zPcPok5rXriocAueZ1L7Ki/vq26U2hpg5MZsm
-        1yfwE4fnYycZ5TFY4ZKPWVnReI263wRCmC4HazkrJ0eux7gIHW/BqfQmLKEN3i+9iCWObA//GMWYP
-        dCXg2ypvVErRh3xsgKvmYz4gsBD7MxC0PSkssl7fofWrUTvacF23jY8czbQSQYguj0z6jHHWEfCTO
-        OxCsTp8QjVVMEcONNlV88MyIBTwC+QiOz3MHJU7cNVzxST4eLSM0aeP+cJeKSPlOHdZ4uQgr72pKp
-        1+4+U46Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q27dX-00GC8e-19;
-        Thu, 25 May 2023 09:51:59 +0000
-Date:   Thu, 25 May 2023 02:51:59 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
+        Thu, 25 May 2023 06:06:09 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BF8310B;
+        Thu, 25 May 2023 03:06:04 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 45E6C68AFE; Thu, 25 May 2023 12:05:58 +0200 (CEST)
+Date:   Thu, 25 May 2023 12:05:57 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Miklos Szeredi <miklos@szeredi.hu>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
         Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: Extending page pinning into fs/direct-io.c
-Message-ID: <ZG8vvzbUdFmsLv5Z@infradead.org>
-References: <ZG2m0PGztI2BZEn9@infradead.org>
- <ZGxfrOLZ4aN9/MvE@infradead.org>
- <20230522205744.2825689-1-dhowells@redhat.com>
- <3068545.1684872971@warthog.procyon.org.uk>
- <3215177.1684918030@warthog.procyon.org.uk>
+        Theodore Ts'o <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 09/11] fs: factor out a direct_write_fallback helper
+Message-ID: <20230525100557.GA30242@lst.de>
+References: <20230524063810.1595778-1-hch@lst.de> <20230524063810.1595778-10-hch@lst.de> <CAJfpeguT-LjhS-XrZwMystZqkxyB=HaON1zo-BTNOC0L1zCa1Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3215177.1684918030@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CAJfpeguT-LjhS-XrZwMystZqkxyB=HaON1zo-BTNOC0L1zCa1Q@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 24, 2023 at 09:47:10AM +0100, David Howells wrote:
-> True - but I was thinking of just treating the zero_page specially and never
-> hold a pin or a ref on it.  It can be checked by address, e.g.:
+On Wed, May 24, 2023 at 09:00:36AM +0200, Miklos Szeredi wrote:
+> > +ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
+> > +               ssize_t direct_written, ssize_t buffered_written)
+> > +{
+> > +       struct address_space *mapping = iocb->ki_filp->f_mapping;
+> > +       loff_t pos = iocb->ki_pos - buffered_written;
+> > +       loff_t end = iocb->ki_pos - 1;
+> > +       int err;
+> > +
+> > +       /*
+> > +        * If the buffered write fallback returned an error, we want to return
+> > +        * the number of bytes which were written by direct I/O, or the error
+> > +        * code if that was zero.
+> > +        *
+> > +        * Note that this differs from normal direct-io semantics, which will
+> > +        * return -EFOO even if some bytes were written.
+> > +        */
+> > +       if (unlikely(buffered_written < 0))
+> > +               return buffered_written;
 > 
->     static inline void bio_release_page(struct bio *bio, struct page *page)
->     {
-> 	    if (page == ZERO_PAGE(0))
-> 		    return;
-> 	    if (bio_flagged(bio, BIO_PAGE_PINNED))
-> 		    unpin_user_page(page);
-> 	    else if (bio_flagged(bio, BIO_PAGE_REFFED))
-> 		    put_page(page);
->     }
-
-That does sound good as well to me.
-
-> I was looking at this:
+> Comment/code mismatch.   The comment says:
 > 
->     static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
->     {
->     ...
-> 	    if (dio->is_async && dio_op == REQ_OP_READ && dio->should_dirty)
-> 		    bio_set_pages_dirty(bio);
->     ...
->     }
-> 
-> but looking again, the lock is taken briefly and the dirty bit is set - which
-> is reasonable.  However, should we be doing it before starting the I/O?
+> if (buffered_written < 0)
+>         return direct_written ?: buffered_written;
 
-It is done before starting the I/O - the submit_bio is just below this.
-
+Yeah.  And the old code matches the comment, so I'll update to that.
+I'm really wondering how I could come up with a good test case for
+this..
