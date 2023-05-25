@@ -2,103 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE90C77B7A
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 14:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F17C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 14:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241383AbjEYOLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 10:11:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
+        id S241229AbjEYOMc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 10:12:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234918AbjEYOLy (ORCPT
+        with ESMTP id S234918AbjEYOMb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 10:11:54 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A09F6183;
-        Thu, 25 May 2023 07:11:53 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5A32F1FE6A;
-        Thu, 25 May 2023 14:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1685023912; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=s2JH6pTYcJePjQtM79Iqz39SbWKAXK4Qz2x1GSVTfLY=;
-        b=RGyV9NO3PzYGEcee4AtXtXB1xO4jeCtqPc89Ldtc0+jxV2LTOn8SQ2TVpUKhPg82a72hSf
-        YbPYy5G/nF0nG2sLTc/iU8w/kbOdF8XcQEeWGzx+nvYujx9CrkrQOgXNaZVwM/7RqJZIQQ
-        djbtpQ6hb7F/xxxVsfTH6VBOufQttEQ=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 23246134B2;
-        Thu, 25 May 2023 14:11:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id yJTQB6hsb2RpZQAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Thu, 25 May 2023 14:11:52 +0000
-Date:   Thu, 25 May 2023 16:11:50 +0200
-From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Yosry Ahmed <yosryahmed@google.com>, Linux-MM <linux-mm@kvack.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Shakeel Butt <shakeelb@google.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Roman Gushchin <roman.gushchin@linux.dev>,
-        Muchun Song <muchun.song@linux.dev>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Waiman Long <longman@redhat.com>, cgroups@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>
-Subject: Re: [PATCH] blk-cgroup: Flush stats before releasing blkcg_gq
-Message-ID: <3ej42djuuzwx36yf2yeo5ggyrvogeaguos5jtve2bvuaejnwff@fak3yjwe2fbi>
-References: <20230524011935.719659-1-ming.lei@redhat.com>
- <CAJD7tkZkbro4H-QC=RJx_dfCdGQ5c=4NJhbFrcEmQSidaaMOmg@mail.gmail.com>
- <ZG14VnHl20lt9jLc@ovpn-8-17.pek2.redhat.com>
+        Thu, 25 May 2023 10:12:31 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCFF191;
+        Thu, 25 May 2023 07:12:26 -0700 (PDT)
+Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4QRqh75P1XzYsmC;
+        Thu, 25 May 2023 22:10:15 +0800 (CST)
+Received: from [10.174.178.159] (10.174.178.159) by
+ kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 25 May 2023 22:12:23 +0800
+Message-ID: <5ec837a5-4e54-b5a2-fd53-a6d7845fb5d7@huawei.com>
+Date:   Thu, 25 May 2023 22:12:11 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="yw4zsdelcidbb6wx"
-Content-Disposition: inline
-In-Reply-To: <ZG14VnHl20lt9jLc@ovpn-8-17.pek2.redhat.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH -next] block: Fix the partition start may overflow in
+ add_partition()
+To:     Christoph Hellwig <hch@infradead.org>,
+        Zhong Jinghua <zhongjinghua@huaweicloud.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
+        <yukuai3@huawei.com>, <chengzhihao1@huawei.com>,
+        <yangerkun@huawei.com>
+References: <20230522070615.1485014-1-zhongjinghua@huaweicloud.com>
+ <ZG8igEyXrFa4j/gf@infradead.org>
+From:   zhongjinghua <zhongjinghua@huawei.com>
+In-Reply-To: <ZG8igEyXrFa4j/gf@infradead.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.178.159]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600002.china.huawei.com (7.193.23.29)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---yw4zsdelcidbb6wx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+在 2023/5/25 16:55, Christoph Hellwig 写道:
+> On Mon, May 22, 2023 at 03:06:15PM +0800, Zhong Jinghua wrote:
+>> +	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
+>> +		return -EINVAL;
+>> +
+>>   	start = p.start >> SECTOR_SHIFT;
+>>   	length = p.length >> SECTOR_SHIFT;
+>>   
+>> +	/* length may be equal to 0 after right shift */
+>> +	if (!length || start + length > get_capacity(bdev->bd_disk))
+>> +		return -EINVAL;
+> While we're at it, shouldn't these be switched to use
+> check_add_overflow?
 
-On Wed, May 24, 2023 at 10:37:10AM +0800, Ming Lei <ming.lei@redhat.com> wr=
-ote:
-> > I am not at all familiar with blkcg, but does calling
-> > cgroup_rstat_flush() in offline_css() fix the problem?
->=20
-> Except for offline, this list needs to be flushed after the associated di=
-sk
-> is deleted.
+However, using check_add_overflow requires the introduction of an 
+additional local variable for the third parameter, which does not make 
+much difference to the current check. Is it worth it?
 
-Why the second flush trigger?
-a) To break another ref-dependency cycle (like on the blkcg side)?
-b) To avoid stale data upon device removal?
+e.g:
 
-(Because b) should be unnecessary, a future reader would flush when
-needed.)
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 3223ea862523..9a40e8f864cb 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -18,7 +18,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+  {
+         struct gendisk *disk = bdev->bd_disk;
+         struct blkpg_partition p;
+-       long long start, length;
++       long long start, length, tmp_check;
 
-Thanks,
-Michal
+         if (!capable(CAP_SYS_ADMIN))
+                 return -EACCES;
+@@ -33,7 +33,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
+         if (op == BLKPG_DEL_PARTITION)
+                 return bdev_del_partition(disk, p.pno);
 
---yw4zsdelcidbb6wx
-Content-Type: application/pgp-signature; name="signature.asc"
+-       if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
++       if (p.start < 0 || p.length <= 0 || check_add_overflow(p.start, 
+p.length, &tmp_check))
+                 return -EINVAL;
 
------BEGIN PGP SIGNATURE-----
+         start = p.start >> SECTOR_SHIFT;
 
-iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCZG9spAAKCRAkDQmsBEOq
-ufTLAP9NX8DIiij6/hpnoy9/M+nnSBemEZ9lY1LODUguhjSJrAEA5g8mQPrBr8KR
-A7VHGk9AX3B3eIPAFYavVz4cMoIrYwE=
-=56eg
------END PGP SIGNATURE-----
+Or do you have a better idea?
 
---yw4zsdelcidbb6wx--
