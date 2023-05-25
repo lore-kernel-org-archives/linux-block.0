@@ -2,96 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06E5C7EE29
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 17:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90A3FC7EE2F
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 18:38:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232561AbjEYR7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 13:59:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
+        id S241850AbjEYSiN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 14:38:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229663AbjEYR7F (ORCPT
+        with ESMTP id S241838AbjEYShm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 13:59:05 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E261B6
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 10:59:04 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ae4d1d35e6so12772955ad.0
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 10:59:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685037544; x=1687629544;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xh+Sq/uMyLsRA2RTYACG11SUiMBdUyGxyXcentsDWSs=;
-        b=nDewzevdtTcZW/Tvxz9qXEWwVsruFiYTgQTHW+iZtEyL+o/CxyuIeqaaGsPgbuaP/u
-         5CjPB1dlDLA4eqiRE/F4yTYJiTCIrHO6QLqO7v6cC1TIaFMtKT0gRQ1xlf4BqICtZJIh
-         7FKr9Uye6UaczrjrbLFkN4fVzdmUFWfeKJXzcuEMWqgLRwrzUDMCE+4r7XdNUplj/+0t
-         EPb237145QDzRlf9LoB5ybdrH7Wh8oKmaYhd9e76CkS3MVDp4/1YmgwDChQjZ2qJGbXn
-         XlNRgdv0G0EC5WyMh/pipDRwuY6fIFgAbBHyunGjVunTIonwqf1sCpx44jJ6pCoVZJvV
-         9NUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685037544; x=1687629544;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xh+Sq/uMyLsRA2RTYACG11SUiMBdUyGxyXcentsDWSs=;
-        b=UZCUvckCEELvfemtxUHEybzcm/NzmvgnyAgJM2UYlfrXh/LE7e6F+qz/OFI2b88EHg
-         53FD+TogmroN5z6W5mcirB7id1xLJAc4uJo64mN0M1LeTXSQne8/KB0YJvsJe+uyb8pY
-         KgTcvz4fR/ihbep3SfHhYsPDMlIjCzwVCFBE502Rch/v67M/cVhwArRTf3L80RR0iBS+
-         A2cuACbHFPP0t7py9FqIGVRcpR6HLu8II5ToqZtPirwb2oy22/18XKMYkU9wD3QmeYny
-         SPa7JIqkj7ANur7iJNV+1NpcdlBDcx+DgADoUYqXo5YDFnt2rWp9hUtK1LSNDTz/Zibv
-         GQnw==
-X-Gm-Message-State: AC+VfDyDiFGMmL2KwDga4bqdWCh0CYiSqDKysiX+GQ8PNCcsPolZ94XH
-        brBab6TVzaI0sxhMhfNoCRM=
-X-Google-Smtp-Source: ACHHUZ729FU4RR8vYy5N7+Ip8rYe+diPK0tpc00S2BYla8wjOuruHnFPIF2tOfxPaaIBu4QGoY+0jQ==
-X-Received: by 2002:a17:902:f693:b0:1a9:6dfb:4b09 with SMTP id l19-20020a170902f69300b001a96dfb4b09mr2745747plg.67.1685037543397;
-        Thu, 25 May 2023 10:59:03 -0700 (PDT)
-Received: from Osmten.. ([103.84.150.78])
-        by smtp.gmail.com with ESMTPSA id j18-20020a170902da9200b001af98dcf958sm1686359plx.288.2023.05.25.10.59.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 May 2023 10:59:03 -0700 (PDT)
-From:   Osama Muhammad <osmtendev@gmail.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Osama Muhammad <osmtendev@gmail.com>
-Subject: [PATCH] pktcdvd.c: Drop error checking for debugfs_create_dir
-Date:   Thu, 25 May 2023 22:58:36 +0500
-Message-Id: <20230525175836.19058-1-osmtendev@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 25 May 2023 14:37:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D2DE73;
+        Thu, 25 May 2023 11:36:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C4F5648CF;
+        Thu, 25 May 2023 18:36:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A077DC433D2;
+        Thu, 25 May 2023 18:36:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685039761;
+        bh=6JCHwVKxkQsQPrUJDGy2mxc74mHzyJx+YWHEXdPHPCs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=NJSc4TZKzPMbtoAH8hPMwJ5F1kqeiw/8T47mYaXhwUoxEPPREpQDHqp7H9ZoLaV9z
+         QsJv5KqCaXXeKZ9bhorlf8SUokSLuAbICXJIJT70zRTNkf/+0hMCkMO2runxHsF52W
+         kzyqNkAt4YSb0wtLW4PEJFhKTAz6rvbUgL99RQei+eLiOln3f2hbd9UY5Ryth93IzM
+         MB7H42D5U/mV4PTKo6h1dI4QuVXgntPJ9BTiFXIhsY4dZFvhTgu1tyJTTU2FuM98Ex
+         QimvncThsZ5+/9mI3PAEp9NwjQrpTC3Uo8Nai7K+GjycrPrsN6kIpSZcdA4INNxClP
+         H717HONKdMWJA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.3 65/67] ublk: fix AB-BA lockdep warning
+Date:   Thu, 25 May 2023 14:31:42 -0400
+Message-Id: <20230525183144.1717540-65-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230525183144.1717540-1-sashal@kernel.org>
+References: <20230525183144.1717540-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch remove the error checking in pktcdvd.c.
-The DebugFS kernel API is developed in
-a way that the caller can safely ignore the errors that
-occur during the creation of DebugFS nodes.
+From: Ming Lei <ming.lei@redhat.com>
 
-The comment above debugfs_create_dir includes the following text.
+[ Upstream commit ac5902f84bb546c64aea02c439c2579cbf40318f ]
 
- * NOTE: it's expected that most callers should _ignore_ the errors returned
- * by this function. Other debugfs functions handle the fact that the "dentry"
- * passed to them could be an error and they don't crash in that case.
- * Drivers should generally work fine even if debugfs fails to init anyway.
+When handling UBLK_IO_FETCH_REQ, ctx->uring_lock is grabbed first, then
+ub->mutex is acquired.
 
-Signed-off-by: Osama Muhammad <osmtendev@gmail.com>
+When handling UBLK_CMD_STOP_DEV or UBLK_CMD_DEL_DEV, ub->mutex is
+grabbed first, then calling io_uring_cmd_done() for canceling uring
+command, in which ctx->uring_lock may be required.
+
+Real deadlock only happens when all the above commands are issued from
+same uring context, and in reality different uring contexts are often used
+for handing control command and IO command.
+
+Fix the issue by using io_uring_cmd_complete_in_task() to cancel command
+in ublk_cancel_dev(ublk_cancel_queue).
+
+Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Closes: https://lore.kernel.org/linux-block/becol2g7sawl4rsjq2dztsbc7mqypfqko6wzsyoyazqydoasml@rcxarzwidrhk
+Cc: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Link: https://lore.kernel.org/r/20230517133408.210944-1-ming.lei@redhat.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/pktcdvd.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/block/ublk_drv.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index d5d7884cedd4..37cdd68c3de5 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -451,8 +451,6 @@ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
- 	if (!pkt_debugfs_root)
- 		return;
- 	pd->dfs_d_root = debugfs_create_dir(pd->name, pkt_debugfs_root);
--	if (!pd->dfs_d_root)
--		return;
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 41c35ab2c25a1..4db5f1bcac44a 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1122,6 +1122,11 @@ static inline bool ublk_queue_ready(struct ublk_queue *ubq)
+ 	return ubq->nr_io_ready == ubq->q_depth;
+ }
  
- 	pd->dfs_f_info = debugfs_create_file("info", 0444,
- 					     pd->dfs_d_root, pd, &debug_fops);
++static void ublk_cmd_cancel_cb(struct io_uring_cmd *cmd, unsigned issue_flags)
++{
++	io_uring_cmd_done(cmd, UBLK_IO_RES_ABORT, 0, issue_flags);
++}
++
+ static void ublk_cancel_queue(struct ublk_queue *ubq)
+ {
+ 	int i;
+@@ -1133,8 +1138,8 @@ static void ublk_cancel_queue(struct ublk_queue *ubq)
+ 		struct ublk_io *io = &ubq->ios[i];
+ 
+ 		if (io->flags & UBLK_IO_FLAG_ACTIVE)
+-			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0,
+-						IO_URING_F_UNLOCKED);
++			io_uring_cmd_complete_in_task(io->cmd,
++						      ublk_cmd_cancel_cb);
+ 	}
+ 
+ 	/* all io commands are canceled */
 -- 
-2.34.1
+2.39.2
 
