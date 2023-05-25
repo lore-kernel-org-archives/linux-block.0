@@ -2,63 +2,92 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 168E1C7EE2C
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 08:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40092C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 09:52:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230389AbjEYIze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 04:55:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42958 "EHLO
+        id S232250AbjEYJwW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 05:52:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240294AbjEYIze (ORCPT
+        with ESMTP id S240596AbjEYJwV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 04:55:34 -0400
+        Thu, 25 May 2023 05:52:21 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550FB1B0;
-        Thu, 25 May 2023 01:55:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7204F12E;
+        Thu, 25 May 2023 02:52:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=K9sG0POcwk6ioMsTPXOQV3eSTLgEBbB2sxvA5LCbWcQ=; b=fdt7VIxbv3TkQRWM91jZwpprV9
-        ZJ6UeaeNYURZHcPVWl9lz509obvVWnmwXb94DjsnzdOTi1W5NRxUZgm2G3iLTvanTBrrRKA2uUBmW
-        R6Le1Lg0MiA0ZT1X3YX7aEMYsV8Hmk91GojRCW2d3WSGcp15cT8xeI+PBwhD71nTJXrz8Yl75BfiX
-        wDqDKKIlWysLrK0rRjcX0ZddExqgE/5YrnkwxWDzH2gxFiPnx8D0zSdtvNZk/rBZJ+Q+00ABKMECF
-        gp4O0zcjlabod1RTaTrITZTNx6itpSK+cG5turE8dUFqrt8KB4fkxbhUY1mYJ1gyVxHcskP5cHHud
-        qsE4p1SA==;
+        bh=nTS/g9fJs1n3cdqbVQhwwN534SXRQ6PP71rBH26gs+o=; b=p6e1VERz8010nQ39lyNEHKlZBJ
+        u9uCZI7CPHvLK/QvHgpdsWDLzUhplfc6m6cEzj55zPcPok5rXriocAueZ1L7Ki/vq26U2hpg5MZsm
+        1yfwE4fnYycZ5TFY4ZKPWVnReI263wRCmC4HazkrJ0eux7gIHW/BqfQmLKEN3i+9iCWObA//GMWYP
+        dCXg2ypvVErRh3xsgKvmYz4gsBD7MxC0PSkssl7fofWrUTvacF23jY8czbQSQYguj0z6jHHWEfCTO
+        OxCsTp8QjVVMEcONNlV88MyIBTwC+QiOz3MHJU7cNVzxST4eLSM0aeP+cJeKSPlOHdZ4uQgr72pKp
+        1+4+U46Q==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q26kq-00G3tZ-2y;
-        Thu, 25 May 2023 08:55:28 +0000
-Date:   Thu, 25 May 2023 01:55:28 -0700
+        id 1q27dX-00GC8e-19;
+        Thu, 25 May 2023 09:51:59 +0000
+Date:   Thu, 25 May 2023 02:51:59 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, zhongjinghua@huawei.com,
-        yi.zhang@huawei.com, yukuai3@huawei.com, chengzhihao1@huawei.com,
-        yangerkun@huawei.com
-Subject: Re: [PATCH -next] block: Fix the partition start may overflow in
- add_partition()
-Message-ID: <ZG8igEyXrFa4j/gf@infradead.org>
-References: <20230522070615.1485014-1-zhongjinghua@huaweicloud.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: Extending page pinning into fs/direct-io.c
+Message-ID: <ZG8vvzbUdFmsLv5Z@infradead.org>
+References: <ZG2m0PGztI2BZEn9@infradead.org>
+ <ZGxfrOLZ4aN9/MvE@infradead.org>
+ <20230522205744.2825689-1-dhowells@redhat.com>
+ <3068545.1684872971@warthog.procyon.org.uk>
+ <3215177.1684918030@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230522070615.1485014-1-zhongjinghua@huaweicloud.com>
+In-Reply-To: <3215177.1684918030@warthog.procyon.org.uk>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 22, 2023 at 03:06:15PM +0800, Zhong Jinghua wrote:
-> +	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
-> +		return -EINVAL;
-> +
->  	start = p.start >> SECTOR_SHIFT;
->  	length = p.length >> SECTOR_SHIFT;
->  
-> +	/* length may be equal to 0 after right shift */
-> +	if (!length || start + length > get_capacity(bdev->bd_disk))
-> +		return -EINVAL;
+On Wed, May 24, 2023 at 09:47:10AM +0100, David Howells wrote:
+> True - but I was thinking of just treating the zero_page specially and never
+> hold a pin or a ref on it.  It can be checked by address, e.g.:
+> 
+>     static inline void bio_release_page(struct bio *bio, struct page *page)
+>     {
+> 	    if (page == ZERO_PAGE(0))
+> 		    return;
+> 	    if (bio_flagged(bio, BIO_PAGE_PINNED))
+> 		    unpin_user_page(page);
+> 	    else if (bio_flagged(bio, BIO_PAGE_REFFED))
+> 		    put_page(page);
+>     }
 
-While we're at it, shouldn't these be switched to use
-check_add_overflow?
+That does sound good as well to me.
+
+> I was looking at this:
+> 
+>     static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
+>     {
+>     ...
+> 	    if (dio->is_async && dio_op == REQ_OP_READ && dio->should_dirty)
+> 		    bio_set_pages_dirty(bio);
+>     ...
+>     }
+> 
+> but looking again, the lock is taken briefly and the dirty bit is set - which
+> is reasonable.  However, should we be doing it before starting the I/O?
+
+It is done before starting the I/O - the submit_bio is just below this.
 
