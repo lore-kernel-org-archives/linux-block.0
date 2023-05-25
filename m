@@ -2,46 +2,44 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A6DC7EE2F
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 18:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C5BC7EE2F
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 18:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242209AbjEYSoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 14:44:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57782 "EHLO
+        id S242161AbjEYSpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 14:45:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242258AbjEYSnv (ORCPT
+        with ESMTP id S242422AbjEYSnz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 14:43:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D70F2682;
-        Thu, 25 May 2023 11:40:35 -0700 (PDT)
+        Thu, 25 May 2023 14:43:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E151268D;
+        Thu, 25 May 2023 11:40:38 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CE28E64947;
-        Thu, 25 May 2023 18:38:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 715E7C4339C;
-        Thu, 25 May 2023 18:38:49 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4A4FE64919;
+        Thu, 25 May 2023 18:38:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06264C433A0;
+        Thu, 25 May 2023 18:38:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685039930;
-        bh=YWmMkh8l0UbNdG6QgZ4XM8b+KLeWJUU4FDAk16KjKIg=;
+        s=k20201202; t=1685039932;
+        bh=P12QkZF3C6C16RHWjPfDDVPk4kIX+N03V18889yx9TE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WF5eyJUnzbmILfvi7nTMtKooC0guNxKiZkekJuPwtsIfQTG854KZO5zbG3cV5RtPc
-         ur32MxsjehvBoRwn9geeDdUE5sg0pWCfysesoNyvTjYdUDi5HJdDu/zSL8QFNsMe/w
-         /QBI4l9CgahJ10inM1PEa55Y/NN0unSDnIfEPrUGb6mmFLufSkfwO+Nuknv5JrBjzZ
-         B9vo2SvGtbjRhiZZZ3uWbEmPjysjzLeo4Ajku61ImVfCA2vA+GApwULRM23q14s2RP
-         DMMoZG9ViKYjpBRvcrwhvX2sgY94i2UDb7RPL1AVki1hOwmQQ9bLbooGCe3JlNZWNm
-         zxoNBvII8qaYQ==
+        b=Zj4LlkS/PLmvTGZuf86WS9Ye+JKPRv0qAtUzF9RsPzbtyKrvHXxLjbwf0NC2/LUoX
+         4dzeDtg1hNUIL7XjJvYS0yoOMvqNK8LQ6xXfJenLE7u5KuLX0D9uh5vQvGATo/1iN8
+         +v0v8QPSq2UVIWa7HDa5QZn8EAU9qcuiy7qZREh1VqFrc+kFXx8wIfvB8vziyuxr1N
+         bAMCkmbL3iS9TDzQyrdemTOUVYIuJz7OD3RrYUJv+HkNdVOeG56R75WLcC4jxwjaRr
+         1Ys8uHgLwYQy5AAAFRHjstOiEYCWLwilcwZsdIfjb1Na3spRYdu29/AWlmShtOT0ZO
+         j7A+BxhALE+gg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ziyang Zhang <ZiyangZhang@linux.alibaba.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 55/57] ublk: fix AB-BA lockdep warning
-Date:   Thu, 25 May 2023 14:36:05 -0400
-Message-Id: <20230525183607.1793983-55-sashal@kernel.org>
+Cc:     Loic Poulain <loic.poulain@linaro.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 57/57] block: Deny writable memory mapping if block is read-only
+Date:   Thu, 25 May 2023 14:36:07 -0400
+Message-Id: <20230525183607.1793983-57-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230525183607.1793983-1-sashal@kernel.org>
 References: <20230525183607.1793983-1-sashal@kernel.org>
@@ -53,63 +51,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+From: Loic Poulain <loic.poulain@linaro.org>
 
-[ Upstream commit ac5902f84bb546c64aea02c439c2579cbf40318f ]
+[ Upstream commit 69baa3a623fd2e58624f24f2f23d46f87b817c93 ]
 
-When handling UBLK_IO_FETCH_REQ, ctx->uring_lock is grabbed first, then
-ub->mutex is acquired.
+User should not be able to write block device if it is read-only at
+block level (e.g force_ro attribute). This is ensured in the regular
+fops write operation (blkdev_write_iter) but not when writing via
+user mapping (mmap), allowing user to actually write a read-only
+block device via a PROT_WRITE mapping.
 
-When handling UBLK_CMD_STOP_DEV or UBLK_CMD_DEL_DEV, ub->mutex is
-grabbed first, then calling io_uring_cmd_done() for canceling uring
-command, in which ctx->uring_lock may be required.
+Example: This can lead to integrity issue of eMMC boot partition
+(e.g mmcblk0boot0) which is read-only by default.
 
-Real deadlock only happens when all the above commands are issued from
-same uring context, and in reality different uring contexts are often used
-for handing control command and IO command.
+To fix this issue, simply deny shared writable mapping if the block
+is readonly.
 
-Fix the issue by using io_uring_cmd_complete_in_task() to cancel command
-in ublk_cancel_dev(ublk_cancel_queue).
+Note: Block remains writable if switch to read-only is performed
+after the initial mapping, but this is expected behavior according
+to commit a32e236eb93e ("Partially revert "block: fail op_is_write()
+requests to read-only partitions"")'.
 
-Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Closes: https://lore.kernel.org/linux-block/becol2g7sawl4rsjq2dztsbc7mqypfqko6wzsyoyazqydoasml@rcxarzwidrhk
-Cc: Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Tested-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Link: https://lore.kernel.org/r/20230517133408.210944-1-ming.lei@redhat.com
+Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20230510074223.991297-1-loic.poulain@linaro.org
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/ublk_drv.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ block/fops.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c0cbc5f3eb266..c56d1c6d8e58d 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1045,6 +1045,11 @@ static inline bool ublk_queue_ready(struct ublk_queue *ubq)
- 	return ubq->nr_io_ready == ubq->q_depth;
+diff --git a/block/fops.c b/block/fops.c
+index e406aa605327e..6197d1c41652d 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -685,6 +685,16 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	return error;
  }
  
-+static void ublk_cmd_cancel_cb(struct io_uring_cmd *cmd, unsigned issue_flags)
++static int blkdev_mmap(struct file *file, struct vm_area_struct *vma)
 +{
-+	io_uring_cmd_done(cmd, UBLK_IO_RES_ABORT, 0, issue_flags);
++	struct inode *bd_inode = bdev_file_inode(file);
++
++	if (bdev_read_only(I_BDEV(bd_inode)))
++		return generic_file_readonly_mmap(file, vma);
++
++	return generic_file_mmap(file, vma);
 +}
 +
- static void ublk_cancel_queue(struct ublk_queue *ubq)
- {
- 	int i;
-@@ -1056,8 +1061,8 @@ static void ublk_cancel_queue(struct ublk_queue *ubq)
- 		struct ublk_io *io = &ubq->ios[i];
- 
- 		if (io->flags & UBLK_IO_FLAG_ACTIVE)
--			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0,
--						IO_URING_F_UNLOCKED);
-+			io_uring_cmd_complete_in_task(io->cmd,
-+						      ublk_cmd_cancel_cb);
- 	}
- 
- 	/* all io commands are canceled */
+ const struct file_operations def_blk_fops = {
+ 	.open		= blkdev_open,
+ 	.release	= blkdev_close,
+@@ -692,7 +702,7 @@ const struct file_operations def_blk_fops = {
+ 	.read_iter	= blkdev_read_iter,
+ 	.write_iter	= blkdev_write_iter,
+ 	.iopoll		= iocb_bio_iopoll,
+-	.mmap		= generic_file_mmap,
++	.mmap		= blkdev_mmap,
+ 	.fsync		= blkdev_fsync,
+ 	.unlocked_ioctl	= blkdev_ioctl,
+ #ifdef CONFIG_COMPAT
 -- 
 2.39.2
 
