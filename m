@@ -2,244 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 465C0C77B7C
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 02:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29610C77B7C
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 02:13:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbjEYCF1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 May 2023 22:05:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60674 "EHLO
+        id S229661AbjEYCN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 May 2023 22:13:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjEYCF1 (ORCPT
+        with ESMTP id S231658AbjEYCN1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 May 2023 22:05:27 -0400
+        Wed, 24 May 2023 22:13:27 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E14D3
-        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 19:04:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F074139
+        for <linux-block@vger.kernel.org>; Wed, 24 May 2023 19:12:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1684980278;
+        s=mimecast20190719; t=1684980759;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e/7UCDDw0yryjkW/Ax/+9xdeNm1OGJSIAfT8ut4c/kY=;
-        b=OWFyiKvVn1Qoic4JtyIYoWAqYlC/SSTOtgx67XqOhCurogZq5P0eadTBemPJ/J2ye1abfs
-        YgClrMZ7Vx3lQscesIjP6EUnhpUayWIc+NPVkekJxO3DAm+m7nCiL2MzIZxgu8/pQiRZ6K
-        bh3MjQsxWi4OEy+5Bumi38eoFoHQnAM=
+        bh=TeTp35xCF/Zw31mWFIk0j/31+kkQUEqxUlQdZLnVNag=;
+        b=WhytWK4NudxMjbf0dVniGXkaNHeR/Ah5+iWbqJtJg8yZ9eAv++XlLLJ1V7V3D/TAmLEVS7
+        ClC7K0MTtuJzM0Bl5SBv5jn+rXXopYsoGq/o6dmhpr+xt037H84kbifEOq3OCZimdoyyQd
+        hrBadlN5ymqygEAOh9Wwfi2D8+tjGe0=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-475-rvCjTLjlPyCr1ECqvU90_A-1; Wed, 24 May 2023 22:04:32 -0400
-X-MC-Unique: rvCjTLjlPyCr1ECqvU90_A-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-675-QqZ-wcvNPzuU5_3kiz7YaA-1; Wed, 24 May 2023 22:12:37 -0400
+X-MC-Unique: QqZ-wcvNPzuU5_3kiz7YaA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 12FEF85A5A8;
-        Thu, 25 May 2023 02:04:32 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 15BCE800B2A;
+        Thu, 25 May 2023 02:12:37 +0000 (UTC)
 Received: from ovpn-8-21.pek2.redhat.com (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 54CDB492B0A;
-        Thu, 25 May 2023 02:04:26 +0000 (UTC)
-Date:   Thu, 25 May 2023 10:04:22 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE7BB492B00;
+        Thu, 25 May 2023 02:12:31 +0000 (UTC)
+Date:   Thu, 25 May 2023 10:12:26 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>, mkoutny@suse.com,
-        Yosry Ahmed <yosryahmed@google.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V2] blk-cgroup: Flush stats before releasing blkcg_gq
-Message-ID: <ZG7CJtN7ATaYZ5Ao@ovpn-8-21.pek2.redhat.com>
-References: <20230524035150.727407-1-ming.lei@redhat.com>
- <f2c10b18-8d83-91a5-bf22-03894bf3c910@redhat.com>
- <ZG2R+jYuAZMpx49d@ovpn-8-17.pek2.redhat.com>
- <76a863b4-112e-82ae-59e4-6326fff48ffc@redhat.com>
- <bde4174a-ace4-6e2a-6536-855fb18d0890@redhat.com>
+To:     Tian Lan <tilan7663@gmail.com>
+Cc:     hare@suse.de, axboe@kernel.dk, horms@kernel.org,
+        linux-block@vger.kernel.org, lkp@intel.com, llvm@lists.linux.dev,
+        oe-kbuild-all@lists.linux.dev, tian.lan@twosigma.com
+Subject: Re: [PATCH] blk-mq: fix blk_mq_hw_ctx active request accounting
+Message-ID: <ZG7ECteMoJah+UqU@ovpn-8-21.pek2.redhat.com>
+References: <1c9fc9df-817c-e6cb-1375-2013c0c5a9bb@suse.de>
+ <20230515122643.597546-1-tilan7663@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bde4174a-ace4-6e2a-6536-855fb18d0890@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+In-Reply-To: <20230515122643.597546-1-tilan7663@gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 24, 2023 at 01:28:41PM -0400, Waiman Long wrote:
-> On 5/24/23 11:43, Waiman Long wrote:
-> > On 5/24/23 00:26, Ming Lei wrote:
-> > > On Wed, May 24, 2023 at 12:19:57AM -0400, Waiman Long wrote:
-> > > > On 5/23/23 23:51, Ming Lei wrote:
-> > > > > As noted by Michal, the blkg_iostat_set's in the lockless list hold
-> > > > > reference to blkg's to protect against their removal. Those blkg's
-> > > > > hold reference to blkcg. When a cgroup is being destroyed,
-> > > > > cgroup_rstat_flush() is only called at css_release_work_fn() which
-> > > > > is called when the blkcg reference count reaches 0. This circular
-> > > > > dependency will prevent blkcg and some blkgs from being freed after
-> > > > > they are made offline.
-> > > > > 
-> > > > > It is less a problem if the cgroup to be destroyed also has other
-> > > > > controllers like memory that will call cgroup_rstat_flush() which will
-> > > > > clean up the reference count. If block is the only
-> > > > > controller that uses
-> > > > > rstat, these offline blkcg and blkgs may never be freed leaking more
-> > > > > and more memory over time.
-> > > > > 
-> > > > > To prevent this potential memory leak:
-> > > > > 
-> > > > > - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
-> > > > > can be added
-> > > > > 
-> > > > > - don't grab bio->bi_blkg reference when adding the stats into blkcg's
-> > > > > per-cpu stat list since all stats are guaranteed to be consumed before
-> > > > > releasing blkg instance, and grabbing blkg reference for stats was the
-> > > > > most fragile part of original patch
-> > > > > 
-> > > > > Based on Waiman's patch:
-> > > > > 
-> > > > > https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
-> > > > > 
-> > > > > 
-> > > > > Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-> > > > > Cc: Waiman Long <longman@redhat.com>
-> > > > > Cc: Tejun Heo <tj@kernel.org>
-> > > > > Cc: mkoutny@suse.com
-> > > > > Cc: Yosry Ahmed <yosryahmed@google.com>
-> > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > > ---
-> > > > > V2:
-> > > > >     - remove kernel/cgroup change, and call blkcg_rstat_flush()
-> > > > >     to flush stat directly
-> > > > > 
-> > > > >    block/blk-cgroup.c | 29 +++++++++++++++++++++--------
-> > > > >    1 file changed, 21 insertions(+), 8 deletions(-)
-> > > > > 
-> > > > > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> > > > > index 0ce64dd73cfe..ed0eb8896972 100644
-> > > > > --- a/block/blk-cgroup.c
-> > > > > +++ b/block/blk-cgroup.c
-> > > > > @@ -34,6 +34,8 @@
-> > > > >    #include "blk-ioprio.h"
-> > > > >    #include "blk-throttle.h"
-> > > > > +static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu);
-> > > > > +
-> > > > >    /*
-> > > > >     * blkcg_pol_mutex protects blkcg_policy[] and policy
-> > > > > [de]activation.
-> > > > >     * blkcg_pol_register_mutex nests outside of it and
-> > > > > synchronizes entire
-> > > > > @@ -163,10 +165,21 @@ static void blkg_free(struct blkcg_gq *blkg)
-> > > > >    static void __blkg_release(struct rcu_head *rcu)
-> > > > >    {
-> > > > >        struct blkcg_gq *blkg = container_of(rcu, struct
-> > > > > blkcg_gq, rcu_head);
-> > > > > +    struct blkcg *blkcg = blkg->blkcg;
-> > > > > +    int cpu;
-> > > > >    #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
-> > > > >        WARN_ON(!bio_list_empty(&blkg->async_bios));
-> > > > >    #endif
-> > > > > +    /*
-> > > > > +     * Flush all the non-empty percpu lockless lists before releasing
-> > > > > +     * us, given these stat belongs to us.
-> > > > > +     *
-> > > > > +     * cgroup locks aren't needed here since __blkcg_rstat_flush just
-> > > > > +     * propagates delta into blkg parent, which is live now.
-> > > > > +     */
-> > > > > +    for_each_possible_cpu(cpu)
-> > > > > +        __blkcg_rstat_flush(blkcg, cpu);
-> > > > >        /* release the blkcg and parent blkg refs this blkg
-> > > > > has been holding */
-> > > > >        css_put(&blkg->blkcg->css);
-> > > > > @@ -951,17 +964,12 @@ static void blkcg_iostat_update(struct
-> > > > > blkcg_gq *blkg, struct blkg_iostat *cur,
-> > > > > u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
-> > > > >    }
-> > > > > -static void blkcg_rstat_flush(struct cgroup_subsys_state
-> > > > > *css, int cpu)
-> > > > > +static void __blkcg_rstat_flush(struct blkcg *blkcg, int cpu)
-> > > > >    {
-> > > > > -    struct blkcg *blkcg = css_to_blkcg(css);
-> > > > >        struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-> > > > >        struct llist_node *lnode;
-> > > > >        struct blkg_iostat_set *bisc, *next_bisc;
-> > > > > -    /* Root-level stats are sourced from system-wide IO stats */
-> > > > > -    if (!cgroup_parent(css->cgroup))
-> > > > > -        return;
-> > > > > -
-> > > > >        rcu_read_lock();
-> > > > >        lnode = llist_del_all(lhead);
-> > > > > @@ -991,13 +999,19 @@ static void blkcg_rstat_flush(struct
-> > > > > cgroup_subsys_state *css, int cpu)
-> > > > >            if (parent && parent->parent)
-> > > > >                blkcg_iostat_update(parent, &blkg->iostat.cur,
-> > > > >                            &blkg->iostat.last);
-> > > > > -        percpu_ref_put(&blkg->refcnt);
-> > > > >        }
-> > > > >    out:
-> > > > >        rcu_read_unlock();
-> > > > >    }
-> > > > > +static void blkcg_rstat_flush(struct cgroup_subsys_state
-> > > > > *css, int cpu)
-> > > > > +{
-> > > > > +    /* Root-level stats are sourced from system-wide IO stats */
-> > > > > +    if (cgroup_parent(css->cgroup))
-> > > > > +        __blkcg_rstat_flush(css_to_blkcg(css), cpu);
-> > > > > +}
-> > > > > +
-> > > > I think it may not safe to call __blkcg_rstat_flus() directly
-> > > > without taking
-> > > > the cgroup_rstat_cpu_lock. That is why I added a helper to
-> > > > kernel/cgroup/rstat.c in my patch to meet the locking requirement.
-> > > All stats are removed from llist_del_all(), and the local list is
-> > > iterated, then each blkg & its parent is touched in
-> > > __blkcg_rstat_flus(), so
-> > > can you explain it a bit why cgroup locks are needed? For protecting
-> > > what?
-> > 
-> > You are right. The llist_del_all() call in blkcg_rstat_flush() is
-> > atomic, so it is safe for concurrent execution which is what the
-> > cgroup_rstat_cpu_lock protects against. That may not be the case for
-> > rstat callbacks of other controllers. So I will suggest you to add a
-> > comment to clarify that point. Other than that, you patch looks good to
-> > me.
-> > 
-> > Reviewed: Waiman Long <longman@redhat.com>
+On Mon, May 15, 2023 at 08:26:43AM -0400, Tian Lan wrote:
+> From: Tian Lan <tian.lan@twosigma.com>
 > 
-> After some more thought, I need to retract my reviewed-by tag for now. There
-> is a slight possibility that blkcg_iostat_update() in blkcg_rstat_flush()
-> can happen concurrently which will corrupt the sequence count.
+> The nr_active counter continues to increase over time which causes the
+> blk_mq_get_tag to hang until the thread is rescheduled to a different
+> core despite there are still tags available.
+> 
+> kernel-stack
+> 
+>   INFO: task inboundIOReacto:3014879 blocked for more than 2 seconds
+>   Not tainted 6.1.15-amd64 #1 Debian 6.1.15~debian11
+>   "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+>   task:inboundIORe state:D stack:0  pid:3014879 ppid:4557 flags:0x00000000
+>     Call Trace:
+>     <TASK>
+>     __schedule+0x351/0xa20
+>     scheduler+0x5d/0xe0
+>     io_schedule+0x42/0x70
+>     blk_mq_get_tag+0x11a/0x2a0
+>     ? dequeue_task_stop+0x70/0x70
+>     __blk_mq_alloc_requests+0x191/0x2e0
+> 
+> kprobe output showing RQF_MQ_INFLIGHT bit is not cleared before
+> __blk_mq_free_request being called.
+> 
+>   320    320  kworker/29:1H __blk_mq_free_request rq_flags 0x220c0
+>          b'__blk_mq_free_request+0x1 [kernel]'
+>          b'bt_iter+0x50 [kernel]'
+>          b'blk_mq_queue_tag_busy_iter+0x318 [kernel]'
+>          b'blk_mq_timeout_work+0x7c [kernel]'
+>          b'process_one_work+0x1c4 [kernel]'
+>          b'worker_thread+0x4d [kernel]'
+>          b'kthread+0xe6 [kernel]'
+>          b'ret_from_fork+0x1f [kernel]'
+> 
+> The issue is caused by the difference between blk_mq_free_request() and
+> blk_mq_end_request_batch() wrt. when to call __blk_mq_dec_active_requests().
+> The former does it before calling req_ref_put_and_test(), and the latter
+> decreases the active request after req_ref_put_and_test().
+> 
+> - Fixes: f794f3351f26 ("block: add support for blk_mq_end_request_batch()")
+> 
+> Signed-off-by: Tian Lan <tian.lan@twosigma.com>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-llist_del_all() moves all 'bis' into one local list, and bis is one percpu
-variable of blkg, so in theory same bis won't be flushed at the same
-time. And one bis should be touched in just one of stat flush code path
-because of llist_del_all().
+Hello Jens,
 
-So 'bis' still can be thought as being flushed in serialized way.
-
-However, blk_cgroup_bio_start() runs concurrently with blkcg_rstat_flush(),
-so once bis->lqueued is cleared in blkcg_rstat_flush(), this same bis
-could be added to the percpu llist and __blkcg_rstat_flush() from blkg_release()
-follows. This should be the only chance for concurrent stats update.
-
-But, blkg_release() is run in RCU callback, so the previous flush has
-been done, but new flush can come, and other blkg's stat could be added
-with same story above.
-
-> One way to
-> avoid that is to synchronize it by cgroup_rstat_cpu_lock. Another way is to
-> use the bisc->lqueued for synchronization.
-
-I'd avoid the external cgroup lock here.
-
-> In that case, you need to move
-> WRITE_ONCE(bisc->lqueued, false) in blkcg_rstat_flush() to the end after all
-> the  blkcg_iostat_update() call with smp_store_release() and replace the
-> READ_ONCE(bis->lqueued) check in blk_cgroup_bio_start() with
-> smp_load_acquire().
-
-This way looks doable, but I guess it still can't avoid concurrent update on parent
-stat, such as when  __blkcg_rstat_flush() from blkg_release() is
-in-progress, another sibling blkg's bis is added, meantime
-blkcg_rstat_flush() is called.
-
-Another way is to add blkcg->stat_lock for covering __blkcg_rstat_flush(), what
-do you think of this way?
+Looks this fix is missed, can you take a look?
 
 
 Thanks,
