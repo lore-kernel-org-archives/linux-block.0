@@ -2,183 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C945CC7EE33
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 21:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B4EC7EE29
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 22:41:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242028AbjEYVtF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 17:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51070 "EHLO
+        id S233687AbjEYWky (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 18:40:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241949AbjEYVs6 (ORCPT
+        with ESMTP id S229981AbjEYWkw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 17:48:58 -0400
-Received: from out-60.mta1.migadu.com (out-60.mta1.migadu.com [IPv6:2001:41d0:203:375::3c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0476B199
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 14:48:46 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685051325;
+        Thu, 25 May 2023 18:40:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49205195
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 15:40:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685054403;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+8VsZ3IfW8Voc5bXsqvAy425eA/o6NFhQPbsyo2Bi7Q=;
-        b=MVHhyF5cjqoEtlo3a4tHak0/gEWogpCnqsyRmLjuBDS4ku+LuA3Ur8M4l5yVZrdOa2KpID
-        0BcqAGAncRgNBg5EMByZKwEDfK/4M3s/W8WrZMjSEmnemU3tMtOrEOC5B2yP2e18wF86xB
-        9gB6p5b+rkqqrQikWAy788zZESaXEnw=
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     linux-kernel@vger.kernel.org, axboe@kernel.dk
-Cc:     Kent Overstreet <kent.overstreet@linux.dev>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>
-Subject: [PATCH 7/7] block: Don't block on s_umount from __invalidate_super()
-Date:   Thu, 25 May 2023 17:48:22 -0400
-Message-Id: <20230525214822.2725616-8-kent.overstreet@linux.dev>
-In-Reply-To: <20230525214822.2725616-1-kent.overstreet@linux.dev>
-References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=XfXqmZRZyewS7hbeld3Fb741MiT0i4I4BJ+K3KWmVSM=;
+        b=Qiwyob4Cc7Qh5Kkv1neb3NaRS2dIBl7fuYlz6dRvHseDZv4E1ZHHzx7mWs1gnZmoE15KJG
+        o5Uuzcw1m2aiKlVRjY8iN6lPEl8THWCZE9XYN63EV4CILWM6dlcI9Ot7ID7ZpnR3eDsUHj
+        fwGtK4l5z5QFgQ3Ym+0a0kF3Ak1Qt6Y=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-632-uSF_FvTSNk6_plfteQwiVw-1; Thu, 25 May 2023 18:39:59 -0400
+X-MC-Unique: uSF_FvTSNk6_plfteQwiVw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A406D29AA39B;
+        Thu, 25 May 2023 22:39:58 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DC8D7C154D1;
+        Thu, 25 May 2023 22:39:55 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>,
+        David Hildenbrand <david@redhat.com>
+Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: [RFC PATCH v2 0/3] block: Make old dio use iov_iter_extract_pages() and page pinning
+Date:   Thu, 25 May 2023 23:39:50 +0100
+Message-Id: <20230525223953.225496-1-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-__invalidate_super() is used to flush any filesystem mounted on a
-device, generally on some sort of media change event.
+Hi Christoph, David,
 
-However, when unmounting a filesystem and closing the underlying block
-devices, we can deadlock if the block driver then calls
-__invalidate_device() (e.g. because the block device goes away when it
-is no longer in use).
+Since Christoph asked nicely[1] ;-), here are three patches that go on top
+of the similar patches for bio structs now in the block tree that make the
+old block direct-IO code use iov_iter_extract_pages() and page pinning.
 
-This happens with bcachefs on top of loopback, and can be triggered by
-fstests generic/042:
+There are three patches:
 
-  put_super
-    -> blkdev_put
-    -> lo_release
-    -> disk_force_media_change
-    -> __invalidate_device
-    -> get_super
+ (1) Make page pinning not add or remove a pin to/from a ZERO_PAGE, thereby
+     allowing the dio code to insert zero pages in the middle of dealing
+     with pinned pages.
 
-This isn't inherently specific to bcachefs - it hasn't shown up with
-other filesystems before because most other filesystems use the sget()
-mechanism for opening/closing block devices (and enforcing exclusion),
-however sget() has its own downsides and weird/sketchy behaviour w.r.t.
-block device open lifetime - if that ever gets fixed more code will run
-into this issue.
+     A pair of functions are provided to wrap the testing of a page or
+     folio to see if it is a zero page.
 
-The __invalidate_device() call here is really a best effort "I just
-yanked the device for a mounted filesystem, please try not to lose my
-data" - if it's ever actually needed the user has already done something
-crazy, and we probably shouldn't make things worse by deadlocking.
-Switching to a trylock seems in keeping with what the code is trying to
-do.
+ (2) Provide a function to allow an additional pin to be taken on a page we
+     already have pinned (and do nothing for a zero page).
 
-If we ever get revoke() at the block layer, perhaps we would look at
-rearchitecting to use that instead.
+ (3) Switch direct-io.c over to using page pinning and to use
+     iov_iter_extract_pages() so that pages from non-user-backed iterators
+     aren't pinned.
 
-Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org
----
- block/bdev.c       |  2 +-
- fs/super.c         | 40 +++++++++++++++++++++++++++++++---------
- include/linux/fs.h |  1 +
- 3 files changed, 33 insertions(+), 10 deletions(-)
+I've pushed the patches here also:
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 1795c7d4b9..743e969b7b 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -922,7 +922,7 @@ EXPORT_SYMBOL(lookup_bdev);
- 
- int __invalidate_device(struct block_device *bdev, bool kill_dirty)
- {
--	struct super_block *sb = get_super(bdev);
-+	struct super_block *sb = try_get_super(bdev);
- 	int res = 0;
- 
- 	if (sb) {
-diff --git a/fs/super.c b/fs/super.c
-index 04bc62ab7d..a2decce02f 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -791,14 +791,7 @@ void iterate_supers_type(struct file_system_type *type,
- 
- EXPORT_SYMBOL(iterate_supers_type);
- 
--/**
-- * get_super - get the superblock of a device
-- * @bdev: device to get the superblock for
-- *
-- * Scans the superblock list and finds the superblock of the file system
-- * mounted on the device given. %NULL is returned if no match is found.
-- */
--struct super_block *get_super(struct block_device *bdev)
-+static struct super_block *__get_super(struct block_device *bdev, bool try)
- {
- 	struct super_block *sb;
- 
-@@ -813,7 +806,12 @@ struct super_block *get_super(struct block_device *bdev)
- 		if (sb->s_bdev == bdev) {
- 			sb->s_count++;
- 			spin_unlock(&sb_lock);
--			down_read(&sb->s_umount);
-+
-+			if (!try)
-+				down_read(&sb->s_umount);
-+			else if (!down_read_trylock(&sb->s_umount))
-+				return NULL;
-+
- 			/* still alive? */
- 			if (sb->s_root && (sb->s_flags & SB_BORN))
- 				return sb;
-@@ -828,6 +826,30 @@ struct super_block *get_super(struct block_device *bdev)
- 	return NULL;
- }
- 
-+/**
-+ * get_super - get the superblock of a device
-+ * @bdev: device to get the superblock for
-+ *
-+ * Scans the superblock list and finds the superblock of the file system
-+ * mounted on the device given. %NULL is returned if no match is found.
-+ */
-+struct super_block *get_super(struct block_device *bdev)
-+{
-+	return __get_super(bdev, false);
-+}
-+
-+/**
-+ * try_get_super - get the superblock of a device, using trylock on sb->s_umount
-+ * @bdev: device to get the superblock for
-+ *
-+ * Scans the superblock list and finds the superblock of the file system
-+ * mounted on the device given. %NULL is returned if no match is found.
-+ */
-+struct super_block *try_get_super(struct block_device *bdev)
-+{
-+	return __get_super(bdev, true);
-+}
-+
- /**
-  * get_active_super - get an active reference to the superblock of a device
-  * @bdev: device to get the superblock for
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index c85916e9f7..1a6f951942 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2878,6 +2878,7 @@ extern struct file_system_type *get_filesystem(struct file_system_type *fs);
- extern void put_filesystem(struct file_system_type *fs);
- extern struct file_system_type *get_fs_type(const char *name);
- extern struct super_block *get_super(struct block_device *);
-+extern struct super_block *try_get_super(struct block_device *);
- extern struct super_block *get_active_super(struct block_device *bdev);
- extern void drop_super(struct super_block *sb);
- extern void drop_super_exclusive(struct super_block *sb);
--- 
-2.40.1
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-old-dio
+
+David
+
+Changes
+=======
+ver #2)
+ - Fix use of ZERO_PAGE().
+ - Add wrappers for testing if a page is a zero page.
+ - Return the zero page obtained, not ZERO_PAGE(0) unconditionally.
+ - Need to set BIO_PAGE_PINNED conditionally, and not BIO_PAGE_REFFED.
+
+Link: https://lore.kernel.org/r/ZGxfrOLZ4aN9/MvE@infradead.org/ [1]
+Link: https://lore.kernel.org/r/20230525155102.87353-1-dhowells@redhat.com/ # v1
+
+David Howells (3):
+  mm: Don't pin ZERO_PAGE in pin_user_pages()
+  mm: Provide a function to get an additional pin on a page
+  block: Use iov_iter_extract_pages() and page pinning in direct-io.c
+
+ fs/direct-io.c          | 72 ++++++++++++++++++++++++-----------------
+ include/linux/mm.h      |  1 +
+ include/linux/pgtable.h | 10 ++++++
+ mm/gup.c                | 54 ++++++++++++++++++++++++++++++-
+ 4 files changed, 107 insertions(+), 30 deletions(-)
 
