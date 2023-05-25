@@ -2,97 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F17C77B7A
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 14:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF700C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 14:54:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241229AbjEYOMc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 10:12:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49902 "EHLO
+        id S241424AbjEYOyh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 10:54:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234918AbjEYOMb (ORCPT
+        with ESMTP id S241064AbjEYOyh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 10:12:31 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCFF191;
-        Thu, 25 May 2023 07:12:26 -0700 (PDT)
-Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4QRqh75P1XzYsmC;
-        Thu, 25 May 2023 22:10:15 +0800 (CST)
-Received: from [10.174.178.159] (10.174.178.159) by
- kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Thu, 25 May 2023 22:12:23 +0800
-Message-ID: <5ec837a5-4e54-b5a2-fd53-a6d7845fb5d7@huawei.com>
-Date:   Thu, 25 May 2023 22:12:11 +0800
+        Thu, 25 May 2023 10:54:37 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00316187
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 07:54:35 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-77479a531abso16545539f.1
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 07:54:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685026475; x=1687618475;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+rSHBWkBgS2mm8ALT6WvzGN5/+TkGxD7ynUj1kfMsBQ=;
+        b=xbd0kecRRx+9NWW2PIoMEfqgPX0CRT1+PNfTWRD27rP6SGjEA08oc2g1ig6qytqArt
+         hxT8emqjIMV+G/8/gMmi49z+HQ/9tAjIdEyPo7LPANxGF9HJoYnm+MLwMWFygdBh3uQ2
+         lyw0gvPILXzUW6eI2WgP4+TIOmIxnj5pQYVGXlUGwOP2hxzwqn1DtoLLCDApR2lY50+w
+         DkNLqerJzwQT2iG5CfgwyEf5ehHUQTVjkHw5EUGwRzB9gemxMQtul7GDRdUHW3c1KkTH
+         OH5Md4o2jll6AEZql2Yoxq2VZawK2EbwkhemknYhEfew0w/vKszegAFX5NxaHMt6fou4
+         T39Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685026475; x=1687618475;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+rSHBWkBgS2mm8ALT6WvzGN5/+TkGxD7ynUj1kfMsBQ=;
+        b=BbnsMo68SFOPLzcYVeRSDEgbe7xsY6iRgvv4h3R4zLobnC30y+CvIhTqhx/V9UoPt9
+         ju81qbtOAfGNc3KoAHh0UhFZGBvD6T0D9qGZCmf7pbB3nCHdv0KiuPRrQedzM/IqYYZI
+         amTV7E/cDiQooUboDDgphTBxDWmXqT+vrKGIpe+cS0xmcDSK2dEN+8SI2B4KcH3HpPNd
+         lWtuxyiZf0lDxN6ZU6seCADaesVucmLPxwzYkRBfAeaZcOZ3S7ZrIhffCMd8A+z9/MjU
+         yt0dFSaO9m7OvcLkPODa7ZIFzgt4CumJWS8V4KJJ+e2O+SGqAIQ4u49oWo6+QPwsrRv6
+         o6mQ==
+X-Gm-Message-State: AC+VfDyuDzu5qRf9dBUPH5YsuZLPoZFrroIDJwwM8+a/tc5UFGzYwweO
+        Pm1Gjla87kAWQ0CBBjaISL4ObgF+SMHQ2ScZEnk=
+X-Google-Smtp-Source: ACHHUZ7LB78/pRUlJbEGNmv97WHmzS3adTxZS+I/k6g+L59//3zumtt9ceLdjobbR+UUxoF4QMs8NA==
+X-Received: by 2002:a5d:9d9f:0:b0:769:8d14:7d15 with SMTP id ay31-20020a5d9d9f000000b007698d147d15mr4546756iob.0.1685026475368;
+        Thu, 25 May 2023 07:54:35 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ei24-20020a05663829b800b00411bf6b457bsm480532jab.101.2023.05.25.07.54.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 May 2023 07:54:34 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc:     kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        joshi.k@samsung.com
+In-Reply-To: <cover.1684154817.git.asml.silence@gmail.com>
+References: <cover.1684154817.git.asml.silence@gmail.com>
+Subject: Re: [PATCH for-next 0/2] Enable IOU_F_TWQ_LAZY_WAKE for
+ passthrough
+Message-Id: <168502647392.717124.7925068931544884226.b4-ty@kernel.dk>
+Date:   Thu, 25 May 2023 08:54:33 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH -next] block: Fix the partition start may overflow in
- add_partition()
-To:     Christoph Hellwig <hch@infradead.org>,
-        Zhong Jinghua <zhongjinghua@huaweicloud.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
-        <yukuai3@huawei.com>, <chengzhihao1@huawei.com>,
-        <yangerkun@huawei.com>
-References: <20230522070615.1485014-1-zhongjinghua@huaweicloud.com>
- <ZG8igEyXrFa4j/gf@infradead.org>
-From:   zhongjinghua <zhongjinghua@huawei.com>
-In-Reply-To: <ZG8igEyXrFa4j/gf@infradead.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.178.159]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600002.china.huawei.com (7.193.23.29)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-在 2023/5/25 16:55, Christoph Hellwig 写道:
-> On Mon, May 22, 2023 at 03:06:15PM +0800, Zhong Jinghua wrote:
->> +	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
->> +		return -EINVAL;
->> +
->>   	start = p.start >> SECTOR_SHIFT;
->>   	length = p.length >> SECTOR_SHIFT;
->>   
->> +	/* length may be equal to 0 after right shift */
->> +	if (!length || start + length > get_capacity(bdev->bd_disk))
->> +		return -EINVAL;
-> While we're at it, shouldn't these be switched to use
-> check_add_overflow?
+On Mon, 15 May 2023 13:54:41 +0100, Pavel Begunkov wrote:
+> Let cmds to use IOU_F_TWQ_LAZY_WAKE and enable it for nvme passthrough.
+> 
+> The result should be same as in test to the original IOU_F_TWQ_LAZY_WAKE [1]
+> patchset, but for a quick test I took fio/t/io_uring with 4 threads each
+> reading their own drive and all pinned to the same CPU to make it CPU
+> bound and got +10% throughput improvement.
+> 
+> [...]
 
-However, using check_add_overflow requires the introduction of an 
-additional local variable for the third parameter, which does not make 
-much difference to the current check. Is it worth it?
+Applied, thanks!
 
-e.g:
+[1/2] io_uring/cmd: add cmd lazy tw wake helper
+      commit: 5f3139fc46993b2d653a7aa5cdfe66a91881fd06
+[2/2] nvme: optimise io_uring passthrough completion
+      commit: f026be0e1e881e3395c3d5418ffc8c2a2203c3f3
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 3223ea862523..9a40e8f864cb 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -18,7 +18,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
-  {
-         struct gendisk *disk = bdev->bd_disk;
-         struct blkpg_partition p;
--       long long start, length;
-+       long long start, length, tmp_check;
+Best regards,
+-- 
+Jens Axboe
 
-         if (!capable(CAP_SYS_ADMIN))
-                 return -EACCES;
-@@ -33,7 +33,7 @@ static int blkpg_do_ioctl(struct block_device *bdev,
-         if (op == BLKPG_DEL_PARTITION)
-                 return bdev_del_partition(disk, p.pno);
 
--       if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
-+       if (p.start < 0 || p.length <= 0 || check_add_overflow(p.start, 
-p.length, &tmp_check))
-                 return -EINVAL;
-
-         start = p.start >> SECTOR_SHIFT;
-
-Or do you have a better idea?
 
