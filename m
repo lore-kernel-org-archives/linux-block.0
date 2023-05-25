@@ -2,115 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C5BC7EE2F
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 18:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6A5C77B7E
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 21:48:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242161AbjEYSpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 14:45:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33700 "EHLO
+        id S231397AbjEYVsl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 17:48:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242422AbjEYSnz (ORCPT
+        with ESMTP id S229944AbjEYVsk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 14:43:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E151268D;
-        Thu, 25 May 2023 11:40:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4A4FE64919;
-        Thu, 25 May 2023 18:38:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06264C433A0;
-        Thu, 25 May 2023 18:38:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685039932;
-        bh=P12QkZF3C6C16RHWjPfDDVPk4kIX+N03V18889yx9TE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Zj4LlkS/PLmvTGZuf86WS9Ye+JKPRv0qAtUzF9RsPzbtyKrvHXxLjbwf0NC2/LUoX
-         4dzeDtg1hNUIL7XjJvYS0yoOMvqNK8LQ6xXfJenLE7u5KuLX0D9uh5vQvGATo/1iN8
-         +v0v8QPSq2UVIWa7HDa5QZn8EAU9qcuiy7qZREh1VqFrc+kFXx8wIfvB8vziyuxr1N
-         bAMCkmbL3iS9TDzQyrdemTOUVYIuJz7OD3RrYUJv+HkNdVOeG56R75WLcC4jxwjaRr
-         1Ys8uHgLwYQy5AAAFRHjstOiEYCWLwilcwZsdIfjb1Na3spRYdu29/AWlmShtOT0ZO
-         j7A+BxhALE+gg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Loic Poulain <loic.poulain@linaro.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 57/57] block: Deny writable memory mapping if block is read-only
-Date:   Thu, 25 May 2023 14:36:07 -0400
-Message-Id: <20230525183607.1793983-57-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230525183607.1793983-1-sashal@kernel.org>
-References: <20230525183607.1793983-1-sashal@kernel.org>
+        Thu, 25 May 2023 17:48:40 -0400
+Received: from out-4.mta1.migadu.com (out-4.mta1.migadu.com [95.215.58.4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53440FB
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 14:48:39 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685051317;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=/htzEy4EHBMdNE/JbpSxK/E6aimlWCZ120WLz6hVPdg=;
+        b=k6jGFcUqjzohjB8xz2f7m8Jps7CXkyBO6+5Ta9qstxqh0NLeOgn367GHD3EQsk1sgmfZKd
+        DPMXEQ/RFaJQFONq4eZEvQUZC/bfUO7wHYP8CqKmiZDQNXvb5ia9htTi5KjE5B/dPmXp8/
+        m6IgFfuoGt5vQIdcp87lhi+vrPF8uxU=
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     linux-kernel@vger.kernel.org, axboe@kernel.dk
+Cc:     Kent Overstreet <kent.overstreet@linux.dev>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: [PATCH 0/7] block layer patches for bcachefs
+Date:   Thu, 25 May 2023 17:48:15 -0400
+Message-Id: <20230525214822.2725616-1-kent.overstreet@linux.dev>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Loic Poulain <loic.poulain@linaro.org>
+Jens, here's the full series of block layer patches needed for bcachefs:
 
-[ Upstream commit 69baa3a623fd2e58624f24f2f23d46f87b817c93 ]
+Some of these (added exports, zero_fill_bio_iter?) can probably go with
+the bcachefs pull and I'm just including here for completeness. The main
+ones are the bio_iter patches, and the __invalidate_super() patch.
 
-User should not be able to write block device if it is read-only at
-block level (e.g force_ro attribute). This is ensured in the regular
-fops write operation (blkdev_write_iter) but not when writing via
-user mapping (mmap), allowing user to actually write a read-only
-block device via a PROT_WRITE mapping.
+The bio_iter series has a new documentation patch.
 
-Example: This can lead to integrity issue of eMMC boot partition
-(e.g mmcblk0boot0) which is read-only by default.
+I would still like the __invalidate_super() patch to get some review
+(from VFS people? unclear who owns this).
 
-To fix this issue, simply deny shared writable mapping if the block
-is readonly.
+Thanks,
+Kent
 
-Note: Block remains writable if switch to read-only is performed
-after the initial mapping, but this is expected behavior according
-to commit a32e236eb93e ("Partially revert "block: fail op_is_write()
-requests to read-only partitions"")'.
+Kent Overstreet (7):
+  block: Add some exports for bcachefs
+  block: Allow bio_iov_iter_get_pages() with bio->bi_bdev unset
+  block: Bring back zero_fill_bio_iter
+  block: Rework bio_for_each_segment_all()
+  block: Rework bio_for_each_folio_all()
+  block: Add documentation for bio iterator macros
+  block: Don't block on s_umount from __invalidate_super()
 
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20230510074223.991297-1-loic.poulain@linaro.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/fops.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ block/bdev.c               |   2 +-
+ block/bio.c                |  57 ++++++------
+ block/blk-core.c           |   1 +
+ block/blk-map.c            |  38 ++++----
+ block/blk.h                |   1 -
+ block/bounce.c             |  12 +--
+ drivers/md/bcache/btree.c  |   8 +-
+ drivers/md/dm-crypt.c      |  10 +-
+ drivers/md/raid1.c         |   4 +-
+ fs/btrfs/disk-io.c         |   4 +-
+ fs/btrfs/extent_io.c       |  50 +++++-----
+ fs/btrfs/raid56.c          |  14 +--
+ fs/crypto/bio.c            |   9 +-
+ fs/erofs/zdata.c           |   4 +-
+ fs/ext4/page-io.c          |   8 +-
+ fs/ext4/readpage.c         |   4 +-
+ fs/f2fs/data.c             |  20 ++--
+ fs/gfs2/lops.c             |  10 +-
+ fs/gfs2/meta_io.c          |   8 +-
+ fs/iomap/buffered-io.c     |  14 +--
+ fs/mpage.c                 |   4 +-
+ fs/squashfs/block.c        |  48 +++++-----
+ fs/squashfs/lz4_wrapper.c  |  17 ++--
+ fs/squashfs/lzo_wrapper.c  |  17 ++--
+ fs/squashfs/xz_wrapper.c   |  19 ++--
+ fs/squashfs/zlib_wrapper.c |  18 ++--
+ fs/squashfs/zstd_wrapper.c |  19 ++--
+ fs/super.c                 |  40 ++++++--
+ fs/verity/verify.c         |   9 +-
+ include/linux/bio.h        | 186 +++++++++++++++++++++++++------------
+ include/linux/blkdev.h     |   1 +
+ include/linux/bvec.h       |  70 ++++++++------
+ include/linux/fs.h         |   1 +
+ 33 files changed, 429 insertions(+), 298 deletions(-)
 
-diff --git a/block/fops.c b/block/fops.c
-index e406aa605327e..6197d1c41652d 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -685,6 +685,16 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 	return error;
- }
- 
-+static int blkdev_mmap(struct file *file, struct vm_area_struct *vma)
-+{
-+	struct inode *bd_inode = bdev_file_inode(file);
-+
-+	if (bdev_read_only(I_BDEV(bd_inode)))
-+		return generic_file_readonly_mmap(file, vma);
-+
-+	return generic_file_mmap(file, vma);
-+}
-+
- const struct file_operations def_blk_fops = {
- 	.open		= blkdev_open,
- 	.release	= blkdev_close,
-@@ -692,7 +702,7 @@ const struct file_operations def_blk_fops = {
- 	.read_iter	= blkdev_read_iter,
- 	.write_iter	= blkdev_write_iter,
- 	.iopoll		= iocb_bio_iopoll,
--	.mmap		= generic_file_mmap,
-+	.mmap		= blkdev_mmap,
- 	.fsync		= blkdev_fsync,
- 	.unlocked_ioctl	= blkdev_ioctl,
- #ifdef CONFIG_COMPAT
 -- 
-2.39.2
+2.40.1
 
