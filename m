@@ -2,122 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42857C77B7E
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 14:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE90C77B7A
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 14:11:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbjEYOLk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 10:11:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49632 "EHLO
+        id S241383AbjEYOLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 10:11:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236270AbjEYOLi (ORCPT
+        with ESMTP id S234918AbjEYOLy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 10:11:38 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EB06186;
-        Thu, 25 May 2023 07:11:37 -0700 (PDT)
+        Thu, 25 May 2023 10:11:54 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A09F6183;
+        Thu, 25 May 2023 07:11:53 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E323521CB5;
-        Thu, 25 May 2023 14:11:35 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5A32F1FE6A;
+        Thu, 25 May 2023 14:11:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1685023895; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1685023912; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=LMsDV6T2jCcjcJj5VyXqb2kAeEnI/lDz50c0BzZL3V4=;
-        b=J2djAVASI/Bf6kURBwuN6TTFCfuPq8Gd7sjwT/n1eoPwgRcHtgZyy3YC5xZ4SbcPMJAGlb
-        y032Au0Jv3m4osldNPB8CBHdobQpSP9NJMPAladVxS/1R7JSVq1k+LOC6krw7Tt+d5L45U
-        xEU21lSuBZVgPxBDWVCodsi4CE0vU/4=
+        bh=s2JH6pTYcJePjQtM79Iqz39SbWKAXK4Qz2x1GSVTfLY=;
+        b=RGyV9NO3PzYGEcee4AtXtXB1xO4jeCtqPc89Ldtc0+jxV2LTOn8SQ2TVpUKhPg82a72hSf
+        YbPYy5G/nF0nG2sLTc/iU8w/kbOdF8XcQEeWGzx+nvYujx9CrkrQOgXNaZVwM/7RqJZIQQ
+        djbtpQ6hb7F/xxxVsfTH6VBOufQttEQ=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B75C2134B2;
-        Thu, 25 May 2023 14:11:35 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 23246134B2;
+        Thu, 25 May 2023 14:11:52 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id bz2gK5dsb2RVZQAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Thu, 25 May 2023 14:11:35 +0000
-Date:   Thu, 25 May 2023 16:11:34 +0200
+        id yJTQB6hsb2RpZQAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 25 May 2023 14:11:52 +0000
+Date:   Thu, 25 May 2023 16:11:50 +0200
 From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        stable@vger.kernel.org, Jay Shin <jaeshin@redhat.com>,
-        Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH V3] blk-cgroup: Flush stats before releasing blkcg_gq
-Message-ID: <sqsb7wcvxjfd3nbohhpbjihbr4armrh5sr6vu5pxci62ga7for@6om7ayuncxnc>
-References: <20230525043518.831721-1-ming.lei@redhat.com>
+Cc:     Yosry Ahmed <yosryahmed@google.com>, Linux-MM <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Shakeel Butt <shakeelb@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Waiman Long <longman@redhat.com>, cgroups@vger.kernel.org,
+        Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH] blk-cgroup: Flush stats before releasing blkcg_gq
+Message-ID: <3ej42djuuzwx36yf2yeo5ggyrvogeaguos5jtve2bvuaejnwff@fak3yjwe2fbi>
+References: <20230524011935.719659-1-ming.lei@redhat.com>
+ <CAJD7tkZkbro4H-QC=RJx_dfCdGQ5c=4NJhbFrcEmQSidaaMOmg@mail.gmail.com>
+ <ZG14VnHl20lt9jLc@ovpn-8-17.pek2.redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="hyhnghupqumzotmb"
+        protocol="application/pgp-signature"; boundary="yw4zsdelcidbb6wx"
 Content-Disposition: inline
-In-Reply-To: <20230525043518.831721-1-ming.lei@redhat.com>
+In-Reply-To: <ZG14VnHl20lt9jLc@ovpn-8-17.pek2.redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---hyhnghupqumzotmb
+--yw4zsdelcidbb6wx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 25, 2023 at 12:35:18PM +0800, Ming Lei <ming.lei@redhat.com> wr=
+On Wed, May 24, 2023 at 10:37:10AM +0800, Ming Lei <ming.lei@redhat.com> wr=
 ote:
-> It is less a problem if the cgroup to be destroyed also has other
-> controllers like memory that will call cgroup_rstat_flush() which will
-> clean up the reference count. If block is the only controller that uses
-> rstat, these offline blkcg and blkgs may never be freed leaking more
-> and more memory over time.
-
-On v2, io implies memory too.
-Do you observe the leak on the v2 system too?
-
-(Beware that (not only) dirty pages would pin offlined memcg, so the
-actual mem_cgroup_css_release and cgroup_rstat_flush would be further
-delayed.)
-
-> To prevent this potential memory leak:
+> > I am not at all familiar with blkcg, but does calling
+> > cgroup_rstat_flush() in offline_css() fix the problem?
 >=20
-> - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
-> can be added
->=20
-> - add global blkg_stat_lock for covering concurrent parent blkg stat
-> update
+> Except for offline, this list needs to be flushed after the associated di=
+sk
+> is deleted.
 
-It's bit unfortunate yet another lock is added :-/
+Why the second flush trigger?
+a) To break another ref-dependency cycle (like on the blkcg side)?
+b) To avoid stale data upon device removal?
 
-IIUC, even Waiman's patch (flush in blkcg_destroy_blkcfs) would need
-synchronization for different CPU replicas flushes in
-blkcg_iostat_update, right?
-
-> - don't grab bio->bi_blkg reference when adding the stats into blkcg's
-> per-cpu stat list since all stats are guaranteed to be consumed before
-> releasing blkg instance, and grabbing blkg reference for stats was the
-> most fragile part of original patch
-
-
-At one moment, the lhead -> blkcg_gq reference seemed alright to me and
-consequently blkcg_gq -> blkcg is the one that looks reversed (forming
-the cycle). But changing its direction would be much more fundamental
-change, it'd need also kind of blkcg_gq reparenting -- similarly to
-memcg.
-
+(Because b) should be unnecessary, a future reader would flush when
+needed.)
 
 Thanks,
 Michal
 
---hyhnghupqumzotmb
+--yw4zsdelcidbb6wx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCZG9shwAKCRAkDQmsBEOq
-ucuTAP0a8JcBs2PoQvq0qKyo0/MnzWO1v2gQ5TcBEw6Ne3L7CgD+OFG+18/XCgsa
-XfLIW1CRCnJ+phqelsySvrMcvUNsNAM=
-=la8T
+iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCZG9spAAKCRAkDQmsBEOq
+ufTLAP9NX8DIiij6/hpnoy9/M+nnSBemEZ9lY1LODUguhjSJrAEA5g8mQPrBr8KR
+A7VHGk9AX3B3eIPAFYavVz4cMoIrYwE=
+=56eg
 -----END PGP SIGNATURE-----
 
---hyhnghupqumzotmb--
+--yw4zsdelcidbb6wx--
