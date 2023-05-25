@@ -2,94 +2,64 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF700C77B7A
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 14:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1963C7EE29
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 15:22:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241424AbjEYOyh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 10:54:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37318 "EHLO
+        id S241154AbjEYPWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 11:22:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241064AbjEYOyh (ORCPT
+        with ESMTP id S241309AbjEYPWG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 10:54:37 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00316187
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 07:54:35 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-77479a531abso16545539f.1
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 07:54:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685026475; x=1687618475;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+rSHBWkBgS2mm8ALT6WvzGN5/+TkGxD7ynUj1kfMsBQ=;
-        b=xbd0kecRRx+9NWW2PIoMEfqgPX0CRT1+PNfTWRD27rP6SGjEA08oc2g1ig6qytqArt
-         hxT8emqjIMV+G/8/gMmi49z+HQ/9tAjIdEyPo7LPANxGF9HJoYnm+MLwMWFygdBh3uQ2
-         lyw0gvPILXzUW6eI2WgP4+TIOmIxnj5pQYVGXlUGwOP2hxzwqn1DtoLLCDApR2lY50+w
-         DkNLqerJzwQT2iG5CfgwyEf5ehHUQTVjkHw5EUGwRzB9gemxMQtul7GDRdUHW3c1KkTH
-         OH5Md4o2jll6AEZql2Yoxq2VZawK2EbwkhemknYhEfew0w/vKszegAFX5NxaHMt6fou4
-         T39Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685026475; x=1687618475;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+rSHBWkBgS2mm8ALT6WvzGN5/+TkGxD7ynUj1kfMsBQ=;
-        b=BbnsMo68SFOPLzcYVeRSDEgbe7xsY6iRgvv4h3R4zLobnC30y+CvIhTqhx/V9UoPt9
-         ju81qbtOAfGNc3KoAHh0UhFZGBvD6T0D9qGZCmf7pbB3nCHdv0KiuPRrQedzM/IqYYZI
-         amTV7E/cDiQooUboDDgphTBxDWmXqT+vrKGIpe+cS0xmcDSK2dEN+8SI2B4KcH3HpPNd
-         lWtuxyiZf0lDxN6ZU6seCADaesVucmLPxwzYkRBfAeaZcOZ3S7ZrIhffCMd8A+z9/MjU
-         yt0dFSaO9m7OvcLkPODa7ZIFzgt4CumJWS8V4KJJ+e2O+SGqAIQ4u49oWo6+QPwsrRv6
-         o6mQ==
-X-Gm-Message-State: AC+VfDyuDzu5qRf9dBUPH5YsuZLPoZFrroIDJwwM8+a/tc5UFGzYwweO
-        Pm1Gjla87kAWQ0CBBjaISL4ObgF+SMHQ2ScZEnk=
-X-Google-Smtp-Source: ACHHUZ7LB78/pRUlJbEGNmv97WHmzS3adTxZS+I/k6g+L59//3zumtt9ceLdjobbR+UUxoF4QMs8NA==
-X-Received: by 2002:a5d:9d9f:0:b0:769:8d14:7d15 with SMTP id ay31-20020a5d9d9f000000b007698d147d15mr4546756iob.0.1685026475368;
-        Thu, 25 May 2023 07:54:35 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ei24-20020a05663829b800b00411bf6b457bsm480532jab.101.2023.05.25.07.54.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 May 2023 07:54:34 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
-Cc:     kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        joshi.k@samsung.com
-In-Reply-To: <cover.1684154817.git.asml.silence@gmail.com>
-References: <cover.1684154817.git.asml.silence@gmail.com>
-Subject: Re: [PATCH for-next 0/2] Enable IOU_F_TWQ_LAZY_WAKE for
- passthrough
-Message-Id: <168502647392.717124.7925068931544884226.b4-ty@kernel.dk>
-Date:   Thu, 25 May 2023 08:54:33 -0600
+        Thu, 25 May 2023 11:22:06 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5566A98;
+        Thu, 25 May 2023 08:22:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=3ssmfPPhjZLZynXP//sBx5vsYc+zLAKwJikGSWYPm+0=; b=nt4MAsSsht78IxSABs4xkmDWo0
+        EKxsw0prVbpYYsQAXeH4XMJ0x63qyDHrACDKjGmUWwQwFw95baWxLTbqrhZPi7KXXAH+6wP6XucMa
+        nq+KefxK7MOXhK99ds49yXhZdWH2wJ6xjoin5d3g2rn7NWMViLGMYfJXwn46iT9GO4a5VRFSPaiNd
+        KBPdPhrlWLULcchf2eZnhyQeC64cbQPOMFlWuwmQ9ClzicvdnSxdeMy+1Z0hxiR4JMndbMt6aRWcb
+        H1/+oA57h6cZFx5kqK8oO3X3OGH4xwwUWHs8ru/wF7t/gy1/UGVmRjdzZzSg9i1OIOAzquLQnycIX
+        zffd+X0g==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1q2Cmj-00CI4P-3g; Thu, 25 May 2023 15:21:49 +0000
+Date:   Thu, 25 May 2023 16:21:49 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Damien Le Moal <dlemoal@kernel.org>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@kvack.org
+Subject: Re: [PATCH] zonefs: Call zonefs_io_error() on any error from
+ filemap_splice_read()
+Message-ID: <ZG99DRyH461VAoUX@casper.infradead.org>
+References: <3788353.1685003937@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3788353.1685003937@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Mon, 15 May 2023 13:54:41 +0100, Pavel Begunkov wrote:
-> Let cmds to use IOU_F_TWQ_LAZY_WAKE and enable it for nvme passthrough.
+On Thu, May 25, 2023 at 09:38:57AM +0100, David Howells wrote:
+>     
+> Call zonefs_io_error() after getting any error from filemap_splice_read()
+> in zonefs_file_splice_read(), including non-fatal errors such as ENOMEM,
+> EINTR and EAGAIN.
 > 
-> The result should be same as in test to the original IOU_F_TWQ_LAZY_WAKE [1]
-> patchset, but for a quick test I took fio/t/io_uring with 4 threads each
-> reading their own drive and all pinned to the same CPU to make it CPU
-> bound and got +10% throughput improvement.
-> 
-> [...]
+> Suggested-by: Damien Le Moal <dlemoal@kernel.org>
+> Link: https://lore.kernel.org/r/5d327bed-b532-ad3b-a211-52ad0a3e276a@kernel.org/
 
-Applied, thanks!
-
-[1/2] io_uring/cmd: add cmd lazy tw wake helper
-      commit: 5f3139fc46993b2d653a7aa5cdfe66a91881fd06
-[2/2] nvme: optimise io_uring passthrough completion
-      commit: f026be0e1e881e3395c3d5418ffc8c2a2203c3f3
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+This seems like a bizarre thing to do.  Let's suppose you got an
+-ENOMEM.  blkdev_report_zones() is also likely to report -ENOMEM in
+that case, which will cause a zonefs_err() to be called.  Surely
+that can't be the desired outcome from getting -ENOMEM!
