@@ -2,64 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1963C7EE29
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 15:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52109C7EE2D
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 15:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241154AbjEYPWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 11:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56970 "EHLO
+        id S241343AbjEYPWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 11:22:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241309AbjEYPWG (ORCPT
+        with ESMTP id S241186AbjEYPWy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 11:22:06 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5566A98;
-        Thu, 25 May 2023 08:22:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=3ssmfPPhjZLZynXP//sBx5vsYc+zLAKwJikGSWYPm+0=; b=nt4MAsSsht78IxSABs4xkmDWo0
-        EKxsw0prVbpYYsQAXeH4XMJ0x63qyDHrACDKjGmUWwQwFw95baWxLTbqrhZPi7KXXAH+6wP6XucMa
-        nq+KefxK7MOXhK99ds49yXhZdWH2wJ6xjoin5d3g2rn7NWMViLGMYfJXwn46iT9GO4a5VRFSPaiNd
-        KBPdPhrlWLULcchf2eZnhyQeC64cbQPOMFlWuwmQ9ClzicvdnSxdeMy+1Z0hxiR4JMndbMt6aRWcb
-        H1/+oA57h6cZFx5kqK8oO3X3OGH4xwwUWHs8ru/wF7t/gy1/UGVmRjdzZzSg9i1OIOAzquLQnycIX
-        zffd+X0g==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q2Cmj-00CI4P-3g; Thu, 25 May 2023 15:21:49 +0000
-Date:   Thu, 25 May 2023 16:21:49 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Damien Le Moal <dlemoal@kernel.org>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@kvack.org
-Subject: Re: [PATCH] zonefs: Call zonefs_io_error() on any error from
- filemap_splice_read()
-Message-ID: <ZG99DRyH461VAoUX@casper.infradead.org>
-References: <3788353.1685003937@warthog.procyon.org.uk>
+        Thu, 25 May 2023 11:22:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6D7194
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 08:22:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685028123;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bazt4DjA9+FzgFbUzBAsQKjHpUMQh4Ias6jYSKB378c=;
+        b=Ggr34xmhsmvvqxUNw5aU9zSU6SRZZHGCT0EiE0h2iwkPCAG0N+Hn5M9JNlvxBthswnOSXK
+        55Amnogu25qVk/V/0PnQv94mvyW9cPTxD3dZwkwOMMBYCmv0Dbj4IH/5fx/GhkLBenfCFA
+        FCWMG9ogbYZ7/DpiSOdSulrB/GE3ZuM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-130-T4FsF4MzPd6JxOVw4M9VHw-1; Thu, 25 May 2023 11:21:57 -0400
+X-MC-Unique: T4FsF4MzPd6JxOVw4M9VHw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E2F129DD99B;
+        Thu, 25 May 2023 15:21:57 +0000 (UTC)
+Received: from [10.22.34.46] (unknown [10.22.34.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 830ED20296C6;
+        Thu, 25 May 2023 15:21:56 +0000 (UTC)
+Message-ID: <6e2da3d2-77a8-d53b-d08e-1243f8d9c688@redhat.com>
+Date:   Thu, 25 May 2023 11:21:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3788353.1685003937@warthog.procyon.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH V3] blk-cgroup: Flush stats before releasing blkcg_gq
+Content-Language: en-US
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        stable@vger.kernel.org, Jay Shin <jaeshin@redhat.com>,
+        Tejun Heo <tj@kernel.org>, Yosry Ahmed <yosryahmed@google.com>
+References: <20230525043518.831721-1-ming.lei@redhat.com>
+ <sqsb7wcvxjfd3nbohhpbjihbr4armrh5sr6vu5pxci62ga7for@6om7ayuncxnc>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <sqsb7wcvxjfd3nbohhpbjihbr4armrh5sr6vu5pxci62ga7for@6om7ayuncxnc>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 09:38:57AM +0100, David Howells wrote:
->     
-> Call zonefs_io_error() after getting any error from filemap_splice_read()
-> in zonefs_file_splice_read(), including non-fatal errors such as ENOMEM,
-> EINTR and EAGAIN.
-> 
-> Suggested-by: Damien Le Moal <dlemoal@kernel.org>
-> Link: https://lore.kernel.org/r/5d327bed-b532-ad3b-a211-52ad0a3e276a@kernel.org/
+On 5/25/23 10:11, Michal Koutný wrote:
+> On Thu, May 25, 2023 at 12:35:18PM +0800, Ming Lei <ming.lei@redhat.com> wrote:
+>> It is less a problem if the cgroup to be destroyed also has other
+>> controllers like memory that will call cgroup_rstat_flush() which will
+>> clean up the reference count. If block is the only controller that uses
+>> rstat, these offline blkcg and blkgs may never be freed leaking more
+>> and more memory over time.
+> On v2, io implies memory too.
+> Do you observe the leak on the v2 system too?
+>
+> (Beware that (not only) dirty pages would pin offlined memcg, so the
+> actual mem_cgroup_css_release and cgroup_rstat_flush would be further
+> delayed.)
 
-This seems like a bizarre thing to do.  Let's suppose you got an
--ENOMEM.  blkdev_report_zones() is also likely to report -ENOMEM in
-that case, which will cause a zonefs_err() to be called.  Surely
-that can't be the desired outcome from getting -ENOMEM!
+The memory leak isn't observed on cgroup v2 as the cgroup_rstat_flush() 
+call by the memory controller will help to flush the extra references 
+holding back blkcgs. It is only happening with a cgroup v1 configuration 
+where blkcg is standalone in a cgroup.
+
+>
+>> To prevent this potential memory leak:
+>>
+>> - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
+>> can be added
+>>
+>> - add global blkg_stat_lock for covering concurrent parent blkg stat
+>> update
+> It's bit unfortunate yet another lock is added :-/
+>
+> IIUC, even Waiman's patch (flush in blkcg_destroy_blkcfs) would need
+> synchronization for different CPU replicas flushes in
+> blkcg_iostat_update, right?
+
+Right, the goal is to prevent concurrent call of blkcg_iostat_update() 
+to the same blkg.
+
+Cheers,
+Longman
+
