@@ -2,118 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D47AC7EE2E
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 17:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F06E5C7EE29
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 17:59:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234714AbjEYR0J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 13:26:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40702 "EHLO
+        id S232561AbjEYR7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 13:59:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233736AbjEYR0J (ORCPT
+        with ESMTP id S229663AbjEYR7F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 13:26:09 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1243C19D
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 10:26:03 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-96f6e83e12fso142159766b.1
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 10:26:02 -0700 (PDT)
+        Thu, 25 May 2023 13:59:05 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E261B6
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 10:59:04 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ae4d1d35e6so12772955ad.0
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 10:59:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1685035561; x=1687627561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EJa+li1Oy5bbsqG6UFm3MUpvaFnPsLyMyN5vhg0qjCI=;
-        b=OYLzxndcW0Aro8j6EGhHjNbZXc806wL/Je0D7ocR6sbo6T37AGbT8iIzPe9vPc1OHc
-         VDExFCpAkJmEOTbMOlM4p9xbdKggA+T4HMW+nDsuYH8RC7PAFZbEaZgxrgn0ovA9GB/1
-         +SAgbASXOJlo4aYu8koCGbnLPiY5cvnqkpKnM=
+        d=gmail.com; s=20221208; t=1685037544; x=1687629544;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xh+Sq/uMyLsRA2RTYACG11SUiMBdUyGxyXcentsDWSs=;
+        b=nDewzevdtTcZW/Tvxz9qXEWwVsruFiYTgQTHW+iZtEyL+o/CxyuIeqaaGsPgbuaP/u
+         5CjPB1dlDLA4eqiRE/F4yTYJiTCIrHO6QLqO7v6cC1TIaFMtKT0gRQ1xlf4BqICtZJIh
+         7FKr9Uye6UaczrjrbLFkN4fVzdmUFWfeKJXzcuEMWqgLRwrzUDMCE+4r7XdNUplj/+0t
+         EPb237145QDzRlf9LoB5ybdrH7Wh8oKmaYhd9e76CkS3MVDp4/1YmgwDChQjZ2qJGbXn
+         XlNRgdv0G0EC5WyMh/pipDRwuY6fIFgAbBHyunGjVunTIonwqf1sCpx44jJ6pCoVZJvV
+         9NUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685035561; x=1687627561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EJa+li1Oy5bbsqG6UFm3MUpvaFnPsLyMyN5vhg0qjCI=;
-        b=CLXbng2lK7c1xRXfCp6WglcvRDVvY3BJMqs43vszzzBpeUM6EXPo5zlD4r1ib9tugH
-         hv9neGv/QYXYLP/VCrLYxysN+KBKh9xpERRlTulzHeI0DqVYpgB6ohmcXU8PpfVbfbh0
-         70DwZSPkW9+kBkaSRIGgg43KTlXQ9+TAt92cbQnJ/ovFrz0B1/lBQdaP1WwTeBy2bqe+
-         bPUwb9HcQfbHvklhksegQyUPvk2yUG34AVlt03A2kXS+f+gTqlnxMUgn5Ig3tkUj8c8Y
-         oEGXySdUgR3LobV5ZelSbJ9HLjcOXlXl+LXvx9u598iTQf7cYzjhNPUufyb+I2F8wfvL
-         jahg==
-X-Gm-Message-State: AC+VfDxmzB/FBlsVqZ13echH61reWE6DktQl5yR5pm9nxOpHpELwaxwH
-        1FXXb2nEEfPXxBFzmmUJpXt7VokjA9bAfCRQNGVM+ugf
-X-Google-Smtp-Source: ACHHUZ4jtxYdJY2Va14SJnUxem2zokpLym+OoE3RWA8uj2thpOWT6EV+Sfqo1zWNI4emCIGWys5eJQ==
-X-Received: by 2002:a17:907:707:b0:96b:1608:3563 with SMTP id xb7-20020a170907070700b0096b16083563mr2398958ejb.58.1685035561342;
-        Thu, 25 May 2023 10:26:01 -0700 (PDT)
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
-        by smtp.gmail.com with ESMTPSA id oy11-20020a170907104b00b0096f7e6d0063sm1088830ejb.75.2023.05.25.10.25.59
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 May 2023 10:26:00 -0700 (PDT)
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-970056276acso141436466b.2
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 10:25:59 -0700 (PDT)
-X-Received: by 2002:a17:906:7954:b0:96a:37af:ff37 with SMTP id
- l20-20020a170906795400b0096a37afff37mr2274160ejo.15.1685035559397; Thu, 25
- May 2023 10:25:59 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685037544; x=1687629544;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xh+Sq/uMyLsRA2RTYACG11SUiMBdUyGxyXcentsDWSs=;
+        b=UZCUvckCEELvfemtxUHEybzcm/NzmvgnyAgJM2UYlfrXh/LE7e6F+qz/OFI2b88EHg
+         53FD+TogmroN5z6W5mcirB7id1xLJAc4uJo64mN0M1LeTXSQne8/KB0YJvsJe+uyb8pY
+         KgTcvz4fR/ihbep3SfHhYsPDMlIjCzwVCFBE502Rch/v67M/cVhwArRTf3L80RR0iBS+
+         A2cuACbHFPP0t7py9FqIGVRcpR6HLu8II5ToqZtPirwb2oy22/18XKMYkU9wD3QmeYny
+         SPa7JIqkj7ANur7iJNV+1NpcdlBDcx+DgADoUYqXo5YDFnt2rWp9hUtK1LSNDTz/Zibv
+         GQnw==
+X-Gm-Message-State: AC+VfDyDiFGMmL2KwDga4bqdWCh0CYiSqDKysiX+GQ8PNCcsPolZ94XH
+        brBab6TVzaI0sxhMhfNoCRM=
+X-Google-Smtp-Source: ACHHUZ729FU4RR8vYy5N7+Ip8rYe+diPK0tpc00S2BYla8wjOuruHnFPIF2tOfxPaaIBu4QGoY+0jQ==
+X-Received: by 2002:a17:902:f693:b0:1a9:6dfb:4b09 with SMTP id l19-20020a170902f69300b001a96dfb4b09mr2745747plg.67.1685037543397;
+        Thu, 25 May 2023 10:59:03 -0700 (PDT)
+Received: from Osmten.. ([103.84.150.78])
+        by smtp.gmail.com with ESMTPSA id j18-20020a170902da9200b001af98dcf958sm1686359plx.288.2023.05.25.10.59.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 May 2023 10:59:03 -0700 (PDT)
+From:   Osama Muhammad <osmtendev@gmail.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Osama Muhammad <osmtendev@gmail.com>
+Subject: [PATCH] pktcdvd.c: Drop error checking for debugfs_create_dir
+Date:   Thu, 25 May 2023 22:58:36 +0500
+Message-Id: <20230525175836.19058-1-osmtendev@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <ZGxfrOLZ4aN9/MvE@infradead.org> <20230522205744.2825689-1-dhowells@redhat.com>
- <3068545.1684872971@warthog.procyon.org.uk> <ZG2m0PGztI2BZEn9@infradead.org>
- <3215177.1684918030@warthog.procyon.org.uk> <CAHk-=wjaqHgd4u63XdZoTPs1YCJnDZ7-GQHKKdFrT32y2-__tw@mail.gmail.com>
- <e00ee9f5-0f02-6463-bc84-b94c17f488bc@redhat.com> <CAHk-=wgPWUCyhiM+=S3nmh4JK8qtBQteYvtiXpoYpDjfKHnEhQ@mail.gmail.com>
- <144598.1685034915@warthog.procyon.org.uk>
-In-Reply-To: <144598.1685034915@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 25 May 2023 10:25:42 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wirrJNoVSOSVK2ae9pa7Q5kJKFYMk2ad-_6YrS1cEScqA@mail.gmail.com>
-Message-ID: <CAHk-=wirrJNoVSOSVK2ae9pa7Q5kJKFYMk2ad-_6YrS1cEScqA@mail.gmail.com>
-Subject: Re: Extending page pinning into fs/direct-io.c
-To:     David Howells <dhowells@redhat.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 10:15=E2=80=AFAM David Howells <dhowells@redhat.com=
-> wrote:
->
->  It doesn't seem I can add it to mm.h as an inline function.
+This patch remove the error checking in pktcdvd.c.
+The DebugFS kernel API is developed in
+a way that the caller can safely ignore the errors that
+occur during the creation of DebugFS nodes.
 
-What? We already have that pattern inside is_longterm_pinnable_page(),
-so that's really strange.
+The comment above debugfs_create_dir includes the following text.
 
-But regardless, please don't duplicate that odd conditional for no
-reason, and don't scream.
+ * NOTE: it's expected that most callers should _ignore_ the errors returned
+ * by this function. Other debugfs functions handle the fact that the "dentry"
+ * passed to them could be an error and they don't crash in that case.
+ * Drivers should generally work fine even if debugfs fails to init anyway.
 
-So regardless of where it is, make that "is_zero_folio()" just do
-"is_zero_page(&folio->page)" rather than repeat the question.
+Signed-off-by: Osama Muhammad <osmtendev@gmail.com>
+---
+ drivers/block/pktcdvd.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-I also wonder whether we shouldn't just use the "transparent union"
-argument thing more aggressively. Something like
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index d5d7884cedd4..37cdd68c3de5 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -451,8 +451,6 @@ static void pkt_debugfs_dev_new(struct pktcdvd_device *pd)
+ 	if (!pkt_debugfs_root)
+ 		return;
+ 	pd->dfs_d_root = debugfs_create_dir(pd->name, pkt_debugfs_root);
+-	if (!pd->dfs_d_root)
+-		return;
+ 
+ 	pd->dfs_f_info = debugfs_create_file("info", 0444,
+ 					     pd->dfs_d_root, pd, &debug_fops);
+-- 
+2.34.1
 
-   typedef union {
-        struct page *page;
-        struct folio *folio;
-   } page_or_folio_t __attribute__ ((__transparent_union__));
-
-and then you should be able to do something like this:
-
-    static inline bool is_zero_page(const page_or_folio_t arg)
-    {
-        return is_zero_pfn(page_to_pfn(arg.page));
-    }
-
-and we don't have to keep generating the two versions over and over
-and over again.
-
-                Linus
