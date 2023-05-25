@@ -2,37 +2,38 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13373C77B7E
-	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 21:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A736DC7EE29
+	for <linux-block@archiver.kernel.org>; Thu, 25 May 2023 21:48:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233159AbjEYVsr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 17:48:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50904 "EHLO
+        id S233846AbjEYVsy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 17:48:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233846AbjEYVsm (ORCPT
+        with ESMTP id S236289AbjEYVso (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 17:48:42 -0400
-Received: from out-15.mta1.migadu.com (out-15.mta1.migadu.com [IPv6:2001:41d0:203:375::f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512B0FB
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 14:48:41 -0700 (PDT)
+        Thu, 25 May 2023 17:48:44 -0400
+Received: from out-55.mta1.migadu.com (out-55.mta1.migadu.com [IPv6:2001:41d0:203:375::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFF41A2
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 14:48:42 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685051319;
+        t=1685051320;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=t8R8a1McseA9yHEzYOxyXGPVlvlW3Oa2+9zEDFiMSek=;
-        b=ggHAXBanEtrsF3Bw6NBbcErQG27OLHdzER6fR1tKOaIZ+UxdklUDO9CjHGMylYPF8hjYYa
-        JCJMbNS42iRiKS1tTjfnAhXHw1ipsVyyDxg5qO4i1o+cw8BKqHSlsjOqDGoKZbfPxvKVi4
-        ZAMsPzraoKPmoCl6zo/nWtGPjfTQsjI=
+        bh=KkRPMSjK8YKASg8ZAP2GYnCrc/m4pRzmXY3p1j1RS/g=;
+        b=a5Ua3jPQQwy6N9lQr/+d3LtuAC8WhjKIbI5ddlzl49u+avjnUPNS4kpj/3yy2kyQZsVj0E
+        aYAzQA+vmk12NIuVpAiLMs3h6CFrQTy2Dq1ggwjeiX4cwmKAn+e7lLhPwhJ5pNtRkw9K3N
+        9d4WZoaUZGUoAYGTRU6FnY85rb5QA7w=
 From:   Kent Overstreet <kent.overstreet@linux.dev>
 To:     linux-kernel@vger.kernel.org, axboe@kernel.dk
-Cc:     Kent Overstreet <kent.overstreet@linux.dev>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 2/7] block: Allow bio_iov_iter_get_pages() with bio->bi_bdev unset
-Date:   Thu, 25 May 2023 17:48:17 -0400
-Message-Id: <20230525214822.2725616-3-kent.overstreet@linux.dev>
+Cc:     Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@linux.dev>
+Subject: [PATCH 3/7] block: Bring back zero_fill_bio_iter
+Date:   Thu, 25 May 2023 17:48:18 -0400
+Message-Id: <20230525214822.2725616-4-kent.overstreet@linux.dev>
 In-Reply-To: <20230525214822.2725616-1-kent.overstreet@linux.dev>
 References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
 MIME-Version: 1.0
@@ -42,51 +43,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_iov_iter_get_pages() trims the IO based on the block size of the
-block device the IO will be issued to.
+From: Kent Overstreet <kent.overstreet@gmail.com>
 
-However, bcachefs is a multi device filesystem; when we're creating the
-bio we don't yet know which block device the bio will be submitted to -
-we have to handle the alignment checks elsewhere.
-
-Thus this is needed to avoid a null ptr deref.
+This reverts the commit that deleted it; it's used by bcachefs.
 
 Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
 Cc: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
 ---
- block/bio.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ block/bio.c         | 6 +++---
+ include/linux/bio.h | 7 ++++++-
+ 2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 1e75840d17..e74a04ea14 100644
+index e74a04ea14..70b5c987bc 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -1245,7 +1245,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	struct page **pages = (struct page **)bv;
- 	ssize_t size, left;
- 	unsigned len, i = 0;
--	size_t offset, trim;
-+	size_t offset;
- 	int ret = 0;
+@@ -606,15 +606,15 @@ struct bio *bio_kmalloc(unsigned short nr_vecs, gfp_t gfp_mask)
+ }
+ EXPORT_SYMBOL(bio_kmalloc);
  
- 	/*
-@@ -1274,10 +1274,12 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+-void zero_fill_bio(struct bio *bio)
++void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
+ {
+ 	struct bio_vec bv;
+ 	struct bvec_iter iter;
  
- 	nr_pages = DIV_ROUND_UP(offset + size, PAGE_SIZE);
+-	bio_for_each_segment(bv, bio, iter)
++	__bio_for_each_segment(bv, bio, iter, start)
+ 		memzero_bvec(&bv);
+ }
+-EXPORT_SYMBOL(zero_fill_bio);
++EXPORT_SYMBOL(zero_fill_bio_iter);
  
--	trim = size & (bdev_logical_block_size(bio->bi_bdev) - 1);
--	iov_iter_revert(iter, trim);
-+	if (bio->bi_bdev) {
-+		size_t trim = size & (bdev_logical_block_size(bio->bi_bdev) - 1);
-+		iov_iter_revert(iter, trim);
-+		size -= trim;
-+	}
+ /**
+  * bio_truncate - truncate the bio to small size of @new_size
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d766be7152..3536f28c05 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -484,7 +484,12 @@ extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ extern void bio_copy_data(struct bio *dst, struct bio *src);
+ extern void bio_free_pages(struct bio *bio);
+ void guard_bio_eod(struct bio *bio);
+-void zero_fill_bio(struct bio *bio);
++void zero_fill_bio_iter(struct bio *bio, struct bvec_iter iter);
++
++static inline void zero_fill_bio(struct bio *bio)
++{
++	zero_fill_bio_iter(bio, bio->bi_iter);
++}
  
--	size -= trim;
- 	if (unlikely(!size)) {
- 		ret = -EFAULT;
- 		goto out;
+ static inline void bio_release_pages(struct bio *bio, bool mark_dirty)
+ {
 -- 
 2.40.1
 
