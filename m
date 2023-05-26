@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB466C7EE32
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7887DC7EE33
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:56:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242578AbjEZH4J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S242591AbjEZH4J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 26 May 2023 03:56:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242138AbjEZH4H (ORCPT
+        with ESMTP id S242581AbjEZH4I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 03:56:07 -0400
+        Fri, 26 May 2023 03:56:08 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0A3125;
-        Fri, 26 May 2023 00:56:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A06819D;
+        Fri, 26 May 2023 00:56:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=NWUBmxTvJYmgTPK2izgiLtu8bfX6PD49E6ZFMW3sIA8=; b=WnxjNjU6yVkEoG/2yJlDTptWs+
-        IG4CY/nxbwF8l4vRcxt8rVMn+9Dke0fLaHt3F5PKjYHOCuggCCfmh6i38zB5Gx5JOJLWasGkYjxH0
-        QrvgHFxs3p0IHA4D2naeXZvojSzJjquvJ8IOoTDRqg0KY+GyKnG89UoXRje+tPiuSXfkrionjwvMZ
-        WwhJR2wNNcLjSsxhHhxiIqnT8Nk9scxo6r5Gv7Jlz/qvE29q34PedlMGogFKJpYEFffHm4TubN+Al
-        +neu4w739RAZ/MuaXB06KM7rPauhpBwSTQwxfDsOHTDhLQFP7KD43o6lXsgWZlGEsM6hpYLW48oqt
-        TUayW7nw==;
+        bh=5oQ2gGbUsqL42uQDz21dyQWBbUA0px4CnOLURAD/lus=; b=LdiDWYPfbsR2VwE3muTukBHf1n
+        2WKuZw7xVn16RN6k6Wo9ylU0o5DsPwzzrnruYbzYdoYyEpJt744EXDXhFgaq3aPLQM0XtiDj2f8FP
+        2plHBSw0sndtNX7DTHqerD4102mCieETYl1G0dRVa+cHO3vzNpp7xWDo8hVulJyMeNAOkZv4L98nW
+        6TmrmiHMZRz3tMGsyF1olHjbXr53o35bSOXIQ23JnCL7T/TEVq47iBber3uY3gk1HYKtkAuea4Vam
+        CYKjwRSPO0HEhImDxfLN6W/tI67qgSTWbDSI9uMVp9MT7NiJOiaImnK7AjLb+fCQHpyGYE6dCefwT
+        r8p56qVA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q2SIj-001WZw-39;
+        id 1q2SIj-001WZg-2T;
         Fri, 26 May 2023 07:55:53 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     hughd@google.com, akpm@linux-foundation.org, willy@infradead.org,
@@ -37,9 +37,9 @@ Cc:     p.raghav@samsung.com, da.gomez@samsung.com, rohan.puri@samsung.com,
         kbusch@kernel.org, mcgrof@kernel.org, patches@lists.linux.dev,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [RFC v2 6/8] shmem: consider block size in shmem_default_max_inodes()
-Date:   Fri, 26 May 2023 00:55:50 -0700
-Message-Id: <20230526075552.363524-7-mcgrof@kernel.org>
+Subject: [RFC v2 1/8] page_flags: add is_folio_hwpoison()
+Date:   Fri, 26 May 2023 00:55:45 -0700
+Message-Id: <20230526075552.363524-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230526075552.363524-1-mcgrof@kernel.org>
 References: <20230526075552.363524-1-mcgrof@kernel.org>
@@ -50,65 +50,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Today we allow for a max number of inodes in consideration for
-the smallest possible inodes with just one block of size PAGE_SIZE.
-The max number of inodes depend on the size of the block size then,
-and if we want to support higher block sizes we end up with less
-number of inodes.
-
-Account for this in the computation for the max number of inodes.
-
-If the blocksize is greater than the PAGE_SIZE, we simply divide the
-number of pages usable, multiply by the page size and divide by the
-blocksize.
-
-This produces no functional changes right now as we don't support
-larger block sizes yet.
+Provide a helper similar to is_page_hwpoison() for folios
+which tests the first head and if the folio is large any page in
+the folio is tested for the poison flag.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- mm/shmem.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ include/linux/page-flags.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/mm/shmem.c b/mm/shmem.c
-index 179fde04f57f..d347a5ba49f1 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -145,11 +145,14 @@ static unsigned long shmem_default_max_blocks(unsigned char block_order)
- 	return totalram_pages() >> (block_order - PAGE_SHIFT + 1);
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index 1c68d67b832f..4d5f395edf03 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -883,6 +883,13 @@ static inline bool is_page_hwpoison(struct page *page)
+ 	return PageHuge(page) && PageHWPoison(compound_head(page));
  }
  
--static unsigned long shmem_default_max_inodes(void)
-+static unsigned long shmem_default_max_inodes(unsigned char block_order)
- {
- 	unsigned long nr_pages = totalram_pages();
-+	unsigned long pages_for_inodes = min(nr_pages - totalhigh_pages(), nr_pages / 2);
- 
--	return min(nr_pages - totalhigh_pages(), nr_pages / 2);
-+	if (block_order == shmem_default_block_order())
-+		return pages_for_inodes;
-+	return pages_for_inodes >> (block_order - PAGE_SHIFT);
- }
- #else
- static u64 shmem_block_order(struct shmem_sb_info *sbinfo)
-@@ -3910,7 +3913,7 @@ static int shmem_show_options(struct seq_file *seq, struct dentry *root)
- 	if (sbinfo->max_blocks != shmem_default_max_blocks(shmem_default_block_order()))
- 		seq_printf(seq, ",size=%luk",
- 			sbinfo->max_blocks << (PAGE_SHIFT - 10));
--	if (sbinfo->max_inodes != shmem_default_max_inodes())
-+	if (sbinfo->max_inodes != shmem_default_max_inodes(shmem_default_block_order()))
- 		seq_printf(seq, ",nr_inodes=%lu", sbinfo->max_inodes);
- 	if (sbinfo->mode != (0777 | S_ISVTX))
- 		seq_printf(seq, ",mode=%03ho", sbinfo->mode);
-@@ -3991,7 +3994,7 @@ static int shmem_fill_super(struct super_block *sb, struct fs_context *fc)
- 		if (!(ctx->seen & SHMEM_SEEN_BLOCKS))
- 			ctx->blocks = shmem_default_max_blocks(shmem_default_block_order());
- 		if (!(ctx->seen & SHMEM_SEEN_INODES))
--			ctx->inodes = shmem_default_max_inodes();
-+			ctx->inodes = shmem_default_max_inodes(shmem_default_block_order());
- 		if (!(ctx->seen & SHMEM_SEEN_INUMS))
- 			ctx->full_inums = IS_ENABLED(CONFIG_TMPFS_INODE64);
- 		sbinfo->noswap = ctx->noswap;
++static inline bool is_folio_hwpoison(struct folio *folio)
++{
++       if (folio_test_hwpoison(folio))
++               return true;
++       return folio_test_large(folio) && folio_test_has_hwpoisoned(folio);
++}
++
+ /*
+  * For pages that are never mapped to userspace (and aren't PageSlab),
+  * page_type may be used.  Because it is initialised to -1, we invert the
 -- 
 2.39.2
 
