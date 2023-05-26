@@ -2,73 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E78D9C7EE23
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 20:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2941C77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 21:11:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237449AbjEZUod (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 16:44:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47832 "EHLO
+        id S231288AbjEZVLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 17:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230398AbjEZUoc (ORCPT
+        with ESMTP id S229570AbjEZVLo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 16:44:32 -0400
-Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [IPv6:2001:41d0:203:375::1a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF701134
-        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 13:44:30 -0700 (PDT)
-Date:   Fri, 26 May 2023 16:44:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685133868;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Fri, 26 May 2023 17:11:44 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903E5BB;
+        Fri, 26 May 2023 14:11:43 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 187291FDB1;
+        Fri, 26 May 2023 21:11:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1685135502; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=8KhM7Tec91IIr/YDqGSLmg2UH0YLVPVmNhygxdKaLXo=;
-        b=YdBrJ6M5eG7UsaBjdAHMN8N/fTptPzh6l1+Uq1Fcfevf9lCW+dfJqr98mF+m0jbJYwflwj
-        lHEBizbTBG0X8AJzw7Xu9gRnmcXRyBJzYWy65UtzSffRlQM2c86ISnt/yBZ5YYkdURabYm
-        dv2YQuUwqMo5t/Fz6g9S9xxW6UCfZVo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 0/7] block layer patches for bcachefs
-Message-ID: <ZHEaKQH22Uxk9jPK@moria.home.lan>
-References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
- <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
+        bh=GTCdMXnNw/we7gpWUIpXMsOp9HhjiCEV541QuBvZbyI=;
+        b=nGFZHAxje2bQi5OKTGrbsgUMwcORsIAPWM0/azph8zJ/82STCr0zqq7OJskz3qFrMTvnm8
+        8XShV3U1AYBeAbz5WvKd78glx2fuXqUWgSOB06tmBe4FuBqYbhe3JlbJ8zTde0afM1Nayn
+        O0e+anTuA/QQKFYJZWvWvafOIk7vykE=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D0923138E6;
+        Fri, 26 May 2023 21:11:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 84YUMo0gcWQfVwAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Fri, 26 May 2023 21:11:41 +0000
+Date:   Fri, 26 May 2023 23:11:40 +0200
+From:   Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Yosry Ahmed <yosryahmed@google.com>,
+        Linux-MM <linux-mm@kvack.org>, Michal Hocko <mhocko@kernel.org>,
+        Shakeel Butt <shakeelb@google.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Roman Gushchin <roman.gushchin@linux.dev>,
+        Muchun Song <muchun.song@linux.dev>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH] blk-cgroup: Flush stats before releasing blkcg_gq
+Message-ID: <wrk7xlexb4kt7zlsqaubmc7ifig2fg6kkeuulfsc4u5xeubrck@pa3okxj3sor4>
+References: <20230524011935.719659-1-ming.lei@redhat.com>
+ <CAJD7tkZkbro4H-QC=RJx_dfCdGQ5c=4NJhbFrcEmQSidaaMOmg@mail.gmail.com>
+ <ZG14VnHl20lt9jLc@ovpn-8-17.pek2.redhat.com>
+ <3ej42djuuzwx36yf2yeo5ggyrvogeaguos5jtve2bvuaejnwff@fak3yjwe2fbi>
+ <8f56f60f-8dd3-d798-3d81-6ccbb185465d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="2lov5w6hllmz7efr"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <8f56f60f-8dd3-d798-3d81-6ccbb185465d@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 26, 2023 at 08:35:23AM -0600, Jens Axboe wrote:
-> On 5/25/23 3:48 PM, Kent Overstreet wrote:
-> > Jens, here's the full series of block layer patches needed for bcachefs:
-> > 
-> > Some of these (added exports, zero_fill_bio_iter?) can probably go with
-> > the bcachefs pull and I'm just including here for completeness. The main
-> > ones are the bio_iter patches, and the __invalidate_super() patch.
-> > 
-> > The bio_iter series has a new documentation patch.
-> > 
-> > I would still like the __invalidate_super() patch to get some review
-> > (from VFS people? unclear who owns this).
-> 
-> I wanted to check the code generation for patches 4 and 5, but the
-> series doesn't seem to apply to current -git nor my for-6.5/block.
-> There's no base commit in this cover letter either, so what is this
-> against?
-> 
-> Please send one that applies to for-6.5/block so it's a bit easier
-> to take a closer look at this.
 
-Here you go:
-git pull https://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
+--2lov5w6hllmz7efr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-changed folio_vec to folio_seg, build tested it and just pointed my CI
-at it, results will be showing up for xfs at
-https://evilpiepirate.org/~testdashboard/ci?branch=block-for-bcachefs
+On Thu, May 25, 2023 at 11:25:05AM -0400, Waiman Long <longman@redhat.com> wrote:
+> Since the percpu blkg_iostat_set's that are linked in the lockless list will
+> be freed if the corresponding blkcg_gq is freed, we need to flush the
+> lockless list to avoid potential use-after-free in a future
+> cgroup_rstat_flush*() call.
+
+Ah, so that was meant to the situation post-patch (that removes refcnt
+of entries on list lockless).
+
+(It sounded like an answer to Yosry's question about
+cgroup_rstat_flush in offline_css in pre-patch version. Nevermind, this
+would need other adjustments.)
+
+Thanks,
+Michal
+
+--2lov5w6hllmz7efr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCZHEgigAKCRAkDQmsBEOq
+uWtDAP9qS2v1mJD+JAJWF4NNLRntYEptKWXuYC5WuXbwLeHXVgEAv+bVtSIdoISo
+P9lLBk2p49pDqTse3bR1E50c/pTTQgU=
+=Aa81
+-----END PGP SIGNATURE-----
+
+--2lov5w6hllmz7efr--
