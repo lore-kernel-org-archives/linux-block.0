@@ -2,136 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E09F2C7EE29
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 00:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30160C77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 00:36:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235214AbjEZAfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 20:35:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42610 "EHLO
+        id S239896AbjEZAgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 20:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234574AbjEZAfL (ORCPT
+        with ESMTP id S236298AbjEZAgJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 20:35:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E52EC198
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 17:34:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685061260;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3HkhSmcztqk7WRQegC24K1K8Fj702Fn4WVYpg4vLlng=;
-        b=CF3AVpPmm2IFmrlocxx08P3YoXCCVK1WwiW4YJfbZJZPECz0g21oV1sWLNWQvGzmKf2W6i
-        SdBAAzK4tnhdKQrbbQ4JC+VHK39RBCvZMl/2EHs+NB5L56e7PCcINKtN0Taw6OdHCNhX7q
-        9cARyB8q9XYW08benkI+2BpWpvwifgs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-190-Wm6kMQb3MvW3FH1f-sushQ-1; Thu, 25 May 2023 20:34:17 -0400
-X-MC-Unique: Wm6kMQb3MvW3FH1f-sushQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DF9E680120A;
-        Fri, 26 May 2023 00:34:16 +0000 (UTC)
-Received: from ovpn-8-21.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A576400F1F;
-        Fri, 26 May 2023 00:34:09 +0000 (UTC)
-Date:   Fri, 26 May 2023 08:34:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        Yosry Ahmed <yosryahmed@google.com>,
-        Jay Shin <jaeshin@redhat.com>, stable@vger.kernel.org,
-        ming.lei@redhat.com
-Subject: Re: [PATCH] blk-cgroup: Flush stats before releasing blkcg_gq
-Message-ID: <ZG/+fB+f8Lf2PKc7@ovpn-8-21.pek2.redhat.com>
-References: <20230525043518.831721-1-ming.lei@redhat.com>
- <20230525160105.1968749-1-longman@redhat.com>
- <64f20e27-0927-334d-5414-9bb81d639cec@redhat.com>
+        Thu, 25 May 2023 20:36:09 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E261AC
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 17:36:07 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-5144a9c11c7so150094a12.2
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 17:36:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1685061367; x=1687653367;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tJ9LyPTo053T3fijbdEEeajXM5b0nc+MBS0L4hj1F/Y=;
+        b=TDAx+dt6pUfaSHJbf2NrRNpfsbscdpyE5E6JoZa4h0wMlat3WMbVhXEVYxqXvIp4Zn
+         L/ZBdVhL4QzPQv2jjXt8wN5XNqHmUFaTb11tEOuzMiAEG/1IDCVoWbTQpGMwPMcaueNA
+         vPVPOhjA71jC4smZBdAUDi9GcD9+MBWOLfpKX+2KH6wZwt3Ox8zXjLhJZl0aCXBjRLV7
+         +1l5X6FhTRJmRgnmpLGr6XxF0d063vavFNvcrtoXsJt+uyXUooiUl4Ro2iGW+9UF3IQn
+         JmcWT/NDBMtg9GGqV/PiUmXYkvwGfMgammbN0RNn5tBb+i9p2JitRx2i/1E2zO8ct7vE
+         FC7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685061367; x=1687653367;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tJ9LyPTo053T3fijbdEEeajXM5b0nc+MBS0L4hj1F/Y=;
+        b=WmwBluOXA1F36EZG6cPdm14ftxJ9IAILwXhfusnpi6dVRPqVqv4ZgKWrPyTc/fptBx
+         lBQPurnpPtroThUm+MLoenmLJkd8Vnf96zqrxtQCOmYmuuaGp4rEQWXh1D9SJBMlj/Ry
+         MuxqAhyqcPBrsmpvEW17B3CtdGz04+ID62c+Q+1atDUFA5g1tvgcDDe3/n6XmtOCrdsb
+         RJs82/tPk9bHPyRVeMvaju1LgsVgZFylQjsrSlxMa37PPmy+LqLhxMPNQ4/Ze6A8TrxF
+         u22I3EQ2Thmkb7UYRM/B6pJGpKo9y9btTYS4U6GBzZtHbmDsll8eYpa4V8sed1Ri9Cb1
+         d4wg==
+X-Gm-Message-State: AC+VfDydBszDAgQP+3i/BSDOp0i+FrMq9h98zx1llJoGnUK21JJwGl4A
+        SBT0L0yHSwNaxvFedCRKHXeZwg==
+X-Google-Smtp-Source: ACHHUZ45T530Np/DKkM/YX0mFC5+v2YjaZ7Ka9v14tyOEH74llzKzA6gQNPz0SE1MkCc9RKZ+f8wxQ==
+X-Received: by 2002:a17:902:d511:b0:1af:cbb6:61ff with SMTP id b17-20020a170902d51100b001afcbb661ffmr589592plg.64.1685061367017;
+        Thu, 25 May 2023 17:36:07 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
+        by smtp.gmail.com with ESMTPSA id y16-20020a17090264d000b00194caf3e975sm1979063pli.208.2023.05.25.17.36.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 May 2023 17:36:06 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q2LR5-003vd3-20;
+        Fri, 26 May 2023 10:36:03 +1000
+Date:   Fri, 26 May 2023 10:36:03 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH 5/7] block: Rework bio_for_each_folio_all()
+Message-ID: <ZG/+88/G+hX5DyCX@dread.disaster.area>
+References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+ <20230525214822.2725616-6-kent.overstreet@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <64f20e27-0927-334d-5414-9bb81d639cec@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+In-Reply-To: <20230525214822.2725616-6-kent.overstreet@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 12:06:07PM -0400, Waiman Long wrote:
-> On 5/25/23 12:01, Waiman Long wrote:
-> > As noted by Michal, the blkg_iostat_set's in the lockless list hold
-> > reference to blkg's to protect against their removal. Those blkg's
-> > hold reference to blkcg. When a cgroup is being destroyed,
-> > cgroup_rstat_flush() is only called at css_release_work_fn() which
-> > is called when the blkcg reference count reaches 0. This circular
-> > dependency will prevent blkcg and some blkgs from being freed after
-> > they are made offline.
-> > 
-> > It is less a problem if the cgroup to be destroyed also has other
-> > controllers like memory that will call cgroup_rstat_flush() which will
-> > clean up the reference count. If block is the only controller that uses
-> > rstat, these offline blkcg and blkgs may never be freed leaking more
-> > and more memory over time.
-> > 
-> > To prevent this potential memory leak:
-> > 
-> > - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
-> >    can be added to avoid use-after-free of the percpu blkg_iostat_set in
-> >    futue cgroup_rstat_flush*() calls.
-> > 
-> > - add a cgroup_rstat_flush_acquire() helper and call it to acquire
-> >    cgroup_rstat_lock to block concurrent execution of other
-> >    cgroup_rstat_flush*() calls
-> > 
-> > - don't grab bio->bi_blkg reference when adding the stats into blkcg's
-> >    per-cpu stat list since all stats are guaranteed to be consumed before
-> >    releasing blkg instance, and grabbing blkg reference for stats was
-> >    the most fragile part of original patch
-> > 
-> > Based on Waiman's patch:
-> > 
-> > https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
-> > 
-> > Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: Jay Shin <jaeshin@redhat.com>
-> > Cc: Waiman Long <longman@redhat.com>
-> > Cc: Tejun Heo <tj@kernel.org>
-> > Cc: mkoutny@suse.com
-> > Cc: Yosry Ahmed <yosryahmed@google.com>
-> > Co-developed-by: Ming Lei <ming.lei@redhat.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > Signed-off-by: Waiman Long <longman@redhat.com>
-> > ---
-> >   block/blk-cgroup.c     | 57 +++++++++++++++++++++++++++++++-----------
-> >   include/linux/cgroup.h |  1 +
-> >   kernel/cgroup/rstat.c  | 15 ++++++++++-
-> >   3 files changed, 57 insertions(+), 16 deletions(-)
+On Thu, May 25, 2023 at 05:48:20PM -0400, Kent Overstreet wrote:
+> This reimplements bio_for_each_folio_all() on top of the newly-reworked
+> bvec_iter_all, and since it's now trivial we also provide
+> bio_for_each_folio.
 > 
-> This is my counter-proposal to Ming's v3 patch. The major difference is that
-> I used the existing cgroup_rstat_lock instead of adding a new internal lock.
-> This minimizes performance impact to existing cgroup_rstat_flush*() call
+> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: linux-block@vger.kernel.org
+> ---
+>  fs/crypto/bio.c        |  9 +++--
+>  fs/iomap/buffered-io.c | 14 ++++---
+>  fs/verity/verify.c     |  9 +++--
+>  include/linux/bio.h    | 91 +++++++++++++++++++++---------------------
+>  include/linux/bvec.h   | 15 +++++--
+>  5 files changed, 75 insertions(+), 63 deletions(-)
+....
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index f86c7190c3..7ced281734 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -169,6 +169,42 @@ static inline void bio_advance(struct bio *bio, unsigned int nbytes)
+>  #define bio_for_each_segment(bvl, bio, iter)				\
+>  	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+>  
+> +struct folio_vec {
+> +	struct folio	*fv_folio;
+> +	size_t		fv_offset;
+> +	size_t		fv_len;
+> +};
 
-The added internal lock has ~zero perf impact on rstat flush cause
-the lock won't be contended basically.
+Can we drop the "fv_" variable prefix here? It's just unnecessary
+verbosity when we know we have a folio_vec structure. i.e fv->folio
+is easier to read and type than fv->fv_folio...
 
-> while achieving the same objective. I am fine with Ming current v3 patch if
-> we decide to go that way.
+Hmmm, this is probably not a good name considering "struct pagevec" is
+something completely different - the equivalent is "struct
+folio_batch" but I can see this being confusing for people who
+largely expect some symmetry between page<->folio naming
+conventions...
 
-As I mentioned, the main motivation with internal lock is to make the fix as
-simple as possible since cross-subsystem change isn't involved, and I am fine
-with any following cleanup or improvement on current blkg rstat flush.
+Also, why is this in bio.h and not in a mm/folio related header
+file?
 
-Another benefit with this internal lock is that race in blkcg_reset_stats()
-can be avoided.
+Cheers,
 
-
-Thanks, 
-Ming
-
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
