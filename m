@@ -2,70 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C9B3C7EE2E
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 18:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E78D9C7EE23
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 20:44:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234439AbjEZSoD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 14:44:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53252 "EHLO
+        id S237449AbjEZUod (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 16:44:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229882AbjEZSoC (ORCPT
+        with ESMTP id S230398AbjEZUoc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 14:44:02 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A82E65;
-        Fri, 26 May 2023 11:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=SC3QuxZifneOZBhZF54TVMUnSROnxAUB8mJntY3DYLA=; b=aGq+uwJcZ2GwzvoAOVaDo+A/5e
-        4GfeZUw+m2279aQn4gfFuyfOanPcGaDB2nTSnB+zXJHXDjAK7YI3gweGfiHmXDd3kURuJHwaBvyTZ
-        R3zA+BIbA0SfXRSMeHsQampNLfBRkGpC1vL/1X0Vf3NeArkee+nlNFhUOsW1dTxCDWOFGdaJQn3Iz
-        OTaqRm5wt/Cp8hULL+gEjXn7uFjzC4f/qlmApbPYMtL3WcCurdXgptPbigQP/dfVT+UPvnLEXbfPx
-        l91JLrC4FpfZ+D6WZ3n6LuK9/qr04EVvVg0Q5u4TPM+sYaRV72Y7NQs0Qm4LF7/4qzZiv5fajb+ZV
-        MHEmsflw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q2cPP-0032TG-0U; Fri, 26 May 2023 18:43:27 +0000
-Date:   Fri, 26 May 2023 19:43:26 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     hughd@google.com, akpm@linux-foundation.org, brauner@kernel.org,
-        djwong@kernel.org, p.raghav@samsung.com, da.gomez@samsung.com,
-        rohan.puri@samsung.com, rpuri.linux@gmail.com,
-        a.manzanares@samsung.com, dave@stgolabs.net, yosryahmed@google.com,
-        keescook@chromium.org, hare@suse.de, kbusch@kernel.org,
-        patches@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC v2 0/8] add support for blocksize > PAGE_SIZE
-Message-ID: <ZHD9zmIeNXICDaRJ@casper.infradead.org>
-References: <20230526075552.363524-1-mcgrof@kernel.org>
- <ZHC6BM+ehSC5Atv8@casper.infradead.org>
- <ZHDtgdhauy0RZPeU@bombadil.infradead.org>
+        Fri, 26 May 2023 16:44:32 -0400
+Received: from out-26.mta1.migadu.com (out-26.mta1.migadu.com [IPv6:2001:41d0:203:375::1a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF701134
+        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 13:44:30 -0700 (PDT)
+Date:   Fri, 26 May 2023 16:44:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685133868;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8KhM7Tec91IIr/YDqGSLmg2UH0YLVPVmNhygxdKaLXo=;
+        b=YdBrJ6M5eG7UsaBjdAHMN8N/fTptPzh6l1+Uq1Fcfevf9lCW+dfJqr98mF+m0jbJYwflwj
+        lHEBizbTBG0X8AJzw7Xu9gRnmcXRyBJzYWy65UtzSffRlQM2c86ISnt/yBZ5YYkdURabYm
+        dv2YQuUwqMo5t/Fz6g9S9xxW6UCfZVo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 0/7] block layer patches for bcachefs
+Message-ID: <ZHEaKQH22Uxk9jPK@moria.home.lan>
+References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+ <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZHDtgdhauy0RZPeU@bombadil.infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 26, 2023 at 10:33:53AM -0700, Luis Chamberlain wrote:
-> On Fri, May 26, 2023 at 02:54:12PM +0100, Matthew Wilcox wrote:
-> > You're coming at this from a block layer perspective, and we have two
-> > ways of doing large block devices -- qemu nvme and brd.  tmpfs should
-> > be like other filesystems and opportunistically use folios of whatever
-> > size makes sense.
+On Fri, May 26, 2023 at 08:35:23AM -0600, Jens Axboe wrote:
+> On 5/25/23 3:48 PM, Kent Overstreet wrote:
+> > Jens, here's the full series of block layer patches needed for bcachefs:
+> > 
+> > Some of these (added exports, zero_fill_bio_iter?) can probably go with
+> > the bcachefs pull and I'm just including here for completeness. The main
+> > ones are the bio_iter patches, and the __invalidate_super() patch.
+> > 
+> > The bio_iter series has a new documentation patch.
+> > 
+> > I would still like the __invalidate_super() patch to get some review
+> > (from VFS people? unclear who owns this).
 > 
-> I figured the backing block size would be a good reason to use high
-> order folios for filesystems, and this mimicks that through the super
-> block block size. Although usage of the block size would be moved to
-> the block device and tmpfs use an page order, what other alternatives
-> were you thinking?
+> I wanted to check the code generation for patches 4 and 5, but the
+> series doesn't seem to apply to current -git nor my for-6.5/block.
+> There's no base commit in this cover letter either, so what is this
+> against?
+> 
+> Please send one that applies to for-6.5/block so it's a bit easier
+> to take a closer look at this.
 
-Use the readahead code like other filesystems to determine what size of
-folios to allocate.  Also use the size of writes to determine what size
-of folio to allocate, as in this patchset:
+Here you go:
+git pull https://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
 
-https://lore.kernel.org/linux-fsdevel/20230520163603.1794256-1-willy@infradead.org/
+changed folio_vec to folio_seg, build tested it and just pointed my CI
+at it, results will be showing up for xfs at
+https://evilpiepirate.org/~testdashboard/ci?branch=block-for-bcachefs
