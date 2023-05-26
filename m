@@ -2,71 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A18CC77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 09:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A44D2C7EE2D
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 09:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243038AbjEZJZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 05:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35126 "EHLO
+        id S243072AbjEZJ0J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 05:26:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243176AbjEZJZE (ORCPT
+        with ESMTP id S243094AbjEZJ0H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 05:25:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1037513D
-        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 02:24:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685093062;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0hvsOWsTxhCAtK9wZGl3ItbtOHeNAmtLYxozsBT60tM=;
-        b=c9qS+AlBTCaTLwOuh+Kn0QdfuvA5F4/ZtqKDesOhp+Y++mSmgNMoan2qaQCQMuzOdU1uET
-        +x76rLfFemSz8tq3mnkZ+VSBi3iSSkQtiVIYV5zICzwr2AWSqBDkZmUrTScwUF7P1Qj8ba
-        DKRF4IBNwDAldeRurIAfcFvUXqGSysM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-DRrrlNIIMsupa_PQ0lUJ8w-1; Fri, 26 May 2023 05:24:21 -0400
-X-MC-Unique: DRrrlNIIMsupa_PQ0lUJ8w-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-307897bc279so313717f8f.3
-        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 02:24:21 -0700 (PDT)
+        Fri, 26 May 2023 05:26:07 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 852331BF;
+        Fri, 26 May 2023 02:25:58 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3f6cbf02747so3563205e9.1;
+        Fri, 26 May 2023 02:25:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685093157; x=1687685157;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=33W3DIYt68JCc1u4c3IHIWclixpfbjQ4h21dOvzyDuw=;
+        b=CvvNWfFpQ3Ld/4CYyw7Xw62+CVZ8Psau5n52Twi4YWjNr5q3rQpPgQCv3bSHqVNQOg
+         1mOE72h1EqZMonHUUcfqrzu/vsJH+0lX803aAnutUrpkYBrRsLBy0VGDYsnd7Z2w1hCh
+         XXdECMzqzEm/BvE8gGyLBbplUgqVFh0XHMoxDvHfi5B2RUonAdJRwhd3IHCNZd6og5fj
+         LQwt06eQOz+OFluI8lZhk0MH6PDV04YkytC0+ygQ9vbrjEUrbGUSu4P1uLEuAT85Qayg
+         4TBpAtOEgFQhOH5ZjcjZdZ3wI5xyaoFCy+dqiU+eQ2GyK/EsudKbsvlW2NjQMLajFU+8
+         HXmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685093060; x=1687685060;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0hvsOWsTxhCAtK9wZGl3ItbtOHeNAmtLYxozsBT60tM=;
-        b=kGBqJHKZaYZkVyJ5Q97E3rVl21KCRTdzCliw0/DUytr++mV11QQISgKtYk6LzlvooR
-         5+/b2qiOycF9EnQM1cGBlTYqo84pujOryhw7EWRpTwBX8OoTamcx4T3LhowxCFJtRb1r
-         N3APdYsImzjXReK2rTbmWXX7qlFG5h0/hdEqGd1q+tmYi0lr1OtuFh62rDl2doCAJRuB
-         doq5FAKrCwGV4s6TMimmd+T7IVoWB62Cp25viV4oXv29IXmveRC87KoJROKMwXtXlPDL
-         R6yTfrG/FE8Ns85/ftwn29LbNSlto2RBiuCBhwD6Zf+XirCA8+7HxJCqLsrNmwdqJ4en
-         b8UQ==
-X-Gm-Message-State: AC+VfDzNnnUCTCaw3wdy53dqkhb6BQwv3GzdPAfRkPEEORW8RbCt6Iqe
-        Wi7dqUg0LzSkhlURdieXJCKBUJ5ZuBkRpyXy7HQ8Aaavg8EIb3yzT88j/pcS4SUi3RK3H5JP2vA
-        vzmLKTo+iyS5wzt0xQiQQngI=
-X-Received: by 2002:adf:e704:0:b0:306:459b:f575 with SMTP id c4-20020adfe704000000b00306459bf575mr994702wrm.12.1685093060458;
-        Fri, 26 May 2023 02:24:20 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7/DN4isxucuKpWnb3968aE5fezzmDpKs9YwOs8B5KHM5/+Y68dG7HuVKtISlXTfNhMp11ttA==
-X-Received: by 2002:adf:e704:0:b0:306:459b:f575 with SMTP id c4-20020adfe704000000b00306459bf575mr994681wrm.12.1685093060096;
-        Fri, 26 May 2023 02:24:20 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c710:9700:7003:7e4d:43dd:7bfd? (p200300cbc710970070037e4d43dd7bfd.dip0.t-ipconnect.de. [2003:cb:c710:9700:7003:7e4d:43dd:7bfd])
-        by smtp.gmail.com with ESMTPSA id v10-20020adfe28a000000b003063a1cdaf2sm4390604wri.48.2023.05.26.02.24.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 May 2023 02:24:19 -0700 (PDT)
-Message-ID: <950f095f-5182-6f14-cdc3-ce5eb35884ca@redhat.com>
-Date:   Fri, 26 May 2023 11:24:18 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [RFC PATCH v2 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        Lorenzo Stoakes <lstoakes@gmail.com>
+        d=1e100.net; s=20221208; t=1685093157; x=1687685157;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=33W3DIYt68JCc1u4c3IHIWclixpfbjQ4h21dOvzyDuw=;
+        b=Wdpwyh6UOBCIbF0gJYuJVRasEFWK+16it6Oa5aEavgo0uOhm2iD4TocJJAk+qz+VJT
+         8Gp9xnDlj+r5O0XDqHL/bKd/fLv+m3q25ERxBs+tTSejie0d3ltEvUAeRwDbY9K1paQb
+         ayqlGFhFu+9KQS03+G6zDwxlG4W0p9F75xttA0b9/t1gpNzl0I9XpsB0QBTBoJyUyOnx
+         HKBSXAVSTpAzwLbODelmpPup/5gSmvcO3vNGx+X1DhJqOqfjX7q/Wca0ol6Fw9jR0aZL
+         AgoyPmhhCRVTsl1oG4Vlek/LsIrFIOEp0uX2QPVeKrdg1AZvmFCXWjWF77kFqs5xid2e
+         4f9A==
+X-Gm-Message-State: AC+VfDy6sN14P7Yk6N4y8KFh0ZvwsEkIFJHpDkwlY7DPteFwC15ItPde
+        BG/rXt9qseiK8XlVJL89fTEyCqynFfQ=
+X-Google-Smtp-Source: ACHHUZ5qATJanUKkPm4qBKb8bF5/1byjJd31CEWo1ros2NS7T6k47Kd+YmqaqHRsSYNaDFQZ5JaRQQ==
+X-Received: by 2002:a05:600c:214d:b0:3f6:6c0:7c9b with SMTP id v13-20020a05600c214d00b003f606c07c9bmr951472wml.15.1685093156586;
+        Fri, 26 May 2023 02:25:56 -0700 (PDT)
+Received: from localhost (host81-154-179-160.range81-154.btcentralplus.com. [81.154.179.160])
+        by smtp.gmail.com with ESMTPSA id u15-20020a05600c210f00b003f42d8dd7d1sm8272494wml.7.2023.05.26.02.25.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 May 2023 02:25:55 -0700 (PDT)
+Date:   Fri, 26 May 2023 10:23:46 +0100
+From:   Lorenzo Stoakes <lstoakes@gmail.com>
+To:     David Howells <dhowells@redhat.com>
 Cc:     Christoph Hellwig <hch@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
         Jens Axboe <axboe@kernel.dk>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
@@ -79,46 +66,54 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [RFC PATCH v2 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
+Message-ID: <859fa154-a0ea-4f7b-9f57-7e36107982b6@lucifer.local>
 References: <4f479af6-2865-4bb3-98b9-78bba9d2065f@lucifer.local>
  <89c7f535-8fc5-4480-845f-de94f335d332@lucifer.local>
  <20230525223953.225496-1-dhowells@redhat.com>
  <20230525223953.225496-2-dhowells@redhat.com>
  <520730.1685090615@warthog.procyon.org.uk>
  <522654.1685092526@warthog.procyon.org.uk>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <522654.1685092526@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 26.05.23 11:15, David Howells wrote:
+On Fri, May 26, 2023 at 10:15:26AM +0100, David Howells wrote:
 > Lorenzo Stoakes <lstoakes@gmail.com> wrote:
-> 
->>> iov_iter_extract_pages(), on the other hand, is only used in two places
->>> with these patches and the pins are always released with
->>> unpin_user_page*() so it's a lot easier to audit.
->>
->> Thanks for the clarification. I guess these are the cases where you're
->> likely to see zero page usage, but since this is changing all PUP*() callers
->> don't you need to audit all of those too?
-> 
+>
+> > > iov_iter_extract_pages(), on the other hand, is only used in two places
+> > > with these patches and the pins are always released with
+> > > unpin_user_page*() so it's a lot easier to audit.
+> >
+> > Thanks for the clarification. I guess these are the cases where you're
+> > likely to see zero page usage, but since this is changing all PUP*() callers
+> > don't you need to audit all of those too?
+>
 > I don't think it should be necessary.  This only affects pages obtained from
 > gup with FOLL_PIN - and, so far as I know, those always have to be released
 > with unpin_user_page*() which is part of the gup API and thus it should be
 > transparent to the users.
+>
 
-Right, and even code like like 873aefb376bb ("vfio/type1: Unpin zero 
-pages") would handle it transparently, because they also call 
-unpin_user_page().
+Right, I was only saying so in relation to you stating the need to audit,
+for precisely this reason I wondered why you felt the need to :)
 
-[we can remove 873aefb376bb even without this change way because it uses 
-FOLL_LONGTERM that shouldn't return the shared zeropage anymore ]
+> Pages obtained FOLL_GET, on the other hand, aren't freed through the gup API -
+> and there are a bunch of ways of releasing them - and getting additional refs
+> too.
 
--- 
-Thanks,
+Yes that's a very good point! Sorry, in my enthusiasm for GUP reform this
+thorny aspect slipped my mind...
 
-David / dhildenb
+As Christoph said though hopefully over time we can limit the use of FOLL_GET so
+this becomes easier perhaps. Larger discussion on this area in [0] :)
 
+[0]:https://lore.kernel.org/all/ZGWnq%2FdAYELyKpTy@infradead.org/
+
+>
+> David
+>
