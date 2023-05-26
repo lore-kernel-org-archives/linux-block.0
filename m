@@ -2,159 +2,186 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD7F6C77B73
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 23:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8B7C77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 23:46:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjEZXbf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 19:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55724 "EHLO
+        id S238040AbjEZXq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 19:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjEZXbe (ORCPT
+        with ESMTP id S243783AbjEZXqH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 19:31:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCFD8B2
-        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 16:31:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D60D616FD
-        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 23:31:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A84BC433D2;
-        Fri, 26 May 2023 23:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685143892;
-        bh=xc3LhZkra+9FGSYDoc+GHxPWr5JhtsrjQc/12w3BuHg=;
-        h=Date:Subject:To:References:From:In-Reply-To:From;
-        b=suJDZ0DQ07Ryn7Vi5kj6eDbV/smQt70p2512/H2BpyvubN6Z2xZg3qifGNzCebZUC
-         YZPQfaP5gv1DC6ZKUhjOIvEjcgTjx4jLuW3kP3E/14fC5oijLEm+iFtNPp3U4DdZWU
-         bVWtPP4Va4S7jl7UIKT8UmLjB1ZD6LgWj3SU94ldQDZ7FPV2pzcwkiqKNdjHRh1TVi
-         stDLRHBOkRM+8RCbCQ7HWn+yWFTtu1xfw5Cp07tHFk3ui6qoMToIc/AMLPHImZIbr/
-         sr1Q/l69y74xoHCKZjTPK4klOAdZSiQV3tp83+s8z78rJNhINyJWJSac4hPYzEUlpz
-         S9/lXBhsBrkKw==
-Message-ID: <b7c9d102-ff68-a8c6-c33d-9dd730a13c12@kernel.org>
-Date:   Sat, 27 May 2023 08:31:31 +0900
+        Fri, 26 May 2023 19:46:07 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 750351BC
+        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 16:45:36 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-64d4e45971bso1085406b3a.2
+        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 16:45:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1685144706; x=1687736706;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CWzxmQ8QxCg8O8dff9yLq2U6+xkvzRDR890XcXfK3mg=;
+        b=qNuMbPXmTsHLzrS9s68EhswAAzoxtilaQGWKnCRgcVZwgN8OI10caCromsS5yYFv2R
+         H+874/2Gj6go+XQifmTf5kewkn7i7zvKifQzI3km3f265IqOyDa5gd9FHfoFuAjSyJKf
+         yp3Cu3MsWTcnXTi9viqZ4k5krjQN5vXKA82k2fOXEqn8d2vffoDkxV23GTnBw+SHldDg
+         BKOE/PD8nm9+R387W92lR63+tYy0KUg7uB0gL32cR+2Vdg9xe1KAHkV5Hxgrp36Ol5Dq
+         mPB6awaqPs/XRgHujtk3dzFuZEXXJDEl3MYeGn/kMUMu3PuoffhICO1ogYG8CxUAsQyb
+         9Idg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685144706; x=1687736706;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CWzxmQ8QxCg8O8dff9yLq2U6+xkvzRDR890XcXfK3mg=;
+        b=OBnXfQkx3UucfX2lyw/xjia3zeRICn+TAS5LmzkGWe7qb7RvDaIka4cF+3ivVcN1jh
+         rK802Pve5BFYxgFl4QIq4e2h0iT1+QZrU6IrISrYe0VIwEu8BwYDlEjDMn92kKdwTIhm
+         urzHkT1HAGTOD19co8JCByy1tqffQopaLMy9UjFV1Pzm7W7ZxBxodDR6a66xI8UoGuqd
+         Nb7xsNb9953KcmFtiGEds4422WviUBuUcBU8dO7Kj8yu5iwnBOE0Kik1I8YpVyL69xv3
+         /SPd07QH6eWLz/NKKyQ7ToahLGJGbHOIzg0b6RW+gxNbWfp+XqTpzLUuG9bR2vw7Fns+
+         Ep0Q==
+X-Gm-Message-State: AC+VfDzjxsV2n+QuaF9hI6K/8fPJBN6jFakrH9T5M+l6TG0yJrsxXEQf
+        eVfP/NluZ06M4cn5pru5C8wKpg==
+X-Google-Smtp-Source: ACHHUZ4K3iebgteK6vCXrRpRxz8VUX6r/9jfq7BcWqxhVfO6CgyxLnisMFr2+io1W37C8mIwj9ZXTw==
+X-Received: by 2002:a05:6a00:2d88:b0:64c:ecf7:f49a with SMTP id fb8-20020a056a002d8800b0064cecf7f49amr5438139pfb.21.1685144706285;
+        Fri, 26 May 2023 16:45:06 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
+        by smtp.gmail.com with ESMTPSA id l11-20020a62be0b000000b0064f46570bb7sm3100448pff.167.2023.05.26.16.45.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 May 2023 16:45:05 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q2h7G-004Jsa-2r;
+        Sat, 27 May 2023 09:45:02 +1000
+Date:   Sat, 27 May 2023 09:45:02 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Joe Thornber <thornber@redhat.com>
+Cc:     Brian Foster <bfoster@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        dm-devel@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Joe Thornber <ejt@redhat.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZHFEfngPyUOqlthr@dread.disaster.area>
+References: <ZGb2Xi6O3i2pLam8@infradead.org>
+ <ZGeKm+jcBxzkMXQs@redhat.com>
+ <ZGgBQhsbU9b0RiT1@dread.disaster.area>
+ <ZGu0LaQfREvOQO4h@redhat.com>
+ <ZGzIJlCE2pcqQRFJ@bfoster>
+ <ZGzbGg35SqMrWfpr@redhat.com>
+ <ZG1dAtHmbQ53aOhA@dread.disaster.area>
+ <ZG+KoxDMeyogq4J0@bfoster>
+ <ZHB954zGG1ag0E/t@dread.disaster.area>
+ <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: block: significant performance regression in iSCSI rescan
-To:     Brian Bunker <brian@purestorage.com>, linux-block@vger.kernel.org
-References: <CAHZQxyKsym0E-GaV0cLQKH8GgO8X_4QR8WjiGghdjswhObLG0g@mail.gmail.com>
-Content-Language: en-US
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <CAHZQxyKsym0E-GaV0cLQKH8GgO8X_4QR8WjiGghdjswhObLG0g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/27/23 00:48, Brian Bunker wrote:
-> Hello,
+On Fri, May 26, 2023 at 12:04:02PM +0100, Joe Thornber wrote:
+> Here's my take:
 > 
-> One of our customers reported a significant regression in the
-> performance of their iSCSI rescan when they upgraded their initiator
-> Linux kernel:
+> I don't see why the filesystem cares if thinp is doing a reservation or
+> provisioning under the hood.  All that matters is that a future write
+> to that region will be honoured (barring device failure etc.).
 > 
-> https://forum.proxmox.com/threads/kernel-5-15-usr-bin-iscsiadm-mode-session-sid-x-rescan-really-slow.110113/
+> I agree that the reservation/force mapped status needs to be inherited
+> by snapshots.
 > 
-> This was determined not to be an array side issue, but I chased the
-> problem for him. The issue comes down to a patch:
 > 
-> commit 508aebb805277c541e94ee14daba4191ff02347e
-> Author: Damien Le Moal <damien.lemoal@wdc.com>
-> Date:   Wed Jan 27 20:47:32 2021
+> One of the few strengths of thinp is the performance of taking a snapshot.
+> Most snapshots created are never activated.  Many other snapshots are
+> only alive for a brief period, and used read-only.  eg, blk-archive
+> (https://github.com/jthornber/blk-archive) uses snapshots to do very
+> fast incremental backups.  As such I'm strongly against any scheme that
+> requires provisioning as part of the snapshot operation.
 > 
->     block: introduce blk_queue_clear_zone_settings()
+> Hank and I are in the middle of the range tree work which requires a
+> metadata
+> change.  So now is a convenient time to piggyback other metadata changes to
+> support reservations.
 > 
-> When I connect 255 volumes with 2 paths to each and run an iSCSI
-> rescan there is a significant difference in the time it takes. The
-> rescan of iscsiadm rescan is a parallel sequential scan of the 255
-> volumes on both paths. It comes down to this for each device:
 > 
-> [root@init107-18 boot]# cd /sys/bus/scsi/devices/11\:0\:0\:1
-> [root@init107-18 11:0:0:1]# echo 1 > rescan
-> [root@init107-18 boot]# cd /sys/bus/scsi/devices/10\:0\:0\:1
-> [root@init107-18 10:0:0:1]# echo 1 > rescan
-> ...
+> Given the above this is what I suggest:
 > 
-> (As 5.11.0-rc5+)
-> Without this patch:
-> Command being timed: "iscsiadm --mode session --rescan"
-> Elapsed (wall clock) time (h:mm:ss or m:ss): 0:02.04
+> 1) We have an api (ioctl, bio flag, whatever) that lets you
+> reserve/guarantee a region:
 > 
-> Just adding this patch on the previous:
-> Command being timed: "iscsiadm --mode session --rescan"
-> Elapsed (wall clock) time (h:mm:ss or m:ss): 0:13.45
-> 
-> In the most recent Linux kernel, 6.4.0-rc3+, the regression is not as
-> pronounced but is still significant.
-> 
-> With:
-> Command being timed: "iscsiadm --mode session --rescan"
-> Elapsed (wall clock) time (h:mm:ss or m:ss): 0:04.84
-> 
-> Without:
-> Command being timed: "iscsiadm --mode session --rescan"
-> Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.53
-> 
-> With the second being only the result of:
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -953,7 +953,7 @@ void disk_set_zoned(struct gendisk *disk, enum
-> blk_zoned_model model)
->                 blk_queue_zone_write_granularity(q,
->                                                 queue_logical_block_size(q));
->         } else {
-> -               disk_clear_zone_settings(disk);
-> +               /* disk_clear_zone_settings(disk); */
->         }
->  }
->  EXPORT_SYMBOL_GPL(disk_set_zoned);
-> 
-> From what I can tell this patch is trying to account for a change in
-> zoned behavior moving to none. It looks like it is saying that there
-> is no good way to tell between this moving to none and never reporting
-> block zoned capabilities at all. The penalty on targets which don't
-> support zoned capabilities at all seems pretty steep. Is there a
-> better way to get what is needed here without affecting disks which
-> are not zoned capable?
-> 
-> Let me know if you need any more details on this.
+>   int reserve_region(dev, sector_t begin, sector_t end);
 
-Can you try this and see if that restores rescan times for your system ?
+A C-based interface is not sufficient because the layer that must do
+provsioning is not guaranteed to be directly under the filesystem.
+We must be able to propagate the request down to the layers that
+need to provision storage, and that includes hardware devices.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 896b4654ab00..4dd59059b788 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -915,6 +915,7 @@ static bool disk_has_partitions(struct gendisk *disk)
- void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model)
- {
-        struct request_queue *q = disk->queue;
-+       unsigned int old_model = q->limits.zoned;
+e.g. dm-thin would have to issue REQ_PROVISION on the LBA ranges it
+allocates in it's backing device to guarantee that the provisioned
+LBA range it allocates is also fully provisioned by the storage
+below it....
 
-        switch (model) {
-        case BLK_ZONED_HM:
-@@ -952,7 +953,7 @@ void disk_set_zoned(struct gendisk *disk, enum
-blk_zoned_model model)
-                 */
-                blk_queue_zone_write_granularity(q,
-                                                queue_logical_block_size(q));
--       } else {
-+       } else if (old_model != BLK_ZONED_NONE) {
-                disk_clear_zone_settings(disk);
-        }
- }
+>   This api should be used minimally, eg, critical FS metadata only.
 
+Keep in mind that "critical FS metadata" in this context is any
+metadata which could cause the filesystem to hang or enter a global
+error state if an unexpected ENOSPC error occurs during a metadata
+write IO.
 
-> 
-> Thanks,
-> Brian Bunker
-> PURE Storage, Inc.
+Which, in pretty much every journalling filesystem, equates to all
+metadata in the filesystem. For a typical root filesystem, that
+might be a in the range of a 1-200MB (depending on journal size).
+For larger filesytems with lots of files in them, it will be in the
+range of GBs of space.
 
+Plan for having to support tens of GBs of provisioned space in
+filesystems, not tens of MBs....
+
+[snip]
+
+> Now this is a lot of work.  As well as the kernel changes we'll need to
+> update the userland tools: thin_check, thin_ls, thin_metadata_unpack,
+> thin_rmap, thin_delta, thin_metadata_pack, thin_repair, thin_trim,
+> thin_dump, thin_metadata_size, thin_restore.  Are we confident that we
+> have buy in from the FS teams that this will be widely adopted?  Are users
+> asking for this?  I really don't want to do 6 months of work for nothing.
+
+I think there's a 2-3 solid days of coding to fully implement
+REQ_PROVISION support in XFS, including userspace tool support.
+Maybe a couple of weeks more to flush the bugs out before it's
+largely ready to go.
+
+So if there's buy in from the block layer and DM people for
+REQ_PROVISION as described, then I'll definitely have XFS support
+ready for you to test whenever dm-thinp is ready to go.
+
+I can't speak for other filesystems, I suspect the only one we care
+about is ext4.  btrfs and f2fs don't need dm-thinp and there aren't
+any other filesystems that are used in production on top of
+dm-thinp, so I think only XFS and ext4 matter at this point in time.
+
+I suspect that ext4 would be fairly easy to add support for as well.
+ext4 has a lot more fixed-place metadata than XFS has so much more
+of it's metadata is covered by mkfs-time provisioning. Limiting
+dynamic metadata to specific fully provisioned block groups and
+provisioning new block groups for metadata when they are near full
+would be equivalent to how I plan to provision metadata space in
+XFS. Hence the implementation for ext4 looks to be broadly similar
+in scope and complexity as XFS....
+
+-Dave.
 -- 
-Damien Le Moal
-Western Digital Research
-
+Dave Chinner
+david@fromorbit.com
