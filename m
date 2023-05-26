@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DB0C77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E443EC7EE2D
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:26:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236878AbjEZIXH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 04:23:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60898 "EHLO
+        id S236919AbjEZI0N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 04:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242221AbjEZIXG (ORCPT
+        with ESMTP id S229981AbjEZI0M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 04:23:06 -0400
+        Fri, 26 May 2023 04:26:12 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF262FB;
-        Fri, 26 May 2023 01:23:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FEA7D8;
+        Fri, 26 May 2023 01:26:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=prrh+Vu8nZehcp2nu1mWJdpU7JobgL09F7dm++keKyY=; b=umJlhCfPvB0nzbxm6ULM/0LnjH
-        oyH9rE6v2h2WrBu1/kmbwIMuqiJ0zfzxtbVHpaDRXW2zgaIpjI9v8Ye7FAEef53vR6XqbEizHzClG
-        q7840vr8smS/71lIbGsg/TxXmerP0FeUxx1Lv61qjxzvXnXdSztqLvix+Oz2u6xd8Hf42/cmR29J7
-        dHGKm6IJmYeDg6M4DDL+rML6LdIDMRtExJUx8pE+8k0380bLI1yD4Oak4EHIyaG/bmKuRkQK3BUV7
-        sC0eM0ZDHAwRuThs1EwByrXR7i9N4AC3xn6QXp9rCCynFxvkNbTGqejKiCH3KAb8YytnywAxqowQV
-        2dh8Y51Q==;
+        bh=Z0fK4mm2FXMJr87PqpFQg/otvRM35WQQChLJtGkFULo=; b=snRLEoo+C6lUyaPMnG6OQwFJQv
+        aXzI9MFe8MXCqXRNCOaOTrbhJ49b2cTR8pjMQuwCPEdp9Tixb3bC3ApDBc9RbwAXmiFqa2zqpF8E4
+        w7m0lSQWnlqjMYeTtfSZPDkO2yzQisapVSs6SMg/7kdXvdjbEGcAGBMaNDI3OF8GibRO7d713ocL3
+        Rv4DdXy81PkM9H3CO3h1znvZuAybWZy4w/Yz5z6g2gFuHOediaVT8p66rZeq813viQzhYE5R+X7EO
+        Or67cCPgG0BdOSIkOp5EX/OFATiR4PJo+W+DpebrLYhc7KRSQlXFXNE9kdaSvJJtWKDa2EZaDaLXH
+        hX6eDANw==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q2Sis-001ajq-1w;
-        Fri, 26 May 2023 08:22:54 +0000
-Date:   Fri, 26 May 2023 01:22:54 -0700
+        id 1q2Sls-001bLV-2l;
+        Fri, 26 May 2023 08:26:00 +0000
+Date:   Fri, 26 May 2023 01:26:00 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -45,19 +45,34 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [RFC PATCH v2 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
-Message-ID: <ZHBsXnJcW3L9SXF4@infradead.org>
+Subject: Re: [RFC PATCH v2 3/3] block: Use iov_iter_extract_pages() and page
+ pinning in direct-io.c
+Message-ID: <ZHBtGJ3SzJtr5HZP@infradead.org>
 References: <20230525223953.225496-1-dhowells@redhat.com>
- <20230525223953.225496-2-dhowells@redhat.com>
+ <20230525223953.225496-4-dhowells@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230525223953.225496-2-dhowells@redhat.com>
+In-Reply-To: <20230525223953.225496-4-dhowells@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Shouldn't unpin_user_pages and bio_release_page also be updated to
-skip a zero page here?
+On Thu, May 25, 2023 at 11:39:53PM +0100, David Howells wrote:
+> Change the old block-based direct-I/O code to use iov_iter_extract_pages()
+> to pin user pages or leave kernel pages unpinned rather than taking refs
+> when submitting bios.
+> 
+> This makes use of the preceding patches to not take pins on the zero page
+> (thereby allowing insertion of zero pages in with pinned pages) and to get
+> additional pins on pages, allowing an extracted page to be used in multiple
+> bios without having to re-extract it.
+
+I'm not seeing where we skip the unpin of the zero page, as commented
+in patch 1 (but maybe I'm not reviewing carefully enough as I'm at a
+conference right now).
+
+Otherwise my only rather cosmetic comment right now is that I'd called
+the "need_unpin" member is_pinned.
 
