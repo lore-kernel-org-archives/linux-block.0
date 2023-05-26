@@ -2,123 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9C5C7EE2D
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E19C7EE2D
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:42:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242468AbjEZHd5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 03:33:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60516 "EHLO
+        id S242344AbjEZHmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 03:42:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242431AbjEZHdp (ORCPT
+        with ESMTP id S236934AbjEZHmG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 03:33:45 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F065412A;
-        Fri, 26 May 2023 00:33:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=l8SXSO/lmiFeJihMCTRRFm0o8Ak15fMAUhw4BXdB6WA=; b=A0xPKQUoDsDrFgURMQlgZXIoK4
-        lF0smhhvDr9DIwh3hI5+Foy4jSB44qqYKTW9k2PV/7PuWcBUSeOo6jWJLU2DNhMOCi1CTP1Vr1qXN
-        cB1zrc2ldkTJb0i1ydOhaeGCJSHRsdi8p9dUGm95225TqZGlE84F6Y3mfrRFtVU8AAk/LeILUvTzj
-        DCxobQiHgxGi8mvk1uiSyIKFvEMqMniMXjlXlxhbRRhvWQ3LnJ21MPhaTWeTq5Fi6r/fGfhBlXjzW
-        o+5/0Ft/FRALeNM171FNjOPX7gizDDJyiLwYYmSgprAWBoMr6t5XCcMourkOlUq8zpJCEwA9TAgAY
-        J55czzyw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q2RxB-001Rda-0i;
-        Fri, 26 May 2023 07:33:37 +0000
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, hch@infradead.org,
-        djwong@kernel.org, minchan@kernel.org, senozhatsky@chromium.org
-Cc:     patches@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, hare@suse.de, p.raghav@samsung.com,
-        da.gomez@samsung.com, rohan.puri@samsung.com,
-        rpuri.linux@gmail.com, kbusch@kernel.org, mcgrof@kernel.org
-Subject: [PATCH v2 5/5] zram: use generic PAGE_SECTORS and PAGE_SECTORS_SHIFT
-Date:   Fri, 26 May 2023 00:33:36 -0700
-Message-Id: <20230526073336.344543-6-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230526073336.344543-1-mcgrof@kernel.org>
-References: <20230526073336.344543-1-mcgrof@kernel.org>
+        Fri, 26 May 2023 03:42:06 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C546B6;
+        Fri, 26 May 2023 00:42:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1DB7763F38;
+        Fri, 26 May 2023 07:42:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B414C433EF;
+        Fri, 26 May 2023 07:42:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685086924;
+        bh=CGmOzSnToxEh6t7Vd3qUTrp6JrJzLGRbWucQIhkrDL8=;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=ZhdEgCsQ+tY/Sauzqi/d9RfxFM0MM60I/mzfPYrhlMTCG1E9gdn2dz673uQ7yrBzm
+         BdZRNjd7RtpjBERFAVLi7NCEPEL3IcL1Br2tCXmsk5R2PPM10wCJ0NZxi8JJTo3n/o
+         SDtVJ2prsrbE75UtWNF04q0WfO9zvRV4S5UAHl/wPtlH+CdGlkCsv8yxQCnkAjSyqm
+         c1fP4OcYewPYdc47Bfmi5xqY0k4ON8pugMkWrldJjYAbQz9JnPyDZl3Y38wB6SQ8wX
+         WE+79MqdkyvLVGPJpj2YJ7bEnFM+WvqovN0NH06M4C8vWJeB2DCa19Z+dpyAoa3DEc
+         AOMvTYRiBKUVg==
+Message-ID: <97ffe91e-bb31-cceb-fb7e-8f7a2252734f@kernel.org>
+Date:   Fri, 26 May 2023 16:42:02 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: ioprio_set can take 8 as the PROCESS CLASS_BE ioprio value
+Content-Language: en-US
+To:     Murphy Zhou <jencce.kernel@gmail.com>, linux-block@vger.kernel.org,
+        Linux-Next <linux-next@vger.kernel.org>
+References: <CADJHv_sedgbfxvZkKHjC6quKvxR+E54noFCVF93MvhyK6bwRoA@mail.gmail.com>
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <CADJHv_sedgbfxvZkKHjC6quKvxR+E54noFCVF93MvhyK6bwRoA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of re-defining the already existing constants use the provided ones:
+On 5/26/23 16:27, Murphy Zhou wrote:
+> Hi Damien,
+> 
+> Since these commits:
+> 
+>   scsi: block: Introduce ioprio hints
+>   scsi: block: ioprio: Clean up interface definition
+> 
+> go into linux-next tree, ioprio_set can take the value of 8
+> as the PROCESS CLASS_BE ioprio parameter, returning
+> success but actually it is setting to 0 due to the mask roundup.
+> 
+> The LTP test case ioprio_set03[1] covers this boundary value
+> testing, which starts to fail since then.
+> 
+> This does not look as expected. Could you help to take a look?
 
-So replace:
+Before the patches, the ioprio level of 8 could indeed be set, but that was
+actually totally meaningless since the kernel components that use the priority
+level all are limited to the range [0..7]. And why the level value 8 could be
+seen, the effective level would have been 0. So at least, with the changes, we
+are not lying to the user...
 
- o SECTORS_PER_PAGE_SHIFT with PAGE_SECTORS_SHIFT
- o SECTORS_PER_PAGE       with PAGE_SECTORS
+I am not sure what this ioprio_set03 test is trying to check.
 
-This produces no functional changes.
+> 
+> Thanks,
+> Murphy
+> 
+> [1] https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/ioprio/ioprio_set03.c
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- drivers/block/zram/zram_drv.c | 12 ++++++------
- drivers/block/zram/zram_drv.h |  2 --
- 2 files changed, 6 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index f6d90f1ba5cf..5fdeb78ace9a 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1834,8 +1834,8 @@ static ssize_t recompress_store(struct device *dev,
- static void zram_bio_discard(struct zram *zram, struct bio *bio)
- {
- 	size_t n = bio->bi_iter.bi_size;
--	u32 index = bio->bi_iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
--	u32 offset = (bio->bi_iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
-+	u32 index = bio->bi_iter.bi_sector >> PAGE_SECTORS_SHIFT;
-+	u32 offset = (bio->bi_iter.bi_sector & (PAGE_SECTORS - 1)) <<
- 			SECTOR_SHIFT;
- 
- 	/*
-@@ -1876,8 +1876,8 @@ static void zram_bio_read(struct zram *zram, struct bio *bio)
- 
- 	start_time = bio_start_io_acct(bio);
- 	bio_for_each_segment(bv, bio, iter) {
--		u32 index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
--		u32 offset = (iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
-+		u32 index = iter.bi_sector >> PAGE_SECTORS_SHIFT;
-+		u32 offset = (iter.bi_sector & (PAGE_SECTORS - 1)) <<
- 				SECTOR_SHIFT;
- 
- 		if (zram_bvec_read(zram, &bv, index, offset, bio) < 0) {
-@@ -1903,8 +1903,8 @@ static void zram_bio_write(struct zram *zram, struct bio *bio)
- 
- 	start_time = bio_start_io_acct(bio);
- 	bio_for_each_segment(bv, bio, iter) {
--		u32 index = iter.bi_sector >> SECTORS_PER_PAGE_SHIFT;
--		u32 offset = (iter.bi_sector & (SECTORS_PER_PAGE - 1)) <<
-+		u32 index = iter.bi_sector >> PAGE_SECTORS_SHIFT;
-+		u32 offset = (iter.bi_sector & (PAGE_SECTORS - 1)) <<
- 				SECTOR_SHIFT;
- 
- 		if (zram_bvec_write(zram, &bv, index, offset, bio) < 0) {
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index ca7a15bd4845..9f2543af5c76 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -21,8 +21,6 @@
- 
- #include "zcomp.h"
- 
--#define SECTORS_PER_PAGE_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
--#define SECTORS_PER_PAGE	(1 << SECTORS_PER_PAGE_SHIFT)
- #define ZRAM_LOGICAL_BLOCK_SHIFT 12
- #define ZRAM_LOGICAL_BLOCK_SIZE	(1 << ZRAM_LOGICAL_BLOCK_SHIFT)
- #define ZRAM_SECTOR_PER_LOGICAL_BLOCK	\
 -- 
-2.39.2
+Damien Le Moal
+Western Digital Research
 
