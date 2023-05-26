@@ -2,57 +2,50 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A91C77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 09:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C34C77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 09:16:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236624AbjEZJA2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 05:00:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50712 "EHLO
+        id S242950AbjEZJQZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 05:16:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242378AbjEZJA1 (ORCPT
+        with ESMTP id S236878AbjEZJQY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 05:00:27 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B63F8119;
-        Fri, 26 May 2023 02:00:25 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-30ab87a1897so245417f8f.1;
-        Fri, 26 May 2023 02:00:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685091624; x=1687683624;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qss+zxEtzgocrouex16BhRqrU2936RxdIAYJmgdoCvo=;
-        b=MbStjYhHUzFc8ILRIy/UykQjsaI3qWMrTCSLE4yyRrdoWKoyQHKS18s+UxIXuXz0ob
-         1+tBeGkdZzgxM0fnFYmZo8klcndWIROQO8qqQnuSJYjvMYGO7jZreoeWx7uylUqKgEEp
-         8ZnZIXPXpM3/P0CryvcxTY1dk7JK/h0qAf6KRgES785Fj2V/aul/qY2OQmqLHtBTTiXR
-         6egji2GEcafG7yYfFUZfPwmiGiHaOZCetl1jjVVH0eN1lZYxVG/em58qiy1wHY8qbb9o
-         XWTtKi17FDMgoPMHhgYEaeFYHXdmmGQaQVjEy43D/xZNZHFj8mTyQ6mnAMNKxJDJSPk3
-         UafA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685091624; x=1687683624;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qss+zxEtzgocrouex16BhRqrU2936RxdIAYJmgdoCvo=;
-        b=KLjxMNdFiRVhITsdfxIXqZlHrH6qpoWPwp5VIboRVCpRswyS02r3ca8o4JwPwnKGAr
-         yugZYOabypEniLevsRDK4n0MHqhPBXiPS9VN8Q9ZpmU41KTCpN57HAvViJVp/2HwrQcl
-         odo34klLBSj0nf95ia3ry7/UdA/wHowgrC5YpPVHefQQGLXZiOjqoGJHTBtCepXgHuyg
-         JhsKk2zCBN118pm/NiIBYwWvT/KDVoCmc9DJhtmOD2oSDGsfWf1ajUa43qcoDGndGGvZ
-         VbEDQageq9yODyecNqtKTV/+WIl3u1wdIlZM2MiQLiSjc8svUrTHKzIA2m31aWDK83n5
-         7lsw==
-X-Gm-Message-State: AC+VfDy/heRQ8BlT+oxyZTWESaqh9iue+ic9aWaQxXLzwNTuRirUuCL+
-        h9ZsYaNc3xwX5u8eIHq4B44=
-X-Google-Smtp-Source: ACHHUZ5EkZrkFXdnKG+OsSeolqc727IKNW5Swk1R+LzKGKOjvK629ibzmcfNdrXmo0Z/6uqU4u/JlQ==
-X-Received: by 2002:adf:dfcc:0:b0:30a:dd15:bb69 with SMTP id q12-20020adfdfcc000000b0030add15bb69mr75933wrn.18.1685091623852;
-        Fri, 26 May 2023 02:00:23 -0700 (PDT)
-Received: from localhost (host81-154-179-160.range81-154.btcentralplus.com. [81.154.179.160])
-        by smtp.gmail.com with ESMTPSA id k7-20020adfe3c7000000b003062b2c5255sm4448182wrm.40.2023.05.26.02.00.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 May 2023 02:00:23 -0700 (PDT)
-Date:   Fri, 26 May 2023 09:58:12 +0100
-From:   Lorenzo Stoakes <lstoakes@gmail.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
+        Fri, 26 May 2023 05:16:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F134F13D
+        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 02:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685092536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/vGFdqik0rBjuVyxRP6fkQFD2f5M7p6nEHdizh76LOg=;
+        b=UoFfkDIdbQCL3Mypyx8ox9zkYuI9NpNxdcdZaWKJhS7dbimzUDvKLPv4HgH6GEdh/+0Inr
+        8QHexAWwi/MK/yNZ/pVjE8958kq/9ZrjaGRncpPhBSXNRnEchVddgdw5iA8f+sGOpw/ka+
+        qJiKf4/pfGRIg0iF27LQ9YhBTZFRMOQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-670-xsMc0qpcOM-rMmA8xGTNwA-1; Fri, 26 May 2023 05:15:31 -0400
+X-MC-Unique: xsMc0qpcOM-rMmA8xGTNwA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 22CC71C08DAC;
+        Fri, 26 May 2023 09:15:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 756EE492B00;
+        Fri, 26 May 2023 09:15:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <4f479af6-2865-4bb3-98b9-78bba9d2065f@lucifer.local>
+References: <4f479af6-2865-4bb3-98b9-78bba9d2065f@lucifer.local> <89c7f535-8fc5-4480-845f-de94f335d332@lucifer.local> <20230525223953.225496-1-dhowells@redhat.com> <20230525223953.225496-2-dhowells@redhat.com> <520730.1685090615@warthog.procyon.org.uk>
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
         David Hildenbrand <david@redhat.com>,
         Jens Axboe <axboe@kernel.dk>,
         Al Viro <viro@zeniv.linux.org.uk>,
@@ -67,91 +60,34 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         Andrew Morton <akpm@linux-foundation.org>
 Subject: Re: [RFC PATCH v2 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
-Message-ID: <4f479af6-2865-4bb3-98b9-78bba9d2065f@lucifer.local>
-References: <89c7f535-8fc5-4480-845f-de94f335d332@lucifer.local>
- <20230525223953.225496-1-dhowells@redhat.com>
- <20230525223953.225496-2-dhowells@redhat.com>
- <520730.1685090615@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <520730.1685090615@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <522653.1685092526.1@warthog.procyon.org.uk>
+Date:   Fri, 26 May 2023 10:15:26 +0100
+Message-ID: <522654.1685092526@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 26, 2023 at 09:43:35AM +0100, David Howells wrote:
-> Lorenzo Stoakes <lstoakes@gmail.com> wrote:
->
-> > I guess we're not quite as concerned about FOLL_GET because FOLL_GET should
-> > be ephemeral and FOLL_PIN (horrifically) adds GUP_PIN_COUNTING_BIAS each
-> > time?
->
-> It's not that - it's that iov_iter_get_pages*() is a lot more commonly used at
-> the moment, and we'd have to find *all* the places that things using that hand
-> refs around.
->
-> iov_iter_extract_pages(), on the other hand, is only used in two places with
-> these patches and the pins are always released with unpin_user_page*() so it's
-> a lot easier to audit.
+Lorenzo Stoakes <lstoakes@gmail.com> wrote:
 
-Thanks for the clarification. I guess these are the cases where you're likely to
-see zero page usage, but since this is changing all PUP*() callers don't you
-need to audit all of those too?
+> > iov_iter_extract_pages(), on the other hand, is only used in two places
+> > with these patches and the pins are always released with
+> > unpin_user_page*() so it's a lot easier to audit.
+> 
+> Thanks for the clarification. I guess these are the cases where you're
+> likely to see zero page usage, but since this is changing all PUP*() callers
+> don't you need to audit all of those too?
 
->
-> I could modify put_page(), folio_put(), etc. to ignore the zero pages, but
-> that might have a larger performance impact.
->
-> > > +		if (is_zero_page(page))
-> > > +			return page_folio(page);
-> > > +
-> >
-> > This will capture huge page cases too which have folio->_pincount and thus
-> > don't suffer the GUP_PIN_COUNTING_BIAS issue, however it is equally logical
-> > to simply skip these when pinning.
->
-> I'm not sure I understand.  The zero page(s) is/are single-page folios?
+I don't think it should be necessary.  This only affects pages obtained from
+gup with FOLL_PIN - and, so far as I know, those always have to be released
+with unpin_user_page*() which is part of the gup API and thus it should be
+transparent to the users.
 
-I'm actually a little unsure of how huge zero pages are handled (not an area I'm
-hugely familiar with) so this might just be mistaken, I mean the point was more
-so that hugetlb calls into this, but seems then not an issue.
+Pages obtained FOLL_GET, on the other hand, aren't freed through the gup API -
+and there are a bunch of ways of releasing them - and getting additional refs
+too.
 
->
-> > This does make me think that we should just skip pinning for FOLL_GET cases
-> > too - there's literally no sane reason we should be pinning zero pages in
-> > any case (unless I'm missing something!)
->
-> As mentioned above, there's a code auditing issue and a potential performance
-> issue, depending on how it's done.
+David
 
-Ack, makes sense. It'd be good to have this documented somewhere though in
-commit msg or docs so this trade-off is clear.
-
->
-> > Another nitty thing that I noticed is, in is_longterm_pinnable_page():-
-> >
-> > 	/* The zero page may always be pinned */
-> > 	if (is_zero_pfn(page_to_pfn(page)))
-> > 		return true;
-> >
-> > Which, strictly speaking I suppose we are 'pinning' it or rather allowing
-> > the pin to succeed without actually pinning, but to be super pedantic
-> > perhaps it's worth updating this comment too.
->
-> Yeah.  It is "pinnable" but no pin will actually be added.
-
-The comment striks me as misleading, previously it literally meant that you
-could pin the zero page. Now it means that we just don't. I do think for the
-sake of avoiding confusion this should be tweaked.
-
-Obviously something of a nit, however!
-
-I did dig into this change a fair bit and kept adding then deleting comments
-since you cover all the bases well, so overall this is nice + I can but nit it
-:) Nice to see further improvements to GUP which is crying out for that.
-
->
-> David
->
->
