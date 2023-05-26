@@ -2,80 +2,119 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE56C7EE2D
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BB3C77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242693AbjEZIft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 04:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38472 "EHLO
+        id S242446AbjEZIo7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 04:44:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242600AbjEZIfs (ORCPT
+        with ESMTP id S242802AbjEZIom (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 04:35:48 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58276199;
-        Fri, 26 May 2023 01:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=cU4HbZ0Ihk69KMRkjUWIN8WBPWiQau/75Wx/UKV6Xy8=; b=NbqKOjNGXmKVkdSnQezuWV1eT5
-        shzgQn36kaoEabnbYb/Jyz3Rdfyo4i9Gt9NcFEgBW4SxCR9JG+o+jSKnUKh34k8rrj8nhlDQulx6y
-        6VreloRZ4j6ECTgnH6aVsJIOwYtIqjD5EVkDYaakhcl9aFDyVUPVL/7qPbXwjDPiuKZjBAJ0h2p/c
-        AeN+fmkiyu4Cusz7HUAP0Hz6pvjMNSt5HsMgL8MBhbG43QEg+Ri3e8GndeuvIjNy1idYUYW6cxIiL
-        jsCIs6TkJFVD5KST6G7qRiRVkM5o6ra1UpwTs2oEuwtb9GLGqQOM7RcaspSqneNmqabaORhr7WwZy
-        Stg1KBDw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q2Sv2-001cm2-0Z;
-        Fri, 26 May 2023 08:35:28 +0000
-Date:   Fri, 26 May 2023 01:35:28 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     hughd@google.com, akpm@linux-foundation.org, willy@infradead.org,
-        brauner@kernel.org, djwong@kernel.org, p.raghav@samsung.com,
-        da.gomez@samsung.com, rohan.puri@samsung.com,
-        rpuri.linux@gmail.com, a.manzanares@samsung.com, dave@stgolabs.net,
-        yosryahmed@google.com, keescook@chromium.org, hare@suse.de,
-        kbusch@kernel.org, patches@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC v2 0/8] add support for blocksize > PAGE_SIZE
-Message-ID: <ZHBvUNqKEyszpJKT@bombadil.infradead.org>
-References: <20230526075552.363524-1-mcgrof@kernel.org>
- <ZHBqfyPUR4B2GNsF@infradead.org>
- <ZHBrS4hTZZn3w4tF@bombadil.infradead.org>
- <ZHBtk3mmupubbWyc@infradead.org>
+        Fri, 26 May 2023 04:44:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44305E4D
+        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 01:43:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685090624;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rO5u1LT/DkSYeKOoJRR+C9ZUgArTLbgJfPbLRFgEFXo=;
+        b=b59M1NGd1hODhNSLixFFto2feuyHJ0m9Tj0UJSZbQwLV+3rvuTGPc2bgCo7HJHSUyoz/t9
+        m4VBz8w+FLrY1FP1uzwy7nqRnDdaUhWSFeVSN3JzqVuxfuFZnNdKL6WiwPoVpnr3OyyySg
+        13owpzdlE+lHFyxyO04eyQXhdYhPKGw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-533-R5eE5ngcPYCRxtk71bmDRg-1; Fri, 26 May 2023 04:43:40 -0400
+X-MC-Unique: R5eE5ngcPYCRxtk71bmDRg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AB26D8007D9;
+        Fri, 26 May 2023 08:43:39 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A07FA1121314;
+        Fri, 26 May 2023 08:43:36 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <89c7f535-8fc5-4480-845f-de94f335d332@lucifer.local>
+References: <89c7f535-8fc5-4480-845f-de94f335d332@lucifer.local> <20230525223953.225496-1-dhowells@redhat.com> <20230525223953.225496-2-dhowells@redhat.com>
+To:     Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [RFC PATCH v2 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZHBtk3mmupubbWyc@infradead.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <520729.1685090615.1@warthog.procyon.org.uk>
+Date:   Fri, 26 May 2023 09:43:35 +0100
+Message-ID: <520730.1685090615@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 26, 2023 at 01:28:03AM -0700, Christoph Hellwig wrote:
-> On Fri, May 26, 2023 at 01:18:19AM -0700, Luis Chamberlain wrote:
-> > On Fri, May 26, 2023 at 01:14:55AM -0700, Christoph Hellwig wrote:
-> > > On Fri, May 26, 2023 at 12:55:44AM -0700, Luis Chamberlain wrote:
-> > > > This is an initial attempt to add support for block size > PAGE_SIZE for tmpfs.
-> > > 
-> > > The concept of a block size doesn't make any sense for tmpfs.   What
-> > > are you actually trying to do here?
-> > 
-> > More of helping to test high order folios for tmpfs. Swap for instance
-> > would be one thing we could use to test.
+Lorenzo Stoakes <lstoakes@gmail.com> wrote:
+
+> I guess we're not quite as concerned about FOLL_GET because FOLL_GET should
+> be ephemeral and FOLL_PIN (horrifically) adds GUP_PIN_COUNTING_BIAS each
+> time?
+
+It's not that - it's that iov_iter_get_pages*() is a lot more commonly used at
+the moment, and we'd have to find *all* the places that things using that hand
+refs around.
+
+iov_iter_extract_pages(), on the other hand, is only used in two places with
+these patches and the pins are always released with unpin_user_page*() so it's
+a lot easier to audit.
+
+I could modify put_page(), folio_put(), etc. to ignore the zero pages, but
+that might have a larger performance impact.
+
+> > +		if (is_zero_page(page))
+> > +			return page_folio(page);
+> > +
 > 
-> I'm still not sure where the concept of a block size would come in here.
+> This will capture huge page cases too which have folio->_pincount and thus
+> don't suffer the GUP_PIN_COUNTING_BIAS issue, however it is equally logical
+> to simply skip these when pinning.
 
-From a filesystem perspective that's what we call it as well today, and
-tmpfs implements a simple one, just that indeed this just a high order
-folio support. The languge for blocksize was used before my patches for the
-sb->s_blocksize and sb->s_blocksize_bits. Even for shmem_statfs()
-buf->f_bsize.
+I'm not sure I understand.  The zero page(s) is/are single-page folios?
 
-I understand we should move the sb->s_blocksize to the block_device
-and use the page order for address_space, but we can't negate the
-existing stuff there immediately.
+> This does make me think that we should just skip pinning for FOLL_GET cases
+> too - there's literally no sane reason we should be pinning zero pages in
+> any case (unless I'm missing something!)
 
-  Luis
+As mentioned above, there's a code auditing issue and a potential performance
+issue, depending on how it's done.
+
+> Another nitty thing that I noticed is, in is_longterm_pinnable_page():-
+> 
+> 	/* The zero page may always be pinned */
+> 	if (is_zero_pfn(page_to_pfn(page)))
+> 		return true;
+> 
+> Which, strictly speaking I suppose we are 'pinning' it or rather allowing
+> the pin to succeed without actually pinning, but to be super pedantic
+> perhaps it's worth updating this comment too.
+
+Yeah.  It is "pinnable" but no pin will actually be added.
+
+David
+
