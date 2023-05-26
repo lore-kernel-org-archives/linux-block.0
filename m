@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4987DC7EE32
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCB0C7EE31
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:56:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242299AbjEZH4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 03:56:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47360 "EHLO
+        id S242627AbjEZH4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 03:56:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242598AbjEZH4K (ORCPT
+        with ESMTP id S242606AbjEZH4L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 03:56:10 -0400
+        Fri, 26 May 2023 03:56:11 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E634D1A2;
-        Fri, 26 May 2023 00:56:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6813C1A8;
+        Fri, 26 May 2023 00:56:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=X5+iEoQSxU/Osj6DTwS+zZOMGO87395DKsZwMMPd0uo=; b=dc/TfmJ1je+wYNn6ZVghaEpsuV
-        hNonEGR/rf9ZvbCAtb5luxqhaZt290ieMP7zWmNl7lupnAdO9iA0HyVxMj1G/RoRzCtvY/M6prI9u
-        lYnSzpeG1xbU/2p54uZWSQ88A0ZYpHndBkZvInbp17tTfW9XSan71VRDhfNHlqoumaNtcu88Wp3k4
-        v5FcBIFu+40VmHsGhbu9Jdd5zPt1PTCK0tbUA93ZZq2etcKHzdK8JGRPp3spp0ExpIzmQerGEiH7Q
-        xB3QY73a5kLbfciwvYDJY/W2Eb3WRU0xJdfAs6PfVoe8OpyRuSafffwUrlDb8+X5ApvoFmqa5E3Ld
-        TAz2AXvA==;
+        bh=BlnfxGH65lfjvCr0EihUnLvC6Y04PW1nCflzWem/FI0=; b=VIpL8dc4hJnM3liOcBxChkT+dG
+        qF/usCC/Wup5mmMJmU1p1ovRc9zKDrFe15DpGpCv7f4i3Mhkrt83uK85qdUAizZUBhBrM5tQg3muw
+        w9qV6fP5s+45uiKWkhPQ/0p5NiELflVvmRKmEbG0pYPjuLPUHkYpxlLQuXAICLo5rrMdD6xkn+c+E
+        rf9/tWnG/HUnZedSs/UfiehEuj5H7zzw7q2FxO93KyrsNh4jk7WDlLYwOr+uIr2u7nhmEjEfjoA1u
+        SDKTfqMfG82ro8eQ/SBy9XVW9hsS7XM0naNEQIHkN+T3/w4EOl/8CsAlecOfKgU/m7H4ZeTp2v+wL
+        YZeBlrZw==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q2SIj-001WZu-30;
+        id 1q2SIj-001WZm-2k;
         Fri, 26 May 2023 07:55:53 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     hughd@google.com, akpm@linux-foundation.org, willy@infradead.org,
@@ -37,9 +37,9 @@ Cc:     p.raghav@samsung.com, da.gomez@samsung.com, rohan.puri@samsung.com,
         kbusch@kernel.org, mcgrof@kernel.org, patches@lists.linux.dev,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [RFC v2 5/8] shmem: account for larger blocks sizes for shmem_default_max_blocks()
-Date:   Fri, 26 May 2023 00:55:49 -0700
-Message-Id: <20230526075552.363524-6-mcgrof@kernel.org>
+Subject: [RFC v2 3/8] shmem: account for high order folios
+Date:   Fri, 26 May 2023 00:55:47 -0700
+Message-Id: <20230526075552.363524-4-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230526075552.363524-1-mcgrof@kernel.org>
 References: <20230526075552.363524-1-mcgrof@kernel.org>
@@ -50,82 +50,132 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we end up supporting a larger block size than PAGE_SIZE the
-calculations in shmem_default_max_blocks() need to be modified to take
-into account the fact that multiple pages would be required for a
-single block.
+shmem uses the shem_info_inode alloced, swapped to account
+for allocated pages and swapped pages. In preparation for high
+order folios adjust the accounting to use folio_nr_pages().
 
-Today the max number of blocks is computed based on the fact that we
-will by default use half of the available memory and each block is of
-PAGE_SIZE.
-
-And so we end up with:
-
-totalram_pages() / 2
-
-That's because blocksize == PAGE_SIZE. When blocksize > PAGE_SIZE
-we need to consider how how many blocks fit into totalram_pages() first,
-then just divide by 2. This ends up being:
-
-totalram_pages * PAGE_SIZE / blocksize / 2
-totalram_pages * 2^PAGE_SHIFT / 2^bbits / 2
-totalram_pages * 2^(PAGE_SHIFT - bbits - 1)
-
-We know bbits > PAGE_SHIFT so we'll end up with a negative
-power of 2. 2^(-some_val). We can factor the -1 out by changing
-this to a division of power of 2 and flipping the values for
-the signs:
-
--1 * (PAGE_SHIFT - bbits -1) = (-PAGE_SHIFT + bbits + 1)
-                             = (bbits - PAGE_SHIFT + 1)
-
-And so we end up with:
-
-totalram_pages / 2^(bbits - PAGE_SHIFT + 1)
-
-The bbits is just the block order.
+This should produce no functional changes yet as higher order
+folios are not yet used or supported in shmem.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- mm/shmem.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ mm/shmem.c | 34 ++++++++++++++++++++--------------
+ 1 file changed, 20 insertions(+), 14 deletions(-)
 
 diff --git a/mm/shmem.c b/mm/shmem.c
-index c124997f8d93..179fde04f57f 100644
+index a947f2678a39..7bea4c5cb83a 100644
 --- a/mm/shmem.c
 +++ b/mm/shmem.c
-@@ -138,9 +138,11 @@ static u64 shmem_sb_blocksize(struct shmem_sb_info *sbinfo)
- 	return 1UL << sbinfo->block_order;
- }
- 
--static unsigned long shmem_default_max_blocks(void)
-+static unsigned long shmem_default_max_blocks(unsigned char block_order)
+@@ -803,15 +803,15 @@ unsigned long shmem_partial_swap_usage(struct address_space *mapping,
+ 						pgoff_t start, pgoff_t end)
  {
--	return totalram_pages() / 2;
-+	if (block_order == shmem_default_block_order())
-+		return totalram_pages() / 2;
-+	return totalram_pages() >> (block_order - PAGE_SHIFT + 1);
- }
+ 	XA_STATE(xas, &mapping->i_pages, start);
+-	struct page *page;
++	struct folio *folio;
+ 	unsigned long swapped = 0;
  
- static unsigned long shmem_default_max_inodes(void)
-@@ -3905,7 +3907,7 @@ static int shmem_show_options(struct seq_file *seq, struct dentry *root)
- {
- 	struct shmem_sb_info *sbinfo = SHMEM_SB(root->d_sb);
+ 	rcu_read_lock();
+-	xas_for_each(&xas, page, end - 1) {
+-		if (xas_retry(&xas, page))
++	xas_for_each(&xas, folio, end - 1) {
++		if (xas_retry(&xas, folio))
+ 			continue;
+-		if (xa_is_value(page))
+-			swapped++;
++		if (xa_is_value(folio))
++			swapped += (folio_nr_pages(folio));
  
--	if (sbinfo->max_blocks != shmem_default_max_blocks())
-+	if (sbinfo->max_blocks != shmem_default_max_blocks(shmem_default_block_order()))
- 		seq_printf(seq, ",size=%luk",
- 			sbinfo->max_blocks << (PAGE_SHIFT - 10));
- 	if (sbinfo->max_inodes != shmem_default_max_inodes())
-@@ -3987,7 +3989,7 @@ static int shmem_fill_super(struct super_block *sb, struct fs_context *fc)
+ 		if (need_resched()) {
+ 			xas_pause(&xas);
+@@ -938,10 +938,12 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, loff_t lend,
+ 			folio = fbatch.folios[i];
+ 
+ 			if (xa_is_value(folio)) {
++				long swaps_freed;
+ 				if (unfalloc)
+ 					continue;
+-				nr_swaps_freed += !shmem_free_swap(mapping,
+-							indices[i], folio);
++				swaps_freed = folio_nr_pages(folio);
++				if (!shmem_free_swap(mapping, indices[i], folio))
++					nr_swaps_freed += swaps_freed;
+ 				continue;
+ 			}
+ 
+@@ -1007,14 +1009,16 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, loff_t lend,
+ 			folio = fbatch.folios[i];
+ 
+ 			if (xa_is_value(folio)) {
++				long swaps_freed;
+ 				if (unfalloc)
+ 					continue;
++				swaps_freed = folio_nr_pages(folio);
+ 				if (shmem_free_swap(mapping, indices[i], folio)) {
+ 					/* Swap was replaced by page: retry */
+ 					index = indices[i];
+ 					break;
+ 				}
+-				nr_swaps_freed++;
++				nr_swaps_freed += swaps_freed;
+ 				continue;
+ 			}
+ 
+@@ -1445,7 +1449,7 @@ static int shmem_writepage(struct page *page, struct writeback_control *wbc)
+ 			NULL) == 0) {
+ 		spin_lock_irq(&info->lock);
+ 		shmem_recalc_inode(inode);
+-		info->swapped++;
++		info->swapped += folio_nr_pages(folio);
+ 		spin_unlock_irq(&info->lock);
+ 
+ 		swap_shmem_alloc(swap);
+@@ -1720,6 +1724,7 @@ static void shmem_set_folio_swapin_error(struct inode *inode, pgoff_t index,
+ 	struct shmem_inode_info *info = SHMEM_I(inode);
+ 	swp_entry_t swapin_error;
+ 	void *old;
++	long num_swap_pages;
+ 
+ 	swapin_error = make_swapin_error_entry();
+ 	old = xa_cmpxchg_irq(&mapping->i_pages, index,
+@@ -1729,6 +1734,7 @@ static void shmem_set_folio_swapin_error(struct inode *inode, pgoff_t index,
+ 		return;
+ 
+ 	folio_wait_writeback(folio);
++	num_swap_pages = folio_nr_pages(folio);
+ 	delete_from_swap_cache(folio);
+ 	spin_lock_irq(&info->lock);
+ 	/*
+@@ -1736,8 +1742,8 @@ static void shmem_set_folio_swapin_error(struct inode *inode, pgoff_t index,
+ 	 * be 0 when inode is released and thus trigger WARN_ON(inode->i_blocks) in
+ 	 * shmem_evict_inode.
  	 */
- 	if (!(sb->s_flags & SB_KERNMOUNT)) {
- 		if (!(ctx->seen & SHMEM_SEEN_BLOCKS))
--			ctx->blocks = shmem_default_max_blocks();
-+			ctx->blocks = shmem_default_max_blocks(shmem_default_block_order());
- 		if (!(ctx->seen & SHMEM_SEEN_INODES))
- 			ctx->inodes = shmem_default_max_inodes();
- 		if (!(ctx->seen & SHMEM_SEEN_INUMS))
+-	info->alloced--;
+-	info->swapped--;
++	info->alloced -= num_swap_pages;
++	info->swapped -= num_swap_pages;
+ 	shmem_recalc_inode(inode);
+ 	spin_unlock_irq(&info->lock);
+ 	swap_free(swap);
+@@ -1827,7 +1833,7 @@ static int shmem_swapin_folio(struct inode *inode, pgoff_t index,
+ 		goto failed;
+ 
+ 	spin_lock_irq(&info->lock);
+-	info->swapped--;
++	info->swapped -= folio_nr_pages(folio);
+ 	shmem_recalc_inode(inode);
+ 	spin_unlock_irq(&info->lock);
+ 
+@@ -2542,8 +2548,8 @@ int shmem_mfill_atomic_pte(pmd_t *dst_pmd,
+ 		goto out_delete_from_cache;
+ 
+ 	spin_lock_irq(&info->lock);
+-	info->alloced++;
+-	inode->i_blocks += PAGE_SECTORS;
++	info->alloced += folio_nr_pages(folio);
++	inode->i_blocks += PAGE_SECTORS << folio_order(folio);
+ 	shmem_recalc_inode(inode);
+ 	spin_unlock_irq(&info->lock);
+ 
 -- 
 2.39.2
 
