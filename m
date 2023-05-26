@@ -2,196 +2,264 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E68C7EE23
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 09:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D8EC7EE23
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 11:30:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243248AbjEZJjU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 05:39:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45418 "EHLO
+        id S242855AbjEZLaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 07:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242719AbjEZJiy (ORCPT
+        with ESMTP id S236570AbjEZLaD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 05:38:54 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D6B510D1;
-        Fri, 26 May 2023 02:38:15 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QSKbl2h7sz4f403M;
-        Fri, 26 May 2023 17:38:11 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rECfnBk1Jn9KA--.30169S3;
-        Fri, 26 May 2023 17:38:12 +0800 (CST)
-Subject: Re: [PATCH -next v2 6/6] blk-sysfs: add a new attr_group for blk_mq
-To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, tj@kernel.org,
-        josef@toxicpanda.com, axboe@kernel.dk
-Cc:     lukas.bulwahn@gmail.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230512093554.911753-1-yukuai1@huaweicloud.com>
- <20230512093554.911753-7-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <8cafbd02-182a-4071-7e04-cc6f96045852@huaweicloud.com>
-Date:   Fri, 26 May 2023 17:38:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 26 May 2023 07:30:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 957BB194
+        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 04:29:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685100561;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1h88QXkQdFyWOO8na2GWe9TzIac4MB0oRM4R5bwyOic=;
+        b=G8W0IDlwqRWwO28FuwcXUQMYPpeuYXWBVegNxKkDja0iH+F2zXRKQlrixE4lb6GWCRMkuU
+        g/Was14hrfbIYK7tI5Poz0cuXkeNMM5tdSsMr1FA4qwBXgFDYBAkp2wzJ3Cl4q1QFHaQ/D
+        bpYuWxBi+MeRaPaBD4b0QoxQZarC/wg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-515-mcN1S3BFMF-76eFF94-8_A-1; Fri, 26 May 2023 07:29:15 -0400
+X-MC-Unique: mcN1S3BFMF-76eFF94-8_A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 760E3381D208;
+        Fri, 26 May 2023 11:29:14 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0526B140E95D;
+        Fri, 26 May 2023 11:29:11 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        Lorenzo Stoakes <lstoakes@gmail.com>
+Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH v3 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
+Date:   Fri, 26 May 2023 12:28:57 +0100
+Message-Id: <20230526112859.654506-2-dhowells@redhat.com>
+In-Reply-To: <20230526112859.654506-1-dhowells@redhat.com>
+References: <20230526112859.654506-1-dhowells@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20230512093554.911753-7-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rECfnBk1Jn9KA--.30169S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxCF47tw4rGF1fKrW8ZFyxKrg_yoWrAF4kpF
-        4DAFy8Zw10q3y7GayxJw4UXwsa9ryF9r43Xr97Kwn2kF12qw4fWryjy34UXrWxArWkWw43
-        ZF4DtrZ8ArZ3ZrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Christoph
+Make pin_user_pages*() leave a ZERO_PAGE unpinned if it extracts a pointer
+to it from the page tables and make unpin_user_page*() correspondingly
+ignore a ZERO_PAGE when unpinning.  We don't want to risk overrunning a
+zero page's refcount as we're only allowed ~2 million pins on it -
+something that userspace can conceivably trigger.
 
-ÔÚ 2023/05/12 17:35, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Currently wbt sysfs entry is created for bio based device, and wbt can
-> be enabled for such device through sysfs while it doesn't make sense
-> because wbt can only work for rq based device. In the meantime, there
-> are other similar sysfs entries.
-> 
-> Fix this by adding a new attr_group for blk_mq, and sysfs entries will
-> only be created when the device is rq based.
-> 
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Add a pair of functions to test whether a page or a folio is a ZERO_PAGE.
 
-Any comments about this patch?
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: David Hildenbrand <david@redhat.com>
+cc: Lorenzo Stoakes <lstoakes@gmail.com>
+cc: Andrew Morton <akpm@linux-foundation.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jan Kara <jack@suse.cz>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Jason Gunthorpe <jgg@nvidia.com>
+cc: Logan Gunthorpe <logang@deltatee.com>
+cc: Hillf Danton <hdanton@sina.com>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-block@vger.kernel.org
+cc: linux-kernel@vger.kernel.org
+cc: linux-mm@kvack.org
+---
 
-Thanks,
-Kuai
-> ---
->   block/blk-sysfs.c | 42 +++++++++++++++++++++++++++++++-----------
->   1 file changed, 31 insertions(+), 11 deletions(-)
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 6c1c4ba66bc0..afc797fb0dfc 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -621,7 +621,6 @@ QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
->   #endif
->   
->   static struct attribute *queue_attrs[] = {
-> -	&queue_requests_entry.attr,
->   	&queue_ra_entry.attr,
->   	&queue_max_hw_sectors_entry.attr,
->   	&queue_max_sectors_entry.attr,
-> @@ -629,7 +628,6 @@ static struct attribute *queue_attrs[] = {
->   	&queue_max_discard_segments_entry.attr,
->   	&queue_max_integrity_segments_entry.attr,
->   	&queue_max_segment_size_entry.attr,
-> -	&elv_iosched_entry.attr,
->   	&queue_hw_sector_size_entry.attr,
->   	&queue_logical_block_size_entry.attr,
->   	&queue_physical_block_size_entry.attr,
-> @@ -650,7 +648,6 @@ static struct attribute *queue_attrs[] = {
->   	&queue_max_open_zones_entry.attr,
->   	&queue_max_active_zones_entry.attr,
->   	&queue_nomerges_entry.attr,
-> -	&queue_rq_affinity_entry.attr,
->   	&queue_iostats_entry.attr,
->   	&queue_stable_writes_entry.attr,
->   	&queue_random_entry.attr,
-> @@ -658,11 +655,7 @@ static struct attribute *queue_attrs[] = {
->   	&queue_wc_entry.attr,
->   	&queue_fua_entry.attr,
->   	&queue_dax_entry.attr,
-> -#ifdef CONFIG_BLK_WBT
-> -	&queue_wb_lat_entry.attr,
-> -#endif
->   	&queue_poll_delay_entry.attr,
-> -	&queue_io_timeout_entry.attr,
->   #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
->   	&blk_throtl_sample_time_entry.attr,
->   #endif
-> @@ -671,16 +664,23 @@ static struct attribute *queue_attrs[] = {
->   	NULL,
->   };
->   
-> +static struct attribute *blk_mq_queue_attrs[] = {
-> +	&queue_requests_entry.attr,
-> +	&elv_iosched_entry.attr,
-> +	&queue_rq_affinity_entry.attr,
-> +	&queue_io_timeout_entry.attr,
-> +#ifdef CONFIG_BLK_WBT
-> +	&queue_wb_lat_entry.attr,
-> +#endif
-> +	NULL,
-> +};
-> +
->   static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
->   				int n)
->   {
->   	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
->   	struct request_queue *q = disk->queue;
->   
-> -	if (attr == &queue_io_timeout_entry.attr &&
-> -		(!q->mq_ops || !q->mq_ops->timeout))
-> -			return 0;
-> -
->   	if ((attr == &queue_max_open_zones_entry.attr ||
->   	     attr == &queue_max_active_zones_entry.attr) &&
->   	    !blk_queue_is_zoned(q))
-> @@ -689,11 +689,30 @@ static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
->   	return attr->mode;
->   }
->   
-> +static umode_t blk_mq_queue_attr_visible(struct kobject *kobj,
-> +					 struct attribute *attr, int n)
-> +{
-> +	struct gendisk *disk = container_of(kobj, struct gendisk, queue_kobj);
-> +	struct request_queue *q = disk->queue;
-> +
-> +	if (!queue_is_mq(q))
-> +		return 0;
-> +
-> +	if (attr == &queue_io_timeout_entry.attr && !q->mq_ops->timeout)
-> +		return 0;
-> +
-> +	return attr->mode;
-> +}
-> +
->   static struct attribute_group queue_attr_group = {
->   	.attrs = queue_attrs,
->   	.is_visible = queue_attr_visible,
->   };
->   
-> +static struct attribute_group blk_mq_queue_attr_group = {
-> +	.attrs = blk_mq_queue_attrs,
-> +	.is_visible = blk_mq_queue_attr_visible,
-> +};
->   
->   #define to_queue(atr) container_of((atr), struct queue_sysfs_entry, attr)
->   
-> @@ -738,6 +757,7 @@ static const struct sysfs_ops queue_sysfs_ops = {
->   
->   static const struct attribute_group *blk_queue_attr_groups[] = {
->   	&queue_attr_group,
-> +	&blk_mq_queue_attr_group,
->   	NULL
->   };
->   
-> 
+Notes:
+    ver #3)
+     - Move is_zero_page() and is_zero_folio() to mm.h for dependency reasons.
+     - Add more comments and adjust the docs.
+    
+    ver #2)
+     - Fix use of ZERO_PAGE().
+     - Add is_zero_page() and is_zero_folio() wrappers.
+     - Return the zero page obtained, not ZERO_PAGE(0) unconditionally.
+
+ Documentation/core-api/pin_user_pages.rst |  6 +++++
+ include/linux/mm.h                        | 26 +++++++++++++++++--
+ mm/gup.c                                  | 31 ++++++++++++++++++++++-
+ 3 files changed, 60 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/core-api/pin_user_pages.rst b/Documentation/core-api/pin_user_pages.rst
+index 9fb0b1080d3b..d3c1f6d8c0e0 100644
+--- a/Documentation/core-api/pin_user_pages.rst
++++ b/Documentation/core-api/pin_user_pages.rst
+@@ -112,6 +112,12 @@ pages:
+ This also leads to limitations: there are only 31-10==21 bits available for a
+ counter that increments 10 bits at a time.
+ 
++* Because of that limitation, special handling is applied to the zero pages
++  when using FOLL_PIN.  We only pretend to pin a zero page - we don't alter its
++  refcount or pincount at all (it is permanent, so there's no need).  The
++  unpinning functions also don't do anything to a zero page.  This is
++  transparent to the caller.
++
+ * Callers must specifically request "dma-pinned tracking of pages". In other
+   words, just calling get_user_pages() will not suffice; a new set of functions,
+   pin_user_page() and related, must be used.
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 27ce77080c79..3c2f6b452586 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1910,6 +1910,28 @@ static inline bool page_needs_cow_for_dma(struct vm_area_struct *vma,
+ 	return page_maybe_dma_pinned(page);
+ }
+ 
++/**
++ * is_zero_page - Query if a page is a zero page
++ * @page: The page to query
++ *
++ * This returns true if @page is one of the permanent zero pages.
++ */
++static inline bool is_zero_page(const struct page *page)
++{
++	return is_zero_pfn(page_to_pfn(page));
++}
++
++/**
++ * is_zero_folio - Query if a folio is a zero page
++ * @folio: The folio to query
++ *
++ * This returns true if @folio is one of the permanent zero pages.
++ */
++static inline bool is_zero_folio(const struct folio *folio)
++{
++	return is_zero_page(&folio->page);
++}
++
+ /* MIGRATE_CMA and ZONE_MOVABLE do not allow pin pages */
+ #ifdef CONFIG_MIGRATION
+ static inline bool is_longterm_pinnable_page(struct page *page)
+@@ -1920,8 +1942,8 @@ static inline bool is_longterm_pinnable_page(struct page *page)
+ 	if (mt == MIGRATE_CMA || mt == MIGRATE_ISOLATE)
+ 		return false;
+ #endif
+-	/* The zero page may always be pinned */
+-	if (is_zero_pfn(page_to_pfn(page)))
++	/* The zero page can be "pinned" but gets special handling. */
++	if (is_zero_page(page))
+ 		return true;
+ 
+ 	/* Coherent device memory must always allow eviction. */
+diff --git a/mm/gup.c b/mm/gup.c
+index bbe416236593..ad28261dcafd 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -51,7 +51,8 @@ static inline void sanity_check_pinned_pages(struct page **pages,
+ 		struct page *page = *pages;
+ 		struct folio *folio = page_folio(page);
+ 
+-		if (!folio_test_anon(folio))
++		if (is_zero_page(page) ||
++		    !folio_test_anon(folio))
+ 			continue;
+ 		if (!folio_test_large(folio) || folio_test_hugetlb(folio))
+ 			VM_BUG_ON_PAGE(!PageAnonExclusive(&folio->page), page);
+@@ -131,6 +132,13 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
+ 	else if (flags & FOLL_PIN) {
+ 		struct folio *folio;
+ 
++		/*
++		 * Don't take a pin on the zero page - it's not going anywhere
++		 * and it is used in a *lot* of places.
++		 */
++		if (is_zero_page(page))
++			return page_folio(page);
++
+ 		/*
+ 		 * Can't do FOLL_LONGTERM + FOLL_PIN gup fast path if not in a
+ 		 * right zone, so fail and let the caller fall back to the slow
+@@ -180,6 +188,8 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
+ static void gup_put_folio(struct folio *folio, int refs, unsigned int flags)
+ {
+ 	if (flags & FOLL_PIN) {
++		if (is_zero_folio(folio))
++			return;
+ 		node_stat_mod_folio(folio, NR_FOLL_PIN_RELEASED, refs);
+ 		if (folio_test_large(folio))
+ 			atomic_sub(refs, &folio->_pincount);
+@@ -224,6 +234,13 @@ int __must_check try_grab_page(struct page *page, unsigned int flags)
+ 	if (flags & FOLL_GET)
+ 		folio_ref_inc(folio);
+ 	else if (flags & FOLL_PIN) {
++		/*
++		 * Don't take a pin on the zero page - it's not going anywhere
++		 * and it is used in a *lot* of places.
++		 */
++		if (is_zero_page(page))
++			return 0;
++
+ 		/*
+ 		 * Similar to try_grab_folio(): be sure to *also*
+ 		 * increment the normal page refcount field at least once,
+@@ -3079,6 +3096,9 @@ EXPORT_SYMBOL_GPL(get_user_pages_fast);
+  *
+  * FOLL_PIN means that the pages must be released via unpin_user_page(). Please
+  * see Documentation/core-api/pin_user_pages.rst for further details.
++ *
++ * Note that if a zero_page is amongst the returned pages, it will not have
++ * pins in it and unpin_user_page() will not remove pins from it.
+  */
+ int pin_user_pages_fast(unsigned long start, int nr_pages,
+ 			unsigned int gup_flags, struct page **pages)
+@@ -3110,6 +3130,9 @@ EXPORT_SYMBOL_GPL(pin_user_pages_fast);
+  *
+  * FOLL_PIN means that the pages must be released via unpin_user_page(). Please
+  * see Documentation/core-api/pin_user_pages.rst for details.
++ *
++ * Note that if a zero_page is amongst the returned pages, it will not have
++ * pins in it and unpin_user_page*() will not remove pins from it.
+  */
+ long pin_user_pages_remote(struct mm_struct *mm,
+ 			   unsigned long start, unsigned long nr_pages,
+@@ -3143,6 +3166,9 @@ EXPORT_SYMBOL(pin_user_pages_remote);
+  *
+  * FOLL_PIN means that the pages must be released via unpin_user_page(). Please
+  * see Documentation/core-api/pin_user_pages.rst for details.
++ *
++ * Note that if a zero_page is amongst the returned pages, it will not have
++ * pins in it and unpin_user_page*() will not remove pins from it.
+  */
+ long pin_user_pages(unsigned long start, unsigned long nr_pages,
+ 		    unsigned int gup_flags, struct page **pages,
+@@ -3161,6 +3187,9 @@ EXPORT_SYMBOL(pin_user_pages);
+  * pin_user_pages_unlocked() is the FOLL_PIN variant of
+  * get_user_pages_unlocked(). Behavior is the same, except that this one sets
+  * FOLL_PIN and rejects FOLL_GET.
++ *
++ * Note that if a zero_page is amongst the returned pages, it will not have
++ * pins in it and unpin_user_page*() will not remove pins from it.
+  */
+ long pin_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+ 			     struct page **pages, unsigned int gup_flags)
 
