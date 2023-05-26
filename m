@@ -2,78 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 843AAC7EE2D
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44492C77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:33:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242399AbjEZH2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 03:28:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59078 "EHLO
+        id S242415AbjEZHdo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 03:33:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236862AbjEZH2P (ORCPT
+        with ESMTP id S236891AbjEZHdn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 03:28:15 -0400
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3859AE41;
-        Fri, 26 May 2023 00:28:01 -0700 (PDT)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-55db055b412so21384077b3.0;
-        Fri, 26 May 2023 00:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685086080; x=1687678080;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2plEDbI3vkoMsRT5+764kLb9XDgxtH9eFEV6HjsgfWw=;
-        b=o51PS8nnGEEJG5PLVAfYXTb00/179VJM7iBDqOIHdSlXt0TDQCtRN9+wCGjTaufU2+
-         pZfA1QfEv1QdYm8tTZ8qk8KyA7H/of/brRToTess6UfBDEuclOQ4f92qCB+/aPKiNuTS
-         pfnD0eFtfucfxVGvf1FYdBtVpET/D7URlw5iPgPqPBr357gkrosUHuNu5rBUdD0yXvW/
-         TyBe5L8PuFybrumrwiM56JhcfK/zVqmF520HNVIlc1SVDmYEYjdZOFJ6EFBYl/VxeWOB
-         z6dq8zN69ckc5KjFtcpi85g4pys1JdzZ7Fhsz6K5Ca1gwIdU2JRtnmusR7fBHL0hwMXo
-         c9Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685086080; x=1687678080;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2plEDbI3vkoMsRT5+764kLb9XDgxtH9eFEV6HjsgfWw=;
-        b=JNnFcYvmB+/iMlr3CfGCiTFAPsHEQLchjcMmSVwZallsf26Wm2vI3aGPJE8Sga6B6j
-         F/PmM5EtArYzaGxsktohm4YENO2XoZ/NyCAsGOiUumZFUdo92//LJooCy7GWnT8rhGqv
-         fTH2OLiyAVh1oO8BPJoqQz5pU8aMXfFXyPgnJ2ySL9A0FP3Uk+nZwsj2E3jpwm3paulI
-         97cSAa1uDyp7yKSlivve3mVi22NruuDkXeUxZsl7iPrfkf1wkepXsP4SAm9lFtq7zciW
-         Qby6E/rgNmx+IEKb+idmFeCmv6H/pV4MUPj3yMXFU8rclskVImoyPSwbrBkK1lLx2rIj
-         mpxw==
-X-Gm-Message-State: AC+VfDzQ90pjpF5AOUzDVrrEQwTUxMc0CgYQKh4LuAnADSTbPk6k5/ZR
-        FPC89FG6qQlhnpTooDUVlYreAOb+LKMBCfkzsniEf/QDU0K3lw==
-X-Google-Smtp-Source: ACHHUZ4n/oNX51z9bZ/362uqmSNt11smJr5LsdBAPXc9+Y+JkilYaWcZI+BOZNiN8IfuwR6GR0R++WsVTqB13SMB8jI=
-X-Received: by 2002:a81:a14a:0:b0:564:c747:64f4 with SMTP id
- y71-20020a81a14a000000b00564c74764f4mr824579ywg.11.1685086080110; Fri, 26 May
- 2023 00:28:00 -0700 (PDT)
+        Fri, 26 May 2023 03:33:43 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B8B8114;
+        Fri, 26 May 2023 00:33:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=FJ06IRMbDJJrXOTKvODn3h7mdJ3kw+A63u/ZaBgMzfY=; b=TvnkXj/I5pCGoRzwSTLwGngHMk
+        E/yOSJcwi8/rld1LFK0la1ONOTYE8kgf0sYeSy7EeAw2M9xM5dchixMhcAFI/dyqAGMeMxn0UGWi1
+        Z/L2v0EUnETlmhx6yMZ2Pkv6KIyQ8DKIRJ9Z3+q5vWbT43/UJgv8w1w9fmLU9F4PjN8odpQtJNiIB
+        V0/+D3Bej6fJHhwfmMBkg/16PEO3VhSIPA07vAmIXi2OuTn4BsoPVzH5VuDjE1wyPEPK76ic2KxwQ
+        ifNUkHYRpWB9KO5IxFO4z82u0HHr7NQ518//dHvsxFWjq0yZXCx7CPAKr73uGMcywgLPIN9gHZEHu
+        NBTI3fcw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q2RxB-001RdW-0P;
+        Fri, 26 May 2023 07:33:37 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, hch@infradead.org,
+        djwong@kernel.org, minchan@kernel.org, senozhatsky@chromium.org
+Cc:     patches@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        willy@infradead.org, hare@suse.de, p.raghav@samsung.com,
+        da.gomez@samsung.com, rohan.puri@samsung.com,
+        rpuri.linux@gmail.com, kbusch@kernel.org, mcgrof@kernel.org
+Subject: [PATCH v2 3/5] iomap: simplify iomap_init() with PAGE_SECTORS
+Date:   Fri, 26 May 2023 00:33:34 -0700
+Message-Id: <20230526073336.344543-4-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230526073336.344543-1-mcgrof@kernel.org>
+References: <20230526073336.344543-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-Date:   Fri, 26 May 2023 15:27:48 +0800
-Message-ID: <CADJHv_sedgbfxvZkKHjC6quKvxR+E54noFCVF93MvhyK6bwRoA@mail.gmail.com>
-Subject: ioprio_set can take 8 as the PROCESS CLASS_BE ioprio value
-To:     Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org,
-        Linux-Next <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Damien,
+Replace common constants with generic versions. This produces no
+functional changes.
 
-Since these commits:
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ fs/iomap/buffered-io.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  scsi: block: Introduce ioprio hints
-  scsi: block: ioprio: Clean up interface definition
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index 915b448b8554..5641e696fb3f 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -1831,7 +1831,7 @@ EXPORT_SYMBOL_GPL(iomap_writepages);
+ 
+ static int __init iomap_init(void)
+ {
+-	return bioset_init(&iomap_ioend_bioset, 4 * (PAGE_SIZE / SECTOR_SIZE),
++	return bioset_init(&iomap_ioend_bioset, 4 * PAGE_SECTORS,
+ 			   offsetof(struct iomap_ioend, io_inline_bio),
+ 			   BIOSET_NEED_BVECS);
+ }
+-- 
+2.39.2
 
-go into linux-next tree, ioprio_set can take the value of 8
-as the PROCESS CLASS_BE ioprio parameter, returning
-success but actually it is setting to 0 due to the mask roundup.
-
-The LTP test case ioprio_set03[1] covers this boundary value
-testing, which starts to fail since then.
-
-This does not look as expected. Could you help to take a look?
-
-Thanks,
-Murphy
-
-[1] https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/ioprio/ioprio_set03.c
