@@ -2,96 +2,203 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF35C7EE2F
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 02:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD1EC77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 02:35:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233928AbjEZC3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 22:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54836 "EHLO
+        id S231990AbjEZCff (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 22:35:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233245AbjEZC3o (ORCPT
+        with ESMTP id S229727AbjEZCfe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 22:29:44 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7EB813D
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 19:29:42 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-96f5685f902so26942666b.2
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 19:29:42 -0700 (PDT)
+        Thu, 25 May 2023 22:35:34 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBCEE199
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 19:35:27 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-96f6e83e12fso29642666b.1
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 19:35:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1685068181; x=1687660181;
+        d=chromium.org; s=google; t=1685068526; x=1687660526;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eFUluCk6Yg3CJh7zCYAWn34AyV3ksw1s+RmFmqdT4VM=;
-        b=Nb3wIdJXogNUmN3PMNhG8ePr98aCwxYjJMnIkdWW8r+lovISuI100UDFy5YFHdqy2A
-         YnFDCafoMLMrBo/TAJfAdiLAhocc4xSmkmhSTou8NdYav/6OBU/E6TnmJKjSlaKiQg9n
-         oIhzXKGARAMNYA9UWQQzDz8qS5/aBVoGajDIo=
+        bh=+W8m3Ca/C7ABr7TnX4n7WXczAjnHTy6VxW28/pga+l4=;
+        b=Wavv/Ov2JSnmm+7j2BYBnmhKRyztSttW1+mnqq7+2MZ9K1A7mAmZr4EJLFq5EASJ6x
+         t2/A3ejCByvnHo+RksigZM4+BFRkPM7YDCuoT3AfyWAv8H7eZA9+C6oL5/qxyUSzxjfC
+         JCU/e5goHDnpHb9hX4afGFLT/JVQv7M4AnxEU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685068181; x=1687660181;
+        d=1e100.net; s=20221208; t=1685068526; x=1687660526;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eFUluCk6Yg3CJh7zCYAWn34AyV3ksw1s+RmFmqdT4VM=;
-        b=Qj17qb90y6r6NWNq9hMsT2hrMnzy28VPGuyn6sxeJwR6M4ik0Q/ZTyzz8fD5ey8a+N
-         TO5IdhGkLqEWfgw3j4QJ/u8N6ET/u2q8r8LF07v3dRXrkoC9Q28u6XfDBtwgBGYdxt+A
-         Btrwbly+zNDcrUlDUVEmoTfTfKXyouZS6Gwkhxc8ZYvqltKbZoD9sDPSC0xfNGK9MxV3
-         u8YV3SrVWvr4foTkN6RFulJCBOA/3J8VQKpbi9ODLhHJ37GTjw50btKZ1iPi3labKcAd
-         1VvXdjJMge1jl+89k3AweaCQsLThdmpRugmnptIiB0O3bEdcuaTIJ/7if6p0RQfG1lva
-         yETA==
-X-Gm-Message-State: AC+VfDye9bXIUBp0Ik9HJMZ5p9fcN5fWHu4YQO6RwsmdQJz5cJHFQVmn
-        KrUO0OqANrTIkThIWdx8csyzJC8E2aHekiGCygMq4WBi
-X-Google-Smtp-Source: ACHHUZ6vcbJVb1s7TEnm5Xz9PnJkgWVFmoE9XBxLqi+h+mLHvmcMPlgbAHa3WdIGLtmapM/Rr5R+VQ==
-X-Received: by 2002:a17:907:7b88:b0:969:9fd0:7ce7 with SMTP id ne8-20020a1709077b8800b009699fd07ce7mr783746ejc.11.1685068181018;
-        Thu, 25 May 2023 19:29:41 -0700 (PDT)
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com. [209.85.218.53])
-        by smtp.gmail.com with ESMTPSA id u24-20020a1709064ad800b0096f67b55b0csm1564781ejt.115.2023.05.25.19.29.39
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 May 2023 19:29:40 -0700 (PDT)
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-96f6a9131fdso27598866b.1
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 19:29:39 -0700 (PDT)
-X-Received: by 2002:a17:907:d10:b0:96f:d345:d100 with SMTP id
- gn16-20020a1709070d1000b0096fd345d100mr533983ejc.59.1685068179297; Thu, 25
- May 2023 19:29:39 -0700 (PDT)
+        bh=+W8m3Ca/C7ABr7TnX4n7WXczAjnHTy6VxW28/pga+l4=;
+        b=ji4u4qlRqjCXGPwRoYdJE5idR3vzY3WCOjWkJ9xstzHfhniyqVXpYt8yCR0QqkWKDi
+         dPhIVf4ync0rnOf2PaP6bX0g6xP4XZkltKnIcu1wW6hcD6vvczMSMEP9GP4/uSldGthH
+         rmLEQajIfc9fXLSB/ai3FBNU/2tSkhMbLWX9QqaGJ22heG4+68Zo24LOFmA5OW0SP0ct
+         VZINF/te3vXdxUfd8Kd928SX07I3KdhZFUO8MHGwBaIoaa/2FVFWQza5E8NdB2rOapSE
+         DL/5qBTBZrhkWPgeA3hQpbqdeIm44nAH7tz+5QgGiyfwo7tyecpV82pRt6/asRqcconw
+         czkQ==
+X-Gm-Message-State: AC+VfDy3p8zbjED4yehtpo6it4EZoSc2s1JB6zm+PzE/iJ07uz4QdObK
+        ruY1Tms7FOtOqw5mNKSthS2WM6a7wf1O3MQwHyNzJA==
+X-Google-Smtp-Source: ACHHUZ4+v93lsnr3vDJxsBIB4NIbwy545X9nEEDCwOA1BxMR0ul1C//JHHo5qpf1DdQM1Wstuba6WbgbYuA6QotLgOc=
+X-Received: by 2002:a17:906:dacb:b0:96b:e92:4feb with SMTP id
+ xi11-20020a170906dacb00b0096b0e924febmr572925ejb.60.1685068526183; Thu, 25
+ May 2023 19:35:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230525223953.225496-1-dhowells@redhat.com> <20230525223953.225496-3-dhowells@redhat.com>
-In-Reply-To: <20230525223953.225496-3-dhowells@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 25 May 2023 19:29:21 -0700
-X-Gmail-Original-Message-ID: <CAHk-=win3ttfr2xb1JcGroPSOoqGs0GooZq0DLsRtZzXUH5YeQ@mail.gmail.com>
-Message-ID: <CAHk-=win3ttfr2xb1JcGroPSOoqGs0GooZq0DLsRtZzXUH5YeQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 2/3] mm: Provide a function to get an additional
- pin on a page
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        David Hildenbrand <david@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Andrew Morton <akpm@linux-foundation.org>
+References: <ZGeKm+jcBxzkMXQs@redhat.com> <ZGgBQhsbU9b0RiT1@dread.disaster.area>
+ <ZGu0LaQfREvOQO4h@redhat.com> <ZGzIJlCE2pcqQRFJ@bfoster> <ZGzbGg35SqMrWfpr@redhat.com>
+ <ZG1dAtHmbQ53aOhA@dread.disaster.area> <ZG5taYoXDRymo/e9@redhat.com>
+ <ZG9JD+4Zu36lnm4F@dread.disaster.area> <ZG+GKwFC7M3FfAO5@redhat.com>
+ <CAG9=OMNhCNFhTcktxSMYbc5WXkSZ-vVVPtb4ak6B3Z2-kEVX0Q@mail.gmail.com> <ZHANCbnHuhnwCrGz@dread.disaster.area>
+In-Reply-To: <ZHANCbnHuhnwCrGz@dread.disaster.area>
+From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date:   Thu, 25 May 2023 19:35:14 -0700
+Message-ID: <CAG9=OMPxHOzYcy8TQRnvNfNvPvvU=A1pceyL72JfyQwJSKNjQQ@mail.gmail.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Mike Snitzer <snitzer@kernel.org>, Joe Thornber <ejt@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 3:40=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
+On Thu, May 25, 2023 at 6:36=E2=80=AFPM Dave Chinner <david@fromorbit.com> =
+wrote:
 >
-> +void page_get_additional_pin(struct page *page)
-> +{
-> +       struct folio *folio =3D page_folio(page);
-> +
-> +       if (page =3D=3D ZERO_PAGE(0))
-> +               return;
+> On Thu, May 25, 2023 at 03:47:21PM -0700, Sarthak Kukreti wrote:
+> > On Thu, May 25, 2023 at 9:00=E2=80=AFAM Mike Snitzer <snitzer@kernel.or=
+g> wrote:
+> > > On Thu, May 25 2023 at  7:39P -0400,
+> > > Dave Chinner <david@fromorbit.com> wrote:
+> > > > On Wed, May 24, 2023 at 04:02:49PM -0400, Mike Snitzer wrote:
+> > > > > On Tue, May 23 2023 at  8:40P -0400,
+> > > > > Dave Chinner <david@fromorbit.com> wrote:
+> > > > > > It's worth noting that XFS already has a coarse-grained
+> > > > > > implementation of preferred regions for metadata storage. It wi=
+ll
+> > > > > > currently not use those metadata-preferred regions for user dat=
+a
+> > > > > > unless all the remaining user data space is full.  Hence I'm pr=
+etty
+> > > > > > sure that a pre-provisioning enhancment like this can be done
+> > > > > > entirely in-memory without requiring any new on-disk state to b=
+e
+> > > > > > added.
+> > > > > >
+> > > > > > Sure, if we crash and remount, then we might chose a different =
+LBA
+> > > > > > region for pre-provisioning. But that's not really a huge deal =
+as we
+> > > > > > could also run an internal background post-mount fstrim operati=
+on to
+> > > > > > remove any unused pre-provisioning that was left over from when=
+ the
+> > > > > > system went down.
+> > > > >
+> > > > > This would be the FITRIM with extension you mention below? Which =
+is a
+> > > > > filesystem interface detail?
+> > > >
+> > > > No. We might reuse some of the internal infrastructure we use to
+> > > > implement FITRIM, but that's about it. It's just something kinda
+> > > > like FITRIM but with different constraints determined by the
+> > > > filesystem rather than the user...
+> > > >
+> > > > As it is, I'm not sure we'd even need it - a preiodic userspace
+> > > > FITRIM would acheive the same result, so leaked provisioned spaces
+> > > > would get cleaned up eventually without the filesystem having to do
+> > > > anything specific...
+> > > >
+> > > > > So dm-thinp would _not_ need to have new
+> > > > > state that tracks "provisioned but unused" block?
+> > > >
+> > > > No idea - that's your domain. :)
+> > > >
+> > > > dm-snapshot, for certain, will need to track provisioned regions
+> > > > because it has to guarantee that overwrites to provisioned space in
+> > > > the origin device will always succeed. Hence it needs to know how
+> > > > much space breaking sharing in provisioned regions after a snapshot
+> > > > has been taken with be required...
+> > >
+> > > dm-thinp offers its own much more scalable snapshot support (doesn't
+> > > use old dm-snapshot N-way copyout target).
+> > >
+> > > dm-snapshot isn't going to be modified to support this level of
+> > > hardening (dm-snapshot is basically in "maintenance only" now).
+>
+> Ah, of course. Sorry for the confusion, I was kinda using
+> dm-snapshot as shorthand for "dm-thinp + snapshots".
+>
+> > > But I understand your meaning: what you said is 100% applicable to
+> > > dm-thinp's snapshot implementation and needs to be accounted for in
+> > > thinp's metadata (inherent 'provisioned' flag).
+>
+> *nod*
+>
+> > A bit orthogonal: would dm-thinp need to differentiate between
+> > user-triggered provision requests (eg. from fallocate()) vs
+> > fs-triggered requests?
+>
+> Why?  How is the guarantee the block device has to provide to
+> provisioned areas different for user vs filesystem internal
+> provisioned space?
+>
+After thinking this through, I stand corrected. I was primarily
+concerned with how this would balloon thin snapshot sizes if users
+potentially provision a large chunk of the filesystem but that's
+putting the cart way before the horse.
 
-You added that nice "is_zero_folio()", and then you did the above anyway..
+Best
+Sarthak
 
-               Linus
+> > I would lean towards user provisioned areas not
+> > getting dedup'd on snapshot creation,
+>
+> <twitch>
+>
+> Snapshotting is a clone operation, not a dedupe operation.
+>
+> Yes, the end result of both is that you have a block shared between
+> multiple indexes that needs COW on the next overwrite, but the two
+> operations that get to that point are very different...
+>
+> </pedantic mode disegaged>
+>
+> > but that would entail tracking
+> > the state of the original request and possibly a provision request
+> > flag (REQ_PROVISION_DEDUP_ON_SNAPSHOT) or an inverse flag
+> > (REQ_PROVISION_NODEDUP). Possibly too convoluted...
+>
+> Let's not try to add everyone's favourite pony to this interface
+> before we've even got it off the ground.
+>
+> It's the simple precision of the API, the lack of cross-layer
+> communication requirements and the ability to implement and optimise
+> the independent layers independently that makes this a very
+> appealing solution.
+>
+> We need to start with getting the simple stuff working and prove the
+> concept. Then once we can observe the behaviour of a working system
+> we can start working on optimising individual layers for efficiency
+> and performance....
+>
+> Cheers,
+>
+> Dave.
+> --
+> Dave Chinner
+> david@fromorbit.com
