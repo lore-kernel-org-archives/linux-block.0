@@ -2,57 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD5BC77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 04:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10A41C7EE31
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 04:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233008AbjEZE6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 00:58:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35890 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234221AbjEZE6r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S229479AbjEZE6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 26 May 2023 00:58:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35884 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233008AbjEZE6q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 May 2023 00:58:46 -0400
 Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5276C183
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 21:58:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8985913A
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 21:58:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1685077126; x=1716613126;
+  t=1685077125; x=1716613125;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RKtGWlSuxI8HIrrsVoZWoKYq9tElwtCzY8UQvSZ/iSc=;
-  b=Fuc4JC2kI7nnIyo0yIhd+9Mef0lc/i3Mm6FkbaB9foAWsWtQh1J+ZsLU
-   g77Ai+yvTUfYn8ZSyuN0GnoaAxRLruxhBnueJX56Ktmbw3g859jRGxuKe
-   Ht8wmvIzRInq1/sCoDfQvnsfjQC4NAId9gSJxPaO81DhFGFEZTt955XdU
-   NqlE11hryuI232hSXRoL/lVnCfQlCBfP+wAVJ7SVa4+9hnsdheENBk0nU
-   iwZmALNN9FKnJaWMRXrcj+S08ol3cWnw6XgSS2H+zQm2mRcZGwPpBY5eh
-   DcwiJPudGqiIlndItYkHKNBhPrK8hQFZP4X3EZiXRel9yU/RMcap/DzsT
-   Q==;
+  bh=pmt7t8vFaRTuFbJrPQjmtj1I56fHkQ5BSpFqy997CHk=;
+  b=Z8LFQALq/vCX2KptV4bQ3ei3Y84cPXxIbzsz8CKwqcbdxUgQ+Bw3HQLJ
+   G0f8u+lzoNNuCARZVcyvx9elpY55TM+fbrYueR1DFuNuZmGVylylWSc+s
+   y72VB/c4JtVPGGj90XOiYqTtjaA4WdTkyt06C0L4ybmUaSuOBVkeeIQMG
+   vHul6jVaezuff2DLHM9X1tkXnXviHCTGBIPK+XzwFkFPVblT2bugqU6du
+   fOrFUzffTBY76UzDDpZMQ56z46zg0vQ7GXknaLw085ppCSvM7WaHmdwu9
+   1pRjNRm72LO2AdpDdnGKVWFsc9cn63pmGdf21FoBfNSsmjMPcQxcOQtV7
+   A==;
 X-IronPort-AV: E=Sophos;i="6.00,193,1681142400"; 
-   d="scan'208";a="231616519"
+   d="scan'208";a="231616517"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 26 May 2023 12:58:46 +0800
-IronPort-SDR: JAwFzq0X61sHQ2A9eH6Acn83+nmplU4m78P10n7rdCKd/XUsC6MkJ6BY3N9xSNV0/pfiy1O5MO
- YNH60FUtvtPbtXFu7TMiEKQtD4djVOdw4EU4on5kU56kASlmr/btbB4hutp1flmx+qQ2IMNr8e
- D4jvbS8/x73C4abFOP/pqFzkmks/HYfK1U/+2kmVBqr7zZ/vQ4sh0fajdTUYJu/eBdO/F4aa71
- mFb8pYDUEDPe8oyjQHYk8O22pr40NZ6JggR4oloTI9WsYSfKaU6ELis01SxaiauW+aXdGNEEUZ
- s9o=
+  by ob1.hgst.iphmx.com with ESMTP; 26 May 2023 12:58:45 +0800
+IronPort-SDR: w8nSLFXCPNWt9Ai3ZNQtjwUZd1Rqb/5cQ0vIdBeqaMawCUQ1Y9zXXqMOUHe+FXf8xb6UBW33Us
+ qfBaDixN44M7WEnuovnelQvU431e68gciM1F+56kT4TjBFP58OnRgbRLnR9WAc69PzKXx44bEe
+ cA9Yv96+9OGKZXv5x24wY8u4TgWia9IkIL2YTZFC39aznQIfOaVXc82//ajkWja0CAntZPEjdd
+ DcihQNCh5IfCa3LuVgr4Q4eS5fmE5X5zxmGj6C0JyEECnH10Xa2ZFgNC3uCEK7VU8+0/Rwc7EQ
+ mNI=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
   by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2023 21:08:03 -0700
-IronPort-SDR: tEwFH3on0LDF0UbeTZ1YEde3lVMA0l34fAG8I10tuKv7VO0ruFeIp+PFA7Cm3NL2Sz+aUcSl7e
- 7ZIq+M5g4YWB/gnTsJjVvfS4zJr6ADc/67ADB6Pp5/lHvDp8+zK4TfwDRSDQDOQCafF2Vk5grA
- SNuUj3fkLgI9NGsJGPwioyH2zQf18jBdUazrZpCye84moLUj7X6ue7tZW7FQu44mdo3jo+/8z6
- w9qLIjB73GSdaDat5inTGfnLIcfGyx473Bd0fjwOHCN+YhuRBIGZpKzjUTOAPy2psQ12sH7vEY
- 2pw=
+IronPort-SDR: aC1JkN/ow4pe3FcmT3EdEXzfM1Kga/mi5QCAYNqf+JmNjwCu2/SPeCK6QUzYtG1Kkh4MEtHQTD
+ bKJIbGAIJ1w0Wz1mAqW67y+Z7dG+jg1Tb8DMTM9Uj3BLQosDIPMiB04EwL3ExdNmvi2SrLHF9T
+ Nje8KJwrpwFN9U2iQAm936L5rZoE0nnYjmehtdR3rbGC3yP1KwtvcBAIu/QLYX7GcqsmimfzNW
+ p1b2K255p5A23g/rkqhViJHgrr1YiaUrhMg9NFfNnbhUCAnrosHidZJx2tUWEt9snYjehLPn67
+ S4s=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.53.55])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 May 2023 21:58:45 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 May 2023 21:58:44 -0700
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 2/3] block/011: skip when mounted block devices are affected
-Date:   Fri, 26 May 2023 13:58:42 +0900
-Message-Id: <20230526045843.168739-3-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 1/3] common/rc: introduce _get_pci_from_dev_sysfs
+Date:   Fri, 26 May 2023 13:58:41 +0900
+Message-Id: <20230526045843.168739-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230526045843.168739-1-shinichiro.kawasaki@wdc.com>
 References: <20230526045843.168739-1-shinichiro.kawasaki@wdc.com>
@@ -62,51 +62,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The test case disables PCI device of the test target block device. When
-the PCI device has other block devices mounted, those block devices are
-disabled also. If the mounted device is the system disk, the test screws
-up the system. To avoid such dangerous operation, check if the target
-PCI device has mounted block devices. In that case, skip the test.
+To prepare for block/011 test case improvement, add the helper function
+which gets PCI device from the given sysfs path of a block device.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/block/011 | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ common/rc | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/tests/block/011 b/tests/block/011
-index 4f331b4..0699936 100755
---- a/tests/block/011
-+++ b/tests/block/011
-@@ -10,12 +10,29 @@ DESCRIPTION="disable PCI device while doing I/O"
- TIMED=1
- CAN_BE_ZONED=1
+diff --git a/common/rc b/common/rc
+index 57e0f42..90122c0 100644
+--- a/common/rc
++++ b/common/rc
+@@ -313,12 +313,16 @@ _require_test_dev_is_pci() {
+ 	return 0
+ }
  
-+pci_dev_mounted() {
-+	local d dev p pdev
-+
-+	pdev="$(_get_pci_dev_from_blkdev)"
-+	for d in /sys/block/*; do
-+		dev=${d##*/}
-+		p=$(_get_pci_from_dev_sysfs "$d")
-+		[[ $p != "$pdev" ]] && continue
-+		grep -qe "/dev/$dev" /proc/mounts && return 0
-+	done
-+	return 1
+-_get_pci_dev_from_blkdev() {
+-	readlink -f "$TEST_DEV_SYSFS/device" | \
++_get_pci_from_dev_sysfs() {
++	readlink -f "$1/device" | \
+ 		grep -Eo '[0-9a-f]{4,5}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]' | \
+ 		tail -1
+ }
+ 
++_get_pci_dev_from_blkdev() {
++	_get_pci_from_dev_sysfs "$TEST_DEV_SYSFS"
 +}
 +
- requires() {
- 	_have_fio && _have_program setpci
- }
- 
- device_requires() {
- 	_require_test_dev_is_pci
-+	if pci_dev_mounted; then
-+		SKIP_REASONS+=("mounted block device exists on test target PCI device")
-+		return 1
-+	fi
- }
- 
- test_device() {
+ _get_pci_parent_from_blkdev() {
+ 	readlink -f "$TEST_DEV_SYSFS/device" | \
+ 		grep -Eo '[0-9a-f]{4,5}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]' | \
 -- 
 2.40.1
 
