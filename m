@@ -2,198 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4C1C7EE2E
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 01:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F324C77B7E
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 02:09:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241879AbjEZBgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 21:36:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34224 "EHLO
+        id S229646AbjEZCJH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 22:09:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241821AbjEZBgQ (ORCPT
+        with ESMTP id S229827AbjEZCJG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 21:36:16 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D7519A
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 18:36:13 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-64d30ab1ef2so333881b3a.2
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 18:36:13 -0700 (PDT)
+        Thu, 25 May 2023 22:09:06 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E9AE7
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 19:09:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1685066945; x=1716602945;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=S2tMkSNY2HpETVypc/udbAgBfviXcb+56jZisHz3zw8=;
+  b=iLv0rSZLp7HY3kylo3nuQLU2qvltc1413DkCm6Gs+tWxZO6jF5tOt6hw
+   kn5nolUDmbvAyBkSeh5q1eutr19pmLFy8JGlOtseDTTAMqLbdHvhpYuxM
+   DwSPpMi8y/E+voPCY3fuWA6uGZm7wrpIVeKKSgORwprBgVcTh3bCat8ER
+   6ytgt7XFQY5PeTYt6L/GkmPtq5Be82zN7sozZEanMjPuuDsT29hiEw6Ig
+   Vb9qr+wSuhctaiMZCwaUnuCUtHb4MSdd7+PRERNWe//USU8OU58dNvkCg
+   umruPgk2wszX6RMaK3K+VWDQeK+4k60Np1KXXMdXcMIFzOeMUlAePZAdw
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.00,192,1681142400"; 
+   d="scan'208";a="343779541"
+Received: from mail-co1nam11lp2170.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.170])
+  by ob1.hgst.iphmx.com with ESMTP; 26 May 2023 10:09:04 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W8P4rEtzjs0ez77uVs6QXpidyHMInj0r3iZMqwUayJswNH6XRBs12R0QdcZz5nN5SqEX9rsIV2DBQW4VPNvF0Ke+Ksk2s/pgFv868Y+jupiIZwalhxAIKpnduwPS4FIx0jYOMH1exCa30OqKr/tUs8bIiVqJR8+ELVTdmSz4Qf4qD9ffRLfo1w8nBS0Akp0j9g/F3WIE/lqoeoIxYPrTreB/IiXqjiDJMOtMD6tPe4VCingkhmx4NxXrhCInDM920gZcFt4kgxUq6Vrnic+TEzUByML8lD2t4rstZbup8nfevY1V+Zm7+/pEmXpbhJR5tfFNSusYaUTkSwwl2aHBCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S2tMkSNY2HpETVypc/udbAgBfviXcb+56jZisHz3zw8=;
+ b=EeFgBFRDBj0BeufsJ88K2ENDTi7DrwXxENEHzOYvsUAkP3fkO/4Zg2Bm28MHIzZ1a6Xa0Tnt9oHtJIdf5L7TtKs8CzaO5zFDfXtSbtmjh0QhBZTyYyV/995y4gUQqcUcunvLbtE6xzBYHMPjzuM558+res4dY0tsieDkVS5GPpP20yIqqFGbb7d4+yWg3Bmwt7RODCELs2JuwTPIXzAHA/tOgsZXxkcbQWFgB+IeqB6bwgX1f8dj1OiQerfS763DldTiU9ovwN+p8FyianYjry5f2lSCwV1upnaPbjN4ZphJrKhh9LH8h/0vqLQA0Nu1KfsgSgV3YJXmWbSYqU/d3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1685064973; x=1687656973;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bR3UToISzSLbX8ZQkHUE42zju/u1Pd13Qxkfw1ihU0s=;
-        b=xBykKLfgpBaSvfRX3A2+FxT1KMrbnM15im+s6pEISEci1JWoy+6UGBvACHOKnzsNQr
-         afk90Xh/M4D33/CZyC3EusZmqc1ApG7JjLCpW6aX3SWhZt9ZYbyqO7WMBxqRgMWFTHtq
-         HSdOCN6vwq8iD2sZuRhSnYIqjspgSjnwj/JJkdgbMcgZZCUfDvhe0451GrKyYqY5eIvT
-         gbFjo76t5wzNhvbQD1+eZ6JBj+DjthvcCoZA0AU3MkAccbMC5I/5OCQHLQBwb95rcN0F
-         aZC1+itQVaJaNWNgoirfbLXH3K81rFtIImWJ/54lSzn69rMSJfSeM4eOwdpVzh8fi8GZ
-         2dwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685064973; x=1687656973;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bR3UToISzSLbX8ZQkHUE42zju/u1Pd13Qxkfw1ihU0s=;
-        b=eYnwQ56qwLrOwCeofhwuhQZmxAwH0OuSODsewDVwEaePLlDDPoE5fSMoirABSCa4wr
-         soa7KinyfmUq8KqFoHiK2O8PldxOZMtNYfNK/ZDAkmisQjgnKdQ2eLYzzEXHTuh1C3cF
-         fer2XJQPt/x5n7TcsELxhmna3izQBfjoSKYcQn5H6IUEOVsc577OfxKm04Yk/zoiKlfB
-         oKxILrKhewBWqCa6y0/QvYH1A0BjsI7rKRYyPiZ+b7T9waAyED0ImIKR6AgASvY3AOKy
-         YV6kgaBTIC2sN9Gi8vP1O8fRNZjgxBpr3J5XnNFNQ2qR2iMSLETO90A+5nsf90rCG/wY
-         uQFw==
-X-Gm-Message-State: AC+VfDwnd4dn39/Pi0OHqMuylJkSvwc9DhkU+ycqDhg0goq4haADu2AQ
-        1yHbY3SKMc6ifPRIGz+StruiUg==
-X-Google-Smtp-Source: ACHHUZ6sPdmuQonaj/olpSGroUfK3OoVqwjZ0hrzZiUIv4Qa66jySy12bySeqpIr9yyQSaUMpmfRQA==
-X-Received: by 2002:a05:6a00:124a:b0:643:96bc:b292 with SMTP id u10-20020a056a00124a00b0064396bcb292mr1061741pfi.5.1685064972718;
-        Thu, 25 May 2023 18:36:12 -0700 (PDT)
-Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
-        by smtp.gmail.com with ESMTPSA id g9-20020a62e309000000b0063efe2f3ecdsm1679539pfh.204.2023.05.25.18.36.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 May 2023 18:36:11 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1q2MNF-003wt9-15;
-        Fri, 26 May 2023 11:36:09 +1000
-Date:   Fri, 26 May 2023 11:36:09 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     Mike Snitzer <snitzer@kernel.org>, Joe Thornber <ejt@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
-Message-ID: <ZHANCbnHuhnwCrGz@dread.disaster.area>
-References: <ZGeKm+jcBxzkMXQs@redhat.com>
- <ZGgBQhsbU9b0RiT1@dread.disaster.area>
- <ZGu0LaQfREvOQO4h@redhat.com>
- <ZGzIJlCE2pcqQRFJ@bfoster>
- <ZGzbGg35SqMrWfpr@redhat.com>
- <ZG1dAtHmbQ53aOhA@dread.disaster.area>
- <ZG5taYoXDRymo/e9@redhat.com>
- <ZG9JD+4Zu36lnm4F@dread.disaster.area>
- <ZG+GKwFC7M3FfAO5@redhat.com>
- <CAG9=OMNhCNFhTcktxSMYbc5WXkSZ-vVVPtb4ak6B3Z2-kEVX0Q@mail.gmail.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S2tMkSNY2HpETVypc/udbAgBfviXcb+56jZisHz3zw8=;
+ b=llNUCTCE3SoEpe3tZSiV9rd59S8gRjDo/6barO239USeQa6SqPm5LTXp9xRz4qP3obLStMGAQe+L1MD8HY0jlxMb+xjOHQ74WCu7bBF0wx5F7av/R1T8DnRTS44NMiYSQOvJ0S7IJ3svrK+G6tkNNaLWImxwvJygb6Cj3eFzbAc=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ MN2PR04MB6301.namprd04.prod.outlook.com (2603:10b6:208:1a7::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6433.15; Fri, 26 May 2023 02:09:02 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::eb0e:1bef:f266:eceb]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::eb0e:1bef:f266:eceb%7]) with mapi id 15.20.6433.015; Fri, 26 May 2023
+ 02:09:02 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Xiao Yang <yangx.jy@fujitsu.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dwagner@suse.de" <dwagner@suse.de>
+Subject: Re: [PATCH blktests v2] srp/rc: Replace _have_module() with
+ _have_driver()
+Thread-Topic: [PATCH blktests v2] srp/rc: Replace _have_module() with
+ _have_driver()
+Thread-Index: AQHZjezNy1+WG3PBxkSh/YVO9hFlf69r0jmA
+Date:   Fri, 26 May 2023 02:09:02 +0000
+Message-ID: <qt7oil6ajrmbr342n6k2ifsm3emilvjhz6kwpveuilzm32n3rv@4rmeeoqlzuxv>
+References: <20230524030643.404546-1-yangx.jy@fujitsu.com>
+In-Reply-To: <20230524030643.404546-1-yangx.jy@fujitsu.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|MN2PR04MB6301:EE_
+x-ms-office365-filtering-correlation-id: 15cbb539-bda6-4280-df31-08db5d8e2d03
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: nGlqssYbJA+gQPBWMjq480Od4vbfPm0Ff3yuMTzaSeWFV7Xrsav0EGDL0Sj69/tX0z45sWVFvOQiryVCY1Vc1IFtOS9VfhbA6j8BuR/kqNAe5zZF10mqJ0oa6NGQV9nCsLf0mbI5J/c0C85Kt0WgQV9gbV5D9uUJZYoUdbpP5egZzZ0DuVhsAJ52TLNj11lkjWc3H7QRPkZx66iOAkK6c08+bFDq4m/k/HZ1o/xxzgyNE17oF8yZwpFTMeL7VwFttiBZH3J/CiTPXbLVO0wmARlKIVENIvlUKHZZVa14imnhRK29S6E7UGzaO35F+/kLvdgtr4iHp3JY3JoNYcGi8wszhwS6AQnGt72yNe8nOfNJ9pKBRm24/MgsiENXQNW0xGO2DXEDqhCdg8HcbifqjR3UZsfar/t0+rJ7HxCdl6aRzoWmkVYE8xtJfLZryTt2VcuWJXub/cIbXESG2DGP56ttfCBwkM7Ha7g3ax3tJ8/LwSa+ItbMZaLz8Q2tN10UQc4R7jGLKncD0LYfyqA00a6AiuyA+vegZdvFUctCCkNTc71Bk6u0VIbASgdTLYfbwWLjCw0iIfiGNjooL5oYuufpNo/F1Mcy9hxVPVqBeCp5uZSTk27Jtz+ILubXS7AN
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(346002)(366004)(376002)(136003)(39860400002)(396003)(451199021)(2906002)(186003)(558084003)(38070700005)(86362001)(33716001)(38100700002)(82960400001)(122000001)(41300700001)(8676002)(8936002)(6486002)(5660300002)(478600001)(54906003)(66946007)(66476007)(4326008)(316002)(71200400001)(6916009)(66556008)(64756008)(76116006)(91956017)(66446008)(9686003)(6512007)(6506007)(26005)(44832011);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Y8iUgIO3/yHmAHekM1T2Q3SkkfQLHWbkY59KgL3HlAocJUXjMzVt5OU+Hfsp?=
+ =?us-ascii?Q?Rsc8l6WBxzEsiISHP5TxT5u7mPdkCEGn+NkD9FcYjDmtuhR6xgJoD4ES4JMa?=
+ =?us-ascii?Q?JODFdFSwERf3s3oS+SuvAnmeb9tP4TlYjbonKkL9CBPa9yAvqvJHU81Q/cWf?=
+ =?us-ascii?Q?0ptwl81NGZHUANX+kll/Kyw50PTE8nCvDjiigOO+hi159TpQG77cuhTFwpkb?=
+ =?us-ascii?Q?E5vFWvM3kF1057J3CFRLj9MJLTcm+rNAec91DZnzW3AnTg0qGOjqKhRG6Ex4?=
+ =?us-ascii?Q?pSSa4YVSmNFB+NmbIzjzpNjLK27S2I252xd3hiumJgQ72dwDBk4OosNqqMI9?=
+ =?us-ascii?Q?rzUdV7UL/uBL/KnQAmrt3cgT+UR1WGVEkOZiDF7Cad1YQJ1lgdYOckLxtN62?=
+ =?us-ascii?Q?IYlmlIwltGYT+d1lcV9P5H/y4bTcISUA5noPi8pxPvw1aqdSUkmrG7M3bdoA?=
+ =?us-ascii?Q?KDUNGbDp6eMEjyB7hYvvt5/4DKGLC//J1H9kntxben17CLNAXwcXjWjwDBkn?=
+ =?us-ascii?Q?8js5tSbCEZ22xABsyFmQt0SlPDV2zcckvzIolIRcd9nUsDoA8CdOP3+J0m0j?=
+ =?us-ascii?Q?rHwsBzcbbbcRx2Upz4H7ahVKyH/fxqrWDdS/q4XIehhen00VUDgcOjK9YfBl?=
+ =?us-ascii?Q?dDqp0hQweXlI4awzqtBy0+hqtSOXMIBP/SPRx8GeSFSDX27ZbE+44O1i5OsN?=
+ =?us-ascii?Q?JSsN7LtmCxAkvLpLpDdquo8ghpcG4vsEFXWq7hOD97icuEQGgJKxmr8QLezF?=
+ =?us-ascii?Q?ieWA2lnzHFcxA8sSa1GkgoK6QKVFMtBOmFNI85Ld8qzxc7y89J3k3VwR5Q+I?=
+ =?us-ascii?Q?DAekVz0PpzIg/sfrI5mQ75DkW9lTx514CIDe/d/j2yXaY/sTXjDyWPx3nVHe?=
+ =?us-ascii?Q?K90/YlVl+cUefOfaU06oFApv4CrkoEF3hFU5+L7XNZUAvo51WcdMbu7Cd3QC?=
+ =?us-ascii?Q?1arWc5dXaoDJlAMrMPTPnZ+ITmk6jhmtS8wVBf14mDJaHnzMjapZFi+a6359?=
+ =?us-ascii?Q?NEA3MJI/ATEuGna2JIurNV7K3d8edGulqhXJM0Kkgv2PYERXa6f4UUx0U5pi?=
+ =?us-ascii?Q?dSkPVjF5/QmzZ31BP91Z8rBoLalzBaUHe5y8dgemr/cl1Fwbathhy/a3kr3E?=
+ =?us-ascii?Q?FXT/5tS3Mxh8eHnlob2yGLA99Pq2fCxVg/db4a+uEYJ8M3HJwCSnFCKakkeW?=
+ =?us-ascii?Q?cOUm4JBJ+PGJQtX3RZBYciqzNpQlZ4HL1opn2qykkXKUfL8QKN0YIdC7RnqA?=
+ =?us-ascii?Q?o5mM1LLi+RHHn0I25uHu17qLHElvvQ/wfy1P/QpT/4XbcI4zVSLKfFToGLO2?=
+ =?us-ascii?Q?cSENuCIE7k0ihX/PKNJMmYle6xJ78pI1VGSRclm5uSK+u/DXBhPA2lj0vWvq?=
+ =?us-ascii?Q?LAekuLYEgmAnZGsldKwt05biylz2wfATXQvuzkui3mTKe7hsnmzLk+PjsJDj?=
+ =?us-ascii?Q?8AAxI7i5+CFDmivUoNqSlGhfJ6ENulbH4eg29YL8lEPVhPwawu1UfUqIRzbv?=
+ =?us-ascii?Q?7XiHJ7yHRUysmrogh2+cIeO4GtFnuEGwHnqwzf7LdVmuZ85vbtZags0/qXyq?=
+ =?us-ascii?Q?/twgPhqB83NtP64nMXV9YLAO0oYk9EEG5mDrkLsMmwD/E7EDdeL7BFYb4xv/?=
+ =?us-ascii?Q?ucp7sQE/FXObqG9vdhfbu/k=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <F59D6B451DA1FC418FDAA0281DE11393@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG9=OMNhCNFhTcktxSMYbc5WXkSZ-vVVPtb4ak6B3Z2-kEVX0Q@mail.gmail.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: F2Jy08FgpiAGXRRgWeryNEYwK2o8098md3Oz0oIFMriY8bjIQZXf6kN0AbSliVyyWLusj/05at0Lrv7USpMPcGdnKXFt/zE16lHqwzek5TrYQeNvNGRpmGMnj3XPKdbfaR5mJuvNdenlWP3W5iVwj3EmOwqJ5FGvNMoYs3g83JQaIFv+T7QEZC7yk7gOx7FdwiFYbrx0kq817nPp++luDD3I0XwAj/YF1vCcmB/bO5azyA+PMvubLCO4s7Lh+QhCgcoaq0IRz+F4/sZVXsjS4tq5Pkl56dK5XJS4VlmVCkMuZYemKmobuSn/0xBvKuj49e7MSS/HtwcCBBL/7COB0OWqm0Pusxe7n2RsTtL7dVELGfXEwym589ENjZ50DK7bm7ly9B+6tRmu70g49g3upxydcAAPbjaT8No1AoNEbr8icC1qsfOPbTP53kB86md/TamiFkjMLFOMCvApiRBuBjMVas9XTgmjz8F3zC/d+Gjp5tc1f3m4ZZ1WvxCWN4OrsggcsP9NiPo9yxKx/sw7YXbnY2wAcw7Bf4TlNPe8uOYw0YlqC827xpPaWDJ/kYVCPrdhq2LYvxa4xIjIJj9tjKuioRsqRWXiZMz1Thh33EoPgx3HcqF6foHHb2tcfZ1Z64HQt8HZQTnyyGF8iJtPMZrXlBK4Q0ib/dRr43ImGT9ILnNA+l8Oi1Ka1ajGEwc9ON6SbPfo8OhfSpRgUC/F5fa7Lgb7Wi3BXvZMYdlz7gtr3tOzZXDU6A06H/Oe59SCWasPfuJKCZP6wGUgQAYZw/G82w1MWScXPRnPXjokbzbgqhTKEPwh+qk49rCSOwpx5i4JWlvLMunpk9uurDE46Q==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15cbb539-bda6-4280-df31-08db5d8e2d03
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 May 2023 02:09:02.4644
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qo8mSTADWd+VL8cgV5yKuGwHRbSh2r3uGoYsaG4XAqd3gJg1rEfZ6CDv/vbPmR1NoMsFaDjwOrasr144TomRgO+Qn9QpCPKNWQ8f0io0EQI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6301
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 03:47:21PM -0700, Sarthak Kukreti wrote:
-> On Thu, May 25, 2023 at 9:00 AM Mike Snitzer <snitzer@kernel.org> wrote:
-> > On Thu, May 25 2023 at  7:39P -0400,
-> > Dave Chinner <david@fromorbit.com> wrote:
-> > > On Wed, May 24, 2023 at 04:02:49PM -0400, Mike Snitzer wrote:
-> > > > On Tue, May 23 2023 at  8:40P -0400,
-> > > > Dave Chinner <david@fromorbit.com> wrote:
-> > > > > It's worth noting that XFS already has a coarse-grained
-> > > > > implementation of preferred regions for metadata storage. It will
-> > > > > currently not use those metadata-preferred regions for user data
-> > > > > unless all the remaining user data space is full.  Hence I'm pretty
-> > > > > sure that a pre-provisioning enhancment like this can be done
-> > > > > entirely in-memory without requiring any new on-disk state to be
-> > > > > added.
-> > > > >
-> > > > > Sure, if we crash and remount, then we might chose a different LBA
-> > > > > region for pre-provisioning. But that's not really a huge deal as we
-> > > > > could also run an internal background post-mount fstrim operation to
-> > > > > remove any unused pre-provisioning that was left over from when the
-> > > > > system went down.
-> > > >
-> > > > This would be the FITRIM with extension you mention below? Which is a
-> > > > filesystem interface detail?
-> > >
-> > > No. We might reuse some of the internal infrastructure we use to
-> > > implement FITRIM, but that's about it. It's just something kinda
-> > > like FITRIM but with different constraints determined by the
-> > > filesystem rather than the user...
-> > >
-> > > As it is, I'm not sure we'd even need it - a preiodic userspace
-> > > FITRIM would acheive the same result, so leaked provisioned spaces
-> > > would get cleaned up eventually without the filesystem having to do
-> > > anything specific...
-> > >
-> > > > So dm-thinp would _not_ need to have new
-> > > > state that tracks "provisioned but unused" block?
-> > >
-> > > No idea - that's your domain. :)
-> > >
-> > > dm-snapshot, for certain, will need to track provisioned regions
-> > > because it has to guarantee that overwrites to provisioned space in
-> > > the origin device will always succeed. Hence it needs to know how
-> > > much space breaking sharing in provisioned regions after a snapshot
-> > > has been taken with be required...
-> >
-> > dm-thinp offers its own much more scalable snapshot support (doesn't
-> > use old dm-snapshot N-way copyout target).
-> >
-> > dm-snapshot isn't going to be modified to support this level of
-> > hardening (dm-snapshot is basically in "maintenance only" now).
+On May 24, 2023 / 11:06, Xiao Yang wrote:
+> srp test group can be executed with built-in scsi_dh_alua,
+> scsi_dh_emc and scsi_dh_rdac drivers.
+>=20
+> Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
 
-Ah, of course. Sorry for the confusion, I was kinda using
-dm-snapshot as shorthand for "dm-thinp + snapshots".
-
-> > But I understand your meaning: what you said is 100% applicable to
-> > dm-thinp's snapshot implementation and needs to be accounted for in
-> > thinp's metadata (inherent 'provisioned' flag).
-
-*nod*
-
-> A bit orthogonal: would dm-thinp need to differentiate between
-> user-triggered provision requests (eg. from fallocate()) vs
-> fs-triggered requests?
-
-Why?  How is the guarantee the block device has to provide to
-provisioned areas different for user vs filesystem internal
-provisioned space?
-
-> I would lean towards user provisioned areas not
-> getting dedup'd on snapshot creation,
-
-<twitch>
-
-Snapshotting is a clone operation, not a dedupe operation.
-
-Yes, the end result of both is that you have a block shared between
-multiple indexes that needs COW on the next overwrite, but the two
-operations that get to that point are very different...
-
-</pedantic mode disegaged>
-
-> but that would entail tracking
-> the state of the original request and possibly a provision request
-> flag (REQ_PROVISION_DEDUP_ON_SNAPSHOT) or an inverse flag
-> (REQ_PROVISION_NODEDUP). Possibly too convoluted...
-
-Let's not try to add everyone's favourite pony to this interface
-before we've even got it off the ground.
-
-It's the simple precision of the API, the lack of cross-layer
-communication requirements and the ability to implement and optimise
-the independent layers independently that makes this a very
-appealing solution.
-
-We need to start with getting the simple stuff working and prove the
-concept. Then once we can observe the behaviour of a working system
-we can start working on optimising individual layers for efficiency
-and performance....
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Applied, thanks!=
