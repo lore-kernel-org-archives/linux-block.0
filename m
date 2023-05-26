@@ -2,85 +2,80 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D11C77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE56C7EE2D
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:35:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236850AbjEZIe4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 04:34:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37448 "EHLO
+        id S242693AbjEZIft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 04:35:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242730AbjEZIep (ORCPT
+        with ESMTP id S242600AbjEZIfs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 04:34:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA0CE18D
-        for <linux-block@vger.kernel.org>; Fri, 26 May 2023 01:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685090036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HZdbB846VP2Mif8vkzLshswwvIDgJcVcn/Vxjtn6SVU=;
-        b=iKea04jW38VtApRpESOwMuC1Xdm8YTzVdkVnRdSCFf+CbY7Dx49+qAZ3Kya6JUwzqNnhGL
-        ev2ajUzZiq0i3VxDD/1vXOwXxKsAQUF9ZOeKqM+m2TSEm8ObHH3zpR6nxT/KbBqUHEOWgs
-        GJtV8Dl4QmZODWhgi8xyy4FEctdGOd0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-31-7sMtwyH8MCSL5zzDtp_gYw-1; Fri, 26 May 2023 04:33:51 -0400
-X-MC-Unique: 7sMtwyH8MCSL5zzDtp_gYw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 626FE1C04180;
-        Fri, 26 May 2023 08:33:50 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E3E5C200AD47;
-        Fri, 26 May 2023 08:33:47 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <ZHBtGJ3SzJtr5HZP@infradead.org>
-References: <ZHBtGJ3SzJtr5HZP@infradead.org> <20230525223953.225496-1-dhowells@redhat.com> <20230525223953.225496-4-dhowells@redhat.com>
+        Fri, 26 May 2023 04:35:48 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58276199;
+        Fri, 26 May 2023 01:35:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=cU4HbZ0Ihk69KMRkjUWIN8WBPWiQau/75Wx/UKV6Xy8=; b=NbqKOjNGXmKVkdSnQezuWV1eT5
+        shzgQn36kaoEabnbYb/Jyz3Rdfyo4i9Gt9NcFEgBW4SxCR9JG+o+jSKnUKh34k8rrj8nhlDQulx6y
+        6VreloRZ4j6ECTgnH6aVsJIOwYtIqjD5EVkDYaakhcl9aFDyVUPVL/7qPbXwjDPiuKZjBAJ0h2p/c
+        AeN+fmkiyu4Cusz7HUAP0Hz6pvjMNSt5HsMgL8MBhbG43QEg+Ri3e8GndeuvIjNy1idYUYW6cxIiL
+        jsCIs6TkJFVD5KST6G7qRiRVkM5o6ra1UpwTs2oEuwtb9GLGqQOM7RcaspSqneNmqabaORhr7WwZy
+        Stg1KBDw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q2Sv2-001cm2-0Z;
+        Fri, 26 May 2023 08:35:28 +0000
+Date:   Fri, 26 May 2023 01:35:28 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, David Hildenbrand <david@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [RFC PATCH v2 3/3] block: Use iov_iter_extract_pages() and page pinning in direct-io.c
+Cc:     hughd@google.com, akpm@linux-foundation.org, willy@infradead.org,
+        brauner@kernel.org, djwong@kernel.org, p.raghav@samsung.com,
+        da.gomez@samsung.com, rohan.puri@samsung.com,
+        rpuri.linux@gmail.com, a.manzanares@samsung.com, dave@stgolabs.net,
+        yosryahmed@google.com, keescook@chromium.org, hare@suse.de,
+        kbusch@kernel.org, patches@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC v2 0/8] add support for blocksize > PAGE_SIZE
+Message-ID: <ZHBvUNqKEyszpJKT@bombadil.infradead.org>
+References: <20230526075552.363524-1-mcgrof@kernel.org>
+ <ZHBqfyPUR4B2GNsF@infradead.org>
+ <ZHBrS4hTZZn3w4tF@bombadil.infradead.org>
+ <ZHBtk3mmupubbWyc@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <520476.1685090027.1@warthog.procyon.org.uk>
-Date:   Fri, 26 May 2023 09:33:47 +0100
-Message-ID: <520477.1685090027@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZHBtk3mmupubbWyc@infradead.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+On Fri, May 26, 2023 at 01:28:03AM -0700, Christoph Hellwig wrote:
+> On Fri, May 26, 2023 at 01:18:19AM -0700, Luis Chamberlain wrote:
+> > On Fri, May 26, 2023 at 01:14:55AM -0700, Christoph Hellwig wrote:
+> > > On Fri, May 26, 2023 at 12:55:44AM -0700, Luis Chamberlain wrote:
+> > > > This is an initial attempt to add support for block size > PAGE_SIZE for tmpfs.
+> > > 
+> > > The concept of a block size doesn't make any sense for tmpfs.   What
+> > > are you actually trying to do here?
+> > 
+> > More of helping to test high order folios for tmpfs. Swap for instance
+> > would be one thing we could use to test.
+> 
+> I'm still not sure where the concept of a block size would come in here.
 
-> I'm not seeing where we skip the unpin of the zero page, as commented
-> in patch 1 (but maybe I'm not reviewing carefully enough as I'm at a
-> conference right now).
+From a filesystem perspective that's what we call it as well today, and
+tmpfs implements a simple one, just that indeed this just a high order
+folio support. The languge for blocksize was used before my patches for the
+sb->s_blocksize and sb->s_blocksize_bits. Even for shmem_statfs()
+buf->f_bsize.
 
-It's done by unpin_user_page{,s}(), hidden away in gup.c.  See the commit
-message for patch 1:
+I understand we should move the sb->s_blocksize to the block_device
+and use the page order for address_space, but we can't negate the
+existing stuff there immediately.
 
-	Make pin_user_pages*() leave a ZERO_PAGE unpinned if it extracts a
-	pointer to it from the page tables and make unpin_user_page*()
-	correspondingly ignore a ZERO_PAGE when unpinning.
-
-David
-
+  Luis
