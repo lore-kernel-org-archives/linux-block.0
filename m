@@ -2,59 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1A1C7EE2D
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B20C77B7A
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 08:15:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242358AbjEZIOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 04:14:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55560 "EHLO
+        id S236867AbjEZIPG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 04:15:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236852AbjEZIOD (ORCPT
+        with ESMTP id S236850AbjEZIPF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 04:14:03 -0400
+        Fri, 26 May 2023 04:15:05 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8422128;
-        Fri, 26 May 2023 01:13:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E584D9;
+        Fri, 26 May 2023 01:15:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=LD/oWd/+mUj05u7ro37NQInoFL
-        QzOw/tkYA8cVHDX+8VYtqDDKsM8OF05TnEUZx6NkzwaoN6OKUQAZJV8bkH41SMqO8dkQiogL53on9
-        oGdLGmmKwtwfXwxOgpUBRjTOSi7VN2TtkHQI5QOFNgLJsKY70Td+PpxZPdYun+JdJPmInaFuVTou+
-        cxx2GDaEkVUCw6GgAS+3fCiOb4NrG7orVCeA4t1x7IE24+c2eoYcddQeqDJmjo0iQjOcgFWaQCbqq
-        6qSd+rSBRbQ8QJPvXdLtfoQC1oVaNYbInTaTaPEVhKwja5Gzbn10nhYW9T1C1gWHoZn5YHKTC+iiv
-        bWNDgIlg==;
+        bh=/LDnVeeKch0nDkcJiHzeVDWqC1m/deVrVItZ5d48J7o=; b=dAbz9GGYrExV5edRPunAjolEZQ
+        WFKsZKWAZJnuLleTCz/VVj+eXCWAn8UxjUjoZM/uAJnWTkKaLYj0udaFwvKzQ8zaCuAkZr3AjAbAq
+        W31Grs1G99VSdxdCeYMCpfMXju0ATeHlGmheau2YJMbkEiC+AsOWFt+whU13yilOPwQtnGgVNMANc
+        0W1EPe+6LJLc659gPmJ0Tjb51SF8xSxiMdKnvVKN//GdqK+ZA5DAt3Nm+qkt7Djn7OnCOzUHFXXbo
+        j74Mbl5MTGc3hdGMXXDolWqxh1kGOK8vTtJceJFTxtd3DsAm0QXgMIU497B2hgLaTZ9mFJsGDcFh/
+        5YpoXT+g==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q2Sa5-001ZC5-2F;
-        Fri, 26 May 2023 08:13:49 +0000
-Date:   Fri, 26 May 2023 01:13:49 -0700
+        id 1q2Sb9-001ZLi-1W;
+        Fri, 26 May 2023 08:14:55 +0000
+Date:   Fri, 26 May 2023 01:14:55 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, hch@infradead.org,
-        djwong@kernel.org, minchan@kernel.org, senozhatsky@chromium.org,
-        patches@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        willy@infradead.org, hare@suse.de, p.raghav@samsung.com,
+Cc:     hughd@google.com, akpm@linux-foundation.org, willy@infradead.org,
+        brauner@kernel.org, djwong@kernel.org, p.raghav@samsung.com,
         da.gomez@samsung.com, rohan.puri@samsung.com,
-        rpuri.linux@gmail.com, kbusch@kernel.org
-Subject: Re: [PATCH v2 3/5] iomap: simplify iomap_init() with PAGE_SECTORS
-Message-ID: <ZHBqPbMCsNHVRvkt@infradead.org>
-References: <20230526073336.344543-1-mcgrof@kernel.org>
- <20230526073336.344543-4-mcgrof@kernel.org>
+        rpuri.linux@gmail.com, a.manzanares@samsung.com, dave@stgolabs.net,
+        yosryahmed@google.com, keescook@chromium.org, hare@suse.de,
+        kbusch@kernel.org, patches@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC v2 0/8] add support for blocksize > PAGE_SIZE
+Message-ID: <ZHBqfyPUR4B2GNsF@infradead.org>
+References: <20230526075552.363524-1-mcgrof@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230526073336.344543-4-mcgrof@kernel.org>
+In-Reply-To: <20230526075552.363524-1-mcgrof@kernel.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Fri, May 26, 2023 at 12:55:44AM -0700, Luis Chamberlain wrote:
+> This is an initial attempt to add support for block size > PAGE_SIZE for tmpfs.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+The concept of a block size doesn't make any sense for tmpfs.   What
+are you actually trying to do here?
+
