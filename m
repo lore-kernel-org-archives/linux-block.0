@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF14C7EE31
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0DC1C7EE33
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 07:33:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242419AbjEZHdo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 03:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60490 "EHLO
+        id S242428AbjEZHdp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 03:33:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbjEZHdn (ORCPT
+        with ESMTP id S242409AbjEZHdn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 26 May 2023 03:33:43 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D84B6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDE3116;
         Fri, 26 May 2023 00:33:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=23YpyXCnG95trpP/pZ5n4GhJ2jHSbd6X9bDByt1pjCI=; b=1pmptwQdQfDrJXHTJIIak+p56N
-        nZDFIQCxxcIxw0zUKarHhboTE6oY7rvTOgGfiswmsjC5CWW8lOGwJ9B5AeQkCpBGux3R65tB+k27i
-        P0vmdsjYL3A3dM9V9slp2BqgHODGy/QH4BFYSeTt8omfsUwrWvOq2scl47MGO3EOySrYqMO7TXK3f
-        mcggnMJmh8lWXyude7lxcrYzLdmf6LD5lAWFgWWQ97kY0Fr+9zfUTGxbeAVryzFYAmYle936W9M7+
-        lbtmgWmxGlHTbwW0x4N0xCtJcJMISx+JewfMyrmz0ftBPLkT8DvX5h3pcFpy/B1olU2EFewhzzf1c
-        At6yXbow==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=E+NZJmg2wGtl9UTyedalDySM8eWxNnKVjwcpkkZSi1c=; b=k7xswGivErozFTM0k3Rp4cWzQN
+        Dude5lKSUZQHlx044tzpe9pekiIonmIyRsCOSAE/ne2v3XWULeyuNagveDJKhCzwzIwpSet/GGPTJ
+        8L/umLYOEmo939tVe8b1LzFSz79yTjVEuVIgi+ODI0gNHPJzRXAzmGEU0uy4w/FXD8FDw1HodRkaX
+        btZ7Pstk2ZQrBoYKCxDF4cnrUuEu7/zPG5VMnZ4MmRE8wjWzPVYHyD4I14U/h9QOMlW+outkkAGYH
+        SVGlcZvTv6O1xgbkdMhgnkGWCImDJG2q5kh2QMmZXxgVfAIEwdNjbjI5gtlCTmuU6FJUWDjjt1SoK
+        m8YH8JIg==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q2RxA-001RdO-2w;
-        Fri, 26 May 2023 07:33:36 +0000
+        id 1q2RxB-001RdY-0Z;
+        Fri, 26 May 2023 07:33:37 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
         philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
@@ -40,48 +40,51 @@ Cc:     patches@lists.linux.dev, linux-block@vger.kernel.org,
         willy@infradead.org, hare@suse.de, p.raghav@samsung.com,
         da.gomez@samsung.com, rohan.puri@samsung.com,
         rpuri.linux@gmail.com, kbusch@kernel.org, mcgrof@kernel.org
-Subject: [PATCH v2 0/5] block: simplify with PAGE_SECTORS_SHIFT
-Date:   Fri, 26 May 2023 00:33:31 -0700
-Message-Id: <20230526073336.344543-1-mcgrof@kernel.org>
+Subject: [PATCH v2 4/5] dm bufio: simplify by using PAGE_SECTORS_SHIFT
+Date:   Fri, 26 May 2023 00:33:35 -0700
+Message-Id: <20230526073336.344543-5-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20230526073336.344543-1-mcgrof@kernel.org>
+References: <20230526073336.344543-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A bit of block drivers have their own incantations with
-PAGE_SHIFT - SECTOR_SHIFT. Just simplfy and use PAGE_SECTORS_SHIFT
-all over.
-                                                                                                                                                                                              
-Based on linux-next next-20230525.
+The PAGE_SHIFT - SECTOR_SHIFT constant be replaced with PAGE_SECTORS_SHIFT
+defined in linux/blt_types.h, which is included by linux/blkdev.h.
 
-Changes since v1:
+This produces no functional changes.
 
- o keep iomap math visibly simple
- o Add tags for Reviews/acks
- o rebase onto next-20230525
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ drivers/md/dm-bufio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Luis Chamberlain (5):
-  block: annotate bdev_disk_changed() deprecation with a symbol
-    namespace
-  drbd: use PAGE_SECTORS_SHIFT and PAGE_SECTORS
-  iomap: simplify iomap_init() with PAGE_SECTORS
-  dm bufio: simplify by using PAGE_SECTORS_SHIFT
-  zram: use generic PAGE_SECTORS and PAGE_SECTORS_SHIFT
-
- block/partitions/core.c          |  6 +-----
- drivers/block/drbd/drbd_bitmap.c |  4 ++--
- drivers/block/loop.c             |  2 ++
- drivers/block/zram/zram_drv.c    | 12 ++++++------
- drivers/block/zram/zram_drv.h    |  2 --
- drivers/md/dm-bufio.c            |  4 ++--
- drivers/s390/block/dasd_genhd.c  |  2 ++
- fs/iomap/buffered-io.c           |  2 +-
- 8 files changed, 16 insertions(+), 18 deletions(-)
-
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index eea977662e81..08c4730e1819 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -1152,7 +1152,7 @@ static void *alloc_buffer_data(struct dm_bufio_client *c, gfp_t gfp_mask,
+ 	    gfp_mask & __GFP_NORETRY) {
+ 		*data_mode = DATA_MODE_GET_FREE_PAGES;
+ 		return (void *)__get_free_pages(gfp_mask,
+-						c->sectors_per_block_bits - (PAGE_SHIFT - SECTOR_SHIFT));
++						c->sectors_per_block_bits - (PAGE_SECTORS_SHIFT));
+ 	}
+ 
+ 	*data_mode = DATA_MODE_VMALLOC;
+@@ -1190,7 +1190,7 @@ static void free_buffer_data(struct dm_bufio_client *c,
+ 
+ 	case DATA_MODE_GET_FREE_PAGES:
+ 		free_pages((unsigned long)data,
+-			   c->sectors_per_block_bits - (PAGE_SHIFT - SECTOR_SHIFT));
++			   c->sectors_per_block_bits - (PAGE_SECTORS_SHIFT));
+ 		break;
+ 
+ 	case DATA_MODE_VMALLOC:
 -- 
 2.39.2
 
