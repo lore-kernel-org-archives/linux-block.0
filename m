@@ -2,58 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 850B8C77B7C
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 05:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE105C77B7C
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 05:51:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbjEZFgC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 01:36:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43368 "EHLO
+        id S233844AbjEZFvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 01:51:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233008AbjEZFgB (ORCPT
+        with ESMTP id S229523AbjEZFvA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 01:36:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D941A4;
-        Thu, 25 May 2023 22:36:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 26 May 2023 01:51:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6EC79E
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 22:50:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685080216;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/O7DGmGJR82LWQJp/HEBcwGojM1nXH9A+INA+Yqn88c=;
+        b=XzUEyGs2KMERiexIHc5SxjPHlAIJh+SY5m9CTdjEIyfzIVT5WuYjDyUgmgKGhapvnxS1Sx
+        yj/D5Dfv6Lhjl+lsprVx9DqENvP2jKGS5+7zGHNYP8a+zKOuc5cEze3Oi5W/x3vKdNNe8x
+        UQQdy64XC2qktQYo9pKlMY822QS+kkQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-465-6hOkj_HvOiqRrtk900f66Q-1; Fri, 26 May 2023 01:50:13 -0400
+X-MC-Unique: 6hOkj_HvOiqRrtk900f66Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 944F464CC2;
-        Fri, 26 May 2023 05:35:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C24D6C4339B;
-        Fri, 26 May 2023 05:35:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685079359;
-        bh=SBy/V1XGvQa9U7b0SSSlskCOsczWK9EZtJih3sffwtk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ojcFBIDzo6GTdw8CASYmJXXIKgRmqwnKiReeAlMViuuagW/rSQH0e3EFafEDyU2ob
-         MiJX0go5Kvk8AFDECpL24C23WMzHjksUYKLw2xJ46yJB79XGCG7HptODIKI+q6ah3y
-         gSZciHVlOVEnxgva3IFZwXoAvQnlmqwdFL9Q72cyVZoswDXme7x2W5l9/Qm0+pPw4w
-         xb5Lczon18dzSrh+RLtnMFsY3TkbB48Als+8wmRuQaTgcsHRVgsSgZglYw2DDe+Ojg
-         wyJtRbXbXh4r5s06TF71vsCo53Lw6sCNGRg6v2eiA1n24mOBvikwza698Tly2EBpNh
-         FcRw1EdK6t1dg==
-Date:   Thu, 25 May 2023 22:35:57 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Zhong Jinghua <zhongjinghua@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yukuai3@huawei.com
-Subject: Re: [PATCH -next v2] block: Fix the partition start may overflow in
- add_partition()
-Message-ID: <20230526053557.GA875@sol.localdomain>
-References: <20230525072041.3701176-1-zhongjinghua@huawei.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9227A85A5A8;
+        Fri, 26 May 2023 05:50:12 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.39.192.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA6072166B2B;
+        Fri, 26 May 2023 05:50:09 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=win3ttfr2xb1JcGroPSOoqGs0GooZq0DLsRtZzXUH5YeQ@mail.gmail.com>
+References: <CAHk-=win3ttfr2xb1JcGroPSOoqGs0GooZq0DLsRtZzXUH5YeQ@mail.gmail.com> <20230525223953.225496-1-dhowells@redhat.com> <20230525223953.225496-3-dhowells@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [RFC PATCH v2 2/3] mm: Provide a function to get an additional pin on a page
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230525072041.3701176-1-zhongjinghua@huawei.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <231194.1685080209.1@warthog.procyon.org.uk>
+Date:   Fri, 26 May 2023 06:50:09 +0100
+Message-ID: <231195.1685080209@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 03:20:41PM +0800, Zhong Jinghua wrote:
-> +	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
-> +		return -EINVAL;
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-Were zero-length partitions allowed before?
+> > +       if (page == ZERO_PAGE(0))
+> > +               return;
+> 
+> You added that nice "is_zero_folio()", and then you did the above anyway..
 
-- Eric
+Bah.  Missed it because it was in a different patch.
+
+David
+
