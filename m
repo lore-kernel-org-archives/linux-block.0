@@ -2,108 +2,198 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66225C77B7A
-	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 00:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4C1C7EE2E
+	for <linux-block@archiver.kernel.org>; Fri, 26 May 2023 01:36:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235290AbjEZAul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 May 2023 20:50:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48566 "EHLO
+        id S241879AbjEZBgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 May 2023 21:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbjEZAuk (ORCPT
+        with ESMTP id S241821AbjEZBgQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 May 2023 20:50:40 -0400
-Received: from out-28.mta1.migadu.com (out-28.mta1.migadu.com [95.215.58.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D5412E
-        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 17:50:39 -0700 (PDT)
-Date:   Thu, 25 May 2023 20:50:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685062237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XccFcqhRV9oVZ2BhjoWlowoz0O43NBdleRYrqpo+tGk=;
-        b=te1MA/PDmp4dIRH1TY49m1pWccvyo+kxGKHIAX3+k8t98qQbEiPCWJYi4Gkczlt1aIn7En
-        cHq/akYRgnPKxFNi2vHECVpzXGpjZ3XraNt/Yalda8BuacVJcdSo4hYF5j3kzlTDgdIB0w
-        GQUPt6jslW3+faac2EkPdAimK2RxUyY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Kent Overstreet <kent.overstreet@linux.dev>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH 5/7] block: Rework bio_for_each_folio_all()
-Message-ID: <ZHACWWNIUR6Ohh/8@moria.home.lan>
-References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
- <20230525214822.2725616-6-kent.overstreet@linux.dev>
- <ZG/+88/G+hX5DyCX@dread.disaster.area>
+        Thu, 25 May 2023 21:36:16 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D7519A
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 18:36:13 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-64d30ab1ef2so333881b3a.2
+        for <linux-block@vger.kernel.org>; Thu, 25 May 2023 18:36:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1685064973; x=1687656973;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bR3UToISzSLbX8ZQkHUE42zju/u1Pd13Qxkfw1ihU0s=;
+        b=xBykKLfgpBaSvfRX3A2+FxT1KMrbnM15im+s6pEISEci1JWoy+6UGBvACHOKnzsNQr
+         afk90Xh/M4D33/CZyC3EusZmqc1ApG7JjLCpW6aX3SWhZt9ZYbyqO7WMBxqRgMWFTHtq
+         HSdOCN6vwq8iD2sZuRhSnYIqjspgSjnwj/JJkdgbMcgZZCUfDvhe0451GrKyYqY5eIvT
+         gbFjo76t5wzNhvbQD1+eZ6JBj+DjthvcCoZA0AU3MkAccbMC5I/5OCQHLQBwb95rcN0F
+         aZC1+itQVaJaNWNgoirfbLXH3K81rFtIImWJ/54lSzn69rMSJfSeM4eOwdpVzh8fi8GZ
+         2dwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685064973; x=1687656973;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bR3UToISzSLbX8ZQkHUE42zju/u1Pd13Qxkfw1ihU0s=;
+        b=eYnwQ56qwLrOwCeofhwuhQZmxAwH0OuSODsewDVwEaePLlDDPoE5fSMoirABSCa4wr
+         soa7KinyfmUq8KqFoHiK2O8PldxOZMtNYfNK/ZDAkmisQjgnKdQ2eLYzzEXHTuh1C3cF
+         fer2XJQPt/x5n7TcsELxhmna3izQBfjoSKYcQn5H6IUEOVsc577OfxKm04Yk/zoiKlfB
+         oKxILrKhewBWqCa6y0/QvYH1A0BjsI7rKRYyPiZ+b7T9waAyED0ImIKR6AgASvY3AOKy
+         YV6kgaBTIC2sN9Gi8vP1O8fRNZjgxBpr3J5XnNFNQ2qR2iMSLETO90A+5nsf90rCG/wY
+         uQFw==
+X-Gm-Message-State: AC+VfDwnd4dn39/Pi0OHqMuylJkSvwc9DhkU+ycqDhg0goq4haADu2AQ
+        1yHbY3SKMc6ifPRIGz+StruiUg==
+X-Google-Smtp-Source: ACHHUZ6sPdmuQonaj/olpSGroUfK3OoVqwjZ0hrzZiUIv4Qa66jySy12bySeqpIr9yyQSaUMpmfRQA==
+X-Received: by 2002:a05:6a00:124a:b0:643:96bc:b292 with SMTP id u10-20020a056a00124a00b0064396bcb292mr1061741pfi.5.1685064972718;
+        Thu, 25 May 2023 18:36:12 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
+        by smtp.gmail.com with ESMTPSA id g9-20020a62e309000000b0063efe2f3ecdsm1679539pfh.204.2023.05.25.18.36.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 May 2023 18:36:11 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q2MNF-003wt9-15;
+        Fri, 26 May 2023 11:36:09 +1000
+Date:   Fri, 26 May 2023 11:36:09 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     Mike Snitzer <snitzer@kernel.org>, Joe Thornber <ejt@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZHANCbnHuhnwCrGz@dread.disaster.area>
+References: <ZGeKm+jcBxzkMXQs@redhat.com>
+ <ZGgBQhsbU9b0RiT1@dread.disaster.area>
+ <ZGu0LaQfREvOQO4h@redhat.com>
+ <ZGzIJlCE2pcqQRFJ@bfoster>
+ <ZGzbGg35SqMrWfpr@redhat.com>
+ <ZG1dAtHmbQ53aOhA@dread.disaster.area>
+ <ZG5taYoXDRymo/e9@redhat.com>
+ <ZG9JD+4Zu36lnm4F@dread.disaster.area>
+ <ZG+GKwFC7M3FfAO5@redhat.com>
+ <CAG9=OMNhCNFhTcktxSMYbc5WXkSZ-vVVPtb4ak6B3Z2-kEVX0Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZG/+88/G+hX5DyCX@dread.disaster.area>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG9=OMNhCNFhTcktxSMYbc5WXkSZ-vVVPtb4ak6B3Z2-kEVX0Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 26, 2023 at 10:36:03AM +1000, Dave Chinner wrote:
-> On Thu, May 25, 2023 at 05:48:20PM -0400, Kent Overstreet wrote:
-> > This reimplements bio_for_each_folio_all() on top of the newly-reworked
-> > bvec_iter_all, and since it's now trivial we also provide
-> > bio_for_each_folio.
-> > 
-> > Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
-> > Cc: Matthew Wilcox <willy@infradead.org>
-> > Cc: linux-block@vger.kernel.org
-> > ---
-> >  fs/crypto/bio.c        |  9 +++--
-> >  fs/iomap/buffered-io.c | 14 ++++---
-> >  fs/verity/verify.c     |  9 +++--
-> >  include/linux/bio.h    | 91 +++++++++++++++++++++---------------------
-> >  include/linux/bvec.h   | 15 +++++--
-> >  5 files changed, 75 insertions(+), 63 deletions(-)
-> ....
-> > diff --git a/include/linux/bio.h b/include/linux/bio.h
-> > index f86c7190c3..7ced281734 100644
-> > --- a/include/linux/bio.h
-> > +++ b/include/linux/bio.h
-> > @@ -169,6 +169,42 @@ static inline void bio_advance(struct bio *bio, unsigned int nbytes)
-> >  #define bio_for_each_segment(bvl, bio, iter)				\
-> >  	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
-> >  
-> > +struct folio_vec {
-> > +	struct folio	*fv_folio;
-> > +	size_t		fv_offset;
-> > +	size_t		fv_len;
-> > +};
-> 
-> Can we drop the "fv_" variable prefix here? It's just unnecessary
-> verbosity when we know we have a folio_vec structure. i.e fv->folio
-> is easier to read and type than fv->fv_folio...
+On Thu, May 25, 2023 at 03:47:21PM -0700, Sarthak Kukreti wrote:
+> On Thu, May 25, 2023 at 9:00 AM Mike Snitzer <snitzer@kernel.org> wrote:
+> > On Thu, May 25 2023 at  7:39P -0400,
+> > Dave Chinner <david@fromorbit.com> wrote:
+> > > On Wed, May 24, 2023 at 04:02:49PM -0400, Mike Snitzer wrote:
+> > > > On Tue, May 23 2023 at  8:40P -0400,
+> > > > Dave Chinner <david@fromorbit.com> wrote:
+> > > > > It's worth noting that XFS already has a coarse-grained
+> > > > > implementation of preferred regions for metadata storage. It will
+> > > > > currently not use those metadata-preferred regions for user data
+> > > > > unless all the remaining user data space is full.  Hence I'm pretty
+> > > > > sure that a pre-provisioning enhancment like this can be done
+> > > > > entirely in-memory without requiring any new on-disk state to be
+> > > > > added.
+> > > > >
+> > > > > Sure, if we crash and remount, then we might chose a different LBA
+> > > > > region for pre-provisioning. But that's not really a huge deal as we
+> > > > > could also run an internal background post-mount fstrim operation to
+> > > > > remove any unused pre-provisioning that was left over from when the
+> > > > > system went down.
+> > > >
+> > > > This would be the FITRIM with extension you mention below? Which is a
+> > > > filesystem interface detail?
+> > >
+> > > No. We might reuse some of the internal infrastructure we use to
+> > > implement FITRIM, but that's about it. It's just something kinda
+> > > like FITRIM but with different constraints determined by the
+> > > filesystem rather than the user...
+> > >
+> > > As it is, I'm not sure we'd even need it - a preiodic userspace
+> > > FITRIM would acheive the same result, so leaked provisioned spaces
+> > > would get cleaned up eventually without the filesystem having to do
+> > > anything specific...
+> > >
+> > > > So dm-thinp would _not_ need to have new
+> > > > state that tracks "provisioned but unused" block?
+> > >
+> > > No idea - that's your domain. :)
+> > >
+> > > dm-snapshot, for certain, will need to track provisioned regions
+> > > because it has to guarantee that overwrites to provisioned space in
+> > > the origin device will always succeed. Hence it needs to know how
+> > > much space breaking sharing in provisioned regions after a snapshot
+> > > has been taken with be required...
+> >
+> > dm-thinp offers its own much more scalable snapshot support (doesn't
+> > use old dm-snapshot N-way copyout target).
+> >
+> > dm-snapshot isn't going to be modified to support this level of
+> > hardening (dm-snapshot is basically in "maintenance only" now).
 
-That's actually one of the things I like about bio/biovec, it's been
-handy in the past for grepping and block layer refactorings...
+Ah, of course. Sorry for the confusion, I was kinda using
+dm-snapshot as shorthand for "dm-thinp + snapshots".
 
-(I would _kill_ for a tool that let me do that kind of type-aware grep.
-ctags can in theory produce that kind of an index but I never figured
-out how to get vim to use it properly. I believe the lsp-server stuff
-that uses the compiler as a backend can do it; I've started using that
-stuff for Rust coding and it works amazingly, don't think I've tried it
-for struct members - I wonder if that stuff works at all on a codebase
-the size of the kernel or just dies...)
+> > But I understand your meaning: what you said is 100% applicable to
+> > dm-thinp's snapshot implementation and needs to be accounted for in
+> > thinp's metadata (inherent 'provisioned' flag).
 
-> Hmmm, this is probably not a good name considering "struct pagevec" is
-> something completely different - the equivalent is "struct
-> folio_batch" but I can see this being confusing for people who
-> largely expect some symmetry between page<->folio naming
-> conventions...
+*nod*
 
-Yeah, good point. folio_seg, perhaps?
+> A bit orthogonal: would dm-thinp need to differentiate between
+> user-triggered provision requests (eg. from fallocate()) vs
+> fs-triggered requests?
 
-(I think Matthew may have already made that suggestion...)
+Why?  How is the guarantee the block device has to provide to
+provisioned areas different for user vs filesystem internal
+provisioned space?
 
-> Also, why is this in bio.h and not in a mm/folio related header
-> file?
+> I would lean towards user provisioned areas not
+> getting dedup'd on snapshot creation,
 
-Is it worth moving it there considering it's only used in bio.h/bvec.h?
-Perhaps we could keep it where it's used for now and move it if it gains
-more users?
+<twitch>
+
+Snapshotting is a clone operation, not a dedupe operation.
+
+Yes, the end result of both is that you have a block shared between
+multiple indexes that needs COW on the next overwrite, but the two
+operations that get to that point are very different...
+
+</pedantic mode disegaged>
+
+> but that would entail tracking
+> the state of the original request and possibly a provision request
+> flag (REQ_PROVISION_DEDUP_ON_SNAPSHOT) or an inverse flag
+> (REQ_PROVISION_NODEDUP). Possibly too convoluted...
+
+Let's not try to add everyone's favourite pony to this interface
+before we've even got it off the ground.
+
+It's the simple precision of the API, the lack of cross-layer
+communication requirements and the ability to implement and optimise
+the independent layers independently that makes this a very
+appealing solution.
+
+We need to start with getting the simple stuff working and prove the
+concept. Then once we can observe the behaviour of a working system
+we can start working on optimising individual layers for efficiency
+and performance....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
