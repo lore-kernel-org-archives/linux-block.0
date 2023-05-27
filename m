@@ -2,125 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A9EC77B7A
-	for <linux-block@archiver.kernel.org>; Sat, 27 May 2023 00:03:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AC77C7EE2C
+	for <linux-block@archiver.kernel.org>; Sat, 27 May 2023 01:10:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230025AbjE0ADB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 May 2023 20:03:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40436 "EHLO
+        id S230179AbjE0BKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 May 2023 21:10:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjE0ADA (ORCPT
+        with ESMTP id S230001AbjE0BKT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 May 2023 20:03:00 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 224BCF7;
-        Fri, 26 May 2023 17:02:59 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-ba81deea9c2so1185398276.2;
-        Fri, 26 May 2023 17:02:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685145778; x=1687737778;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZCYb9wPXyJ/3oXy1yCdw5B+8RtjUO1MjS0Wu3M21DUQ=;
-        b=oKcCgQRfKxioZHus4cbkMTbZ0h2JZqWlc5YdRqFRYDbvqayLB5EF5Tp4im5/hgr7YK
-         UAPF/fYyuKkUm5yK/hCBXBbFRjVribyXG0TcdQW7R9dJ2BdrdGx228CIiWAVIn71HcUc
-         wGBMAQbDJuwQ8nE5vnfi07/m9hPih//8/ZigxnOUMSqrZUlshcJ2UsGvfFUqVJqun4I6
-         QzxxXSv5v/NyEba4v5SnfzT9p/3pTc3wuDy5IEOfVqtD4YySPM5i9/h5iM+s1jerpWQu
-         M4EWBecQSlrGayDzuxvxeLXtZfidvTqKfPMttLaUEK8UkYZmBimWcooGKkDNNVWXDZqQ
-         9+2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685145778; x=1687737778;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZCYb9wPXyJ/3oXy1yCdw5B+8RtjUO1MjS0Wu3M21DUQ=;
-        b=Z9Fk4PLK1Bw/YwJ9SYH3VQuq9clJDH2fZozO0RysfIGu7R0e8YY+SLXvuF9Z7Iv6SJ
-         YR2y499MX0RTvBkkwEMLsH0S1/eb3QpZk+GLebOzNRgF0ez3keGsC7GddYO6HENcektC
-         O0BmkeNmiXC2p9Qm4zIFMJ7WNCrpPVLxsw301EwYqV4l5bBHVgN1Fti17Fn6OlIs9ClE
-         m3EM4aSG7dTRQQSSqZmIpci9uxCmHdW35ZnH2ibhlaqrjWnmIXLwpzADK9ktNKw8+zUG
-         jPBBlBFhP8petVMGsPr76JdZLyHfwqglp+2X40zanrppkBO4iXC4GDKFv0JcBfec79OR
-         /aow==
-X-Gm-Message-State: AC+VfDz82fctn1fQ+ysPCbRRCJSAFm79yrELtDzgXlWVGA7//SpkhbJ/
-        Su3/2Lauy0CFFkmJwbmH4eJx808foOMYsZvgPcWps7GKfbz5BQ==
-X-Google-Smtp-Source: ACHHUZ55mKb9FFBN8YKKanHY3XxUX0onBjkJ9eiAieIHAx6sU+QTlxS2t3UFIeX1TssjgdbVoCVu2TbtbTX0tVRVf40=
-X-Received: by 2002:a0d:d9d2:0:b0:561:e9f0:924a with SMTP id
- b201-20020a0dd9d2000000b00561e9f0924amr4006086ywe.28.1685145778280; Fri, 26
- May 2023 17:02:58 -0700 (PDT)
+        Fri, 26 May 2023 21:10:19 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A0119A;
+        Fri, 26 May 2023 18:10:17 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QSkH86Rlhz4f4qLH;
+        Sat, 27 May 2023 09:10:12 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgCH77J0WHFkNZwtKQ--.29147S4;
+        Sat, 27 May 2023 09:10:13 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     hch@lst.de, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next v3 0/5] blk-wbt: minor fix and cleanup
+Date:   Sat, 27 May 2023 09:06:39 +0800
+Message-Id: <20230527010644.647900-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <CADJHv_sedgbfxvZkKHjC6quKvxR+E54noFCVF93MvhyK6bwRoA@mail.gmail.com>
- <97ffe91e-bb31-cceb-fb7e-8f7a2252734f@kernel.org>
-In-Reply-To: <97ffe91e-bb31-cceb-fb7e-8f7a2252734f@kernel.org>
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-Date:   Sat, 27 May 2023 08:02:47 +0800
-Message-ID: <CADJHv_uXXVdog0GsFCTd+eouVAuX_wT9NRKJeUUqfZNvz34b0w@mail.gmail.com>
-Subject: Re: ioprio_set can take 8 as the PROCESS CLASS_BE ioprio value
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     linux-block@vger.kernel.org,
-        Linux-Next <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCH77J0WHFkNZwtKQ--.29147S4
+X-Coremail-Antispam: 1UD129KBjvdXoWruF18KF4rCrWktF1xZFW5KFg_yoWfWrX_WF
+        97JaykG3Z8WFn3CFW2kFn5XFWUKr4Fvr4jvFZ5X3ySyr1fJr1DKws7GrsxZrW3ZF40kF9Y
+        vw1DXF4xJw1SyjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbz8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 26, 2023 at 3:42=E2=80=AFPM Damien Le Moal <dlemoal@kernel.org>=
- wrote:
->
-> On 5/26/23 16:27, Murphy Zhou wrote:
-> > Hi Damien,
-> >
-> > Since these commits:
-> >
-> >   scsi: block: Introduce ioprio hints
-> >   scsi: block: ioprio: Clean up interface definition
-> >
-> > go into linux-next tree, ioprio_set can take the value of 8
-> > as the PROCESS CLASS_BE ioprio parameter, returning
-> > success but actually it is setting to 0 due to the mask roundup.
-> >
-> > The LTP test case ioprio_set03[1] covers this boundary value
-> > testing, which starts to fail since then.
-> >
-> > This does not look as expected. Could you help to take a look?
->
-> Before the patches, the ioprio level of 8 could indeed be set, but that w=
-as
+From: Yu Kuai <yukuai3@huawei.com>
 
-Before the patches, it can't be set to 8 because the check in
-ioprio_check_cap refused it.
-   >=3D IOPRIO_NR_LEVELS
-Before the patches, the value can be greater than 8, so it takes effect.
-After the patches, the value is limited to [0..7], this check always passes=
-.
+Changes in v3:
+ - patch 1 from v2 is sent separately, and it's removd from this series.
+ - add review tag for all the patches.
 
-> actually totally meaningless since the kernel components that use the pri=
-ority
-> level all are limited to the range [0..7]. And why the level value 8 coul=
-d be
-> seen, the effective level would have been 0. So at least, with the change=
-s, we
-> are not lying to the user...
->
-> I am not sure what this ioprio_set03 test is trying to check.
+Changes in v2:
+ - make the code more readable for patch 1
+ - add a new attr_group that is only visible for rq based device
+ - explain in detail for patch 4
+ - add review tag for patch 2,3,5
 
-I guess it is trying to make sure boundary values do not cause uncertaining=
-.
-The test case can be updated according to intended kernel changes. So does
-other user space applications that may depend on this, or there is none of
-them to worry about.
+Yu Kuai (5):
+  blk-wbt: don't create wbt sysfs entry if CONFIG_BLK_WBT is disabled
+  blk-wbt: remove dead code to handle wbt enable/disable with io
+    inflight
+  blk-wbt: cleanup rwb_enabled() and wbt_disabled()
+  blk-iocost: move wbt_enable/disable_default() out of spinlock
+  blk-sysfs: add a new attr_group for blk_mq
 
-Thanks,
-Murphy
->
-> >
-> > Thanks,
-> > Murphy
-> >
-> > [1] https://github.com/linux-test-project/ltp/blob/master/testcases/ker=
-nel/syscalls/ioprio/ioprio_set03.c
->
-> --
-> Damien Le Moal
-> Western Digital Research
->
+ block/blk-iocost.c |   7 +-
+ block/blk-sysfs.c  | 181 ++++++++++++++++++++++++++-------------------
+ block/blk-wbt.c    |  21 +-----
+ block/blk-wbt.h    |  19 -----
+ 4 files changed, 110 insertions(+), 118 deletions(-)
+
+-- 
+2.39.2
+
