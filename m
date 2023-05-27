@@ -2,195 +2,102 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 016B3C77B7C
-	for <linux-block@archiver.kernel.org>; Sat, 27 May 2023 09:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79CCDC77B7C
+	for <linux-block@archiver.kernel.org>; Sat, 27 May 2023 16:09:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231925AbjE0JUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 May 2023 05:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60914 "EHLO
+        id S230419AbjE0QJ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 May 2023 12:09:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbjE0JUv (ORCPT
+        with ESMTP id S231637AbjE0QJx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 May 2023 05:20:51 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6EEE3;
-        Sat, 27 May 2023 02:20:48 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QSx9859Fnz4f3nTh;
-        Sat, 27 May 2023 17:20:44 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rFoy3FkYoRGKQ--.53803S4;
-        Sat, 27 May 2023 17:20:42 +0800 (CST)
-From:   linan666@huaweicloud.com
-To:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linan122@huawei.com,
-        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH] blk-iocost: use spin_lock_irqsave in adjust_inuse_and_calc_cost
-Date:   Sat, 27 May 2023 17:19:04 +0800
-Message-Id: <20230527091904.3001833-1-linan666@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        Sat, 27 May 2023 12:09:53 -0400
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52219C3
+        for <linux-block@vger.kernel.org>; Sat, 27 May 2023 09:09:52 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1ae3fe67980so16843505ad.3
+        for <linux-block@vger.kernel.org>; Sat, 27 May 2023 09:09:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685203791; x=1687795791;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PiQhmIqcu7JM0y3Q8ClGIplJIZSVGBBQywtY0HCYB4s=;
+        b=D2GDINJRK+8osyCKhYv1yRC4kpQ60tojl+wy6FvBj5wNuhPKSkyooDqItIqZf8XVI2
+         SYB2Z9h805au50HXihsEVZkQIuF3Fy4VXxb+Yuv6tKAWEFWwDuG9fieSDln4bvlU4jNX
+         SlaqCIK5mhnUpvlmnMTTCwnswg4YEpOzMHntk6ZJbMqnlWCumhU4uz9epcnwNHlouZ7Z
+         xFf/zPSJpedITlewpYjVPcik+w4X+kEOkSu1msKKVajsdLjybk9FZMXq050D9r2CFO0J
+         D6c3MphEVXxY4u1a4uY81JL7UQcH+/mEFm1f2tntC2K6104mqXfdyfoIMXzQAwgflUxd
+         813Q==
+X-Gm-Message-State: AC+VfDwhYg9oXKamSRl9Np+7BJr0NtB3H+BBEVFHR7HY3B0yZV3BoeCa
+        txtUQTweXZsI7s2dmbAu2U4=
+X-Google-Smtp-Source: ACHHUZ6dY8CPkV1nhNirJn4QiguKDgrOznAOt6vUdERSziinsZ0xkvqGBT+oqbJ8UkZAj6B1tEqiXg==
+X-Received: by 2002:a17:903:249:b0:1ab:d6f:51b0 with SMTP id j9-20020a170903024900b001ab0d6f51b0mr7023897plh.18.1685203791442;
+        Sat, 27 May 2023 09:09:51 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id b4-20020a170902bd4400b001ab0669d84csm5101857plx.26.2023.05.27.09.09.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 May 2023 09:09:50 -0700 (PDT)
+Message-ID: <eb97f471-723f-5c2e-92f6-190986cd51da@acm.org>
+Date:   Sat, 27 May 2023 09:09:49 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rFoy3FkYoRGKQ--.53803S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3AFy3Jr45Cw15Gr1rtFy8uFg_yoW7Xw1kpF
-        43Kry3Ar4jyF10qa10kr1Yqrs8C398u3y7Gr93Ga1fAF45ur13X3WxAFy09FWYgrW3CFW2
-        qF1kt3yrAFsxAw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU92b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487
-        Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aV
-        AFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF
-        7I0E8cxan2IY04v7M4kE6xkIj40Ew7xC0wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYx
-        BIdaVFxhVjvjDU0xZFpf9x07UKoGdUUUUU=
-X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH v5 1/9] block: Use pr_info() instead of printk(KERN_INFO
+ ...)
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, jyescas@google.com,
+        Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
+References: <20230522222554.525229-1-bvanassche@acm.org>
+ <20230522222554.525229-2-bvanassche@acm.org>
+ <ZGv2TP1HZE1kgKlA@bombadil.infradead.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ZGv2TP1HZE1kgKlA@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Li Nan <linan122@huawei.com>
+On 5/22/23 16:10, Luis Chamberlain wrote:
+> On Mon, May 22, 2023 at 03:25:33PM -0700, Bart Van Assche wrote:
+>> Switch to the modern style of printing kernel messages. Use %u instead
+>> of %d to print unsigned integers.
+>>
+>> Cc: Christoph Hellwig <hch@lst.de>
+>> Cc: Ming Lei <ming.lei@redhat.com>
+>> Cc: Keith Busch <kbusch@kernel.org>
+>> Cc: Luis Chamberlain <mcgrof@kernel.org>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>> ---
+>>   block/blk-settings.c | 12 ++++--------
+>>   1 file changed, 4 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/block/blk-settings.c b/block/blk-settings.c
+>> index 896b4654ab00..1d8d2ae7bdf4 100644
+>> --- a/block/blk-settings.c
+>> +++ b/block/blk-settings.c
+>> @@ -127,8 +127,7 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
+>>   
+>>   	if ((max_hw_sectors << 9) < PAGE_SIZE) {
+>>   		max_hw_sectors = 1 << (PAGE_SHIFT - 9);
+>> -		printk(KERN_INFO "%s: set to minimum %d\n",
+>> -		       __func__, max_hw_sectors);
+>> +		pr_info("%s: set to minimum %u\n", __func__, max_hw_sectors);
+> 
+> You may want to then also add at the very top of the file before any
+> includes something like:
+> 
+> #define pr_fmt(fmt) "blk-settings: " fmt
+> 
+> You can see the other defines of pr_fmt on block/*.c
 
-adjust_inuse_and_calc_cost() use spin_lock_irq() and IRQ will be enabled
-when unlock. DEADLOCK might happen if we have held other locks and disabled
-IRQ before invoking it.
+My goal with this patch is *not* to modify the output so I prefer not to 
+define the pr_fmt() macro in this file.
 
-Fix it by using spin_lock_irqsave() instead, which can keep IRQ state
-consistent with before when unlock.
+Thanks,
 
-  ================================
-  WARNING: inconsistent lock state
-  5.10.0-02758-g8e5f91fd772f #26 Not tainted
-  --------------------------------
-  inconsistent {IN-HARDIRQ-W} -> {HARDIRQ-ON-W} usage.
-  kworker/2:3/388 [HC0[0]:SC0[0]:HE0:SE1] takes:
-  ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: spin_lock_irq
-  ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: bfq_bio_merge+0x141/0x390
-  {IN-HARDIRQ-W} state was registered at:
-    __lock_acquire+0x3d7/0x1070
-    lock_acquire+0x197/0x4a0
-    __raw_spin_lock_irqsave
-    _raw_spin_lock_irqsave+0x3b/0x60
-    bfq_idle_slice_timer_body
-    bfq_idle_slice_timer+0x53/0x1d0
-    __run_hrtimer+0x477/0xa70
-    __hrtimer_run_queues+0x1c6/0x2d0
-    hrtimer_interrupt+0x302/0x9e0
-    local_apic_timer_interrupt
-    __sysvec_apic_timer_interrupt+0xfd/0x420
-    run_sysvec_on_irqstack_cond
-    sysvec_apic_timer_interrupt+0x46/0xa0
-    asm_sysvec_apic_timer_interrupt+0x12/0x20
-  irq event stamp: 837522
-  hardirqs last  enabled at (837521): [<ffffffff84b9419d>] __raw_spin_unlock_irqrestore
-  hardirqs last  enabled at (837521): [<ffffffff84b9419d>] _raw_spin_unlock_irqrestore+0x3d/0x40
-  hardirqs last disabled at (837522): [<ffffffff84b93fa3>] __raw_spin_lock_irq
-  hardirqs last disabled at (837522): [<ffffffff84b93fa3>] _raw_spin_lock_irq+0x43/0x50
-  softirqs last  enabled at (835852): [<ffffffff84e00558>] __do_softirq+0x558/0x8ec
-  softirqs last disabled at (835845): [<ffffffff84c010ff>] asm_call_irq_on_stack+0xf/0x20
-
-  other info that might help us debug this:
-   Possible unsafe locking scenario:
-
-         CPU0
-         ----
-    lock(&bfqd->lock);
-    <Interrupt>
-      lock(&bfqd->lock);
-
-   *** DEADLOCK ***
-
-  3 locks held by kworker/2:3/388:
-   #0: ffff888107af0f38 ((wq_completion)kthrotld){+.+.}-{0:0}, at: process_one_work+0x742/0x13f0
-   #1: ffff8881176bfdd8 ((work_completion)(&td->dispatch_work)){+.+.}-{0:0}, at: process_one_work+0x777/0x13f0
-   #2: ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: spin_lock_irq
-   #2: ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: bfq_bio_merge+0x141/0x390
-
-  stack backtrace:
-  CPU: 2 PID: 388 Comm: kworker/2:3 Not tainted 5.10.0-02758-g8e5f91fd772f #26
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-  Workqueue: kthrotld blk_throtl_dispatch_work_fn
-  Call Trace:
-   __dump_stack lib/dump_stack.c:77 [inline]
-   dump_stack+0x107/0x167
-   print_usage_bug
-   valid_state
-   mark_lock_irq.cold+0x32/0x3a
-   mark_lock+0x693/0xbc0
-   mark_held_locks+0x9e/0xe0
-   __trace_hardirqs_on_caller
-   lockdep_hardirqs_on_prepare.part.0+0x151/0x360
-   trace_hardirqs_on+0x5b/0x180
-   __raw_spin_unlock_irq
-   _raw_spin_unlock_irq+0x24/0x40
-   spin_unlock_irq
-   adjust_inuse_and_calc_cost+0x4fb/0x970
-   ioc_rqos_merge+0x277/0x740
-   __rq_qos_merge+0x62/0xb0
-   rq_qos_merge
-   bio_attempt_back_merge+0x12c/0x4a0
-   blk_mq_sched_try_merge+0x1b6/0x4d0
-   bfq_bio_merge+0x24a/0x390
-   __blk_mq_sched_bio_merge+0xa6/0x460
-   blk_mq_sched_bio_merge
-   blk_mq_submit_bio+0x2e7/0x1ee0
-   __submit_bio_noacct_mq+0x175/0x3b0
-   submit_bio_noacct+0x1fb/0x270
-   blk_throtl_dispatch_work_fn+0x1ef/0x2b0
-   process_one_work+0x83e/0x13f0
-   process_scheduled_works
-   worker_thread+0x7e3/0xd80
-   kthread+0x353/0x470
-   ret_from_fork+0x1f/0x30
-
-Fixes: b0853ab4a238 ("blk-iocost: revamp in-period donation snapbacks")
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- block/blk-iocost.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 82e634d552d9..7581893e0d82 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2438,6 +2438,7 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
- 	u32 hwi, adj_step;
- 	s64 margin;
- 	u64 cost, new_inuse;
-+	unsigned long flags;
- 
- 	current_hweight(iocg, NULL, &hwi);
- 	old_hwi = hwi;
-@@ -2456,11 +2457,11 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
- 	    iocg->inuse == iocg->active)
- 		return cost;
- 
--	spin_lock_irq(&ioc->lock);
-+	spin_lock_irqsave(&ioc->lock, flags);
- 
- 	/* we own inuse only when @iocg is in the normal active state */
- 	if (iocg->abs_vdebt || list_empty(&iocg->active_list)) {
--		spin_unlock_irq(&ioc->lock);
-+		spin_unlock_irqrestore(&ioc->lock, flags);
- 		return cost;
- 	}
- 
-@@ -2481,7 +2482,7 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
- 	} while (time_after64(vtime + cost, now->vnow) &&
- 		 iocg->inuse != iocg->active);
- 
--	spin_unlock_irq(&ioc->lock);
-+	spin_unlock_irqrestore(&ioc->lock, flags);
- 
- 	TRACE_IOCG_PATH(inuse_adjust, iocg, now,
- 			old_inuse, iocg->inuse, old_hwi, hwi);
--- 
-2.31.1
+Bart.
 
