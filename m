@@ -2,94 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35305C77B7E
-	for <linux-block@archiver.kernel.org>; Mon, 29 May 2023 14:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A68BDC7EE2C
+	for <linux-block@archiver.kernel.org>; Mon, 29 May 2023 16:37:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbjE2Ol0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 May 2023 10:41:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42200 "EHLO
+        id S229547AbjE2Qh1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 May 2023 12:37:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbjE2OlV (ORCPT
+        with ESMTP id S229468AbjE2QhZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 May 2023 10:41:21 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AAE3A0
-        for <linux-block@vger.kernel.org>; Mon, 29 May 2023 07:41:19 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-64d61fff78aso809393b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 29 May 2023 07:41:19 -0700 (PDT)
+        Mon, 29 May 2023 12:37:25 -0400
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ACCC1BD;
+        Mon, 29 May 2023 09:36:49 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-565eb83efe4so24202567b3.0;
+        Mon, 29 May 2023 09:36:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685371278; x=1687963278;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OG76HNB7npnw/rHN1WMaWhQZtlraiTnBwKpKSz5JGBs=;
-        b=hb59JQN3zEZE3VQe0Uh+tAYY8N1ae8m2mw6ExQ2Z+IX03G27U1B//O2lDN2DIizr8V
-         9VZyXcb0YFNJb45nLg+9xvYlOnRwDVWo5oxqGD/96VPiJNNbaeUNhP1bbU2lhBZSiOhE
-         6Tbw1x+mKHTigGZZEhfw5fqCQCXEyEeiPoxbdNKQu22nuRgyn8wYLaw1JLfC+juhovs6
-         QpjmXKqDoO3YuLlZsXqT7BdE6QF6THp5fPi7Ec7jkc2v9WwDfidKFrcqt1xb6RcnMXJL
-         xrJmkwPtEXVPo7pmwAUjrrQzXoX7S5IfjJS8hDaaNQra7ifH2Y7CGJmWKYw2ObhIkxDt
-         GKmQ==
+        d=gmail.com; s=20221208; t=1685378184; x=1687970184;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XGlmlfpGRhYW8HjfyI5EG9tKXwTbZGzHl2Gw/X6ax14=;
+        b=gD4kPaLLf9pJV0lpw2cIWttEo9EVBn7x8f+92LW12OXCCFANe21Fg01PjDXO0UtxY2
+         Ub5I5H1SdDWAoWmUFNeFLAYHmxDq8YTSmOaqguooZLFZobRrzvTxGbtaD72knDH23eOR
+         MY6ARUPzlKzmyW1m+BBJysdYOhoJdDqFYBuSUXe+0EMClHkTcg4RjJwjoiWhoOTKM3Dt
+         9K997gDZQsyxazGzIDcLguDZimyccw5IT7vyORCRBHtiqJDhUH/qSIl0d7GezyQg513/
+         VW7HwcNry8jcfbS5LOs9BUzeIfyV4CP5ISfkACbfC7ABZjMV3VQHFd1Zf4JXCiU+XtDx
+         EW2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685371278; x=1687963278;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OG76HNB7npnw/rHN1WMaWhQZtlraiTnBwKpKSz5JGBs=;
-        b=S9vX1vLk5DtjMzKlxkIKRUhr2tRUv1jTTlN9t7iYEqIn+Ds3dgCOZqNNeltr8ohr7P
-         m2M+QjkZ3k8SG0JeYgHiMCkFgRFz5kLHrvohVgie0CpuFLPUe4YqwUDOeQf165feI2RZ
-         sE8wS3i3wRK+QolBbIauY68lLjAwVLk309nmYQpvG5AAC6QDib7T/AKtA4ym0IsprL7I
-         po3alsMC3OhE/4DV4mc2Yri1i21ObH4cV76UD2Gi9DosqDNS+6SM1tS11XcnIYn7z95U
-         yAK50ItqSTbgQz74/jswNE7XtrL6wrgtxA17V35OUrt3oMcHNJZxSVNWGkZlzFSx5Lq/
-         x2YQ==
-X-Gm-Message-State: AC+VfDz8OMCytB5KbQ/5jckTd/ZVMVU0ZZzcdZuZ6mL/hmtdiqzVtyhi
-        92vEpw6hPjDn7Gzo/Kk3TcLVwg==
-X-Google-Smtp-Source: ACHHUZ7De38RS/n38mOB9v2BcBuas/NGuFjcBe3VijwLzSlJZU4yEcJ9OWVl92Dq5aoox/gX3DfeRQ==
-X-Received: by 2002:a05:6a20:8e19:b0:10c:8939:fc48 with SMTP id y25-20020a056a208e1900b0010c8939fc48mr11916581pzj.3.1685371278555;
-        Mon, 29 May 2023 07:41:18 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9-20020a170902654900b001a64011899asm8443851pln.25.2023.05.29.07.41.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 May 2023 07:41:17 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-Cc:     Brian Bunker <brian@purestorage.com>
-In-Reply-To: <20230529073237.1339862-1-dlemoal@kernel.org>
-References: <20230529073237.1339862-1-dlemoal@kernel.org>
-Subject: Re: [PATCH v2] block: fix revalidate performance regression
-Message-Id: <168537127713.974829.9443681036221072157.b4-ty@kernel.dk>
-Date:   Mon, 29 May 2023 08:41:17 -0600
+        d=1e100.net; s=20221208; t=1685378184; x=1687970184;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XGlmlfpGRhYW8HjfyI5EG9tKXwTbZGzHl2Gw/X6ax14=;
+        b=GsNNlAKbeXflSyaAa6v79IOGVeQxbnXU1jT7PQgFL7HfCIJLIn0ORbsSofuQ+8WE4X
+         TUHtFu1vAFklN4LpJvxI2XwOF7lKxOrICDBk9tSqql2w69jZu+NN7c8X1w5f0RyvZdJd
+         pdcWa3h4ppCrAtpuEilCU1rbR665Yj3UKjvcfOZzqjuabu62r32VXzBqP5ZJbSIQbEMH
+         SFI4ZR2/NATus1f38WMMzSNzSfa31jmqF6MyxYHQN6FOXDaRX5xwQ3Xda+x/ns2ic8g+
+         lmKB2qR7LT5ZBI0rBzqOAb0ghe7n14LwyuQy4Bn/ZGQykhlAwaKRMXmXd/ypSxqkDKtI
+         hbbA==
+X-Gm-Message-State: AC+VfDxdASf+QV70XbJiWXTY1CpTM1L1BdwawKGia5e+249t5YtYodcX
+        b7D03l4EtXIVz6TuMUlQt5pPrCAMZd/eD6Bf9D8=
+X-Google-Smtp-Source: ACHHUZ7InCRLGF330bSJ+LMuRh4g/NfzTfd2m8OEywQty5+b+eU+JLZRKLHh0ktsR3qbMPwu4QSHwqAz7Ha/ifAXWSw=
+X-Received: by 2002:a0d:d88b:0:b0:565:bb04:53fa with SMTP id
+ a133-20020a0dd88b000000b00565bb0453famr11663162ywe.10.1685378184319; Mon, 29
+ May 2023 09:36:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-00303
+References: <20230522104146.2856-1-nj.shetty@samsung.com> <CGME20230522104536epcas5p23dd8108dd267ec588e5c36e8f9eb9fe8@epcas5p2.samsung.com>
+ <20230522104146.2856-3-nj.shetty@samsung.com> <20230524154049.GD11607@frogsfrogsfrogs>
+In-Reply-To: <20230524154049.GD11607@frogsfrogsfrogs>
+From:   Nitesh Shetty <nitheshshetty@gmail.com>
+Date:   Mon, 29 May 2023 22:06:13 +0530
+Message-ID: <CAOSviJ2-=U+Y2vFOq6=8n=uHqXgoud3=7gaH7H7sw2jiPXtNPA@mail.gmail.com>
+Subject: Re: [dm-devel] [PATCH v11 2/9] block: Add copy offload support infrastructure
+To:     "Darrick J. Wong" <djwong@kernel.org>
+Cc:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, linux-mm@kvack.org,
+        gost.dev@samsung.com, anuj20.g@samsung.com,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        ming.lei@redhat.com, James.Bottomley@hansenpartnership.com,
+        linux-fsdevel@vger.kernel.org, dlemoal@kernel.org,
+        joshi.k@samsung.com, bvanassche@acm.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+> > +/*
+> > + * @bdev_in: source block device
+> > + * @pos_in:  source offset
+> > + * @bdev_out:        destination block device
+> > + * @pos_out: destination offset
+> > + * @len:     length in bytes to be copied
+> > + * @endio:   endio function to be called on completion of copy operation,
+> > + *           for synchronous operation this should be NULL
+> > + * @private: endio function will be called with this private data, should be
+> > + *           NULL, if operation is synchronous in nature
+> > + * @gfp_mask:   memory allocation flags (for bio_alloc)
+> > + *
+> > + * Returns the length of bytes copied or error if encountered
+> > + *
+> > + * Description:
+> > + *   Copy source offset from source block device to destination block
+> > + *   device. Max total length of copy is limited to MAX_COPY_TOTAL_LENGTH
+> > + */
+> > +int blkdev_issue_copy(struct block_device *bdev_in, loff_t pos_in,
+>
+> I'd have thought you'd return ssize_t here.  If the two block devices
+> are loopmounted xfs files, we can certainly reflink "copy" more than 2GB
+> at a time.
+>
+> --D
+>
 
-On Mon, 29 May 2023 16:32:37 +0900, Damien Le Moal wrote:
-> The scsi driver function sd_read_block_characteristics() always calls
-> disk_set_zoned() to a disk zoned model correctly, in case the device
-> model changed. This is done even for regular disks to set the zoned
-> model to BLK_ZONED_NONE and free any zone related resources if the drive
-> previously was zoned.
-> 
-> This behavior significantly impact the time it takes to revalidate disks
-> on a large system as the call to disk_clear_zone_settings() done from
-> disk_set_zoned() for the BLK_ZONED_NONE case results in the device
-> request queued to be frozen, even if there are no zone resources to
-> free.
-> 
-> [...]
+Sure we will add this to make API future proof, but at present we do have
+a limit for copy. COPY_MAX_BYTES(=128MB) at present. This limit is based
+on our internal testing, we have plans to increase/remove with this
+limit in future phases.
 
-Applied, thanks!
-
-[1/1] block: fix revalidate performance regression
-      commit: 47fe1c3064c6bc1bfa3c032ff78e603e5dd6e5bc
-
-Best regards,
--- 
-Jens Axboe
-
-
-
+Thank you,
+Nitesh Shetty
