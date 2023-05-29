@@ -2,209 +2,234 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2FBC77B7E
-	for <linux-block@archiver.kernel.org>; Mon, 29 May 2023 13:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35007C7EE2E
+	for <linux-block@archiver.kernel.org>; Mon, 29 May 2023 13:16:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbjE2NEj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 May 2023 09:04:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36108 "EHLO
+        id S229641AbjE2NQa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 May 2023 09:16:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbjE2NEO (ORCPT
+        with ESMTP id S229805AbjE2NQT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 May 2023 09:04:14 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D8CA91;
-        Mon, 29 May 2023 06:04:12 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QVG1z3HSKz4f3sjQ;
-        Mon, 29 May 2023 21:04:07 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rHFonRka0nnKQ--.55562S3;
-        Mon, 29 May 2023 21:04:06 +0800 (CST)
-Subject: Re: [PATCH] blk-iocost: use spin_lock_irqsave in
- adjust_inuse_and_calc_cost
-To:     linan666@huaweicloud.com, tj@kernel.org, josef@toxicpanda.com,
-        axboe@kernel.dk
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linan122@huawei.com,
-        yi.zhang@huawei.com, houtao1@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230527091904.3001833-1-linan666@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <33d41ddd-73bd-8e12-9aba-e074c4d67deb@huaweicloud.com>
-Date:   Mon, 29 May 2023 21:04:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 29 May 2023 09:16:19 -0400
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2F73A7;
+        Mon, 29 May 2023 06:15:56 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-565c7399afaso31295017b3.1;
+        Mon, 29 May 2023 06:15:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685366148; x=1687958148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jNJv+PrDzjttfOFh4xwhFfRvuqaxgX/4LA6m2e9aZr8=;
+        b=SwXJHMF+oduRPX+oWgzDBamm1+MRkZN1u12mnM685hAk2jOE+5xSAGp5MY0ynuJIpo
+         gvrOBe/bWFnxAuGJABr9FdthKrr3rEmtUxJno/YRQjrgq7f5wTSBnH7d1aFJ6yWPIZJE
+         eRDoeflHvsLFNOZHn2JFfdKJnk6q3GtXs37DlXRIe2t3p+NWkFdn1xc3Bvi2lC71077G
+         j951XrzkLrXifJK2a3FvQql17kWX/KvQUw5KzvM4ikrN6/iFFZAifiE4gO+NGvYnyoKU
+         v3UXcCjfbngecd9y8hLuu6o8WXzHIXe/Z+s/bFaBffDxCWdP5Jn60s2cHZe/B4EMeNaj
+         rl/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685366148; x=1687958148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jNJv+PrDzjttfOFh4xwhFfRvuqaxgX/4LA6m2e9aZr8=;
+        b=aXt+5gdKXIEtWoECt5PsTLuq9OpX2pAjPDcwj3+UO1gUzQAkQ4T70jXF0NcmGFRuxr
+         kxZtHGxW80W3OYEWO/+YZ5EiQJbuE4HgTaGG5PIgI8lZcAWf419ntq5wFcpOMKJeY8iY
+         VjnP40JfIyZwHwieCCoBlq5f/J9ueXINS4S+3sXSYbXzOSFwaYG1SDt8eTW4d81u0Pqj
+         Lxt/kd9UfhvrjPr9Qy1rG4Oy4VA1Xq1j24RVANNl02bcYyy7uWmmpHfHYkAlQ1rcOXm5
+         vrCIljDUAQNjDsp6Nm+Gi8qzmMDtQ0Vo1/X0xtB5cbdydW7Pk7ptfZgRP84uqfrLR/mF
+         owiw==
+X-Gm-Message-State: AC+VfDwk0FiAZSdANKO5MRqBwITx/HkGwp98RYl4vHKaZ6agllRB2BXk
+        fDxnFh8YposYUiMC4TBBxecVFvTs4WLgliC8xCA=
+X-Google-Smtp-Source: ACHHUZ6OY9Sz5AhH/ARGZOmb2o44+d0OQTndDE86RjAPKcDl2jkZ78TeOiqsrAzQslrVLZynVvKjTtcXU+voyVdUENQ=
+X-Received: by 2002:a0d:f7c5:0:b0:565:ab9f:7623 with SMTP id
+ h188-20020a0df7c5000000b00565ab9f7623mr14131597ywf.36.1685366148173; Mon, 29
+ May 2023 06:15:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20230527091904.3001833-1-linan666@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rHFonRka0nnKQ--.55562S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3XrykCFW7CFy7CF43GFWfKrg_yoW7ZFW7pF
-        sagrZxAr4UZryjqa1IkF1aq395C39xC3y7Gr93K3WfAF4xur13G3WxAF40gFWqgry3AFZr
-        tF1Dt3yfuwsxAwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWU
-        JwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUF9a9DUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <CADJHv_sedgbfxvZkKHjC6quKvxR+E54noFCVF93MvhyK6bwRoA@mail.gmail.com>
+ <97ffe91e-bb31-cceb-fb7e-8f7a2252734f@kernel.org> <CADJHv_uXXVdog0GsFCTd+eouVAuX_wT9NRKJeUUqfZNvz34b0w@mail.gmail.com>
+ <036846b9-c757-450b-2612-6a649b901888@kernel.org> <CADJHv_vUgoYuuSjqp1OsmRogZ7QRkWydo9s4joEnjdcdUkEvFA@mail.gmail.com>
+In-Reply-To: <CADJHv_vUgoYuuSjqp1OsmRogZ7QRkWydo9s4joEnjdcdUkEvFA@mail.gmail.com>
+From:   Murphy Zhou <jencce.kernel@gmail.com>
+Date:   Mon, 29 May 2023 21:15:36 +0800
+Message-ID: <CADJHv_sHzBig=ducWkdPNoWgDTg7xQuLWvQZgHk0=46i4Yvncw@mail.gmail.com>
+Subject: Re: ioprio_set can take 8 as the PROCESS CLASS_BE ioprio value
+To:     Damien Le Moal <dlemoal@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>
+Cc:     linux-block@vger.kernel.org,
+        Linux-Next <linux-next@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        LTP List <ltp@lists.linux.it>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Adding ioprio_set03.c author Wallejj.
 
-ÔÚ 2023/05/27 17:19, linan666@huaweicloud.com Ð´µÀ:
-> From: Li Nan <linan122@huawei.com>
-> 
-> adjust_inuse_and_calc_cost() use spin_lock_irq() and IRQ will be enabled
-> when unlock. DEADLOCK might happen if we have held other locks and disabled
-> IRQ before invoking it.
-> 
-> Fix it by using spin_lock_irqsave() instead, which can keep IRQ state
-> consistent with before when unlock.
-> 
->    ================================
->    WARNING: inconsistent lock state
->    5.10.0-02758-g8e5f91fd772f #26 Not tainted
->    --------------------------------
->    inconsistent {IN-HARDIRQ-W} -> {HARDIRQ-ON-W} usage.
->    kworker/2:3/388 [HC0[0]:SC0[0]:HE0:SE1] takes:
->    ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: spin_lock_irq
->    ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: bfq_bio_merge+0x141/0x390
->    {IN-HARDIRQ-W} state was registered at:
->      __lock_acquire+0x3d7/0x1070
->      lock_acquire+0x197/0x4a0
->      __raw_spin_lock_irqsave
->      _raw_spin_lock_irqsave+0x3b/0x60
->      bfq_idle_slice_timer_body
->      bfq_idle_slice_timer+0x53/0x1d0
->      __run_hrtimer+0x477/0xa70
->      __hrtimer_run_queues+0x1c6/0x2d0
->      hrtimer_interrupt+0x302/0x9e0
->      local_apic_timer_interrupt
->      __sysvec_apic_timer_interrupt+0xfd/0x420
->      run_sysvec_on_irqstack_cond
->      sysvec_apic_timer_interrupt+0x46/0xa0
->      asm_sysvec_apic_timer_interrupt+0x12/0x20
->    irq event stamp: 837522
->    hardirqs last  enabled at (837521): [<ffffffff84b9419d>] __raw_spin_unlock_irqrestore
->    hardirqs last  enabled at (837521): [<ffffffff84b9419d>] _raw_spin_unlock_irqrestore+0x3d/0x40
->    hardirqs last disabled at (837522): [<ffffffff84b93fa3>] __raw_spin_lock_irq
->    hardirqs last disabled at (837522): [<ffffffff84b93fa3>] _raw_spin_lock_irq+0x43/0x50
->    softirqs last  enabled at (835852): [<ffffffff84e00558>] __do_softirq+0x558/0x8ec
->    softirqs last disabled at (835845): [<ffffffff84c010ff>] asm_call_irq_on_stack+0xf/0x20
-> 
->    other info that might help us debug this:
->     Possible unsafe locking scenario:
-> 
->           CPU0
->           ----
->      lock(&bfqd->lock);
->      <Interrupt>
->        lock(&bfqd->lock);
-> 
->     *** DEADLOCK ***
-> 
->    3 locks held by kworker/2:3/388:
->     #0: ffff888107af0f38 ((wq_completion)kthrotld){+.+.}-{0:0}, at: process_one_work+0x742/0x13f0
->     #1: ffff8881176bfdd8 ((work_completion)(&td->dispatch_work)){+.+.}-{0:0}, at: process_one_work+0x777/0x13f0
->     #2: ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: spin_lock_irq
->     #2: ffff888118c00c28 (&bfqd->lock){?.-.}-{2:2}, at: bfq_bio_merge+0x141/0x390
-> 
->    stack backtrace:
->    CPU: 2 PID: 388 Comm: kworker/2:3 Not tainted 5.10.0-02758-g8e5f91fd772f #26
->    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
->    Workqueue: kthrotld blk_throtl_dispatch_work_fn
->    Call Trace:
->     __dump_stack lib/dump_stack.c:77 [inline]
->     dump_stack+0x107/0x167
->     print_usage_bug
->     valid_state
->     mark_lock_irq.cold+0x32/0x3a
->     mark_lock+0x693/0xbc0
->     mark_held_locks+0x9e/0xe0
->     __trace_hardirqs_on_caller
->     lockdep_hardirqs_on_prepare.part.0+0x151/0x360
->     trace_hardirqs_on+0x5b/0x180
->     __raw_spin_unlock_irq
->     _raw_spin_unlock_irq+0x24/0x40
->     spin_unlock_irq
->     adjust_inuse_and_calc_cost+0x4fb/0x970
->     ioc_rqos_merge+0x277/0x740
->     __rq_qos_merge+0x62/0xb0
->     rq_qos_merge
->     bio_attempt_back_merge+0x12c/0x4a0
->     blk_mq_sched_try_merge+0x1b6/0x4d0
->     bfq_bio_merge+0x24a/0x390
->     __blk_mq_sched_bio_merge+0xa6/0x460
->     blk_mq_sched_bio_merge
->     blk_mq_submit_bio+0x2e7/0x1ee0
->     __submit_bio_noacct_mq+0x175/0x3b0
->     submit_bio_noacct+0x1fb/0x270
->     blk_throtl_dispatch_work_fn+0x1ef/0x2b0
->     process_one_work+0x83e/0x13f0
->     process_scheduled_works
->     worker_thread+0x7e3/0xd80
->     kthread+0x353/0x470
->     ret_from_fork+0x1f/0x30
-
-So this happens when iocost is used together with bfq, performance will
-be quite bad in this case, I don't think there will be any real use
-case. However, the changes looks reasonable, feel free to add:
-
-Reviewed-by: Yu Kuai <yukuai3@huawei.com>
-> 
-> Fixes: b0853ab4a238 ("blk-iocost: revamp in-period donation snapbacks")
-> Signed-off-by: Li Nan <linan122@huawei.com>
-> ---
->   block/blk-iocost.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index 82e634d552d9..7581893e0d82 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -2438,6 +2438,7 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
->   	u32 hwi, adj_step;
->   	s64 margin;
->   	u64 cost, new_inuse;
-> +	unsigned long flags;
->   
->   	current_hweight(iocg, NULL, &hwi);
->   	old_hwi = hwi;
-> @@ -2456,11 +2457,11 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
->   	    iocg->inuse == iocg->active)
->   		return cost;
->   
-> -	spin_lock_irq(&ioc->lock);
-> +	spin_lock_irqsave(&ioc->lock, flags);
->   
->   	/* we own inuse only when @iocg is in the normal active state */
->   	if (iocg->abs_vdebt || list_empty(&iocg->active_list)) {
-> -		spin_unlock_irq(&ioc->lock);
-> +		spin_unlock_irqrestore(&ioc->lock, flags);
->   		return cost;
->   	}
->   
-> @@ -2481,7 +2482,7 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
->   	} while (time_after64(vtime + cost, now->vnow) &&
->   		 iocg->inuse != iocg->active);
->   
-> -	spin_unlock_irq(&ioc->lock);
-> +	spin_unlock_irqrestore(&ioc->lock, flags);
->   
->   	TRACE_IOCG_PATH(inuse_adjust, iocg, now,
->   			old_inuse, iocg->inuse, old_hwi, hwi);
-> 
-
+On Mon, May 29, 2023 at 1:46=E2=80=AFPM Murphy Zhou <jencce.kernel@gmail.co=
+m> wrote:
+>
+> On Mon, May 29, 2023 at 10:28=E2=80=AFAM Damien Le Moal <dlemoal@kernel.o=
+rg> wrote:
+> >
+> > +Jens
+> >
+> > and also +Jan as he did some work on ioprio previously.
+> >
+> > On 5/27/23 09:02, Murphy Zhou wrote:
+> > > On Fri, May 26, 2023 at 3:42=E2=80=AFPM Damien Le Moal <dlemoal@kerne=
+l.org> wrote:
+> > >>
+> > >> On 5/26/23 16:27, Murphy Zhou wrote:
+> > >>> Hi Damien,
+> > >>>
+> > >>> Since these commits:
+> > >>>
+> > >>>   scsi: block: Introduce ioprio hints
+> > >>>   scsi: block: ioprio: Clean up interface definition
+> > >>>
+> > >>> go into linux-next tree, ioprio_set can take the value of 8
+> > >>> as the PROCESS CLASS_BE ioprio parameter, returning
+> > >>> success but actually it is setting to 0 due to the mask roundup.
+> > >>>
+> > >>> The LTP test case ioprio_set03[1] covers this boundary value
+> > >>> testing, which starts to fail since then.
+> > >>>
+> > >>> This does not look as expected. Could you help to take a look?
+> > >>
+> > >> Before the patches, the ioprio level of 8 could indeed be set, but t=
+hat was
+> > >
+> > > Before the patches, it can't be set to 8 because the check in
+> > > ioprio_check_cap refused it.
+> > >    >=3D IOPRIO_NR_LEVELS
+> > > Before the patches, the value can be greater than 8, so it takes effe=
+ct.
+> > > After the patches, the value is limited to [0..7], this check always =
+passes.
+> > >
+> > >> actually totally meaningless since the kernel components that use th=
+e priority
+> > >> level all are limited to the range [0..7]. And why the level value 8=
+ could be
+> > >> seen, the effective level would have been 0. So at least, with the c=
+hanges, we
+> > >> are not lying to the user...
+> > >>
+> > >> I am not sure what this ioprio_set03 test is trying to check.
+> > >
+> > > I guess it is trying to make sure boundary values do not cause uncert=
+aining.
+> > > The test case can be updated according to intended kernel changes. So=
+ does
+> > > other user space applications that may depend on this, or there is no=
+ne of
+> > > them to worry about.
+> >
+> > The checks before the patch was using IOPRIO_PRIO_DATA() to get the
+> > level value, and that macro was doing a mask with IOPRIO_PRIO_MASK (1 <=
+<
+> > 13). So if the application was doing:
+> >
+> > IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, 8192 + 1)
+> >
+> > then the ioprio value would end up being the same as:
+> >
+> > IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, 0)
+> >
+> > which is a valid ioprio value. So ioprio_check_cap() would not detect
+> > that case either. The fact that class and level are combined into a
+> > single value essentially prevents us to be exhaustive with the checks i=
+n
+> > ioprio_check_cap().
+> >
+> > I am not sure if this is worth fixing. as no matter what we do, the
+> > above problem remains: we cannot catch all bad cases and end up with a
+> > valid value which will prevent the user from seeing an error and
+> > catching his/hers invalid use of the ioprio values...
+>
+> Agree.  We can't prevent that. Please go ahead with any solution that
+> makes sense to you.
+>
+> Thanks,
+> Murphy
+> >
+> > We could do something like shown below, but I am not sure if it is wort=
+h
+> > it as their are no guarantees that the user is actually using the
+> > definitions in include/uapi/linux/ioprio.h
+> > (/usr/include/linux/iorprio.h). E.g. see fio code which redefines the
+> > values and macros locally.
+> >
+> > diff --git a/include/uapi/linux/ioprio.h b/include/uapi/linux/ioprio.h
+> > index 607c7617b9d2..c09cfbee9117 100644
+> > --- a/include/uapi/linux/ioprio.h
+> > +++ b/include/uapi/linux/ioprio.h
+> > @@ -6,15 +6,13 @@
+> >   * Gives us 8 prio classes with 13-bits of data for each class
+> >   */
+> >  #define IOPRIO_CLASS_SHIFT     13
+> > -#define IOPRIO_CLASS_MASK      0x07
+> > +#define IOPRIO_NR_CLASSES      8
+> > +#define IOPRIO_CLASS_MASK      (IOPRIO_NR_CLASSES - 1)
+> >  #define IOPRIO_PRIO_MASK       ((1UL << IOPRIO_CLASS_SHIFT) - 1)
+> >
+> >  #define IOPRIO_PRIO_CLASS(ioprio)      \
+> >         (((ioprio) >> IOPRIO_CLASS_SHIFT) & IOPRIO_CLASS_MASK)
+> >  #define IOPRIO_PRIO_DATA(ioprio)       ((ioprio) & IOPRIO_PRIO_MASK)
+> > -#define IOPRIO_PRIO_VALUE(class, data) \
+> > -       ((((class) & IOPRIO_CLASS_MASK) << IOPRIO_CLASS_SHIFT) | \
+> > -        ((data) & IOPRIO_PRIO_MASK))
+> >
+> >  /*
+> >   * These are the io priority classes as implemented by the BFQ and
+> > mq-deadline
+> > @@ -73,15 +71,6 @@ enum {
+> >  #define IOPRIO_PRIO_HINT(ioprio)       \
+> >         (((ioprio) >> IOPRIO_HINT_SHIFT) & IOPRIO_HINT_MASK)
+> >
+> > -/*
+> > - * Alternate macro for IOPRIO_PRIO_VALUE() to define an IO priority wi=
+th
+> > - * a class, level and hint.
+> > - */
+> > -#define IOPRIO_PRIO_VALUE_HINT(class, level, hint)              \
+> > -       ((((class) & IOPRIO_CLASS_MASK) << IOPRIO_CLASS_SHIFT) | \
+> > -        (((hint) & IOPRIO_HINT_MASK) << IOPRIO_HINT_SHIFT) |    \
+> > -        ((level) & IOPRIO_LEVEL_MASK))
+> > -
+> >  /*
+> >   * IO hints.
+> >   */
+> > @@ -107,4 +96,22 @@ enum {
+> >         IOPRIO_HINT_DEV_DURATION_LIMIT_7 =3D 7,
+> >  };
+> >
+> > +/*
+> > + * Return an I/O priority value based on a class, a level and hints.
+> > + */
+> > +static inline u16 ioprio_value(int class, int level, int hint)
+> > +{
+> > +       if (class < 0 || class >=3D IOPRIO_NR_CLASSES ||
+> > +           level < 0 || level >=3D IOPRIO_NR_LEVELS ||
+> > +           hint < 0 || hint >=3D IOPRIO_NR_HINTS)
+> > +               return USHRT_MAX;
+> > +       return (class << IOPRIO_CLASS_SHIFT) |
+> > +              (hint << IOPRIO_HINT_SHIFT) | level;
+> > +}
+> > +
+> > +#define IOPRIO_PRIO_VALUE(class, level)                        \
+> > +       ioprio_value(class, level, IOPRIO_HINT_NONE)
+> > +#define IOPRIO_PRIO_VALUE_HINT(class, level, hint)     \
+> > +       ioprio_value(class, level, hint)
+> > +
+> >  #endif /* _UAPI_LINUX_IOPRIO_H */
+> >
+> > --
+> > Damien Le Moal
+> > Western Digital Research
+> >
