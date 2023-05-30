@@ -2,203 +2,143 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A58C7EE31
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 16:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 902ABC77B73
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 16:51:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231891AbjE3QXD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 12:23:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39268 "EHLO
+        id S230352AbjE3QvB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 12:51:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231823AbjE3QXB (ORCPT
+        with ESMTP id S230063AbjE3Qu7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 12:23:01 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7093C9
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 09:22:50 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230530162247epoutp048c1925ad9bc3363bcc3379d293511eb1~j_F3T2KtM0380603806epoutp048
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 16:22:47 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230530162247epoutp048c1925ad9bc3363bcc3379d293511eb1~j_F3T2KtM0380603806epoutp048
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1685463767;
-        bh=iQHQHNsByexlloqhkgYnt5iCj3YMH2bRf9GJ2+IFCqo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=mj9Kp246tFJsvk49BzWLL8WrQrzlQlRGeWp84cPM2FN+4hmYdEjPTDdftj1sdpK4N
-         kPbt3ynZUNGge8cf2RttYaaqgWdPbnyjQH9nFQOfCYHSzbBqhJoKc+SrE6EWA5YFeP
-         9dsjRqvLAPoEyOfoEZY4Ouo2kinX1FtgaUMIzXe4=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20230530162245epcas5p13dd525f833dbe394e5e0edaa652cdb0c~j_F1911Nb0345803458epcas5p1-;
-        Tue, 30 May 2023 16:22:45 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.175]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4QVyNh1y9wz4x9Pp; Tue, 30 May
-        2023 16:22:44 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        77.3F.04567.4D226746; Wed, 31 May 2023 01:22:44 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230530121351epcas5p2b18d46d6be650a7b830690b845ec22c8~j6sgq_Mda2862728627epcas5p2h;
-        Tue, 30 May 2023 12:13:51 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230530121350epsmtrp2a219b3672da915ce319a0c25d4204123~j6sgpTLJG0347103471epsmtrp2-;
-        Tue, 30 May 2023 12:13:50 +0000 (GMT)
-X-AuditID: b6c32a49-943ff700000011d7-4a-647622d46e21
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        51.D5.28392.E78E5746; Tue, 30 May 2023 21:13:50 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230530121346epsmtip2a090cc3928ef845f7729023ca25e9244~j6sc4LK2o1829318293epsmtip2a;
-        Tue, 30 May 2023 12:13:46 +0000 (GMT)
-Date:   Tue, 30 May 2023 17:40:43 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Maurizio Lombardi <mlombard@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        James.Bottomley@hansenpartnership.com, bvanassche@acm.org,
-        hare@suse.de, ming.lei@redhat.com, dlemoal@kernel.org,
-        anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
-        gost.dev@samsung.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v11 2/9] block: Add copy offload support infrastructure
-Message-ID: <20230530121043.psdxyk7z3rk7sjtm@green245>
+        Tue, 30 May 2023 12:50:59 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEF9BE
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 09:50:57 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id ca18e2360f4ac-76c304efb8fso23336439f.1
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 09:50:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685465457; x=1688057457;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=thlNA+UuWKKyy8pZTqyvsqUpo/JiTFe7Xh7JxERMZ40=;
+        b=G+rs7+ExcnneR8BbE3EySvbKDR5K+ZX2Ri4FIBqu2kPlvVkPeUPNPloKVvWPEnscrh
+         PWtT52bVoSL3WJrcwT8YyXKwin0mNNKDA3PgNKMTsUKpCIiM6Ul4PcP7y2OksfggjiWj
+         gOZV9ONj35tEjBXx7i39azg3oZ6ZjTBLwv8kQ7GUB2aPMcBpCjBRAQoPXGUqEeb5KkX4
+         rM3xI80KIE0TmgVV5TqPIvZWrmHPBOBv6zqk3MsfP5g0zL+Ki9LRT0AdC8h2SkBBRhWr
+         7agI3E08H9L0zT4DRPRv9v/Liv//reEsCJyCzCHBvPG5lV+roxZWjl7IjCs1wVY3sW3z
+         /x4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685465457; x=1688057457;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=thlNA+UuWKKyy8pZTqyvsqUpo/JiTFe7Xh7JxERMZ40=;
+        b=bzkBdYSjP59HLHGsVDiRRJnu+Syhm/TcusmJBDL9uvNY26L7P0BYp4kUTQfV1Srd5Y
+         V/Who5EBVrWrcSSbgzHJzAwm8sxP8E4o9gdDl8IG2raEOaBc9qceNF6GFrThbL5zefGg
+         3WaxgEjGju96m2u4r/gOvWI5Guwl4YZvt+wJGpA7Qs+hYbUZWWi/AmkWkrKNYN/yj5vB
+         ijlL8oatGYG6yg9tg2kx1lKiMk9xR6sr+rduOQMgMrCH/XZyZuB4ZmNz3XLLReUVRQDg
+         6rOLT4D49tEyjwoWpq60n7Oh0OHc9ZGz7CnE5rrreOdnjvdW8Y2IIlJBIlNUTCwqNGX0
+         IC5A==
+X-Gm-Message-State: AC+VfDzbKh3po2vHaLBTP55QLjcvjCVp6E0dF8Ts4aAy91tK/8X5pBM7
+        I1NvBwGh9XcD3dcIRqWuH/R1JA==
+X-Google-Smtp-Source: ACHHUZ6jo5ahe5aPT0LiWcCj/I9bwL9QTDlnCR5dwxCtNXBP/2xuIbuw+WquGRcAFohxXHsdBHE2+w==
+X-Received: by 2002:a05:6e02:1061:b0:32b:51df:26a0 with SMTP id q1-20020a056e02106100b0032b51df26a0mr19937ilj.2.1685465456841;
+        Tue, 30 May 2023 09:50:56 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id l3-20020a92d943000000b0033ba0b7e926sm746877ilq.31.2023.05.30.09.50.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 May 2023 09:50:56 -0700 (PDT)
+Message-ID: <2a56b6d4-5f24-9738-ec83-cefb20998c8c@kernel.dk>
+Date:   Tue, 30 May 2023 10:50:55 -0600
 MIME-Version: 1.0
-In-Reply-To: <CAFL455nMtKbDt1HeN6D2WPB2JjOYq2z1=RagmmuhmQ33eL2Bfw@mail.gmail.com>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xbdRTHc+9tby+QYsdj/oBNoLoQmDy6lfpjAbfoipfgA0I0c8qwg2sh
-        lLbpg83FOFYYOibykCErhIGylZc8t/EoMMJDXjIkPIfCGCmYQGQ8s2mF2nKL+t/nfM85v3N+
-        5+QQmMMgy5VIkKoohVQk4eK2jPvd3l6+49zkuIC0vwlYO/gTBotqq3Goyd7BYNVsFg5XujcQ
-        mL/2JwbnH5yE7auFTPioswWFbd/norCiqheF9VkE1Jeuo7DX9AcOc7smEbg4oUVh+8xR2NY+
-        wIBjrUU4nKs2MeGtO4sseH2qGYe6vl0Udn2bisKh/EYMNhuuILBm5SkD9s+4wZGdPiY0Pi/C
-        T71Ejo2Hk9rHwzjZop1lkSNz9QwyP3cQJxvLfcixYTXZUHkNJxs2cllkf4GRQTaWXSb1j1Jw
-        MjN1FSfXF2cY5NOOCZz85m4lEuF4NjE4nhLFUQoPShori0uQikO44VExb8YECgJ4vrwg+BrX
-        QypKokK4p9+O8A1NkJgnxfVIFknUZilCpFRy/V8PVsjUKsojXqZUhXApeZxEzpf7KUVJSrVU
-        7CelVCd4AQHHAs2BnyTG/1A/i8oNDhcXbg6jKcg0OwOxIQCHD7Y1W0gGYks4cPQIuFo0YTU2
-        EDD1y3cM2thEwEhBJ3M/ZTFn2OpoRUDHzxtM2lhCQF1NNWaJYnCOgL6tNfNbBIFzjoIhE2GR
-        ncy4nlbGsDDGSWOBjQx7CztywoHhYR1qYTZHAMaH5q18AAzcNOzF23AiQX1T2Z7uzDkECm5v
-        Y5a6gKOxBabSTYzu7jTQ/XoDp9kRLPfdZdHsCjZX2636BVCRV47TyWkI0E5pEdpxElwdzMIs
-        TWOceFDVq6blw+DGYA1KN20PMo0GlNbZoLl4n18G1bUl1vddwOSzK1YmwVZ6G4seUBoKlgzr
-        eDbirv3f57T/ldPulTgBrq1pmDS7g9R7hRgd4gZ0uwSN3qC21b8EwSsRF0quTBJTykA5T0pd
-        +Hf5sbKkBmTvqHzCmpHZ+TW/LgQlkC4EEBjXiR0iUsY5sONEn12iFLIYhVpCKbuQQPPacjBX
-        51iZ+SqlqhgePyiALxAI+EHHBTzui2yvkIFYB45YpKISKUpOKfbzUMLGNQXN9HkyJn7f7uF5
-        k4tAevYDmHf/UiTOsMtV5f2O8/Idfc586fup5qMt/U66hrwcZWg6/mGXp8dbXxxiSZK1hg79
-        6jusNx7f8fxK1iocp1ZqqstSEyblbZ/XhW8/UBl54gNzoV6FMcLxsKgefc+p4sbF5KFg/XtL
-        57AfvXZ3FuQfCycSBzwuionb765HZ77yF+a1YM+OzM7v5mY3j/LugfqFEP/D10uHmMrypuU5
-        d/clItlOfMzpt2jhmeet3s78Ql1SQYmb0HnxySgalnPwhVFdusvwrazpmSFjTyqrk1iaNp0L
-        ZIUe+TrofOZytL9DcX+MseVV1x7dQf4zz3Gn0xVyIZehjBfxfDCFUvQPC7mUe90EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBKsWRmVeSWpSXmKPExsWy7bCSvG7di9IUgzm7jC3WnzrGbDFn/Ro2
-        i6YJf5ktVt/tZ7N4ffgTo8W0Dz+ZLR7st7fY+242q8XNAzuZLPYsmsRksXL1USaLjf0cFrsX
-        fmSyOPr/LZvFpEPXGC2eXp3FZLH3lrbFnr0nWSwu75rDZnFvzX9Wi/nLnrJbdF/fwWax/Pg/
-        JotDk5uZLE5P28xsseNJI6PFutfvWSxO3JK2OP/3OKvF7x9z2BzkPC5f8faYdf8sm8fOWXfZ
-        Pc7f28jiMW3SKTaPzSu0PC6fLfXYtKqTzWPTp0nsHidm/Gbx2Lyk3mP3zQY2j97md2weH5/e
-        YvF4v+8qm0ffllWMAcJRXDYpqTmZZalF+nYJXBkHXvawF3zlr+g7v5i1gbGNu4uRk0NCwETi
-        6cSzLCC2kMAORokF11Ug4pISy/4eYYawhSVW/nvO3sXIBVTzhFHi1bJl7CAJFgFVieNfPjB2
-        MXJwsAloS5z+zwESFgEyP7YsYQGpZxboYpeY9X4hG0hCWMBb4sm5DUwgNq+AmcSV0w+YIIa2
-        MElMmPOEFSIhKHFy5hOwi5iBiuZtfsgMsoBZQFpi+T8OiLC8RPPW2WDHcQoESmzcvgRspqiA
-        jMSMpV+ZJzAKzUIyaRaSSbMQJs1CMmkBI8sqRsnUguLc9NxiwwKjvNRyveLE3OLSvHS95Pzc
-        TYzgxKOltYNxz6oPeocYmTgYDzFKcDArifDaJhanCPGmJFZWpRblxxeV5qQWH2KU5mBREue9
-        0HUyXkggPbEkNTs1tSC1CCbLxMEp1cB00eRwQ+60icv0dNaHB2b/mqtT6ZofcXTB86ivtc0q
-        +33nB/beCQ0xWOpTrB6oFy3xmXu2832rDfHXyj5fuTzRU45nYtyTAw2G++VOBbBN5vLcNGvp
-        366/JX63a9pD3ybwZgh/V3m+uezBn3il+L/b+C7f81JVEtxyU6yWbeeiyISD72cna1R9TZE0
-        nbvGXP7m3+T9hoqRBhyzZpQvUpmy3G6Wx5/FP/YcNPUqdfseq3Bp27TYMJnU3361dSkvNNdI
-        sR++UqG782aTeLrWxEP57jvmnJ4oHJZ2ICPg04fpzhH3P0d3vTw8yf2kywoDnav5c457LrKe
-        dOHe+22RH+o3ezW8rwlx/bFi7WMeVbWXSizFGYmGWsxFxYkAu5aSqKsDAAA=
-X-CMS-MailID: 20230530121351epcas5p2b18d46d6be650a7b830690b845ec22c8
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_319e1_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230522104536epcas5p23dd8108dd267ec588e5c36e8f9eb9fe8
-References: <CGME20230522104536epcas5p23dd8108dd267ec588e5c36e8f9eb9fe8@epcas5p2.samsung.com>
-        <20230522104146.2856-1-nj.shetty@samsung.com>
-        <20230522104146.2856-3-nj.shetty@samsung.com>
-        <CAFL455nMtKbDt1HeN6D2WPB2JjOYq2z1=RagmmuhmQ33eL2Bfw@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/7] block layer patches for bcachefs
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+ <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
+ <ZHEaKQH22Uxk9jPK@moria.home.lan>
+ <8e874109-db4a-82e3-4020-0596eeabbadf@kernel.dk>
+ <ZHYfGvPJFONm58dA@moria.home.lan>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZHYfGvPJFONm58dA@moria.home.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_319e1_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-
-On 23/05/30 01:29PM, Maurizio Lombardi wrote:
->po 22. 5. 2023 v 13:17 odesílatel Nitesh Shetty <nj.shetty@samsung.com> napsal:
+On 5/30/23 10:06?AM, Kent Overstreet wrote:
+> On Tue, May 30, 2023 at 08:22:50AM -0600, Jens Axboe wrote:
+>> On 5/26/23 2:44?PM, Kent Overstreet wrote:
+>>> On Fri, May 26, 2023 at 08:35:23AM -0600, Jens Axboe wrote:
+>>>> On 5/25/23 3:48?PM, Kent Overstreet wrote:
+>>>>> Jens, here's the full series of block layer patches needed for bcachefs:
+>>>>>
+>>>>> Some of these (added exports, zero_fill_bio_iter?) can probably go with
+>>>>> the bcachefs pull and I'm just including here for completeness. The main
+>>>>> ones are the bio_iter patches, and the __invalidate_super() patch.
+>>>>>
+>>>>> The bio_iter series has a new documentation patch.
+>>>>>
+>>>>> I would still like the __invalidate_super() patch to get some review
+>>>>> (from VFS people? unclear who owns this).
+>>>>
+>>>> I wanted to check the code generation for patches 4 and 5, but the
+>>>> series doesn't seem to apply to current -git nor my for-6.5/block.
+>>>> There's no base commit in this cover letter either, so what is this
+>>>> against?
+>>>>
+>>>> Please send one that applies to for-6.5/block so it's a bit easier
+>>>> to take a closer look at this.
+>>>
+>>> Here you go:
+>>> git pull https://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
 >>
->> +static int __blkdev_copy_offload(struct block_device *bdev_in, loff_t pos_in,
->> +               struct block_device *bdev_out, loff_t pos_out, size_t len,
->> +               cio_iodone_t endio, void *private, gfp_t gfp_mask)
->> +{
->> +       struct cio *cio;
->> +       struct copy_ctx *ctx;
->> +       struct bio *read_bio, *write_bio;
->> +       struct page *token;
->> +       sector_t copy_len;
->> +       sector_t rem, max_copy_len;
->> +
->> +       cio = kzalloc(sizeof(struct cio), GFP_KERNEL);
->> +       if (!cio)
->> +               return -ENOMEM;
->> +       atomic_set(&cio->refcount, 0);
->> +       cio->waiter = current;
->> +       cio->endio = endio;
->> +       cio->private = private;
->> +
->> +       max_copy_len = min(bdev_max_copy_sectors(bdev_in),
->> +                       bdev_max_copy_sectors(bdev_out)) << SECTOR_SHIFT;
->> +
->> +       cio->pos_in = pos_in;
->> +       cio->pos_out = pos_out;
->> +       /* If there is a error, comp_len will be set to least successfully
->> +        * completed copied length
->> +        */
->> +       cio->comp_len = len;
->> +       for (rem = len; rem > 0; rem -= copy_len) {
->> +               copy_len = min(rem, max_copy_len);
->> +
->> +               token = alloc_page(gfp_mask);
->> +               if (unlikely(!token))
->> +                       goto err_token;
->
->[...]
->
->> +err_token:
->> +       cio->comp_len = min_t(sector_t, cio->comp_len, (len - rem));
->> +       if (!atomic_read(&cio->refcount))
->> +               return -ENOMEM;
->> +       /* Wait for submitted IOs to complete */
->> +       return blkdev_copy_wait_completion(cio);
->> +}
->
->Suppose the first call to "token = alloc_page()" fails (and
->cio->refcount == 0), isn't "cio" going to be leaked here?
->
->Maurizio
->
+>> Thanks
+>>
+>> The re-exporting of helpers is somewhat odd - why is bcachefs special
+>> here and needs these, while others do not?
+> 
+> It's not iomap based.
+> 
+>> But the main issue for me are the iterator changes, which mostly just
+>> seems like unnecessary churn. What's the justification for these? The
+>> commit messages don;t really have any. Doesn't seem like much of a
+>> simplification, and in fact it's more code than before and obviously
+>> more stack usage as well.
+> 
+> I need bio_for_each_folio().
+> 
+> The approach taken by the bcachefs IO paths is to first build up bios,
+> then walk the extents btree to determine where to send them, splitting
+> as needed.
+> 
+> For reading into the page cache we additionally need to initialize our
+> private state based on what we're reading from that says what's on
+> disk (unallocated, reservation, or normal allocation) and how many
+> replicas. This is used for both i_blocks accounting and for deciding
+> when we need to get a disk reservation. Since we're doing this post
+> split, it needs bio_for_each_folio, not the _all variant.
+> 
+> Yes, the iterator changes are a bit more code - but it's split up into
+> better helpers now, the pointer arithmetic before was a bit dense; I
+> found the result to be more readable. I'm surprised at more stack
+> usage; I would have expected _less_ for bio_for_each_page_all() since
+> it gets rid of a pointer into the bvec_iter_all. How did you measure
+> that?
 
-Agreed, will free it in "err_token", and will update next version.
+Sorry typo, I meant text. Just checked stack and it looks identical, but
+things like blk-map grows ~6% more text, and bio ~3%. Didn't check all
+of them, but at least those two are consistent across x86-64 and
+aarch64. Ditto on the data front. Need to take a closer look at where
+exactly that is coming from, and what that looks like.
 
-Thank you,
-Nitesh Shetty
+-- 
+Jens Axboe
 
-------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_319e1_
-Content-Type: text/plain; charset="utf-8"
-
-
-------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_319e1_--
