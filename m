@@ -2,64 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 405C7C7EE2F
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 15:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98FE6C7EE2C
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 16:07:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233129AbjE3P72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 11:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46340 "EHLO
+        id S233210AbjE3QHZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 12:07:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233146AbjE3P7T (ORCPT
+        with ESMTP id S233284AbjE3QHN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 11:59:19 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A361AD;
-        Tue, 30 May 2023 08:59:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=18OSvYiG0zIcEikpFuO5yhaNcppNczPdkyzmCbvrupw=; b=PQ7AUm4XmnRX/4BaMtwqnZFAQx
-        xQiTbKyqkKcVG7e15O+WskcS69vdvksxtc/q+R7kTa8LZmQPPAqJSJZWh3nyQA4iG1u4z/VA14rAd
-        zPBVbJI0piRA8g5fixcGudecRTQ0mT67MUv19JKHQKsELGGBWyBOx+H1/e8yB25df7rj4TVyBDBmt
-        K/X0ZvHTImU88VELnSxLmQ8k9uq5mntW+w3tblr9JupFCIvj3BfZ23BMFw+fi0UkIrPg/v/qEe3MC
-        9jBcrMWe3r05qiGG8t/0HubdNMJh+3SYkCxGNMu0ArKeSbop61CdcLGnJvi0JBDefL8H8BAhUcHRo
-        kxzwRIog==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q41kO-006QMe-SK; Tue, 30 May 2023 15:58:56 +0000
-Date:   Tue, 30 May 2023 16:58:56 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        dm-devel@redhat.com, Song Liu <song@kernel.org>,
-        linux-raid@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>, gouhao@uniontech.com
-Subject: Re: [PATCH v6 20/20] block: mark bio_add_folio as __must_check
-Message-ID: <ZHYdQJQ7S4ya09Jt@casper.infradead.org>
-References: <cover.1685461490.git.johannes.thumshirn@wdc.com>
- <3d45098a7640897cbace54713efe10d88b74c160.1685461490.git.johannes.thumshirn@wdc.com>
+        Tue, 30 May 2023 12:07:13 -0400
+Received: from out-55.mta1.migadu.com (out-55.mta1.migadu.com [IPv6:2001:41d0:203:375::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982FC11C
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 09:07:00 -0700 (PDT)
+Date:   Tue, 30 May 2023 12:06:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685462818;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GvzDBLaFoADOumJHcj6o4wathgB48XH/zOUCBfWh1rI=;
+        b=sy7Fwk/kgvokmeLr0X9kOdkzIshmz3RIjnrrzA/Q5pwbmqQc5EKb47hfIQJddkEkTXT/qF
+        N5qMsH6OoZcTKHOXD4mh38mYq+Qkw0vb6xhb2K2mzIN38Sl8V2TiggGBWUVtydQngHKQTi
+        ML9bOGFfq2i0evMAHiRrTLfgOfmzqoM=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 0/7] block layer patches for bcachefs
+Message-ID: <ZHYfGvPJFONm58dA@moria.home.lan>
+References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+ <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
+ <ZHEaKQH22Uxk9jPK@moria.home.lan>
+ <8e874109-db4a-82e3-4020-0596eeabbadf@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3d45098a7640897cbace54713efe10d88b74c160.1685461490.git.johannes.thumshirn@wdc.com>
+In-Reply-To: <8e874109-db4a-82e3-4020-0596eeabbadf@kernel.dk>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 30, 2023 at 08:49:23AM -0700, Johannes Thumshirn wrote:
-> Now that all callers of bio_add_folio() check the return value, mark it as
-> __must_check.
+On Tue, May 30, 2023 at 08:22:50AM -0600, Jens Axboe wrote:
+> On 5/26/23 2:44?PM, Kent Overstreet wrote:
+> > On Fri, May 26, 2023 at 08:35:23AM -0600, Jens Axboe wrote:
+> >> On 5/25/23 3:48?PM, Kent Overstreet wrote:
+> >>> Jens, here's the full series of block layer patches needed for bcachefs:
+> >>>
+> >>> Some of these (added exports, zero_fill_bio_iter?) can probably go with
+> >>> the bcachefs pull and I'm just including here for completeness. The main
+> >>> ones are the bio_iter patches, and the __invalidate_super() patch.
+> >>>
+> >>> The bio_iter series has a new documentation patch.
+> >>>
+> >>> I would still like the __invalidate_super() patch to get some review
+> >>> (from VFS people? unclear who owns this).
+> >>
+> >> I wanted to check the code generation for patches 4 and 5, but the
+> >> series doesn't seem to apply to current -git nor my for-6.5/block.
+> >> There's no base commit in this cover letter either, so what is this
+> >> against?
+> >>
+> >> Please send one that applies to for-6.5/block so it's a bit easier
+> >> to take a closer look at this.
+> > 
+> > Here you go:
+> > git pull https://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
 > 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Thanks
+> 
+> The re-exporting of helpers is somewhat odd - why is bcachefs special
+> here and needs these, while others do not?
 
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+It's not iomap based.
 
+> But the main issue for me are the iterator changes, which mostly just
+> seems like unnecessary churn. What's the justification for these? The
+> commit messages don;t really have any. Doesn't seem like much of a
+> simplification, and in fact it's more code than before and obviously
+> more stack usage as well.
+
+I need bio_for_each_folio().
+
+The approach taken by the bcachefs IO paths is to first build up bios,
+then walk the extents btree to determine where to send them, splitting
+as needed.
+
+For reading into the page cache we additionally need to initialize our
+private state based on what we're reading from that says what's on disk
+(unallocated, reservation, or normal allocation) and how many replicas.
+This is used for both i_blocks accounting and for deciding when we need
+to get a disk reservation. Since we're doing this post split, it needs
+bio_for_each_folio, not the _all variant.
+
+Yes, the iterator changes are a bit more code - but it's split up into
+better helpers now, the pointer arithmetic before was a bit dense; I
+found the result to be more readable. I'm surprised at more stack usage;
+I would have expected _less_ for bio_for_each_page_all() since it gets
+rid of a pointer into the bvec_iter_all. How did you measure that?
