@@ -2,171 +2,110 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E43C7EE23
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 20:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB061C7EE24
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 20:41:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233511AbjE3UeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 16:34:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56862 "EHLO
+        id S231591AbjE3UlM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 16:41:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbjE3UeJ (ORCPT
+        with ESMTP id S230194AbjE3UlL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 16:34:09 -0400
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50BDDE42;
-        Tue, 30 May 2023 13:33:32 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.west.internal (Postfix) with ESMTP id 0D022320096E;
-        Tue, 30 May 2023 16:32:20 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Tue, 30 May 2023 16:32:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        invisiblethingslab.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1685478740; x=1685565140; bh=gJtXKfjMb5
-        k3PryJlBFsKsS3ZINd0EksqBFZ4ekKEDw=; b=iSW8ttt26dngYvxurKxiOI2vd1
-        WHoQ92v7hwye8qiWm/sMzD3pqp5ya8c2OA22dKJKDKSCyzxijZP+Dp144KoNmvpt
-        K8OI+kD4ismX23LXNvkYBIS8haogcvQd7EEZ19u32N/1GOR8sh6VaGOBsVQxw9Bq
-        zrT17xw8paAPsuaett1MoyqWDe6uGCPznnCFymKvWzjN2rUubwy9Ob0uFq6jMg76
-        gqlN1m7Mc8Mkxu+yjAxvH0vX7/PlJqdVVec52wcaqJpFToYt9AxPY3yOgBt+RjEI
-        aG4fzuzWpC22NKMBxr6O/RMjHdv28qKWfTHlwgkpaOz+BcWrwFwxRmGMeaMg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1685478740; x=
-        1685565140; bh=gJtXKfjMb5k3PryJlBFsKsS3ZINd0EksqBFZ4ekKEDw=; b=o
-        QbHhAjdGI/824Nl01Pip/x1ESJBxXGnNCUCk4Arc6BskEm0MTh9UC6MZYaR2q79S
-        k1Uqb9Vj1z9f6r5u3H1HVCqm/h4f+Vs2C2I55ZxnoCF18+ZrNegBzgUSduwuENN3
-        ZelAmC1BB6EziOQZ1m0S4cDcLpBIGrjkaMEsTbam0kd7jHN3XymXk0VF7iAEn4+L
-        g585WZp+QBIJWRDnqGJWJT85ZYmZick+DsS7QTOGtDLjDvulDczBAEFMf2pxjFDZ
-        z70/jIsQbBWGVBj2a0QhQ3776f+UlGOsyvyOBXKD9nxTQaFTHfPjpO3nn2UqnNoO
-        C4Idzu7QZyx3OsqotLhew==
-X-ME-Sender: <xms:VF12ZCx6LBtGDgihYZ-NBi1TQbMnT10K4M83ELm3G3ATfM8R279sSA>
-    <xme:VF12ZOSoOZisX8Dh7PgaI1Br2VXmS17_-QQHdNrd8ODedLEjRJsiupF-ePxfF5-CL
-    VIu0ou0rSk2fvk>
-X-ME-Received: <xmr:VF12ZEUZ2v-22K9HABN8joZIwupVm2l2OuN_SbATb71V0ubBkGLMjmuY97GOgzqwv3poc01Y0NU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeekjedgudeglecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffvghm
-    ihcuofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhishhisghlvghthhhinh
-    hgshhlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpeejffejgffgueegudevvdejkefg
-    hefghffhffejteekleeufeffteffhfdtudehteenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhisghlvghthhhinhhg
-    shhlrggsrdgtohhm
-X-ME-Proxy: <xmx:VF12ZIgsEEnwHKmC43Kv9GxV7bH-i7tiH_PkAz1p_2nBYwSEAf6YrA>
-    <xmx:VF12ZEDqiN37KhUgZoqxnScnVqOaHAYoy7GmY53oxQjsejR59koZOQ>
-    <xmx:VF12ZJLZp0lEBhXhDlI94ziBRaLfrp4UJrXDlteRIEm9FlDD8PS34w>
-    <xmx:VF12ZCA0rxPCrK0M9295LprgFjyNUobhbd0Xa629Rogk5JO32xfXOA>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 30 May 2023 16:32:19 -0400 (EDT)
-From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com
-Cc:     Demi Marie Obenour <demi@invisiblethingslab.com>,
-        =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= 
-        <marmarek@invisiblethingslab.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org
-Subject: [PATCH v2 16/16] xen-blkback: Inform userspace that device has been opened
-Date:   Tue, 30 May 2023 16:31:16 -0400
-Message-Id: <20230530203116.2008-17-demi@invisiblethingslab.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230530203116.2008-1-demi@invisiblethingslab.com>
-References: <20230530203116.2008-1-demi@invisiblethingslab.com>
+        Tue, 30 May 2023 16:41:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F348E;
+        Tue, 30 May 2023 13:41:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 286156336C;
+        Tue, 30 May 2023 20:41:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86BC1C4339E;
+        Tue, 30 May 2023 20:41:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685479269;
+        bh=NZg4xbNptwq5J83x4/9FfgWYp2tn6LBMqAKgwyJG6tQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=huQNFFH3zVrLLnm5WPfMAbkQPvxCmvDcAuR9nNKd/g6ZoLU+oubgPMfhcvejhwbMy
+         bRuBct3r6wHKkzYqhqEvGFfCpZYRAuAiT3wzv9jYwpqlslolPQpVoC6l4bkxTW5cgq
+         aHvAkKgwybK+QQl1B0Jilwhzk8yfsI7fuifW9XQTkoKFITI0dXVq6KXEBzrUICZPze
+         PyVOTDar79WsVhr08Ikvo3yCjwDdtgjfVU2jkcBlq4rrXYZPDH8DmVzyUBEoHLrosB
+         Mkru2m9rHaX4pyzYCzA4oMl+/2mViC42oBWSv4cVmV6MbUN1IWMmZVyQlgMZsMsif+
+         TJLaW7xm4WLyg==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-4f4db9987f8so275773e87.1;
+        Tue, 30 May 2023 13:41:09 -0700 (PDT)
+X-Gm-Message-State: AC+VfDyEDKU7ap/F+eqFKI+/1NjSEoNR+a/SpvbbwknSwtcTS2B9K1Wk
+        VX4UKpEIsObbwju0F9EMx+H2XddgdzALxM+QQHA=
+X-Google-Smtp-Source: ACHHUZ7vuf2vQNikh852gIOeYbs1mAspWrnHLpuRQ0WVk/9d/YVdWPAiSzLnXbcDRj80He113UbugMRuu4yM7AjsQxc=
+X-Received: by 2002:a2e:a222:0:b0:2af:18a9:782f with SMTP id
+ i2-20020a2ea222000000b002af18a9782fmr4570675ljm.0.1685479267531; Tue, 30 May
+ 2023 13:41:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1685461490.git.johannes.thumshirn@wdc.com> <d7cfd04d410accee4148d8c0e51230bcb8b4bb8f.1685461490.git.johannes.thumshirn@wdc.com>
+In-Reply-To: <d7cfd04d410accee4148d8c0e51230bcb8b4bb8f.1685461490.git.johannes.thumshirn@wdc.com>
+From:   Song Liu <song@kernel.org>
+Date:   Tue, 30 May 2023 13:40:55 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW6hZWx3Jx0UOc20mf06c5QS5vfDKF_nauzm0mLkr3Xhsw@mail.gmail.com>
+Message-ID: <CAPhsuW6hZWx3Jx0UOc20mf06c5QS5vfDKF_nauzm0mLkr3Xhsw@mail.gmail.com>
+Subject: Re: [PATCH v6 13/20] md: check for failure when adding pages in alloc_behind_master_bio
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>, gouhao@uniontech.com,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set "opened" to "0" before the hotplug script is called.  Once the
-device node has been opened, set "opened" to "1".
+On Tue, May 30, 2023 at 8:50=E2=80=AFAM Johannes Thumshirn
+<johannes.thumshirn@wdc.com> wrote:
+>
+> alloc_behind_master_bio() can possibly add multiple pages to a bio, but i=
+t
+> is not checking for the return value of bio_add_page() if adding really
+> succeeded.
+>
+> Check if the page adding succeeded and if not bail out.
+>
+> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-"opened" is used exclusively by userspace.  It serves two purposes:
+Acked-by: Song Liu <song@kernel.org>
 
-1. It tells userspace that the diskseq Xenstore entry is supported.
-
-2. It tells userspace that it can wait for "opened" to be set to 1.
-   Once "opened" is 1, blkback has a reference to the device, so
-   userspace doesn't need to keep one.
-
-Together, these changes allow userspace to use block devices with
-delete-on-close behavior, such as loop devices with the autoclear flag
-set or device-mapper devices with the deferred-remove flag set.
-
-Signed-off-by: Demi Marie Obenour <demi@invisiblethingslab.com>
----
- drivers/block/xen-blkback/xenbus.c | 35 ++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
-
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 9c3eb148fbd802c74e626c3d7bcd69dcb09bd921..519a78aa9073d1faa1dce5c1b36e95ae58da534b 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -3,6 +3,20 @@
-     Copyright (C) 2005 Rusty Russell <rusty@rustcorp.com.au>
-     Copyright (C) 2005 XenSource Ltd
- 
-+In addition to the Xenstore nodes required by the Xen block device
-+specification, this implementation of blkback uses a new Xenstore
-+node: "opened".  blkback sets "opened" to "0" before the hotplug script
-+is called.  Once the device node has been opened, blkback sets "opened"
-+to "1".
-+
-+"opened" is read exclusively by userspace.  It serves two purposes:
-+
-+1. It tells userspace that diskseq@major:minor syntax for "physical-device" is
-+   supported.
-+
-+2. It tells userspace that it can wait for "opened" to be set to 1 after writing
-+   "physical-device".  Once "opened" is 1, blkback has a reference to the
-+   device, so userspace doesn't need to keep one.
- 
- */
- 
-@@ -699,6 +713,14 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 	if (err)
- 		pr_warn("%s write out 'max-ring-page-order' failed\n", __func__);
- 
-+	/*
-+	 * This informs userspace that the "opened" node will be set to "1" when
-+	 * the device has been opened successfully.
-+	 */
-+	err = xenbus_write(XBT_NIL, dev->nodename, "opened", "0");
-+	if (err)
-+		goto fail;
-+
- 	err = xenbus_switch_state(dev, XenbusStateInitWait);
- 	if (err)
- 		goto fail;
-@@ -826,6 +848,19 @@ static void backend_changed(struct xenbus_watch *watch,
- 		goto fail;
- 	}
- 
-+	/*
-+	 * Tell userspace that the device has been opened and that blkback has a
-+	 * reference to it.  Userspace can then close the device or mark it as
-+	 * delete-on-close, knowing that blkback will keep the device open as
-+	 * long as necessary.
-+	 */
-+	err = xenbus_write(XBT_NIL, dev->nodename, "opened", "1");
-+	if (err) {
-+		xenbus_dev_fatal(dev, err, "%s: notifying userspace device has been opened",
-+				 dev->nodename);
-+		goto free_vbd;
-+	}
-+
- 	err = xenvbd_sysfs_addif(dev);
- 	if (err) {
- 		xenbus_dev_fatal(dev, err, "creating sysfs entries");
--- 
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
-
+> ---
+>  drivers/md/raid1.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index 68a9e2d9985b..8283ef177f6c 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -1147,7 +1147,10 @@ static void alloc_behind_master_bio(struct r1bio *=
+r1_bio,
+>                 if (unlikely(!page))
+>                         goto free_pages;
+>
+> -               bio_add_page(behind_bio, page, len, 0);
+> +               if (!bio_add_page(behind_bio, page, len, 0)) {
+> +                       free_page(page);
+> +                       goto free_pages;
+> +               }
+>
+>                 size -=3D len;
+>                 i++;
+> --
+> 2.40.1
+>
