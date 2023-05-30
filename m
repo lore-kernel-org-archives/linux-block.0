@@ -2,156 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 239E9C77B7A
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 14:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 942A5C7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 14:23:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232806AbjE3ODZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 10:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47586 "EHLO
+        id S232591AbjE3OXu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 10:23:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232554AbjE3ODY (ORCPT
+        with ESMTP id S232815AbjE3OX0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 10:03:24 -0400
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88E96F1
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 07:02:42 -0700 (PDT)
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-62603efd2e3so22257516d6.1
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 07:02:42 -0700 (PDT)
+        Tue, 30 May 2023 10:23:26 -0400
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1157B180
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 07:22:54 -0700 (PDT)
+Received: by mail-il1-x12c.google.com with SMTP id e9e14a558f8ab-33110a36153so750905ab.0
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 07:22:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685456572; x=1688048572;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SMQ9ry8AKTO2FR7tRHTRE93ffp9TP0HpWMZoGgQvYPQ=;
+        b=V05PqSXnA/o4aizLouT8C2GNTnWY6Jmz3rPcWRR6mywaAUXjuFQVBqL8n43YaW8lKZ
+         lh3UJRUh8Lx/GZPnqEfgKEkYJejr5+w4tQjI5MNHp9Ru6g7bYDRFAwYnfe4Bkqxdp9tU
+         CX0Y7d2iwsnVfC4nCDzPphTXgpfmA/iOjqRhzl3LHhb12Qq/P0SQ0ZWMj3Tooe8N6sui
+         F/785TkH0bWEk/ua64A6iLfNwNLnnDIVE0YvTALbpD8v0cF+NTQ7RWnosUA1k1V9/kgf
+         kJBfWKPN9lUlQozDDRB9eQimr3bc8ssAX/dhzR2wK523e9oQKyXo6c7E3JInD/9Ovt68
+         JiiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685455361; x=1688047361;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20221208; t=1685456572; x=1688048572;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SLXZZ4okt0cYFY/QNAJJGFsPl/H71jdcBcEpr3wA2kw=;
-        b=W7feReV39C69H2yevz6y4G0hwaFC4Y/0F3Ib6t7/ineomjmXp1SooH52GG/oKSnEVI
-         TGImUOVm4Ao9Rq3JIc5wgZ5ROJYJarkf7iHpLKaFiw2MFCNG0ymEO1wI5av6jkUixAkJ
-         CJLgkvzK+PR7m2kf4SdtE7oj8fSkraqF1pEEEY4ii8Gk2HIx9gBysxUpKGxiJ0DRmVke
-         0khT5NFGukz0nlDE6fnowWY5MQslPJ2pltBaXj6y64AFuqwpjkuvqOgxseOwqsZnhsjN
-         R+yBv8BfHVWNhPpIUc3UeX5lY94lkXdU2lelpmFginp9Okc1DwN8P+Eumzod9IS00vZv
-         WXEw==
-X-Gm-Message-State: AC+VfDwlRo4QhpsCfxQCAh/nC8F4AfTYt0y4C4msoJeWVbOin/+by9K1
-        G/pCd6vcPsfG0DRmZdXyqjj8
-X-Google-Smtp-Source: ACHHUZ7c+L67lbfSXpLgK/LYE2fkMm11TxLSTkagmUtFWm5173a2X+RzwOCM3DIH+r9HCG6yNT7q6w==
-X-Received: by 2002:a05:6214:40a:b0:626:299b:68ee with SMTP id z10-20020a056214040a00b00626299b68eemr2306743qvx.55.1685455361523;
-        Tue, 30 May 2023 07:02:41 -0700 (PDT)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id jh18-20020a0562141fd200b0062382e1e228sm4619878qvb.49.2023.05.30.07.02.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 May 2023 07:02:40 -0700 (PDT)
-Date:   Tue, 30 May 2023 10:02:39 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Joe Thornber <thornber@redhat.com>
-Cc:     Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        linux-kernel@vger.kernel.org, Joe Thornber <ejt@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Sarthak Kukreti <sarthakkukreti@chromium.org>,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
-Message-ID: <ZHYB/6l5Wi+xwkbQ@redhat.com>
-References: <ZGgBQhsbU9b0RiT1@dread.disaster.area>
- <ZGu0LaQfREvOQO4h@redhat.com>
- <ZGzIJlCE2pcqQRFJ@bfoster>
- <ZGzbGg35SqMrWfpr@redhat.com>
- <ZG1dAtHmbQ53aOhA@dread.disaster.area>
- <ZG+KoxDMeyogq4J0@bfoster>
- <ZHB954zGG1ag0E/t@dread.disaster.area>
- <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
- <ZHFEfngPyUOqlthr@dread.disaster.area>
- <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
+        bh=SMQ9ry8AKTO2FR7tRHTRE93ffp9TP0HpWMZoGgQvYPQ=;
+        b=Wtne8NJE1XRBb6Q30jDR6pGe3VEjiFq4xJMH5qHbGbth/KSBLLh46IlYx6AyMWNG7g
+         rnc3e0gFFpTd67M/Q0yrSyh0etHxoM+z+xldreF8IStnuYM/mRLmbX8KuaBi1+7aJeBQ
+         a6n64W2zMHxT2r0GcKZk6samw2aeF2euxX9FFPRcDb7mJ5kN7kxNHOC6SBlsBNYZnNBh
+         p/QjOKlyWEHMxQ3g/FpWcSUI8uxSkNJUUU561liIe3H7FfubP6IC7oyiwe7GSeYsYpqO
+         WjoagmueFGhRxnoZSEg1tIw64FBljtsfKn8Yqno9nxlfYtHar54Qky3FPiOfVv+CkU/0
+         mxFA==
+X-Gm-Message-State: AC+VfDw4mmaueBm4qb2YI+O5e/L9Xj0fNkV7aQaSBflBY03FNIeEcAtf
+        7ylOSRuF8Hum6dNjrWQMIXbf1Q==
+X-Google-Smtp-Source: ACHHUZ6bAQuuHXpQlR+iC5nEfSoFbg5j9AdJTp/kx+0TZ1coKbNYT8KiYZ6HXc/m0Q1/bl2BmHMSwg==
+X-Received: by 2002:a05:6e02:219d:b0:33b:3a14:c14c with SMTP id j29-20020a056e02219d00b0033b3a14c14cmr1520578ila.3.1685456572032;
+        Tue, 30 May 2023 07:22:52 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id v11-20020a056638250b00b004035b26b6d8sm761464jat.2.2023.05.30.07.22.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 May 2023 07:22:51 -0700 (PDT)
+Message-ID: <8e874109-db4a-82e3-4020-0596eeabbadf@kernel.dk>
+Date:   Tue, 30 May 2023 08:22:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/7] block layer patches for bcachefs
+Content-Language: en-US
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+ <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
+ <ZHEaKQH22Uxk9jPK@moria.home.lan>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZHEaKQH22Uxk9jPK@moria.home.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 30 2023 at  3:27P -0400,
-Joe Thornber <thornber@redhat.com> wrote:
-
-> On Sat, May 27, 2023 at 12:45 AM Dave Chinner <david@fromorbit.com> wrote:
+On 5/26/23 2:44?PM, Kent Overstreet wrote:
+> On Fri, May 26, 2023 at 08:35:23AM -0600, Jens Axboe wrote:
+>> On 5/25/23 3:48?PM, Kent Overstreet wrote:
+>>> Jens, here's the full series of block layer patches needed for bcachefs:
+>>>
+>>> Some of these (added exports, zero_fill_bio_iter?) can probably go with
+>>> the bcachefs pull and I'm just including here for completeness. The main
+>>> ones are the bio_iter patches, and the __invalidate_super() patch.
+>>>
+>>> The bio_iter series has a new documentation patch.
+>>>
+>>> I would still like the __invalidate_super() patch to get some review
+>>> (from VFS people? unclear who owns this).
+>>
+>> I wanted to check the code generation for patches 4 and 5, but the
+>> series doesn't seem to apply to current -git nor my for-6.5/block.
+>> There's no base commit in this cover letter either, so what is this
+>> against?
+>>
+>> Please send one that applies to for-6.5/block so it's a bit easier
+>> to take a closer look at this.
 > 
-> > On Fri, May 26, 2023 at 12:04:02PM +0100, Joe Thornber wrote:
-> >
-> > > 1) We have an api (ioctl, bio flag, whatever) that lets you
-> > > reserve/guarantee a region:
-> > >
-> > >   int reserve_region(dev, sector_t begin, sector_t end);
-> >
-> > A C-based interface is not sufficient because the layer that must do
-> > provsioning is not guaranteed to be directly under the filesystem.
-> > We must be able to propagate the request down to the layers that
-> > need to provision storage, and that includes hardware devices.
-> >
-> > e.g. dm-thin would have to issue REQ_PROVISION on the LBA ranges it
-> > allocates in it's backing device to guarantee that the provisioned
-> > LBA range it allocates is also fully provisioned by the storage
-> > below it....
-> >
-> 
-> Fine, bio flag it is.
-> 
-> 
-> >
-> > >   This api should be used minimally, eg, critical FS metadata only.
-> >
-> >
-> >
-> > Plan for having to support tens of GBs of provisioned space in
-> > filesystems, not tens of MBs....
-> >
-> 
-> Also fine.
-> 
-> 
-> I think there's a 2-3 solid days of coding to fully implement
-> > REQ_PROVISION support in XFS, including userspace tool support.
-> > Maybe a couple of weeks more to flush the bugs out before it's
-> > largely ready to go.
-> >
-> > So if there's buy in from the block layer and DM people for
-> > REQ_PROVISION as described, then I'll definitely have XFS support
-> > ready for you to test whenever dm-thinp is ready to go.
-> >
-> 
-> Great, this is what I wanted to hear.  I guess we need an ack from the
-> block guys and then I'll get started.
+> Here you go:
+> git pull https://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
 
-The block portion is where this discussion started (in the context of
-this thread's patchset, now at v7).
+Thanks
 
-During our discussion I think there were 2 gaps identified with this
-patchset:
+The re-exporting of helpers is somewhat odd - why is bcachefs special
+here and needs these, while others do not?
 
-1) provisioning should be opt-in, and we need a clear flag that upper
-   layers look for to know if REQ_PROVISION available
-   - we do get this with the max_provision_sectors = 0 default, is
-     checking queue_limits (via queue_max_provision_sectors)
-     sufficient for upper layers like xfs?
+But the main issue for me are the iterator changes, which mostly just
+seems like unnecessary churn. What's the justification for these? The
+commit messages don;t really have any. Doesn't seem like much of a
+simplification, and in fact it's more code than before and obviously
+more stack usage as well.
 
-2) DM thinp needs REQ_PROVISION passdown support
-   - also dm_table_supports_provision() needs to be stricter by
-     requiring _all_ underlying devices support provisioning?
+-- 
+Jens Axboe
 
-Bonus dm-thinp work: add ranged REQ_PROVISION support to reduce number
-of calls (and bios) block core needs to pass to dm thinp.
-
-Also Joe, for you proposed dm-thinp design where you distinquish
-between "provision" and "reserve": Would it make sense for REQ_META
-(e.g. all XFS metadata) with REQ_PROVISION to be treated as an
-LBA-specific hard request?  Whereas REQ_PROVISION on its own provides
-more freedom to just reserve the length of blocks? (e.g. for XFS
-delalloc where LBA range is unknown, but dm-thinp can be asked to
-reserve space to accomodate it).
-
-Mike
