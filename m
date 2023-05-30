@@ -2,118 +2,157 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F48C7EE24
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 19:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF1DC7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 20:31:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230511AbjE3To1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 15:44:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34576 "EHLO
+        id S231585AbjE3Ubj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 16:31:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231630AbjE3To0 (ORCPT
+        with ESMTP id S230288AbjE3Ubi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 15:44:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFB89F3
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 12:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685475819;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=61jSLilvI6Kq8tZP1TgtpGiMrTcQZMGT4z3p0LusAeA=;
-        b=NIXrLxq7kf7eT3Uyx1drIGN3v/7egCwjxknLdwJCWXczUgAWa3rr5vDiAWcNiZOsOzMp7U
-        PxFr4D/Cu4ihTf3qrgCdtRvedoTsA540Okn0WrQw1RawJmmuKZf4lDbVmyFEBTcO+9AH8y
-        6X7l/KjbClBBO7Fy7AvxJjuZEJWdM14=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-142-MsdeEUCPPlCHG2sXrVx-fA-1; Tue, 30 May 2023 15:43:35 -0400
-X-MC-Unique: MsdeEUCPPlCHG2sXrVx-fA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 903E8800B2A;
-        Tue, 30 May 2023 19:43:34 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5346B2166B25;
-        Tue, 30 May 2023 19:43:34 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 34UJhY4b022142;
-        Tue, 30 May 2023 15:43:34 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 34UJhXMb022117;
-        Tue, 30 May 2023 15:43:33 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Tue, 30 May 2023 15:43:33 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Mike Snitzer <snitzer@kernel.org>
-cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        "axboe @ kernel . dk" <axboe@kernel.dk>, shaggy@kernel.org,
-        damien.lemoal@wdc.com, cluster-devel@redhat.com, kch@nvidia.com,
-        agruenba@redhat.com, linux-mm@kvack.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        jfs-discussion@lists.sourceforge.net, willy@infradead.org,
-        ming.lei@redhat.com, linux-block@vger.kernel.org, song@kernel.org,
-        dm-devel@redhat.com, rpeterso@redhat.com,
-        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-        hch@lst.de
-Subject: Re: [PATCH v5 16/20] dm-crypt: check if adding pages to clone bio
- fails
-In-Reply-To: <ZHYbIYxGbcXbpvIK@redhat.com>
-Message-ID: <alpine.LRH.2.21.2305301527410.18906@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20230502101934.24901-1-johannes.thumshirn@wdc.com> <20230502101934.24901-17-johannes.thumshirn@wdc.com> <alpine.LRH.2.21.2305301045220.3943@file01.intranet.prod.int.rdu2.redhat.com> <ZHYbIYxGbcXbpvIK@redhat.com>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        Tue, 30 May 2023 16:31:38 -0400
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD713F7;
+        Tue, 30 May 2023 13:31:36 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id E6A0D3200906;
+        Tue, 30 May 2023 16:31:33 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Tue, 30 May 2023 16:31:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        invisiblethingslab.com; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:date:from:from:in-reply-to
+        :message-id:mime-version:reply-to:sender:subject:subject:to:to;
+         s=fm1; t=1685478693; x=1685565093; bh=mBn4BtTIuaSR4k6kR5OhxVvo4
+        bxwgD7eI3h6KSrS77Y=; b=OV5XCQmm52GKorJgytjmRhmDfFno0a/Pgi7UWpDrL
+        hmac3z3F+t+j3QvIAwMR4SXWsjE00Dk8J2pl4/bzWVkMLVwTCqNUhcwwpYQQyRID
+        prcGg+R9vE6c37cpOzefITiocc0xsV6Klz2vTQHMOb7Bq4dZxG0KjFsbkZlmP2KN
+        4UGnkgg5UwPtIm1WL0u1FQq0kfl3kpp3phUtHwN0psepWye8YFq97zYVHkIfuPNZ
+        XwdZ5Q15Y7S6lVoiCRL7QUWcNMt4WbaKMKTLoIV+vAoQTKxR0jmJ6p2DjVSE/Nvp
+        eo3yhydz4SncBJZ1C9N20dkMonTC3o23ffZYDb/MYwasA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:date:feedback-id:feedback-id
+        :from:from:in-reply-to:message-id:mime-version:reply-to:sender
+        :subject:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender
+        :x-me-sender:x-sasl-enc; s=fm1; t=1685478693; x=1685565093; bh=m
+        Bn4BtTIuaSR4k6kR5OhxVvo4bxwgD7eI3h6KSrS77Y=; b=AsrK9fySZ3AZJANui
+        7+TxVT0aD6Mmt+OOYUCS1xBbGC40JB4t9Zr57FAhjpU9BbocgsFPZv3WNzEHoyiw
+        T9iw4+MxlfR5NR9KNQD77hE9wDHDsXxa0IM+szCQBqgjx9Jzd+6H0dn8mz8XkxbN
+        LRLDdd58fW+Zs20WpFjccSO76SGJy2Ryqfg87kJHl9jRUt5dPpNasxKX+RAc4T1L
+        bXo0Gg/hA2d6xc6Bcd5Hr+l3xrVftdl7twbjEh52cjWu0wYiR2RsWqfKFx7vZ+4X
+        8esMxX3l4CZV0yTt6g7boPGvPu+uu0wNvJUK9FRrodoQFrKkOkYS+Z9UWiOdk64K
+        9dIMg==
+X-ME-Sender: <xms:JV12ZKw_sleDe0CYhkOy1rfxDsKjpyELd-fxjymHbgcgq5lekwsKZA>
+    <xme:JV12ZGTAn57_8e1GFIsXL0ysKh0FpixwJKQ-TddPSbdxYp9ycPOiTVwaNOrltt2ad
+    ug8Bk31vxxSZPs>
+X-ME-Received: <xmr:JV12ZMUabxwRmIasWNcUfFJi1r8ayOF9Gz99yU6V6s-nhGY0G9ciErqgnlwdmTNxI5uZ2MoKV6c>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeekjedgudeglecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvfevufffkffogggtgfesthekredtredtjeenucfhrhhomhepffgvmhhi
+    ucforghrihgvucfqsggvnhhouhhruceouggvmhhisehinhhvihhsihgslhgvthhhihhngh
+    hslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhephfeggfeiiedtieejgedutdekgfet
+    geehheegteekvefhfefgudehtdevleegueegnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepuggvmhhisehinhhvihhsihgslhgvthhhihhnghhs
+    lhgrsgdrtghomh
+X-ME-Proxy: <xmx:JV12ZAjQ2rV9YCzr3z2bw2d41_MyNZJp_kvJGEi-trj6PoDKHYaXqQ>
+    <xmx:JV12ZMCHtfgQyZp2PZhX45i91mJDIhD_ys-ao3poTncETHRblZjImQ>
+    <xmx:JV12ZBLpJyOl-upuH58Tw1NYpbK7gxAD5Bx9jCgXSTOlNIObWkK6QA>
+    <xmx:JV12ZKAryiWCZk5crUODpJpFTwj0sB-WzC-8b4F9y9v0UR85ql4CiA>
+Feedback-ID: iac594737:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 30 May 2023 16:31:32 -0400 (EDT)
+From:   Demi Marie Obenour <demi@invisiblethingslab.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com
+Cc:     Demi Marie Obenour <demi@invisiblethingslab.com>,
+        =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= 
+        <marmarek@invisiblethingslab.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org
+Subject: [PATCH v2 00/16] Diskseq support in loop, device-mapper, and blkback
+Date:   Tue, 30 May 2023 16:31:00 -0400
+Message-Id: <20230530203116.2008-1-demi@invisiblethingslab.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This work aims to allow userspace to create and destroy block devices
+in a race-free way, and to allow them to be exposed to other Xen VMs via
+blkback without races.
 
+Changes since v1:
 
-On Tue, 30 May 2023, Mike Snitzer wrote:
+- Several device-mapper fixes added.
+- The diskseq is now a separate Xenstore node, rather than being part of
+  physical-device.
+- Potentially backwards-incompatible changes to device-mapper now
+  require userspace opt-in.
+- The code has been tested: I have a block script written in C that uses
+  these changes to successfully boot a Xen VM.
+- The core block layer is almost completely untouched.  Instead of
+  exposing a block device inode directly to userspace, device-mapper
+  ioctls that create a block device now return that device's diskseq.
+  Userspace can then use that diskseq to safely open the device.
+  Furthermore, ioctls that operate on an existing device-mapper device
+  now accept a diskseq parameter, which can be used to prevent races.
 
-> On Tue, May 30 2023 at 11:13P -0400,
-> Mikulas Patocka <mpatocka@redhat.com> wrote:
-> 
-> > Hi
-> > 
-> > I nack this. This just adds code that can't ever be executed.
-> > 
-> > dm-crypt already allocates enough entries in the vector (see "unsigned int 
-> > nr_iovecs = (size + PAGE_SIZE - 1) >> PAGE_SHIFT;"), so bio_add_page can't 
-> > fail.
-> > 
-> > If you want to add __must_check to bio_add_page, you should change the 
-> > dm-crypt code to:
-> > if (!bio_add_page(clone, page, len, 0)) {
-> > 	WARN(1, "this can't happen");
-> > 	return NULL;
-> > }
-> > and not write recovery code for a can't-happen case.
-> 
-> Thanks for the review Mikulas. But the proper way forward, in the
-> context of this patchset, is to simply change bio_add_page() to
-> __bio_add_page()
-> 
-> Subject becomes: "dm crypt: use __bio_add_page to add single page to clone bio"
-> 
-> And header can explain that "crypt_alloc_buffer() already allocates
-> enough entries in the clone bio's vector, so bio_add_page can't fail".
-> 
-> Mike
+There are a few changes that make device-mapper's table validation
+stricter.  Two of them are clear-cut fixes for memory safety bugs: one
+prevents a misaligned pointer dereference in the kernel, and the other
+prevents pointer arithmetic overflow that could cause the kernel to
+dereference a userspace pointer, especially on 32-bit systems.  One
+fixes a double-fetch bug that happens to be harmless right now, but
+would make distribution backports of subsequent patches unsafe.  The
+remaining fixes prevent totally nonsensical tables from being accepted.
+This includes parameter strings that overlap the subsequent target spec,
+and target specs that overlap the 'struct dm_ioctl' or each other.  I
+doubt there is any userspace extant that generates such tables.
 
-Yes, __bio_add_page would look nicer. But bio_add_page can merge adjacent 
-pages into a single bvec entry and __bio_add_page can't (I don't know how 
-often the merging happens or what is the performance implication of 
-non-merging).
+Finally, one patch forbids device-mapper devices to be named ".", "..",
+or "control".  Since device-mapper devices are often accessed via
+/dev/mapper/NAME, such names would likely greatly confuse userspace.  I
+consider this to be an extension of the existing check that prohibits
+device mapper names or UUIDs from containing '/'.
 
-I think that for the next merge window, we can apply this patch: 
-https://listman.redhat.com/archives/dm-devel/2023-May/054046.html
-which makes this discussion irrelevant. (you can change bio_add_page to 
-__bio_add_page in it)
+Demi Marie Obenour (16):
+  device-mapper: Check that target specs are sufficiently aligned
+  device-mapper: Avoid pointer arithmetic overflow
+  device-mapper: do not allow targets to overlap 'struct dm_ioctl'
+  device-mapper: Better error message for too-short target spec
+  device-mapper: Target parameters must not overlap next target spec
+  device-mapper: Avoid double-fetch of version
+  device-mapper: Allow userspace to opt-in to strict parameter checks
+  device-mapper: Allow userspace to provide expected diskseq
+  device-mapper: Allow userspace to suppress uevent generation
+  device-mapper: Refuse to create device named "control"
+  device-mapper: "." and ".." are not valid symlink names
+  device-mapper: inform caller about already-existing device
+  xen-blkback: Implement diskseq checks
+  block, loop: Increment diskseq when releasing a loop device
+  xen-blkback: Minor cleanups
+  xen-blkback: Inform userspace that device has been opened
 
-Mikukas
+ block/genhd.c                       |   1 +
+ drivers/block/loop.c                |   6 +
+ drivers/block/xen-blkback/blkback.c |   8 +-
+ drivers/block/xen-blkback/xenbus.c  | 147 ++++++++--
+ drivers/md/dm-core.h                |   2 +
+ drivers/md/dm-ioctl.c               | 432 ++++++++++++++++++++++------
+ drivers/md/dm.c                     |   5 +-
+ include/linux/device-mapper.h       |   2 +-
+ include/uapi/linux/dm-ioctl.h       |  67 ++++-
+ 9 files changed, 551 insertions(+), 119 deletions(-)
+
+-- 
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+Invisible Things Lab
 
