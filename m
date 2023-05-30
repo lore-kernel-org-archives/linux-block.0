@@ -2,127 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D560AC77B7A
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 02:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB5FC7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 02:41:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230141AbjE3CIS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 May 2023 22:08:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48600 "EHLO
+        id S229524AbjE3Cle (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 May 2023 22:41:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbjE3CIP (ORCPT
+        with ESMTP id S229494AbjE3Cld (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 May 2023 22:08:15 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC3AE3;
-        Mon, 29 May 2023 19:07:58 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QVbQL2WSYz4f3lVw;
-        Tue, 30 May 2023 10:07:54 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCH77J6WnVk4dYPKg--.45958S3;
-        Tue, 30 May 2023 10:07:55 +0800 (CST)
-Subject: Re: [PATCH -next] block: fix blktrace debugfs entries leak
-To:     Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>
-Cc:     ming.lei@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230511065633.710045-1-yukuai1@huaweicloud.com>
- <20230511152808.GA8641@lst.de>
- <18db3894-d128-7857-4c11-25b59d82ff54@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e26d37bc-0f09-426a-ef25-57bdbd716ae9@huaweicloud.com>
-Date:   Tue, 30 May 2023 10:07:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 29 May 2023 22:41:33 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E9E6A8;
+        Mon, 29 May 2023 19:41:31 -0700 (PDT)
+X-UUID: 7982e574fe9311ed9cb5633481061a41-20230530
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=qQkRn78F4m8QN2PjOiwEOoJXrUMDRX+JHKVaHWxbwlQ=;
+        b=JV8vPxj8ra8ZUq7c+io7j7bi+5MP8Fbtov19lVhQrfAPLHcH/01DU/o6SkKplWFuhmfClgmKxJUGGjNvyMH9vrQ+FRhZsJNPBwyljG4Y0DqFWMzqBmXLL7rGQj97e3vyunE2Mim9LE7LJWeITZ/BymuRaxYf17MK13Fli2xqyVo=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.25,REQID:ef7388d8-ace4-42b4-9f53-c243b9157b27,IP:0,U
+        RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+        :release,TS:-5
+X-CID-META: VersionHash:d5b0ae3,CLOUDID:9cd4646d-2f20-4998-991c-3b78627e4938,B
+        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-UUID: 7982e574fe9311ed9cb5633481061a41-20230530
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+        (envelope-from <powen.kao@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 697670874; Tue, 30 May 2023 10:41:27 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 30 May 2023 10:41:25 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Tue, 30 May 2023 10:41:25 +0800
+From:   Po-Wen Kao <powen.kao@mediatek.com>
+To:     <linux-scsi@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        "Christoph Hellwig" <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+CC:     <wsd_upstream@mediatek.com>, <peter.wang@mediatek.com>,
+        <stanley.chu@mediatek.com>, <powen.kao@mediatek.com>,
+        <alice.chao@mediatek.com>, <naomi.chu@mediatek.com>,
+        <chun-hung.wu@mediatek.com>, <cc.chou@mediatek.com>,
+        <eddie.huang@mediatek.com>, Ed Tsai <ed.tsai@mediatek.com>,
+        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
+Subject: [PATCH v1 1/1] nvme: complete directly for hctx with only one ctx mapping
+Date:   Tue, 30 May 2023 10:41:19 +0800
+Message-ID: <20230530024120.17196-1-powen.kao@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
-In-Reply-To: <18db3894-d128-7857-4c11-25b59d82ff54@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCH77J6WnVk4dYPKg--.45958S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXw15AFW7CF17KF1kZw1rXrb_yoW5Gr1xpF
-        Z2qan0kryUArsYva4jvw48Za4fK34rJFWkWF93GryS9FsxJr1agrW7XrsY9rW5Xr4v9r90
-        qw15ZrW7Ar18XFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
-        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9
-        -UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Christoph
+From: Ed Tsai <ed.tsai@mediatek.com>
 
-在 2023/05/12 15:14, Yu Kuai 写道:
-> Hi,
-> 
-> 在 2023/05/11 23:28, Christoph Hellwig 写道:
->> On Thu, May 11, 2023 at 02:56:33PM +0800, Yu Kuai wrote:
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>
->>> Commit 99d055b4fd4b ("block: remove per-disk debugfs files in
->>> blk_unregister_queue") moves blk_trace_shutdown() from
->>> blk_release_queue() to blk_unregister_queue(), this is safe if blktrace
->>> is created through sysfs, however, there are some regression in corner
->>> cases:
->>>
->>> 1) for scsi, passthrough io can still be issued after del_gendisk, and
->>>     blktrace debugfs entries will be removed immediately after
->>>     del_gendisk(), therefor passthrough io can't be tracked and blktrace
->>>     will complain:
->>>
->>>     failed read of /sys/kernel/debug/block/sdb/trace0: 5/Input/output 
->>> error
->>
->> But that is the right thing.  The only thing that has a name is the
->> gendisk and it is gone at this point.  Leaking the debugfs entries
->> that are named after, and ultimatively associated with the gendisk
->> (even if the code is still a bit confused about this) will create a lot
->> of trouble for us.
->>
->>> 2) blktrace can still be enabled after del_gendisk() through ioctl if 
->>> the
->>>     disk is opened before del_gendisk(), and if blktrace is not shutdown
->>>     through ioctl before closing the disk, debugfs entries will be
->>>     leaked.
->>
->> Yes.
->>
->>> It seems 1) is not important, while 2) needs to be fixed apparently.
->>>
->>> Fix this problem by shutdown blktrace in blk_free_queue(),
->>> disk_release() is not used because scsi sg support blktrace without
->>> gendisk, and this is safe because queue is not freed yet, and
->>> blk_trace_shutdown() is reentrant.
->>
->> I think disk_release is the right place for "normal" blktrace.  The
->> odd cdev based blktrace for /dev/sg will need separate handling.
->> To be honest I'm not even sure how /dev/sg based passthrough is
->> even supposed to work in practice, but I'll need to spend some more
->> time to familarize myself with it.
-> 
-> I'm not sure how to specail hanlde /dev/sg* for now, however,
-> If we don't care about blktrace for passthrough io after del_gendisk(),
-> and /dev/sg* has separate handling, I think it's better just to check
-> QUEUE_FLAG_REGISTERED in blk_trace_setup(), and don't enable blktrace
-> in the first place.
+Refer to
+commit f168420c62e7
+("blk-mq: don't redirect completion for hctx withs only one ctx mapping")
+When nvme applies a 1:1 mapping of hctx and ctx, there will be no remote
+request.
 
-Any suggestions about this problem? Should we use separate handling for
-/dev/sd? Or just free blktrace in blk_free_queue().
-> 
-> Thanks,
-> Kuai
-> 
-> .
-> 
+But for ufs, the submission and completion queue could be asymmetric.
+(e.g. Multiple SQs share one CQ) Therefore, 1:1 mapping of hctx and
+ctx won't complete request on the submission cpu. In this situation,
+put this condition in block layer could violate the
+QUEUE_FLAG_SAME_FORCE, as a result, move this back to nvme.
+
+Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
+Signed-off-by: Po-Wen Kao <powen.kao@mediatek.com>
+---
+ block/blk-mq.c           | 8 +++-----
+ drivers/nvme/host/nvme.h | 4 ++++
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1749f5890606..b60c78f5ad46 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1181,12 +1181,10 @@ bool blk_mq_complete_request_remote(struct request *rq)
+ 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+ 
+ 	/*
+-	 * For request which hctx has only one ctx mapping,
+-	 * or a polled request, always complete locally,
+-	 * it's pointless to redirect the completion.
++	 * For a polled request, always complete locally, it's pointless
++	 * to redirect the completion.
+ 	 */
+-	if (rq->mq_hctx->nr_ctx == 1 ||
+-		rq->cmd_flags & REQ_POLLED)
++	if (rq->cmd_flags & REQ_POLLED)
+ 		return false;
+ 
+ 	if (blk_mq_complete_need_ipi(rq)) {
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 7cf8e44d135e..acc9b1ce071d 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -702,6 +702,10 @@ static inline bool nvme_try_complete_req(struct request *req, __le16 status,
+ 	nvme_should_fail(req);
+ 	if (unlikely(blk_should_fake_timeout(req->q)))
+ 		return true;
++	if (likely(req->mq_hctx->nr_ctx == 1)) {
++		WRITE_ONCE(req->state, MQ_RQ_COMPLETE);
++		return false;
++	}
+ 	return blk_mq_complete_request_remote(req);
+ }
+ 
+-- 
+2.18.0
 
