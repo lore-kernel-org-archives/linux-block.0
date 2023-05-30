@@ -2,93 +2,142 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E7FC77B7A
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 17:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35738C7EE2F
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 17:26:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjE3RNY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 13:13:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45522 "EHLO
+        id S233488AbjE3R0E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 13:26:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232763AbjE3RNX (ORCPT
+        with ESMTP id S233048AbjE3RZt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 13:13:23 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A414F10D
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:13:15 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-338bd590bc1so751235ab.1
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:13:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685466795; x=1688058795;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X9lZV7bV7fcpjfbgqIwMWLtZa7MEtpBcanyjWNz9SA4=;
-        b=xyLFhYk7xI5CYPvLeQkuOD1Z89KueAAajRiTaDrZh07ITGjo9jHqbiKMRbYZNbWzv+
-         HmqqhLHdAzzjmAJTVdhuSMPg3cI9nGuwVAMhg2Ep8MLU9EtD+G4iOjxIA/b6N7IM1sao
-         PUThVWll/0JIgxIiHuGwZ2BSuxITRKUZZ5Solv/TPxkLNQEJxplaEMDGjCPJQ/1zJdrn
-         lDN4I0wagYiQuROt+XpyZZ5vDDKUrX3tum8wJOej2yoID/95poYBmxfHyD5pe8dx3SKX
-         Eap3C+aY+sOde5CJZi+AqyFha0Lw1FxVoxW7//8A0MyKUyVK9TZA1KwGojvFzrLhWzce
-         4P1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685466795; x=1688058795;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X9lZV7bV7fcpjfbgqIwMWLtZa7MEtpBcanyjWNz9SA4=;
-        b=c4a9MMyOfHk+Y2VQ3nht+b9CUM0HEvQmM0x3XbS3aP56VJhZnWcc8+7X3L+kUFryII
-         meDWaZ+EWgVTki4sh0f/2nEhr4JQ8ef4OLVqUoI/VS30jPUNFNSlgl9cdIdXZd1h5RON
-         FnzDAHksyUESu5+FAqorUD21r1I/PtjCrYzE5a9AUakrpeM6ZPh898h2MvqnpIxwQUXZ
-         NkydCm3ERl9nl+mIjM+Eui0bW411ihCF5FjCM3y6rDJbcNnrmLRjPeQwUouqMOcE474A
-         bQDVAUdl1BACil2yp+49bDZwZwYUmVvjTU1y+0tp6PvWd5A0dYsw2GwTW5jGGA8HcW1y
-         qqVg==
-X-Gm-Message-State: AC+VfDxpuo0nQI9h5gbwTb79N64j7mGwS+/P30E1AUkkEoWiVPLtwAo4
-        zWggWQIPstjHQC4ayWxS/hiEDUUXndctQYGtZCQ=
-X-Google-Smtp-Source: ACHHUZ4H0t7i48FfHuwAM9EvQXL2x+v9wdYmg8vgH6Bl+e7aisaRBhtMo7bNHYR/aHixz5BEUVFlkw==
-X-Received: by 2002:a92:c568:0:b0:33b:c4c:f425 with SMTP id b8-20020a92c568000000b0033b0c4cf425mr60590ilj.3.1685466794987;
-        Tue, 30 May 2023 10:13:14 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id y59-20020a029541000000b0040fa32ccb0bsm817352jah.79.2023.05.30.10.13.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 May 2023 10:13:14 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel test robot <lkp@intel.com>
-In-Reply-To: <20230419-const-partition-v3-0-4e14e48be367@weissschuh.net>
-References: <20230419-const-partition-v3-0-4e14e48be367@weissschuh.net>
-Subject: Re: [PATCH v3 0/4] block: constify some structures of
- partitions/core.c
-Message-Id: <168546679410.36719.118353258344450301.b4-ty@kernel.dk>
-Date:   Tue, 30 May 2023 11:13:14 -0600
+        Tue, 30 May 2023 13:25:49 -0400
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761F51B6
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:25:18 -0700 (PDT)
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34UGY90h031170
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:23:53 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=bHlDZ98iZ2yfgOB8PPLdZzv6+izKLcs4GDZzU2G+rPE=;
+ b=BqTHeYYaLgLknyO8xaTdKS0UwXRvuI2IwkNK2sLTn3jK8N3KW1VD0H5aZsV0mAxIMozc
+ S/rJ8/HJI7IzZJxleACqD2zcXXn7oDgIkVfS3paskizdXVE91yesiQfFcbLwAW7h3MoT
+ v5hiSJXWVmyKRIzuGpIuVsk0gZhzY/6mY9CE8BgWUVJvC0E4o61kiMpUZ7pBhJyAlfx/
+ uGtozZGfD8Me098sjNM4vYbNybvoItrUPf1QhlAaI9PSYJNSSOb6C54VneOAas8cozJQ
+ M68m48u17PZoA+oW21PZZICvsn3G6XZxOT6aNKAHX2YUqEiACufyfcs6LrtYyrKMAVZ+ eg== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3qwb4x49fq-4
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:23:53 -0700
+Received: from twshared52232.38.frc1.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a8:82::e) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 30 May 2023 10:23:50 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id AB3A3194BF685; Tue, 30 May 2023 10:23:48 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <hch@lst.de>, <axboe@kernel.dk>
+CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 1/2] block: add request polling helper
+Date:   Tue, 30 May 2023 10:23:42 -0700
+Message-ID: <20230530172343.3250958-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.13-dev-00303
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: nXojOi3prQ4b0CbaX9w2uVOJVzqYvSDw
+X-Proofpoint-ORIG-GUID: nXojOi3prQ4b0CbaX9w2uVOJVzqYvSDw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-30_12,2023-05-30_01,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Keith Busch <kbusch@kernel.org>
 
-On Tue, 30 May 2023 19:09:56 +0200, Thomas Weißschuh wrote:
-> A few structures containing function pointers that could and should be
-> const are not. Change that.
-> 
-> 
+This will be used by drivers that allocate polling requests. It
+interface does not require a bio, and can skip the overhead associated
+with polling those.
 
-Applied, thanks!
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-mq.c         | 29 ++++++++++++++++++++++++++---
+ include/linux/blk-mq.h |  2 ++
+ 2 files changed, 28 insertions(+), 3 deletions(-)
 
-[1/4] block: constify partition prober array
-      commit: 539050f92ea7666bca17c2c380d8071d2f93dcde
-[2/4] block: constify struct part_type part_type
-      commit: cdb37f73cf05631c4f7401f2cd99878733c0c3d9
-[3/4] block: constify struct part_attr_group
-      commit: 0bd478005cfc7f50ccb769744d952e9687ee75b4
-[4/4] block: constify the whole_disk device_attribute
-      commit: a378f6a40fac4a2f1812adea7017613d2bd5dab6
-
-Best regards,
--- 
-Jens Axboe
-
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f6dad0886a2fa..3c12c476e3a5c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4740,10 +4740,9 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_=
+set *set, int nr_hw_queues)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
+=20
+-int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
+_batch *iob,
+-		unsigned int flags)
++static int blk_hctx_poll(struct request_queue *q, struct blk_mq_hw_ctx *=
+hctx,
++			 struct io_comp_batch *iob, unsigned int flags)
+ {
+-	struct blk_mq_hw_ctx *hctx =3D blk_qc_to_hctx(q, cookie);
+ 	long state =3D get_current_state();
+ 	int ret;
+=20
+@@ -4768,6 +4767,30 @@ int blk_mq_poll(struct request_queue *q, blk_qc_t =
+cookie, struct io_comp_batch *
+ 	return 0;
+ }
+=20
++int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
+_batch *iob,
++		unsigned int flags)
++{
++	return blk_hctx_poll(q, blk_qc_to_hctx(q, cookie), iob, flags);
++}
++
++int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
++		unsigned int poll_flags)
++{
++	struct request_queue *q =3D rq->q;
++	int ret;
++
++	if (!blk_rq_is_poll(rq))
++		return 0;
++	if (!percpu_ref_tryget(&q->q_usage_counter))
++		return 0;
++
++	ret =3D blk_hctx_poll(q, rq->mq_hctx, iob, poll_flags);
++	blk_queue_exit(q);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(blk_rq_poll);
++
+ unsigned int blk_mq_rq_cpu(struct request *rq)
+ {
+ 	return rq->mq_ctx->cpu;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 06caacd77ed66..579818fa1f91d 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -722,6 +722,8 @@ int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set *se=
+t,
+ void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
+=20
+ void blk_mq_free_request(struct request *rq);
++int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
++		unsigned int poll_flags);
+=20
+ bool blk_mq_queue_inflight(struct request_queue *q);
+=20
+--=20
+2.34.1
 
