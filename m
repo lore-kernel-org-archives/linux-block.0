@@ -2,49 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14224C77B7A
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 14:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32B8BC7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 15:14:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbjE3OzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 10:55:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33504 "EHLO
+        id S230404AbjE3POg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 11:14:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbjE3OzU (ORCPT
+        with ESMTP id S232470AbjE3POc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 10:55:20 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAC98F
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 07:55:19 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 67BE968B05; Tue, 30 May 2023 16:55:16 +0200 (CEST)
-Date:   Tue, 30 May 2023 16:55:16 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/7] blk-mq: use the I/O scheduler for writes from the
- flush state machine
-Message-ID: <20230530145516.GA11237@lst.de>
-References: <20230519044050.107790-1-hch@lst.de> <20230519044050.107790-5-hch@lst.de> <20230524055327.GA19543@lst.de> <d2e12e08-3a5f-2f5b-e3d1-2c1ea39d716b@acm.org>
+        Tue, 30 May 2023 11:14:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3231A7
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 08:13:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685459621;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vye8gB1vOKUzz58ckJ8yXN12XsS7VmnNhEIxChnaCeU=;
+        b=hb717otMSCCVlkmSE9gCqMpDCLj1dAQBjUTyIMH4liNsSdARw3FKQS4ERekCzhYjJhP9Zk
+        tgYik/2kDDMy9e2x4gSFEQqlfRbqLUkAdoQU3HBQWh9sIMWDQWA1KrpdoLxB787IxJRnoA
+        x7eJjIfWJNSzbxr5PMEHezW3DNv4vdg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-5-hmEFKwvqOZWLGW87qowi1w-1; Tue, 30 May 2023 11:13:40 -0400
+X-MC-Unique: hmEFKwvqOZWLGW87qowi1w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BB27785A5BA;
+        Tue, 30 May 2023 15:13:39 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A93F140EBB8;
+        Tue, 30 May 2023 15:13:39 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 34UFDdMG006630;
+        Tue, 30 May 2023 11:13:39 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 34UFDc58006626;
+        Tue, 30 May 2023 11:13:38 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Tue, 30 May 2023 11:13:38 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+cc:     "axboe @ kernel . dk" <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, damien.lemoal@wdc.com, kch@nvidia.com,
+        agruenba@redhat.com, shaggy@kernel.org, song@kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        snitzer@kernel.org, jfs-discussion@lists.sourceforge.net,
+        willy@infradead.org, ming.lei@redhat.com, cluster-devel@redhat.com,
+        linux-mm@kvack.org, dm-devel@redhat.com,
+        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+        hch@lst.de, rpeterso@redhat.com
+Subject: Re: [dm-devel] [PATCH v5 16/20] dm-crypt: check if adding pages to
+ clone bio fails
+In-Reply-To: <20230502101934.24901-17-johannes.thumshirn@wdc.com>
+Message-ID: <alpine.LRH.2.21.2305301045220.3943@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20230502101934.24901-1-johannes.thumshirn@wdc.com> <20230502101934.24901-17-johannes.thumshirn@wdc.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d2e12e08-3a5f-2f5b-e3d1-2c1ea39d716b@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, May 28, 2023 at 01:50:50PM -0700, Bart Van Assche wrote:
-> On 5/23/23 22:53, Christoph Hellwig wrote:
->> I turns out this causes some kind of hang I haven't been able to
->> debug yet in blktests' hotplug test.   Can you drop this and the
->> subsequent patches for now?
->
-> Hi Christoph,
->
-> Are you perhaps referring to test block/027? It passes in my test-VM
-> with Jens' for-next branch and the following blktests config file:
 
-No, I mean block/001
+
+On Tue, 2 May 2023, Johannes Thumshirn wrote:
+
+> Check if adding pages to clone bio fails and if it does retry with
+> reclaim. This mirrors the behaviour of page allocation in
+> crypt_alloc_buffer().
+> 
+> This way we can mark bio_add_pages as __must_check.
+> 
+> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
+>  drivers/md/dm-crypt.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> index 8b47b913ee83..b234dc089cee 100644
+> --- a/drivers/md/dm-crypt.c
+> +++ b/drivers/md/dm-crypt.c
+> @@ -1693,7 +1693,14 @@ static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned int size)
+>  
+>  		len = (remaining_size > PAGE_SIZE) ? PAGE_SIZE : remaining_size;
+>  
+> -		bio_add_page(clone, page, len, 0);
+> +		if (!bio_add_page(clone, page, len, 0)) {
+> +			mempool_free(page, &cc->page_pool);
+> +			crypt_free_buffer_pages(cc, clone);
+> +			bio_put(clone);
+> +			gfp_mask |= __GFP_DIRECT_RECLAIM;
+> +			goto retry;
+> +
+> +		}
+>  
+>  		remaining_size -= len;
+>  	}
+
+Hi
+
+I nack this. This just adds code that can't ever be executed.
+
+dm-crypt already allocates enough entries in the vector (see "unsigned int 
+nr_iovecs = (size + PAGE_SIZE - 1) >> PAGE_SHIFT;"), so bio_add_page can't 
+fail.
+
+If you want to add __must_check to bio_add_page, you should change the 
+dm-crypt code to:
+if (!bio_add_page(clone, page, len, 0)) {
+	WARN(1, "this can't happen");
+	return NULL;
+}
+and not write recovery code for a can't-happen case.
+
+Mikulas
+
