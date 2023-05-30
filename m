@@ -2,283 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C41E7C7EE23
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 17:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCB4C7EE23
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 17:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233441AbjE3R0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 13:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50936 "EHLO
+        id S232524AbjE3Rp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 13:45:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233466AbjE3R0A (ORCPT
+        with ESMTP id S231484AbjE3Rpz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 13:26:00 -0400
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671C3E59
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:25:31 -0700 (PDT)
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34UGY3vk010975
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:24:02 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=7ApPjhbD0YCmJA9+SszNafaDNZtkZLNh6kXcyxMsgIs=;
- b=cNJEJ9sESzq+U8rY7Xkot+YAY9g061OqLEzBmI7MsEqRL5fnHWuV2Ns+JzeyRrvuM8Gn
- HEwIsjc0w9HNjs+zo2XLee0Bc2kZPfg7uFLXW08IXvsn6xoFRkQcPfG9mxs1ltDccav/
- t9vhDn+13RBoq9pMWQAIaewwQ6usmdH9brtnggvxaG/5193BaQVr6fFv72OdHYZViLq2
- t6qJDXf7VoZlwcRmJMH9gPcLO9cFPWAGHnOj9F5QQnX7OCLqPAFgeBzbfH0Ps/0Gqz2E
- p8o4sxlIeQXE2zDYw1+NfqCg6uwZc0wTe23tzMUANhNK+F016xY9Wy554beJzvCFkBiA Zw== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3qwfn0k0d8-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:24:01 -0700
-Received: from ash-exhub204.TheFacebook.com (2620:10d:c0a8:83::4) by
- ash-exhub104.TheFacebook.com (2620:10d:c0a8:82::d) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 30 May 2023 10:24:00 -0700
-Received: from twshared25760.37.frc1.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a8:83::4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 30 May 2023 10:24:00 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id B7A40194BF687; Tue, 30 May 2023 10:23:48 -0700 (PDT)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>, <hch@lst.de>, <axboe@kernel.dk>
-CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 2/2] nvme: improved uring polling
-Date:   Tue, 30 May 2023 10:23:43 -0700
-Message-ID: <20230530172343.3250958-2-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230530172343.3250958-1-kbusch@meta.com>
-References: <20230530172343.3250958-1-kbusch@meta.com>
+        Tue, 30 May 2023 13:45:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28D01BE;
+        Tue, 30 May 2023 10:45:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B7BC260B92;
+        Tue, 30 May 2023 17:45:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D26DBC433EF;
+        Tue, 30 May 2023 17:45:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685468753;
+        bh=M2d8QfDnpbBofbpHBedx96eep1G2TGIo1MipTNzs2PE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Q4PEQyK+Mb3z74hsjrsMPy/Evc1arWxzfqzw5cH2IvfHoHszeY/44cBnBqYAMJ+jP
+         xBGueyzWYa9U21olM5/VoQEq+1K0LVOMVFqH0/tKhXG5NgpXgY+oqcByD67g7R+1TH
+         QgZJETtDRtMqOoiIXXRKFQrci4R4JLPsf2mu1DYqVVJYpie6lNbKgynV+XlAgO+IT3
+         IBJSEfy/xuieAy7mkdMWFgMUDA8WND/LwP35qGMvo5L+/oK8tYqy5Z9KC0Ecn4XOTu
+         B3C20Rf4ygCQuBpZQUDWtpAzTq6G4LbfO0qERH5irkavwadEw/Ev/J0OQb+Jn1Tmaj
+         br4bRC0Dg2SGg==
+Date:   Tue, 30 May 2023 11:45:49 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Po-Wen Kao <powen.kao@mediatek.com>
+Cc:     linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>,
+        wsd_upstream@mediatek.com, peter.wang@mediatek.com,
+        stanley.chu@mediatek.com, alice.chao@mediatek.com,
+        naomi.chu@mediatek.com, chun-hung.wu@mediatek.com,
+        cc.chou@mediatek.com, eddie.huang@mediatek.com,
+        Ed Tsai <ed.tsai@mediatek.com>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v1 1/1] nvme: complete directly for hctx with only one
+ ctx mapping
+Message-ID: <ZHY2TUrKVBj2xGE2@kbusch-mbp.dhcp.thefacebook.com>
+References: <20230530024120.17196-1-powen.kao@mediatek.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: pOER7X_WipId8uECyhillOrE9FdbGgjy
-X-Proofpoint-GUID: pOER7X_WipId8uECyhillOrE9FdbGgjy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-30_12,2023-05-30_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230530024120.17196-1-powen.kao@mediatek.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On Tue, May 30, 2023 at 10:41:19AM +0800, Po-Wen Kao wrote:
+> ---
+>  block/blk-mq.c           | 8 +++-----
+>  drivers/nvme/host/nvme.h | 4 ++++
+>  2 files changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 1749f5890606..b60c78f5ad46 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1181,12 +1181,10 @@ bool blk_mq_complete_request_remote(struct request *rq)
+>  	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
+>  
+>  	/*
+> -	 * For request which hctx has only one ctx mapping,
+> -	 * or a polled request, always complete locally,
+> -	 * it's pointless to redirect the completion.
+> +	 * For a polled request, always complete locally, it's pointless
+> +	 * to redirect the completion.
+>  	 */
+> -	if (rq->mq_hctx->nr_ctx == 1 ||
+> -		rq->cmd_flags & REQ_POLLED)
+> +	if (rq->cmd_flags & REQ_POLLED)
+>  		return false;
+>  
+>  	if (blk_mq_complete_need_ipi(rq)) {
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+> index 7cf8e44d135e..acc9b1ce071d 100644
+> --- a/drivers/nvme/host/nvme.h
+> +++ b/drivers/nvme/host/nvme.h
+> @@ -702,6 +702,10 @@ static inline bool nvme_try_complete_req(struct request *req, __le16 status,
+>  	nvme_should_fail(req);
+>  	if (unlikely(blk_should_fake_timeout(req->q)))
+>  		return true;
+> +	if (likely(req->mq_hctx->nr_ctx == 1)) {
+> +		WRITE_ONCE(req->state, MQ_RQ_COMPLETE);
+> +		return false;
+> +	}
 
-Drivers can poll requests directly, so use that. We just need to ensure
-the driver's request was allocated from a polled hctx, so a special
-driver flag is added to struct io_uring_cmd.
+I don't think we want low level drivers directly messing with blk-mq
+request state.
 
-The first advantage is unshared and multipath namespaces can use the same
-polling callback, and multipath is guaranteed to get the same queue as
-the command was submitted on. Previously multipath polling might check
-a different path and poll the wrong info.
+Is the early nr_ctx check optimisation really worth it? Would the
+following work for your use case?
 
-The other advantage is we don't need a bio payload in order to poll,
-allowing commands like 'flush' and 'write zeroes' to be submitted on
-the same high priority queue as read and write commands. And using the
-request based polling skips the unnecessary bio overhead and xarray hctx
-lookup when we have a request.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/nvme/host/ioctl.c     | 68 +++++++++--------------------------
- drivers/nvme/host/multipath.c |  2 +-
- drivers/nvme/host/nvme.h      |  2 --
- include/uapi/linux/io_uring.h |  2 ++
- 4 files changed, 20 insertions(+), 54 deletions(-)
-
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index d24ea2e051564..3fa9a50433f18 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -505,7 +505,6 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struc=
-t request *req,
- {
- 	struct io_uring_cmd *ioucmd =3D req->end_io_data;
- 	struct nvme_uring_cmd_pdu *pdu =3D nvme_uring_cmd_pdu(ioucmd);
--	void *cookie =3D READ_ONCE(ioucmd->cookie);
-=20
- 	req->bio =3D pdu->bio;
- 	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-@@ -518,9 +517,10 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(stru=
-ct request *req,
- 	 * For iopoll, complete it directly.
- 	 * Otherwise, move the completion to task work.
- 	 */
--	if (cookie !=3D NULL && blk_rq_is_poll(req))
-+	if (blk_rq_is_poll(req)) {
-+		WRITE_ONCE(ioucmd->cookie, NULL);
- 		nvme_uring_task_cb(ioucmd, IO_URING_F_UNLOCKED);
--	else
-+	} else
- 		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
-=20
- 	return RQ_END_IO_FREE;
-@@ -531,7 +531,6 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(=
-struct request *req,
- {
- 	struct io_uring_cmd *ioucmd =3D req->end_io_data;
- 	struct nvme_uring_cmd_pdu *pdu =3D nvme_uring_cmd_pdu(ioucmd);
--	void *cookie =3D READ_ONCE(ioucmd->cookie);
-=20
- 	req->bio =3D pdu->bio;
- 	pdu->req =3D req;
-@@ -540,9 +539,10 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io_meta=
-(struct request *req,
- 	 * For iopoll, complete it directly.
- 	 * Otherwise, move the completion to task work.
- 	 */
--	if (cookie !=3D NULL && blk_rq_is_poll(req))
-+	if (blk_rq_is_poll(req)) {
-+		WRITE_ONCE(ioucmd->cookie, NULL);
- 		nvme_uring_task_meta_cb(ioucmd, IO_URING_F_UNLOCKED);
--	else
-+	} else
- 		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
-=20
- 	return RQ_END_IO_NONE;
-@@ -599,7 +599,6 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, =
-struct nvme_ns *ns,
- 	if (issue_flags & IO_URING_F_IOPOLL)
- 		rq_flags |=3D REQ_POLLED;
-=20
--retry:
- 	req =3D nvme_alloc_user_request(q, &c, rq_flags, blk_flags);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
-@@ -613,17 +612,11 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl=
-, struct nvme_ns *ns,
- 			return ret;
- 	}
-=20
--	if (issue_flags & IO_URING_F_IOPOLL && rq_flags & REQ_POLLED) {
--		if (unlikely(!req->bio)) {
--			/* we can't poll this, so alloc regular req instead */
--			blk_mq_free_request(req);
--			rq_flags &=3D ~REQ_POLLED;
--			goto retry;
--		} else {
--			WRITE_ONCE(ioucmd->cookie, req->bio);
--			req->bio->bi_opf |=3D REQ_POLLED;
--		}
-+	if (blk_rq_is_poll(req)) {
-+		ioucmd->flags |=3D IORING_URING_CMD_POLLED;
-+		WRITE_ONCE(ioucmd->cookie, req);
- 	}
-+
- 	/* to free bio on completion, as req->bio will be null at that time */
- 	pdu->bio =3D req->bio;
- 	pdu->meta_len =3D d.metadata_len;
-@@ -782,18 +775,16 @@ int nvme_ns_chr_uring_cmd_iopoll(struct io_uring_cm=
-d *ioucmd,
- 				 struct io_comp_batch *iob,
- 				 unsigned int poll_flags)
- {
--	struct bio *bio;
-+	struct request *req;
- 	int ret =3D 0;
--	struct nvme_ns *ns;
--	struct request_queue *q;
-+
-+	if (!(ioucmd->flags & IORING_URING_CMD_POLLED))
-+		return 0;
-=20
- 	rcu_read_lock();
--	bio =3D READ_ONCE(ioucmd->cookie);
--	ns =3D container_of(file_inode(ioucmd->file)->i_cdev,
--			struct nvme_ns, cdev);
--	q =3D ns->queue;
--	if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio && bio->bi_bdev)
--		ret =3D bio_poll(bio, iob, poll_flags);
-+	req =3D READ_ONCE(ioucmd->cookie);
-+	if (req && blk_rq_is_poll(req))
-+		ret =3D blk_rq_poll(req, iob, poll_flags);
- 	rcu_read_unlock();
- 	return ret;
- }
-@@ -885,31 +876,6 @@ int nvme_ns_head_chr_uring_cmd(struct io_uring_cmd *=
-ioucmd,
- 	srcu_read_unlock(&head->srcu, srcu_idx);
- 	return ret;
- }
--
--int nvme_ns_head_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
--				      struct io_comp_batch *iob,
--				      unsigned int poll_flags)
--{
--	struct cdev *cdev =3D file_inode(ioucmd->file)->i_cdev;
--	struct nvme_ns_head *head =3D container_of(cdev, struct nvme_ns_head, c=
-dev);
--	int srcu_idx =3D srcu_read_lock(&head->srcu);
--	struct nvme_ns *ns =3D nvme_find_path(head);
--	struct bio *bio;
--	int ret =3D 0;
--	struct request_queue *q;
--
--	if (ns) {
--		rcu_read_lock();
--		bio =3D READ_ONCE(ioucmd->cookie);
--		q =3D ns->queue;
--		if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio
--				&& bio->bi_bdev)
--			ret =3D bio_poll(bio, iob, poll_flags);
--		rcu_read_unlock();
--	}
--	srcu_read_unlock(&head->srcu, srcu_idx);
--	return ret;
--}
- #endif /* CONFIG_NVME_MULTIPATH */
-=20
- int nvme_dev_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_f=
-lags)
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.=
-c
-index 9171452e2f6d4..f17be1c72f4de 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -470,7 +470,7 @@ static const struct file_operations nvme_ns_head_chr_=
-fops =3D {
- 	.unlocked_ioctl	=3D nvme_ns_head_chr_ioctl,
- 	.compat_ioctl	=3D compat_ptr_ioctl,
- 	.uring_cmd	=3D nvme_ns_head_chr_uring_cmd,
--	.uring_cmd_iopoll =3D nvme_ns_head_chr_uring_cmd_iopoll,
-+	.uring_cmd_iopoll =3D nvme_ns_chr_uring_cmd_iopoll,
- };
-=20
- static int nvme_add_ns_head_cdev(struct nvme_ns_head *head)
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index bf46f122e9e1e..ca4ea89333660 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -847,8 +847,6 @@ long nvme_dev_ioctl(struct file *file, unsigned int c=
-md,
- 		unsigned long arg);
- int nvme_ns_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
- 		struct io_comp_batch *iob, unsigned int poll_flags);
--int nvme_ns_head_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
--		struct io_comp_batch *iob, unsigned int poll_flags);
- int nvme_ns_chr_uring_cmd(struct io_uring_cmd *ioucmd,
- 		unsigned int issue_flags);
- int nvme_ns_head_chr_uring_cmd(struct io_uring_cmd *ioucmd,
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.=
-h
-index 0716cb17e4360..f8d6ffe78073e 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -232,8 +232,10 @@ enum io_uring_op {
-  * sqe->uring_cmd_flags
-  * IORING_URING_CMD_FIXED	use registered buffer; pass this flag
-  *				along with setting sqe->buf_index.
-+ * IORING_URING_CMD_POLLED	driver use only
-  */
- #define IORING_URING_CMD_FIXED	(1U << 0)
-+#define IORING_URING_CMD_POLLED	(1U << 31)
-=20
-=20
- /*
---=20
-2.34.1
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f6dad0886a2fa..a2d65bb127e29 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1176,7 +1176,8 @@ bool blk_mq_complete_request_remote(struct request *rq)
+         * or a polled request, always complete locally,
+         * it's pointless to redirect the completion.
+         */
+-       if (rq->mq_hctx->nr_ctx == 1 ||
++       if ((rq->mq_hctx->nr_ctx == 1 &&
++            rq->mq_ctx->cpu == raw_smp_processor_id()) ||
+                rq->cmd_flags & REQ_POLLED)
+                return false;
+--
