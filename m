@@ -2,130 +2,155 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5C7C7EE31
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 09:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 479A9C77B7A
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 10:42:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230494AbjE3Jo5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 05:44:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55766 "EHLO
+        id S231597AbjE3KmA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 06:42:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231160AbjE3Jos (ORCPT
+        with ESMTP id S229989AbjE3Kl6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 05:44:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB68A9C
-        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 02:44:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685439842;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NKWW8GAQhmAtS8uQDZD6eBnK5TVSsGSEJitesv9am/I=;
-        b=QEIpdXyRAk+NsCxU1+iaXUd0IljnvmxoHUxFE5RunbdBqFIY+Xf71QKkPvgHjPyeeF5N9R
-        nfUWg9xNSe9HHwbgmAguKxCpWDRawcE8N4IBm+y3lsDMIf3SIf6b6yPDB8gc7yyOZ7khs3
-        8M6Y6wsSIN7ZLCyIJW5ycVVmDgYUuQM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-380-LFG5OHVdOL6MQ9wCCVPA2g-1; Tue, 30 May 2023 05:43:55 -0400
-X-MC-Unique: LFG5OHVdOL6MQ9wCCVPA2g-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 90B9C2A59566;
-        Tue, 30 May 2023 09:43:54 +0000 (UTC)
-Received: from localhost (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 87DCB492B00;
-        Tue, 30 May 2023 09:43:53 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org
-Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/2] nvme: add API of nvme_delete_dead_ctrl
-Date:   Tue, 30 May 2023 17:43:21 +0800
-Message-Id: <20230530094322.258090-2-ming.lei@redhat.com>
-In-Reply-To: <20230530094322.258090-1-ming.lei@redhat.com>
-References: <20230530094322.258090-1-ming.lei@redhat.com>
+        Tue, 30 May 2023 06:41:58 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D203D9
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 03:41:56 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230530104154epoutp011fefad0eea5d0b60ccdf69d7b7e9faa1~j5cO2lZif0863908639epoutp01g
+        for <linux-block@vger.kernel.org>; Tue, 30 May 2023 10:41:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230530104154epoutp011fefad0eea5d0b60ccdf69d7b7e9faa1~j5cO2lZif0863908639epoutp01g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1685443314;
+        bh=e4TeZbW46dphNnP8CuNH+8k9Da2YCsqAHU9OQBI1OwI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Zkbl9mb3ylHviCR0tv364qYFl0onIn9JYq5uc2HBDHdAqdVqUcp6Gz2Fd4IMYNtnf
+         Mu6VEFA3JXrbMLNwB6GN3WEPRhqxla30s+fk3p8nsG6Mc9chhqosqGT4TTlXP5lT5m
+         kGvwI7+XNzRjr9CNm33p7dQfBbCFzzaXmWgWNv38=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20230530104153epcas5p2876a4c3f4e06f0e8e6c882b2fd33ffef~j5cN-Evjq0384103841epcas5p2h;
+        Tue, 30 May 2023 10:41:53 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.175]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4QVpqM4sc2z4x9Pw; Tue, 30 May
+        2023 10:41:51 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        3C.91.44881.FE2D5746; Tue, 30 May 2023 19:41:51 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230530102050epcas5p24882da82b49dc397d3ab694d51658705~j5J2J-5Pj2734627346epcas5p2e;
+        Tue, 30 May 2023 10:20:50 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230530102050epsmtrp2dd099d94863ef09ba0c46326022e7ff0~j5J2IXIeD0209902099epsmtrp2H;
+        Tue, 30 May 2023 10:20:50 +0000 (GMT)
+X-AuditID: b6c32a4a-c47ff7000001af51-2c-6475d2ef7820
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        93.4D.28392.20EC5746; Tue, 30 May 2023 19:20:50 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230530102045epsmtip13a67ba165c229e2b47ea3d055ff9f54b~j5Jw0ZBr42118821188epsmtip1C;
+        Tue, 30 May 2023 10:20:44 +0000 (GMT)
+Date:   Tue, 30 May 2023 15:47:40 +0530
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        James.Bottomley@hansenpartnership.com, bvanassche@acm.org,
+        hare@suse.de, ming.lei@redhat.com, dlemoal@kernel.org,
+        anuj20.g@samsung.com, joshi.k@samsung.com, nitheshshetty@gmail.com,
+        gost.dev@samsung.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v11 2/9] block: Add copy offload support infrastructure
+Message-ID: <20230530101740.lsb3mnt5zx6n7tzn@green245>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+In-Reply-To: <ZHTm/v1jTZhcpDei@casper.infradead.org>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te1BUVRzHO3eXuxcH7LIr0xEyaLMxQXAXlvWgrFBa3UAbm9SZdISu7B2W
+        ZB/tZTWhAkFRNOIVhMtOPkJRQEB0cuWhsLwJ2pCQoHiYoJUpAgoKAe2ya+N/n9/3fL9zfr/f
+        mUNw+EaeGxGtimW0KjpGiC/i/lC/cqXP6A2dXHSveDkqa2viIENZCY6SMmY5qLg/HUf36scB
+        yn34lIOGrgejmgf5Dqi39iqGqk9nYeh8cSOGLqYTqOrUGIYa5+/jKMt0E6CRbj2Gavq8UXVN
+        Kxd1VRpwNFAy74BOnB3hoWM9RhwVNs9hyJSdjCHj8AGASu+NclFLnzsyzzY7oJknBjxkGdX1
+        SxilH+zAqav6fh5lHrjIpXKz2nDq0jkvqqtDR1UUpeJUxXgWj2rJm+FSlwoSqKreRJxKS36A
+        U2MjfVxq9Fo3Tn19uQhsEezYE6RgaDmj9WRUkWp5tCpKJgz7MGJDRIBUJPYRB6I1Qk8VrWRk
+        wo2btvi8Ex1jWZLQcy8do7NIW2iWFa5eH6RV62IZT4WajZUJGY08RiPR+LK0ktWponxVTOxa
+        sUjkF2AxfrxH0Tx3iavp5X1WdOo3biJowI8CRwKSEpg8Nck5ChYRfLIKwN72Y/ZiHMCDx3OA
+        1cUnJwA0l/s/SwzOmB1spkoAu+tPY7biDoBPzhZYCoLgkq/Dw22+VsRJb/jjPGHFJeQb8J/L
+        flY3h+zE4bj59kIXAjIMDv9UvpB0JqVwao62ys6kC2w9Psy1sqPl2rmmPzEru5Ivw7wzjxf6
+        hOQdR3hldNA+zUZ4JaXSzgL4d/Nlno3d4MSDGru+D57/5hxuCx8EUN+jB7aDYHioLZ1jZQ6p
+        gHkp/fbAMpjTVorZ9MUwbWYYs+nO0PjdM34NlpSdtPuXwptTB+xMwUcp1Tzbfu4CWPCVmZsB
+        PPTPTad/7j4br4WpD5Mc9JZlcEh3WDhH2HAlLKtcfRI4FIGljIZVRjFsgMZPxez7/70j1coK
+        sPCFvEKN4NbQQ18TwAhgApDgCJc4y2hWzneW0/vjGK06QquLYVgTCLA8VSbHzTVSbfmDqtgI
+        sSRQJJFKpZJAf6lY+JLzCllrJJ+MomOZPQyjYbTPchjh6JaIrQLp7VXbwgVh4k2dhxbTQ6Kf
+        rz1e1WJapokeDvUp3+yxvuNCmsskXFe9jT/o7/iFMXxFocfOF/796K9gHZiX7RRsTWhKfTPk
+        frdS0D59YjvrVFu7zTjJe/TBXGZlfnNpwqe7vLy3Nx7+drYz9Ogn63ridQFrZIZEXbggvSek
+        qtMznr9Uv3uSei/kbY/fv/w1+62h/Y3v1/U47XYiiz1Kcgqk6EUD0zA9E1In3t94duvyd103
+        jsSVu3xfHZCEsoMOP/08i4mPy9cCxfXbdTc2n2nIlLhn1N1qrR95NTdRubbPxTt+h2Z9k1m6
+        dyzFsDX3QtL2uF2mgVfubmifyDSoj/S7Tvf+IeSyClrsxdGy9H8wQ8YVywQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOIsWRmVeSWpSXmKPExsWy7bCSnC7TudIUg6MLdCzWnzrGbDFn/Ro2
+        i6YJf5ktVt/tZ7N4ffgTo8W0Dz+ZLR7st7fY+242q8XNAzuZLPYsmsRksXL1USaLjf0cFrsX
+        fmSyOPr/LZvFpEPXGC2eXp3FZLH3lrbFnr0nWSwu75rDZnFvzX9Wi/nLnrJbdF/fwWax/Pg/
+        JotDk5uZLHY8aWS0WPf6PYvFiVvSFuf/Hme1+P1jDpuDrMflK94es+6fZfPYOesuu8f5extZ
+        PKZNOsXmsXmFlsfls6Uem1Z1snls+jSJ3ePEjN8sHpuX1HvsvtnA5tHb/I7N4+PTWywe7/dd
+        ZfPo27KKMUA4issmJTUnsyy1SN8ugSvj6UzRgm7Wirubv7A0ME5g6WLk5JAQMJG4//s8K4gt
+        JLCDUeLNv1SIuKTEsr9HmCFsYYmV/56zdzFyAdU8YZT4cOYAWxcjBweLgKpE+yk9EJNNQFvi
+        9H8OEFNEQEPizRYjkGpmgetsEpOurQUbLyzgLfHk3AYmkBpeATOJ7/8SISY+Z5SYuOwaWA2v
+        gKDEyZlPwE5jBqqZt/khM0g9s4C0xPJ/HCBhTqCL/x17wQRiiwrISMxY+pV5AqPgLCTds5B0
+        z0LoXsDIvIpRMrWgODc9t9iwwCgvtVyvODG3uDQvXS85P3cTIzhtaGntYNyz6oPeIUYmDsZD
+        jBIczEoivLaJxSlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnNTk0tSC2CyTJx
+        cEo1MHk/vpn7nu+FXZZp20KzgNvLi+xrKy/Z3WYK7SlPcvo5WVvxc4xka95jE3XuY+uPz2jy
+        VcqYxF4+LyV9z6MA1vl7dgmmsXZy+mlf6vyuct4r+qOS9cWCawse3I9ifRmY+Ugz7vz+SzGh
+        wnn397UJ3X0j735+qdPUGOHlLRuuf1qQNdPsRcnd9E33NdcnN1TL7RPamXfeRH27oGf7fLFL
+        r8pZj+YWqzIYVLr2tHZmlLXWvOssf9JuukGVKfdeQ0BktLaRw/boohkrYxj2dlx78OOq7m0Z
+        YzbplB9ydflTu2UXz/yn/zRit1Ds04btD/R1F34x+9feebzt/N6N4sLyZ2Icr91wNq9Xe7j7
+        kk+nEktxRqKhFnNRcSIAIU/XjIoDAAA=
+X-CMS-MailID: 20230530102050epcas5p24882da82b49dc397d3ab694d51658705
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_312ff_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230522104536epcas5p23dd8108dd267ec588e5c36e8f9eb9fe8
+References: <20230522104146.2856-1-nj.shetty@samsung.com>
+        <CGME20230522104536epcas5p23dd8108dd267ec588e5c36e8f9eb9fe8@epcas5p2.samsung.com>
+        <20230522104146.2856-3-nj.shetty@samsung.com>
+        <ZHTm/v1jTZhcpDei@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When driver confirms that the controller is dead, this controller should
-be deleted with marking as DEAD. Otherwise, upper layer may wait forever
-in __bio_queue_enter() since the disk won't be marked as DEAD.
-Especially, in del_gendisk(), disk won't be marked as DEAD unless bdev
-sync & invalidate returns. If any writeback IO waits in
-__bio_queue_enter(), IO deadlock is caused.
+------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_312ff_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Add nvme_delete_dead_ctrl() for avoiding such kind of io deadlock.
+On 23/05/29 06:55PM, Matthew Wilcox wrote:
+>On Mon, May 22, 2023 at 04:11:33PM +0530, Nitesh Shetty wrote:
+>> +		token = alloc_page(gfp_mask);
+>
+>Why is PAGE_SIZE the right size for 'token'?  That seems quite unlikely.
+>I could understand it being SECTOR_SIZE or something that's dependent on
+>the device, but I cannot fathom it being dependent on the host' page size.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/core.c | 24 +++++++++++++++++++++++-
- drivers/nvme/host/nvme.h |  1 +
- 2 files changed, 24 insertions(+), 1 deletion(-)
+This has nothing to do with block device at this point, merely a place
+holder to store information about copy offload such as src sectors, len.
+Token will be typecasted by driver to get copy info.
+SECTOR_SIZE also should work in this case, will update in next version.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index ccb6eb1282f8..413213cfa417 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -227,16 +227,38 @@ static void nvme_delete_ctrl_work(struct work_struct *work)
- 	nvme_do_delete_ctrl(ctrl);
- }
- 
--int nvme_delete_ctrl(struct nvme_ctrl *ctrl)
-+static int __nvme_delete_ctrl(struct nvme_ctrl *ctrl,
-+			      enum nvme_ctrl_state state)
- {
-+	if (state != NVME_CTRL_DELETING && state != NVME_CTRL_DEAD)
-+		return -EINVAL;
-+
- 	if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_DELETING))
- 		return -EBUSY;
-+	if (state == NVME_CTRL_DEAD) {
-+		if (!nvme_change_ctrl_state(ctrl, NVME_CTRL_DEAD))
-+			return -EBUSY;
-+	}
- 	if (!queue_work(nvme_delete_wq, &ctrl->delete_work))
- 		return -EBUSY;
- 	return 0;
- }
-+
-+int nvme_delete_ctrl(struct nvme_ctrl *ctrl)
-+{
-+	return __nvme_delete_ctrl(ctrl, NVME_CTRL_DELETING);
-+}
- EXPORT_SYMBOL_GPL(nvme_delete_ctrl);
- 
-+/*
-+ * Called when driver confirmed that the controller is really dead
-+ */
-+int nvme_delete_dead_ctrl(struct nvme_ctrl *ctrl)
-+{
-+	return __nvme_delete_ctrl(ctrl, NVME_CTRL_DEAD);
-+}
-+EXPORT_SYMBOL_GPL(nvme_delete_dead_ctrl);
-+
- static void nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl)
- {
- 	/*
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index bf46f122e9e1..8f62246a85be 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -828,6 +828,7 @@ void nvme_stop_keep_alive(struct nvme_ctrl *ctrl);
- int nvme_reset_ctrl(struct nvme_ctrl *ctrl);
- int nvme_reset_ctrl_sync(struct nvme_ctrl *ctrl);
- int nvme_delete_ctrl(struct nvme_ctrl *ctrl);
-+int nvme_delete_dead_ctrl(struct nvme_ctrl *ctrl);
- void nvme_queue_scan(struct nvme_ctrl *ctrl);
- int nvme_get_log(struct nvme_ctrl *ctrl, u32 nsid, u8 log_page, u8 lsp, u8 csi,
- 		void *log, size_t size, u64 offset);
--- 
-2.40.1
+------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_312ff_
+Content-Type: text/plain; charset="utf-8"
 
+
+------dpMjS_Krfo.HeTa1.nqRY6lfIY-msh.FGO-xMH_14-IlSSmS=_312ff_--
