@@ -2,97 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2386C77B73
-	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 13:24:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E7FC77B7A
+	for <linux-block@archiver.kernel.org>; Tue, 30 May 2023 13:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230165AbjE3NYq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 May 2023 09:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50368 "EHLO
+        id S230300AbjE3NmY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 May 2023 09:42:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231157AbjE3NYp (ORCPT
+        with ESMTP id S232762AbjE3NmX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 May 2023 09:24:45 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949ABD9;
-        Tue, 30 May 2023 06:24:42 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QVtR938J0z4f3nTh;
-        Tue, 30 May 2023 21:24:37 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rEU+XVkWUMyKg--.13490S3;
-        Tue, 30 May 2023 21:24:38 +0800 (CST)
-Subject: Re: [PATCH V1] block: Fix null pointer dereference issue on struct
- io_cq
-To:     Pradeep Pragallapati <quic_pragalla@quicinc.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230517084434.18932-1-quic_pragalla@quicinc.com>
- <07b8b870-a464-25a9-c0a6-c123fad05ff5@huaweicloud.com>
- <a29dcfa5-bb6a-d3b9-9fb7-cce87a8f8620@huaweicloud.com>
- <4648819c-2115-a981-1b74-0495b94d4233@huaweicloud.com>
- <b1b7e7f1-55c2-4833-040f-6cdb75f8c11b@quicinc.com>
- <00eefae6-8db4-139b-9f8a-9ed326817561@quicinc.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b7d92802-8403-874d-0cf5-d492e3ea96ae@huaweicloud.com>
-Date:   Tue, 30 May 2023 21:24:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 30 May 2023 09:42:23 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA4C8E;
+        Tue, 30 May 2023 06:42:22 -0700 (PDT)
+Received: from kwepemm600002.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4QVtn11r9yzsSfJ;
+        Tue, 30 May 2023 21:40:05 +0800 (CST)
+Received: from [10.174.178.159] (10.174.178.159) by
+ kwepemm600002.china.huawei.com (7.193.23.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Tue, 30 May 2023 21:42:18 +0800
+Message-ID: <867dcc0a-c807-2851-e2c4-750a7646a97f@huawei.com>
+Date:   Tue, 30 May 2023 21:42:06 +0800
 MIME-Version: 1.0
-In-Reply-To: <00eefae6-8db4-139b-9f8a-9ed326817561@quicinc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH -next v2] block: Fix the partition start may overflow in
+ add_partition()
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
+        <yukuai3@huawei.com>
+References: <20230525072041.3701176-1-zhongjinghua@huawei.com>
+ <20230526053557.GA875@sol.localdomain>
+From:   zhongjinghua <zhongjinghua@huawei.com>
+In-Reply-To: <20230526053557.GA875@sol.localdomain>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rEU+XVkWUMyKg--.13490S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7JryrJFWfJF4xWF1fur1kAFb_yoW3WFc_Ww
-        4UuasrGwn0gw4xtrn8Krnaq34vqF18KF13JrWxAF4xG3s7Zas5AF4rJ393A347GrW7Jw48
-        Cr1qga4SqFsxKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb4xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
-        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
-        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUU
-        UU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Originating-IP: [10.174.178.159]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600002.china.huawei.com (7.193.23.29)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-在 2023/05/30 21:15, Pradeep Pragallapati 写道:
-> Hi,
-> 
-> On 5/22/2023 11:49 AM, Pradeep Pragallapati wrote:
->>
->> On 5/18/2023 6:14 PM, Yu Kuai wrote:
->>> Hi,
->>>
->>> 在 2023/05/18 20:16, Yu Kuai 写道:
->>>
->>>> @@ -173,18 +171,17 @@ void ioc_clear_queue(struct request_queue *q)
->>>>   {
->>>>          LIST_HEAD(icq_list);
->>>>
->>>> +       rcu_read_lock();
->>>
->>> Sorry that I realized this is still not enough, following list_empty()
->>> and list_entry() can still concurrent with list_del(). Please try the
->>> following patch:
->> sure will try and update the results.
-> 
-> 
-> At least for 80+hrs of testing, i didn't see the issue reproduced. seems 
-> like it is helping my case.
-
-Thanks for the test, I'll send a patch soon.
-
-Kuai
-
+在 2023/5/26 13:35, Eric Biggers 写道:
+> On Thu, May 25, 2023 at 03:20:41PM +0800, Zhong Jinghua wrote:
+>> +	if (p.start < 0 || p.length <= 0 || p.start + p.length < 0)
+>> +		return -EINVAL;
+> Were zero-length partitions allowed before?
+Before this patch,  the io to the zero-length partition failed, I think 
+it is meaningless, and it was fixed by the way
+> - Eric
