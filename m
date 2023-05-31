@@ -2,114 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0446DC77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 15:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD503C77B7A
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 15:48:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234111AbjEaPoR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 11:44:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60518 "EHLO
+        id S231860AbjEaPsh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 11:48:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229993AbjEaPoN (ORCPT
+        with ESMTP id S230446AbjEaPsg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 11:44:13 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C1A12E
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 08:44:03 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id ca18e2360f4ac-76c304efb8fso30551439f.1
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 08:44:03 -0700 (PDT)
+        Wed, 31 May 2023 11:48:36 -0400
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60E078E
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 08:48:35 -0700 (PDT)
+Received: by mail-il1-x136.google.com with SMTP id e9e14a558f8ab-339fca7da2aso2001695ab.0
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 08:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685547843; x=1688139843;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VCDfCinS9stSsitWfjmIvk+rqXPfi4hHCoTlLHm/DaQ=;
-        b=mmnwjchbyQVxfJ9UNtHOJgGG5cLtQcxBhOoPDbUqjgNbYh2aT78GRhWENfG1gZ5VvW
-         MH1VMJiV8RgwrpLe14jGdZ0PvrCe2zUWNMEbUq1kLdcgjgnMw2cfmdEK3fIt1gukCmLP
-         LmVdSHpl0/vZ62e06VlupyOcCc4iujQEU7ac+B3QmfPZMB75Jl+c8QxxWblAv0hT3g4g
-         YCIew5zV6D25X2eYbAwAyR/Z2UBe3Sa3P0bd0oSA6Wv6GIagZMqBJxY4H6OdwwD7Olaw
-         uFvoqTu0mKgTv9q6olsZRjlDPo6af8HIB98vqHnjc0F2ssxr7XfG0H9QnueBsAT0J7bF
-         P8nA==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685548115; x=1688140115;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xh+NM7DUxAEzTOJt7Ae/1UKGsTT1CaBWPKgHIK+Ua4s=;
+        b=TeV2nuosxCCQSaB5ZclhgFC3ci1TbhrLaLO7YeIa++CfuP3tLyp3XgFpxvgwElWYJB
+         tHOvz9UOWflYz0udLqW8SlXtramYgCn2tvTozp6JaEpMJEnUOIOc9htdjbFb9wvYSRcL
+         Q9sgHw0VEfQJl89cB8p6S3BmlVvQ51rl2tUtJAP0ZFYUgvBVXjltJCIrCS2NNtp+8Dxx
+         Ctg+EYHhUNQDa0WFaYpG+Dq1/lO8dS++A7XL0PkNnCt87heuEDDhP4nKE2bgY3mhTx8o
+         ejL2+csFEJTi2h+Flhy8H6ZBi8Zxqv3ks3EYKU54mH0IQkZju6Ym/N47UBAkeuuRGS/b
+         MQQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685547843; x=1688139843;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VCDfCinS9stSsitWfjmIvk+rqXPfi4hHCoTlLHm/DaQ=;
-        b=FresCsdPwY8+mawH7pqCK9Yy1BnBQO0fu4L+MiFsZISoEAT5z5P+UQ4DIalPgZnNr8
-         r1bf2FS1fsrWhP+8buQU/VMDsSUslbmUbMdU8ij15VKgHskyxYvG/mY+akTIcjJ/Ix4n
-         N5OP8Z/lPqcuZpjCX3mDhgHap8yF290JzoPWnVQwPPvilqS9uhHidOZDQYZD36051/4d
-         P4J9UL9uSihZBEbc+N2SRHCq+s8uOO3eZsTfgJNisU8nFNylgjAEgBW33xzW6oZgc9PJ
-         sn8VvnQBYWVZZwlsqJioLpzB78YbjXffJXNNfzX+b834zoy1ENduAxaNI7LAOSOXS+1j
-         mf+g==
-X-Gm-Message-State: AC+VfDxyvBO9g9mnH7MmlYELE77o0zEviULd+bRxUVBBVwvq1skSYwWL
-        8KyUrP3tiPbsN55FwSJnBrHot0HzaImEvIKJpFY=
-X-Google-Smtp-Source: ACHHUZ4CoWPBD8nTys5HQpKoFV41Udgwurj67i5533KRVHxL5b7Yj2c/OT1PXJgesQ9+vB7pOT60Cw==
-X-Received: by 2002:a5d:9c42:0:b0:775:78ff:4fff with SMTP id 2-20020a5d9c42000000b0077578ff4fffmr1741351iof.1.1685547842906;
-        Wed, 31 May 2023 08:44:02 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id u10-20020a02b1ca000000b004189da0d852sm1525121jah.167.2023.05.31.08.44.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 May 2023 08:44:01 -0700 (PDT)
-Message-ID: <5f4f978d-7fba-4d43-b347-dd1bc8add55e@kernel.dk>
-Date:   Wed, 31 May 2023 09:44:00 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] io_uring: set plug tags for same file
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>, Keith Busch <kbusch@meta.com>
-Cc:     asml.silence@gmail.com, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20230504162427.1099469-1-kbusch@meta.com>
- <ZHZggvjNnhl/69s/@kbusch-mbp.dhcp.thefacebook.com>
+        d=1e100.net; s=20221208; t=1685548115; x=1688140115;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xh+NM7DUxAEzTOJt7Ae/1UKGsTT1CaBWPKgHIK+Ua4s=;
+        b=bVK+atcuRXA85PXtqEmXtPJBd7xuduca/LxeGTwI+cpIqVfxlDTQQPhb+TTXDP0x8K
+         b6AqBQF8KPfV29CI1GdFpQWGNZgUcA6iGosPIiTqUyYVDfS+9fG5GkNRXUuzpNVsL28M
+         Avr4EmxHU7I8+h4GaimZvf7y236ed9xZsMUrPmVlaijziNRlTD3n+0EfFJXSoHLzzx+x
+         fxyhnPv5yj8CL0qVNHKPGpfFYYNGNoIY1PKyvPJVMpp0nT7Ny10HnEm/aIh49A+Y2F8y
+         fZI0JJKFb1CgmvodKC9rSimHnaq2RkS+h0lOIEvFhwS6fSEYj62c83CXFInUuczSl7QK
+         /tAQ==
+X-Gm-Message-State: AC+VfDwmPyCJD8BHlkM4AvK/cpTVXDLgj1M/Q+3tg3iDPGAeYMYoNz5z
+        YsulySLXn29CjI7R1ZXZWN72fg==
+X-Google-Smtp-Source: ACHHUZ7olLMdzgJo49hRI+Brw+8ZbYH7IxOyZnrYIxdhWvtRY4fllkEJYDoAKqWowWyMCg9AG6Kdvg==
+X-Received: by 2002:a6b:8d53:0:b0:774:80fc:11a9 with SMTP id p80-20020a6b8d53000000b0077480fc11a9mr1999696iod.1.1685548114657;
+        Wed, 31 May 2023 08:48:34 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id f16-20020a02a110000000b004091d72f62dsm1552201jag.85.2023.05.31.08.48.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 May 2023 08:48:33 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZHZggvjNnhl/69s/@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Christoph Hellwig <hch@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        David Howells <dhowells@redhat.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+In-Reply-To: <20230526214142.958751-1-dhowells@redhat.com>
+References: <20230526214142.958751-1-dhowells@redhat.com>
+Subject: Re: [PATCH v4 0/3] block: Make old dio use
+ iov_iter_extract_pages() and page pinning
+Message-Id: <168554811322.183150.13490236053670818511.b4-ty@kernel.dk>
+Date:   Wed, 31 May 2023 09:48:33 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-00303
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/30/23 2:45?PM, Keith Busch wrote:
-> On Thu, May 04, 2023 at 09:24:27AM -0700, Keith Busch wrote:
->> From: Keith Busch <kbusch@kernel.org>
->>
->> io_uring tries to optimize allocating tags by hinting to the plug how
->> many it expects to need for a batch instead of allocating each tag
->> individually. But io_uring submission queueus may have a mix of many
->> devices for io, so the number of io's counted may be overestimated. This
->> can lead to allocating too many tags, which adds overhead to finding
->> that many contiguous tags, freeing up the ones we didn't use, and may
->> starve out other users that can actually use them.
+
+On Fri, 26 May 2023 22:41:39 +0100, David Howells wrote:
+> Here are three patches that go on top of the similar patches for bio
+> structs now in the block tree that make the old block direct-IO code use
+> iov_iter_extract_pages() and page pinning.
 > 
-> When running batched IO to multiple nvme drives, like with t/io_uring,
-> this shows a tiny improvement in CPU utilization from avoiding the
-> unlikely clean up condition in __blk_flush_plug() shown below:
+> There are three patches:
 > 
->         if (unlikely(!rq_list_empty(plug->cached_rq)))
->                 blk_mq_free_plug_rqs(plug);
+>  (1) Make page pinning neither add nor remove a pin to/from a ZERO_PAGE,
+>      thereby allowing the dio code to insert zero pages in the middle of
+>      dealing with pinned pages.  This also mitigates a potential problem
+>      whereby userspace could force the overrun the pin counter of a zero
+>      page.
+> 
+> [...]
 
-Conceptually the patch certainly makes sense, and is probably as close
-to ideal on tag reservations as we can get without making things a lot
-more complicated (or relying on extra app input).
+Applied, thanks!
 
-But it does mean we'll always be doing a second loop over the submission
-list, which is obviously not ideal in terms of overhead. I can see a few
-potential ways forward:
+[1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
+      commit: c8070b78751955e59b42457b974bea4a4fe00187
+[2/3] mm: Provide a function to get an additional pin on a page
+      commit: 1101fb8f89e5fc548c4d0ad66750e98980291815
+[3/3] block: Use iov_iter_extract_pages() and page pinning in direct-io.c
+      commit: 1ccf164ec866cb8575ab9b2e219fca875089c60e
 
-1) Maybe just submit directly if plugging isn't required? That'd leave
-   the pending list just the items that do plug, and avoid the extra
-   loop for those that don't.
-
-2) At least get something out of the extra loop - alloc and prep
-   requests upfront, then submit. If we have to do N things to submit a
-   request, it's always going to be better to bundle each sub-step. This
-   patch doesn't do that, it just kind of takes the easy way out.
-
-What do you think? I think these are important questions to answer,
-particularly as the overhead of flushing extraneous tags seem pretty
-minuscule.
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
