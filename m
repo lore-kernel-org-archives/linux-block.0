@@ -2,111 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E967C77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 09:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED0AC77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 09:40:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234902AbjEaJ36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 05:29:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37352 "EHLO
+        id S235454AbjEaJkM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 05:40:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235595AbjEaJ3z (ORCPT
+        with ESMTP id S235197AbjEaJkL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 05:29:55 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D3CC0;
-        Wed, 31 May 2023 02:29:54 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QWP9n5rnRz4f3nBf;
-        Wed, 31 May 2023 17:29:49 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgCX_7KNE3dk69dxKg--.3757S5;
-        Wed, 31 May 2023 17:29:51 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH -next v2] block: fix blktrace debugfs entries leak
-Date:   Wed, 31 May 2023 17:26:06 +0800
-Message-Id: <20230531092606.3037560-2-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230531092606.3037560-1-yukuai1@huaweicloud.com>
-References: <20230531092606.3037560-1-yukuai1@huaweicloud.com>
+        Wed, 31 May 2023 05:40:11 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CC3C0
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 02:40:09 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-30a1fdde3d6so5555286f8f.0
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 02:40:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20221208.gappssmtp.com; s=20221208; t=1685526008; x=1688118008;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZrOxajovW5T4Rbc75jHs3zSIJj4eFv63SxzUYy8QEwU=;
+        b=qUlVbwtJBWmIyaMOTjCP/Jml9WD6DnDXO4a8G5HdiF/aIRwSGT9KLO1PItVeboq7RW
+         4se6h/UfuCnFxfNORMrQMgwKI56A2x/tV4LZ9HZQlos09T8x2x2GollQ8kkZsooJZS6Z
+         JERGkcC87yHxF8AmnB2ONMaEXiBuKcMvi6Gh5MP8HfCFtFXuV49G+xaRg0GmyLsoZc0K
+         QycT3N4DLTpkhqnuFESrGpxBiePWXdvPjnBgZ1njZslPsHu7ZJ1QFZstxHFLyc1/ZP4O
+         GqoG+M/mM5pqDG8rNHzMit31d4DUyLje7OENUzOaQjra61WtsRZWt6e01Z51ugTx6S/q
+         Koaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685526008; x=1688118008;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZrOxajovW5T4Rbc75jHs3zSIJj4eFv63SxzUYy8QEwU=;
+        b=Hw3L3W0KeGicXBc52kypJyN3XHHTbHaxcC833pxXZfNYBBtEpSmuFJ79ls1OcoPG77
+         OvgqIcAoLEuHkVy5zniqdKKfkSe8zZ0h+LMLDS9Wj0SUZxFcrwm/FKsVxKpoyBYBpCVq
+         8znPNhY2M+RWNCqULdnDY689T8zH/t8aNXHO53qmHwE9KxgDcUsZbXtZM7nRJyL2fPZf
+         OcIl5Vl5WnuqYaH+2f6pw9Qi5L08erLpSoqc5uH23xmJsVliiHeQgVXUBIzAynNlNQCO
+         u6KWh9D9LCwkgheIT/DHJ3u/sKlbJRo05AvBlOyFoK0r2zfrlzHLQxIyeA2p03/L52xu
+         HOvg==
+X-Gm-Message-State: AC+VfDys/kARQFSimR5luw8IUy8TNj4hXRtScaDL9cZp8tLRIZDwyed+
+        PJY0mO2kZMp489EjmXKwDYy1ZA==
+X-Google-Smtp-Source: ACHHUZ7QLmP32Ur33JMLykY91ywIOn9nnqyILXvyiJhEBzynYD4c3RWkXh/LJXNTMuCZPlJB3qhBvg==
+X-Received: by 2002:adf:dd92:0:b0:30a:b46a:a443 with SMTP id x18-20020adfdd92000000b0030ab46aa443mr3268355wrl.51.1685526008093;
+        Wed, 31 May 2023 02:40:08 -0700 (PDT)
+Received: from [10.1.3.59] (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.gmail.com with ESMTPSA id n16-20020a5d4850000000b0030632833e74sm6170228wrs.11.2023.05.31.02.40.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 May 2023 02:40:07 -0700 (PDT)
+Message-ID: <af5df07e-f93f-9588-4fdb-b89b37aa28a1@baylibre.com>
+Date:   Wed, 31 May 2023 11:40:04 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCX_7KNE3dk69dxKg--.3757S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw4fWFyxGF1fury7Zr4DXFb_yoW8Cr13pa
-        9Ikw4YkrWjqr4avFyDuw17XF1xKa95Wr95JryfWFyYvrnrGrZ0qFZ2vr4IgrWrCrZa9FZ8
-        Wa4UWFsxCrW8XaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBC14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
-        x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUAVWUtw
-        CF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j
-        6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64
-        vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-        Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0x
-        vEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUe5r4UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2] blk-mq: check on cpu id when there is only one ctx
+ mapping
+Content-Language: en-US
+To:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk
+Cc:     kbusch@kernel.org, liusong@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, wsd_upstream@mediatek.com,
+        peter.wang@mediatek.com, stanley.chu@mediatek.com,
+        powen.kao@mediatek.com, alice.chao@mediatek.com,
+        naomi.chu@mediatek.com
+References: <20230531083828.8009-1-ed.tsai@mediatek.com>
+ <20230531083828.8009-2-ed.tsai@mediatek.com>
+From:   Alexandre Mergnat <amergnat@baylibre.com>
+In-Reply-To: <20230531083828.8009-2-ed.tsai@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 31/05/2023 10:38, Ed Tsai wrote:
+> commit f168420 ("blk-mq: don't redirect completion for hctx withs only
+> one ctx mapping") When nvme applies a 1:1 mapping of hctx and ctx, there
+> will be no remote request.
+> 
+> But for ufs, the submission and completion queues could be asymmetric.
+> (e.g. Multiple SQs share one CQ) Therefore, 1:1 mapping of hctx and
+> ctx won't complete request on the submission cpu. In this situation,
+> this nr_ctx check could violate the QUEUE_FLAG_SAME_FORCE, as a result,
+> check on cpu id when there is only one ctx mapping.
 
-Commit 99d055b4fd4b ("block: remove per-disk debugfs files in
-blk_unregister_queue") moves blk_trace_shutdown() from
-blk_release_queue() to blk_unregister_queue(), this is safe if blktrace
-is created through sysfs, however, there is a regression in corner
-case.
+Reviewed-by: Alexandre Mergnat <amergnat@baylibre.com>
 
-blktrace can still be enabled after del_gendisk() through ioctl if
-the disk is opened before del_gendisk(), and if blktrace is not shutdown
-through ioctl before closing the disk, debugfs entries will be leaked.
-
-Fix this problem by shutdown blktrace in disk_release(), this is safe
-because blk_trace_shutdown() is reentrant.
-
-Noted that scsi sg can support blktrace without gendisk and still need
-special handling to avoid this problem.
-
-Fixes: 99d055b4fd4b ("block: remove per-disk debugfs files in blk_unregister_queue")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/genhd.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 1cb489b927d5..f5718367965c 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -25,8 +25,9 @@
- #include <linux/pm_runtime.h>
- #include <linux/badblocks.h>
- #include <linux/part_stat.h>
--#include "blk-throttle.h"
-+#include <linux/blktrace_api.h>
- 
-+#include "blk-throttle.h"
- #include "blk.h"
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
-@@ -1171,6 +1172,10 @@ static void disk_release(struct device *dev)
- 	might_sleep();
- 	WARN_ON_ONCE(disk_live(disk));
- 
-+	mutex_lock(&disk->queue->debugfs_mutex);
-+	blk_trace_shutdown(disk->queue);
-+	mutex_unlock(&disk->queue->debugfs_mutex);
-+
- 	/*
- 	 * To undo the all initialization from blk_mq_init_allocated_queue in
- 	 * case of a probe failure where add_disk is never called we have to
 -- 
-2.39.2
+Regards,
+Alexandre
 
