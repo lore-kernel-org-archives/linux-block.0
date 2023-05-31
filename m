@@ -2,117 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A30C77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 07:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F715C77B7A
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 07:57:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234881AbjEaHxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 03:53:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55300 "EHLO
+        id S234789AbjEaH5b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 03:57:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233832AbjEaHwU (ORCPT
+        with ESMTP id S234983AbjEaH5S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 03:52:20 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DBBF93;
-        Wed, 31 May 2023 00:51:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=aL4JtBxyhKSUIoIs8zshulNYsaa+7wvzZcQ7A9usZGk=; b=aD7gWyr8b1clmJUz0ng4wh8iN1
-        2pIdPjbYXIRRh1Kmmhvr9XUZfJmEzYUSG9MpfRaqOXtpIf81N0C4KW91kRTVNx/1xjofKh6ID5fEZ
-        y0kgxzCPuOAOcRvxjkI+DhSzh8PYwGOXVEdzJScdskD02HMegMKHsJzKs791UpMHizTDm3fmN//tX
-        6rl5sT9sqqCp86Mfokmpj/WL2CP1OSYP66n1f8RX2gICxutiEFyhwPyN+TIwbF9/1JsQcegS+vv7u
-        4nIF9K3m4qzWLhU31xzEOyoJGgpwCjxO0CBkTrYH/d1JRTGC4jWZ7AwjftTuF3pr+nYL1/XFGg0kY
-        tKlqRbMg==;
-Received: from [2001:4bb8:182:6d06:f5c3:53d7:b5aa:b6a7] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q4Gbi-00GW03-0R;
-        Wed, 31 May 2023 07:50:58 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Chao Yu <chao@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Damien Le Moal <dlemoal@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>,
-        Miklos Szeredi <mszeredi@redhat.com>
-Subject: [PATCH 11/12] fuse: drop redundant arguments to fuse_perform_write
-Date:   Wed, 31 May 2023 09:50:25 +0200
-Message-Id: <20230531075026.480237-12-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230531075026.480237-1-hch@lst.de>
-References: <20230531075026.480237-1-hch@lst.de>
+        Wed, 31 May 2023 03:57:18 -0400
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09070198E;
+        Wed, 31 May 2023 00:56:06 -0700 (PDT)
+Received: from [192.168.0.2] (ip5f5ae86a.dynamic.kabel-deutschland.de [95.90.232.106])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id B64BB61E4052B;
+        Wed, 31 May 2023 09:54:23 +0200 (CEST)
+Message-ID: <e510055e-da93-e9c1-d60b-f6b357d6611b@molgen.mpg.de>
+Date:   Wed, 31 May 2023 09:54:23 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v6 15/20] md: raid1: check if adding pages to resync bio
+ fails
+To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Song Liu <song@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, linux-raid@vger.kernel.org,
+        Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>, gouhao@uniontech.com,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <cover.1685461490.git.johannes.thumshirn@wdc.com>
+ <c60c6f46b70c96b528b6c4746918ea87c2a01473.1685461490.git.johannes.thumshirn@wdc.com>
+ <20230531042502.GM32705@lst.de>
+ <CAPhsuW62vBccjUkCUmYr+OZSLgGozFzX4YyzP8OV+dvsLujCGg@mail.gmail.com>
+Content-Language: en-US
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CAPhsuW62vBccjUkCUmYr+OZSLgGozFzX4YyzP8OV+dvsLujCGg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-pos is always equal to iocb->ki_pos, and mapping is always equal to
-iocb->ki_filp->f_mapping.
+Dear Johannes,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Acked-by: Miklos Szeredi <mszeredi@redhat.com>
----
- fs/fuse/file.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index e60e48bf392d49..025973ad813e05 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -1280,13 +1280,13 @@ static inline unsigned int fuse_wr_pages(loff_t pos, size_t len,
- 		     max_pages);
- }
- 
--static ssize_t fuse_perform_write(struct kiocb *iocb,
--				  struct address_space *mapping,
--				  struct iov_iter *ii, loff_t pos)
-+static ssize_t fuse_perform_write(struct kiocb *iocb, struct iov_iter *ii)
- {
-+	struct address_space *mapping = iocb->ki_filp->f_mapping;
- 	struct inode *inode = mapping->host;
- 	struct fuse_conn *fc = get_fuse_conn(inode);
- 	struct fuse_inode *fi = get_fuse_inode(inode);
-+	loff_t pos = iocb->ki_pos;
- 	int err = 0;
- 	ssize_t res = 0;
- 
-@@ -1383,8 +1383,7 @@ static ssize_t fuse_cache_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 		if (written < 0 || !iov_iter_count(from))
- 			goto out;
- 
--		written_buffered = fuse_perform_write(iocb, mapping, from,
--						      iocb->ki_pos);
-+		written_buffered = fuse_perform_write(iocb, from);
- 		if (written_buffered < 0) {
- 			err = written_buffered;
- 			goto out;
-@@ -1403,7 +1402,7 @@ static ssize_t fuse_cache_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 
- 		written += written_buffered;
- 	} else {
--		written = fuse_perform_write(iocb, mapping, from, iocb->ki_pos);
-+		written = fuse_perform_write(iocb, from);
- 	}
- out:
- 	inode_unlock(inode);
--- 
-2.39.2
+Thank you for your patches.
 
+Am 31.05.23 um 06:58 schrieb Song Liu:
+> On Tue, May 30, 2023 at 9:25 PM Christoph Hellwig <hch@lst.de> wrote:
+>>
+>> To me these look like __bio_add_page candidates, but I guess Song
+>> preferred it this way?  It'll add a bit pointless boilerplate code,
+>> but I'm ok with that.
+> 
+> We had some discussion on this in v2, and decided to keep these
+> assert-like WARN_ON().
+
+it’d be great if you added a summary/note of the discussion to the 
+commit message.
+
+
+Kind regards,
+
+Paul
