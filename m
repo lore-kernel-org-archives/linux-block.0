@@ -2,94 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED0AC77B7C
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 09:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95753C7EE24
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 09:49:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235454AbjEaJkM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 05:40:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42934 "EHLO
+        id S235464AbjEaJtJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 05:49:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235197AbjEaJkL (ORCPT
+        with ESMTP id S235424AbjEaJtF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 05:40:11 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CC3C0
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 02:40:09 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-30a1fdde3d6so5555286f8f.0
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 02:40:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20221208.gappssmtp.com; s=20221208; t=1685526008; x=1688118008;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZrOxajovW5T4Rbc75jHs3zSIJj4eFv63SxzUYy8QEwU=;
-        b=qUlVbwtJBWmIyaMOTjCP/Jml9WD6DnDXO4a8G5HdiF/aIRwSGT9KLO1PItVeboq7RW
-         4se6h/UfuCnFxfNORMrQMgwKI56A2x/tV4LZ9HZQlos09T8x2x2GollQ8kkZsooJZS6Z
-         JERGkcC87yHxF8AmnB2ONMaEXiBuKcMvi6Gh5MP8HfCFtFXuV49G+xaRg0GmyLsoZc0K
-         QycT3N4DLTpkhqnuFESrGpxBiePWXdvPjnBgZ1njZslPsHu7ZJ1QFZstxHFLyc1/ZP4O
-         GqoG+M/mM5pqDG8rNHzMit31d4DUyLje7OENUzOaQjra61WtsRZWt6e01Z51ugTx6S/q
-         Koaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685526008; x=1688118008;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZrOxajovW5T4Rbc75jHs3zSIJj4eFv63SxzUYy8QEwU=;
-        b=Hw3L3W0KeGicXBc52kypJyN3XHHTbHaxcC833pxXZfNYBBtEpSmuFJ79ls1OcoPG77
-         OvgqIcAoLEuHkVy5zniqdKKfkSe8zZ0h+LMLDS9Wj0SUZxFcrwm/FKsVxKpoyBYBpCVq
-         8znPNhY2M+RWNCqULdnDY689T8zH/t8aNXHO53qmHwE9KxgDcUsZbXtZM7nRJyL2fPZf
-         OcIl5Vl5WnuqYaH+2f6pw9Qi5L08erLpSoqc5uH23xmJsVliiHeQgVXUBIzAynNlNQCO
-         u6KWh9D9LCwkgheIT/DHJ3u/sKlbJRo05AvBlOyFoK0r2zfrlzHLQxIyeA2p03/L52xu
-         HOvg==
-X-Gm-Message-State: AC+VfDys/kARQFSimR5luw8IUy8TNj4hXRtScaDL9cZp8tLRIZDwyed+
-        PJY0mO2kZMp489EjmXKwDYy1ZA==
-X-Google-Smtp-Source: ACHHUZ7QLmP32Ur33JMLykY91ywIOn9nnqyILXvyiJhEBzynYD4c3RWkXh/LJXNTMuCZPlJB3qhBvg==
-X-Received: by 2002:adf:dd92:0:b0:30a:b46a:a443 with SMTP id x18-20020adfdd92000000b0030ab46aa443mr3268355wrl.51.1685526008093;
-        Wed, 31 May 2023 02:40:08 -0700 (PDT)
-Received: from [10.1.3.59] (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.gmail.com with ESMTPSA id n16-20020a5d4850000000b0030632833e74sm6170228wrs.11.2023.05.31.02.40.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 May 2023 02:40:07 -0700 (PDT)
-Message-ID: <af5df07e-f93f-9588-4fdb-b89b37aa28a1@baylibre.com>
-Date:   Wed, 31 May 2023 11:40:04 +0200
+        Wed, 31 May 2023 05:49:05 -0400
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49732E2
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 02:49:03 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20230531094900epoutp01b8ac502c749908619abb9e822d5e2047~kMXVdM-qV0374003740epoutp01A
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 09:49:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20230531094900epoutp01b8ac502c749908619abb9e822d5e2047~kMXVdM-qV0374003740epoutp01A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1685526540;
+        bh=dgHU00N/+R/KHKgNRjIXIRKTVuQTmbw0OyEaTHfs+n8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=K9usgEE66aGgoY0S9IC6VMVAGnQ4BMfsYup4a8EFXZA0HfHauBEjilejg/AQb1dPq
+         AQyLlvIhgkX0tTMOqDQwaUjJRwZsXi3+MlabZ8aGcGfej51ulyYl4MLnYcIFbuDJjr
+         hhTcto0r+rwNcIMLs7dVikfJXecSEW+ncFL7XjiM=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20230531094900epcas5p4239c356021a98922de5f54fe9895f6ea~kMXVIZ5pE2669026690epcas5p4R;
+        Wed, 31 May 2023 09:49:00 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.183]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4QWPbt4n5Dz4x9Q7; Wed, 31 May
+        2023 09:48:58 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        E1.58.16380.90817746; Wed, 31 May 2023 18:48:57 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20230531094857epcas5p4b3046c55ef96b6aaefee2fd1f853dc9c~kMXSItqNb2669026690epcas5p4M;
+        Wed, 31 May 2023 09:48:57 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230531094857epsmtrp1a00a077ce10f9d2928e228cc6e1c107e~kMXSH0FTE1498114981epsmtrp1H;
+        Wed, 31 May 2023 09:48:57 +0000 (GMT)
+X-AuditID: b6c32a4b-56fff70000013ffc-18-647718091df7
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        5A.76.27706.80817746; Wed, 31 May 2023 18:48:56 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230531094855epsmtip27651a058430e2468748d5b744eee1f2e~kMXQ5pODk2593025930epsmtip2u;
+        Wed, 31 May 2023 09:48:55 +0000 (GMT)
+Date:   Wed, 31 May 2023 15:15:52 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Keith Busch <kbusch@meta.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, hch@lst.de, axboe@kernel.dk,
+        sagi@grimberg.me, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 1/2] block: add request polling helper
+Message-ID: <20230531094552.GA19592@green245>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2] blk-mq: check on cpu id when there is only one ctx
- mapping
-Content-Language: en-US
-To:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk
-Cc:     kbusch@kernel.org, liusong@linux.alibaba.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, wsd_upstream@mediatek.com,
-        peter.wang@mediatek.com, stanley.chu@mediatek.com,
-        powen.kao@mediatek.com, alice.chao@mediatek.com,
-        naomi.chu@mediatek.com
-References: <20230531083828.8009-1-ed.tsai@mediatek.com>
- <20230531083828.8009-2-ed.tsai@mediatek.com>
-From:   Alexandre Mergnat <amergnat@baylibre.com>
-In-Reply-To: <20230531083828.8009-2-ed.tsai@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20230530172343.3250958-1-kbusch@meta.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOJsWRmVeSWpSXmKPExsWy7bCmhi6nRHmKwfVlohar7/azWaxcfZTJ
+        4l3rORaLSYeuMVqcubqQxWLvLW2L+cuesluse/2exYHD4/y9jSwel8+Wemxa1cnmsXlJvcfu
+        mw1sHucuVnh83iQXwB6VbZORmpiSWqSQmpecn5KZl26r5B0c7xxvamZgqGtoaWGupJCXmJtq
+        q+TiE6DrlpkDdJGSQlliTilQKCCxuFhJ386mKL+0JFUhI7+4xFYptSAlp8CkQK84Mbe4NC9d
+        Ly+1xMrQwMDIFKgwITtj++TT7AVnWStadn9gbmD8xNLFyMEhIWAi0XdWrouRi0NIYDejxInX
+        6xghnE+MEo9mrmCDcL4xSvzfuZWpi5ETrKO1swcqsZdRoql1D5TzjFFiw753LCBVLAKqEr+e
+        f2QG2cEmoClxYXIpSFhEQFHiPDAQQGxmgbWMEru3pYPYwgJWEos+rWYEKecV0JXoPSwBEuYV
+        EJQ4OfMJ2EROAXOJK78eMYPYogLKEge2HWcCWSsh0MshsWTmKmaI41wkzn+6zAJhC0u8Or6F
+        HcKWknjZ3wZlJ0tcmnkO6pkSicd7DkLZ9hKtp/qZIW7LkNjwYxLUnXwSvb+fMEGCi1eio00I
+        olxR4t6kp6wQtrjEwxlLoGwPicuHN4KtEhLoYpT4sEtmAqPcLCTvzEKyAcK2kuj80MQ6C2gD
+        s4C0xPJ/HBCmpsT6XfoLGFlXMUqmFhTnpqcWmxYY56WWw2M4OT93EyM4hWp572B89OCD3iFG
+        Jg7GQ4wSHMxKIry2icUpQrwpiZVVqUX58UWlOanFhxhNgZEzkVlKNDkfmMTzSuINTSwNTMzM
+        zEwsjc0MlcR51W1PJgsJpCeWpGanphakFsH0MXFwSjUwdSoFPaj60zh9h8hZxntVgafPCfzX
+        0dm39sdvo9SYXp21B5bqmb58HPhB/d/u6YsuX5R9OTFn8oMNE0UyggSTUjhfWyR8fJB72M7b
+        4bdR/d7QV98dux8G7cy32hzJNGnG29bY6TO+pE249aB1vcDZF7OLvBI33bqd29n4rPr8AqHu
+        9eym2gcOBF2bvGHS9/WdfJ86/t8/eut31pG+5Brz06tNeCx2Pdby85r46F2zGp/Lt4SejYFZ
+        58Lfn5/3beO0lNm31IMu7330b4e2zJFOo6C9FdHv3xrMv1mpXrGTOdVEwHrW8bKEvsYln578
+        1KvNdfM2Pb6vb0WB3JkJcuHLP230PtL0mrG+TopB1t7kR7kSS3FGoqEWc1FxIgAnpFOXKgQA
+        AA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKLMWRmVeSWpSXmKPExsWy7bCSvC6HRHmKwYbP1har7/azWaxcfZTJ
+        4l3rORaLSYeuMVqcubqQxWLvLW2L+cuesluse/2exYHD4/y9jSwel8+Wemxa1cnmsXlJvcfu
+        mw1sHucuVnh83iQXwB7FZZOSmpNZllqkb5fAlbFswk32gv9MFff/nWRsYNzH1MXIySEhYCLR
+        2tnDBmILCexmlPh9zh8iLi7RfO0HO4QtLLHy33N2iJonjBLNh2JBbBYBVYlfzz8ydzFycLAJ
+        aEpcmFwKEhYRUJQ4D3QHiM0ssJZRYve2dBBbWMBKYtGn1Ywg5bwCuhK9hyW6GLmAJnYxSmza
+        9JcFpIZXQFDi5MwnLBC9ZhLzNj8EG88sIC2x/B8HSJhTwFziyq9HzCC2qICyxIFtx5kmMArO
+        QtI9C0n3LITuBYzMqxglUwuKc9Nziw0LDPNSy/WKE3OLS/PS9ZLzczcxgmNCS3MH4/ZVH/QO
+        MTJxMB5ilOBgVhLhtU0sThHiTUmsrEotyo8vKs1JLT7EKM3BoiTOe6HrZLyQQHpiSWp2ampB
+        ahFMlomDU6qBSVk97OBNnxzVBTHfLgS7KejNmTIlJ3p/ooHl79l5ccuMJxjIN6xXLOFPFMry
+        2VLCEaT7hW8p+5K7Dc377+yXuXzZYLsey7SLfyJ5bk8/MmfS9LXnrQ0n//r6XLXe7ur7FQtL
+        Gg3MX3xX1gvsnvC8235RnJ5g61XrC+wdDOxn1dR+3HnzXGL3vlVthU87ml/t1Ha70Sd9PCuC
+        u4jn719h98uRu7YKJ3LdmPnQf5HLZX9L25fGDn0x8+XlTrVoPUqfWrwxfIHU5dP5pv0ip97m
+        JDLyPd9T13lk4u1NfyccVP8RwOXYNfdqrYhm/r5uc7kCZlYeCWmpdz9Due/I6C7YOj3Yfndd
+        +wJFzrURf+6YKbEUZyQaajEXFScCAPkiq9v4AgAA
+X-CMS-MailID: 20230531094857epcas5p4b3046c55ef96b6aaefee2fd1f853dc9c
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_369a9_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230530172405epcas5p317e15a619d6101c8875b920224f02e31
+References: <CGME20230530172405epcas5p317e15a619d6101c8875b920224f02e31@epcas5p3.samsung.com>
+        <20230530172343.3250958-1-kbusch@meta.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 31/05/2023 10:38, Ed Tsai wrote:
-> commit f168420 ("blk-mq: don't redirect completion for hctx withs only
-> one ctx mapping") When nvme applies a 1:1 mapping of hctx and ctx, there
-> will be no remote request.
-> 
-> But for ufs, the submission and completion queues could be asymmetric.
-> (e.g. Multiple SQs share one CQ) Therefore, 1:1 mapping of hctx and
-> ctx won't complete request on the submission cpu. In this situation,
-> this nr_ctx check could violate the QUEUE_FLAG_SAME_FORCE, as a result,
-> check on cpu id when there is only one ctx mapping.
+------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_369a9_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Reviewed-by: Alexandre Mergnat <amergnat@baylibre.com>
+On Tue, May 30, 2023 at 10:23:42AM -0700, Keith Busch wrote:
+>From: Keith Busch <kbusch@kernel.org>
+>
+>This will be used by drivers that allocate polling requests. It
+>interface does not require a bio, and can skip the overhead associated
+>with polling those.
+>
+>Signed-off-by: Keith Busch <kbusch@kernel.org>
 
--- 
-Regards,
-Alexandre
+Looks good.
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
+------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_369a9_
+Content-Type: text/plain; charset="utf-8"
+
+
+------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_369a9_--
