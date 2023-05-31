@@ -2,129 +2,159 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58474C77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 10:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7411C77B7C
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 11:38:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235847AbjEaKNa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 06:13:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34110 "EHLO
+        id S234815AbjEaLiK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 07:38:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234821AbjEaKN3 (ORCPT
+        with ESMTP id S230341AbjEaLiJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 06:13:29 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD8811C
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 03:13:25 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230531101323epoutp022882af76c6027914cd7e2c33845f0fab~kMsoQQHD-0342903429epoutp025
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 10:13:23 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230531101323epoutp022882af76c6027914cd7e2c33845f0fab~kMsoQQHD-0342903429epoutp025
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1685528004;
-        bh=9l2Z2oAcGHCRMkQsEPmwo78F4hANn3IhhsC7gL0Quzw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=A/tCRE0MyP+IW3cPkcAKIO0WdmAkM1OLd7Q2PMQDVkTiGAm93MRHfHE19Pa5SkCrl
-         BFTyfyOc/Dh5aArBeajIQhS97/i9LzToL6nlv6t4HCfLEEwn+MQnxMjJ1ywfTh8+6d
-         oATbMHYxCm34PJkE/YWxQvzLQzR0a8lZQsH/GhF4=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20230531101323epcas5p373d4efa70286d3921949f94ff0f91598~kMsn8MuBp1841618416epcas5p3c;
-        Wed, 31 May 2023 10:13:23 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.183]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4QWQ8271Czz4x9Q5; Wed, 31 May
-        2023 10:13:22 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        BF.AE.44881.2CD17746; Wed, 31 May 2023 19:13:22 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20230531101322epcas5p3448a17bb2283baaa1e0697088a5f4271~kMsm_4bF42018420184epcas5p3L;
-        Wed, 31 May 2023 10:13:22 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230531101322epsmtrp18e4cc0f370e8cedaa5508e5a62974976~kMsm9lYcu2991229912epsmtrp10;
-        Wed, 31 May 2023 10:13:22 +0000 (GMT)
-X-AuditID: b6c32a4a-c47ff7000001af51-9e-64771dc26cf2
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        55.D1.28392.2CD17746; Wed, 31 May 2023 19:13:22 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230531101320epsmtip2ba7616988cb7dc2f6ee22856cab4d60d~kMslQQxpF1128111281epsmtip2q;
-        Wed, 31 May 2023 10:13:20 +0000 (GMT)
-Date:   Wed, 31 May 2023 15:40:20 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Keith Busch <kbusch@meta.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, hch@lst.de, axboe@kernel.dk,
-        sagi@grimberg.me, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 2/2] nvme: improved uring polling
-Message-ID: <20230531101020.GB19592@green245>
+        Wed, 31 May 2023 07:38:09 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32920E5;
+        Wed, 31 May 2023 04:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1685533087; x=1717069087;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LvvitQpZZtAL6oj1gqbFnc01A5MrDrOWTWrqLbLHBtg=;
+  b=TGA+vbVwlyf//CJ/tO4s1XYxMKDn7ZrdNuzSPxJDc7pea8D7KwBjsqHq
+   TZTmMN9zeRvleeRHLErXC1DZ23bQ0j2SwkCvF1qiwzfAWNgJGaA9ePXiL
+   bO6R425etcQC1NHfZCAwz+8CPtIatkbSgHJ2Ex5cIxeP+ZBFRaqe0vWI6
+   yY5ur2foPLDvvdznL0jvRgtpqupjfRqAl96NmSqFkfyv/dVmNGl0Ssxvf
+   Xoeqtm8ANactFsuRToXg5jNhCrzgMMExn6qGq7oUv0hmiJ7MSmRwmDlcv
+   tMn+xVNb6tGMjcg3BNdjEpPnEhrOr+yjE+EAepg2o7SHq9fqX9FSYNSbX
+   g==;
+X-IronPort-AV: E=Sophos;i="6.00,207,1681142400"; 
+   d="scan'208";a="344179010"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 31 May 2023 19:38:07 +0800
+IronPort-SDR: nePLnNaQJRq8r29PfsVroxAIStw5c92OssI0j8HEQTXQZkF7JzKP9bJ4++cuDPSs8oNUSNmaDE
+ 9pJ7dv/otZth4jQZndpodaMTsMFi95nLSdouV9G5QCSM/jzXtJjHBMMHillHOZ4hUlVaH68Dm8
+ 1dH5DIeGiqwMpTzIRstCAsAP2RVeS2l+5DWSWxoO3hG0kFiLtUeMunzI7H0sxuBuWOYhSY2x4Z
+ UkDPEqhN9MSLlRg2gkl+Rh7joFEy+PKgibG3ZyLx9VjjLTF227SUlpK6MakxAxdrlAY9kdMMk3
+ Abw=
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 May 2023 03:47:19 -0700
+IronPort-SDR: MvRk2MpNk3e8gqt7qwqmL3jPRXa6b09ylTyL/ys7eOTZgvQgIabksCsBGQRYSIPZ3fvJoKYihN
+ Pf+m2tntLEopBBTPDXShIwemVZlqUpoiexRwQOM9vXrxGeZtfqIjzfL7BMbwSy+e2/4hGk0mff
+ 0TQnjGk9GH6WtgFUosfjjuzMtQzDD0dAG/x6MmRyT6fauYzygDv0ft2B72XwweukdX03DxZBnz
+ bDWJTrR4E+YBqjH9qg+kXG8rJIPgi2AXjM0c/MXwL4OF8owppSIwbZsIwVwUThpUzxV7rdhssW
+ keY=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.6])
+  by uls-op-cesaip02.wdc.com with ESMTP; 31 May 2023 04:38:04 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dm-devel@redhat.com, Song Liu <song@kernel.org>,
+        linux-raid@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
+        Bob Peterson <rpeterso@redhat.com>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>, gouha7@uniontech.com,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v6 00/20] bio: check return values of bio_add_page
+Date:   Wed, 31 May 2023 04:37:42 -0700
+Message-ID: <cover.1685461490.git.johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-In-Reply-To: <20230530172343.3250958-2-kbusch@meta.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGJsWRmVeSWpSXmKPExsWy7bCmuu4h2fIUg7PzzSxW3+1ns1i5+iiT
-        xbvWcywWkw5dY7Q4c3Uhi8XeW9oW85c9ZbdY9/o9iwOHx/l7G1k8Lp8t9di0qpPNY/OSeo/d
-        NxvYPM5drPD4vEkugD0q2yYjNTEltUghNS85PyUzL91WyTs43jne1MzAUNfQ0sJcSSEvMTfV
-        VsnFJ0DXLTMH6CIlhbLEnFKgUEBicbGSvp1NUX5pSapCRn5xia1SakFKToFJgV5xYm5xaV66
-        Xl5qiZWhgYGRKVBhQnbG2s92BZNZK+6t2s/cwHiWpYuRk0NCwESi88w2xi5GLg4hgd2MElsO
-        tUI5nxglvvV/YYFwPjNKTPq6ka2LkQOsZdtXB4j4LkaJrnNr2CGcZ4wSG/ofMoMUsQioSty8
-        owxisgloSlyYXAqyTURAUeI8MAhAbGaBtYwSu7elg9jCAqYSf7deBYvzCuhKzOp6zwphC0qc
-        nPmEBWQMp4C5ROsMa5CwqICyxIFtx5lAtkoIdHJIXGu8ywTxjYvEiwOzoT4Tlnh1fAs7hC0l
-        8bK/DcpOlrg08xxUfYnE4z0HoWx7idZT/cwQt2VILD28jhHC5pPo/f2ECeJ1XomONiGIckWJ
-        e5OeskLY4hIPZyyBsj0kZr7tY4WEyHZGic+7WpknMMrNQvLOLCQrIGwric4PTayzgFYwC0hL
-        LP/HAWFqSqzfpb+AkXUVo2RqQXFuemqxaYFRXmo5PIKT83M3MYITqJbXDsaHDz7oHWJk4mA8
-        xCjBwawkwmubWJwixJuSWFmVWpQfX1Sak1p8iNEUGDkTmaVEk/OBKTyvJN7QxNLAxMzMzMTS
-        2MxQSZxX3fZkspBAemJJanZqakFqEUwfEwenVAPTpOnqB/IVLiSFH5iduIp1dmPtp9u/k3Zu
-        XvzpvJfd2ms6nG/l9/E9M1Oerc55baZmTXRuqbXOeoeFh0Pvmau6ZGmZeP35cHSZ6t65O2Jr
-        Dx24vUprVo7kJoMJMk/j+F0uby8IUhd959KjdOpI8JHtP518o70X33g+/VHFfolYx2Auo0vu
-        ecsCgkOKF0wxt13yU1/i7Bq3RxtTjtnMfvavxiF01qO0eVNlzZdVOs1ap3wuqEXUI6b6d9zd
-        dfevyHB8n504l98moigsdO65oprJBiJiBw7LP7umY+9/7tqco7mutilt+4vnHEhiO8h/8Uzj
-        pYfHGtUYz4e/eNrHcaukf+HjpyEPjm7y05BSn507WYmlOCPRUIu5qDgRAAEqNHQpBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKLMWRmVeSWpSXmKPExsWy7bCSvO4h2fIUg9m7pS1W3+1ns1i5+iiT
-        xbvWcywWkw5dY7Q4c3Uhi8XeW9oW85c9ZbdY9/o9iwOHx/l7G1k8Lp8t9di0qpPNY/OSeo/d
-        NxvYPM5drPD4vEkugD2KyyYlNSezLLVI3y6BK+PN06+sBUeZKm40vWRvYJzJ1MXIwSEhYCKx
-        7atDFyMXh5DADkaJDzuXAMU5geLiEs3XfrBD2MISK/89Z4coesIo8Wv/VVaQZhYBVYmbd5RB
-        TDYBTYkLk0tBykUEFCXOA90BYjMLrGWU2L0tHcQWFjCV+Lv1KlicV0BXYlbXe1aIkdsZJR7N
-        fcIEkRCUODnzCQtEs5nEvM0PmUHmMwtISyz/xwFicgqYS7TOsAapEBVQljiw7TjTBEbBWUia
-        ZyFpnoXQvICReRWjZGpBcW56brFhgVFearlecWJucWleul5yfu4mRnBMaGntYNyz6oPeIUYm
-        DsZDjBIczEoivLaJxSlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnNTk0tSC2C
-        yTJxcEo1MNVl3j/bfzrwhnGtr+OPl/bGd503zz6qK+ha+G6hf90XT/VINZWP8x571Jjeen3t
-        vMjEWJ9Z148rHFDyePgmr7MxZO3Hc3+SLv6dnC+xTkxmh6nZtHDZxcvtFe+5fTXZL+xhdkP3
-        wpKwJTO6s1UDrthcOfpgOaPUqfj7cXc/nXN70qPYddda9sKBz+f5fB0UizqiNbd5bLxUc8LO
-        OcB653x+we/nbB9u26EmrFuvaqyqHnvysUvKv7PvN1v5hHGq5aa+8+2aqXagwLbs+o+tOmHG
-        L2Vz2D+HVsXu1YoTnpDcqGvEtt7cJinCNm3lJKeN2040b12oduRv8/nJErZebrLZV1TdH+kz
-        ZbxbEO6docRSnJFoqMVcVJwIAAsGpwD4AgAA
-X-CMS-MailID: 20230531101322epcas5p3448a17bb2283baaa1e0697088a5f4271
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_36b7f_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230530172444epcas5p18e5bc9bdf2017e00c6f7bbdfa463473c
-References: <20230530172343.3250958-1-kbusch@meta.com>
-        <CGME20230530172444epcas5p18e5bc9bdf2017e00c6f7bbdfa463473c@epcas5p1.samsung.com>
-        <20230530172343.3250958-2-kbusch@meta.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
+Message-ID: <20230531113742.W23sDNJtoptvAt0nEIRpVE_zWqy2h4hh_YvHhzgv7Tc@z>
 
-------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_36b7f_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+We have two functions for adding a page to a bio, __bio_add_page() which is
+used to add a single page to a freshly created bio and bio_add_page() which is
+used to add a page to an existing bio.
 
-On Tue, May 30, 2023 at 10:23:43AM -0700, Keith Busch wrote:
->From: Keith Busch <kbusch@kernel.org>
+While __bio_add_page() is expected to succeed, bio_add_page() can fail.
 
-This may need to be wired up against the code after
-https://lore.kernel.org/linux-nvme/168502647392.717124.7925068931544884226.b4-ty@kernel.dk/
+This series converts the callers of bio_add_page() which can easily use
+__bio_add_page() to using it and checks the return of bio_add_page() for
+callers that don't work on a freshly created bio.
 
-Looks good otherwise.
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+Lastly it marks bio_add_page() as __must_check so we don't have to go again
+and audit all callers.
 
-------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_36b7f_
-Content-Type: text/plain; charset="utf-8"
+Changes to v5:
+- Rebased onto latest Linus' master
+- Removed now superfluous BUG_ON() in fs/buffer.c (Gou)
+- Removed dead cleanup code in dm-crypt.c (Mikulas)
+
+Changes to v4:
+- Rebased onto latest Linus' master
+- Dropped already merged patches
+- Added Sergey's Reviewed-by
+
+Changes to v3:
+- Added __bio_add_folio and use it in iomap (Willy)
+- Mark bio_add_folio must check (Willy)
+- s/GFS/GFS2/ (Andreas)
+
+Changes to v2:
+- Removed 'wont fail' comments pointed out by Song
+
+Changes to v1:
+- Removed pointless comment pointed out by Willy
+- Changed commit messages pointed out by Damien
+- Colledted Damien's Reviews and Acks
 
 
-------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_36b7f_--
+
+Johannes Thumshirn (20):
+  swap: use __bio_add_page to add page to bio
+  drbd: use __bio_add_page to add page to bio
+  dm: dm-zoned: use __bio_add_page for adding single metadata page
+  fs: buffer: use __bio_add_page to add single page to bio
+  md: use __bio_add_page to add single page
+  md: raid5-log: use __bio_add_page to add single page
+  md: raid5: use __bio_add_page to add single page to new bio
+  jfs: logmgr: use __bio_add_page to add single page to bio
+  gfs2: use __bio_add_page for adding single page to bio
+  zonefs: use __bio_add_page for adding single page to bio
+  zram: use __bio_add_page for adding single page to bio
+  floppy: use __bio_add_page for adding single page to bio
+  md: check for failure when adding pages in alloc_behind_master_bio
+  md: raid1: use __bio_add_page for adding single page to bio
+  md: raid1: check if adding pages to resync bio fails
+  dm-crypt: check if adding pages to clone bio fails
+  block: mark bio_add_page as __must_check
+  block: add __bio_add_folio
+  fs: iomap: use __bio_add_folio where possible
+  block: mark bio_add_folio as __must_check
+
+ block/bio.c                      |  8 ++++++++
+ drivers/block/drbd/drbd_bitmap.c |  4 +---
+ drivers/block/floppy.c           |  2 +-
+ drivers/block/zram/zram_drv.c    |  2 +-
+ drivers/md/dm-crypt.c            |  5 ++++-
+ drivers/md/dm-zoned-metadata.c   |  6 +++---
+ drivers/md/md.c                  |  4 ++--
+ drivers/md/raid1-10.c            | 11 ++++++-----
+ drivers/md/raid1.c               |  7 +++++--
+ drivers/md/raid10.c              | 20 ++++++++++----------
+ drivers/md/raid5-cache.c         |  2 +-
+ drivers/md/raid5-ppl.c           |  4 ++--
+ fs/buffer.c                      |  3 +--
+ fs/gfs2/ops_fstype.c             |  2 +-
+ fs/iomap/buffered-io.c           |  6 +++---
+ fs/jfs/jfs_logmgr.c              |  4 ++--
+ fs/zonefs/super.c                |  2 +-
+ include/linux/bio.h              |  5 +++--
+ mm/page_io.c                     |  8 ++++----
+ 19 files changed, 59 insertions(+), 46 deletions(-)
+
+-- 
+2.40.1
+
