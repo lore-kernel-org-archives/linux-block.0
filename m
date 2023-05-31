@@ -2,87 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C901C7EE31
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 09:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B56EEC7EE32
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 09:05:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234794AbjEaJFH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 05:05:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47074 "EHLO
+        id S234939AbjEaJFI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 05:05:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235363AbjEaJFD (ORCPT
+        with ESMTP id S235286AbjEaJEw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 05:05:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C99B5113;
-        Wed, 31 May 2023 02:05:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 541D3634A0;
-        Wed, 31 May 2023 09:05:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34978C4339B;
-        Wed, 31 May 2023 09:04:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685523900;
-        bh=2sYByOARuvzs0xgoeOJuHM0JAfAc9I7u2R3Ei6WHdos=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=CE7/pk4wQuSL/LNwZaW//4y9h+8Ah0nBiwA+2FoZoRqH0P2XxGiZKvU7Kwwk6Dtou
-         H+PPHOTbJeg0iKHcdZ2xTbNZynpgF1LhJskFjKGy6JDuJ/8rE5Fpz04rx52BcFAOuK
-         4BJtQ1OuWZ7h+DwdRnfpwel8tJ2fU9pAj2QIwThNCyXFiIknEmCrCy0WLFIdVaBYDd
-         vTE3Rz4LPpzpIlv1XQqVzOT5Yw98nChI1BwgSQ7v4WEb59quF5XQ2IXYyBnrlU1LUe
-         CKwK/+1voe/mi+ut/8w8Yk+gZ++ZWpoHyrsn3GEKlYPI1djuVNEsMeuqS+hgOaxhTt
-         LKYHh3lZAHhNw==
-Message-ID: <f182cd69-2553-18bb-5908-966209bb313b@kernel.org>
-Date:   Wed, 31 May 2023 18:04:57 +0900
+        Wed, 31 May 2023 05:04:52 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFEA9135;
+        Wed, 31 May 2023 02:04:50 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2af31dc49f9so60311361fa.0;
+        Wed, 31 May 2023 02:04:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685523889; x=1688115889;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jrtN/2a5JJTprBcYp9jvZ+UGojw4315OmIU8TzujPAw=;
+        b=aGDLNuG8w9aRbKs613i2qng0wy6XdphgsO9DC+Qy40A8rrPXO9353ZgHVIohfsrRW6
+         Y4ZtTXx+79iQm0YUYe89Vqp+5OVVe3+4Xqk2Jgb3dNc5kabutUgM4rsNjvbiuvMk63JL
+         QXAnWJByUDNBgRAXdXmQCPcHzH5Q2bEGNspZwLuEFmy+EFcixV895frB3qBUU/ah+BnC
+         CV1X5sG+lH4+m283ml9QcxW/0SU6vh1rQZTDqxGbuzfroAyrc33I/Zyg841loN91YQFG
+         JmCL4pwEkJfwG2BbIXHG1FbSgpi1tNSY+JAsLI5foOekv+9fsfTF1HndjVO0nfoSUtby
+         2JtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685523889; x=1688115889;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jrtN/2a5JJTprBcYp9jvZ+UGojw4315OmIU8TzujPAw=;
+        b=hkRK9qBUPEyBlj/JYnQGFcIXrFWGYawxy54kIGdMmyDL8MskH5ICyRHUVBTTVN7ohD
+         cHwafAJqWJFt1iLj6SORx6yp69eoJLekecgptOBgdKmoXVeEv3VDOGhbe6fqHNhvDxXH
+         q+USx5h9U7NTbHSPw+fsasfTdtunBhNcl7zcntxL7JFVr2TpUCDuuN1ifcyaBCmYh+dW
+         1lJjS55ZUPYSKTLgc7F2S6D1Dickc4XaMrFQ2BcAOT3ES07t1VUmZweKlR0ovhMWxCSe
+         nrGdC3OJNKcq0CM9NvpJqGy7oLfGw8oeJ8+/QZYq5FR/S4a0TxjpfxwLgLtFWH704eXa
+         kOkQ==
+X-Gm-Message-State: AC+VfDxyLIo6zVCpXU8EVgebjUIj3FY+9Jb0l94d848cy//20YnIrISb
+        7XnJIuElQ+Z2eymtxo4PLYuJ3CBv4EUWI2H99tBn4/z74Q==
+X-Google-Smtp-Source: ACHHUZ6Q/b1Vd1sDwa9EpiwBHjkXj03DdqC6oi6LN/XlpOtPYWRjn5KHR1hRURuJRJou2lJKUENmn1RoQ1Y2NHNG4DY=
+X-Received: by 2002:a2e:9e15:0:b0:2ac:8c95:d42b with SMTP id
+ e21-20020a2e9e15000000b002ac8c95d42bmr2183665ljk.4.1685523888771; Wed, 31 May
+ 2023 02:04:48 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH 01/12] backing_dev: remove current->backing_dev_info
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
-References: <20230531075026.480237-1-hch@lst.de>
- <20230531075026.480237-2-hch@lst.de>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230531075026.480237-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230531083828.8009-1-ed.tsai@mediatek.com>
+In-Reply-To: <20230531083828.8009-1-ed.tsai@mediatek.com>
+From:   Stanley Chu <chu.stanley@gmail.com>
+Date:   Wed, 31 May 2023 17:04:36 +0800
+Message-ID: <CAGaU9a_Aoyka-tNvG-WGAEacGgcF38gyHLcTLrK+mL_qGfwRwg@mail.gmail.com>
+Subject: Re: blk-mq: check on cpu id when there is only one ctx mapping
+To:     Ed Tsai <ed.tsai@mediatek.com>
+Cc:     axboe@kernel.dk, kbusch@kernel.org, liusong@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, wsd_upstream@mediatek.com,
+        peter.wang@mediatek.com, stanley.chu@mediatek.com,
+        powen.kao@mediatek.com, alice.chao@mediatek.com,
+        naomi.chu@mediatek.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/31/23 16:50, Christoph Hellwig wrote:
-> The last user of current->backing_dev_info disappeared in commit
-> b9b1335e6403 ("remove bdi_congested() and wb_congested() and related
-> functions").  Remove the field and all assignments to it.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+On Wed, May 31, 2023 at 4:49=E2=80=AFPM Ed Tsai <ed.tsai@mediatek.com> wrot=
+e:
+>
+> commit f168420 ("blk-mq: don't redirect completion for hctx withs only
+> one ctx mapping") When nvme applies a 1:1 mapping of hctx and ctx, there
+> will be no remote request.
+>
+> But for ufs, the submission and completion queues could be asymmetric.
+> (e.g. Multiple SQs share one CQ) Therefore, 1:1 mapping of hctx and
+> ctx won't complete request on the submission cpu. In this situation,
+> this nr_ctx check could violate the QUEUE_FLAG_SAME_FORCE, as a result,
+> check on cpu id when there is only one ctx mapping.
+>
+> Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
+> Signed-off-by: Po-Wen Kao <powen.kao@mediatek.com>
 
-Nice cleanup !
-
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-
--- 
-Damien Le Moal
-Western Digital Research
-
+Reviewed-by: Stanley Chu <stanley.chu@mediatek.com>
