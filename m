@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 100D4C7EE2F
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 12:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2BAC7EE31
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 12:56:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236076AbjEaM4b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 08:56:31 -0400
+        id S236078AbjEaM4d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 08:56:33 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236061AbjEaM4a (ORCPT
+        with ESMTP id S235040AbjEaM4c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 08:56:30 -0400
+        Wed, 31 May 2023 08:56:32 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED841BD;
-        Wed, 31 May 2023 05:56:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55CC1B7;
+        Wed, 31 May 2023 05:56:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=vvrMwE8BjC38RZj2WyqFyAbLSvr7o9QLGri8y3hsVWs=; b=LsMvMjodlrdIcQmqStvcRmEg6a
-        p73uxa7uiSXgEqFhriiibCgnB2FhMDBVH4F2qp9/qRc6mLk+JyM9MYIWiIlxZ2DHT6qWm5atTLfMa
-        OpHvyzf9lvD6g/hEdnuHMYAEmiyKQv+bsfJgYbLtvSXhFxarfCZfT1PX2QA+FFcehUhxw0W+GeQVN
-        NffZr8VRBrS0QaOyFJ5XBR/nAoMFXL4+YlFyQJFt994UVHC1i9Y0g0P9eAmgLbTpU3RmOQq2Ym4T7
-        wdFYC75VgJy0nGYxtTNHpqZ8CPmOZWDdNL1ZsMTtTGI7eHwh40D1mxHOHRxxzeUxn8pqODLBK0yHT
-        1GqWLJxw==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=/mNIMohr1uFpuUxrcr17WPn+hv1s0+EROxi7hXvr1PA=; b=u866lGd1Vz7A5VVdyUkbO2/gwY
+        20+X8LAEch7ckqxwPd5twS1ieR8YO9Pyl8P0njz7Koi7E19RrjR7KdpYcR2VbOsZnJkMo7uc1zi8Y
+        ehBF6YjjGmfvesKB0EFJs3dRbXGFQO3umTFm7dOgfL3O7S9ONK5X2xB5fHgDOdFxMa7bAITF/SaxW
+        H70Y9lzqVxCdLcINYJtFs9PzXJX277XJlAGwf/ATadOumBCdPmN5ZtWQv5yO3E2kogKMJjOOCA93W
+        9+nH+RyxDLMjHiyMuGQmeKbWyqvh2pFsqDeQ/iEyG7iZKo7XPhcZrSCVYBroFw22V3mKj+QhdIFXn
+        I3Gu4kNg==;
 Received: from [2001:4bb8:182:6d06:2e49:a56:513a:92ee] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q4LMZ-00HQu7-1g;
-        Wed, 31 May 2023 12:55:40 +0000
+        id 1q4LMk-00HQwo-2V;
+        Wed, 31 May 2023 12:55:51 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -42,10 +42,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
         linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
-Subject: fix the name_to_dev_t mess v2
-Date:   Wed, 31 May 2023 14:55:11 +0200
-Message-Id: <20230531125535.676098-1-hch@lst.de>
+Subject: [PATCH 02/24] PM: hibernate: factor out a helper to find the resume device
+Date:   Wed, 31 May 2023 14:55:13 +0200
+Message-Id: <20230531125535.676098-3-hch@lst.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230531125535.676098-1-hch@lst.de>
+References: <20230531125535.676098-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -53,36 +55,109 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+Split the logic to find the resume device out software_resume and into
+a separate helper to start unwindig the convoluted goto logic.
 
-this series tries to sort out accumulated mess around the name_to_dev_t
-function.  This function is intended to allow looking up the dev_t of a
-block device based on a name string before the root file systems is
-mounted and thus the normal path based lookup is available.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
+---
+ kernel/power/hibernate.c | 72 +++++++++++++++++++++-------------------
+ 1 file changed, 37 insertions(+), 35 deletions(-)
 
-Unfortunately a few years ago it managed to get exported and used in
-non-init contexts, leading to the something looking like a path name
-also beeing lookuped up by a different and potential dangerous
-algorithm.
+diff --git a/kernel/power/hibernate.c b/kernel/power/hibernate.c
+index 30d1274f03f625..07279506366255 100644
+--- a/kernel/power/hibernate.c
++++ b/kernel/power/hibernate.c
+@@ -910,6 +910,41 @@ int hibernate_quiet_exec(int (*func)(void *data), void *data)
+ }
+ EXPORT_SYMBOL_GPL(hibernate_quiet_exec);
+ 
++static int find_resume_device(void)
++{
++	if (!strlen(resume_file))
++		return -ENOENT;
++
++	pm_pr_dbg("Checking hibernation image partition %s\n", resume_file);
++
++	if (resume_delay) {
++		pr_info("Waiting %dsec before reading resume device ...\n",
++			resume_delay);
++		ssleep(resume_delay);
++	}
++
++	/* Check if the device is there */
++	swsusp_resume_device = name_to_dev_t(resume_file);
++	if (swsusp_resume_device)
++		return 0;
++
++	/*
++	 * Some device discovery might still be in progress; we need to wait for
++	 * this to finish.
++	 */
++	wait_for_device_probe();
++	if (resume_wait) {
++		while (!(swsusp_resume_device = name_to_dev_t(resume_file)))
++			msleep(10);
++		async_synchronize_full();
++	}
++
++	swsusp_resume_device = name_to_dev_t(resume_file);
++	if (!swsusp_resume_device)
++		return -ENODEV;
++	return 0;
++}
++
+ /**
+  * software_resume - Resume from a saved hibernation image.
+  *
+@@ -949,45 +984,12 @@ static int software_resume(void)
+ 
+ 	snapshot_test = false;
+ 
+-	if (swsusp_resume_device)
+-		goto Check_image;
+-
+-	if (!strlen(resume_file)) {
+-		error = -ENOENT;
+-		goto Unlock;
+-	}
+-
+-	pm_pr_dbg("Checking hibernation image partition %s\n", resume_file);
+-
+-	if (resume_delay) {
+-		pr_info("Waiting %dsec before reading resume device ...\n",
+-			resume_delay);
+-		ssleep(resume_delay);
+-	}
+-
+-	/* Check if the device is there */
+-	swsusp_resume_device = name_to_dev_t(resume_file);
+ 	if (!swsusp_resume_device) {
+-		/*
+-		 * Some device discovery might still be in progress; we need
+-		 * to wait for this to finish.
+-		 */
+-		wait_for_device_probe();
+-
+-		if (resume_wait) {
+-			while ((swsusp_resume_device = name_to_dev_t(resume_file)) == 0)
+-				msleep(10);
+-			async_synchronize_full();
+-		}
+-
+-		swsusp_resume_device = name_to_dev_t(resume_file);
+-		if (!swsusp_resume_device) {
+-			error = -ENODEV;
++		error = find_resume_device();
++		if (error)
+ 			goto Unlock;
+-		}
+ 	}
+ 
+- Check_image:
+ 	pm_pr_dbg("Hibernation image partition %d:%d present\n",
+ 		MAJOR(swsusp_resume_device), MINOR(swsusp_resume_device));
+ 
+-- 
+2.39.2
 
-This series does a fair amount of refactoring and finally ends up with
-the renamed and improved name_to_dev_t only beeing available for the
-early init code again.
-
-The series is against Jens' for-6.5/block tree but probably applies
-against current mainline just fine as well.
-
-A git tree is also available here:
-
-    git://git.infradead.org/users/hch/block.git blk-init-cleanup
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-init-cleanup
-
-Changes since v1:
- - really propagate the actual error in dm_get_device
- - improve the documentation in kernel-parameters.txt
- - spelling fixes
-
-Diffstat:
