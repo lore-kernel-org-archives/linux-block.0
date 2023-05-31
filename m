@@ -2,129 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12AEDC77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 08:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA3B8C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 08:39:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234834AbjEaIhR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 04:37:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55010 "EHLO
+        id S234672AbjEaIjO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 04:39:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234773AbjEaIhP (ORCPT
+        with ESMTP id S234798AbjEaIjM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 04:37:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5BC184
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 01:36:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685522162;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D2ZwdaLGqkNgpQd/gtgsXYogAn46nzSogOGGTIXtoVA=;
-        b=HkNBGHhYAPjS8y/E37NU2RmMrgffeRY/Ztcy27DJMQGyh2VBAuw2BXC52Nd29EaO2TO1Dj
-        /kkdt6iYtSry/7dS8J2DMx5wF2fLei2UA8MiaZ5AzVwxQHFWK+33UbX9Fc5oJnKp3XHWTc
-        jCskUYdmN1stRJiqINvuCURn+weKObc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-477-akBoGxAJNLKPo3Ap7wG4_g-1; Wed, 31 May 2023 04:35:59 -0400
-X-MC-Unique: akBoGxAJNLKPo3Ap7wG4_g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0837B800159;
-        Wed, 31 May 2023 08:35:58 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32053112132C;
-        Wed, 31 May 2023 08:35:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <cbd39f94-407a-03b6-9c43-8144d0efc8bb@redhat.com>
-References: <cbd39f94-407a-03b6-9c43-8144d0efc8bb@redhat.com> <20230526214142.958751-1-dhowells@redhat.com> <20230526214142.958751-2-dhowells@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v4 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
+        Wed, 31 May 2023 04:39:12 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECEFE122;
+        Wed, 31 May 2023 01:39:02 -0700 (PDT)
+X-UUID: 94cf3336ff8e11ed9cb5633481061a41-20230531
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=0nv3Rl9Ah0Yurqkil5EC4EA2Z4hlg1w19JmuTm7+APQ=;
+        b=mtnsGzE7RinVue+XL2iMRZmrc+bigQKb/3ebA8d+pwbfbCGRagViSmJFStkCGqlPFmsLLj/DKvo8GcR//KFG33M28wuXenoySUKbzsFt9+saHi8/4yaqA17H55qutIJsXjRfIA4MlKlaU44aTScpjEGrHwXeS1NpxE5yRYjU5Rk=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.25,REQID:4553f587-a283-4f76-84c8-c87aef2abf4b,IP:0,U
+        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+        N:release,TS:100
+X-CID-INFO: VERSION:1.1.25,REQID:4553f587-a283-4f76-84c8-c87aef2abf4b,IP:0,URL
+        :0,TC:0,Content:0,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Spam_GS981B3D,ACTIO
+        N:quarantine,TS:100
+X-CID-META: VersionHash:d5b0ae3,CLOUDID:92a7ec3c-de1e-4348-bc35-c96f92f1dcbb,B
+        ulkID:230531163859FAK7U5FV,BulkQuantity:0,Recheck:0,SF:29|28|17|19|48,TC:n
+        il,Content:0,EDM:-3,IP:nil,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OS
+        I:0,OSA:0,AV:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-UUID: 94cf3336ff8e11ed9cb5633481061a41-20230531
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+        (envelope-from <ed.tsai@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1126539607; Wed, 31 May 2023 16:38:56 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 31 May 2023 16:38:55 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 31 May 2023 16:38:55 +0800
+From:   Ed Tsai <ed.tsai@mediatek.com>
+To:     <axboe@kernel.dk>
+CC:     <kbusch@kernel.org>, <liusong@linux.alibaba.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>, <wsd_upstream@mediatek.com>,
+        <peter.wang@mediatek.com>, <stanley.chu@mediatek.com>,
+        <powen.kao@mediatek.com>, <alice.chao@mediatek.com>,
+        <naomi.chu@mediatek.com>, Ed Tsai <ed.tsai@mediatek.com>
+Subject: blk-mq: check on cpu id when there is only one ctx mapping
+Date:   Wed, 31 May 2023 16:38:28 +0800
+Message-ID: <20230531083828.8009-1-ed.tsai@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <510964.1685522152.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 31 May 2023 09:35:52 +0100
-Message-ID: <510965.1685522152@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Hildenbrand <david@redhat.com> wrote:
+commit f168420 ("blk-mq: don't redirect completion for hctx withs only
+one ctx mapping") When nvme applies a 1:1 mapping of hctx and ctx, there
+will be no remote request.
 
-> > Make pin_user_pages*() leave a ZERO_PAGE unpinned if it extracts a poi=
-nter
-> > to it from the page tables and make unpin_user_page*() correspondingly
-> > ignore a ZERO_PAGE when unpinning.  We don't want to risk overrunning =
-a
-> > zero page's refcount as we're only allowed ~2 million pins on it -
-> > something that userspace can conceivably trigger.
-> =
+But for ufs, the submission and completion queues could be asymmetric.
+(e.g. Multiple SQs share one CQ) Therefore, 1:1 mapping of hctx and
+ctx won't complete request on the submission cpu. In this situation,
+this nr_ctx check could violate the QUEUE_FLAG_SAME_FORCE, as a result,
+check on cpu id when there is only one ctx mapping.
 
-> 2 millions pins (FOLL_PIN, which increments the refcount by 1024) or 2 m=
-illion
-> references ?
+Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
+Signed-off-by: Po-Wen Kao <powen.kao@mediatek.com>
+---
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Definitely pins.  It's tricky because we've been using "pinned" to mean he=
-ld
-by a refcount or held by a flag too.
-
-2 million pins on the zero page is in the realms of possibility.  It only
-takes 32768 64-page DIO writes.
-
-> > @@ -3079,6 +3096,9 @@ EXPORT_SYMBOL_GPL(get_user_pages_fast);
-> >    *
-> >    * FOLL_PIN means that the pages must be released via unpin_user_pag=
-e(). Please
-> >    * see Documentation/core-api/pin_user_pages.rst for further details=
-.
-> > + *
-> > + * Note that if a zero_page is amongst the returned pages, it will no=
-t have
-> > + * pins in it and unpin_user_page() will not remove pins from it.
-> >    */
-> =
-
-> "it will not have pins in it" sounds fairly weird to a non-native speake=
-r.
-
-Oh, I know.  The problem is that "pin" is now really ambiguous.  Can we ch=
-ange
-"FOLL_PIN" to "FOLL_NAIL"?  Or maybe "FOLL_SCREW" - your pages are screwed=
- if
-you use DIO and fork at the same time.
-
-> "Note that the refcount of any zero_pages returned among the pinned page=
-s will
-> not be incremented, and unpin_user_page() will similarly not decrement i=
-t."
-
-That's not really right (although it happens to be true), because we're
-talking primarily about the pin counter, not the refcount - and they may b=
-e
-separate.
-
-David
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 41f7e2b500bd..ecc30ebe9483 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1176,7 +1176,8 @@ bool blk_mq_complete_request_remote(struct request *rq)
+ 	 * or a polled request, always complete locally,
+ 	 * it's pointless to redirect the completion.
+ 	 */
+-	if (rq->mq_hctx->nr_ctx == 1 ||
++	if ((rq->mq_hctx->nr_ctx == 1 &&
++	     rq->mq_ctx->cpu == raw_smp_processor_id()) ||
+ 		rq->cmd_flags & REQ_POLLED)
+ 		return false;
+ 
+-- 
+2.18.0
 
