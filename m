@@ -2,49 +2,49 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 758BEC77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 13:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87CCC87FF1
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 13:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236872AbjEaNsK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 09:48:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59534 "EHLO
+        id S237125AbjEaNvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 09:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236956AbjEaNri (ORCPT
+        with ESMTP id S237291AbjEaNuT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 09:47:38 -0400
+        Wed, 31 May 2023 09:50:19 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E9CFE56;
-        Wed, 31 May 2023 06:44:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFAEF2D7C;
+        Wed, 31 May 2023 06:45:47 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7F46463B6A;
-        Wed, 31 May 2023 13:44:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02F46C4339E;
-        Wed, 31 May 2023 13:44:02 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5E1A663B7F;
+        Wed, 31 May 2023 13:45:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C77B2C4339B;
+        Wed, 31 May 2023 13:45:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685540643;
-        bh=pV9uChkc0H4x4MSq/JUNMWPSxLJQXSvHsCVIU8XyKYU=;
+        s=k20201202; t=1685540731;
+        bh=p/IgxmZZFrxBdPYVbroxVgHz0FMQYuzCL/FQBFsDPeg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pSk/ef7XqtDyHJtvLmw8nsfj/JHJjeyb7mPNF6k+Jn1hVBBULmCBBJ2lPI+EFcc+G
-         J05a9DDS5jjrBAobce5HDuKOFyJfXsaUNFDmHrWNJbMV2aJdBsDscCHWQ4QR77T4X8
-         gXCV6JqYWzUCqzUi6J7Va39+wJLvCkxcL45I79JYNbDoBu+XvdIdFLcgOd+MckXGLd
-         R06ks5TDmGwCHmQw6oxYd7mPWAPFpFllFSf6DCucd4Vfqm+rmN8PuKTeVY+OskW7PB
-         zeEiZ1kDsG5Pv/29qO7CLwVOjIzIOX2iLPARjJAbxV2g/JzIxJRBiHtrMa3m/wmrcw
-         BgiQjbtxRcigg==
+        b=gsP/PpgZHs3JyUBeO4WmELP+CM81s9Hiotlsj3drW6kgRnoApYPP4gwPRoGlxiToN
+         2HQ/VxH88YGyziOO7f5vP2d3jGDWpc9ZyHqXnGridTKFGsiwI3RmL1oUSPhIniFVOB
+         XW0CE3vz1QVXahSOtTRh98XWhpLruunBjXDrQytm1i/+XefEIXcnuojAxs951Cuqw3
+         GZJupS/PLGEAZhy4/UdY1OIQkLxxGMQYdUB+3tLgaCqyEd1aw9aK1C8mX6F3dtsEkT
+         WpbY+g9tk43wKb7AxxI9YjQDJonXqT9opxC7z+dRHFQ2ST34LgtY43QUVpRqzATJ3L
+         Ns6uxmx64+BRw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ross Lagerwall <ross.lagerwall@citrix.com>,
         Juergen Gross <jgross@suse.com>,
-        Sasha Levin <sashal@kernel.org>, sstabellini@kernel.org,
-        roger.pau@citrix.com, axboe@kernel.dk,
+        Sasha Levin <sashal@kernel.org>, roger.pau@citrix.com,
+        sstabellini@kernel.org, axboe@kernel.dk,
         xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 22/24] xen/blkfront: Only check REQ_FUA for writes
-Date:   Wed, 31 May 2023 09:43:18 -0400
-Message-Id: <20230531134320.3384102-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 16/17] xen/blkfront: Only check REQ_FUA for writes
+Date:   Wed, 31 May 2023 09:45:00 -0400
+Message-Id: <20230531134502.3384828-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230531134320.3384102-1-sashal@kernel.org>
-References: <20230531134320.3384102-1-sashal@kernel.org>
+In-Reply-To: <20230531134502.3384828-1-sashal@kernel.org>
+References: <20230531134502.3384828-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 24a86d829f92a..831747ba8113c 100644
+index d0538c03f0332..da67621ebc212 100644
 --- a/drivers/block/xen-blkfront.c
 +++ b/drivers/block/xen-blkfront.c
-@@ -780,7 +780,8 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
+@@ -779,7 +779,8 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
  		ring_req->u.rw.handle = info->handle;
  		ring_req->operation = rq_data_dir(req) ?
  			BLKIF_OP_WRITE : BLKIF_OP_READ;
