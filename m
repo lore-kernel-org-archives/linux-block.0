@@ -2,122 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 119FDC77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 14:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E698BC7EE32
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 14:15:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237498AbjEaOED (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 10:04:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47674 "EHLO
+        id S236286AbjEaOPT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 10:15:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237244AbjEaODj (ORCPT
+        with ESMTP id S237671AbjEaOPB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 10:03:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D590170F
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 06:56:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685541344;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ziEVWybyK4gf6HAMK2OABfQt5DxF+29cSopVoad9/Oc=;
-        b=gd3mg0Wx1oI3UEzONLv7MJtivVgbDWzQJIUXlUBU2WnwJr64PXAJOM42IPaRsMMs6+MeW6
-        TqasaKLjfb7DTV9NjRGQ4yy7EAl5CHJWK6JovWinbCsqpX/QyR3Y3owd9+5mDIzX6N48l9
-        UsV8ui2ZRBruWMSFRcT7LEa8nQRXBHE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-8xAnoC19Ms-okkMyrsc2Qw-1; Wed, 31 May 2023 09:55:41 -0400
-X-MC-Unique: 8xAnoC19Ms-okkMyrsc2Qw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 31 May 2023 10:15:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E20592717;
+        Wed, 31 May 2023 07:12:39 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5F228032E4;
-        Wed, 31 May 2023 13:55:40 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E03D6C154D7;
-        Wed, 31 May 2023 13:55:37 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <492558dc-1377-fc4b-126f-c358bb000ff7@redhat.com>
-References: <492558dc-1377-fc4b-126f-c358bb000ff7@redhat.com> <cbd39f94-407a-03b6-9c43-8144d0efc8bb@redhat.com> <20230526214142.958751-1-dhowells@redhat.com> <20230526214142.958751-2-dhowells@redhat.com> <510965.1685522152@warthog.procyon.org.uk>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v4 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 545E463C99;
+        Wed, 31 May 2023 14:11:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F15DDC4339B;
+        Wed, 31 May 2023 14:11:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685542277;
+        bh=CGLL01Wm70Z32tapHLX9z2kfk8hHrHa2+CbAAqxp8sU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=j90kb5FfsprOPsl/05r4it2PURvWGBJ+EOjep2awpbg3jtHdlNM6GV2Z0Zwq3heiL
+         HNkiomrYm3kiXvMdyEm5j15UhlWjd515dmOZ9sek/CyGBJCWhNwnW8BMDzUbjWsjOC
+         5kT8PxmKPDqm2yZZIRLSP89PtnJFpdIGeMFTWEGnCzYTobP8d7lOBbXYvlC1ui/qzb
+         TVnq+RkCvAa9SwER+euHKv5NWjz8E7RER4tAe64pZb64vGFI7YiU6fP9a3r7fIjDDg
+         rnnsR83JSLepj2yHG2y0VevVaeBOW6SaW9ASGH+knv60NJsyOY+SYjyfygNwbTDZ34
+         329M6cHexyEfw==
+Date:   Wed, 31 May 2023 16:11:08 +0200
+From:   Christian Brauner <brauner@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 01/12] backing_dev: remove current->backing_dev_info
+Message-ID: <20230531-wirkt-attraktion-d97bdcbc3aee@brauner>
+References: <20230531075026.480237-1-hch@lst.de>
+ <20230531075026.480237-2-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <703627.1685541335.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 31 May 2023 14:55:35 +0100
-Message-ID: <703628.1685541335@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230531075026.480237-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Hildenbrand <david@redhat.com> wrote:
+On Wed, May 31, 2023 at 09:50:15AM +0200, Christoph Hellwig wrote:
+> The last user of current->backing_dev_info disappeared in commit
+> b9b1335e6403 ("remove bdi_congested() and wb_congested() and related
+> functions").  Remove the field and all assignments to it.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+> ---
 
-> Yes, it would be clearer if we would be using "pinned" now only for FOLL=
-_PIN
-
-You're not likely to get that.  "To pin" is too useful a verb that gets us=
-ed
-in other contexts too.  For that reason, I think FOLL_PIN was a poor choic=
-e of
-name:-/.  I guess the English language has got somewhat overloaded.  Maybe
-FOLL_PEG? ;-)
-
-> and everything else is simply "taking a temporary reference on the page"=
-.
-
-Excluding refs taken with pins, many refs are more permanent than pins as,=
- so
-far as I'm aware, pins only last for the duration of an I/O operation.
-
-> >> "Note that the refcount of any zero_pages returned among the pinned p=
-ages will
-> >> not be incremented, and unpin_user_page() will similarly not decremen=
-t it."
-> > That's not really right (although it happens to be true), because we'r=
-e
-> > talking primarily about the pin counter, not the refcount - and they m=
-ay be
-> > separate.
-> =
-
-> In any case (FOLL_PIN/FOLL_GET) you increment/decrement the refcount. If=
- we
-> have a separate pincount, we increment/decrement the refcount by 1 when
-> (un)pinning.
-
-FOLL_GET isn't relevant here - only FOLL_PIN.  Yes, as it happens, we coun=
-t a
-ref if we count a pin, but that's kind of irrelevant; what matters is that=
- the
-effect must be undone with un-PUP.
-
-It would be nice not to get a ref on the zero page in FOLL_GET, but I don'=
-t
-think we can do that yet.  Too many places assume that GUP will give them =
-a
-ref they can release later via ordinary methods.
-
-David
-
+I somehow thought I'd already acked this... Anyway,
+Reviewed-by: Christian Brauner <brauner@kernel.org>
