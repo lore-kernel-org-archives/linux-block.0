@@ -2,94 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 915EAC7EE23
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 13:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 119FDC77B7A
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 14:04:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237320AbjEaNvr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 09:51:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60726 "EHLO
+        id S237498AbjEaOED (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 10:04:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237577AbjEaNu4 (ORCPT
+        with ESMTP id S237244AbjEaODj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 09:50:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132611711;
-        Wed, 31 May 2023 06:46:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 31 May 2023 10:03:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D590170F
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 06:56:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685541344;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ziEVWybyK4gf6HAMK2OABfQt5DxF+29cSopVoad9/Oc=;
+        b=gd3mg0Wx1oI3UEzONLv7MJtivVgbDWzQJIUXlUBU2WnwJr64PXAJOM42IPaRsMMs6+MeW6
+        TqasaKLjfb7DTV9NjRGQ4yy7EAl5CHJWK6JovWinbCsqpX/QyR3Y3owd9+5mDIzX6N48l9
+        UsV8ui2ZRBruWMSFRcT7LEa8nQRXBHE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-205-8xAnoC19Ms-okkMyrsc2Qw-1; Wed, 31 May 2023 09:55:41 -0400
+X-MC-Unique: 8xAnoC19Ms-okkMyrsc2Qw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 816E963B9D;
-        Wed, 31 May 2023 13:46:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED1C6C4339C;
-        Wed, 31 May 2023 13:46:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685540786;
-        bh=9TH9kbz82M/rlSZWTwKcCj2cFk5ctGnmCg3LAaqJ3eI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=p22/GQ9z2/M4XwRfrpZySejAoXbRWMRfRZIfef1gGL2h42hF4g1BqzQWaGR4pESMd
-         RRkOI9Urn3F0toz5G5DE6tl2QJpzhT/L0LqBeFppu1nG7CqOwJ5HhE8+ca4kseF0ci
-         fsRd8U4n5Kqh5Xqk5T4ey5OZmAH8WPVoiMbNoHAJGeyj7rL3XdRy4hcLlQPNl/O5yr
-         fRKgGu7Y5cdDaWTKuY7L0IHwv3pEN+CEBX0Y8evrdpnsVHpe/GXvI5pn2CiGm/gTNQ
-         pIPXZUBtPhxSOwrO0ukgZv89zy/pkrDdyomjfXFhfCfxbNvuLujQ6xEwHn0MXg11zQ
-         jDmiwPn7Z9HIw==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ross Lagerwall <ross.lagerwall@citrix.com>,
-        Juergen Gross <jgross@suse.com>,
-        Sasha Levin <sashal@kernel.org>, roger.pau@citrix.com,
-        sstabellini@kernel.org, axboe@kernel.dk,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 10/10] xen/blkfront: Only check REQ_FUA for writes
-Date:   Wed, 31 May 2023 09:46:06 -0400
-Message-Id: <20230531134606.3385210-10-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230531134606.3385210-1-sashal@kernel.org>
-References: <20230531134606.3385210-1-sashal@kernel.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5F228032E4;
+        Wed, 31 May 2023 13:55:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E03D6C154D7;
+        Wed, 31 May 2023 13:55:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <492558dc-1377-fc4b-126f-c358bb000ff7@redhat.com>
+References: <492558dc-1377-fc4b-126f-c358bb000ff7@redhat.com> <cbd39f94-407a-03b6-9c43-8144d0efc8bb@redhat.com> <20230526214142.958751-1-dhowells@redhat.com> <20230526214142.958751-2-dhowells@redhat.com> <510965.1685522152@warthog.procyon.org.uk>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v4 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <703627.1685541335.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 31 May 2023 14:55:35 +0100
+Message-ID: <703628.1685541335@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ross Lagerwall <ross.lagerwall@citrix.com>
+David Hildenbrand <david@redhat.com> wrote:
 
-[ Upstream commit b6ebaa8100090092aa602530d7e8316816d0c98d ]
+> Yes, it would be clearer if we would be using "pinned" now only for FOLL=
+_PIN
 
-The existing code silently converts read operations with the
-REQ_FUA bit set into write-barrier operations. This results in data
-loss as the backend scribbles zeroes over the data instead of returning
-it.
+You're not likely to get that.  "To pin" is too useful a verb that gets us=
+ed
+in other contexts too.  For that reason, I think FOLL_PIN was a poor choic=
+e of
+name:-/.  I guess the English language has got somewhat overloaded.  Maybe
+FOLL_PEG? ;-)
 
-While the REQ_FUA bit doesn't make sense on a read operation, at least
-one well-known out-of-tree kernel module does set it and since it
-results in data loss, let's be safe here and only look at REQ_FUA for
-writes.
+> and everything else is simply "taking a temporary reference on the page"=
+.
 
-Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Acked-by: Juergen Gross <jgross@suse.com>
-Link: https://lore.kernel.org/r/20230426164005.2213139-1-ross.lagerwall@citrix.com
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/xen-blkfront.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Excluding refs taken with pins, many refs are more permanent than pins as,=
+ so
+far as I'm aware, pins only last for the duration of an I/O operation.
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index cd58f582c50c1..b649f1a68b417 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -780,7 +780,8 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 		ring_req->u.rw.handle = info->handle;
- 		ring_req->operation = rq_data_dir(req) ?
- 			BLKIF_OP_WRITE : BLKIF_OP_READ;
--		if (req_op(req) == REQ_OP_FLUSH || req->cmd_flags & REQ_FUA) {
-+		if (req_op(req) == REQ_OP_FLUSH ||
-+		    (req_op(req) == REQ_OP_WRITE && (req->cmd_flags & REQ_FUA))) {
- 			/*
- 			 * Ideally we can do an unordered flush-to-disk.
- 			 * In case the backend onlysupports barriers, use that.
--- 
-2.39.2
+> >> "Note that the refcount of any zero_pages returned among the pinned p=
+ages will
+> >> not be incremented, and unpin_user_page() will similarly not decremen=
+t it."
+> > That's not really right (although it happens to be true), because we'r=
+e
+> > talking primarily about the pin counter, not the refcount - and they m=
+ay be
+> > separate.
+> =
+
+> In any case (FOLL_PIN/FOLL_GET) you increment/decrement the refcount. If=
+ we
+> have a separate pincount, we increment/decrement the refcount by 1 when
+> (un)pinning.
+
+FOLL_GET isn't relevant here - only FOLL_PIN.  Yes, as it happens, we coun=
+t a
+ref if we count a pin, but that's kind of irrelevant; what matters is that=
+ the
+effect must be undone with un-PUP.
+
+It would be nice not to get a ref on the zero page in FOLL_GET, but I don'=
+t
+think we can do that yet.  Too many places assume that GUP will give them =
+a
+ref they can release later via ordinary methods.
+
+David
 
