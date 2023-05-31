@@ -2,157 +2,40 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C0C5C77B7A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 12:46:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BE3C77B73
+	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 12:49:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235901AbjEaMqb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 08:46:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43150 "EHLO
+        id S235982AbjEaMtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 08:49:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235905AbjEaMqa (ORCPT
+        with ESMTP id S236045AbjEaMtQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 08:46:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14644126
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 05:45:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685537142;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VUrQef8DmIGGqxD5N5RNkU1BHyTMou9oFGzjwHHlMuE=;
-        b=H5yRwNeVIjOnlS5NbLxWGa6hsALP2DgsXpmWB5byNmH/bj/eNw71uz3bZdOwWFtI/nvJhU
-        5rWTUaAGkSL09UJIWE0YSaiDFR5GScNUu1OziMoAHBDYKBhVEbvvAVgAwEk2q4no7YnUE/
-        IN+QKUgcOkPNSI68si7CnfvicpooxVk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-479-MLbnjYjsMtCMKcbnjqfptw-1; Wed, 31 May 2023 08:45:38 -0400
-X-MC-Unique: MLbnjYjsMtCMKcbnjqfptw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE0311C0150B;
-        Wed, 31 May 2023 12:45:37 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CF7F20296C8;
-        Wed, 31 May 2023 12:45:34 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH net-next v2 1/6] splice, net: Fix MSG_MORE signalling in splice_direct_to_actor()
-Date:   Wed, 31 May 2023 13:45:23 +0100
-Message-ID: <20230531124528.699123-2-dhowells@redhat.com>
-In-Reply-To: <20230531124528.699123-1-dhowells@redhat.com>
-References: <20230531124528.699123-1-dhowells@redhat.com>
+        Wed, 31 May 2023 08:49:16 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFAE3E6C;
+        Wed, 31 May 2023 05:48:41 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 995C768B05; Wed, 31 May 2023 14:47:52 +0200 (CEST)
+Date:   Wed, 31 May 2023 14:47:52 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, dlemoal@kernel.org, quic_pragalla@quicinc.com,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH] blk-ioc: protect ioc_destroy_icq() by 'queue_lock'
+Message-ID: <20230531124752.GA27468@lst.de>
+References: <20230531073435.2923422-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230531073435.2923422-1-yukuai1@huaweicloud.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-splice_direct_to_actor() doesn't manage SPLICE_F_MORE correctly - and, as a
-result, incorrectly signals MSG_MORE when splicing to a socket.  The
-problem happens when a short splice occurs because we got a short read due
-to hitting the EOF on a file.  Because the length read (read_len) is less
-than the remaining size to be spliced (len), SPLICE_F_MORE is set.
+Looks good:
 
-This causes MSG_MORE to be set by pipe_to_sendpage(), indicating to the
-network protocol that more data is to be expected.  With the changes I want
-to make to switch from using sendpage to using sendmsg(MSG_SPLICE_PAGES),
-MSG_MORE needs to work properly.
-
-This was observed with the multi_chunk_sendfile tests in the tls kselftest
-program.  Some of those tests would hang and time out when the last chunk
-of file was less than the sendfile request size.
-
-This has been observed before[1] and worked around in AF_TLS[2].
-
-Fix this by checking to see if the source file is seekable if we get a
-short read and, if it is, checking to see if we hit the file size.  This
-should also work for block devices.
-
-This won't help procfiles and suchlike as they're zero length files that
-can be read from[3].  To handle that, should splice make a zero-length call
-with SPLICE_F_MORE cleared (assuming it wasn't set by userspace via
-splice()) if it gets a zero-length read?
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jan Kara <jack@suse.cz>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: Boris Pismenny <borisp@nvidia.com>
-cc: John Fastabend <john.fastabend@gmail.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-block@vger.kernel.org
-cc: linux-mm@kvack.org
-cc: netdev@vger.kernel.org
-
-Link: https://lore.kernel.org/netdev/1591392508-14592-1-git-send-email-pooja.trivedi@stackpath.com/ [1]
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d452d48b9f8b1a7f8152d33ef52cfd7fe1735b0a [2]
-Link: https://lore.kernel.org/r/CAHk-=wjDq5_wLWrapzFiJ3ZNn6aGFWeMJpAj5q+4z-Ok8DD9dA@mail.gmail.com/ [3]
----
- fs/splice.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/fs/splice.c b/fs/splice.c
-index 3e06611d19ae..a7cf216c02a7 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -982,10 +982,21 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 		 * If this is the last data and SPLICE_F_MORE was not set
- 		 * initially, clears it.
- 		 */
--		if (read_len < len)
--			sd->flags |= SPLICE_F_MORE;
--		else if (!more)
-+		if (read_len < len) {
-+			struct inode *ii = in->f_mapping->host;
-+
-+			if (ii->i_fop->llseek != noop_llseek &&
-+			    pos >= i_size_read(ii)) {
-+				if (!more)
-+					sd->flags &= ~SPLICE_F_MORE;
-+			} else {
-+				sd->flags |= SPLICE_F_MORE;
-+			}
-+
-+		} else if (!more) {
- 			sd->flags &= ~SPLICE_F_MORE;
-+		}
-+
- 		/*
- 		 * NOTE: nonblocking mode only applies to the input. We
- 		 * must not do the output in nonblocking mode as then we
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
