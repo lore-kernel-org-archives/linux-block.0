@@ -2,143 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24960C77B7E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 05:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9542FC7EE23
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 06:19:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231699AbjFAFx6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jun 2023 01:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57394 "EHLO
+        id S231351AbjFAGTF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jun 2023 02:19:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231703AbjFAFxg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 01:53:36 -0400
-X-Greylist: delayed 570 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 31 May 2023 22:52:06 PDT
-Received: from out-21.mta0.migadu.com (out-21.mta0.migadu.com [IPv6:2001:41d0:1004:224b::15])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C242E10CA
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 22:52:06 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1685598097;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wMraD2clGsbsww7FgpOj2nLzIuUm/oP4AQqhudlO+CU=;
-        b=FkyWsbBZ2oZLCAcBImfx6W1IHJc3i/7Zx7aiKeb4ibNEDe4ItNvXQ055eYXhHUKeeeNI80
-        QsTlFsysUgtFRAULTHNVAFK4WDrfCURYAnLgKGeK5GJUpW1ybrWuwAm/fo5xXor0NoIPCo
-        pKfYZcuMo1xdrXJyz/zYeU/YONzok2g=
-From:   chengming.zhou@linux.dev
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH] blk-mq: fix incorrect rq start_time_ns and alloc_time_ns after throttled
-Date:   Thu,  1 Jun 2023 13:39:19 +0800
-Message-Id: <20230601053919.3639954-1-chengming.zhou@linux.dev>
+        with ESMTP id S230473AbjFAGTE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 02:19:04 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6526CE2;
+        Wed, 31 May 2023 23:19:02 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 194B267373; Thu,  1 Jun 2023 08:18:59 +0200 (CEST)
+Date:   Thu, 1 Jun 2023 08:18:58 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH -next v2] block: fix blktrace debugfs entries leak
+Message-ID: <20230601061858.GA24071@lst.de>
+References: <20230531092606.3037560-1-yukuai1@huaweicloud.com> <20230531124404.GA27412@lst.de> <509bcea6-21f6-3f64-01c3-02215955283d@huaweicloud.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <509bcea6-21f6-3f64-01c3-02215955283d@huaweicloud.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chengming Zhou <zhouchengming@bytedance.com>
+On Thu, Jun 01, 2023 at 09:50:22AM +0800, Yu Kuai wrote:
+> Hi, Christoph
+>
+> 在 2023/05/31 20:44, Christoph Hellwig 写道:
+>> I like where this is going, but did you check that this doesn't
+>> introduce a potential crash with the current /dev/sg based blktrace?
+>
+> I just start to look at how /dev/sg is created and destroyed, however,
+> I'm confused here, do you mean that the added blk_trace_shutdown() here
+> might cause that /dev/sg blktrace to access freed momory or NULL
+> pointer?
 
-iocost rely on rq start_time_ns and alloc_time_ns to tell the saturation
-state of the block device.
-
-If any qos ->throttle() end up blocking, the cached rq start_time_ns and
-alloc_time_ns will include its throtted time, which can confuse its user.
-
-This patch add nr_flush counter in blk_plug, so we can tell if the task
-has throttled in any qos ->throttle(), in which case we need to correct
-the rq start_time_ns and alloc_time_ns.
-
-Another solution may be make rq_qos_throttle() return bool to indicate
-if it has throttled in any qos ->throttle(). But this need more changes.
-
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-core.c       |  3 +++
- block/blk-mq.c         | 18 ++++++++++++++++++
- include/linux/blkdev.h |  8 +++++---
- 3 files changed, 26 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 00c74330fa92..5109f7f5606c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1053,6 +1053,7 @@ void blk_start_plug_nr_ios(struct blk_plug *plug, unsigned short nr_ios)
- 	plug->cached_rq = NULL;
- 	plug->nr_ios = min_t(unsigned short, nr_ios, BLK_MAX_REQUEST_COUNT);
- 	plug->rq_count = 0;
-+	plug->nr_flush = 0;
- 	plug->multiple_queues = false;
- 	plug->has_elevator = false;
- 	plug->nowait = false;
-@@ -1150,6 +1151,8 @@ void __blk_flush_plug(struct blk_plug *plug, bool from_schedule)
- 	 */
- 	if (unlikely(!rq_list_empty(plug->cached_rq)))
- 		blk_mq_free_plug_rqs(plug);
-+
-+	plug->nr_flush++;
- }
- 
- /**
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f6dad0886a2f..8731f2815790 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2871,6 +2871,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- {
- 	struct request *rq;
- 	enum hctx_type type, hctx_type;
-+	unsigned short nr_flush;
- 
- 	if (!plug)
- 		return NULL;
-@@ -2897,8 +2898,25 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	 * before we throttle.
- 	 */
- 	plug->cached_rq = rq_list_next(rq);
-+	nr_flush = plug->nr_flush;
- 	rq_qos_throttle(q, *bio);
- 
-+	/*
-+	 * If any qos ->throttle() end up blocking, we will have flushed the
-+	 * plug and we need to correct the rq start_time_ns and alloc_time_ns.
-+	 */
-+	if (nr_flush != plug->nr_flush) {
-+		if (blk_mq_need_time_stamp(rq)) {
-+			u64 now = ktime_get_ns();
-+
-+#ifdef CONFIG_BLK_RQ_ALLOC_TIME
-+			if (rq->alloc_time_ns)
-+				rq->alloc_time_ns += now - rq->start_time_ns;
-+#endif
-+			rq->start_time_ns = now;
-+		}
-+	}
-+
- 	rq->cmd_flags = (*bio)->bi_opf;
- 	INIT_LIST_HEAD(&rq->queuelist);
- 	return rq;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e3242e67a8e3..cf66871a1844 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -978,9 +978,11 @@ struct blk_plug {
- 
- 	unsigned short rq_count;
- 
--	bool multiple_queues;
--	bool has_elevator;
--	bool nowait;
-+	unsigned short nr_flush;
-+
-+	bool multiple_queues:1;
-+	bool has_elevator:1;
-+	bool nowait:1;
- 
- 	struct list_head cb_list; /* md requires an unplug callback */
- };
--- 
-2.39.2
+Yes.  Given that __blk_trace_remove clears out q->blk_trace and
+frees the blk trace structure I'm worried about that.
 
