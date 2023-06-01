@@ -2,168 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F511C7EE33
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 21:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 147AAC7EE23
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 21:49:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233070AbjFAVs4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jun 2023 17:48:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60966 "EHLO
+        id S233015AbjFAVtc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jun 2023 17:49:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233057AbjFAVsx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 17:48:53 -0400
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F21A197;
-        Thu,  1 Jun 2023 14:48:35 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.nyi.internal (Postfix) with ESMTP id 7BAED5C01A3;
-        Thu,  1 Jun 2023 17:48:34 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Thu, 01 Jun 2023 17:48:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        invisiblethingslab.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1685656114; x=1685742514; bh=/ceYfrFEiY
-        puOEzUpc708tuWKW8Bpfbqx/MGT13F/ic=; b=pEQVwivCtKSIpnnVWyl0qP+rHf
-        wPJW/rTpMLu3K1l6wwlXDGP9UX80lL33h6FL1YwNd5pNXE5H+EuMpkNGlny4YEKR
-        kfonkVrJqyLi3OO8X17gUfMWD0O23JgH37DrdQAlG3VBrzKFNl0Y+s9xiwsTZADl
-        i92YhiGkiJmSVmH8Swd/RHcEDn8MnDnNFjvzqnVpGd7SKPmABkL9pqwmUhbpVOXz
-        y7peMFpTOPTp83A9mfL016h9FBDdk6DU3K73c4PBJngqXB5Rgg+agxPu/TiqHfdj
-        Bz7H3HmTOvQa2g0s1XnqKwllPkGTn05zgrvWLEZJH3WxDI0W0gSAKSm9Im3g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1685656114; x=
-        1685742514; bh=/ceYfrFEiYpuOEzUpc708tuWKW8Bpfbqx/MGT13F/ic=; b=U
-        xIKiEWBCHGFMG5NZxOXdwiJwb3/lK3/JpB9Vv1Hl7fPrCBeS0F99jTphL0PHZjLz
-        xUNI2qvB2J2AM54zwE6BoW+k4Q68Ja/ssWGsCPa5BBeFs3V09KHogiQl0v4kRhln
-        thQz6IOIKfiDXWejvhMmkwRo/bEe6bDvFu8K6QrW3klEIJq8eSjQ1y5gH+72tVUj
-        FHckrqCwUzpDhu2p6u27WxwlxuWz26/mzG+BOBg8VvDttZUM4PCZof29kEqM+iwp
-        /kMu+HP1AREYUaPF1JzjGxOrr6rNGELCCEMS3stLBJDq2Wa4hLyZYmUQfTlxGn0Y
-        KUxqi3+DjKvNPHlGLCYhA==
-X-ME-Sender: <xms:MhJ5ZG2BXSWv30MZ-lYSx-FnJtY2bFX_pYcW9CFzZgXrkKwYrGtvvA>
-    <xme:MhJ5ZJEligkQPgY8NIo0VzkgXlcYxsH1m_Y4C6GXmIsQfV9JrcC-4uazqegSTjNPr
-    Fr67_CxqYhWZME>
-X-ME-Received: <xmr:MhJ5ZO6cnoQk2zNidxQcZ9_i9oPiqEjxSk5dkNpVRrmp9QTpjuUbJjdFkvtDzKVhAH_CJLimU30>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeelvddgtddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgvmhhi
-    ucforghrihgvucfqsggvnhhouhhruceouggvmhhisehinhhvihhsihgslhgvthhhihhngh
-    hslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepjeffjefggfeugeduvedvjeekgfeh
-    gffhhfffjeetkeelueefffetfffhtdduheetnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepuggvmhhisehinhhvihhsihgslhgvthhhihhnghhs
-    lhgrsgdrtghomh
-X-ME-Proxy: <xmx:MhJ5ZH0R0kyNFR9BfneeYqkdFVRfJu-2LyTArB5XymX46XWVO-XRRA>
-    <xmx:MhJ5ZJGEpzJ4ZCNg5t-2wQ4s77DneRYcjyOrqXXCT3HqwcCV6iF7Ww>
-    <xmx:MhJ5ZA9UAIekEfcs2dKXH2eLECqBUe2ZS6jAaXZ0beZ68z6ZBqZyCQ>
-    <xmx:MhJ5ZNjY733Xf8Buyr5R4bW8kBDzi6IDwQR9wWOECti5GchVfbYBRg>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 1 Jun 2023 17:48:33 -0400 (EDT)
-From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Demi Marie Obenour <demi@invisiblethingslab.com>,
-        =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= 
-        <marmarek@invisiblethingslab.com>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] xen-blkback: Inform userspace that device has been opened
-Date:   Thu,  1 Jun 2023 17:48:23 -0400
-Message-Id: <20230601214823.1701-3-demi@invisiblethingslab.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230601214823.1701-1-demi@invisiblethingslab.com>
-References: <20230601214823.1701-1-demi@invisiblethingslab.com>
+        with ESMTP id S233057AbjFAVtM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 17:49:12 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08869E68
+        for <linux-block@vger.kernel.org>; Thu,  1 Jun 2023 14:48:51 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6af7e368bb7so1192275a34.1
+        for <linux-block@vger.kernel.org>; Thu, 01 Jun 2023 14:48:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1685656130; x=1688248130;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5OcnCx/pmbtKXZ7Da/cfbjcjL+zu9BSzJDqrWeCJgqM=;
+        b=iJ+8KgBdIdC0fmpV+4X5AKELAx0FWqlDQWhfpsM+A7pnnV/3/dVBEBpGetyDVC4ugR
+         K/OZ5yTSh2/Hk3/Ch55PUxSbD/VlFdQbMoibi19k4RKFT5WhvtOqoEUyc0wbsCeBZPLn
+         Z0F/FCkSFr5gt7mnVJP7Xfej7iMQCk1AOqFuxHsYLceDp2DJbAT6BHetM17aJ+MLxOYJ
+         UgBs+hheP7eKDjZ8LgeVTIRLxYXUP01QDIeck0U2kF5B40/7hUOKs3H5MIG5ilO2BK9W
+         NAlDPf8Y9tnkQDg4ogyDVoFGO9CALjAVW0iifu8WadfLVGgLiIOl0VO1iuluLRKySMYv
+         5x+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685656130; x=1688248130;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5OcnCx/pmbtKXZ7Da/cfbjcjL+zu9BSzJDqrWeCJgqM=;
+        b=keeKaQrxcyjuywXCI2LDyExm01RmxjaZ5pmtrv2508aPtlBTcjpLLzLt44DTvBdEbE
+         nMjg92DtoR2vAwaMB/vXdwhzwxs5XVhInn56/As6Q+V1Tr9ZMZAQPu5hq5pCYeqckCNv
+         fLniQW6+uA9mwYln5x5vz7lL/hc4UMa0qrYrtnrknLRG1CxEGY/zJB/3oEnbDlHyBM0z
+         2dpGUS8d/Zk9GqJ/z/xiSyJiZ1vN6Ofg6smQl2fzywUsM77x0r2Ha8r83cwOSqxvffv6
+         vy9KOr4fZaAY3bmGsYwLXIq5hU6K40QTrmN1UK1Ys6q0zQll/aimfdCKLZjdE1Cr4UfW
+         AsbQ==
+X-Gm-Message-State: AC+VfDyIayIPEBvQ1o+Fq7jd98ypUNSfD1iRviFK0yT7ZCOb9LFcHxIa
+        GTqlgDOVSG6YLRmKijKh8IOhQw==
+X-Google-Smtp-Source: ACHHUZ415WnubrhQMrYWFgLqY3RXllLba3VYlMrHqu2QPousFmk1Hej1ZnqOsZGP095dGQGVDiGwOA==
+X-Received: by 2002:a05:6358:7242:b0:123:3f75:f56a with SMTP id i2-20020a056358724200b001233f75f56amr6105303rwa.0.1685656130299;
+        Thu, 01 Jun 2023 14:48:50 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
+        by smtp.gmail.com with ESMTPSA id u10-20020aa7848a000000b00627fafe49f9sm5485376pfn.106.2023.06.01.14.48.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 14:48:49 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q4qA3-006f3I-0v;
+        Fri, 02 Jun 2023 07:48:47 +1000
+Date:   Fri, 2 Jun 2023 07:48:47 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Subject: Re: introduce bdev holder ops and a file system shutdown method v3
+Message-ID: <ZHkSP0qlKQWDcStr@dread.disaster.area>
+References: <20230601094459.1350643-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230601094459.1350643-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set "opened" to "0" before the hotplug script is called.  Once the
-device node has been opened, set "opened" to "1".
+On Thu, Jun 01, 2023 at 11:44:43AM +0200, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series fixes the long standing problem that we never had a good way
+> to communicate block device events to the user of the block device.
+> 
+> It fixes this by introducing a new set of holder ops registered at
+> blkdev_get_by_* time for the exclusive holder, and then wire that up
+> to a shutdown super operation to report the block device remove to the
+> file systems.
 
-"opened" is used exclusively by userspace.  It serves two purposes:
+Thanks for doing this, Christoph.
 
-1. It tells userspace that the diskseq Xenstore entry is supported.
+For the series:
 
-2. It tells userspace that it can wait for "opened" to be set to 1.
-   Once "opened" is 1, blkback has a reference to the device, so
-   userspace doesn't need to keep one.
+Acked-by: Dave Chinner <dchinner@redhat.com>
 
-Together, these changes allow userspace to use block devices with
-delete-on-close behavior, such as loop devices with the autoclear flag
-set.
+For the XFS patches in the series:
 
-Signed-off-by: Demi Marie Obenour <demi@invisiblethingslab.com>
----
- drivers/block/xen-blkback/xenbus.c | 35 ++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+Reviewed-by: Dave Chinner <dchinner@redhat.com>
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 9c3eb148fbd802c74e626c3d7bcd69dcb09bd921..519a78aa9073d1faa1dce5c1b36e95ae58da534b 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -3,6 +3,20 @@
-     Copyright (C) 2005 Rusty Russell <rusty@rustcorp.com.au>
-     Copyright (C) 2005 XenSource Ltd
- 
-+In addition to the Xenstore nodes required by the Xen block device
-+specification, this implementation of blkback uses a new Xenstore
-+node: "opened".  blkback sets "opened" to "0" before the hotplug script
-+is called.  Once the device node has been opened, blkback sets "opened"
-+to "1".
-+
-+"opened" is read exclusively by userspace.  It serves two purposes:
-+
-+1. It tells userspace that diskseq@major:minor syntax for "physical-device" is
-+   supported.
-+
-+2. It tells userspace that it can wait for "opened" to be set to 1 after writing
-+   "physical-device".  Once "opened" is 1, blkback has a reference to the
-+   device, so userspace doesn't need to keep one.
- 
- */
- 
-@@ -699,6 +713,14 @@ static int xen_blkbk_probe(struct xenbus_device *dev,
- 	if (err)
- 		pr_warn("%s write out 'max-ring-page-order' failed\n", __func__);
- 
-+	/*
-+	 * This informs userspace that the "opened" node will be set to "1" when
-+	 * the device has been opened successfully.
-+	 */
-+	err = xenbus_write(XBT_NIL, dev->nodename, "opened", "0");
-+	if (err)
-+		goto fail;
-+
- 	err = xenbus_switch_state(dev, XenbusStateInitWait);
- 	if (err)
- 		goto fail;
-@@ -826,6 +848,19 @@ static void backend_changed(struct xenbus_watch *watch,
- 		goto fail;
- 	}
- 
-+	/*
-+	 * Tell userspace that the device has been opened and that blkback has a
-+	 * reference to it.  Userspace can then close the device or mark it as
-+	 * delete-on-close, knowing that blkback will keep the device open as
-+	 * long as necessary.
-+	 */
-+	err = xenbus_write(XBT_NIL, dev->nodename, "opened", "1");
-+	if (err) {
-+		xenbus_dev_fatal(dev, err, "%s: notifying userspace device has been opened",
-+				 dev->nodename);
-+		goto free_vbd;
-+	}
-+
- 	err = xenvbd_sysfs_addif(dev);
- 	if (err) {
- 		xenbus_dev_fatal(dev, err, "creating sysfs entries");
+-Dave.
 -- 
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
-
+Dave Chinner
+david@fromorbit.com
