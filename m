@@ -2,179 +2,329 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AF7C7EE2A
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 14:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA7BC7EE2A
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 15:00:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233894AbjFAOaB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jun 2023 10:30:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47432 "EHLO
+        id S232705AbjFAPAI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jun 2023 11:00:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234334AbjFAO3w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 10:29:52 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29ED998;
-        Thu,  1 Jun 2023 07:29:51 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 351ESGQA002486;
-        Thu, 1 Jun 2023 14:29:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=CcPfCzY8208PdCOnE1aO6P15WOICSUETE+4+BuarsJ4=;
- b=glePTwE33g12AqTcQp4b5bnMaxXtrd5xg2kPD1vJknFsnN2IIsVVBRHlJvun7/jKDi9Z
- hWWMlfMXTk0j1gTbo1iBvWVL/Y6cPX00ORLM8ywqcXOz6dZSCNovDBKy4Y2D6CBiEFOO
- 3imgXNaWcdgUEOvUY0VpdavdJAI2hGtxsfkY/8r/1/S8R++jMP+7ybT3IklCtE3+I/Qh
- 2zfAU5TeB1VJU0+Qraacmr8CeQ4R1wZrd9ykrpQPb12jZ/H1lZLLmbBAhQkDYXS3xWL6
- bYtaQYZMzyFDap6YeMcsjhKnslMsagN8LedS0BUekyOv75K6CK31kjgCGho9F4K9uxQF 4Q== 
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxw4fg0wg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 14:29:30 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 351C6hSo012658;
-        Thu, 1 Jun 2023 14:29:30 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
-        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3qu9g625tr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Jun 2023 14:29:29 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 351ETSAT57737500
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Jun 2023 14:29:28 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8577358067;
-        Thu,  1 Jun 2023 14:29:28 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4E82A5805D;
-        Thu,  1 Jun 2023 14:29:28 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.61.58.163])
-        by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Jun 2023 14:29:28 +0000 (GMT)
-Message-ID: <9a752cf0b1e1d6f4ee2744fa3979f323b863dbbd.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH 1/4] block:sed-opal: SED Opal keystore
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
-To:     Jarkko Sakkinen <jarkko@kernel.org>, linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        axboe@kernel.dk, akpm@linux-foundation.org,
-        linux-efi@vger.kernel.org, keyrings@vger.kernel.org,
-        me@benboeckel.net, elliott@hpe.com, andonnel@au1.ibm.com
-Date:   Thu, 01 Jun 2023 09:29:28 -0500
-In-Reply-To: <CSIYR76Z8U02.30IIQJ49LMY05@suppilovahvero>
-References: <20230505194402.2079010-1-gjoyce@linux.vnet.ibm.com>
-         <20230505194402.2079010-2-gjoyce@linux.vnet.ibm.com>
-         <CSIYR76Z8U02.30IIQJ49LMY05@suppilovahvero>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DlyEBDRksE0zBECYKv0_QIgClff7ChD6
-X-Proofpoint-ORIG-GUID: DlyEBDRksE0zBECYKv0_QIgClff7ChD6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-01_08,2023-05-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 bulkscore=0 mlxscore=0
- mlxlogscore=984 clxscore=1011 adultscore=0 phishscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2304280000 definitions=main-2306010124
+        with ESMTP id S234777AbjFAO7u (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 10:59:50 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB0410E0;
+        Thu,  1 Jun 2023 07:59:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=qFF6fLdGcSdKlOPYnxGb89x929heU6NqNup9f91209k=; b=wmq67X7kYyI1B5F1ECXLwrMY0T
+        7Y6PvoIwnb70q0Ip3NqZe+9BvsMOK/ZfabselOaqQF4hgbwCaALq7GWsBLMlmlw3aGlQfEhiSDGZE
+        qgCCLr/RcUkDH31Unwf4PALPHIR/628eDsUXOsJEzwWpC03Jq4mmTe4EYmYthsBJ97pKfm3AxoFS2
+        vK+qpxXWzdn0AWxaTUZ9j+AaJFhtMPX1W2V2+DH28Xro9DDo9ZVJAaJfM7i//CET9jJbCeHdJORmX
+        MyyBuMtvMazpByyotke4mF8RVMvKciUfblvRr5u7+igwHsf1p7VQJ+JtOW6PNkcsfe5y/rzoWYG4i
+        1NVtLVgQ==;
+Received: from [2001:4bb8:182:6d06:eacb:c751:971:73eb] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q4jld-003w2V-0F;
+        Thu, 01 Jun 2023 14:59:09 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Chao Yu <chao@kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 01/12] backing_dev: remove current->backing_dev_info
+Date:   Thu,  1 Jun 2023 16:58:53 +0200
+Message-Id: <20230601145904.1385409-2-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230601145904.1385409-1-hch@lst.de>
+References: <20230601145904.1385409-1-hch@lst.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2023-05-11 at 01:50 +0300, Jarkko Sakkinen wrote:
-> On Fri May 5, 2023 at 10:43 PM EEST,  wrote:
-> > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > 
-> > Add read and write functions that allow SED Opal keys to stored
-> > in a permanent keystore.
-> 
-> Please be more verbose starting from "Self-Encrypting Drive (SED)",
-> instead of just "SED", and take time to explain what these keys are.
+The last user of current->backing_dev_info disappeared in commit
+b9b1335e6403 ("remove bdi_congested() and wb_congested() and related
+functions").  Remove the field and all assignments to it.
 
-A further elaboration of SED and the keys will be in the next patchset.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christian Brauner <brauner@kernel.org>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+Acked-by: Theodore Ts'o <tytso@mit.edu>
+---
+ fs/btrfs/file.c       | 6 +-----
+ fs/ceph/file.c        | 4 ----
+ fs/ext4/file.c        | 2 --
+ fs/f2fs/file.c        | 2 --
+ fs/fuse/file.c        | 4 ----
+ fs/gfs2/file.c        | 2 --
+ fs/nfs/file.c         | 5 +----
+ fs/ntfs/file.c        | 2 --
+ fs/ntfs3/file.c       | 3 ---
+ fs/xfs/xfs_file.c     | 4 ----
+ include/linux/sched.h | 3 ---
+ mm/filemap.c          | 3 ---
+ 12 files changed, 2 insertions(+), 38 deletions(-)
 
-> 
-> > Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
-> > ---
-> >  block/Makefile               |  2 +-
-> >  block/sed-opal-key.c         | 24 ++++++++++++++++++++++++
-> >  include/linux/sed-opal-key.h | 15 +++++++++++++++
-> >  3 files changed, 40 insertions(+), 1 deletion(-)
-> >  create mode 100644 block/sed-opal-key.c
-> >  create mode 100644 include/linux/sed-opal-key.h
-> > 
-> > diff --git a/block/Makefile b/block/Makefile
-> > index 4e01bb71ad6e..464a9f209552 100644
-> > --- a/block/Makefile
-> > +++ b/block/Makefile
-> > @@ -35,7 +35,7 @@ obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
-> >  obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
-> >  obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
-> >  obj-$(CONFIG_BLK_DEBUG_FS_ZONED)+= blk-mq-debugfs-zoned.o
-> > -obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o
-> > +obj-$(CONFIG_BLK_SED_OPAL)	+= sed-opal.o sed-opal-key.o
-> >  obj-$(CONFIG_BLK_PM)		+= blk-pm.o
-> >  obj-$(CONFIG_BLK_INLINE_ENCRYPTION)	+= blk-crypto.o blk-
-> > crypto-profile.o \
-> >  					   blk-crypto-sysfs.o
-> > diff --git a/block/sed-opal-key.c b/block/sed-opal-key.c
-> > new file mode 100644
-> > index 000000000000..16f380164c44
-> > --- /dev/null
-> > +++ b/block/sed-opal-key.c
-> > @@ -0,0 +1,24 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * SED key operations.
-> > + *
-> > + * Copyright (C) 2022 IBM Corporation
-> > + *
-> > + * These are the accessor functions (read/write) for SED Opal
-> > + * keys. Specific keystores can provide overrides.
-> > + *
-> > + */
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <linux/errno.h>
-> > +#include <linux/sed-opal-key.h>
-> > +
-> > +int __weak sed_read_key(char *keyname, char *key, u_int *keylen)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> > +
-> > +int __weak sed_write_key(char *keyname, char *key, u_int keylen)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> > diff --git a/include/linux/sed-opal-key.h b/include/linux/sed-opal-
-> > key.h
-> > new file mode 100644
-> > index 000000000000..c9b1447986d8
-> > --- /dev/null
-> > +++ b/include/linux/sed-opal-key.h
-> > @@ -0,0 +1,15 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * SED key operations.
-> > + *
-> > + * Copyright (C) 2022 IBM Corporation
-> > + *
-> > + * These are the accessor functions (read/write) for SED Opal
-> > + * keys. Specific keystores can provide overrides.
-> > + *
-> > + */
-> > +
-> > +#include <linux/kernel.h>
-> > +
-> > +int sed_read_key(char *keyname, char *key, u_int *keylen);
-> > +int sed_write_key(char *keyname, char *key, u_int keylen);
-> > -- 
-> > gjoyce@linux.vnet.ibm.com
-> 
-> BR, Jarkko
+diff --git a/fs/btrfs/file.c b/fs/btrfs/file.c
+index f649647392e0e4..ecd43ab66fa6c7 100644
+--- a/fs/btrfs/file.c
++++ b/fs/btrfs/file.c
+@@ -1145,7 +1145,6 @@ static int btrfs_write_check(struct kiocb *iocb, struct iov_iter *from,
+ 	    !(BTRFS_I(inode)->flags & (BTRFS_INODE_NODATACOW | BTRFS_INODE_PREALLOC)))
+ 		return -EAGAIN;
+ 
+-	current->backing_dev_info = inode_to_bdi(inode);
+ 	ret = file_remove_privs(file);
+ 	if (ret)
+ 		return ret;
+@@ -1165,10 +1164,8 @@ static int btrfs_write_check(struct kiocb *iocb, struct iov_iter *from,
+ 		loff_t end_pos = round_up(pos + count, fs_info->sectorsize);
+ 
+ 		ret = btrfs_cont_expand(BTRFS_I(inode), oldsize, end_pos);
+-		if (ret) {
+-			current->backing_dev_info = NULL;
++		if (ret)
+ 			return ret;
+-		}
+ 	}
+ 
+ 	return 0;
+@@ -1689,7 +1686,6 @@ ssize_t btrfs_do_write_iter(struct kiocb *iocb, struct iov_iter *from,
+ 	if (sync)
+ 		atomic_dec(&inode->sync_writers);
+ 
+-	current->backing_dev_info = NULL;
+ 	return num_written;
+ }
+ 
+diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+index f4d8bf7dec88a8..c8ef72f723badd 100644
+--- a/fs/ceph/file.c
++++ b/fs/ceph/file.c
+@@ -1791,9 +1791,6 @@ static ssize_t ceph_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	else
+ 		ceph_start_io_write(inode);
+ 
+-	/* We can write back this queue in page reclaim */
+-	current->backing_dev_info = inode_to_bdi(inode);
+-
+ 	if (iocb->ki_flags & IOCB_APPEND) {
+ 		err = ceph_do_getattr(inode, CEPH_STAT_CAP_SIZE, false);
+ 		if (err < 0)
+@@ -1940,7 +1937,6 @@ static ssize_t ceph_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 		ceph_end_io_write(inode);
+ out_unlocked:
+ 	ceph_free_cap_flush(prealloc_cf);
+-	current->backing_dev_info = NULL;
+ 	return written ? written : err;
+ }
+ 
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index d101b3b0c7dad8..bc430270c23c19 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -285,9 +285,7 @@ static ssize_t ext4_buffered_write_iter(struct kiocb *iocb,
+ 	if (ret <= 0)
+ 		goto out;
+ 
+-	current->backing_dev_info = inode_to_bdi(inode);
+ 	ret = generic_perform_write(iocb, from);
+-	current->backing_dev_info = NULL;
+ 
+ out:
+ 	inode_unlock(inode);
+diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
+index 5ac53d2627d20d..4f423d367a44b9 100644
+--- a/fs/f2fs/file.c
++++ b/fs/f2fs/file.c
+@@ -4517,9 +4517,7 @@ static ssize_t f2fs_buffered_write_iter(struct kiocb *iocb,
+ 	if (iocb->ki_flags & IOCB_NOWAIT)
+ 		return -EOPNOTSUPP;
+ 
+-	current->backing_dev_info = inode_to_bdi(inode);
+ 	ret = generic_perform_write(iocb, from);
+-	current->backing_dev_info = NULL;
+ 
+ 	if (ret > 0) {
+ 		iocb->ki_pos += ret;
+diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+index 89d97f6188e05e..97d435874b14aa 100644
+--- a/fs/fuse/file.c
++++ b/fs/fuse/file.c
+@@ -1362,9 +1362,6 @@ static ssize_t fuse_cache_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ writethrough:
+ 	inode_lock(inode);
+ 
+-	/* We can write back this queue in page reclaim */
+-	current->backing_dev_info = inode_to_bdi(inode);
+-
+ 	err = generic_write_checks(iocb, from);
+ 	if (err <= 0)
+ 		goto out;
+@@ -1409,7 +1406,6 @@ static ssize_t fuse_cache_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 			iocb->ki_pos += written;
+ 	}
+ out:
+-	current->backing_dev_info = NULL;
+ 	inode_unlock(inode);
+ 	if (written > 0)
+ 		written = generic_write_sync(iocb, written);
+diff --git a/fs/gfs2/file.c b/fs/gfs2/file.c
+index 300844f50dcd28..904a0d6ac1a1a9 100644
+--- a/fs/gfs2/file.c
++++ b/fs/gfs2/file.c
+@@ -1041,11 +1041,9 @@ static ssize_t gfs2_file_buffered_write(struct kiocb *iocb,
+ 			goto out_unlock;
+ 	}
+ 
+-	current->backing_dev_info = inode_to_bdi(inode);
+ 	pagefault_disable();
+ 	ret = iomap_file_buffered_write(iocb, from, &gfs2_iomap_ops);
+ 	pagefault_enable();
+-	current->backing_dev_info = NULL;
+ 	if (ret > 0) {
+ 		iocb->ki_pos += ret;
+ 		written += ret;
+diff --git a/fs/nfs/file.c b/fs/nfs/file.c
+index f0edf5a36237d1..665ce3fc62eaf4 100644
+--- a/fs/nfs/file.c
++++ b/fs/nfs/file.c
+@@ -648,11 +648,8 @@ ssize_t nfs_file_write(struct kiocb *iocb, struct iov_iter *from)
+ 	since = filemap_sample_wb_err(file->f_mapping);
+ 	nfs_start_io_write(inode);
+ 	result = generic_write_checks(iocb, from);
+-	if (result > 0) {
+-		current->backing_dev_info = inode_to_bdi(inode);
++	if (result > 0)
+ 		result = generic_perform_write(iocb, from);
+-		current->backing_dev_info = NULL;
+-	}
+ 	nfs_end_io_write(inode);
+ 	if (result <= 0)
+ 		goto out;
+diff --git a/fs/ntfs/file.c b/fs/ntfs/file.c
+index c481b14e4fd989..e296f804a9c442 100644
+--- a/fs/ntfs/file.c
++++ b/fs/ntfs/file.c
+@@ -1911,11 +1911,9 @@ static ssize_t ntfs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 
+ 	inode_lock(vi);
+ 	/* We can write back this queue in page reclaim. */
+-	current->backing_dev_info = inode_to_bdi(vi);
+ 	err = ntfs_prepare_file_for_write(iocb, from);
+ 	if (iov_iter_count(from) && !err)
+ 		written = ntfs_perform_write(file, from, iocb->ki_pos);
+-	current->backing_dev_info = NULL;
+ 	inode_unlock(vi);
+ 	iocb->ki_pos += written;
+ 	if (likely(written > 0))
+diff --git a/fs/ntfs3/file.c b/fs/ntfs3/file.c
+index 9a3d55c367d920..86d16a2c8339ca 100644
+--- a/fs/ntfs3/file.c
++++ b/fs/ntfs3/file.c
+@@ -820,7 +820,6 @@ static ssize_t ntfs_compress_write(struct kiocb *iocb, struct iov_iter *from)
+ 	if (!pages)
+ 		return -ENOMEM;
+ 
+-	current->backing_dev_info = inode_to_bdi(inode);
+ 	err = file_remove_privs(file);
+ 	if (err)
+ 		goto out;
+@@ -993,8 +992,6 @@ static ssize_t ntfs_compress_write(struct kiocb *iocb, struct iov_iter *from)
+ out:
+ 	kfree(pages);
+ 
+-	current->backing_dev_info = NULL;
+-
+ 	if (err < 0)
+ 		return err;
+ 
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index aede746541f8ae..431c3fd0e2b598 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -717,9 +717,6 @@ xfs_file_buffered_write(
+ 	if (ret)
+ 		goto out;
+ 
+-	/* We can write back this queue in page reclaim */
+-	current->backing_dev_info = inode_to_bdi(inode);
+-
+ 	trace_xfs_file_buffered_write(iocb, from);
+ 	ret = iomap_file_buffered_write(iocb, from,
+ 			&xfs_buffered_write_iomap_ops);
+@@ -753,7 +750,6 @@ xfs_file_buffered_write(
+ 		goto write_retry;
+ 	}
+ 
+-	current->backing_dev_info = NULL;
+ out:
+ 	if (iolock)
+ 		xfs_iunlock(ip, iolock);
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index eed5d65b8d1f4d..54780571fe9a07 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -41,7 +41,6 @@
+ 
+ /* task_struct member predeclarations (sorted alphabetically): */
+ struct audit_context;
+-struct backing_dev_info;
+ struct bio_list;
+ struct blk_plug;
+ struct bpf_local_storage;
+@@ -1186,8 +1185,6 @@ struct task_struct {
+ 	/* VM state: */
+ 	struct reclaim_state		*reclaim_state;
+ 
+-	struct backing_dev_info		*backing_dev_info;
+-
+ 	struct io_context		*io_context;
+ 
+ #ifdef CONFIG_COMPACTION
+diff --git a/mm/filemap.c b/mm/filemap.c
+index b4c9bd368b7e58..33b54660ad2b39 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -3991,8 +3991,6 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	ssize_t		err;
+ 	ssize_t		status;
+ 
+-	/* We can write back this queue in page reclaim */
+-	current->backing_dev_info = inode_to_bdi(inode);
+ 	err = file_remove_privs(file);
+ 	if (err)
+ 		goto out;
+@@ -4053,7 +4051,6 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 			iocb->ki_pos += written;
+ 	}
+ out:
+-	current->backing_dev_info = NULL;
+ 	return written ? written : err;
+ }
+ EXPORT_SYMBOL(__generic_file_write_iter);
+-- 
+2.39.2
 
