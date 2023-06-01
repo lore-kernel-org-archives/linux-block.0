@@ -2,138 +2,143 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB42C77B7E
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 22:27:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B44C7EE29
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 22:36:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231398AbjFAW1D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jun 2023 18:27:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46296 "EHLO
+        id S230037AbjFAWgu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jun 2023 18:36:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233059AbjFAW1C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 18:27:02 -0400
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D40133;
-        Thu,  1 Jun 2023 15:27:01 -0700 (PDT)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id 917AE5C00E9;
-        Thu,  1 Jun 2023 18:27:00 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Thu, 01 Jun 2023 18:27:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        invisiblethingslab.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:from:from:in-reply-to:message-id
-        :mime-version:reply-to:sender:subject:subject:to:to; s=fm1; t=
-        1685658420; x=1685744820; bh=iy/GUaaPPTaS6rwFy0PBDtNgCO5kwW/eHTt
-        pnmc0zuM=; b=Z4CU56AmPFLmSjNIWicm+SUnvn06uYZdblO+4TbIMCkPjvv3Ln1
-        PUGtE16bSWofN22Vt+X2zZGIJGkuyouG/D5XPX8FvyTvcTrnvhzAuXCfY6ReCRCg
-        DiP6PNnaBxDU3OKY+F4z5pvJd1q5JvD5Kro6Nm/M3m6hYgGN7smjJSFilEt8t4zB
-        COaptwSpXohvxx2Gtb4UQ9U3UD7gU6gielaRyN58klN5CzFW+a4rUrI76DvkM/tR
-        wZV1J7+zVS+99LLzT780Rgd8aVgzRUqggLcsEDZyEIBXZ/5V9Vfr0VueVc3fKVGe
-        Rr1JnCq40cUvesA+lXIWJiE4XaxF4hbYslQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:message-id:mime-version:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm1; t=1685658420; x=1685744820; bh=iy/GUaaPPTaS6
-        rwFy0PBDtNgCO5kwW/eHTtpnmc0zuM=; b=Scu4bR1SCTs286aPBJ/DD1KjDzD/I
-        8RxwId/3DCAKrMCzel/o2GuBy11qjd0/saTJzkxC9YQ7W5i1HQkQgsZYDNDkhKCc
-        1ktSFIQWP/HgA3TwfskAKrmbngIVbgpj58M3qeHRQw/8A+6Fuszl+N0TNADd2cOS
-        DmYiSHJgB/XGiYuIRG7aUyOQWrU5IQ6B0gutiBrATt9WODw73zImss9wLnbj43ow
-        Hxb7d9FRjkaeHWMu4VA+TXX273Q2GbSvRIEuOMqeNbRbRW+FXLCND3HiDlQdGQSJ
-        fPyGd0o/NyhaV82tXsUsGqbTlPt20GIaDtNlTHL5YZlq9YMXvOtJmdiAg==
-X-ME-Sender: <xms:NBt5ZOa1I9p2HrXSxmQ3PBPozIP2-Cing6xVgtVvXLwfBtpDazriSg>
-    <xme:NBt5ZBYzn2JCOnrKyXy0zUnn4QQyZC8xHzl7HcUQu0-5UYkHk8wf-ybaZX44NjKXk
-    cihMOnejmeWDWA>
-X-ME-Received: <xmr:NBt5ZI_cVimzQC8DvwhLNzjI5VxDhKfONe3kogA74XzI3DZgRkDUzmLe8ybYu_0Jgqd6EFrPT3o>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrfeelvddguddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepffgvmhhiucfo
-    rghrihgvucfqsggvnhhouhhruceouggvmhhisehinhhvihhsihgslhgvthhhihhnghhslh
-    grsgdrtghomheqnecuggftrfgrthhtvghrnhepvdefgeekvdekgfffgeekhfeijedtffek
-    hefhleehfeejueetgfelgefgtdevieelnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepuggvmhhisehinhhvihhsihgslhgvthhhihhnghhslhgr
-    sgdrtghomh
-X-ME-Proxy: <xmx:NBt5ZArP2z5ceXGfT-WnNAic88zSfXGiefzY0w7GCi8gY__mgqfqPg>
-    <xmx:NBt5ZJrnFQUM_pwfKg91jPfqXOgvhvtJ3e4MtUgG6qzzFfJBiMuZnw>
-    <xmx:NBt5ZOSURmcj3xPqFh8zXkD4AAFuGtgGFoRa5CV93AzUfZgyGNmmaA>
-    <xmx:NBt5ZKDxtd3dhzdgCmQxN2-98JyvDX0oo8PKnvrFn3_v8qjit326dA>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 1 Jun 2023 18:26:59 -0400 (EDT)
-From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Demi Marie Obenour <demi@invisiblethingslab.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] block, loop: Increment diskseq when releasing a loop device
-Date:   Thu,  1 Jun 2023 18:26:56 -0400
-Message-Id: <20230601222656.2062-1-demi@invisiblethingslab.com>
-X-Mailer: git-send-email 2.40.1
+        with ESMTP id S229884AbjFAWgt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 18:36:49 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1772A12C;
+        Thu,  1 Jun 2023 15:36:48 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 351MLCUf018089;
+        Thu, 1 Jun 2023 22:36:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=mU47nVdTexep16MaxjhHdEziD+FCGlC8fmtsxhP3bcg=;
+ b=NpsGTQt9wXr7hWbHEkeMj9C430KqzAzcmiUfp7Pa4Z3kkz9yBbplOkun9lsT8QT6WMfn
+ 8R+8+OIl/powUWscVMUkP5gzj5jiSCRwy2Isd6dN2dN9csJRfbam9qYWa0gw3vbU/0Oc
+ kMkBhubDHkT7ovSxIRYXEJJ6hudTZbyLwXNri6SHCSVixPyB1la/JnKtFGQHSfmEGbI6
+ rOlkZXHJOYodZ4dgDfCVkAQ4DRUuiuY6qsVVEjO25YP/r0kS/mBNVuKQToHfdX9t2k38
+ d1+oV4plVQD9Y1qb9yWeBJS/PQsnB9YgIfMLmyT/6GdEGIVWKPDq4hQisX+oqwfauyJO wA== 
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qy41v86pc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jun 2023 22:36:35 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 351G5SXh017488;
+        Thu, 1 Jun 2023 22:36:34 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
+        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3qu9g5af7s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jun 2023 22:36:34 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 351MaXqr34930996
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Jun 2023 22:36:33 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7471258056;
+        Thu,  1 Jun 2023 22:36:33 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D21B158054;
+        Thu,  1 Jun 2023 22:36:32 +0000 (GMT)
+Received: from rhel-laptop.ibm.com (unknown [9.61.58.163])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Jun 2023 22:36:32 +0000 (GMT)
+From:   gjoyce@linux.vnet.ibm.com
+To:     linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
+        gjoyce@linux.vnet.ibm.com, keyrings@vger.kernel.org
+Subject: [PATCH v6 2/3] block/sed-opal: keystore access for SED Opal keys
+Date:   Thu,  1 Jun 2023 17:36:29 -0500
+Message-Id: <20230601223630.2136006-3-gjoyce@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20230601223630.2136006-1-gjoyce@linux.vnet.ibm.com>
+References: <20230601223630.2136006-1-gjoyce@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: EsIwT61g79xw5a2JZsRKbnn0JqywJ_Vr
+X-Proofpoint-GUID: EsIwT61g79xw5a2JZsRKbnn0JqywJ_Vr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-01_08,2023-05-31_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 priorityscore=1501 mlxscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 mlxlogscore=999 adultscore=0 phishscore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306010194
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The previous patch for checking diskseq in blkback is not enough to
-prevent the following race:
+From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
 
-1. Program X opens a loop device
-2. Program X gets the diskseq of the loop device.
-3. Program X associates a file with the loop device.
-4. Program X passes the loop device major, minor, and diskseq to
-   something.
-5. Program X exits.
-6. Program Y detaches the file from the loop device.
-7. Program Y attaches a different file to the loop device.
-8. The opener finally gets around to opening the loop device and checks
-   that the diskseq is what it expects it to be.  Even though the
-   diskseq is the expected value, the result is that the opener is
-   accessing the wrong file.
+Allow for permanent SED Opal authentication keys by
+reading/writing to the SED Opal non-volatile keystore.
 
-To prevent this race condition, increment the diskseq of a loop device
-when it is detached from its file descriptor.  This causes blkback (or
-any other program, for that matter) to fail at step 8.  Export the
-inc_diskseq() function to make this possible.
-
-Signed-off-by: Demi Marie Obenour <demi@invisiblethingslab.com>
+Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reviewed-by: Jonathan Derrick <jonathan.derrick@linux.dev>
 ---
-I considered destroying the loop device altogether instead of bumping
-its diskseq, but was not able to accomplish that.  Suggestions welcome.
----
- block/genhd.c        | 1 +
- drivers/block/loop.c | 6 ++++++
- 2 files changed, 7 insertions(+)
+ block/sed-opal.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1cb489b927d50ab06a84a4bfd6913ca8ba7318d4..c0ca2c387732171321555cd57565fbc606768505 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1502,3 +1502,4 @@ void inc_diskseq(struct gendisk *disk)
- {
- 	disk->diskseq = atomic64_inc_return(&diskseq);
- }
-+EXPORT_SYMBOL(inc_diskseq);
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index bc31bb7072a2cb7294d32066f5d0aa14130349b4..05ea5fb41508b4106f184dd6b4c37942716bdcac 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1205,6 +1205,12 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	if (!part_shift)
- 		set_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
- 	mutex_lock(&lo->lo_mutex);
-+
-+	/*
-+	 * Increment the disk sequence number, so that userspace knows this
-+	 * device now points to something else.
-+	 */
-+	inc_diskseq(lo->lo_disk);
- 	lo->lo_state = Lo_unbound;
- 	mutex_unlock(&lo->lo_mutex);
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 7f5f235a9048..1e8cfa00b609 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -18,6 +18,7 @@
+ #include <linux/uaccess.h>
+ #include <uapi/linux/sed-opal.h>
+ #include <linux/sed-opal.h>
++#include <linux/sed-opal-key.h>
+ #include <linux/string.h>
+ #include <linux/kdev_t.h>
+ #include <linux/key.h>
+@@ -2803,7 +2804,13 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
+ 	if (ret)
+ 		return ret;
  
+-	/* update keyring with new password */
++	/* update keyring and key store with new password */
++	ret = sed_write_key(OPAL_AUTH_KEY,
++			    opal_pw->new_user_pw.opal_key.key,
++			    opal_pw->new_user_pw.opal_key.key_len);
++	if (ret != -EOPNOTSUPP)
++		pr_warn("error updating SED key: %d\n", ret);
++
+ 	ret = update_sed_opal_key(OPAL_AUTH_KEY,
+ 				  opal_pw->new_user_pw.opal_key.key,
+ 				  opal_pw->new_user_pw.opal_key.key_len);
+@@ -3050,6 +3057,8 @@ EXPORT_SYMBOL_GPL(sed_ioctl);
+ static int __init sed_opal_init(void)
+ {
+ 	struct key *kr;
++	char init_sed_key[OPAL_KEY_MAX];
++	int keylen = OPAL_KEY_MAX - 1;
+ 
+ 	kr = keyring_alloc(".sed_opal",
+ 			   GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
+@@ -3062,6 +3071,11 @@ static int __init sed_opal_init(void)
+ 
+ 	sed_opal_keyring = kr;
+ 
+-	return 0;
++	if (sed_read_key(OPAL_AUTH_KEY, init_sed_key, &keylen) < 0) {
++		memset(init_sed_key, '\0', sizeof(init_sed_key));
++		keylen = OPAL_KEY_MAX - 1;
++	}
++
++	return update_sed_opal_key(OPAL_AUTH_KEY, init_sed_key, keylen);
+ }
+ late_initcall(sed_opal_init);
 -- 
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
+gjoyce@linux.vnet.ibm.com
 
