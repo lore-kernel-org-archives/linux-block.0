@@ -2,77 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69DCC77B73
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 01:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA393C77B7E
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 04:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230286AbjFABu1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 21:50:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44580 "EHLO
+        id S229462AbjFAEGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jun 2023 00:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbjFABu0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 21:50:26 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E736D121;
-        Wed, 31 May 2023 18:50:25 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QWpxB06Fkz4f3v4v;
-        Thu,  1 Jun 2023 09:50:22 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rFe+Xdk2ySmKg--.17522S3;
-        Thu, 01 Jun 2023 09:50:22 +0800 (CST)
-Subject: Re: [PATCH -next v2] block: fix blktrace debugfs entries leak
-To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230531092606.3037560-1-yukuai1@huaweicloud.com>
- <20230531124404.GA27412@lst.de>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <509bcea6-21f6-3f64-01c3-02215955283d@huaweicloud.com>
-Date:   Thu, 1 Jun 2023 09:50:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229636AbjFAEGN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 00:06:13 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAF8AE7
+        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 21:06:12 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-119-27.bstnma.fios.verizon.net [173.48.119.27])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 35144uJl025934
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 1 Jun 2023 00:04:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1685592303; bh=mIavo5j4+6St+xYcUc/m3FtaH+qhMLsBPwolTHZN5go=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=nJgLIM8bsghBqgoXKZjgAIvBsl1fN8A71/4BAhNIH12Mc4kaX0scpDkCoBhixBbTZ
+         gW9wJbEuch5eyPKGIWPjUMuWYynPCinG2gNgtfUuJrUWbrQOIB1/daL+AtTGrscc0g
+         fXlPmr5nR3b26+X2puSMJFG8wjxOOpXpEgrs4hC7JxLTQWWTeGcDvap8QDXckRZXNF
+         k7FAnsbKeVvtL8unzzJONnG5qW8XPIo7C4llJN6UaCMVsMnQmm5/uChVkKfw85MPhX
+         KpKei7rQwD+KqaqOdYkfi5taGJngIgiMPrCZzkOvzWlsLIJw75OrFU22cuYv40BzcH
+         3fVMgSgTtY6jg==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id D1FCB15C02EE; Thu,  1 Jun 2023 00:04:56 -0400 (EDT)
+Date:   Thu, 1 Jun 2023 00:04:56 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 01/12] backing_dev: remove current->backing_dev_info
+Message-ID: <20230601040456.GA896851@mit.edu>
+References: <20230531075026.480237-1-hch@lst.de>
+ <20230531075026.480237-2-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20230531124404.GA27412@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rFe+Xdk2ySmKg--.17522S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYz7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0
-        xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-        1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-        14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-        IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY
-        6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-        73UjIFyTuYvjfUF9a9DUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230531075026.480237-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Christoph
-
-ÔÚ 2023/05/31 20:44, Christoph Hellwig Ð´µÀ:
-> I like where this is going, but did you check that this doesn't
-> introduce a potential crash with the current /dev/sg based blktrace?
-
-I just start to look at how /dev/sg is created and destroyed, however,
-I'm confused here, do you mean that the added blk_trace_shutdown() here
-might cause that /dev/sg blktrace to access freed momory or NULL
-pointer?
-
-Thanks,
-Kuai
+On Wed, May 31, 2023 at 09:50:15AM +0200, Christoph Hellwig wrote:
+> The last user of current->backing_dev_info disappeared in commit
+> b9b1335e6403 ("remove bdi_congested() and wb_congested() and related
+> functions").  Remove the field and all assignments to it.
 > 
-> 
-> .
-> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
+Acked-by: Theodore Ts'o <tytso@mit.edu>
