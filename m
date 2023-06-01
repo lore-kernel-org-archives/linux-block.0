@@ -2,163 +2,237 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D052C77B7A
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 10:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D6E4C7EE2A
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 14:27:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232441AbjFAKVC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:21:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54448 "EHLO
+        id S233854AbjFAO1p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jun 2023 10:27:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233419AbjFAKTO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 06:19:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A4FD1FFB
-        for <linux-block@vger.kernel.org>; Thu,  1 Jun 2023 03:15:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685614464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NYR/VkMk/voOznqHepF47pBoY++iUIp7AId3uEofiiU=;
-        b=dQ13meQ+T7sQL3wVuwWT2ZUA3kKoLFA6bHqrGSYSSRor7sVCOs7zpdc0jroU60vwMpiHP0
-        I1Elb1O7UTu25UN3oShWFT0lKS0vwu9Ak9S9jx+ICwmEYkYO1r36GYCdgtvkswjmqKioBM
-        kHt6qcAsTqij3glOsP/ubFiknpdJP/k=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-SZk08AKBOcamT38RtDsTZw-1; Thu, 01 Jun 2023 06:14:22 -0400
-X-MC-Unique: SZk08AKBOcamT38RtDsTZw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3f603fed174so4180895e9.2
-        for <linux-block@vger.kernel.org>; Thu, 01 Jun 2023 03:14:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685614462; x=1688206462;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :references:cc:to:content-language:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NYR/VkMk/voOznqHepF47pBoY++iUIp7AId3uEofiiU=;
-        b=lCCWHFZpf24cB7EwVcBzcFvtV5YY+zI7ZlKUbP+/gDT+VaAZbJ6d/qaWY6U4GNAPn9
-         ru+WAY6LpYo6YwMwJhTsTN6/h6nQ+nSBlC3ZB4MpDYRLFX62Pd38YQR2ekKEH+CopCGi
-         7ogE1KLsHEKc6fbbDB4h4VQHj/hW/T/qechvBDaXK0z5sKTKJ4IOw5hmDaj9QQnVrpay
-         fp2Mlj1/LKewfJI8WzYmBQL8hVRLfGeePPHOhnh6N14vAbXTgaIDe0B9PDJOaWM6Wa5P
-         FyGeA1CTPk4Cn/p1DFzhKL6hIrY/4JeBZP7miH8W9EfeknLr3MTsCoJbEhYSpHVfP6wF
-         ctDg==
-X-Gm-Message-State: AC+VfDy7nSQrX515sFxk16BDMtlWLme1nF2atoifL3uv4UiougRzM70T
-        icPLLSTy2aElSljbxvXH5UF4QV0cJvqGBHAnX4eqYbJCsgstLRXGK6GtJIPTNSEwZexzIpuooSe
-        CCvUwKHE5796N1sJlIH9g2tYqrvV+FH0=
-X-Received: by 2002:a1c:4b04:0:b0:3f6:1508:950d with SMTP id y4-20020a1c4b04000000b003f61508950dmr1560168wma.8.1685614461792;
-        Thu, 01 Jun 2023 03:14:21 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7VnsEBhESdjXdiQFg74eikZktRK8TAGK3ABpDAi6e4ScCG4i4Ww4wsGLH4CWPzX8JVUMeRXg==
-X-Received: by 2002:a1c:4b04:0:b0:3f6:1508:950d with SMTP id y4-20020a1c4b04000000b003f61508950dmr1560131wma.8.1685614461274;
-        Thu, 01 Jun 2023 03:14:21 -0700 (PDT)
-Received: from ?IPV6:2a09:80c0:192:0:5dac:bf3d:c41:c3e7? ([2a09:80c0:192:0:5dac:bf3d:c41:c3e7])
-        by smtp.gmail.com with ESMTPSA id e25-20020a05600c219900b003f42314832fsm1766220wme.18.2023.06.01.03.14.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Jun 2023 03:14:20 -0700 (PDT)
-Message-ID: <73befe4b-b9cc-72ee-872e-29efc16539ca@redhat.com>
-Date:   Thu, 1 Jun 2023 12:14:19 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Andrew Morton <akpm@linux-foundation.org>
-References: <492558dc-1377-fc4b-126f-c358bb000ff7@redhat.com>
- <cbd39f94-407a-03b6-9c43-8144d0efc8bb@redhat.com>
- <20230526214142.958751-1-dhowells@redhat.com>
- <20230526214142.958751-2-dhowells@redhat.com>
- <510965.1685522152@warthog.procyon.org.uk>
- <703628.1685541335@warthog.procyon.org.uk>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v4 1/3] mm: Don't pin ZERO_PAGE in pin_user_pages()
-In-Reply-To: <703628.1685541335@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        with ESMTP id S232295AbjFAO1o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 10:27:44 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC60FC;
+        Thu,  1 Jun 2023 07:27:41 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 351EMKkp008873;
+        Thu, 1 Jun 2023 14:27:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=KDCcvfOMtv0kGWqqVMfClqyqi+qnHl34NlJRU1GMl78=;
+ b=trW0NbcRWJm31saHH8qHdePtGhc558ZCFSRTUXxgG71M2cvXTQBk0cHOyI9T0cHeM6Si
+ VRlWzm3ozzKaZtQtPbSrToxAdtxaEgZvJztdfVXFowtIrbL2UVEyRNa/QFSsuSB5gv9Q
+ fvc4/N54pBJ7iXkcUKUlCUSpFbjhEoYJ8hWg9P8M8rqUU5pOm0gJkc7dBIVpL3P1BTvx
+ FvsZVtJDZ3/JpZbe6HBCCq2TAWIRo50XWqKAttRt0Cnyb3CEypSOzhWJl5NfFOmwBBcF
+ W4XJ1M24Pd0KiKuA+ciyqg4Z26R9KTNwReGmtzYbUDmaHktXUmEcoJXXF+eMfRZZdtT0 VA== 
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3qxw1kg4cv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jun 2023 14:27:24 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 351CL4wN013950;
+        Thu, 1 Jun 2023 14:27:23 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([9.208.129.113])
+        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3qu9g62880-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 01 Jun 2023 14:27:23 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 351ERL4G61538576
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 1 Jun 2023 14:27:21 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B0C575805C;
+        Thu,  1 Jun 2023 14:27:21 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 012E65805F;
+        Thu,  1 Jun 2023 14:27:21 +0000 (GMT)
+Received: from rhel-laptop.ibm.com (unknown [9.61.58.163])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  1 Jun 2023 14:27:20 +0000 (GMT)
+Message-ID: <ebd5fdef2348647e5c54278d67384e5d6e4b6e38.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH 4/4] powerpc/pseries: update SED for PLPKS api changes
+From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reply-To: gjoyce@linux.vnet.ibm.com
+To:     Andrew Donnellan <ajd@linux.ibm.com>, linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        axboe@kernel.dk, akpm@linux-foundation.org,
+        linux-efi@vger.kernel.org, keyrings@vger.kernel.org,
+        me@benboeckel.net, elliott@hpe.com, nayna@linux.ibm.com
+Date:   Thu, 01 Jun 2023 09:27:20 -0500
+In-Reply-To: <aebe6be66ad982dafa072848246255b9a32e8903.camel@linux.ibm.com>
+References: <20230505194402.2079010-1-gjoyce@linux.vnet.ibm.com>
+         <20230505194402.2079010-5-gjoyce@linux.vnet.ibm.com>
+         <aebe6be66ad982dafa072848246255b9a32e8903.camel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OhzqyXviBWgIj_5lknGyuf9i39WWN-Y8
+X-Proofpoint-ORIG-GUID: OhzqyXviBWgIj_5lknGyuf9i39WWN-Y8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-01_08,2023-05-31_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ suspectscore=0 mlxscore=0 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=999 adultscore=0 clxscore=1011 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306010124
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 31.05.23 15:55, David Howells wrote:
-> David Hildenbrand <david@redhat.com> wrote:
+On Mon, 2023-05-15 at 15:52 +1000, Andrew Donnellan wrote:
+> On Fri, 2023-05-05 at 14:44 -0500, gjoyce@linux.vnet.ibm.com wrote:
+> > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+> > 
+> > Changes to the PLPKS API require minor updates to the SED Opal
+> > PLPKS keystore code.
+> > 
+> > Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
 > 
->> Yes, it would be clearer if we would be using "pinned" now only for FOLL_PIN
+> [+ Nayna]
 > 
-> You're not likely to get that.  "To pin" is too useful a verb that gets used
-> in other contexts too.  For that reason, I think FOLL_PIN was a poor choice of
-> name:-/.  I guess the English language has got somewhat overloaded.  Maybe
-> FOLL_PEG? ;-)
+> This patch will need to be squashed with patch 2.
 
-You're probably right. FOLL_PIN and all around that is "get me an 
-additional reference on the page and make sure I can DMA it without any 
-undesired side-effects".
-
-FOLL_PIN_DMA would have been clearer (and matches 
-folio_maybe_dma_pinned() ) ... but then, there are some use cases where 
-want the same semantics but not actually perform DMA, but simply 
-read/write via the directmap (e.g., vmsplice, some io_uring cases). 
-Sure, one could say that they behave like DMA: access page content at 
-any time.
-
-Saying a page is pinned (additional refcount) and having a pincount of 0 
-or does indeed cause confusion.
-
-... but once we start renaming FOLL_PIN, pincount, ... we also have to 
-rename pin_user_pages() and friends, and things get nasty.
+Thanks. I've squashed the patches and will resend shortly.
 
 > 
->> and everything else is simply "taking a temporary reference on the page".
+> > ---
+> >  arch/powerpc/platforms/pseries/Kconfig        |  6 +++++
+> >  arch/powerpc/platforms/pseries/Makefile       |  2 +-
+> >  .../powerpc/platforms/pseries/plpks_sed_ops.c | 22 +++++--------
+> > ----
+> > --
+> >  block/Kconfig                                 |  1 +
+> >  4 files changed, 13 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/arch/powerpc/platforms/pseries/Kconfig
+> > b/arch/powerpc/platforms/pseries/Kconfig
+> > index 21b22bf16ce6..c2f8a29e7b9b 100644
+> > --- a/arch/powerpc/platforms/pseries/Kconfig
+> > +++ b/arch/powerpc/platforms/pseries/Kconfig
+> > @@ -163,6 +163,12 @@ config PSERIES_PLPKS
+> >         # This option is selected by in-kernel consumers that
+> > require
+> >         # access to the PKS.
+> >  
+> > +config PSERIES_PLPKS_SED
+> > +       depends on PPC_PSERIES
+> > +       bool
+> > +       # This option is selected by in-kernel consumers that
+> > require
+> > +       # access to the SED PKS keystore.
+> > +
+> >  config PAPR_SCM
+> >         depends on PPC_PSERIES && MEMORY_HOTPLUG && LIBNVDIMM
+> >         tristate "Support for the PAPR Storage Class Memory
+> > interface"
+> > diff --git a/arch/powerpc/platforms/pseries/Makefile
+> > b/arch/powerpc/platforms/pseries/Makefile
+> > index 4242aed0d5d3..1476c5e4433c 100644
+> > --- a/arch/powerpc/platforms/pseries/Makefile
+> > +++ b/arch/powerpc/platforms/pseries/Makefile
+> > @@ -29,7 +29,7 @@ obj-$(CONFIG_PPC_SVM)         += svm.o
+> >  obj-$(CONFIG_FA_DUMP)          += rtas-fadump.o
+> >  obj-$(CONFIG_PSERIES_PLPKS)    += plpks.o
+> >  obj-$(CONFIG_PPC_SECURE_BOOT)  += plpks-secvar.o
+> > -obj-$(CONFIG_PSERIES_PLPKS_SED)        += plpks-sed.o
+> > +obj-$(CONFIG_PSERIES_PLPKS_SED)        += plpks_sed_ops.o
 > 
-> Excluding refs taken with pins, many refs are more permanent than pins as, so
-> far as I'm aware, pins only last for the duration of an I/O operation.
+> I think you could just use obj-$(CONFIG_BLK_SED_OPAL) and then there
+> wouldn't be a need to introduce a new option? Unless there's going to
+> be a second consumer.
 
-I was more thinking along the lines of FOLL_GET vs. FOLL_PIN. Once we 
-consider any references we might have on a page, things get more tricky 
-indeed.
-
-> 
->>>> "Note that the refcount of any zero_pages returned among the pinned pages will
->>>> not be incremented, and unpin_user_page() will similarly not decrement it."
->>> That's not really right (although it happens to be true), because we're
->>> talking primarily about the pin counter, not the refcount - and they may be
->>> separate.
->>
->> In any case (FOLL_PIN/FOLL_GET) you increment/decrement the refcount. If we
->> have a separate pincount, we increment/decrement the refcount by 1 when
->> (un)pinning.
-> 
-> FOLL_GET isn't relevant here - only FOLL_PIN.  Yes, as it happens, we count a
-> ref if we count a pin, but that's kind of irrelevant; what matters is that the
-> effect must be undone with un-PUP.
-
-The point I was trying to make is that we always modify the refcount, 
-and in some cases (FOLL_PIN on order > 0) also the pincount.
-
-But if you define "pins" as "additional reference", we're on the same page.
+I was following the model of CONFIG_PPC_SECURE_BOOT. That gives a
+littler finer control and flexibilty for using SED and PLPKS. This also
+confines use of CONFIG_BLK_SED_OPAL to the base SED OPAL code.
 
 > 
-> It would be nice not to get a ref on the zero page in FOLL_GET, but I don't
-> think we can do that yet.  Too many places assume that GUP will give them a
-> ref they can release later via ordinary methods.
-
-No we can't I'm afraid.
-
--- 
-Thanks,
-
-David / dhildenb
+> >  obj-$(CONFIG_SUSPEND)          += suspend.o
+> >  obj-$(CONFIG_PPC_VAS)          += vas.o vas-sysfs.o
+> >  
+> > diff --git a/arch/powerpc/platforms/pseries/plpks_sed_ops.c
+> > b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
+> > index 086934b319a9..c1d08075e850 100644
+> > --- a/arch/powerpc/platforms/pseries/plpks_sed_ops.c
+> > +++ b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
+> > @@ -14,7 +14,7 @@
+> >  #include <linux/string.h>
+> >  #include <linux/ioctl.h>
+> >  #include <linux/sed-opal-key.h>
+> > -#include "plpks.h"
+> > +#include <asm/plpks.h>
+> >  
+> >  /*
+> >   * structure that contains all SED data
+> > @@ -28,9 +28,6 @@ struct plpks_sed_object_data {
+> >         u_char key[32];
+> >  };
+> >  
+> > -#define PLPKS_PLATVAR_POLICY            WORLDREADABLE
+> > -#define PLPKS_PLATVAR_OS_COMMON         4
+> > -
+> >  #define PLPKS_SED_OBJECT_DATA_V0        0
+> >  #define PLPKS_SED_MANGLED_LABEL         "/default/pri"
+> >  #define PLPKS_SED_COMPONENT             "sed-opal"
+> > @@ -50,8 +47,8 @@ void plpks_init_var(struct plpks_var *var, char
+> > *keyname)
+> >                 var->name = PLPKS_SED_MANGLED_LABEL;
+> >                 var->namelen = strlen(keyname);
+> >         }
+> > -       var->policy = PLPKS_PLATVAR_POLICY;
+> > -       var->os = PLPKS_PLATVAR_OS_COMMON;
+> > +       var->policy = PLPKS_WORLDREADABLE;
+> > +       var->os = PLPKS_VAR_COMMON;
+> >         var->data = NULL;
+> >         var->datalen = 0;
+> >         var->component = PLPKS_SED_COMPONENT;
+> > @@ -64,28 +61,19 @@ int sed_read_key(char *keyname, char *key,
+> > u_int
+> > *keylen)
+> >  {
+> >         struct plpks_var var;
+> >         struct plpks_sed_object_data data;
+> > -       u_int offset;
+> >         int ret;
+> >         u_int len;
+> >  
+> >         plpks_init_var(&var, keyname);
+> > -       var.data = &data;
+> > +       var.data = (u8 *)&data;
+> >         var.datalen = sizeof(data);
+> >  
+> >         ret = plpks_read_os_var(&var);
+> >         if (ret != 0)
+> >                 return ret;
+> >  
+> > -       offset = offsetof(struct plpks_sed_object_data, key);
+> > -       if (offset > var.datalen) {
+> > -               return -EINVAL;
+> > -       }
+> > -
+> > -       len = min(be32_to_cpu(data.key_len), *keylen);
+> > -
+> > +       len = min_t(u16, be32_to_cpu(data.key_len), var.datalen);
+> >         memcpy(key, data.key, len);
+> > -       kfree(var.data);
+> > -
+> >         key[len] = '\0';
+> >         *keylen = len;
+> >  
+> > diff --git a/block/Kconfig b/block/Kconfig
+> > index 76b23114fdeb..75d4db34df5a 100644
+> > --- a/block/Kconfig
+> > +++ b/block/Kconfig
+> > @@ -182,6 +182,7 @@ config BLK_SED_OPAL
+> >         bool "Logic for interfacing with Opal enabled SEDs"
+> >         depends on KEYS
+> >         select PSERIES_PLPKS if PPC_PSERIES
+> > +       select PSERIES_PLPKS_SED if PPC_PSERIES
+> >         help
+> >         Builds Logic for interfacing with Opal enabled controllers.
+> >         Enabling this option enables users to setup/unlock/lock
 
