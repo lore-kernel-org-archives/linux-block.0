@@ -2,144 +2,139 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E372C7EE2A
-	for <linux-block@archiver.kernel.org>; Wed, 31 May 2023 22:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54EEC77B7A
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 00:44:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230313AbjEaWhI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 May 2023 18:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
+        id S230390AbjFAAoB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 May 2023 20:44:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230360AbjEaWhH (ORCPT
+        with ESMTP id S230429AbjFAAn6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 May 2023 18:37:07 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B7E192
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 15:37:02 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3980f2df1e7so45842b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 31 May 2023 15:37:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1685572622; x=1688164622;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=n3rg9Z09BIl1aIQXz+8gKGwERErjA3Juhruo9wqB2U8=;
-        b=wiX6dI4YQSE++dSI7EaUMDXFauekYMtpXk1nx5uvMyo25lrfQV5e1AHiqUl7vtZsLM
-         IMsq1Z5rdgpxryXDQhmnhU6BFy28pl/Iq9YtSyYwXYAcruYkWNkt+idLzDGSUr3FKl5P
-         71TZQmlrc+8IX5Yr3GC2L31c13tTWeaseGd8GHnF4nTP4gHfGL9GdiqTtVrRnTBPX75w
-         rNqYxEQM0IHHwuhf+2DOFuAeL1Rj0RWSYjbBRij29aY9ImveoAP+ZDW+DAQgL+Nrskc1
-         zy8HdL5xcRs5rA3RogSXnzYu4aaVp7d7YXAaBJhIgs7D1bBPAkB/rkpyaOArHbaD1136
-         cQVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685572622; x=1688164622;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n3rg9Z09BIl1aIQXz+8gKGwERErjA3Juhruo9wqB2U8=;
-        b=MjItIIYm+9On4pX8jpSB7kf+yfscpYDkEqlG04TX6Wv45wjG5s3lOgqiziLwOf0Se0
-         1vnNHI0YbyiyK1D/w6xq6MQNzaYkyKOh2HCR8rcEJa1GFYj7z6y0rmBTKBLVRf4JNdsv
-         OGnTDrEpkBTLrrdI6dWioXcPkEMIAeawLBOXKTAz0QpRJxgXtPdU9TEiaPydzZ8yw6eL
-         ZSKNT3RIXed/esIp4b92trOvExH8akhPWrJORNVvUhJ1worxHGLWpW0bYztJOHGn8D9K
-         HKbILzN0g1bzSfRKrm3mElyXfadlSAn7ERjIKSTi/WklUo3SDDszXtqyEtTKq2Ch9saC
-         9gHA==
-X-Gm-Message-State: AC+VfDycgOhm8ypiVni+e/DCz+ewb/I7hE6mfB4PntOEaacZlIIxDGOj
-        bhI0mXjWUl0fQH/fz3OqSgCAQQ==
-X-Google-Smtp-Source: ACHHUZ7R3wjvNkmWSbL60I9ylavOeUTJY88g1+p1PDiLJE+SHWNaI13IUYsVS+xjUDM8kOkAj2iUNQ==
-X-Received: by 2002:a05:6808:1496:b0:398:2f85:ff7f with SMTP id e22-20020a056808149600b003982f85ff7fmr6512900oiw.50.1685572621938;
-        Wed, 31 May 2023 15:37:01 -0700 (PDT)
-Received: from dread.disaster.area (pa49-179-0-188.pa.nsw.optusnet.com.au. [49.179.0.188])
-        by smtp.gmail.com with ESMTPSA id e12-20020a170902784c00b001b034fafaefsm1948337pln.38.2023.05.31.15.37.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 May 2023 15:37:01 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1q4UR9-006HGI-0M;
-        Thu, 01 Jun 2023 08:36:59 +1000
-Date:   Thu, 1 Jun 2023 08:36:59 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        dm-devel@redhat.com, Song Liu <song@kernel.org>,
-        linux-raid@vger.kernel.org, Mike Snitzer <snitzer@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        jfs-discussion@lists.sourceforge.net, cluster-devel@redhat.com,
-        Bob Peterson <rpeterso@redhat.com>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>, gouha7@uniontech.com
-Subject: Re: [PATCH v7 19/20] fs: iomap: use bio_add_folio_nofail where
- possible
-Message-ID: <ZHfMC86ktyLtIxNb@dread.disaster.area>
-References: <cover.1685532726.git.johannes.thumshirn@wdc.com>
- <58fa893c24c67340a63323f09a179fefdca07f2a.1685532726.git.johannes.thumshirn@wdc.com>
+        Wed, 31 May 2023 20:43:58 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAC8185;
+        Wed, 31 May 2023 17:43:50 -0700 (PDT)
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34VJbiXu020031;
+        Thu, 1 Jun 2023 00:43:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2023-03-30;
+ bh=GD6hCxEk3L0IIhByLlcvvVsHmFrFS9FYPAJZDk1KJhs=;
+ b=rT+oBvRU4md5ESCBLwSk9WX0jyi4rVTbUx5sEEy/2jewAQhAaxa1AOsvdwQfrdI6rUc8
+ l/lmL1/wSqH13/anfp4OCbDrw5Mh062dZCImOrxEdO013OP5OoOgiaA1LA3QHM6yiFIm
+ RWuMRycEOkLWPlEMCl1aNXsp0sT8rnTbtCx5x8tpaEyte7KcNuy2XRQ7p7TdRZ+0nc7I
+ 8GvzgbVAZO0rqZSrmfNh60543LejhE3a5mve9qkmBHLMbRu8xgY2bTHB/QHTeBA0tpUu
+ dFbYjP+57m5X+AHFRSdn6l3dhrk9oYFCg1I/Drv+xmtCIWBzdLemf0BkFie0jyDibHWz tg== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3qvhjh7cnw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Jun 2023 00:43:35 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 34VMhvGw004404;
+        Thu, 1 Jun 2023 00:43:34 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3qv4ye2eav-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 01 Jun 2023 00:43:34 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3510hV9L008516;
+        Thu, 1 Jun 2023 00:43:33 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3qv4ye2e6s-3;
+        Thu, 01 Jun 2023 00:43:33 +0000
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Niklas Cassel <nks@flawful.org>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
+Subject: Re: [PATCH v7 00/19] Add Command Duration Limits support
+Date:   Wed, 31 May 2023 20:43:12 -0400
+Message-Id: <168558000054.2461197.15843380024043711693.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230511011356.227789-1-nks@flawful.org>
+References: <20230511011356.227789-1-nks@flawful.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58fa893c24c67340a63323f09a179fefdca07f2a.1685532726.git.johannes.thumshirn@wdc.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-05-31_18,2023-05-31_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=830
+ adultscore=0 malwarescore=0 bulkscore=0 suspectscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2306010004
+X-Proofpoint-GUID: 0ArI-bCon4iraFW0sj-1q9sYhdeEwk0Q
+X-Proofpoint-ORIG-GUID: 0ArI-bCon4iraFW0sj-1q9sYhdeEwk0Q
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 31, 2023 at 04:50:42AM -0700, Johannes Thumshirn wrote:
-> When the iomap buffered-io code can't add a folio to a bio, it allocates a
-> new bio and adds the folio to that one. This is done using bio_add_folio(),
-> but doesn't check for errors.
+On Thu, 11 May 2023 03:13:33 +0200, Niklas Cassel wrote:
+
+> This series adds support for Command Duration Limits.
+> The series is based on linux tag: v6.4-rc1
+> The series can also be found in git:
+> https://github.com/floatious/linux/commits/cdl-v7
 > 
-> As adding a folio to a newly created bio can't fail, use the newly
-> introduced bio_add_folio_nofail() function.
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
->  fs/iomap/buffered-io.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> =================
+> CDL in ATA / SCSI
+> =================
+> Command Duration Limits is defined in:
+> T13 ATA Command Set - 5 (ACS-5) and
+> T10 SCSI Primary Commands - 6 (SPC-6) respectively
+> (a simpler version of CDL is defined in T10 SPC-5).
 > 
-> diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> index 063133ec77f4..0edab9deae2a 100644
-> --- a/fs/iomap/buffered-io.c
-> +++ b/fs/iomap/buffered-io.c
-> @@ -312,7 +312,7 @@ static loff_t iomap_readpage_iter(const struct iomap_iter *iter,
->  			ctx->bio->bi_opf |= REQ_RAHEAD;
->  		ctx->bio->bi_iter.bi_sector = sector;
->  		ctx->bio->bi_end_io = iomap_read_end_io;
-> -		bio_add_folio(ctx->bio, folio, plen, poff);
-> +		bio_add_folio_nofail(ctx->bio, folio, plen, poff);
->  	}
->  
->  done:
-> @@ -539,7 +539,7 @@ static int iomap_read_folio_sync(loff_t block_start, struct folio *folio,
->  
->  	bio_init(&bio, iomap->bdev, &bvec, 1, REQ_OP_READ);
->  	bio.bi_iter.bi_sector = iomap_sector(iomap, block_start);
-> -	bio_add_folio(&bio, folio, plen, poff);
-> +	bio_add_folio_nofail(&bio, folio, plen, poff);
->  	return submit_bio_wait(&bio);
->  }
->  
-> @@ -1582,7 +1582,7 @@ iomap_add_to_ioend(struct inode *inode, loff_t pos, struct folio *folio,
->  
->  	if (!bio_add_folio(wpc->ioend->io_bio, folio, len, poff)) {
->  		wpc->ioend->io_bio = iomap_chain_bio(wpc->ioend->io_bio);
-> -		bio_add_folio(wpc->ioend->io_bio, folio, len, poff);
-> +		bio_add_folio_nofail(wpc->ioend->io_bio, folio, len, poff);
->  	}
+> [...]
 
-We lose adjacent page merging with this change.
+Applied to 6.5/scsi-queue, thanks!
 
-We've had performance regressions in the past that have been
-attributed to either the page allocator not handing out sequential
-adjacent pages for sequential writes and/or bios not merging
-adjacent pages. Some hardware is much more performant when it only
-has to do a single large DMA instead of (potentially) hundreds of
-single page DMAs for the same amount of data...
+[01/19] ioprio: cleanup interface definition
+        https://git.kernel.org/mkp/scsi/c/eca2040972b4
+[02/19] block: introduce ioprio hints
+        https://git.kernel.org/mkp/scsi/c/6c913257226a
+[03/19] block: introduce BLK_STS_DURATION_LIMIT
+        https://git.kernel.org/mkp/scsi/c/dffc480d2df1
+[04/19] scsi: core: allow libata to complete successful commands via EH
+        https://git.kernel.org/mkp/scsi/c/3d848ca1ebc8
+[05/19] scsi: rename and move get_scsi_ml_byte()
+        https://git.kernel.org/mkp/scsi/c/734326937b65
+[06/19] scsi: support retrieving sub-pages of mode pages
+        https://git.kernel.org/mkp/scsi/c/a6cdc35fab0d
+[07/19] scsi: support service action in scsi_report_opcode()
+        https://git.kernel.org/mkp/scsi/c/152e52fb6ff1
+[08/19] scsi: detect support for command duration limits
+        https://git.kernel.org/mkp/scsi/c/624885209f31
+[09/19] scsi: allow enabling and disabling command duration limits
+        https://git.kernel.org/mkp/scsi/c/1b22cfb14142
+[10/19] scsi: sd: set read/write commands CDL index
+        https://git.kernel.org/mkp/scsi/c/e59e80cfef60
+[11/19] scsi: sd: handle read/write CDL timeout failures
+        https://git.kernel.org/mkp/scsi/c/390e2d1a5874
+[12/19] ata: libata-scsi: remove unnecessary !cmd checks
+        https://git.kernel.org/mkp/scsi/c/91a8967ca7f4
+[13/19] ata: libata: change ata_eh_request_sense() to not set CHECK_CONDITION
+        https://git.kernel.org/mkp/scsi/c/24aeebbf8ea9
+[14/19] ata: libata: detect support for command duration limits
+        https://git.kernel.org/mkp/scsi/c/62e4a60e0cdb
+[15/19] ata: libata-scsi: handle CDL bits in ata_scsiop_maint_in()
+        https://git.kernel.org/mkp/scsi/c/0de558015286
+[16/19] ata: libata-scsi: add support for CDL pages mode sense
+        https://git.kernel.org/mkp/scsi/c/673b2fe6ff1d
+[17/19] ata: libata: add ATA feature control sub-page translation
+        https://git.kernel.org/mkp/scsi/c/df60f9c64576
+[18/19] ata: libata: set read/write commands CDL index
+        https://git.kernel.org/mkp/scsi/c/eafe804bda7b
+[19/19] ata: libata: handle completion of CDL commands using policy 0xD
+        https://git.kernel.org/mkp/scsi/c/18bd7718b5c4
 
-What performance regression testing has been done on this change?
-
--Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Martin K. Petersen	Oracle Linux Engineering
