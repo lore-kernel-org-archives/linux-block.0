@@ -2,97 +2,156 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 218DBC7EE2A
-	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 09:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4231C7EE31
+	for <linux-block@archiver.kernel.org>; Thu,  1 Jun 2023 10:11:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231599AbjFAJ6v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Jun 2023 05:58:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40576 "EHLO
+        id S233336AbjFAKLd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Jun 2023 06:11:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232548AbjFAJ6i (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 05:58:38 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C88FC;
-        Thu,  1 Jun 2023 02:58:35 -0700 (PDT)
+        with ESMTP id S232444AbjFAKKl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Jun 2023 06:10:41 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA75D10D2;
+        Thu,  1 Jun 2023 03:10:03 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 50ECD2195F;
-        Thu,  1 Jun 2023 09:58:34 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 431761F86C;
+        Thu,  1 Jun 2023 10:10:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1685613514; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1685614202; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oDsyFBeXQbC/1D222Hf6R8KVGa7uZdAOGxoAw0743Nc=;
-        b=1qJz0f0jfps3GDUrMZXnpklVnuUt1kk9y32Imzhc93nObTo5JrDGyENX+0eUuJJvJtlNy6
-        6is+zhz3I7pZYPt/0gGYxck7diLCMW8OkoGqHE9mPRTZOZ8sLKM4N+DqprE77A0o2/dpux
-        NZoKGBrhWc0yEmmtgkqFy6r1h1Vbv6Y=
+        bh=abruGtVP9ScBJlQSE7zQj+GmYvnPwSTU2l53mgFmTic=;
+        b=Zx42HasM4xUfIKAaR1DIxrUHCDlW++ScBSLvBmVU7mgPyM2tfeAHZ9IqjU/o7qHowTYmUT
+        j/ATwbtIxL0pvc5qcdjUBHxGh4x6QaOkAIC0I3cjFZgnBfxGX0E5YKLvzLS+o1n9I5V7cI
+        lw+0C3I0imyQfaWsT5L5ehhp0TJ87PQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1685613514;
+        s=susede2_ed25519; t=1685614202;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=oDsyFBeXQbC/1D222Hf6R8KVGa7uZdAOGxoAw0743Nc=;
-        b=FawsNXR1x8fq6cFZ0sd9ja08hccc5PB/xO4OtRBX2nmVJCjFS6DeLj+Vvx933NircztxPP
-        YRNxEE/v/ZDNYvBg==
+        bh=abruGtVP9ScBJlQSE7zQj+GmYvnPwSTU2l53mgFmTic=;
+        b=nYy+Xvq2gyytdIjl0KzaQGicobj+XiYliqCUlH53r9TtVRlhqhLacFR0384vPY6X7qIT1X
+        lfFwVbWHLXu2btDA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4121E139B7;
-        Thu,  1 Jun 2023 09:58:34 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 31762139B7;
+        Thu,  1 Jun 2023 10:10:02 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id v4DLD8preGT0NgAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 01 Jun 2023 09:58:34 +0000
+        id 0csDDHpueGQcPQAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 01 Jun 2023 10:10:02 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id CA6D2A0754; Thu,  1 Jun 2023 11:58:33 +0200 (CEST)
-Date:   Thu, 1 Jun 2023 11:58:33 +0200
+        id B5AB3A0754; Thu,  1 Jun 2023 12:10:01 +0200 (CEST)
+Date:   Thu, 1 Jun 2023 12:10:01 +0200
 From:   Jan Kara <jack@suse.cz>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
         Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 02/13] block: refactor bd_may_claim
-Message-ID: <20230601095833.xd65rrzfkhkxuf6s@quack3>
-References: <20230518042323.663189-1-hch@lst.de>
- <20230518042323.663189-3-hch@lst.de>
- <20230530114148.zobtxdurit24pqev@quack3>
- <20230601081105.GA31903@lst.de>
+        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 14/16] ext4: split ext4_shutdown
+Message-ID: <20230601101001.najppil33tuntlaw@quack3>
+References: <20230601094459.1350643-1-hch@lst.de>
+ <20230601094459.1350643-15-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230601081105.GA31903@lst.de>
+In-Reply-To: <20230601094459.1350643-15-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 01-06-23 10:11:05, Christoph Hellwig wrote:
-> On Tue, May 30, 2023 at 01:41:48PM +0200, Jan Kara wrote:
-> > > +	if (bdev->bd_holder) {
-> > > +		/*
-> > > +		 * The same holder can always re-claim.
-> > > +		 */
-> > > +		if (bdev->bd_holder == holder)
-> > > +			return true;
-> > > +		return false;
-> > 
-> > With this simple condition I'd just do:
-> > 		/* The same holder can always re-claim. */
-> > 		return bdev->bd_holder == holder;
+On Thu 01-06-23 11:44:57, Christoph Hellwig wrote:
+> Split ext4_shutdown into a low-level helper that will be reused for
+> implementing the shutdown super operation and a wrapper for the ioctl
+> handling.
 > 
-> As of this patch this makes sense, and I did in fact did it that
-> way first.  But once we start checking the holder ops we need
-> the eplcicit conditional, so I decided to start out with this more
-> verbose option to avoid churn later.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Ah, OK.
+Looks good. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
 
+> ---
+>  fs/ext4/ext4.h  |  1 +
+>  fs/ext4/ioctl.c | 24 +++++++++++++++---------
+>  2 files changed, 16 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+> index 6948d673bba2e8..2d60bbe8d171d9 100644
+> --- a/fs/ext4/ext4.h
+> +++ b/fs/ext4/ext4.h
+> @@ -2965,6 +2965,7 @@ int ext4_fileattr_set(struct mnt_idmap *idmap,
+>  int ext4_fileattr_get(struct dentry *dentry, struct fileattr *fa);
+>  extern void ext4_reset_inode_seed(struct inode *inode);
+>  int ext4_update_overhead(struct super_block *sb, bool force);
+> +int ext4_force_shutdown(struct super_block *sb, u32 flags);
+>  
+>  /* migrate.c */
+>  extern int ext4_ext_migrate(struct inode *);
+> diff --git a/fs/ext4/ioctl.c b/fs/ext4/ioctl.c
+> index f9a43015206323..961284cc9b65cc 100644
+> --- a/fs/ext4/ioctl.c
+> +++ b/fs/ext4/ioctl.c
+> @@ -793,16 +793,9 @@ static int ext4_ioctl_setproject(struct inode *inode, __u32 projid)
+>  }
+>  #endif
+>  
+> -static int ext4_shutdown(struct super_block *sb, unsigned long arg)
+> +int ext4_force_shutdown(struct super_block *sb, u32 flags)
+>  {
+>  	struct ext4_sb_info *sbi = EXT4_SB(sb);
+> -	__u32 flags;
+> -
+> -	if (!capable(CAP_SYS_ADMIN))
+> -		return -EPERM;
+> -
+> -	if (get_user(flags, (__u32 __user *)arg))
+> -		return -EFAULT;
+>  
+>  	if (flags > EXT4_GOING_FLAGS_NOLOGFLUSH)
+>  		return -EINVAL;
+> @@ -838,6 +831,19 @@ static int ext4_shutdown(struct super_block *sb, unsigned long arg)
+>  	return 0;
+>  }
+>  
+> +static int ext4_ioctl_shutdown(struct super_block *sb, unsigned long arg)
+> +{
+> +	u32 flags;
+> +
+> +	if (!capable(CAP_SYS_ADMIN))
+> +		return -EPERM;
+> +
+> +	if (get_user(flags, (__u32 __user *)arg))
+> +		return -EFAULT;
+> +
+> +	return ext4_force_shutdown(sb, flags);
+> +}
+> +
+>  struct getfsmap_info {
+>  	struct super_block	*gi_sb;
+>  	struct fsmap_head __user *gi_data;
+> @@ -1566,7 +1572,7 @@ static long __ext4_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+>  		return ext4_ioctl_get_es_cache(filp, arg);
+>  
+>  	case EXT4_IOC_SHUTDOWN:
+> -		return ext4_shutdown(sb, arg);
+> +		return ext4_ioctl_shutdown(sb, arg);
+>  
+>  	case FS_IOC_ENABLE_VERITY:
+>  		if (!ext4_has_feature_verity(sb))
+> -- 
+> 2.39.2
+> 
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
