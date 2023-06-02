@@ -2,144 +2,217 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18722C7EE2A
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jun 2023 18:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BF4C7EE29
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jun 2023 21:53:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236969AbjFBSon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jun 2023 14:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50642 "EHLO
+        id S236643AbjFBVxU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jun 2023 17:53:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235496AbjFBSom (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2023 14:44:42 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5F21B1
-        for <linux-block@vger.kernel.org>; Fri,  2 Jun 2023 11:44:39 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-96f7bf29550so353759466b.3
-        for <linux-block@vger.kernel.org>; Fri, 02 Jun 2023 11:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1685731478; x=1688323478;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VS2PPB5+6vCBsSxepSbGKCuyaQT9nPsi9usTi72Jayc=;
-        b=Dh5hdhHUskk0dJUgRg/dHNjcoQaoFcCqqW49L8C4cxOuUHd7A5klJumDFALbc77kfN
-         TOe0SZh9Dxxkx8+yCDim6XmVdsfaY+BAN/Pm0iZaRA5iIdCJ7AcEHtdbfhfKBnMbqXKg
-         IrjS0jeZ4gkJK0nbaCc7bGKUFbSb6IaEGqIDM=
+        with ESMTP id S236623AbjFBVxN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2023 17:53:13 -0400
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDAEB10E3
+        for <linux-block@vger.kernel.org>; Fri,  2 Jun 2023 14:52:03 -0700 (PDT)
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-75ca95cd9b1so271368885a.0
+        for <linux-block@vger.kernel.org>; Fri, 02 Jun 2023 14:52:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685731478; x=1688323478;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VS2PPB5+6vCBsSxepSbGKCuyaQT9nPsi9usTi72Jayc=;
-        b=dYSLqjsk+Mk89AkcXiiVoet5Sgdx3rs98Dk6YRz59y5ex15qnvsyKwvCdJSWjRIEh4
-         GP1aEp8lX4NslQ67rcTcnxIREefUnnPPVN/PVSUdaYrggaqj/RtjoIP9W0Zm8KxeUtAi
-         xblc0LtrRpUBF1j1DCFLOD0THqFX/z/yhQoFor6qW57xqoED+HfKJayJz4CEH1Ycdw0f
-         8wU7CNUAScZucxZNYaBgcBJGnrF0SAcAgXPjrUuTtr4eFV0fD3DPYAV97dGUXIzxXZo+
-         g5C2l7MeROlKWgZkTFftXBWFIrgxTK3lKrjNHlPkJ8pISgCg1desZnIS0272DPBj7BRV
-         Q5SQ==
-X-Gm-Message-State: AC+VfDyrCrkrgaYYp/qae13U5IZz577Dh8CHZbBs4yMb4tUBXk8GD6Ig
-        ZG3yCvwmC5sadhFRsFWM4OT5bFDyo7pT/s2qMuKoXg==
-X-Google-Smtp-Source: ACHHUZ7H8ymmvsuV8pIQreDZRzT1x8Q5ySH7cuWVFpH38pUlAJ9sGk9vksaBVqGaNtyGZXGewzGH8jOcPNcYXgPHGa4=
-X-Received: by 2002:a17:906:eec8:b0:970:c9f:2db6 with SMTP id
- wu8-20020a170906eec800b009700c9f2db6mr11444588ejb.63.1685731478182; Fri, 02
- Jun 2023 11:44:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <ZGzIJlCE2pcqQRFJ@bfoster> <ZGzbGg35SqMrWfpr@redhat.com>
- <ZG1dAtHmbQ53aOhA@dread.disaster.area> <ZG+KoxDMeyogq4J0@bfoster>
- <ZHB954zGG1ag0E/t@dread.disaster.area> <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
- <ZHFEfngPyUOqlthr@dread.disaster.area> <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
- <ZHYB/6l5Wi+xwkbQ@redhat.com> <CAJ0trDaUOevfiEpXasOESrLHTCcr=oz28ywJU+s+YOiuh7iWow@mail.gmail.com>
- <ZHYWAGmKhwwmTjW/@redhat.com>
-In-Reply-To: <ZHYWAGmKhwwmTjW/@redhat.com>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Fri, 2 Jun 2023 11:44:27 -0700
-Message-ID: <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
-Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Joe Thornber <thornber@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, dm-devel@redhat.com,
+        d=1e100.net; s=20221208; t=1685742652; x=1688334652;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UTRky113EniM0nT/xznU7UrijnGVH8CEk6F86K/tnEo=;
+        b=hW+9e595C4NDNo3OGS03LoR7HP6xc3GDqOrAFXu6dZLZPs5fcGjHazkCt7IzrIerog
+         4FwGftlHdO+MNplAoIrYa3IVu8/yfVnQUvJ8NfdpgY/o5YnGfjUFehI6L9YOnAMVRd1o
+         D8L1zc/114eFIDUsi99jRhsJ562YNF3RV3hag3Y7nLW/9XMFLesNtAgHoR/gi5+za5pD
+         cuuKqMd+feQef1hvwZPPMRPC7On9QmMJCDxtPz7FHpt0yCzktHibiTDacQX3AAxUNUVa
+         TgV82Kwkg61eFnUmNYUNfkjTZKKZGqg2D02RgBMJtQfQu37Fvh9GEgWlJjz/C9jRBw7N
+         1A0g==
+X-Gm-Message-State: AC+VfDwSWE/Oqg28vQY9XG+o4JXTOU/fWc7gAuiSi1jqf14t1vBejxUV
+        G1RbsE5fqTIgoKyXP0IquWKEQA9oBdZJBtvUwA==
+X-Google-Smtp-Source: ACHHUZ7EYtrupkurG9n+8SFwQbMMRsCnns2grd76F2kWxvjetuxx5d1DqIPs4GPppwGqt5TFKDjmsg==
+X-Received: by 2002:ac8:5e11:0:b0:3f6:b017:6289 with SMTP id h17-20020ac85e11000000b003f6b0176289mr16977166qtx.10.1685742651495;
+        Fri, 02 Jun 2023 14:50:51 -0700 (PDT)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id i2-20020ac813c2000000b003f6f83de87esm1236527qtj.92.2023.06.02.14.50.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Jun 2023 14:50:50 -0700 (PDT)
+Date:   Fri, 2 Jun 2023 17:50:49 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Joe Thornber <thornber@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
         "Darrick J. Wong" <djwong@kernel.org>,
         Brian Foster <bfoster@redhat.com>,
         Bart Van Assche <bvanassche@google.com>,
         Dave Chinner <david@fromorbit.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Joe Thornber <ejt@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>,
+        linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, Joe Thornber <ejt@redhat.com>,
         Alasdair Kergon <agk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZHpkOTMDdoxLD/j1@redhat.com>
+References: <ZG1dAtHmbQ53aOhA@dread.disaster.area>
+ <ZG+KoxDMeyogq4J0@bfoster>
+ <ZHB954zGG1ag0E/t@dread.disaster.area>
+ <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
+ <ZHFEfngPyUOqlthr@dread.disaster.area>
+ <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
+ <ZHYB/6l5Wi+xwkbQ@redhat.com>
+ <CAJ0trDaUOevfiEpXasOESrLHTCcr=oz28ywJU+s+YOiuh7iWow@mail.gmail.com>
+ <ZHYWAGmKhwwmTjW/@redhat.com>
+ <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 30, 2023 at 8:28=E2=80=AFAM Mike Snitzer <snitzer@kernel.org> w=
-rote:
->
-> On Tue, May 30 2023 at 10:55P -0400,
-> Joe Thornber <thornber@redhat.com> wrote:
->
-> > On Tue, May 30, 2023 at 3:02=E2=80=AFPM Mike Snitzer <snitzer@kernel.or=
-g> wrote:
+On Fri, Jun 02 2023 at  2:44P -0400,
+Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
+
+> On Tue, May 30, 2023 at 8:28 AM Mike Snitzer <snitzer@kernel.org> wrote:
 > >
-> > >
-> > > Also Joe, for you proposed dm-thinp design where you distinquish
-> > > between "provision" and "reserve": Would it make sense for REQ_META
-> > > (e.g. all XFS metadata) with REQ_PROVISION to be treated as an
-> > > LBA-specific hard request?  Whereas REQ_PROVISION on its own provides
-> > > more freedom to just reserve the length of blocks? (e.g. for XFS
-> > > delalloc where LBA range is unknown, but dm-thinp can be asked to
-> > > reserve space to accomodate it).
-> > >
+> > On Tue, May 30 2023 at 10:55P -0400,
+> > Joe Thornber <thornber@redhat.com> wrote:
 > >
-> > My proposal only involves 'reserve'.  Provisioning will be done as part=
- of
-> > the usual io path.
->
-> OK, I think we'd do well to pin down the top-level block interfaces in
-> question. Because this patchset's block interface patch (2/5) header
-> says:
->
-> "This patch also adds the capability to call fallocate() in mode 0
-> on block devices, which will send REQ_OP_PROVISION to the block
-> device for the specified range,"
->
-> So it wires up blkdev_fallocate() to call blkdev_issue_provision(). A
-> user of XFS could then use fallocate() for user data -- which would
-> cause thinp's reserve to _not_ be used for critical metadata.
->
-> The only way to distinquish the caller (between on-behalf of user data
-> vs XFS metadata) would be REQ_META?
->
-> So should dm-thinp have a REQ_META-based distinction? Or just treat
-> all REQ_OP_PROVISION the same?
->
-I'm in favor of a REQ_META-based distinction. Does that imply that
-REQ_META also needs to be passed through the block/filesystem stack
-(eg. REQ_OP_PROVION + REQ_META on a loop device translates to a
-fallocate(<insert meta flag name>) to the underlying file)?
+> > > On Tue, May 30, 2023 at 3:02 PM Mike Snitzer <snitzer@kernel.org> wrote:
+> > >
+> > > >
+> > > > Also Joe, for you proposed dm-thinp design where you distinquish
+> > > > between "provision" and "reserve": Would it make sense for REQ_META
+> > > > (e.g. all XFS metadata) with REQ_PROVISION to be treated as an
+> > > > LBA-specific hard request?  Whereas REQ_PROVISION on its own provides
+> > > > more freedom to just reserve the length of blocks? (e.g. for XFS
+> > > > delalloc where LBA range is unknown, but dm-thinp can be asked to
+> > > > reserve space to accomodate it).
+> > > >
+> > >
+> > > My proposal only involves 'reserve'.  Provisioning will be done as part of
+> > > the usual io path.
+> >
+> > OK, I think we'd do well to pin down the top-level block interfaces in
+> > question. Because this patchset's block interface patch (2/5) header
+> > says:
+> >
+> > "This patch also adds the capability to call fallocate() in mode 0
+> > on block devices, which will send REQ_OP_PROVISION to the block
+> > device for the specified range,"
+> >
+> > So it wires up blkdev_fallocate() to call blkdev_issue_provision(). A
+> > user of XFS could then use fallocate() for user data -- which would
+> > cause thinp's reserve to _not_ be used for critical metadata.
+> >
+> > The only way to distinquish the caller (between on-behalf of user data
+> > vs XFS metadata) would be REQ_META?
+> >
+> > So should dm-thinp have a REQ_META-based distinction? Or just treat
+> > all REQ_OP_PROVISION the same?
+> >
+> I'm in favor of a REQ_META-based distinction. Does that imply that
+> REQ_META also needs to be passed through the block/filesystem stack
+> (eg. REQ_OP_PROVION + REQ_META on a loop device translates to a
+> fallocate(<insert meta flag name>) to the underlying file)?
 
-<bikeshed>
-I think that might have applications beyond just provisioning:
-currently, for stacked filesystems (eg filesystems residing in a file
-on top of another filesystem), even if the upper filesystem issues
-read/write requests with REQ_META | REQ_PRIO, these flags are lost in
-translation at the loop device layer.  A flag like the above would
-allow the prioritization of stacked filesystem metadata requests.
-</bikeshed>
+Unclear, I was thinking your REQ_UNSHARE (tied to fallocate) might be
+a means to translate REQ_OP_PROVISION + REQ_META to fallocate and have
+it perform the LBA-specific provisioning of Joe's design (referenced
+below).
 
-Bringing the discussion back to this series for a bit, I'm still
-waiting on feedback from the Block maintainers before sending out v8
-(which at the moment, only have a
-s/EXPORT_SYMBOL/EXPORT_SYMBOL_GPL/g). I believe from the conversation
-most of the above is follow up work, but please let me know if you'd
-prefer I add some of this to the current series!
+> <bikeshed>
+> I think that might have applications beyond just provisioning:
+> currently, for stacked filesystems (eg filesystems residing in a file
+> on top of another filesystem), even if the upper filesystem issues
+> read/write requests with REQ_META | REQ_PRIO, these flags are lost in
+> translation at the loop device layer.  A flag like the above would
+> allow the prioritization of stacked filesystem metadata requests.
+> </bikeshed>
 
-Best
-Sarthak
+Yes, it could prove useful.
 
-> Mike
+> Bringing the discussion back to this series for a bit, I'm still
+> waiting on feedback from the Block maintainers before sending out v8
+> (which at the moment, only have a
+> s/EXPORT_SYMBOL/EXPORT_SYMBOL_GPL/g). I believe from the conversation
+> most of the above is follow up work, but please let me know if you'd
+> prefer I add some of this to the current series!
+
+I need a bit more time to work through various aspects of the broader
+requirements and the resulting interfaces that fall out.
+
+Joe's design is pretty compelling because it will properly handle
+snapshot thin devices:
+https://listman.redhat.com/archives/dm-devel/2023-May/054351.html
+
+Here is my latest status:
+- Focused on prototype for thinp block reservation (XFS metadata, XFS
+  delalloc, fallocate)
+- Decided the "dynamic" (non-LBA specific) reservation stuff (old
+  prototype code) is best left independent from Joe's design.  SO 2
+  classes of thinp reservation.
+  - Forward-ported the old prototype code that Brian Foster, Joe
+    Thornber and I worked on years ago.  It needs more careful review
+    (and very likely will need fixes from Brian and myself).  The XFS
+    changes are pretty intrusive and likely up for serious debate (as
+    to whether we even care to handle reservations for user data).
+- REQ_OP_PROVISION bio’s with REQ_META will use Joe’s design,
+  otherwise data (XFS data and fallocate) will use “dynamic”
+  reservation.
+  - "dynamic" name is due to the reservation being generic (non-LBA:
+    not in terms of an LBA range). Also, in-core only; so the associated
+    “dynamic_reserve_count” accounting is reset to 0 every activation. 
+  - Fallocate may require stronger guarantees in the end (in which
+    case we’ll add a REQ_UNSHARE flag that is selectable from the
+    fallocate interface) 
+- Will try to share common code, but just sorting out highlevel
+  interface(s) still...
+
+I'll try to get a git tree together early next week.  It will be the
+forward ported "dynamic" prototype code and your latest v7 code with
+some additional work to branch accordingly for each class of thinp
+reservation.  And I'll use your v7 code as a crude stub for Joe's
+approach (branch taken if REQ_META set).
+
+Lastly, here are some additional TODOs I've noted in code earlier in
+my review process:
+
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index 0d9301802609..43a6702f9efe 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -1964,6 +1964,26 @@ static void process_provision_bio(struct thin_c *tc, struct bio *bio)
+ 	struct dm_cell_key key;
+ 	struct dm_thin_lookup_result lookup_result;
+ 
++	/*
++	 * FIXME:
++	 * Joe's elegant reservation design is detailed here:
++	 * https://listman.redhat.com/archives/dm-devel/2023-May/054351.html
++	 * - this design, with associated thinp metadata updates,
++	 *   is how provision bios should be handled.
++	 *
++	 * FIXME: add thin-pool flag "ignore_provision"
++	 *
++	 * FIXME: needs provision_passdown support
++	 *        (needs thinp flag "no_provision_passdown")
++	 */
++
++	/*
++	 * FIXME: require REQ_META (or REQ_UNSHARE?) to allow deeper
++	 *        provisioning code that follows? (so that thinp
++	 *        block _is_ fully provisioned upon return)
++	 *        (or just remove all below code entirely?)
++	 */
++
+ 	/*
+ 	 * If cell is already occupied, then the block is already
+ 	 * being provisioned so we have nothing further to do here.
+
