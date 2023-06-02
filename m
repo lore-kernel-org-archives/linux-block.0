@@ -2,183 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 860C9C77B7A
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jun 2023 15:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A172CC7EE29
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jun 2023 15:41:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236466AbjFBPJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jun 2023 11:09:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57954 "EHLO
+        id S235813AbjFBPlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jun 2023 11:41:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236468AbjFBPJS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2023 11:09:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 443961BB
-        for <linux-block@vger.kernel.org>; Fri,  2 Jun 2023 08:08:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685718507;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jyBtAHnxIDOUxFx8QcCqc48iyvS91zdxptS6bgS5LhE=;
-        b=IRaCQqKzp3BsP8MtVhEkDqvXEAyWelhPTtq4FrlCcm2pwMbcq9F0ul2E6Na2owER2tnKV0
-        SsSNEZraE0aO9IJCrTV9wHQsmMB1Wu0xS+Y3nj2onOTPjDXRORHhNnre7IkFntVGAvOuHQ
-        pBfUfqKTSbOuIrTp7lDbGVYviLVwRAo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-652-HJKW5r7wNUG_h4BsM00Cfg-1; Fri, 02 Jun 2023 11:08:26 -0400
-X-MC-Unique: HJKW5r7wNUG_h4BsM00Cfg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42DA4811E8F;
-        Fri,  2 Jun 2023 15:08:25 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 30388492B00;
-        Fri,  2 Jun 2023 15:08:22 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     netdev@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH net-next v3 05/11] splice, net: Fix SPLICE_F_MORE signalling in splice_direct_to_actor()
-Date:   Fri,  2 Jun 2023 16:07:46 +0100
-Message-ID: <20230602150752.1306532-6-dhowells@redhat.com>
-In-Reply-To: <20230602150752.1306532-1-dhowells@redhat.com>
-References: <20230602150752.1306532-1-dhowells@redhat.com>
+        with ESMTP id S235166AbjFBPlf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2023 11:41:35 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8454BB3
+        for <linux-block@vger.kernel.org>; Fri,  2 Jun 2023 08:41:34 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7E35F68AA6; Fri,  2 Jun 2023 17:41:30 +0200 (CEST)
+Date:   Fri, 2 Jun 2023 17:41:30 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/3] block: fail writes to read-only devices
+Message-ID: <20230602154130.GA26710@lst.de>
+References: <20230601072829.1258286-1-hch@lst.de> <20230601072829.1258286-4-hch@lst.de> <CAHk-=wj3TrM-NWUcFUivefNwzbfGdfcgDGfGP12m6WBfH9JpWg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wj3TrM-NWUcFUivefNwzbfGdfcgDGfGP12m6WBfH9JpWg@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-splice_direct_to_actor() doesn't manage SPLICE_F_MORE correctly[1] - and,
-as a result, it incorrectly signals/fails to signal MSG_MORE when splicing
-to a socket.  The problem I'm seeing happens when a short splice occurs
-because we got a short read due to hitting the EOF on a file: as the length
-read (read_len) is less than the remaining size to be spliced (len),
-SPLICE_F_MORE (and thus MSG_MORE) is set.
+[quoting your reply out of order, because I think it makes sense that
+ way]
 
-The issue is that, for the moment, we have no way to know *why* the short
-read occurred and so can't make a good decision on whether we *should* keep
-MSG_MORE set.  Further, the argument can be made that it should be left to
-userspace to decide how to handle it - userspace could perform some sort of
-cancellation for example.
+On Thu, Jun 01, 2023 at 09:02:25PM -0400, Linus Torvalds wrote:
+> So honestly, that whole test for
+> 
+> +       if (op_is_write(bio_op(bio)) && bio_sectors(bio) &&
+> +           bdev_read_only(bdev)) {
+> 
+> may look "obviously correct", but it's also equally valid to view it
+> as "obviously garbage", simply because the test is being done at the
+> wrong point.
+> 
+> The same way you can write to a file that was opened for writing, but
+> has then become read-only afterwards, writing to a device with a bdev
+> that was writable when you *started* writing is not at all necessarily
+> wrong.
 
-MSG_SENDPAGE_NOTLAST was added to work around this, but that is also set
-incorrectly under some circumstances - for example if a short read fills a
-single pipe_buffer, but the next read would return more (seqfile can do
-this).
+files, or more specifically file descriptors really are the wrong
+analogy here.  A file descriptor allows you to keep writing to
+a file that you were allowed to write to at open time.  And that's
+fine (at least most of the time, people keep wanting a revoke and
+keep implementing broken special cases of it, but I disgress).
 
-This was observed with the multi_chunk_sendfile tests in the tls kselftest
-program.  Some of those tests would hang and time out when the last chunk
-of file was less than the sendfile request size:
+The struct block_device is not such a handle, it's the underlying
+object.  And the equivalent here is that we allow writes to inodes
+that don't even implement a write method, or have the immutable
+bit set.
 
-	build/kselftest/net/tls -r tls.12_aes_gcm.multi_chunk_sendfile
+> The logic wrt "bdev_read_only()" is not necessarily a "right now it's
+> read-only", but more of a thing that should be checked purely when the
+> device is opened. Which is pretty much exactly what we do.
 
-This has been observed before[2] and worked around in AF_TLS[3].
+Except the whole make a thing readonly just for fun is the corner case.
+DM does it, and we have a sysfs file to allow it.  But the usual
+case is that a block device has been read-only all the time, or has
+been force to be read-only by the actual storage device, which
+doesn't know anything about the file descriptor model, and will
+not be happy.
 
-Fix this by making splice_direct_to_actor() always signal SPLICE_F_MORE if
-we haven't yet hit the requested operation size.  SPLICE_F_MORE remains
-signalled if the user passed it in to splice() but otherwise gets cleared
-when we've read sufficient data to fulfill the request.  The cleanup of a
-short splice to userspace is left to userspace.
+So maybe a lazy read-only after the last writer goes away would be
+nice (not that we actully track writers right now, but that whole
+area is comletely fucked up and I'm looking into fixing it at the
+moment).
 
-[!] Note that this changes user-visible behaviour.  It will cause the
-    multi_chunk_sendfile tests in the TLS kselftest to fail.  This failure
-    in the testsuite will be addressed in a subsequent patch by making
-    userspace do a zero-length send().
-
-It appears that SPLICE_F_MORE is only used by splice-to-socket.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jan Kara <jack@suse.cz>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: Boris Pismenny <borisp@nvidia.com>
-cc: John Fastabend <john.fastabend@gmail.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-block@vger.kernel.org
-cc: linux-mm@kvack.org
-cc: netdev@vger.kernel.org
-
-Link: https://lore.kernel.org/r/499791.1685485603@warthog.procyon.org.uk/ [1]
-Link: https://lore.kernel.org/r/1591392508-14592-1-git-send-email-pooja.trivedi@stackpath.com/ [2]
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d452d48b9f8b1a7f8152d33ef52cfd7fe1735b0a [3]
----
- fs/splice.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/fs/splice.c b/fs/splice.c
-index 9b1d43c0c562..c71bd8e03469 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -1052,13 +1052,17 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 	 */
- 	bytes = 0;
- 	len = sd->total_len;
-+
-+	/* Don't block on output, we have to drain the direct pipe. */
- 	flags = sd->flags;
-+	sd->flags &= ~SPLICE_F_NONBLOCK;
- 
- 	/*
--	 * Don't block on output, we have to drain the direct pipe.
-+	 * We signal MORE until we've read sufficient data to fulfill the
-+	 * request and we keep signalling it if the caller set it.
- 	 */
--	sd->flags &= ~SPLICE_F_NONBLOCK;
- 	more = sd->flags & SPLICE_F_MORE;
-+	sd->flags |= SPLICE_F_MORE;
- 
- 	WARN_ON_ONCE(!pipe_empty(pipe->head, pipe->tail));
- 
-@@ -1074,14 +1078,12 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 		sd->total_len = read_len;
- 
- 		/*
--		 * If more data is pending, set SPLICE_F_MORE
--		 * If this is the last data and SPLICE_F_MORE was not set
--		 * initially, clears it.
-+		 * If we now have sufficient data to fulfill the request then
-+		 * we clear SPLICE_F_MORE if it was not set initially.
- 		 */
--		if (read_len < len)
--			sd->flags |= SPLICE_F_MORE;
--		else if (!more)
-+		if (read_len >= len && !more)
- 			sd->flags &= ~SPLICE_F_MORE;
-+
- 		/*
- 		 * NOTE: nonblocking mode only applies to the input. We
- 		 * must not do the output in nonblocking mode as then we
+And for extra fun blkdev_get_by_dev doesn't check for read-only
+because we've historically allowed to open writable file descriptors
+on read-only block devices for ioctls (in addition to the magic
+(flags & O_ACCMODE) == 3 mode just ioctl). 
 
