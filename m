@@ -2,122 +2,183 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2842CC7EE29
-	for <linux-block@archiver.kernel.org>; Fri,  2 Jun 2023 13:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 860C9C77B7A
+	for <linux-block@archiver.kernel.org>; Fri,  2 Jun 2023 15:09:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbjFBNYO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Jun 2023 09:24:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39364 "EHLO
+        id S236466AbjFBPJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Jun 2023 11:09:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjFBNYN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2023 09:24:13 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF83132
-        for <linux-block@vger.kernel.org>; Fri,  2 Jun 2023 06:24:10 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id ca18e2360f4ac-760dff4b701so10185539f.0
-        for <linux-block@vger.kernel.org>; Fri, 02 Jun 2023 06:24:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685712249; x=1688304249;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YCNMsz4Hf4KvL+9Ehh6e7vaBK4L/g/yzA7xvAPqA5vI=;
-        b=awCwmQFEqBB1M8NGPQc2WfXNS3HnsOF7AC8pgI8NJefGKIHPIsbPsoyP2qWN1QEjzj
-         9IaruUUvvZYCnOTxxIFNpuhPJL9e5YHqYXjYY8YzOVH4nyLafky7o3C7ZItreOMzwV3T
-         AirM70f9i35ZsZYgmX+ZAFk0JQv6/3racILRjLKtfCzopgdEA7YjO7NNdOcMsRrDiU3u
-         vul/ODIB4tJZes/a4g32wny0wc00Zb1BzJhup/9yuqk+r9UfzGkjQihG5KNVyaGelj3q
-         x0rZyzk8uxqICmgV6MhceMCubYahhCINGwjDd1ch3pl6o87RoSO6oota4u/Hbni4LiSL
-         ydkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685712249; x=1688304249;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YCNMsz4Hf4KvL+9Ehh6e7vaBK4L/g/yzA7xvAPqA5vI=;
-        b=XdGDJimuPLhGLrjNk0uqLAaePxu4xBfr546GDQaC500r+0Ygog04aNSah+sgjwDRk0
-         MzxDKb6UEtsFGAH2RHFBLOPpn6PbZqI0KTxXxRY6TZLes0nR1OUTBNc9scKxUjyEZjNH
-         zdoNmPTapwpBOV0CC1S/mpMTZFbF2Le7cO//pDQAdomcWNdYnJ91UV3tGAFSsqmbbenK
-         5bUVSjB1JeePUxzSJoYQfaGjHuY6uaVki2j6mLyPAuMUQ9HmyeTYrdiyXTs+ypkhwgNq
-         sOCbK6fmX12G0+jPcdZo6JPm5XepYfw1XokqbTfOp06mT3Dun1ZwmoApYwPzbbmQh0XO
-         sBew==
-X-Gm-Message-State: AC+VfDzOjlI0R+IrSYyZd7qvrpZEFAgdanmuW3hrngkMi3JK5sa83ksr
-        ccIrV9lVSUXAIUaVcTS6JAApIWlj8SoYGtnaRKM=
-X-Google-Smtp-Source: ACHHUZ717ZTNK/KVEc9v5rrQIt/bADDNRO/DiV+64pyH17sXQVowXcF2KoNDiTBh/KiBRO6OW0wQPw==
-X-Received: by 2002:a05:6602:2d8b:b0:774:9337:2d4c with SMTP id k11-20020a0566022d8b00b0077493372d4cmr10093471iow.1.1685712249363;
-        Fri, 02 Jun 2023 06:24:09 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id z24-20020a6be018000000b00774804141f1sm393516iog.36.2023.06.02.06.24.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Jun 2023 06:24:08 -0700 (PDT)
-Message-ID: <7b49cd00-55fa-5806-39c0-ac0c26051e13@kernel.dk>
-Date:   Fri, 2 Jun 2023 07:24:08 -0600
+        with ESMTP id S236468AbjFBPJS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Jun 2023 11:09:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 443961BB
+        for <linux-block@vger.kernel.org>; Fri,  2 Jun 2023 08:08:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685718507;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jyBtAHnxIDOUxFx8QcCqc48iyvS91zdxptS6bgS5LhE=;
+        b=IRaCQqKzp3BsP8MtVhEkDqvXEAyWelhPTtq4FrlCcm2pwMbcq9F0ul2E6Na2owER2tnKV0
+        SsSNEZraE0aO9IJCrTV9wHQsmMB1Wu0xS+Y3nj2onOTPjDXRORHhNnre7IkFntVGAvOuHQ
+        pBfUfqKTSbOuIrTp7lDbGVYviLVwRAo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-652-HJKW5r7wNUG_h4BsM00Cfg-1; Fri, 02 Jun 2023 11:08:26 -0400
+X-MC-Unique: HJKW5r7wNUG_h4BsM00Cfg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42DA4811E8F;
+        Fri,  2 Jun 2023 15:08:25 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 30388492B00;
+        Fri,  2 Jun 2023 15:08:22 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH net-next v3 05/11] splice, net: Fix SPLICE_F_MORE signalling in splice_direct_to_actor()
+Date:   Fri,  2 Jun 2023 16:07:46 +0100
+Message-ID: <20230602150752.1306532-6-dhowells@redhat.com>
+In-Reply-To: <20230602150752.1306532-1-dhowells@redhat.com>
+References: <20230602150752.1306532-1-dhowells@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.4-rc5
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+splice_direct_to_actor() doesn't manage SPLICE_F_MORE correctly[1] - and,
+as a result, it incorrectly signals/fails to signal MSG_MORE when splicing
+to a socket.  The problem I'm seeing happens when a short splice occurs
+because we got a short read due to hitting the EOF on a file: as the length
+read (read_len) is less than the remaining size to be spliced (len),
+SPLICE_F_MORE (and thus MSG_MORE) is set.
 
-Just an NVMe pull request with (mostly) KATO fixes, a regression fix for
-zoned device revalidation, and a fix for an md raid5 regression. Please
-pull!
+The issue is that, for the moment, we have no way to know *why* the short
+read occurred and so can't make a good decision on whether we *should* keep
+MSG_MORE set.  Further, the argument can be made that it should be left to
+userspace to decide how to handle it - userspace could perform some sort of
+cancellation for example.
 
+MSG_SENDPAGE_NOTLAST was added to work around this, but that is also set
+incorrectly under some circumstances - for example if a short read fills a
+single pipe_buffer, but the next read would return more (seqfile can do
+this).
 
-The following changes since commit 9491d01fbc550d123d72bf1cd7a0985508a9c469:
+This was observed with the multi_chunk_sendfile tests in the tls kselftest
+program.  Some of those tests would hang and time out when the last chunk
+of file was less than the sendfile request size:
 
-  Merge tag 'nvme-6.4-2023-05-26' of git://git.infradead.org/nvme into block-6.4 (2023-05-26 09:46:01 -0600)
+	build/kselftest/net/tls -r tls.12_aes_gcm.multi_chunk_sendfile
 
-are available in the Git repository at:
+This has been observed before[2] and worked around in AF_TLS[3].
 
-  git://git.kernel.dk/linux.git tags/block-6.4-2023-06-02
+Fix this by making splice_direct_to_actor() always signal SPLICE_F_MORE if
+we haven't yet hit the requested operation size.  SPLICE_F_MORE remains
+signalled if the user passed it in to splice() but otherwise gets cleared
+when we've read sufficient data to fulfill the request.  The cleanup of a
+short splice to userspace is left to userspace.
 
-for you to fetch changes up to 2e45a49531fef55f4abbd6738c052545f53f43d4:
+[!] Note that this changes user-visible behaviour.  It will cause the
+    multi_chunk_sendfile tests in the TLS kselftest to fail.  This failure
+    in the testsuite will be addressed in a subsequent patch by making
+    userspace do a zero-length send().
 
-  Merge tag 'nvme-6.4-2023-06-01' of git://git.infradead.org/nvme into block-6.4 (2023-06-01 11:12:46 -0600)
+It appears that SPLICE_F_MORE is only used by splice-to-socket.
 
-----------------------------------------------------------------
-block-6.4-2023-06-02
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jan Kara <jack@suse.cz>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: David Hildenbrand <david@redhat.com>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Chuck Lever <chuck.lever@oracle.com>
+cc: Boris Pismenny <borisp@nvidia.com>
+cc: John Fastabend <john.fastabend@gmail.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-block@vger.kernel.org
+cc: linux-mm@kvack.org
+cc: netdev@vger.kernel.org
 
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      nvme: fix the name of Zone Append for verbose logging
+Link: https://lore.kernel.org/r/499791.1685485603@warthog.procyon.org.uk/ [1]
+Link: https://lore.kernel.org/r/1591392508-14592-1-git-send-email-pooja.trivedi@stackpath.com/ [2]
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d452d48b9f8b1a7f8152d33ef52cfd7fe1735b0a [3]
+---
+ fs/splice.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-Damien Le Moal (1):
-      block: fix revalidate performance regression
-
-Jens Axboe (2):
-      Merge tag 'md-fixes-2023-05-24' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.4
-      Merge tag 'nvme-6.4-2023-06-01' of git://git.infradead.org/nvme into block-6.4
-
-Uday Shankar (3):
-      nvme: double KA polling frequency to avoid KATO with TBKAS on
-      nvme: check IO start time when deciding to defer KA
-      nvme: improve handling of long keep alives
-
-Yu Kuai (1):
-      md/raid5: fix miscalculation of 'end_sector' in raid5_read_one_chunk()
-
-min15.li (1):
-      nvme: fix miss command type check
-
- block/blk-settings.c           |  3 ++-
- drivers/md/raid5.c             |  2 +-
- drivers/nvme/host/constants.c  |  2 +-
- drivers/nvme/host/core.c       | 52 ++++++++++++++++++++++++++++++++++++++----
- drivers/nvme/host/ioctl.c      |  2 +-
- drivers/nvme/host/nvme.h       |  3 ++-
- drivers/nvme/target/passthru.c |  2 +-
- 7 files changed, 56 insertions(+), 10 deletions(-)
-
--- 
-Jens Axboe
+diff --git a/fs/splice.c b/fs/splice.c
+index 9b1d43c0c562..c71bd8e03469 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -1052,13 +1052,17 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 	 */
+ 	bytes = 0;
+ 	len = sd->total_len;
++
++	/* Don't block on output, we have to drain the direct pipe. */
+ 	flags = sd->flags;
++	sd->flags &= ~SPLICE_F_NONBLOCK;
+ 
+ 	/*
+-	 * Don't block on output, we have to drain the direct pipe.
++	 * We signal MORE until we've read sufficient data to fulfill the
++	 * request and we keep signalling it if the caller set it.
+ 	 */
+-	sd->flags &= ~SPLICE_F_NONBLOCK;
+ 	more = sd->flags & SPLICE_F_MORE;
++	sd->flags |= SPLICE_F_MORE;
+ 
+ 	WARN_ON_ONCE(!pipe_empty(pipe->head, pipe->tail));
+ 
+@@ -1074,14 +1078,12 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 		sd->total_len = read_len;
+ 
+ 		/*
+-		 * If more data is pending, set SPLICE_F_MORE
+-		 * If this is the last data and SPLICE_F_MORE was not set
+-		 * initially, clears it.
++		 * If we now have sufficient data to fulfill the request then
++		 * we clear SPLICE_F_MORE if it was not set initially.
+ 		 */
+-		if (read_len < len)
+-			sd->flags |= SPLICE_F_MORE;
+-		else if (!more)
++		if (read_len >= len && !more)
+ 			sd->flags &= ~SPLICE_F_MORE;
++
+ 		/*
+ 		 * NOTE: nonblocking mode only applies to the input. We
+ 		 * must not do the output in nonblocking mode as then we
 
