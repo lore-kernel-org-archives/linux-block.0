@@ -2,90 +2,88 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2646EC7EE23
-	for <linux-block@archiver.kernel.org>; Sun,  4 Jun 2023 14:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 460A4C7EE2D
+	for <linux-block@archiver.kernel.org>; Sun,  4 Jun 2023 23:39:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbjFDOfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Jun 2023 10:35:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56194 "EHLO
+        id S231328AbjFDXjD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Jun 2023 19:39:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231839AbjFDOfR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jun 2023 10:35:17 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB14DF2
-        for <linux-block@vger.kernel.org>; Sun,  4 Jun 2023 07:34:48 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-6584553892cso149651b3a.0
-        for <linux-block@vger.kernel.org>; Sun, 04 Jun 2023 07:34:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685889273; x=1688481273;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UDNiEjmcT76CGWhVA0wu0AtafPvzFp9/FTf2B8bDrd4=;
-        b=mwb2a8sbXziJagMciWe4iNgQXJhC/Lg6+YFAMmVZ8s/vdpJLkyLX11XT73DdkquHc/
-         oylWrD44nbHTNuhMi9HIVIGO4uGITfpPBxgucb1nrLzjQaLrudA4FQKvZMys05AhrQw7
-         /VhUaSOniYeBHBUMzUtutAINo2wKG+0EfLZoqyfvTBiDj+85BM11fxCdqOuoHo4sWW9S
-         78iQsDkZWi7bEieA5wiBiOILvgEMJ4ihKkQfEGfLGON99L9/k43yw9ferYptb42NexI6
-         tQuojI5Fh/emgnXQ8bPnI9mTxS8W1uMuRydlfuQsOX8iXwymNOJVlAuEthuDhngIDt2y
-         ZC2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685889273; x=1688481273;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UDNiEjmcT76CGWhVA0wu0AtafPvzFp9/FTf2B8bDrd4=;
-        b=Nkmb4cQvdelmxoXi1WcKB3RYAc1j2Ickq4dYYHZ2+/cBhheR6QaRAeSESsKPix5Fxq
-         kfOuQZCK5urzkbmnDS4Qn4HeHjtTf7fClOjZSjb541MC+6M/cuLtkDbgHkeZCInILFPv
-         uFy9MydR+15eCDBFnXOeO5o1pvfycMiMnr/+96ONwVP3Ylt+qVex1/9Cuk1FpHSvXWvc
-         9Ypmln+UU9s5b1BQcGd/m8GEOVLpV1jLgB6I19tDZYw4RfT92cuj33oBtdQd8OtO+CLr
-         gCvZT/9XHtXcCM9EkpOE3X69kFRtX104gXwq9erF0iL4TJsfGRadkuOFCEZ7jPXEJhpL
-         HxAw==
-X-Gm-Message-State: AC+VfDxlZPAYgntcs0tTDbw7H/v08ZT5IULUka301AQ9oQmPI6VpQMQU
-        P9rB2dtMZiSa3pZ+z0KoLeiDgaH3b5oU7JocpFQ=
-X-Google-Smtp-Source: ACHHUZ6pGUWcTED+h01ZniPB8QE4IEChgQ21iuFfccmXDXTNC6s2glszqAUyqIwW1jBS5Jik58oUvw==
-X-Received: by 2002:a05:6a21:339a:b0:112:cf5:d5cc with SMTP id yy26-20020a056a21339a00b001120cf5d5ccmr15721624pzb.1.1685889273303;
-        Sun, 04 Jun 2023 07:34:33 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x5-20020a654545000000b004fab4455748sm3835941pgr.75.2023.06.04.07.34.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jun 2023 07:34:32 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20230603040601.775227-1-ming.lei@redhat.com>
-References: <20230603040601.775227-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] ublk: add control command of UBLK_U_CMD_GET_FEATURES
-Message-Id: <168588927222.4566.13635658855258211518.b4-ty@kernel.dk>
-Date:   Sun, 04 Jun 2023 08:34:32 -0600
+        with ESMTP id S230218AbjFDXjC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Jun 2023 19:39:02 -0400
+Received: from out-59.mta0.migadu.com (out-59.mta0.migadu.com [91.218.175.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC31BAD
+        for <linux-block@vger.kernel.org>; Sun,  4 Jun 2023 16:39:00 -0700 (PDT)
+Date:   Sun, 4 Jun 2023 19:38:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1685921939;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uVV3yjs4kWVzhhx/jsq5Z0tB6otLGDTtFTIwSZr9j+c=;
+        b=EOPfTYA3F0a6RtdIdrmU5x9GpdaD6sOglMygl8F8JDqYWn5YKqJ+qIBCx/PBPzs6o9eQ2Q
+        TJceDQRJN5rMDhWkZzIrWm86IANSXMx70+67IJKQi4vEw0y/0CCqfTQECaPC+qREXDsRwR
+        7T2Bc/Po+zaMlhPBmIS6HPT4RG3jWFk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 0/7] block layer patches for bcachefs
+Message-ID: <ZH0gjyuBgYzqhZh7@moria.home.lan>
+References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+ <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
+ <ZHEaKQH22Uxk9jPK@moria.home.lan>
+ <8e874109-db4a-82e3-4020-0596eeabbadf@kernel.dk>
+ <ZHYfGvPJFONm58dA@moria.home.lan>
+ <2a56b6d4-5f24-9738-ec83-cefb20998c8c@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-c6835
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a56b6d4-5f24-9738-ec83-cefb20998c8c@kernel.dk>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, May 30, 2023 at 10:50:55AM -0600, Jens Axboe wrote:
+> Sorry typo, I meant text. Just checked stack and it looks identical, but
+> things like blk-map grows ~6% more text, and bio ~3%. Didn't check all
+> of them, but at least those two are consistent across x86-64 and
+> aarch64. Ditto on the data front. Need to take a closer look at where
+> exactly that is coming from, and what that looks like.
 
-On Sat, 03 Jun 2023 12:06:01 +0800, Ming Lei wrote:
-> Add control command of UBLK_U_CMD_GET_FEATURES for returning driver's
-> feature set or capability.
-> 
-> This way can simplify userspace for maintaining compatibility because
-> userspace doesn't need to send command to one device for querying driver
-> feature set any more. Such as, with the queried feature set, userspace
-> can choose to use:
-> 
-> [...]
+A good chunk of that is because I added warnings and assertions for
+e.g. running past the end of the bvec array. These bugs are rare and
+shouldn't happen with normal iterator usage (e.g. the bio_for_each_*
+macros), but I'd like to keep them as a debug mode thing.
 
-Applied, thanks!
+But we don't yet have CONFIG_BLOCK_DEBUG - perhaps we should.
 
-[1/1] ublk: add control command of UBLK_U_CMD_GET_FEATURES
-      commit: b5bbc52fd01278642773818642288999a0236cb6
+With those out, I see a code size decrease in bio.c, which makes sense -
+gcc ought to be able to generate slightly better code when it's dealing
+with pure values, provided everything is inlined and there's no aliasing
+considerations.
 
-Best regards,
--- 
-Jens Axboe
+Onto blk-map.c:
 
+bio_copy_kern_endio_read() increases in code size, but if I change
+memcpy_from_bvec() to take the bvec by val instead of by ref it's
+basically the same code size. There's no disadvantage to changing
+memcpy_from_bvec() to pass by val.
 
+bio_copy_(to|from)_iter() is a wtf, though - gcc is now spilling the
+constructed bvec to the stack; my best guess is it's a register pressure
+thing (but we shouldn't be short registers here!).
 
+So, since the fastpath stuff in bio.c gets smaller and blk-map.c is not
+exactly fastpath stuff I'm not inclined to fight with gcc on this one -
+let me know if that works for you.
+
+Branch is updated - I split out the new assertions into a separate patch
+that adds CONFIG_BLK_DEBUG, and another patch for mempcy_(to|from)_bio()
+for a small code size decrease.
+
+https://evilpiepirate.org/git/bcachefs.git/log/?h=block-for-bcachefs
+or
+git pull http://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
