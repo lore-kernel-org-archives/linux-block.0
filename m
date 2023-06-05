@@ -2,65 +2,72 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB624C7EE2D
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 17:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F731C77B73
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 17:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234985AbjFERWK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 13:22:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44636 "EHLO
+        id S229791AbjFERWM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 13:22:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234603AbjFERWH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 13:22:07 -0400
-Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E610510C
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 10:22:03 -0700 (PDT)
-Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-1a2cc92f12aso637334fac.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 10:22:03 -0700 (PDT)
+        with ESMTP id S233773AbjFERWJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 13:22:09 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFB411B
+        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 10:22:05 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-39b349405d9so69724b6e.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 10:22:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685985722; x=1688577722;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685985725; x=1688577725;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9HBzAKQ8EWkIuzHq6aIJ4mqwm9+DaKYAj6ps+F/vuTI=;
-        b=jh2UmAQ3NsKFC/MrynS5s4VOiwEkVYskRKYwmk2+r9IhdcNLaWSoRFhCITHNAwpw2w
-         bTVPEyYGpdrWg/AfDmiWW5LMgBNHD7iPyGbjQ38kps2Kwq4XW1CMRIkFXj2etTskPemV
-         GWWUMdq0FhYa5jHjFZZOn2STiHFEJMPEx6Vh9Lx2pkmbyH/bPw3UTOzEkwq9oVe+6Gvu
-         mVeRryP8psvMA5OaaANvxrFw3MTbHBXsJI31FRRwpBUQKSd9aSH095es87US3bTcGYpF
-         dZxTINVrQN/BTouOpqCAhoEMlsXUP3gbmYISyXWbPAshVYhvfYFI+BDRDMPBLMWzG2QA
-         N1Bw==
+        bh=6XZ3PYFTW8wBOrcxa44gmTJZRL7p9p613s1N10mZMVY=;
+        b=ycFVn/L/naAjRsAnEqR9ysNncUv/HbQfjetBqXx4erHA+VIlFcLYsCCYZpKwYV2LfY
+         KG9fKbgqWBtjwwWULsEPR4hELvi+OZ1caxlR7XcilK6EroWpiY6H/p7eKLSZ+XxaHD3z
+         Np995JYCblZZVyD3K7OFjrqfChq6ClFMXNni2e95MICclPFh9tYtD96AnJBnDqL0e5h3
+         gNQx/XCZtwcC6ZUYiuGd7rF+gU4oSsIdadeHa4vlVuCgI+cVs0ugq+AgzEMh9VhTYA88
+         lKTzoHiM5hZHwFCpR2aBwpBWlk5yBK2tuS/6r6Rh0flFXVi7X0z9nkLjh+5izffZ0SFk
+         gqwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685985722; x=1688577722;
+        d=1e100.net; s=20221208; t=1685985725; x=1688577725;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9HBzAKQ8EWkIuzHq6aIJ4mqwm9+DaKYAj6ps+F/vuTI=;
-        b=eX/2VriLIkTLB5xs5qpfS9/A/0Difj72I/2R/x5M/CbBIIPIMgHvrKYKpL7UxK5Ix0
-         aHbw0eAEGxzsWnzxAYSUcQfBF4abt7tz13QEN/J7mrP/wc4Oa4h5oHY06qBnMoJFs/Xx
-         fYVnox5BSKE2VAevCZUZdnstEsTVgYQl+OJIbgfG9q15VMoCZnXi5qmOOt8K8j9HAhkN
-         lqKPLcjGj/VEQpvdGqogKLUZesyQn/aSBB/mw7KkCCiSootis3ySLUpb5vzL9ZzA+5VR
-         Cpg0ioT28CpBAe84iPYzA0sELvGSR1YjT1ag7x7wKK2PG4QxwlqSxdD2r8ddBMPR1z4+
-         Ys0Q==
-X-Gm-Message-State: AC+VfDwwAFsDB3IRnPzko2efUhBRMHt+FUaukznFvzLBAYLOpAm9qYqF
-        GQsJvRTAwQYoGWi4FSEq4LV6j5a6QnK+UMEnbx4=
-X-Google-Smtp-Source: ACHHUZ6PL62Ib5H4QB3rPGiaQRZcV0rInc/UOc81HCQF8mpjnx0vviMbWu8Zk38mJqV6Qj9LKxCzMg==
-X-Received: by 2002:a05:6358:cc27:b0:127:fa1b:fb0e with SMTP id gx39-20020a056358cc2700b00127fa1bfb0emr1263873rwb.1.1685985722606;
-        Mon, 05 Jun 2023 10:22:02 -0700 (PDT)
+        bh=6XZ3PYFTW8wBOrcxa44gmTJZRL7p9p613s1N10mZMVY=;
+        b=ER6Ekr0Sdio8x0N6aTew3DjJCx+9lvrGIubfG2Na+IKwdc/glN0sF8RQz8d8Wq/cPr
+         d8G4AOq0KJbYMmSitG1W5CWdcjbtsOy7WqTCB1JVGYlnrrDA1Ay+Ye/XADwaHe91mOJ9
+         O+rc5m/yWMhqidwZNZH69mZumxgni4sXLS/Vgn/FU3exb4+tF9MkNrLogGJEH6CHC4fV
+         vPAYf/UdyIOiVXVV/XF8SchcMgY1V2OMRjz+rDFZWMlBI/b4znNDtyOd1zpQcwDPPhCJ
+         9GmncZZXnk0eXpwy81GeZabW+kfYCCHxXMkjjSuQ5UXHfGZNNSTQKAnBMNaBjhbX26Fn
+         3sEg==
+X-Gm-Message-State: AC+VfDwJYAIN+9Xe8DILezQjcmflWWUjFASxkda1bdfA7ydzIfJsAolG
+        61ikeyenKuttph/I+GMj6tPhBA==
+X-Google-Smtp-Source: ACHHUZ55ijmtRxUtr2PJeE7u8S0QvWcKyGSmOe2wfBtgxRK6mvg8iopMfucIMuRB5AN9ZmOkwUXzHA==
+X-Received: by 2002:a05:6358:c401:b0:127:6a3c:2280 with SMTP id ff1-20020a056358c40100b001276a3c2280mr4551121rwb.2.1685985724648;
+        Mon, 05 Jun 2023 10:22:04 -0700 (PDT)
 Received: from [127.0.0.1] ([2600:380:c01c:32f0:eff8:7692:bf8a:abc6])
-        by smtp.gmail.com with ESMTPSA id cl9-20020a17090af68900b0025643e5da99sm7993666pjb.37.2023.06.05.10.22.01
+        by smtp.gmail.com with ESMTPSA id cl9-20020a17090af68900b0025643e5da99sm7993666pjb.37.2023.06.05.10.22.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 10:22:01 -0700 (PDT)
+        Mon, 05 Jun 2023 10:22:03 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org
-In-Reply-To: <20230601094459.1350643-1-hch@lst.de>
-References: <20230601094459.1350643-1-hch@lst.de>
-Subject: Re: introduce bdev holder ops and a file system shutdown method v3
-Message-Id: <168598572109.2504.8975232011754082233.b4-ty@kernel.dk>
-Date:   Mon, 05 Jun 2023 11:22:01 -0600
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Joern Engel <joern@lazybastard.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Loic Poulain <loic.poulain@linaro.org>, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-pm@vger.kernel.org
+In-Reply-To: <20230531125535.676098-2-hch@lst.de>
+References: <20230531125535.676098-1-hch@lst.de>
+ <20230531125535.676098-2-hch@lst.de>
+Subject: Re: [PATCH 01/24] driver core: return bool from driver_probe_done
+Message-Id: <168598572280.2504.3952473013804137907.b4-ty@kernel.dk>
+Date:   Mon, 05 Jun 2023 11:22:02 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -70,51 +77,62 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Thu, 01 Jun 2023 11:44:43 +0200, Christoph Hellwig wrote:
-> this series fixes the long standing problem that we never had a good way
-> to communicate block device events to the user of the block device.
+On Wed, 31 May 2023 14:55:12 +0200, Christoph Hellwig wrote:
+> bool is the most sensible return value for a yes/no return.  Also
+> add __init as this funtion is only called from the early boot code.
 > 
-> It fixes this by introducing a new set of holder ops registered at
-> blkdev_get_by_* time for the exclusive holder, and then wire that up
-> to a shutdown super operation to report the block device remove to the
-> file systems.
 > 
-> [...]
 
 Applied, thanks!
 
-[01/16] block: factor out a bd_end_claim helper from blkdev_put
-        commit: 0783b1a7cbd9a02ddc35fe531b5966b674b304f0
-[02/16] block: refactor bd_may_claim
-        commit: ae5f855ead6b41422ca0c971ebda509c0414f8ec
-[03/16] block: turn bdev_lock into a mutex
-        commit: 74e6464a987b2572771ac19163e961777fd0252e
-[04/16] block: consolidate the shutdown logic in blk_mark_disk_dead and del_gendisk
-        commit: 66fddc25fe182fd7d28b35f4173113f3eefc7fb5
-[05/16] block: avoid repeated work in blk_mark_disk_dead
-        commit: a4f75764d16bed317276b05a9fe2c179ef61680d
-[06/16] block: unhash the inode earlier in delete_partition
-        commit: 69f90b70bdb62e1a930239d33579e04884cd0b9a
-[07/16] block: delete partitions later in del_gendisk
-        commit: eec1be4c30df73238b936fa9f3653773a6f8b15c
-[08/16] block: remove blk_drop_partitions
-        commit: 00080f7fb7a599c26523037b202fb945f3141811
-[09/16] block: introduce holder ops
-        commit: 0718afd47f70cf46877c39c25d06b786e1a3f36c
-[10/16] block: add a mark_dead holder operation
-        commit: f55e017c642051ddc01d77a89ab18f5ee71d6276
-[11/16] fs: add a method to shut down the file system
-        commit: 87efb39075be6a288cd7f23858f15bd01c83028a
-[12/16] xfs: wire up sops->shutdown
-        commit: e7caa877e5ddac63886f4a8376cb3ffbd4dfe569
-[13/16] xfs: wire up the ->mark_dead holder operation for log and RT devices
-        commit: 8067ca1dcdfcc2a5e0a51bff3730ad3eef0623d6
-[14/16] ext4: split ext4_shutdown
-        commit: 97524b454bc562f4052751f0e635a61dad78f1b2
-[15/16] ext4: wire up sops->shutdown
-        commit: f5db130d4443ddf63b49e195782038ebaab0bec9
-[16/16] ext4: wire up the ->mark_dead holder operation for log devices
-        commit: dd2e31afba9e3a3107aa202726b6199c55075f59
+[01/24] driver core: return bool from driver_probe_done
+        commit: aa5f6ed8c21ec1aa5fd688118d8d5cd87c5ffc1d
+[02/24] PM: hibernate: factor out a helper to find the resume device
+        commit: 02b42d58f3898134b900ff3030561099e38adb32
+[03/24] PM: hibernate: remove the global snapshot_test variable
+        commit: d6545e687271ab27472eebff770f2de6a5f1a464
+[04/24] PM: hibernate: move finding the resume device out of software_resume
+        commit: cc89c63e2fe37d476357c82390dfb12edcd41cdd
+[05/24] init: remove pointless Root_* values
+        commit: f5524c3fadba35c075a5131bad74e3041507a694
+[06/24] init: rename mount_block_root to mount_root_generic
+        commit: e3102722ffe77094ba9e7e46380792b3dd8a7abd
+[07/24] init: refactor mount_root
+        commit: a6a41d39c2d91ff2543d31b6cc6070f3957e3aea
+[08/24] init: pass root_device_name explicitly
+        commit: c8643c72bc42781fc169c6498a3902bec447099e
+[09/24] init: don't remove the /dev/ prefix from error messages
+        commit: 73231b58b1b496d631fa0ecf9fa7f64f5a07c6e3
+[10/24] init: handle ubi/mtd root mounting like all other root types
+        commit: 07d63cbb67cdb5e2a7720fdd8579b3be979c2d66
+[11/24] init: factor the root_wait logic in prepare_namespace into a helper
+        commit: 3701c600a3e735b9fbac6f7a73e4c086090c97ca
+[12/24] init: move the nfs/cifs/ram special cases out of name_to_dev_t
+        commit: c0c1a7dcb6f5db4500e6574294674213bc24940c
+[13/24] init: improve the name_to_dev_t interface
+        commit: cf056a43121559d3642419917d405c3237ded90a
+[14/24] init: clear root_wait on all invalid root= strings
+        commit: 079caa35f7863cd9958b4555ae873ea4d352a502
+[15/24] block: move the code to do early boot lookup of block devices to block/
+        commit: 702f3189e454b3c3c2f3c99dbf30acf41aab707c
+[16/24] block: move more code to early-lookup.c
+        commit: 7cadcaf1d82618852745e7206fffa2c72c17ce4b
+[17/24] dm-snap: simplify the origin_dev == cow_dev check in snapshot_ctr
+        commit: 26110d5afe8117d1b505fe735ac709bdf063f4da
+[18/24] dm: open code dm_get_dev_t in dm_init_init
+        commit: 49177377e910a8fd5cd1388c966d8fbb51075c3c
+[19/24] dm: remove dm_get_dev_t
+        commit: d4a28d7defe79006e59293a4b43d518ba8483fb0
+[20/24] dm: only call early_lookup_bdev from early boot context
+        commit: 7a126d5bf975f082281fb9b45d110cd49b7c3ee4
+[21/24] PM: hibernate: don't use early_lookup_bdev in resume_store
+        commit: 1e8c813b083c4122dfeaa5c3b11028331026e85d
+[22/24] mtd: block2mtd: factor the early block device open logic into a helper
+        commit: b2baa57475e3a24bb9ad27bb9047ea3be94627f5
+[23/24] mtd: block2mtd: don't call early_lookup_bdev after the system is running
+        commit: 8d03187ee7328af8e18ef1782289e0b034e75485
+[24/24] block: mark early_lookup_bdev as __init
+        commit: 2577f53f42947d8ca01666e3444bb7307319ea38
 
 Best regards,
 -- 
