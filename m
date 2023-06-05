@@ -2,114 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBE2C7EE24
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 09:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8E5C77B73
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 12:24:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbjFEJ3Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 05:29:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54016 "EHLO
+        id S231176AbjFEMYJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 08:24:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjFEJ3Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 05:29:16 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95195A7
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 02:29:14 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-30e412a852dso817978f8f.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 02:29:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20221208.gappssmtp.com; s=20221208; t=1685957353; x=1688549353;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g2THcfh8s/E8A9Q3W+8XFt0p7Au/U9ACqLSkFJ7lxEE=;
-        b=UvBj2Hz/ZyBpE3lZSzXKA6ngq0oc0HTbjyhRG8nzmfnlVnJ4qkk3+a5nd2qQmveFDj
-         t71ab8pGB7bQWWjRGYYkk712PmUXzLv0IcSD6VwwLiN1U1Srhh5C5KJJ25HLZz9qxSco
-         03Aop4Wo7ynqXbjPiNrKjqdwKF9Vi1HhYUQUjuZCpMU1ILl8xjVmcmTsu7htky31FXR6
-         JVTuXJ4bCLrDt80cC9mSJSlqO5cfCRWnNcJ7gLLXyS8jQhlV9vJXKTqCrjlpxRMTvbXc
-         fFVwrq/Wuc3c1IWXFkEPNsY55LGFeL1PfwdSlQSwl+9UNF0e5V6fLAfVVx4+ctOCAX5a
-         6tJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685957353; x=1688549353;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g2THcfh8s/E8A9Q3W+8XFt0p7Au/U9ACqLSkFJ7lxEE=;
-        b=CoJ+ymKDWwCQMIGjRJh6Vn/HLXky8yDu8r/lPWWs1Rumvu04+uiwH1rvglOC3tAc3F
-         gfCt/PP5/XaYgy0bmM6l0GJ3sCCQgaCY81hbYDEq625ql82CNrmCjaVeDPC3PWNpo8rU
-         hi6Di7xLSvNwpgWxz7ELJW/mPsUE1vQjXWICg/COMCNktUxGEl5TR5OpoFUHFxfrvJYF
-         pRaxBNA9GvljOVjSpb2pYGyVZS7GbDRzU4h42k40XgWECFoBmkIgsGOUqbrVoP4hPSeF
-         /ht51EMHg42P3DFoLzh4bqJTzd999H/Sy0QiLI5EaScVCbPCIsOADgWkdq164eHh0YVt
-         BdmA==
-X-Gm-Message-State: AC+VfDwanwzFR5iVsx/09LfXWhCYP0Kofb847vLzEqfnpslPSkPdwHm6
-        lob7sX/DGwqY4aPh+te4/8BDmHIsKNFYlZhri5NJsw==
-X-Google-Smtp-Source: ACHHUZ4IzU7/FDO3TZ9CMu/B7p9RSwV7e1VVEtKPAbfQjjSYbz4yBn6ModbRKB7EWAwlhO/cTJ4RMQ==
-X-Received: by 2002:a5d:65ca:0:b0:307:a075:2709 with SMTP id e10-20020a5d65ca000000b00307a0752709mr4179957wrw.68.1685957353048;
-        Mon, 05 Jun 2023 02:29:13 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id n18-20020a5d4c52000000b0030ae901bc54sm9095163wrt.62.2023.06.05.02.29.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jun 2023 02:29:12 -0700 (PDT)
-Message-ID: <2135eb9d-b673-1a0d-6698-d73de60fa00d@linbit.com>
-Date:   Mon, 5 Jun 2023 11:29:11 +0200
+        with ESMTP id S233392AbjFEMX7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 08:23:59 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E3C0A1;
+        Mon,  5 Jun 2023 05:23:53 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QZXpD6Ks9z4f3lXJ;
+        Mon,  5 Jun 2023 20:23:48 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgBn0LPU031kd577Kw--.18844S4;
+        Mon, 05 Jun 2023 20:23:49 +0800 (CST)
+From:   Zhong Jinghua <zhongjinghua@huaweicloud.com>
+To:     josef@toxicpanda.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, zhongjinghua@huawei.com,
+        yi.zhang@huawei.com, yukuai3@huawei.com, yangerkun@huawei.com
+Subject: [PATCH -next] nbd: Add the maximum limit of allocated index in nbd_dev_add
+Date:   Mon,  5 Jun 2023 20:21:59 +0800
+Message-Id: <20230605122159.2134384-1-zhongjinghua@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] drbd: stop defining __KERNEL_SYSCALLS__
-To:     Christoph Hellwig <hch@lst.de>, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com
-Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-References: <20230601151646.1386867-1-hch@lst.de>
-Content-Language: en-US
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-In-Reply-To: <20230601151646.1386867-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBn0LPU031kd577Kw--.18844S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrur4rtFW7JF4UGr48Kw17ZFb_yoWfWrg_CF
+        18Cws7ZrZ3KryfCr4ayryYvry0yw1qqF48uFnIgrWfXay7AFn7W3ZrXrZ8Zr1DZFW7urZ5
+        Zry29rs7Arn7KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbokYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
+        z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+        AF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
+        IxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s
+        0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsG
+        vfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: x2kr0wpmlqwxtxd6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Am 01.06.23 um 17:16 schrieb Christoph Hellwig:
-> __KERNEL_SYSCALLS__ hasn't been needed since Linux 2.6.19 so stop
-> defining it.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/drbd/drbd_main.c     | 1 -
->  drivers/block/drbd/drbd_receiver.c | 1 -
->  2 files changed, 2 deletions(-)
-> 
-> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-> index 83987e7a5ef275..54223f64610a05 100644
-> --- a/drivers/block/drbd/drbd_main.c
-> +++ b/drivers/block/drbd/drbd_main.c
-> @@ -37,7 +37,6 @@
->  #include <linux/notifier.h>
->  #include <linux/kthread.h>
->  #include <linux/workqueue.h>
-> -#define __KERNEL_SYSCALLS__
->  #include <linux/unistd.h>
->  #include <linux/vmalloc.h>
->  #include <linux/sched/signal.h>
-> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-> index 8c2bc47de4735e..0c9f54197768d6 100644
-> --- a/drivers/block/drbd/drbd_receiver.c
-> +++ b/drivers/block/drbd/drbd_receiver.c
-> @@ -27,7 +27,6 @@
->  #include <uapi/linux/sched/types.h>
->  #include <linux/sched/signal.h>
->  #include <linux/pkt_sched.h>
-> -#define __KERNEL_SYSCALLS__
->  #include <linux/unistd.h>
->  #include <linux/vmalloc.h>
->  #include <linux/random.h>
+From: Zhong Jinghua <zhongjinghua@huawei.com>
 
-Looks right.
+If the index allocated by idr_alloc greater than MINORMASK >> part_shift,
+the device number will overflow, resulting in failure to create a block
+device.
 
-Reviewed-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Fix it by imiting the size of the max allocation.
 
+Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
+---
+ drivers/block/nbd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 592cfa8b765a..cb38477f359f 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1770,7 +1770,8 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+ 		if (err == -ENOSPC)
+ 			err = -EEXIST;
+ 	} else {
+-		err = idr_alloc(&nbd_index_idr, nbd, 0, 0, GFP_KERNEL);
++		err = idr_alloc(&nbd_index_idr, nbd, 0,
++				(MINORMASK >> part_shift) + 1, GFP_KERNEL);
+ 		if (err >= 0)
+ 			index = err;
+ 	}
 -- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+2.31.1
+
