@@ -2,92 +2,103 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5FFEC7EE24
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 18:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE395C77B73
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 18:31:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233589AbjFESJF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 14:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40284 "EHLO
+        id S234685AbjFESbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 14:31:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229687AbjFESJE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 14:09:04 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DACC6D3
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 11:09:02 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-5344d45bfb0so203830a12.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 11:09:02 -0700 (PDT)
+        with ESMTP id S232140AbjFESbf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 14:31:35 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52EC0F1;
+        Mon,  5 Jun 2023 11:31:17 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-653bed78635so2076679b3a.0;
+        Mon, 05 Jun 2023 11:31:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685988542; x=1688580542;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SbhZgeRfrMzo8RZUjiv5Kr8KvV2/iK/o9SdLtbvSVL4=;
-        b=M12TBi/qdCVHqFYGFxUaq8Xsf9tqgm2Saa+5o3o1AI1a3KbqNFyMgmbcVKqIov05Ci
-         uMu1xJio3U6fVN1G/jl2PUsd6FfTM2VoZDOwX7lR25xQYp21IAoM8ZUY/ZFgfbyD0/sV
-         1KfXLD/Y35e9+smYan7Kr0Rem30tgZYv9c1pkZmEhNS3G64FQ4tbzn+Z96fOlAH7oCKE
-         70Mug7V/5btfozq7bpQdOHu/l9UdwCtFocNQzW7AxzrKfoRhhwBlyuGyqmjY35AoVCsP
-         1bBlhI363MBzD9H2yKJRzFRGAoewe0XkRBxhBpjKASyBecCg93NxosUIBRL4RHua0PUg
-         e6fQ==
+        d=gmail.com; s=20221208; t=1685989877; x=1688581877;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=usnkZ76/foY9UJhYGSnPlQxyp1CPa9L1vTnAf5ryxaE=;
+        b=SCjp70qdzoSdFk7YXwoHOJPQVKrUFWBcHQolEZVkY2amb+A3jADHUmcS1aVDjXhIrc
+         Rb/Go5IKAWmq8DE1jldzMhxAl8wk6/SF/BKWxFfhD8YMYYYF54U83bKZE1m5SEAnC6wK
+         0s1FrlMB687vMqXXkiCnMQ/XlRafSRgodlJl4P20vTsS2LdqMuP/f5xGzkb9Vbm4YgkF
+         aO08qbYuEis9S0DPMrhyIKTg6qe2vGCf6Xt92UHUMlhGrGvy69kHQStrpWVYCykIIoPH
+         4pAK27TAC/uDzKSedKFhEfXNKX7A+wZsRlWxb2oLRcSa1NmeGaYwQ62Icglq3KXQtew4
+         86cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685988542; x=1688580542;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1685989877; x=1688581877;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SbhZgeRfrMzo8RZUjiv5Kr8KvV2/iK/o9SdLtbvSVL4=;
-        b=VdP5dHhyffBRopJ4Jf/4zWf6mdfA7eMnUIldKAlz60hrSGdLag3enykm1RkGES0PlO
-         i4EMWCJJrfnR5UAUWjoSpufqH3POBT6VLHXxbNLsLOrPYyvOvDNwssFlTAzPazFLA4ie
-         ovN2FOreDDRFjNaN4Tr9bjMeIN5iII9xkeW7xeZwpXrU62udwgNoJ0hcaqQ5iuFYquxy
-         kmdO50+trvqgzuqRu5IUGAFk5GNjSSTRl2BrynS5gkW6jKH4Apm0zbE6uzSoyKPZ3N09
-         aQ0X1XZ0yW1MNhe0wdoXOrCFgEEFCo+YNBOqk9/DNH9e0UvbMmNZynDXR8RtNAqfm6WC
-         KDMA==
-X-Gm-Message-State: AC+VfDw+t/+et76sdi24ZNMElC8wVYnwx90iJ1ClAlheQyO0cj28ZZ8w
-        7gbyhFPcTpLmkjTMzdMt5YAJgQ==
-X-Google-Smtp-Source: ACHHUZ5x1VhEu0cbk+F9o60l7ZlBAYq207KYwhSkbPgBXjs/jRHW4y+9It3zndPrTP6WOfYfW5+i8g==
-X-Received: by 2002:a17:90a:e7d0:b0:256:4bc:6bc8 with SMTP id kb16-20020a17090ae7d000b0025604bc6bc8mr23198257pjb.2.1685988542338;
-        Mon, 05 Jun 2023 11:09:02 -0700 (PDT)
-Received: from [127.0.0.1] ([2620:10d:c090:400::5:a83f])
-        by smtp.gmail.com with ESMTPSA id i9-20020a17090a2ac900b0025645d118adsm6656422pjg.14.2023.06.05.11.09.00
+        bh=usnkZ76/foY9UJhYGSnPlQxyp1CPa9L1vTnAf5ryxaE=;
+        b=DwOZkqS3Wl5bmMrZdhjEs1D/yHvjBPcsG4xDtYaTJJxoXaGc4Qk25P6u3RKWfi7YCh
+         VW8YOcM4y+Zxjy7n77Ty9DnRfy2towYanqqHItUoFFrRjvBZ98UA3KRyKHyBMQXE2BdC
+         lpd3AKVpq64CzDJt1I0L881H7fnms6RS5R/pA2z2okCzAVL4XuYyCIiEn+iWIIwtXvJr
+         YFEBWTOio0raOp4/s24M9FKutlnsYwghSieDIMI8BS5HSXsTOv0V0GxwB5fG2xwo0txF
+         R6VG1z28vbiKabPE1ekjP34OCIROFqhPWT0gwas2Nhz99w+WgCSiKVP6X5O0hfclwBFX
+         bjQw==
+X-Gm-Message-State: AC+VfDyQj5TCS3ji2ugckN7GtcTwT/CMFMhXbzw89CtDlZjEJE9GFrUo
+        0m+MKcrPdqOqKWucFJo9vew=
+X-Google-Smtp-Source: ACHHUZ5Icpc8CzidVyFb2h3eh8Fzgit98a+Fj8QQKyYRTtqfutHMQNWANvdlM4IZTQ7I4TCY6G9/ZQ==
+X-Received: by 2002:a05:6a20:1450:b0:10a:b812:bcc7 with SMTP id a16-20020a056a20145000b0010ab812bcc7mr8686501pzi.17.1685989876594;
+        Mon, 05 Jun 2023 11:31:16 -0700 (PDT)
+Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
+        by smtp.gmail.com with ESMTPSA id t24-20020a635358000000b0053f1d55676fsm6060144pgl.2.2023.06.05.11.31.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 11:09:01 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     tj@kernel.org, josef@toxicpanda.com, linan666@huaweicloud.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linan122@huawei.com,
-        yukuai3@huawei.com, yi.zhang@huawei.com, houtao1@huawei.com,
-        yangerkun@huawei.com
-In-Reply-To: <20230527091904.3001833-1-linan666@huaweicloud.com>
-References: <20230527091904.3001833-1-linan666@huaweicloud.com>
-Subject: Re: [PATCH] blk-iocost: use spin_lock_irqsave in
- adjust_inuse_and_calc_cost
-Message-Id: <168598854044.127564.8532399641861277056.b4-ty@kernel.dk>
-Date:   Mon, 05 Jun 2023 12:09:00 -0600
+        Mon, 05 Jun 2023 11:31:16 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 5 Jun 2023 08:31:14 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     chengming.zhou@linux.dev
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: Re: [PATCH] blk-mq: fix incorrect rq start_time_ns and alloc_time_ns
+ after throttled
+Message-ID: <ZH4p8tqFc57_OYoH@slm.duckdns.org>
+References: <20230601053919.3639954-1-chengming.zhou@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-c6835
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230601053919.3639954-1-chengming.zhou@linux.dev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-On Sat, 27 May 2023 17:19:04 +0800, linan666@huaweicloud.com wrote:
-> adjust_inuse_and_calc_cost() use spin_lock_irq() and IRQ will be enabled
-> when unlock. DEADLOCK might happen if we have held other locks and disabled
-> IRQ before invoking it.
+On Thu, Jun 01, 2023 at 01:39:19PM +0800, chengming.zhou@linux.dev wrote:
+> From: Chengming Zhou <zhouchengming@bytedance.com>
 > 
-> Fix it by using spin_lock_irqsave() instead, which can keep IRQ state
-> consistent with before when unlock.
+> iocost rely on rq start_time_ns and alloc_time_ns to tell the saturation
+> state of the block device.
 > 
-> [...]
+> If any qos ->throttle() end up blocking, the cached rq start_time_ns and
+> alloc_time_ns will include its throtted time, which can confuse its user.
 
-Applied, thanks!
+I don't follow. rq_qos_throttle() happens before a request is allocated, so
+whether ->throttle() blocks or not doesn't affect alloc_time_ns or
+start_time_ns.
 
-[1/1] blk-iocost: use spin_lock_irqsave in adjust_inuse_and_calc_cost
-      commit: 8d211554679d0b23702bd32ba04aeac0c1c4f660
+> This patch add nr_flush counter in blk_plug, so we can tell if the task
+> has throttled in any qos ->throttle(), in which case we need to correct
+> the rq start_time_ns and alloc_time_ns.
+> 
+> Another solution may be make rq_qos_throttle() return bool to indicate
+> if it has throttled in any qos ->throttle(). But this need more changes.
+> 
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
 
-Best regards,
+Depending on the flush behavior and adjusting alloc_time_ns seems fragile to
+me and will likely confuse other users of alloc_time_ns too.
+
+Maybe I'm misunderstanding the problem you're describing. Can you give a
+concrete example of how the current code would misbehave?
+
+Thanks.
+
 -- 
-Jens Axboe
-
-
-
+tejun
