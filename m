@@ -2,73 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6565C77B73
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 07:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DE3C77B73
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 07:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230223AbjFEHVV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 03:21:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51684 "EHLO
+        id S231219AbjFEHbN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 03:31:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjFEHVU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 03:21:20 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EBD898;
-        Mon,  5 Jun 2023 00:21:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=E+0ybOJ1piPxKB/FyeoJ61KE5Hxwo4eicjZY6NegJ+c=; b=vFCGDxIf6uh3QnYk9AG6tcohxH
-        2Md46KX+b1u6q6o+HhPk2k/ojn1rdbGlLQmW0ff5bOTS+TTr7UDHYurepiwzvVXjF+OtJcUbZ7oZI
-        cnih5dMT2h8GWGPPL1TOkftxRiaaV3F7IqVdkvF9e5I5CnB4vFrUzrLhFCJVKvyJN4TQcNHba6D+J
-        Wsr98tpUckVHQOzyL6+qiP7w2pclr8zYKvvmj2ucSeI+qrHQaXhNSf4WNzTMH9Yzqk1am+u/EeIhV
-        sIbZRBiGqrWMrTXM0nUjd2McSLrFzxv6/Ge7yqhR6SkxUXcGSAI956JlcnaC8RKv/LHyWsBTQ11td
-        LhdoGN3Q==;
-Received: from [2001:4bb8:191:e9d5:e931:d7f5:9239:69f3] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q64Wk-00EX0Y-0M;
-        Mon, 05 Jun 2023 07:21:18 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     song@kernel.org, axboe@kernel.dk
-Cc:     johannes.thumshirn@wdc.com, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH] raid1: fix incorrect page freeing in alloc_behind_master_bio
-Date:   Mon,  5 Jun 2023 09:21:14 +0200
-Message-Id: <20230605072114.497609-1-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S230137AbjFEHbL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 03:31:11 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897D4ED;
+        Mon,  5 Jun 2023 00:31:05 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C6F431F8AB;
+        Mon,  5 Jun 2023 07:31:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1685950263; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YVRcanLPFi7lyuQlKPnGmc13Uyp9ZWsqVpdnpFIz5UM=;
+        b=hpUmsqnWkfmhs9EigCvHGyl56rlX62htlu+2TqprKMvosmqe+MogJhcQ/wQIIr/37CMuqD
+        tL5nYSyHe6wWIgSox0lEbI9E1kUftzX2g5viHf7YDN/EuFCBU883Ep8ZmkAHv/wR77yI5n
+        a/3nAce2H6AerDnR16c/zLCQqWNNGso=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1685950263;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YVRcanLPFi7lyuQlKPnGmc13Uyp9ZWsqVpdnpFIz5UM=;
+        b=le1fwFIqO/0tHJ3e2PXlU8Nla+HsnrWctOpO22KD8zshs7aZvKt9GY7KmCrUG+1q1CEaVR
+        BQqjuu17u0xJUuDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 930DB139C7;
+        Mon,  5 Jun 2023 07:31:03 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id cgatIjePfWSKbQAAMHmgww
+        (envelope-from <hare@suse.de>); Mon, 05 Jun 2023 07:31:03 +0000
+Message-ID: <01e896e4-92d7-42b0-118d-2e99baa4e1c3@suse.de>
+Date:   Mon, 5 Jun 2023 09:31:04 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 3/3] scsi: simplify scsi_stop_queue()
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, mwilck@suse.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20230602163845.32108-1-mwilck@suse.com>
+ <20230602163845.32108-4-mwilck@suse.com>
+ <59a03648-f65f-0c7c-b200-1b24f321c2d6@acm.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <59a03648-f65f-0c7c-b200-1b24f321c2d6@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-free_page takes the virtual address of the memory to be freed, and
-does so as an unsigned long just to make things confusing.  Use
-put_page instead, which actually works on the page pointer.
+On 6/4/23 15:54, Bart Van Assche wrote:
+> On 6/2/23 09:38, mwilck@suse.com wrote:
+>> @@ -2910,6 +2904,13 @@ scsi_target_block(struct device *dev)
+>>                       device_block);
+>>       else
+>>           device_for_each_child(dev, NULL, target_block);
+>> +
+>> +    /*
+>> +     * SCSI never enables blk-mq's BLK_MQ_F_BLOCKING flag,
+>> +     * so blk_mq_wait_quiesce_done() comes down to just 
+>> synchronize_rcu().
+>> +     * Just calling it once is enough.
+>> +     */
+>> +    synchronize_rcu();
+>>   }
+>>   EXPORT_SYMBOL_GPL(scsi_target_block);
+> 
+> The above comment is wrong. See also commit b125bb99559e ("scsi:
+> core: Support setting BLK_MQ_F_BLOCKING").
+> 
+Well, this patch got written before your patchset has been posted.
+But yeah, we'll be updating it.
 
-Note that this is a reason why this should have used __bio_add_page
-instead for this impossible to hit case..
+Cheers,
 
-Fixes: 2f9848178cfa ("md: raid1: use __bio_add_page for adding single page to bio")
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/raid1.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
-index ff89839455ec11..3570da63969b58 100644
---- a/drivers/md/raid1.c
-+++ b/drivers/md/raid1.c
-@@ -1148,7 +1148,7 @@ static void alloc_behind_master_bio(struct r1bio *r1_bio,
- 			goto free_pages;
- 
- 		if (!bio_add_page(behind_bio, page, len, 0)) {
--			free_page(page);
-+			put_page(page);
- 			goto free_pages;
- 		}
- 
+Hannes
 -- 
-2.39.2
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
