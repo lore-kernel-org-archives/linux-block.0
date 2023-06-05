@@ -2,139 +2,128 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F47C77B73
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 14:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD07C7EE24
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 16:50:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234017AbjFEOcw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 10:32:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54186 "EHLO
+        id S231641AbjFEQtu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 12:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232427AbjFEOcv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 10:32:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 367D31A7
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 07:32:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685975523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2LOUE1+edZo8CLP02ssMHBKJqlKpC7hvUhEkUiHsJl4=;
-        b=QLzo1eFFl+ObvLDbLS2FH2rufend9Sb9+GiNTwXcS/trPDny4d5pZcnv97Iq1Vnk+dKBOS
-        FTZo3sHDNEb47DHk6qix0c3VNt6wRLL/aoXdFLlo1vJS2Uvk1po1v1954Ux0XuE/6Zatsc
-        mPpmgyIfKOIGCp7Ta3y87CjXU8CwJDE=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-578--pANpk6ONoumG9-mI7wuCw-1; Mon, 05 Jun 2023 10:32:01 -0400
-X-MC-Unique: -pANpk6ONoumG9-mI7wuCw-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-25667878a53so1664607a91.3
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 07:32:01 -0700 (PDT)
+        with ESMTP id S234818AbjFEQtn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 12:49:43 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 412DCED
+        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 09:49:40 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6584553892cso401417b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 09:49:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685983779; x=1688575779;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vDRJgVE5cH04MV15lyuR8QwAmByzpL4hoF/MQxP+aCo=;
+        b=Ei/LRpe8k3OFfTc/VkSB/xDKar7hPdfukU8UV74asVwDhnlUFq6MoQI77JP70KYzqT
+         VwpJl9HpmDuXDVX1DG5iZIqF/6J0ErGIY41R19KPoHLnjeF8Gi/FH+8ghj3XB7T03WtI
+         VbLYFEUH+p2Nzqh1DTfqkDDmh9kocKybhx0WRy0HA3aWOsXcDYaCCXp4LYMtUQeiTQtK
+         orgN2Q+rMlNc3hqMCgoH+0O7l62JNW3r+LaORs4nvGiuhPO4WFjgX1qrLHxZZ1AaVx5K
+         KZzSB9g5huWomew3qr9ttRdjb7Gs9g0f0THUtsddtKNSSubwcD1aRda+VpW2odzfxL/L
+         j0IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685975521; x=1688567521;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2LOUE1+edZo8CLP02ssMHBKJqlKpC7hvUhEkUiHsJl4=;
-        b=Z7sg8G2RA4LaSYrDDRBBs12hYlkIrN6I0qGGtG6kips8r4YbyzxPEsuDYX8C1w8ds0
-         fMlBxSeBqtGe25jiG+YtTzQcuEj1UbaXGgg93RXLvqmV1oy7r8TF1RKgRGfDSXEZRKz7
-         CFhNH2zvX2Sw6eYj1X9QN30/vrT+AF7MdRJRk3JcU3MaDqLkYXHOmzQhmgUN8qOqCM2b
-         VGPzFBV4ynNw7SbeLtjreTLT5EGRb5HsXHXotk5ZZveXpRe7U3s6g/8VgXNEQ33BmT0I
-         tjA1HSUlszks9jnTpO+T4IXW7HsxEnrfLdiNqAgCrQVpjzeEpJdZv+jCIA6UrI+M7r/8
-         R0cQ==
-X-Gm-Message-State: AC+VfDwESXcFSYS6XsNKSCAVXbJBnJI7PN5Q9HpSkiLF4pXIEpjaJzsI
-        dLWTmi9lyfBYNTCsZtUdrxRHwIafAC9mcIyub8miv39QKKzEnwhZzQpEDIrG6LPBimrFV7cHlZx
-        xAD3Bhi2PbmuxoSgiHUM8b+zKRjQRI1AxhFduXRw=
-X-Received: by 2002:a17:90b:1241:b0:24c:5e6:7035 with SMTP id gx1-20020a17090b124100b0024c05e67035mr3740245pjb.30.1685975520835;
-        Mon, 05 Jun 2023 07:32:00 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ79eo6F/FYMQnL0znbN05LlFP4162WJ1RiEELM6PG6eNAfkSk/s/IY1CZksWJQ9xwWpnmdlbar2+RMMM6vMzlY=
-X-Received: by 2002:a17:90b:1241:b0:24c:5e6:7035 with SMTP id
- gx1-20020a17090b124100b0024c05e67035mr3740228pjb.30.1685975520512; Mon, 05
- Jun 2023 07:32:00 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685983779; x=1688575779;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vDRJgVE5cH04MV15lyuR8QwAmByzpL4hoF/MQxP+aCo=;
+        b=UBuOA4Ii1L3qs/k4aQS23MHbXRYYrXXje4yXqU4Zn1Nn2Fn3VE7hJh+dDMt9PxcZ+2
+         xMBBnKpw33K22Tbc10IpBPmu+jM82ijMB98Sv2FtJFfZ2mCxbeuvEclMHR/ZNBbUdeJk
+         TE4UTyZtdDPwO1hREX1lypqAMuPu89oPuoUYXu1S3CySbRIpWtAsBx7Mn1sVaisBllFb
+         QFPjih8AKJ/71XyVdVIJ3UjKQZbqJD1oUa/RzZoyxk4HvMmeTKzA7MXLhG9Ir/yxijyM
+         NZ3kOTA9nxSkCkjBzaMEoLdIM6uBCSSexaro1VDWjvUKqXHb6PpfXRY1+NNoIQqe3acE
+         4xpQ==
+X-Gm-Message-State: AC+VfDxRCtBefgw+HXs7Ppskb1FcvrF4KnsQoD3DpGlkw0CMFllhOE0h
+        AMo98gju2SFe63r741+LOH2ARw==
+X-Google-Smtp-Source: ACHHUZ6VtRPk+7R/QDfHd2G8LTg/K3iK/fpK4MXqyEZASfsbZ7S8d8CBo4OHEHv2VzEDz6LQ7MPerA==
+X-Received: by 2002:a05:6a20:4425:b0:116:1cc7:ada with SMTP id ce37-20020a056a20442500b001161cc70adamr4482199pzb.6.1685983779369;
+        Mon, 05 Jun 2023 09:49:39 -0700 (PDT)
+Received: from ?IPV6:2600:380:c01c:32f0:eff8:7692:bf8a:abc6? ([2600:380:c01c:32f0:eff8:7692:bf8a:abc6])
+        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b0064fd8b3dd14sm5404414pfn.124.2023.06.05.09.49.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jun 2023 09:49:38 -0700 (PDT)
+Message-ID: <b1b43d30-8c7c-1a71-0ead-8b967b8af0a4@kernel.dk>
+Date:   Mon, 5 Jun 2023 10:49:37 -0600
 MIME-Version: 1.0
-References: <20230530094322.258090-1-ming.lei@redhat.com> <20230530094322.258090-3-ming.lei@redhat.com>
-In-Reply-To: <20230530094322.258090-3-ming.lei@redhat.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Mon, 5 Jun 2023 22:31:48 +0800
-Message-ID: <CAHj4cs-4gQHnp5aiekvJmb6o8qAcb6nLV61uOGFiisCzM49_dg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] nvme: rdma/tcp: call nvme_delete_dead_ctrl for
- handling reconnect failure
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/7] block layer patches for bcachefs
+Content-Language: en-US
+To:     Kent Overstreet <kent.overstreet@linux.dev>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
+ <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
+ <ZHEaKQH22Uxk9jPK@moria.home.lan>
+ <8e874109-db4a-82e3-4020-0596eeabbadf@kernel.dk>
+ <ZHYfGvPJFONm58dA@moria.home.lan>
+ <2a56b6d4-5f24-9738-ec83-cefb20998c8c@kernel.dk>
+ <ZH0gjyuBgYzqhZh7@moria.home.lan>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ZH0gjyuBgYzqhZh7@moria.home.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks Ming, feel free to add:
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
+On 6/4/23 5:38?PM, Kent Overstreet wrote:
+> On Tue, May 30, 2023 at 10:50:55AM -0600, Jens Axboe wrote:
+>> Sorry typo, I meant text. Just checked stack and it looks identical, but
+>> things like blk-map grows ~6% more text, and bio ~3%. Didn't check all
+>> of them, but at least those two are consistent across x86-64 and
+>> aarch64. Ditto on the data front. Need to take a closer look at where
+>> exactly that is coming from, and what that looks like.
+> 
+> A good chunk of that is because I added warnings and assertions for
+> e.g. running past the end of the bvec array. These bugs are rare and
+> shouldn't happen with normal iterator usage (e.g. the bio_for_each_*
+> macros), but I'd like to keep them as a debug mode thing.
+> 
+> But we don't yet have CONFIG_BLOCK_DEBUG - perhaps we should.
 
-On Tue, May 30, 2023 at 5:44=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Reconnect failure has been reached after trying enough times, and control=
-ler
-> is actually incapable of handling IO, so it should be marked as dead, so =
-call
-> nvme_delete_dead_ctrl() to handle the failure for avoiding the following =
-IO
-> deadlock:
->
-> 1) writeback IO waits in __bio_queue_enter() because queue is frozen
-> during error recovery
->
-> 2) reconnect failure handler removes controller, and del_gendisk() waits
-> for above writeback IO in fsync/invalidate bdev
->
-> Fix the issue by calling nvme_delete_dead_ctrl() which call
-> nvme_mark_namespaces_dead() before deleting disk, so the above writeback
-> IO will be failed, and IO deadlock is avoided.
->
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/nvme/host/rdma.c | 2 +-
->  drivers/nvme/host/tcp.c  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-> index 0eb79696fb73..cdf5855c3009 100644
-> --- a/drivers/nvme/host/rdma.c
-> +++ b/drivers/nvme/host/rdma.c
-> @@ -1028,7 +1028,7 @@ static void nvme_rdma_reconnect_or_remove(struct nv=
-me_rdma_ctrl *ctrl)
->                 queue_delayed_work(nvme_wq, &ctrl->reconnect_work,
->                                 ctrl->ctrl.opts->reconnect_delay * HZ);
->         } else {
-> -               nvme_delete_ctrl(&ctrl->ctrl);
-> +               nvme_delete_dead_ctrl(&ctrl->ctrl);
->         }
->  }
->
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index bf0230442d57..2c119bff7010 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -2047,7 +2047,7 @@ static void nvme_tcp_reconnect_or_remove(struct nvm=
-e_ctrl *ctrl)
->                                 ctrl->opts->reconnect_delay * HZ);
->         } else {
->                 dev_info(ctrl->device, "Removing controller...\n");
-> -               nvme_delete_ctrl(ctrl);
-> +               nvme_delete_dead_ctrl(ctrl);
->         }
->  }
->
-> --
-> 2.40.1
->
+Let's split those out then, especially as we don't have a BLOCK_DEBUG
+option right now.
 
+> With those out, I see a code size decrease in bio.c, which makes sense -
+> gcc ought to be able to generate slightly better code when it's dealing
+> with pure values, provided everything is inlined and there's no aliasing
+> considerations.
+> 
+> Onto blk-map.c:
+> 
+> bio_copy_kern_endio_read() increases in code size, but if I change
+> memcpy_from_bvec() to take the bvec by val instead of by ref it's
+> basically the same code size. There's no disadvantage to changing
+> memcpy_from_bvec() to pass by val.
+> 
+> bio_copy_(to|from)_iter() is a wtf, though - gcc is now spilling the
+> constructed bvec to the stack; my best guess is it's a register pressure
+> thing (but we shouldn't be short registers here!).
+> 
+> So, since the fastpath stuff in bio.c gets smaller and blk-map.c is not
+> exactly fastpath stuff I'm not inclined to fight with gcc on this one -
+> let me know if that works for you.
+> 
+> Branch is updated - I split out the new assertions into a separate patch
+> that adds CONFIG_BLK_DEBUG, and another patch for mempcy_(to|from)_bio()
+> for a small code size decrease.
+> 
+> https://evilpiepirate.org/git/bcachefs.git/log/?h=block-for-bcachefs
+> or
+> git pull http://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
 
---=20
-Best Regards,
-  Yi Zhang
+Cn you resend just the iterator changes in their current form? The
+various re-exports are a separate discussion, I think we should focus on
+the iterator bits first.
+
+-- 
+Jens Axboe
 
