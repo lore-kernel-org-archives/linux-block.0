@@ -2,159 +2,275 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE605C7EE24
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 12:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA5DC77B73
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 12:47:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233576AbjFEMhM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 08:37:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33294 "EHLO
+        id S233622AbjFEMrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 08:47:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233584AbjFEMgv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 08:36:51 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14BCAE75;
-        Mon,  5 Jun 2023 05:36:35 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QZY4q4sHXz4f3kpB;
-        Mon,  5 Jun 2023 20:36:27 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCH77LL1n1ktEr8Kw--.27071S3;
-        Mon, 05 Jun 2023 20:36:28 +0800 (CST)
-Subject: Re: [PATCH -next] loop: Add parm check in loop_control_ioctl
-To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>, axboe@kernel.dk,
-        kay.sievers@vrfy.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhongjinghua@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230605122838.2148878-1-zhongjinghua@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <aa6963b1-6add-161f-aac2-6e30634f9f19@huaweicloud.com>
-Date:   Mon, 5 Jun 2023 20:36:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S233455AbjFEMrH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 08:47:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7FE9D2
+        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 05:46:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1685969182;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nTV++T1qFJV7bEuDjQHfHExm7YDjffLohFjYna0MPZ0=;
+        b=KUD2uP/CPkw7Ol4rEB8/O4sVtGnJdQAgX9GvpoWTznXDqxBhJ1JufwgZI9al8AZNyW6G1z
+        jO2d17ZSzl/PrL/wK/Otai6U3SqRD0HRJtz0sHfdkca8z7frExO55tpIyKbXPvardO4FHS
+        k6efHOMm/SEQ+ZtALR2esg7aId2xWRA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-601-gzBNOFPnODqMmUTrqVdFFg-1; Mon, 05 Jun 2023 08:46:18 -0400
+X-MC-Unique: gzBNOFPnODqMmUTrqVdFFg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C07C3811E93;
+        Mon,  5 Jun 2023 12:46:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DBA884087C62;
+        Mon,  5 Jun 2023 12:46:14 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH net-next v4 04/11] splice, net: Add a splice_eof op to file-ops and socket-ops
+Date:   Mon,  5 Jun 2023 13:45:53 +0100
+Message-ID: <20230605124600.1722160-5-dhowells@redhat.com>
+In-Reply-To: <20230605124600.1722160-1-dhowells@redhat.com>
+References: <20230605124600.1722160-1-dhowells@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20230605122838.2148878-1-zhongjinghua@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCH77LL1n1ktEr8Kw--.27071S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxCFWDWw1xKF18XrykAr13urg_yoW5WF4DpF
-        W8Ja4Yya4DKF47Ca12qa4UZa45C3Wjv3yrZry2ywnY9r9xCryav3y5WFW5Xa17tFW3tFW5
-        XF1DXa48K3WUCrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyCb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-        AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-        j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-        kEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAK
-        I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-        xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-        jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-        0EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
-        7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Add an optional method, ->splice_eof(), to allow splice to indicate the
+premature termination of a splice to struct file_operations and struct
+proto_ops.
 
-ÔÚ 2023/06/05 20:28, Zhong Jinghua Ð´µÀ:
-> From: Zhong Jinghua <zhongjinghua@huawei.com>
-> 
-> We found that in loop_control_ioctl, the kernel panic can be easily caused:
-> 
-> 1. syscall(__NR_ioctl, r[1], 0x4c80, 0x80000200000ul);
-> Create a loop device 0x80000200000ul.
-> In fact, in the code, it is used as the first_minor number, and the
-> first_minor number is 0.
-> So the created loop device number is 7:0.
-> 
-> 2. syscall(__NR_ioctl, r[2], 0x4c80, 0ul);
-> Create a loop device 0x0ul.
-> Since the 7:0 device has been created in 1, add_disk will fail because
-> the major and first_minor numbers are consistent.
-> 
-> 3. syscall(__NR_ioctl, r[5], 0x4c81, 0ul);
-> Delete the device that failed to create, the kernel panics.
+This is called if sendfile() or splice() encounters all of the following
+conditions inside splice_direct_to_actor():
 
-Please notice that kernel panic won't be triggered because add_disk()
-has appropriate error handling.
+ (1) the user did not set SPLICE_F_MORE (splice only), and
 
-Thanks,
-Kuai
-> 
-> Panic like below:
-> BUG: KASAN: null-ptr-deref in device_del+0xb3/0x840 drivers/base/core.c:3107
-> Call Trace:
->   kill_device drivers/base/core.c:3079 [inline]
->   device_del+0xb3/0x840 drivers/base/core.c:3107
->   del_gendisk+0x463/0x5f0 block/genhd.c:971
->   loop_remove drivers/block/loop.c:2190 [inline]
->   loop_control_ioctl drivers/block/loop.c:2289 [inline]
-> 
-> The stack like below:
-> Create loop device:
-> loop_control_ioctl
->    loop_add
->      add_disk
->        device_add_disk
->          bdi_register
->            bdi_register_va
->              device_create
->                device_create_groups_vargs
->                  device_add
->                    kfree(dev->p);
->                      dev->p = NULL;
-> 
-> Remove loop device:
-> loop_control_ioctl
->    loop_remove
->      del_gendisk
->        device_del
->          kill_device
->            if (dev->p->dead) // p is null
-> 
-> Fix it by adding a check for parm.
-> 
-> Fixes: 770fe30a46a1 ("loop: add management interface for on-demand device allocation")
-> Signed-off-by: Zhong Jinghua <zhongjinghua@huawei.com>
-> ---
->   drivers/block/loop.c | 14 +++++++++++++-
->   1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 76b96c42f417..60f2a31c4a24 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2084,6 +2084,17 @@ static int loop_add(struct loop_device **l, int i)
->   	struct gendisk *disk;
->   	int err;
->   
-> +	/*
-> +	 * i << part_shift is actually used as the first_minor.
-> +	 * So here should avoid i << part_shift overflow.
-> +	 * And, MKDEV() expect that the max bits of
-> +	 * first_minor is 20.
-> +	 */
-> +	if (i > 0 && i > MINORMASK >> part_shift) {
-> +		err = -EINVAL;
-> +		goto out;
-> +	}
-> +
->   	err = -ENOMEM;
->   	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
->   	if (!lo)
-> @@ -2097,7 +2108,8 @@ static int loop_add(struct loop_device **l, int i)
->   		if (err == -ENOSPC)
->   			err = -EEXIST;
->   	} else {
-> -		err = idr_alloc(&loop_index_idr, lo, 0, 0, GFP_KERNEL);
-> +		err = idr_alloc(&loop_index_idr, lo, 0,
-> +				(MINORMASK >> part_shift) + 1, GFP_KERNEL);
->   	}
->   	if (err < 0)
->   		goto out_free_dev;
-> 
+ (2) an EOF condition occurred (->splice_read() returned 0), and
+
+ (3) we haven't read enough to fulfill the request (ie. len > 0 still), and
+
+ (4) we have already spliced at least one byte.
+
+A further patch will modify the behaviour of SPLICE_F_MORE to always be
+passed to the actor if either the user set it or we haven't yet read
+sufficient data to fulfill the request.
+
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/r/CAHk-=wh=V579PDYvkpnTobCLGczbgxpMgGmmhqiTyE34Cpi5Gg@mail.gmail.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jan Kara <jack@suse.cz>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: David Hildenbrand <david@redhat.com>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Chuck Lever <chuck.lever@oracle.com>
+cc: Boris Pismenny <borisp@nvidia.com>
+cc: John Fastabend <john.fastabend@gmail.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-block@vger.kernel.org
+cc: linux-mm@kvack.org
+cc: netdev@vger.kernel.org
+---
+ fs/splice.c            | 31 ++++++++++++++++++++++++++++++-
+ include/linux/fs.h     |  1 +
+ include/linux/net.h    |  1 +
+ include/linux/splice.h |  1 +
+ include/net/sock.h     |  1 +
+ net/socket.c           | 10 ++++++++++
+ 6 files changed, 44 insertions(+), 1 deletion(-)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 9b1d43c0c562..3063f9a3ba62 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -969,6 +969,17 @@ static long do_splice_from(struct pipe_inode_info *pipe, struct file *out,
+ 	return out->f_op->splice_write(pipe, out, ppos, len, flags);
+ }
+ 
++/*
++ * Indicate to the caller that there was a premature EOF when reading from the
++ * source and the caller didn't indicate they would be sending more data after
++ * this.
++ */
++static void do_splice_eof(struct splice_desc *sd)
++{
++	if (sd->splice_eof)
++		sd->splice_eof(sd);
++}
++
+ /*
+  * Attempt to initiate a splice from a file to a pipe.
+  */
+@@ -1068,7 +1079,7 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 
+ 		ret = do_splice_to(in, &pos, pipe, len, flags);
+ 		if (unlikely(ret <= 0))
+-			goto out_release;
++			goto read_failure;
+ 
+ 		read_len = ret;
+ 		sd->total_len = read_len;
+@@ -1108,6 +1119,15 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 	file_accessed(in);
+ 	return bytes;
+ 
++read_failure:
++	/*
++	 * If the user did *not* set SPLICE_F_MORE *and* we didn't hit that
++	 * "use all of len" case that cleared SPLICE_F_MORE, *and* we did a
++	 * "->splice_in()" that returned EOF (ie zero) *and* we have sent at
++	 * least 1 byte *then* we will also do the ->splice_eof() call.
++	 */
++	if (ret == 0 && !more && len > 0 && bytes)
++		do_splice_eof(sd);
+ out_release:
+ 	/*
+ 	 * If we did an incomplete transfer we must release
+@@ -1136,6 +1156,14 @@ static int direct_splice_actor(struct pipe_inode_info *pipe,
+ 			      sd->flags);
+ }
+ 
++static void direct_file_splice_eof(struct splice_desc *sd)
++{
++	struct file *file = sd->u.file;
++
++	if (file->f_op->splice_eof)
++		file->f_op->splice_eof(file);
++}
++
+ /**
+  * do_splice_direct - splices data directly between two files
+  * @in:		file to splice from
+@@ -1161,6 +1189,7 @@ long do_splice_direct(struct file *in, loff_t *ppos, struct file *out,
+ 		.flags		= flags,
+ 		.pos		= *ppos,
+ 		.u.file		= out,
++		.splice_eof	= direct_file_splice_eof,
+ 		.opos		= opos,
+ 	};
+ 	long ret;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index f8254c3acf83..e393f2550300 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1796,6 +1796,7 @@ struct file_operations {
+ 	int (*flock) (struct file *, int, struct file_lock *);
+ 	ssize_t (*splice_write)(struct pipe_inode_info *, struct file *, loff_t *, size_t, unsigned int);
+ 	ssize_t (*splice_read)(struct file *, loff_t *, struct pipe_inode_info *, size_t, unsigned int);
++	void (*splice_eof)(struct file *file);
+ 	int (*setlease)(struct file *, long, struct file_lock **, void **);
+ 	long (*fallocate)(struct file *file, int mode, loff_t offset,
+ 			  loff_t len);
+diff --git a/include/linux/net.h b/include/linux/net.h
+index b73ad8e3c212..8defc8f1d82e 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -210,6 +210,7 @@ struct proto_ops {
+ 				      int offset, size_t size, int flags);
+ 	ssize_t 	(*splice_read)(struct socket *sock,  loff_t *ppos,
+ 				       struct pipe_inode_info *pipe, size_t len, unsigned int flags);
++	void		(*splice_eof)(struct socket *sock);
+ 	int		(*set_peek_off)(struct sock *sk, int val);
+ 	int		(*peek_len)(struct socket *sock);
+ 
+diff --git a/include/linux/splice.h b/include/linux/splice.h
+index 991ae318b6eb..4fab18a6e371 100644
+--- a/include/linux/splice.h
++++ b/include/linux/splice.h
+@@ -38,6 +38,7 @@ struct splice_desc {
+ 		struct file *file;	/* file to read/write */
+ 		void *data;		/* cookie */
+ 	} u;
++	void (*splice_eof)(struct splice_desc *sd); /* Unexpected EOF handler */
+ 	loff_t pos;			/* file position */
+ 	loff_t *opos;			/* sendfile: output position */
+ 	size_t num_spliced;		/* number of bytes already spliced */
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 656ea89f60ff..330b9c24ef70 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1267,6 +1267,7 @@ struct proto {
+ 					   size_t len, int flags, int *addr_len);
+ 	int			(*sendpage)(struct sock *sk, struct page *page,
+ 					int offset, size_t size, int flags);
++	void			(*splice_eof)(struct socket *sock);
+ 	int			(*bind)(struct sock *sk,
+ 					struct sockaddr *addr, int addr_len);
+ 	int			(*bind_add)(struct sock *sk,
+diff --git a/net/socket.c b/net/socket.c
+index c4d9104418c8..b778fc03c6e0 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -130,6 +130,7 @@ static int sock_fasync(int fd, struct file *filp, int on);
+ static ssize_t sock_splice_read(struct file *file, loff_t *ppos,
+ 				struct pipe_inode_info *pipe, size_t len,
+ 				unsigned int flags);
++static void sock_splice_eof(struct file *file);
+ 
+ #ifdef CONFIG_PROC_FS
+ static void sock_show_fdinfo(struct seq_file *m, struct file *f)
+@@ -163,6 +164,7 @@ static const struct file_operations socket_file_ops = {
+ 	.fasync =	sock_fasync,
+ 	.splice_write = splice_to_socket,
+ 	.splice_read =	sock_splice_read,
++	.splice_eof =	sock_splice_eof,
+ 	.show_fdinfo =	sock_show_fdinfo,
+ };
+ 
+@@ -1076,6 +1078,14 @@ static ssize_t sock_splice_read(struct file *file, loff_t *ppos,
+ 	return sock->ops->splice_read(sock, ppos, pipe, len, flags);
+ }
+ 
++static void sock_splice_eof(struct file *file)
++{
++	struct socket *sock = file->private_data;
++
++	if (sock->ops->splice_eof)
++		sock->ops->splice_eof(sock);
++}
++
+ static ssize_t sock_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ {
+ 	struct file *file = iocb->ki_filp;
 
