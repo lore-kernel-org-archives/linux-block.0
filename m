@@ -2,137 +2,175 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56605C7EE2A
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 04:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05807C7EE2A
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 04:47:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232762AbjFEEnm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 00:43:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54030 "EHLO
+        id S232837AbjFEErR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 00:47:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232098AbjFEEnl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 00:43:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57A9B0;
-        Sun,  4 Jun 2023 21:43:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4AD6A60FF2;
-        Mon,  5 Jun 2023 04:43:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0084BC433D2;
-        Mon,  5 Jun 2023 04:43:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685940218;
-        bh=Q2LYPU3tLkyhQ4Pp64yIytDL2o67Pr2wna2sgrcUcpM=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=br5SZ4RyOoGkIRtZ5ayTXvpjkF9uaWeLKWgUCteluljBEyALZfPobF4beAnmMcL39
-         XN1/ooUQjseEsPwv2SPF1JuH+h4oCwk4lv0siLcz/+3gHeaaU8v7twWzpp8sG/MVEK
-         /tgYm0yfS9rX3lcIbZbfHL2L3A6jKZaLjqRhwkgD6H2+Ibxgnysf//ejIDIXdRwQMH
-         wlDH6rLVbqYe/8S1XAru2XgRHaE6geXSOPqCXHj+aDMQdTDsfKMu1M8CEG3ZhVJ/4N
-         tLfWt0Cd80n+Nxerh6bRZlmRx7KcAAA71rGhvC4kG7TwB8nGjUzeipiOdLHYNJKUPv
-         KpUXRBdfMr/0g==
-Message-ID: <8a405b3b-b630-8cf6-6062-57034dfa6086@kernel.org>
-Date:   Mon, 5 Jun 2023 13:43:36 +0900
+        with ESMTP id S232825AbjFEErP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 00:47:15 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A84B0
+        for <linux-block@vger.kernel.org>; Sun,  4 Jun 2023 21:47:13 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-5149429c944so6774240a12.0
+        for <linux-block@vger.kernel.org>; Sun, 04 Jun 2023 21:47:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1685940431; x=1688532431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=06zA5PJSQMmfDhZEXKzzRsPi8utG/lf0ef8eRLldERQ=;
+        b=IUPRmK7evATjPNi2UfnBgjO1Usqx8u0vWoUyDmaUlgNq/2vNUgg6w/9uMNACQ/1pUf
+         MAEGe1fCTVwyKWD74Of8PR4c81l/QsB3XOJXAFfcE4wrZ4s8DfSo5mTK2wmVDBI+YPQs
+         +7Xb+56PL2dYM69mqhXr75iqjvPPHf0hq4CixL9ahoekFdjh7ysB91K0GZdYroC4xfB/
+         3HvuB8JFoQaid6CWzi0FqgYPUL9//8TSy36kwDuK2z2UxWwOnijxfiNchAAbiuQtuLHK
+         //GQtt1p869ynOvOK2p1SC62Xq2Ap9+DBnbDfgbSXHL7ouG/gRrhA1idn+xTuU2qAdCc
+         Nipg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685940431; x=1688532431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=06zA5PJSQMmfDhZEXKzzRsPi8utG/lf0ef8eRLldERQ=;
+        b=Wac6x4RJ5j45Andzw1+TojPP3mP01FRgp5a+uwVzhG1jDcFU68qVDtJqaABD3xWdNL
+         Y1OjZWDDGyxi2AAX0ZiQj3YUbK1IclTjsmcz6Zw7MeQTPcgXXsbBUAHbcXQ8EyFNulKZ
+         4aV+TKpoQbXf9ODzXSCJwBhJvnzDcyGeI8h8F9I7jxh2GmyQVKX2Ut4hrQapcyHVVJBU
+         yDS9zhqOXRw9Kz5NyIaQcC3iu84MICNnJlbcPl7EHkFfNHuioqHUXGL3BuKdJKxrcokD
+         NPSzwkGoiKpAHr+dsPLWYVHaRLk1XjIIlo2vPQ6z/opyErI6jaUqS84d9d1QO2qZtoCV
+         y9Mw==
+X-Gm-Message-State: AC+VfDyIR6KZ2e0kenHrsKokIhN9uBxoA03zDZWRi6hZJw7hHbKNPSS/
+        Li/3MdlNfcKKwPpS2pYpum/Kte0Em1Y6t8yE9ekgSw==
+X-Google-Smtp-Source: ACHHUZ6N4v6FQLcrCOJffj9h0dxU3alusm+0YqU9TdCoLt2rL7Ac0kU4vQ7jTydhl7YWoiAEp1SGfZmRL3Urzr8S2no=
+X-Received: by 2002:aa7:d608:0:b0:50b:d5e5:519d with SMTP id
+ c8-20020aa7d608000000b0050bd5e5519dmr6590276edr.4.1685940431627; Sun, 04 Jun
+ 2023 21:47:11 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] block: improve ioprio value validity checks
-Content-Language: en-US
-To:     Linus Walleij <linus.walleij@linaro.org>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20230530061307.525644-1-dlemoal@kernel.org>
- <ZHW9IQvePaG0yxY8@x1-carbon>
- <CACRpkdZskZ-GktsYL0MXbMwdOQmF=-4yyns3u+-2eHP1Nt_RHg@mail.gmail.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <CACRpkdZskZ-GktsYL0MXbMwdOQmF=-4yyns3u+-2eHP1Nt_RHg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20230603165949.1753326-1-masahiroy@kernel.org>
+In-Reply-To: <20230603165949.1753326-1-masahiroy@kernel.org>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Mon, 5 Jun 2023 06:47:02 +0200
+Message-ID: <CAMGffEk-_dGmciH7ggsATVAHyCwLemkR_UX4ikRJmuC7w1ePrg@mail.gmail.com>
+Subject: Re: [PATCH] block/rnbd: fix mixed module-builtin object
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Nick Terrell <terrelln@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/30/23 20:30, Linus Walleij wrote:
-> On Tue, May 30, 2023 at 11:09 AM Niklas Cassel <Niklas.Cassel@wdc.com> wrote:
-> 
->> We noticed that the LTP test case:
->> https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/ioprio/ioprio_set03.c
->>
->> Started failing since this commit in linux-next:
->> eca2040972b4 ("scsi: block: ioprio: Clean up interface definition")
->>
->> The test case expects that a syscall that sets ioprio with a class of 8
->> should fail.
->>
->> Before this commit in linux next, the 16 bit ioprio was defined like this:
->> 3 bits class | 13 bits level
->>
->> However, ioprio_check_cap() rejected any priority levels in the range
->> 8-8191, which meant that the only bits that could actually be used to
->> store an ioprio were:
->> 3 bits class | 10 bits unused | 3 bits level
->>
->> The 10 unused bits were defined to store an ioprio hint in commit:
->> 6c913257226a ("scsi: block: Introduce ioprio hints"), so it is now:
->> 3 bits class | 10 bits hint | 3 bits level
->>
->> This meant that the LTP test trying to set a ioprio level of 8,
->> will no longer fail. It will now set a level of 0, and a hint of value 1.
-> 
-> Wow good digging! I knew the test would be good for something.
-> Like for maintaining the test.
-> 
->> The fix that Damien suggested, which adds multiple boundary checks in the
->> IOPRIO_PRIO_VALUE() macro will fix any user space program that uses the uapi
->> header.
-> 
-> Fixing things in the UAPI headers make it easier to do things right
-> going forward with classes and all.
-> 
->> However, some applications, like the LTP test case, do not use the
->> uapi header, but defines the macros inside their own header.
-> 
-> IIRC that was because there were no UAPI headers when the test
-> was created, I don't think I was just randomly lazy... Well maybe I
-> was. The numbers are ABI anyway, not the header files.
-> 
->> Note that even before commit:
->> eca2040972b4 ("scsi: block: ioprio: Clean up interface definition")
->>
->> The exact same problem existed, ioprio_check_cap() would not give an
->> error if a user space program sent in a level that was higher than
->> what could be represented by the bits used to define the level,
->> e.g. a user space program using IOPRIO_PRIO_VALUE(IOPRIO_CLASS_RT, 8192)
->> would not have the syscall return error, even though the level was higher
->> than 7. (And the effective level would be 0.)
->>
->> The LTP test case needs to be updated anyway, since it copies the ioprio
->> macros instead of including the uapi header.
-> 
-> Yeah one of the reasons the kernel fails is in order to be
-> able to slot in new behaviour in response to these ioctls,
-> so the test should probably just be updated to also test
-> the new scheduling classes and all that, using the UAPI
-> headers.
-> 
-> Will you send a patch?
-
-Linus,
-
-I sent a couple of patches for ltp to fix this. As I am not subscribed to the
-ltp list, I got the usual "Your mail to 'ltp' with the subject ... Is being held
-until the list moderator can review it for approval.".
+Hi Masahiro,
 
 
-> 
-> Yours,
-> Linus Walleij
+On Sat, Jun 3, 2023 at 6:59=E2=80=AFPM Masahiro Yamada <masahiroy@kernel.or=
+g> wrote:
+>
+> With CONFIG_BLK_DEV_RNBD_CLIENT=3Dm and CONFIG_BLK_DEV_RNBD_SERVER=3Dy
+> (or vice versa), rnbd-common.o is linked to a module and also to
+> vmlinux even though CFLAGS are different between builtins and modules.
+>
+> This is the same situation as fixed by commit 637a642f5ca5 ("zstd:
+> Fixing mixed module-builtin objects").
+>
+> Turn rnbd_access_mode_str() into an inline function.
+Thx for you fix, but Guoqing has a slightly different patch in the queue:
 
--- 
-Damien Le Moal
-Western Digital Research
+https://lore.kernel.org/linux-block/CAMGffEnDjAP3zqytmsYxacvUROLKZj+KhH6LOX=
+icOoPhS9FJJQ@mail.gmail.com/
+>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
+
+> ---
+>
+>  drivers/block/rnbd/Makefile      |  6 ++----
+>  drivers/block/rnbd/rnbd-common.c | 23 -----------------------
+>  drivers/block/rnbd/rnbd-proto.h  | 14 +++++++++++++-
+>  3 files changed, 15 insertions(+), 28 deletions(-)
+>  delete mode 100644 drivers/block/rnbd/rnbd-common.c
+>
+> diff --git a/drivers/block/rnbd/Makefile b/drivers/block/rnbd/Makefile
+> index 40b31630822c..208e5f865497 100644
+> --- a/drivers/block/rnbd/Makefile
+> +++ b/drivers/block/rnbd/Makefile
+> @@ -3,13 +3,11 @@
+>  ccflags-y :=3D -I$(srctree)/drivers/infiniband/ulp/rtrs
+>
+>  rnbd-client-y :=3D rnbd-clt.o \
+> -                 rnbd-clt-sysfs.o \
+> -                 rnbd-common.o
+> +                 rnbd-clt-sysfs.o
+>
+>  CFLAGS_rnbd-srv-trace.o =3D -I$(src)
+>
+> -rnbd-server-y :=3D rnbd-common.o \
+> -                 rnbd-srv.o \
+> +rnbd-server-y :=3D rnbd-srv.o \
+>                   rnbd-srv-sysfs.o \
+>                   rnbd-srv-trace.o
+>
+> diff --git a/drivers/block/rnbd/rnbd-common.c b/drivers/block/rnbd/rnbd-c=
+ommon.c
+> deleted file mode 100644
+> index 596c3f732403..000000000000
+> --- a/drivers/block/rnbd/rnbd-common.c
+> +++ /dev/null
+> @@ -1,23 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-or-later
+> -/*
+> - * RDMA Network Block Driver
+> - *
+> - * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
+> - * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
+> - * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
+> - */
+> -#include "rnbd-proto.h"
+> -
+> -const char *rnbd_access_mode_str(enum rnbd_access_mode mode)
+> -{
+> -       switch (mode) {
+> -       case RNBD_ACCESS_RO:
+> -               return "ro";
+> -       case RNBD_ACCESS_RW:
+> -               return "rw";
+> -       case RNBD_ACCESS_MIGRATION:
+> -               return "migration";
+> -       default:
+> -               return "unknown";
+> -       }
+> -}
+> diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-pr=
+oto.h
+> index da1d0542d7e2..57afe9b07fda 100644
+> --- a/drivers/block/rnbd/rnbd-proto.h
+> +++ b/drivers/block/rnbd/rnbd-proto.h
+> @@ -300,6 +300,18 @@ static inline u32 rq_to_rnbd_flags(struct request *r=
+q)
+>         return rnbd_opf;
+>  }
+>
+> -const char *rnbd_access_mode_str(enum rnbd_access_mode mode);
+> +static inline const char *rnbd_access_mode_str(enum rnbd_access_mode mod=
+e)
+> +{
+> +       switch (mode) {
+> +       case RNBD_ACCESS_RO:
+> +               return "ro";
+> +       case RNBD_ACCESS_RW:
+> +               return "rw";
+> +       case RNBD_ACCESS_MIGRATION:
+> +               return "migration";
+> +       default:
+> +               return "unknown";
+> +       }
+> +}
+>
+>  #endif /* RNBD_PROTO_H */
+> --
+> 2.39.2
+>
