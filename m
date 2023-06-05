@@ -2,178 +2,85 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31686C7EE23
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 16:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BF0C7EE23
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 17:22:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230433AbjFEQwX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 12:52:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56464 "EHLO
+        id S235384AbjFERWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 13:22:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233019AbjFEQwW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 12:52:22 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB58E6
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 09:52:21 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-256200b49cdso798390a91.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 09:52:21 -0700 (PDT)
+        with ESMTP id S234244AbjFERWE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 13:22:04 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A90B0
+        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 10:22:01 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-2564ced644bso1035015a91.0
+        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 10:22:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685983940; x=1688575940;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zJNMYZ5ZlCwWFShxq5SVp0goxBjUhrKSnIdXymTHIMA=;
-        b=eCI7hkAM00pEJVL1uVIG+L7F7tIEbviV3dizbWupXZgZzYGGiWUr/7YXVjom0pGngN
-         WMyAc4/5g8N1IWO57Lf7ZbI1Dpd3DRD7xiNQ6esKC+///UVz4SiZeeL9RqDvxOdRT0aI
-         HCgziPbLo3f4sgMozOg6ysKkvbB9rpz+7YNk3gwIBd/KKPclRk9pq0wqepC7lMvg16Hj
-         Y8I4Ax7sbrmn/0MZwlznYVucPkBvxHXODAyLSRJf34g5tv6JDP0tZH5jpmIQHxtLgTnd
-         rTd0RWlvFe0+NxhfAp8K579bNuj8fVyY93kZAB2Q8MV+sOK0T6ychjXdysLTuJro4Dv7
-         iFDw==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685985721; x=1688577721;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4bx3FOQ8WpXAjUchLrV7ZdQUMCcuc5rVhaoplHLZKkU=;
+        b=NmMei7rN/FQixwaXZYdcuIqojmmWOTp3C9B6kG7NOpV0TNYhFnHmxNTr6RVA4dADhm
+         lnGs6br8Osze0v/nf45uyiMWPpbT08Ed1pOxiu/uIzRR2GRirueFk/vTh71TTVGMY1tM
+         lcu3bjzFVw6A6v2Q9VvvaP0ykmVyppKEVkhGBB5l562aAKL9NBDktU2ohjDOodcjtPlR
+         ydBEK2dmhGggVTvL0IAa3d830ysmMcn0aUkBoYH/nX5g3XagTgxONQNHPde0tx5wfQY9
+         7ryJkoTYpwHPx5dL1kP/eqdpJuoLDjFkmuAUfIkT3+cVjJPLBPdohoZ3RvxQKC4ZzZCx
+         ybgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685983940; x=1688575940;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJNMYZ5ZlCwWFShxq5SVp0goxBjUhrKSnIdXymTHIMA=;
-        b=E6hjROAZvMZrm3AUHqGVs0V/4LQ/wVJinFVtmO8I/qD65qGbHteKV/zCVP5X0EvLnp
-         KNtpPZGz8dsHFAcoaOOwL8pLZKINomggiLLmdlS6hIuFbYa92+uCpCSYoL51D1bca0GK
-         kODDWLLGMt9cQ6TwqAEfu1f9VCCuFvIHXKzTpje0NaiFz974kojEZjGVZ52btehoRXG5
-         mIQ1F2gEec3/z0pasH92JtLrq2BLvfXPLPo0xNLqi3hOFrXTCSk8JO4m+Btq8Gxcmqy8
-         1yTSaOW4Ju0Kw/cq14zIshnYx35izQJWKG28POBYIxc6UclMnWOJvVA3+tJntkOtiyIP
-         p38A==
-X-Gm-Message-State: AC+VfDz0DEA2g3yBAkgLm2udq+/C4oOLNJ47wolM4eXBORgLTMCetv7E
-        HL1fTV6lfRS/AY35x0DJwdGpbw==
-X-Google-Smtp-Source: ACHHUZ4plkQPRc81+FMyI3pGvSItsM7r3Pq1a0SJx1hFlpW/XJG6VQ5dkmCpuLqzdFwsuXFaoVWJVw==
-X-Received: by 2002:a17:90b:4f47:b0:255:c3a3:43a with SMTP id pj7-20020a17090b4f4700b00255c3a3043amr18747151pjb.4.1685983940422;
-        Mon, 05 Jun 2023 09:52:20 -0700 (PDT)
-Received: from ?IPV6:2600:380:c01c:32f0:eff8:7692:bf8a:abc6? ([2600:380:c01c:32f0:eff8:7692:bf8a:abc6])
-        by smtp.gmail.com with ESMTPSA id e91-20020a17090a6fe400b002508d73f4e8sm8440142pjk.57.2023.06.05.09.52.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jun 2023 09:52:19 -0700 (PDT)
-Message-ID: <286f350c-b1b3-694d-b969-d06747b52144@kernel.dk>
-Date:   Mon, 5 Jun 2023 10:52:18 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] blk-ioc: protect ioc_destroy_icq() by 'queue_lock'
-Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, dlemoal@kernel.org,
-        quic_pragalla@quicinc.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230531073435.2923422-1-yukuai1@huaweicloud.com>
- <03ffbdc4-66e2-5508-f632-e3a1999f40df@huaweicloud.com>
+        d=1e100.net; s=20221208; t=1685985721; x=1688577721;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4bx3FOQ8WpXAjUchLrV7ZdQUMCcuc5rVhaoplHLZKkU=;
+        b=foUpRXab2snFZd7kjGmqGOMSZmAmkPjq2wKSz/+WxNnqo6y3rc0ZVog+7q8xt1l4Xk
+         C0TRQ6x2j/H9QBe24N6hdKCrE00Dux82Fgxd6nMrbT3Pe+pBmwi0lPzTPrfQQD1f7Ltn
+         k9Aba3VreT+CH3f48F1VGcGp97aAbw95J/5pyrO7dvxq6C5Kl0i6GCtqoSRam/0fwURj
+         WGDgVEUr+dAzUa9Ik0OKo88cmzhMhWYh5d4JA44QnFpu4of/Drex/9TjAPUtPL4ETpjr
+         utJn0yKNl+IuVMUYXl+IOiAZ4RncyqUhp4uzZO9YVn2zde/2FmiJ4HwyJc6FLHciX/Aa
+         j7vA==
+X-Gm-Message-State: AC+VfDwCLc/uIoZOqMDVLbDSwvdPdABWMXP7BWtcUsdUjjk79QQwcjAK
+        AGfJ9O66XN/Wa2WIY8hEcJ3GiFfIdljxNyMYduw=
+X-Google-Smtp-Source: ACHHUZ661iczc0HcuBHzs3Fi+bR77NqS/CnPjg3kZtWjD9M5bK3e6bkSVWVIc5Nlkq2/lDCuuq4zNg==
+X-Received: by 2002:a17:90b:1e51:b0:258:85d9:be02 with SMTP id pi17-20020a17090b1e5100b0025885d9be02mr16979731pjb.2.1685985720966;
+        Mon, 05 Jun 2023 10:22:00 -0700 (PDT)
+Received: from [127.0.0.1] ([2600:380:c01c:32f0:eff8:7692:bf8a:abc6])
+        by smtp.gmail.com with ESMTPSA id cl9-20020a17090af68900b0025643e5da99sm7993666pjb.37.2023.06.05.10.21.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jun 2023 10:22:00 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <03ffbdc4-66e2-5508-f632-e3a1999f40df@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, Christoph Hellwig <hch@lst.de>
+Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
+In-Reply-To: <20230601151646.1386867-1-hch@lst.de>
+References: <20230601151646.1386867-1-hch@lst.de>
+Subject: Re: [PATCH] drbd: stop defining __KERNEL_SYSCALLS__
+Message-Id: <168598571992.2504.2085169404981858004.b4-ty@kernel.dk>
+Date:   Mon, 05 Jun 2023 11:21:59 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/5/23 6:58 AM, Yu Kuai wrote:
-> Hi, Jens
-> 
-> 在 2023/05/31 15:34, Yu Kuai 写道:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Currently, icq is tracked by both request_queue(icq->q_node) and
->> task(icq->ioc_node), and ioc_clear_queue() from elevator exit is not
->> safe because it can access the list without protection:
->>
->> ioc_clear_queue            ioc_release_fn
->>   lock queue_lock
->>   list_splice
->>   /* move queue list to a local list */
->>   unlock queue_lock
->>   /*
->>    * lock is released, the local list
->>    * can be accessed through task exit.
->>    */
->>
->>                 lock ioc->lock
->>                 while (!hlist_empty)
->>                  icq = hlist_entry
->>                  lock queue_lock
->>                   ioc_destroy_icq
->>                    delete icq->ioc_node
->>   while (!list_empty)
->>    icq = list_entry()           list_del icq->q_node
->>    /*
->>     * This is not protected by any lock,
->>     * list_entry concurrent with list_del
->>     * is not safe.
->>     */
->>
->>                  unlock queue_lock
->>                 unlock ioc->lock
->>
->> Fix this problem by protecting list 'icq->q_node' by queue_lock from
->> ioc_clear_queue().
->>
->> Reported-and-tested-by: Pradeep Pragallapati <quic_pragalla@quicinc.com>
->> Link: https://lore.kernel.org/lkml/20230517084434.18932-1-quic_pragalla@quicinc.com/
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/blk-ioc.c | 30 +++++++++++++-----------------
->>   1 file changed, 13 insertions(+), 17 deletions(-)
->>
->> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
->> index 63fc02042408..d5db92e62c43 100644
->> --- a/block/blk-ioc.c
->> +++ b/block/blk-ioc.c
->> @@ -77,6 +77,10 @@ static void ioc_destroy_icq(struct io_cq *icq)
->>       struct elevator_type *et = q->elevator->type;
->>         lockdep_assert_held(&ioc->lock);
->> +    lockdep_assert_held(&q->queue_lock);
->> +
->> +    if (icq->flags & ICQ_DESTROYED)
->> +        return;
->>         radix_tree_delete(&ioc->icq_tree, icq->q->id);
->>       hlist_del_init(&icq->ioc_node);
->> @@ -128,12 +132,7 @@ static void ioc_release_fn(struct work_struct *work)
->>               spin_lock(&q->queue_lock);
->>               spin_lock(&ioc->lock);
->>   -            /*
->> -             * The icq may have been destroyed when the ioc lock
->> -             * was released.
->> -             */
->> -            if (!(icq->flags & ICQ_DESTROYED))
->> -                ioc_destroy_icq(icq);
->> +            ioc_destroy_icq(icq);
->>                 spin_unlock(&q->queue_lock);
->>               rcu_read_unlock();
->> @@ -171,23 +170,20 @@ static bool ioc_delay_free(struct io_context *ioc)
->>    */
->>   void ioc_clear_queue(struct request_queue *q)
->>   {
->> -    LIST_HEAD(icq_list);
->> -
->>       spin_lock_irq(&q->queue_lock);
->> -    list_splice_init(&q->icq_list, &icq_list);
->> -    spin_unlock_irq(&q->queue_lock);
->> -
->> -    rcu_read_lock();
->> -    while (!list_empty(&icq_list)) {
->> +    while (!list_empty(&q->icq_list)) {
->>           struct io_cq *icq =
->> -            list_entry(icq_list.next, struct io_cq, q_node);
->> +            list_first_entry(&q->icq_list, struct io_cq, q_node);
->>   +        /*
->> +         * Other context won't hold ioc lock to wait for queue_lock, see
->> +         * details in ioc_release_fn().
->> +         */
->>           spin_lock_irq(&icq->ioc->lock);
-> 
-> Sorry that I made a mistake here to use spin_lock_irq() for recursive
-> locking.
-> 
-> Should I resend this patch or send a new fix patch?
 
-Your patch is already staged in for-6.5/block, so please send a patch
-that fixes up the current tree.
+On Thu, 01 Jun 2023 17:16:46 +0200, Christoph Hellwig wrote:
+> __KERNEL_SYSCALLS__ hasn't been needed since Linux 2.6.19 so stop
+> defining it.
+> 
+> 
 
+Applied, thanks!
+
+[1/1] drbd: stop defining __KERNEL_SYSCALLS__
+      commit: d519df00938eed652fc041ff4e07b2b38a4ad3bc
+
+Best regards,
 -- 
 Jens Axboe
+
 
 
