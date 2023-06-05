@@ -2,182 +2,179 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C54C77B73
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 12:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28252C7EE23
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 13:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233754AbjFEMrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 08:47:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39512 "EHLO
+        id S229655AbjFENOa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 09:14:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233567AbjFEMrV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 08:47:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E8FF3
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 05:46:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1685969191;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JUlHVh8MNfDhhBvWQPpsitslIPkAozPn8dJTCurx9p4=;
-        b=F3ysGPubkRi9XKsHcNlAB2ybUJ0RNhQa0Qp/mGdiVy5Vb5IlfSLAXhT1czNOR3qs0lSEcW
-        9NSE2KgduK8GE8g3cvKRxxgtVXuem3VnPqBz4cH8GZeUcMtydV6Sv/7MutN1ERFKivZezL
-        CnG0WJS2IYJIZT+8RFpl4O2b7K7H6vQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-502-xgRayiKmOY-kMAeSedZ3cg-1; Mon, 05 Jun 2023 08:46:28 -0400
-X-MC-Unique: xgRayiKmOY-kMAeSedZ3cg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 92C5438294AB;
-        Mon,  5 Jun 2023 12:46:26 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A634CC1603B;
-        Mon,  5 Jun 2023 12:46:23 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     netdev@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH net-next v4 07/11] splice, net: Fix SPLICE_F_MORE signalling in splice_direct_to_actor()
-Date:   Mon,  5 Jun 2023 13:45:56 +0100
-Message-ID: <20230605124600.1722160-8-dhowells@redhat.com>
-In-Reply-To: <20230605124600.1722160-1-dhowells@redhat.com>
-References: <20230605124600.1722160-1-dhowells@redhat.com>
+        with ESMTP id S234001AbjFENO2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 09:14:28 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E125F113;
+        Mon,  5 Jun 2023 06:14:24 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QZYYs4Xkyz4f3kkC;
+        Mon,  5 Jun 2023 20:58:09 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgBXwLPd231kQXP9Kw--.46378S3;
+        Mon, 05 Jun 2023 20:58:07 +0800 (CST)
+Subject: Re: [PATCH] blk-ioc: protect ioc_destroy_icq() by 'queue_lock'
+To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, dlemoal@kernel.org,
+        quic_pragalla@quicinc.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230531073435.2923422-1-yukuai1@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <03ffbdc4-66e2-5508-f632-e3a1999f40df@huaweicloud.com>
+Date:   Mon, 5 Jun 2023 20:58:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20230531073435.2923422-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-CM-TRANSID: gCh0CgBXwLPd231kQXP9Kw--.46378S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw4xAw48uFWfWrWkZr17Awb_yoW5uF43pr
+        yrWa9xC3y8Xr4xWr4DWa1293s3ua1Fgr4qyr1fGrZ5Ar9FvrnIg3W8AryFqFn5XFs7ArZ8
+        Zr4UK395Cr4UCwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
+        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-splice_direct_to_actor() doesn't manage SPLICE_F_MORE correctly[1] - and,
-as a result, it incorrectly signals/fails to signal MSG_MORE when splicing
-to a socket.  The problem I'm seeing happens when a short splice occurs
-because we got a short read due to hitting the EOF on a file: as the length
-read (read_len) is less than the remaining size to be spliced (len),
-SPLICE_F_MORE (and thus MSG_MORE) is set.
+Hi, Jens
 
-The issue is that, for the moment, we have no way to know *why* the short
-read occurred and so can't make a good decision on whether we *should* keep
-MSG_MORE set.
+ÔÚ 2023/05/31 15:34, Yu Kuai Ð´µÀ:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Currently, icq is tracked by both request_queue(icq->q_node) and
+> task(icq->ioc_node), and ioc_clear_queue() from elevator exit is not
+> safe because it can access the list without protection:
+> 
+> ioc_clear_queue			ioc_release_fn
+>   lock queue_lock
+>   list_splice
+>   /* move queue list to a local list */
+>   unlock queue_lock
+>   /*
+>    * lock is released, the local list
+>    * can be accessed through task exit.
+>    */
+> 
+> 				lock ioc->lock
+> 				while (!hlist_empty)
+> 				 icq = hlist_entry
+> 				 lock queue_lock
+> 				  ioc_destroy_icq
+> 				   delete icq->ioc_node
+>   while (!list_empty)
+>    icq = list_entry()		   list_del icq->q_node
+>    /*
+>     * This is not protected by any lock,
+>     * list_entry concurrent with list_del
+>     * is not safe.
+>     */
+> 
+> 				 unlock queue_lock
+> 				unlock ioc->lock
+> 
+> Fix this problem by protecting list 'icq->q_node' by queue_lock from
+> ioc_clear_queue().
+> 
+> Reported-and-tested-by: Pradeep Pragallapati <quic_pragalla@quicinc.com>
+> Link: https://lore.kernel.org/lkml/20230517084434.18932-1-quic_pragalla@quicinc.com/
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/blk-ioc.c | 30 +++++++++++++-----------------
+>   1 file changed, 13 insertions(+), 17 deletions(-)
+> 
+> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+> index 63fc02042408..d5db92e62c43 100644
+> --- a/block/blk-ioc.c
+> +++ b/block/blk-ioc.c
+> @@ -77,6 +77,10 @@ static void ioc_destroy_icq(struct io_cq *icq)
+>   	struct elevator_type *et = q->elevator->type;
+>   
+>   	lockdep_assert_held(&ioc->lock);
+> +	lockdep_assert_held(&q->queue_lock);
+> +
+> +	if (icq->flags & ICQ_DESTROYED)
+> +		return;
+>   
+>   	radix_tree_delete(&ioc->icq_tree, icq->q->id);
+>   	hlist_del_init(&icq->ioc_node);
+> @@ -128,12 +132,7 @@ static void ioc_release_fn(struct work_struct *work)
+>   			spin_lock(&q->queue_lock);
+>   			spin_lock(&ioc->lock);
+>   
+> -			/*
+> -			 * The icq may have been destroyed when the ioc lock
+> -			 * was released.
+> -			 */
+> -			if (!(icq->flags & ICQ_DESTROYED))
+> -				ioc_destroy_icq(icq);
+> +			ioc_destroy_icq(icq);
+>   
+>   			spin_unlock(&q->queue_lock);
+>   			rcu_read_unlock();
+> @@ -171,23 +170,20 @@ static bool ioc_delay_free(struct io_context *ioc)
+>    */
+>   void ioc_clear_queue(struct request_queue *q)
+>   {
+> -	LIST_HEAD(icq_list);
+> -
+>   	spin_lock_irq(&q->queue_lock);
+> -	list_splice_init(&q->icq_list, &icq_list);
+> -	spin_unlock_irq(&q->queue_lock);
+> -
+> -	rcu_read_lock();
+> -	while (!list_empty(&icq_list)) {
+> +	while (!list_empty(&q->icq_list)) {
+>   		struct io_cq *icq =
+> -			list_entry(icq_list.next, struct io_cq, q_node);
+> +			list_first_entry(&q->icq_list, struct io_cq, q_node);
+>   
+> +		/*
+> +		 * Other context won't hold ioc lock to wait for queue_lock, see
+> +		 * details in ioc_release_fn().
+> +		 */
+>   		spin_lock_irq(&icq->ioc->lock);
 
-MSG_SENDPAGE_NOTLAST was added to work around this, but that is also set
-incorrectly under some circumstances - for example if a short read fills a
-single pipe_buffer, but the next read would return more (seqfile can do
-this).
+Sorry that I made a mistake here to use spin_lock_irq() for recursive
+locking.
 
-This was observed with the multi_chunk_sendfile tests in the tls kselftest
-program.  Some of those tests would hang and time out when the last chunk
-of file was less than the sendfile request size:
+Should I resend this patch or send a new fix patch?
 
-	build/kselftest/net/tls -r tls.12_aes_gcm.multi_chunk_sendfile
+Sincerely apologize for this trouble.
 
-This has been observed before[2] and worked around in AF_TLS[3].
-
-Fix this by making splice_direct_to_actor() always signal SPLICE_F_MORE if
-we haven't yet hit the requested operation size.  SPLICE_F_MORE remains
-signalled if the user passed it in to splice() but otherwise gets cleared
-when we've read sufficient data to fulfill the request.
-
-If, however, we get a premature EOF from ->splice_read(), have sent at
-least one byte and SPLICE_F_MORE was not set by the caller, ->splice_eof()
-will be invoked.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jan Kara <jack@suse.cz>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: Boris Pismenny <borisp@nvidia.com>
-cc: John Fastabend <john.fastabend@gmail.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-block@vger.kernel.org
-cc: linux-mm@kvack.org
-cc: netdev@vger.kernel.org
-
-Link: https://lore.kernel.org/r/499791.1685485603@warthog.procyon.org.uk/ [1]
-Link: https://lore.kernel.org/r/1591392508-14592-1-git-send-email-pooja.trivedi@stackpath.com/ [2]
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d452d48b9f8b1a7f8152d33ef52cfd7fe1735b0a [3]
----
-
-Notes:
-    ver #4)
-     - Use ->splice_eof() to signal a premature EOF to the splice output.
-
- fs/splice.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/fs/splice.c b/fs/splice.c
-index 3063f9a3ba62..1be3ba622b0c 100644
---- a/fs/splice.c
-+++ b/fs/splice.c
-@@ -1063,13 +1063,17 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 	 */
- 	bytes = 0;
- 	len = sd->total_len;
-+
-+	/* Don't block on output, we have to drain the direct pipe. */
- 	flags = sd->flags;
-+	sd->flags &= ~SPLICE_F_NONBLOCK;
- 
- 	/*
--	 * Don't block on output, we have to drain the direct pipe.
-+	 * We signal MORE until we've read sufficient data to fulfill the
-+	 * request and we keep signalling it if the caller set it.
- 	 */
--	sd->flags &= ~SPLICE_F_NONBLOCK;
- 	more = sd->flags & SPLICE_F_MORE;
-+	sd->flags |= SPLICE_F_MORE;
- 
- 	WARN_ON_ONCE(!pipe_empty(pipe->head, pipe->tail));
- 
-@@ -1085,14 +1089,12 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
- 		sd->total_len = read_len;
- 
- 		/*
--		 * If more data is pending, set SPLICE_F_MORE
--		 * If this is the last data and SPLICE_F_MORE was not set
--		 * initially, clears it.
-+		 * If we now have sufficient data to fulfill the request then
-+		 * we clear SPLICE_F_MORE if it was not set initially.
- 		 */
--		if (read_len < len)
--			sd->flags |= SPLICE_F_MORE;
--		else if (!more)
-+		if (read_len >= len && !more)
- 			sd->flags &= ~SPLICE_F_MORE;
-+
- 		/*
- 		 * NOTE: nonblocking mode only applies to the input. We
- 		 * must not do the output in nonblocking mode as then we
+Thanks,
+Kuai
+> -		if (!(icq->flags & ICQ_DESTROYED))
+> -			ioc_destroy_icq(icq);
+> +		ioc_destroy_icq(icq);
+>   		spin_unlock_irq(&icq->ioc->lock);
+>   	}
+> -	rcu_read_unlock();
+> +	spin_unlock_irq(&q->queue_lock);
+>   }
+>   #else /* CONFIG_BLK_ICQ */
+>   static inline void ioc_exit_icqs(struct io_context *ioc)
+> 
 
