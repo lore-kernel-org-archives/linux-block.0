@@ -2,103 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE395C77B73
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 18:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F318C77B73
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 21:15:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234685AbjFESbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 14:31:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49726 "EHLO
+        id S232539AbjFEVPA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 17:15:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232140AbjFESbf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 14:31:35 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52EC0F1;
-        Mon,  5 Jun 2023 11:31:17 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-653bed78635so2076679b3a.0;
-        Mon, 05 Jun 2023 11:31:17 -0700 (PDT)
+        with ESMTP id S232179AbjFEVOd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 17:14:33 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163B5FA
+        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 14:14:32 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-64ff1f11054so850847b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 14:14:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685989877; x=1688581877;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=usnkZ76/foY9UJhYGSnPlQxyp1CPa9L1vTnAf5ryxaE=;
-        b=SCjp70qdzoSdFk7YXwoHOJPQVKrUFWBcHQolEZVkY2amb+A3jADHUmcS1aVDjXhIrc
-         Rb/Go5IKAWmq8DE1jldzMhxAl8wk6/SF/BKWxFfhD8YMYYYF54U83bKZE1m5SEAnC6wK
-         0s1FrlMB687vMqXXkiCnMQ/XlRafSRgodlJl4P20vTsS2LdqMuP/f5xGzkb9Vbm4YgkF
-         aO08qbYuEis9S0DPMrhyIKTg6qe2vGCf6Xt92UHUMlhGrGvy69kHQStrpWVYCykIIoPH
-         4pAK27TAC/uDzKSedKFhEfXNKX7A+wZsRlWxb2oLRcSa1NmeGaYwQ62Icglq3KXQtew4
-         86cg==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685999671; x=1688591671;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Oqx+vgT1KOd/rG0v+EGrhyHZcbzQJ8RW6j/ejKPzyV0=;
+        b=j8g3UuzxdgTGjVV1y3R5vC/zbawUoqd0GHOEGH735oclZN5uylfFW29k3ALNqymkKO
+         zOI9IJNptXyqvXhuDUohGo6+XB+iqAPTdpS8xnzQbyN9ZzCJb2V48dzwfhNnt29AVlKP
+         VLFoQVZ/RzXJ4vShqVQv27MswBglmWDfKZPdwKBYEJDj+Bem9CeQfIxfrgTssr6LpEO1
+         NWES731IZKMXHlB1inaKp40+GtlmXq369msNQea0Zdy1Az6CPeljXQoJWOQ1BrI3+n99
+         B7Jqj4uJoFy0784kDvEhQTE8TUuagtZ+Pp9TRXRtSLou5H05oXjMmV83/lNRGEwjJYGs
+         gAGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685989877; x=1688581877;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=usnkZ76/foY9UJhYGSnPlQxyp1CPa9L1vTnAf5ryxaE=;
-        b=DwOZkqS3Wl5bmMrZdhjEs1D/yHvjBPcsG4xDtYaTJJxoXaGc4Qk25P6u3RKWfi7YCh
-         VW8YOcM4y+Zxjy7n77Ty9DnRfy2towYanqqHItUoFFrRjvBZ98UA3KRyKHyBMQXE2BdC
-         lpd3AKVpq64CzDJt1I0L881H7fnms6RS5R/pA2z2okCzAVL4XuYyCIiEn+iWIIwtXvJr
-         YFEBWTOio0raOp4/s24M9FKutlnsYwghSieDIMI8BS5HSXsTOv0V0GxwB5fG2xwo0txF
-         R6VG1z28vbiKabPE1ekjP34OCIROFqhPWT0gwas2Nhz99w+WgCSiKVP6X5O0hfclwBFX
-         bjQw==
-X-Gm-Message-State: AC+VfDyQj5TCS3ji2ugckN7GtcTwT/CMFMhXbzw89CtDlZjEJE9GFrUo
-        0m+MKcrPdqOqKWucFJo9vew=
-X-Google-Smtp-Source: ACHHUZ5Icpc8CzidVyFb2h3eh8Fzgit98a+Fj8QQKyYRTtqfutHMQNWANvdlM4IZTQ7I4TCY6G9/ZQ==
-X-Received: by 2002:a05:6a20:1450:b0:10a:b812:bcc7 with SMTP id a16-20020a056a20145000b0010ab812bcc7mr8686501pzi.17.1685989876594;
-        Mon, 05 Jun 2023 11:31:16 -0700 (PDT)
-Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
-        by smtp.gmail.com with ESMTPSA id t24-20020a635358000000b0053f1d55676fsm6060144pgl.2.2023.06.05.11.31.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 11:31:16 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 5 Jun 2023 08:31:14 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     chengming.zhou@linux.dev
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: Re: [PATCH] blk-mq: fix incorrect rq start_time_ns and alloc_time_ns
- after throttled
-Message-ID: <ZH4p8tqFc57_OYoH@slm.duckdns.org>
-References: <20230601053919.3639954-1-chengming.zhou@linux.dev>
+        d=1e100.net; s=20221208; t=1685999671; x=1688591671;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oqx+vgT1KOd/rG0v+EGrhyHZcbzQJ8RW6j/ejKPzyV0=;
+        b=P8cxX/DN23/HF3Kxlrby1ju9clgL7mMq2IHeNwMfJrE57kYKCvITOvubTdsdxk6qZj
+         CYZGnPluGPRBRbrvR5NKZbf9WwjxcBwUSOdh1dg3pkQtTKcRsBbNkNvuNjrsc1WVZkuT
+         N0vHCw+/T7JIVC8s9vz4oCfmIMYTayJOIpkOHAdxS82hxFpQaMKB1qY5rehpSBSlEL9J
+         gEOsTw9KYQVF4pA2r2B8nveOqh/aM8CEf8U6/t3SdEtYF8jjwSE5QbmkgxTwx+hGW0qE
+         7rIoOpfYEpy5Af47bBNDJ8gxdY4nZeYXJE9yGYfeQMQ1Qp8drVLKRRmPzr706PzQAvId
+         FFfA==
+X-Gm-Message-State: AC+VfDxQDDaGsvNT25fe8Snh4banl3FGeQvNEzlWROurXKkC/XHYv23T
+        KwaKXeUGDyOemfjk8YVY13Em4A==
+X-Google-Smtp-Source: ACHHUZ7F4+qQ0Ki8xUwZZjZ6tfxl9MU00ff9sZzRn2/+Pmuj5tNT2z/CfpIZyNw6H1APR47vxOd/1A==
+X-Received: by 2002:a05:6a00:139a:b0:656:39af:5137 with SMTP id t26-20020a056a00139a00b0065639af5137mr6836048pfg.0.1685999671519;
+        Mon, 05 Jun 2023 14:14:31 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c085:21c1::173f? ([2620:10d:c090:400::5:ffbc])
+        by smtp.gmail.com with ESMTPSA id a6-20020aa78646000000b0064d4d11b8bfsm5604697pfo.59.2023.06.05.14.14.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jun 2023 14:14:30 -0700 (PDT)
+Message-ID: <e340332d-ef64-9fa9-b4d6-927a3c271730@kernel.dk>
+Date:   Mon, 5 Jun 2023 15:14:28 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230601053919.3639954-1-chengming.zhou@linux.dev>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v4 RESEND 0/3] sed-opal: keyrings, discovery, revert, key
+ store
+Content-Language: en-US
+To:     gjoyce@linux.vnet.ibm.com, linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        nayna@linux.ibm.com, akpm@linux-foundation.org,
+        keyrings@vger.kernel.org
+References: <20230601223745.2136203-1-gjoyce@linux.vnet.ibm.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20230601223745.2136203-1-gjoyce@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Thu, Jun 01, 2023 at 01:39:19PM +0800, chengming.zhou@linux.dev wrote:
-> From: Chengming Zhou <zhouchengming@bytedance.com>
+On 6/1/23 4:37 PM, gjoyce@linux.vnet.ibm.com wrote:
+> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
 > 
-> iocost rely on rq start_time_ns and alloc_time_ns to tell the saturation
-> state of the block device.
+> This patchset has gone through numerous rounds of review and
+> all comments/suggetions have been addressed. I believe that
+> this patchset is ready for inclusion.
 > 
-> If any qos ->throttle() end up blocking, the cached rq start_time_ns and
-> alloc_time_ns will include its throtted time, which can confuse its user.
-
-I don't follow. rq_qos_throttle() happens before a request is allocated, so
-whether ->throttle() blocks or not doesn't affect alloc_time_ns or
-start_time_ns.
-
-> This patch add nr_flush counter in blk_plug, so we can tell if the task
-> has throttled in any qos ->throttle(), in which case we need to correct
-> the rq start_time_ns and alloc_time_ns.
+> TCG SED Opal is a specification from The Trusted Computing Group
+> that allows self encrypting storage devices (SED) to be locked at
+> power on and require an authentication key to unlock the drive.
 > 
-> Another solution may be make rq_qos_throttle() return bool to indicate
-> if it has throttled in any qos ->throttle(). But this need more changes.
+> The current SED Opal implementation in the block driver
+> requires that authentication keys be provided in an ioctl
+> so that they can be presented to the underlying SED
+> capable drive. Currently, the key is typically entered by
+> a user with an application like sedutil or sedcli. While
+> this process works, it does not lend itself to automation
+> like unlock by a udev rule.
 > 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> The SED block driver has been extended so it can alternatively
+> obtain a key from a sed-opal kernel keyring. The SED ioctls
+> will indicate the source of the key, either directly in the
+> ioctl data or from the keyring.
+> 
+> Two new SED ioctls have also been added. These are:
+>   1) IOC_OPAL_REVERT_LSP to revert LSP state
+>   2) IOC_OPAL_DISCOVERY to discover drive capabilities/state
+> 
+> change log v4:
+>         - rebase to 6.3-rc7
+> 	- replaced "255" magic number with U8_MAX
 
-Depending on the flush behavior and adjusting alloc_time_ns seems fragile to
-me and will likely confuse other users of alloc_time_ns too.
+None of this applies for for-6.5/block, and I'm a little puzzled
+as to why you'd rebase to an old kernel rather than a 6.4-rc at
+least?
 
-Maybe I'm misunderstanding the problem you're describing. Can you give a
-concrete example of how the current code would misbehave?
-
-Thanks.
+Please resend one that is current.
 
 -- 
-tejun
+Jens Axboe
+
+
