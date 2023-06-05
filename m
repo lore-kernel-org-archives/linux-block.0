@@ -2,58 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05807C7EE2A
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 04:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05F8C7EE2A
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 06:14:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232837AbjFEErR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 00:47:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54892 "EHLO
+        id S229512AbjFEGO0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 02:14:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232825AbjFEErP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 00:47:15 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A84B0
-        for <linux-block@vger.kernel.org>; Sun,  4 Jun 2023 21:47:13 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-5149429c944so6774240a12.0
-        for <linux-block@vger.kernel.org>; Sun, 04 Jun 2023 21:47:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1685940431; x=1688532431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=06zA5PJSQMmfDhZEXKzzRsPi8utG/lf0ef8eRLldERQ=;
-        b=IUPRmK7evATjPNi2UfnBgjO1Usqx8u0vWoUyDmaUlgNq/2vNUgg6w/9uMNACQ/1pUf
-         MAEGe1fCTVwyKWD74Of8PR4c81l/QsB3XOJXAFfcE4wrZ4s8DfSo5mTK2wmVDBI+YPQs
-         +7Xb+56PL2dYM69mqhXr75iqjvPPHf0hq4CixL9ahoekFdjh7ysB91K0GZdYroC4xfB/
-         3HvuB8JFoQaid6CWzi0FqgYPUL9//8TSy36kwDuK2z2UxWwOnijxfiNchAAbiuQtuLHK
-         //GQtt1p869ynOvOK2p1SC62Xq2Ap9+DBnbDfgbSXHL7ouG/gRrhA1idn+xTuU2qAdCc
-         Nipg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685940431; x=1688532431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=06zA5PJSQMmfDhZEXKzzRsPi8utG/lf0ef8eRLldERQ=;
-        b=Wac6x4RJ5j45Andzw1+TojPP3mP01FRgp5a+uwVzhG1jDcFU68qVDtJqaABD3xWdNL
-         Y1OjZWDDGyxi2AAX0ZiQj3YUbK1IclTjsmcz6Zw7MeQTPcgXXsbBUAHbcXQ8EyFNulKZ
-         4aV+TKpoQbXf9ODzXSCJwBhJvnzDcyGeI8h8F9I7jxh2GmyQVKX2Ut4hrQapcyHVVJBU
-         yDS9zhqOXRw9Kz5NyIaQcC3iu84MICNnJlbcPl7EHkFfNHuioqHUXGL3BuKdJKxrcokD
-         NPSzwkGoiKpAHr+dsPLWYVHaRLk1XjIIlo2vPQ6z/opyErI6jaUqS84d9d1QO2qZtoCV
-         y9Mw==
-X-Gm-Message-State: AC+VfDyIR6KZ2e0kenHrsKokIhN9uBxoA03zDZWRi6hZJw7hHbKNPSS/
-        Li/3MdlNfcKKwPpS2pYpum/Kte0Em1Y6t8yE9ekgSw==
-X-Google-Smtp-Source: ACHHUZ6N4v6FQLcrCOJffj9h0dxU3alusm+0YqU9TdCoLt2rL7Ac0kU4vQ7jTydhl7YWoiAEp1SGfZmRL3Urzr8S2no=
-X-Received: by 2002:aa7:d608:0:b0:50b:d5e5:519d with SMTP id
- c8-20020aa7d608000000b0050bd5e5519dmr6590276edr.4.1685940431627; Sun, 04 Jun
- 2023 21:47:11 -0700 (PDT)
+        with ESMTP id S229459AbjFEGO0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 02:14:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80AE7D3;
+        Sun,  4 Jun 2023 23:14:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1515D61E5A;
+        Mon,  5 Jun 2023 06:14:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71112C4339B;
+        Mon,  5 Jun 2023 06:14:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685945664;
+        bh=d0OhcA2rGOdVDKF2rdDgoapcxyC5qb5qQKl0LgpKoUU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=RV6tka3UG68hUKl8fxv256hzzD4UL5GOvvVkIWlPMNibuKKThHKdoTAVVVHQPr8Zj
+         w77givxyoUmeAUw5pgJt6kJb5mE6cEbmtqp7lYkSnc8m6tOYKv0i0LcOY9uhlC8L4l
+         cI2cdQJTlBKUgtwScm5nDVd8qZiQblZmN2S2YKIuV0I5TKV1aiYYvlULUc32mvHNtR
+         Bljo3yepKArbpRwTHyvUdrbZiIGF7cbEdvg0dSA9vrMN1/M3yHsSOPBjTcpwMBSJ3O
+         UIJEKYisxX7VOC0o+S0gIRGwb3iB79bgqYQrEXFXSYErUvQxq9Bi2nMulTdY99M2YC
+         moksMd2FAYDBg==
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-55564892accso3057024eaf.2;
+        Sun, 04 Jun 2023 23:14:24 -0700 (PDT)
+X-Gm-Message-State: AC+VfDy8cuI5/hxJCTjuzHDhlrW31i0BWLqZ+JItjQwR0rwwqqC/lP9e
+        bKfeB5sS6DK8Mj/rDWyOV5Us2duyToUVm2O3nSQ=
+X-Google-Smtp-Source: ACHHUZ5W/0BNLagax1j39qocfPmY+tRCTc7v+RQmA3oSK1975CHAeEttcz7BxvRw3cGdkfKJVICIf5DrsQ+KogFqkSY=
+X-Received: by 2002:a4a:ca05:0:b0:558:c5b8:9575 with SMTP id
+ w5-20020a4aca05000000b00558c5b89575mr1812805ooq.1.1685945663785; Sun, 04 Jun
+ 2023 23:14:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230603165949.1753326-1-masahiroy@kernel.org>
-In-Reply-To: <20230603165949.1753326-1-masahiroy@kernel.org>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Mon, 5 Jun 2023 06:47:02 +0200
-Message-ID: <CAMGffEk-_dGmciH7ggsATVAHyCwLemkR_UX4ikRJmuC7w1ePrg@mail.gmail.com>
+References: <20230603165949.1753326-1-masahiroy@kernel.org> <CAMGffEk-_dGmciH7ggsATVAHyCwLemkR_UX4ikRJmuC7w1ePrg@mail.gmail.com>
+In-Reply-To: <CAMGffEk-_dGmciH7ggsATVAHyCwLemkR_UX4ikRJmuC7w1ePrg@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Mon, 5 Jun 2023 15:13:47 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATopDDvV+aVsa_qc6FCkT9v6mRQcABnrKMdW4oMkQfd1g@mail.gmail.com>
+Message-ID: <CAK7LNATopDDvV+aVsa_qc6FCkT9v6mRQcABnrKMdW4oMkQfd1g@mail.gmail.com>
 Subject: Re: [PATCH] block/rnbd: fix mixed module-builtin object
-To:     Masahiro Yamada <masahiroy@kernel.org>
+To:     Jinpu Wang <jinpu.wang@ionos.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
@@ -64,113 +58,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Masahiro,
+On Mon, Jun 5, 2023 at 1:47=E2=80=AFPM Jinpu Wang <jinpu.wang@ionos.com> wr=
+ote:
+>
+> Hi Masahiro,
+>
+>
+> On Sat, Jun 3, 2023 at 6:59=E2=80=AFPM Masahiro Yamada <masahiroy@kernel.=
+org> wrote:
+> >
+> > With CONFIG_BLK_DEV_RNBD_CLIENT=3Dm and CONFIG_BLK_DEV_RNBD_SERVER=3Dy
+> > (or vice versa), rnbd-common.o is linked to a module and also to
+> > vmlinux even though CFLAGS are different between builtins and modules.
+> >
+> > This is the same situation as fixed by commit 637a642f5ca5 ("zstd:
+> > Fixing mixed module-builtin objects").
+> >
+> > Turn rnbd_access_mode_str() into an inline function.
+> Thx for you fix, but Guoqing has a slightly different patch in the queue:
+>
+> https://lore.kernel.org/linux-block/CAMGffEnDjAP3zqytmsYxacvUROLKZj+KhH6L=
+OXicOoPhS9FJJQ@mail.gmail.com/
+>
+
+LGTM. Thank you.
 
 
-On Sat, Jun 3, 2023 at 6:59=E2=80=AFPM Masahiro Yamada <masahiroy@kernel.or=
-g> wrote:
->
-> With CONFIG_BLK_DEV_RNBD_CLIENT=3Dm and CONFIG_BLK_DEV_RNBD_SERVER=3Dy
-> (or vice versa), rnbd-common.o is linked to a module and also to
-> vmlinux even though CFLAGS are different between builtins and modules.
->
-> This is the same situation as fixed by commit 637a642f5ca5 ("zstd:
-> Fixing mixed module-builtin objects").
->
-> Turn rnbd_access_mode_str() into an inline function.
-Thx for you fix, but Guoqing has a slightly different patch in the queue:
 
-https://lore.kernel.org/linux-block/CAMGffEnDjAP3zqytmsYxacvUROLKZj+KhH6LOX=
-icOoPhS9FJJQ@mail.gmail.com/
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-
-
-> ---
->
->  drivers/block/rnbd/Makefile      |  6 ++----
->  drivers/block/rnbd/rnbd-common.c | 23 -----------------------
->  drivers/block/rnbd/rnbd-proto.h  | 14 +++++++++++++-
->  3 files changed, 15 insertions(+), 28 deletions(-)
->  delete mode 100644 drivers/block/rnbd/rnbd-common.c
->
-> diff --git a/drivers/block/rnbd/Makefile b/drivers/block/rnbd/Makefile
-> index 40b31630822c..208e5f865497 100644
-> --- a/drivers/block/rnbd/Makefile
-> +++ b/drivers/block/rnbd/Makefile
-> @@ -3,13 +3,11 @@
->  ccflags-y :=3D -I$(srctree)/drivers/infiniband/ulp/rtrs
->
->  rnbd-client-y :=3D rnbd-clt.o \
-> -                 rnbd-clt-sysfs.o \
-> -                 rnbd-common.o
-> +                 rnbd-clt-sysfs.o
->
->  CFLAGS_rnbd-srv-trace.o =3D -I$(src)
->
-> -rnbd-server-y :=3D rnbd-common.o \
-> -                 rnbd-srv.o \
-> +rnbd-server-y :=3D rnbd-srv.o \
->                   rnbd-srv-sysfs.o \
->                   rnbd-srv-trace.o
->
-> diff --git a/drivers/block/rnbd/rnbd-common.c b/drivers/block/rnbd/rnbd-c=
-ommon.c
-> deleted file mode 100644
-> index 596c3f732403..000000000000
-> --- a/drivers/block/rnbd/rnbd-common.c
-> +++ /dev/null
-> @@ -1,23 +0,0 @@
-> -// SPDX-License-Identifier: GPL-2.0-or-later
-> -/*
-> - * RDMA Network Block Driver
-> - *
-> - * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-> - * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-> - * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-> - */
-> -#include "rnbd-proto.h"
-> -
-> -const char *rnbd_access_mode_str(enum rnbd_access_mode mode)
-> -{
-> -       switch (mode) {
-> -       case RNBD_ACCESS_RO:
-> -               return "ro";
-> -       case RNBD_ACCESS_RW:
-> -               return "rw";
-> -       case RNBD_ACCESS_MIGRATION:
-> -               return "migration";
-> -       default:
-> -               return "unknown";
-> -       }
-> -}
-> diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-pr=
-oto.h
-> index da1d0542d7e2..57afe9b07fda 100644
-> --- a/drivers/block/rnbd/rnbd-proto.h
-> +++ b/drivers/block/rnbd/rnbd-proto.h
-> @@ -300,6 +300,18 @@ static inline u32 rq_to_rnbd_flags(struct request *r=
-q)
->         return rnbd_opf;
->  }
->
-> -const char *rnbd_access_mode_str(enum rnbd_access_mode mode);
-> +static inline const char *rnbd_access_mode_str(enum rnbd_access_mode mod=
-e)
-> +{
-> +       switch (mode) {
-> +       case RNBD_ACCESS_RO:
-> +               return "ro";
-> +       case RNBD_ACCESS_RW:
-> +               return "rw";
-> +       case RNBD_ACCESS_MIGRATION:
-> +               return "migration";
-> +       default:
-> +               return "unknown";
-> +       }
-> +}
->
->  #endif /* RNBD_PROTO_H */
-> --
-> 2.39.2
->
+--=20
+Best Regards
+Masahiro Yamada
