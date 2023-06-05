@@ -2,62 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BF0C7EE23
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 17:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB624C7EE2D
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 17:22:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235384AbjFERWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 13:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44604 "EHLO
+        id S234985AbjFERWK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 13:22:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234244AbjFERWE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 13:22:04 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91A90B0
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 10:22:01 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-2564ced644bso1035015a91.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 10:22:01 -0700 (PDT)
+        with ESMTP id S234603AbjFERWH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 13:22:07 -0400
+Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E610510C
+        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 10:22:03 -0700 (PDT)
+Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-1a2cc92f12aso637334fac.0
+        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 10:22:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685985721; x=1688577721;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685985722; x=1688577722;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4bx3FOQ8WpXAjUchLrV7ZdQUMCcuc5rVhaoplHLZKkU=;
-        b=NmMei7rN/FQixwaXZYdcuIqojmmWOTp3C9B6kG7NOpV0TNYhFnHmxNTr6RVA4dADhm
-         lnGs6br8Osze0v/nf45uyiMWPpbT08Ed1pOxiu/uIzRR2GRirueFk/vTh71TTVGMY1tM
-         lcu3bjzFVw6A6v2Q9VvvaP0ykmVyppKEVkhGBB5l562aAKL9NBDktU2ohjDOodcjtPlR
-         ydBEK2dmhGggVTvL0IAa3d830ysmMcn0aUkBoYH/nX5g3XagTgxONQNHPde0tx5wfQY9
-         7ryJkoTYpwHPx5dL1kP/eqdpJuoLDjFkmuAUfIkT3+cVjJPLBPdohoZ3RvxQKC4ZzZCx
-         ybgw==
+        bh=9HBzAKQ8EWkIuzHq6aIJ4mqwm9+DaKYAj6ps+F/vuTI=;
+        b=jh2UmAQ3NsKFC/MrynS5s4VOiwEkVYskRKYwmk2+r9IhdcNLaWSoRFhCITHNAwpw2w
+         bTVPEyYGpdrWg/AfDmiWW5LMgBNHD7iPyGbjQ38kps2Kwq4XW1CMRIkFXj2etTskPemV
+         GWWUMdq0FhYa5jHjFZZOn2STiHFEJMPEx6Vh9Lx2pkmbyH/bPw3UTOzEkwq9oVe+6Gvu
+         mVeRryP8psvMA5OaaANvxrFw3MTbHBXsJI31FRRwpBUQKSd9aSH095es87US3bTcGYpF
+         dZxTINVrQN/BTouOpqCAhoEMlsXUP3gbmYISyXWbPAshVYhvfYFI+BDRDMPBLMWzG2QA
+         N1Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685985721; x=1688577721;
+        d=1e100.net; s=20221208; t=1685985722; x=1688577722;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4bx3FOQ8WpXAjUchLrV7ZdQUMCcuc5rVhaoplHLZKkU=;
-        b=foUpRXab2snFZd7kjGmqGOMSZmAmkPjq2wKSz/+WxNnqo6y3rc0ZVog+7q8xt1l4Xk
-         C0TRQ6x2j/H9QBe24N6hdKCrE00Dux82Fgxd6nMrbT3Pe+pBmwi0lPzTPrfQQD1f7Ltn
-         k9Aba3VreT+CH3f48F1VGcGp97aAbw95J/5pyrO7dvxq6C5Kl0i6GCtqoSRam/0fwURj
-         WGDgVEUr+dAzUa9Ik0OKo88cmzhMhWYh5d4JA44QnFpu4of/Drex/9TjAPUtPL4ETpjr
-         utJn0yKNl+IuVMUYXl+IOiAZ4RncyqUhp4uzZO9YVn2zde/2FmiJ4HwyJc6FLHciX/Aa
-         j7vA==
-X-Gm-Message-State: AC+VfDwCLc/uIoZOqMDVLbDSwvdPdABWMXP7BWtcUsdUjjk79QQwcjAK
-        AGfJ9O66XN/Wa2WIY8hEcJ3GiFfIdljxNyMYduw=
-X-Google-Smtp-Source: ACHHUZ661iczc0HcuBHzs3Fi+bR77NqS/CnPjg3kZtWjD9M5bK3e6bkSVWVIc5Nlkq2/lDCuuq4zNg==
-X-Received: by 2002:a17:90b:1e51:b0:258:85d9:be02 with SMTP id pi17-20020a17090b1e5100b0025885d9be02mr16979731pjb.2.1685985720966;
-        Mon, 05 Jun 2023 10:22:00 -0700 (PDT)
+        bh=9HBzAKQ8EWkIuzHq6aIJ4mqwm9+DaKYAj6ps+F/vuTI=;
+        b=eX/2VriLIkTLB5xs5qpfS9/A/0Difj72I/2R/x5M/CbBIIPIMgHvrKYKpL7UxK5Ix0
+         aHbw0eAEGxzsWnzxAYSUcQfBF4abt7tz13QEN/J7mrP/wc4Oa4h5oHY06qBnMoJFs/Xx
+         fYVnox5BSKE2VAevCZUZdnstEsTVgYQl+OJIbgfG9q15VMoCZnXi5qmOOt8K8j9HAhkN
+         lqKPLcjGj/VEQpvdGqogKLUZesyQn/aSBB/mw7KkCCiSootis3ySLUpb5vzL9ZzA+5VR
+         Cpg0ioT28CpBAe84iPYzA0sELvGSR1YjT1ag7x7wKK2PG4QxwlqSxdD2r8ddBMPR1z4+
+         Ys0Q==
+X-Gm-Message-State: AC+VfDwwAFsDB3IRnPzko2efUhBRMHt+FUaukznFvzLBAYLOpAm9qYqF
+        GQsJvRTAwQYoGWi4FSEq4LV6j5a6QnK+UMEnbx4=
+X-Google-Smtp-Source: ACHHUZ6PL62Ib5H4QB3rPGiaQRZcV0rInc/UOc81HCQF8mpjnx0vviMbWu8Zk38mJqV6Qj9LKxCzMg==
+X-Received: by 2002:a05:6358:cc27:b0:127:fa1b:fb0e with SMTP id gx39-20020a056358cc2700b00127fa1bfb0emr1263873rwb.1.1685985722606;
+        Mon, 05 Jun 2023 10:22:02 -0700 (PDT)
 Received: from [127.0.0.1] ([2600:380:c01c:32f0:eff8:7692:bf8a:abc6])
-        by smtp.gmail.com with ESMTPSA id cl9-20020a17090af68900b0025643e5da99sm7993666pjb.37.2023.06.05.10.21.59
+        by smtp.gmail.com with ESMTPSA id cl9-20020a17090af68900b0025643e5da99sm7993666pjb.37.2023.06.05.10.22.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jun 2023 10:22:00 -0700 (PDT)
+        Mon, 05 Jun 2023 10:22:01 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, Christoph Hellwig <hch@lst.de>
-Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-In-Reply-To: <20230601151646.1386867-1-hch@lst.de>
-References: <20230601151646.1386867-1-hch@lst.de>
-Subject: Re: [PATCH] drbd: stop defining __KERNEL_SYSCALLS__
-Message-Id: <168598571992.2504.2085169404981858004.b4-ty@kernel.dk>
-Date:   Mon, 05 Jun 2023 11:21:59 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+In-Reply-To: <20230601094459.1350643-1-hch@lst.de>
+References: <20230601094459.1350643-1-hch@lst.de>
+Subject: Re: introduce bdev holder ops and a file system shutdown method v3
+Message-Id: <168598572109.2504.8975232011754082233.b4-ty@kernel.dk>
+Date:   Mon, 05 Jun 2023 11:22:01 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -67,16 +70,51 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Thu, 01 Jun 2023 17:16:46 +0200, Christoph Hellwig wrote:
-> __KERNEL_SYSCALLS__ hasn't been needed since Linux 2.6.19 so stop
-> defining it.
+On Thu, 01 Jun 2023 11:44:43 +0200, Christoph Hellwig wrote:
+> this series fixes the long standing problem that we never had a good way
+> to communicate block device events to the user of the block device.
 > 
+> It fixes this by introducing a new set of holder ops registered at
+> blkdev_get_by_* time for the exclusive holder, and then wire that up
+> to a shutdown super operation to report the block device remove to the
+> file systems.
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] drbd: stop defining __KERNEL_SYSCALLS__
-      commit: d519df00938eed652fc041ff4e07b2b38a4ad3bc
+[01/16] block: factor out a bd_end_claim helper from blkdev_put
+        commit: 0783b1a7cbd9a02ddc35fe531b5966b674b304f0
+[02/16] block: refactor bd_may_claim
+        commit: ae5f855ead6b41422ca0c971ebda509c0414f8ec
+[03/16] block: turn bdev_lock into a mutex
+        commit: 74e6464a987b2572771ac19163e961777fd0252e
+[04/16] block: consolidate the shutdown logic in blk_mark_disk_dead and del_gendisk
+        commit: 66fddc25fe182fd7d28b35f4173113f3eefc7fb5
+[05/16] block: avoid repeated work in blk_mark_disk_dead
+        commit: a4f75764d16bed317276b05a9fe2c179ef61680d
+[06/16] block: unhash the inode earlier in delete_partition
+        commit: 69f90b70bdb62e1a930239d33579e04884cd0b9a
+[07/16] block: delete partitions later in del_gendisk
+        commit: eec1be4c30df73238b936fa9f3653773a6f8b15c
+[08/16] block: remove blk_drop_partitions
+        commit: 00080f7fb7a599c26523037b202fb945f3141811
+[09/16] block: introduce holder ops
+        commit: 0718afd47f70cf46877c39c25d06b786e1a3f36c
+[10/16] block: add a mark_dead holder operation
+        commit: f55e017c642051ddc01d77a89ab18f5ee71d6276
+[11/16] fs: add a method to shut down the file system
+        commit: 87efb39075be6a288cd7f23858f15bd01c83028a
+[12/16] xfs: wire up sops->shutdown
+        commit: e7caa877e5ddac63886f4a8376cb3ffbd4dfe569
+[13/16] xfs: wire up the ->mark_dead holder operation for log and RT devices
+        commit: 8067ca1dcdfcc2a5e0a51bff3730ad3eef0623d6
+[14/16] ext4: split ext4_shutdown
+        commit: 97524b454bc562f4052751f0e635a61dad78f1b2
+[15/16] ext4: wire up sops->shutdown
+        commit: f5db130d4443ddf63b49e195782038ebaab0bec9
+[16/16] ext4: wire up the ->mark_dead holder operation for log devices
+        commit: dd2e31afba9e3a3107aa202726b6199c55075f59
 
 Best regards,
 -- 
