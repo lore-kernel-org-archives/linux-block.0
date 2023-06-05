@@ -2,128 +2,178 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD07C7EE24
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 16:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31686C7EE23
+	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 16:52:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231641AbjFEQtu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 12:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54430 "EHLO
+        id S230433AbjFEQwX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 12:52:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234818AbjFEQtn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 12:49:43 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 412DCED
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 09:49:40 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6584553892cso401417b3a.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 09:49:40 -0700 (PDT)
+        with ESMTP id S233019AbjFEQwW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 12:52:22 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB58E6
+        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 09:52:21 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-256200b49cdso798390a91.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 09:52:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685983779; x=1688575779;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1685983940; x=1688575940;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=vDRJgVE5cH04MV15lyuR8QwAmByzpL4hoF/MQxP+aCo=;
-        b=Ei/LRpe8k3OFfTc/VkSB/xDKar7hPdfukU8UV74asVwDhnlUFq6MoQI77JP70KYzqT
-         VwpJl9HpmDuXDVX1DG5iZIqF/6J0ErGIY41R19KPoHLnjeF8Gi/FH+8ghj3XB7T03WtI
-         VbLYFEUH+p2Nzqh1DTfqkDDmh9kocKybhx0WRy0HA3aWOsXcDYaCCXp4LYMtUQeiTQtK
-         orgN2Q+rMlNc3hqMCgoH+0O7l62JNW3r+LaORs4nvGiuhPO4WFjgX1qrLHxZZ1AaVx5K
-         KZzSB9g5huWomew3qr9ttRdjb7Gs9g0f0THUtsddtKNSSubwcD1aRda+VpW2odzfxL/L
-         j0IQ==
+        bh=zJNMYZ5ZlCwWFShxq5SVp0goxBjUhrKSnIdXymTHIMA=;
+        b=eCI7hkAM00pEJVL1uVIG+L7F7tIEbviV3dizbWupXZgZzYGGiWUr/7YXVjom0pGngN
+         WMyAc4/5g8N1IWO57Lf7ZbI1Dpd3DRD7xiNQ6esKC+///UVz4SiZeeL9RqDvxOdRT0aI
+         HCgziPbLo3f4sgMozOg6ysKkvbB9rpz+7YNk3gwIBd/KKPclRk9pq0wqepC7lMvg16Hj
+         Y8I4Ax7sbrmn/0MZwlznYVucPkBvxHXODAyLSRJf34g5tv6JDP0tZH5jpmIQHxtLgTnd
+         rTd0RWlvFe0+NxhfAp8K579bNuj8fVyY93kZAB2Q8MV+sOK0T6ychjXdysLTuJro4Dv7
+         iFDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685983779; x=1688575779;
+        d=1e100.net; s=20221208; t=1685983940; x=1688575940;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vDRJgVE5cH04MV15lyuR8QwAmByzpL4hoF/MQxP+aCo=;
-        b=UBuOA4Ii1L3qs/k4aQS23MHbXRYYrXXje4yXqU4Zn1Nn2Fn3VE7hJh+dDMt9PxcZ+2
-         xMBBnKpw33K22Tbc10IpBPmu+jM82ijMB98Sv2FtJFfZ2mCxbeuvEclMHR/ZNBbUdeJk
-         TE4UTyZtdDPwO1hREX1lypqAMuPu89oPuoUYXu1S3CySbRIpWtAsBx7Mn1sVaisBllFb
-         QFPjih8AKJ/71XyVdVIJ3UjKQZbqJD1oUa/RzZoyxk4HvMmeTKzA7MXLhG9Ir/yxijyM
-         NZ3kOTA9nxSkCkjBzaMEoLdIM6uBCSSexaro1VDWjvUKqXHb6PpfXRY1+NNoIQqe3acE
-         4xpQ==
-X-Gm-Message-State: AC+VfDxRCtBefgw+HXs7Ppskb1FcvrF4KnsQoD3DpGlkw0CMFllhOE0h
-        AMo98gju2SFe63r741+LOH2ARw==
-X-Google-Smtp-Source: ACHHUZ6VtRPk+7R/QDfHd2G8LTg/K3iK/fpK4MXqyEZASfsbZ7S8d8CBo4OHEHv2VzEDz6LQ7MPerA==
-X-Received: by 2002:a05:6a20:4425:b0:116:1cc7:ada with SMTP id ce37-20020a056a20442500b001161cc70adamr4482199pzb.6.1685983779369;
-        Mon, 05 Jun 2023 09:49:39 -0700 (PDT)
+        bh=zJNMYZ5ZlCwWFShxq5SVp0goxBjUhrKSnIdXymTHIMA=;
+        b=E6hjROAZvMZrm3AUHqGVs0V/4LQ/wVJinFVtmO8I/qD65qGbHteKV/zCVP5X0EvLnp
+         KNtpPZGz8dsHFAcoaOOwL8pLZKINomggiLLmdlS6hIuFbYa92+uCpCSYoL51D1bca0GK
+         kODDWLLGMt9cQ6TwqAEfu1f9VCCuFvIHXKzTpje0NaiFz974kojEZjGVZ52btehoRXG5
+         mIQ1F2gEec3/z0pasH92JtLrq2BLvfXPLPo0xNLqi3hOFrXTCSk8JO4m+Btq8Gxcmqy8
+         1yTSaOW4Ju0Kw/cq14zIshnYx35izQJWKG28POBYIxc6UclMnWOJvVA3+tJntkOtiyIP
+         p38A==
+X-Gm-Message-State: AC+VfDz0DEA2g3yBAkgLm2udq+/C4oOLNJ47wolM4eXBORgLTMCetv7E
+        HL1fTV6lfRS/AY35x0DJwdGpbw==
+X-Google-Smtp-Source: ACHHUZ4plkQPRc81+FMyI3pGvSItsM7r3Pq1a0SJx1hFlpW/XJG6VQ5dkmCpuLqzdFwsuXFaoVWJVw==
+X-Received: by 2002:a17:90b:4f47:b0:255:c3a3:43a with SMTP id pj7-20020a17090b4f4700b00255c3a3043amr18747151pjb.4.1685983940422;
+        Mon, 05 Jun 2023 09:52:20 -0700 (PDT)
 Received: from ?IPV6:2600:380:c01c:32f0:eff8:7692:bf8a:abc6? ([2600:380:c01c:32f0:eff8:7692:bf8a:abc6])
-        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b0064fd8b3dd14sm5404414pfn.124.2023.06.05.09.49.38
+        by smtp.gmail.com with ESMTPSA id e91-20020a17090a6fe400b002508d73f4e8sm8440142pjk.57.2023.06.05.09.52.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jun 2023 09:49:38 -0700 (PDT)
-Message-ID: <b1b43d30-8c7c-1a71-0ead-8b967b8af0a4@kernel.dk>
-Date:   Mon, 5 Jun 2023 10:49:37 -0600
+        Mon, 05 Jun 2023 09:52:19 -0700 (PDT)
+Message-ID: <286f350c-b1b3-694d-b969-d06747b52144@kernel.dk>
+Date:   Mon, 5 Jun 2023 10:52:18 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH 0/7] block layer patches for bcachefs
+Subject: Re: [PATCH] blk-ioc: protect ioc_destroy_icq() by 'queue_lock'
 Content-Language: en-US
-To:     Kent Overstreet <kent.overstreet@linux.dev>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-References: <20230525214822.2725616-1-kent.overstreet@linux.dev>
- <ee03b7ce-8257-17f9-f83e-bea2c64aff16@kernel.dk>
- <ZHEaKQH22Uxk9jPK@moria.home.lan>
- <8e874109-db4a-82e3-4020-0596eeabbadf@kernel.dk>
- <ZHYfGvPJFONm58dA@moria.home.lan>
- <2a56b6d4-5f24-9738-ec83-cefb20998c8c@kernel.dk>
- <ZH0gjyuBgYzqhZh7@moria.home.lan>
+To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, dlemoal@kernel.org,
+        quic_pragalla@quicinc.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, yangerkun@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20230531073435.2923422-1-yukuai1@huaweicloud.com>
+ <03ffbdc4-66e2-5508-f632-e3a1999f40df@huaweicloud.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZH0gjyuBgYzqhZh7@moria.home.lan>
+In-Reply-To: <03ffbdc4-66e2-5508-f632-e3a1999f40df@huaweicloud.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/4/23 5:38?PM, Kent Overstreet wrote:
-> On Tue, May 30, 2023 at 10:50:55AM -0600, Jens Axboe wrote:
->> Sorry typo, I meant text. Just checked stack and it looks identical, but
->> things like blk-map grows ~6% more text, and bio ~3%. Didn't check all
->> of them, but at least those two are consistent across x86-64 and
->> aarch64. Ditto on the data front. Need to take a closer look at where
->> exactly that is coming from, and what that looks like.
+On 6/5/23 6:58 AM, Yu Kuai wrote:
+> Hi, Jens
 > 
-> A good chunk of that is because I added warnings and assertions for
-> e.g. running past the end of the bvec array. These bugs are rare and
-> shouldn't happen with normal iterator usage (e.g. the bio_for_each_*
-> macros), but I'd like to keep them as a debug mode thing.
+> 在 2023/05/31 15:34, Yu Kuai 写道:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Currently, icq is tracked by both request_queue(icq->q_node) and
+>> task(icq->ioc_node), and ioc_clear_queue() from elevator exit is not
+>> safe because it can access the list without protection:
+>>
+>> ioc_clear_queue            ioc_release_fn
+>>   lock queue_lock
+>>   list_splice
+>>   /* move queue list to a local list */
+>>   unlock queue_lock
+>>   /*
+>>    * lock is released, the local list
+>>    * can be accessed through task exit.
+>>    */
+>>
+>>                 lock ioc->lock
+>>                 while (!hlist_empty)
+>>                  icq = hlist_entry
+>>                  lock queue_lock
+>>                   ioc_destroy_icq
+>>                    delete icq->ioc_node
+>>   while (!list_empty)
+>>    icq = list_entry()           list_del icq->q_node
+>>    /*
+>>     * This is not protected by any lock,
+>>     * list_entry concurrent with list_del
+>>     * is not safe.
+>>     */
+>>
+>>                  unlock queue_lock
+>>                 unlock ioc->lock
+>>
+>> Fix this problem by protecting list 'icq->q_node' by queue_lock from
+>> ioc_clear_queue().
+>>
+>> Reported-and-tested-by: Pradeep Pragallapati <quic_pragalla@quicinc.com>
+>> Link: https://lore.kernel.org/lkml/20230517084434.18932-1-quic_pragalla@quicinc.com/
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/blk-ioc.c | 30 +++++++++++++-----------------
+>>   1 file changed, 13 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+>> index 63fc02042408..d5db92e62c43 100644
+>> --- a/block/blk-ioc.c
+>> +++ b/block/blk-ioc.c
+>> @@ -77,6 +77,10 @@ static void ioc_destroy_icq(struct io_cq *icq)
+>>       struct elevator_type *et = q->elevator->type;
+>>         lockdep_assert_held(&ioc->lock);
+>> +    lockdep_assert_held(&q->queue_lock);
+>> +
+>> +    if (icq->flags & ICQ_DESTROYED)
+>> +        return;
+>>         radix_tree_delete(&ioc->icq_tree, icq->q->id);
+>>       hlist_del_init(&icq->ioc_node);
+>> @@ -128,12 +132,7 @@ static void ioc_release_fn(struct work_struct *work)
+>>               spin_lock(&q->queue_lock);
+>>               spin_lock(&ioc->lock);
+>>   -            /*
+>> -             * The icq may have been destroyed when the ioc lock
+>> -             * was released.
+>> -             */
+>> -            if (!(icq->flags & ICQ_DESTROYED))
+>> -                ioc_destroy_icq(icq);
+>> +            ioc_destroy_icq(icq);
+>>                 spin_unlock(&q->queue_lock);
+>>               rcu_read_unlock();
+>> @@ -171,23 +170,20 @@ static bool ioc_delay_free(struct io_context *ioc)
+>>    */
+>>   void ioc_clear_queue(struct request_queue *q)
+>>   {
+>> -    LIST_HEAD(icq_list);
+>> -
+>>       spin_lock_irq(&q->queue_lock);
+>> -    list_splice_init(&q->icq_list, &icq_list);
+>> -    spin_unlock_irq(&q->queue_lock);
+>> -
+>> -    rcu_read_lock();
+>> -    while (!list_empty(&icq_list)) {
+>> +    while (!list_empty(&q->icq_list)) {
+>>           struct io_cq *icq =
+>> -            list_entry(icq_list.next, struct io_cq, q_node);
+>> +            list_first_entry(&q->icq_list, struct io_cq, q_node);
+>>   +        /*
+>> +         * Other context won't hold ioc lock to wait for queue_lock, see
+>> +         * details in ioc_release_fn().
+>> +         */
+>>           spin_lock_irq(&icq->ioc->lock);
 > 
-> But we don't yet have CONFIG_BLOCK_DEBUG - perhaps we should.
+> Sorry that I made a mistake here to use spin_lock_irq() for recursive
+> locking.
+> 
+> Should I resend this patch or send a new fix patch?
 
-Let's split those out then, especially as we don't have a BLOCK_DEBUG
-option right now.
-
-> With those out, I see a code size decrease in bio.c, which makes sense -
-> gcc ought to be able to generate slightly better code when it's dealing
-> with pure values, provided everything is inlined and there's no aliasing
-> considerations.
-> 
-> Onto blk-map.c:
-> 
-> bio_copy_kern_endio_read() increases in code size, but if I change
-> memcpy_from_bvec() to take the bvec by val instead of by ref it's
-> basically the same code size. There's no disadvantage to changing
-> memcpy_from_bvec() to pass by val.
-> 
-> bio_copy_(to|from)_iter() is a wtf, though - gcc is now spilling the
-> constructed bvec to the stack; my best guess is it's a register pressure
-> thing (but we shouldn't be short registers here!).
-> 
-> So, since the fastpath stuff in bio.c gets smaller and blk-map.c is not
-> exactly fastpath stuff I'm not inclined to fight with gcc on this one -
-> let me know if that works for you.
-> 
-> Branch is updated - I split out the new assertions into a separate patch
-> that adds CONFIG_BLK_DEBUG, and another patch for mempcy_(to|from)_bio()
-> for a small code size decrease.
-> 
-> https://evilpiepirate.org/git/bcachefs.git/log/?h=block-for-bcachefs
-> or
-> git pull http://evilpiepirate.org/git/bcachefs.git block-for-bcachefs
-
-Cn you resend just the iterator changes in their current form? The
-various re-exports are a separate discussion, I think we should focus on
-the iterator bits first.
+Your patch is already staged in for-6.5/block, so please send a patch
+that fixes up the current tree.
 
 -- 
 Jens Axboe
+
 
