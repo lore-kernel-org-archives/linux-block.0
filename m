@@ -2,109 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CD8C77B7A
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 14:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C58F3C7EE24
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 15:00:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238437AbjFFOrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 10:47:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47348 "EHLO
+        id S237181AbjFFPAz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 11:00:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237799AbjFFOrU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 10:47:20 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B0F268E;
-        Tue,  6 Jun 2023 07:46:17 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id 3f1490d57ef6-ba829e17aacso7723462276.0;
-        Tue, 06 Jun 2023 07:46:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686062773; x=1688654773;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uxHl+ipU+ZDLZfzTOn/c27PgH2beIB/6BgFtv/UvuGs=;
-        b=Dh1PzSTUKHit9jeQYeJ2K2O09l0hxiYqBOueqmDoSZt/bG08R357RJyV6olMuQj7KM
-         ExSoMYeX6pozMxl8Xc0B2/As9/Pci9XZvfsrwJBjU5gvpC+aQJ8y7ZsfAOokw9va80Jq
-         fc3F6E6WaRStkX2UvOGUvjoDIOTX+Y431Vr9pt2A6qMzoulT8flLAk8gHfS5I3hm+D7F
-         CBWBCLE4lBUwgMPhxbqhlEZzf9zxlqbTok6unq60A8/f1/vgO+bkATJDz5Qe3GSht3bc
-         9cls+ydoZz6LYCNd4P+r/kb2Zfdqt8hkLmo6c7hmKJzUH2p3OgMqMGVm6PI5bqWhqnLp
-         AQ0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686062773; x=1688654773;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uxHl+ipU+ZDLZfzTOn/c27PgH2beIB/6BgFtv/UvuGs=;
-        b=aJCyvoUMnjD2lEH5U8uoRpUYCb98IfxByI8PHWQ+3ZtgizgsHyP6vRqxkA+zPR4yIb
-         UnKODxeuzTAIsPwI6N/QPbEq5P3bQHku0cwh3uRvVN2U0Gw96LK+dT9J32f35/+UEhOj
-         V6vtRjKhBfvlGGlE0XDG1Zi1jh1AcUhauUoPVO6xsuA7AdZSdRzsJaPzXEBv7PQfUJLM
-         EpSSiVTR3ZH9v3Pb8MxhwNQWoRfND2FcVgeHxr9tdmdOvxcmcV/jhHnWErpnb4Z541w6
-         j63pYgE9F9ZtIERZWsH/TIa2fmqC8eRxU5GJgiFBG5J1/Z2+YY7WJ5fZw9m8MIx1uuB/
-         yKnA==
-X-Gm-Message-State: AC+VfDwlkFE9fmEBxSkhSK+Mrl/Dtj+iE5CMNvV59EMNcwwKuoF1fXta
-        AFlp8HcSi29ZSO798QlbA5SoxqpPEJe+6QIDbI4=
-X-Google-Smtp-Source: ACHHUZ6r28OgpTb4skzaYajMiLnd9SU4e6H84abqyT5Y6x8WBSY+gkL9EdR/1lqQ6bZQtV5X2hnvyNQC46h4RtKHE6k=
-X-Received: by 2002:a81:6a87:0:b0:568:fe3a:46b3 with SMTP id
- f129-20020a816a87000000b00568fe3a46b3mr2547087ywc.28.1686062772654; Tue, 06
- Jun 2023 07:46:12 -0700 (PDT)
+        with ESMTP id S237570AbjFFPAw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 11:00:52 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5254F199A;
+        Tue,  6 Jun 2023 08:00:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686063632; x=1717599632;
+  h=date:from:to:subject:message-id:references:mime-version:
+   in-reply-to;
+  bh=Wlt2kIy2P85sLJKYJcYLugIw7E4/N60edZHtxt3m85U=;
+  b=GRl5JEmaL42TojDnT2ogGotMuBqFe2i+QXkA5R9q2NaqeVo2eLzKrx/w
+   WLr6dr2+veTEFt/AdiAfJypKIaw0yOIaJ6Uk6uIw5vRnE4HKgdZO21fxx
+   nOKg91idLQ8Jh2s/sLRTbrEyWRlB1z5wd1nfiQq1Rqd+ym+vfal0e8EfB
+   2LyNEJt+iUD/JKzznCqUidNs/jv2zsQSRxKE5iZOAVaWi7gJSWOl2C8yR
+   ja08Qabfk3HjLeuyCB5BJ0WjdYA9Efzgt+6p8u07urMAzV5YxWTN4c0IT
+   IyiY64WMD2oOC6DfuqMbUjeNonhYQfAaqrLd7EcdHVxKLtHMLBbffiPDp
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="337052481"
+X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
+   d="scan'208";a="337052481"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 07:58:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10733"; a="955791278"
+X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
+   d="scan'208";a="955791278"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga006.fm.intel.com with ESMTP; 06 Jun 2023 07:58:37 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1q6Y8q-001gP3-1g;
+        Tue, 06 Jun 2023 17:58:36 +0300
+Date:   Tue, 6 Jun 2023 17:58:36 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/9] pktdvd: Clean up the driver
+Message-ID: <ZH9JnPAL8x2GPSV3@smile.fi.intel.com>
+References: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
 MIME-Version: 1.0
-References: <20230503090708.2524310-1-nmi@metaspace.dk> <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
- <87jzxot0jk.fsf@metaspace.dk> <b9a1c1b2-3baa-2cad-31ae-8b14e4ee5709@acm.org>
- <ZFP+8apHunCCMmOZ@kbusch-mbp.dhcp.thefacebook.com> <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
- <87ttvkaevf.fsf@metaspace.dk>
-In-Reply-To: <87ttvkaevf.fsf@metaspace.dk>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Tue, 6 Jun 2023 16:46:01 +0200
-Message-ID: <CANiq72kMgh8qKzmLUokvRt=LbZY+vNVU481=-b-kKamupaxajw@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/11] Rust null block driver
-To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, rust-for-linux@vger.kernel.org,
-        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
-        Benno Lossin <benno.lossin@proton.me>,
-        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Guillaume Tucker <guillaume.tucker@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 6, 2023 at 3:40=E2=80=AFPM Andreas Hindborg (Samsung)
-<nmi@metaspace.dk> wrote:
->
->    Samsung will provide resources to support this CI effort. Through this=
- effort
->    I will aim to minimize any inconvenience for maintainers.
+On Fri, Mar 10, 2023 at 06:45:40PM +0200, Andy Shevchenko wrote:
+> Some cleanups to the recently resurrected driver.
 
-This is great.
+Anybody to pick this up, please?
 
->    We also have Rust support in Intel 0-day CI, although only compile tes=
-ts for
->    now.
+> v2:
+> - added tags (Greg)
+> 
+> Andy Shevchenko (9):
+>   pktcdvd: Get rid of custom printing macros
+>   pktcdvd: replace sscanf() by kstrtoul()
+>   pktcdvd: use sysfs_emit() to instead of scnprintf()
+>   pktcdvd: Get rid of pkt_seq_show() forward declaration
+>   pktcdvd: Drop redundant castings for sector_t
+>   pktcdvd: Use DEFINE_SHOW_ATTRIBUTE() to simplify code
+>   pktcdvd: Use put_unaligned_be16() and get_unaligned_be16()
+>   pktcdvd: Get rid of redundant 'else'
+>   pktcdvd: Sort headers
+> 
+>  drivers/block/pktcdvd.c      | 525 +++++++++++++++++------------------
+>  include/linux/pktcdvd.h      |   1 -
+>  include/uapi/linux/pktcdvd.h |   1 +
+>  3 files changed, 257 insertions(+), 270 deletions(-)
+> 
+> -- 
+> 2.39.1
+> 
 
-In addition, we also have initial Rust support in KernelCI (including
-`linux-next` [1], `rust-next` and the old `rust` branch), which could
-be expanded upon, especially with more resources (Cc'ing Guillaume).
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Moreover, our plan is to replicate the simple CI we originally had for
-the `rust` branch (which included QEMU boot tests under a matrix of
-several archs/configs/compilers) to our `rust-next`, `rust-fixes` and
-`rust-dev` branches, in order to complement the other CIs and to get
-some early smoke testing (especially for `rust-dev`).
 
-[1] https://github.com/kernelci/kernelci-core/blob/65b0900438e0ed20e7efe0ad=
-a681ab212dc8c774/config/core/build-configs.yaml#L1152-L1197
-
-Cheers,
-Miguel
