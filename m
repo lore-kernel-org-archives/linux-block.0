@@ -2,112 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA92AC7EE24
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 03:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A25FC77B7A
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 03:58:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231917AbjFFDu3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 23:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48312 "EHLO
+        id S230483AbjFFD6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 23:58:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230526AbjFFDu2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 23:50:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6A510F
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 20:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686023382;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hSOOdxHtG5JNYtrYEawXhmXi7iZRU3vUw/vcz97F7Yk=;
-        b=dhrYWdjkaM6fMv8XrEQ1wcX2+kTTqRQ1yJ8uI7C83qLRqxfBpH/Q/JdaZJ8JGk3C9rk94F
-        gawRQM/z/MzQAumm+xqHhG0Vka9+gd8nM//NLnFDFFv0ThXmf36VVWkOBPiTQaVS9g4VCK
-        SCnSVAtl+z8S+lAMmGprQajBQBYJHAU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-591-ge9Rnm9qPamtMCdLHIoeYg-1; Mon, 05 Jun 2023 23:49:37 -0400
-X-MC-Unique: ge9Rnm9qPamtMCdLHIoeYg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B5F71C03388;
-        Tue,  6 Jun 2023 03:49:36 +0000 (UTC)
-Received: from ovpn-8-17.pek2.redhat.com (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DB191121314;
-        Tue,  6 Jun 2023 03:49:18 +0000 (UTC)
-Date:   Tue, 6 Jun 2023 11:49:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>
-Cc:     linux-block@vger.kernel.org, stable@vger.kernel.org,
-        Jay Shin <jaeshin@redhat.com>,
-        Waiman Long <longman@redhat.com>, mkoutny@suse.com,
-        Yosry Ahmed <yosryahmed@google.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V3] blk-cgroup: Flush stats before releasing blkcg_gq
-Message-ID: <ZH6suXYDNbIZjQyp@ovpn-8-17.pek2.redhat.com>
-References: <20230525043518.831721-1-ming.lei@redhat.com>
+        with ESMTP id S231391AbjFFD6Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 23:58:16 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D9C12D;
+        Mon,  5 Jun 2023 20:58:14 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QZxXL6H6Hz4f3nKR;
+        Tue,  6 Jun 2023 11:58:10 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgD3X7PSrn5kHOotLA--.51186S3;
+        Tue, 06 Jun 2023 11:58:11 +0800 (CST)
+Subject: Re: [PATCH -next v2] block: fix blktrace debugfs entries leak
+To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230531092606.3037560-1-yukuai1@huaweicloud.com>
+ <20230531124404.GA27412@lst.de>
+ <509bcea6-21f6-3f64-01c3-02215955283d@huaweicloud.com>
+ <20230601061858.GA24071@lst.de>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <386257b1-3060-62f4-c050-2069ae35b82c@huaweicloud.com>
+Date:   Tue, 6 Jun 2023 11:58:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230525043518.831721-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+In-Reply-To: <20230601061858.GA24071@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgD3X7PSrn5kHOotLA--.51186S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF4DWryrWw4rJr1xZr1DKFg_yoW8Gr47pa
+        9Fvan0gr4UXr43Ka4xZw18u34S9ayfAFW5Krn5KryrCFs8Jry3XFW2gF1qvFy3Zas8GFW3
+        Xa40vryDGw10grUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
+        UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 12:35:18PM +0800, Ming Lei wrote:
-> As noted by Michal, the blkg_iostat_set's in the lockless list hold
-> reference to blkg's to protect against their removal. Those blkg's
-> hold reference to blkcg. When a cgroup is being destroyed,
-> cgroup_rstat_flush() is only called at css_release_work_fn() which
-> is called when the blkcg reference count reaches 0. This circular
-> dependency will prevent blkcg and some blkgs from being freed after
-> they are made offline.
-> 
-> It is less a problem if the cgroup to be destroyed also has other
-> controllers like memory that will call cgroup_rstat_flush() which will
-> clean up the reference count. If block is the only controller that uses
-> rstat, these offline blkcg and blkgs may never be freed leaking more
-> and more memory over time.
-> 
-> To prevent this potential memory leak:
-> 
-> - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
-> can be added
-> 
-> - add global blkg_stat_lock for covering concurrent parent blkg stat
-> update
-> 
-> - don't grab bio->bi_blkg reference when adding the stats into blkcg's
-> per-cpu stat list since all stats are guaranteed to be consumed before
-> releasing blkg instance, and grabbing blkg reference for stats was the
-> most fragile part of original patch
-> 
-> Based on Waiman's patch:
-> 
-> https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
-> 
-> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-> Cc: stable@vger.kernel.org
-> Reported-by: Jay Shin <jaeshin@redhat.com>
-> Cc: Waiman Long <longman@redhat.com>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: mkoutny@suse.com
-> Cc: Yosry Ahmed <yosryahmed@google.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V3:
-> 	- add one global blkg_stat_lock for avoiding concurrent update on
-> 	blkg stat; this way is easier for backport, also won't cause contention;
+Hi, Christoph
 
-Hello Jens and Tejun,
+在 2023/06/01 14:18, Christoph Hellwig 写道:
+> On Thu, Jun 01, 2023 at 09:50:22AM +0800, Yu Kuai wrote:
+>> Hi, Christoph
+>>
+>> 在 2023/05/31 20:44, Christoph Hellwig 写道:
+>>> I like where this is going, but did you check that this doesn't
+>>> introduce a potential crash with the current /dev/sg based blktrace?
+>>
+>> I just start to look at how /dev/sg is created and destroyed, however,
+>> I'm confused here, do you mean that the added blk_trace_shutdown() here
+>> might cause that /dev/sg blktrace to access freed momory or NULL
+>> pointer?
+> 
+> Yes.  Given that __blk_trace_remove clears out q->blk_trace and
+> frees the blk trace structure I'm worried about that.
+> 
 
-Can we move on with this patch or Waiman's version[1]?
+sg ioctl call blktrace apis blk_trace_setup/startstop/remove(), and
+these apis are all protected by 'q->debugfs_mutex', and they're safe
+to call at anytime as long as request_queue is not released.
 
-I am fine with either one.
+And I found that it's true sg can still enable blktrace through ioctl
+after the related scsi device gendisk is released, I'm thinking about
+following possible solution:
 
-[1] https://lore.kernel.org/linux-block/20230525160105.1968749-1-longman@redhat.com/
+sg_device_destroy() is called at last, when all openers close and the
+related device is deleted, so, I think we can get a queue reference
+while initializing /dev/sg, and then remove blktrace and put queue
+reference from sg_device_destroy().
 
-Thanks, 
-Ming
+Any suggestions?
+
+Thanks,
+Kuai
 
