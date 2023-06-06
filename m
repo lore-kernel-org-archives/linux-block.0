@@ -2,136 +2,180 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0723FC77B7A
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 07:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B261C77B7A
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 07:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235856AbjFFHcI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 03:32:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46350 "EHLO
+        id S235342AbjFFHkU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 03:40:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235222AbjFFHcI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 03:32:08 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A55106;
-        Tue,  6 Jun 2023 00:32:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686036726; x=1717572726;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=y0tUjBJZQc0NgAH98sMioZbdb4zlFj8YB+VyFvWw5EE=;
-  b=XEEIG0l+vNVPSiI17XepmY0z93wqNlCBSfRdA4zLstaiV9ctXmFdvJfs
-   N7/IS388OaswN0zP1qy8/GkhYC1XaXM4041fbH045oibDtDba3gwWI7xl
-   Xx1rJE3Aa8ebS5+Wx9blAejyPR9vI6SGmpEWeQHazmkCVPetcamyYAnlg
-   WmZVJ8+ZF5z6EI/zRWAspi8rrvntSmnR7oob1ilYTpk8yO+gYYGiV5hCK
-   E5RYO7ZEJx4wxzDjH/7/GMmE5BGsJY13I5K6FmBKfGcJsog0mTcfr0+Wa
-   FOCbZgQUqgbIdL8Dz0BpDuKbUoF4uN1qTdBE3+OkGWxgoCHaI5ziTiPM7
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="420139166"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="420139166"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 00:32:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="833118130"
-X-IronPort-AV: E=Sophos;i="6.00,219,1681196400"; 
-   d="scan'208";a="833118130"
-Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 06 Jun 2023 00:32:04 -0700
-Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q6RAh-0004yV-1p;
-        Tue, 06 Jun 2023 07:32:03 +0000
-Date:   Tue, 6 Jun 2023 15:31:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Kent Overstreet <kmo@daterainc.com>, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, Kent Overstreet <kmo@daterainc.com>
-Subject: Re: [PATCH v2 4/5] block: Change memcpy_(to|from)_bvec to pass bvec
- by value
-Message-ID: <202306061511.LwAxWAce-lkp@intel.com>
-References: <20230605212717.2570570-4-kent.overstreet@linux.dev>
+        with ESMTP id S236341AbjFFHkQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 03:40:16 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC28E55;
+        Tue,  6 Jun 2023 00:40:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=SQswGPGJjSOolqgUFSYGX1AabMy5/DP2Tw/s3/r3yqg=; b=2MynR8QAmA2gZpPRvkdWYM0ENb
+        IArUaR1A7xEHD/0or2gLb5eP/s9nrLYL9L/daXdZs3nYCua+W3GJb+I/B7x5/W4/Rf7mLD7JKCGYT
+        H8EqZSkISD07AX4uFHc3zMtkj7yOSXEwTQpEFcvIcE/u2PcA50ARtaouBNJ8AleEKy/cUEx1xWOm0
+        ja9Y90mDqAin14gK2EkrCpBotfhdPskWa9VGlp0+BM+PW/cmh7k0XZ9+MuiqC9OOUiiHr+pY3q/eg
+        FYNNMUjpJSf4h7hc3O0Bqkg3aJeu+WMHXQq6bjVNh9CMn7ta7E8WrGD5+93ahvV3aiSQigm3VSe+B
+        ViJqSx7Q==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q6RIH-000Ya3-0f;
+        Tue, 06 Jun 2023 07:39:53 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Phillip Potter <phil@philpotter.co.uk>,
+        Coly Li <colyli@suse.de>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-scsi@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        linux-btrfs@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-pm@vger.kernel.org
+Subject: decouple block open flags from fmode_t
+Date:   Tue,  6 Jun 2023 09:39:19 +0200
+Message-Id: <20230606073950.225178-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230605212717.2570570-4-kent.overstreet@linux.dev>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Kent,
+Hi all,
 
-kernel test robot noticed the following build errors:
+this series adds a new blk_mode_t for block open flags instead of abusing
+fmode_t.  The block open flags work very different from the normal use of
+fmode_t and only share the basic READ/WRITE flags with it.  None of the
+other normal FMODE_* flags is used, but instead there are three
+block-specific ones not used by anyone else, which can now be removed.
 
-[auto build test ERROR on axboe-block/for-next]
-[cannot apply to kdave/for-next device-mapper-dm/for-next gfs2/for-next tytso-ext4/dev linus/master v6.4-rc5 next-20230606]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Note that I've only CCed maintainers and lists for drivers and file systems
+that have non-trivial changes, as otherwise the series would spam literally
+everyone in the block and file system world.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kent-Overstreet/block-Rework-bio_for_each_folio_all/20230606-052850
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20230605212717.2570570-4-kent.overstreet%40linux.dev
-patch subject: [PATCH v2 4/5] block: Change memcpy_(to|from)_bvec to pass bvec by value
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20230606/202306061511.LwAxWAce-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 12.3.0
-reproduce (this is a W=1 build):
-        mkdir -p ~/bin
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        git remote add axboe-block https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-        git fetch axboe-block for-next
-        git checkout axboe-block/for-next
-        b4 shazam https://lore.kernel.org/r/20230605212717.2570570-4-kent.overstreet@linux.dev
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=alpha olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=alpha SHELL=/bin/bash drivers/scsi/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306061511.LwAxWAce-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/scsi/aha1542.c: In function 'aha1542_free_cmd':
->> drivers/scsi/aha1542.c:270:40: error: incompatible type for argument 1 of 'memcpy_to_bvec'
-     270 |                         memcpy_to_bvec(&bv, buf);
-         |                                        ^~~
-         |                                        |
-         |                                        struct bio_vec *
-   In file included from include/linux/blk_types.h:10,
-                    from include/linux/blkdev.h:9,
-                    from include/scsi/scsi_cmnd.h:6,
-                    from drivers/scsi/aha1542.c:23:
-   include/linux/bvec.h:271:50: note: expected 'struct bio_vec' but argument is of type 'struct bio_vec *'
-     271 | static inline void memcpy_to_bvec(struct bio_vec bvec, const char *from)
-         |                                   ~~~~~~~~~~~~~~~^~~~
-
-
-vim +/memcpy_to_bvec +270 drivers/scsi/aha1542.c
-
-^1da177e4c3f41 Linus Torvalds    2005-04-16  258  
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  259  static void aha1542_free_cmd(struct scsi_cmnd *cmd)
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  260  {
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  261  	struct aha1542_cmd *acmd = scsi_cmd_priv(cmd);
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  262  
-2f2fef022c3e7a Christoph Hellwig 2021-03-31  263  	if (cmd->sc_data_direction == DMA_FROM_DEVICE) {
-11bf4ec580737c Bart Van Assche   2021-08-09  264  		struct request *rq = scsi_cmd_to_rq(cmd);
-2f2fef022c3e7a Christoph Hellwig 2021-03-31  265  		void *buf = acmd->data_buffer;
-2f2fef022c3e7a Christoph Hellwig 2021-03-31  266  		struct req_iterator iter;
-2f2fef022c3e7a Christoph Hellwig 2021-03-31  267  		struct bio_vec bv;
-2f2fef022c3e7a Christoph Hellwig 2021-03-31  268  
-11bf4ec580737c Bart Van Assche   2021-08-09  269  		rq_for_each_segment(bv, rq, iter) {
-e6ab6113526aa4 Christoph Hellwig 2021-10-18 @270  			memcpy_to_bvec(&bv, buf);
-2f2fef022c3e7a Christoph Hellwig 2021-03-31  271  			buf += bv.bv_len;
-2f2fef022c3e7a Christoph Hellwig 2021-03-31  272  		}
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  273  	}
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  274  
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  275  	scsi_dma_unmap(cmd);
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  276  }
-1794ef2b150dd5 Christoph Hellwig 2018-11-10  277  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Diffstat:
+ arch/um/drivers/ubd_kern.c          |   20 ++-----
+ arch/xtensa/platforms/iss/simdisk.c |    6 +-
+ block/bdev.c                        |   99 ++++++++++++++++++------------------
+ block/blk-zoned.c                   |   12 ++--
+ block/blk.h                         |   26 ++++++++-
+ block/bsg-lib.c                     |    2 
+ block/bsg.c                         |    8 +-
+ block/disk-events.c                 |   47 +++++++----------
+ block/fops.c                        |   54 ++++++++++++-------
+ block/genhd.c                       |   13 ++--
+ block/ioctl.c                       |   61 +++++++---------------
+ drivers/block/amiflop.c             |   20 +++----
+ drivers/block/aoe/aoeblk.c          |    8 +-
+ drivers/block/ataflop.c             |   43 +++++++--------
+ drivers/block/drbd/drbd_main.c      |   13 ++--
+ drivers/block/drbd/drbd_nl.c        |   23 +++++---
+ drivers/block/floppy.c              |   72 +++++++++++++-------------
+ drivers/block/loop.c                |   24 ++++----
+ drivers/block/mtip32xx/mtip32xx.c   |    4 -
+ drivers/block/nbd.c                 |   12 ++--
+ drivers/block/pktcdvd.c             |   36 ++++++-------
+ drivers/block/rbd.c                 |    6 +-
+ drivers/block/rnbd/rnbd-clt.c       |    8 +-
+ drivers/block/rnbd/rnbd-srv-sysfs.c |    3 -
+ drivers/block/rnbd/rnbd-srv.c       |   23 ++++----
+ drivers/block/rnbd/rnbd-srv.h       |    2 
+ drivers/block/sunvdc.c              |    2 
+ drivers/block/swim.c                |   24 ++++----
+ drivers/block/swim3.c               |   33 +++++-------
+ drivers/block/ublk_drv.c            |    4 -
+ drivers/block/xen-blkback/xenbus.c  |    4 -
+ drivers/block/xen-blkfront.c        |    2 
+ drivers/block/z2ram.c               |    8 +-
+ drivers/block/zram/zram_drv.c       |   21 +++----
+ drivers/cdrom/cdrom.c               |   36 +++----------
+ drivers/cdrom/gdrom.c               |   12 ++--
+ drivers/md/bcache/bcache.h          |    2 
+ drivers/md/bcache/request.c         |    4 -
+ drivers/md/bcache/super.c           |   25 ++++-----
+ drivers/md/dm-cache-target.c        |   12 ++--
+ drivers/md/dm-clone-target.c        |   10 +--
+ drivers/md/dm-core.h                |    7 +-
+ drivers/md/dm-era-target.c          |    6 +-
+ drivers/md/dm-ioctl.c               |   10 +--
+ drivers/md/dm-snap.c                |    4 -
+ drivers/md/dm-table.c               |   11 ++--
+ drivers/md/dm-thin.c                |    9 +--
+ drivers/md/dm-verity-fec.c          |    2 
+ drivers/md/dm-verity-target.c       |    6 +-
+ drivers/md/dm.c                     |   20 +++----
+ drivers/md/dm.h                     |    2 
+ drivers/md/md.c                     |   50 +++++++++---------
+ drivers/mmc/core/block.c            |   12 ++--
+ drivers/mtd/devices/block2mtd.c     |    6 +-
+ drivers/mtd/mtd_blkdevs.c           |    8 +-
+ drivers/mtd/mtdblock.c              |    2 
+ drivers/mtd/ubi/block.c             |    9 +--
+ drivers/nvme/host/core.c            |    6 +-
+ drivers/nvme/host/ioctl.c           |   66 +++++++++++++-----------
+ drivers/nvme/host/multipath.c       |    6 +-
+ drivers/nvme/host/nvme.h            |    4 -
+ drivers/nvme/target/io-cmd-bdev.c   |    4 -
+ drivers/s390/block/dasd.c           |   10 +--
+ drivers/s390/block/dasd_genhd.c     |    5 +
+ drivers/s390/block/dasd_int.h       |    3 -
+ drivers/s390/block/dasd_ioctl.c     |    2 
+ drivers/s390/block/dcssblk.c        |   11 +---
+ drivers/scsi/ch.c                   |    3 -
+ drivers/scsi/scsi_bsg.c             |    4 -
+ drivers/scsi/scsi_ioctl.c           |   38 ++++++-------
+ drivers/scsi/sd.c                   |   39 ++++++--------
+ drivers/scsi/sg.c                   |    7 +-
+ drivers/scsi/sr.c                   |   22 ++++----
+ drivers/scsi/st.c                   |    2 
+ drivers/target/target_core_iblock.c |    9 +--
+ drivers/target/target_core_pscsi.c  |   10 +--
+ fs/btrfs/dev-replace.c              |    6 +-
+ fs/btrfs/ioctl.c                    |   12 ++--
+ fs/btrfs/super.c                    |   21 ++-----
+ fs/btrfs/volumes.c                  |   55 +++++++++-----------
+ fs/btrfs/volumes.h                  |   11 +---
+ fs/erofs/super.c                    |    7 +-
+ fs/ext4/super.c                     |   11 +---
+ fs/f2fs/super.c                     |   12 ++--
+ fs/jfs/jfs_logmgr.c                 |    6 +-
+ fs/nfs/blocklayout/dev.c            |    9 +--
+ fs/nilfs2/super.c                   |   12 +---
+ fs/ocfs2/cluster/heartbeat.c        |    7 +-
+ fs/reiserfs/journal.c               |   19 +++---
+ fs/reiserfs/reiserfs.h              |    1 
+ fs/super.c                          |   33 ++++--------
+ fs/xfs/xfs_super.c                  |   15 ++---
+ include/linux/blkdev.h              |   68 +++++++++++-------------
+ include/linux/bsg.h                 |    2 
+ include/linux/cdrom.h               |   12 ++--
+ include/linux/device-mapper.h       |    8 +-
+ include/linux/fs.h                  |    8 --
+ include/linux/mtd/blktrans.h        |    2 
+ include/scsi/scsi_ioctl.h           |    4 -
+ kernel/power/hibernate.c            |   12 +---
+ kernel/power/power.h                |    2 
+ kernel/power/swap.c                 |   28 ++++------
+ mm/swapfile.c                       |    7 +-
+ 103 files changed, 796 insertions(+), 853 deletions(-)
