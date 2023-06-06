@@ -2,135 +2,121 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F09E2C77B73
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 10:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2A1C77B7A
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 11:38:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235654AbjFFKXD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 06:23:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46808 "EHLO
+        id S237031AbjFFLin (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 07:38:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbjFFKWp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 06:22:45 -0400
-Received: from out-41.mta1.migadu.com (out-41.mta1.migadu.com [IPv6:2001:41d0:203:375::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C46E10E4
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 03:22:43 -0700 (PDT)
-Message-ID: <c82d6bab-36d0-0403-9304-4415f6ffd972@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1686046961;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DFk0zdNlKOCUf25Ig5Wq1urmJN+0zpOyY9aDUoSpYr0=;
-        b=gPy6Td94BVZ7oznWfnLp9FzPJbWp7ePOqDC6PbqskvRb1S+ZzMXui4UnpXFrpIqOXrEmFM
-        0QDCauz0o7TwRBB04YchcW/fvoTNradxOEB76quiU/hqJM402LazsfT4azN6uyTV+UQgcV
-        dDaLXME8iQ5ozJm4fsyda9J+O0RSg0A=
-Date:   Tue, 6 Jun 2023 18:22:28 +0800
+        with ESMTP id S237262AbjFFLid (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 07:38:33 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 323FB1988
+        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 04:38:03 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4f3bb395e69so7619267e87.2
+        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2023 04:38:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=thegoodpenguin-co-uk.20221208.gappssmtp.com; s=20221208; t=1686051480; x=1688643480;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RuUYiShAVsr/HQXAy2EuULhAqBmB4VM4J4Wz4NRgzOM=;
+        b=tVovYlEmhUSlLnvELQxcPikgppad4Fqf4CV8W8h2fBXiX6quQya3h23sutIIdD5SGj
+         EHoe2l//8SYc8xJiSDL68Idy93xoV+SrWf0YNbOlLcPXX7A/Mbf1DGmeItbJLUYuWwha
+         eGGY6NfRc+LPzNl1EMNOfmOjm91ZlC6CvhEsiopWay86S3/8urUXi8/c8tgsGhGkQyuQ
+         I4NighavESAvG6kRh50B3ZeLCw//+SUINTlg5cxu8OLGGpAoE60DraoN29HVQMdE6jtT
+         beMKhOV31SCYcdpobYxCrFWBmrBSZnNbWBIltALMkCm8c2bvZuqwm5zCPxAEPnyccSYn
+         4glQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686051480; x=1688643480;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RuUYiShAVsr/HQXAy2EuULhAqBmB4VM4J4Wz4NRgzOM=;
+        b=fjZZYLXpbXnzkEJG4b3hKpAaIhaNKxVemEfQscDSdWTaKb3vChTQ9IGLJQfTegdiKR
+         PjaK9MbBn6c+yT8guysxiZRJCF+yqHGU+O8awZbH+ZJmxTlrwoBTYy3crpOPOMcgTOU3
+         2EYKFaqHY1RjYuKmeRma3qciiLj7/cB4cpt5o3l17JMTVT8WVEqfGZNIy30C0seBALc7
+         yqYoRWDsMO8HhnfCDRSxvm09JrWPap5IROr04TenO4z0u02PC6/+UPcGqc2Fz0RICGbz
+         LPr1DcAwHrkXE8ttVpTSR1S/boWPvZM/bHSjabgN1xQX+I3ukWNM16PZ0NjTculfC06B
+         EVhw==
+X-Gm-Message-State: AC+VfDx6CEJUkVSL193xgYt2UVFOUQRNvab+LUg/s6XO0Yu47AsrazUQ
+        IP9dxRKZu1u4QfWu4e/L6lq3aHoQTwDvAjxb69jIl/x4OaLaijsxAVY=
+X-Google-Smtp-Source: ACHHUZ76cVTfSMlBx0hx0MOYrARUD2mxISMgc8umBYfkWedgvv1Y6VCqt0iL+k/KKBhCxboC0hkfux5h3gLP8Huz2S0=
+X-Received: by 2002:a2e:9d97:0:b0:2b1:c1b2:e2ef with SMTP id
+ c23-20020a2e9d97000000b002b1c1b2e2efmr1026938ljj.51.1686051480068; Tue, 06
+ Jun 2023 04:38:00 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [PATCH] blk-mq: fix incorrect rq start_time_ns and alloc_time_ns
- after throttled
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-References: <20230601053919.3639954-1-chengming.zhou@linux.dev>
- <ZH4p8tqFc57_OYoH@slm.duckdns.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <ZH4p8tqFc57_OYoH@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From:   Andrew Murray <amurray@thegoodpenguin.co.uk>
+Date:   Tue, 6 Jun 2023 12:37:49 +0100
+Message-ID: <CALqELGxfvF-YuU_K7709nN=LPkr5AWQe9ypGH2JZkPosORg9rw@mail.gmail.com>
+Subject: Slow random write access
+To:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2023/6/6 02:31, Tejun Heo wrote:
-> Hello,
-> 
-> On Thu, Jun 01, 2023 at 01:39:19PM +0800, chengming.zhou@linux.dev wrote:
->> From: Chengming Zhou <zhouchengming@bytedance.com>
->>
->> iocost rely on rq start_time_ns and alloc_time_ns to tell the saturation
->> state of the block device.
->>
->> If any qos ->throttle() end up blocking, the cached rq start_time_ns and
->> alloc_time_ns will include its throtted time, which can confuse its user.
-> 
-> I don't follow. rq_qos_throttle() happens before a request is allocated, so
-> whether ->throttle() blocks or not doesn't affect alloc_time_ns or
-> start_time_ns.
-Yes, most of the time request is allocated after rq_qos_throttle() and its
-alloc_time_ns or start_time_ns won't be affected clearly.
+Hello,
 
-But for plug batched allocation introduced by the commit 47c122e35d7e
-("block: pre-allocate requests if plug is started and is a batch"), we can
-rq_qos_throttle() after the allocation of the request. This is what the
-blk_mq_get_cached_request() does.
+I've been working with an embedded video recording device that writes
+data to the exfat filesystem of an SD card. 4 files (streams of video)
+are written simultaneously by processes usually running on different
+cores.
 
-In this case, the cached request alloc_time_ns or start_time_ns is much ahead
-if block in any qos ->throttle().
+If you assume a newly formatted SD card, then because exfat clusters
+appear to be sequentially allocated as needed when data is written (in
+userspace), then those clusters are interleaved across the 4 files.
+When writeback occurs, you see a cluster of sequential writes for each
+file but with gaps where clusters are used by other files (as if
+writeback is happening per process at different times). This results
+in a random access pattern. Ideally an IO scheduler would recognise
+these are cooperating processes, merge these 4 clusters of activities
+to result in a sequential write pattern and combine into fewer larger
+writes.
 
-> 
->> This patch add nr_flush counter in blk_plug, so we can tell if the task
->> has throttled in any qos ->throttle(), in which case we need to correct
->> the rq start_time_ns and alloc_time_ns.
->>
->> Another solution may be make rq_qos_throttle() return bool to indicate
->> if it has throttled in any qos ->throttle(). But this need more changes.
->>
->> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> 
-> Depending on the flush behavior and adjusting alloc_time_ns seems fragile to
-> me and will likely confuse other users of alloc_time_ns too.
+This is important for SD cards, because their write throughput is very
+dependent on access patterns and size of write request. For example my
+current SD card and above access pattern (with writes averaging 60KB)
+results in a write throughput for a fully utilised device of less than
+a few MB/S. This may seem contrary to the performance claims of SD
+card manufacturers, but those claims are typically made for sequential
+access with 512KB writes. Further, the claims made for the UHS speed
+grades, e.g. U3 and the video class grades, e.g. V90 also assume that
+specific SD card commands are used to enter a specific speed grade
+mode (which isn't supported in Linux it seems). In other words larger
+write accesses and more sequential access patterns will increase the
+available bandwidth. (The only exception appears to be for the
+application classes of SD cards which are optimised for random access
+at 4KB).
 
-I agree with you, this code is not good. My basic idea is to adjust the cached
-request alloc_time_ns and start_time_ns when throttled.
+I've explored the various mq schedulers (i'm still learning) - though
+I understand that to prevent software being a bottleneck for fast
+devices each core (or is that process?) has its own queue. As a result
+schedulers can't make decisions across those queues (as that defeats
+the point of mq). Thus implying that in my use-case, where
+"cooperating processes" are on separate cores, then there is no
+capability for the scheduler to combine the interleaved writes (I
+notice that bfq has logic to detect this, though not sure if it's for
+reads or rotational devices).
 
-> 
-> Maybe I'm misunderstanding the problem you're describing. Can you give a
-> concrete example of how the current code would misbehave?
-> 
+I've seen that mq-deadline appears to sort it's dispatch queue (I
+understand a single queue for the device - so this is where those
+software queues join) by sector - combined with the write_expire and
+fifo_depth tunables - then it appears that mq-deadline does a good job
+of turning interleaved writes to sequential writes (even across
+processes running on different cores). However it doesn't appear to
+combine writes which would greatly help.
 
-I tried using fio to reproduce it:
+Many of the schedulers aim to achieve a maximum latency, but it feels
+like for slow devices, then a minimum write latency and ability to
+reorder and combine those writes across cores would be beneficial.
 
-1. set the iocost qos (a bit strict qos setting to reproduce throttle)
+I'm keen to understand if there is anything I've missed? Perhaps there
+are tuneables or a specific scheduler that fits this purpose? Are my
+assumptions about the mq layer correct?
 
-echo "259:0 enable=1 rpct=5 rlat=500 wpct=5 wlat=500" > io.cost.qos
+Does it make sense to add merging in the dispatch queue (within
+mq-deadline), is this the right approach?
 
-2. run fio using io_uring ioengine (for now only io_uring used batched allocation)
+Thanks,
 
-fio --name global --runtime 30 --time_based --size 10G --ioengine io_uring \
---iodepth 256 --buffered 0 --sqthread_poll \
---name job1 --rw read --cgroup job1 --numjobs 10 \
---name job2 --rw write --cgroup job2 --numjobs 10
-
-3. run bpftrace to check request start_time_ns
-
-bpftrace -e 'kprobe:__rq_qos_track { $rq = (struct request *)arg1; if ($rq->start_time_ns) { @delta = hist((nsecs - $rq->start_time_ns)/1000); } }'
-
-
-If we go blk_mq_get_cached_request() -> throttle() and throttled for some time,
-then the returned cached request start_time_ns will be much ahead.
-
-Like below: (delta value is us)
-
-@delta:
-[0]               170090 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[1]                  898 |                                                    |
-[2, 4)               418 |                                                    |
-[4, 8)               284 |                                                    |
-[8, 16)               54 |                                                    |
-[16, 32)             198 |                                                    |
-[32, 64)            5416 |@                                                   |
-[64, 128)           5082 |@                                                   |
-[128, 256)          1296 |                                                    |
-[256, 512)            23 |                                                    |
-[512, 1K)           2632 |                                                    |
-[1K, 2K)           21143 |@@@@@@                                              |
-[2K, 4K)           26349 |@@@@@@@@                                            |
-[4K, 8K)            4559 |@                                                   |
-[8K, 16K)           4273 |@                                                   |
-[16K, 32K)            14 |                                                    |
-
+Andrew Murray
