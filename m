@@ -2,289 +2,224 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1FEC77B7A
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 13:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA652C77B73
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 14:19:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233083AbjFFNkO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 09:40:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60212 "EHLO
+        id S237517AbjFFOTU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 10:19:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232466AbjFFNkN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 09:40:13 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 457C310DB
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 06:40:08 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-51475e981f0so9013362a12.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2023 06:40:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1686058807; x=1688650807;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=TuQcZTlYuJWIJGVGPX1FYC2vSGGbheUssDv1PYTz480=;
-        b=fNAefN4HvEGREq3Sj+Jyz3LnUeHV+vla1j7XQncjRwj3KoQxgJgwcceR8EXnVTNIGo
-         enEfS7FH5dVqCG/WHZeS7kFfm2RmDjy48dgBeFLD4ficFOEV4vEN8vKxRm/bFtfOkCwm
-         cPpJrJCvXRIO7OKqxY/nLqZ8EuFDCihAmtsQcRikp//A3TBuNNw2MSo4ot1T8BfVQM7f
-         A6FEgHOiN2EtH4eRWtd4dROi//SmekC/LngGNJ1xpqr/kdUGftuiU3W9aILIDHm06ud2
-         JBvA+Kphoi8+iBUFf59KYKiBPaSMSOzPWheee0FLTZplWrgLlt/nHp/Fui8qs94sBpqZ
-         52Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686058807; x=1688650807;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TuQcZTlYuJWIJGVGPX1FYC2vSGGbheUssDv1PYTz480=;
-        b=LbUHilsqTRA/bl28ucqHxfUXZFcmIe3IcTGn4yCeHPbbO8VIUUDne43O0Hc/hTQf14
-         bHSfRgm+B3qxOZ5CXPeu8ui5/7H0TJfbTAXkLEL9CBhqqZxSWBxKgv1ovcbQdaGR7Pz4
-         ezoqATa4XdJHZccfeItymy4ORsVJWqoYWkQ03zzG277+ZL/W+ZBqmekJr5pTbCeSkK6e
-         EXET4CbiVLmm8M7uQ16EllewaDDJqTXB7jPDtEkGUgcwlmBq8GmafuaUycXnQMptj8K6
-         /T7y8n7MKD3KxhAd9KysfhJ+o7zdj7AFFqb+jaMLQSXXRfsG11/tqRjG7SyD+ym6EInP
-         5dBQ==
-X-Gm-Message-State: AC+VfDwd13V8NfVa+KtHJvPpSzVsOVoOXC4UD/W3LL6VkTAuWYAfLe7B
-        aHNUfzEtpgtUdaR/uiSsZ0xo/Q==
-X-Google-Smtp-Source: ACHHUZ5XLO8axA40iII673EklfhmaEB/Gj3Fapwb9AgeUHHbXZrNug2Mh9mK2Elk+NrhZljQTGl33g==
-X-Received: by 2002:aa7:d716:0:b0:514:a110:6bed with SMTP id t22-20020aa7d716000000b00514a1106bedmr2040587edq.27.1686058806617;
-        Tue, 06 Jun 2023 06:40:06 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id r21-20020aa7c155000000b0051421010690sm4967093edp.21.2023.06.06.06.40.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 06:40:06 -0700 (PDT)
-References: <20230503090708.2524310-1-nmi@metaspace.dk>
- <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
- <87jzxot0jk.fsf@metaspace.dk>
- <b9a1c1b2-3baa-2cad-31ae-8b14e4ee5709@acm.org>
- <ZFP+8apHunCCMmOZ@kbusch-mbp.dhcp.thefacebook.com>
- <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
-User-agent: mu4e 1.10.3; emacs 28.2.50
-From:   "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Hannes Reinecke <hare@suse.de>, rust-for-linux@vger.kernel.org,
-        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Wedson Almeida Filho <wedsonaf@gmail.com>,
-        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-        =?utf-8?Q?Bj?= =?utf-8?Q?=C3=B6rn?= Roy Baron 
-        <bjorn3_gh@protonmail.com>, Benno Lossin <benno.lossin@proton.me>,
-        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
-        Matias =?utf-8?Q?Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Subject: Re: [RFC PATCH 00/11] Rust null block driver
-Date:   Tue, 06 Jun 2023 15:33:44 +0200
-In-reply-to: <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
-Message-ID: <87ttvkaevf.fsf@metaspace.dk>
+        with ESMTP id S231605AbjFFOTT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 10:19:19 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2C218B
+        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 07:19:15 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230606141912epoutp0242b7ead49d20b5922fa845a39f8cc516~mF69wWfX03213432134epoutp02x
+        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 14:19:12 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230606141912epoutp0242b7ead49d20b5922fa845a39f8cc516~mF69wWfX03213432134epoutp02x
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1686061152;
+        bh=UOxM1GwH4N78/5VcZmRi0SOFUE4InTqlB4yboWdBops=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PZw1PRsP3Vrqe4rBgl2Q+llmA+X/Y64Mgt62j0rqVIiINQHQz37xv9cTHbe78woTb
+         5BxEesBBycF+gggWT9A5ORabSDHqm0HgkJVRO6OoIW9+f+7OZdJFEDgW6HO58kUDBK
+         ZFYVIHdSenb57diO3bEYFPfETDlbB5mJcxWAs+jM=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20230606141911epcas5p3feaf4868278ede2a218037055402778a~mF68ppvKo0226602266epcas5p3G;
+        Tue,  6 Jun 2023 14:19:11 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4QbCJt3gbnz4x9Pp; Tue,  6 Jun
+        2023 14:19:10 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        ED.0D.04567.E504F746; Tue,  6 Jun 2023 23:19:10 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230606113849epcas5p20436fd9c3a47354fc4f5264540cd9887~mDu7kpk5C1243112431epcas5p2V;
+        Tue,  6 Jun 2023 11:38:49 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20230606113849epsmtrp1037164b0d5a6cfbe44a01819ba98ed2b~mDu7i-Kls0420604206epsmtrp1I;
+        Tue,  6 Jun 2023 11:38:49 +0000 (GMT)
+X-AuditID: b6c32a49-943ff700000011d7-f9-647f405ec85f
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        B7.47.28392.9CA1F746; Tue,  6 Jun 2023 20:38:49 +0900 (KST)
+Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230606113842epsmtip230b93d2fae8d0d35d5b4cfcfbf869ead~mDu1DVgJ-2435324353epsmtip29;
+        Tue,  6 Jun 2023 11:38:42 +0000 (GMT)
+Date:   Tue, 6 Jun 2023 17:05:35 +0530
+From:   Nitesh Shetty <nj.shetty@samsung.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        willy@infradead.org, hare@suse.de, djwong@kernel.org,
+        bvanassche@acm.org, ming.lei@redhat.com, dlemoal@kernel.org,
+        nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v12 5/9] nvme: add copy offload support
+Message-ID: <20230606113535.rjbhe6eqlyqk4pqq@green245>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <ZH3mjUb+yqI11XD8@infradead.org>
+User-Agent: NeoMutt/20171215
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te1STZRzHz/O+493QZq9c6nGUcN44JtiAGeADSKChvQEVzTpd/gB2tvcw
+        AradjYlmHW4KAnJRWycWxEUuAiUIZBNEcURDkYAQCPJCBmgQ90MoKLS50fG/z/P9/b7P7/n9
+        fufh4DZX2TxOtCyeUcpEsRSxgXWhzWU7PzwwUeJRnmmHaq//gqOUvCc4qrmdS6DJtnmAvp59
+        hKPR1nSA+kY3oZErAahl+lsrNNR6EUOXSk9hqDOvFENVNe0Yai6Zw9BftxbYqH1tikCn9AMA
+        jfVrMdQyvAOVpJWx0KWWayzU11RAoKKKMTbKGtQRqNKwiiH96VQM6UaTATo3OcNCHcMOqPuJ
+        wQqtPCwgAh3pvpshtPZuF0Ff1N5m0913zrPohrOudF+Xmq6vziDohrJEunkoiaDP5Jy2orNT
+        pwl6bmyYRc9c7ifonMZqQDd0HqEX6reGbf40ZreUEUkYpRMjE8sl0bIofyrkQMSbEV7eHgK+
+        wAftopxkojjGnwoKDePvj441DotyOiiKVRulMJFKRbm/sVspV8czTlK5Kt6fYhSSWIWnwk0l
+        ilOpZVFuMibeV+DhsdPLmBgZIzUMlrIVDQ6HBpYfWiWBKy9kAmsOJD1hT2EFy8Q2ZDOAustv
+        ZYINRp4HMD9LA8yHBQCLu/uxdcdEVwZhDjQB2N8+ZMkaB3B5rR2YslikM2w7M2d0cDgEuQN2
+        rnFMsh3pAocr03ET42Q1G7auUia2Jf3gyODkU51LesM/0qosvBleyx9lma6xJvlwOPsjk2xP
+        vgS/KV/ETWUh+a81LO4xtwDJIFjSfhI3sy2cMDSyzcyDf+emWTgBVn11ljCbjwKoHdQCcyAA
+        Hruea3mcFJb0j1v0l6Hm+jnMrG+C2Sujlklwoe67dX4Ffl9bTJh5CxxYSrYwDc/3PLZM6x6A
+        bSl6LA84ap9pTvtMPTP7wozZFCutsWmcdICVqxwzusDaJvdiYFUNtjAKVVwUo/JSCGRMwv8L
+        F8vj6sHTv+T6tg7cHpl10wOMA/QAcnDKjvtZQKLEhisRHf6cUcojlOpYRqUHXsZdncR59mK5
+        8TPK4iMEnj4ent7e3p4+r3sLqBe5r/pfE9uQUaJ4JoZhFIxy3YdxrHlJGHK4eKFWfMc2fJnn
+        5yzgCJMNB/bZP256b3DJdwCbC+w3iBxDHgiXeoM9uxf9Auq8KiUYN0WhGj9xaT6O3Lq2Udgb
+        Tsn5edJmeye+5uO6LKFPTfmhB7d0E9s60MC+XceL7FM06SNTWWq334lk/s8rFUKe+7bUHu6j
+        9B9GkjUn6HcTZB/8s1odmX/0tRs81nxP4dXf9nwZoqZCe9N6/YV2+p2FU6HHfrxboJvR7V3I
+        HZ2ua5wUf7gH3P9kY2pZuziHf397/g2NRurc4WbI/fMWCH4nKPL9sKidrUXJVZ0d+MzzB8ti
+        vgheFFXcvGc35PTcfuGuw4yj8CdSefwI8WtE3VoYxVJJRQJXXKkS/Qe0f8wY1AQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpileLIzCtJLcpLzFFi42LZdlhJXvekVH2KwYpt8hbrTx1jtmia8JfZ
+        YvXdfjaL14c/MVpM+/CT2eLJgXZGi8tP+Cwe7Le32PtuNqvFzQM7mSz2LJrEZHF6wiImi5Wr
+        jzJZ7F74kcni8Z3P7BZH/79ls5h06BqjxdOrs5gs9t7StljYtoTFYs/ekywWl3fNYbOYv+wp
+        u0X39R1sFsuP/2OyODS5mclix5NGRot1r9+zWJy4JW1x/u9xVovfP+awOch7XL7i7THr/lk2
+        j52z7rJ7nL+3kcVj8wotj8tnSz02repk89i8pN5j980GNo/FfZNZPXqb37F5fHx6i8Xj/b6r
+        bB59W1Yxemw+Xe3xeZNcgGAUl01Kak5mWWqRvl0CV8afTztYC55KVBx5vZi5gbFbpIuRk0NC
+        wETi1dlONhBbSGAHo8SvmxYQcUmJZX+PMEPYwhIr/z1n72LkAqp5wihx9vpeFpAEi4CKxOHF
+        H5m6GDk42AS0JU7/5wAJiwhoStxa3s4MUs8ssI5d4uvWa2CDhAWsJR5cfw1m8wqYSdxuW8kM
+        MfQRo8T/I8ugEoISJ2c+AVvADFQ0b/NDZpAFzALSEsv/cYCYnAK6Erd6w0EqRAVkJGYs/co8
+        gVFwFpLmWUiaZyE0L2BkXsUomVpQnJueW2xYYJSXWq5XnJhbXJqXrpecn7uJEZxMtLR2MO5Z
+        9UHvECMTB+MhRgkOZiUR3l1e1SlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnN
+        Tk0tSC2CyTJxcEo1MLU+OaWufuTyRoVPCv08vlE7nq07MuF4bcMm/o60vvMlbcm7Pl/1mLd9
+        ztH9l+72c6ee+DXFKzvLa+ZxCT/JZIblbzofX2vVkWUO0L/6SClK5h6Xs/ilnIlPQ9XXn3vq
+        az1NPSqi7N2O30XznC8Hlk7YfTvg9nRR5xtOV+4Giql2/vgsmRWz+OOxyODJgvZWjS8c5py8
+        fTj96Y+iY/HVKw/4199n3rhRdOf3isRqnWVybZllKaqa1/bfevKp3m99aAznpTviSy66L308
+        TyX0j4DyhcYmmVbBc4zz9NRN+5Z379TodNuh9HDxt9N7zy5+5bJ37v2m09OYj1kk+FwXNmN1
+        bHg75X/8fTv5DyZ9PSFKLMUZiYZazEXFiQAmhJ86lQMAAA==
+X-CMS-MailID: 20230606113849epcas5p20436fd9c3a47354fc4f5264540cd9887
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230605122310epcas5p4aaebfc26fe5377613a36fe50423cf494
+References: <20230605121732.28468-1-nj.shetty@samsung.com>
+        <CGME20230605122310epcas5p4aaebfc26fe5377613a36fe50423cf494@epcas5p4.samsung.com>
+        <20230605121732.28468-6-nj.shetty@samsung.com>
+        <ZH3mjUb+yqI11XD8@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Hi All,
+On 23/06/05 06:43AM, Christoph Hellwig wrote:
+>>  		break;
+>>  	case REQ_OP_READ:
+>> -		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
+>> +		if (unlikely(req->cmd_flags & REQ_COPY))
+>> +			nvme_setup_copy_read(ns, req);
+>> +		else
+>> +			ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
+>>  		break;
+>>  	case REQ_OP_WRITE:
+>> -		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
+>> +		if (unlikely(req->cmd_flags & REQ_COPY))
+>> +			ret = nvme_setup_copy_write(ns, req, cmd);
+>> +		else
+>> +			ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
+>
+>Yikes.  Overloading REQ_OP_READ and REQ_OP_WRITE with something entirely
+>different brings us back the horrors of the block layer 15 years ago.
+>Don't do that.  Please add separate REQ_COPY_IN/OUT (or maybe
+>SEND/RECEIVE or whatever) methods.
+>
 
-I apologize for the lengthy email, but I have a lot of things to cover.
+Downside will be duplicating checks which are present for read, write in
+block layer, device-mapper and zoned devices.
+But we can do this, shouldn't be an issue.
 
-As some of you know, a goal of mine is to make it possible to write blk-mq
-device drivers in Rust. The RFC patches I have sent to this list are the first
-steps of making that goal a reality. They are a sample of the work I am doing.
+>> +	/* setting copy limits */
+>> +	if (blk_queue_flag_test_and_set(QUEUE_FLAG_COPY, q))
+>
+>I don't understand this comment.
+>
 
-My current plan of action is to provide a Rust API that allows implementation of
-blk-mq device drives, along with a Rust implementation of null_blk to serve as a
-reference implementation. This reference implementation will demonstrate how to
-use the API.
+It was a mistake. Comment is misplaced and it should have been
+"setting copy flag" instead of "setting copy limits".
+Anyway now we feel this comment is redundant, will remove it.
+Also, we should have used blk_queue_flag_set to enable copy offload.
 
-I attended LSF in Vancouver a few weeks back where I led a discussion on the
-topic. My goal for that session was to obtain input from the community on how to
-upstream the work as it becomes more mature.
+>> +struct nvme_copy_token {
+>> +	char *subsys;
+>> +	struct nvme_ns *ns;
+>> +	sector_t src_sector;
+>> +	sector_t sectors;
+>> +};
+>
+>Why do we need a subsys token?  Inter-namespace copy is pretty crazy,
+>and not really anything we should aim for.  But this whole token design
+>is pretty odd anyway.  The only thing we'd need is a sequence number /
+>idr / etc to find an input and output side match up, as long as we
+>stick to the proper namespace scope.
+>
 
-I received a lot of feedback, both during the session, in the hallway, and on
-the mailing list. Ultimately, we did not achieve consensus on a path forward. I
-will try to condense the key points raised by the community here. If anyone feel
-their point is not contained below, please chime in.
+The idea behind subsys is to prevent copy across different subsystem.
+For example, copy across nvme subsystem and the scsi subsystem. [1]
+At present, we don't support inter-namespace(copy across NVMe namespace),
+but after community feedback for previous series we left scope for it.
+About idr per namespace, it will be similar to namespace check that
+we are doing to prevent copy across namespace.
+We went with current structure for token, as it was solving above
+issues as well as provides a placeholder for storing source LBA and
+number of sectors.
+Do have any suggestions on how we can store source info, if we go with
+idr based approach ?
 
-Please note that I am paraphrasing the points below, they are not citations.
+[1] https://lore.kernel.org/all/alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com/T/#m407f24fb4454d35c3283a5e51fdb04f1600463af
 
-1) "Block layer community does not speak Rust and thus cannot review Rust patches"
+>> +	if (unlikely((req->cmd_flags & REQ_COPY) &&
+>> +				(req_op(req) == REQ_OP_READ))) {
+>> +		blk_mq_start_request(req);
+>> +		return BLK_STS_OK;
+>> +	}
+>
+>This really needs to be hiden inside of nvme_setup_cmd.  And given
+>that other drivers might need similar handling the best way is probably
+>to have a new magic BLK_STS_* value for request started but we're
+>not actually sending it to hardware.
 
-   This work hinges on one of two things happening. Either block layer reviewers
-   and maintainers eventually becoming fluent in Rust, or they accept code in
-   their tree that are maintained by the "rust people". I very much would prefer
-   the first option.
+Sure we will add new BLK_STS_* for completion and move the snippet.
 
-   I would suggest to use this work to facilitate gradual adoption of Rust. I
-   understand that this will be a multi-year effort. By giving the community
-   access to a Rust bindings specifically designed or the block layer, the block
-   layer community will have a helpful reference to consult when investigating
-   Rust.
+Thank you,
+Nitesh Shetty
 
-   While the block community is getting up to speed in Rust, the Rust for Linux
-   community is ready to conduct review of patches targeting the block layer.
-   Until such a time where Rust code can be reviewed by block layer experts, the
-   work could be gated behind an "EXPERIMENTAL" flag.
-
-   Selection of the null_blk driver for a reference implementation to drive the
-   Rust block API was not random. The null_blk driver is relatively simple and
-   thus makes for a good platform to demonstrate the Rust API without having to
-   deal with actual hardware.
-
-   The null_blk driver is a piece of testing infrastructure that is not usually
-   deployed in production environments, so people who are worried about Rust in
-   general will not have to worry about their production environments being
-   infested with Rust.
-
-   Finally there have been suggestions both to replace and/or complement the
-   existing C null_blk driver with the Rust version. I would suggest
-   (eventually, not _now_) complementing the existing driver, since it can be
-   very useful to benchmark and test the two drivers side by side.
-
-2) "Having Rust bindings for the block layer in-tree is a burden for the
-   maintainers"
-
-   I believe we can integrate the bindings in a way so that any potential
-   breakage in the Rust API does not impact current maintenance work.
-   Maintainers and reviewers that do not wish to bother with Rust should be able
-   to opt out. All Rust parts should be gated behind a default N kconfig option.
-   With this scheme there should be very little inconvenience for current
-   maintainers.
-
-   I will take necessary steps to make sure block layer Rust bindings are always
-   up to date with changes to kernel C API. I would run CI against
-
-   - for-next of https://git.kernel.dk/linux.git
-   - master of https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-   - mainline releases including RCs
-   - stable and longterm kernels with queues applied
-   - stable and longterm releases including RCs
-
-   Samsung will provide resources to support this CI effort. Through this effort
-   I will aim to minimize any inconvenience for maintainers.
-
-3) "How will you detect breakage in the Rust API caused by changes to C code?"
-
-   The way we call C code from Rust in the kernel guarantees that most changes
-   to C APIs that are called by Rust code will cause a compile failure when
-   building the kernel with Rust enabled. This includes changing C function
-   argument names or types, and struct field names or types. Thus, we do not need
-   to rely on symvers CRC calculation as suggested by James Bottomley at LSF.
-
-   However, if the semantics of a kernel C function is changed without changing
-   its name or signature, potential breakage will not be detected by the build
-   system. To detect breakage resulting from this kind of change, we have to
-   rely _on the same mechanics_ that maintainers of kernel C code are relying on
-   today:
-
-   - kunit tests
-   - blktests
-   - fstests
-   - staying in the loop wrt changes in general
-
-   We also have Rust support in Intel 0-day CI, although only compile tests for
-   now.
-
-4) "How will you prevent breakage in C code resulting from changes to Rust code"
-
-   The way the Rust API is designed, existing C code is not going to be reliant
-   on Rust code. If anything breaks just disable Rust and no Rust code will be
-   built. Or disable block layer Rust code if you want to keep general Rust
-   support. If Rust is disabled by default, nothing in the kernel should break
-   because of Rust, if not explicitly enabled.
-
-5) "Block drivers in general are not security sensitive because they are mostly
-   privileged code and have limited user visible API"
-
-   There are probably easier ways to exploit a Linux system than to target the
-   block layer, although people are plugging in potentially malicious block
-   devices all the time in the form of USB Mass Storage devices or CF cards.
-
-   While memory safety is very relevant for preventing exploitable security
-   vulnerabilities, it is also incredibly useful in preventing memory safety
-   bugs in general. Fewer bugs means less risk of bugs leading to data
-   corruption. It means less time spent on tracking down and fixing bugs, and
-   less time spent reviewing bug fixes. It also means less time required to
-   review patches in general, because reviewers do not have to review for memory
-   safety issues.
-
-   So while Rust has high merit in exposed and historically exploited
-   subsystems, this does not mean that it has no merit in other subsystems.
-
-6) "Other subsystems may benefit more from adopting Rust"
-
-   While this might be true, it does not prevent the block subsystem from
-   benefiting from adopting Rust (see 5).
+------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_
+Content-Type: text/plain; charset="utf-8"
 
 
-7) "Do not waste time re-implementing null_blk, it is test infrastructure so
-   memory safety does not matter. Why don't you do loop instead?"
-
-   I strongly believe that memory safety is also relevant in test
-   infrastructure. We waste time and energy fixing memory safety issues in our
-   code, no matter if the code is test infrastructure or not. I refer to the
-   statistics I posted to the list at an earlier date [3].
-
-   Further, I think it is a benefit to all if the storage community can become
-   fluent in Rust before any critical infrastructure is deployed using Rust.
-   This is one reason that I switched my efforts to null_block and that I am not
-   pushing Rust NVMe.
-
-8) "Why don't you wait with this work until you have a driver for a new storage
-   standard"
-
-   Let's be proactive. I think it is important to iron out the details of the
-   Rust API before we implement any potential new driver. When we eventually
-   need to implement a driver for a future storage standard, the choice to do so
-   in Rust should be easy. By making the API available ahead of time, we will be
-   able to provide future developers with a stable implementation to choose
-   from.
-
-9) "You are a new face in our community. How do we know you will not disappear?"
-
-   I recognize this consideration and I acknowledge that the community is trust
-   based. Trust takes time to build. I can do little more than state that I
-   intend to stay with my team at Samsung to take care of this project for many
-   years to come. Samsung is behind this particular effort. In general Google
-   and Microsoft are actively contributing to the wider Rust for Linux project.
-   Perhaps that can be an indication that the project in general is not going
-   away.
-
-10) "How can I learn how to build the kernel with Rust enabled?"
-
-    We have a guide in `Documentation/rust/quick-start.rst`. If that guide does
-    not get you started, please reach out to us [1] and we will help you get
-    started (and fix the documentation since it must not be good enough then).
-
-11) "What if something catches fire and you are out of office?"
-
-    If I am for some reason not responding to pings during a merge, please
-    contact the Rust subsystem maintainer and the Rust for Linux list [2]. There
-    are quite a few people capable of firefighting if it should ever become
-    necessary.
-
-12) "These patches are not ready yet, we should not accept them"
-
-    They most definitely are _not_ ready, and I would not ask for them to be
-    included at all in their current state. The RFC is meant to give a sample of
-    the work that I am doing and to start this conversation. I would rather have
-    this conversation preemptively. I did not intend to give the impression that
-    the patches are in a finalized state at all.
-
-
-With all this in mind I would suggest that we treat the Rust block layer API and
-associated null block driver as an experiment. I would suggest that we merge it
-in when it is ready, and we gate it behind an experimental kconfig option. If it
-turns out that all your worst nightmares come true and it becomes an unbearable
-load for maintainers, reviewers and contributors, it will be low effort remove
-it again. I very much doubt this will be the case though.
-
-Jens, Kieth, Christoph, Ming, I would kindly ask you to comment on my suggestion
-for next steps, or perhaps suggest an alternate path. In general I would
-appreciate any constructive feedback from the community.
-
-[1] https://rust-for-linux.com/contact
-[2] rust-for-linux@vger.kernel.org
-[3] https://lore.kernel.org/all/87y1ofj5tt.fsf@metaspace.dk/
-
-Best regards,
-Andreas Hindborg
+------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_--
