@@ -2,82 +2,76 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA9AC7EE43
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 20:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2A6C7EE43
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 20:34:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238623AbjFFUXJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 16:23:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49928 "EHLO
+        id S235236AbjFFUd6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 16:33:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233989AbjFFUXI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 16:23:08 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B1BE5B
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 13:23:06 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64ff1f11054so1098681b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2023 13:23:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686082986; x=1688674986;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7cMM+3Frap8CPDJIHI+z3vZmvyWyRt3GdKNUKBr4Jv4=;
-        b=P4B9Sa4PUYVtwV6pKmSW1heOYBApHtr7MaB6q+TtcOijL4NDuHBov4KvNg+W0KfQoj
-         T04Kje24RwrmpakzRA3wgmpd24XY/BPObZy138e596gkCSgnVdCwEAJTrCKMRXxDXOEs
-         mUwqqSHfEbxEqzh8yg+nJrIkgvUH5QE8KFdmLnjowneNmG5S2qFJVlNtv4aXpSidPGwW
-         KLpvzmslFj0nTJ9+Ol9xblSy2I+SV/tVljWdJvfqrK7Ecih91jFHSf3W+U2wb9Lyfrxp
-         yK9VBJid3ILOkEdPau/jQSngS2+OXRioo+7Vyz0XSUMQNEw9YsKSVZvWVQk++ot4mE47
-         MQPg==
+        with ESMTP id S234193AbjFFUd5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 16:33:57 -0400
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9507B1A7;
+        Tue,  6 Jun 2023 13:33:56 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-256931ec244so5687966a91.3;
+        Tue, 06 Jun 2023 13:33:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686082986; x=1688674986;
-        h=content-transfer-encoding:in-reply-to:from:references:to
+        d=1e100.net; s=20221208; t=1686083636; x=1688675636;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7cMM+3Frap8CPDJIHI+z3vZmvyWyRt3GdKNUKBr4Jv4=;
-        b=YJfMgDZQ2K7tLh5KG/pmVMtXAsRp5xiCJ9YRfCHe2O+2J+MJtdGsHUCJjAeSvZvPby
-         23qoNenn9NUQmVwF+EQDP8/T6EWzb8O8DdsAkSL7PGnS3sNlXV1FhZwEMfboHzy3sk3/
-         MKH1lbltq3RFeTBiFMpCyKUvJ3Dl0EGcU6SQn7Oi7mLVkLL7XzTJoS83uA4DnYzSe3Nx
-         UDMxooAFDJ4YGeW2YmmpXaqQkH7dGSOJtqrO/qbJVqbtZR81mda8z7TmyiBgM23kQ5tD
-         gA9FXhdFK3NS8op2cpK9cedUjF864GNzta7Y3RVkQwOBm9sJHeWO/ScIo2zOglVkQpZJ
-         N6qA==
-X-Gm-Message-State: AC+VfDzNZHC4GX2gyuhfqfn5Cw6DhEt0LmLyduDv6FGZx+4oRl2Y+C6H
-        ORuR8y1s+eUJCLuIfmzOUk97SA==
-X-Google-Smtp-Source: ACHHUZ6a3iq+Fc7SO2Oud/wSXecn/lSv+X9VE7/uzvDYcISChXTF6tG4xX5wXsxyJ5bZ1FTUMjrfzA==
-X-Received: by 2002:a05:6a21:9995:b0:111:a0e5:d2b7 with SMTP id ve21-20020a056a21999500b00111a0e5d2b7mr4092602pzb.4.1686082985944;
-        Tue, 06 Jun 2023 13:23:05 -0700 (PDT)
-Received: from ?IPV6:2600:380:c07d:6a15:5a4b:a5e4:a3ae:c2e1? ([2600:380:c07d:6a15:5a4b:a5e4:a3ae:c2e1])
-        by smtp.gmail.com with ESMTPSA id g9-20020aa78749000000b0062e0515f020sm7162492pfo.162.2023.06.06.13.23.04
+        bh=MgJp+orwk1NKxueTZD2IplILXAWARVtQ9HQ4gN8T56w=;
+        b=UeLbdlSvBGqlOFJlTSI3vhBZ93+qSLbefLqPhyy4PrZreXgcMrF3KvaYwWekrBOnN9
+         Oq9CsEdImWHqlOQekGdbffRPY8I8U9BEJzyNH8O6G8MSdLA7yCFC388B4baBin4QUNDK
+         C41lFfJtroAJYiuwxrydnnceBwDZCOdX3JHOouEznCtkAM1SrMMxcJSUZ6pBwifBIw0u
+         JeFTNYwRKfRDhdfZ2qRF6Cet9FySP2gFyLy+93Sf3sYuGq4NZSFD+GYCe6Qr3RDqIuk8
+         ZzEEm1hoFhWYJpyFbMeGpTw6omN4Gget2qzhxZIOMSUKqCiDQ3zOHy0uHM0h14rRiJEB
+         Vvwg==
+X-Gm-Message-State: AC+VfDz9xb1OvrvepG6YscwHM1APuYlzWonkNjTzBo93p3HhcMRk+jiu
+        8zyLgpKnfGNiqux/QwBNMhM=
+X-Google-Smtp-Source: ACHHUZ54ZXhppPBlZio1a0xCAdGhS7743bczBArw4DhbAmwgKbH4ZpB5w23QwGVm1a0qzsRA08VCUg==
+X-Received: by 2002:a17:902:f683:b0:1af:b92d:b5fe with SMTP id l3-20020a170902f68300b001afb92db5femr4114616plg.0.1686083635869;
+        Tue, 06 Jun 2023 13:33:55 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id q16-20020a170902bd9000b001a64011899asm8899148pls.25.2023.06.06.13.33.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jun 2023 13:23:05 -0700 (PDT)
-Message-ID: <c00870f9-9ae4-27b1-3362-444aa76d7671@kernel.dk>
-Date:   Tue, 6 Jun 2023 14:23:03 -0600
+        Tue, 06 Jun 2023 13:33:55 -0700 (PDT)
+Message-ID: <3c9414d7-fd6d-f6fd-31c0-16fadb5bb574@acm.org>
+Date:   Tue, 6 Jun 2023 13:33:54 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH v2 0/9] pktdvd: Clean up the driver
+Subject: Re: [PATCH v2 0/3] scsi: fixes for targets with many LUNs
 Content-Language: en-US
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
- <ZH9JnPAL8x2GPSV3@smile.fi.intel.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZH9JnPAL8x2GPSV3@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     mwilck@suse.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+References: <20230606193845.9627-1-mwilck@suse.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230606193845.9627-1-mwilck@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/6/23 8:58 AM, Andy Shevchenko wrote:
-> On Fri, Mar 10, 2023 at 06:45:40PM +0200, Andy Shevchenko wrote:
->> Some cleanups to the recently resurrected driver.
+On 6/6/23 12:38, mwilck@suse.com wrote:
+> From: Martin Wilck <mwilck@suse.com>
 > 
-> Anybody to pick this up, please?
+> This patch series addresses some issues we saw in a test setup
+> with a large number of SCSI LUNs. The first two patches simply
+> increase the number of available sg and bsg devices. The last one
+> fixes an large delay we encountered between blocking a Fibre Channel
+> remote port and the dev_loss_tmo.
+> 
+> Changes v1 -> v2:
+>   - call blk_mq_wait_quiesce_done() from scsi_target_block() to
+>     cover the case where BLK_MQ_F_BLOCKING is set (Bart van Assche)
 
-I can pick it up, I'm assuming this is all untested?
+For the entire series:
 
--- 
-Jens Axboe
-
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
