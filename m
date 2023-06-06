@@ -2,80 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3F3C7EE24
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 17:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14D4C7EE2A
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 18:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233762AbjFFRpE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 13:45:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47182 "EHLO
+        id S231824AbjFFSIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 14:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238691AbjFFRpD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 13:45:03 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D6910F8;
-        Tue,  6 Jun 2023 10:45:01 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1b011cffe7fso30300055ad.1;
-        Tue, 06 Jun 2023 10:45:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686073501; x=1688665501;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nmi/PPknLe5NcPV5GoTVPuKYHIzmi3+CPOd87Hhbxx8=;
-        b=lR6wHl8n2NYWtlglWrbKCBfzt0/vRzPxgWYVbnKlNZzGrFHgRZp7jkEROqPfdo5IKl
-         gjR2vue+mt7MGIso3IdwkDTehYfP6dY4kfzi7zLcuD9oYNNP7m+x/ddKHQNPXwpuN23U
-         MXZr8pIptf7BAnSntsPHB3e6YvhWEEKAje39elOMy5Dr8IRqXVCu8/Xtw9Qr83pM8b8U
-         +xkJUDaFUjg1Oh1y1lc6HmyrHmq0qPtRMb8y7l9ejHABQHoPL9lCDbk8Uri1SOnSE+Dv
-         fIehHBFWuFKuc8/U+W3iklqQZ5ZTXm2jiJr5F8+1AtMvpFGM46SQ9NA7J+BxVRFa7tBH
-         52wA==
-X-Gm-Message-State: AC+VfDxJ0e2C6xQW4DXKm9SRV8nnQ7VT0LY757txVxJ8b/K8rFLppHmA
-        /F9modXVOs/ldHMrWi9xeSg=
-X-Google-Smtp-Source: ACHHUZ5fAcNgcADCkYRu+xZLEJI/xVmrRhz62JDO1XlAcIckIgnvK0ZOSG42WS2yq3aifD/6GR1Uqg==
-X-Received: by 2002:a17:902:c949:b0:1b2:499f:674f with SMTP id i9-20020a170902c94900b001b2499f674fmr335469pla.25.1686073500922;
-        Tue, 06 Jun 2023 10:45:00 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id r19-20020a170902be1300b001ab12ccc2a7sm8784309pls.98.2023.06.06.10.44.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jun 2023 10:45:00 -0700 (PDT)
-Message-ID: <bb8c8d9b-0fcb-4ba2-eea7-6954d8723d1d@acm.org>
-Date:   Tue, 6 Jun 2023 10:44:59 -0700
+        with ESMTP id S233549AbjFFSIb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 14:08:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6380C1707
+        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 11:07:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686074860;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KCHea5uxb09v02T7QiZVlUPaNE7poMAC7MU6JVuAUYE=;
+        b=gyUwt/QTT5y/fbTwpIX3ABFbvR56ggxczE4YHd97kqBcAb9gTk1kD2fJOr4Y9SlFgyp9WJ
+        9U2kBZkOV2ISZlQZ5r8hQlACtSGyMyisjsLGsT1qrrKTnJtbyppyRHlGbPE0dz9ckIkTdD
+        pCNnjgygWFHIAG430p/HEItAqBlQevI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-30-OAh2WxHKOXOizHjU1T6MHQ-1; Tue, 06 Jun 2023 14:07:37 -0400
+X-MC-Unique: OAh2WxHKOXOizHjU1T6MHQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AACF6800BFF;
+        Tue,  6 Jun 2023 18:07:36 +0000 (UTC)
+Received: from llong.com (unknown [10.22.34.1])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2ADFC2166B25;
+        Tue,  6 Jun 2023 18:07:36 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Waiman Long <longman@redhat.com>
+Subject: [PATCH] blk-cgroup: Reinit blkg_iostat_set after clearing in blkcg_reset_stats()
+Date:   Tue,  6 Jun 2023 14:07:24 -0400
+Message-Id: <20230606180724.2455066-1-longman@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH blktests v1] nvmeof-mp: Remove nvmeof-mp tests
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>, linux-nvme@lists.infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
-        Hannes Reinecke <hare@suse.de>,
-        John Meneghini <jmeneghi@redhat.com>
-References: <20230606075443.17437-1-dwagner@suse.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230606075443.17437-1-dwagner@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/6/23 00:54, Daniel Wagner wrote:
-> The nvmeof-mp are designed to test a NVMe multipathing setup using
-> dm_multipath, which was a configuration RHEL shipped. In the meantime,
-> RHEL switched also to NVMe native multipathing which is tested with the
-> nvme tests.
-> 
-> The nvme tests cover all the use cases which are testes by nvmeof-mp
-> including the transport failure, see nvme/040.
-> 
-> During LSFMM 2023 conference it was decided it is better to drop these
-> tests and reduce the maintenance burden on blktests.
-> 
-> Cc: John Meneghini <jmeneghi@redhat.com>
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
+When blkg_alloc() is called to allocate a blkcg_gq structure
+with the associated blkg_iostat_set's, there are 2 fields within
+blkg_iostat_set that requires proper initialization - blkg & sync.
+The former field was introduced by commit 3b8cc6298724 ("blk-cgroup:
+Optimize blkcg_rstat_flush()") while the later one was introduced by
+commit f73316482977 ("blk-cgroup: reimplement basic IO stats using
+cgroup rstat").
 
-How about Cc-ing the person that wrote the code when removing code? 
-Anyway, this patch looks good to me.
+Unfortunately those fields in the blkg_iostat_set's are not properly
+re-initialized when they are cleared in v1's blkcg_reset_stats(). This
+can lead to a kernel panic due to NULL pointer access of the blkg
+pointer. The missing initialization of sync is less problematic and
+can be a problem in a debug kernel due to missing lockdep initialization.
 
-Bart.
+Fix these problems by re-initializing them after memory clearing.
+
+Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+Fixes: f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
+Signed-off-by: Waiman Long <longman@redhat.com>
+---
+ block/blk-cgroup.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 90c2efc3767f..48084321e3e0 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -636,8 +636,13 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+ 			struct blkg_iostat_set *bis =
+ 				per_cpu_ptr(blkg->iostat_cpu, cpu);
+ 			memset(bis, 0, sizeof(*bis));
++
++			/* Re-initialize the cleared blkg_iostat_set */
++			u64_stats_init(&bis->sync);
++			bis->blkg = blkg;
+ 		}
+ 		memset(&blkg->iostat, 0, sizeof(blkg->iostat));
++		u64_stats_init(&blkg->iostat.sync);
+ 
+ 		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 			struct blkcg_policy *pol = blkcg_policy[i];
+-- 
+2.31.1
 
