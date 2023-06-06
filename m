@@ -2,78 +2,239 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14233C7EE24
-	for <linux-block@archiver.kernel.org>; Mon,  5 Jun 2023 23:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD40FC7EE23
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 00:04:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231214AbjFEXSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Jun 2023 19:18:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51058 "EHLO
+        id S231442AbjFFAES (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Jun 2023 20:04:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbjFEXSM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 19:18:12 -0400
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6042A7
-        for <linux-block@vger.kernel.org>; Mon,  5 Jun 2023 16:18:10 -0700 (PDT)
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-4f13c41c957so482870e87.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Jun 2023 16:18:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686007089; x=1688599089;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8zPGauo5IGjlOWoNI867DR+5xDWdnkel73bVvbsYF4=;
-        b=kNCJNrQaloiSy6rISafnL0UHsyXmtwdzJWM+cBgdRg/lIQFJbj6dbub47OvtJy73PY
-         PokFZbjgHRGlyYfdo9uTQiwfgr2FBAJprAUp1iN6IG+P0AcJzZi1G/6hX1vPXkzaPml6
-         EYuR4Q1rJLbUStyJkTfo2YLMUQ/gK5lBfgUu0sJmcbYlnDkCMGNDjm+JhCJ7+ZH2RJcr
-         nVrmcnE25rFKmernUGvvqPcTY33NrBdDp8pBAT5FXmsVGACOPmYbLE2iVtTJfXclMY5j
-         cc+a5895jTnrTyHEb8KEVNuGZUDp8YHsKrOWDJs/6cTXoZQwC4UL5ca3X3gzo3TAskeT
-         aiig==
-X-Gm-Message-State: AC+VfDzmNgWCVykJu6DLgA/CbTFGU6+0/W6VowYq/WJV+Ea7lW/YXp1H
-        XQ+Q1wJKWLZx5nd6YwX4ONg=
-X-Google-Smtp-Source: ACHHUZ7tOjpGDR3uN2PYKuKb/jOyQ8HhYJZo5JSdlYn6jaDtFqS3lf+BuCv5YljQjhIP1bN6l2BhfQ==
-X-Received: by 2002:a05:6512:4c1:b0:4f6:2246:aac4 with SMTP id w1-20020a05651204c100b004f62246aac4mr137014lfq.6.1686007088908;
-        Mon, 05 Jun 2023 16:18:08 -0700 (PDT)
-Received: from [10.100.102.14] (46-117-190-200.bb.netvision.net.il. [46.117.190.200])
-        by smtp.gmail.com with ESMTPSA id a26-20020a056512021a00b004f60be0c685sm1264785lfo.123.2023.06.05.16.18.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jun 2023 16:18:08 -0700 (PDT)
-Message-ID: <446c46d8-fbc7-ecd2-8efa-1c9497e16851@grimberg.me>
-Date:   Tue, 6 Jun 2023 02:18:07 +0300
+        with ESMTP id S230376AbjFFAER (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Jun 2023 20:04:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B69F9;
+        Mon,  5 Jun 2023 17:04:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BA1BC62915;
+        Tue,  6 Jun 2023 00:04:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1C3C433D2;
+        Tue,  6 Jun 2023 00:04:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686009855;
+        bh=xPqDBnA9crfcda+QJHDEogmu65T/ezefUhM18Debbm0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ddPmBSXSMvlY9x94xIIznZYGaNuipQq3VI72KC0oXDBKaGeDQjKtRJmfrsGmehWvO
+         +dPcgrPTfGtR6It+kcXJltBdEm6/kbNCqegUMdcjJLpThWScaZHuyrI92e+KxL5eSE
+         6UYfqRlb93ixurnxyFXwOAH/gstR61UDyavP5IbH3jiHC6gYnE66jfhBxNASdfvKoO
+         3g91Y67k3IwVIP5kIbGlNmjoUpg38PKL0tJCWBDOdkxq0zpo0hU4ztLFtuUy69XDvZ
+         pgOw60wCPj40tpC46Ad5a91ebl7gCGcJ/iJcwmK8v80Pnvc61AL6XuQN4t+34IdDjQ
+         mC0Xvp8bW0hvA==
+Date:   Mon, 5 Jun 2023 17:04:14 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Xiubo Li <xiubli@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Damien Le Moal <dlemoal@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, Miklos Szeredi <mszeredi@redhat.com>
+Subject: Re: [PATCH 09/12] fs: factor out a direct_write_fallback helper
+Message-ID: <20230606000414.GJ1325469@frogsfrogsfrogs>
+References: <20230601145904.1385409-1-hch@lst.de>
+ <20230601145904.1385409-10-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH blktests] nvme/{016,017}: use _check_genctr instead of
- _filter_discovery
-Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Yang Xu <xuyang2018.jy@fujitsu.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-References: <1685495221-4598-1-git-send-email-xuyang2018.jy@fujitsu.com>
- <6fbgjc5ykve3jyko4vlzudrnwueou4ehgn6n2dtihjko3qv7ww@sqlyuxx4ijt5>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <6fbgjc5ykve3jyko4vlzudrnwueou4ehgn6n2dtihjko3qv7ww@sqlyuxx4ijt5>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230601145904.1385409-10-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Jun 01, 2023 at 04:59:01PM +0200, Christoph Hellwig wrote:
+> Add a helper dealing with handling the syncing of a buffered write fallback
+> for direct I/O.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Miklos Szeredi <mszeredi@redhat.com>
 
-> On May 31, 2023 / 09:07, Yang Xu wrote:
->> Since commit 328943e3 ("Update tests for discovery log page changes"),
->> blktests also include the discovery subsystem itself. But it
->> will lead these cases fails on older nvme-cli system.
-> 
-> Thanks for this report. What is the nvme-cli version with the issue?
-> 
->>
->> To avoid this, like nvme/002, use _check_genctr to check instead of
->> comparing many discovery Log Entry output.
->>
->> Signed-off-by: Yang Xu <xuyang2018.jy@fujitsu.com>
-> 
-> The change looks fine to me, but I'd wait for comments by nvme developers.
+Looks good to me; whose tree do you want this to go through?
 
-I'm ok with this change, but IIRC Chaitanya wanted that we keep checking
-the full log-page output...
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+
+--D
+
+> ---
+>  fs/libfs.c         | 41 ++++++++++++++++++++++++++++
+>  include/linux/fs.h |  2 ++
+>  mm/filemap.c       | 66 +++++++++++-----------------------------------
+>  3 files changed, 58 insertions(+), 51 deletions(-)
+> 
+> diff --git a/fs/libfs.c b/fs/libfs.c
+> index 89cf614a327158..5b851315eeed03 100644
+> --- a/fs/libfs.c
+> +++ b/fs/libfs.c
+> @@ -1613,3 +1613,44 @@ u64 inode_query_iversion(struct inode *inode)
+>  	return cur >> I_VERSION_QUERIED_SHIFT;
+>  }
+>  EXPORT_SYMBOL(inode_query_iversion);
+> +
+> +ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
+> +		ssize_t direct_written, ssize_t buffered_written)
+> +{
+> +	struct address_space *mapping = iocb->ki_filp->f_mapping;
+> +	loff_t pos = iocb->ki_pos - buffered_written;
+> +	loff_t end = iocb->ki_pos - 1;
+> +	int err;
+> +
+> +	/*
+> +	 * If the buffered write fallback returned an error, we want to return
+> +	 * the number of bytes which were written by direct I/O, or the error
+> +	 * code if that was zero.
+> +	 *
+> +	 * Note that this differs from normal direct-io semantics, which will
+> +	 * return -EFOO even if some bytes were written.
+> +	 */
+> +	if (unlikely(buffered_written < 0)) {
+> +		if (direct_written)
+> +			return direct_written;
+> +		return buffered_written;
+> +	}
+> +
+> +	/*
+> +	 * We need to ensure that the page cache pages are written to disk and
+> +	 * invalidated to preserve the expected O_DIRECT semantics.
+> +	 */
+> +	err = filemap_write_and_wait_range(mapping, pos, end);
+> +	if (err < 0) {
+> +		/*
+> +		 * We don't know how much we wrote, so just return the number of
+> +		 * bytes which were direct-written
+> +		 */
+> +		if (direct_written)
+> +			return direct_written;
+> +		return err;
+> +	}
+> +	invalidate_mapping_pages(mapping, pos >> PAGE_SHIFT, end >> PAGE_SHIFT);
+> +	return direct_written + buffered_written;
+> +}
+> +EXPORT_SYMBOL_GPL(direct_write_fallback);
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 91021b4e1f6f48..6af25137543824 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -2738,6 +2738,8 @@ extern ssize_t __generic_file_write_iter(struct kiocb *, struct iov_iter *);
+>  extern ssize_t generic_file_write_iter(struct kiocb *, struct iov_iter *);
+>  extern ssize_t generic_file_direct_write(struct kiocb *, struct iov_iter *);
+>  ssize_t generic_perform_write(struct kiocb *, struct iov_iter *);
+> +ssize_t direct_write_fallback(struct kiocb *iocb, struct iov_iter *iter,
+> +		ssize_t direct_written, ssize_t buffered_written);
+>  
+>  ssize_t vfs_iter_read(struct file *file, struct iov_iter *iter, loff_t *ppos,
+>  		rwf_t flags);
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index ddb6f8aa86d6ca..137508da5525b6 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -4006,23 +4006,19 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  {
+>  	struct file *file = iocb->ki_filp;
+>  	struct address_space *mapping = file->f_mapping;
+> -	struct inode 	*inode = mapping->host;
+> -	ssize_t		written = 0;
+> -	ssize_t		err;
+> -	ssize_t		status;
+> +	struct inode *inode = mapping->host;
+> +	ssize_t ret;
+>  
+> -	err = file_remove_privs(file);
+> -	if (err)
+> -		goto out;
+> +	ret = file_remove_privs(file);
+> +	if (ret)
+> +		return ret;
+>  
+> -	err = file_update_time(file);
+> -	if (err)
+> -		goto out;
+> +	ret = file_update_time(file);
+> +	if (ret)
+> +		return ret;
+>  
+>  	if (iocb->ki_flags & IOCB_DIRECT) {
+> -		loff_t pos, endbyte;
+> -
+> -		written = generic_file_direct_write(iocb, from);
+> +		ret = generic_file_direct_write(iocb, from);
+>  		/*
+>  		 * If the write stopped short of completing, fall back to
+>  		 * buffered writes.  Some filesystems do this for writes to
+> @@ -4030,45 +4026,13 @@ ssize_t __generic_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>  		 * not succeed (even if it did, DAX does not handle dirty
+>  		 * page-cache pages correctly).
+>  		 */
+> -		if (written < 0 || !iov_iter_count(from) || IS_DAX(inode))
+> -			goto out;
+> -
+> -		pos = iocb->ki_pos;
+> -		status = generic_perform_write(iocb, from);
+> -		/*
+> -		 * If generic_perform_write() returned a synchronous error
+> -		 * then we want to return the number of bytes which were
+> -		 * direct-written, or the error code if that was zero.  Note
+> -		 * that this differs from normal direct-io semantics, which
+> -		 * will return -EFOO even if some bytes were written.
+> -		 */
+> -		if (unlikely(status < 0)) {
+> -			err = status;
+> -			goto out;
+> -		}
+> -		/*
+> -		 * We need to ensure that the page cache pages are written to
+> -		 * disk and invalidated to preserve the expected O_DIRECT
+> -		 * semantics.
+> -		 */
+> -		endbyte = pos + status - 1;
+> -		err = filemap_write_and_wait_range(mapping, pos, endbyte);
+> -		if (err == 0) {
+> -			written += status;
+> -			invalidate_mapping_pages(mapping,
+> -						 pos >> PAGE_SHIFT,
+> -						 endbyte >> PAGE_SHIFT);
+> -		} else {
+> -			/*
+> -			 * We don't know how much we wrote, so just return
+> -			 * the number of bytes which were direct-written
+> -			 */
+> -		}
+> -	} else {
+> -		written = generic_perform_write(iocb, from);
+> +		if (ret < 0 || !iov_iter_count(from) || IS_DAX(inode))
+> +			return ret;
+> +		return direct_write_fallback(iocb, from, ret,
+> +				generic_perform_write(iocb, from));
+>  	}
+> -out:
+> -	return written ? written : err;
+> +
+> +	return generic_perform_write(iocb, from);
+>  }
+>  EXPORT_SYMBOL(__generic_file_write_iter);
+>  
+> -- 
+> 2.39.2
+> 
