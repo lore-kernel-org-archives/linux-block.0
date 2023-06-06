@@ -2,224 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA652C77B73
-	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 14:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CD8C77B7A
+	for <linux-block@archiver.kernel.org>; Tue,  6 Jun 2023 14:47:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237517AbjFFOTU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 10:19:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54564 "EHLO
+        id S238437AbjFFOrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 10:47:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231605AbjFFOTT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 10:19:19 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2C218B
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 07:19:15 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230606141912epoutp0242b7ead49d20b5922fa845a39f8cc516~mF69wWfX03213432134epoutp02x
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 14:19:12 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230606141912epoutp0242b7ead49d20b5922fa845a39f8cc516~mF69wWfX03213432134epoutp02x
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1686061152;
-        bh=UOxM1GwH4N78/5VcZmRi0SOFUE4InTqlB4yboWdBops=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=PZw1PRsP3Vrqe4rBgl2Q+llmA+X/Y64Mgt62j0rqVIiINQHQz37xv9cTHbe78woTb
-         5BxEesBBycF+gggWT9A5ORabSDHqm0HgkJVRO6OoIW9+f+7OZdJFEDgW6HO58kUDBK
-         ZFYVIHdSenb57diO3bEYFPfETDlbB5mJcxWAs+jM=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20230606141911epcas5p3feaf4868278ede2a218037055402778a~mF68ppvKo0226602266epcas5p3G;
-        Tue,  6 Jun 2023 14:19:11 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4QbCJt3gbnz4x9Pp; Tue,  6 Jun
-        2023 14:19:10 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        ED.0D.04567.E504F746; Tue,  6 Jun 2023 23:19:10 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230606113849epcas5p20436fd9c3a47354fc4f5264540cd9887~mDu7kpk5C1243112431epcas5p2V;
-        Tue,  6 Jun 2023 11:38:49 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20230606113849epsmtrp1037164b0d5a6cfbe44a01819ba98ed2b~mDu7i-Kls0420604206epsmtrp1I;
-        Tue,  6 Jun 2023 11:38:49 +0000 (GMT)
-X-AuditID: b6c32a49-943ff700000011d7-f9-647f405ec85f
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        B7.47.28392.9CA1F746; Tue,  6 Jun 2023 20:38:49 +0900 (KST)
-Received: from green245 (unknown [107.99.41.245]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20230606113842epsmtip230b93d2fae8d0d35d5b4cfcfbf869ead~mDu1DVgJ-2435324353epsmtip29;
-        Tue,  6 Jun 2023 11:38:42 +0000 (GMT)
-Date:   Tue, 6 Jun 2023 17:05:35 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
-        willy@infradead.org, hare@suse.de, djwong@kernel.org,
-        bvanassche@acm.org, ming.lei@redhat.com, dlemoal@kernel.org,
-        nitheshshetty@gmail.com, gost.dev@samsung.com,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v12 5/9] nvme: add copy offload support
-Message-ID: <20230606113535.rjbhe6eqlyqk4pqq@green245>
+        with ESMTP id S237799AbjFFOrU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 10:47:20 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B0F268E;
+        Tue,  6 Jun 2023 07:46:17 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id 3f1490d57ef6-ba829e17aacso7723462276.0;
+        Tue, 06 Jun 2023 07:46:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686062773; x=1688654773;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uxHl+ipU+ZDLZfzTOn/c27PgH2beIB/6BgFtv/UvuGs=;
+        b=Dh1PzSTUKHit9jeQYeJ2K2O09l0hxiYqBOueqmDoSZt/bG08R357RJyV6olMuQj7KM
+         ExSoMYeX6pozMxl8Xc0B2/As9/Pci9XZvfsrwJBjU5gvpC+aQJ8y7ZsfAOokw9va80Jq
+         fc3F6E6WaRStkX2UvOGUvjoDIOTX+Y431Vr9pt2A6qMzoulT8flLAk8gHfS5I3hm+D7F
+         CBWBCLE4lBUwgMPhxbqhlEZzf9zxlqbTok6unq60A8/f1/vgO+bkATJDz5Qe3GSht3bc
+         9cls+ydoZz6LYCNd4P+r/kb2Zfdqt8hkLmo6c7hmKJzUH2p3OgMqMGVm6PI5bqWhqnLp
+         AQ0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686062773; x=1688654773;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uxHl+ipU+ZDLZfzTOn/c27PgH2beIB/6BgFtv/UvuGs=;
+        b=aJCyvoUMnjD2lEH5U8uoRpUYCb98IfxByI8PHWQ+3ZtgizgsHyP6vRqxkA+zPR4yIb
+         UnKODxeuzTAIsPwI6N/QPbEq5P3bQHku0cwh3uRvVN2U0Gw96LK+dT9J32f35/+UEhOj
+         V6vtRjKhBfvlGGlE0XDG1Zi1jh1AcUhauUoPVO6xsuA7AdZSdRzsJaPzXEBv7PQfUJLM
+         EpSSiVTR3ZH9v3Pb8MxhwNQWoRfND2FcVgeHxr9tdmdOvxcmcV/jhHnWErpnb4Z541w6
+         j63pYgE9F9ZtIERZWsH/TIa2fmqC8eRxU5GJgiFBG5J1/Z2+YY7WJ5fZw9m8MIx1uuB/
+         yKnA==
+X-Gm-Message-State: AC+VfDwlkFE9fmEBxSkhSK+Mrl/Dtj+iE5CMNvV59EMNcwwKuoF1fXta
+        AFlp8HcSi29ZSO798QlbA5SoxqpPEJe+6QIDbI4=
+X-Google-Smtp-Source: ACHHUZ6r28OgpTb4skzaYajMiLnd9SU4e6H84abqyT5Y6x8WBSY+gkL9EdR/1lqQ6bZQtV5X2hnvyNQC46h4RtKHE6k=
+X-Received: by 2002:a81:6a87:0:b0:568:fe3a:46b3 with SMTP id
+ f129-20020a816a87000000b00568fe3a46b3mr2547087ywc.28.1686062772654; Tue, 06
+ Jun 2023 07:46:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ZH3mjUb+yqI11XD8@infradead.org>
-User-Agent: NeoMutt/20171215
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te1STZRzHz/O+493QZq9c6nGUcN44JtiAGeADSKChvQEVzTpd/gB2tvcw
-        AradjYlmHW4KAnJRWycWxEUuAiUIZBNEcURDkYAQCPJCBmgQ90MoKLS50fG/z/P9/b7P7/n9
-        fufh4DZX2TxOtCyeUcpEsRSxgXWhzWU7PzwwUeJRnmmHaq//gqOUvCc4qrmdS6DJtnmAvp59
-        hKPR1nSA+kY3oZErAahl+lsrNNR6EUOXSk9hqDOvFENVNe0Yai6Zw9BftxbYqH1tikCn9AMA
-        jfVrMdQyvAOVpJWx0KWWayzU11RAoKKKMTbKGtQRqNKwiiH96VQM6UaTATo3OcNCHcMOqPuJ
-        wQqtPCwgAh3pvpshtPZuF0Ff1N5m0913zrPohrOudF+Xmq6vziDohrJEunkoiaDP5Jy2orNT
-        pwl6bmyYRc9c7ifonMZqQDd0HqEX6reGbf40ZreUEUkYpRMjE8sl0bIofyrkQMSbEV7eHgK+
-        wAftopxkojjGnwoKDePvj441DotyOiiKVRulMJFKRbm/sVspV8czTlK5Kt6fYhSSWIWnwk0l
-        ilOpZVFuMibeV+DhsdPLmBgZIzUMlrIVDQ6HBpYfWiWBKy9kAmsOJD1hT2EFy8Q2ZDOAustv
-        ZYINRp4HMD9LA8yHBQCLu/uxdcdEVwZhDjQB2N8+ZMkaB3B5rR2YslikM2w7M2d0cDgEuQN2
-        rnFMsh3pAocr03ET42Q1G7auUia2Jf3gyODkU51LesM/0qosvBleyx9lma6xJvlwOPsjk2xP
-        vgS/KV/ETWUh+a81LO4xtwDJIFjSfhI3sy2cMDSyzcyDf+emWTgBVn11ljCbjwKoHdQCcyAA
-        Hruea3mcFJb0j1v0l6Hm+jnMrG+C2Sujlklwoe67dX4Ffl9bTJh5CxxYSrYwDc/3PLZM6x6A
-        bSl6LA84ap9pTvtMPTP7wozZFCutsWmcdICVqxwzusDaJvdiYFUNtjAKVVwUo/JSCGRMwv8L
-        F8vj6sHTv+T6tg7cHpl10wOMA/QAcnDKjvtZQKLEhisRHf6cUcojlOpYRqUHXsZdncR59mK5
-        8TPK4iMEnj4ent7e3p4+r3sLqBe5r/pfE9uQUaJ4JoZhFIxy3YdxrHlJGHK4eKFWfMc2fJnn
-        5yzgCJMNB/bZP256b3DJdwCbC+w3iBxDHgiXeoM9uxf9Auq8KiUYN0WhGj9xaT6O3Lq2Udgb
-        Tsn5edJmeye+5uO6LKFPTfmhB7d0E9s60MC+XceL7FM06SNTWWq334lk/s8rFUKe+7bUHu6j
-        9B9GkjUn6HcTZB/8s1odmX/0tRs81nxP4dXf9nwZoqZCe9N6/YV2+p2FU6HHfrxboJvR7V3I
-        HZ2ua5wUf7gH3P9kY2pZuziHf397/g2NRurc4WbI/fMWCH4nKPL9sKidrUXJVZ0d+MzzB8ti
-        vgheFFXcvGc35PTcfuGuw4yj8CdSefwI8WtE3VoYxVJJRQJXXKkS/Qe0f8wY1AQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpileLIzCtJLcpLzFFi42LZdlhJXvekVH2KwYpt8hbrTx1jtmia8JfZ
-        YvXdfjaL14c/MVpM+/CT2eLJgXZGi8tP+Cwe7Le32PtuNqvFzQM7mSz2LJrEZHF6wiImi5Wr
-        jzJZ7F74kcni8Z3P7BZH/79ls5h06BqjxdOrs5gs9t7StljYtoTFYs/ekywWl3fNYbOYv+wp
-        u0X39R1sFsuP/2OyODS5mclix5NGRot1r9+zWJy4JW1x/u9xVovfP+awOch7XL7i7THr/lk2
-        j52z7rJ7nL+3kcVj8wotj8tnSz02repk89i8pN5j980GNo/FfZNZPXqb37F5fHx6i8Xj/b6r
-        bB59W1Yxemw+Xe3xeZNcgGAUl01Kak5mWWqRvl0CV8afTztYC55KVBx5vZi5gbFbpIuRk0NC
-        wETi1dlONhBbSGAHo8SvmxYQcUmJZX+PMEPYwhIr/z1n72LkAqp5wihx9vpeFpAEi4CKxOHF
-        H5m6GDk42AS0JU7/5wAJiwhoStxa3s4MUs8ssI5d4uvWa2CDhAWsJR5cfw1m8wqYSdxuW8kM
-        MfQRo8T/I8ugEoISJ2c+AVvADFQ0b/NDZpAFzALSEsv/cYCYnAK6Erd6w0EqRAVkJGYs/co8
-        gVFwFpLmWUiaZyE0L2BkXsUomVpQnJueW2xYYJSXWq5XnJhbXJqXrpecn7uJEZxMtLR2MO5Z
-        9UHvECMTB+MhRgkOZiUR3l1e1SlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnN
-        Tk0tSC2CyTJxcEo1MLU+OaWufuTyRoVPCv08vlE7nq07MuF4bcMm/o60vvMlbcm7Pl/1mLd9
-        ztH9l+72c6ee+DXFKzvLa+ZxCT/JZIblbzofX2vVkWUO0L/6SClK5h6Xs/ilnIlPQ9XXn3vq
-        az1NPSqi7N2O30XznC8Hlk7YfTvg9nRR5xtOV+4Giql2/vgsmRWz+OOxyODJgvZWjS8c5py8
-        fTj96Y+iY/HVKw/4199n3rhRdOf3isRqnWVybZllKaqa1/bfevKp3m99aAznpTviSy66L308
-        TyX0j4DyhcYmmVbBc4zz9NRN+5Z379TodNuh9HDxt9N7zy5+5bJ37v2m09OYj1kk+FwXNmN1
-        bHg75X/8fTv5DyZ9PSFKLMUZiYZazEXFiQAmhJ86lQMAAA==
-X-CMS-MailID: 20230606113849epcas5p20436fd9c3a47354fc4f5264540cd9887
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20230605122310epcas5p4aaebfc26fe5377613a36fe50423cf494
-References: <20230605121732.28468-1-nj.shetty@samsung.com>
-        <CGME20230605122310epcas5p4aaebfc26fe5377613a36fe50423cf494@epcas5p4.samsung.com>
-        <20230605121732.28468-6-nj.shetty@samsung.com>
-        <ZH3mjUb+yqI11XD8@infradead.org>
+References: <20230503090708.2524310-1-nmi@metaspace.dk> <da7b815d-3da8-38e5-9b25-b9cfb6878293@acm.org>
+ <87jzxot0jk.fsf@metaspace.dk> <b9a1c1b2-3baa-2cad-31ae-8b14e4ee5709@acm.org>
+ <ZFP+8apHunCCMmOZ@kbusch-mbp.dhcp.thefacebook.com> <e7bc2155-613b-8904-9942-2e9615b0dc63@kernel.dk>
+ <87ttvkaevf.fsf@metaspace.dk>
+In-Reply-To: <87ttvkaevf.fsf@metaspace.dk>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Tue, 6 Jun 2023 16:46:01 +0200
+Message-ID: <CANiq72kMgh8qKzmLUokvRt=LbZY+vNVU481=-b-kKamupaxajw@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/11] Rust null block driver
+To:     "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
+Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>, rust-for-linux@vger.kernel.org,
+        linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Wedson Almeida Filho <wedsonaf@gmail.com>,
+        Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+        =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+        Benno Lossin <benno.lossin@proton.me>,
+        open list <linux-kernel@vger.kernel.org>, gost.dev@samsung.com,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Guillaume Tucker <guillaume.tucker@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
-
-On 23/06/05 06:43AM, Christoph Hellwig wrote:
->>  		break;
->>  	case REQ_OP_READ:
->> -		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
->> +		if (unlikely(req->cmd_flags & REQ_COPY))
->> +			nvme_setup_copy_read(ns, req);
->> +		else
->> +			ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_read);
->>  		break;
->>  	case REQ_OP_WRITE:
->> -		ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
->> +		if (unlikely(req->cmd_flags & REQ_COPY))
->> +			ret = nvme_setup_copy_write(ns, req, cmd);
->> +		else
->> +			ret = nvme_setup_rw(ns, req, cmd, nvme_cmd_write);
+On Tue, Jun 6, 2023 at 3:40=E2=80=AFPM Andreas Hindborg (Samsung)
+<nmi@metaspace.dk> wrote:
 >
->Yikes.  Overloading REQ_OP_READ and REQ_OP_WRITE with something entirely
->different brings us back the horrors of the block layer 15 years ago.
->Don't do that.  Please add separate REQ_COPY_IN/OUT (or maybe
->SEND/RECEIVE or whatever) methods.
->
+>    Samsung will provide resources to support this CI effort. Through this=
+ effort
+>    I will aim to minimize any inconvenience for maintainers.
 
-Downside will be duplicating checks which are present for read, write in
-block layer, device-mapper and zoned devices.
-But we can do this, shouldn't be an issue.
+This is great.
 
->> +	/* setting copy limits */
->> +	if (blk_queue_flag_test_and_set(QUEUE_FLAG_COPY, q))
->
->I don't understand this comment.
->
+>    We also have Rust support in Intel 0-day CI, although only compile tes=
+ts for
+>    now.
 
-It was a mistake. Comment is misplaced and it should have been
-"setting copy flag" instead of "setting copy limits".
-Anyway now we feel this comment is redundant, will remove it.
-Also, we should have used blk_queue_flag_set to enable copy offload.
+In addition, we also have initial Rust support in KernelCI (including
+`linux-next` [1], `rust-next` and the old `rust` branch), which could
+be expanded upon, especially with more resources (Cc'ing Guillaume).
 
->> +struct nvme_copy_token {
->> +	char *subsys;
->> +	struct nvme_ns *ns;
->> +	sector_t src_sector;
->> +	sector_t sectors;
->> +};
->
->Why do we need a subsys token?  Inter-namespace copy is pretty crazy,
->and not really anything we should aim for.  But this whole token design
->is pretty odd anyway.  The only thing we'd need is a sequence number /
->idr / etc to find an input and output side match up, as long as we
->stick to the proper namespace scope.
->
+Moreover, our plan is to replicate the simple CI we originally had for
+the `rust` branch (which included QEMU boot tests under a matrix of
+several archs/configs/compilers) to our `rust-next`, `rust-fixes` and
+`rust-dev` branches, in order to complement the other CIs and to get
+some early smoke testing (especially for `rust-dev`).
 
-The idea behind subsys is to prevent copy across different subsystem.
-For example, copy across nvme subsystem and the scsi subsystem. [1]
-At present, we don't support inter-namespace(copy across NVMe namespace),
-but after community feedback for previous series we left scope for it.
-About idr per namespace, it will be similar to namespace check that
-we are doing to prevent copy across namespace.
-We went with current structure for token, as it was solving above
-issues as well as provides a placeholder for storing source LBA and
-number of sectors.
-Do have any suggestions on how we can store source info, if we go with
-idr based approach ?
+[1] https://github.com/kernelci/kernelci-core/blob/65b0900438e0ed20e7efe0ad=
+a681ab212dc8c774/config/core/build-configs.yaml#L1152-L1197
 
-[1] https://lore.kernel.org/all/alpine.LRH.2.02.2202011327350.22481@file01.intranet.prod.int.rdu2.redhat.com/T/#m407f24fb4454d35c3283a5e51fdb04f1600463af
-
->> +	if (unlikely((req->cmd_flags & REQ_COPY) &&
->> +				(req_op(req) == REQ_OP_READ))) {
->> +		blk_mq_start_request(req);
->> +		return BLK_STS_OK;
->> +	}
->
->This really needs to be hiden inside of nvme_setup_cmd.  And given
->that other drivers might need similar handling the best way is probably
->to have a new magic BLK_STS_* value for request started but we're
->not actually sending it to hardware.
-
-Sure we will add new BLK_STS_* for completion and move the snippet.
-
-Thank you,
-Nitesh Shetty
-
-------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_
-Content-Type: text/plain; charset="utf-8"
-
-
-------JBF_njb0NWiSS48ThI00c_Y9Zxz.JAos93qymBy6wSZnW6dc=_4db83_--
+Cheers,
+Miguel
