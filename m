@@ -2,298 +2,182 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A4FC7EE25
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 14:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7682FC7EE29
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 14:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234809AbjFGOU7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 10:20:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51424 "EHLO
+        id S241110AbjFGOmv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 10:42:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240324AbjFGOU6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 10:20:58 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08D41BCA
-        for <linux-block@vger.kernel.org>; Wed,  7 Jun 2023 07:20:56 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9788554a8c9so108582666b.2
-        for <linux-block@vger.kernel.org>; Wed, 07 Jun 2023 07:20:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686147655; x=1688739655;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HjnuyJE5MPCESC15VfWBkFspvFs6sDC35cz2+03PVNk=;
-        b=rrHj2rz6T2jIgziFoHaiCJuN451HlDOO89oOgtV0hOmxMsy+bzBPgZVKSDzU1p7/6S
-         ILrJnt56RG7uqmSYWIvsWfkCXGMQY0MVAdYqohsZkecFcTVOEkE68nAtE5nAQJ3Mqd9G
-         sbdMNy49pjuzJD7rNE/IaK+LTHsXXgCEZNEhc5U3eESs/mGdWSpREZRrnSyRN3dzb28N
-         xu7s9ybE1tDNXSIqDEAKnkf1sE+a6suX8f9Q2XTCCIUxRQFW+1q54/66WuIj3BPD6NKA
-         QWNggpf9kvFYg9Ds/UufP/aWPzt5ktH1BZOailS7sr4buSLCwOUh3OEWsi3CNv2lV2S4
-         0B/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686147655; x=1688739655;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HjnuyJE5MPCESC15VfWBkFspvFs6sDC35cz2+03PVNk=;
-        b=gGT7K56ZW/SGly1qEY1xRrYndYNGePYi7XxCky2uBIrtH4rLPSr6Aej9EFI7P9DwS2
-         ot2bSbP4lyFBy5XOm3e205nROPrV0fNzEanZep8JF/WwIYFkDXV1O2G7cbepnZ0v/sLv
-         ms4j/azG5mZhGP+v+6fsV0enipTvAvRPCAubCNU0nLzZZJqJttIdtdWpVsDtGPQUttnT
-         ccylvyxagWH7FCm1mEadd1tOVF9VfDug6rBkU0ahWntxLu6AXYf/LN2bM6gzLgFbiDZC
-         4Klt1nZIsABVdQfR5mT5wV+06qrmZssjQMKd9uZM17Ds/0mnoAoDiZzD3HcwGacEIdpz
-         7+wQ==
-X-Gm-Message-State: AC+VfDwgA4/IjVNPb+dw2sRVKd0E6+JRfs2tBV8x+MCZQNCqW8umkVJK
-        yNXgOi/mMJpRYMcMR2MeqBCaFW7cSC0L2pSAnlQ=
-X-Google-Smtp-Source: ACHHUZ7EnBNjNqKKKXQB75Z3EtNvO1CN90RT/W9gem8aG5Qfqvf4PPaNN11JzfzaQ8AEyd4sK+E/zJAAFyRx8zs2pWU=
-X-Received: by 2002:a17:907:6ea3:b0:966:2123:e0ca with SMTP id
- sh35-20020a1709076ea300b009662123e0camr7219002ejc.34.1686147654888; Wed, 07
- Jun 2023 07:20:54 -0700 (PDT)
+        with ESMTP id S241116AbjFGOmu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 10:42:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03911BD2
+        for <linux-block@vger.kernel.org>; Wed,  7 Jun 2023 07:42:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686148923;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VfP0KSvbwDpdDK3r99Lo/bGf0PzU9/ETfdNk/1wpqNM=;
+        b=M/t9JxpGG1lbOnwlNGraRSDI9k3eoqUMm34VSpojC1SuXDkyN1Q6V7yXoxUuV2scLYcIb5
+        KVaangsk4sJou22PCdyWtVM+WeIKAxTmW9KtQvq7DDjttR44yCnUcfjAgi49Jzc9eFwvxu
+        3AN1CdREjEuFg0MA6MSIAvMdFvKTfXA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-81-yTkbrzWfOVqVewkXPojfRg-1; Wed, 07 Jun 2023 10:06:48 -0400
+X-MC-Unique: yTkbrzWfOVqVewkXPojfRg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C33823806705;
+        Wed,  7 Jun 2023 14:06:47 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F23512026D6A;
+        Wed,  7 Jun 2023 14:06:43 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH net-next v5 10/14] splice, net: Fix SPLICE_F_MORE signalling in splice_direct_to_actor()
+Date:   Wed,  7 Jun 2023 15:05:55 +0100
+Message-ID: <20230607140559.2263470-11-dhowells@redhat.com>
+In-Reply-To: <20230607140559.2263470-1-dhowells@redhat.com>
+References: <20230607140559.2263470-1-dhowells@redhat.com>
 MIME-Version: 1.0
-References: <BN9PR11MB53545DD1516BFA0FB23F95458353A@BN9PR11MB5354.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB53545DD1516BFA0FB23F95458353A@BN9PR11MB5354.namprd11.prod.outlook.com>
-From:   Suwan Kim <suwan.kim027@gmail.com>
-Date:   Wed, 7 Jun 2023 23:20:43 +0900
-Message-ID: <CAFNWusa7goyDs1HaMVYDvvXT7ePfB7cAQt3EewT+t=-kKNf5eg@mail.gmail.com>
-Subject: Re: virtio-blk: support completion batching for the IRQ path - failure
-To:     "Roberts, Martin" <martin.roberts@intel.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 7, 2023 at 6:14=E2=80=AFPM Roberts, Martin <martin.roberts@inte=
-l.com> wrote:
->
-> Re: virtio-blk: support completion batching for the IRQ path =C2=B7 torva=
-lds/linux@07b679f =C2=B7 GitHub
->
-> Signed-off-by: Suwan Kim suwan.kim027@gmail.com
->
-> Signed-off-by: Michael S. Tsirkin mst@redhat.com
->
->
->
->
->
-> This change appears to have broken things=E2=80=A6
->
-> We now see applications hanging during disk accesses.
->
-> e.g.
->
-> multi-port virtio-blk device running in h/w (FPGA)
->
-> Host running a simple =E2=80=98fio=E2=80=98 test.
->
-> [global]
->
-> thread=3D1
->
-> direct=3D1
->
-> ioengine=3Dlibaio
->
-> norandommap=3D1
->
-> group_reporting=3D1
->
-> bs=3D4K
->
-> rw=3Dread
->
-> iodepth=3D128
->
-> runtime=3D1
->
-> numjobs=3D4
->
-> time_based
->
-> [job0]
->
-> filename=3D/dev/vda
->
-> [job1]
->
-> filename=3D/dev/vdb
->
-> [job2]
->
-> filename=3D/dev/vdc
->
-> ...
->
-> [job15]
->
-> filename=3D/dev/vdp
->
->
->
-> i.e. 16 disks; 4 queues per disk; simple burst of 4KB reads
->
-> This is repeatedly run in a loop.
->
->
->
-> After a few, normally <10 seconds, fio hangs.
->
-> With 64 queues (16 disks), failure occurs within a few seconds; with 8 qu=
-eues (2 disks) it may take ~hour before hanging.
->
-> Last message:
->
-> fio-3.19
->
-> Starting 8 threads
->
-> Jobs: 1 (f=3D1): [_(7),R(1)][68.3%][eta 03h:11m:06s]
->
-> I think this means at the end of the run 1 queue was left incomplete.
->
->
->
-> =E2=80=98diskstats=E2=80=99 (run while fio is hung) shows no outstanding =
-transactions.
->
-> e.g.
->
-> $ cat /proc/diskstats
->
-> ...
->
-> 252       0 vda 1843140071 0 14745120568 712568645 0 0 0 0 0 3117947 7125=
-68645 0 0 0 0 0 0
->
-> 252      16 vdb 1816291511 0 14530332088 704905623 0 0 0 0 0 3117711 7049=
-05623 0 0 0 0 0 0
->
-> ...
->
->
->
-> Other stats (in the h/w, and added to the virtio-blk driver ([a]virtio_qu=
-eue_rq(), [b]virtblk_handle_req(), [c]virtblk_request_done()) all agree, an=
-d show every request had a completion, and that virtblk_request_done() neve=
-r gets called.
->
-> e.g.
->
-> PF=3D 0                         vq=3D0           1           2           =
-3
->
-> [a]request_count     -   839416590   813148916   105586179    84988123
->
-> [b]completion1_count -   839416590   813148916   105586179    84988123
->
-> [c]completion2_count -           0           0           0           0
->
->
->
-> PF=3D 1                         vq=3D0           1           2           =
-3
->
-> [a]request_count     -   823335887   812516140   104582672    75856549
->
-> [b]completion1_count -   823335887   812516140   104582672    75856549
->
-> [c]completion2_count -           0           0           0           0
->
->
->
-> i.e. the issue is after the virtio-blk driver.
->
->
->
->
->
-> This change was introduced in kernel 6.3.0.
->
-> I am seeing this using 6.3.3.
->
-> If I run with an earlier kernel (5.15), it does not occur.
->
-> If I make a simple patch to the 6.3.3 virtio-blk driver, to skip the blk_=
-mq_add_to_batch()call, it does not fail.
->
-> e.g.
->
-> kernel 5.15 =E2=80=93 this is OK
->
-> virtio_blk.c,virtblk_done() [irq handler]
->
->                  if (likely(!blk_should_fake_timeout(req->q))) {
->
->                           blk_mq_complete_request(req);
->
->                  }
->
->
->
-> kernel 6.3.3 =E2=80=93 this fails
->
-> virtio_blk.c,virtblk_handle_req() [irq handler]
->
->                  if (likely(!blk_should_fake_timeout(req->q))) {
->
->                           if (!blk_mq_complete_request_remote(req)) {
->
->                                   if (!blk_mq_add_to_batch(req, iob, virt=
-blk_vbr_status(vbr), virtblk_complete_batch)) {
->
->                                            virtblk_request_done(req);    =
-//this never gets called... so blk_mq_add_to_batch() must always succeed
->
->                                    }
->
->                           }
->
->                  }
->
->
->
-> If I do, kernel 6.3.3 =E2=80=93 this is OK
->
-> virtio_blk.c,virtblk_handle_req() [irq handler]
->
->                  if (likely(!blk_should_fake_timeout(req->q))) {
->
->                           if (!blk_mq_complete_request_remote(req)) {
->
->                                    virtblk_request_done(req); //force thi=
-s here...
->
->                                   if (!blk_mq_add_to_batch(req, iob, virt=
-blk_vbr_status(vbr), virtblk_complete_batch)) {
->
->                                            virtblk_request_done(req);    =
-//this never gets called... so blk_mq_add_to_batch() must always succeed
->
->                                    }
->
->                           }
->
->                  }
->
->
->
->
->
-> Perhaps you might like to fix/test/revert this change=E2=80=A6
->
-> Martin
->
->
+splice_direct_to_actor() doesn't manage SPLICE_F_MORE correctly[1] - and,
+as a result, it incorrectly signals/fails to signal MSG_MORE when splicing
+to a socket.  The problem I'm seeing happens when a short splice occurs
+because we got a short read due to hitting the EOF on a file: as the length
+read (read_len) is less than the remaining size to be spliced (len),
+SPLICE_F_MORE (and thus MSG_MORE) is set.
 
-Hi Martin,
+The issue is that, for the moment, we have no way to know *why* the short
+read occurred and so can't make a good decision on whether we *should* keep
+MSG_MORE set.
 
-There are many changes between 6.3.0 and 6.3.3.
-Could you try to find a commit which triggers the io hang?
-Is it ok with 6.3.0 kernel or with reverting
-"virtio-blk: support completion batching for the IRQ path" commit?
+MSG_SENDPAGE_NOTLAST was added to work around this, but that is also set
+incorrectly under some circumstances - for example if a short read fills a
+single pipe_buffer, but the next read would return more (seqfile can do
+this).
 
-We need to confirm which commit is causing the error.
+This was observed with the multi_chunk_sendfile tests in the tls kselftest
+program.  Some of those tests would hang and time out when the last chunk
+of file was less than the sendfile request size:
 
-Regards,
-Suwan Kim
+	build/kselftest/net/tls -r tls.12_aes_gcm.multi_chunk_sendfile
+
+This has been observed before[2] and worked around in AF_TLS[3].
+
+Fix this by making splice_direct_to_actor() always signal SPLICE_F_MORE if
+we haven't yet hit the requested operation size.  SPLICE_F_MORE remains
+signalled if the user passed it in to splice() but otherwise gets cleared
+when we've read sufficient data to fulfill the request.
+
+If, however, we get a premature EOF from ->splice_read(), have sent at
+least one byte and SPLICE_F_MORE was not set by the caller, ->splice_eof()
+will be invoked.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jan Kara <jack@suse.cz>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: David Hildenbrand <david@redhat.com>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Chuck Lever <chuck.lever@oracle.com>
+cc: Boris Pismenny <borisp@nvidia.com>
+cc: John Fastabend <john.fastabend@gmail.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-block@vger.kernel.org
+cc: linux-mm@kvack.org
+cc: netdev@vger.kernel.org
+
+Link: https://lore.kernel.org/r/499791.1685485603@warthog.procyon.org.uk/ [1]
+Link: https://lore.kernel.org/r/1591392508-14592-1-git-send-email-pooja.trivedi@stackpath.com/ [2]
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d452d48b9f8b1a7f8152d33ef52cfd7fe1735b0a [3]
+---
+
+Notes:
+    ver #4)
+     - Use ->splice_eof() to signal a premature EOF to the splice output.
+
+ fs/splice.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/fs/splice.c b/fs/splice.c
+index 67dbd85db207..67ddaac1f5c5 100644
+--- a/fs/splice.c
++++ b/fs/splice.c
+@@ -1063,13 +1063,17 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 	 */
+ 	bytes = 0;
+ 	len = sd->total_len;
++
++	/* Don't block on output, we have to drain the direct pipe. */
+ 	flags = sd->flags;
++	sd->flags &= ~SPLICE_F_NONBLOCK;
+ 
+ 	/*
+-	 * Don't block on output, we have to drain the direct pipe.
++	 * We signal MORE until we've read sufficient data to fulfill the
++	 * request and we keep signalling it if the caller set it.
+ 	 */
+-	sd->flags &= ~SPLICE_F_NONBLOCK;
+ 	more = sd->flags & SPLICE_F_MORE;
++	sd->flags |= SPLICE_F_MORE;
+ 
+ 	WARN_ON_ONCE(!pipe_empty(pipe->head, pipe->tail));
+ 
+@@ -1085,14 +1089,12 @@ ssize_t splice_direct_to_actor(struct file *in, struct splice_desc *sd,
+ 		sd->total_len = read_len;
+ 
+ 		/*
+-		 * If more data is pending, set SPLICE_F_MORE
+-		 * If this is the last data and SPLICE_F_MORE was not set
+-		 * initially, clears it.
++		 * If we now have sufficient data to fulfill the request then
++		 * we clear SPLICE_F_MORE if it was not set initially.
+ 		 */
+-		if (read_len < len)
+-			sd->flags |= SPLICE_F_MORE;
+-		else if (!more)
++		if (read_len >= len && !more)
+ 			sd->flags &= ~SPLICE_F_MORE;
++
+ 		/*
+ 		 * NOTE: nonblocking mode only applies to the input. We
+ 		 * must not do the output in nonblocking mode as then we
+
