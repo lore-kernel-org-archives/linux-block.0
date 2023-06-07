@@ -2,112 +2,69 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16733C7EE23
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 18:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EFBC77B7A
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 19:10:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbjFGS0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 14:26:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41028 "EHLO
+        id S233025AbjFGTKY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 15:10:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231848AbjFGSYq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 14:24:46 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 864122134;
-        Wed,  7 Jun 2023 11:24:23 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D5CF221A1F;
-        Wed,  7 Jun 2023 18:23:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1686162199; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xr1XcDgRZw9XqtqsIfNxxAv7284ffceOajLjHlMMpp4=;
-        b=cAGzOg5ynQmo8kTz93ic/RMaAf8m7w0Ji+4mj9dd2vzAAE7l+ukLuqL9wUOdwz1RBJNhlb
-        /whl4Kf3jCvQRzCH9f59C54ARV65DDgITDmZ0K1FhkShCOHtfNq0h/ow0hHXdDlDYc/tby
-        WVq/m2k8NNAQqbuTlDBlcqxC3fPlsdw=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A8321346D;
-        Wed,  7 Jun 2023 18:23:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 0G8vGBfLgGRzBQAAMHmgww
-        (envelope-from <mwilck@suse.com>); Wed, 07 Jun 2023 18:23:19 +0000
-From:   mwilck@suse.com
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        with ESMTP id S232060AbjFGTKY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 15:10:24 -0400
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECEA19BB;
+        Wed,  7 Jun 2023 12:10:22 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-64d18d772bdso8536186b3a.3;
+        Wed, 07 Jun 2023 12:10:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686165022; x=1688757022;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E/ROL5X23EtRW2s4Tc2qz2B6DotRTf9dy5BcCfiIbvU=;
+        b=Z6emKV5sMX+Ncujj5Kz9JlORB4795EZHiSR0aRYUwa/TbvV8A7nxOXbKGrVAPxLpUP
+         yqbZ32ptooRqyZTS+DlQqSyAS1RqGHa2KV0QwKz2yMtnVfgDYKaZUupyfmQ937NIb/kV
+         4qiBAkDva8bdAYYTJpzTDu8vZbM+hreCBmdCD9RlqALEUmciE1CIOgUg7DksphazB2OX
+         UdFBD1NGA7fLl072DO9PNuLjrLFPQYDNvR0E9puYR+rgcVn2yXII3wNcEWNZTwoeFfBP
+         3hMNz95QBthWgsVBZTYdnOGgcbebBzE3LmPHQc49XlnZEY4SzN1vspxHrqlrjfrfSFQy
+         4q0A==
+X-Gm-Message-State: AC+VfDz7WpGhCL4eNw/Z041N5g1um1YpkFFGDBo+zujrfULGqdQd58JQ
+        3wZczUKqgoujArY/iUFRAto=
+X-Google-Smtp-Source: ACHHUZ5s6bXlj3C+bqupMuplRXRkw5rIJq4uiqcK2Z6KpTvD7jhCyPyY1gkYa2AQploVr2buS5ZutQ==
+X-Received: by 2002:a17:902:b20f:b0:1b0:26f0:8778 with SMTP id t15-20020a170902b20f00b001b026f08778mr5337711plr.19.1686165021641;
+        Wed, 07 Jun 2023 12:10:21 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id t6-20020a170902e84600b001aaf2172418sm1746216plg.95.2023.06.07.12.10.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Jun 2023 12:10:21 -0700 (PDT)
+Message-ID: <34a3e242-cc79-908f-4382-30fac244676a@acm.org>
+Date:   Wed, 7 Jun 2023 12:10:20 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3 3/8] scsi: merge scsi_internal_device_block() and
+ device_block()
+Content-Language: en-US
+To:     mwilck@suse.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
         Bart Van Assche <Bart.VanAssche@sandisk.com>
 Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
         linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v3 7/8] scsi: have scsi_target_block() expect a scsi_target parent argument
-Date:   Wed,  7 Jun 2023 20:22:48 +0200
-Message-Id: <20230607182249.22623-8-mwilck@suse.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230607182249.22623-1-mwilck@suse.com>
+        Hannes Reinecke <hare@suse.de>
 References: <20230607182249.22623-1-mwilck@suse.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ <20230607182249.22623-4-mwilck@suse.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230607182249.22623-4-mwilck@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Martin Wilck <mwilck@suse.com>
+On 6/7/23 11:22, mwilck@suse.com wrote:
+> scsi_internal_device_block() is only called from device_block().
+> Merge the two functions, and call the result scsi_device_block(),
+> as the name device_block() is confusingly generic.
 
-All callers (fc_remote_port_delete(), __iscsi_block_session(),
-__srp_start_tl_fail_timers(), srp_reconnect_rport(), snic_tgt_del()) pass
-parent devices of scsi_target devices to scsi_target_block().
-Simplify scsi_target_block() to assume that it is always passed a parent
-device.
-
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Martin Wilck <mwilck@suse.com>
----
- drivers/scsi/scsi_lib.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 25ec6eb8df7f..e572fc56a8dd 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2884,17 +2884,25 @@ target_block(struct device *dev, void *data)
- 	return 0;
- }
- 
-+/**
-+ * scsi_target_block - transition all SCSI child devices to SDEV_BLOCK state
-+ * @dev: a parent device of one or more scsi_target devices
-+ *
-+ * Iterate over all children of @dev, which should be scsi_target devices,
-+ * and switch all subordinate scsi devices to SDEV_BLOCK state. Wait for
-+ * ongoing scsi_queue_rq() calls to finish. May sleep.
-+ *
-+ * Returns zero if successful or a negative error code upon failure.
-+ *
-+ * Note:
-+ * @dev must not itself be a scsi_target device.
-+ */
- void
- scsi_target_block(struct device *dev)
- {
- 	struct Scsi_Host *shost = dev_to_shost(dev);
- 
--	if (scsi_is_target_device(dev))
--		starget_for_each_device(to_scsi_target(dev), NULL,
--					scsi_device_block);
--	else
--		device_for_each_child(dev, NULL, target_block);
--
-+	device_for_each_child(dev, NULL, target_block);
- 	blk_mq_wait_quiesce_done(&shost->tag_set);
- }
- EXPORT_SYMBOL_GPL(scsi_target_block);
--- 
-2.40.1
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
