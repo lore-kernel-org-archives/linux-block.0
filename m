@@ -2,160 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7041CC7EE25
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 16:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA33C7EE2F
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 16:56:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbjFGQmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 12:42:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60408 "EHLO
+        id S230298AbjFGQ4s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 12:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbjFGQmJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 12:42:09 -0400
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA911FC4;
-        Wed,  7 Jun 2023 09:42:08 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-        by mailout.nyi.internal (Postfix) with ESMTP id 194615C007C;
-        Wed,  7 Jun 2023 12:42:08 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Wed, 07 Jun 2023 12:42:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        invisiblethingslab.com; h=cc:cc:content-type:content-type:date
-        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to; s=fm1; t=
-        1686156128; x=1686242528; bh=42y1EYFXvq4hYeXlSpmVr7gmNpbInmaS7tg
-        G+Ss9F5U=; b=CHxsNu/TLuBvPTG0yHh4WOq5QJN1It8U4K4Mt15g1FIi6vpL6Ad
-        4SNv/41uiq14W8leF4UWTsz72Su5CRbXiIRYEnHIDHBx9oDZqT6ymIagHkd2CQwm
-        wNifs0xXvmsiFF3ncmrudJvXcMTwLJELPyOnernFr6t3hASMW0zPB0PfLDwC0BW0
-        uHq3ry34wEAUTA3EsUXoZvNluvYHvcmg1lIB0QJ7a3DfUUW9bYOQ3lM4uFz62ezH
-        Prl2L8QV+COLB0QySNuIbWY+j9m6wIwBBTmIGRXwua/wfc+B9Lhpp6LKDxOCNs1A
-        bvTFZlTojHJl6zVroypQ8HtiXc5lAVlS+rQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm1; t=1686156128; x=1686242528; bh=42y1EYFXvq4hY
-        eXlSpmVr7gmNpbInmaS7tgG+Ss9F5U=; b=CsL/olnib/EC7s2AniVOsID2RnvaO
-        gHEE1/PviC87GXlrK2jQrtRUoDiIUCd3PtoZMt1pM2/PfxbOkOjWQjNVZkVe/Lvr
-        KUlvOi1I9n0bCjNREsjfXNTcuAmGB3wZUYXeFyqAUFyLIH0XI/ZdN2tZRXyBDIDw
-        Q0OybDNsW02ypxRMnzz6nL11B8Pm6rec3hbwVmEFrw+0ZpslcCIJJN3Q1grAWypJ
-        LgceyJdxSEpqDgSvmOPuPPq4XxJZ5J0z5qm3GBh9GhG88SW3k3wKeKyHBl/WLKwK
-        9wEObMIJ7i8awdQgzUCQQmLUcfv6L9lHBdVfEyqqz1sK1byku2VFQmGKg==
-X-ME-Sender: <xms:X7OAZM1ueUtCZdO5gXwRqFsrTiESkIoCnY3pNx4WgbAYO0oyzbY1PA>
-    <xme:X7OAZHF3Mm8dFQfIxCWk2Q2sncJ1ilMSCg4BcG3qR59V5ItJEHxuGXhmWfURtWr79
-    0K3DL6PsGWuCx4>
-X-ME-Received: <xmr:X7OAZE65WME9hDYCcsiCzgK011Z8Vz86jMcNQVl3Ypi6IuTe6Ryys5wXUsw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgedtgedguddtgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpeffvghm
-    ihcuofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhishhisghlvghthhhinh
-    hgshhlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedvjeetgeekhfetudfhgfetffeg
-    fffguddvgffhffeifeeikeektdehgeetheffleenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhisghlvghthhhinhhg
-    shhlrggsrdgtohhm
-X-ME-Proxy: <xmx:X7OAZF1mDsYgwtD-fK8d8Ln8N-NhaJ-ZqD3je5aBQiOsM5VgdG175w>
-    <xmx:X7OAZPHnGIQFnU7zGkQzx5MOEv1iOX-kwemrqJUS1fOPh52IJyHP7A>
-    <xmx:X7OAZO_jD_APgbz570axrPJPE4wcAJWB3FlObPxftl1hiSmRcMkhFA>
-    <xmx:YLOAZFMANyMVDb7AixBzA8LP_hT_vpDIINqDbQ6YIw0Uxp04beErWA>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 7 Jun 2023 12:42:07 -0400 (EDT)
-Date:   Wed, 7 Jun 2023 12:42:00 -0400
-From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
- device
-Message-ID: <ZICzXbJeLj56NRYB@itl-email>
-References: <20230601222656.2062-1-demi@invisiblethingslab.com>
- <ZIA004HDuhoTQzY/@infradead.org>
- <ZICg2sxHQRRPW3Nc@itl-email>
+        with ESMTP id S230179AbjFGQ4r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 12:56:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08A413D;
+        Wed,  7 Jun 2023 09:56:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 38712641B1;
+        Wed,  7 Jun 2023 16:56:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9642C433EF;
+        Wed,  7 Jun 2023 16:56:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686157005;
+        bh=aPvBZetYhuElDrsk7XgaTFNO0pGltg6x0ZotRqSwJPw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Inki/nRUfVwANPsVcJ1lXwPjALjzfm1hJuhTUtyxbCdDVKiA6DT2hysaQq7YRArkY
+         TmcAYk6xx2FxD6ZvT/LxBhyATpqVWXVwoXsxT4L3Fk+VS7tXb7l+Ezz8YYFYq8q3oN
+         2VLd8kilvOMvEceRci0tIwOEfxF6ZWhZW6zJpebJLwpnoIu63ZhnwNcgUWuTFd3ibp
+         L0MsVZNJ93F5rs2zGgKC/I5saeGGpHAMmCqleqjKHOf2+M7fX4kNpTZjTklqey4w1L
+         GcKK0AbFASSEzR05VPsh1SBNgSFAMsHKsDl80TScNufOJ8BAovXa75T/RLI6PZf2dS
+         ame/Hiq/DI6ow==
+Date:   Wed, 7 Jun 2023 09:56:43 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     netdev@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH net-next v5 04/14] splice, net: Add a splice_eof op to
+ file-ops and socket-ops
+Message-ID: <20230607095643.38c18ef6@kernel.org>
+In-Reply-To: <20230607140559.2263470-5-dhowells@redhat.com>
+References: <20230607140559.2263470-1-dhowells@redhat.com>
+        <20230607140559.2263470-5-dhowells@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="Lhc+hn0jVRR2V+8y"
-Content-Disposition: inline
-In-Reply-To: <ZICg2sxHQRRPW3Nc@itl-email>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed,  7 Jun 2023 15:05:49 +0100 David Howells wrote:
+> Add an optional method, ->splice_eof(), to allow splice to indicate the
+> premature termination of a splice to struct file_operations and struct
+> proto_ops.
+> 
+> This is called if sendfile() or splice() encounters all of the following
+> conditions inside splice_direct_to_actor():
+> 
+>  (1) the user did not set SPLICE_F_MORE (splice only), and
+> 
+>  (2) an EOF condition occurred (->splice_read() returned 0), and
+> 
+>  (3) we haven't read enough to fulfill the request (ie. len > 0 still), and
+> 
+>  (4) we have already spliced at least one byte.
+> 
+> A further patch will modify the behaviour of SPLICE_F_MORE to always be
+> passed to the actor if either the user set it or we haven't yet read
+> sufficient data to fulfill the request.
 
---Lhc+hn0jVRR2V+8y
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 7 Jun 2023 12:42:00 -0400
-From: Demi Marie Obenour <demi@invisiblethingslab.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
- device
-
-On Wed, Jun 07, 2023 at 11:23:00AM -0400, Demi Marie Obenour wrote:
-> > > --- a/drivers/block/loop.c
-> > > +++ b/drivers/block/loop.c
-> > > @@ -1205,6 +1205,12 @@ static void __loop_clr_fd(struct loop_device *=
-lo, bool release)
-> > >  	if (!part_shift)
-> > >  		set_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
-> > >  	mutex_lock(&lo->lo_mutex);
-> > > +
-> > > +	/*
-> > > +	 * Increment the disk sequence number, so that userspace knows this
-> > > +	 * device now points to something else.
-> > > +	 */
-> > > +	inc_diskseq(lo->lo_disk);
-> >=20
-> > And I'm not sure why we even need this.  __loop_clr_fd
-> > already calls disk_force_media_change, which calls inc_diskseq.
-> > Why do we need an extra increment?
->=20
-> How does disk_force_media_change() call inc_diskseq()?  I don=E2=80=99t s=
-ee any
-> calls in the source code.  I=E2=80=99m going to use systemtap to see if t=
-here is
-> an indirect call chain.
-
-Were you thinking of bdev_check_media_change()?  That can call
-inc_diskseq() via this call chain:
-
-  bdev_check_media_change()
-    disk_clear_events()
-      disk_check_events()
-        inc_diskseq()
-
-disk_force_media_change() does not call inc_diskseq(), and I checked
-that calling losetup -D does not change the diskseq of a loop device.
-=46rom what you have writte, I=E2=80=99m pretty sure that=E2=80=99s a bug in
-disk_force_media_change(), though.  I=E2=80=99ll send a v3 that adds this c=
-all.
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
-
---Lhc+hn0jVRR2V+8y
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEdodNnxM2uiJZBxxxsoi1X/+cIsEFAmSAs10ACgkQsoi1X/+c
-IsGbBBAAoZxDjSSs9J+siCWh0MMyGUEwddaQhnOqS6hH//JuLOHDb71mJVF51gZR
-ayDHrJnYDhxsSpb02lxWKKPfo0plXSnTwb8gt2ZX+HUIXR+QteXUpfXzKi45ZwT7
-p70ZnygsFNmn24ePKu5RS491F3n/Kz51PPdacIE429QBLi5YRAAlTTan4pOJRvRt
-bgliY4CSe63mDrCJ4GMd7614e4mTPrsaJYbAAx5ri1xJBNy8pKjbyUMcSfR5VQnu
-ujJgAXImHu3mzEeJlHKusofkCA43rWdhLsrZvrjArGXEXOcK7Qk4zkVUGh/dG7Ta
-QxljW+MD+foQRsFmsrc+XMfIpPuWy/AigkYi7a+jINyzwfmNqfnWwuxW4Q3mQlhu
-eJ7inplmVJ7xsPJKbRL/DcqiHvE+KgGU5GHuZPCwu7e9G+pkcEJ1kTqzHZrRTAJW
-WXhLxBLajojgzKCrbTusEmLuodkVMZpqM1VPsSBeGjYwV+BvVlymK15DWtlxffC4
-XdsQHu88yG8rdDe4TO7GgSWfNXDGuIQOtmHTsvrvLR/XVduEByxaXdsYj5k5JO/V
-A7h0LAnLqTZo2+0tYqaFHHUjUHWua8edZYrdVvXTsNgkMfDol8/SGSSsbstvEbGz
-8WGMKF+Qp8uA8T9fUDq95d6QDXwdg1E5NLawy7Yg9CfYScpy1Mg=
-=AmeY
------END PGP SIGNATURE-----
-
---Lhc+hn0jVRR2V+8y--
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
