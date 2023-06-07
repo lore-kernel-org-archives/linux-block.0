@@ -2,76 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C4DC7EE23
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 07:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEADAC7EE23
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 07:48:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238168AbjFGHr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 03:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40332 "EHLO
+        id S239325AbjFGHsE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 03:48:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238737AbjFGHrF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 03:47:05 -0400
-Received: from h2.cmg2.smtp.forpsi.com (h2.cmg2.smtp.forpsi.com [81.2.195.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4904510D5
-        for <linux-block@vger.kernel.org>; Wed,  7 Jun 2023 00:45:37 -0700 (PDT)
-Received: from lenoch ([80.95.121.122])
-        by cmgsmtp with ESMTPSA
-        id 6nrKqOBdTv5uI6nrLqCwQ6; Wed, 07 Jun 2023 09:45:35 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=triops.cz; s=f2019;
-        t=1686123935; bh=6Da3kD3R2MTkcuUr4S40ZXt/uYdS4+Mx3J6oHgc4Et8=;
-        h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-        b=Cg8kZ0g9qtzpCFa4LW7X4XmyLv3qrbcgkHvQy0hSdjm7dw/aoPUtf5LhbkC2XhaP/
-         IQ4JxhGIr9c6jip0XShv8XseIpU+wRQ17rPSXFWDIwlblv5YNnYEZJzRa+am8UODf/
-         lRMS8PelkVStFYYPbSfxAsUw4d0d8O2B0WPo/B/1Rm/nLotol5qoYaNjq5rA/Wd5eG
-         X+XygWzV0QCUv6xGE/e4ZroZnnIVUF+BMZzqdQlt6kaQolB4ZIpIl4wws2Nm7t4vd4
-         2nwQNhd7USb+ALmMN9/BN2jKKklROBYXiMZQ1POs8ta4bjS+zXkC8sY3WAw3/Ma0Jy
-         YkvpAqqffNvyA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=triops.cz; s=f2019;
-        t=1686123935; bh=6Da3kD3R2MTkcuUr4S40ZXt/uYdS4+Mx3J6oHgc4Et8=;
-        h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-        b=Cg8kZ0g9qtzpCFa4LW7X4XmyLv3qrbcgkHvQy0hSdjm7dw/aoPUtf5LhbkC2XhaP/
-         IQ4JxhGIr9c6jip0XShv8XseIpU+wRQ17rPSXFWDIwlblv5YNnYEZJzRa+am8UODf/
-         lRMS8PelkVStFYYPbSfxAsUw4d0d8O2B0WPo/B/1Rm/nLotol5qoYaNjq5rA/Wd5eG
-         X+XygWzV0QCUv6xGE/e4ZroZnnIVUF+BMZzqdQlt6kaQolB4ZIpIl4wws2Nm7t4vd4
-         2nwQNhd7USb+ALmMN9/BN2jKKklROBYXiMZQ1POs8ta4bjS+zXkC8sY3WAw3/Ma0Jy
-         YkvpAqqffNvyA==
-Date:   Wed, 7 Jun 2023 09:45:34 +0200
-From:   Ladislav Michl <oss-lists@triops.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] block: ratelimit warning in bio_check_ro
-Message-ID: <ZIA1nsJzEj/dAOYG@lenoch>
-References: <ZIAjht591AEza3c4@lenoch>
- <20230607063002.GA21239@lst.de>
+        with ESMTP id S239330AbjFGHrl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 03:47:41 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F03212E;
+        Wed,  7 Jun 2023 00:46:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zx7QiNnFC0Cpwen1yiSTOeTK/8rpSNjru1sqAkfYhQU=; b=yAWYaRs/exv9l4aW3kRh15uGCe
+        26FluPYMyAqbRNSSIKILK5H+P/HRb+mLP2AVCZD8Q6/dOrzSkIWCs7Epg5moTHRi1Pj0dpEWULnsO
+        O7NYmBvnRZqEt+xSMqI3EI3MQfvt5yQ42VPSZsOOdcFokDphTUPA66kyZ6YO1YnkrYywoCHQYV3Ea
+        0MDsIqEqxuTqVM0/S2p9YhiyYiGf5LX7u3r4ZZIlUTMCZAFMMuz8srwGclvl/WuS8PZXb9qms4iiV
+        jkrDp65eAYRHr6bzEzcpMFs/3lcXVHwIJ6nXcIQysCnXcIa9qte7v7qw+LV/9Oskk3ET3QhPsIhKZ
+        nl2txkrA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q6ns0-004nZS-2l;
+        Wed, 07 Jun 2023 07:46:16 +0000
+Date:   Wed, 7 Jun 2023 00:46:16 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Demi Marie Obenour <demi@invisiblethingslab.com>
+Cc:     Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= 
+        <marmarek@invisiblethingslab.com>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] xen-blkback: Inform userspace that device has been
+ opened
+Message-ID: <ZIA1yLiJyfcJ45vD@infradead.org>
+References: <20230601214823.1701-1-demi@invisiblethingslab.com>
+ <20230601214823.1701-3-demi@invisiblethingslab.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230607063002.GA21239@lst.de>
-X-CMAE-Envelope: MS4wfG2P4CAxB7az0PiADDZMTTwQP41YZ4A37X9/aHyOV6V72ImOqUK/OsN+WfXmug4IoevfKwCIoKWZhXqbK3MI9I1o67ciWD/WuQL23+0sRNiQqxD3LXyk
- 7aFoHgHBmPPh+maWUGOdSf/bu4JKqHNdBNduSFHvb8r3g7xlHnDKbjJ3OpEc6T3U4zJHcnyrC3yopPbvOoI4gkloSwHRMu6EaLA=
+In-Reply-To: <20230601214823.1701-3-demi@invisiblethingslab.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -3,6 +3,20 @@
+>      Copyright (C) 2005 Rusty Russell <rusty@rustcorp.com.au>
+>      Copyright (C) 2005 XenSource Ltd
+>  
+> +In addition to the Xenstore nodes required by the Xen block device
+> +specification, this implementation of blkback uses a new Xenstore
+> +node: "opened".  blkback sets "opened" to "0" before the hotplug script
+> +is called.  Once the device node has been opened, blkback sets "opened"
+> +to "1".
 
-On Wed, Jun 07, 2023 at 08:30:02AM +0200, Christoph Hellwig wrote:
-> On Wed, Jun 07, 2023 at 08:28:22AM +0200, Ladislav Michl wrote:
-> > From: Ladislav Michl <ladis@linux-mips.org>
-> > 
-> > Until 57e95e4670d1 ("block: fix and cleanup bio_check_ro")
-> > a WARN_ONCE was used to print a warning. Current pr_warn causes
-> > log flood, so use pr_warn_ratelimited instead.
-> > Once there adjust message to match the one used in bio_check_eod.
-> 
-> Do you have a case that hits this?  Beause we'd really need to fix it.
-
-I hit that while working on customer's embedded board. There's eMMC
-where boot partitions are locked after upgrade by writing 1 into
-force_ro sysfs file. Pending writes are triggering this warnign.
-Of course update scripts was fixed meanwhile and knowing what
-process triggered warning was quite helpful. So there's nothing
-to fix, it is just improved diagnostic and returning to (almost)
-old behaviour.
-
-> Otherwise this looks ok to me.
+This is a really odd comment style, and a really strange place for it.
+To me it feels like this should just be a file in Documentation as it
+relates to how to use the driver, and doesn't really explain the code.
