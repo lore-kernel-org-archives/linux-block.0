@@ -2,73 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C034C7EE43
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 07:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A448CC83003
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 07:46:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231890AbjFGHp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 03:45:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39128 "EHLO
+        id S239375AbjFGHqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 03:46:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234874AbjFGHoe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 03:44:34 -0400
+        with ESMTP id S239850AbjFGHpy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 03:45:54 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1041FC8;
-        Wed,  7 Jun 2023 00:42:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE3D2D65;
+        Wed,  7 Jun 2023 00:44:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=OM0BuqqlawJryT9IX33+CW481h0jO+pL7fC3zg1G8M0=; b=Dwam7ai2Hae6B/IyWvM+6/4d4U
-        p1tzeI8V42Mp6UhB++W7VYusnoAtCzwBtZk2ORH+/kHpvZjMdvQTWp22BaTT2CT4Asp2/vjwmnDAW
-        4+t2O8KUOLuF8mK1xspDlcoWayDBpfhVZF/kaT7mp/sxc4TqtaUdeMQstgztfMxeXljLCKbYtNGm0
-        rsaIkR+DqpE2+hmPGKGdoZEojIBhwr5eCe1UOtaQamCLWia8dZv4RQzyuC2WPbII3siuQMYxhT0K/
-        6IA0O8xrKNXavDlT9BOuv6sjNWDK6dhQMHfzVCqusXh5VEPi/X2AWFEpueZz7Lly2Oj65xdzkh26O
-        L6co5k5g==;
+        bh=4Sx6PZ8z7yUHSRyrSyhfNlQuLMPtcylN+zdcdoTWpXg=; b=KEHhRRtM/7119LZoHZ21PYKQvf
+        oxQ3RW7h1hm22BBehjrTIxZs+Hq4vNo2r7l6s04yZHqhXriMF63WHd9i5/zDyUJLhCmuIXXizFHjF
+        4Jsv/ky6uLqB5DrYaMtEapqpJJHQIp+5COiFf/fjdAb68jrejI06b4/3yOXZm25RDROV2sLsCI7/M
+        LzYuzlMAcsstPZ3ok7GYLmLvIlnHuHYvruYjB+JVdJQz2zhH7pKYEIBJ1kQdE+vY6qsnVevIkJy2M
+        ta9L6kYnOflYPdvVBtihfIYaqAzWLOjNSQvLp3cM2kFEDfgTrtzUdL7vORwRcQ+gVauExyOPeEpbw
+        JiOgiSfQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q6no3-004mhI-09;
-        Wed, 07 Jun 2023 07:42:11 +0000
-Date:   Wed, 7 Jun 2023 00:42:11 -0700
+        id 1q6nqB-004n5l-03;
+        Wed, 07 Jun 2023 07:44:23 +0000
+Date:   Wed, 7 Jun 2023 00:44:22 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Demi Marie Obenour <demi@invisiblethingslab.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
- device
-Message-ID: <ZIA004HDuhoTQzY/@infradead.org>
-References: <20230601222656.2062-1-demi@invisiblethingslab.com>
+Cc:     Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= 
+        <marmarek@invisiblethingslab.com>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] xen-blkback: Implement diskseq checks
+Message-ID: <ZIA1VkDdgt5kmqEt@infradead.org>
+References: <20230601214823.1701-1-demi@invisiblethingslab.com>
+ <20230601214823.1701-2-demi@invisiblethingslab.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230601222656.2062-1-demi@invisiblethingslab.com>
+In-Reply-To: <20230601214823.1701-2-demi@invisiblethingslab.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +++ b/block/genhd.c
-> @@ -1502,3 +1502,4 @@ void inc_diskseq(struct gendisk *disk)
->  {
->  	disk->diskseq = atomic64_inc_return(&diskseq);
->  }
-> +EXPORT_SYMBOL(inc_diskseq);
-
-I really do not like exporting this as a lowlevel function.  If we
-increment the sequence it should be part of a higher level operation.
-
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1205,6 +1205,12 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
->  	if (!part_shift)
->  		set_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
->  	mutex_lock(&lo->lo_mutex);
+On Thu, Jun 01, 2023 at 05:48:22PM -0400, Demi Marie Obenour wrote:
+> +	if (diskseq) {
+> +		struct gendisk *disk = bdev->bd_disk;
 > +
-> +	/*
-> +	 * Increment the disk sequence number, so that userspace knows this
-> +	 * device now points to something else.
-> +	 */
-> +	inc_diskseq(lo->lo_disk);
+> +		if (unlikely(disk == NULL)) {
+> +			pr_err("%s: device %08x has no gendisk\n",
+> +			       __func__, vbd->pdevice);
+> +			xen_vbd_free(vbd);
+> +			return -EFAULT;
+> +		}
 
-And I'm not sure why we even need this.  __loop_clr_fd
-already calls disk_force_media_change, which calls inc_diskseq.
-Why do we need an extra increment?
+bdev->bd_disk is never NULL.
 
+> +	diskseq_str = xenbus_read(XBT_NIL, dev->nodename, "diskseq", &diskseq_len);
+
+Please avoid the overly long line.
+
+> +	if (IS_ERR(diskseq_str)) {
+> +		int err = PTR_ERR(diskseq_str);
+> +		diskseq_str = NULL;
+> +
+> +		/*
+> +		 * If this does not exist, it means legacy userspace that does not
+
+.. even more so in comments.
+
+> +		 * support diskseq.
+> +		 */
+> +		if (unlikely(!XENBUS_EXIST_ERR(err))) {
+> +			xenbus_dev_fatal(dev, err, "reading diskseq");
+> +			return;
+> +		}
+> +		diskseq = 0;
+> +	} else if (diskseq_len <= 0) {
+> +		xenbus_dev_fatal(dev, -EFAULT, "diskseq must not be empty");
+> +		goto fail;
+> +	} else if (diskseq_len > 16) {
+
+No need for a else after a return.
+
+> +		xenbus_dev_fatal(dev, -ERANGE, "diskseq too long: got %d but limit is 16",
+> +				 diskseq_len);
+> +		goto fail;
+> +	} else if (diskseq_str[0] == '0') {
+> +		xenbus_dev_fatal(dev, -ERANGE, "diskseq must not start with '0'");
+> +		goto fail;
+> +	} else {
+> +		char *diskseq_end;
+> +		diskseq = simple_strtoull(diskseq_str, &diskseq_end, 16);
+> +		if (diskseq_end != diskseq_str + diskseq_len) {
+> +			xenbus_dev_fatal(dev, -EINVAL, "invalid diskseq");
+> +			goto fail;
+> +		}
+> +		kfree(diskseq_str);
+> +		diskseq_str = NULL;
+> +	}
+
+And I suspect the code will be a lot easier to follow if you move
+the diskseq validation into a separate helper.
