@@ -2,157 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 951DFC7EE23
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 15:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A478C7EE25
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 15:38:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234667AbjFGPZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 11:25:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33786 "EHLO
+        id S240508AbjFGPia (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 11:38:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241254AbjFGPYs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 11:24:48 -0400
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B71E2707;
-        Wed,  7 Jun 2023 08:24:13 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 54D205C0083;
-        Wed,  7 Jun 2023 11:23:09 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 07 Jun 2023 11:23:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        invisiblethingslab.com; h=cc:cc:content-type:content-type:date
-        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to; s=fm1; t=
-        1686151389; x=1686237789; bh=Wv7B88fCXHMfzlDN3UtqKmkgxzrFTCsQxuL
-        FkzoPHro=; b=XHoJXnU2+Jkn+R2bLfxIbPT3bxyCMF5fQ0zS8CtDaGSqTker57P
-        +kWa087zeC5Ak/d9FH1sIyKJfOUWIEPH0W+iLtAAwje6RiZiNIzNHKAKLuZBcQzy
-        iSA8qh+dv3ecCR3pxKTD1QhHl76XcJUmsRH4JD2b3zdtTGSPFs+0BvS3My/btqlf
-        1QxY6VQJrkPBM/yDs5df/q66phXvfOxWuP60SCz0KAu0jOjFksl7ptO5Yad9+w91
-        3I4JMbOv0gOb/nITmlYw+i1RAmyT0ry3MSHecRMprLdXrSoOLf/0D/BFsVWFOM7k
-        45UTq+Lo+WOzCC+V7SKVWcYnC3Ie3qSwFkw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:content-type:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm1; t=1686151389; x=1686237789; bh=Wv7B88fCXHMfz
-        lDN3UtqKmkgxzrFTCsQxuLFkzoPHro=; b=WfumrNaC/mT4OajhXHOPWdcfHkkRO
-        SZxV2GMvr7fjCKdu30Xlbk8xXeRJbI2KfUgBJ2UetKMClF6NadOWhoMVJbj1lEqp
-        cRJeUFo4/rxQ+zmQI/G68XmA8Tq6x8++apsN10xmDfBDdUxsJvR/3Vm9yWfMxQxK
-        4BSwzZdM7ZpVYXu7YH8mF9TuYgXHVSZ63yHwIJTGJmDzZXj1EEbqdpEt8N2cVELa
-        OC12kqNMT+udqBO0F9ZrEtpESzyCByu0HE1ih+9yzF/WBJ0vFiRfa+mw8bAHB91a
-        I0ZIjGVNV9DekVhFswsKhRMNNj+EygWawq/0HoK06rTHZlxXEA5iBzxdg==
-X-ME-Sender: <xms:3aCAZKIePnmYH3J5jOSqMNxXvAl_imf-4iBP7eI7sGwDDo1N4Fd42Q>
-    <xme:3aCAZCKzRnAX1EsopXNKY1hl1_lndEpGoS6tHm1M4cruxgXfpc0s2CLvPFGVBreZp
-    HEEznlA5akIP7c>
-X-ME-Received: <xmr:3aCAZKspw-lkDixv91bZzVjZ1rJrXPT5JfphLqFuvqcyQfgzQvv59PW1iQs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgedtgedgkeejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepffgvmhhi
-    ucforghrihgvucfqsggvnhhouhhruceouggvmhhisehinhhvihhsihgslhgvthhhihhngh
-    hslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepvdejteegkefhteduhffgteffgeff
-    gfduvdfghfffieefieekkedtheegteehffelnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepuggvmhhisehinhhvihhsihgslhgvthhhihhnghhs
-    lhgrsgdrtghomh
-X-ME-Proxy: <xmx:3aCAZPbLD9jwZE94B875RYnbBA-THOuPZ6lpzR_jbGp8OkRaFT3dRA>
-    <xmx:3aCAZBagBMf94CsyL7OqQza8ILYscmGdY9fEXTkwXQP7GACLD-oZbA>
-    <xmx:3aCAZLCJ-g2hls9eWfKLhTzmcZKfZdH0igmijUnbFehtRrhRfVHzlg>
-    <xmx:3aCAZAwgnAlah1z8Ldh3loCdK-6XmzNQqI3Pc2Fvn1p3p4I8NW0f5w>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 7 Jun 2023 11:23:08 -0400 (EDT)
-Date:   Wed, 7 Jun 2023 11:23:00 -0400
-From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
- device
-Message-ID: <ZICg2sxHQRRPW3Nc@itl-email>
-References: <20230601222656.2062-1-demi@invisiblethingslab.com>
- <ZIA004HDuhoTQzY/@infradead.org>
+        with ESMTP id S235079AbjFGPi3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 11:38:29 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C3A125;
+        Wed,  7 Jun 2023 08:38:28 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A15301FDAF;
+        Wed,  7 Jun 2023 15:38:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1686152307; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Kkwlk03GZO5nENrvtVROVto9i8M8yZ82CN7aOAB3zBw=;
+        b=KWv3E76mWyJniU27FhrjPpLJqpUZJXMFdDhPUCg8YC2G3mUnPWyUMAzU9zVP9soTrW1SHk
+        QdazOR4d+s9rQxUaaJ/9eT9fojTAi9rKTC29Erbv6x5cQTihROytFlzvj9AOBUNwaK9pC4
+        LhAODKpUNBz566fNxokekBwQHRoUhpM=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3EBAE1346D;
+        Wed,  7 Jun 2023 15:38:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HYRoDXOkgGRsNAAAMHmgww
+        (envelope-from <mwilck@suse.com>); Wed, 07 Jun 2023 15:38:27 +0000
+Message-ID: <7ee70331d921854e2b27de3d072d0d8f8ce97f3b.camel@suse.com>
+Subject: Re: [PATCH v2 3/3] scsi: simplify scsi_stop_queue()
+From:   Martin Wilck <mwilck@suse.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Date:   Wed, 07 Jun 2023 17:38:26 +0200
+In-Reply-To: <903c7222-c95e-fda1-9b90-b59e184944cf@acm.org>
+References: <20230606193845.9627-1-mwilck@suse.com>
+         <20230606193845.9627-4-mwilck@suse.com> <20230607052710.GC20052@lst.de>
+         <c0563161eb613f9500e6a1cccdcff6fc64efffad.camel@suse.com>
+         <903c7222-c95e-fda1-9b90-b59e184944cf@acm.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.1 
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="ciKbitYsLUhZP3Im"
-Content-Disposition: inline
-In-Reply-To: <ZIA004HDuhoTQzY/@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---ciKbitYsLUhZP3Im
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 7 Jun 2023 11:23:00 -0400
-From: Demi Marie Obenour <demi@invisiblethingslab.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
- device
-
-On Wed, Jun 07, 2023 at 12:42:11AM -0700, Christoph Hellwig wrote:
-> > +++ b/block/genhd.c
-> > @@ -1502,3 +1502,4 @@ void inc_diskseq(struct gendisk *disk)
-> >  {
-> >  	disk->diskseq =3D atomic64_inc_return(&diskseq);
-> >  }
-> > +EXPORT_SYMBOL(inc_diskseq);
+On Wed, 2023-06-07 at 07:05 -0700, Bart Van Assche wrote:
+> On 6/7/23 02:26, Martin Wilck wrote:
+> > On Wed, 2023-06-07 at 07:27 +0200, Christoph Hellwig wrote:
+> > > On Tue, Jun 06, 2023 at 09:38:45PM +0200, mwilck@suse.com=A0wrote:
+> > > > =A0=A0scsi_target_block(struct device *dev)
+> > > > =A0=A0{
+> > > > +=A0=A0=A0=A0=A0=A0=A0struct Scsi_Host *shost =3D dev_to_shost(dev)=
+;
+> > > > +
+> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0if (scsi_is_target_device(dev))
+> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0starget_for_each=
+_device(to_scsi_target(dev),
+> > > > NULL,
+> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0device_block);
+> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0else
+> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0device_for_each_=
+child(dev, NULL,
+> > > > target_block);
+> > > > +
+> > > > +=A0=A0=A0=A0=A0=A0=A0/* Wait for ongoing scsi_queue_rq() calls to =
+finish. */
+> > > > +=A0=A0=A0=A0=A0=A0=A0if (!WARN_ON_ONCE(!shost))
+> > >=20
+> > > How could host ever be NULL here?=A0 I can't see why we'd want this
+> > > check.
+> >=20
+> > The reason is simple: I wasn't certain if dev_to_shost() could
+> > return
+> > NULL, and preferred skipping the wait over an Oops. I hear you say
+> > that
+> > dev_to_shost() can't go wrong, so I'll remove the NULL test.
 >=20
-> I really do not like exporting this as a lowlevel function.  If we
-> increment the sequence it should be part of a higher level operation.
+> I propose to pass shost as the first argument to scsi_target_block()=20
+> instead of using dev_to_shost() inside scsi_target_block(). Except in
+> __iscsi_block_session(), shost is already available as a local
+> variable.
 
-Fair!
+If we do this, it might actually be cleaner to just pass the tag set to
+wait for.
 
-> > --- a/drivers/block/loop.c
-> > +++ b/drivers/block/loop.c
-> > @@ -1205,6 +1205,12 @@ static void __loop_clr_fd(struct loop_device *lo=
-, bool release)
-> >  	if (!part_shift)
-> >  		set_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
-> >  	mutex_lock(&lo->lo_mutex);
-> > +
-> > +	/*
-> > +	 * Increment the disk sequence number, so that userspace knows this
-> > +	 * device now points to something else.
-> > +	 */
-> > +	inc_diskseq(lo->lo_disk);
->=20
-> And I'm not sure why we even need this.  __loop_clr_fd
-> already calls disk_force_media_change, which calls inc_diskseq.
-> Why do we need an extra increment?
+Martin
 
-How does disk_force_media_change() call inc_diskseq()?  I don=E2=80=99t see=
- any
-calls in the source code.  I=E2=80=99m going to use systemtap to see if the=
-re is
-an indirect call chain.
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
-
---ciKbitYsLUhZP3Im
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEdodNnxM2uiJZBxxxsoi1X/+cIsEFAmSAoNoACgkQsoi1X/+c
-IsHQlBAAkPrxFId08lsXJQUerNo6JNd7c3rnGL/J7C1RclnoXZvb2wTxTOU7SyAK
-Pm0DjJ+MkEbJPCtk4mhaA75ezfDNiA66cPmmaN3xBDb9VmuqwMSUgKhEDqpvMGyD
-r41wCIrMIv3daXrqMbdThLX8MN9nyLNFPG2VkLK71z7Yar/3jEhTVH7JkcrCZ79C
-STBv9mj8oG86ycCIUrKeWpI3zFZaniO0yUqlqXEuCt9x5LZ1WQ/EG6G9kiQyJIb1
-rdKyWeJg0al9eRWJT9xQxnBmPlGAj5l/C9NUk70WYWaer5r7xmhmVZhyazIAwf/I
-pz3huGDWEr7XEt7Nf6+3Xoyq4+koI9RnJtO3Hn5wYzQC/Xn6+JA1qcD1krJoLA2F
-fockSGh2BA7UtVXx+krv3tnC9xmayLJCxuFBYjzcoWFmzsJoXpgaQ2wR77qXtwnB
-SUbw55OBbOR2TCXmJajNIDhKc9WvqV46uFd15/Sq8S+xhyU5pkeZM/uK7QBxUT6j
-Wrb0iPLE6R5KOhDiE+TqfFfaUxMS9zi1sS4eu+KyZ7bQ42CN70SGH/1UDmwAk3x6
-rWtTna5azpbJbQO7y4TtOS1/7ieCXwFBbGESqJCOACdBWHNKCmoA4Krc1p16l3+k
-Qapw/TfC17dcL5X9rynQ238Hvvgwmu6tRFIQFonQVRaaKY9LeFk=
-=OUMI
------END PGP SIGNATURE-----
-
---ciKbitYsLUhZP3Im--
