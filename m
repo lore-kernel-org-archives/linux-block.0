@@ -2,91 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E717C7EE2E
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 20:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3141C83005
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 20:29:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233152AbjFGUXF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 16:23:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48094 "EHLO
+        id S233529AbjFGU3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 16:29:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233051AbjFGUXB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 16:23:01 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C056C2122
-        for <linux-block@vger.kernel.org>; Wed,  7 Jun 2023 13:22:20 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b0338fac5dso8523405ad.0
-        for <linux-block@vger.kernel.org>; Wed, 07 Jun 2023 13:22:20 -0700 (PDT)
+        with ESMTP id S233525AbjFGU3C (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 16:29:02 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2700226A1
+        for <linux-block@vger.kernel.org>; Wed,  7 Jun 2023 13:28:42 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6584553892cso977039b3a.0
+        for <linux-block@vger.kernel.org>; Wed, 07 Jun 2023 13:28:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686169322; x=1688761322;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LfCmBNg3+Uy1inUmOxVLBDjLR39fkV9eWgE4s9E2L1M=;
-        b=3iAfZ8xyjx1cuFNM+HY9k/R83T8jW44DMw/mRj3/KeCerY6N9MDC0PloVp3rsod/+R
-         quRP8zyOmkpSZSkkiswlaP/r3xPuIZkdrQWMqDgk3HuD3fF/suRQhpAnHuwJNBULjLIU
-         /aU+0MdNfHxgpi04n/Tv09ZUvnJ3FhzISWpOoe8I5FOGDs9rnuctIkZbcEQVaESRvCdk
-         3p9TWd4Y3d6hdOdQfBRXQJ8ah7Yqai9HxdVqvOYjbMDy3U+ox4rpM0JEA6A6s+f1jUGF
-         63c2l4BunZaAeQ35qn4rb281naqGC47L1Ovj7UXnYxQrV2zzje10Yz9tF3AcvfeROL0n
-         TYgg==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686169718; x=1688761718;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g1NtfRKLBxewd34t5Gh6CqfpKexDHoQxzpKbSXODOss=;
+        b=hpH8J+RP6Lx2aCaOgiVhXeFACjtdhhQmTUYfxAHMCF+wJ3p2S2tMcmkixOxxQpDWTO
+         e3rGDzk+QEIzH0pfJGC3LM1e0YI/l7Jcp5l5MRb1P5MjgBq38h0dtJSS4dpW18bYDzjA
+         BdK6z2QXlcrO0sQ3we+AuWjuEL/KPmT3nSil5wDyzbwdZfE/2hZ1Mll9BjH+ckTvxe4m
+         oLKQGHnZ/cbg2Qhhijkeez+vSolIVI8VXNT/YzqhFdvO/u8pGdcrozv4ULslU+6VKGxP
+         vXg088Ig7qrznPB58ztwc1JZ/ZmDRYczE7fmjWZCqtQp0HXUiENC5hfy8NazPBsBnw4T
+         cA3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686169322; x=1688761322;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LfCmBNg3+Uy1inUmOxVLBDjLR39fkV9eWgE4s9E2L1M=;
-        b=f/QUoX50GziIN22Pr5XUK4QH5D9zXHNreKEoavVd3QovdGKyTZelKc5UVlZKTGIXYb
-         YMSOA4dVJuu9uR7IopiHJWa98TsMV/Zijzx8VUK1PiZo1100d0fTD7qNcRN9G2uH0288
-         0ACz+ShlaP06Eul9DY/G1myLOQAL6puNPM9Q0fM6+SXHZSH7skLHBAyeABQkRpWmmHlX
-         vHFBeAH4Scf0CrXqzy1RT2jHs+0w7j/SIqFt6VH0pNAv65H0TTbM4lklonJb/IxfqFFi
-         XMY1kPgnybVK6pwCqc4chZBCd/39TAUDnDjjTNQ4C6kl124ZWzuBk26vyblQwW7fwlgy
-         IZYQ==
-X-Gm-Message-State: AC+VfDxxla78QN3887Owo0pD1pSn61QTZi+Apmh5Ykhhfwc37nl+1Qgx
-        78V6jWQph2mXpchEZlUozHOdsQ==
-X-Google-Smtp-Source: ACHHUZ6Cd+UehTWRW7DGE4Pn67++NdA2EmMZGXqex/Wr+tqQoHXFeTtZUV7Hn8eH6V4VkTapVI6P1g==
-X-Received: by 2002:a17:903:41cf:b0:1ae:4567:2737 with SMTP id u15-20020a17090341cf00b001ae45672737mr6982746ple.2.1686169322124;
-        Wed, 07 Jun 2023 13:22:02 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:122::1:6343? ([2620:10d:c090:600::2:9b70])
-        by smtp.gmail.com with ESMTPSA id n1-20020a170902d2c100b001a67759f9f8sm10870339plc.106.2023.06.07.13.22.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jun 2023 13:22:00 -0700 (PDT)
-Message-ID: <b8e954f3-bd03-9264-5abb-f887448c5f3e@kernel.dk>
-Date:   Wed, 7 Jun 2023 14:21:59 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2 0/9] pktdvd: Clean up the driver
-Content-Language: en-US
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
- <ZH9JnPAL8x2GPSV3@smile.fi.intel.com>
- <c00870f9-9ae4-27b1-3362-444aa76d7671@kernel.dk>
- <ZIDjwjRbX+YkA5J1@smile.fi.intel.com>
+        d=1e100.net; s=20221208; t=1686169718; x=1688761718;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g1NtfRKLBxewd34t5Gh6CqfpKexDHoQxzpKbSXODOss=;
+        b=HqJlsbM5h/5NSBqmwhRXHr5P3MAcOU/5W2vYRWpXIIMKGF4ybFgauGq2tz8AAPoURi
+         62IWFeVtv0ZC2ZFTR3UJm3+DoEe315Rls9gyyq9Xs1UGFNUhf9D2kXsQ751gEs5tE/fM
+         aUBuoHlRo8eJd94AgUKhEL7mTlJyUBZ44eTWK0G/P2OER4PAaDoPZG48dicWEARxjsw4
+         gRcOzxeFO1G8l3Q/Wv4MkDWnTRwImdw5ganEuNUfMkm02eYzECUBd1oKg54kVXYl9fij
+         tbGgLbozz3n/gyuDsiR9BDOsWoREqgn1fUblJUZglR0O/jZkA8VM4OmotPOHO1pgxyP+
+         BO1Q==
+X-Gm-Message-State: AC+VfDyJgESmp/vGjP3oqeEXLleKLRibqwA0LPmSfVmsdYnADh0eVNqJ
+        iE9W/jx/22dQBquWzehZuA7T+PrUwSKKaeSVGAY=
+X-Google-Smtp-Source: ACHHUZ4U2oYKGpIcb8vlY9R5t+nDeGtzp/Blv5niP/qS7WsFMO8inGOI4BMBYdCMMh4UXRRgY/z2PQ==
+X-Received: by 2002:a05:6a00:2909:b0:662:a9c3:7b84 with SMTP id cg9-20020a056a00290900b00662a9c37b84mr1578756pfb.2.1686169718218;
+        Wed, 07 Jun 2023 13:28:38 -0700 (PDT)
+Received: from [127.0.0.1] ([2620:10d:c090:600::2:9b70])
+        by smtp.gmail.com with ESMTPSA id fe16-20020a056a002f1000b00653dc27acadsm7828231pfb.205.2023.06.07.13.28.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jun 2023 13:28:36 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ZIDjwjRbX+YkA5J1@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
+References: <20230310164549.22133-1-andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH v2 0/9] pktdvd: Clean up the driver
+Message-Id: <168616971619.107466.374645634630337878.b4-ty@kernel.dk>
+Date:   Wed, 07 Jun 2023 14:28:36 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/7/23 2:08 PM, Andy Shevchenko wrote:
-> On Tue, Jun 06, 2023 at 02:23:03PM -0600, Jens Axboe wrote:
->> On 6/6/23 8:58 AM, Andy Shevchenko wrote:
->>> On Fri, Mar 10, 2023 at 06:45:40PM +0200, Andy Shevchenko wrote:
->>>> Some cleanups to the recently resurrected driver.
->>>
->>> Anybody to pick this up, please?
->>
->> I can pick it up, I'm assuming this is all untested?
+
+On Fri, 10 Mar 2023 18:45:40 +0200, Andy Shevchenko wrote:
+> Some cleanups to the recently resurrected driver.
 > 
-> Compile tested only. So I assume the answer is yes, untested.
+> v2:
+> - added tags (Greg)
+> 
+> Andy Shevchenko (9):
+>   pktcdvd: Get rid of custom printing macros
+>   pktcdvd: replace sscanf() by kstrtoul()
+>   pktcdvd: use sysfs_emit() to instead of scnprintf()
+>   pktcdvd: Get rid of pkt_seq_show() forward declaration
+>   pktcdvd: Drop redundant castings for sector_t
+>   pktcdvd: Use DEFINE_SHOW_ATTRIBUTE() to simplify code
+>   pktcdvd: Use put_unaligned_be16() and get_unaligned_be16()
+>   pktcdvd: Get rid of redundant 'else'
+>   pktcdvd: Sort headers
+> 
+> [...]
 
-I'd be surprised if you said you actually ran it. Series looks sane,
-I'll get it applied. Thanks.
+Applied, thanks!
 
+[1/9] pktcdvd: Get rid of custom printing macros
+      commit: 3a41db531e5124adaa3a9ab9ca0c724aee85b10c
+[2/9] pktcdvd: replace sscanf() by kstrtoul()
+      commit: 1a0ddd56e545b743af510b5a1b8dbdfe7d35cd3b
+[3/9] pktcdvd: use sysfs_emit() to instead of scnprintf()
+      commit: 3bb5746c26cdfcc354af4867c02f1e0ec1131a62
+[4/9] pktcdvd: Get rid of pkt_seq_show() forward declaration
+      commit: f023faaa988671f0f1d1a965dc5d7e61d0f5e65e
+[5/9] pktcdvd: Drop redundant castings for sector_t
+      commit: 93c8f6f38be67e30adf8d8eb5e7e9ccb89326119
+[6/9] pktcdvd: Use DEFINE_SHOW_ATTRIBUTE() to simplify code
+      commit: 80d994d2a71f88e0809dcaccef2259c791d2e3ef
+[7/9] pktcdvd: Use put_unaligned_be16() and get_unaligned_be16()
+      commit: 046636a4bac575aff78e44c7e1cff84c83a345a9
+[8/9] pktcdvd: Get rid of redundant 'else'
+      commit: 6a5945a8eb5a626afe6feb341824e7e1d007c8ff
+[9/9] pktcdvd: Sort headers
+      commit: 7da15fb0318f18398feea2848d099a8d0d7b5965
+
+Best regards,
 -- 
 Jens Axboe
+
 
 
