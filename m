@@ -2,108 +2,198 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A478C7EE25
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 15:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CA5C77B7A
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 16:00:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240508AbjFGPia (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 11:38:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48636 "EHLO
+        id S235890AbjFGQAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 12:00:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235079AbjFGPi3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 11:38:29 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C3A125;
-        Wed,  7 Jun 2023 08:38:28 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A15301FDAF;
-        Wed,  7 Jun 2023 15:38:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1686152307; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Kkwlk03GZO5nENrvtVROVto9i8M8yZ82CN7aOAB3zBw=;
-        b=KWv3E76mWyJniU27FhrjPpLJqpUZJXMFdDhPUCg8YC2G3mUnPWyUMAzU9zVP9soTrW1SHk
-        QdazOR4d+s9rQxUaaJ/9eT9fojTAi9rKTC29Erbv6x5cQTihROytFlzvj9AOBUNwaK9pC4
-        LhAODKpUNBz566fNxokekBwQHRoUhpM=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3EBAE1346D;
-        Wed,  7 Jun 2023 15:38:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id HYRoDXOkgGRsNAAAMHmgww
-        (envelope-from <mwilck@suse.com>); Wed, 07 Jun 2023 15:38:27 +0000
-Message-ID: <7ee70331d921854e2b27de3d072d0d8f8ce97f3b.camel@suse.com>
-Subject: Re: [PATCH v2 3/3] scsi: simplify scsi_stop_queue()
-From:   Martin Wilck <mwilck@suse.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-Date:   Wed, 07 Jun 2023 17:38:26 +0200
-In-Reply-To: <903c7222-c95e-fda1-9b90-b59e184944cf@acm.org>
-References: <20230606193845.9627-1-mwilck@suse.com>
-         <20230606193845.9627-4-mwilck@suse.com> <20230607052710.GC20052@lst.de>
-         <c0563161eb613f9500e6a1cccdcff6fc64efffad.camel@suse.com>
-         <903c7222-c95e-fda1-9b90-b59e184944cf@acm.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.1 
+        with ESMTP id S235978AbjFGQAi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 12:00:38 -0400
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2BBE4;
+        Wed,  7 Jun 2023 09:00:37 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id 869505C0135;
+        Wed,  7 Jun 2023 12:00:36 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Wed, 07 Jun 2023 12:00:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        invisiblethingslab.com; h=cc:cc:content-type:content-type:date
+        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to; s=fm1; t=
+        1686153636; x=1686240036; bh=5028jVPHP9PdFYdLuVCSXCH9vrAc5KtFszG
+        WksMpGUc=; b=C1cAy4eG464IqwFzu5xeP8gAE0QO3dLhTabsmagrE6+5R6TBxmH
+        pvqIWi2MhW7XF++PVFirKmt/IhrFVF9S4TlHsMzlUbCfYF9odjPncT8XMrzJosos
+        kPB0xE/usXX0McDFIiZUqyZ7fKbpxkvofxzL4XBtKGAO9fYDVczXLbBHhy4LuCjk
+        EuRo9k9bs1b4Q/LufMkRTlvH6+agpSy+sBSlG1Oqxhaf17gJR8Xy87qMkxpecZSD
+        BXSK2SDOOZmSi0H/BVWOX4TlJaywLxpCysr+/V8LCGmaJ3INEaYiGf5k6z8uhUDC
+        cSkvagZov6MfRIgGYo+ic5Pv5TdHMImHh5w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1686153636; x=1686240036; bh=5028jVPHP9PdF
+        YdLuVCSXCH9vrAc5KtFszGWksMpGUc=; b=vHwfFTGT/5ssYIxdP7wETLuuxk6eC
+        ARgxzVUapDh+HCKJJ8iHh24XSq02KTaPS6M0Wt9XlqjMnO59fEC0q+Myz3byIQ+r
+        4eH+at1xsN5LoszpsLl4kMETWuXanw/kSXECpBBmoe2fFdFqqDccXU4Qc/ulqjxr
+        /UfuPuhs66RaE8mbOYgAkPq17kIAw2UbmlfFlJvqptPtot5Vk6cELU1U8T2iU/m2
+        WzMqVGJgdxCYjhiK6Ug/dB1dJelA/OiMIF6wxslWBXtkTvyRNfLF+FCZH9yVY1FV
+        Bpi/5dcOovMKPvtCy+Bs8MqZGv3pamgiWbyisiytKLVkgKCK3rZmDumgA==
+X-ME-Sender: <xms:pKmAZMcLo39yitTMll5iVSvRCR-Rm-1emH2Huav95zhyje1KSxLKdw>
+    <xme:pKmAZOPpaor5cBwX_YamCJT8uKI-s1RLSzDOEjHM6d1JyArTRoMo5T7XGE75s3gJx
+    44oGcV5aGdAnhw>
+X-ME-Received: <xmr:pKmAZNjfS2yjK4_WlTYeTsUp4nXQvd630j7pQiXvaBpB4BuYGAzSDyV4sbY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgedtgedgleehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesghdtreertddtvdenucfhrhhomhepffgvmhhi
+    ucforghrihgvucfqsggvnhhouhhruceouggvmhhisehinhhvihhsihgslhgvthhhihhngh
+    hslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepudeileefueetvdelheeuteffjeeg
+    jeegffekleevueelueekjeejudffteejkeetnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepuggvmhhisehinhhvihhsihgslhgvthhhihhnghhs
+    lhgrsgdrtghomh
+X-ME-Proxy: <xmx:pKmAZB_LbTcOUN9Y4UmEdCnb2EQpvfLp4_AGO3a7d4msJWJpEID-IQ>
+    <xmx:pKmAZIsaFZ01jW2Ims43CaghesuX8msDbywk_MLelotLBjIOwieWzA>
+    <xmx:pKmAZIHL31ojvjJN_FhQoqB9f7_5Pz-fhuiysZ51yGGlty5x4YBDkg>
+    <xmx:pKmAZKLHp2_Xb59rXMoTDV9vfJTPByJH8LEmMZvSAUf4sDbrJxueIA>
+Feedback-ID: iac594737:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 7 Jun 2023 12:00:35 -0400 (EDT)
+Date:   Wed, 7 Jun 2023 12:00:29 -0400
+From:   Demi Marie Obenour <demi@invisiblethingslab.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= 
+        <marmarek@invisiblethingslab.com>, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] xen-blkback: Implement diskseq checks
+Message-ID: <ZICpodHAGv8qRw5A@itl-email>
+References: <20230601214823.1701-1-demi@invisiblethingslab.com>
+ <20230601214823.1701-2-demi@invisiblethingslab.com>
+ <ZIA1VkDdgt5kmqEt@infradead.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="CTS34Y4jd0AZd9RG"
+Content-Disposition: inline
+In-Reply-To: <ZIA1VkDdgt5kmqEt@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2023-06-07 at 07:05 -0700, Bart Van Assche wrote:
-> On 6/7/23 02:26, Martin Wilck wrote:
-> > On Wed, 2023-06-07 at 07:27 +0200, Christoph Hellwig wrote:
-> > > On Tue, Jun 06, 2023 at 09:38:45PM +0200, mwilck@suse.com=A0wrote:
-> > > > =A0=A0scsi_target_block(struct device *dev)
-> > > > =A0=A0{
-> > > > +=A0=A0=A0=A0=A0=A0=A0struct Scsi_Host *shost =3D dev_to_shost(dev)=
-;
-> > > > +
-> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0if (scsi_is_target_device(dev))
-> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0starget_for_each=
-_device(to_scsi_target(dev),
-> > > > NULL,
-> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0device_block);
-> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0else
-> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0device_for_each_=
-child(dev, NULL,
-> > > > target_block);
-> > > > +
-> > > > +=A0=A0=A0=A0=A0=A0=A0/* Wait for ongoing scsi_queue_rq() calls to =
-finish. */
-> > > > +=A0=A0=A0=A0=A0=A0=A0if (!WARN_ON_ONCE(!shost))
-> > >=20
-> > > How could host ever be NULL here?=A0 I can't see why we'd want this
-> > > check.
-> >=20
-> > The reason is simple: I wasn't certain if dev_to_shost() could
-> > return
-> > NULL, and preferred skipping the wait over an Oops. I hear you say
-> > that
-> > dev_to_shost() can't go wrong, so I'll remove the NULL test.
+
+--CTS34Y4jd0AZd9RG
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 7 Jun 2023 12:00:29 -0400
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] xen-blkback: Implement diskseq checks
+
+On Wed, Jun 07, 2023 at 12:44:22AM -0700, Christoph Hellwig wrote:
+> On Thu, Jun 01, 2023 at 05:48:22PM -0400, Demi Marie Obenour wrote:
+> > +	if (diskseq) {
+> > +		struct gendisk *disk =3D bdev->bd_disk;
+> > +
+> > +		if (unlikely(disk =3D=3D NULL)) {
+> > +			pr_err("%s: device %08x has no gendisk\n",
+> > +			       __func__, vbd->pdevice);
+> > +			xen_vbd_free(vbd);
+> > +			return -EFAULT;
+> > +		}
 >=20
-> I propose to pass shost as the first argument to scsi_target_block()=20
-> instead of using dev_to_shost() inside scsi_target_block(). Except in
-> __iscsi_block_session(), shost is already available as a local
-> variable.
+> bdev->bd_disk is never NULL.
 
-If we do this, it might actually be cleaner to just pass the tag set to
-wait for.
+Fixed in v3.
 
-Martin
+> > +	diskseq_str =3D xenbus_read(XBT_NIL, dev->nodename, "diskseq", &disks=
+eq_len);
+>=20
+> Please avoid the overly long line.
 
+Fixed in v3.
+
+> > +	if (IS_ERR(diskseq_str)) {
+> > +		int err =3D PTR_ERR(diskseq_str);
+> > +		diskseq_str =3D NULL;
+> > +
+> > +		/*
+> > +		 * If this does not exist, it means legacy userspace that does not
+>=20
+> .. even more so in comments.
+
+Fixed in v3.
+
+> > +		 * support diskseq.
+> > +		 */
+> > +		if (unlikely(!XENBUS_EXIST_ERR(err))) {
+> > +			xenbus_dev_fatal(dev, err, "reading diskseq");
+> > +			return;
+> > +		}
+> > +		diskseq =3D 0;
+> > +	} else if (diskseq_len <=3D 0) {
+> > +		xenbus_dev_fatal(dev, -EFAULT, "diskseq must not be empty");
+> > +		goto fail;
+> > +	} else if (diskseq_len > 16) {
+>=20
+> No need for a else after a return.
+
+Fixed in v3.
+
+> > +		xenbus_dev_fatal(dev, -ERANGE, "diskseq too long: got %d but limit i=
+s 16",
+> > +				 diskseq_len);
+> > +		goto fail;
+> > +	} else if (diskseq_str[0] =3D=3D '0') {
+> > +		xenbus_dev_fatal(dev, -ERANGE, "diskseq must not start with '0'");
+> > +		goto fail;
+> > +	} else {
+> > +		char *diskseq_end;
+> > +		diskseq =3D simple_strtoull(diskseq_str, &diskseq_end, 16);
+> > +		if (diskseq_end !=3D diskseq_str + diskseq_len) {
+> > +			xenbus_dev_fatal(dev, -EINVAL, "invalid diskseq");
+> > +			goto fail;
+> > +		}
+> > +		kfree(diskseq_str);
+> > +		diskseq_str =3D NULL;
+> > +	}
+>=20
+> And I suspect the code will be a lot easier to follow if you move
+> the diskseq validation into a separate helper.
+
+Fixed in v3.
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+Invisible Things Lab
+
+--CTS34Y4jd0AZd9RG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEdodNnxM2uiJZBxxxsoi1X/+cIsEFAmSAqaEACgkQsoi1X/+c
+IsH5yhAAnK+FHobE4EaJLu/MXl1mYHrYhpZKqUOIopKg1xODd1RlWyQI95qq3vHX
+AnwOhHN+Wv/PbJ0vhvL+/DtuC56AIaCxzhShuZmqZjvLDPwdvi73nSf4xiV7SLWG
+6GfMhn9Mo8MGoj+ek88P10z9bIwrfdCWnvnuns6bcGlHsMkrx/B3Jzk5ZOD1QWWj
+W6jzKRmUDCv+RKHcajLUB3iM2JTTYOLcljqldvSyRv1SySytToLRtTWfZrOJS7Z2
+Tjf9heSRPhvHPvcaHyidiaZ87xQjcmI4LRzOXEybxFd6uxIf4QpDD4rschFu25NL
+TTEFPRIocqwHQgyVcG8aIu86nizNf7f/O/iLfQhNTuYQ1mbq6l8QNyAcJ6sXMz0A
+fms3iMGiH2LF/pi8vEprOfiC1+0L+whpAqEEogIWh4zYp/tM0raENGZNJL6ZTwXI
+BPkVkAmsrZAQljrzecbtjRWPZJUDmi+u9XGFCjY9MX7oHtnRH22hLdVeYqd1NljD
+bgleEMTPiV/ZhPhOPi/Fyccze9VneSOjQ7QoKii0JaiECzatJFr3ZoIgwpIJsv17
+KSglgXTjzQpGPURe+RK+rQWMAlb6V2gT3mNC36txOv8j+Y6CuL3xfwGIdfP5nLh+
+qTO2n1i40TxJ0VEZa9kD67tyqrLuOS7kru2hQbdhvW9f92eOPo4=
+=m1I6
+-----END PGP SIGNATURE-----
+
+--CTS34Y4jd0AZd9RG--
