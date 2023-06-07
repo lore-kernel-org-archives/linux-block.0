@@ -2,155 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42834C7EE37
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 02:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4A4C7EE2F
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 02:54:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240724AbjFGCPX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 22:15:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46508 "EHLO
+        id S235015AbjFGCyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 22:54:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240679AbjFGCPT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 22:15:19 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A74D719BD
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 19:15:16 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b24b34b59fso5059805ad.3
-        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2023 19:15:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1686104116; x=1688696116;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oQUlCOcqt0tuXvcUCaoZv+EjOka/kZ7fKStDDBCleig=;
-        b=q+TsFLfQE4gn0cXqpEsWkLsNprKrqq8d0lYmxTWIi38uAFA2ziC8yx5o/30ncBczrn
-         zLmgXFV/zcNyl9FhreLy3L7DJsJ7E+hRoIj4bQznRSdPefG7jMnHzzoQ5Xn/0kfLegPL
-         hO3hfWhbjtLOYTpkZpFeXMikvagv4kvfPHiq2e0C7uDCC8qd9AJOIhPkTNhO1SJYJtAI
-         y+r3wMfkE/TExvpTLnn1QuvGByptzbVUv+EQEpzJ576IwooDMl/13BjSEYQKAqpmzwYD
-         Q91cRCAHRlV6YEuT/2Wy8hE1qV3spvT7z/V+UxhL8TXfaJmNPhgBfHDiJDovUX8a5e1e
-         eiXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686104116; x=1688696116;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oQUlCOcqt0tuXvcUCaoZv+EjOka/kZ7fKStDDBCleig=;
-        b=VFLZmnCb5FwUDG2pRDvLKXXqPAo+TU9Jp4+RSP8hHoMj42Eqv8VllotpUtDb5RJCDt
-         HkbyPbnJ1oF/PJZOZf16aQUvlMkiYxENjYXhKX+XfcBGhUvEnSChsoKBvzN5Eau2WD4f
-         7GZmwJYqRWYQWKU35IKGFRSwzU0UnNa5jrHehGg0oQgbXkMPetK80i3BmglZkkWQJRdS
-         aH1Xy0//kYXnq7eRANmJfmOy2qisuga7lpg8KuObst7Rk/21wTEwBvzZrVlTSnYFKksW
-         7ijTQhmtCU9WXho3giF0eDDprfRfDU9lBYzKvQpQuQbPVrjTREFgONMVj6A1gGur+rdV
-         NIGw==
-X-Gm-Message-State: AC+VfDxMWE1NU2zzAUJixkMkK3r4bEnDHq0xQHmsAKW9yan3METnAvqX
-        DXFjGlCFhzSM8lEZhNl0WEmy/A==
-X-Google-Smtp-Source: ACHHUZ6vvabNin59tYSUj++K9GAS9dwnlbxvpk5BtcC6SjhWGVfnYwarfgRhemu10fEWP5UF/cCASw==
-X-Received: by 2002:a17:902:db0f:b0:1b0:4bc7:31ee with SMTP id m15-20020a170902db0f00b001b04bc731eemr3975802plx.32.1686104116012;
-        Tue, 06 Jun 2023 19:15:16 -0700 (PDT)
-Received: from dread.disaster.area (pa49-179-79-151.pa.nsw.optusnet.com.au. [49.179.79.151])
-        by smtp.gmail.com with ESMTPSA id p21-20020a170902ead500b00199203a4fa3sm9173051pld.203.2023.06.06.19.15.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 19:15:15 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1q6ihc-008ieJ-1f;
-        Wed, 07 Jun 2023 12:15:12 +1000
-Date:   Wed, 7 Jun 2023 12:15:12 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     Mike Snitzer <snitzer@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Joe Thornber <thornber@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-        linux-ext4@vger.kernel.org, Joe Thornber <ejt@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
-Message-ID: <ZH/oMK7BoBo8a3Hu@dread.disaster.area>
-References: <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
- <ZHFEfngPyUOqlthr@dread.disaster.area>
- <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
- <ZHYB/6l5Wi+xwkbQ@redhat.com>
- <CAJ0trDaUOevfiEpXasOESrLHTCcr=oz28ywJU+s+YOiuh7iWow@mail.gmail.com>
- <ZHYWAGmKhwwmTjW/@redhat.com>
- <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
- <ZHqOvq3ORETQB31m@dread.disaster.area>
- <ZHti/MLnX5xGw9b7@redhat.com>
- <CAG9=OMNv80fOyVixEY01XESnOFzYyfj9j8etHMq_Ap52z4UWNQ@mail.gmail.com>
+        with ESMTP id S234906AbjFGCyk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 22:54:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD06173B
+        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 19:54:39 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 52803635C3
+        for <linux-block@vger.kernel.org>; Wed,  7 Jun 2023 02:54:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F0E1C433EF;
+        Wed,  7 Jun 2023 02:54:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686106478;
+        bh=ILgU1UxJPPw2U0e8MJPoERmpdDm5/OX9dTwMe5P6TYA=;
+        h=Date:Subject:To:References:From:In-Reply-To:From;
+        b=Ese1MqB2ST20jI5fz9R3RdkCdvkwtYRoG7o1J4IdlEPfAKwh//3wrtThB/5U87fmv
+         neK3oLh5ShlzrSO2dzNFnapsXwcMG8TvYEPG4s3wQB3SINx/ENbc13+LxkUc3zQQpc
+         Hr1ZAiRUyHfjX/rgsJI+WbLPe8ZRwaQXzfHlsd9iXTPh2fZhXm+XkK63M+igprs70P
+         MZeytg3FU4UvzA5ZABKJPJImtxsp9sfnp2Gzc8nS/z8O9xArLbwf8HEfaVeRUrFl2B
+         2aUTX17zYeen2hfcs5273ZtuOtA4qhEy8zFv7+yNNRaV6AMGYZzI3iQJ8A+is7en9y
+         HMbm5PGsReH9w==
+Message-ID: <d280e5cc-1114-b65b-83de-a9406d99071c@kernel.org>
+Date:   Wed, 7 Jun 2023 11:54:37 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAG9=OMNv80fOyVixEY01XESnOFzYyfj9j8etHMq_Ap52z4UWNQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: Slow random write access
+To:     Andrew Murray <amurray@thegoodpenguin.co.uk>,
+        linux-block@vger.kernel.org
+References: <CALqELGxfvF-YuU_K7709nN=LPkr5AWQe9ypGH2JZkPosORg9rw@mail.gmail.com>
+Content-Language: en-US
+From:   Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <CALqELGxfvF-YuU_K7709nN=LPkr5AWQe9ypGH2JZkPosORg9rw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 05, 2023 at 02:14:44PM -0700, Sarthak Kukreti wrote:
-> On Sat, Jun 3, 2023 at 8:57 AM Mike Snitzer <snitzer@kernel.org> wrote:
-> > On Fri, Jun 02 2023 at  8:52P -0400,
-> > Dave Chinner <david@fromorbit.com> wrote:
-> > > On Fri, Jun 02, 2023 at 11:44:27AM -0700, Sarthak Kukreti wrote:
-> > > > > The only way to distinquish the caller (between on-behalf of user data
-> > > > > vs XFS metadata) would be REQ_META?
-> > > > >
-> > > > > So should dm-thinp have a REQ_META-based distinction? Or just treat
-> > > > > all REQ_OP_PROVISION the same?
-> > > > >
-> > > > I'm in favor of a REQ_META-based distinction.
-> > >
-> > > Why? What *requirement* is driving the need for this distinction?
-> >
-> > Think I answered that above, XFS delalloc accounting parity on thinp.
-> >
-> I actually had a few different use-cases in mind (apart from the user
-> data provisioning 'fear' that you pointed out): in essence, there are
-> cases where userspace would benefit from having more control over how
-> much space a snapshot takes:
+On 6/6/23 20:37, Andrew Murray wrote:
+> Hello,
 > 
-> 1) In the original RFC patchset [1], I alluded to this being a
-> mechanism for pre-allocating space for preserving space for thin
-> logical volumes. The use-case I'd like to explore is delta updatable
-> read-only filesystems similar to systemd system extensions [2]: In
-> essence:
-> a) Preserve space for a 'base' thin logical volume that will contain a
-> read-only filesystem on over-the-air installation: for filesystems
-> like squashfs and erofs, pretty much the entire image is a compressed
-> file that I'd like to reserve space for before installation.
-> b) Before update, create a thin snapshot and preserve enough space to
-> ensure that a delta update will succeed (eg. block level diff of the
-> base image). Then, the update is guaranteed to have disk space to
-> succeed (similar to the A-B update guarantees on ChromeOS). On
-> success, we merge the snapshot and reserve an update snapshot for the
-> next possible update. On failure, we drop the snapshot.
+> I've been working with an embedded video recording device that writes
+> data to the exfat filesystem of an SD card. 4 files (streams of video)
+> are written simultaneously by processes usually running on different
+> cores.
+> 
+> If you assume a newly formatted SD card, then because exfat clusters
+> appear to be sequentially allocated as needed when data is written (in
+> userspace), then those clusters are interleaved across the 4 files.
+> When writeback occurs, you see a cluster of sequential writes for each
+> file but with gaps where clusters are used by other files (as if
+> writeback is happening per process at different times). This results
+> in a random access pattern. Ideally an IO scheduler would recognise
+> these are cooperating processes, merge these 4 clusters of activities
+> to result in a sequential write pattern and combine into fewer larger
+> writes.
+> 
+> This is important for SD cards, because their write throughput is very
+> dependent on access patterns and size of write request. For example my
+> current SD card and above access pattern (with writes averaging 60KB)
+> results in a write throughput for a fully utilised device of less than
+> a few MB/S. This may seem contrary to the performance claims of SD
+> card manufacturers, but those claims are typically made for sequential
+> access with 512KB writes. Further, the claims made for the UHS speed
+> grades, e.g. U3 and the video class grades, e.g. V90 also assume that
+> specific SD card commands are used to enter a specific speed grade
+> mode (which isn't supported in Linux it seems). In other words larger
+> write accesses and more sequential access patterns will increase the
+> available bandwidth. (The only exception appears to be for the
+> application classes of SD cards which are optimised for random access
+> at 4KB).
+> 
+> I've explored the various mq schedulers (i'm still learning) - though
+> I understand that to prevent software being a bottleneck for fast
+> devices each core (or is that process?) has its own queue. As a result
+> schedulers can't make decisions across those queues (as that defeats
+> the point of mq). Thus implying that in my use-case, where
+> "cooperating processes" are on separate cores, then there is no
+> capability for the scheduler to combine the interleaved writes (I
+> notice that bfq has logic to detect this, though not sure if it's for
+> reads or rotational devices).
+> 
+> I've seen that mq-deadline appears to sort it's dispatch queue (I
+> understand a single queue for the device - so this is where those
+> software queues join) by sector - combined with the write_expire and
+> fifo_depth tunables - then it appears that mq-deadline does a good job
+> of turning interleaved writes to sequential writes (even across
+> processes running on different cores). However it doesn't appear to
+> combine writes which would greatly help.
+> 
+> Many of the schedulers aim to achieve a maximum latency, but it feels
 
-Sounds very similar to the functionality blksnap is supposed to
-provide....
+maximum throughput... Maximizing latency is not something that anyone wants :)
 
-https://lore.kernel.org/linux-fsdevel/20230404140835.25166-1-sergei.shtepa@veeam.com/
+> like for slow devices, then a minimum write latency and ability to
+> reorder and combine those writes across cores would be beneficial.
+> I'm keen to understand if there is anything I've missed? Perhaps there
+> are tuneables or a specific scheduler that fits this purpose? Are my
+> assumptions about the mq layer correct?
+> 
+> Does it make sense to add merging in the dispatch queue (within
+> mq-deadline), is this the right approach?
 
+Try with "none" scheduler, that is no scheduler at all.
 
-> 2) The other idea I wanted to explore was rollback protection for
-> stateful filesystem features: in essence, if an update from kernel 4.x
-> to 5.y failed very quickly (due to unrelated reasons) and we enabled
-> some stateful filesystem features that are only supported on 5.y, we'd
-> be able to rollback to 4.x if we used short-lived snapshots (in the
-> ChromiumOS world, the lifetime of these snapshots would be < 10s per
-> boot).
+> 
+> Thanks,
+> 
+> Andrew Murray
 
-Not sure that blksnap has a "roll origin back to read-only snapshot"
-feature yet, but that's what you'd need for this. i.e. on success,
-drop the snapshot. On failure, "roll origin back to snapshot and
-reboot".
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Damien Le Moal
+Western Digital Research
+
