@@ -2,273 +2,189 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4F6C7EE29
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 02:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE82C7EE29
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 02:15:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234323AbjFGCBj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 22:01:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43008 "EHLO
+        id S240712AbjFGCPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 22:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240531AbjFGCBe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 22:01:34 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D512D196
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 19:01:32 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6b15e510630so2500065a34.3
-        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2023 19:01:32 -0700 (PDT)
+        with ESMTP id S240679AbjFGCPA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 22:15:00 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02328D3
+        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 19:14:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1686104098; x=1717640098;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=9AdQSZ/kIkRyJIKZZWWrNYsguM/iwGeOv0IvcUwDa78=;
+  b=EkU8rF2HNk7rZVQrB9RMwhc0Q54wKVD3n2IOo1mC0amO0HeGCyuFyJY9
+   M+XdTLF1jgqwxdIENcj5TWoAlhC4mwvkZcNjQxlUkrTXhg+9KdTScvyW3
+   DewtZUKOtqoCFgdXTwOjqIbzh94hmFbRkcv+1mmPs2aAn9za4BqhJksrG
+   3QISianaXvN/Yu1TNvLX5t3MfelDsA8KxNwATSNhAHy2fSiUoirdSwS8k
+   4LaoIMwxyo86wFOFCdRDMmpECoyimq1bjY8ZTSNO1eLcNR7c39PKAMlhY
+   BJVxlszPhTCWICUAQChgG51i3fjLgp4aRS1xzM6qmyEUhYY8ypONzG+pt
+   w==;
+X-IronPort-AV: E=Sophos;i="6.00,222,1681142400"; 
+   d="scan'208";a="231073696"
+Received: from mail-dm6nam10lp2108.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.108])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Jun 2023 10:14:57 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YcXYaB12tTlXgWWfJGaKmwb/Hia597S14U4izvyWx5pA1vI0mbv8bichUKdeJNxrWsv5/tg9WLexA6aDiDS115emfIjFpQ6uIuyAkY/+bpu9ze3dVlpu9fx97oiVcE5A6l2+4NjvZYLWRrI8mH5fb9wj/rz4utMANRj6XNARq9N+D1sdGp5GX7MCLxn9P11singqVR+f6CL41CR3mdY8K8CKQT9VqAwk7ouPOIiYjuajfA4b0a9V3RBDF/byx7hz3Nn2MaTb2sfZ3DVdagqH8HY6ecUOorwn03GDeag6+uUgZo9jmadHnQmzWyeYgmwAqsHdkpIhGp4u69KViDg+hQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VM0JERZO3ES07e+gv0Mvnt4cwvWGgX1UGMDBkhWZSP4=;
+ b=OesTCO5aNSxcNCMD1dlBCbavlKX6buQDrINDvdlefmupuE8bSqk0ZMR4xkiZHe9n1Fp3zdo7XTl5pPJgCwIaIMIUA3IsWsVqqnOpM+LOVmPijmHDp4Lg6X+7SaMOJrokrY212cw+/G9kUqAPbXRKvBkZRZe+dxCaiI+nxKqFXQZwFLvMxwlTNayyBEIHUSqCZGWWGbiFxSrYG11njBzOeQHd82Juo1br8YGkMalmx3MlUlvhNwUCiDCigazKBZ8625RolKU+dL3Wq06qkfBDZgGBzWrHsmTILV6WLxGGaxYcgUbTI9my7aKOUOS37sTWo9IZvkpwURKJ5MFQfOMJaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1686103291; x=1688695291;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=j5Cy8tBCL9F/0/npHcEhwYUjt7WcWHdplqXcZoUtV+0=;
-        b=S38JhUY0rjGS8/ejnAM445GcScFR7303fsI7enooXy8aNW0507nQpNQhvO3u3E3lif
-         e60ZRwPp5ITPRpOhi6O7xOnkHrs3vMFzOOaqIzEvAs2Hxy3fCcjCl5yPImkw1L/tuZO3
-         rsgcvEWpJuoUxcbOGL9O4zkuhdrGp/WHrISPsZzNhhNFWYmFj9dsztrtXUgxqcFtpE8I
-         uWGXHvcab1fBbvJZWotAME4Z6VIN2YnnSEjsxv5DF0P3PcXeicy02gd3DQWsYBdR4Y/A
-         FroVS5zqewrJgH81ZL3YfdrvOWUJ98tTmrk04tCNxDyIpeJD1JKKXQvG1IPKG+PqFQPc
-         8PpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686103291; x=1688695291;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j5Cy8tBCL9F/0/npHcEhwYUjt7WcWHdplqXcZoUtV+0=;
-        b=HQjfi2AGEpntzeqZN65dCRjxpFgX3R/cERvJfum1E/cmBpLENO6Q9S3vyjyrg1slaj
-         12tdpXeIGRSmGYW55WRJBgAJ3JCI15VNWogqWqW/9uUjQSYFnb3hMPjocGOdlJGJTD8O
-         +Ej6JaTjBm2IZ+biWrRzTDpghROFgos29q5J7QlOjU3bb9skxDBWOXRiF0s7wBkCIZpK
-         ARm3a0Wgn9ziXYhCFp4hCEjNmKxKGajXUnG+ZyoqXPGmbwyfvJFOgA/oPdGTYShMrHiV
-         glJsDdqlJFETVSCR5w82wiqOKSnXrFVXkSg3RuwchM8TCsJza8reNC8Za95xV049aGFo
-         eomg==
-X-Gm-Message-State: AC+VfDytBIP/qPZcGm1hOu62Q8ybqh3Mnno5bd/LFBIJVH+E4rSiAsF1
-        8VBBxra6WHZOcmLamZdHGFRyTw==
-X-Google-Smtp-Source: ACHHUZ5VYVq+3IAbaiVsgoydY4WCLUW/jBSbIonSM1lHWrf78Rur1YGuoiyya2F8GsBWigs9zYnexA==
-X-Received: by 2002:a05:6358:c525:b0:123:4444:e5f8 with SMTP id fb37-20020a056358c52500b001234444e5f8mr141321rwb.18.1686103290958;
-        Tue, 06 Jun 2023 19:01:30 -0700 (PDT)
-Received: from dread.disaster.area (pa49-179-79-151.pa.nsw.optusnet.com.au. [49.179.79.151])
-        by smtp.gmail.com with ESMTPSA id q66-20020a17090a1b4800b002533ce5b261sm220132pjq.10.2023.06.06.19.01.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jun 2023 19:01:29 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1q6iUI-008iUT-2e;
-        Wed, 07 Jun 2023 12:01:26 +1000
-Date:   Wed, 7 Jun 2023 12:01:26 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Joe Thornber <thornber@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>, dm-devel@redhat.com,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-        linux-ext4@vger.kernel.org, Joe Thornber <ejt@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
-Message-ID: <ZH/k9ss2Cg9HYrEV@dread.disaster.area>
-References: <ZHB954zGG1ag0E/t@dread.disaster.area>
- <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
- <ZHFEfngPyUOqlthr@dread.disaster.area>
- <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
- <ZHYB/6l5Wi+xwkbQ@redhat.com>
- <CAJ0trDaUOevfiEpXasOESrLHTCcr=oz28ywJU+s+YOiuh7iWow@mail.gmail.com>
- <ZHYWAGmKhwwmTjW/@redhat.com>
- <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
- <ZHqOvq3ORETQB31m@dread.disaster.area>
- <ZHti/MLnX5xGw9b7@redhat.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VM0JERZO3ES07e+gv0Mvnt4cwvWGgX1UGMDBkhWZSP4=;
+ b=zJjacl0ESFs4Dmg5ONK3d7yQg/KSpDlFMQz8ZWsmYT4bjJYpvLrgFgswxZ5zqT7Md+XJr+71HURlgD6y1gWdlse/j7vgi04mcLKuZzzYPhX9ASAlRvYQ9AE9mLaE8nirkLYyonOA3FpjXzIfai4zRmPFhLPiB/jjx82fitVovb4=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BL3PR04MB8155.namprd04.prod.outlook.com (2603:10b6:208:34a::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6455.33; Wed, 7 Jun 2023 02:14:55 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::eb0e:1bef:f266:eceb]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::eb0e:1bef:f266:eceb%3]) with mapi id 15.20.6455.028; Wed, 7 Jun 2023
+ 02:14:55 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+CC:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Yang Xu <xuyang2018.jy@fujitsu.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH blktests] nvme/{016,017}: use _check_genctr instead of
+ _filter_discovery
+Thread-Topic: [PATCH blktests] nvme/{016,017}: use _check_genctr instead of
+ _filter_discovery
+Thread-Index: AQHZk1w9J1fvV9jcWESv88AeU5E84q9z3PqAgAkERoCAAEOxAIAAOVAAgAFGoAA=
+Date:   Wed, 7 Jun 2023 02:14:55 +0000
+Message-ID: <zcko3ff67h3tilz6smfqhy6cxwihzzl74kdap52aoo3pm6an6v@4fxn2ymekely>
+References: <1685495221-4598-1-git-send-email-xuyang2018.jy@fujitsu.com>
+ <6fbgjc5ykve3jyko4vlzudrnwueou4ehgn6n2dtihjko3qv7ww@sqlyuxx4ijt5>
+ <446c46d8-fbc7-ecd2-8efa-1c9497e16851@grimberg.me>
+ <eadb2514-f06d-7cb2-2cdb-04a6226edac8@nvidia.com>
+ <18855542-e07b-70c0-ccd9-2fa0f0d2df86@grimberg.me>
+In-Reply-To: <18855542-e07b-70c0-ccd9-2fa0f0d2df86@grimberg.me>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BL3PR04MB8155:EE_
+x-ms-office365-filtering-correlation-id: e80e9490-3f91-4909-e9d4-08db66fcfc2a
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JqP0wCYvLHex0qSdxA97URlDiIxs+q42SZMKsM++yUkbFRGZXtutmfIsOFVoewK8T2BWv+Vo5m3vFlsQtxZB3gulAEgh779dvP56gOqDNudtBBHyEt6snaPktcmvjAfPBSk+tZvuAp3polqniUUJJipYmt5JPughn/na3A58Fgi4hOB+RjSvpa2u5d8/z/DbNB9mhCxYhdhC5IU2d3r+8EIGR/zd+FTftelUL4bJjbDh5T0UpnDL8e5mkDqeN/SnpgK+gAqg/cUsHka4Z2AFyWD3bz0d5O18Jpj7P7B4n6A6C20s3TCiwzMXJntw6MQf1xvCwMY5ivmaqfHV49odAZ1ta7oJOHEwRfQC1VzmQb2KKg1N1vhNxMEsaHatbf+RouML1lSISc3piIr+nykDWSzNm3qVTPnGzFNP5Jley9BFgATRbtABIECvHuJDv+RBQ38ytgtUM1YqnUCK+RVs+/BLSqvwZsj1tsIDer3O5ZZvrMB9hSTkb7Bx12vNNs/X6iyhaPIj0nEP2W+6VBPYcXLneJGRMsl8uxPw7NoRviSX9yXEuxGsyeCGS5CmjT2KC37wsku2YFhriIVhu4dPo+wfzKNVUyWN2KiMJNcQGMA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(39860400002)(136003)(396003)(346002)(366004)(376002)(451199021)(86362001)(83380400001)(478600001)(44832011)(54906003)(82960400001)(5660300002)(8936002)(8676002)(316002)(122000001)(38070700005)(66446008)(66946007)(66476007)(76116006)(66556008)(91956017)(4326008)(38100700002)(6916009)(41300700001)(64756008)(6486002)(71200400001)(2906002)(6506007)(6512007)(26005)(9686003)(33716001)(186003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zSwDqoJ6V7t/a4eVl1nyqDtQZuW6zgmXC+BsMNBFeoELLBGD+p03aD+bwXxc?=
+ =?us-ascii?Q?B2bGkzRccOcFyPpLpPm21vVoExiJ5vigorGPLpMbxNABWWtWeUS8BQoBbwGd?=
+ =?us-ascii?Q?jB+XwU2If5aUbrz/pgvRD7qOFBdn0WBhdf70hPMki21h07gjUttAoPZDrK7R?=
+ =?us-ascii?Q?zS2iQmm1pbCo3vMFWQqawBcHL+23v8box5sPXR9H5eQGMGzRkd+HCxot9nji?=
+ =?us-ascii?Q?UDD3Ug4U3dLB1Q/XtumfGsYWJ1yKWk9ulVm1A/3Xy8yUPojdG6W77Jh0gmuE?=
+ =?us-ascii?Q?I4vKHbi+uz/xqLzNXSGOLzQyRtL86kt7J6Ko0raAOFjOr9aAFF8BdLdTTwwz?=
+ =?us-ascii?Q?slXKrTyU+8dFCm9num3Dd4xsjT+na+Sq79BVQFlEAsc4M/bd3Z/7K/0LBHYV?=
+ =?us-ascii?Q?y6phO42CMyuuhsxdWjFpSULcRdNm/0EzT+sVW3qGvISW3yqyosRawgE6JVyy?=
+ =?us-ascii?Q?1SAi8oGJDLmVB8HAV2TrolbL3D+cvFcW4KkQZwA9NQVKC75A7fPjXhANygTu?=
+ =?us-ascii?Q?6StKZ0zCBNJOGzdLPIehgOCQm/+lWynClCuOroY8J5IC4wuge/MVvrSnyxeQ?=
+ =?us-ascii?Q?szz5AW+GQn9K2UjZndyK6gNzYxOSMxbFELIuq1R0+CUXaWRPZpcrDvakf1ir?=
+ =?us-ascii?Q?vzD6MN1jiEh7Kb3lj7o6+NdTU88BfW076KjXSslUqnL5bF5/qlLFwdW+C25Z?=
+ =?us-ascii?Q?x9hgHbV1EUXCyR0sIcP3roHw8zv4KgyN1U8gkohuGR5Jd3dyp2jmnICF66kT?=
+ =?us-ascii?Q?a3tQ8VZX/WBDJ3BP+HfIikB8pn+P2VE0Hdf+Ln4xlVRm/Hdeoeq7q3mKQZyA?=
+ =?us-ascii?Q?ABrZ8e1l+fl39+rWrKgs24lEz2iQh7JceR98vLHEmvt+Gp+ta5RHylsMH7ls?=
+ =?us-ascii?Q?rdTg0yJqiToydXyo4vmT/ou/XU1z80CoAXm/qzYC9fgmKQ+WJT66UYo6Cm4x?=
+ =?us-ascii?Q?dyDjtgsEBKA2avJAbN7z+e1unhDUzP+E1DaAvlYtaixLl+W4IRsROEaN2e51?=
+ =?us-ascii?Q?7u6/gf7Y6/b1Sei1LixgCTq+QQHqvdTDJDdbxLm/Q8rEpsCdD2tZeOVF65i8?=
+ =?us-ascii?Q?UO8zzNczXqhrUGz5b3sdFf/dV1SZGqOT8Oo69Amm43jJP3fxVMAE8PU5t1O7?=
+ =?us-ascii?Q?u4uaHadW6mpJZX0JAqqPxiGMpje6kh12pC8sj5O+Spd7dB7AJI9hDxfplLv7?=
+ =?us-ascii?Q?Zprp81jbqVus369Bj5TwzGVBcAu8VwofpLJ2/1oSfLddgRbmJq4jI9YfF8w6?=
+ =?us-ascii?Q?2aFv4gvSjewNlXYNDjmJCzVPILstAOut1NN/SOFeXXzw985DMwuHVNnO8lVV?=
+ =?us-ascii?Q?bI/3M9nIhAh0IkUt/h1RaguNSwrRWxq+cluaLQYyz7k/cjyy6H151+Bh5+0E?=
+ =?us-ascii?Q?RMWC1M2nzjJz8PT6yx04SkBLLo3SM3GJihsSS2znLN+4TWsT8H+b+d6E8N53?=
+ =?us-ascii?Q?cBHnW+ZK9gZa69zamwFOTQ4HzolTQlZQU4CHQp5V7MHR2yPh5vKPkmGic80D?=
+ =?us-ascii?Q?ua9BLCTMuKGS/XLI2BqtNqENpl5foFpDuTu2i8A3GKM1JpJ12oNn0YVIH45Z?=
+ =?us-ascii?Q?84f1ff/DZ24UYKcQ1oq96ZYHwv09FJW1MR2gtjoh3PdtWX1SBE//FFt/q9CT?=
+ =?us-ascii?Q?pc95pK1QScjSuHZGrylIQQ0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <38289B5CE886D342865409E3778C21AE@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZHti/MLnX5xGw9b7@redhat.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: jCctYoPx3acKMPRFYl0+2wDD+UqOrIa4QTMGOUQW8Ab4UXkltptu4aNwxTrxi4v8LRRr9T5GA/GAlEMOk587jCUWQJ39zVmNdaaCsK0V5rPUDR8aduIicpysMychAlY792mvm/8QFHbncgtMiSAvy98nhcVgiA1cexhTTznAj6kTUeO0dsQ429B+eCpt1Vh9GS8gT9iL4YOSS641taCHgXIWgB0yrSEky7iY56X9JtS6csNB7vga1tHkHn3vJUlpjpN0rOJGi5l1iNtrc+4LVPaWKL2qnRWLmZAaix0TGZU1+rav4bor0DpF6MgyZPqOA/VlGFcI7gEAMKrQTLzF0VxNnRuMuIv0n8hkusu+DjosZol8EsMRh5HJE/ZDfqkZDPv4WrB0WuMJ7d2swX621wvhSbJG2syb6oPng4Pesr2zwSphikjJhesoWa6JI+JnBRBHIcaqgEl6QCc4hChXngoXS+MaAgnDTyNMD6Q4qeQ/Go/6SROHoWmnzEkc+qNXZ50In79cp42PrxbU6fGYJkU51oNN3/udnWXCagd+hWhVDjVupK4j5XAqJQd4CNEx198IZCwP6nCO0XCixauB9rRbNPo2HB4DRLNR4wkKDqo46Do2khN9ZKye+O7dLYzCL6ugd6uNc/TMvGGEHXtHRf5rQdaQzXIj9tAXSfCugKhECk0jrJUGRBAb8ijTRCSZx6YRelMqCJfnH4B8Yaj5xvqjExSZRdRkPJlInOSmbS1GtqBJWG3wINxzEtXdlp29y37Gr/cnwK6AkjhAddrE5nmd58Lb+bwiPUlnS48OCq2CEIGmFfsmG9HLp5+9j5XHx4SbtSN4UrwIG0F7lHYcc8WCf2a21YN5ihwwynvdoKXxNEaEFOBICAtxTbfYPKedP3By3xIRt3lTVpSDaL3RTbQegN7F/8FPJvNi/FWujYg=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e80e9490-3f91-4909-e9d4-08db66fcfc2a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2023 02:14:55.1502
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: L6DxoYen2OoeZiHrGROwWq5QNQEMmbFZieYiJplBO2Ej76uOb8JAt8lm2eZtU/YFqmUrwi6wbCi8qCHZMGw1AjVwHIQZlBsqqZP/upcCM1I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR04MB8155
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 03, 2023 at 11:57:48AM -0400, Mike Snitzer wrote:
-> On Fri, Jun 02 2023 at  8:52P -0400,
-> Dave Chinner <david@fromorbit.com> wrote:
-> 
-> > On Fri, Jun 02, 2023 at 11:44:27AM -0700, Sarthak Kukreti wrote:
-> > > On Tue, May 30, 2023 at 8:28 AM Mike Snitzer <snitzer@kernel.org> wrote:
-> > > >
-> > > > On Tue, May 30 2023 at 10:55P -0400,
-> > > > Joe Thornber <thornber@redhat.com> wrote:
-> > > >
-> > > > > On Tue, May 30, 2023 at 3:02 PM Mike Snitzer <snitzer@kernel.org> wrote:
-> > > > >
-> > > > > >
-> > > > > > Also Joe, for you proposed dm-thinp design where you distinquish
-> > > > > > between "provision" and "reserve": Would it make sense for REQ_META
-> > > > > > (e.g. all XFS metadata) with REQ_PROVISION to be treated as an
-> > > > > > LBA-specific hard request?  Whereas REQ_PROVISION on its own provides
-> > > > > > more freedom to just reserve the length of blocks? (e.g. for XFS
-> > > > > > delalloc where LBA range is unknown, but dm-thinp can be asked to
-> > > > > > reserve space to accomodate it).
-> > > > > >
-> > > > >
-> > > > > My proposal only involves 'reserve'.  Provisioning will be done as part of
-> > > > > the usual io path.
-> > > >
-> > > > OK, I think we'd do well to pin down the top-level block interfaces in
-> > > > question. Because this patchset's block interface patch (2/5) header
-> > > > says:
-> > > >
-> > > > "This patch also adds the capability to call fallocate() in mode 0
-> > > > on block devices, which will send REQ_OP_PROVISION to the block
-> > > > device for the specified range,"
-> > > >
-> > > > So it wires up blkdev_fallocate() to call blkdev_issue_provision(). A
-> > > > user of XFS could then use fallocate() for user data -- which would
-> > > > cause thinp's reserve to _not_ be used for critical metadata.
-> > 
-> > Mike, I think you might have misunderstood what I have been proposing.
-> > Possibly unintentionally, I didn't call it REQ_OP_PROVISION but
-> > that's what I intended - the operation does not contain data at all.
-> > It's an operation like REQ_OP_DISCARD or REQ_OP_WRITE_ZEROS - it
-> > contains a range of sectors that need to be provisioned (or
-> > discarded), and nothing else.
-> 
-> No, I understood that.
-> 
-> > The write IOs themselves are not tagged with anything special at all.
-> 
-> I know, but I've been looking at how to also handle the delalloc
-> usecase (and yes I know you feel it doesn't need handling, the issue
-> is XFS does deal nicely with ensuring it has space when it tracks its
-> allocations on "thick" storage
+On Jun 06, 2023 / 09:45, Sagi Grimberg wrote:
+>=20
+> > > > On May 31, 2023 / 09:07, Yang Xu wrote:
+> > > > > Since commit 328943e3 ("Update tests for discovery log page chang=
+es"),
+> > > > > blktests also include the discovery subsystem itself. But it
+> > > > > will lead these cases fails on older nvme-cli system.
+> > > >=20
+> > > > Thanks for this report. What is the nvme-cli version with the issue=
+?
+> > > >=20
+> > > > >=20
+> > > > > To avoid this, like nvme/002, use _check_genctr to check instead =
+of
+> > > > > comparing many discovery Log Entry output.
+> > > > >=20
+> > > > > Signed-off-by: Yang Xu <xuyang2018.jy@fujitsu.com>
+> > > >=20
+> > > > The change looks fine to me, but I'd wait for comments by nvme
+> > > > developers.
+> > >=20
+> > > I'm ok with this change, but IIRC Chaitanya wanted that we keep check=
+ing
+> > > the full log-page output...
+> >=20
+> > the original testcase was designed to validate the log page internals
+> > and  that correctness cannot be established without looking into the lo=
+g
+> > page.
 
-Oh, no it doesn't. It -works for most cases-, but that does not mean
-it provides any guarantees at all. We can still get ENOSPC for user
-data when delayed allocation reservations "run out".
+I think nvme/016 and 017 still have value even without the log-page output
+checks. They exercise namespace creations and deletions which other test
+cases don't.
 
-This may be news to you, but the ephemeral XFS delayed allocation
-space reservation is not accurate. It contains a "fudge factor"
-called "indirect length". This is a "wet finger in the wind"
-estimation of how much new metadata will need to be allocated to
-index the physical allocations when they are made. It assumes large
-data extents are allocated, which is good enough for most cases, but
-it is no guarantee when there are no large data extents available to
-allocate (e.g. near ENOSPC!).
+> >=20
+> > but given that how much churn this is generating eveytime something
+> > changes in nvme-cli or in kernel implementation I'm really wondering is
+> > that worth everyone's time ?
+> >=20
+> > Sagi/Shinichiro any thoughts ?
+>=20
+> Also back then I thought it'd create churn because the log page output
+> is not an interface.
 
-And therein lies the fundamental problem with ephemeral range
-reservations: at the time of reservation, we don't know how many
-individual physical LBA ranges the reserved data range is actually
-going to span.
+So, we should drop the log page output check, and it means that Yang's patc=
+h is
+the choice.
 
-As a result, XFS delalloc reservations are a "close-but-not-quite"
-reservation backed by a global reserve pool that can be dipped into
-if we run out of delalloc reservation. If the reserve pool is then
-fully depleted before all delalloc conversion completes, we'll still
-give ENOSPC. The pool is sized such that the vast majority of
-workloads will complete delalloc conversion successfully before the
-pool is depleted.
-
-Hence XFS gives everyone the -appearance- that it deals nicely with
-ENOSPC conditions, but it never provides a -guarantee- that any
-accepted write will always succeed without ENOSPC.
-
-IMO, using this "close-but-not-quite" reservation as the basis of
-space requirements for other layers to provide "won't ENOSPC"
-guarantees is fraught with problems. We already know that it is
-insufficient in important corner cases at the filesystem level, and
-we also know that lower layers trying to do ephemeral space
-reservations will have exactly the same problems providing a
-guarantee. And these are problems we've been unable to engineer
-around in the past, so the likelihood we can engineer around them
-now or in the future is also very unlikely.
-
-> -- so adding coordination between XFS
-> and dm-thin layers provides comparable safety.. that safety is an
-> expected norm).
->
-> But rather than discuss in terms of data vs metadata, the distinction
-> is:
-> 1) LBA range reservation (normal case, your proposal)
-> 2) non-LBA reservation (absolute value, LBA range is known at later stage)
-> 
-> But I'm clearly going off script for dwelling on wanting to handle
-> both.
-
-Right, because if we do 1) then we don't need 2). :)
-
-> My looking at (ab)using REQ_META being set (use 1) vs not (use 2) was
-> a crude simplification for branching between the 2 approaches.
-> 
-> And I understand I made you nervous by expanding the scope to a much
-> more muddled/shitty interface. ;)
-
-Nervous? No, I'm simply trying to make sure that everyone is on the
-same page. i.e. that if we water down the guarantee that 1) relies
-on, then it's not actually useful to filesystems at all.
-
-> > It's just not practical for the block device to add arbitrary
-> > constraints based on the type of IO because we then have to add
-> > mechanisms to userspace APIs to allow them to control the IO context
-> > so the block device will do the right thing. Especially considering
-> > we really only need one type of guarantee regardless of where the IO
-> > originates from or what type of data the IO contains....
-> 
-> If anything my disposition on the conditional to require a REQ_META
-> (or some fallocate generated REQ_UNSHARE ditto to reflect the same) to
-> perform your approach to REQ_OP_PROVISION and honor fallocate()
-> requirements is a big problem.  Would be much better to have a flag to
-> express "this reservation does not have an LBA range _yet_,
-> nevertheless try to be mindful of this expected near-term block
-> allocation".
-
-And that's where all the complexity starts ;)
-
-> > Put simply: if we restrict REQ_OP_PROVISION guarantees to just
-> > REQ_META writes (or any other specific type of write operation) then
-> > it's simply not worth persuing at the filesystem level because the
-> > guarantees we actually need just aren't there and the complexity of
-> > discovering and handling those corner cases just isn't worth the
-> > effort.
-> 
-> Here is where I get to say: I think you misunderstood me (but it was
-> my fault for not being absolutely clear: I'm very much on the same
-> page as you and Joe; and your visions need to just be implemented
-> ASAP).
-
-OK, good that we've clarified the misunderstandings on both sides
-quickly :)
-
-> I was taking your designs as a given, but looking further at: how do
-> we also handle the non-LBA (delalloc) usecase _before_ we include
-> REQ_OP_PROVISION in kernel.
-> 
-> But I'm happy to let the delalloc case go (we can revisit addressing
-> it if/when needed).
-
-Again, I really don't think filesystem delalloc ranges ever need to
-be covered by block device provisioning guarantees because the
-filesystem itself provides no guarantees for unprovisioned writes.
-
-I suspect that if, in future, we want to manage unprovisioned space
-in different ways, we're better off taking this sort of approach:
-
-https://lore.kernel.org/linux-xfs/20171026083322.20428-1-david@fromorbit.com/
-
-because using grow/shrink to manage the filesystem's unprovisioned
-space if far, far simpler than trying to use dynamic, cross layer
-ephemeral reservations.  Indeed, with the block device filesystem
-shutdown path Christoph recently posted, we have a model for adding
-in-kernel filesystem control interfaces for block devices...
-
-There's something to be said for turning everything upside down
-occasionally. :)
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Chaitanya, is it ok for you?=
