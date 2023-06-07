@@ -2,52 +2,73 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F409BC7EE23
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 07:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C034C7EE43
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 07:45:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238437AbjFGHkF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 03:40:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37442 "EHLO
+        id S231890AbjFGHp5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 03:45:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238408AbjFGHjc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 03:39:32 -0400
+        with ESMTP id S234874AbjFGHoe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 03:44:34 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C3A30FF;
-        Wed,  7 Jun 2023 00:37:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1041FC8;
+        Wed,  7 Jun 2023 00:42:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=uFJ/YLyasn02ccX4eOnPN90GJE
-        ZXSadDNXdmXgzlGpqxVfyn1LuXll8QWajHB1C5k42xmowA61EKHp8hHIsBaGIexP1cMN1und6YZjn
-        cguL618L/Wv6O7jrl3wD75Wwz+uKZB2ZaNlH77W/+4k5YsIxLzbLCMqSJtUgzGFCR+XkNZrKF6jj0
-        FKZVtUfXntHxrLzfUABYRjeZl7mMwWx2aHPA51P3yyMFD0TFpHWhOhJ7U91wSopztEd0FdL+rWj2w
-        KqLAZF+DmQXepg0oqUG85ajHHSP2m9ZS7NB3oSgIX0w8i7ghkNI1HqsBnNGLgMJOXKlRvNDEWTo8g
-        N+cnR/Rw==;
+        bh=OM0BuqqlawJryT9IX33+CW481h0jO+pL7fC3zg1G8M0=; b=Dwam7ai2Hae6B/IyWvM+6/4d4U
+        p1tzeI8V42Mp6UhB++W7VYusnoAtCzwBtZk2ORH+/kHpvZjMdvQTWp22BaTT2CT4Asp2/vjwmnDAW
+        4+t2O8KUOLuF8mK1xspDlcoWayDBpfhVZF/kaT7mp/sxc4TqtaUdeMQstgztfMxeXljLCKbYtNGm0
+        rsaIkR+DqpE2+hmPGKGdoZEojIBhwr5eCe1UOtaQamCLWia8dZv4RQzyuC2WPbII3siuQMYxhT0K/
+        6IA0O8xrKNXavDlT9BOuv6sjNWDK6dhQMHfzVCqusXh5VEPi/X2AWFEpueZz7Lly2Oj65xdzkh26O
+        L6co5k5g==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q6njY-004lfP-37;
-        Wed, 07 Jun 2023 07:37:32 +0000
-Date:   Wed, 7 Jun 2023 00:37:32 -0700
+        id 1q6no3-004mhI-09;
+        Wed, 07 Jun 2023 07:42:11 +0000
+Date:   Wed, 7 Jun 2023 00:42:11 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Zhong Jinghua <zhongjinghua@huaweicloud.com>
-Cc:     josef@toxicpanda.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org,
-        zhongjinghua@huawei.com, yi.zhang@huawei.com, yukuai3@huawei.com,
-        yangerkun@huawei.com
-Subject: Re: [PATCH -next] nbd: Add the maximum limit of allocated index in
- nbd_dev_add
-Message-ID: <ZIAzvKZuGrcQUx82@infradead.org>
-References: <20230605122159.2134384-1-zhongjinghua@huaweicloud.com>
+To:     Demi Marie Obenour <demi@invisiblethingslab.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
+ device
+Message-ID: <ZIA004HDuhoTQzY/@infradead.org>
+References: <20230601222656.2062-1-demi@invisiblethingslab.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230605122159.2134384-1-zhongjinghua@huaweicloud.com>
+In-Reply-To: <20230601222656.2062-1-demi@invisiblethingslab.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+> +++ b/block/genhd.c
+> @@ -1502,3 +1502,4 @@ void inc_diskseq(struct gendisk *disk)
+>  {
+>  	disk->diskseq = atomic64_inc_return(&diskseq);
+>  }
+> +EXPORT_SYMBOL(inc_diskseq);
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I really do not like exporting this as a lowlevel function.  If we
+increment the sequence it should be part of a higher level operation.
+
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1205,6 +1205,12 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+>  	if (!part_shift)
+>  		set_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+>  	mutex_lock(&lo->lo_mutex);
+> +
+> +	/*
+> +	 * Increment the disk sequence number, so that userspace knows this
+> +	 * device now points to something else.
+> +	 */
+> +	inc_diskseq(lo->lo_disk);
+
+And I'm not sure why we even need this.  __loop_clr_fd
+already calls disk_force_media_change, which calls inc_diskseq.
+Why do we need an extra increment?
 
