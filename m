@@ -2,92 +2,107 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B61C77B7A
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 01:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29152C77B7A
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 01:29:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240462AbjFGBVN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Jun 2023 21:21:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58014 "EHLO
+        id S240449AbjFGB3O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Jun 2023 21:29:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240479AbjFGBVI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 21:21:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 598DF10D4
-        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 18:20:20 -0700 (PDT)
+        with ESMTP id S240457AbjFGB3J (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Jun 2023 21:29:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D221981
+        for <linux-block@vger.kernel.org>; Tue,  6 Jun 2023 18:28:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686100819;
+        s=mimecast20190719; t=1686101300;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qGEHQH/dGpmg+Jhug+Ls4D+Tdbcp6OnKOZC6+fEmDVg=;
-        b=FxLZuwXpYZ97yhP4RqRe4NW80GbU4uRUNdAgZhjkMBzkUDGGfhnuQOZZ/fLUw9OBqjPkuN
-        SDZWZOOp4PaB/CtZkV5QArGp9JoM7LUMvMAeTQBfYX4dqnvgATWxcEAWJubZ98NBNaNJUD
-        mxaoq9/9CHzRdEO5metdjUS0soaq32E=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-VRq3IN4gOuiWE_TZbp4z1Q-1; Tue, 06 Jun 2023 21:20:17 -0400
-X-MC-Unique: VRq3IN4gOuiWE_TZbp4z1Q-1
-Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-43b4987f917so33932137.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Jun 2023 18:20:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686100817; x=1688692817;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qGEHQH/dGpmg+Jhug+Ls4D+Tdbcp6OnKOZC6+fEmDVg=;
-        b=hRwSGidBCdfg2qF23dSBYUtMTA11ly8L2od81zWayrAr2fRWAKqvgoJCQSkFU/a6fD
-         vTEs39Yu7AeuGEGhvqx32ysdy3Xd+e/YHstjNz56kZrdN24ASy6TZ6LFzoogbBkXHFvg
-         OgClNUgAwjMBv6e3Z2fnwVZdaKmGIsl3AOOFLpW5z4D7+LsjV1Fhqbfse+cMUDu6jLJn
-         MERxtD7e5A924i77FeVavarh0RYO8Hg67oWi3oL7GsMryX0uZ1jl0vBUFbmvMtFaPytN
-         iEp1tRsiLecY2rGCAzIC533wJ3/ZwIbx6B9pms7O7bBx+4tXMssuIwEpRS3BHvnBCeLX
-         wFoA==
-X-Gm-Message-State: AC+VfDzktTHnLfK65FWbo+aJmB3E+Yj8AXUlQqGschxOJFXqczxd89O0
-        X0ba3koMdWg61txwP7Ck+JVqpVX/hdm3NheoMZHChGds2TrtTrrYxhTrGBB2JXKkQBNXjRzg5a1
-        H2nfQvZ5Z8QwsIOm5sPyHmcVKkSoVn42e+R1jXks=
-X-Received: by 2002:a05:6102:5121:b0:425:cf4e:f58 with SMTP id bm33-20020a056102512100b00425cf4e0f58mr1593143vsb.2.1686100817283;
-        Tue, 06 Jun 2023 18:20:17 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4tvkBBtCkFMOto9z7RJD3p455MoOxxtmj42Gna8mX89BjHPvyAtv78zxYrHdGdjJ3nV0tmgoKXvgVFgV7tXH4=
-X-Received: by 2002:a05:6102:5121:b0:425:cf4e:f58 with SMTP id
- bm33-20020a056102512100b00425cf4e0f58mr1593137vsb.2.1686100817038; Tue, 06
- Jun 2023 18:20:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230606193845.9627-1-mwilck@suse.com>
-In-Reply-To: <20230606193845.9627-1-mwilck@suse.com>
+        bh=1h0nXm4obQWr/nMN17xlxThI6u2crQzlPISlM1jWir0=;
+        b=XaAwKWI8M34st32pDbwA7SxRgVZ813Ujx0f0R6yXS5VQ3Nb/7TkkY2TtQ9OB1A5Bs7rTZg
+        H1JeEA47bkMUCZuN0+OPdGJM1FFV8I46CgFBDrApLt8ESwg4YkskKGzssqp5yISTiVLyA3
+        KTx/yUieOnRU3OVXpzVqDqye3iMwh5Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-583-ITxAbywmO4unISCQRha-2w-1; Tue, 06 Jun 2023 21:28:17 -0400
+X-MC-Unique: ITxAbywmO4unISCQRha-2w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1DEC5801182;
+        Wed,  7 Jun 2023 01:28:17 +0000 (UTC)
+Received: from ovpn-8-23.pek2.redhat.com (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E961440D1B66;
+        Wed,  7 Jun 2023 01:28:12 +0000 (UTC)
+Date:   Wed, 7 Jun 2023 09:28:08 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-Date:   Wed, 7 Jun 2023 09:20:06 +0800
-Message-ID: <CAFj5m9+2jejQr2ZM=Nre0__n3Fjc8OyDphm=GnPTbHC_gCHUrg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] scsi: fixes for targets with many LUNs
-To:     mwilck@suse.com
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Waiman Long <longman@redhat.com>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-cgroup: Reinit blkg_iostat_set after clearing in
+ blkcg_reset_stats()
+Message-ID: <ZH/dKFnTIHZqsjQa@ovpn-8-23.pek2.redhat.com>
+References: <20230606180724.2455066-1-longman@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230606180724.2455066-1-longman@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 7, 2023 at 3:38=E2=80=AFAM <mwilck@suse.com> wrote:
->
-> From: Martin Wilck <mwilck@suse.com>
->
-> This patch series addresses some issues we saw in a test setup
-> with a large number of SCSI LUNs. The first two patches simply
-> increase the number of available sg and bsg devices. The last one
-> fixes an large delay we encountered between blocking a Fibre Channel
-> remote port and the dev_loss_tmo.
->
-> Changes v1 -> v2:
->  - call blk_mq_wait_quiesce_done() from scsi_target_block() to
->    cover the case where BLK_MQ_F_BLOCKING is set (Bart van Assche)
+On Tue, Jun 06, 2023 at 02:07:24PM -0400, Waiman Long wrote:
+> When blkg_alloc() is called to allocate a blkcg_gq structure
+> with the associated blkg_iostat_set's, there are 2 fields within
+> blkg_iostat_set that requires proper initialization - blkg & sync.
+> The former field was introduced by commit 3b8cc6298724 ("blk-cgroup:
+> Optimize blkcg_rstat_flush()") while the later one was introduced by
+> commit f73316482977 ("blk-cgroup: reimplement basic IO stats using
+> cgroup rstat").
+> 
+> Unfortunately those fields in the blkg_iostat_set's are not properly
+> re-initialized when they are cleared in v1's blkcg_reset_stats(). This
+> can lead to a kernel panic due to NULL pointer access of the blkg
+> pointer. The missing initialization of sync is less problematic and
+> can be a problem in a debug kernel due to missing lockdep initialization.
+> 
+> Fix these problems by re-initializing them after memory clearing.
+> 
+> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
+> Fixes: f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
+> Signed-off-by: Waiman Long <longman@redhat.com>
+> ---
+>  block/blk-cgroup.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 90c2efc3767f..48084321e3e0 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -636,8 +636,13 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+>  			struct blkg_iostat_set *bis =
+>  				per_cpu_ptr(blkg->iostat_cpu, cpu);
+>  			memset(bis, 0, sizeof(*bis));
+> +
+> +			/* Re-initialize the cleared blkg_iostat_set */
+> +			u64_stats_init(&bis->sync);
+> +			bis->blkg = blkg;
+>  		}
+>  		memset(&blkg->iostat, 0, sizeof(blkg->iostat));
+> +		u64_stats_init(&blkg->iostat.sync);
+>  
+>  		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+>  			struct blkcg_policy *pol = blkcg_policy[i];
 
+Looks fine,
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
+
 Thanks,
+Ming
 
