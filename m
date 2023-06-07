@@ -2,62 +2,65 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 600BDC83005
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 09:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED74BC7EE23
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 12:11:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240124AbjFGJpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 05:45:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32802 "EHLO
+        id S234878AbjFGMLE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 08:11:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234667AbjFGJpx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 05:45:53 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545BF1731
-        for <linux-block@vger.kernel.org>; Wed,  7 Jun 2023 02:45:51 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-51494659d49so1135236a12.3
-        for <linux-block@vger.kernel.org>; Wed, 07 Jun 2023 02:45:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1686131150; x=1688723150;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=79vzDiF+tHrnH1dRnmQpod9DfGlW5ryqo0lz5n79FPI=;
-        b=FJamJYdT3if+5bC5MiBpMp+FFu/lOoO4qwlYSJv9n0/h/OCDUjBN+06Y5+uXbPlxGg
-         WzF23UIBA7vCWADd8Vks7i2cG2U4opcA9P/78wHN/K4fj8HGhf6KnCl8YjjpgJJVnvlB
-         hiZSt/O06mq6yVTGbe1Xbm78hWMDypBHvsUI14YH2ldWO/fNP5glJNykhF7/3t13XEm8
-         J+PFP/ZVX+XFyUteBqBkDLqr81iNO7g4hjhPuN5y9T9TIVwh6rNLUX/Nk3vsBKiV6F+x
-         GXhYFeACevO08CL9xeeLqMtmWxMOgxDUBpFi70eYskDjDqEfgVaRrrjyxsUtCDN7+EvU
-         utwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686131150; x=1688723150;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=79vzDiF+tHrnH1dRnmQpod9DfGlW5ryqo0lz5n79FPI=;
-        b=HXkSikCF8m9Ksf8EtdaNGcaSNND+rkh84ZZscl/l7k3RDgS3stYc0XNaFiJtbbhHxO
-         IPBBmPHSmtdBQpNrX/J94yyesdOsm0GYb6X2H29Iv4QI6p6GsUfJNJqlZryfVCxnRrGm
-         pCREhhj3P3usHg/VbrcoHosZgNswwKoaRv2qOajmUcdQyb0kgC5TxWOuCdsvwYLOKMlF
-         HHxI9zlsZSdhRZ11fAB3Z16IMfK0XqOUfjSol/w/UcWzkalmjbZsPsyBMomHGN76lqL9
-         WQORd+RCtv7+L3AKpyx1yS6pjBdloaFQXni4GSYLsuwRvMbxrddsLWxZ+fSeMvuPLpTZ
-         Jt9Q==
-X-Gm-Message-State: AC+VfDxkBcmH8KOTx5E3o64GTQx5m4UEPW9FkAp2L5Qes6+hOxn/O1qJ
-        MFee5JNctwgWSe9oHCytTEUgC26yd8frIjHYO/QDmQ==
-X-Google-Smtp-Source: ACHHUZ6S5zCcoB3bV8vZmXpO8sNjvRC4rvkXRPMqlcDG+MUEcxQoM5+7tlD1+Znnck9OUJnJex1d7ZYhdubt6xLn55E=
-X-Received: by 2002:aa7:c3c3:0:b0:516:3261:17d with SMTP id
- l3-20020aa7c3c3000000b005163261017dmr3783303edr.20.1686131149770; Wed, 07 Jun
- 2023 02:45:49 -0700 (PDT)
+        with ESMTP id S238739AbjFGMLD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 08:11:03 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3AD41BDC;
+        Wed,  7 Jun 2023 05:10:33 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B2D7D1FDAB;
+        Wed,  7 Jun 2023 12:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1686139831; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VqcjXu0CZTTpOZmrsxN0Wk6sBEC02dewC7QyNvd2soI=;
+        b=IHfmh7S/uiagddCbXIRJmosPllrO40PYEOdRWLxIJcakAcNIU++BrgHVQz0wc7LcQAKKzC
+        PPRnjWo+UKOWnOBcyWCCyUZkDBITx9Cp6jogvlX5nqnl/7EZ1E52mDDTaguTf4aV9jJ4YH
+        Y0E8fz71thAZEe372iOj6DPRk6Att+g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1686139831;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VqcjXu0CZTTpOZmrsxN0Wk6sBEC02dewC7QyNvd2soI=;
+        b=MkcUMKJtjBchJhTKblNCrLqdAmaj8HslDTq0hIfVSuBi5J7Ox9FYzyAcm0vHDIQaJJ1iFw
+        8q1qSbcsmckQBWBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6D65E13776;
+        Wed,  7 Jun 2023 12:10:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id m3hLGrdzgGTFOwAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 07 Jun 2023 12:10:31 +0000
+Message-ID: <1b1e8640-7bc8-a213-9b6c-2eb0b843ece6@suse.de>
+Date:   Wed, 7 Jun 2023 14:10:27 +0200
 MIME-Version: 1.0
-References: <20230606073950.225178-1-hch@lst.de> <20230606073950.225178-29-hch@lst.de>
-In-Reply-To: <20230606073950.225178-29-hch@lst.de>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Wed, 7 Jun 2023 11:45:39 +0200
-Message-ID: <CAMGffEk2LB0CDqR6DJczhejkkyK1Q5Ybu-wJ_fr99O0fXa-pew@mail.gmail.com>
-Subject: Re: [PATCH 28/31] block: replace fmode_t with a block-specific type
- for block open flags
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 01/31] block: also call ->open for incremental partition
+ opens
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Richard Weinberger <richard@nod.at>,
         Josef Bacik <josef@toxicpanda.com>,
         "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
         Phillip Potter <phil@philpotter.co.uk>,
         Coly Li <colyli@suse.de>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
@@ -75,41 +78,30 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
         linux-f2fs-devel@lists.sourceforge.net,
         linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20230606073950.225178-1-hch@lst.de>
+ <20230606073950.225178-2-hch@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230606073950.225178-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 6, 2023 at 9:41=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrote=
-:
->
-> The only overlap between the block open flags mapped into the fmode_t and
-> other uses of fmode_t are FMODE_READ and FMODE_WRITE.  Define a new
-> blk_mode_t instead for use in blkdev_get_by_*, ->open and ->ioctl and
-> stop abusing fmode_t.
->
+On 6/6/23 09:39, Christoph Hellwig wrote:
+> For whole devices ->open is called for each open, but for partitions it
+> is only called on the first open of a partition.  This is problematic
+> as various block drivers look at open flags and might not do all setup
+> for ioctl only or NDELAY opens.
+> 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  arch/um/drivers/ubd_kern.c          |  8 +++---
->  arch/xtensa/platforms/iss/simdisk.c |  2 +-
->  block/bdev.c                        | 32 +++++++++++-----------
->  block/blk-zoned.c                   |  8 +++---
->  block/blk.h                         | 11 ++++----
->  block/fops.c                        | 26 +++++++++++++-----
->  block/genhd.c                       |  8 +++---
->  block/ioctl.c                       | 42 +++++++++--------------------
->  drivers/block/amiflop.c             | 12 ++++-----
->  drivers/block/aoe/aoeblk.c          |  4 +--
->  drivers/block/ataflop.c             | 25 +++++++++--------
->  drivers/block/drbd/drbd_main.c      |  7 ++---
->  drivers/block/drbd/drbd_nl.c        |  2 +-
->  drivers/block/floppy.c              | 28 +++++++++----------
->  drivers/block/loop.c                | 22 +++++++--------
->  drivers/block/mtip32xx/mtip32xx.c   |  4 +--
->  drivers/block/nbd.c                 |  4 +--
->  drivers/block/pktcdvd.c             | 17 ++++++------
->  drivers/block/rbd.c                 |  2 +-
->  drivers/block/rnbd/rnbd-clt.c       |  4 +--
->  drivers/block/rnbd/rnbd-srv.c       |  4 +--
-Acked-by: Jack Wang <jinpu.wang@ionos.com> # for rnbd.
+>   block/bdev.c | 18 ++++++++----------
+>   1 file changed, 8 insertions(+), 10 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+
+Cheers,
+
+Hannes
+
