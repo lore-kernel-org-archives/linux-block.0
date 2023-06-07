@@ -2,109 +2,160 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1294FC7EE2F
-	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 16:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7041CC7EE25
+	for <linux-block@archiver.kernel.org>; Wed,  7 Jun 2023 16:42:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229504AbjFGQja (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 12:39:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58988 "EHLO
+        id S229803AbjFGQmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 12:42:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjFGQja (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 12:39:30 -0400
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFCB01BFE;
-        Wed,  7 Jun 2023 09:39:28 -0700 (PDT)
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1b0201d9a9eso6443115ad.0;
-        Wed, 07 Jun 2023 09:39:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686155968; x=1688747968;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=luNT/INyKsFl9KSShF42us3zzE8nFAUkhlKdA1zIJKw=;
-        b=IOr/a71S7Lv8QlnsMiqVlXO7a5VDottrCzomLTUIrhQV+ba33XndxpmvH4CNP5u9aQ
-         Y7NnwOsRnG+gOdhjgukSxsZjGm/DZp/JtxXh7XyTqiE0S2rmhHExFBqqknND8H8Aewhx
-         pHtjoxDtl7P34KHmUYWNTH0+XgAm5L+sqJb2ViyvtOId7C7ULQdL3KOgnAOltjdt63TY
-         Crm3oxB/QPW7RvI/0zmmsyYapqOOGmx7F4IaMJRy3jrUzqEGgPFHX1cfQ90kpIAPTatW
-         M8mSxxOV0Pd6Xu0d5o+/NQ4a49qdEMJigTcnY5A698GKcADTrzU+SzynLgX39a1uKs45
-         lb5A==
-X-Gm-Message-State: AC+VfDwK3os2fY56VfLnOn7ZTvjiuYGozt3aNSXPr5TeGugqDl1k9bkz
-        nr/ECQh2RclMV2GYEe4I3sE=
-X-Google-Smtp-Source: ACHHUZ7/Wm4lKhfqh2pnikDu4qrN3RFyFpgghV91bwBl4bf2a0efhjJeZfcMUkOTPE7WiSUH3VW+EA==
-X-Received: by 2002:a17:902:dac4:b0:1b0:62e2:1f84 with SMTP id q4-20020a170902dac400b001b062e21f84mr19498370plx.5.1686155967638;
-        Wed, 07 Jun 2023 09:39:27 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id k4-20020a170902760400b001b02df0ddbbsm10658443pll.275.2023.06.07.09.39.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jun 2023 09:39:26 -0700 (PDT)
-Message-ID: <c9f55fc9-3c60-5a6c-be2d-0c313c345bb2@acm.org>
-Date:   Wed, 7 Jun 2023 09:39:24 -0700
+        with ESMTP id S229641AbjFGQmJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 12:42:09 -0400
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA911FC4;
+        Wed,  7 Jun 2023 09:42:08 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id 194615C007C;
+        Wed,  7 Jun 2023 12:42:08 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Wed, 07 Jun 2023 12:42:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        invisiblethingslab.com; h=cc:cc:content-type:content-type:date
+        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to; s=fm1; t=
+        1686156128; x=1686242528; bh=42y1EYFXvq4hYeXlSpmVr7gmNpbInmaS7tg
+        G+Ss9F5U=; b=CHxsNu/TLuBvPTG0yHh4WOq5QJN1It8U4K4Mt15g1FIi6vpL6Ad
+        4SNv/41uiq14W8leF4UWTsz72Su5CRbXiIRYEnHIDHBx9oDZqT6ymIagHkd2CQwm
+        wNifs0xXvmsiFF3ncmrudJvXcMTwLJELPyOnernFr6t3hASMW0zPB0PfLDwC0BW0
+        uHq3ry34wEAUTA3EsUXoZvNluvYHvcmg1lIB0QJ7a3DfUUW9bYOQ3lM4uFz62ezH
+        Prl2L8QV+COLB0QySNuIbWY+j9m6wIwBBTmIGRXwua/wfc+B9Lhpp6LKDxOCNs1A
+        bvTFZlTojHJl6zVroypQ8HtiXc5lAVlS+rQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1686156128; x=1686242528; bh=42y1EYFXvq4hY
+        eXlSpmVr7gmNpbInmaS7tgG+Ss9F5U=; b=CsL/olnib/EC7s2AniVOsID2RnvaO
+        gHEE1/PviC87GXlrK2jQrtRUoDiIUCd3PtoZMt1pM2/PfxbOkOjWQjNVZkVe/Lvr
+        KUlvOi1I9n0bCjNREsjfXNTcuAmGB3wZUYXeFyqAUFyLIH0XI/ZdN2tZRXyBDIDw
+        Q0OybDNsW02ypxRMnzz6nL11B8Pm6rec3hbwVmEFrw+0ZpslcCIJJN3Q1grAWypJ
+        LgceyJdxSEpqDgSvmOPuPPq4XxJZ5J0z5qm3GBh9GhG88SW3k3wKeKyHBl/WLKwK
+        9wEObMIJ7i8awdQgzUCQQmLUcfv6L9lHBdVfEyqqz1sK1byku2VFQmGKg==
+X-ME-Sender: <xms:X7OAZM1ueUtCZdO5gXwRqFsrTiESkIoCnY3pNx4WgbAYO0oyzbY1PA>
+    <xme:X7OAZHF3Mm8dFQfIxCWk2Q2sncJ1ilMSCg4BcG3qR59V5ItJEHxuGXhmWfURtWr79
+    0K3DL6PsGWuCx4>
+X-ME-Received: <xmr:X7OAZE65WME9hDYCcsiCzgK011Z8Vz86jMcNQVl3Ypi6IuTe6Ryys5wXUsw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgedtgedguddtgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvvefukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpeffvghm
+    ihcuofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhishhisghlvghthhhinh
+    hgshhlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedvjeetgeekhfetudfhgfetffeg
+    fffguddvgffhffeifeeikeektdehgeetheffleenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhisghlvghthhhinhhg
+    shhlrggsrdgtohhm
+X-ME-Proxy: <xmx:X7OAZF1mDsYgwtD-fK8d8Ln8N-NhaJ-ZqD3je5aBQiOsM5VgdG175w>
+    <xmx:X7OAZPHnGIQFnU7zGkQzx5MOEv1iOX-kwemrqJUS1fOPh52IJyHP7A>
+    <xmx:X7OAZO_jD_APgbz570axrPJPE4wcAJWB3FlObPxftl1hiSmRcMkhFA>
+    <xmx:YLOAZFMANyMVDb7AixBzA8LP_hT_vpDIINqDbQ6YIw0Uxp04beErWA>
+Feedback-ID: iac594737:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 7 Jun 2023 12:42:07 -0400 (EDT)
+Date:   Wed, 7 Jun 2023 12:42:00 -0400
+From:   Demi Marie Obenour <demi@invisiblethingslab.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
+ device
+Message-ID: <ZICzXbJeLj56NRYB@itl-email>
+References: <20230601222656.2062-1-demi@invisiblethingslab.com>
+ <ZIA004HDuhoTQzY/@infradead.org>
+ <ZICg2sxHQRRPW3Nc@itl-email>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v2 3/3] scsi: simplify scsi_stop_queue()
-Content-Language: en-US
-To:     Martin Wilck <mwilck@suse.com>, Christoph Hellwig <hch@lst.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-References: <20230606193845.9627-1-mwilck@suse.com>
- <20230606193845.9627-4-mwilck@suse.com> <20230607052710.GC20052@lst.de>
- <c0563161eb613f9500e6a1cccdcff6fc64efffad.camel@suse.com>
- <903c7222-c95e-fda1-9b90-b59e184944cf@acm.org>
- <7ee70331d921854e2b27de3d072d0d8f8ce97f3b.camel@suse.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <7ee70331d921854e2b27de3d072d0d8f8ce97f3b.camel@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="Lhc+hn0jVRR2V+8y"
+Content-Disposition: inline
+In-Reply-To: <ZICg2sxHQRRPW3Nc@itl-email>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/7/23 08:38, Martin Wilck wrote:
-> On Wed, 2023-06-07 at 07:05 -0700, Bart Van Assche wrote:
->> On 6/7/23 02:26, Martin Wilck wrote:
->>> On Wed, 2023-06-07 at 07:27 +0200, Christoph Hellwig wrote:
->>>> On Tue, Jun 06, 2023 at 09:38:45PM +0200, mwilck@suse.com wrote:
->>>>>    scsi_target_block(struct device *dev)
->>>>>    {
->>>>> +       struct Scsi_Host *shost = dev_to_shost(dev);
->>>>> +
->>>>>           if (scsi_is_target_device(dev))
->>>>>                   starget_for_each_device(to_scsi_target(dev),
->>>>> NULL,
->>>>>                                           device_block);
->>>>>           else
->>>>>                   device_for_each_child(dev, NULL,
->>>>> target_block);
->>>>> +
->>>>> +       /* Wait for ongoing scsi_queue_rq() calls to finish. */
->>>>> +       if (!WARN_ON_ONCE(!shost))
->>>>
->>>> How could host ever be NULL here?  I can't see why we'd want this
->>>> check.
->>>
->>> The reason is simple: I wasn't certain if dev_to_shost() could
->>> return
->>> NULL, and preferred skipping the wait over an Oops. I hear you say
->>> that
->>> dev_to_shost() can't go wrong, so I'll remove the NULL test.
->>
->> I propose to pass shost as the first argument to scsi_target_block()
->> instead of using dev_to_shost() inside scsi_target_block(). Except in
->> __iscsi_block_session(), shost is already available as a local
->> variable.
-> 
-> If we do this, it might actually be cleaner to just pass the tag set to
-> wait for.
 
-Wouldn't that be close to a layering violation? Shouldn't SCSI APIs accept
-pointers to SCSI objects instead of pointers to block layer abstractions?
+--Lhc+hn0jVRR2V+8y
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 7 Jun 2023 12:42:00 -0400
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block, loop: Increment diskseq when releasing a loop
+ device
 
-Thanks,
+On Wed, Jun 07, 2023 at 11:23:00AM -0400, Demi Marie Obenour wrote:
+> > > --- a/drivers/block/loop.c
+> > > +++ b/drivers/block/loop.c
+> > > @@ -1205,6 +1205,12 @@ static void __loop_clr_fd(struct loop_device *=
+lo, bool release)
+> > >  	if (!part_shift)
+> > >  		set_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+> > >  	mutex_lock(&lo->lo_mutex);
+> > > +
+> > > +	/*
+> > > +	 * Increment the disk sequence number, so that userspace knows this
+> > > +	 * device now points to something else.
+> > > +	 */
+> > > +	inc_diskseq(lo->lo_disk);
+> >=20
+> > And I'm not sure why we even need this.  __loop_clr_fd
+> > already calls disk_force_media_change, which calls inc_diskseq.
+> > Why do we need an extra increment?
+>=20
+> How does disk_force_media_change() call inc_diskseq()?  I don=E2=80=99t s=
+ee any
+> calls in the source code.  I=E2=80=99m going to use systemtap to see if t=
+here is
+> an indirect call chain.
 
-Bart.
+Were you thinking of bdev_check_media_change()?  That can call
+inc_diskseq() via this call chain:
 
+  bdev_check_media_change()
+    disk_clear_events()
+      disk_check_events()
+        inc_diskseq()
+
+disk_force_media_change() does not call inc_diskseq(), and I checked
+that calling losetup -D does not change the diskseq of a loop device.
+=46rom what you have writte, I=E2=80=99m pretty sure that=E2=80=99s a bug in
+disk_force_media_change(), though.  I=E2=80=99ll send a v3 that adds this c=
+all.
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+Invisible Things Lab
+
+--Lhc+hn0jVRR2V+8y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEdodNnxM2uiJZBxxxsoi1X/+cIsEFAmSAs10ACgkQsoi1X/+c
+IsGbBBAAoZxDjSSs9J+siCWh0MMyGUEwddaQhnOqS6hH//JuLOHDb71mJVF51gZR
+ayDHrJnYDhxsSpb02lxWKKPfo0plXSnTwb8gt2ZX+HUIXR+QteXUpfXzKi45ZwT7
+p70ZnygsFNmn24ePKu5RS491F3n/Kz51PPdacIE429QBLi5YRAAlTTan4pOJRvRt
+bgliY4CSe63mDrCJ4GMd7614e4mTPrsaJYbAAx5ri1xJBNy8pKjbyUMcSfR5VQnu
+ujJgAXImHu3mzEeJlHKusofkCA43rWdhLsrZvrjArGXEXOcK7Qk4zkVUGh/dG7Ta
+QxljW+MD+foQRsFmsrc+XMfIpPuWy/AigkYi7a+jINyzwfmNqfnWwuxW4Q3mQlhu
+eJ7inplmVJ7xsPJKbRL/DcqiHvE+KgGU5GHuZPCwu7e9G+pkcEJ1kTqzHZrRTAJW
+WXhLxBLajojgzKCrbTusEmLuodkVMZpqM1VPsSBeGjYwV+BvVlymK15DWtlxffC4
+XdsQHu88yG8rdDe4TO7GgSWfNXDGuIQOtmHTsvrvLR/XVduEByxaXdsYj5k5JO/V
+A7h0LAnLqTZo2+0tYqaFHHUjUHWua8edZYrdVvXTsNgkMfDol8/SGSSsbstvEbGz
+8WGMKF+Qp8uA8T9fUDq95d6QDXwdg1E5NLawy7Yg9CfYScpy1Mg=
+=AmeY
+-----END PGP SIGNATURE-----
+
+--Lhc+hn0jVRR2V+8y--
