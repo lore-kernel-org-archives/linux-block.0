@@ -2,639 +2,248 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE40C7EE29
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jun 2023 15:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A256C7EE29
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jun 2023 15:23:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236927AbjFHPQ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jun 2023 11:16:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
+        id S236144AbjFHPXS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jun 2023 11:23:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236925AbjFHPQP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 11:16:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF73E2D63
-        for <linux-block@vger.kernel.org>; Thu,  8 Jun 2023 08:15:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686237338;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SEf73cD85E+g04wNzEVF3ahCKEdMFTjq+zIvFZg2GUU=;
-        b=i6PzWy/rXgE3oRWqJeTZ9uoXY46UF/wtOpoUR3nBuTNznEmJ2c6TLA04LtWHR0Ts/9nYu8
-        s5ZKyELpbFaiakZY+ImOXajXC/mWTE1LEr9JFCSoRAzH5efYAGtVru8sdOVEFZKuvjEgSg
-        b7qi4KiItHhATTANPxBokrkIHgRfKxU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-KM9exG2qNpKGlyE3i1R5mg-1; Thu, 08 Jun 2023 11:15:36 -0400
-X-MC-Unique: KM9exG2qNpKGlyE3i1R5mg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3f7e4dc0fe5so4231285e9.3
-        for <linux-block@vger.kernel.org>; Thu, 08 Jun 2023 08:15:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686237334; x=1688829334;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SEf73cD85E+g04wNzEVF3ahCKEdMFTjq+zIvFZg2GUU=;
-        b=kYgcs0H3lAaGg6s6mdTQ4ChkaOcRjEv1CCMgg60GyXE0YSgRERNJSTk6XCs58RJfwY
-         gC053GbuZ0bEeovQMgatltGWmg75pQqAsCL0t3g18YxH58zNp9drPWs/Z0BbcCZnTgiy
-         0VtxhSh8SX4sSzOecLQfeEoLUYRUVf2/GwNWbUU9iAONG5Z8aX2Ni81BsZfP0cZrSFE9
-         rMccGaU8+1Xr/5h92dAydUyhxksSm1N2hcuzQ6tr0kGax1X4E0JzTmfVe7EwZbJwGnkG
-         0G/K9TJUgsw17yTR37WuhvSE9Cin1H24juAUSXYj5vXRYVVs8jW0q+DwDY5be3Fqtexv
-         d53Q==
-X-Gm-Message-State: AC+VfDxd6c4j4fwGm0mIvSiEK6kjMA4njMhSnfgoCG/PkpmVoC1AnWmR
-        rfMUtfayiykHcIFK5fnSJjiwZL2vrZ//PsEr+JAQ+FL2kzuoNd584sjAbVlyvrr+A0trVLPV5fm
-        /CwYOVwGtyoPMWq2RLj5CeFM=
-X-Received: by 2002:a7b:cb8c:0:b0:3f6:455:de09 with SMTP id m12-20020a7bcb8c000000b003f60455de09mr1610364wmi.39.1686237334518;
-        Thu, 08 Jun 2023 08:15:34 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6Y/iGnEgF8gKZIvgP/wtwMSE4Hp3FRZ6qnwf4YtDHo32D2KOSmtvEjJ137mMmgNDr1EkTsOQ==
-X-Received: by 2002:a7b:cb8c:0:b0:3f6:455:de09 with SMTP id m12-20020a7bcb8c000000b003f60455de09mr1610345wmi.39.1686237334135;
-        Thu, 08 Jun 2023 08:15:34 -0700 (PDT)
-Received: from redhat.com ([2.55.4.169])
-        by smtp.gmail.com with ESMTPSA id h4-20020a1ccc04000000b003f7ec896cefsm5556492wmb.8.2023.06.08.08.15.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jun 2023 08:15:33 -0700 (PDT)
-Date:   Thu, 8 Jun 2023 11:15:30 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Suwan Kim <suwan.kim027@gmail.com>
-Cc:     "Roberts, Martin" <martin.roberts@intel.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: virtio-blk: support completion batching for the IRQ path -
- failure
-Message-ID: <20230608111505-mutt-send-email-mst@kernel.org>
-References: <BN9PR11MB53545DD1516BFA0FB23F95458353A@BN9PR11MB5354.namprd11.prod.outlook.com>
- <CAFNWusa7goyDs1HaMVYDvvXT7ePfB7cAQt3EewT+t=-kKNf5eg@mail.gmail.com>
- <BN9PR11MB535433DFB3A1CFAD097C13278353A@BN9PR11MB5354.namprd11.prod.outlook.com>
- <BN9PR11MB53545EDF64FC43EF8854D0628350A@BN9PR11MB5354.namprd11.prod.outlook.com>
- <CAFNWusbOKhZtVBRu88Ebo3=Cv9rdsX2aAf6_5hfnge=iryR3DQ@mail.gmail.com>
- <20230608104537-mutt-send-email-mst@kernel.org>
- <CAFNWusZZbFD+RLeJdno3vT6BAguq3jDB2EX8H8z5vPBE5sp54g@mail.gmail.com>
+        with ESMTP id S232018AbjFHPXS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 11:23:18 -0400
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 943AB26AD;
+        Thu,  8 Jun 2023 08:23:16 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.nyi.internal (Postfix) with ESMTP id 47EE85C01C4;
+        Thu,  8 Jun 2023 11:23:13 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Thu, 08 Jun 2023 11:23:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        invisiblethingslab.com; h=cc:cc:content-type:content-type:date
+        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to; s=fm1; t=
+        1686237793; x=1686324193; bh=8NQR1QgWkz5FJshx76hkwpBKXiFIu2ZBcaz
+        eZgfU2HU=; b=RNr33zvInGlHpMqFqPaWlax+/J8+13RX1z3cGoqD0m0mN6T9KFG
+        uTT4/u3eB4me0Falzaq63/Eemzr1qJtHm5R4bTa8/r21DQf3Yy7mwtd6p44inMtv
+        0JFHYicLUv9e4toFh/H+7UvqWYmznpmzIV8bwPZGVgN1aAjulb6mWWGTf5WDsgkG
+        rZwYYXi71/jw29GnspjgKa4nND6h73b7Z45UJ+V1JeDMzWDWboGXkrnkjvcMfrRv
+        zLPcHRFbZ3s/gvU0VvNCzIiLatTypTI+C2CnkczM93CuSEorSSoiJSOIjD8Lkb3V
+        yhBs5btMqhSesOtB0QYdVIDZfxKD7tLgL6w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1686237793; x=1686324193; bh=8NQR1QgWkz5FJ
+        shx76hkwpBKXiFIu2ZBcazeZgfU2HU=; b=yqh6JQeZP2OslVaaN0b9gaJwAlpTD
+        X84n2uEtVHFyB3O6aAGEmbiRHVdgmgZ1eZfw1LHyV/naZqMA4EWAQblH1eYvCfIp
+        1ILnCXQdTmPHGuBrkgAf4XOyMsdanOPcdhRJj3AgqmEBTNgHBZ6jW5o9mkBd78cP
+        iQB6nWQxUxd58M93OJIJPp21F9ntgyYSSVlATbT34ifDAcfcHb4U4tRTbO3/ttRq
+        8ZoiGHF714dhLWiQSBSv3sFvK2s2f3O1uT5BZhKq/1jH3cxvVSj1tmIje4cfQl4N
+        niXqwKld7slr8EPB4FvoLVPY6HzzBH+naNWCw/er4ElkDhh+l/n4pilOw==
+X-ME-Sender: <xms:YPKBZOe8-xo8s7Dfgt-AopesjR3IiAnC_W2hN5O7lh0Ia4keVlAS0w>
+    <xme:YPKBZIMU0WdxOItx84HVTp_nkTI_YvTFLAg9KKjvI2NS8-HMhqr4wzcPgqTyqbAc3
+    6qaALGQ_ppjUCY>
+X-ME-Received: <xmr:YPKBZPjFl4bpETpiF7W5ZGmwjx3XfxDnoL9zJrMElrBIuJ_XWfd9AQk_U_E>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgedtiedgkeejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepffgvmhhi
+    ucforghrihgvucfqsggvnhhouhhruceouggvmhhisehinhhvihhsihgslhgvthhhihhngh
+    hslhgrsgdrtghomheqnecuggftrfgrthhtvghrnhepvdejteegkefhteduhffgteffgeff
+    gfduvdfghfffieefieekkedtheegteehffelnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepuggvmhhisehinhhvihhsihgslhgvthhhihhnghhs
+    lhgrsgdrtghomh
+X-ME-Proxy: <xmx:YPKBZL-G_3_Ci0GJw6XrystQz7a7FePvF3QI7x0lBogsLIuVP4tAvw>
+    <xmx:YPKBZKu9MyksjpE4khqAqJYtJqiMPbirkUanGOh9zy-mIl1kKRKmvQ>
+    <xmx:YPKBZCEA-qutMj487Mpgc9AYYvjqXp9tZZJa7O1Uq_Ao_6jBUQPupw>
+    <xmx:YfKBZOgpfrXR2AJL2GZsTVjPWsw6q3cdbRyGuIOAbUx1E3udWcBmpA>
+Feedback-ID: iac594737:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 8 Jun 2023 11:23:12 -0400 (EDT)
+Date:   Thu, 8 Jun 2023 11:23:07 -0400
+From:   Demi Marie Obenour <demi@invisiblethingslab.com>
+To:     Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= 
+        <marmarek@invisiblethingslab.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 16/16] xen-blkback: Inform userspace that device has
+ been opened
+Message-ID: <ZIHyXrAj5+DXAblD@itl-email>
+References: <20230530203116.2008-1-demi@invisiblethingslab.com>
+ <20230530203116.2008-17-demi@invisiblethingslab.com>
+ <ZH75OTMA6N3zYrH2@Air-de-Roger>
+ <ZH9tcGh0N2fEcwjH@itl-email>
+ <ZIBDgKKDhDj+//Q0@Air-de-Roger>
+ <ZICwaWidZxhaGp8v@itl-email>
+ <ZIGbUDpqjwbR5zmz@Air-de-Roger>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="PU98An8gDVvBtzYA"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFNWusZZbFD+RLeJdno3vT6BAguq3jDB2EX8H8z5vPBE5sp54g@mail.gmail.com>
+In-Reply-To: <ZIGbUDpqjwbR5zmz@Air-de-Roger>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 09, 2023 at 12:12:16AM +0900, Suwan Kim wrote:
-> On Thu, Jun 8, 2023 at 11:46 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Thu, Jun 08, 2023 at 11:07:21PM +0900, Suwan Kim wrote:
-> > > On Thu, Jun 8, 2023 at 7:16 PM Roberts, Martin <martin.roberts@intel.com> wrote:
-> > > >
-> > > > The rq_affinity change does not resolve the issue; just reduces its occurrence rate; I am still seeing hangs with it set to 2.
-> > > >
-> > > > Martin
-> > > >
-> > > >
-> > > >
-> > > > From: Roberts, Martin
-> > > > Sent: Wednesday, June 7, 2023 3:46 PM
-> > > > To: Suwan Kim <suwan.kim027@gmail.com>
-> > > > Cc: mst@redhat.com; virtualization <virtualization@lists.linux-foundation.org>; linux-block@vger.kernel.org
-> > > > Subject: RE: virtio-blk: support completion batching for the IRQ path - failure
-> > > >
-> > > >
-> > > >
-> > > > It is the change indicated that breaks it - changing the IRQ handling to batching.
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > From reports such as,
-> > > >
-> > > > [PATCH 1/1] blk-mq: added case for cpu offline during send_ipi in rq_complete (kernel.org)
-> > > https://lore.kernel.org/lkml/20220929033428.25948-1-mj0123.lee@samsung.com/T/
-> > > >
-> > > > [RFC] blk-mq: Don't IPI requests on PREEMPT_RT - Patchwork (linaro.org)
-> > > https://patches.linaro.org/project/linux-rt-users/patch/20201023110400.bx3uzsb7xy5jtsea@linutronix.de/
-> > > >
-> > > >
-> > > >
-> > > > I’m thinking the issue has something to do with which CPU the IRQ is running on.
-> > > >
-> > > >
-> > > >
-> > > > So, I set,
-> > > >
-> > > > # echo 2 > /sys/block/vda/queue/rq_affinity
-> > > >
-> > > > # echo 2 > /sys/block/vdb/queue/rq_affinity
-> > > >
-> > > > …
-> > > >
-> > > > # echo 2 > /sys/block/vdp/queue/rq_affinity
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > and the system (running 16 disks, 4 queues/disk) has not yet hung (running OK for several hours)…
-> > > >
-> > > >
-> > > >
-> > > > Martin
-> > > >
-> > >
-> > > Hi Martin,
-> > >
-> > > Both codes (original code and your simple path) execute
-> > > blk_mq_complete_send_ipi()
-> > > at blk_mq_complete_request_remote(). So maybe missing request completion
-> > > on other vCPU is not the cause...
-> > >
-> > > The difference between the original code and your simple path is that
-> > > the original code calls blk_mq_end_request_batch() at virtblk_done()
-> > > to process request at block layer
-> > > and your code calls blk_mq_end_request() at virtblk_done() to do same thing.
-> > >
-> > > The original code :
-> > > virtblk_handle_req() first collects all requests from virtqueue in while loop
-> > > and pass it to blk_mq_end_request_batch() at once
-> > >
-> > > Your simple path:
-> > > virtblk_handle_req() get single request from virtqueue and pass it to
-> > > blk_mq_end_request() and do it again in while loop until there in no request
-> > > in virtqueue
-> > >
-> > >
-> > > I think we need to focus on the difference between blk_mq_end_request()
-> > > and blk_mq_end_request_batch()
-> > >
-> > > Regards,
-> > > Suwan Kim
-> > >
-> >
-> > Yes but linux release is imminent and regressions are bad.
-> > What do you suggest for now? If there's no better idea
-> > I'll send a revert patch and we'll see in the next linux version.
-> >
-> >
-> 
-> It is better to revert this commit. I have no good idea to debug it for now.
-> I will try to reproduce it in my machine.
-> 
-> Regards,
-> Suwan Kim
 
+--PU98An8gDVvBtzYA
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 8 Jun 2023 11:23:07 -0400
+From: Demi Marie Obenour <demi@invisiblethingslab.com>
+To: Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2 16/16] xen-blkback: Inform userspace that device has
+ been opened
 
-ok so reverting
-[PATCH v3 2/2] virtio-blk: support completion batching for the IRQ path
-for now
+On Thu, Jun 08, 2023 at 11:11:44AM +0200, Roger Pau Monn=C3=A9 wrote:
+> On Wed, Jun 07, 2023 at 12:29:26PM -0400, Demi Marie Obenour wrote:
+> > On Wed, Jun 07, 2023 at 10:44:48AM +0200, Roger Pau Monn=C3=A9 wrote:
+> > > On Tue, Jun 06, 2023 at 01:31:25PM -0400, Demi Marie Obenour wrote:
+> > > > On Tue, Jun 06, 2023 at 11:15:37AM +0200, Roger Pau Monn=C3=A9 wrot=
+e:
+> > > > > On Tue, May 30, 2023 at 04:31:16PM -0400, Demi Marie Obenour wrot=
+e:
+> > > > > > Set "opened" to "0" before the hotplug script is called.  Once =
+the
+> > > > > > device node has been opened, set "opened" to "1".
+> > > > > >=20
+> > > > > > "opened" is used exclusively by userspace.  It serves two purpo=
+ses:
+> > > > > >=20
+> > > > > > 1. It tells userspace that the diskseq Xenstore entry is suppor=
+ted.
+> > > > > >=20
+> > > > > > 2. It tells userspace that it can wait for "opened" to be set t=
+o 1.
+> > > > > >    Once "opened" is 1, blkback has a reference to the device, so
+> > > > > >    userspace doesn't need to keep one.
+> > > > > >=20
+> > > > > > Together, these changes allow userspace to use block devices wi=
+th
+> > > > > > delete-on-close behavior, such as loop devices with the autocle=
+ar flag
+> > > > > > set or device-mapper devices with the deferred-remove flag set.
+> > > > >=20
+> > > > > There was some work in the past to allow reloading blkback as a
+> > > > > module, it's clear that using delete-on-close won't work if attem=
+pting
+> > > > > to reload blkback.
+> > > >=20
+> > > > Should blkback stop itself from being unloaded if delete-on-close i=
+s in
+> > > > use?
+> > >=20
+> > > Hm, maybe.  I guess that's the best we can do right now.
+> >=20
+> > I=E2=80=99ll implement this.
+>=20
+> Let's make this a separate patch.
 
-> > >
-> > >
-> > > >
-> > > >
-> > > > -----Original Message-----
-> > > > From: Suwan Kim <suwan.kim027@gmail.com>
-> > > > Sent: Wednesday, June 7, 2023 3:21 PM
-> > > > To: Roberts, Martin <martin.roberts@intel.com>
-> > > > Cc: mst@redhat.com; virtualization <virtualization@lists.linux-foundation.org>; linux-block@vger.kernel.org
-> > > > Subject: Re: virtio-blk: support completion batching for the IRQ path - failure
-> > > >
-> > > >
-> > > >
-> > > > On Wed, Jun 7, 2023 at 6:14 PM Roberts, Martin <martin.roberts@intel.com> wrote:
-> > > >
-> > > > >
-> > > >
-> > > > > Re: virtio-blk: support completion batching for the IRQ path · torvalds/linux@07b679f · GitHub
-> > > >
-> > > > >
-> > > >
-> > > > > Signed-off-by: Suwan Kim suwan.kim027@gmail.com
-> > > >
-> > > > >
-> > > >
-> > > > > Signed-off-by: Michael S. Tsirkin mst@redhat.com
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > This change appears to have broken things…
-> > > >
-> > > > >
-> > > >
-> > > > > We now see applications hanging during disk accesses.
-> > > >
-> > > > >
-> > > >
-> > > > > e.g.
-> > > >
-> > > > >
-> > > >
-> > > > > multi-port virtio-blk device running in h/w (FPGA)
-> > > >
-> > > > >
-> > > >
-> > > > > Host running a simple ‘fio‘ test.
-> > > >
-> > > > >
-> > > >
-> > > > > [global]
-> > > >
-> > > > >
-> > > >
-> > > > > thread=1
-> > > >
-> > > > >
-> > > >
-> > > > > direct=1
-> > > >
-> > > > >
-> > > >
-> > > > > ioengine=libaio
-> > > >
-> > > > >
-> > > >
-> > > > > norandommap=1
-> > > >
-> > > > >
-> > > >
-> > > > > group_reporting=1
-> > > >
-> > > > >
-> > > >
-> > > > > bs=4K
-> > > >
-> > > > >
-> > > >
-> > > > > rw=read
-> > > >
-> > > > >
-> > > >
-> > > > > iodepth=128
-> > > >
-> > > > >
-> > > >
-> > > > > runtime=1
-> > > >
-> > > > >
-> > > >
-> > > > > numjobs=4
-> > > >
-> > > > >
-> > > >
-> > > > > time_based
-> > > >
-> > > > >
-> > > >
-> > > > > [job0]
-> > > >
-> > > > >
-> > > >
-> > > > > filename=/dev/vda
-> > > >
-> > > > >
-> > > >
-> > > > > [job1]
-> > > >
-> > > > >
-> > > >
-> > > > > filename=/dev/vdb
-> > > >
-> > > > >
-> > > >
-> > > > > [job2]
-> > > >
-> > > > >
-> > > >
-> > > > > filename=/dev/vdc
-> > > >
-> > > > >
-> > > >
-> > > > > ...
-> > > >
-> > > > >
-> > > >
-> > > > > [job15]
-> > > >
-> > > > >
-> > > >
-> > > > > filename=/dev/vdp
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > i.e. 16 disks; 4 queues per disk; simple burst of 4KB reads
-> > > >
-> > > > >
-> > > >
-> > > > > This is repeatedly run in a loop.
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > After a few, normally <10 seconds, fio hangs.
-> > > >
-> > > > >
-> > > >
-> > > > > With 64 queues (16 disks), failure occurs within a few seconds; with 8 queues (2 disks) it may take ~hour before hanging.
-> > > >
-> > > > >
-> > > >
-> > > > > Last message:
-> > > >
-> > > > >
-> > > >
-> > > > > fio-3.19
-> > > >
-> > > > >
-> > > >
-> > > > > Starting 8 threads
-> > > >
-> > > > >
-> > > >
-> > > > > Jobs: 1 (f=1): [_(7),R(1)][68.3%][eta 03h:11m:06s]
-> > > >
-> > > > >
-> > > >
-> > > > > I think this means at the end of the run 1 queue was left incomplete.
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > ‘diskstats’ (run while fio is hung) shows no outstanding transactions.
-> > > >
-> > > > >
-> > > >
-> > > > > e.g.
-> > > >
-> > > > >
-> > > >
-> > > > > $ cat /proc/diskstats
-> > > >
-> > > > >
-> > > >
-> > > > > ...
-> > > >
-> > > > >
-> > > >
-> > > > > 252       0 vda 1843140071 0 14745120568 712568645 0 0 0 0 0 3117947 712568645 0 0 0 0 0 0
-> > > >
-> > > > >
-> > > >
-> > > > > 252      16 vdb 1816291511 0 14530332088 704905623 0 0 0 0 0 3117711 704905623 0 0 0 0 0 0
-> > > >
-> > > > >
-> > > >
-> > > > > ...
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > Other stats (in the h/w, and added to the virtio-blk driver ([a]virtio_queue_rq(), [b]virtblk_handle_req(), [c]virtblk_request_done()) all agree, and show every request had a completion, and that virtblk_request_done() never gets called.
-> > > >
-> > > > >
-> > > >
-> > > > > e.g.
-> > > >
-> > > > >
-> > > >
-> > > > > PF= 0                         vq=0           1           2           3
-> > > >
-> > > > >
-> > > >
-> > > > > [a]request_count     -   839416590   813148916   105586179    84988123
-> > > >
-> > > > >
-> > > >
-> > > > > [b]completion1_count -   839416590   813148916   105586179    84988123
-> > > >
-> > > > >
-> > > >
-> > > > > [c]completion2_count -           0           0           0           0
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > PF= 1                         vq=0           1           2           3
-> > > >
-> > > > >
-> > > >
-> > > > > [a]request_count     -   823335887   812516140   104582672    75856549
-> > > >
-> > > > >
-> > > >
-> > > > > [b]completion1_count -   823335887   812516140   104582672    75856549
-> > > >
-> > > > >
-> > > >
-> > > > > [c]completion2_count -           0           0           0           0
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > i.e. the issue is after the virtio-blk driver.
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > This change was introduced in kernel 6.3.0.
-> > > >
-> > > > >
-> > > >
-> > > > > I am seeing this using 6.3.3.
-> > > >
-> > > > >
-> > > >
-> > > > > If I run with an earlier kernel (5.15), it does not occur.
-> > > >
-> > > > >
-> > > >
-> > > > > If I make a simple patch to the 6.3.3 virtio-blk driver, to skip the blk_mq_add_to_batch()call, it does not fail.
-> > > >
-> > > > >
-> > > >
-> > > > > e.g.
-> > > >
-> > > > >
-> > > >
-> > > > > kernel 5.15 – this is OK
-> > > >
-> > > > >
-> > > >
-> > > > > virtio_blk.c,virtblk_done() [irq handler]
-> > > >
-> > > > >
-> > > >
-> > > > >                  if (likely(!blk_should_fake_timeout(req->q))) {
-> > > >
-> > > > >
-> > > >
-> > > > >                           blk_mq_complete_request(req);
-> > > >
-> > > > >
-> > > >
-> > > > >                  }
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > kernel 6.3.3 – this fails
-> > > >
-> > > > >
-> > > >
-> > > > > virtio_blk.c,virtblk_handle_req() [irq handler]
-> > > >
-> > > > >
-> > > >
-> > > > >                  if (likely(!blk_should_fake_timeout(req->q))) {
-> > > >
-> > > > >
-> > > >
-> > > > >                           if (!blk_mq_complete_request_remote(req)) {
-> > > >
-> > > > >
-> > > >
-> > > > >                                   if (!blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr), virtblk_complete_batch)) {
-> > > >
-> > > > >
-> > > >
-> > > > >                                            virtblk_request_done(req);    //this never gets called... so blk_mq_add_to_batch() must always succeed
-> > > >
-> > > > >
-> > > >
-> > > > >                                    }
-> > > >
-> > > > >
-> > > >
-> > > > >                           }
-> > > >
-> > > > >
-> > > >
-> > > > >                  }
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > If I do, kernel 6.3.3 – this is OK
-> > > >
-> > > > >
-> > > >
-> > > > > virtio_blk.c,virtblk_handle_req() [irq handler]
-> > > >
-> > > > >
-> > > >
-> > > > >                  if (likely(!blk_should_fake_timeout(req->q))) {
-> > > >
-> > > > >
-> > > >
-> > > > >                           if (!blk_mq_complete_request_remote(req)) {
-> > > >
-> > > > >
-> > > >
-> > > > >                                    virtblk_request_done(req); //force this here...
-> > > >
-> > > > >
-> > > >
-> > > > >                                   if (!blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr), virtblk_complete_batch)) {
-> > > >
-> > > > >
-> > > >
-> > > > >                                            virtblk_request_done(req);    //this never gets called... so blk_mq_add_to_batch() must always succeed
-> > > >
-> > > > >
-> > > >
-> > > > >                                    }
-> > > >
-> > > > >
-> > > >
-> > > > >                           }
-> > > >
-> > > > >
-> > > >
-> > > > >                  }
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > > > Perhaps you might like to fix/test/revert this change…
-> > > >
-> > > > >
-> > > >
-> > > > > Martin
-> > > >
-> > > > >
-> > > >
-> > > > >
-> > > >
-> > > >
-> > > >
-> > > > Hi Martin,
-> > > >
-> > > >
-> > > >
-> > > > There are many changes between 6.3.0 and 6.3.3.
-> > > >
-> > > > Could you try to find a commit which triggers the io hang?
-> > > >
-> > > > Is it ok with 6.3.0 kernel or with reverting
-> > > >
-> > > > "virtio-blk: support completion batching for the IRQ path" commit?
-> > > >
-> > > >
-> > > >
-> > > > We need to confirm which commit is causing the error.
-> > > >
-> > > >
-> > > >
-> > > > Regards,
-> > > >
-> > > > Suwan Kim
-> >
+Good idea.
 
+> > > > > Isn't there some existing way to check whether a device is opened?
+> > > > > (stat syscall maybe?).
+> > > >=20
+> > > > Knowing that the device has been opened isn=E2=80=99t enough.  The =
+block script
+> > > > needs to be able to wait for blkback (and not something else) to op=
+en
+> > > > the device.  Otherwise it will be confused if the device is opened =
+by
+> > > > e.g. udev.
+> > >=20
+> > > Urg, no, the block script cannot wait indefinitely for blkback to open
+> > > the device, as it has an execution timeout.  blkback is free to only
+> > > open the device upon guest frontend connection, and that (when using
+> > > libxl) requires the hotplug scripts execution to be finished so the
+> > > guest can be started.
+> >=20
+> > I=E2=80=99m a bit confused here.  My understanding is that blkdev_get_b=
+y_dev()
+> > already opens the device, and that happens in the xenstore watch
+> > handler.  I have tested this with delete-on-close device-mapper devices,
+> > and it does work.
+>=20
+> Right, but on a very contended system there's no guarantee of when
+> blkback will pick up the update to "physical-device" and open the
+> device, so far the block script only writes the physical-device node
+> and exits.  With the proposed change the block script will also wait
+> for blkback to react to the physcal-device write, hence making VM
+> creation slower.
+
+Only block scripts that choose to wait for device open suffer
+this performance penalty.  My current plan is to only do so for
+delete-on-close devices which are managed by the block script
+itself.  Other devices will not suffer a performance hit.
+
+In the long term, I would like to solve this problem entirely by using
+an ioctl to configure blkback.  The ioctl would take a file descriptor
+argument, avoiding the need for a round-trip through xenstore.  This
+also solves a security annoyance with the current design, which is that
+the device is opened by a kernel thread and so the security context of
+whoever requested the device to be opened is lost.
+
+> > > > > I would like to avoid adding more xenstore blkback state if such
+> > > > > information can be fetched from other methods.
+> > > >=20
+> > > > I don=E2=80=99t think it can be, unless the information is passed v=
+ia a
+> > > > completely different method.  Maybe netlink(7) or ioctl(2)?  Arguab=
+ly
+> > > > this information should not be stored in Xenstore at all, as it exp=
+oses
+> > > > backend implementation details to the frontend.
+> > >=20
+> > > Could you maybe use sysfs for this information?
+> >=20
+> > Probably?  This would involve adding a new file in sysfs.
+> >=20
+> > > We have all sorts of crap in xenstore, but it would be best if we can
+> > > see of placing stuff like this in another interface.
+> >=20
+> > Fair.
+>=20
+> Let's see if that's a suitable approach, and we can avoid having to
+> add an extra node to xenstore.
+
+I thought about this some more and realized that in Qubes OS, we might
+want to include the diskseq in the information dom0 gets about each
+exported block device.  This would allow dom0 to write the xenstore node
+itself, but it would require some way for dom0 to be informed about
+blkback having this feature.
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+Invisible Things Lab
+
+--PU98An8gDVvBtzYA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEdodNnxM2uiJZBxxxsoi1X/+cIsEFAmSB8l4ACgkQsoi1X/+c
+IsFSYA//XhC38a6SDufwf6y+xaRXnVDYSdUsP21JYKyDgiz9s6lEag0nuPNrUkLt
++pQdAxPoPq99fFKrhleiVEbr1GtEBonRU6qMCe/cUJ/BqTkUyJ75EOeRtxFjr7DI
+QC9dbaly+Q+WkiLwmtHiaWgk56TaGp+GqYrG2Zj6w0fmIwOmZ59IRaDeIqwJYA6p
+T4vagAEMK+f3poK6sWfEhZE2IJ5tGqyZwxvpVPY3ldnm5wS9n5WmNZF0rM7lKGzF
+J8S8ITQut9DtW9NicTQfFz1jjIMDs3KFReSPchQ41+IRUx6nM3sjr6RnE2kBCER8
+io/OtNbe6TVv5LxDe2bDLpEzPesjl3RNrx+mgC/LpIaO8JhvZEYpF49XmgQbXRhe
+HMob73O0quNIUMQLqQ18zunfqE4wIq8Yfv4E146jRaItTN+AZT4oAFZZJb8f43BS
+c95GNTtjdguBVeLKb3Vi9dH9bgqtO9CbDop9PeP1T05q2VHxMTEGhf2XkZoOCCxI
+oMIV9IEbkBcVQT/nVZa56Suqgp6XKy/llGIrvk45bhraLT8ljpoHUeZnjQaJxJEO
+YWr7ImrznVH+57dQbSlkQrWKZcp8f0dzzfoDGGWXP6UTTA9JiiVMkqjmk6YZEyQL
+VGban/xP4mC8GD10OtAsc/b3n0w87wxVYjYT9hdDtgIBUzjcGP4=
+=1nZV
+-----END PGP SIGNATURE-----
+
+--PU98An8gDVvBtzYA--
