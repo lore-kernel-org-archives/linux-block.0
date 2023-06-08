@@ -2,107 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F766C77B7A
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jun 2023 02:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6542DC7EE2F
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jun 2023 03:24:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233684AbjFHCqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Jun 2023 22:46:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48390 "EHLO
+        id S234001AbjFHDYS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Jun 2023 23:24:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233680AbjFHCqP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 22:46:15 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 171E62126;
-        Wed,  7 Jun 2023 19:46:14 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Qc7rK4mhKz4f3lKQ;
-        Thu,  8 Jun 2023 10:46:09 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgD3rLDwQIFkn13HLA--.37355S6;
-        Thu, 08 Jun 2023 10:46:11 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, axboe@kernel.dk, dgilbert@interlog.com,
-        jejb@linux.ibm.com, martin.petersen@oracle.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH v3 2/2] block: fix blktrace debugfs entries leakage
-Date:   Thu,  8 Jun 2023 10:41:59 +0800
-Message-Id: <20230608024159.1282953-3-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230608024159.1282953-1-yukuai1@huaweicloud.com>
-References: <20230608024159.1282953-1-yukuai1@huaweicloud.com>
+        with ESMTP id S231599AbjFHDYR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Jun 2023 23:24:17 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD427210A;
+        Wed,  7 Jun 2023 20:24:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=cxhjXp8UqaZuHQSEUX/zpZgXQq8nJphVe5X9oVt9Lt4=; b=B09aOYuo6yIOyWUGfX5fEyLtt7
+        9ou3FUywOhl2aerjKqarqR7I4edV+KOUpAfSQcfUg9++n0fDaMzqD09DLsjve8Q0P+/cRGHEXvExV
+        49UFEwzi8xZ3VqNoQMjhcwe2t5cHVjPS7F43P6o3qOqpiafEjz0rfAbR2pBaJQBc7lD1cAEIvxXEX
+        6IfHGl8e/bavFWsCc5+A4MKi76oxJa4U7nPPLrqzMegUJcvs2/ocSV4CZd/mEaJctLO5Dvoi88NjB
+        FmsVdc3W1+HNF35BsaFIyj8vReE9FqbMuwQslUKlZk0OTCDCrkEGk/BMBZUZxasGsPhx8ihPxjNE0
+        LooAL6HQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q76Fr-007uuc-2Q;
+        Thu, 08 Jun 2023 03:24:07 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     hch@infradead.org, djwong@kernel.org, dchinner@redhat.com,
+        kbusch@kernel.org, willy@infradead.org
+Cc:     hare@suse.de, ritesh.list@gmail.com, rgoldwyn@suse.com,
+        jack@suse.cz, patches@lists.linux.dev, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        p.raghav@samsung.com, da.gomez@samsung.com, rohan.puri@samsung.com,
+        rpuri.linux@gmail.com, mcgrof@kernel.org, corbet@lwn.net,
+        jake@lwn.net
+Subject: [RFC 0/4] bdev: allow buffer-head & iomap aops to co-exist
+Date:   Wed,  7 Jun 2023 20:24:00 -0700
+Message-Id: <20230608032404.1887046-1-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3rLDwQIFkn13HLA--.37355S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw4fWFyxGF1fury7Zr4DXFb_yoW8Wry5pa
-        9rur45KrWjvr4YvF1Duw17XF18Ka95GryrAr9agFWYvr17Crs8X392vr4IgrWrAFZI9rZ8
-        Wa4UGr9xArWkXaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPj14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
-        CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOJPEUUUU
-        U
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+At LSFMM it was clear that for some in order to support large order folios
+we want to use iomap. So the filesystems staying and requiring buffer-heads
+cannot make use of high order folios. This simplifies support and reduces
+the scope for what we need to do in order to support high order folios for
+buffered-io.
 
-Commit 99d055b4fd4b ("block: remove per-disk debugfs files in
-blk_unregister_queue") moves blk_trace_shutdown() from
-blk_release_queue() to blk_unregister_queue(), this is safe if blktrace
-is created through sysfs, however, there is a regression in corner
-case.
+As Christoph's patches show though, we can only end up without buffer-heads
+if you build and boot a system without any support for any filesystem that
+requires buffer-heads. That's a tall order today.
 
-blktrace can still be enabled after del_gendisk() through ioctl if
-the disk is opened before del_gendisk(), and if blktrace is not shutdown
-through ioctl before closing the disk, debugfs entries will be leaked.
+We however want to be able to support block devices which may want to
+completely opt-in to to only use iomap and iomap based filesystems. We
+cannot do that today. To help with this we must extend the block device
+cache so to enable each block device to get its own super block, and so
+to later enable us to pick and choose the aops we use for the block
+device.
 
-Fix this problem by shutdown blktrace in disk_release(), this is safe
-because blk_trace_remove() is reentrant.
+The first patch seems already applicable upstream. The second is just
+makes future changes easier to read. The third patch probably just needs
+to be squashed into Christoph's work.
 
-Fixes: 99d055b4fd4b ("block: remove per-disk debugfs files in blk_unregister_queue")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/genhd.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+The last patch is the meat of this.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 3537b7d7c484..134cb6eb8e91 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -25,8 +25,9 @@
- #include <linux/pm_runtime.h>
- #include <linux/badblocks.h>
- #include <linux/part_stat.h>
--#include "blk-throttle.h"
-+#include <linux/blktrace_api.h>
- 
-+#include "blk-throttle.h"
- #include "blk.h"
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
-@@ -1171,6 +1172,8 @@ static void disk_release(struct device *dev)
- 	might_sleep();
- 	WARN_ON_ONCE(disk_live(disk));
- 
-+	blk_trace_remove(disk->queue);
-+
- 	/*
- 	 * To undo the all initialization from blk_mq_init_allocated_queue in
- 	 * case of a probe failure where add_disk is never called we have to
+It goes boot tested, and applies on top of Christoph's patches which
+enable you to build a sytem without buffer-heads. For convenience I've
+stashed what this looks like on my large-block-20230607-dev-cache
+branch [0].
+
+The hot swapping of the aops is what would be next, and when we do that.
+One option is to pursue things as-is now and then only flip if we need
+high order folios. I'm sure Christoph will have better ideas how to do
+that cleanly. But this is is what I have so far.
+
+Lemme know how crappy this looks or pitfalls I'm sure I missed.
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=large-block-20230607-dev-cache
+
+Luis Chamberlain (4):
+  bdev: replace export of blockdev_superblock with BDEVFS_MAGIC
+  bdev: abstract inode lookup on blkdev_get_no_open()
+  bdev: rename iomap aops
+  bdev: extend bdev inode with it's own super_block
+
+ block/bdev.c       | 106 +++++++++++++++++++++++++++++++++++++--------
+ block/blk.h        |   1 +
+ block/fops.c       |  14 +++---
+ include/linux/fs.h |   4 +-
+ 4 files changed, 98 insertions(+), 27 deletions(-)
+
 -- 
 2.39.2
 
