@@ -2,45 +2,38 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B834C7EE23
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jun 2023 05:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B86DC7EE37
+	for <linux-block@archiver.kernel.org>; Thu,  8 Jun 2023 05:42:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234131AbjFHFb7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jun 2023 01:31:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38848 "EHLO
+        id S233976AbjFHFmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jun 2023 01:42:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233578AbjFHFb6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 01:31:58 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B0FE2;
-        Wed,  7 Jun 2023 22:31:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=VU8sM/MyDIK5Q0mZlQqc5FU5cp
-        DOTvTbMR4bSaF0BHmXtFA6e9sTM9DqisaJ4fl8u7jrxYrI1zTJbS14Xc/vS4ZMJcr5s6MPU37XOsr
-        ouOumRjSgq/GaXcdqdSP9h03v01gj+Y9MHkd7NDlMsV+GwkiWmkcTdI3BPNzBESkKxnnxyJey65B9
-        b19EeR1dEvpt34DCYBPSwH6IMMUbE+pN3YEilPJqYVAjqJcGRgpyfMAcDr5GEghHdA/0Rjy2kTKpV
-        gsenhVW5FSMEFa/zXaOscMqtor+msBYoImph96nMdubMXpvC7PtcEz7FZ/94hImDaIiu0cJ4srD91
-        46BjVmMA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q78FY-0089WW-1I;
-        Thu, 08 Jun 2023 05:31:56 +0000
-Date:   Wed, 7 Jun 2023 22:31:56 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Demi Marie Obenour <demi@invisiblethingslab.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>, stable@vger.kernel.org
-Subject: Re: [PATCH] block: increment diskseq on all media change events
-Message-ID: <ZIFnzGM95xpAm49i@infradead.org>
-References: <20230607170837.1559-1-demi@invisiblethingslab.com>
+        with ESMTP id S230300AbjFHFmf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 01:42:35 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96B422690;
+        Wed,  7 Jun 2023 22:42:34 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C9C716732D; Thu,  8 Jun 2023 07:42:30 +0200 (CEST)
+Date:   Thu, 8 Jun 2023 07:42:30 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     mwilck@suse.com
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v3 3/8] scsi: merge scsi_internal_device_block() and
+ device_block()
+Message-ID: <20230608054230.GA11554@lst.de>
+References: <20230607182249.22623-1-mwilck@suse.com> <20230607182249.22623-4-mwilck@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230607170837.1559-1-demi@invisiblethingslab.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20230607182249.22623-4-mwilck@suse.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -48,3 +41,4 @@ X-Mailing-List: linux-block@vger.kernel.org
 Looks good:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+
