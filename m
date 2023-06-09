@@ -2,93 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA67C7EE25
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 07:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A54C7EE2E
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 08:43:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238903AbjFIHrI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 03:47:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54214 "EHLO
+        id S240433AbjFIInz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 04:43:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239018AbjFIHqr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 03:46:47 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06B11FDA
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 00:46:46 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-ba82059ef0bso1535584276.1
-        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 00:46:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1686296806; x=1688888806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eQtWQgBWONEjapQJ3HGUtmOPuWCE3mcLvRmJpvrUrHg=;
-        b=LyMadsitRIufLweIhTI+hPtNLXcZUNLMMWUpXLkmVpGQERt8m8BWk/xYROW/Yz4SSh
-         yLhSmpswBZqLPw2ifCqYpm1xpAG+nGiuGDhyU96K9R/YOLIKKlgzcmvjBRXgE6nXsM5s
-         pml3i9pM3Ea7m/7FrxdSID+R0SWKpWreU5JCivj/sTdQz8sd7UjQLR3eNdG2f0HAuYDL
-         S5X5Q668T+HMmUwxhdL/h0uMTTNWFI7IsGlWrm8h2TzWEe8X7j4ytJODhZEsylAcFQDL
-         8l48uf5UO5ZZxko8wHxh6GJ4LQProdR5JNOijtoAW+s5aJvgAHwuRaozSGDU8oJfmN+e
-         m/nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686296806; x=1688888806;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQtWQgBWONEjapQJ3HGUtmOPuWCE3mcLvRmJpvrUrHg=;
-        b=ZgnY18tiDKtIiUW+6YWWAwDJHv/tm2xUoSnqjA0S3eOh/OyvBsPoSRExYbIFpA6ZgL
-         N3BEehmluhPgu6eb/0ndbyMmVbJtv1QT/BQp1rNtdP3WZCjbIF72I/kmz5Qgpdk6/Hqr
-         gxjIx0Y8HlTkoSDJLTuN8DUa9OettQD80pYktRMfE7TfVMhHpyUzetxvsHRrX0Bzq41S
-         SskBwW72Xt7VBYcjX9iii1hI+JO0qLklhN4Zc2vbgyAV/TTCLWOxyI2J8nGTZ32Xc56l
-         OizAVKlLhII9uXwQGTQHEUZwQrVGKTq1vn2dhFO8x1vbM/Y4FcFEvo1Dehk9r5Y9qLL3
-         1jSw==
-X-Gm-Message-State: AC+VfDzQI0A3Lqsd32mSAnh7Q/WR44UJJPRHrjnSO73TXTHXxL8ZfREQ
-        QeJoly/o8X0+jyg08s0EDzGEUBuZScO7uJCmi2pNdg==
-X-Google-Smtp-Source: ACHHUZ55dnpCpQSf88QzN1dhH/frReaHdcdBTwnPH1jJ2/G1Jn6ipXKw/74xtImalulB9Gr93fuua0ElhWtX00WAt1U=
-X-Received: by 2002:a25:a4a8:0:b0:bab:a56f:c580 with SMTP id
- g37-20020a25a4a8000000b00baba56fc580mr349340ybi.50.1686296806144; Fri, 09 Jun
- 2023 00:46:46 -0700 (PDT)
+        with ESMTP id S230395AbjFIInm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 04:43:42 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A549895;
+        Fri,  9 Jun 2023 01:43:32 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qcvk81mvVz4f3tP1;
+        Fri,  9 Jun 2023 16:43:28 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbEu5oJkNdspLQ--.1947S4;
+        Fri, 09 Jun 2023 16:43:28 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     hch@lst.de, axboe@kernel.dk, dgilbert@interlog.com,
+        jejb@linux.ibm.com, martin.petersen@oracle.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: [PATCH v4 0/2] fix blktrace debugfs entries leakage
+Date:   Fri,  9 Jun 2023 16:39:11 +0800
+Message-Id: <20230609083913.2254980-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <20230608095556.124001-1-dlemoal@kernel.org>
-In-Reply-To: <20230608095556.124001-1-dlemoal@kernel.org>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Fri, 9 Jun 2023 09:46:35 +0200
-Message-ID: <CACRpkdbmxoUwcwHdw4bcgaDy633ZKLOZ3z-d1qjzBF42omC1CA@mail.gmail.com>
-Subject: Re: [PATCH RESEND] block: improve ioprio value validity checks
-To:     Damien Le Moal <dlemoal@kernel.org>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Niklas Cassel <niklas.cassel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBnHbEu5oJkNdspLQ--.1947S4
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYc7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
+        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
+        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
+        M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
+        1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
+        b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
+        vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI
+        42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
+        evJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 8, 2023 at 11:55=E2=80=AFAM Damien Le Moal <dlemoal@kernel.org>=
- wrote:
+From: Yu Kuai <yukuai3@huawei.com>
 
-> The introduction of the macro IOPRIO_PRIO_LEVEL() in commit
-> eca2040972b4 ("scsi: block: ioprio: Clean up interface definition")
-> results in an iopriority level to always be masked using the macro
-> IOPRIO_LEVEL_MASK, and thus to the kernel always seeing an acceptable
-> value for an I/O priority level when checked in ioprio_check_cap().
-> Before this patch, this function would return an error for some (but not
-> all) invalid values for a level valid range of [0..7].
->
-> Restore and improve the detection of invalid priority levels by
-> introducing the inline function ioprio_value() to check an ioprio class,
-> level and hint value before combining these fields into a single value
-> to be used with ioprio_set() or AIOs. If an invalid value for the class,
-> level or hint of an ioprio is detected, ioprio_value() returns an ioprio
-> using the class IOPRIO_CLASS_INVALID, indicating an invalid value and
-> causing ioprio_check_cap() to return -EINVAL.
->
-> Fixes: 6c913257226a ("scsi: block: Introduce ioprio hints")
-> Fixes: eca2040972b4 ("scsi: block: ioprio: Clean up interface definition"=
-)
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Changes in v4:
+ - blk_trace_remove() will trigger build warning if blktrace config is
+ not enabled, use blk_trace_shutdown() instead.
 
-This makes it easier to get things right.
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Changes in v3:
+ - add a new patch to handle /dev/sg
 
-Yours,
-Linus Walleij
+Changes in v2:
+ - cleanup bltkrace in disk_release() instead of blk_free_queue()
+
+Yu Kuai (2):
+  scsi: sg: fix blktrace debugfs entries leakage
+  block: fix blktrace debugfs entries leakage
+
+ block/genhd.c     |  7 ++++++-
+ drivers/scsi/sg.c | 11 +++++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+-- 
+2.39.2
+
