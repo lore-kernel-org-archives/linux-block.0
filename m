@@ -2,114 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A619CC7EE25
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 20:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C641C7EE45
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 20:32:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232465AbjFIUV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 16:21:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32952 "EHLO
+        id S230049AbjFIUcd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 16:32:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229928AbjFIUVg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 16:21:36 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B07422F
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 13:20:38 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-77ad566f7fbso18570239f.1
-        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 13:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686342019; x=1688934019;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v3DLcpk3UcHISJgBg0wNxB82l3aLFWCna+oxTSr88k4=;
-        b=UfhmWUw/Dzx1GVDpFJ0YFhGO0921WYkh7E28L6wNqbq74mkBjAZbmgyQ1aR0t6NbD5
-         o4qgV0jxQaHvIoRag5Sd4OPDIb9YF0Ryssx60MHtrQfmtzJ4yPJ6jxfDg3oE74wgihMj
-         Pp7NbqGxgtyV2fuzxSC42zIkxoIfAh53va8zbyQc8H4zYZVRvlr5pBPtgPMgpZV4ZKk/
-         ExdoRCwD3IqfcHa7MctVQ4Jk9M7Dw+4ZxcTbFIhQsN2BWxW3jBwUo3DZCbVH287u4AzX
-         4g1b+x413qISM9NAmzmK4m4r0zA72Bnz6JofR9Vjq7ssrlhy0/OdgLFi4CuzeOEXaT6B
-         om0A==
+        with ESMTP id S229803AbjFIUcc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 16:32:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E1F7D8
+        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 13:31:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686342704;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kqBodWvsMAtzK0roMuBBNkvevtML0piZ6ybEx/MweaE=;
+        b=QTdgM9lVtL4CFMnYLPm5bLxb+YopEa1Dn5HSuGxRP9fg79EoMsJdDtSSQALeb40gtBbjPU
+        zx7r6f/HNtf1HH9tTxshaDEn7t5BKGis2Ecf/Gwy53Qq/muj/dEKsUTUTc74o/Z4HkHutK
+        4+oPCzAH0QdrSoG+hVVe87EJZ1YyIvw=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-376-j1--QvWQNKel36TenMpnBg-1; Fri, 09 Jun 2023 16:31:43 -0400
+X-MC-Unique: j1--QvWQNKel36TenMpnBg-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6261a0b2391so23977396d6.1
+        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 13:31:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686342019; x=1688934019;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=v3DLcpk3UcHISJgBg0wNxB82l3aLFWCna+oxTSr88k4=;
-        b=NDLgqQ1nDS0aUOspn7HMw4n1rzQCeaGss+7DyGm7mBd+EM7ErvRb7n400xZHK5PgaT
-         Sg6kIVKN2EFzEIo41zabLRvBmnys4K+a218bS4OC9vAof/3w5su/8q/2sbvTrKMzEVDS
-         eegB8sbLKJFLOj+Wtb/Z+HQ+GKqISrGl+CmDR9r2h/n62lnMYspNTE/VMW4BpD2O3ezm
-         Nxz2dZSpRuezONTDg44KAV0LMuFijsHvvMWNL9OS7kExUK15h6ojPwklhsiAd61Hw8XR
-         q4GjaaGCLn2CTNwE2rf3s9Jrk1owqa20ZGkL5P5q0yxFrWd1KVJ8F/HQT9cD8s3fGpVC
-         iYCQ==
-X-Gm-Message-State: AC+VfDxzBnrDNQC+EKyiduEbkdtWKoHaV7JYIVbZN5y6JyyajSqXccyz
-        m5n7f8w77IYHUxVtNp9DmdrZrw==
-X-Google-Smtp-Source: ACHHUZ6wYvO+aKId9kQoH+OsDlNxz65Exh4nvQ5uC/E+NDSCsF/Oe7lAyZ3vkZIpqsDx6QW6LZj1Kg==
-X-Received: by 2002:a6b:5810:0:b0:777:b7c8:ad32 with SMTP id m16-20020a6b5810000000b00777b7c8ad32mr1886269iob.0.1686342019487;
-        Fri, 09 Jun 2023 13:20:19 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id n17-20020a6b7211000000b0077ac2261248sm1262082ioc.5.2023.06.09.13.20.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jun 2023 13:20:18 -0700 (PDT)
-Message-ID: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
-Date:   Fri, 9 Jun 2023 14:20:18 -0600
+        d=1e100.net; s=20221208; t=1686342703; x=1688934703;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kqBodWvsMAtzK0roMuBBNkvevtML0piZ6ybEx/MweaE=;
+        b=MabS/3JwhCKw8Wiejy6ZVvDbKN4B10FxwhPX8gvoO5ef9UFwyjMGCq0/PVVM+slWxV
+         x7zv8QWfiOtWi4OyUzaaaTumhy+QmbQxq+Sr1AXD5maFTUMCXRqMfQUI6xwFp6Zn1pDe
+         El5Zt/Tbzb/CA1xmZ2WFnAxVaZeyXdcFM/KlRozB4rMMu382Y+ZNA7s60oHX33EiqdEj
+         OLcV3OPabYx7ABVWQyDpmGMQEyVBK2IOGL3Ru5VwMmeIdSKFobYixo9VJLAlIKtOgmNt
+         OXyvvOJjqCczz0pv+MRZEWh+QoWN5eLy93r+BuRxc7JSTr47IRo5zOxo7kRjQzdAywn4
+         s1EQ==
+X-Gm-Message-State: AC+VfDxe5aNI32l0a8kBmccDxul7sHCL0cXLnbD3KnepdQE4H+v372Wa
+        +GV96Y3YVQ/HVQsG112RBKmZQS9MXyp+IgvWPqDFAFqF8l96ZVOOWcLNof8Dv5MkNqzjR4B0lv4
+        ByiLY+2X+gO4QFM9yHvEZBA==
+X-Received: by 2002:a05:6214:124a:b0:626:3a5a:f8dc with SMTP id r10-20020a056214124a00b006263a5af8dcmr3512872qvv.57.1686342703126;
+        Fri, 09 Jun 2023 13:31:43 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ78w0WDf0o6qhufepqm2d8bEB8MBtf2WH2t9YiWbkCms2QdUrQ0M7FAIP95SCC+cHOEnZuU1A==
+X-Received: by 2002:a05:6214:124a:b0:626:3a5a:f8dc with SMTP id r10-20020a056214124a00b006263a5af8dcmr3512845qvv.57.1686342702858;
+        Fri, 09 Jun 2023 13:31:42 -0700 (PDT)
+Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
+        by smtp.gmail.com with ESMTPSA id m24-20020ae9e718000000b007578622c861sm1250201qka.108.2023.06.09.13.31.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jun 2023 13:31:42 -0700 (PDT)
+Date:   Fri, 9 Jun 2023 16:31:41 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Joe Thornber <thornber@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-kernel@vger.kernel.org, Joe Thornber <ejt@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, Brian Foster <bfoster@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZIOMLfMjugGf4C2T@redhat.com>
+References: <ZHFEfngPyUOqlthr@dread.disaster.area>
+ <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
+ <ZHYB/6l5Wi+xwkbQ@redhat.com>
+ <CAJ0trDaUOevfiEpXasOESrLHTCcr=oz28ywJU+s+YOiuh7iWow@mail.gmail.com>
+ <ZHYWAGmKhwwmTjW/@redhat.com>
+ <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
+ <ZHqOvq3ORETQB31m@dread.disaster.area>
+ <ZHti/MLnX5xGw9b7@redhat.com>
+ <CAG9=OMNv80fOyVixEY01XESnOFzYyfj9j8etHMq_Ap52z4UWNQ@mail.gmail.com>
+ <ZIESXNF5anyvJEjm@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.4-rc6
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZIESXNF5anyvJEjm@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Wed, Jun 07 2023 at  7:27P -0400,
+Mike Snitzer <snitzer@kernel.org> wrote:
 
-Just a few minor fixes for this release:
+> On Mon, Jun 05 2023 at  5:14P -0400,
+> Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
+> 
+> > On Sat, Jun 3, 2023 at 8:57 AM Mike Snitzer <snitzer@kernel.org> wrote:
+> > >
+> > > We all just need to focus on your proposal and Joe's dm-thin
+> > > reservation design...
+> > >
+> > > [Sarthak: FYI, this implies that it doesn't really make sense to add
+> > > dm-thinp support before Joe's design is implemented.  Otherwise we'll
+> > > have 2 different responses to REQ_OP_PROVISION.  The one that is
+> > > captured in your patchset isn't adequate to properly handle ensuring
+> > > upper layer (like XFS) can depend on the space being available across
+> > > snapshot boundaries.]
+> > >
+> > Ack. Would it be premature for the rest of the series to go through
+> > (REQ_OP_PROVISION + support for loop and non-dm-thinp device-mapper
+> > targets)? I'd like to start using this as a reference to suggest
+> > additions to the virtio-spec for virtio-blk support and start looking
+> > at what an ext4 implementation would look like.
+> 
+> Please drop the dm-thin.c and dm-snap.c changes.  dm-snap.c would need
+> more work to provide the type of guarantee XFS requires across
+> snapshot boundaries. I'm inclined to _not_ add dm-snap.c support
+> because it is best to just use dm-thin.
+> 
+> And FYI even your dm-thin patch will be the starting point for the
+> dm-thin support (we'll keep attribution to you for all the code in a
+> separate patch).
+> 
+> > Fair points, I certainly don't want to derail this conversation; I'd
+> > be happy to see this work merged sooner rather than later.
+> 
+> Once those dm target changes are dropped I think the rest of the
+> series is fine to go upstream now.  Feel free to post a v8.
 
-- Fix an issue with the hardware queue nr_active, causing it to become
-  imbalanced (Tian)
+FYI, I've made my latest code available in this
+'dm-6.5-provision-support' branch (based on 'dm-6.5'):
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-6.5-provision-support
 
-- Fix an issue with null_blk not releasing pages if configured as memory
-  backed (Nitesh)
+It's what v8 should be plus the 2 dm-thin patches (that I don't think
+should go upstream yet, but are theoretically useful for Dave and
+Joe).
 
-- Fix a locking issue in dasd (Jan)
+The "dm thin: complete interface for REQ_OP_PROVISION support" commit
+establishes all the dm-thin interface I think is needed.  The FIXME in
+process_provision_bio() (and the patch header) cautions against upper
+layers like XFS using this dm-thinp support quite yet.
 
-Please pull!
+Otherwise we'll have the issue where dm-thinp's REQ_OP_PROVISION
+support initially doesn't provide the guarantee that XFS needs across
+snapshots (which is: snapshots inherit all previous REQ_OP_PROVISION).
 
-
-The following changes since commit 2e45a49531fef55f4abbd6738c052545f53f43d4:
-
-  Merge tag 'nvme-6.4-2023-06-01' of git://git.infradead.org/nvme into block-6.4 (2023-06-01 11:12:46 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.4-2023-06-09
-
-for you to fetch changes up to ccc45cb4e7271c74dbb27776ae8f73d84557f5c6:
-
-  s390/dasd: Use correct lock while counting channel queue length (2023-06-09 11:35:52 -0600)
-
-----------------------------------------------------------------
-block-6.4-2023-06-09
-
-----------------------------------------------------------------
-Jan Höppner (1):
-      s390/dasd: Use correct lock while counting channel queue length
-
-Nitesh Shetty (1):
-      null_blk: Fix: memory release when memory_backed=1
-
-Tian Lan (1):
-      blk-mq: fix blk_mq_hw_ctx active request accounting
-
- block/blk-mq.c                  | 8 ++++----
- drivers/block/null_blk/main.c   | 1 +
- drivers/s390/block/dasd_ioctl.c | 4 ++--
- 3 files changed, 7 insertions(+), 6 deletions(-)
-
--- 
-Jens Axboe
+Mike
 
