@@ -2,67 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09933C7EE25
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 21:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38513C7EE43
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 21:52:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230044AbjFIVYL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 17:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55200 "EHLO
+        id S232102AbjFIVwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 17:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229827AbjFIVYL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 17:24:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3D435BE
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 14:24:10 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1F15360ED3
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 21:24:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 827E9C433D2;
-        Fri,  9 Jun 2023 21:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686345849;
-        bh=f5m9GxqfzgS5/SMRZPsPVnAvliF6In5HtosyWM/vboI=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Wom+oVyyiRy/OmDxfmHSCuj6YazvKrhFVk5vqupDzi1iLu7tA82CNL1amM7wUKlTI
-         0BAGG8kCCsyaYGqDCuA4y3ZXpOxi9shWZUFYlvRu9xg+tfB5XCTtA6tlqYbdvDMJQO
-         PsvUjuKQin0M/ZN/2YSgY0j498oqJHIVfd+9eXWOLA2jSFh7e4P/7CCu5WW1jKljEi
-         LpYwaRDLH69fwINrjPXsvW18TEozQQIXw5qozrsTbngS/15Stxl7qAvlnl5TUvPOCP
-         DgdrQuq7VsycUWxk98O1BJWKc6KHRD4aCTcVKevuZ14ul8YG4eDBb2LrNWSLoJVlQO
-         Ed0xTItylujIA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6FE49C43143;
-        Fri,  9 Jun 2023 21:24:09 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.4-rc6
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
-References: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.4-2023-06-09
-X-PR-Tracked-Commit-Id: ccc45cb4e7271c74dbb27776ae8f73d84557f5c6
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 64569520920a3ca5d456ddd9f4f95fc6ea9b8b45
-Message-Id: <168634584945.8966.6518299567363434380.pr-tracker-bot@kernel.org>
-Date:   Fri, 09 Jun 2023 21:24:09 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        with ESMTP id S229475AbjFIVwy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 17:52:54 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4A22685;
+        Fri,  9 Jun 2023 14:52:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686347573; x=1717883573;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=izJ4f9F65dVTOY3ec3XppLSc9XRNMCow5CmFkhoSG/Y=;
+  b=h9ywdeFY44JjAfgzrCLBAn5dlNf1tLfUPPyl7uVslvwI2QZC4SZ0bSUi
+   JrQ0FhErcVIROENrLOsLQslF6FhnJahusWqLJleiLHyCERhITzkLpNRes
+   SWoI3uMdPG9GmGat3+73+H7WfEOUeem+7O+DQdMguz5lv3fIdi2EtlUkT
+   m/bwlK1IKlP9tthPhw2vqmxzjKfaE66LynPhpQWrj71qYPpunu4jyM+hW
+   MI8liqrqhJ5ak5ortLmL1o6Z2DNcMvmS73fwmZM54jPQnL6hsDCLMZ3H0
+   HXIXi8Pcc2N5GJC7DBRlkMMeplACBH49nmqNN905lDXaNi4zZHvJtZOn4
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10736"; a="444066207"
+X-IronPort-AV: E=Sophos;i="6.00,230,1681196400"; 
+   d="scan'208";a="444066207"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2023 14:52:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10736"; a="957297138"
+X-IronPort-AV: E=Sophos;i="6.00,230,1681196400"; 
+   d="scan'208";a="957297138"
+Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 09 Jun 2023 14:52:49 -0700
+Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q7k2K-0009RN-24;
+        Fri, 09 Jun 2023 21:52:48 +0000
+Date:   Sat, 10 Jun 2023 05:52:41 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk,
+        dgilbert@interlog.com, jejb@linux.ibm.com,
+        martin.petersen@oracle.com
+Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: Re: [PATCH v4 1/2] scsi: sg: fix blktrace debugfs entries leakage
+Message-ID: <202306100517.8BoUnWma-lkp@intel.com>
+References: <20230609083913.2254980-2-yukuai1@huaweicloud.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230609083913.2254980-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 9 Jun 2023 14:20:18 -0600:
+Hi Yu,
 
-> git://git.kernel.dk/linux.git tags/block-6.4-2023-06-09
+kernel test robot noticed the following build errors:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/64569520920a3ca5d456ddd9f4f95fc6ea9b8b45
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on mkp-scsi/for-next linus/master v6.4-rc5 next-20230609]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you!
+url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/scsi-sg-fix-blktrace-debugfs-entries-leakage/20230609-164641
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/20230609083913.2254980-2-yukuai1%40huaweicloud.com
+patch subject: [PATCH v4 1/2] scsi: sg: fix blktrace debugfs entries leakage
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20230610/202306100517.8BoUnWma-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 12.3.0
+reproduce (this is a W=1 build):
+        mkdir -p ~/bin
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        git remote add axboe-block https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+        git fetch axboe-block for-next
+        git checkout axboe-block/for-next
+        b4 shazam https://lore.kernel.org/r/20230609083913.2254980-2-yukuai1@huaweicloud.com
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=s390 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306100517.8BoUnWma-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+ERROR: modpost: "devm_ioremap_resource" [drivers/dma/qcom/hdma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
+ERROR: modpost: "iounmap" [drivers/tty/ipwireless/ipwireless.ko] undefined!
+ERROR: modpost: "ioremap" [drivers/tty/ipwireless/ipwireless.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/char/xillybus/xillybus_of.ko] undefined!
+ERROR: modpost: "devm_memremap" [drivers/misc/open-dice.ko] undefined!
+ERROR: modpost: "devm_memunmap" [drivers/misc/open-dice.ko] undefined!
+>> ERROR: modpost: "blk_trace_shutdown" [drivers/scsi/sg.ko] undefined!
+ERROR: modpost: "iounmap" [drivers/net/ethernet/8390/pcnet_cs.ko] undefined!
+WARNING: modpost: suppressed 14 unresolved symbol warnings because there were too many)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
