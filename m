@@ -2,38 +2,37 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EEAC83005
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 12:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14401C87FE1
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 12:21:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231923AbjFIMVn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 08:21:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33818 "EHLO
+        id S240306AbjFIMVq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 08:21:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231731AbjFIMVk (ORCPT
+        with ESMTP id S231865AbjFIMVk (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 08:21:40 -0400
-X-Greylist: delayed 1107 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 09 Jun 2023 05:21:38 PDT
 Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C336A3586;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C329E3583;
         Fri,  9 Jun 2023 05:21:37 -0700 (PDT)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id 6AAEC41AF7;
-        Fri,  9 Jun 2023 08:05:06 -0400 (EDT)
+        by mx2.veeam.com (Postfix) with ESMTPS id 7843841D63;
+        Fri,  9 Jun 2023 08:03:08 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx2-2022; t=1686312306;
-        bh=KwEJElULIhzngKuCheDEIlQjJm5prpi1+WDkRSSRLHU=;
+        s=mx2-2022; t=1686312188;
+        bh=EO/SkXV19dass/HmzJL1BcRfUBYeuxs+ohaD556a/ZM=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=S+hVTJHI8bvrpx5IiA9njLuXrXU2GVBEvGfrbA53jGPpL0z2Xl2IGI0OgkpmfXpk8
-         Ua1i9F4PQsWOkdwimzBY6xqDVfOEYkFNxKD24gM/cK1HHqi3yT7WMSfthmxJAtozsv
-         OdZuF6LXvnBxDJwYqJxmKxtJvKv/BbKKB3H4o2lfemUu5oscJZlXYxMBdkvc9suirO
-         X7DMSSzFDpDa6AvICsvj+yHuPqWK2dDNd2oh5OAEMims6Bkf4tyoVrSitwuCI1OJsG
-         rHBa0OKQq7QRrkqkDR+3ZZWkPWukA5zPDPyqw8cBjqDLPnqYTMFQn/P3lPMo92iPr2
-         ieQeW6slQycVg==
+        b=ZizslHRjuXB5V271Sjrl8nLNybgZqWCPEF/cRh51+EVQpCQHAYlvzKDztqCI3QQvg
+         yEgyMA7n8EFP3x296zasmrTDu9htHfErOjO+HxXFup7kuKiz5pA0SZsKUU8WLifQ6W
+         wazfvH6fKN1nPXMgPd676CLCEp8Ri+fKaLB6pItUrxYVrCh/v9svigZJgEATtXuqb3
+         gpg3X3j2Ph+av+6w4QQV/Xl3Ae9UkXIbO7CEfCPttvtJLfq6h9WQcjtNI54K1VgUT1
+         mPSYYmCgi683WS870vsTPv973kCM0oscWdfWPn693iTnercgNOcND98hI/yRhV1ArO
+         1UuhSG9uAfOxg==
 Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
  prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 9 Jun 2023 14:05:05 +0200
+ 15.2.1118.26; Fri, 9 Jun 2023 14:03:03 +0200
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <axboe@kernel.dk>, <hch@infradead.org>, <corbet@lwn.net>,
         <snitzer@kernel.org>
@@ -43,9 +42,9 @@ CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
         <gregkh@linuxfoundation.org>, <linux-block@vger.kernel.org>,
         <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-fsdevel@vger.kernel.org>, <sergei.shtepa@veeam.com>
-Subject: [PATCH v4 07/11] blksnap: minimum data storage unit of the original block device
-Date:   Fri, 9 Jun 2023 13:58:54 +0200
-Message-ID: <20230609115858.4737-7-sergei.shtepa@veeam.com>
+Subject: [PATCH v4 05/11] blksnap: module management interface functions
+Date:   Fri, 9 Jun 2023 13:58:52 +0200
+Message-ID: <20230609115858.4737-5-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230609115858.4737-1-sergei.shtepa@veeam.com>
 References: <20230609115858.4737-1-sergei.shtepa@veeam.com>
@@ -62,600 +61,545 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The struct chunk describes the minimum data storage unit of the original
-block device. Functions for working with these minimal blocks implement
-algorithms for reading and writing blocks.
+Contains callback functions for loading and unloading the module and
+implementation of module management interface functions. The module
+parameters and other mandatory declarations for the kernel module are
+also defined.
 
 Co-developed-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- drivers/block/blksnap/chunk.c | 454 ++++++++++++++++++++++++++++++++++
- drivers/block/blksnap/chunk.h | 114 +++++++++
- 2 files changed, 568 insertions(+)
- create mode 100644 drivers/block/blksnap/chunk.c
- create mode 100644 drivers/block/blksnap/chunk.h
+ MAINTAINERS                    |   1 +
+ drivers/block/blksnap/main.c   | 483 +++++++++++++++++++++++++++++++++
+ drivers/block/blksnap/params.h |  16 ++
+ 3 files changed, 500 insertions(+)
+ create mode 100644 drivers/block/blksnap/main.c
+ create mode 100644 drivers/block/blksnap/params.h
 
-diff --git a/drivers/block/blksnap/chunk.c b/drivers/block/blksnap/chunk.c
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1cbd551d3897..e306b729fd10 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3597,6 +3597,7 @@ M:	Sergei Shtepa <sergei.shtepa@veeam.com>
+ L:	linux-block@vger.kernel.org
+ S:	Supported
+ F:	Documentation/block/blksnap.rst
++F:	drivers/block/blksnap/*
+ F:	include/uapi/linux/blksnap.h
+
+ BLOCK LAYER
+diff --git a/drivers/block/blksnap/main.c b/drivers/block/blksnap/main.c
 new file mode 100644
-index 000000000000..fe1e9b0e3323
+index 000000000000..7bb37c191fda
 --- /dev/null
-+++ b/drivers/block/blksnap/chunk.c
-@@ -0,0 +1,454 @@
++++ b/drivers/block/blksnap/main.c
+@@ -0,0 +1,483 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/* Copyright (C) 2023 Veeam Software Group GmbH */
-+#define pr_fmt(fmt) KBUILD_MODNAME "-chunk: " fmt
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <linux/blkdev.h>
-+#include <linux/slab.h>
++#include <linux/module.h>
++#include <linux/miscdevice.h>
++#include <linux/build_bug.h>
++#include <uapi/linux/blksnap.h>
++#include "snapimage.h"
++#include "snapshot.h"
++#include "tracker.h"
 +#include "chunk.h"
-+#include "diff_buffer.h"
-+#include "diff_storage.h"
 +#include "params.h"
 +
-+struct chunk_bio {
-+	struct work_struct work;
-+	struct list_head chunks;
-+	struct bio *orig_bio;
-+	struct bvec_iter orig_iter;
-+	struct bio bio;
++/*
++ * The power of 2 for minimum tracking block size.
++ * If we make the tracking block size small, we will get detailed information
++ * about the changes, but the size of the change tracker table will be too
++ * large, which will lead to inefficient memory usage.
++ */
++static unsigned int tracking_block_minimum_shift = 16;
++
++/*
++ * The maximum number of tracking blocks.
++ * A table is created to store information about the status of all tracking
++ * blocks in RAM. So, if the size of the tracking block is small, then the size
++ * of the table turns out to be large and memory is consumed inefficiently.
++ * As the size of the block device grows, the size of the tracking block
++ * size should also grow. For this purpose, the limit of the maximum
++ * number of block size is set.
++ */
++static unsigned int tracking_block_maximum_count = 2097152;
++
++/*
++ * The power of 2 for maximum tracking block size.
++ * On very large capacity disks, the block size may be too large. To prevent
++ * this, the maximum block size is limited.
++ * If the limit on the maximum block size has been reached, then the number of
++ * blocks may exceed the tracking_block_maximum_count.
++ */
++static unsigned int tracking_block_maximum_shift = 26;
++
++/*
++ * The power of 2 for minimum chunk size.
++ * The size of the chunk depends on how much data will be copied to the
++ * difference storage when at least one sector of the block device is changed.
++ * If the size is small, then small I/O units will be generated, which will
++ * reduce performance. Too large a chunk size will lead to inefficient use of
++ * the difference storage.
++ */
++static unsigned int chunk_minimum_shift = 18;
++
++/*
++ * The power of 2 for maximum number of chunks.
++ * To store information about the state of the chunks, a table is created
++ * in RAM. So, if the size of the chunk is small, then the size of the table
++ * turns out to be large and memory is consumed inefficiently.
++ * As the size of the block device grows, the size of the chunk should also
++ * grow. For this purpose, the maximum number of chunks is set.
++ * The table expands dynamically when new chunks are allocated. Therefore,
++ * memory consumption also depends on the intensity of writing to the block
++ * device under the snapshot.
++ */
++static unsigned int chunk_maximum_count_shift = 40;
++
++/*
++ * The power of 2 for maximum chunk size.
++ * On very large capacity disks, the block size may be too large. To prevent
++ * this, the maximum block size is limited.
++ * If the limit on the maximum block size has been reached, then the number of
++ * blocks may exceed the chunk_maximum_count.
++ */
++static unsigned int chunk_maximum_shift = 26;
++/*
++ * The maximum number of chunks in queue.
++ * The chunk is not immediately stored to the difference storage. The chunks
++ * are put in a store queue. The store queue allows to postpone the operation
++ * of storing a chunks data to the difference storage and perform it later in
++ * the worker thread.
++ */
++static unsigned int chunk_maximum_in_queue = 16;
++
++/*
++ * The size of the pool of preallocated difference buffers.
++ * A buffer can be allocated for each chunk. After use, this buffer is not
++ * released immediately, but is sent to the pool of free buffers.
++ * However, if there are too many free buffers in the pool, then these free
++ * buffers will be released immediately.
++ */
++static unsigned int free_diff_buffer_pool_size = 128;
++
++/*
++ * The minimum allowable size of the difference storage in sectors.
++ * The difference storage is a part of the disk space allocated for storing
++ * snapshot data. If there is less free space in the storage than the minimum,
++ * an event is generated about the lack of free space.
++ */
++static unsigned int diff_storage_minimum = 2097152;
++
++#define VERSION_STR "2.0.0.0"
++static const struct blksnap_version version = {
++	.major = 2,
++	.minor = 0,
++	.revision = 0,
++	.build = 0,
 +};
 +
-+static struct bio_set chunk_io_bioset;
-+static struct bio_set chunk_clone_bioset;
-+
-+static inline sector_t chunk_sector(struct chunk *chunk)
++unsigned int get_tracking_block_minimum_shift(void)
 +{
-+	return (sector_t)(chunk->number)
-+	       << (chunk->diff_area->chunk_shift - SECTOR_SHIFT);
++	return tracking_block_minimum_shift;
 +}
 +
-+void chunk_store_failed(struct chunk *chunk, int error)
++unsigned int get_tracking_block_maximum_shift(void)
 +{
-+	struct diff_area *diff_area = diff_area_get(chunk->diff_area);
-+
-+	WARN_ON_ONCE(chunk->state != CHUNK_ST_NEW &&
-+		     chunk->state != CHUNK_ST_IN_MEMORY);
-+	chunk->state = CHUNK_ST_FAILED;
-+
-+	if (likely(chunk->diff_buffer)) {
-+		diff_buffer_release(diff_area, chunk->diff_buffer);
-+		chunk->diff_buffer = NULL;
-+	}
-+	diff_storage_free_region(chunk->diff_region);
-+	chunk->diff_region = NULL;
-+
-+	chunk_up(chunk);
-+	if (error)
-+		diff_area_set_corrupted(diff_area, error);
-+	diff_area_put(diff_area);
-+};
-+
-+static void chunk_schedule_storing(struct chunk *chunk)
-+{
-+	struct diff_area *diff_area = diff_area_get(chunk->diff_area);
-+	int queue_count;
-+
-+	WARN_ON_ONCE(chunk->state != CHUNK_ST_NEW &&
-+		     chunk->state != CHUNK_ST_STORED);
-+	chunk->state = CHUNK_ST_IN_MEMORY;
-+
-+	spin_lock(&diff_area->store_queue_lock);
-+	list_add_tail(&chunk->link, &diff_area->store_queue);
-+	queue_count = atomic_inc_return(&diff_area->store_queue_count);
-+	spin_unlock(&diff_area->store_queue_lock);
-+
-+	chunk_up(chunk);
-+
-+	/* Initiate the queue clearing process */
-+	if (queue_count > get_chunk_maximum_in_queue())
-+		queue_work(system_wq, &diff_area->store_queue_work);
-+	diff_area_put(diff_area);
++	return tracking_block_maximum_shift;
 +}
 +
-+void chunk_copy_bio(struct chunk *chunk, struct bio *bio,
-+		    struct bvec_iter *iter)
++unsigned int get_tracking_block_maximum_count(void)
 +{
-+	unsigned int chunk_ofs, chunk_left;
-+
-+	chunk_ofs = (iter->bi_sector - chunk_sector(chunk)) << SECTOR_SHIFT;
-+	chunk_left = chunk->diff_buffer->size - chunk_ofs;
-+	while (chunk_left && iter->bi_size) {
-+		struct bio_vec bvec = bio_iter_iovec(bio, *iter);
-+		unsigned int page_ofs = offset_in_page(chunk_ofs);
-+		struct page *page;
-+		unsigned int len;
-+
-+		page = chunk->diff_buffer->pages[chunk_ofs >> PAGE_SHIFT];
-+		len = min3(bvec.bv_len,
-+			   chunk_left,
-+			   (unsigned int)PAGE_SIZE - page_ofs);
-+
-+		if (op_is_write(bio_op(bio))) {
-+			/* from bio to buffer */
-+			memcpy_page(page, page_ofs,
-+				    bvec.bv_page, bvec.bv_offset,
-+				    len);
-+		} else {
-+			/* from buffer to bio */
-+			memcpy_page(bvec.bv_page, bvec.bv_offset,
-+				    page, page_ofs,
-+				    len);
-+		}
-+
-+		chunk_ofs += len;
-+		chunk_left -= len;
-+		bio_advance_iter_single(bio, iter, len);
-+	}
++	return tracking_block_maximum_count;
 +}
 +
-+static void chunk_clone_endio(struct bio *bio)
++unsigned int get_chunk_minimum_shift(void)
 +{
-+	struct bio *orig_bio = bio->bi_private;
-+
-+	if (unlikely(bio->bi_status != BLK_STS_OK))
-+		bio_io_error(orig_bio);
-+	else
-+		bio_endio(orig_bio);
++	return chunk_minimum_shift;
 +}
 +
-+static inline sector_t chunk_offset(struct chunk *chunk, struct bio *bio)
++unsigned int get_chunk_maximum_shift(void)
 +{
-+	return bio->bi_iter.bi_sector - chunk_sector(chunk);
++	return chunk_maximum_shift;
 +}
 +
-+static inline void chunk_limit_iter(struct chunk *chunk, struct bio *bio,
-+				    sector_t sector, struct bvec_iter *iter)
++unsigned long get_chunk_maximum_count(void)
 +{
-+	sector_t chunk_ofs = chunk_offset(chunk, bio);
-+
-+	iter->bi_sector = sector + chunk_ofs;
-+	iter->bi_size = min_t(unsigned int,
-+			bio->bi_iter.bi_size,
-+			(chunk->sector_count - chunk_ofs) << SECTOR_SHIFT);
++	return (1ul << chunk_maximum_count_shift);
 +}
 +
-+static inline unsigned int chunk_limit(struct chunk *chunk, struct bio *bio)
++unsigned int get_chunk_maximum_in_queue(void)
 +{
-+	unsigned int chunk_ofs, chunk_left;
-+
-+	chunk_ofs = (unsigned int)chunk_offset(chunk, bio) << SECTOR_SHIFT;
-+	chunk_left = chunk->diff_buffer->size - chunk_ofs;
-+
-+	return min(bio->bi_iter.bi_size, chunk_left);
++	return chunk_maximum_in_queue;
 +}
 +
-+struct bio *chunk_alloc_clone(struct block_device *bdev, struct bio *bio)
++unsigned int get_free_diff_buffer_pool_size(void)
 +{
-+	return bio_alloc_clone(bdev, bio, GFP_NOIO, &chunk_clone_bioset);
++	return free_diff_buffer_pool_size;
 +}
 +
-+void chunk_clone_bio(struct chunk *chunk, struct bio *bio)
++unsigned int get_diff_storage_minimum(void)
 +{
-+	struct bio *new_bio;
-+	struct block_device *bdev;
-+	sector_t sector;
++	return diff_storage_minimum;
++}
 +
-+	if (chunk->state == CHUNK_ST_STORED) {
-+		bdev = chunk->diff_region->bdev;
-+		sector = chunk->diff_region->sector;
-+	} else {
-+		bdev = chunk->diff_area->orig_bdev;
-+		sector = chunk_sector(chunk);
++static int ioctl_version(unsigned long arg)
++{
++	struct blksnap_version __user *user_version =
++		(struct blksnap_version __user *)arg;
++
++	if (copy_to_user(user_version, &version, sizeof(version))) {
++		pr_err("Unable to get version: invalid user buffer\n");
++		return -ENODATA;
 +	}
 +
-+	new_bio = chunk_alloc_clone(bdev, bio);
-+	WARN_ON(!new_bio);
-+
-+	chunk_limit_iter(chunk, bio, sector, &new_bio->bi_iter);
-+	bio_set_flag(new_bio, BIO_FILTERED);
-+	new_bio->bi_end_io = chunk_clone_endio;
-+	new_bio->bi_private = bio;
-+
-+	bio_advance(bio, new_bio->bi_iter.bi_size);
-+	bio_inc_remaining(bio);
-+
-+	submit_bio_noacct(new_bio);
-+}
-+
-+static inline struct chunk *get_chunk_from_cbio(struct chunk_bio *cbio)
-+{
-+	struct chunk *chunk = list_first_entry_or_null(&cbio->chunks,
-+						       struct chunk, link);
-+
-+	if (chunk)
-+		list_del_init(&chunk->link);
-+	return chunk;
-+}
-+
-+static void notify_load_and_schedule_io(struct work_struct *work)
-+{
-+	struct chunk_bio *cbio = container_of(work, struct chunk_bio, work);
-+	struct chunk *chunk;
-+
-+	while ((chunk = get_chunk_from_cbio(cbio))) {
-+		if (unlikely(cbio->bio.bi_status != BLK_STS_OK)) {
-+			chunk_store_failed(chunk, -EIO);
-+			continue;
-+		}
-+		if (chunk->state == CHUNK_ST_FAILED) {
-+			chunk_up(chunk);
-+			continue;
-+		}
-+
-+		chunk_copy_bio(chunk, cbio->orig_bio, &cbio->orig_iter);
-+		bio_endio(cbio->orig_bio);
-+
-+		chunk_schedule_storing(chunk);
-+	}
-+
-+	bio_put(&cbio->bio);
-+}
-+
-+static void notify_load_and_postpone_io(struct work_struct *work)
-+{
-+	struct chunk_bio *cbio = container_of(work, struct chunk_bio, work);
-+	struct chunk *chunk;
-+
-+	while ((chunk = get_chunk_from_cbio(cbio))) {
-+		if (unlikely(cbio->bio.bi_status != BLK_STS_OK)) {
-+			chunk_store_failed(chunk, -EIO);
-+			continue;
-+		}
-+		if (chunk->state == CHUNK_ST_FAILED) {
-+			chunk_up(chunk);
-+			continue;
-+		}
-+
-+		chunk_schedule_storing(chunk);
-+	}
-+
-+	/* submit the original bio fed into the tracker */
-+	submit_bio_noacct_nocheck(cbio->orig_bio);
-+	bio_put(&cbio->bio);
-+}
-+
-+static void chunk_notify_store(struct work_struct *work)
-+{
-+	struct chunk_bio *cbio = container_of(work, struct chunk_bio, work);
-+	struct chunk *chunk;
-+
-+	while ((chunk = get_chunk_from_cbio(cbio))) {
-+		if (unlikely(cbio->bio.bi_status != BLK_STS_OK)) {
-+			chunk_store_failed(chunk, -EIO);
-+			continue;
-+		}
-+
-+		WARN_ON_ONCE(chunk->state != CHUNK_ST_IN_MEMORY);
-+		chunk->state = CHUNK_ST_STORED;
-+
-+		if (chunk->diff_buffer) {
-+			diff_buffer_release(chunk->diff_area,
-+					    chunk->diff_buffer);
-+			chunk->diff_buffer = NULL;
-+		}
-+		chunk_up(chunk);
-+	}
-+
-+	bio_put(&cbio->bio);
-+}
-+
-+static void chunk_io_endio(struct bio *bio)
-+{
-+	struct chunk_bio *cbio = container_of(bio, struct chunk_bio, bio);
-+
-+	queue_work(system_wq, &cbio->work);
-+}
-+
-+static void chunk_submit_bio(struct bio *bio)
-+{
-+	bio->bi_end_io = chunk_io_endio;
-+	submit_bio_noacct(bio);
-+}
-+
-+static inline unsigned short calc_max_vecs(sector_t left)
-+{
-+	return bio_max_segs(round_up(left, PAGE_SECTORS) / PAGE_SECTORS);
-+}
-+
-+void chunk_store(struct chunk *chunk)
-+{
-+	struct block_device *bdev = chunk->diff_region->bdev;
-+	sector_t sector = chunk->diff_region->sector;
-+	sector_t count = chunk->diff_region->count;
-+	unsigned int page_idx = 0;
-+	struct bio *bio;
-+	struct chunk_bio *cbio;
-+
-+	bio = bio_alloc_bioset(bdev, calc_max_vecs(count),
-+			       REQ_OP_WRITE | REQ_SYNC | REQ_FUA, GFP_NOIO,
-+			       &chunk_io_bioset);
-+	bio->bi_iter.bi_sector = sector;
-+	bio_set_flag(bio, BIO_FILTERED);
-+
-+	while (count) {
-+		struct bio *next;
-+		sector_t portion = min_t(sector_t, count, PAGE_SECTORS);
-+		unsigned int bytes = portion << SECTOR_SHIFT;
-+
-+		if (bio_add_page(bio, chunk->diff_buffer->pages[page_idx],
-+				 bytes, 0) == bytes) {
-+			page_idx++;
-+			count -= portion;
-+			continue;
-+		}
-+
-+		/* Create next bio */
-+		next = bio_alloc_bioset(bdev, calc_max_vecs(count),
-+					REQ_OP_WRITE | REQ_SYNC | REQ_FUA,
-+					GFP_NOIO, &chunk_io_bioset);
-+		next->bi_iter.bi_sector = bio_end_sector(bio);
-+		bio_set_flag(next, BIO_FILTERED);
-+		bio_chain(bio, next);
-+		submit_bio_noacct(bio);
-+		bio = next;
-+	}
-+
-+	cbio = container_of(bio, struct chunk_bio, bio);
-+
-+	INIT_WORK(&cbio->work, chunk_notify_store);
-+	INIT_LIST_HEAD(&cbio->chunks);
-+	list_add_tail(&chunk->link, &cbio->chunks);
-+	cbio->orig_bio = NULL;
-+	chunk_submit_bio(bio);
-+}
-+
-+static struct bio *__chunk_load(struct chunk *chunk)
-+{
-+	struct diff_buffer *diff_buffer;
-+	unsigned int page_idx = 0;
-+	struct bio *bio;
-+	struct block_device *bdev;
-+	sector_t sector, count;
-+
-+	diff_buffer = diff_buffer_take(chunk->diff_area);
-+	if (IS_ERR(diff_buffer))
-+		return ERR_CAST(diff_buffer);
-+	chunk->diff_buffer = diff_buffer;
-+
-+	if (chunk->state == CHUNK_ST_STORED) {
-+		bdev = chunk->diff_region->bdev;
-+		sector = chunk->diff_region->sector;
-+		count = chunk->diff_region->count;
-+	} else {
-+		bdev = chunk->diff_area->orig_bdev;
-+		sector = chunk_sector(chunk);
-+		count = chunk->sector_count;
-+	}
-+
-+	bio = bio_alloc_bioset(bdev, calc_max_vecs(count),
-+			       REQ_OP_READ, GFP_NOIO, &chunk_io_bioset);
-+	bio->bi_iter.bi_sector = sector;
-+	bio_set_flag(bio, BIO_FILTERED);
-+
-+	while (count) {
-+		struct bio *next;
-+		sector_t portion = min_t(sector_t, count, PAGE_SECTORS);
-+		unsigned int bytes = portion << SECTOR_SHIFT;
-+
-+		if (bio_add_page(bio, chunk->diff_buffer->pages[page_idx],
-+				 bytes, 0) == bytes) {
-+			page_idx++;
-+			count -= portion;
-+			continue;
-+		}
-+
-+		/* Create next bio */
-+		next = bio_alloc_bioset(bdev, calc_max_vecs(count),
-+					REQ_OP_READ, GFP_NOIO,
-+					&chunk_io_bioset);
-+		next->bi_iter.bi_sector = bio_end_sector(bio);
-+		bio_set_flag(next, BIO_FILTERED);
-+		bio_chain(bio, next);
-+		submit_bio_noacct(bio);
-+		bio = next;
-+	}
-+	return bio;
-+}
-+
-+int chunk_load_and_postpone_io(struct chunk *chunk, struct bio **chunk_bio)
-+{
-+	struct bio *prev = *chunk_bio, *bio;
-+
-+	bio = __chunk_load(chunk);
-+	if (IS_ERR(bio))
-+		return PTR_ERR(bio);
-+
-+	if (prev) {
-+		bio_chain(prev, bio);
-+		submit_bio_noacct(prev);
-+	}
-+
-+	*chunk_bio = bio;
 +	return 0;
 +}
 +
-+void chunk_load_and_postpone_io_finish(struct list_head *chunks,
-+				struct bio *chunk_bio, struct bio *orig_bio)
++static_assert(sizeof(uuid_t) == sizeof(struct blksnap_uuid),
++	"Invalid size of struct blksnap_uuid.");
++
++static int ioctl_snapshot_create(unsigned long arg)
 +{
-+	struct chunk_bio *cbio;
-+
-+	cbio = container_of(chunk_bio, struct chunk_bio, bio);
-+	INIT_LIST_HEAD(&cbio->chunks);
-+	while (!list_empty(chunks)) {
-+		struct chunk *it;
-+
-+		it = list_first_entry(chunks, struct chunk, link);
-+		list_del_init(&it->link);
-+
-+		list_add_tail(&it->link, &cbio->chunks);
-+	}
-+	INIT_WORK(&cbio->work, notify_load_and_postpone_io);
-+	cbio->orig_bio = orig_bio;
-+	chunk_submit_bio(chunk_bio);
-+}
-+
-+int chunk_load_and_schedule_io(struct chunk *chunk, struct bio *orig_bio)
-+{
-+	struct chunk_bio *cbio;
-+	struct bio *bio;
-+
-+	bio = __chunk_load(chunk);
-+	if (IS_ERR(bio))
-+		return PTR_ERR(bio);
-+
-+	cbio = container_of(bio, struct chunk_bio, bio);
-+	INIT_LIST_HEAD(&cbio->chunks);
-+	list_add_tail(&chunk->link, &cbio->chunks);
-+	INIT_WORK(&cbio->work, notify_load_and_schedule_io);
-+	cbio->orig_bio = orig_bio;
-+	cbio->orig_iter = orig_bio->bi_iter;
-+	bio_advance_iter_single(orig_bio, &orig_bio->bi_iter,
-+				chunk_limit(chunk, orig_bio));
-+	bio_inc_remaining(orig_bio);
-+
-+	chunk_submit_bio(bio);
-+	return 0;
-+}
-+
-+int __init chunk_init(void)
-+{
++	struct blksnap_uuid __user *user_id = (struct blksnap_uuid __user *)arg;
++	uuid_t kernel_id;
 +	int ret;
 +
-+	ret = bioset_init(&chunk_io_bioset, 64,
-+			  offsetof(struct chunk_bio, bio),
-+			  BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER);
-+	if (!ret)
-+		ret = bioset_init(&chunk_clone_bioset, 64, 0,
-+				  BIOSET_NEED_BVECS | BIOSET_NEED_RESCUER);
++	ret = snapshot_create(&kernel_id);
++	if (ret)
++		return ret;
++
++	if (copy_to_user(user_id->b, kernel_id.b, sizeof(uuid_t))) {
++		pr_err("Unable to create snapshot: invalid user buffer\n");
++		return -ENODATA;
++	}
++
++	return 0;
++}
++
++static int ioctl_snapshot_destroy(unsigned long arg)
++{
++	struct blksnap_uuid __user *user_id = (struct blksnap_uuid __user *)arg;
++	uuid_t kernel_id;
++
++	if (copy_from_user(kernel_id.b, user_id->b, sizeof(uuid_t))) {
++		pr_err("Unable to destroy snapshot: invalid user buffer\n");
++		return -ENODATA;
++	}
++
++	return snapshot_destroy(&kernel_id);
++}
++
++static int ioctl_snapshot_append_storage(unsigned long arg)
++{
++	int ret;
++	struct blksnap_snapshot_append_storage __user *uarg =
++		(struct blksnap_snapshot_append_storage __user *)arg;
++	struct blksnap_snapshot_append_storage karg;
++	char *bdev_path = NULL;
++
++	pr_debug("Append difference storage\n");
++
++	if (copy_from_user(&karg, uarg, sizeof(karg))) {
++		pr_err("Unable to append difference storage: invalid user buffer\n");
++		return -EINVAL;
++	}
++
++	bdev_path = strndup_user(u64_to_user_ptr(karg.bdev_path),
++				 karg.bdev_path_size);
++	if (IS_ERR(bdev_path)) {
++		pr_err("Unable to append difference storage: invalid block device name buffer\n");
++		return PTR_ERR(bdev_path);
++	}
++
++	ret = snapshot_append_storage((uuid_t *)karg.id.b, bdev_path,
++				      u64_to_user_ptr(karg.ranges), karg.count);
++	kfree(bdev_path);
 +	return ret;
 +}
 +
-+void chunk_done(void)
++static int ioctl_snapshot_take(unsigned long arg)
 +{
-+	bioset_exit(&chunk_io_bioset);
-+	bioset_exit(&chunk_clone_bioset);
++	struct blksnap_uuid __user *user_id = (struct blksnap_uuid __user *)arg;
++	uuid_t kernel_id;
++
++	if (copy_from_user(kernel_id.b, user_id->b, sizeof(uuid_t))) {
++		pr_err("Unable to take snapshot: invalid user buffer\n");
++		return -ENODATA;
++	}
++
++	return snapshot_take(&kernel_id);
 +}
-diff --git a/drivers/block/blksnap/chunk.h b/drivers/block/blksnap/chunk.h
++
++static int ioctl_snapshot_collect(unsigned long arg)
++{
++	int ret;
++	struct blksnap_snapshot_collect karg;
++
++	if (copy_from_user(&karg, (const void __user *)arg, sizeof(karg))) {
++		pr_err("Unable to collect available snapshots: invalid user buffer\n");
++		return -ENODATA;
++	}
++
++	ret = snapshot_collect(&karg.count, u64_to_user_ptr(karg.ids));
++
++	if (copy_to_user((void __user *)arg, &karg, sizeof(karg))) {
++		pr_err("Unable to collect available snapshots: invalid user buffer\n");
++		return -ENODATA;
++	}
++
++	return ret;
++}
++
++static_assert(sizeof(struct blksnap_snapshot_event) == 4096,
++	"The size struct blksnap_snapshot_event should be equal to the size of the page.");
++
++static int ioctl_snapshot_wait_event(unsigned long arg)
++{
++	int ret = 0;
++	struct blksnap_snapshot_event __user *uarg =
++		(struct blksnap_snapshot_event __user *)arg;
++	struct blksnap_snapshot_event *karg;
++	struct event *ev;
++
++	karg = kzalloc(sizeof(struct blksnap_snapshot_event), GFP_KERNEL);
++	if (!karg)
++		return -ENOMEM;
++
++	/* Copy only snapshot ID and timeout*/
++	if (copy_from_user(karg, uarg, sizeof(uuid_t) + sizeof(__u32))) {
++		pr_err("Unable to get snapshot event. Invalid user buffer\n");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ev = snapshot_wait_event((uuid_t *)karg->id.b, karg->timeout_ms);
++	if (IS_ERR(ev)) {
++		ret = PTR_ERR(ev);
++		goto out;
++	}
++
++	pr_debug("Received event=%lld code=%d data_size=%d\n", ev->time,
++		 ev->code, ev->data_size);
++	karg->code = ev->code;
++	karg->time_label = ev->time;
++
++	if (ev->data_size > sizeof(karg->data)) {
++		pr_err("Event size %d is too big\n", ev->data_size);
++		ret = -ENOSPC;
++		/* If we can't copy all the data, we copy only part of it. */
++	}
++	memcpy(karg->data, ev->data, ev->data_size);
++	event_free(ev);
++
++	if (copy_to_user(uarg, karg, sizeof(struct blksnap_snapshot_event))) {
++		pr_err("Unable to get snapshot event. Invalid user buffer\n");
++		ret = -EINVAL;
++	}
++out:
++	kfree(karg);
++
++	return ret;
++}
++
++static int (*const blksnap_ioctl_table[])(unsigned long arg) = {
++	ioctl_version,
++	ioctl_snapshot_create,
++	ioctl_snapshot_destroy,
++	ioctl_snapshot_append_storage,
++	ioctl_snapshot_take,
++	ioctl_snapshot_collect,
++	ioctl_snapshot_wait_event,
++};
++
++static_assert(
++	sizeof(blksnap_ioctl_table) ==
++	((blksnap_ioctl_snapshot_wait_event + 1) * sizeof(void *)),
++	"The size of table blksnap_ioctl_table does not match the enum blksnap_ioctl.");
++
++static long ctrl_unlocked_ioctl(struct file *filp, unsigned int cmd,
++				unsigned long arg)
++{
++	int nr = _IOC_NR(cmd);
++
++	if (nr > (sizeof(blksnap_ioctl_table) / sizeof(void *)))
++		return -ENOTTY;
++
++	if (!blksnap_ioctl_table[nr])
++		return -ENOTTY;
++
++	return blksnap_ioctl_table[nr](arg);
++}
++
++static const struct file_operations blksnap_ctrl_fops = {
++	.owner		= THIS_MODULE,
++	.unlocked_ioctl	= ctrl_unlocked_ioctl,
++};
++
++static struct miscdevice blksnap_ctrl_misc = {
++	.minor		= MISC_DYNAMIC_MINOR,
++	.name		= BLKSNAP_CTL,
++	.fops		= &blksnap_ctrl_fops,
++};
++
++static int __init parameters_init(void)
++{
++	pr_debug("tracking_block_minimum_shift: %d\n",
++		 tracking_block_minimum_shift);
++	pr_debug("tracking_block_maximum_shift: %d\n",
++		 tracking_block_maximum_shift);
++	pr_debug("tracking_block_maximum_count: %d\n",
++		 tracking_block_maximum_count);
++
++	pr_debug("chunk_minimum_shift: %d\n", chunk_minimum_shift);
++	pr_debug("chunk_maximum_shift: %d\n", chunk_maximum_shift);
++	pr_debug("chunk_maximum_count_shift: %u\n", chunk_maximum_count_shift);
++
++	pr_debug("chunk_maximum_in_queue: %d\n", chunk_maximum_in_queue);
++	pr_debug("free_diff_buffer_pool_size: %d\n",
++		 free_diff_buffer_pool_size);
++	pr_debug("diff_storage_minimum: %d\n", diff_storage_minimum);
++
++	if (tracking_block_maximum_shift < tracking_block_minimum_shift) {
++		tracking_block_maximum_shift = tracking_block_minimum_shift;
++		pr_warn("fixed tracking_block_maximum_shift: %d\n",
++			 tracking_block_maximum_shift);
++	}
++
++	if (chunk_maximum_shift < chunk_minimum_shift) {
++		chunk_maximum_shift = chunk_minimum_shift;
++		pr_warn("fixed chunk_maximum_shift: %d\n",
++			 chunk_maximum_shift);
++	}
++
++	/*
++	 * The XArray is used to store chunks. And 'unsigned long' is used as
++	 * chunk number parameter. So, The number of chunks cannot exceed the
++	 * limits of ULONG_MAX.
++	 */
++	if (sizeof(unsigned long) < 4u)
++		chunk_maximum_count_shift = min(16u, chunk_maximum_count_shift);
++	else if (sizeof(unsigned long) == 4)
++		chunk_maximum_count_shift = min(32u, chunk_maximum_count_shift);
++	else if (sizeof(unsigned long) >= 8)
++		chunk_maximum_count_shift = min(64u, chunk_maximum_count_shift);
++
++	return 0;
++}
++
++static int __init blksnap_init(void)
++{
++	int ret;
++
++	pr_debug("Loading\n");
++	pr_debug("Version: %s\n", VERSION_STR);
++
++	ret = parameters_init();
++	if (ret)
++		return ret;
++
++	ret = chunk_init();
++	if (ret)
++		goto fail_chunk_init;
++
++	ret = tracker_init();
++	if (ret)
++		goto fail_tracker_init;
++
++	ret = misc_register(&blksnap_ctrl_misc);
++	if (ret)
++		goto fail_misc_register;
++
++	return 0;
++
++fail_misc_register:
++	tracker_done();
++fail_tracker_init:
++	chunk_done();
++fail_chunk_init:
++
++	return ret;
++}
++
++static void __exit blksnap_exit(void)
++{
++	pr_debug("Unloading module\n");
++
++	misc_deregister(&blksnap_ctrl_misc);
++
++	chunk_done();
++	snapshot_done();
++	tracker_done();
++
++	pr_debug("Module was unloaded\n");
++}
++
++module_init(blksnap_init);
++module_exit(blksnap_exit);
++
++module_param_named(tracking_block_minimum_shift, tracking_block_minimum_shift,
++		   uint, 0644);
++MODULE_PARM_DESC(tracking_block_minimum_shift,
++		 "The power of 2 for minimum tracking block size");
++module_param_named(tracking_block_maximum_count, tracking_block_maximum_count,
++		   uint, 0644);
++MODULE_PARM_DESC(tracking_block_maximum_count,
++		 "The maximum number of tracking blocks");
++module_param_named(tracking_block_maximum_shift, tracking_block_maximum_shift,
++		   uint, 0644);
++MODULE_PARM_DESC(tracking_block_maximum_shift,
++		 "The power of 2 for maximum trackings block size");
++module_param_named(chunk_minimum_shift, chunk_minimum_shift, uint, 0644);
++MODULE_PARM_DESC(chunk_minimum_shift,
++		 "The power of 2 for minimum chunk size");
++module_param_named(chunk_maximum_count_shift, chunk_maximum_count_shift,
++		   uint, 0644);
++MODULE_PARM_DESC(chunk_maximum_count_shift,
++		 "The power of 2 for maximum number of chunks");
++module_param_named(chunk_maximum_shift, chunk_maximum_shift, uint, 0644);
++MODULE_PARM_DESC(chunk_maximum_shift,
++		 "The power of 2 for maximum snapshots chunk size");
++module_param_named(chunk_maximum_in_queue, chunk_maximum_in_queue, uint, 0644);
++MODULE_PARM_DESC(chunk_maximum_in_queue,
++		 "The maximum number of chunks in store queue");
++module_param_named(free_diff_buffer_pool_size, free_diff_buffer_pool_size,
++		   uint, 0644);
++MODULE_PARM_DESC(free_diff_buffer_pool_size,
++		 "The size of the pool of preallocated difference buffers");
++module_param_named(diff_storage_minimum, diff_storage_minimum, uint, 0644);
++MODULE_PARM_DESC(diff_storage_minimum,
++	"The minimum allowable size of the difference storage in sectors");
++
++MODULE_DESCRIPTION("Block Device Snapshots Module");
++MODULE_VERSION(VERSION_STR);
++MODULE_AUTHOR("Veeam Software Group GmbH");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/block/blksnap/params.h b/drivers/block/blksnap/params.h
 new file mode 100644
-index 000000000000..cd119ac729df
+index 000000000000..85606e1a8746
 --- /dev/null
-+++ b/drivers/block/blksnap/chunk.h
-@@ -0,0 +1,114 @@
++++ b/drivers/block/blksnap/params.h
+@@ -0,0 +1,16 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/* Copyright (C) 2023 Veeam Software Group GmbH */
-+#ifndef __BLKSNAP_CHUNK_H
-+#define __BLKSNAP_CHUNK_H
++#ifndef __BLKSNAP_PARAMS_H
++#define __BLKSNAP_PARAMS_H
 +
-+#include <linux/blk_types.h>
-+#include <linux/blkdev.h>
-+#include <linux/rwsem.h>
-+#include <linux/atomic.h>
-+#include "diff_area.h"
++unsigned int get_tracking_block_minimum_shift(void);
++unsigned int get_tracking_block_maximum_shift(void);
++unsigned int get_tracking_block_maximum_count(void);
++unsigned int get_chunk_minimum_shift(void);
++unsigned int get_chunk_maximum_shift(void);
++unsigned long get_chunk_maximum_count(void);
++unsigned int get_chunk_maximum_in_queue(void);
++unsigned int get_free_diff_buffer_pool_size(void);
++unsigned int get_diff_storage_minimum(void);
 +
-+struct diff_area;
-+struct diff_region;
-+
-+/**
-+ * enum chunk_st - Possible states for a chunk.
-+ *
-+ * @CHUNK_ST_NEW:
-+ *	No data is associated with the chunk.
-+ * @CHUNK_ST_IN_MEMORY:
-+ *	The data of the chunk is ready to be read from the RAM buffer.
-+ *	The flag is removed when a chunk is removed from the store queue
-+ *	and its buffer is released.
-+ * @CHUNK_ST_STORED:
-+ *	The data of the chunk has been written to the difference storage.
-+ * @CHUNK_ST_FAILED:
-+ *	An error occurred while processing the chunk data.
-+ *
-+ * Chunks life circle:
-+ *	CHUNK_ST_NEW -> CHUNK_ST_IN_MEMORY <-> CHUNK_ST_STORED
-+ */
-+
-+enum chunk_st {
-+	CHUNK_ST_NEW,
-+	CHUNK_ST_IN_MEMORY,
-+	CHUNK_ST_STORED,
-+	CHUNK_ST_FAILED,
-+};
-+
-+/**
-+ * struct chunk - Minimum data storage unit.
-+ *
-+ * @link:
-+ *	The list header allows to create queue of chunks.
-+ * @number:
-+ *	Sequential number of the chunk.
-+ * @sector_count:
-+ *	Number of sectors in the current chunk. This is especially true
-+ *	for the	last chunk.
-+ * @lock:
-+ *	Binary semaphore. Syncs access to the chunks fields: state,
-+ *	diff_buffer and diff_region.
-+ * @diff_area:
-+ *	Pointer to the difference area - the difference storage area for a
-+ *	specific device. This field is only available when the chunk is locked.
-+ *	Allows to protect the difference area from early release.
-+ * @state:
-+ *	Defines the state of a chunk.
-+ * @diff_buffer:
-+ *	Pointer to &struct diff_buffer. Describes a buffer in the memory
-+ *	for storing the chunk data.
-+ * @diff_region:
-+ *	Pointer to &struct diff_region. Describes a copy of the chunk data
-+ *	on the difference storage.
-+ *
-+ * This structure describes the block of data that the module operates
-+ * with when executing the copy-on-write algorithm and when performing I/O
-+ * to snapshot images.
-+ *
-+ * If the data of the chunk has been changed or has just been read, then
-+ * the chunk gets into store queue.
-+ *
-+ * The semaphore is blocked for writing if there is no actual data in the
-+ * buffer, since a block of data is being read from the original device or
-+ * from a diff storage. If data is being read from or written to the
-+ * diff_buffer, the semaphore must be locked.
-+ */
-+struct chunk {
-+	struct list_head link;
-+	unsigned long number;
-+	sector_t sector_count;
-+
-+	struct semaphore lock;
-+	struct diff_area *diff_area;
-+
-+	enum chunk_st state;
-+	struct diff_buffer *diff_buffer;
-+	struct diff_region *diff_region;
-+};
-+
-+static inline void chunk_up(struct chunk *chunk)
-+{
-+	struct diff_area *diff_area = chunk->diff_area;
-+
-+	chunk->diff_area = NULL;
-+	up(&chunk->lock);
-+	diff_area_put(diff_area);
-+};
-+
-+void chunk_store_failed(struct chunk *chunk, int error);
-+struct bio *chunk_alloc_clone(struct block_device *bdev, struct bio *bio);
-+
-+void chunk_copy_bio(struct chunk *chunk, struct bio *bio,
-+		    struct bvec_iter *iter);
-+void chunk_clone_bio(struct chunk *chunk, struct bio *bio);
-+void chunk_store(struct chunk *chunk);
-+int chunk_load_and_schedule_io(struct chunk *chunk, struct bio *orig_bio);
-+int chunk_load_and_postpone_io(struct chunk *chunk, struct bio **chunk_bio);
-+void chunk_load_and_postpone_io_finish(struct list_head *chunks,
-+				struct bio *chunk_bio, struct bio *orig_bio);
-+
-+int __init chunk_init(void);
-+void chunk_done(void);
-+#endif /* __BLKSNAP_CHUNK_H */
++#endif /* __BLKSNAP_PARAMS_H */
 --
 2.20.1
 
