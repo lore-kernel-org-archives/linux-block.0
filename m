@@ -2,51 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A54C7EE2E
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 08:43:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B282C7EE37
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 08:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240433AbjFIInz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 04:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48048 "EHLO
+        id S241021AbjFIIn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 04:43:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230395AbjFIInm (ORCPT
+        with ESMTP id S239375AbjFIInm (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 04:43:42 -0400
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A549895;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E109C1725;
         Fri,  9 Jun 2023 01:43:32 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qcvk81mvVz4f3tP1;
-        Fri,  9 Jun 2023 16:43:28 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qcvk91pMCz4f3v4d;
+        Fri,  9 Jun 2023 16:43:29 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgBnHbEu5oJkNdspLQ--.1947S4;
-        Fri, 09 Jun 2023 16:43:28 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbEu5oJkNdspLQ--.1947S6;
+        Fri, 09 Jun 2023 16:43:29 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dgilbert@interlog.com,
         jejb@linux.ibm.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-scsi@vger.kernel.org, yukuai3@huawei.com,
         yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH v4 0/2] fix blktrace debugfs entries leakage
-Date:   Fri,  9 Jun 2023 16:39:11 +0800
-Message-Id: <20230609083913.2254980-1-yukuai1@huaweicloud.com>
+Subject: [PATCH v4 2/2] block: fix blktrace debugfs entries leakage
+Date:   Fri,  9 Jun 2023 16:39:13 +0800
+Message-Id: <20230609083913.2254980-3-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230609083913.2254980-1-yukuai1@huaweicloud.com>
+References: <20230609083913.2254980-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnHbEu5oJkNdspLQ--.1947S4
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYc7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
-        M4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-        1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-        b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-        vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI
-        42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-        evJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-TRANSID: gCh0CgBnHbEu5oJkNdspLQ--.1947S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7uw4fWFyxGF1fury7Zr4DXFb_yoW8Ar48pa
+        9xCr4YkrW0vr4avFyDu3W7XF18Ga95WryxAr9agF1avr17Crs8XrZ2vrWIgrWrArZ29FZ8
+        W3WUGr9xArWkXaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
+        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUHbyAUUUUU
+        =
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -55,24 +60,51 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Changes in v4:
- - blk_trace_remove() will trigger build warning if blktrace config is
- not enabled, use blk_trace_shutdown() instead.
+Commit 99d055b4fd4b ("block: remove per-disk debugfs files in
+blk_unregister_queue") moves blk_trace_shutdown() from
+blk_release_queue() to blk_unregister_queue(), this is safe if blktrace
+is created through sysfs, however, there is a regression in corner
+case.
 
-Changes in v3:
- - add a new patch to handle /dev/sg
+blktrace can still be enabled after del_gendisk() through ioctl if
+the disk is opened before del_gendisk(), and if blktrace is not shutdown
+through ioctl before closing the disk, debugfs entries will be leaked.
 
-Changes in v2:
- - cleanup bltkrace in disk_release() instead of blk_free_queue()
+Fix this problem by shutdown blktrace in disk_release(), this is safe
+because blk_trace_remove() is reentrant.
 
-Yu Kuai (2):
-  scsi: sg: fix blktrace debugfs entries leakage
-  block: fix blktrace debugfs entries leakage
+Fixes: 99d055b4fd4b ("block: remove per-disk debugfs files in blk_unregister_queue")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/genhd.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
- block/genhd.c     |  7 ++++++-
- drivers/scsi/sg.c | 11 +++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 3537b7d7c484..fd2a6819be3c 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -25,8 +25,9 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/badblocks.h>
+ #include <linux/part_stat.h>
+-#include "blk-throttle.h"
++#include <linux/blktrace_api.h>
+ 
++#include "blk-throttle.h"
+ #include "blk.h"
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
+@@ -1171,6 +1172,10 @@ static void disk_release(struct device *dev)
+ 	might_sleep();
+ 	WARN_ON_ONCE(disk_live(disk));
+ 
++	mutex_lock(&disk->queue->debugfs_mutex);
++	blk_trace_shutdown(disk->queue);
++	mutex_unlock(&disk->queue->debugfs_mutex);
++
+ 	/*
+ 	 * To undo the all initialization from blk_mq_init_allocated_queue in
+ 	 * case of a probe failure where add_disk is never called we have to
 -- 
 2.39.2
 
