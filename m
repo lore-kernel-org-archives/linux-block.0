@@ -2,247 +2,94 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C0DC7EE43
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 13:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12060C7EE29
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 13:22:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231898AbjFINWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 09:22:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45626 "EHLO
+        id S231396AbjFINW5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 09:22:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231396AbjFINW3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 09:22:29 -0400
-X-Greylist: delayed 119 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 09 Jun 2023 06:22:28 PDT
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 108B7180;
-        Fri,  9 Jun 2023 06:22:28 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 9E5A52B42E;
-        Fri,  9 Jun 2023 15:07:05 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1686312425;
-        bh=SLOWvZa9vJo565OIEup8WCzwZ50SqCqIg3IOsqiIpd8=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=GHGB+24O9PSDaRBLKgrbNR6Hr9z102CSwo5YhbnrnUx+K1Vk1VqoT9PCPV3cl9qo+
-         /OqDhsS/t4aZSnMv0vuOV+GC7PaYvvk3SoTfRIES1mK5Uj5w1CqLBckK4rgH3BBBu9
-         luh9137icizk3A8R0bJKFRMsRjUNqpii9g5jFb5WPCZ9PoI2V7r5hWtWQpKAYhqK6H
-         z3KPHuAFYFI1OS40a+AaTVy0/cQKpEYbVSnYVw12fq57dsgI/TVK2HpjL9QW1VCPDg
-         MT/Jqoqj8XrH+8LaleHjsL4qCQ2HHcC9gHuvMXGxcODjCQwovoy+bDwNOLQMso/fmY
-         qw3R/2PPzBfqQ==
-Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
- prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 9 Jun 2023 14:07:04 +0200
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     <axboe@kernel.dk>, <hch@infradead.org>, <corbet@lwn.net>,
-        <snitzer@kernel.org>
-CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <willy@infradead.org>, <dlemoal@kernel.org>, <wsa@kernel.org>,
-        <heikki.krogerus@linux.intel.com>, <ming.lei@redhat.com>,
-        <gregkh@linuxfoundation.org>, <linux-block@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <sergei.shtepa@veeam.com>
-Subject: [PATCH v4 09/11] blksnap: event queue from the difference storage
-Date:   Fri, 9 Jun 2023 13:58:56 +0200
-Message-ID: <20230609115858.4737-9-sergei.shtepa@veeam.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230609115858.4737-1-sergei.shtepa@veeam.com>
-References: <20230609115858.4737-1-sergei.shtepa@veeam.com>
+        with ESMTP id S230477AbjFINW4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 09:22:56 -0400
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F84330F7
+        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 06:22:21 -0700 (PDT)
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-75efda08137so20274785a.2
+        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 06:22:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686316940; x=1688908940;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3ItSZqiZR0dUIQmEkEzuGcGQcKdyOeKjnBx3LrxDDhQ=;
+        b=IFppvXvchSQTgdCEsO/m53CFy57iZdN/Cs7nZcpx4lwI+RoExgLwgkoVW9DMSz4asM
+         8+SViz9SwwnPs9I2h6plv7H7/bI5bh551tcxnpUyOYvAbaSfbsUJAaocy/T1aZx7rq/n
+         H/iFfONsQjR2rJSANbC7TyjQgFn3uhn0Rp2dDmhtB6u9DsHYVwV9zlkJhV2le7xJ/bBJ
+         nLZYYa/Nz6RYsmP4CnunLtfNifVFdPbKhj5it5t5pn4MXhTjs3Xz83dWf9mZ6/Vow32k
+         3dMnI7X40rhJ0eXgMhsa0TZ8qpIX1Vuz7V6aGTkoXmvDfe5i+Y3IP0QeahguPOqQp5PC
+         A5qQ==
+X-Gm-Message-State: AC+VfDw/qK+gT2+0CgaKfP7oh8hGmDTCssjwq1sRfDW41IfuyKl82zxv
+        bQUM9dasf0wAgpd8ZYb8WaTl
+X-Google-Smtp-Source: ACHHUZ7EaXUkLQWa4KL7eGOdK/zJn4Oe2c+mBf8RG5CIwOab23xBx689Kz4XeWIsapxaCANxot2Leg==
+X-Received: by 2002:a05:622a:288:b0:3f6:b32c:3766 with SMTP id z8-20020a05622a028800b003f6b32c3766mr1862912qtw.11.1686316940294;
+        Fri, 09 Jun 2023 06:22:20 -0700 (PDT)
+Received: from localhost ([37.19.196.165])
+        by smtp.gmail.com with ESMTPSA id z4-20020ac87104000000b003f6be76a5c1sm1159305qto.6.2023.06.09.06.22.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jun 2023 06:22:19 -0700 (PDT)
+Date:   Fri, 9 Jun 2023 09:22:18 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Darrick J. Wong" <djwong@kernel.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: Re: block: fix a crash when bio_for_each_folio_all iterates over an
+ empty bio
+Message-ID: <ZIMnivRz/3xfHKgV@redhat.com>
+References: <alpine.LRH.2.21.2304171433370.17217@file01.intranet.prod.int.rdu2.redhat.com>
+ <ZD61QWC6TW59anIM@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2924031554627C6B
-X-Veeam-MMEX: True
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZD61QWC6TW59anIM@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provides transmission of events from the difference storage to the user
-process. Only two events are currently defined. The first is that there
-are few free regions in the difference storage. The second is that the
-request for a free region for storing differences failed with an error,
-since there are no more free regions left in the difference storage
-(the snapshot overflow state).
+On Tue, Apr 18 2023 at 11:20P -0400,
+Mike Snitzer <snitzer@kernel.org> wrote:
 
-Co-developed-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
- drivers/block/blksnap/event_queue.c | 87 +++++++++++++++++++++++++++++
- drivers/block/blksnap/event_queue.h | 65 +++++++++++++++++++++
- 2 files changed, 152 insertions(+)
- create mode 100644 drivers/block/blksnap/event_queue.c
- create mode 100644 drivers/block/blksnap/event_queue.h
+> On Mon, Apr 17 2023 at  3:11P -0400,
+> Mikulas Patocka <mpatocka@redhat.com> wrote:
+> 
+> > If we use bio_for_each_folio_all on an empty bio, it will access the first
+> > bio vector unconditionally (it is uninitialized) and it may crash
+> > depending on the uninitialized data.
+> > 
+> > This patch fixes it by checking the parameter "i" against "bio->bi_vcnt"
+> > and returning NULL fi->folio if it is out of range.
+> > 
+> > The patch also drops the test "if (fi->_i + 1 < bio->bi_vcnt)" from
+> > bio_next_folio because the same condition is already being checked in
+> > bio_first_folio.
+> >
+> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> 
+> This fix is a prereq for this dm-crypt patch to use folios:
+> https://patchwork.kernel.org/project/dm-devel/patch/alpine.LRH.2.21.2302161619430.5436@file01.intranet.prod.int.rdu2.redhat.com/
+> Mikulas explained why an empty bio is possible here:
+> https://listman.redhat.com/archives/dm-devel/2023-April/053916.html
+> 
+> Reviewed-by: Mike Snitzer <snitzer@kernel.org>
 
-diff --git a/drivers/block/blksnap/event_queue.c b/drivers/block/blksnap/event_queue.c
-new file mode 100644
-index 000000000000..5d3bedd63c10
---- /dev/null
-+++ b/drivers/block/blksnap/event_queue.c
-@@ -0,0 +1,87 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2023 Veeam Software Group GmbH */
-+#define pr_fmt(fmt) KBUILD_MODNAME "-event_queue: " fmt
-+
-+#include <linux/slab.h>
-+#include <linux/sched.h>
-+#include "event_queue.h"
-+
-+void event_queue_init(struct event_queue *event_queue)
-+{
-+	INIT_LIST_HEAD(&event_queue->list);
-+	spin_lock_init(&event_queue->lock);
-+	init_waitqueue_head(&event_queue->wq_head);
-+}
-+
-+void event_queue_done(struct event_queue *event_queue)
-+{
-+	struct event *event;
-+
-+	spin_lock(&event_queue->lock);
-+	while (!list_empty(&event_queue->list)) {
-+		event = list_first_entry(&event_queue->list, struct event,
-+					 link);
-+		list_del(&event->link);
-+		event_free(event);
-+	}
-+	spin_unlock(&event_queue->lock);
-+}
-+
-+int event_gen(struct event_queue *event_queue, gfp_t flags, int code,
-+	      const void *data, int data_size)
-+{
-+	struct event *event;
-+
-+	event = kzalloc(sizeof(struct event) + data_size + 1, flags);
-+	if (!event)
-+		return -ENOMEM;
-+
-+	event->time = ktime_get();
-+	event->code = code;
-+	event->data_size = data_size;
-+	memcpy(event->data, data, data_size);
-+
-+	pr_debug("Generate event: time=%lld code=%d data_size=%d\n",
-+		 event->time, event->code, event->data_size);
-+
-+	spin_lock(&event_queue->lock);
-+	list_add_tail(&event->link, &event_queue->list);
-+	spin_unlock(&event_queue->lock);
-+
-+	wake_up(&event_queue->wq_head);
-+	return 0;
-+}
-+
-+struct event *event_wait(struct event_queue *event_queue,
-+			 unsigned long timeout_ms)
-+{
-+	int ret;
-+
-+	ret = wait_event_interruptible_timeout(event_queue->wq_head,
-+				!list_empty(&event_queue->list), timeout_ms);
-+	if (ret >= 0) {
-+		struct event *event = ERR_PTR(-ENOENT);
-+
-+		spin_lock(&event_queue->lock);
-+		if (!list_empty(&event_queue->list)) {
-+			event = list_first_entry(&event_queue->list,
-+						 struct event, link);
-+			list_del(&event->link);
-+		}
-+		spin_unlock(&event_queue->lock);
-+
-+		if (IS_ERR(event))
-+			pr_debug("Queue list is empty, timeout_ms=%lu\n", timeout_ms);
-+		else
-+			pr_debug("Event received: time=%lld code=%d\n",
-+				 event->time, event->code);
-+		return event;
-+	}
-+	if (ret == -ERESTARTSYS) {
-+		pr_debug("event waiting interrupted\n");
-+		return ERR_PTR(-EINTR);
-+	}
-+
-+	pr_err("Failed to wait event. errno=%d\n", abs(ret));
-+	return ERR_PTR(ret);
-+}
-diff --git a/drivers/block/blksnap/event_queue.h b/drivers/block/blksnap/event_queue.h
-new file mode 100644
-index 000000000000..7f1209bbfc98
---- /dev/null
-+++ b/drivers/block/blksnap/event_queue.h
-@@ -0,0 +1,65 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2023 Veeam Software Group GmbH */
-+#ifndef __BLKSNAP_EVENT_QUEUE_H
-+#define __BLKSNAP_EVENT_QUEUE_H
-+
-+#include <linux/types.h>
-+#include <linux/ktime.h>
-+#include <linux/list.h>
-+#include <linux/spinlock.h>
-+#include <linux/wait.h>
-+
-+/**
-+ * struct event - An event to be passed to the user space.
-+ * @link:
-+ *	The list header allows to combine events from the queue.
-+ * @time:
-+ *	A timestamp indicates when an event occurred.
-+ * @code:
-+ *	Event code.
-+ * @data_size:
-+ *	The number of bytes in the event data array.
-+ * @data:
-+ *	An array of event data. The allowed size of the array is limited
-+ *      so that the size of the entire structure does not exceed PAGE_SIZE.
-+ *
-+ * Events can be different, so they contain different data. The size of the
-+ * data array is not defined exactly, but it has limitations. The size of
-+ * the event structure may exceed the PAGE_SIZE.
-+ */
-+struct event {
-+	struct list_head link;
-+	ktime_t time;
-+	int code;
-+	int data_size;
-+	char data[];
-+};
-+
-+/**
-+ * struct event_queue - A queue of &struct event.
-+ * @list:
-+ *	Linked list for storing events.
-+ * @lock:
-+ *	Spinlock allows to guarantee safety of the linked list.
-+ * @wq_head:
-+ *	A wait queue allows to put a user thread in a waiting state until
-+ *	an event appears in the linked list.
-+ */
-+struct event_queue {
-+	struct list_head list;
-+	spinlock_t lock;
-+	struct wait_queue_head wq_head;
-+};
-+
-+void event_queue_init(struct event_queue *event_queue);
-+void event_queue_done(struct event_queue *event_queue);
-+
-+int event_gen(struct event_queue *event_queue, gfp_t flags, int code,
-+	      const void *data, int data_size);
-+struct event *event_wait(struct event_queue *event_queue,
-+			 unsigned long timeout_ms);
-+static inline void event_free(struct event *event)
-+{
-+	kfree(event);
-+};
-+#endif /* __BLKSNAP_EVENT_QUEUE_H */
---
-2.20.1
+Hey Jens (and Matthew),
 
+Can you please pick this up?
+
+Without it DM needs to do the checking (by open-coding a fixed variant
+of bio_for_each_folio_all); while we _could_ do that: fixing
+bio_first_folio seems best.
+
+Thanks,
+Mike
