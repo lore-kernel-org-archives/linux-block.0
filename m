@@ -2,101 +2,117 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE625C7EE29
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 18:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A510FC7EE25
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 18:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbjFISI4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 14:08:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59612 "EHLO
+        id S230103AbjFISNk convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 14:13:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjFISI4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 14:08:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78F343586
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 11:08:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686334089;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=OgLUI49R4BzjOlw54BaHHTPcDlb20jeY7Ns7msS4H+8=;
-        b=G/PDxmF1rMnm/oGLfNBLCdrE1ZE8iKICAfXGQv6PADJCmKjOlE0uiBs3XCurKHD1c3mT82
-        TRLUn7RBrV0DyVlbCHgLGQQ9PhTWHoMrjqxvL4GcjG3dW7id/+mIkWHkEv5s0B3citpTBm
-        xEaXVuSbqqJm4+seFKz9wzWvHTx41+g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-AYDdVwSyMM-9rsO_liRF6g-1; Fri, 09 Jun 2023 14:08:08 -0400
-X-MC-Unique: AYDdVwSyMM-9rsO_liRF6g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A92C6101A531;
-        Fri,  9 Jun 2023 18:08:07 +0000 (UTC)
-Received: from host.redhat.com (unknown [10.22.16.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B8C040D1B66;
-        Fri,  9 Jun 2023 18:08:07 +0000 (UTC)
-From:   John Pittman <jpittman@redhat.com>
-To:     axboe@kernel.dk
-Cc:     djeffery@redhat.com, loberman@redhat.com, emilne@redhat.com,
-        minlei@redhat.com, linux-block@vger.kernel.org,
-        John Pittman <jpittman@redhat.com>
-Subject: [PATCH] block: set reasonable default for discard max
-Date:   Fri,  9 Jun 2023 14:08:05 -0400
-Message-Id: <20230609180805.736872-1-jpittman@redhat.com>
+        with ESMTP id S229436AbjFISNk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 14:13:40 -0400
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67E913583;
+        Fri,  9 Jun 2023 11:13:39 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-977d3292be0so55136166b.1;
+        Fri, 09 Jun 2023 11:13:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686334418; x=1688926418;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f2Xux0G0tFdJlDzvQzZhcAqUXfykTqTn9g16hyE21ys=;
+        b=O8+rgBcSCmr7ISsLmZwhYt2QuRaOx19GpuhElVxPga2ffv3FF6dC4T+tx4hPruvjTb
+         9vRqlJKiSAjiiRGfNO26zl63DYH+9TUf3eaCJGkc+eAoEUDKzBGjKZauFZUlu6Ew4Wu8
+         JhOG4NfTbt8gyRAziil1iXgBKO9cgeHeI9W3aB6hL5YWVqq+X2A7WMIfDY4pDtQBhu4/
+         HU1mPg0HVILj5bd8QjZ6/n1W7Oy8yg4cjCVfngIeZwEmYzSDFJw4tY1FwwTzcIDcPBN4
+         R6O70UJnFPGL80aqDbuMt7vDiS28/aycG46CDyR+7ZSf0Bd1s1M69EeO5OMKX2EGFDh+
+         BtaA==
+X-Gm-Message-State: AC+VfDzM63fEMAKyAwGd7fowQQU+V97ul7KX08jd/wfRHyvKkIpIC42H
+        0ys/UrPI0wjFM1vSdDaS0HFowj62vZw8QuUb3kE=
+X-Google-Smtp-Source: ACHHUZ7r7lbBrTdxRkyp2bTqJCFBDA6+Ddf+RviatN0r97z5LUsaxAu6Q2CxPlvVkZ/6P5sUxBvleBvx6ETeZa4XK48=
+X-Received: by 2002:a17:906:1049:b0:974:56cb:9dfc with SMTP id
+ j9-20020a170906104900b0097456cb9dfcmr1993996ejj.1.1686334417837; Fri, 09 Jun
+ 2023 11:13:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+References: <20230608110258.189493-1-hch@lst.de> <20230608110258.189493-12-hch@lst.de>
+In-Reply-To: <20230608110258.189493-12-hch@lst.de>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Fri, 9 Jun 2023 20:13:23 +0200
+Message-ID: <CAJZ5v0h61q6=JxjeUjjMz5k05HuRGWVKp_rK+9N8rug58kU_VQ@mail.gmail.com>
+Subject: Re: [PATCH 11/30] swsusp: don't pass a stack address to blkdev_get_by_path
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Phillip Potter <phil@philpotter.co.uk>,
+        Coly Li <colyli@suse.de>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-scsi@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        linux-btrfs@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-pm@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some drive manufacturers export a very large supported max discard size.
-However, when the operating system sends I/O of the max size to the
-device, extreme I/O latency can often be encountered. Since hardware
-does not provide an optimal discard value in addition to the max, and
-there is no way to foreshadow how well a drive handles the large size,
-take the method from max_sectors setting, and use BLK_DEF_MAX_SECTORS to
-set a more reasonable default discard max. This should avoid the extreme
-latency while still allowing the user to increase the value for specific
-needs.
+On Thu, Jun 8, 2023 at 1:03 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> holder is just an on-stack pointer that can easily be reused by other calls,
+> replace it with a static variable that doesn't change.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Signed-off-by: John Pittman <jpittman@redhat.com>
-Suggested-by: David Jeffery <djeffery@redhat.com>
----
- Documentation/ABI/stable/sysfs-block | 4 +++-
- block/blk-settings.c                 | 3 ++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+Acked-by: Rafael J. Wysocki <rafael@kernel.org>
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stable/sysfs-block
-index c57e5b7cb532..158a1e6f1f6d 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -235,7 +235,9 @@ Description:
- 		large latencies when large discards are issued, setting this
- 		value lower will make Linux issue smaller discards and
- 		potentially help reduce latencies induced by large discard
--		operations.
-+		operations. For this reason, the max is currently defaulted to
-+		four times BLK_DEF_MAX_SECTORS, but can be increased via sysfs
-+		as needed.
- 
- 
- What:		/sys/block/<disk>/queue/discard_max_hw_bytes
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 4dd59059b788..4401c0b8477e 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -179,7 +179,8 @@ void blk_queue_max_discard_sectors(struct request_queue *q,
- 		unsigned int max_discard_sectors)
- {
- 	q->limits.max_hw_discard_sectors = max_discard_sectors;
--	q->limits.max_discard_sectors = max_discard_sectors;
-+	q->limits.max_discard_sectors = min(max_discard_sectors,
-+						BLK_DEF_MAX_SECTORS * 4);
- }
- EXPORT_SYMBOL(blk_queue_max_discard_sectors);
- 
--- 
-2.38.1
-
+> ---
+>  kernel/power/swap.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/kernel/power/swap.c b/kernel/power/swap.c
+> index 81aec3b2c60510..b03ff1a33c7f68 100644
+> --- a/kernel/power/swap.c
+> +++ b/kernel/power/swap.c
+> @@ -1510,6 +1510,8 @@ int swsusp_read(unsigned int *flags_p)
+>         return error;
+>  }
+>
+> +static void *swsusp_holder;
+> +
+>  /**
+>   *      swsusp_check - Check for swsusp signature in the resume device
+>   */
+> @@ -1517,14 +1519,13 @@ int swsusp_read(unsigned int *flags_p)
+>  int swsusp_check(bool snapshot_test)
+>  {
+>         int error;
+> -       void *holder;
+>         fmode_t mode = FMODE_READ;
+>
+>         if (snapshot_test)
+>                 mode |= FMODE_EXCL;
+>
+>         hib_resume_bdev = blkdev_get_by_dev(swsusp_resume_device,
+> -                                           mode, &holder, NULL);
+> +                                           mode, &swsusp_holder, NULL);
+>         if (!IS_ERR(hib_resume_bdev)) {
+>                 set_blocksize(hib_resume_bdev, PAGE_SIZE);
+>                 clear_page(swsusp_header);
+> --
+> 2.39.2
+>
