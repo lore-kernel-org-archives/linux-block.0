@@ -2,57 +2,59 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17974C7EE2E
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 20:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63848C7EE37
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 20:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232396AbjFIUpf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 16:45:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46248 "EHLO
+        id S229831AbjFIUpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 16:45:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232101AbjFIUpd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 16:45:33 -0400
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F4F30F9
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 13:45:31 -0700 (PDT)
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 359GaXmE000937
-        for <linux-block@vger.kernel.org>; Fri, 9 Jun 2023 13:45:31 -0700
+        with ESMTP id S229523AbjFIUpp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 16:45:45 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A2E26B1
+        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 13:45:44 -0700 (PDT)
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+        by m0089730.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 359GZHVJ029943
+        for <linux-block@vger.kernel.org>; Fri, 9 Jun 2023 13:45:43 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=s2048-2021-q4;
- bh=zTgmawKXlZLqbO9qk02nenZbeuA4dRP64zsoMrkzonA=;
- b=TRzXYv/W+UJmPF9hbCQbqHUfI5LvChTzI/4L52aByVtPZ/FVnbHbhF8/069W60BfFi0r
- TPwPRCfSAmhHpuy6Pdp76DnDx7tejgQ2fwFnpsYPqdA+oEca2tGtsg/zD2TUq+Qruqw0
- 6bOVc7kOnyN8bl62ur0LiYubTKZLpSlInbYUPrB5AoEyNZq8PxiwOysm243mtiZXHh+T
- SFTgc9zKAMqAtta7PjAcKuvNrhkZIsSKoBo/sPHc3NwlkQh1FAQsSpV1X8qL9jAx9bVP
- 7yaUJzt2rwsOri/LLfRPMpksvHvAqbaUBGg4znN731Lyn905Gr2l4f/jAYCQ0ztWNLkU nw== 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3r3us9xk6p-2
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=1kZjeiWSwR0l0AHDID9w8iNkq6BqXuyHlq5IGLxTmXc=;
+ b=ihq0nR7GzmXeIHgpFcbkUS/Wt0cGqkh8v7JpOh4Oud+ZAXc/WN5U6PoFch22p1hPOuLF
+ PAikMmi5HjgondPR1YCGqltq3fkjugpi2+doa7uo/qU4kURdQsyJf0zU32OF3MZtWnQ8
+ N/B5nGvI+8Dp6sUlToexLxriCPEE4PluHPu3N2uA4rmIo7u4J/xmsd82MvBTFlDMOS7y
+ 0JINKFKYARUOe6upHPA34q76ieQIYcHcykHekjB+JBGOqT82V0Oue4+6B6Pfw7avT8Tb
+ OE57xzOsgDL7qfxAy+JEkBysaXONHBkvQASMNfQl8t7KlWKeb3LLNI5g815IACi8L1R1 uw== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by m0089730.ppops.net (PPS) with ESMTPS id 3r3ugpex1b-4
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 13:45:30 -0700
-Received: from twshared25760.37.frc1.facebook.com (2620:10d:c085:108::8) by
- mail.thefacebook.com (2620:10d:c085:11d::7) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 13:45:43 -0700
+Received: from ash-exhub204.TheFacebook.com (2620:10d:c0a8:83::4) by
+ ash-exhub203.TheFacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 9 Jun 2023 13:45:29 -0700
+ 15.1.2507.23; Fri, 9 Jun 2023 13:45:39 -0700
+Received: from twshared5974.02.ash9.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a8:83::4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Fri, 9 Jun 2023 13:45:39 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 4523C19D4CC4D; Fri,  9 Jun 2023 13:45:19 -0700 (PDT)
+        id E007F19D4CC35; Fri,  9 Jun 2023 13:45:19 -0700 (PDT)
 From:   Keith Busch <kbusch@meta.com>
 To:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>, <hch@lst.de>, <axboe@kernel.dk>
 CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
         Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 1/2] block: add request polling helper
-Date:   Fri, 9 Jun 2023 13:45:16 -0700
-Message-ID: <20230609204517.493889-2-kbusch@meta.com>
+Subject: [PATCHv2 0/2] enhanced nvme uring command polling
+Date:   Fri, 9 Jun 2023 13:45:15 -0700
+Message-ID: <20230609204517.493889-1-kbusch@meta.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230609204517.493889-1-kbusch@meta.com>
-References: <20230609204517.493889-1-kbusch@meta.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Tq9We6YNoxN5gw8zL8ABVnkeEasZ1BoZ
-X-Proofpoint-GUID: Tq9We6YNoxN5gw8zL8ABVnkeEasZ1BoZ
+X-Proofpoint-ORIG-GUID: 9WBcEeXx_cljwSYB0BFzLSotSBBSyHyL
+X-Proofpoint-GUID: 9WBcEeXx_cljwSYB0BFzLSotSBBSyHyL
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
  definitions=2023-06-09_16,2023-06-09_01,2023-05-22_02
@@ -62,131 +64,30 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-Provide a direct request polling will for drivers. The interface does
-not require a bio, and can skip the overhead associated with polling
-those. The biggest gain from skipping the relatively expensive xarray
-lookup unnecessary when you already have the request.
+Changes from previous version:
 
-With this, the simple rq/qc conversion functions have only one caller
-each, so open code this and remove the helpers.
+  Used the new hctx polling for the existing request polling use case.
+  (Christoph)
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
----
- block/blk-mq.c         | 48 ++++++++++++++++++++++++++++--------------
- include/linux/blk-mq.h |  2 ++
- 2 files changed, 34 insertions(+), 16 deletions(-)
+  Open coded the qc/rq conversion functions since they're simple and
+  have one caller each. (Christoph)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1749f5890606b..b82b5b3324108 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -49,17 +49,8 @@ static void blk_mq_request_bypass_insert(struct reques=
-t *rq,
- 		blk_insert_t flags);
- static void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list);
--
--static inline struct blk_mq_hw_ctx *blk_qc_to_hctx(struct request_queue =
-*q,
--		blk_qc_t qc)
--{
--	return xa_load(&q->hctx_table, qc);
--}
--
--static inline blk_qc_t blk_rq_to_qc(struct request *rq)
--{
--	return rq->mq_hctx->queue_num;
--}
-+static int blk_hctx_poll(struct request_queue *q, struct blk_mq_hw_ctx *=
-hctx,
-+			 struct io_comp_batch *iob, unsigned int flags);
-=20
- /*
-  * Check if any of the ctx, dispatch list or elevator
-@@ -1247,7 +1238,7 @@ void blk_mq_start_request(struct request *rq)
- 		q->integrity.profile->prepare_fn(rq);
- #endif
- 	if (rq->bio && rq->bio->bi_opf & REQ_POLLED)
--	        WRITE_ONCE(rq->bio->bi_cookie, blk_rq_to_qc(rq));
-+	        WRITE_ONCE(rq->bio->bi_cookie, rq->mq_hctx->queue_num);
- }
- EXPORT_SYMBOL(blk_mq_start_request);
-=20
-@@ -1349,7 +1340,7 @@ EXPORT_SYMBOL_GPL(blk_rq_is_poll);
- static void blk_rq_poll_completion(struct request *rq, struct completion=
- *wait)
- {
- 	do {
--		blk_mq_poll(rq->q, blk_rq_to_qc(rq), NULL, 0);
-+		blk_hctx_poll(rq->q, rq->mq_hctx, NULL, 0);
- 		cond_resched();
- 	} while (!completion_done(wait));
- }
-@@ -4735,10 +4726,9 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_=
-set *set, int nr_hw_queues)
- }
- EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
-=20
--int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, struct io_comp=
-_batch *iob,
--		unsigned int flags)
-+static int blk_hctx_poll(struct request_queue *q, struct blk_mq_hw_ctx *=
-hctx,
-+			 struct io_comp_batch *iob, unsigned int flags)
- {
--	struct blk_mq_hw_ctx *hctx =3D blk_qc_to_hctx(q, cookie);
- 	long state =3D get_current_state();
- 	int ret;
-=20
-@@ -4763,6 +4753,32 @@ int blk_mq_poll(struct request_queue *q, blk_qc_t =
-cookie, struct io_comp_batch *
- 	return 0;
- }
-=20
-+int blk_mq_poll(struct request_queue *q, blk_qc_t cookie,
-+		struct io_comp_batch *iob, unsigned int flags)
-+{
-+	struct blk_mq_hw_ctx *hctx =3D xa_load(&q->hctx_table, cookie);
-+
-+	return blk_hctx_poll(q, hctx, iob, flags);
-+}
-+
-+int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
-+		unsigned int poll_flags)
-+{
-+	struct request_queue *q =3D rq->q;
-+	int ret;
-+
-+	if (!blk_rq_is_poll(rq))
-+		return 0;
-+	if (!percpu_ref_tryget(&q->q_usage_counter))
-+		return 0;
-+
-+	ret =3D blk_hctx_poll(q, rq->mq_hctx, iob, poll_flags);
-+	blk_queue_exit(q);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(blk_rq_poll);
-+
- unsigned int blk_mq_rq_cpu(struct request *rq)
- {
- 	return rq->mq_ctx->cpu;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 59b52ec155b1b..9f4d285b52b93 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -715,6 +715,8 @@ int blk_mq_alloc_sq_tag_set(struct blk_mq_tag_set *se=
-t,
- void blk_mq_free_tag_set(struct blk_mq_tag_set *set);
-=20
- void blk_mq_free_request(struct request *rq);
-+int blk_rq_poll(struct request *rq, struct io_comp_batch *iob,
-+		unsigned int poll_flags);
-=20
- bool blk_mq_queue_inflight(struct request_queue *q);
-=20
+  Merged up to block/for-6.5/io_uring because (1) this series touches
+  io_uring uapi, and (2) using this baseline prevents a future merge
+  conflict.
+
+Keith Busch (2):
+  block: add request polling helper
+  nvme: improved uring polling
+
+ block/blk-mq.c                | 48 ++++++++++++++++--------
+ drivers/nvme/host/ioctl.c     | 70 ++++++++++-------------------------
+ drivers/nvme/host/multipath.c |  2 +-
+ drivers/nvme/host/nvme.h      |  2 -
+ include/linux/blk-mq.h        |  2 +
+ include/uapi/linux/io_uring.h |  2 +
+ 6 files changed, 56 insertions(+), 70 deletions(-)
+
 --=20
 2.34.1
 
