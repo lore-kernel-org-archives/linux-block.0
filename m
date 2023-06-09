@@ -2,116 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 123DDC7EE23
-	for <linux-block@archiver.kernel.org>; Thu,  8 Jun 2023 23:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6010C7EE29
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 00:10:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234442AbjFHXKN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jun 2023 19:10:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39836 "EHLO
+        id S237703AbjFIAKT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jun 2023 20:10:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbjFHXKM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 19:10:12 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404B12D7F;
-        Thu,  8 Jun 2023 16:10:11 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-64d44b198baso895995b3a.0;
-        Thu, 08 Jun 2023 16:10:11 -0700 (PDT)
+        with ESMTP id S235685AbjFIAKR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 20:10:17 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F932D68
+        for <linux-block@vger.kernel.org>; Thu,  8 Jun 2023 17:10:16 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b026657a6fso2848705ad.0
+        for <linux-block@vger.kernel.org>; Thu, 08 Jun 2023 17:10:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686265811; x=1688857811;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1686269416; x=1688861416;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+4FKiEuTY82YAx8X30F4eHfJTbH8o0Cttt9EczZAL3w=;
-        b=JxuHQgmGloQy0UG4WmE9136U+ix/yoFiPKDYVh5C5OqVHTkn0nAgHFVQkYGeAj1/Ej
-         3LrhJY1K0zI8Fam6cCMvU2tjj0phKzecZLqls0c0BseELUEUF61VIb7TUdheqS2WzqCY
-         dSAEUSzqP3VDbCOmJXA9Mq0p7bC2nMIePzk7GXLGE3vgsucTddpMLd/bp/u5G3eNBHCn
-         cN7TxomenxlZ5Qq49AVHwmD2yrS8RseKgcCuDo68Ll0IRca4dMUW8GRvKjHcymbLfXp1
-         ZG+4gZMZo1zvKpwA7lpgBNq8DtUY7gRB8zjMIgWmzGXynqmhLo3TfZFZOChqMiZfb1x0
-         CbSg==
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eSknQxfSV4+v9bHiWDr5V1hQkXbY8spDyyTXR1H3Z7w=;
+        b=HJx733T5tRUocMxkNFje8IYT5y67NY8WQ9amqlXIrQE0tO5LmkrYdPSVks/TY2IxcT
+         UUj464UKm1Ze10y30+7mDcVysdd5foK6T1gZMus8II2PhCtKOmFDhUAG4if56wLq6NFn
+         +ZvD8azh3PqqeTyEvmGfqWTkYtIV5V0p3FJcAivduTYIzAKAgH1q8iCTukjIcU5Ghiam
+         9bgoebeFRtoeIrJgBTUVEsgoZxdqVfyknN9PGTnhCfK7BeWkP38a4H5SaLjXifwAErTq
+         HBwvuRZNYSPNMd2LHZ3bmRQ1U5bP5bzkIRccEiGV60hLmbFPk36J+rSWZ0NVBxObvp5U
+         J//Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686265811; x=1688857811;
+        d=1e100.net; s=20221208; t=1686269416; x=1688861416;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+4FKiEuTY82YAx8X30F4eHfJTbH8o0Cttt9EczZAL3w=;
-        b=D2Lc4iVv2fAULjGOKnzeBRHyY4bmgaq1hkU8Kg/b07GKw5oWZBZLyzCwKGz/h4nDhk
-         TLp6yC9q08CUoCEBqEq5SETBMhlwrHOVVT23RUbPDbgoFAh3A0IplxldemW0RyLQnmkC
-         IE77li0WjE1etvp3/epYYMKdITV3g7qNLXNnsEVFmWivD+d5VAHX5tSRTqVO5xBaF4Xd
-         erAIvK6vjU2ZI/o0oRqJgD+3MDLMeuNhcJ7Srn5TJmfAZ/fAyvYI1juVdoE5QVisaMbS
-         3Io7j80a1MbAyY3ucL2UTHoOHyv9qrX4ZtHADayk8gtO2nbKC2X5nnjy6f7+xJKE4MAl
-         Iz7Q==
-X-Gm-Message-State: AC+VfDzFojhe9c2LI6tUs9XBibSA/Qe+3RMvaKDDzPmrN1T8UKHk7YyB
-        MlHqsICgaAsSD6lD79QTIuc=
-X-Google-Smtp-Source: ACHHUZ6K9VCTFcMLBRjQIz8O1sq6dZlmJLKUuquIhY6b+HKX49rqri5Fnd4NmviM1hmWkcdUPct66g==
-X-Received: by 2002:a05:6a00:24c4:b0:64f:f478:2294 with SMTP id d4-20020a056a0024c400b0064ff4782294mr185298pfv.0.1686265810191;
-        Thu, 08 Jun 2023 16:10:10 -0700 (PDT)
-Received: from localhost (dhcp-72-235-13-41.hawaiiantel.net. [72.235.13.41])
-        by smtp.gmail.com with ESMTPSA id a15-20020aa7864f000000b0064fe332209esm1592972pfo.98.2023.06.08.16.10.09
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eSknQxfSV4+v9bHiWDr5V1hQkXbY8spDyyTXR1H3Z7w=;
+        b=PgXNd4zfViJDiiVe2FcdvZBXYH8PmNyLH1VFGZ/Cgz8psn3gZbua84kVxAr7RL07u+
+         XeICe8mZJsfaNRINB6TADdde/cduAcnQM+b2EKFYjn6qTWqU/X+s8CrI1tl+p3YbjkRu
+         shTM/lW26ZsFDoNcuDVuFM8PizkatJksGT8JJrtV3STPnOiTVbWYtCnFBg6GCeNZci7C
+         CihjYCow4fYkN0M+O6cEPgV4k+24ttE4F6en/Fq7wGy7gEZiI/nEp769TwuoaxltDqvi
+         UU1kIsAgqk2HMUAFrwMUZjoLuk5fMwKgkJKyhkZ15XCbnBM2snrgUroxZr1YtAGdRC16
+         khvA==
+X-Gm-Message-State: AC+VfDyTkDX62Ipb5fwXRaIvabuJXTKee5Mal6TmlhUSMV9K2wqx5+3D
+        TEH/sD5kqC56alxuFrw4nqrMsw==
+X-Google-Smtp-Source: ACHHUZ45Am6lEfPDHZXqbwBRcUTK946UynbP/40rwMJHewDfZDlg3Hu4zbYOxv8aShlKmaGa6Khcbw==
+X-Received: by 2002:a17:903:120d:b0:1ad:f138:b2f6 with SMTP id l13-20020a170903120d00b001adf138b2f6mr10756391plh.16.1686269416027;
+        Thu, 08 Jun 2023 17:10:16 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-79-151.pa.nsw.optusnet.com.au. [49.179.79.151])
+        by smtp.gmail.com with ESMTPSA id b13-20020a170903228d00b001ae8b4dc49bsm1972178plh.13.2023.06.08.17.10.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jun 2023 16:10:09 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 8 Jun 2023 13:10:10 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        stable@vger.kernel.org, Jay Shin <jaeshin@redhat.com>,
-        Waiman Long <longman@redhat.com>, mkoutny@suse.com,
-        Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH V3] blk-cgroup: Flush stats before releasing blkcg_gq
-Message-ID: <ZIJf0hBOB89II79Z@slm.duckdns.org>
-References: <20230525043518.831721-1-ming.lei@redhat.com>
+        Thu, 08 Jun 2023 17:10:15 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q7Phl-009U1b-0E;
+        Fri, 09 Jun 2023 10:10:13 +1000
+Date:   Fri, 9 Jun 2023 10:10:13 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Joe Thornber <thornber@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>, dm-devel@redhat.com,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Brian Foster <bfoster@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Joe Thornber <ejt@redhat.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZIJt5V2aO15yVt3B@dread.disaster.area>
+References: <ZHB954zGG1ag0E/t@dread.disaster.area>
+ <CAJ0trDbspRaDKzTzTjFdPHdB9n0Q9unfu1cEk8giTWoNu3jP8g@mail.gmail.com>
+ <ZHFEfngPyUOqlthr@dread.disaster.area>
+ <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
+ <ZHYB/6l5Wi+xwkbQ@redhat.com>
+ <CAJ0trDaUOevfiEpXasOESrLHTCcr=oz28ywJU+s+YOiuh7iWow@mail.gmail.com>
+ <ZHYWAGmKhwwmTjW/@redhat.com>
+ <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
+ <ZHqOvq3ORETQB31m@dread.disaster.area>
+ <yq1sfb21zsa.fsf@ca-mkp.ca.oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230525043518.831721-1-ming.lei@redhat.com>
+In-Reply-To: <yq1sfb21zsa.fsf@ca-mkp.ca.oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 25, 2023 at 12:35:18PM +0800, Ming Lei wrote:
-> As noted by Michal, the blkg_iostat_set's in the lockless list hold
-> reference to blkg's to protect against their removal. Those blkg's
-> hold reference to blkcg. When a cgroup is being destroyed,
-> cgroup_rstat_flush() is only called at css_release_work_fn() which
-> is called when the blkcg reference count reaches 0. This circular
-> dependency will prevent blkcg and some blkgs from being freed after
-> they are made offline.
+On Wed, Jun 07, 2023 at 10:03:40PM -0400, Martin K. Petersen wrote:
 > 
-> It is less a problem if the cgroup to be destroyed also has other
-> controllers like memory that will call cgroup_rstat_flush() which will
-> clean up the reference count. If block is the only controller that uses
-> rstat, these offline blkcg and blkgs may never be freed leaking more
-> and more memory over time.
+> Dave,
 > 
-> To prevent this potential memory leak:
+> > Possibly unintentionally, I didn't call it REQ_OP_PROVISION but that's
+> > what I intended - the operation does not contain data at all. It's an
+> > operation like REQ_OP_DISCARD or REQ_OP_WRITE_ZEROS - it contains a
+> > range of sectors that need to be provisioned (or discarded), and
+> > nothing else.
 > 
-> - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
-> can be added
-> 
-> - add global blkg_stat_lock for covering concurrent parent blkg stat
-> update
-> 
-> - don't grab bio->bi_blkg reference when adding the stats into blkcg's
-> per-cpu stat list since all stats are guaranteed to be consumed before
-> releasing blkg instance, and grabbing blkg reference for stats was the
-> most fragile part of original patch
-> 
-> Based on Waiman's patch:
-> 
-> https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
-> 
-> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-> Cc: stable@vger.kernel.org
-> Reported-by: Jay Shin <jaeshin@redhat.com>
-> Cc: Waiman Long <longman@redhat.com>
-> Cc: Tejun Heo <tj@kernel.org>
-> Cc: mkoutny@suse.com
-> Cc: Yosry Ahmed <yosryahmed@google.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Yep. That's also how SCSI defines it. The act of provisioning a block
+> range is done through an UNMAP command using a special flag. All it does
+> is pin down those LBAs so future writes to them won't result in ENOSPC.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+*nod*
 
-Thanks.
+That I knew, and it's one of the reasons I'd like the filesystem <->
+block layer provisioning model to head in this direction. i.e. we
+don't have to do anything special to enable routing of provisioning
+requests to hardware and/or remote block storage devices (e.g.
+ceph-rbd, nbd, etc). Hence "external" devices can provide the same
+guarantees as a native software-only block device implementations
+like dm-thinp can provide and everything gets just that little bit
+better behaved...
+
+Cheers,
+
+Dave.
 
 -- 
-tejun
+Dave Chinner
+david@fromorbit.com
