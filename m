@@ -2,126 +2,74 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC29C7EE43
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 08:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50347C7EE29
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 09:25:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240956AbjFIInz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 04:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48050 "EHLO
+        id S230301AbjFIJZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 05:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239113AbjFIInm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 04:43:42 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC88F5;
-        Fri,  9 Jun 2023 01:43:32 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qcvk83jR5z4f4MWs;
-        Fri,  9 Jun 2023 16:43:28 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgBnHbEu5oJkNdspLQ--.1947S5;
-        Fri, 09 Jun 2023 16:43:29 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, axboe@kernel.dk, dgilbert@interlog.com,
-        jejb@linux.ibm.com, martin.petersen@oracle.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH v4 1/2] scsi: sg: fix blktrace debugfs entries leakage
-Date:   Fri,  9 Jun 2023 16:39:12 +0800
-Message-Id: <20230609083913.2254980-2-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230609083913.2254980-1-yukuai1@huaweicloud.com>
-References: <20230609083913.2254980-1-yukuai1@huaweicloud.com>
+        with ESMTP id S230474AbjFIJY0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 05:24:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50746EA2;
+        Fri,  9 Jun 2023 02:18:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 852ED618EA;
+        Fri,  9 Jun 2023 09:17:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4493C4339C;
+        Fri,  9 Jun 2023 09:17:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686302272;
+        bh=RQisGjj9KL7kg1igwwGHNm1IZaL2rbAG8kSrlm0JzKg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=b8qzhMu/qygDwv+U5QLA/usX5K3ECwj+MWUgaKKeHU1A6jDPzwgU3fjQTHoJIcRQ2
+         vpNZP+VrZ90ThxS166jMfUrT+QZKtm1KBvowVFfbmzSS0ZpEBL4QomvUjcGt0b52Tl
+         Vt/rs9HHyHQ8dLhU3gGj0OEBMcgAa+y35a7SmaLQgtKrg33rNDWaZIuKcmpotThwN1
+         fu5DkvO1vw/WNMbn33yxhtRaPCasPjOvUKIM3fRdHCT2l22iUWVnMcE5Y8vhK9LjcW
+         H16WBbKojs/cJ4E/ye6mdTIzDmYUTtUdX5j7GNSY8Zb/7OM7u+VmMpIdu95ff+AI7s
+         ZYsiksFxpfitw==
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-3f738f579ceso11218805e9.3;
+        Fri, 09 Jun 2023 02:17:52 -0700 (PDT)
+X-Gm-Message-State: AC+VfDwq/ZcmRaLstf5k5+DGAm73+mrYqlxspWg7ufDrlMRKjd2j+4ub
+        MDFeMhDN/92vaVJV4STVSg2VkUrdk3Oyt4z0aQM=
+X-Google-Smtp-Source: ACHHUZ70M63/s5OAb5SuDf8GVqAjthMUYLs718VlOe6y2HvimEHtOeklfwr9dXNjNX4PdOTUT/IHiblpHj8LQ8LvlE4=
+X-Received: by 2002:a7b:c8d7:0:b0:3f4:2cb2:a6cf with SMTP id
+ f23-20020a7bc8d7000000b003f42cb2a6cfmr423308wml.10.1686302271124; Fri, 09 Jun
+ 2023 02:17:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnHbEu5oJkNdspLQ--.1947S5
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kry3Zr4kJrWxuFyxtr4ruFg_yoW8Zw4rpF
-        WUXa90yrWUWr4UGw45Zw1UZF1fCay093yrGFW7Kw1rWF4rJr90gFyktFy7W3W5ArZ5uFZ8
-        JFW5tF95GF17Jw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
-        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU4T5dUUUUU
-        =
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <20230608032404.1887046-1-mcgrof@kernel.org> <20230608032404.1887046-5-mcgrof@kernel.org>
+ <ZIHZngefNAtYtg7L@casper.infradead.org> <ZIHcl8epO0h3z1TO@infradead.org>
+ <ZIITpjDXyupKom+N@bombadil.infradead.org> <ZIKofhpTXREOR3ec@infradead.org>
+In-Reply-To: <ZIKofhpTXREOR3ec@infradead.org>
+From:   Luis Chamberlain <mcgrof@kernel.org>
+Date:   Fri, 9 Jun 2023 02:17:39 -0700
+X-Gmail-Original-Message-ID: <CAB=NE6V-w+NWTZ0tZaUNhOH2uW7T3EEYKt-+YhkDX6tZZ8BccA@mail.gmail.com>
+Message-ID: <CAB=NE6V-w+NWTZ0tZaUNhOH2uW7T3EEYKt-+YhkDX6tZZ8BccA@mail.gmail.com>
+Subject: Re: [RFC 4/4] bdev: extend bdev inode with it's own super_block
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Matthew Wilcox <willy@infradead.org>, djwong@kernel.org,
+        dchinner@redhat.com, kbusch@kernel.org, hare@suse.de,
+        ritesh.list@gmail.com, rgoldwyn@suse.com, jack@suse.cz,
+        patches@lists.linux.dev, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        p.raghav@samsung.com, da.gomez@samsung.com, rohan.puri@samsung.com,
+        rpuri.linux@gmail.com, corbet@lwn.net, jake@lwn.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Thu, Jun 8, 2023 at 9:20=E2=80=AFPM Christoph Hellwig <hch@infradead.org=
+> wrote:
+> Again, every non-trivial file system right now has more than one set
+> of aops per superblock.  I'm not sure what problem you are trying to
+> solve here.
 
-sg_ioctl() support to enable blktrace, which will create debugfs entries
-"/sys/kernel/debug/block/sgx/", however, there is no guarantee that user
-will remove these entries through ioctl, and deleting sg device doesn't
-cleanup these blktrace entries.
+Alright, a 2 liner does indeed let it co-exist and replace this mess, thank=
+s.
 
-This problem can be fixed by cleanup blktrace while releasing
-request_queue, however, it's not a good idea to do this special handling
-in common layer just for sg device.
-
-Fix this problem by shutdown bltkrace in sg_device_destroy(), where the
-device is deleted and all the users close the device, also grab a
-scsi_device reference from sg_add_device() to prevent scsi_device to be
-freed before sg_device_destroy();
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/scsi/sg.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index 037f8c98a6d3..dd62c5b0d079 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -1496,6 +1496,10 @@ sg_add_device(struct device *cl_dev)
- 	int error;
- 	unsigned long iflags;
- 
-+	error = scsi_device_get(scsidp);
-+	if (error)
-+		return error;
-+
- 	error = -ENOMEM;
- 	cdev = cdev_alloc();
- 	if (!cdev) {
-@@ -1553,6 +1557,7 @@ sg_add_device(struct device *cl_dev)
- out:
- 	if (cdev)
- 		cdev_del(cdev);
-+	scsi_device_put(scsidp);
- 	return error;
- }
- 
-@@ -1560,6 +1565,7 @@ static void
- sg_device_destroy(struct kref *kref)
- {
- 	struct sg_device *sdp = container_of(kref, struct sg_device, d_ref);
-+	struct request_queue *q = sdp->device->request_queue;
- 	unsigned long flags;
- 
- 	/* CAUTION!  Note that the device can still be found via idr_find()
-@@ -1567,6 +1573,11 @@ sg_device_destroy(struct kref *kref)
- 	 * any other cleanup.
- 	 */
- 
-+	mutex_lock(&q->debugfs_mutex);
-+	blk_trace_shutdown(q);
-+	mutex_unlock(&q->debugfs_mutex);
-+	scsi_device_put(sdp->device);
-+
- 	write_lock_irqsave(&sg_index_lock, flags);
- 	idr_remove(&sg_index_idr, sdp->index);
- 	write_unlock_irqrestore(&sg_index_lock, flags);
--- 
-2.39.2
-
+  Luis
