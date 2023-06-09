@@ -2,199 +2,207 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE6CAC7EE29
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 00:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BB5C7EE25
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 00:34:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229622AbjFIA3H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jun 2023 20:29:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44432 "EHLO
+        id S229513AbjFIAe6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jun 2023 20:34:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjFIA3G (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 20:29:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE92F132
-        for <linux-block@vger.kernel.org>; Thu,  8 Jun 2023 17:28:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686270500;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dZ0yORwAdXDCRd2fZyWQ1kLxeAr//tPmWz4kXkYhyTs=;
-        b=L/cueAdDOzvLN/LhEGtJ8Q5NcTHkbb3qRA6MK0SvQUgzaCOn/wJpsAjC6PerGjvgheFAhO
-        c6VW8nVvdJyj53ipHrlhSYBFeMWLW/eiVEptDgViNo9UAkimdV7Fh99t/FqH0GoXaLh/15
-        kyJxDPW0trMEMUSqYXuGsMdqn5UiV80=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-537-vt6TsPAKM2G6KVnu0XAOIA-1; Thu, 08 Jun 2023 20:28:19 -0400
-X-MC-Unique: vt6TsPAKM2G6KVnu0XAOIA-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-75d8e5ddc93so150408385a.0
-        for <linux-block@vger.kernel.org>; Thu, 08 Jun 2023 17:28:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686270498; x=1688862498;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dZ0yORwAdXDCRd2fZyWQ1kLxeAr//tPmWz4kXkYhyTs=;
-        b=kSZlQJEi6pfm0WzU0NYBh5UC8sRJ+vkGdO+fqqT9Q6fvepfjk1XVZLyU4dvUnHyJlv
-         PsgE5lJWz0T8Udra/W9m+MIhPOebPGdXMDpkcTwVYPm0Hq/lFlNoZVIweuQkMFCaNJ5L
-         8gph/OkZ4rpTbQhwFKyENego9lcdOIZ0uFrkBFknbV7Z0/FmGw7QbJ0iLMpQPlmjx529
-         fUFoYoqfHOB2jm5saDc0FWAXwJ6HioWTxQebq4wj1oovppt1lce9IHwCW53IHrHnjAf4
-         8+obB+seB1K7wQSkMgtkMgCpYOzrwuIx9JYGTfnbGtCkmUhn05hBEldQ7Wa/PZiZGMf5
-         wbmg==
-X-Gm-Message-State: AC+VfDwoqZSM82e8+HbhbYNmrFmR/mUiVe6/iUwooH3T63MabrOxlpd4
-        BY8N+paxf33k4bg1/JghoR04x5BD5xMdUU8PzY1H90tnUlnTBNdAfo5ynfEmjDNMMxyu2EYm6b/
-        OmqIklLttqLk7P6fU7SVU5g==
-X-Received: by 2002:a05:620a:2810:b0:75b:23a1:830c with SMTP id f16-20020a05620a281000b0075b23a1830cmr6973256qkp.7.1686270498616;
-        Thu, 08 Jun 2023 17:28:18 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5VNYOErVU972i4sJBtGLp/lGfEdbBIVxwb21zSx3OzLfsQlP0gnu+6DNqAnZHJO5hi85SI6A==
-X-Received: by 2002:a05:620a:2810:b0:75b:23a1:830c with SMTP id f16-20020a05620a281000b0075b23a1830cmr6973236qkp.7.1686270498360;
-        Thu, 08 Jun 2023 17:28:18 -0700 (PDT)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id m14-20020a05620a13ae00b0075da00ef114sm693183qki.46.2023.06.08.17.28.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jun 2023 17:28:17 -0700 (PDT)
-Date:   Thu, 8 Jun 2023 20:28:16 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
-        Joe Thornber <ejt@redhat.com>,
-        Brian Foster <bfoster@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
+        with ESMTP id S237612AbjFIAe5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 20:34:57 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB632697;
+        Thu,  8 Jun 2023 17:34:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686270895; x=1717806895;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NPBgbxkyvwwXlvp1wqABln5v+5rzW4e4NuoGP9H/glY=;
+  b=hG7Z84Ig6PGZcPGleVD+y+FMnPWYyIR+616kKfC48ZZHuYkx0tgc9gGS
+   cANngFfsDNjnacpfcYrMocsrgJ9yqY0bkBosswkPd/RpiBRZOEsYLUPhr
+   TeROFK557ON1qVOTyCfwlhwVX8CTjB8zfUWPw0SQs4P+Evv68b6MRxHf4
+   TTLxPrdzgea30rkrYew8AVhe36sRAjkSziD2Kq94lVFkjGd4Nkz0dOXQZ
+   Gy5CQptEOyF5h8RPKSb+UciWZce6yGn+459ORLqUJg+F+m7ZiuIDuJDG4
+   UDAPWYegLKh5lZJEcdaEpW8pd2jaE+ZR7bAZa04tbZjDQpJEOfSDYK6MN
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10735"; a="385825519"
+X-IronPort-AV: E=Sophos;i="6.00,228,1681196400"; 
+   d="scan'208";a="385825519"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2023 17:34:55 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10735"; a="687549137"
+X-IronPort-AV: E=Sophos;i="6.00,228,1681196400"; 
+   d="scan'208";a="687549137"
+Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 08 Jun 2023 17:34:52 -0700
+Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q7Q5b-0008OS-1b;
+        Fri, 09 Jun 2023 00:34:51 +0000
+Date:   Fri, 9 Jun 2023 08:34:32 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        "Roberts, Martin" <martin.roberts@intel.com>,
         Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH v7 4/5] dm-thin: Add REQ_OP_PROVISION support
-Message-ID: <ZIJyIOIPx+jE9/iv@redhat.com>
-References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
- <20230518223326.18744-5-sarthakkukreti@chromium.org>
- <ZGeUYESOQsZkOQ1Q@redhat.com>
- <ZIJHH+ekx59+6Uu0@redhat.com>
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
+Subject: Re: [PATCH] Revert "virtio-blk: support completion batching for the
+ IRQ path"
+Message-ID: <202306090808.d1u5ZgZ9-lkp@intel.com>
+References: <9443f7273fbba6e62f89e54cbb2a70d2c93ed8e9.1686260774.git.mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZIJHH+ekx59+6Uu0@redhat.com>
+In-Reply-To: <9443f7273fbba6e62f89e54cbb2a70d2c93ed8e9.1686260774.git.mst@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 08 2023 at  5:24P -0400,
-Mike Snitzer <snitzer@kernel.org> wrote:
+Hi Michael,
 
-> On Fri, May 19 2023 at 11:23P -0400,
-> Mike Snitzer <snitzer@kernel.org> wrote:
-> 
-> > On Thu, May 18 2023 at  6:33P -0400,
-> > Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
-> > 
-> > > dm-thinpool uses the provision request to provision
-> > > blocks for a dm-thin device. dm-thinpool currently does not
-> > > pass through REQ_OP_PROVISION to underlying devices.
-> > > 
-> > > For shared blocks, provision requests will break sharing and copy the
-> > > contents of the entire block. Additionally, if 'skip_block_zeroing'
-> > > is not set, dm-thin will opt to zero out the entire range as a part
-> > > of provisioning.
-> > > 
-> > > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > > ---
-> > >  drivers/md/dm-thin.c | 74 +++++++++++++++++++++++++++++++++++++++++---
-> > >  1 file changed, 70 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-> > > index 2b13c949bd72..f1b68b558cf0 100644
-> > > --- a/drivers/md/dm-thin.c
-> > > +++ b/drivers/md/dm-thin.c
-> > > @@ -1245,8 +1247,8 @@ static int io_overlaps_block(struct pool *pool, struct bio *bio)
-> > >  
-> > >  static int io_overwrites_block(struct pool *pool, struct bio *bio)
-> > >  {
-> > > -	return (bio_data_dir(bio) == WRITE) &&
-> > > -		io_overlaps_block(pool, bio);
-> > > +	return (bio_data_dir(bio) == WRITE) && io_overlaps_block(pool, bio) &&
-> > > +	       bio_op(bio) != REQ_OP_PROVISION;
-> > >  }
-> > >  
-> > >  static void save_and_set_endio(struct bio *bio, bio_end_io_t **save,
-> > > @@ -1394,6 +1396,9 @@ static void schedule_zero(struct thin_c *tc, dm_block_t virt_block,
-> > >  	m->data_block = data_block;
-> > >  	m->cell = cell;
-> > >  
-> > > +	if (bio && bio_op(bio) == REQ_OP_PROVISION)
-> > > +		m->bio = bio;
-> > > +
-> > >  	/*
-> > >  	 * If the whole block of data is being overwritten or we are not
-> > >  	 * zeroing pre-existing data, we can issue the bio immediately.
-> > 
-> > This doesn't seem like the best way to address avoiding passdown of
-> > provision bios (relying on process_prepared_mapping's implementation
-> > that happens to do the right thing if m->bio set).  Doing so cascades
-> > into relying on complete_overwrite_bio() happening to _not_ actually
-> > being specific to "overwrite" bios.
-> > 
-> > I don't have a better suggestion yet but will look closer.  Just think
-> > this needs to be formalized a bit more rather than it happening to
-> > "just work".
-> > 
-> > Cc'ing Joe to see what he thinks too.  This is something we can clean
-> > up with a follow-on patch though, so not a show-stopper for this
-> > series.
-> 
-> I haven't circled back to look close enough at this but
-> REQ_OP_PROVISION bios _are_ being passed down to the thin-pool's
-> underlying data device.
-> 
-> Brian Foster reported that if he issues a REQ_OP_PROVISION to a thin
-> device after a snapshot (to break sharing), it'll fail with
-> -EOPNOTSUPP (response is from bio being passed down to device that
-> doesn't support it).  I was able to reproduce with:
-> 
-> # fallocate --offset 0 --length 1048576 /dev/test/thin
-> # lvcreate -n snap --snapshot test/thin
-> 
-> # fallocate --offset 0 --length 1048576 /dev/test/thin
-> fallocate: fallocate failed: Operation not supported
-> 
-> But reports success when retried:
-> # fallocate --offset 0 --length 1048576 /dev/test/thin
-> # echo $?
-> 0
-> 
-> It's somewhat moot in that Joe will be reimplementing handling for
-> REQ_OP_PROVISION _but_ in the meantime it'd be nice to have a version
-> of this patch that doesn't error (due to passdown of REQ_OP_PROVISION)
-> when breaking sharing.  Primarily so the XFS guys (Dave and Brian) can
-> make progress.
-> 
-> I'll take a closer look tomorrow but figured I'd let you know.
+kernel test robot noticed the following build errors:
 
-This fixes the issue for me (causes process_prepared_mapping to end
-the bio without REQ_OP_PROVISION passdown).
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v6.4-rc5 next-20230608]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-But like I said above back on May 19: needs cleanup to make it less of
-a hack for the REQ_OP_PROVISION case. At a minimum
-complete_overwrite_bio() would need renaming.
+url:    https://github.com/intel-lab-lkp/linux/commits/Michael-S-Tsirkin/Revert-virtio-blk-support-completion-batching-for-the-IRQ-path/20230609-054840
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+patch link:    https://lore.kernel.org/r/9443f7273fbba6e62f89e54cbb2a70d2c93ed8e9.1686260774.git.mst%40redhat.com
+patch subject: [PATCH] Revert "virtio-blk: support completion batching for the IRQ path"
+config: s390-randconfig-r014-20230608 (https://download.01.org/0day-ci/archive/20230609/202306090808.d1u5ZgZ9-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build):
+        mkdir -p ~/bin
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install s390 cross compiling tool for clang build
+        # apt-get install binutils-s390x-linux-gnu
+        git remote add axboe-block https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
+        git fetch axboe-block for-next
+        git checkout axboe-block/for-next
+        b4 shazam https://lore.kernel.org/r/9443f7273fbba6e62f89e54cbb2a70d2c93ed8e9.1686260774.git.mst@redhat.com
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang ~/bin/make.cross W=1 O=build_dir ARCH=s390 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang ~/bin/make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash drivers/block/
 
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index 43a6702f9efe..434a3b37af2f 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -1324,6 +1324,9 @@ static void schedule_copy(struct thin_c *tc, dm_block_t virt_block,
- 	m->data_block = data_dest;
- 	m->cell = cell;
- 
-+	if (bio_op(bio) == REQ_OP_PROVISION)
-+		m->bio = bio;
-+
- 	/*
- 	 * quiesce action + copy action + an extra reference held for the
- 	 * duration of this function (we may need to inc later for a
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306090808.d1u5ZgZ9-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/block/virtio_blk.c:10:
+   In file included from include/linux/virtio.h:7:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:75:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:37:59: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
+     102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
+         |                                                      ^
+   In file included from drivers/block/virtio_blk.c:10:
+   In file included from include/linux/virtio.h:7:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:75:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:35:59: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
+     115 | #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
+         |                                                      ^
+   In file included from drivers/block/virtio_blk.c:10:
+   In file included from include/linux/virtio.h:7:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:75:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     692 |         readsb(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     700 |         readsw(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     708 |         readsl(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     717 |         writesb(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     726 |         writesw(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     735 |         writesl(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+>> drivers/block/virtio_blk.c:1283:43: error: no member named 'status' in 'struct virtblk_req'
+    1283 |                     !blk_mq_add_to_batch(req, iob, vbr->status,
+         |                                                    ~~~  ^
+   12 warnings and 1 error generated.
+
+
+vim +1283 drivers/block/virtio_blk.c
+
+  1266	
+  1267	static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+  1268	{
+  1269		struct virtio_blk *vblk = hctx->queue->queuedata;
+  1270		struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
+  1271		struct virtblk_req *vbr;
+  1272		unsigned long flags;
+  1273		unsigned int len;
+  1274		int found = 0;
+  1275	
+  1276		spin_lock_irqsave(&vq->lock, flags);
+  1277	
+  1278		while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
+  1279			struct request *req = blk_mq_rq_from_pdu(vbr);
+  1280	
+  1281			found++;
+  1282			if (!blk_mq_complete_request_remote(req) &&
+> 1283			    !blk_mq_add_to_batch(req, iob, vbr->status,
+  1284							virtblk_complete_batch))
+  1285				virtblk_request_done(req);
+  1286		}
+  1287	
+  1288		if (found)
+  1289			blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
+  1290	
+  1291		spin_unlock_irqrestore(&vq->lock, flags);
+  1292	
+  1293		return found;
+  1294	}
+  1295	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
