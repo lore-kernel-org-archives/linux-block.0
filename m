@@ -2,92 +2,67 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63848C7EE37
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 20:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09933C7EE25
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 21:24:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229831AbjFIUpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 16:45:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46360 "EHLO
+        id S230044AbjFIVYL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 17:24:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjFIUpp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 16:45:45 -0400
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A2E26B1
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 13:45:44 -0700 (PDT)
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-        by m0089730.ppops.net (8.17.1.19/8.17.1.19) with ESMTP id 359GZHVJ029943
-        for <linux-block@vger.kernel.org>; Fri, 9 Jun 2023 13:45:43 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=s2048-2021-q4;
- bh=1kZjeiWSwR0l0AHDID9w8iNkq6BqXuyHlq5IGLxTmXc=;
- b=ihq0nR7GzmXeIHgpFcbkUS/Wt0cGqkh8v7JpOh4Oud+ZAXc/WN5U6PoFch22p1hPOuLF
- PAikMmi5HjgondPR1YCGqltq3fkjugpi2+doa7uo/qU4kURdQsyJf0zU32OF3MZtWnQ8
- N/B5nGvI+8Dp6sUlToexLxriCPEE4PluHPu3N2uA4rmIo7u4J/xmsd82MvBTFlDMOS7y
- 0JINKFKYARUOe6upHPA34q76ieQIYcHcykHekjB+JBGOqT82V0Oue4+6B6Pfw7avT8Tb
- OE57xzOsgDL7qfxAy+JEkBysaXONHBkvQASMNfQl8t7KlWKeb3LLNI5g815IACi8L1R1 uw== 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by m0089730.ppops.net (PPS) with ESMTPS id 3r3ugpex1b-4
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 13:45:43 -0700
-Received: from ash-exhub204.TheFacebook.com (2620:10d:c0a8:83::4) by
- ash-exhub203.TheFacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 9 Jun 2023 13:45:39 -0700
-Received: from twshared5974.02.ash9.facebook.com (2620:10d:c0a8:1c::1b) by
- mail.thefacebook.com (2620:10d:c0a8:83::4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 9 Jun 2023 13:45:39 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id E007F19D4CC35; Fri,  9 Jun 2023 13:45:19 -0700 (PDT)
-From:   Keith Busch <kbusch@meta.com>
-To:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>, <hch@lst.de>, <axboe@kernel.dk>
-CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 0/2] enhanced nvme uring command polling
-Date:   Fri, 9 Jun 2023 13:45:15 -0700
-Message-ID: <20230609204517.493889-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 9WBcEeXx_cljwSYB0BFzLSotSBBSyHyL
-X-Proofpoint-GUID: 9WBcEeXx_cljwSYB0BFzLSotSBBSyHyL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-09_16,2023-06-09_01,2023-05-22_02
+        with ESMTP id S229827AbjFIVYL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 17:24:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A3D435BE
+        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 14:24:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1F15360ED3
+        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 21:24:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 827E9C433D2;
+        Fri,  9 Jun 2023 21:24:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686345849;
+        bh=f5m9GxqfzgS5/SMRZPsPVnAvliF6In5HtosyWM/vboI=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=Wom+oVyyiRy/OmDxfmHSCuj6YazvKrhFVk5vqupDzi1iLu7tA82CNL1amM7wUKlTI
+         0BAGG8kCCsyaYGqDCuA4y3ZXpOxi9shWZUFYlvRu9xg+tfB5XCTtA6tlqYbdvDMJQO
+         PsvUjuKQin0M/ZN/2YSgY0j498oqJHIVfd+9eXWOLA2jSFh7e4P/7CCu5WW1jKljEi
+         LpYwaRDLH69fwINrjPXsvW18TEozQQIXw5qozrsTbngS/15Stxl7qAvlnl5TUvPOCP
+         DgdrQuq7VsycUWxk98O1BJWKc6KHRD4aCTcVKevuZ14ul8YG4eDBb2LrNWSLoJVlQO
+         Ed0xTItylujIA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6FE49C43143;
+        Fri,  9 Jun 2023 21:24:09 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.4-rc6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
+References: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.4-2023-06-09
+X-PR-Tracked-Commit-Id: ccc45cb4e7271c74dbb27776ae8f73d84557f5c6
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 64569520920a3ca5d456ddd9f4f95fc6ea9b8b45
+Message-Id: <168634584945.8966.6518299567363434380.pr-tracker-bot@kernel.org>
+Date:   Fri, 09 Jun 2023 21:24:09 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+The pull request you sent on Fri, 9 Jun 2023 14:20:18 -0600:
 
-Changes from previous version:
+> git://git.kernel.dk/linux.git tags/block-6.4-2023-06-09
 
-  Used the new hctx polling for the existing request polling use case.
-  (Christoph)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/64569520920a3ca5d456ddd9f4f95fc6ea9b8b45
 
-  Open coded the qc/rq conversion functions since they're simple and
-  have one caller each. (Christoph)
+Thank you!
 
-  Merged up to block/for-6.5/io_uring because (1) this series touches
-  io_uring uapi, and (2) using this baseline prevents a future merge
-  conflict.
-
-Keith Busch (2):
-  block: add request polling helper
-  nvme: improved uring polling
-
- block/blk-mq.c                | 48 ++++++++++++++++--------
- drivers/nvme/host/ioctl.c     | 70 ++++++++++-------------------------
- drivers/nvme/host/multipath.c |  2 +-
- drivers/nvme/host/nvme.h      |  2 -
- include/linux/blk-mq.h        |  2 +
- include/uapi/linux/io_uring.h |  2 +
- 6 files changed, 56 insertions(+), 70 deletions(-)
-
---=20
-2.34.1
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
