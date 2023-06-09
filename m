@@ -2,134 +2,109 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE138C7EE37
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 01:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A9EC7EE25
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 03:33:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235563AbjFIBMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Jun 2023 21:12:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34248 "EHLO
+        id S237998AbjFIDdE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Jun 2023 23:33:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234096AbjFIBMw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 21:12:52 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33054E47;
-        Thu,  8 Jun 2023 18:12:51 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qcjk64lh4z4f3kpy;
-        Fri,  9 Jun 2023 09:12:46 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCH77KJfIJkbOAQLQ--.60116S3;
-        Fri, 09 Jun 2023 09:12:43 +0800 (CST)
-Subject: Re: [PATCH v3 1/2] scsi: sg: fix blktrace debugfs entries leakage
-To:     kernel test robot <lkp@intel.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk,
-        dgilbert@interlog.com, jejb@linux.ibm.com,
-        martin.petersen@oracle.com
-Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230608024159.1282953-2-yukuai1@huaweicloud.com>
- <202306082353.o2lpbQcL-lkp@intel.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <f952e9b0-7695-0366-a713-3d2444b74a90@huaweicloud.com>
-Date:   Fri, 9 Jun 2023 09:12:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S235704AbjFIDdC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Jun 2023 23:33:02 -0400
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D57D185
+        for <linux-block@vger.kernel.org>; Thu,  8 Jun 2023 20:33:01 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6b280319df5so301213a34.3
+        for <linux-block@vger.kernel.org>; Thu, 08 Jun 2023 20:33:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1686281580; x=1688873580;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6iwigF78U3EwOQGn53e2UyWPNzHupFHtA26oaO3R2wc=;
+        b=IUFu6gG5Y34+fr+pT0fZlm3gbhBerxiSZw2i1915MxIWtDQeIYZTwhIfxZmRHtIyiR
+         NFlOVNBDBv4/iHd9xqTHen6L7cwEJR2miWxty9rxd+mk6AtmzR3I1xxG5LAkyihtV0UE
+         3/jD4CNKGPbNmdD2KK8c1YBe88FwQhH58dTi9C94lOBqYZTDhOFWExKvxj5Kp+IXNOgU
+         zX89XwkY9Pgh5GQ5zDMDjn1C2akzPzmnPzODvfSMY1/G48ZUuRJTjtxkVvp/a53l/BsA
+         SRJ7B68f+Pab/mILI/Gop73OnxPKT98d3/ZDR6sz0msjAMQnDOI/J9Kzm9qPanig48z3
+         RfKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686281580; x=1688873580;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6iwigF78U3EwOQGn53e2UyWPNzHupFHtA26oaO3R2wc=;
+        b=c/WeWnrxzVFNdV681dCsagwT8OYkBCEWGJWixsjBz8h57XEqnoZ3CP9Du7Yq5UrTmr
+         0h572aTGALD0F4nfoCvPu3rpnLGpw0WLN+oGn1jMMxzOsDgVDChsYPoTmAPU0j/EsZHM
+         aPaZv7y8wK/Jdomt/kTCfljkG4GYikUHzK8SotLbc3SFnmdKd2bC9oENqcAJ/COvu1eC
+         fTfCFU8cNp7W6bl+4nKEDrJwrhQ6NzBldlzka+8n/x9lVJEp1ZoutP74MlTPjWyL3d4n
+         MEsBzxIKrpRvk6uOgpDgxWq+Ev1UQrf1UJu0V7MvDEqWttGAJME/sTIG3+iW2NdiHChh
+         NUfA==
+X-Gm-Message-State: AC+VfDwMUVk7/rpEFtbBFcx1FO5NyycRp7IHAoAaVBeV5NHhTowZCYBd
+        hH7kBwVR/Degtfnt6qEIQMcDkq6icAK1RC30lXc=
+X-Google-Smtp-Source: ACHHUZ4jpAKkv/P4I5GyogL5cyKUBbH9jdQo3rd8sW4sBbrGIyPOxPKXrqwUV/kK78Vqo7hkyQEMOA==
+X-Received: by 2002:a05:6830:3a0a:b0:6a6:6121:dc60 with SMTP id di10-20020a0568303a0a00b006a66121dc60mr317885otb.10.1686281580410;
+        Thu, 08 Jun 2023 20:33:00 -0700 (PDT)
+Received: from dread.disaster.area (pa49-179-79-151.pa.nsw.optusnet.com.au. [49.179.79.151])
+        by smtp.gmail.com with ESMTPSA id t1-20020aa79381000000b0064381853bfcsm1723703pfe.89.2023.06.08.20.32.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 20:32:59 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q7Srw-009XUr-2X;
+        Fri, 09 Jun 2023 13:32:56 +1000
+Date:   Fri, 9 Jun 2023 13:32:56 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Joe Thornber <thornber@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        linux-kernel@vger.kernel.org, Joe Thornber <ejt@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, Brian Foster <bfoster@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH v7 0/5] Introduce provisioning primitives
+Message-ID: <ZIKdaJNhSq9JfFDU@dread.disaster.area>
+References: <ZHFEfngPyUOqlthr@dread.disaster.area>
+ <CAJ0trDZJQwvAzngZLBJ1hB0XkQ1HRHQOdNQNTw9nK-U5i-0bLA@mail.gmail.com>
+ <ZHYB/6l5Wi+xwkbQ@redhat.com>
+ <CAJ0trDaUOevfiEpXasOESrLHTCcr=oz28ywJU+s+YOiuh7iWow@mail.gmail.com>
+ <ZHYWAGmKhwwmTjW/@redhat.com>
+ <CAG9=OMMnDfN++-bJP3jLmUD6O=Q_ApV5Dr392_5GqsPAi_dDkg@mail.gmail.com>
+ <ZHqOvq3ORETQB31m@dread.disaster.area>
+ <ZHti/MLnX5xGw9b7@redhat.com>
+ <ZH/k9ss2Cg9HYrEV@dread.disaster.area>
+ <ZIEXwTd17z0iYW4s@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <202306082353.o2lpbQcL-lkp@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCH77KJfIJkbOAQLQ--.60116S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGFW3trykWw48GFyrXr45trb_yoWrGF43pa
-        1DXw4Ykr1UXr4I9a1I9r17u3Z8t398J345Xw1DKwn8uF9Fyasruwn29FZ8X3yqvw1vgasx
-        tr93uFyq9w1DX37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZIEXwTd17z0iYW4s@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Wed, Jun 07, 2023 at 07:50:25PM -0400, Mike Snitzer wrote:
+> Do you think you're OK to scope out, and/or implement, the XFS changes
+> if you use v7 of this patchset as the starting point? (v8 should just
+> be v7 minus the dm-thin.c and dm-snap.c changes).  The thinp
+> support in v7 will work enough to allow XFS to issue REQ_OP_PROVISION
+> and/or fallocate (via mkfs.xfs) to dm-thin devices.
 
-ÔÚ 2023/06/09 0:02, kernel test robot Ð´µÀ:
-> Hi Yu,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on axboe-block/for-next]
-> [also build test WARNING on linus/master v6.4-rc5 next-20230608]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/scsi-sg-fix-blktrace-debugfs-entries-leakage/20230608-104735
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-> patch link:    https://lore.kernel.org/r/20230608024159.1282953-2-yukuai1%40huaweicloud.com
-> patch subject: [PATCH v3 1/2] scsi: sg: fix blktrace debugfs entries leakage
-> config: i386-randconfig-r002-20230608 (https://download.01.org/0day-ci/archive/20230608/202306082353.o2lpbQcL-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce (this is a W=1 build):
->          git remote add axboe-block https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
->          git fetch axboe-block for-next
->          git checkout axboe-block/for-next
->          b4 shazam https://lore.kernel.org/r/20230608024159.1282953-2-yukuai1@huaweicloud.com
->          # save the config file
->          mkdir build_dir && cp config build_dir/.config
->          make W=1 O=build_dir ARCH=i386 olddefconfig
->          make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202306082353.o2lpbQcL-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
->     In file included from drivers/scsi/sg.c:45:
->     drivers/scsi/sg.c: In function 'sg_device_destroy':
->>> include/linux/blktrace_api.h:88:57: warning: statement with no effect [-Wunused-value]
->        88 | # define blk_trace_remove(q)                            (-ENOTTY)
->           |        
+Yup, XFS only needs blkdev_issue_provision() and
+bdev_max_provision_sectors() to be present.  filesystem code. The
+initial XFS provisioning detection and fallocate() support is just
+under 50 lines of new code...
 
-So, this warning happens in all the caller of blk_trace_remove() when
-CONFIG_BLK_DEV_IO_TRACE is disabled that doesn't handle the return
-value. I'll use blk_trace_shutdown() instead to avoid this warning.
-                                                  ^
-Thanks,
-Kuai
->     drivers/scsi/sg.c:1575:9: note: in expansion of macro 'blk_trace_remove'
->      1575 |         blk_trace_remove(sdp->device->request_queue);
->           |         ^~~~~~~~~~~~~~~~
-> 
-> 
-> vim +88 include/linux/blktrace_api.h
-> 
-> 157f9c00e88529 Arnaldo Carvalho de Melo 2009-01-26  81
-> 2056a782f8e7e6 Jens Axboe               2006-03-23  82  #else /* !CONFIG_BLK_DEV_IO_TRACE */
-> 2056a782f8e7e6 Jens Axboe               2006-03-23  83  # define blk_trace_ioctl(bdev, cmd, arg)		(-ENOTTY)
-> 2056a782f8e7e6 Jens Axboe               2006-03-23  84  # define blk_trace_shutdown(q)				do { } while (0)
-> a54895fa057c67 Christoph Hellwig        2020-12-03  85  # define blk_add_driver_data(rq, data, len)		do {} while (0)
-> d0deef5b14af7d Shawn Du                 2009-04-14  86  # define blk_trace_setup(q, name, dev, bdev, arg)	(-ENOTTY)
-> 6da127ad0918f9 Christof Schmitt         2008-01-11  87  # define blk_trace_startstop(q, start)			(-ENOTTY)
-> 6da127ad0918f9 Christof Schmitt         2008-01-11 @88  # define blk_trace_remove(q)				(-ENOTTY)
-> 9d5f09a424a67d Alan D. Brunelle         2008-05-27  89  # define blk_add_trace_msg(q, fmt, ...)			do { } while (0)
-> 35fe6d763229e8 Shaohua Li               2017-07-12  90  # define blk_add_cgroup_trace_msg(q, cg, fmt, ...)	do { } while (0)
-> 59fa0224cfea31 Shaohua Li               2016-05-09  91  # define blk_trace_note_message_enabled(q)		(false)
-> 2056a782f8e7e6 Jens Axboe               2006-03-23  92  #endif /* CONFIG_BLK_DEV_IO_TRACE */
-> d0deef5b14af7d Shawn Du                 2009-04-14  93
-> 
+Cheers,
 
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
