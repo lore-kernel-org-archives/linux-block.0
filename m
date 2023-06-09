@@ -2,116 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01D8C7EE37
-	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 20:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A619CC7EE25
+	for <linux-block@archiver.kernel.org>; Fri,  9 Jun 2023 20:22:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229801AbjFIUBI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 16:01:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52260 "EHLO
+        id S232465AbjFIUV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 16:21:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231367AbjFIUBG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 16:01:06 -0400
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D5683598
-        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 13:00:27 -0700 (PDT)
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-3f9b2b7109dso16496361cf.0
-        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 13:00:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686340826; x=1688932826;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        with ESMTP id S229928AbjFIUVg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 16:21:36 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B07422F
+        for <linux-block@vger.kernel.org>; Fri,  9 Jun 2023 13:20:38 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-77ad566f7fbso18570239f.1
+        for <linux-block@vger.kernel.org>; Fri, 09 Jun 2023 13:20:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686342019; x=1688934019;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XFxNC6AwIefC8h+OVa9YMEjCXThkDxxKP8p9zX4LNFY=;
-        b=ZUIbH4SLqtq+ljGBGTJtzLKAQOdTNJnCCwJfJF1MQsBTjTMzHWS4oeWTZH8B9pn6cN
-         ufgiycdGLgskp/iLT+FrX3jaKS9C8s+yCYmqT8Ms47DQoCHOkrAIJ6wvUa/LRR2itb78
-         8w3GuEoHIwZt3pDu+RjHZmmSnIZEorM295jx40WL/UMC7EiKVMCNkyucfx6mN8UQyr/+
-         E9dcEHimXW+XBjjQUs5va3QA5l6rNz8feg8CXvKXqXeLGs8NWVBXuGALDpw113Z9kOtR
-         LQCu+ZPxDKWjP/OJFzOMzUAyIrBrUUQavA0QqQZ2sgzw0xqmaa6Bv3J/N3zAoIsQSeRt
-         ZdkA==
-X-Gm-Message-State: AC+VfDzwGUO4hWfRinPBzOP3/YdCBTTpNunDDAstxR3pt8QZWoKNaaiE
-        CSgLKXkzXVkLbOQxu10Kaitn
-X-Google-Smtp-Source: ACHHUZ6f5D0na1vDQSbLNkOIR7VVTt7ADDPvJzshNMQToGx2m/jPA4IIyjKZFD+hGnfTs+abIWzkWA==
-X-Received: by 2002:ac8:7e88:0:b0:3f8:6c15:c3a5 with SMTP id w8-20020ac87e88000000b003f86c15c3a5mr3039832qtj.33.1686340826214;
-        Fri, 09 Jun 2023 13:00:26 -0700 (PDT)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id d3-20020ac85343000000b003f740336bb9sm1418338qto.9.2023.06.09.13.00.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 13:00:25 -0700 (PDT)
-Date:   Fri, 9 Jun 2023 16:00:24 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Brian Foster <bfoster@redhat.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        "Darrick J. Wong" <djwong@kernel.org>
-Subject: Re: [PATCH v7 2/5] block: Introduce provisioning primitives
-Message-ID: <ZIOE2ASeUAXxzpRO@redhat.com>
-References: <20230518223326.18744-1-sarthakkukreti@chromium.org>
- <20230518223326.18744-3-sarthakkukreti@chromium.org>
+        bh=v3DLcpk3UcHISJgBg0wNxB82l3aLFWCna+oxTSr88k4=;
+        b=UfhmWUw/Dzx1GVDpFJ0YFhGO0921WYkh7E28L6wNqbq74mkBjAZbmgyQ1aR0t6NbD5
+         o4qgV0jxQaHvIoRag5Sd4OPDIb9YF0Ryssx60MHtrQfmtzJ4yPJ6jxfDg3oE74wgihMj
+         Pp7NbqGxgtyV2fuzxSC42zIkxoIfAh53va8zbyQc8H4zYZVRvlr5pBPtgPMgpZV4ZKk/
+         ExdoRCwD3IqfcHa7MctVQ4Jk9M7Dw+4ZxcTbFIhQsN2BWxW3jBwUo3DZCbVH287u4AzX
+         4g1b+x413qISM9NAmzmK4m4r0zA72Bnz6JofR9Vjq7ssrlhy0/OdgLFi4CuzeOEXaT6B
+         om0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686342019; x=1688934019;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=v3DLcpk3UcHISJgBg0wNxB82l3aLFWCna+oxTSr88k4=;
+        b=NDLgqQ1nDS0aUOspn7HMw4n1rzQCeaGss+7DyGm7mBd+EM7ErvRb7n400xZHK5PgaT
+         Sg6kIVKN2EFzEIo41zabLRvBmnys4K+a218bS4OC9vAof/3w5su/8q/2sbvTrKMzEVDS
+         eegB8sbLKJFLOj+Wtb/Z+HQ+GKqISrGl+CmDR9r2h/n62lnMYspNTE/VMW4BpD2O3ezm
+         Nxz2dZSpRuezONTDg44KAV0LMuFijsHvvMWNL9OS7kExUK15h6ojPwklhsiAd61Hw8XR
+         q4GjaaGCLn2CTNwE2rf3s9Jrk1owqa20ZGkL5P5q0yxFrWd1KVJ8F/HQT9cD8s3fGpVC
+         iYCQ==
+X-Gm-Message-State: AC+VfDxzBnrDNQC+EKyiduEbkdtWKoHaV7JYIVbZN5y6JyyajSqXccyz
+        m5n7f8w77IYHUxVtNp9DmdrZrw==
+X-Google-Smtp-Source: ACHHUZ6wYvO+aKId9kQoH+OsDlNxz65Exh4nvQ5uC/E+NDSCsF/Oe7lAyZ3vkZIpqsDx6QW6LZj1Kg==
+X-Received: by 2002:a6b:5810:0:b0:777:b7c8:ad32 with SMTP id m16-20020a6b5810000000b00777b7c8ad32mr1886269iob.0.1686342019487;
+        Fri, 09 Jun 2023 13:20:19 -0700 (PDT)
+Received: from [192.168.1.94] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id n17-20020a6b7211000000b0077ac2261248sm1262082ioc.5.2023.06.09.13.20.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Jun 2023 13:20:18 -0700 (PDT)
+Message-ID: <54b8e861-a1a9-32b7-3160-60e323327008@kernel.dk>
+Date:   Fri, 9 Jun 2023 14:20:18 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230518223326.18744-3-sarthakkukreti@chromium.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.4-rc6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 18 2023 at  6:33P -0400,
-Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
+Hi Linus,
 
-> Introduce block request REQ_OP_PROVISION. The intent of this request
-> is to request underlying storage to preallocate disk space for the given
-> block range. Block devices that support this capability will export
-> a provision limit within their request queues.
-> 
-> This patch also adds the capability to call fallocate() in mode 0
-> on block devices, which will send REQ_OP_PROVISION to the block
-> device for the specified range,
-> 
-> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> ---
-...
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 896b4654ab00..d303e6614c36 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -59,6 +59,7 @@ void blk_set_default_limits(struct queue_limits *lim)
->  	lim->zoned = BLK_ZONED_NONE;
->  	lim->zone_write_granularity = 0;
->  	lim->dma_alignment = 511;
-> +	lim->max_provision_sectors = 0;
->  }
->  
->  /**
-> @@ -82,6 +83,7 @@ void blk_set_stacking_limits(struct queue_limits *lim)
->  	lim->max_dev_sectors = UINT_MAX;
->  	lim->max_write_zeroes_sectors = UINT_MAX;
->  	lim->max_zone_append_sectors = UINT_MAX;
-> +	lim->max_provision_sectors = UINT_MAX;
->  }
->  EXPORT_SYMBOL(blk_set_stacking_limits);
->  
-> @@ -578,6 +594,9 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->  	t->max_segment_size = min_not_zero(t->max_segment_size,
->  					   b->max_segment_size);
->  
-> +	t->max_provision_sectors = min_not_zero(t->max_provision_sectors,
-> +						b->max_provision_sectors);
-> +
+Just a few minor fixes for this release:
 
-This needs to use min() since max_provision_sectors also serves to
-indicate if the device supports REQ_OP_PROVISION.  Otherwise, if I set
-max_provision_sectors to 0 on a dm thin-pool the blk_stack_limits()
-will ignore my having set it to 0 (to disable) and it'll remain as
-UINT_MAX (thanks to blk_set_default_limits).
+- Fix an issue with the hardware queue nr_active, causing it to become
+  imbalanced (Tian)
 
-Mike
+- Fix an issue with null_blk not releasing pages if configured as memory
+  backed (Nitesh)
+
+- Fix a locking issue in dasd (Jan)
+
+Please pull!
+
+
+The following changes since commit 2e45a49531fef55f4abbd6738c052545f53f43d4:
+
+  Merge tag 'nvme-6.4-2023-06-01' of git://git.infradead.org/nvme into block-6.4 (2023-06-01 11:12:46 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux.git tags/block-6.4-2023-06-09
+
+for you to fetch changes up to ccc45cb4e7271c74dbb27776ae8f73d84557f5c6:
+
+  s390/dasd: Use correct lock while counting channel queue length (2023-06-09 11:35:52 -0600)
+
+----------------------------------------------------------------
+block-6.4-2023-06-09
+
+----------------------------------------------------------------
+Jan Höppner (1):
+      s390/dasd: Use correct lock while counting channel queue length
+
+Nitesh Shetty (1):
+      null_blk: Fix: memory release when memory_backed=1
+
+Tian Lan (1):
+      blk-mq: fix blk_mq_hw_ctx active request accounting
+
+ block/blk-mq.c                  | 8 ++++----
+ drivers/block/null_blk/main.c   | 1 +
+ drivers/s390/block/dasd_ioctl.c | 4 ++--
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+-- 
+Jens Axboe
+
