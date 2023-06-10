@@ -2,53 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C59C7EE2E
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 02:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69682C7EE25
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 03:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232413AbjFJCfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 22:35:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49338 "EHLO
+        id S229707AbjFJDGG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 23:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229942AbjFJCfG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 22:35:06 -0400
+        with ESMTP id S229471AbjFJDGG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 23:06:06 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5628935B3;
-        Fri,  9 Jun 2023 19:35:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F7935B8;
+        Fri,  9 Jun 2023 20:06:04 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QdMVX4xj3z4f3m7K;
-        Sat, 10 Jun 2023 10:35:00 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QdNBJ3Hsxz4f3kKc;
+        Sat, 10 Jun 2023 11:06:00 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAHoZRT4YNktllkLQ--.11524S4;
-        Sat, 10 Jun 2023 10:35:01 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBnHbGX6INk2BFmLQ--.41501S4;
+        Sat, 10 Jun 2023 11:06:01 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     jack@suse.cz, axboe@kernel.dk, qiulaibin@huawei.com,
-        andriy.shevchenko@linux.intel.com
+To:     axboe@kernel.dk, bvanassche@acm.org, kch@nvidia.com,
+        damien.lemoal@opensource.wdc.com, hare@suse.de,
+        vincent.fu@samsung.com, akinobu.mita@gmail.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH -next v2] blk-mq: fix potential io hang by wrong 'wake_batch'
-Date:   Sat, 10 Jun 2023 10:30:43 +0800
-Message-Id: <20230610023043.2559121-1-yukuai1@huaweicloud.com>
+Subject: [PATCH -next] null_blk: fix null-ptr-dereference while configuring 'power' and 'submit_queues'
+Date:   Sat, 10 Jun 2023 11:01:43 +0800
+Message-Id: <20230610030143.2604480-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHoZRT4YNktllkLQ--.11524S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxXrWrAFW7Jr15ZrWfWw4kJFb_yoWrJF4fpa
-        yUCa17Kw1Sqr1UXayDt39rXF1Sgan0yr13Jrsaqa4YvF1j9r1fXr18urW0qrW0qrs3AF43
-        urs8trW8tF4UG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID: gCh0CgBnHbGX6INk2BFmLQ--.41501S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxZr1xWFWrtF4UuF45Kr13XFb_yoW5Wr4rpF
+        Wqga1jkry8J3WUXa1q9r4DKF1rAF4qvFyxGryxG3sagF1qvryvy3WkAF15Xr48t397CrWa
+        v3ZrZrWft3WUXaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
         JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
         CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
         W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
         Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
         xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v2
-        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
-        UZa9-UUUUU=
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
+        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+        fUoOJ5UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -57,119 +58,100 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-In __blk_mq_tag_busy/idle(), updating 'active_queues' and calculating
-'wake_batch' is not atomic:
+Writing 'power' and 'submit_queues' concurrently will trigger kernel
+panic:
 
-t1:			t2:
-_blk_mq_tag_busy	blk_mq_tag_busy
-inc active_queues
-// assume 1->2
-			inc active_queues
-			// 2 -> 3
-			blk_mq_update_wake_batch
-			// calculate based on 3
-blk_mq_update_wake_batch
-/* calculate based on 2, while active_queues is actually 3. */
+Test script:
 
-Fix this problem by protecting them wih 'tags->lock', this is not a hot
-path, so performance should not be concerned. And now that all writers
-are inside the lock, switch 'actives_queues' from atomic to unsigned
-int.
+modprobe null_blk nr_devices=0
+mkdir -p /sys/kernel/config/nullb/nullb0
+while true; do echo 1 > submit_queues; echo 4 > submit_queues; done &
+while true; do echo 1 > power; echo 0 > power; done
 
-Fixes: 180dccb0dba4 ("blk-mq: fix tag_get wait task can't be awakened")
+Test result:
+
+BUG: kernel NULL pointer dereference, address: 0000000000000148
+Oops: 0000 [#1] PREEMPT SMP
+RIP: 0010:__lock_acquire+0x41d/0x28f0
+Call Trace:
+ <TASK>
+ lock_acquire+0x121/0x450
+ down_write+0x5f/0x1d0
+ simple_recursive_removal+0x12f/0x5c0
+ blk_mq_debugfs_unregister_hctxs+0x7c/0x100
+ blk_mq_update_nr_hw_queues+0x4a3/0x720
+ nullb_update_nr_hw_queues+0x71/0xf0 [null_blk]
+ nullb_device_submit_queues_store+0x79/0xf0 [null_blk]
+ configfs_write_iter+0x119/0x1e0
+ vfs_write+0x326/0x730
+ ksys_write+0x74/0x150
+
+This is because del_gendisk() can concurrent with
+blk_mq_update_nr_hw_queues():
+
+nullb_device_power_store	nullb_apply_submit_queues
+ null_del_dev
+ del_gendisk
+				 nullb_update_nr_hw_queues
+				  if (!dev->nullb)
+				  // still set while gendisk is deleted
+				   return 0
+				  blk_mq_update_nr_hw_queues
+ dev->nullb = NULL
+
+Fix this problem by synchronize nullb_device_power_store() and
+nullb_update_nr_hw_queues() with a mutex.
+
+Fixes: 45919fbfe1c4 ("null_blk: Enable modifying 'submit_queues' after an instance has been configured")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
-Changes in v2:
- - switch 'active_queues' from atomic to unsigned int.
+ drivers/block/null_blk/main.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
- block/blk-mq-debugfs.c |  2 +-
- block/blk-mq-tag.c     | 15 ++++++++++-----
- block/blk-mq.h         |  3 +--
- include/linux/blk-mq.h |  3 +--
- 4 files changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 68165a50951b..c3b5930106b2 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -401,7 +401,7 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
- 	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
- 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
- 	seq_printf(m, "active_queues=%d\n",
--		   atomic_read(&tags->active_queues));
-+		   READ_ONCE(tags->active_queues));
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index b3fedafe301e..21c668998d95 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1810,6 +1810,7 @@ static void null_del_dev(struct nullb *nullb)
+ 		return;
  
- 	seq_puts(m, "\nbitmap_tags:\n");
- 	sbitmap_queue_show(&tags->bitmap_tags, m);
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index dfd81cab5788..cc57e2dd9a0b 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -38,6 +38,7 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
- void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
- 	unsigned int users;
-+	struct blk_mq_tags *tags = hctx->tags;
+ 	dev = nullb->dev;
++	dev->nullb = NULL;
  
- 	/*
- 	 * calling test_bit() prior to test_and_set_bit() is intentional,
-@@ -55,9 +56,11 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- 			return;
- 	}
+ 	ida_simple_remove(&nullb_indexes, nullb->index);
  
--	users = atomic_inc_return(&hctx->tags->active_queues);
--
--	blk_mq_update_wake_batch(hctx->tags, users);
-+	spin_lock_irq(&tags->lock);
-+	users = tags->active_queues + 1;
-+	WRITE_ONCE(tags->active_queues, users);
-+	blk_mq_update_wake_batch(tags, users);
-+	spin_unlock_irq(&tags->lock);
+@@ -1831,7 +1832,6 @@ static void null_del_dev(struct nullb *nullb)
+ 	if (null_cache_active(nullb))
+ 		null_free_device_storage(nullb->dev, true);
+ 	kfree(nullb);
+-	dev->nullb = NULL;
  }
  
- /*
-@@ -90,9 +93,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
- 			return;
+ static void null_config_discard(struct nullb *nullb)
+@@ -2087,7 +2087,6 @@ static int null_add_dev(struct nullb_device *dev)
+ 		goto out;
  	}
+ 	nullb->dev = dev;
+-	dev->nullb = nullb;
  
--	users = atomic_dec_return(&tags->active_queues);
--
-+	spin_lock_irq(&tags->lock);
-+	users = tags->active_queues - 1;
-+	WRITE_ONCE(tags->active_queues, users);
- 	blk_mq_update_wake_batch(tags, users);
-+	spin_unlock_irq(&tags->lock);
+ 	spin_lock_init(&nullb->lock);
  
- 	blk_mq_tag_wakeup_all(tags, false);
+@@ -2179,6 +2178,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 	if (rv)
+ 		goto out_ida_free;
+ 
++	dev->nullb = nullb;
+ 	mutex_lock(&lock);
+ 	list_add_tail(&nullb->list, &nullb_list);
+ 	mutex_unlock(&lock);
+@@ -2200,7 +2200,6 @@ static int null_add_dev(struct nullb_device *dev)
+ 	cleanup_queues(nullb);
+ out_free_nullb:
+ 	kfree(nullb);
+-	dev->nullb = NULL;
+ out:
+ 	return rv;
  }
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 8c642e9f32f1..1743857e0b01 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -412,8 +412,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
- 			return true;
- 	}
- 
--	users = atomic_read(&hctx->tags->active_queues);
--
-+	users = READ_ONCE(hctx->tags->active_queues);
- 	if (!users)
- 		return true;
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 59b52ec155b1..f401067ac03a 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -739,8 +739,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- struct blk_mq_tags {
- 	unsigned int nr_tags;
- 	unsigned int nr_reserved_tags;
--
--	atomic_t active_queues;
-+	unsigned int active_queues;
- 
- 	struct sbitmap_queue bitmap_tags;
- 	struct sbitmap_queue breserved_tags;
 -- 
 2.39.2
 
