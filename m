@@ -2,53 +2,56 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC0DCC83005
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 02:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDFDC7EE45
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 02:24:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233399AbjFJCY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 22:24:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45352 "EHLO
+        id S233518AbjFJCY3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 22:24:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjFJCY0 (ORCPT
+        with ESMTP id S232349AbjFJCY0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 22:24:26 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C9C73AB7;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88B653ABA;
         Fri,  9 Jun 2023 19:24:25 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QdMGD44m7z4f3k6H;
-        Sat, 10 Jun 2023 10:24:20 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgBH_rHT3oNkRsFjLQ--.44376S4;
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QdMGF5R6xz4f3mHp;
         Sat, 10 Jun 2023 10:24:21 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgBH_rHT3oNkRsFjLQ--.44376S6;
+        Sat, 10 Jun 2023 10:24:22 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, axboe@kernel.dk, dgilbert@interlog.com,
         jejb@linux.ibm.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-scsi@vger.kernel.org, yukuai3@huawei.com,
         yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: [PATCH v5 0/3] fix blktrace debugfs entries leakage
-Date:   Sat, 10 Jun 2023 10:20:00 +0800
-Message-Id: <20230610022003.2557284-1-yukuai1@huaweicloud.com>
+Subject: [PATCH v5 2/3] scsi: sg: fix blktrace debugfs entries leakage
+Date:   Sat, 10 Jun 2023 10:20:02 +0800
+Message-Id: <20230610022003.2557284-3-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230610022003.2557284-1-yukuai1@huaweicloud.com>
+References: <20230610022003.2557284-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBH_rHT3oNkRsFjLQ--.44376S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrKw4kKr48Kw15KrWfXry8Grg_yoWfXrc_uw
-        4DC3s7Gr17WF9YkF4SyF4rJFW09ay09r1UX3Wktry3Zw17Xry3Gayqgw4qq3WakFn8ua48
-        Ary7A348Xw1aqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbxxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-        n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWU
-        JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
-        J5UUUUU
+X-CM-TRANSID: gCh0CgBH_rHT3oNkRsFjLQ--.44376S6
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kry3Zr4kJrWxuFyxtr4ruFg_yoW8ZFy5pF
+        W7Xa90krWUWr4UGw45Z34UZFySk3y0934rGFW7Kw1fWF4rJr90gFyktFyUX3W5ArZ5uFZ8
+        AFW3KF95GFnrJ3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBK14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
+        v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_
+        Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x
+        0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8
+        JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIx
+        AIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbdOz7UUUUU=
+        =
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -57,32 +60,67 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-Changes in v5:
- - blk_trace_shutdown() can't be used for module, add a new patch to use
- inline function for blk_trace_remove() to fix build warning from v3.
- - add review tag for patch 2,3 that is the same from v3.
+sg_ioctl() support to enable blktrace, which will create debugfs entries
+"/sys/kernel/debug/block/sgx/", however, there is no guarantee that user
+will remove these entries through ioctl, and deleting sg device doesn't
+cleanup these blktrace entries.
 
-Changes in v4:
- - blk_trace_remove() will trigger build warning if blktrace config is
- not enabled, use blk_trace_shutdown() instead.
+This problem can be fixed by cleanup blktrace while releasing
+request_queue, however, it's not a good idea to do this special handling
+in common layer just for sg device.
 
-Changes in v3:
- - add a new patch to handle /dev/sg
+Fix this problem by shutdown bltkrace in sg_device_destroy(), where the
+device is deleted and all the users close the device, also grab a
+scsi_device reference from sg_add_device() to prevent scsi_device to be
+freed before sg_device_destroy();
 
-Changes in v2:
- - cleanup bltkrace in disk_release() instead of blk_free_queue()
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/sg.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Yu Kuai (3):
-  blktrace: use inline function for blk_trace_remove() while blktrace is
-    disabled
-  scsi: sg: fix blktrace debugfs entries leakage
-  block: fix blktrace debugfs entries leakage
-
- block/genhd.c                | 5 ++++-
- drivers/scsi/sg.c            | 9 +++++++++
- include/linux/blktrace_api.h | 6 +++++-
- 3 files changed, 18 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+index 037f8c98a6d3..0adfbd77437f 100644
+--- a/drivers/scsi/sg.c
++++ b/drivers/scsi/sg.c
+@@ -1496,6 +1496,10 @@ sg_add_device(struct device *cl_dev)
+ 	int error;
+ 	unsigned long iflags;
+ 
++	error = scsi_device_get(scsidp);
++	if (error)
++		return error;
++
+ 	error = -ENOMEM;
+ 	cdev = cdev_alloc();
+ 	if (!cdev) {
+@@ -1553,6 +1557,7 @@ sg_add_device(struct device *cl_dev)
+ out:
+ 	if (cdev)
+ 		cdev_del(cdev);
++	scsi_device_put(scsidp);
+ 	return error;
+ }
+ 
+@@ -1560,6 +1565,7 @@ static void
+ sg_device_destroy(struct kref *kref)
+ {
+ 	struct sg_device *sdp = container_of(kref, struct sg_device, d_ref);
++	struct request_queue *q = sdp->device->request_queue;
+ 	unsigned long flags;
+ 
+ 	/* CAUTION!  Note that the device can still be found via idr_find()
+@@ -1567,6 +1573,9 @@ sg_device_destroy(struct kref *kref)
+ 	 * any other cleanup.
+ 	 */
+ 
++	blk_trace_remove(q);
++	scsi_device_put(sdp->device);
++
+ 	write_lock_irqsave(&sg_index_lock, flags);
+ 	idr_remove(&sg_index_idr, sdp->index);
+ 	write_unlock_irqrestore(&sg_index_lock, flags);
 -- 
 2.39.2
 
