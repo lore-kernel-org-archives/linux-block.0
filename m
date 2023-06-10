@@ -2,71 +2,174 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCB1C7EE2E
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 02:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C59C7EE2E
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 02:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbjFJC0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 22:26:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46924 "EHLO
+        id S232413AbjFJCfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 22:35:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbjFJC0m (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 22:26:42 -0400
+        with ESMTP id S229942AbjFJCfG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 22:35:06 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC73CE;
-        Fri,  9 Jun 2023 19:26:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5628935B3;
+        Fri,  9 Jun 2023 19:35:04 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QdMJs1TxJz4f3k62;
-        Sat, 10 Jun 2023 10:26:37 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHcLNc34Nkn+FjLQ--.14638S3;
-        Sat, 10 Jun 2023 10:26:38 +0800 (CST)
-Subject: Re: [PATCH -next] blk-mq: fix potential io hang by wrong 'wake_batch'
-To:     Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai1@huaweicloud.com>,
-        jack@suse.cz, andriy.shevchenko@linux.intel.com,
-        qiulaibin@huawei.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, yangerkun@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20230609085130.2320859-1-yukuai1@huaweicloud.com>
- <6b2fc148-3bf9-83d5-fd5e-242ff51c9c96@kernel.dk>
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QdMVX4xj3z4f3m7K;
+        Sat, 10 Jun 2023 10:35:00 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgAHoZRT4YNktllkLQ--.11524S4;
+        Sat, 10 Jun 2023 10:35:01 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <a745facb-07de-3118-6fe3-08e68bc1224b@huaweicloud.com>
-Date:   Sat, 10 Jun 2023 10:26:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To:     jack@suse.cz, axboe@kernel.dk, qiulaibin@huawei.com,
+        andriy.shevchenko@linux.intel.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH -next v2] blk-mq: fix potential io hang by wrong 'wake_batch'
+Date:   Sat, 10 Jun 2023 10:30:43 +0800
+Message-Id: <20230610023043.2559121-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-In-Reply-To: <6b2fc148-3bf9-83d5-fd5e-242ff51c9c96@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHcLNc34Nkn+FjLQ--.14638S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYg7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2js
-        IEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
-        5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeV
-        CFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxG
-        xcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrw
-        CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
-        14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
-        IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAv
-        wI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
-        AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-TRANSID: gCh0CgAHoZRT4YNktllkLQ--.11524S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxXrWrAFW7Jr15ZrWfWw4kJFb_yoWrJF4fpa
+        yUCa17Kw1Sqr1UXayDt39rXF1Sgan0yr13Jrsaqa4YvF1j9r1fXr18urW0qrW0qrs3AF43
+        urs8trW8tF4UG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v2
+        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
+        UZa9-UUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Yu Kuai <yukuai3@huawei.com>
 
-在 2023/06/10 1:41, Jens Axboe 写道:
->>From a quick look, these are the only manipulators of active_queues.
-> If we're under the tags lock, why do they still need to be atomics?
-> 
-Yes, 'active_queues' doesn't need to be atomic any more.
+In __blk_mq_tag_busy/idle(), updating 'active_queues' and calculating
+'wake_batch' is not atomic:
 
-Thanks,
-Kuai
+t1:			t2:
+_blk_mq_tag_busy	blk_mq_tag_busy
+inc active_queues
+// assume 1->2
+			inc active_queues
+			// 2 -> 3
+			blk_mq_update_wake_batch
+			// calculate based on 3
+blk_mq_update_wake_batch
+/* calculate based on 2, while active_queues is actually 3. */
+
+Fix this problem by protecting them wih 'tags->lock', this is not a hot
+path, so performance should not be concerned. And now that all writers
+are inside the lock, switch 'actives_queues' from atomic to unsigned
+int.
+
+Fixes: 180dccb0dba4 ("blk-mq: fix tag_get wait task can't be awakened")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+Changes in v2:
+ - switch 'active_queues' from atomic to unsigned int.
+
+ block/blk-mq-debugfs.c |  2 +-
+ block/blk-mq-tag.c     | 15 ++++++++++-----
+ block/blk-mq.h         |  3 +--
+ include/linux/blk-mq.h |  3 +--
+ 4 files changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 68165a50951b..c3b5930106b2 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -401,7 +401,7 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
+ 	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
+ 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
+ 	seq_printf(m, "active_queues=%d\n",
+-		   atomic_read(&tags->active_queues));
++		   READ_ONCE(tags->active_queues));
+ 
+ 	seq_puts(m, "\nbitmap_tags:\n");
+ 	sbitmap_queue_show(&tags->bitmap_tags, m);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index dfd81cab5788..cc57e2dd9a0b 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -38,6 +38,7 @@ static void blk_mq_update_wake_batch(struct blk_mq_tags *tags,
+ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+ 	unsigned int users;
++	struct blk_mq_tags *tags = hctx->tags;
+ 
+ 	/*
+ 	 * calling test_bit() prior to test_and_set_bit() is intentional,
+@@ -55,9 +56,11 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 			return;
+ 	}
+ 
+-	users = atomic_inc_return(&hctx->tags->active_queues);
+-
+-	blk_mq_update_wake_batch(hctx->tags, users);
++	spin_lock_irq(&tags->lock);
++	users = tags->active_queues + 1;
++	WRITE_ONCE(tags->active_queues, users);
++	blk_mq_update_wake_batch(tags, users);
++	spin_unlock_irq(&tags->lock);
+ }
+ 
+ /*
+@@ -90,9 +93,11 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 			return;
+ 	}
+ 
+-	users = atomic_dec_return(&tags->active_queues);
+-
++	spin_lock_irq(&tags->lock);
++	users = tags->active_queues - 1;
++	WRITE_ONCE(tags->active_queues, users);
+ 	blk_mq_update_wake_batch(tags, users);
++	spin_unlock_irq(&tags->lock);
+ 
+ 	blk_mq_tag_wakeup_all(tags, false);
+ }
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 8c642e9f32f1..1743857e0b01 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -412,8 +412,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 			return true;
+ 	}
+ 
+-	users = atomic_read(&hctx->tags->active_queues);
+-
++	users = READ_ONCE(hctx->tags->active_queues);
+ 	if (!users)
+ 		return true;
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 59b52ec155b1..f401067ac03a 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -739,8 +739,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ struct blk_mq_tags {
+ 	unsigned int nr_tags;
+ 	unsigned int nr_reserved_tags;
+-
+-	atomic_t active_queues;
++	unsigned int active_queues;
+ 
+ 	struct sbitmap_queue bitmap_tags;
+ 	struct sbitmap_queue breserved_tags;
+-- 
+2.39.2
 
