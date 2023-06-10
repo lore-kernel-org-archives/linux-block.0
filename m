@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69682C7EE25
-	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 03:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91329C7EE2E
+	for <linux-block@archiver.kernel.org>; Sat, 10 Jun 2023 03:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229707AbjFJDGG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Jun 2023 23:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55876 "EHLO
+        id S232562AbjFJDWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Jun 2023 23:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjFJDGG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 23:06:06 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F7935B8;
-        Fri,  9 Jun 2023 20:06:04 -0700 (PDT)
+        with ESMTP id S233942AbjFJDVz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Jun 2023 23:21:55 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 691673C3E;
+        Fri,  9 Jun 2023 20:21:53 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QdNBJ3Hsxz4f3kKc;
-        Sat, 10 Jun 2023 11:06:00 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QdNXX2xQwz4f3jXd;
+        Sat, 10 Jun 2023 11:21:48 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgBnHbGX6INk2BFmLQ--.41501S4;
-        Sat, 10 Jun 2023 11:06:01 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgCX_7JM7INkl_BmLQ--.26241S4;
+        Sat, 10 Jun 2023 11:21:50 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     axboe@kernel.dk, bvanassche@acm.org, kch@nvidia.com,
-        damien.lemoal@opensource.wdc.com, hare@suse.de,
-        vincent.fu@samsung.com, akinobu.mita@gmail.com
+To:     axboe@kernel.dk, kch@nvidia.com, bvanassche@acm.org,
+        damien.lemoal@opensource.wdc.com, vincent.fu@samsung.com,
+        kbusch@kernel.org
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
         yangerkun@huawei.com
-Subject: [PATCH -next] null_blk: fix null-ptr-dereference while configuring 'power' and 'submit_queues'
-Date:   Sat, 10 Jun 2023 11:01:43 +0800
-Message-Id: <20230610030143.2604480-1-yukuai1@huaweicloud.com>
+Subject: [PATCH -next v2] null_blk: fix null-ptr-dereference while configuring 'power' and 'submit_queues'
+Date:   Sat, 10 Jun 2023 11:17:32 +0800
+Message-Id: <20230610031732.2610012-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnHbGX6INk2BFmLQ--.41501S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxZr1xWFWrtF4UuF45Kr13XFb_yoW5Wr4rpF
-        Wqga1jkry8J3WUXa1q9r4DKF1rAF4qvFyxGryxG3sagF1qvryvy3WkAF15Xr48t397CrWa
-        v3ZrZrWft3WUXaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID: gCh0CgCX_7JM7INkl_BmLQ--.26241S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxZr1xWFWrtF4UuF45Kr13XFb_yoW5tFyxpF
+        W5Ga1Yk348XF47Xw42qw1DGF9xAF4jvFyfGrWxG3yxCa4jvr1vvr1vyFW5XrW8G39xCrWY
+        qa1DJFs0kF4UWFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
         9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-        0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
-        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+        n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+        AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v2
+        6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvj
         fUoOJ5UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
@@ -105,53 +105,78 @@ nullb_update_nr_hw_queues() with a mutex.
 Fixes: 45919fbfe1c4 ("null_blk: Enable modifying 'submit_queues' after an instance has been configured")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- drivers/block/null_blk/main.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/block/null_blk/main.c | 29 ++++++++++++++++++++++-------
+ 1 file changed, 22 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index b3fedafe301e..21c668998d95 100644
+index b3fedafe301e..16c191cb85de 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -1810,6 +1810,7 @@ static void null_del_dev(struct nullb *nullb)
- 		return;
- 
- 	dev = nullb->dev;
-+	dev->nullb = NULL;
- 
- 	ida_simple_remove(&nullb_indexes, nullb->index);
- 
-@@ -1831,7 +1832,6 @@ static void null_del_dev(struct nullb *nullb)
- 	if (null_cache_active(nullb))
- 		null_free_device_storage(nullb->dev, true);
- 	kfree(nullb);
--	dev->nullb = NULL;
+@@ -392,13 +392,25 @@ static int nullb_update_nr_hw_queues(struct nullb_device *dev,
+ static int nullb_apply_submit_queues(struct nullb_device *dev,
+ 				     unsigned int submit_queues)
+ {
+-	return nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues);
++	int ret;
++
++	mutex_lock(&lock);
++	ret = nullb_update_nr_hw_queues(dev, submit_queues, dev->poll_queues);
++	mutex_unlock(&lock);
++
++	return ret;
  }
  
- static void null_config_discard(struct nullb *nullb)
-@@ -2087,7 +2087,6 @@ static int null_add_dev(struct nullb_device *dev)
- 		goto out;
+ static int nullb_apply_poll_queues(struct nullb_device *dev,
+ 				   unsigned int poll_queues)
+ {
+-	return nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
++	int ret;
++
++	mutex_lock(&lock);
++	ret = nullb_update_nr_hw_queues(dev, dev->submit_queues, poll_queues);
++	mutex_unlock(&lock);
++
++	return ret;
+ }
+ 
+ NULLB_DEVICE_ATTR(size, ulong, NULL);
+@@ -444,28 +456,31 @@ static ssize_t nullb_device_power_store(struct config_item *item,
+ 	if (ret < 0)
+ 		return ret;
+ 
++	ret = count;
++	mutex_lock(&lock);
+ 	if (!dev->power && newp) {
+ 		if (test_and_set_bit(NULLB_DEV_FL_UP, &dev->flags))
+-			return count;
++			goto out;
++
+ 		ret = null_add_dev(dev);
+ 		if (ret) {
+ 			clear_bit(NULLB_DEV_FL_UP, &dev->flags);
+-			return ret;
++			goto out;
+ 		}
+ 
+ 		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
+ 		dev->power = newp;
+ 	} else if (dev->power && !newp) {
+ 		if (test_and_clear_bit(NULLB_DEV_FL_UP, &dev->flags)) {
+-			mutex_lock(&lock);
+ 			dev->power = newp;
+ 			null_del_dev(dev->nullb);
+-			mutex_unlock(&lock);
+ 		}
+ 		clear_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
  	}
- 	nullb->dev = dev;
--	dev->nullb = nullb;
  
- 	spin_lock_init(&nullb->lock);
- 
-@@ -2179,6 +2178,7 @@ static int null_add_dev(struct nullb_device *dev)
- 	if (rv)
- 		goto out_ida_free;
- 
-+	dev->nullb = nullb;
- 	mutex_lock(&lock);
- 	list_add_tail(&nullb->list, &nullb_list);
- 	mutex_unlock(&lock);
-@@ -2200,7 +2200,6 @@ static int null_add_dev(struct nullb_device *dev)
- 	cleanup_queues(nullb);
- out_free_nullb:
- 	kfree(nullb);
--	dev->nullb = NULL;
- out:
- 	return rv;
+-	return count;
++out:
++	mutex_unlock(&lock);
++	return ret;
  }
+ 
+ CONFIGFS_ATTR(nullb_device_, power);
 -- 
 2.39.2
 
