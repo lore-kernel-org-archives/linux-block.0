@@ -2,61 +2,79 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C74C7EE45
-	for <linux-block@archiver.kernel.org>; Sun, 11 Jun 2023 08:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA00C77B7A
+	for <linux-block@archiver.kernel.org>; Sun, 11 Jun 2023 15:22:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230468AbjFKIMD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Jun 2023 04:12:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35804 "EHLO
+        id S229497AbjFKPWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Jun 2023 11:22:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbjFKIMC (ORCPT
+        with ESMTP id S229464AbjFKPWE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Jun 2023 04:12:02 -0400
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8723E2D70;
-        Sun, 11 Jun 2023 01:12:00 -0700 (PDT)
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-3f7364c2ed8so7860865e9.0;
-        Sun, 11 Jun 2023 01:12:00 -0700 (PDT)
+        Sun, 11 Jun 2023 11:22:04 -0400
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8181BB;
+        Sun, 11 Jun 2023 08:22:01 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-653436fcc1bso2879531b3a.2;
+        Sun, 11 Jun 2023 08:22:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686471119; x=1689063119;
+        d=1e100.net; s=20221208; t=1686496921; x=1689088921;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=egzgeU6eN8CK2MkKKsyWwFYv6fpkcQu0G2xFHRwd6xh3utM7FNd6LsGgu8fwFve8Ji
-         mKWOs8U5yHZugDl4ZucKo0dNN+6obLiK9RK9K15NXL33Gdom25mxVTV9jumr1u02puL+
-         FoYj9InERLTA6lYmcqvmarxe1oYXHisaFMy9yk58XPNHomDjgxat8fPdgIECS1u2H4ae
-         ea3mdtlQW3Pde1w/nu8bCG3WlN1OL1bQEJRh6l6I4/V0KLpRJ5OPkp54kWYuZY9+o23z
-         B6rx5OHWcs9HrGdlPKI1K2Vthvi6pldTt+Wp74lXZ5llbPN2RFq8M6rxQA+C4J9VsJEF
-         ZX3Q==
-X-Gm-Message-State: AC+VfDxsNOJpeK525x8ASlPBAzk9Bjep4ONx8r1jvOz40wLe9ZT3vCeq
-        3KQmHt8jT80AenFU+yWk4CU=
-X-Google-Smtp-Source: ACHHUZ64frQa+gMpcjF6rcObCQafPY4X/Q7kQS32yU1aAfWzdv9vipvatKYvGhgIIc8uqziiaG7ZjQ==
-X-Received: by 2002:a05:600c:468a:b0:3f7:f519:355f with SMTP id p10-20020a05600c468a00b003f7f519355fmr4980461wmo.0.1686471118935;
-        Sun, 11 Jun 2023 01:11:58 -0700 (PDT)
-Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id 14-20020a05600c024e00b003f8044b3448sm7366451wmj.9.2023.06.11.01.11.58
+        bh=RkO45KeJdEpx3Se2ZTh73OLYZQ+QPKr/D2y/xQd9e3U=;
+        b=LEgZhzFj35eShBZpeHUCRV4r7KW1jqD48U3e0rbJaMVq6FrYhs93ZGTlpMjm3u3dKS
+         FG74fjl+OkRg2VjK3Xzq07gsyVjFDwg5jVS/HS6BKZfbAZ5hPdZ1JX9ou59TELowWMnT
+         0cugRZtoAlGhNr/m4A+D2MbZtHe/VLc9aYouUHZ7VaSx3sdOzJYY8jHAlk7CDdb6Wjf3
+         +R69JNoHYi0bd61rbndSujP8uj7+WH6HUu1uR0S0A5oTHdva7zm0yl8Dv9o2YVt4s0dm
+         fWOvjh/57Ly0H877LzCxHxc6sp42+d08j4aLnn/izW8R6AJRMlNdsEIIXJDIzw6kboxD
+         49pg==
+X-Gm-Message-State: AC+VfDxeLedwO52gHRuDKsESTD8IvIA3rvUlvYFdaKt5p8BBao0aSM38
+        mx7OAArNoBM6q8xlOb0jplg=
+X-Google-Smtp-Source: ACHHUZ4d4NpK7AJHOF6a4bBcWkXSodbTR9hYUf0gLKHkzP/qRhS+ld13K10x82nWt42VQEJeypafpQ==
+X-Received: by 2002:a05:6a20:8f1e:b0:103:883b:10c1 with SMTP id b30-20020a056a208f1e00b00103883b10c1mr8410722pzk.41.1686496920530;
+        Sun, 11 Jun 2023 08:22:00 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id e10-20020a62ee0a000000b0064fdf5b1d7esm5449598pfi.157.2023.06.11.08.21.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Jun 2023 01:11:58 -0700 (PDT)
-Message-ID: <9a43577d-5e69-88ee-62ab-e92524b1ed87@grimberg.me>
-Date:   Sun, 11 Jun 2023 11:11:57 +0300
+        Sun, 11 Jun 2023 08:22:00 -0700 (PDT)
+Message-ID: <bb0cbd67-12ff-476c-628c-0e6dfd2cd482@acm.org>
+Date:   Sun, 11 Jun 2023 08:21:59 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCHv2 1/2] block: add request polling helper
+ Thunderbird/102.11.0
+Subject: Re: blk-mq: check on cpu id when there is only one ctx mapping
 Content-Language: en-US
-To:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        hch@lst.de, axboe@kernel.dk
-Cc:     joshi.k@samsung.com, Keith Busch <kbusch@kernel.org>
-References: <20230609204517.493889-1-kbusch@meta.com>
- <20230609204517.493889-2-kbusch@meta.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230609204517.493889-2-kbusch@meta.com>
+To:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk
+Cc:     kbusch@kernel.org, liusong@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, wsd_upstream@mediatek.com,
+        peter.wang@mediatek.com, stanley.chu@mediatek.com,
+        powen.kao@mediatek.com, alice.chao@mediatek.com,
+        naomi.chu@mediatek.com
+References: <20230531083828.8009-1-ed.tsai@mediatek.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230531083828.8009-1-ed.tsai@mediatek.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On 5/31/23 01:38, Ed Tsai wrote:
+> commit f168420 ("blk-mq: don't redirect completion for hctx withs only
+> one ctx mapping") When nvme applies a 1:1 mapping of hctx and ctx, there
+> will be no remote request.
+
+The above sentence is incomprehensible. Please make it comprehensible.
+
+> Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
+> Signed-off-by: Po-Wen Kao <powen.kao@mediatek.com>
+
+This patch comes from Keith Busch. Why has his name not been mentioned? 
+See also 
+https://lore.kernel.org/linux-block/ZHY2TUrKVBj2xGE2@kbusch-mbp.dhcp.thefacebook.com/.
+
+Bart.
+
