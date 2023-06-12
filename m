@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF689C7EE43
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 20:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B52EFC7EE2E
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 20:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236160AbjFLUda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 16:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53826 "EHLO
+        id S236594AbjFLUdb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 16:33:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236594AbjFLUd2 (ORCPT
+        with ESMTP id S236681AbjFLUd3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 16:33:28 -0400
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA7C10CE
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:27 -0700 (PDT)
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1b3a9eae57cso15992885ad.1
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:27 -0700 (PDT)
+        Mon, 12 Jun 2023 16:33:29 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A84BE10FC
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:28 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1b3a6fc8067so15779605ad.3
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686602007; x=1689194007;
+        d=1e100.net; s=20221208; t=1686602008; x=1689194008;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=D76EF1PRUG4k1Tw0AWeqUDGcfk53v67F7APUOd5gLok=;
-        b=D1eDFKnJvuKEhCmvLysekJuRq4ReyBb52w6apBOtRbBEopofhO5/PKLZZnkCFEzM1m
-         7E+YAFMTHMjLqdHLIvAY0mdTkllcCUT8X8n6JlDLVJ5LamZkow4jBymxguBXkaMv3oRu
-         SSit/fN9Otxz2vxdrttcdOfHGC2l3KnwViaNIUqV/r3iU9WIBTC728l19QwW0leUePkS
-         xzOcW8ssdIAm+8XXYJT3JtkEyed2TAZuf70QFb4y2naGNDXnfgE82EgpB8db1KRFkAFV
-         uWj8bRk+0+QXKbChAjZVudkPfeViRBHi/4upxmBnC85zUwPXe/s/OMZimd0K5gpJ0n3B
-         COPg==
-X-Gm-Message-State: AC+VfDwDIcZyQlaEDCF3Wo4c9zenOQBJUGEUFSKuGAdF+ZPQTW3LOGy8
-        KyD54O9T1ocBEGfj+GCu+bk=
-X-Google-Smtp-Source: ACHHUZ6+ywaGcwwhW/1e0+gJeV6PNofySNqKstbEfzqwcpLZqBmm/9miafUPnKio/eEZhl7jtElv7w==
-X-Received: by 2002:a17:902:d487:b0:1b2:22cd:9827 with SMTP id c7-20020a170902d48700b001b222cd9827mr9630245plg.1.1686602006638;
-        Mon, 12 Jun 2023 13:33:26 -0700 (PDT)
+        bh=h+3rH1/I9JYUC9AV7hb8Nbme0XVHrq65BO+O7WSem7o=;
+        b=DIX81hQI59dj3BtOdYT/ldIw7UFTVpMbSdZtek4VIiLeTZpw4bjW/XdtNfeTzNPq3F
+         05lfxhSIEPSRlz/8UkNUnp8sXRL5Kp8eUsuFgacjFuN3d07Vtgg5KSKaexB7/uIWPnb/
+         kykW/ga3x4rspZ4RDSKz+fMuGUDEwCa8BTmvhAU8zzN9lFXIjf2j4DCiSuDk8xza+91Q
+         ZGCrXxwoEjWvJEb6FN0BFCtEboc0sinLw10BWdvKEtMgoGCGe96zScM6vYM8fLK/C09M
+         1cj25Pmu22jkQodbhJaayUpgy++Pmb3TwoY28J2H889hRVTNbjZO2nDFyykAYNpVK5Kk
+         R1sw==
+X-Gm-Message-State: AC+VfDySJNtMUx16ackx8ciwstVux7QlyyGTFq6ai61TIlw3VffJ7R//
+        m44ItfxpAi5ym38yuc8j/Mo=
+X-Google-Smtp-Source: ACHHUZ58dz+iv/BsbrZlS7DI2Y3W8VhQ8/RxK2kfezpujyVSFBZCL6KBaRh+Bm9oLMANo1mIE7LX3g==
+X-Received: by 2002:a17:903:248:b0:1b2:4e00:a3a9 with SMTP id j8-20020a170903024800b001b24e00a3a9mr7158565plh.41.1686602007995;
+        Mon, 12 Jun 2023 13:33:27 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b001b016313b1dsm3324767plb.86.2023.06.12.13.33.25
+        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b001b016313b1dsm3324767plb.86.2023.06.12.13.33.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jun 2023 13:33:25 -0700 (PDT)
+        Mon, 12 Jun 2023 13:33:27 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -45,10 +45,11 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Sandeep Dhavale <dhavale@google.com>,
         Juan Yescas <jyescas@google.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH v6 6/8] block: Add support for filesystem requests and small segments
-Date:   Mon, 12 Jun 2023 13:33:12 -0700
-Message-Id: <20230612203314.17820-7-bvanassche@acm.org>
+        Douglas Gilbert <dgilbert@interlog.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH v6 7/8] scsi_debug: Support configuring the maximum segment size
+Date:   Mon, 12 Jun 2023 13:33:13 -0700
+Message-Id: <20230612203314.17820-8-bvanassche@acm.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230612203314.17820-1-bvanassche@acm.org>
 References: <20230612203314.17820-1-bvanassche@acm.org>
@@ -58,80 +59,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add support in the bio splitting code and also in the bio submission code
-for bios with segments smaller than the page size.
+Add a kernel module parameter for configuring the maximum segment size.
+This patch enables testing SCSI support for segments smaller than the
+page size.
 
+Acked-by: Douglas Gilbert <dgilbert@interlog.com>
 Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-Tested-by: Sandeep Dhavale <dhavale@google.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-merge.c |  8 ++++++--
- block/blk-mq.c    |  2 ++
- block/blk.h       | 11 +++++------
- 3 files changed, 13 insertions(+), 8 deletions(-)
+ drivers/scsi/scsi_debug.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 65e75efa9bd3..0b28f6df07bc 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -294,7 +294,8 @@ struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
- 		if (nsegs < lim->max_segments &&
- 		    bytes + bv.bv_len <= max_bytes &&
- 		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
--			nsegs++;
-+			/* single-page bvec optimization */
-+			nsegs += blk_segments(lim, bv.bv_len);
- 			bytes += bv.bv_len;
- 		} else {
- 			if (bvec_split_segs(lim, &bv, &nsegs, &bytes,
-@@ -544,7 +545,10 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 			    __blk_segment_map_sg_merge(q, &bvec, &bvprv, sg))
- 				goto next_bvec;
+diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+index 8c58128ad32a..e951c622bf64 100644
+--- a/drivers/scsi/scsi_debug.c
++++ b/drivers/scsi/scsi_debug.c
+@@ -752,6 +752,7 @@ static int sdebug_host_max_queue;	/* per host */
+ static int sdebug_lowest_aligned = DEF_LOWEST_ALIGNED;
+ static int sdebug_max_luns = DEF_MAX_LUNS;
+ static int sdebug_max_queue = SDEBUG_CANQUEUE;	/* per submit queue */
++static unsigned int sdebug_max_segment_size = BLK_MAX_SEGMENT_SIZE;
+ static unsigned int sdebug_medium_error_start = OPT_MEDIUM_ERR_ADDR;
+ static int sdebug_medium_error_count = OPT_MEDIUM_ERR_NUM;
+ static int sdebug_ndelay = DEF_NDELAY;	/* if > 0 then unit is nanoseconds */
+@@ -5735,6 +5736,7 @@ module_param_named(lowest_aligned, sdebug_lowest_aligned, int, S_IRUGO);
+ module_param_named(lun_format, sdebug_lun_am_i, int, S_IRUGO | S_IWUSR);
+ module_param_named(max_luns, sdebug_max_luns, int, S_IRUGO | S_IWUSR);
+ module_param_named(max_queue, sdebug_max_queue, int, S_IRUGO | S_IWUSR);
++module_param_named(max_segment_size, sdebug_max_segment_size, uint, S_IRUGO);
+ module_param_named(medium_error_count, sdebug_medium_error_count, int,
+ 		   S_IRUGO | S_IWUSR);
+ module_param_named(medium_error_start, sdebug_medium_error_start, int,
+@@ -5811,6 +5813,7 @@ MODULE_PARM_DESC(lowest_aligned, "lowest aligned lba (def=0)");
+ MODULE_PARM_DESC(lun_format, "LUN format: 0->peripheral (def); 1 --> flat address method");
+ MODULE_PARM_DESC(max_luns, "number of LUNs per target to simulate(def=1)");
+ MODULE_PARM_DESC(max_queue, "max number of queued commands (1 to max(def))");
++MODULE_PARM_DESC(max_segment_size, "max bytes in a single segment");
+ MODULE_PARM_DESC(medium_error_count, "count of sectors to return follow on MEDIUM error");
+ MODULE_PARM_DESC(medium_error_start, "starting sector number to return MEDIUM error");
+ MODULE_PARM_DESC(ndelay, "response delay in nanoseconds (def=0 -> ignore)");
+@@ -7723,6 +7726,7 @@ static int sdebug_driver_probe(struct device *dev)
  
--			if (bvec.bv_offset + bvec.bv_len <= PAGE_SIZE)
-+			if (bvec.bv_offset + bvec.bv_len <= PAGE_SIZE &&
-+			    (!blk_queue_sub_page_limits(&q->limits) ||
-+			     bvec.bv_len <= q->limits.max_segment_size))
-+				/* single-segment bvec optimization */
- 				nsegs += __blk_bvec_map_sg(bvec, sglist, sg);
- 			else
- 				nsegs += blk_bvec_map_sg(q, &bvec, sglist, sg);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1749f5890606..ad787c14ea09 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2936,6 +2936,8 @@ void blk_mq_submit_bio(struct bio *bio)
- 		bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
- 		if (!bio)
- 			return;
-+	} else if (bio->bi_vcnt == 1) {
-+		nr_segs = blk_segments(&q->limits, bio->bi_io_vec[0].bv_len);
- 	}
+ 	sdebug_driver_template.can_queue = sdebug_max_queue;
+ 	sdebug_driver_template.cmd_per_lun = sdebug_max_queue;
++	sdebug_driver_template.max_segment_size = sdebug_max_segment_size;
+ 	if (!sdebug_clustering)
+ 		sdebug_driver_template.dma_boundary = PAGE_SIZE - 1;
  
- 	if (!bio_integrity_prep(bio))
-diff --git a/block/blk.h b/block/blk.h
-index 18b898a38c72..e905cc6364fa 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -332,13 +332,12 @@ static inline bool bio_may_exceed_limits(struct bio *bio,
- 	}
- 
- 	/*
--	 * All drivers must accept single-segments bios that are <= PAGE_SIZE.
--	 * This is a quick and dirty check that relies on the fact that
--	 * bi_io_vec[0] is always valid if a bio has data.  The check might
--	 * lead to occasional false negatives when bios are cloned, but compared
--	 * to the performance impact of cloned bios themselves the loop below
--	 * doesn't matter anyway.
-+	 * Check whether bio splitting should be performed. This check may
-+	 * trigger the bio splitting code even if splitting is not necessary.
- 	 */
-+	if (blk_queue_sub_page_limits(lim) && bio->bi_io_vec &&
-+	    bio->bi_io_vec->bv_len > lim->max_segment_size)
-+		return true;
- 	return lim->chunk_sectors || bio->bi_vcnt != 1 ||
- 		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > PAGE_SIZE;
- }
