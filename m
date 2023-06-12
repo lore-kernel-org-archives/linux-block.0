@@ -2,98 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C5A0C88CB4
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AD3C88CB2
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:40:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237913AbjFLPfu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 11:35:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59862 "EHLO
+        id S233363AbjFLPkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 11:40:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237971AbjFLPfn (ORCPT
+        with ESMTP id S239951AbjFLPkQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 11:35:43 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8780E10CC;
-        Mon, 12 Jun 2023 08:35:41 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 2D5282006B;
-        Mon, 12 Jun 2023 15:35:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1686584140; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XfMX5GkRlcCXZrm+39RxSV/v2lDxhTSbtQbov4nf1aI=;
-        b=OOxCbloND4423ExL0qSudphz9lJAnZplrNvakFzIh2QzFoykv8FyHorX7/gTGr+goTuicl
-        gHjhMc0uX3GxWaBljL3XWLZM+3KDQMeoJBkC6h1pCrZ2Lca2VBrIKeuqqRDPIPZVXqAdOl
-        mxKnSK9PJ9t7/E5b+CnPN33zXzARXZg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1686584140;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XfMX5GkRlcCXZrm+39RxSV/v2lDxhTSbtQbov4nf1aI=;
-        b=a09gqA0SO2f+M7bS3XC50BU9wIrKgy5DvzskD6GGSj02EJ8WaFZK3g2rjPmEd0Cfj7Gpc0
-        qL8BNvL1IkrMzcDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D5FD0138EC;
-        Mon, 12 Jun 2023 15:35:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id fFftMks7h2QZPgAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 12 Jun 2023 15:35:39 +0000
-Message-ID: <64f15f3c-6b6b-781e-d6aa-419fdcea55b8@suse.de>
-Date:   Mon, 12 Jun 2023 17:35:38 +0200
+        Mon, 12 Jun 2023 11:40:16 -0400
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA3E210CB;
+        Mon, 12 Jun 2023 08:40:10 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-650c89c7e4fso4794698b3a.0;
+        Mon, 12 Jun 2023 08:40:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686584410; x=1689176410;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VsnGA8Sn5qSVmWHY2CC/rIiXe0BUsfmX764WRUzBsNo=;
+        b=c2AaPKfwTtpi3YFcvPTLAgi/s3fSOAPT6ob35bNNlL1HzSw91ihcCG27ePy9hF6eEX
+         SP345/SY+emuFJh+ZgjcLBlzM8F/+rKBd6SPngvzyUrV66WgcPS7oYK4YEPtE2jp8RAz
+         Mv28/yyN/5N+8SVvlQj5ysftORdI9mtYxopsW06D2ehkDzaumSOD0U/HhiV3CACFg3ND
+         kg56JiQPhE2fJZ9jk6bLJlIpWapesCigsYI8R4nnwDu+sp5bDYlM4r55eX0KRT8kkYV8
+         2jPVh163cKmncGKDm+0DN5ZHiJMKLdTjcgPhMn9xp8YujUoGTQeKJ3IA0sspKyxfH6aO
+         UGXw==
+X-Gm-Message-State: AC+VfDyRbwpZU9yJn5eIq4vXNh5u7r0Z/DaOE5FAIQGX3koI9wuWDeza
+        Aq2RQ83p1N1LX/MQffNHm7c=
+X-Google-Smtp-Source: ACHHUZ5zsHEAFuXGkIlKJvJe8Gp7QUKU9gLcR3mJyE5csKXgpdUhNcpBU9GhMcDLPHMBnQ4IqM59Lw==
+X-Received: by 2002:a05:6a20:1606:b0:10f:708b:bb28 with SMTP id l6-20020a056a20160600b0010f708bbb28mr11768044pzj.7.1686584409955;
+        Mon, 12 Jun 2023 08:40:09 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id g3-20020a17090a3c8300b0024e33c69ee5sm7547334pjc.5.2023.06.12.08.40.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jun 2023 08:40:09 -0700 (PDT)
+Message-ID: <c0908f1d-58e9-6ecb-7f4c-c0bf4659a17f@acm.org>
+Date:   Mon, 12 Jun 2023 08:40:07 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH v4 3/6] scsi: merge scsi_internal_device_block() and
- device_block()
+Subject: Re: [PATCH v4 4/6] scsi: don't wait for quiesce in scsi_stop_queue()
 Content-Language: en-US
 To:     mwilck@suse.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
 Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230612145638.16999-1-mwilck@suse.com>
- <20230612145638.16999-4-mwilck@suse.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230612145638.16999-4-mwilck@suse.com>
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+References: <20230612150309.18103-1-mwilck@suse.com>
+ <20230612150309.18103-5-mwilck@suse.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230612150309.18103-5-mwilck@suse.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/23 16:56, mwilck@suse.com wrote:
-> From: Martin Wilck <mwilck@suse.com>
-> 
-> scsi_internal_device_block() is only called from device_block().
-> Merge the two functions, and call the result scsi_device_block(),
-> as the name device_block() is confusingly generic.
-> 
-> Signed-off-by: Martin Wilck <mwilck@suse.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/scsi/scsi_lib.c | 27 ++++++++-------------------
->   1 file changed, 8 insertions(+), 19 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On 6/12/23 08:03, mwilck@suse.com wrote:
+> -	 * However, we still need to wait until quiesce is done
+> -	 * in case that queue has been stopped.
+> +	 * After return, we still need to wait until quiesce is done.
 
-Cheers,
+The above comment would be more clear if "After return, we still need" 
+would be changed into "The caller needs".
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+> @@ -2800,9 +2792,17 @@ static void scsi_device_block(struct scsi_device *sdev, void *data)
+>   
+>   	mutex_lock(&sdev->state_mutex);
+>   	err = __scsi_internal_device_block_nowait(sdev);
+> -	if (err == 0)
+> -		scsi_stop_queue(sdev, false);
+> -	mutex_unlock(&sdev->state_mutex);
+> +	if (err == 0) {
+> +		/*
+> +		 * scsi_stop_queue() must be called with the state_mutex
+> +		 * held. Otherwise a simultaneous scsi_start_queue() call
+> +		 * might unquiesce the queue before we quiesce it.
+> +		 */
+> +		scsi_stop_queue(sdev);
+> +		mutex_unlock(&sdev->state_mutex);
+> +		blk_mq_wait_quiesce_done(sdev->request_queue->tag_set);
+> +	} else
+> +		mutex_unlock(&sdev->state_mutex);
+
+Has it been considered to modify the above code such that there is a 
+single mutex_unlock() call instead of two? I wouldn't mind if 
+blk_mq_wait_quiesce_done() would be called if err != 0 since performance 
+is not that important if this function fails.
+
+Thanks,
+
+Bart.
 
