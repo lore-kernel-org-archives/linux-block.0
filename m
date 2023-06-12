@@ -2,126 +2,86 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EF9C88CB4
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 16:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F8DC88CB2
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 17:40:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237253AbjFLQwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 12:52:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45378 "EHLO
+        id S231951AbjFLRkA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 13:40:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234788AbjFLQwM (ORCPT
+        with ESMTP id S236945AbjFLRj6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 12:52:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C522FE77
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 09:51:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686588691;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=KUdFKCdBRtXD70pPEw8UKzishmgLHxiTnsybrG/P/8Q=;
-        b=HG0wGPwFuB+pdkmE6BW5LD9jo25cJjFQzPZtkjs7pHgK9yfIlAYTfpFTGgzbFngRr0TjZN
-        /uU9akSonP4T/cQHFYJ8JYLCdvFtpal/0zl3R6aHo0fLG/lXhQzbc7GqNkKIytNkHU/ac8
-        Du247MD6tkNyY5Bq6M7SiAGTaRU0aUc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-557-3Bd9b2jJP1qS--WMQacq3A-1; Mon, 12 Jun 2023 12:51:25 -0400
-X-MC-Unique: 3Bd9b2jJP1qS--WMQacq3A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D2BFA85A5AA;
-        Mon, 12 Jun 2023 16:51:24 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1088720234B3;
-        Mon, 12 Jun 2023 16:51:21 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, David Hildenbrand <david@redhat.com>,
-        kernel test robot <oliver.sang@intel.com>
-cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
+        Mon, 12 Jun 2023 13:39:58 -0400
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E26134;
+        Mon, 12 Jun 2023 10:39:54 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2568caabfbfso2438006a91.3;
+        Mon, 12 Jun 2023 10:39:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686591593; x=1689183593;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OqrcW7dKqDqh3X1XpUeD4qSVl2OIxugj8mzYiL/6NUY=;
+        b=Q95VeUju/ofp5ypVQgj88o8p0gbKIy6FYENT8QpF/u+mSbdpasG1DRydE6BTl4zfFR
+         nY3M92bh048ULKxgMitmAimtexF+GXanLSMMGPAJu5CLR4t3brRKJvgE7TMq5qmu4zLH
+         eGU79tl4rXFVmp/YdsNIvLWquUZnv14bPTrF+NH1jWXx8UBXA0wX3fyC9FtNFRsBQe4/
+         1t9j7tyG6bbWkZRTEqACD8s+kumM1hIfp0X40p6imbtxScQ+adRobHSwJ3X/UZzhOaOc
+         HqMn4K1EwBwhIYdLTlG/IRkd8KPNJdWYwQPvbWJi5W3kAbznnLwVtahg0pPhN6hqDz99
+         4oGw==
+X-Gm-Message-State: AC+VfDwwJCjP6Tk3pfS+z5iBp+JzLIZKF1K558kFwL4b5r/AZ3lmoiGu
+        EfKixXMIRGPcUKWXAyFf2g4=
+X-Google-Smtp-Source: ACHHUZ55fwWltcVU/4TIaIKtet3ye+yw8pX7D0kp6PmrZCInBSOH4wrjDftV/ZQGwhGwGj3MuvIaWA==
+X-Received: by 2002:a17:90a:5a04:b0:25b:e747:103 with SMTP id b4-20020a17090a5a0400b0025be7470103mr3060607pjd.26.1686591593092;
+        Mon, 12 Jun 2023 10:39:53 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id ep11-20020a17090ae64b00b00255e2d5d56csm7674854pjb.1.2023.06.12.10.39.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jun 2023 10:39:52 -0700 (PDT)
+Message-ID: <2f629dc3-fe39-624f-a2fe-d29eee1d2b82@acm.org>
+Date:   Mon, 12 Jun 2023 10:39:51 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <431928.1686588681.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 12 Jun 2023 17:51:21 +0100
-Message-ID: <431929.1686588681@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>, Ted Tso <tytso@mit.edu>,
+        yebin <yebin@huaweicloud.com>, linux-fsdevel@vger.kernel.org
+References: <20230612161614.10302-1-jack@suse.cz>
+ <20230612162545.frpr3oqlqydsksle@quack3>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230612162545.frpr3oqlqydsksle@quack3>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-    =
+On 6/12/23 09:25, Jan Kara wrote:
+> On Mon 12-06-23 18:16:14, Jan Kara wrote:
+>> Writing to mounted devices is dangerous and can lead to filesystem
+>> corruption as well as crashes. Furthermore syzbot comes with more and
+>> more involved examples how to corrupt block device under a mounted
+>> filesystem leading to kernel crashes and reports we can do nothing
+>> about. Add config option to disallow writing to mounted (exclusively
+>> open) block devices. Syzbot can use this option to avoid uninteresting
+>> crashes. Also users whose userspace setup does not need writing to
+>> mounted block devices can set this config option for hardening.
+>>
+>> Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd9@linaro.org
+>> Signed-off-by: Jan Kara <jack@suse.cz>
+> 
+> Please disregard this patch. I had uncommited fixups in my tree. I'll send
+> fixed version shortly. I'm sorry for the noise.
 
-Fix dio_bio_alloc() to set BIO_PAGE_PINNED, not BIO_PAGE_REFFED, so that
-the bio code unpins the pinned pages rather than putting a ref on them.
+Have alternatives been configured to making this functionality configurable
+at build time only? How about a kernel command line parameter instead of a
+config option?
 
-The issue was causing:
+Thanks,
 
-        WARNING: CPU: 6 PID: 2220 at mm/gup.c:76 try_get_folio
-
-This can be caused by creating a file on a loopback UDF filesystem, openin=
-g
-it O_DIRECT and making two writes to it from the same source buffer.
-
-Fixes: 1ccf164ec866 ("block: Use iov_iter_extract_pages() and page pinning=
- in direct-io.c")
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202306120931.a9606b88-oliver.sang@i=
-ntel.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: Andrew Morton <akpm@linux-foundation.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jan Kara <jack@suse.cz>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Jason Gunthorpe <jgg@nvidia.com>
-cc: Logan Gunthorpe <logang@deltatee.com>
-cc: Hillf Danton <hdanton@sina.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-block@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-cc: linux-mm@kvack.org
----
- fs/direct-io.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 14049204cac8..04e810826ee8 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -415,7 +415,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio=
-,
- 	else
- 		bio->bi_end_io =3D dio_bio_end_io;
- 	/* for now require references for all pages */
--	bio_set_flag(bio, BIO_PAGE_REFFED);
-+	if (dio->need_unpin)
-+		bio_set_flag(bio, BIO_PAGE_PINNED);
- 	sdio->bio =3D bio;
- 	sdio->logical_offset_in_bio =3D sdio->cur_page_fs_offset;
- }
+Bart.
 
