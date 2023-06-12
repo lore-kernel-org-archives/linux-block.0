@@ -2,75 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 097B6C88CB2
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 17:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F35ADC88CB6
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 18:00:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235126AbjFLRr3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 13:47:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52774 "EHLO
+        id S236449AbjFLSAZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 14:00:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234982AbjFLRr3 (ORCPT
+        with ESMTP id S236845AbjFLSAX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 13:47:29 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCEE2FB
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 10:47:27 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-82-39.bstnma.fios.verizon.net [173.48.82.39])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 35CHl1lV018047
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Jun 2023 13:47:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1686592023; bh=k5/mHoM4TKtwuRzijsuJUvOl+RgFkywa2qtXQ3b9Dqs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=lF0Da9dBYHdFjBZwXhrM/yTEBIMSSnD44OE2GDG/1eZqwdpKGecGfQyKQwJ5ZKr+I
-         mLe9HOMFzcQKASATbj0M/4P81ls5rg/slbVop7JCoLOqGz+AFlVdyPLyIAmNMvDtIz
-         x9VRsOfDyBZJRiLoKXFwR9XLoTF4LFp2AenkjvPWA3wf3lXzRSzLkqOoNpfVk8CrFU
-         zWW7VXtAzgvrPQ/wu3IqU/bix1gMsvTvf1OfZP4KGQMwHGMfc1OfXl8wcYnveI7S44
-         gf4D02ajuDr6QFALUHSt01hD2vXZSlz7IP9dTIAduCWawOYWA3nXVlv/oCm7yIcb2C
-         6ek0sBxatUi/Q==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 3D31815C00B0; Mon, 12 Jun 2023 13:47:01 -0400 (EDT)
-Date:   Mon, 12 Jun 2023 13:47:01 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        yebin <yebin@huaweicloud.com>, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
- devices
-Message-ID: <20230612174701.GC1500045@mit.edu>
-References: <20230612161614.10302-1-jack@suse.cz>
- <20230612162545.frpr3oqlqydsksle@quack3>
- <2f629dc3-fe39-624f-a2fe-d29eee1d2b82@acm.org>
+        Mon, 12 Jun 2023 14:00:23 -0400
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E920DE57;
+        Mon, 12 Jun 2023 11:00:22 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1b3a6fc8067so14341495ad.3;
+        Mon, 12 Jun 2023 11:00:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686592822; x=1689184822;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DtaKyGMMsO1d5IaBvOlYvD5aIurl50eNqjEgvky0SN0=;
+        b=kKsvH9S4tEDKVcfGOWiw9WAr6P4eG49i4QBwVx/T/Xf0iM8CMjF6iB0YuX0WgnuQWm
+         yfM6DSSYq4pet+egNTI2YY8Y5BIa1ECZWCE2wppj2ldCn4rO0+ixhrQPIW/H/1EDeN29
+         7HkwPDqkIv6cgZyfpPahIMHS+9XD0ak/iKA2O925YxaTgYkZk7Wng9qLawAdbxcVhSBV
+         PsAlw9JtsdRsZjDvIkpLREhlIMhh9gxDk/6lkg62WL7vLrd+HkH2vjPxPsIw9vKCXb8I
+         40BZRcCU1wrWBh1PuOXP2q0JjAhHy7/VPQAWXbss8e4rbuUuDcd53dskh4CR3Z5uDySg
+         ltug==
+X-Gm-Message-State: AC+VfDx3yGjHYK3xszr3lfiVFhK1/Gjk+r2mDODksiEashwDjSyXET6l
+        xwGWACwEq4Rm18xJt3Q7AEo=
+X-Google-Smtp-Source: ACHHUZ5SQy4Ts+NFIvs2Cwje2NT9J9yvTizdY2ZR23/lLaAR2EwE0/oI919r/BKw8RG88hQ+F9YmhQ==
+X-Received: by 2002:a17:902:ecc8:b0:1b1:d8ce:73cb with SMTP id a8-20020a170902ecc800b001b1d8ce73cbmr7427269plh.59.1686592822085;
+        Mon, 12 Jun 2023 11:00:22 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b001b016313b1dsm3208788plb.86.2023.06.12.11.00.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jun 2023 11:00:21 -0700 (PDT)
+Message-ID: <31043005-eb42-1a03-676a-1544c3cbbe26@acm.org>
+Date:   Mon, 12 Jun 2023 11:00:20 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2f629dc3-fe39-624f-a2fe-d29eee1d2b82@acm.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v5 3/7] scsi: merge scsi_internal_device_block() and
+ device_block()
+Content-Language: en-US
+To:     mwilck@suse.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+References: <20230612165049.29440-1-mwilck@suse.com>
+ <20230612165049.29440-4-mwilck@suse.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230612165049.29440-4-mwilck@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 10:39:51AM -0700, Bart Van Assche wrote:
-> > > Writing to mounted devices is dangerous and can lead to filesystem
-> > > corruption as well as crashes. Furthermore syzbot comes with more and
-> > > more involved examples how to corrupt block device under a mounted
-> > > filesystem leading to kernel crashes and reports we can do nothing
-> > > about. Add config option to disallow writing to mounted (exclusively
-> > > open) block devices. Syzbot can use this option to avoid uninteresting
-> > > crashes. Also users whose userspace setup does not need writing to
-> > > mounted block devices can set this config option for hardening.
-> 
-> Have alternatives been configured to making this functionality
-> configurable at build time only? How about a kernel command line
-> parameter instead of a config option?
+On 6/12/23 09:50, mwilck@suse.com wrote:
+> -static int scsi_internal_device_block(struct scsi_device *sdev)
+> +static void scsi_device_block(struct scsi_device *sdev, void *data)
+>   {
+>   	int err;
+>   
+> @@ -2805,7 +2804,8 @@ static int scsi_internal_device_block(struct scsi_device *sdev)
+>   		scsi_stop_queue(sdev, false);
+>   	mutex_unlock(&sdev->state_mutex);
+>   
+> -	return err;
+> +	WARN_ONCE(err, "__scsi_internal_device_block_nowait(%s) failed: err = %d\n",
+> +		  dev_name(&sdev->sdev_gendev), err);
+>   }
 
-I could imagine wanting a config option which changes the default, as
-well as a way of setting the parameter on the command line so that
-users of distro kernel can change the parameter value.  That's
-especially since it might be useful for more than just reining in
-syzbot reports.
+Hmm ... wasn't it your intention to change the reference to the
+__scsi_internal_device_block_nowait() function in this message?
 
-						- Ted
+Thanks,
+
+Bart.
