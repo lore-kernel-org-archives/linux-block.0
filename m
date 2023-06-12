@@ -2,75 +2,226 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47ABDC7EE23
-	for <linux-block@archiver.kernel.org>; Sun, 11 Jun 2023 21:18:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 961E8C77B7A
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 01:33:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232840AbjFKVSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Jun 2023 17:18:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56916 "EHLO
+        id S231488AbjFLBd2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Jun 2023 21:33:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjFKVSc (ORCPT
+        with ESMTP id S229464AbjFLBd1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Jun 2023 17:18:32 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4789B1A8
-        for <linux-block@vger.kernel.org>; Sun, 11 Jun 2023 14:18:30 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-77ade29e1easo280201039f.1
-        for <linux-block@vger.kernel.org>; Sun, 11 Jun 2023 14:18:30 -0700 (PDT)
+        Sun, 11 Jun 2023 21:33:27 -0400
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B161C7;
+        Sun, 11 Jun 2023 18:33:26 -0700 (PDT)
+Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-43b2da5b307so1030947137.2;
+        Sun, 11 Jun 2023 18:33:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686533605; x=1689125605;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ud3GHaugFlTWgt3eVABQXSfDs3e4nTmgNYap85e+06E=;
+        b=amWA2VIH0o7HsD/FEOm2D1dssGSZ1SWrW11XOMUTvmKYlCI0oPHoxRn7lxpx7G7T3R
+         JaAUUDLqlMdyRQ82Vh+9G6CYqPPoVLLUIxT4bBrDz0vlEA0v43kLCwDnFmm+O/G3W+Hm
+         SGUmtO2jdrwC6PVN+RPwQau4z7ld6L44eVT6wwdGmkwTLzbF4GBW73PlrOgQTj/eXcLp
+         NK04lWhYl7M4wX40xhwWRBmaWhqBafVLdFsHPlIgtSgeO3z0Bfx3zGZtJN1FDB9fSz/e
+         BsOEOa7VyIFts4pMffzJIcd+cIh3s99yo8516rtdUggHw/0t51MHA8H/Dyria/mhHABl
+         nlLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686518309; x=1689110309;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=++zemBX/2RrOYOFOLtSc1QjMmPmCs+Z/n8b0jPh3c7o=;
-        b=WiulE6sO2KsfAgTxr6ma3J8z2VuskwMgiAzEE3HyBF7HkWUjtuxNcbK3Dr4C5baRN/
-         Bv/c6MuhWahUoo4eE0nfT1t6vAxACniJAMdzvPz1jj9IG3AUMjARogNZdQz7AK6P+PYz
-         OgIEk9dfMWbuXXLJGsazTgSpdXE0sCnYgH/tsqIRZeJn/IG4Y9pcGX2FPBBIsrdo9lM4
-         YgcHyvKy7vk5vtTOPZUOkcWIfcHkFw98ieTU1jyscBvMQZ4j06glpLzTj/WLSQAbNULV
-         Q9Vz0H8XvvwyVYgGlF9Myc98CK1VI1IJ/akVpmrZCoCX5LZlhYUvCs3JfqO2nOxiZ1Y4
-         y+dQ==
-X-Gm-Message-State: AC+VfDyTw2S9UGHw4N4ZXksPkGbXwbzbKkIjap/EG6eA8OVeZVhtImfl
-        NJYLT2GMB/H0MhFqJTx4f2Ke0gy0xBw+UpoAwa27AbYtjMX1
-X-Google-Smtp-Source: ACHHUZ5uexlpBPtPJccaNdHhmErmovEuc0aJEQv+DulBACxbzELH3wDT/Ehuljo6vWiQkQ7yLj0tlIJ2iLEPDZLXWLeSG1iJZatu
+        d=1e100.net; s=20221208; t=1686533605; x=1689125605;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ud3GHaugFlTWgt3eVABQXSfDs3e4nTmgNYap85e+06E=;
+        b=da4lCGauRBjZCsIjQwWK57Mx6wjdSUe8TrvQQjAHSuWarMjJE2FGEQpfAYJgsZPsMd
+         XduPKZ7OgmOEBQaIR861QR2Sy4D6aKTwwMFNK/MvsXirFMcLidw1D1XxgnxK1smfkCZ4
+         xtjt3c+e7nFADYQ3wfo5ibF2iEUXYyfs6Pv77M3S686hGANKqJ2z/RqN0LNnFClz/U6U
+         dVSOLavNaQuTc6IlCr3uG2ffr0cB7C0nUdovrSe04ILtoLxBVm6SEHtUFqwKA5zJj/Fm
+         Xv8XHe7OYhGiNxjs96JZ2/9GCUif108NppsG1cm8bm6pVaPEGyZVYYD2vPfA0twNTOXx
+         7Big==
+X-Gm-Message-State: AC+VfDw+nnm9NNHYecIVralFp3fTv9kJQHFOLrqmC2Ygul0Jl2s9nF8F
+        BZvhJdCq0hZk+V6DBy4f0i8=
+X-Google-Smtp-Source: ACHHUZ6vXKpHT1KclLMh/rpSgQLCkjHNmx/+qncsRUIzBAhLU/n62P9EpBZ9RWHnsTtNfAL8PE9XQw==
+X-Received: by 2002:a67:efc2:0:b0:43d:ef1b:232c with SMTP id s2-20020a67efc2000000b0043def1b232cmr959325vsp.0.1686533605277;
+        Sun, 11 Jun 2023 18:33:25 -0700 (PDT)
+Received: from localhost.localdomain ([179.50.15.34])
+        by smtp.gmail.com with ESMTPSA id k6-20020ab05386000000b006904fa86e7csm1476365uaa.2.2023.06.11.18.33.24
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sun, 11 Jun 2023 18:33:24 -0700 (PDT)
+From:   Yang Hau <yuanyanghau@gmail.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yang Hau <yuanyanghau@gmail.com>
+Subject: [PATCH 1/2] block: fix random typos
+Date:   Sun, 11 Jun 2023 20:33:17 -0500
+Message-Id: <20230612013317.87065-1-yuanyanghau@gmail.com>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-X-Received: by 2002:a6b:fd15:0:b0:777:afc6:8da0 with SMTP id
- c21-20020a6bfd15000000b00777afc68da0mr2935869ioi.1.1686518309621; Sun, 11 Jun
- 2023 14:18:29 -0700 (PDT)
-Date:   Sun, 11 Jun 2023 14:18:29 -0700
-In-Reply-To: <000000000000da4f6b05eb9bf593@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c0951105fde12435@google.com>
-Subject: Re: [syzbot] [nilfs?] general protection fault in nilfs_clear_dirty_page
-From:   syzbot <syzbot+53369d11851d8f26735c@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, dsterba@suse.com, hch@lst.de,
-        konishi.ryusuke@gmail.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        wqu@suse.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+Fix some random typos.
 
-commit 4a445b7b6178d88956192c0202463063f52e8667
-Author: Qu Wenruo <wqu@suse.com>
-Date:   Sat Aug 13 08:06:53 2022 +0000
+Signed-off-by: Yang Hau <yuanyanghau@gmail.com>
+---
+ block/bdev.c              | 2 +-
+ block/bfq-iosched.c       | 4 ++--
+ block/blk-cgroup-rwstat.c | 2 +-
+ block/blk-ia-ranges.c     | 2 +-
+ block/blk-merge.c         | 6 +++---
+ block/blk.h               | 2 +-
+ block/elevator.c          | 2 +-
+ block/kyber-iosched.c     | 2 +-
+ block/mq-deadline.c       | 2 +-
+ 9 files changed, 12 insertions(+), 12 deletions(-)
 
-    btrfs: don't merge pages into bio if their page offset is not contiguous
+diff --git a/block/bdev.c b/block/bdev.c
+index 1795c7d4b..6f8bff116 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -539,7 +539,7 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
+  * @bdev: block device of interest
+  * @holder: holder that has claimed @bdev
+  *
+- * Finish exclusive open of a block device. Mark the device as exlusively
++ * Finish exclusive open of a block device. Mark the device as exclusively
+  * open by the holder and wake up all waiters for exclusive open to finish.
+  */
+ static void bd_finish_claiming(struct block_device *bdev, void *holder)
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index d9ed3108c..3adb03633 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1963,7 +1963,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	 * As for throughput, we ask bfq_better_to_idle() whether we
+ 	 * still need to plug I/O dispatching. If bfq_better_to_idle()
+ 	 * says no, then plugging is not needed any longer, either to
+-	 * boost throughput or to perserve service guarantees. Then
++	 * boost throughput or to preserve service guarantees. Then
+ 	 * the best option is to stop plugging I/O, as not doing so
+ 	 * would certainly lower throughput. We may end up in this
+ 	 * case if: (1) upon a dispatch attempt, we detected that it
+@@ -2491,7 +2491,7 @@ static int bfq_request_merge(struct request_queue *q, struct request **req,
+ 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
+ 		*req = __rq;
+ 
+-		if (blk_discard_mergable(__rq))
++		if (blk_discard_mergeable(__rq))
+ 			return ELEVATOR_DISCARD_MERGE;
+ 		return ELEVATOR_FRONT_MERGE;
+ 	}
+diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
+index 3304e841d..0039e4756 100644
+--- a/block/blk-cgroup-rwstat.c
++++ b/block/blk-cgroup-rwstat.c
+@@ -37,7 +37,7 @@ EXPORT_SYMBOL_GPL(blkg_rwstat_exit);
+  * @pd: policy private data of interest
+  * @rwstat: rwstat to print
+  *
+- * Print @rwstat to @sf for the device assocaited with @pd.
++ * Print @rwstat to @sf for the device associated with @pd.
+  */
+ u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
+ 			 const struct blkg_rwstat_sample *rwstat)
+diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
+index c9eb4241e..f65f7a2cf 100644
+--- a/block/blk-ia-ranges.c
++++ b/block/blk-ia-ranges.c
+@@ -63,7 +63,7 @@ static const struct sysfs_ops blk_ia_range_sysfs_ops = {
+ };
+ 
+ /*
+- * Independent access range entries are not freed individually, but alltogether
++ * Independent access range entries are not freed individually, but all together
+  * with struct blk_independent_access_ranges and its array of ranges. Since
+  * kobject_add() takes a reference on the parent kobject contained in
+  * struct blk_independent_access_ranges, the array of independent access range
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 6460abdb2..29034bb9d 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -790,7 +790,7 @@ static void blk_account_io_merge_request(struct request *req)
+ static enum elv_merge blk_try_req_merge(struct request *req,
+ 					struct request *next)
+ {
+-	if (blk_discard_mergable(req))
++	if (blk_discard_mergeable(req))
+ 		return ELEVATOR_DISCARD_MERGE;
+ 	else if (blk_rq_pos(req) + blk_rq_sectors(req) == blk_rq_pos(next))
+ 		return ELEVATOR_BACK_MERGE;
+@@ -864,7 +864,7 @@ static struct request *attempt_merge(struct request_queue *q,
+ 
+ 	req->__data_len += blk_rq_bytes(next);
+ 
+-	if (!blk_discard_mergable(req))
++	if (!blk_discard_mergeable(req))
+ 		elv_merge_requests(q, req, next);
+ 
+ 	/*
+@@ -947,7 +947,7 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 
+ enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
+ {
+-	if (blk_discard_mergable(rq))
++	if (blk_discard_mergeable(rq))
+ 		return ELEVATOR_DISCARD_MERGE;
+ 	else if (blk_rq_pos(rq) + blk_rq_sectors(rq) == bio->bi_iter.bi_sector)
+ 		return ELEVATOR_BACK_MERGE;
+diff --git a/block/blk.h b/block/blk.h
+index cc4e8873d..eb2ae2df1 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -148,7 +148,7 @@ static inline bool rq_mergeable(struct request *rq)
+  *  2) Otherwise, the request will be normal read/write requests.  The ranges
+  *     need to be contiguous.
+  */
+-static inline bool blk_discard_mergable(struct request *req)
++static inline bool blk_discard_mergeable(struct request *req)
+ {
+ 	if (req_op(req) == REQ_OP_DISCARD &&
+ 	    queue_max_discard_segments(req->q) > 1)
+diff --git a/block/elevator.c b/block/elevator.c
+index 24909069f..a6ab90cff 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -310,7 +310,7 @@ enum elv_merge elv_merge(struct request_queue *q, struct request **req,
+ 	if (__rq && elv_bio_merge_ok(__rq, bio)) {
+ 		*req = __rq;
+ 
+-		if (blk_discard_mergable(__rq))
++		if (blk_discard_mergeable(__rq))
+ 			return ELEVATOR_DISCARD_MERGE;
+ 		return ELEVATOR_BACK_MERGE;
+ 	}
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 214696923..678448cf9 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -142,7 +142,7 @@ struct kyber_cpu_latency {
+  */
+ struct kyber_ctx_queue {
+ 	/*
+-	 * Used to ensure operations on rq_list and kcq_map to be an atmoic one.
++	 * Used to ensure operations on rq_list and kcq_map to be an atomic one.
+ 	 * Also protect the rqs on rq_list when merge.
+ 	 */
+ 	spinlock_t lock;
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index f10c2a0d1..910a23ef4 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -734,7 +734,7 @@ static int dd_request_merge(struct request_queue *q, struct request **rq,
+ 
+ 		if (elv_bio_merge_ok(__rq, bio)) {
+ 			*rq = __rq;
+-			if (blk_discard_mergable(__rq))
++			if (blk_discard_mergeable(__rq))
+ 				return ELEVATOR_DISCARD_MERGE;
+ 			return ELEVATOR_FRONT_MERGE;
+ 		}
+-- 
+2.39.0
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17778475280000
-start commit:   022ce8862dff Merge tag 'i2c-for-6.4-rc6' of git://git.kern..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14f78475280000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10f78475280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7474de833c217bf4
-dashboard link: https://syzkaller.appspot.com/bug?extid=53369d11851d8f26735c
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13e9d48b280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d7fa63280000
-
-Reported-by: syzbot+53369d11851d8f26735c@syzkaller.appspotmail.com
-Fixes: 4a445b7b6178 ("btrfs: don't merge pages into bio if their page offset is not contiguous")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
