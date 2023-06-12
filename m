@@ -2,73 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79446C88CB4
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC18C88CB2
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:57:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235229AbjFLPtl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 11:49:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40760 "EHLO
+        id S234715AbjFLP4s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 11:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232559AbjFLPtk (ORCPT
+        with ESMTP id S238401AbjFLP43 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 11:49:40 -0400
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B1D10C7;
-        Mon, 12 Jun 2023 08:49:40 -0700 (PDT)
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1b3a82c8887so19390585ad.2;
-        Mon, 12 Jun 2023 08:49:40 -0700 (PDT)
+        Mon, 12 Jun 2023 11:56:29 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD00E5
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 08:56:28 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-77ad566f7fbso43538439f.1
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 08:56:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686585387; x=1689177387;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NDv2++4y4WHcpliO9UwrmYpCoiXZ+M28TkOhP00UkEw=;
+        b=D6ZmOLjyzxaHcs6eQLunqJpIwEWY7jErsCxy4YXZMy8YUeZa4hC1v4nWBjFjlgxiat
+         F4GFarXBrfWyPoPZyNzH+cJBZos7Piv33/NrTfWCsqlHS+ZBjj77NTbAUvlbw4S10Kqr
+         x8lr/AdVbZ1LodiLsSh9jMSHosmau+wYeR2MAH6wj1a3dDfyQ/dhaHEIuS3Fcs+1yFZL
+         pgQtLAloz6it7Hj7JSHGme8c3777opKpREUanyhWMdJP1uDdFU1MI/TLW3qnE4RdHE+h
+         xll2x/dOweKwGT6+jmP9wT3P0IMeGcAZ4/dUGGb/gPST0A5cgfY+axrLhDng7037RBYp
+         wmgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686584980; x=1689176980;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TYfVhY3uC1rPtKUOcd4WiYqqlpaKjnLTB5rZELO6dUc=;
-        b=Ftek8DWxA5ssnm5r2/DLUxaWOrtSJJ3b5btJETyghxwJ0zfUcu03c1vU3TKEcYoNd2
-         OU15G+zQ8Cy0R8LroPfZDQxPJ1+y94qM37t39hrfKxSeFvpUShB9o18aiMIWYjOqlqJ/
-         M9ENOh9K2izm4dtszwvpb6mJkgONAKLFYSwTgqh35ZjIe1uE5kT5DQM4uR0XrO3NYlGS
-         v/OC+/KjPaz+Pa7SL1VuAnJb8gAvZnykp2vV0KFIxtIxBTk6QxGpgaPC5JusjgM64q1p
-         d8knbXdfZVtFQsRjIze8DaVM5m1mzg0xZvOiqwF2qu4cPdoesyOdeRkdYf1WjyaqPhM8
-         s4FQ==
-X-Gm-Message-State: AC+VfDwHdUhC5gXnilWPnAIaWG8PhMlI/XV8Mq8T0qlOVtxidN8e4UNS
-        0VU6K86MpX4zEJXX4hZAlwA=
-X-Google-Smtp-Source: ACHHUZ6gkZzTuMHWRnZjo1dy4XM87ORx/ZXp3Eo1PRS4R5ffbhINCKV/wqj4181O4HMMicc52RitQA==
-X-Received: by 2002:a17:902:f691:b0:1b0:2390:3674 with SMTP id l17-20020a170902f69100b001b023903674mr7355579plg.65.1686584979479;
-        Mon, 12 Jun 2023 08:49:39 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id u14-20020a170902a60e00b001b05e96d859sm8390716plq.135.2023.06.12.08.49.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jun 2023 08:49:39 -0700 (PDT)
-Message-ID: <02068097-2e48-7662-3ac8-96542f64ab5d@acm.org>
-Date:   Mon, 12 Jun 2023 08:49:36 -0700
+        d=1e100.net; s=20221208; t=1686585387; x=1689177387;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NDv2++4y4WHcpliO9UwrmYpCoiXZ+M28TkOhP00UkEw=;
+        b=NBC/wpjY45KUJsKN8jjqh5QSqZyZi1n/MO1XzknFJY8Rsov0wxZuA4CTv745x3dsWd
+         a4XLoY/sBc68x5su0uI0/G8/QQZAQXc8PWLF93qWM4qvvUs2B9qNPMszTJ5WgjcNVPnS
+         RNyMRliGXFgnrl85X1HXnLNdzedDa6FdVMPZVwqmUqbIUxvYr06I7tViD7HWRNu2Mkrx
+         a/btjt0FH3iGTi8/51TAwsod66A3OHtcBQl8xHZcVHYKH5B4qqw48LFoBOIMU1h+U/Jo
+         Q8hC8KjQ/xWQWm7laG3wbQxT9eGkLQStMyIk3XJXcN6kcdd6TDiod4WpgxSyhhbIdKe5
+         3wlw==
+X-Gm-Message-State: AC+VfDwQ6qRgJcj7HDJLA6/SkO9Vwybc47zR1ZBdWa8bvFCIkePqSzX4
+        IUQBcicMyBvaoPzsarwueHDbEw==
+X-Google-Smtp-Source: ACHHUZ5D2TB3x2QAL8IlcUNXKrqNOABHBJlGyqgh/qrlzc8p3NCE7wnJM6hOjxnkWc1Joo8I6QmbEg==
+X-Received: by 2002:a05:6e02:1a2c:b0:338:4b36:5097 with SMTP id g12-20020a056e021a2c00b003384b365097mr6968899ile.1.1686585387673;
+        Mon, 12 Jun 2023 08:56:27 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id m10-20020a924b0a000000b0033355fa5440sm3291980ilg.37.2023.06.12.08.56.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jun 2023 08:56:27 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     jack@suse.cz, qiulaibin@huawei.com,
+        andriy.shevchenko@linux.intel.com,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230610023043.2559121-1-yukuai1@huaweicloud.com>
+References: <20230610023043.2559121-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH -next v2] blk-mq: fix potential io hang by wrong
+ 'wake_batch'
+Message-Id: <168658538673.969588.639148205003839147.b4-ty@kernel.dk>
+Date:   Mon, 12 Jun 2023 09:56:26 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v4 6/6] scsi: replace scsi_target_block() by
- scsi_block_targets()
-Content-Language: en-US
-To:     mwilck@suse.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>,
-        Karan Tilak Kumar <kartilak@cisco.com>,
-        Sesidhar Baddela <sebaddel@cisco.com>
-References: <20230612150309.18103-1-mwilck@suse.com>
- <20230612150309.18103-7-mwilck@suse.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20230612150309.18103-7-mwilck@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/23 08:03, mwilck@suse.com wrote:
-> + * Note:
-> + * @dev must not itself be a scsi_target device.
 
-Please add a WARN_ON_ONCE() that checks this condition.
+On Sat, 10 Jun 2023 10:30:43 +0800, Yu Kuai wrote:
+> In __blk_mq_tag_busy/idle(), updating 'active_queues' and calculating
+> 'wake_batch' is not atomic:
+> 
+> t1:			t2:
+> _blk_mq_tag_busy	blk_mq_tag_busy
+> inc active_queues
+> // assume 1->2
+> 			inc active_queues
+> 			// 2 -> 3
+> 			blk_mq_update_wake_batch
+> 			// calculate based on 3
+> blk_mq_update_wake_batch
+> /* calculate based on 2, while active_queues is actually 3. */
+> 
+> [...]
 
-Thanks,
+Applied, thanks!
 
-Bart.
+[1/1] blk-mq: fix potential io hang by wrong 'wake_batch'
+      commit: 4f1731df60f9033669f024d06ae26a6301260b55
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
