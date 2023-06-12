@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DC1C7EE2E
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 20:33:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF689C7EE43
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 20:33:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236274AbjFLUd1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 16:33:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53772 "EHLO
+        id S236160AbjFLUda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 16:33:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236307AbjFLUd0 (ORCPT
+        with ESMTP id S236594AbjFLUd2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 16:33:26 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB32710C9
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:25 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1b3d29cfb17so11909635ad.3
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:25 -0700 (PDT)
+        Mon, 12 Jun 2023 16:33:28 -0400
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA7C10CE
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:27 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1b3a9eae57cso15992885ad.1
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686602005; x=1689194005;
+        d=1e100.net; s=20221208; t=1686602007; x=1689194007;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qo39VGVNKAqYQuhvjR9+/XSsIZeV792czsUdbh6Q7Qk=;
-        b=j/iTwHf2pXI3vhU0slyNvW0z5X7qbfZ/BfTCQAaco2FalLE89OsTDrjZRufXNGxWlz
-         2eWULbrhbsgzlItO3rPfb9uDnG63jE72l+VUnGQVchcVqyqDEvHJae6nlSq4C+2ntOMV
-         /CLx+TFm8HruhLqnMS/xf0qeXyjKeLJTyYAGclAfQGA24D+cp7QEmj827v3AepBahxnb
-         tPpH5oAsAg6NJPZ0PYw2mPb4Rs02n0vRnf3hU+zGRahE0Z+P744eXOEcdpMUGs0RWgnp
-         QrRMRaKqdiQPPb3NEOjVz7+DKw68iCPF70jb6Ex5rpAn650aAuqfAIH6ponw/nbocmt5
-         c9NA==
-X-Gm-Message-State: AC+VfDzCMOJEj43md+yz3av9ssWSTZysSePmvhwIz/pqgYngyPGy6KfV
-        rDuxwUawTD/ZoTLOosJGfYE=
-X-Google-Smtp-Source: ACHHUZ5wFhJjb9g/E2490NF5L48uzJhLdUJt7YLw7hmbdFJDs89hn7CpzfCM7PGdmFyNHLRXx+s/NQ==
-X-Received: by 2002:a17:902:c407:b0:1ac:5717:fd5 with SMTP id k7-20020a170902c40700b001ac57170fd5mr10519253plk.60.1686602005320;
-        Mon, 12 Jun 2023 13:33:25 -0700 (PDT)
+        bh=D76EF1PRUG4k1Tw0AWeqUDGcfk53v67F7APUOd5gLok=;
+        b=D1eDFKnJvuKEhCmvLysekJuRq4ReyBb52w6apBOtRbBEopofhO5/PKLZZnkCFEzM1m
+         7E+YAFMTHMjLqdHLIvAY0mdTkllcCUT8X8n6JlDLVJ5LamZkow4jBymxguBXkaMv3oRu
+         SSit/fN9Otxz2vxdrttcdOfHGC2l3KnwViaNIUqV/r3iU9WIBTC728l19QwW0leUePkS
+         xzOcW8ssdIAm+8XXYJT3JtkEyed2TAZuf70QFb4y2naGNDXnfgE82EgpB8db1KRFkAFV
+         uWj8bRk+0+QXKbChAjZVudkPfeViRBHi/4upxmBnC85zUwPXe/s/OMZimd0K5gpJ0n3B
+         COPg==
+X-Gm-Message-State: AC+VfDwDIcZyQlaEDCF3Wo4c9zenOQBJUGEUFSKuGAdF+ZPQTW3LOGy8
+        KyD54O9T1ocBEGfj+GCu+bk=
+X-Google-Smtp-Source: ACHHUZ6+ywaGcwwhW/1e0+gJeV6PNofySNqKstbEfzqwcpLZqBmm/9miafUPnKio/eEZhl7jtElv7w==
+X-Received: by 2002:a17:902:d487:b0:1b2:22cd:9827 with SMTP id c7-20020a170902d48700b001b222cd9827mr9630245plg.1.1686602006638;
+        Mon, 12 Jun 2023 13:33:26 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b001b016313b1dsm3324767plb.86.2023.06.12.13.33.24
+        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b001b016313b1dsm3324767plb.86.2023.06.12.13.33.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jun 2023 13:33:24 -0700 (PDT)
+        Mon, 12 Jun 2023 13:33:25 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -46,9 +46,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Juan Yescas <jyescas@google.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Ming Lei <ming.lei@redhat.com>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH v6 5/8] block: Support submitting passthrough requests with small segments
-Date:   Mon, 12 Jun 2023 13:33:11 -0700
-Message-Id: <20230612203314.17820-6-bvanassche@acm.org>
+Subject: [PATCH v6 6/8] block: Add support for filesystem requests and small segments
+Date:   Mon, 12 Jun 2023 13:33:12 -0700
+Message-Id: <20230612203314.17820-7-bvanassche@acm.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230612203314.17820-1-bvanassche@acm.org>
 References: <20230612203314.17820-1-bvanassche@acm.org>
@@ -58,59 +58,80 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the segment size is smaller than the page size there may be multiple
-segments per bvec even if a bvec only contains a single page. Hence this
-patch.
+Add support in the bio splitting code and also in the bio submission code
+for bios with segments smaller than the page size.
 
 Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+Tested-by: Sandeep Dhavale <dhavale@google.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-map.c |  2 +-
- block/blk.h     | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ block/blk-merge.c |  8 ++++++--
+ block/blk-mq.c    |  2 ++
+ block/blk.h       | 11 +++++------
+ 3 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 3551c3ff17cf..c1d92b0dcc5d 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -535,7 +535,7 @@ int blk_rq_append_bio(struct request *rq, struct bio *bio)
- 	unsigned int nr_segs = 0;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 65e75efa9bd3..0b28f6df07bc 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -294,7 +294,8 @@ struct bio *bio_split_rw(struct bio *bio, const struct queue_limits *lim,
+ 		if (nsegs < lim->max_segments &&
+ 		    bytes + bv.bv_len <= max_bytes &&
+ 		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
+-			nsegs++;
++			/* single-page bvec optimization */
++			nsegs += blk_segments(lim, bv.bv_len);
+ 			bytes += bv.bv_len;
+ 		} else {
+ 			if (bvec_split_segs(lim, &bv, &nsegs, &bytes,
+@@ -544,7 +545,10 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
+ 			    __blk_segment_map_sg_merge(q, &bvec, &bvprv, sg))
+ 				goto next_bvec;
  
- 	bio_for_each_bvec(bv, bio, iter)
--		nr_segs++;
-+		nr_segs += blk_segments(&rq->q->limits, bv.bv_len);
+-			if (bvec.bv_offset + bvec.bv_len <= PAGE_SIZE)
++			if (bvec.bv_offset + bvec.bv_len <= PAGE_SIZE &&
++			    (!blk_queue_sub_page_limits(&q->limits) ||
++			     bvec.bv_len <= q->limits.max_segment_size))
++				/* single-segment bvec optimization */
+ 				nsegs += __blk_bvec_map_sg(bvec, sglist, sg);
+ 			else
+ 				nsegs += blk_bvec_map_sg(q, &bvec, sglist, sg);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1749f5890606..ad787c14ea09 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2936,6 +2936,8 @@ void blk_mq_submit_bio(struct bio *bio)
+ 		bio = __bio_split_to_limits(bio, &q->limits, &nr_segs);
+ 		if (!bio)
+ 			return;
++	} else if (bio->bi_vcnt == 1) {
++		nr_segs = blk_segments(&q->limits, bio->bi_io_vec[0].bv_len);
+ 	}
  
- 	if (!rq->bio) {
- 		blk_rq_bio_prep(rq, bio, nr_segs);
+ 	if (!bio_integrity_prep(bio))
 diff --git a/block/blk.h b/block/blk.h
-index 065449e7d0bd..18b898a38c72 100644
+index 18b898a38c72..e905cc6364fa 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -86,6 +86,24 @@ struct bio_vec *bvec_alloc(mempool_t *pool, unsigned short *nr_vecs,
- 		gfp_t gfp_mask);
- void bvec_free(mempool_t *pool, struct bio_vec *bv, unsigned short nr_vecs);
+@@ -332,13 +332,12 @@ static inline bool bio_may_exceed_limits(struct bio *bio,
+ 	}
  
-+/* Number of DMA segments required to transfer @bytes data. */
-+static inline unsigned int blk_segments(const struct queue_limits *limits,
-+					unsigned int bytes)
-+{
-+	if (!blk_queue_sub_page_limits(limits))
-+		return 1;
-+
-+	{
-+		const unsigned int mss = limits->max_segment_size;
-+
-+		if (bytes <= mss)
-+			return 1;
-+		if (is_power_of_2(mss))
-+			return round_up(bytes, mss) >> ilog2(mss);
-+		return (bytes + mss - 1) / mss;
-+	}
-+}
-+
- static inline bool biovec_phys_mergeable(struct request_queue *q,
- 		struct bio_vec *vec1, struct bio_vec *vec2)
- {
+ 	/*
+-	 * All drivers must accept single-segments bios that are <= PAGE_SIZE.
+-	 * This is a quick and dirty check that relies on the fact that
+-	 * bi_io_vec[0] is always valid if a bio has data.  The check might
+-	 * lead to occasional false negatives when bios are cloned, but compared
+-	 * to the performance impact of cloned bios themselves the loop below
+-	 * doesn't matter anyway.
++	 * Check whether bio splitting should be performed. This check may
++	 * trigger the bio splitting code even if splitting is not necessary.
+ 	 */
++	if (blk_queue_sub_page_limits(lim) && bio->bi_io_vec &&
++	    bio->bi_io_vec->bv_len > lim->max_segment_size)
++		return true;
+ 	return lim->chunk_sectors || bio->bi_vcnt != 1 ||
+ 		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > PAGE_SIZE;
+ }
