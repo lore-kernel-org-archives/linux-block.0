@@ -2,88 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AF8C7EE2F
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 18:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08057C7EE2E
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 18:40:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbjFLSfi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 14:35:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53922 "EHLO
+        id S229480AbjFLSkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 14:40:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237309AbjFLSeo (ORCPT
+        with ESMTP id S238103AbjFLSk3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 14:34:44 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B70F1E69
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 11:34:38 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-3f6e68cc738so35364565e9.1
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 11:34:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686594877; x=1689186877;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l0IOWy1Q/nQ3vvc3NqtOdJTxE/lj89TxQGfmJuj8eq4=;
-        b=rdZopJ1b6hkx8M3BLkjqUBcixkpXeNboW961IgX8x/J9nZ/xb0tMyCEPseOFjJhWdn
-         7ZAfXS/UTcHXI5ycB3s/4rDbqGksl+5ey0evWS6JHjIBgn9FStjLNF1Gh30xHAm6ufH4
-         qI1kYnGGb5RFZCIa5+/B8xMrdkUTiAL5D3yxPkiC9l1nl2xBba6VAJRx6LdtbSjfSVJ1
-         do/Ed/3j5+0qfOmgedHjW50Qo4rrIErPm+lMc4uUDZTDJnK3TFbSSAjZJe9IOLNvPpLF
-         OjbI0Z3j5rqqN16AuYa3GAjurV+kyMnNFusz30H0gllShURH1fKDFayyO0F461sztcd4
-         1QqA==
+        Mon, 12 Jun 2023 14:40:29 -0400
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B322102
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 11:40:28 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1b1806264e9so28663375ad.0
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 11:40:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686594877; x=1689186877;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l0IOWy1Q/nQ3vvc3NqtOdJTxE/lj89TxQGfmJuj8eq4=;
-        b=Xb/upcDDDSOxCl9ApKNAPRjwK0u/Q091jGWkPG1HRx0/GaMv2iXJ0jXxNLLatL0rzz
-         J/XMfCQOchaLmxakgms1e5EwBymsoZNFFyFGRLe58TbJks9/4wAjsCtJezAvYwMrt/E6
-         tmkLtyTxWVuxUkiGdkaAoGLQhuAj1NpPgoWNe0HX44JHKJBcmj7Co9rdBtlLTqmq+K3Z
-         5+5LmEB3eVqHfIcPxr5fmdeohqlElBXz4BIYSTjW63qcNZkmZW4AtGi5o76fU8nIoHSw
-         iiEh6E+U4IiJe8m87+T6WsxzecWIFk/Tesya6gZHKmRhxhaT2msSgN/hLubbbqMHO62j
-         Ozkw==
-X-Gm-Message-State: AC+VfDzw9REq7fvUy4fUz/NaaEyQfNSZIVLOvo+ql6hk7nY4SYOtKulG
-        r/9gKlPlorQ1czUKT7xjoDbVLUbNMmrF0NcGtUEJIw6R6pAolFpbRhM=
-X-Google-Smtp-Source: ACHHUZ5cH+4gdxRh6mGKIsGNR68yFt95azKNVDTz/qTH5o8xuXb0T7aFOe/VRogrgh5DU5BQ9Hl+FwS/hWkGYLnw6EY=
-X-Received: by 2002:adf:e9c9:0:b0:30f:bcf3:9a30 with SMTP id
- l9-20020adfe9c9000000b0030fbcf39a30mr3005478wrn.17.1686594877035; Mon, 12 Jun
- 2023 11:34:37 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686595227; x=1689187227;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vw4pkDrOYi5uqGMAbarHch433HMaxyugmnYTDtOcJs8=;
+        b=bIub5Q9hE3BMaUXb79Nhb3IAWJRKSQE5P4KiqKfk4Cd+NLwNNNF/raoJYiJBXj3R6R
+         J2yh5/JcwR8GlytuXP65rPG9Ghw1hxuUy0r6sFCHdjQOOC9Gk0RVNXV+qvSe7UEBKZdZ
+         1U23Icm2g7jNLARl4xagxElS5Aa5Mm9dNyn6+6SnJmuTkqHB0AwssT0DWWzi0VkdcyXR
+         r4x5uy9CNnrjcHkFeELLkivcj1NZwMsNzNhHHvHMNUIbyQnSAJqMtmA71aWKdwKjZXGp
+         OjcvwrY0c2iUnnNI8Ce8KZcH/tZVluhGP57iOQHbHVpfnuCc+IJ7HQNyivEWKE4JLTgl
+         lWgA==
+X-Gm-Message-State: AC+VfDxy44nMD848takaImYrtMAnEIoi5IawcpWVRqXhPkIBYFNbcEkx
+        S9xqebzY62QRCgNOKYUr+sUxhDDDmE7KJA==
+X-Google-Smtp-Source: ACHHUZ7gSDhFqP0VkD6BvCkJm49AN+z0r/YJfJbb7KbNrti3Ih389OZ+mwu96K3Ri5f6vj8z9sKNhg==
+X-Received: by 2002:a17:902:da81:b0:1ae:6cf0:94eb with SMTP id j1-20020a170902da8100b001ae6cf094ebmr8951971plx.5.1686595227487;
+        Mon, 12 Jun 2023 11:40:27 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id 4-20020a170902e9c400b001b04a6707d3sm8555983plk.141.2023.06.12.11.40.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jun 2023 11:40:26 -0700 (PDT)
+Message-ID: <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
+Date:   Mon, 12 Jun 2023 11:40:26 -0700
 MIME-Version: 1.0
-References: <20230522222554.525229-1-bvanassche@acm.org> <CAB=BE-SGR8xc9JOF2g4vGVYp0MRmV1pG2WLjoWo3YwAGL1LKJg@mail.gmail.com>
- <6240756d-718a-ccfa-e479-9a3f7a26244a@acm.org>
-In-Reply-To: <6240756d-718a-ccfa-e479-9a3f7a26244a@acm.org>
-From:   Sandeep Dhavale <dhavale@google.com>
-Date:   Mon, 12 Jun 2023 11:34:25 -0700
-Message-ID: <CAB=BE-SmbYUcnKe-J6FF7Y30MOwturY=dqrP_buLhLvPR_fkrg@mail.gmail.com>
-Subject: Re: [PATCH v5 0/9] Support limits below the page size
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, jyescas@google.com,
-        mcgrof@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: LVM kernel lockup scenario during lvcreate
+To:     Jaco Kroon <jaco@uls.co.za>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
+Content-Language: en-US
+In-Reply-To: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 11:15=E2=80=AFAM Bart Van Assche <bvanassche@acm.or=
-g> wrote:
->
-> On 6/9/23 10:14, Sandeep Dhavale wrote:
-> > We have tested this series on Pixel 6 by applying to android common
-> > kernel at [0] successfully with 16K page size.
-> >
-> > Feel free to add
-> > Tested-by: Sandeep Dhavale <dhavale@google.com>
->
-> Thanks Sandeep for the testing. I assume that the Tested-by tag applies
-> to patches 1, 2, 3 and 6 of this series?
->
-That is correct Bart, those were the relevant patches for our testing
-with 16KB page size. Sorry, I should have been more clear.
+On 6/9/23 00:29, Jaco Kroon wrote:
+> I'm attaching dmesg -T and ps axf.  dmesg in particular may provide
+> clues as it provides a number of stack traces indicating stalling at
+> IO time.
+> 
+> Once this has triggered, even commands such as "lvs" goes into
+> uninterruptable wait, I unfortunately didn't test "dmsetup ls" now
+> and triggered a reboot already (system needs to be up).
+
+To me the call traces suggest that an I/O request got stuck. 
+Unfortunately call traces are not sufficient to identify the root cause 
+in case I/O gets stuck. Has debugfs been mounted? If so, how about 
+dumping the contents of /sys/kernel/debug/block/ into a tar file after 
+the lockup has been reproduced and sharing that information?
+
+tar -czf- -C /sys/kernel/debug/block . >block.tgz
 
 Thanks,
-Sandeep.
 
-> Thanks,
->
-> Bart.
+Bart.
