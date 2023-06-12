@@ -2,111 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8862BC77B7A
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 01:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EB9C77B7A
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 01:49:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbjFLBho (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Jun 2023 21:37:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51974 "EHLO
+        id S229897AbjFLBtL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Jun 2023 21:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbjFLBhn (ORCPT
+        with ESMTP id S229531AbjFLBtK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Jun 2023 21:37:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5763BC7
-        for <linux-block@vger.kernel.org>; Sun, 11 Jun 2023 18:36:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686533816;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YrQbBfCMruid3dvNA82sFQHqZr8uVfLOg59uBwIc3/c=;
-        b=GtXqoiYxpJGr6bV9nnuL0rY7iDHEPvSLcTDuja3p2eFIBdFdVXVezazwrqINGYG26/d31+
-        6uiGrFRNi0OVzBp7l9yik+QNLLzaTJnnCKAdrJ2YkVBb6smhUKuyflYo6v2GiMuQQICnvJ
-        Q9TpyGLYe7/lY5CUwRWYfBGJtA1JHC8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-92-9d73ADh_PcmrLuVMuf7Xug-1; Sun, 11 Jun 2023 21:36:51 -0400
-X-MC-Unique: 9d73ADh_PcmrLuVMuf7Xug-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F3FA1C03DB4;
-        Mon, 12 Jun 2023 01:36:51 +0000 (UTC)
-Received: from ovpn-8-23.pek2.redhat.com (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F48C2166B25;
-        Mon, 12 Jun 2023 01:36:45 +0000 (UTC)
-Date:   Mon, 12 Jun 2023 09:36:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, stable@vger.kernel.org,
-        Jay Shin <jaeshin@redhat.com>, Tejun Heo <tj@kernel.org>,
-        Waiman Long <longman@redhat.com>, mkoutny@suse.com,
-        Yosry Ahmed <yosryahmed@google.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V4] blk-cgroup: Flush stats before releasing blkcg_gq
-Message-ID: <ZIZ2qGXw7vrRB78e@ovpn-8-23.pek2.redhat.com>
-References: <20230609234249.1412858-1-ming.lei@redhat.com>
+        Sun, 11 Jun 2023 21:49:10 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E41CC12F
+        for <linux-block@vger.kernel.org>; Sun, 11 Jun 2023 18:49:08 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-25bdae05eb3so171337a91.0
+        for <linux-block@vger.kernel.org>; Sun, 11 Jun 2023 18:49:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686534548; x=1689126548;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5U8oyK5GvJhj4Ee7fdxDkvyVUsHqjfnF8NeWf8XxItU=;
+        b=wZzIkBfWdhXKPiGod3HcmD0cDSxEPRas9KTszL4STTlTfZlTsRmv6pdEnvO+csFkl/
+         zf6SElO3xUazy81wnZgHrwI3fEOhB8a/uD/t+65cR6Kt54uOesm/J56p75pflFVq6fmM
+         HDUcU3c11xYY9a4ehzxsdpN25kCE+WxLpXtKj+Ia8lHh/OUTKhTWWWxADyDoL73ut6ow
+         8icw/ui1OqIOLzRqDC4MfnUgLX9mAoIiCv9h431hWY+WdJTdJgDPqYZEPydvdAzWL/bm
+         cYPxsnrlRL9U5a56CyoQF2ICct8XFQPDRVLyBk5RjsFXa7DiCg+cM2+3aw3gpK//uGy/
+         +kig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686534548; x=1689126548;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5U8oyK5GvJhj4Ee7fdxDkvyVUsHqjfnF8NeWf8XxItU=;
+        b=LOeAarlkDtFQYKW+fKsUte1WeeZtaQYu765ISmGoKkGxWs2l2bCS/2n0i4eC0iOqPd
+         A+gNKuj4eK8KFswOJNPQqick1lb1us5y89UoS3xpO0LDHW/lI1Jn0Gw0WvFlmmsilfIL
+         qAYt8kVTGtaG5HIwY9YSqJkRJv3iab4Q2CIwc4YW2NigtwRis8E4ABl2ug22Ad7HK7ih
+         joL+UI8TCoq8sJZYVhKlfo1fjAtsoSnliLDmVmpqbGYlBkNkddAU6FQ2FPFx9ZQpRumA
+         hNbsPH7eJ70Xe+bQUY2JwDOHe7dzCaBmf+fJFkLq1fZ56M2FoiasQqAn+8jep5/o5X/m
+         CQ/Q==
+X-Gm-Message-State: AC+VfDyAAuUSN3cZLzywPjBwKM+wf5WJMyV2i97jrsYd/RbaHHHgs7Q3
+        xF09Q5fIBg/IZgQnQ1PM0JhYoaEz+2QRKALBZkg=
+X-Google-Smtp-Source: ACHHUZ7AXnDu72RnN78JE+qXYbIQxrIu3H5dvr0kG8IW3Nm78Nt3l4OSkMF61BfnNEstl7PoPwWtXw==
+X-Received: by 2002:a17:90b:3852:b0:25b:de63:f193 with SMTP id nl18-20020a17090b385200b0025bde63f193mr2420894pjb.4.1686534547697;
+        Sun, 11 Jun 2023 18:49:07 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 23-20020a17090a195700b0024e37e0a67dsm6802959pjh.20.2023.06.11.18.49.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Jun 2023 18:49:06 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     haris.iqbal@ionos.com, jinpu.wang@ionos.com,
+        Guoqing Jiang <guoqing.jiang@linux.dev>
+Cc:     linux-block@vger.kernel.org
+In-Reply-To: <20230524070026.2932-1-guoqing.jiang@linux.dev>
+References: <20230524070026.2932-1-guoqing.jiang@linux.dev>
+Subject: Re: [PATCH V2 0/8] misc patches for rnbd
+Message-Id: <168653454636.828148.3086329887965824145.b4-ty@kernel.dk>
+Date:   Sun, 11 Jun 2023 19:49:06 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230609234249.1412858-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 10, 2023 at 07:42:49AM +0800, Ming Lei wrote:
-> As noted by Michal, the blkg_iostat_set's in the lockless list hold
-> reference to blkg's to protect against their removal. Those blkg's
-> hold reference to blkcg. When a cgroup is being destroyed,
-> cgroup_rstat_flush() is only called at css_release_work_fn() which
-> is called when the blkcg reference count reaches 0. This circular
-> dependency will prevent blkcg and some blkgs from being freed after
-> they are made offline.
-> 
-> It is less a problem if the cgroup to be destroyed also has other
-> controllers like memory that will call cgroup_rstat_flush() which will
-> clean up the reference count. If block is the only controller that uses
-> rstat, these offline blkcg and blkgs may never be freed leaking more
-> and more memory over time.
-> 
-> To prevent this potential memory leak:
-> 
-> - flush blkcg per-cpu stats list in __blkg_release(), when no new stat
-> can be added
-> 
-> - add global blkg_stat_lock for covering concurrent parent blkg stat
-> update
-> 
-> - don't grab bio->bi_blkg reference when adding the stats into blkcg's
-> per-cpu stat list since all stats are guaranteed to be consumed before
-> releasing blkg instance, and grabbing blkg reference for stats was the
-> most fragile part of original patch
-> 
-> Based on Waiman's patch:
-> 
-> https://lore.kernel.org/linux-block/20221215033132.230023-3-longman@redhat.com/
-> 
-> Fixes: 3b8cc6298724 ("blk-cgroup: Optimize blkcg_rstat_flush()")
-> Cc: stable@vger.kernel.org
-> Reported-by: Jay Shin <jaeshin@redhat.com>
-> Acked-by: Tejun Heo <tj@kernel.org>
-> Cc: Waiman Long <longman@redhat.com>
-> Cc: mkoutny@suse.com
-> Cc: Yosry Ahmed <yosryahmed@google.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V4:
-> 	- add ack tag
 
-Hi Jens,
+On Wed, 24 May 2023 15:00:18 +0800, Guoqing Jiang wrote:
+> V2 changes:
+> 1. two patches are dropped
+> 2. collect tags from Jack
+> 3. replace "int mode" with "enum rnbd_access_mode" in the 3rd one
+> 
+> Hi,
+> 
+> [...]
 
-Waiman agrees with this approach too[1], can you make it in v6.4 if you
-are fine?
+Applied, thanks!
 
-[1] https://lore.kernel.org/linux-block/64f20e27-0927-334d-5414-9bb81d639cec@redhat.com/
+[1/8] block/rnbd: kill rnbd_flags_supported
+      commit: b0488411e919368014907850f74191d03e25f031
+[2/8] block/rnbd-srv: remove unused header
+      commit: 5783153ac67e20f65a402ef42237cd1a6d7fa320
+[3/8] block/rnbd: introduce rnbd_access_modes
+      commit: d6e94913cb1cb4b4d1d737f72b5cef10b13395ff
+[4/8] block/rnbd-srv: no need to check sess_dev
+      commit: ba2eed1cf8f08f1e5b1ba009ac22554f14d05342
+[5/8] block/rnbd-srv: rename one member in rnbd_srv_dev
+      commit: 3ecdbf91513511fae49eb0cfa9f39f690eb4fe11
+[6/8] block/rnbd-srv: init ret with 0 instead of -EPERM
+      commit: 6a12d5379508d530a73140fc7d5502551558ced5
+[7/8] block/rnbd-srv: init err earlier in rnbd_srv_init_module
+      commit: d3fc0b46642524bc8e38aed3c7f5e99742436495
+[8/8] block/rnbd-srv: make process_msg_sess_info returns void
+      commit: fece685cc7bbb5e1af89f891223c31c3bcc969f7
 
-Thanks,
-Ming
+Best regards,
+-- 
+Jens Axboe
+
+
 
