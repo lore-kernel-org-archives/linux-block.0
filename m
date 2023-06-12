@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDD1C7EE2E
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3714C88CB6
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:03:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239018AbjFLPDd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 11:03:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
+        id S239041AbjFLPDe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 11:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239183AbjFLPDY (ORCPT
+        with ESMTP id S239179AbjFLPDX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 11:03:24 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C661B3;
+        Mon, 12 Jun 2023 11:03:23 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CA2D1AD;
         Mon, 12 Jun 2023 08:03:22 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B1FA522824;
-        Mon, 12 Jun 2023 15:03:21 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C94EF1FDAB;
+        Mon, 12 Jun 2023 15:03:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1686582201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1686582200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JIjxpbkqThyyoQ2YYr55e0YiunAhTFrUIQj17ynnC6Q=;
-        b=n4M1gMw0jwEOjE3LfWYWukKOYPq2HjgowcRpCkvxt07f6pVGPrlTUvz75BAypCOx22F5eh
-        Iu3OrKpN3hCc/ZeRLCpKJs0aMVXSpWQTDfMcbZC8y5GpOU6ZXG2aYws1gFb+nlJGOkp56G
-        EmHPZ/VizMEfi1b3EiHvuo4aJ3BXEd8=
+        bh=dcQe94NHWKwEfD3MI7AnQAtuXjeqyhqnM1uaeyFHWSs=;
+        b=JqQGslZQVc8UnsMLM5Z1SRSIotcL65BqOYI6fVhBODEbbTsFpVi2BztCQEn+l6coYNULRd
+        DQnz3MhRPTBz2brexBOW0oqoZdrx8acJ/rtzjKudhFjVUxtRlc/NiKngcN/GtUjc0xaS7W
+        uTFP1ByYW4Ci9nY6TPo9rfNzV2RHzaI=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 51B3E138EC;
-        Mon, 12 Jun 2023 15:03:21 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 731AD138EC;
+        Mon, 12 Jun 2023 15:03:20 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id ePgOErkzh2RMMAAAMHmgww
-        (envelope-from <mwilck@suse.com>); Mon, 12 Jun 2023 15:03:21 +0000
+        id mDA2Grgzh2RMMAAAMHmgww
+        (envelope-from <mwilck@suse.com>); Mon, 12 Jun 2023 15:03:20 +0000
 From:   mwilck@suse.com
 To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>
 Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
         linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v4 3/6] scsi: merge scsi_internal_device_block() and device_block()
-Date:   Mon, 12 Jun 2023 17:03:06 +0200
-Message-Id: <20230612150309.18103-4-mwilck@suse.com>
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH v4 1/6] bsg: increase number of devices
+Date:   Mon, 12 Jun 2023 17:03:04 +0200
+Message-Id: <20230612150309.18103-2-mwilck@suse.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230612150309.18103-1-mwilck@suse.com>
 References: <20230612150309.18103-1-mwilck@suse.com>
@@ -59,92 +59,34 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Martin Wilck <mwilck@suse.com>
+From: Hannes Reinecke <hare@suse.de>
 
-scsi_internal_device_block() is only called from device_block().
-Merge the two functions, and call the result scsi_device_block(),
-as the name device_block() is confusingly generic.
+Larger setups may need to allocate more than 32k bsg devices, so
+increase the number of devices to the full range of minor device
+numbers.
 
+Signed-off-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Martin Wilck <mwilck@suse.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/scsi_lib.c | 27 ++++++++-------------------
- 1 file changed, 8 insertions(+), 19 deletions(-)
+ block/bsg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 496bdfc19c95..69fb7a9d8883 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2781,13 +2781,12 @@ int scsi_internal_device_block_nowait(struct scsi_device *sdev)
- EXPORT_SYMBOL_GPL(scsi_internal_device_block_nowait);
- 
- /**
-- * scsi_internal_device_block - try to transition to the SDEV_BLOCK state
-+ * scsi_device_block - try to transition to the SDEV_BLOCK state
-  * @sdev: device to block
-+ * @data: dummy argument, ignored
-  *
-  * Pause SCSI command processing on the specified device and wait until all
-- * ongoing scsi_request_fn() / scsi_queue_rq() calls have finished. May sleep.
-- *
-- * Returns zero if successful or a negative error code upon failure.
-+ * ongoing scsi_queue_rq() calls have finished. May sleep.
-  *
-  * Note:
-  * This routine transitions the device to the SDEV_BLOCK state (which must be
-@@ -2795,7 +2794,7 @@ EXPORT_SYMBOL_GPL(scsi_internal_device_block_nowait);
-  * is paused until the device leaves the SDEV_BLOCK state. See also
-  * scsi_internal_device_unblock().
-  */
--static int scsi_internal_device_block(struct scsi_device *sdev)
-+static void scsi_device_block(struct scsi_device *sdev, void *data)
- {
- 	int err;
- 
-@@ -2805,7 +2804,8 @@ static int scsi_internal_device_block(struct scsi_device *sdev)
- 		scsi_stop_queue(sdev, false);
- 	mutex_unlock(&sdev->state_mutex);
- 
--	return err;
-+	WARN_ONCE(err, "__scsi_internal_device_block_nowait(%s) failed: err = %d\n",
-+		  dev_name(&sdev->sdev_gendev), err);
+diff --git a/block/bsg.c b/block/bsg.c
+index 7eca43f33d7f..c53f24243bf2 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -36,7 +36,7 @@ static inline struct bsg_device *to_bsg_device(struct inode *inode)
  }
  
- /**
-@@ -2888,23 +2888,12 @@ static int scsi_internal_device_unblock(struct scsi_device *sdev,
- 	return ret;
- }
+ #define BSG_DEFAULT_CMDS	64
+-#define BSG_MAX_DEVS		32768
++#define BSG_MAX_DEVS		(1 << MINORBITS)
  
--static void
--device_block(struct scsi_device *sdev, void *data)
--{
--	int ret;
--
--	ret = scsi_internal_device_block(sdev);
--
--	WARN_ONCE(ret, "scsi_internal_device_block(%s) failed: ret = %d\n",
--		  dev_name(&sdev->sdev_gendev), ret);
--}
--
- static int
- target_block(struct device *dev, void *data)
- {
- 	if (scsi_is_target_device(dev))
- 		starget_for_each_device(to_scsi_target(dev), NULL,
--					device_block);
-+					scsi_device_block);
- 	return 0;
- }
- 
-@@ -2913,7 +2902,7 @@ scsi_target_block(struct device *dev)
- {
- 	if (scsi_is_target_device(dev))
- 		starget_for_each_device(to_scsi_target(dev), NULL,
--					device_block);
-+					scsi_device_block);
- 	else
- 		device_for_each_child(dev, NULL, target_block);
- }
+ static DEFINE_IDA(bsg_minor_ida);
+ static struct class *bsg_class;
 -- 
 2.40.1
 
