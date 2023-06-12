@@ -2,129 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC3FC88CB6
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 14:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D67C88CB6
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:03:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238284AbjFLOeA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 10:34:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43216 "EHLO
+        id S238932AbjFLPDc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 11:03:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238827AbjFLOdn (ORCPT
+        with ESMTP id S239175AbjFLPDX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 10:33:43 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D8910D9;
-        Mon, 12 Jun 2023 07:32:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=PwbnNapXRdevBF0hfE35KqBRaBpKqJIqHALduY4qOvE=; b=C7wViTvphkn9dIMtH5VQREhMUv
-        1+E8O8JuhmHiYk+T16MMJqF/5v+zETwS4qWgZQ13Iy3fitgN+Qsx70hNBOJcF3Z1ZrUcIS/ol7AHQ
-        E+wgpI0JDDsTgpeu07A5zlWT36Z2dhcbYcdjJMxUfz7cDnpognXwMNZmGzpoz1KO9VejzqKFfAxyS
-        AjqgPBwN1pR1bBUcDcvUSNZ4xL37g4gTaCk3BT6JU3ZTLCFXz6E2K7PmKBczz+eDYrBC596zadpdL
-        HNHKxVCFSCamSO+JSQsLkfdHzUYpwRIPqioTTKT8BKG1tlR/drnQiKyK2ajJ1DH+LA+ttEJeAM8Lb
-        KkA/wExw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8ib4-004JET-0R;
-        Mon, 12 Jun 2023 14:32:42 +0000
-Date:   Mon, 12 Jun 2023 07:32:42 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     axboe@kernel.dk, hch@infradead.org, corbet@lwn.net,
-        snitzer@kernel.org, viro@zeniv.linux.org.uk, brauner@kernel.org,
-        dchinner@redhat.com, willy@infradead.org, dlemoal@kernel.org,
-        linux@weissschuh.net, jack@suse.cz, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v5 00/11] blksnap - block devices snapshots module
-Message-ID: <ZIcsijGWeyk/FjHs@infradead.org>
-References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+        Mon, 12 Jun 2023 11:03:23 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6E0CC;
+        Mon, 12 Jun 2023 08:03:21 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 652E61FDAA;
+        Mon, 12 Jun 2023 15:03:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1686582200; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=4RRLF67QU9Cka1JulfEZOYPSL3pjhbA85Tmqle8Ma9k=;
+        b=r/ahxzOTTp91xlft6REYlge957cZ1laMQsCwBCxtLEhdHMZREnY1OuJVw7u61vFOJZXH6D
+        Eddj/UHlk6XCBb5nCamdUspU5i2M3CRrTeN0Gis+zYLyjDGsdDfFwfCH8beWvTCZuc+Ymy
+        nqvND375Nsq2hIOEN1s8xKaA5BziXAQ=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 03BE6138EC;
+        Mon, 12 Jun 2023 15:03:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id XGmuObczh2RMMAAAMHmgww
+        (envelope-from <mwilck@suse.com>); Mon, 12 Jun 2023 15:03:19 +0000
+From:   mwilck@suse.com
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v4 0/6] scsi: fixes for targets with many LUNs, and scsi_target_block rework
+Date:   Mon, 12 Jun 2023 17:03:03 +0200
+Message-Id: <20230612150309.18103-1-mwilck@suse.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230612135228.10702-1-sergei.shtepa@veeam.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I'm of course a little byassed by having spent a lot of my own time
-on this, but this version now looks ready to merge to me:
+From: Martin Wilck <mwilck@suse.com>
 
-Acked-by: Christoph Hellwig <hch@lst.de>
+This patch series addresses some issues we saw in a test setup
+with a large number of SCSI LUNs. The first two patches simply
+increase the number of available sg and bsg devices. 3-5 fix
+a large delay we encountered between blocking a Fibre Channel
+remote port and the dev_loss_tmo. 6 renames scsi_target_block()
+to scsi_block_targets(), and makes additional changes to this API,
+as suggested in the review of the v2 series.
 
-But as Jens just merged my series to reopen the open flag we'll also
-need to fold this in:
+Changes v3 -> v4:
+ - skipped 4/8: keep state_mutex held while quiescing queue (Bart van Assche),
+   added a comment in 4/6 to explain the rationale
+ - renamed scsi_target_block() to scsi_block_targets() (Christoph Hellwig), and
+   merged the previous patches 7/8 and 8/8 modifying this API into 6/6.
+ - rebased to latest mkp/queue branch
 
-diff --git a/drivers/block/blksnap/diff_area.c b/drivers/block/blksnap/diff_area.c
-index 169fa003b6d66d..0848c947591508 100644
---- a/drivers/block/blksnap/diff_area.c
-+++ b/drivers/block/blksnap/diff_area.c
-@@ -128,7 +128,7 @@ void diff_area_free(struct kref *kref)
- 	xa_destroy(&diff_area->chunk_map);
- 
- 	if (diff_area->orig_bdev) {
--		blkdev_put(diff_area->orig_bdev, FMODE_READ | FMODE_WRITE);
-+		blkdev_put(diff_area->orig_bdev, NULL);
- 		diff_area->orig_bdev = NULL;
- 	}
- 
-@@ -214,7 +214,8 @@ struct diff_area *diff_area_new(dev_t dev_id, struct diff_storage *diff_storage)
- 
- 	pr_debug("Open device [%u:%u]\n", MAJOR(dev_id), MINOR(dev_id));
- 
--	bdev = blkdev_get_by_dev(dev_id, FMODE_READ | FMODE_WRITE, NULL, NULL);
-+	bdev = blkdev_get_by_dev(dev_id, BLK_OPEN_READ | BLK_OPEN_WRITE, NULL,
-+				 NULL);
- 	if (IS_ERR(bdev)) {
- 		int err = PTR_ERR(bdev);
- 
-@@ -224,7 +225,7 @@ struct diff_area *diff_area_new(dev_t dev_id, struct diff_storage *diff_storage)
- 
- 	diff_area = kzalloc(sizeof(struct diff_area), GFP_KERNEL);
- 	if (!diff_area) {
--		blkdev_put(bdev, FMODE_READ | FMODE_WRITE);
-+		blkdev_put(bdev, NULL);
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
-diff --git a/drivers/block/blksnap/diff_storage.c b/drivers/block/blksnap/diff_storage.c
-index 1787fa6931a816..f3814474b9804a 100644
---- a/drivers/block/blksnap/diff_storage.c
-+++ b/drivers/block/blksnap/diff_storage.c
-@@ -123,7 +123,7 @@ void diff_storage_free(struct kref *kref)
- 	}
- 
- 	while ((storage_bdev = first_storage_bdev(diff_storage))) {
--		blkdev_put(storage_bdev->bdev, FMODE_READ | FMODE_WRITE);
-+		blkdev_put(storage_bdev->bdev, NULL);
- 		list_del(&storage_bdev->link);
- 		kfree(storage_bdev);
- 	}
-@@ -138,7 +138,7 @@ static struct block_device *diff_storage_add_storage_bdev(
- 	struct storage_bdev *storage_bdev, *existing_bdev = NULL;
- 	struct block_device *bdev;
- 
--	bdev = blkdev_get_by_path(bdev_path, FMODE_READ | FMODE_WRITE,
-+	bdev = blkdev_get_by_path(bdev_path, BLK_OPEN_READ | BLK_OPEN_WRITE,
- 				  NULL, NULL);
- 	if (IS_ERR(bdev)) {
- 		pr_err("Failed to open device. errno=%ld\n", PTR_ERR(bdev));
-@@ -153,14 +153,14 @@ static struct block_device *diff_storage_add_storage_bdev(
- 	spin_unlock(&diff_storage->lock);
- 
- 	if (existing_bdev->bdev == bdev) {
--		blkdev_put(bdev, FMODE_READ | FMODE_WRITE);
-+		blkdev_put(bdev, NULL);
- 		return existing_bdev->bdev;
- 	}
- 
- 	storage_bdev = kzalloc(sizeof(struct storage_bdev) +
- 			       strlen(bdev_path) + 1, GFP_KERNEL);
- 	if (!storage_bdev) {
--		blkdev_put(bdev, FMODE_READ | FMODE_WRITE);
-+		blkdev_put(bdev, NULL);
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
+Changes v2 -> v3:
+ - Split previous 3/3 into 4 separate patches as suggested by
+   Christoph Hellwig.
+ - Added 7/8 and 8/8, as suggested by Christoph and Bart van Assche.
+ - Added s-o-b and reviewed-by tags.
+
+Changes v1 -> v2:
+ - call blk_mq_wait_quiesce_done() from scsi_target_block() to
+   cover the case where BLK_MQ_F_BLOCKING is set (Bart van Assche)
+
+Hannes Reinecke (2):
+  bsg: increase number of devices
+  scsi: sg: increase number of devices
+
+Martin Wilck (4):
+  scsi: merge scsi_internal_device_block() and device_block()
+  scsi: don't wait for quiesce in scsi_stop_queue()
+  scsi: don't wait for quiesce in scsi_device_block()
+  scsi: replace scsi_target_block() by scsi_block_targets()
+
+ block/bsg.c                         |  2 +-
+ drivers/scsi/scsi_lib.c             | 76 ++++++++++++++---------------
+ drivers/scsi/scsi_transport_fc.c    |  2 +-
+ drivers/scsi/scsi_transport_iscsi.c |  3 +-
+ drivers/scsi/scsi_transport_srp.c   |  6 +--
+ drivers/scsi/sg.c                   |  2 +-
+ drivers/scsi/snic/snic_disc.c       |  2 +-
+ include/scsi/scsi_device.h          |  2 +-
+ 8 files changed, 46 insertions(+), 49 deletions(-)
+
+-- 
+2.40.1
+
