@@ -2,79 +2,132 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F098CC7EE2E
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 19:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 448D8C7EE43
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 20:25:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbjFLThJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 15:37:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58630 "EHLO
+        id S237424AbjFLUZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 16:25:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230302AbjFLThI (ORCPT
+        with ESMTP id S237126AbjFLUZ3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 15:37:08 -0400
-Received: from bagheera.iewc.co.za (unknown [IPv6:2c0f:f720:0:3::9a49:2249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E77B1
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 12:37:03 -0700 (PDT)
-Received: from [154.73.32.4] (helo=tauri.local.uls.co.za)
-        by bagheera.iewc.co.za with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <jaco@uls.co.za>)
-        id 1q8nL9-00087l-CZ; Mon, 12 Jun 2023 21:36:35 +0200
-Received: from [192.168.1.145]
-        by tauri.local.uls.co.za with esmtp (Exim 4.94.2)
-        (envelope-from <jaco@uls.co.za>)
-        id 1q8nL8-0007SU-J9; Mon, 12 Jun 2023 21:36:34 +0200
-Message-ID: <f60c64e0-cfac-53bd-b164-92387c6910cf@uls.co.za>
-Date:   Mon, 12 Jun 2023 21:36:33 +0200
+        Mon, 12 Jun 2023 16:25:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CE821BF
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:24:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686601479;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=S42fl/HoNEU97xotwFSAjJfWCsSnH9zjSpzpvH3McME=;
+        b=FVrCY6wJAl4btUHZV39tgLK0o9mP0JtRyqdefhoGAMYQDvYrLroSSYu4T6IiCDMzkbQiFV
+        65pfBrRBk0QnS+zOOaH8RFeucQQ21/xnawa8y95mifV4CusYJlY8GLueOAUgaRP+Ms45xE
+        IoH7emAjArzw79UuuuW+2HVvJnzkKKs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-139-xzVXP3XYOhqICv2yzeVXDA-1; Mon, 12 Jun 2023 16:24:38 -0400
+X-MC-Unique: xzVXP3XYOhqICv2yzeVXDA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 230618037AA;
+        Mon, 12 Jun 2023 20:24:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A51B12956;
+        Mon, 12 Jun 2023 20:24:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, David Hildenbrand <david@redhat.com>,
+        kernel test robot <oliver.sang@intel.com>
+cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: LVM kernel lockup scenario during lvcreate
-Content-Language: en-GB
-To:     Bart Van Assche <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
- <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
-From:   Jaco Kroon <jaco@uls.co.za>
-Organization: Ultimate Linux Solutions (Pty) Ltd
-In-Reply-To: <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <545462.1686601473.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 12 Jun 2023 21:24:33 +0100
+Message-ID: <545463.1686601473@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bart,
+    =
 
-On 2023/06/12 20:40, Bart Van Assche wrote:
-> On 6/9/23 00:29, Jaco Kroon wrote:
->> I'm attaching dmesg -T and ps axf.  dmesg in particular may provide
->> clues as it provides a number of stack traces indicating stalling at
->> IO time.
->>
->> Once this has triggered, even commands such as "lvs" goes into
->> uninterruptable wait, I unfortunately didn't test "dmsetup ls" now
->> and triggered a reboot already (system needs to be up).
->
-> To me the call traces suggest that an I/O request got stuck. 
-> Unfortunately call traces are not sufficient to identify the root 
-> cause in case I/O gets stuck. Has debugfs been mounted? If so, how 
-> about dumping the contents of /sys/kernel/debug/block/ into a tar file 
-> after the lockup has been reproduced and sharing that information?
+Fix dio_bio_alloc() to set BIO_PAGE_PINNED, not BIO_PAGE_REFFED, so that
+the bio code unpins the pinned pages rather than putting a ref on them.
 
-Looks to be mounted, at least I've got a /sys/kernel/debug/block/ folder 
-on the relevant server.
+The issue was causing:
 
->
-> tar -czf- -C /sys/kernel/debug/block . >block.tgz
+        WARNING: CPU: 6 PID: 2220 at mm/gup.c:76 try_get_folio
 
-Definitely can do, I'm not sure how to interpret the data in this - is 
-there anything specific you're looking for?  Would love to not just pass 
-the information on but also learn from this.
+This can be caused by creating a file on a loopback UDF filesystem, openin=
+g
+it O_DIRECT and making two writes to it from the same source buffer.
 
-Generally the lockup rate seem to be about once a week currently so I 
-expect (on average) to see this pop again some time over the weekend.
+Fixes: 1ccf164ec866 ("block: Use iov_iter_extract_pages() and page pinning=
+ in direct-io.c")
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202306120931.a9606b88-oliver.sang@i=
+ntel.com
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: David Hildenbrand <david@redhat.com>
+cc: Andrew Morton <akpm@linux-foundation.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: Jan Kara <jack@suse.cz>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Jason Gunthorpe <jgg@nvidia.com>
+cc: Logan Gunthorpe <logang@deltatee.com>
+cc: Hillf Danton <hdanton@sina.com>
+cc: Christian Brauner <brauner@kernel.org>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-block@vger.kernel.org
+cc: linux-kernel@vger.kernel.org
+cc: linux-mm@kvack.org
+---
 
-Kind regards,
-Jaco
+Notes:
+    ver #2)
+     - Remove comment on requiring references for all pages.
+
+ fs/direct-io.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/direct-io.c b/fs/direct-io.c
+index 14049204cac8..5d4c5be0fb41 100644
+--- a/fs/direct-io.c
++++ b/fs/direct-io.c
+@@ -414,8 +414,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio=
+,
+ 		bio->bi_end_io =3D dio_bio_end_aio;
+ 	else
+ 		bio->bi_end_io =3D dio_bio_end_io;
+-	/* for now require references for all pages */
+-	bio_set_flag(bio, BIO_PAGE_REFFED);
++	if (dio->need_unpin)
++		bio_set_flag(bio, BIO_PAGE_PINNED);
+ 	sdio->bio =3D bio;
+ 	sdio->logical_offset_in_bio =3D sdio->cur_page_fs_offset;
+ }
 
