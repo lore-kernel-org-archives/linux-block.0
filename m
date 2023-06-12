@@ -2,132 +2,125 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 448D8C7EE43
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 20:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 425E9C7EE2E
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 20:33:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237424AbjFLUZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 16:25:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50324 "EHLO
+        id S236013AbjFLUdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 16:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237126AbjFLUZ3 (ORCPT
+        with ESMTP id S229604AbjFLUdW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 16:25:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CE821BF
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:24:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686601479;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=S42fl/HoNEU97xotwFSAjJfWCsSnH9zjSpzpvH3McME=;
-        b=FVrCY6wJAl4btUHZV39tgLK0o9mP0JtRyqdefhoGAMYQDvYrLroSSYu4T6IiCDMzkbQiFV
-        65pfBrRBk0QnS+zOOaH8RFeucQQ21/xnawa8y95mifV4CusYJlY8GLueOAUgaRP+Ms45xE
-        IoH7emAjArzw79UuuuW+2HVvJnzkKKs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-139-xzVXP3XYOhqICv2yzeVXDA-1; Mon, 12 Jun 2023 16:24:38 -0400
-X-MC-Unique: xzVXP3XYOhqICv2yzeVXDA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 230618037AA;
-        Mon, 12 Jun 2023 20:24:37 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A51B12956;
-        Mon, 12 Jun 2023 20:24:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, David Hildenbrand <david@redhat.com>,
-        kernel test robot <oliver.sang@intel.com>
-cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
+        Mon, 12 Jun 2023 16:33:22 -0400
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BDEAE57
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:20 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1b3ce6607cbso13131875ad.2
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 13:33:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686601999; x=1689193999;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6gwlNlSludwmmwPw7ux9zT2qNHcHNp42Vd8OqQlYgis=;
+        b=g5+EcNibTG1BSUQyOnjOySD77nVsrHB6m/pEsTX9pTNwR/MA1kJnZoyJMTvY6YB4Go
+         nf+vS2bq+obRWxceEHke6w/Zw8iYiQR8pPgBZPw6XzhGjjvddCN6f6MbSr5+cr/sD71B
+         1hpnq1nLdp/fowxgBQl7byrTjpLnBuAUUAhevAnR5/RbdqjBLUQg8u6SzXdxTWZsxtjC
+         iTrs8NiX5ZAR+la6AXYUqli9VzHIxQI0FA70tyw92J3WJIac8qc8yq07usOPLVT9Dfi2
+         uVwxFHV0FxKzD1UW2FjPJai/QsHGD3pycVbgSdl0XNPhx88VgH430sqa0UTf79vFUFnR
+         vX4g==
+X-Gm-Message-State: AC+VfDxykdxd8m6Yt72dqTqa0P4kUoAkxBM3y2/ONbHJZFPDTl2x0ON5
+        cdrOR9u1R2k5Ux042dDaH0U=
+X-Google-Smtp-Source: ACHHUZ6H1OEPsiihuOoVGPymTNx+7jS/YLnJw5kqYWlFWCsTbRuFzfihu+DU19lgxjcork1HdGPL4A==
+X-Received: by 2002:a17:903:18e:b0:1b0:295b:f192 with SMTP id z14-20020a170903018e00b001b0295bf192mr7956443plg.3.1686601999282;
+        Mon, 12 Jun 2023 13:33:19 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b001b016313b1dsm3324767plb.86.2023.06.12.13.33.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jun 2023 13:33:18 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Sandeep Dhavale <dhavale@google.com>,
+        Juan Yescas <jyescas@google.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v6 0/8] Support limits below the page size
+Date:   Mon, 12 Jun 2023 13:33:06 -0700
+Message-Id: <20230612203314.17820-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <545462.1686601473.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 12 Jun 2023 21:24:33 +0100
-Message-ID: <545463.1686601473@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-    =
+Hi Jens,
 
-Fix dio_bio_alloc() to set BIO_PAGE_PINNED, not BIO_PAGE_REFFED, so that
-the bio code unpins the pinned pages rather than putting a ref on them.
+We want to improve Android performance by increasing the page size from 4 KiB
+to 16 KiB. However, some of the storage controllers we care about do not support
+DMA segments larger than 4 KiB. Hence the need support for DMA segments that are
+smaller than the size of one virtual memory page. This patch series implements
+that support. Please consider this patch series for the next merge window.
 
-The issue was causing:
+Thanks,
 
-        WARNING: CPU: 6 PID: 2220 at mm/gup.c:76 try_get_folio
+Bart.
 
-This can be caused by creating a file on a loopback UDF filesystem, openin=
-g
-it O_DIRECT and making two writes to it from the same source buffer.
+Changes compared to v5:
+- Rebased the entire series on top of the block layer for-next branch.
+- Dropped patch "block: Add support for small segments in blk_rq_map_user_iov()"
+  because that patch prepares for a patch that has already been dropped.
+- Modified a source code comment in patch 3/9 such that it fits in 80 columns.
 
-Fixes: 1ccf164ec866 ("block: Use iov_iter_extract_pages() and page pinning=
- in direct-io.c")
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202306120931.a9606b88-oliver.sang@i=
-ntel.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: Andrew Morton <akpm@linux-foundation.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jan Kara <jack@suse.cz>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Jason Gunthorpe <jgg@nvidia.com>
-cc: Logan Gunthorpe <logang@deltatee.com>
-cc: Hillf Danton <hdanton@sina.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-block@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-cc: linux-mm@kvack.org
----
+Changes compared to v4:
+- Fixed the debugfs patch such that the behavior for creating the block
+  debugfs directory is retained.
+- Made the description of patch "Support configuring limits below the page
+  size" more detailed. Split that patch into two patches.
+- Added patch "Use pr_info() instead of printk(KERN_INFO ...)".
 
-Notes:
-    ver #2)
-     - Remove comment on requiring references for all pages.
+Changes compared to v3:
+- Removed CONFIG_BLK_SUB_PAGE_SEGMENTS and QUEUE_FLAG_SUB_PAGE_SEGMENTS.
+  Replaced these by a new member in struct queue_limits and a static branch.
+- The static branch that controls whether or not sub-page limits are enabled
+  is set by the block layer core instead of by block drivers.
+- Dropped the patches that are no longer needed (SCSI core and UFS Exynos
+  driver).
 
- fs/direct-io.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes compared to v2:
+- For SCSI drivers, only set flag QUEUE_FLAG_SUB_PAGE_SEGMENTS if necessary.
+- In the scsi_debug patch, sorted kernel module parameters alphabetically.
+  Only set flag QUEUE_FLAG_SUB_PAGE_SEGMENTS if necessary.
+- Added a patch for the UFS Exynos driver that enables
+  CONFIG_BLK_SUB_PAGE_SEGMENTS if the page size exceeds 4 KiB.
 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 14049204cac8..5d4c5be0fb41 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -414,8 +414,8 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio=
-,
- 		bio->bi_end_io =3D dio_bio_end_aio;
- 	else
- 		bio->bi_end_io =3D dio_bio_end_io;
--	/* for now require references for all pages */
--	bio_set_flag(bio, BIO_PAGE_REFFED);
-+	if (dio->need_unpin)
-+		bio_set_flag(bio, BIO_PAGE_PINNED);
- 	sdio->bio =3D bio;
- 	sdio->logical_offset_in_bio =3D sdio->cur_page_fs_offset;
- }
+Changes compared to v1:
+- Added a CONFIG variable that controls whether or not small segment support
+  is enabled.
+- Improved patch descriptions.
+
+Bart Van Assche (8):
+  block: Use pr_info() instead of printk(KERN_INFO ...)
+  block: Prepare for supporting sub-page limits
+  block: Support configuring limits below the page size
+  block: Make sub_page_limit_queues available in debugfs
+  block: Support submitting passthrough requests with small segments
+  block: Add support for filesystem requests and small segments
+  scsi_debug: Support configuring the maximum segment size
+  null_blk: Support configuring the maximum segment size
+
+ block/blk-core.c                  |  4 ++
+ block/blk-map.c                   |  2 +-
+ block/blk-merge.c                 |  8 ++-
+ block/blk-mq-debugfs.c            |  9 +++
+ block/blk-mq-debugfs.h            |  6 ++
+ block/blk-mq.c                    |  2 +
+ block/blk-settings.c              | 91 +++++++++++++++++++++++++++----
+ block/blk.h                       | 39 +++++++++++--
+ drivers/block/null_blk/main.c     | 19 ++++++-
+ drivers/block/null_blk/null_blk.h |  1 +
+ drivers/scsi/scsi_debug.c         |  4 ++
+ include/linux/blkdev.h            |  2 +
+ 12 files changed, 163 insertions(+), 24 deletions(-)
 
