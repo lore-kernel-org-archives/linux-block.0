@@ -2,104 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0933C7EE45
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 10:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF06C7EE25
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 11:37:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235385AbjFLKtV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 06:49:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51470 "EHLO
+        id S232468AbjFLLhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 07:37:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235513AbjFLKsv (ORCPT
+        with ESMTP id S232651AbjFLLgj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 06:48:51 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F0F7D88;
-        Mon, 12 Jun 2023 03:33:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 12 Jun 2023 07:36:39 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0153C1708;
+        Mon, 12 Jun 2023 04:15:24 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D218623F0;
-        Mon, 12 Jun 2023 10:33:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32083C4339B;
-        Mon, 12 Jun 2023 10:33:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1686565986;
-        bh=3g1ezkSeNovKyNA/mYRnkKvsFp4NaVHgDIm4yL0ohA8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QtmF08sghYmBDd9UBshT23jBK1ILZr+o1F+BzTsat6Kh+D+hwS07zeGzWc+edA010
-         03/fwA7fAbgXeqHHvJSp2BcVCUL9dNVuvYiJs9URhXmRK2LBv8BJfHvzwngUe6T8sf
-         pyEhx0P9U7ChM2QNKh45nGdF6zke6xHWOqgQeMh8=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     stable@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        patches@lists.linux.dev, Martin Liska <mliska@suse.cz>,
-        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-Subject: [PATCH 5.10 08/68] block/blk-iocost (gcc13): keep large values in a new enum
-Date:   Mon, 12 Jun 2023 12:26:00 +0200
-Message-ID: <20230612101658.811733055@linuxfoundation.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230612101658.437327280@linuxfoundation.org>
-References: <20230612101658.437327280@linuxfoundation.org>
-User-Agent: quilt/0.67
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B633A1FED7;
+        Mon, 12 Jun 2023 11:15:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1686568523; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uV8gfOHNoty7LIUzvG3FLkKQz6YIw9I8wGaNW/Cgnfk=;
+        b=OjaFRAHXVApnkEoO+JYsE9j80+6hp3FBWMCcwPOdIXv0aunL35c1c/13RZNLKilZacUEK6
+        gxT3sZseyPYCjK6a6hevn8FLpzULDxJ963v3inja8c/zqoDuNL0bLnyem8LJ1yDV89KDgB
+        VbBHLQZc0bUitn4hnmrtOn+gZzK596Q=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 56C8F138EC;
+        Mon, 12 Jun 2023 11:15:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id zt5mE0v+hmSJQQAAMHmgww
+        (envelope-from <mwilck@suse.com>); Mon, 12 Jun 2023 11:15:23 +0000
+Message-ID: <2bfdb9a65668109c204f7d4677bd717f049b1e83.camel@suse.com>
+Subject: Re: [PATCH v3 4/8] scsi: call scsi_stop_queue() without state_mutex
+ held
+From:   Martin Wilck <mwilck@suse.com>
+To:     Mike Christie <michael.christie@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Date:   Mon, 12 Jun 2023 13:15:22 +0200
+In-Reply-To: <dcef340d-0b43-42d3-0e1c-a96cd90283d3@oracle.com>
+References: <20230607182249.22623-1-mwilck@suse.com>
+         <20230607182249.22623-5-mwilck@suse.com>
+         <3b8b13bf-a458-827a-b916-07d7eee8ae00@acm.org>
+         <50cb1a5bd501721d7c816b1ca8bf560daa8e3cc9.camel@suse.com>
+         <ff669f59e3c42e5dec4920d705e2b8748ad600d5.camel@suse.com>
+         <20230608054444.GB11554@lst.de>
+         <5be7eebb-f734-1a0a-9f97-1b3534bc26ac@acm.org>
+         <dcef340d-0b43-42d3-0e1c-a96cd90283d3@oracle.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+On Thu, 2023-06-08 at 13:54 -0500, Mike Christie wrote:
+> On 6/8/23 9:12 AM, Bart Van Assche wrote:
+> > On 6/7/23 22:44, Christoph Hellwig wrote:
+> > > > > Thanks. This wasn't obvious to me from the current code. I'll
+> > > > > add a
+> > > > > comment in the next version.
+> > > >=20
+> > > > The crucial question is now, is it sufficient to call
+> > > > blk_mq_quiesce_queue_nowait() under the mutex, or does the call
+> > > > to
+> > > > blk_mq_wait_quiesce_done() have to be under the mutex, too?
+> > > > The latter would actually kill off our attempt to fix the delay
+> > > > in fc_remote_port_delete() that was caused by repeated
+> > > > synchronize_rcu() calls.
+> > > >=20
+> > > > But if I understand you correctly, moving the wait out of the
+> > > > mutex
+> > > > should be ok. I'll update the series accordingly.
+> > >=20
+> > > I can't think of a reason we'd want to lock over the wait, but
+> > > Bart
+> > > knows this code way better than I do.
+> >=20
+> > Unless deep changes would be made in the block layer
+> > blk_mq_quiesce_queue_nowait() and/or blk_mq_wait_quiesce_done()
+> > functions, moving blk_mq_wait_quiesce_done() outside the critical
+> > section seems fine to me.
+>=20
+> If it helps, I tested with iscsi and the mutex changes discussed
+> above
+> and it worked ok for me.
 
-commit ff1cc97b1f4c10db224f276d9615b22835b8c424 upstream.
+I guess the race that Bart was hinting at is hard to trigger.
 
-Since gcc13, each member of an enum has the same type as the enum [1]. And
-that is inherited from its members. Provided:
-  VTIME_PER_SEC_SHIFT     = 37,
-  VTIME_PER_SEC           = 1LLU << VTIME_PER_SEC_SHIFT,
-  ...
-  AUTOP_CYCLE_NSEC        = 10LLU * NSEC_PER_SEC,
-the named type is unsigned long.
+I would like to remark that the fact that we need to hold the SCSI
+state_mutex while calling blk_mq_quiesce_queue_nowait() looks like a
+layering issue to me. Not sure if, and how, this could be avoided,
+though.
 
-This generates warnings with gcc-13:
-  block/blk-iocost.c: In function 'ioc_weight_prfill':
-  block/blk-iocost.c:3037:37: error: format '%u' expects argument of type 'unsigned int', but argument 4 has type 'long unsigned int'
-
-  block/blk-iocost.c: In function 'ioc_weight_show':
-  block/blk-iocost.c:3047:34: error: format '%u' expects argument of type 'unsigned int', but argument 3 has type 'long unsigned int'
-
-So split the anonymous enum with large values to a separate enum, so
-that they don't affect other members.
-
-[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36113
-
-Cc: Martin Liska <mliska@suse.cz>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Josef Bacik <josef@toxicpanda.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: cgroups@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-Link: https://lore.kernel.org/r/20221213120826.17446-1-jirislaby@kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- block/blk-iocost.c |    2 ++
- 1 file changed, 2 insertions(+)
-
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -232,7 +232,9 @@ enum {
- 
- 	/* 1/64k is granular enough and can easily be handled w/ u32 */
- 	WEIGHT_ONE		= 1 << 16,
-+};
- 
-+enum {
- 	/*
- 	 * As vtime is used to calculate the cost of each IO, it needs to
- 	 * be fairly high precision.  For example, it should be able to
-
+Regards
+Martin
 
