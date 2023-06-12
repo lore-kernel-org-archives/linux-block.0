@@ -2,82 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D559AC88CB2
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 19:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 512EFC88CB8
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 19:04:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236337AbjFLTAi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 15:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39230 "EHLO
+        id S237693AbjFLTEG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 15:04:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235117AbjFLTAg (ORCPT
+        with ESMTP id S233694AbjFLTEE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 15:00:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0694CB7
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 11:59:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686596390;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RdqrcPQ7BBl4ytQNpaqxmu9LSFYsD/XjC2NBSLHQ2VA=;
-        b=i2OVGaCtUmu4n4k5K0Cy6TEZTNbswCP2JF6wh8MqbwhVzvmU5c9TW3otcjBGhXTsARBhkK
-        y8XgRfAKzdBn98kXUjwP1JzSZ9wgZRaunX00u+Qhacnb30mpCYBsLqbw/0DHwB+/duxchI
-        EHOqJgmCz46/LijRiuy+VWGegrhtcKc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-41-KoHFH9iyOfC9QeDV-WPW4w-1; Mon, 12 Jun 2023 14:59:44 -0400
-X-MC-Unique: KoHFH9iyOfC9QeDV-WPW4w-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C83D3C0ED5C;
-        Mon, 12 Jun 2023 18:59:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E033B492C38;
-        Mon, 12 Jun 2023 18:59:40 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <f50b438f-90bc-36b1-c943-18d7a4b3f441@redhat.com>
-References: <f50b438f-90bc-36b1-c943-18d7a4b3f441@redhat.com> <431929.1686588681@warthog.procyon.org.uk>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        kernel test robot <oliver.sang@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
+        Mon, 12 Jun 2023 15:04:04 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067F8AD
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 12:04:03 -0700 (PDT)
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35CGWNtB015907
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 12:04:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=4cT2BB79av4X2m47c8QSpy8GnjpJdMG3CuizmFlgZO8=;
+ b=nVhZS5GTwOR5q65Hqd/gN4IUHb/PLTqxRyHiFtLmMw8bKDr7UjdzDjoeBFiUVnIdKJpB
+ CElO1+eJMInK/yshDVVSTHDKVRyHTpNGCrCexhfA+6JcYCfMK4ZeCBXrPR0a02k/MjT0
+ gp0uwz2eZ1NoUT9ot8NDGOcwtgXYGn6cHkWHUo2xVdWtlk07JIg8Il2jWoNjmXJijth+
+ suNZZDTMYz9+iUAl1oWIMlP4V+5Jcr/Yw4oL0Ph+uDyKo72SZGA3mFG7PlBAdIDe88ez
+ D75363Thj+2oM8r05ge5x8cHrXJmkbnHZx030bIGSuECRRfv7vPNl4+axGWjmaU9IqXz bw== 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3r5xf14cs9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 12:04:02 -0700
+Received: from twshared35445.38.frc1.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a8:82::d) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Mon, 12 Jun 2023 12:04:01 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id E58CA19FA77A0; Mon, 12 Jun 2023 12:03:44 -0700 (PDT)
+From:   Keith Busch <kbusch@meta.com>
+To:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <hch@lst.de>, <axboe@kernel.dk>
+CC:     <sagi@grimberg.me>, <joshi.k@samsung.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv3 0/2] enhanced nvme uring command polling
+Date:   Mon, 12 Jun 2023 12:03:41 -0700
+Message-ID: <20230612190343.2087040-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <513560.1686596380.1@warthog.procyon.org.uk>
-Date:   Mon, 12 Jun 2023 19:59:40 +0100
-Message-ID: <513561.1686596380@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 99h-niE7T7YwVb8AozRabeeeHyieqASl
+X-Proofpoint-GUID: 99h-niE7T7YwVb8AozRabeeeHyieqASl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
+ definitions=2023-06-12_14,2023-06-12_02,2023-05-22_02
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Hildenbrand <david@redhat.com> wrote:
+From: Keith Busch <kbusch@kernel.org>
 
-> >   	/* for now require references for all pages */
-> 
-> Does the comment still hold?
+Changes from previous version:
 
-Actually, no.
+  Fixex botched merge compiler bug (kernel test robot)
 
-David
+  Added reviews
+
+Keith Busch (2):
+  block: add request polling helper
+  nvme: improved uring polling
+
+ block/blk-mq.c                | 48 ++++++++++++++++--------
+ drivers/nvme/host/ioctl.c     | 70 ++++++++++-------------------------
+ drivers/nvme/host/multipath.c |  2 +-
+ drivers/nvme/host/nvme.h      |  2 -
+ include/linux/blk-mq.h        |  2 +
+ include/uapi/linux/io_uring.h |  2 +
+ 6 files changed, 56 insertions(+), 70 deletions(-)
+
+--=20
+2.34.1
 
