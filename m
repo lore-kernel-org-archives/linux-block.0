@@ -2,114 +2,91 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF06C7EE25
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 11:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA15C7EE25
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 12:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232468AbjFLLhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 07:37:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52752 "EHLO
+        id S233650AbjFLM0p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 08:26:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232651AbjFLLgj (ORCPT
+        with ESMTP id S229541AbjFLM0o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 07:36:39 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0153C1708;
-        Mon, 12 Jun 2023 04:15:24 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B633A1FED7;
-        Mon, 12 Jun 2023 11:15:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1686568523; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Mon, 12 Jun 2023 08:26:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5CBB114
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 05:26:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686572761;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uV8gfOHNoty7LIUzvG3FLkKQz6YIw9I8wGaNW/Cgnfk=;
-        b=OjaFRAHXVApnkEoO+JYsE9j80+6hp3FBWMCcwPOdIXv0aunL35c1c/13RZNLKilZacUEK6
-        gxT3sZseyPYCjK6a6hevn8FLpzULDxJ963v3inja8c/zqoDuNL0bLnyem8LJ1yDV89KDgB
-        VbBHLQZc0bUitn4hnmrtOn+gZzK596Q=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=tTMhvLLlxLduku60kqh9t4hhU2KGCMkQO9qTJKYmDvE=;
+        b=R8KYLgos4qvJwdjnlXTsKGUW664IAn57250CaNpFr6uEvwbf2cunOShycwBAh7j7Siiims
+        cv2au+3tq5lIHiqG63ADTRcQd+W1dWLL03HtnHzkDgwi7/50ZOLB2qCPRKG7/7R2SAxAz6
+        nqf0gzVkFdSSa6AN90x1L7SP2EXwEZo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-30-AynBElupPJ6WiOJw2BAedg-1; Mon, 12 Jun 2023 08:25:57 -0400
+X-MC-Unique: AynBElupPJ6WiOJw2BAedg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 56C8F138EC;
-        Mon, 12 Jun 2023 11:15:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id zt5mE0v+hmSJQQAAMHmgww
-        (envelope-from <mwilck@suse.com>); Mon, 12 Jun 2023 11:15:23 +0000
-Message-ID: <2bfdb9a65668109c204f7d4677bd717f049b1e83.camel@suse.com>
-Subject: Re: [PATCH v3 4/8] scsi: call scsi_stop_queue() without state_mutex
- held
-From:   Martin Wilck <mwilck@suse.com>
-To:     Mike Christie <michael.christie@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-Date:   Mon, 12 Jun 2023 13:15:22 +0200
-In-Reply-To: <dcef340d-0b43-42d3-0e1c-a96cd90283d3@oracle.com>
-References: <20230607182249.22623-1-mwilck@suse.com>
-         <20230607182249.22623-5-mwilck@suse.com>
-         <3b8b13bf-a458-827a-b916-07d7eee8ae00@acm.org>
-         <50cb1a5bd501721d7c816b1ca8bf560daa8e3cc9.camel@suse.com>
-         <ff669f59e3c42e5dec4920d705e2b8748ad600d5.camel@suse.com>
-         <20230608054444.GB11554@lst.de>
-         <5be7eebb-f734-1a0a-9f97-1b3534bc26ac@acm.org>
-         <dcef340d-0b43-42d3-0e1c-a96cd90283d3@oracle.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.1 
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDEEC3C11C67;
+        Mon, 12 Jun 2023 12:25:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 023222026833;
+        Mon, 12 Jun 2023 12:25:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <202306121557.2d17019b-oliver.sang@intel.com>
+References: <202306121557.2d17019b-oliver.sang@intel.com>
+To:     kernel test robot <oliver.sang@intel.com>
+Cc:     dhowells@redhat.com, oe-lkp@lists.linux.dev, lkp@intel.com,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <brauner@kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        David Hildenbrand <david@redhat.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-btrfs@vger.kernel.org,
+        ecryptfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        linux-ext4@vger.kernel.org, cluster-devel@redhat.com,
+        linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
+        ocfs2-devel@oss.oracle.com,
+        linux-karma-devel@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org, ying.huang@intel.com,
+        feng.tang@intel.com, fengwei.yin@intel.com
+Subject: Re: [linux-next:master] [splice] 2cb1e08985: stress-ng.sendfile.ops_per_sec 11.6% improvement
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <105868.1686572748.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 12 Jun 2023 13:25:48 +0100
+Message-ID: <105869.1686572748@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2023-06-08 at 13:54 -0500, Mike Christie wrote:
-> On 6/8/23 9:12 AM, Bart Van Assche wrote:
-> > On 6/7/23 22:44, Christoph Hellwig wrote:
-> > > > > Thanks. This wasn't obvious to me from the current code. I'll
-> > > > > add a
-> > > > > comment in the next version.
-> > > >=20
-> > > > The crucial question is now, is it sufficient to call
-> > > > blk_mq_quiesce_queue_nowait() under the mutex, or does the call
-> > > > to
-> > > > blk_mq_wait_quiesce_done() have to be under the mutex, too?
-> > > > The latter would actually kill off our attempt to fix the delay
-> > > > in fc_remote_port_delete() that was caused by repeated
-> > > > synchronize_rcu() calls.
-> > > >=20
-> > > > But if I understand you correctly, moving the wait out of the
-> > > > mutex
-> > > > should be ok. I'll update the series accordingly.
-> > >=20
-> > > I can't think of a reason we'd want to lock over the wait, but
-> > > Bart
-> > > knows this code way better than I do.
-> >=20
-> > Unless deep changes would be made in the block layer
-> > blk_mq_quiesce_queue_nowait() and/or blk_mq_wait_quiesce_done()
-> > functions, moving blk_mq_wait_quiesce_done() outside the critical
-> > section seems fine to me.
->=20
-> If it helps, I tested with iscsi and the mutex changes discussed
-> above
-> and it worked ok for me.
+kernel test robot <oliver.sang@intel.com> wrote:
 
-I guess the race that Bart was hinting at is hard to trigger.
+> kernel test robot noticed a 11.6% improvement of stress-ng.sendfile.ops_=
+per_sec on:
 
-I would like to remark that the fact that we need to hold the SCSI
-state_mutex while calling blk_mq_quiesce_queue_nowait() looks like a
-layering issue to me. Not sure if, and how, this could be avoided,
-though.
+If it's sending to a socket, this is entirely feasible.  The
+splice_to_socket() function now sends multiple pages in one go to the netw=
+ork
+protocol's sendmsg() method to process instead of using sendpage to send o=
+ne
+page at a time.
 
-Regards
-Martin
+David
 
