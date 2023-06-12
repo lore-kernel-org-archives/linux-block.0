@@ -2,89 +2,180 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDA2C7EE2E
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 04:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E93C7EE23
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 07:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231735AbjFLD77 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Jun 2023 23:59:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
+        id S234846AbjFLHnO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 03:43:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231603AbjFLD76 (ORCPT
+        with ESMTP id S234982AbjFLHnM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Jun 2023 23:59:58 -0400
-Received: from mail-ua1-x92a.google.com (mail-ua1-x92a.google.com [IPv6:2607:f8b0:4864:20::92a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE3318B;
-        Sun, 11 Jun 2023 20:59:57 -0700 (PDT)
-Received: by mail-ua1-x92a.google.com with SMTP id a1e0cc1a2514c-78cd0c63ae2so94294241.1;
-        Sun, 11 Jun 2023 20:59:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686542396; x=1689134396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h5eFbd9HFD/KRz0+XmRiub04jDxZ5/25uC97kTShMpE=;
-        b=EHyikn5gRvV78mN0YYf4xUPtAFpwRdYAhXIgBhQsen9zlXyZa6YQlQUu4I0VWvmJh+
-         dhWeExCKRXcTldPlqkBujT4S8hYN9S3Jbd0cMP3UHAxhFpCvnWUtHmMlhjd82cWzsGvU
-         Qb7ARehRdVdQqDwwsuvnhXh3B4toJX9+XvVg9hyMHUdMnCY5RWns/MKwcvTSzaHC+A5z
-         LGWo7zNB0SZBqKipj0F/4Pdmq3YHlJiRJAryzsQ/uZsCXKixJBKSxVNWgBYySL2p8hyI
-         XG2M96nT6JkeIkwNK/tgbq9u68or6XC76h7ZdsAV4l8TrLv8iVPvQyw7+G8nKpB+6EsB
-         ZRJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686542396; x=1689134396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h5eFbd9HFD/KRz0+XmRiub04jDxZ5/25uC97kTShMpE=;
-        b=O29izzM6VWi3MIrt9LuOqD2CTZj8NvvtlC6b/4dkY1fO8JY53wJ3Lm91+oDx9A1muw
-         fdTxacKpCx7giw5aNhJfUVVef68mb9+0EiiW8VIBW//e+DyMPZw8o730gQlAWPUV0BhG
-         sWjXLX2OasTjkUtTAMuTG4hLJ9tiwha0yW35z5AuQTZ7331fe2CUIPXdAMQa3isZgRUs
-         c3MitrJ7FoiFgFQW1CdpwAygMEBB+RDK8Nt/4jX0I/MskH9as4bgcSpt8FauuHViY8jD
-         NjqeBbNeSPOY68zTqQD4HaiyF1e++8P4Qgqg41osxRtTtu6GDTu9R6didb2UsQAV2c10
-         sOQQ==
-X-Gm-Message-State: AC+VfDysFHCOwwuhuOPxZjBQccTrVLIs1TWsMpqlyt7p6K6NIInipxnI
-        3yLZTQj+Qnnq3f6w2Cz20ESqFjArNyr+MW0SN+Y=
-X-Google-Smtp-Source: ACHHUZ6USzvroyFg92cZrS7qO9IxCrPShW1dFdqmI83KF4j0hqeLShP/3gCnfuLWhWbnhcZB+F5Mz/kUXDkjrqKPDPY=
-X-Received: by 2002:a67:f906:0:b0:43b:2630:477 with SMTP id
- t6-20020a67f906000000b0043b26300477mr2660495vsq.5.1686542395803; Sun, 11 Jun
- 2023 20:59:55 -0700 (PDT)
+        Mon, 12 Jun 2023 03:43:12 -0400
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564AA170B;
+        Mon, 12 Jun 2023 00:42:37 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Vku1XZA_1686555663;
+Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0Vku1XZA_1686555663)
+          by smtp.aliyun-inc.com;
+          Mon, 12 Jun 2023 15:41:04 +0800
+From:   Jingbo Xu <jefflexu@linux.alibaba.com>
+To:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, tianjia.zhang@linux.alibaba.com,
+        xiang@kernel.org, casey@schaufler-ca.com
+Subject: [PATCH v2] block: fine-granular CAP_SYS_ADMIN for Persistent Reservation ioctl
+Date:   Mon, 12 Jun 2023 15:41:03 +0800
+Message-Id: <20230612074103.4866-1-jefflexu@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
-References: <000000000000da4f6b05eb9bf593@google.com> <000000000000c0951105fde12435@google.com>
- <20230612033023.GA16241@lst.de>
-In-Reply-To: <20230612033023.GA16241@lst.de>
-From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Mon, 12 Jun 2023 12:59:39 +0900
-Message-ID: <CAKFNMomCUnaB3_3chQm4P8devx2NwAp2hMpYfbyaHKyO2WLEkw@mail.gmail.com>
-Subject: Re: [syzbot] [nilfs?] general protection fault in nilfs_clear_dirty_page
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     syzbot <syzbot+53369d11851d8f26735c@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, dsterba@suse.com, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        wqu@suse.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 12, 2023 at 12:30=E2=80=AFPM Christoph Hellwig wrote:
->
-> On Sun, Jun 11, 2023 at 02:18:29PM -0700, syzbot wrote:
-> > syzbot has bisected this issue to:
-> >
-> > commit 4a445b7b6178d88956192c0202463063f52e8667
-> > Author: Qu Wenruo <wqu@suse.com>
-> > Date:   Sat Aug 13 08:06:53 2022 +0000
-> >
-> >     btrfs: don't merge pages into bio if their page offset is not conti=
-guous
->
-> I can't see how that btrfs commit would affect nilfs2..
+Allow of unprivileged Persistent Reservation (PR) operations on devices
+if the write permission check on the device node has passed.
 
-Yeah, I think this bisection result is wrong.
-I have already posted a bug-fix patch titled "nilfs2: prevent general
-protection fault in nilfs_clear_dirty_page()"
-for this issue.
+Besides, refuse the unprivileged PR operations on partitions as
+reservations on partitions doesn't make sense.
 
-Thanks,
-Ryusuke Konishi
+Signed-off-by: Jingbo Xu <jefflexu@linux.alibaba.com>
+---
+changes since RFC:
+- only allow unprivileged reservations if the file descriptor is open
+  for write (Christoph Hellwig)
+- refuse the unprivileged reservations on partitions (Christoph Hellwig)
+  (maybe this checking shall also be done when CAP_SYS_ADMIN is set?)
+
+RFC: https://lore.kernel.org/all/20230609102122.118800-1-jefflexu@linux.alibaba.com/
+---
+ block/ioctl.c | 48 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 32 insertions(+), 16 deletions(-)
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 9c5f637ff153..420dc4701f9c 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -254,13 +254,29 @@ int blkdev_compat_ptr_ioctl(struct block_device *bdev, fmode_t mode,
+ EXPORT_SYMBOL(blkdev_compat_ptr_ioctl);
+ #endif
+ 
+-static int blkdev_pr_register(struct block_device *bdev,
++static bool blkdev_pr_allowed(struct block_device *bdev, fmode_t mode)
++{
++	if (capable(CAP_SYS_ADMIN))
++		return true;
++
++	/* no sense to make reservations for partitions */
++	if (bdev_is_partition(bdev))
++		return false;
++
++	/*
++	 * Only allow unprivileged reservations if the file descriptor is open
++	 * for writing.
++	 */
++	return mode & FMODE_WRITE;
++}
++
++static int blkdev_pr_register(struct block_device *bdev, fmode_t mode,
+ 		struct pr_registration __user *arg)
+ {
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_registration reg;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
++	if (!blkdev_pr_allowed(bdev, mode))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_register)
+ 		return -EOPNOTSUPP;
+@@ -272,13 +288,13 @@ static int blkdev_pr_register(struct block_device *bdev,
+ 	return ops->pr_register(bdev, reg.old_key, reg.new_key, reg.flags);
+ }
+ 
+-static int blkdev_pr_reserve(struct block_device *bdev,
++static int blkdev_pr_reserve(struct block_device *bdev, fmode_t mode,
+ 		struct pr_reservation __user *arg)
+ {
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_reservation rsv;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
++	if (!blkdev_pr_allowed(bdev, mode))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_reserve)
+ 		return -EOPNOTSUPP;
+@@ -290,13 +306,13 @@ static int blkdev_pr_reserve(struct block_device *bdev,
+ 	return ops->pr_reserve(bdev, rsv.key, rsv.type, rsv.flags);
+ }
+ 
+-static int blkdev_pr_release(struct block_device *bdev,
++static int blkdev_pr_release(struct block_device *bdev, fmode_t mode,
+ 		struct pr_reservation __user *arg)
+ {
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_reservation rsv;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
++	if (!blkdev_pr_allowed(bdev, mode))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_release)
+ 		return -EOPNOTSUPP;
+@@ -308,13 +324,13 @@ static int blkdev_pr_release(struct block_device *bdev,
+ 	return ops->pr_release(bdev, rsv.key, rsv.type);
+ }
+ 
+-static int blkdev_pr_preempt(struct block_device *bdev,
++static int blkdev_pr_preempt(struct block_device *bdev, fmode_t mode,
+ 		struct pr_preempt __user *arg, bool abort)
+ {
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_preempt p;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
++	if (!blkdev_pr_allowed(bdev, mode))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_preempt)
+ 		return -EOPNOTSUPP;
+@@ -326,13 +342,13 @@ static int blkdev_pr_preempt(struct block_device *bdev,
+ 	return ops->pr_preempt(bdev, p.old_key, p.new_key, p.type, abort);
+ }
+ 
+-static int blkdev_pr_clear(struct block_device *bdev,
++static int blkdev_pr_clear(struct block_device *bdev, fmode_t mode,
+ 		struct pr_clear __user *arg)
+ {
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_clear c;
+ 
+-	if (!capable(CAP_SYS_ADMIN))
++	if (!blkdev_pr_allowed(bdev, mode))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_clear)
+ 		return -EOPNOTSUPP;
+@@ -534,17 +550,17 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case BLKTRACETEARDOWN:
+ 		return blk_trace_ioctl(bdev, cmd, argp);
+ 	case IOC_PR_REGISTER:
+-		return blkdev_pr_register(bdev, argp);
++		return blkdev_pr_register(bdev, mode, argp);
+ 	case IOC_PR_RESERVE:
+-		return blkdev_pr_reserve(bdev, argp);
++		return blkdev_pr_reserve(bdev, mode, argp);
+ 	case IOC_PR_RELEASE:
+-		return blkdev_pr_release(bdev, argp);
++		return blkdev_pr_release(bdev, mode, argp);
+ 	case IOC_PR_PREEMPT:
+-		return blkdev_pr_preempt(bdev, argp, false);
++		return blkdev_pr_preempt(bdev, mode, argp, false);
+ 	case IOC_PR_PREEMPT_ABORT:
+-		return blkdev_pr_preempt(bdev, argp, true);
++		return blkdev_pr_preempt(bdev, mode, argp, true);
+ 	case IOC_PR_CLEAR:
+-		return blkdev_pr_clear(bdev, argp);
++		return blkdev_pr_clear(bdev, mode, argp);
+ 	default:
+ 		return -ENOIOCTLCMD;
+ 	}
+-- 
+2.19.1.6.gb485710b
+
