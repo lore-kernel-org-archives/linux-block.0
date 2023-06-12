@@ -2,220 +2,614 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 527EAC88CB8
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB96BC88CB4
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 15:05:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239106AbjFLPDh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 11:03:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
+        id S230331AbjFLPFW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 11:05:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239204AbjFLPDZ (ORCPT
+        with ESMTP id S237650AbjFLPFV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 11:03:25 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EAF5186;
-        Mon, 12 Jun 2023 08:03:24 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 1DEEF2282D;
-        Mon, 12 Jun 2023 15:03:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1686582203; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z17y6TnSyJ/5qmpSAhVX+KctQTEdoiLh6ukFOT1911I=;
-        b=lfec0NuNOSVYomsGJ8Rs3mf4DzZAawVJWzgvVLXNmGp9Mtgv4v3eMrks6EkoF+AZL9yDUC
-        oyqeTrPaRdr+1GO+i603+cT6IoH/TXGiNIBtlFu8/r9bVp4sJnGKaYSIqWnZWtajtGgxFO
-        TYVKFayNdThjnb/5pSEorgxzGm5QYW0=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5698138EC;
-        Mon, 12 Jun 2023 15:03:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id EPNxJrozh2RMMAAAMHmgww
-        (envelope-from <mwilck@suse.com>); Mon, 12 Jun 2023 15:03:22 +0000
-From:   mwilck@suse.com
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>,
-        Karan Tilak Kumar <kartilak@cisco.com>,
-        Sesidhar Baddela <sebaddel@cisco.com>
-Subject: [PATCH v4 6/6] scsi: replace scsi_target_block() by scsi_block_targets()
-Date:   Mon, 12 Jun 2023 17:03:09 +0200
-Message-Id: <20230612150309.18103-7-mwilck@suse.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230612150309.18103-1-mwilck@suse.com>
-References: <20230612150309.18103-1-mwilck@suse.com>
+        Mon, 12 Jun 2023 11:05:21 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5CF1B3
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 08:05:09 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4f619c2ba18so4986184e87.1
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 08:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686582308; x=1689174308;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8UID8H1ujoYRgO0p+bWdKckV7P3/rZg4rHUWf5ScJio=;
+        b=eNFEpNewuhaMeXLFWje18KM3cm+S0IT4U5By9h+7E8rNkDy5HgdLbx6u2mJ3dochuF
+         waL3XxOZG4sgO29tB7e/TN/dRWQ29kxeEZ2lThsQr952sv4AAR++dzeG6nKz3Dy9ruw5
+         35GK/cQKNWzLrV59UtUj4eqBKXAwOaQEl3SHz9jKqISjX7hgE2B3ke8NZJVAUOcRQOXw
+         kiERd7jzVenupOmmr3AWGloHxP1dZ1oRS6GG8YlHFhBClPjqrNlraO/QgXmyxze4b0sV
+         8AiI/MwDAHmcCO6M1yr4gIp/FGPAgQa8Ncma/BoQqdkSXJdKyjgUT6R1xqJnOezI5tS/
+         xSfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686582308; x=1689174308;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8UID8H1ujoYRgO0p+bWdKckV7P3/rZg4rHUWf5ScJio=;
+        b=DKHdvCnGb/2re7aHB3DzBpuxf90UgnEBEAXd+F/IZAs2fnCY/8Eceqt6hXm5uHsgW6
+         IMDhnJEoauNc9EdD7tiJc1ABVhPK220nwPx8oQ5jIQVIccxZy23xrMGf0ccoWZq24vGo
+         xERHkyjTHbsNHfRwen2iQJ8VTOQpKQQl3y1VL6ta7so4N+IxNv643Qo1znqQlkL3gPB5
+         xE6rNdBaHOSuYL4FIl8ELycW1gRfIAckFQwxP4wmyfRQGQodxfsVgUg4Dz+kY7ejgM/t
+         lAaM5RP4q23xYGUVDmOuDidH9p04mOtx4gICiIPCl3qoj3dSrC/I1ms/6rc9EmsA4ziF
+         ePEA==
+X-Gm-Message-State: AC+VfDyXdPKmUhNPTtKiAK+SMLh8jLgy2HvOxVUUQQYTnl6fD7tdkNt2
+        JsCqU2/pkh3eaTPIYXxWB++L9KAXYM3SAmqNdUX1iETI23U=
+X-Google-Smtp-Source: ACHHUZ5rgb34SSnAnWspYm6/e0LAjmovQC6YjuTv1gVZbkU2O0OVezH4NrpAhKz3NrO6sUT4oYVYIrpXUpZOyduzXM0=
+X-Received: by 2002:a2e:300f:0:b0:2a9:f114:f168 with SMTP id
+ w15-20020a2e300f000000b002a9f114f168mr2882405ljw.46.1686582307627; Mon, 12
+ Jun 2023 08:05:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <BN9PR11MB53545DD1516BFA0FB23F95458353A@BN9PR11MB5354.namprd11.prod.outlook.com>
+ <CAFNWusa7goyDs1HaMVYDvvXT7ePfB7cAQt3EewT+t=-kKNf5eg@mail.gmail.com>
+ <BN9PR11MB535433DFB3A1CFAD097C13278353A@BN9PR11MB5354.namprd11.prod.outlook.com>
+ <BN9PR11MB53545EDF64FC43EF8854D0628350A@BN9PR11MB5354.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB53545EDF64FC43EF8854D0628350A@BN9PR11MB5354.namprd11.prod.outlook.com>
+From:   Suwan Kim <suwan.kim027@gmail.com>
+Date:   Tue, 13 Jun 2023 00:04:56 +0900
+Message-ID: <CAFNWusbqh97L-x2KhR3eWC9p6xQQevzmV4Fz-3OLMy8gG5-KWQ@mail.gmail.com>
+Subject: Re: virtio-blk: support completion batching for the IRQ path - failure
+To:     "Roberts, Martin" <martin.roberts@intel.com>
+Cc:     "mst@redhat.com" <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Martin Wilck <mwilck@suse.com>
+Hi Martin,
 
-All callers (fc_remote_port_delete(), __iscsi_block_session(),
-__srp_start_tl_fail_timers(), srp_reconnect_rport(), snic_tgt_del()) pass
-parent devices of scsi_target devices to scsi_target_block().
+I'm trying to reproduce the issue but in my machine, IO hang doesn't happen=
+.
+I attached upto 16 disk images to vm and set various vCPU number and
+memory size (3~16 vCPU, 2~8GB RAM)
+Could you let me know your VM settings?
 
-Rename the function to scsi_block_targets(), and simplify it by assuming
-that it is always passed a parent device. Also, have callers pass the
-Scsi_Host pointer to scsi_block_targets(), as every caller has this pointer
-readily available.
+And in order to know if the IO hang is triggered by driver,
+Could you please share a log when IO hang happens?
+You can get a log for each /dev/vd* with below command
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Martin Wilck <mwilck@suse.com>
-Cc: Karan Tilak Kumar <kartilak@cisco.com>
-Cc: Sesidhar Baddela <sebaddel@cisco.com>
----
- drivers/scsi/scsi_lib.c             | 25 +++++++++++++++----------
- drivers/scsi/scsi_transport_fc.c    |  2 +-
- drivers/scsi/scsi_transport_iscsi.c |  3 ++-
- drivers/scsi/scsi_transport_srp.c   |  6 +++---
- drivers/scsi/snic/snic_disc.c       |  2 +-
- include/scsi/scsi_device.h          |  2 +-
- 6 files changed, 23 insertions(+), 17 deletions(-)
+cd /sys/kernel/debug/block/[test_device] && find . -type f -exec grep
+-aH . {} \;
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 183f29705af7..8305e8160791 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2895,20 +2895,25 @@ target_block(struct device *dev, void *data)
- 	return 0;
- }
- 
-+/**
-+ * scsi_block_targets - transition all SCSI child devices to SDEV_BLOCK state
-+ * @dev: a parent device of one or more scsi_target devices
-+ * @shost: the Scsi_Host to which this device belongs
-+ *
-+ * Iterate over all children of @dev, which should be scsi_target devices,
-+ * and switch all subordinate scsi devices to SDEV_BLOCK state. Wait for
-+ * ongoing scsi_queue_rq() calls to finish. May sleep.
-+ *
-+ * Note:
-+ * @dev must not itself be a scsi_target device.
-+ */
- void
--scsi_target_block(struct device *dev)
-+scsi_block_targets(struct device *dev, struct Scsi_Host *shost)
- {
--	struct Scsi_Host *shost = dev_to_shost(dev);
--
--	if (scsi_is_target_device(dev))
--		starget_for_each_device(to_scsi_target(dev), NULL,
--					scsi_device_block);
--	else
--		device_for_each_child(dev, NULL, target_block);
--
-+	device_for_each_child(dev, NULL, target_block);
- 	blk_mq_wait_quiesce_done(&shost->tag_set);
- }
--EXPORT_SYMBOL_GPL(scsi_target_block);
-+EXPORT_SYMBOL_GPL(scsi_block_targets);
- 
- static void
- device_unblock(struct scsi_device *sdev, void *data)
-diff --git a/drivers/scsi/scsi_transport_fc.c b/drivers/scsi/scsi_transport_fc.c
-index 64ff2629eaf9..7fd90b51a7e6 100644
---- a/drivers/scsi/scsi_transport_fc.c
-+++ b/drivers/scsi/scsi_transport_fc.c
-@@ -3451,7 +3451,7 @@ fc_remote_port_delete(struct fc_rport  *rport)
- 
- 	spin_unlock_irqrestore(shost->host_lock, flags);
- 
--	scsi_target_block(&rport->dev);
-+	scsi_block_targets(&rport->dev, shost);
- 
- 	/* see if we need to kill io faster than waiting for device loss */
- 	if ((rport->fast_io_fail_tmo != -1) &&
-diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
-index b9b97300e3b3..0a64ea20f71c 100644
---- a/drivers/scsi/scsi_transport_iscsi.c
-+++ b/drivers/scsi/scsi_transport_iscsi.c
-@@ -1943,13 +1943,14 @@ static void __iscsi_block_session(struct work_struct *work)
- 	struct iscsi_cls_session *session =
- 			container_of(work, struct iscsi_cls_session,
- 				     block_work);
-+	struct Scsi_Host *shost = iscsi_session_to_shost(session);
- 	unsigned long flags;
- 
- 	ISCSI_DBG_TRANS_SESSION(session, "Blocking session\n");
- 	spin_lock_irqsave(&session->lock, flags);
- 	session->state = ISCSI_SESSION_FAILED;
- 	spin_unlock_irqrestore(&session->lock, flags);
--	scsi_target_block(&session->dev);
-+	scsi_block_targets(&session->dev, shost);
- 	ISCSI_DBG_TRANS_SESSION(session, "Completed SCSI target blocking\n");
- 	if (session->recovery_tmo >= 0)
- 		queue_delayed_work(session->workq,
-diff --git a/drivers/scsi/scsi_transport_srp.c b/drivers/scsi/scsi_transport_srp.c
-index 87d0fb8dc503..787b1a487e51 100644
---- a/drivers/scsi/scsi_transport_srp.c
-+++ b/drivers/scsi/scsi_transport_srp.c
-@@ -396,7 +396,7 @@ static void srp_reconnect_work(struct work_struct *work)
- }
- 
- /*
-- * scsi_target_block() must have been called before this function is
-+ * scsi_block_targets() must have been called before this function is
-  * called to guarantee that no .queuecommand() calls are in progress.
-  */
- static void __rport_fail_io_fast(struct srp_rport *rport)
-@@ -480,7 +480,7 @@ static void __srp_start_tl_fail_timers(struct srp_rport *rport)
- 	    srp_rport_set_state(rport, SRP_RPORT_BLOCKED) == 0) {
- 		pr_debug("%s new state: %d\n", dev_name(&shost->shost_gendev),
- 			 rport->state);
--		scsi_target_block(&shost->shost_gendev);
-+		scsi_block_targets(&shost->shost_gendev, shost);
- 		if (fast_io_fail_tmo >= 0)
- 			queue_delayed_work(system_long_wq,
- 					   &rport->fast_io_fail_work,
-@@ -548,7 +548,7 @@ int srp_reconnect_rport(struct srp_rport *rport)
- 		 * later is ok though, scsi_internal_device_unblock_nowait()
- 		 * treats SDEV_TRANSPORT_OFFLINE like SDEV_BLOCK.
- 		 */
--		scsi_target_block(&shost->shost_gendev);
-+		scsi_block_targets(&shost->shost_gendev, shost);
- 	res = rport->state != SRP_RPORT_LOST ? i->f->reconnect(rport) : -ENODEV;
- 	pr_debug("%s (state %d): transport.reconnect() returned %d\n",
- 		 dev_name(&shost->shost_gendev), rport->state, res);
-diff --git a/drivers/scsi/snic/snic_disc.c b/drivers/scsi/snic/snic_disc.c
-index 8fbf3c1b1311..f81abeccc386 100644
---- a/drivers/scsi/snic/snic_disc.c
-+++ b/drivers/scsi/snic/snic_disc.c
-@@ -214,7 +214,7 @@ snic_tgt_del(struct work_struct *work)
- 		scsi_flush_work(shost);
- 
- 	/* Block IOs on child devices, stops new IOs */
--	scsi_target_block(&tgt->dev);
-+	scsi_block_targets(&tgt->dev, shost);
- 
- 	/* Cleanup IOs */
- 	snic_tgt_scsi_abort_io(tgt);
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index b2cdb078b7bd..b31ec356e8f5 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -456,7 +456,7 @@ extern void scsi_scan_target(struct device *parent, unsigned int channel,
- 			     unsigned int id, u64 lun,
- 			     enum scsi_scan_mode rescan);
- extern void scsi_target_reap(struct scsi_target *);
--extern void scsi_target_block(struct device *);
-+extern void scsi_block_targets(struct device *dev, struct Scsi_Host *shost);
- extern void scsi_target_unblock(struct device *, enum scsi_device_state);
- extern void scsi_remove_target(struct device *);
- extern const char *scsi_device_state_name(enum scsi_device_state);
--- 
-2.40.1
+Regards,
+Suwan Kim
 
+
+On Thu, Jun 8, 2023 at 7:16=E2=80=AFPM Roberts, Martin <martin.roberts@inte=
+l.com> wrote:
+>
+> The rq_affinity change does not resolve the issue; just reduces its occur=
+rence rate; I am still seeing hangs with it set to 2.
+>
+> Martin
+>
+>
+>
+> From: Roberts, Martin
+> Sent: Wednesday, June 7, 2023 3:46 PM
+> To: Suwan Kim <suwan.kim027@gmail.com>
+> Cc: mst@redhat.com; virtualization <virtualization@lists.linux-foundation=
+.org>; linux-block@vger.kernel.org
+> Subject: RE: virtio-blk: support completion batching for the IRQ path - f=
+ailure
+>
+>
+>
+> It is the change indicated that breaks it - changing the IRQ handling to =
+batching.
+>
+>
+>
+>
+>
+>
+>
+> From reports such as,
+>
+> [PATCH 1/1] blk-mq: added case for cpu offline during send_ipi in rq_comp=
+lete (kernel.org)
+>
+> [RFC] blk-mq: Don't IPI requests on PREEMPT_RT - Patchwork (linaro.org)
+>
+>
+>
+> I=E2=80=99m thinking the issue has something to do with which CPU the IRQ=
+ is running on.
+>
+>
+>
+> So, I set,
+>
+> # echo 2 > /sys/block/vda/queue/rq_affinity
+>
+> # echo 2 > /sys/block/vdb/queue/rq_affinity
+>
+> =E2=80=A6
+>
+> # echo 2 > /sys/block/vdp/queue/rq_affinity
+>
+>
+>
+>
+>
+> and the system (running 16 disks, 4 queues/disk) has not yet hung (runnin=
+g OK for several hours)=E2=80=A6
+>
+>
+>
+> Martin
+>
+>
+>
+> -----Original Message-----
+> From: Suwan Kim <suwan.kim027@gmail.com>
+> Sent: Wednesday, June 7, 2023 3:21 PM
+> To: Roberts, Martin <martin.roberts@intel.com>
+> Cc: mst@redhat.com; virtualization <virtualization@lists.linux-foundation=
+.org>; linux-block@vger.kernel.org
+> Subject: Re: virtio-blk: support completion batching for the IRQ path - f=
+ailure
+>
+>
+>
+> On Wed, Jun 7, 2023 at 6:14=E2=80=AFPM Roberts, Martin <martin.roberts@in=
+tel.com> wrote:
+>
+> >
+>
+> > Re: virtio-blk: support completion batching for the IRQ path =C2=B7 tor=
+valds/linux@07b679f =C2=B7 GitHub
+>
+> >
+>
+> > Signed-off-by: Suwan Kim suwan.kim027@gmail.com
+>
+> >
+>
+> > Signed-off-by: Michael S. Tsirkin mst@redhat.com
+>
+> >
+>
+> >
+>
+> >
+>
+> >
+>
+> >
+>
+> > This change appears to have broken things=E2=80=A6
+>
+> >
+>
+> > We now see applications hanging during disk accesses.
+>
+> >
+>
+> > e.g.
+>
+> >
+>
+> > multi-port virtio-blk device running in h/w (FPGA)
+>
+> >
+>
+> > Host running a simple =E2=80=98fio=E2=80=98 test.
+>
+> >
+>
+> > [global]
+>
+> >
+>
+> > thread=3D1
+>
+> >
+>
+> > direct=3D1
+>
+> >
+>
+> > ioengine=3Dlibaio
+>
+> >
+>
+> > norandommap=3D1
+>
+> >
+>
+> > group_reporting=3D1
+>
+> >
+>
+> > bs=3D4K
+>
+> >
+>
+> > rw=3Dread
+>
+> >
+>
+> > iodepth=3D128
+>
+> >
+>
+> > runtime=3D1
+>
+> >
+>
+> > numjobs=3D4
+>
+> >
+>
+> > time_based
+>
+> >
+>
+> > [job0]
+>
+> >
+>
+> > filename=3D/dev/vda
+>
+> >
+>
+> > [job1]
+>
+> >
+>
+> > filename=3D/dev/vdb
+>
+> >
+>
+> > [job2]
+>
+> >
+>
+> > filename=3D/dev/vdc
+>
+> >
+>
+> > ...
+>
+> >
+>
+> > [job15]
+>
+> >
+>
+> > filename=3D/dev/vdp
+>
+> >
+>
+> >
+>
+> >
+>
+> > i.e. 16 disks; 4 queues per disk; simple burst of 4KB reads
+>
+> >
+>
+> > This is repeatedly run in a loop.
+>
+> >
+>
+> >
+>
+> >
+>
+> > After a few, normally <10 seconds, fio hangs.
+>
+> >
+>
+> > With 64 queues (16 disks), failure occurs within a few seconds; with 8 =
+queues (2 disks) it may take ~hour before hanging.
+>
+> >
+>
+> > Last message:
+>
+> >
+>
+> > fio-3.19
+>
+> >
+>
+> > Starting 8 threads
+>
+> >
+>
+> > Jobs: 1 (f=3D1): [_(7),R(1)][68.3%][eta 03h:11m:06s]
+>
+> >
+>
+> > I think this means at the end of the run 1 queue was left incomplete.
+>
+> >
+>
+> >
+>
+> >
+>
+> > =E2=80=98diskstats=E2=80=99 (run while fio is hung) shows no outstandin=
+g transactions.
+>
+> >
+>
+> > e.g.
+>
+> >
+>
+> > $ cat /proc/diskstats
+>
+> >
+>
+> > ...
+>
+> >
+>
+> > 252       0 vda 1843140071 0 14745120568 712568645 0 0 0 0 0 3117947 71=
+2568645 0 0 0 0 0 0
+>
+> >
+>
+> > 252      16 vdb 1816291511 0 14530332088 704905623 0 0 0 0 0 3117711 70=
+4905623 0 0 0 0 0 0
+>
+> >
+>
+> > ...
+>
+> >
+>
+> >
+>
+> >
+>
+> > Other stats (in the h/w, and added to the virtio-blk driver ([a]virtio_=
+queue_rq(), [b]virtblk_handle_req(), [c]virtblk_request_done()) all agree, =
+and show every request had a completion, and that virtblk_request_done() ne=
+ver gets called.
+>
+> >
+>
+> > e.g.
+>
+> >
+>
+> > PF=3D 0                         vq=3D0           1           2         =
+  3
+>
+> >
+>
+> > [a]request_count     -   839416590   813148916   105586179    84988123
+>
+> >
+>
+> > [b]completion1_count -   839416590   813148916   105586179    84988123
+>
+> >
+>
+> > [c]completion2_count -           0           0           0           0
+>
+> >
+>
+> >
+>
+> >
+>
+> > PF=3D 1                         vq=3D0           1           2         =
+  3
+>
+> >
+>
+> > [a]request_count     -   823335887   812516140   104582672    75856549
+>
+> >
+>
+> > [b]completion1_count -   823335887   812516140   104582672    75856549
+>
+> >
+>
+> > [c]completion2_count -           0           0           0           0
+>
+> >
+>
+> >
+>
+> >
+>
+> > i.e. the issue is after the virtio-blk driver.
+>
+> >
+>
+> >
+>
+> >
+>
+> >
+>
+> >
+>
+> > This change was introduced in kernel 6.3.0.
+>
+> >
+>
+> > I am seeing this using 6.3.3.
+>
+> >
+>
+> > If I run with an earlier kernel (5.15), it does not occur.
+>
+> >
+>
+> > If I make a simple patch to the 6.3.3 virtio-blk driver, to skip the bl=
+k_mq_add_to_batch()call, it does not fail.
+>
+> >
+>
+> > e.g.
+>
+> >
+>
+> > kernel 5.15 =E2=80=93 this is OK
+>
+> >
+>
+> > virtio_blk.c,virtblk_done() [irq handler]
+>
+> >
+>
+> >                  if (likely(!blk_should_fake_timeout(req->q))) {
+>
+> >
+>
+> >                           blk_mq_complete_request(req);
+>
+> >
+>
+> >                  }
+>
+> >
+>
+> >
+>
+> >
+>
+> > kernel 6.3.3 =E2=80=93 this fails
+>
+> >
+>
+> > virtio_blk.c,virtblk_handle_req() [irq handler]
+>
+> >
+>
+> >                  if (likely(!blk_should_fake_timeout(req->q))) {
+>
+> >
+>
+> >                           if (!blk_mq_complete_request_remote(req)) {
+>
+> >
+>
+> >                                   if (!blk_mq_add_to_batch(req, iob, vi=
+rtblk_vbr_status(vbr), virtblk_complete_batch)) {
+>
+> >
+>
+> >                                            virtblk_request_done(req);  =
+  //this never gets called... so blk_mq_add_to_batch() must always succeed
+>
+> >
+>
+> >                                    }
+>
+> >
+>
+> >                           }
+>
+> >
+>
+> >                  }
+>
+> >
+>
+> >
+>
+> >
+>
+> > If I do, kernel 6.3.3 =E2=80=93 this is OK
+>
+> >
+>
+> > virtio_blk.c,virtblk_handle_req() [irq handler]
+>
+> >
+>
+> >                  if (likely(!blk_should_fake_timeout(req->q))) {
+>
+> >
+>
+> >                           if (!blk_mq_complete_request_remote(req)) {
+>
+> >
+>
+> >                                    virtblk_request_done(req); //force t=
+his here...
+>
+> >
+>
+> >                                   if (!blk_mq_add_to_batch(req, iob, vi=
+rtblk_vbr_status(vbr), virtblk_complete_batch)) {
+>
+> >
+>
+> >                                            virtblk_request_done(req);  =
+  //this never gets called... so blk_mq_add_to_batch() must always succeed
+>
+> >
+>
+> >                                    }
+>
+> >
+>
+> >                           }
+>
+> >
+>
+> >                  }
+>
+> >
+>
+> >
+>
+> >
+>
+> >
+>
+> >
+>
+> > Perhaps you might like to fix/test/revert this change=E2=80=A6
+>
+> >
+>
+> > Martin
+>
+> >
+>
+> >
+>
+>
+>
+> Hi Martin,
+>
+>
+>
+> There are many changes between 6.3.0 and 6.3.3.
+>
+> Could you try to find a commit which triggers the io hang?
+>
+> Is it ok with 6.3.0 kernel or with reverting
+>
+> "virtio-blk: support completion batching for the IRQ path" commit?
+>
+>
+>
+> We need to confirm which commit is causing the error.
+>
+>
+>
+> Regards,
+>
+> Suwan Kim
