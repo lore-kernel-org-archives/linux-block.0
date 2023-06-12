@@ -2,605 +2,170 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA309C88CB4
-	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 13:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDC5C88CB4
+	for <linux-block@archiver.kernel.org>; Mon, 12 Jun 2023 14:11:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230274AbjFLN4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 09:56:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41968 "EHLO
+        id S237093AbjFLOLw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 10:11:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236880AbjFLNyc (ORCPT
+        with ESMTP id S237047AbjFLOLv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 09:54:32 -0400
-Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875EF1985;
-        Mon, 12 Jun 2023 06:54:05 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id E4D5D41C8E;
-        Mon, 12 Jun 2023 09:54:02 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx2-2022; t=1686578043;
-        bh=yaq/4FsG/2MuXFGrk8IZIIpm2ljp3ayFKai9wzNOGBU=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=Ma0+2HKlulpf9ZvuKGVFnsT96nH7WEZ8+QzpF7vvjudCpfP0YJwJr7iN0V8uW4eX2
-         LEi3UIgIJGL+xURcpxidAcs/f+tF+HAsqNmJ4bxN8NI9JwFhI0mlIMNN+Ey2cyidLN
-         EsWqyYy1Y7Tf5P+ovUYKCMyk4NaOvL946pXp8XZER5L0dOrtZwx2o47R2VhEJgTumA
-         raV/hciMjKA/x7aRSd27suCivxiYumioIVnhYEKe/At6pFyaCMyhYXiamVHlrSWX85
-         iC83FUj190yk+aa14UyTcckXd+DVQsUjsGTxdGcFuB1/bpNPB1+meGjwMbD8TpU2kD
-         Tp9HhihGzrlzA==
-Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
- prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Mon, 12 Jun 2023 15:54:01 +0200
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     <axboe@kernel.dk>, <hch@infradead.org>, <corbet@lwn.net>,
-        <snitzer@kernel.org>
-CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <dchinner@redhat.com>, <willy@infradead.org>, <dlemoal@kernel.org>,
-        <linux@weissschuh.net>, <jack@suse.cz>, <ming.lei@redhat.com>,
-        <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <sergei.shtepa@veeam.com>
-Subject: [PATCH v5 05/11] blksnap: module management interface functions
-Date:   Mon, 12 Jun 2023 15:52:22 +0200
-Message-ID: <20230612135228.10702-6-sergei.shtepa@veeam.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230612135228.10702-1-sergei.shtepa@veeam.com>
-References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+        Mon, 12 Jun 2023 10:11:51 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927CE10C4
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 07:11:48 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id ca18e2360f4ac-7748ca56133so36785339f.0
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 07:11:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686579108; x=1689171108;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4muTChvfXbyFleywXuJztp663UoDJyd/b1njxzLhqy8=;
+        b=sLZGHozVNiyKe7ZdVW/Izn1P7sgaQShCFq8nFxDEUw2HPGtUJB2+ZAyPMlipviAeTp
+         k3uQ8FI/e0eQenGUZnHNrzUL6Ik3G0IXm+GRBayvvLbMzgaY+UXyhfCpD4GOrVPEdTJv
+         IcIkIA09lG9xzyFYUO5JzJkmOBfAprST6Rp9IHrO/jxkuWSRx8pvHMOooqILGwgI/Lo6
+         1VEW0UpTP7V9T32ew0hLYFEC4JqpDUjaCB9j68pNjawpUBhqZ7JS8ocpEabGbvX3LMxh
+         84vjMA0Z3WUKqubPW8wvoXypai5o3n5GNzihnbK3f7nqUGYlTvpK/lKsx4hWnhA+HiQE
+         ZgZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686579108; x=1689171108;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4muTChvfXbyFleywXuJztp663UoDJyd/b1njxzLhqy8=;
+        b=Eik2LghIMEzM8nJcetSMxz4lhgDxWoE0RFxQkCv9SO2WaSLjycRlDVIIOsRRs53MgD
+         X10pmpvriuK21juX3dRVRXhJASlgZcfpAoEc4jDu8PNHKZWUZkAK2cREO/CGNeGo4zgs
+         uH/VAl8GqCQAWnaCG+XF1YjFGEKQAiyn1poVWv1zONQ+GaITkKxjuasdta6b970i877q
+         ytiviX+qD+uzgWRoaqaN009X56hLzBGA0N9eLgaF9rLBBCVz8W4QcZsVVeeGzgSaV6nf
+         oxSbP/hybPc/7uqe+TnF/ZWwr5v9HXXpB6PrQDa1BH+wC72yW4P9Pf//cNYVk8RRYHXY
+         XAwQ==
+X-Gm-Message-State: AC+VfDyugPXjFGfRWeeNrz00lqbtGYg2VfdT7w7qukTsTkH7iZVxVBNb
+        LRH8w4ZB3iZN0yZ+k/Q+HQ8nFQ==
+X-Google-Smtp-Source: ACHHUZ7oss5Q4qEAESR1LIaLJkD7ZwONVfsRpFehVo9Ss1V9OTMOTrOh14yI7Krm7Ivy+/EbDcrm4g==
+X-Received: by 2002:a6b:690a:0:b0:77a:ee79:652 with SMTP id e10-20020a6b690a000000b0077aee790652mr4231482ioc.1.1686579107952;
+        Mon, 12 Jun 2023 07:11:47 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id i19-20020a02cc53000000b0041408b79f1esm2793007jaq.111.2023.06.12.07.11.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jun 2023 07:11:47 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Phillip Potter <phil@philpotter.co.uk>,
+        Coly Li <colyli@suse.de>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Pavel Machek <pavel@ucw.cz>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-scsi@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        linux-btrfs@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-pm@vger.kernel.org
+In-Reply-To: <20230608110258.189493-1-hch@lst.de>
+References: <20230608110258.189493-1-hch@lst.de>
+Subject: Re: decouple block open flags from fmode_t v2
+Message-Id: <168657910650.933808.4041515037046679285.b4-ty@kernel.dk>
+Date:   Mon, 12 Jun 2023 08:11:46 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29240315546D776B
-X-Veeam-MMEX: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Contains callback functions for loading and unloading the module and
-implementation of module management interface functions. The module
-parameters and other mandatory declarations for the kernel module are
-also defined.
 
-Co-developed-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
- MAINTAINERS                    |   1 +
- drivers/block/blksnap/main.c   | 483 +++++++++++++++++++++++++++++++++
- drivers/block/blksnap/params.h |  16 ++
- 3 files changed, 500 insertions(+)
- create mode 100644 drivers/block/blksnap/main.c
- create mode 100644 drivers/block/blksnap/params.h
+On Thu, 08 Jun 2023 13:02:28 +0200, Christoph Hellwig wrote:
+> this series adds a new blk_mode_t for block open flags instead of abusing
+> fmode_t.  The block open flags work very different from the normal use of
+> fmode_t and only share the basic READ/WRITE flags with it.  None of the
+> other normal FMODE_* flags is used, but instead there are three
+> block-specific ones not used by anyone else, which can now be removed.
+> 
+> Note that I've only CCed maintainers and lists for drivers and file systems
+> that have non-trivial changes, as otherwise the series would spam literally
+> everyone in the block and file system world.
+> 
+> [...]
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 76b14ad604dc..a26eee956aec 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3594,6 +3594,7 @@ M:	Sergei Shtepa <sergei.shtepa@veeam.com>
- L:	linux-block@vger.kernel.org
- S:	Supported
- F:	Documentation/block/blksnap.rst
-+F:	drivers/block/blksnap/*
- F:	include/uapi/linux/blksnap.h
- 
- BLOCK LAYER
-diff --git a/drivers/block/blksnap/main.c b/drivers/block/blksnap/main.c
-new file mode 100644
-index 000000000000..7bb37c191fda
---- /dev/null
-+++ b/drivers/block/blksnap/main.c
-@@ -0,0 +1,483 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2023 Veeam Software Group GmbH */
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/miscdevice.h>
-+#include <linux/build_bug.h>
-+#include <uapi/linux/blksnap.h>
-+#include "snapimage.h"
-+#include "snapshot.h"
-+#include "tracker.h"
-+#include "chunk.h"
-+#include "params.h"
-+
-+/*
-+ * The power of 2 for minimum tracking block size.
-+ * If we make the tracking block size small, we will get detailed information
-+ * about the changes, but the size of the change tracker table will be too
-+ * large, which will lead to inefficient memory usage.
-+ */
-+static unsigned int tracking_block_minimum_shift = 16;
-+
-+/*
-+ * The maximum number of tracking blocks.
-+ * A table is created to store information about the status of all tracking
-+ * blocks in RAM. So, if the size of the tracking block is small, then the size
-+ * of the table turns out to be large and memory is consumed inefficiently.
-+ * As the size of the block device grows, the size of the tracking block
-+ * size should also grow. For this purpose, the limit of the maximum
-+ * number of block size is set.
-+ */
-+static unsigned int tracking_block_maximum_count = 2097152;
-+
-+/*
-+ * The power of 2 for maximum tracking block size.
-+ * On very large capacity disks, the block size may be too large. To prevent
-+ * this, the maximum block size is limited.
-+ * If the limit on the maximum block size has been reached, then the number of
-+ * blocks may exceed the tracking_block_maximum_count.
-+ */
-+static unsigned int tracking_block_maximum_shift = 26;
-+
-+/*
-+ * The power of 2 for minimum chunk size.
-+ * The size of the chunk depends on how much data will be copied to the
-+ * difference storage when at least one sector of the block device is changed.
-+ * If the size is small, then small I/O units will be generated, which will
-+ * reduce performance. Too large a chunk size will lead to inefficient use of
-+ * the difference storage.
-+ */
-+static unsigned int chunk_minimum_shift = 18;
-+
-+/*
-+ * The power of 2 for maximum number of chunks.
-+ * To store information about the state of the chunks, a table is created
-+ * in RAM. So, if the size of the chunk is small, then the size of the table
-+ * turns out to be large and memory is consumed inefficiently.
-+ * As the size of the block device grows, the size of the chunk should also
-+ * grow. For this purpose, the maximum number of chunks is set.
-+ * The table expands dynamically when new chunks are allocated. Therefore,
-+ * memory consumption also depends on the intensity of writing to the block
-+ * device under the snapshot.
-+ */
-+static unsigned int chunk_maximum_count_shift = 40;
-+
-+/*
-+ * The power of 2 for maximum chunk size.
-+ * On very large capacity disks, the block size may be too large. To prevent
-+ * this, the maximum block size is limited.
-+ * If the limit on the maximum block size has been reached, then the number of
-+ * blocks may exceed the chunk_maximum_count.
-+ */
-+static unsigned int chunk_maximum_shift = 26;
-+/*
-+ * The maximum number of chunks in queue.
-+ * The chunk is not immediately stored to the difference storage. The chunks
-+ * are put in a store queue. The store queue allows to postpone the operation
-+ * of storing a chunks data to the difference storage and perform it later in
-+ * the worker thread.
-+ */
-+static unsigned int chunk_maximum_in_queue = 16;
-+
-+/*
-+ * The size of the pool of preallocated difference buffers.
-+ * A buffer can be allocated for each chunk. After use, this buffer is not
-+ * released immediately, but is sent to the pool of free buffers.
-+ * However, if there are too many free buffers in the pool, then these free
-+ * buffers will be released immediately.
-+ */
-+static unsigned int free_diff_buffer_pool_size = 128;
-+
-+/*
-+ * The minimum allowable size of the difference storage in sectors.
-+ * The difference storage is a part of the disk space allocated for storing
-+ * snapshot data. If there is less free space in the storage than the minimum,
-+ * an event is generated about the lack of free space.
-+ */
-+static unsigned int diff_storage_minimum = 2097152;
-+
-+#define VERSION_STR "2.0.0.0"
-+static const struct blksnap_version version = {
-+	.major = 2,
-+	.minor = 0,
-+	.revision = 0,
-+	.build = 0,
-+};
-+
-+unsigned int get_tracking_block_minimum_shift(void)
-+{
-+	return tracking_block_minimum_shift;
-+}
-+
-+unsigned int get_tracking_block_maximum_shift(void)
-+{
-+	return tracking_block_maximum_shift;
-+}
-+
-+unsigned int get_tracking_block_maximum_count(void)
-+{
-+	return tracking_block_maximum_count;
-+}
-+
-+unsigned int get_chunk_minimum_shift(void)
-+{
-+	return chunk_minimum_shift;
-+}
-+
-+unsigned int get_chunk_maximum_shift(void)
-+{
-+	return chunk_maximum_shift;
-+}
-+
-+unsigned long get_chunk_maximum_count(void)
-+{
-+	return (1ul << chunk_maximum_count_shift);
-+}
-+
-+unsigned int get_chunk_maximum_in_queue(void)
-+{
-+	return chunk_maximum_in_queue;
-+}
-+
-+unsigned int get_free_diff_buffer_pool_size(void)
-+{
-+	return free_diff_buffer_pool_size;
-+}
-+
-+unsigned int get_diff_storage_minimum(void)
-+{
-+	return diff_storage_minimum;
-+}
-+
-+static int ioctl_version(unsigned long arg)
-+{
-+	struct blksnap_version __user *user_version =
-+		(struct blksnap_version __user *)arg;
-+
-+	if (copy_to_user(user_version, &version, sizeof(version))) {
-+		pr_err("Unable to get version: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return 0;
-+}
-+
-+static_assert(sizeof(uuid_t) == sizeof(struct blksnap_uuid),
-+	"Invalid size of struct blksnap_uuid.");
-+
-+static int ioctl_snapshot_create(unsigned long arg)
-+{
-+	struct blksnap_uuid __user *user_id = (struct blksnap_uuid __user *)arg;
-+	uuid_t kernel_id;
-+	int ret;
-+
-+	ret = snapshot_create(&kernel_id);
-+	if (ret)
-+		return ret;
-+
-+	if (copy_to_user(user_id->b, kernel_id.b, sizeof(uuid_t))) {
-+		pr_err("Unable to create snapshot: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ioctl_snapshot_destroy(unsigned long arg)
-+{
-+	struct blksnap_uuid __user *user_id = (struct blksnap_uuid __user *)arg;
-+	uuid_t kernel_id;
-+
-+	if (copy_from_user(kernel_id.b, user_id->b, sizeof(uuid_t))) {
-+		pr_err("Unable to destroy snapshot: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return snapshot_destroy(&kernel_id);
-+}
-+
-+static int ioctl_snapshot_append_storage(unsigned long arg)
-+{
-+	int ret;
-+	struct blksnap_snapshot_append_storage __user *uarg =
-+		(struct blksnap_snapshot_append_storage __user *)arg;
-+	struct blksnap_snapshot_append_storage karg;
-+	char *bdev_path = NULL;
-+
-+	pr_debug("Append difference storage\n");
-+
-+	if (copy_from_user(&karg, uarg, sizeof(karg))) {
-+		pr_err("Unable to append difference storage: invalid user buffer\n");
-+		return -EINVAL;
-+	}
-+
-+	bdev_path = strndup_user(u64_to_user_ptr(karg.bdev_path),
-+				 karg.bdev_path_size);
-+	if (IS_ERR(bdev_path)) {
-+		pr_err("Unable to append difference storage: invalid block device name buffer\n");
-+		return PTR_ERR(bdev_path);
-+	}
-+
-+	ret = snapshot_append_storage((uuid_t *)karg.id.b, bdev_path,
-+				      u64_to_user_ptr(karg.ranges), karg.count);
-+	kfree(bdev_path);
-+	return ret;
-+}
-+
-+static int ioctl_snapshot_take(unsigned long arg)
-+{
-+	struct blksnap_uuid __user *user_id = (struct blksnap_uuid __user *)arg;
-+	uuid_t kernel_id;
-+
-+	if (copy_from_user(kernel_id.b, user_id->b, sizeof(uuid_t))) {
-+		pr_err("Unable to take snapshot: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return snapshot_take(&kernel_id);
-+}
-+
-+static int ioctl_snapshot_collect(unsigned long arg)
-+{
-+	int ret;
-+	struct blksnap_snapshot_collect karg;
-+
-+	if (copy_from_user(&karg, (const void __user *)arg, sizeof(karg))) {
-+		pr_err("Unable to collect available snapshots: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	ret = snapshot_collect(&karg.count, u64_to_user_ptr(karg.ids));
-+
-+	if (copy_to_user((void __user *)arg, &karg, sizeof(karg))) {
-+		pr_err("Unable to collect available snapshots: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return ret;
-+}
-+
-+static_assert(sizeof(struct blksnap_snapshot_event) == 4096,
-+	"The size struct blksnap_snapshot_event should be equal to the size of the page.");
-+
-+static int ioctl_snapshot_wait_event(unsigned long arg)
-+{
-+	int ret = 0;
-+	struct blksnap_snapshot_event __user *uarg =
-+		(struct blksnap_snapshot_event __user *)arg;
-+	struct blksnap_snapshot_event *karg;
-+	struct event *ev;
-+
-+	karg = kzalloc(sizeof(struct blksnap_snapshot_event), GFP_KERNEL);
-+	if (!karg)
-+		return -ENOMEM;
-+
-+	/* Copy only snapshot ID and timeout*/
-+	if (copy_from_user(karg, uarg, sizeof(uuid_t) + sizeof(__u32))) {
-+		pr_err("Unable to get snapshot event. Invalid user buffer\n");
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	ev = snapshot_wait_event((uuid_t *)karg->id.b, karg->timeout_ms);
-+	if (IS_ERR(ev)) {
-+		ret = PTR_ERR(ev);
-+		goto out;
-+	}
-+
-+	pr_debug("Received event=%lld code=%d data_size=%d\n", ev->time,
-+		 ev->code, ev->data_size);
-+	karg->code = ev->code;
-+	karg->time_label = ev->time;
-+
-+	if (ev->data_size > sizeof(karg->data)) {
-+		pr_err("Event size %d is too big\n", ev->data_size);
-+		ret = -ENOSPC;
-+		/* If we can't copy all the data, we copy only part of it. */
-+	}
-+	memcpy(karg->data, ev->data, ev->data_size);
-+	event_free(ev);
-+
-+	if (copy_to_user(uarg, karg, sizeof(struct blksnap_snapshot_event))) {
-+		pr_err("Unable to get snapshot event. Invalid user buffer\n");
-+		ret = -EINVAL;
-+	}
-+out:
-+	kfree(karg);
-+
-+	return ret;
-+}
-+
-+static int (*const blksnap_ioctl_table[])(unsigned long arg) = {
-+	ioctl_version,
-+	ioctl_snapshot_create,
-+	ioctl_snapshot_destroy,
-+	ioctl_snapshot_append_storage,
-+	ioctl_snapshot_take,
-+	ioctl_snapshot_collect,
-+	ioctl_snapshot_wait_event,
-+};
-+
-+static_assert(
-+	sizeof(blksnap_ioctl_table) ==
-+	((blksnap_ioctl_snapshot_wait_event + 1) * sizeof(void *)),
-+	"The size of table blksnap_ioctl_table does not match the enum blksnap_ioctl.");
-+
-+static long ctrl_unlocked_ioctl(struct file *filp, unsigned int cmd,
-+				unsigned long arg)
-+{
-+	int nr = _IOC_NR(cmd);
-+
-+	if (nr > (sizeof(blksnap_ioctl_table) / sizeof(void *)))
-+		return -ENOTTY;
-+
-+	if (!blksnap_ioctl_table[nr])
-+		return -ENOTTY;
-+
-+	return blksnap_ioctl_table[nr](arg);
-+}
-+
-+static const struct file_operations blksnap_ctrl_fops = {
-+	.owner		= THIS_MODULE,
-+	.unlocked_ioctl	= ctrl_unlocked_ioctl,
-+};
-+
-+static struct miscdevice blksnap_ctrl_misc = {
-+	.minor		= MISC_DYNAMIC_MINOR,
-+	.name		= BLKSNAP_CTL,
-+	.fops		= &blksnap_ctrl_fops,
-+};
-+
-+static int __init parameters_init(void)
-+{
-+	pr_debug("tracking_block_minimum_shift: %d\n",
-+		 tracking_block_minimum_shift);
-+	pr_debug("tracking_block_maximum_shift: %d\n",
-+		 tracking_block_maximum_shift);
-+	pr_debug("tracking_block_maximum_count: %d\n",
-+		 tracking_block_maximum_count);
-+
-+	pr_debug("chunk_minimum_shift: %d\n", chunk_minimum_shift);
-+	pr_debug("chunk_maximum_shift: %d\n", chunk_maximum_shift);
-+	pr_debug("chunk_maximum_count_shift: %u\n", chunk_maximum_count_shift);
-+
-+	pr_debug("chunk_maximum_in_queue: %d\n", chunk_maximum_in_queue);
-+	pr_debug("free_diff_buffer_pool_size: %d\n",
-+		 free_diff_buffer_pool_size);
-+	pr_debug("diff_storage_minimum: %d\n", diff_storage_minimum);
-+
-+	if (tracking_block_maximum_shift < tracking_block_minimum_shift) {
-+		tracking_block_maximum_shift = tracking_block_minimum_shift;
-+		pr_warn("fixed tracking_block_maximum_shift: %d\n",
-+			 tracking_block_maximum_shift);
-+	}
-+
-+	if (chunk_maximum_shift < chunk_minimum_shift) {
-+		chunk_maximum_shift = chunk_minimum_shift;
-+		pr_warn("fixed chunk_maximum_shift: %d\n",
-+			 chunk_maximum_shift);
-+	}
-+
-+	/*
-+	 * The XArray is used to store chunks. And 'unsigned long' is used as
-+	 * chunk number parameter. So, The number of chunks cannot exceed the
-+	 * limits of ULONG_MAX.
-+	 */
-+	if (sizeof(unsigned long) < 4u)
-+		chunk_maximum_count_shift = min(16u, chunk_maximum_count_shift);
-+	else if (sizeof(unsigned long) == 4)
-+		chunk_maximum_count_shift = min(32u, chunk_maximum_count_shift);
-+	else if (sizeof(unsigned long) >= 8)
-+		chunk_maximum_count_shift = min(64u, chunk_maximum_count_shift);
-+
-+	return 0;
-+}
-+
-+static int __init blksnap_init(void)
-+{
-+	int ret;
-+
-+	pr_debug("Loading\n");
-+	pr_debug("Version: %s\n", VERSION_STR);
-+
-+	ret = parameters_init();
-+	if (ret)
-+		return ret;
-+
-+	ret = chunk_init();
-+	if (ret)
-+		goto fail_chunk_init;
-+
-+	ret = tracker_init();
-+	if (ret)
-+		goto fail_tracker_init;
-+
-+	ret = misc_register(&blksnap_ctrl_misc);
-+	if (ret)
-+		goto fail_misc_register;
-+
-+	return 0;
-+
-+fail_misc_register:
-+	tracker_done();
-+fail_tracker_init:
-+	chunk_done();
-+fail_chunk_init:
-+
-+	return ret;
-+}
-+
-+static void __exit blksnap_exit(void)
-+{
-+	pr_debug("Unloading module\n");
-+
-+	misc_deregister(&blksnap_ctrl_misc);
-+
-+	chunk_done();
-+	snapshot_done();
-+	tracker_done();
-+
-+	pr_debug("Module was unloaded\n");
-+}
-+
-+module_init(blksnap_init);
-+module_exit(blksnap_exit);
-+
-+module_param_named(tracking_block_minimum_shift, tracking_block_minimum_shift,
-+		   uint, 0644);
-+MODULE_PARM_DESC(tracking_block_minimum_shift,
-+		 "The power of 2 for minimum tracking block size");
-+module_param_named(tracking_block_maximum_count, tracking_block_maximum_count,
-+		   uint, 0644);
-+MODULE_PARM_DESC(tracking_block_maximum_count,
-+		 "The maximum number of tracking blocks");
-+module_param_named(tracking_block_maximum_shift, tracking_block_maximum_shift,
-+		   uint, 0644);
-+MODULE_PARM_DESC(tracking_block_maximum_shift,
-+		 "The power of 2 for maximum trackings block size");
-+module_param_named(chunk_minimum_shift, chunk_minimum_shift, uint, 0644);
-+MODULE_PARM_DESC(chunk_minimum_shift,
-+		 "The power of 2 for minimum chunk size");
-+module_param_named(chunk_maximum_count_shift, chunk_maximum_count_shift,
-+		   uint, 0644);
-+MODULE_PARM_DESC(chunk_maximum_count_shift,
-+		 "The power of 2 for maximum number of chunks");
-+module_param_named(chunk_maximum_shift, chunk_maximum_shift, uint, 0644);
-+MODULE_PARM_DESC(chunk_maximum_shift,
-+		 "The power of 2 for maximum snapshots chunk size");
-+module_param_named(chunk_maximum_in_queue, chunk_maximum_in_queue, uint, 0644);
-+MODULE_PARM_DESC(chunk_maximum_in_queue,
-+		 "The maximum number of chunks in store queue");
-+module_param_named(free_diff_buffer_pool_size, free_diff_buffer_pool_size,
-+		   uint, 0644);
-+MODULE_PARM_DESC(free_diff_buffer_pool_size,
-+		 "The size of the pool of preallocated difference buffers");
-+module_param_named(diff_storage_minimum, diff_storage_minimum, uint, 0644);
-+MODULE_PARM_DESC(diff_storage_minimum,
-+	"The minimum allowable size of the difference storage in sectors");
-+
-+MODULE_DESCRIPTION("Block Device Snapshots Module");
-+MODULE_VERSION(VERSION_STR);
-+MODULE_AUTHOR("Veeam Software Group GmbH");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/block/blksnap/params.h b/drivers/block/blksnap/params.h
-new file mode 100644
-index 000000000000..85606e1a8746
---- /dev/null
-+++ b/drivers/block/blksnap/params.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2023 Veeam Software Group GmbH */
-+#ifndef __BLKSNAP_PARAMS_H
-+#define __BLKSNAP_PARAMS_H
-+
-+unsigned int get_tracking_block_minimum_shift(void);
-+unsigned int get_tracking_block_maximum_shift(void);
-+unsigned int get_tracking_block_maximum_count(void);
-+unsigned int get_chunk_minimum_shift(void);
-+unsigned int get_chunk_maximum_shift(void);
-+unsigned long get_chunk_maximum_count(void);
-+unsigned int get_chunk_maximum_in_queue(void);
-+unsigned int get_free_diff_buffer_pool_size(void);
-+unsigned int get_diff_storage_minimum(void);
-+
-+#endif /* __BLKSNAP_PARAMS_H */
+Applied, thanks!
+
+[01/30] block: also call ->open for incremental partition opens
+        commit: 9d1c92872e7082f100f629a58b32fa0214aa1aec
+[02/30] cdrom: remove the unused bdev argument to cdrom_open
+        commit: 764b83100b9aff52f950e408539c22a37cdedae8
+[03/30] cdrom: remove the unused mode argument to cdrom_ioctl
+        commit: 473399b50de1fdc12606254351273c71d1786251
+[04/30] cdrom: remove the unused cdrom_close_write release code
+        commit: a4cec8bc14c02e15006a71f02b0e1bbc72b9f796
+[05/30] cdrom: track if a cdrom_device_info was opened for data
+        commit: 8cdf433e2b8e4fc6c7b4393deb93fb258175d537
+[06/30] cdrom: remove the unused mode argument to cdrom_release
+        commit: 7ae24fcee9929f9002b84d8121144b2b3590b58c
+[07/30] block: pass a gendisk on bdev_check_media_change
+        commit: 444aa2c58cb3b6cfe3b7cc7db6c294d73393a894
+[08/30] block: pass a gendisk to ->open
+        commit: d32e2bf83791727a84ad5d3e3d713e82f9adbe30
+[09/30] block: remove the unused mode argument to ->release
+        commit: ae220766d87cd6799dbf918fea10613ae14c0654
+[10/30] block: rename blkdev_close to blkdev_release
+        commit: 7ee34cbc291a28134b60683b246ba58b4b676ec3
+[11/30] swsusp: don't pass a stack address to blkdev_get_by_path
+        commit: c889d0793d9dc07e94a5fddcc05356157fab00b7
+[12/30] bcache: don't pass a stack address to blkdev_get_by_path
+        commit: 29499ab060fec044161be73fb0e448eab97b4813
+[13/30] rnbd-srv: don't pass a holder for non-exclusive blkdev_get_by_path
+        commit: 5ee607675debef509946f8a251d4c30a21493ec2
+[14/30] btrfs: don't pass a holder for non-exclusive blkdev_get_by_path
+        commit: 2ef789288afd365f4245ba97e56189062de5148e
+[15/30] block: use the holder as indication for exclusive opens
+        commit: 2736e8eeb0ccdc71d1f4256c9c9a28f58cc43307
+[16/30] block: add a sb_open_mode helper
+        commit: 3f0b3e785e8b54a40c530fa77b7ab37bec925c57
+[17/30] fs: remove sb->s_mode
+        commit: 81b1fb7d17c0110df839e13468ada9e99bb6e5f4
+[18/30] scsi: replace the fmode_t argument to scsi_cmd_allowed with a simple bool
+        commit: 5f4eb9d5413fdfc779c099fdaf0ff417eb163145
+[19/30] scsi: replace the fmode_t argument to scsi_ioctl with a simple bool
+        commit: 2e80089c18241699c41d0af0669cb93844ff0dc1
+[20/30] scsi: replace the fmode_t argument to ->sg_io_fn with a simple bool
+        commit: 1991299e49fa58c3ba7e91599932f84bf537d592
+[21/30] nvme: replace the fmode_t argument to the nvme ioctl handlers with a simple bool
+        commit: 7d9d7d59d44b7e9236d168472aa222b6543fae25
+[22/30] mtd: block: use a simple bool to track open for write
+        commit: 658afed19ceed54a52b9e9e69c0791c8868ff55d
+[23/30] rnbd-srv: replace sess->open_flags with a "bool readonly"
+        commit: 99b07780814e89f16bec2773c237eb25121f8502
+[24/30] ubd: remove commented out code in ubd_open
+        commit: bd6abfc8e7898ce2163a1ffdbb9ec71a0a081267
+[25/30] block: move a few internal definitions out of blkdev.h
+        commit: cfb425761c79b6056ae5bb73f8d400f03b513959
+[26/30] block: remove unused fmode_t arguments from ioctl handlers
+        commit: 5e4ea834676e3b8965344ca61d36e1ae236249eb
+[27/30] block: replace fmode_t with a block-specific type for block open flags
+        commit: 05bdb9965305bbfdae79b31d22df03d1e2cfcb22
+[28/30] block: always use I_BDEV on file->f_mapping->host to find the bdev
+        commit: 4e762d8623448bb9d32711832ce977a65ff7636a
+[29/30] block: store the holder in file->private_data
+        commit: ee3249a8ce78ef014a71b05157a43fba8dc764e3
+[30/30] fs: remove the now unused FMODE_* flags
+        commit: 0733ad8002916b9dbbbcfe6e92ad44d2657de1c1
+
+Best regards,
 -- 
-2.20.1
+Jens Axboe
+
+
 
