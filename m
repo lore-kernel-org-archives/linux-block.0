@@ -2,100 +2,122 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC64CEB64D8
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 14:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E7AEB64D9
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 14:16:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242883AbjFMOJJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 10:09:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34318 "EHLO
+        id S241003AbjFMOQs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 10:16:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242676AbjFMOJD (ORCPT
+        with ESMTP id S240572AbjFMOQr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 10:09:03 -0400
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 694A61709;
-        Tue, 13 Jun 2023 07:08:37 -0700 (PDT)
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-25c119005bcso644424a91.0;
-        Tue, 13 Jun 2023 07:08:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686665250; x=1689257250;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EvAFLkMD1GiJryurX3BgCgJEcKGxveNHWp6M99GnmxU=;
-        b=HPcNeMI8D6+8DvPkAgnsReTK9ZlMybgb3Ryl8FC66Ydwa+TnLy5+GAy8okT7hATKoW
-         AcHLYbVsXaaHPTBbTrFvyjblMlu1yMVAOl2nYy3mfjMtWM2xegXYsnkRPqybMHoozDQx
-         l6jz6w6lq5wlhWeqb+krOb8G8aOq122OFAkveDKEPZ8xnvVZZB6RyO+ceFcFYVtAuO9e
-         dnyjygZiAtiui+3ZHLCV0OOllh/e5ICerDY5W0ujKxcMNHthI6AG2jMJO278cgOvqW9o
-         5ZGjGZ7JBXqt8ZsVOJfK15XCv5Nwxmxz9lMKeYOgDCmhpd7vWBfLhka8W4PWmoIJP43W
-         Uglg==
-X-Gm-Message-State: AC+VfDx2tJdb45yknMr7a8YXpWntWvY2wOZ4Hed3XVa/4ccjgjQLucXw
-        rFTEyLuFZ5NWhdHpQ2f/8oE=
-X-Google-Smtp-Source: ACHHUZ46BDy0mDKcY0HLANL3dOq0tH4OBEkYAY5URE+QljLf4o5QTQFqfE4hLEQB26qVcW4lasD6VQ==
-X-Received: by 2002:a17:90a:5891:b0:253:340d:77d8 with SMTP id j17-20020a17090a589100b00253340d77d8mr10649596pji.33.1686665249640;
-        Tue, 13 Jun 2023 07:07:29 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id l7-20020a17090a150700b0025621aa4c6bsm6051815pja.25.2023.06.13.07.07.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jun 2023 07:07:28 -0700 (PDT)
-Message-ID: <04a4d0db-2f2d-e2fc-5458-4ddf852ffc8a@acm.org>
-Date:   Tue, 13 Jun 2023 07:07:27 -0700
+        Tue, 13 Jun 2023 10:16:47 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733C194;
+        Tue, 13 Jun 2023 07:16:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=CbGcyfHi9QA1um+JXK92ovTuo4LzjCmAsPSThsU99qE=; b=YHP/QC3m5r8bf93VtZEyxh/INM
+        9SOJij2U2Pjj1WYK4iuiA5KnydctxBsfTeeOshHG6I5pU/VVHdwrIhivOjqLXT3nzcB1acCCbiql8
+        S2dITLjPcWpzWwA0o1jk3ep/cZh80zjDVXi36DD6YTUnyNSkggJpNz648uDI6nV4UJDjxPt0gaXgQ
+        KlMDjs/fCy5DGFXU3tp5QvcaznNwNLq4CDvuFyyxYHbeZ/n7YABL0evJaWOiVE26mwVdnjgCh81Dm
+        jEiv3jIzyvmTOQ/V6ntL6I59lSH1Qkl1aEHOGSBr+j/meYKNOgSM8/8LFgCJH8F9FmRj9A3byqfaF
+        06OCKDmw==;
+Received: from [2601:1c2:980:9ec0::2764]
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q94oy-008IDS-2l;
+        Tue, 13 Jun 2023 14:16:32 +0000
+Message-ID: <77171ea8-c8d9-5f8d-caf0-76bd5ca03f0c@infradead.org>
+Date:   Tue, 13 Jun 2023 07:16:31 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.2
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+Subject: Re: [PATCH v4 02/11] block: Block Device Filtering Mechanism
 Content-Language: en-US
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        stanley.chu@mediatek.com, peter.wang@mediatek.com,
-        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
-        powen.kao@mediatek.com, naomi.chu@mediatek.com,
-        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <ZF0K7A6G2cYBjSgn@infradead.org>
- <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
- <ZF5G5ztMng8Xbd1W@infradead.org>
- <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
- <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
- <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
- <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
- <097caed2-10b3-7cd1-7c06-90f983e5c720@acm.org>
- <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
- <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
- <bef8340e-f051-db63-5c2f-a2bc94c678ac@huaweicloud.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <bef8340e-f051-db63-5c2f-a2bc94c678ac@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
+Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
+        dlemoal@kernel.org, wsa@kernel.org,
+        heikki.krogerus@linux.intel.com, ming.lei@redhat.com,
+        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>
+References: <20230609115858.4737-1-sergei.shtepa@veeam.com>
+ <20230609115858.4737-2-sergei.shtepa@veeam.com>
+ <e2f851d7-6b17-7a36-b5b3-2d60d450989d@infradead.org>
+ <f7b67068-62c4-0977-265a-37c84f553eab@veeam.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <f7b67068-62c4-0977-265a-37c84f553eab@veeam.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/23 00:55, Yu Kuai wrote:
-> 在 2023/05/18 10:23, Bart Van Assche 写道:
->> On 5/17/23 18:49, Yu Kuai wrote:
->>> Currently, fair share from hctx_may_queue() requires two
->>> atomic_read(active_queues and active_requests), I think this smoothing
->>> method can be placed into get_tag fail path, for example, the more times
->>> a disk failed to get tag in a period of time, the more tag this disk can
->>> get, and all the information can be updated here(perhaps directly
->>> record how many tags a disk can get, then hctx_may_queue() still only
->>> require 2 atomic_read()).
->>
->> That sounds interesting to me. Do you perhaps plan to implement this 
->> approach and to post it as a patch?
+
+
+On 6/13/23 05:34, Sergei Shtepa wrote:
 > 
-> Of course, I'll try to send a RFC patch.
+> 
+> On 6/13/23 03:51, Randy Dunlap wrote:
+>>
+>> On 6/9/23 04:58, Sergei Shtepa wrote:
+>>> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+>>> index b7b56871029c..7904f157b245 100644
+>>> --- a/include/uapi/linux/fs.h
+>>> +++ b/include/uapi/linux/fs.h
+>>> @@ -189,6 +189,9 @@ struct fsxattr {
+>>>   * A jump here: 130-136 are reserved for zoned block devices
+>>>   * (see uapi/linux/blkzoned.h)
+>>>   */
+>>> +#define BLKFILTER_ATTACH	_IOWR(0x12, 140, struct blkfilter_name)
+>>> +#define BLKFILTER_DETACH	_IOWR(0x12, 141, struct blkfilter_name)
+>>> +#define BLKFILTER_CTL		_IOWR(0x12, 142, struct blkfilter_ctl)
+>>
+>> Please update Documentation/userspace-api/ioctl/ioctl-number.rst
+>> with the blkfilter ioctl number usage.
+> 
+> It seems to me that there is no need to change anything in the table of
+> numbers for 'blkfilter'. I think the existing record is enough:
+> 
+> 0x10  20-2F  arch/s390/include/uapi/asm/hypfs.h
+> 0x12  all    linux/fs.h
+>              linux/blkpg.h
 
-Hi Kuai,
+Yes, OK.
 
-Has this RFC patch already been posted or did I perhaps miss it?
+> Maybe it would probably be correct to specify the file 'uapi/linux/fs.h'?
+> And maybe we need to specify the request numbers for blksnap?
 
-Thanks,
+Yes.
 
-Bart.
+> add ioctls numbers for blksnap
+> 
+> Asked-by: Randy Dunlap <rdunlap@infradead.org>
 
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+
+Thanks.
+
+> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+> ---
+>  Documentation/userspace-api/ioctl/ioctl-number.rst | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
+> index 176e8fc3f31b..96af64988251 100644
+> --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
+> +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+> @@ -202,6 +202,7 @@ Code  Seq#    Include File                                           Comments
+>  'V'   C0     linux/ivtvfb.h                                          conflict!
+>  'V'   C0     linux/ivtv.h                                            conflict!
+>  'V'   C0     media/si4713.h                                          conflict!
+> +'V'   00-1F  uapi/linux/blksnap.h                                    conflict!
+>  'W'   00-1F  linux/watchdog.h                                        conflict!
+>  'W'   00-1F  linux/wanrouter.h                                       conflict! (pre 3.9)
+>  'W'   00-3F  sound/asound.h                                          conflict!
+
+-- 
+~Randy
