@@ -2,95 +2,97 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E08C7EE43
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 06:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B536C7EE2E
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 06:11:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240038AbjFMGKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 02:10:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58876 "EHLO
+        id S240248AbjFMGLX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 02:11:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240220AbjFMGJs (ORCPT
+        with ESMTP id S239924AbjFMGLV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 02:09:48 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E001726
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 23:09:28 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-4f58444a410so1936e87.0
-        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 23:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686636567; x=1689228567;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xGbu130z1RnxKoH3Z00k/EYNGxDJ/ndaMTIJwz7/L08=;
-        b=2KWRZHgRZDRZRt8sfRhTo/wZZKNDXflR5DgEGYXphjyNhgup7HAf5kch2vs9l757hT
-         UEiI+x9yZTuuF90p2EBlpPcIJQDFWqqkC4ZO8bFQ2NKJEWiAyWQWFxdPB/y9mwNuC9+8
-         lYLotUZYexzi/MTpG/IbQ2jkFyWOpahYa7D4zpQGKxlWIDFssPL9KhKwxE3O22+yANMd
-         UDvYaasp2AjuNADnYC6lgirF2Nt46cd2BV8LXhNoL4ZGs4QrNRapqmtMRHGmpWxyTjQh
-         5Rntacj6tVjA7FaQOfubwhglbe5vYy4/dScWwwtRutBotttFZaDo3FMlztKik3TcH3C1
-         7wrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686636567; x=1689228567;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xGbu130z1RnxKoH3Z00k/EYNGxDJ/ndaMTIJwz7/L08=;
-        b=EWvSMDoYNvYahcf4Mp/+uYllS4jpkXdQB4B3tPAGLzviz2aMBzbe3FFJemW5eyvb6p
-         FwPx+Efomgwp2w44iJ8vzlwpPIJF2AsmV6cTrhyPE4ZkoWTawiA6EI4FIrszRZB+Fb+g
-         xiQqZ9FpcFNL/OQrJyyJSvGC5PXsGb9VzscwvYUgyLNJLul4P07tpid0IjQ46zlMA+5E
-         qQsVT4gxmw/bdttfI0Q14/mh+VF1UxNNAfwOd0CcFbLGaCdJf1SJic3SdUkGGjEjLIbr
-         SwWhGQvTJ0RtmnP3BYUdw+jWyXLZL9WLR2CKJvoGfCfAiPFXwSzJJnjvPP2/LyeLzQVm
-         lCXQ==
-X-Gm-Message-State: AC+VfDxu2cq/84Dcm2a9GWncqeRehFlaCWi5AulVLbqAcGU332jmPD62
-        vP6CnY3CIB+Jkd1CqDOfD9fkQTSAMvmwuEg0v8nK0Q==
-X-Google-Smtp-Source: ACHHUZ7NP/ucZh2Q7T8bButu0xoi30PXSQl4jTXOvURjSgowUr9KvJLTTR5O5mItM+PfwvyR4e/lrf8VAiL6oEOo/t4=
-X-Received: by 2002:ac2:5dca:0:b0:4f6:1722:d73a with SMTP id
- x10-20020ac25dca000000b004f61722d73amr9300lfq.5.1686636566462; Mon, 12 Jun
- 2023 23:09:26 -0700 (PDT)
+        Tue, 13 Jun 2023 02:11:21 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE53910E9;
+        Mon, 12 Jun 2023 23:10:47 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 7E27B1FD71;
+        Tue, 13 Jun 2023 06:10:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1686636646; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vrh65Rt7esW0A/zZzMpLuw0sVKLnmd4txI3JUDbCM38=;
+        b=2Es8vzS6MBHvSmzKyLtn6/vMMBiz/JcJs7gtQRokM9oBz6LDTU+MsVFt0f/d91rAxul15f
+        elVxHHSDcAuZyEaoax+vxCc0/KWzfZG38CLs9sZzT1SKxqjG60aspwTO5A35MKdCs1Bo9+
+        hcgle3AnE0Arj1xpOwOFzJTLGgEHnXU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1686636646;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vrh65Rt7esW0A/zZzMpLuw0sVKLnmd4txI3JUDbCM38=;
+        b=y8dKMZfQF1Gy6xme3+kzHEmm/W5v9e97tNMEmAu05H3ocW+fh6Usyx/iDzat/WtvvYXgVY
+        hQc1pmMpXpHf+6CA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3CA5D13483;
+        Tue, 13 Jun 2023 06:10:46 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ZtJwDGYIiGRjcQAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 13 Jun 2023 06:10:46 +0000
+Message-ID: <9c46a69b-a3e6-48e8-ed46-e179097925f7@suse.de>
+Date:   Tue, 13 Jun 2023 08:10:45 +0200
 MIME-Version: 1.0
-References: <20230612161614.10302-1-jack@suse.cz> <ZIf6RrbeyZVXBRhm@infradead.org>
-In-Reply-To: <ZIf6RrbeyZVXBRhm@infradead.org>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 13 Jun 2023 08:09:14 +0200
-Message-ID: <CACT4Y+ZsN3wemvGLVyNWj9zjykGwcHoy581w7GuAHGpAj1YLxg@mail.gmail.com>
-Subject: Re: [PATCH] block: Add config option to not allow writing to mounted devices
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Ted Tso <tytso@mit.edu>,
-        yebin <yebin@huaweicloud.com>, linux-fsdevel@vger.kernel.org,
-        syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v5 7/7] scsi: improve warning message in
+ scsi_device_block()
+Content-Language: en-US
+To:     mwilck@suse.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+References: <20230612165049.29440-1-mwilck@suse.com>
+ <20230612165049.29440-8-mwilck@suse.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20230612165049.29440-8-mwilck@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 13 Jun 2023 at 07:10, Christoph Hellwig <hch@infradead.org> wrote:
->
-> > +config BLK_DEV_WRITE_HARDENING
-> > +     bool "Do not allow writing to mounted devices"
-> > +     help
-> > +     When a block device is mounted, writing to its buffer cache very likely
-> > +     going to cause filesystem corruption. It is also rather easy to crash
-> > +     the kernel in this way since the filesystem has no practical way of
-> > +     detecting these writes to buffer cache and verifying its metadata
-> > +     integrity. Select this option to disallow writing to mounted devices.
-> > +     This should be mostly fine but some filesystems (e.g. ext4) rely on
-> > +     the ability of filesystem tools to write to mounted filesystems to
-> > +     set e.g. UUID or run fsck on the root filesystem in some setups.
->
-> I'm not sure a config option is really the right thing.
->
-> I'd much prefer a BLK_OPEN_ flag to prohibit any other writer.
-> Except for etN and maybe fat all file systems can set that
-> unconditionally.  And for those file systems that have historically
-> allowed writes to mounted file systems they can find a local way
-> to decide on when and when not to set it.
+On 6/12/23 18:50, mwilck@suse.com wrote:
+> From: Martin Wilck <mwilck@suse.com>
+> 
+> If __scsi_internal_device_block() returns an error, it is always -EINVAL
+> because of an invalid state transition. For debugging purposes, it makes
+> more sense to print the device state.
+> 
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
+> ---
+>   drivers/scsi/scsi_lib.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-I don't question there are use cases for the flag, but there are use
-cases for the config as well.
+Cheers,
 
-Some distros may want a guarantee that this does not happen as it
-compromises lockdown and kernel integrity (on par with unsigned module
-loading).
-For fuzzing systems it also may be hard to ensure fine-grained
-argument constraints, it's much easier and more reliable to prohibit
-it on config level.
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
