@@ -2,65 +2,52 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 877D9EB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 15:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AB4EB64D8
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 16:02:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242932AbjFMPsX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 11:48:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60338 "EHLO
+        id S240660AbjFMQCn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 12:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242928AbjFMPsW (ORCPT
+        with ESMTP id S241453AbjFMQCg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 11:48:22 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D7919F
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 08:48:21 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-33bcc8f0d21so3739185ab.1
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 08:48:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686671300; x=1689263300;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GSrctI8rg8I7twHK6Nil4YKzI1pYE/l9OdmquxynZq4=;
-        b=1IxMrX8EdCYYXT8z4R8g5xqadrCypUsYWgg41u3N/dlybwXZJu7zAUDrBeN4GL449o
-         +8RfTGMi6r5QikoO/a1XC8JEDxdc4ILd/eIp3FOAFEcyMBjAKLVIAkG6aaCp1B/0GAh5
-         h4DCxWuoSl72Xf9hJ3tYHUmZxuCN11luuhQkBuupPRWrUiybaDDE83+lfAmhfszwQVZC
-         tYqtRCdXcBg8+M/hPoMUyTQcoGw2bipRmg3f7WRV2QYo7ekDRaCHO+HWJdf5M1zAQKRy
-         wsaurWEurnvuCie8fqVMgUxsHgVftMVS9XSbnCorlXIG/gNuD/libC/nNCKEBg/dxtq/
-         JoKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686671300; x=1689263300;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GSrctI8rg8I7twHK6Nil4YKzI1pYE/l9OdmquxynZq4=;
-        b=OhnQXVY6XL5g1AweqpmQmVZE6P4pk8rt/BxLL3TQHfuBcJFrhDrtCMErCMmW9IHUG9
-         dou2wAUROHIttrys3aihGfosRcHSZdoaJtnymChQNH6Jih4LRww8C1uuhw8kcc9kkEjK
-         btczJqh53VjmHz1vSssc96ZgxbGgTp4dwx+3nkFxbAKvWTFAkGxtKDq4tFjGgh7PoaWw
-         iPnAHVmPX/nPEzoPRlUciG0spSdDaFBZZzZuU6DApRO+0OKyLGjOJ+viLarCzgdd+hAb
-         HTrOuOY2dsTq3DHN0o69JMdZKZIGxNCyrs9lpSzk1bDgUnphTJG2O+gYcYOvGaxm239A
-         kFlQ==
-X-Gm-Message-State: AC+VfDxgBVnY52M1/lTXYUt83wXnOyCwqCWW7Q6JVs8DRMdjxSoVK+e9
-        y54655cLvN84O0U7V1s1g+E4fg==
-X-Google-Smtp-Source: ACHHUZ5StGBwUyOjFSA4oiFTpuXR+sgEyx4jlxweuyIJg1gEkVnyybc/DjDXsTvbpm397ZVPBanKkQ==
-X-Received: by 2002:a05:6602:1789:b0:777:b456:abbe with SMTP id y9-20020a056602178900b00777b456abbemr7180557iox.0.1686671300719;
-        Tue, 13 Jun 2023 08:48:20 -0700 (PDT)
-Received: from [192.168.1.94] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id h24-20020a02cd38000000b004145ebbf193sm3468444jaq.51.2023.06.13.08.48.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jun 2023 08:48:20 -0700 (PDT)
-Message-ID: <491da795-e9e0-1d84-558b-df09063228cb@kernel.dk>
-Date:   Tue, 13 Jun 2023 09:48:18 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v2] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        kernel test robot <oliver.sang@intel.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
+        Tue, 13 Jun 2023 12:02:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CB71721
+        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 09:01:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686672109;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uOW3Y8zY4kGlP9KbZHBX2nDj4gK+e50wvJNscFZ2VoM=;
+        b=HX2flAgSx9fiQjuF/1VO4OcexzUnNBAWSRs6nIjmakxEMQMdUjWUADt6Ij5Vlz0rcVAb01
+        WzP/p/xIg+J9pVJh+R92Y7GBuCfDxc03hT7B6d6r+DmE8NZg1RoAe6kxBRCP6LXMeOJ1ry
+        fdfPxrWR6gEcixnYJkpht5HzEq0TvmI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-664-wyfvzX_HM8ORYd1nAWkS2Q-1; Tue, 13 Jun 2023 12:01:38 -0400
+X-MC-Unique: wyfvzX_HM8ORYd1nAWkS2Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0A09C380670B;
+        Tue, 13 Jun 2023 16:00:42 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B7F2492CA6;
+        Tue, 13 Jun 2023 16:00:38 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <491da795-e9e0-1d84-558b-df09063228cb@kernel.dk>
+References: <491da795-e9e0-1d84-558b-df09063228cb@kernel.dk> <545463.1686601473@warthog.procyon.org.uk>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     dhowells@redhat.com, David Hildenbrand <david@redhat.com>,
+        kernel test robot <oliver.sang@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Al Viro <viro@zeniv.linux.org.uk>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
@@ -73,30 +60,23 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
         linux-kernel@vger.kernel.org
-References: <545463.1686601473@warthog.procyon.org.uk>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <545463.1686601473@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <639734.1686672037.1@warthog.procyon.org.uk>
+Date:   Tue, 13 Jun 2023 17:00:37 +0100
+Message-ID: <639735.1686672037@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/23 2:24 PM, David Howells wrote:
->     
-> Fix dio_bio_alloc() to set BIO_PAGE_PINNED, not BIO_PAGE_REFFED, so that
-> the bio code unpins the pinned pages rather than putting a ref on them.
-> 
-> The issue was causing:
-> 
->         WARNING: CPU: 6 PID: 2220 at mm/gup.c:76 try_get_folio
-> 
-> This can be caused by creating a file on a loopback UDF filesystem, opening
-> it O_DIRECT and making two writes to it from the same source buffer.
+Jens Axboe <axboe@kernel.dk> wrote:
 
-What is this against?
+> What is this against?
 
--- 
-Jens Axboe
+It's against the branch I posted.  I should rebase it on your tree, but I'm in
+a conference at the moment, so that may have to wait till Thursday.
 
+David
 
