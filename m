@@ -2,122 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E7AEB64D9
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 14:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB84EB64D0
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 14:41:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241003AbjFMOQs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 10:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41142 "EHLO
+        id S240146AbjFMOlw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 10:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240572AbjFMOQr (ORCPT
+        with ESMTP id S240019AbjFMOlv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 10:16:47 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733C194;
-        Tue, 13 Jun 2023 07:16:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=CbGcyfHi9QA1um+JXK92ovTuo4LzjCmAsPSThsU99qE=; b=YHP/QC3m5r8bf93VtZEyxh/INM
-        9SOJij2U2Pjj1WYK4iuiA5KnydctxBsfTeeOshHG6I5pU/VVHdwrIhivOjqLXT3nzcB1acCCbiql8
-        S2dITLjPcWpzWwA0o1jk3ep/cZh80zjDVXi36DD6YTUnyNSkggJpNz648uDI6nV4UJDjxPt0gaXgQ
-        KlMDjs/fCy5DGFXU3tp5QvcaznNwNLq4CDvuFyyxYHbeZ/n7YABL0evJaWOiVE26mwVdnjgCh81Dm
-        jEiv3jIzyvmTOQ/V6ntL6I59lSH1Qkl1aEHOGSBr+j/meYKNOgSM8/8LFgCJH8F9FmRj9A3byqfaF
-        06OCKDmw==;
-Received: from [2601:1c2:980:9ec0::2764]
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q94oy-008IDS-2l;
-        Tue, 13 Jun 2023 14:16:32 +0000
-Message-ID: <77171ea8-c8d9-5f8d-caf0-76bd5ca03f0c@infradead.org>
-Date:   Tue, 13 Jun 2023 07:16:31 -0700
+        Tue, 13 Jun 2023 10:41:51 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A02E53
+        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 07:41:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6D3AA6373C
+        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 14:41:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59122C433F0;
+        Tue, 13 Jun 2023 14:41:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686667309;
+        bh=rz+MvUN0L8ibBl9HEERCSlFQiDhgrt46iEHzqWHPbRk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dFF5lZue2Y5RtMYy4iJ03ENWntYI/A6FEw/W3rnw6uAcCsBQpDAuoviVkYjf/QQ/O
+         z3NR7BMuUChnsyON/8PvNmeGoO9RGg03SPPLp8AHnQ+OmMvuE8uJHeR8JqJBlt7Jo6
+         3GoDzJ6jJgHAI4Npdb2gNb0J6e7oFqPsSwybFt1HRPv9rn+w6D9sTolLUVwUuoghN1
+         EuVhNu1yBQm6rY1Coo543hjPHZserD7V0nIqwmtTO46FSpAkzWT7EBHhO8ql3rbXA8
+         s6ecfZibxgvgRYFJjg+H52m4yN4GS+YCHcSHCpNpUln4O9Vd1oixaCwbAI1yAFTz41
+         y3ys/ygefEjJw==
+Date:   Tue, 13 Jun 2023 08:41:46 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
+        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
+Subject: Re: [PATCH 2/2] nvme: don't freeze/unfreeze queues from different
+ contexts
+Message-ID: <ZIiAKhi5Vmc0Fc9W@kbusch-mbp.dhcp.thefacebook.com>
+References: <20230613005847.1762378-1-ming.lei@redhat.com>
+ <20230613005847.1762378-3-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v4 02/11] block: Block Device Filtering Mechanism
-Content-Language: en-US
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
-Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
-        dlemoal@kernel.org, wsa@kernel.org,
-        heikki.krogerus@linux.intel.com, ming.lei@redhat.com,
-        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>
-References: <20230609115858.4737-1-sergei.shtepa@veeam.com>
- <20230609115858.4737-2-sergei.shtepa@veeam.com>
- <e2f851d7-6b17-7a36-b5b3-2d60d450989d@infradead.org>
- <f7b67068-62c4-0977-265a-37c84f553eab@veeam.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <f7b67068-62c4-0977-265a-37c84f553eab@veeam.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230613005847.1762378-3-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Jun 13, 2023 at 08:58:47AM +0800, Ming Lei wrote:
+> And this way is correct because quiesce is enough for driver to handle
+> error recovery. The only difference is where to wait during error recovery.
+> With this way, IO is just queued in block layer queue instead of
+> __bio_queue_enter(), finally waiting for completion is done in upper
+> layer. Either way, IO can't move on during error recovery.
 
-
-On 6/13/23 05:34, Sergei Shtepa wrote:
-> 
-> 
-> On 6/13/23 03:51, Randy Dunlap wrote:
->>
->> On 6/9/23 04:58, Sergei Shtepa wrote:
->>> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
->>> index b7b56871029c..7904f157b245 100644
->>> --- a/include/uapi/linux/fs.h
->>> +++ b/include/uapi/linux/fs.h
->>> @@ -189,6 +189,9 @@ struct fsxattr {
->>>   * A jump here: 130-136 are reserved for zoned block devices
->>>   * (see uapi/linux/blkzoned.h)
->>>   */
->>> +#define BLKFILTER_ATTACH	_IOWR(0x12, 140, struct blkfilter_name)
->>> +#define BLKFILTER_DETACH	_IOWR(0x12, 141, struct blkfilter_name)
->>> +#define BLKFILTER_CTL		_IOWR(0x12, 142, struct blkfilter_ctl)
->>
->> Please update Documentation/userspace-api/ioctl/ioctl-number.rst
->> with the blkfilter ioctl number usage.
-> 
-> It seems to me that there is no need to change anything in the table of
-> numbers for 'blkfilter'. I think the existing record is enough:
-> 
-> 0x10  20-2F  arch/s390/include/uapi/asm/hypfs.h
-> 0x12  all    linux/fs.h
->              linux/blkpg.h
-
-Yes, OK.
-
-> Maybe it would probably be correct to specify the file 'uapi/linux/fs.h'?
-> And maybe we need to specify the request numbers for blksnap?
-
-Yes.
-
-> add ioctls numbers for blksnap
-> 
-> Asked-by: Randy Dunlap <rdunlap@infradead.org>
-
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-
-Thanks.
-
-> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> ---
->  Documentation/userspace-api/ioctl/ioctl-number.rst | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> index 176e8fc3f31b..96af64988251 100644
-> --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-> +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> @@ -202,6 +202,7 @@ Code  Seq#    Include File                                           Comments
->  'V'   C0     linux/ivtvfb.h                                          conflict!
->  'V'   C0     linux/ivtv.h                                            conflict!
->  'V'   C0     media/si4713.h                                          conflict!
-> +'V'   00-1F  uapi/linux/blksnap.h                                    conflict!
->  'W'   00-1F  linux/watchdog.h                                        conflict!
->  'W'   00-1F  linux/wanrouter.h                                       conflict! (pre 3.9)
->  'W'   00-3F  sound/asound.h                                          conflict!
-
--- 
-~Randy
+The point was to contain the fallout from modifying the hctx mappings.
+If you allow IO to queue in the blk-mq layer while a reset is in
+progress, they may be entering a context that won't be as expected on
+the other side of the reset.
