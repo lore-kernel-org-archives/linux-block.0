@@ -2,75 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7053BEB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 20:34:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D414AEB64D8
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 20:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbjFMUeN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 16:34:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42294 "EHLO
+        id S231991AbjFMU4S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 16:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjFMUeM (ORCPT
+        with ESMTP id S230229AbjFMU4R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 16:34:12 -0400
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02A3C135
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 13:34:11 -0700 (PDT)
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-4f642ecd8c1so1149267e87.0
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 13:34:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686688449; x=1689280449;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9wuGhny5hsKLzce/C/qbgMqj8TH9cCCK1tE6kjfQ+WY=;
-        b=Hspx++HfJ1Q7Q0rAV2GSTVldb/vS3Oa03agYnbcrLSvJjSFBQRuXX2pj31JtxGqXRc
-         6ZvvSLPhIccHEIrh/s4wHobWg0U5eQf0OhzrHO1p978c2HHqc5bm9fahlY8tfBarhf/v
-         A3p9r95Nt9FvPcpjvbVk5SmLfm6mlBGeBZrw8PO17r0tJbSf5Cv3ms4LsTVb9Y7/Q014
-         sq00i3jftCkiJJMfvxHW4sRO8ci0XzegDwT4NGz5e2RSEUbzZmpnFQyJSHFOLPzHWmzL
-         ZL57gzcybLRp8b2Gv4zyXajZk+zthC8Rsd0fDXStui9Et/4I0+7RDcXqnfsxYgFPKCb6
-         Z/7g==
-X-Gm-Message-State: AC+VfDw1DAaALnRRbUw0nNS2yBsEX+eyD6p23RMyq8zE2Y4rUJYEWg8A
-        /Iq6wkjWd3qf/uCN8k3ifqo=
-X-Google-Smtp-Source: ACHHUZ7CbPWFbJl1TsFH/qBGM3J6KaEiV3j3MUWjw1DLl1z3gWHod6EgSPbJTxX1J+xKFaQioQViZw==
-X-Received: by 2002:ac2:43c4:0:b0:4f3:ab15:aea with SMTP id u4-20020ac243c4000000b004f3ab150aeamr5837044lfl.2.1686688449009;
-        Tue, 13 Jun 2023 13:34:09 -0700 (PDT)
-Received: from [10.100.102.14] (46-117-190-200.bb.netvision.net.il. [46.117.190.200])
-        by smtp.gmail.com with ESMTPSA id g9-20020a19ac09000000b004f7642f638csm41050lfc.192.2023.06.13.13.34.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jun 2023 13:34:08 -0700 (PDT)
-Message-ID: <4c40b502-4309-d601-d8bc-18042c3f490c@grimberg.me>
-Date:   Tue, 13 Jun 2023 23:34:05 +0300
+        Tue, 13 Jun 2023 16:56:17 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC9A410F4;
+        Tue, 13 Jun 2023 13:56:16 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 68E9E22431;
+        Tue, 13 Jun 2023 20:56:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1686689775; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7sCeSsVRIBOYfYz0gtOw4EStwSHCdECdpehVah90ILY=;
+        b=rpFugcuiTgrioK9FPs73dOLv0Lo+HWubcKAxeoa+9mUnv9xUT/5JqQYsBThZu4yU+14jHe
+        u891JZxaL1WPbbww59nWnYX630tX7QfvfctT4qImqOkBuN82XaUKbAC6+nkwLM5iZnczuC
+        jNe9h/29OJoGJxwAKHRRoguEiwSfzR4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1686689775;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7sCeSsVRIBOYfYz0gtOw4EStwSHCdECdpehVah90ILY=;
+        b=dI7yy1jUiRIa4nFqhW6P8TUTMa2/kjzABoM8YehBwUcSvegbOzu8DpdLThCZRO6ZeQW75o
+        GCNLzsZkybaXeNDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5A1BC13345;
+        Tue, 13 Jun 2023 20:56:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Nzf+Fe/XiGTxLQAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 13 Jun 2023 20:56:15 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id E3887A0755; Tue, 13 Jun 2023 22:56:14 +0200 (CEST)
+Date:   Tue, 13 Jun 2023 22:56:14 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>,
+        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org, Kees Cook <keescook@google.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Message-ID: <20230613205614.atlrwst55bpqjzxf@quack3>
+References: <20230612161614.10302-1-jack@suse.cz>
+ <ZIf6RrbeyZVXBRhm@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 2/2] nvme: don't freeze/unfreeze queues from different
- contexts
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org,
-        Chunguang Xu <brookxu.cn@gmail.com>
-References: <20230613005847.1762378-1-ming.lei@redhat.com>
- <20230613005847.1762378-3-ming.lei@redhat.com>
- <ZIiAKhi5Vmc0Fc9W@kbusch-mbp.dhcp.thefacebook.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <ZIiAKhi5Vmc0Fc9W@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZIf6RrbeyZVXBRhm@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->> And this way is correct because quiesce is enough for driver to handle
->> error recovery. The only difference is where to wait during error recovery.
->> With this way, IO is just queued in block layer queue instead of
->> __bio_queue_enter(), finally waiting for completion is done in upper
->> layer. Either way, IO can't move on during error recovery.
+On Mon 12-06-23 22:10:30, Christoph Hellwig wrote:
+> > +config BLK_DEV_WRITE_HARDENING
+> > +	bool "Do not allow writing to mounted devices"
+> > +	help
+> > +	When a block device is mounted, writing to its buffer cache very likely
+> > +	going to cause filesystem corruption. It is also rather easy to crash
+> > +	the kernel in this way since the filesystem has no practical way of
+> > +	detecting these writes to buffer cache and verifying its metadata
+> > +	integrity. Select this option to disallow writing to mounted devices.
+> > +	This should be mostly fine but some filesystems (e.g. ext4) rely on
+> > +	the ability of filesystem tools to write to mounted filesystems to
+> > +	set e.g. UUID or run fsck on the root filesystem in some setups.
 > 
-> The point was to contain the fallout from modifying the hctx mappings.
-> If you allow IO to queue in the blk-mq layer while a reset is in
-> progress, they may be entering a context that won't be as expected on
-> the other side of the reset.
+> I'm not sure a config option is really the right thing.
+> 
+> I'd much prefer a BLK_OPEN_ flag to prohibit any other writer.
+> Except for etN and maybe fat all file systems can set that
+> unconditionally.  And for those file systems that have historically
+> allowed writes to mounted file systems they can find a local way
+> to decide on when and when not to set it.
 
-That still happens to *some* commands though right?
+Well, as I've mentioned in the changelog there are old setups (without
+initrd) that run fsck on root filesystem mounted read-only and fsck
+programs tend to open the device with O_RDWR. These would be broken by this
+change (for the filesystems that would use BLK_OPEN_ flag). Similarly some
+boot loaders can write to first sectors of the root partition while the
+filesystem is mounted. So I don't think controlling the behavior by the
+in-kernel user that is having the bdev exclusively open really works. It
+seems to be more a property of the system setup than a property of the
+in-kernel bdev user. Am I mistaken?
+
+So I think kconfig option or sysfs tunable (maybe a per-device one?) will
+be more appropriate choice? With default behavior configurable by kernel
+parameter? And once set to write-protect on mount, do we allow flipping it
+back? Both have advantages and disadvantages so the tunable might be
+tri-state in the end (no protection, write-protect but can be turned off,
+write-protect that cannot be turned off)? But maybe I'm overcomplicating
+this so please share your thoughts :)
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
