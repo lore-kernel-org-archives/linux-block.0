@@ -2,143 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7444EEB64D8
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 21:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0288EB64D7
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 21:36:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239585AbjFMVQ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 17:16:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60802 "EHLO
+        id S229674AbjFMVgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 17:36:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235998AbjFMVQ1 (ORCPT
+        with ESMTP id S240925AbjFMVf5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 17:16:27 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF0C19B7;
-        Tue, 13 Jun 2023 14:16:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686690986; x=1718226986;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xBxRrQSWCNJeRrf4b0WLzHh8isR+4h1yUuTtpwm0xS8=;
-  b=Thb0yr6yDOENAAADQ/By5OkT5yGyR4hWy1y4J20bDPy6VTfPDAxMKLQy
-   TzWgtPbSJjSkZ4oJQoFKUX5lgz0CPcj89m5ttxAW11nNses68G9r7M4oO
-   x5IFReoswNbQOV48ToWuUsk1disZDLd6MRuoWPpmnqNqwRIZ34PVoZb1H
-   NdD+eEcRirEdWrzHaWvYHflfq+zekAXInc5YKoZyyyGPvN8txp9TfG6jh
-   1plnai4ngiCvihK8xUiMIO0+IpECLhPJnzAhiFyrjxPd4UbAVwFShjXYj
-   YEBN1H8UHcSuoyCPCl+n5YrhuUudFg6tffWCl117VLl9GdxGiFA9ZLDJ9
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="357334279"
-X-IronPort-AV: E=Sophos;i="6.00,240,1681196400"; 
-   d="scan'208";a="357334279"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2023 14:16:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10740"; a="1041912514"
-X-IronPort-AV: E=Sophos;i="6.00,240,1681196400"; 
-   d="scan'208";a="1041912514"
-Received: from lkp-server01.sh.intel.com (HELO 211f47bdb1cb) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 13 Jun 2023 14:16:22 -0700
-Received: from kbuild by 211f47bdb1cb with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q9BNF-0001mK-2i;
-        Tue, 13 Jun 2023 21:16:21 +0000
-Date:   Wed, 14 Jun 2023 05:16:04 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     mwilck@suse.com, "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>,
-        Karan Tilak Kumar <kartilak@cisco.com>,
-        Sesidhar Baddela <sebaddel@cisco.com>
-Subject: Re: [PATCH v6 6/7] scsi: replace scsi_target_block() by
- scsi_block_targets()
-Message-ID: <202306140503.hMWyg8Xa-lkp@intel.com>
-References: <20230613174227.11235-7-mwilck@suse.com>
+        Tue, 13 Jun 2023 17:35:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE54BC7
+        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 14:34:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686692034;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sq4Gobht14PLhIrlUF3qoMat2z47BnhfNavxp+vbMx8=;
+        b=Telw4TtRE2xXzEzkJVZR03SbKFpnHhCfXVeUTGSJPWE4n/kQtnTHty43hFKdvAFwKUQPeb
+        vwA1jN+o/+rpH+Bgm0/1+rPremPxUw+6YeVpz4ss+xIT9hroQOQN25mCybe2jluC5vu3ZW
+        /pgR3KMZ1CE1gEDGvhyOFKnmoh4ebbo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-26-n-lhBdEfO5-ebbjiGfLzWQ-1; Tue, 13 Jun 2023 17:33:52 -0400
+X-MC-Unique: n-lhBdEfO5-ebbjiGfLzWQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5184F1C0512F;
+        Tue, 13 Jun 2023 21:33:50 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7C0B140E951;
+        Tue, 13 Jun 2023 21:33:47 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <f50b438f-90bc-36b1-c943-18d7a4b3f441@redhat.com>
+References: <f50b438f-90bc-36b1-c943-18d7a4b3f441@redhat.com> <431929.1686588681@warthog.procyon.org.uk>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+        kernel test robot <oliver.sang@intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Jeff Layton <jlayton@kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Hillf Danton <hdanton@sina.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230613174227.11235-7-mwilck@suse.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1156282.1686692027.1@warthog.procyon.org.uk>
+Date:   Tue, 13 Jun 2023 22:33:47 +0100
+Message-ID: <1156283.1686692027@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Okay, it isn't this.  The problem appears to be that __blockdev_direct_IO()
+calls dio_cleanup() twice if do_direct_IO() fails.
 
-kernel test robot noticed the following build errors:
+David
 
-[auto build test ERROR on mkp-scsi/for-next]
-[also build test ERROR on jejb-scsi/for-next axboe-block/for-next linus/master v6.4-rc6 next-20230613]
-[cannot apply to hch-configfs/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/mwilck-suse-com/bsg-increase-number-of-devices/20230614-014437
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git for-next
-patch link:    https://lore.kernel.org/r/20230613174227.11235-7-mwilck%40suse.com
-patch subject: [PATCH v6 6/7] scsi: replace scsi_target_block() by scsi_block_targets()
-config: arm-randconfig-r011-20230612 (https://download.01.org/0day-ci/archive/20230614/202306140503.hMWyg8Xa-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build):
-        mkdir -p ~/bin
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm cross compiling tool for clang build
-        # apt-get install binutils-arm-linux-gnueabi
-        git remote add mkp-scsi https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git
-        git fetch mkp-scsi for-next
-        git checkout mkp-scsi/for-next
-        b4 shazam https://lore.kernel.org/r/20230613174227.11235-7-mwilck@suse.com
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang ~/bin/make.cross W=1 O=build_dir ARCH=arm olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang ~/bin/make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash drivers/scsi/
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306140503.hMWyg8Xa-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/scsi/scsi_lib.c:2912:1: error: conflicting types for 'scsi_block_targets'
-    2912 | scsi_block_targets(struct device *dev, struct Scsi_Host *shost)
-         | ^
-   include/scsi/scsi_device.h:459:6: note: previous declaration is here
-     459 | void scsi_block_targets(struct Scsi_Host *shost, struct device *dev);
-         |      ^
-   1 error generated.
-
-
-vim +/scsi_block_targets +2912 drivers/scsi/scsi_lib.c
-
-  2898	
-  2899	/**
-  2900	 * scsi_block_targets - transition all SCSI child devices to SDEV_BLOCK state
-  2901	 * @dev: a parent device of one or more scsi_target devices
-  2902	 * @shost: the Scsi_Host to which this device belongs
-  2903	 *
-  2904	 * Iterate over all children of @dev, which should be scsi_target devices,
-  2905	 * and switch all subordinate scsi devices to SDEV_BLOCK state. Wait for
-  2906	 * ongoing scsi_queue_rq() calls to finish. May sleep.
-  2907	 *
-  2908	 * Note:
-  2909	 * @dev must not itself be a scsi_target device.
-  2910	 */
-  2911	void
-> 2912	scsi_block_targets(struct device *dev, struct Scsi_Host *shost)
-  2913	{
-  2914		WARN_ON_ONCE(scsi_is_target_device(dev));
-  2915		device_for_each_child(dev, NULL, target_block);
-  2916		blk_mq_wait_quiesce_done(&shost->tag_set);
-  2917	}
-  2918	EXPORT_SYMBOL_GPL(scsi_block_targets);
-  2919	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
