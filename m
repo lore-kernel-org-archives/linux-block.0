@@ -2,147 +2,135 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C915BEB64DA
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 21:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1157EB64DA
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 22:12:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240660AbjFMV4l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 17:56:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46366 "EHLO
+        id S230324AbjFMWMC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 18:12:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232634AbjFMV4J (ORCPT
+        with ESMTP id S229955AbjFMWMB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 17:56:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BA191FD9
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 14:55:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686693305;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1PjQMG6Yu1qBPrMj044V/Nk+rlr/96uKkoV0wYpuazQ=;
-        b=HGt+JmBhmmBAaQJETxi7dPA1iwMREEIlVzKvx6FITpm8FwNcjyAS0HCOMZXXkKYfBwTS02
-        Vhe+4YceEwfymaiFl5XiRL1K8GIqPacibPF9ux6UfzzjojP0seRDR1CXbJ0aZCh0RU65yY
-        YLjFPgzRzyxItxdbIghpJmAeXYeLips=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-39-3wnroJiJOTC1wvpPs_598w-1; Tue, 13 Jun 2023 17:54:57 -0400
-X-MC-Unique: 3wnroJiJOTC1wvpPs_598w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A1BE3C0CEF0;
-        Tue, 13 Jun 2023 21:54:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D29182166B25;
-        Tue, 13 Jun 2023 21:54:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, David Hildenbrand <david@redhat.com>,
-        kernel test robot <oliver.sang@intel.com>
-cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Fix dio_cleanup() to advance the head index
+        Tue, 13 Jun 2023 18:12:01 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A0761989;
+        Tue, 13 Jun 2023 15:11:52 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-543d32eed7cso2667450a12.2;
+        Tue, 13 Jun 2023 15:11:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686694312; x=1689286312;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UYvFV+rRgOj31IeXun1J8221rw1qfjApgNtLvJG7y7Q=;
+        b=g6oqo0kB4RqVvgJXE0QBsLnZmfaeVLV+l/nEQHa9dCVc3AaW++OnDyFOxS3J8yvX10
+         6xSlS2GKw/Mg7LqXLTQXt4QukLbmM7CbflpFLF5w+0gzrVnt8NxxOc0+cwbgai3R/jfa
+         CPjJ6ZyzNE26HVrF4ZIK4C+bhTgPh6m3oVmjspzWRT3b7HiXS4++QJziJnTfuWaoFAZ2
+         RFdNSvPk3TymroBRxpR0h9TsPGv7zj/mCwDIwumpT8EkXnUz40ejPxsLV4z1c+YnVkFq
+         MoDWhzUy/tEusTvZ88TekCokvLf3hr7DMWJtBz5PaGbqVFuE1CvTVdzhfIw5Gd5NkEVX
+         2xfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686694312; x=1689286312;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UYvFV+rRgOj31IeXun1J8221rw1qfjApgNtLvJG7y7Q=;
+        b=C1oQFg1hu0+mwRgrw7dALScxFzQRxBF7OtWWCFhVL+dTHX4gJJ7dlfdlZIZrh0QUOJ
+         dn7Ncg1xVe/ZnlrKkd5uIBZGEsptL/9xoKejHNh2Pz5nklxavUHWh0DHsfi73j8m4+LG
+         VcMttZyP1PRSzHV59PP18ZkkyPqJ0FRu5IlxuFZLssmodluV2o7WO+REhiboBH7/3WHB
+         EjvNsFlsdr1gyynRkXQKf3e6nxip9aqqBn/tZCbrvaaYvSv/1uofSg8Qwiv7C5LIWLUP
+         muevf01r+IDTE8dwg9IlhepA8V1hzhUCXyPwQPDGm1JRHBrMtaI2HM+i4P0mdtTz+d5C
+         y4GQ==
+X-Gm-Message-State: AC+VfDwwqvx92DG98lyVKZFqR+EnWz4Pl1J3rsK7aLkSBSXjpnlZTEna
+        K9dsvFTd+dWqoq2OTZU4U3Q=
+X-Google-Smtp-Source: ACHHUZ4gMeUCzbu/44eWvUPib9Y87vE0Hu8usy96+kGWbmGtvkVZvAJVVMsKshD4A1KfBHNyu0jjNg==
+X-Received: by 2002:a17:90a:fd8b:b0:25b:d7e3:a018 with SMTP id cx11-20020a17090afd8b00b0025bd7e3a018mr16146pjb.35.1686694311786;
+        Tue, 13 Jun 2023 15:11:51 -0700 (PDT)
+Received: from ?IPV6:2001:df0:0:200c:ad3e:4a38:ffce:bee7? ([2001:df0:0:200c:ad3e:4a38:ffce:bee7])
+        by smtp.gmail.com with ESMTPSA id 12-20020a17090a194c00b0025c03008555sm2884069pjh.4.2023.06.13.15.11.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jun 2023 15:11:51 -0700 (PDT)
+Message-ID: <86671bf8-98db-7d82-f7cb-a80d6f6c064c@gmail.com>
+Date:   Wed, 14 Jun 2023 10:11:45 +1200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1193484.1686693279.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 13 Jun 2023 22:54:39 +0100
-Message-ID: <1193485.1686693279@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v7 2/2] block: add overflow checks for Amiga partition
+ support
+Content-Language: en-US
+To:     Martin Steigerwald <martin@lichtvoll.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org,
+        Christoph Hellwig <hch@infradead.org>
+References: <1539570747-19906-1-git-send-email-schmitzmic@gmail.com>
+ <4814181.GXAFRqVoOG@lichtvoll.de>
+ <12241273-9403-426e-58ed-f3f597fe331b@gmail.com>
+ <3748744.kQq0lBPeGt@lichtvoll.de>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+In-Reply-To: <3748744.kQq0lBPeGt@lichtvoll.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-    =
+Hi Martin,
 
-Fix dio_bio_cleanup() to advance the head index into the list of pages pas=
-t
-the pages it has released, as __blockdev_direct_IO() will call it twice if
-do_direct_IO() fails.
+On 13/06/23 22:57, Martin Steigerwald wrote:
+> Michael Schmitz - 13.06.23, 10:18:24 CEST:
+>> Am 13.06.2023 um 19:25 schrieb Martin Steigerwald:
+>>> Hi Michael, hi Jens, Hi Geert.
+>>>
+>>> Michael Schmitz - 22.08.22, 22:56:10 CEST:
+>>>> On 23/08/22 08:41, Jens Axboe wrote:
+>>>>> On 8/22/22 2:39 PM, Michael Schmitz wrote:
+>>>>>> Hi Jens,
+>>>>>>
+>>>>>> will do - just waiting to hear back what needs to be done
+>>>>>> regarding
+>>>>>> backporting issues raised by Geert.
+>>>>> It needs to go upstream first before it can go to stable. Just
+>>>>> mark
+>>>>> it with the right Fixes tags and that will happen automatically.
+>>> […]
+>>>
+>>>> thanks - the Fixes tag in my patches refers to Martin's bug report
+>>>> and won't be useful to decide how far back this must be applied.
+>>>>
+>>>> Now the bug pre-dates git, making the commit to 'fix'
+>>>> 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 ... That one's a bit
+>>>> special, please yell if you want me to lie about this and use a
+>>>> later commit specific to the partition parser code.
+>>> After this discussion happened I thought the patch went in. However…
+>>> as John Paul Adrian asked in "Status of affs support in the kernel
+>>> and affstools" thread on linux-m68k and debian-68k mailing list, I
+>>> searched for the patch in git history but did not find it.
+>> I may have messed that one up, as it turns out. Last version was v9
+>> which I had to resend twice, and depending on what Jens uses to keep
+>> track of patches, the resends may not have shown up in his tool. I
+>> should have bumped the version number instead.
+>>
+>> I'll see if my latest version still applies cleanly ...
+> Many thanks!
+>
+> Would be nice to see it finally go in.
+My last version (v9) still applies, but that one still threw a sparse 
+warning for patch 2:
 
-The issue was causing:
+Link:https://lore.kernel.org/all/202208231319.Ng5RTzzg-lkp@intel.com
 
-        WARNING: CPU: 6 PID: 2220 at mm/gup.c:76 try_get_folio
+Not sure how to treat that one - rdb_CylBlocks is not declared as big 
+endian so the warning is correct, but as far as I can see, for all 
+practical purposes rdb_CylBlocks would be expected to be in big endian 
+order (partition usually prepared on a big endian system)?
 
-This can be triggered by setting up a clean pair of UDF filesystems on
-loopback devices and running the generic/451 xfstest with them as the
-scratch and test partitions.  Something like the following:
+I can drop the be32_to_cpu conversion (and would expect to see a warning 
+printed on little endian systems), or force the cast to __be32. Or 
+rather drop that consistency check outright...
 
-    fallocate /mnt2/udf_scratch -l 1G
-    fallocate /mnt2/udf_test -l 1G
-    mknod /dev/lo0 b 7 0
-    mknod /dev/lo1 b 7 1
-    losetup lo0 /mnt2/udf_scratch
-    losetup lo1 /mnt2/udf_test
-    mkfs -t udf /dev/lo0
-    mkfs -t udf /dev/lo1
-    cd xfstests
-    ./check generic/451
+Cheers,
 
-with xfstests configured by putting the following into local.config:
+     Michael
 
-    export FSTYP=3Dudf
-    export DISABLE_UDF_TEST=3D1
-    export TEST_DEV=3D/dev/lo1
-    export TEST_DIR=3D/xfstest.test
-    export SCRATCH_DEV=3D/dev/lo0
-    export SCRATCH_MNT=3D/xfstest.scratch
-
-Fixes: 1ccf164ec866 ("block: Use iov_iter_extract_pages() and page pinning=
- in direct-io.c")
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202306120931.a9606b88-oliver.sang@i=
-ntel.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: Andrew Morton <akpm@linux-foundation.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Jan Kara <jack@suse.cz>
-cc: Jeff Layton <jlayton@kernel.org>
-cc: Jason Gunthorpe <jgg@nvidia.com>
-cc: Logan Gunthorpe <logang@deltatee.com>
-cc: Hillf Danton <hdanton@sina.com>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-block@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-cc: linux-mm@kvack.org
----
- fs/direct-io.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 0643f1bb4b59..2ceb378b93c0 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -459,6 +459,7 @@ static inline void dio_cleanup(struct dio *dio, struct=
- dio_submit *sdio)
- 	if (dio->is_pinned)
- 		unpin_user_pages(dio->pages + sdio->head,
- 				 sdio->tail - sdio->head);
-+	sdio->head =3D sdio->tail;
- }
- =
-
- /*
-
+>
+> Best,
