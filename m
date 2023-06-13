@@ -2,95 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E617AC7EE2E
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 10:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C23A3C7EE29
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 10:47:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241989AbjFMKmh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 06:42:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38720 "EHLO
+        id S241759AbjFMKrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 06:47:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241966AbjFMKmf (ORCPT
+        with ESMTP id S238981AbjFMKrk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 06:42:35 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 098B319F;
-        Tue, 13 Jun 2023 03:42:34 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Tue, 13 Jun 2023 06:47:40 -0400
+Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B96811AC;
+        Tue, 13 Jun 2023 03:47:39 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 29D8221D89;
-        Tue, 13 Jun 2023 10:42:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1686652952; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fdRjObJW3pDOu1v60Qd7J1KvXFeaeo4NoAyaYtHQWlg=;
-        b=uZ/nnln2BbRk87uvgO1WlUiC3ZVQjSNb6di00xZqRFFw+VG5FrvIU+mtJTPQmZlTqnd//W
-        ekSg/VqsRcdBWBck3vco/9nrPPa6SVC3lHSRhjOZ4HU7JTIsVW53iko3+4483SFpHy+/3U
-        jAIjrYl7yW5khynWnrTHI/KjsLwda50=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C7ED613483;
-        Tue, 13 Jun 2023 10:42:31 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 4B6+LhdIiGQMegAAMHmgww
-        (envelope-from <mwilck@suse.com>); Tue, 13 Jun 2023 10:42:31 +0000
-Message-ID: <7e05a257cffd09615b03681e0783e51e285ee15b.camel@suse.com>
-Subject: Re: [PATCH v5 3/7] scsi: merge scsi_internal_device_block() and
- device_block()
-From:   Martin Wilck <mwilck@suse.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-Date:   Tue, 13 Jun 2023 12:42:30 +0200
-In-Reply-To: <31043005-eb42-1a03-676a-1544c3cbbe26@acm.org>
-References: <20230612165049.29440-1-mwilck@suse.com>
-         <20230612165049.29440-4-mwilck@suse.com>
-         <31043005-eb42-1a03-676a-1544c3cbbe26@acm.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.1 
+        by mx4.veeam.com (Postfix) with ESMTPS id D96E25E91D;
+        Tue, 13 Jun 2023 13:47:37 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx4-2022; t=1686653258;
+        bh=Z7dNDDmcpifePckvcqW3TSCqfRweG1amD84n3lPragY=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=G81g0nM4EYIPIQEClVwgOGTxMajn0Ko1zyPiCrWwoKHprdoEd8oLiDEE4qaLbjrNp
+         VZe0PpeeqGdLTgyqAMv2gCODJvMXr18nCaOsz5uCa+B6EVY6YO7LbLYxubvuHknSLw
+         +Sf5GD/P3f4ElvgLDl6C+02x/jeBbE/ecien7pvE44117yMV9PhA7S0lDmEpnYXF1G
+         6w/xdup9AYJbf4dvxFFT1pjLUWh9USwm94QAnCU0vDSOYXuecjsgmOwttyBomuIiva
+         j+SLkf2kWAH5bumQnimtvQ79U7Qj5xta8aMXLkRzurdwUqt6I0ADNfdWYQuOrjvf9f
+         O6tUHBnRi4eww==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Tue, 13 Jun
+ 2023 12:47:36 +0200
+Message-ID: <7dbbaf60-c85d-5a7a-8f16-5f5e4ff43cd8@veeam.com>
+Date:   Tue, 13 Jun 2023 12:47:29 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v4 11/11] blksnap: Kconfig and Makefile
+Content-Language: en-US
+To:     Randy Dunlap <rdunlap@infradead.org>, <axboe@kernel.dk>,
+        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+        <willy@infradead.org>, <dlemoal@kernel.org>, <wsa@kernel.org>,
+        <heikki.krogerus@linux.intel.com>, <ming.lei@redhat.com>,
+        <gregkh@linuxfoundation.org>, <linux-block@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>
+References: <20230609115858.4737-1-sergei.shtepa@veeam.com>
+ <20230609115858.4737-11-sergei.shtepa@veeam.com>
+ <499ded51-3fb8-f11b-8776-08ab2e9a8812@infradead.org>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <499ded51-3fb8-f11b-8776-08ab2e9a8812@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29240315546D7163
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2023-06-12 at 11:00 -0700, Bart Van Assche wrote:
-> On 6/12/23 09:50, mwilck@suse.com=A0wrote:
-> > -static int scsi_internal_device_block(struct scsi_device *sdev)
-> > +static void scsi_device_block(struct scsi_device *sdev, void
-> > *data)
-> > =A0 {
-> > =A0=A0=A0=A0=A0=A0=A0=A0int err;
-> > =A0=20
-> > @@ -2805,7 +2804,8 @@ static int scsi_internal_device_block(struct
-> > scsi_device *sdev)
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0scsi_stop_queue(sdev, f=
-alse);
-> > =A0=A0=A0=A0=A0=A0=A0=A0mutex_unlock(&sdev->state_mutex);
-> > =A0=20
-> > -=A0=A0=A0=A0=A0=A0=A0return err;
-> > +=A0=A0=A0=A0=A0=A0=A0WARN_ONCE(err, "__scsi_internal_device_block_nowa=
-it(%s)
-> > failed: err =3D %d\n",
-> > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 dev_name(&sdev->sdev_=
-gendev), err);
-> > =A0 }
->=20
-> Hmm ... wasn't it your intention to change the reference to the
-> __scsi_internal_device_block_nowait() function in this message?
 
-Yes. I did it in a separate patch (as you saw), because I didn't want
-to void the Reviewed-by: tags this patch had already received.
 
-Regards,
-Martin
+On 6/13/23 01:43, Randy Dunlap wrote:
+>> +config BLKSNAP
+>> +	tristate "Block Devices Snapshots Module (blksnap)"
+>> +	help
+>> +	  Allow to create snapshots and track block changes for block devices.
+>> +	  Designed for creating backups for simple block devices. Snapshots are
+>> +	  temporary and are released then backup is completed. Change block
+> 	                             when backup is completed.
+> 
+> or is the order of operations as listed: release snapshots and then backup
+> can be completed?
+> 
+>> +	  tracking allows to create incremental or differential backups.
 
+"when backup is completed." - it will be more correct.
+
+Normal backup process:
+
+Take snapshot                                        Release snapshot
+    |    Start backup                        Finish backup   |
+    |        |  Copy data from snapshot images    |          |
+------------------------------------------------------------------------->
+                                                                         t
+
+In case of failure, for example, when the snapshot is overflowing:
+
+                                           The snapshot is corrupted
+Take snapshot                                   | Release snapshot
+    |    Start backup                           |   | Finish failed backup
+    |        |  Copy data from snapshot images  |   |    |
+------------------------------------------------------------------------->
+                                                                         t
