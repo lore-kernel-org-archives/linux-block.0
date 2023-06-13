@@ -2,183 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 475CEC88CB4
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 01:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F61EC7EE2E
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 03:52:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238724AbjFMBwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Jun 2023 21:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
+        id S233356AbjFMDw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Jun 2023 23:52:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjFMBwz (ORCPT
+        with ESMTP id S229749AbjFMDw1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Jun 2023 21:52:55 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D49A013E;
-        Mon, 12 Jun 2023 18:52:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=NjFb2DneMugGIPw5KlK2+oDu3ftr6iDdoaz0Ka2kCgc=; b=uqYivyfZxr4tZ6Ciy1zx0jCDWG
-        1MvyOF1wlySoP6i6IRg7beLoPQ28OH7kxTBb4cK+QIPnDeNTNaiq7Bm41S31+5Ncs7i0dfrWIP+2N
-        51InwiFpifoThbHx2/UIebWu3F/IDOkAwgSKeZ1NKomXQLYCBd9zMqbuYsf1WHKYz/kThqKTUMwsg
-        fg1AlBuxFVJM47s9OkB0wyM1x4syJ/m0RVkMrF2JUC/sQMXKvWnR8hD7i7NDAl+k+Qobazt+uiM2P
-        hfu+mWIpj+AQKLdjDXKxPHRAIvXF2i7/ZZJ2l4C033j7eW837bm+tZ4R/FMpF8/clfv2o33abnrnn
-        PXleK7hA==;
-Received: from [2601:1c2:980:9ec0::2764]
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8tDB-006cLc-08;
-        Tue, 13 Jun 2023 01:52:45 +0000
-Message-ID: <004cc6b2-1941-5aed-6e09-3bd01dfbf8e4@infradead.org>
-Date:   Mon, 12 Jun 2023 18:52:43 -0700
+        Mon, 12 Jun 2023 23:52:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F21C61AD
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 20:51:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686628301;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4C3Qet8pfbumCHeQRQJPhvf0fawkFBs8tKAQEcPXsl8=;
+        b=DTUoDrRp/nVG1heljgxeDGdS0VIZj9yaftKKtoGSbhHW8TeJYUTqIHc+4P/ATKnWoUF765
+        RxzaHVP2SsTNGkwcP7UAuNg49R85011tYFJ4kBA9Vq21IBPE2IvVF17EyKdKYuS8Z4pbEJ
+        X+M8s0b4h3qpMbu1TeXkdp8QbnQan3k=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-43-tpLAkSCoP3y1tDfhhjz1wQ-1; Mon, 12 Jun 2023 23:51:39 -0400
+X-MC-Unique: tpLAkSCoP3y1tDfhhjz1wQ-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-3f994c591bdso7658291cf.0
+        for <linux-block@vger.kernel.org>; Mon, 12 Jun 2023 20:51:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686628298; x=1689220298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4C3Qet8pfbumCHeQRQJPhvf0fawkFBs8tKAQEcPXsl8=;
+        b=l8r6HHDF0BSS6eAb4nw2cdOSsrzUaT7W7KdmyaF4M12H22lk4e+h8GDYoB6R/+wZHY
+         e+ZNGQW3IV5VXjDC40XeySt9yccsX9+i+nr90aCCvascoAZt0zfEJwz1/voUTKuHYdjj
+         g0LlwJB+bvwYjFbL7UXDiU30qx6BxutRON0lA5dJWxieoOa88hFzKcXYiPgeqlETf6Or
+         GGZ+7/oNpcr+ReS8LdeRvT47v08qVCqr8j8bdGZzocFOLCI/yQmjRuiVYUq04LK6Myjj
+         sTdETEjIWEJeNCa5/XWYgRez3ypJ33RmG4RNhKlLh0iRoomJLA07LnoKZgFSPL+AhcEj
+         T7gA==
+X-Gm-Message-State: AC+VfDzeTXXUJm63bbyim9hLA2hVNaMJ/eYuGJcwW7Lro1iF+rEFBOvd
+        hVuflaxjfRFPkYl4Hu4JBylYXMBYV/ZectxsRNtep6ZpNPMwMXulblLMV69cXHRCXlblGZzUOwE
+        wa6iKz/+PE3HdzPFW+gR6KMmWUIsTx+/0VTNI/w8=
+X-Received: by 2002:a05:622a:58d:b0:3f0:ab4e:df6b with SMTP id c13-20020a05622a058d00b003f0ab4edf6bmr13376056qtb.67.1686628298180;
+        Mon, 12 Jun 2023 20:51:38 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ77q9JM4D3nlwn+WSOng3WLkYEnk7ORFVxoz6Go1qcYYHvUtAhi0IrS4HeqbAYoiDffwJDzqdo9NagKfCPHwxI=
+X-Received: by 2002:a05:622a:58d:b0:3f0:ab4e:df6b with SMTP id
+ c13-20020a05622a058d00b003f0ab4edf6bmr13376041qtb.67.1686628297957; Mon, 12
+ Jun 2023 20:51:37 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v4 01/11] documentation: Block Device Filtering Mechanism
-Content-Language: en-US
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        hch@infradead.org, corbet@lwn.net, snitzer@kernel.org
-Cc:     viro@zeniv.linux.org.uk, brauner@kernel.org, willy@infradead.org,
-        dlemoal@kernel.org, wsa@kernel.org,
-        heikki.krogerus@linux.intel.com, ming.lei@redhat.com,
-        gregkh@linuxfoundation.org, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Bagas Sanjaya <bagasdotme@gmail.com>
-References: <20230609115858.4737-1-sergei.shtepa@veeam.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230609115858.4737-1-sergei.shtepa@veeam.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230520052957.798486-1-leobras@redhat.com>
+In-Reply-To: <20230520052957.798486-1-leobras@redhat.com>
+From:   Leonardo Bras Soares Passos <leobras@redhat.com>
+Date:   Tue, 13 Jun 2023 00:51:27 -0300
+Message-ID: <CAJ6HWG6dK_-5jjoGJadOXqE=9c0Np-85r9-ymtAt241XrdwW=w@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/3] Move usages of struct __call_single_data to call_single_data_t
+To:     Jens Axboe <axboe@kernel.dk>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Palmer Dabbelt <palmer@rivosinc.com>,
+        Leonardo Bras <leobras@redhat.com>,
+        Guo Ren <guoren@kernel.org>,
+        Valentin Schneider <vschneid@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi--
+Friendly ping
 
-On 6/9/23 04:58, Sergei Shtepa wrote:
-> The document contains:
-> * Describes the purpose of the mechanism
-> * A little historical background on the capabilities of handling I/O
->   units of the Linux kernel
-> * Brief description of the design
-> * Reference to interface description
-> 
-> Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> ---
->  Documentation/block/blkfilter.rst | 64 +++++++++++++++++++++++++++++++
->  Documentation/block/index.rst     |  1 +
->  MAINTAINERS                       |  6 +++
->  3 files changed, 71 insertions(+)
->  create mode 100644 Documentation/block/blkfilter.rst
-> 
-> diff --git a/Documentation/block/blkfilter.rst b/Documentation/block/blkfilter.rst
-> new file mode 100644
-> index 000000000000..555625789244
-> --- /dev/null
-> +++ b/Documentation/block/blkfilter.rst
-> @@ -0,0 +1,64 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +================================
-> +Block Device Filtering Mechanism
-> +================================
-> +
-> +The block device filtering mechanism is an API that allows to attach block
+On Sat, May 20, 2023 at 2:30=E2=80=AFAM Leonardo Bras <leobras@redhat.com> =
+wrote:
+>
+> Changes since RFCv1:
+> - request->csd moved to the middle of the struct, without size impact
+> - type change happens in a different patch (thanks Jens Axboe!)
+> - Improved the third patch to also update the .h file.
+>
+> Leonardo Bras (3):
+>   blk-mq: Move csd inside struct request so it's 32-byte aligned
+>   blk-mq: Change request->csd type to call_single_data_t
+>   smp: Change signatures to use call_single_data_t
+>
+>  include/linux/blk-mq.h | 10 +++++-----
+>  include/linux/smp.h    |  2 +-
+>  kernel/smp.c           |  4 ++--
+>  kernel/up.c            |  2 +-
+>  4 files changed, 9 insertions(+), 9 deletions(-)
+>
+> --
+> 2.40.1
+>
 
-                                                  that allows {what or who} to attach
-
-so who/what does the attach? Is it a driver or a user or admin or something else?
-and attach them to what?
-
-> +device filters. Block device filters allow perform additional processing
-
-                                        allow performing ...
-
-> +for I/O units.
-> +
-> +Introduction
-> +============
-> +
-> +The idea of handling I/O units on block devices is not new. Back in the
-> +2.6 kernel, there was an undocumented possibility of handling I/O units
-> +by substituting the make_request_fn() function, which belonged to the
-> +request_queue structure. But none of the in-tree kernel modules used this
-> +feature, and it was eliminated in the 5.10 kernel.
-> +
-> +The block device filtering mechanism returns the ability to handle I/O units.
-> +It is possible to safely attach filter to a block device "on the fly" without
-
-                            attach a filter
-or
-                            attach filters
-
-> +changing the structure of block devices stack.
-
-                          of the block device's stack.
-
-> +
-> +It supports attaching one filter to one block device, because there is only
-> +one filter implementation in the kernel yet.
-> +See Documentation/block/blksnap.rst.
-> +
-> +Design
-> +======
-> +
-> +The block device filtering mechanism provides registration and unregistration
-> +for filter operations. The struct blkfilter_operations contains a pointer to
-> +the callback functions for the filter. After registering the filter operations,
-> +filter can be managed using block device ioctl BLKFILTER_ATTACH,
-
-   a filter
-or
-   the filter                               ioctls
-
-> +BLKFILTER_DETACH and BLKFILTER_CTL.
-> +
-> +When the filter is attached, the callback function is called for each I/O unit
-> +for a block device, providing I/O unit filtering. Depending on the result of
-> +filtering the I/O unit, it can either be passed for subsequent processing by
-> +the block layer, or skipped.
-> +
-> +The filter can be implemented as a loadable module. In this case, the filter
-> +module cannot be unloaded while the filter is attached to at least one of the
-> +block devices.
-> +
-> +Interface description
-> +=====================
-> +
-> +The ioctl BLKFILTER_ATTACH and BLKFILTER_DETACH use structure blkfilter_name.
-
-       ioctls
-
-> +It allows to attach a filter to a block device or detach it.
-
-   It allows a driver to attach a filter ...
-?
-
-> +
-> +The ioctl BLKFILTER_CTL use structure blkfilter_ctl. It allows to send a
-
-                                                        It allows a driver to send a
-
-> +filter-specific command.
-> +
-> +.. kernel-doc:: include/uapi/linux/blk-filter.h
-> +
-> +To register in the system, the filter creates its own account, which contains
-> +callback functions, unique filter name and module owner. This filter account is
-> +used by the registration functions.
-
-I'm having a problem with this "account" thingy. Can you explain more about it?
-Is there an alternate word that might be used here?
-
-> +
-> +.. kernel-doc:: include/linux/blk-filter.h
-> +
-> +.. kernel-doc:: block/blk-filter.c
-> +   :export:
-
-Thanks.
--- 
-~Randy
