@@ -2,84 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F655C001B0
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 16:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2C6EB64DB
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 17:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231517AbjFMQka (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 12:40:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58590 "EHLO
+        id S232047AbjFMRmk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 13:42:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232686AbjFMQkK (ORCPT
+        with ESMTP id S239672AbjFMRmg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 12:40:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C12810F7
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 09:39:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686674359;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AcIaHBGFQIXuSfMrtRY4iVaejyldODuRWOKh30XsKHo=;
-        b=DV/FVAYem5IrLHiO26Pa6VGt9+sWs9fwVExHdDRdufxG4eK032DljR6+/5Iyh/B6JtZ/Lu
-        qjlw4rPgkoiUPDiKi2Dn3oBVfTsw5nGhc6crxEDCjjvwS1i6sAuwnX5iTl9/v1zzNn9Jfr
-        K5D79IZ39UlHjPy2Ib9mK4BkFdhuZGI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-14-n5bk6yWKO62xrbbYqo5uGQ-1; Tue, 13 Jun 2023 12:39:15 -0400
-X-MC-Unique: n5bk6yWKO62xrbbYqo5uGQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Tue, 13 Jun 2023 13:42:36 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65AB912C;
+        Tue, 13 Jun 2023 10:42:35 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3F0838039C9;
-        Tue, 13 Jun 2023 16:39:03 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DE4081C558;
-        Tue, 13 Jun 2023 16:38:59 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <639735.1686672037@warthog.procyon.org.uk>
-References: <639735.1686672037@warthog.procyon.org.uk> <491da795-e9e0-1d84-558b-df09063228cb@kernel.dk> <545463.1686601473@warthog.procyon.org.uk>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     dhowells@redhat.com, David Hildenbrand <david@redhat.com>,
-        kernel test robot <oliver.sang@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 186231FD67;
+        Tue, 13 Jun 2023 17:42:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1686678154; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Md2lKFbYYlIFRimhTAFovw3H98C3UoSpAEfzkvqw8/k=;
+        b=mrM+ux3vfS5f0sYubjbwO98sq52Jf49ZxcagsIC+vyDL1ivoH4rkrsREzVBRxnKY9XBJx7
+        bgcw2ZOL6zNWJY0w1MAlMPMBPDg1e8IpD82ZvPS8Spkl+HZ2T5xERH4yxPFI84yD/NIp/H
+        kWSr/AIyE53OTWk3ROB31+vj4HxD54A=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AA36313483;
+        Tue, 13 Jun 2023 17:42:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id OOB0J4mqiGSWXwAAMHmgww
+        (envelope-from <mwilck@suse.com>); Tue, 13 Jun 2023 17:42:33 +0000
+From:   mwilck@suse.com
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>,
+        Douglas Gilbert <dgilbert@interlog.com>
+Subject: [PATCH v6 2/7] scsi: sg: increase number of devices
+Date:   Tue, 13 Jun 2023 19:42:22 +0200
+Message-Id: <20230613174227.11235-3-mwilck@suse.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230613174227.11235-1-mwilck@suse.com>
+References: <20230613174227.11235-1-mwilck@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <726323.1686674339.1@warthog.procyon.org.uk>
-Date:   Tue, 13 Jun 2023 17:38:59 +0100
-Message-ID: <726324.1686674339@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+From: Hannes Reinecke <hare@suse.de>
 
-> > What is this against?
-> 
-> It's against the branch I posted.
+Larger setups may need to allocate more than 32k sg devices, so
+increase the number of devices to the full range of minor device
+numbers.
 
-Actually, it's not.  It's against an old version of the patch on a different
-branch.  The patches you have applied already have that change - so the issue
-must be something else:-/
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+Acked-by: Douglas Gilbert <dgilbert@interlog.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+---
+ drivers/scsi/sg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-David
+diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
+index 037f8c98a6d3..6c04cf941dac 100644
+--- a/drivers/scsi/sg.c
++++ b/drivers/scsi/sg.c
+@@ -71,7 +71,7 @@ static int sg_proc_init(void);
+ 
+ #define SG_ALLOW_DIO_DEF 0
+ 
+-#define SG_MAX_DEVS 32768
++#define SG_MAX_DEVS (1 << MINORBITS)
+ 
+ /* SG_MAX_CDB_SIZE should be 260 (spc4r37 section 3.1.30) however the type
+  * of sg_io_hdr::cmd_len can only represent 255. All SCSI commands greater
+-- 
+2.40.1
 
