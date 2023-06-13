@@ -2,58 +2,36 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A96C77B7A
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 04:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8814AC77B7A
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 04:33:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239934AbjFMEcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 00:32:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
+        id S239990AbjFMEdB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 00:33:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239839AbjFMEbt (ORCPT
+        with ESMTP id S239639AbjFMEci (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 00:31:49 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD38B1FCF;
-        Mon, 12 Jun 2023 21:28:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=ryKq7bxbg4ef0qaI3pTxqxm2yR
-        wnJe8TefRz5dM8wTiP1PZa5jAfwkSHI+Kutb7CBC3tn8uDXxMbAPctSdwTwgb2TJ1gfO7SIL/USQb
-        sWS1V7HkEHNjrsK82hmPN3C/b86JPAEwpEGv9eiSp+HA/W+HsNWMBz6Hkng9Pcbg1fidb1Tlp+Cvn
-        rovj+9ljujRL+uZAWQCkZDGBKctdAyeaaT6A66Yv/NC58zmOOeMlAaO1fVYWZ3QUqjl0nkKXVJDFZ
-        pGIqFl8euIRh92xKG/vCFa3DhBPhfyB4yYQxjU7QV91W668MDAnPSXJNahsxVT7C8goRVhUtRa4+q
-        ZlQ+HqPA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q8vdf-006sZD-2p;
-        Tue, 13 Jun 2023 04:28:15 +0000
-Date:   Mon, 12 Jun 2023 21:28:15 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, David Hildenbrand <david@redhat.com>,
-        kernel test robot <oliver.sang@intel.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
-        Jeff Layton <jlayton@kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Hillf Danton <hdanton@sina.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] block: Fix dio_bio_alloc() to set BIO_PAGE_PINNED
-Message-ID: <ZIfwX7Fo+CWjbAYr@infradead.org>
-References: <545463.1686601473@warthog.procyon.org.uk>
+        Tue, 13 Jun 2023 00:32:38 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3D5173E;
+        Mon, 12 Jun 2023 21:30:44 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id B978468B05; Tue, 13 Jun 2023 06:30:38 +0200 (CEST)
+Date:   Tue, 13 Jun 2023 06:30:38 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Keith Busch <kbusch@meta.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, hch@lst.de, axboe@kernel.dk,
+        sagi@grimberg.me, joshi.k@samsung.com,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv3 2/2] nvme: improved uring polling
+Message-ID: <20230613043038.GA13343@lst.de>
+References: <20230612190343.2087040-1-kbusch@meta.com> <20230612190343.2087040-3-kbusch@meta.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <545463.1686601473@warthog.procyon.org.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20230612190343.2087040-3-kbusch@meta.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -61,4 +39,3 @@ X-Mailing-List: linux-block@vger.kernel.org
 Looks good:
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-
