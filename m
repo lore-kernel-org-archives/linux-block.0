@@ -2,178 +2,127 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B62BC88CB2
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 08:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4157DC88CB6
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 10:12:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241588AbjFMIkq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 04:40:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48334 "EHLO
+        id S233490AbjFMKMa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 06:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241689AbjFMIkP (ORCPT
+        with ESMTP id S232386AbjFMKM3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 04:40:15 -0400
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F7DFCA;
-        Tue, 13 Jun 2023 01:40:14 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Vl1XjjM_1686645610;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0Vl1XjjM_1686645610)
-          by smtp.aliyun-inc.com;
-          Tue, 13 Jun 2023 16:40:11 +0800
-From:   Jingbo Xu <jefflexu@linux.alibaba.com>
-To:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, tianjia.zhang@linux.alibaba.com,
-        xiang@kernel.org, casey@schaufler-ca.com
-Subject: [PATCH v3 2/2] block: fine-granular CAP_SYS_ADMIN for Persistent Reservation
-Date:   Tue, 13 Jun 2023 16:40:08 +0800
-Message-Id: <20230613084008.93795-3-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20230613084008.93795-1-jefflexu@linux.alibaba.com>
-References: <20230613084008.93795-1-jefflexu@linux.alibaba.com>
+        Tue, 13 Jun 2023 06:12:29 -0400
+Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D92EE6;
+        Tue, 13 Jun 2023 03:12:28 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx4.veeam.com (Postfix) with ESMTPS id 029085E916;
+        Tue, 13 Jun 2023 13:12:26 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx4-2022; t=1686651146;
+        bh=JCHZt/RMowuGTByB3i6nzG7sEtmRHmsCzYrBdaBijZI=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=Ldg8lEVWEws8TO7hjHusUvJGlpUZa8S+jCqgCPdO4Ys98qGhfGY4Gguib1I/paiaw
+         aI+LM2y3S+e5E1AKlmTBkgQttAfdnEfCoW/RYJAQSfMC7Ra9y/jCXBj6sEXL4nDuww
+         izMq3hnu3F0AmcoOxz1yhvFZA2QV7w6kGHy1Tf0Hrl5e+Lvm9oy22RabvLHV+GYVuG
+         HTGHY8jK2T/VxTJx9hhCa0cuwLgradoJ2LVFvmjSAu/y+V2n+cEH/s+USGmZrsp14h
+         ZFR4NLvZAOxmijJ9IHtvvXtiJbY1gjpF+xxAXwo5WskeyUG2gilkLLRWaPFJiIS4pU
+         4UHRowkWky1cQ==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Tue, 13 Jun
+ 2023 12:12:24 +0200
+Message-ID: <20a5802d-424d-588a-c497-1d1236c52880@veeam.com>
+Date:   Tue, 13 Jun 2023 12:12:19 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v5 00/11] blksnap - block devices snapshots module
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "snitzer@kernel.org" <snitzer@kernel.org>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "brauner@kernel.org" <brauner@kernel.org>,
+        "dchinner@redhat.com" <dchinner@redhat.com>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "dlemoal@kernel.org" <dlemoal@kernel.org>,
+        "linux@weissschuh.net" <linux@weissschuh.net>,
+        "jack@suse.cz" <jack@suse.cz>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612161911.GA1200@sol.localdomain>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <20230612161911.GA1200@sol.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29240315546D766B
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allow of unprivileged Persistent Reservation operations on devices
-if the write permission check on the device node has passed.
 
-brw-rw---- 1 root disk 259, 0 Jun 13 07:09 /dev/nvme0n1
 
-In the example above, the "disk" group of nvme0n1 is also allowed to
-make reservations on the device even without CAP_SYS_ADMIN.
+On 6/12/23 18:19, Eric Biggers wrote:
+> This is the first time you've received an email from this sender 
+> ebiggers@kernel.org, please exercise caution when clicking on links or opening 
+> attachments.
+> 
+> 
+> On Mon, Jun 12, 2023 at 03:52:17PM +0200, Sergei Shtepa wrote:
+>  > Hi all.
+>  >
+>  > I am happy to offer a improved version of the Block Devices Snapshots
+>  > Module. It allows to create non-persistent snapshots of any block devices.
+>  > The main purpose of such snapshots is to provide backups of block devices.
+>  > See more in Documentation/block/blksnap.rst.
+> 
+> How does blksnap interact with blk-crypto?
+> 
+> I.e., what happens if a bio with a ->bi_crypt_context set is submitted to a
+> block device that has blksnap active?
+> 
+> If you are unfamiliar with blk-crypto, please read
+> Documentation/block/inline-encryption.rst
 
-Signed-off-by: Jingbo Xu <jefflexu@linux.alibaba.com>
----
- block/ioctl.c | 41 ++++++++++++++++++++++-------------------
- 1 file changed, 22 insertions(+), 19 deletions(-)
+Thank you, this is an important point. Yes, that's right.
+The current version of blksnap can cause blk-crypto to malfunction while
+holding a snapshot. When handling bios from the file system, the
+->bi_crypt_context is preserved. But the bio requests serving the snapshot
+are executed without context. I think that the snapshot will be unreadable.
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index c75299006bdd..3be11941fb2d 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -254,7 +254,7 @@ int blkdev_compat_ptr_ioctl(struct block_device *bdev, blk_mode_t mode,
- EXPORT_SYMBOL(blkdev_compat_ptr_ioctl);
- #endif
- 
--static bool blkdev_pr_allowed(struct block_device *bdev)
-+static bool blkdev_pr_allowed(struct block_device *bdev, blk_mode_t mode)
- {
- 	/* no sense to make reservations for partitions */
- 	if (bdev_is_partition(bdev))
-@@ -262,17 +262,20 @@ static bool blkdev_pr_allowed(struct block_device *bdev)
- 
- 	if (capable(CAP_SYS_ADMIN))
- 		return true;
--
--	return false;
-+	/*
-+	 * Only allow unprivileged reservations if the file descriptor is open
-+	 * for writing.
-+	 */
-+	return mode & BLK_OPEN_WRITE;
- }
- 
--static int blkdev_pr_register(struct block_device *bdev,
-+static int blkdev_pr_register(struct block_device *bdev, blk_mode_t mode,
- 		struct pr_registration __user *arg)
- {
- 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
- 	struct pr_registration reg;
- 
--	if (!blkdev_pr_allowed(bdev))
-+	if (!blkdev_pr_allowed(bdev, mode))
- 		return -EPERM;
- 	if (!ops || !ops->pr_register)
- 		return -EOPNOTSUPP;
-@@ -284,13 +287,13 @@ static int blkdev_pr_register(struct block_device *bdev,
- 	return ops->pr_register(bdev, reg.old_key, reg.new_key, reg.flags);
- }
- 
--static int blkdev_pr_reserve(struct block_device *bdev,
-+static int blkdev_pr_reserve(struct block_device *bdev, blk_mode_t mode,
- 		struct pr_reservation __user *arg)
- {
- 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
- 	struct pr_reservation rsv;
- 
--	if (!blkdev_pr_allowed(bdev))
-+	if (!blkdev_pr_allowed(bdev, mode))
- 		return -EPERM;
- 	if (!ops || !ops->pr_reserve)
- 		return -EOPNOTSUPP;
-@@ -302,13 +305,13 @@ static int blkdev_pr_reserve(struct block_device *bdev,
- 	return ops->pr_reserve(bdev, rsv.key, rsv.type, rsv.flags);
- }
- 
--static int blkdev_pr_release(struct block_device *bdev,
-+static int blkdev_pr_release(struct block_device *bdev, blk_mode_t mode,
- 		struct pr_reservation __user *arg)
- {
- 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
- 	struct pr_reservation rsv;
- 
--	if (!blkdev_pr_allowed(bdev))
-+	if (!blkdev_pr_allowed(bdev, mode))
- 		return -EPERM;
- 	if (!ops || !ops->pr_release)
- 		return -EOPNOTSUPP;
-@@ -320,13 +323,13 @@ static int blkdev_pr_release(struct block_device *bdev,
- 	return ops->pr_release(bdev, rsv.key, rsv.type);
- }
- 
--static int blkdev_pr_preempt(struct block_device *bdev,
-+static int blkdev_pr_preempt(struct block_device *bdev, blk_mode_t mode,
- 		struct pr_preempt __user *arg, bool abort)
- {
- 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
- 	struct pr_preempt p;
- 
--	if (!blkdev_pr_allowed(bdev))
-+	if (!blkdev_pr_allowed(bdev, mode))
- 		return -EPERM;
- 	if (!ops || !ops->pr_preempt)
- 		return -EOPNOTSUPP;
-@@ -338,13 +341,13 @@ static int blkdev_pr_preempt(struct block_device *bdev,
- 	return ops->pr_preempt(bdev, p.old_key, p.new_key, p.type, abort);
- }
- 
--static int blkdev_pr_clear(struct block_device *bdev,
-+static int blkdev_pr_clear(struct block_device *bdev, blk_mode_t mode,
- 		struct pr_clear __user *arg)
- {
- 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
- 	struct pr_clear c;
- 
--	if (!blkdev_pr_allowed(bdev))
-+	if (!blkdev_pr_allowed(bdev, mode))
- 		return -EPERM;
- 	if (!ops || !ops->pr_clear)
- 		return -EOPNOTSUPP;
-@@ -546,17 +549,17 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
- 	case BLKTRACETEARDOWN:
- 		return blk_trace_ioctl(bdev, cmd, argp);
- 	case IOC_PR_REGISTER:
--		return blkdev_pr_register(bdev, argp);
-+		return blkdev_pr_register(bdev, mode, argp);
- 	case IOC_PR_RESERVE:
--		return blkdev_pr_reserve(bdev, argp);
-+		return blkdev_pr_reserve(bdev, mode, argp);
- 	case IOC_PR_RELEASE:
--		return blkdev_pr_release(bdev, argp);
-+		return blkdev_pr_release(bdev, mode, argp);
- 	case IOC_PR_PREEMPT:
--		return blkdev_pr_preempt(bdev, argp, false);
-+		return blkdev_pr_preempt(bdev, mode, argp, false);
- 	case IOC_PR_PREEMPT_ABORT:
--		return blkdev_pr_preempt(bdev, argp, true);
-+		return blkdev_pr_preempt(bdev, mode, argp, true);
- 	case IOC_PR_CLEAR:
--		return blkdev_pr_clear(bdev, argp);
-+		return blkdev_pr_clear(bdev, mode, argp);
- 	default:
- 		return -ENOIOCTLCMD;
- 	}
--- 
-2.19.1.6.gb485710b
+But I don't see any obstacles in the way of blksnap and blk-crypto
+compatibility. If DM implements support for blk-crypto, then the same
+principle can be applied for blksnap. I think that the integration of
+blksnap with blk-crypto may be one of the stages of further development.
 
+The dm-crypto should work properly. 
+
+It is noteworthy that in 7 years of using the out-of-tree module to take
+a snapshot, I have not encountered cases of such problems.
+But incompatibility with blk-crypto is possible, this is already a pain
+for some users. I will request this information from our support team.
+
+> 
+> It looks like blksnap hooks into the block layer directly, via the new
+> "blkfilter" mechanism. I'm concerned that it might ignore ->bi_crypt_context
+> and write data to the disk in plaintext, when it is supposed to be encrypted.
+
+No. The "blkfilter" mechanism should not affect the operation of blk-crypto.
+It does not change the bio.
+Only a module that has been attached and provides its own filtering algorithm,
+such as blksnap, can violate the logic of blk-crypto.
+Therefore, until the blksnap module is loaded, blk-crypto should work as before.
