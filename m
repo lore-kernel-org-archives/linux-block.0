@@ -2,101 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C23A3C7EE29
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 10:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 403EAC7EE29
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 10:57:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241759AbjFMKrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 06:47:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40384 "EHLO
+        id S240739AbjFMK50 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 06:57:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238981AbjFMKrk (ORCPT
+        with ESMTP id S238726AbjFMK5Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 06:47:40 -0400
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B96811AC;
-        Tue, 13 Jun 2023 03:47:39 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 13 Jun 2023 06:57:25 -0400
+X-Greylist: delayed 12107 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 13 Jun 2023 03:57:24 PDT
+Received: from mail.lichtvoll.de (luna.lichtvoll.de [194.150.191.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A8110DA;
+        Tue, 13 Jun 2023 03:57:24 -0700 (PDT)
+Received: from 127.0.0.1 (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-384) server-digest SHA384)
         (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id D96E25E91D;
-        Tue, 13 Jun 2023 13:47:37 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1686653258;
-        bh=Z7dNDDmcpifePckvcqW3TSCqfRweG1amD84n3lPragY=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=G81g0nM4EYIPIQEClVwgOGTxMajn0Ko1zyPiCrWwoKHprdoEd8oLiDEE4qaLbjrNp
-         VZe0PpeeqGdLTgyqAMv2gCODJvMXr18nCaOsz5uCa+B6EVY6YO7LbLYxubvuHknSLw
-         +Sf5GD/P3f4ElvgLDl6C+02x/jeBbE/ecien7pvE44117yMV9PhA7S0lDmEpnYXF1G
-         6w/xdup9AYJbf4dvxFFT1pjLUWh9USwm94QAnCU0vDSOYXuecjsgmOwttyBomuIiva
-         j+SLkf2kWAH5bumQnimtvQ79U7Qj5xta8aMXLkRzurdwUqt6I0ADNfdWYQuOrjvf9f
-         O6tUHBnRi4eww==
-Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
- (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Tue, 13 Jun
- 2023 12:47:36 +0200
-Message-ID: <7dbbaf60-c85d-5a7a-8f16-5f5e4ff43cd8@veeam.com>
-Date:   Tue, 13 Jun 2023 12:47:29 +0200
+        by mail.lichtvoll.de (Postfix) with ESMTPSA id 7FAA56F5413;
+        Tue, 13 Jun 2023 12:57:22 +0200 (CEST)
+From:   Martin Steigerwald <martin@lichtvoll.de>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Michael Schmitz <schmitzmic@gmail.com>
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v7 2/2] block: add overflow checks for Amiga partition support
+Date:   Tue, 13 Jun 2023 12:57:22 +0200
+Message-ID: <3748744.kQq0lBPeGt@lichtvoll.de>
+In-Reply-To: <12241273-9403-426e-58ed-f3f597fe331b@gmail.com>
+References: <1539570747-19906-1-git-send-email-schmitzmic@gmail.com>
+ <4814181.GXAFRqVoOG@lichtvoll.de>
+ <12241273-9403-426e-58ed-f3f597fe331b@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v4 11/11] blksnap: Kconfig and Makefile
-Content-Language: en-US
-To:     Randy Dunlap <rdunlap@infradead.org>, <axboe@kernel.dk>,
-        <hch@infradead.org>, <corbet@lwn.net>, <snitzer@kernel.org>
-CC:     <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-        <willy@infradead.org>, <dlemoal@kernel.org>, <wsa@kernel.org>,
-        <heikki.krogerus@linux.intel.com>, <ming.lei@redhat.com>,
-        <gregkh@linuxfoundation.org>, <linux-block@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>
-References: <20230609115858.4737-1-sergei.shtepa@veeam.com>
- <20230609115858.4737-11-sergei.shtepa@veeam.com>
- <499ded51-3fb8-f11b-8776-08ab2e9a8812@infradead.org>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <499ded51-3fb8-f11b-8776-08ab2e9a8812@infradead.org>
+Content-Transfer-Encoding: 8BIT
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29240315546D7163
-X-Veeam-MMEX: True
+Authentication-Results: mail.lichtvoll.de;
+        auth=pass smtp.auth=martin smtp.mailfrom=martin@lichtvoll.de
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 6/13/23 01:43, Randy Dunlap wrote:
->> +config BLKSNAP
->> +	tristate "Block Devices Snapshots Module (blksnap)"
->> +	help
->> +	  Allow to create snapshots and track block changes for block devices.
->> +	  Designed for creating backups for simple block devices. Snapshots are
->> +	  temporary and are released then backup is completed. Change block
-> 	                             when backup is completed.
+Michael Schmitz - 13.06.23, 10:18:24 CEST:
+> Am 13.06.2023 um 19:25 schrieb Martin Steigerwald:
+> > Hi Michael, hi Jens, Hi Geert.
+> > 
+> > Michael Schmitz - 22.08.22, 22:56:10 CEST:
+> >> On 23/08/22 08:41, Jens Axboe wrote:
+> >>> On 8/22/22 2:39 PM, Michael Schmitz wrote:
+> >>>> Hi Jens,
+> >>>> 
+> >>>> will do - just waiting to hear back what needs to be done
+> >>>> regarding
+> >>>> backporting issues raised by Geert.
+> >>> 
+> >>> It needs to go upstream first before it can go to stable. Just
+> >>> mark
+> >>> it with the right Fixes tags and that will happen automatically.
+> > 
+> > […]
+> > 
+> >> thanks - the Fixes tag in my patches refers to Martin's bug report
+> >> and won't be useful to decide how far back this must be applied.
+> >> 
+> >> Now the bug pre-dates git, making the commit to 'fix'
+> >> 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 ... That one's a bit
+> >> special, please yell if you want me to lie about this and use a
+> >> later commit specific to the partition parser code.
+> > 
+> > After this discussion happened I thought the patch went in. However…
+> > as John Paul Adrian asked in "Status of affs support in the kernel
+> > and affstools" thread on linux-m68k and debian-68k mailing list, I
+> > searched for the patch in git history but did not find it.
 > 
-> or is the order of operations as listed: release snapshots and then backup
-> can be completed?
+> I may have messed that one up, as it turns out. Last version was v9
+> which I had to resend twice, and depending on what Jens uses to keep
+> track of patches, the resends may not have shown up in his tool. I
+> should have bumped the version number instead.
 > 
->> +	  tracking allows to create incremental or differential backups.
+> I'll see if my latest version still applies cleanly ...
 
-"when backup is completed." - it will be more correct.
+Many thanks!
 
-Normal backup process:
+Would be nice to see it finally go in.
 
-Take snapshot                                        Release snapshot
-    |    Start backup                        Finish backup   |
-    |        |  Copy data from snapshot images    |          |
-------------------------------------------------------------------------->
-                                                                         t
+Best,
+-- 
+Martin
 
-In case of failure, for example, when the snapshot is overflowing:
 
-                                           The snapshot is corrupted
-Take snapshot                                   | Release snapshot
-    |    Start backup                           |   | Finish failed backup
-    |        |  Copy data from snapshot images  |   |    |
-------------------------------------------------------------------------->
-                                                                         t
