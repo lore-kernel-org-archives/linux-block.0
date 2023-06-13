@@ -2,40 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ADBDEB64D7
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 13:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC64CEB64D8
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 14:09:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242263AbjFMNtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 09:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50358 "EHLO
+        id S242883AbjFMOJJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 10:09:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242472AbjFMNtg (ORCPT
+        with ESMTP id S242676AbjFMOJD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 09:49:36 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E76F810DA;
-        Tue, 13 Jun 2023 06:49:34 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 5FC5568AFE; Tue, 13 Jun 2023 15:49:32 +0200 (CEST)
-Date:   Tue, 13 Jun 2023 15:49:32 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jingbo Xu <jefflexu@linux.alibaba.com>
-Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, tianjia.zhang@linux.alibaba.com,
-        xiang@kernel.org, casey@schaufler-ca.com
-Subject: Re: [PATCH v3 2/2] block: fine-granular CAP_SYS_ADMIN for
- Persistent Reservation
-Message-ID: <20230613134932.GB23303@lst.de>
-References: <20230613084008.93795-1-jefflexu@linux.alibaba.com> <20230613084008.93795-3-jefflexu@linux.alibaba.com>
+        Tue, 13 Jun 2023 10:09:03 -0400
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 694A61709;
+        Tue, 13 Jun 2023 07:08:37 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-25c119005bcso644424a91.0;
+        Tue, 13 Jun 2023 07:08:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686665250; x=1689257250;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EvAFLkMD1GiJryurX3BgCgJEcKGxveNHWp6M99GnmxU=;
+        b=HPcNeMI8D6+8DvPkAgnsReTK9ZlMybgb3Ryl8FC66Ydwa+TnLy5+GAy8okT7hATKoW
+         AcHLYbVsXaaHPTBbTrFvyjblMlu1yMVAOl2nYy3mfjMtWM2xegXYsnkRPqybMHoozDQx
+         l6jz6w6lq5wlhWeqb+krOb8G8aOq122OFAkveDKEPZ8xnvVZZB6RyO+ceFcFYVtAuO9e
+         dnyjygZiAtiui+3ZHLCV0OOllh/e5ICerDY5W0ujKxcMNHthI6AG2jMJO278cgOvqW9o
+         5ZGjGZ7JBXqt8ZsVOJfK15XCv5Nwxmxz9lMKeYOgDCmhpd7vWBfLhka8W4PWmoIJP43W
+         Uglg==
+X-Gm-Message-State: AC+VfDx2tJdb45yknMr7a8YXpWntWvY2wOZ4Hed3XVa/4ccjgjQLucXw
+        rFTEyLuFZ5NWhdHpQ2f/8oE=
+X-Google-Smtp-Source: ACHHUZ46BDy0mDKcY0HLANL3dOq0tH4OBEkYAY5URE+QljLf4o5QTQFqfE4hLEQB26qVcW4lasD6VQ==
+X-Received: by 2002:a17:90a:5891:b0:253:340d:77d8 with SMTP id j17-20020a17090a589100b00253340d77d8mr10649596pji.33.1686665249640;
+        Tue, 13 Jun 2023 07:07:29 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id l7-20020a17090a150700b0025621aa4c6bsm6051815pja.25.2023.06.13.07.07.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jun 2023 07:07:28 -0700 (PDT)
+Message-ID: <04a4d0db-2f2d-e2fc-5458-4ddf852ffc8a@acm.org>
+Date:   Tue, 13 Jun 2023 07:07:27 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230613084008.93795-3-jefflexu@linux.alibaba.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+Content-Language: en-US
+To:     Yu Kuai <yukuai1@huaweicloud.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        stanley.chu@mediatek.com, peter.wang@mediatek.com,
+        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
+        powen.kao@mediatek.com, naomi.chu@mediatek.com,
+        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <ZF0K7A6G2cYBjSgn@infradead.org>
+ <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
+ <ZF5G5ztMng8Xbd1W@infradead.org>
+ <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
+ <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
+ <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
+ <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
+ <097caed2-10b3-7cd1-7c06-90f983e5c720@acm.org>
+ <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
+ <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
+ <bef8340e-f051-db63-5c2f-a2bc94c678ac@huaweicloud.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <bef8340e-f051-db63-5c2f-a2bc94c678ac@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On 5/18/23 00:55, Yu Kuai wrote:
+> 在 2023/05/18 10:23, Bart Van Assche 写道:
+>> On 5/17/23 18:49, Yu Kuai wrote:
+>>> Currently, fair share from hctx_may_queue() requires two
+>>> atomic_read(active_queues and active_requests), I think this smoothing
+>>> method can be placed into get_tag fail path, for example, the more times
+>>> a disk failed to get tag in a period of time, the more tag this disk can
+>>> get, and all the information can be updated here(perhaps directly
+>>> record how many tags a disk can get, then hctx_may_queue() still only
+>>> require 2 atomic_read()).
+>>
+>> That sounds interesting to me. Do you perhaps plan to implement this 
+>> approach and to post it as a patch?
+> 
+> Of course, I'll try to send a RFC patch.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Hi Kuai,
+
+Has this RFC patch already been posted or did I perhaps miss it?
+
+Thanks,
+
+Bart.
+
