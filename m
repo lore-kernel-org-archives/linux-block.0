@@ -2,111 +2,170 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDAA4C7EE29
-	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 11:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1EAC77B7A
+	for <linux-block@archiver.kernel.org>; Tue, 13 Jun 2023 11:35:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239702AbjFMLZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 07:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59762 "EHLO
+        id S232194AbjFMLfH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 07:35:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242273AbjFMLYw (ORCPT
+        with ESMTP id S239438AbjFMLew (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 07:24:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499FB1711
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 04:23:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686655414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Tue, 13 Jun 2023 07:34:52 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7B5CD;
+        Tue, 13 Jun 2023 04:34:50 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 6B3451FD91;
+        Tue, 13 Jun 2023 11:34:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1686656089; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=sPBk+yWrNJZvZrgDRYA0KMEl3CZftju4owuDc7vUT0A=;
-        b=V8tt8CnWO3uwqBVGBVbCjjkdU+cWeaPLhuyxaTeEP9uuTIgXYa8axpFKzWdkp8Q3fn4lFb
-        fSCbtYzDFr8shlsf5j48StSto9jMpeCZl1H9MUVjNtawLK0lx+ToUjFVRib+xKIxeZqC8R
-        JsYeDik/YBgdzOeWGh3/9hdjRG9+j8k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-0U6UiUElPCO3PcqRyYZnOA-1; Tue, 13 Jun 2023 07:23:33 -0400
-X-MC-Unique: 0U6UiUElPCO3PcqRyYZnOA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-30fcc3125acso353228f8f.2
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 04:23:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686655412; x=1689247412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sPBk+yWrNJZvZrgDRYA0KMEl3CZftju4owuDc7vUT0A=;
-        b=fh8jy4oq9ngCF+6qXEoVgtVAzGpN+gx1ZBmqDCQhEnhdizHxuethFL0OP+aaXgGKGp
-         sjs+N4X5FgqxUH69MX+adFwMsqSmvw3dp/jSGFK+mGbNA1nZ7ykTXur0N0xApJab/0qG
-         QxyNfqPSBCkeIQz8heEMJN10GP6PwNbLz3P/ZnG+uGEJP8ivHAR3GMeQAC2n5VCA4jpT
-         anZJhju4U3Kbicc9LevaSv/qYvTzbBCRgZn6iWpjtpOoa59B3IUyDkF2tV9ybbM9508m
-         tOQ29pZ6e2rfObL+hM3xPZVLmsmP8NsNYugNv+sqFsJ0h9WKAqxyBx73VR7hE4oioJFv
-         4ciw==
-X-Gm-Message-State: AC+VfDzuck1G0xDDNsrdNXg/gsx0kp6/ztC/VczMka4MEfzp9DCiKNaN
-        NLikOCmbEEWH5TE2Kai4kxQ+n4dfZyjMVnom/saA1TkNsZ/HBde4kR6Htp5h7/UOLHzy9apKh/e
-        EIGkyGlujUFo04Rry7176cny6Hwzr7uPtJ0wF+Fs=
-X-Received: by 2002:a5d:5185:0:b0:30f:cd69:dd42 with SMTP id k5-20020a5d5185000000b0030fcd69dd42mr1232812wrv.29.1686655412453;
-        Tue, 13 Jun 2023 04:23:32 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6lDN10DT0aOMA4Q9ESTrPOH+9Ahu84Ybee5qYeXovctNO7Mzdbkk03pyx29G8vnpkVRmL2IxM+pwArnHbvz84=
-X-Received: by 2002:a5d:5185:0:b0:30f:cd69:dd42 with SMTP id
- k5-20020a5d5185000000b0030fcd69dd42mr1232799wrv.29.1686655412225; Tue, 13 Jun
- 2023 04:23:32 -0700 (PDT)
+        bh=BTbTiUGilqHur9sl4tAQ10e6uWfud6O0TKx7z1X8AGk=;
+        b=M9ee6xDEXUBuyeXDG8T3ZF7ZDW7HIyxKnX6b1C55ByQ1WAtvj88qXkJQJgWhHG/pkbWFKP
+        dZLTzIDUdqyBu8LTYixd3w6gtbv5IjvEum4XQInRwd4BO0PVB4khQm9jk3x59C1QUvCjk9
+        Wev+UPnnE8FH04BCzy2NJwmtgLAo3Hk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1686656089;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BTbTiUGilqHur9sl4tAQ10e6uWfud6O0TKx7z1X8AGk=;
+        b=Kaqqm2oxupWuCOg2/Qtz9CbRjdQPtmbtBSzSsbn9ElY7CiG00/wJ8yQonzFnBNJht3dOFS
+        DkvD8ntldj9zdbDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 58C8813345;
+        Tue, 13 Jun 2023 11:34:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id V1yhFVlUiGQiFwAAMHmgww
+        (envelope-from <jack@suse.cz>); Tue, 13 Jun 2023 11:34:49 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id E634AA0717; Tue, 13 Jun 2023 13:34:48 +0200 (CEST)
+Date:   Tue, 13 Jun 2023 13:34:48 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Colin Walters <walters@verbum.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Theodore Ts'o <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Message-ID: <20230613113448.5txw46hvmdjvuoif@quack3>
+References: <20230612161614.10302-1-jack@suse.cz>
+ <20230612162545.frpr3oqlqydsksle@quack3>
+ <2f629dc3-fe39-624f-a2fe-d29eee1d2b82@acm.org>
+ <a6c355f7-8c60-4aab-8f0c-5c6310f9c2a8@betaapp.fastmail.com>
 MIME-Version: 1.0
-References: <20230609180805.736872-1-jpittman@redhat.com> <yq1legs1nns.fsf@ca-mkp.ca.oracle.com>
- <CA+RJvhzPfmjD0FZxWS5gFeZJWKki5OcdmywZdngqhgSjm6wiFA@mail.gmail.com> <yq14jnc18y0.fsf@ca-mkp.ca.oracle.com>
-In-Reply-To: <yq14jnc18y0.fsf@ca-mkp.ca.oracle.com>
-From:   Ewan Milne <emilne@redhat.com>
-Date:   Tue, 13 Jun 2023 07:23:21 -0400
-Message-ID: <CAGtn9rmYE6eNn7+UVLsN-8DLppv5_Wu1Te-tF59nJ3t5ot9Fnw@mail.gmail.com>
-Subject: Re: [PATCH] block: set reasonable default for discard max
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     John Pittman <jpittman@redhat.com>, axboe@kernel.dk,
-        djeffery@redhat.com, loberman@redhat.com, minlei@redhat.com,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a6c355f7-8c60-4aab-8f0c-5c6310f9c2a8@betaapp.fastmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-FWIW the most recent discard performance issue I looked at was
-an early SSD that only supported a small max discard size.  Doing
-a discard of the whole device (mkfs) took several minutes with
-lots of little discards.  So it isn't always just an issue of the max size.
+On Mon 12-06-23 14:52:54, Colin Walters wrote:
+> On Mon, Jun 12, 2023, at 1:39 PM, Bart Van Assche wrote:
+> > On 6/12/23 09:25, Jan Kara wrote:
+> >> On Mon 12-06-23 18:16:14, Jan Kara wrote:
+> >>> Writing to mounted devices is dangerous and can lead to filesystem
+> >>> corruption as well as crashes. Furthermore syzbot comes with more and
+> >>> more involved examples how to corrupt block device under a mounted
+> >>> filesystem leading to kernel crashes and reports we can do nothing
+> >>> about. Add config option to disallow writing to mounted (exclusively
+> >>> open) block devices. Syzbot can use this option to avoid uninteresting
+> >>> crashes. Also users whose userspace setup does not need writing to
+> >>> mounted block devices can set this config option for hardening.
+> >>>
+> >>> Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd9@linaro.org
+> >>> Signed-off-by: Jan Kara <jack@suse.cz>
+> >> 
+> >> Please disregard this patch. I had uncommited fixups in my tree. I'll send
+> >> fixed version shortly. I'm sorry for the noise.
+> >
+> > Have alternatives been configured to making this functionality configurable
+> > at build time only? How about a kernel command line parameter instead of a
+> > config option?
+> 
+> It's not just syzbot here; at least once in my life I accidentally did
+> `dd if=/path/to/foo.iso of=/dev/sda` when `/dev/sda` was my booted disk
+> and not the target USB device.  I know I'm not alone =)
 
--Ewan
+Yeah, so I'm not sure we are going to protect against this particular case.
+I mean it is not *that* uncommon to alter partition table of /dev/sda while
+/dev/sda1 is mounted. And for the kernel it is difficult to distinguish
+this and your mishap.
 
-On Mon, Jun 12, 2023 at 10:00=E2=80=AFPM Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->
->
-> John,
->
-> > Thanks alot for responding Martin.  Forgive my ignorance; just trying
-> > to gain understanding.  For example, if we find a device with a 2TiB
-> > max discard (way too high for any device to handle reasonably from
-> > what I've seen),
->
-> That really depends. On some devices performing a 2TB discard may just
-> involve updating a few entries in a block translation table. It could be
-> close to constant time regardless of the number of terabytes unmapped.
->
-> > and we make a quirk for it that brings the max discard down, how do we
-> > decide what value to bring that down to? Would we ask the hardware
-> > vendor for an optimal value? Is there some way we could decide the
-> > value?
->
-> The best thing would be to ask the vendor. Or maybe if you provide the
-> output of
->
-> # sg_vpd -p bl /dev/sdN
->
-> and we can try to see if we can come up with a suitable heuristic for a
-> quirk.
->
-> --
-> Martin K. Petersen      Oracle Linux Engineering
->
+> There's a lot of similar accidental-damage protection from this.  Another
+> stronger argument here is that if one has a security policy that
+> restricts access to filesystem level objects, if a process can somehow
+> write to a mounted block device, it effectively subverts all of those
+> controls. 
 
+Well, there are multiple levels of protection that I can think of:
+
+1) If user can write some image and make kernel mount it.
+2) If user can modify device content while mounted (but not buffer cache
+of the device).
+3) If user can modify buffer cache of the device while mounted.
+
+3) is the most problematic and effectively equivalent to full machine
+control (executing arbitrary code in kernel mode) these days.  For 1) and
+2) there are reasonable protection measures the filesystem driver can take
+(and effectively you cannot escape these problems if you allow attaching
+untrusted devices such as USB sticks) so they can cause DoS but we should
+be able to prevent full machine takeover in the filesystem code.
+
+So this patch is mainly aimed at forbiding 3).
+
+> Right now it looks to me we're invoking devcgroup_check_permission pretty
+> early on; maybe we could extend the device cgroup stuff to have a new
+> check for write-mounted, like
+> 
+> ```
+> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+> index c994ff5b157c..f2af33c5acc1 100644
+> --- a/tools/include/uapi/linux/bpf.h
+> +++ b/tools/include/uapi/linux/bpf.h
+> @@ -6797,6 +6797,7 @@ enum {
+>  	BPF_DEVCG_ACC_MKNOD	= (1ULL << 0),
+>  	BPF_DEVCG_ACC_READ	= (1ULL << 1),
+>  	BPF_DEVCG_ACC_WRITE	= (1ULL << 2),
+> +	BPF_DEVCG_ACC_WRITE_MOUNTED	= (1ULL << 3),
+>  };
+>  
+>  enum {
+> ```
+> 
+> ?  But probably this would need to be some kind of opt-in flag to avoid
+> breaking existing bpf progs?
+> 
+> If it was configurable via the device cgroup, then it's completely
+> flexible from userspace; most specifically including supporting some
+> specially privileged processes from doing it if necessary.
+
+I kind of like the flexibility of device cgroups but it does not seem to
+fit well with my "stop unactionable syzbot reports" usecase and doing the
+protection properly would mean that we now need to create way to approve
+access for all the tools that need this. So I'm not against this but I'd
+consider this "future extension possibility" :).
+
+> Also, I wonder if we should also support restricting *reads* from mounted
+> block devices?
+
+I don't see a strong usecase for this. Why would mounted vs unmounted
+matter here?
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
