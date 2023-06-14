@@ -2,89 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71613EB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CB6EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:17:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245456AbjFNONt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 10:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
+        id S245543AbjFNOQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 10:16:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245455AbjFNONs (ORCPT
+        with ESMTP id S245542AbjFNOQq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 10:13:48 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD1BCD
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:13:47 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1b3ce6607cbso28372225ad.2
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:13:47 -0700 (PDT)
+        Wed, 14 Jun 2023 10:16:46 -0400
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA302683
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:16:40 -0700 (PDT)
+Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-39ca0c2970aso3964587b6e.3
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:16:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1686752027; x=1689344027;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=atkhLsJk4kYIR051jZUJsqhyVSqD17cKG1dfd3E+c04=;
-        b=QtPPdAz8+r7dt+3azArNI+jobqYcT5F/K5n1989N0B9h/dF9O0THNdPrbOgk401sv3
-         5J4d7liK3gdJtZ9cdamd5TvGz8tspTsfmQzlUei3suVhQyLyrh3DkFHy4rVZlSHdPsr5
-         YEErmKXQc4bgS24oNRScFjmmHUyABKOtOISkA=
+        d=google.com; s=20221208; t=1686752199; x=1689344199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f57lCLd7OdJQ5Blvl8wGJZyK116HtB6qFU6rPcmeblM=;
+        b=LSQwn5MG67BP/+AQZt17SggoC4gLE3roHuhaYzIcFAuElnPEdILAfPsBHCJZVvqwh3
+         XvRbYvSPgP+OkIUVaDnUpKqNbzGqO7UEnZ/Kr5+tV5tqa2pTaS05sj/LlavK0voHdg5L
+         8Os8TgtX0c/OJgEg8I+w52z/UYhCY8r2Hp+whkOCH8c6XaK2i0IbpHBi81/XP6F+X4sG
+         JUpz4BtXIoS/6LIAgNdOHbcppVUNc6RsHlF5i9Uso1MdJmjvGUHgFlU6pu0zYdCWXSNi
+         RZEj9fvIVkWRC1tPlpNMCmmvB3/LwDnfcZGu8MDSIb+arT+zuNVIfTNeRTCkm1/j3d3e
+         TZeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686752027; x=1689344027;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=atkhLsJk4kYIR051jZUJsqhyVSqD17cKG1dfd3E+c04=;
-        b=O3hdyKMIFvnLGM6MJ45DBLy/f0fI+6cx5H+dT5EMc5n4Wj41heL4cz4f0gFIlCR2P3
-         aTwUfwdOwdM1Pxs/W3dKqv5HVtFl7rbbpeYsPx3n1atbWeFrhL6sgpSs87RrcORmjWHd
-         Ll0c0Ji9OZH5tn2ozKBrEqvbjytVQ4eHQBQVJe89o/tOpZSlQ9XoIL6/vlzZdt0NcVmM
-         TflyBr3fRXpPHKb+pwOAUvwot3oK8P0Ylkv63q/jFGHo9W4tK4xMeKLmE7nDLqxRJwbO
-         fNF5NdHgGLBYsanvD49ZX7D9kd0T7ZlcGxWZVd1ivXMYPmChJVtOT1sFgWWm/g7gizkO
-         rulw==
-X-Gm-Message-State: AC+VfDxrTKnPJq3m+Kg1h8AvO//GlD14wyw1hRX7AvsNgjNZ/6pr+HEy
-        baCZbu2PI9v2bloh+px7u5UK6h2CjnoHlss8zYQ=
-X-Google-Smtp-Source: ACHHUZ7c5hnOfemkMscvWj+eorrnWGExlzE2F7LXwlInsGAGaYBz8d88ceGN6cOoTGXRuvmWq7tQGg==
-X-Received: by 2002:a17:903:124d:b0:1ac:aba5:7885 with SMTP id u13-20020a170903124d00b001acaba57885mr14900116plh.47.1686752027301;
-        Wed, 14 Jun 2023 07:13:47 -0700 (PDT)
-Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:e1a3:812:fed0:eeab])
-        by smtp.gmail.com with ESMTPSA id h18-20020a170902f55200b001b042c0939fsm12226648plf.99.2023.06.14.07.13.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jun 2023 07:13:46 -0700 (PDT)
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Minchan Kim <minchan@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Brian Geffon <bgeffon@google.com>
-Subject: [PATCH] zram: further limit recompression threshold
-Date:   Wed, 14 Jun 2023 23:13:12 +0900
-Message-ID: <20230614141338.3480029-1-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
+        d=1e100.net; s=20221208; t=1686752199; x=1689344199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f57lCLd7OdJQ5Blvl8wGJZyK116HtB6qFU6rPcmeblM=;
+        b=V73p9RDQGNFzyxLMniVHzFOgDGcIgj70bGL3zRapL6tDdEnr130iD+vS44rJ2CXzkX
+         RyuQjEOVTNq2wJMVsI5sLvovVNv3yXFYa9AkAkQRlw8+qbJKxq/Q8QUhN5HHrGSz7tKL
+         uKo3KgCfcEg+zsTTc6wW56ksr8RcTtrihTD00nA3a5jZ9jb0/lEP79LEYh7qJK+wqJZU
+         G723HU/N3VtFG3dcWymOUk+qE3oC4ulEDMUUbY+MUFIPdmHkKok7Ik+Q+mOge9KS42qp
+         n5yz/FnMgSJJ6plSQK4lBGopsiEjf1qRDS4o/Oxo1ZFcnoh8UML2q5ImXIP0gi9JGz6A
+         wUlA==
+X-Gm-Message-State: AC+VfDx23Tgr2e7VotTSfZGsv5EyeE9DN/GeCOtoIdvf84N421mtc4Cj
+        dVyS0amr5uIR/xSbZxVd49Xr+107Q/skBt2NgJ4N9Q==
+X-Google-Smtp-Source: ACHHUZ7wb3qZ+Qnq9csb+a5N85VcMfo3f7fVKEeFXq1y2jgoyp8xHBYXcB4Sf3yFT1UhZua9LFNTzQXcWOCxAZOfITE=
+X-Received: by 2002:a05:6808:2984:b0:397:fbe7:a0fb with SMTP id
+ ex4-20020a056808298400b00397fbe7a0fbmr10144901oib.18.1686752199333; Wed, 14
+ Jun 2023 07:16:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230614141338.3480029-1-senozhatsky@chromium.org>
+In-Reply-To: <20230614141338.3480029-1-senozhatsky@chromium.org>
+From:   Brian Geffon <bgeffon@google.com>
+Date:   Wed, 14 Jun 2023 10:16:03 -0400
+Message-ID: <CADyq12xoEKpYOd7nFy+ET89ss-zTdKbbj6870UMDQeLe09=Zow@mail.gmail.com>
+Subject: Re: [PATCH] zram: further limit recompression threshold
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Recompression threshold should be below huge-size-class
-watermark.
+Thanks Sergey
 
-Suggested-by: Brian Geffon <bgeffon@google.com>
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- drivers/block/zram/zram_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Jun 14, 2023 at 10:13=E2=80=AFAM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> Recompression threshold should be below huge-size-class
+> watermark.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 1867f378b319..5676e6dd5b16 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1753,7 +1753,7 @@ static ssize_t recompress_store(struct device *dev,
- 		}
- 	}
- 
--	if (threshold >= PAGE_SIZE)
-+	if (threshold >= huge_class_size)
- 		return -EINVAL;
- 
- 	down_read(&zram->init_lock);
--- 
-2.41.0.162.gfafddb0af9-goog
+Acked-by: Brian Geffon <bgeffon@google.com>
 
+>
+> Suggested-by: Brian Geffon <bgeffon@google.com>
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> ---
+>  drivers/block/zram/zram_drv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
+c
+> index 1867f378b319..5676e6dd5b16 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -1753,7 +1753,7 @@ static ssize_t recompress_store(struct device *dev,
+>                 }
+>         }
+>
+> -       if (threshold >=3D PAGE_SIZE)
+> +       if (threshold >=3D huge_class_size)
+>                 return -EINVAL;
+>
+>         down_read(&zram->init_lock);
+> --
+> 2.41.0.162.gfafddb0af9-goog
+>
