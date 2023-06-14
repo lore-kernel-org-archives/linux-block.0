@@ -2,162 +2,90 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2336CEB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 00:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE39DEB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 00:39:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240572AbjFNA0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 20:26:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54310 "EHLO
+        id S231675AbjFNAjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 20:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230496AbjFNA0j (ORCPT
+        with ESMTP id S229641AbjFNAjl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 20:26:39 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5726B19B5
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 17:26:35 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-543c692db30so4418877a12.3
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 17:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1686702395; x=1689294395;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QajGQslzzctkaDr1mgFDGYFv/dJbKUMY50GQqUSjsyU=;
-        b=0d+yVoOF9RLKOLDioGzBjk4of6B/ELGbtZeDRidEhiXoi0k01UmVts9bYGLhAALO11
-         It/k6o+eieUvWaAbmWudWu3sHqqmpOhO1Q+JynFDmO0DqYdLhqpz7Gjob/hQYJ2oCQz3
-         mJBo8I0G0/tBIeh5LGCMUD5mSNhe9K8wN/5UJxnFNvPQIIWx9cVOEOVwjJOU2RndF7ph
-         5unDMdpwvVwxNrvF/bhWMhJ5Q5upTHf3Z0wHOTSVJjgKcAYk01g4d/8eJVEn3Du6EUMZ
-         4vxDFkPBFJGpTuNvzqeRGJPloNc4FJ9LsKY4saelLj/IHKq09gcAAeE+wWvGFfObQrg6
-         Ra/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686702395; x=1689294395;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QajGQslzzctkaDr1mgFDGYFv/dJbKUMY50GQqUSjsyU=;
-        b=UTgAj973iLMQmZ96TfyWeTJI647bIqDzg8oL5GUvuPTDNAVghypmXwomaP2w8BGcLa
-         iNqNZK2ETk2Waoj++g6KRx6BlmB9sTyU9zg0OPcqcjSpi/GCVzhkAFs5uVQymXJFwR3J
-         CogMar/p9SKvICmn3Ri0XEqBReSRNM25BJmPj53FMPLpiKRJsAHoF2Jz6p/4mOg1Ew6T
-         M6arREGH0wJi+IrO6U111f9j/m8MwTb9EZJeamuGYJS24hVdI7WA8iR+XbAIqLD7vo5a
-         NqRS6grouI6H3h9E1m1ragy1zS0x6QWJSgJix86/1a/RAXMsJV6U8z4kUMauGAByoRCR
-         h0UA==
-X-Gm-Message-State: AC+VfDxCWqbYGKDHC1g+EU/wrLM219By8EHPdoj6zDRn6S3Gr/w6//4C
-        rrP5Ub0QkuSy9hmch6hPg9Rl4g==
-X-Google-Smtp-Source: ACHHUZ7hUVmtofcr2phlzKmyh0/J/vmdnLeHcAWruzJ4Rla8wEpdmbXk7zXylq6Vb0/lk/S1qmcCpg==
-X-Received: by 2002:a05:6a20:a108:b0:101:73a9:1683 with SMTP id q8-20020a056a20a10800b0010173a91683mr335461pzk.33.1686702394620;
-        Tue, 13 Jun 2023 17:26:34 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-13-202.pa.nsw.optusnet.com.au. [49.180.13.202])
-        by smtp.gmail.com with ESMTPSA id x2-20020a056a00270200b005d22639b577sm971152pfv.165.2023.06.13.17.26.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jun 2023 17:26:33 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1q9ELG-00BTYW-2T;
-        Wed, 14 Jun 2023 10:26:30 +1000
-Date:   Wed, 14 Jun 2023 10:26:30 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
-        linux-fsdevel@vger.kernel.org, Kees Cook <keescook@google.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
- devices
-Message-ID: <ZIkJNmpO/S7pv0A6@dread.disaster.area>
-References: <20230612161614.10302-1-jack@suse.cz>
- <CACT4Y+aEScXmq2F1-vqAfr-b2w-xyOohN+FZxorW1YuRvKDLNQ@mail.gmail.com>
+        Tue, 13 Jun 2023 20:39:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C17719A5
+        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 17:38:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686703136;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=R9iHfOD/vO8uwMzm3mcAdfEih6GadZu/HkBIfv0PcKo=;
+        b=Z0az2RHoA6fqHb/Ur+R2zqHn+s91pfWNFDK2S3dO4e3+P/yToEGNYa7loCQxrYutnXapix
+        iMNdD4XK7mVCrbm5OcfVCwiwYyjoMKAdsVdKVNjSHG+A2GqkXgfLcNa5fjf7idQTeT0zRm
+        sHWveQOQq8t+km/RqZWCxCxXE1UXM6k=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-407-ET0woB5OMiyqLlLl_AOuPw-1; Tue, 13 Jun 2023 20:38:53 -0400
+X-MC-Unique: ET0woB5OMiyqLlLl_AOuPw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A60CD3C025D3;
+        Wed, 14 Jun 2023 00:38:52 +0000 (UTC)
+Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 59608492CA6;
+        Wed, 14 Jun 2023 00:38:47 +0000 (UTC)
+Date:   Wed, 14 Jun 2023 08:38:43 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
+        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
+Subject: Re: [PATCH 2/2] nvme: don't freeze/unfreeze queues from different
+ contexts
+Message-ID: <ZIkME5kc9E4IoJff@ovpn-8-16.pek2.redhat.com>
+References: <20230613005847.1762378-1-ming.lei@redhat.com>
+ <20230613005847.1762378-3-ming.lei@redhat.com>
+ <ZIiAKhi5Vmc0Fc9W@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACT4Y+aEScXmq2F1-vqAfr-b2w-xyOohN+FZxorW1YuRvKDLNQ@mail.gmail.com>
+In-Reply-To: <ZIiAKhi5Vmc0Fc9W@kbusch-mbp.dhcp.thefacebook.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 13, 2023 at 08:49:38AM +0200, Dmitry Vyukov wrote:
-> On Mon, 12 Jun 2023 at 18:16, Jan Kara <jack@suse.cz> wrote:
-> >
-> > Writing to mounted devices is dangerous and can lead to filesystem
-> > corruption as well as crashes. Furthermore syzbot comes with more and
-> > more involved examples how to corrupt block device under a mounted
-> > filesystem leading to kernel crashes and reports we can do nothing
-> > about. Add config option to disallow writing to mounted (exclusively
-> > open) block devices. Syzbot can use this option to avoid uninteresting
-> > crashes. Also users whose userspace setup does not need writing to
-> > mounted block devices can set this config option for hardening.
+On Tue, Jun 13, 2023 at 08:41:46AM -0600, Keith Busch wrote:
+> On Tue, Jun 13, 2023 at 08:58:47AM +0800, Ming Lei wrote:
+> > And this way is correct because quiesce is enough for driver to handle
+> > error recovery. The only difference is where to wait during error recovery.
+> > With this way, IO is just queued in block layer queue instead of
+> > __bio_queue_enter(), finally waiting for completion is done in upper
+> > layer. Either way, IO can't move on during error recovery.
 > 
-> +syzkaller, Kees, Alexander, Eric
-> 
-> We can enable this on syzbot, however I have the same concerns as with
-> disabling of XFS_SUPPORT_V4:
-> https://github.com/google/syzkaller/issues/3918#issuecomment-1560624278
+> The point was to contain the fallout from modifying the hctx mappings.
 
-Really?
+blk_mq_update_nr_hw_queues() is called after nvme_wait_freeze
+returns, nothing changes here, so correctness wrt. updating hctx
+mapping is provided.
 
-This is exactly what I *detest most* about syzbot: the recalcitrant
-maintainer who thinks their ideology is more important than any
-other engineering consideration that might exist.
+> If you allow IO to queue in the blk-mq layer while a reset is in
+> progress, they may be entering a context that won't be as expected on
+> the other side of the reset.
+ 
+The only difference is that in-tree code starts to freeze
+at the beginning of error recovery, which way can just prevent new IO,
+and old ones still are queued, but can't be dispatched to driver
+because of quiescing in both ways. With this patch, new IOs queued
+after error recovery are just like old ones canceled before resetting.
 
-We want *better quality bug reports* on *current code* that we have
-to *support for the foreseeable future*, not get buried under
-repeated shitty reports containing yet more variants of problems we
-fixed over a decade ago.
+So not see problems from driver side with this change, and nvme
+driver has to cover new IOs queued after error happens.
 
-I'll repeat what Eric has already pointed out in the above GH issue
-in the vain hope you'll listen this time rather than making even more
-extreme ideological demands on us.
 
-The XFS engineers put in place a planned, well documented
-deprecation and removal process for V4 format support back in 2020.
-We are well into that plan - we are not that far from turning it off
-v4 support by default. The V4 format is legacy code and users are
-already migrating away from it.
+Thanks.
+Ming
 
-As such, it has much lower priority and relevance to us compared to
-supporting v5 filesystems. The syzbot maintainers don't get to
-decide how important XFS v4 format support is - that's the job of
-the XFS engineers responsibile for developing XFS code and
-supporting XFS users.
-
-Because V4 has been deprecated and support is slowing down as people
-migrate off it, we don't need as extensive test coverage as we once
-did. i.e.  we are ramping down the validation in accordance with
-it's lower priority and approaching disabling in 2025. We are
-placing much more importance on validation of v5 format features and
-functionality.
-
-As such, we really don't need syzbot to be exercising v4 formats any
-more - it's much more important to our users that we exercise v5
-formats as extensively as possible. That is what we are asking the
-syzkaller runners (and syzbot) do as a service for us.
-
-If your ideology demands that "the only way to stop syzbot testing
-XFS v4 filesytsems is to remove the code entirely" (paraphrasing
-your comments from the above github issue), then the entire problem
-here is your ideology.
-
-That is, your ideology is getting in the way of practical, well
-thought out, long running end-of-life engineering processes. It is
-creating unnecessary load on limited resources. Further, your
-demands that we place syzbot coverage (if syzbot doesn't test it, it
-must depend on CONFIG_INSECURE!) above our direct responsibilities
-to distro maintainers and other downstream users is, at best,
-terribly misguided.
-
-Syzbot is a *tool*. It's not even a critical tool we depend on - we
-can live without it just fine. We'd really like syzbot to be a
-better tool, but the ideology behind syzbot is the biggest
-impediment to making it a better, more effective tool for the
-community.
-
-If syzbot maintainers won't listen to simple requests to improve
-test coverage according to subsystem requirements, then it's clear
-that syzbot is being driven by ideology rather than engineering
-requirements. This needs to change.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
