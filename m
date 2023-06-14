@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B34EB64DC
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 11:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 579FAC001B3
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 11:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243930AbjFNLrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 07:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59652 "EHLO
+        id S244267AbjFNLrC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 07:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230129AbjFNLrA (ORCPT
+        with ESMTP id S236153AbjFNLrA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 14 Jun 2023 07:47:00 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E576810F7;
-        Wed, 14 Jun 2023 04:46:58 -0700 (PDT)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1138A1BE9;
+        Wed, 14 Jun 2023 04:46:59 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 9D4951FDED;
+        by smtp-out1.suse.de (Postfix) with ESMTP id B36A82252F;
         Wed, 14 Jun 2023 11:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1686743217; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HqgE0FoAJNGu3N9ldwgXXKWng+6fcILJBM9HxWu5/NM=;
-        b=XIORnNdJrvGEKeB2679tyIGGbsGA6aRreLcugpVv3sg62nALqkZYkJYvIm6YUHEukI2EIj
-        f/TA8v5NejynDwmXXWOp7RdmPFjRzr4pzi7ZkIcLnwLt5FDXeRSalpRiNwGkf/fx6R27Xo
-        CQkoT/X4KqzxC1nf0aiLAg6AXVYEMzM=
+        bh=07KAYk4SthrO3fQhas82j8fyHpnc5bRMX3kImRSFlUk=;
+        b=Kp7aqo3YOc2v6vzpWLCRu5NMYJAlqDzGoIt9Wywl4nnU5pIKA6Qwb4ilRVNtBBhd9MHd9w
+        6/UkRMkd4j0A84amowZr76QsU7iDsm2fA4yXj/ZyudHg/ya/UFQkR8UOO5dO9C39N3Q/1U
+        QbrCro1ElbWTz1c54Ht+1yJbolv1JH4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1686743217;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HqgE0FoAJNGu3N9ldwgXXKWng+6fcILJBM9HxWu5/NM=;
-        b=E5RJpF3gL1iygNwm8tgdEVR9oSKr1G01Fvtut4qtEtAg95627X2HroAfPDGDIW7yqUeyVz
-        CTZwvWSz93eCtnAg==
+        bh=07KAYk4SthrO3fQhas82j8fyHpnc5bRMX3kImRSFlUk=;
+        b=MfAA5PP+8kGCQ480wk1yiwsSkZerT4G5Yj2tu2k3gsQaH3BqJvIm9L6eDGAgU2HXVRSSVC
+        NzGXsfuur5b//HAw==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 8BF2F2C145;
+        by relay2.suse.de (Postfix) with ESMTP id A41492C14F;
         Wed, 14 Jun 2023 11:46:57 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 808DC51C4E0F; Wed, 14 Jun 2023 13:46:57 +0200 (CEST)
+        id A009C51C4E17; Wed, 14 Jun 2023 13:46:57 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Luis Chamberlain <mcgrof@kernel.org>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 3/7] brd: abstract page_size conventions
-Date:   Wed, 14 Jun 2023 13:46:33 +0200
-Message-Id: <20230614114637.89759-4-hare@suse.de>
+Subject: [PATCH 7/7] mm/readahead: align readahead down to mapping blocksize
+Date:   Wed, 14 Jun 2023 13:46:37 +0200
+Message-Id: <20230614114637.89759-8-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230614114637.89759-1-hare@suse.de>
 References: <20230614114637.89759-1-hare@suse.de>
@@ -60,117 +60,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation for changing the block sizes abstract away references
-to PAGE_SIZE and friends.
+If the blocksize of the mapping is larger than the page size we need
+to align down readahead to avoid reading past the end of the device.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/block/brd.c | 39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
+ mm/readahead.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 24769d010fee..71d3d8af8b0d 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -45,6 +45,23 @@ struct brd_device {
- 	u64			brd_nr_folios;
- };
+diff --git a/mm/readahead.c b/mm/readahead.c
+index 031935b78af7..91a7dbf4fa04 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -285,6 +285,7 @@ static void do_page_cache_ra(struct readahead_control *ractl,
+ 	struct inode *inode = ractl->mapping->host;
+ 	unsigned long index = readahead_index(ractl);
+ 	loff_t isize = i_size_read(inode);
++	unsigned int iblksize = i_blocksize(inode);
+ 	pgoff_t end_index;	/* The last page we want to read */
  
-+#define BRD_SECTOR_SHIFT(b) (PAGE_SHIFT - SECTOR_SHIFT)
+ 	if (isize == 0)
+@@ -293,6 +294,9 @@ static void do_page_cache_ra(struct readahead_control *ractl,
+ 	end_index = (isize - 1) >> PAGE_SHIFT;
+ 	if (index > end_index)
+ 		return;
++	if (iblksize > PAGE_SIZE)
++		end_index = ALIGN_DOWN(end_index, iblksize);
 +
-+static pgoff_t brd_sector_index(struct brd_device *brd, sector_t sector)
-+{
-+	pgoff_t idx;
-+
-+	idx = sector >> BRD_SECTOR_SHIFT(brd);
-+	return idx;
-+}
-+
-+static int brd_sector_offset(struct brd_device *brd, sector_t sector)
-+{
-+	unsigned int rd_sector_mask = (1 << BRD_SECTOR_SHIFT(brd)) - 1;
-+
-+	return ((unsigned int)sector & rd_sector_mask) << SECTOR_SHIFT;
-+}
-+
- /*
-  * Look up and return a brd's folio for a given sector.
-  */
-@@ -53,7 +70,7 @@ static struct folio *brd_lookup_folio(struct brd_device *brd, sector_t sector)
- 	pgoff_t idx;
- 	struct folio *folio;
- 
--	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to folio index */
-+	idx = brd_sector_index(brd, sector); /* sector to folio index */
- 	folio = xa_load(&brd->brd_folios, idx);
- 
- 	BUG_ON(folio && folio->index != idx);
-@@ -68,19 +85,20 @@ static int brd_insert_folio(struct brd_device *brd, sector_t sector, gfp_t gfp)
- {
- 	pgoff_t idx;
- 	struct folio *folio, *cur;
-+	unsigned int rd_sector_order = get_order(PAGE_SIZE);
- 	int ret = 0;
- 
- 	folio = brd_lookup_folio(brd, sector);
- 	if (folio)
- 		return 0;
- 
--	folio = folio_alloc(gfp | __GFP_ZERO | __GFP_HIGHMEM, 0);
-+	folio = folio_alloc(gfp | __GFP_ZERO | __GFP_HIGHMEM, rd_sector_order);
- 	if (!folio)
- 		return -ENOMEM;
- 
- 	xa_lock(&brd->brd_folios);
- 
--	idx = sector >> PAGE_SECTORS_SHIFT;
-+	idx = brd_sector_index(brd, sector);
- 	folio->index = idx;
- 
- 	cur = __xa_cmpxchg(&brd->brd_folios, idx, NULL, folio, gfp);
-@@ -122,11 +140,12 @@ static void brd_free_folios(struct brd_device *brd)
- static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
- 			     gfp_t gfp)
- {
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
-+	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
- 	int ret;
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	copy = min_t(size_t, n, rd_sector_size - offset);
- 	ret = brd_insert_folio(brd, sector, gfp);
- 	if (ret)
- 		return ret;
-@@ -145,10 +164,11 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
- {
- 	struct folio *folio;
- 	void *dst;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
-+	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	copy = min_t(size_t, n, rd_sector_size - offset);
- 	folio = brd_lookup_folio(brd, sector);
- 	BUG_ON(!folio);
- 
-@@ -177,10 +197,11 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
- {
- 	struct folio *folio;
- 	void *src;
--	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
-+	unsigned int rd_sector_size = PAGE_SIZE;
-+	unsigned int offset = brd_sector_offset(brd, sector);
- 	size_t copy;
- 
--	copy = min_t(size_t, n, PAGE_SIZE - offset);
-+	copy = min_t(size_t, n, rd_sector_size - offset);
- 	folio = brd_lookup_folio(brd, sector);
- 	if (folio) {
- 		src = kmap_local_folio(folio, offset);
+ 	/* Don't read past the page containing the last byte of the file */
+ 	if (nr_to_read > end_index - index)
+ 		nr_to_read = end_index - index + 1;
 -- 
 2.35.3
 
