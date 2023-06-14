@@ -2,114 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD9FEB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 07:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD6BEB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 08:19:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243407AbjFNHfl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 03:35:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50202 "EHLO
+        id S243297AbjFNITI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 04:19:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243417AbjFNHfh (ORCPT
+        with ESMTP id S243420AbjFNISb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 03:35:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D9D10E9;
-        Wed, 14 Jun 2023 00:35:35 -0700 (PDT)
+        Wed, 14 Jun 2023 04:18:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410F51985;
+        Wed, 14 Jun 2023 01:18:28 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2FDD962613;
-        Wed, 14 Jun 2023 07:35:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A4DFC433C8;
-        Wed, 14 Jun 2023 07:35:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C3F4A639ED;
+        Wed, 14 Jun 2023 08:18:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2E6C433C0;
+        Wed, 14 Jun 2023 08:18:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686728134;
-        bh=kQ44VJLr/FHwQrB/2L3l6jXV4zJt9Y1vtnE4iZmuCmM=;
+        s=k20201202; t=1686730707;
+        bh=UZ7T6wpompPxMLQubsjrqybaIQtHskyAXV9BO5YKxak=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ayNynNAcYUqOAm+33UVGdlyyyn+7fJqwY4kbwPhO0VbRebTMPcdZf13v2khKa+s9f
-         A0XAZmDuhBJlFzG1XylPPRaRYt2B9SICo3m+9mzb4OI0qqL/LJ83uZSP1O7COKNRDb
-         kk+jr83YHwQ7i0qP9hZaUj59rVo354buA/dSg7EKOXmNqEVSeRMRoNtizlG4YWbOAh
-         AIKWRSeiKPuDuA9GceQIFygHZcOUEEIU6L7kW/d4xKX+U+6HKWxLO/ddRGQVoD5EjN
-         0JrzDlvjvn6OgTQGyRW9BL7NJvukli6226acmrfuMaSbhESp60fy3z5rlLsnf9hLtb
-         cQ+BVhC9E1w7w==
-Date:   Wed, 14 Jun 2023 09:35:29 +0200
+        b=NQaMg0NzSyFNIp4l37g0LkhxIkUOA2wWyn19FzyKDrsWLukuKiFtrM51dRGHu7+j5
+         BJpbxReA8PzxvYFFhuGQ+yJXo9jpZa2XOxXH2KsoZx3z9Dc7LCBGCI63ZxJaYjr1l5
+         klIosYKVIgfUUiH7dhqv4x/46DpN1fCGvbJfcC3n+5PaFo32exCkaFDUjWwLbzUZUG
+         Nvn0AhbXGidOlLWZthNFZWtS1M/AD+vTlFYhSBDdQLO0tBgtNMJ4DYFIL5rTIu1i1G
+         R1yiuvZ7LmkgMwUMnxOQxuWrCLCwtXgS7CJCJJ6/Ds6TWwyZI3BUVYfTrK/LSXyI5K
+         7h/qC8Y5LeAJQ==
+Date:   Wed, 14 Jun 2023 10:18:16 +0200
 From:   Christian Brauner <brauner@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Dmitry Vyukov <dvyukov@google.com>, Jan Kara <jack@suse.cz>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Dmitry Vyukov <dvyukov@google.com>, Ted Tso <tytso@mit.edu>,
-        yebin <yebin@huaweicloud.com>, linux-fsdevel@vger.kernel.org,
-        Kees Cook <keescook@google.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        Eric Biggers <ebiggers@google.com>
+        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org,
+        syzkaller <syzkaller@googlegroups.com>
 Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
  devices
-Message-ID: <20230614-galopp-aussuchen-1c95be0709f0@brauner>
+Message-ID: <20230614-anstalt-gepfercht-affd490e6544@brauner>
 References: <20230612161614.10302-1-jack@suse.cz>
  <ZIf6RrbeyZVXBRhm@infradead.org>
- <20230613205614.atlrwst55bpqjzxf@quack3>
+ <CACT4Y+ZsN3wemvGLVyNWj9zjykGwcHoy581w7GuAHGpAj1YLxg@mail.gmail.com>
+ <ZIlphqM9cpruwU6m@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230613205614.atlrwst55bpqjzxf@quack3>
+In-Reply-To: <ZIlphqM9cpruwU6m@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 13, 2023 at 10:56:14PM +0200, Jan Kara wrote:
-> On Mon 12-06-23 22:10:30, Christoph Hellwig wrote:
-> > > +config BLK_DEV_WRITE_HARDENING
-> > > +	bool "Do not allow writing to mounted devices"
-> > > +	help
-> > > +	When a block device is mounted, writing to its buffer cache very likely
-> > > +	going to cause filesystem corruption. It is also rather easy to crash
-> > > +	the kernel in this way since the filesystem has no practical way of
-> > > +	detecting these writes to buffer cache and verifying its metadata
-> > > +	integrity. Select this option to disallow writing to mounted devices.
-> > > +	This should be mostly fine but some filesystems (e.g. ext4) rely on
-> > > +	the ability of filesystem tools to write to mounted filesystems to
-> > > +	set e.g. UUID or run fsck on the root filesystem in some setups.
+On Wed, Jun 14, 2023 at 12:17:26AM -0700, Christoph Hellwig wrote:
+> On Tue, Jun 13, 2023 at 08:09:14AM +0200, Dmitry Vyukov wrote:
+> > I don't question there are use cases for the flag, but there are use
+> > cases for the config as well.
 > > 
-> > I'm not sure a config option is really the right thing.
-> > 
-> > I'd much prefer a BLK_OPEN_ flag to prohibit any other writer.
-> > Except for etN and maybe fat all file systems can set that
-> > unconditionally.  And for those file systems that have historically
-> > allowed writes to mounted file systems they can find a local way
-> > to decide on when and when not to set it.
+> > Some distros may want a guarantee that this does not happen as it
+> > compromises lockdown and kernel integrity (on par with unsigned module
+> > loading).
+> > For fuzzing systems it also may be hard to ensure fine-grained
+> > argument constraints, it's much easier and more reliable to prohibit
+> > it on config level.
 > 
-> Well, as I've mentioned in the changelog there are old setups (without
-
-Before going into the details: Let's please take syzbot out of the
-picture as a justification or required reviewer for this patch. This is
-a complete distraction imho. If the patch has the side effect that it
-somehow makes for less noisy syzbot reports then so be it but it's
-really not why this patch is a good idea.
-
-For userspace this patch is immediately useful and a security mechanism
-that everyone familiar with block device/filesystem attack surfaces will
-want to make use of. And we should encourage this be the default
-whenever possible imho. That's all the justification that we need.
-
-> initrd) that run fsck on root filesystem mounted read-only and fsck
-> programs tend to open the device with O_RDWR. These would be broken by this
-> change (for the filesystems that would use BLK_OPEN_ flag). Similarly some
-> boot loaders can write to first sectors of the root partition while the
-> filesystem is mounted. So I don't think controlling the behavior by the
-> in-kernel user that is having the bdev exclusively open really works. It
-> seems to be more a property of the system setup than a property of the
-> in-kernel bdev user. Am I mistaken?
+> I'm fine with a config option enforcing write blocking for any
+> BLK_OPEN_EXCL open.  Maybe the way to it is to:
 > 
-> So I think kconfig option or sysfs tunable (maybe a per-device one?) will
-> be more appropriate choice? With default behavior configurable by kernel
-> parameter? And once set to write-protect on mount, do we allow flipping it
-> back? Both have advantages and disadvantages so the tunable might be
-> tri-state in the end (no protection, write-protect but can be turned off,
-> write-protect that cannot be turned off)? But maybe I'm overcomplicating
-> this so please share your thoughts :)
+>  a) have an option to prevent any writes to exclusive openers, including
+>     a run-time version to enable it
 
-A simple bool Kconfig overridable by kernel command line option is what
-we want. Fundamental security relevant properties such as this should
-never be runtime configurable. They should be boot and build time
-configurable and then they should be off limits.
+I really would wish we don't make this runtime configurable. Build time
+and boot time yes but toggling it at runtime makes this already a lot
+less interesting.
