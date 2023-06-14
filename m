@@ -2,99 +2,153 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D325BEB64DD
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 13:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC739EB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 13:50:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245104AbjFNNtW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 09:49:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53388 "EHLO
+        id S245241AbjFNNuj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 09:50:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245132AbjFNNtB (ORCPT
+        with ESMTP id S245268AbjFNNu0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 09:49:01 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3FA2211F;
-        Wed, 14 Jun 2023 06:48:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=b3Y3/1awi/EIUtJLSYKdDfjVRJbSniVIB1Dlm1y0AL0=; b=uWEIEEbCH3UWnrZPe2J7cDmYLd
-        O4Xj5AZCGsFXCimSKq5lz6aOuksqDgqazL9wSmVsHWLHLSk17R/3rs+QZzZZ7wbXMrjv2bTZxaXQa
-        iWT86t8NpwX1P0IyfWfzBJJjCnm3uujbBGVJywSX1MdFgvgU7UAFJ8Q3acwQYGAz5bFiezYUr9JbX
-        1bIXUbB3NisFfH4953N2bWGqYwBFv3EWV35lEsq9bZsBLQrV0bgDGbgLA77UOsxnk8yAcPuyS/0T2
-        d6WlnfqURx8jDVpUxjxVBSCxnv0qwPLQuXM9kKcAUOFv6k9QrBRrYRrod/9pQBLUPdj6S+YkS219Z
-        JswljtgQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q9Qrp-006Nnl-5o; Wed, 14 Jun 2023 13:48:57 +0000
-From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Wed, 14 Jun 2023 09:50:26 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F7C2116;
+        Wed, 14 Jun 2023 06:50:17 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 732882188F;
+        Wed, 14 Jun 2023 13:50:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1686750616; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a9V/45eMabXhdU3ckOTW7r4gN0IDt7PkTYtZbqmL44k=;
+        b=rM+JpluVe+Jr5/j6YYpyU/tVWR/032uTsXQmf0akGKqtBrnqiv9J2ECp2dp2GKBapSJiXs
+        QGq8CdA6TdZb3np0SgEl3xUSJE8P3IAl7b5W/2sMk1YyzpH+Wz3z2p3wTwSGLQOwdVZAmd
+        zgfwwotfrMbVoYFAIGR6JRBsQKJky7Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1686750616;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a9V/45eMabXhdU3ckOTW7r4gN0IDt7PkTYtZbqmL44k=;
+        b=GkxWrTsFLuSl8ecpM41owT4NXQNz3dJex//nhOgFxl6AD5O6J64r/oYvOmqg9aD9ojvowo
+        Aweo7KXZa1tq22Dw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6101E1357F;
+        Wed, 14 Jun 2023 13:50:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 0/wZF5jFiWRuaAAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 14 Jun 2023 13:50:16 +0000
+Message-ID: <6c6bb81e-04cd-f813-c06c-59a706685d63@suse.de>
+Date:   Wed, 14 Jun 2023 15:50:16 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 2/7] brd: convert to folios
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>,
         Christoph Hellwig <hch@lst.de>,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH 2/2] highmem: Add memcpy_from_folio()
-Date:   Wed, 14 Jun 2023 14:48:53 +0100
-Message-Id: <20230614134853.1521439-2-willy@infradead.org>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20230614114637.89759-1-hare@suse.de>
 References: <20230614114637.89759-1-hare@suse.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ <20230614114637.89759-3-hare@suse.de> <ZInEeq1lfDUxye58@casper.infradead.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZInEeq1lfDUxye58@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is the folio equivalent of memcpy_from_page(), but it handles large
-highmem folios.  It may be a little too big to inline on systems that
-have CONFIG_HIGHMEM enabled but on systems we actually care about almost
-all the code will be eliminated.
+On 6/14/23 15:45, Matthew Wilcox wrote:
+> On Wed, Jun 14, 2023 at 01:46:32PM +0200, Hannes Reinecke wrote:
+>>   /*
+>> - * Each block ramdisk device has a xarray brd_pages of pages that stores
+>> - * the pages containing the block device's contents. A brd page's ->index is
+>> - * its offset in PAGE_SIZE units. This is similar to, but in no way connected
+>> - * with, the kernel's pagecache or buffer cache (which sit above our block
+>> - * device).
+>> + * Each block ramdisk device has a xarray of folios that stores the folios
+>> + * containing the block device's contents. A brd folio's ->index is its offset
+>> + * in PAGE_SIZE units. This is similar to, but in no way connected with,
+>> + * the kernel's pagecache or buffer cache (which sit above our block device).
+> 
+> Having read my way to the end of the series, I can now circle back and
+> say this comment is wrong.  The folio->index is its offset in PAGE_SIZE
+> units if the sector size is <= PAGE_SIZE, otherwise it's the offset in
+> sector size units.  This is _different from_ the pagecache which uses
+> PAGE_SIZE units and multi-index entries in the XArray.
+> 
+Hmm. I am aware that brd is using the ->index field in a different way,
+but I thought I got it straigtened out ...
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- include/linux/highmem.h | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+>> @@ -144,29 +143,29 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
+>>   static void copy_to_brd(struct brd_device *brd, const void *src,
+>>   			sector_t sector, size_t n)
+>>   {
+>> -	struct page *page;
+>> +	struct folio *folio;
+>>   	void *dst;
+>>   	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+>>   	size_t copy;
+>>   
+>>   	copy = min_t(size_t, n, PAGE_SIZE - offset);
+>> -	page = brd_lookup_page(brd, sector);
+>> -	BUG_ON(!page);
+>> +	folio = brd_lookup_folio(brd, sector);
+>> +	BUG_ON(!folio);
+>>   
+>> -	dst = kmap_atomic(page);
+>> -	memcpy(dst + offset, src, copy);
+>> -	kunmap_atomic(dst);
+>> +	dst = kmap_local_folio(folio, offset);
+>> +	memcpy(dst, src, copy);
+>> +	kunmap_local(dst);
+> 
+> This should use memcpy_to_folio(), which doesn't exist yet.
+> Compile-tested patch incoming shortly ...
+> 
+Ah. You live and learn.
 
-diff --git a/include/linux/highmem.h b/include/linux/highmem.h
-index ec39f544113d..d47f4a09f2fa 100644
---- a/include/linux/highmem.h
-+++ b/include/linux/highmem.h
-@@ -536,6 +536,34 @@ static inline void memcpy_to_folio(struct folio *folio, size_t offset,
- 	flush_dcache_folio(folio);
- }
- 
-+/**
-+ * memcpy_from_folio - Copy a range of bytes from a folio
-+ * @to: The memory to copy to.
-+ * @folio: The folio to read from.
-+ * @offset: The first byte in the folio to read.
-+ * @len: The number of bytes to copy.
-+ */
-+static inline void memcpy_from_folio(char *to, struct folio *folio,
-+		size_t offset, size_t len)
-+{
-+	size_t n = len;
-+
-+	VM_BUG_ON(offset + len > folio_size(folio));
-+
-+	if (folio_test_highmem(folio))
-+		n = min(len, PAGE_SIZE - offset_in_page(offset));
-+	for (;;) {
-+		char *from = kmap_local_folio(folio, offset);
-+		memcpy(to, from, n);
-+		kunmap_local(from);
-+		if (!folio_test_highmem(folio) || n == len)
-+			break;
-+		offset += n;
-+		len -= n;
-+		n = min(len, PAGE_SIZE);
-+	}
-+}
-+
- static inline void put_and_unmap_page(struct page *page, void *addr)
- {
- 	kunmap_local(addr);
--- 
-2.39.2
+>> +	folio = brd_lookup_folio(brd, sector);
+>> +	if (folio) {
+>> +		src = kmap_local_folio(folio, offset);
+>> +		memcpy(dst, src, copy);
+>> +		kunmap_local(src);
+> 
+> And this will need memcpy_from_folio(), patch for that incoming too.
+> 
+>> @@ -226,15 +225,15 @@ static int brd_do_bvec(struct brd_device *brd, struct page *page,
+>>   			goto out;
+>>   	}
+>>   
+>> -	mem = kmap_atomic(page);
+>> +	mem = kmap_local_folio(folio, off);
+>>   	if (!op_is_write(opf)) {
+>> -		copy_from_brd(mem + off, brd, sector, len);
+>> -		flush_dcache_page(page);
+>> +		copy_from_brd(mem, brd, sector, len);
+>> +		flush_dcache_folio(folio);
+> 
+> Nngh.  This will need to be a more complex loop.  I don't think we can
+> do a simple abstraction here.  Perhaps you can base it on the two
+> patches you're about to see?
+> 
+Sure.
+Might explain the strange crashes I've seen ...
+
+Cheers,
+
+Hannes
 
