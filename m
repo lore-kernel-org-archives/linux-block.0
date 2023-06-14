@@ -2,77 +2,93 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 637A4EB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 13:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B77DEB64DB
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:01:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245165AbjFNNxz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 09:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58230 "EHLO
+        id S245315AbjFNOB0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 10:01:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245083AbjFNNxy (ORCPT
+        with ESMTP id S245264AbjFNOBZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 09:53:54 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A748A6;
-        Wed, 14 Jun 2023 06:53:53 -0700 (PDT)
+        Wed, 14 Jun 2023 10:01:25 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E14219A;
+        Wed, 14 Jun 2023 07:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BrKiZJ/7P5/xEOj2+1/+w23iGdbuRJcoaS4+TydPQrU=; b=iaVfzAFislHMvK4fgcYmEmftit
-        zSer6ZD4amu8Fdm6wa+O8vMTfFneJYaM+AdziypCD/zY/RTsk8X82jEepoZPIJpJekz3sfvECo7Jb
-        8J86iS2YDuk6a4XkJS0b7NQtp2uxVuhpiypSXRwzVESAUCvqBOTg0UOUkXc95QHpQsLpNOVy9igfz
-        68qStwCEjF3XiQ+yailPKEWyCPdvXQ2v0OM9AVPaRxva87xatn4VUJpPnl6J/D3Ll3cNpgQbqCmF/
-        oVenZBP+RBREOUa29WQnrygaWSg+mWVKZZaNwQ/KX9anVQofdOSwrVsK+8A9j6qXz8utJllUJ9JY0
-        65z3PjCQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1q9QwZ-006O5L-B0; Wed, 14 Jun 2023 13:53:51 +0000
-Date:   Wed, 14 Jun 2023 14:53:51 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH 0/7] RFC: high-order folio support for I/O
-Message-ID: <ZInGbz6X/ZQAwdRx@casper.infradead.org>
-References: <20230614114637.89759-1-hare@suse.de>
- <cd816905-0e3e-6397-1a6f-fd4d29dfc739@suse.de>
+        bh=cUPWTRyD6KgConRvc/LzTbU+jQN8JxfjvL3UpIyXkeM=; b=NodLVcgJ1NXwF37xa71v0LeCgL
+        QwCltgPLEdPtIhwT7ovBuinlI+NjgDmuppsqrL5ZJwh4EknK7qM8znLme5kOfiJHpoji+aiYT9iDZ
+        NdcrHcz0BNtrRJ679hKdInCKU7PuPxkrVRWrdIUFBLmyxf9+3CnyMTouyRP2493eMqUeiP410+G+2
+        /uFLTDI/Re80AMP9x20SHyQSeCAG3vW9mBib778IK9QDFs2WVH1rAaIhflvWk6XMrbR6eIkY9Qkcd
+        2IpaYW3w+oiKk7IBCM86K20Xo6Fj2kE0BX7RKUU73k2GjBI4Y6tYPm5mGDC/rLZ2lxLfz+V8VkOTG
+        aqu6HM8w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q9R3p-00BqmJ-08;
+        Wed, 14 Jun 2023 14:01:21 +0000
+Date:   Wed, 14 Jun 2023 07:01:20 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "Jain, Ayush" <Ayush.Jain3@amd.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "sfr@canb.auug.org.au" <sfr@canb.auug.org.au>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "Karny, Wyes" <Wyes.Karny@amd.com>, Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "V, Narasimhan" <Narasimhan.V@amd.com>,
+        "Shetty, Kalpana" <Kalpana.Shetty@amd.com>,
+        "Shukla, Santosh" <Santosh.Shukla@amd.com>
+Subject: Re: Kernel null pointer dereference on stopping raid device
+Message-ID: <ZInIMLlMby2aNNr1@infradead.org>
+References: <e78344ad-8d57-91d8-0bfb-724c740c7c72@amd.com>
+ <3c4911c4-d3d7-a93e-5f14-e97384ae4f21@amd.com>
+ <ZIlqvsZ6nMv2OT2u@infradead.org>
+ <IA1PR12MB61375A452083D65B5FB815DBBA5AA@IA1PR12MB6137.namprd12.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cd816905-0e3e-6397-1a6f-fd4d29dfc739@suse.de>
+In-Reply-To: <IA1PR12MB61375A452083D65B5FB815DBBA5AA@IA1PR12MB6137.namprd12.prod.outlook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 14, 2023 at 03:17:25PM +0200, Hannes Reinecke wrote:
-> Turns out that was quite easy to fix (just remove the check in
-> set_blocksize()), but now I get this:
+On Wed, Jun 14, 2023 at 09:54:07AM +0000, Jain, Ayush wrote:
+> Patch applied cleanly on next-20230614 and resolved the issue.
 > 
-> SGI XFS with ACLs, security attributes, quota, no debug enabled
-> XFS (ram0): File system with blocksize 16384 bytes. Only pagesize (4096) or
-> less will currently work.
+> Reported-by: Ayush Jain <ayush.jain3@amd.com>
+> Tested-by: Ayush Jain <ayush.jain3@amd.com>
 
-What happens if you just remove this hunk:
+That was just a quick hack to verify the problem.  I think this is
+the proper fix, can you try it as well?
 
-+++ b/fs/xfs/xfs_super.c
-@@ -1583,18 +1583,6 @@ xfs_fs_fill_super(
-                goto out_free_sb;
-        }
-
--       /*
--        * Until this is fixed only page-sized or smaller data blocks work.
--        */
--       if (mp->m_sb.sb_blocksize > PAGE_SIZE) {
--               xfs_warn(mp,
--               "File system with blocksize %d bytes. "
--               "Only pagesize (%ld) or less will currently work.",
--                               mp->m_sb.sb_blocksize, PAGE_SIZE);
--               error = -ENOSYS;
--               goto out_free_sb;
--       }
--
-        /* Ensure this filesystem fits in the page cache limits */
-        if (xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_dblocks) ||
-            xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_rblocks)) {
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index ca0de7ddd9434d..da523e80a4e990 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -2467,10 +2467,12 @@ static void export_rdev(struct md_rdev *rdev, struct mddev *mddev)
+ 
+ static void md_kick_rdev_from_array(struct md_rdev *rdev)
+ {
+-	bd_unlink_disk_holder(rdev->bdev, rdev->mddev->gendisk);
++	struct mddev *mddev = rdev->mddev;
++
++	bd_unlink_disk_holder(rdev->bdev, mddev->gendisk);
+ 	list_del_rcu(&rdev->same_set);
+ 	pr_debug("md: unbind<%pg>\n", rdev->bdev);
+-	mddev_destroy_serial_pool(rdev->mddev, rdev, false);
++	mddev_destroy_serial_pool(mddev, rdev, false);
+ 	rdev->mddev = NULL;
+ 	sysfs_remove_link(&rdev->kobj, "block");
+ 	sysfs_put(rdev->sysfs_state);
+@@ -2488,7 +2490,7 @@ static void md_kick_rdev_from_array(struct md_rdev *rdev)
+ 	INIT_WORK(&rdev->del_work, rdev_delayed_delete);
+ 	kobject_get(&rdev->kobj);
+ 	queue_work(md_rdev_misc_wq, &rdev->del_work);
+-	export_rdev(rdev, rdev->mddev);
++	export_rdev(rdev, mddev);
+ }
+ 
+ static void export_array(struct mddev *mddev)
