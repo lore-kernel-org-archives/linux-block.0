@@ -2,89 +2,105 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD62EB64DD
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 17:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6279EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 17:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232161AbjFNRPK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 13:15:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
+        id S232233AbjFNRWK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 13:22:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236570AbjFNRPJ (ORCPT
+        with ESMTP id S231969AbjFNRWK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 13:15:09 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5059D1BF0
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 10:15:08 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-77af9ee36d0so52305139f.0
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 10:15:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686762907; x=1689354907;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B26eBiSEO8OUhK8kpmF2mZpYPqAE55XIYMWNVoLAx3Q=;
-        b=ElLhn6Vb6ONuH/yutGqRSu0BujuRvECftwA7kC+v3U5p8cI9B7BHt8sPFm/BkMq3tZ
-         6XjPfdFsjXPyAoShZE+Osiv+ldN1nwOXeKOFR2BO8PqYOgZSLTzy6CMkcaZWPhIY2wFs
-         ErcB1uFEtThSIv6jHwmhqkHhcV86rA5IYgaciFlzM9hyq+23TVqgcEcOlcbY53Du0E5F
-         28Mg28TpN68OhQbulzBIznABi0RNr33khib7/hGrXBcuuJsYEyi0qoM8YOz16u8f2iEj
-         o/td+WXtr0EhGLPQdIEK8OrFkdRqSk9L3evTJSdmlFfqj0NqwnoX3EuigxSB6nqZHpLH
-         cTUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686762907; x=1689354907;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B26eBiSEO8OUhK8kpmF2mZpYPqAE55XIYMWNVoLAx3Q=;
-        b=LRM6OZ510/3VyV5x6nKCWH6jYpbumhPb9l60l0MkdHDnFTcV2XD1AnCAK/hkz48+DB
-         LbBOfjaxGiEGWzxkT4dbQd9wnp/WxRKius7dpIfDpXsgfTapt+D4HLsfu9vQwXstoGYu
-         OyAMAok2cL5WYSEAD5Lc/nPRLprm+SFCY7zDCjnM1MMPKs/Z27DPP0vmfGyeKmwDAk21
-         6HkVrMSMf+QZulqyCX3toHGsOaeSw8mSBDrkFBHadIztg6aYFkcGLKRDShLiReXXrPSy
-         0dUdMTgAIhZPKYrUaKkV4kgwvoPmoNlcIJ4dvSRZtlL81Sq814ChPvJgUXf73Xt0ir8w
-         dS7g==
-X-Gm-Message-State: AC+VfDzMaQFausfn4R9TLAPeOkyFxC5/NEsb8d3ORtqrb/OdX6gHM5IB
-        2PeKX31gZ0yXDmiucdxpgmST2g==
-X-Google-Smtp-Source: ACHHUZ6kZIXJ4WVd6TtuAzwSart7NeuZwYzm8p682e/ql6LucW3pz+VE49BLOS3W2aHX2uzGaLLXdg==
-X-Received: by 2002:a05:6602:2d56:b0:77a:b7b7:acfc with SMTP id d22-20020a0566022d5600b0077ab7b7acfcmr7462109iow.1.1686762907709;
-        Wed, 14 Jun 2023 10:15:07 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id t12-20020a02c48c000000b0040f94261ab1sm5160089jam.12.2023.06.14.10.15.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jun 2023 10:15:06 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     mcgrof@kernel.org, linux-block@vger.kernel.org,
-        gost.dev@samsung.com, hare@suse.de,
-        Matthew Wilcox <willy@infradead.org>
-In-Reply-To: <20230614133538.1279369-1-p.raghav@samsung.com>
-References: <CGME20230614133540eucas1p1a761c184d7d571cfcd893ab5f8b759fd@eucas1p1.samsung.com>
- <20230614133538.1279369-1-p.raghav@samsung.com>
-Subject: Re: [PATCH for-next] brd: use cond_resched instead of
- cond_resched_rcu
-Message-Id: <168676290645.1832065.8226937574445830901.b4-ty@kernel.dk>
-Date:   Wed, 14 Jun 2023 11:15:06 -0600
+        Wed, 14 Jun 2023 13:22:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E011B3;
+        Wed, 14 Jun 2023 10:22:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C761C64517;
+        Wed, 14 Jun 2023 17:22:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5445C433C8;
+        Wed, 14 Jun 2023 17:22:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686763328;
+        bh=w5/LJ9VL/tOf3UMtuc4O4E9fW27si5j7tY7DpTj4pss=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=CxR8M3oxJ/8tD5K4WiBXG9FURLGXMbDB+KLaO4hVqKynleUbR2BRf6KBkeaADyGz9
+         1lbBHibfKX9JBkMZEjk1Pogn6Kj8fnfsfDkp2ykJxWpLc0aZblP0DSJYP3zDyDNO1F
+         FGUw+56BiggUXhFxKiyA5RfA4ZrzZOMLM+gCmrSgl9VB6hdntTuE7YGpSd0rGdcoZ1
+         Qdl/Y0WXIHOFiVWxTwMXypMcsV+77ogcE8w+HreNHPVx5Bddq89B7q6V68bn/kiNbS
+         gsRwg54n7A8fNuHGDLyySHM5P3qiloRKc+z9uWrsrT85gW3qUfvtlACqDnr1eU0dBK
+         a0ezyBCLOWW1Q==
+Date:   Wed, 14 Jun 2023 10:22:05 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "snitzer@kernel.org" <snitzer@kernel.org>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "brauner@kernel.org" <brauner@kernel.org>,
+        "dchinner@redhat.com" <dchinner@redhat.com>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "dlemoal@kernel.org" <dlemoal@kernel.org>,
+        "linux@weissschuh.net" <linux@weissschuh.net>,
+        "jack@suse.cz" <jack@suse.cz>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v5 00/11] blksnap - block devices snapshots module
+Message-ID: <20230614172205.GB1146@sol.localdomain>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612161911.GA1200@sol.localdomain>
+ <20a5802d-424d-588a-c497-1d1236c52880@veeam.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-c6835
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20a5802d-424d-588a-c497-1d1236c52880@veeam.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Wed, 14 Jun 2023 15:35:38 +0200, Pankaj Raghav wrote:
-> The body of the loop is run without RCU lock held. Use the regular
-> cond_resched() instead of cond_resched_rcu().
+On Tue, Jun 13, 2023 at 12:12:19PM +0200, Sergei Shtepa wrote:
+> On 6/12/23 18:19, Eric Biggers wrote:
+> > This is the first time you've received an email from this sender 
+> > ebiggers@kernel.org, please exercise caution when clicking on links or opening 
+> > attachments.
+> > 
+> > 
+> > On Mon, Jun 12, 2023 at 03:52:17PM +0200, Sergei Shtepa wrote:
+> >  > Hi all.
+> >  >
+> >  > I am happy to offer a improved version of the Block Devices Snapshots
+> >  > Module. It allows to create non-persistent snapshots of any block devices.
+> >  > The main purpose of such snapshots is to provide backups of block devices.
+> >  > See more in Documentation/block/blksnap.rst.
+> > 
+> > How does blksnap interact with blk-crypto?
+> > 
+> > I.e., what happens if a bio with a ->bi_crypt_context set is submitted to a
+> > block device that has blksnap active?
+> > 
+> > If you are unfamiliar with blk-crypto, please read
+> > Documentation/block/inline-encryption.rst
 > 
-> 
+> Thank you, this is an important point. Yes, that's right.
+> The current version of blksnap can cause blk-crypto to malfunction while
+> holding a snapshot. When handling bios from the file system, the
+> ->bi_crypt_context is preserved. But the bio requests serving the snapshot
+> are executed without context. I think that the snapshot will be unreadable.
 
-Applied, thanks!
+Well not only would the resulting snapshot be unreadable, but plaintext data
+would be written to disk, contrary to the intent of the submitter of the bios.
+That would be a security vulnerability.
 
-[1/1] brd: use cond_resched instead of cond_resched_rcu
-      commit: 6dd4423f3f247b6f0ecb828cf62ea2bc4604f0b5
+If the initial version of blksnap isn't going to be compatible with blk-crypto,
+that is tolerable for now, but there needs to be an explicit check to cause an
+error to be returned if the two features are combined, before anything is
+written to disk.
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+- Eric
