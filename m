@@ -2,60 +2,61 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A033EB64DC
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 15:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB55EB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 15:35:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245755AbjFNPGS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 11:06:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47032 "EHLO
+        id S235356AbjFNPfg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 11:35:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245749AbjFNPGR (ORCPT
+        with ESMTP id S229736AbjFNPfG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 11:06:17 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4CC1BFF;
-        Wed, 14 Jun 2023 08:06:16 -0700 (PDT)
+        Wed, 14 Jun 2023 11:35:06 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D99EB6;
+        Wed, 14 Jun 2023 08:35:04 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 225A522558;
-        Wed, 14 Jun 2023 15:06:15 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id F41081FDB5;
+        Wed, 14 Jun 2023 15:35:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1686755175; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1686756903; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=X+iWl9r/tSDUmPJvtaMNNO71uG272AM8uYMcS2LX1HA=;
-        b=zWH+1UhvlX0xFsf6CtqMF58XReNVqILWs/UD3a8cjl+SBOtnaZ4Xqq/y++WdEpEHcg3hMJ
-        xqDsYrDb6pNPPmC9syAaiVT9wPYIRffIEUhKQsg5Ibju9OmA+FPLvStXEU5CMm8t6Vu8nY
-        OY+YZHX9lYkbhMWUBfu0UbqkgM8nhIM=
+        bh=kZQgDi2VbOJpatdj+K52qKpMPGdEGQyZQB7VZLDRrk0=;
+        b=fUFVVC3XA/mDZqMaAEfUGeGjVt9wOWzjWc+k0KQr04POAEBD8IDz6iZ9S4+/FWked+CqTL
+        N54EvcEqNVNtgI9C7AnjQ9FBX0GKusVOr6HxuizQr8vtDp9I74hUhiAuwI3jKZHPRkTCX0
+        NRa90g24DNZMo894Pk4AP1FK6LWTSX4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1686755175;
+        s=susede2_ed25519; t=1686756903;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=X+iWl9r/tSDUmPJvtaMNNO71uG272AM8uYMcS2LX1HA=;
-        b=bMEJITchW/Qfuw3BbMAkjbI1kC6iyOT4RZTkBtZLchhazoizEHlXhjOdArmuURsuzO7BKP
-        eVwimY9YeyTtxsBQ==
+        bh=kZQgDi2VbOJpatdj+K52qKpMPGdEGQyZQB7VZLDRrk0=;
+        b=a3SNS2gseRlaWZ4Uk7ssBaGnd+YEFqWgniZp4QSerAuSO5oD9qbSnjsL+Lw/SZML4ijWs/
+        1Rrw8eErycXi86CQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E648D1391E;
-        Wed, 14 Jun 2023 15:06:14 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BC8B81357F;
+        Wed, 14 Jun 2023 15:35:02 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id vRomN2bXiWTrEQAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 14 Jun 2023 15:06:14 +0000
-Message-ID: <b3fa1b77-d120-f86b-e02f-f79b6d13efcc@suse.de>
-Date:   Wed, 14 Jun 2023 17:06:14 +0200
+        id rdIILCbeiWTDHwAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 14 Jun 2023 15:35:02 +0000
+Message-ID: <cfa191cc-47e4-5b61-bf4f-33ebd52fa783@suse.de>
+Date:   Wed, 14 Jun 2023 17:35:02 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
 Subject: Re: [PATCH 0/7] RFC: high-order folio support for I/O
 Content-Language: en-US
+From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -64,62 +65,57 @@ Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
 References: <20230614114637.89759-1-hare@suse.de>
  <cd816905-0e3e-6397-1a6f-fd4d29dfc739@suse.de>
  <ZInGbz6X/ZQAwdRx@casper.infradead.org>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <ZInGbz6X/ZQAwdRx@casper.infradead.org>
+ <b3fa1b77-d120-f86b-e02f-f79b6d13efcc@suse.de>
+In-Reply-To: <b3fa1b77-d120-f86b-e02f-f79b6d13efcc@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/23 15:53, Matthew Wilcox wrote:
-> On Wed, Jun 14, 2023 at 03:17:25PM +0200, Hannes Reinecke wrote:
->> Turns out that was quite easy to fix (just remove the check in
->> set_blocksize()), but now I get this:
->>
->> SGI XFS with ACLs, security attributes, quota, no debug enabled
->> XFS (ram0): File system with blocksize 16384 bytes. Only pagesize (4096) or
->> less will currently work.
+On 6/14/23 17:06, Hannes Reinecke wrote:
+[ .. ]
 > 
-> What happens if you just remove this hunk:
+> Whee! That works!
 > 
-> +++ b/fs/xfs/xfs_super.c
-> @@ -1583,18 +1583,6 @@ xfs_fs_fill_super(
->                  goto out_free_sb;
->          }
+> Rebased things with your memcpy_{to,from}_folio() patches, disabled that 
+> chunk, and:
 > 
-> -       /*
-> -        * Until this is fixed only page-sized or smaller data blocks work.
-> -        */
-> -       if (mp->m_sb.sb_blocksize > PAGE_SIZE) {
-> -               xfs_warn(mp,
-> -               "File system with blocksize %d bytes. "
-> -               "Only pagesize (%ld) or less will currently work.",
-> -                               mp->m_sb.sb_blocksize, PAGE_SIZE);
-> -               error = -ENOSYS;
-> -               goto out_free_sb;
-> -       }
-> -
->          /* Ensure this filesystem fits in the page cache limits */
->          if (xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_dblocks) ||
->              xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_rblocks)) {
+> # mount /dev/ram0 /mnt
+> XFS (ram0): Mounting V5 Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
+> XFS (ram0): Ending clean mount
+> xfs filesystem being mounted at /mnt supports timestamps until 
+> 2038-01-19 (0x7fffffff)
+> # umount /mnt
+> XFS (ram0): Unmounting Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
+> 
+> Great work, Matthew!
+> 
+> (Now I just need to check why copying data from NFS crashes ...)
+> 
+Hmm. And for that I'm hitting include/linux/pagemap.h:1250 pretty 
+consistently; something's going haywire with readahead.
 
-Whee! That works!
+Matthew, are you sure that this one:
 
-Rebased things with your memcpy_{to,from}_folio() patches, disabled that 
-chunk, and:
+/** 
 
-# mount /dev/ram0 /mnt
-XFS (ram0): Mounting V5 Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
-XFS (ram0): Ending clean mount
-xfs filesystem being mounted at /mnt supports timestamps until 
-2038-01-19 (0x7fffffff)
-# umount /mnt
-XFS (ram0): Unmounting Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
+  * readahead_length - The number of bytes in this readahead request. 
 
-Great work, Matthew!
+  * @rac: The readahead request. 
 
-(Now I just need to check why copying data from NFS crashes ...)
+  */
+static inline size_t readahead_length(struct readahead_control *rac)
+{
+         return rac->_nr_pages * PAGE_SIZE;
+}
+
+is tenable for large folios?
+Especially as we have in mm/readahead.c:499
+
+         ractl->_nr_pages += 1UL << order;
+
+Hmm?
 
 Cheers,
 
