@@ -2,104 +2,113 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0974EB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 13:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78692EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 13:17:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244809AbjFNNDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 09:03:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56278 "EHLO
+        id S240303AbjFNNRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 09:17:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235509AbjFNNDb (ORCPT
+        with ESMTP id S235119AbjFNNR3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 09:03:31 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDAD199C;
-        Wed, 14 Jun 2023 06:03:30 -0700 (PDT)
+        Wed, 14 Jun 2023 09:17:29 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A0F191;
+        Wed, 14 Jun 2023 06:17:26 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D9F35219A1;
-        Wed, 14 Jun 2023 13:03:28 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 651782253C;
+        Wed, 14 Jun 2023 13:17:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1686747808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1686748645; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MU22H/MNDJGEWTigTjVbKwhrgWPT8oAuPxOTZnn1eHM=;
-        b=RB7pkRCivSsE7KU1e6+RdYW6iTT0HlugUyrVn51a7TWkTduIH6/DOz7IuceXhn+9wnTZhS
-        jNWIKLM6QF4ULmrK7MEuJBaiz07Gihq9s+2HMuT98sEGzglKEVCCfJw6nLnJAEM98KCGG8
-        6+FR0kxGLGpe/n0Arg04TVD3fuWwxjg=
+        bh=TF9KeihZRpsRH7T+tME1HMriDiLYlq5Qpm9I9dncI04=;
+        b=x6D7/vDI4fB3czijhPkylAjL59vWALMoOVZ2+0BgXEWptq2qjL56Qnjc5ytTDPRhW81JVp
+        Zu3XHrUml5Gm+M3iYMSFmN5cDzGA6ZvpmJaDVwokxpzkotS+qbXuHzbNtdlrUfPHF9ubRh
+        7gnvBOTk1EaWlq6FqCDQCHrUO0zq4dQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1686747808;
+        s=susede2_ed25519; t=1686748645;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MU22H/MNDJGEWTigTjVbKwhrgWPT8oAuPxOTZnn1eHM=;
-        b=lGUd2w/L0TFJ/VWS7jRtIrk6i8FIpWdj7zrzpZ98yqiDKIN2dMv+yY2roBSIyXlFgtiW1h
-        QiBUbTTBlP4myiDA==
+        bh=TF9KeihZRpsRH7T+tME1HMriDiLYlq5Qpm9I9dncI04=;
+        b=yJA1cNdW0aOM6hkHkZafKTzX2u7vwQbYBNCG5FN7DbGBmZG1djKyXVCh/sFWp7UtZX3e9X
+        s5P5SHQv+Jl0zCBw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C74021357F;
-        Wed, 14 Jun 2023 13:03:28 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 50DCB1357F;
+        Wed, 14 Jun 2023 13:17:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id zJwLMKC6iWRjTwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 14 Jun 2023 13:03:28 +0000
-Message-ID: <549489d7-ff60-b8d0-9241-60e54e454c14@suse.de>
-Date:   Wed, 14 Jun 2023 15:03:28 +0200
+        id Vms7E+W9iWT7VgAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 14 Jun 2023 13:17:25 +0000
+Message-ID: <cd816905-0e3e-6397-1a6f-fd4d29dfc739@suse.de>
+Date:   Wed, 14 Jun 2023 15:17:25 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
-Subject: Re: [PATCH 1/7] brd: use XArray instead of radix-tree to index
- backing pages
+Subject: Re: [PATCH 0/7] RFC: high-order folio support for I/O
 Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>,
-        Matthew Wilcox <willy@infradead.org>
+To:     Matthew Wilcox <willy@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         Andrew Morton <akpm@linux-foundation.org>,
         Christoph Hellwig <hch@lst.de>,
         Luis Chamberlain <mcgrof@kernel.org>
 References: <20230614114637.89759-1-hare@suse.de>
- <20230614114637.89759-2-hare@suse.de>
- <CGME20230614124605eucas1p13e57b1da46266467a71f124e40ab8252@eucas1p1.samsung.com>
- <ZIm2fqesAKAHHh5j@casper.infradead.org>
- <25657702-19a7-6523-21bd-c671935c2c2e@samsung.com>
 From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <25657702-19a7-6523-21bd-c671935c2c2e@samsung.com>
+In-Reply-To: <20230614114637.89759-1-hare@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/23 14:50, Pankaj Raghav wrote:
->>>   
->>> -		/*
->>> -		 * It takes 3.4 seconds to remove 80GiB ramdisk.
->>> -		 * So, we need cond_resched to avoid stalling the CPU.
->>> -		 */
->>> -		cond_resched();
->>> +	xa_for_each(&brd->brd_pages, idx, page) {
->>> +		__free_page(page);
->>> +		cond_resched_rcu();
->>
->> This should be a regular cond_resched().  The body of the loop is run
->> without the RCU read lock held.  Surprised none of the bots have noticed
->> an unlock-underflow.  Perhaps they don't test brd ;-)
->>
->> With that fixed,
->>
->> Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+On 6/14/23 13:46, Hannes Reinecke wrote:
+> Hi all,
 > 
-> This patch is already queued up for 6.5 in Jens's tree.
-> I will send this as a fix soon. Thanks.
+> now, that was easy.
+> Thanks to willy and his recent patchset to support large folios in
+> gfs2 turns out that most of the work to support high-order folios
+> for I/O is actually done.
+> It only need twe rather obvious patches to allocate folios with
+> the order derived from the mapping blocksize, and to adjust readahead
+> to avoid reading off the end of the device.
+> But with these two patches (and the patchset from hch to switch
+> the block device over to iomap) (and the patchset from ritesh to
+> support sub-blocksize iomap buffers) I can now do:
+> 
+> # modprobe brd rd_size=524288 rd_blksize=16384
+> # mkfs.xfs -b size=16384 /dev/ram0
+> 
+> it still fails when trying to mount the device:
+> 
+> XFS (ram0): Cannot set_blocksize to 16384 on device ram0
+> 
+> but to my understanding this is being worked on.
+> 
+Turns out that was quite easy to fix (just remove the check in 
+set_blocksize()), but now I get this:
 
-Ah. Hence. I've been running off akpms mm-unstable branch, which doesn't 
-have that patch (yet).
+SGI XFS with ACLs, security attributes, quota, no debug enabled
+XFS (ram0): File system with blocksize 16384 bytes. Only pagesize (4096) 
+or less will currently work.
+
+Hmm. And btrfs doesn't fare better here:
+
+BTRFS info (device ram0): using crc32c (crc32c-intel) checksum algorithm
+BTRFS error (device ram0): sectorsize 16384 not yet supported for page 
+size 4096
+BTRFS error (device ram0): superblock contains fatal errors
+BTRFS error (device ram0): open_ctree failed
+
+But at least we _can_ test these filesystems now :-)
 
 Cheers,
 
