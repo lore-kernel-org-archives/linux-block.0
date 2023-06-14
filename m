@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E058C001DE
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 11:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189F2C001DF
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 11:47:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244281AbjFNLrD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 07:47:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59658 "EHLO
+        id S236153AbjFNLrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 07:47:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243896AbjFNLrA (ORCPT
+        with ESMTP id S235826AbjFNLrB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 07:47:00 -0400
+        Wed, 14 Jun 2023 07:47:01 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1BE0A2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E597D199C;
         Wed, 14 Jun 2023 04:46:58 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id ACB8C22519;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 97F1322511;
         Wed, 14 Jun 2023 11:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1686743217; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=u1yTeoSVLVyjZiMQAOJz+F9uUM4XPnKqxDI9EXnILlU=;
-        b=WXZo/hrnY9KoS/cRpRil5negGKX0kEDL5MkDRBN8jhPpaeY6blrfAsNR22+KjBddDUCgbg
-        mccP3bHnwBZSZ58fKwX7SUqG4kbb5MTMsOiD4ojMoyCMoNAZPHKS3DePvrgoEW31PDLNyx
-        0t+00SrhBD/U6atjJL330n8j+dU5F/Q=
+        bh=aYOs+uABb5gYnoNK951Q+oP81sGUVzH0UFROd8+HK+U=;
+        b=UaMoMJVUZCkNQ1TkRASiERLoBdOgAdypqmSgBc5f44Tn8t9EMSsreEJ9WgSZq/RW8iFMyE
+        rKvcdMi9r8eofRzfWy8it968U+wUleEGohl9x2RI7qBjdB3cqy13Mnj4KS+sy6LFZM93iJ
+        baGhswcgOr4TagkiSN4dO9rqQZw95AQ=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1686743217;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=u1yTeoSVLVyjZiMQAOJz+F9uUM4XPnKqxDI9EXnILlU=;
-        b=S9MMdSSeOkT+Jen8/vr/M/ALKN0CKtIzVXFfvlSD4rjStJrcyMBtcqprjSJnc82REEECoW
-        HwvLYf3SH3i9vmDA==
+        bh=aYOs+uABb5gYnoNK951Q+oP81sGUVzH0UFROd8+HK+U=;
+        b=aC+1V25h3X4iLNyoKbcBzPP7PmJgRObaoqakQOcgW0HGlHPIQRWZmqDrgbVLX/Z9vO7+Xl
+        6QBkpHwxszS3ymBg==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 985F72C149;
+        by relay2.suse.de (Postfix) with ESMTP id 843122C143;
         Wed, 14 Jun 2023 11:46:57 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 90C2251C4E13; Wed, 14 Jun 2023 13:46:57 +0200 (CEST)
+        id 78EEB51C4E0D; Wed, 14 Jun 2023 13:46:57 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Luis Chamberlain <mcgrof@kernel.org>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 5/7] brd: make logical sector size configurable
-Date:   Wed, 14 Jun 2023 13:46:35 +0200
-Message-Id: <20230614114637.89759-6-hare@suse.de>
+Subject: [PATCH 2/7] brd: convert to folios
+Date:   Wed, 14 Jun 2023 13:46:32 +0200
+Message-Id: <20230614114637.89759-3-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20230614114637.89759-1-hare@suse.de>
 References: <20230614114637.89759-1-hare@suse.de>
@@ -60,128 +60,340 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a module option 'rd_logical_blksize' to allow the user to change
-the logical sector size of the RAM disks.
+Convert the driver to work on folios instead of pages.
 
 Signed-off-by: Hannes Reinecke <hare@suse.de>
 ---
- drivers/block/brd.c | 38 ++++++++++++++++++++++++++++++--------
- 1 file changed, 30 insertions(+), 8 deletions(-)
+ drivers/block/brd.c | 150 ++++++++++++++++++++++----------------------
+ 1 file changed, 74 insertions(+), 76 deletions(-)
 
 diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 2ebb5532a204..a9f3c6591e75 100644
+index 2f71376afc71..24769d010fee 100644
 --- a/drivers/block/brd.c
 +++ b/drivers/block/brd.c
-@@ -45,9 +45,11 @@ struct brd_device {
- 	u64			brd_nr_folios;
- 	unsigned int		brd_sector_shift;
- 	unsigned int		brd_sector_size;
-+	unsigned int		brd_logical_sector_shift;
-+	unsigned int		brd_logical_sector_size;
+@@ -28,11 +28,10 @@
+ #include <linux/uaccess.h>
+ 
+ /*
+- * Each block ramdisk device has a xarray brd_pages of pages that stores
+- * the pages containing the block device's contents. A brd page's ->index is
+- * its offset in PAGE_SIZE units. This is similar to, but in no way connected
+- * with, the kernel's pagecache or buffer cache (which sit above our block
+- * device).
++ * Each block ramdisk device has a xarray of folios that stores the folios
++ * containing the block device's contents. A brd folio's ->index is its offset
++ * in PAGE_SIZE units. This is similar to, but in no way connected with,
++ * the kernel's pagecache or buffer cache (which sit above our block device).
+  */
+ struct brd_device {
+ 	int			brd_number;
+@@ -40,81 +39,81 @@ struct brd_device {
+ 	struct list_head	brd_list;
+ 
+ 	/*
+-	 * Backing store of pages. This is the contents of the block device.
++	 * Backing store of folios. This is the contents of the block device.
+ 	 */
+-	struct xarray	        brd_pages;
+-	u64			brd_nr_pages;
++	struct xarray	        brd_folios;
++	u64			brd_nr_folios;
  };
  
--#define BRD_SECTOR_SHIFT(b) ((b)->brd_sector_shift - SECTOR_SHIFT)
-+#define BRD_SECTOR_SHIFT(b) ((b)->brd_sector_shift - (b)->brd_logical_sector_shift)
- 
- static pgoff_t brd_sector_index(struct brd_device *brd, sector_t sector)
+ /*
+- * Look up and return a brd's page for a given sector.
++ * Look up and return a brd's folio for a given sector.
+  */
+-static struct page *brd_lookup_page(struct brd_device *brd, sector_t sector)
++static struct folio *brd_lookup_folio(struct brd_device *brd, sector_t sector)
  {
-@@ -61,7 +63,7 @@ static int brd_sector_offset(struct brd_device *brd, sector_t sector)
- {
- 	unsigned int rd_sector_mask = (1 << BRD_SECTOR_SHIFT(brd)) - 1;
+ 	pgoff_t idx;
+-	struct page *page;
++	struct folio *folio;
  
--	return ((unsigned int)sector & rd_sector_mask) << SECTOR_SHIFT;
-+	return ((unsigned int)sector & rd_sector_mask) << brd->brd_logical_sector_shift;
+-	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to page index */
+-	page = xa_load(&brd->brd_pages, idx);
++	idx = sector >> PAGE_SECTORS_SHIFT; /* sector to folio index */
++	folio = xa_load(&brd->brd_folios, idx);
+ 
+-	BUG_ON(page && page->index != idx);
++	BUG_ON(folio && folio->index != idx);
+ 
+-	return page;
++	return folio;
  }
  
  /*
-@@ -152,7 +154,7 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
+- * Insert a new page for a given sector, if one does not already exist.
++ * Insert a new folio for a given sector, if one does not already exist.
+  */
+-static int brd_insert_page(struct brd_device *brd, sector_t sector, gfp_t gfp)
++static int brd_insert_folio(struct brd_device *brd, sector_t sector, gfp_t gfp)
+ {
+ 	pgoff_t idx;
+-	struct page *page, *cur;
++	struct folio *folio, *cur;
+ 	int ret = 0;
+ 
+-	page = brd_lookup_page(brd, sector);
+-	if (page)
++	folio = brd_lookup_folio(brd, sector);
++	if (folio)
+ 		return 0;
+ 
+-	page = alloc_page(gfp | __GFP_ZERO | __GFP_HIGHMEM);
+-	if (!page)
++	folio = folio_alloc(gfp | __GFP_ZERO | __GFP_HIGHMEM, 0);
++	if (!folio)
+ 		return -ENOMEM;
+ 
+-	xa_lock(&brd->brd_pages);
++	xa_lock(&brd->brd_folios);
+ 
+ 	idx = sector >> PAGE_SECTORS_SHIFT;
+-	page->index = idx;
++	folio->index = idx;
+ 
+-	cur = __xa_cmpxchg(&brd->brd_pages, idx, NULL, page, gfp);
++	cur = __xa_cmpxchg(&brd->brd_folios, idx, NULL, folio, gfp);
+ 
+ 	if (unlikely(cur)) {
+-		__free_page(page);
++		folio_put(folio);
+ 		ret = xa_err(cur);
+ 		if (!ret && (cur->index != idx))
+ 			ret = -EIO;
+ 	} else {
+-		brd->brd_nr_pages++;
++		brd->brd_nr_folios++;
+ 	}
+ 
+-	xa_unlock(&brd->brd_pages);
++	xa_unlock(&brd->brd_folios);
+ 
+ 	return ret;
+ }
+ 
+ /*
+- * Free all backing store pages and xarray. This must only be called when
++ * Free all backing store folios and xarray. This must only be called when
+  * there are no other users of the device.
+  */
+-static void brd_free_pages(struct brd_device *brd)
++static void brd_free_folios(struct brd_device *brd)
+ {
+-	struct page *page;
++	struct folio *folio;
+ 	pgoff_t idx;
+ 
+-	xa_for_each(&brd->brd_pages, idx, page) {
+-		__free_page(page);
++	xa_for_each(&brd->brd_folios, idx, folio) {
++		folio_put(folio);
+ 		cond_resched_rcu();
+ 	}
+ 
+-	xa_destroy(&brd->brd_pages);
++	xa_destroy(&brd->brd_folios);
+ }
+ 
+ /*
+@@ -128,12 +127,12 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
+ 	int ret;
+ 
+ 	copy = min_t(size_t, n, PAGE_SIZE - offset);
+-	ret = brd_insert_page(brd, sector, gfp);
++	ret = brd_insert_folio(brd, sector, gfp);
  	if (ret)
  		return ret;
  	if (copy < n) {
--		sector += copy >> SECTOR_SHIFT;
-+		sector += copy >> brd->brd_logical_sector_shift;
- 		ret = brd_insert_folio(brd, sector, gfp);
+ 		sector += copy >> SECTOR_SHIFT;
+-		ret = brd_insert_page(brd, sector, gfp);
++		ret = brd_insert_folio(brd, sector, gfp);
  	}
  	return ret;
-@@ -180,7 +182,7 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
+ }
+@@ -144,29 +143,29 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
+ static void copy_to_brd(struct brd_device *brd, const void *src,
+ 			sector_t sector, size_t n)
+ {
+-	struct page *page;
++	struct folio *folio;
+ 	void *dst;
+ 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+ 	size_t copy;
+ 
+ 	copy = min_t(size_t, n, PAGE_SIZE - offset);
+-	page = brd_lookup_page(brd, sector);
+-	BUG_ON(!page);
++	folio = brd_lookup_folio(brd, sector);
++	BUG_ON(!folio);
+ 
+-	dst = kmap_atomic(page);
+-	memcpy(dst + offset, src, copy);
+-	kunmap_atomic(dst);
++	dst = kmap_local_folio(folio, offset);
++	memcpy(dst, src, copy);
++	kunmap_local(dst);
  
  	if (copy < n) {
  		src += copy;
--		sector += copy >> SECTOR_SHIFT;
-+		sector += copy >> brd->brd_logical_sector_shift;
+ 		sector += copy >> SECTOR_SHIFT;
  		copy = n - copy;
- 		folio = brd_lookup_folio(brd, sector);
- 		BUG_ON(!folio);
-@@ -214,7 +216,7 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
+-		page = brd_lookup_page(brd, sector);
+-		BUG_ON(!page);
++		folio = brd_lookup_folio(brd, sector);
++		BUG_ON(!folio);
  
- 	if (copy < n) {
+-		dst = kmap_atomic(page);
++		dst = kmap_local_folio(folio, 0);
+ 		memcpy(dst, src, copy);
+-		kunmap_atomic(dst);
++		kunmap_local(dst);
+ 	}
+ }
+ 
+@@ -176,17 +175,17 @@ static void copy_to_brd(struct brd_device *brd, const void *src,
+ static void copy_from_brd(void *dst, struct brd_device *brd,
+ 			sector_t sector, size_t n)
+ {
+-	struct page *page;
++	struct folio *folio;
+ 	void *src;
+ 	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+ 	size_t copy;
+ 
+ 	copy = min_t(size_t, n, PAGE_SIZE - offset);
+-	page = brd_lookup_page(brd, sector);
+-	if (page) {
+-		src = kmap_atomic(page);
+-		memcpy(dst, src + offset, copy);
+-		kunmap_atomic(src);
++	folio = brd_lookup_folio(brd, sector);
++	if (folio) {
++		src = kmap_local_folio(folio, offset);
++		memcpy(dst, src, copy);
++		kunmap_local(src);
+ 	} else
+ 		memset(dst, 0, copy);
+ 
+@@ -194,20 +193,20 @@ static void copy_from_brd(void *dst, struct brd_device *brd,
  		dst += copy;
--		sector += copy >> SECTOR_SHIFT;
-+		sector += copy >> brd->brd_logical_sector_shift;
+ 		sector += copy >> SECTOR_SHIFT;
  		copy = n - copy;
- 		folio = brd_lookup_folio(brd, sector);
- 		if (folio) {
-@@ -273,8 +275,8 @@ static void brd_submit_bio(struct bio *bio)
+-		page = brd_lookup_page(brd, sector);
+-		if (page) {
+-			src = kmap_atomic(page);
++		folio = brd_lookup_folio(brd, sector);
++		if (folio) {
++			src = kmap_local_folio(folio, 0);
+ 			memcpy(dst, src, copy);
+-			kunmap_atomic(src);
++			kunmap_local(src);
+ 		} else
+ 			memset(dst, 0, copy);
+ 	}
+ }
+ 
+ /*
+- * Process a single bvec of a bio.
++ * Process a single folio of a bio.
+  */
+-static int brd_do_bvec(struct brd_device *brd, struct page *page,
++static int brd_do_folio(struct brd_device *brd, struct folio *folio,
+ 			unsigned int len, unsigned int off, blk_opf_t opf,
+ 			sector_t sector)
+ {
+@@ -217,7 +216,7 @@ static int brd_do_bvec(struct brd_device *brd, struct page *page,
+ 	if (op_is_write(opf)) {
+ 		/*
+ 		 * Must use NOIO because we don't want to recurse back into the
+-		 * block or filesystem layers from page reclaim.
++		 * block or filesystem layers from folio reclaim.
+ 		 */
+ 		gfp_t gfp = opf & REQ_NOWAIT ? GFP_NOWAIT : GFP_NOIO;
+ 
+@@ -226,15 +225,15 @@ static int brd_do_bvec(struct brd_device *brd, struct page *page,
+ 			goto out;
+ 	}
+ 
+-	mem = kmap_atomic(page);
++	mem = kmap_local_folio(folio, off);
+ 	if (!op_is_write(opf)) {
+-		copy_from_brd(mem + off, brd, sector, len);
+-		flush_dcache_page(page);
++		copy_from_brd(mem, brd, sector, len);
++		flush_dcache_folio(folio);
+ 	} else {
+-		flush_dcache_page(page);
+-		copy_to_brd(brd, mem + off, sector, len);
++		flush_dcache_folio(folio);
++		copy_to_brd(brd, mem, sector, len);
+ 	}
+-	kunmap_atomic(mem);
++	kunmap_local(mem);
+ 
+ out:
+ 	return err;
+@@ -244,19 +243,18 @@ static void brd_submit_bio(struct bio *bio)
+ {
+ 	struct brd_device *brd = bio->bi_bdev->bd_disk->private_data;
+ 	sector_t sector = bio->bi_iter.bi_sector;
+-	struct bio_vec bvec;
+-	struct bvec_iter iter;
++	struct folio_iter iter;
+ 
+-	bio_for_each_segment(bvec, bio, iter) {
+-		unsigned int len = bvec.bv_len;
++	bio_for_each_folio_all(iter, bio) {
++		unsigned int len = iter.length;
  		int err;
  
  		/* Don't support un-aligned buffer */
--		WARN_ON_ONCE((iter.offset & (SECTOR_SIZE - 1)) ||
--				(len & (SECTOR_SIZE - 1)));
-+		WARN_ON_ONCE((iter.offset & (brd->brd_logical_sector_size - 1)) ||
-+				(len & (brd->brd_logical_sector_size - 1)));
+-		WARN_ON_ONCE((bvec.bv_offset & (SECTOR_SIZE - 1)) ||
++		WARN_ON_ONCE((iter.offset & (SECTOR_SIZE - 1)) ||
+ 				(len & (SECTOR_SIZE - 1)));
  
- 		err = brd_do_folio(brd, iter.folio, len, iter.offset,
- 				   bio->bi_opf, sector);
-@@ -286,7 +288,7 @@ static void brd_submit_bio(struct bio *bio)
- 			bio_io_error(bio);
- 			return;
- 		}
--		sector += len >> SECTOR_SHIFT;
-+		sector += len >> brd->brd_logical_sector_shift;
- 	}
+-		err = brd_do_bvec(brd, bvec.bv_page, len, bvec.bv_offset,
+-				  bio->bi_opf, sector);
++		err = brd_do_folio(brd, iter.folio, len, iter.offset,
++				   bio->bi_opf, sector);
+ 		if (err) {
+ 			if (err == -ENOMEM && bio->bi_opf & REQ_NOWAIT) {
+ 				bio_wouldblock_error(bio);
+@@ -328,12 +326,12 @@ static int brd_alloc(int i)
+ 	brd->brd_number		= i;
+ 	list_add_tail(&brd->brd_list, &brd_devices);
  
- 	bio_endio(bio);
-@@ -316,6 +318,10 @@ static unsigned int rd_blksize = PAGE_SIZE;
- module_param(rd_blksize, uint, 0444);
- MODULE_PARM_DESC(rd_blksize, "Blocksize of each RAM disk in bytes.");
- 
-+static unsigned int rd_logical_blksize = SECTOR_SIZE;
-+module_param(rd_logical_blksize, uint, 0444);
-+MODULE_PARM_DESC(rd_logical_blksize, "Logical blocksize of each RAM disk in bytes.");
-+
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_BLOCKDEV_MAJOR(RAMDISK_MAJOR);
- MODULE_ALIAS("rd");
-@@ -373,6 +379,21 @@ static int brd_alloc(int i)
- 	}
- 	brd->brd_sector_size = rd_blksize;
- 
-+	brd->brd_logical_sector_shift = ilog2(rd_logical_blksize);
-+	if ((1ULL << brd->brd_sector_shift) != rd_blksize) {
-+		pr_err("rd_logical_blksize %d is not supported\n",
-+		       rd_logical_blksize);
-+		err = -EINVAL;
-+		goto out_free_dev;
-+	}
-+	if (rd_logical_blksize > rd_blksize) {
-+		pr_err("rd_logical_blksize %d larger than rd_blksize %d\n",
-+		       rd_logical_blksize, rd_blksize);
-+		err = -EINVAL;
-+		goto out_free_dev;
-+	}
-+	brd->brd_logical_sector_size = rd_logical_blksize;
-+
- 	xa_init(&brd->brd_folios);
+-	xa_init(&brd->brd_pages);
++	xa_init(&brd->brd_folios);
  
  	snprintf(buf, DISK_NAME_LEN, "ram%d", i);
-@@ -393,6 +414,7 @@ static int brd_alloc(int i)
- 	set_capacity(disk, rd_size * 2);
+ 	if (!IS_ERR_OR_NULL(brd_debugfs_dir))
+ 		debugfs_create_u64(buf, 0444, brd_debugfs_dir,
+-				&brd->brd_nr_pages);
++				&brd->brd_nr_folios);
  
- 	blk_queue_physical_block_size(disk->queue, rd_blksize);
-+	blk_queue_logical_block_size(disk->queue, rd_logical_blksize);
- 	blk_queue_max_hw_sectors(disk->queue, 1ULL << (MAX_ORDER + PAGE_SECTORS_SHIFT));
+ 	disk = brd->brd_disk = blk_alloc_disk(NUMA_NO_NODE);
+ 	if (!disk)
+@@ -388,7 +386,7 @@ static void brd_cleanup(void)
+ 	list_for_each_entry_safe(brd, next, &brd_devices, brd_list) {
+ 		del_gendisk(brd->brd_disk);
+ 		put_disk(brd->brd_disk);
+-		brd_free_pages(brd);
++		brd_free_folios(brd);
+ 		list_del(&brd->brd_list);
+ 		kfree(brd);
+ 	}
+@@ -419,7 +417,7 @@ static int __init brd_init(void)
  
- 	/* Tell the block layer that this is not a rotational device */
+ 	brd_check_and_reset_par();
+ 
+-	brd_debugfs_dir = debugfs_create_dir("ramdisk_pages", NULL);
++	brd_debugfs_dir = debugfs_create_dir("ramdisk_folios", NULL);
+ 
+ 	for (i = 0; i < rd_nr; i++) {
+ 		err = brd_alloc(i);
 -- 
 2.35.3
 
