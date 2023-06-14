@@ -2,80 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B4DEB64DC
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71613EB64D8
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:13:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245388AbjFNOHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 10:07:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36990 "EHLO
+        id S245456AbjFNONt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 10:13:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245366AbjFNOHe (ORCPT
+        with ESMTP id S245455AbjFNONs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 10:07:34 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB713172E;
-        Wed, 14 Jun 2023 07:07:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7zKVnjvzit87w4LvMJMfhzArUJCjxSyS9z+9JMuufv0=; b=tEAtQCHhfR4Vb3SCSgPJ0NazMr
-        isWCiYg7499DEFizrwQiervPnffzp/TurF1vFQCf0XGRCc0yT6KucKJdx7pNy093snkYZxYFo1kOl
-        WBdEHOihJKfaEA3PrmEFokNco80EXoNE6C4Gey9Vctt/U6iVvaM5X3bE1hWwV6coGWAx8nNWZLG3d
-        FARfb2/mVfruNpVGZ9s54BUq8BNfgXC/tzbVoYvJQTWzBussVf7prhn0fcW85KCSJbcm0Oc4wmdRD
-        CRfOsZ7lqiWHsmVTInHiN7qreFJAjBZyjO4//29ctzD4K2VHCv64Iu2vQHlFtwbmWYwK83cEM8n8I
-        QyAy5xzw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q9R9Y-00BrUL-2D;
-        Wed, 14 Jun 2023 14:07:16 +0000
-Date:   Wed, 14 Jun 2023 07:07:16 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>, axboe@kernel.dk,
-        corbet@lwn.net, snitzer@kernel.org, viro@zeniv.linux.org.uk,
-        brauner@kernel.org, dchinner@redhat.com, willy@infradead.org,
-        dlemoal@kernel.org, linux@weissschuh.net, jack@suse.cz,
-        ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Donald Buczek <buczek@molgen.mpg.de>
-Subject: Re: [PATCH v5 04/11] blksnap: header file of the module interface
-Message-ID: <ZInJlD70tMKoBi7T@infradead.org>
-References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
- <20230612135228.10702-5-sergei.shtepa@veeam.com>
- <ZIjsywOtHM5nIhSr@dread.disaster.area>
- <ZIldkb1pwhNsSlfl@infradead.org>
- <733f591e-0e8f-8668-8298-ddb11a74df81@veeam.com>
+        Wed, 14 Jun 2023 10:13:48 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD1BCD
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:13:47 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1b3ce6607cbso28372225ad.2
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:13:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1686752027; x=1689344027;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=atkhLsJk4kYIR051jZUJsqhyVSqD17cKG1dfd3E+c04=;
+        b=QtPPdAz8+r7dt+3azArNI+jobqYcT5F/K5n1989N0B9h/dF9O0THNdPrbOgk401sv3
+         5J4d7liK3gdJtZ9cdamd5TvGz8tspTsfmQzlUei3suVhQyLyrh3DkFHy4rVZlSHdPsr5
+         YEErmKXQc4bgS24oNRScFjmmHUyABKOtOISkA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686752027; x=1689344027;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=atkhLsJk4kYIR051jZUJsqhyVSqD17cKG1dfd3E+c04=;
+        b=O3hdyKMIFvnLGM6MJ45DBLy/f0fI+6cx5H+dT5EMc5n4Wj41heL4cz4f0gFIlCR2P3
+         aTwUfwdOwdM1Pxs/W3dKqv5HVtFl7rbbpeYsPx3n1atbWeFrhL6sgpSs87RrcORmjWHd
+         Ll0c0Ji9OZH5tn2ozKBrEqvbjytVQ4eHQBQVJe89o/tOpZSlQ9XoIL6/vlzZdt0NcVmM
+         TflyBr3fRXpPHKb+pwOAUvwot3oK8P0Ylkv63q/jFGHo9W4tK4xMeKLmE7nDLqxRJwbO
+         fNF5NdHgGLBYsanvD49ZX7D9kd0T7ZlcGxWZVd1ivXMYPmChJVtOT1sFgWWm/g7gizkO
+         rulw==
+X-Gm-Message-State: AC+VfDxrTKnPJq3m+Kg1h8AvO//GlD14wyw1hRX7AvsNgjNZ/6pr+HEy
+        baCZbu2PI9v2bloh+px7u5UK6h2CjnoHlss8zYQ=
+X-Google-Smtp-Source: ACHHUZ7c5hnOfemkMscvWj+eorrnWGExlzE2F7LXwlInsGAGaYBz8d88ceGN6cOoTGXRuvmWq7tQGg==
+X-Received: by 2002:a17:903:124d:b0:1ac:aba5:7885 with SMTP id u13-20020a170903124d00b001acaba57885mr14900116plh.47.1686752027301;
+        Wed, 14 Jun 2023 07:13:47 -0700 (PDT)
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:e1a3:812:fed0:eeab])
+        by smtp.gmail.com with ESMTPSA id h18-20020a170902f55200b001b042c0939fsm12226648plf.99.2023.06.14.07.13.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jun 2023 07:13:46 -0700 (PDT)
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Minchan Kim <minchan@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Brian Geffon <bgeffon@google.com>
+Subject: [PATCH] zram: further limit recompression threshold
+Date:   Wed, 14 Jun 2023 23:13:12 +0900
+Message-ID: <20230614141338.3480029-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <733f591e-0e8f-8668-8298-ddb11a74df81@veeam.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 14, 2023 at 11:26:20AM +0200, Sergei Shtepa wrote:
-> This code worked quite successfully for the veeamsnap module, on the
-> basis of which blksnap was created. Indeed, such an allocation of an
-> area on a block device using a file does not look safe.
-> 
-> We've already discussed this with Donald Buczek <buczek@molgen.mpg.de>.
-> Link: https://github.com/veeam/blksnap/issues/57#issuecomment-1576569075
-> And I have planned work on moving to a more secure ioctl in the future.
-> Link: https://github.com/veeam/blksnap/issues/61
-> 
-> Now, thanks to Dave, it becomes clear to me how to solve this problem best.
-> swapfile is a good example of how to do it right.
+Recompression threshold should be below huge-size-class
+watermark.
 
-I don't actually think swapfile is a very good idea, in fact the Linux
-swap code in general is not a very good place to look for inspirations
-:)
+Suggested-by: Brian Geffon <bgeffon@google.com>
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+---
+ drivers/block/zram/zram_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-IFF the usage is always to have a whole file for the diff storage the
-over all API is very simple - just pass a fd to the kernel for the area,
-and then use in-kernel direct I/O on it.  Now if that file should also
-be able to reside on the same file system that the snapshot is taken
-of things get a little more complicated, because writes to it also need
-to automatically set the BIO_REFFED flag.  I have some ideas for that
-and will share some draft code with you.
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 1867f378b319..5676e6dd5b16 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1753,7 +1753,7 @@ static ssize_t recompress_store(struct device *dev,
+ 		}
+ 	}
+ 
+-	if (threshold >= PAGE_SIZE)
++	if (threshold >= huge_class_size)
+ 		return -EINVAL;
+ 
+ 	down_read(&zram->init_lock);
+-- 
+2.41.0.162.gfafddb0af9-goog
+
