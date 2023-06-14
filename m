@@ -2,71 +2,66 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BC5EB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 17:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD62EB64DD
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 17:15:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232060AbjFNRLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 13:11:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40600 "EHLO
+        id S232161AbjFNRPK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 13:15:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234018AbjFNRLy (ORCPT
+        with ESMTP id S236570AbjFNRPJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 13:11:54 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A29213B
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 10:11:53 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-33bcc8f0d21so4758125ab.1
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 10:11:53 -0700 (PDT)
+        Wed, 14 Jun 2023 13:15:09 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5059D1BF0
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 10:15:08 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-77af9ee36d0so52305139f.0
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 10:15:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686762712; x=1689354712;
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686762907; x=1689354907;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oFGm7FqvVo6N2TIKugcE6wuGfwkXCoffvc2Z4/ZFrvk=;
-        b=lm1oNKUB9xU8Pb6XFA19Ula4qGY1HRWrLbYsGRzV5RHzhzp7pwTPNlfXwJPIVxA0nJ
-         lS2aewP3Q2LDai+BwjNnKBHv4pJ90hQ6cpZMLdko+u/M+lSkgm8XYrzzg18wpdMQ043U
-         wBroNJCPhC8P8AxxZnWkw3zjxehqUOI0ZQ2twVjawryi4NAxzlEDV0a6xQxU9ShuBt9a
-         3Pu4Vo7mbsM7bHmBYUNsE43Oa0MZDT8BOvemG5mLhkq9epAqbLyAvDmLMqCj36Mhu1JY
-         wshaZs+i0Q3UyPO29s23hrcgXtnNYkwp8E2jlL41wew88vO9pymj1H93lM6MMp4MiWaD
-         hjew==
+        bh=B26eBiSEO8OUhK8kpmF2mZpYPqAE55XIYMWNVoLAx3Q=;
+        b=ElLhn6Vb6ONuH/yutGqRSu0BujuRvECftwA7kC+v3U5p8cI9B7BHt8sPFm/BkMq3tZ
+         6XjPfdFsjXPyAoShZE+Osiv+ldN1nwOXeKOFR2BO8PqYOgZSLTzy6CMkcaZWPhIY2wFs
+         ErcB1uFEtThSIv6jHwmhqkHhcV86rA5IYgaciFlzM9hyq+23TVqgcEcOlcbY53Du0E5F
+         28Mg28TpN68OhQbulzBIznABi0RNr33khib7/hGrXBcuuJsYEyi0qoM8YOz16u8f2iEj
+         o/td+WXtr0EhGLPQdIEK8OrFkdRqSk9L3evTJSdmlFfqj0NqwnoX3EuigxSB6nqZHpLH
+         cTUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686762712; x=1689354712;
+        d=1e100.net; s=20221208; t=1686762907; x=1689354907;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oFGm7FqvVo6N2TIKugcE6wuGfwkXCoffvc2Z4/ZFrvk=;
-        b=Gve+C1V/bcgN8DEWSYFDrGlvCigaTmiIc+Dss3u38jJhznsDAItq6igh+yOfihqIz/
-         37NYJDZzGynxfYkVpz00J+EoBHd2kKooCJe6A3ziSWE7buUoGgLwe9ofRNQ5zDZB5SuT
-         eCKNmIvVClxpBxce9XwyJhHJRD4RhKxN2SK86w/NiymTEYo6HXlLk7Cjcy+xlUCGgOAy
-         LQJqfB4pQISDeBH+o26g3I1i7zpWxet7mzXAE6GrViZrYKx93RpSxYMvja3/u/+7HPfQ
-         f6WA4di0H6/OibZ/fDpJWIO5rGDhQm7Ze1Qutn4BH+Orblpj0Z7HLd7CMLOUj3DBZsvT
-         OClA==
-X-Gm-Message-State: AC+VfDz7h2NmG7iinmJBGS4MW6GDlFFd4YHiGgkBtmvU0d45ST7l+/Wr
-        59xSpyBVH1MRxYSsQzSB2mePTA==
-X-Google-Smtp-Source: ACHHUZ6yQRQ1s8D9mzXhZ3rYN6V6cthldCfEgP5WF7NRHJ5KcSo9a5YXXGXUhFA/hu1SGecsAQuqGA==
-X-Received: by 2002:a05:6e02:50f:b0:33b:1b5d:9723 with SMTP id d15-20020a056e02050f00b0033b1b5d9723mr10710356ils.3.1686762712334;
-        Wed, 14 Jun 2023 10:11:52 -0700 (PDT)
+        bh=B26eBiSEO8OUhK8kpmF2mZpYPqAE55XIYMWNVoLAx3Q=;
+        b=LRM6OZ510/3VyV5x6nKCWH6jYpbumhPb9l60l0MkdHDnFTcV2XD1AnCAK/hkz48+DB
+         LbBOfjaxGiEGWzxkT4dbQd9wnp/WxRKius7dpIfDpXsgfTapt+D4HLsfu9vQwXstoGYu
+         OyAMAok2cL5WYSEAD5Lc/nPRLprm+SFCY7zDCjnM1MMPKs/Z27DPP0vmfGyeKmwDAk21
+         6HkVrMSMf+QZulqyCX3toHGsOaeSw8mSBDrkFBHadIztg6aYFkcGLKRDShLiReXXrPSy
+         0dUdMTgAIhZPKYrUaKkV4kgwvoPmoNlcIJ4dvSRZtlL81Sq814ChPvJgUXf73Xt0ir8w
+         dS7g==
+X-Gm-Message-State: AC+VfDzMaQFausfn4R9TLAPeOkyFxC5/NEsb8d3ORtqrb/OdX6gHM5IB
+        2PeKX31gZ0yXDmiucdxpgmST2g==
+X-Google-Smtp-Source: ACHHUZ6kZIXJ4WVd6TtuAzwSart7NeuZwYzm8p682e/ql6LucW3pz+VE49BLOS3W2aHX2uzGaLLXdg==
+X-Received: by 2002:a05:6602:2d56:b0:77a:b7b7:acfc with SMTP id d22-20020a0566022d5600b0077ab7b7acfcmr7462109iow.1.1686762907709;
+        Wed, 14 Jun 2023 10:15:07 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9-20020a056638020900b00418af04e405sm4313921jaq.116.2023.06.14.10.11.51
+        by smtp.gmail.com with ESMTPSA id t12-20020a02c48c000000b0040f94261ab1sm5160089jam.12.2023.06.14.10.15.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jun 2023 10:11:51 -0700 (PDT)
+        Wed, 14 Jun 2023 10:15:06 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Ed Tsai <ed.tsai@mediatek.com>
-Cc:     matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, kbusch@kernel.org,
-        amergnat@baylibre.com, liusong@linux.alibaba.com,
-        wsd_upstream@mediatek.com, peter.wang@mediatek.com,
-        stanley.chu@mediatek.com, powen.kao@mediatek.com,
-        alice.chao@mediatek.com, naomi.chu@mediatek.com,
-        Chun-Hung.Wu@mediatek.com
-In-Reply-To: <20230614002529.6636-1-ed.tsai@mediatek.com>
-References: <20230614002529.6636-1-ed.tsai@mediatek.com>
-Subject: Re: [PATCH v3] blk-mq: check on cpu id when there is only one ctx
- mapping
-Message-Id: <168676271101.1830690.9612621068004159159.b4-ty@kernel.dk>
-Date:   Wed, 14 Jun 2023 11:11:51 -0600
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     mcgrof@kernel.org, linux-block@vger.kernel.org,
+        gost.dev@samsung.com, hare@suse.de,
+        Matthew Wilcox <willy@infradead.org>
+In-Reply-To: <20230614133538.1279369-1-p.raghav@samsung.com>
+References: <CGME20230614133540eucas1p1a761c184d7d571cfcd893ab5f8b759fd@eucas1p1.samsung.com>
+ <20230614133538.1279369-1-p.raghav@samsung.com>
+Subject: Re: [PATCH for-next] brd: use cond_resched instead of
+ cond_resched_rcu
+Message-Id: <168676290645.1832065.8226937574445830901.b4-ty@kernel.dk>
+Date:   Wed, 14 Jun 2023 11:15:06 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -76,23 +71,16 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On Wed, 14 Jun 2023 08:25:29 +0800, Ed Tsai wrote:
-> commit f168420c62e7 ("blk-mq: don't redirect completion for hctx withs
-> only one ctx mapping") When nvme applies a 1:1 mapping of hctx and ctx,
-> there will be no remote request.
+On Wed, 14 Jun 2023 15:35:38 +0200, Pankaj Raghav wrote:
+> The body of the loop is run without RCU lock held. Use the regular
+> cond_resched() instead of cond_resched_rcu().
 > 
-> But for ufs, the submission and completion queues could be asymmetric.
-> (e.g. Multiple SQs share one CQ) Therefore, 1:1 mapping of hctx and
-> ctx won't complete request on the submission cpu. In this situation,
-> this nr_ctx check could violate the QUEUE_FLAG_SAME_FORCE, as a result,
-> check on cpu id when there is only one ctx mapping.
 > 
-> [...]
 
 Applied, thanks!
 
-[1/1] blk-mq: check on cpu id when there is only one ctx mapping
-      commit: 30654614f3d27230200b1650f6025a2ce67900b4
+[1/1] brd: use cond_resched instead of cond_resched_rcu
+      commit: 6dd4423f3f247b6f0ecb828cf62ea2bc4604f0b5
 
 Best regards,
 -- 
