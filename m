@@ -2,41 +2,45 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8BDEB64D9
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 11:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61826C001B0
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 11:47:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243169AbjFNLrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 07:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59644 "EHLO
+        id S230129AbjFNLrC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 07:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235826AbjFNLq7 (ORCPT
+        with ESMTP id S230388AbjFNLrA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 07:46:59 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D214C10D8;
+        Wed, 14 Jun 2023 07:47:00 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F299C1BC3;
         Wed, 14 Jun 2023 04:46:58 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 9223D1FDEB;
+        by smtp-out1.suse.de (Postfix) with ESMTP id AF2BB2251A;
         Wed, 14 Jun 2023 11:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
         t=1686743217; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=YFHMf/7AFROZukssL33URO15KYKs2xMsFMw9VWiHPOA=;
-        b=k5uyzmJjl8nFyPS17MLVkLMQyQAYSsHNR9iCRdJTxOo3Mli2N4LeCJwsg4gGodxtSTebgs
-        L5Q3whjVIHACOH0T+GqVxS5l1abx8As73k2JfYHCg3Kqp3XjKd/tzPu39hsHqasLZUkrtc
-        GlfPPmmwWOgZ9aqN98gqvJFA0Ys6Kas=
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CbocsrMjXp7dBwU80SxwtZMmeZa5Prxn6bB4blsRqFc=;
+        b=VBwllP/vdy0rvoghMWasHmjJKlmJP4eYOLD9/8tJO+rxARI9BJ/dzhII0uV02vTRUSoHzh
+        CCE1rQnLEMFY06ZBORzgWF31ETC1Ab7UC5J9W2tiQZyJL03WjeVSiNP4xJByqGPUTEuUxk
+        FFxdxW6iTjXbu0+3Lcq1e7fIrQ/dPN8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
         s=susede2_ed25519; t=1686743217;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=YFHMf/7AFROZukssL33URO15KYKs2xMsFMw9VWiHPOA=;
-        b=gwE4RXfx6xQuGXY51gX1+mV11s57CjBgyCTXv/7QuYxYMB4EaVTWB9c29nQJzwm8vwwe16
-        wADlEWYv1f7JsrAg==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CbocsrMjXp7dBwU80SxwtZMmeZa5Prxn6bB4blsRqFc=;
+        b=1TLaH2Wd/FXHoOKBlRtPpC5KmV11QkwhBaKWiyVPkOgs/JRFzcrWBvZKIaQTKD0YoXVxH7
+        vMoIa7WQxmxHeWAg==
 Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
-        by relay2.suse.de (Postfix) with ESMTP id 7C1C02C141;
+        by relay2.suse.de (Postfix) with ESMTP id 9E91A2C14E;
         Wed, 14 Jun 2023 11:46:57 +0000 (UTC)
 Received: by adalid.arch.suse.de (Postfix, from userid 16045)
-        id 6CF3A51C4E09; Wed, 14 Jun 2023 13:46:57 +0200 (CEST)
+        id 97D9451C4E15; Wed, 14 Jun 2023 13:46:57 +0200 (CEST)
 From:   Hannes Reinecke <hare@suse.de>
 To:     Matthew Wilcox <willy@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
@@ -44,67 +48,111 @@ Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Luis Chamberlain <mcgrof@kernel.org>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 0/7] RFC: high-order folio support for I/O
-Date:   Wed, 14 Jun 2023 13:46:30 +0200
-Message-Id: <20230614114637.89759-1-hare@suse.de>
+Subject: [PATCH 6/7] mm/filemap: allocate folios with mapping blocksize
+Date:   Wed, 14 Jun 2023 13:46:36 +0200
+Message-Id: <20230614114637.89759-7-hare@suse.de>
 X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20230614114637.89759-1-hare@suse.de>
+References: <20230614114637.89759-1-hare@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+The mapping has an underlying blocksize (by virtue of
+mapping->host->i_blkbits), so if the mapping blocksize
+is larger than the pagesize we should allocate folios
+in the correct order.
 
-now, that was easy.
-Thanks to willy and his recent patchset to support large folios in
-gfs2 turns out that most of the work to support high-order folios
-for I/O is actually done.
-It only need twe rather obvious patches to allocate folios with
-the order derived from the mapping blocksize, and to adjust readahead
-to avoid reading off the end of the device.
-But with these two patches (and the patchset from hch to switch
-the block device over to iomap) (and the patchset from ritesh to
-support sub-blocksize iomap buffers) I can now do:
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ include/linux/pagemap.h | 7 +++++++
+ mm/filemap.c            | 7 ++++---
+ mm/readahead.c          | 6 +++---
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
-# modprobe brd rd_size=524288 rd_blksize=16384
-# mkfs.xfs -b size=16384 /dev/ram0
-
-it still fails when trying to mount the device:
-
-XFS (ram0): Cannot set_blocksize to 16384 on device ram0
-
-but to my understanding this is being worked on.
-
-Christoph, any chance to have an updated submission of your
-patchset to convert block devices over to iomap?
-I don't actually need the last one to switch off buffer heads,
-but the others really do help for this case.
-
-The entire tree can be found at:
-
-git.kernel.org:/pub/scm/linux/git/kernel/hare/scsi-devel.git
-branch brd.v2
-
-Happy hacking!
-
-Hannes Reinecke (6):
-  brd: convert to folios
-  brd: abstract page_size conventions
-  brd: make sector size configurable
-  brd: make logical sector size configurable
-  mm/filemap: allocate folios with mapping blocksize
-  mm/readahead: align readahead down to mapping blocksize
-
-Pankaj Raghav (1):
-  brd: use XArray instead of radix-tree to index backing pages
-
- drivers/block/brd.c     | 320 +++++++++++++++++++++-------------------
- include/linux/pagemap.h |   7 +
- mm/filemap.c            |   7 +-
- mm/readahead.c          |  10 +-
- 4 files changed, 186 insertions(+), 158 deletions(-)
-
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 716953ee1ebd..9ea1a9724d64 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -494,6 +494,13 @@ static inline gfp_t readahead_gfp_mask(struct address_space *x)
+ 	return mapping_gfp_mask(x) | __GFP_NORETRY | __GFP_NOWARN;
+ }
+ 
++static inline int mapping_get_order(struct address_space *x)
++{
++	if (x->host->i_blkbits > PAGE_SHIFT)
++		return x->host->i_blkbits - PAGE_SHIFT;
++	return 0;
++}
++
+ typedef int filler_t(struct file *, struct folio *);
+ 
+ pgoff_t page_cache_next_miss(struct address_space *mapping,
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 4be20e82e4c3..6f08d04995d9 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1936,7 +1936,7 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+ 			gfp |= GFP_NOWAIT | __GFP_NOWARN;
+ 		}
+ 
+-		folio = filemap_alloc_folio(gfp, 0);
++		folio = filemap_alloc_folio(gfp, mapping_get_order(mapping));
+ 		if (!folio)
+ 			return ERR_PTR(-ENOMEM);
+ 
+@@ -2495,7 +2495,8 @@ static int filemap_create_folio(struct file *file,
+ 	struct folio *folio;
+ 	int error;
+ 
+-	folio = filemap_alloc_folio(mapping_gfp_mask(mapping), 0);
++	folio = filemap_alloc_folio(mapping_gfp_mask(mapping),
++				    mapping_get_order(mapping));
+ 	if (!folio)
+ 		return -ENOMEM;
+ 
+@@ -3646,7 +3647,7 @@ static struct folio *do_read_cache_folio(struct address_space *mapping,
+ repeat:
+ 	folio = filemap_get_folio(mapping, index);
+ 	if (IS_ERR(folio)) {
+-		folio = filemap_alloc_folio(gfp, 0);
++		folio = filemap_alloc_folio(gfp, mapping_get_order(mapping));
+ 		if (!folio)
+ 			return ERR_PTR(-ENOMEM);
+ 		err = filemap_add_folio(mapping, folio, index, gfp);
+diff --git a/mm/readahead.c b/mm/readahead.c
+index 47afbca1d122..031935b78af7 100644
+--- a/mm/readahead.c
++++ b/mm/readahead.c
+@@ -245,7 +245,7 @@ void page_cache_ra_unbounded(struct readahead_control *ractl,
+ 			continue;
+ 		}
+ 
+-		folio = filemap_alloc_folio(gfp_mask, 0);
++		folio = filemap_alloc_folio(gfp_mask, mapping_get_order(mapping));
+ 		if (!folio)
+ 			break;
+ 		if (filemap_add_folio(mapping, folio, index + i,
+@@ -806,7 +806,7 @@ void readahead_expand(struct readahead_control *ractl,
+ 		if (folio && !xa_is_value(folio))
+ 			return; /* Folio apparently present */
+ 
+-		folio = filemap_alloc_folio(gfp_mask, 0);
++		folio = filemap_alloc_folio(gfp_mask, mapping_get_order(mapping));
+ 		if (!folio)
+ 			return;
+ 		if (filemap_add_folio(mapping, folio, index, gfp_mask) < 0) {
+@@ -833,7 +833,7 @@ void readahead_expand(struct readahead_control *ractl,
+ 		if (folio && !xa_is_value(folio))
+ 			return; /* Folio apparently present */
+ 
+-		folio = filemap_alloc_folio(gfp_mask, 0);
++		folio = filemap_alloc_folio(gfp_mask, mapping_get_order(mapping));
+ 		if (!folio)
+ 			return;
+ 		if (filemap_add_folio(mapping, folio, index, gfp_mask) < 0) {
 -- 
 2.35.3
 
