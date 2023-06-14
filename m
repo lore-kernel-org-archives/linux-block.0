@@ -2,124 +2,224 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E15EB64DA
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 01:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B73EB64D7
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 02:04:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241372AbjFNB6n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 21:58:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52974 "EHLO
+        id S241866AbjFNCER (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 22:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233260AbjFNB6m (ORCPT
+        with ESMTP id S232600AbjFNCEQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 21:58:42 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17ED1FC9;
-        Tue, 13 Jun 2023 18:58:26 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QgpVR0MJpz4f3tNm;
-        Wed, 14 Jun 2023 09:58:23 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCnD7O+HolkasWdLg--.26820S3;
-        Wed, 14 Jun 2023 09:58:23 +0800 (CST)
-Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        stanley.chu@mediatek.com, peter.wang@mediatek.com,
-        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
-        powen.kao@mediatek.com, naomi.chu@mediatek.com,
-        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230509065230.32552-1-ed.tsai@mediatek.com>
- <20230509065230.32552-3-ed.tsai@mediatek.com>
- <ZF0K7A6G2cYBjSgn@infradead.org>
- <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
- <ZF5G5ztMng8Xbd1W@infradead.org>
- <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
- <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
- <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
- <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
- <097caed2-10b3-7cd1-7c06-90f983e5c720@acm.org>
- <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
- <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
- <bef8340e-f051-db63-5c2f-a2bc94c678ac@huaweicloud.com>
- <04a4d0db-2f2d-e2fc-5458-4ddf852ffc8a@acm.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <3e9e42aa-9a0d-2b73-194b-5c229e9ed533@huaweicloud.com>
-Date:   Wed, 14 Jun 2023 09:58:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 13 Jun 2023 22:04:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2213F173C;
+        Tue, 13 Jun 2023 19:04:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5465A63CCD;
+        Wed, 14 Jun 2023 02:04:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9905C433C8;
+        Wed, 14 Jun 2023 02:04:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686708252;
+        bh=ZuYjOOMYcIapf1xTzMaH8bllN8MN9sV5m2s612yPNPM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Tp8o8AXugCF/9U+D/4c/3Z5pRrIPqUguRtwn3FlBaG4OOf3P8mKQNAfyGKdzL2bkr
+         X6aTKujlYWbWhpolSfZ0neNy1I3MXY+UbyvwG0CqHv00+Kq6ICp+RBHQjwVORNPgbW
+         N/1cEwZi2a1IUr9Q317NEaQYdfCwRMjCJ3dFbVxbJ4cw74boS7a5Q8DwHOB4gkel3H
+         +7LIAgGak27XpL0TlYOVaJmU/rObgt+tQtek/hB6LvxUQDNwWiiocqU/Qh45GQBgIC
+         7lY125sMXe3cqAV9gBKePwDP0dEbc6G4FGsM2UwmDX7pds+X83QSn/Rz1n6lnXBtBm
+         t/im0oviKIAzw==
+Date:   Tue, 13 Jun 2023 19:04:12 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org, Kees Cook <keescook@google.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Message-ID: <20230614020412.GB11423@frogsfrogsfrogs>
+References: <20230612161614.10302-1-jack@suse.cz>
+ <CACT4Y+aEScXmq2F1-vqAfr-b2w-xyOohN+FZxorW1YuRvKDLNQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <04a4d0db-2f2d-e2fc-5458-4ddf852ffc8a@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCnD7O+HolkasWdLg--.26820S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF43JrWUJr4fWrykXrW3Awb_yoW8Jw4Upa
-        y8tFZIkFs7J398AwsrX3W8uayftwn3Jr97Jr1fG347Zwn09w4fZw4Ut3909rZ3Zr97Cr12
-        gay8Xr95X3s5Z37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
-        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-        BIdaVFxhVjvjDU0xZFpf9x0JUAxhLUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+aEScXmq2F1-vqAfr-b2w-xyOohN+FZxorW1YuRvKDLNQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Tue, Jun 13, 2023 at 08:49:38AM +0200, Dmitry Vyukov wrote:
+> On Mon, 12 Jun 2023 at 18:16, Jan Kara <jack@suse.cz> wrote:
+> >
+> > Writing to mounted devices is dangerous and can lead to filesystem
+> > corruption as well as crashes. Furthermore syzbot comes with more and
+> > more involved examples how to corrupt block device under a mounted
+> > filesystem leading to kernel crashes and reports we can do nothing
+> > about. Add config option to disallow writing to mounted (exclusively
+> > open) block devices. Syzbot can use this option to avoid uninteresting
+> > crashes. Also users whose userspace setup does not need writing to
+> > mounted block devices can set this config option for hardening.
+> 
+> +syzkaller, Kees, Alexander, Eric
+> 
+> We can enable this on syzbot, however I have the same concerns as with
+> disabling of XFS_SUPPORT_V4:
+> https://github.com/google/syzkaller/issues/3918#issuecomment-1560624278
+> 
+> It's useful to know the actual situation with respect to
+> bugs/vulnerabilities and one of the goals of syzbot is surfacing this
+> situation.
+> For some areas there is mismatch between upstream kernel and
+> downstream distros. Upstream says "this is buggy and deprecated",
+> which is fine in itself if not the other part: downstream distros
+> simply ignore that (maybe not even aware) and keep things enabled for
+> as long as possible. Stopping testing this is moving more in this
+> direction: silencing warnings and pretending that everything is fine,
+> when it's not.
+> 
+> I wonder if there is a way to at least somehow bridge this gap.
+> 
+> There is CONFIG_BROKEN, but not sure if it's the right thing here.
+> Maybe we add something like CONFIG_INSECURE. And such insecure config
+> settings (not setting BLK_DEV_WRITE_HARDENING, setting XFS_SUPPORT_V4)
+> will say:
+> 
+> depends on INSECURE
+> 
+> So that distros will need to at least acknowledge this to users by saying:
+> 
+> CONFIG_INSECURE=y
+> 
+> They are then motivated to work on actually removing dependencies on
+> these deprecated things.
+> 
+> CONFIG_INSECURE description can say something along the lines of "this
+> kernel includes subsystems with known bugs that may cause security and
+> data integrity issues". When a subsystem adds "depends on INSECURE",
+> the commit should list some of the known issues.
+> 
+> Then I see how trading disabling things on syzbot in exchange for
+> "depends on INSECURE" becomes reasonable and satisfies all parties to
+> some degree.
 
-在 2023/06/13 22:07, Bart Van Assche 写道:
-> On 5/18/23 00:55, Yu Kuai wrote:
->> 在 2023/05/18 10:23, Bart Van Assche 写道:
->>> On 5/17/23 18:49, Yu Kuai wrote:
->>>> Currently, fair share from hctx_may_queue() requires two
->>>> atomic_read(active_queues and active_requests), I think this smoothing
->>>> method can be placed into get_tag fail path, for example, the more 
->>>> times
->>>> a disk failed to get tag in a period of time, the more tag this disk 
->>>> can
->>>> get, and all the information can be updated here(perhaps directly
->>>> record how many tags a disk can get, then hctx_may_queue() still only
->>>> require 2 atomic_read()).
->>>
->>> That sounds interesting to me. Do you perhaps plan to implement this 
->>> approach and to post it as a patch?
->>
->> Of course, I'll try to send a RFC patch.
-> 
-> Hi Kuai,
-> 
-> Has this RFC patch already been posted or did I perhaps miss it?
+Well in that case, post a patchset adding "depends on INSECURE" for
+every subsystem that syzbot files bugs against, if the maintainers do
+not immediately drop what they're doing to resolve the bug.
 
-Sorry for the delay, I finished switch from not share to fair share
-directly verion, however, I found that it's not that simple to add a
-smoothing method, and I'm stuck here for now.
+Google extracts a bunch more unpaid labor from society to make its
+owners richer, and everyone else on the planet suffers for it, just like
+you all have done for the past 25 years.  That's the definition of
+Googley!!
 
-I'll try to send a RFC verion soon, the smoothing method may not be
-flexible, but I'll make sure it can work for your simple case that
-2 device share tags, and one only issue few io while the other issue
-lots of io.
+--D
 
-Thanks,
-Kuai
 > 
-> Thanks,
+> Btw, if we do this it can make sense to invert this config (enable
+> concurrent writes), default to 'y' and recommend 'n'.
 > 
-> Bart.
+> Does it make any sense? Any other suggestions?
+> 
+> P.S. Alex, if this lands this may be a candidate for addition to:
+> https://github.com/a13xp0p0v/kconfig-hardened-check
+> (and XFS_SUPPORT_V4 as well).
 > 
 > 
-> .
-> 
-
+> > Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd9@linaro.org
+> > Signed-off-by: Jan Kara <jack@suse.cz>
+> > ---
+> >  block/Kconfig             | 12 ++++++++++++
+> >  block/bdev.c              | 10 ++++++++++
+> >  include/linux/blk_types.h |  3 +++
+> >  3 files changed, 25 insertions(+)
+> >
+> > FWIW I've tested this and my test VM with ext4 root fs boots fine and fstests
+> > on ext4 seem to be also running fine with BLK_DEV_WRITE_HARDENING enabled.
+> > OTOH my old VM setup which is not using initrd fails to boot with
+> > BLK_DEV_WRITE_HARDENING enabled because fsck cannot open the root device
+> > because the root is already mounted (read-only). Anyway this should be useful
+> > for syzbot (Dmitry indicated interest in this option in the past) and maybe
+> > other well controlled setups.
+> >
+> > diff --git a/block/Kconfig b/block/Kconfig
+> > index 86122e459fe0..c44e2238e18d 100644
+> > --- a/block/Kconfig
+> > +++ b/block/Kconfig
+> > @@ -77,6 +77,18 @@ config BLK_DEV_INTEGRITY_T10
+> >         select CRC_T10DIF
+> >         select CRC64_ROCKSOFT
+> >
+> > +config BLK_DEV_WRITE_HARDENING
+> > +       bool "Do not allow writing to mounted devices"
+> > +       help
+> > +       When a block device is mounted, writing to its buffer cache very likely
+> > +       going to cause filesystem corruption. It is also rather easy to crash
+> > +       the kernel in this way since the filesystem has no practical way of
+> > +       detecting these writes to buffer cache and verifying its metadata
+> > +       integrity. Select this option to disallow writing to mounted devices.
+> > +       This should be mostly fine but some filesystems (e.g. ext4) rely on
+> > +       the ability of filesystem tools to write to mounted filesystems to
+> > +       set e.g. UUID or run fsck on the root filesystem in some setups.
+> > +
+> >  config BLK_DEV_ZONED
+> >         bool "Zoned block device support"
+> >         select MQ_IOSCHED_DEADLINE
+> > diff --git a/block/bdev.c b/block/bdev.c
+> > index 21c63bfef323..ad01f0a6af0d 100644
+> > --- a/block/bdev.c
+> > +++ b/block/bdev.c
+> > @@ -602,6 +602,12 @@ static int blkdev_get_whole(struct block_device *bdev, fmode_t mode)
+> >         struct gendisk *disk = bdev->bd_disk;
+> >         int ret;
+> >
+> > +       if (IS_ENABLED(BLK_DEV_WRITE_HARDENING)) {
+> > +               if (mode & FMODE_EXCL && atomic_read(&bdev->bd_writers) > 0)
+> > +                       return -EBUSY;
+> > +               if (mode & FMODE_WRITE && bdev->bd_holders > 0)
+> > +                       return -EBUSY;
+> > +       }
+> >         if (disk->fops->open) {
+> >                 ret = disk->fops->open(bdev, mode);
+> >                 if (ret) {
+> > @@ -617,6 +623,8 @@ static int blkdev_get_whole(struct block_device *bdev, fmode_t mode)
+> >                 set_init_blocksize(bdev);
+> >         if (test_bit(GD_NEED_PART_SCAN, &disk->state))
+> >                 bdev_disk_changed(disk, false);
+> > +       if (IS_ENABLED(BLK_DEV_WRITE_HARDENING) && mode & FMODE_WRITE)
+> > +               atomic_inc(&bdev->bd_writers);
+> >         atomic_inc(&bdev->bd_openers);
+> >         return 0;
+> >  }
+> > @@ -625,6 +633,8 @@ static void blkdev_put_whole(struct block_device *bdev, fmode_t mode)
+> >  {
+> >         if (atomic_dec_and_test(&bdev->bd_openers))
+> >                 blkdev_flush_mapping(bdev);
+> > +       if (IS_ENABLED(BLK_DEV_WRITE_HARDENING) && mode & FMODE_WRITE)
+> > +               atomic_dec(&bdev->bd_writers);
+> >         if (bdev->bd_disk->fops->release)
+> >                 bdev->bd_disk->fops->release(bdev->bd_disk, mode);
+> >  }
+> > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> > index 740afe80f297..25af3340f316 100644
+> > --- a/include/linux/blk_types.h
+> > +++ b/include/linux/blk_types.h
+> > @@ -67,6 +67,9 @@ struct block_device {
+> >         struct partition_meta_info *bd_meta_info;
+> >  #ifdef CONFIG_FAIL_MAKE_REQUEST
+> >         bool                    bd_make_it_fail;
+> > +#endif
+> > +#ifdef CONFIG_BLK_DEV_WRITE_HARDENING
+> > +       atomic_t                bd_writers;
+> >  #endif
+> >         /*
+> >          * keep this out-of-line as it's both big and not needed in the fast
+> > --
+> > 2.35.3
+> >
