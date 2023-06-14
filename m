@@ -2,99 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CB6EB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D55CAEB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:31:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245543AbjFNOQ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 10:16:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44032 "EHLO
+        id S236096AbjFNObN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 10:31:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245542AbjFNOQq (ORCPT
+        with ESMTP id S244533AbjFNObK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 10:16:46 -0400
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA302683
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:16:40 -0700 (PDT)
-Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-39ca0c2970aso3964587b6e.3
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 07:16:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686752199; x=1689344199;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f57lCLd7OdJQ5Blvl8wGJZyK116HtB6qFU6rPcmeblM=;
-        b=LSQwn5MG67BP/+AQZt17SggoC4gLE3roHuhaYzIcFAuElnPEdILAfPsBHCJZVvqwh3
-         XvRbYvSPgP+OkIUVaDnUpKqNbzGqO7UEnZ/Kr5+tV5tqa2pTaS05sj/LlavK0voHdg5L
-         8Os8TgtX0c/OJgEg8I+w52z/UYhCY8r2Hp+whkOCH8c6XaK2i0IbpHBi81/XP6F+X4sG
-         JUpz4BtXIoS/6LIAgNdOHbcppVUNc6RsHlF5i9Uso1MdJmjvGUHgFlU6pu0zYdCWXSNi
-         RZEj9fvIVkWRC1tPlpNMCmmvB3/LwDnfcZGu8MDSIb+arT+zuNVIfTNeRTCkm1/j3d3e
-         TZeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686752199; x=1689344199;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f57lCLd7OdJQ5Blvl8wGJZyK116HtB6qFU6rPcmeblM=;
-        b=V73p9RDQGNFzyxLMniVHzFOgDGcIgj70bGL3zRapL6tDdEnr130iD+vS44rJ2CXzkX
-         RyuQjEOVTNq2wJMVsI5sLvovVNv3yXFYa9AkAkQRlw8+qbJKxq/Q8QUhN5HHrGSz7tKL
-         uKo3KgCfcEg+zsTTc6wW56ksr8RcTtrihTD00nA3a5jZ9jb0/lEP79LEYh7qJK+wqJZU
-         G723HU/N3VtFG3dcWymOUk+qE3oC4ulEDMUUbY+MUFIPdmHkKok7Ik+Q+mOge9KS42qp
-         n5yz/FnMgSJJ6plSQK4lBGopsiEjf1qRDS4o/Oxo1ZFcnoh8UML2q5ImXIP0gi9JGz6A
-         wUlA==
-X-Gm-Message-State: AC+VfDx23Tgr2e7VotTSfZGsv5EyeE9DN/GeCOtoIdvf84N421mtc4Cj
-        dVyS0amr5uIR/xSbZxVd49Xr+107Q/skBt2NgJ4N9Q==
-X-Google-Smtp-Source: ACHHUZ7wb3qZ+Qnq9csb+a5N85VcMfo3f7fVKEeFXq1y2jgoyp8xHBYXcB4Sf3yFT1UhZua9LFNTzQXcWOCxAZOfITE=
-X-Received: by 2002:a05:6808:2984:b0:397:fbe7:a0fb with SMTP id
- ex4-20020a056808298400b00397fbe7a0fbmr10144901oib.18.1686752199333; Wed, 14
- Jun 2023 07:16:39 -0700 (PDT)
+        Wed, 14 Jun 2023 10:31:10 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B9F62697;
+        Wed, 14 Jun 2023 07:30:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rB8JFk5K99YKXzStmqgYF9E3nSRDDREOo2MajlfIWQA=; b=A1wm0Nd7/eVEtnBe2ZIa4jMH/W
+        pOQXx8yuu8fCCYzs79aZWKa8wtk2hxzNtskcpOqaKQjr00hyfa8IBg7qADOvorPOWAB+nMQ2TZVJ2
+        cz2gl3a59Dia4Y4Gtsa4EEqzeIdcGQ6zSaTdsQZrWFBneY7sTThUxRKNB6cAeWQvfFsfHwgf4683w
+        +7lqAJOUv+ilZeQ9X5sQ+CfKEXI94BzcYpW25Uueuv9YTbF7E2DrOyL2DqLQEXPW8rFyR0Vrz5MDF
+        rj1jcuR0EMxMNEAQFGH9oFzvKsGU4oXdnmmjAspc7XGOvIf8YG3RYrILJIDeehEgf9MDtRzStfW8B
+        ClAlgXiQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q9RWA-00Butb-0u;
+        Wed, 14 Jun 2023 14:30:38 +0000
+Date:   Wed, 14 Jun 2023 07:30:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Colin Walters <walters@verbum.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Theodore Ts'o <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Message-ID: <ZInPDsjs/4Hsk8mW@infradead.org>
+References: <20230612161614.10302-1-jack@suse.cz>
+ <20230612162545.frpr3oqlqydsksle@quack3>
+ <2f629dc3-fe39-624f-a2fe-d29eee1d2b82@acm.org>
+ <a6c355f7-8c60-4aab-8f0c-5c6310f9c2a8@betaapp.fastmail.com>
+ <20230613113448.5txw46hvmdjvuoif@quack3>
+ <ZIln4s7//kjlApI0@infradead.org>
+ <20230614101256.kgnui242k72lmp4e@quack3>
 MIME-Version: 1.0
-References: <20230614141338.3480029-1-senozhatsky@chromium.org>
-In-Reply-To: <20230614141338.3480029-1-senozhatsky@chromium.org>
-From:   Brian Geffon <bgeffon@google.com>
-Date:   Wed, 14 Jun 2023 10:16:03 -0400
-Message-ID: <CADyq12xoEKpYOd7nFy+ET89ss-zTdKbbj6870UMDQeLe09=Zow@mail.gmail.com>
-Subject: Re: [PATCH] zram: further limit recompression threshold
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Minchan Kim <minchan@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230614101256.kgnui242k72lmp4e@quack3>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks Sergey
+On Wed, Jun 14, 2023 at 12:12:56PM +0200, Jan Kara wrote:
+> Well, OK, I have not been precise :). Modifying a partition table (or LVM
+> description block) is impossible to distinguish from clobbering a
+> filesystem on open(2) time. Once we decide we implement arbitration of each
+> individual write(2), we can obviously stop writes to area covered by some
+> exclusively open partition. But then you are getting at the complexity
+> level of tracking used ranges of block devices which Darrick has suggested
+> and you didn't seem to like that (and neither do I).
 
-On Wed, Jun 14, 2023 at 10:13=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> Recompression threshold should be below huge-size-class
-> watermark.
+Well, we track these ranges in the block_devices hanging off the gendisk
+anyway, so this is a totally different league.  But in the end parsing
+partition tables is a little easier than parsing file system metadata
+but not fundamentally different.  So if we really want to lock down
+broken sideband manipulations we can't allow that either and need
+in-kernel support for manipulating partition tables if that is required
+at run time.
 
-Acked-by: Brian Geffon <bgeffon@google.com>
-
->
-> Suggested-by: Brian Geffon <bgeffon@google.com>
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-> ---
->  drivers/block/zram/zram_drv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
-c
-> index 1867f378b319..5676e6dd5b16 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1753,7 +1753,7 @@ static ssize_t recompress_store(struct device *dev,
->                 }
->         }
->
-> -       if (threshold >=3D PAGE_SIZE)
-> +       if (threshold >=3D huge_class_size)
->                 return -EINVAL;
->
->         down_read(&zram->init_lock);
-> --
-> 2.41.0.162.gfafddb0af9-goog
->
