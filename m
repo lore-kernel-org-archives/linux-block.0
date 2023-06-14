@@ -2,93 +2,58 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B77DEB64DB
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E0BEB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 14:03:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245315AbjFNOB0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 10:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33664 "EHLO
+        id S245354AbjFNODu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 10:03:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245264AbjFNOBZ (ORCPT
+        with ESMTP id S236460AbjFNODt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 10:01:25 -0400
+        Wed, 14 Jun 2023 10:03:49 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E14219A;
-        Wed, 14 Jun 2023 07:01:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56EEFCD;
+        Wed, 14 Jun 2023 07:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=cUPWTRyD6KgConRvc/LzTbU+jQN8JxfjvL3UpIyXkeM=; b=NodLVcgJ1NXwF37xa71v0LeCgL
-        QwCltgPLEdPtIhwT7ovBuinlI+NjgDmuppsqrL5ZJwh4EknK7qM8znLme5kOfiJHpoji+aiYT9iDZ
-        NdcrHcz0BNtrRJ679hKdInCKU7PuPxkrVRWrdIUFBLmyxf9+3CnyMTouyRP2493eMqUeiP410+G+2
-        /uFLTDI/Re80AMP9x20SHyQSeCAG3vW9mBib778IK9QDFs2WVH1rAaIhflvWk6XMrbR6eIkY9Qkcd
-        2IpaYW3w+oiKk7IBCM86K20Xo6Fj2kE0BX7RKUU73k2GjBI4Y6tYPm5mGDC/rLZ2lxLfz+V8VkOTG
-        aqu6HM8w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q9R3p-00BqmJ-08;
-        Wed, 14 Jun 2023 14:01:21 +0000
-Date:   Wed, 14 Jun 2023 07:01:20 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Jain, Ayush" <Ayush.Jain3@amd.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "sfr@canb.auug.org.au" <sfr@canb.auug.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        "Karny, Wyes" <Wyes.Karny@amd.com>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "V, Narasimhan" <Narasimhan.V@amd.com>,
-        "Shetty, Kalpana" <Kalpana.Shetty@amd.com>,
-        "Shukla, Santosh" <Santosh.Shukla@amd.com>
-Subject: Re: Kernel null pointer dereference on stopping raid device
-Message-ID: <ZInIMLlMby2aNNr1@infradead.org>
-References: <e78344ad-8d57-91d8-0bfb-724c740c7c72@amd.com>
- <3c4911c4-d3d7-a93e-5f14-e97384ae4f21@amd.com>
- <ZIlqvsZ6nMv2OT2u@infradead.org>
- <IA1PR12MB61375A452083D65B5FB815DBBA5AA@IA1PR12MB6137.namprd12.prod.outlook.com>
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=Dxv9yZH5Cq3a68CFMHSbxe2K3jCtV+ECrt+k1qx7EHA=; b=sG9nO9EBC4wDI7ERlLrcD9lQur
+        FlaE1RloXVDpRiK4nl6U6eZlN7VOIy6qOoHr0nNLkhYCwN5mQ4UCBf2NaOvpJGcXv6YZlNvhuBYZy
+        OLeU7PKHpcKPDmUK62QHCAsDlkwXMMiiULUHg2cVuW6oo0TgY06gNLibbC4oVXBAUEIxn8K+z67QE
+        AmgLm/ZXn+j5w68/PaPlXvzoPgDBZifO1FZxOuP3vWRFQn29nXiZrVsaSnAfDziPk1Uyw02ZqhjKT
+        o0OzQ8cgirNgNNHsAke4MRbYngh2gNykkp6L+CsioJLbv4J1DGuPsGgPQq0qbb9bVhkRY0huZALvB
+        hxSmkpsA==;
+Received: from 2a02-8389-2341-5b80-39d3-4735-9a3c-88d8.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:39d3:4735:9a3c:88d8] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q9R69-00Br8z-2T;
+        Wed, 14 Jun 2023 14:03:46 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: dio / splice fixups
+Date:   Wed, 14 Jun 2023 16:03:37 +0200
+Message-Id: <20230614140341.521331-1-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <IA1PR12MB61375A452083D65B5FB815DBBA5AA@IA1PR12MB6137.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 14, 2023 at 09:54:07AM +0000, Jain, Ayush wrote:
-> Patch applied cleanly on next-20230614 and resolved the issue.
-> 
-> Reported-by: Ayush Jain <ayush.jain3@amd.com>
-> Tested-by: Ayush Jain <ayush.jain3@amd.com>
+Hi all,
 
-That was just a quick hack to verify the problem.  I think this is
-the proper fix, can you try it as well?
+this series has a small fix and a bunch of cleanups on top of the
+splice and direct I/O rework in the block tree.
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index ca0de7ddd9434d..da523e80a4e990 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2467,10 +2467,12 @@ static void export_rdev(struct md_rdev *rdev, struct mddev *mddev)
- 
- static void md_kick_rdev_from_array(struct md_rdev *rdev)
- {
--	bd_unlink_disk_holder(rdev->bdev, rdev->mddev->gendisk);
-+	struct mddev *mddev = rdev->mddev;
-+
-+	bd_unlink_disk_holder(rdev->bdev, mddev->gendisk);
- 	list_del_rcu(&rdev->same_set);
- 	pr_debug("md: unbind<%pg>\n", rdev->bdev);
--	mddev_destroy_serial_pool(rdev->mddev, rdev, false);
-+	mddev_destroy_serial_pool(mddev, rdev, false);
- 	rdev->mddev = NULL;
- 	sysfs_remove_link(&rdev->kobj, "block");
- 	sysfs_put(rdev->sysfs_state);
-@@ -2488,7 +2490,7 @@ static void md_kick_rdev_from_array(struct md_rdev *rdev)
- 	INIT_WORK(&rdev->del_work, rdev_delayed_delete);
- 	kobject_get(&rdev->kobj);
- 	queue_work(md_rdev_misc_wq, &rdev->del_work);
--	export_rdev(rdev, rdev->mddev);
-+	export_rdev(rdev, mddev);
- }
- 
- static void export_array(struct mddev *mddev)
+ block/blk.h               |    2 --
+ fs/splice.c               |   15 +++++++--------
+ include/linux/bio.h       |    3 +--
+ include/linux/blk_types.h |    1 -
+ include/linux/uio.h       |    6 ------
+ lib/iov_iter.c            |   35 +++++++----------------------------
+ 6 files changed, 15 insertions(+), 47 deletions(-)
