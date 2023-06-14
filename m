@@ -2,128 +2,99 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB55EB64D9
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 15:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B097EB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 16:43:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235356AbjFNPfg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 11:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39220 "EHLO
+        id S235303AbjFNQnb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 12:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229736AbjFNPfG (ORCPT
+        with ESMTP id S235224AbjFNQn1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 11:35:06 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D99EB6;
-        Wed, 14 Jun 2023 08:35:04 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 14 Jun 2023 12:43:27 -0400
+Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7C81A3;
+        Wed, 14 Jun 2023 09:43:24 -0700 (PDT)
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id F41081FDB5;
-        Wed, 14 Jun 2023 15:35:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1686756903; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kZQgDi2VbOJpatdj+K52qKpMPGdEGQyZQB7VZLDRrk0=;
-        b=fUFVVC3XA/mDZqMaAEfUGeGjVt9wOWzjWc+k0KQr04POAEBD8IDz6iZ9S4+/FWked+CqTL
-        N54EvcEqNVNtgI9C7AnjQ9FBX0GKusVOr6HxuizQr8vtDp9I74hUhiAuwI3jKZHPRkTCX0
-        NRa90g24DNZMo894Pk4AP1FK6LWTSX4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1686756903;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kZQgDi2VbOJpatdj+K52qKpMPGdEGQyZQB7VZLDRrk0=;
-        b=a3SNS2gseRlaWZ4Uk7ssBaGnd+YEFqWgniZp4QSerAuSO5oD9qbSnjsL+Lw/SZML4ijWs/
-        1Rrw8eErycXi86CQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BC8B81357F;
-        Wed, 14 Jun 2023 15:35:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id rdIILCbeiWTDHwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 14 Jun 2023 15:35:02 +0000
-Message-ID: <cfa191cc-47e4-5b61-bf4f-33ebd52fa783@suse.de>
-Date:   Wed, 14 Jun 2023 17:35:02 +0200
+        by mx1.veeam.com (Postfix) with ESMTPS id A838441C22;
+        Wed, 14 Jun 2023 12:43:21 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx1-2022; t=1686761001;
+        bh=jNTgcvWm1vw80HHo0h776WVZUmiYhzpPLC0Z4LijRXU=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=kIebp/AY7hQOAPU7dr4d2uQksODoxH0g/Z1VW20qAjTclm2YEp/FOQMds78ngEKkK
+         X5AoTgpoN2bGr1/8zPbkNYjRImT29BknuqEfCgYsAeE+gYWJmEMEnv0DdkOLFydauT
+         a7ihjMGKq5BHyq5bAhAGErRN30NDlXD04HhOfwoJn2MeJIVC+Spr9+kVY0UDPIpMA7
+         ICWaidyXrAjvvvMeqSeLy/12zbRN7Hq5ckHeI9IQ3MD1e7IznjuXwbDArQK8V3obt1
+         XSwV2jtKL3cTAlka9tAqd3JrvElD67sQpFr9l+5T6N3FAaMVhxC/hKY7WJzDksj0v9
+         PkFEwWfHNV3PQ==
+Received: from [172.24.10.107] (172.24.10.107) by prgmbx01.amust.local
+ (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.26; Wed, 14 Jun
+ 2023 18:43:20 +0200
+Message-ID: <c4c9da4f-0d82-4e35-0365-f246666f0c37@veeam.com>
+Date:   Wed, 14 Jun 2023 18:43:10 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 0/7] RFC: high-order folio support for I/O
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v5 04/11] blksnap: header file of the module interface
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     Dave Chinner <david@fromorbit.com>, <axboe@kernel.dk>,
+        <corbet@lwn.net>, <snitzer@kernel.org>, <viro@zeniv.linux.org.uk>,
+        <brauner@kernel.org>, <dchinner@redhat.com>, <willy@infradead.org>,
+        <dlemoal@kernel.org>, <linux@weissschuh.net>, <jack@suse.cz>,
+        <ming.lei@redhat.com>, <linux-block@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-fsdevel@vger.kernel.org>,
+        "Donald Buczek" <buczek@molgen.mpg.de>
+References: <20230612135228.10702-1-sergei.shtepa@veeam.com>
+ <20230612135228.10702-5-sergei.shtepa@veeam.com>
+ <ZIjsywOtHM5nIhSr@dread.disaster.area> <ZIldkb1pwhNsSlfl@infradead.org>
+ <733f591e-0e8f-8668-8298-ddb11a74df81@veeam.com>
+ <ZInJlD70tMKoBi7T@infradead.org>
 Content-Language: en-US
-From:   Hannes Reinecke <hare@suse.de>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>
-References: <20230614114637.89759-1-hare@suse.de>
- <cd816905-0e3e-6397-1a6f-fd4d29dfc739@suse.de>
- <ZInGbz6X/ZQAwdRx@casper.infradead.org>
- <b3fa1b77-d120-f86b-e02f-f79b6d13efcc@suse.de>
-In-Reply-To: <b3fa1b77-d120-f86b-e02f-f79b6d13efcc@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <ZInJlD70tMKoBi7T@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.24.10.107]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ prgmbx01.amust.local (172.24.128.102)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29240315546D7067
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/23 17:06, Hannes Reinecke wrote:
-[ .. ]
+
+
+On 6/14/23 16:07, Christoph Hellwig wrote:
+> I don't actually think swapfile is a very good idea, in fact the Linux
+> swap code in general is not a very good place to look for inspirations
+> 😄
+
+Perhaps. I haven't looked at the code yet. But I like the idea of
+protecting the file from any access from the user-space, as it is
+implemented for swapfile.
+
 > 
-> Whee! That works!
-> 
-> Rebased things with your memcpy_{to,from}_folio() patches, disabled that 
-> chunk, and:
-> 
-> # mount /dev/ram0 /mnt
-> XFS (ram0): Mounting V5 Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
-> XFS (ram0): Ending clean mount
-> xfs filesystem being mounted at /mnt supports timestamps until 
-> 2038-01-19 (0x7fffffff)
-> # umount /mnt
-> XFS (ram0): Unmounting Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
-> 
-> Great work, Matthew!
-> 
-> (Now I just need to check why copying data from NFS crashes ...)
-> 
-Hmm. And for that I'm hitting include/linux/pagemap.h:1250 pretty 
-consistently; something's going haywire with readahead.
+> IFF the usage is always to have a whole file for the diff storage the
+> over all API is very simple - just pass a fd to the kernel for the area,
+> and then use in-kernel direct I/O on it.  Now if that file should also
+> be able to reside on the same file system that the snapshot is taken
+> of things get a little more complicated, because writes to it also need
+> to automatically set the BIO_REFFED flag.
 
-Matthew, are you sure that this one:
+There is definitely no task to create a difference storage file on the
+same block device for which the snapshot is being created. The file can
+be created on any block device.
 
-/** 
+Still, the variant when a whole partition is allocated for the difference
+storage can also be useful.
 
-  * readahead_length - The number of bytes in this readahead request. 
+> I have some ideas for that and will share some draft code with you.
 
-  * @rac: The readahead request. 
-
-  */
-static inline size_t readahead_length(struct readahead_control *rac)
-{
-         return rac->_nr_pages * PAGE_SIZE;
-}
-
-is tenable for large folios?
-Especially as we have in mm/readahead.c:499
-
-         ractl->_nr_pages += 1UL << order;
-
-Hmm?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
-
+I'll be glad.
