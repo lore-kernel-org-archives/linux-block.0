@@ -2,100 +2,162 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E95EB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 00:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2336CEB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 00:26:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241372AbjFNA0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 20:26:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54292 "EHLO
+        id S240572AbjFNA0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 20:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241337AbjFNA0g (ORCPT
+        with ESMTP id S230496AbjFNA0j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 20:26:36 -0400
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 396C01980;
-        Tue, 13 Jun 2023 17:26:31 -0700 (PDT)
-X-UUID: 1a3fe1580a4a11ee9cb5633481061a41-20230614
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=2uy7+tbw1Y+OXG3TkTMsX7CtXTp/7125jL2NZJ+Idfc=;
-        b=gQ9sGR3+KlNe79dhoLjaUuRNiFG75wC79fmSpvmB043BC5IRIT7QxjT/7gx/G9aKhpS/B/jOid5Lfzy4X3/C2bD9vPYkcCXzPSLAundwUw+ntfmP23K5n9HUUlM28VgsAz1q2tQ8eIf769FeOZZvdqzg3M0cfCdpUXwmnS/DfgY=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.26,REQID:18cfa8ad-5e09-4811-be40-661661b4fd81,IP:0,U
-        RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-        :release,TS:-5
-X-CID-META: VersionHash:cb9a4e1,CLOUDID:9b57f96e-2f20-4998-991c-3b78627e4938,B
-        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-        RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 1a3fe1580a4a11ee9cb5633481061a41-20230614
-Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw01.mediatek.com
-        (envelope-from <ed.tsai@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 2114748177; Wed, 14 Jun 2023 08:26:27 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.186) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 14 Jun 2023 08:26:22 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 14 Jun 2023 08:26:22 +0800
-From:   Ed Tsai <ed.tsai@mediatek.com>
-To:     <axboe@kernel.dk>
-CC:     <matthias.bgg@gmail.com>,
-        <angelogioacchino.delregno@collabora.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>, <kbusch@kernel.org>,
-        <amergnat@baylibre.com>, <liusong@linux.alibaba.com>,
-        <wsd_upstream@mediatek.com>, <peter.wang@mediatek.com>,
-        <stanley.chu@mediatek.com>, <powen.kao@mediatek.com>,
-        <alice.chao@mediatek.com>, <naomi.chu@mediatek.com>,
-        <Chun-Hung.Wu@mediatek.com>, Ed Tsai <ed.tsai@mediatek.com>
-Subject: [PATCH v3] blk-mq: check on cpu id when there is only one ctx mapping
-Date:   Wed, 14 Jun 2023 08:25:29 +0800
-Message-ID: <20230614002529.6636-1-ed.tsai@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+        Tue, 13 Jun 2023 20:26:39 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5726B19B5
+        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 17:26:35 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-543c692db30so4418877a12.3
+        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 17:26:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1686702395; x=1689294395;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QajGQslzzctkaDr1mgFDGYFv/dJbKUMY50GQqUSjsyU=;
+        b=0d+yVoOF9RLKOLDioGzBjk4of6B/ELGbtZeDRidEhiXoi0k01UmVts9bYGLhAALO11
+         It/k6o+eieUvWaAbmWudWu3sHqqmpOhO1Q+JynFDmO0DqYdLhqpz7Gjob/hQYJ2oCQz3
+         mJBo8I0G0/tBIeh5LGCMUD5mSNhe9K8wN/5UJxnFNvPQIIWx9cVOEOVwjJOU2RndF7ph
+         5unDMdpwvVwxNrvF/bhWMhJ5Q5upTHf3Z0wHOTSVJjgKcAYk01g4d/8eJVEn3Du6EUMZ
+         4vxDFkPBFJGpTuNvzqeRGJPloNc4FJ9LsKY4saelLj/IHKq09gcAAeE+wWvGFfObQrg6
+         Ra/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686702395; x=1689294395;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QajGQslzzctkaDr1mgFDGYFv/dJbKUMY50GQqUSjsyU=;
+        b=UTgAj973iLMQmZ96TfyWeTJI647bIqDzg8oL5GUvuPTDNAVghypmXwomaP2w8BGcLa
+         iNqNZK2ETk2Waoj++g6KRx6BlmB9sTyU9zg0OPcqcjSpi/GCVzhkAFs5uVQymXJFwR3J
+         CogMar/p9SKvICmn3Ri0XEqBReSRNM25BJmPj53FMPLpiKRJsAHoF2Jz6p/4mOg1Ew6T
+         M6arREGH0wJi+IrO6U111f9j/m8MwTb9EZJeamuGYJS24hVdI7WA8iR+XbAIqLD7vo5a
+         NqRS6grouI6H3h9E1m1ragy1zS0x6QWJSgJix86/1a/RAXMsJV6U8z4kUMauGAByoRCR
+         h0UA==
+X-Gm-Message-State: AC+VfDxCWqbYGKDHC1g+EU/wrLM219By8EHPdoj6zDRn6S3Gr/w6//4C
+        rrP5Ub0QkuSy9hmch6hPg9Rl4g==
+X-Google-Smtp-Source: ACHHUZ7hUVmtofcr2phlzKmyh0/J/vmdnLeHcAWruzJ4Rla8wEpdmbXk7zXylq6Vb0/lk/S1qmcCpg==
+X-Received: by 2002:a05:6a20:a108:b0:101:73a9:1683 with SMTP id q8-20020a056a20a10800b0010173a91683mr335461pzk.33.1686702394620;
+        Tue, 13 Jun 2023 17:26:34 -0700 (PDT)
+Received: from dread.disaster.area (pa49-180-13-202.pa.nsw.optusnet.com.au. [49.180.13.202])
+        by smtp.gmail.com with ESMTPSA id x2-20020a056a00270200b005d22639b577sm971152pfv.165.2023.06.13.17.26.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jun 2023 17:26:33 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+        (envelope-from <david@fromorbit.com>)
+        id 1q9ELG-00BTYW-2T;
+        Wed, 14 Jun 2023 10:26:30 +1000
+Date:   Wed, 14 Jun 2023 10:26:30 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org, Kees Cook <keescook@google.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Message-ID: <ZIkJNmpO/S7pv0A6@dread.disaster.area>
+References: <20230612161614.10302-1-jack@suse.cz>
+ <CACT4Y+aEScXmq2F1-vqAfr-b2w-xyOohN+FZxorW1YuRvKDLNQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+aEScXmq2F1-vqAfr-b2w-xyOohN+FZxorW1YuRvKDLNQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit f168420c62e7 ("blk-mq: don't redirect completion for hctx withs
-only one ctx mapping") When nvme applies a 1:1 mapping of hctx and ctx,
-there will be no remote request.
+On Tue, Jun 13, 2023 at 08:49:38AM +0200, Dmitry Vyukov wrote:
+> On Mon, 12 Jun 2023 at 18:16, Jan Kara <jack@suse.cz> wrote:
+> >
+> > Writing to mounted devices is dangerous and can lead to filesystem
+> > corruption as well as crashes. Furthermore syzbot comes with more and
+> > more involved examples how to corrupt block device under a mounted
+> > filesystem leading to kernel crashes and reports we can do nothing
+> > about. Add config option to disallow writing to mounted (exclusively
+> > open) block devices. Syzbot can use this option to avoid uninteresting
+> > crashes. Also users whose userspace setup does not need writing to
+> > mounted block devices can set this config option for hardening.
+> 
+> +syzkaller, Kees, Alexander, Eric
+> 
+> We can enable this on syzbot, however I have the same concerns as with
+> disabling of XFS_SUPPORT_V4:
+> https://github.com/google/syzkaller/issues/3918#issuecomment-1560624278
 
-But for ufs, the submission and completion queues could be asymmetric.
-(e.g. Multiple SQs share one CQ) Therefore, 1:1 mapping of hctx and
-ctx won't complete request on the submission cpu. In this situation,
-this nr_ctx check could violate the QUEUE_FLAG_SAME_FORCE, as a result,
-check on cpu id when there is only one ctx mapping.
+Really?
 
-Signed-off-by: Ed Tsai <ed.tsai@mediatek.com>
-Signed-off-by: Po-Wen Kao <powen.kao@mediatek.com>
-Suggested-by: Keith Busch <kbusch@kernel.org>
+This is exactly what I *detest most* about syzbot: the recalcitrant
+maintainer who thinks their ideology is more important than any
+other engineering consideration that might exist.
 
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+We want *better quality bug reports* on *current code* that we have
+to *support for the foreseeable future*, not get buried under
+repeated shitty reports containing yet more variants of problems we
+fixed over a decade ago.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 41f7e2b500bd..ecc30ebe9483 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1176,7 +1176,8 @@ bool blk_mq_complete_request_remote(struct request *rq)
- 	 * or a polled request, always complete locally,
- 	 * it's pointless to redirect the completion.
- 	 */
--	if (rq->mq_hctx->nr_ctx == 1 ||
-+	if ((rq->mq_hctx->nr_ctx == 1 &&
-+	     rq->mq_ctx->cpu == raw_smp_processor_id()) ||
- 		rq->cmd_flags & REQ_POLLED)
- 		return false;
- 
+I'll repeat what Eric has already pointed out in the above GH issue
+in the vain hope you'll listen this time rather than making even more
+extreme ideological demands on us.
+
+The XFS engineers put in place a planned, well documented
+deprecation and removal process for V4 format support back in 2020.
+We are well into that plan - we are not that far from turning it off
+v4 support by default. The V4 format is legacy code and users are
+already migrating away from it.
+
+As such, it has much lower priority and relevance to us compared to
+supporting v5 filesystems. The syzbot maintainers don't get to
+decide how important XFS v4 format support is - that's the job of
+the XFS engineers responsibile for developing XFS code and
+supporting XFS users.
+
+Because V4 has been deprecated and support is slowing down as people
+migrate off it, we don't need as extensive test coverage as we once
+did. i.e.  we are ramping down the validation in accordance with
+it's lower priority and approaching disabling in 2025. We are
+placing much more importance on validation of v5 format features and
+functionality.
+
+As such, we really don't need syzbot to be exercising v4 formats any
+more - it's much more important to our users that we exercise v5
+formats as extensively as possible. That is what we are asking the
+syzkaller runners (and syzbot) do as a service for us.
+
+If your ideology demands that "the only way to stop syzbot testing
+XFS v4 filesytsems is to remove the code entirely" (paraphrasing
+your comments from the above github issue), then the entire problem
+here is your ideology.
+
+That is, your ideology is getting in the way of practical, well
+thought out, long running end-of-life engineering processes. It is
+creating unnecessary load on limited resources. Further, your
+demands that we place syzbot coverage (if syzbot doesn't test it, it
+must depend on CONFIG_INSECURE!) above our direct responsibilities
+to distro maintainers and other downstream users is, at best,
+terribly misguided.
+
+Syzbot is a *tool*. It's not even a critical tool we depend on - we
+can live without it just fine. We'd really like syzbot to be a
+better tool, but the ideology behind syzbot is the biggest
+impediment to making it a better, more effective tool for the
+community.
+
+If syzbot maintainers won't listen to simple requests to improve
+test coverage according to subsystem requirements, then it's clear
+that syzbot is being driven by ideology rather than engineering
+requirements. This needs to change.
+
+-Dave.
 -- 
-2.18.0
-
+Dave Chinner
+david@fromorbit.com
