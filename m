@@ -2,90 +2,129 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE39DEB64D7
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 00:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDB6EB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 01:20:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231675AbjFNAjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 20:39:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57530 "EHLO
+        id S232434AbjFNBUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 21:20:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbjFNAjl (ORCPT
+        with ESMTP id S230495AbjFNBUm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 20:39:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C17719A5
-        for <linux-block@vger.kernel.org>; Tue, 13 Jun 2023 17:38:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686703136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=R9iHfOD/vO8uwMzm3mcAdfEih6GadZu/HkBIfv0PcKo=;
-        b=Z0az2RHoA6fqHb/Ur+R2zqHn+s91pfWNFDK2S3dO4e3+P/yToEGNYa7loCQxrYutnXapix
-        iMNdD4XK7mVCrbm5OcfVCwiwYyjoMKAdsVdKVNjSHG+A2GqkXgfLcNa5fjf7idQTeT0zRm
-        sHWveQOQq8t+km/RqZWCxCxXE1UXM6k=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-407-ET0woB5OMiyqLlLl_AOuPw-1; Tue, 13 Jun 2023 20:38:53 -0400
-X-MC-Unique: ET0woB5OMiyqLlLl_AOuPw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A60CD3C025D3;
-        Wed, 14 Jun 2023 00:38:52 +0000 (UTC)
-Received: from ovpn-8-16.pek2.redhat.com (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 59608492CA6;
-        Wed, 14 Jun 2023 00:38:47 +0000 (UTC)
-Date:   Wed, 14 Jun 2023 08:38:43 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
-        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH 2/2] nvme: don't freeze/unfreeze queues from different
- contexts
-Message-ID: <ZIkME5kc9E4IoJff@ovpn-8-16.pek2.redhat.com>
-References: <20230613005847.1762378-1-ming.lei@redhat.com>
- <20230613005847.1762378-3-ming.lei@redhat.com>
- <ZIiAKhi5Vmc0Fc9W@kbusch-mbp.dhcp.thefacebook.com>
+        Tue, 13 Jun 2023 21:20:42 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99087C3;
+        Tue, 13 Jun 2023 18:20:41 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-25df7944f60so126591a91.2;
+        Tue, 13 Jun 2023 18:20:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686705641; x=1689297641;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HhulmoGSB7sGxWdwqroB3Y8DgLgRBrm8tc2o1GdcU5Y=;
+        b=LK0+IzkAVSRqezUYqouIvYxD1ljAeKRr2wrTcT2uo46MNgJI9Y8pcnAtuiazmd3G0H
+         w9WUbl+fDcQaAr8NuJsqhOgYEIkozr8onEjnagv8wuyLO1HVH6I/ZOfH7f3wpQ3asDJc
+         V9zdWnJjBzMp4hEcqkua2jPhWJRKspAvrRpNL0xzY5FTOQDpn0d2iy4UniFXIZA60GoM
+         ATs1hCdPDMeaEmLLPF/E38cjyEcfQUlXMXS6stWh+hYvY0VO9uoQpDr4OOoR3Swbr4x6
+         qldb8G2Y4ssdfnGjg6RxLzH5DEGAJYhkSvQNCWIkN7XGMXWDbi92y0uXOUyNXFs+EME0
+         oU+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686705641; x=1689297641;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HhulmoGSB7sGxWdwqroB3Y8DgLgRBrm8tc2o1GdcU5Y=;
+        b=jO5nlKN4JAnqdjmPPQGuV/aUSltQHPM6TcZgpQLiilsApcj9KFC2yqm/KmAcSdC+L9
+         2LNpD2am5O2cK/9/VuS+pjtifJGfEYS1uOsQ+XqmXQ1nbziHfF9whL8Z4fLxZZbnrI3w
+         8HyVInKS0TIfslmjZ7yHsfRY21IfcpH7GjD0iEomqsUw39ptgITI/QbrgQR2etYCWvPv
+         DOXg9itgZQ+VmjEvXuLp7v+cT5TUXvMGNmerWdrytDYabQqshEcdz5J8ucmT7gYWE4DP
+         aejoJv6NkqZa7seeutWe2WKNZjBfBgPjkPyJOryadd0Vflg4dSK0LN6w7Sx9L4ToA3Pc
+         urFA==
+X-Gm-Message-State: AC+VfDzsQUWs1o2rMtaJMYcfC7dYOIFVR1islnqtvscFM/3qEKyFVCRW
+        BnjGS+kTLecgyjylfnX9HXz7JecnTcQ=
+X-Google-Smtp-Source: ACHHUZ7G5pBNjieB5ZiRi+IcMF2kbpUJ+zcW86h3EOnprlWdjUF/Jp5EmhynldKcoT6PBoL3pZRzdQ==
+X-Received: by 2002:a17:90a:804a:b0:25c:7f2:2e5d with SMTP id e10-20020a17090a804a00b0025c07f22e5dmr425865pjw.13.1686705640941;
+        Tue, 13 Jun 2023 18:20:40 -0700 (PDT)
+Received: from ?IPV6:2001:df0:0:200c:ad3e:4a38:ffce:bee7? ([2001:df0:0:200c:ad3e:4a38:ffce:bee7])
+        by smtp.gmail.com with ESMTPSA id gf18-20020a17090ac7d200b00250d670306esm9823426pjb.35.2023.06.13.18.20.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jun 2023 18:20:40 -0700 (PDT)
+Message-ID: <12c29812-4afe-96d7-5fc2-15573ea571fd@gmail.com>
+Date:   Wed, 14 Jun 2023 13:20:35 +1200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZIiAKhi5Vmc0Fc9W@kbusch-mbp.dhcp.thefacebook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v7 2/2] block: add overflow checks for Amiga partition
+ support
+Content-Language: en-US
+To:     Finn Thain <fthain@linux-m68k.org>
+Cc:     Martin Steigerwald <martin@lichtvoll.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-m68k@vger.kernel.org, geert@linux-m68k.org,
+        Christoph Hellwig <hch@infradead.org>
+References: <1539570747-19906-1-git-send-email-schmitzmic@gmail.com>
+ <4814181.GXAFRqVoOG@lichtvoll.de>
+ <12241273-9403-426e-58ed-f3f597fe331b@gmail.com>
+ <3748744.kQq0lBPeGt@lichtvoll.de>
+ <86671bf8-98db-7d82-f7cb-a80d6f6c064c@gmail.com>
+ <437adeb4-160c-38a9-68af-ff4ec7454f5c@linux-m68k.org>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+In-Reply-To: <437adeb4-160c-38a9-68af-ff4ec7454f5c@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 13, 2023 at 08:41:46AM -0600, Keith Busch wrote:
-> On Tue, Jun 13, 2023 at 08:58:47AM +0800, Ming Lei wrote:
-> > And this way is correct because quiesce is enough for driver to handle
-> > error recovery. The only difference is where to wait during error recovery.
-> > With this way, IO is just queued in block layer queue instead of
-> > __bio_queue_enter(), finally waiting for completion is done in upper
-> > layer. Either way, IO can't move on during error recovery.
-> 
-> The point was to contain the fallout from modifying the hctx mappings.
+Hi Finn,
 
-blk_mq_update_nr_hw_queues() is called after nvme_wait_freeze
-returns, nothing changes here, so correctness wrt. updating hctx
-mapping is provided.
+On 14/06/23 12:07, Finn Thain wrote:
+> On Wed, 14 Jun 2023, Michael Schmitz wrote:
+>
+>> My last version (v9) still applies, but that one still threw a sparse
+>> warning for patch 2:
+>>
+>> Link:https://lore.kernel.org/all/202208231319.Ng5RTzzg-lkp@intel.com
+>>
+>> Not sure how to treat that one - rdb_CylBlocks is not declared as big
+>> endian so the warning is correct, but as far as I can see, for all
+>> practical purposes rdb_CylBlocks would be expected to be in big endian
+>> order (partition usually prepared on a big endian system)?
+>>
+>> I can drop the be32_to_cpu conversion (and would expect to see a warning
+>> printed on little endian systems), or force the cast to __be32. Or
+>> rather drop that consistency check outright...
+>>
+> The new warning comes from this new code:
+>
+> 		if (cylblk > be32_to_cpu((__be32)rdb->rdb_CylBlocks)) {
+> 			pr_warn("Dev %s: cylblk %u > rdb_CylBlocks %u!\n",
+> 				state->disk->disk_name, cylblk,
+> 				be32_to_cpu(rdb->rdb_CylBlocks));
+> 		}
+>
+> The __be32 cast appears in the first line but not the fourth, which is an
+> inconsistency you might want to tidy up. However, both lines produce the
+> same sparse warning here.
 
-> If you allow IO to queue in the blk-mq layer while a reset is in
-> progress, they may be entering a context that won't be as expected on
-> the other side of the reset.
- 
-The only difference is that in-tree code starts to freeze
-at the beginning of error recovery, which way can just prevent new IO,
-and old ones still are queued, but can't be dispatched to driver
-because of quiescing in both ways. With this patch, new IOs queued
-after error recovery are just like old ones canceled before resetting.
+Thanks for checking that - the cast is redundant as-is (be32_to_cpu() 
+contains the same cast already). Does use of (__force __be32) instead 
+make the warning go away? (I haven't managed to get sparse working for 
+me, so I have no way of checking.)
 
-So not see problems from driver side with this change, and nvme
-driver has to cover new IOs queued after error happens.
+> The inconsistent use of big-endian and native-endian members in struct
+> RigidDiskBlock looks like the root cause to me but I know nothing about
+> Amiga partition maps so I'm not going to guess.
 
+The check appeared in the first version of the patch, after discussion 
+around the RFC version at length. Going over that thread again, I 
+haven't found why that check was added. It's probably been out of an 
+overabundance of caution (as I know little about RDB, too) and can 
+probably be removed.
 
-Thanks.
-Ming
+Cheers,
+
+     Michael
+
 
