@@ -2,103 +2,112 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF00EB64DD
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 10:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24C9EB64D9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 10:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235344AbjFNKgm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 06:36:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46958 "EHLO
+        id S235309AbjFNKhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 06:37:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235120AbjFNKgi (ORCPT
+        with ESMTP id S235120AbjFNKg5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 06:36:38 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1038CC3;
-        Wed, 14 Jun 2023 03:36:37 -0700 (PDT)
+        Wed, 14 Jun 2023 06:36:57 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E3C2B5;
+        Wed, 14 Jun 2023 03:36:56 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A6FE42253D;
-        Wed, 14 Jun 2023 10:36:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1686738995; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        by smtp-out1.suse.de (Postfix) with ESMTPS id EB09322493;
+        Wed, 14 Jun 2023 10:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1686739014; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=JBZbEawiIpZprdZTA1GMxE9hL27s7KVDXGtVeStDZCs=;
-        b=tXq+9gYYkLoGjIexgfFsXiUWMfhw7+U4d1t8OqrrolAw2wK5/5+M8kYhcFLrW++V3ht/Yl
-        R9t9KII8lLXAEsZEiBc/6ry/7AGjajRSp6Ou/cc70IXRVieyH70IfDvnddNRkFvBUBLlrF
-        3AxBxsPlvZZo+Tx+j07DgmkTFnd1Ge8=
+        bh=sFuunLuk/KGPgOZE70zqAYLnO7a/eDeyuBJEDejMyac=;
+        b=RAyFpTYpW6tCEvx75rYKbFCiIUGWbm2HXHnx5MhUkbHEkfb5MkArgvn1tnoWFQuKMstQ2I
+        PBSMWyyIyShG9i//UBHQMZDt6emgx+2ksCO97cwEKt4p1dpg4bnGV/3NagbYMtkLs3zThg
+        HwNd3KbsTgYBHZ0X471sCm7frRqm6WM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1686739014;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sFuunLuk/KGPgOZE70zqAYLnO7a/eDeyuBJEDejMyac=;
+        b=zqYS6atnPsqDHm9nC/oXo7/uQvjlA5j6TWQLxZPps1LAstmr2Ck8XzzguQXfkQ1CFJQBLB
+        Ju5UxDbVwdsoW9BQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 568661357F;
-        Wed, 14 Jun 2023 10:36:35 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DCCA01357F;
+        Wed, 14 Jun 2023 10:36:54 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id COpFEzOYiWSTfQAAMHmgww
-        (envelope-from <mwilck@suse.com>); Wed, 14 Jun 2023 10:36:35 +0000
-From:   mwilck@suse.com
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Martin Wilck <mwilck@suse.com>
-Subject: [PATCH v7 7/7] scsi: improve warning message in scsi_device_block()
-Date:   Wed, 14 Jun 2023 12:36:16 +0200
-Message-Id: <20230614103616.31857-8-mwilck@suse.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230614103616.31857-1-mwilck@suse.com>
-References: <20230614103616.31857-1-mwilck@suse.com>
+        id d0vdNUaYiWTCfQAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 14 Jun 2023 10:36:54 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 727D1A0755; Wed, 14 Jun 2023 12:36:54 +0200 (CEST)
+Date:   Wed, 14 Jun 2023 12:36:54 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christian Brauner <brauner@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ted Tso <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
+        linux-fsdevel@vger.kernel.org,
+        syzkaller <syzkaller@googlegroups.com>
+Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
+ devices
+Message-ID: <20230614103654.ydiosiv6ptljwd7i@quack3>
+References: <20230612161614.10302-1-jack@suse.cz>
+ <ZIf6RrbeyZVXBRhm@infradead.org>
+ <CACT4Y+ZsN3wemvGLVyNWj9zjykGwcHoy581w7GuAHGpAj1YLxg@mail.gmail.com>
+ <ZIlphqM9cpruwU6m@infradead.org>
+ <20230614-anstalt-gepfercht-affd490e6544@brauner>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230614-anstalt-gepfercht-affd490e6544@brauner>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Martin Wilck <mwilck@suse.com>
+On Wed 14-06-23 10:18:16, Christian Brauner wrote:
+> On Wed, Jun 14, 2023 at 12:17:26AM -0700, Christoph Hellwig wrote:
+> > On Tue, Jun 13, 2023 at 08:09:14AM +0200, Dmitry Vyukov wrote:
+> > > I don't question there are use cases for the flag, but there are use
+> > > cases for the config as well.
+> > > 
+> > > Some distros may want a guarantee that this does not happen as it
+> > > compromises lockdown and kernel integrity (on par with unsigned module
+> > > loading).
+> > > For fuzzing systems it also may be hard to ensure fine-grained
+> > > argument constraints, it's much easier and more reliable to prohibit
+> > > it on config level.
+> > 
+> > I'm fine with a config option enforcing write blocking for any
+> > BLK_OPEN_EXCL open.  Maybe the way to it is to:
+> > 
+> >  a) have an option to prevent any writes to exclusive openers, including
+> >     a run-time version to enable it
+> 
+> I really would wish we don't make this runtime configurable. Build time
+> and boot time yes but toggling it at runtime makes this already a lot
+> less interesting.
 
-If __scsi_internal_device_block() returns an error, it is always -EINVAL
-because of an invalid state transition. For debugging purposes, it makes
-more sense to print the device state.
+I see your point from security POV. But if you are say a desktop (or even
+server) user you may need to say resize your LVM or add partition to your
+disk or install grub2 into boot sector of your partition. In all these
+cases you need write access to a block device that is exclusively claimed
+by someone else. Do you mandate reboot in permissive mode for all these
+cases? Realistically that means such users just won't bother with the
+feature and leave it disabled all the time. I'm OK with such outcome but I
+wanted to point out this "no protection change after boot" policy noticably
+restricts number of systems where this is applicable.
 
-Signed-off-by: Martin Wilck <mwilck@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
----
- drivers/scsi/scsi_lib.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 599c9ec550e0..b7f78e53184a 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -2790,9 +2790,11 @@ EXPORT_SYMBOL_GPL(scsi_internal_device_block_nowait);
- static void scsi_device_block(struct scsi_device *sdev, void *data)
- {
- 	int err;
-+	enum scsi_device_state state;
- 
- 	mutex_lock(&sdev->state_mutex);
- 	err = __scsi_internal_device_block_nowait(sdev);
-+	state = sdev->sdev_state;
- 	if (err == 0)
- 		/*
- 		 * scsi_stop_queue() must be called with the state_mutex
-@@ -2803,8 +2805,8 @@ static void scsi_device_block(struct scsi_device *sdev, void *data)
- 
- 	mutex_unlock(&sdev->state_mutex);
- 
--	WARN_ONCE(err, "__scsi_internal_device_block_nowait(%s) failed: err = %d\n",
--		  dev_name(&sdev->sdev_gendev), err);
-+	WARN_ONCE(err, "%s: failed to block %s in state %d\n",
-+		  __func__, dev_name(&sdev->sdev_gendev), state);
- }
- 
- /**
+								Honza
 -- 
-2.40.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
