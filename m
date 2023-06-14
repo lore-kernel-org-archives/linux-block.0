@@ -2,102 +2,115 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7249DEB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 13:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9908DEB64DB
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 13:45:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244315AbjFNNgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 09:36:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46776 "EHLO
+        id S245051AbjFNNpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 09:45:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243483AbjFNNgm (ORCPT
+        with ESMTP id S236740AbjFNNpd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 09:36:42 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B3C31FC4
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 06:36:41 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 110381FDEE;
-        Wed, 14 Jun 2023 13:36:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1686749800; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U9GJ8ya9z2XHoqQWq2/v69J4A8CBYF1KNjX4WfuSRHs=;
-        b=UKv9WOObHh6bzDsP9n6a/JplKi+SvHMv2Hez+JddLpXdiZWIchDg4bdXq26vofR8bW+ehf
-        vsVMUWppKcxOS26joVuitCTTjDCVxXrpBeep3NCgA0URtFPASZpLyvLsBZ3Lzv630gM+h9
-        UZPBs8Sg4KmECjGcMv1dFEJflW9Fvko=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1686749800;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U9GJ8ya9z2XHoqQWq2/v69J4A8CBYF1KNjX4WfuSRHs=;
-        b=a/BZb/OgnNYx44ELR7qPqZ0SqOP4xkbr47dhJLOYIDrtlAoLX7SNtxI/IgOiZxhfoOxr+6
-        1gsvEraJAnNIcVCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0014E1357F;
-        Wed, 14 Jun 2023 13:36:39 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id +DtCO2fCiWTyYAAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 14 Jun 2023 13:36:39 +0000
-Message-ID: <b7700f44-97b2-84a7-aafa-07887c90e5a4@suse.de>
-Date:   Wed, 14 Jun 2023 15:36:39 +0200
+        Wed, 14 Jun 2023 09:45:33 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD7F81BFD;
+        Wed, 14 Jun 2023 06:45:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Az+mDoXTt1ZnhjFATyvU/a3dOhH49ucjiGQ0gL0+ANg=; b=RKBXtJ3rosx+y5/NSJ6Z/5qIMD
+        musumP15B57eQzfxQxgURyADh7zy+xNuVkXXZk3UHtZhZrqs/8WaV8pPQj6mpkQzaJgZcilAIScmz
+        CnIAiCC5kSeEykvXtcBPOXunuWLCXqe917HMq/k6nKwrrS/Pq1nYzXUjpFbSqcwzZo4AqPyDhs6QB
+        lquxKykMmi3aMXnx1wOJjzum8mAxB7ctynkQ6OS3SjPxq3a+ZXbioxvsUlAnGbegD1eyKZK7FnWFG
+        v3AMBWfV4q/Uampn/k2wHyz7Zf9eVbiAvlsDFYRP+MVPebg6QSvZv6jEMsIG3S5rrTMWX76eEiy63
+        Bj+efrFg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1q9QoU-006NaI-KS; Wed, 14 Jun 2023 13:45:30 +0000
+Date:   Wed, 14 Jun 2023 14:45:30 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH 2/7] brd: convert to folios
+Message-ID: <ZInEeq1lfDUxye58@casper.infradead.org>
+References: <20230614114637.89759-1-hare@suse.de>
+ <20230614114637.89759-3-hare@suse.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH for-next] brd: use cond_resched instead of
- cond_resched_rcu
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk
-Cc:     mcgrof@kernel.org, linux-block@vger.kernel.org,
-        gost.dev@samsung.com, Matthew Wilcox <willy@infradead.org>
-References: <CGME20230614133540eucas1p1a761c184d7d571cfcd893ab5f8b759fd@eucas1p1.samsung.com>
- <20230614133538.1279369-1-p.raghav@samsung.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230614133538.1279369-1-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230614114637.89759-3-hare@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/23 15:35, Pankaj Raghav wrote:
-> The body of the loop is run without RCU lock held. Use the regular
-> cond_resched() instead of cond_resched_rcu().
-> 
-> Fixes: 786bb0245881 ("brd: use XArray instead of radix-tree to index backing pages")
-> Suggested-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
->   drivers/block/brd.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-> index 2f71376afc71..970bd6ff38c4 100644
-> --- a/drivers/block/brd.c
-> +++ b/drivers/block/brd.c
-> @@ -111,7 +111,7 @@ static void brd_free_pages(struct brd_device *brd)
->   
->   	xa_for_each(&brd->brd_pages, idx, page) {
->   		__free_page(page);
-> -		cond_resched_rcu();
-> +		cond_resched();
->   	}
->   
->   	xa_destroy(&brd->brd_pages);
+On Wed, Jun 14, 2023 at 01:46:32PM +0200, Hannes Reinecke wrote:
+>  /*
+> - * Each block ramdisk device has a xarray brd_pages of pages that stores
+> - * the pages containing the block device's contents. A brd page's ->index is
+> - * its offset in PAGE_SIZE units. This is similar to, but in no way connected
+> - * with, the kernel's pagecache or buffer cache (which sit above our block
+> - * device).
+> + * Each block ramdisk device has a xarray of folios that stores the folios
+> + * containing the block device's contents. A brd folio's ->index is its offset
+> + * in PAGE_SIZE units. This is similar to, but in no way connected with,
+> + * the kernel's pagecache or buffer cache (which sit above our block device).
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Having read my way to the end of the series, I can now circle back and
+say this comment is wrong.  The folio->index is its offset in PAGE_SIZE
+units if the sector size is <= PAGE_SIZE, otherwise it's the offset in
+sector size units.  This is _different from_ the pagecache which uses
+PAGE_SIZE units and multi-index entries in the XArray.
 
-Cheers,
+> @@ -144,29 +143,29 @@ static int copy_to_brd_setup(struct brd_device *brd, sector_t sector, size_t n,
+>  static void copy_to_brd(struct brd_device *brd, const void *src,
+>  			sector_t sector, size_t n)
+>  {
+> -	struct page *page;
+> +	struct folio *folio;
+>  	void *dst;
+>  	unsigned int offset = (sector & (PAGE_SECTORS-1)) << SECTOR_SHIFT;
+>  	size_t copy;
+>  
+>  	copy = min_t(size_t, n, PAGE_SIZE - offset);
+> -	page = brd_lookup_page(brd, sector);
+> -	BUG_ON(!page);
+> +	folio = brd_lookup_folio(brd, sector);
+> +	BUG_ON(!folio);
+>  
+> -	dst = kmap_atomic(page);
+> -	memcpy(dst + offset, src, copy);
+> -	kunmap_atomic(dst);
+> +	dst = kmap_local_folio(folio, offset);
+> +	memcpy(dst, src, copy);
+> +	kunmap_local(dst);
 
-Hannes
+This should use memcpy_to_folio(), which doesn't exist yet.
+Compile-tested patch incoming shortly ...
+
+> +	folio = brd_lookup_folio(brd, sector);
+> +	if (folio) {
+> +		src = kmap_local_folio(folio, offset);
+> +		memcpy(dst, src, copy);
+> +		kunmap_local(src);
+
+And this will need memcpy_from_folio(), patch for that incoming too.
+
+> @@ -226,15 +225,15 @@ static int brd_do_bvec(struct brd_device *brd, struct page *page,
+>  			goto out;
+>  	}
+>  
+> -	mem = kmap_atomic(page);
+> +	mem = kmap_local_folio(folio, off);
+>  	if (!op_is_write(opf)) {
+> -		copy_from_brd(mem + off, brd, sector, len);
+> -		flush_dcache_page(page);
+> +		copy_from_brd(mem, brd, sector, len);
+> +		flush_dcache_folio(folio);
+
+Nngh.  This will need to be a more complex loop.  I don't think we can
+do a simple abstraction here.  Perhaps you can base it on the two
+patches you're about to see?
 
