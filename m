@@ -2,178 +2,124 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25571EB64D8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 01:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E15EB64DA
+	for <linux-block@archiver.kernel.org>; Wed, 14 Jun 2023 01:58:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232912AbjFNBzz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Jun 2023 21:55:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51034 "EHLO
+        id S241372AbjFNB6n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Jun 2023 21:58:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241337AbjFNBzy (ORCPT
+        with ESMTP id S233260AbjFNB6m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Jun 2023 21:55:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F331981;
-        Tue, 13 Jun 2023 18:55:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1592B63544;
-        Wed, 14 Jun 2023 01:55:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A1B6C433C8;
-        Wed, 14 Jun 2023 01:55:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686707751;
-        bh=+TQ2BSnPydlyqEA0jKJ3KsS/rKfRN5nG17oZLglMtjk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HqXdINT34KKlbL6sIYr1eiGpDH9hm/BX4R41EpKhFhGLp5ZV2dXJM+Lga2B+ZjKYI
-         6xaEw/b53lkYLkPnUXJUtEOpBF8AwhBT+9plqIHFgkU4I5bCjcueriPrtt3XtrvXPT
-         /5ZF0GdC/VnCICj/7u1tPzoftw+x15rMHFW35++tAwzp5DemOiLtbtyx8yl3trzMWz
-         xdWgHmUYFr3I4SGiDfuJVG9qiFaD67stfbxUapn5X9pDuJ1CoKH1SkXyyaXrjngD5d
-         h0y3Sqflrm4uraAeoSYiw2F2RUyzod8O5eq4DIPdqVbFuPlI4Q1gcpu8GqhLFSjVXK
-         28TRG7GewEkOg==
-Date:   Tue, 13 Jun 2023 18:55:50 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Colin Walters <walters@verbum.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Theodore Ts'o <tytso@mit.edu>, yebin <yebin@huaweicloud.com>,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
- devices
-Message-ID: <20230614015550.GA11423@frogsfrogsfrogs>
-References: <20230612161614.10302-1-jack@suse.cz>
- <20230612162545.frpr3oqlqydsksle@quack3>
- <2f629dc3-fe39-624f-a2fe-d29eee1d2b82@acm.org>
- <a6c355f7-8c60-4aab-8f0c-5c6310f9c2a8@betaapp.fastmail.com>
- <20230613113448.5txw46hvmdjvuoif@quack3>
+        Tue, 13 Jun 2023 21:58:42 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17ED1FC9;
+        Tue, 13 Jun 2023 18:58:26 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QgpVR0MJpz4f3tNm;
+        Wed, 14 Jun 2023 09:58:23 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgCnD7O+HolkasWdLg--.26820S3;
+        Wed, 14 Jun 2023 09:58:23 +0800 (CST)
+Subject: Re: [PATCH 2/2] ufs: don't use the fair tag sharings
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Ed Tsai <ed.tsai@mediatek.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        stanley.chu@mediatek.com, peter.wang@mediatek.com,
+        chun-hung.wu@mediatek.com, alice.chao@mediatek.com,
+        powen.kao@mediatek.com, naomi.chu@mediatek.com,
+        wsd_upstream@mediatek.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20230509065230.32552-1-ed.tsai@mediatek.com>
+ <20230509065230.32552-3-ed.tsai@mediatek.com>
+ <ZF0K7A6G2cYBjSgn@infradead.org>
+ <aa9af9ae-62a4-6469-244c-b5d9106bb044@acm.org>
+ <ZF5G5ztMng8Xbd1W@infradead.org>
+ <2740ee82-e35f-1cbf-f5d0-373f94eb14a5@acm.org>
+ <de3f41a0-b13d-d4f6-765a-19b857bce53e@huaweicloud.com>
+ <86065501-ab2e-09b4-71cd-c0b18ede00ed@acm.org>
+ <a26e28a6-91e0-e803-749e-2ce957711c64@huaweicloud.com>
+ <097caed2-10b3-7cd1-7c06-90f983e5c720@acm.org>
+ <f9ccab59-91a1-69d5-6d20-2c6ea0e24b5a@huaweicloud.com>
+ <66906bd5-d73f-af96-bf38-c6aee576fa73@acm.org>
+ <bef8340e-f051-db63-5c2f-a2bc94c678ac@huaweicloud.com>
+ <04a4d0db-2f2d-e2fc-5458-4ddf852ffc8a@acm.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <3e9e42aa-9a0d-2b73-194b-5c229e9ed533@huaweicloud.com>
+Date:   Wed, 14 Jun 2023 09:58:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230613113448.5txw46hvmdjvuoif@quack3>
+In-Reply-To: <04a4d0db-2f2d-e2fc-5458-4ddf852ffc8a@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCnD7O+HolkasWdLg--.26820S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tF43JrWUJr4fWrykXrW3Awb_yoW8Jw4Upa
+        y8tFZIkFs7J398AwsrX3W8uayftwn3Jr97Jr1fG347Zwn09w4fZw4Ut3909rZ3Zr97Cr12
+        gay8Xr95X3s5Z37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
+        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+        BIdaVFxhVjvjDU0xZFpf9x0JUAxhLUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 13, 2023 at 01:34:48PM +0200, Jan Kara wrote:
-> On Mon 12-06-23 14:52:54, Colin Walters wrote:
-> > On Mon, Jun 12, 2023, at 1:39 PM, Bart Van Assche wrote:
-> > > On 6/12/23 09:25, Jan Kara wrote:
-> > >> On Mon 12-06-23 18:16:14, Jan Kara wrote:
-> > >>> Writing to mounted devices is dangerous and can lead to filesystem
-> > >>> corruption as well as crashes. Furthermore syzbot comes with more and
-> > >>> more involved examples how to corrupt block device under a mounted
-> > >>> filesystem leading to kernel crashes and reports we can do nothing
-> > >>> about. Add config option to disallow writing to mounted (exclusively
-> > >>> open) block devices. Syzbot can use this option to avoid uninteresting
-> > >>> crashes. Also users whose userspace setup does not need writing to
-> > >>> mounted block devices can set this config option for hardening.
-> > >>>
-> > >>> Link: https://lore.kernel.org/all/60788e5d-5c7c-1142-e554-c21d709acfd9@linaro.org
-> > >>> Signed-off-by: Jan Kara <jack@suse.cz>
-> > >> 
-> > >> Please disregard this patch. I had uncommited fixups in my tree. I'll send
-> > >> fixed version shortly. I'm sorry for the noise.
-> > >
-> > > Have alternatives been configured to making this functionality configurable
-> > > at build time only? How about a kernel command line parameter instead of a
-> > > config option?
-> > 
-> > It's not just syzbot here; at least once in my life I accidentally did
-> > `dd if=/path/to/foo.iso of=/dev/sda` when `/dev/sda` was my booted disk
-> > and not the target USB device.  I know I'm not alone =)
-> 
-> Yeah, so I'm not sure we are going to protect against this particular case.
-> I mean it is not *that* uncommon to alter partition table of /dev/sda while
-> /dev/sda1 is mounted. And for the kernel it is difficult to distinguish
-> this and your mishap.
+Hi,
 
-Honestly?
+在 2023/06/13 22:07, Bart Van Assche 写道:
+> On 5/18/23 00:55, Yu Kuai wrote:
+>> 在 2023/05/18 10:23, Bart Van Assche 写道:
+>>> On 5/17/23 18:49, Yu Kuai wrote:
+>>>> Currently, fair share from hctx_may_queue() requires two
+>>>> atomic_read(active_queues and active_requests), I think this smoothing
+>>>> method can be placed into get_tag fail path, for example, the more 
+>>>> times
+>>>> a disk failed to get tag in a period of time, the more tag this disk 
+>>>> can
+>>>> get, and all the information can be updated here(perhaps directly
+>>>> record how many tags a disk can get, then hctx_may_queue() still only
+>>>> require 2 atomic_read()).
+>>>
+>>> That sounds interesting to me. Do you perhaps plan to implement this 
+>>> approach and to post it as a patch?
+>>
+>> Of course, I'll try to send a RFC patch.
+> 
+> Hi Kuai,
+> 
+> Has this RFC patch already been posted or did I perhaps miss it?
 
-I'd love it if filesystems actually /could/ lock down the parts of block
-devices they're using.  They could hand out write privileges to the open
-bdev fds at the same time that a block layout lease is created, and
-retract them when the lease terminates.  Areas before the fs (e.g. BIOS
-boot sector) could actually be left writable by filesystems that don't
-use that area; and anything beyond EOFS would still be writable (hello
-lvm).  Then xfs actually /could/ prevent you from blowing away mounted
-xfs filesystem.
+Sorry for the delay, I finished switch from not share to fair share
+directly verion, however, I found that it's not that simple to add a
+smoothing method, and I'm stuck here for now.
 
-ext4 could even still allow primary superblock writes to avoid breaking
-tune2fs, or they could detect secureboot lockdown and prohibit that.
+I'll try to send a RFC verion soon, the smoothing method may not be
+flexible, but I'll make sure it can work for your simple case that
+2 device share tags, and one only issue few io while the other issue
+lots of io.
 
-In the past, I was told to go write an LSM if I wanted XFS to protect
-itself from getting nuked, but I've been too busy to learn how to do
-that.  The other nastier question is blocking writes to sda when sda1 is
-mounted; for that I have no response. :(
+Thanks,
+Kuai
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> 
+> .
+> 
 
---D
-
-> > There's a lot of similar accidental-damage protection from this.  Another
-> > stronger argument here is that if one has a security policy that
-> > restricts access to filesystem level objects, if a process can somehow
-> > write to a mounted block device, it effectively subverts all of those
-> > controls. 
-> 
-> Well, there are multiple levels of protection that I can think of:
-> 
-> 1) If user can write some image and make kernel mount it.
-> 2) If user can modify device content while mounted (but not buffer cache
-> of the device).
-> 3) If user can modify buffer cache of the device while mounted.
-> 
-> 3) is the most problematic and effectively equivalent to full machine
-> control (executing arbitrary code in kernel mode) these days.  For 1) and
-> 2) there are reasonable protection measures the filesystem driver can take
-> (and effectively you cannot escape these problems if you allow attaching
-> untrusted devices such as USB sticks) so they can cause DoS but we should
-> be able to prevent full machine takeover in the filesystem code.
-> 
-> So this patch is mainly aimed at forbiding 3).
-> 
-> > Right now it looks to me we're invoking devcgroup_check_permission pretty
-> > early on; maybe we could extend the device cgroup stuff to have a new
-> > check for write-mounted, like
-> > 
-> > ```
-> > diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> > index c994ff5b157c..f2af33c5acc1 100644
-> > --- a/tools/include/uapi/linux/bpf.h
-> > +++ b/tools/include/uapi/linux/bpf.h
-> > @@ -6797,6 +6797,7 @@ enum {
-> >  	BPF_DEVCG_ACC_MKNOD	= (1ULL << 0),
-> >  	BPF_DEVCG_ACC_READ	= (1ULL << 1),
-> >  	BPF_DEVCG_ACC_WRITE	= (1ULL << 2),
-> > +	BPF_DEVCG_ACC_WRITE_MOUNTED	= (1ULL << 3),
-> >  };
-> >  
-> >  enum {
-> > ```
-> > 
-> > ?  But probably this would need to be some kind of opt-in flag to avoid
-> > breaking existing bpf progs?
-> > 
-> > If it was configurable via the device cgroup, then it's completely
-> > flexible from userspace; most specifically including supporting some
-> > specially privileged processes from doing it if necessary.
-> 
-> I kind of like the flexibility of device cgroups but it does not seem to
-> fit well with my "stop unactionable syzbot reports" usecase and doing the
-> protection properly would mean that we now need to create way to approve
-> access for all the tools that need this. So I'm not against this but I'd
-> consider this "future extension possibility" :).
-> 
-> > Also, I wonder if we should also support restricting *reads* from mounted
-> > block devices?
-> 
-> I don't see a strong usecase for this. Why would mounted vs unmounted
-> matter here?
-> 
-> 								Honza
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
