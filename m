@@ -2,95 +2,75 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29418EB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 07:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68870EB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 08:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241790AbjFOHWv convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 03:22:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41364 "EHLO
+        id S243910AbjFOIGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 04:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244787AbjFOHWS (ORCPT
+        with ESMTP id S233955AbjFOIGF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 03:22:18 -0400
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 444C112E;
-        Thu, 15 Jun 2023 00:21:45 -0700 (PDT)
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-46e9af5f2dfso503911e0c.3;
-        Thu, 15 Jun 2023 00:21:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686813704; x=1689405704;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hn71mLncpr2dBLJLDyOG+/F3PHayIULue0eyh7Gy5ps=;
-        b=MnMpCGrAh3xN9tWVNH84mMW9kkMhTvBrpnINp+CA25BqdEKYPx4lgkCyBJrxVrdqby
-         XW4Iy0198zXiHR7UpTzy/6PI6PL16O2utythSZgWnMsDy7wd4IuEcpAKGL/zK/dzn1/1
-         63QRADvrEiHc/TlELNgiBjv5m9wS4LzZF/MSgmPWE0HsyM6aasPTEmvDdJxDzEm5OS21
-         HuH4uZEpL0DRl5/1Z28Cyfdk0e1XptyvrZR3pgGACak/aWUu8uyz7TALqnTaVuAYar26
-         IY1yA2zld2k+kxw9+PcGGrZ2L8HNKrlTFPnYRao4agWrL3/m4e7yakkqSPmEFBAaEXcM
-         hIMg==
-X-Gm-Message-State: AC+VfDyVyQXSOpEVvssk0Sw7Uzwb0uNeOu32iFZpf04F+UmG1rgbnaqI
-        T4H2i3OB2tAlYv6NNiI226LHYouZoHfFCA==
-X-Google-Smtp-Source: ACHHUZ4zTgrcIQrQ03XlF1ED8ngRlTxDQyyimeUTDvmpKWzSyht9WMmVNM8ZjtiJKHhk0CSqpHYOTw==
-X-Received: by 2002:a1f:3dcf:0:b0:463:57aa:96b9 with SMTP id k198-20020a1f3dcf000000b0046357aa96b9mr8711241vka.8.1686813704080;
-        Thu, 15 Jun 2023 00:21:44 -0700 (PDT)
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com. [209.85.222.50])
-        by smtp.gmail.com with ESMTPSA id p12-20020a1fa60c000000b0045a62e76581sm2535090vke.45.2023.06.15.00.21.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jun 2023 00:21:43 -0700 (PDT)
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-78a3e1ed1deso1314167241.1;
-        Thu, 15 Jun 2023 00:21:43 -0700 (PDT)
-X-Received: by 2002:a05:6102:3168:b0:43f:4779:49cf with SMTP id
- l8-20020a056102316800b0043f477949cfmr3074669vsm.5.1686813703273; Thu, 15 Jun
- 2023 00:21:43 -0700 (PDT)
+        Thu, 15 Jun 2023 04:06:05 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA73E1709;
+        Thu, 15 Jun 2023 01:06:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686816364; x=1718352364;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=cE0imxgo5OZIB2fcU90wVkO4chUCAdIiRch7+SIGZ98=;
+  b=eLLmMuxsFcBLgHnJbBUC+IVMP0Ffb9LtO8MucPzbZ8DAk0leKnI6q2vV
+   zGQn3rQGEPj9zkLfLluFTjxAFmbFHK+kOdIlrvkGEXOcg+TrFXs+fqbGM
+   phaBNYpEYgIglaP+ONpqUWgjYWcDoCOkK0SSPkarxAxGmZDdqLmaD7qKf
+   YuMDxeBtO5e9Nb8hSAOFoMrctmcB2atm+09ujR7kwIUCUD+hcVkUMoyHc
+   WUCOy9Hyir73gAPxhYrLNdAlBYrjtgkUdo2Y55jAe6CWHVtAz3GtKittk
+   HXZcEB4+TlOXfJTQaRglrGAeO9b+267SkR3I8pl47qON6NOu4jBU0ykbS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="338471403"
+X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
+   d="scan'208";a="338471403"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 01:06:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="886563710"
+X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
+   d="scan'208";a="886563710"
+Received: from mtkaczyk-mobl.ger.corp.intel.com (HELO localhost) ([10.249.136.207])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 01:06:02 -0700
+Date:   Thu, 15 Jun 2023 10:05:57 +0200
+From:   Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Song Liu <song@kernel.org>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: deprecate md bitmap file support
+Message-ID: <20230615100557.00003d8e@linux.intel.com>
+In-Reply-To: <20230615064840.629492-1-hch@lst.de>
+References: <20230615064840.629492-1-hch@lst.de>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-References: <20230615030837.8518-1-schmitzmic@gmail.com> <20230615030837.8518-3-schmitzmic@gmail.com>
- <20230615041742.GA4426@lst.de> <056834c7-89ca-c8cd-69be-62100f1e5591@gmail.com>
- <20230615055349.GA5544@lst.de>
-In-Reply-To: <20230615055349.GA5544@lst.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Thu, 15 Jun 2023 09:21:30 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdWyQnKUaNtxYjqpxXovFKNPmhQDeCXX=exrqtgOfSFUjw@mail.gmail.com>
-Message-ID: <CAMuHMdWyQnKUaNtxYjqpxXovFKNPmhQDeCXX=exrqtgOfSFUjw@mail.gmail.com>
-Subject: Re: [PATCH v10 2/3] block: change annotation of rdb_CylBlocks in affs_hardblocks.h
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, linux-m68k@vger.kernel.org, martin@lichtvoll.de,
-        fthain@linux-m68k.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Michael,
+On Thu, 15 Jun 2023 08:48:29 +0200
+Christoph Hellwig <hch@lst.de> wrote:
 
-Thanks for your patch!
+> Hi Song,
+> 
+> the md bitmap file support is very problematic in how it bypasses the
+> file system for file access.  I looked into fixing it in preparation
+> for making buffer_head optionals but had to give up because it is so
+> convoluted.  This series includes the cleanups I've started which seem
+> useful even for the internal bitmap support, then makes the bitmap file
+> support conditional and adds a deprecation warning.
+> 
+Hi Christoph,
+I think that it is worthy to make mdadm aware of that. For example, by requiring
+"--force" to make the volume with bitmap file now.
 
-On Thu, Jun 15, 2023 at 7:53 AM Christoph Hellwig <hch@lst.de> wrote:
-> On Thu, Jun 15, 2023 at 04:50:45PM +1200, Michael Schmitz wrote:
-> >> And as far as I can tell everything that is a __u32 here should
-> >> be an __be32 because it is a big endian on-disk format.  Why
-> >> would you change only a single field?
-> >
-> > Because that's all I needed, and wanted to avoid excess patch churn. Plus
-> > (appeal to authority here :-)) it's in keeping with what Al Viro did when
-> > the __be32 annotations were first added.
-> >
-> > I can change all __u32 to __be32 and drop the comment if that's preferred.
->
-> That would be great!
-
-I totally agree with Christoph.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Thanks,
+Mariusz
