@@ -2,57 +2,145 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A91AC0015E
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 09:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6DFEB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 09:44:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240593AbjFOJ2R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 05:28:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58856 "EHLO
+        id S240269AbjFOJoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 05:44:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241077AbjFOJ2O (ORCPT
+        with ESMTP id S241292AbjFOJoI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 05:28:14 -0400
-Received: from mail.lokoho.com (mail.lokoho.com [217.61.105.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C821709
-        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 02:28:13 -0700 (PDT)
-Received: by mail.lokoho.com (Postfix, from userid 1001)
-        id D2B94866D8; Thu, 15 Jun 2023 10:24:37 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lokoho.com; s=mail;
-        t=1686821085; bh=Z0N5VlX9/JlryGOL5I747Le9USomZJCRNNGRT3LbbKc=;
-        h=Date:From:To:Subject:From;
-        b=oWUc8SwrQ6bsYey3DKXkuA2FWfTCvtMb39pOJmHxvMOVVA4nE1L28trXgpllty+8k
-         STLqks5ZW4lvaJJ6a+36e8E51+Hu9wspzRb/tWKJgJwwebgMUDW557WXExCgkV102A
-         oPMHqwthLaxBgmy5+88X4tBYZ7xgMsWfZzDIXUUe4lOIS0B41uIwan8AQotke95hYk
-         f6jDfKX/NwYEw1DT6Ykhg2pBJiwIZefAKMkqS1iDPPm/oSfB+PVOmJekQOy/OCKkbJ
-         yHSF/Sf491uQoGv+6oMwo7T9kKn40OCszHi0pxx2fTKd3Yy6zkO8FGgQLQdqDt2Fq6
-         8vzJ5TClP/+aw==
-Received: by mail.lokoho.com for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 09:21:26 GMT
-Message-ID: <20230615094301-0.1.6n.2mcm7.0.kl0i5cmq8o@lokoho.com>
-Date:   Thu, 15 Jun 2023 09:21:26 GMT
-From:   "Adam Charachuta" <adam.charachuta@lokoho.com>
-To:     <linux-block@vger.kernel.org>
-Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
-X-Mailer: mail.lokoho.com
+        Thu, 15 Jun 2023 05:44:08 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 750F61FC3;
+        Thu, 15 Jun 2023 02:44:04 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 35DD11FDDA;
+        Thu, 15 Jun 2023 09:44:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1686822243; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8mZXGVDy7NrN3aij1vIxeuv9Sp9HUIfolXkpk9DhWX4=;
+        b=b+y5foYoqvXUdSjUpwU93sTqKASFJKgL8m8K2JndWDSYrBrpRpxf0esMpGfhwZJiWXEV6s
+        1TCDb9t9oo+027hsMgblTh4yOAI0uQVO1BprFm7EswnODB4XnVtHFnNy8qaEJeM1JA6RVh
+        /w7atwZqnFnHDTvYpS+Li5b458i7GE4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1686822243;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8mZXGVDy7NrN3aij1vIxeuv9Sp9HUIfolXkpk9DhWX4=;
+        b=VucCVkAf0fAnXI367JMpxwO4xeWpbXQ/dSxLfHOAG7WKuqvY0O2rdLikm7yo9kQth/XZTH
+        Q6pVV8g4iFeNFBDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 281B313A47;
+        Thu, 15 Jun 2023 09:44:03 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id EFiZCWPdimRQWgAAMHmgww
+        (envelope-from <dwagner@suse.de>); Thu, 15 Jun 2023 09:44:03 +0000
+From:   Daniel Wagner <dwagner@suse.de>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro@fastmail.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        James Smart <jsmart2021@gmail.com>,
+        Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH v1 1/2] nvme-fc: Do not wait in vain when unloading module
+Date:   Thu, 15 Jun 2023 11:43:55 +0200
+Message-Id: <20230615094356.14878-2-dwagner@suse.de>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230615094356.14878-1-dwagner@suse.de>
+References: <20230615094356.14878-1-dwagner@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,
+The module unload code will wait for a controller to be delete even when
+there is no controller and we wait for completion forever to happen.
+Thus only wait for the completion when there is a controller which
+needs to be removed.
 
-zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
-=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
-o dalszych rozm=C3=B3w.=20
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+ drivers/nvme/host/fc.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
-=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
-=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
-strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 2ed75923507d..472ed285fd45 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -3932,10 +3932,11 @@ static int __init nvme_fc_init_module(void)
+ 	return ret;
+ }
+ 
+-static void
++static bool
+ nvme_fc_delete_controllers(struct nvme_fc_rport *rport)
+ {
+ 	struct nvme_fc_ctrl *ctrl;
++	bool cleanup = false;
+ 
+ 	spin_lock(&rport->lock);
+ 	list_for_each_entry(ctrl, &rport->ctrl_list, ctrl_list) {
+@@ -3943,21 +3944,28 @@ nvme_fc_delete_controllers(struct nvme_fc_rport *rport)
+ 			"NVME-FC{%d}: transport unloading: deleting ctrl\n",
+ 			ctrl->cnum);
+ 		nvme_delete_ctrl(&ctrl->ctrl);
++		cleanup = true;
+ 	}
+ 	spin_unlock(&rport->lock);
++
++	return cleanup;
+ }
+ 
+-static void
++static bool
+ nvme_fc_cleanup_for_unload(void)
+ {
+ 	struct nvme_fc_lport *lport;
+ 	struct nvme_fc_rport *rport;
++	bool cleanup = false;
+ 
+ 	list_for_each_entry(lport, &nvme_fc_lport_list, port_list) {
+ 		list_for_each_entry(rport, &lport->endp_list, endp_list) {
+-			nvme_fc_delete_controllers(rport);
++			if (nvme_fc_delete_controllers(rport))
++				cleanup = true;
+ 		}
+ 	}
++
++	return cleanup;
+ }
+ 
+ static void __exit nvme_fc_exit_module(void)
+@@ -3967,10 +3975,8 @@ static void __exit nvme_fc_exit_module(void)
+ 
+ 	spin_lock_irqsave(&nvme_fc_lock, flags);
+ 	nvme_fc_waiting_to_unload = true;
+-	if (!list_empty(&nvme_fc_lport_list)) {
+-		need_cleanup = true;
+-		nvme_fc_cleanup_for_unload();
+-	}
++	if (!list_empty(&nvme_fc_lport_list))
++		need_cleanup = nvme_fc_cleanup_for_unload();
+ 	spin_unlock_irqrestore(&nvme_fc_lock, flags);
+ 	if (need_cleanup) {
+ 		pr_info("%s: waiting for ctlr deletes\n", __func__);
+-- 
+2.40.1
 
-Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
-
-
-Pozdrawiam
-Adam Charachuta
