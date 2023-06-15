@@ -2,97 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B55C1EB64D8
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 02:22:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BAAEEB64D8
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 02:24:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237209AbjFOCWg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Jun 2023 22:22:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58634 "EHLO
+        id S241224AbjFOCY0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Jun 2023 22:24:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238059AbjFOCWf (ORCPT
+        with ESMTP id S237432AbjFOCY0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Jun 2023 22:22:35 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EE4268C
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 19:22:33 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-656bc570a05so1716631b3a.0
-        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 19:22:33 -0700 (PDT)
+        Wed, 14 Jun 2023 22:24:26 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5380C1BF9
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 19:24:25 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b0338fac5dso9675965ad.0
+        for <linux-block@vger.kernel.org>; Wed, 14 Jun 2023 19:24:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686795753; x=1689387753;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6+OtGQ2U+RZAIcscS2go2xf62JKef1IHh4L17JllKOY=;
-        b=P+60U1KmK3vxLi6XhvFRbuCoFSKs2SXKamBCuvwoLyumGocZ5pS2ehUh9KTegWxst5
-         LiWNZon1uQlkjV8QPcEZDNmexE9NeumBIOGksqYwD0Nx9a4imOOBbAVkQKtizeAppYiv
-         A3kCQNW8ezLu5oQSwEaoiDW8JT774Iv3x8S+coUBnAcNv9bEpuyojRigimm7YhN/wOO9
-         AYbDnKd8AHfykwl3sN1ynlovSjowHoZQ3fF7UAc2iYvZwd0SX8EIgaHiQ/p+P47FITsi
-         caa0mvesS5eZ0cnXEvm5zCFdRt9guChrq26iUdKPAwUnC+8+9IwR2CNtPddpSEBbrPiP
-         KLuA==
+        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686795865; x=1689387865;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RSR50Y8VWLWHMMq4nms0HKVmdE5u9BBnFe5bAJ0HtnY=;
+        b=w1vYVgJzS9pjyHpDGocrQGNlRMjxacXj+jIRXxU0M+NratXeH2J2xuxppoGEHZSovM
+         K6SGNblnvVnW6J4J5WrkRU6J8XezgqcuX8cZPLTROTqY8UMesNzmU+GCI+7XCjo4hjwz
+         0BrieDbaOjOvWm1XYpyddJtBmirQsd6sdsbIL0mi+tEBwpZ3WIbpS2n8aghMYuUSABVQ
+         erOBT//6m+9y5vr809Yj0aLal+bzxoqzyvSia9giXgmhe/rPjPJkK39vcH00NV97cwxR
+         XCILag4gHkBoyy4IO2LZZrn04hbQJWqxpd6ubLSSRazSfGgF7vx1MpiPC+5RUO4eoLr1
+         BZ3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686795753; x=1689387753;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+OtGQ2U+RZAIcscS2go2xf62JKef1IHh4L17JllKOY=;
-        b=DvdPC7/FXra/c8rr7Nur61bHsAIDewo4ajNQ0QjGKTS1AVqeGrfUCqlhAdff8qoDBV
-         0+yYR3FmIU9gDZshpoSbZQ+UCuhYyEfM+IoN+XmAm9tm99/cUus40cE4bEJ9mh+KrvYx
-         UPErXasw/M+ntqf5ix3PzyANs3virVGBin9xbkiz6GDsnfKlclYCKgp+Kl32Gu91JA9C
-         6ZWbJIy9VMZCJweT9Xjoq406AbpStBel0kbwhxfKCXkkTs5VCFtR3inqugOLrbD0VjSh
-         Yzb+J/M4tRPqaESb4bjZmxdHaFdVuWUriv67/zLyR97V1E8BCeDgNF6w9yVuAW4Agrxy
-         2gGQ==
-X-Gm-Message-State: AC+VfDy2ny8Qh2Sj0Zt6eW4VcgY/B32t4m2g1K1xGI2EReR81aknZ/B0
-        //iHYcNpI+eh6kwAberZXybCgA==
-X-Google-Smtp-Source: ACHHUZ4w60/za3x3+f3zN+/SvlWwue/H+HEY3+BGoHy45Vxh0dd1Gnpnyiq97D5jk2mf22OAJzpdVQ==
-X-Received: by 2002:a05:6a20:3d28:b0:117:2125:559d with SMTP id y40-20020a056a203d2800b001172125559dmr21359267pzi.4.1686795753253;
-        Wed, 14 Jun 2023 19:22:33 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id y23-20020aa78557000000b0064cb0845c77sm10933821pfn.122.2023.06.14.19.22.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jun 2023 19:22:32 -0700 (PDT)
-Message-ID: <5041fc15-2c6c-b91e-6fb6-5eac740f75eb@kernel.dk>
-Date:   Wed, 14 Jun 2023 20:22:31 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v6 0/8] Support limits below the page size
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Sandeep Dhavale <dhavale@google.com>,
-        Juan Yescas <jyescas@google.com>
-References: <20230612203314.17820-1-bvanassche@acm.org>
+        d=1e100.net; s=20221208; t=1686795865; x=1689387865;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RSR50Y8VWLWHMMq4nms0HKVmdE5u9BBnFe5bAJ0HtnY=;
+        b=cd7FZ0DYPWE/H6+KZAr+i1neoqktuj+qPXBuI0vpmikw1XdVEGvHk15BTffvxXqIzO
+         kWTTxH1iRTBnT405VjJm49/fgsl/zLhxAncxHvTyqTXYVSr3XkuArskn3va7uZGkjwwd
+         rN2BROylTCXxzkMPptKNuEbD3MmjIi4llm+NpJDjU3QFY0GVrTDaXSIHDIHwMrNp4cmx
+         bxWV20X1N8cI/exKAXUBjMgWOEtEns7umE/kfrhfnO6B5/Lm+IV4H+OVmCr6YpdJwoL6
+         CpaztQbqmBiMdGHuBUog8WY++7FP7T39zCYm9QilAEWgIwlY43kdsIgHsJ+54G5Ghlbw
+         0sgw==
+X-Gm-Message-State: AC+VfDwandB0BXV89ZessS1sDhPzFRq1uAuUGhtJ/PZx8EiTzuNdl/PE
+        SU0WcX6rUgfYqrJxE3fslQ33diff8BX5btq+fcU=
+X-Google-Smtp-Source: ACHHUZ5D2OcFpcRCZ+WTQ8jJZZpZqq2lo8r/m6n+auc6W6Vc799H8O2HZWqfA6aNnF4o9Emqd8jxpA==
+X-Received: by 2002:a17:902:f682:b0:1b3:d4bb:3515 with SMTP id l2-20020a170902f68200b001b3d4bb3515mr11038855plg.0.1686795864826;
+        Wed, 14 Jun 2023 19:24:24 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id u11-20020a170902714b00b001ae0b373382sm12977035plm.198.2023.06.14.19.24.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jun 2023 19:24:24 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20230612203314.17820-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To:     hch@lst.de, dgilbert@interlog.com, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com, yangerkun@huawei.com
+In-Reply-To: <20230610022003.2557284-1-yukuai1@huaweicloud.com>
+References: <20230610022003.2557284-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v5 0/3] fix blktrace debugfs entries leakage
+Message-Id: <168679586333.2051714.1943947298850230853.b4-ty@kernel.dk>
+Date:   Wed, 14 Jun 2023 20:24:23 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/12/23 2:33?PM, Bart Van Assche wrote:
-> Hi Jens,
+
+On Sat, 10 Jun 2023 10:20:00 +0800, Yu Kuai wrote:
+> Changes in v5:
+>  - blk_trace_shutdown() can't be used for module, add a new patch to use
+>  inline function for blk_trace_remove() to fix build warning from v3.
+>  - add review tag for patch 2,3 that is the same from v3.
 > 
-> We want to improve Android performance by increasing the page size
-> from 4 KiB to 16 KiB. However, some of the storage controllers we care
-> about do not support DMA segments larger than 4 KiB. Hence the need
-> support for DMA segments that are smaller than the size of one virtual
-> memory page. This patch series implements that support. Please
-> consider this patch series for the next merge window.
+> Changes in v4:
+>  - blk_trace_remove() will trigger build warning if blktrace config is
+>  not enabled, use blk_trace_shutdown() instead.
+> 
+> [...]
 
-I'm usually a fan of putting code in the core so we don't have to in
-drivers, that's how most of the block layer is designed. But this seems
-niche enough that perhaps it's worth considering just remapping these in
-the driver? It's peppering changes all over delicate parts of the core
-for cases that 99.9% don't need to worry about or should worry about.
-I will say that I do think the patches do look better than they did in
-earlier versions, however.
+Applied, thanks!
 
-Maybe we've already discussed this before, but let's please have the
-discussion again. Because I'd really love to avoid this code, if at all
-possible.
+[1/3] blktrace: use inline function for blk_trace_remove() while blktrace is disabled
+      commit: cbe7cff4a76bc749dd70264ca5cf924e2adf9296
+[2/3] scsi: sg: fix blktrace debugfs entries leakage
+      commit: db59133e927916d8a25ee1fd8264f2808040909d
+[3/3] block: fix blktrace debugfs entries leakage
+      commit: dd7de3704af9989b780693d51eaea49a665bd9c2
 
+Best regards,
 -- 
 Jens Axboe
+
+
 
