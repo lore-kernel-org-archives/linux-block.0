@@ -2,100 +2,84 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FE2EB64DA
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 13:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B40EB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 13:56:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344275AbjFONet (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 09:34:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44498 "EHLO
+        id S1344841AbjFON4I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 09:56:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344124AbjFONeO (ORCPT
+        with ESMTP id S1344789AbjFON4A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 09:34:14 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C253B30F8
-        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 06:33:47 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6664ac3be47so396385b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 06:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686836027; x=1689428027;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sVR+vT8DdsvA3Z3S0QOP6jSANdRArM8WL8xik+euJ7U=;
-        b=DEJZBn0jRo+nrmjAYfVbkW/mbWTo9TPUh5Zk5FdEZ9pNqXulFJpZdIL6dCbj+nxtYS
-         zcZv11ORnK6I++2adpuFhjl0ft85vJq3OrXtav0aI4US0+3khl91+a+ZlJDjLB7gWOV3
-         TL/LSTeYzjcZht0650UgDtwxgCQToPTz4Uzvkm/KwSKr+RKEp0szPSV+3yrBpWxmz8aF
-         BGLXUncI1pi+EeL4aNxttKZJn2qmvi5Hv1XuwsJh3/vCgx6DZU8SLeXeo0PgjwCmr6RU
-         lrTtxLpVwmaHEHOVBQTylSMH/9Qk0C2lntzNe91kKp6XtrlCCXay1JBOj9YToZZZ+RIj
-         MWdg==
+        Thu, 15 Jun 2023 09:56:00 -0400
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA5D1FC3
+        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 06:55:38 -0700 (PDT)
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6b426eb7e81so1801396a34.0
+        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 06:55:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686836027; x=1689428027;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sVR+vT8DdsvA3Z3S0QOP6jSANdRArM8WL8xik+euJ7U=;
-        b=d/66j3kFjL7YjKaP8x0KkpujVMV4Q5YcW8c50anjMzIpCKq773Q0TPGkCxDuCFEqzA
-         y/YVnvsb+5oRmgV3mq1B98HY1f5DaxKDcaiDwkJ4ikwmV5XzaJjJp9OYP4k20hxYkhww
-         nUJfRowKWorX56+Sa2oUsFmijQx4tKP+PipIMAlWNhlHB3kU2C+Qwzxi1fX/PkhPJmdr
-         F3ZAlDuzsyWsvYhLhorp4Jvspw4PYwQceD3mCV/mBXs9h/YTyUxCZVbaC5AxdX4kjmdP
-         CoQ0X6DSGoVcbyaIt9cf4ROfG/o6JA2Zu3ctQgNidmfrElj8muhb3vuMT47syjQwoQ73
-         AKrw==
-X-Gm-Message-State: AC+VfDwTcrjBD/OXqzgkdQ3vKp6btNdGMgjTuJOjJ91hcDNOf77Cutfl
-        Hee9dJhfPLEJQGQMm6I2WXFUDA==
-X-Google-Smtp-Source: ACHHUZ4hYDWKSnGc0F3oLOsil5ywgqcuGr7h8N6KfecEA3vYODtqH0U/YpLcDAf/Ug39JuiuTrNGXw==
-X-Received: by 2002:a05:6a20:8e19:b0:11a:efaa:eb88 with SMTP id y25-20020a056a208e1900b0011aefaaeb88mr15781079pzj.3.1686836026892;
-        Thu, 15 Jun 2023 06:33:46 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x17-20020aa793b1000000b00640dbf177b8sm12062928pff.37.2023.06.15.06.33.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 06:33:45 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20230615121223.22502-1-colyli@suse.de>
-References: <20230615121223.22502-1-colyli@suse.de>
-Subject: Re: [PATCH 0/6] bcache-next 20230615
-Message-Id: <168683602549.2139966.16055841086380737489.b4-ty@kernel.dk>
-Date:   Thu, 15 Jun 2023 07:33:45 -0600
+        d=1e100.net; s=20221208; t=1686837337; x=1689429337;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b4U30jEpHQMdQo/ctm8QjpR5L8CIHwce7o4fRrt3t6w=;
+        b=AwbwSpCYWSq63DjGFZdKx6zGwuswETijBwplGanaMf2oF4ZL5iHDqUli7bM9sOoIL1
+         9f/oSqvFOdz7Tri6aZ9LBZSPFtK1bmHU+mEzXmDb4YoSPs91HzOxcqZSJFsA8mfUXkaz
+         FTcO5gKnMwHSPnqhMYXKAEmUcn1tmct7g/pE5eDoqaLFtgrRbj28S3a2/gQ4HZbHMHAR
+         A6T/wiQ+QAipjC1rPr14KhW1QZ5i+BTI/Jm7tkjbc30hDzhO5ghSPDyQbWrPEc+ZKaC7
+         +aeztZaO371gwvsoSQWNvKSzMlIo4JHZhMPtmNkVwTbAGO302snTFEbnsmZ+m/Uo2uYv
+         5DrA==
+X-Gm-Message-State: AC+VfDwqXbx3CwPDS8CBRVBFU/WWJHP13mf9v+wLhXZwC+iZelrCWMZD
+        gzVGLNqg2qcsIxWg2QlmKzY=
+X-Google-Smtp-Source: ACHHUZ5wGZfTDONajWxKH3sNvxJEIsAr4BNl5zW1VwCO5E+gLCb5rrcrEQgPgKvvcw6EOsPVARoDQQ==
+X-Received: by 2002:a05:6358:edd:b0:12b:dc3e:34c8 with SMTP id 29-20020a0563580edd00b0012bdc3e34c8mr9098829rwh.4.1686837337219;
+        Thu, 15 Jun 2023 06:55:37 -0700 (PDT)
+Received: from [192.168.50.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id j8-20020a635948000000b0054fb537ca5dsm4896050pgm.92.2023.06.15.06.55.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jun 2023 06:55:36 -0700 (PDT)
+Message-ID: <1d55e942-5150-de4c-3a02-c3d066f87028@acm.org>
+Date:   Thu, 15 Jun 2023 06:55:36 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v6 0/8] Support limits below the page size
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
+        Sandeep Dhavale <dhavale@google.com>,
+        Juan Yescas <jyescas@google.com>
+References: <20230612203314.17820-1-bvanassche@acm.org>
+ <5041fc15-2c6c-b91e-6fb6-5eac740f75eb@kernel.dk>
+ <20230615041537.GB4281@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20230615041537.GB4281@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-c6835
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 6/14/23 21:15, Christoph Hellwig wrote:
+> I really hate having this core complexity, but I suspect trying to driver
+> hacks would be even worse than that, especially as this goes through
+> the SCSI midlayer.  I think the answer is simply that if Google keeps
+> buying broken hardware for their products from Samsung they just need
+> to stick to a 4k page size instead of moving to a larger one.
 
-On Thu, 15 Jun 2023 20:12:17 +0800, Coly Li wrote:
-> I start to follow Song Liu's -next style to submit bcache patches to
-> you. This series are minor fixes I tested for a while, and generated
-> based on top of the for-6.5/block branch from linux-block tree.
-> 
-> The patch from Mingzhe Zou fixes a race in bcache initializaiton time,
-> rested patches from Andrea, Thomas, Zheng and Ye are code cleanup and
-> good to have them in.
-> 
-> [...]
+Although I do not like it that the Exynos UFS controller does not follow 
+the UFS standard, this UFS controller is used much more widely than only 
+in devices produced by my employer. See e.g. the output of the following 
+grep command:
 
-Applied, thanks!
+$ git grep -nH '\.compatible' */*/ufs-exynos.c
+drivers/ufs/host/ufs-exynos.c:1739:	{ .compatible = "samsung,exynos7-ufs",
+drivers/ufs/host/ufs-exynos.c:1741:	{ .compatible = 
+"samsung,exynosautov9-ufs",
+drivers/ufs/host/ufs-exynos.c:1743:	{ .compatible = 
+"samsung,exynosautov9-ufs-vh",
+drivers/ufs/host/ufs-exynos.c:1745:	{ .compatible = "tesla,fsd-ufs",
 
-[1/6] bcache: Convert to use sysfs_emit()/sysfs_emit_at() APIs
-      commit: a301b2deb66cd93bae0f676702356273ebf8abb6
-[2/6] bcache: make kobj_type structures constant
-      commit: b98dd0b0a596fdeaca68396ce8f782883ed253a9
-[3/6] bcache: Remove dead references to cache_readaheads
-      commit: ccb8c3bd6d93e7986b702d1f66d5d56d08abc59f
-[4/6] bcache: Remove some unnecessary NULL point check for the return value of __bch_btree_node_alloc-related pointer
-      commit: 028ddcac477b691dd9205c92f991cc15259d033e
-[5/6] bcache: Fix __bch_btree_node_alloc to make the failure behavior consistent
-      commit: 80fca8a10b604afad6c14213fdfd816c4eda3ee4
-[6/6] bcache: fixup btree_cache_wait list damage
-      commit: f0854489fc07d2456f7cc71a63f4faf9c716ffbe
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+Bart.
