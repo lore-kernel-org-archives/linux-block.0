@@ -2,75 +2,108 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68870EB64D9
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 08:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44015EB64DB
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 08:12:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243910AbjFOIGK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 04:06:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43626 "EHLO
+        id S239935AbjFOIMq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 04:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233955AbjFOIGF (ORCPT
+        with ESMTP id S239764AbjFOIMn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 04:06:05 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA73E1709;
-        Thu, 15 Jun 2023 01:06:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686816364; x=1718352364;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cE0imxgo5OZIB2fcU90wVkO4chUCAdIiRch7+SIGZ98=;
-  b=eLLmMuxsFcBLgHnJbBUC+IVMP0Ffb9LtO8MucPzbZ8DAk0leKnI6q2vV
-   zGQn3rQGEPj9zkLfLluFTjxAFmbFHK+kOdIlrvkGEXOcg+TrFXs+fqbGM
-   phaBNYpEYgIglaP+ONpqUWgjYWcDoCOkK0SSPkarxAxGmZDdqLmaD7qKf
-   YuMDxeBtO5e9Nb8hSAOFoMrctmcB2atm+09ujR7kwIUCUD+hcVkUMoyHc
-   WUCOy9Hyir73gAPxhYrLNdAlBYrjtgkUdo2Y55jAe6CWHVtAz3GtKittk
-   HXZcEB4+TlOXfJTQaRglrGAeO9b+267SkR3I8pl47qON6NOu4jBU0ykbS
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="338471403"
-X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
-   d="scan'208";a="338471403"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 01:06:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10741"; a="886563710"
-X-IronPort-AV: E=Sophos;i="6.00,244,1681196400"; 
-   d="scan'208";a="886563710"
-Received: from mtkaczyk-mobl.ger.corp.intel.com (HELO localhost) ([10.249.136.207])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2023 01:06:02 -0700
-Date:   Thu, 15 Jun 2023 10:05:57 +0200
-From:   Mariusz Tkaczyk <mariusz.tkaczyk@linux.intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Song Liu <song@kernel.org>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: deprecate md bitmap file support
-Message-ID: <20230615100557.00003d8e@linux.intel.com>
-In-Reply-To: <20230615064840.629492-1-hch@lst.de>
-References: <20230615064840.629492-1-hch@lst.de>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Thu, 15 Jun 2023 04:12:43 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47AAE26B8
+        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 01:12:37 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-4f6283d0d84so10108682e87.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 01:12:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=philpotter-co-uk.20221208.gappssmtp.com; s=20221208; t=1686816755; x=1689408755;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zGTiHQrhaAJSUC61c2YPaRGro3EmyDPsldMcLZccS04=;
+        b=rnSud88z3yGn24afsyPHfViHe3GRRLhOk7w3aqRFK5pcfOL54c8yNkvG4URKJODzV3
+         74AGtUxjwjQhXOF5a7bk0Kv3rrCdrraecgKCjwCAu/Mtfp0TdhKq8eDJL4FT5pI4rNfm
+         d4QeJwuQmE7zAzeXc3ie0OtZwQSbLLpAH/qvQlKC4WZCoVq19HJTqEtksbR7OXvvCSrH
+         OLY6zyvpV8D5PcRKLJUPhdAgSqXS+ZgwMpkxrYIU6uiux6QOFC99fpZtJghJKfsYzRz5
+         65EYLHqCJnxH7sAurcyKyIflxlN2ooFSdAOU+qV5g539xzq2IZiGKQBYfdy52wtZom0G
+         shRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686816755; x=1689408755;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zGTiHQrhaAJSUC61c2YPaRGro3EmyDPsldMcLZccS04=;
+        b=h9qPBWxxAGEu96hHVqTjEYHCTUHUQkN/VQM3vfktbXpel0QgBekRmIrGRLr+OVsAz+
+         PLIm5WA0JsnLLshTtZbNY9wXjLbO5MkadnakCfhdJGgJ9ZBy8wjVdWrVH6/xzz8yAYr6
+         uf1X3JyNoAo6OdPyKFWjROCbXipyV1QUBBxlU+ZxKxJsE0wMBVNycv6ivraFLlKAZ6IR
+         CN7b4TcCtQHSsZ7t4WpGjvODWH7YGDHcCynWGusqB1oW3dnfn4zCBUJjlD1MhKk3eArN
+         WsU02JxbhMVO+/QP9nlRC9mwOw+/b3+0DEEineAw4Oa0uaWtdavq1GAmCHjo+VeNm+9T
+         nYfQ==
+X-Gm-Message-State: AC+VfDwgq5md2bGeV329S8lzlZGpY740OCu9q9Q0qQpNfdGRctyj8hbI
+        1LZkcQQge2AFeZc0raGUzaqKKFu/UYQF93v4unqj7w==
+X-Google-Smtp-Source: ACHHUZ7++tlNQo4pbEToMtpZEUEumJTy3i0Hm6NVXk3Oq8jUwvT2dviPsNY/5jQvVsXomuzu7Z+ymw==
+X-Received: by 2002:ac2:4e8a:0:b0:4f8:4673:26ca with SMTP id o10-20020ac24e8a000000b004f8467326camr264155lfr.47.1686816755378;
+        Thu, 15 Jun 2023 01:12:35 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
+        by smtp.gmail.com with ESMTPSA id a3-20020a056000050300b003068f5cca8csm20186044wrf.94.2023.06.15.01.12.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jun 2023 01:12:34 -0700 (PDT)
+Date:   Thu, 15 Jun 2023 09:12:33 +0100
+From:   Phillip Potter <phil@philpotter.co.uk>
+To:     Jordy Zomer <jordyzomer@google.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] cdrom: Fix spectre-v1 gadget
+Message-ID: <ZIrH8fMomznQWZGj@equinox>
+References: <20230612110040.849318-1-jordyzomer@google.com>
+ <20230612110040.849318-2-jordyzomer@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230612110040.849318-2-jordyzomer@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 15 Jun 2023 08:48:29 +0200
-Christoph Hellwig <hch@lst.de> wrote:
-
-> Hi Song,
+On Mon, Jun 12, 2023 at 11:00:40AM +0000, Jordy Zomer wrote:
+> This patch fixes a spectre-v1 gadget in cdrom.
+> The gadget could be triggered by,
+>  speculatviely bypassing the cdi->capacity check.
 > 
-> the md bitmap file support is very problematic in how it bypasses the
-> file system for file access.  I looked into fixing it in preparation
-> for making buffer_head optionals but had to give up because it is so
-> convoluted.  This series includes the cleanups I've started which seem
-> useful even for the internal bitmap support, then makes the bitmap file
-> support conditional and adds a deprecation warning.
+> Signed-off-by: Jordy Zomer <jordyzomer@google.com>
+> ---
+>  drivers/cdrom/cdrom.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-Hi Christoph,
-I think that it is worthy to make mdadm aware of that. For example, by requiring
-"--force" to make the volume with bitmap file now.
+> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+> index 416f723a2dbb..ecf2b458c108 100644
+> --- a/drivers/cdrom/cdrom.c
+> +++ b/drivers/cdrom/cdrom.c
+> @@ -264,6 +264,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/kernel.h>
+>  #include <linux/mm.h>
+> +#include <linux/nospec.h>
+>  #include <linux/slab.h> 
+>  #include <linux/cdrom.h>
+>  #include <linux/sysctl.h>
+> @@ -2329,6 +2330,9 @@ static int cdrom_ioctl_media_changed(struct cdrom_device_info *cdi,
+>  	if (arg >= cdi->capacity)
+>  		return -EINVAL;
+>  
+> +	/* Prevent arg from speculatively bypassing the length check */
+> +	barrier_nospec();
+> +
+>  	info = kmalloc(sizeof(*info), GFP_KERNEL);
+>  	if (!info)
+>  		return -ENOMEM;
+> -- 
+> 2.41.0.162.gfafddb0af9-goog
+> 
+Hi Jordy,
 
-Thanks,
-Mariusz
+Thanks for the patch, I will review/build it properly tonight after
+work, although at first glance it looks good to me. I'll be in touch.
+
+Regards,
+Phil Potter
