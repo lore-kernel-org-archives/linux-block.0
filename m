@@ -2,107 +2,126 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF04EB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 06:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47DAEB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 06:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244075AbjFOGek (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 02:34:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
+        id S229824AbjFOGuT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 02:50:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243769AbjFOGeJ (ORCPT
+        with ESMTP id S244524AbjFOGt5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 02:34:09 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74EAD2D73;
-        Wed, 14 Jun 2023 23:33:36 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B4E2D22323;
-        Thu, 15 Jun 2023 06:33:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1686810812; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LKb4/LPHtY0XYaNTrO1aD5csiltOHFQtIbms7/cEaA8=;
-        b=anVz8nIQMGRqFNaioPCf42++S+9a/l8YYCNBXI1IJiDHheXnJrojTxl7F+cr21P+Poeuya
-        JcpbmdEIPzwwvjuos+UCflr/tY4jGCgD9RgBHCJHJw70n3M5Bn5oJ7v0ID60TRw443GIPn
-        H9/phTpwRAlB/LoIIiJuKAJ77E9RYVQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1686810812;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LKb4/LPHtY0XYaNTrO1aD5csiltOHFQtIbms7/cEaA8=;
-        b=mJ16Sy4bfIEyNRLNFyNjB1MZE8XjkM01dDeeTPjRtouSQFdWw2IhGd3oxggakrtLLuUaGz
-        o+xsDtQNAjDqAwAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6E4F913467;
-        Thu, 15 Jun 2023 06:33:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 4XbGGbywimRZdQAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 15 Jun 2023 06:33:32 +0000
-Message-ID: <b5367951-ef57-023b-840a-4b4dea8be307@suse.de>
-Date:   Thu, 15 Jun 2023 08:33:31 +0200
+        Thu, 15 Jun 2023 02:49:57 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5618F35A2;
+        Wed, 14 Jun 2023 23:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=O5rqINDOhGBEmYmacIiPWpa7oZ33A3MhfQ9jfU86Orc=; b=2+DsE36xb63m2Zc84KQ7PH894I
+        rBMP3Eumf4cCd5fMxWkbnn02fO0xoSE17+5z48XreihvUbhHSR6pSw3tDDx2ELQQBPC9PHKuNTR/M
+        exCkuwhED4ypM0vwQAqANJRXIX6jLVrXoTAQ1a6Zo3eQkoiMGigVLRbm0rG4Tw1iOn9egHBlMteHg
+        yx5b0xMmoVOfBGykoSTNin6O3AddV83z8x3LNI4DRJAlOTrNFrCdadYdGa8vMPaXO/xj/z4yPxU4j
+        qQjq3hPUw28uuTUvv+H9UOw0gmdh6I14HlqPVELeQ7DFSSVxkY0vmaNf0nuiZ1aUyxBIUfN15oQjy
+        u9eBP/tw==;
+Received: from 2a02-8389-2341-5b80-8c8c-28f8-1274-e038.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:8c8c:28f8:1274:e038] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1q9gmq-00DuAV-2s;
+        Thu, 15 Jun 2023 06:48:53 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Song Liu <song@kernel.org>
+Cc:     linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [PATCH 04/11] md-bitmap: split file writes into a separate helper
+Date:   Thu, 15 Jun 2023 08:48:33 +0200
+Message-Id: <20230615064840.629492-5-hch@lst.de>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230615064840.629492-1-hch@lst.de>
+References: <20230615064840.629492-1-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 4/7] brd: make sector size configurable
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Dave Chinner <david@fromorbit.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Luis Chamberlain <mcgrof@kernel.org>
-References: <20230614114637.89759-1-hare@suse.de>
- <20230614114637.89759-5-hare@suse.de> <ZIp0qH3CAMr1mGzX@dread.disaster.area>
- <20230615055540.GA5561@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20230615055540.GA5561@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/23 07:55, Christoph Hellwig wrote:
-> On Thu, Jun 15, 2023 at 12:17:12PM +1000, Dave Chinner wrote:
->> On Wed, Jun 14, 2023 at 01:46:34PM +0200, Hannes Reinecke wrote:
->>> @@ -310,6 +312,10 @@ static int max_part = 1;
->>>   module_param(max_part, int, 0444);
->>>   MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
->>>   
->>> +static unsigned int rd_blksize = PAGE_SIZE;
->>> +module_param(rd_blksize, uint, 0444);
->>> +MODULE_PARM_DESC(rd_blksize, "Blocksize of each RAM disk in bytes.");
->>
->> This needs CONFIG_BLK_DEV_RAM_BLOCK_SIZE to set the default size
->> for those of us who don't use modular kernels....
-> 
-> You can set module parameter on the command line for built-in code
-> like brd.rd_blksize=8196
-> 
-> While we're at it, why that weird rd_ prefix for the parameter?
-> 
-Because that's what's used for all the existing parameters, too.
+Split the file write code out of write_page into a separate helper.
 
-We can remove it, though, but then we either have inconsistent naming
-(some parameters with 'rd_', others without), or break existing setups.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/md-bitmap.c | 48 +++++++++++++++++++++---------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-Cheers,
-
-Hannes
+diff --git a/drivers/md/md-bitmap.c b/drivers/md/md-bitmap.c
+index e4b466522d4e74..46fbcfc9d1fcac 100644
+--- a/drivers/md/md-bitmap.c
++++ b/drivers/md/md-bitmap.c
+@@ -296,33 +296,22 @@ static void write_sb_page(struct bitmap *bitmap, struct page *page, int wait)
+ }
+ 
+ static void md_bitmap_file_kick(struct bitmap *bitmap);
+-/*
+- * write out a page to a file
+- */
+-static void write_page(struct bitmap *bitmap, struct page *page, int wait)
+-{
+-	struct buffer_head *bh;
+ 
+-	if (bitmap->storage.file == NULL) {
+-		write_sb_page(bitmap, page, wait);
+-	} else {
+-
+-		bh = page_buffers(page);
+-
+-		while (bh && bh->b_blocknr) {
+-			atomic_inc(&bitmap->pending_writes);
+-			set_buffer_locked(bh);
+-			set_buffer_mapped(bh);
+-			submit_bh(REQ_OP_WRITE | REQ_SYNC, bh);
+-			bh = bh->b_this_page;
+-		}
++static void write_file_page(struct bitmap *bitmap, struct page *page, int wait)
++{
++	struct buffer_head *bh = page_buffers(page);
+ 
+-		if (wait)
+-			wait_event(bitmap->write_wait,
+-				   atomic_read(&bitmap->pending_writes)==0);
++	while (bh && bh->b_blocknr) {
++		atomic_inc(&bitmap->pending_writes);
++		set_buffer_locked(bh);
++		set_buffer_mapped(bh);
++		submit_bh(REQ_OP_WRITE | REQ_SYNC, bh);
++		bh = bh->b_this_page;
+ 	}
+-	if (test_bit(BITMAP_WRITE_ERROR, &bitmap->flags))
+-		md_bitmap_file_kick(bitmap);
++
++	if (wait)
++		wait_event(bitmap->write_wait,
++			   atomic_read(&bitmap->pending_writes) == 0);
+ }
+ 
+ static void end_bitmap_write(struct buffer_head *bh, int uptodate)
+@@ -429,6 +418,17 @@ static int read_page(struct file *file, unsigned long index,
+  * bitmap file superblock operations
+  */
+ 
++/*
++ * write out a page to a file
++ */
++static void write_page(struct bitmap *bitmap, struct page *page, int wait)
++{
++	if (bitmap->storage.file)
++		write_file_page(bitmap, page, wait);
++	else
++		write_sb_page(bitmap, page, wait);
++}
++
+ /*
+  * md_bitmap_wait_writes() should be called before writing any bitmap
+  * blocks, to ensure previous writes, particularly from
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+2.39.2
 
