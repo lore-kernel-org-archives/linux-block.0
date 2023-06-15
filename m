@@ -2,50 +2,57 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B59A5EB64DB
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 05:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4903EB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 05:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231789AbjFOFxy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 01:53:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59860 "EHLO
+        id S229677AbjFOFzp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 01:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbjFOFxx (ORCPT
+        with ESMTP id S233380AbjFOFzo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 01:53:53 -0400
+        Thu, 15 Jun 2023 01:55:44 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E8410E9;
-        Wed, 14 Jun 2023 22:53:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADDA010E9;
+        Wed, 14 Jun 2023 22:55:43 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7468067373; Thu, 15 Jun 2023 07:53:49 +0200 (CEST)
-Date:   Thu, 15 Jun 2023 07:53:49 +0200
+        id 2AB0267373; Thu, 15 Jun 2023 07:55:40 +0200 (CEST)
+Date:   Thu, 15 Jun 2023 07:55:40 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, linux-m68k@vger.kernel.org, geert@linux-m68k.org,
-        martin@lichtvoll.de, fthain@linux-m68k.org, stable@vger.kernel.org
-Subject: Re: [PATCH v10 2/3] block: change annotation of rdb_CylBlocks in
- affs_hardblocks.h
-Message-ID: <20230615055349.GA5544@lst.de>
-References: <20230615030837.8518-1-schmitzmic@gmail.com> <20230615030837.8518-3-schmitzmic@gmail.com> <20230615041742.GA4426@lst.de> <056834c7-89ca-c8cd-69be-62100f1e5591@gmail.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH 4/7] brd: make sector size configurable
+Message-ID: <20230615055540.GA5561@lst.de>
+References: <20230614114637.89759-1-hare@suse.de> <20230614114637.89759-5-hare@suse.de> <ZIp0qH3CAMr1mGzX@dread.disaster.area>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <056834c7-89ca-c8cd-69be-62100f1e5591@gmail.com>
+In-Reply-To: <ZIp0qH3CAMr1mGzX@dread.disaster.area>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 04:50:45PM +1200, Michael Schmitz wrote:
->> And as far as I can tell everything that is a __u32 here should
->> be an __be32 because it is a big endian on-disk format.  Why
->> would you change only a single field?
->
-> Because that's all I needed, and wanted to avoid excess patch churn. Plus 
-> (appeal to authority here :-)) it's in keeping with what Al Viro did when 
-> the __be32 annotations were first added.
->
-> I can change all __u32 to __be32 and drop the comment if that's preferred.
+On Thu, Jun 15, 2023 at 12:17:12PM +1000, Dave Chinner wrote:
+> On Wed, Jun 14, 2023 at 01:46:34PM +0200, Hannes Reinecke wrote:
+> > @@ -310,6 +312,10 @@ static int max_part = 1;
+> >  module_param(max_part, int, 0444);
+> >  MODULE_PARM_DESC(max_part, "Num Minors to reserve between devices");
+> >  
+> > +static unsigned int rd_blksize = PAGE_SIZE;
+> > +module_param(rd_blksize, uint, 0444);
+> > +MODULE_PARM_DESC(rd_blksize, "Blocksize of each RAM disk in bytes.");
+> 
+> This needs CONFIG_BLK_DEV_RAM_BLOCK_SIZE to set the default size
+> for those of us who don't use modular kernels....
 
-That would be great!
+You can set module parameter on the command line for built-in code
+like brd.rd_blksize=8196
+
+While we're at it, why that weird rd_ prefix for the parameter?
 
