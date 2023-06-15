@@ -2,49 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3807EB64DB
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 05:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE899EB64DC
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 06:05:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237867AbjFOF6l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 01:58:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
+        id S238331AbjFOGFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 02:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239987AbjFOF6h (ORCPT
+        with ESMTP id S243481AbjFOGEL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 01:58:37 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173EE270C;
-        Wed, 14 Jun 2023 22:58:35 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 912AB67373; Thu, 15 Jun 2023 07:58:31 +0200 (CEST)
-Date:   Thu, 15 Jun 2023 07:58:31 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     Hannes Reinecke <hare@suse.de>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH 1/2] highmem: Add memcpy_to_folio()
-Message-ID: <20230615055831.GA5609@lst.de>
-References: <20230614114637.89759-1-hare@suse.de> <20230614134853.1521439-1-willy@infradead.org>
+        Thu, 15 Jun 2023 02:04:11 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA5F295B;
+        Wed, 14 Jun 2023 23:03:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hRjaMQchwaDw51gYY0A6pzxnY9mg2ZrdZZNaLj4dZeA=; b=2hlMq+ya9mZtwNO3r77yfR79wx
+        jteAUkH60G2v+Yo4PufzKQT8JLVtKTUoRCQO1Pv3W3rJro3RDat/Gqx84gGOdEO1xgpa+c8tz6SF/
+        oiLLUuc0aE4g9+haEXR6sNQObtZTm56QUaTd3whFwOYuPNEpMe1d98L9iQEEWGptFPFKtb+3LbVCF
+        hZUZrP7OpDQRiryZRmVJCKy/rGCwv73AISmQHKFv98u66P13D3PksbofOHp/Lj1+x//HllJDN0Pje
+        DPlnLFq/lFc7t3/gbMVBFZaQxUCvWS8EGwoZEBX4rAONc7d5ffPgH6iu5nYoPoV6DOxnIqrPh51S0
+        pA/4zdpA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1q9g5C-00DnhB-0u;
+        Thu, 15 Jun 2023 06:03:46 +0000
+Date:   Wed, 14 Jun 2023 23:03:46 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ayush Jain <ayush.jain3@amd.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "sfr@canb.auug.org.au" <sfr@canb.auug.org.au>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "Karny, Wyes" <Wyes.Karny@amd.com>, Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "V, Narasimhan" <Narasimhan.V@amd.com>,
+        "Shetty, Kalpana" <Kalpana.Shetty@amd.com>,
+        "Shukla, Santosh" <Santosh.Shukla@amd.com>
+Subject: Re: Kernel null pointer dereference on stopping raid device
+Message-ID: <ZIqpwhu4Tfa9MDzM@infradead.org>
+References: <e78344ad-8d57-91d8-0bfb-724c740c7c72@amd.com>
+ <3c4911c4-d3d7-a93e-5f14-e97384ae4f21@amd.com>
+ <ZIlqvsZ6nMv2OT2u@infradead.org>
+ <IA1PR12MB61375A452083D65B5FB815DBBA5AA@IA1PR12MB6137.namprd12.prod.outlook.com>
+ <ZInIMLlMby2aNNr1@infradead.org>
+ <fc7b82a6-a74a-7675-7cfd-4dd9ac10543b@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230614134853.1521439-1-willy@infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <fc7b82a6-a74a-7675-7cfd-4dd9ac10543b@amd.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 14, 2023 at 02:48:52PM +0100, Matthew Wilcox (Oracle) wrote:
-> This is the folio equivalent of memcpy_to_page(), but it handles large
-> highmem folios.  It may be a little too big to inline on systems that
-> have CONFIG_HIGHMEM enabled but on systems we actually care about almost
-> all the code will be eliminated.
+On Thu, Jun 15, 2023 at 11:14:02AM +0530, Ayush Jain wrote:
+> > That was just a quick hack to verify the problem.  I think this is
+> > the proper fix, can you try it as well?
+> > 
+> 
+> Sure, this works on my machine.
+> 
+> Tested-by: Ayush Jain <ayush.jain3@amd.com>
 
-I suspect the right thing is to have the trivial version without kmapping
-for !HIGHMEM inline, and a separate version with the kmap loop out of
-line for HIGHMEM builds.
+So it turns out that Jens merged the md pull request for 6.5 yesterday,
+and that includes and equivalent change in
 
-Same for the next patch.
+3ce94ce5d05ae89190a23f6187f64d8f4b2d3782
+Author: Yu Kuai <yukuai3@huawei.com>
+Date:   Tue May 23 09:27:27 2023 +0800
+
+    md: fix duplicate filename for rdev
+
+With that I think we don't need an extra fix.  Sorry for all the
+extra work.
