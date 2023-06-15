@@ -2,78 +2,169 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE899EB64DC
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 06:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 695DFEB64D9
+	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 06:21:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238331AbjFOGFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 02:05:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34340 "EHLO
+        id S243511AbjFOGVW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 02:21:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243481AbjFOGEL (ORCPT
+        with ESMTP id S243484AbjFOGVS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 02:04:11 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA5F295B;
-        Wed, 14 Jun 2023 23:03:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hRjaMQchwaDw51gYY0A6pzxnY9mg2ZrdZZNaLj4dZeA=; b=2hlMq+ya9mZtwNO3r77yfR79wx
-        jteAUkH60G2v+Yo4PufzKQT8JLVtKTUoRCQO1Pv3W3rJro3RDat/Gqx84gGOdEO1xgpa+c8tz6SF/
-        oiLLUuc0aE4g9+haEXR6sNQObtZTm56QUaTd3whFwOYuPNEpMe1d98L9iQEEWGptFPFKtb+3LbVCF
-        hZUZrP7OpDQRiryZRmVJCKy/rGCwv73AISmQHKFv98u66P13D3PksbofOHp/Lj1+x//HllJDN0Pje
-        DPlnLFq/lFc7t3/gbMVBFZaQxUCvWS8EGwoZEBX4rAONc7d5ffPgH6iu5nYoPoV6DOxnIqrPh51S0
-        pA/4zdpA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1q9g5C-00DnhB-0u;
-        Thu, 15 Jun 2023 06:03:46 +0000
-Date:   Wed, 14 Jun 2023 23:03:46 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ayush Jain <ayush.jain3@amd.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "sfr@canb.auug.org.au" <sfr@canb.auug.org.au>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        "Karny, Wyes" <Wyes.Karny@amd.com>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "V, Narasimhan" <Narasimhan.V@amd.com>,
-        "Shetty, Kalpana" <Kalpana.Shetty@amd.com>,
-        "Shukla, Santosh" <Santosh.Shukla@amd.com>
-Subject: Re: Kernel null pointer dereference on stopping raid device
-Message-ID: <ZIqpwhu4Tfa9MDzM@infradead.org>
-References: <e78344ad-8d57-91d8-0bfb-724c740c7c72@amd.com>
- <3c4911c4-d3d7-a93e-5f14-e97384ae4f21@amd.com>
- <ZIlqvsZ6nMv2OT2u@infradead.org>
- <IA1PR12MB61375A452083D65B5FB815DBBA5AA@IA1PR12MB6137.namprd12.prod.outlook.com>
- <ZInIMLlMby2aNNr1@infradead.org>
- <fc7b82a6-a74a-7675-7cfd-4dd9ac10543b@amd.com>
+        Thu, 15 Jun 2023 02:21:18 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB38F213F;
+        Wed, 14 Jun 2023 23:21:12 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 498BB21A98;
+        Thu, 15 Jun 2023 06:21:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1686810071; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=biUIRbFtv4J5T47mu3LPEV5ukQGdv1abBVElBuXklZE=;
+        b=ABpAS2iN+77+SWTFncbqQEqlqkmCWDTbFIBltIfmeyivtFMQlNSQSQL6Upge8/miL9KJYj
+        ybUd5fY7HEBrWXIxK/vxDkMxnxPj3v5UkG+ORJdqTWgUAL2m7k7baCWjcraIH5X7OxWb8l
+        Zdx29Psz834PXJ2NpK5yeXDppxF709o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1686810071;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=biUIRbFtv4J5T47mu3LPEV5ukQGdv1abBVElBuXklZE=;
+        b=MaCJaaYRzFshDmLg0yPD3GElWb1H/EdU7162MpR4sbWK+JgoRtRpKo0NZX0MpsbM1ouwX1
+        +8Ap494dmNO7ubDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0153913467;
+        Thu, 15 Jun 2023 06:21:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Wp4POtatimQJcAAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 15 Jun 2023 06:21:10 +0000
+Message-ID: <df8e7a88-f540-af93-77dc-164262a5a3d0@suse.de>
+Date:   Thu, 15 Jun 2023 08:21:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fc7b82a6-a74a-7675-7cfd-4dd9ac10543b@amd.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 0/7] RFC: high-order folio support for I/O
+Content-Language: en-US
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>
+References: <20230614114637.89759-1-hare@suse.de>
+ <cd816905-0e3e-6397-1a6f-fd4d29dfc739@suse.de>
+ <ZInGbz6X/ZQAwdRx@casper.infradead.org>
+ <b3fa1b77-d120-f86b-e02f-f79b6d13efcc@suse.de>
+ <ZIpS9u4P43PgJwuj@dread.disaster.area>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <ZIpS9u4P43PgJwuj@dread.disaster.area>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 11:14:02AM +0530, Ayush Jain wrote:
-> > That was just a quick hack to verify the problem.  I think this is
-> > the proper fix, can you try it as well?
-> > 
+On 6/15/23 01:53, Dave Chinner wrote:
+> On Wed, Jun 14, 2023 at 05:06:14PM +0200, Hannes Reinecke wrote:
+>> On 6/14/23 15:53, Matthew Wilcox wrote:
+>>> On Wed, Jun 14, 2023 at 03:17:25PM +0200, Hannes Reinecke wrote:
+>>>> Turns out that was quite easy to fix (just remove the check in
+>>>> set_blocksize()), but now I get this:
+>>>>
+>>>> SGI XFS with ACLs, security attributes, quota, no debug enabled
+>>>> XFS (ram0): File system with blocksize 16384 bytes. Only pagesize (4096) or
+>>>> less will currently work.
+>>>
+>>> What happens if you just remove this hunk:
+>>>
+>>> +++ b/fs/xfs/xfs_super.c
+>>> @@ -1583,18 +1583,6 @@ xfs_fs_fill_super(
+>>>                   goto out_free_sb;
+>>>           }
+>>>
+>>> -       /*
+>>> -        * Until this is fixed only page-sized or smaller data blocks work.
+>>> -        */
+>>> -       if (mp->m_sb.sb_blocksize > PAGE_SIZE) {
+>>> -               xfs_warn(mp,
+>>> -               "File system with blocksize %d bytes. "
+>>> -               "Only pagesize (%ld) or less will currently work.",
+>>> -                               mp->m_sb.sb_blocksize, PAGE_SIZE);
+>>> -               error = -ENOSYS;
+>>> -               goto out_free_sb;
+>>> -       }
+>>> -
+>>>           /* Ensure this filesystem fits in the page cache limits */
+>>>           if (xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_dblocks) ||
+>>>               xfs_sb_validate_fsb_count(&mp->m_sb, mp->m_sb.sb_rblocks)) {
+>>
+>> Whee! That works!
+>>
+>> Rebased things with your memcpy_{to,from}_folio() patches, disabled that
+>> chunk, and:
+>>
+>> # mount /dev/ram0 /mnt
+>> XFS (ram0): Mounting V5 Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
+>> XFS (ram0): Ending clean mount
+>> xfs filesystem being mounted at /mnt supports timestamps until 2038-01-19
+>> (0x7fffffff)
+>> # umount /mnt
+>> XFS (ram0): Unmounting Filesystem 5cd71ab5-2d11-4c18-97dd-71708f40e551
 > 
-> Sure, this works on my machine.
+> Mounting the filesystem doesn't mean it works. XFS metadata has
+> laways worked with bs > ps, and mounting the filesystem only does
+> metadata IO.
 > 
-> Tested-by: Ayush Jain <ayush.jain3@amd.com>
+> It's not until you start reading/writing user data that the
+> filesystem will start exercising the page cache....
+> 
+>> Great work, Matthew!
+>>
+>> (Now I just need to check why copying data from NFS crashes ...)
+> 
+> .... and then we see it doesn't actually work. :)
+> 
+> Likely you also need the large folio support in the iomap write path
+> patches from Willy, plus whatever corner cases in iomap that still
+> have implicit dependencies on PAGE_SIZE need to be fixed (truncate,
+> invalidate, sub-block zeroing, etc may not be doing exactly the
+> right thing).
+> 
+These are built on top of the mm-unstable branch from akpm, which does 
+include the iomap write path patches from Willy, so yes, I know.
 
-So it turns out that Jens merged the md pull request for 6.5 yesterday,
-and that includes and equivalent change in
+> All you need to do now is run the BS > PS filesytems through a full
+> fstests pass (reflink + rmap enabled, auto group), and then we can
+> start on the real data integrity validation work. It'll need tens of
+> billions of fsx ops run on it, days of recoveryloop testing, days of
+> fstress based exercise, etc before we can actually enable it in
+> XFS....
+> 
+Hey, c'mon. I do know _that_. All I'm saying is that now we can _start_
+running tests and figure out corner cases (like NFS crashing on me :-).
+With this patchset we now have some infrastructure in place making it
+even _possible_ to run those tests.
 
-3ce94ce5d05ae89190a23f6187f64d8f4b2d3782
-Author: Yu Kuai <yukuai3@huawei.com>
-Date:   Tue May 23 09:27:27 2023 +0800
+Don't be so pessimistic ...
 
-    md: fix duplicate filename for rdev
+Cheers,
 
-With that I think we don't need an extra fix.  Sorry for all the
-extra work.
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
+
