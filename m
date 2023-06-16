@@ -2,106 +2,87 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E420EEB64D8
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 07:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBBEEB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 07:22:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244919AbjFPHVv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 03:21:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58594 "EHLO
+        id S244736AbjFPHWb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 03:22:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245084AbjFPHV3 (ORCPT
+        with ESMTP id S245012AbjFPHWJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 03:21:29 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF96030FB;
-        Fri, 16 Jun 2023 00:21:00 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b525af07a6so2731945ad.1;
-        Fri, 16 Jun 2023 00:21:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686900060; x=1689492060;
-        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
-         :message-id:from:cc:references:to:subject:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JrtEi7hlzKkUlwcufPInEFlIubkp8fe9gW38ZbKM+eg=;
-        b=JsuFpLF9zakTA9YWgYezQk1TUO8xzurBvXqlL3OFB99lIsEm3qhVOU6GUiZH15Hv6u
-         Lgoe8PU3rqNGTMU6ytNbosb6kWU+WUAYSdvrVgZNc7efnqxHHWSyKeklXISi2ZExVkFH
-         nwF3tqoBrrJQcRdVR0jBHgStLp8eJeFZ5iccium/PWu3YJ78iNRHkQnO2iNUpwGPCU0j
-         c5ko6Unj6Aji3DF2KtwsVTVWEr0qSJ4MxqvQnXrkGMwR9CiLe+jn2b8myHHjwYJdGCuE
-         dYY64cvbTn5/haPTVP/62+mvoioK4YxcRWza5Itt8kPgIjiLVpwdkmniRIR4kSBlrxCs
-         lsDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686900060; x=1689492060;
-        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
-         :message-id:from:cc:references:to:subject:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JrtEi7hlzKkUlwcufPInEFlIubkp8fe9gW38ZbKM+eg=;
-        b=ee4lmfiB8u7drarpcH6IbZS+WxMY1qAx5Q1DUvIc40T1i2yuryp+8RbADb1b9fLuQp
-         HHJHYhdPTyzbLuv97JiIV3Nq5wIUAsLtCb3J9jDXe3IgKhA4p0otqzU85mc+E0k3XLE2
-         1u7NPf3NOeox1y1HebA2/Tv176jMThqtJu4v7Dvf6gkNwVrddpiCJ/Zey/cDReDHDZ+3
-         VgPNUqCO9bzB586NpEZJmj1xVGd5rpRwE+y+nqV+oAtP2teGbq7AHu0FGAs3cDojDZqp
-         WWos3ya5fIyVu1WY/O6CaeLBz3kS0bxxoGTnIKRBhPzsURBjc2FS58x6RQK4TZqeXjX/
-         q3dA==
-X-Gm-Message-State: AC+VfDwTeNh4+FhspTAYd5ro6WyhN95yKuen4Ic1iY3W4SUI5Ys1R6kp
-        0z99CRhEoQArFUFxt3X2Q6Dzhd4zRNA=
-X-Google-Smtp-Source: ACHHUZ4ury2YljOkQx0+2BcslguYPw0P192uFbYQRmnPf2fZ2KB+GXinKnZu1bF1M21e8Y3ssSNhOw==
-X-Received: by 2002:a17:902:db0d:b0:1b2:6054:8629 with SMTP id m13-20020a170902db0d00b001b260548629mr947360plx.52.1686900059695;
-        Fri, 16 Jun 2023 00:20:59 -0700 (PDT)
-Received: from [10.1.1.24] (222-152-217-2-adsl.sparkbb.co.nz. [222.152.217.2])
-        by smtp.gmail.com with ESMTPSA id g1-20020a170902c38100b001a52c38350fsm630171plg.169.2023.06.16.00.20.54
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 16 Jun 2023 00:20:59 -0700 (PDT)
-Subject: Re: [PATCH v10 2/3] block: change annotation of rdb_CylBlocks in
- affs_hardblocks.h
+        Fri, 16 Jun 2023 03:22:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B74D30C1
+        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 00:20:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686900054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Tqp0jBy0MAwlbUsOY9gyPmPTKTK42ZPVNu6TVt7Ucvw=;
+        b=ZIIngV5zUGJPpZnvWG9v6ulF63VbR+VZk9aaSlywDbBOzG1KAI2piRIHOVxOgCEo5sF2Wp
+        YGyqFpTSVnCtPHqjeZd62Ga+vvlIEeLZsAn1WRqP5c1kMY2rUoa9LeKt2E50uYmELOKsFU
+        IxY6xeEBscdjVWqUQGh7URAaSJUIZ8A=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-15--JlAnzDoOqqlAjkngnYWaA-1; Fri, 16 Jun 2023 03:20:49 -0400
+X-MC-Unique: -JlAnzDoOqqlAjkngnYWaA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10D55281424C;
+        Fri, 16 Jun 2023 07:20:48 +0000 (UTC)
+Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 366D540C20F4;
+        Fri, 16 Jun 2023 07:20:42 +0000 (UTC)
+Date:   Fri, 16 Jun 2023 15:20:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
-References: <20230615030837.8518-1-schmitzmic@gmail.com>
- <20230615030837.8518-3-schmitzmic@gmail.com> <20230615041742.GA4426@lst.de>
- <056834c7-89ca-c8cd-69be-62100f1e5591@gmail.com>
- <20230615055349.GA5544@lst.de>
- <CAMuHMdWyQnKUaNtxYjqpxXovFKNPmhQDeCXX=exrqtgOfSFUjw@mail.gmail.com>
- <69ecfff9-0f18-abe7-aa97-3ec60cf53f13@gmail.com>
- <20230616054847.GB28499@lst.de>
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-m68k@vger.kernel.org, martin@lichtvoll.de,
-        fthain@linux-m68k.org, stable@vger.kernel.org
-From:   Michael Schmitz <schmitzmic@gmail.com>
-Message-ID: <80ffb46c-b560-7c4e-0200-f9a91350c000@gmail.com>
-Date:   Fri, 16 Jun 2023 19:20:52 +1200
-User-Agent: Mozilla/5.0 (X11; Linux ppc; rv:45.0) Gecko/20100101
- Icedove/45.4.0
+Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
+        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
+Subject: Re: [PATCH 1/4] blk-mq: add API of blk_mq_unfreeze_queue_force
+Message-ID: <ZIwNRu1zodp61PEO@ovpn-8-18.pek2.redhat.com>
+References: <20230615143236.297456-1-ming.lei@redhat.com>
+ <20230615143236.297456-2-ming.lei@redhat.com>
+ <ZIsrSyEqWMw8/ikq@kbusch-mbp.dhcp.thefacebook.com>
+ <ZIsxt7Q2nmiLNTX2@ovpn-8-16.pek2.redhat.com>
+ <20230616054800.GA28499@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20230616054847.GB28499@lst.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230616054800.GA28499@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On Fri, Jun 16, 2023 at 07:48:00AM +0200, Christoph Hellwig wrote:
+> On Thu, Jun 15, 2023 at 11:43:51PM +0800, Ming Lei wrote:
+> > On Thu, Jun 15, 2023 at 09:16:27AM -0600, Keith Busch wrote:
+> > > On Thu, Jun 15, 2023 at 10:32:33PM +0800, Ming Lei wrote:
+> > > > NVMe calls freeze/unfreeze in different contexts, and controller removal
+> > > > may break in-progress error recovery, then leave queues in frozen state.
+> > > > So cause IO hang in del_gendisk() because pending writeback IOs are
+> > > > still waited in bio_queue_enter().
+> > > 
+> > > Shouldn't those writebacks be unblocked by the existing check in
+> > > bio_queue_enter, test_bit(GD_DEAD, &disk->state))? Or are we missing a
+> > > disk state update or wakeup on this condition?
+> > 
+> > GD_DEAD is only set if the device is really dead, then all pending IO
+> > will be failed.
+> 
+> del_gendisk also sets GD_DEAD early on.
 
-Am 16.06.2023 um 17:48 schrieb Christoph Hellwig:
-> On Fri, Jun 16, 2023 at 07:53:11AM +1200, Michael Schmitz wrote:
->> Thanks - now there's two __s32 fields in that header - one checksum each
->> for RDB and PB. No one has so far seen the need for a 'signed big endian 32
->> bit' type, and I'd rather avoid adding one to types.h. I'll leave those as
->> they are (with the tacit understanding that they are equally meant to be
->> big endian).
->
-> We have those in a few other pleases and store them as __be32 as well.  The
-> (implicit) cast to s32 will make them signed again.
+No.
 
-Where's that cast to s32 hidden? I've only seen
+The hang happens in fsync_bdev() of del_gendisk(), and there are IOs pending on
+bio_queue_enter().
 
-#define __be32_to_cpu(x) ((__force __u32)(__be32)(x))
+Thanks,
+Ming
 
-which would make the checksums unsigned if __be32 was used.
-
-Whether the checksum code uses signed or unsigned math would require 
-inspection of the Amiga partitioning tool source which I don't have, so 
-I've kept __s32 to be safe.
-
-Thanks for reviewing v11!
-
-Cheers,
-
-	Michael
