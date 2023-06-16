@@ -2,63 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B5FEB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 09:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF66C001B1
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 10:27:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232025AbjFPJro (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 05:47:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58700 "EHLO
+        id S1344365AbjFPK16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 06:27:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232698AbjFPJrj (ORCPT
+        with ESMTP id S1344048AbjFPK10 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 05:47:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEB6119
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 02:46:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686908814;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LbHOKemj3x3i/RRfgL4O8FQ7JtEapB4R9zBWaNJlTbY=;
-        b=WDdfGkD9qoirt+eavXogAa1jWMpu0lWjK3gih11JNXh/4i5TYtffdHYvD9ChqR3zAdmlXS
-        zUq/c225EeMvoEVU78f6fGqRpvrvQgl6Vz0wqNySzjCIh9yVhwTuaBMDHnUOwdteappGrI
-        BBOkBNiOf4T2mvSQMYP7H6SpVk7z0yE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-319-7irUyZ8YNuW6mBiU_L1P6A-1; Fri, 16 Jun 2023 05:46:51 -0400
-X-MC-Unique: 7irUyZ8YNuW6mBiU_L1P6A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 16 Jun 2023 06:27:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D1C4483;
+        Fri, 16 Jun 2023 03:26:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D9F57101A528;
-        Fri, 16 Jun 2023 09:46:50 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 124CDC1604C;
-        Fri, 16 Jun 2023 09:46:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20230614140341.521331-1-hch@lst.de>
-References: <20230614140341.521331-1-hch@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: dio / splice fixups
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 36C8B63628;
+        Fri, 16 Jun 2023 10:26:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E145C433C9;
+        Fri, 16 Jun 2023 10:26:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686911169;
+        bh=GS0pPVjWt188lZEoepBV2THYAmcEA8YdD0oC8UPiH2w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=GnD/aEpDrTy5n1Xu2roLuevA3iSC1f0qvobXTi2kUP18as3m2bAWU1xDXS6dKSpPL
+         6GkW8Pa8CR0TeuOxh2ql0UpY2vANJvMRaOWqtMLe43LVbrYNkkZ8HGHoBWFSoj/j4n
+         Akgo1EkB6E86fCPLMXcFp9lylnhA7PNXgc5/+owk9N4tlSM5sLJoMp7ssBUMTXvcLg
+         j65SFvlTePwHUP5UV/CIHdi7sEbHSYbA8G6I6XJGcdhOI4RFFvVQL9ADLkxjwYnQSL
+         oIjYjMyFrr6+9HeLePhwba2jIXxZhEvl0ipG0PEznjKiD2yb6Kytj9FP+wguQ6YJLK
+         3XnVxqT9nnVrw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Nitesh Shetty <nj.shetty@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        bvanassche@acm.org, kch@nvidia.com,
+        damien.lemoal@opensource.wdc.com, vincent.fu@samsung.com,
+        error27@gmail.com, akinobu.mita@gmail.com,
+        shinichiro.kawasaki@wdc.com, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.3 22/30] null_blk: Fix: memory release when memory_backed=1
+Date:   Fri, 16 Jun 2023 06:25:10 -0400
+Message-Id: <20230616102521.673087-22-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230616102521.673087-1-sashal@kernel.org>
+References: <20230616102521.673087-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <423966.1686908809.1@warthog.procyon.org.uk>
-Date:   Fri, 16 Jun 2023 10:46:49 +0100
-Message-ID: <423967.1686908809@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.3.8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: David Howells <dhowells@redhat.com>
+From: Nitesh Shetty <nj.shetty@samsung.com>
+
+[ Upstream commit 8cfb98196cceec35416041c6b91212d2b99392e4 ]
+
+Memory/pages are not freed, when unloading nullblk driver.
+
+Steps to reproduce issue
+  1.free -h
+        total        used        free      shared  buff/cache   available
+Mem:    7.8Gi       260Mi       7.1Gi       3.0Mi       395Mi       7.3Gi
+Swap:      0B          0B          0B
+  2.modprobe null_blk memory_backed=1
+  3.dd if=/dev/urandom of=/dev/nullb0 oflag=direct bs=1M count=1000
+  4.modprobe -r null_blk
+  5.free -h
+        total        used        free      shared  buff/cache   available
+Mem:    7.8Gi       1.2Gi       6.1Gi       3.0Mi       398Mi       6.3Gi
+Swap:      0B          0B          0B
+
+Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+Link: https://lore.kernel.org/r/20230605062354.24785-1-nj.shetty@samsung.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/null_blk/main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 14491952047f5..3b6b4cb400f42 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -2212,6 +2212,7 @@ static void null_destroy_dev(struct nullb *nullb)
+ 	struct nullb_device *dev = nullb->dev;
+ 
+ 	null_del_dev(nullb);
++	null_free_device_storage(dev, false);
+ 	null_free_dev(dev);
+ }
+ 
+-- 
+2.39.2
 
