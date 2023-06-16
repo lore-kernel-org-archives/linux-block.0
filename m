@@ -2,98 +2,101 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B77EB64D8
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 12:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25449EB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 13:24:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229558AbjFPM70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 08:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
+        id S1345547AbjFPNY5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 09:24:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232489AbjFPM70 (ORCPT
+        with ESMTP id S1345665AbjFPNY4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 08:59:26 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33EA83581;
-        Fri, 16 Jun 2023 05:59:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=xc0rFww4DDidrWoBZkAi7FUYLAiSH50b8oCJnfR9dZ4=; b=j2z5IAKHx+iYyWyLz2HFE50zJ/
-        Jhh4tgKe4YJEQr6oI0WEHTxShrKgtDl8stsJaY/dOoZ9vna81ZCN4XwQplvFkW8/haHb6omkttGT+
-        UpOAo65ikQVFI1E7A47AistDWYV+VSIJUM2w8KE3GAzCu0tRCkBbdT0zscpvs6e5krwZNRZCe9RZe
-        uTQhd7AkCWHdwfHmX69TV0jzW+xKMUcdOdy4WIDRHcssEkkCVFZz3UGQKXanUtM8VAAAcZB3SgLu5
-        FPAxg7yRIIpo4TFPZIHwX+GMBJm0AR/zz7RKHRFhztKcC9TsW/wysILWTFx6leAC4utwq81CNMGZ1
-        blemVp9Q==;
-Received: from [2601:1c2:980:9ec0::2764]
-        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1qA92m-000crn-1T;
-        Fri, 16 Jun 2023 12:59:12 +0000
-Message-ID: <c6696073-7882-bdac-32da-c90f181a2804@infradead.org>
-Date:   Fri, 16 Jun 2023 05:59:11 -0700
+        Fri, 16 Jun 2023 09:24:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570D13593
+        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 06:24:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1686921843;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=fvyIBhCmIa02JifUqylvlN6bM+Xl3WwUs/XeMyD02Zs=;
+        b=W/OHcrR7/SvIGVsQCUOXDD/0ifoaT7K+r2AtI1e6otYf3pvd7I+wa+4Uix87Gkbj7xHXYH
+        rCSLrMWGkgw9gabGjmidLpNDF1+cmQvpgTGkzzeTD6yCevd1DMfFHQjSCHv+zSwx2n88xn
+        jb7F/1vue2AjtvwQqU2lvwIb3Q2h+EI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-483-g6_Mvr7FM9-nZOPdrqpOEw-1; Fri, 16 Jun 2023 09:24:01 -0400
+X-MC-Unique: g6_Mvr7FM9-nZOPdrqpOEw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D1D085A5A6;
+        Fri, 16 Jun 2023 13:24:01 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 842F548FB02;
+        Fri, 16 Jun 2023 13:24:00 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Guangwu Zhang <guazhang@redhat.com>
+Subject: [PATCH] blk-mq: fix NULL dereference on q->elevator in blk_mq_elv_switch_none
+Date:   Fri, 16 Jun 2023 21:23:54 +0800
+Message-Id: <20230616132354.415109-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH v2 1/1] cdrom: Fix spectre-v1 gadget
-Content-Language: en-US
-To:     Jordy Zomer <jordyzomer@google.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Phillip Potter <phil@philpotter.co.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20230612110040.849318-1-jordyzomer@google.com>
- <20230612110040.849318-2-jordyzomer@google.com>
- <20230615163125.td3aodpfwth5n4mc@desk> <ZIufZn+reW0rza1H@equinox>
- <20230616031447.yslq6ep7lxe6sjv4@desk>
- <CABjM8Zc4WU-QXVDDtfKtGPnsHOhjXYufg+HZ=cdSudXYeKS7YQ@mail.gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <CABjM8Zc4WU-QXVDDtfKtGPnsHOhjXYufg+HZ=cdSudXYeKS7YQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+After grabbing q->sysfs_lock, q->elevator may become NULL because of
+elevator switch.
 
+Fix the NULL dereference on q->elevator by checking it with lock.
 
-On 6/16/23 02:39, Jordy Zomer wrote:
-> Thanks for the explanation Pawan, a little bit off-topic for this patch but
-> shall I send a patch to add this to the documentation of array_index_nospec()
-> and fix other calls to that function where the upper bound is not a constant? :)
-> 
+Reported-by: Guangwu Zhang <guazhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Yes, please. We don't want to lose that info.
-
-Thanks.
-
-> On Fri, Jun 16, 2023 at 5:15 AM Pawan Gupta
-> <pawan.kumar.gupta@linux.intel.com> wrote:
->>
->> On Fri, Jun 16, 2023 at 12:31:50AM +0100, Phillip Potter wrote:
->>> I've now looked at this. It is possible for cdi->capacity to be > 1, as
->>> it is set via get_capabilities() -> cdrom_number_of_slots(), if the
->>> device is an individual or cartridge changer.
->>
->> Ohk. Is there an upper limit to cdi->capacity? If not, we are left with
->> barrier_nospec().
->>
->>> Therefore, I think using CDI_MAX_CAPACITY of 1 is not the correct
->>> approach. Jordy's V2 patch is fine therefore, but perhaps using
->>> array_index_nospec() with cdi->capacity is still better than a
->>> do/while loop from a performance perspective, given it would be cached
->>> etc. at that point, so possibly quicker. Thoughts? (I'm no expert on
->>> spectre-v1 I'll admit).
->>
->> array_index_nospec() can only clip the arg correctly if the upper bound
->> is correct. Problem with array_index_nospec(arg, cdi->capacity) is
->> cdi->capacity is not a constant, so it suffers from the same problem as
->> arg i.e. cdi->capacity could also be speculated. Although having to
->> control 2 loads makes the attack difficult, but does not rules out
->> completely.
->>
->> barrier_nospec() makes the CPU wait for all previous loads to retire
->> before executing following instructions speculatively. This causes the
->> conditional branch to resolve correctly. I hope this does not fall into
->> a hotpath.
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 850bfb844ed2..9516f65a50ea 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4608,9 +4608,6 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
+ {
+ 	struct blk_mq_qe_pair *qe;
+ 
+-	if (!q->elevator)
+-		return true;
+-
+ 	qe = kmalloc(sizeof(*qe), GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
+ 	if (!qe)
+ 		return false;
+@@ -4618,6 +4615,12 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
+ 	/* q->elevator needs protection from ->sysfs_lock */
+ 	mutex_lock(&q->sysfs_lock);
+ 
++	/* the check has to be done with holding sysfs_lock */
++	if (!q->elevator) {
++		kfree(qe);
++		goto unlock;
++	}
++
+ 	INIT_LIST_HEAD(&qe->node);
+ 	qe->q = q;
+ 	qe->type = q->elevator->type;
+@@ -4625,6 +4628,7 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
+ 	__elevator_get(qe->type);
+ 	list_add(&qe->node, head);
+ 	elevator_disable(q);
++unlock:
+ 	mutex_unlock(&q->sysfs_lock);
+ 
+ 	return true;
 -- 
-~Randy
+2.40.1
+
