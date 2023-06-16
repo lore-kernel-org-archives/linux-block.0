@@ -2,85 +2,104 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D60EB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 22:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11FACEB64DC
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 22:36:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229654AbjFPW2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 18:28:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60610 "EHLO
+        id S230254AbjFPWgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 18:36:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbjFPW2G (ORCPT
+        with ESMTP id S229939AbjFPWgX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 18:28:06 -0400
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEA62D6B
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 15:28:05 -0700 (PDT)
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-25bf7568f73so934110a91.2
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 15:28:05 -0700 (PDT)
+        Fri, 16 Jun 2023 18:36:23 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFAFA30EA;
+        Fri, 16 Jun 2023 15:36:22 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1b512309c86so9666495ad.1;
+        Fri, 16 Jun 2023 15:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686954982; x=1689546982;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r2pM5g49GFy88WomX95Eva6SdQ52mHJEO5HDcQWqPak=;
+        b=l5dETQh2WqkJonxwjs1rc/c917IadhA0jE01cdCabGTXR/H5KyUej7d0oi1DJgiSc8
+         0xXmX9ryVLX2lxh7ub5oVFk+1tVXI1GW0P/Y7KHH/upgorvjQ05Oai9pfJR0ae/qQCBt
+         FEx3I4+K2zqLCSZT8IhfempleR/mnDM+FzKrJWk8izW5D/L13i6YFx4O17FHWyIG5Y/N
+         9vJ6a6QixbdymZEitM4xs8hTKRdQBNJKhhkAfRYom3+MKD3zqRjCmLDinzL/pa6uzThs
+         ELaJLu4dcsQCNddKYk6Q5RMzGzhXoMIHKkEJN4xb+Gz8rmYdXJxUMRik35H4b2GvoEjR
+         817A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686954485; x=1689546485;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3iZIa3b3KREAEUdhNA6p/V0gi2VpJPLq6VYDn4e2IBY=;
-        b=f5PU65lbSTS4r382anD9W50Or3/syi64iM0Dz6E8aQbsBPn8h7+YAL82/RRGwOWRYG
-         eSg4l1geuDr6GGuv76kb0Jdx0HchJ/v7RiR5cddoQYdIhO+nF4dKXE/pGRwGupyomiCa
-         MVpDvYprQgDLD20mOud/NemEFgOmUhF9nvo/A4vdT637FpucJ+ISxGcXMFZLHneOA+h6
-         GDuHgL/cGPjaZoarrj5fkGWTzLQLdnI+b0/bXi9ocywrYUbxtWroAjh8S6pT/+sCID7P
-         lOVNLxTKyjc+UqhRThB8JrWm3nM/sfl58WGNcuacsFEdaRJWGB/l70Ff2GRJ6mY+o1IX
-         2ACA==
-X-Gm-Message-State: AC+VfDykwIWfRjLb58kseE1rjFfFrJZ+W12DwygZzkzF7wRLlBxK5GAV
-        fDBjbhhcBGodcZ0N3m5gJgM=
-X-Google-Smtp-Source: ACHHUZ7ax7Kmak9hlUvt2Q5NXZn4BxBQ8G9YpgWIEk9DRlS9BnVpRm5ONBmQt1oQdN2Vh8wyIJNd5g==
-X-Received: by 2002:a17:90a:195e:b0:25e:9549:6bef with SMTP id 30-20020a17090a195e00b0025e95496befmr2846681pjh.29.1686954484850;
-        Fri, 16 Jun 2023 15:28:04 -0700 (PDT)
-Received: from [192.168.50.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id 39-20020a17090a0faa00b0024e33c69ee5sm1963293pjz.5.2023.06.16.15.28.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jun 2023 15:28:03 -0700 (PDT)
-Message-ID: <9bb864d3-1932-f391-7399-248abdf9f0b1@acm.org>
-Date:   Fri, 16 Jun 2023 15:28:01 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v6 0/8] Support limits below the page size
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
-        Sandeep Dhavale <dhavale@google.com>,
-        Juan Yescas <jyescas@google.com>
-References: <20230612203314.17820-1-bvanassche@acm.org>
- <5041fc15-2c6c-b91e-6fb6-5eac740f75eb@kernel.dk>
- <20230615041537.GB4281@lst.de> <1d55e942-5150-de4c-3a02-c3d066f87028@acm.org>
- <20230616070237.GC29500@lst.de>
- <d0dce017-390e-301f-1c85-0970c91ed80d@acm.org>
- <e5782494-1a57-819d-d790-13f2051c4714@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <e5782494-1a57-819d-d790-13f2051c4714@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        d=1e100.net; s=20221208; t=1686954982; x=1689546982;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r2pM5g49GFy88WomX95Eva6SdQ52mHJEO5HDcQWqPak=;
+        b=iUCnJEZGuXhPbJw4cDuoRWAj93K/bdfmNt4LekuSzRnkVxXsTLMnQTxZpLJqX3Wx5v
+         15WqNQZQKXzodtF320c6ysy8ypvJaMmwtpHyiDETsIyiGhAbAdCziUXT1IZrubKAqoLq
+         KI1Woxn5VmyP4Kv8M5ukqTE+8yavjdvGJDPk1KwbnEEzP/7OBMt+E63YtnNBTbRMRB5b
+         uLC1djm1h2vvIRqLlkshvvFiAEfKHkQcCZQECx5xWx7K7NWeMuIzxXe0mA/AIzjjVWuf
+         j2LpuJZQtAxxWRdj/My+t045mXQid8JLCJorFxrhkZyiLOciPgdWZA1oPfm4rtlcKjFb
+         p5ow==
+X-Gm-Message-State: AC+VfDztePi6h3wc70++I47nHzA/3b9kQyOIRXIUdzgl3TOGNX1Wiq8j
+        NJaVHm2bkCQVlV8HakHwNf4=
+X-Google-Smtp-Source: ACHHUZ6KEL5fPNlCEqv8uMFBQivgWcki1o7jlMoxOLoxGhUsDRhanGFTJc8oE6ZVS8KzJsehz45Wbw==
+X-Received: by 2002:a17:902:e88b:b0:1b0:3d03:4179 with SMTP id w11-20020a170902e88b00b001b03d034179mr4482956plg.6.1686954982252;
+        Fri, 16 Jun 2023 15:36:22 -0700 (PDT)
+Received: from xplor.waratah.dyndns.org (222-152-217-2-adsl.sparkbb.co.nz. [222.152.217.2])
+        by smtp.gmail.com with ESMTPSA id w17-20020a170902e89100b001adf6b21c77sm8244231plg.107.2023.06.16.15.36.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jun 2023 15:36:21 -0700 (PDT)
+Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
+        id E7F34360318; Sat, 17 Jun 2023 10:36:17 +1200 (NZST)
+From:   Michael Schmitz <schmitzmic@gmail.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org, hch@lst.de,
+        martin@lichtvoll.de, fthain@linux-m68k.org,
+        Michael Schmitz <schmitzmic@gmail.com>
+Subject: [PATCH v12 0/3] Amiga RDB partition support fixes
+Date:   Sat, 17 Jun 2023 10:36:13 +1200
+Message-Id: <20230616223616.6002-1-schmitzmic@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/16/23 14:48, Jens Axboe wrote:
-> Nudge the vendors to ensure what they deliver comply with that,
-> I believe Google has quite some pull in terms of that...
+Hi Jens,
 
-It would be great if vendors of Android devices would ask the Google 
-Android team for its opinion before selecting hardware components. 
-However, that's not how it works. I think that it's more likely that 
-Android vendors will put Google under pressure to support the hardware 
-they have selected instead of Android vendors asking Google for its 
-opinion about which hardware components to select.
+the hopefully last version of this patch series, only change
+in this version is to change all 32 bit fields in the
+affs_hardblocks.h header to __be32 following review comments
+by Christoph and Geert.
 
-Additionally, bring-up of 16K page size support for Android happens with 
-existing Android hardware. This patch series helps 16K page size support 
-bring-up effort because 16K page size support is being tested on Android 
-devices with an Exynos UFS host controller.
+The simple fix (patch 1) still leaves ample room for overflows in
+calculating start address and size of a RDB partition, though
+such overflows should only be seen in rather unusual cases.
 
-Thanks,
+To address these potential overflows, checks are added in the
+third patch of this series. Comments by Geert have been
+addressed in full. 
 
-Bart.
+In order to avoid warnings about a cast to a restricted
+type (__be32, inside be32_to_cpu()) introduced by the third
+patch, the second patch changes the annotation of all 32 bit
+fields to __be32 (which is what these fields in the RDB
+struct ought to have been in the first instance). 
 
+Reviewed-by tags by Geert and Christoph added. Fixes and
+prerequisites for stable backport also added. 
+
+Cheers,
+
+        Michael
+
+Michael Schmitz (3):
+  block: fix signed int overflow in Amiga partition support
+  block: change annotation of rdb_CylBlocks in affs_hardblocks.h
+  block: add overflow checks for Amiga partition support
+
+ block/partitions/amiga.c             | 102 ++++++++++++++++++++++-----
+ include/uapi/linux/affs_hardblocks.h |  68 +++++++++---------
+ 2 files changed, 119 insertions(+), 51 deletions(-)
+
+-- 
+2.17.1
 
