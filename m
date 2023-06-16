@@ -2,63 +2,50 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E339EB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 21:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D60EB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 22:28:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjFPVsQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 17:48:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47152 "EHLO
+        id S229654AbjFPW2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 18:28:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjFPVsP (ORCPT
+        with ESMTP id S229518AbjFPW2G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 17:48:15 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DBAB1993
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 14:48:14 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b50a419ab6so2613015ad.1
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 14:48:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20221208.gappssmtp.com; s=20221208; t=1686952094; x=1689544094;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r8j8JrHWHG0dyB/Y6Y8tKCDtvtcnvzyiYePhEonun9g=;
-        b=pCWNDc8zZqR1nRTFmju77DdnuLb7TAtowVtlzumxk61j4hAjRiq888HFq7X7gb5hTM
-         F9x2kxTJiP/e1LyA+0dFfZgacZwKv9t7L6vtDdr0fkVuMpC4QsOQX0LFq8OC1X01qhMw
-         cxjOQQrZlUHDYLyaBrb/HG4uMTS63QYB1vYVAsNrxrjDHzC0ohAdLXJmtLgKsNiirSdu
-         L2QVAY6wMDihCXEmyNHh4NU6ohD+ddR57oqBQutjw0Qd+YMS2C/CotKGjTiFFQO595xP
-         BDNnhjdaJTlYuLvm6vxH7imqFp+ai4aXNEWdCrKoOkAl5XNXccs3ytWMzCrh8/BuwA1C
-         UKpA==
+        Fri, 16 Jun 2023 18:28:06 -0400
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEA62D6B
+        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 15:28:05 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-25bf7568f73so934110a91.2
+        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 15:28:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686952094; x=1689544094;
+        d=1e100.net; s=20221208; t=1686954485; x=1689546485;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r8j8JrHWHG0dyB/Y6Y8tKCDtvtcnvzyiYePhEonun9g=;
-        b=bKCjvBG2CNM+lTcjNEZuGzz9pfkmMAHz1rHJRV6RrlEJ8AnX+2T0lbX5E2cbOQebsX
-         dHYYEX04YjrmKyA+LBRCfEo+jMb5UKKMY28zXT5Btr0rwaEPNvOaFrofjPvmTLOa/aDY
-         VedvXuOEo2hgtUeUoICeZ+XzlJJe5PV6nXORX8V/uWy+eZw/RPMA94P2ZgSmFhO0bZ/3
-         tolnJ/e3YCp3volMQxZ4/h1NaJwZkh6mjMqwAwze4legKgq0aMSnrT5+upskHA/kA2cE
-         b+JjrZVYKW02paSItptGegaANzMebL162bwSSxwdqBflH1yfCXCKVMtQ972QueCbOAni
-         zopQ==
-X-Gm-Message-State: AC+VfDxUppnozCZu8Tvm3Sh4MZ4V5NeqaRqKGhuUFL63VaIVSybT51yY
-        xuxeAHN/H0/3SMwG+1+Lr0WSMg==
-X-Google-Smtp-Source: ACHHUZ7g3pkU8hkuHpRvEU0LQ29xAnYaMyVQ+bLLs9bTQNEWM9/rR02pWUbVMKuEZZv0ClyZeb7KBw==
-X-Received: by 2002:a17:902:ea01:b0:1b3:e842:40a7 with SMTP id s1-20020a170902ea0100b001b3e84240a7mr3653544plg.1.1686952093948;
-        Fri, 16 Jun 2023 14:48:13 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id iw19-20020a170903045300b001b3fb909f73sm1951034plb.112.2023.06.16.14.48.12
+        bh=3iZIa3b3KREAEUdhNA6p/V0gi2VpJPLq6VYDn4e2IBY=;
+        b=f5PU65lbSTS4r382anD9W50Or3/syi64iM0Dz6E8aQbsBPn8h7+YAL82/RRGwOWRYG
+         eSg4l1geuDr6GGuv76kb0Jdx0HchJ/v7RiR5cddoQYdIhO+nF4dKXE/pGRwGupyomiCa
+         MVpDvYprQgDLD20mOud/NemEFgOmUhF9nvo/A4vdT637FpucJ+ISxGcXMFZLHneOA+h6
+         GDuHgL/cGPjaZoarrj5fkGWTzLQLdnI+b0/bXi9ocywrYUbxtWroAjh8S6pT/+sCID7P
+         lOVNLxTKyjc+UqhRThB8JrWm3nM/sfl58WGNcuacsFEdaRJWGB/l70Ff2GRJ6mY+o1IX
+         2ACA==
+X-Gm-Message-State: AC+VfDykwIWfRjLb58kseE1rjFfFrJZ+W12DwygZzkzF7wRLlBxK5GAV
+        fDBjbhhcBGodcZ0N3m5gJgM=
+X-Google-Smtp-Source: ACHHUZ7ax7Kmak9hlUvt2Q5NXZn4BxBQ8G9YpgWIEk9DRlS9BnVpRm5ONBmQt1oQdN2Vh8wyIJNd5g==
+X-Received: by 2002:a17:90a:195e:b0:25e:9549:6bef with SMTP id 30-20020a17090a195e00b0025e95496befmr2846681pjh.29.1686954484850;
+        Fri, 16 Jun 2023 15:28:04 -0700 (PDT)
+Received: from [192.168.50.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id 39-20020a17090a0faa00b0024e33c69ee5sm1963293pjz.5.2023.06.16.15.28.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Jun 2023 14:48:13 -0700 (PDT)
-Message-ID: <e5782494-1a57-819d-d790-13f2051c4714@kernel.dk>
-Date:   Fri, 16 Jun 2023 15:48:11 -0600
+        Fri, 16 Jun 2023 15:28:03 -0700 (PDT)
+Message-ID: <9bb864d3-1932-f391-7399-248abdf9f0b1@acm.org>
+Date:   Fri, 16 Jun 2023 15:28:01 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.11.0
 Subject: Re: [PATCH v6 0/8] Support limits below the page size
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>,
         Sandeep Dhavale <dhavale@google.com>,
         Juan Yescas <jyescas@google.com>
@@ -67,30 +54,33 @@ References: <20230612203314.17820-1-bvanassche@acm.org>
  <20230615041537.GB4281@lst.de> <1d55e942-5150-de4c-3a02-c3d066f87028@acm.org>
  <20230616070237.GC29500@lst.de>
  <d0dce017-390e-301f-1c85-0970c91ed80d@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <d0dce017-390e-301f-1c85-0970c91ed80d@acm.org>
-Content-Type: text/plain; charset=UTF-8
+ <e5782494-1a57-819d-d790-13f2051c4714@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <e5782494-1a57-819d-d790-13f2051c4714@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/16/23 2:26?PM, Bart Van Assche wrote:
-> On 6/16/23 00:02, Christoph Hellwig wrote:
->> But it seems like no one is insisting on using it with larger than 4k
->> page sizes.
-> 
-> The Android common kernel (ACK) team is working on bringing up 16K
-> page size support. This involves kernel changes and also changes in
-> user space code. Once 16K page size support is ready, I expect that
-> more users will ask for 16K page size support in Android and also that
-> more users will ask for small segment size support.
+On 6/16/23 14:48, Jens Axboe wrote:
+> Nudge the vendors to ensure what they deliver comply with that,
+> I believe Google has quite some pull in terms of that...
 
-Like Christoph said in a previous email, gate the 16K page sizes on
-hardware that can sanely support it. If it can't, then it runs 4K
-kernels. Nudge the vendors to ensure what they deliver comply with that,
-I believe Google has quite some pull in terms of that...
+It would be great if vendors of Android devices would ask the Google 
+Android team for its opinion before selecting hardware components. 
+However, that's not how it works. I think that it's more likely that 
+Android vendors will put Google under pressure to support the hardware 
+they have selected instead of Android vendors asking Google for its 
+opinion about which hardware components to select.
 
--- 
-Jens Axboe
+Additionally, bring-up of 16K page size support for Android happens with 
+existing Android hardware. This patch series helps 16K page size support 
+bring-up effort because 16K page size support is being tested on Android 
+devices with an Exynos UFS host controller.
+
+Thanks,
+
+Bart.
+
 
