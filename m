@@ -2,133 +2,114 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 445EBEB64D9
-	for <linux-block@archiver.kernel.org>; Thu, 15 Jun 2023 23:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CC2EB64D9
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 01:19:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbjFOXb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Jun 2023 19:31:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54752 "EHLO
+        id S232771AbjFPBTS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Jun 2023 21:19:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234203AbjFOXb4 (ORCPT
+        with ESMTP id S229530AbjFPBTR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Jun 2023 19:31:56 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BCBB3
-        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 16:31:54 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4f649db9b25so15202e87.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Jun 2023 16:31:54 -0700 (PDT)
+        Thu, 15 Jun 2023 21:19:17 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04842959;
+        Thu, 15 Jun 2023 18:19:16 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-75d4b85b3ccso22886985a.2;
+        Thu, 15 Jun 2023 18:19:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20221208.gappssmtp.com; s=20221208; t=1686871913; x=1689463913;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OYCrQY+vD5Zhy3XYtfstQ901gmXcf6Fa7FD0xvyG1mA=;
-        b=WkXEayk061Kdw3iPzXlRwePQmWd2w33QCzircznXEC0Xx0IC+D9GzBjbBVkK4jKq2q
-         nfdE6tqVk/Gikz2CP+Thg4Q1DCawjcIr2SSaIclxQg+u0CPecJ/NTczT8BeRY3Dk/dET
-         d+oQ293TtRZuAOMXp7I2K/t+PBKNmWMkHPNwSfQxviqsRH1vq9CtH5sao+riq5IN72c2
-         /hxRKvTivMHKM90GmVp55bdLn7HnYcurm+je0mswz7Q26LMaedh8OnB1pKXpvjiFzHFA
-         VYCVsmKzS3cipmmpHO02zO/oLBb3sQX5JWLKG0tEN13r+/hXo5JhvCj1IVf2tFlbKxq7
-         POfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686871913; x=1689463913;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1686878356; x=1689470356;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OYCrQY+vD5Zhy3XYtfstQ901gmXcf6Fa7FD0xvyG1mA=;
-        b=CVZFcGaEmEkivlCUGGNZ1Xiym70fBzsnfLFRkw2xXEuZbK30739Pv4lPutU215326n
-         eYsIBHJ53FT8I40zJWsWVcFMVHbqVfE0OK28AW4/7uHlVAwgeQwN2v9BjAAtVW2obEox
-         dh4gZTE0CZIXLR+CJvtgQsjJ7gJXhuPZLwT3QOb8r/Dut8gjRZb91bSFJ4aj9IM4JFxx
-         EAlLOd4KniqiVg+aIrnUV4Z22Iwr82MVZN51RJHz3udFLNwJZ24ECBdCNvqlWaJdwShk
-         Oc1zi+ah6FbI027wmSaHtwO8HMFsOy8cwDazV7Q+lN9yALiOd5ZQCWE48shD7MXQjjt/
-         gvYw==
-X-Gm-Message-State: AC+VfDxNKHrY4v+yiLRJwcY7sDgei8or34CrPKLVO8Anowz+MHiRILxN
-        IM+S7iBUuak49z1OiBlqDNTkNQ==
-X-Google-Smtp-Source: ACHHUZ67+RO4aZ/zllxkh6V7HrysWfqRH2iujxqDDBvPqKh9/DHLw/Kh5WD70xMyopEPLhoc1BpBfg==
-X-Received: by 2002:a19:8c44:0:b0:4f6:2c03:36b0 with SMTP id i4-20020a198c44000000b004f62c0336b0mr104795lfj.26.1686871912504;
-        Thu, 15 Jun 2023 16:31:52 -0700 (PDT)
-Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
-        by smtp.gmail.com with ESMTPSA id 12-20020a05600c028c00b003f736735424sm435340wmk.43.2023.06.15.16.31.51
+        bh=+cAVdLOTJ1zYbui/212MXWSvsgY0dsdtWgvAXgi24g8=;
+        b=lGYPOIJTK08LxTbAxFsXUk6XB8lH9xPZjchbpLyYtw6EYfnzo4BrmKSNuskVsCPg+z
+         q/VBiYiXMr94/mDoVltSVYq/M1LOiSsHDF7YtLRd4GkFhz0EMI35+jioHMVdzYCU1QbP
+         NQOeTw7p4ZIBDZi0NnkzJPiDuqCR2SnABSsLUe1txwPnYYv5KjZZp6h3tNSTNQfpMAe1
+         hFH52UD+3qt7Gw0aQU4wlZ29Zpaw2VNzrr1CnAEz9x1aLPch1BPYiNoJPujkt5aI0Myx
+         tEfZDb6IUhV0/dgnpRQ6WWOJk36IWaqrKC+rY4o+6V9PYMlkEXtTwYe1oEObBAAgJAiY
+         SYNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686878356; x=1689470356;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+cAVdLOTJ1zYbui/212MXWSvsgY0dsdtWgvAXgi24g8=;
+        b=GQaF5PS9DfabdWwK8to0CH/4qYnnH3gTA/0dvBvVzAcU0XHNUIEeNQ8AA95VF4smCU
+         j0Jgc+3l7pqEAaYmR/uZo5qksnF9PsNWJal35D5OsovJIZHJ36QZRGJLHydgo+eW4Lo+
+         2yEERLM0EDhoOeIXewnCpiEq3Yq+ISQvjstusgxXDTawZCOlv0+8wwKJt55GyrCrXSVE
+         /+0kzEVL7fq9gcVUx+69YwatF7+qRxGb+MnOvN0fiMh7FTAmpbGoTxzBJgM5gsEWW2N9
+         eSGypNKS8mMUW5KrL0PlR9jyKP0DlmabACdzr7yacuOxDF/sh0E0JO1giCDnxhLB8oHI
+         K+vg==
+X-Gm-Message-State: AC+VfDxL1meeA+JqzHbFeSBiZW7niaIzJN2spQ+tSl/sKE3Hw8lqA9U5
+        aq1rLALuJn9+xlx4W+qokbwjIeUfZVI=
+X-Google-Smtp-Source: ACHHUZ7/TCRCy/mO1ZLK6bwMnq2OQOt2O1qrsqi3Rl4SbmY1YM0iyVx3KLfbNyr2gzCidoDFJk5Ptw==
+X-Received: by 2002:a05:620a:2b95:b0:75e:d513:ba3a with SMTP id dz21-20020a05620a2b9500b0075ed513ba3amr199788qkb.71.1686878355707;
+        Thu, 15 Jun 2023 18:19:15 -0700 (PDT)
+Received: from xplor.waratah.dyndns.org (222-152-217-2-adsl.sparkbb.co.nz. [222.152.217.2])
+        by smtp.gmail.com with ESMTPSA id x20-20020aa784d4000000b0064d566f658esm243691pfn.135.2023.06.15.18.19.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jun 2023 16:31:51 -0700 (PDT)
-Date:   Fri, 16 Jun 2023 00:31:50 +0100
-From:   Phillip Potter <phil@philpotter.co.uk>
-To:     pawan.kumar.gupta@linux.intel.com
-Cc:     linux-kernel@vger.kernel.org, jordyzomer@google.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] cdrom: Fix spectre-v1 gadget
-Message-ID: <ZIufZn+reW0rza1H@equinox>
-References: <20230612110040.849318-1-jordyzomer@google.com>
- <20230612110040.849318-2-jordyzomer@google.com>
- <20230615163125.td3aodpfwth5n4mc@desk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230615163125.td3aodpfwth5n4mc@desk>
+        Thu, 15 Jun 2023 18:19:15 -0700 (PDT)
+Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
+        id 70000360318; Fri, 16 Jun 2023 13:19:11 +1200 (NZST)
+From:   Michael Schmitz <schmitzmic@gmail.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org, hch@lst.de,
+        martin@lichtvoll.de, fthain@linux-m68k.org,
+        Michael Schmitz <schmitzmic@gmail.com>
+Subject: [PATCH v11 0/3] Amiga RDB partition support fixes
+Date:   Fri, 16 Jun 2023 13:19:04 +1200
+Message-Id: <20230616011907.26498-1-schmitzmic@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 09:31:25AM -0700, Pawan Gupta wrote:
-> On Mon, Jun 12, 2023 at 11:00:40AM +0000, Jordy Zomer wrote:
-> > This patch fixes a spectre-v1 gadget in cdrom.
-> > The gadget could be triggered by,
-> >  speculatviely bypassing the cdi->capacity check.
-> > 
-> > Signed-off-by: Jordy Zomer <jordyzomer@google.com>
-> > ---
-> >  drivers/cdrom/cdrom.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-> > index 416f723a2dbb..ecf2b458c108 100644
-> > --- a/drivers/cdrom/cdrom.c
-> > +++ b/drivers/cdrom/cdrom.c
-> > @@ -264,6 +264,7 @@
-> >  #include <linux/errno.h>
-> >  #include <linux/kernel.h>
-> >  #include <linux/mm.h>
-> > +#include <linux/nospec.h>
-> >  #include <linux/slab.h> 
-> >  #include <linux/cdrom.h>
-> >  #include <linux/sysctl.h>
-> > @@ -2329,6 +2330,9 @@ static int cdrom_ioctl_media_changed(struct cdrom_device_info *cdi,
-> >  	if (arg >= cdi->capacity)
-> >  		return -EINVAL;
-> >  
-> > +	/* Prevent arg from speculatively bypassing the length check */
-> > +	barrier_nospec();
-> 
-> On a quick look it at the call chain ...
-> 
-> sr_block_ioctl(..., arg)
->   cdrom_ioctl(..., arg)
->     cdrom_ioctl_media_changed(..., arg)
-> 
-> .... it appears maximum value cdi->capacity can be only 1:
-> 
-> sr_probe()
-> {
-> ...
-> 	cd->cdi.capacity = 1;
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/scsi/sr.c?h=v6.4-rc6#n665
-> 
-> If we know that max possible value than, instead of big hammer
-> barrier_nospec(), its possible to use lightweight array_index_nospec()
-> as below:
-> ...
+Hi Jens,
 
-Hi Pawan and Jordy,
+Following up on Martin's enquiry, I am resubmitting the Amiga
+partition support fixes again as v11, with changes addressing
+your comments on v8, and a fix for warnings I saw from sparse
+checking on v8 and v9. 
 
-I've now looked at this. It is possible for cdi->capacity to be > 1, as
-it is set via get_capabilities() -> cdrom_number_of_slots(), if the
-device is an individual or cartridge changer.
+The simple fix (patch 1) still leaves ample room for overflows in
+calculating start address and size of a RDB partition, though
+such overflows should only be seen in rather unusual cases.
 
-Therefore, I think using CDI_MAX_CAPACITY of 1 is not the correct
-approach. Jordy's V2 patch is fine therefore, but perhaps using
-array_index_nospec() with cdi->capacity is still better than a
-do/while loop from a performance perspective, given it would be cached
-etc. at that point, so possibly quicker. Thoughts? (I'm no expert on
-spectre-v1 I'll admit).
+To address these potential overflows, checks are added in the
+third patch of this series. Comments by Geert have been
+addressed in full. 
 
-Regards,
-Phil
+In order to avoid warnings about a cast to a restricted
+type (__be32, inside be32_to_cpu()) introduced by the third
+patch, the second patch changes the annotation of all __u32
+fields to __be32 (which is what these fields in the RDB
+struct ought to have been in the first instance). 
+
+Reviewed-by tags by Geert and Christoph added. Fixes and
+prerequisites for stable backport also added. 
+
+Patch 2 has been initially reviewed by Christoph and Geert
+(but no Reviewed-by tags have been added). In my humble
+opinion, patch 1 can be applied while we wait for further
+review, as it does mostly fix this long standing bug (at
+least when LBD is enabled). 
+
+Only change in this version is to change all __u32 in the
+affs_hardblocks.h header, not just the one that caused
+the sparse warning.
+
+Cheers,
+
+        Michael
+
+Michael Schmitz (3):
+  block: fix signed int overflow in Amiga partition support
+  block: change annotation of rdb_CylBlocks in affs_hardblocks.h
+  block: add overflow checks for Amiga partition support
+
+ block/partitions/amiga.c             | 102 ++++++++++++++++++++++-----
+ include/uapi/linux/affs_hardblocks.h |  64 ++++++++---------
+ 2 files changed, 117 insertions(+), 49 deletions(-)
+
+-- 
+2.17.1
+
