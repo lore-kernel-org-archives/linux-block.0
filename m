@@ -2,94 +2,134 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 372DAEB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 07:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1265EB64DA
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 07:45:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231791AbjFPHev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 03:34:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34354 "EHLO
+        id S245389AbjFPHpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 03:45:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245019AbjFPHep (ORCPT
+        with ESMTP id S241144AbjFPHph (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 03:34:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 663191993
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 00:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686900836;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YU3joFkw4kZzWWYuU925f38CU9gyhPWMQcZQu/tUalI=;
-        b=D7dxemPlhbsnilcCOmQJQS1xlTFDlcUrJ9F+8C8J7KtraSCBpZ/pgkvxfPchiYpTa/LP25
-        5eQjDTa89GGFKwJOK5Kal9JzZ8d1/KFtVT7M/6WzAeDagsR+pHG1Cw2+POepWAsFQd963d
-        mzDNNramnxQdYm0eG6RkriXftmGoaCc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-610-Yf57gMwsN_2oY6PazRG36Q-1; Fri, 16 Jun 2023 03:33:53 -0400
-X-MC-Unique: Yf57gMwsN_2oY6PazRG36Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0FE0A3811F3B;
-        Fri, 16 Jun 2023 07:33:52 +0000 (UTC)
-Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AAED140E952;
-        Fri, 16 Jun 2023 07:33:46 +0000 (UTC)
-Date:   Fri, 16 Jun 2023 15:33:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
-        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH 1/4] blk-mq: add API of blk_mq_unfreeze_queue_force
-Message-ID: <ZIwQVWAXrvH7N1kK@ovpn-8-18.pek2.redhat.com>
-References: <20230615143236.297456-1-ming.lei@redhat.com>
- <20230615143236.297456-2-ming.lei@redhat.com>
- <ZIsrSyEqWMw8/ikq@kbusch-mbp.dhcp.thefacebook.com>
- <ZIsxt7Q2nmiLNTX2@ovpn-8-16.pek2.redhat.com>
- <20230616054800.GA28499@lst.de>
- <ZIwNRu1zodp61PEO@ovpn-8-18.pek2.redhat.com>
- <20230616072721.GA30186@lst.de>
+        Fri, 16 Jun 2023 03:45:37 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB0B2944;
+        Fri, 16 Jun 2023 00:45:35 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b53910241eso73005ad.2;
+        Fri, 16 Jun 2023 00:45:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686901535; x=1689493535;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:from:cc:references:to:subject:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9dUQ4h/rPm3CGPVEQXhmcRGAFqssSVeZxrzFM8/+8xM=;
+        b=e88zrghBd7AZlhWODvhq9J9ixtKvLrAoTCK+yeHAbA1YPM9Zq1fD9+8kCuDkfO525K
+         cs/vL6623M5TMrEf2HKymQiTpPFPg8GCX2pJMItJ47aU1juQjW3SEWqcSSDdV4yBlCZ1
+         qJ9Ez+wq4N/BXyGC7jBZ7Z+84QNle+uwrm21CJaCVBNlryQ4fCdVfEbksxbWnqGGlBw0
+         qPXyi0j4SfcfrNOfiXKYH0JIe/SO76PFN7j/oOft/8XQVHtB5hfZOmaw2xqdZ2YnTTM5
+         YL1jYLvRIP5UrAf8dP7tmW/Q3Zz7sQ1XDMHcpsb+mBeUbLlHEySZLGsYSEKsipzGnOLs
+         8NsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686901535; x=1689493535;
+        h=content-transfer-encoding:in-reply-to:mime-version:user-agent:date
+         :message-id:from:cc:references:to:subject:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9dUQ4h/rPm3CGPVEQXhmcRGAFqssSVeZxrzFM8/+8xM=;
+        b=SRxJuE6dy/0gqYLn/eqiwC7e4e+Mo+zf11Bq2earXq7Htw/QMD9cjM8G/rNRNLuXnm
+         fK2DNrQAKcWn+L/QLyD7L9H7tFp7waLHJVnIhbXufgQ+ErrX6+HROVfD7bfWi/G258au
+         TKV2musQc5gMgCGoD6hacn9kaPcXKoQC/pVCud3SU3Gq516g9uZUBhkGuZdo0U5T5x07
+         TKeN1VmxWzxOaW9Tv3gTed/JpmVw6awGnRCzZM12/sgw798EvGXon9wuLuv36m/zaRpq
+         Z7+ZxNEJP4YZVQTmjiEgwE41YXcaXxXJYDn395nJbe/5Qr4V7BSfUkkbPDqUendGIwEW
+         7zGw==
+X-Gm-Message-State: AC+VfDwBu1X8OMb2m2pe1CoOI94wY87Q1DoG4kUXXYktjRlNrhaZSgvl
+        3usTD7TqyjwSqGnC6xJUcJ1d0rUi1lA=
+X-Google-Smtp-Source: ACHHUZ52OjAWRqdKw7PxKZknc3/LmUCbu/qNlfbqlc0LbFapeKqomDaR6cvc5XX6HuWkmL4mu+wq7g==
+X-Received: by 2002:a17:903:264e:b0:1a8:ce:afd1 with SMTP id je14-20020a170903264e00b001a800ceafd1mr1187367plb.20.1686901534814;
+        Fri, 16 Jun 2023 00:45:34 -0700 (PDT)
+Received: from [10.1.1.24] (222-152-217-2-adsl.sparkbb.co.nz. [222.152.217.2])
+        by smtp.gmail.com with ESMTPSA id x21-20020a17090300d500b001acad024c8asm11536975plc.40.2023.06.16.00.45.29
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 16 Jun 2023 00:45:34 -0700 (PDT)
+Subject: Re: [PATCH v10 2/3] block: change annotation of rdb_CylBlocks in
+ affs_hardblocks.h
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+References: <20230615030837.8518-1-schmitzmic@gmail.com>
+ <20230615030837.8518-3-schmitzmic@gmail.com> <20230615041742.GA4426@lst.de>
+ <056834c7-89ca-c8cd-69be-62100f1e5591@gmail.com>
+ <20230615055349.GA5544@lst.de>
+ <CAMuHMdWyQnKUaNtxYjqpxXovFKNPmhQDeCXX=exrqtgOfSFUjw@mail.gmail.com>
+ <69ecfff9-0f18-abe7-aa97-3ec60cf53f13@gmail.com>
+ <20230616054847.GB28499@lst.de>
+ <80ffb46c-b560-7c4e-0200-f9a91350c000@gmail.com>
+ <CAMuHMdXpxK2HXJ0s_Fa--sMOAjR8Qt4EVQL2UC7UynMCA6q+1g@mail.gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        axboe@kernel.dk, linux-m68k@vger.kernel.org, martin@lichtvoll.de,
+        fthain@linux-m68k.org, stable@vger.kernel.org
+From:   Michael Schmitz <schmitzmic@gmail.com>
+Message-ID: <fec3fd71-47ae-9d15-a64a-a3a899bee503@gmail.com>
+Date:   Fri, 16 Jun 2023 19:45:27 +1200
+User-Agent: Mozilla/5.0 (X11; Linux ppc; rv:45.0) Gecko/20100101
+ Icedove/45.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230616072721.GA30186@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+In-Reply-To: <CAMuHMdXpxK2HXJ0s_Fa--sMOAjR8Qt4EVQL2UC7UynMCA6q+1g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 16, 2023 at 09:27:21AM +0200, Christoph Hellwig wrote:
-> On Fri, Jun 16, 2023 at 03:20:38PM +0800, Ming Lei wrote:
-> > > > > Shouldn't those writebacks be unblocked by the existing check in
-> > > > > bio_queue_enter, test_bit(GD_DEAD, &disk->state))? Or are we missing a
-> > > > > disk state update or wakeup on this condition?
-> > > > 
-> > > > GD_DEAD is only set if the device is really dead, then all pending IO
-> > > > will be failed.
-> > > 
-> > > del_gendisk also sets GD_DEAD early on.
-> > 
-> > No.
-> > 
-> > The hang happens in fsync_bdev() of del_gendisk(), and there are IOs pending on
-> > bio_queue_enter().
-> 
-> What is the workload here?  If del_gendisk is called to remove a disk
-> that is in perfectly fine state and can do I/O, fsync_bdev should write
-> back data, which is what is exists for.  If the disk is dead, we should
-> have called blk_mark_disk_dead before.
+Hi Geert,
 
-It is basically that removing ctrl breaks in-progress error recovery,
-then queues are left as quiesced and froze.
+Am 16.06.2023 um 19:28 schrieb Geert Uytterhoeven:
+> Hi Michael,
+>
+> On Fri, Jun 16, 2023 at 9:21 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
+>> Am 16.06.2023 um 17:48 schrieb Christoph Hellwig:
+>>> On Fri, Jun 16, 2023 at 07:53:11AM +1200, Michael Schmitz wrote:
+>>>> Thanks - now there's two __s32 fields in that header - one checksum each
+>>>> for RDB and PB. No one has so far seen the need for a 'signed big endian 32
+>>>> bit' type, and I'd rather avoid adding one to types.h. I'll leave those as
+>>>> they are (with the tacit understanding that they are equally meant to be
+>>>> big endian).
+>>>
+>>> We have those in a few other pleases and store them as __be32 as well.  The
+>>> (implicit) cast to s32 will make them signed again.
+>>
+>> Where's that cast to s32 hidden? I've only seen
+>>
+>> #define __be32_to_cpu(x) ((__force __u32)(__be32)(x))
+>>
+>> which would make the checksums unsigned if __be32 was used.
+>>
+>> Whether the checksum code uses signed or unsigned math would require
+>> inspection of the Amiga partitioning tool source which I don't have, so
+>> I've kept __s32 to be safe.
+>
+> Unsurprisingly, block/partitions/amiga.c:checksum_block() calculates
+> a checksum over __be32 words.  The actual signedness of the checksum
+> field doesn't matter much[*], as using two-complement numbers, you can
+> just assign a signed value to an unsigned field.
+> It should definitely be __be32.
+>
+> [*] I guess it was made signed because the procedure to update the
+> check goes like this:
+>   1. set checksum field to zero,
+>   2. calculate sum,
+>   3. store negated sum in checksum field.
 
-https://lore.kernel.org/linux-nvme/CAHj4cs-4gQHnp5aiekvJmb6o8qAcb6nLV61uOGFiisCzM49_dg@mail.gmail.com/T/#u
+Thanks, that explains why the result of checksum_block() is tested 
+against zero. Makes sense now.
 
-https://lore.kernel.org/linux-nvme/cover.1685350577.git.chunguang.xu@shopee.com/
+Will fix in v12 ...
 
-Thanks, 
-Ming
+Cheers,
 
+	Michael
+
+
+
+>
+> Gr{oetje,eeting}s,
+>
+>                         Geert
+>
