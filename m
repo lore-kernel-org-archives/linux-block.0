@@ -2,101 +2,89 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25449EB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 13:24:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 471F7EB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 14:26:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345547AbjFPNY5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 09:24:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33734 "EHLO
+        id S229722AbjFPO0N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 10:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345665AbjFPNY4 (ORCPT
+        with ESMTP id S1345434AbjFPO0N (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 09:24:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570D13593
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 06:24:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686921843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fvyIBhCmIa02JifUqylvlN6bM+Xl3WwUs/XeMyD02Zs=;
-        b=W/OHcrR7/SvIGVsQCUOXDD/0ifoaT7K+r2AtI1e6otYf3pvd7I+wa+4Uix87Gkbj7xHXYH
-        rCSLrMWGkgw9gabGjmidLpNDF1+cmQvpgTGkzzeTD6yCevd1DMfFHQjSCHv+zSwx2n88xn
-        jb7F/1vue2AjtvwQqU2lvwIb3Q2h+EI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-483-g6_Mvr7FM9-nZOPdrqpOEw-1; Fri, 16 Jun 2023 09:24:01 -0400
-X-MC-Unique: g6_Mvr7FM9-nZOPdrqpOEw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D1D085A5A6;
-        Fri, 16 Jun 2023 13:24:01 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 842F548FB02;
-        Fri, 16 Jun 2023 13:24:00 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Guangwu Zhang <guazhang@redhat.com>
-Subject: [PATCH] blk-mq: fix NULL dereference on q->elevator in blk_mq_elv_switch_none
-Date:   Fri, 16 Jun 2023 21:23:54 +0800
-Message-Id: <20230616132354.415109-1-ming.lei@redhat.com>
+        Fri, 16 Jun 2023 10:26:13 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02BC230E3;
+        Fri, 16 Jun 2023 07:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1686925571; x=1718461571;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jbvx+fzCk6wuoZXDOskZS3VFaadcPZdfZkhrwY1ULLc=;
+  b=lPYbMMdPn16dDXSSud8doBGuw+4pB1fxXcWMrTmIYmPVIIasgccFYdRN
+   W2r0LAgibmZvQ9eZar0E0RSFBn+4oipgbfXsLppaLJpzL5DPiG4EGbKrK
+   krZ2nlO1UXjMxJ2mpyHRc3mQKrydzAuz6p46Eb4xBfWaElBfJbYBqIwdl
+   wefvLozWVDvAgFNd3m0tKYxZ1TyiGXrz7AEp/0FYDnD/0DZAn+y0vxknq
+   dT3sIiOu3Nv1wL/gGP7i/LCnblQvka8B92UDiqYKiG5GF+DKRwCZdAOqm
+   S1Xvg/apXfCKdUI0ELZ9fPhbmCMwENnYZuoiTARIkESOB96Q+fPVNOvQT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="348934347"
+X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
+   d="scan'208";a="348934347"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 07:26:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="716043859"
+X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
+   d="scan'208";a="716043859"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga007.fm.intel.com with ESMTP; 16 Jun 2023 07:26:08 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id BC90E379; Fri, 16 Jun 2023 17:26:17 +0300 (EEST)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
+Date:   Fri, 16 Jun 2023 17:26:14 +0300
+Message-Id: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.40.0.1.gaa8946217a0b
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After grabbing q->sysfs_lock, q->elevator may become NULL because of
-elevator switch.
+In a couple of places replace min()+max() pair by clamp_val().
 
-Fix the NULL dereference on q->elevator by checking it with lock.
-
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- block/blk-mq.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ drivers/block/pktcdvd.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 850bfb844ed2..9516f65a50ea 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4608,9 +4608,6 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index a1428538bda5..18a960bb6165 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -208,14 +208,11 @@ static DEVICE_ATTR_RO(size);
+ static void init_write_congestion_marks(int* lo, int* hi)
  {
- 	struct blk_mq_qe_pair *qe;
- 
--	if (!q->elevator)
--		return true;
--
- 	qe = kmalloc(sizeof(*qe), GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY);
- 	if (!qe)
- 		return false;
-@@ -4618,6 +4615,12 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
- 	/* q->elevator needs protection from ->sysfs_lock */
- 	mutex_lock(&q->sysfs_lock);
- 
-+	/* the check has to be done with holding sysfs_lock */
-+	if (!q->elevator) {
-+		kfree(qe);
-+		goto unlock;
-+	}
-+
- 	INIT_LIST_HEAD(&qe->node);
- 	qe->q = q;
- 	qe->type = q->elevator->type;
-@@ -4625,6 +4628,7 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
- 	__elevator_get(qe->type);
- 	list_add(&qe->node, head);
- 	elevator_disable(q);
-+unlock:
- 	mutex_unlock(&q->sysfs_lock);
- 
- 	return true;
+ 	if (*hi > 0) {
+-		*hi = max(*hi, 500);
+-		*hi = min(*hi, 1000000);
++		*hi = clamp_val(*hi, 500, 1000000);
+ 		if (*lo <= 0)
+ 			*lo = *hi - 100;
+-		else {
+-			*lo = min(*lo, *hi - 100);
+-			*lo = max(*lo, 100);
+-		}
++		else
++			*lo = clamp_val(*lo, 100, *hi - 100);
+ 	} else {
+ 		*hi = -1;
+ 		*lo = -1;
 -- 
-2.40.1
+2.40.0.1.gaa8946217a0b
 
