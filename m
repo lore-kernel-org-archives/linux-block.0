@@ -2,119 +2,98 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2383AEB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 11:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B77EB64D8
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 12:59:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240464AbjFPLxC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 07:53:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38604 "EHLO
+        id S229558AbjFPM70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 08:59:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344397AbjFPLxB (ORCPT
+        with ESMTP id S232489AbjFPM70 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 07:53:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C55191;
-        Fri, 16 Jun 2023 04:52:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8799763810;
-        Fri, 16 Jun 2023 11:52:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 538D6C433C9;
-        Fri, 16 Jun 2023 11:52:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686916378;
-        bh=vLi/Ctgz4882UqtH6fdv5YzHK0VG2XkpSMNA82BO34A=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=JZ4veK4EM7+Drhrqe3EyyEUcnY6OgSUIEC7RF1MHwJu+WzBt9DEbjvnkfxJe79VN+
-         Ou6mweWotByj1Kulm6TEnmAvJkLNzSFElkCx0xCySJShFtFaejz95r8dXwVj6X7HiR
-         lFvLJx1TsvYupHgIbqKsaj051h8g8zA7tzAowgCc/jLmFTHNXzwG3d6dfXAuWMo4bV
-         ipYTECvuzi4e2N/EOKcQkF4BAC1WROnIVxG7p/1zfmOzXQZl7McORump73TNOxkpk6
-         CYGRPzKA5CBgUKflc2qZm4tOrw0xyr5owilv4yiWPgMMdpj+RNMEeGdhGPTCituBpT
-         JtaEAN/3B8l2w==
-Message-ID: <5b0eaf1d-60b1-532e-7d12-c67810541902@kernel.org>
-Date:   Fri, 16 Jun 2023 20:52:55 +0900
+        Fri, 16 Jun 2023 08:59:26 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33EA83581;
+        Fri, 16 Jun 2023 05:59:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=xc0rFww4DDidrWoBZkAi7FUYLAiSH50b8oCJnfR9dZ4=; b=j2z5IAKHx+iYyWyLz2HFE50zJ/
+        Jhh4tgKe4YJEQr6oI0WEHTxShrKgtDl8stsJaY/dOoZ9vna81ZCN4XwQplvFkW8/haHb6omkttGT+
+        UpOAo65ikQVFI1E7A47AistDWYV+VSIJUM2w8KE3GAzCu0tRCkBbdT0zscpvs6e5krwZNRZCe9RZe
+        uTQhd7AkCWHdwfHmX69TV0jzW+xKMUcdOdy4WIDRHcssEkkCVFZz3UGQKXanUtM8VAAAcZB3SgLu5
+        FPAxg7yRIIpo4TFPZIHwX+GMBJm0AR/zz7RKHRFhztKcC9TsW/wysILWTFx6leAC4utwq81CNMGZ1
+        blemVp9Q==;
+Received: from [2601:1c2:980:9ec0::2764]
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qA92m-000crn-1T;
+        Fri, 16 Jun 2023 12:59:12 +0000
+Message-ID: <c6696073-7882-bdac-32da-c90f181a2804@infradead.org>
+Date:   Fri, 16 Jun 2023 05:59:11 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v3] block: add capacity validation in bdev_add_partition()
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v2 1/1] cdrom: Fix spectre-v1 gadget
 Content-Language: en-US
-To:     "min.li" <min15.li@samsung.com>, axboe@kernel.dk,
-        willy@infradead.org, hch@lst.de, gregkh@linuxfoundation.org,
-        wsa@kernel.org, vkoul@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <CGME20230616092054epcas5p340e977377808d2df7210dc4a7d6c1d8e@epcas5p3.samsung.com>
- <20230616171913.13045-1-min15.li@samsung.com>
-From:   Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230616171913.13045-1-min15.li@samsung.com>
+To:     Jordy Zomer <jordyzomer@google.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+Cc:     Phillip Potter <phil@philpotter.co.uk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20230612110040.849318-1-jordyzomer@google.com>
+ <20230612110040.849318-2-jordyzomer@google.com>
+ <20230615163125.td3aodpfwth5n4mc@desk> <ZIufZn+reW0rza1H@equinox>
+ <20230616031447.yslq6ep7lxe6sjv4@desk>
+ <CABjM8Zc4WU-QXVDDtfKtGPnsHOhjXYufg+HZ=cdSudXYeKS7YQ@mail.gmail.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <CABjM8Zc4WU-QXVDDtfKtGPnsHOhjXYufg+HZ=cdSudXYeKS7YQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/17/23 02:19, min.li wrote:
-> In the function bdev_add_partition(),there is no check that the start
-> and end sectors exceed the size of the disk before calling add_partition.
-> When we call the block's ioctl interface directly to add a partition,
-> and the capacity of the disk is set to 0 by driver,the command will
-> continue to execute.
-> 
-> Signed-off-by: min.li <min15.li@samsung.com>
 
-I am guessing this should be:
 
-Signed-off-by: Min Li <min15.li@samsung.com>
+On 6/16/23 02:39, Jordy Zomer wrote:
+> Thanks for the explanation Pawan, a little bit off-topic for this patch but
+> shall I send a patch to add this to the documentation of array_index_nospec()
+> and fix other calls to that function where the upper bound is not a constant? :)
+> 
 
-No ? The signed-off-by tag, and any other tag, must have your full name
-correctly written.
+Yes, please. We don't want to lose that info.
 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> ---
-> Changes from v1:
-> 
-> - Check for overflows of the start + length value.
-> - Place the capacity check at the beginning of the function.
-> 
-> Changes from v2:
-> 
-> - Place the assignment on the first line and merge the two lines into one.
-> - Modify the singed name.
-> ---
->  block/partitions/core.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index 49e0496ff23c..b511f88bf558 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -436,10 +436,21 @@ static bool partition_overlaps(struct gendisk *disk, sector_t start,
->  int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
->  		sector_t length)
->  {
-> +	sector_t capacity = get_capacity(disk), end;
->  	struct block_device *part;
->  	int ret;
->  
->  	mutex_lock(&disk->open_mutex);
-> +	if (check_add_overflow(start, length, &end)) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	if (start >= capacity || end > capacity) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
->  	if (!disk_live(disk)) {
->  		ret = -ENXIO;
->  		goto out;
+Thanks.
+
+> On Fri, Jun 16, 2023 at 5:15 AM Pawan Gupta
+> <pawan.kumar.gupta@linux.intel.com> wrote:
+>>
+>> On Fri, Jun 16, 2023 at 12:31:50AM +0100, Phillip Potter wrote:
+>>> I've now looked at this. It is possible for cdi->capacity to be > 1, as
+>>> it is set via get_capabilities() -> cdrom_number_of_slots(), if the
+>>> device is an individual or cartridge changer.
+>>
+>> Ohk. Is there an upper limit to cdi->capacity? If not, we are left with
+>> barrier_nospec().
+>>
+>>> Therefore, I think using CDI_MAX_CAPACITY of 1 is not the correct
+>>> approach. Jordy's V2 patch is fine therefore, but perhaps using
+>>> array_index_nospec() with cdi->capacity is still better than a
+>>> do/while loop from a performance perspective, given it would be cached
+>>> etc. at that point, so possibly quicker. Thoughts? (I'm no expert on
+>>> spectre-v1 I'll admit).
+>>
+>> array_index_nospec() can only clip the arg correctly if the upper bound
+>> is correct. Problem with array_index_nospec(arg, cdi->capacity) is
+>> cdi->capacity is not a constant, so it suffers from the same problem as
+>> arg i.e. cdi->capacity could also be speculated. Although having to
+>> control 2 loads makes the attack difficult, but does not rules out
+>> completely.
+>>
+>> barrier_nospec() makes the CPU wait for all previous loads to retire
+>> before executing following instructions speculatively. This causes the
+>> conditional branch to resolve correctly. I hope this does not fall into
+>> a hotpath.
 
 -- 
-Damien Le Moal
-Western Digital Research
-
+~Randy
