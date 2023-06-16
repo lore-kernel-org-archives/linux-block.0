@@ -2,89 +2,81 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 471F7EB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 14:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F0CEEB64DA
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 16:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbjFPO0N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 10:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39342 "EHLO
+        id S229535AbjFPQHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 12:07:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345434AbjFPO0N (ORCPT
+        with ESMTP id S231265AbjFPQHI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 10:26:13 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02BC230E3;
-        Fri, 16 Jun 2023 07:26:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686925571; x=1718461571;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jbvx+fzCk6wuoZXDOskZS3VFaadcPZdfZkhrwY1ULLc=;
-  b=lPYbMMdPn16dDXSSud8doBGuw+4pB1fxXcWMrTmIYmPVIIasgccFYdRN
-   W2r0LAgibmZvQ9eZar0E0RSFBn+4oipgbfXsLppaLJpzL5DPiG4EGbKrK
-   krZ2nlO1UXjMxJ2mpyHRc3mQKrydzAuz6p46Eb4xBfWaElBfJbYBqIwdl
-   wefvLozWVDvAgFNd3m0tKYxZ1TyiGXrz7AEp/0FYDnD/0DZAn+y0vxknq
-   dT3sIiOu3Nv1wL/gGP7i/LCnblQvka8B92UDiqYKiG5GF+DKRwCZdAOqm
-   S1Xvg/apXfCKdUI0ELZ9fPhbmCMwENnYZuoiTARIkESOB96Q+fPVNOvQT
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="348934347"
-X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="348934347"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2023 07:26:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10742"; a="716043859"
-X-IronPort-AV: E=Sophos;i="6.00,247,1681196400"; 
-   d="scan'208";a="716043859"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga007.fm.intel.com with ESMTP; 16 Jun 2023 07:26:08 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id BC90E379; Fri, 16 Jun 2023 17:26:17 +0300 (EEST)
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 1/1] pktcdvd: Use clamp_val() instead of min()+max()
-Date:   Fri, 16 Jun 2023 17:26:14 +0300
-Message-Id: <20230616142614.36206-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.40.0.1.gaa8946217a0b
+        Fri, 16 Jun 2023 12:07:08 -0400
+Received: from out-8.mta0.migadu.com (out-8.mta0.migadu.com [IPv6:2001:41d0:1004:224b::8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 118492D73
+        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 09:07:04 -0700 (PDT)
+Date:   Fri, 16 Jun 2023 12:06:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1686931622;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1USo/ooQu2H7EgxmruGrjOf5Ce4S9FGHhwjIFSZcL8g=;
+        b=AvYIpx2IZmfDjuE83FMHHGRVn5CHoIbLozXAhwVh2bD5fACJ29EVxnu2MCMm9d09OEipb0
+        MgBFJDyj/QpsA3DesKX/8Wq3MHqu3wV57uW4yJuqfX7cUCLXM4Ps7pDBGLX2LGOBc8No7b
+        9+LlES+CUK2YNrstj0ZkECR9Qpqy0vY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Kent Overstreet <kent.overstreet@linux.dev>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH 0/7] RFC: high-order folio support for I/O
+Message-ID: <ZIyIon3DCdA14pWR@moria.home.lan>
+References: <20230614114637.89759-1-hare@suse.de>
+ <cd816905-0e3e-6397-1a6f-fd4d29dfc739@suse.de>
+ <ZInGbz6X/ZQAwdRx@casper.infradead.org>
+ <b3fa1b77-d120-f86b-e02f-f79b6d13efcc@suse.de>
+ <ZIpS9u4P43PgJwuj@dread.disaster.area>
+ <df8e7a88-f540-af93-77dc-164262a5a3d0@suse.de>
+ <ZIrRFwElpZsAnl4Q@dread.disaster.area>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZIrRFwElpZsAnl4Q@dread.disaster.area>
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In a couple of places replace min()+max() pair by clamp_val().
+On Thu, Jun 15, 2023 at 06:51:35PM +1000, Dave Chinner wrote:
+> On Thu, Jun 15, 2023 at 08:21:10AM +0200, Hannes Reinecke wrote:
+> > On 6/15/23 01:53, Dave Chinner wrote:
+> > > On Wed, Jun 14, 2023 at 05:06:14PM +0200, Hannes Reinecke wrote:
+> > > All you need to do now is run the BS > PS filesytems through a full
+> > > fstests pass (reflink + rmap enabled, auto group), and then we can
+> > > start on the real data integrity validation work. It'll need tens of
+> > > billions of fsx ops run on it, days of recoveryloop testing, days of
+> > > fstress based exercise, etc before we can actually enable it in
+> > > XFS....
+> > > 
+> > Hey, c'mon. I do know _that_. All I'm saying is that now we can _start_
+> > running tests and figure out corner cases (like NFS crashing on me :-).
+> > With this patchset we now have some infrastructure in place making it
+> > even _possible_ to run those tests.
+> 
+> I got to this same point several years ago. You know, that patchset
+> that Luis went back to when he brought up this whole topic again?
+> That's right when I started running fsx, and I realised it
+> didn't cover FICLONERANGE, FIDEDUPERANGE and copy_file_range().
+> 
+> Yep, that's when we first realised we had -zero- test coverage of
+> those operations. Darrick and I spent the next *3 months* pretty
+> much rewriting the VFS level of those operations and fixing all the
+> other bugs in the implementations, just so we could validate they
+> worked correct on BS <= PS.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/block/pktcdvd.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index a1428538bda5..18a960bb6165 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -208,14 +208,11 @@ static DEVICE_ATTR_RO(size);
- static void init_write_congestion_marks(int* lo, int* hi)
- {
- 	if (*hi > 0) {
--		*hi = max(*hi, 500);
--		*hi = min(*hi, 1000000);
-+		*hi = clamp_val(*hi, 500, 1000000);
- 		if (*lo <= 0)
- 			*lo = *hi - 100;
--		else {
--			*lo = min(*lo, *hi - 100);
--			*lo = max(*lo, 100);
--		}
-+		else
-+			*lo = clamp_val(*lo, 100, *hi - 100);
- 	} else {
- 		*hi = -1;
- 		*lo = -1;
--- 
-2.40.0.1.gaa8946217a0b
-
+code coverage analysis...
