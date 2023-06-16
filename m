@@ -2,87 +2,63 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBBEEB64D7
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 07:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 355CFEB64D8
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 07:26:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244736AbjFPHWb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 03:22:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58126 "EHLO
+        id S232983AbjFPH0E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 03:26:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245012AbjFPHWJ (ORCPT
+        with ESMTP id S244583AbjFPH0C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 03:22:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B74D30C1
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 00:20:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686900054;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tqp0jBy0MAwlbUsOY9gyPmPTKTK42ZPVNu6TVt7Ucvw=;
-        b=ZIIngV5zUGJPpZnvWG9v6ulF63VbR+VZk9aaSlywDbBOzG1KAI2piRIHOVxOgCEo5sF2Wp
-        YGyqFpTSVnCtPHqjeZd62Ga+vvlIEeLZsAn1WRqP5c1kMY2rUoa9LeKt2E50uYmELOKsFU
-        IxY6xeEBscdjVWqUQGh7URAaSJUIZ8A=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-15--JlAnzDoOqqlAjkngnYWaA-1; Fri, 16 Jun 2023 03:20:49 -0400
-X-MC-Unique: -JlAnzDoOqqlAjkngnYWaA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10D55281424C;
-        Fri, 16 Jun 2023 07:20:48 +0000 (UTC)
-Received: from ovpn-8-18.pek2.redhat.com (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 366D540C20F4;
-        Fri, 16 Jun 2023 07:20:42 +0000 (UTC)
-Date:   Fri, 16 Jun 2023 15:20:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, Yi Zhang <yi.zhang@redhat.com>,
-        linux-block@vger.kernel.org, Chunguang Xu <brookxu.cn@gmail.com>
-Subject: Re: [PATCH 1/4] blk-mq: add API of blk_mq_unfreeze_queue_force
-Message-ID: <ZIwNRu1zodp61PEO@ovpn-8-18.pek2.redhat.com>
-References: <20230615143236.297456-1-ming.lei@redhat.com>
- <20230615143236.297456-2-ming.lei@redhat.com>
- <ZIsrSyEqWMw8/ikq@kbusch-mbp.dhcp.thefacebook.com>
- <ZIsxt7Q2nmiLNTX2@ovpn-8-16.pek2.redhat.com>
- <20230616054800.GA28499@lst.de>
+        Fri, 16 Jun 2023 03:26:02 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756A526A9;
+        Fri, 16 Jun 2023 00:25:59 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 52BC767373; Fri, 16 Jun 2023 09:25:55 +0200 (CEST)
+Date:   Fri, 16 Jun 2023 09:25:55 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Michael Schmitz <schmitzmic@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-m68k@vger.kernel.org, martin@lichtvoll.de,
+        fthain@linux-m68k.org, stable@vger.kernel.org
+Subject: Re: [PATCH v10 2/3] block: change annotation of rdb_CylBlocks in
+ affs_hardblocks.h
+Message-ID: <20230616072554.GA30156@lst.de>
+References: <20230615030837.8518-1-schmitzmic@gmail.com> <20230615030837.8518-3-schmitzmic@gmail.com> <20230615041742.GA4426@lst.de> <056834c7-89ca-c8cd-69be-62100f1e5591@gmail.com> <20230615055349.GA5544@lst.de> <CAMuHMdWyQnKUaNtxYjqpxXovFKNPmhQDeCXX=exrqtgOfSFUjw@mail.gmail.com> <69ecfff9-0f18-abe7-aa97-3ec60cf53f13@gmail.com> <20230616054847.GB28499@lst.de> <80ffb46c-b560-7c4e-0200-f9a91350c000@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230616054800.GA28499@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+In-Reply-To: <80ffb46c-b560-7c4e-0200-f9a91350c000@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 16, 2023 at 07:48:00AM +0200, Christoph Hellwig wrote:
-> On Thu, Jun 15, 2023 at 11:43:51PM +0800, Ming Lei wrote:
-> > On Thu, Jun 15, 2023 at 09:16:27AM -0600, Keith Busch wrote:
-> > > On Thu, Jun 15, 2023 at 10:32:33PM +0800, Ming Lei wrote:
-> > > > NVMe calls freeze/unfreeze in different contexts, and controller removal
-> > > > may break in-progress error recovery, then leave queues in frozen state.
-> > > > So cause IO hang in del_gendisk() because pending writeback IOs are
-> > > > still waited in bio_queue_enter().
-> > > 
-> > > Shouldn't those writebacks be unblocked by the existing check in
-> > > bio_queue_enter, test_bit(GD_DEAD, &disk->state))? Or are we missing a
-> > > disk state update or wakeup on this condition?
-> > 
-> > GD_DEAD is only set if the device is really dead, then all pending IO
-> > will be failed.
-> 
-> del_gendisk also sets GD_DEAD early on.
+On Fri, Jun 16, 2023 at 07:20:52PM +1200, Michael Schmitz wrote:
+> Am 16.06.2023 um 17:48 schrieb Christoph Hellwig:
+>> On Fri, Jun 16, 2023 at 07:53:11AM +1200, Michael Schmitz wrote:
+>>> Thanks - now there's two __s32 fields in that header - one checksum each
+>>> for RDB and PB. No one has so far seen the need for a 'signed big endian 32
+>>> bit' type, and I'd rather avoid adding one to types.h. I'll leave those as
+>>> they are (with the tacit understanding that they are equally meant to be
+>>> big endian).
+>>
+>> We have those in a few other pleases and store them as __be32 as well.  The
+>> (implicit) cast to s32 will make them signed again.
+>
+> Where's that cast to s32 hidden? I've only seen
+>
+> #define __be32_to_cpu(x) ((__force __u32)(__be32)(x))
+>
+> which would make the checksums unsigned if __be32 was used.
+>
+> Whether the checksum code uses signed or unsigned math would require 
+> inspection of the Amiga partitioning tool source which I don't have, so 
+> I've kept __s32 to be safe.
 
-No.
-
-The hang happens in fsync_bdev() of del_gendisk(), and there are IOs pending on
-bio_queue_enter().
-
-Thanks,
-Ming
-
+Well, the return value of be32_to_cpu is going to be a assigned to a,
+presumably signed, variable.  With that you get an implicit cast.
