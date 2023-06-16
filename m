@@ -2,101 +2,163 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C0DEB64DB
-	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 09:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E3DEEB64D7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Jun 2023 09:44:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344465AbjFPJkf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Jun 2023 05:40:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53306 "EHLO
+        id S232377AbjFPJnw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Jun 2023 05:43:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344407AbjFPJkK (ORCPT
+        with ESMTP id S1344243AbjFPJnP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Jun 2023 05:40:10 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163362117
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 02:40:09 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id e9e14a558f8ab-33b7f217dd0so151875ab.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 02:40:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1686908408; x=1689500408;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=43PrIaNilwLVOBaGJgg3FhjL+CYuMOw3V/XLZiBQlYE=;
-        b=yKrw35JciWVKtv0Yy+RXVoVaEA9wuX/nelST7hHhfAOkFL2FkdHfykVwC7K37WIPsh
-         GhS4gCLqMvOyYRHo2Le16NAXgZGrnckfTr9G9YAk1YcYG+HZMHBr3EHuEjVtcrJOZx8S
-         8aRccrcvczj3fVY928UAXdnZPn8c5M4qZopfbGBtMvbNTZMd5MHxz8S7zN0nr03Qf3ic
-         8Q/AZzMB7wEMIADV6tEJXAX5v6yfJ8oHP9dYudDQ5FUQUDxw3KdGNSr46G6ROPRUndKD
-         sn31joB99Ma6r/Rk2uKKpxsJ68yvzXdByPm17oMMvDqLvj9jXS4M0FQ0YspfGi69i5uB
-         ebJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686908408; x=1689500408;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=43PrIaNilwLVOBaGJgg3FhjL+CYuMOw3V/XLZiBQlYE=;
-        b=CPcD2A3HqVqGm8pol7kEGP94SGQrgi6y4grYX+NhBVTNRJHc+ooGz98kAEWYZF91oz
-         Lu93PTxPz2DicF53bTJLWT+Hro4B2oj2jSFnAX5DWFItr8oqysVV2ZzUuqmpMQQrPPEI
-         hJKSyke3/vDBXtwXwTDbgGeJHVhTCLBJz0MDXSVq7PYj2uX4n4Z1d5TWUGMsMtNks+jt
-         V/SnDA8npk743G6X4yPvY3GAA+/u6lZgdICiOgozNyEHjBcGJ/Q+1Mfhs6/qBTaaNliM
-         JIfcGE+hHe/ZyK28LO1Jm/T6hTc76eEGJW63xh3DmiJTlHFlTeQlLPABDd0ttg/JLnEF
-         7bWA==
-X-Gm-Message-State: AC+VfDykIcqrSz5JKEwOqW9+lFXJX/4Ln2L6vvEHiPzgbnWfzZPi013V
-        pQ7voq2/XeylvGn+AKXc/RFgJ8ozXP2RfX81PunnDg==
-X-Google-Smtp-Source: ACHHUZ4CLjc42sgoycpHkixS7s+Qk0aypo3zCVJ/AGY8A/3PTK8S+fQ75d1iH45DeHuHotIaZnyTETriUMEXxyuSRHA=
-X-Received: by 2002:a05:6e02:1569:b0:338:55b9:f1a3 with SMTP id
- k9-20020a056e02156900b0033855b9f1a3mr454946ilu.7.1686908408312; Fri, 16 Jun
- 2023 02:40:08 -0700 (PDT)
+        Fri, 16 Jun 2023 05:43:15 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AADD035A4
+        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 02:42:52 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20230616094228epoutp04a1d241cb26d3901cc39745442fba0843~pGmMg6CYE2443624436epoutp044
+        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 09:42:28 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20230616094228epoutp04a1d241cb26d3901cc39745442fba0843~pGmMg6CYE2443624436epoutp044
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1686908548;
+        bh=oWIj79E/6JkqBTQXFwgb0y29I1jook9TSDLjz17j/Ro=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=VKb4aXSVZc9k3hJBzqeYBeG7+XKOFSN5N/eVoqfediswF8ecOHmqax5OJ5nOeGWms
+         JdCzREtPdGaQFnlfOip+6iS4u3BFt4xY1UBEq44yqypQ9PGi6sb9FiR2OSZ/1AUGVd
+         0+UA+M7xlvCS2/a0bXeL24H9Xl3cksCaqGMOzo9o=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20230616094227epcas5p1217672b323c59851039ba2dfe2d8f871~pGmL4qk_91222412224epcas5p10;
+        Fri, 16 Jun 2023 09:42:27 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4QjDhy06FCz4x9Q1; Fri, 16 Jun
+        2023 09:42:26 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        BB.6B.44881.18E2C846; Fri, 16 Jun 2023 18:42:25 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20230616092054epcas5p340e977377808d2df7210dc4a7d6c1d8e~pGTW82UBX1047010470epcas5p3F;
+        Fri, 16 Jun 2023 09:20:54 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230616092054epsmtrp26644f7cb738c71b1ed4143127792c838~pGTW79WFv2884728847epsmtrp25;
+        Fri, 16 Jun 2023 09:20:54 +0000 (GMT)
+X-AuditID: b6c32a4a-c47ff7000001af51-3c-648c2e8129e4
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        44.DF.27706.5792C846; Fri, 16 Jun 2023 18:20:53 +0900 (KST)
+Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230616092052epsmtip1d15b5cc6acbbdd82906312bf2bf4a6d1~pGTVi4F7l2879828798epsmtip1k;
+        Fri, 16 Jun 2023 09:20:52 +0000 (GMT)
+From:   "min.li" <min15.li@samsung.com>
+To:     axboe@kernel.dk, willy@infradead.org, hch@lst.de,
+        dlemoal@kernel.org, gregkh@linuxfoundation.org, wsa@kernel.org,
+        vkoul@kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "min.li" <min15.li@samsung.com>
+Subject: [PATCH v3] block: add capacity validation in bdev_add_partition()
+Date:   Fri, 16 Jun 2023 17:19:13 +0000
+Message-Id: <20230616171913.13045-1-min15.li@samsung.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20230612110040.849318-1-jordyzomer@google.com>
- <20230612110040.849318-2-jordyzomer@google.com> <20230615163125.td3aodpfwth5n4mc@desk>
- <ZIufZn+reW0rza1H@equinox> <20230616031447.yslq6ep7lxe6sjv4@desk>
-In-Reply-To: <20230616031447.yslq6ep7lxe6sjv4@desk>
-From:   Jordy Zomer <jordyzomer@google.com>
-Date:   Fri, 16 Jun 2023 11:39:57 +0200
-Message-ID: <CABjM8Zc4WU-QXVDDtfKtGPnsHOhjXYufg+HZ=cdSudXYeKS7YQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] cdrom: Fix spectre-v1 gadget
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     Phillip Potter <phil@philpotter.co.uk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrBJsWRmVeSWpSXmKPExsWy7bCmum6jXk+KwcdXphar7/azWTzYb2/R
+        vHg9m8WN4++YLea+vsRisXL1USaLvbe0LS7vmsNmsXxVB5PF2QkfWC123jnBbPH7B1Ds7v65
+        jBY31l1lceDz2LxCy+Py2VKPTas62Tz2z13D7rH7ZgObR9+WVYwenzfJBbBHZdtkpCampBYp
+        pOYl56dk5qXbKnkHxzvHm5oZGOoaWlqYKynkJeam2iq5+AToumXmAN2rpFCWmFMKFApILC5W
+        0rezKcovLUlVyMgvLrFVSi1IySkwKdArTswtLs1L18tLLbEyNDAwMgUqTMjOaOycwFhwibvi
+        wOyNzA2Mazi7GDk5JARMJLbcvczYxcjFISSwm1Fi6fLtUM4nRom7faegnG+MEvPnvGTvYuQA
+        a3m6rQikW0hgL6PE8oteEDXPgeyPixhBEmwCqhLTn85gBrFFBDoYJbYcBVvHLJAgsfr8G0aQ
+        OcICXhInW01BwixA5b97VrKA2LwClhJvrx5ihrhOXmL/wbPMEHFBiZMzn7BAjJGXaN46mxlk
+        r4RAL4fEm6f3WCEaXCTOPlnDDmELS7w6vgXKlpL4/G4vG8T9xRIvf4RBhGskdn+7zQRhW0ts
+        W7+OCaSEWUBTYv0ufYiwrMTUU+uYINbySfT+fgJVziuxYx6MrSTx98I5RghbQmLx/oesEJs8
+        JDr2aENCKlbi0ZdPzBMY5WcheWYWkmdmISxewMi8ilEytaA4Nz212LTAKC+1HB6pyfm5mxjB
+        SVbLawfjwwcf9A4xMnEwHmKU4GBWEuFddqIrRYg3JbGyKrUoP76oNCe1+BCjKTCEJzJLiSbn
+        A9N8Xkm8oYmlgYmZmZmJpbGZoZI4r7rtyWQhgfTEktTs1NSC1CKYPiYOTqkGpprPX1Y1aLwv
+        nsWhnyzwaGeJ+YQYudidvtdcPRyLL3+tiqjh/6FqdG2hkqX0ETa1I3M7Ak7MbVubkbNlu6HL
+        Cb6+DTIL1cL1fh33bpX4xzBthm/8pWMvPgoFKVrGqoUaTL0lWLezwPdvZ82DmL4cEb6tQtw8
+        GffOVF/Z8LvmNG/VK/niTR9V+n1vlCYvdDlvKXFqUuKGd27/jM5azpdil7fL7rZ4tmuZ5p0j
+        dp4fD3S/2/C9ZMaEC3UX63Q5Hl7/+7B63n5D9sywx07134L3Swv7fX52hbMgQ//zlkyT6Sln
+        TWfu842fInNBalJAjcQ7wxrTdaqzhXc6b7V/6FZ2weCQkmLGpfks03aGPV8er8RSnJFoqMVc
+        VJwIACmf7ns7BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsWy7bCSnG6pZk+Kwd8eC4vVd/vZLB7st7do
+        XryezeLG8XfMFnNfX2KxWLn6KJPF3lvaFpd3zWGzWL6qg8ni7IQPrBY775xgtvj9Ayh2d/9c
+        Rosb666yOPB5bF6h5XH5bKnHplWdbB77565h99h9s4HNo2/LKkaPz5vkAtijuGxSUnMyy1KL
+        9O0SuDIaOycwFlzirjgweyNzA+Mazi5GDg4JAROJp9uKuhi5OIQEdjNKrPjzkrmLkRMoLiFx
+        ft4vNghbWGLlv+fsILaQwFNGiS2LxEBsNgFVielPZzCDNIsITGKUuH/hNSvIUGaBJIn+mdYg
+        prCAl8TJVlOQchag8t89K1lAbF4BS4m3Vw9BrZKX2H/wLDNEXFDi5MwnYDXMQPHmrbOZJzDy
+        zUKSmoUktYCRaRWjZGpBcW56brFhgWFearlecWJucWleul5yfu4mRnDIa2nuYNy+6oPeIUYm
+        DsZDjBIczEoivMtOdKUI8aYkVlalFuXHF5XmpBYfYpTmYFES573QdTJeSCA9sSQ1OzW1ILUI
+        JsvEwSnVwHQm8tXP0L4bphNmJ7UF3pySovPcbWfVZy+XH4yp87xDbv+8mtm1sOXVwxUv8qd9
+        Co26mNx3X3vy+/Ifon7s5UJzr69f923f3enu+ZO3BqdlGDzl7BcILu778/DEKVFNq78LueYu
+        PDNLkTOr6xi7/qJWb/8NW9+XV8w/finGwuBD7EF513T5Z3cOe/jasHvFbUnumzxxb8Gj6pX7
+        3kRembftW+fx043CHTc23vz32G75Ok0rj3MHC6etTohlWnVwq7vTg/574q+C/2t7pgetNLoS
+        Wvsl4WKop9DkgJVLldcsX3Nu9TaRZ9NTLyz58/JWm8KL2VlXi3YLS2vNlhc74N8WMZszjk3G
+        awG7zIJL6skHlViKMxINtZiLihMB9JJBaOgCAAA=
+X-CMS-MailID: 20230616092054epcas5p340e977377808d2df7210dc4a7d6c1d8e
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230616092054epcas5p340e977377808d2df7210dc4a7d6c1d8e
+References: <CGME20230616092054epcas5p340e977377808d2df7210dc4a7d6c1d8e@epcas5p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for the explanation Pawan, a little bit off-topic for this patch but
-shall I send a patch to add this to the documentation of array_index_nospec=
-()
-and fix other calls to that function where the upper bound is not a constan=
-t? :)
+In the function bdev_add_partition(),there is no check that the start
+and end sectors exceed the size of the disk before calling add_partition.
+When we call the block's ioctl interface directly to add a partition,
+and the capacity of the disk is set to 0 by driver,the command will
+continue to execute.
 
-On Fri, Jun 16, 2023 at 5:15=E2=80=AFAM Pawan Gupta
-<pawan.kumar.gupta@linux.intel.com> wrote:
->
-> On Fri, Jun 16, 2023 at 12:31:50AM +0100, Phillip Potter wrote:
-> > I've now looked at this. It is possible for cdi->capacity to be > 1, as
-> > it is set via get_capabilities() -> cdrom_number_of_slots(), if the
-> > device is an individual or cartridge changer.
->
-> Ohk. Is there an upper limit to cdi->capacity? If not, we are left with
-> barrier_nospec().
->
-> > Therefore, I think using CDI_MAX_CAPACITY of 1 is not the correct
-> > approach. Jordy's V2 patch is fine therefore, but perhaps using
-> > array_index_nospec() with cdi->capacity is still better than a
-> > do/while loop from a performance perspective, given it would be cached
-> > etc. at that point, so possibly quicker. Thoughts? (I'm no expert on
-> > spectre-v1 I'll admit).
->
-> array_index_nospec() can only clip the arg correctly if the upper bound
-> is correct. Problem with array_index_nospec(arg, cdi->capacity) is
-> cdi->capacity is not a constant, so it suffers from the same problem as
-> arg i.e. cdi->capacity could also be speculated. Although having to
-> control 2 loads makes the attack difficult, but does not rules out
-> completely.
->
-> barrier_nospec() makes the CPU wait for all previous loads to retire
-> before executing following instructions speculatively. This causes the
-> conditional branch to resolve correctly. I hope this does not fall into
-> a hotpath.
+Signed-off-by: min.li <min15.li@samsung.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+
+---
+Changes from v1:
+
+- Check for overflows of the start + length value.
+- Place the capacity check at the beginning of the function.
+
+Changes from v2:
+
+- Place the assignment on the first line and merge the two lines into one.
+- Modify the singed name.
+---
+ block/partitions/core.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 49e0496ff23c..b511f88bf558 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -436,10 +436,21 @@ static bool partition_overlaps(struct gendisk *disk, sector_t start,
+ int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
+ 		sector_t length)
+ {
++	sector_t capacity = get_capacity(disk), end;
+ 	struct block_device *part;
+ 	int ret;
+ 
+ 	mutex_lock(&disk->open_mutex);
++	if (check_add_overflow(start, length, &end)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (start >= capacity || end > capacity) {
++		ret = -EINVAL;
++		goto out;
++	}
++
+ 	if (!disk_live(disk)) {
+ 		ret = -ENXIO;
+ 		goto out;
+-- 
+2.34.1
+
