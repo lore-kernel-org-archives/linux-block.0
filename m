@@ -2,148 +2,151 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C4DAEB64D9
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 05:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3D0EB64DA
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 08:05:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233026AbjFQFYj convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 01:24:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47926 "EHLO
+        id S1346257AbjFQIFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 04:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229852AbjFQFYi (ORCPT
+        with ESMTP id S1346259AbjFQIFE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 01:24:38 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AA781FD7
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 22:24:36 -0700 (PDT)
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35H4uCSF015406
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 22:24:35 -0700
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3r8msdf1ft-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 16 Jun 2023 22:24:35 -0700
-Received: from twshared24695.38.frc1.facebook.com (2620:10d:c0a8:1c::11) by
- mail.thefacebook.com (2620:10d:c0a8:83::7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 16 Jun 2023 22:24:34 -0700
-Received: by devbig932.frc1.facebook.com (Postfix, from userid 4523)
-        id 14AF11F6F226A; Fri, 16 Jun 2023 22:24:17 -0700 (PDT)
-From:   Song Liu <song@kernel.org>
-To:     <linux-raid@vger.kernel.org>
-CC:     <linux-block@vger.kernel.org>, Song Liu <song@kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] md: use mddev->external to select holder in export_rdev()
-Date:   Fri, 16 Jun 2023 22:24:04 -0700
-Message-ID: <20230617052405.305871-1-song@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        Sat, 17 Jun 2023 04:05:04 -0400
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56A982720
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 01:05:03 -0700 (PDT)
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-77d9de8a74aso148380939f.0
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 01:05:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686989102; x=1689581102;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VRqqk+KnI8bsq63moaUWeoHIlR4mBeW0CyKozfhswNU=;
+        b=fgpfyLRAtPH80bq+vWapLaZedZcpw88h5dtTrK3xIGe3QfzKVI3hbUoXEgDR/GDQbv
+         rmN1H8R1ZAlSX7LqebmesGdyQPjXdn0iw70J0EgU085/eCIepoUL07yUPvWLqCLt2zE4
+         LffJW3SorDc3rpZel6jP8EbO4XE+jpuvNDm0uhI5WJgbMI7Zwr8mSm/bkkcJ4o+BmNNA
+         gobFCjxgULuQVeVyH6k4sncjzb0gv4RiHKo9XmSmmv7m7Qslw/2YAm9nZwrcH9e9TL+z
+         hNyM/VVGGxhnZYcoDo3VGo5B4cWlxtdUXUp/mX7ATqFMFc4iH0dG7UsexXFXUUf8Wnt8
+         CFyg==
+X-Gm-Message-State: AC+VfDxDRlsqAkfJcFkbGOjzhnhPhJA6yZrUNjpTumaYnvXuVgeDw19n
+        6VR0/5MXb/fap6/86P6Tnrx3+6xr2795SkT1yuuULbjgjK34
+X-Google-Smtp-Source: ACHHUZ62fPJVvXvzTsmYmAXHcXDDK+ZVeEDx0Y3e3i7f9Ssn/Mxma2nP2a/rQxe7pK2insHlzfYQkml8Se73M6rfx/gIFdpeBRkj
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: z4_uBPkIDvgSDPAPwJJOuaVXigDJIsl5
-X-Proofpoint-GUID: z4_uBPkIDvgSDPAPwJJOuaVXigDJIsl5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-17_03,2023-06-16_01,2023-05-22_02
+X-Received: by 2002:a6b:7b46:0:b0:777:b438:2926 with SMTP id
+ m6-20020a6b7b46000000b00777b4382926mr1037633iop.3.1686989102697; Sat, 17 Jun
+ 2023 01:05:02 -0700 (PDT)
+Date:   Sat, 17 Jun 2023 01:05:02 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000034d5e005fe4ec280@google.com>
+Subject: [syzbot] [block?] WARNING in blkdev_get_by_dev
+From:   syzbot <syzbot+00cd27751f78817f167b@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, brauner@kernel.org, hare@suse.de, hch@lst.de,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-mdadm test "10ddf-create-fail-rebuild" triggers warnings like the following
+Hello,
 
-[  215.526357] ------------[ cut here ]------------
-[  215.527243] WARNING: CPU: 18 PID: 1264 at block/bdev.c:617 blkdev_put+0x269/0x350
-[  215.528334] Modules linked in:
-[  215.528806] CPU: 18 PID: 1264 Comm: mdmon Not tainted 6.4.0-rc2+ #768
-[  215.529863] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-[  215.531464] RIP: 0010:blkdev_put+0x269/0x350
-[  215.532167] Code: ff ff 49 8d 7d 10 e8 56 bf b8 ff 4d 8b 65 10 49 8d bc
-24 58 05 00 00 e8 05 be b8 ff 41 83 ac 24 58 05 00 00 01 e9 44 ff ff ff
-<0f> 0b e9 52 fe ff ff 0f 0b e9 6b fe ff ff1
-[  215.534780] RSP: 0018:ffffc900040bfbf0 EFLAGS: 00010283
-[  215.535635] RAX: ffff888174001000 RBX: ffff88810b1c3b00 RCX: ffffffff819a4061
-[  215.536645] RDX: dffffc0000000000 RSI: dffffc0000000000 RDI: ffff88810b1c3ba0
-[  215.537657] RBP: ffff88810dbde800 R08: fffffbfff0fca983 R09: fffffbfff0fca983
-[  215.538674] R10: ffffc900040bfbf0 R11: fffffbfff0fca982 R12: ffff88810b1c3b38
-[  215.539687] R13: ffff88810b1c3b10 R14: ffff88810dbdecb8 R15: ffff88810b1c3b00
-[  215.540833] FS:  00007f2aabdff700(0000) GS:ffff888dfb400000(0000) knlGS:0000000000000000
-[  215.541961] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  215.542775] CR2: 00007fa19a85d934 CR3: 000000010c076006 CR4: 0000000000370ee0
-[  215.543814] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  215.544840] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  215.545885] Call Trace:
-[  215.546257]  <TASK>
-[  215.546608]  export_rdev.isra.63+0x71/0xe0
-[  215.547338]  mddev_unlock+0x1b1/0x2d0
-[  215.547898]  array_state_store+0x28d/0x450
-[  215.548519]  md_attr_store+0xd7/0x150
-[  215.549059]  ? __pfx_sysfs_kf_write+0x10/0x10
-[  215.549702]  kernfs_fop_write_iter+0x1b9/0x260
-[  215.550351]  vfs_write+0x491/0x760
-[  215.550863]  ? __pfx_vfs_write+0x10/0x10
-[  215.551445]  ? __fget_files+0x156/0x230
-[  215.552053]  ksys_write+0xc0/0x160
-[  215.552570]  ? __pfx_ksys_write+0x10/0x10
-[  215.553141]  ? ktime_get_coarse_real_ts64+0xec/0x100
-[  215.553878]  do_syscall_64+0x3a/0x90
-[  215.554403]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[  215.555125] RIP: 0033:0x7f2aade11847
-[  215.555696] Code: c3 66 90 41 54 49 89 d4 55 48 89 f5 53 89 fb 48 83 ec
-10 e8 1b fd ff ff 4c 89 e2 48 89 ee 89 df 41 89 c0 b8 01 00 00 00 0f 05
-<48> 3d 00 f0 ff ff 77 35 44 89 c7 48 89 448
-[  215.558398] RSP: 002b:00007f2aabdfeba0 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-[  215.559516] RAX: ffffffffffffffda RBX: 0000000000000010 RCX: 00007f2aade11847
-[  215.560515] RDX: 0000000000000005 RSI: 0000000000438b8b RDI: 0000000000000010
-[  215.561512] RBP: 0000000000438b8b R08: 0000000000000000 R09: 00007f2aaecf0060
-[  215.562511] R10: 000000000e3ba40b R11: 0000000000000293 R12: 0000000000000005
-[  215.563647] R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000c70750
-[  215.564693]  </TASK>
-[  215.565029] irq event stamp: 15979
-[  215.565584] hardirqs last  enabled at (15991): [<ffffffff811a7432>] __up_console_sem+0x52/0x60
-[  215.566806] hardirqs last disabled at (16000): [<ffffffff811a7417>] __up_console_sem+0x37/0x60
-[  215.568022] softirqs last  enabled at (15716): [<ffffffff8277a2db>] __do_softirq+0x3eb/0x531
-[  215.569239] softirqs last disabled at (15711): [<ffffffff810d8f45>] irq_exit_rcu+0x115/0x160
-[  215.570434] ---[ end trace 0000000000000000 ]---
+syzbot found the following issue on:
 
-This means export_rdev() calls blkdev_put with a different holder than the
-one used by blkdev_get_by_dev(). This is because mddev->major_version == -2
-is not a good check for external metadata. Fix this by using
-mddev->external instead.
+HEAD commit:    1f6ce8392d6f Add linux-next specific files for 20230613
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=17899407280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d103d5f9125e9fe9
+dashboard link: https://syzkaller.appspot.com/bug?extid=00cd27751f78817f167b
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16102c55280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1202453b280000
 
-Also, do not clear mddev->external in md_clean(), as the flag might be used
-later in export_rdev().
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2d9bf45aeae9/disk-1f6ce839.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e0b03ef83e17/vmlinux-1f6ce839.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b6c21a24174d/bzImage-1f6ce839.xz
 
+The issue was bisected to:
+
+commit 2736e8eeb0ccdc71d1f4256c9c9a28f58cc43307
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Thu Jun 8 11:02:43 2023 +0000
+
+    block: use the holder as indication for exclusive opens
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1164889b280000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1364889b280000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1564889b280000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+00cd27751f78817f167b@syzkaller.appspotmail.com
 Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Song Liu <song@kernel.org>
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5024 at block/bdev.c:794 blkdev_get_by_dev.part.0+0x8ea/0xb50 block/bdev.c:794
+Modules linked in:
+CPU: 1 PID: 5024 Comm: syz-executor231 Not tainted 6.4.0-rc6-next-20230613-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
+RIP: 0010:blkdev_get_by_dev.part.0+0x8ea/0xb50 block/bdev.c:794
+Code: 44 24 08 e8 c8 94 7c fd 48 85 ed 4c 63 6c 24 08 0f 85 5f fe ff ff e9 ca fe ff ff e8 40 62 e3 fd e9 fe f8 ff ff e8 86 23 90 fd <0f> 0b 49 c7 c5 fb ff ff ff e9 c2 fe ff ff e8 73 23 90 fd 48 8b 44
+RSP: 0018:ffffc90003a0fc98 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff88801e5f2e00 RCX: 0000000000000000
+RDX: ffff88807e089dc0 RSI: ffffffff83f4524a RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000004 R11: 0000000000000001 R12: ffff88801fc56000
+R13: 0000000000000005 R14: 0000000000000000 R15: 0000000000000004
+FS:  0000555556bcf300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000005fdeb8 CR3: 000000007ceb9000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ blkdev_get_by_dev+0x79/0x80 block/bdev.c:845
+ disk_scan_partitions+0x1e2/0x300 block/genhd.c:368
+ blkdev_common_ioctl+0x5b8/0x1a40 block/ioctl.c:531
+ blkdev_ioctl+0x24f/0x760 block/ioctl.c:600
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f9e3c0e35c9
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc336b7018 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f9e3c0e35c9
+RDX: 0000000000000000 RSI: 000000000000125f RDI: 0000000000000003
+RBP: 00007f9e3c0a30d0 R08: 0000000000000000 R09: 0000000000000000
+R10: 000000000000ffff R11: 0000000000000246 R12: 00007f9e3c0a3160
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+
+
 ---
- drivers/md/md.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index cf3733c90c47..8e7cc2e69bc9 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -2458,7 +2458,7 @@ static void export_rdev(struct md_rdev *rdev, struct mddev *mddev)
- 	if (test_bit(AutoDetected, &rdev->flags))
- 		md_autodetect_dev(rdev->bdev->bd_dev);
- #endif
--	blkdev_put(rdev->bdev, mddev->major_version == -2 ? &claim_rdev : rdev);
-+	blkdev_put(rdev->bdev, mddev->external ? &claim_rdev : rdev);
- 	rdev->bdev = NULL;
- 	kobject_put(&rdev->kobj);
- }
-@@ -6140,7 +6140,7 @@ static void md_clean(struct mddev *mddev)
- 	mddev->resync_min = 0;
- 	mddev->resync_max = MaxSector;
- 	mddev->reshape_position = MaxSector;
--	mddev->external = 0;
-+	/* we still need mddev->external in export_rdev, do not clear it yet */
- 	mddev->persistent = 0;
- 	mddev->level = LEVEL_NONE;
- 	mddev->clevel[0] = 0;
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
