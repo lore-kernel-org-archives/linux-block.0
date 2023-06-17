@@ -2,96 +2,106 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F344EB64DA
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 10:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189BBEB64DA
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 11:09:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234167AbjFQKnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 06:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60902 "EHLO
+        id S235192AbjFQLI5 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 07:08:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbjFQKnD (ORCPT
+        with ESMTP id S235048AbjFQLIz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 06:43:03 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80AC910DB;
-        Sat, 17 Jun 2023 03:43:02 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qjt0K34yQz4f56MJ;
-        Sat, 17 Jun 2023 18:42:57 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.104.67])
-        by APP4 (Coremail) with SMTP id gCh0CgAHuKsujo1kJ6GfLw--.51912S4;
-        Sat, 17 Jun 2023 18:42:56 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     hch@lst.de, axboe@kernel.dk, brauner@kernel.org, hare@suse.de,
-        dsterba@suse.com, jinpu.wang@ionos.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
-Date:   Sat, 17 Jun 2023 18:38:13 +0800
-Message-Id: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+        Sat, 17 Jun 2023 07:08:55 -0400
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784A7212C;
+        Sat, 17 Jun 2023 04:08:52 -0700 (PDT)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5701e8f2b79so21389277b3.0;
+        Sat, 17 Jun 2023 04:08:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687000131; x=1689592131;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sWtixX3Z6V44aeoqqIIxWyopGY/w/u3lW96iqUHBgNM=;
+        b=kaU3hsRdAozjSoGR8EAAsMJVlDMeWpXMC2mHPzwB0g/J0Az/3GTH8mOktfP8XuzT+p
+         bCtTrTDiUgdl/a2Yj/Aj7xwHL9P/CDW+YrPSx0+7IZ1I09ZmkwVhDUAxqXb3y0lH0kti
+         YSdjHNyW4mHnRmXgXX9lbZ0KcuE8CNwtpc7pUic/JNvg8BiXjY09ZoNPZeyI52NHgayd
+         L1pPq6nrhPvTu8QLJTuIutOpd0O6IifW3EK9glERwqzptSjgSmN2IxWmoPYKaoCRS5yS
+         D+m1PSp3EFxpVwglxhs8Jz+tIlMI6mnrRLqqhZAQ4/TNcr750LBZZO++bhYW2+A2zIQH
+         f2Ow==
+X-Gm-Message-State: AC+VfDzohN4yllvsoh6ynXSh3FTT2Fbzm/6blFYwMnGxa35Z9EQgCXit
+        Mr9D7nDE2FbpbE8BCrz3Qx2bbXt0crVOkA==
+X-Google-Smtp-Source: ACHHUZ5n38vgX09upKwlvBP+oVLfgWv42x4mdkLw24WwhcRTs0ffv7Jg9R5nwG5H1BSzDwFXrpeg0w==
+X-Received: by 2002:a81:4f54:0:b0:56f:f565:c037 with SMTP id d81-20020a814f54000000b0056ff565c037mr5219067ywb.7.1687000131444;
+        Sat, 17 Jun 2023 04:08:51 -0700 (PDT)
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com. [209.85.219.171])
+        by smtp.gmail.com with ESMTPSA id p187-20020a0dffc4000000b005706c3e5dfcsm709395ywf.48.2023.06.17.04.08.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 17 Jun 2023 04:08:51 -0700 (PDT)
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-bd744ffc263so1822127276.3;
+        Sat, 17 Jun 2023 04:08:50 -0700 (PDT)
+X-Received: by 2002:a25:ae26:0:b0:be5:c78a:e9b5 with SMTP id
+ a38-20020a25ae26000000b00be5c78ae9b5mr2319004ybj.47.1687000130521; Sat, 17
+ Jun 2023 04:08:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHuKsujo1kJ6GfLw--.51912S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF4rWFWfKF17Jr4rGr45Wrg_yoW8Gw1kpF
-        WUWF45tryqgryxuF4vy3ZrGay5Gan8GryxKrWIgw1Fv39xXrnYkF92krZ8Wr10vFWSg3y5
-        WFnrZFyFqF1F9wUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-        6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-        n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWU
-        JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
-        J5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <20230616223616.6002-1-schmitzmic@gmail.com> <20230616223616.6002-3-schmitzmic@gmail.com>
+In-Reply-To: <20230616223616.6002-3-schmitzmic@gmail.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Sat, 17 Jun 2023 13:08:36 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdXo+Za3_Bz-PaLhq_oZzEzkN=g5YyDp=vaX7485WuE=Cg@mail.gmail.com>
+Message-ID: <CAMuHMdXo+Za3_Bz-PaLhq_oZzEzkN=g5YyDp=vaX7485WuE=Cg@mail.gmail.com>
+Subject: Re: [PATCH v12 2/3] block: change annotation of rdb_CylBlocks in affs_hardblocks.h
+To:     Michael Schmitz <schmitzmic@gmail.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-m68k@vger.kernel.org, hch@lst.de, martin@lichtvoll.de,
+        fthain@linux-m68k.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Sat, Jun 17, 2023 at 12:36 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
+> The Amiga partition parser module uses signed int for partition sector
+> address and count, which will overflow for disks larger than 1 TB.
+>
+> Use u64 as type for sector address and size to allow using disks up to
+> 2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
+> format allows to specify disk sizes up to 2^128 bytes (though native
+> OS limitations reduce this somewhat, to max 2^68 bytes), so check for
+> u64 overflow carefully to protect against overflowing sector_t.
+>
+> This bug was reported originally in 2012, and the fix was created by
+> the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
+> discussed and reviewed on linux-m68k at that time but never officially
+> submitted (now resubmitted as patch 1 of this series).
+>
+> Patch 3 (this series) adds additional error checking and warning
+> messages. One of the error checks now makes use of the previously
+> unused rdb_CylBlocks field, which causes a 'sparse' warning
+> (cast to restricted __be32).
+>
+> Annotate all 32 bit fields in affs_hardblocks.h as __be32, as the
+> on-disk format of RDB and partition blocks is always big endian.
+>
+> Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Message-ID: <201206192146.09327.Martin@lichtvoll.de>
+> Cc: <stable@vger.kernel.org> # 5.2
+> Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-After commit 2736e8eeb0cc ("block: use the holder as indication for
-exclusive opens"), blkdev_get_by_dev() will warn if holder is NULL and
-mode contains 'FMODE_EXCL'.
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-holder from blkdev_get_by_dev() from disk_scan_partitions() is always NULL,
-hence it should not use 'FMODE_EXCL', which is broben by the commit. For
-consequence, WARN_ON_ONCE() will be triggered from blkdev_get_by_dev()
-if user scan partitions with device opened exclusively.
+Gr{oetje,eeting}s,
 
-Fix this problem by removing 'FMODE_EXCL' from disk_scan_partitions(),
-as it used to be.
+                        Geert
 
-Reported-by: syzbot+00cd27751f78817f167b@syzkaller.appspotmail.com
-Link: https://syzkaller.appspot.com/bug?extid=00cd27751f78817f167b
-Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/genhd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 2c2f9a716822..1fb964866fd0 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -365,7 +365,8 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
- 	}
- 
- 	set_bit(GD_NEED_PART_SCAN, &disk->state);
--	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL, NULL);
-+	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
-+				 NULL);
- 	if (IS_ERR(bdev))
- 		ret =  PTR_ERR(bdev);
- 	else
 -- 
-2.39.2
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
