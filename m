@@ -2,106 +2,83 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189BBEB64DA
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 11:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF516EB64D9
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 11:38:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235192AbjFQLI5 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 07:08:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37796 "EHLO
+        id S234150AbjFQLic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 07:38:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235048AbjFQLIz (ORCPT
+        with ESMTP id S231889AbjFQLib (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 07:08:55 -0400
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784A7212C;
-        Sat, 17 Jun 2023 04:08:52 -0700 (PDT)
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5701e8f2b79so21389277b3.0;
-        Sat, 17 Jun 2023 04:08:52 -0700 (PDT)
+        Sat, 17 Jun 2023 07:38:31 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B9D819BE
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 04:38:30 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f8d1eb535eso12452695e9.3
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 04:38:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=philpotter-co-uk.20221208.gappssmtp.com; s=20221208; t=1687001909; x=1689593909;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oaLHMANTlFxz5pDEw8B8VWAUhy20bV6DED3efN5fhM4=;
+        b=1p81pXukbRCxGMSIwz9Bv3gVaRHn0hhKeaKKZW6lSvZqe/ZZefO7zRLSqnAXD7o38h
+         a9eWWOFUVMGvaxx2aMLax4GyBZgYOPHhWV0kmBd7G/zQg40Vm/5LBie5HGpdXnOzEBOi
+         NE/6+v/1LavJ0b0hp0q/E4T9qy17DQe2qevN+Wgx/0v3hUMJGhLh9GQ35FsC6kyiX9pf
+         wCYWwfol2a5HbqUoJXLAw9gElTLQnhWxUg586F7Wxjjr76nABA76udU2MieC+J7Pgq8d
+         jhTtULSwYgr+cn1/Ie1goF6yfF5AAKZsd/kjRqtN7DVAJRO63s4TAHx3GqAuSHtN9AZd
+         8+dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687000131; x=1689592131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sWtixX3Z6V44aeoqqIIxWyopGY/w/u3lW96iqUHBgNM=;
-        b=kaU3hsRdAozjSoGR8EAAsMJVlDMeWpXMC2mHPzwB0g/J0Az/3GTH8mOktfP8XuzT+p
-         bCtTrTDiUgdl/a2Yj/Aj7xwHL9P/CDW+YrPSx0+7IZ1I09ZmkwVhDUAxqXb3y0lH0kti
-         YSdjHNyW4mHnRmXgXX9lbZ0KcuE8CNwtpc7pUic/JNvg8BiXjY09ZoNPZeyI52NHgayd
-         L1pPq6nrhPvTu8QLJTuIutOpd0O6IifW3EK9glERwqzptSjgSmN2IxWmoPYKaoCRS5yS
-         D+m1PSp3EFxpVwglxhs8Jz+tIlMI6mnrRLqqhZAQ4/TNcr750LBZZO++bhYW2+A2zIQH
-         f2Ow==
-X-Gm-Message-State: AC+VfDzohN4yllvsoh6ynXSh3FTT2Fbzm/6blFYwMnGxa35Z9EQgCXit
-        Mr9D7nDE2FbpbE8BCrz3Qx2bbXt0crVOkA==
-X-Google-Smtp-Source: ACHHUZ5n38vgX09upKwlvBP+oVLfgWv42x4mdkLw24WwhcRTs0ffv7Jg9R5nwG5H1BSzDwFXrpeg0w==
-X-Received: by 2002:a81:4f54:0:b0:56f:f565:c037 with SMTP id d81-20020a814f54000000b0056ff565c037mr5219067ywb.7.1687000131444;
-        Sat, 17 Jun 2023 04:08:51 -0700 (PDT)
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com. [209.85.219.171])
-        by smtp.gmail.com with ESMTPSA id p187-20020a0dffc4000000b005706c3e5dfcsm709395ywf.48.2023.06.17.04.08.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 17 Jun 2023 04:08:51 -0700 (PDT)
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-bd744ffc263so1822127276.3;
-        Sat, 17 Jun 2023 04:08:50 -0700 (PDT)
-X-Received: by 2002:a25:ae26:0:b0:be5:c78a:e9b5 with SMTP id
- a38-20020a25ae26000000b00be5c78ae9b5mr2319004ybj.47.1687000130521; Sat, 17
- Jun 2023 04:08:50 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687001909; x=1689593909;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oaLHMANTlFxz5pDEw8B8VWAUhy20bV6DED3efN5fhM4=;
+        b=RnmyBXY0D5aFuBshHhC1AAYo3dGPkP1YTGPn3SgH0Ry/WMxITaNOybQeOrI3lIvrBy
+         kqX7xtXH1bbMSH4wYb9LVsNGAXFd056yDNt+2eyQGqbsJbPMnXM4KG53DZ57rfHdcSKv
+         yU6t9Zf3EyCNbZUn2fr/kIzcRrQvb1K8XcwWaRWgSVt5QPiQ9b6z+3HatgVMNrfYl8UH
+         ctyVMpOM/hkwwd7MWRYJjv39H4VUCY35/myaBMknfylzle40EgiKbPEzkO/CfJRKF/gE
+         mKrl+RzFWsIKmFV5CwhUusEDXV4oO5c71obIo9A+ZpD7ElOef45hb2nGLyyRBsqWSJmN
+         NaMw==
+X-Gm-Message-State: AC+VfDx7iA+tYbGcaOKQA37KwzXFpjCFukn4y+X/p+nJ1eybJQcv5Job
+        OUWbr7vW7eY1+PUeupQHpv1r+RVwCcq9qn+yOAI=
+X-Google-Smtp-Source: ACHHUZ4pz8K7b6TdlI512BNgOJDfvQdgF1FWLZV9oXuj8XP2/OCisoH5zi3pVekrHA1o0ezgSJvoiw==
+X-Received: by 2002:a05:600c:214d:b0:3f8:342:d67f with SMTP id v13-20020a05600c214d00b003f80342d67fmr3654474wml.0.1687001908967;
+        Sat, 17 Jun 2023 04:38:28 -0700 (PDT)
+Received: from localhost.localdomain (3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::3])
+        by smtp.gmail.com with ESMTPSA id c26-20020a7bc85a000000b003f7febc8fb8sm4748855wml.34.2023.06.17.04.38.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Jun 2023 04:38:28 -0700 (PDT)
+From:   Phillip Potter <phil@philpotter.co.uk>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 0/1] cdrom: spectre-v1 patch for 6.5
+Date:   Sat, 17 Jun 2023 12:38:27 +0100
+Message-Id: <20230617113828.1230-1-phil@philpotter.co.uk>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-References: <20230616223616.6002-1-schmitzmic@gmail.com> <20230616223616.6002-3-schmitzmic@gmail.com>
-In-Reply-To: <20230616223616.6002-3-schmitzmic@gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Sat, 17 Jun 2023 13:08:36 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXo+Za3_Bz-PaLhq_oZzEzkN=g5YyDp=vaX7485WuE=Cg@mail.gmail.com>
-Message-ID: <CAMuHMdXo+Za3_Bz-PaLhq_oZzEzkN=g5YyDp=vaX7485WuE=Cg@mail.gmail.com>
-Subject: Re: [PATCH v12 2/3] block: change annotation of rdb_CylBlocks in affs_hardblocks.h
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-m68k@vger.kernel.org, hch@lst.de, martin@lichtvoll.de,
-        fthain@linux-m68k.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 17, 2023 at 12:36 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
-> The Amiga partition parser module uses signed int for partition sector
-> address and count, which will overflow for disks larger than 1 TB.
->
-> Use u64 as type for sector address and size to allow using disks up to
-> 2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
-> format allows to specify disk sizes up to 2^128 bytes (though native
-> OS limitations reduce this somewhat, to max 2^68 bytes), so check for
-> u64 overflow carefully to protect against overflowing sector_t.
->
-> This bug was reported originally in 2012, and the fix was created by
-> the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
-> discussed and reviewed on linux-m68k at that time but never officially
-> submitted (now resubmitted as patch 1 of this series).
->
-> Patch 3 (this series) adds additional error checking and warning
-> messages. One of the error checks now makes use of the previously
-> unused rdb_CylBlocks field, which causes a 'sparse' warning
-> (cast to restricted __be32).
->
-> Annotate all 32 bit fields in affs_hardblocks.h as __be32, as the
-> on-disk format of RDB and partition blocks is always big endian.
->
-> Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-> Cc: <stable@vger.kernel.org> # 5.2
-> Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+Hi Jens,
 
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Please apply the following patch from Jordy Zomer, which introduces a
+spectre-v1 mitigation within the CDROM_MEDIA_CHANGED ioctl handler of
+drivers/cdrom/cdrom.c, to your for-6.5/block branch.
 
-Gr{oetje,eeting}s,
+Many thanks in advance.
 
-                        Geert
+Regards,
+Phil
+
+Jordy Zomer (1):
+  cdrom: Fix spectre-v1 gadget
+
+ drivers/cdrom/cdrom.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.40.1
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
