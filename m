@@ -2,58 +2,59 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F452EB64D9
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 12:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A9FEB64DB
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 12:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231374AbjFQM0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 08:26:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54710 "EHLO
+        id S236455AbjFQM2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 08:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231128AbjFQM0h (ORCPT
+        with ESMTP id S230312AbjFQM2h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 08:26:37 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9A2B5;
-        Sat, 17 Jun 2023 05:26:36 -0700 (PDT)
+        Sat, 17 Jun 2023 08:28:37 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C39419F;
+        Sat, 17 Jun 2023 05:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687004796; x=1718540796;
+  t=1687004916; x=1718540916;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=cXD0g1H9E9UuwGms7XxMSDgjreFk+KWaexzmji8c5Sk=;
-  b=RDl+b/UbfWizwjLycGZYzmFV+UsAD/FxCzaEp/04NR+X9FA1nlXwqMVd
-   JOt/njqMe8Z9Nr+kiN/CjP7R5KmfbWn56t/XVnUlBjT5gIrrJIiPvEjOl
-   YqFr7YNJRHCJPolWyupr4QXcjUt0sM/Ex58Atc4aQtTzlujvoctlftYcY
-   bJKXME2kp5ow+VAJF+Ikz44OPrHIb44jIt1+AjBv5NOE8f6dADWL2p7BV
-   qb5iDuaRqpgn0aVPdV3lHlpUdUK43KylINRm0lsZ0SlKAFCNsrMx4Z/G9
-   Pmh7vVHzwiAlCj3Qej2stD1E5h0n6cNbuNlvnRylDYSqcUHorXPhMx8zQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="445765392"
+  bh=BS+7g9s6vwhiPsZpjXoLp2psNJroOghxiRnYu0+h3Qo=;
+  b=EC+Zdxwn+qCOoCWs3Wg/h9JBxGPhtbZAeBadI6JCOI0WGSamHOKe+fzY
+   ePEZBCqN7haISiFuWr2MwbwXCQMSIgiEBP+AlKvb4Cn3SyD8PGcQkHILf
+   OCC8R4fVT2vL4CpxBNf7C9UM6Iu2jUno+QdvniDdS+8KakKUly9AqaGsZ
+   GID8aAfWDoOuf4hv6Ja+rtYc104T1KqLUQpY4vV71fC89DYK8p1M8/V4M
+   iwAwxVGM3BNvuq8g/A9Yfid3sgieL9dR8MUngDy9rayuUaCSVuQKtlIBf
+   Uv4F/3lBOAYPMofpSR5XVn2qbADuu5jp6bLvoo8N1HLkq8fVtM52T+ei9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="358257308"
 X-IronPort-AV: E=Sophos;i="6.00,250,1681196400"; 
-   d="scan'208";a="445765392"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2023 05:26:36 -0700
+   d="scan'208";a="358257308"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2023 05:28:36 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="716339005"
+X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="959933040"
 X-IronPort-AV: E=Sophos;i="6.00,250,1681196400"; 
-   d="scan'208";a="716339005"
+   d="scan'208";a="959933040"
 Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 17 Jun 2023 05:26:33 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 17 Jun 2023 05:28:33 -0700
 Received: from kbuild by 783282924a45 with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1qAV0i-0002kG-1u;
-        Sat, 17 Jun 2023 12:26:32 +0000
-Date:   Sat, 17 Jun 2023 20:25:56 +0800
+        id 1qAV2e-0002kM-26;
+        Sat, 17 Jun 2023 12:28:32 +0000
+Date:   Sat, 17 Jun 2023 20:28:02 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk,
         brauner@kernel.org, hare@suse.de, dsterba@suse.com,
         jinpu.wang@ionos.com
-Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
 Subject: Re: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from
  disk_scan_partitions()
-Message-ID: <202306172040.1dllc8rx-lkp@intel.com>
+Message-ID: <202306172025.taiLXERW-lkp@intel.com>
 References: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -73,26 +74,99 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/block-fix-wrong-m
 base:   next-20230616
 patch link:    https://lore.kernel.org/r/20230617103813.3708374-1-yukuai1%40huaweicloud.com
 patch subject: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
-config: alpha-randconfig-r036-20230617 (https://download.01.org/0day-ci/archive/20230617/202306172040.1dllc8rx-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230617/202306172040.1dllc8rx-lkp@intel.com/reproduce)
+config: um-allnoconfig (https://download.01.org/0day-ci/archive/20230617/202306172025.taiLXERW-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230617/202306172025.taiLXERW-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306172040.1dllc8rx-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306172025.taiLXERW-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   block/genhd.c: In function 'disk_scan_partitions':
->> block/genhd.c:369:59: error: 'FMODE_EXCL' undeclared (first use in this function); did you mean 'FMODE_EXEC'?
+   In file included from block/genhd.c:13:
+   In file included from include/linux/blkdev.h:9:
+   In file included from include/linux/blk_types.h:10:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     547 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from block/genhd.c:13:
+   In file included from include/linux/blkdev.h:9:
+   In file included from include/linux/blk_types.h:10:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from block/genhd.c:13:
+   In file included from include/linux/blkdev.h:9:
+   In file included from include/linux/blk_types.h:10:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/um/include/asm/hardirq.h:5:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/um/include/asm/io.h:24:
+   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     584 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     692 |         readsb(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     700 |         readsw(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     708 |         readsl(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     717 |         writesb(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     726 |         writesw(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     735 |         writesl(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+>> block/genhd.c:369:52: error: use of undeclared identifier 'FMODE_EXCL'
      369 |         bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
-         |                                                           ^~~~~~~~~~
-         |                                                           FMODE_EXEC
-   block/genhd.c:369:59: note: each undeclared identifier is reported only once for each function it appears in
+         |                                                           ^
+   12 warnings and 1 error generated.
 
 
-vim +369 block/genhd.c
+vim +/FMODE_EXCL +369 block/genhd.c
 
    342	
    343	int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
