@@ -2,151 +2,111 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D43EB64D9
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 08:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65EF0EB64D9
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 09:37:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346115AbjFQI2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 04:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33212 "EHLO
+        id S233237AbjFQJhc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 05:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234197AbjFQI2F (ORCPT
+        with ESMTP id S229683AbjFQJha (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 04:28:05 -0400
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71CE1FF7
-        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 01:28:03 -0700 (PDT)
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-77da0200928so154248939f.3
-        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 01:28:03 -0700 (PDT)
+        Sat, 17 Jun 2023 05:37:30 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8765CD
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 02:37:28 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-311275efaf8so637549f8f.3
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 02:37:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=philpotter-co-uk.20221208.gappssmtp.com; s=20221208; t=1686994647; x=1689586647;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1RZsSEqkPqjOoyob7BwESxMJrfyBSDtQOVj//55DVlk=;
+        b=g32b9Eu3F61GLUFvjdDWkKEgaosZry8knKL6Uqa3EbHmUjO7A9YJSyk3Vaoosg36ay
+         95pzVspZ3iU1/5n24G3LpARjEkOFaSaBMAHXQhqghrD7icDm3n7J82XND2GTuEUVDxQT
+         fHSiZ8P9VeeNdrtyKQybN+aTfeK/XOIapxze48ShpUbjdK3oSeKB9GQY/lcepWx+gBxN
+         d65q7mxulB2HTOtOdCwOrOz2ZP219GrIGG6efYlfvW4BLFA6qM2wskzU7DFuJt87x3Ac
+         LtyspTcunuhvuhGegmGWhT4B1kZes2Ma5XmlyOMxxgqUc6uDTqHwEtgrKft861dxFVlq
+         NYJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686990483; x=1689582483;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EvzkMc9H5Qu3CfLh6Ayp0HxbA/K5f7RFDZ+Yf/cv0ic=;
-        b=WyzL3L2tNFF64FbSsyZYAsqPcFNGMEfV1wmhLUJFD/7uXvFEr3xHhsQXW49HRV27OT
-         Phm3eNArU2Z2QzvdJ6+FfK9k/vgggwnw3XrFT97TzEodSq53f96H5bYevJJp2dkrE+Y7
-         ao6tFNJtGuroR5mm14LeMxSyNma3UpUWyR+PtRjaocTtCVUq92vTViNwUcAvkYxEBWKI
-         6jA1HmeiQm12SPH0cAdJNhbs+QfXEJHBG9BQmMh/sDLqxerGUCWDWIz2/YiFo69ddd8q
-         ZTDMSfVYq/47j83kJJx1urdxFskl9wL59OXAylXMXRO9czdwUwkrBbasfnJKfRX9fxsn
-         mXWQ==
-X-Gm-Message-State: AC+VfDyOXoUzuMDXxX7uxln4LANJSfCZvcnoQvsw+Ma4YMJ767ziyvc5
-        V++MnpUDYGn2e3LnE0EgNoBfh+rvTySi40kbfjvIti5ch2uj
-X-Google-Smtp-Source: ACHHUZ5VaKdxrt3XJL1Kd65bRkQ2/NqG1BaMZjE2EcapUA6Ieh2QN2UA7P+X2TjTaXSFIL6Mdt7XLUorkRhe6kEevEIAHB1f4hC4
+        d=1e100.net; s=20221208; t=1686994647; x=1689586647;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1RZsSEqkPqjOoyob7BwESxMJrfyBSDtQOVj//55DVlk=;
+        b=L6yKLuVDlvjbAC3X7MbGDfZCI05Mgo7vvTxOdc2CejCotLSZAbAXHsZXI2nHCqw9X5
+         q3MIvPdh1SN8ucG6WfbhjyjTyicVrXyt8mtcKt5MBPBOp84HQKIhW3RmhmGqaT5iCsiG
+         wx8mR6YpLGQdMaSnUr54ur+nAFePZoXMysR1kFM9jOPSdFTjAmOtlnhgY4gc5qK040od
+         TRYmKwXzovK7YJA+QfybCdQXXBVXs1I25mx4zYs4Kx7qnPpMKDnEzaVVqH/LR7hBYRX3
+         IfK07Bd0Txz0xk8m65dXuQOX2GJnn6g8uRrWaepqa/6KvutfuErcyLl6beTHzmnPk2Li
+         oNmg==
+X-Gm-Message-State: AC+VfDz1WeJQfMaSv+wz8SQKmIAFQGkkRT3KPrLIZKd6TM5iROkvvwhr
+        NuqLEkNwP8YWhD4by16vbLBEyg==
+X-Google-Smtp-Source: ACHHUZ4A4TANxWCTCFqJqNCqV+3Guz04XkAgLUa2iOUseEYh9FGN03ZfyLtVRwGI8HT4ItPAbaFckg==
+X-Received: by 2002:a05:6000:1008:b0:307:8c47:a266 with SMTP id a8-20020a056000100800b003078c47a266mr2520982wrx.61.1686994647030;
+        Sat, 17 Jun 2023 02:37:27 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
+        by smtp.gmail.com with ESMTPSA id l15-20020adff48f000000b003078cd719ffsm25786861wro.95.2023.06.17.02.37.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 17 Jun 2023 02:37:26 -0700 (PDT)
+Date:   Sat, 17 Jun 2023 10:37:24 +0100
+From:   Phillip Potter <phil@philpotter.co.uk>
+To:     Jordy Zomer <jordyzomer@google.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2 1/1] cdrom: Fix spectre-v1 gadget
+Message-ID: <ZI1+1OG9Ut1MqsUC@equinox>
+References: <20230612110040.849318-1-jordyzomer@google.com>
+ <20230612110040.849318-2-jordyzomer@google.com>
 MIME-Version: 1.0
-X-Received: by 2002:a5e:860f:0:b0:774:8e68:1ce6 with SMTP id
- z15-20020a5e860f000000b007748e681ce6mr1098962ioj.3.1686990483134; Sat, 17 Jun
- 2023 01:28:03 -0700 (PDT)
-Date:   Sat, 17 Jun 2023 01:28:03 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007ca70405fe4f149a@google.com>
-Subject: [syzbot] [block?] WARNING in blkdev_put (3)
-From:   syzbot <syzbot+04625c80899f4555de39@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230612110040.849318-2-jordyzomer@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Mon, Jun 12, 2023 at 11:00:40AM +0000, Jordy Zomer wrote:
+> This patch fixes a spectre-v1 gadget in cdrom.
+> The gadget could be triggered by,
+>  speculatviely bypassing the cdi->capacity check.
+> 
+> Signed-off-by: Jordy Zomer <jordyzomer@google.com>
+> ---
+>  drivers/cdrom/cdrom.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+> index 416f723a2dbb..ecf2b458c108 100644
+> --- a/drivers/cdrom/cdrom.c
+> +++ b/drivers/cdrom/cdrom.c
+> @@ -264,6 +264,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/kernel.h>
+>  #include <linux/mm.h>
+> +#include <linux/nospec.h>
+>  #include <linux/slab.h> 
+>  #include <linux/cdrom.h>
+>  #include <linux/sysctl.h>
+> @@ -2329,6 +2330,9 @@ static int cdrom_ioctl_media_changed(struct cdrom_device_info *cdi,
+>  	if (arg >= cdi->capacity)
+>  		return -EINVAL;
+>  
+> +	/* Prevent arg from speculatively bypassing the length check */
+> +	barrier_nospec();
+> +
+>  	info = kmalloc(sizeof(*info), GFP_KERNEL);
+>  	if (!info)
+>  		return -ENOMEM;
+> -- 
+> 2.41.0.162.gfafddb0af9-goog
+> 
 
-syzbot found the following issue on:
+Hi Jordy,
 
-HEAD commit:    f7efed9f38f8 Add linux-next specific files for 20230616
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=12240d17280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=60b1a32485a77c16
-dashboard link: https://syzkaller.appspot.com/bug?extid=04625c80899f4555de39
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11bc386b280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17bbc85b280000
+Looks good to me,
+Reviewed-by: Phillip Potter <phil@philpotter.co.uk>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/95bcbee03439/disk-f7efed9f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6fd295caa4de/vmlinux-f7efed9f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/69c038a34b5f/bzImage-f7efed9f.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/b37a2f98c970/mount_0.gz
+I will forward on for inclusion.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+04625c80899f4555de39@syzkaller.appspotmail.com
-
-REISERFS (device loop0): journal params: device loop0, size 512, journal first block 18, max trans len 256, max batch 225, max commit age 30, max trans age 30
-REISERFS (device loop0): checking transaction log (loop0)
-REISERFS (device loop0): Using r5 hash to sort names
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5034 at block/bdev.c:617 bd_end_claim block/bdev.c:617 [inline]
-WARNING: CPU: 1 PID: 5034 at block/bdev.c:617 blkdev_put+0x562/0x8a0 block/bdev.c:901
-Modules linked in:
-CPU: 1 PID: 5034 Comm: syz-executor379 Not tainted 6.4.0-rc6-next-20230616-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-RIP: 0010:bd_end_claim block/bdev.c:617 [inline]
-RIP: 0010:blkdev_put+0x562/0x8a0 block/bdev.c:901
-Code: c0 74 08 3c 03 0f 8e 23 03 00 00 41 83 ac 24 f0 04 00 00 01 e9 2b fe ff ff e8 1a 39 90 fd 0f 0b e9 4b fc ff ff e8 0e 39 90 fd <0f> 0b e9 e0 fb ff ff e8 02 39 90 fd 4c 8d ab a8 00 00 00 31 f6 4c
-RSP: 0018:ffffc90003b5fa28 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888148c8c500 RCX: 0000000000000000
-RDX: ffff888025959dc0 RSI: ffffffff83f42912 RDI: 0000000000000001
-RBP: ffff88801f459000 R08: 0000000000000000 R09: fffffbfff1d53172
-R10: ffffffff8ea98b97 R11: 0000000000000003 R12: ffff888148c8c538
-R13: ffffc90003b81000 R14: ffff88801f459460 R15: ffff888148c8c500
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f42f1a5f140 CR3: 000000000c775000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- release_journal_dev fs/reiserfs/journal.c:2592 [inline]
- free_journal_ram+0x421/0x5c0 fs/reiserfs/journal.c:1896
- do_journal_release fs/reiserfs/journal.c:1960 [inline]
- journal_release+0x276/0x630 fs/reiserfs/journal.c:1971
- reiserfs_put_super+0xe4/0x5c0 fs/reiserfs/super.c:616
- generic_shutdown_super+0x158/0x480 fs/super.c:499
- kill_block_super+0x64/0xb0 fs/super.c:1422
- deactivate_locked_super+0x98/0x160 fs/super.c:330
- deactivate_super+0xb1/0xd0 fs/super.c:361
- cleanup_mnt+0x2ae/0x3d0 fs/namespace.c:1247
- task_work_run+0x16f/0x270 kernel/task_work.c:179
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xadc/0x2a30 kernel/exit.c:874
- do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
- __do_sys_exit_group kernel/exit.c:1035 [inline]
- __se_sys_exit_group kernel/exit.c:1033 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1033
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f42f19ea9c9
-Code: Unable to access opcode bytes at 0x7f42f19ea99f.
-RSP: 002b:00007fffc2761718 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 00007f42f1a61330 RCX: 00007f42f19ea9c9
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000001
-RBP: 0000000000000001 R08: ffffffffffffffc0 R09: 0000000000001111
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f42f1a61330
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Regards,
+Phil
