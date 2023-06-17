@@ -2,108 +2,96 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B5DEB64D9
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 09:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F344EB64DA
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 10:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235264AbjFQJkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 05:40:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45828 "EHLO
+        id S234167AbjFQKnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 06:43:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233405AbjFQJkc (ORCPT
+        with ESMTP id S229683AbjFQKnD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 05:40:32 -0400
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7CF519B5
-        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 02:40:30 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3111cb3dda1so1378419f8f.0
-        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 02:40:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20221208.gappssmtp.com; s=20221208; t=1686994829; x=1689586829;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sSprmwV55BL6pO21twlGThyVNNCHtDq+U6HFFLynfeU=;
-        b=QvopeLhwKs03MqbVjzfgMBgUpb3MFQWLcXeEkgVOfBW2OjBGU7figSHWDe/7KSVC59
-         uUh2CmgsfwfqFZRhN4x8MJlEZ1JY3sOT3N2tGx2ld14fMVG80JHEb3+Xl0ONlf0r0AwQ
-         x6SZuzTj3FbVxiEPQinqvPDdUQ/6t7fIC3T7hN7zR/FEwpnMuyEIDIQJ1476sLISoNtg
-         EDZHjCy8sTox1N9+O/yDDX/bHW6VVVtsac8HvtW4p6NlKGiojL50yQUcc3ovWqu9A0/r
-         bdmmpzoA5WUSpYaq4VGnRJjPJdp05L/+KGm8hhFpb6hKccusnlfsaAzaj4hal3jXHL9H
-         xdJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686994829; x=1689586829;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sSprmwV55BL6pO21twlGThyVNNCHtDq+U6HFFLynfeU=;
-        b=G7F8mNUK4JCeYFaZFKOFyxqa4a4FGdiDgG76Aoi9rsr+CU5GidgpBreJBWoBOSseQX
-         9LQi/Flx88AsiTowKnMhWaxehfTfL1AQI5DvcJDc2EXolu/dMWbZsOh/KQzLmLM2LZNn
-         CffpM3Us2rUgYcbdGcZHrlPsgba0DKyBF8UjYnpODoeA6COwXyhB/vzQfQmUsk2OExvy
-         X9D4vkzXdWIuzvT/Dl8hr5erHKsepdon3dptgRSP1AKhHdHLSbI0vMEm4iC664H4wtAz
-         cn6GwLCD21SLRxi3aZnWFnwb6YLXYt3UiWh/sS2DAHdyiLc5En1i1qV0fL6INgaXNxLc
-         vyhw==
-X-Gm-Message-State: AC+VfDziGWlhmFoydXosj4aWDM86WJkdMO88C487ejZCOqBs/gTcxF7o
-        HvpFgGUPgu+z7Y9++kckPiuiB9/scpFUyvqn7vRJyQ==
-X-Google-Smtp-Source: ACHHUZ48RfrAu3uWhShOXGuryhBPWKmeDCU6Sa6NwRJUaUbJQztOBoeMXM5rF7rzk+LforIRXtB6Sg==
-X-Received: by 2002:adf:fc4c:0:b0:30a:e69d:721e with SMTP id e12-20020adffc4c000000b0030ae69d721emr2656000wrs.55.1686994829244;
-        Sat, 17 Jun 2023 02:40:29 -0700 (PDT)
-Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
-        by smtp.gmail.com with ESMTPSA id q3-20020adff503000000b0030fa3567541sm22690907wro.48.2023.06.17.02.40.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 17 Jun 2023 02:40:28 -0700 (PDT)
-Date:   Sat, 17 Jun 2023 10:40:27 +0100
-From:   Phillip Potter <phil@philpotter.co.uk>
-To:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc:     linux-kernel@vger.kernel.org, jordyzomer@google.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] cdrom: Fix spectre-v1 gadget
-Message-ID: <ZI1/i3E20Wysp//g@equinox>
-References: <20230612110040.849318-1-jordyzomer@google.com>
- <20230612110040.849318-2-jordyzomer@google.com>
- <20230615163125.td3aodpfwth5n4mc@desk>
- <ZIufZn+reW0rza1H@equinox>
- <20230616031447.yslq6ep7lxe6sjv4@desk>
+        Sat, 17 Jun 2023 06:43:03 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80AC910DB;
+        Sat, 17 Jun 2023 03:43:02 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qjt0K34yQz4f56MJ;
+        Sat, 17 Jun 2023 18:42:57 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgAHuKsujo1kJ6GfLw--.51912S4;
+        Sat, 17 Jun 2023 18:42:56 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     hch@lst.de, axboe@kernel.dk, brauner@kernel.org, hare@suse.de,
+        dsterba@suse.com, jinpu.wang@ionos.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
+Date:   Sat, 17 Jun 2023 18:38:13 +0800
+Message-Id: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230616031447.yslq6ep7lxe6sjv4@desk>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAHuKsujo1kJ6GfLw--.51912S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF4rWFWfKF17Jr4rGr45Wrg_yoW8Gw1kpF
+        WUWF45tryqgryxuF4vy3ZrGay5Gan8GryxKrWIgw1Fv39xXrnYkF92krZ8Wr10vFWSg3y5
+        WFnrZFyFqF1F9wUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+        6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+        n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
+        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWU
+        JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
+        J5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 08:14:47PM -0700, Pawan Gupta wrote:
-> On Fri, Jun 16, 2023 at 12:31:50AM +0100, Phillip Potter wrote:
-> > I've now looked at this. It is possible for cdi->capacity to be > 1, as
-> > it is set via get_capabilities() -> cdrom_number_of_slots(), if the
-> > device is an individual or cartridge changer.
-> 
-> Ohk. Is there an upper limit to cdi->capacity? If not, we are left with
-> barrier_nospec().
-> 
+From: Yu Kuai <yukuai3@huawei.com>
 
-No, from the perspective of the codebase, this value is read from the
-device and is therefore arbitrary in theory.
+After commit 2736e8eeb0cc ("block: use the holder as indication for
+exclusive opens"), blkdev_get_by_dev() will warn if holder is NULL and
+mode contains 'FMODE_EXCL'.
 
-> > Therefore, I think using CDI_MAX_CAPACITY of 1 is not the correct
-> > approach. Jordy's V2 patch is fine therefore, but perhaps using
-> > array_index_nospec() with cdi->capacity is still better than a
-> > do/while loop from a performance perspective, given it would be cached
-> > etc. at that point, so possibly quicker. Thoughts? (I'm no expert on
-> > spectre-v1 I'll admit).
-> 
-> array_index_nospec() can only clip the arg correctly if the upper bound
-> is correct. Problem with array_index_nospec(arg, cdi->capacity) is
-> cdi->capacity is not a constant, so it suffers from the same problem as
-> arg i.e. cdi->capacity could also be speculated. Although having to
-> control 2 loads makes the attack difficult, but does not rules out
-> completely.
-> 
-> barrier_nospec() makes the CPU wait for all previous loads to retire
-> before executing following instructions speculatively. This causes the
-> conditional branch to resolve correctly. I hope this does not fall into
-> a hotpath.
+holder from blkdev_get_by_dev() from disk_scan_partitions() is always NULL,
+hence it should not use 'FMODE_EXCL', which is broben by the commit. For
+consequence, WARN_ON_ONCE() will be triggered from blkdev_get_by_dev()
+if user scan partitions with device opened exclusively.
 
-Thanks for the explanation. Based on this and the fact that particular
-ioctl function isn't likely on a hugely hot path for most users, I have
-approved the patch via another e-mail.
+Fix this problem by removing 'FMODE_EXCL' from disk_scan_partitions(),
+as it used to be.
 
-Regards,
-Phil
+Reported-by: syzbot+00cd27751f78817f167b@syzkaller.appspotmail.com
+Link: https://syzkaller.appspot.com/bug?extid=00cd27751f78817f167b
+Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/genhd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 2c2f9a716822..1fb964866fd0 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -365,7 +365,8 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+ 	}
+ 
+ 	set_bit(GD_NEED_PART_SCAN, &disk->state);
+-	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL, NULL);
++	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
++				 NULL);
+ 	if (IS_ERR(bdev))
+ 		ret =  PTR_ERR(bdev);
+ 	else
+-- 
+2.39.2
+
