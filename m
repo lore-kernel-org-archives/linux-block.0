@@ -2,217 +2,144 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB53EEB64DB
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 12:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F452EB64D9
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 12:26:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346218AbjFQMQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 08:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46434 "EHLO
+        id S231374AbjFQM0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 08:26:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346265AbjFQMQY (ORCPT
+        with ESMTP id S231128AbjFQM0h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 08:16:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F5B213F
-        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 05:14:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687004041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XKse4vF5Frqs4bdWsYMKttBmqWRsH1PFiAHwvjH79qA=;
-        b=FEVN1XwrB7Uj4EDnY75i/fkzeGXkEFGqz39+JoTybH1XIcD0BEqD19jE4J4DubResIpWRH
-        JyTfZtECtDQ+0l5yuZgafm2Yx4vS1je24xaz5gh8fmIf3EQviRU+sy6iJXCPjw5O5jvCIM
-        cBPdrTBZjZuArqELTR2YW3BTKqj5ZOc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-2-7XIMq-mIPQOIc8pmfQb5Cg-1; Sat, 17 Jun 2023 08:12:51 -0400
-X-MC-Unique: 7XIMq-mIPQOIc8pmfQb5Cg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC560101A56C;
-        Sat, 17 Jun 2023 12:12:50 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E891B48FB01;
-        Sat, 17 Jun 2023 12:12:48 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org
-Subject: [PATCH net-next v2 14/17] drdb: Send an entire bio in a single sendmsg
-Date:   Sat, 17 Jun 2023 13:11:43 +0100
-Message-ID: <20230617121146.716077-15-dhowells@redhat.com>
-In-Reply-To: <20230617121146.716077-1-dhowells@redhat.com>
-References: <20230617121146.716077-1-dhowells@redhat.com>
+        Sat, 17 Jun 2023 08:26:37 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9A2B5;
+        Sat, 17 Jun 2023 05:26:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687004796; x=1718540796;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cXD0g1H9E9UuwGms7XxMSDgjreFk+KWaexzmji8c5Sk=;
+  b=RDl+b/UbfWizwjLycGZYzmFV+UsAD/FxCzaEp/04NR+X9FA1nlXwqMVd
+   JOt/njqMe8Z9Nr+kiN/CjP7R5KmfbWn56t/XVnUlBjT5gIrrJIiPvEjOl
+   YqFr7YNJRHCJPolWyupr4QXcjUt0sM/Ex58Atc4aQtTzlujvoctlftYcY
+   bJKXME2kp5ow+VAJF+Ikz44OPrHIb44jIt1+AjBv5NOE8f6dADWL2p7BV
+   qb5iDuaRqpgn0aVPdV3lHlpUdUK43KylINRm0lsZ0SlKAFCNsrMx4Z/G9
+   Pmh7vVHzwiAlCj3Qej2stD1E5h0n6cNbuNlvnRylDYSqcUHorXPhMx8zQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="445765392"
+X-IronPort-AV: E=Sophos;i="6.00,250,1681196400"; 
+   d="scan'208";a="445765392"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2023 05:26:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="716339005"
+X-IronPort-AV: E=Sophos;i="6.00,250,1681196400"; 
+   d="scan'208";a="716339005"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 17 Jun 2023 05:26:33 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qAV0i-0002kG-1u;
+        Sat, 17 Jun 2023 12:26:32 +0000
+Date:   Sat, 17 Jun 2023 20:25:56 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk,
+        brauner@kernel.org, hare@suse.de, dsterba@suse.com,
+        jinpu.wang@ionos.com
+Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com, yangerkun@huawei.com
+Subject: Re: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from
+ disk_scan_partitions()
+Message-ID: <202306172040.1dllc8rx-lkp@intel.com>
+References: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since _drdb_sendpage() is now using sendmsg to send the pages rather
-sendpage, pass the entire bio in one go using a bvec iterator instead of
-doing it piecemeal.
+Hi Yu,
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Philipp Reisner <philipp.reisner@linbit.com>
-cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: drbd-dev@lists.linbit.com
-cc: linux-block@vger.kernel.org
-cc: netdev@vger.kernel.org
----
+kernel test robot noticed the following build errors:
 
-Notes:
-    ver #2)
-     - Use "unsigned int" rather than "unsigned".
+[auto build test ERROR on next-20230616]
 
- drivers/block/drbd/drbd_main.c | 77 +++++++++++-----------------------
- 1 file changed, 25 insertions(+), 52 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/block-fix-wrong-mode-for-blkdev_get_by_dev-from-disk_scan_partitions/20230617-184451
+base:   next-20230616
+patch link:    https://lore.kernel.org/r/20230617103813.3708374-1-yukuai1%40huaweicloud.com
+patch subject: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
+config: alpha-randconfig-r036-20230617 (https://download.01.org/0day-ci/archive/20230617/202306172040.1dllc8rx-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 12.3.0
+reproduce: (https://download.01.org/0day-ci/archive/20230617/202306172040.1dllc8rx-lkp@intel.com/reproduce)
 
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 8a01a18a2550..beba74ae093b 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -1520,28 +1520,15 @@ static void drbd_update_congested(struct drbd_connection *connection)
-  * As a workaround, we disable sendpage on pages
-  * with page_count == 0 or PageSlab.
-  */
--static int _drbd_no_send_page(struct drbd_peer_device *peer_device, struct page *page,
--			      int offset, size_t size, unsigned msg_flags)
--{
--	struct socket *socket;
--	void *addr;
--	int err;
--
--	socket = peer_device->connection->data.socket;
--	addr = kmap(page) + offset;
--	err = drbd_send_all(peer_device->connection, socket, addr, size, msg_flags);
--	kunmap(page);
--	if (!err)
--		peer_device->device->send_cnt += size >> 9;
--	return err;
--}
--
--static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *page,
--		    int offset, size_t size, unsigned msg_flags)
-+static int _drbd_send_pages(struct drbd_peer_device *peer_device,
-+			    struct iov_iter *iter, unsigned int msg_flags)
- {
- 	struct socket *socket = peer_device->connection->data.socket;
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = msg_flags, };
-+	struct msghdr msg = {
-+		.msg_flags	= msg_flags | MSG_NOSIGNAL,
-+		.msg_iter	= *iter,
-+	};
-+	size_t size = iov_iter_count(iter);
- 	int err = -EIO;
- 
- 	/* e.g. XFS meta- & log-data is in slab pages, which have a
-@@ -1550,11 +1537,8 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 	 * put_page(); and would cause either a VM_BUG directly, or
- 	 * __page_cache_release a page that would actually still be referenced
- 	 * by someone, leading to some obscure delayed Oops somewhere else. */
--	if (!drbd_disable_sendpage && sendpage_ok(page))
--		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
--
--	bvec_set_page(&bvec, page, offset, size);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
-+	if (drbd_disable_sendpage)
-+		msg.msg_flags &= ~(MSG_NOSIGNAL | MSG_SPLICE_PAGES);
- 
- 	drbd_update_congested(peer_device->connection);
- 	do {
-@@ -1587,39 +1571,22 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 
- static int _drbd_send_bio(struct drbd_peer_device *peer_device, struct bio *bio)
- {
--	struct bio_vec bvec;
--	struct bvec_iter iter;
-+	struct iov_iter iter;
- 
--	/* hint all but last page with MSG_MORE */
--	bio_for_each_segment(bvec, bio, iter) {
--		int err;
-+	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
-+		      bio->bi_iter.bi_size);
- 
--		err = _drbd_no_send_page(peer_device, bvec.bv_page,
--					 bvec.bv_offset, bvec.bv_len,
--					 bio_iter_last(bvec, iter)
--					 ? 0 : MSG_MORE);
--		if (err)
--			return err;
--	}
--	return 0;
-+	return _drbd_send_pages(peer_device, &iter, 0);
- }
- 
- static int _drbd_send_zc_bio(struct drbd_peer_device *peer_device, struct bio *bio)
- {
--	struct bio_vec bvec;
--	struct bvec_iter iter;
-+	struct iov_iter iter;
- 
--	/* hint all but last page with MSG_MORE */
--	bio_for_each_segment(bvec, bio, iter) {
--		int err;
-+	iov_iter_bvec(&iter, ITER_SOURCE, bio->bi_io_vec, bio->bi_vcnt,
-+		      bio->bi_iter.bi_size);
- 
--		err = _drbd_send_page(peer_device, bvec.bv_page,
--				      bvec.bv_offset, bvec.bv_len,
--				      bio_iter_last(bvec, iter) ? 0 : MSG_MORE);
--		if (err)
--			return err;
--	}
--	return 0;
-+	return _drbd_send_pages(peer_device, &iter, MSG_SPLICE_PAGES);
- }
- 
- static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
-@@ -1631,10 +1598,16 @@ static int _drbd_send_zc_ee(struct drbd_peer_device *peer_device,
- 
- 	/* hint all but last page with MSG_MORE */
- 	page_chain_for_each(page) {
-+		struct iov_iter iter;
-+		struct bio_vec bvec;
- 		unsigned l = min_t(unsigned, len, PAGE_SIZE);
- 
--		err = _drbd_send_page(peer_device, page, 0, l,
--				      page_chain_next(page) ? MSG_MORE : 0);
-+		bvec_set_page(&bvec, page, 0, l);
-+		iov_iter_bvec(&iter, ITER_SOURCE, &bvec, 1, l);
-+
-+		err = _drbd_send_pages(peer_device, &iter,
-+				       MSG_SPLICE_PAGES |
-+				       (page_chain_next(page) ? MSG_MORE : 0));
- 		if (err)
- 			return err;
- 		len -= l;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306172040.1dllc8rx-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+   block/genhd.c: In function 'disk_scan_partitions':
+>> block/genhd.c:369:59: error: 'FMODE_EXCL' undeclared (first use in this function); did you mean 'FMODE_EXEC'?
+     369 |         bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
+         |                                                           ^~~~~~~~~~
+         |                                                           FMODE_EXEC
+   block/genhd.c:369:59: note: each undeclared identifier is reported only once for each function it appears in
+
+
+vim +369 block/genhd.c
+
+   342	
+   343	int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+   344	{
+   345		struct block_device *bdev;
+   346		int ret = 0;
+   347	
+   348		if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
+   349			return -EINVAL;
+   350		if (test_bit(GD_SUPPRESS_PART_SCAN, &disk->state))
+   351			return -EINVAL;
+   352		if (disk->open_partitions)
+   353			return -EBUSY;
+   354	
+   355		/*
+   356		 * If the device is opened exclusively by current thread already, it's
+   357		 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
+   358		 * synchronize with other exclusive openers and other partition
+   359		 * scanners.
+   360		 */
+   361		if (!(mode & BLK_OPEN_EXCL)) {
+   362			ret = bd_prepare_to_claim(disk->part0, disk_scan_partitions,
+   363						  NULL);
+   364			if (ret)
+   365				return ret;
+   366		}
+   367	
+   368		set_bit(GD_NEED_PART_SCAN, &disk->state);
+ > 369		bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
+   370					 NULL);
+   371		if (IS_ERR(bdev))
+   372			ret =  PTR_ERR(bdev);
+   373		else
+   374			blkdev_put(bdev, NULL);
+   375	
+   376		/*
+   377		 * If blkdev_get_by_dev() failed early, GD_NEED_PART_SCAN is still set,
+   378		 * and this will cause that re-assemble partitioned raid device will
+   379		 * creat partition for underlying disk.
+   380		 */
+   381		clear_bit(GD_NEED_PART_SCAN, &disk->state);
+   382		if (!(mode & BLK_OPEN_EXCL))
+   383			bd_abort_claiming(disk->part0, disk_scan_partitions);
+   384		return ret;
+   385	}
+   386	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
