@@ -2,218 +2,202 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A9FEB64DB
-	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 12:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D50C9EB64D9
+	for <linux-block@archiver.kernel.org>; Sat, 17 Jun 2023 13:25:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236455AbjFQM2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Jun 2023 08:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55772 "EHLO
+        id S231648AbjFQNZE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Jun 2023 09:25:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230312AbjFQM2h (ORCPT
+        with ESMTP id S229852AbjFQNZD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Jun 2023 08:28:37 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C39419F;
-        Sat, 17 Jun 2023 05:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687004916; x=1718540916;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BS+7g9s6vwhiPsZpjXoLp2psNJroOghxiRnYu0+h3Qo=;
-  b=EC+Zdxwn+qCOoCWs3Wg/h9JBxGPhtbZAeBadI6JCOI0WGSamHOKe+fzY
-   ePEZBCqN7haISiFuWr2MwbwXCQMSIgiEBP+AlKvb4Cn3SyD8PGcQkHILf
-   OCC8R4fVT2vL4CpxBNf7C9UM6Iu2jUno+QdvniDdS+8KakKUly9AqaGsZ
-   GID8aAfWDoOuf4hv6Ja+rtYc104T1KqLUQpY4vV71fC89DYK8p1M8/V4M
-   iwAwxVGM3BNvuq8g/A9Yfid3sgieL9dR8MUngDy9rayuUaCSVuQKtlIBf
-   Uv4F/3lBOAYPMofpSR5XVn2qbADuu5jp6bLvoo8N1HLkq8fVtM52T+ei9
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="358257308"
-X-IronPort-AV: E=Sophos;i="6.00,250,1681196400"; 
-   d="scan'208";a="358257308"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2023 05:28:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10743"; a="959933040"
-X-IronPort-AV: E=Sophos;i="6.00,250,1681196400"; 
-   d="scan'208";a="959933040"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 17 Jun 2023 05:28:33 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qAV2e-0002kM-26;
-        Sat, 17 Jun 2023 12:28:32 +0000
-Date:   Sat, 17 Jun 2023 20:28:02 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk,
-        brauner@kernel.org, hare@suse.de, dsterba@suse.com,
-        jinpu.wang@ionos.com
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
-        yangerkun@huawei.com
-Subject: Re: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from
- disk_scan_partitions()
-Message-ID: <202306172025.taiLXERW-lkp@intel.com>
-References: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
+        Sat, 17 Jun 2023 09:25:03 -0400
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AAE013E
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 06:25:02 -0700 (PDT)
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-33b2e96ea07so17342625ab.0
+        for <linux-block@vger.kernel.org>; Sat, 17 Jun 2023 06:25:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687008301; x=1689600301;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eKT35itmh35X+BVg1xyD9Iz6NOKE1S0Sbt2WIuNW/AI=;
+        b=KGXAOGsOos1iJY2CR1VOQ7dwNsQ54w/+37AIZhRbNcEWhUofVU5kqX/iGLkoWe+Oc8
+         7mY3mKAU7Rt4774ojH/gPNAGsGQRjtCfxwY6ewn1UYA1i7iXx/rbNgrrUXL9lJtVR4IT
+         gWTD2iSf5MuVEVXmt+3As4CVf3VugSIBcV02reWwk7XVyyCnHieNFlzpCfElw9uq5ZCK
+         dvYwBD3/DoHA0yvUyMpDhjcsXtIOBayr2mS++iKXJW3eVDgaPRtJL70VwGo6KFAQG4XW
+         PliPpMaojYXQHhvv1Z3NZYr8JN6TvZHYWdz0Tu1d6nEEhw0YjdQhNkNvBFjaBo8eyLbg
+         Oy+A==
+X-Gm-Message-State: AC+VfDxNg7t25F9nTtehR8a/7B0NcPLP04gTRTAo1vhpPV5fL1dxEmWQ
+        sq2naYIdBof4usi4SudN4QXil60smbNokaoIhAzMokMhhDcM
+X-Google-Smtp-Source: ACHHUZ5hY1CtLi6DQK0PcL4kz8OLy4HRx6wdNtGgJ/4ih3twZhZKNVIp04Be/L73r+3AALt4uW5KmpMD6uibsNK8NKogpD0fEOYI
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
+X-Received: by 2002:a92:d483:0:b0:341:da64:d82d with SMTP id
+ p3-20020a92d483000000b00341da64d82dmr1289041ilg.6.1687008301588; Sat, 17 Jun
+ 2023 06:25:01 -0700 (PDT)
+Date:   Sat, 17 Jun 2023 06:25:01 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008ca7ee05fe533ac3@google.com>
+Subject: [syzbot] [block?] KMSAN: kernel-infoleak in copy_page_to_iter (4)
+From:   syzbot <syzbot+17a061f6132066e9fb95@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, glider@google.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Yu,
+Hello,
 
-kernel test robot noticed the following build errors:
+syzbot found the following issue on:
 
-[auto build test ERROR on next-20230616]
+HEAD commit:    7cccf3be6dcb string: use __builtin_memcpy() in strlcpy/str..
+git tree:       https://github.com/google/kmsan.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=1228ed9b280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5e9e8900159378
+dashboard link: https://syzkaller.appspot.com/bug?extid=17a061f6132066e9fb95
+compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
+userspace arch: i386
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/block-fix-wrong-mode-for-blkdev_get_by_dev-from-disk_scan_partitions/20230617-184451
-base:   next-20230616
-patch link:    https://lore.kernel.org/r/20230617103813.3708374-1-yukuai1%40huaweicloud.com
-patch subject: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
-config: um-allnoconfig (https://download.01.org/0day-ci/archive/20230617/202306172025.taiLXERW-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce: (https://download.01.org/0day-ci/archive/20230617/202306172025.taiLXERW-lkp@intel.com/reproduce)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306172025.taiLXERW-lkp@intel.com/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5e08b958e39c/disk-7cccf3be.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9003cbdf6555/vmlinux-7cccf3be.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/192dba10f451/bzImage-7cccf3be.xz
 
-All errors (new ones prefixed by >>):
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+17a061f6132066e9fb95@syzkaller.appspotmail.com
 
-   In file included from block/genhd.c:13:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from block/genhd.c:13:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from block/genhd.c:13:
-   In file included from include/linux/blkdev.h:9:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> block/genhd.c:369:52: error: use of undeclared identifier 'FMODE_EXCL'
-     369 |         bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
-         |                                                           ^
-   12 warnings and 1 error generated.
+=====================================================
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+BUG: KMSAN: kernel-infoleak in copyout lib/iov_iter.c:169 [inline]
+BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x420/0x1d00 lib/iov_iter.c:536
+ instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+ copyout lib/iov_iter.c:169 [inline]
+ _copy_to_iter+0x420/0x1d00 lib/iov_iter.c:536
+ copy_page_to_iter+0x46e/0x920 lib/iov_iter.c:742
+ copy_folio_to_iter include/linux/uio.h:197 [inline]
+ filemap_read+0xc37/0x14f0 mm/filemap.c:2742
+ blkdev_read_iter+0xa1b/0xbc0 block/fops.c:606
+ call_read_iter include/linux/fs.h:1862 [inline]
+ new_sync_read fs/read_write.c:389 [inline]
+ vfs_read+0x933/0xe40 fs/read_write.c:470
+ ksys_read+0x20f/0x4c0 fs/read_write.c:613
+ __do_sys_read fs/read_write.c:623 [inline]
+ __se_sys_read fs/read_write.c:621 [inline]
+ __x64_sys_read+0x93/0xd0 fs/read_write.c:621
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Uninit was stored to memory at:
+ _copy_to_iter+0xc9e/0x1d00 lib/iov_iter.c:536
+ copy_page_to_iter+0x46e/0x920 lib/iov_iter.c:742
+ shmem_file_read_iter+0xac2/0x1310 mm/shmem.c:2696
+ do_iter_read+0xd0a/0x1340 fs/read_write.c:795
+ vfs_iter_read+0x88/0xe0 fs/read_write.c:837
+ lo_read_simple drivers/block/loop.c:290 [inline]
+ do_req_filebacked drivers/block/loop.c:500 [inline]
+ loop_handle_cmd drivers/block/loop.c:1888 [inline]
+ loop_process_work+0x12c9/0x3990 drivers/block/loop.c:1923
+ loop_rootcg_workfn+0x2b/0x30 drivers/block/loop.c:1954
+ process_one_work+0xb0d/0x1410 kernel/workqueue.c:2405
+ worker_thread+0x107e/0x1d60 kernel/workqueue.c:2552
+ kthread+0x3e8/0x540 kernel/kthread.c:379
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+
+Uninit was stored to memory at:
+ memcpy_from_iter lib/iov_iter.c:639 [inline]
+ copy_page_from_iter_atomic+0x1271/0x26d0 lib/iov_iter.c:872
+ generic_perform_write+0x4a2/0xbb0 mm/filemap.c:3931
+ __generic_file_write_iter+0x393/0x920 mm/filemap.c:4051
+ generic_file_write_iter+0x103/0x5b0 mm/filemap.c:4083
+ do_iter_write+0x605/0x1310 fs/read_write.c:860
+ vfs_iter_write+0x88/0xe0 fs/read_write.c:901
+ lo_write_bvec drivers/block/loop.c:249 [inline]
+ lo_write_simple drivers/block/loop.c:271 [inline]
+ do_req_filebacked drivers/block/loop.c:495 [inline]
+ loop_handle_cmd drivers/block/loop.c:1888 [inline]
+ loop_process_work+0x206d/0x3990 drivers/block/loop.c:1923
+ loop_workfn+0x48/0x60 drivers/block/loop.c:1947
+ process_one_work+0xb0d/0x1410 kernel/workqueue.c:2405
+ worker_thread+0x107e/0x1d60 kernel/workqueue.c:2552
+ kthread+0x3e8/0x540 kernel/kthread.c:379
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+
+Uninit was stored to memory at:
+ copy_to_dinode+0x88d/0xb40 fs/jfs/jfs_imap.c:3148
+ diWrite+0x1bf0/0x1f00 fs/jfs/jfs_imap.c:786
+ txCommit+0xe52/0x8f40 fs/jfs/jfs_txnmgr.c:1250
+ __jfs_xattr_set+0x1b3/0x1f0 fs/jfs/xattr.c:919
+ jfs_xattr_set+0x79/0x90 fs/jfs/xattr.c:941
+ __vfs_setxattr+0x7aa/0x8b0 fs/xattr.c:201
+ __vfs_setxattr_noperm+0x24f/0xa30 fs/xattr.c:235
+ __vfs_setxattr_locked+0x441/0x480 fs/xattr.c:296
+ vfs_setxattr+0x294/0x650 fs/xattr.c:322
+ do_setxattr fs/xattr.c:630 [inline]
+ setxattr+0x45f/0x540 fs/xattr.c:653
+ __do_sys_fsetxattr fs/xattr.c:709 [inline]
+ __se_sys_fsetxattr+0x2bb/0x420 fs/xattr.c:698
+ __ia32_sys_fsetxattr+0xe3/0x150 fs/xattr.c:698
+ do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+ __do_fast_syscall_32+0xa2/0x100 arch/x86/entry/common.c:178
+ do_fast_syscall_32+0x37/0x80 arch/x86/entry/common.c:203
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:246
+ entry_SYSENTER_compat_after_hwframe+0x70/0x82
+
+Uninit was stored to memory at:
+ ea_put fs/jfs/xattr.c:637 [inline]
+ __jfs_setxattr+0x1877/0x1b90 fs/jfs/xattr.c:783
+ __jfs_xattr_set+0xe6/0x1f0 fs/jfs/xattr.c:917
+ jfs_xattr_set+0x79/0x90 fs/jfs/xattr.c:941
+ __vfs_setxattr+0x7aa/0x8b0 fs/xattr.c:201
+ __vfs_setxattr_noperm+0x24f/0xa30 fs/xattr.c:235
+ __vfs_setxattr_locked+0x441/0x480 fs/xattr.c:296
+ vfs_setxattr+0x294/0x650 fs/xattr.c:322
+ do_setxattr fs/xattr.c:630 [inline]
+ setxattr+0x45f/0x540 fs/xattr.c:653
+ __do_sys_fsetxattr fs/xattr.c:709 [inline]
+ __se_sys_fsetxattr+0x2bb/0x420 fs/xattr.c:698
+ __ia32_sys_fsetxattr+0xe3/0x150 fs/xattr.c:698
+ do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+ __do_fast_syscall_32+0xa2/0x100 arch/x86/entry/common.c:178
+ do_fast_syscall_32+0x37/0x80 arch/x86/entry/common.c:203
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:246
+ entry_SYSENTER_compat_after_hwframe+0x70/0x82
+
+Local variable ea_buf created at:
+ __jfs_setxattr+0x5d/0x1b90 fs/jfs/xattr.c:660
+ __jfs_xattr_set+0xe6/0x1f0 fs/jfs/xattr.c:917
+
+Bytes 3689-3691 of 4096 are uninitialized
+Memory access of size 4096 starts at ffff88815f2ee000
+Data copied to user address 000055a672e8dc78
+
+CPU: 1 PID: 7649 Comm: udevd Not tainted 6.4.0-rc6-syzkaller-g7cccf3be6dcb #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+=====================================================
 
 
-vim +/FMODE_EXCL +369 block/genhd.c
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-   342	
-   343	int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
-   344	{
-   345		struct block_device *bdev;
-   346		int ret = 0;
-   347	
-   348		if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
-   349			return -EINVAL;
-   350		if (test_bit(GD_SUPPRESS_PART_SCAN, &disk->state))
-   351			return -EINVAL;
-   352		if (disk->open_partitions)
-   353			return -EBUSY;
-   354	
-   355		/*
-   356		 * If the device is opened exclusively by current thread already, it's
-   357		 * safe to scan partitons, otherwise, use bd_prepare_to_claim() to
-   358		 * synchronize with other exclusive openers and other partition
-   359		 * scanners.
-   360		 */
-   361		if (!(mode & BLK_OPEN_EXCL)) {
-   362			ret = bd_prepare_to_claim(disk->part0, disk_scan_partitions,
-   363						  NULL);
-   364			if (ret)
-   365				return ret;
-   366		}
-   367	
-   368		set_bit(GD_NEED_PART_SCAN, &disk->state);
- > 369		bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
-   370					 NULL);
-   371		if (IS_ERR(bdev))
-   372			ret =  PTR_ERR(bdev);
-   373		else
-   374			blkdev_put(bdev, NULL);
-   375	
-   376		/*
-   377		 * If blkdev_get_by_dev() failed early, GD_NEED_PART_SCAN is still set,
-   378		 * and this will cause that re-assemble partitioned raid device will
-   379		 * creat partition for underlying disk.
-   380		 */
-   381		clear_bit(GD_NEED_PART_SCAN, &disk->state);
-   382		if (!(mode & BLK_OPEN_EXCL))
-   383			bd_abort_claiming(disk->part0, disk_scan_partitions);
-   384		return ret;
-   385	}
-   386	
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
