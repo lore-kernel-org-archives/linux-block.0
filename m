@@ -2,78 +2,100 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 533E3EB64D7
-	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 05:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656CCEB64D8
+	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 06:05:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbjFRF7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Jun 2023 01:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44092 "EHLO
+        id S229506AbjFRGF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Jun 2023 02:05:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjFRF7I (ORCPT
+        with ESMTP id S229456AbjFRGF2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2023 01:59:08 -0400
+        Sun, 18 Jun 2023 02:05:28 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C0B10E9;
-        Sat, 17 Jun 2023 22:59:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5175F10E3;
+        Sat, 17 Jun 2023 23:05:27 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QkMfG2Fkgz4f4Dhk;
-        Sun, 18 Jun 2023 13:59:02 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCXaK8lnY5kd+bcLw--.30297S3;
-        Sun, 18 Jun 2023 13:59:02 +0800 (CST)
-Subject: Re: [PATCH -next] block: fix wrong mode for blkdev_get_by_dev() from
- disk_scan_partitions()
-To:     kernel test robot <lkp@intel.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, axboe@kernel.dk,
-        brauner@kernel.org, hare@suse.de, dsterba@suse.com,
-        jinpu.wang@ionos.com
-Cc:     oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        yangerkun@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20230617103813.3708374-1-yukuai1@huaweicloud.com>
- <202306172040.1dllc8rx-lkp@intel.com>
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QkMnb1BKvz4f4PNl;
+        Sun, 18 Jun 2023 14:05:23 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgCH77Kgno5k_0DdLw--.62007S4;
+        Sun, 18 Jun 2023 14:05:21 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <1df1d531-cd16-5db5-6f36-744896aa945e@huaweicloud.com>
-Date:   Sun, 18 Jun 2023 13:59:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To:     hch@lst.de, axboe@kernel.dk, brauner@kernel.org, dsterba@suse.com,
+        hare@suse.de, jinpu.wang@ionos.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH -next v2] block: fix wrong mode for blkdev_get_by_dev() from disk_scan_partitions()
+Date:   Sun, 18 Jun 2023 22:04:02 +0800
+Message-Id: <20230618140402.7556-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-In-Reply-To: <202306172040.1dllc8rx-lkp@intel.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCXaK8lnY5kd+bcLw--.30297S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYg7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2js
-        IEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE
-        5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeV
-        CFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxG
-        xcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrw
-        CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
-        14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
-        IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxK
-        x2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
-        AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-TRANSID: gCh0CgCH77Kgno5k_0DdLw--.62007S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF4rWFWfKF17Jr4rGr45Wrg_yoW8Xr4UpF
+        W5WF45tryqgryxZF4vv3ZrGay5Ga98GryxKrWIgw1Fv39xXrsYkF92krs8Wr10vFZagrW5
+        WFnrZFyFqFyF9wUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9q14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
+        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
+        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r
+        1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAq
+        YI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4I
+        kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+        WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+        0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWr
+        Jr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r
+        4UJbIYCTnIWIevJa73UjIFyTuYvjTRNgAwUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Yu Kuai <yukuai3@huawei.com>
 
-ÔÚ 2023/06/17 20:25, kernel test robot Ð´µÀ:
-> 
->     block/genhd.c: In function 'disk_scan_partitions':
->>> block/genhd.c:369:59: error: 'FMODE_EXCL' undeclared (first use in this function); did you mean 'FMODE_EXEC'?
->       369 |         bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXCL, NULL,
->           |                                                           ^~~~~~~~~~
->           |                                                           FMODE_EXEC
+After commit 2736e8eeb0cc ("block: use the holder as indication for
+exclusive opens"), blkdev_get_by_dev() will warn if holder is NULL and
+mode contains 'FMODE_EXCL'.
 
-Sorry about this typo, I'll send a new version.
+holder from blkdev_get_by_dev() from disk_scan_partitions() is always NULL,
+hence it should not use 'FMODE_EXCL', which is broben by the commit. For
+consequence, WARN_ON_ONCE() will be triggered from blkdev_get_by_dev()
+if user scan partitions with device opened exclusively.
 
-Thanks,
-Kuai
+Fix this problem by removing 'FMODE_EXCL' from disk_scan_partitions(),
+as it used to be.
+
+Reported-by: syzbot+00cd27751f78817f167b@syzkaller.appspotmail.com
+Link: https://syzkaller.appspot.com/bug?extid=00cd27751f78817f167b
+Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+
+Changes in v2:
+ - fix a typo
+
+ block/genhd.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 2c2f9a716822..d1e845ae1b32 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -365,7 +365,8 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+ 	}
+ 
+ 	set_bit(GD_NEED_PART_SCAN, &disk->state);
+-	bdev = blkdev_get_by_dev(disk_devt(disk), mode, NULL, NULL);
++	bdev = blkdev_get_by_dev(disk_devt(disk), mode & ~FMODE_EXEC, NULL,
++				 NULL);
+ 	if (IS_ERR(bdev))
+ 		ret =  PTR_ERR(bdev);
+ 	else
+-- 
+2.39.2
 
