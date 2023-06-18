@@ -2,73 +2,77 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD4CEB64D7
-	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 21:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70053EB64D7
+	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 23:28:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbjFRVGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Jun 2023 17:06:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58966 "EHLO
+        id S229475AbjFRX2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Jun 2023 19:28:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjFRVGd (ORCPT
+        with ESMTP id S229456AbjFRX2f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2023 17:06:33 -0400
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE6E4E44
-        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 14:06:32 -0700 (PDT)
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-77e23d23eccso138192039f.1
-        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 14:06:32 -0700 (PDT)
+        Sun, 18 Jun 2023 19:28:35 -0400
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94323E47
+        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:28:34 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1b51780c1b3so23257395ad.1
+        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:28:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687122392; x=1689714392;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20221208; t=1687130914; x=1689722914;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AGPCsyVCjaMdb5zctZvXHEEDcHJ/Z5rO2/FLB/BsIJI=;
-        b=iNUqmklxQJgE/Xit5kPyNYvCn/eZrYjPd8FMjEWT9aKbZ47f70TBgCfAjnc2QFj9sE
-         oGsLEOnYFFd+7smOWmTCFEWk5KnQwsSQe/5ptsF+hZf6F0kLChq0Fvb/FlpFd+l2J6JK
-         FxJj4SCxIZDPUrvSX0MswTrSq80HfkjB+mSH7LhACjy9UT5rcSeadKrW3JNSIWCAIWgl
-         5HhW/V0Vb4dEBaZhgLQdHSZToPFy3WfKm51Mk3wJ75xdL5JMpRpgjZ+9HHACkS3IWRF8
-         32AXWBYEtGi6Oi7WdIOLz1CiIw1KE3sVLo6gzq2baq/k31InXvrGtewuY8Edm1liJ0x/
-         MhpQ==
-X-Gm-Message-State: AC+VfDz+GHJ55eVbq7pE6yWrbG9yw//GEgPlYpIFUL7be7YCq6Rc7XBg
-        8+HT+gNNlYMYajNCk5SIDHuDvZYXvzWQkI6ZeEnpxFkW/064
-X-Google-Smtp-Source: ACHHUZ7xSr4w6krwjQPockQqELqyYqRd9bokpQafWNXKhNDv0G3b/mUPdU0P2k3tDRz7L758vvswpWfxwmv/yRNxFreCGHk5VisC
+        bh=HF4al/KpfE3U00Gc3jY6jQGLinv7+Agy63xfkUqw/9I=;
+        b=edCd59MDGBtdZU6tOFMLxGRWZ6fcbPNbSmLUtOXTln9jHfG6VUT+FJvw/M8LrcoNdA
+         6deUolEDaMk3FpjwVsT2/J+XtqIGl9kdfk6qwyJIOH7z5HLTIwlTqWBS+CyJNt5r6Rh8
+         ZBvF4lPc2jzZxwBgIe28saKZuPaWAC2rIbZCjAaSrhTlTUEHvoa/4Xw4uxZtw0SMofj+
+         hXHfErbGB81/meCoGeSFzviWVXu1Kv30WOeKq143WmKVI6sjZKf43dUl7J4QBbtL5JiS
+         NvJ5C1axRtvcnyL+VXw5xiYW7QAn7erO2B8yadEW8PEmN7n2YNWEEaxUzY106kp/PSen
+         K74g==
+X-Gm-Message-State: AC+VfDzXLIz7QkBz/5tjqND298uwKWiqjqXzV0yQifP2JoIXRH7Frg0e
+        s/DsmbveJhvYf08ZMQfmF5iGRocPHH8=
+X-Google-Smtp-Source: ACHHUZ7irfmNs/6/0h6WG+1UviAAEuFpdk6KmssgBF1RWma+xZkT7FH0S46bwLMoFgndfWA7refd3Q==
+X-Received: by 2002:a17:902:9a0a:b0:1b4:5697:d991 with SMTP id v10-20020a1709029a0a00b001b45697d991mr7990039plp.15.1687130913880;
+        Sun, 18 Jun 2023 16:28:33 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id u13-20020a170903124d00b001b3d44788f4sm8208654plh.9.2023.06.18.16.28.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Jun 2023 16:28:33 -0700 (PDT)
+Message-ID: <1efd3874-bedd-1e49-9fa3-fca0e85187f4@acm.org>
+Date:   Sun, 18 Jun 2023 16:28:32 -0700
 MIME-Version: 1.0
-X-Received: by 2002:a6b:7c0b:0:b0:763:7dfb:27b2 with SMTP id
- m11-20020a6b7c0b000000b007637dfb27b2mr2282322iok.0.1687122392334; Sun, 18 Jun
- 2023 14:06:32 -0700 (PDT)
-Date:   Sun, 18 Jun 2023 14:06:32 -0700
-In-Reply-To: <0000000000007ca70405fe4f149a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e34c0505fe6dca7a@google.com>
-Subject: Re: [syzbot] [block?] WARNING in blkdev_put (3)
-From:   syzbot <syzbot+04625c80899f4555de39@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, brauner@kernel.org, hare@suse.de, hch@lst.de,
-        hdanton@sina.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: LVM kernel lockup scenario during lvcreate
+Content-Language: en-US
+To:     Jaco Kroon <jaco@uls.co.za>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
+ <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
+ <f60c64e0-cfac-53bd-b164-92387c6910cf@uls.co.za>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <f60c64e0-cfac-53bd-b164-92387c6910cf@uls.co.za>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+On 6/12/23 12:36, Jaco Kroon wrote:
+> On 2023/06/12 20:40, Bart Van Assche wrote:
+>> tar -czf- -C /sys/kernel/debug/block . >block.tgz
+> 
+> Definitely can do, I'm not sure how to interpret the data in this - is 
+> there anything specific you're looking for?  Would love to not just pass 
+> the information on but also learn from this.
 
-commit 2736e8eeb0ccdc71d1f4256c9c9a28f58cc43307
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Thu Jun 8 11:02:43 2023 +0000
+Most of the information in debugfs is needed. It's easier to capture it 
+all than to only request for the many attributes that are needed.
 
-    block: use the holder as indication for exclusive opens
+I'm not sure there is any better documentation available for these 
+attributes than the information in the source file block/blk-mq-debugfs.c.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1713d65b280000
-start commit:   f7efed9f38f8 Add linux-next specific files for 20230616
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1493d65b280000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1093d65b280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=60b1a32485a77c16
-dashboard link: https://syzkaller.appspot.com/bug?extid=04625c80899f4555de39
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1600684b280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16b484f3280000
+Thanks,
 
-Reported-by: syzbot+04625c80899f4555de39@syzkaller.appspotmail.com
-Fixes: 2736e8eeb0cc ("block: use the holder as indication for exclusive opens")
+Bart.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
