@@ -2,118 +2,164 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7721FEB64D8
-	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 07:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B613EB64D7
+	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 08:09:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbjFRHvn convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Jun 2023 03:51:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57382 "EHLO
+        id S229560AbjFRIJF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Jun 2023 04:09:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjFRHvm (ORCPT
+        with ESMTP id S229543AbjFRIJD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2023 03:51:42 -0400
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B845FE51;
-        Sun, 18 Jun 2023 00:51:40 -0700 (PDT)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-5700401acbeso27900317b3.0;
-        Sun, 18 Jun 2023 00:51:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687074699; x=1689666699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iXMXyUUSJXR/nTNTa+k3QFOvjzI9dKq9J11YzB0zBbc=;
-        b=DCxCDit2X9jblnIQiL8Q1yuZvkbo7/UbqjncYC6Q5XX2PxYGIb9ON4g8rfnaCb59Af
-         lxDofc5ROwmlPcpV9tzFr+dbnPAQori3pFn/0N+6STQFUkQkU/nG3ze6KIkC43W04xlv
-         WFzMytmCYL272rK5l4E9vNa8AMXBi3qwsKgQRMxLAg8bkd5iyw3SVSGARnhKEwaxiAHd
-         ADJU4bLCLLgxLmiMDKym3PchVLVkIban5rL36616gb/aqACdGOcqvxaOeGRqHd75d8tM
-         exqlQJ5BiC7xNFSPFBXa9I0g2RoID75j7gn2fGaWvCQi1w/RhnAnXoHdHXANEUc66U51
-         KI/Q==
-X-Gm-Message-State: AC+VfDz6wYj7aCEb8zGLsUj0gwCw+KXPBEQh6uDA0cRX1Ea1afuU7kcZ
-        U03+WiZ5eYKD/fNDiYsik0fOm1PzO/cPuw==
-X-Google-Smtp-Source: ACHHUZ7gfC9SiAKuiZVkdGPEIOUbBiWWQzVVNssBR/KT1jM0N6dnRFxrMrm59gO2v3gfW4ajop+EwA==
-X-Received: by 2002:a0d:ca0d:0:b0:56d:770:c315 with SMTP id m13-20020a0dca0d000000b0056d0770c315mr6766217ywd.49.1687074699573;
-        Sun, 18 Jun 2023 00:51:39 -0700 (PDT)
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com. [209.85.219.180])
-        by smtp.gmail.com with ESMTPSA id b16-20020a0dd910000000b005707f542f62sm953037ywe.25.2023.06.18.00.51.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Jun 2023 00:51:38 -0700 (PDT)
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-bd6d9d7da35so2611586276.0;
-        Sun, 18 Jun 2023 00:51:38 -0700 (PDT)
-X-Received: by 2002:a5b:cb:0:b0:bc7:47a:9861 with SMTP id d11-20020a5b00cb000000b00bc7047a9861mr3316637ybp.51.1687074698581;
- Sun, 18 Jun 2023 00:51:38 -0700 (PDT)
+        Sun, 18 Jun 2023 04:09:03 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E502BE70;
+        Sun, 18 Jun 2023 01:09:01 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QkQX86bCZz4f3nyQ;
+        Sun, 18 Jun 2023 16:08:56 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.104.67])
+        by APP4 (Coremail) with SMTP id gCh0CgAHoZSXu45kz8rjLw--.30784S5;
+        Sun, 18 Jun 2023 16:08:58 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     bvanassche@acm.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com,
+        yangerkun@huawei.com
+Subject: [PATCH RFC 1/7] blk-mq: factor out a structure from blk_mq_tags to control tag sharing
+Date:   Mon, 19 Jun 2023 00:07:32 +0800
+Message-Id: <20230618160738.54385-2-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230618160738.54385-1-yukuai1@huaweicloud.com>
+References: <20230618160738.54385-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-References: <20230616223616.6002-1-schmitzmic@gmail.com> <20230616223616.6002-3-schmitzmic@gmail.com>
- <CAMuHMdXo+Za3_Bz-PaLhq_oZzEzkN=g5YyDp=vaX7485WuE=Cg@mail.gmail.com> <e29dcf24-367f-4304-9b01-7913e0dcf650@gmail.com>
-In-Reply-To: <e29dcf24-367f-4304-9b01-7913e0dcf650@gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Sun, 18 Jun 2023 09:51:25 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUHNGKP4jFM7CDhFxHWd+SR4GG6Co0PosLCk1qpBV176w@mail.gmail.com>
-Message-ID: <CAMuHMdUHNGKP4jFM7CDhFxHWd+SR4GG6Co0PosLCk1qpBV176w@mail.gmail.com>
-Subject: Re: [PATCH v12 2/3] block: change annotation of rdb_CylBlocks in affs_hardblocks.h
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-m68k@vger.kernel.org, hch@lst.de, martin@lichtvoll.de,
-        fthain@linux-m68k.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAHoZSXu45kz8rjLw--.30784S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxXrykAw43Wr17AFy8Kr4Durg_yoW5urWDpa
+        98Ga17Cw1fJr1UXFWqq3y7XF1SganIyF1xGwn3W34YyF1jkw1fZr109rW0vr48ZrsayF47
+        Grs8trWktF1UW37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUBK14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUZVW8XwA2048vs2IY02
+        0E87I2jVAFwI0_Jr4l82xGYIkIc2x26xkF7I0E14v26r1I6r4UM28lY4IEw2IIxxk0rwA2
+        F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjx
+        v20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E
+        87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64
+        kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm
+        72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYx
+        C7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_
+        Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x
+        0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8
+        JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIx
+        AIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRE2NtUUUUUU=
+        =
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Michael,
+From: Yu Kuai <yukuai3@huawei.com>
 
-On Sun, Jun 18, 2023 at 5:10 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
-> Am 17.06.2023 um 23:08 schrieb Geert Uytterhoeven:
-> > On Sat, Jun 17, 2023 at 12:36 AM Michael Schmitz <schmitzmic@gmail.com> wrote:
-> >> The Amiga partition parser module uses signed int for partition sector
-> >> address and count, which will overflow for disks larger than 1 TB.
-> >>
-> >> Use u64 as type for sector address and size to allow using disks up to
-> >> 2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
-> >> format allows to specify disk sizes up to 2^128 bytes (though native
-> >> OS limitations reduce this somewhat, to max 2^68 bytes), so check for
-> >> u64 overflow carefully to protect against overflowing sector_t.
-> >>
-> >> This bug was reported originally in 2012, and the fix was created by
-> >> the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
-> >> discussed and reviewed on linux-m68k at that time but never officially
-> >> submitted (now resubmitted as patch 1 of this series).
-> >>
-> >> Patch 3 (this series) adds additional error checking and warning
-> >> messages. One of the error checks now makes use of the previously
-> >> unused rdb_CylBlocks field, which causes a 'sparse' warning
-> >> (cast to restricted __be32).
-> >>
-> >> Annotate all 32 bit fields in affs_hardblocks.h as __be32, as the
-> >> on-disk format of RDB and partition blocks is always big endian.
-> >>
-> >> Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-> >> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-> >> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> >> Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-> >> Cc: <stable@vger.kernel.org> # 5.2
-> >> Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-> >> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> >
-> > Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
->
-> Thanks - now I notice the patch title for this one doesn't fit too well
-> anymore.
->
-> Would a change of title mess up the common patch tracking tools?
+Currently tags is fair shared, and the new structure contains only one
+field active_queues. There are no functional changes and prepare to
+refactor tag sharing.
 
-You mean changing one patch subject in v13?
-Nah, happens all the time, so the tooling should handle that fine.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-mq-debugfs.c |  2 +-
+ block/blk-mq-tag.c     |  8 ++++----
+ block/blk-mq.h         |  2 +-
+ include/linux/blk-mq.h | 10 ++++++++--
+ 4 files changed, 14 insertions(+), 8 deletions(-)
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index c3b5930106b2..431aaa3eb181 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -401,7 +401,7 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
+ 	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
+ 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
+ 	seq_printf(m, "active_queues=%d\n",
+-		   READ_ONCE(tags->active_queues));
++		   READ_ONCE(tags->ctl.active_queues));
+ 
+ 	seq_puts(m, "\nbitmap_tags:\n");
+ 	sbitmap_queue_show(&tags->bitmap_tags, m);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index cc57e2dd9a0b..fe41a0d34fc0 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -57,8 +57,8 @@ void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ 	}
+ 
+ 	spin_lock_irq(&tags->lock);
+-	users = tags->active_queues + 1;
+-	WRITE_ONCE(tags->active_queues, users);
++	users = tags->ctl.active_queues + 1;
++	WRITE_ONCE(tags->ctl.active_queues, users);
+ 	blk_mq_update_wake_batch(tags, users);
+ 	spin_unlock_irq(&tags->lock);
+ }
+@@ -94,8 +94,8 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 	}
+ 
+ 	spin_lock_irq(&tags->lock);
+-	users = tags->active_queues - 1;
+-	WRITE_ONCE(tags->active_queues, users);
++	users = tags->ctl.active_queues - 1;
++	WRITE_ONCE(tags->ctl.active_queues, users);
+ 	blk_mq_update_wake_batch(tags, users);
+ 	spin_unlock_irq(&tags->lock);
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 1743857e0b01..ca1c13127868 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -412,7 +412,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 			return true;
+ 	}
+ 
+-	users = READ_ONCE(hctx->tags->active_queues);
++	users = READ_ONCE(hctx->tags->ctl.active_queues);
+ 	if (!users)
+ 		return true;
+ 
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index f401067ac03a..8d2cd6b9d305 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -733,13 +733,16 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 		blk_opf_t opf, blk_mq_req_flags_t flags,
+ 		unsigned int hctx_idx);
+ 
++struct tag_sharing_ctl {
++	unsigned int active_queues;
++};
++
+ /*
+  * Tag address space map.
+  */
+ struct blk_mq_tags {
+ 	unsigned int nr_tags;
+ 	unsigned int nr_reserved_tags;
+-	unsigned int active_queues;
+ 
+ 	struct sbitmap_queue bitmap_tags;
+ 	struct sbitmap_queue breserved_tags;
+@@ -750,9 +753,12 @@ struct blk_mq_tags {
+ 
+ 	/*
+ 	 * used to clear request reference in rqs[] before freeing one
+-	 * request pool
++	 * request pool, and to protect tag_sharing_ctl.
+ 	 */
+ 	spinlock_t lock;
++
++	/* used when tags is shared for multiple request_queue or hctx. */
++	struct tag_sharing_ctl ctl;
+ };
+ 
+ static inline struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags,
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.39.2
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
