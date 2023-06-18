@@ -2,136 +2,78 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C07EB64D7
-	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 23:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A08EB64D7
+	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 23:56:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbjFRXfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Jun 2023 19:35:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53432 "EHLO
+        id S229482AbjFRX4t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Jun 2023 19:56:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjFRXfH (ORCPT
+        with ESMTP id S229456AbjFRX4s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2023 19:35:07 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3946FE47
-        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:35:06 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id 46e09a7af769-6b46e540326so517443a34.2
-        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:35:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20221208.gappssmtp.com; s=20221208; t=1687131305; x=1689723305;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fh/QD67RXkBHOuMqDMBgCmptKVZnGnbT6cHL+zbUSS8=;
-        b=lZgAzHZa/Je9B8XgN45KtCbueBGf7YzmwSs7VouPjN2kkneg9+92jCQRLQtFFkv65u
-         VjJx3YV5WCio4L+1wtbUH1vxW1cRQIgiN3fRjiOEEN0zOKuq7sZ/x+2dWGzWeUnqpyHw
-         JUUSl5Zc4EvHIqcI2bIjMvY9u+4oPXZx46C/4KywGVQ2fDuxo2jBmV5xrbXAi0X3aVz9
-         Uy9zryMjHykSGXL2zfd2fuE1+RUmsDBW9x+HkV1S6TLkMVysh1lHKN+UnANV7mZfEuWa
-         UHVFw3fYKystbr++THU2CT2e+wuz1XXcL4PSbERQjn4QO0WjWGcrbVrJxg/CeskwUzOS
-         pRjw==
+        Sun, 18 Jun 2023 19:56:48 -0400
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F301FDB
+        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:56:45 -0700 (PDT)
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-77de67139ccso153775839f.0
+        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:56:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687131305; x=1689723305;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fh/QD67RXkBHOuMqDMBgCmptKVZnGnbT6cHL+zbUSS8=;
-        b=PdcAn/Tum7TeHLK37amUdfM0q27K+9f1jxCnf3IkUiPA+E5qAwsvlbzDYwVn3MPBeI
-         1Z9u8eTPz61GMTSRIQsgRGJ5jJ3/jUE/xIMau8bKVE4HC5bTrF68ckPdLEOvBzpasc5v
-         91ZrggfeT90m7TGOl07WJ9L3LHgZJiY8Fuff2/L5w/jHBTFq48WTEu+C3alCDTMA11+L
-         21a7spuRBiE70ZnIYzvLAPAkN6BCJz027iDBisILYxls5JGsIyiwsDL+aDTj5WQJZGkm
-         myVa9o/MSZCVu2PvKXZWZH+MAr5TQ57lq5bHBfL0JOBMXAukuU+HC8LG40SUjqm+I3I7
-         sY3w==
-X-Gm-Message-State: AC+VfDxmMBLWtKpPR5d+QMSZGve4fma9nNmzgBqR7boc9KmYi7+HSyce
-        PEfoKJI/DLyoS0F9dKwGol2Lww==
-X-Google-Smtp-Source: ACHHUZ4XLGw6/vMFfxHGld2JCcJ2RIFDx573ZwSIVpvb522QQtnV+YmQECUW5hvMxcuNhEbFaRSVnA==
-X-Received: by 2002:a9d:6c50:0:b0:6b5:6b95:5876 with SMTP id g16-20020a9d6c50000000b006b56b955876mr728803otq.25.1687131305552;
-        Sun, 18 Jun 2023 16:35:05 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-13-202.pa.nsw.optusnet.com.au. [49.180.13.202])
-        by smtp.gmail.com with ESMTPSA id v9-20020aa78089000000b006475f831838sm10110992pff.30.2023.06.18.16.35.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Jun 2023 16:35:04 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-        (envelope-from <david@fromorbit.com>)
-        id 1qB1vB-00DRS8-0J;
-        Mon, 19 Jun 2023 09:35:01 +1000
-Date:   Mon, 19 Jun 2023 09:35:01 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     "Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>, Ted Tso <tytso@mit.edu>,
-        yebin <yebin@huaweicloud.com>, linux-fsdevel@vger.kernel.org,
-        Kees Cook <keescook@google.com>,
-        Alexander Popov <alex.popov@linux.com>,
-        syzkaller <syzkaller@googlegroups.com>,
-        Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH] block: Add config option to not allow writing to mounted
- devices
-Message-ID: <ZI+UpU2OQC+XyeJy@dread.disaster.area>
-References: <20230612161614.10302-1-jack@suse.cz>
- <CACT4Y+aEScXmq2F1-vqAfr-b2w-xyOohN+FZxorW1YuRvKDLNQ@mail.gmail.com>
- <20230614020412.GB11423@frogsfrogsfrogs>
- <CACT4Y+YTfim0VhX6mTKyxMDVvY94zh7OiOLjv-Fs0kgj=vi=Qg@mail.gmail.com>
- <ZIpPgC57bhb1cMNL@dread.disaster.area>
- <CACT4Y+aqL_woqyGuxVGc-F2TEbk7i4OguiudDrA1cWpOi-n50Q@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1687132605; x=1689724605;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DhbQ/9Lw/d7VRHRatcO6ogwl+kSlam871Nks56VmkhQ=;
+        b=HKenFjNgkuMs+fFtU9hz/QdHY5Pj6fk3sU0XrbjdPZWV8uYKAAHoS8WlCejQaupf8K
+         GNOjEIrK3iwSNHmmBb3dLKDn5JOl7RhaBfsniqE8lXkL+AG3DsZcVSSwweywV0a64cCI
+         TSMA58BX7zIIYc97q4520lbtUClTgh8XRhBnY3fU1MqLP7c8GGnv6fuH8JpSeb4B/mY3
+         q/kIGqzbmNhoKgeKy9KJnJP8/ywqsdjhGJIRIpuo2T1ieLp/vhYbLH7c7U3P8E3hi7U5
+         7rE8a34PC/syBBUqCjgD8scqsRIgqwjkHLRd9yr2ZBrOrjjxgpKqwTrpJz+EeJAKek9E
+         5Eig==
+X-Gm-Message-State: AC+VfDxkd3Kp5QXsupg9H+rBZlJMezDyIcz/r2idoEG5zmDT0/PN/al/
+        uc+asEu1s96yV2cF3Klha+8HMZ2mGY8=
+X-Google-Smtp-Source: ACHHUZ5glNoj0inoIBoMlcuMRLI+ce5l9ywrkbS+kH1FvhON//wJv2pHft+oD2cwcLR7myTGexMC7w==
+X-Received: by 2002:a92:ce47:0:b0:342:6935:68b2 with SMTP id a7-20020a92ce47000000b00342693568b2mr1429240ilr.25.1687132605014;
+        Sun, 18 Jun 2023 16:56:45 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id h33-20020a635321000000b005302682a668sm17196636pgb.17.2023.06.18.16.56.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Jun 2023 16:56:44 -0700 (PDT)
+Message-ID: <6b066ab5-7806-5a23-72a5-073153259116@acm.org>
+Date:   Sun, 18 Jun 2023 16:56:43 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACT4Y+aqL_woqyGuxVGc-F2TEbk7i4OguiudDrA1cWpOi-n50Q@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: LVM kernel lockup scenario during lvcreate
+Content-Language: en-US
+To:     Jaco Kroon <jaco@uls.co.za>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
+ <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
+ <102b1994-74ff-c099-292c-f5429ce768c3@uls.co.za>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <102b1994-74ff-c099-292c-f5429ce768c3@uls.co.za>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 15, 2023 at 11:14:53AM +0200, Dmitry Vyukov wrote:
-> On Thu, 15 Jun 2023 at 01:38, Dave Chinner <david@fromorbit.com> wrote:
-> > Hence the claim that "because syzbot doesn't run we don't have
-> > visibility of code bugs" is naive, conceited, incredibly
-> > narcissistic and demonstratable false. It also indicates a very
-> > poor understanding of where syzbot actually fits into the overall
-> > engineering processes.
-> 
-> Hi Dave, Ted,
-> 
-> We are currently looking into options of how to satisfy all parties.
-> 
-> I am not saying that all of these bugs need to be fixed, nor that they
-> are more important than bugs in supported parts. And we are very much
-> interested in testing supported parts as well as we can do.
-> 
-> By CONFIG_INSECURE I just meant something similar to kernel taint
-> bits.
+On 6/18/23 12:34, Jaco Kroon wrote:
+> On 2023/06/12 20:40, Bart Van Assche wrote:
+>> tar -czf- -C /sys/kernel/debug/block . >block.tgz
+>>
+> Right on queue ... please find attached.  Not seeing any content in any 
+> of the files from the tar czf so I doubt there is much use here ... 
+> perhaps you might be able to explain why all of these files under 
+> /sys/kernel/debug/block would be empty?
 
-How is that any better?  Who gets to decide what sets
-this taint? Subsystem maintainers?
+Apparently the tar command is incompatible with debugfs :-( I should 
+have tested the command before I sent it to you.
 
-> A user is free to continue after any bad thing has happened/they
-> did, but some warranties are void. And if a kernel developer receives
-> a bug report on a tainted kernel, they will take it with a grain of
-> salt. So it's important to note the fact and inform about it.
-> Something similar here: bugs in deprecated parts do not need to be
-> fixed, and distros are still free to enable them, but this fact is
-> acknowledged by distros and made visible to users.
+Does this work better?
 
-"Deprecated" does not mean *unmaintained*. They are two completely
-different things, and conflating the two does not help anyone.
+(cd /sys/kernel/debug/block/ && grep -r . .) | gzip -9 > block.gz
 
-You are talking about marking unmaintained code with a taint, not
-deprecated code. reiserfs is unmaintained code. ntfs3 is
-unmaintained code. hfs is unmaintained code. There are several other
-unmaintained filesystems that don't have active maintainers.  Bug
-reports never, ever get looked at, etc. Sure, there's an argument to
-taint them.
+Thanks,
 
-But whilst XFS v4 is deprecated, it is still very much maintained.
-We encourage people to move off V4, we focus less on it, but if bug
-reports from users come in, we still fix them. So even if you
-introduce some "unmaintained" taint for the kernel, you aren't going
-to see it get set for the XFS V4 format.
-
-> But we are looking into other options that won't require even CONFIG_INSECURE.
-
-Who is this nebulous "we"?
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Bart.
