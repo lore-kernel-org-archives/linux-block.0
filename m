@@ -2,40 +2,47 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 522A2EB64D9
-	for <linux-block@archiver.kernel.org>; Mon, 19 Jun 2023 04:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1688EB64D9
+	for <linux-block@archiver.kernel.org>; Mon, 19 Jun 2023 05:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjFSE7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Jun 2023 00:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49972 "EHLO
+        id S229832AbjFSFAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Jun 2023 01:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjFSE73 (ORCPT
+        with ESMTP id S229482AbjFSFAT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Jun 2023 00:59:29 -0400
+        Mon, 19 Jun 2023 01:00:19 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB9FE49;
-        Sun, 18 Jun 2023 21:59:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC461E44;
+        Sun, 18 Jun 2023 22:00:18 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1F13F6732A; Mon, 19 Jun 2023 06:59:24 +0200 (CEST)
-Date:   Mon, 19 Jun 2023 06:59:23 +0200
+        id 38AE06732A; Mon, 19 Jun 2023 07:00:16 +0200 (CEST)
+Date:   Mon, 19 Jun 2023 07:00:15 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, axboe@kernel.dk, brauner@kernel.org, dsterba@suse.com,
-        hare@suse.de, jinpu.wang@ionos.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com, yangerkun@huawei.com
-Subject: Re: [PATCH -next v2] block: fix wrong mode for blkdev_get_by_dev()
- from disk_scan_partitions()
-Message-ID: <20230619045923.GA10741@lst.de>
-References: <20230618140402.7556-1-yukuai1@huaweicloud.com>
+To:     Song Liu <song@kernel.org>
+Cc:     linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] md: use mddev->external to select holder in
+ export_rdev()
+Message-ID: <20230619050015.GB10741@lst.de>
+References: <20230617052405.305871-1-song@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230618140402.7556-1-yukuai1@huaweicloud.com>
+In-Reply-To: <20230617052405.305871-1-song@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
+
+On Fri, Jun 16, 2023 at 10:24:04PM -0700, Song Liu wrote:
+> This means export_rdev() calls blkdev_put with a different holder than the
+> one used by blkdev_get_by_dev(). This is because mddev->major_version == -2
+> is not a good check for external metadata. Fix this by using
+> mddev->external instead.
+> 
+> Also, do not clear mddev->external in md_clean(), as the flag might be used
+> later in export_rdev().
 
 Looks good:
 
