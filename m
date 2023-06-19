@@ -2,78 +2,166 @@ Return-Path: <linux-block-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A08EB64D7
-	for <linux-block@archiver.kernel.org>; Sun, 18 Jun 2023 23:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 290E4EB64DB
+	for <linux-block@archiver.kernel.org>; Mon, 19 Jun 2023 01:18:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbjFRX4t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Jun 2023 19:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55630 "EHLO
+        id S229602AbjFSBSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Jun 2023 21:18:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjFRX4s (ORCPT
+        with ESMTP id S229587AbjFSBSE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Jun 2023 19:56:48 -0400
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F301FDB
-        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:56:45 -0700 (PDT)
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-77de67139ccso153775839f.0
-        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 16:56:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687132605; x=1689724605;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DhbQ/9Lw/d7VRHRatcO6ogwl+kSlam871Nks56VmkhQ=;
-        b=HKenFjNgkuMs+fFtU9hz/QdHY5Pj6fk3sU0XrbjdPZWV8uYKAAHoS8WlCejQaupf8K
-         GNOjEIrK3iwSNHmmBb3dLKDn5JOl7RhaBfsniqE8lXkL+AG3DsZcVSSwweywV0a64cCI
-         TSMA58BX7zIIYc97q4520lbtUClTgh8XRhBnY3fU1MqLP7c8GGnv6fuH8JpSeb4B/mY3
-         q/kIGqzbmNhoKgeKy9KJnJP8/ywqsdjhGJIRIpuo2T1ieLp/vhYbLH7c7U3P8E3hi7U5
-         7rE8a34PC/syBBUqCjgD8scqsRIgqwjkHLRd9yr2ZBrOrjjxgpKqwTrpJz+EeJAKek9E
-         5Eig==
-X-Gm-Message-State: AC+VfDxkd3Kp5QXsupg9H+rBZlJMezDyIcz/r2idoEG5zmDT0/PN/al/
-        uc+asEu1s96yV2cF3Klha+8HMZ2mGY8=
-X-Google-Smtp-Source: ACHHUZ5glNoj0inoIBoMlcuMRLI+ce5l9ywrkbS+kH1FvhON//wJv2pHft+oD2cwcLR7myTGexMC7w==
-X-Received: by 2002:a92:ce47:0:b0:342:6935:68b2 with SMTP id a7-20020a92ce47000000b00342693568b2mr1429240ilr.25.1687132605014;
-        Sun, 18 Jun 2023 16:56:45 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id h33-20020a635321000000b005302682a668sm17196636pgb.17.2023.06.18.16.56.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Jun 2023 16:56:44 -0700 (PDT)
-Message-ID: <6b066ab5-7806-5a23-72a5-073153259116@acm.org>
-Date:   Sun, 18 Jun 2023 16:56:43 -0700
+        Sun, 18 Jun 2023 21:18:04 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6FB01B6
+        for <linux-block@vger.kernel.org>; Sun, 18 Jun 2023 18:18:00 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20230619011756epoutp024146b4e93887901e3822d3b64c95b028~p6piqdKsh0957109571epoutp02a
+        for <linux-block@vger.kernel.org>; Mon, 19 Jun 2023 01:17:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20230619011756epoutp024146b4e93887901e3822d3b64c95b028~p6piqdKsh0957109571epoutp02a
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687137476;
+        bh=OleBLvtikVcBHuH8IDNEgE039JVPKNisZ9aLSJ3hOFY=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=uUWjEbNOYrZBVsKR6SvsyRHr+Tzm+SKq6OcbDSQsPwOGN9VbOALLdOVioWInjHwuQ
+         G9tjqiDh0CGLklFvYQs1rB+TKHWbLMTxd9lPbERwvoklQnOVqHx41kBXCIpu4atd8H
+         vgCE+QJ8n3HslVaIpRV5UW/9vHGRWo/69f6HnDgM=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20230619011756epcas5p49e7808cd190e4707f5c73efab94995bb~p6ph6JEVs1902519025epcas5p4a;
+        Mon, 19 Jun 2023 01:17:56 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.174]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4QksMQ2zqcz4x9Q0; Mon, 19 Jun
+        2023 01:17:54 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        D5.9D.58203.2CCAF846; Mon, 19 Jun 2023 10:17:54 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20230619011354epcas5p32c094e0c9bcd1ec2184c66a5f8be3268~p6mAmrEJA0421404214epcas5p3L;
+        Mon, 19 Jun 2023 01:13:54 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230619011354epsmtrp22f0aa82bf7f77d011a0707e0336d55d1~p6mAl07Yn1345013450epsmtrp2d;
+        Mon, 19 Jun 2023 01:13:54 +0000 (GMT)
+X-AuditID: b6c32a4b-c55fd7000001e35b-8e-648facc291aa
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        C8.81.64355.1DBAF846; Mon, 19 Jun 2023 10:13:54 +0900 (KST)
+Received: from ubuntu.. (unknown [109.105.118.54]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20230619011352epsmtip1ec693ec61f4bed0d0c8c3f920ba79937~p6l-P13IR2286522865epsmtip1P;
+        Mon, 19 Jun 2023 01:13:52 +0000 (GMT)
+From:   Min Li <min15.li@samsung.com>
+To:     axboe@kernel.dk, willy@infradead.org, hch@lst.de,
+        dlemoal@kernel.org, gregkh@linuxfoundation.org, wsa@kernel.org,
+        vkoul@kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Min Li <min15.li@samsung.com>
+Subject: [PATCH v4] block: add capacity validation in bdev_add_partition()
+Date:   Mon, 19 Jun 2023 09:12:14 +0000
+Message-Id: <20230619091214.31615-1-min15.li@samsung.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: LVM kernel lockup scenario during lvcreate
-Content-Language: en-US
-To:     Jaco Kroon <jaco@uls.co.za>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <549daeae-1180-c0d4-915c-f18bcd1c68c3@uls.co.za>
- <58b1c8ae-dd2d-3eeb-f707-3f20513ab9e3@acm.org>
- <102b1994-74ff-c099-292c-f5429ce768c3@uls.co.za>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <102b1994-74ff-c099-292c-f5429ce768c3@uls.co.za>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrFJsWRmVeSWpSXmKPExsWy7bCmhu6hNf0pBi8miVmsvtvPZvFgv71F
+        8+L1bBY3jr9jtpj7+hKLxcrVR5ks9t7Stri8aw6bxfJVHUwWZyd8YLXYeecEs8XvH0Cxu/vn
+        MlrcWHeVxYHPY/MKLY/LZ0s9Nq3qZPPYP3cNu8fumw1sHn1bVjF6fN4kF8AelW2TkZqYklqk
+        kJqXnJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ibaqvk4hOg65aZA3SvkkJZYk4pUCggsbhY
+        Sd/Opii/tCRVISO/uMRWKbUgJafApECvODG3uDQvXS8vtcTK0MDAyBSoMCE748Wbj4wFT7kr
+        bl/2b2DcxtnFyMkhIWAi8fd9L0sXIxeHkMBuRonGl0cYIZxPjBL/VmxkgXNWv5nFAtPy6dJM
+        NojETkaJvtnt7BDOc0aJ13fPMncxcnCwCShLbFvqA9IgItDBKLHlKNg+ZoE4iUtdnewgtrCA
+        l0Tnvi9sIDaLgKrEzmWHmUFsXgFLiV8n5kAtk5fYf/AsVFxQ4uTMJywQc+QlmrfOZgbZKyHQ
+        yiEx6+NeNogGF4nr+79DNQtLvDq+hR3ClpL4/A6khgPILpZ4+SMMIlwjsfvbbSYI21pi2/p1
+        TCAlzAKaEut36UOEZSWmnlrHBLGWT6L39xOocl6JHfNgbCWJvxfOMULYEhKL9z9khbA9JE6/
+        PABWIyQQKzH1cA/LBEb5WUi+mYXkm1kImxcwMq9ilEwtKM5NTy02LTDOSy2HR2tyfu4mRnCi
+        1fLewfjowQe9Q4xMHIyHGCU4mJVEeIP29qUI8aYkVlalFuXHF5XmpBYfYjQFBvFEZinR5Hxg
+        qs8riTc0sTQwMTMzM7E0NjNUEue9eL03RUggPbEkNTs1tSC1CKaPiYNTqoFp/r6Me58Mn2za
+        fme/lu/+d4Kfox/k8XNoty03tN+nfW+T5kdVj20ykccuB1/myrMV9xJOOn101ZU99mw9WjsX
+        zPT1Or7UcPHPb3WzuBmO1/kxX7GrXXfqSd6BftFDRe9tVuzKjF1mcmYOTz6/7sHFH+RORLlv
+        SNm1LLCivuf841Itj5tNcq/uvjKVqFrwc9JVBe7X675JHf48+YV7JLNUcduedn+9P7PNGvy2
+        /D/05qNEmdr735cD5bfOd3Evnd4V925ZQnyVPG9CAs8D+aj1Ju/FNIqN16x9G9zxaSnn603H
+        566cevTOsr/ffrza9rR8umP1RM+Pf5ZwbXR1PxkrsMu/rqYtSCk2Ucw8gCntmRJLcUaioRZz
+        UXEiACYdgX49BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrELMWRmVeSWpSXmKPExsWy7bCSnO6l1f0pBtdfM1qsvtvPZvFgv71F
+        8+L1bBY3jr9jtpj7+hKLxcrVR5ks9t7Stri8aw6bxfJVHUwWZyd8YLXYeecEs8XvH0Cxu/vn
+        MlrcWHeVxYHPY/MKLY/LZ0s9Nq3qZPPYP3cNu8fumw1sHn1bVjF6fN4kF8AexWWTkpqTWZZa
+        pG+XwJXx4s1HxoKn3BW3L/s3MG7j7GLk5JAQMJH4dGkmG4gtJLCdUeLw5xqIuITE+Xm/2CBs
+        YYmV/56zdzFyAdU8ZZTY1bCVsYuRg4NNQFli21IfkLiIwCRGifsXXrOCNDALJEh0/DjEDmIL
+        C3hJdO77AjaIRUBVYueyw8wgNq+ApcSvE3NYIBbIS+w/eBYqLihxcuYTFog58hLNW2czT2Dk
+        m4UkNQtJagEj0ypG0dSC4tz03OQCQ73ixNzi0rx0veT83E2M4GDXCtrBuGz9X71DjEwcjIcY
+        JTiYlUR4g/b2pQjxpiRWVqUW5ccXleakFh9ilOZgURLnVc7pTBESSE8sSc1OTS1ILYLJMnFw
+        SjUwWamL8195qLNFyv/c4zu6ZnFhppPeWXbPDuGzYd2yetWB55mRJYWz/4iItGouEeVd23hO
+        Y99/A584YeOkg6e0am89uf3qiojo3mUL1X3s3vOGH0phyWi1+H1+DWPP/wnH1rj2zivTm3qK
+        26TNPXfSys0BfusP+EYmvjnxSHvKXEtex8/B3clvp2fclZgmvrVY4re5sEO18sxfxddXr9J8
+        +P9TmMnEgn5rsb0HsreX2cckPDtup7jtaW2Suv0h174ct30WPu9n7i1v1P16yGBa/p1Cx2+3
+        7s9TiZBw8GEJuMX3K2va6l65zxaL1kelTwmetp49wVRP87Gs8wRBpRVFLOse1WXvszWQ9XM5
+        cmuGEktxRqKhFnNRcSIAMiTDTeUCAAA=
+X-CMS-MailID: 20230619011354epcas5p32c094e0c9bcd1ec2184c66a5f8be3268
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230619011354epcas5p32c094e0c9bcd1ec2184c66a5f8be3268
+References: <CGME20230619011354epcas5p32c094e0c9bcd1ec2184c66a5f8be3268@epcas5p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/18/23 12:34, Jaco Kroon wrote:
-> On 2023/06/12 20:40, Bart Van Assche wrote:
->> tar -czf- -C /sys/kernel/debug/block . >block.tgz
->>
-> Right on queue ... please find attached.  Not seeing any content in any 
-> of the files from the tar czf so I doubt there is much use here ... 
-> perhaps you might be able to explain why all of these files under 
-> /sys/kernel/debug/block would be empty?
+In the function bdev_add_partition(),there is no check that the start
+and end sectors exceed the size of the disk before calling add_partition.
+When we call the block's ioctl interface directly to add a partition,
+and the capacity of the disk is set to 0 by driver,the command will
+continue to execute.
 
-Apparently the tar command is incompatible with debugfs :-( I should 
-have tested the command before I sent it to you.
+Signed-off-by: Min Li <min15.li@samsung.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Does this work better?
+---
+Changes from v1:
 
-(cd /sys/kernel/debug/block/ && grep -r . .) | gzip -9 > block.gz
+- Check for overflows of the start + length value
+- Place the capacity check at the beginning of the function.
 
-Thanks,
+Changes from v2:
 
-Bart.
+- Place the assignment on the first line and merge the two lines into one
+
+Changes from v3:
+
+- Modify the singed name
+---
+ block/partitions/core.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 49e0496ff23c..b511f88bf558 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -436,10 +436,21 @@ static bool partition_overlaps(struct gendisk *disk, sector_t start,
+ int bdev_add_partition(struct gendisk *disk, int partno, sector_t start,
+ 		sector_t length)
+ {
++	sector_t capacity = get_capacity(disk), end;
+ 	struct block_device *part;
+ 	int ret;
+ 
+ 	mutex_lock(&disk->open_mutex);
++	if (check_add_overflow(start, length, &end)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	if (start >= capacity || end > capacity) {
++		ret = -EINVAL;
++		goto out;
++	}
++
+ 	if (!disk_live(disk)) {
+ 		ret = -ENXIO;
+ 		goto out;
+-- 
+2.34.1
+
